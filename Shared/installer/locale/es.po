@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-01-18 20:19\n"
-"PO-Revision-Date: 2015-02-25 15:44+0000\n"
-"Last-Translator: PerikiyoXD <pedroluis200198@hotmail.es>\n"
+"PO-Revision-Date: 2016-12-29 16:49+0000\n"
+"Last-Translator: Renkon <fmbesteiro@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -15,7 +15,7 @@ msgstr ""
 "X-Generator: Pootle 2.5.0-rc1\n"
 "Translators: Castillo; Francisco \"WolfPire\" Arias; HAZJ; Renkon; OGF; "
 "shaneke; Tomas; PerikiyoXD; ccw; ciber; JostVice\n"
-"X-POOTLE-MTIME: 1424879057.0\n"
+"X-POOTLE-MTIME: 1483030146.0\n"
 
 #. WELCOME_TEXT
 #: ../Shared/installer/nightly.nsi:183
@@ -514,19 +514,19 @@ msgstr "Tipo de instalación: Actualización"
 #. NETTEST_TITLE1
 #: ../Shared/installer/nightly.nsi:2407
 msgid "Online update"
-msgstr ""
+msgstr "Actualización en línea"
 
 #. NETTEST_TITLE2
 #: ../Shared/installer/nightly.nsi:2408
 msgid "Checking for update information"
-msgstr ""
+msgstr "Comprobando información de actualizaciones"
 
 #. NETTEST_STATUS1
 #: ../Shared/installer/nightly.nsi:2409
 msgid "Checking for installer update information..."
-msgstr ""
+msgstr "Comprobando información de actualizaciones del instalador..."
 
 #. NETTEST_STATUS2
 #: ../Shared/installer/nightly.nsi:2410
 msgid "Please ensure your firewall is not blocking"
-msgstr ""
+msgstr "Por favor asegura que tu cortafuegos no esté bloqueando"

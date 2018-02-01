@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-01-18 20:10+0000\n"
-"PO-Revision-Date: 2016-07-22 04:04+0000\n"
-"Last-Translator: RaceXtreme <crissonicx2@gmail.com>\n"
+"PO-Revision-Date: 2018-02-01 11:25+0000\n"
+"Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -16,9 +16,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: RaceXtreme; LooooP; DNL291; Cadu12; Zezin; Banex; neves768; "
-"gustavorn; Davidhm; ccw; Dan \"Talidan\" Chowdhury\n"
-"X-POOTLE-MTIME: 1469160257.0\n"
+"Translators: RaceXtreme; LooooP; DNL291; Zezin; Cadu12; Cristiano \"Banex\" "
+"Teixeira; ccw; neves768; Davidhm; gustavorn; Talidan\n"
+"X-POOTLE-MTIME: 1517484316.0\n"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:36
 msgid "***[ COMMAND HELP ]***\n"
@@ -318,8 +318,8 @@ msgstr "Sim"
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr ""
-"O MTA:SA não pode continuar a instalação porque o disco %s não tem espaço "
-"suficiente."
+"O MTA:SA não pôde continuar com a instalação porque o disco %s não possui "
+"espaço suficiente."
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:773
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\shared_logic\Utils.cpp:152
@@ -374,7 +374,7 @@ msgstr "mostra o seu serial"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1394
 msgid "connects to a server (host port nick pass)"
-msgstr "conecta a um servidor (host porta nick senha)"
+msgstr "conecta a um servidor (IP porta nick senha)"
 
 # No jogo, abram o console (F8) e digite help. Lá estão esta e outras traduções do tipo.
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1395
@@ -752,8 +752,8 @@ msgid ""
 msgstr ""
 "PARA SE CONECTAR RAPIDAMENTE:\n"
 "\n"
-"Escreva o endereço e a porta na barra de endereço ao lado.\n"
-"Ou selecione um servidor na aba Recentes e clique em Conectar"
+"Digite o endereço e a porta na barra de endereço.\n"
+"Ou selecione um servidor na aba Recentes e clique em 'Conectar'"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:214
 msgid "HELP"
@@ -779,7 +779,7 @@ msgstr "Conectar"
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:227
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:273
 msgid "Server information"
-msgstr "Informação do servidor"
+msgstr "Informações do servidor"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:230
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:274
@@ -896,7 +896,7 @@ msgstr "Informação"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1326
 msgid "You have to select a server to connect to."
-msgstr "Você tem que selecionar um servidor para se conectar."
+msgstr "Você deve selecionar um servidor para se conectar."
 
 #. Create queue window
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:32
@@ -915,7 +915,7 @@ msgstr "Nome:"
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:46
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:71
 msgid "Server Address:"
-msgstr "IP:"
+msgstr "IP do servidor:"
 
 #. Gamemode
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:47
@@ -971,7 +971,7 @@ msgstr "Entrar no servidor quando um jogador desconectar."
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:313
 msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "POR FAVOR COLOQUE A SENHA"
+msgstr "POR FAVOR DIGITE A SENHA DO SERVIDOR"
 
 #. The server has timed out
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:405
@@ -1024,7 +1024,7 @@ msgstr "A lista de servidores não pôde ser obtida."
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:280
 msgid "(Backup server list)"
-msgstr "(Fazendo um backup da lista dos servidores)"
+msgstr "(Fazendo um backup da lista de servidores)"
 
 # Possivelmente o MTA usa isto para se comunicar à porta LAN do computador por meio de um código UDP. Eu teria que achar um livro sobre redes de computadores para obter o termo certo em português... ;/
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:330
@@ -2102,7 +2102,7 @@ msgstr "Nenhuma atualização disponível"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1881
 msgid "DOWNLOADING"
-msgstr "FAZENDO DOWNLOAD"
+msgstr "BAIXANDO"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1882
 msgid "waiting..."
@@ -2219,7 +2219,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Esperando por resposta  -  %-3d"
+"Aguardando resposta  -  %-3d"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -3032,7 +3032,7 @@ msgstr "Iniciando servidor local ..."
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1020
 #, c-format
 msgid "You were kicked from the game ( %s )"
-msgstr "Iniciando servidor local ..."
+msgstr ""
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1088
 msgid "Connecting to local server..."

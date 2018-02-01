@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-01-18 20:10+0000\n"
-"PO-Revision-Date: 2015-02-14 23:27+0000\n"
-"Last-Translator: ccw <ccw808@googlemail.com>\n"
+"PO-Revision-Date: 2017-07-26 20:22+0000\n"
+"Last-Translator: Francisco <wolfpire1337@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -16,12 +16,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: Francisco \"WolfPire\" Arias; ccw; otoutou\n"
-"X-POOTLE-MTIME: 1423956451.0\n"
+"Translators: Francisco \"WolfPire\" Arias; otoutou; ccw\n"
+"X-POOTLE-MTIME: 1501100558.0\n"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:36
 msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ コマンド ヘルプ ] ***\n"
+msgstr "***[ コマンド ヘルプ ]***\n"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:190
 #, c-format
@@ -35,33 +35,33 @@ msgstr "接続構文：'connect <host> <port> [<nick> <pass>]'"
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:288
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:339
 msgid "connect: Bad port number"
-msgstr "接続: 不正ポート番号"
+msgstr "接続: 無効なポート番号"
 
 # %s:%u
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:304
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:354
 #, c-format
 msgid "connect: Connecting to %s:%u..."
-msgstr "接続: %s:%u に接続しています。"
+msgstr "接続: %s:%u に接続している..."
 
 # %s:%u
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:308
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:358
 #, c-format
 msgid "connect: could not connect to %s:%u!"
-msgstr "接続: %s:%u に接続できませんでした！"
+msgstr "接続: %s:%u と接続できませんでした！"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:313
 msgid "connect: Failed to unload current mod"
-msgstr "接続：MODのダウンロードに失敗しました。"
+msgstr "接続：MODの消去することができませんでした"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:392
 msgid "Bound all controls from GTA"
-msgstr "全てのコントローラ割り当てはGTAからコピーされました。"
+msgstr "全てのバインドは GTAから コピーされました。"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:406
 msgid "Saved configuration file"
-msgstr "設定ファイルを保存しました"
+msgstr "保存された設定ファイル"
 
 #. Print it
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:466
@@ -186,11 +186,11 @@ msgstr "検証コードが不足しています"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:84
 msgid "Connecting failed. Invalid nick provided!"
-msgstr "接続に失敗しました。無効なニックネームです！"
+msgstr "接続に失敗しました。無効なニックネーム!"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:111
 msgid "Connecting failed. Invalid host provided!"
-msgstr "接続に失敗しました。無効なホストです！"
+msgstr "接続に失敗しました。無効なホストです!"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:127
 #, c-format
@@ -207,7 +207,7 @@ msgstr "%s:%uに接続中。。。"
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:149
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:579
 msgid "CONNECTING"
-msgstr "接続"
+msgstr "接続中"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:266
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1178
@@ -223,17 +223,17 @@ msgstr "切断：不明なプロトコルエラー"
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:286
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1226
 msgid "Disconnected: disconnected remotely"
-msgstr "切断：リモートから接続切断しました"
+msgstr "切断：リモートで切断しました"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:289
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1229
 msgid "Disconnected: connection lost remotely"
-msgstr "切断： リモートへの接続が失われました。"
+msgstr "切断： リモートで接続が失われました"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:292
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1232
 msgid "Disconnected: you are banned from this server"
-msgstr "切断： あなたはこのサーバーからBANされました"
+msgstr "切断： あなたはこのサーバーから禁止されました"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:298
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1238
@@ -248,7 +248,7 @@ msgstr "切断：サーバーとの接続が失われました"
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:307
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1247
 msgid "Disconnected: connection was refused"
-msgstr "切断: 接続が断られました。"
+msgstr "切断: 接続が拒否されました"
 
 #. Failed loading the mod
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:406
@@ -262,7 +262,7 @@ msgstr "不正なサーバーレスポンス (2)"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:424
 msgid "Bad server response (1)"
-msgstr "不正なサーバーレスポンス (1)"
+msgstr "不正なサーバー返答でした (1)"
 
 #. Create window
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConsole.cpp:423
@@ -368,7 +368,7 @@ msgstr "すべての割り当てを表示"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1385
 msgid "shows your serial"
-msgstr "シリアルを表示する"
+msgstr "シリアル番号を表示する"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1394
 msgid "connects to a server (host port nick pass)"
@@ -424,7 +424,7 @@ msgstr "メモリデータを表示"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1410
 msgid "shows the frame timing graph"
-msgstr "FPSグラフを表示"
+msgstr "FPSグラフを表示する"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.h:55
 #, fuzzy
@@ -567,19 +567,19 @@ msgstr "歩く"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:204
 msgid "Vehicle fire"
-msgstr "車両兵器を撃つ"
+msgstr "運転席で攻撃する"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:205
 msgid "Vehicle secondary fire"
-msgstr "二番目の車両兵器を撃つ"
+msgstr "助手席で攻撃する"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:206
 msgid "Vehicle left"
-msgstr "車両左"
+msgstr "車両の左"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:207
 msgid "Vehicle right"
-msgstr "車両右"
+msgstr "車両の右"
 
 #. 20
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CKeyBinds.cpp:208
@@ -682,7 +682,7 @@ msgid ""
 "\n"
 "Are you sure you want to disconnect?"
 msgstr ""
-"サーバーから切断します。\n"
+"サーバーから切断されることになります。\n"
 "\n"
 "本当にサーバーから切断しますか。"
 
@@ -779,17 +779,17 @@ msgstr "サーバー情報"
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:230
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:274
 msgid "Search servers"
-msgstr "サーバ検索"
+msgstr "サーバを検索"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:231
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:275
 msgid "Search players"
-msgstr "プレイヤー検索"
+msgstr "プレイヤーを検索する"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:232
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:276
 msgid "Start search"
-msgstr "検索の開始"
+msgstr "検索開始"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:314
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1643
@@ -800,7 +800,7 @@ msgstr "プレイヤー検索。。。"
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:426
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:1641
 msgid "Search servers..."
-msgstr "サーバー検索。。。"
+msgstr "サーバーを検索する…"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:457
 msgid "Name"
@@ -848,7 +848,7 @@ msgstr "オフライン"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:533
 msgid "Other Versions"
-msgstr "別のバージョン"
+msgstr "他のバージョン"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerBrowser.cpp:554
 msgid "Back"
@@ -897,7 +897,7 @@ msgstr "サーバーを選んでください。"
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:32
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:305
 msgid "SERVER IS FULL"
-msgstr "サーバーはいっぱいです"
+msgstr "サーバーが満ちている"
 
 #. Start position
 #. Server Name
@@ -961,11 +961,11 @@ msgstr "サーバーのパスワードを入力してください:"
 #. TRANSLATORS:  If you need more room, there is space for one extra line using a newline (\n).
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:182
 msgid "Join the server as soon as a player slot is available."
-msgstr "スペースが空いたら、すぐ参加する。"
+msgstr "スペースが空いたら、すぐに参加する。"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:313
 msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "サーバーのパスワードを入れてください"
+msgstr "パスワードを入れてください"
 
 #. The server has timed out
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerInfo.cpp:405
@@ -988,7 +988,7 @@ msgstr[0] "プレイヤープレイヤー"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:155
 msgid "on"
-msgstr "能動"
+msgstr "に"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:158
 msgid "server"
@@ -1054,11 +1054,11 @@ msgstr "インターフェース"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:131
 msgid "Web Browser"
-msgstr ""
+msgstr "ウェブブラウザー"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:132
 msgid "Advanced"
-msgstr "高度"
+msgstr "上級"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:133
 msgid "Community"
@@ -1213,11 +1213,11 @@ msgstr "サーバーブラウザを自動リフレッシュ"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:440
 msgid "Allow screen upload"
-msgstr "スクリーンショットを許可する"
+msgstr "スクリーンショットを有効する"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:445
 msgid "Use customized GTA:SA files"
-msgstr "カスタマイズGTA:SAファイルを利用"
+msgstr "カスタムGTA:SAファイルを利用"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:450
 msgid "Map rendering options"
@@ -1266,19 +1266,19 @@ msgstr "一般的な設定"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:569
 msgid "Mute Radio sounds when minimized"
-msgstr "最小化の時はラジオの音をミュートする"
+msgstr "ウインドウを隠す際、ラジオの音をミュートする"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:574
 msgid "Mute SFX sounds when minimized"
-msgstr "最小化の時はSFXの音をミュートする"
+msgstr "ウインドウを隠す際、SFXの音をミュートする"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:579
 msgid "Mute MTA sounds when minimized"
-msgstr "最小化の時はMTAの音をミュートする"
+msgstr "ウインドウを隠す際、MTAの音をミュートする"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:584
 msgid "Mute Voice sounds when minimized"
-msgstr "最小化の時は声の音をミュートする"
+msgstr "ウインドウを隠す際、声の音をミュートする"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:591
 msgid "Radio Equalizer"
@@ -1319,7 +1319,7 @@ msgstr "解像度:"
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:637
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:694
 msgid "FOV:"
-msgstr ""
+msgstr "FOV："
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:638
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:710
@@ -1458,7 +1458,7 @@ msgstr "HUDアスペクト比"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:824
 msgid "Volumetric Shadows"
-msgstr "ボリュームシャドウ"
+msgstr "体積影"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:828
 msgid "Grass effect"
@@ -1568,19 +1568,19 @@ msgstr "書いていない時に背景を隠す"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1140
 msgid "Nickname completion using the \"Tab\" key"
-msgstr ""
+msgstr "「タッブ」キーでニック完成する"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1145
 msgid "Allow server to flash the window"
-msgstr ""
+msgstr "サーバーをウィンドウフラッシュするのを有効する"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1160
 msgid "Enable remote websites"
-msgstr ""
+msgstr "リモートウェブサイトを有効する"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1165
 msgid "Enable Javascript on remote websites"
-msgstr ""
+msgstr "リモートサイトにJavascriptを有効する"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1170
 msgid "Enable plugins (like Flash, Silverlight; Java is disabled by default)"
@@ -1588,36 +1588,36 @@ msgstr ""
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1175
 msgid "Custom blacklist"
-msgstr ""
+msgstr "カスタムブラックリスト"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1185
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1213
 msgid "Enter a domain e.g. google.com"
-msgstr ""
+msgstr "ドメインを入力してください（例：google.com）"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1187
 msgid "Block"
-msgstr ""
+msgstr "ブロック"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1195
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1223
 msgid "Domain"
-msgstr ""
+msgstr "ドメイン"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1197
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1225
 msgid "Remove domain"
-msgstr ""
+msgstr "ドメインを消す"
 
 #. Reset vecTemp
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1203
 msgid "Custom whitelist"
-msgstr ""
+msgstr "カスタムホワイトリスト"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1215
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CWebsiteRequests.cpp:48
 msgid "Allow"
-msgstr ""
+msgstr "有効"
 
 #. Misc section label
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1238
@@ -1650,14 +1650,14 @@ msgstr "単一接続:"
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1302
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4123
 msgid "Packet tag:"
-msgstr ""
+msgstr "パケットタッグ："
 
 #. Progress animation
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1249
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1315
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4125
 msgid "Progress animation:"
-msgstr ""
+msgstr "アニメーション進歩："
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1251
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4115
@@ -1688,7 +1688,7 @@ msgstr "ビルドタイプをアップデートする:"
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1255
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1427
 msgid "Install important updates:"
-msgstr ""
+msgstr "重要なアップデートをインストール："
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1269
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1297
@@ -1777,10 +1777,9 @@ msgstr "再起動が必要です"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1637
 msgid "Some settings will be changed when you disconnect the current server"
-msgstr ""
+msgstr "サーバーとの接続を切ってから、ある設定が変わる"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1638
-#, fuzzy
 msgid ""
 "\n"
 "\n"
@@ -1788,11 +1787,11 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"今すぐ再起動しますか。"
+"今、切断しますか？"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1641
 msgid "DISCONNECT REQUIRED"
-msgstr ""
+msgstr "切断必要"
 
 #. Update the joystick name
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1922
@@ -1868,9 +1867,8 @@ msgid "Transparency:"
 msgstr "透明:"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3665
-#, fuzzy
 msgid "Please disconnect before changing language"
-msgstr "スキンを変える前に、切断してください"
+msgstr "言語を変更する前に、切断してください"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3694
 msgid "Please disconnect before changing skin"
@@ -1882,13 +1880,13 @@ msgid ""
 "\n"
 "Are you sure you want to enable them?"
 msgstr ""
-"ボリュームシャドウはFPS低下を招くかもしれません。\n"
+"流量影がOS速度を落とすかもしれません。\n"
 "\n"
-"本当に有効にしますか。"
+"有効にしますか。"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3923
 msgid "PERFORMANCE WARNING"
-msgstr "パフォーマンス警告！"
+msgstr "リモートウェブサイトを有効する"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3942
 msgid ""
@@ -1956,11 +1954,11 @@ msgstr "ダウンロード中に単一接続にスイッチします。"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4123
 msgid "Tag network packets to help ISPs identify MTA traffic."
-msgstr ""
+msgstr "ISPがMTAの交通を確認するため、パケットをタッグしてください。"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4125
 msgid "Spinning circle animation at the bottom of the screen"
-msgstr ""
+msgstr "画面の底に回転するサークル"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4127
 msgid "Select default always. (This setting is not saved)"
@@ -1981,7 +1979,7 @@ msgstr "バグレポートが可能な人以外、デフォルトを選んでく
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4133
 msgid "Select default to automatically install important updates."
-msgstr ""
+msgstr "重要なアップデートをインストールするように、ディフォルトを選びください。"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:4135
 msgid "16-bit color:"
@@ -2068,7 +2066,7 @@ msgstr "ダウンロード中"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1882
 msgid "waiting..."
-msgstr "待機中。。。"
+msgstr "待機中..."
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CVersionUpdater.cpp:1899
 msgid "MANDATORY UPDATE"
@@ -2183,24 +2181,24 @@ msgstr ""
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CWebsiteRequests.cpp:19
 msgid "Website requests"
-msgstr ""
+msgstr "ウェッブサイトリクエスト"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CWebsiteRequests.cpp:26
 msgid ""
 "The server requests the following websites in order to load them (later):"
-msgstr ""
+msgstr "後にロードするため、サーバーは次のウェッブサイトをリクエストしています："
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CWebsiteRequests.cpp:31
 msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr ""
+msgstr "盗まらないように、個人情報を絶対書かないでください"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CWebsiteRequests.cpp:43
 msgid "Remember decision"
-msgstr ""
+msgstr "決を保存"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CWebsiteRequests.cpp:54
 msgid "Deny"
-msgstr ""
+msgstr "否定"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\game_sa\CSettingsSA.cpp:639
 msgid "Can't find valid screen resolution."
@@ -2489,7 +2487,7 @@ msgstr "完了です!"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Install.cpp:95
 msgid "Do you want to terminate the MTA Server and continue updating?"
-msgstr ""
+msgstr "MTAサーバーを停止して、アップデートしますか？"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:223
 msgid ""
@@ -2584,6 +2582,9 @@ msgid ""
 "\n"
 "Do you want to change the following setting?"
 msgstr ""
+"MTA:SAを実行するには問題がありまか？\n"
+"\n"
+"次の設定に変更したいですか？"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:385
 msgid ""
@@ -2591,6 +2592,9 @@ msgid ""
 "\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr ""
+"MTA：SAを実行するには問題ありますか？\n"
+"\n"
+"次のソフトを無効してみてください："
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:415
 msgid ""
@@ -2734,6 +2738,9 @@ msgid ""
 "\n"
 "Please restart your PC.\n"
 msgstr ""
+"MTA:SAは「セーフモード」で実行できません。\n"
+"\n"
+"パソコンを再起動してください。\n"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\MainFunctions.cpp:1002
 #, c-format
@@ -2790,7 +2797,7 @@ msgstr "GTA:SAがモデルを読み込みに失敗しました。"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1828
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr ""
+msgstr "最近「gta3.img」を変更した場合、GTA:SAを再インストールしてください。"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\loader\Utils.cpp:1854
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
@@ -2815,15 +2822,15 @@ msgstr "ゲームから切断する"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:63
 msgid "shows the nametags"
-msgstr "ネームタグを表示"
+msgstr "ネームタグを表示する"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:64
 msgid "shows the chatbox"
-msgstr "チャットボックスを表示"
+msgstr "チャットボックスを表示する"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:65
 msgid "shows the network statistics"
-msgstr "ネットスタティックを表示"
+msgstr "ネット統計を表示する"
 
 #. Key commands (registered as 'mod commands', can be disabled)
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:69
@@ -2836,7 +2843,7 @@ msgstr "他のプレーヤーに送信する"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:71
 msgid "enters a car as passenger"
-msgstr "乗客として車に乗る"
+msgstr "同乗で車に乗る"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\CClient.cpp:72
 msgid "next radio channel"
@@ -2970,7 +2977,7 @@ msgstr "切断：サーバは現在満ちています"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1244
 msgid "Disconnected: invalid password specified"
-msgstr "切断：パスワードは正しくありません。"
+msgstr "接続切断：パスワードは正しくありません。"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1264
 msgid "MTA Client verification failed!"
@@ -3030,7 +3037,7 @@ msgid ""
 "Disconnected: Serial is banned.\n"
 "Reason: %s"
 msgstr ""
-"切断：シリアルがBANされました。\n"
+"切断：シリアルが禁止されました。\n"
 "理由： %s"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:483
@@ -3039,7 +3046,7 @@ msgid ""
 "Disconnected: You are banned.\n"
 "Reason: %s"
 msgstr ""
-"切断： あなたがBANされました。\n"
+"切断： あなたが禁止されました。\n"
 "理由：%s"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:488
@@ -3048,7 +3055,7 @@ msgid ""
 "Disconnected: Account is banned.\n"
 "Reason: %s"
 msgstr ""
-"切断：アカウントがBANされました。\n"
+"切断：アカウントが禁止されました。\n"
 "理由： %s"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:492
@@ -3091,11 +3098,11 @@ msgstr ""
 msgid ""
 "Disconnected: Server is running an older build.\n"
 "Information: %s"
-msgstr "切断： サーバが古いビルドを実行しています。情報： %s"
+msgstr "接続切断： サーバが古いビルドを実行しています。情報： %s"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:514
 msgid "Disconnected: Nick already in use"
-msgstr "切断： ニックネームは今使われています"
+msgstr "接続切断： ニックネームは今使われています"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:517
 msgid "Disconnected: Player Element Could not be created."
@@ -3127,7 +3134,7 @@ msgstr "切断： %s に禁止されました"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:548
 msgid "Disconnected: Server shutdown or restarting"
-msgstr ""
+msgstr "切断：サーバー停止、また再起動"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:571
 msgid "Time Remaining: "
@@ -3154,7 +3161,7 @@ msgstr[0] "%d 分"
 #. Display the error
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CPacketHandler.cpp:587
 msgid "Disconnected"
-msgstr "切断"
+msgstr "切断されました"
 
 #. Throw the error and disconnect
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:134
@@ -3217,7 +3224,7 @@ msgstr "接続エラー"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\Shared\sdk\SharedUtil.Misc.hpp:75
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
-msgstr "Multi Theft Auto は適切にインストールできませんでした、再インストールしてください。"
+msgstr "Multi Theft Auto は正しくインストールできませんでした、再インストールしてください。"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\Shared\sdk\SharedUtil.Misc.hpp:630
 msgid ""

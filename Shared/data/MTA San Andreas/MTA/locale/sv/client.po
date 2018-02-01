@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-01-18 20:10+0000\n"
-"PO-Revision-Date: 2014-07-20 07:00+0000\n"
-"Last-Translator: Anonymous Pootle User\n"
+"PO-Revision-Date: 2017-07-04 19:28+0000\n"
+"Last-Translator: Vovven <vovven86@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
 "Translators: Cheeze; Vovven; SWEMike; Magnus \"magnsuburton\" Burton; ccw\n"
-"X-POOTLE-MTIME: 1405839633.0\n"
+"X-POOTLE-MTIME: 1499196512.0\n"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:36
 msgid "***[ COMMAND HELP ]***\n"
@@ -1781,11 +1781,15 @@ msgid "Some settings will be changed when you disconnect the current server"
 msgstr ""
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1638
+#, fuzzy
 msgid ""
 "\n"
 "\n"
 "Do you want to disconnect now?"
 msgstr ""
+"\n"
+"\n"
+"Vill du starta om nu?"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:1641
 msgid "DISCONNECT REQUIRED"
@@ -1866,8 +1870,9 @@ msgid "Transparency:"
 msgstr "Genomskinlighet:"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3665
+#, fuzzy
 msgid "Please disconnect before changing language"
-msgstr ""
+msgstr "Avbryt anslutningen innan du ändrar skin"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3694
 msgid "Please disconnect before changing skin"

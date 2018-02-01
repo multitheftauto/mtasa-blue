@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-01-18 20:19\n"
-"PO-Revision-Date: 2016-07-22 03:54+0000\n"
-"Last-Translator: RaceXtreme <crissonicx2@gmail.com>\n"
+"PO-Revision-Date: 2017-08-08 05:51+0000\n"
+"Last-Translator: Zezin <netfixmta@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -13,9 +13,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: RaceXtreme; LooooP; DNL291; Cadu12; Zezin; Banex; neves768; "
-"gustavorn; Davidhm; ccw; Dan \"Talidan\" Chowdhury\n"
-"X-POOTLE-MTIME: 1469159690.0\n"
+"Translators: RaceXtreme; LooooP; DNL291; Zezin; Cadu12; Cristiano \"Banex\" "
+"Teixeira; neves768; Davidhm; gustavorn; Talidan; ccw\n"
+"X-POOTLE-MTIME: 1502171474.0\n"
 
 #. WELCOME_TEXT
 #: ../Shared/installer/nightly.nsi:183
@@ -59,8 +59,8 @@ msgid ""
 msgstr ""
 "Selecione a pasta onde Grand Theft Auto: San Andreas foi instalado.$\n"
 " $\n"
-"Você DEVE possuir Grand Theft Auto: San Andreas 1.0 para usar o MTA:SA. "
-"Outras versões não serão suportadas.$\n"
+"Você DEVE ter a versão 1.0 do Grand Theft Auto: San Andreas para usar o "
+"MTA:SA, outras versões não são suportadas.$\n"
 " $\n"
 "Clique em Instalar para iniciar a instalação."
 
@@ -72,7 +72,7 @@ msgstr "Criar um grupo no Meu Iniciar para os aplicativos instalados"
 #. DESC_Section11
 #: ../Shared/installer/nightly.nsi:190
 msgid "Create a Desktop Shortcut for the MTA:SA Client."
-msgstr "Criar um atalho do MTA:SA na Área de Trabalho"
+msgstr "Criar um atalho do MTA:SA na Área de Trabalho."
 
 #. DESC_Section12
 #: ../Shared/installer/nightly.nsi:191
@@ -84,7 +84,7 @@ msgstr ""
 #. DESC_Section13
 #: ../Shared/installer/nightly.nsi:192
 msgid "Add to Windows Games Explorer (if present)."
-msgstr "Adicionar ao Explorador de Jogos do Windows (se disponível)"
+msgstr "Adicionar ao Explorador de Jogos do Windows (se disponível)."
 
 #. DESC_Section1
 #: ../Shared/installer/nightly.nsi:193
@@ -94,7 +94,7 @@ msgstr "Componentes necessários para executar o Multi Theft Auto."
 #. DESC_Section2
 #: ../Shared/installer/nightly.nsi:194
 msgid "The MTA:SA modification, allowing you to play online."
-msgstr "Modificação do MTA:SA, que te permitirá jogar on-line."
+msgstr "A Modificação MTA:SA, que te permitirá jogar on-line."
 
 #. DESC_SectionGroupServer
 #: ../Shared/installer/nightly.nsi:197
@@ -102,18 +102,18 @@ msgid ""
 "The Multi Theft Auto Server. This allows you to host games from your "
 "computer. This requires a fast internet connection."
 msgstr ""
-"O Servidor do Multi Theft Auto. Permite hospedar um jogo a partir de seu "
+"O Servidor do Multi Theft Auto. Ele permite hospedar um jogo a partir do seu "
 "computador. É necessário ter uma boa conexão com a internet."
 
 #. DESC_Section4
 #: ../Shared/installer/nightly.nsi:198
 msgid "The Multi Theft Auto server. This is a required component."
-msgstr "O servidor do Multi Theft Auto. Este é um componente necessário."
+msgstr "O Servidor do Multi Theft Auto. Este é um componente necessário."
 
 #. DESC_Section5
 #: ../Shared/installer/nightly.nsi:199
 msgid "The MTA:SA modification for the server."
-msgstr "Modificação do MTA:SA para o servidor."
+msgstr "A modificação MTA:SA para o servidor."
 
 #. DESC_Section6
 #: ../Shared/installer/nightly.nsi:200
@@ -131,8 +131,8 @@ msgid ""
 "The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps "
 "for use in gamemodes for MTA."
 msgstr ""
-"Editor de Mapas do MTA:SA 1.0. É usado com objetivo de criar seus próprios "
-"mapas para complementar o jogo no MTA."
+"O Editor de Mapas do MTA:SA 1.0. Ele é utilizado para criar seus próprios "
+"mapas para o seu modo de jogo do MTA."
 
 #. DESC_Section9
 #: ../Shared/installer/nightly.nsi:203
@@ -155,7 +155,7 @@ msgstr ""
 #. DESC_SectionGroupClient
 #: ../Shared/installer/nightly.nsi:206
 msgid "The client is the program you run to play on a Multi Theft Auto server"
-msgstr "Programa que lhe permite jogar em um servidor de MTA"
+msgstr "Programa que lhe permite jogar em um servidor de MTA."
 
 #. INST_CLIENTSERVER
 #: ../Shared/installer/nightly.nsi:406
@@ -180,7 +180,7 @@ msgstr "Ícone na Área de Trabalho"
 #. INST_PROTOCOL
 #: ../Shared/installer/nightly.nsi:423
 msgid "Register mtasa:// protocol"
-msgstr "Registro do protocolo mtasa://"
+msgstr "Registrar o protocolo mtasa://"
 
 #. INST_GAMES_EXPLORER
 #: ../Shared/installer/nightly.nsi:424
@@ -229,7 +229,7 @@ msgstr ""
 "Uma versão válida do Grand Theft Auto: San Andreas para Windows não foi "
 "encontrada.$\r$\n"
 "Porém, a instalação continuará mesmo assim.$\r$\n"
-"Caso houver problemas após a instalação, resinstale o GTA:SA."
+"Por favor, reinstale caso houver problemas após a instalação."
 
 # 'Resources' são os Recursos que rodam no servidor.
 #. INST_SEC_CORE_RESOURCES
@@ -326,9 +326,7 @@ msgstr ""
 #. MSGBOX_VC12RED_ERROR1
 #: ../Shared/installer/nightly.nsi:1193
 msgid "Unable to download Microsoft Visual Studio 2013 redistributable"
-msgstr ""
-"Não foi possível realizar o download de Microsoft Visual Studio 2013 "
-"redistributable"
+msgstr "Não foi possível baixar o Microsoft Visual Studio 2013 redistributable"
 
 #. MSGBOX_VC12RED_ERROR2
 #: ../Shared/installer/nightly.nsi:1194
@@ -345,10 +343,9 @@ msgid ""
 "$\n"
 "Please reinstall if there are problems later."
 msgstr ""
-"Não foi possível realizar o download de Microsoft Visual Studio 2013 "
-"redistributable.$\r$\n"
+"Não foi possível baixar o Microsoft Visual Studio 2013 redistributable.$\r$\n"
 "A instalação irá prosseguir.$\r$\n"
-"Reinstale o MTA:SA se houver problemas depois."
+"Por favor, reinstale caso houver problemas depois."
 
 #. MSGBOX_PATCH_FAIL1
 #: ../Shared/installer/nightly.nsi:1244
@@ -356,8 +353,8 @@ msgid ""
 "Unable to download the patch file for your version of Grand Theft Auto: San "
 "Andreas"
 msgstr ""
-"Não foi possível ralizar o download do patch para sua versão do Grand Theft "
-"Auto: San Andreas"
+"Não foi possível baixar o patch para sua versão do Grand Theft Auto: San "
+"Andreas"
 
 #. MSGBOX_PATCH_FAIL2
 #: ../Shared/installer/nightly.nsi:1245
@@ -371,13 +368,13 @@ msgstr ""
 #. UAC_RIGHTS1
 #: ../Shared/installer/nightly.nsi:1286
 msgid "This installer requires admin access, try again"
-msgstr "Este instalador necessita de acesso do administrador. Tente novamente."
+msgstr "Este instalador necessita de acesso do administrador, tente novamente."
 
 #. UAC_RIGHTS_UN
 #: ../Shared/installer/nightly.nsi:1287
 msgid "This uninstaller requires admin access, try again"
 msgstr ""
-"Este desinstalador necessita de acesso do administrador. Tente novamente."
+"Este desinstalador necessita de acesso do administrador, tente novamente."
 
 #. UAC_RIGHTS3
 #: ../Shared/installer/nightly.nsi:1288
@@ -387,7 +384,7 @@ msgstr "O serviço 'Logon' não está em execução, a instalação será aborta
 #. UAC_RIGHTS4
 #: ../Shared/installer/nightly.nsi:1289
 msgid "Unable to elevate"
-msgstr "Não foi possível obter o direto de execução necessário"
+msgstr "Não foi possível obter o direito de execução necessário"
 
 #. INST_MTA_CONFLICT
 #: ../Shared/installer/nightly.nsi:1843

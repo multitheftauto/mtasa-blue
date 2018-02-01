@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-01-18 20:10+0000\n"
-"PO-Revision-Date: 2016-04-03 20:13+0000\n"
+"PO-Revision-Date: 2017-11-21 10:03+0000\n"
 "Last-Translator: Easterdie <easterdie@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: ru\n"
@@ -18,11 +18,11 @@ msgstr ""
 "10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
 "Translators: Easterdie; Александр \"Ethical\" Шилякин; CoolDark; Kenix; "
-"Dr.CrazY; Nexus_; GTA-Multiplayer.com; Stanislav \"Sarrum\" Zverev; SalwadoR; "
-"lil_Toady; Lex128; Gallardo994; Pavel \"MB116\" Andreychenko; Nikita \"Strix\" "
-"Obrekht; MeowCola; ccw; The_Creator; Dan \"Talidan\" Chowdhury; "
-"FranklinRoosevelt; Rocketman\n"
-"X-POOTLE-MTIME: 1459714434.0\n"
+"Dr.CrazY; Nexus_; GTA-Multiplayer.com; Stanislav \"Sarrum\" Zverev; Alexander "
+"\"Lex128\" Romanov; SalwadoR; lil_Toady; Gallardo994; Pavel \"MB116\" "
+"Andreychenko; Nikita \"Strix\" Obrekht; MeowCola; The_Creator; Talidan; "
+"FranklinRoosevelt; Rocketman; ccw\n"
+"X-POOTLE-MTIME: 1511258614.0\n"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:36
 msgid "***[ COMMAND HELP ]***\n"
@@ -189,7 +189,7 @@ msgstr "Отсутствует код подтверждения"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:84
 msgid "Connecting failed. Invalid nick provided!"
-msgstr "Не удалось подключиться. Неверный никнейм!"
+msgstr "Подключение не удалось. Некорректное имя пользователя!"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:111
 msgid "Connecting failed. Invalid host provided!"
@@ -236,7 +236,7 @@ msgstr "Отключение: потеряно удаленное соедине
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:292
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1232
 msgid "Disconnected: you are banned from this server"
-msgstr "Отключено: вы внесены в бан-лист этого сервера"
+msgstr "Отключение: вы забанены на этом сервере"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CConnectManager.cpp:298
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\mods\deathmatch\logic\CClientGame.cpp:1238
@@ -351,7 +351,7 @@ msgstr "эта страница помощи"
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1379
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1380
 msgid "exits the application"
-msgstr "выйти из MTA"
+msgstr "выйти из приложения"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1381
 msgid "shows the version"
@@ -363,7 +363,7 @@ msgstr "показать текущее время"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1383
 msgid "shows the hud"
-msgstr "показать hud"
+msgstr "показать интерфейс игрока"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:1384
 msgid "shows all the binds"

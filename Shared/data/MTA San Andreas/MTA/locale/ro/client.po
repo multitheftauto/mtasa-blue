@@ -426,9 +426,8 @@ msgid "shows the frame timing graph"
 msgstr "arată graficul cu timpii cadrului"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.h:55
-#, fuzzy
 msgid "Copyright (C) 2003 - 2015 Multi Theft Auto"
-msgstr "Copyright (C) 2003 - 2014 Multi Theft Auto"
+msgstr ""
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCredits.cpp:32
 msgid "Programming"
@@ -1874,9 +1873,8 @@ msgid "Transparency:"
 msgstr "Transparență:"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3665
-#, fuzzy
 msgid "Please disconnect before changing language"
-msgstr "Te rugăm să te deconectezi înainte de a schimba tema"
+msgstr ""
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CSettings.cpp:3694
 msgid "Please disconnect before changing skin"

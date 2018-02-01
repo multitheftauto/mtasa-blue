@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-01-18 20:19\n"
-"PO-Revision-Date: 2013-05-22 10:34+0000\n"
-"Last-Translator: Vigo <vigo.krumins@knot.lv>\n"
+"PO-Revision-Date: 2017-07-04 18:48+0000\n"
+"Last-Translator: RPeris <rbiistamais@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: lv\n"
 "MIME-Version: 1.0\n"
@@ -14,9 +14,9 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
 "2);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: Vigo \"VirtualGamingLV\" Krūmiņš; Jānis \"Jesha\" Lanka; ccw; Dan "
-"\"Talidan\" Chowdhury\n"
-"X-POOTLE-MTIME: 1369218840.0\n"
+"Translators: Vigo \"VirtualGamingLV\" Krūmiņš; RPeris \"Biistamais\" Bistamais; "
+"Jānis \"Jesha\" Lanka; ccw; HawK3yLV; Shockinss; Talidan\n"
+"X-POOTLE-MTIME: 1499194080.0\n"
 
 #. WELCOME_TEXT
 #: ../Shared/installer/nightly.nsi:183
@@ -32,12 +32,12 @@ msgstr ""
 "Šī instalācija palīdzēs Jums uzinstalēt vai atjaunināt $(^Name) "
 "${REVISION_TAG}\n"
 "\n"
-"Ieteicams aizvērt visas citas aplikācijas, pirms uzsākāt instalāciju.\n"
+"Ieteicams aizvērt visas citas aplikācijas, pirms uzsākat instalāciju.\n"
 "\n"
-"[Administratora piekļuve var būt pieprasīta priekš Windows Vista un "
-"jaunākiem OS]\n"
+"[Administratora piekļuve var tikt pieprasīta priekš Windows Vista un "
+"jaunākām OS]\n"
 "\n"
-"Spiediet tālāk, lai turpinātu."
+"Spiediet Tālāk, lai turpinātu."
 
 #. HEADER_Text
 #: ../Shared/installer/nightly.nsi:184
@@ -60,15 +60,15 @@ msgid ""
 msgstr ""
 "Lūdzu izvēlieties Grand Theft Auto: San Andreas mapi.$\n"
 "$\n"
-"Jums IR jābūt Grand Theft Auto: San Andreas 1.0 instalētam, lai varētu "
+"Jums IR jābūt uzinstalētam Grand Theft Auto: San Andreas 1.0 lai varētu "
 "izmantot MTA:SA, MTA:SA neatbalsta citas versijas.$\n"
 "$\n"
-"Spiediet instalēt lai uzsāktu instalāciju."
+"Spiediet Instalēt lai uzsāktu instalāciju."
 
 #. DESC_Section10
 #: ../Shared/installer/nightly.nsi:189
 msgid "Create a Start Menu group for installed applications"
-msgstr "Izveidot Izvēlnē sākt grupu priekš instalētās aplikācijas"
+msgstr "Izveidot Start Menu grupu priekš instalētajām aplikācijām"
 
 #. DESC_Section11
 #: ../Shared/installer/nightly.nsi:190
@@ -278,6 +278,10 @@ msgid ""
 "$\n"
 "Run the new installer to upgrade and preserve your settings."
 msgstr ""
+"Attisntelēšana atjauninājuma laikā?$\r$\n"
+"Mēs Jums neiesakam attinstalēt spēli, laikā kad tiek instalēta jaunā MTA:SA "
+"versija.$\r$\n"
+"Startējiet jaunu instalāciju, un saglabājat arī savus iestatijumus."
 
 #. UNINST_DATA_REQUEST
 #: ../Shared/installer/nightly.nsi:1047
@@ -316,12 +320,12 @@ msgstr ""
 #. MSGBOX_VC12RED_ERROR1
 #: ../Shared/installer/nightly.nsi:1193
 msgid "Unable to download Microsoft Visual Studio 2013 redistributable"
-msgstr ""
+msgstr "Neizdevās lejupielādēt Microsoft Visual Studio 2013"
 
 #. MSGBOX_VC12RED_ERROR2
 #: ../Shared/installer/nightly.nsi:1194
 msgid "Unable to install Microsoft Visual Studio 2013 redistributable"
-msgstr ""
+msgstr "Neizdevās instalēt Microsoft Visual Studio 2013"
 
 #. MSGBOX_VC12RED_ERROR3
 #: ../Shared/installer/nightly.nsi:1197
@@ -332,6 +336,9 @@ msgid ""
 "$\n"
 "Please reinstall if there are problems later."
 msgstr ""
+"Neizdevās lejuplādēt Microsoft Visual Studio 2013 redistributable.$\r$\n"
+"Bet tāpat instalācija turpināsies.$\r$\n"
+"Ja būs radušās problēmas, pārinstalējiet MTA:SA."
 
 #. MSGBOX_PATCH_FAIL1
 #: ../Shared/installer/nightly.nsi:1244
@@ -393,6 +400,10 @@ msgid ""
 "Do you want to use the default install directory$\n"
 "$DEFAULT_INSTDIR ?"
 msgstr ""
+"MTA nevar būt instalēts tajā pašā vietā, kur atrodas GTA:SA.$\n"
+"$\n"
+"Vai vēlaties izmantot standarta instalācijas vietu$\n"
+"$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
 #: ../Shared/installer/nightly.nsi:1848
@@ -490,17 +501,17 @@ msgstr "Instalācijas tips:   Atjauninājums"
 #. NETTEST_TITLE1
 #: ../Shared/installer/nightly.nsi:2407
 msgid "Online update"
-msgstr ""
+msgstr "Tiešsaistes atjauninājums"
 
 #. NETTEST_TITLE2
 #: ../Shared/installer/nightly.nsi:2408
 msgid "Checking for update information"
-msgstr ""
+msgstr "Pārbauda atjauninājumu informāciju"
 
 #. NETTEST_STATUS1
 #: ../Shared/installer/nightly.nsi:2409
 msgid "Checking for installer update information..."
-msgstr ""
+msgstr "Pārbauda instalācijas informācijas atjaunošanu"
 
 #. NETTEST_STATUS2
 #: ../Shared/installer/nightly.nsi:2410

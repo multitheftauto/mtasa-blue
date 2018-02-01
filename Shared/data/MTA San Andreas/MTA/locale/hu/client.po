@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-01-18 20:10+0000\n"
-"PO-Revision-Date: 2016-01-31 10:58+0000\n"
-"Last-Translator: NeXuS <admpatrik@gmail.com>\n"
+"PO-Revision-Date: 2017-11-12 19:10+0000\n"
+"Last-Translator: Anonymous Pootle User\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -17,8 +17,8 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
 "Translators: Bence \"Max_Taylor\" Szlobodics; György \"Rozsdi\" Péter; "
-"NitroByte; pa3ck; Lámbó; Bishop_Waltemer; csiguusz; NeXuS; ccw\n"
-"X-POOTLE-MTIME: 1454237883.0\n"
+"NitroByte; pa3ck; Lámbó; csiguusz; Bishop_Waltemer; NeXuS; Hamza; ccw\n"
+"X-POOTLE-MTIME: 1510513818.0\n"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:36
 msgid "***[ COMMAND HELP ]***\n"
@@ -31,7 +31,7 @@ msgstr "* Az idő %d:%02d:%02d"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:280
 msgid "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"
-msgstr "kapcsolódás: Szintaxis: 'connect <hoszt> <port> [<név> <jelszó>]'"
+msgstr "kapcsolódás: Példa: 'connect <hoszt> <port> [<név> <jelszó>]'"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:288
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:339
@@ -273,7 +273,7 @@ msgstr "KONZOL"
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CQuestionBox.cpp:202
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\Shared\sdk\SharedUtil.Misc.hpp:618
 msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Akarsz néhány online tanácsot kapni erről a hibáról?"
+msgstr "Szeretnél néhány online tanácsot kapni erről a hibáról?"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCore.cpp:715
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CMainMenu.cpp:1101
@@ -684,7 +684,7 @@ msgid ""
 msgstr ""
 "Ezzel lefogsz csatlakozni a jelenlegi szerverről.\n"
 "\n"
-"Biztos vagy benne hogy lecsatlakozol?"
+"Biztos vagy benne, hogy lecsatlakozol?"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CMainMenu.cpp:1099
 msgid "DISCONNECT WARNING"

@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-01-18 20:10+0000\n"
-"PO-Revision-Date: 2016-03-09 09:54+0000\n"
-"Last-Translator: Josip <d-josip@hotmail.com>\n"
+"PO-Revision-Date: 2018-02-01 11:18+0000\n"
+"Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: hr\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,7 @@ msgstr ""
 "X-Generator: Pootle 2.5.0-rc1\n"
 "Translators: CapY; Josip \"mega9\" Devedžić; JoeBullet; Blast3r; ccw; "
 "GodFather; Playboy\n"
-"X-POOTLE-MTIME: 1457517286.0\n"
+"X-POOTLE-MTIME: 1517483896.0\n"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CCommandFuncs.cpp:36
 msgid "***[ COMMAND HELP ]***\n"
@@ -983,6 +983,7 @@ msgid "Idle"
 msgstr "Mirovanje"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:154
+#, fuzzy
 msgid "player"
 msgid_plural "players"
 msgstr[0] "igrač"
@@ -994,6 +995,7 @@ msgid "on"
 msgstr "uključen"
 
 #: F:\Users\Source\VS\mtasa-blue-unmodified-merge-targets\mtasa-blue-1.6.0\MTA10\core\CServerList.cpp:158
+#, fuzzy
 msgid "server"
 msgid_plural "servers"
 msgstr[0] "poslužitelj"

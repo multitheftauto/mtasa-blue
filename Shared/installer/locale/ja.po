@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-01-18 20:19\n"
-"PO-Revision-Date: 2016-03-17 18:08+0000\n"
-"Last-Translator: otoutou <kakayuisama@gmail.com>\n"
+"PO-Revision-Date: 2017-07-26 19:55+0000\n"
+"Last-Translator: Francisco <wolfpire1337@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,8 +13,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: Francisco \"WolfPire\" Arias; ccw; otoutou\n"
-"X-POOTLE-MTIME: 1458238096.0\n"
+"Translators: Francisco \"WolfPire\" Arias; otoutou; ccw\n"
+"X-POOTLE-MTIME: 1501098943.0\n"
 
 #. WELCOME_TEXT
 #: ../Shared/installer/nightly.nsi:183
@@ -214,18 +214,18 @@ msgid ""
 "Please reinstall if there are problems later."
 msgstr ""
 "Grand Theft Auto: San Andreasは発見されませんでした。$\r$\n"
-"ところが、インストールは続きます。$\r$\n"
-"問題があったら、あとで再インストールしてください。"
+"ところが、インストールは続きますが、$\r$\n"
+"問題が発生したら、再インストールしてください。"
 
 #. INST_SEC_CORE_RESOURCES
 #: ../Shared/installer/nightly.nsi:456
 msgid "Core Resources"
-msgstr "コア資源"
+msgstr "コアリソース"
 
 #. INST_SEC_OPTIONAL_RESOURCES
 #: ../Shared/installer/nightly.nsi:457
 msgid "Optional Resources"
-msgstr "その他の資源"
+msgstr "オプションりソース"
 
 #. INST_SEC_EDITOR
 #: ../Shared/installer/nightly.nsi:458
@@ -240,7 +240,7 @@ msgstr "開発"
 #. UNINST_SUCCESS
 #: ../Shared/installer/nightly.nsi:1018
 msgid "$(^Name) was successfully removed from your computer."
-msgstr "$(^Name) は成功削除されました。"
+msgstr "$(^Name) は成功に削除されました。"
 
 #. UNINST_FAIL
 #: ../Shared/installer/nightly.nsi:1025
@@ -263,6 +263,9 @@ msgid ""
 "$\n"
 "Run the new installer to upgrade and preserve your settings."
 msgstr ""
+"アップデートする前にアンインストールしますか?$\r$\n"
+"新しいMTA:SAバージョンをインストールする時はアンインストールする必要がありません$\r$\n"
+"インストーラを実行すると自動的にアップデートできます。"
 
 #. UNINST_DATA_REQUEST
 #: ../Shared/installer/nightly.nsi:1047
@@ -297,15 +300,13 @@ msgstr ""
 
 #. MSGBOX_VC12RED_ERROR1
 #: ../Shared/installer/nightly.nsi:1193
-#, fuzzy
 msgid "Unable to download Microsoft Visual Studio 2013 redistributable"
-msgstr "Microsoft Visual Studio 2008 SP1 Redistributableはダウンロードできませんでした。"
+msgstr "Microsoft Visual Studio 2013 再頒布可能パッケージのダウンロードが失敗しました"
 
 #. MSGBOX_VC12RED_ERROR2
 #: ../Shared/installer/nightly.nsi:1194
-#, fuzzy
 msgid "Unable to install Microsoft Visual Studio 2013 redistributable"
-msgstr "Microsoft Visual Studio 2008 SP1 Redistributableはインストールできませんでした。"
+msgstr "Microsoft Visual Studio 2013 再頒布可能パッケージのインストールが失敗しました"
 
 #. MSGBOX_VC12RED_ERROR3
 #: ../Shared/installer/nightly.nsi:1197
@@ -316,6 +317,9 @@ msgid ""
 "$\n"
 "Please reinstall if there are problems later."
 msgstr ""
+"Microsoft Visual Studio 2013 再頒布可能パッケージのダウンロードが失敗しました。$\r$\n"
+"インストールは続きますが$\r$\n"
+"もし問題が発生した場合には,再インストールしてください。"
 
 #. MSGBOX_PATCH_FAIL1
 #: ../Shared/installer/nightly.nsi:1244
@@ -339,17 +343,17 @@ msgstr "このインストーラはアドミンアクセスが必要です、も
 #. UAC_RIGHTS_UN
 #: ../Shared/installer/nightly.nsi:1287
 msgid "This uninstaller requires admin access, try again"
-msgstr "このアンインストーラはアドミンアクセスが必要です、もう一度始めてください"
+msgstr "このアンインストーラはアドミンアクセスが必要です、もう一度試してください。"
 
 #. UAC_RIGHTS3
 #: ../Shared/installer/nightly.nsi:1288
 msgid "Logon service not running, aborting!"
-msgstr "Logonサービスは実行していません、中止されています！"
+msgstr "Logonサービスは実行していません、中止します！"
 
 #. UAC_RIGHTS4
 #: ../Shared/installer/nightly.nsi:1289
 msgid "Unable to elevate"
-msgstr "上げることができません。"
+msgstr "上げることができません"
 
 #. INST_MTA_CONFLICT
 #: ../Shared/installer/nightly.nsi:1843
@@ -363,7 +367,7 @@ msgstr ""
 "$\n"
 "MTAは最新バーションを違うところにインストールするとしてデザインされました。$\n"
 "$\n"
-"$INSTDIRのMTA $1に上書きしますか。"
+"$INSTDIRのMTA $1に上書きしますか？"
 
 #. INST_GTA_CONFLICT
 #: ../Shared/installer/nightly.nsi:1846
@@ -373,6 +377,10 @@ msgid ""
 "Do you want to use the default install directory$\n"
 "$DEFAULT_INSTDIR ?"
 msgstr ""
+"MTAはGTA:SAと同じインストールフォルダーでインストールすることはできません$\n"
+"$\n"
+"デフォルトのインストールフォルダーにしますか？$\n"
+"$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
 #: ../Shared/installer/nightly.nsi:1848
@@ -392,14 +400,14 @@ msgid ""
 "$\n"
 "Are you sure you want to continue ?"
 msgstr ""
-"$GTA_DIRにGTA:SAは見つかれませんでした。$\n"
+"$GTA_DIRにGTA:SAが見つかりませんでした。$\n"
 "$\n"
-"本当に続けますか。"
+"とりあえず、続けますか。"
 
 #. INST_CHOOSE_LOC_TOP
 #: ../Shared/installer/nightly.nsi:1966
 msgid "Choose Install Location"
-msgstr "インストールの選択"
+msgstr "インストールフォルダーを選んでください"
 
 #. INST_CHOOSE_LOC
 #: ../Shared/installer/nightly.nsi:1967
@@ -417,14 +425,14 @@ msgid ""
 " Click Next to continue."
 msgstr ""
 "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}は次のフォルダにインストールします。$\n"
-"他のフォルダーインストール場合は、「ブラウズ」にクリックして、他のフォルダを選んでください。$\n"
+"他のフォルダーでインストールする場合は、「ブラウズ」にクリックして、他のフォルダを選んでください。$\n"
 "$\n"
-"「次へ」にクリックして、続行してください。"
+"　「次へ」にクリックして、続行してください。"
 
 #. INST_CHOOSE_LOC3
 #: ../Shared/installer/nightly.nsi:1970
 msgid "Destination Folder"
-msgstr "送り先フォルダー"
+msgstr "宛先フォルダー"
 
 #. INST_CHOOSE_LOC_BROWSE
 #: ../Shared/installer/nightly.nsi:1971
@@ -439,7 +447,7 @@ msgstr "デフォルト"
 #. INST_CHOOSE_LOC_LAST_USED
 #: ../Shared/installer/nightly.nsi:1973
 msgid "Last used"
-msgstr "最後の利用"
+msgstr "前回利用"
 
 #. INST_CHOOSE_LOC_CUSTOM
 #: ../Shared/installer/nightly.nsi:1974
@@ -450,7 +458,7 @@ msgstr "カスタム"
 #: ../Shared/installer/nightly.nsi:2145
 msgid ""
 "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
-msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}をインストールフォルダを選んでください："
+msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}のインストールフォルダを選んでください："
 
 #. INST_LOC_OW
 #: ../Shared/installer/nightly.nsi:2163
@@ -466,19 +474,19 @@ msgstr "インストールタイプ： アップデート"
 #. NETTEST_TITLE1
 #: ../Shared/installer/nightly.nsi:2407
 msgid "Online update"
-msgstr ""
+msgstr "オンライン更新"
 
 #. NETTEST_TITLE2
 #: ../Shared/installer/nightly.nsi:2408
 msgid "Checking for update information"
-msgstr ""
+msgstr "更新情報を確認しています"
 
 #. NETTEST_STATUS1
 #: ../Shared/installer/nightly.nsi:2409
 msgid "Checking for installer update information..."
-msgstr ""
+msgstr "インストーラの更新情報を確認しています…"
 
 #. NETTEST_STATUS2
 #: ../Shared/installer/nightly.nsi:2410
 msgid "Please ensure your firewall is not blocking"
-msgstr ""
+msgstr "ファイアウォールにブロックされていないのを確認してください"
