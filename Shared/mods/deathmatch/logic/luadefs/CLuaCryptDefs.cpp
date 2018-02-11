@@ -341,28 +341,31 @@ int CLuaCryptDefs::EncodeString ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        SString &key = options["key"];
-        if( !key.empty () )
+        switch ( algorithm )
         {
-            switch ( algorithm )
+            case StringEncryptFunction::TEA:
             {
-                case StringEncryptFunction::TEA:
+                SString &key = options["key"];
+
+                if ( key.empty () )
                 {
-                    SString result;
-                    SharedUtil::TeaEncode ( data, key, &result );
-                    lua_pushlstring ( luaVM, result, result.length () );
-                    break;
-                }
-                default:
-                {
-                    m_pScriptDebugging->LogCustom ( luaVM, "Unknown encryption algorithm" );
+                    m_pScriptDebugging->LogCustom ( luaVM, "Invalid value for field 'key'" );
                     lua_pushboolean ( luaVM, false );
+                    return 1;
                 }
+
+                SString result;
+                SharedUtil::TeaEncode ( data, key, &result );
+                lua_pushlstring ( luaVM, result, result.length () );
+                return 1;
             }
-            return 1;
+            default:
+            {
+                m_pScriptDebugging->LogCustom ( luaVM, "Unknown encryption algorithm" );
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }
         }
-        else
-            m_pScriptDebugging->LogCustom ( luaVM, "Invalid value for field 'key'" );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
@@ -384,28 +387,31 @@ int CLuaCryptDefs::DecodeString ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        SString &key = options["key"];
-        if( !key.empty () )
+        switch ( algorithm )
         {
-            switch ( algorithm )
+            case StringEncryptFunction::TEA:
             {
-                case StringEncryptFunction::TEA:
+                SString &key = options["key"];
+
+                if ( key.empty () )
                 {
-                    SString result;
-                    SharedUtil::TeaDecode ( data, key, &result );
-                    lua_pushlstring ( luaVM, result, result.length () );
-                    break;
-                }
-                default:
-                {
-                    m_pScriptDebugging->LogCustom ( luaVM, "Unknown encryption algorithm" );
+                    m_pScriptDebugging->LogCustom ( luaVM, "Invalid value for field 'key'" );
                     lua_pushboolean ( luaVM, false );
+                    return 1;
                 }
+
+                SString result;
+                SharedUtil::TeaDecode ( data, key, &result );
+                lua_pushlstring ( luaVM, result, result.length () );
+                return 1;
             }
-            return 1;
+            default:
+            {
+                m_pScriptDebugging->LogCustom ( luaVM, "Unknown encryption algorithm" );
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }
         }
-        else
-            m_pScriptDebugging->LogCustom ( luaVM, "Invalid value for field 'key'" );
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
