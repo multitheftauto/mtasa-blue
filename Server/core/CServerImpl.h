@@ -14,10 +14,9 @@
 *
 *****************************************************************************/
 
-class CServerImpl;
+#pragma once
 
-#ifndef __CSERVERIMPL_H
-#define __CSERVERIMPL_H
+class CServerImpl;
 
 #include "MTAPlatform.h"
 #include <string>
@@ -99,21 +98,18 @@ private:
     bool                m_bRequestedQuit;
     bool                m_bRequestedReset;
 
-    wchar_t             m_szInputBuffer[255];
+    wchar_t             m_szInputBuffer [ 255 ];
     unsigned int        m_uiInputCount;
     
-    char                m_szTag[80];
+    char                m_szTag [ 80 ];
 
     double              m_dLastTimeMs;
     double              m_dPrevOverrun;
 
 #ifdef WIN32
-    HANDLE              m_hConsole;
-    HANDLE              m_hConsoleInput;
-    CHAR_INFO           m_ScrnBuffer[256];
-
-    CThreadCommandQueue*    m_pThreadCommandQueue;
+    HANDLE                      m_hConsole;
+    HANDLE                      m_hConsoleInput;
+    std::vector < CHAR_INFO >   m_vecScreenBuffer;
+    CThreadCommandQueue *       m_pThreadCommandQueue;
 #endif
 };
-
-#endif
