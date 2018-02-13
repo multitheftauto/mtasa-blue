@@ -86,7 +86,7 @@ public:
 private:
     CLuaManager*                    m_pLuaManager;
     unsigned int                    m_uiLogFileLevel;
-    bool                            m_bTriggeringOnClientDebugMessage;
+    bool                            m_bTriggeringMessageEvent;
     SLuaDebugInfo                   m_SavedLuaDebugInfo;
     std::list < CLuaMain* >         m_LuaMainStack;
     HANDLE                          m_flushTimerHandle;

@@ -151,9 +151,7 @@ void CClientProjectile::DoPulse ( void )
 
 void CClientProjectile::Initiate ( CVector& vecPosition, CVector& vecRotation, CVector& vecVelocity, unsigned short usModel )
 {
-#ifdef MTA_DEBUG
-    if ( m_pInitiateData ) _asm int 3
-#endif
+    dassert(!m_pInitiateData);
 
     // Store our initiation data
     m_pInitiateData = new CProjectileInitiateData;

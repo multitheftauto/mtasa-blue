@@ -60,6 +60,7 @@ private:
     std::mutex                  m_mutexHttpDosProtect;
     std::mutex                  m_mutexLoggedInMap;
     SString                     m_strWarnMessageForIp;
+    CElapsedTime                m_WarnMessageTimer;
 };
 
 #endif

@@ -841,7 +841,8 @@ SString SharedUtil::GetSystemShortPathName( const SString& strPath )
 {
     wchar_t szBuffer[32000];
     szBuffer[0] = 0;
-    GetShortPathNameW( FromUTF8( strPath ), szBuffer, NUMELMS( szBuffer ) - 1 );
+    if (!GetShortPathNameW( FromUTF8( strPath ), szBuffer, NUMELMS( szBuffer ) - 1 ))
+        return strPath;
     return ToUTF8( szBuffer );
 }
 
@@ -849,7 +850,8 @@ SString SharedUtil::GetSystemLongPathName( const SString& strPath )
 {
     wchar_t szBuffer[32000];
     szBuffer[0] = 0;
-    GetLongPathNameW( FromUTF8( strPath ), szBuffer, NUMELMS( szBuffer ) - 1 );
+    if (!GetLongPathNameW( FromUTF8( strPath ), szBuffer, NUMELMS( szBuffer ) - 1 ))
+        return strPath;
     return ToUTF8( szBuffer );
 }
 #endif // WIN32

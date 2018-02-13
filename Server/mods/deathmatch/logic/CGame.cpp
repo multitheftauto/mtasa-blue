@@ -274,6 +274,9 @@ CGame::~CGame ( void )
     // Stop networking
     Stop ();
 
+    // Stop async task scheduler
+    SAFE_DELETE(m_pAsyncTaskScheduler);
+
      // Destroy our stuff
     SAFE_DELETE( m_pResourceManager );
 
@@ -483,6 +486,8 @@ void CGame::DoPulse ( void )
 
     CLOCK_CALL1( m_pLatentTransferManager->DoPulse (); );
 
+    CLOCK_CALL1(m_pAsyncTaskScheduler->CollectResults());
+
     PrintLogOutputFromNetModule();
     m_pScriptDebugging->UpdateLogOutput();
 
@@ -549,6 +554,15 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
         return false;
     }
 
+    // Check json has precision mod - #8853 (toJSON passes wrong floats)
+    json_object* pJsonObject = json_object_new_double(5.12345678901234);
+    SString strJsonResult = json_object_to_json_string_ext(pJsonObject, JSON_C_TO_STRING_PLAIN);
+    json_object_put(pJsonObject);
+    if (strJsonResult != "5.12345678901234")
+    {
+        CLogger::ErrorPrintf("JSON built without precision modification\n");
+    }
+
     // Grab the path to the main config
     SString strBuffer;
     const char* szMainConfig;
@@ -559,6 +573,7 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     else
     {
         strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "mtaserver.conf" );
+        m_bUsingMtaServerConf = true;
     }
     m_pMainConfig->SetFileName ( strBuffer );
 
@@ -596,6 +611,9 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     const SString strServerIPList = m_pMainConfig->GetServerIPList ();
     unsigned short usServerPort = m_pMainConfig->GetServerPort ();
     unsigned int uiMaxPlayers = m_pMainConfig->GetMaxPlayers ();
+
+    // Start async task scheduler
+    m_pAsyncTaskScheduler = new SharedUtil::CAsyncTaskScheduler(2);
 
     // Create the account manager
     strBuffer = g_pServerInterface->GetModManager ()->GetAbsolutePath ( "internal.db" );
@@ -899,14 +917,25 @@ bool CGame::Start ( int iArgumentCount, char* szArguments [] )
     // Flush any pending master server announce messages
     g_pNetServer->GetHTTPDownloadManager ( EDownloadMode::ASE )->ProcessQueuedFiles ();
 
-    if ( m_pMainConfig->GetAuthSerialEnabled() )
+    // Warnings only if not editor or local server
+    if (IsUsingMtaServerConf())
     {
-        CLogger::LogPrintf( "Authorized serial account protection is enabled for the ACL group(s): `%s`  See http:""//mtasa.com/authserial\n",
-                            *SString::Join( ",", m_pMainConfig->GetAuthSerialGroupList() ) );
-    }
-    else
-    {
-        CLogger::LogPrint( "Authorized serial account protection is DISABLED. See http:""//mtasa.com/authserial\n" );
+        // Authorized serial account protection
+        if ( m_pMainConfig->GetAuthSerialEnabled() )
+        {
+            CLogger::LogPrintf( "Authorized serial account protection is enabled for the ACL group(s): `%s`  See http:""//mtasa.com/authserial\n",
+                                *SString::Join( ",", m_pMainConfig->GetAuthSerialGroupList() ) );
+        }
+        else
+        {
+            CLogger::LogPrint( "Authorized serial account protection is DISABLED. See http:""//mtasa.com/authserial\n" );
+        }
+
+        // Owner email address
+        if (m_pMainConfig->GetOwnerEmailAddressList().empty())
+        {
+            CLogger::LogPrintf("WARNING: <owner_email_address> not set\n");
+        }
     }
 
     // Done
@@ -1441,7 +1470,8 @@ void CGame::AddBuiltInEvents ( void )
     // Object events
 
     // Pickup events
-    m_Events.AddEvent ( "onPickupHit", "player, matchingDimension", NULL, false );
+    m_Events.AddEvent ( "onPickupHit", "player", NULL, false );
+    m_Events.AddEvent ( "onPickupLeave", "player", NULL, false );
     m_Events.AddEvent ( "onPickupUse", "player", NULL, false );
     m_Events.AddEvent ( "onPickupSpawn", "", NULL, false );
 
@@ -1459,7 +1489,8 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onPlayerWeaponSwitch", "previous, current", NULL, false );
     m_Events.AddEvent ( "onPlayerMarkerHit", "marker, matchingDimension", NULL, false );
     m_Events.AddEvent ( "onPlayerMarkerLeave", "marker, matchingDimension", NULL, false );
-    m_Events.AddEvent ( "onPlayerPickupHit", "pickup, matchingDimension", NULL, false );
+    m_Events.AddEvent ( "onPlayerPickupHit", "pickup", NULL, false );
+    m_Events.AddEvent ( "onPlayerPickupLeave", "pickup", NULL, false );
     m_Events.AddEvent ( "onPlayerPickupUse", "pickup", NULL, false );
     m_Events.AddEvent ( "onPlayerClick", "button, state, element, posX, posY, posZ", NULL, false );
     m_Events.AddEvent ( "onPlayerContact", "previous, current", NULL, false );
@@ -1625,6 +1656,13 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                 strExtra = SStringX ( strExtraTemp );
                 strPlayerVersion = SStringX ( strPlayerVersionTemp );
             }
+        #if MTASA_VERSION_TYPE < VERSION_TYPE_UNSTABLE
+            if (atoi(ExtractVersionStringBuildNumber(Packet.GetPlayerVersion())) != 0)
+            {
+                // Use player version from packet if it contains a valid build number
+                strPlayerVersion = Packet.GetPlayerVersion();
+            }
+        #endif
 
             SString strIP = pPlayer->GetSourceIP ();
             SString strIPAndSerial( "IP: %s  Serial: %s  Version: %s", strIP.c_str (), strSerial.c_str (), strPlayerVersion.c_str () );

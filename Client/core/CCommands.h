@@ -36,7 +36,8 @@ public:
     void                Delete                      ( const char* szCommand );
     void                DeleteAll                   ( void );
 
-    inline void         SetExecuteHandler           ( pfnExecuteCommandHandler pfnHandler )         { m_pfnExecuteHandler = pfnHandler; };
+    void                SetExecuteHandler           ( pfnExecuteCommandHandler pfnHandler )         { m_pfnExecuteHandler = pfnHandler; }
+    pfnExecuteCommandHandler GetExecuteHandler      ( void )                                        { return m_pfnExecuteHandler; }
 
     tagCOMMANDENTRY*    Get                         ( const char* szCommand, bool bCheckIfMod = false, bool bModCommand = false );
 

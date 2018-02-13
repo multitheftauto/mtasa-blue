@@ -21,6 +21,8 @@ void CLuaCryptDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "base64Decode", Base64decode );
     CLuaCFunctions::AddFunction("passwordHash", PasswordHash);
     CLuaCFunctions::AddFunction("passwordVerify", PasswordVerify);
+    CLuaCFunctions::AddFunction ( "encodeString", EncodeString );
+    CLuaCFunctions::AddFunction ( "decodeString", DecodeString );
 }
 
 int CLuaCryptDefs::Md5 ( lua_State* luaVM )
@@ -178,15 +180,22 @@ int CLuaCryptDefs::Base64decode ( lua_State* luaVM )
 
 int CLuaCryptDefs::PasswordHash(lua_State* luaVM)
 {
-//  string password_hash(string password, string algorithm, table options = {})
+//  string password_hash(string password, string algorithm, table options = {} [, function callback])
     SString password;
     PasswordHashFunction algorithm;
-    std::unordered_map<SString, SString> options;
+    CStringMap options;
+    CLuaFunctionRef luaFunctionRef;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(password);
     argStream.ReadEnumString(algorithm);
-    argStream.ReadStringMap(options, true);
+    argStream.ReadStringMap(options);
+
+    if (argStream.NextIsFunction())
+    {
+        argStream.ReadFunction(luaFunctionRef);
+        argStream.ReadFunctionComplete();
+    }
 
     if (!argStream.HasErrors())
     {
@@ -202,14 +211,49 @@ int CLuaCryptDefs::PasswordHash(lua_State* luaVM)
 
             if (!ss.fail())
             {
-                SString hash = SharedUtil::BcryptHash(password, options["salt"], cost);
-                if (!hash.empty())
+                // Sync
+                if (luaFunctionRef == CLuaFunctionRef{})
                 {
-                    lua_pushstring(luaVM, hash);
-                    return 1;
+                    SString hash = SharedUtil::BcryptHash(password, options["salt"], cost);
+                    if (!hash.empty())
+                    {
+                        lua_pushstring(luaVM, hash);
+                        return 1;
+                    }
+                    else
+                        m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'salt'");
                 }
-                else
-                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'salt'");
+                else // Async
+                {
+                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                    if (pLuaMain)
+                    {
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>([password, salt = options["salt"], cost] {
+                            // Execute time-consuming task
+                            return SharedUtil::BcryptHash(password, salt, cost);
+
+                        }, [luaFunctionRef](const SString& hash) {
+                            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                            if (pLuaMain)
+                            {
+                                CLuaArguments arguments;
+
+                                if (hash.empty())
+                                {
+                                    m_pScriptDebugging->LogCustom(pLuaMain->GetVM(), "Invalid value for field 'salt'");
+                                    arguments.PushBoolean(false);
+                                }
+                                else
+                                    arguments.PushString(hash);
+
+                                arguments.Call(pLuaMain, luaFunctionRef);
+                            }
+                        });
+
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                }
             }
             else
                 m_pScriptDebugging->LogWarning(luaVM, "Invalid value for field 'cost'");
@@ -224,19 +268,52 @@ int CLuaCryptDefs::PasswordHash(lua_State* luaVM)
 
 int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
 {
-//  bool passwordVerify(string password, string hash)
+//  bool passwordVerify(string password, string hash [, function callback])
     SString password;
     SString hash;
+    CLuaFunctionRef luaFunctionRef;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(password);
     argStream.ReadString(hash);
 
+    if (argStream.NextIsFunction())
+    {
+        argStream.ReadFunction(luaFunctionRef);
+        argStream.ReadFunctionComplete();
+    }
+
     if (!argStream.HasErrors())
     {
         if (hash.BeginsWith("$2y$"))
         {
-            lua_pushboolean(luaVM, SharedUtil::BcryptVerify(password, hash));
+            // Sync
+            if (luaFunctionRef == CLuaFunctionRef())
+            {
+                lua_pushboolean(luaVM, SharedUtil::BcryptVerify(password, hash));
+            }
+            else // Async
+            {
+                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                if (pLuaMain)
+                {
+                    CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>([password, hash]{
+                        // Execute time-consuming task
+                        return SharedUtil::BcryptVerify(password, hash);
+
+                    }, [luaFunctionRef](const bool& correct) {
+                        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                        if (pLuaMain)
+                        {
+                            CLuaArguments arguments;
+                            arguments.PushBoolean(correct);
+                            arguments.Call(pLuaMain, luaFunctionRef);
+                        }
+                    });
+
+                    lua_pushboolean(luaVM, true);
+                }
+            }
             return 1;
         }
         else
@@ -248,5 +325,97 @@ int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaCryptDefs::EncodeString ( lua_State* luaVM )
+{
+    StringEncryptFunction algorithm;
+    SString data;
+    CStringMap options;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( algorithm );
+    argStream.ReadString ( data );
+    argStream.ReadStringMap ( options );
+
+    if ( !argStream.HasErrors () )
+    {
+        switch ( algorithm )
+        {
+            case StringEncryptFunction::TEA:
+            {
+                SString &key = options["key"];
+
+                if ( key.empty () )
+                {
+                    m_pScriptDebugging->LogCustom ( luaVM, "Invalid value for field 'key'" );
+                    lua_pushboolean ( luaVM, false );
+                    return 1;
+                }
+
+                SString result;
+                SharedUtil::TeaEncode ( data, key, &result );
+                lua_pushlstring ( luaVM, result, result.length () );
+                return 1;
+            }
+            default:
+            {
+                m_pScriptDebugging->LogCustom ( luaVM, "Unknown encryption algorithm" );
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaCryptDefs::DecodeString ( lua_State* luaVM )
+{
+    StringEncryptFunction algorithm;
+    SString data;
+    CStringMap options;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( algorithm );
+    argStream.ReadString ( data );
+    argStream.ReadStringMap ( options );
+
+    if ( !argStream.HasErrors () )
+    {
+        switch ( algorithm )
+        {
+            case StringEncryptFunction::TEA:
+            {
+                SString &key = options["key"];
+
+                if ( key.empty () )
+                {
+                    m_pScriptDebugging->LogCustom ( luaVM, "Invalid value for field 'key'" );
+                    lua_pushboolean ( luaVM, false );
+                    return 1;
+                }
+
+                SString result;
+                SharedUtil::TeaDecode ( data, key, &result );
+                lua_pushlstring ( luaVM, result, result.length () );
+                return 1;
+            }
+            default:
+            {
+                m_pScriptDebugging->LogCustom ( luaVM, "Unknown encryption algorithm" );
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
     return 1;
 }

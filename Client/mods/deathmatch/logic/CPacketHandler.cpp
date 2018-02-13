@@ -245,7 +245,7 @@ void CPacketHandler::Packet_ServerConnected ( NetBitStreamInterface& bitStream )
     unsigned short ucSize = 0;
     if (!bitStream.Read(ucSize))
     {
-        __asm int 3;
+        dassert(false);
         g_pCore->SetConnected ( false );
         return;
     }
@@ -581,13 +581,17 @@ void CPacketHandler::Packet_ServerDisconnected ( NetBitStreamInterface& bitStrea
             int iHours = static_cast < int > ( Duration / 3600 );
             Duration = Duration % 3600;
             int iMins = static_cast < int > ( Duration / 60 );
+            Duration = Duration % 60;
+            int iSeconds = static_cast < int > ( Duration );
 
             if ( iDays )
-                strReason += SString(_tn( "%d day", "%d days", iDays ),iDays) += iHours ? " " : "";
+                strReason += SString( _tn( "%d day", "%d days", iDays ), iDays ) += (iHours || iMins) ? " " : "";
             if ( iHours )
-                strReason += SString(_tn( "%d hour", "%d hours", iHours ),iHours)  += iMins ? " " : "";
+                strReason += SString( _tn( "%d hour", "%d hours", iHours ), iHours )  += iMins ? " " : "";
             if ( iMins )
-                strReason += SString(_tn( "%d minute", "%d minutes", iMins ),iMins);
+                strReason += SString( _tn( "%d minute", "%d minutes", iMins ), iMins ) += iSeconds?  " " : "";
+            if ( !iDays && !iHours && iSeconds )
+                strReason += SString( _tn( "%d second", "%d seconds", iSeconds ), iSeconds );
         }
 
         // Display the error
@@ -1264,6 +1268,7 @@ void CPacketHandler::Packet_ChatEcho ( NetBitStreamInterface& bitStream )
     // unsigned char    (1)     - green
     // unsigned char    (1)     - blue
     // unsigned char    (1)     - color-coded
+    // ElementID        (2)     - client (if typed by a player)
     // unsigned char    (x)     - message
 
     // Read out the color
@@ -1271,14 +1276,28 @@ void CPacketHandler::Packet_ChatEcho ( NetBitStreamInterface& bitStream )
     unsigned char ucGreen;
     unsigned char ucBlue;
     bool ucColorCoded;
+
+    CClientEntity * pClient = nullptr;
+
     if ( bitStream.Read ( ucRed ) &&
          bitStream.Read ( ucGreen ) &&
          bitStream.Read ( ucBlue ) &&
          bitStream.ReadBit ( ucColorCoded ) )
     {
-        // Valid length?
+        // Read the client's ID
+        int iNumberOfBytesUsed;
 
-        int iNumberOfBytesUsed = bitStream.GetNumberOfBytesUsed () - 4;
+        if ( bitStream.Version() >= 0x06B ) {
+            ElementID ClientID;
+            bitStream.Read( ClientID );
+            pClient = ( ClientID != INVALID_ELEMENT_ID ) ? CElementIDs::GetElement( ClientID ) : nullptr;
+            iNumberOfBytesUsed = bitStream.GetNumberOfBytesUsed() - 6;
+        }
+        else {
+            iNumberOfBytesUsed = bitStream.GetNumberOfBytesUsed() - 4;
+        }
+
+        // Valid length?
         if ( iNumberOfBytesUsed >= MIN_CHATECHO_LENGTH  )
         {
             // Read the message into a buffer
@@ -1291,13 +1310,17 @@ void CPacketHandler::Packet_ChatEcho ( NetBitStreamInterface& bitStream )
                 // Strip it for bad characters
                 StripControlCodes ( szMessage, ' ' );
 
+                // Determine the event source entity
+                CClientEntity * pRootEntity = g_pClientGame->GetRootEntity();
+                CClientEntity * pEntity = pClient ? pClient : pRootEntity;
+
                 // Call an event
                 CLuaArguments Arguments;
                 Arguments.PushString ( szMessage );
                 Arguments.PushNumber ( ucRed );
                 Arguments.PushNumber ( ucGreen );
                 Arguments.PushNumber ( ucBlue );
-                bool bCancelled = !g_pClientGame->GetRootEntity()->CallEvent ( "onClientChatMessage", Arguments, false );
+                bool bCancelled = !pEntity->CallEvent ( "onClientChatMessage", Arguments, pEntity != pRootEntity );
                 if ( !bCancelled )
                 {
                     // Echo it
@@ -1630,10 +1653,9 @@ void CPacketHandler::Packet_Vehicle_InOut ( NetBitStreamInterface& bitStream )
 
                     case CClientGame::VEHICLE_NOTIFY_IN_RETURN:
                     {
-                        // Is he not getting in the vehicle yet?
-                        //if ( !pPlayer->IsGettingIntoVehicle () )
+                        if ( !pPlayer->IsLocalPlayer () || pPlayer->GetOccupiedVehicle () != pVehicle )
                         {
-                            // Warp him in
+                            // Warp him in. Don't do that for local player as he is already sitting inside.
                             pPlayer->WarpIntoVehicle ( pVehicle, ucSeat );
                         }
 

@@ -5,11 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -28,16 +28,12 @@
 
 #include <curl/curl.h>
 #include "netrc.h"
-
-#include "strequal.h"
 #include "strtok.h"
+#include "strcase.h"
+
+/* The last 3 #include files should be in this order */
+#include "curl_printf.h"
 #include "curl_memory.h"
-#include "rawstr.h"
-
-#define _MPRINTF_REPLACE /* use our functions only */
-#include <curl/mprintf.h>
-
-/* The last #include file should be: */
 #include "memdebug.h"
 
 /* Get user and password from .netrc when given a machine name */
@@ -50,17 +46,18 @@ enum host_lookup_state {
 
 /*
  * @unittest: 1304
+ *
+ * *loginp and *passwordp MUST be allocated if they aren't NULL when passed
+ * in.
  */
 int Curl_parsenetrc(const char *host,
-                    char *login,
-                    char *password,
+                    char **loginp,
+                    char **passwordp,
                     char *netrcfile)
 {
   FILE *file;
   int retcode=1;
-  int specific_login = (login[0] != 0);
-  char *home = NULL;
-  bool home_alloc = FALSE;
+  int specific_login = (*loginp && **loginp != 0);
   bool netrc_alloc = FALSE;
   enum host_lookup_state state=NOTHING;
 
@@ -71,10 +68,23 @@ int Curl_parsenetrc(const char *host,
 #define NETRC DOT_CHAR "netrc"
 
   if(!netrcfile) {
-    home = curl_getenv("HOME"); /* portable environment reader */
+    bool home_alloc = FALSE;
+    char *home = curl_getenv("HOME"); /* portable environment reader */
     if(home) {
       home_alloc = TRUE;
-#if defined(HAVE_GETPWUID) && defined(HAVE_GETEUID)
+#if defined(HAVE_GETPWUID_R) && defined(HAVE_GETEUID)
+    }
+    else {
+      struct passwd pw, *pw_res;
+      char pwbuf[1024];
+      if(!getpwuid_r(geteuid(), &pw, pwbuf, sizeof(pwbuf), &pw_res)
+         && pw_res) {
+        home = strdup(pw.pw_dir);
+        if(!home)
+          return CURLE_OUT_OF_MEMORY;
+        home_alloc = TRUE;
+      }
+#elif defined(HAVE_GETPWUID) && defined(HAVE_GETEUID)
     }
     else {
       struct passwd *pw;
@@ -86,18 +96,20 @@ int Curl_parsenetrc(const char *host,
     }
 
     if(!home)
-      return -1;
+      return retcode; /* no home directory found (or possibly out of memory) */
 
     netrcfile = curl_maprintf("%s%s%s", home, DIR_CHAR, NETRC);
+    if(home_alloc)
+      free(home);
     if(!netrcfile) {
-      if(home_alloc)
-        free(home);
       return -1;
     }
     netrc_alloc = TRUE;
   }
 
-  file = fopen(netrcfile, "r");
+  file = fopen(netrcfile, FOPEN_READTEXT);
+  if(netrc_alloc)
+    free(netrcfile);
   if(file) {
     char *tok;
     char *tok_buf;
@@ -109,23 +121,27 @@ int Curl_parsenetrc(const char *host,
       tok=strtok_r(netrcbuffer, " \t\n", &tok_buf);
       while(!done && tok) {
 
-        if(login[0] && password[0]) {
+        if((*loginp && **loginp) && (*passwordp && **passwordp)) {
           done=TRUE;
           break;
         }
 
         switch(state) {
         case NOTHING:
-          if(Curl_raw_equal("machine", tok)) {
+          if(strcasecompare("machine", tok)) {
             /* the next tok is the machine name, this is in itself the
                delimiter that starts the stuff entered for this machine,
                after this we need to search for 'login' and
                'password'. */
             state=HOSTFOUND;
           }
+          else if(strcasecompare("default", tok)) {
+            state=HOSTVALID;
+            retcode=0; /* we did find our host */
+          }
           break;
         case HOSTFOUND:
-          if(Curl_raw_equal(host, tok)) {
+          if(strcasecompare(host, tok)) {
             /* and yes, this is our host! */
             state=HOSTVALID;
             retcode=0; /* we did find our host */
@@ -138,24 +154,34 @@ int Curl_parsenetrc(const char *host,
           /* we are now parsing sub-keywords concerning "our" host */
           if(state_login) {
             if(specific_login) {
-              state_our_login = Curl_raw_equal(login, tok);
+              state_our_login = strcasecompare(*loginp, tok);
             }
             else {
-              strncpy(login, tok, LOGINSIZE-1);
+              free(*loginp);
+              *loginp = strdup(tok);
+              if(!*loginp) {
+                retcode = -1; /* allocation failed */
+                goto out;
+              }
             }
             state_login=0;
           }
           else if(state_password) {
             if(state_our_login || !specific_login) {
-              strncpy(password, tok, PASSWORDSIZE-1);
+              free(*passwordp);
+              *passwordp = strdup(tok);
+              if(!*passwordp) {
+                retcode = -1; /* allocation failed */
+                goto out;
+              }
             }
             state_password=0;
           }
-          else if(Curl_raw_equal("login", tok))
+          else if(strcasecompare("login", tok))
             state_login=1;
-          else if(Curl_raw_equal("password", tok))
+          else if(strcasecompare("password", tok))
             state_password=1;
-          else if(Curl_raw_equal("machine", tok)) {
+          else if(strcasecompare("machine", tok)) {
             /* ok, there's machine here go => */
             state = HOSTFOUND;
             state_our_login = FALSE;
@@ -167,13 +193,9 @@ int Curl_parsenetrc(const char *host,
       } /* while(tok) */
     } /* while fgets() */
 
+    out:
     fclose(file);
   }
-
-  if(home_alloc)
-    free(home);
-  if(netrc_alloc)
-    free(netrcfile);
 
   return retcode;
 }

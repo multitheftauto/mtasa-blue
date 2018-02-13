@@ -606,12 +606,11 @@ void CServerImpl::ShowInfoTag ( char* szTag )
     // Windows console code
         // Get the console's width
         CONSOLE_SCREEN_BUFFER_INFO ScrnBufferInfo;
+
         if ( !GetConsoleScreenBufferInfo( m_hConsole, &ScrnBufferInfo ) )
             return;
 
-        COORD BufferSize = { ScrnBufferInfo.dwSize.X, 1 };
-        COORD TopLeft = { 0, ScrnBufferInfo.srWindow.Top };
-        SMALL_RECT Region = { 0, ScrnBufferInfo.srWindow.Top, ScrnBufferInfo.dwSize.X, 1 };
+        ScrnBufferInfo.dwSize.X = std::min ( ScrnBufferInfo.dwSize.X, SCREEN_BUFFER_SIZE );
 
         // If the screenbuffer doesn't exist yet, or if the tag is changed
         if ( m_ScrnBuffer == NULL || strcmp ( szTag, m_szTag ) )
@@ -657,6 +656,11 @@ void CServerImpl::ShowInfoTag ( char* szTag )
                 }
             }
         }
+
+        COORD BufferSize = { ScrnBufferInfo.dwSize.X, 1 };
+        COORD TopLeft = { 0, ScrnBufferInfo.srWindow.Top };
+        SMALL_RECT Region = { 0, ScrnBufferInfo.srWindow.Top, ScrnBufferInfo.dwSize.X, 1 };
+
         WriteConsoleOutputW ( m_hConsole, m_ScrnBuffer, BufferSize, TopLeft, &Region);
 #else
     // Linux curses variant, so much easier :)

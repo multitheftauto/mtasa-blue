@@ -111,6 +111,7 @@ struct SDxStatus
     struct
     {
         bool            bWindowed;
+        int             iFullScreenStyle;
         int             iFXQuality;
         int             iDrawDistance;
         bool            bVolumetricShadows;

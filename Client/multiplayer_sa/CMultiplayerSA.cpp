@@ -88,8 +88,6 @@ DWORD RETURN_CollisionStreamRead =                          0x41B1D6;
 #define CALL_CRenderer_Render                               0x53EA12
 #define FUNC_CRenderer_Render                               0x727140
 
-#define CALL_CBike_ProcessRiderAnims                        0x6BF425   // @ CBike::ProcessDrivingAnims
-
 #define CALL_CTrafficLights_GetPrimaryLightState 			0x49DB5F
 #define CALL_CTrafficLights_GetSecondaryLightState 			0x49DB6D
 #define HOOKPOS_CTrafficLights_DisplayActualLight           0x49E1D9
@@ -101,7 +99,6 @@ DWORD RETURN_CGame_Process =                                0x53C09F;
 #define HOOKPOS_Idle                                        0x53E981
 DWORD RETURN_Idle =                                         0x53E98B;
 
-DWORD FUNC_CBike_ProcessRiderAnims =                        0x6B7280;
 DWORD FUNC_CEntity_Render =                                 0x534310;
 
 #define HOOKPOS_VehicleCamStart                             0x5245ED
@@ -282,6 +279,8 @@ DWORD RETURN_CObject_ProcessCollision = 0x548DD1;
 DWORD JMP_DynamicObject_Cond_Zero = 0x548E98;
 #define HOOKPOS_CGlass_WindowRespondsToCollision           0x71BC40
 DWORD RETURN_CGlass_WindowRespondsToCollision = 0x71BC48;
+#define HOOKPOS_CGlass__BreakGlassPhysically                0x71D14B
+DWORD RETURN_CGlass__BreakGlassPhysically = 0x71D150;
 
 #define HOOKPOS_FxManager_c__DestroyFxSystem                0x4A989A
 
@@ -291,6 +290,14 @@ DWORD RETURN_CTaskSimplyGangDriveBy__ProcessPed = 0x62D5AC;
 #define HOOKPOS_CAERadioTrackManager__ChooseMusicTrackIndex 0x4EA296
 DWORD RETURN_CAERadioTrackManager__ChooseMusicTrackIndex             = 0x4EA2A0;
 DWORD RETURN_CAERadioTrackManager__ChooseMusicTrackIndex_Regenerate  = 0x04EA286;
+
+#define HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyHeli     0x4FE9B9
+DWORD RETURN_CAEVEhicleAudioEntity__ProcessDummyHeli      = 0x4FEDFB;
+DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIHeli         = FUNC_CAEVehicleAudioEntity__ProcessAIHeli;
+
+#define HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyProp     0x4FD96D
+DWORD RETURN_CAEVEhicleAudioEntity__ProcessDummyProp      = 0x4FDFAB;
+DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIProp         = FUNC_CAEVehicleAudioEntity__ProcessAIProp;
 
 CPed* pContextSwitchedPed = 0;
 CVector vecCenterOfWorld;
@@ -377,7 +384,6 @@ void HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic();
 void HOOK_Trailer_BreakTowLink();
 void HOOK_CRadar__DrawRadarGangOverlay();
 void HOOK_CTaskComplexJump__CreateSubTask();
-void HOOK_CBike_ProcessRiderAnims();
 void HOOK_FxManager_CreateFxSystem ();
 void HOOK_FxManager_DestroyFxSystem ();
 void HOOK_CCam_ProcessFixed ();
@@ -499,12 +505,16 @@ void HOOK_CObject_ProcessDamage ();
 void HOOK_CObject_ProcessBreak ();
 void HOOK_CObject_ProcessCollision ();
 void HOOK_CGlass_WindowRespondsToCollision ();
+void HOOK_CGlass__BreakGlassPhysically ();
 
 void HOOK_FxManager_c__DestroyFxSystem ();
 
 void HOOK_CTaskSimpleGangDriveBy__ProcessPed();
 
 void HOOK_CAERadioTrackManager__ChooseMusicTrackIndex ( );
+
+void HOOK_CAEVehicleAudioEntity__ProcessDummyHeli ();
+void HOOK_CAEVehicleAudioEntity__ProcessDummyProp ();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -646,7 +656,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CHandlingData_isNotRWD, (DWORD)HOOK_isVehDriveTypeNotRWD, 7 );
     HookInstall(HOOKPOS_CHandlingData_isNotFWD, (DWORD)HOOK_isVehDriveTypeNotFWD, 7 );
 
-    HookInstallCall ( CALL_CBike_ProcessRiderAnims, (DWORD)HOOK_CBike_ProcessRiderAnims );
     HookInstallCall ( CALL_Render3DStuff, (DWORD)HOOK_Render3DStuff );
     HookInstallCall ( CALL_VehicleCamUp, (DWORD)HOOK_VehicleCamUp );
     HookInstallCall ( CALL_VehicleLookBehindUp, (DWORD)HOOK_VehicleCamUp );
@@ -706,6 +715,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall ( HOOKPOS_CObject_ProcessBreak, (DWORD)HOOK_CObject_ProcessBreak, 5 );
     HookInstall ( HOOKPOS_CObject_ProcessCollision, (DWORD)HOOK_CObject_ProcessCollision, 10 );
     HookInstall ( HOOKPOS_CGlass_WindowRespondsToCollision, (DWORD)HOOK_CGlass_WindowRespondsToCollision, 8 );
+    HookInstall ( HOOKPOS_CGlass__BreakGlassPhysically, (DWORD)HOOK_CGlass__BreakGlassPhysically, 5 );
 
     // Post-destruction hook for FxSystems
     HookInstall ( HOOKPOS_FxManager_c__DestroyFxSystem, (DWORD)HOOK_FxManager_c__DestroyFxSystem, 5);
@@ -719,6 +729,9 @@ void CMultiplayerSA::InitHooks()
         // CAERadioTrackManager::ChooseMusicTrackIndex hook for fixing a crash with the steam audio files
         HookInstall(HOOKPOS_CAERadioTrackManager__ChooseMusicTrackIndex, (DWORD) HOOK_CAERadioTrackManager__ChooseMusicTrackIndex, 10);
     }
+
+    HookInstall ( HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyHeli, (DWORD) HOOK_CAEVehicleAudioEntity__ProcessDummyHeli, 5 );
+    HookInstall ( HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyProp, (DWORD) HOOK_CAEVehicleAudioEntity__ProcessDummyProp, 5 );
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet ( (void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion () == VERSION_EU_10 ? 6 : 10 );
@@ -827,10 +840,12 @@ void CMultiplayerSA::InitHooks()
     MemPut < BYTE > ( 0x56E871, 0x08 );
     MemPut < BYTE > ( 0x56E872, 0x00 );
 
-    // Disable call to FxSystem_c__GetCompositeMatrix in CAEFireAudioEntity::UpdateParameters 
+    // Disable call to FxSystem_c__GetCompositeMatrix in CAEFireAudioEntity::UpdateParameters
     // that was causing a crash - spent ages debugging, the crash happens if you create 40 or 
     // so vehicles that catch fire (upside down) then delete them, repeating a few times.
-    MemSet ((void*)0x4DCF87,0x90,6);
+    // MemSet ((void*)0x4DCF87,0x90,6);
+    //
+    // The above MemSet was commented out because of mantis#8590, gh#124, see c20d2adc5
     
     /*
     // DISABLE CPed__RemoveBodyPart
@@ -1444,6 +1459,14 @@ void CMultiplayerSA::InitHooks()
     // Skip vehicle type check in CVehicle::SetupRender & CVehicle::ResetAfterRender (fix for #8158)
     MemSet ( (void*) 0x6D6517, 0x90, 2 );
     MemSet ( (void*) 0x6D0E43, 0x90, 2 );
+
+    // Disable vehicle audio driver logic so MTA can reimplement it (#9681)
+    // Disable updating m_bPlayerDriver in CAEVehicleAudioEntity::Service
+    MemSetFast ( (void*) 0x5023B2, 0x90, 6 );
+    // Disable call to CAEVehicleAudioEntity::JustGotInVehicleAsDriver
+    MemSetFast( (void*) 0x5023E1, 0x90, 5 );
+    // Disable call to CAEVehicleAudioEntity::JustGotOutOfVehicleAsDriver
+    MemSetFast( (void*) 0x502341, 0x90, 5 );
 
 
     InitHooks_CrashFixHacks ();
@@ -2623,52 +2646,6 @@ void _declspec(naked) HOOK_Trailer_BreakTowLink()
     }
 }
 
-
-bool ProcessRiderAnims ( CPedSAInterface * pPedInterface )
-{
-    CPed * pPed = pGameInterface->GetPools ()->GetPed ( (DWORD*) pPedInterface );
-    if ( pPed )
-    {
-        CPedSA * pPedSA = dynamic_cast < CPedSA * > ( pPed );
-        if ( pPedSA->GetOccupiedSeat () == 0 )
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-
-CPedSAInterface * pRiderPed = NULL;
-void _declspec(naked) HOOK_CBike_ProcessRiderAnims ()
-{    
-    // This hook is no longer needed
-    _asm jmp    FUNC_CBike_ProcessRiderAnims
-
-    _asm
-    {
-        mov     pRiderPed, eax
-        pushad
-    }
-
-    if ( ProcessRiderAnims ( pRiderPed ) )
-    {
-        _asm
-        {
-            popad
-            jmp    FUNC_CBike_ProcessRiderAnims
-        }
-    }
-    else
-    {
-        _asm
-        {
-            popad
-            ret
-        }
-    }
-}
-
 eExplosionType explosionType;
 CVector vecExplosionLocation;
 DWORD explosionCreator = 0;
@@ -2788,12 +2765,18 @@ void _declspec(naked) HOOK_CExplosion_AddExplosion()
     // Call the explosion handler
     if ( !CallExplosionHandler () )
     {
-        _asm    popad
-        _asm    retn // if they return false from the handler, they don't want the explosion to show
+        _asm
+        {
+            popad
+            retn // if they return false from the handler, they don't want the explosion to show
+        }
     }
     else
     {
-        _asm popad
+        _asm
+        {
+            popad
+        }
     }
 
     _asm
@@ -2868,7 +2851,8 @@ void _declspec(naked) HOOK_CTaskComplexJump__CreateSubTask()
 
     if ( processGrab() )
     {
-        _asm {
+        _asm
+        {
             popad
             mov     eax, 0x67DAD6
             jmp     eax
@@ -2876,7 +2860,8 @@ void _declspec(naked) HOOK_CTaskComplexJump__CreateSubTask()
     }
     else
     {
-        _asm {
+        _asm
+        {
             popad
             mov     eax, 0x67DAD1
             jmp     eax
@@ -3024,8 +3009,10 @@ void _declspec(naked) HOOK_CCam_ProcessFixed ()
 
 void _declspec(naked) HOOK_Render3DStuff ()
 {
-    _asm pushad    
-    
+    _asm
+    {
+        pushad    
+    }
     if ( m_pRender3DStuffHandler ) m_pRender3DStuffHandler ();
 
     _asm
@@ -3183,7 +3170,6 @@ void CRunningScript_Process ( void )
             add     esp, 4
         }
 */
-        //_asm int 3
         dwFunc = 0x420B80; // set position
         fX = 2488.562f;
         fY = -1666.864f;
@@ -3197,7 +3183,7 @@ void CRunningScript_Process ( void )
             mov     ecx, [edi]
             call    dwFunc
         }
-        /*_asm int 3
+        /*
         dwFunc = 0x609540; // reactivate player ped
         _asm
         {
@@ -3232,7 +3218,8 @@ void CRunningScript_Process ( void )
             push    4   
             push    eax
             call    dwFunc
-        }*/
+        }
+*/
 
         
         bHasProcessedScript = true;
@@ -4046,7 +4033,10 @@ void _declspec(naked) HOOK_CollisionStreamRead ()
 unsigned char ucDesignatedLightState = 0;
 void _declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState ()
 {
-    _asm pushad
+    _asm
+    {
+        pushad    
+    }
 
     if ( ucTrafficLightState == 0 || ucTrafficLightState == 5 || ucTrafficLightState == 8 )
     {
@@ -4073,7 +4063,10 @@ void _declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState ()
 
 void _declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState ()
 {
-    _asm pushad
+    _asm
+    {
+        pushad    
+    }
 
     if ( ucTrafficLightState == 3 || ucTrafficLightState == 5 || ucTrafficLightState == 7 )
     {
@@ -4100,7 +4093,10 @@ void _declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState ()
 
 void _declspec(naked) HOOK_CTrafficLights_DisplayActualLight ()
 {
-    _asm pushad
+    _asm
+    {
+        pushad    
+    }
 
     if ( ucTrafficLightState == 2 )
     {
@@ -4914,8 +4910,10 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam_2 ()
 DWORD dwCCoronas_RegisterCorona = 0x6FC580;
 void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect_1 ()
 {
-    // 160, 160, 140
-    _asm pushad
+    _asm
+    {
+        pushad    
+    }
 
     CVehicle_GetHeadLightColor ( pLightsVehicleInterface, 160.0f, 160.0f, 140.0f );
 
@@ -4940,8 +4938,10 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect_1 ()
 
 void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect_2 ()
 {
-    // 160, 160, 140
-    _asm pushad
+    _asm
+    {
+        pushad    
+    }
 
     CVehicle_GetHeadLightColor ( pLightsVehicleInterface, 160.0f, 160.0f, 140.0f );
 
@@ -4967,8 +4967,10 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect_2 ()
 DWORD dwCShadows_StoreCarLightShadow = 0x70C500;
 void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin ()
 {
-    // 45, 45, 45
-    _asm pushad
+    _asm
+    {
+        pushad    
+    }
  
     CVehicle_GetHeadLightColor ( pLightsVehicleInterface, 45.0f, 45.0f, 45.0f );
 
@@ -4991,8 +4993,10 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin ()
 
 void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle ()
 {
-    // 45, 45, 45
-    __asm pushad
+    _asm
+    {
+        pushad    
+    }
 
     CVehicle_GetHeadLightColor ( pLightsVehicleInterface, 45.0f, 45.0f, 45.0f );
 
@@ -5495,8 +5499,11 @@ void CMultiplayerSA::DeleteAndDisableGangTags ()
         }
 
         dwFunc = FUNC_CTagManager_ShutdownForRestart;
-        _asm call dwFunc
- 
+        _asm
+        {
+            call dwFunc
+        }
+
         // Disallow spraying gang tags
         // Nop the whole CTagManager::IsTag function and replace its body with:
         // xor eax, eax
@@ -6529,7 +6536,10 @@ bool TriggerObjectBreakEvent ( )
 
 void _declspec(naked) HOOK_CObject_ProcessBreak ( )
 {
-    _asm pushad
+    _asm
+    {
+        pushad
+    }
     ucColDamageEffect = *(unsigned char*)((DWORD)pDamagedObject + 324);
     
     if ( ucColDamageEffect != NULL  )
@@ -6606,6 +6616,41 @@ void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision ()
         _asm
         {
             popad
+            retn
+        }
+    }
+}
+
+// Called when glass object is being broken by ped melee attack
+DWORD dummy_404350 = 0x404350;
+void _declspec(naked) HOOK_CGlass__BreakGlassPhysically ()
+{
+    _asm
+    {
+        mov     pDamagedObject, esi
+    }
+    // we can't get attacker from here
+    pObjectAttacker = NULL;
+
+    if ( TriggerObjectBreakEvent () )
+    {
+        _asm
+        {
+            // restore replaced part
+            push    dummy_404350
+            // jump outside of the hook
+            jmp     RETURN_CGlass__BreakGlassPhysically
+        }
+    }
+    else
+    {
+        _asm
+        {
+            pop     edi
+            pop     esi
+            pop     ebp
+            pop     ebx
+            add     esp, 0BCh
             retn
         }
     }
@@ -6884,5 +6929,35 @@ void _declspec(naked) HOOK_CAERadioTrackManager__ChooseMusicTrackIndex ( )
         mov ecx, dwNumberOfTracks
         // jump back to normal processing
         jmp RETURN_CAERadioTrackManager__ChooseMusicTrackIndex
+    }
+}
+
+// Use AI heli rotor sound if player sound bank is not loaded
+void _declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyHeli ()
+{
+    _asm
+    {
+        // push our argument
+        push    [esp+8Ch+4]
+        mov     ecx, esi
+        // call twin function
+        call    dwFUNC_CAEVehicleAudioEntity__ProcessAIHeli
+        // go back
+        jmp     RETURN_CAEVEhicleAudioEntity__ProcessDummyHeli
+    }
+}
+
+// Use AI plane propeller sound if player sound bank is not loaded
+void _declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyProp ()
+{
+    _asm
+    {
+        // push our argument
+        push    [esp+98h+4]
+        mov     ecx, esi
+        // call twin function
+        call    dwFUNC_CAEVehicleAudioEntity__ProcessAIProp
+        // go back
+        jmp     RETURN_CAEVEhicleAudioEntity__ProcessDummyProp
     }
 }

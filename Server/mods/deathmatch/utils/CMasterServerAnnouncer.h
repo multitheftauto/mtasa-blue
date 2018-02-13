@@ -78,7 +78,7 @@ public:
                 // Send request
                 this->AddRef();     // Keep object alive
                 m_bStatusBusy = true;
-                GetDownloadManager()->QueueFile( m_Definition.strURL, NULL, 0, "", 0, false, this, StaticDownloadFinishedCallback, false, 2 );
+                GetDownloadManager()->QueueFile( m_Definition.strURL, NULL, "", 0, false, this, StaticDownloadFinishedCallback, false, 2 );
             }
         }
         else
@@ -94,7 +94,7 @@ public:
                 m_llLastPushTime = llTickCountNow;
                 SString strPostContent = ASE::GetInstance()->QueryLight();
                 bool bPostContentBinary = true;
-                GetDownloadManager()->QueueFile( m_Definition.strURL, NULL, 0, &strPostContent.at( 0 ), strPostContent.length(), bPostContentBinary, NULL, NULL, false, 1 );
+                GetDownloadManager()->QueueFile( m_Definition.strURL, NULL, &strPostContent.at( 0 ), strPostContent.length(), bPostContentBinary, NULL, NULL, false, 1 );
             }
         }
     }
@@ -102,21 +102,21 @@ public:
     //
     // Process response from master server
     //
-    static void StaticDownloadFinishedCallback( char * data, size_t dataLength, void * obj, bool bSuccess, int iErrorCode )
+    static void StaticDownloadFinishedCallback( const SHttpDownloadResult& result )
     {
-        CMasterServer* pMasterServer = (CMasterServer*)obj;
-        pMasterServer->DownloadFinishedCallback( data, dataLength, bSuccess, iErrorCode );
+        CMasterServer* pMasterServer = (CMasterServer*)result.pObj;
+        pMasterServer->DownloadFinishedCallback( result );
         pMasterServer->Release();   // No need to keep object alive now
     }
 
     //
     // Process response from master server
     //
-    void DownloadFinishedCallback( char * data, size_t dataLength, bool bSuccess, int iErrorCode )
+    void DownloadFinishedCallback( const SHttpDownloadResult& result )
     {
         m_bStatusBusy = false;
 
-        if ( bSuccess )
+        if ( result.bSuccess )
         {
             if ( m_Stage < ANNOUNCE_STAGE_REMINDER )
             {
@@ -124,20 +124,20 @@ public:
                 if ( !m_Definition.bHideSuccess )
                 {
                     CArgMap argMap;
-                    argMap.SetFromString( data );
+                    argMap.SetFromString( result.pData );
                     SString strOkMessage = argMap.Get( "ok_message" );
 
                     // Log successful initial announcement
-                    if ( iErrorCode == 200 )
+                    if ( result.iErrorCode == 200 )
                         CLogger::LogPrintf( "%s success! %s\n", *m_Definition.strDesc, *strOkMessage );
                     else
-                        CLogger::LogPrintf( "%s successish! (%u %s)\n", *m_Definition.strDesc, iErrorCode, GetDownloadManager()->GetError() );
+                        CLogger::LogPrintf( "%s successish! (%u %s)\n", *m_Definition.strDesc, result.iErrorCode, GetDownloadManager()->GetError() );
                 }
             }
         }
         else
         {
-            bool bCanRetry = ( iErrorCode == 28 ); // We can retry if 'Timeout was reached'
+            bool bCanRetry = ( result.iErrorCode == 28 ); // We can retry if 'Timeout was reached'
 
             if ( m_Stage == ANNOUNCE_STAGE_INITIAL )
             {
@@ -161,7 +161,7 @@ public:
                     if ( !m_Definition.bHideProblems )
                     {
                         // Log final failure
-                        CLogger::LogPrintf( "%s failed! (%u %s)\n", *m_Definition.strDesc, iErrorCode, GetDownloadManager()->GetError() );
+                        CLogger::LogPrintf( "%s failed! (%u %s)\n", *m_Definition.strDesc, result.iErrorCode, GetDownloadManager()->GetError() );
                     }
                 }
             }

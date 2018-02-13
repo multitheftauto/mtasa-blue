@@ -184,6 +184,13 @@ int CLuaXMLDefs::xmlLoadFile ( lua_State* luaVM )
                             }
                         }
 
+                        if ( FileExists ( strPath ) )
+                        {
+                            SString strError;
+                            xmlFile->GetLastError ( strError );
+                            if ( !strError.empty( ) )
+                                argStream.SetCustomError ( strError, SString("Unable to read XML file %s", strFileInput.c_str( ) ) );
+                        }
                         // Destroy it if we failed
                         pLuaMain->DestroyXML ( xmlFile );
                     }

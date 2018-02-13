@@ -262,9 +262,10 @@ void CWebCore::InitialiseWhiteAndBlacklist ( bool bAddHardcoded, bool bAddDynami
     if ( bAddDynamic )
     {
         // Hardcoded whitelist
-        static SString whitelist[] = { 
+        static SString whitelist[] = {
             "google.com", "youtube.com", "www.youtube-nocookie.com", "vimeo.com", "player.vimeo.com", "code.jquery.com",
             "myvideo.com", "mtasa.com", "multitheftauto.com", "mtavc.com", "www.googleapis.com", "ajax.googleapis.com",
+            "localhost", "127.0.0.1"
         };
 
         // Hardcoded blacklist
@@ -490,7 +491,7 @@ bool CWebCore::UpdateListsFromMaster ()
             OutputDebugLine ( "Updating white- and blacklist..." );
         #endif
             g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadModeType::WEBBROWSER_LISTS )->QueueFile ( SString("%s?type=getrev", BROWSER_UPDATE_URL),
-                NULL, 0, NULL, 0, false, this, &CWebCore::StaticFetchRevisionFinished, false, 3 );
+                NULL, NULL, 0, false, this, &CWebCore::StaticFetchRevisionFinished, false, 3 );
 
             pLastUpdateNode->SetTagContent ( SString ( "%d", (long long)currentTime ) );
             m_pXmlConfig->Write ();
@@ -670,12 +671,12 @@ void CWebCore::GetFilterEntriesByType ( std::vector<std::pair<SString, bool>>& o
     }
 }
 
-void CWebCore::StaticFetchRevisionFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+void CWebCore::StaticFetchRevisionFinished ( const SHttpDownloadResult& result )
 {
-    CWebCore* pWebCore = static_cast < CWebCore* > ( pObj );
-    if ( bSuccess )
+    CWebCore* pWebCore = static_cast < CWebCore* > ( result.pObj );
+    if ( result.bSuccess )
     {
-        SString strData = pCompletedData;
+        SString strData = result.pData;
         SString strWhiteRevision, strBlackRevision;
         strData.Split ( ";", &strWhiteRevision, &strBlackRevision );
 
@@ -685,7 +686,7 @@ void CWebCore::StaticFetchRevisionFinished ( char* pCompletedData, size_t comple
             if ( iWhiteListRevision > pWebCore->m_iWhitelistRevision )
             {
                 g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadModeType::WEBBROWSER_LISTS )->QueueFile ( SString("%s?type=fetchwhite", BROWSER_UPDATE_URL ),
-                    NULL, 0, NULL, 0, false, pWebCore, &CWebCore::StaticFetchWhitelistFinished, false, 3 );
+                    NULL, NULL, 0, false, pWebCore, &CWebCore::StaticFetchWhitelistFinished, false, 3 );
 
                 pWebCore->m_iWhitelistRevision = iWhiteListRevision;
             }
@@ -693,7 +694,7 @@ void CWebCore::StaticFetchRevisionFinished ( char* pCompletedData, size_t comple
             if ( iBlackListRevision > pWebCore->m_iBlacklistRevision )
             {
                 g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadModeType::WEBBROWSER_LISTS )->QueueFile ( SString("%s?type=fetchblack", BROWSER_UPDATE_URL),
-                    NULL, 0, NULL, 0, false, pWebCore, &CWebCore::StaticFetchBlacklistFinished, false, 3 );
+                    NULL, NULL, 0, false, pWebCore, &CWebCore::StaticFetchBlacklistFinished, false, 3 );
 
                 pWebCore->m_iBlacklistRevision = iBlackListRevision;
             }
@@ -701,12 +702,12 @@ void CWebCore::StaticFetchRevisionFinished ( char* pCompletedData, size_t comple
     }
 }
 
-void CWebCore::StaticFetchWhitelistFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+void CWebCore::StaticFetchWhitelistFinished ( const SHttpDownloadResult& result )
 {
-    if ( !bSuccess )
+    if ( !result.bSuccess )
         return;
 
-    CWebCore* pWebCore = static_cast < CWebCore* > ( pObj );
+    CWebCore* pWebCore = static_cast < CWebCore* > ( result.pObj );
     if ( !pWebCore->m_pXmlConfig )
         return;
 
@@ -715,7 +716,7 @@ void CWebCore::StaticFetchWhitelistFinished ( char* pCompletedData, size_t compl
 
     CXMLNode* pRootNode = pWebCore->m_pXmlConfig->GetRootNode ();
     std::vector<SString> whitelist;
-    SString strData = pCompletedData;
+    SString strData = result.pData;
     strData.Split ( ";", whitelist );
     CXMLNode* pListNode = pRootNode->FindSubNode ( "globalwhitelist" );
     if ( !pListNode )
@@ -744,12 +745,12 @@ void CWebCore::StaticFetchWhitelistFinished ( char* pCompletedData, size_t compl
 #endif
 }
 
-void CWebCore::StaticFetchBlacklistFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+void CWebCore::StaticFetchBlacklistFinished ( const SHttpDownloadResult& result )
 {
-    if ( !bSuccess )
+    if ( !result.bSuccess )
         return;
 
-    CWebCore* pWebCore = static_cast < CWebCore* > ( pObj );
+    CWebCore* pWebCore = static_cast < CWebCore* > ( result.pObj );
     if ( !pWebCore->m_pXmlConfig )
         return;
 
@@ -758,7 +759,7 @@ void CWebCore::StaticFetchBlacklistFinished ( char* pCompletedData, size_t compl
 
     CXMLNode* pRootNode = pWebCore->m_pXmlConfig->GetRootNode ();
     std::vector<SString> blacklist;
-    SString strData = pCompletedData;
+    SString strData = result.pData;
     strData.Split ( ";", blacklist );
     CXMLNode* pListNode = pRootNode->FindSubNode ( "globalblacklist" );
     if ( !pListNode )

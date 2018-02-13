@@ -128,7 +128,7 @@ public:
     void                        DoPulse                     ( void );
 
     bool                        Load                        ( void );
-    bool                        Save                        ( void );
+    void                        Save                        ( bool bForce = false );
     void                        Save                        ( CAccount* pParent, bool bCheckForErrors = true );
 
     bool                        SaveSettings                ( void );
@@ -147,10 +147,12 @@ public:
     bool                        GetAllAccountData           ( CAccount* pAccount, lua_State* pLua );
 
     void                        GetAccountsBySerial         ( const SString& strSerial, std::vector<CAccount*>& outAccounts );
+    void                        GetAccountsByIP             ( const SString& strIP, std::vector<CAccount*>& outAccounts );
+    void                        GetAccountsByData           ( const SString& dataName, const SString& value, std::vector<CAccount*>& outAccounts );
 
     CAccount*                   AddGuestAccount             ( const SString& strName );
     CAccount*                   AddConsoleAccount           ( const SString& strName );
-    CAccount*                   AddPlayerAccount            ( const SString& strName, const SString& strPassword, int iUserID, const SString& strIP, const SString& strSerial );
+    CAccount*                   AddPlayerAccount            ( const SString& strName, const SString& strPassword, int iUserID, const SString& strIP, const SString& strSerial, const SString& strHttpPassAppend );
     CAccount*                   AddNewPlayerAccount         ( const SString& strName, const SString& strPassword );
     bool                        RemoveAccount               ( CAccount* pAccount );
     bool                        IsAuthorizedSerialRequired  ( CAccount* pAccount );
@@ -164,6 +166,7 @@ protected:
     void                        ChangingName                ( CAccount* pAccount, const SString& strOldName, const SString& strNewName );
     void                        LoadAccountSerialUsage      ( CAccount* pAccount );
     void                        SaveAccountSerialUsage      ( CAccount* pAccount );
+    void                        ReconnectToDatabase         (void);
 
 public:
     void                        RemoveAll                   ( void );
@@ -185,6 +188,7 @@ protected:
     SDbConnectionId             m_hDbConnection;
     CDatabaseManager*           m_pDatabaseManager;
     int                         m_iAccounts;
+    SString                     m_strDbPathFilename;
 };
 
 

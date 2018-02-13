@@ -306,6 +306,8 @@ public:
     CRemoteCalls*                       GetRemoteCalls                  ( void )        { return m_pRemoteCalls; }
     CResourceFileDownloadManager*       GetResourceFileDownloadManager  ( void )        { return m_pResourceFileDownloadManager; }
 
+    inline SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler       ( void )        { return m_pAsyncTaskScheduler; }
+
     // Status toggles
     void                                ShowNetstat                     ( int iCmd );
     void                                ShowEaeg                        ( bool bShow );
@@ -793,6 +795,8 @@ private:
     std::set < SString >                m_AllowKeyUpMap;
     uint                                m_uiPrecisionCallDepth;
     SString                             m_strFileCacheRoot;
+
+    SharedUtil::CAsyncTaskScheduler*    m_pAsyncTaskScheduler;
 };
 
 extern CClientGame* g_pClientGame;

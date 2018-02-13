@@ -56,7 +56,6 @@ void CWebView::Initialise ()
     browserSettings.universal_access_from_file_urls = cef_state_t::STATE_DISABLED; // Also filtered by resource interceptor, but set this nevertheless
     browserSettings.file_access_from_file_urls = cef_state_t::STATE_DISABLED;
     browserSettings.webgl = cef_state_t::STATE_ENABLED;
-    browserSettings.javascript_open_windows = cef_state_t::STATE_DISABLED;
 
     browserSettings.plugins = cef_state_t::STATE_DISABLED;
     if ( !m_bIsLocal )
@@ -65,8 +64,12 @@ void CWebView::Initialise ()
         browserSettings.javascript = bEnabledJavascript ? cef_state_t::STATE_ENABLED : cef_state_t::STATE_DISABLED;
     }
 
+    // Set background color to opaque white if transparency is disabled
+    if (!m_bIsTransparent)
+        browserSettings.background_color = 0xffffffff;
+
     CefWindowInfo windowInfo;
-    windowInfo.SetAsWindowless ( g_pCore->GetHookedWindow (), m_bIsTransparent );
+    windowInfo.SetAsWindowless ( g_pCore->GetHookedWindow () );
 
     CefBrowserHost::CreateBrowser ( windowInfo, this, "", browserSettings, nullptr );
 }

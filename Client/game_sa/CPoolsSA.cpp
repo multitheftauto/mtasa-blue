@@ -1027,28 +1027,47 @@ CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSiz
 }
 
 
-char szOutput[1024];
-
-void CPoolsSA::DumpPoolsStatus ()
+uint CPoolsSA::GetModelIdFromClump(RpClump* pRpClump)
 {
-    char*  poolNames[] = {"Buildings", "Peds", "Objects", "Dummies", "Vehicles", "ColModels", 
-        "Tasks", "Events", "TaskAllocators", "PedIntelligences", "PedAttractors", 
-        "EntryInfoNodes", "NodeRoutes", "PatrolRoutes", "PointRoutes", 
-        "PointerNodeDoubleLinks", "PointerNodeSingleLinks" };
-
-    int poolSizes[] = {13000,140,350,2500,110,10150,500,200,16,140,64,500,64,32,64,3200,70000};
-    int iPosition = 0;
-    char percent = '%';
-    iPosition += snprintf ( szOutput, 1024, "-----------------\n" );
-    int iAmount = std::min < int >(MAX_POOLS, std::min(NUMELMS(poolNames), NUMELMS(poolSizes)));
-    for ( int i = 0; i < iAmount; i++ )
+    // Search our pools for a match
+    for (uint i = 0; i < m_pedPool.ulCount; i++)
     {
-        int usedSpaces = GetNumberOfUsedSpaces ( (ePools)i );
-        iPosition += snprintf ( szOutput + iPosition, 1024 - iPosition, "%s: %d (%d) (%.2f%c)\n", poolNames[i], usedSpaces, poolSizes[i], ((float)usedSpaces / (float)poolSizes[i] * 100), percent  );
+        CEntitySA* pEntitySA = m_pedPool.array[i];
+        if (pEntitySA->GetRpClump() == pRpClump)
+        {
+            return pEntitySA->GetModelIndex();
+        }
     }
-    #ifdef MTA_DEBUG
-    OutputDebugString ( szOutput );
-    #endif
+
+    for (uint i = 0; i < m_vehiclePool.ulCount; i++)
+    {
+        CEntitySA* pEntitySA = m_vehiclePool.array[i];
+        if (pEntitySA->GetRpClump() == pRpClump)
+        {
+            return pEntitySA->GetModelIndex();
+        }
+    }
+
+    for (uint i = 0; i < m_objectPool.ulCount; i++)
+    {
+        CEntitySA* pEntitySA = m_objectPool.array[i];
+        if (pEntitySA->GetRpClump() == pRpClump)
+        {
+            return pEntitySA->GetModelIndex();
+        }
+    }
+
+    // Finally search model info array
+    CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
+    for (uint i = 1; i < 20000; i++)
+    {
+        CBaseModelInfoSAInterface* m_pInterface = ppModelInfo[i];
+        if (m_pInterface && m_pInterface->pRwObject == (RwObject*)pRpClump)
+        {
+            return i;
+        }
+    }
+    return 0;
 }
 
 

@@ -22,16 +22,11 @@ CAccountManager::CAccountManager ( const SString& strDbPathFilename )
     m_bChangedSinceSaved = false;
     m_iAccounts = 1;
     m_pDatabaseManager = g_pGame->GetDatabaseManager ();
+    m_strDbPathFilename = strDbPathFilename;
+    m_hDbConnection = INVALID_DB_HANDLE;
 
     //Load internal.db
-    SString strOptions;
-#ifdef WITH_ACCOUNT_QUERY_LOGGING
-    g_pGame->GetDatabaseManager ()->SetLogLevel ( EJobLogLevel::ALL, g_pGame->GetConfig ()->GetDbLogFilename () );
-    SetOption < CDbOptionsMap > ( strOptions, "log", 1 );
-    SetOption < CDbOptionsMap > ( strOptions, "tag", "accounts" );
-#endif
-    SetOption < CDbOptionsMap > ( strOptions, "queue", DB_SQLITE_QUEUE_NAME_INTERNAL );
-    m_hDbConnection = m_pDatabaseManager->Connect ( "sqlite", PathConform ( strDbPathFilename ), "", "", strOptions );
+    ReconnectToDatabase();
 
     // Check if new installation
     CRegistryResult result;
@@ -94,21 +89,47 @@ CAccountManager::CAccountManager ( const SString& strDbPathFilename )
         // Add unique index
 	    m_pDatabaseManager->Execf ( m_hDbConnection, "CREATE UNIQUE INDEX IF NOT EXISTS IDX_USERDATA_USERID_KEY_U on userdata(userid,key)" );
     }
-    
+
     // Ensure old indexes are removed
     m_pDatabaseManager->Execf ( m_hDbConnection, "DROP INDEX IF EXISTS IDX_ACCOUNTS_NAME" );
     m_pDatabaseManager->Execf ( m_hDbConnection, "DROP INDEX IF EXISTS IDX_USERDATA_USERID" );
     m_pDatabaseManager->Execf ( m_hDbConnection, "DROP INDEX IF EXISTS IDX_USERDATA_USERID_KEY" );
+
+    // Check if httppass has been added yet
+	m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "PRAGMA table_info(accounts)");
+    if (ListContains(result->ColNames, "httppass") == false)
+    {
+        m_pDatabaseManager->Execf(m_hDbConnection, "ALTER TABLE accounts ADD COLUMN httppass TEXT");
+    }
 }
 
 
 CAccountManager::~CAccountManager ( void )
 {
     //Save everything
-    Save ();
+    Save (true);
     //Delete our save file
     m_pDatabaseManager->Disconnect ( m_hDbConnection );
     RemoveAll ();
+}
+
+
+void CAccountManager::ReconnectToDatabase(void)
+{
+    if (m_hDbConnection != INVALID_DB_HANDLE)
+    {
+        m_pDatabaseManager->Disconnect(m_hDbConnection);
+    }
+
+    //Load internal.db
+    SString strOptions;
+#ifdef WITH_ACCOUNT_QUERY_LOGGING
+    g_pGame->GetDatabaseManager ()->SetLogLevel ( EJobLogLevel::ALL, g_pGame->GetConfig ()->GetDbLogFilename () );
+    SetOption < CDbOptionsMap > ( strOptions, "log", 1 );
+    SetOption < CDbOptionsMap > ( strOptions, "tag", "accounts" );
+#endif
+    SetOption < CDbOptionsMap > ( strOptions, "queue", DB_SQLITE_QUEUE_NAME_INTERNAL );
+    m_hDbConnection = m_pDatabaseManager->Connect ( "sqlite", PathConform ( m_strDbPathFilename ), "", "", strOptions );
 }
 
 
@@ -129,7 +150,7 @@ bool CAccountManager::Load( void )
     //Create a registry result
     CRegistryResult result;
     //Select all our required information from the accounts database
-    m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT id,name,password,ip,serial from accounts" );
+    m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT id,name,password,ip,serial,httppass from accounts" );
 
     //Initialize all our variables
     m_iAccounts = 0;
@@ -145,6 +166,7 @@ bool CAccountManager::Load( void )
         SString strPassword = (const char *)row[2].pVal;
         SString strIP = (const char *)row[3].pVal;
         SString strSerial = (const char *)row[4].pVal;
+        SString strHttpPassAppend = (const char *)row[5].pVal;
 
         // Check for overlong names and incorrect escapement
         bool bRemoveAccount = false;
@@ -181,7 +203,7 @@ bool CAccountManager::Load( void )
         }
 
         //Create a new account with the specified information
-        CAccount* pAccount = g_pGame->GetAccountManager ()->AddPlayerAccount ( strName, strPassword, iUserID, strIP, strSerial );
+        CAccount* pAccount = g_pGame->GetAccountManager ()->AddPlayerAccount ( strName, strPassword, iUserID, strIP, strSerial, strHttpPassAppend );
 
         if ( bChanged )
             pAccount->SetChanged ( bChanged );
@@ -245,27 +267,26 @@ void CAccountManager::Save ( CAccount* pAccount, bool bCheckForErrors )
 {
     SString strName = pAccount->GetName();
     SString strPassword = pAccount->GetPasswordHash();
+    SString strHttpPassAppend = pAccount->GetHttpPassAppend();
     SString strIP = pAccount->GetIP();
     SString strSerial = pAccount->GetSerial();
     unsigned int iID = pAccount->GetID();
 
     m_pDatabaseManager->Execf ( m_hDbConnection, "INSERT OR IGNORE INTO accounts (id, name, ip, serial, password) VALUES(?,?,?,?,?)", SQLITE_INTEGER, iID, SQLITE_TEXT, strName.c_str (), SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str () );
 
-    if ( bCheckForErrors )
+    SString strQuery;
+    strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, "UPDATE accounts SET ip=?", SQLITE_TEXT, *strIP);
+    if (!strSerial.empty())
+        strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, ",serial=?", SQLITE_TEXT, *strSerial);
+    strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, ",password=?, httppass=? WHERE name=?", SQLITE_TEXT, *strPassword, SQLITE_TEXT, *strHttpPassAppend, SQLITE_TEXT, *strName);
+
+    if (bCheckForErrors)
     {
-        if ( strSerial != "" )
-            m_pDatabaseManager->QueryWithCallbackf ( m_hDbConnection, StaticDbCallback, this, "UPDATE accounts SET ip=?, serial=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
-        else
-            //If we don't have a serial then IP and password will suffice
-            m_pDatabaseManager->QueryWithCallbackf ( m_hDbConnection, StaticDbCallback, this, "UPDATE accounts SET ip=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
+        m_pDatabaseManager->QueryWithCallback(m_hDbConnection, StaticDbCallback, this, strQuery);
     }
     else
     {
-        if ( strSerial != "" )
-            m_pDatabaseManager->Execf ( m_hDbConnection, "UPDATE accounts SET ip=?, serial=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strSerial.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
-        else
-            //If we don't have a serial then IP and password will suffice
-            m_pDatabaseManager->Execf ( m_hDbConnection, "UPDATE accounts SET ip=?, password=? WHERE name=?", SQLITE_TEXT, strIP.c_str (), SQLITE_TEXT, strPassword.c_str (), SQLITE_TEXT, strName.c_str () );
+        m_pDatabaseManager->Exec(m_hDbConnection, strQuery);
     }
 
     SaveAccountSerialUsage( pAccount );
@@ -275,19 +296,21 @@ void CAccountManager::Save ( CAccount* pAccount, bool bCheckForErrors )
 }
 
 
-bool CAccountManager::Save ( void )
+void CAccountManager::Save ( bool bForce )
 {
-    // Attempted save now
-    m_bChangedSinceSaved = false;
-
-    for ( auto pAccount : m_List )
+    if (m_bChangedSinceSaved || bForce)
     {
-        if ( pAccount->IsRegistered () && pAccount->HasChanged () && !pAccount->IsConsoleAccount ()  )
+        // Attempted save now
+        m_bChangedSinceSaved = false;
+
+        for ( auto pAccount : m_List )
         {
-            Save ( pAccount );
+            if ( pAccount->IsRegistered () && pAccount->HasChanged () && !pAccount->IsConsoleAccount ()  )
+            {
+                Save ( pAccount );
+            }
         }
     }
-    return true;
 }
 
 
@@ -848,6 +871,7 @@ bool CAccountManager::GetAllAccountData( CAccount* pAccount, lua_State* pLua )
 
 void CAccountManager::GetAccountsBySerial ( const SString& strSerial, std::vector<CAccount*>& outAccounts )
 {
+    Save();
     CRegistryResult result;
     m_pDatabaseManager->QueryWithResultf ( m_hDbConnection, &result, "SELECT name FROM accounts WHERE serial = ?", SQLITE_TEXT, strSerial.c_str () );
 
@@ -856,7 +880,40 @@ void CAccountManager::GetAccountsBySerial ( const SString& strSerial, std::vecto
         const CRegistryResultRow& row = *iter;
         
         CAccount* pAccount = Get ( (const char*)row[0].pVal );
-        outAccounts.push_back ( pAccount );
+        if (pAccount)
+            outAccounts.push_back ( pAccount );
+    }
+}
+
+void CAccountManager::GetAccountsByIP( const SString& strIP, std::vector<CAccount*>& outAccounts ) 
+{
+    Save();
+    CRegistryResult result;
+    m_pDatabaseManager->QueryWithResultf( m_hDbConnection, &result, "SELECT name FROM accounts WHERE added_ip = ?", SQLITE_TEXT, strIP.c_str() );
+
+    for ( CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter ) 
+    {
+        const CRegistryResultRow& row = *iter;
+
+        CAccount* pAccount = Get( (const char*) row[0].pVal );
+        if (pAccount)
+            outAccounts.push_back( pAccount );
+    }
+}
+
+void CAccountManager::GetAccountsByData ( const SString& dataName, const SString& value, std::vector<CAccount*>& outAccounts ) 
+{
+    Save();
+    CRegistryResult result;
+    m_pDatabaseManager->QueryWithResultf( m_hDbConnection, &result, "SELECT acc.name FROM accounts acc, userdata dat WHERE dat.key = ? AND dat.value = ? AND dat.userid = acc.id", SQLITE_TEXT, dataName.c_str(), SQLITE_TEXT, value.c_str() );
+
+    for ( CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter ) 
+    {
+        const CRegistryResultRow& row = *iter;
+
+        CAccount* pAccount = Get( (const char*) row[0].pVal );
+        if (pAccount)
+            outAccounts.push_back( pAccount );
     }
 }
 
@@ -872,9 +929,9 @@ CAccount* CAccountManager::AddConsoleAccount( const SString& strName )
     return pAccount;
 }
 
-CAccount* CAccountManager::AddPlayerAccount( const SString& strName, const SString& strPassword, int iUserID, const SString& strIP, const SString& strSerial )
+CAccount* CAccountManager::AddPlayerAccount( const SString& strName, const SString& strPassword, int iUserID, const SString& strIP, const SString& strSerial, const SString& strHttpPassAppend )
 {
-    CAccount* pAccount = new CAccount ( this, EAccountType::Player, strName, strPassword, iUserID, strIP, strSerial );
+    CAccount* pAccount = new CAccount ( this, EAccountType::Player, strName, strPassword, iUserID, strIP, strSerial, strHttpPassAppend );
     return pAccount;
 }
 
@@ -911,7 +968,7 @@ void CAccountManager::StaticDbCallback ( CDbJobData* pJobData, void* pContext )
         ((CAccountManager*)pContext)->DbCallback ( pJobData );
 #ifdef MTA_DEBUG
     else
-        CLogger::LogPrintf ( "DEBUGINFO: StaticDbCallback stage was %d for '%s'\n", pJobData->stage, *pJobData->command.strData );
+        CLogger::LogPrintf ( "DEBUGINFO: StaticDbCallback stage was %d for '%s'\n", pJobData->stage, *pJobData->GetCommandStringForLog() );
 #endif
 }
 
@@ -919,12 +976,20 @@ void CAccountManager::DbCallback ( CDbJobData* pJobData )
 {
     if ( m_pDatabaseManager->QueryPoll ( pJobData, 0 ) )
     {
-        if ( pJobData->result.status == EJobResult::FAIL ) 
-            CLogger::LogPrintf ( "ERROR: While updating account with '%s': %s.\n", *pJobData->command.strData, *pJobData->result.strReason );
+        if ( pJobData->result.status == EJobResult::FAIL )
+        {
+            CLogger::LogPrintf ( "ERROR: While updating account with '%s': %s.\n", *pJobData->GetCommandStringForLog(), *pJobData->result.strReason );
+            if (pJobData->result.strReason.ContainsI("missing database"))
+            {
+                // Try reconnection
+                CLogger::LogPrintf("INFO: Reconnecting to accounts database\n");
+                ReconnectToDatabase();
+            }
+        }
     }
     else
     {
-        CLogger::LogPrintf ( "ERROR: Something worrying happened in DbCallback '%s': %s.\n", *pJobData->command.strData, *pJobData->result.strReason );
+        CLogger::LogPrintf ( "ERROR: Something worrying happened in DbCallback '%s': %s.\n", *pJobData->GetCommandStringForLog(), *pJobData->result.strReason );
     }
 }
 

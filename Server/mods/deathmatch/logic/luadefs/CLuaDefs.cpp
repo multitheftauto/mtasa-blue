@@ -249,3 +249,19 @@ void CLuaDefs::DidUseFunction ( lua_CFunction f, lua_State* luaVM )
 
     g_pGame->GetDebugHookManager()->OnPostFunction( f, luaVM );
 }
+
+//
+// Prints a warning message in script-debug if the element is a player and not joined yet
+//
+void CLuaDefs::LogWarningIfPlayerHasNotJoinedYet ( lua_State* luaVM, CElement* pElement )
+{
+    static auto szWarningText = "Modifying players before onPlayerJoin can cause desynchronization";
+
+    if ( pElement && IS_PLAYER ( pElement ) )
+    {
+        auto pPlayer = static_cast < CPlayer * > ( pElement );
+
+        if ( !pPlayer->IsJoined() )
+            m_pScriptDebugging->LogWarning ( luaVM, "%s: %s", lua_tostring ( luaVM, lua_upvalueindex ( 1 ) ), szWarningText );
+    }
+}

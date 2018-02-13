@@ -23,6 +23,7 @@
 #include "CCVarsInterface.h"
 #include "CWebCoreInterface.h"
 #include "CTrayIconInterface.h"
+#include "CChatInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
 
@@ -33,13 +34,6 @@ class CNet;
 class CGame;
 class CModelCacheManager;
 class CLocalizationInterface;
-
-namespace ChatFonts
-{
-    enum eChatFont { CHAT_FONT_DEFAULT,CHAT_FONT_CLEAR,CHAT_FONT_BOLD,CHAT_FONT_ARIAL,CHAT_FONT_MAX };
-}
-
-using ChatFonts::eChatFont;
 
 enum eCoreVersion
 {

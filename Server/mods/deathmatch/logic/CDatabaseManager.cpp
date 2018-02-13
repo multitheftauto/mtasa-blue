@@ -34,11 +34,11 @@ public:
     virtual void                    DoPulse                     ( void );
     virtual SConnectionHandle       Connect                     ( const SString& strType, const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions );
     virtual bool                    Disconnect                  ( SConnectionHandle hConnection );
-    virtual SString                 PrepareString               ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
+    virtual SString                 PrepareString               ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs = nullptr );
     virtual SString                 PrepareStringf              ( SConnectionHandle hConnection, const char* szQuery, ... );
-    virtual CDbJobData*             Exec                        ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
+    virtual CDbJobData*             Exec                        ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs = nullptr );
     virtual CDbJobData*             Execf                       ( SConnectionHandle hConnection, const char* szQuery, ... );
-    virtual CDbJobData*             QueryStart                  ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs );
+    virtual CDbJobData*             QueryStart                  ( SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs = nullptr );
     virtual CDbJobData*             QueryStartf                 ( SConnectionHandle hConnection, const char* szQuery, ... );
     virtual bool                    QueryPoll                   ( CDbJobData* pJobData, uint ulTimeout );
     virtual bool                    QueryFree                   ( CDbJobData* pJobData );
@@ -46,6 +46,7 @@ public:
     virtual const SString&          GetLastErrorMessage         ( void )                    { return m_strLastErrorMessage; }
     virtual bool                    IsLastErrorSuppressed       ( void )                    { return m_bLastErrorSuppressed; }
     virtual bool                    QueryWithResultf            ( SConnectionHandle hConnection, CRegistryResult* pResult, const char* szQuery, ... );
+    virtual bool                    QueryWithCallback           ( SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const SString& strQuery, CLuaArguments* pArgs = nullptr );
     virtual bool                    QueryWithCallbackf          ( SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const char* szQuery, ... );
     virtual void                    SetLogLevel                 ( EJobLogLevelType logLevel, const SString& strLogFilename );
 
@@ -433,6 +434,42 @@ bool CDatabaseManagerImpl::QueryWithResultf ( SConnectionHandle hConnection, CRe
 
 ///////////////////////////////////////////////////////////////
 //
+// CDatabaseManagerImpl::QueryWithCallback
+//
+// Start a query and direct the result through a callback
+//
+///////////////////////////////////////////////////////////////
+bool CDatabaseManagerImpl::QueryWithCallback ( SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const SString& strQuery, CLuaArguments* pArgs )
+{
+    ClearLastErrorMessage ();
+
+    // Check connection
+    if ( !MapContains ( m_ConnectionTypeMap, hConnection ) )
+    {
+        SetLastErrorMessage ( "Invalid connection" );
+        return false;
+    }
+
+    // Insert arguments with correct escapement
+    SString strEscapedQuery = InsertQueryArguments ( hConnection, strQuery, pArgs );
+
+    // Start query
+    CDbJobData* pJobData = m_JobQueue->AddCommand ( EJobCommand::QUERY, hConnection, strEscapedQuery );
+    if ( !pJobData )
+    {
+        SetLastErrorMessage( "Invalid connection" );
+        return false;
+    }
+
+    // Set callback vars
+    pJobData->SetCallback ( pfnDbResult, pCallbackContext );
+
+    return true;
+}
+
+
+///////////////////////////////////////////////////////////////
+//
 // CDatabaseManagerImpl::QueryWithCallbackf
 //
 // Start a query and direct the result through a callback
@@ -662,4 +699,27 @@ void CDbJobData::ProcessCallback ( void )
     assert ( HasCallback () );
     callback.bDone = true;
     callback.pfnDbResult( this, callback.pContext );
+}
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDbJobData::GetCommandStringForLog
+//
+// Remove sensitive info
+//
+///////////////////////////////////////////////////////////////
+SString CDbJobData::GetCommandStringForLog(void)
+{
+    if (command.type == EJobCommand::CONNECT)
+    {
+        std::vector<SString> parts;
+        command.strData.Split("\1", parts);
+        if (parts.size() >= 5)
+        {
+            // Remove host, username and password
+            return parts[0] + " " + parts[4];
+        }
+    }
+    return command.strData;
 }

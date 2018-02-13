@@ -33,12 +33,12 @@ void CClientEffectManager::DeleteAll( )
     m_bCanRemoveFromList = true;
 }
 
-CClientEffect * CClientEffectManager::Create(const SString& strEffectName, const CVector &vecPosition, ElementID ID)
+CClientEffect * CClientEffectManager::Create(const SString& strEffectName, const CVector &vecPosition, ElementID ID, bool bSoundEnable )
 {
     if ( strEffectName.length () >= 0x60 )
         return NULL;
 
-    CFxSystem * pFxSA = g_pGame->GetFxManager()->CreateFxSystem ( strEffectName, vecPosition, NULL, true );
+    CFxSystem * pFxSA = g_pGame->GetFxManager()->CreateFxSystem ( strEffectName, vecPosition, NULL, true, bSoundEnable );
     if ( pFxSA == NULL )
         return NULL; // GTA was unable to create the effect (e.g. wrong effect name)
 

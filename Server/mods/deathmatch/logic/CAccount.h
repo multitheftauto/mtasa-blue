@@ -67,7 +67,7 @@ public:
     };
 
     ZERO_ON_NEW
-                                CAccount                ( class CAccountManager* pManager, EAccountType accountType, const std::string& strName, const std::string& strPassword = "", int iUserID = 0, const std::string& strIP = "", const std::string& strSerial = "" );
+                                CAccount                ( class CAccountManager* pManager, EAccountType accountType, const std::string& strName, const std::string& strPassword = "", int iUserID = 0, const std::string& strIP = "", const std::string& strSerial = "", const SString& strHttpPassAppend = "" );
                                 ~CAccount               ( void );
 
     bool                        IsRegistered            ( void )                    { return m_AccountType != EAccountType::Guest; }
@@ -79,8 +79,10 @@ public:
     void                        SetName                 ( const std::string& strName );
 
     void                        SetPassword             ( const SString& strPassword );
-    bool                        IsPassword              ( const SString& strPassword );
+    bool                        IsPassword              ( const SString& strPassword, bool* pbUsedHttpPassAppend=nullptr );
     SString                     GetPasswordHash         ( void );
+    const SString&              GetHttpPassAppend       ( void )                    { return m_strHttpPassAppend; }
+    void                        SetHttpPassAppend       ( const SString& strHttpPassAppend );
 
     inline const std::string&   GetIP                   ( void )                    { return m_strIP; }
     inline const std::string&   GetSerial               ( void )                    { return m_strSerial; }
@@ -119,6 +121,7 @@ public:
     EAccountType                m_AccountType;
     SString                     m_strName;
     CAccountPassword            m_Password;
+    SString                     m_strHttpPassAppend;
     std::string                 m_strIP;
     std::string                 m_strSerial;
     int                         m_iUserID;

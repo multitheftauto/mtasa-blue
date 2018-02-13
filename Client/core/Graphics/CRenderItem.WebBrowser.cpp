@@ -94,7 +94,7 @@ void CWebBrowserItem::CreateUnderlyingData ()
     assert ( !m_pD3DRenderTargetSurface );
     assert ( !m_pD3DTexture );
 
-    D3DXCreateTexture ( m_pDevice, m_uiSizeX, m_uiSizeY, 1, 0, D3DFMT_A8B8G8R8, D3DPOOL_MANAGED, (IDirect3DTexture9**)&m_pD3DTexture );
+    D3DXCreateTexture ( m_pDevice, m_uiSizeX, m_uiSizeY, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, (IDirect3DTexture9**)&m_pD3DTexture );
     
     // Check texture created
     if ( !m_pD3DTexture )

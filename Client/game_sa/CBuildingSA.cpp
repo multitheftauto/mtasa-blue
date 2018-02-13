@@ -76,7 +76,6 @@ CBuildingSA::CBuildingSA( DWORD dwModel )
     //CBuildingSAInterface * building = (CBuildingSAInterface*)this->GetInterface();
     //building->bBackfaceCulled = true;
     //building->m_areaCode = *(DWORD *)0xB72914;
-    //_asm int 3
     /*dwFunc = 0x533D30; // createrwobject - fails if the game hasn't already loaded the object, and doesn't seem to show anyway
     _asm
     {

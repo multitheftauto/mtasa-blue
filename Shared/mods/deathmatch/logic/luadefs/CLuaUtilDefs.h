@@ -45,4 +45,7 @@ public:
     LUA_DECLARE ( PregFind );
     LUA_DECLARE ( PregReplace );
     LUA_DECLARE ( PregMatch );
+
+    // Debug functions
+    LUA_DECLARE(DebugSleep);
 };

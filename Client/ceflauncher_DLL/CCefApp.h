@@ -56,7 +56,7 @@ public:
     virtual void OnRegisterCustomSchemes ( CefRawPtr < CefSchemeRegistrar > registrar ) override
     {
         // Register custom MTA scheme (has to be called in all proceseses)
-        registrar->AddCustomScheme ( "mtalocal", false, false, false, false, false );
+        registrar->AddCustomScheme ( "mtalocal", false, false, false, false, false, true );
     }
 
 

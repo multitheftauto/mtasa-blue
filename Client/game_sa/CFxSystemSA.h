@@ -43,9 +43,12 @@
 
 class CAEFireAudioEntitySAInterface
 {
+public:
     // this derives from CAEAudioEntity
     // todo: reverse this structure and CAEAudioEntity
-    int unk[0x22]; 
+    std::int32_t pad1[0x21];
+
+    void* audio; // 0x84 // TODO: Reverse what this __exactly__ is
 };
 static_assert(sizeof(CAEFireAudioEntitySAInterface) == 0x88, "Invalid size for CAEFireAudioEntitySAInterface");
 

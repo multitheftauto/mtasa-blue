@@ -74,8 +74,8 @@ public:
     CNetHTTPDownloadManagerInterface* GetHTTP               ( void );
     void                GetSaveLocationList                 ( std::list < SString >& outSaveLocationList, const SString& strFilename );
     SString             GetResumableSaveLocation            ( const SString& strFilename, const SString& strMD5, uint iFilesize );
-    static void         StaticDownloadFinished              ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
-    void                DownloadFinished                    ( char* pCompletedData, size_t completedLength, bool bSuccess, int iErrorCode );
+    static void         StaticDownloadFinished              ( const SHttpDownloadResult& result );
+    void                DownloadFinished                    ( const SHttpDownloadResult& result );
 
     // Commands
     void                _UseMasterFetchURLs                 ( void );
@@ -3162,14 +3162,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
         }
     }
 
-    // Get version of installed VS2015 runtime
-    SString strVS2015Version = "0";
-    SString strVS2015Install = GetSystemRegistryValue ( (uint)HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\DevDiv\\vc\\Servicing\\14.0\\RuntimeMinimum", "Install" );
-    if ( strVS2015Install == "\x01" )
-    {
-        strVS2015Version = GetSystemRegistryValue ( (uint)HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\DevDiv\\vc\\Servicing\\14.0\\RuntimeMinimum", "Version" );
-    }
-
+    bool bSecureBootEnabled = (GetSystemRegistryValue((uint)HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\SecureBoot\\State", "UEFISecureBootEnabled") == "\x01");
     // Compile some system stats
     SDxStatus dxStatus;
     g_pGraphics->GetRenderItemManager ()->GetDxStatus ( dxStatus );
@@ -3212,16 +3205,16 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
                              , dxStatus.videoCard.depthBufferFormat
                            );
 
-    SString strSystemStats3 ( "3_%d"
+    SString strSystemStats3 ( "3_0"     // Was VS2013 runtime installed
                              "_%s"
                              "_%s"
                              "_%d"
-                             "_%s"
-                             , GetApplicationSettingInt( "vs2013-runtime-installed" )
+                             "_0"       // Was VS2015 runtime version
+                             "_%d"
                              , *GetApplicationSetting ( "real-os-build" )
                              , *GetApplicationSetting ( "locale" ).Replace( "_", "-" )
                              , (uint)FileSize( PathJoin( GetSystemSystemPath(), "normaliz.dll" ) )
-                             , *strVS2015Version
+                             , bSecureBootEnabled
                            );
 
     SString strConnectUsage = SString("%i_%i", GetApplicationSettingInt ( "times-connected-editor" ), GetApplicationSettingInt ( "times-connected" ) );
@@ -3263,7 +3256,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
     m_JobInfo.downloadStatus = EDownloadStatus::Running;
     m_JobInfo.iDownloadResultCode = 0;
     GetHTTP()->Reset();
-    GetHTTP()->QueueFile( strQueryURL, m_JobInfo.strResumableSaveLocation, 0, NULL, 0, false, this, StaticDownloadFinished, false, 10, 10000, false, true );
+    GetHTTP()->QueueFile( strQueryURL, m_JobInfo.strResumableSaveLocation, NULL, 0, false, this, StaticDownloadFinished, false, 10, 10000, false, true );
     m_strLastQueryURL = strQueryURL;
     OutputDebugLine( SString ( "[Updater] DoSendDownloadRequestToNextServer %d/%d %s", m_JobInfo.iCurrent, m_JobInfo.serverList.size (), strQueryURL.c_str () ) );
     return RES_OK;
@@ -3277,26 +3270,26 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
 // Handle when download finishes
 //
 ///////////////////////////////////////////////////////////////
-void CVersionUpdater::StaticDownloadFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+void CVersionUpdater::StaticDownloadFinished ( const SHttpDownloadResult& result )
 {
-    ((CVersionUpdater*)pObj)->DownloadFinished( pCompletedData, completedLength, bSuccess, iErrorCode );
+    ((CVersionUpdater*)result.pObj)->DownloadFinished( result );
 }
 
-void CVersionUpdater::DownloadFinished( char* pCompletedData, size_t completedLength, bool bSuccess, int iErrorCode )
+void CVersionUpdater::DownloadFinished( const SHttpDownloadResult& result )
 {
-    if ( bSuccess )
+    if ( result.bSuccess )
     {
         m_JobInfo.downloadStatus = EDownloadStatus::Success;
-        m_JobInfo.iDownloadResultCode = iErrorCode;
+        m_JobInfo.iDownloadResultCode = result.iErrorCode;
         // Save data if a file wasn't used
-        m_JobInfo.downloadBuffer.resize( completedLength );
-        if ( completedLength > 0 )
-            memcpy ( &m_JobInfo.downloadBuffer[0], pCompletedData, completedLength );
+        m_JobInfo.downloadBuffer.resize( result.dataSize );
+        if ( result.dataSize > 0 )
+            memcpy ( &m_JobInfo.downloadBuffer[0], result.pData, result.dataSize );
     }
     else
     {
         m_JobInfo.downloadStatus = EDownloadStatus::Failure;
-        m_JobInfo.iDownloadResultCode = iErrorCode;
+        m_JobInfo.iDownloadResultCode = result.iErrorCode;
     }
 }
 
@@ -3416,7 +3409,7 @@ int CVersionUpdater::DoSendPostToNextServer ( void )
     // Send data. Doesn't check if it was received.
     //
     GetHTTP()->Reset();
-    GetHTTP()->QueueFile( strQueryURL, NULL, 0, &m_JobInfo.postContent.at ( 0 ), m_JobInfo.postContent.size (), m_JobInfo.bPostContentBinary );
+    GetHTTP()->QueueFile( strQueryURL, NULL, &m_JobInfo.postContent.at ( 0 ), m_JobInfo.postContent.size (), m_JobInfo.bPostContentBinary );
 
     return RES_OK;
 }

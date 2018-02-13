@@ -90,9 +90,9 @@ public:
     void                LoadListsFromXML     ( bool bWhitelist, bool bBlacklist, bool bCustomLists );
     void                WriteCustomList     ( const SString& strListName, const std::vector<SString>& customList, bool bReset = true );
     void                GetFilterEntriesByType( std::vector<std::pair<SString, bool>>& outEntries, eWebFilterType filterType, eWebFilterState state = eWebFilterState::WEBFILTER_ALL );
-    static void         StaticFetchRevisionFinished  ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
-    static void         StaticFetchWhitelistFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
-    static void         StaticFetchBlacklistFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
+    static void         StaticFetchRevisionFinished  ( const SHttpDownloadResult& result );
+    static void         StaticFetchWhitelistFinished ( const SHttpDownloadResult& result );
+    static void         StaticFetchBlacklistFinished ( const SHttpDownloadResult& result );
     
 private:
     typedef std::pair<bool, eWebFilterType> WebFilterPair;

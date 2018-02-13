@@ -325,13 +325,7 @@ int CLuaDatabaseDefs::DbQuery ( lua_State* luaVM )
         argStream.ReadFunction ( iLuaFunction );
         if ( argStream.NextIsTable () )
         {
-            lua_pushnil ( luaVM );      // Loop through our table, beginning at the first key
-            while ( lua_next ( luaVM, argStream.m_iIndex ) != 0 )
-            {
-                callbackArgs.ReadArgument ( luaVM, -1 );    // Ignore the index at -2, and just read the value
-                lua_pop ( luaVM, 1 );                       // Remove the item and keep the key for the next iteration
-            }
-            argStream.m_iIndex++;
+            argStream.ReadLuaArgumentsTable( callbackArgs );
         }
     }
     argStream.ReadUserData ( pElement );
@@ -388,13 +382,7 @@ int CLuaDatabaseDefs::OOP_DbQuery ( lua_State* luaVM )
         argStream.ReadFunction ( iLuaFunction );
         if ( argStream.NextIsTable () )
         {
-            lua_pushnil ( luaVM );      // Loop through our table, beginning at the first key
-            while ( lua_next ( luaVM, argStream.m_iIndex ) != 0 )
-            {
-                callbackArgs.ReadArgument ( luaVM, -1 );    // Ignore the index at -2, and just read the value
-                lua_pop ( luaVM, 1 );                       // Remove the item and keep the key for the next iteration
-            }
-            argStream.m_iIndex++;
+            argStream.ReadLuaArgumentsTable( callbackArgs );
         }
     }
     argStream.ReadString ( strQuery );

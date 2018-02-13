@@ -236,7 +236,7 @@ namespace
             for ( uint i = 0 ; i < m_ColumnList.size () ; i++ )
             {
                 const SColumn& column = m_ColumnList[i];
-                g_pGraphics->DrawTextQueued ( fX, fY, fX + column.uiWidth, fY, 0xFFFFFFFF, column.strText, 1, 1, DT_NOCLIP | column.uiAlignment, NULL, true, true );
+                g_pGraphics->DrawStringQueued ( fX, fY, fX + column.uiWidth, fY, 0xFFFFFFFF, column.strText, 1, 1, DT_NOCLIP | column.uiAlignment, NULL, true, true );
                 fX += column.uiWidth;
             }
         }

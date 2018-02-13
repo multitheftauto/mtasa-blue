@@ -192,7 +192,7 @@ bool CResource::Load ( void )
                 // If we're using a zip file, we need a temp directory for extracting
                 // 17 = already exists (on windows)
 
-                if ( mymkdir ( m_strResourceCachePath.c_str () ) == -1 && errno != EEXIST ) // check this is the correct return for *NIX too
+                if ( File::Mkdir( m_strResourceCachePath.c_str () ) == -1 && errno != EEXIST ) // check this is the correct return for *NIX too
                 {
                     // Unregister EHS stuff
                     g_pGame->GetHTTPD()->UnregisterEHS ( m_strResourceName.c_str () );
@@ -3188,7 +3188,7 @@ int makedir (char *newdir)
   if (buffer[len-1] == '/') {
     buffer[len-1] = '\0';
   }
-  if (mymkdir(buffer) == 0)
+  if (File::Mkdir(buffer) == 0)
     {
       free(buffer);
       return 1;
@@ -3203,7 +3203,7 @@ int makedir (char *newdir)
         p++;
       hold = *p;
       *p = 0;
-      if ((mymkdir(buffer) == -1) && (errno == ENOENT))
+      if ((File::Mkdir(buffer) == -1) && (errno == ENOENT))
         {
           //printf("couldn't create directory %s\n",buffer);
           free(buffer);
@@ -3296,7 +3296,7 @@ int do_extract_currentfile(unzFile uf,const int* popt_extract_without_path,int*p
         if ((*popt_extract_without_path)==0)
         {
             //printf("creating directory: %s\n",filename_inzip);
-            mymkdir(filename_inzip);
+            File::Mkdir(filename_inzip);
         }
     }
     else
@@ -3329,8 +3329,7 @@ int do_extract_currentfile(unzFile uf,const int* popt_extract_without_path,int*p
         */
 
         // prepend the filepath to read from
-        //_asm int 3;
-        mymkdir ( szFilePath );
+        File::Mkdir( szFilePath );
         char szOutFile [MAX_PATH];
         size_t lenFilePath = strlen ( szFilePath );
         if ( szFilePath [ lenFilePath - 1 ] == '\\' ||

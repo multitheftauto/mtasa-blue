@@ -28,4 +28,8 @@ public:
     static bool CheckUTF8BOMAndUpdate ( const char** pcpOutBuffer, uint* puiOutSize );
     static void LoadFunctions ( void );
     static void AddClasses ( lua_State* luaVM );
+
+    // Shared scripting is the only place where we need the async task scheduler
+    // so just go with a hack here
+    static SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler();
 };

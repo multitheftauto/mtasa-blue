@@ -11,7 +11,7 @@
 *****************************************************************************/
 
 #include "StdInc.h"
-
+#define BLANK_LINE_COMMENT_MAGIC "##BLANK-LINE##"
 using std::list;
 
 CXMLNodeImpl::CXMLNodeImpl ( CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node ) :
@@ -80,11 +80,20 @@ CXMLNodeImpl::~CXMLNodeImpl ( void )
 }
 
 
-CXMLNode* CXMLNodeImpl::CreateSubNode ( const char* szTagName )
+CXMLNode* CXMLNodeImpl::CreateSubNode ( const char* szTagName, CXMLNode* pInsertAfter )
 {
-    // Create a new subnode after the last child
-    TiXmlElement* pNewNode = new TiXmlElement ( szTagName );
-    m_pNode->LinkEndChild ( pNewNode );
+    TiXmlElement* pNewNode;
+    if (pInsertAfter)
+    {
+        // Insert after supplied node
+        pNewNode = (TiXmlElement*)m_pNode->InsertAfterChild(((CXMLNodeImpl*)pInsertAfter)->GetNode(), TiXmlElement(szTagName));
+    }
+    else
+    {
+        // Add to end
+        pNewNode = new TiXmlElement(szTagName);
+        m_pNode->LinkEndChild(pNewNode);
+    }
 
     // Create and return the wrapper element
     CXMLNode* xmlNode = new CXMLNodeImpl ( m_pFile, this, *pNewNode );
@@ -509,4 +518,59 @@ SString CXMLNodeImpl::GetAttributeValue ( const SString& strAttributeName )
 {
     CXMLAttribute* pAttribute = GetAttributes ().Find ( strAttributeName );
     return pAttribute ? pAttribute->GetValue () : "";
+}
+
+
+SString CXMLNodeImpl::GetCommentText(void)
+{
+    SString strComment;
+    TiXmlNode* pCommentNode = m_pNode->PreviousSibling();
+    if (pCommentNode && pCommentNode->Type() == TiXmlNode::COMMENT)
+    {
+        strComment = pCommentNode->Value();
+        // Remove indents
+        std::vector<SString> lineList;
+        ReadTokenSeparatedList("\n", strComment, lineList);
+        strComment = SString::Join("\n", lineList);
+    }
+    return strComment;
+}
+
+
+//
+// Set comment text for this node.
+// Leading blank line can only be inserted when creating the comment.
+//
+void CXMLNodeImpl::SetCommentText(const char* szCommentText, bool bLeadingBlankLine)
+{
+    // If previous sibling is not a comment, then insert one (with blank line if required)
+    TiXmlNode* pCommentNode = m_pNode->PreviousSibling();
+    if (!pCommentNode || pCommentNode->Type() != TiXmlNode::COMMENT)
+    {
+        if (bLeadingBlankLine)
+        {
+            m_pNode->Parent()->InsertBeforeChild(m_pNode, TiXmlComment(BLANK_LINE_COMMENT_MAGIC));
+        }
+        pCommentNode = m_pNode->Parent()->InsertBeforeChild(m_pNode, TiXmlComment());
+    }
+
+    // Calc indent
+    SString strIndent = "     ";
+    CXMLNode* pTemp = this;
+    while (pTemp = pTemp->GetParent())
+    {
+        strIndent += "    ";
+    }
+
+    // Apply indent
+    std::vector<SString> lineList;
+    SStringX(szCommentText).Split("\n", lineList);
+    for (uint i = 1; i < lineList.size(); ++i)
+    {
+        lineList[i] = strIndent + lineList[i];
+    }
+
+    // Compose final comment string
+    SString strComment = " " + SString::Join("\n", lineList) + " ";
+    pCommentNode->SetValue(strComment);
 }

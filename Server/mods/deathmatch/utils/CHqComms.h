@@ -88,29 +88,29 @@ public:
 
             // Send request
             this->AddRef();     // Keep object alive
-            GetDownloadManager()->QueueFile( m_strURL, NULL, 0, (const char*)bitStream->GetData(), bitStream->GetNumberOfBytesUsed(), true, this, StaticDownloadFinishedCallback, false, 2 );
+            GetDownloadManager()->QueueFile( m_strURL, NULL, (const char*)bitStream->GetData(), bitStream->GetNumberOfBytesUsed(), true, this, StaticDownloadFinishedCallback, false, 2 );
         }
     }
 
     //
     // Process response from hq
     //
-    static void StaticDownloadFinishedCallback( char * data, size_t dataLength, void * obj, bool bSuccess, int iErrorCode )
+    static void StaticDownloadFinishedCallback( const SHttpDownloadResult& result )
     {
-        CHqComms* pHqComms = (CHqComms*)obj;
-        pHqComms->DownloadFinishedCallback( data, dataLength, bSuccess, iErrorCode );
+        CHqComms* pHqComms = (CHqComms*)result.pObj;
+        pHqComms->DownloadFinishedCallback( result );
         pHqComms->Release();   // No need to keep object alive now
     }
 
     //
     // Process response from hq
     //
-    void DownloadFinishedCallback( char * data, size_t dataLength, bool bSuccess, int iErrorCode )
+    void DownloadFinishedCallback( const SHttpDownloadResult& result )
     {
-        if ( bSuccess )
+        if ( result.bSuccess )
         {
             m_Stage = HQCOMMS_STAGE_TIMER;
-            CBitStream bitStream( data, dataLength );
+            CBitStream bitStream( result.pData, result.dataSize );
 
             // Process various parts of returned data
             ProcessPollInterval( bitStream );
