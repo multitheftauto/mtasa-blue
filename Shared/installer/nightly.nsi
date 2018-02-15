@@ -658,10 +658,11 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\game_sa.dll"
         File "${FILES_ROOT}\mta\multiplayer_sa.dll"
         File "${FILES_ROOT}\mta\netc.dll"
-        File "${FILES_ROOT}\mta\libcurl.dll"
         File "${FILES_ROOT}\mta\loader.dll"
         File "${FILES_ROOT}\mta\pthread.dll"
         File "${FILES_ROOT}\mta\cefweb.dll"
+        File "${FILES_ROOT}\mta\libwow64.dll"
+        File "${FILES_ROOT}\mta\wow64_helper.exe"
         
         SetOutPath "$INSTDIR\MTA"
 		File "${FILES_ROOT}\mta\chrome_elf.dll"
@@ -809,7 +810,6 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         File "${FILES_ROOT}\mta\xmll.dll"
         File "${SERVER_FILES_ROOT}\MTA Server.exe"
         File "${SERVER_FILES_ROOT}\net.dll"
-        File "${FILES_ROOT}\mta\libcurl.dll"
         File "${FILES_ROOT}\mta\pthread.dll"
         ${LogText} "-Section end - SERVER CORE"
     SectionEnd
@@ -1091,10 +1091,14 @@ Section Uninstall
 
     RmDir /r "$INSTDIR\MTA\cgui"
     RmDir /r "$INSTDIR\MTA\data"
+    RmDir /r "$INSTDIR\MTA\CEF"
+    RmDir /r "$INSTDIR\MTA\locale"
     Delete "$INSTDIR\MTA\*.dll"
-    Delete "$INSTDIR\MTA\*.ax"
-    Delete "$INSTDIR\MTA\*.txt"
+    Delete "$INSTDIR\MTA\*.exe"
+    Delete "$INSTDIR\MTA\*.dmp"
+    Delete "$INSTDIR\MTA\*.log"
     Delete "$INSTDIR\MTA\*.dat"
+    Delete "$INSTDIR\MTA\*.bin"
 
     RmDir /r "$APPDATA\MTA San Andreas All\${0.0}"
     ; TODO if $APPDATA\MTA San Andreas All\Common is the only one left, delete it

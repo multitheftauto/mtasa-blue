@@ -65,9 +65,7 @@ bool CHTTPD::StartHTTPD ( const char* szIP, unsigned int port )
     {
         EHSServerParameters parameters;
 
-        char szPort[10];
-        itoa ( port, szPort, 10 );
-        parameters[ "port" ] = szPort;
+        parameters[ "port" ] = std::to_string(port);
 
         if ( szIP && szIP[0] )
         {

@@ -12,6 +12,11 @@
         <css_background>0</css_background>
         <line_life>12000</line_life>
         <line_fadeout>3000</line_fadeout>
+        <position_horizontal>0</position_horizontal>
+        <position_vertical>0</position_vertical>
+        <text_alignment>0</text_alignment>
+        <offset_x>0.0125</offset_x>
+        <offset_y>0.0150</offset_y>
     </preset>
     <preset name="MTA Black">
         <color_text>255 255 255</color_text>
@@ -26,6 +31,11 @@
         <css_background>0</css_background>
         <line_life>12000</line_life>
         <line_fadeout>3000</line_fadeout>
+        <position_horizontal>0</position_horizontal>
+        <position_vertical>0</position_vertical>
+        <text_alignment>0</text_alignment>
+        <offset_x>0.0125</offset_x>
+        <offset_y>0.0150</offset_y>
     </preset>
     <preset name="Transparent">
         <color_text>255 255 255</color_text>
@@ -40,6 +50,11 @@
         <css_background>0</css_background>
         <line_life>12000</line_life>
         <line_fadeout>3000</line_fadeout>
+        <position_horizontal>0</position_horizontal>
+        <position_vertical>0</position_vertical>
+        <text_alignment>0</text_alignment>
+        <offset_x>0.0125</offset_x>
+        <offset_y>0.0150</offset_y>
     </preset>
     <preset name="Race Oversized">
         <color_text>172 213 254 255</color_text>
@@ -54,6 +69,11 @@
         <css_background>0</css_background>
         <line_life>12000</line_life>
         <line_fadeout>3000</line_fadeout>
+        <position_horizontal>0</position_horizontal>
+        <position_vertical>0</position_vertical>
+        <text_alignment>0</text_alignment>
+        <offset_x>0.0125</offset_x>
+        <offset_y>0.0150</offset_y>
     </preset>
     <preset name="iRace 2009">
         <color_text>172 213 254 255</color_text>
@@ -68,5 +88,10 @@
         <css_background>0</css_background>
         <line_life>30000</line_life>
         <line_fadeout>300000</line_fadeout>
+        <position_horizontal>0</position_horizontal>
+        <position_vertical>0</position_vertical>
+        <text_alignment>0</text_alignment>
+        <offset_x>0.0125</offset_x>
+        <offset_y>0.0150</offset_y>
     </preset>
 </chatboxpresets>

@@ -19,6 +19,7 @@ namespace SharedUtil
     {
         struct SBaseTask
         {
+            virtual ~SBaseTask() {}
             virtual void Execute() = 0;
             virtual void ProcessResult() = 0;
         };

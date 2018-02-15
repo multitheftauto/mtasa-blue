@@ -359,13 +359,11 @@ bool CRegistry::Query ( const std::string& strQuery, CLuaArguments *pArgs, CRegi
 
 bool CRegistry::Select ( const std::string& strColumns, const std::string& strTable, const std::string& strWhere, unsigned int uiLimit, CRegistryResult* pResult )
 {
-    char szBuffer[32] = {0};
-
     std::string strQuery = "SELECT " + strColumns + " FROM " + strTable;
     if ( !strWhere.empty () )
         strQuery += " WHERE " + strWhere;
     if ( uiLimit > 0 )
-        strQuery += " LIMIT " + std::string ( itoa ( uiLimit, szBuffer, 10 ) );
+        strQuery += " LIMIT " + std::to_string(uiLimit);
 
     if ( m_bOpened == false )
 	{

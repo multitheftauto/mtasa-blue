@@ -253,11 +253,11 @@ int CLuaCameraDefs::SetCameraFieldOfView ( lua_State* luaVM )
             }
 
             if ( eMode == FOV_MODE_PLAYER )
-                g_pGame->GetSettings ()->SetFieldOfViewPlayer ( fFOV );
+                g_pGame->GetSettings ()->SetFieldOfViewPlayer ( fFOV, true );
             else if ( eMode == FOV_MODE_VEHICLE )
-                g_pGame->GetSettings ()->SetFieldOfViewVehicle ( fFOV );
+                g_pGame->GetSettings ()->SetFieldOfViewVehicle ( fFOV, true );
             else if ( eMode == FOV_MODE_VEHICLE_MAX )
-                g_pGame->GetSettings ()->SetFieldOfViewVehicleMax ( fFOV );
+                g_pGame->GetSettings ()->SetFieldOfViewVehicleMax ( fFOV, true );
             else {
                 argStream.m_iIndex = 1;
                 argStream.SetCustomError ( SString ( "Enum not yet implemented: " + EnumToString ( eMode ) ) );

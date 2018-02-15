@@ -42,7 +42,10 @@ void CMarkerSA::Init ( void )
 VOID CMarkerSA::SetSprite ( eMarkerSprite Sprite = (eMarkerSprite)MARKER_SPRITE_NONE )
 {
     DEBUG_TRACE("VOID CMarkerSA::SetSprite ( eMarkerSprite Sprite = (eMarkerSprite)MARKER_SPRITE_NONE )");
-    internalInterface->nBlipSprite = Sprite;
+    if (Sprite >= MARKER_SPRITE_NONE && Sprite <= MARKER_SPRITE_SPRAY)
+    {
+        internalInterface->nBlipSprite = Sprite;
+    }
 }
 
 /**

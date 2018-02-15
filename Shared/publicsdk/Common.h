@@ -26,7 +26,7 @@ extern "C"
 #ifdef WIN32
     #define MTAEXPORT extern "C" __declspec(dllexport)
 #else
-    #define MTAEXPORT extern "C"
+    #define MTAEXPORT extern "C" __attribute__ ((visibility ("default")))
 #endif
 
 #include <list>

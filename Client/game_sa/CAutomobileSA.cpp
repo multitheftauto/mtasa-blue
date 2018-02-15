@@ -40,8 +40,7 @@ CAutomobileSA::CAutomobileSA( eVehicleTypes dwModelID, unsigned char ucVariation
         for(int i =0;i<MAX_DOORS;i++)
             this->door[i] = new CDoorSA(&((CAutomobileSAInterface *)this->GetInterface())->doors[i]);
     /*}
-    else
-        _asm int 3*/
+*/
 }
 
 

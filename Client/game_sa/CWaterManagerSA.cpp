@@ -415,7 +415,7 @@ void CWaterManagerSA::RelocatePools ()
 DWORD dwHook6E9E23continue = 0x6E9E29;
 void __declspec(naked) Hook6E9E23 ()
 {
-    __asm
+    _asm
     {
 check:
         mov eax, dword ptr [edi]
@@ -434,7 +434,7 @@ DWORD dwHook6EFCD7continue = 0x6EFCDD;
 DWORD dwHook6EFCD7skip = 0x6EFE5E;
 void __declspec(naked) Hook6EFCD7 ()
 {
-    __asm
+    _asm
     {
         mov eax, dword ptr [esi-4]
         test eax, eax
@@ -452,7 +452,7 @@ check:
 DWORD dwHook6EFBD8continue = 0x6EFBDE;
 void __declspec(naked) Hook6EFBD8 ()
 {
-    __asm
+    _asm
     {
 check:
         mov eax, 0x6EFC27

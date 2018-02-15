@@ -33,7 +33,7 @@ void CFoo::DoPulse ( void )
         if ( pVehicle )
         {
             unsigned char ucGear = pVehicle->GetGameVehicle ()->GetCurrentGear ();
-            g_pCore->GetGraphics ()->DrawText ( 200, 200, 0xFFFFFFFF, 1.0f, "Gear = %u", ucGear );
+            g_pCore->GetGraphics ()->DrawString ( 200, 200, 0xFFFFFFFF, 1.0f, "Gear = %u", ucGear );
         }
         */
 

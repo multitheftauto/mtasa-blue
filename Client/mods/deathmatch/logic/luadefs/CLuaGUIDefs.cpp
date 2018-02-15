@@ -113,6 +113,7 @@ void CLuaGUIDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "guiGetSize", GUIGetSize );
     CLuaCFunctions::AddFunction ( "guiGetPosition", GUIGetPosition );
     CLuaCFunctions::AddFunction ( "guiGetVisible", GUIGetVisible );
+    CLuaCFunctions::AddFunction ( "guiGetCursorType", GUIGetCursorType );
 
     CLuaCFunctions::AddFunction ( "guiCheckBoxGetSelected", GUICheckBoxGetSelected );
     CLuaCFunctions::AddFunction ( "guiRadioButtonGetSelected", GUIRadioButtonGetSelected );
@@ -192,6 +193,7 @@ void CLuaGUIDefs::AddGuiElementClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "isTransferBoxActive", "isTransferBoxActive" );
     lua_classfunction ( luaVM, "isInputEnabled", "guiGetInputEnabled" );
     lua_classfunction ( luaVM, "getInputMode", "guiGetInputMode" );
+    lua_classfunction ( luaVM, "getCursorType", "guiGetCursorType" );
 
     lua_classfunction ( luaVM, "getScreenSize", "guiGetScreenSize" );
     lua_classfunction ( luaVM, "getProperties", "guiGetProperties" );
@@ -224,6 +226,7 @@ void CLuaGUIDefs::AddGuiElementClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "inputEnabled", "guiSetInputEnabled", "guiGetInputEnabled" );
     lua_classvariable ( luaVM, "inputMode", "guiGetInputMode", "guiSetInputMode" );
     lua_classvariable ( luaVM, "cursorAlpha", "setCursorAlpha", "getCursorAlpha" );
+    lua_classvariable ( luaVM, "cursorType", NULL, "guiGetCursorType" );
     lua_classvariable ( luaVM, "font", "guiSetFont", "guiGetFont" );
     lua_classvariable ( luaVM, "visible", "guiSetVisible", "guiGetVisible" );
     lua_classvariable ( luaVM, "properties", NULL, "guiGetProperties" );
@@ -668,13 +671,11 @@ int CLuaGUIDefs::GUIIsTransferBoxActive ( lua_State* luaVM )
 int CLuaGUIDefs::GUICreateWindow ( lua_State* luaVM )
 {
 //  element guiCreateWindow ( float x, float y, float width, float height, string titleBarText, bool relative )
-    float x; float y; float width; float height; SString titleBarText; bool relative;
+    CVector2D position; CVector2D size; SString titleBarText; bool relative;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( x );
-    argStream.ReadNumber ( y );
-    argStream.ReadNumber ( width );
-    argStream.ReadNumber ( height );
+    argStream.ReadVector2D(position);
+    argStream.ReadVector2D(size);
     argStream.ReadString ( titleBarText );
     argStream.ReadBool ( relative );
 
@@ -684,7 +685,7 @@ int CLuaGUIDefs::GUICreateWindow ( lua_State* luaVM )
 
         if ( pLuaMain )
         {
-            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateWindow ( *pLuaMain, x, y, width, height, titleBarText, relative );
+            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateWindow ( *pLuaMain, position, size, titleBarText, relative );
             lua_pushelement ( luaVM, pGUIElement );
             return 1;
         }
@@ -701,13 +702,11 @@ int CLuaGUIDefs::GUICreateWindow ( lua_State* luaVM )
 int CLuaGUIDefs::GUICreateLabel ( lua_State* luaVM )
 {
 //  element guiCreateLabel ( float x, float y, float width, float height, string text, bool relative, [element parent = nil] )
-    float x; float y; float width; float height; SString text; bool relative; CClientGUIElement* parent;
+    CVector2D position; CVector2D size; SString text; bool relative; CClientGUIElement* parent;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( x );
-    argStream.ReadNumber ( y );
-    argStream.ReadNumber ( width );
-    argStream.ReadNumber ( height );
+    argStream.ReadVector2D(position);
+    argStream.ReadVector2D(size);
     argStream.ReadString ( text );
     argStream.ReadBool ( relative );
     argStream.ReadUserData ( parent, NULL );
@@ -718,7 +717,7 @@ int CLuaGUIDefs::GUICreateLabel ( lua_State* luaVM )
 
         if ( pLuaMain )
         {
-            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateLabel ( *pLuaMain, x, y, width, height, text, relative, parent );
+            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateLabel ( *pLuaMain, position, size, text, relative, parent );
             lua_pushelement ( luaVM, pGUIElement );
             return 1;
         }
@@ -735,13 +734,11 @@ int CLuaGUIDefs::GUICreateLabel ( lua_State* luaVM )
 int CLuaGUIDefs::GUICreateStaticImage ( lua_State* luaVM )
 {
 //  element guiCreateStaticImage ( float x, float y, float width, float height, string path, bool relative, [element parent = nil] )
-    float x; float y; float width; float height; SString path; bool relative; CClientGUIElement* parent;
+    CVector2D position; CVector2D size; SString path; bool relative; CClientGUIElement* parent;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( x );
-    argStream.ReadNumber ( y );
-    argStream.ReadNumber ( width );
-    argStream.ReadNumber ( height );
+    argStream.ReadVector2D(position);
+    argStream.ReadVector2D(size);
     argStream.ReadString ( path );
     argStream.ReadBool ( relative );
     argStream.ReadUserData ( parent, NULL );
@@ -756,12 +753,12 @@ int CLuaGUIDefs::GUICreateStaticImage ( lua_State* luaVM )
             SString strPath;
             if ( CResourceManager::ParseResourcePathInput( path, pResource, &strPath ) )
             {
-                CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage ( *pLuaMain, x, y, width, height, strPath, relative, parent );
+                CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateStaticImage ( *pLuaMain, position, size, strPath, relative, parent );
                 lua_pushelement ( luaVM, pGUIElement );
                 return 1;
             }
             else
-                argStream.SetCustomError( strPath, "Bad file path" );
+                argStream.SetCustomError( path, "Bad file path" );
         }
     }
     if ( argStream.HasErrors () )
@@ -776,13 +773,11 @@ int CLuaGUIDefs::GUICreateStaticImage ( lua_State* luaVM )
 int CLuaGUIDefs::GUICreateButton ( lua_State* luaVM )
 {
 //  element guiCreateButton ( float x, float y, float width, float height, string text, bool relative, [ element parent = nil ] )
-    float x; float y; float width; float height; SString text; bool relative; CClientGUIElement* parent;
+    CVector2D position; CVector2D size; SString text; bool relative; CClientGUIElement* parent;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( x );
-    argStream.ReadNumber ( y );
-    argStream.ReadNumber ( width );
-    argStream.ReadNumber ( height );
+    argStream.ReadVector2D(position);
+    argStream.ReadVector2D(size);
     argStream.ReadString ( text );
     argStream.ReadBool ( relative );
     argStream.ReadUserData ( parent, NULL );
@@ -793,7 +788,7 @@ int CLuaGUIDefs::GUICreateButton ( lua_State* luaVM )
 
         if ( pLuaMain )
         {
-            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateButton ( *pLuaMain, x, y, width, height, text, relative, parent );
+            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateButton ( *pLuaMain, position, size, text, relative, parent );
             lua_pushelement ( luaVM, pGUIElement );
             return 1;
         }
@@ -810,13 +805,11 @@ int CLuaGUIDefs::GUICreateButton ( lua_State* luaVM )
 int CLuaGUIDefs::GUICreateProgressBar ( lua_State* luaVM )
 {
 //  element guiCreateProgressBar ( float x, float y, float width, float height, bool relative, [element parent = nil] )
-    float x; float y; float width; float height; bool relative; CClientGUIElement* parent;
+    CVector2D position; CVector2D size; bool relative; CClientGUIElement* parent;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( x );
-    argStream.ReadNumber ( y );
-    argStream.ReadNumber ( width );
-    argStream.ReadNumber ( height );
+    argStream.ReadVector2D(position);
+    argStream.ReadVector2D(size);
     argStream.ReadBool ( relative );
     argStream.ReadUserData ( parent, NULL );
 
@@ -826,7 +819,7 @@ int CLuaGUIDefs::GUICreateProgressBar ( lua_State* luaVM )
 
         if ( pLuaMain )
         {
-            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateProgressBar ( *pLuaMain, x, y, width, height, relative, parent );
+            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateProgressBar ( *pLuaMain, position, size, relative, parent );
             lua_pushelement ( luaVM, pGUIElement );
             return 1;
         }
@@ -843,13 +836,11 @@ int CLuaGUIDefs::GUICreateProgressBar ( lua_State* luaVM )
 int CLuaGUIDefs::GUICreateCheckBox ( lua_State* luaVM )
 {
 //  element guiCreateCheckBox ( float x, float y, float width, float height, string text, bool selected, bool relative, [element parent = nil] )
-    float x; float y; float width; float height; SString text; bool selected; bool relative; CClientGUIElement* parent;
+    CVector2D position; CVector2D size; SString text; bool selected; bool relative; CClientGUIElement* parent;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( x );
-    argStream.ReadNumber ( y );
-    argStream.ReadNumber ( width );
-    argStream.ReadNumber ( height );
+    argStream.ReadVector2D(position);
+    argStream.ReadVector2D(size);
     argStream.ReadString ( text );
     argStream.ReadBool ( selected );
     argStream.ReadBool ( relative );
@@ -861,7 +852,7 @@ int CLuaGUIDefs::GUICreateCheckBox ( lua_State* luaVM )
 
         if ( pLuaMain )
         {
-            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateCheckBox ( *pLuaMain, x, y, width, height, text, selected, relative, parent );
+            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateCheckBox ( *pLuaMain, position, size, text, selected, relative, parent );
             lua_pushelement ( luaVM, pGUIElement );
             return 1;
         }
@@ -878,13 +869,11 @@ int CLuaGUIDefs::GUICreateCheckBox ( lua_State* luaVM )
 int CLuaGUIDefs::GUICreateRadioButton ( lua_State* luaVM )
 {
 //  element guiCreateRadioButton ( float x, float y, float width, float height, string text, bool relative, [element parent = nil] )
-    float x; float y; float width; float height; SString text; bool relative; CClientGUIElement* parent;
+    CVector2D position; CVector2D size; SString text; bool relative; CClientGUIElement* parent;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( x );
-    argStream.ReadNumber ( y );
-    argStream.ReadNumber ( width );
-    argStream.ReadNumber ( height );
+    argStream.ReadVector2D(position);
+    argStream.ReadVector2D(size);
     argStream.ReadString ( text );
     argStream.ReadBool ( relative );
     argStream.ReadUserData ( parent, NULL );
@@ -895,7 +884,7 @@ int CLuaGUIDefs::GUICreateRadioButton ( lua_State* luaVM )
 
         if ( pLuaMain )
         {
-            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateRadioButton ( *pLuaMain, x, y, width, height, text, relative, parent );
+            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateRadioButton ( *pLuaMain, position, size, text, relative, parent );
             lua_pushelement ( luaVM, pGUIElement );
             return 1;
         }
@@ -912,13 +901,11 @@ int CLuaGUIDefs::GUICreateRadioButton ( lua_State* luaVM )
 int CLuaGUIDefs::GUICreateEdit ( lua_State* luaVM )
 {
 //  gui-edit guiCreateEdit ( float x, float y, float width, float height, string text, bool relative, [element parent = nil] )
-    float x; float y; float width; float height; SString text; bool relative; CClientGUIElement* parent;
+    CVector2D position; CVector2D size; SString text; bool relative; CClientGUIElement* parent;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( x );
-    argStream.ReadNumber ( y );
-    argStream.ReadNumber ( width );
-    argStream.ReadNumber ( height );
+    argStream.ReadVector2D(position);
+    argStream.ReadVector2D(size);
     argStream.ReadString ( text );
     argStream.ReadBool ( relative );
     argStream.ReadUserData ( parent, NULL );
@@ -929,7 +916,7 @@ int CLuaGUIDefs::GUICreateEdit ( lua_State* luaVM )
 
         if ( pLuaMain )
         {
-            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateEdit ( *pLuaMain, x, y, width, height, text, relative, parent );
+            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateEdit ( *pLuaMain, position, size, text, relative, parent );
             lua_pushelement ( luaVM, pGUIElement );
             return 1;
         }
@@ -946,13 +933,11 @@ int CLuaGUIDefs::GUICreateEdit ( lua_State* luaVM )
 int CLuaGUIDefs::GUICreateMemo ( lua_State* luaVM )
 {
 //  gui-memo guiCreateMemo ( float x, float y, float width, float height, string text, bool relative, [element parent = nil] )
-    float x; float y; float width; float height; SString text; bool relative; CClientGUIElement* parent;
+    CVector2D position; CVector2D size; SString text; bool relative; CClientGUIElement* parent;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( x );
-    argStream.ReadNumber ( y );
-    argStream.ReadNumber ( width );
-    argStream.ReadNumber ( height );
+    argStream.ReadVector2D(position);
+    argStream.ReadVector2D(size);
     argStream.ReadString ( text );
     argStream.ReadBool ( relative );
     argStream.ReadUserData ( parent, NULL );
@@ -963,7 +948,7 @@ int CLuaGUIDefs::GUICreateMemo ( lua_State* luaVM )
 
         if ( pLuaMain )
         {
-            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateMemo ( *pLuaMain, x, y, width, height, text, relative, parent );
+            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateMemo ( *pLuaMain, position, size, text, relative, parent );
             lua_pushelement ( luaVM, pGUIElement );
             return 1;
         }
@@ -980,13 +965,11 @@ int CLuaGUIDefs::GUICreateMemo ( lua_State* luaVM )
 int CLuaGUIDefs::GUICreateGridList ( lua_State* luaVM )
 {
 //  element guiCreateGridList ( float x, float y, float width, float height, bool relative, [ element parent = nil ] )
-    float x; float y; float width; float height; bool relative; CClientGUIElement* parent;
+    CVector2D position; CVector2D size; bool relative; CClientGUIElement* parent;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( x );
-    argStream.ReadNumber ( y );
-    argStream.ReadNumber ( width );
-    argStream.ReadNumber ( height );
+    argStream.ReadVector2D(position);
+    argStream.ReadVector2D(size);
     argStream.ReadBool ( relative );
     argStream.ReadUserData ( parent, NULL );
 
@@ -996,7 +979,7 @@ int CLuaGUIDefs::GUICreateGridList ( lua_State* luaVM )
 
         if ( pLuaMain )
         {
-            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateGridList ( *pLuaMain, x, y, width, height, relative, parent );
+            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateGridList ( *pLuaMain, position, size, relative, parent );
             lua_pushelement ( luaVM, pGUIElement );
             return 1;
         }
@@ -1013,13 +996,11 @@ int CLuaGUIDefs::GUICreateGridList ( lua_State* luaVM )
 int CLuaGUIDefs::GUICreateScrollPane ( lua_State* luaVM )
 {
 //  element guiCreateScrollPane( float x, float y, float width, float height, bool relative, [gui-element parent = nil])
-    float x; float y; float width; float height; bool relative; CClientGUIElement* parent;
+    CVector2D position; CVector2D size; bool relative; CClientGUIElement* parent;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( x );
-    argStream.ReadNumber ( y );
-    argStream.ReadNumber ( width );
-    argStream.ReadNumber ( height );
+    argStream.ReadVector2D(position);
+    argStream.ReadVector2D(size);
     argStream.ReadBool ( relative );
     argStream.ReadUserData ( parent, NULL );
 
@@ -1029,7 +1010,7 @@ int CLuaGUIDefs::GUICreateScrollPane ( lua_State* luaVM )
 
         if ( pLuaMain )
         {
-            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateScrollPane ( *pLuaMain, x, y, width, height, relative, parent );
+            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateScrollPane ( *pLuaMain, position, size, relative, parent );
             lua_pushelement ( luaVM, pGUIElement );
             return 1;
         }
@@ -1046,13 +1027,11 @@ int CLuaGUIDefs::GUICreateScrollPane ( lua_State* luaVM )
 int CLuaGUIDefs::GUICreateScrollBar ( lua_State* luaVM )
 {
 //  gui-scrollbar guiCreateScrollBar ( float x, float y, float width, float height, bool horizontal, bool relative, [gui-element parent = nil])
-    float x; float y; float width; float height; bool horizontal; bool relative; CClientGUIElement* parent;
+    CVector2D position; CVector2D size; bool horizontal; bool relative; CClientGUIElement* parent;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( x );
-    argStream.ReadNumber ( y );
-    argStream.ReadNumber ( width );
-    argStream.ReadNumber ( height );
+    argStream.ReadVector2D(position);
+    argStream.ReadVector2D(size);
     argStream.ReadBool ( horizontal );
     argStream.ReadBool ( relative );
     argStream.ReadUserData ( parent, NULL );
@@ -1063,7 +1042,7 @@ int CLuaGUIDefs::GUICreateScrollBar ( lua_State* luaVM )
 
         if ( pLuaMain )
         {
-            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateScrollBar ( *pLuaMain, x, y, width, height, horizontal, relative, parent );
+            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateScrollBar ( *pLuaMain, position, size, horizontal, relative, parent );
             lua_pushelement ( luaVM, pGUIElement );
             return 1;
         }
@@ -1080,13 +1059,11 @@ int CLuaGUIDefs::GUICreateScrollBar ( lua_State* luaVM )
 int CLuaGUIDefs::GUICreateTabPanel ( lua_State* luaVM )
 {
 //  element guiCreateTabPanel ( float x, float y, float width, float height, bool relative, [element parent = nil ] )
-    float x; float y; float width; float height; bool relative; CClientGUIElement* parent;
+    CVector2D position; CVector2D size; bool relative; CClientGUIElement* parent;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( x );
-    argStream.ReadNumber ( y );
-    argStream.ReadNumber ( width );
-    argStream.ReadNumber ( height );
+    argStream.ReadVector2D(position);
+    argStream.ReadVector2D(size);
     argStream.ReadBool ( relative );
     argStream.ReadUserData ( parent, NULL );
 
@@ -1096,7 +1073,7 @@ int CLuaGUIDefs::GUICreateTabPanel ( lua_State* luaVM )
 
         if ( pLuaMain )
         {
-            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateTabPanel ( *pLuaMain, x, y, width, height, relative, parent );
+            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateTabPanel ( *pLuaMain, position, size, relative, parent );
             lua_pushelement ( luaVM, pGUIElement );
             return 1;
         }
@@ -1135,10 +1112,10 @@ int CLuaGUIDefs::GUIStaticImageLoadImage ( lua_State* luaVM )
                     return 1;
                 }
                 else
-                    argStream.SetCustomError( strPath, "Error loading image" );
+                    argStream.SetCustomError( filename, "Error loading image" );
             }
             else
-                argStream.SetCustomError( strPath, "Bad file path" );
+                argStream.SetCustomError( filename, "Bad file path" );
         }
     }
     if ( argStream.HasErrors () )
@@ -3330,6 +3307,11 @@ int CLuaGUIDefs::GUIGetChatboxLayout ( lua_State* luaVM )
     //* chat_input_prefix_color - Returns the color of the input prefix text
     //* chat_input_text_color - Returns the color of the text in the chatbox input
     //* chat_scale - Returns the scale of the text in the chatbox
+    //* chat_position_offset_x - Returns the position offset of the chatbox on the x axis
+    //* chat_position_offset_y - Returns the position offset of the chatbox on the y axis
+    //* chat_position_horizontal - Returns the horizontal position of the chatbox
+    //* chat_position_vertical - Returns the vertical position of the chatbox
+    //* chat_text_alignment - Returns the horizontal alignment of the chatbox text
     //* chat_width - Returns the scale of the background width
     //* chat_css_style_text - Returns whether text fades out over time
     //* chat_css_style_background - Returns whether the background fades out over time
@@ -3339,6 +3321,7 @@ int CLuaGUIDefs::GUIGetChatboxLayout ( lua_State* luaVM )
     //* text_scale - Returns text scale
 
     CCVarsInterface* pCVars = g_pCore->GetCVars ();
+    int iNumber;
     float fNumber;
     pCVars->Get("chat_font", fNumber);
     lua_newtable ( luaVM );
@@ -3350,6 +3333,21 @@ int CLuaGUIDefs::GUIGetChatboxLayout ( lua_State* luaVM )
     pCVars->Get("chat_width", fNumber);
     lua_pushnumber ( luaVM, fNumber );
     lua_setfield ( luaVM, -2, "chat_width" );
+    pCVars->Get("chat_position_offset_x", fNumber);
+    lua_pushnumber ( luaVM, fNumber );
+    lua_setfield ( luaVM, -2, "chat_position_offset_x" );
+    pCVars->Get("chat_position_offset_y", fNumber);
+    lua_pushnumber ( luaVM, fNumber );
+    lua_setfield ( luaVM, -2, "chat_position_offset_y" );
+    pCVars->Get("chat_position_horizontal", iNumber);
+    lua_pushnumber ( luaVM, iNumber );
+    lua_setfield ( luaVM, -2, "chat_position_horizontal" );
+    pCVars->Get("chat_position_vertical", iNumber);
+    lua_pushnumber ( luaVM, iNumber );
+    lua_setfield ( luaVM, -2, "chat_position_vertical" );
+    pCVars->Get("chat_text_alignment", iNumber);
+    lua_pushnumber ( luaVM, iNumber );
+    lua_setfield ( luaVM, -2, "chat_text_alignment" );
     pCVars->Get("chat_css_style_text", fNumber);
     lua_pushnumber ( luaVM, fNumber );
     lua_setfield ( luaVM, -2, "chat_css_style_text" );
@@ -3491,19 +3489,18 @@ int CLuaGUIDefs::GUIGetChatboxLayout ( lua_State* luaVM )
         lua_settable( luaVM, -3 );
         lua_setfield ( luaVM, -2, "chat_scale" );
     }
+
     return 1;
 }
 
 int CLuaGUIDefs::GUICreateComboBox ( lua_State* luaVM )
 {
 //  element guiCreateComboBox ( float x, float y, float width, float height, string caption, bool relative, [ element parent = nil ] )
-    float x; float y; float width; float height; SString caption; bool relative; CClientGUIElement* parent;
+    CVector2D position; CVector2D size; SString caption; bool relative; CClientGUIElement* parent;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( x );
-    argStream.ReadNumber ( y );
-    argStream.ReadNumber ( width );
-    argStream.ReadNumber ( height );
+    argStream.ReadVector2D(position);
+    argStream.ReadVector2D(size);
     argStream.ReadString ( caption );
     argStream.ReadBool ( relative );
     argStream.ReadUserData ( parent, NULL );
@@ -3513,7 +3510,7 @@ int CLuaGUIDefs::GUICreateComboBox ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
-            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateComboBox ( *pLuaMain, x, y, width, height, caption, relative, parent );
+            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateComboBox ( *pLuaMain, position, size, caption, relative, parent );
             lua_pushelement ( luaVM, pGUIElement );
             return 1;
         }
@@ -3726,5 +3723,14 @@ int CLuaGUIDefs::GUICreateFont ( lua_State* luaVM )
 
     // error: bad arguments
     lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaGUIDefs::GUIGetCursorType ( lua_State* luaVM )
+{
+//  string guiGetCursorType ( )
+    auto eType = CStaticFunctionDefinitions::GUIGetCursorType ( );
+    lua_pushstring (luaVM, EnumToString ( eType ) );
     return 1;
 }

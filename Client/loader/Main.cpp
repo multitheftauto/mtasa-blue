@@ -30,8 +30,7 @@
 //      4. By 'MTA San Andreas.exe' during auto-update (in a temporary directory somewhere) (Which may then call it again as admin)
 //
 ///////////////////////////////////////////////////////////////
-extern "C" _declspec(dllexport)
-int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+MTAEXPORT int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
     AddUtf8FileHooks();
 

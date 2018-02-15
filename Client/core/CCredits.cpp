@@ -51,6 +51,7 @@ CCredits::CCredits ( void )
                               L"Richard \"Cazomino05\" Whitlock\n"
                               L"Gamesnert\n"
                               L"Jusonex\n"
+                              L"Qais \"qaisjp\" Patankar\n"
                               L"\n"
                               L"\n" );
 
@@ -63,7 +64,9 @@ CCredits::CCredits ( void )
                               "Iztas\n"
                               "impulze\n"
                               "JoeBullet\n"
-                              "Qais \"qaisjp\" Patankar\n"
+                              "lopezloo\n"
+                              "Marek \"Necktrox\" Kulik\n"
+                              "Dutchman101\n"
                               "\n";
 
     m_strCredits +=           _("Game Design / Scripting");
@@ -118,15 +121,23 @@ CCredits::CCredits ( void )
                               "[GP_A]XetaQuake\n"
                               "asturel\n"
                               "FrankZZ\n"
-                              "GA_Justus\n"
                               "John_Michael\n"
                               "-ffs-Sniper\n"
                               "W\n"
-                              "TheKiller 'Dutchman' 101\n"
                               "Fedor Sinev\n"
-                              "lopezloo\n"
-                              "Marek \"Necktrox\" Kulik\n"
                               "zneext\n"
+                              "ZRec\n"
+                              "Pawelo / 4O4\n"
+                              "Sergeanur\n"
+                              "AleksCore\n"
+                              "tederis\n"
+                              "CrosRoad95\n"
+                              "Bonus1702\n"
+                              "Einheit-101\n"
+                              "TAPL-93\n"
+                              "JR10\n"
+                              "PhrozenByte\n"
+                              "AboShanab\n"
                               "\n";
                               "\n";
 

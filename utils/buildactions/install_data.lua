@@ -22,7 +22,7 @@ newaction {
 		os.mkdir(BIN_DIR)
 		
 		-- Copy data files
-		if os.get() == "windows" then
+		if os.host() == "windows" then
 			os.copydir(DATA_DIR, BIN_DIR)
 		end
 
@@ -33,7 +33,7 @@ newaction {
 		-- Make sure server/x64 directory exists
 		os.mkdir(BIN_DIR.."/server/x64")
 		
-		if os.get() == "windows" then
+		if os.host() == "windows" then
 			http.download_print_errors(NET_PATH_X86_WIN, BIN_DIR.."/server/net.dll")
 			http.download_print_errors(NET_PATH_X64_WIN, BIN_DIR.."/server/x64/net.dll")
 			http.download_print_errors(NETC_PATH_WIN, BIN_DIR.."/MTA/netc.dll")

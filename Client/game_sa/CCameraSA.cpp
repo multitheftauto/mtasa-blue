@@ -251,7 +251,6 @@ void CCameraSA::RestoreLastGoodState ( void )
 CMatrix * CCameraSA::GetMatrix ( CMatrix * matrix )
 {
     DEBUG_TRACE("CMatrix * CCameraSA::GetMatrix ( CMatrix * matrix )");
-    //_asm int 3
     //CCameraSAInterface * pCamInterface = this->GetInterface();
     CMatrix_Padded * pCamMatrix = &this->GetInterface()->m_cameraMatrix; // ->Placeable.matrix;
     if ( pCamMatrix )

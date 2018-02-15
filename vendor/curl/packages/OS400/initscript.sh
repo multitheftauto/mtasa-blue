@@ -1,6 +1,16 @@
 #!/bin/sh
 
 
+setenv()
+
+{
+        #       Define and export.
+
+        eval ${1}="${2}"
+        export ${1}
+}
+
+
 case "${SCRIPTDIR}" in
 /*)     ;;
 *)      SCRIPTDIR="`pwd`/${SCRIPTDIR}"
@@ -32,18 +42,30 @@ export SONAME
 #
 ################################################################################
 
-TARGETLIB='CURL'                # Target OS/400 program library
-STATBNDDIR='CURL_A'             # Static binding directory.
-DYNBNDDIR='CURL'                # Dynamic binding directory.
-SRVPGM="CURL.${SONAME}"         # Service program.
-TGTCCSID='500'                  # Target CCSID of objects
-DEBUG='*ALL'                    # Debug level
-OPTIMIZE='10'                   # Optimisation level
-OUTPUT='*NONE'                  # Compilation output option.
-TGTRLS='V5R3M0'                 # Target OS release
+setenv TARGETLIB        'CURL'                  # Target OS/400 program library.
+setenv STATBNDDIR       'CURL_A'                # Static binding directory.
+setenv DYNBNDDIR        'CURL'                  # Dynamic binding directory.
+setenv SRVPGM           "CURL.${SONAME}"        # Service program.
+setenv TGTCCSID         '500'                   # Target CCSID of objects.
+setenv DEBUG            '*ALL'                  # Debug level.
+setenv OPTIMIZE         '10'                    # Optimisation level
+setenv OUTPUT           '*NONE'                 # Compilation output option.
+setenv TGTRLS           'V6R1M0'                # Target OS release.
+setenv IFSDIR           '/curl'                 # Installation IFS directory.
 
-export TARGETLIB STATBNDDIR DYNBNDDIR SRVPGM TGTCCSID DEBUG OPTIMIZE OUTPUT
-export TGTRLS
+#       Define ZLIB availability and locations.
+
+setenv WITH_ZLIB        0                       # Define to 1 to enable.
+setenv ZLIB_INCLUDE     '/zlib/include'         # ZLIB include IFS directory.
+setenv ZLIB_LIB         'ZLIB'                  # ZLIB library.
+setenv ZLIB_BNDDIR      'ZLIB_A'                # ZLIB binding directory.
+
+#       Define LIBSSH2 availability and locations.
+
+setenv WITH_LIBSSH2     0                       # Define to 1 to enable.
+setenv LIBSSH2_INCLUDE  '/libssh2/include'      # LIBSSH2 include IFS directory.
+setenv LIBSSH2_LIB      'LIBSSH2'               # LIBSSH2 library.
+setenv LIBSSH2_BNDDIR   'LIBSSH2_A'             # LIBSSH2 binding directory.
 
 
 ################################################################################
@@ -104,6 +126,41 @@ action_needed()
 }
 
 
+#       canonicalize_path path
+#
+#       Return canonicalized path as:
+#       - Absolute
+#       - No . or .. component.
+
+canonicalize_path()
+
+{
+        if expr "${1}" : '^/' > /dev/null
+        then    P="${1}"
+        else    P="`pwd`/${1}"
+        fi
+
+        R=
+        IFSSAVE="${IFS}"
+        IFS="/"
+
+        for C in ${P}
+        do      IFS="${IFSSAVE}"
+                case "${C}" in
+                .)      ;;
+                ..)     R=`expr "${R}" : '^\(.*/\)..*'`
+                        ;;
+                ?*)     R="${R}${C}/"
+                        ;;
+                *)      ;;
+                esac
+        done
+
+        IFS="${IFSSAVE}"
+        echo "/`expr "${R}" : '^\(.*\)/'`"
+}
+
+
 #       make_module module_name source_name [additional_definitions]
 #
 #       Compile source name into ASCII module if needed.
@@ -116,6 +173,7 @@ make_module()
         MODULES="${MODULES} ${1}"
         MODIFSNAME="${LIBIFSNAME}/${1}.MODULE"
         action_needed "${MODIFSNAME}" "${2}" || return 0;
+        SRCDIR=`dirname \`canonicalize_path "${2}"\``
 
         #       #pragma convert has to be in the source file itself, i.e.
         #               putting it in an include file makes it only active
@@ -130,17 +188,37 @@ make_module()
         CMD="CRTCMOD MODULE(${TARGETLIB}/${1}) SRCSTMF('__tmpsrcf.c')"
 #       CMD="${CMD} SYSIFCOPT(*IFS64IO) OPTION(*INCDIRFIRST *SHOWINC *SHOWSYS)"
         CMD="${CMD} SYSIFCOPT(*IFS64IO) OPTION(*INCDIRFIRST)"
-        CMD="${CMD} LOCALETYPE(*LOCALE)"
+        CMD="${CMD} LOCALETYPE(*LOCALE) FLAG(10)"
         CMD="${CMD} INCDIR('/qibm/proddata/qadrt/include'"
-        CMD="${CMD} '${TOPDIR}/include/curl' '${TOPDIR}/include'"
-        CMD="${CMD} '${TOPDIR}/packages/OS400' ${INCLUDES})"
+        CMD="${CMD} '${TOPDIR}/include/curl' '${TOPDIR}/include' '${SRCDIR}'"
+        CMD="${CMD} '${TOPDIR}/packages/OS400'"
+
+        if [ "${WITH_ZLIB}" != "0" ]
+        then    CMD="${CMD} '${ZLIB_INCLUDE}'"
+        fi
+
+        if [ "${WITH_LIBSSH2}" != "0" ]
+        then    CMD="${CMD} '${LIBSSH2_INCLUDE}'"
+        fi
+
+        CMD="${CMD} ${INCLUDES})"
         CMD="${CMD} TGTCCSID(${TGTCCSID}) TGTRLS(${TGTRLS})"
         CMD="${CMD} OUTPUT(${OUTPUT})"
         CMD="${CMD} OPTIMIZE(${OPTIMIZE})"
         CMD="${CMD} DBGVIEW(${DEBUG})"
 
-        if [ "${3}" ]
-        then    CMD="${CMD} DEFINE(${3})"
+        DEFINES="${3} BUILDING_LIBCURL"
+
+        if [ "${WITH_ZLIB}" != "0" ]
+        then    DEFINES="${DEFINES} HAVE_LIBZ HAVE_ZLIB_H"
+        fi
+
+        if [ "${WITH_LIBSSH2}" != "0" ]
+        then    DEFINES="${DEFINES} USE_LIBSSH2 HAVE_LIBSSH2_H"
+        fi
+
+        if [ "${DEFINES}" ]
+        then    CMD="${CMD} DEFINE(${DEFINES})"
         fi
 
         system "${CMD}"
@@ -154,11 +232,17 @@ make_module()
 db2_name()
 
 {
-        basename "${1}"                                                 |
-        tr 'a-z-' 'A-Z_'                                                |
-        sed -e 's/\..*//'                                               \
-            -e 's/^CURL_*/C/'                                           \
-            -e 's/^\(.\).*\(.........\)$/\1\2/'
+        if [ "${2}" = 'nomangle' ]
+        then    basename "${1}"                                         |
+                tr 'a-z-' 'A-Z_'                                        |
+                sed -e 's/\..*//'                                       \
+                    -e 's/^\(.\).*\(.........\)$/\1\2/'
+        else    basename "${1}"                                         |
+                tr 'a-z-' 'A-Z_'                                        |
+                sed -e 's/\..*//'                                       \
+                    -e 's/^CURL_*/C/'                                   \
+                    -e 's/^\(.\).*\(.........\)$/\1\2/'
+        fi
 }
 
 

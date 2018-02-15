@@ -5,11 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at http://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.haxx.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -23,46 +23,64 @@
 /* Base64 encoding/decoding */
 
 #include "curl_setup.h"
-
-#define _MPRINTF_REPLACE /* use our functions only */
-#include <curl/mprintf.h>
-
-#include "urldata.h" /* for the SessionHandle definition */
+#include "urldata.h" /* for the Curl_easy definition */
 #include "warnless.h"
 #include "curl_base64.h"
-#include "curl_memory.h"
 #include "non-ascii.h"
 
-/* include memdebug.h last */
+/* The last 3 #include files should be in this order */
+#include "curl_printf.h"
+#include "curl_memory.h"
 #include "memdebug.h"
 
 /* ---- Base64 Encoding/Decoding Table --- */
-static const char table64[]=
+static const char base64[]=
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-static void decodeQuantum(unsigned char *dest, const char *src)
+/* The Base 64 encoding with an URL and filename safe alphabet, RFC 4648
+   section 5 */
+static const char base64url[]=
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+
+static size_t decodeQuantum(unsigned char *dest, const char *src)
 {
+  size_t padding = 0;
   const char *s, *p;
-  unsigned long i, v, x = 0;
+  unsigned long i, x = 0;
 
   for(i = 0, s = src; i < 4; i++, s++) {
-    v = 0;
-    p = table64;
-    while(*p && (*p != *s)) {
-      v++;
-      p++;
-    }
-    if(*p == *s)
-      x = (x << 6) + v;
-    else if(*s == '=')
+    unsigned long v = 0;
+
+    if(*s == '=') {
       x = (x << 6);
+      padding++;
+    }
+    else {
+      p = base64;
+
+      while(*p && (*p != *s)) {
+        v++;
+        p++;
+      }
+
+      if(*p == *s)
+        x = (x << 6) + v;
+      else
+        return 0;
+    }
   }
 
-  dest[2] = curlx_ultouc(x & 0xFFUL);
+  if(padding < 1)
+    dest[2] = curlx_ultouc(x & 0xFFUL);
+
   x >>= 8;
-  dest[1] = curlx_ultouc(x & 0xFFUL);
+  if(padding < 2)
+    dest[1] = curlx_ultouc(x & 0xFFUL);
+
   x >>= 8;
   dest[0] = curlx_ultouc(x & 0xFFUL);
+
+  return 3 - padding;
 }
 
 /*
@@ -82,84 +100,80 @@ static void decodeQuantum(unsigned char *dest, const char *src)
 CURLcode Curl_base64_decode(const char *src,
                             unsigned char **outptr, size_t *outlen)
 {
+  size_t srclen = 0;
   size_t length = 0;
-  size_t equalsTerm = 0;
+  size_t padding = 0;
   size_t i;
   size_t numQuantums;
-  unsigned char lastQuantum[3];
   size_t rawlen = 0;
+  unsigned char *pos;
   unsigned char *newstr;
 
   *outptr = NULL;
   *outlen = 0;
+  srclen = strlen(src);
 
+  /* Check the length of the input string is valid */
+  if(!srclen || srclen % 4)
+    return CURLE_BAD_CONTENT_ENCODING;
+
+  /* Find the position of any = padding characters */
   while((src[length] != '=') && src[length])
     length++;
+
   /* A maximum of two = padding characters is allowed */
   if(src[length] == '=') {
-    equalsTerm++;
-    if(src[length+equalsTerm] == '=')
-      equalsTerm++;
+    padding++;
+    if(src[length + 1] == '=')
+      padding++;
   }
-  numQuantums = (length + equalsTerm) / 4;
 
-  /* Don't allocate a buffer if the decoded length is 0 */
-  if(numQuantums == 0)
-    return CURLE_OK;
+  /* Check the = padding characters weren't part way through the input */
+  if(length + padding != srclen)
+    return CURLE_BAD_CONTENT_ENCODING;
 
-  rawlen = (numQuantums * 3) - equalsTerm;
+  /* Calculate the number of quantums */
+  numQuantums = srclen / 4;
 
-  /* The buffer must be large enough to make room for the last quantum
-  (which may be partially thrown out) and the zero terminator. */
-  newstr = malloc(rawlen+4);
+  /* Calculate the size of the decoded string */
+  rawlen = (numQuantums * 3) - padding;
+
+  /* Allocate our buffer including room for a zero terminator */
+  newstr = malloc(rawlen + 1);
   if(!newstr)
     return CURLE_OUT_OF_MEMORY;
 
-  *outptr = newstr;
+  pos = newstr;
 
-  /* Decode all but the last quantum (which may not decode to a
-  multiple of 3 bytes) */
-  for(i = 0; i < numQuantums - 1; i++) {
-    decodeQuantum(newstr, src);
-    newstr += 3; src += 4;
+  /* Decode the quantums */
+  for(i = 0; i < numQuantums; i++) {
+    size_t result = decodeQuantum(pos, src);
+    if(!result) {
+      free(newstr);
+
+      return CURLE_BAD_CONTENT_ENCODING;
+    }
+
+    pos += result;
+    src += 4;
   }
 
-  /* This final decode may actually read slightly past the end of the buffer
-  if the input string is missing pad bytes.  This will almost always be
-  harmless. */
-  decodeQuantum(lastQuantum, src);
-  for(i = 0; i < 3 - equalsTerm; i++)
-    newstr[i] = lastQuantum[i];
+  /* Zero terminate */
+  *pos = '\0';
 
-  newstr[i] = '\0'; /* zero terminate */
-
-  *outlen = rawlen; /* return size of decoded data */
+  /* Return the decoded data */
+  *outptr = newstr;
+  *outlen = rawlen;
 
   return CURLE_OK;
 }
 
-/*
- * Curl_base64_encode()
- *
- * Given a pointer to an input buffer and an input size, encode it and
- * return a pointer in *outptr to a newly allocated memory area holding
- * encoded data. Size of encoded data is returned in variable pointed by
- * outlen.
- *
- * Input length of 0 indicates input buffer holds a NUL-terminated string.
- *
- * Returns CURLE_OK on success, otherwise specific error code. Function
- * output shall not be considered valid unless CURLE_OK is returned.
- *
- * When encoded data length is 0, returns NULL in *outptr.
- *
- * @unittest: 1302
- */
-CURLcode Curl_base64_encode(struct SessionHandle *data,
-                            const char *inputbuff, size_t insize,
-                            char **outptr, size_t *outlen)
+static CURLcode base64_encode(const char *table64,
+                              struct Curl_easy *data,
+                              const char *inputbuff, size_t insize,
+                              char **outptr, size_t *outlen)
 {
-  CURLcode error;
+  CURLcode result;
   unsigned char ibuf[3];
   unsigned char obuf[4];
   int i;
@@ -173,11 +187,16 @@ CURLcode Curl_base64_encode(struct SessionHandle *data,
   *outptr = NULL;
   *outlen = 0;
 
-  if(0 == insize)
+  if(!insize)
     insize = strlen(indata);
 
-  base64data = output = malloc(insize*4/3+4);
-  if(NULL == output)
+#if SIZEOF_SIZE_T == 4
+  if(insize > UINT_MAX/4)
+    return CURLE_OUT_OF_MEMORY;
+#endif
+
+  base64data = output = malloc(insize * 4 / 3 + 4);
+  if(!output)
     return CURLE_OUT_OF_MEMORY;
 
   /*
@@ -185,10 +204,10 @@ CURLcode Curl_base64_encode(struct SessionHandle *data,
    * not the host encoding.  And we can't change the actual input
    * so we copy it to a buffer, translate it, and use that instead.
    */
-  error = Curl_convert_clone(data, indata, insize, &convbuf);
-  if(error) {
+  result = Curl_convert_clone(data, indata, insize, &convbuf);
+  if(result) {
     free(output);
-    return error;
+    return result;
   }
 
   if(convbuf)
@@ -219,30 +238,83 @@ CURLcode Curl_base64_encode(struct SessionHandle *data,
                table64[obuf[0]],
                table64[obuf[1]]);
       break;
+
     case 2: /* two bytes read */
       snprintf(output, 5, "%c%c%c=",
                table64[obuf[0]],
                table64[obuf[1]],
                table64[obuf[2]]);
       break;
+
     default:
       snprintf(output, 5, "%c%c%c%c",
                table64[obuf[0]],
                table64[obuf[1]],
                table64[obuf[2]],
-               table64[obuf[3]] );
+               table64[obuf[3]]);
       break;
     }
     output += 4;
   }
+
+  /* Zero terminate */
   *output = '\0';
-  *outptr = base64data; /* return pointer to new data, allocated memory */
 
-  if(convbuf)
-    free(convbuf);
+  /* Return the pointer to the new data (allocated memory) */
+  *outptr = base64data;
 
-  *outlen = strlen(base64data); /* return the length of the new data */
+  free(convbuf);
+
+  /* Return the length of the new data */
+  *outlen = strlen(base64data);
 
   return CURLE_OK;
 }
-/* ---- End of Base64 Encoding ---- */
+
+/*
+ * Curl_base64_encode()
+ *
+ * Given a pointer to an input buffer and an input size, encode it and
+ * return a pointer in *outptr to a newly allocated memory area holding
+ * encoded data. Size of encoded data is returned in variable pointed by
+ * outlen.
+ *
+ * Input length of 0 indicates input buffer holds a NUL-terminated string.
+ *
+ * Returns CURLE_OK on success, otherwise specific error code. Function
+ * output shall not be considered valid unless CURLE_OK is returned.
+ *
+ * When encoded data length is 0, returns NULL in *outptr.
+ *
+ * @unittest: 1302
+ */
+CURLcode Curl_base64_encode(struct Curl_easy *data,
+                            const char *inputbuff, size_t insize,
+                            char **outptr, size_t *outlen)
+{
+  return base64_encode(base64, data, inputbuff, insize, outptr, outlen);
+}
+
+/*
+ * Curl_base64url_encode()
+ *
+ * Given a pointer to an input buffer and an input size, encode it and
+ * return a pointer in *outptr to a newly allocated memory area holding
+ * encoded data. Size of encoded data is returned in variable pointed by
+ * outlen.
+ *
+ * Input length of 0 indicates input buffer holds a NUL-terminated string.
+ *
+ * Returns CURLE_OK on success, otherwise specific error code. Function
+ * output shall not be considered valid unless CURLE_OK is returned.
+ *
+ * When encoded data length is 0, returns NULL in *outptr.
+ *
+ * @unittest: 1302
+ */
+CURLcode Curl_base64url_encode(struct Curl_easy *data,
+                               const char *inputbuff, size_t insize,
+                               char **outptr, size_t *outlen)
+{
+  return base64_encode(base64url, data, inputbuff, insize, outptr, outlen);
+}
