@@ -1834,6 +1834,25 @@ bool CConsoleCommands::AuthorizeSerial( CConsole* pConsole, const char* szArgume
     return false;
 }
 
+bool CConsoleCommands::ReloadAcl(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
+{
+    if (pClient->GetClientType() != CClient::CLIENT_CONSOLE)
+    {
+        if (!g_pGame->GetACLManager()->CanObjectUseRight(pClient->GetAccount()->GetName(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "reloadacl", CAccessControlListRight::RIGHT_TYPE_COMMAND, false))
+        {
+            pEchoClient->SendConsole("reloadacl: You do not have sufficient rights to use this command.");
+            return false;
+        }
+    }
+    if (g_pGame->GetACLManager()->Reload())
+    {
+        pClient->SendEcho("reloadacl: ACL successfully reloaded");
+        return true;
+    }
+    pClient->SendEcho("reloadacl: ACL failed to reload, fix any errors and run again");
+    return false;
+}
+
 
 bool CConsoleCommands::FakeLag ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
