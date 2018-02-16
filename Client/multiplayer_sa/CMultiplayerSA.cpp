@@ -1459,7 +1459,11 @@ void CMultiplayerSA::InitHooks()
     // Skip vehicle type check in CVehicle::SetupRender & CVehicle::ResetAfterRender (fix for #8158)
     MemSet ( (void*) 0x6D6517, 0x90, 2 );
     MemSet ( (void*) 0x6D0E43, 0x90, 2 );
-
+  
+    // Fix killing ped during car jacking (#4319)
+    // by using CTaskComplexLeaveCar instead of CTaskComplexLeaveCarAndDie
+    MemPut < BYTE > ( 0x63F576, 0xEB );
+  
     // Disable vehicle audio driver logic so MTA can reimplement it (#9681)
     // Disable updating m_bPlayerDriver in CAEVehicleAudioEntity::Service
     MemSetFast ( (void*) 0x5023B2, 0x90, 6 );
@@ -1467,7 +1471,6 @@ void CMultiplayerSA::InitHooks()
     MemSetFast( (void*) 0x5023E1, 0x90, 5 );
     // Disable call to CAEVehicleAudioEntity::JustGotOutOfVehicleAsDriver
     MemSetFast( (void*) 0x502341, 0x90, 5 );
-
 
     InitHooks_CrashFixHacks ();
 
