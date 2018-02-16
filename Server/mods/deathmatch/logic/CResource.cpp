@@ -92,6 +92,7 @@ CResource::CResource ( CResourceManager * resourceManager, bool bIsZipped, const
     m_bProtected = false;
     m_bStartedManually = false;
     m_iDownloadPriorityGroup = 0;
+    m_bDestroyed = false;
 
     m_uiVersionMajor = 0;
     m_uiVersionMinor = 0;
@@ -447,6 +448,9 @@ void CResource::Reload ( void )
 CResource::~CResource ( )
 {
     CIdArray::PushUniqueId ( this, EIdClass::RESOURCE, m_uiScriptID );
+    
+    m_bDestroyed = true;
+
     Unload ();
 
     // Overkill, but easiest way to stop crashes:
@@ -459,8 +463,6 @@ CResource::~CResource ( )
     }
 
     m_strResourceName = "";
-
-    m_bDestroyed = true;
 
     pthread_mutex_destroy(&m_mutex);
 }
@@ -1097,6 +1099,7 @@ bool CResource::Stop ( bool bStopManually )
         // Call the onResourceStop event on this resource element
         CLuaArguments Arguments;
         Arguments.PushResource ( this );
+        Arguments.PushBoolean ( m_bDestroyed );
         m_pResourceElement->CallEvent ( "onResourceStop", Arguments );
 
         // Remove us from the resources we depend on (they might unload too first)
