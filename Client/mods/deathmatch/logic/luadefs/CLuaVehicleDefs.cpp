@@ -41,6 +41,7 @@ void CLuaVehicleDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getVehiclePaintjob", GetVehiclePaintjob );
     CLuaCFunctions::AddFunction ( "getVehiclePlateText", GetVehiclePlateText );
     CLuaCFunctions::AddFunction ( "getVehicleWheelStates", GetVehicleWheelStates );
+    CLuaCFunctions::AddFunction ( "isVehicleWheelCollided", IsVehicleWheelCollided );
     CLuaCFunctions::AddFunction ( "isVehicleDamageProof", IsVehicleDamageProof );
     CLuaCFunctions::AddFunction ( "isVehicleFuelTankExplodable", IsVehicleFuelTankExplodable );
     CLuaCFunctions::AddFunction ( "isVehicleFrozen", IsVehicleFrozen );
@@ -173,6 +174,7 @@ void CLuaVehicleDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getPaintjob", "getVehiclePaintjob" );
     lua_classfunction ( luaVM, "getTurretPosition", "getVehicleTurretPosition" );
     lua_classfunction ( luaVM, "getWheelStates", "getVehicleWheelStates" );
+    lua_classfunction ( luaVM, "isWheelCollided", "isVehicleWheelCollided" );
     lua_classfunction ( luaVM, "getDoorOpenRatio", "getVehicleDoorOpenRatio" );
     lua_classfunction ( luaVM, "getVariant", "getVehicleVariant" );
     lua_classfunction ( luaVM, "getHandling", "getVehicleHandling" );
@@ -916,6 +918,22 @@ int CLuaVehicleDefs::GetVehicleWheelStates ( lua_State* luaVM )
     return 1;
 }
 
+int CLuaVehicleDefs::IsVehicleWheelCollided ( lua_State* luaVM )
+{
+    CClientVehicle* pVehicle = nullptr; eWheelPosition wheel;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pVehicle );
+    argStream.ReadEnumStringOrNumber ( wheel );
+
+    if ( !argStream.HasErrors () )
+        lua_pushboolean ( luaVM, pVehicle->IsWheelCollided ( wheel ) );
+    else
+    {
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        lua_pushboolean ( luaVM, false );
+    }
+    return 1;
+}
 
 int CLuaVehicleDefs::GetVehicleDoorState ( lua_State* luaVM )
 {

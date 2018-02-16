@@ -47,6 +47,7 @@ DECLARE_ENUM( EComponentBase::EComponentBaseType );
 DECLARE_ENUM( eWebBrowserMouseButton );
 DECLARE_ENUM( eTrayIconType )
 DECLARE_ENUM( eCursorType )
+DECLARE_ENUM( eWheelPosition )
 
 enum eDXHorizontalAlign
 {
