@@ -477,8 +477,8 @@ void CNametags::DrawTagForPlayer ( CClientPlayer* pPlayer, unsigned char ucAlpha
         // Draw shadow first
         int iScreenPosX = static_cast < int > ( vecScreenPosition.fX );
         int iScreenPosY = static_cast < int > ( vecScreenPosition.fY );
-        pGraphics->DrawText ( iScreenPosX + 1, iScreenPosY+ 1, iScreenPosX + 1, iScreenPosY + 1, COLOR_ARGB ( 255, 0, 0, 0 ), szNick, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
-        pGraphics->DrawText ( iScreenPosX, iScreenPosY, iScreenPosX, iScreenPosY, COLOR_ARGB ( 255, ucR, ucG, ucB ), szNick, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
+        pGraphics->DrawString ( iScreenPosX + 1, iScreenPosY+ 1, iScreenPosX + 1, iScreenPosY + 1, COLOR_ARGB ( 255, 0, 0, 0 ), szNick, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
+        pGraphics->DrawString ( iScreenPosX, iScreenPosY, iScreenPosX, iScreenPosY, COLOR_ARGB ( 255, ucR, ucG, ucB ), szNick, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER );
 
         // We need to draw health tags?
         if ( m_bDrawHealth )

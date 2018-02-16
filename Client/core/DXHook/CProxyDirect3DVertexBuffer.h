@@ -42,10 +42,11 @@ public:
     virtual ~CProxyDirect3DVertexBuffer ( void );
 
     IDirect3DVertexBuffer9* GetOriginal ( void )                        { return m_pOriginal; }
+    HRESULT                 DoLock      ( UINT OffsetToLock, UINT SizeToLock, void** ppbData, DWORD Flags );
 
 protected:
     IDirect3DVertexBuffer9* m_pOriginal;
-    int                     m_iMemUsed;
+    uint                    m_iMemUsed;
     DWORD                   m_dwUsage;
     DWORD                   m_dwFVF;
     D3DPOOL                 m_pool;

@@ -39,8 +39,9 @@ public:
     virtual void        OnLoseFocus                 ( void );
     virtual void        OnPaint                     ( void );
     virtual bool        GetRequiredDisplayResolution( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex );
+    virtual int         GetFullScreenStyle          ( void )    { return m_iCurrentFullscreenStyle; }
+    virtual bool        IsDisplayModeWindowed       ( void );
 
-    bool                IsDisplayModeWindowed       ( void );
     bool                IsDisplayModeFullScreen     ( void );
     bool                IsDisplayModeFullScreenWindow   ( void );
     bool                GetCurrentAdapterRect       ( LPRECT pOutRect );

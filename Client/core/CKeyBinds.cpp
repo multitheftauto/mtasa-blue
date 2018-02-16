@@ -2131,7 +2131,7 @@ void CKeyBinds::DoPostFramePulse ( void )
 
     if ( SystemState != 9 /* GS_PLAYING_GAME */ ) return;
 
-    bool bInVehicle = false, bHasDetonator = false, bIsDead = false, bEnteringVehicle = false;
+    bool bInVehicle = false, bHasDetonator = false, bIsDead = false, bAimingWeapon = false, bEnteringVehicle = false;
     CPed* pPed = m_pCore->GetGame ()->GetPools ()->GetPedFromRef ( (DWORD)1 );
     // Don't set any controller states if the local player isnt alive
     if ( !pPed )
@@ -2156,6 +2156,10 @@ void CKeyBinds::DoPostFramePulse ( void )
     if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_DEAD )
         bIsDead = true;
 
+    pTask = pTaskManager->GetTaskSecondary ( TASK_SECONDARY_ATTACK );
+    if ( pTask && pTask->GetTaskType () == TASK_SIMPLE_USE_GUN )
+        bAimingWeapon = g_bcControls [ 39 ].bState;
+
     if ( bInVehicle != m_bInVehicle )
     {
         m_bInVehicle = bInVehicle;
@@ -2164,8 +2168,6 @@ void CKeyBinds::DoPostFramePulse ( void )
         else
             CallAllGTAControlBinds ( CONTROL_VEHICLE, false );
     }
-
-    bool bAimingWeapon = g_bcControls [ 39 ].bState;
 
     CControllerState cs;
     memset ( &cs, 0, sizeof ( CControllerState ) );

@@ -82,17 +82,17 @@ void CClientCamera::DoPulse ( void )
                     {
                         if ( !pVehicle )
                         {
-                            SetFocus ( m_pFocusedPlayer, MODE_BEHINDCAR );
+                            SetFocus ( m_pFocusedPlayer, MODE_CAM_ON_A_STRING );
                         }
                     }
                     else if ( pVehicle )
                     {
-                        SetFocus ( m_pFocusedPlayer, MODE_BEHINDCAR );
+                        SetFocus ( m_pFocusedPlayer, MODE_CAM_ON_A_STRING );
                     }
                 }
                 else
                 {
-                    SetFocus ( m_pFocusedPlayer, MODE_BEHINDCAR );
+                    SetFocus ( m_pFocusedPlayer, MODE_CAM_ON_A_STRING );
                 }
             }
 
@@ -357,8 +357,7 @@ void CClientCamera::SetFocus ( CClientEntity* pEntity, eCamMode eMode, bool bSmo
             }
 
             // Hacky, used to follow peds
-            //if ( eMode == MODE_CAM_ON_A_STRING && eType == CCLIENTPLAYERMODEL )
-            if ( eMode == MODE_BEHINDCAR && ( eType == CCLIENTPED || eType == CCLIENTPLAYER ) )
+            if ( eMode == MODE_CAM_ON_A_STRING && ( eType == CCLIENTPED || eType == CCLIENTPLAYER ) )
                 eMode = MODE_FOLLOWPED;
 
             // Do it
@@ -503,7 +502,7 @@ void CClientCamera::RestoreEntity ( CClientEntity* pEntity )
     {
         if ( m_pFocusedEntity && m_pFocusedEntity == pEntity )
         {
-            SetFocus ( pEntity, MODE_BEHINDCAR );
+            SetFocus ( pEntity, MODE_CAM_ON_A_STRING );
             m_bInvalidated = false;
         }
     }

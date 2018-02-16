@@ -150,6 +150,7 @@ CRemoteCall::CRemoteCall ( const char * szServerHost, const char * szResourceNam
 
     arguments->WriteToJSONString ( m_options.strPostData, true );
     m_options.bPostBinary = false;
+    m_options.bIsLegacy = true;
     m_bIsFetch = false;
 
     m_strURL = SString ( "http://%s/%s/call/%s", szServerHost, szResourceName, szFunctionName );
@@ -166,6 +167,7 @@ CRemoteCall::CRemoteCall ( const char * szURL, CLuaArguments * arguments, CLuaMa
 
     arguments->WriteToJSONString ( m_options.strPostData, true );
     m_options.bPostBinary = false;
+    m_options.bIsLegacy = true;
     m_bIsFetch = false;
 
     m_strURL = szURL;
@@ -183,6 +185,7 @@ CRemoteCall::CRemoteCall ( const char * szURL, CLuaArguments * fetchArguments, c
 
     m_options.strPostData = strPostData;
     m_options.bPostBinary = bPostBinary;
+    m_options.bIsLegacy = true;
     m_bIsFetch = true;
 
     m_strURL = szURL;
@@ -255,10 +258,16 @@ void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
 
         // Headers as a subtable
         CLuaArguments headers;
-        for (auto iter : result.headers )
+        std::vector<SString> headerLineList;
+        SStringX(result.szHeaders).Split("\n", headerLineList);
+        for (const SString& strLine : headerLineList)
         {
-            headers.PushString(iter.first);
-            headers.PushString(iter.second);
+            SString strKey, strValue;
+            if (strLine.Split(": ", &strKey, &strValue))
+            {
+                headers.PushString(strKey);
+                headers.PushString(strValue);
+            }
         }
         info.PushString("headers");
         info.PushTable(&headers);

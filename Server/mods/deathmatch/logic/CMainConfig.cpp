@@ -503,7 +503,7 @@ bool CMainConfig::Load ( void )
 
     // auth_serial_groups
     SString strGroupList;
-    if ( GetString( m_pRootNode, "auth_serial_groups", strGroupList, 1 ) != IS_SUCCESS )
+    if ( GetString( m_pRootNode, "auth_serial_groups", strGroupList ) != IS_SUCCESS )
     {
         // If not defined in conf file, then default to Admin
         strGroupList = "Admin";
@@ -834,6 +834,7 @@ bool CMainConfig::LoadExtended ( void )
 
     RegisterCommand ( "aclrequest", CConsoleCommands::AclRequest, false );
     RegisterCommand ( "authserial", CConsoleCommands::AuthorizeSerial, false );
+    RegisterCommand ( "reloadacl", CConsoleCommands::ReloadAcl, false );
     RegisterCommand ( "debugjoinflood", CConsoleCommands::DebugJoinFlood, false );
     RegisterCommand ( "debuguptime", CConsoleCommands::DebugUpTime, false );
     RegisterCommand ( "sfakelag", CConsoleCommands::FakeLag, false );

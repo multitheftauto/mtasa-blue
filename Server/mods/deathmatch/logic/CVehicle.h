@@ -69,7 +69,7 @@ enum eDoors
     MAX_DOORS
 };
 
-enum eWheels
+enum eWheelPosition
 {
     FRONT_LEFT_WHEEL = 0,
     REAR_LEFT_WHEEL,

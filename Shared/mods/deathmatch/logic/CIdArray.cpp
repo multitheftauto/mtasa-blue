@@ -20,6 +20,9 @@ uint                            CIdArray::m_uiPopIdCounter = 0;
 uint                            CIdArray::m_uiMinTicksBetweenIdReuse = 0;
 CTickCount                      CIdArray::m_LastPeriodStart;
 
+#ifdef MTA_CLIENT
+    static const char* GetIdClassTypeName ( EIdClassType eClass );
+#endif
 
 //
 // Initialize
@@ -36,7 +39,6 @@ void CIdArray::Initialize ( void )
         ExpandBy ( 2000 );
     }
 }
-
 
 //
 // Add object to the list and get a new id for it
@@ -72,16 +74,46 @@ SArrayId CIdArray::PopUniqueId ( void* pObject, EIdClassType idClass )
     }
 
     // Grab the next unused ID
-    SArrayId ulPhysicalIndex;
+    SArrayId ulPhysicalIndex = INVALID_ARRAY_ID;
     bool bSuccess = m_IDStack.Pop ( ulPhysicalIndex );
     assert ( bSuccess );
 
     // Checks
-    assert ( ( ulPhysicalIndex != INVALID_ARRAY_ID ) &&
-            ( ulPhysicalIndex <= m_uiCapacity ) &&
-            ( m_Elements.size () > ulPhysicalIndex ) &&
-            ( m_Elements [ ulPhysicalIndex ].pObject == NULL ) &&
-            ( m_Elements [ ulPhysicalIndex ].idClass == EIdClass::NONE ) );
+	assert( ulPhysicalIndex != INVALID_ARRAY_ID );
+    
+#ifdef MTA_CLIENT
+    if ( ulPhysicalIndex > m_uiCapacity )
+    {
+        WriteErrorEvent ( "--------------------------------------------------------------------------------" );
+        WriteErrorEvent ( "-- Error section for: CIdArray::PopUniqueId" );
+        WriteErrorEvent ( "--------------------------------------------------------------------------------" );
+        WriteErrorEvent ( SString ( " ulPhysicalIndex <= m_uiCapacity:   %s (must be false)",        ulPhysicalIndex <= m_uiCapacity ? "true" : "false" ) );
+        WriteErrorEvent ( SString ( " CIdArray::m_IDStack:               %lu unused, %lu capacity",  m_IDStack.GetUnusedAmount(), m_IDStack.GetCapacity() ) );
+        WriteErrorEvent ( SString ( " CIdArray::m_Elements:              %zu size, %u capacity",     m_Elements.size(), m_Elements.capacity() ) );
+        WriteErrorEvent ( SString ( " CIdArray::m_uiPopIdCounter:        %u",                        m_uiPopIdCounter ) );
+        WriteErrorEvent ( SString ( " CIdArray::m_uiCapacity:            %u",                        m_uiCapacity ) );
+        WriteErrorEvent ( SString ( " ulPhysicalIndex:                   %lu",                       ulPhysicalIndex ) );
+        WriteErrorEvent ( "--------------------------------------------------------------------------------" );
+        WriteErrorEvent ( "-- Dump: CIdArray::m_Elements" );
+        WriteErrorEvent ( "--------------------------------------------------------------------------------" );
+
+        SArrayId startIndex = ( ulPhysicalIndex < 5 ) ? 0 : ( ulPhysicalIndex - 5 );
+        SArrayId stopIndex  = std::min( startIndex + 10, static_cast < SArrayId > ( m_Elements.size() ) );
+
+        for ( SArrayId i = startIndex; i < stopIndex; ++i )
+        {
+            WriteErrorEvent ( SString ( " [%lu] pObject = %p, idClass = %d (%s)", i, m_Elements[i].pObject, m_Elements[i].idClass, GetIdClassTypeName( m_Elements[i].idClass ) ) );
+        }
+
+        WriteErrorEvent ( "--------------------------------------------------------------------------------" );
+        assert ( false );
+    }
+#else
+    assert( ulPhysicalIndex <= m_uiCapacity );
+#endif
+	assert( m_Elements.size () > ulPhysicalIndex );
+	assert( m_Elements [ ulPhysicalIndex ].pObject == nullptr );
+	assert( m_Elements [ ulPhysicalIndex ].idClass == EIdClass::NONE );
 
     m_Elements [ ulPhysicalIndex ].pObject = pObject;
     m_Elements [ ulPhysicalIndex ].idClass = idClass;
@@ -97,13 +129,14 @@ void CIdArray::PushUniqueId ( void* pObject, EIdClassType idClass, SArrayId id )
     dassert ( m_bInitialized );
 
     // Map to index
+    assert( id >= SHARED_ARRAY_BASE_ID );
     SArrayId ulPhysicalIndex = id - SHARED_ARRAY_BASE_ID;
 
     // Checks
-    assert ( ( id != INVALID_ARRAY_ID ) &&
-            ( ulPhysicalIndex <= m_uiCapacity ) &&
-            ( m_Elements [ ulPhysicalIndex ].pObject == pObject ) &&
-            ( m_Elements [ ulPhysicalIndex ].idClass == idClass ) );
+	assert( id != INVALID_ARRAY_ID );
+	assert( ulPhysicalIndex <= m_uiCapacity );
+	assert( m_Elements [ ulPhysicalIndex ].pObject == pObject );
+	assert( m_Elements [ ulPhysicalIndex ].idClass == idClass );
 
     m_IDStack.Push ( ulPhysicalIndex );
     m_Elements [ ulPhysicalIndex ].pObject = NULL;
@@ -151,3 +184,41 @@ uint CIdArray::GetUnusedAmount ( void )
 {
     return m_IDStack.GetUnusedAmount ();
 }
+
+
+#ifdef MTA_CLIENT
+static const char* GetIdClassTypeName ( EIdClassType eClass )
+{
+    switch (eClass)
+    {
+    case EIdClassType::ACCOUNT:
+        return "Account";
+    case EIdClassType::ACL:
+        return "ACL";
+    case EIdClassType::ACL_GROUP:
+        return "ACL Group";
+    case EIdClassType::BAN:
+        return "Ban";
+    case EIdClassType::DB_JOBDATA:
+        return "DB Jobdata";
+    case EIdClassType::RESOURCE:
+        return "Resource";
+    case EIdClassType::TEXT_DISPLAY:
+        return "Text Display";
+    case EIdClassType::TEXT_ITEM:
+        return "Text Item";
+    case EIdClassType::TIMER:
+        return "Timer";
+    case EIdClassType::VECTOR2:
+        return "Vector2";
+    case EIdClassType::VECTOR3:
+        return "Vector3";
+    case EIdClassType::VECTOR4:
+        return "Vector4";
+    case EIdClassType::MATRIX:
+        return "Matrix";
+    default:
+        return "None";
+    }
+}
+#endif

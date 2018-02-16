@@ -5,11 +5,11 @@
 # *                            | (__| |_| |  _ <| |___
 # *                             \___|\___/|_| \_\_____|
 # *
-# * Copyright (C) 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+# * Copyright (C) 2012 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
 # *
 # * This software is licensed as described in the file COPYING, which
 # * you should have received as part of this distribution. The terms
-# * are also available at http://curl.haxx.se/docs/copyright.html.
+# * are also available at https://curl.haxx.se/docs/copyright.html.
 # *
 # * You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # * copies of the Software, and permit persons to whom the Software is
@@ -36,7 +36,7 @@
 # file name that may be longer than 10 characters, or not, into a string
 # with at most 10 characters which may be used as an OS/400 object name.
 #
-# This function might not be universally usefull, nor we care about it.
+# This function might not be universally useful, nor we care about it.
 #
 # It is intended to be used with libcurl's (*.c) source file names, so
 # dependency on libcurl's source file naming scheme is acceptable and

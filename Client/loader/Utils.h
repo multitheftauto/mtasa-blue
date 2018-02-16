@@ -46,6 +46,26 @@ struct SOSVersionInfo
     DWORD dwBuild;
 };
 
+enum class EGtaFileVersion
+{
+    Unknown,
+    US,
+    EU,
+    Encrypted,
+};
+
+struct SPEFileOffsets
+{
+    uint TimeDateStamp;
+    uint Characteristics;
+    uint AddressOfEntryPoint;
+    uint DllCharacteristics;
+    struct
+    {
+        uint PointerToRawData;
+    } sections[1];
+};
+
 // Loads the given dll into hProcess. Returns 0 on failure or the handle to the
 // remote dll module on success.
 HMODULE         RemoteLoadLibrary                   ( HANDLE hProcess, const WString& strLibPath );
@@ -66,6 +86,8 @@ SString         GetMTASAPath                        ( void );
 ePathResult     DiscoverGTAPath                     ( bool bFindIfMissing );
 SString         GetGTAPath                          ( void );
 bool            HasGTAPath                          ( void );
+EGtaFileVersion GetGtaFileVersion                   (const SString& strGTAEXEPath);
+void            GetPEFileOffsets                    (SPEFileOffsets& outOffsets, const SString& strGTAEXEPath);
 
 void            FindFilesRecursive                  ( const SString& strPathMatch, std::vector < SString >& outFileList, uint uiMaxDepth = 99 );
 SOSVersionInfo  GetOSVersion                        ( void );
@@ -73,8 +95,8 @@ SOSVersionInfo  GetRealOSVersion                    ( void );
 bool            IsWindows10OrGreater                ( void );
 bool            IsWindows10Threshold2OrGreater      ( void );
 
-bool            IsVS2013RuntimeInstalled            ( void );
 BOOL            IsUserAdmin                         ( void );
+void            RelaunchAsAdmin                     (const SString& strCmdLine, const SString& strReason);
 
 void            UpdateMTAVersionApplicationSetting  ( bool bQuiet = false );
 bool            Is32bitProcess                      ( DWORD processID );
@@ -109,9 +131,40 @@ SString         PadLeft                             ( const SString& strText, ui
 bool            IsDeviceSelectionDialogOpen         ( DWORD dwThreadId );
 std::vector < DWORD > MyEnumProcesses               ( bool bInclude64bit = false, bool bIncludeCurrent = false );
 SString         GetProcessPathFilename              ( DWORD processID );
+SString         GetProcessFilename                  ( DWORD processID );
 void            WriteDebugEventAndReport            ( uint uiId, const SString& strText );
 WString         ReadCompatibilityEntries            ( const WString& strProgName, const WString& strSubKey, HKEY hKeyRoot, uint uiFlags );
 bool            WriteCompatibilityEntries           ( const WString& strProgName, const WString& strSubKey, HKEY hKeyRoot, uint uiFlags, const WString& strNewData );
+
+
+// Return false on read failure
+template<class T>
+bool ReadFileValue(const SString& strFilename, T& value, uint uiOffset)
+{
+    std::ifstream file(FromUTF8(strFilename), std::ios::binary);
+    if (file)
+    {
+        file.seekg(uiOffset);
+        file.read((char*)&value, sizeof(T));
+    }
+    return !file.fail();
+}
+
+// Return false on write failure
+template<class T>
+bool WriteFileValue(const SString& strFilename, const T& value, uint uiOffset)
+{
+    SetFileAttributes(strFilename, FILE_ATTRIBUTE_NORMAL);
+    std::fstream file(FromUTF8(strFilename), std::ios::in | std::ios::out | std::ios::binary);
+    if (file)
+    {
+        file.seekp(uiOffset);
+        file.write((const char*)&value, sizeof(T));
+    }
+    return !file.fail();
+
+}
+
 
 //
 // Determine if game process has gone wonky
@@ -148,6 +201,14 @@ public:
     CElapsedTime    m_StuckTimer;
 };
 
+// For NtQuerySystemInformation
+#define STATUS_INFO_LENGTH_MISMATCH	((NTSTATUS)0xC0000004L)
+#define SystemProcessImageNameInformation ((SYSTEM_INFORMATION_CLASS)88)
+typedef struct _SYSTEM_PROCESS_IMAGE_NAME_INFORMATION
+{
+    HANDLE ProcessId;
+    UNICODE_STRING ImageName;
+} SYSTEM_PROCESS_IMAGE_NAME_INFORMATION, *PSYSTEM_PROCESS_IMAGE_NAME_INFORMATION;
 
 #undef CREATE_SUSPENDED
 #define CREATE_SUSPENDED 5
@@ -164,129 +225,10 @@ public:
 
 #else
 
-    typedef
-    LPVOID
-    (WINAPI
-    *FUNC_VirtualAllocEx)(
-        __in     HANDLE hProcess,
-        __in_opt LPVOID lpAddress,
-        __in     SIZE_T dwSize,
-        __in     DWORD flAllocationType,
-        __in     DWORD flProtect
-        );
-
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_VirtualProtectEx)(
-        __in  HANDLE hProcess,
-        __in  LPVOID lpAddress,
-        __in  SIZE_T dwSize,
-        __in  DWORD flNewProtect,
-        __out PDWORD lpflOldProtect
-        );
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_VirtualFreeEx)(
-        __in HANDLE hProcess,
-        __in LPVOID lpAddress,
-        __in SIZE_T dwSize,
-        __in DWORD  dwFreeType
-        );
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_ReadProcessMemory)(
-        __in      HANDLE hProcess,
-        __in      LPCVOID lpBaseAddress,
-        __out_bcount_part(nSize, *lpNumberOfBytesRead) LPVOID lpBuffer,
-        __in      SIZE_T nSize,
-        __out_opt SIZE_T * lpNumberOfBytesRead
-        );
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_WriteProcessMemory)(
-        __in      HANDLE hProcess,
-        __in      LPVOID lpBaseAddress,
-        __in_bcount(nSize) LPCVOID lpBuffer,
-        __in      SIZE_T nSize,
-        __out_opt SIZE_T * lpNumberOfBytesWritten
-        );
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_CreateProcessW)(
-        __in_opt    LPCWSTR lpApplicationName,
-        __inout_opt LPWSTR lpCommandLine,
-        __in_opt    LPSECURITY_ATTRIBUTES lpProcessAttributes,
-        __in_opt    LPSECURITY_ATTRIBUTES lpThreadAttributes,
-        __in        BOOL bInheritHandles,
-        __in        DWORD dwCreationFlags,
-        __in_opt    LPVOID lpEnvironment,
-        __in_opt    LPCWSTR lpCurrentDirectory,
-        __in        LPSTARTUPINFOW lpStartupInfo,
-        __out       LPPROCESS_INFORMATION lpProcessInformation
-        );
-
-    typedef
-    HANDLE
-    (WINAPI
-    *FUNC_CreateRemoteThread)(
-        __in      HANDLE hProcess,
-        __in_opt  LPSECURITY_ATTRIBUTES lpThreadAttributes,
-        __in      SIZE_T dwStackSize,
-        __in      LPTHREAD_START_ROUTINE lpStartAddress,
-        __in_opt  LPVOID lpParameter,
-        __in      DWORD dwCreationFlags,
-        __out_opt LPDWORD lpThreadId
-        );
-
-    typedef
-    HRESULT
-    (STDAPICALLTYPE
-    *FUNC_WscGetSecurityProviderHealth)(DWORD Providers,
-                                    PWSC_SECURITY_PROVIDER_HEALTH pHealth);
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_InitializeProcThreadAttributeList)(
-        _Out_writes_bytes_to_opt_(*lpSize, *lpSize) LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList,
-        _In_ DWORD dwAttributeCount,
-        _Reserved_ DWORD dwFlags,
-        _When_(lpAttributeList == nullptr, _Out_) _When_(lpAttributeList != nullptr, _Inout_) PSIZE_T lpSize
-        );
-
-    typedef
-    VOID
-    (WINAPI
-    *FUNC_DeleteProcThreadAttributeList)(
-        _Inout_ LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList
-        );
-
-    typedef
-    BOOL
-    (WINAPI
-    *FUNC_UpdateProcThreadAttribute)(
-        _Inout_ LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList,
-        _In_ DWORD dwFlags,
-        _In_ DWORD_PTR Attribute,
-        _In_reads_bytes_opt_(cbSize) PVOID lpValue,
-        _In_ SIZE_T cbSize,
-        _Out_writes_bytes_opt_(cbSize) PVOID lpPreviousValue,
-        _In_opt_ PSIZE_T lpReturnSize
-        );
-
     void* LoadFunction ( const char* szLibName, const char* c, const char* a, const char* b );
 
     #define _DEFFUNCTION( lib, name, a,b,c ) \
+        using FUNC_##name = decltype(&name); \
         inline FUNC_##name __##name ( void ) \
         { \
             static FUNC_##name pfn = NULL; \
@@ -308,6 +250,8 @@ public:
     #define _InitializeProcThreadAttributeList  __InitializeProcThreadAttributeList()
     #define _DeleteProcThreadAttributeList      __DeleteProcThreadAttributeList()
     #define _UpdateProcThreadAttribute          __UpdateProcThreadAttribute()
+    #define _QueryFullProcessImageNameW         __QueryFullProcessImageNameW()
+    #define _NtQuerySystemInformation           __NtQuerySystemInformation()
 
     DEFFUNCTION( "kernel32", Virt,ualAll,ocEx )
     DEFFUNCTION( "kernel32", Virt,ualPro,tectEx )
@@ -320,5 +264,7 @@ public:
     DEFFUNCTION( "kernel32", Initiali,zeProcT,hreadAttributeList )
     DEFFUNCTION( "kernel32", Dele,teProcT,hreadAttributeList )
     DEFFUNCTION( "kernel32", Upda,teProcT,hreadAttribute )
+    DEFFUNCTION( "kernel32", QueryFullProcessImageNam,e,W )
+    DEFFUNCTION( "ntdll", NtQuerySystemInformati,o,n )
 
 #endif

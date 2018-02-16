@@ -1470,7 +1470,8 @@ void CGame::AddBuiltInEvents ( void )
     // Object events
 
     // Pickup events
-    m_Events.AddEvent ( "onPickupHit", "player, matchingDimension", NULL, false );
+    m_Events.AddEvent ( "onPickupHit", "player", NULL, false );
+    m_Events.AddEvent ( "onPickupLeave", "player", NULL, false );
     m_Events.AddEvent ( "onPickupUse", "player", NULL, false );
     m_Events.AddEvent ( "onPickupSpawn", "", NULL, false );
 
@@ -1488,7 +1489,8 @@ void CGame::AddBuiltInEvents ( void )
     m_Events.AddEvent ( "onPlayerWeaponSwitch", "previous, current", NULL, false );
     m_Events.AddEvent ( "onPlayerMarkerHit", "marker, matchingDimension", NULL, false );
     m_Events.AddEvent ( "onPlayerMarkerLeave", "marker, matchingDimension", NULL, false );
-    m_Events.AddEvent ( "onPlayerPickupHit", "pickup, matchingDimension", NULL, false );
+    m_Events.AddEvent ( "onPlayerPickupHit", "pickup", NULL, false );
+    m_Events.AddEvent ( "onPlayerPickupLeave", "pickup", NULL, false );
     m_Events.AddEvent ( "onPlayerPickupUse", "pickup", NULL, false );
     m_Events.AddEvent ( "onPlayerClick", "button, state, element, posX, posY, posZ", NULL, false );
     m_Events.AddEvent ( "onPlayerContact", "previous, current", NULL, false );
@@ -1654,6 +1656,13 @@ void CGame::Packet_PlayerJoinData ( CPlayerJoinDataPacket& Packet )
                 strExtra = SStringX ( strExtraTemp );
                 strPlayerVersion = SStringX ( strPlayerVersionTemp );
             }
+        #if MTASA_VERSION_TYPE < VERSION_TYPE_UNSTABLE
+            if (atoi(ExtractVersionStringBuildNumber(Packet.GetPlayerVersion())) != 0)
+            {
+                // Use player version from packet if it contains a valid build number
+                strPlayerVersion = Packet.GetPlayerVersion();
+            }
+        #endif
 
             SString strIP = pPlayer->GetSourceIP ();
             SString strIPAndSerial( "IP: %s  Serial: %s  Version: %s", strIP.c_str (), strSerial.c_str (), strPlayerVersion.c_str () );

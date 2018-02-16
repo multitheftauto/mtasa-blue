@@ -49,7 +49,7 @@ void CClientDisplayManager::DrawText2D ( const char* szCaption, const CVector& v
     float fResHeight = static_cast < float > ( g_pCore->GetGraphics ()->GetViewportHeight () );
 
     // Render
-    g_pCore->GetGraphics ()->DrawText ( static_cast < int > ( vecPosition.fX * fResWidth ),
+    g_pCore->GetGraphics ()->DrawString ( static_cast < int > ( vecPosition.fX * fResWidth ),
                                         static_cast < int > ( vecPosition.fY * fResHeight ),
                                         static_cast < int > ( fResWidth ),
                                         static_cast < int > ( fResHeight ),

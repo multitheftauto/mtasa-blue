@@ -140,6 +140,7 @@ int CLuaFunctionRef::ToInt ( void ) const
     return m_iFunction;
 }
 
+// Returns null if VM has closed
 lua_State* CLuaFunctionRef::GetLuaVM ( void ) const
 {
     return m_luaVM;

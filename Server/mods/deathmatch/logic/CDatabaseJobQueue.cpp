@@ -332,7 +332,7 @@ void CDatabaseJobQueueImpl::UpdateDebugData ( void )
             if ( age.ToLongLong () > 1000 * 60 * 5 )
             {
                 shared.m_Mutex.Unlock ();
-                g_pGame->GetScriptDebugging()->LogWarning( pJobData->m_LuaDebugInfo, "Database result uncollected after 5 minutes. [Query: %s]", *pJobData->command.strData );
+                g_pGame->GetScriptDebugging()->LogWarning( pJobData->m_LuaDebugInfo, "Database result uncollected after 5 minutes. [Query: %s]", *pJobData->GetCommandStringForLog() );
                 shared.m_Mutex.Lock ();
                 pJobData->result.bLoggedWarning = true;
                 break;
@@ -410,7 +410,7 @@ bool CDatabaseJobQueueImpl::PollCommand ( CDbJobData* pJobData, uint uiTimeout )
         if ( uiTotalWaitTime > uiWaitTimeWarnThresh )
         {
             shared.m_Mutex.Unlock ();
-            g_pGame->GetScriptDebugging()->LogWarning( pJobData->m_LuaDebugInfo, "dbPoll is waiting a long time (%d seconds so far). [Query: %s]", uiTotalWaitTime / 1000, *pJobData->command.strData );
+            g_pGame->GetScriptDebugging()->LogWarning( pJobData->m_LuaDebugInfo, "dbPoll is waiting a long time (%d seconds so far). [Query: %s]", uiTotalWaitTime / 1000, *pJobData->GetCommandStringForLog() );
             shared.m_Mutex.Lock ();
             uiWaitTimeWarnThresh += TICKS_FROM_SECONDS( 60 );
         }
@@ -854,7 +854,7 @@ void CDatabaseJobQueueImpl::LogResult ( CDbJobData* pJobData )
                                     , *GetLocalTimeString ( true, true )
                                     , *pConnection->m_strLogTag
                                     , pJobData->result.registryResult->uiNumAffectedRows
-                                    , *pJobData->command.strData
+                                    , *pJobData->GetCommandStringForLog()
                                 );
             LogString ( strLine );
         }
@@ -872,7 +872,7 @@ void CDatabaseJobQueueImpl::LogResult ( CDbJobData* pJobData )
                                     , *pConnection->m_strLogTag
                                     , pJobData->result.uiErrorCode
                                     , *pJobData->result.strReason
-                                    , *pJobData->command.strData
+                                    , *pJobData->GetCommandStringForLog()
                                 );
             LogString ( strLine );
         }

@@ -12,6 +12,7 @@ if ci and ci:lower() == "true" then
 else 
 	CI_BUILD = false
 end 
+GLIBC_COMPAT = os.getenv("GLIBC_COMPAT") == "true"
 
 workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
@@ -21,7 +22,7 @@ workspace "MTASA"
 	location "Build"
 	startproject "Client Launcher"
 	
-	flags { "C++11" }
+	cppdialect "C++14"
 	characterset "MBCS"
 	pic "On"
 	symbols "On"
@@ -31,20 +32,29 @@ workspace "MTASA"
 		"vendor",
 		"Shared/sdk", 
 	}
-	
-	 -- I know linking bcrypt here is ugly, but SharedUtil depends on it, thus it's required everywhere
-	links { "blowfish_bcrypt" }
 
 	defines { 
 		"_CRT_SECURE_NO_WARNINGS",
 		"_SCL_SECURE_NO_WARNINGS",
 		"_CRT_NONSTDC_NO_DEPRECATE",
-		"NOMINMAX"
+		"NOMINMAX",
+		"_TIMESPEC_DEFINED"
 	}
 		
 	-- Helper function for output path 
 	buildpath = function(p) return "%{wks.location}/../Bin/"..p.."/" end
 	copy = function(p) return "{COPY} %{cfg.buildtarget.abspath} %{wks.location}../Bin/"..p.."/" end 
+
+	if GLIBC_COMPAT then 
+		filter { "system:linux" }
+			includedirs "/compat"
+			linkoptions "-static-libstdc++ -static-libgcc"
+			forceincludes  { "glibc_version.h" }
+		filter { "system:linux", "platforms:x86" }
+			libdirs { "/compat/x86" }
+		filter { "system:linux", "platforms:x64" }
+			libdirs { "/compat/x64" }
+	end
 	
 	filter "platforms:x86"
 		architecture "x86"
@@ -69,22 +79,19 @@ workspace "MTASA"
 	filter {"system:windows", "configurations:Nightly", "kind:not StaticLib"}
 		os.mkdir("Build/Symbols")
 		linkoptions "/PDB:\"Symbols\\$(ProjectName).pdb\""
-
-	filter {"system:windows", "toolset:*140*"}
-		defines { "_TIMESPEC_DEFINED" } -- fix pthread redefinition error, TODO: Remove when we fully moved to vs2015
 	
 	filter {"system:windows", "toolset:*_xp*"}
 		buildoptions { "/Zc:threadSafeInit-" } -- Fix Windows XP not initialising TLS early
 	
 	filter "system:windows"
-		toolset "v140"
+		toolset "v141"
 		flags { "StaticRuntime" }
 		defines { "WIN32", "_WIN32" }
 		includedirs { 
-			dxdir.."Include"
+			path.join(dxdir, "Include")
 		}
 		libdirs {
-			dxdir.."Lib/x86"
+			path.join(dxdir, "Lib/x86")
 		}
 	
 	filter {"system:windows", "configurations:Debug"}
@@ -93,9 +100,10 @@ workspace "MTASA"
 
 	filter "system:linux"
 		vectorextensions "SSE2"
+		buildoptions { "-fvisibility=hidden" }
 	
 	-- Only build the client on Windows
-	if os.get() == "windows" then
+	if os.target() == "windows" then
 		group "Client"
 		include "Client/ceflauncher"
 		include "Client/ceflauncher_DLL"
@@ -122,7 +130,6 @@ workspace "MTASA"
 		include "vendor/tinygettext"
 		include "vendor/pthreads"
 		include "vendor/libspeex"
-		include "vendor/curl/lib"
 	end
 	
 	filter {}
@@ -131,7 +138,8 @@ workspace "MTASA"
 		include "Server/dbconmy"
 		include "Server/launcher"
 		include "Server/mods/deathmatch"
-		
+		include "Server/sdk"
+
 		group "Shared"
 		include "Shared"
 		include "Shared/XML"
@@ -139,10 +147,12 @@ workspace "MTASA"
 		group "Vendor"
 		include "vendor/bcrypt"
 		include "vendor/cryptopp"
+		include "vendor/curl"
 		include "vendor/ehs"
 		include "vendor/google-breakpad"
 		include "vendor/json-c"
 		include "vendor/lua"
+		include "vendor/mbedtls"
 		include "vendor/pcre"
 		include "vendor/pme"
 		include "vendor/sqlite"

@@ -20,6 +20,11 @@ bool CChatEchoPacket::Write ( NetBitStreamInterface& BitStream ) const
     BitStream.Write ( m_ucBlue );
     BitStream.WriteBit ( m_bColorCoded );
 
+    // Write the client's ID
+    if ( BitStream.Version() >= 0x06B ) {
+        BitStream.Write ( GetSourceElement() ? GetSourceElement()->GetID() : INVALID_ELEMENT_ID );
+    }
+
     // Too short?
     size_t sizeMessage = m_strMessage.length();
     if ( sizeMessage >= MIN_CHATECHO_LENGTH )

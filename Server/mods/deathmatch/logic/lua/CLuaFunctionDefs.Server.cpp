@@ -25,7 +25,7 @@
 #define MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS       "1.3.0-9.04563"
 #define MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT           "1.3.5"
 #define MIN_SERVER_REQ_CALLREMOTE_OPTIONS_TABLE             "1.5.4-9.11342"
-
+#define MIN_SERVER_REQ_CALLREMOTE_OPTIONS_FORMFIELDS        "1.5.4-9.11413"
 
 int CLuaFunctionDefs::GetMaxPlayers ( lua_State* luaVM )
 {
@@ -530,23 +530,47 @@ int CLuaFunctionDefs::Get ( lua_State* luaVM )
 // Call a function on a remote server
 int CLuaFunctionDefs::CallRemote ( lua_State* luaVM )
 {
+    /* Determine if the argument stream is either a remote-server resource call or a web call:
+     * a) bool callRemote ( string host [, string queueName ][, int connectionAttempts = 10, int connectTimeout = 10000 ], string resourceName, string functionName, callback callbackFunction, [ arguments... ] )
+     * b) bool callRemote ( string URL [, string queueName ][, int connectionAttempts = 10, int connectTimeout = 10000 ], callback callbackFunction, [ arguments... ] )
+    */
     CScriptArgReader argStream ( luaVM );
-    if ( !argStream.NextIsFunction ( 1 ) && !argStream.NextIsFunction ( 2 ) )
-    {
-        // Call type 1
-        //  bool callRemote ( string host [, string queueName ][, int connectionAttempts = 10, int connectTimeout = 10000 ], string resourceName, string functionName, callback callbackFunction, [ arguments... ] )
-        SString strHost; SString strQueueName; uint uiConnectionAttempts; uint uiConnectTimeoutMs; SString strResourceName; SString strFunctionName; CLuaFunctionRef iLuaFunction; CLuaArguments args;
+    SString strHost;
+    SString strQueueName = CALL_REMOTE_DEFAULT_QUEUE_NAME;
 
-        argStream.ReadString ( strHost );
-        if ( argStream.NextIsString () )
-            MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_QUEUE_NAME, "'queue name' is being used" );
-        argStream.ReadIfNextIsString ( strQueueName, CALL_REMOTE_DEFAULT_QUEUE_NAME );
-        if ( argStream.NextIsNumber () )
-            MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS, "'connection attempts' is being used" );
-        argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
-        if ( argStream.NextIsNumber () )
-            MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT, "'connect timeout' is being used" );
-        argStream.ReadIfNextIsNumber ( uiConnectTimeoutMs, 10000 );
+    argStream.ReadString ( strHost );
+
+    /* Find out if the next parameter is the 'queueName' argument
+     * 1) string queueName, int connectionAttempts, ...
+     * 2) string queueName, callback callbackFunction, ...
+     * 3) string queueName, string resourceName, string functionName, ...
+    */
+    if ( argStream.NextIsString () && ( argStream.NextIsNumber (1) || argStream.NextIsFunction (1) || ( argStream.NextIsString (1) && argStream.NextIsString (2) ) ) )
+    {
+        MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_QUEUE_NAME, "'queue name' is being used" );
+        argStream.ReadString ( strQueueName, CALL_REMOTE_DEFAULT_QUEUE_NAME );
+    }
+
+    // Read connectionAttempts and connectTimeout arguments if given
+    uint uiConnectionAttempts = 10U;
+    uint uiConnectTimeoutMs = 10000U;
+
+    if ( argStream.NextIsNumber () )
+        MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS, "'connection attempts' is being used" );
+    argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10U );
+    
+    if ( argStream.NextIsNumber () )
+        MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT, "'connect timeout' is being used" );
+    argStream.ReadIfNextIsNumber ( uiConnectTimeoutMs, 10000U );
+
+    // Continue with either call type a) or b)
+    CLuaFunctionRef iLuaFunction;
+    CLuaArguments args;
+
+    if ( argStream.NextIsString () && argStream.NextIsString (1) && argStream.NextIsFunction (2) )
+    {
+        SString strResourceName;
+        SString strFunctionName;
         argStream.ReadString ( strResourceName );
         argStream.ReadString ( strFunctionName );
         argStream.ReadFunction ( iLuaFunction );
@@ -564,22 +588,8 @@ int CLuaFunctionDefs::CallRemote ( lua_State* luaVM )
             }
         }
     }
-    else
+    else if ( argStream.NextIsFunction () )
     {
-        // Call type 2
-        //  bool callRemote ( string URL [, string queueName ][, int connectionAttempts = 10, int connectTimeout = 10000 ], callback callbackFunction, [ arguments... ] )
-        SString strURL; SString strQueueName; uint uiConnectionAttempts; uint uiConnectTimeoutMs; CLuaFunctionRef iLuaFunction; CLuaArguments args;
-
-        argStream.ReadString ( strURL );
-        if ( argStream.NextIsString () )
-            MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_QUEUE_NAME, "'queue name' is being used" );
-        argStream.ReadIfNextIsString ( strQueueName, CALL_REMOTE_DEFAULT_QUEUE_NAME );
-        if ( argStream.NextIsNumber () )
-            MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECTION_ATTEMPTS, "'connection attempts' is being used" );
-        argStream.ReadIfNextIsNumber ( uiConnectionAttempts, 10 );
-        if ( argStream.NextIsNumber () )
-            MinServerReqCheck ( argStream, MIN_SERVER_REQ_CALLREMOTE_CONNECT_TIMEOUT, "'connect timeout' is being used" );
-        argStream.ReadIfNextIsNumber ( uiConnectTimeoutMs, 10000 );
         argStream.ReadFunction ( iLuaFunction );
         argStream.ReadLuaArguments ( args );
         argStream.ReadFunctionComplete ();
@@ -589,11 +599,15 @@ int CLuaFunctionDefs::CallRemote ( lua_State* luaVM )
             CLuaMain * luaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
             if ( luaMain )
             {
-                g_pGame->GetRemoteCalls ()->Call ( strURL, &args, luaMain, iLuaFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs );
+                g_pGame->GetRemoteCalls ()->Call ( strHost, &args, luaMain, iLuaFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs );
                 lua_pushboolean ( luaVM, true );
                 return 1;
             }
         }
+    }
+    else
+    {
+        argStream.SetCustomWarning( "Unrecognized argument list for callRemote: bad arguments or missing arguments" );
     }
 
     if ( argStream.HasErrors () )
@@ -607,7 +621,7 @@ int CLuaFunctionDefs::CallRemote ( lua_State* luaVM )
 // Call a function on a remote server
 int CLuaFunctionDefs::FetchRemote ( lua_State* luaVM )
 {
-//  bool fetchRemote ( string URL [, string queueName ][, int connectionAttempts = 10, int connectTimeout = 10000 ][, table headers ], callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
+//  bool fetchRemote ( string URL [, string queueName ][, int connectionAttempts = 10, int connectTimeout = 10000 ], callback callbackFunction, [ string postData, bool bPostBinary, arguments... ] )
 //  bool fetchRemote ( string URL [, table options ], callback callbackFunction[, table callbackArguments ] )
     CScriptArgReader argStream ( luaVM );
     SString strURL; SString strQueueName; SHttpRequestOptions httpRequestOptions; CLuaFunctionRef iLuaFunction; CLuaArguments callbackArguments;
@@ -644,7 +658,6 @@ int CLuaFunctionDefs::FetchRemote ( lua_State* luaVM )
     }
     else
     {
-        MinServerReqCheck(argStream, MIN_SERVER_REQ_CALLREMOTE_OPTIONS_TABLE, "'options' table is being used");
         CStringMap optionsMap;
 
         argStream.ReadStringMap(optionsMap);
@@ -662,10 +675,13 @@ int CLuaFunctionDefs::FetchRemote ( lua_State* luaVM )
         optionsMap.ReadNumber("maxRedirects", httpRequestOptions.uiMaxRedirects, 8);
         optionsMap.ReadString("username", httpRequestOptions.strUsername, "");
         optionsMap.ReadString("password", httpRequestOptions.strPassword, "");
+        optionsMap.ReadStringMap("headers", httpRequestOptions.requestHeaders);
+        optionsMap.ReadStringMap("formFields", httpRequestOptions.formFields);
 
-        CStringMap headersMap;
-        optionsMap.ReadStringMap("headers", headersMap);
-        httpRequestOptions.requestHeaders.insert(headersMap.begin(), headersMap.end());
+        if (httpRequestOptions.formFields.empty())
+            MinServerReqCheck(argStream, MIN_SERVER_REQ_CALLREMOTE_OPTIONS_TABLE, "'options' table is being used");
+        else
+            MinServerReqCheck(argStream, MIN_SERVER_REQ_CALLREMOTE_OPTIONS_FORMFIELDS, "'formFields' is being used");
 
         if (!argStream.HasErrors())
         {

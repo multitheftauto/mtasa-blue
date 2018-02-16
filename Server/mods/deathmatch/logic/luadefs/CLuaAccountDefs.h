@@ -30,12 +30,16 @@ public:
     LUA_DECLARE ( IsGuestAccount );
     LUA_DECLARE ( GetAccountData );
     LUA_DECLARE ( GetAllAccountData );
+    LUA_DECLARE ( GetAccountsByData );
     LUA_DECLARE ( GetAccountSerial );
     LUA_DECLARE ( GetAccountsBySerial );
+    LUA_DECLARE ( GetAccountIP );
+    LUA_DECLARE ( GetAccountsByIP );
 
     // Account set funcs
     LUA_DECLARE ( AddAccount );
     LUA_DECLARE ( RemoveAccount );
+    LUA_DECLARE ( SetAccountName );
     LUA_DECLARE ( SetAccountPassword );
     LUA_DECLARE ( SetAccountData );
     LUA_DECLARE ( CopyAccountData );

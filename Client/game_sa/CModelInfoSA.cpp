@@ -24,6 +24,7 @@ std::map < unsigned short, int > CModelInfoSA::ms_RestreamTxdIDMap;
 std::map < DWORD, float > CModelInfoSA::ms_ModelDefaultLodDistanceMap;
 std::set < uint > CModelInfoSA::ms_ReplacedColModels;
 std::map < DWORD, BYTE > CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
+std::unordered_map<CVehicleModelInfoSAInterface*, CVector> CModelInfoSA::ms_ModelDefaultVehicleFumesPosition;
 
 CModelInfoSA::CModelInfoSA ( void )
 {
@@ -676,7 +677,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
             {
                 if ( !pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered )
                 {
-                    __asm
+                    _asm
                     {
                         mov ecx, pEntity
                         mov eax, [ecx]
@@ -700,7 +701,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
             {
                 if ( !pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered )
                 {
-                    __asm
+                    _asm
                     {
                         mov ecx, pEntity
                         mov eax, [ecx]
@@ -936,6 +937,43 @@ void* CModelInfoSA::SetVehicleSuspensionData ( void* pSuspensionLines )
     return pOrigSuspensionLines;
 }
 
+
+CVector CModelInfoSA::GetVehicleExhaustFumesPosition()
+{
+    if (!IsVehicle())
+        return CVector();
+
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    return pVehicleModel->pVisualInfo->exhaustPosition;
+}
+
+void CModelInfoSA::SetVehicleExhaustFumesPosition(const CVector& position)
+{
+    if (!IsVehicle())
+        return;
+
+    // Store default position in map
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    auto iter = ms_ModelDefaultVehicleFumesPosition.find(pVehicleModel);
+    if (iter == ms_ModelDefaultVehicleFumesPosition.end())
+    {
+        ms_ModelDefaultVehicleFumesPosition.insert({ pVehicleModel, pVehicleModel->pVisualInfo->exhaustPosition });
+    }
+
+    // Set fumes position
+    pVehicleModel->pVisualInfo->exhaustPosition = position;
+}
+
+void CModelInfoSA::ResetAllVehicleExhaustFumes()
+{
+    for (auto& info : ms_ModelDefaultVehicleFumesPosition)
+    {
+        CVehicleModelInfoSAInterface* pVehicleModel = info.first;
+        pVehicleModel->pVisualInfo->exhaustPosition = info.second;
+    }
+    ms_ModelDefaultVehicleFumesPosition.clear();
+}
+
 void CModelInfoSA::SetCustomModel ( RpClump* pClump )
 {
     // Error
@@ -1029,7 +1067,8 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
 
         // public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
         DWORD func = 0x5B2C20;
-        __asm {
+        _asm
+        {
             push    pColModelInterface
             push    ModelID
             call    func
@@ -1079,7 +1118,8 @@ void CModelInfoSA::RestoreColModel ( void )
 
             // public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
             DWORD func = 0x5B2C20;
-            __asm {
+            _asm
+            {
                 push    dwOriginalColModelInterface
                 push    ModelID
                 call    func

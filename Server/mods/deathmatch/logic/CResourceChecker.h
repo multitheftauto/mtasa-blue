@@ -39,6 +39,7 @@ namespace ECheckerWhat
         NONE,
         REMOVED,
         REPLACED,
+        MODIFIED,
     };
 };
 using ECheckerWhat::ECheckerWhatType;
@@ -63,7 +64,7 @@ protected:
     long                FindLuaIdentifier               ( const char* szLuaSource, long* plOutLength, long* plLineNumber );
     bool                UpgradeLuaFunctionName          ( const string& strFunctionName, bool bClientScript, string& strOutUpgraded );
     void                IssueLuaFunctionNameWarnings    ( const string& strFunctionName, const string& strFileName, const string& strResourceName, bool bClientScript, unsigned long ulLineNumber );
-    ECheckerWhatType    GetLuaFunctionNameUpgradeInfo   ( const string& strFunctionName, bool bClientScript, string& strOutHow );
+    ECheckerWhatType    GetLuaFunctionNameUpgradeInfo   ( const string& strFunctionName, bool bClientScript, string& strOutHow, string& strOutVersion );
     int                 ReplaceFilesInZIP               ( const string& strOrigZip, const string& strTempZip, const vector < string >& pathInArchiveList, const vector < string >& upgradedFullPathList );
     bool                RenameBackupFile                ( const string& strOrigFilename, const string& strBakAppend );
     void                CheckVersionRequirements        ( const string& strIdentifierName, bool bClientScript );
@@ -71,6 +72,8 @@ protected:
     bool                m_bUpgradeScripts;
     unsigned long       m_ulDeprecatedWarningCount;
     vector < string >   m_upgradedFullPathList;
+    SString             m_strMinClientReqFromMetaXml;
+    SString             m_strMinServerReqFromMetaXml;
     SString             m_strReqClientVersion;
     SString             m_strReqServerVersion;
     SString             m_strReqClientReason;

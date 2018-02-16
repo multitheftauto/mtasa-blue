@@ -20,7 +20,7 @@ class CFxSystemSAInterface;
 class CFxManager
 {
 public:
-    virtual CFxSystem* CreateFxSystem ( const char * szBlueprint, const CVector & vecPosition, RwMatrix * pRwMatrixTag, unsigned char bSkipCameraFrustumCheck ) = 0;
+    virtual CFxSystem* CreateFxSystem ( const char * szBlueprint, const CVector & vecPosition, RwMatrix * pRwMatrixTag, unsigned char bSkipCameraFrustumCheck, bool bSoundEnable ) = 0;
     virtual void       DestroyFxSystem ( CFxSystem* pFxSystem ) = 0;
     virtual void       OnFxSystemSAInterfaceDestroyed ( CFxSystemSAInterface* pFxSystemSAInterface ) = 0;
 };

@@ -147,10 +147,12 @@ public:
     virtual eRadarMode      GetRadarMode            ( void ) = 0;
     virtual void            SetRadarMode            ( eRadarMode hudMode ) = 0;
 
-    virtual void            SetFieldOfView          ( float fAngle ) = 0;
-    virtual void            SetFieldOfViewPlayer    ( float fAngle ) = 0;
-    virtual void            SetFieldOfViewVehicle   ( float fAngle ) = 0;
-    virtual void            SetFieldOfViewVehicleMax( float fAngle ) = 0;
+    virtual void            UpdateFieldOfViewFromSettings   ( void ) = 0;
+    virtual void            ResetFieldOfViewFromScript      ( void ) = 0;
+    virtual void            SetFieldOfViewPlayer            ( float fAngle, bool bFromScript ) = 0;
+    virtual void            SetFieldOfViewVehicle           ( float fAngle, bool bFromScript ) = 0;
+    virtual void            SetFieldOfViewVehicleMax        ( float fAngle, bool bFromScript ) = 0;
+
     virtual float           GetFieldOfViewPlayer    ( void ) = 0;
     virtual float           GetFieldOfViewVehicle   ( void ) = 0;
     virtual float           GetFieldOfViewVehicleMax( void ) = 0;

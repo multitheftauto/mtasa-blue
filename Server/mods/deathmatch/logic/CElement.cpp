@@ -464,10 +464,7 @@ bool CElement::CallEvent ( const char* szName, const CLuaArguments& Arguments, C
     CallParentEvent ( szName, Arguments, this, pCaller );
 
     // Call it on all our children
-    if ( g_pGame->GetConfig()->IsEnableDiagnostic("CallEvent") )
-        CallEventNoParentSlow ( szName, Arguments, this, pCaller );
-    else
-        CallEventNoParent ( szName, Arguments, this, pCaller );
+    CallEventNoParent ( szName, Arguments, this, pCaller );
 
     // Tell the event manager that we're done calling the event
     pEvents->PostEventPulse ();
@@ -1056,43 +1053,22 @@ void CElement::CallEventNoParent ( const char* szName, const CLuaArguments& Argu
     }
 
     // Call it on all our children
-    CChildListType ::const_iterator iter = m_Children.begin ();
-    for ( ; iter != m_Children.end (); iter++ )
+    CElementListSnapshot* pList = GetChildrenListSnapshot();
+    pList->AddRef();    // Keep list alive during use
+    for ( CElementListSnapshot::const_iterator iter = pList->begin() ; iter != pList->end() ; iter++ )
     {
         CElement* pElement = *iter;
-
-        if ( !pElement->m_pEventManager || pElement->m_pEventManager->HasEvents () || !pElement->m_Children.empty () )
+        if ( !pElement->IsBeingDeleted() )
         {
-            pElement->CallEventNoParent ( szName, Arguments, pSource, pCaller );
-            if ( m_bIsBeingDeleted )
-                break;
+            if ( !pElement->m_pEventManager || pElement->m_pEventManager->HasEvents () || !pElement->m_Children.empty () )
+            {
+                pElement->CallEventNoParent ( szName, Arguments, pSource, pCaller );
+                if ( m_bIsBeingDeleted )
+                    break;
+            }
         }
     }
-}
-
-
-void CElement::CallEventNoParentSlow ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller )
-{
-    // Call it on us if this isn't the same class it was raised on
-    if ( pSource != this && m_pEventManager->HasEvents () )
-    {
-        m_pEventManager->Call ( szName, Arguments, pSource, this, pCaller );
-    }
-
-    // Call it on all our children
-    CChildListType childrenCopy = m_Children;
-    CChildListType ::const_iterator iter = childrenCopy.begin ();
-    for ( ; iter != childrenCopy.end (); iter++ )
-    {
-        CElement* pElement = *iter;
-
-        if ( !pElement->m_pEventManager || pElement->m_pEventManager->HasEvents () || !pElement->m_Children.empty () )
-        {
-            pElement->CallEventNoParentSlow ( szName, Arguments, pSource, pCaller );
-            if ( m_bIsBeingDeleted )
-                break;
-        }
-    }
+    pList->Release();
 }
 
 
