@@ -14,7 +14,7 @@
 
 CXMLImpl* pXMLInterface = NULL;
 
-_DECLSPEC_EX CXML* InitXMLInterface( const char* szSaveFlagDirectory )
+MTAEXPORT CXML* InitXMLInterface( const char* szSaveFlagDirectory )
 {
     // Initialize and do any file recovery as necessary
     CXMLFileImpl::InitFileRecovery( szSaveFlagDirectory );
@@ -26,7 +26,7 @@ _DECLSPEC_EX CXML* InitXMLInterface( const char* szSaveFlagDirectory )
     return pXMLInterface;
 }
 
-_DECLSPEC_EX void ReleaseXMLInterface()
+MTAEXPORT void ReleaseXMLInterface()
 {
     if ( pXMLInterface )
     {

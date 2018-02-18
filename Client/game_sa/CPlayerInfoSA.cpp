@@ -74,7 +74,8 @@ VOID CPlayerInfoSA::GivePlayerParachute ( VOID )
 {
     DEBUG_TRACE("VOID CPlayerInfoSA::GivePlayerParachute ( VOID )");
     DWORD dwFunction = FUNC_GivePlayerParachute;
-    _asm {
+    _asm
+    {
         call dwFunction
     }
 }
@@ -86,7 +87,8 @@ VOID CPlayerInfoSA::StreamParachuteWeapon ( bool bAllowParachute )
 {
     DEBUG_TRACE("VOID CPlayerInfoSA::StreamParachuteWeapon ( bool bAllowParachute )");
     DWORD dwFunction = FUNC_StreamParachuteWeapon;
-    _asm {
+    _asm
+    {
         push bAllowParachute
         call dwFunction
     }

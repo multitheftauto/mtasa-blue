@@ -40,6 +40,7 @@ public:
     inline std::list < CClientRadarMarker* > ::const_iterator   IterEnd                         ( void )                                    { return m_Markers.end (); };
 
     bool                                                        Exists                          ( CClientRadarMarker* pMarker );
+    static bool                                                 IsValidIcon                     ( unsigned long ulIcon )                    { return ulIcon <= RADAR_MARKER_LIMIT; }
 
 private:
     inline void                                             AddToList                       ( CClientRadarMarker* pMarker )             { m_Markers.push_back ( pMarker ); };

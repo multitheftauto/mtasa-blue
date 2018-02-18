@@ -135,7 +135,7 @@ bool CConsoleCommands::RestartResource ( CConsole* pConsole, const char* szArgum
 bool CConsoleCommands::RefreshResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
     BeginConsoleOutputCapture ( pEchoClient );
-    g_pGame->GetResourceManager ()->Refresh ( false, "", SStringX( szArguments ) == "t" );
+    g_pGame->GetResourceManager ()->Refresh ( false, szArguments );
     EndConsoleOutputCapture ( pEchoClient, "refresh completed" );
     return true;
 }
@@ -143,7 +143,7 @@ bool CConsoleCommands::RefreshResources ( CConsole* pConsole, const char* szArgu
 bool CConsoleCommands::RefreshAllResources ( CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient )
 {
     BeginConsoleOutputCapture ( pEchoClient );
-    g_pGame->GetResourceManager ()->Refresh ( true );
+    g_pGame->GetResourceManager ()->Refresh ( true, szArguments );
     EndConsoleOutputCapture ( pEchoClient, "refreshall completed" );
     return true;
 }
@@ -361,13 +361,15 @@ bool CConsoleCommands::Say ( CConsole* pConsole, const char* szInArguments, CCli
                                 }
 
                                 // Broadcast the message to all clients
-                                pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( CChatEchoPacket ( strEcho, ucR, ucG, ucB, true ) );
+                                auto ChatEchoPacket = CChatEchoPacket ( strEcho, ucR, ucG, ucB, true );
+                                ChatEchoPacket.SetSourceElement( pPlayer );
+                                pConsole->GetPlayerManager ()->BroadcastOnlyJoined ( ChatEchoPacket );
 
                                 // Call onChatMessage if players chat message was delivered
                                 CLuaArguments Arguments2;
                                 Arguments2.PushString ( szArguments );
                                 Arguments2.PushElement ( pPlayer );
-                                static_cast < CPlayer* > ( pClient )->CallEvent ( "onChatMessage", Arguments2 );
+                                pPlayer->CallEvent ( "onChatMessage", Arguments2 );
                             }
 
                             break;
@@ -1829,6 +1831,25 @@ bool CConsoleCommands::AuthorizeSerial( CConsole* pConsole, const char* szArgume
         pAccount->SetHttpPassAppend(strHttpPassAppend);
         return true;
     }
+    return false;
+}
+
+bool CConsoleCommands::ReloadAcl(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
+{
+    if (pClient->GetClientType() != CClient::CLIENT_CONSOLE)
+    {
+        if (!g_pGame->GetACLManager()->CanObjectUseRight(pClient->GetAccount()->GetName(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "reloadacl", CAccessControlListRight::RIGHT_TYPE_COMMAND, false))
+        {
+            pEchoClient->SendConsole("reloadacl: You do not have sufficient rights to use this command.");
+            return false;
+        }
+    }
+    if (g_pGame->GetACLManager()->Reload())
+    {
+        pClient->SendEcho("reloadacl: ACL successfully reloaded");
+        return true;
+    }
+    pClient->SendEcho("reloadacl: ACL failed to reload, fix any errors and run again");
     return false;
 }
 

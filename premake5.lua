@@ -12,7 +12,7 @@ if ci and ci:lower() == "true" then
 else 
 	CI_BUILD = false
 end 
-local GLIBC_COMPAT = os.getenv("GLIBC_COMPAT") == "true"
+GLIBC_COMPAT = os.getenv("GLIBC_COMPAT") == "true"
 
 workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
@@ -22,7 +22,7 @@ workspace "MTASA"
 	location "Build"
 	startproject "Client Launcher"
 	
-	cppdialect "C++11"
+	cppdialect "C++14"
 	characterset "MBCS"
 	pic "On"
 	symbols "On"
@@ -88,10 +88,10 @@ workspace "MTASA"
 		flags { "StaticRuntime" }
 		defines { "WIN32", "_WIN32" }
 		includedirs { 
-			dxdir.."Include"
+			path.join(dxdir, "Include")
 		}
 		libdirs {
-			dxdir.."Lib/x86"
+			path.join(dxdir, "Lib/x86")
 		}
 	
 	filter {"system:windows", "configurations:Debug"}
@@ -100,6 +100,7 @@ workspace "MTASA"
 
 	filter "system:linux"
 		vectorextensions "SSE2"
+		buildoptions { "-fvisibility=hidden" }
 	
 	-- Only build the client on Windows
 	if os.target() == "windows" then
@@ -137,7 +138,8 @@ workspace "MTASA"
 		include "Server/dbconmy"
 		include "Server/launcher"
 		include "Server/mods/deathmatch"
-		
+		include "Server/sdk"
+
 		group "Shared"
 		include "Shared"
 		include "Shared/XML"

@@ -65,7 +65,7 @@
 /* #undef EGD_SOCKET */
 
 /* Define if you want to enable IPv6 support */
-#define ENABLE_IPV6 1
+/* #undef ENABLE_IPV6 */
 
 /* Define to the type qualifier of arg 1 for getnameinfo. */
 /* #undef GETNAMEINFO_QUAL_ARG1 */
@@ -883,7 +883,7 @@
 /* #undef USE_ARES */
 
 /* Define if you want to enable POSIX threaded DNS lookup */
-/* #undef USE_THREADS_POSIX */
+#define USE_THREADS_POSIX 1
 
 /* Define to disable non-blocking sockets. */
 /* #undef USE_BLOCKING_SOCKETS */

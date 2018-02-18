@@ -265,6 +265,8 @@ void CVehicleSA::Init ( void )
 
     // only applicable for CAutomobile based vehicles (i.e. not bikes, trains or boats, but includes planes, helis etc)
     this->m_pDamageManager = new CDamageManagerSA( m_pInterface, (CDamageManagerSAInterface *)((DWORD)this->GetInterface() + 1440));
+    
+    this->m_pVehicleAudioEntity = new CAEVehicleAudioEntitySA ( &GetVehicleInterface()->m_VehicleAudioEntity );
 
     // Replace the handling interface with our own to prevent handlig.cfg cheats and allow custom handling stuff.
     // We don't use SA's array because we want one handling per vehicle type and also allow custom handlings
@@ -342,6 +344,12 @@ CVehicleSA::~CVehicleSA()
             {
                 delete m_pDamageManager;
                 m_pDamageManager = NULL;
+            }
+
+            if ( m_pVehicleAudioEntity )
+            {
+                delete m_pVehicleAudioEntity;
+                m_pVehicleAudioEntity = NULL;
             }
 
             if ( m_pSuspensionLines )
@@ -2033,6 +2041,26 @@ void CVehicleSA::SetBikeWheelStatus ( BYTE bWheel, BYTE bStatus )
     else if ( bWheel == 1 ) * ( BYTE * ) ( (DWORD)this->GetInterface() + 0x65D ) = bStatus;
 }
 
+bool CVehicleSA::IsWheelCollided ( BYTE eWheelPosition )
+{
+    CVehicleSAInterface * vehicle = (CVehicleSAInterface *)this->GetInterface ();
+    
+    switch ( vehicle->m_type )
+    {
+        case 0:
+            if ( eWheelPosition < 4 )
+                return  vehicle->wheelCollisionState[eWheelPosition] == 4.f;
+            break;
+
+        case 9:
+            if ( eWheelPosition < 2 )
+                return  *(float *)( (DWORD)vehicle + 0x730 + eWheelPosition * 8 ) == 4.f ||
+                        *(float *)( (DWORD)vehicle + 0x734 + eWheelPosition * 8 ) == 4.f;
+            break;
+    }
+    return false;
+}
+
 void CVehicleSA::SetTaxiLightOn ( bool bLightOn )
 {
     DEBUG_TRACE("void CVehicleSA::SetTaxiLight ( bool bLightOn )");
@@ -2127,7 +2155,7 @@ CObject * CVehicleSA::SpawnFlyingComponent ( int i_1, unsigned int ui_2 )
 }
 
 
-void CVehicleSA::SetWheelVisibility ( eWheels wheel, bool bVisible )
+void CVehicleSA::SetWheelVisibility ( eWheelPosition wheel, bool bVisible )
 {    
     CVehicleSAInterface * vehicle = (CVehicleSAInterface *)this->GetInterface();
     RwFrame * pFrame = NULL;
@@ -2157,7 +2185,7 @@ void CVehicleSA::SetWheelVisibility ( eWheels wheel, bool bVisible )
 }
 
 
-CVector CVehicleSA::GetWheelPosition ( eWheels wheel )
+CVector CVehicleSA::GetWheelPosition ( eWheelPosition wheel )
 {
     switch (wheel)
     {

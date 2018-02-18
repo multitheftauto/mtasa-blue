@@ -115,7 +115,7 @@ void CGraphics::DrawString ( int uiLeft, int uiTop, int uiRight, int uiBottom, u
             std::wstring strText = MbUTF8ToUTF16(szText);
 
             if ( bOutline )
-                DrawStringBlurred( rect, ulColor & 0xFF000000, strText.c_str(), ulFormat, pDXFont );
+                DrawStringOutline( rect, ulColor, strText.c_str(), ulFormat, pDXFont );
             pDXFont->DrawTextW ( m_pDXSprite, strText.c_str(), -1, &rect, ulFormat, ulColor );
         EndDrawBatch ();
     }        
@@ -134,23 +134,43 @@ void CGraphics::DrawString ( int iX, int iY, unsigned long dwColor, float fScale
 }
 
 // Slow
-void CGraphics::DrawStringBlurred(const RECT& rect, unsigned long ulColor, const wchar_t* szText, unsigned long ulFormat, LPD3DXFONT pDXFont)
+void CGraphics::DrawStringOutline(const RECT& rect, unsigned long ulColor, const wchar_t* szText, unsigned long ulFormat, LPD3DXFONT pDXFont)
 {
-    // Blur definition
-    const float E = 0;
-    const float D = 0.33f;
-    const float C = 0.66f;
-    const float B = 1;
-    const float A = 0;
-    static const float kernelData[] = {
-                            E, D, D, D, E,
-                            D, C, B, C, D,
-                            D, B, A, B, D,
-                            D, C, B, C, D,
-                            E, D, D, D, E };
     const uint uiKernelSizeX = 5;
     const uint uiKernelSizeY = 5;
-    const float* pKernel = kernelData;
+    const float* pKernel;
+
+    // Select outline style
+    int iRed = (ulColor & 0x00FF0000) >> 16;
+    int iGreen = (ulColor & 0x0000FF00) >> 8;
+    int iBlue = (ulColor & 0x000000FF) >> 0;
+    float fBrightness = (iRed * 0.299f + iGreen * 0.587f + iBlue * 0.114f);
+    if (fBrightness > 64)
+    {
+        // Use black outline with thicker border
+        ulColor = ulColor & 0xFF000000;
+        const float F = 0, E = 0.16f, D = 0.33f, C = 0.66f, B = 1, A = 0;
+        static const float kernelData[] = {
+                                F, E, D, E, F,
+                                E, C, B, C, E,
+                                D, B, A, B, D,
+                                E, C, B, C, E,
+                                F, E, D, E, F };
+        pKernel = kernelData;
+    }
+    else
+    {
+        // Use white outline with thinner border
+        ulColor = ulColor | 0x00FFFFFF;
+        const float F = 0, E = 0, D = 0.25f, C = 0.5f, B = 1, A = 0;
+        static const float kernelData[] = {
+                                F, E, D, E, F,
+                                E, C, B, C, E,
+                                D, B, A, B, D,
+                                E, C, B, C, E,
+                                F, E, D, E, F };
+        pKernel = kernelData;
+    }
 
     // Apply definition
     int iInputAlpha = (ulColor & 0xFF000000) >> 24;
@@ -628,7 +648,7 @@ float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT
         if (bColorCoded)
             RemoveColorCodesInPlaceW(strText);
 
-        // DT_CALCRECT does not take space characters at the end of a line 
+        // DT_CALCRECT may not take space characters at the end of a line 
         // into consideration for the rect size.
         // Count the amount of space characters at the end
         int iSpaceCount = 0;
@@ -649,6 +669,8 @@ float CGraphics::GetDXTextExtent ( const char * szText, float fScale, LPD3DXFONT
             SIZE size;
             GetTextExtentPoint32W( dc, L" ", 1, &size );
             iAdditionalPixels = iSpaceCount * size.cx;
+            // Remove trailing spaces from the text
+            strText = strText.Left(strText.length() - iSpaceCount);
         }
         
         // Compute the size of the text itself 

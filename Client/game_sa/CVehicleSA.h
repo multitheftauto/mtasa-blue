@@ -29,6 +29,7 @@ class CVehicleSA;
 #include "CDamageManagerSA.h"
 #include "CDoorSA.h"
 #include "CColPointSA.h"
+#include "CAEVehicleAudioEntitySA.h"
 
 #define SIZEOF_CHELI                            2584
 
@@ -322,17 +323,6 @@ struct CTrainFlags
     unsigned char unknown7 : 8;
 };
 
-
-// TODO: Size?
-class CAEVehicleAudioEntity
-{
-    BYTE pad1[154];
-public:
-    BYTE bCurrentRadioStation;
-private:
-    BYTE pad2;
-};
-
 class CAutoPilot
 {
     BYTE pad[56];
@@ -346,9 +336,7 @@ class CAutoPilot
 class CVehicleSAInterface : public CPhysicalSAInterface
 {
 public:
-    CAEVehicleAudioEntity m_VehicleAudioEntity; // 312
-
-    int padaudio[108];
+    CAEVehicleAudioEntitySAInterface m_VehicleAudioEntity; // 312
 
     tHandlingDataSA* pHandlingData;                             // +900
     tFlyingHandlingDataSA* pFlyingHandlingData;                 // +904
@@ -441,7 +429,13 @@ public:
     RwTexture* m_pCustomPlateTexture;
 
     //1420
-    BYTE Padding225[20];
+    BYTE Padding225[4];
+
+    //1424
+    BYTE m_type;                    // 0 = car/plane, 5 = boat, 6 = train, 9 = bike
+
+    //1425
+    BYTE Padding226[15];
 
     //1440
     unsigned char m_ucTrackNodeID;  // Current node on train tracks
@@ -493,7 +487,6 @@ public:
     RwFrame * pWindscreen;
     RwFrame * pExhaust;
 
-
     // Hacked in from jb-contribs branch
     RwFrame * pSpecialParts[5]; // 1688
     RwFrame * pExtraParts[5]; // 1708
@@ -504,17 +497,24 @@ public:
     CColPointSAInterface WheelFrontRightColPoint;
     CColPointSAInterface WheelRearRightColPoint;
 
-    BYTE padding280[260];
+    BYTE padding275[32];
+    // 2036
+    float wheelCollisionState[MAX_WHEELS];
+
+    // 2052
+    BYTE padding280[224];
+
     // 2276
     float m_fBurningTime;
 };
-static_assert(sizeof(CVehicleSAInterface) == 1688 + 576 + 4 , "Invalid size for CVehicleSAInterface");
+static_assert(sizeof(CVehicleSAInterface) == 1688 + 576 + 4 + 12 , "Invalid size for CVehicleSAInterface");
 
 class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 {
     friend class CPoolsSA;
 private:
     CDamageManagerSA*           m_pDamageManager;
+    CAEVehicleAudioEntitySA*    m_pVehicleAudioEntity;
     CHandlingEntrySA*           m_pHandlingData;
     void*                       m_pSuspensionLines;
     bool                        m_bIsDerailable;
@@ -727,6 +727,8 @@ public:
     BYTE                        GetBikeWheelStatus              ( BYTE bWheel );
     void                        SetBikeWheelStatus              ( BYTE bWheel, BYTE bStatus );
 
+    bool                        IsWheelCollided                 ( BYTE eWheelPosition );
+
     void                        GetGravity                      ( CVector* pvecGravity ) const  { *pvecGravity = m_vecGravity; }
     void                        SetGravity                      ( const CVector* pvecGravity );
 
@@ -734,8 +736,8 @@ public:
     inline void                 SetHeadLightColor               ( const SColor color )  { m_HeadLightColor = color; }
 
     CObject *                   SpawnFlyingComponent            ( int i_1, unsigned int ui_2 );
-    void                        SetWheelVisibility              ( eWheels wheel, bool bVisible );
-    CVector                     GetWheelPosition                ( eWheels wheel );
+    void                        SetWheelVisibility              ( eWheelPosition wheel, bool bVisible );
+    CVector                     GetWheelPosition                ( eWheelPosition wheel );
 
     bool                        IsHeliSearchLightVisible        ( void );
     void                        SetHeliSearchLightVisible       ( bool bVisible );
@@ -788,6 +790,8 @@ public:
     bool                        SetWindowOpenFlagState          ( unsigned char ucWindow, bool bState );
 
     void                        UpdateLandingGearPosition       ( );
+
+    CAEVehicleAudioEntitySA *   GetVehicleAudioEntity           ( void )  { return m_pVehicleAudioEntity; };
 
 private:
     void                        RecalculateSuspensionLines          ( void );

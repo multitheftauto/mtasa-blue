@@ -30,7 +30,7 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 * [Wiki Roadmap](https://wiki.mtasa.com/wiki/Roadmap)
 
 ### IDE Setup
-Download and install the [EditorConfig](https://visualstudiogallery.msdn.microsoft.com/c8bccfe2-650c-4b42-bc5c-845e21f96328) to automatically set up your IDE for the correct formatting.
+If not using Visual Studio 2017, download and install the [EditorConfig](https://visualstudiogallery.msdn.microsoft.com/c8bccfe2-650c-4b42-bc5c-845e21f96328) plugin to automatically set up your IDE for the correct formatting.
 
 ### Build Instructions
 #### Windows
@@ -44,19 +44,19 @@ Building MTA:SA is only supported on 64-bit Linux OSes. You can however cross-co
 1. Execute `utils/premake5 gmake`
 2. `cd Build`
 3. Run `make config=release_x86` to build the 32-bit server and `make config=release_x64` to build the 64-bit server (or use `debug` instead of `release` to run an unoptimized debug build)
-4. Execute `linux-install-data.sh` (optional step)
+4. Execute `linux-install-data.sh` (optional step).
 
 #### Linux: Docker Build Environment
 If you have problems resolving the required dependencies or want maximum compatibility, you can use our dockerized build environment that ships all needed dependencies. We also use this environment to build the official binaries.
 
 64-bit target:
 ```
-docker run -it -v `pwd`:/mtasa-blue multitheftauto/mtasa-blue
+docker run -it -v `pwd`:/build multitheftauto/mtasa-blue
 ```
 
 32-bit target:
 ```
-docker run -it -v `pwd`:/mtasa-blue -e BUILD_BITS=32 multitheftauto/mtasa-blue
+docker run -it -v `pwd`:/build -e BUILD_BITS=32 multitheftauto/mtasa-blue
 ```
 If the current directory is a valid git repository clone, it will use this as the build source. If not, it will create a (shallow) clone. After compiling, you will find the resulting binaries in `./Bin`.
 
@@ -68,4 +68,4 @@ Just execute `win-create-projects.bat`.
 
 Unless otherwise specified, all source code hosted on this repository is licensed under the GPLv3 license. See the LICENSE file for more details.
 
-Grand Theft Auto and all related trademarks are © Rockstar North 1997 - 2017.
+Grand Theft Auto and all related trademarks are © Rockstar North 1997 - 2018.

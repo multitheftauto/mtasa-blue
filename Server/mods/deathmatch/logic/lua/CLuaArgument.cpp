@@ -285,6 +285,12 @@ void CLuaArgument::Read ( lua_State* luaVM, int iArgument, CFastHashMap < const 
                 break;
             }
 
+            case LUA_TTHREAD:
+            {
+                m_iType = LUA_TNIL;
+                break;
+            }
+
             default:
             {
                 m_iType = LUA_TNONE;

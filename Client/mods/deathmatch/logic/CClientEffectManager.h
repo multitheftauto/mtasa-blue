@@ -21,7 +21,7 @@ class CClientEffectManager
     friend class CClientManager;
 
 public:
-    CClientEffect*                  Create                  ( const SString& strEffectName, const CVector& vecPosition, ElementID ID );
+    CClientEffect*                  Create                  ( const SString& strEffectName, const CVector& vecPosition, ElementID ID, bool bSoundEnable );
     void                            SAEffectDestroyed       ( void * pFxSAInterface );
     void                            DeleteAll               ( void );
 

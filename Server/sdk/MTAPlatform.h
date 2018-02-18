@@ -90,20 +90,10 @@ extern "C" bool g_bNoTopBar;
     #define strnicmp strncasecmp
     #endif
 
-    #define _copysign copysign
-
     #ifndef Sleep
         #define Sleep(duration) usleep(duration * 1000)
     #endif
-
-    // Itoa replacement function
-    char* itoa ( int value, char* result, int base );
-
     
 #endif
-
-// This function should be used instead of mkdir to preserve multiplatform
-// compatibility
-extern int mymkdir ( const char* dirname );
 
 #endif

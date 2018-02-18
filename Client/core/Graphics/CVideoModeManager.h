@@ -37,6 +37,8 @@ public:
     virtual void        OnLoseFocus                 ( void ) = 0;
     virtual void        OnPaint                     ( void ) = 0;
     virtual bool        GetRequiredDisplayResolution( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex ) = 0;
+    virtual int         GetFullScreenStyle          ( void ) = 0;
+    virtual bool        IsDisplayModeWindowed       ( void ) = 0;
 };
 
 CVideoModeManagerInterface* GetVideoModeManager ( void );

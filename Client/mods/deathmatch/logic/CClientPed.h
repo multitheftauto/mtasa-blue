@@ -522,7 +522,8 @@ public:
     CControllerState*           m_lastControllerState;
     CRemoteDataStorage*         m_remoteDataStorage;
     unsigned long               m_ulLastTimeFired;
-    unsigned long               m_ulLastTimeAimed;
+    unsigned long               m_ulLastTimeBeganAiming;
+    unsigned long               m_ulLastTimeEndedAiming;
     unsigned long               m_ulLastTimeBeganCrouch;
     unsigned long               m_ulLastTimeBeganStand;
     unsigned long               m_ulLastTimeMovedWhileCrouched;
