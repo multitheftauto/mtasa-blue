@@ -443,6 +443,7 @@ public:
 
     bool                        CanReloadWeapon         ( void );
     bool                        ReloadWeapon            ( void );
+    bool                        IsReloadingWeapon       ( void );
 
     bool                        ShouldBeStealthAiming   ( void );
     inline bool                 IsStealthAiming         ( void )            { return m_bStealthAiming; }

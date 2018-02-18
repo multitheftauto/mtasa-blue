@@ -6045,6 +6045,12 @@ bool CClientPed::ReloadWeapon ( void )
 }
 
 
+bool CClientPed::IsReloadingWeapon(void)
+{
+    return GetWeapon()->GetState() == WEAPONSTATE_RELOADING;
+}
+
+
 bool CClientPed::ShouldBeStealthAiming ( void )
 {
     if ( m_pPlayerPed )
