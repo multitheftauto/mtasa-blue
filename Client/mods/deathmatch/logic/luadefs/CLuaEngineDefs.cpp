@@ -395,7 +395,7 @@ int CLuaEngineDefs::EngineImportTXD ( lua_State* luaVM )
 }
 
 
-int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
+int CLuaEngineDefs::EngineReplaceModel  ( lua_State* luaVM )
 {
     CClientDFF* pDFF;
     SString strModelName;
