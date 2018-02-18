@@ -43,6 +43,9 @@ typedef struct RwObjectFrame RwObjectFrame;
 typedef struct RpAtomic RpAtomic;
 typedef struct RwCamera RwCamera;
 typedef struct RpLight RpLight;
+typedef struct RpMeshHeader RpMeshHeader;
+typedef struct RwResEntry RwResEntry;
+typedef struct RpMorphTarget RpMorphTarget;
 
 typedef RwCamera *(*RwCameraPreCallback) (RwCamera * camera);
 typedef RwCamera *(*RwCameraPostCallback) (RwCamera * camera);
@@ -57,6 +60,13 @@ struct RwV2d
 struct RwV3d
 {   // 12-byte
     float x,y,z;
+    CVector getVector() {
+        CVector RwV3dVector;
+        RwV3dVector.fX = x;
+        RwV3dVector.fY = y;
+        RwV3dVector.fZ = z;
+        return RwV3dVector;
+    }
 };
 struct RwPlane
 {
@@ -141,6 +151,31 @@ enum RpLightFlags
     LIGHT_ILLUMINATES_ATOMICS = 1,
     LIGHT_ILLUMINATES_GEOMETRY = 2,
     LIGHT_FLAGS_LAST = RW_STRUCT_ALIGN
+};
+
+struct RpMesh
+{
+    unsigned short *indices;
+    unsigned int   numIndices;
+    RpMaterial    *material;
+    bool isValidIndices(unsigned short usIndices)
+    {
+        return (numIndices >= 0 && numIndices > usIndices);
+    }
+};
+
+struct RpMeshHeader
+{
+    unsigned int   flags;
+    unsigned short numMeshes;
+    unsigned short serialNum;
+    unsigned int   totalIndicesInMesh;
+    unsigned int   firstMeshOffset;
+    RpMesh *getMeshes(void) { return (RpMesh*)(this + 1); }
+    bool isValidMeshId(int meshId)
+    {
+        return (meshId >= 0 && numMeshes > meshId);
+    }
 };
 
 // RenderWare/plugin base types
@@ -287,6 +322,10 @@ struct RpAtomic
     unsigned short   unknown7;
     RwList           sectors;
     void             *render;
+    RwFrame * getFrame()
+    {
+        return reinterpret_cast<RwFrame *>(this->object.object.parent);
+    }
 };
 struct RpAtomicContainer {
     RpAtomic    *atomic;
@@ -311,6 +350,10 @@ struct RpClump
     RwList          cameras;
     RwListEntry     globalClumps;
     RpClumpCallback callback;
+    RpAtomic* getAtomic()
+    {
+        return (RpAtomic*)((this->atomics.root.next) - 0x8);
+    }
 };
 struct RpMaterialLighting
 {
@@ -331,6 +374,13 @@ struct RpMaterials
     int        entries;
     int        unknown;
 };
+struct RpMorphTarget
+{
+    RpGeometry   *parentGeom;
+    RwSphere      boundingSphere;
+    RwV3d        *verts;
+    RwV3d        *normals;
+};
 struct RpTriangle
 {
     unsigned short v1, v2, v3;
@@ -345,16 +395,16 @@ struct RpGeometry
 
     int                  triangles_size;
     int                  vertices_size;
-    int                  unknown_size;
+    int                  morphTarget_size;
     int                  texcoords_size;
 
     RpMaterials          materials;
     RpTriangle           *triangles;
     RwColor              *colors;
     RwTextureCoordinates *texcoords[RW_MAX_TEXTURE_COORDS];
-    void                 *unknown2;
+    RpMeshHeader         *header;
     void                 *info;
-    void                 *unknown3;
+    RpMorphTarget        *morphTarget;
 };
 
 /*****************************************************************************/

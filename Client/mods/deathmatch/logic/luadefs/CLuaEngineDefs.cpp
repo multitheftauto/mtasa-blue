@@ -31,6 +31,8 @@ void CLuaEngineDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "engineGetModelTextureNames", EngineGetModelTextureNames );
     CLuaCFunctions::AddFunction ( "engineGetVisibleTextureNames", EngineGetVisibleTextureNames );
 
+    CLuaCFunctions::AddFunction ( "engineDFFGetProperties", EngineDFFGetProperties );
+
     //CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
     //CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
     //CLuaCFunctions::AddFunction ( "enginePositionAtomic", EnginePositionAtomic );
@@ -95,6 +97,9 @@ void CLuaEngineDefs::AddEngineDffClass ( lua_State* luaVM )
 
     lua_classfunction ( luaVM, "create", "engineLoadDFF" );
     lua_classfunction ( luaVM, "replace", "engineReplaceModel" );
+    lua_classfunction ( luaVM, "getProperties", "engineDFFGetProperties" );
+
+    lua_classvariable ( luaVM, "properties", NULL, "engineDFFGetProperties" );
 
     lua_registerclass ( luaVM, "EngineDFF", "Element" );
 }
@@ -158,13 +163,14 @@ int CLuaEngineDefs::EngineLoadCOL ( lua_State* luaVM )
 }
 
 
-int CLuaEngineDefs::EngineLoadDFF ( lua_State* luaVM )
+int CLuaEngineDefs::EngineLoadDFF(lua_State* luaVM)
 {
     SString strFile = "";
-    CScriptArgReader argStream ( luaVM );
-    // Grab the DFF filename or data (model ID ignored after 1.3.1)
-    argStream.ReadString ( strFile );
+    SString strModelName;
 
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadString ( strFile );
+    argStream.ReadString ( strModelName, "" );
     if ( !argStream.HasErrors ( ) )
     {
         // Grab our virtual machine and grab our resource from that.
@@ -172,16 +178,16 @@ int CLuaEngineDefs::EngineLoadDFF ( lua_State* luaVM )
         if ( pLuaMain )
         {
             // Get this resource
-            CResource* pResource = pLuaMain->GetResource ();
+            CResource* pResource = pLuaMain->GetResource ( );
             if ( pResource )
             {
-                bool bIsRawData = CClientDFF::IsDFFData( strFile );
+                bool bIsRawData = CClientDFF::IsDFFData ( strFile );
                 SString strPath;
                 // Is this a legal filepath?
-                if ( bIsRawData || CResourceManager::ParseResourcePathInput( strFile, pResource, &strPath ) )
+                if (bIsRawData || CResourceManager::ParseResourcePathInput ( strFile, pResource, &strPath ) )
                 {
                     // Grab the resource root entity
-                    CClientEntity* pRoot = pResource->GetResourceDFFRoot ();
+                    CClientEntity* pRoot = pResource->GetResourceDFFRoot ( );
 
                     // Create a DFF element
                     CClientDFF* pDFF = new CClientDFF ( m_pManager, INVALID_ELEMENT_ID );
@@ -192,6 +198,21 @@ int CLuaEngineDefs::EngineLoadDFF ( lua_State* luaVM )
                         // Success loading the file. Set parent to DFF root
                         pDFF->SetParent ( pRoot );
 
+                        if ( strModelName != "" )
+                        {
+                            ushort usModelID = CModelNames::ResolveModelID ( strModelName );
+                            if ( usModelID != INVALID_MODEL_ID )
+                                pDFF->m_usModelID = usModelID;
+
+                            if (!CClientDFFManager::IsReplacableModel(usModelID))
+                            {
+                                argStream.SetCustomError(bIsRawData ? "raw data" : strFile, "Invalid model ID");
+                                delete pDFF;
+                                lua_pushboolean(luaVM, false);
+                                return 1;
+                            }
+                            pDFF->m_strModelName = strModelName;
+                        }
                         // Return the DFF
                         lua_pushelement ( luaVM, pDFF );
                         return 1;
@@ -200,16 +221,16 @@ int CLuaEngineDefs::EngineLoadDFF ( lua_State* luaVM )
                     {
                         // Delete it again
                         delete pDFF;
-                        argStream.SetCustomError( bIsRawData ? "raw data" : strFile, "Error loading DFF" );
+                        argStream.SetCustomError ( bIsRawData ? "raw data" : strFile, "Error loading DFF" );
                     }
                 }
                 else
-                    argStream.SetCustomError( bIsRawData ? "raw data" : strFile, "Bad file path" );
+                    argStream.SetCustomError ( bIsRawData ? "raw data" : strFile, "Bad file path" );
             }
         }
     }
     if ( argStream.HasErrors ( ) )
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage ( ) );
 
     // We failed
     lua_pushboolean ( luaVM, false );
@@ -374,7 +395,7 @@ int CLuaEngineDefs::EngineImportTXD ( lua_State* luaVM )
 }
 
 
-int CLuaEngineDefs::EngineReplaceModel ( lua_State* luaVM )
+int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
 {
     CClientDFF* pDFF;
     SString strModelName;
@@ -382,27 +403,42 @@ int CLuaEngineDefs::EngineReplaceModel ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pDFF );
-    argStream.ReadString ( strModelName );
-    argStream.ReadBool ( bAlphaTransparency, false );
-
-    if ( !argStream.HasErrors () )
+    if ( argStream.NextIsBool ( ) )
     {
-        ushort usModelID = CModelNames::ResolveModelID ( strModelName );
+        argStream.ReadBool ( bAlphaTransparency, false );
+    }
+    else
+    {
+        argStream.ReadString ( strModelName, "" );
+        argStream.ReadBool ( bAlphaTransparency, false );
+    }
+
+    if ( !argStream.HasErrors( ) )
+    {
+        ushort usModelID = INVALID_MODEL_ID;
+        if ( pDFF->m_strModelName != "")
+        {
+            usModelID = CModelNames::ResolveModelID ( pDFF->m_strModelName );
+        }
+        else
+        {
+            usModelID = CModelNames::ResolveModelID ( strModelName );
+        }
         if ( usModelID != INVALID_MODEL_ID )
         {
-            if ( pDFF->ReplaceModel ( usModelID, bAlphaTransparency ) )
+            if (pDFF->ReplaceModel ( usModelID, bAlphaTransparency ) )
             {
-                lua_pushboolean ( luaVM, true );
+                lua_pushboolean( luaVM, true );
                 return 1;
             }
             else
-                argStream.SetCustomError( SString( "Model ID %d replace failed", usModelID ) );
+                argStream.SetCustomError ( SString ( "Model ID %d replace failed", usModelID ) );
         }
         else
-            argStream.SetCustomError( "Expected valid model ID or name at argument 2" );
+            argStream.SetCustomError ( "Expected valid model ID or name at argument 2" );
     }
-    if ( argStream.HasErrors () )
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+    if ( argStream.HasErrors ( ) )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage ( ) );
 
     lua_pushboolean ( luaVM, false );
     return 1;
@@ -795,6 +831,126 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     // We failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaEngineDefs::EngineDFFGetProperties(lua_State* luaVM)
+{
+    CClientDFF* pDFF;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pDFF );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        ushort usModelID = pDFF->m_usModelID;
+        if ( usModelID != INVALID_MODEL_ID )
+        {
+            RpClump* pClump = pDFF->GetLoadedClump ( usModelID );
+            if ( pClump )
+            {
+                RpAtomic* pAtomic = pClump->getAtomic ( );
+                if ( !pAtomic )
+                {
+                    lua_pushboolean ( luaVM, false );
+                    return 1;
+                }
+                RwFrame* pFrame = pAtomic->getFrame ( );
+                if ( !pFrame )
+                {
+                    lua_pushboolean ( luaVM, false );
+                    return 1;
+                }
+                RpGeometry* pGeometry = pAtomic->geometry;
+                if ( !pGeometry )
+                {
+                    lua_pushboolean ( luaVM, false );
+                    return 1;
+                }
+                lua_newtable ( luaVM );
+
+                lua_pushstring ( luaVM, "model" );
+                lua_pushnumber ( luaVM, usModelID );
+                lua_settable ( luaVM, -3 );
+
+                lua_pushstring ( luaVM, "verticesCount" );
+                lua_pushnumber ( luaVM, pGeometry->vertices_size );
+                lua_settable ( luaVM, -3 );
+
+                lua_pushstring ( luaVM, "trianglesCount" );
+                lua_pushnumber ( luaVM, pGeometry->triangles_size );
+                lua_settable  (luaVM, -3 );
+
+                lua_pushstring ( luaVM, "materialsCount" );
+                lua_pushnumber ( luaVM, pGeometry->materials.entries );
+                lua_settable ( luaVM, -3 );
+
+                lua_pushstring ( luaVM, "morphTargetCount" );
+                lua_pushnumber ( luaVM, pGeometry->morphTarget_size );
+                lua_settable ( luaVM, -3 );
+
+                lua_pushstring(luaVM, "meshCount");
+                lua_pushnumber (luaVM, pGeometry->header->numMeshes );
+                lua_settable ( luaVM, -3 );
+
+                lua_pushstring (luaVM, "uvCoordsCount" );
+                lua_pushnumber ( luaVM, pGeometry->texcoords_size );
+                lua_settable ( luaVM, -3 );
+
+                lua_pushstring ( luaVM, "flags" );
+                lua_pushnumber ( luaVM, pGeometry->flags );
+                lua_settable ( luaVM, -3 );
+
+                CVector vecMin;
+                CVector vecMax;
+                for ( ushort i = 0; i < pGeometry->vertices_size; i++ )
+                {
+                    RwV3d vVert = pGeometry->morphTarget->verts [ i ];
+                    if ( vVert.x < vecMin.fX )
+                        vecMin.fX = vVert.x;
+                    if ( vVert.y < vecMin.fY )
+                        vecMin.fZ = vVert.y;
+                    if ( vVert.z < vecMin.fZ )
+                        vecMin.fZ = vVert.z;
+
+                    if ( vVert.x > vecMax.fX )
+                        vecMax.fX = vVert.x;
+                    if ( vVert.y > vecMax.fY )
+                        vecMax.fZ = vVert.y;
+                    if ( vVert.z > vecMax.fZ )
+                        vecMax.fZ = vVert.z;
+                }
+
+
+                lua_pushstring ( luaVM, "boundingBox" );
+                lua_newtable ( luaVM );
+                lua_pushstring ( luaVM, "radius" );
+                lua_pushnumber ( luaVM, pAtomic->bsphereLocal.radius );
+                lua_settable ( luaVM, -3 );
+
+                lua_pushstring ( luaVM, "center" );
+                lua_pushvector ( luaVM, pAtomic->bsphereLocal.position.getVector ( ) );
+                lua_settable ( luaVM, -3 );
+
+                lua_pushstring ( luaVM, "min" );
+                lua_pushvector ( luaVM, vecMin );
+                lua_settable ( luaVM, -3 );
+
+                lua_pushstring ( luaVM, "max" );
+                lua_pushvector ( luaVM, vecMax );
+                lua_settable  (luaVM, -3 );
+                lua_settable ( luaVM, -3 );
+                return 1;
+            }
+            else
+                argStream.SetCustomError ( SString ( "Model ID %d failed", usModelID ) );
+        }
+        else
+            argStream.SetCustomError ( "Expected valid model ID or name at argument 2" );
+    }
+    if ( argStream.HasErrors ( ) )
+        m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage ( ) );
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }
