@@ -6044,14 +6044,10 @@ bool CClientPed::ReloadWeapon ( void )
     return false;
 }
 
+
 bool CClientPed::IsReloadingWeapon(void)
 {
-    CWeapon * pWeapon = GetWeapon ();
-
-    if ( pWeapon->GetState() == WEAPONSTATE_RELOADING )
-        return true;
-
-    return false;
+    return GetWeapon()->GetState() == WEAPONSTATE_RELOADING;
 }
 
 
