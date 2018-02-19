@@ -700,3 +700,26 @@ void CDbJobData::ProcessCallback ( void )
     callback.bDone = true;
     callback.pfnDbResult( this, callback.pContext );
 }
+
+
+///////////////////////////////////////////////////////////////
+//
+// CDbJobData::GetCommandStringForLog
+//
+// Remove sensitive info
+//
+///////////////////////////////////////////////////////////////
+SString CDbJobData::GetCommandStringForLog(void)
+{
+    if (command.type == EJobCommand::CONNECT)
+    {
+        std::vector<SString> parts;
+        command.strData.Split("\1", parts);
+        if (parts.size() >= 5)
+        {
+            // Remove host, username and password
+            return parts[0] + " " + parts[4];
+        }
+    }
+    return command.strData;
+}

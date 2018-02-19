@@ -288,7 +288,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pGame->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
     g_pGame->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
     g_pGame->SetTaskSimpleBeHitHandler ( CClientGame::StaticTaskSimpleBeHitHandler );
-    g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( CClientGame::StaticKeyStrokeHandler );
     g_pCore->GetKeyBinds ()->SetCharacterKeyHandler ( CClientGame::StaticCharacterKeyHandler );
     g_pNet->RegisterPacketHandler ( CClientGame::StaticProcessPacket );
@@ -416,6 +415,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetFireHandler ( NULL );
     g_pMultiplayer->SetProjectileStopHandler ( NULL );
     g_pMultiplayer->SetProjectileHandler ( NULL );
+    g_pMultiplayer->SetProcessCamHandler(nullptr);
     g_pMultiplayer->SetRender3DStuffHandler ( NULL );
     g_pMultiplayer->SetPreRenderSkyHandler ( NULL );
     g_pMultiplayer->SetRenderHeliLightHandler ( nullptr );
@@ -439,11 +439,11 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetGameProjectileDestructHandler( NULL );
     g_pMultiplayer->SetGameModelRemoveHandler( NULL );
     g_pMultiplayer->SetGameEntityRenderHandler( NULL );
+    g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
     g_pGame->SetPreWeaponFireHandler ( NULL );
     g_pGame->SetPostWeaponFireHandler ( NULL );
     g_pGame->SetTaskSimpleBeHitHandler ( NULL );
     g_pGame->GetAudio ()->SetWorldSoundHandler ( NULL );
-    g_pCore->SetMessageProcessor ( NULL );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( NULL );
     g_pCore->GetKeyBinds ()->SetCharacterKeyHandler ( NULL );
     g_pNet->StopNetwork ();

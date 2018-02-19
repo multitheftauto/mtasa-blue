@@ -56,7 +56,7 @@ void InitLocalization( bool bShowErrors )
         if ( !bShowErrors )
             return;
         DisplayErrorMessageBox ( ("Load failed.  Please ensure that "
-                            "the file core.dll is in the modules "
+                            "the file " MTA_DLL_NAME " is in the modules "
                             "directory within the MTA root directory."), _E("CL23"), "core-missing" ); // Core.dll missing
 
         return ExitProcess( EXIT_ERROR );
@@ -388,17 +388,33 @@ void HandleNotUsedMainMenu ( void )
         }
     }
 
-    // Check if Evolve is active
-    for ( auto processId : MyEnumProcesses( true ) )
+    // Check if problem processes are active
+    struct
     {
-        SString strFilename = ExtractFilename( GetProcessPathFilename( processId ) );
-        if ( strFilename.BeginsWithI( "Evolve" ) )
+        std::vector<SString> matchTextList;
+        const char* szProductName;
+        const char* szTrouble;
+    } procItems[] = {
+        {{"\\Evolve"}, "Evolve", "not-used-menu-evolve"},
+        {{"\\GbpSv.exe", "Diebold\\Warsaw"}, "GAS Tecnologia - G-Buster Browser Defense", "not-used-menu-gbpsv"}};
+    for (uint i = 0; i < NUMELMS(procItems); i++ )
+    {
+        for ( auto processId : MyEnumProcesses( true ) )
         {
-            SString strMessage = _("Are you having problems running MTA:SA?.\n\nTry disabling the following products for GTA and MTA:");
-            strMessage += "\n\nEvolve";
-            DisplayErrorMessageBox ( strMessage, _E("CL43"), "not-used-menu-evolve" );
-            break;
+            SString strProcessFilename = GetProcessPathFilename(processId);    
+            for (auto strMatchText : procItems[i].matchTextList)
+            {
+                if (strProcessFilename.ContainsI(strMatchText))
+                {
+                    SString strMessage = _("Are you having problems running MTA:SA?.\n\nTry disabling the following products for GTA and MTA:");
+                    strMessage += "\n\n";
+                    strMessage += procItems[i].szProductName;
+                    DisplayErrorMessageBox ( strMessage, _E("CL43"), procItems[i].szTrouble );
+                    goto done;
+                }
+            }
         }
+        done:;
     }
 }
 
@@ -1082,7 +1098,11 @@ int LaunchGame ( SString strCmdLine )
     SString strMtaDir = PathJoin( strMTASAPath, "mta" );
 
     SetDllDirectory( strMtaDir );
-    CheckService ( CHECK_SERVICE_PRE_CREATE );
+    if (!CheckService(CHECK_SERVICE_PRE_CREATE) && !IsUserAdmin())
+    {
+        RelaunchAsAdmin(strCmdLine, _("Fix configuration issue"));
+        ExitProcess(EXIT_OK);
+    }
 
     // Do some D3D things
     BeginD3DStuff();
@@ -1131,9 +1151,8 @@ int LaunchGame ( SString strCmdLine )
         if ( dwError == ERROR_ELEVATION_REQUIRED && !bDoneAdmin )
         {
             // Try to relaunch as admin if not done so already
-            ReleaseSingleInstanceMutex ();
-            ShellExecuteNonBlocking( "runas", PathJoin ( strMTASAPath, MTA_EXE_NAME ), strCmdLine + " /done-admin" );            
-            return 5;
+            RelaunchAsAdmin(strCmdLine + " /done-admin", _("Fix elevation required error"));
+            ExitProcess(EXIT_OK);
         }
         else
         {

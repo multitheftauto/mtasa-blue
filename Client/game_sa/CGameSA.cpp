@@ -66,6 +66,7 @@ CGameSA::CGameSA()
 
     DEBUG_TRACE("CGameSA::CGameSA()");
     this->m_pAudioEngine            = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
+    this->m_pAEAudioHardware        = new CAEAudioHardwareSA((CAEAudioHardwareSAInterface*)CLASS_CAEAudioHardware);
     this->m_pAudioContainer         = new CAudioContainerSA();
     this->m_pWorld                  = new CWorldSA();
     this->m_pPools                  = new CPoolsSA();
@@ -240,6 +241,7 @@ CGameSA::~CGameSA ( void )
     delete reinterpret_cast < CPoolsSA* > ( m_pPools );
     delete reinterpret_cast < CWorldSA* > ( m_pWorld );
     delete reinterpret_cast < CAudioEngineSA* > ( m_pAudioEngine );
+    delete reinterpret_cast < CAEAudioHardwareSA* > ( m_pAEAudioHardware );
     delete reinterpret_cast < CAudioContainerSA* > ( m_pAudioContainer );
     delete reinterpret_cast < CPointLightsSA * > ( m_pPointLights );
 }
@@ -465,6 +467,9 @@ void CGameSA::Reset ( void )
         // Restore the HUD
         m_pHud->Disable ( false );
         m_pHud->SetComponentVisible ( HUD_ALL, true );
+
+        // Restore model exhaust fumes positions
+        CModelInfoSA::ResetAllVehicleExhaustFumes();
     }
 }
 

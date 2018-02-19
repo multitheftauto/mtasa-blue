@@ -23,23 +23,15 @@
 #include "CCVarsInterface.h"
 #include "CWebCoreInterface.h"
 #include "CTrayIconInterface.h"
+#include "CChatInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
-
-typedef bool (*pfnProcessMessage) ( HWND, UINT, WPARAM, LPARAM );
 
 class CMultiplayer;
 class CNet;
 class CGame;
 class CModelCacheManager;
 class CLocalizationInterface;
-
-namespace ChatFonts
-{
-    enum eChatFont { CHAT_FONT_DEFAULT,CHAT_FONT_CLEAR,CHAT_FONT_BOLD,CHAT_FONT_ARIAL,CHAT_FONT_MAX };
-}
-
-using ChatFonts::eChatFont;
 
 enum eCoreVersion
 {
@@ -121,7 +113,6 @@ public:
     virtual void                    ShowServerInfo                  ( unsigned int WindowType ) = 0;
 
     virtual void                    ForceCursorVisible              ( bool bVisible, bool bToggleControls = true ) = 0;
-    virtual void                    SetMessageProcessor             ( pfnProcessMessage pfnMessageProcessor ) = 0;
     virtual void                    ShowMessageBox                  ( const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK * ResponseHandler = NULL ) = 0;
     virtual void                    RemoveMessageBox                ( bool bNextFrame = false ) = 0;
     virtual void                    ShowErrorMessageBox             ( const SString& strTitle, SString strMessage, const SString& strTroubleLink = "" ) = 0;

@@ -15,7 +15,7 @@
 #include <string>
 #include "net_common.h"
 #include "net/bitstream.h"
-#include "CNetHTTPDownloadManagerInterface.h"
+#include "net/CNetHTTPDownloadManagerInterface.h"
 
 #define MAX_CALL_REMOTE_QUEUES  100
 

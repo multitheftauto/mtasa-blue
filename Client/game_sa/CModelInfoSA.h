@@ -223,6 +223,13 @@ public:
     // +772 = Anim file index
 };
 
+class CVehicleModelVisualInfoSAInterface // Not sure about this name. If somebody knows more, please change
+{
+public:
+    uint8_t pad[72];
+    CVector exhaustPosition; // +72
+};
+
 
 class CVehicleModelInfoSAInterface : public CBaseModelInfoSAInterface
 {
@@ -231,7 +238,7 @@ public:
     RpMaterial*     pPlateMaterial;     // +36
     char            plateText[8];       // +40
     char            pad[44];
-    class CVehicleStructure* pSomeInfo; // +92
+    CVehicleModelVisualInfoSAInterface* pVisualInfo; // +92
 };
 
 enum eModelInfoType : unsigned char
@@ -263,8 +270,10 @@ protected:
     static std::map < unsigned short, int > ms_RestreamTxdIDMap;
     static std::map < DWORD, float > ms_ModelDefaultLodDistanceMap;
     static std::map < DWORD, BYTE > ms_ModelDefaultAlphaTransparencyMap;
+    static std::unordered_map<CVehicleModelInfoSAInterface*, CVector> ms_ModelDefaultVehicleFumesPosition;
     bool                            m_bAddedRefForCollision;
     SVehicleSupportedUpgrades       m_ModelSupportedUpgrades;
+
 public:
     static std::set < uint >        ms_ReplacedColModels;
 
@@ -331,6 +340,9 @@ public:
     unsigned int                    GetNumRemaps            ( void );
     void*                           GetVehicleSuspensionData( void );
     void*                           SetVehicleSuspensionData( void* pSuspensionLines );
+    CVector                         GetVehicleExhaustFumesPosition() override;
+    void                            SetVehicleExhaustFumesPosition(const CVector& position) override;
+    static void                     ResetAllVehicleExhaustFumes();
 
     // ONLY use for peds
     void                            GetVoice                ( short* psVoiceType, short* psVoice );

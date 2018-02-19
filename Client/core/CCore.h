@@ -52,7 +52,7 @@ class CCore;
 #include <dinput.h>
 
 #define BLUE_VERSION_STRING     "Multi Theft Auto v" MTA_DM_BUILDTAG_LONG
-#define BLUE_COPYRIGHT_STRING    _td("Copyright (C) 2003 - 2016 Multi Theft Auto")
+#define BLUE_COPYRIGHT_STRING    _td("Copyright (C) 2003 - 2018 Multi Theft Auto")
 
 // Configuration file path (relative to MTA install directory)
 #define MTA_CONFIG_PATH             "mta/config/coreconfig.xml"
@@ -158,7 +158,6 @@ public:
     // Mod
     void                    SetOfflineMod                   ( bool bOffline );
     void                    ForceCursorVisible              ( bool bVisible, bool bToggleControls = true );
-    void                    SetMessageProcessor             ( pfnProcessMessage pfnMessageProcessor );
     void                    ShowMessageBox                  ( const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK * ResponseHandler = NULL );
     void                    RemoveMessageBox                ( bool bNextFrame = false );
     void                    ShowErrorMessageBox             ( const SString& strTitle, SString strMessage, const SString& strTroubleLink = "" );
@@ -194,8 +193,6 @@ public:
     HWND                    GetHookedWindow                 ( void );
     void                    SwitchRenderWindow              ( HWND hWnd, HWND hWndInput );
     void                    CallSetCursorPos                ( int X, int Y );
-    void                    SetClientMessageProcessor       ( pfnProcessMessage pfnMessageProcessor ) { m_pfnMessageProcessor = pfnMessageProcessor; };
-    pfnProcessMessage       GetClientMessageProcessor       ( void ) { return m_pfnMessageProcessor; }
     void                    ChangeResolution                ( long width, long height, long depth );
 
     bool                    IsFocused                       ( void )                        { return ( GetForegroundWindow ( ) == GetHookedWindow ( ) ); };
@@ -334,7 +331,6 @@ private:
     bool                        m_bFirstFrame;
     bool                        m_bIsOfflineMod;
     bool                        m_bCursorToggleControls;
-    pfnProcessMessage           m_pfnMessageProcessor;
 
     CGUIMessageBox*             m_pMessageBox;
 

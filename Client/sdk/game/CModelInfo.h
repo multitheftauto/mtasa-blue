@@ -152,6 +152,8 @@ public:
     virtual unsigned int    GetNumRemaps            ( void ) = 0;
     virtual void*           GetVehicleSuspensionData( void ) = 0;
     virtual void*           SetVehicleSuspensionData( void* pSuspensionLines ) = 0;
+    virtual CVector         GetVehicleExhaustFumesPosition() = 0;
+    virtual void            SetVehicleExhaustFumesPosition(const CVector& position) = 0;
 
     // Init the supported upgrades structure
     virtual void            InitialiseSupportedUpgrades ( RpClump * pClump ) = 0;

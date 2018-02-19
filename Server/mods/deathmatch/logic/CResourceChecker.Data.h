@@ -255,6 +255,7 @@ namespace
         bool bRemoved;
         SString strOldName;
         SString strNewName;      
+        SString strVersion;      
     };
 
     SDeprecatedItem clientDeprecatedList[] = {
@@ -322,6 +323,9 @@ namespace
         { false, "guiMemoSetCaratIndex",           "guiMemoSetCaretIndex" },
         // XML
         { false, "xmlNodeFindChild",               "xmlFindChild" },
+
+        { false, "getComponentPosition",           "will return 3 floats instead of a Vector3", "1.5.5-9.11710" },
+        { false, "getComponentRotation",           "will return 3 floats instead of a Vector3", "1.5.5-9.11710" },
     };
 
 

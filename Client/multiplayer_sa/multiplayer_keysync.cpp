@@ -470,8 +470,6 @@ void SwitchContext ( CVehicle* pVehicle )
             // radio etc when they are removed) - issue #95
             MemPutFast < BYTE > ( 0x50230C, 0x0 );
 
-            MemPutFast < BYTE > ( dwVehicle + 312 + 0xA5, 0 );
-
             // For tanks, to prevent our mouse movement affecting remote tanks
             // 006AEA25   0F85 60010000    JNZ gta_sa.006AEB8B
             // V

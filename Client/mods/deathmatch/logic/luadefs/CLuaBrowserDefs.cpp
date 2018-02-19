@@ -849,13 +849,11 @@ int CLuaBrowserDefs::ReloadBrowserPage( lua_State* luaVM )
 int CLuaBrowserDefs::GUICreateBrowser ( lua_State* luaVM )
 {
     //  element guiCreateBrowser ( float x, float y, float width, float height, bool isLocal, bool isTransparent, bool relative, [element parent = nil] )
-    float x; float y; float width; float height; bool bIsLocal; bool bIsTransparent; bool bIsRelative; CClientGUIElement* parent;
+    CVector2D position; CVector2D size; bool bIsLocal; bool bIsTransparent; bool bIsRelative; CClientGUIElement* parent;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( x );
-    argStream.ReadNumber ( y );
-    argStream.ReadNumber ( width );
-    argStream.ReadNumber ( height );
+    argStream.ReadVector2D(position);
+    argStream.ReadVector2D(size);
     argStream.ReadBool ( bIsLocal );
     argStream.ReadBool ( bIsTransparent );
     argStream.ReadBool ( bIsRelative );
@@ -872,7 +870,7 @@ int CLuaBrowserDefs::GUICreateBrowser ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if ( pLuaMain )
         {
-            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateBrowser ( *pLuaMain, x, y, width, height, bIsLocal, bIsTransparent, bIsRelative, parent );
+            CClientGUIElement* pGUIElement = CStaticFunctionDefinitions::GUICreateBrowser ( *pLuaMain, position, size, bIsLocal, bIsTransparent, bIsRelative, parent );
             lua_pushelement ( luaVM, pGUIElement );
             return 1;
         }

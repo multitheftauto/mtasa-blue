@@ -3162,14 +3162,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
         }
     }
 
-    // Get version of installed VS2015 runtime
-    SString strVS2015Version = "0";
-    SString strVS2015Install = GetSystemRegistryValue ( (uint)HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\DevDiv\\vc\\Servicing\\14.0\\RuntimeMinimum", "Install" );
-    if ( strVS2015Install == "\x01" )
-    {
-        strVS2015Version = GetSystemRegistryValue ( (uint)HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\DevDiv\\vc\\Servicing\\14.0\\RuntimeMinimum", "Version" );
-    }
-
+    bool bSecureBootEnabled = (GetSystemRegistryValue((uint)HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\SecureBoot\\State", "UEFISecureBootEnabled") == "\x01");
     // Compile some system stats
     SDxStatus dxStatus;
     g_pGraphics->GetRenderItemManager ()->GetDxStatus ( dxStatus );
@@ -3212,16 +3205,16 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer ( void )
                              , dxStatus.videoCard.depthBufferFormat
                            );
 
-    SString strSystemStats3 ( "3_%d"
+    SString strSystemStats3 ( "3_0"     // Was VS2013 runtime installed
                              "_%s"
                              "_%s"
                              "_%d"
-                             "_%s"
-                             , GetApplicationSettingInt( "vs2013-runtime-installed" )
+                             "_0"       // Was VS2015 runtime version
+                             "_%d"
                              , *GetApplicationSetting ( "real-os-build" )
                              , *GetApplicationSetting ( "locale" ).Replace( "_", "-" )
                              , (uint)FileSize( PathJoin( GetSystemSystemPath(), "normaliz.dll" ) )
-                             , *strVS2015Version
+                             , bSecureBootEnabled
                            );
 
     SString strConnectUsage = SString("%i_%i", GetApplicationSettingInt ( "times-connected-editor" ), GetApplicationSettingInt ( "times-connected" ) );

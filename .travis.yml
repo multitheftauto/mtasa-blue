@@ -1,4 +1,6 @@
 language: cpp
+sudo: false
+dist: trusty
 
 matrix:
   include:
@@ -19,13 +21,13 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.8
+            - llvm-toolchain-trusty-4.0
           packages:
-            - clang-3.8
+            - clang-4.0
             - zip
       env: 
-        ENV_CXX=clang++-3.8 
-        ENV_CC=clang-3.8 
+        ENV_CXX=clang++-4.0 
+        ENV_CC=clang-4.0 
         NIGHTLY_UPLOAD=0
     
 before_script:
