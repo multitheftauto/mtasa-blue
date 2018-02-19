@@ -288,7 +288,6 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pGame->SetPreWeaponFireHandler ( CClientGame::PreWeaponFire );
     g_pGame->SetPostWeaponFireHandler ( CClientGame::PostWeaponFire );
     g_pGame->SetTaskSimpleBeHitHandler ( CClientGame::StaticTaskSimpleBeHitHandler );
-    g_pCore->SetMessageProcessor ( CClientGame::StaticProcessMessage );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( CClientGame::StaticKeyStrokeHandler );
     g_pCore->GetKeyBinds ()->SetCharacterKeyHandler ( CClientGame::StaticCharacterKeyHandler );
     g_pNet->RegisterPacketHandler ( CClientGame::StaticProcessPacket );
@@ -445,7 +444,6 @@ CClientGame::~CClientGame ( void )
     g_pGame->SetPostWeaponFireHandler ( NULL );
     g_pGame->SetTaskSimpleBeHitHandler ( NULL );
     g_pGame->GetAudio ()->SetWorldSoundHandler ( NULL );
-    g_pCore->SetMessageProcessor ( NULL );
     g_pCore->GetKeyBinds ()->SetKeyStrokeHandler ( NULL );
     g_pCore->GetKeyBinds ()->SetCharacterKeyHandler ( NULL );
     g_pNet->StopNetwork ();

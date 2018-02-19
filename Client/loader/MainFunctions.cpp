@@ -56,7 +56,7 @@ void InitLocalization( bool bShowErrors )
         if ( !bShowErrors )
             return;
         DisplayErrorMessageBox ( ("Load failed.  Please ensure that "
-                            "the file core.dll is in the modules "
+                            "the file " MTA_DLL_NAME " is in the modules "
                             "directory within the MTA root directory."), _E("CL23"), "core-missing" ); // Core.dll missing
 
         return ExitProcess( EXIT_ERROR );

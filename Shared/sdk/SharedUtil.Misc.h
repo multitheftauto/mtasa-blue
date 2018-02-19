@@ -1514,7 +1514,7 @@ namespace SharedUtil
             AddString ( strFilterDesc );
         }
 
-        bool IsFiltered ( int iValue )
+        bool IsFiltered ( int iValue ) const
         {
             if ( MapContains ( idMap, iValue ) )
                 return cDefaultType == '+';

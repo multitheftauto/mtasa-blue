@@ -219,8 +219,7 @@ void CModManager::Unload ( void )
         CLocalGUI::GetSingleton ().GetDebugView ()->Clear ();
         CLocalGUI::GetSingleton ().SetDebugViewVisible ( false );
 
-        // NULL the message processor and the unhandled command handler
-        CCore::GetSingleton ().SetClientMessageProcessor ( NULL );
+        // NULL the unhandled command handler
         CCore::GetSingleton ().GetCommands ()->SetExecuteHandler ( NULL );
 
         // Reset cursor alpha

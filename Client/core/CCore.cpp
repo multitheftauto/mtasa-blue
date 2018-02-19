@@ -135,7 +135,6 @@ CCore::CCore ( void )
 
     CCrashDumpWriter::SetHandlers();
 
-    m_pfnMessageProcessor       = NULL;
     m_pMessageBox = NULL;
 
     m_bFirstFrame = true;
@@ -656,12 +655,6 @@ void CCore::ForceCursorVisible ( bool bVisible, bool bToggleControls )
 {
     m_bCursorToggleControls = bToggleControls;
     m_pLocalGUI->ForceCursorVisible ( bVisible );
-}
-
-
-void CCore::SetMessageProcessor ( pfnProcessMessage pfnMessageProcessor )
-{
-    m_pfnMessageProcessor = pfnMessageProcessor;
 }
 
 
