@@ -4276,9 +4276,9 @@ bool CStaticFunctionDefinitions::ResetAmbientSounds ( void )
 }
 
 
-bool CStaticFunctionDefinitions::SetWorldSoundEnabled ( uint uiGroup, uint uiIndex, bool bMute, bool bForceCancel )
+bool CStaticFunctionDefinitions::SetWorldSoundEnabled ( uint uiGroup, uint uiIndex, bool bMute, bool bImmediate )
 {
-    g_pGame->GetAudio ()->SetWorldSoundEnabled ( uiGroup, uiIndex, bMute, bForceCancel );
+    g_pGame->GetAudio ()->SetWorldSoundEnabled ( uiGroup, uiIndex, bMute, bImmediate );
     return true;
 }
 

@@ -142,7 +142,7 @@ public:
     VOID                        SetAmbientSoundEnabled          ( eAmbientSoundType eType, bool bEnabled );
     bool                        IsAmbientSoundEnabled           ( eAmbientSoundType eType );
     void                        ResetAmbientSounds              ( void );
-    VOID                        SetWorldSoundEnabled            ( uint uiGroup, uint uiIndex, bool bEnabled, bool bForceCancel );
+    VOID                        SetWorldSoundEnabled            ( uint uiGroup, uint uiIndex, bool bEnabled, bool bImmediate );
     bool                        IsWorldSoundEnabled             ( uint uiGroup, uint uiIndex );
     void                        ResetWorldSounds                ( void );
     void                        SetWorldSoundHandler            ( WorldSoundHandler * pHandler );
