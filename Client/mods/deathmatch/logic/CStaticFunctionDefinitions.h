@@ -334,7 +334,7 @@ public:
     static bool                         SetAmbientSoundEnabled              ( eAmbientSoundType eType, bool bMute );
     static bool                         IsAmbientSoundEnabled               ( eAmbientSoundType eType, bool& bOutMute );
     static bool                         ResetAmbientSounds                  ( void );
-    static bool                         SetWorldSoundEnabled                ( uint uiGroup, uint uiIndex, bool bMute );
+    static bool                         SetWorldSoundEnabled                ( uint uiGroup, uint uiIndex, bool bMute, bool bForceCancel );
     static bool                         IsWorldSoundEnabled                 ( uint uiGroup, uint uiIndex, bool& bOutMute );
     static bool                         ResetWorldSounds                    ( void );
     static bool                         PlaySFX                             ( CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop, CClientSound*& outSound );

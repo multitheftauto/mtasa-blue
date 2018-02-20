@@ -17,9 +17,14 @@
 DWORD RETURN_CAEAmbienceTrackManager_CheckForPause =        0x4D6E27;
 void HOOK_CAEAmbienceTrackManager_CheckForPause ();
 
-#define HOOKPOS_CAESoundManager_RequestNewSound       0x4EFB10
-DWORD RETURN_CAESoundManager_RequestNewSound =        0x4EFB15;
+#define HOOKPOS_CAESoundManager_RequestNewSound     0x4EFB10
+DWORD RETURN_CAESoundManager_RequestNewSound =      0x4EFB15;
 void HOOK_CAESoundManager_RequestNewSound();
+
+#define FUNC_CAESoundManager__CancelSoundsInBankSlot    0x4EFC60
+#define VAR_pAESoundManager                             0xB62CB0
+
+class CAESoundManager;
 
 CAudioEngineSA* g_pAudioSA = NULL;
 
@@ -463,14 +468,27 @@ void _declspec(naked) HOOK_CAEAmbienceTrackManager_CheckForPause ()
 //
 
 // uiIndex = -1 for all in group
-void CAudioEngineSA::SetWorldSoundEnabled ( uint uiGroup, uint uiIndex, bool bEnabled )
+void CAudioEngineSA::SetWorldSoundEnabled ( uint uiGroup, uint uiIndex, bool bEnabled, bool bForceCancel )
 {
     uint uiFirst = ( uiGroup << 8 ) + ( uiIndex != -1 ? uiIndex : 0 );
     uint uiLast  = ( uiGroup << 8 ) + ( uiIndex != -1 ? uiIndex : 255 );
     if ( !bEnabled )
+    {
         m_DisabledWorldSounds.SetRange ( uiFirst, uiLast - uiFirst + 1 );
+
+        if ( bForceCancel )
+            CancelSoundsInBankSlot ( uiGroup, uiIndex );
+    }
     else
         m_DisabledWorldSounds.UnsetRange ( uiFirst, uiLast - uiFirst + 1 );
+}
+
+static auto CancelSoundsInBankSlot ( uint uiGroup, uint uiIndex )
+{
+    using CAESoundManager__CancelSoundsInBankSlot = CAESound * ( __thiscall * ) ( CAESoundManager *, uint, uint );
+    static auto pAESoundManager             = reinterpret_cast < CAESoundManager * >                        ( VAR_pAESoundManager );
+    static auto pCancelSoundsInBankSlot     = reinterpret_cast < CAESoundManager__CancelSoundsInBankSlot >  ( FUNC_CAESoundManager__CancelSoundsInBankSlot );
+    return pCancelSoundsInBankSlot ( pAESoundManager, uiGroup, uiIndex );
 }
 
 // uiIndex = -1 for all in group

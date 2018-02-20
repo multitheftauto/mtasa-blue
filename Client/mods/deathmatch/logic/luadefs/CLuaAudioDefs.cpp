@@ -1431,18 +1431,19 @@ int CLuaAudioDefs::ResetAmbientSounds ( lua_State* luaVM )
 
 int CLuaAudioDefs::SetWorldSoundEnabled ( lua_State* luaVM )
 {
-    //  setWorldSoundEnabled ( int group, [int index, ], bool enable )
-    int group; int index = -1; bool bEnabled;
+    //  setWorldSoundEnabled ( int group, [int index, ], bool enable [, bool forceCancel = false ] )
+    int group; int index = -1; bool bEnabled; bool bForceCancel;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadNumber ( group );
     if ( !argStream.NextIsBool () )
         argStream.ReadNumber ( index );
     argStream.ReadBool ( bEnabled );
+    argStream.ReadBool ( bForceCancel, false );
 
     if ( !argStream.HasErrors () )
     {
-        if ( CStaticFunctionDefinitions::SetWorldSoundEnabled ( group, index, bEnabled ) )
+        if ( CStaticFunctionDefinitions::SetWorldSoundEnabled ( group, index, bEnabled, bForceCancel ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
