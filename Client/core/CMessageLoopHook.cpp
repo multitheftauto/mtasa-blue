@@ -424,11 +424,23 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage ( HWND hwnd,
             // Lead the message through the keybinds message processor
             g_pCore->GetKeyBinds ()->ProcessMessage ( hwnd, uMsg, wParam, lParam );
 
+            bool bProcessed = false, bClientProcessed = false;          
+
             // Check and see if the GUI should process this message
-            bool bProcessed = CLocalGUI::GetSingleton ().ProcessMessage ( hwnd, uMsg, wParam, lParam );
+            bProcessed = CLocalGUI::GetSingleton ().ProcessMessage ( hwnd, uMsg, wParam, lParam );
             
+            // Check and see if the Core/mod should process this message
+            if ( !CCore::GetSingleton ().GetGame ()->IsAtMenu() )
+            {            
+                pfnProcessMessage pfnClientMessageProcessor = CCore::GetSingleton ().GetClientMessageProcessor();
+                if ( pfnClientMessageProcessor )
+                {
+                    bClientProcessed = pfnClientMessageProcessor ( hwnd, uMsg, wParam, lParam );
+                }
+            }
+
             // If GTA can process this key
-            if ( !bProcessed )
+            if ( !bProcessed && !bClientProcessed )
             {
                 // ALWAYS return true on escape to stop us getting to GTA's menu
                 if ( uMsg == WM_KEYDOWN && wParam == VK_ESCAPE )
