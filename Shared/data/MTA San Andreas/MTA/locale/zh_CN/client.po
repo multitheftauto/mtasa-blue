@@ -15,9 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"Translators: Jin Yin; mk124; ChineseGTA Li; hcyxsq; LilDollaTechZone\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: Jin \"yinjin_116s\" Yin; mk124; ChineseGTA \"ChineseGTA\" Li; "
-"LilDollaTechZone; hcyxsq\n"
 "X-POOTLE-MTIME: 1453526401.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
@@ -259,10 +258,7 @@ msgid "No"
 msgstr "否"
 
 #. /////////////////////////////////////////////////////////////////////////
-#.
 #. Dialog strings
-#.
-#.
 #. /////////////////////////////////////////////////////////////////////////
 #: C:\mtasa-blue\Client\core\CCore.cpp:715
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1091
@@ -398,8 +394,9 @@ msgid "shows the frame timing graph"
 msgstr "显示帧数图表"
 
 #: C:\mtasa-blue\Client\core\CCore.h:55
+#, fuzzy
 msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
-msgstr ""
+msgstr "版权所有 (C) 2003 - 2015 Multi Theft Auto"
 
 #: C:\mtasa-blue\Client\core\CCredits.cpp:32
 msgid "Programming"
@@ -630,8 +627,8 @@ msgstr "小组控制 后退"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:317
 msgid ""
-"You are using a feature-branch build! This is a test build only which cannot "
-"be used to connect to public servers!"
+"You are using a feature-branch build! This is a test build only which cannot"
+" be used to connect to public servers!"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
@@ -1484,8 +1481,9 @@ msgid "Bottom"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2181
+#, fuzzy
 msgid "Font"
-msgstr ""
+msgstr "字体:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2223
 msgid "Hide background when not typing"
@@ -1508,9 +1506,11 @@ msgid "Chat text black/white outline"
 msgstr ""
 
 #. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2494
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2501
 msgid "Press a key to bind, or escape to clear"
@@ -2138,7 +2138,8 @@ msgid "Please enter the password to the server:"
 msgstr "请输入进入此服务器所需的密码:"
 
 #. Autojoin checkbox
-#. TRANSLATORS:  If you need more room, there is space for one extra line using a newline (\n).
+#. TRANSLATORS:  If you need more room, there is space for one extra line
+#. using a newline (\n).
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:182
 msgid "Join the server as soon as a player slot is available."
 msgstr "当服务器有空位时进入。"
@@ -2347,8 +2348,7 @@ msgstr "你的侠盗猎车手：圣安地列斯的安装目录包含以下 d3d9.
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:64
 msgid ""
-"The file is not required and may interfere with the graphical features in "
-"this version of MTA:SA.\n"
+"The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
@@ -2628,7 +2628,8 @@ msgstr "无法关闭侠盗猎车手: 圣安地列斯. 如果问题仍继续出�
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:611
 msgid ""
-"Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+"Registry entries are missing. Please reinstall Multi Theft Auto: San "
+"Andreas."
 msgstr "注册键值丢失.请重新安装 MTA:SA."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:615
@@ -2682,7 +2683,8 @@ msgstr "载入失败. 无法在 %s 里定位 gta_sa.exe."
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:804
 #, c-format
 msgid ""
-"Load failed. %s exists in the GTA directory. Please delete before continuing."
+"Load failed. %s exists in the GTA directory. Please delete before "
+"continuing."
 msgstr "载入失败. %s 在GTA目录已经存在.请在继续前删除"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:812
@@ -2712,8 +2714,7 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:862
 msgid ""
-".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation "
-"directory.\n"
+".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
@@ -2749,8 +2750,7 @@ msgstr ""
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1161
 #, c-format
 msgid ""
-"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
-"the problem persists,contact MTA at www.multitheftauto.com. \n"
+"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 msgstr ""

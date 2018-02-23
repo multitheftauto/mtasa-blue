@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Pootle 2.5.0-rc1\n"
 "Translators: guix; cedricpc; arthrik; 4L3X\n"
+"X-Generator: Pootle 2.5.0-rc1\n"
 "X-POOTLE-MTIME: 1517483102.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
@@ -261,10 +261,7 @@ msgid "No"
 msgstr "Non"
 
 #. /////////////////////////////////////////////////////////////////////////
-#.
 #. Dialog strings
-#.
-#.
 #. /////////////////////////////////////////////////////////////////////////
 #: C:\mtasa-blue\Client\core\CCore.cpp:715
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1091
@@ -347,7 +344,8 @@ msgstr "affiche votre numéro de série"
 
 #: C:\mtasa-blue\Client\core\CCore.cpp:1402
 msgid "connects to a server (host port nick pass)"
-msgstr "connexion à un serveur ( <hôte> <port> [<pseudonyme> <mot de passe>] )"
+msgstr ""
+"connexion à un serveur ( <hôte> <port> [<pseudonyme> <mot de passe>] )"
 
 #: C:\mtasa-blue\Client\core\CCore.cpp:1403
 msgid "connects to a previous server"
@@ -636,8 +634,8 @@ msgstr "Vers l'arrière (contrôle groupe)"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:317
 msgid ""
-"You are using a feature-branch build! This is a test build only which cannot "
-"be used to connect to public servers!"
+"You are using a feature-branch build! This is a test build only which cannot"
+" be used to connect to public servers!"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
@@ -1338,8 +1336,8 @@ msgstr "REDÉMARRAGE NÉCESSAIRE"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1338
 msgid "Some settings will be changed when you disconnect the current server"
 msgstr ""
-"Certains paramètres seront modifiés quand vous vous déconnecterez du serveur "
-"actuel"
+"Certains paramètres seront modifiés quand vous vous déconnecterez du serveur"
+" actuel"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1339
 msgid ""
@@ -1515,9 +1513,11 @@ msgid "Chat text black/white outline"
 msgstr ""
 
 #. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2494
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2501
 msgid "Press a key to bind, or escape to clear"
@@ -1582,8 +1582,7 @@ msgid ""
 "\n"
 "Are you sure you want to enable them?"
 msgstr ""
-"Les ombres volumétriques peuvent provoquer des ralentissement sur certains "
-"systèmes.\n"
+"Les ombres volumétriques peuvent provoquer des ralentissement sur certains systèmes.\n"
 "\n"
 "Êtes-vous sûr de vouloir les activer?"
 
@@ -1597,8 +1596,7 @@ msgid ""
 "\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr ""
-"L'envoi de captures d'écrans est nécessaire sur certains serveurs utilisant "
-"l'anti-triche.\n"
+"L'envoi de captures d'écrans est nécessaire sur certains serveurs utilisant l'anti-triche.\n"
 "\n"
 "(Le Tchat et l'Interface Graphique sont exclus de la capture d'écran)\n"
 
@@ -1618,8 +1616,7 @@ msgstr ""
 "Certains fichiers dans le dossier Data de GTA:SA sont personnalisés.\n"
 "MTA utilisera ces fichiers modifiés, si cette case est cochée.\n"
 "\n"
-"Cependant, les fichiers personnalisés seront bloqués sur la plupart des "
-"serveurs.\n"
+"Cependant, les fichiers personnalisés seront bloqués sur la plupart des serveurs.\n"
 "\n"
 "Êtes-vous sûr de vouloir les utiliser?"
 
@@ -1910,8 +1907,7 @@ msgid ""
 msgstr ""
 "Impossible d'initialiser Direct3D9.\n"
 "\n"
-"Veuillez vous assurer que les Composants d'Exécution Utilisateur Final "
-"DirectX et\n"
+"Veuillez vous assurer que les Composants d'Exécution Utilisateur Final DirectX et\n"
 "les derniers Service Packs de Windows sont installés correctement."
 
 #. Create the window
@@ -2157,7 +2153,8 @@ msgid "Please enter the password to the server:"
 msgstr "Veuillez saisir le mot de passe du serveur:"
 
 #. Autojoin checkbox
-#. TRANSLATORS:  If you need more room, there is space for one extra line using a newline (\n).
+#. TRANSLATORS:  If you need more room, there is space for one extra line
+#. using a newline (\n).
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:182
 msgid "Join the server as soon as a player slot is available."
 msgstr "Se connecter au serveur dès qu'une place est disponible."
@@ -2198,8 +2195,7 @@ msgstr[1] "serveurs"
 
 #. We are polling for the master server list (first pass)
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:249
-#, c-format
-#, c-format, c-format
+#, c-format, c-format, c-format
 msgid "Requesting master server list (%lu ms elapsed)"
 msgstr "Sollicitation de la liste du Serveur principal (%lu ms écoulées)"
 
@@ -2375,13 +2371,11 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:64
 msgid ""
-"The file is not required and may interfere with the graphical features in "
-"this version of MTA:SA.\n"
+"The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
-"Le fichier n'est pas requis et pourrait interférer avec les améliorations "
-"graphiques de cette version de MTA:SA.\n"
+"Le fichier n'est pas requis et pourrait interférer avec les améliorations graphiques de cette version de MTA:SA.\n"
 "\n"
 "Il est recommandé de supprimer ou renommer d3d9.dll"
 
@@ -2463,8 +2457,7 @@ msgid ""
 msgstr ""
 "MTA n'a pas pu détecter d'anti-virus sur votre ordinateur.\n"
 "\n"
-"Les virus interfèrent avec MTA et dégradent votre expérience de "
-"jouabilité...\n"
+"Les virus interfèrent avec MTA et dégradent votre expérience de jouabilité...\n"
 "\n"
 "Appuyez sur 'Aide' pour plus d'informations."
 
@@ -2580,8 +2573,7 @@ msgid ""
 "Do you want to reset GTA settings now?"
 msgstr ""
 "Il semble y avoir un problème au démarrage de MTA:.SA\n"
-"La réinitialisation des paramètres de GTA:SA peut parfois résoudre ce "
-"problème.\n"
+"La réinitialisation des paramètres de GTA:SA peut parfois résoudre ce problème.\n"
 "\n"
 "Voulez-vous réinitialiser les paramètres de GTA:SA?"
 
@@ -2643,8 +2635,7 @@ msgstr ""
 "ATTENTION\n"
 "\n"
 "MTA:SA a détecté une activité suspecte.\n"
-"Veuillez lancer un scan de virus pour vous assurer de la sécurité de votre "
-"système.\n"
+"Veuillez lancer un scan de virus pour vous assurer de la sécurité de votre système.\n"
 "\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:446
@@ -2657,8 +2648,8 @@ msgid ""
 "An instance of GTA: San Andreas is already running. It needs to be "
 "terminated before MTA:SA can be started. Do you want to do that now?"
 msgstr ""
-"Une instance de GTA: San Andreas est déjà en cours d'exécution, et doit être "
-"terminée pour que MTA:SA puisse démarrer. Voulez-vous la terminer "
+"Une instance de GTA: San Andreas est déjà en cours d'exécution, et doit être"
+" terminée pour que MTA:SA puisse démarrer. Voulez-vous la terminer "
 "maintenant?"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:589
@@ -2671,10 +2662,11 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:611
 msgid ""
-"Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+"Registry entries are missing. Please reinstall Multi Theft Auto: San "
+"Andreas."
 msgstr ""
-"Certaines clés du Registre sont manquantes. Veuillez réinstaller Multi Theft "
-"Auto: San Andreas."
+"Certaines clés du Registre sont manquantes. Veuillez réinstaller Multi Theft"
+" Auto: San Andreas."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:615
 msgid ""
@@ -2683,8 +2675,8 @@ msgid ""
 "installation to a compatible path that contains only standard ASCII "
 "characters and reinstall Multi Theft Auto: San Andreas."
 msgstr ""
-"L'emplacement d'installation de GTA: San Andreas contient des caractères non "
-"supportés (Unicode). Veuillez déplacer les fichiers de GTA: San Andreas à "
+"L'emplacement d'installation de GTA: San Andreas contient des caractères non"
+" supportés (Unicode). Veuillez déplacer les fichiers de GTA: San Andreas à "
 "un emplacement contenant uniquement des caractères standards (ASCII) et "
 "réinstaller Multi Theft Auto: San Andreas"
 
@@ -2718,8 +2710,8 @@ msgid ""
 "Load failed. Please ensure that the latest data files have been installed "
 "correctly."
 msgstr ""
-"Le chargement a échoué. Veuillez vous assurer que les fichiers Data les plus "
-"récents ont été installés correctement."
+"Le chargement a échoué. Veuillez vous assurer que les fichiers Data les plus"
+" récents ont été installés correctement."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:787
 #, c-format
@@ -2736,7 +2728,8 @@ msgstr "Le chargement a échoué. Impossible de localiser gta_sa.exe dans %s."
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:804
 #, c-format
 msgid ""
-"Load failed. %s exists in the GTA directory. Please delete before continuing."
+"Load failed. %s exists in the GTA directory. Please delete before "
+"continuing."
 msgstr ""
 "Le chargement a échoué. %s existe à l'emplacement de GTA: San Andreas. "
 "Veuillez le supprimer avant de continuer."
@@ -2768,26 +2761,25 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:862
 msgid ""
-".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation "
-"directory.\n"
+".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
-"Des fichiers .asi ont été trouvés dans les dossiers d'installation de GTA:SA "
-"ou MTA:SA.\n"
+"Des fichiers .asi ont été trouvés dans les dossiers d'installation de GTA:SA ou MTA:SA.\n"
 "\n"
-"Supprimez ou déplacez ces fichiers si vous constatez des problèmes avec "
-"MTA:SA."
+"Supprimez ou déplacez ces fichiers si vous constatez des problèmes avec MTA:SA."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:926
 msgid ""
 "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "La version du fichier ne correspond pas. Veuillez réinstaller MTA:SA si vous "
-"constatez des problèmes.\n"
+msgstr ""
+"La version du fichier ne correspond pas. Veuillez réinstaller MTA:SA si vous"
+" constatez des problèmes.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:935
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Des fichiers sont manquants. Veuillez réinstaller MTA:SA si vous constatez "
+msgstr ""
+"Des fichiers sont manquants. Veuillez réinstaller MTA:SA si vous constatez "
 "des problèmes.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:947
@@ -2812,14 +2804,11 @@ msgstr ""
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1161
 #, c-format
 msgid ""
-"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
-"the problem persists,contact MTA at www.multitheftauto.com. \n"
+"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 msgstr ""
-"Impossible de démarrer GTA: San Andreas.  Veuillez tenter de réinstaller, ou "
-"si le problème persiste, contactez l'équipe de MTA à l'adresse "
-"www.multitheftauto.com. \n"
+"Impossible de démarrer GTA: San Andreas.  Veuillez tenter de réinstaller, ou si le problème persiste, contactez l'équipe de MTA à l'adresse www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 
@@ -2868,7 +2857,8 @@ msgstr "GTA:SA a rencontré un problème durant le chargement d'un model."
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1914
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "Si vous avez récemment modifié gta3.img, essayez de réinstaller GTA:SA."
+msgstr ""
+"Si vous avez récemment modifié gta3.img, essayez de réinstaller GTA:SA."
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1940
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
@@ -3014,8 +3004,8 @@ msgid ""
 "Not connected; please use Quick Connect or the 'connect' command to connect "
 "to a server."
 msgstr ""
-"Non connecté. Veuillez utiliser la Connexion Rapide ou la commande 'connect' "
-"pour joindre un serveur."
+"Non connecté. Veuillez utiliser la Connexion Rapide ou la commande 'connect'"
+" pour joindre un serveur."
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:686
 msgid "The server is not installed"
@@ -3118,8 +3108,7 @@ msgid "Disconnect from server"
 msgstr "Déconnecté du serveur."
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:485
-#, c-format
-#, c-format,
+#, c-format, c-format, 
 msgid ""
 "Disconnected: Serial is banned.\n"
 "Reason: %s"
@@ -3152,8 +3141,8 @@ msgstr "Déconnecté: version incompatible."
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:502
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
 msgstr ""
-"Déconnecté: trop de connexions simultanées. Veuillez réessayer dans quelques "
-"instants."
+"Déconnecté: trop de connexions simultanées. Veuillez réessayer dans quelques"
+" instants."
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:505
 #, c-format
@@ -3165,8 +3154,7 @@ msgstr ""
 "Information: %s"
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:509
-#, c-format
-#, c-format,
+#, c-format, c-format, 
 msgid ""
 "Disconnected: Bad version.\n"
 "Information: %s"
@@ -3175,8 +3163,7 @@ msgstr ""
 "Information: %s"
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:513
-#, c-format
-#, c-format,
+#, c-format, c-format, 
 msgid ""
 "Disconnected: Server is running a newer build.\n"
 "Information: %s"
@@ -3185,8 +3172,7 @@ msgstr ""
 "Information: %s"
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:517
-#, c-format
-#, c-format,
+#, c-format, c-format, 
 msgid ""
 "Disconnected: Server is running an older build.\n"
 "Information: %s"
@@ -3203,8 +3189,7 @@ msgid "Disconnected: Player Element Could not be created."
 msgstr "Déconnecté: l'Element du joueur n'a pas pu être crée."
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:527
-#, c-format
-#, c-format,
+#, c-format, c-format, 
 msgid "Disconnected: Server refused the connection: %s"
 msgstr "Déconnecté: le serveur a refusé la connexion: %s"
 
@@ -3350,8 +3335,7 @@ msgid ""
 msgstr ""
 "Votre navigateur va s'ouvrir sur une page Web contenant de l'aide.\n"
 "\n"
-"(Si la page ne s'ouvre pas correctement, veuillez copier/collez l'adresse "
-"dans votre navigateur.)"
+"(Si la page ne s'ouvre pas correctement, veuillez copier/collez l'adresse dans votre navigateur.)"
 
 #~ msgid "Services currently unavailable"
 #~ msgstr "Services actuellement indisponibles"

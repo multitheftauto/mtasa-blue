@@ -14,10 +14,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
-"20)) ? 1 : 2);;\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);;\n"
+"Translators: QuantumZ; Cezar Ignat; Cheez; wally00\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: QuantumZ; Cezar \"cezarignat\" Ignat; Cheez; wally00\n"
 "X-POOTLE-MTIME: 1405867422.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
@@ -259,10 +258,7 @@ msgid "No"
 msgstr "Nu"
 
 #. /////////////////////////////////////////////////////////////////////////
-#.
 #. Dialog strings
-#.
-#.
 #. /////////////////////////////////////////////////////////////////////////
 #: C:\mtasa-blue\Client\core\CCore.cpp:715
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1091
@@ -632,8 +628,8 @@ msgstr "Control de grup înapoi"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:317
 msgid ""
-"You are using a feature-branch build! This is a test build only which cannot "
-"be used to connect to public servers!"
+"You are using a feature-branch build! This is a test build only which cannot"
+" be used to connect to public servers!"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
@@ -668,7 +664,8 @@ msgstr "Portul specificat este invalid!"
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:565
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:664
 msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Numele ales este invaild! Te rugăm mergi la Setări și setează unul nou!"
+msgstr ""
+"Numele ales este invaild! Te rugăm mergi la Setări și setează unul nou!"
 
 #: C:\mtasa-blue\Client\core\CScreenShot.cpp:53
 #, c-format
@@ -1512,9 +1509,11 @@ msgid "Chat text black/white outline"
 msgstr ""
 
 #. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2494
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2501
 msgid "Press a key to bind, or escape to clear"
@@ -1593,8 +1592,7 @@ msgid ""
 "\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr ""
-"Trimiterea capturilor de ecran este necesară pentru anumite servere din "
-"motive anti-cheat.\n"
+"Trimiterea capturilor de ecran este necesară pentru anumite servere din motive anti-cheat.\n"
 "\n"
 "(Fereastra de chat și GUI-ul sunt excluse din captură)\n"
 
@@ -1633,8 +1631,7 @@ msgid ""
 "This will be your name when you connect to and play in a server"
 msgstr ""
 "Introdu un nume care va fi folosit în joc.\n"
-"Acesta va fi numele tău în momentul în care te conectezi la și te joci pe un "
-"server."
+"Acesta va fi numele tău în momentul în care te conectezi la și te joci pe un server."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4352
 msgid "Very experimental feature."
@@ -1643,8 +1640,8 @@ msgstr "Funcționalitate foarte experimentală."
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4354
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr ""
-"Oprește blocările încărcărilor variațiilor de CJ (Folosește 65 MB de memorie "
-"RAM în plus)"
+"Oprește blocările încărcărilor variațiilor de CJ (Folosește 65 MB de memorie"
+" RAM în plus)"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4356
 msgid "Older routers may require a slower scan speed."
@@ -1677,7 +1674,8 @@ msgstr "Actualizator automat:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4368
 msgid "Select default unless you like filling out bug reports."
-msgstr "Selectează 'Implicit' dacă nu dorești să completezi rapoarte de erori."
+msgstr ""
+"Selectează 'Implicit' dacă nu dorești să completezi rapoarte de erori."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4370
 msgid "Select default to automatically install important updates."
@@ -1697,7 +1695,8 @@ msgstr "Fixare mouse:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4374
 msgid "Mouse movement fix - May need PC restart"
-msgstr "Fixează mişcarea mouseului - Poate necesita restartarea calculatorului"
+msgstr ""
+"Fixează mişcarea mouseului - Poate necesita restartarea calculatorului"
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:637
 msgid "Busy"
@@ -1721,8 +1720,7 @@ msgid ""
 "\n"
 "Do you want to download and install MTA:SA %s ?"
 msgstr ""
-"O versiune mai actuală de MTA:SA %s este necesară pentru a juca pe serverul "
-"selectat.\n"
+"O versiune mai actuală de MTA:SA %s este necesară pentru a juca pe serverul selectat.\n"
 "\n"
 "Ești sigur că vrei să descarci și să instalezi MTA:SA %s?"
 
@@ -2146,7 +2144,8 @@ msgid "Please enter the password to the server:"
 msgstr "Te rugăm introdu parola serverului:"
 
 #. Autojoin checkbox
-#. TRANSLATORS:  If you need more room, there is space for one extra line using a newline (\n).
+#. TRANSLATORS:  If you need more room, there is space for one extra line
+#. using a newline (\n).
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:182
 msgid "Join the server as soon as a player slot is available."
 msgstr "Intră în joc imediat ce un slot este disponibil."
@@ -2367,13 +2366,11 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:64
 msgid ""
-"The file is not required and may interfere with the graphical features in "
-"this version of MTA:SA.\n"
+"The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
-"Acest fișier nu este necesar și poate interfera cu caracteristicile grafice "
-"ale MTA:SA.\n"
+"Acest fișier nu este necesar și poate interfera cu caracteristicile grafice ale MTA:SA.\n"
 "\n"
 "Este recomandat să ștergi sau să redenumești d3d9.dll"
 
@@ -2625,8 +2622,7 @@ msgstr ""
 "AVERTISMENT\n"
 "\n"
 "MTA:SA a detectat activități neobișnuite.\n"
-"Te rugăm rulează o scanare de detectare a virușilor pentru a te asigura că "
-"sistemul tău este în siguranță.\n"
+"Te rugăm rulează o scanare de detectare a virușilor pentru a te asigura că sistemul tău este în siguranță.\n"
 "\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:446
@@ -2652,7 +2648,8 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:611
 msgid ""
-"Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+"Registry entries are missing. Please reinstall Multi Theft Auto: San "
+"Andreas."
 msgstr ""
 "Intrările din registru lipsesc. Te rugăm reinstalează Multi Theft Auto: San "
 "Andreas."
@@ -2676,8 +2673,8 @@ msgid ""
 "can find information to resolve this issue."
 msgstr ""
 "Se pare că aveți o versiune Steam a GTA: San Andreas care este momentan "
-"incompatibilă cu MTA: San Andreas. Veți fi redirecționat către o pagină unde "
-"veți putea găsi informații despre cum să rezolvați această problemă."
+"incompatibilă cu MTA: San Andreas. Veți fi redirecționat către o pagină unde"
+" veți putea găsi informații despre cum să rezolvați această problemă."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:632
 msgid ""
@@ -2691,8 +2688,7 @@ msgstr ""
 "conține un simbol ';' (punct și virgulă).\n"
 "\n"
 "Dacă întâmpinați probleme în timpul rulării MTA:SA,\n"
-"mutați-vă instalarea sau instalările într-un loc care nu conține acest "
-"simbol."
+"mutați-vă instalarea sau instalările într-un loc care nu conține acest simbol."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:773
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:780
@@ -2716,7 +2712,8 @@ msgstr "Încărcarea a eșuat. Nu s-a putut găsi 'gta_sa.exe' în %s."
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:804
 #, c-format
 msgid ""
-"Load failed. %s exists in the GTA directory. Please delete before continuing."
+"Load failed. %s exists in the GTA directory. Please delete before "
+"continuing."
 msgstr ""
 "Încărcarea a eșuat. %s se află în directorul GTA. Te rugăm șterge-l înainte "
 "de a continua."
@@ -2748,20 +2745,19 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:862
 msgid ""
-".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation "
-"directory.\n"
+".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
-"S-au găsit fișiere .asi în directorul de instalare al MTA: San Andreas sau "
-"al GTA: San Andreas.\n"
+"S-au găsit fișiere .asi în directorul de instalare al MTA: San Andreas sau al GTA: San Andreas.\n"
 "\n"
 "Șterge aceste fișiere .asi dacă întâmpini probleme cu MTA:SA."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:926
 msgid ""
 "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Eroare de nepotrivire a versiunilor fișierelor. Reinstalează MTA:SA dacă "
+msgstr ""
+"Eroare de nepotrivire a versiunilor fișierelor. Reinstalează MTA:SA dacă "
 "întâmpini probleme.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:935
@@ -2787,14 +2783,11 @@ msgstr ""
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1161
 #, c-format
 msgid ""
-"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
-"the problem persists,contact MTA at www.multitheftauto.com. \n"
+"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 msgstr ""
-"Nu s-a putut porni Grand Theft Auto: San Andreas. Te rugăm încearcă să-ți "
-"restartezi calculatorul sau dacă problema persistă, să contactezi MTA la "
-"www.multitheftauto.com.\n"
+"Nu s-a putut porni Grand Theft Auto: San Andreas. Te rugăm încearcă să-ți restartezi calculatorul sau dacă problema persistă, să contactezi MTA la www.multitheftauto.com.\n"
 "\n"
 "[%s]"
 
@@ -2846,7 +2839,8 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1940
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SA a întâmpinat probleme la adăugarea de îmbunătățiri unui vehicul."
+msgstr ""
+"GTA:SA a întâmpinat probleme la adăugarea de îmbunătățiri unui vehicul."
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1960
 #, c-format
@@ -3320,8 +3314,7 @@ msgid ""
 msgstr ""
 "Navigatorul tău va afișa acum o pagină web cu informații ajutătoare.\n"
 "\n"
-"(Dacă pagina eșuează să se încarce, lipește (CTRL+V) URL-ul în navigatorul "
-"tău)"
+"(Dacă pagina eșuează să se încarce, lipește (CTRL+V) URL-ul în navigatorul tău)"
 
 #~ msgid "Services currently unavailable"
 #~ msgstr "Servicii momentan indisponibile"

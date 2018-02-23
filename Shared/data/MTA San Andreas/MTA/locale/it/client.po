@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.5.0-rc1\n"
 "Translators: Ash; Robbster; LilDollaTechZone\n"
+"X-Generator: Pootle 2.5.0-rc1\n"
 "X-POOTLE-MTIME: 1405838755.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
@@ -258,10 +258,7 @@ msgid "No"
 msgstr "No"
 
 #. /////////////////////////////////////////////////////////////////////////
-#.
 #. Dialog strings
-#.
-#.
 #. /////////////////////////////////////////////////////////////////////////
 #: C:\mtasa-blue\Client\core\CCore.cpp:715
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1091
@@ -308,8 +305,8 @@ msgstr "Errore durante l'esecuzione dell'URL"
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr ""
-"Errore durante l'esecuzione della mod specificata nella linea di comando ('%"
-"s')"
+"Errore durante l'esecuzione della mod specificata nella linea di comando "
+"('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
@@ -633,8 +630,8 @@ msgstr "Controlli di gruppo (ritirarsi)"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:317
 msgid ""
-"You are using a feature-branch build! This is a test build only which cannot "
-"be used to connect to public servers!"
+"You are using a feature-branch build! This is a test build only which cannot"
+" be used to connect to public servers!"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
@@ -1513,9 +1510,11 @@ msgid "Chat text black/white outline"
 msgstr ""
 
 #. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2494
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2501
 msgid "Press a key to bind, or escape to clear"
@@ -1613,8 +1612,7 @@ msgid ""
 "Are you sure you want to use them?"
 msgstr ""
 "Alcuni file nella tua cartella di GTA:SA sono personalizzati.\n"
-"MTA utilizzerà questi file modificati solamente se questa casella sarà "
-"spuntata.\n"
+"MTA utilizzerà questi file modificati solamente se questa casella sarà spuntata.\n"
 "\n"
 "Tuttavia, I FILE PERSONALIZZATI DI GTA:SA SONO BLOCCATI IN MOLTI SERVER\n"
 "\n"
@@ -1727,8 +1725,7 @@ msgid ""
 "\n"
 "Do you want to download and install MTA:SA %s ?"
 msgstr ""
-"Una versione aggiornata di MTA:SA %s è richiesta per entrare nel server "
-"selezionato.\n"
+"Una versione aggiornata di MTA:SA %s è richiesta per entrare nel server selezionato.\n"
 "\n"
 "Vuoi scaricare ed installare MTA:SA %s?"
 
@@ -2152,7 +2149,8 @@ msgid "Please enter the password to the server:"
 msgstr "Per favore immetti la password per il server:"
 
 #. Autojoin checkbox
-#. TRANSLATORS:  If you need more room, there is space for one extra line using a newline (\n).
+#. TRANSLATORS:  If you need more room, there is space for one extra line
+#. using a newline (\n).
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:182
 msgid "Join the server as soon as a player slot is available."
 msgstr "Partecipa alla partita appena un posto diventa disponibile."
@@ -2312,8 +2310,8 @@ msgstr ""
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr ""
-"Multi Theft Auto non è stato installato correttamente, per favore installalo "
-"nuovamente. %s"
+"Multi Theft Auto non è stato installato correttamente, per favore installalo"
+" nuovamente. %s"
 
 #: C:\mtasa-blue\Client\loader\CInstallManager.cpp:740
 msgid "Missing file:"
@@ -2368,8 +2366,7 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:64
 msgid ""
-"The file is not required and may interfere with the graphical features in "
-"this version of MTA:SA.\n"
+"The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
@@ -2633,12 +2630,13 @@ msgid ""
 "Unable to terminate GTA: San Andreas. If the problem persists, please "
 "restart your computer."
 msgstr ""
-"Impossibile terminare GTA: San Andreas. Se il problema persiste riavviare il "
-"computer."
+"Impossibile terminare GTA: San Andreas. Se il problema persiste riavviare il"
+" computer."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:611
 msgid ""
-"Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+"Registry entries are missing. Please reinstall Multi Theft Auto: San "
+"Andreas."
 msgstr ""
 "Voci di registro mancanti. Per favore reinstalla Multi Theft Auto: San "
 "Andreas"
@@ -2662,8 +2660,8 @@ msgid ""
 "can find information to resolve this issue."
 msgstr ""
 "Sembra che tu abbia la versione Steam di GTA:SA, attualmente incompatibile "
-"con MTA:SA. Stai per essere reindirizzato ad una pagina dove puoi trovare le "
-"informazioni per risolvere questo problema."
+"con MTA:SA. Stai per essere reindirizzato ad una pagina dove puoi trovare le"
+" informazioni per risolvere questo problema."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:632
 msgid ""
@@ -2677,8 +2675,7 @@ msgstr ""
 "contiene un ';' (punto e virgola).\n"
 "\n"
 "Se riscontri problemi utilizzando MTA:SA,\n"
-"sposta l'installazione/installazioni in un percorso che non contiene il "
-"punto e virgola."
+"sposta l'installazione/installazioni in un percorso che non contiene il punto e virgola."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:773
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:780
@@ -2686,8 +2683,8 @@ msgid ""
 "Load failed. Please ensure that the latest data files have been installed "
 "correctly."
 msgstr ""
-"Caricamento fallito. Per favore assicurati che i file dati più recenti siano "
-"stati installati correttamente."
+"Caricamento fallito. Per favore assicurati che i file dati più recenti siano"
+" stati installati correttamente."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:787
 #, c-format
@@ -2704,7 +2701,8 @@ msgstr "Caricamento fallito. Impossibile trovare gta_sa.exe in %s."
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:804
 #, c-format
 msgid ""
-"Load failed. %s exists in the GTA directory. Please delete before continuing."
+"Load failed. %s exists in the GTA directory. Please delete before "
+"continuing."
 msgstr ""
 "Caricamento fallito: %s esiste nella directory di GTA. Per favore eliminalo "
 "prima di continuare."
@@ -2730,8 +2728,7 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:862
 msgid ""
-".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation "
-"directory.\n"
+".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
@@ -2764,14 +2761,11 @@ msgstr ""
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1161
 #, c-format
 msgid ""
-"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
-"the problem persists,contact MTA at www.multitheftauto.com. \n"
+"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 msgstr ""
-"Impossibile avviare Grand Theft Auto: San Andreas. Per favore prova a "
-"riavviarlo, oppure se il problema persiste, contatta MTA a "
-"www.multitheftauto.com. \n"
+"Impossibile avviare Grand Theft Auto: San Andreas. Per favore prova a riavviarlo, oppure se il problema persiste, contatta MTA a www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 
@@ -2960,8 +2954,8 @@ msgid ""
 "Not connected; please use Quick Connect or the 'connect' command to connect "
 "to a server."
 msgstr ""
-"Non connesso; per favore usa la connessione rapida o il comando 'connettiti' "
-"per connetterti ad un server."
+"Non connesso; per favore usa la connessione rapida o il comando 'connettiti'"
+" per connetterti ad un server."
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:686
 msgid "The server is not installed"
@@ -3266,8 +3260,8 @@ msgid ""
 "Protocol error (%u). If this problem persists, please check out mtasa.com "
 "for support."
 msgstr ""
-"Errore di protocollo (%u). Se il problema persiste controllare mtasa.com per "
-"supporto."
+"Errore di protocollo (%u). Se il problema persiste controllare mtasa.com per"
+" supporto."
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:169
 msgid "Connection error"
@@ -3290,8 +3284,7 @@ msgid ""
 "\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr ""
-"Il tuo browser ora visualizzerà una pagina web con alcune informazioni "
-"utili.\n"
+"Il tuo browser ora visualizzerà una pagina web con alcune informazioni utili.\n"
 "\n"
 "(Se questa pagina non carica copia (CTRL + V) l'URL nel tuo browser)"
 

@@ -15,10 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"Translators: Furkan Özden; Avenger; Darkneblade; Semih; Oguzcan Uyar; Colegon; Samurai; Mert; WindowsOttoman; RaceXtreme; Oguzcan; Cynydlan; Eren Yücel; TRFURKAN; velona77\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: Furkan \"furkanozden\" Özden; Avenger; Darkneblade; Semih; "
-"Oguzcan \"Cena\" Uyar; Colegon; Samurai; Mert; WindowsOttoman; "
-"RaceXtreme; Oguzcan; Cynydlan; Eren \"Eren07\" Yücel; TRFURKAN; velona77\n"
 "X-POOTLE-MTIME: 1406302144.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
@@ -261,10 +259,7 @@ msgid "No"
 msgstr "Hayır"
 
 #. /////////////////////////////////////////////////////////////////////////
-#.
 #. Dialog strings
-#.
-#.
 #. /////////////////////////////////////////////////////////////////////////
 #: C:\mtasa-blue\Client\core\CCore.cpp:715
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1091
@@ -634,8 +629,8 @@ msgstr "Grup kontrol geri"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:317
 msgid ""
-"You are using a feature-branch build! This is a test build only which cannot "
-"be used to connect to public servers!"
+"You are using a feature-branch build! This is a test build only which cannot"
+" be used to connect to public servers!"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
@@ -1513,9 +1508,11 @@ msgid "Chat text black/white outline"
 msgstr ""
 
 #. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2494
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2501
 msgid "Press a key to bind, or escape to clear"
@@ -1615,8 +1612,7 @@ msgstr ""
 "GTA:SA veri adresinizdeki bazı dosyalar özelleştirilmiştir.\n"
 "MTA bu dosyaları sadece kontrol kutusu işaretlenmişse kullanır\n"
 "\n"
-"Ancak, ÖZELLEŞTİRİLMİŞ GTA:SA DOSYALARI ÇOĞU SUNUCU TARAFINDAN "
-"ENGELLENMİŞTİR.\n"
+"Ancak, ÖZELLEŞTİRİLMİŞ GTA:SA DOSYALARI ÇOĞU SUNUCU TARAFINDAN ENGELLENMİŞTİR.\n"
 "Bu dosyaları kullanmak istediğinizden emin misiniz?"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4208
@@ -1695,7 +1691,8 @@ msgstr "Fareyi düzelt:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4374
 msgid "Mouse movement fix - May need PC restart"
-msgstr "Fare hareketini düzelt - Bilgisayarı yeniden başlatmayı gerektirebilir"
+msgstr ""
+"Fare hareketini düzelt - Bilgisayarı yeniden başlatmayı gerektirebilir"
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:637
 msgid "Busy"
@@ -1880,8 +1877,7 @@ msgstr ""
 "Cevap bekleniyor %-3d"
 
 #: C:\mtasa-blue\Client\core\DXHook\CDirect3DEvents9.cpp:233
-#, c-format
-#, c-format, fuzzy
+#, c-format, c-format, fuzzy
 msgid "Screenshot got %d bytes, but expected %d"
 msgstr "Ekran görüntüsü  %d boyutunda %d"
 
@@ -2144,7 +2140,8 @@ msgid "Please enter the password to the server:"
 msgstr "Sunucu şifresini girin:"
 
 #. Autojoin checkbox
-#. TRANSLATORS:  If you need more room, there is space for one extra line using a newline (\n).
+#. TRANSLATORS:  If you need more room, there is space for one extra line
+#. using a newline (\n).
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:182
 msgid "Join the server as soon as a player slot is available."
 msgstr "Yer açılınca en kısa sürede sunucuya bağlanabileceksiniz."
@@ -2335,8 +2332,8 @@ msgstr "Çökme bilgisi"
 msgid ""
 "Tick the check box to send this crash info to MTA devs using the 'internet'"
 msgstr ""
-"Çökme bilgisini 'internet' aracılığı ile MTA geliştiricilerine göndemek için "
-"kutucuğu işaretleyin"
+"Çökme bilgisini 'internet' aracılığı ile MTA geliştiricilerine göndemek için"
+" kutucuğu işaretleyin"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:54
 msgid "Doing so will increase the chance of this crash being fixed."
@@ -2360,13 +2357,11 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:64
 msgid ""
-"The file is not required and may interfere with the graphical features in "
-"this version of MTA:SA.\n"
+"The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
-"Bu dosya lazım değil ve MTA:SA ' ın bu sürümünde grafik özellikleri ile "
-"çakışabilir.\n"
+"Bu dosya lazım değil ve MTA:SA ' ın bu sürümünde grafik özellikleri ile çakışabilir.\n"
 "\n"
 "d3d9.dll dosyasını silmeniz veya yeniden adlandırmanız önerilmektedir"
 
@@ -2647,10 +2642,11 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:611
 msgid ""
-"Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+"Registry entries are missing. Please reinstall Multi Theft Auto: San "
+"Andreas."
 msgstr ""
-"Kayıt defteri girdileri eksik. Lütfen Multi Theft Auto: San Andreas'ı tekrar "
-"yükleyiniz."
+"Kayıt defteri girdileri eksik. Lütfen Multi Theft Auto: San Andreas'ı tekrar"
+" yükleyiniz."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:615
 msgid ""
@@ -2660,8 +2656,8 @@ msgid ""
 "characters and reinstall Multi Theft Auto: San Andreas."
 msgstr ""
 "GTA: San Andreas yüklemenizin yolu desteklenmeyen (unicode) karakterler "
-"içeriyor. Lütfen Grand Theft Auto: San Andreas yüklemenizi sadece uyumlu bir "
-"yola, yani sadece standart ASCII karakterleri içeren bir yere taşıyın ve "
+"içeriyor. Lütfen Grand Theft Auto: San Andreas yüklemenizi sadece uyumlu bir"
+" yola, yani sadece standart ASCII karakterleri içeren bir yere taşıyın ve "
 "Multi Theft Auto: San Andreas'ı tekrar yükleyin. "
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:619
@@ -2710,7 +2706,8 @@ msgstr "Yükleme başarısız. gta_sa.exe %s de bulunamadı"
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:804
 #, c-format
 msgid ""
-"Load failed. %s exists in the GTA directory. Please delete before continuing."
+"Load failed. %s exists in the GTA directory. Please delete before "
+"continuing."
 msgstr ""
 "Yükleme başarısız. %s GTA rehberinde bulunmaktadır. Lütfen devam etmeden "
 "önce bunu siliniz."
@@ -2742,25 +2739,25 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:862
 msgid ""
-".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation "
-"directory.\n"
+".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
 ".asi dosyaları 'MTA:SA' veya 'GTA: San Andreas' yüklü olduğu dizinde.\n"
 "\n"
-"Eğer MTA:SA ile alakalı bir problemle karşılaşırsanız bu .asi dosyalarını "
-"silin."
+"Eğer MTA:SA ile alakalı bir problemle karşılaşırsanız bu .asi dosyalarını silin."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:926
 msgid ""
 "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Dosya sürümü uyumsuzluk hatası. Bir problemle karşılaşırsanız MTA:SA tekrar "
+msgstr ""
+"Dosya sürümü uyumsuzluk hatası. Bir problemle karşılaşırsanız MTA:SA tekrar "
 "kurun.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:935
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Bazı dosyaları eksik. Bir problemle karşılaşırsanız MTA:SA ' yı tekrar "
+msgstr ""
+"Bazı dosyaları eksik. Bir problemle karşılaşırsanız MTA:SA ' yı tekrar "
 "kurun.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:947
@@ -2782,14 +2779,11 @@ msgstr ""
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1161
 #, c-format
 msgid ""
-"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
-"the problem persists,contact MTA at www.multitheftauto.com. \n"
+"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 msgstr ""
-"Grand Theft Auto: San Andreas başlatılamadı. Lütfen tekrar deneyiniz, yada "
-"sorun devam ederse, lütfen www.multitheftauto.com adresinden MTA ile "
-"iletişime geçiniz. \n"
+"Grand Theft Auto: San Andreas başlatılamadı. Lütfen tekrar deneyiniz, yada sorun devam ederse, lütfen www.multitheftauto.com adresinden MTA ile iletişime geçiniz. \n"
 "\n"
 "[%s]"
 

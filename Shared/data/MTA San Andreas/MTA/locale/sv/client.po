@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Translators: Cheeze; Vovven; SWEMike; Magnus Burton\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: Cheeze; Vovven; SWEMike; Magnus \"magnsuburton\" Burton\n"
 "X-POOTLE-MTIME: 1499196512.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
@@ -258,10 +258,7 @@ msgid "No"
 msgstr "Nej"
 
 #. /////////////////////////////////////////////////////////////////////////
-#.
 #. Dialog strings
-#.
-#.
 #. /////////////////////////////////////////////////////////////////////////
 #: C:\mtasa-blue\Client\core\CCore.cpp:715
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1091
@@ -631,8 +628,8 @@ msgstr "Grupp kontroll bakåt"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:317
 msgid ""
-"You are using a feature-branch build! This is a test build only which cannot "
-"be used to connect to public servers!"
+"You are using a feature-branch build! This is a test build only which cannot"
+" be used to connect to public servers!"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
@@ -1511,9 +1508,11 @@ msgid "Chat text black/white outline"
 msgstr ""
 
 #. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2494
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2501
 msgid "Press a key to bind, or escape to clear"
@@ -1611,8 +1610,7 @@ msgid ""
 "Are you sure you want to use them?"
 msgstr ""
 "Vissa filer i din GTA:SA datakatalog är anpassade.\n"
-"MTA kommer endast att använda dessa modifierade filer ifall den här "
-"checkboxen är ikryssad.\n"
+"MTA kommer endast att använda dessa modifierade filer ifall den här checkboxen är ikryssad.\n"
 "\n"
 "Emellertid, ANPASSADE GTA:SA FILER ÄR BLOCKERADE AV MÅNGA SERVRAR\n"
 "\n"
@@ -2142,7 +2140,8 @@ msgid "Please enter the password to the server:"
 msgstr "Vänligen skriv serverlösenordet:"
 
 #. Autojoin checkbox
-#. TRANSLATORS:  If you need more room, there is space for one extra line using a newline (\n).
+#. TRANSLATORS:  If you need more room, there is space for one extra line
+#. using a newline (\n).
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:182
 msgid "Join the server as soon as a player slot is available."
 msgstr "Anslut till servern så fort det finns en ledig spelarplats."
@@ -2357,8 +2356,7 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:64
 msgid ""
-"The file is not required and may interfere with the graphical features in "
-"this version of MTA:SA.\n"
+"The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
@@ -2627,7 +2625,8 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:611
 msgid ""
-"Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+"Registry entries are missing. Please reinstall Multi Theft Auto: San "
+"Andreas."
 msgstr ""
 "Registerposter saknas. Var god installera om Multi Theft Auto: San Andreas."
 
@@ -2665,8 +2664,7 @@ msgstr ""
 "innehåller ett ';' (semikolon).\n"
 "\n"
 " Om du får problem när du kör MTA:SA,\n"
-" flytta din(a) installation(er) till en sökväg som ej innehåller ett "
-"semikolon."
+" flytta din(a) installation(er) till en sökväg som ej innehåller ett semikolon."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:773
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:780
@@ -2680,7 +2678,8 @@ msgstr ""
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:787
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
-msgstr "Initiering misslyckades. Försäkra dig om att %s är installerat korrekt."
+msgstr ""
+"Initiering misslyckades. Försäkra dig om att %s är installerat korrekt."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:794
 #, c-format
@@ -2690,7 +2689,8 @@ msgstr "Initiering misslyckades. gta_sa.exe kunde inte hittas i %s."
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:804
 #, c-format
 msgid ""
-"Load failed. %s exists in the GTA directory. Please delete before continuing."
+"Load failed. %s exists in the GTA directory. Please delete before "
+"continuing."
 msgstr ""
 "Initiering misslyckades. %s finns i GTA sökvägen. Ta bort innan du "
 "fortsätter."
@@ -2716,8 +2716,7 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:862
 msgid ""
-".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation "
-"directory.\n"
+".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
@@ -2750,13 +2749,11 @@ msgstr ""
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1161
 #, c-format
 msgid ""
-"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
-"the problem persists,contact MTA at www.multitheftauto.com. \n"
+"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 msgstr ""
-"Kunde inte starta Grand Theft Auto: San Andreas.  Prova att starta om, eller "
-"om problemet kvarstår, kontakta MTA på www.multitheftauto.com. \n"
+"Kunde inte starta Grand Theft Auto: San Andreas.  Prova att starta om, eller om problemet kvarstår, kontakta MTA på www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 
@@ -2764,7 +2761,8 @@ msgstr ""
 msgid ""
 "GTA: San Andreas may not have launched correctly. Do you want to terminate "
 "it?"
-msgstr "GTA: San Andreas har kanske inte startats korrekt. Vill du avsluta det?"
+msgstr ""
+"GTA: San Andreas har kanske inte startats korrekt. Vill du avsluta det?"
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:874
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
@@ -2974,7 +2972,8 @@ msgstr "Fel vid anslutning till servern."
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1111
 msgid "Connecting to local server timed out. See console for details."
-msgstr "Anslutning till lokal server avbröts. Kolla konsolen för mer detaljer."
+msgstr ""
+"Anslutning till lokal server avbröts. Kolla konsolen för mer detaljer."
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1214
 msgid "Connection with the server was lost"
@@ -3259,7 +3258,8 @@ msgstr ""
 
 #: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:89
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
-msgstr "Multi Theft Auto har inte installerats korrekt, var god installera om."
+msgstr ""
+"Multi Theft Auto har inte installerats korrekt, var god installera om."
 
 #: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:653
 msgid ""

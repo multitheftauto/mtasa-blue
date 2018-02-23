@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.5.0-rc1\n"
 "Translators: SirTerning; Plugin; LilDollaTechZone; Geryha\n"
+"X-Generator: Pootle 2.5.0-rc1\n"
 "X-POOTLE-MTIME: 1479134207.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
@@ -258,10 +258,7 @@ msgid "No"
 msgstr "Nei"
 
 #. /////////////////////////////////////////////////////////////////////////
-#.
 #. Dialog strings
-#.
-#.
 #. /////////////////////////////////////////////////////////////////////////
 #: C:\mtasa-blue\Client\core\CCore.cpp:715
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1091
@@ -307,7 +304,8 @@ msgstr "Feil ved utføring av URL"
 #: C:\mtasa-blue\Client\core\CCore.cpp:1299
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
-msgstr "Feil ved kjøring av modifikasjonen spesifisert i kommandolinjen ('%s')"
+msgstr ""
+"Feil ved kjøring av modifikasjonen spesifisert i kommandolinjen ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
@@ -426,7 +424,8 @@ msgstr "Særlig Takk til"
 
 #: C:\mtasa-blue\Client\core\CCredits.cpp:177
 msgid "This software makes use of the following libraries and software:"
-msgstr "Denne programvaren benytter seg av følgende biblioteker og programmer:"
+msgstr ""
+"Denne programvaren benytter seg av følgende biblioteker og programmer:"
 
 #. Even the default skin doesn't work, so give up
 #: C:\mtasa-blue\Client\core\CGUI.cpp:85
@@ -631,8 +630,8 @@ msgstr "Gruppe kontroll bakover"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:317
 msgid ""
-"You are using a feature-branch build! This is a test build only which cannot "
-"be used to connect to public servers!"
+"You are using a feature-branch build! This is a test build only which cannot"
+" be used to connect to public servers!"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
@@ -911,7 +910,8 @@ msgstr "Demp Stemmer ved minimering"
 msgid "Radio Equalizer"
 msgstr "Radio tonekontroll"
 
-# Got no logical Norwegian translation for this so letting it stay English for the time being.
+# Got no logical Norwegian translation for this so letting it stay English for
+# the time being.
 #: C:\mtasa-blue\Client\core\CSettings.cpp:543
 msgid "Radio Auto-tune"
 msgstr "Radio Auto-tune"
@@ -1110,7 +1110,8 @@ msgstr ""
 msgid "Full Screen Minimize"
 msgstr "Minimer Fullskjerm"
 
-# Don't know if this is 100% but will let it be like that until I have tested it with the game
+# Don't know if this is 100% but will let it be like that until I have tested
+# it with the game
 #: C:\mtasa-blue\Client\core\CSettings.cpp:805
 msgid "Enable Device Selection Dialog"
 msgstr "Aktiver Enhet Dialog Utvalg"
@@ -1160,8 +1161,9 @@ msgstr "Tilpasset hviteliste"
 msgid "Misc"
 msgstr "Div"
 
-# Don't know if this is 100% but will let it be like this until I have tested it with the game
 #. Fast clothes loading
+# Don't know if this is 100% but will let it be like this until I have tested
+# it with the game
 #: C:\mtasa-blue\Client\core\CSettings.cpp:933
 #: C:\mtasa-blue\Client\core\CSettings.cpp:949
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4354
@@ -1512,9 +1514,11 @@ msgid "Chat text black/white outline"
 msgstr ""
 
 #. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2494
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2501
 msgid "Press a key to bind, or escape to clear"
@@ -1718,8 +1722,7 @@ msgid ""
 "\n"
 "Do you want to download and install MTA:SA %s ?"
 msgstr ""
-"En oppdatert versjon av MTA:SA %s er påkrevd for å delta i den valgte "
-"serveren.\n"
+"En oppdatert versjon av MTA:SA %s er påkrevd for å delta i den valgte serveren.\n"
 "\n"
 "Ønsker du å laste ned og installere MTA:SA %s ?"
 
@@ -2143,7 +2146,8 @@ msgid "Please enter the password to the server:"
 msgstr "Vennligst skriv inn passordet til serveren:"
 
 #. Autojoin checkbox
-#. TRANSLATORS:  If you need more room, there is space for one extra line using a newline (\n).
+#. TRANSLATORS:  If you need more room, there is space for one extra line
+#. using a newline (\n).
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:182
 msgid "Join the server as soon as a player slot is available."
 msgstr "Bli med i serveren så fort det er en plass ledig."
@@ -2184,8 +2188,7 @@ msgstr[1] "servere"
 
 #. We are polling for the master server list (first pass)
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:249
-#, c-format
-#, c-format, c-format
+#, c-format, c-format, c-format
 msgid "Requesting master server list (%lu ms elapsed)"
 msgstr "Ber om master server listen (%lu ms gått)"
 
@@ -2203,7 +2206,8 @@ msgstr "Server listen kunne ikke hentes."
 msgid "(Backup server list)"
 msgstr "(Sikkerhetskopier server listen)"
 
-# Got no logical Norwegian translation for this so letting it stay English for the time being.
+# Got no logical Norwegian translation for this so letting it stay English for
+# the time being.
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:330
 msgid "Cannot bind LAN-broadcast socket"
 msgstr "Cannot bind LAN-broadcast socket"
@@ -2230,7 +2234,8 @@ msgstr "MTA: San Andreas"
 msgid "Update Aero setting"
 msgstr "Oppdater Aero innstillinger"
 
-# Got no logical Norwegian translation for this so will let it be English for the time being
+# Got no logical Norwegian translation for this so will let it be English for
+# the time being
 #: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:160
 msgid "Update Large Memory setting"
 msgstr "Update Large Memory setting"
@@ -2305,8 +2310,8 @@ msgstr ""
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr ""
-"Multi Theft Auto har ikke blitt installert korrekt, vennligst reinstaller. %"
-"s"
+"Multi Theft Auto har ikke blitt installert korrekt, vennligst reinstaller. "
+"%s"
 
 #: C:\mtasa-blue\Client\loader\CInstallManager.cpp:740
 msgid "Missing file:"
@@ -2365,13 +2370,11 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:64
 msgid ""
-"The file is not required and may interfere with the graphical features in "
-"this version of MTA:SA.\n"
+"The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
-"Den filen er ikke påkrevd og kan påvirke grafiske funksjoner i denne "
-"versjonen av MTA:SA.\n"
+"Den filen er ikke påkrevd og kan påvirke grafiske funksjoner i denne versjonen av MTA:SA.\n"
 "\n"
 "Det anbefales at du fjerner eller endrer navn på d3d9.dll filen"
 
@@ -2657,7 +2660,8 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:611
 msgid ""
-"Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+"Registry entries are missing. Please reinstall Multi Theft Auto: San "
+"Andreas."
 msgstr ""
 "Register oppføringer mangler. Vennligst reinstaller Multi Theft Auto San "
 "Andreas."
@@ -2669,8 +2673,8 @@ msgid ""
 "installation to a compatible path that contains only standard ASCII "
 "characters and reinstall Multi Theft Auto: San Andreas."
 msgstr ""
-"Banen til din GTA: San Andreas installasjon inneholder tegn som ikke støttes "
-"(unicode). Vennligst flytt din Grand Theft Auto: San Andreas installasjon "
+"Banen til din GTA: San Andreas installasjon inneholder tegn som ikke støttes"
+" (unicode). Vennligst flytt din Grand Theft Auto: San Andreas installasjon "
 "til en kompatibel bane som bare inneholder ASCII tegn og reinstaller Mutli "
 "Theft Auto: San Andreas."
 
@@ -2721,7 +2725,8 @@ msgstr "Feil ved lasting. Kunne ikke finne gta_sa.exe i %s."
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:804
 #, c-format
 msgid ""
-"Load failed. %s exists in the GTA directory. Please delete before continuing."
+"Load failed. %s exists in the GTA directory. Please delete before "
+"continuing."
 msgstr ""
 "Feil ved lasting. %s eksisterer i GTA mappen. Vennligst slett den før du "
 "fortsetter."
@@ -2753,8 +2758,7 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:862
 msgid ""
-".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation "
-"directory.\n"
+".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
@@ -2765,7 +2769,8 @@ msgstr ""
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:926
 msgid ""
 "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Fil versjon matcher ikke. Reinstaller MTA:SA om du opplever problemer.\n"
+msgstr ""
+"Fil versjon matcher ikke. Reinstaller MTA:SA om du opplever problemer.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:935
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
@@ -2793,14 +2798,11 @@ msgstr ""
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1161
 #, c-format
 msgid ""
-"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
-"the problem persists,contact MTA at www.multitheftauto.com. \n"
+"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 msgstr ""
-"Kunne ikke starte Grand Theft Auto: San Andreas.  Vennligst prøv å starte på "
-"nytt, eller om problemet fortsetter, kontakt MTA på www.multitheftauto.com. "
-"\n"
+"Kunne ikke starte Grand Theft Auto: San Andreas.  Vennligst prøv å starte på nytt, eller om problemet fortsetter, kontakt MTA på www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 
@@ -2887,8 +2889,9 @@ msgstr "viser chat boksen"
 msgid "shows the network statistics"
 msgstr "viser nettverks statistikken"
 
-# Don't know if it is 100% but will let it stay like this until I have tested it in-game
 #. Key commands (registered as 'mod commands', can be disabled)
+# Don't know if it is 100% but will let it stay like this until I have tested
+# it in-game
 #: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:69
 msgid "open the chat input"
 msgstr "åpne chat inngangen"
@@ -2979,7 +2982,8 @@ msgstr "definerer skala multiplikatoren for alle tekst flater"
 msgid "(Development mode) shows the colshapes"
 msgstr "(Utvikler modus) viser colshapes"
 
-# Don't know if 100% but will let it stay like that until I have tested it in-game
+# Don't know if 100% but will let it stay like that until I have tested it in-
+# game
 #: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:99
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(Utvikler modus) skriver verdens lyd IDene inn i debug vinduet"
@@ -3309,7 +3313,8 @@ msgstr ""
 
 #: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:89
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
-msgstr "Multi Theft Auto har ikke blitt installert rett, vennligst reinstaller."
+msgstr ""
+"Multi Theft Auto har ikke blitt installert rett, vennligst reinstaller."
 
 #: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:653
 msgid ""

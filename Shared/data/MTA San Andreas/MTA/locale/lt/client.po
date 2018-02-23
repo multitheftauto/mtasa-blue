@@ -14,12 +14,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%"
-"100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Translators: Kristupas Skabeikis; Rytis Jankauskas; Gabrielius  Laurinavičius; Tadas Lapė; Karolis Vaikutis; Dzinas\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: Kristupas \"Buffalo\" Skabeikis; Rytis \"-TmS\" Jankauskas; "
-"Gabrielius  \"Drakath\" Laurinavičius; Tadas \"Grafu\" Lapė; Karolis "
-"\"Blantas\" Vaikutis; Dzinas\n"
 "X-POOTLE-MTIME: 1437321120.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
@@ -263,10 +260,7 @@ msgid "No"
 msgstr "Ne"
 
 #. /////////////////////////////////////////////////////////////////////////
-#.
 #. Dialog strings
-#.
-#.
 #. /////////////////////////////////////////////////////////////////////////
 #: C:\mtasa-blue\Client\core\CCore.cpp:715
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1091
@@ -637,8 +631,8 @@ msgstr "Gaujos nurodymas atsitraukti"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:317
 msgid ""
-"You are using a feature-branch build! This is a test build only which cannot "
-"be used to connect to public servers!"
+"You are using a feature-branch build! This is a test build only which cannot"
+" be used to connect to public servers!"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
@@ -1516,9 +1510,11 @@ msgid "Chat text black/white outline"
 msgstr ""
 
 #. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2494
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2501
 msgid "Press a key to bind, or escape to clear"
@@ -1598,8 +1594,7 @@ msgid ""
 "\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr ""
-"Ekrano siuntimas yra reikalaujamas kai kuriuose serveriuose dėl sukčiavimo "
-"susekimo.\n"
+"Ekrano siuntimas yra reikalaujamas kai kuriuose serveriuose dėl sukčiavimo susekimo.\n"
 "\n"
 "(Kalbėjimo langas ir GUI yra neįtraukiamas į nuotrauką)\n"
 
@@ -1650,7 +1645,8 @@ msgstr "Sustabdo strigimus su CJ variacijomis (Naudoja 65MB daugiau RAM)"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4356
 msgid "Older routers may require a slower scan speed."
-msgstr "Senesni maršrutizatoriai gali reikalauti lėtesnio greičio atnaujinant."
+msgstr ""
+"Senesni maršrutizatoriai gali reikalauti lėtesnio greičio atnaujinant."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4358
 msgid "Switch on to use only one connection when downloading."
@@ -1699,7 +1695,8 @@ msgstr "Pelės pataisymas:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4374
 msgid "Mouse movement fix - May need PC restart"
-msgstr "Pelės valdymo pataisymas - Gali prireikti paleisti kompiuterį iš naujo"
+msgstr ""
+"Pelės valdymo pataisymas - Gali prireikti paleisti kompiuterį iš naujo"
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:637
 msgid "Busy"
@@ -1723,8 +1720,7 @@ msgid ""
 "\n"
 "Do you want to download and install MTA:SA %s ?"
 msgstr ""
-"Patobulintos MTA:SA %s versijos atnaujinimas yra būtinas norint prisijungti "
-"į šį serverį.\n"
+"Patobulintos MTA:SA %s versijos atnaujinimas yra būtinas norint prisijungti į šį serverį.\n"
 "\n"
 "Ar norite atsisiųsti ir įdiegti MTA:SA %s ?"
 
@@ -2148,7 +2144,8 @@ msgid "Please enter the password to the server:"
 msgstr "Pateikite serverio slaptažodį:"
 
 #. Autojoin checkbox
-#. TRANSLATORS:  If you need more room, there is space for one extra line using a newline (\n).
+#. TRANSLATORS:  If you need more room, there is space for one extra line
+#. using a newline (\n).
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:182
 msgid "Join the server as soon as a player slot is available."
 msgstr "Prisijungti į serverį, kai tiktai atsiras vietos."
@@ -2310,7 +2307,8 @@ msgstr ""
 #: C:\mtasa-blue\Client\loader\CInstallManager.cpp:541
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Multi Theft Auto nebuvo tinkamai įrašytas, prašome įdiegti iš naujo. %s"
+msgstr ""
+"Multi Theft Auto nebuvo tinkamai įrašytas, prašome įdiegti iš naujo. %s"
 
 #: C:\mtasa-blue\Client\loader\CInstallManager.cpp:740
 msgid "Missing file:"
@@ -2369,13 +2367,11 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:64
 msgid ""
-"The file is not required and may interfere with the graphical features in "
-"this version of MTA:SA.\n"
+"The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
-"Šis failas yra nebūtinas ir gali sukelti nesklandumų su naujomis grafikos "
-"galimybėmis šioje MTA:SA versijoje.\n"
+"Šis failas yra nebūtinas ir gali sukelti nesklandumų su naujomis grafikos galimybėmis šioje MTA:SA versijoje.\n"
 "\n"
 "Rekomenduojama pašalinti arba pervadinti failą d3d9.dll"
 
@@ -2573,8 +2569,7 @@ msgid ""
 "Do you want to reset GTA settings now?"
 msgstr ""
 "Atrtodo, jog yra problemų paleidžiant MTA:SA.\n"
-"Sugražinant numatytuosius GTA nustatymus kartais padeda sutvarkyti šią "
-"problemą.\n"
+"Sugražinant numatytuosius GTA nustatymus kartais padeda sutvarkyti šią problemą.\n"
 "\n"
 "Ar norite sugražinti GTA nustatymus dabar?"
 
@@ -2630,8 +2625,7 @@ msgstr ""
 "ĮSPĖJIMAS\n"
 "\n"
 "MTA:SA aptiko neįprastą veiklą.\n"
-"Prašome paleisti virusų skenavimo programą, kad įsitikintumėte sistemos "
-"saugumu.\n"
+"Prašome paleisti virusų skenavimo programą, kad įsitikintumėte sistemos saugumu.\n"
 "\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:446
@@ -2657,7 +2651,8 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:611
 msgid ""
-"Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+"Registry entries are missing. Please reinstall Multi Theft Auto: San "
+"Andreas."
 msgstr ""
 "Trūksta reikalingų įvesčių registre. Prašome įdiegti Multi Theft Auto: San "
 "Andreas iš naujo."
@@ -2720,7 +2715,8 @@ msgstr "Įkėlimas nepavyko. Nerastas gta_sa.exe nurodytoje vietoje %s."
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:804
 #, c-format
 msgid ""
-"Load failed. %s exists in the GTA directory. Please delete before continuing."
+"Load failed. %s exists in the GTA directory. Please delete before "
+"continuing."
 msgstr ""
 "Įkėlimas nepavyko. %s egzistuoja GTA direktorijoje. Prašome ištrinti prieš "
 "tęsiant."
@@ -2752,8 +2748,7 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:862
 msgid ""
-".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation "
-"directory.\n"
+".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
@@ -2764,12 +2759,14 @@ msgstr ""
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:926
 msgid ""
 "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Neteisingos failo versijos klaida. Perrašykite MTA:SA, jei patirsite "
+msgstr ""
+"Neteisingos failo versijos klaida. Perrašykite MTA:SA, jei patirsite "
 "nesklandumų.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:935
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Trūksta kai kurių failų. Perrašykite MTA:SA, jei patirsite nesklandumų.\n"
+msgstr ""
+"Trūksta kai kurių failų. Perrašykite MTA:SA, jei patirsite nesklandumų.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:947
 msgid ""
@@ -2790,14 +2787,11 @@ msgstr ""
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1161
 #, c-format
 msgid ""
-"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
-"the problem persists,contact MTA at www.multitheftauto.com. \n"
+"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 msgstr ""
-"Nepavyko paleisti Grand Theft Auto: San Andreas. Prašome paleisti iš naujo, "
-"arba, jei problema kartosis, susisiekti su MTA svetainėje "
-"www.multitheftauto.com. \n"
+"Nepavyko paleisti Grand Theft Auto: San Andreas. Prašome paleisti iš naujo, arba, jei problema kartosis, susisiekti su MTA svetainėje www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 

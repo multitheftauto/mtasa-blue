@@ -15,9 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Translators: Bence Szlobodics; György Péter; NitroByte; pa3ck; Lámbó; csiguusz; Bishop_Waltemer; NeXuS; Hamza\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: Bence \"Max_Taylor\" Szlobodics; György \"Rozsdi\" Péter; "
-"NitroByte; pa3ck; Lámbó; csiguusz; Bishop_Waltemer; NeXuS; Hamza\n"
 "X-POOTLE-MTIME: 1510513818.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
@@ -263,10 +262,7 @@ msgid "No"
 msgstr "Nem"
 
 #. /////////////////////////////////////////////////////////////////////////
-#.
 #. Dialog strings
-#.
-#.
 #. /////////////////////////////////////////////////////////////////////////
 #: C:\mtasa-blue\Client\core\CCore.cpp:715
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1091
@@ -636,8 +632,8 @@ msgstr "Csoportos irányítás hátra"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:317
 msgid ""
-"You are using a feature-branch build! This is a test build only which cannot "
-"be used to connect to public servers!"
+"You are using a feature-branch build! This is a test build only which cannot"
+" be used to connect to public servers!"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
@@ -1518,9 +1514,11 @@ msgid "Chat text black/white outline"
 msgstr ""
 
 #. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2494
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2501
 msgid "Press a key to bind, or escape to clear"
@@ -1620,8 +1618,7 @@ msgstr ""
 "Néhány fájl a GTA:SA mappádban átlett alakítva.\n"
 "Az MTA csak akkor fogja ezeket használni, ha engedélyt adsz rá.\n"
 "\n"
-"Mindenesetre, az átalakított GTA:SA fájlok tiltva vannak rengeteg szerver "
-"által\n"
+"Mindenesetre, az átalakított GTA:SA fájlok tiltva vannak rengeteg szerver által\n"
 "\n"
 "Biztos vagy benne hogy használatba veszed őket?"
 
@@ -1671,7 +1668,8 @@ msgstr "Forgó kör animáció a képernyő alján"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4364
 msgid "Select default always. (This setting is not saved)"
-msgstr "Alapértelmezett választása mindig. (Ez a beállítás nem kerül mentésre)"
+msgstr ""
+"Alapértelmezett választása mindig. (Ez a beállítás nem kerül mentésre)"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4366
 msgid "Maximum is usually best"
@@ -1731,8 +1729,7 @@ msgid ""
 "\n"
 "Do you want to download and install MTA:SA %s ?"
 msgstr ""
-"Egy frissebb MTA:SA verzió %s szükséges hogy játszhass a kiválasztott "
-"szerveren.\n"
+"Egy frissebb MTA:SA verzió %s szükséges hogy játszhass a kiválasztott szerveren.\n"
 "\n"
 "Akarod hogy az MTA:SA letöltse és telepítse a frissítést %s ?"
 
@@ -1946,8 +1943,7 @@ msgstr ""
 "GYORS CSATLAKOZÁS:\n"
 "\n"
 "Írd be a címsávba a szerver elérését.\n"
-"Vagy a legutóbbi szerverek közül válassz egyet és nyomd meg a 'Csatlakozás' "
-"gombot."
+"Vagy a legutóbbi szerverek közül válassz egyet és nyomd meg a 'Csatlakozás' gombot."
 
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:210
 msgid "HELP"
@@ -2157,7 +2153,8 @@ msgid "Please enter the password to the server:"
 msgstr "Adja meg a szerver jelszavát:"
 
 #. Autojoin checkbox
-#. TRANSLATORS:  If you need more room, there is space for one extra line using a newline (\n).
+#. TRANSLATORS:  If you need more room, there is space for one extra line
+#. using a newline (\n).
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:182
 msgid "Join the server as soon as a player slot is available."
 msgstr "Csatlakozás amint egy férőhely szabaddá válik."
@@ -2375,13 +2372,11 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:64
 msgid ""
-"The file is not required and may interfere with the graphical features in "
-"this version of MTA:SA.\n"
+"The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
-"A fájl nem szükséges, és zavarhatja a grafikai funkciókat a jelenlegi MTA: "
-"SA verzióban.\n"
+"A fájl nem szükséges, és zavarhatja a grafikai funkciókat a jelenlegi MTA: SA verzióban.\n"
 "\n"
 "Javasoljuk, hogy távolítsa el vagy nevezze át: D3D9.dll"
 
@@ -2641,8 +2636,7 @@ msgstr ""
 "FIGYELEM\n"
 " \n"
 " MTA:SA szokatlan tevékenységet észlelt.\n"
-" Kérjük, futtass egy víruskeresést, amely biztosítja, hogy a rendszer "
-"biztonságos.\n"
+" Kérjük, futtass egy víruskeresést, amely biztosítja, hogy a rendszer biztonságos.\n"
 "\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:446
@@ -2668,7 +2662,8 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:611
 msgid ""
-"Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+"Registry entries are missing. Please reinstall Multi Theft Auto: San "
+"Andreas."
 msgstr ""
 "Registry bejegyzések hiányoznak. Telepítse újra a Multi Theft Auto: San "
 "Andreas-t."
@@ -2681,8 +2676,8 @@ msgid ""
 "characters and reinstall Multi Theft Auto: San Andreas."
 msgstr ""
 "A GTA: San Andreas útja nem támogatott (Unicode) karaktereket tartalmaz. "
-"Kérjük helyezze a Grand Theft Auto: San Andreas telepítését egy kompatibilis "
-"útra, amely csak szabványos ASCII karaktereket tartalmaz és telepítse újra "
+"Kérjük helyezze a Grand Theft Auto: San Andreas telepítését egy kompatibilis"
+" útra, amely csak szabványos ASCII karaktereket tartalmaz és telepítse újra "
 "a Multi Theft Auto: San Andreas-t."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:619
@@ -2732,7 +2727,8 @@ msgstr "Betöltés sikertelen. Nem találom a gta_sa.exe-t itt %s."
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:804
 #, c-format
 msgid ""
-"Load failed. %s exists in the GTA directory. Please delete before continuing."
+"Load failed. %s exists in the GTA directory. Please delete before "
+"continuing."
 msgstr ""
 "Betöltés sikertelen. %s létezik a GTA könyvtárban. Kérjük törölje a "
 "folytatás előtt."
@@ -2764,24 +2760,24 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:862
 msgid ""
-".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation "
-"directory.\n"
+".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
-".asi fájlok vannak az 'MTA:SA' vagy a 'GTA: San Andreas' telepítési "
-"könyvtárban.\n"
+".asi fájlok vannak az 'MTA:SA' vagy a 'GTA: San Andreas' telepítési könyvtárban.\n"
 "\n"
 "Törölje ezeket a fájlokat, ha problémája van az MTA:SA-val."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:926
 msgid ""
 "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Fájl verzió hiba. Telepítse újra az MTA:SA-t, ha problémák merülnének fel.\n"
+msgstr ""
+"Fájl verzió hiba. Telepítse újra az MTA:SA-t, ha problémák merülnének fel.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:935
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Egyes fájlok hiányoznak. Telepítse újra az MTA: SA-t, ha problémák merülnek "
+msgstr ""
+"Egyes fájlok hiányoznak. Telepítse újra az MTA: SA-t, ha problémák merülnek "
 "fel.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:947
@@ -2806,13 +2802,11 @@ msgstr ""
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1161
 #, c-format
 msgid ""
-"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
-"the problem persists,contact MTA at www.multitheftauto.com. \n"
+"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 msgstr ""
-"Nem lehet elindítani a Grand Theft Auto: San Andreas-t. Kérjük, próbálja meg "
-"újraindítani, vagy ha a probléma továbbra is fennáll, lépjen\n"
+"Nem lehet elindítani a Grand Theft Auto: San Andreas-t. Kérjük, próbálja meg újraindítani, vagy ha a probléma továbbra is fennáll, lépjen\n"
 " kapcsolatba az MTA-val itt: www.multitheftauto.com.\n"
 "\n"
 "[%s]"
@@ -2821,7 +2815,8 @@ msgstr ""
 msgid ""
 "GTA: San Andreas may not have launched correctly. Do you want to terminate "
 "it?"
-msgstr "GTA: San Andreas nem indult el megfelelően. Szeretnéd ezt megszüntetni?"
+msgstr ""
+"GTA: San Andreas nem indult el megfelelően. Szeretnéd ezt megszüntetni?"
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:874
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
@@ -3326,7 +3321,8 @@ msgstr ""
 
 #: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:89
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
-msgstr "Multi Theft Auto nincs megfelelően feltelepítve, kérlek telepítsd újra."
+msgstr ""
+"Multi Theft Auto nincs megfelelően feltelepítve, kérlek telepítsd újra."
 
 #: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:653
 msgid ""

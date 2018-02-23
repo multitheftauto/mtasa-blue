@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"Translators: Francisco Arias; otoutou\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: Francisco \"WolfPire\" Arias; otoutou\n"
 "X-POOTLE-MTIME: 1501100558.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
@@ -260,10 +260,7 @@ msgid "No"
 msgstr "いいえ"
 
 #. /////////////////////////////////////////////////////////////////////////
-#.
 #. Dialog strings
-#.
-#.
 #. /////////////////////////////////////////////////////////////////////////
 #: C:\mtasa-blue\Client\core\CCore.cpp:715
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1091
@@ -631,8 +628,8 @@ msgstr "グループコントロール後方"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:317
 msgid ""
-"You are using a feature-branch build! This is a test build only which cannot "
-"be used to connect to public servers!"
+"You are using a feature-branch build! This is a test build only which cannot"
+" be used to connect to public servers!"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
@@ -1508,9 +1505,11 @@ msgid "Chat text black/white outline"
 msgstr ""
 
 #. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2494
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2501
 msgid "Press a key to bind, or escape to clear"
@@ -2139,7 +2138,8 @@ msgid "Please enter the password to the server:"
 msgstr "サーバーのパスワードを入力してください:"
 
 #. Autojoin checkbox
-#. TRANSLATORS:  If you need more room, there is space for one extra line using a newline (\n).
+#. TRANSLATORS:  If you need more room, there is space for one extra line
+#. using a newline (\n).
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:182
 msgid "Join the server as soon as a player slot is available."
 msgstr "スペースが空いたら、すぐに参加する。"
@@ -2348,8 +2348,7 @@ msgstr "あなたのGTA: San Andreasインストールがd3d9.dllファイルを
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:64
 msgid ""
-"The file is not required and may interfere with the graphical features in "
-"this version of MTA:SA.\n"
+"The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
@@ -2635,7 +2634,8 @@ msgstr "GTA: San Andreasを中止できませんでした。この問題が続�
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:611
 msgid ""
-"Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+"Registry entries are missing. Please reinstall Multi Theft Auto: San "
+"Andreas."
 msgstr "レジストリエントリ不足。MTA:SAを再インストールしてください。"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:615
@@ -2645,8 +2645,8 @@ msgid ""
 "installation to a compatible path that contains only standard ASCII "
 "characters and reinstall Multi Theft Auto: San Andreas."
 msgstr ""
-"GTA: San Andreasのインストールパスのキャラクタがサポートされていません（ユニコード）。GTA:SAのインストールフォルダをASCIIのパ"
-"スに移動して、MTA:SAを再インストールしてください。"
+"GTA: San "
+"Andreasのインストールパスのキャラクタがサポートされていません（ユニコード）。GTA:SAのインストールフォルダをASCIIのパスに移動して、MTA:SAを再インストールしてください。"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:619
 msgid ""
@@ -2654,8 +2654,7 @@ msgid ""
 "incompatible with MTASA.  You are now being redirected to a page where you "
 "can find information to resolve this issue."
 msgstr ""
-"あなたはGTA:SAのSteamバーションを使っているそうです。現在、Steamバーションはサポートされていませんので、オンラインでフィックスにあるペー"
-"ジにリダイレクトされます。"
+"あなたはGTA:SAのSteamバーションを使っているそうです。現在、Steamバーションはサポートされていませんので、オンラインでフィックスにあるページにリダイレクトされます。"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:632
 msgid ""
@@ -2690,7 +2689,8 @@ msgstr "読み込み失敗。gta_sa.exe は %s に見つかれませんでした
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:804
 #, c-format
 msgid ""
-"Load failed. %s exists in the GTA directory. Please delete before continuing."
+"Load failed. %s exists in the GTA directory. Please delete before "
+"continuing."
 msgstr "読み込み失敗。%s は存在しています。続く前に、消しておいてください。"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:812
@@ -2720,8 +2720,7 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:862
 msgid ""
-".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation "
-"directory.\n"
+".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
@@ -2760,13 +2759,11 @@ msgstr ""
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1161
 #, c-format
 msgid ""
-"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
-"the problem persists,contact MTA at www.multitheftauto.com. \n"
+"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 msgstr ""
-"GTA：San Andreasが実行できませんでした。 再起動してください、この問題が続いたら、MTAを「www.multitheftauto.com. "
-"」までに連絡してください。 \n"
+"GTA：San Andreasが実行できませんでした。 再起動してください、この問題が続いたら、MTAを「www.multitheftauto.com. 」までに連絡してください。 \n"
 "\n"
 "[%s]"
 

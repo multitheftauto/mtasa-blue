@@ -15,10 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Translators: MCvarial; MittellBuurman; JaJa; Winky; iam2noob4u; Tim Ossenblok; RaceXtreme; HOLLAND; Lukkie; Blokker_1999; Boštjan Kozar\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: MCvarial; MittellBuurman; JaJa; Winky; iam2noob4u; Tim \"tim26\" "
-"Ossenblok; RaceXtreme; HOLLAND; Lukkie; Blokker_1999; Boštjan "
-"\"DrEspy\" Kozar\n"
 "X-POOTLE-MTIME: 1406144014.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
@@ -92,8 +90,7 @@ msgstr "Configuratiebestand opgeslagen"
 
 #. Print it
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:468
-#, c-format
-#, c-format, c-format
+#, c-format, c-format, c-format
 msgid "* Your serial is: %s"
 msgstr "* Uw serial is: %s"
 
@@ -262,10 +259,7 @@ msgid "No"
 msgstr "Nee"
 
 #. /////////////////////////////////////////////////////////////////////////
-#.
 #. Dialog strings
-#.
-#.
 #. /////////////////////////////////////////////////////////////////////////
 #: C:\mtasa-blue\Client\core\CCore.cpp:715
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1091
@@ -635,8 +629,8 @@ msgstr "Groepsbesturing achteruit"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:317
 msgid ""
-"You are using a feature-branch build! This is a test build only which cannot "
-"be used to connect to public servers!"
+"You are using a feature-branch build! This is a test build only which cannot"
+" be used to connect to public servers!"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
@@ -911,7 +905,8 @@ msgstr "Demp geluidseffecten als MTA geminimaliseerd is"
 msgid "Mute MTA sounds when minimized"
 msgstr "Demp MTA geluiden als MTA geminimaliseerd is"
 
-# I presume that "when minimized" applies to MTA (e.g. "when MTA is minimized" could also be used)
+# I presume that "when minimized" applies to MTA (e.g. "when MTA is minimized"
+# could also be used)
 #: C:\mtasa-blue\Client\core\CSettings.cpp:532
 msgid "Mute Voice sounds when minimized"
 msgstr "Demp stemgeluiden als MTA geminimaliseerd is"
@@ -1516,9 +1511,11 @@ msgid "Chat text black/white outline"
 msgstr ""
 
 #. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2494
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2501
 msgid "Press a key to bind, or escape to clear"
@@ -1597,8 +1594,7 @@ msgid ""
 "\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr ""
-"Het uploaden van je scherm is soms vereist in servers omdat ze anti-cheat "
-"programma's hebben.\n"
+"Het uploaden van je scherm is soms vereist in servers omdat ze anti-cheat programma's hebben.\n"
 "\n"
 "(De chat box en GUI worden niet geüpload)\n"
 
@@ -1616,8 +1612,7 @@ msgid ""
 "Are you sure you want to use them?"
 msgstr ""
 "Sommige bestanden in uw GTA:SA data map zijn gewijzigd.\n"
-"MTA zal alleen gebruik maken van deze gewijzigde bestanden als dit vakje is "
-"aangevinkt.\n"
+"MTA zal alleen gebruik maken van deze gewijzigde bestanden als dit vakje is aangevinkt.\n"
 "\n"
 "Echter, GEWIJZIGDE GTA:SA BESTANDEN ZIJN GEBLOKEERD DOOR VEEL SERVERS\n"
 "\n"
@@ -1723,8 +1718,7 @@ msgid ""
 "\n"
 "Do you want to download and install MTA:SA %s ?"
 msgstr ""
-"Een nieuwere versie van MTA:SA %s is nodig om de geselecteerde server binnen "
-"te komen.\n"
+"Een nieuwere versie van MTA:SA %s is nodig om de geselecteerde server binnen te komen.\n"
 "\n"
 "Wilt u de nieuwere versie van MTA:SA %s downloaden en installeren?"
 
@@ -2149,7 +2143,8 @@ msgid "Please enter the password to the server:"
 msgstr "Geef het wachtwoord op naar de server:"
 
 #. Autojoin checkbox
-#. TRANSLATORS:  If you need more room, there is space for one extra line using a newline (\n).
+#. TRANSLATORS:  If you need more room, there is space for one extra line
+#. using a newline (\n).
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:182
 msgid "Join the server as soon as a player slot is available."
 msgstr "Verbind met de server zodra een speler slot beschikbaar is."
@@ -2311,8 +2306,8 @@ msgstr ""
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr ""
-"Multi Theft Auto werd niet correct geïnstalleerd, gelieve te herinstalleren. "
-"%s"
+"Multi Theft Auto werd niet correct geïnstalleerd, gelieve te herinstalleren."
+" %s"
 
 #: C:\mtasa-blue\Client\loader\CInstallManager.cpp:740
 msgid "Missing file:"
@@ -2347,8 +2342,8 @@ msgstr "Crash informatie"
 msgid ""
 "Tick the check box to send this crash info to MTA devs using the 'internet'"
 msgstr ""
-"Vink dit vakje aan om deze crash info te verzenden naar de MTA ontwikkelaars "
-"via het 'internet'"
+"Vink dit vakje aan om deze crash info te verzenden naar de MTA ontwikkelaars"
+" via het 'internet'"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:54
 msgid "Doing so will increase the chance of this crash being fixed."
@@ -2371,13 +2366,11 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:64
 msgid ""
-"The file is not required and may interfere with the graphical features in "
-"this version of MTA:SA.\n"
+"The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
-"Dit bestand is niet nodig en kan mogelijks de grafische functies van MTA:SA "
-"storen.\n"
+"Dit bestand is niet nodig en kan mogelijks de grafische functies van MTA:SA storen.\n"
 "\n"
 "Het wordt aanbevolen dat u d3d9.dll verwijdert of hernoemt."
 
@@ -2630,8 +2623,7 @@ msgstr ""
 "WAARSCHUWING\n"
 "\n"
 "MTA:SA heeft vreemde activiteiten ontdekt.\n"
-"Gelieve een virusscan uit te voeren om te verzekeren dat uw systeem veilig "
-"is.\n"
+"Gelieve een virusscan uit te voeren om te verzekeren dat uw systeem veilig is.\n"
 "\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:446
@@ -2657,7 +2649,8 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:611
 msgid ""
-"Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+"Registry entries are missing. Please reinstall Multi Theft Auto: San "
+"Andreas."
 msgstr ""
 "Registervermeldingen ontbreken. Gelieve Multi Theft Auto: San Andreas te "
 "herinstalleren."
@@ -2681,8 +2674,8 @@ msgid ""
 "can find information to resolve this issue."
 msgstr ""
 "Het lijkt alsof u een Steam versie van GTA:SA heeft, dit wordt momenteel "
-"niet ondersteund door MTA:SA. U wordt nu doorverwezen naar een pagina waar u "
-"informatie kan vinden om dit probleem op te lossen."
+"niet ondersteund door MTA:SA. U wordt nu doorverwezen naar een pagina waar u"
+" informatie kan vinden om dit probleem op te lossen."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:632
 msgid ""
@@ -2720,7 +2713,8 @@ msgstr "Laden mislukt. Kon gta_sa.exe niet vinden in %s."
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:804
 #, c-format
 msgid ""
-"Load failed. %s exists in the GTA directory. Please delete before continuing."
+"Load failed. %s exists in the GTA directory. Please delete before "
+"continuing."
 msgstr ""
 "Laden mislukt. %s bestaat in uw GTA pad. Gelieve het te verwijderen voor u "
 "doorgaat."
@@ -2752,25 +2746,25 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:862
 msgid ""
-".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation "
-"directory.\n"
+".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
-"Er bevinden zich .asi bestand in de 'MTA:SA' of 'GTA: San Andreas' "
-"installatiemap.\n"
+"Er bevinden zich .asi bestand in de 'MTA:SA' of 'GTA: San Andreas' installatiemap.\n"
 "\n"
 "Verwijder deze .asi bestanden als u problemen heeft met MTA:SA."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:926
 msgid ""
 "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Bestandsversie komt niet overeen. Herinstalleer MTA:SA als u problemen "
+msgstr ""
+"Bestandsversie komt niet overeen. Herinstalleer MTA:SA als u problemen "
 "ondervindt.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:935
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Sommige bestanden onderbreken. Herinstalleer MTA:SA als u problemen "
+msgstr ""
+"Sommige bestanden onderbreken. Herinstalleer MTA:SA als u problemen "
 "ondervindt.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:947
@@ -2792,13 +2786,11 @@ msgstr ""
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1161
 #, c-format
 msgid ""
-"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
-"the problem persists,contact MTA at www.multitheftauto.com. \n"
+"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 msgstr ""
-"Kon Grand Theft Auto: San Andreas niet starten.  Probleem te herstarten, of "
-"als het probleem aanhoudt, contacteer MTA op www.multitheftauto.com. \n"
+"Kon Grand Theft Auto: San Andreas niet starten.  Probleem te herstarten, of als het probleem aanhoudt, contacteer MTA op www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 
@@ -2989,8 +2981,8 @@ msgid ""
 "Not connected; please use Quick Connect or the 'connect' command to connect "
 "to a server."
 msgstr ""
-"Niet verbonden; gelieve Quick Connect of het 'connect' commando te gebruiken "
-"om te verbinden met een server."
+"Niet verbonden; gelieve Quick Connect of het 'connect' commando te gebruiken"
+" om te verbinden met een server."
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:686
 msgid "The server is not installed"
@@ -3281,8 +3273,8 @@ msgid ""
 "Fatal error (%u). If this problem persists, please check out mtasa.com for "
 "support."
 msgstr ""
-"Fatale fout (%u). Als dit probleem aanhoudt, gelieve mtasa.com te raadplegen "
-"voor hulp."
+"Fatale fout (%u). Als dit probleem aanhoudt, gelieve mtasa.com te raadplegen"
+" voor hulp."
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3455,8 +3447,8 @@ msgstr ""
 #, fuzzy
 #~ msgid "A valid nickname isn't set. Please go to Settings and set a new."
 #~ msgstr ""
-#~ "Ongeldige gebruikersnaam! Gelieve naar Instellingen te gaan en een nieuwe in "
-#~ "te geven!"
+#~ "Ongeldige gebruikersnaam! Gelieve naar Instellingen te gaan en een nieuwe in"
+#~ " te geven!"
 
 #~ msgid "Services currently unavaliable"
 #~ msgstr "Dienst momenteel niet beschikbaar"
@@ -3485,8 +3477,8 @@ msgstr ""
 
 #~ msgid "Invalid nickname! Please go to Settings and set a new!"
 #~ msgstr ""
-#~ "Ongeldige gebruikersnaam! Gelieve naar Instellingen te gaan en een nieuwe in "
-#~ "te geven!"
+#~ "Ongeldige gebruikersnaam! Gelieve naar Instellingen te gaan en een nieuwe in"
+#~ " te geven!"
 
 #, fuzzy
 #~ msgid "Disconnected: unknown protocol error."

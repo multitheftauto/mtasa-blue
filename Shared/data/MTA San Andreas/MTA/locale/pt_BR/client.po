@@ -15,9 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Translators: RaceXtreme; LooooP; DNL291; Zezin; Cadu12; Cristiano Teixeira; neves768; Davidhm; gustavorn\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: RaceXtreme; LooooP; DNL291; Zezin; Cadu12; Cristiano \"Banex\" "
-"Teixeira; neves768; gustavorn; Davidhm\n"
 "X-POOTLE-MTIME: 1517484316.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
@@ -58,7 +57,8 @@ msgstr "* São: %d:%02d:%02d"
 
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:279
 msgid "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"
-msgstr "Conexão: A sintaxe correta é 'connect <IP> <porta> [<apelido> <senha>]'"
+msgstr ""
+"Conexão: A sintaxe correta é 'connect <IP> <porta> [<apelido> <senha>]'"
 
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:287
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:338
@@ -260,10 +260,7 @@ msgid "No"
 msgstr "Não"
 
 #. /////////////////////////////////////////////////////////////////////////
-#.
 #. Dialog strings
-#.
-#.
 #. /////////////////////////////////////////////////////////////////////////
 #: C:\mtasa-blue\Client\core\CCore.cpp:715
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1091
@@ -340,7 +337,8 @@ msgstr "habilita o hud"
 msgid "shows all the binds"
 msgstr "mostra todos os comandos vinculados"
 
-# No jogo, abram o console (F8) e digite help. Lá estão esta e outras traduções do tipo.
+# No jogo, abram o console (F8) e digite help. Lá estão esta e outras
+# traduções do tipo.
 #: C:\mtasa-blue\Client\core\CCore.cpp:1393
 msgid "shows your serial"
 msgstr "mostra o seu serial"
@@ -349,7 +347,8 @@ msgstr "mostra o seu serial"
 msgid "connects to a server (host port nick pass)"
 msgstr "conecta a um servidor (IP porta nick senha)"
 
-# No jogo, abram o console (F8) e digite help. Lá estão esta e outras traduções do tipo.
+# No jogo, abram o console (F8) e digite help. Lá estão esta e outras
+# traduções do tipo.
 #: C:\mtasa-blue\Client\core\CCore.cpp:1403
 msgid "connects to a previous server"
 msgstr "conecta ao servidor anterior"
@@ -403,8 +402,9 @@ msgid "shows the frame timing graph"
 msgstr "mostra um gráfico dos quadros renderizados em relação ao tempo"
 
 #: C:\mtasa-blue\Client\core\CCore.h:55
+#, fuzzy
 msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
-msgstr ""
+msgstr "Copyright (C) 2003 - 2016 Multi Theft Auto"
 
 #: C:\mtasa-blue\Client\core\CCredits.cpp:32
 msgid "Programming"
@@ -637,8 +637,8 @@ msgstr "Ordenar ao grupo para recuar"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:317
 msgid ""
-"You are using a feature-branch build! This is a test build only which cannot "
-"be used to connect to public servers!"
+"You are using a feature-branch build! This is a test build only which cannot"
+" be used to connect to public servers!"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
@@ -796,7 +796,8 @@ msgstr "Padrão (Mouse + Teclado)"
 msgid "Classic controls (Joypad)"
 msgstr "Clássico (Joystick)"
 
-# Pelo que eu pesquisei, a dead zone é o quanto você move lentamente o analog para ele não registrar o movimento no jogo.
+# Pelo que eu pesquisei, a dead zone é o quanto você move lentamente o analog
+# para ele não registrar o movimento no jogo.
 #: C:\mtasa-blue\Client\core\CSettings.cpp:281
 msgid "Dead Zone"
 msgstr "Zona Limite"
@@ -1117,7 +1118,8 @@ msgstr ""
 msgid "Full Screen Minimize"
 msgstr "Minimizar modo de Tela Cheia"
 
-# Pelo que eu pesquisei, quando uma pessoa tem mais de uma placa-de-vídeo no pc, o MTA abre uma janela para escolher uma delas.
+# Pelo que eu pesquisei, quando uma pessoa tem mais de uma placa-de-vídeo no
+# pc, o MTA abre uma janela para escolher uma delas.
 #: C:\mtasa-blue\Client\core\CSettings.cpp:805
 msgid "Enable Device Selection Dialog"
 msgstr "Este ativa a janela para escolher a placa-de-vídeo"
@@ -1304,11 +1306,11 @@ msgstr "Correção do mouse"
 #. Cache path info
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1108
 msgid "Client resource files:"
-msgstr ""
+msgstr "Arquivos de recursos do cliente:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1112
 msgid "Show in Explorer"
-msgstr ""
+msgstr "Mostrar no Explorer"
 
 #. Auto updater section label
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1127
@@ -1344,8 +1346,8 @@ msgstr "É NECESSÁRIO REINICIAR O MTA"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1338
 msgid "Some settings will be changed when you disconnect the current server"
 msgstr ""
-"Algumas configurações serão alteradas quando você se desconectar do servidor "
-"atual"
+"Algumas configurações serão alteradas quando você se desconectar do servidor"
+" atual"
 
 # *Previnir reprtição de frases*
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1339
@@ -1403,12 +1405,13 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1955
 msgid "Layout"
-msgstr ""
+msgstr "Layout"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1956
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2217
+#, fuzzy
 msgid "Options"
-msgstr ""
+msgstr "Opções:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1962
 msgid "Chat Background"
@@ -1456,7 +1459,7 @@ msgstr "seg"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2047
 msgid "Fading"
-msgstr ""
+msgstr "Desaparecimento gradual"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2053
 msgid "Fade out old lines"
@@ -1500,8 +1503,9 @@ msgid "Bottom"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2181
+#, fuzzy
 msgid "Font"
-msgstr ""
+msgstr "Fonte:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2223
 msgid "Hide background when not typing"
@@ -1517,16 +1521,18 @@ msgstr "Permitir que o servidor pisque a janela"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2238
 msgid "Allow tray balloon notifications"
-msgstr ""
+msgstr "Permitir notificações do balão da bandeja"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2243
 msgid "Chat text black/white outline"
 msgstr ""
 
 #. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2494
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2501
 msgid "Press a key to bind, or escape to clear"
@@ -1606,11 +1612,9 @@ msgid ""
 "\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr ""
-"Habilitar o envio de capturas de tela é requisitado por alguns servidores em "
-"razão de prevenir trapaças durante as partidas.\n"
+"Habilitar o envio de capturas de tela é requisitado por alguns servidores em razão de prevenir trapaças durante as partidas.\n"
 "\n"
-"(Lembrando que o chat e o GUI (janelas do MTA) não são incluídos na captura "
-"de tela)\n"
+"(Lembrando que o chat e o GUI (janelas do MTA) não são incluídos na captura de tela)\n"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4181
 msgid "SCREEN UPLOAD INFORMATION"
@@ -1653,7 +1657,8 @@ msgstr ""
 msgid "Very experimental feature."
 msgstr "Opção em fase bem experimental"
 
-# Tenho quase certeza que o correto (ou mais correto) é Otimiza em vez de  Optimiza:
+# Tenho quase certeza que o correto (ou mais correto) é Otimiza em vez de
+# Optimiza:
 # http://pt.wiktionary.org/wiki/Discuss%C3%A3o:optimiza%C3%A7%C3%A3o
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4354
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
@@ -1675,8 +1680,8 @@ msgstr ""
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4360
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr ""
-"Marca os pacotes de rede para ajudar os ISPs a identificar o tráfego de rede "
-"do MTA."
+"Marca os pacotes de rede para ajudar os ISPs a identificar o tráfego de rede"
+" do MTA."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4362
 msgid "Spinning circle animation at the bottom of the screen"
@@ -1746,8 +1751,7 @@ msgid ""
 "\n"
 "Do you want to download and install MTA:SA %s ?"
 msgstr ""
-"Uma versão mais atual do MTA:SA %s é necessária para entrar no servidor "
-"selecionado.\n"
+"Uma versão mais atual do MTA:SA %s é necessária para entrar no servidor selecionado.\n"
 "\n"
 "Você quer baixar e instalar o MTA:SA %s ?"
 
@@ -2135,8 +2139,8 @@ msgstr "IP do servidor:"
 msgid "Gamemode:"
 msgstr "Modo de jogo:"
 
-# A única tradução possível é essa :)
 #. Map
+# A única tradução possível é essa :)
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:48
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:94
 msgid "Map:"
@@ -2176,7 +2180,8 @@ msgid "Please enter the password to the server:"
 msgstr "Digite a senha para se conectar ao servidor:"
 
 #. Autojoin checkbox
-#. TRANSLATORS:  If you need more room, there is space for one extra line using a newline (\n).
+#. TRANSLATORS:  If you need more room, there is space for one extra line
+#. using a newline (\n).
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:182
 msgid "Join the server as soon as a player slot is available."
 msgstr "Entrar no servidor quando um jogador desconectar."
@@ -2223,8 +2228,8 @@ msgstr ""
 "Esperando fazer o download da lista dos servidores... (Já se passaram %lu "
 "ms)"
 
-# 'pôde' não seria o correto?
 #. Abort
+# 'pôde' não seria o correto?
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:263
 msgid "Master server list could not be parsed."
 msgstr "A lista de servidores não pôde ser processada."
@@ -2238,7 +2243,9 @@ msgstr "A lista de servidores não pôde ser obtida."
 msgid "(Backup server list)"
 msgstr "(Fazendo um backup da lista de servidores)"
 
-# Possivelmente o MTA usa isto para se comunicar à porta LAN do computador por meio de um código UDP. Eu teria que achar um livro sobre redes de computadores para obter o termo certo em português... ;/
+# Possivelmente o MTA usa isto para se comunicar à porta LAN do computador por
+# meio de um código UDP. Eu teria que achar um livro sobre redes de
+# computadores para obter o termo certo em português... ;/
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:330
 msgid "Cannot bind LAN-broadcast socket"
 msgstr "Não foi possível se conectar ao soquete da 'LAN-broadcast'"
@@ -2397,13 +2404,11 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:64
 msgid ""
-"The file is not required and may interfere with the graphical features in "
-"this version of MTA:SA.\n"
+"The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
-"O arquivo não é necessário e pode interferir com os recursos gráficos dessa "
-"versão do MTA:SA.\n"
+"O arquivo não é necessário e pode interferir com os recursos gráficos dessa versão do MTA:SA.\n"
 "\n"
 "É recomendado que você remova ou renomeie o arquivo d3d9.dll"
 
@@ -2676,8 +2681,8 @@ msgid ""
 "An instance of GTA: San Andreas is already running. It needs to be "
 "terminated before MTA:SA can be started. Do you want to do that now?"
 msgstr ""
-"O GTA: San Andreas já esta rodando. Ele precisa ser fechado antes para que o "
-"MTA:SA possa ser iniciado. Você quer continuar?"
+"O GTA: San Andreas já esta rodando. Ele precisa ser fechado antes para que o"
+" MTA:SA possa ser iniciado. Você quer continuar?"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:589
 msgid ""
@@ -2689,7 +2694,8 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:611
 msgid ""
-"Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+"Registry entries are missing. Please reinstall Multi Theft Auto: San "
+"Andreas."
 msgstr "Entradas de registro estão faltando. Por favor reinstale o MTA:SA."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:615
@@ -2709,8 +2715,8 @@ msgid ""
 "incompatible with MTASA.  You are now being redirected to a page where you "
 "can find information to resolve this issue."
 msgstr ""
-"Parece que você tem uma versão Steam do GTA: San Andreas, que atualmente não "
-"é compatível com o MTA:SA. Você vai ser direcionado a uma página em que "
+"Parece que você tem uma versão Steam do GTA: San Andreas, que atualmente não"
+" é compatível com o MTA:SA. Você vai ser direcionado a uma página em que "
 "poderá encontrar informações de como resolver este problema."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:632
@@ -2725,8 +2731,7 @@ msgstr ""
 "contém um ';' (Ponto e vírgula).\n"
 "\n"
 " Se você perceber problemas ao rodar o MTA:SA,\n"
-" mova sua(as) instalação(ões) para um caminho que não contenha um Ponto e "
-"vírgula."
+" mova sua(as) instalação(ões) para um caminho que não contenha um Ponto e vírgula."
 
 # Será que estes arquivos são do GTA ou do MTA? :S
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:773
@@ -2753,7 +2758,8 @@ msgstr "Falha ao carregar. Não foi possível localizar o gta_sa.exe em %s."
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:804
 #, c-format
 msgid ""
-"Load failed. %s exists in the GTA directory. Please delete before continuing."
+"Load failed. %s exists in the GTA directory. Please delete before "
+"continuing."
 msgstr ""
 "Não foi possível carregar o MTA, pois o arquivo %s está na pasta do GTA. "
 "Delete-o antes de continuar."
@@ -2763,15 +2769,15 @@ msgstr ""
 msgid "Main file has an incorrect name (%s)"
 msgstr "O arquivo executável do GTA:SA está com nome incorreto (%s)"
 
-# O correto é 'funcionar' em: "Veja uma ajuda online se o MTA:SA não funciona corretamente."
+# O correto é 'funcionar' em: "Veja uma ajuda online se o MTA:SA não funciona
+# corretamente."
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:823
 msgid ""
 "Main file is unsigned. Possible virus activity.\n"
 "\n"
 "See online help if MTA does not work correctly."
 msgstr ""
-"O executável do GTA:SA apresenta uma assinatura diferente, portanto pode "
-"conter um vírus.\n"
+"O executável do GTA:SA apresenta uma assinatura diferente, portanto pode conter um vírus.\n"
 "\n"
 "Se o MTA não funcionar corretamente, procure por ajuda online."
 
@@ -2787,8 +2793,7 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:862
 msgid ""
-".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation "
-"directory.\n"
+".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
@@ -2805,7 +2810,8 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:935
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Alguns arquivos estão faltando. Reinstale o MTA:SA se acontecer algum "
+msgstr ""
+"Alguns arquivos estão faltando. Reinstale o MTA:SA se acontecer algum "
 "problema.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:947
@@ -2830,14 +2836,11 @@ msgstr ""
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1161
 #, c-format
 msgid ""
-"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
-"the problem persists,contact MTA at www.multitheftauto.com. \n"
+"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 msgstr ""
-"Não foi possível iniciar o GTA: San Andreas.  Por favor reinicie seu "
-"computador, mas se o problema persistir, entre em contato em "
-"www.multitheftauto.com. \n"
+"Não foi possível iniciar o GTA: San Andreas.  Por favor reinicie seu computador, mas se o problema persistir, entre em contato em www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 
@@ -2896,7 +2899,7 @@ msgstr "O GTA:SA teve um problema em adicionar itens de tunagem ao veículo."
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1960
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
-msgstr ""
+msgstr "O GTA:SA encontrou erros no arquivo '%s'"
 
 #. Ask user to confirm
 #: C:\mtasa-blue\Client\loader\Utils.cpp:2035
@@ -3033,8 +3036,8 @@ msgid ""
 "Not connected; please use Quick Connect or the 'connect' command to connect "
 "to a server."
 msgstr ""
-"Não foi possível conectar. Use a opção Conexão Rápida ou o comando 'connect' "
-"para se conectar a um servidor."
+"Não foi possível conectar. Use a opção Conexão Rápida ou o comando 'connect'"
+" para se conectar a um servidor."
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:686
 msgid "The server is not installed"
@@ -3230,7 +3233,8 @@ msgstr "Desconectado: Falha ao verificar o serial"
 msgid "Disconnected: Connection desync %s"
 msgstr "Você foi desconectado, pois a conexão dessincronizou: %s"
 
-# Na verdade, são, responsável pela expulsão e motivo (se tiver) respectivamente.
+# Na verdade, são, responsável pela expulsão e motivo (se tiver)
+# respectivamente.
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:542
 #, c-format
 msgid "Disconnected: You were kicked by %s"
@@ -3350,7 +3354,7 @@ msgstr "Houve um erro de conexão"
 #. Couldn't create render target for CPostEffects
 #: C:\mtasa-blue\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1427
 msgid "Problem with graphics driver"
-msgstr ""
+msgstr "Problema com o driver de gráficos"
 
 #: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:89
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
@@ -3366,8 +3370,7 @@ msgid ""
 msgstr ""
 "O seu navegador vai abrir uma página da web com algumas informações.\n"
 "\n"
-"(Se a página falhar ao carregar, cole (CTRL-V) a URL no seu navegador de "
-"internet)"
+"(Se a página falhar ao carregar, cole (CTRL-V) a URL no seu navegador de internet)"
 
 #~ msgid "Services currently unavailable"
 #~ msgstr "O serviço está atualmente indisponível"

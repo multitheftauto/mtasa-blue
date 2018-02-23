@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Translators: Alex Georgiou\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: Alex \"Dredd\" Georgiou\n"
 "X-POOTLE-MTIME: 1517675779.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
@@ -260,10 +260,7 @@ msgid "No"
 msgstr "Όχι"
 
 #. /////////////////////////////////////////////////////////////////////////
-#.
 #. Dialog strings
-#.
-#.
 #. /////////////////////////////////////////////////////////////////////////
 #: C:\mtasa-blue\Client\core\CCore.cpp:715
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1091
@@ -636,11 +633,11 @@ msgstr "Πλήκτρο ομάδας πίσω"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:317
 msgid ""
-"You are using a feature-branch build! This is a test build only which cannot "
-"be used to connect to public servers!"
+"You are using a feature-branch build! This is a test build only which cannot"
+" be used to connect to public servers!"
 msgstr ""
-"Χρησιμοποιείται ένα χαρακτηριστικό τμήμα έκδοσης! Αυτή είναι μια δοκιμαστική "
-"έκδοση μόνο για όσους δεν μπορούν να συνδεθούν στους ανοιχτούς διακοσμητές!"
+"Χρησιμοποιείται ένα χαρακτηριστικό τμήμα έκδοσης! Αυτή είναι μια δοκιμαστική"
+" έκδοση μόνο για όσους δεν μπορούν να συνδεθούν στους ανοιχτούς διακοσμητές!"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
 msgid ""
@@ -1518,9 +1515,11 @@ msgid "Chat text black/white outline"
 msgstr "Άσπρο/μαύρο περίγραμμα κειμένου συνομιλίας"
 
 #. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2494
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2501
 msgid "Press a key to bind, or escape to clear"
@@ -1585,8 +1584,7 @@ msgid ""
 "\n"
 "Are you sure you want to enable them?"
 msgstr ""
-"Οι ογκομετρικές σκιές μπορεί να προκαλέσουν κάποια συστήματα να "
-"επιβραδύνουν.\n"
+"Οι ογκομετρικές σκιές μπορεί να προκαλέσουν κάποια συστήματα να επιβραδύνουν.\n"
 "\n"
 "Είστε σίγουρος ότι θέλετε να τις ενεργοποιήσετε;"
 
@@ -1600,11 +1598,9 @@ msgid ""
 "\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr ""
-"Η αναφόρτωση οθόνης είναι απαραίτητη για μερικούς διακομιστές για anti-cheat "
-"λόγους.\n"
+"Η αναφόρτωση οθόνης είναι απαραίτητη για μερικούς διακομιστές για anti-cheat λόγους.\n"
 "\n"
-"(Το πλαίσιο συνομιλίας και το Γραφικό περιβάλλον διεπαφής χρήστη (GUI) δεν "
-"συμπεριλαμβάνονται στην αναφόρτωση)\n"
+"(Το πλαίσιο συνομιλίας και το Γραφικό περιβάλλον διεπαφής χρήστη (GUI) δεν συμπεριλαμβάνονται στην αναφόρτωση)\n"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4181
 msgid "SCREEN UPLOAD INFORMATION"
@@ -1620,11 +1616,9 @@ msgid ""
 "Are you sure you want to use them?"
 msgstr ""
 "Μερικά αρχεία στον προορισμό δεδομένων του GTA:SA είναι εξατομικευμένα.\n"
-"Το MTA θα χρησιμοποιήσει μόνο αυτά τα τροποποιημένα αρχεία αν αυτό το "
-"πλαίσιο ελέγχου είναι τικαρισμένο.\n"
+"Το MTA θα χρησιμοποιήσει μόνο αυτά τα τροποποιημένα αρχεία αν αυτό το πλαίσιο ελέγχου είναι τικαρισμένο.\n"
 "\n"
-"Ωστόσο, ΤΑ ΕΞΑΤΟΜΙΚΕΥΜΕΝΑ GTA:SA ΑΡΧΕΙΑ ΕΙΝΑΙ ΑΠΟΚΛΕΙΣΜΕΝΑ ΣΕ ΠΟΛΛΟΥΣ "
-"ΔΙΑΚΟΜΙΣΤΕΣ\n"
+"Ωστόσο, ΤΑ ΕΞΑΤΟΜΙΚΕΥΜΕΝΑ GTA:SA ΑΡΧΕΙΑ ΕΙΝΑΙ ΑΠΟΚΛΕΙΣΜΕΝΑ ΣΕ ΠΟΛΛΟΥΣ ΔΙΑΚΟΜΙΣΤΕΣ\n"
 "\n"
 "Είστε σίγουρος ότι θέλετε να τα χρησιμοποιήσετε;"
 
@@ -1667,8 +1661,8 @@ msgstr "Ενεργοποίηση χρήσης μόνο μιας σύνδεσης
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4360
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr ""
-"Πακέτα ετικετών δικτύου για βοήθεια των ISPs στην αναγνώριση της MTA κίνησης "
-"δεδομένων. "
+"Πακέτα ετικετών δικτύου για βοήθεια των ISPs στην αναγνώριση της MTA κίνησης"
+" δεδομένων. "
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4362
 msgid "Spinning circle animation at the bottom of the screen"
@@ -1739,8 +1733,7 @@ msgid ""
 "\n"
 "Do you want to download and install MTA:SA %s ?"
 msgstr ""
-"Μια ενημερωμένη έκδοση του MTA:SA %s απαιτείται για την σύνδεση στον "
-"επιλεγμένο διακομιστή.\n"
+"Μια ενημερωμένη έκδοση του MTA:SA %s απαιτείται για την σύνδεση στον επιλεγμένο διακομιστή.\n"
 "\n"
 "Θέλετε να κάνετε λήψη και να την εγκαταστήσετε MTA:SA %s ;"
 
@@ -2165,7 +2158,8 @@ msgid "Please enter the password to the server:"
 msgstr "Παρακαλώ εισάγετε τον κωδικό του διακομιστή:"
 
 #. Autojoin checkbox
-#. TRANSLATORS:  If you need more room, there is space for one extra line using a newline (\n).
+#. TRANSLATORS:  If you need more room, there is space for one extra line
+#. using a newline (\n).
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:182
 msgid "Join the server as soon as a player slot is available."
 msgstr ""
@@ -2386,13 +2380,11 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:64
 msgid ""
-"The file is not required and may interfere with the graphical features in "
-"this version of MTA:SA.\n"
+"The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
-"Αυτό το αρχείο δεν χρειάζεται και μπορεί να ανακατευτεί με τα γραφικά "
-"χαρακτηριστικά σε αυτή την έκδοση του MTA:SA.\n"
+"Αυτό το αρχείο δεν χρειάζεται και μπορεί να ανακατευτεί με τα γραφικά χαρακτηριστικά σε αυτή την έκδοση του MTA:SA.\n"
 "\n"
 "Συνίσταται να αφαιρέσετε ή να μετονομάσετε το d3d9.dll"
 
@@ -2591,8 +2583,7 @@ msgid ""
 "Do you want to reset GTA settings now?"
 msgstr ""
 "Φαίνεται ότι υπάρχει πρόβλημα με την εκκίνηση του MTA:SA.\n"
-"Η επαναφορά των ρυθμίσεων GTA μπορεί μερικές φορές να διορθώσει αυτό το "
-"πρόβλημα.\n"
+"Η επαναφορά των ρυθμίσεων GTA μπορεί μερικές φορές να διορθώσει αυτό το πρόβλημα.\n"
 "\n"
 "Θέλετε να επαναφέρετε τις ρυθμίσεις GTA τώρα;"
 
@@ -2654,8 +2645,7 @@ msgstr ""
 "ΠΡΟΕΙΔΟΠΟΙΗΣΗ\n"
 "\n"
 "Το MTA:SA έχει εντοπίσει ασυνήθιστη δραστηριότητα.\n"
-"Εκτελέστε μια σάρωση ιών για να βεβαιωθείτε ότι το σύστημά σας είναι "
-"ασφαλές.\n"
+"Εκτελέστε μια σάρωση ιών για να βεβαιωθείτε ότι το σύστημά σας είναι ασφαλές.\n"
 "\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:446
@@ -2681,7 +2671,8 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:611
 msgid ""
-"Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+"Registry entries are missing. Please reinstall Multi Theft Auto: San "
+"Andreas."
 msgstr ""
 "Δεν υπάρχουν καταχωρήσεις μητρώου. Παρακαλώ επανεγκαταστήστε το Multi Theft "
 "Auto: San Andreas."
@@ -2720,8 +2711,7 @@ msgstr ""
 "περιέχει ένα ';' (ερωτηματικό).\n"
 "\n"
 "Αν αντιμετωπίζετε προβλήματα κατά την εκτέλεση του MTA:SA,\n"
-"μετακινήστε την εγκατάσταση ή τις εγκαταστάσεις σας σε μια διαδρομή που δεν "
-"περιέχει ερωτηματικό."
+"μετακινήστε την εγκατάσταση ή τις εγκαταστάσεις σας σε μια διαδρομή που δεν περιέχει ερωτηματικό."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:773
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:780
@@ -2745,7 +2735,8 @@ msgstr "Η φόρτωση απέτυχε. Δεν ήταν δυνατή η εύρ
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:804
 #, c-format
 msgid ""
-"Load failed. %s exists in the GTA directory. Please delete before continuing."
+"Load failed. %s exists in the GTA directory. Please delete before "
+"continuing."
 msgstr ""
 "Η φόρτωση απέτυχε. %s υπάρχει στον προορισμό του GTA. Παρακαλώ διαγράψτε "
 "πριν συνεχίσετε."
@@ -2777,25 +2768,25 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:862
 msgid ""
-".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation "
-"directory.\n"
+".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
-"Αρχεία .asi βρίσκονται στον προορισμό εγκατάστασης του 'MTA:SA' ή του 'GTA: "
-"San Andreas'.\n"
+"Αρχεία .asi βρίσκονται στον προορισμό εγκατάστασης του 'MTA:SA' ή του 'GTA: San Andreas'.\n"
 "\n"
 "Καταργήστε αυτά τα αρχεία .asi αν αντιμετωπίσετε προβλήματα με το MTA:SA."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:926
 msgid ""
 "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Σφάλμα αναντιστοιχίας έκδοσης αρχείου. Επανεγκαταστήστε το MTA:SA αν "
+msgstr ""
+"Σφάλμα αναντιστοιχίας έκδοσης αρχείου. Επανεγκαταστήστε το MTA:SA αν "
 "αντιμετωπίσετε προβλήματα.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:935
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Κάποια αρχεία λείπουν. Επανεγκαταστήστε το MTA:SA αν αντιμετωπίσετε "
+msgstr ""
+"Κάποια αρχεία λείπουν. Επανεγκαταστήστε το MTA:SA αν αντιμετωπίσετε "
 "προβλήματα.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:947
@@ -2820,14 +2811,11 @@ msgstr "Επιδιόρθωση σφάλματος ανύψωσης"
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1161
 #, c-format
 msgid ""
-"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
-"the problem persists,contact MTA at www.multitheftauto.com. \n"
+"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 msgstr ""
-"Δεν ήταν δυνατή η εκκίνηση του Grand Theft Auto: San Andreas.   Παρακαλώ "
-"δοκιμάστε να κάνετε επανεκκίνηση ή εάν το πρόβλημα παραμένει, επικοινωνήστε "
-"με το MTA στη διεύθυνση www.multitheftauto.com. \n"
+"Δεν ήταν δυνατή η εκκίνηση του Grand Theft Auto: San Andreas.   Παρακαλώ δοκιμάστε να κάνετε επανεκκίνηση ή εάν το πρόβλημα παραμένει, επικοινωνήστε με το MTA στη διεύθυνση www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 
@@ -2881,7 +2869,8 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1940
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "Το GTA:SA αντιμετώπισε πρόβλημα στην προσθήκη αναβάθμισης σε ένα όχημα."
+msgstr ""
+"Το GTA:SA αντιμετώπισε πρόβλημα στην προσθήκη αναβάθμισης σε ένα όχημα."
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1960
 #, c-format
@@ -2891,7 +2880,8 @@ msgstr "Το GTA:SA βρήκε σφάλματα στο αρχείο '%s'"
 #. Ask user to confirm
 #: C:\mtasa-blue\Client\loader\Utils.cpp:2035
 msgid "Did your computer restart when playing MTA:SA?"
-msgstr "Έγινε επανεκκίνηση του υπολογιστή σας κατά την αναπαραγωγή του MTA:SA;"
+msgstr ""
+"Έγινε επανεκκίνηση του υπολογιστή σας κατά την αναπαραγωγή του MTA:SA;"
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:2103
 msgid "Please terminate the following programs before continuing:"
@@ -3354,11 +3344,9 @@ msgid ""
 "\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr ""
-"Το πρόγραμμα περιήγησής σας θα εμφανίσει τώρα μια ιστοσελίδα με κάποιες "
-"πληροφορίες βοήθειας.\n"
+"Το πρόγραμμα περιήγησής σας θα εμφανίσει τώρα μια ιστοσελίδα με κάποιες πληροφορίες βοήθειας.\n"
 "\n"
-"(Εάν η σελίδα δεν φορτώσει, επικολλήστε (CTRL-V) τη διεύθυνση URL στο "
-"πρόγραμμα περιήγησης ιστού)"
+"(Εάν η σελίδα δεν φορτώσει, επικολλήστε (CTRL-V) τη διεύθυνση URL στο πρόγραμμα περιήγησης ιστού)"
 
 #~ msgid "Chat BG"
 #~ msgstr "Συνομιλία BG"

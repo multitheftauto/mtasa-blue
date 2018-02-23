@@ -14,10 +14,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
-"n%100==4 ? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
+"Translators: PrimoXD; Boštjan Kozar; Bine\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: PrimoXD; Boštjan \"DrEspy\" Kozar; Bine\n"
 "X-POOTLE-MTIME: 1405839499.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
@@ -259,10 +258,7 @@ msgid "No"
 msgstr "Ne"
 
 #. /////////////////////////////////////////////////////////////////////////
-#.
 #. Dialog strings
-#.
-#.
 #. /////////////////////////////////////////////////////////////////////////
 #: C:\mtasa-blue\Client\core\CCore.cpp:715
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1091
@@ -398,8 +394,9 @@ msgid "shows the frame timing graph"
 msgstr "prikaže časovni graf okvirja"
 
 #: C:\mtasa-blue\Client\core\CCore.h:55
+#, fuzzy
 msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
-msgstr ""
+msgstr "Avtorske pravice © 2003 - 2013 Multi Theft Auto"
 
 #: C:\mtasa-blue\Client\core\CCredits.cpp:32
 msgid "Programming"
@@ -634,8 +631,8 @@ msgstr "Nadzor skupine nazaj"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:317
 msgid ""
-"You are using a feature-branch build! This is a test build only which cannot "
-"be used to connect to public servers!"
+"You are using a feature-branch build! This is a test build only which cannot"
+" be used to connect to public servers!"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
@@ -670,7 +667,8 @@ msgstr "Določena so bila napačna vrata!"
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:565
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:664
 msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Napačen vzdevek! Prosimo pojdite na Nastavitve in si izberite drugega!"
+msgstr ""
+"Napačen vzdevek! Prosimo pojdite na Nastavitve in si izberite drugega!"
 
 #: C:\mtasa-blue\Client\core\CScreenShot.cpp:53
 #, c-format
@@ -1491,8 +1489,9 @@ msgid "Bottom"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2181
+#, fuzzy
 msgid "Font"
-msgstr ""
+msgstr "Pisava:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2223
 msgid "Hide background when not typing"
@@ -1515,9 +1514,11 @@ msgid "Chat text black/white outline"
 msgstr ""
 
 #. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2494
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2501
 msgid "Press a key to bind, or escape to clear"
@@ -1597,8 +1598,7 @@ msgid ""
 "\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr ""
-"Nalaganje zaslona je potrebno na nekaterih strežnikih za protigoljufijske "
-"namene.\n"
+"Nalaganje zaslona je potrebno na nekaterih strežnikih za protigoljufijske namene.\n"
 "\n"
 "(Klepet in GUI sta izključena iz nalaganja)\n"
 
@@ -1902,8 +1902,7 @@ msgid ""
 msgstr ""
 "Ni bilo mogoče inicializirati Direct3D9.\n"
 "\n"
-"Prosimo preverite, če sta na vaši napravi naložena DirectX End-User Runtime "
-"in\n"
+"Prosimo preverite, če sta na vaši napravi naložena DirectX End-User Runtime in\n"
 "najnovejši Windows servisni paket.."
 
 #. Create the window
@@ -1939,8 +1938,7 @@ msgstr ""
 "ZA HITER DOSTOP:\n"
 "\n"
 "Vpišite naslov in vrata v naslovno vrstico.\n"
-"Ali izberite strežnik iz seznama zgodovine in pritisnite 'Vzpostavi "
-"povezavo'"
+"Ali izberite strežnik iz seznama zgodovine in pritisnite 'Vzpostavi povezavo'"
 
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:210
 msgid "HELP"
@@ -2150,7 +2148,8 @@ msgid "Please enter the password to the server:"
 msgstr "Prosimo vnesite geslo za povezavo s strežnikom:"
 
 #. Autojoin checkbox
-#. TRANSLATORS:  If you need more room, there is space for one extra line using a newline (\n).
+#. TRANSLATORS:  If you need more room, there is space for one extra line
+#. using a newline (\n).
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:182
 msgid "Join the server as soon as a player slot is available."
 msgstr "Pridruži se strežniku takoj, ko bo na voljo prostor."
@@ -2307,8 +2306,8 @@ msgid ""
 "Could not update due to file conflicts. Please close other applications and "
 "retry"
 msgstr ""
-"Ni mogoče posodobiti zaradi konfliktov z datotekami. Prosimo, zaprite ostale "
-"aplikacije in poskusite znova"
+"Ni mogoče posodobiti zaradi konfliktov z datotekami. Prosimo, zaprite ostale"
+" aplikacije in poskusite znova"
 
 #: C:\mtasa-blue\Client\loader\CInstallManager.cpp:541
 #, c-format
@@ -2369,8 +2368,7 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:64
 msgid ""
-"The file is not required and may interfere with the graphical features in "
-"this version of MTA:SA.\n"
+"The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
@@ -2639,7 +2637,8 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:611
 msgid ""
-"Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+"Registry entries are missing. Please reinstall Multi Theft Auto: San "
+"Andreas."
 msgstr ""
 "Vpisi registra manjkajo. Prosimo, ponovno namestite Multi Theft Auto: San "
 "Andreas."
@@ -2653,8 +2652,8 @@ msgid ""
 msgstr ""
 "Pot, kjer je nameščen GTA: San Andreas vsebuje nepodprte (unicode) znake. "
 "Prosimo, premaknite Grand Theft Auto: San Andreas namestitev na združljivo "
-"pot, ki vsebuje samo standardne ASCII znake in ponovno namestite Multi Theft "
-"Auto: San Andreas"
+"pot, ki vsebuje samo standardne ASCII znake in ponovno namestite Multi Theft"
+" Auto: San Andreas"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:619
 msgid ""
@@ -2662,8 +2661,8 @@ msgid ""
 "incompatible with MTASA.  You are now being redirected to a page where you "
 "can find information to resolve this issue."
 msgstr ""
-"Kot kaže, imate Steam različico programa GTA:SA, ki trenutno ni združljiva z "
-"MTA:SA. Sedaj boste preusmerjeni na spletno stran, kjer lahko najdete "
+"Kot kaže, imate Steam različico programa GTA:SA, ki trenutno ni združljiva z"
+" MTA:SA. Sedaj boste preusmerjeni na spletno stran, kjer lahko najdete "
 "informacije kako rešiti ta problem."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:632
@@ -2703,7 +2702,8 @@ msgstr "Nalaganje se je izjalovilo. Ni bilo mogoče najti gta_sa.exe v %s."
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:804
 #, c-format
 msgid ""
-"Load failed. %s exists in the GTA directory. Please delete before continuing."
+"Load failed. %s exists in the GTA directory. Please delete before "
+"continuing."
 msgstr ""
 "Nalaganje se je izjalovilo. %s obstaja v GTA mapi. Prosimo, da ga pred "
 "nadaljevanjem izbrišete."
@@ -2729,8 +2729,7 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:862
 msgid ""
-".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation "
-"directory.\n"
+".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
@@ -2763,14 +2762,11 @@ msgstr ""
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1161
 #, c-format
 msgid ""
-"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
-"the problem persists,contact MTA at www.multitheftauto.com. \n"
+"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 msgstr ""
-"Ni bilo mogoče zagnati Grand Theft Auto: San Andreas. Prosimo, da poskusite "
-"s ponovnim zagonom. Če pa se problem pojavlja, se obrnite na MTA na "
-"http://www.multitheftauto.com/ .\n"
+"Ni bilo mogoče zagnati Grand Theft Auto: San Andreas. Prosimo, da poskusite s ponovnim zagonom. Če pa se problem pojavlja, se obrnite na MTA na http://www.multitheftauto.com/ .\n"
 "\n"
 "[%s]"
 
@@ -2778,7 +2774,8 @@ msgstr ""
 msgid ""
 "GTA: San Andreas may not have launched correctly. Do you want to terminate "
 "it?"
-msgstr "GTA: San Andreas se ni zagnal pravilno. Ali hočete prekiniti ta proces?"
+msgstr ""
+"GTA: San Andreas se ni zagnal pravilno. Ali hočete prekiniti ta proces?"
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:874
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
@@ -3296,8 +3293,7 @@ msgid ""
 msgstr ""
 "Vaš brskalnik bo sedaj prikazal spletno stran za pomoč in informacije.\n"
 "\n"
-"(Če se prikaz strani izjalovi, kopirajte (CTRL + V) spletni naslov v vaš "
-"internetni brskalnik)"
+"(Če se prikaz strani izjalovi, kopirajte (CTRL + V) spletni naslov v vaš internetni brskalnik)"
 
 #~ msgid "Services currently unavailable"
 #~ msgstr "Storitev trenutno ni na voljo"

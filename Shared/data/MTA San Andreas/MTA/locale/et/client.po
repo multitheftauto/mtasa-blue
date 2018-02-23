@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.5.0-rc1\n"
 "Translators: SpunkyMe; LilDollaTechZone\n"
+"X-Generator: Pootle 2.5.0-rc1\n"
 "X-POOTLE-MTIME: 1405838405.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
@@ -258,10 +258,7 @@ msgid "No"
 msgstr "Ei"
 
 #. /////////////////////////////////////////////////////////////////////////
-#.
 #. Dialog strings
-#.
-#.
 #. /////////////////////////////////////////////////////////////////////////
 #: C:\mtasa-blue\Client\core\CCore.cpp:715
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1091
@@ -631,8 +628,8 @@ msgstr "Grupi käsk tagasi"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:317
 msgid ""
-"You are using a feature-branch build! This is a test build only which cannot "
-"be used to connect to public servers!"
+"You are using a feature-branch build! This is a test build only which cannot"
+" be used to connect to public servers!"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
@@ -1510,9 +1507,11 @@ msgid "Chat text black/white outline"
 msgstr ""
 
 #. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2494
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2501
 msgid "Press a key to bind, or escape to clear"
@@ -2139,7 +2138,8 @@ msgid "Please enter the password to the server:"
 msgstr "Palun sisestage serveri salasõna:"
 
 #. Autojoin checkbox
-#. TRANSLATORS:  If you need more room, there is space for one extra line using a newline (\n).
+#. TRANSLATORS:  If you need more room, there is space for one extra line
+#. using a newline (\n).
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:182
 msgid "Join the server as soon as a player slot is available."
 msgstr "Liitu serveriga esimesel võimalusel kui koht vabaneb."
@@ -2292,8 +2292,8 @@ msgid ""
 "Could not update due to file conflicts. Please close other applications and "
 "retry"
 msgstr ""
-"Ei suuda uuendada faili konflikti pärast. Palun sulgege teised rakendused ja "
-"proovige uuesti"
+"Ei suuda uuendada faili konflikti pärast. Palun sulgege teised rakendused ja"
+" proovige uuesti"
 
 #: C:\mtasa-blue\Client\loader\CInstallManager.cpp:541
 #, c-format
@@ -2354,8 +2354,7 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:64
 msgid ""
-"The file is not required and may interfere with the graphical features in "
-"this version of MTA:SA.\n"
+"The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
@@ -2624,7 +2623,8 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:611
 msgid ""
-"Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+"Registry entries are missing. Please reinstall Multi Theft Auto: San "
+"Andreas."
 msgstr ""
 "Registrikanne puudub. Palun paigaldage Multi Theft Auto: San Andreas uuesti."
 
@@ -2688,7 +2688,8 @@ msgstr "Laadimine ebaõnnestus. Ei suutnud leida gta_sa.exe kohast %s."
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:804
 #, c-format
 msgid ""
-"Load failed. %s exists in the GTA directory. Please delete before continuing."
+"Load failed. %s exists in the GTA directory. Please delete before "
+"continuing."
 msgstr ""
 "Laadimine ebaõnnestus. %s eksisteerib GTA kaustas. Palun kustutage ennem "
 "jätkamist."
@@ -2714,8 +2715,7 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:862
 msgid ""
-".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation "
-"directory.\n"
+".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
@@ -2748,14 +2748,11 @@ msgstr ""
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1161
 #, c-format
 msgid ""
-"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
-"the problem persists,contact MTA at www.multitheftauto.com. \n"
+"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 msgstr ""
-"Ei suuda käivitada Grand Theft Auto: San Andreast. Proovige taaskäivitada "
-"ning kui probleem jätkub siis kontakteeruge MTA tiimiga veebilehelt "
-"www.multitheftauto.com\n"
+"Ei suuda käivitada Grand Theft Auto: San Andreast. Proovige taaskäivitada ning kui probleem jätkub siis kontakteeruge MTA tiimiga veebilehelt www.multitheftauto.com\n"
 "\n"
 "[%s]"
 
@@ -2763,7 +2760,8 @@ msgstr ""
 msgid ""
 "GTA: San Andreas may not have launched correctly. Do you want to terminate "
 "it?"
-msgstr "GTA: San Andreas ei käivitunud korrektselt. Kas soovite selle sulgeda?"
+msgstr ""
+"GTA: San Andreas ei käivitunud korrektselt. Kas soovite selle sulgeda?"
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:874
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
@@ -3200,7 +3198,8 @@ msgstr "Alla laadimise viga: %s"
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CServer.cpp:194
 msgid "Could not start the local server. See console for details."
-msgstr "Ei suuda kohalikku serverit käivitada. Rohkem informatsiooni konsoolis."
+msgstr ""
+"Ei suuda kohalikku serverit käivitada. Rohkem informatsiooni konsoolis."
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CServer.cpp:195
 #, c-format
@@ -3248,8 +3247,8 @@ msgid ""
 "Protocol error (%u). If this problem persists, please check out mtasa.com "
 "for support."
 msgstr ""
-"Protokolli viga (%u). Kui probleem jätkub siis palun külastage mtasa.com abi "
-"saamiseks."
+"Protokolli viga (%u). Kui probleem jätkub siis palun külastage mtasa.com abi"
+" saamiseks."
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:169
 msgid "Connection error"
@@ -3262,7 +3261,8 @@ msgstr ""
 
 #: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:89
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
-msgstr "Multi Theft Auto pole paigaldatud korrektselt, palun paigaldage uuesti."
+msgstr ""
+"Multi Theft Auto pole paigaldatud korrektselt, palun paigaldage uuesti."
 
 #: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:653
 msgid ""
@@ -3272,8 +3272,7 @@ msgid ""
 msgstr ""
 "Sinu brauser näitab veebilehte koos abistava tekstiga.\n"
 "\n"
-"(Kui lehekülg ei lae ära siis kleebi (CTRL-V) aadress oma veebilehitseja "
-"aknasse)"
+"(Kui lehekülg ei lae ära siis kleebi (CTRL-V) aadress oma veebilehitseja aknasse)"
 
 #~ msgid "Services currently unavailable"
 #~ msgstr "Teenus pole praegu kättesaadav"
