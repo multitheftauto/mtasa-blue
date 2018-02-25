@@ -41,6 +41,7 @@ typedef CNetServer* (*InitNetServerInterface) ( void );
 
 #ifdef WIN32
 typedef void (FClientFeedback) ( const char* szText );
+constexpr SHORT SCREEN_BUFFER_SIZE = 256;
 #endif
 
 class CServerImpl : public CServerInterface
@@ -110,7 +111,7 @@ private:
 #ifdef WIN32
     HANDLE              m_hConsole;
     HANDLE              m_hConsoleInput;
-    CHAR_INFO           m_ScrnBuffer[256];
+    CHAR_INFO           m_ScrnBuffer[SCREEN_BUFFER_SIZE];
 
     CThreadCommandQueue*    m_pThreadCommandQueue;
 #endif

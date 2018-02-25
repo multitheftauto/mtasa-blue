@@ -363,7 +363,6 @@ void CClientPacketRecorder::DoPulse ( void )
         // Time to play the next packet?
         long lCurTime = (long)CClientTime::GetTime () - m_lRelative;
         //g_pCore->GetConsole()->Printf("current time:%u\n",lCurTime);
-        if(m_bFrameBased) __asm int 3;
         while ( ( m_bFrameBased && ( m_lFrames - m_lRelative >= m_lNextPacketTime ) ) || ( !m_bFrameBased && ( lCurTime >= m_lNextPacketTime ) ) )
         {
             // Load the file
@@ -397,7 +396,7 @@ void CClientPacketRecorder::DoPulse ( void )
                     // Raise a breakpoint?
                     if ( ucPacketID == 0xFD )
                     {
-                        _asm int 3;
+                        assert(false);
                         Stop ();
                         return;
                     }

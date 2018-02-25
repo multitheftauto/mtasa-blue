@@ -120,24 +120,61 @@ HRESULT CProxyDirect3DVertexBuffer::Lock ( UINT OffsetToLock, UINT SizeToLock, v
     }
 
     *ppbData = NULL;
-    HRESULT hr = m_pOriginal->Lock ( OffsetToLock, SizeToLock, ppbData, Flags );
+    HRESULT hr = DoLock(OffsetToLock, SizeToLock, ppbData, Flags);
 
-    if( FAILED( hr ) )
+    // Report problems
+    if(FAILED(hr) || *ppbData == NULL)
     {
-        SString strMessage( "Lock VertexBuffer fail: hr:%x Length:%x Usage:%x FVF:%x Pool:%x OffsetToLock:%x SizeToLock:%x Flags:%x"
-                                                        , hr, m_iMemUsed, m_dwUsage, m_dwFVF, m_pool, OffsetToLock, SizeToLock, Flags );
+        struct
+        {
+            const char* szText;
+            uint uiReportId;
+            uint uiLogEventId;
+        } info;
+        if (hr == D3D_OK)
+            info = {"result NULL", 8621, 621};
+        else if (hr == E_BOUNDS)
+            info = {"offset out of range", 8622, 622};
+        else if (hr == STATUS_ACCESS_VIOLATION)
+            info = {"access violation", 8623, 623};
+        else
+            info = {"fail", 8620, 620};
+
+        SString strMessage( "Lock VertexBuffer [%s] hr:%x Length:%x Usage:%x FVF:%x Pool:%x OffsetToLock:%x SizeToLock:%x Flags:%x",
+                                                        info.szText, hr, m_iMemUsed, m_dwUsage, m_dwFVF, m_pool, OffsetToLock, SizeToLock, Flags );
         WriteDebugEvent( strMessage );
-        AddReportLog( 8620, strMessage );
-        CCore::GetSingleton ().LogEvent ( 620, "Lock VertexBuffer", "", strMessage );
-    }
-    else
-    if ( *ppbData == NULL )
-    {
-        SString strMessage( "Lock VertexBuffer result NULL: hr:%x Length:%x Usage:%x FVF:%x Pool:%x OffsetToLock:%x SizeToLock:%x Flags:%x"
-                                                        , hr, m_iMemUsed, m_dwUsage, m_dwFVF, m_pool, OffsetToLock, SizeToLock, Flags );
-        WriteDebugEvent( strMessage );
-        AddReportLog( 8621, strMessage );
-        CCore::GetSingleton ().LogEvent ( 621, "Lock VertexBuffer NULL", "", strMessage );
+        AddReportLog( info.uiReportId, strMessage );
+        CCore::GetSingleton ().LogEvent ( info.uiLogEventId, "Lock VertexBuffer", "", strMessage );
     }
     return hr;
+}
+
+
+/////////////////////////////////////////////////////////////
+//
+// CProxyDirect3DVertexBuffer::DoLock
+//
+// With validation and exception catcher
+//
+/////////////////////////////////////////////////////////////
+HRESULT CProxyDirect3DVertexBuffer::DoLock(UINT OffsetToLock, UINT SizeToLock, void** ppbData, DWORD Flags)
+{
+    // Validate sizes because gta can give invalid values (reason unknown)
+    if (OffsetToLock + SizeToLock > m_iMemUsed)
+    {
+        if (OffsetToLock > m_iMemUsed)
+        {
+            return E_BOUNDS;
+        }
+        SizeToLock = m_iMemUsed - OffsetToLock;
+    }
+
+    __try
+    {
+        return m_pOriginal->Lock(OffsetToLock, SizeToLock, ppbData, Flags);
+    }
+    __except(GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION)
+    {
+        return STATUS_ACCESS_VIOLATION;
+    }
 }

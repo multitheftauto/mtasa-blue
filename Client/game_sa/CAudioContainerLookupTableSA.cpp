@@ -13,17 +13,22 @@
 #include "StdInc.h"
 #include "CAudioContainerLookupTableSA.h"
 
-CAudioContainerLookupTableSA::CAudioContainerLookupTableSA( const SString& strPath )
+CAudioContainerLookupTableSA::CAudioContainerLookupTableSA ( const SString& strPath )
 {
-    std::ifstream fileHandle ( FromUTF8( strPath ), std::ios::binary );
+    std::ifstream fileHandle ( FromUTF8 ( strPath ), std::ios::binary );
+    
     if ( !fileHandle )
         return;
 
-    while (true)
+    while ( true )
     {
         SAudioLookupEntrySA* entry = new SAudioLookupEntrySA;
-        if ( !fileHandle.read ( reinterpret_cast<char*> ( entry ), sizeof ( SAudioLookupEntrySA ) ) )
+
+        if ( !fileHandle.read ( reinterpret_cast < char * > ( entry ), sizeof ( SAudioLookupEntrySA ) ) )
+        {
+            delete entry;
             break;
+        }
 
         m_Entries[entry->index].push_back ( entry );
     }
@@ -31,13 +36,13 @@ CAudioContainerLookupTableSA::CAudioContainerLookupTableSA( const SString& strPa
     fileHandle.close ();
 }
 
-CAudioContainerLookupTableSA::~CAudioContainerLookupTableSA(void)
+CAudioContainerLookupTableSA::~CAudioContainerLookupTableSA ( void )
 {
     for ( int i = 0; i < 9; i++ )
     {
         for ( std::vector<SAudioLookupEntrySA*>::iterator it = m_Entries[i].begin (); it != m_Entries[i].end (); it++ )
         {
-           if ( *it != NULL )
+           if ( *it != nullptr )
                delete *it;
         }
     }
@@ -54,10 +59,10 @@ int CAudioContainerLookupTableSA::CountIndex ( eAudioLookupIndex index )
 SAudioLookupEntrySA* CAudioContainerLookupTableSA::GetEntry ( eAudioLookupIndex lookupIndex, uint8 bankIndex )
 {
     if ( lookupIndex < 0 || lookupIndex > 8 )
-        return NULL;
+        return nullptr;
 
     if ( static_cast<unsigned int>(bankIndex+1) > m_Entries[lookupIndex].size () )
-        return NULL;
+        return nullptr;
 
     return m_Entries[lookupIndex][bankIndex];
 }

@@ -98,7 +98,6 @@ CObjectSA::CObjectSA( DWORD dwModel, bool bBreakingDisabled )
         mov     dwTemp, eax
     }
 
-//    _asm int 3
     dwFunc = 0x5B51E0; // AddBuildingInstancesToWorld
     _asm
     {

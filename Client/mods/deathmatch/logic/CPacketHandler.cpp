@@ -245,7 +245,7 @@ void CPacketHandler::Packet_ServerConnected ( NetBitStreamInterface& bitStream )
     unsigned short ucSize = 0;
     if (!bitStream.Read(ucSize))
     {
-        __asm int 3;
+        dassert(false);
         g_pCore->SetConnected ( false );
         return;
     }

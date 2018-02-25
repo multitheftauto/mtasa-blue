@@ -29,6 +29,11 @@ enum class PasswordHashFunction
     Bcrypt
 };
 
+enum class StringEncryptFunction
+{
+    TEA
+};
+
 namespace SharedUtil
 {
     struct MD5

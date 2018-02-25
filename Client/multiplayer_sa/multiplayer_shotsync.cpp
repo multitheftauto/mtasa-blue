@@ -367,7 +367,7 @@ VOID _declspec(naked) HOOK_SkipAim ()
         _asm
         {
             // Restore all registers
-            _asm popad;
+            popad
 
             // Return to 0x62A565 (arms up)
             mov         ecx, 0x62A565
@@ -379,7 +379,7 @@ VOID _declspec(naked) HOOK_SkipAim ()
         _asm
         {
             // Restore all registers
-            _asm popad;
+            popad
 
             // Return to 0x62AEED (normal aim)
             mov         ecx, 0x62AEED
@@ -1337,7 +1337,10 @@ void _declspec(naked) HOOK_CWeapon_FireInstantHit ()
     }
 
     // Make sure we include car tyres in our ProcessLineOfSight check
-    _asm call DoFireInstantHitPokes
+    _asm
+    {
+        call DoFireInstantHitPokes
+    }
 
     HandleRemoteInstantHit ();
 
@@ -1488,16 +1491,16 @@ void _declspec(naked) HOOK_CWeapon_FireInstantHit_IsPlayer ()
     }
 }
     
-/*
+#if false
 VOID _declspec(naked) HOOK_CCamera__Find3rdPersonCamTargetVector()
-{*/
+{
     /*
     0046FB36  |. 5D             POP EBP
     0046FB37  |. 5E             POP ESI
     0046FB38  |. 5B             POP EBX
     0046FB39  \. C2 1800        RETN 18
     */
-    /*_asm
+    _asm
     {
         mov     ebp, esp
         add     ebp, 0x14
@@ -1555,7 +1558,7 @@ VOID _declspec(naked) HOOK_CCamera__Find3rdPersonCamTargetVector()
             LocalPlayerStartVector.fY, 
             LocalPlayerStartVector.fZ);
         OutputDebugString(szDebug);*/
-/*  }
+    }
 
     _asm
     {
@@ -1566,10 +1569,10 @@ VOID _declspec(naked) HOOK_CCamera__Find3rdPersonCamTargetVector()
         pop     ebx
         retn    0x18
     }   
-}*/
-/*
+}
+
 VOID _declspec(naked) HOOK_CWeapon__FireShotgun()
-{*/
+{
     // this is used to store and replace the CrossProduct
     /*
     005CDA99   . 50                      PUSH EAX
@@ -1581,7 +1584,10 @@ VOID _declspec(naked) HOOK_CWeapon__FireShotgun()
     005CDAAA   . 83C4 0C                 ADD ESP,0C
     */
 
-/*  _asm pushad
+    _asm
+    {
+        pushad
+    }
 
     if(IsNotInLocalContext() && GetContextSwitchPedID())
     {
@@ -1639,7 +1645,8 @@ VOID _declspec(naked) HOOK_CWeapon__FireShotgun()
         add     edx, 20
         jmp     edx
     }   
-}*/
+}
+#endif
 
 CPedSAInterface *CEventVehicleExplosion_pPed;
 

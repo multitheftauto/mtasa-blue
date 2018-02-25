@@ -15,7 +15,7 @@
 #include "ns_common.h"
 #include "net/bitstream.h"
 #include "ns_playerid.h"
-#include "CNetHTTPDownloadManagerInterface.h"
+#include "net/CNetHTTPDownloadManagerInterface.h"
 
 #define MAX_CALL_REMOTE_QUEUES  100
 

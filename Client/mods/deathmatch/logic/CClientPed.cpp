@@ -1413,7 +1413,7 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
         // Swim tasks
         KillTask ( TASK_PRIORITY_EVENT_RESPONSE_NONTEMP );
         // Jump & vehicle enter/exit & custom animation tasks
-        KillTask ( TASK_PRIORITY_PRIMARY );
+        m_pTaskManager->RemoveTask ( TASK_PRIORITY_PRIMARY );
 
         KillTaskSecondary ( TASK_SECONDARY_ATTACK );
 
@@ -1515,6 +1515,11 @@ void CClientPed::WarpIntoVehicle ( CClientVehicle* pVehicle, unsigned int uiSeat
     // Turn on the radio if local player and it's not already on.
     if ( m_bIsLocalPlayer )
     {
+        CVehicle* pGameVehicle = pVehicle->m_pVehicle;
+        if ( pGameVehicle )
+        {
+            pGameVehicle->GetVehicleAudioEntity ()->TurnOnRadioForVehicle ();
+        }
         StartRadio ();
     }
 
@@ -5118,6 +5123,7 @@ bool CClientPed::IsGettingOutOfVehicle ( void )
                     switch ( pSubTask->GetTaskType () )
                     {
                         case TASK_SIMPLE_CAR_GET_OUT:
+                        case TASK_SIMPLE_CAR_JUMP_OUT:
                         case TASK_SIMPLE_CAR_CLOSE_DOOR_FROM_OUTSIDE:
                         {
                             return true;
@@ -6036,6 +6042,12 @@ bool CClientPed::ReloadWeapon ( void )
         }
     }
     return false;
+}
+
+
+bool CClientPed::IsReloadingWeapon(void)
+{
+    return GetWeapon()->GetState() == WEAPONSTATE_RELOADING;
 }
 
 

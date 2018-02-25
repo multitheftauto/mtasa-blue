@@ -72,6 +72,7 @@ public:
     LUA_DECLARE ( SetPedMoveAnim );
     LUA_DECLARE ( SetPedWeaponSlot );
     LUA_DECLARE ( GivePedWeapon );
+    LUA_DECLARE ( IsPedReloadingWeapon );
     LUA_DECLARE ( AddPedClothes );
     LUA_DECLARE ( RemovePedClothes );
     LUA_DECLARE ( SetPedControlState );

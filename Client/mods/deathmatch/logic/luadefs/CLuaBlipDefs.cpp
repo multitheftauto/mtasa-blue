@@ -77,6 +77,11 @@ int CLuaBlipDefs::CreateBlip ( lua_State* luaVM )
     argStream.ReadNumber ( sOrdering, 0 );
     argStream.ReadNumber ( usVisibleDistance, 16383 );
 
+    if (!CClientRadarMarkerManager::IsValidIcon(ucIcon))
+    {
+        argStream.SetCustomError("Invalid icon");
+    }
+
     if ( !argStream.HasErrors () )
     {
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
@@ -129,7 +134,11 @@ int CLuaBlipDefs::CreateBlipAttachedTo ( lua_State* luaVM )
     argStream.ReadNumber ( sOrdering, 0 );
     argStream.ReadNumber ( usVisibleDistance, 16383 );
 
-    // Element in place?
+    if (!CClientRadarMarkerManager::IsValidIcon(ucIcon))
+    {
+        argStream.SetCustomError("Invalid icon");
+    }
+
     if ( !argStream.HasErrors () )
     {
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );

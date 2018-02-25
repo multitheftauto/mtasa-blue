@@ -758,7 +758,7 @@ int CLuaGUIDefs::GUICreateStaticImage ( lua_State* luaVM )
                 return 1;
             }
             else
-                argStream.SetCustomError( strPath, "Bad file path" );
+                argStream.SetCustomError( path, "Bad file path" );
         }
     }
     if ( argStream.HasErrors () )
@@ -1112,10 +1112,10 @@ int CLuaGUIDefs::GUIStaticImageLoadImage ( lua_State* luaVM )
                     return 1;
                 }
                 else
-                    argStream.SetCustomError( strPath, "Error loading image" );
+                    argStream.SetCustomError( filename, "Error loading image" );
             }
             else
-                argStream.SetCustomError( strPath, "Bad file path" );
+                argStream.SetCustomError( filename, "Bad file path" );
         }
     }
     if ( argStream.HasErrors () )

@@ -67,7 +67,6 @@ VOID CPopulationSA::AddPed ( CPedSAInterface * ped )
         }
     }
 
-    //_asm int 3
     CCivilianPedSA * pedSA = dynamic_cast < CCivilianPedSA* > ( pGameInterface->GetPools()->AddCivilianPed((DWORD *)ped ) );
     if ( !pedSA ) return;
 

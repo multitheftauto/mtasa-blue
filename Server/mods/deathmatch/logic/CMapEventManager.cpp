@@ -173,6 +173,9 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
 
                     TIMEUS startTime = GetTimeUs();
 
+                    if ( !g_pGame->GetDebugHookManager()->OnPreEventFunction( szName, Arguments, pSource, pCaller, pMapEvent ) )
+                        continue;
+
                     // Store the current values of the globals
                     lua_getglobal ( pState, "source" );
                     CLuaArgument OldSource ( pState, -1 );
@@ -241,6 +244,8 @@ bool CMapEventManager::Call ( const char* szName, const CLuaArguments& Arguments
                     // Call it
                     pMapEvent->Call ( Arguments );
                     bCalled = true;
+
+                    g_pGame->GetDebugHookManager()->OnPostEventFunction( szName, Arguments, pSource, pCaller, pMapEvent );
 
                     // Reset the globals on that VM
                     OldSource.Push ( pState );

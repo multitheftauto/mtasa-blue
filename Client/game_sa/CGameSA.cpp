@@ -67,6 +67,7 @@ CGameSA::CGameSA()
     DEBUG_TRACE("CGameSA::CGameSA()");
     this->m_pAudioEngine            = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
     this->m_pAEAudioHardware        = new CAEAudioHardwareSA((CAEAudioHardwareSAInterface*)CLASS_CAEAudioHardware);
+    this->m_pAESoundManager         = new CAESoundManagerSA((CAESoundManagerSAInterface*)CLASS_CAESoundManager);
     this->m_pAudioContainer         = new CAudioContainerSA();
     this->m_pWorld                  = new CWorldSA();
     this->m_pPools                  = new CPoolsSA();
