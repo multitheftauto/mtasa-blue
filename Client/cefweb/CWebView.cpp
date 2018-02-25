@@ -976,7 +976,7 @@ bool CWebView::OnTooltip ( CefRefPtr<CefBrowser> browser, CefString& title )
 // http://magpcss.org/ceforum/apidocs/projects/%28default%29/CefDisplayHandler.html#OnConsoleMessage%28CefRefPtr%3CCefBrowser%3E,constCefString&,constCefString&,int%29 //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnConsoleMessage ( CefRefPtr<CefBrowser> browser, const CefString& message, const CefString& source, int line )
+bool CWebView::OnConsoleMessage ( CefRefPtr<CefBrowser> browser, cef_log_severity_t level, const CefString& message, const CefString& source, int line )
 {
     // Redirect console message to debug window (if development mode is enabled)
     if ( g_pCore->GetWebCore ()->IsTestModeEnabled () )
