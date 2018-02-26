@@ -30,7 +30,7 @@ public:
     LUA_DECLARE ( GetObjectAirResistance );
     LUA_DECLARE ( GetObjectElasticity );
     LUA_DECLARE ( GetObjectBuoyancyConstant );
-    LUA_DECLARE ( GetObjectCenterOfMass );
+    LUA_DECLARE_OOP ( GetObjectCenterOfMass );
 
     // Object set funcs
     LUA_DECLARE ( SetObjectRotation );

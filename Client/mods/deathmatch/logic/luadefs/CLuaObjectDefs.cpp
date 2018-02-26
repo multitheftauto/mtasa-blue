@@ -71,7 +71,7 @@ void CLuaObjectDefs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "airResistance", "setObjectAirResistance", "getObjectAirResistance" );
     lua_classvariable ( luaVM, "elasticity", "setObjectElasticity", "getObjectElasticity" );
     lua_classvariable ( luaVM, "buoyancy", "setObjectBuoyancy", "getObjectBuoyancy" );
-    lua_classvariable ( luaVM, "centerOfMass", "setObjectCenterOfMass", "getObjectCenterOfMass" );
+    lua_classvariable ( luaVM, "centerOfMass", SetObjectCenterOfMass, OOP_GetObjectCenterOfMass );
 
     // Add deprecated methods for backwards compatibility
     lua_classfunction(luaVM, "toggleObjectRespawn", "toggleObjectRespawn");
@@ -335,7 +335,7 @@ int CLuaObjectDefs::GetObjectBuoyancyConstant ( lua_State* luaVM )
 
 int CLuaObjectDefs::GetObjectCenterOfMass ( lua_State* luaVM )
 {
-//  float getObjectCenterOfMass ( object theObject )
+//  float, float, float getObjectCenterOfMass ( object theObject )
     CClientObject* pObject;
 
     CScriptArgReader argStream ( luaVM );
@@ -354,6 +354,31 @@ int CLuaObjectDefs::GetObjectCenterOfMass ( lua_State* luaVM )
     }
     else
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaObjectDefs::OOP_GetObjectCenterOfMass ( lua_State* luaVM )
+{
+    CClientObject* pObject;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pObject );
+
+    if ( !argStream.HasErrors () )
+    {
+        CVector vecCenterOfMass;
+
+        if ( CStaticFunctionDefinitions::GetObjectCenterOfMass ( *pObject, vecCenterOfMass ) )
+        {
+            lua_pushvector ( luaVM, vecCenterOfMass );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
 
     lua_pushboolean ( luaVM, false );
     return 1;
