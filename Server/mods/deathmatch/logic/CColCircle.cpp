@@ -25,6 +25,12 @@ CColCircle::CColCircle ( CColManager* pManager, CElement* pParent, const CVector
 }
 
 
+CColCircle* CColCircle::Clone ( CColManager* pManager ) 
+{
+    return new CColCircle ( pManager, this->m_pParent, this->m_vecPosition, this->m_fRadius, this->m_pXMLNode, this->IsPartnered() );
+}
+
+
 bool CColCircle::DoHitDetection ( const CVector& vecNowPosition )
 {
     // Do a simple distance check between now position and our position 

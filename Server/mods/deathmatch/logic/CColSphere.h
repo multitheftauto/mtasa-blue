@@ -21,6 +21,7 @@ class CColSphere : public CColShape
 public:
                     CColSphere      ( CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, CXMLNode* pNode = NULL, bool bIsPartnered = false );
 
+    CColSphere*     Clone           ( CColManager* pManager );
     virtual CSphere         GetWorldBoundingSphere  ( void );
 
     eColShapeType   GetShapeType    ( void )            { return COLSHAPE_SPHERE; }

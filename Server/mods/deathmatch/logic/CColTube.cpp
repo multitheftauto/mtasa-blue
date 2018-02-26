@@ -22,6 +22,12 @@ CColTube::CColTube ( CColManager* pManager, CElement* pParent, const CVector& ve
 }
 
 
+CColTube* CColTube::Clone ( CColManager* pManager ) 
+{
+    return new CColTube ( pManager, this->m_pParent, this->m_vecPosition, this->m_fRadius, this->m_fHeight, this->m_pXMLNode );
+}
+
+
 bool CColTube::DoHitDetection ( const CVector& vecNowPosition )
 {
     // FIXME: What about radius in height?

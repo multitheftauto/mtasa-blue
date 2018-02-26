@@ -22,6 +22,14 @@ CColPolygon::CColPolygon ( CColManager* pManager, CElement* pParent, const CVect
 }
 
 
+CColPolygon* CColPolygon::Clone ( CColManager* pManager ) 
+{
+    CColPolygon* pNewCol = new CColPolygon ( pManager, this->m_pParent, this->m_vecPosition, this->m_pXMLNode );
+    pNewCol->m_Points = this->m_Points;
+    return pNewCol;
+}
+
+
 bool CColPolygon::DoHitDetection  ( const CVector& vecNowPosition )
 {
     if ( !IsInBounds ( vecNowPosition ) )

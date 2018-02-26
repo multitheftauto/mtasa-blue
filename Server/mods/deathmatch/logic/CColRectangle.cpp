@@ -24,6 +24,12 @@ CColRectangle::CColRectangle ( CColManager* pManager, CElement* pParent, const C
 }
 
 
+CColRectangle* CColRectangle::Clone ( CColManager* pManager ) 
+{
+    return new CColRectangle ( pManager, this->m_pParent, this->m_vecPosition, this->m_vecSize, this->m_pXMLNode );
+}
+
+
 bool CColRectangle::DoHitDetection ( const CVector& vecNowPosition )
 {
     // FIXME: What about radius?

@@ -41,6 +41,25 @@ CColShape::~CColShape ( void )
 }
 
 
+CColShape* CColShape::Clone ( CColManager* pManager ) {
+    switch ( this->GetShapeType () ) {
+        case COLSHAPE_CIRCLE:
+            return static_cast < CColCircle* > ( this )->Clone ( pManager );
+        case COLSHAPE_CUBOID:
+            return static_cast < CColCuboid* > ( this )->Clone ( pManager );
+        case COLSHAPE_POLYGON:
+            return static_cast < CColPolygon* > ( this )->Clone ( pManager );
+        case COLSHAPE_RECTANGLE:
+            return static_cast < CColRectangle* > ( this )->Clone ( pManager );
+        case COLSHAPE_SPHERE:
+            return static_cast < CColSphere* > ( this )->Clone ( pManager );
+        case COLSHAPE_TUBE:
+            return static_cast < CColTube* > ( this )->Clone ( pManager );
+    }
+    return NULL;
+} 
+
+
 void CColShape::Unlink ( void )
 {
     // Remove us from manager's list

@@ -21,6 +21,7 @@ class CColTube : public CColShape
 public:
                             CColTube        ( CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, float fHeight, CXMLNode* pNode = NULL );
 
+    CColTube*               Clone           ( CColManager* pManager ); 
     virtual CSphere         GetWorldBoundingSphere  ( void );
 
     eColShapeType           GetShapeType    ( void )            { return COLSHAPE_TUBE; }

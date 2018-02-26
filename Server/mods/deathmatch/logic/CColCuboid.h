@@ -19,7 +19,8 @@ class CColCuboid : public CColShape
 {
 public:
                             CColCuboid      ( CColManager* pManager, CElement* pParent, const CVector& vecPosition, const CVector& vecSize, CXMLNode* pNode = NULL );
-
+    
+    CColCuboid*             Clone           ( CColManager* pManager );
     virtual CSphere         GetWorldBoundingSphere  ( void );
 
     eColShapeType           GetShapeType    ( void )            { return COLSHAPE_CUBOID; }

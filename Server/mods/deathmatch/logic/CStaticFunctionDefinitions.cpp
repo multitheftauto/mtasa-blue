@@ -349,6 +349,7 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
             case CElement::PICKUP:
             case CElement::RADAR_AREA:
             case CElement::PATH_NODE_UNUSED:
+            case CElement::COLSHAPE:
                 break;
             default:
                 return NULL;
@@ -510,6 +511,13 @@ CElement* CStaticFunctionDefinitions::CloneElement ( CResource* pResource, CElem
 
                 pNewElement = pTemp;
             }
+            break;
+        }
+        case CElement::COLSHAPE:
+        {  
+            CColShape* pColShape = static_cast < CColShape* > ( pElement );
+             
+            pNewElement = pColShape->Clone ( m_pColManager );
             break;
         }
     }
