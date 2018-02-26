@@ -3998,49 +3998,40 @@ bool CStaticFunctionDefinitions::SetObjectTurnMass ( CClientEntity& Entity, floa
 
 bool CStaticFunctionDefinitions::SetObjectAirResistance ( CClientEntity& Entity, float fAirResistance )
 {
-    //if ( fAirResistance > 0.0f && fAirResistance <= 1.0f )
-    //{
-        RUN_CHILDREN ( SetObjectAirResistance ( **iter, fAirResistance ) )
+    RUN_CHILDREN ( SetObjectAirResistance ( **iter, fAirResistance ) )
 
-        if ( IS_OBJECT ( &Entity ) )
-        {
-            CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
-            Object.SetAirResistance ( fAirResistance );
-            return true;
-        }
-    //}
+    if ( IS_OBJECT ( &Entity ) )
+    {
+        CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
+        Object.SetAirResistance ( fAirResistance );
+        return true;
+    }
     return false;
 }
 
 bool CStaticFunctionDefinitions::SetObjectElasticity ( CClientEntity& Entity, float fElasticity )
 {
-    //if ( fElasticity >= 0.0f )
-    //{
-        RUN_CHILDREN ( SetObjectElasticity ( **iter, fElasticity ) )
+    RUN_CHILDREN ( SetObjectElasticity ( **iter, fElasticity ) )
 
-        if ( IS_OBJECT ( &Entity ) )
-        {
-            CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
-            Object.SetElasticity ( fElasticity );
-            return true;
-        }
-    //}
+    if ( IS_OBJECT ( &Entity ) )
+    {
+        CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
+        Object.SetElasticity ( fElasticity );
+        return true;
+    }
     return false;
 }
 
 bool CStaticFunctionDefinitions::SetObjectBuoyancyConstant ( CClientEntity& Entity, float fBuoyancyConstant )
 {
-    //if ( fElasticity >= 0.0f )
-    //{
-        RUN_CHILDREN ( SetObjectBuoyancyConstant ( **iter, fBuoyancyConstant ) )
+    RUN_CHILDREN ( SetObjectBuoyancyConstant ( **iter, fBuoyancyConstant ) )
 
-        if ( IS_OBJECT ( &Entity ) )
-        {
-            CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
-            Object.SetBuoyancyConstant ( fBuoyancyConstant );
-            return true;
-        }
-    //}
+    if ( IS_OBJECT ( &Entity ) )
+    {
+        CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
+        Object.SetBuoyancyConstant ( fBuoyancyConstant );
+        return true;
+    }
     return false;
 }
 
