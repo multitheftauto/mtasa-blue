@@ -55,6 +55,13 @@
 #include "CVoiceRecorder.h"
 #include "CSingularFileDownloadManager.h"
 #include "CObjectRespawner.h"
+
+typedef CAnimBlendAssociation *  ( __thiscall * hCAnimBlendAssocGroup_CopyAnimation )
+(
+    CAnimBlendAssocGroupSAInterface * pThis, 
+    AnimationId                       AnimID
+);
+
 #define HeliKill_List_Clear_Rate 500
 #define MIN_PUSH_ANTISPAM_RATE 1500
 #define INVALID_DOWNLOAD_PRIORITY_GROUP (INT_MIN)
@@ -502,7 +509,7 @@ private:
     static void                         StaticPostWorldProcessHandler   ( void );
     static void                         StaticPreFxRenderHandler        ( void );
     static void                         StaticPreHudRenderHandler       ( void );
-    static void                         StaticAddAnimationHandler       ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
+    static CAnimBlendAssociation *      StaticAddAnimationHandler       ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     static void                         StaticBlendAnimationHandler     ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     static bool                         StaticProcessCollisionHandler   ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     static bool                         StaticVehicleCollisionHandler   ( CVehicleSAInterface* pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity  );
@@ -533,7 +540,7 @@ private:
     bool                                ChokingHandler                  ( unsigned char ucWeaponType );
     void                                PreWorldProcessHandler          ( void );
     void                                PostWorldProcessHandler         ( void );
-    void                                AddAnimationHandler             ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
+    CAnimBlendAssociation *             AddAnimationHandler             ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     void                                BlendAnimationHandler           ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     bool                                ProcessCollisionHandler         ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     bool                                VehicleCollisionHandler         ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity  );
