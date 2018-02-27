@@ -36,6 +36,7 @@ struct SClothesCacheStats
     uint uiNumRemoved;
 };
 
+class CAnimBlendAssociation;
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
 
@@ -63,7 +64,7 @@ typedef void ( PostWorldProcessHandler ) ( void );
 typedef void ( IdleHandler ) ( void );
 typedef void ( PreFxRenderHandler ) ( void );
 typedef void ( PreHudRenderHandler ) ( void );
-typedef void ( AddAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
+typedef CAnimBlendAssociation * ( AddAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
 typedef void ( BlendAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
 typedef bool ( ProcessCollisionHandler ) ( class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface );
 typedef bool ( VehicleCollisionHandler ) ( class CVehicleSAInterface* pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity );
