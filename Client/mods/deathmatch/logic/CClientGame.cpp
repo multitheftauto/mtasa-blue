@@ -24,6 +24,7 @@
 
 #include "StdInc.h"
 #include <net/SyncStructures.h>
+#include <../Client/game_sa/CAnimBlendAssocGroupSA.h>
 
 SString StringZeroPadout ( const SString& strInput, uint uiPadoutSize )
 {
@@ -3690,9 +3691,9 @@ bool CClientGame::StaticChokingHandler ( unsigned char ucWeaponType )
     return g_pClientGame->ChokingHandler ( ucWeaponType );
 }
 
-void CClientGame::StaticAddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
+CAnimBlendAssociation * CClientGame::StaticAddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
 {
-    g_pClientGame->AddAnimationHandler ( pClump, animGroup, animID );
+    return g_pClientGame->AddAnimationHandler ( pClump, animGroup, animID );
 }
 
 void CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
@@ -3981,10 +3982,23 @@ bool CClientGame::ChokingHandler ( unsigned char ucWeaponType )
     return m_pLocalPlayer->CallEvent ( "onClientPlayerChoke", Arguments, true );
 }
 
-
-void CClientGame::AddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
+CAnimBlendAssociation * CClientGame::AddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
 {
+    printf ( "AddAnimationHandler called! GroupID, AnimID: %d, %d\n", animGroup, animID );
+
     //CClientPed * pPed = m_pPedManager->Get ( pClump, true );
+
+    hCAnimBlendAssocGroup_CopyAnimation CAnimBlendAssocGroup_CopyAnimation = reinterpret_cast < hCAnimBlendAssocGroup_CopyAnimation > ( FUNC_CAnimBlendAssocGroup_CopyAnimation );
+
+    CAnimBlendAssocGroupSAInterface * pAnimAssocGroup  = reinterpret_cast < CAnimBlendAssocGroupSAInterface * > ( ((DWORD*)*(DWORD*)0x00B4EA34)  + (5 * animGroup) );
+    CAnimBlendAssociation           * pAnimAssociation = CAnimBlendAssocGroup_CopyAnimation ( pAnimAssocGroup, animID );
+
+
+    //CAnimBlendAssociation * pAnimAssociation = CAnimBlendAssocGroup_CopyAnimation ( pAnimAssocGroupInterface, animID );
+    //CAnimBlendAssocGroupSA pAssocGroupSA ( pAnimAssocGroupInterface );
+    //CAnimBlendAssociation  * pAnimAssociation = pAssocGroupSA.CopyAnimation ( animID );
+
+    return pAnimAssociation;
 }
 
 void CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
