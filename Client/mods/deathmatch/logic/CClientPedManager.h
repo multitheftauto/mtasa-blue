@@ -10,8 +10,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CClientPedManager_H
-#define __CClientPedManager_H
+#pragma once
 
 #include <list>
 
@@ -29,7 +28,7 @@ public:
     void                            DeleteAll                       ( void );
 
     void                            DoPulse                         ( bool bDoStandardPulses );
-    CClientPed*                     Get                             ( ElementID ID, bool bCheckPlayers = false );    
+    CClientPed*                     Get                             ( ElementID ID, bool bIncludePlayers = false );    
     CClientPed*                     Get                             ( CPlayerPed* pPlayer, bool bValidatePointer, bool bCheckPlayers );
     CClientPed*                     GetSafe                         ( CEntity * pEntity, bool bCheckPlayers );
 
@@ -63,4 +62,3 @@ protected:
     bool                            m_bRemoveFromList;
 };
 
-#endif

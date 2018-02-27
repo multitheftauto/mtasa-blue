@@ -2824,15 +2824,14 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                 }
                                                 else
                                                 {
-                                                    // TODO: support jacking peds (not simple!)
                                                     // Is the jacked person a player and stationary in the car (ie not getting in or out)
-                                                    if ( IS_PLAYER ( pOccupant ) && pOccupant->GetVehicleAction () == CPlayer::VEHICLEACTION_NONE )
+                                                    if ( pOccupant->GetVehicleAction () == CPed::VEHICLEACTION_NONE )
                                                     {
                                                         // He's now jacking the car and the occupant is getting jacked
-                                                        pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_JACKING );
+                                                        pPlayer->SetVehicleAction ( CPed::VEHICLEACTION_JACKING );
                                                         pPlayer->SetJackingVehicle ( pVehicle );
                                                         pVehicle->SetJackingPlayer ( pPlayer );
-                                                        pOccupant->SetVehicleAction ( CPlayer::VEHICLEACTION_JACKED );
+                                                        pOccupant->SetVehicleAction ( CPed::VEHICLEACTION_JACKED );
 
                                                         // Call the entering vehicle event
                                                         CLuaArguments EnterArguments;
@@ -2843,7 +2842,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                         if ( pVehicle->CallEvent ( "onVehicleStartEnter", EnterArguments ) )
                                                         {
                                                             // HACK?: check the player's vehicle-action is still the same (not warped in?)
-                                                            if ( pPlayer->GetVehicleAction () == CPlayer::VEHICLEACTION_JACKING )
+                                                            if ( pPlayer->GetVehicleAction () == CPed::VEHICLEACTION_JACKING )
                                                             {
                                                                 // Call the exiting vehicle event
                                                                 CLuaArguments ExitArguments;
@@ -2853,7 +2852,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                                 if ( pVehicle->CallEvent ( "onVehicleStartExit", ExitArguments ) )
                                                                 {
                                                                     // HACK?: check the player's vehicle-action is still the same (not warped out?)
-                                                                    if ( pOccupant->GetVehicleAction () == CPlayer::VEHICLEACTION_JACKED )
+                                                                    if ( pOccupant->GetVehicleAction () == CPed::VEHICLEACTION_JACKED )
                                                                     {
                                                                         /* Jax: we don't need to worry about a syncer if we already have and will have a driver
                                                                         // Force the player as the syncer of the vehicle to which they are entering
@@ -2881,7 +2880,7 @@ void CGame::Packet_Vehicle_InOut ( CVehicleInOutPacket& Packet )
                                                         failReason = FAIL_JACKED_ACTION;
                                                 }
                                             }
-                                            else
+                                            else // We're not going for driver
                                             {
                                                 CPed* pCurrentOccupant = pVehicle->GetOccupant ( ucSeat );
                                                 if ( pCurrentOccupant || ucSeat > pVehicle->GetMaxPassengers () )
