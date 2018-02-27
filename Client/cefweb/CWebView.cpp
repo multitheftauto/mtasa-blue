@@ -56,7 +56,6 @@ void CWebView::Initialise ()
     browserSettings.universal_access_from_file_urls = cef_state_t::STATE_DISABLED; // Also filtered by resource interceptor, but set this nevertheless
     browserSettings.file_access_from_file_urls = cef_state_t::STATE_DISABLED;
     browserSettings.webgl = cef_state_t::STATE_ENABLED;
-    browserSettings.javascript_open_windows = cef_state_t::STATE_DISABLED;
 
     browserSettings.plugins = cef_state_t::STATE_DISABLED;
     if ( !m_bIsLocal )
@@ -977,7 +976,7 @@ bool CWebView::OnTooltip ( CefRefPtr<CefBrowser> browser, CefString& title )
 // http://magpcss.org/ceforum/apidocs/projects/%28default%29/CefDisplayHandler.html#OnConsoleMessage%28CefRefPtr%3CCefBrowser%3E,constCefString&,constCefString&,int%29 //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnConsoleMessage ( CefRefPtr<CefBrowser> browser, const CefString& message, const CefString& source, int line )
+bool CWebView::OnConsoleMessage ( CefRefPtr<CefBrowser> browser, cef_log_severity_t level, const CefString& message, const CefString& source, int line )
 {
     // Redirect console message to debug window (if development mode is enabled)
     if ( g_pCore->GetWebCore ()->IsTestModeEnabled () )

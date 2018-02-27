@@ -47,6 +47,6 @@ project "Core"
 		links { "ncursesw", "breakpad", "rt" }
 		buildoptions { "-pthread" }
 		linkoptions { "-pthread" }
-
+	
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))

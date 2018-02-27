@@ -417,6 +417,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetFireHandler ( NULL );
     g_pMultiplayer->SetProjectileStopHandler ( NULL );
     g_pMultiplayer->SetProjectileHandler ( NULL );
+    g_pMultiplayer->SetProcessCamHandler(nullptr);
     g_pMultiplayer->SetRender3DStuffHandler ( NULL );
     g_pMultiplayer->SetPreRenderSkyHandler ( NULL );
     g_pMultiplayer->SetRenderHeliLightHandler ( nullptr );
@@ -440,6 +441,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetGameProjectileDestructHandler( NULL );
     g_pMultiplayer->SetGameModelRemoveHandler( NULL );
     g_pMultiplayer->SetGameEntityRenderHandler( NULL );
+    g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
     g_pGame->SetPreWeaponFireHandler ( NULL );
     g_pGame->SetPostWeaponFireHandler ( NULL );
     g_pGame->SetTaskSimpleBeHitHandler ( NULL );

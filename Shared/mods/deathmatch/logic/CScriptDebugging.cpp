@@ -180,6 +180,7 @@ void CScriptDebugging::LogString (const char* szPrePend, const SLuaDebugInfo& lu
     }
 
     // Check whether on(Client)DebugMessage is currently being triggered
+    bool notCancelled = false;
     if (!m_bTriggeringMessageEvent)
     {
         // Make sure the state of on(Client)DebugMessage being triggered can be retrieved later
@@ -209,16 +210,17 @@ void CScriptDebugging::LogString (const char* szPrePend, const SLuaDebugInfo& lu
 
         // Call on(Client)DebugMessage
 #ifdef MTA_CLIENT
-        g_pClientGame->GetRootEntity ()->CallEvent ("onClientDebugMessage", Arguments, false);
+        notCancelled = g_pClientGame->GetRootEntity ()->CallEvent ("onClientDebugMessage", Arguments, false);
 #else
-        g_pGame->GetMapManager ()->GetRootElement ()->CallEvent ("onDebugMessage", Arguments);
+        notCancelled = g_pGame->GetMapManager ()->GetRootElement ()->CallEvent ("onDebugMessage", Arguments);
 #endif
 
         // Reset trigger state, so onDebugMessage can be called again at a later moment
         m_bTriggeringMessageEvent = false;
     }
 
-    m_DuplicateLineFilter.AddLine ({ strText, uiMinimumDebugLevel, ucRed, ucGreen, ucBlue });
+    if (notCancelled)
+        m_DuplicateLineFilter.AddLine ({ strText, uiMinimumDebugLevel, ucRed, ucGreen, ucBlue });
 
 #ifdef MTA_CLIENT
     if (g_pCore->GetCVars ()->GetValue < bool > ("filter_duplicate_log_lines") == false)

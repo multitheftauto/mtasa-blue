@@ -26,6 +26,7 @@ typedef void ( InRenderer ) ( void );
 #include "CAnimManager.h"
 #include "CAudioEngine.h"
 #include "CAEAudioHardware.h"
+#include "CAESoundManager.h"
 #include "CAEVehicleAudioEntity.h"
 #include "CAudioContainer.h"
 #include "CCam.h"
@@ -139,6 +140,7 @@ public:
     virtual CAERadioTrackManager* GetAERadioTrackManager()=0;
     virtual CAudioEngine        * GetAudioEngine()=0;
     virtual CAEAudioHardware    * GetAEAudioHardware()=0;
+    virtual CAESoundManager     * GetAESoundManager ( ) = 0;
     virtual CAudioEngine        * GetAudio()=0;
     virtual CAudioContainer     * GetAudioContainer()=0;
     virtual CMenuManager        * GetMenuManager()=0;

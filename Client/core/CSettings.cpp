@@ -1013,16 +1013,16 @@ void CSettings::CreateGUI ( void )
     vecTemp.fY += fLineHeight;
 
     // Process priority
-    m_pPriorityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, "Process priority:" ) );
+    m_pPriorityLabel = reinterpret_cast < CGUILabel* > ( pManager->CreateLabel ( pTabAdvanced, _("Process priority:") ) );
     m_pPriorityLabel->SetPosition ( CVector2D ( vecTemp.fX, vecTemp.fY ) );
     m_pPriorityLabel->AutoSize ( );
 
     m_pPriorityCombo = reinterpret_cast < CGUIComboBox* > ( pManager->CreateComboBox ( pTabAdvanced, "" ) );
     m_pPriorityCombo->SetPosition ( CVector2D ( vecTemp.fX + fIndentX, vecTemp.fY - 1.0f ) );
     m_pPriorityCombo->SetSize ( CVector2D ( fComboWidth, 95.0f ) );
-    m_pPriorityCombo->AddItem ( "Normal" )->SetData ( (void*)0 );
-    m_pPriorityCombo->AddItem ( "Above normal" )->SetData ( (void*)1 );
-    m_pPriorityCombo->AddItem ( "High" )->SetData ( (void*)2 );
+    m_pPriorityCombo->AddItem ( _("Normal") )->SetData ( (void*)0 );
+    m_pPriorityCombo->AddItem ( _("Above normal") )->SetData ( (void*)1 );
+    m_pPriorityCombo->AddItem ( _("High") )->SetData ( (void*)2 );
     m_pPriorityCombo->SetReadOnly ( true );
     vecTemp.fY += 29;
 
@@ -2940,9 +2940,9 @@ void CSettings::LoadData ( void )
     // Process priority
     int iVar;
     CVARS_GET ( "process_priority", iVar );
-    if ( iVar == 0 ) m_pPriorityCombo->SetText ( "Normal" );
-    else if ( iVar == 1 ) m_pPriorityCombo->SetText ( "Above normal" );
-    else if ( iVar == 2 ) m_pPriorityCombo->SetText ( "High" );
+    if ( iVar == 0 ) m_pPriorityCombo->SetText ( _("Normal") );
+    else if ( iVar == 1 ) m_pPriorityCombo->SetText ( _("Above normal") );
+    else if ( iVar == 2 ) m_pPriorityCombo->SetText ( _("High") );
     int PriorityClassList[] = { NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS };
     SetPriorityClass( GetCurrentProcess(), PriorityClassList[ CVARS_GET_VALUE < int > ( "process_priority" ) % 3 ] );
 

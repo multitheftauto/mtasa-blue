@@ -15,53 +15,25 @@
 void CPlayerPed__ProcessControl_Abort();
 
 //
-// Test macros for CrashFixes
-//
-#ifdef MTA_DEBUG
-
-#define SIMULATE_ERROR_BEGIN( chance ) \
-{ \
-    _asm { pushad } \
-    if ( rand() % 100 < (chance) ) \
-    { \
-        _asm popad
-
-
-#define SIMULATE_ERROR_END \
-        _asm pushad \
-    } \
-    _asm popad \
-}
-
-#endif
-
-#define TEST_CRASH_FIXES 0
-
-
-//
 // Support for crash stats
 //
 void OnCrashAverted ( uint uiId );
 void OnEnterCrashZone ( uint uiId );
 
-void _cdecl CrashAverted ( DWORD id )
+void _declspec(naked) CrashAverted ()
 {
-    OnCrashAverted ( id );
-}
-
-#define CRASH_AVERTED(id) \
-    } \
-    _asm pushfd \
-    _asm pushad \
-    _asm mov eax, id \
-    _asm push eax \
-    _asm call CrashAverted \
-    _asm add esp, 4 \
-    _asm popad \
-    _asm popfd \
-    _asm \
+    _asm
     {
-
+        pushfd
+        pushad
+        push    [esp+4+32+4*1]
+        call    OnCrashAverted
+        add     esp, 4
+        popad
+        popfd    
+        retn    4
+    }
+}
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -80,7 +52,8 @@ void _declspec(naked) HOOK_CrashFix_Misc1 ()
         mov     ecx,dword ptr [eax+esi]     // If [eax+esi] is 0, it causes a crash
         test    ecx,ecx
         jne     cont
-        CRASH_AVERTED( 1 )
+        push    1
+        call    CrashAverted
         xor    ecx,ecx
     cont:
         jmp     RETURN_CrashFix_Misc1
@@ -113,7 +86,8 @@ void _declspec(naked) HOOK_CrashFix_Misc2 ()
         mov     cl,byte ptr [esi+429h]
         jmp     RETURN_CrashFix_Misc2
     cont:
-        CRASH_AVERTED( 2 )
+        push    2 
+        call    CrashAverted
         jmp     RETURN_CrashFix_Misc2B
     }
 }
@@ -133,7 +107,8 @@ void _declspec(naked) HOOK_CrashFix_Misc3 ()
         mov     edx,dword ptr [ecx+384h]
         jmp     RETURN_CrashFix_Misc3
     cont:
-        CRASH_AVERTED( 3 )
+        push    3 
+        call    CrashAverted
         jmp     CPlayerPed__ProcessControl_Abort
     }
 }
@@ -156,7 +131,8 @@ void _declspec(naked) HOOK_CrashFix_Misc4 ()
         add     edx, ebp  
         jmp     RETURN_CrashFix_Misc4
     cont:
-        CRASH_AVERTED( 4 )
+        push    4 
+        call    CrashAverted
         jmp     RETURN_CrashFix_Misc4B
     }
 }
@@ -179,7 +155,8 @@ void _declspec(naked) HOOK_CrashFix_Misc5 ()
         mov     edi, dword ptr [ecx*4+0A9B0C8h]
         jmp     RETURN_CrashFix_Misc5
     cont:
-        CRASH_AVERTED( 5 )
+        push    5 
+        call    CrashAverted
         pop edi
         jmp     RETURN_CrashFix_Misc5B
     }
@@ -203,7 +180,8 @@ void _declspec(naked) HOOK_CrashFix_Misc6 ()
         test    eax, eax
         jmp     RETURN_CrashFix_Misc6
     cont:
-        CRASH_AVERTED( 6 )
+        push    6 
+        call    CrashAverted
         jmp     RETURN_CrashFix_Misc6B
     }
 }
@@ -226,7 +204,8 @@ void _declspec(naked) HOOK_CrashFix_Misc7 ()
         test    esi, esi
         jmp     RETURN_CrashFix_Misc7
     cont:
-        CRASH_AVERTED( 7 )
+        push    7 
+        call    CrashAverted
         jmp     RETURN_CrashFix_Misc7B
     }
 }
@@ -249,7 +228,8 @@ void _declspec(naked) HOOK_CrashFix_Misc8 ()
         test    ecx, ecx 
         jmp     RETURN_CrashFix_Misc8
     cont:
-        CRASH_AVERTED( 8 )
+        push    8 
+        call    CrashAverted
         jmp     RETURN_CrashFix_Misc8B
     }
 }
@@ -272,7 +252,8 @@ void _declspec(naked) HOOK_CrashFix_Misc9 ()
         test    ah, 1
         jmp     RETURN_CrashFix_Misc9
     cont:
-        CRASH_AVERTED( 9 )
+        push    9 
+        call    CrashAverted
         jmp     RETURN_CrashFix_Misc9B
     }
 }
@@ -295,7 +276,8 @@ void _declspec(naked) HOOK_CrashFix_Misc10 ()
         mov     dword ptr [esp], edx
         jmp     RETURN_CrashFix_Misc10
     cont:
-        CRASH_AVERTED( 10 )
+        push    10 
+        call    CrashAverted
         mov     ecx, dword ptr [esp+1Ch]
         mov     dword ptr [ecx],0
         mov     dword ptr [ecx+4],0
@@ -322,7 +304,8 @@ void _declspec(naked) HOOK_CrashFix_Misc11 ()
         test    eax, eax 
         jmp     RETURN_CrashFix_Misc11
     cont:
-        CRASH_AVERTED( 11 )
+        push    11 
+        call    CrashAverted
         jmp     RETURN_CrashFix_Misc11B
     }
 }
@@ -345,7 +328,8 @@ void _declspec(naked) HOOK_CrashFix_Misc12 ()
         test    al, al 
         jmp     RETURN_CrashFix_Misc12
     cont:
-        CRASH_AVERTED( 12 )
+        push    12 
+        call    CrashAverted
         jmp     RETURN_CrashFix_Misc12B
     }
 }
@@ -367,7 +351,8 @@ void _declspec(naked) HOOK_CrashFix_Misc13 ()
         shr     al, 5
         jmp     RETURN_CrashFix_Misc13
     cont:
-        CRASH_AVERTED( 13 )
+        push    13 
+        call    CrashAverted
         jmp     RETURN_CrashFix_Misc13B
     }
 }
@@ -388,7 +373,8 @@ void _declspec(naked) HOOK_CrashFix_Misc14 ()
         sub     esp, 0D4h
         jmp     RETURN_CrashFix_Misc14
     cont:
-        CRASH_AVERTED( 14 )
+        push    14 
+        call    CrashAverted
         add     esp, 12
         retn    12
     }
@@ -451,15 +437,6 @@ void _declspec(naked) HOOK_FreezeFix_Misc15 ()
 DWORD RETURN_CrashFix_Misc16 =                              0x5E581B;
 void _declspec(naked) HOOK_CrashFix_Misc16 ()
 {
-#if TEST_CRASH_FIXES
-    SIMULATE_ERROR_BEGIN( 10 )
-        _asm
-        {
-            mov     eax, 0
-        }
-    SIMULATE_ERROR_END
-#endif
-
     _asm
     {
         cmp     eax, 0
@@ -471,7 +448,8 @@ void _declspec(naked) HOOK_CrashFix_Misc16 ()
         jmp     RETURN_CrashFix_Misc16
 
     cont:
-        CRASH_AVERTED( 16 )
+        push    16 
+        call    CrashAverted
         add     esp, 96
         retn
     }
@@ -502,7 +480,8 @@ void _declspec(naked) HOOK_CrashFix_Misc17 ()
         jmp     RETURN_CrashFix_Misc17_BOTH
 
     cont:
-        CRASH_AVERTED( 17 )
+        push    17 
+        call    CrashAverted
         jmp     RETURN_CrashFix_Misc17B_BOTH
     }
 }
@@ -515,15 +494,6 @@ void _declspec(naked) HOOK_CrashFix_Misc17 ()
 DWORD RETURN_CrashFix_Misc18 =                              0x4C7DB4;
 void _declspec(naked) HOOK_CrashFix_Misc18 ()
 {
-#if TEST_CRASH_FIXES
-    SIMULATE_ERROR_BEGIN( 10 )
-        _asm
-        {
-            mov     ebp, 0
-        }
-    SIMULATE_ERROR_END
-#endif
-
     _asm
     {
         cmp     ebp, 0
@@ -535,7 +505,8 @@ void _declspec(naked) HOOK_CrashFix_Misc18 ()
         jmp     RETURN_CrashFix_Misc18
 
     cont:
-        CRASH_AVERTED( 18 )
+        push    18 
+        call    CrashAverted
         mov         edx,0 
         mov         eax,dword ptr [esp+10h]
         mov         dword ptr [eax],edx 
@@ -573,9 +544,10 @@ void _declspec(naked) HOOK_CrashFix_Misc19 ()
         jmp     RETURN_CrashFix_Misc19_BOTH
 
     cont:
-        CRASH_AVERTED( 19 )
-        mov         edx,dword ptr [ecx+98h] 
-        test        edx,edx
+        push    19 
+        call    CrashAverted
+        mov     edx,dword ptr [ecx+98h] 
+        test    edx,edx
         jmp     RETURN_CrashFix_Misc19B_BOTH
     }
 }
@@ -587,14 +559,6 @@ void _declspec(naked) HOOK_CrashFix_Misc19 ()
 DWORD RETURN_CrashFix_Misc20 =                              0x54F3B6;
 void _declspec(naked) HOOK_CrashFix_Misc20 ()
 {
-#if TEST_CRASH_FIXES
-    SIMULATE_ERROR_BEGIN( 10 )
-        _asm
-        {
-            mov     ecx, 0
-        }
-    SIMULATE_ERROR_END
-#endif
     _asm
     {
         cmp     ecx, 0
@@ -606,7 +570,8 @@ void _declspec(naked) HOOK_CrashFix_Misc20 ()
         jmp     RETURN_CrashFix_Misc20
 
     cont:
-        CRASH_AVERTED( 20 )
+        push    20 
+        call    CrashAverted
         retn
     }
 }
@@ -646,15 +611,6 @@ bool IsTaskSimpleCarFallOutValid( CAnimBlendAssociationSAInterface* pAnimBlendAs
 DWORD RETURN_CrashFix_Misc21 =                              0x648EE7;
 void _declspec(naked) HOOK_CrashFix_Misc21 ()
 {
-#if TEST_CRASH_FIXES
-    SIMULATE_ERROR_BEGIN( 10 )
-        _asm
-        {
-            mov     [esp+8], 0x10
-        }
-    SIMULATE_ERROR_END
-#endif
-
     _asm
     {
         pushad
@@ -672,7 +628,8 @@ void _declspec(naked) HOOK_CrashFix_Misc21 ()
         jmp     RETURN_CrashFix_Misc21
 
     cont:
-        CRASH_AVERTED( 21 )
+        push    21 
+        call    CrashAverted
         retn
     }
 }
@@ -688,19 +645,7 @@ void _declspec(naked) HOOK_CrashFix_Misc22 ()
     _asm
     {
         mov         edx,dword ptr [edi+0Ch] 
-    }
 
-#if TEST_CRASH_FIXES
-    SIMULATE_ERROR_BEGIN( 10 )
-        _asm
-        {
-            mov     edx, 0x10
-        }
-    SIMULATE_ERROR_END
-#endif
-
-    _asm
-    {
         cmp     edx, 0x480
         jb      altcode  // Fill output with zeros if edx is low
 
@@ -721,7 +666,8 @@ void _declspec(naked) HOOK_CrashFix_Misc22 ()
 
         // do alternate code
     altcode:
-        CRASH_AVERTED( 22 )
+        push    22 
+        call    CrashAverted
         mov     edx,0
         mov         ebx,dword ptr [esi+10h] 
         mov         dword ptr [ebx+ecx+10h],edx 
@@ -743,16 +689,6 @@ void _declspec(naked) HOOK_CrashFix_Misc22 ()
 DWORD RETURN_CrashFix_Misc23 =                              0x6E3D17;
 void _declspec(naked) HOOK_CrashFix_Misc23 ()
 {
-#if TEST_CRASH_FIXES
-    SIMULATE_ERROR_BEGIN( 10 )
-        _asm
-        {
-            mov     edx,0xffff0000
-            mov     [esp+8], edx
-        }
-    SIMULATE_ERROR_END
-#endif
-
     _asm
     {
         // Ensure door index is reasonable
@@ -763,7 +699,8 @@ void _declspec(naked) HOOK_CrashFix_Misc23 ()
         // zero if out of range
         mov     edx,0
         mov     [esp+8], edx
-        CRASH_AVERTED( 23 )
+        push    23 
+        call    CrashAverted
 
     ok:
         // continue standard path
@@ -795,7 +732,8 @@ void _declspec(naked) HOOK_CrashFix_Misc24 ()
         jmp     RETURN_CrashFix_Misc24_BOTH
 
     cont:
-        CRASH_AVERTED( 24 )
+        push    24 
+        call    CrashAverted
         mov     ebp, 0
         mov     eax, 0
         jmp     RETURN_CrashFix_Misc24_BOTH
@@ -810,16 +748,6 @@ void _declspec(naked) HOOK_CrashFix_Misc24 ()
 DWORD RETURN_CrashFix_Misc25 =                              0x64602B;
 void _declspec(naked) HOOK_CrashFix_Misc25 ()
 {
-#if TEST_CRASH_FIXES
-    SIMULATE_ERROR_BEGIN( 10 )
-        _asm
-        {
-            mov     eax, 0
-            mov     [esi+0x10], eax
-        }
-    SIMULATE_ERROR_END
-#endif
-
     _asm
     {
         // Check for zero pointer to vehicle
@@ -833,7 +761,8 @@ void _declspec(naked) HOOK_CrashFix_Misc25 ()
         jmp     RETURN_CrashFix_Misc25
 
     fix:
-        CRASH_AVERTED( 25 )
+        push    25 
+        call    CrashAverted
         // Do special thing
         pop     esi
         pop     ecx
@@ -849,15 +778,6 @@ void _declspec(naked) HOOK_CrashFix_Misc25 ()
 DWORD RETURN_CrashFix_Misc26 =                              0x739FA6;
 void _declspec(naked) HOOK_CrashFix_Misc26 ()
 {
-#if TEST_CRASH_FIXES
-    SIMULATE_ERROR_BEGIN( 10 )
-        _asm
-        {
-            mov     ebx, 130h
-        }
-    SIMULATE_ERROR_END
-#endif
-
     _asm
     {
         // Check for incorrect pointer
@@ -871,7 +791,8 @@ void _declspec(naked) HOOK_CrashFix_Misc26 ()
         jmp     RETURN_CrashFix_Misc26
 
     fix:
-        CRASH_AVERTED( 26 )
+        push    26 
+        call    CrashAverted
         // Do special thing
         mov     edi, 0 
         dec     ebp  
@@ -898,7 +819,8 @@ void _declspec(naked) HOOK_CrashFix_Misc27 ()
         mov     ecx, [edi+58Ch]
         test    ecx, ecx
         jne     cont
-        CRASH_AVERTED( 27 )
+        push    27 
+        call    CrashAverted
 
 cont:
         // Continue standard path
@@ -919,24 +841,13 @@ void _declspec(naked) HOOK_CrashFix_Misc28 ()
     {
         // Execute replaced code
         mov     eax, [esi+170h]
-    }
 
-#if TEST_CRASH_FIXES
-    SIMULATE_ERROR_BEGIN( 50 )
-        _asm
-        {
-            mov     eax, 0
-        }
-    SIMULATE_ERROR_END
-#endif
-
-    _asm
-    {
         // Check if dummy pointer is zero
         test    eax, eax
         jne     cont
 
-        CRASH_AVERTED( 28 )
+        push    28 
+        call    CrashAverted
         // Skip much code
         jmp     RETURN_CrashFix_Misc28B
 
@@ -959,19 +870,7 @@ void _declspec(naked) HOOK_CrashFix_Misc29 ()
     {
         // Execute replaced code
         movsx   eax,word ptr [esp+8]
-    }
 
-#if TEST_CRASH_FIXES
-    SIMULATE_ERROR_BEGIN( 10 )
-        _asm
-        {
-            mov     eax, 0xFFFFFFFF
-        }
-    SIMULATE_ERROR_END
-#endif
-
-    _asm
-    {
         // Check word being -1
         cmp     al, 0xffff
         jz      cont
@@ -980,7 +879,8 @@ void _declspec(naked) HOOK_CrashFix_Misc29 ()
         jmp     RETURN_CrashFix_Misc29
 
 cont:
-        CRASH_AVERTED( 29 )
+        push    29 
+        call    CrashAverted
         // Skip much code
         jmp     RETURN_CrashFix_Misc29B
     }
@@ -996,15 +896,6 @@ DWORD RETURN_CrashFix_Misc30 =                              0x4CEBEF;
 DWORD RETURN_CrashFix_Misc30B =                             0x4CEBF5;
 void _declspec(naked) HOOK_CrashFix_Misc30 ()
 {
-#if TEST_CRASH_FIXES
-    SIMULATE_ERROR_BEGIN( 10 )
-        _asm
-        {
-            mov     ecx, 0
-        }
-    SIMULATE_ERROR_END
-#endif
-
     _asm
     {
         // Check for incorrect pointer
@@ -1017,7 +908,8 @@ void _declspec(naked) HOOK_CrashFix_Misc30 ()
         jmp     RETURN_CrashFix_Misc30
 
 cont:
-        CRASH_AVERTED( 30 )
+        push    30 
+        call    CrashAverted
         // Skip much code
         jmp     RETURN_CrashFix_Misc30B
     }
@@ -1602,7 +1494,8 @@ void _declspec(naked) HOOK_RwMatrixMultiply()
         jmp     RETURN_RwMatrixMultiply_BOTH
 
 cont:
-        CRASH_AVERTED(31)
+        push    31 
+        call    CrashAverted
         retn
     }
 }

@@ -9,7 +9,7 @@ fi
 
 # 32-bits
 if [ ! -d /compat/x86 ] && [[ $BUILD_BITS = "32" ]]; then
-    apt-get install -y libmysqlclient-dev:i386
+    apt-get update && apt-get install -y libmysqlclient-dev:i386
     mkdir -p /compat/x86
     objcopy --redefine-syms=/compat/glibc_version_x86.redef /usr/lib/gcc/x86_64-linux-gnu/5/32/libstdc++.a /compat/x86/libstdc++.a
     objcopy --redefine-syms=/compat/glibc_version_x86.redef /usr/lib/i386-linux-gnu/libmysqlclient.a /compat/x86/libmysqlclient.a

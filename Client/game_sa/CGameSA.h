@@ -136,6 +136,7 @@ public:
     inline CAERadioTrackManager     * GetAERadioTrackManager()  { DEBUG_TRACE("CAERadioTrackManager * GetAERadioTrackManager()");return m_pCAERadioTrackManager; };
     inline CAudioEngine             * GetAudioEngine()          { DEBUG_TRACE("CAudio     * GetAudioEngine()");return m_pAudioEngine; };
     inline CAEAudioHardware         * GetAEAudioHardware()      { DEBUG_TRACE("CAEAudioHardware     * GetAEAudioHardware()");return m_pAEAudioHardware; };
+    inline CAESoundManager          * GetAESoundManager ( ) override { return m_pAESoundManager; }
     inline CAudioEngine             * GetAudio()                { DEBUG_TRACE("CAudio     * GetAudioEngine()");return m_pAudioEngine; };
     inline CAudioContainer          * GetAudioContainer()       { DEBUG_TRACE("CAudio     * GetAudioContainer()");return m_pAudioContainer; };
     inline CMenuManager             * GetMenuManager()          { DEBUG_TRACE("CMenuManager         * GetMenuManager()");return m_pMenuManager; };
@@ -298,6 +299,7 @@ private:
     CAERadioTrackManager        * m_pCAERadioTrackManager;
     CAudioEngine                * m_pAudioEngine;
     CAEAudioHardware            * m_pAEAudioHardware;
+    CAESoundManager             * m_pAESoundManager;
     CAudioContainer             * m_pAudioContainer;
     CMenuManager                * m_pMenuManager;
     CText                       * m_pText;

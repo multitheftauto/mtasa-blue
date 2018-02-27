@@ -1152,6 +1152,10 @@ int CLuaDrawingDefs::DxGetStatus ( lua_State* luaVM )
         lua_pushboolean ( luaVM, dxStatus.settings.bWindowed );
         lua_settable ( luaVM, -3 );
 
+        lua_pushstring ( luaVM, "SettingFullScreenStyle" );
+        lua_pushnumber ( luaVM, dxStatus.settings.iFullScreenStyle );
+        lua_settable ( luaVM, -3 );
+
         lua_pushstring ( luaVM, "SettingFXQuality" );
         lua_pushnumber ( luaVM, dxStatus.settings.iFXQuality );
         lua_settable ( luaVM, -3 );

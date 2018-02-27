@@ -47,6 +47,7 @@ public:
     virtual void            DeleteAll                           ( void ) = 0;
 
     virtual void            SetExecuteHandler                   ( pfnExecuteCommandHandler pfnHandler ) = 0;
+    virtual pfnExecuteCommandHandler GetExecuteHandler          ( void ) = 0;
 
     virtual COMMANDENTRY*   Get                                 ( const char* szCommand, bool bCheckIfMod = false, bool bModCommand = false ) = 0;
     virtual std::list < COMMANDENTRY* > ::iterator IterBegin    ( void ) = 0;

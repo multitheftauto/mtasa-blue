@@ -14,8 +14,9 @@ project "Lua_Server"
 		"src/**.h",
 	}
 
+	defines { "LUA_BUILD_AS_DLL" }
+
 	filter "system:windows"
-		defines { "LUA_BUILD_AS_DLL" }
 		kind "SharedLib"
 		targetdir(buildpath("server/mods/deathmatch"))
 
@@ -46,11 +47,9 @@ if os.target() == "windows" then
 		}
 	
 		defines {
-			"LUA_USE_APICHECK"
+			"LUA_USE_APICHECK",
+			"LUA_BUILD_AS_DLL"
 		}
-
-		configuration "windows"
-			defines { "LUA_BUILD_AS_DLL" }
 
         filter "platforms:x64"
             flags { "ExcludeFromBuild" } 

@@ -18,6 +18,7 @@ public:
     static void AddClass      ( lua_State* luaVM );
 
 private:
+    LUA_DECLARE ( File );
     LUA_DECLARE ( fileOpen );
     LUA_DECLARE ( fileCreate );
     LUA_DECLARE ( fileExists );

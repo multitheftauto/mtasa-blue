@@ -22,9 +22,7 @@ CCoreInterface* g_pCore = NULL;
 // This function uses the initialized data sections of the executables
 // to differentiate between versions.  MUST be called at least once
 // in order for proper initialization to occur.
-
-extern "C" _declspec(dllexport)
-CGame * GetGameInterface( CCoreInterface* pCore )
+MTAEXPORT CGame * GetGameInterface( CCoreInterface* pCore )
 {
     DEBUG_TRACE("CGame * GetGameInterface()");
 

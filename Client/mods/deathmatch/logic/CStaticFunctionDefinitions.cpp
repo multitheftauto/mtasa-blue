@@ -4063,22 +4063,28 @@ bool CStaticFunctionDefinitions::SetRadarAreaFlashing ( CClientRadarArea* RadarA
 
 bool CStaticFunctionDefinitions::IsInsideRadarArea ( CClientRadarArea* RadarArea, CVector2D vecPosition, bool& inside )
 {
-    if ( RadarArea )
+    assert ( RadarArea );
+
+    CVector2D vecAreaPosition = RadarArea->GetPosition ();
+    CVector2D vecAreaSize = RadarArea->GetSize ();
+
+    inside = false;
+
+    // Calculate boundaries and make sure they're in ascending order,
+    // so it is always safe to start checking from the bottom-left corner
+    std::pair<float, float> fHorizontalBounds = std::minmax ( vecAreaPosition.fX, vecAreaPosition.fX + vecAreaSize.fX );
+    std::pair<float, float> fVerticalBounds = std::minmax ( vecAreaPosition.fY, vecAreaPosition.fY + vecAreaSize.fY );
+
+    // Do the calc from the bottom-left corner
+    if ( vecPosition.fX >= fHorizontalBounds.first && vecPosition.fX <= fHorizontalBounds.second )
     {
-        CVector2D vecRadarPos = RadarArea->GetPosition();
-        CVector2D vecRadarSize = RadarArea->GetSize();
-        float fMaxX = vecRadarPos.fX + vecRadarSize.fX;
-        float fMaxY = vecRadarPos.fY + vecRadarSize.fY;
-        if ( vecPosition.fX >= vecRadarPos.fX && vecPosition.fX <= fMaxX )
+        if ( vecPosition.fY >= fVerticalBounds.first && vecPosition.fY <= fVerticalBounds.second )
         {
-            if ( vecPosition.fY >= vecRadarPos.fY && vecPosition.fY <= fMaxY )
-            {
-                inside = true;
-            }
+            inside = true;
         }
-        return true;
     }
-    return false;
+
+    return true;
 }
 
 
@@ -4270,9 +4276,9 @@ bool CStaticFunctionDefinitions::ResetAmbientSounds ( void )
 }
 
 
-bool CStaticFunctionDefinitions::SetWorldSoundEnabled ( uint uiGroup, uint uiIndex, bool bMute )
+bool CStaticFunctionDefinitions::SetWorldSoundEnabled ( uint uiGroup, uint uiIndex, bool bMute, bool bImmediate )
 {
-    g_pGame->GetAudio ()->SetWorldSoundEnabled ( uiGroup, uiIndex, bMute );
+    g_pGame->GetAudio ()->SetWorldSoundEnabled ( uiGroup, uiIndex, bMute, bImmediate );
     return true;
 }
 
@@ -4811,11 +4817,11 @@ eCursorType CStaticFunctionDefinitions::GUIGetCursorType ( void )
 }
 
 
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateWindow ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative )
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateWindow ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative )
 {
     CGUIElement *pElement = m_pGUI->CreateWnd ( NULL, szCaption );
-    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    pElement->SetPosition ( position, bRelative );
+    pElement->SetSize ( size, bRelative );
 
     // register to the gui manager
     CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
@@ -4830,11 +4836,11 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateWindow ( CLuaMain& LuaMa
 }
 
 
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateStaticImage ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const SString& strPath, bool bRelative, CClientGUIElement* pParent )
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateStaticImage ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const SString& strPath, bool bRelative, CClientGUIElement* pParent )
 {
     CGUIElement *pElement = m_pGUI->CreateStaticImage ( pParent ? pParent->GetCGUIElement () : NULL );
-    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    pElement->SetPosition ( position, bRelative );
+    pElement->SetSize ( size, bRelative );
 
     // Register to the gui manager
     CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
@@ -4905,11 +4911,11 @@ bool CStaticFunctionDefinitions::GUIStaticImageGetNativeSize ( CClientEntity& En
 }
 
 
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateLabel ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateLabel ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
 {
     CGUIElement *pElement = m_pGUI->CreateLabel ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
-    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    pElement->SetPosition ( position, bRelative );
+    pElement->SetSize ( size, bRelative );
 
     // register to the gui manager
     CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
@@ -4919,11 +4925,11 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateLabel ( CLuaMain& LuaMai
 }
 
 
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateButton ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateButton ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
 {
     CGUIElement *pElement = m_pGUI->CreateButton ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
-    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    pElement->SetPosition ( position, bRelative );
+    pElement->SetSize ( size, bRelative );
    
     // register to the gui manager
     CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
@@ -4937,11 +4943,11 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateButton ( CLuaMain& LuaMa
 }
 
 
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateProgressBar ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent )
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateProgressBar ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative, CClientGUIElement* pParent )
 {
     CGUIElement *pElement = m_pGUI->CreateProgressBar ( pParent ? pParent->GetCGUIElement () : NULL );
-    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    pElement->SetPosition ( position, bRelative );
+    pElement->SetSize ( size, bRelative );
     
     // register to the gui manager
     CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
@@ -4951,11 +4957,11 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateProgressBar ( CLuaMain& 
 }
 
 
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateScrollBar ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bHorizontal, bool bRelative, CClientGUIElement* pParent )
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateScrollBar ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bHorizontal, bool bRelative, CClientGUIElement* pParent )
 {
     CGUIElement *pElement = m_pGUI->CreateScrollBar ( bHorizontal, pParent ? pParent->GetCGUIElement () : NULL );
-    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    pElement->SetPosition ( position, bRelative );
+    pElement->SetSize ( size, bRelative );
     
     // register to the gui manager
     CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
@@ -4969,11 +4975,11 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateScrollBar ( CLuaMain& Lu
 }
 
 
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateCheckBox ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bChecked, bool bRelative, CClientGUIElement* pParent )
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateCheckBox ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bChecked, bool bRelative, CClientGUIElement* pParent )
 {
     CGUIElement *pElement = m_pGUI->CreateCheckBox ( pParent ? pParent->GetCGUIElement () : NULL, szCaption, bChecked );
-    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    pElement->SetPosition ( position, bRelative );
+    pElement->SetSize ( size, bRelative );
     
     // register to the gui manager
     CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
@@ -4987,11 +4993,11 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateCheckBox ( CLuaMain& Lua
 }
 
 
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateRadioButton ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateRadioButton ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
 {
     CGUIElement *pElement = m_pGUI->CreateRadioButton ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
-    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    pElement->SetPosition ( position, bRelative );
+    pElement->SetSize ( size, bRelative );
     
     // register to the gui manager
     CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
@@ -5005,11 +5011,11 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateRadioButton ( CLuaMain& 
 }
 
 
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateEdit ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateEdit ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
 {
     CGUIElement *pElement = m_pGUI->CreateEdit ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
-    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    pElement->SetPosition ( position, bRelative );
+    pElement->SetSize ( size, bRelative );
     pElement->SetText ( szCaption );
 
     // register to the gui manager
@@ -5025,11 +5031,11 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateEdit ( CLuaMain& LuaMain
 }
 
 
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateMemo ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateMemo ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
 {
     CGUIElement *pElement = m_pGUI->CreateMemo ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
-    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    pElement->SetPosition ( position, bRelative );
+    pElement->SetSize ( size, bRelative );
     pElement->SetText ( szCaption );
 
     // register to the gui manager
@@ -5044,11 +5050,11 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateMemo ( CLuaMain& LuaMain
 }
 
 
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateGridList ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent )
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateGridList ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative, CClientGUIElement* pParent )
 {
     CGUIElement *pElement = m_pGUI->CreateGridList ( pParent ? pParent->GetCGUIElement () : NULL, true );
-    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    pElement->SetPosition ( position, bRelative );
+    pElement->SetSize ( size, bRelative );
 
     // register to the gui manager
     CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
@@ -5058,11 +5064,11 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateGridList ( CLuaMain& Lua
 }
 
 
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateTabPanel ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent )
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateTabPanel ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative, CClientGUIElement* pParent )
 {
     CGUIElement *pElement = m_pGUI->CreateTabPanel ( pParent ? pParent->GetCGUIElement () : NULL );
-    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    pElement->SetPosition ( position, bRelative );
+    pElement->SetSize ( size, bRelative );
 
     // register to the gui manager
     CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
@@ -5076,11 +5082,11 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateTabPanel ( CLuaMain& Lua
 }
 
 
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateScrollPane ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bRelative, CClientGUIElement* pParent )
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateScrollPane ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative, CClientGUIElement* pParent )
 {
     CGUIElement *pElement = m_pGUI->CreateScrollPane ( pParent ? pParent->GetCGUIElement () : NULL );
-    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    pElement->SetPosition ( position, bRelative );
+    pElement->SetSize ( size, bRelative );
 
     // register to the gui manager
     CClientGUIElement *pGUIElement = new CClientGUIElement ( m_pManager, &LuaMain, pElement );
@@ -5154,11 +5160,11 @@ bool CStaticFunctionDefinitions::GUIDeleteTab ( CLuaMain& LuaMain, CClientGUIEle
     return true;
 }
 
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateComboBox ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateComboBox ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative, CClientGUIElement* pParent )
 {
     CGUIElement *pElement = m_pGUI->CreateComboBox ( pParent ? pParent->GetCGUIElement () : NULL, szCaption );
-    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    pElement->SetPosition ( position, bRelative );
+    pElement->SetSize ( size, bRelative );
     
     // Disable editing of the box...
     //CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( pElement );
@@ -5318,11 +5324,11 @@ bool CStaticFunctionDefinitions::GUIComboBoxSetItemText ( CClientEntity& Entity,
     return false;
 }
 
-CClientGUIElement* CStaticFunctionDefinitions::GUICreateBrowser ( CLuaMain& LuaMain, float fX, float fY, float fWidth, float fHeight, bool bIsLocal, bool bIsTransparent, bool bRelative, CClientGUIElement* pParent )
+CClientGUIElement* CStaticFunctionDefinitions::GUICreateBrowser ( CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bIsLocal, bool bIsTransparent, bool bRelative, CClientGUIElement* pParent )
 {
     CGUIWebBrowser* pElement = m_pGUI->CreateWebBrowser ( pParent ? pParent->GetCGUIElement () : nullptr );
-    pElement->SetPosition ( CVector2D ( fX, fY ), bRelative );
-    pElement->SetSize ( CVector2D ( fWidth, fHeight ), bRelative );
+    pElement->SetPosition ( position, bRelative );
+    pElement->SetSize ( size, bRelative );
 
     // Register to the gui manager
     CVector2D absoluteSize;
@@ -5488,8 +5494,14 @@ void CStaticFunctionDefinitions::GUIMoveToBack ( CClientEntity& Entity )
     {
         CClientGUIElement& GUIElement = static_cast < CClientGUIElement& > ( Entity );
 
+        bool bConsoleHadInputFocus = g_pCore->GetConsole ()->IsInputActive ();
+
         // Move it to the back
         GUIElement.GetCGUIElement ()->MoveToBack ();
+
+        // Restore input focus to the console if required
+        if ( bConsoleHadInputFocus )
+            g_pCore->GetConsole ()->ActivateInput ();
     }
 }
 
@@ -7454,9 +7466,9 @@ bool CStaticFunctionDefinitions::FxAddFootSplash ( CVector & vecPosition )
     return true;
 }
 
-CClientEffect* CStaticFunctionDefinitions::CreateEffect(CResource& Resource, const SString &strFxName, const CVector &vecPosition)
+CClientEffect* CStaticFunctionDefinitions::CreateEffect( CResource& Resource, const SString &strFxName, const CVector &vecPosition, bool bSoundEnable )
 {
-    CClientEffect * pFx =  m_pManager->GetEffectManager()->Create(strFxName, vecPosition, INVALID_ELEMENT_ID);
+    CClientEffect * pFx =  m_pManager->GetEffectManager()->Create( strFxName, vecPosition, INVALID_ELEMENT_ID, bSoundEnable );
     if ( pFx )
         pFx->SetParent ( Resource.GetResourceDynamicEntity () );
     return pFx;

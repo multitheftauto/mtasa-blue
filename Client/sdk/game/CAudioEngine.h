@@ -56,7 +56,7 @@ public:
     virtual VOID                        SetAmbientSoundEnabled          ( eAmbientSoundType eType, bool bEnabled ) = 0;
     virtual bool                        IsAmbientSoundEnabled           ( eAmbientSoundType eType ) = 0;
     virtual void                        ResetAmbientSounds              ( void ) = 0;
-    virtual VOID                        SetWorldSoundEnabled            ( uint uiGroup, uint uiIndex, bool bEnabled ) = 0;
+    virtual VOID                        SetWorldSoundEnabled            ( uint uiGroup, uint uiIndex, bool bEnabled, bool bForceCancel ) = 0;
     virtual bool                        IsWorldSoundEnabled             ( uint uiGroup, uint uiIndex ) = 0;
     virtual void                        ResetWorldSounds                ( void ) = 0;
     virtual void                        SetWorldSoundHandler            ( WorldSoundHandler pHandler ) = 0;

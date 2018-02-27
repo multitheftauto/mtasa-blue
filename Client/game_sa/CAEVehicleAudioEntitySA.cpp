@@ -16,26 +16,52 @@ CAEVehicleAudioEntitySA::CAEVehicleAudioEntitySA ( CAEVehicleAudioEntitySAInterf
     m_pInterface = pInterface;
 }
 
-// Based on CAEVehicleAudioEntity::JustGotInVehicleAsDriver
-// Loads accelerate sound bank for planes and helis.
-void CAEVehicleAudioEntitySA::LoadDriverSounds ( void )
+void CAEVehicleAudioEntitySA::JustGotInVehicleAsDriver ( void )
 {
-    CAEVehicleAudioEntitySAInterface * pVehicleAudioEntity = m_pInterface;
-    char soundType = pVehicleAudioEntity->m_nSettings.m_nVehicleSoundType;
-
-    // If it's heli or plane sound type
-    if ( soundType == 4 || soundType == 5 )
+    m_pInterface->m_bPlayerDriver = true;
+    DWORD dwFunc = FUNC_CAEVehicleAudioEntity__JustGotInVehicleAsDriver;
+    DWORD dwThis = (DWORD) m_pInterface;
+    _asm
     {
-        // If there is accelerate sound bank defined
-        if ( pVehicleAudioEntity->m_wEngineAccelerateSoundBankId != -1 )
+        mov     ecx, dwThis
+        call    dwFunc
+    }
+}
+
+void CAEVehicleAudioEntitySA::JustGotOutOfVehicleAsDriver ( void )
+{
+    m_pInterface->m_bPlayerDriver = false;
+    DWORD dwFunc = FUNC_CAEVehicleAudioEntity__JustGotOutOfVehicleAsDriver;
+    DWORD dwThis = (DWORD) m_pInterface;
+    _asm
+    {
+        mov     ecx, dwThis
+        call    dwFunc
+    }
+}
+
+void CAEVehicleAudioEntitySA::TurnOnRadioForVehicle ( void )
+{
+    DWORD dwFunc = FUNC_CAEVehicleAudioEntity__TurnOnRadioForVehicle;
+    DWORD dwThis = (DWORD) m_pInterface;
+    _asm
+    {
+        mov     ecx, dwThis
+        call    dwFunc
+    }
+}
+
+void CAEVehicleAudioEntitySA::StopVehicleEngineSound ( unsigned char ucSlot )
+{
+    DWORD dwFunc = FUNC_CAESound__Stop;
+    tVehicleSound * pVehicleSound = &m_pInterface->m_aEngineSounds [ ucSlot ];
+    if ( pVehicleSound->m_pSound )
+    {
+        DWORD dwThis = (DWORD) pVehicleSound->m_pSound;
+        _asm
         {
-            CAEAudioHardware * pAEAudioHardware = pGame->GetAEAudioHardware ();
-            // If this bank is not already loaded
-            if ( !pAEAudioHardware->IsSoundBankLoaded ( pVehicleAudioEntity->m_wEngineAccelerateSoundBankId, BANKSLOT_ENGINE_RESIDENT ) )
-            {
-                // Load it
-                pAEAudioHardware->LoadSoundBank ( pVehicleAudioEntity->m_wEngineAccelerateSoundBankId, BANKSLOT_ENGINE_RESIDENT );
-            }
+            mov     ecx, dwThis
+            call    dwFunc
         }
     }
 }

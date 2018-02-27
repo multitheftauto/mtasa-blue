@@ -11,8 +11,25 @@
 
 #pragma once
 
+enum eVehicleAudioType
+{
+    VEHICLE_AUDIO_CAR = 0,
+    VEHICLE_AUDIO_BIKE,
+    VEHICLE_AUDIO_BICYCLE,
+    VEHICLE_AUDIO_BOAT,
+    VEHICLE_AUDIO_HELI,
+    VEHICLE_AUDIO_PLANE,
+    VEHICLE_AUDIO_SEAPLANE, // unused?
+
+    VEHICLE_AUDIO_TRAIN = 8,
+    VEHICLE_AUDIO_SPECIAL, // RC vehicles, vortex, caddy, few trailers
+    VEHICLE_AUDIO_SILENT
+};
+
 class CAEVehicleAudioEntity
 {
 public:
-    virtual void                        LoadDriverSounds                        ( void ) = 0;
+    virtual void                        JustGotInVehicleAsDriver                ( void ) = 0;
+    virtual void                        JustGotOutOfVehicleAsDriver             ( void ) = 0;
+    virtual void                        TurnOnRadioForVehicle                   ( void ) = 0;
 };

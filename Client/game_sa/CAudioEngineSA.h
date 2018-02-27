@@ -41,6 +41,8 @@
 #define FUNC_CAudioEngine_ReportBulletHit                   0x506ec0
 #define FUNC_CAudioEngine_ReportWeaponEvent                 0x506f40
 
+#define FUNC_CAESound__Stop                     0x4EF1C0
+
 class CAudioEngineSAInterface
 {
 };
@@ -140,7 +142,7 @@ public:
     VOID                        SetAmbientSoundEnabled          ( eAmbientSoundType eType, bool bEnabled );
     bool                        IsAmbientSoundEnabled           ( eAmbientSoundType eType );
     void                        ResetAmbientSounds              ( void );
-    VOID                        SetWorldSoundEnabled            ( uint uiGroup, uint uiIndex, bool bEnabled );
+    VOID                        SetWorldSoundEnabled            ( uint uiGroup, uint uiIndex, bool bEnabled, bool bImmediate );
     bool                        IsWorldSoundEnabled             ( uint uiGroup, uint uiIndex );
     void                        ResetWorldSounds                ( void );
     void                        SetWorldSoundHandler            ( WorldSoundHandler pHandler );

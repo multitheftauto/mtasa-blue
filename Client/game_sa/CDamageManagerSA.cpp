@@ -84,16 +84,16 @@ VOID CDamageManagerSA::SetDoorStatus ( eDoors bDoor, BYTE bDoorStatus )
     }
 }
 
-BYTE CDamageManagerSA::GetWheelStatus ( eWheels bWheel )
+BYTE CDamageManagerSA::GetWheelStatus ( eWheelPosition bWheel )
 {
-    DEBUG_TRACE("BYTE CDamageManagerSA::GetWheelStatus ( eWheels bWheel )");
+    DEBUG_TRACE("BYTE CDamageManagerSA::GetWheelStatus ( eWheelPosition bWheel )");
     if(bWheel < MAX_WHEELS) return internalInterface->Wheel[bWheel];
     return NULL;
 }
 
-VOID CDamageManagerSA::SetWheelStatus ( eWheels bWheel, BYTE bTireStatus )
+VOID CDamageManagerSA::SetWheelStatus ( eWheelPosition bWheel, BYTE bTireStatus )
 {
-    DEBUG_TRACE("VOID CDamageManagerSA::SetWheelStatus ( eWheels bWheel, BYTE bTireStatus )");
+    DEBUG_TRACE("VOID CDamageManagerSA::SetWheelStatus ( eWheelPosition bWheel, BYTE bTireStatus )");
     if(bWheel < MAX_WHEELS)
     {   
         // Different than before?

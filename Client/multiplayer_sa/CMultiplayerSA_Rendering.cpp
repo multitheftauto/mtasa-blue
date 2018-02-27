@@ -525,7 +525,10 @@ void _declspec(naked) HOOK_RwCameraSetNearClipPlane ()
 DWORD RETURN_RenderEffects_HeliLight =                            0x53E1BE;
 void _declspec(naked) HOOK_RenderEffects_HeliLight ()
 {
-    _asm pushad
+    _asm
+    {
+        pushad
+    }
 
     // Call render handler
     if ( pRenderHeliLightHandler )
