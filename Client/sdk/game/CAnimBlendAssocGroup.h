@@ -14,6 +14,7 @@
 
 typedef unsigned char BYTE;
 typedef unsigned long AssocGroupId;
+class CAnimBlendAssociation;
 class CAnimBlendStaticAssociation;
 struct RpClump;
 class CAnimBlock;
@@ -21,11 +22,12 @@ class CAnimBlock;
 class CAnimBlendAssocGroup
 {
 public:
+	virtual CAnimBlendAssociation           *   CopyAnimation           ( unsigned int AnimID ) = 0;
     virtual void                                InitEmptyAssociations   ( RpClump * pClump ) = 0;
     virtual bool                                IsCreated               ( void ) = 0;
     virtual int                                 GetNumAnimations        ( void ) = 0;
-    virtual CAnimBlock *                        GetAnimBlock            ( void ) = 0;
-    virtual CAnimBlendStaticAssociation *       GetAnimation            ( unsigned int ID ) = 0;
+    virtual CAnimBlock                      *   GetAnimBlock            ( void ) = 0;
+    virtual CAnimBlendStaticAssociation     *   GetAnimation            ( unsigned int ID ) = 0;
     virtual void                                CreateAssociations      ( const char * szBlockName ) = 0;
     virtual bool                                IsLoaded                ( void ) = 0;
     virtual void                                SetIDOffset             ( int iOffset ) = 0;
