@@ -157,6 +157,7 @@ DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse =    0x4BA076;
 
 #define HOOKPOS_CAnimManager_AddAnimation                   0x4d3aa0
 DWORD RETURN_CAnimManager_AddAnimation =                    0x4D3AAA;
+DWORD RETURN_CAnimManager_AddAnimation_SkipCopyAnimation =  0x4D3ABC;
 #define HOOKPOS_CAnimManager_BlendAnimation                 0x4D4610
 DWORD RETURN_CAnimManager_BlendAnimation =                  0x4D4617;
 
@@ -5328,6 +5329,7 @@ void _declspec(naked) HOOK_CEventHandler_ComputeKnockOffBikeResponse ()
 RpClump * animationClump = NULL;
 AssocGroupId animationGroup = 0;
 AnimationId animationID = 0;
+CAnimBlendAssociationSAInterface * pAnimAssociation = nullptr;
 void _declspec(naked) HOOK_CAnimManager_AddAnimation ()
 {
     _asm
@@ -5343,16 +5345,33 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation ()
     
     if ( m_pAddAnimationHandler  )
     {
-        m_pAddAnimationHandler ( animationClump, animationGroup, animationID );
+        pAnimAssociation = m_pAddAnimationHandler ( animationClump, animationGroup, animationID );
+    }
+    else 
+    {
+        // This will avoid crash if m_pAddAnimationHandler is removed
+        // continue the normal flow of AddAnimation function, instead of skipping CopyAnimation
+
+       _asm
+        {
+            popad
+            mov     eax,dword ptr [esp+0Ch] 
+            mov     edx,dword ptr ds:[0B4EA34h] 
+            jmp     RETURN_CAnimManager_AddAnimation
+        }
     }
 
+    // As we are manually creating animation association, so skip CopyAnimation call
     _asm
     {
         popad
-        mov     eax,dword ptr [esp+0Ch] 
-        mov     edx,dword ptr ds:[0B4EA34h] 
-        jmp     RETURN_CAnimManager_AddAnimation
-    }
+        mov     eax, dword ptr [esp+0Ch]
+        mov     edx, dword ptr ds:[0B4EA34h]
+        push    esi
+        push    edi
+        mov     eax, pAnimAssociation
+        jmp     RETURN_CAnimManager_AddAnimation_SkipCopyAnimation
+    } 
 }
 
 float animationBlendDelta;
