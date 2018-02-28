@@ -5365,8 +5365,6 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation ()
     _asm
     {
         popad
-        mov     eax, dword ptr [esp+0Ch]
-        mov     edx, dword ptr ds:[0B4EA34h]
         push    esi
         push    edi
         mov     eax, pAnimAssociation
