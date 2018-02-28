@@ -46,12 +46,12 @@ class CAnimBlendAssocGroupSA : public CAnimBlendAssocGroup
 public:
                                         CAnimBlendAssocGroupSA  ( CAnimBlendAssocGroupSAInterface * pInterface );
 
-    CAnimBlendAssociation           *   CopyAnimation           ( unsigned int AnimID );
+    CAnimBlendAssociationSAInterface *  CopyAnimation           ( unsigned int AnimID );
     void                                InitEmptyAssociations   ( RpClump * pClump );
     bool                                IsCreated               ( void );
     int                                 GetNumAnimations        ( void );
-    CAnimBlock                      *   GetAnimBlock            ( void );
-    CAnimBlendStaticAssociation     *   GetAnimation            ( unsigned int ID );
+    CAnimBlock                       *  GetAnimBlock            ( void );
+    CAnimBlendStaticAssociation      *  GetAnimation            ( unsigned int ID );
     void                                CreateAssociations      ( const char * szBlockName );
 
     bool                                IsLoaded                ( void );
@@ -60,8 +60,8 @@ public:
 protected:
     void                                SetupAnimBlock          ( void );
 
-    CAnimBlendAssocGroupSAInterface *   m_pInterface;
-    CAnimBlockSA                    *   m_pAnimBlock;
+    CAnimBlendAssocGroupSAInterface  *  m_pInterface;
+    CAnimBlockSA                     *  m_pAnimBlock;
 };
 
 #endif

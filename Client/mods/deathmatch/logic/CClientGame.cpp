@@ -25,6 +25,7 @@
 #include "StdInc.h"
 #include <net/SyncStructures.h>
 #include <../Client/game_sa/CAnimBlendAssocGroupSA.h>
+#include <../Client/game_sa/CAnimBlendAssociationSA.h>
 
 SString StringZeroPadout ( const SString& strInput, uint uiPadoutSize )
 {
@@ -3691,7 +3692,7 @@ bool CClientGame::StaticChokingHandler ( unsigned char ucWeaponType )
     return g_pClientGame->ChokingHandler ( ucWeaponType );
 }
 
-CAnimBlendAssociation * CClientGame::StaticAddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
+CAnimBlendAssociationSAInterface * CClientGame::StaticAddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
 {
     return g_pClientGame->AddAnimationHandler ( pClump, animGroup, animID );
 }
@@ -3982,7 +3983,7 @@ bool CClientGame::ChokingHandler ( unsigned char ucWeaponType )
     return m_pLocalPlayer->CallEvent ( "onClientPlayerChoke", Arguments, true );
 }
 
-CAnimBlendAssociation * CClientGame::AddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
+CAnimBlendAssociationSAInterface * CClientGame::AddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
 {
     printf ( "AddAnimationHandler called! GroupID, AnimID: %d, %d\n", animGroup, animID );
 
@@ -3990,10 +3991,10 @@ CAnimBlendAssociation * CClientGame::AddAnimationHandler ( RpClump * pClump, Ass
 
     hCAnimBlendAssocGroup_CopyAnimation CAnimBlendAssocGroup_CopyAnimation = reinterpret_cast < hCAnimBlendAssocGroup_CopyAnimation > ( FUNC_CAnimBlendAssocGroup_CopyAnimation );
 
-    CAnimBlendAssocGroupSAInterface * pAnimAssocGroup  = reinterpret_cast < CAnimBlendAssocGroupSAInterface * > ( ((DWORD*)*(DWORD*)0x00B4EA34)  + (5 * animGroup) );
-    CAnimBlendAssociation           * pAnimAssociation = CAnimBlendAssocGroup_CopyAnimation ( pAnimAssocGroup, animID );
+    CAnimBlendAssocGroupSAInterface  * pAnimAssocGroup  = reinterpret_cast < CAnimBlendAssocGroupSAInterface * > ( ((DWORD*)*(DWORD*)0x00B4EA34)  + (5 * animGroup) );
+    CAnimBlendAssociationSAInterface * pAnimAssociation = CAnimBlendAssocGroup_CopyAnimation ( pAnimAssocGroup, animID );
 
-
+    printf ("pThis: %p | sAnimGroup: %d | sAnimID: %d\n\n", (void*)pAnimAssociation, pAnimAssociation->sAnimGroup, pAnimAssociation->sAnimID);
     //CAnimBlendAssociation * pAnimAssociation = CAnimBlendAssocGroup_CopyAnimation ( pAnimAssocGroupInterface, animID );
     //CAnimBlendAssocGroupSA pAssocGroupSA ( pAnimAssocGroupInterface );
     //CAnimBlendAssociation  * pAnimAssociation = pAssocGroupSA.CopyAnimation ( animID );

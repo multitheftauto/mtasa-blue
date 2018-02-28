@@ -19,6 +19,7 @@
 #include <game/CStats.h>
 #include "CPopulationMP.h"
 #include "CLimits.h"
+#include <../Client/game_sa/CAnimBlendAssociationSA.h>
 
 struct SRwResourceStats
 {
@@ -36,7 +37,7 @@ struct SClothesCacheStats
     uint uiNumRemoved;
 };
 
-class CAnimBlendAssociation;
+class CAnimBlendAssociationSAInterface;
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
 
@@ -64,7 +65,7 @@ typedef void ( PostWorldProcessHandler ) ( void );
 typedef void ( IdleHandler ) ( void );
 typedef void ( PreFxRenderHandler ) ( void );
 typedef void ( PreHudRenderHandler ) ( void );
-typedef CAnimBlendAssociation * ( AddAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
+typedef CAnimBlendAssociationSAInterface * ( AddAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
 typedef void ( BlendAnimationHandler ) ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
 typedef bool ( ProcessCollisionHandler ) ( class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface );
 typedef bool ( VehicleCollisionHandler ) ( class CVehicleSAInterface* pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity );

@@ -56,7 +56,7 @@
 #include "CSingularFileDownloadManager.h"
 #include "CObjectRespawner.h"
 
-typedef CAnimBlendAssociation *  ( __thiscall * hCAnimBlendAssocGroup_CopyAnimation )
+typedef CAnimBlendAssociationSAInterface *  ( __thiscall * hCAnimBlendAssocGroup_CopyAnimation )
 (
     CAnimBlendAssocGroupSAInterface * pThis, 
     AnimationId                       AnimID
@@ -508,9 +508,9 @@ private:
     static void                         StaticPreWorldProcessHandler    ( void );
     static void                         StaticPostWorldProcessHandler   ( void );
     static void                         StaticPreFxRenderHandler        ( void );
-    static void                         StaticPreHudRenderHandler       ( void );
-    static CAnimBlendAssociation *      StaticAddAnimationHandler       ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
-    static void                         StaticBlendAnimationHandler     ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
+    static void                               StaticPreHudRenderHandler       ( void );
+    static CAnimBlendAssociationSAInterface * StaticAddAnimationHandler       ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
+    static void                               StaticBlendAnimationHandler     ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     static bool                         StaticProcessCollisionHandler   ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     static bool                         StaticVehicleCollisionHandler   ( CVehicleSAInterface* pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity  );
     static bool                         StaticVehicleDamageHandler      ( CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType, const CVector& vecDamagePos, uchar ucTyre );
@@ -540,7 +540,7 @@ private:
     bool                                ChokingHandler                  ( unsigned char ucWeaponType );
     void                                PreWorldProcessHandler          ( void );
     void                                PostWorldProcessHandler         ( void );
-    CAnimBlendAssociation *             AddAnimationHandler             ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
+    CAnimBlendAssociationSAInterface *  AddAnimationHandler             ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     void                                BlendAnimationHandler           ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta );
     bool                                ProcessCollisionHandler         ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     bool                                VehicleCollisionHandler         ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity  );
