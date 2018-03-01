@@ -56,12 +56,6 @@
 #include "CSingularFileDownloadManager.h"
 #include "CObjectRespawner.h"
 
-typedef CAnimBlendAssociationSAInterface *  ( __thiscall * hCAnimBlendAssocGroup_CopyAnimation )
-(
-    CAnimBlendAssocGroupSAInterface * pThis, 
-    AnimationId                       AnimID
-);
-
 #define HeliKill_List_Clear_Rate 500
 #define MIN_PUSH_ANTISPAM_RATE 1500
 #define INVALID_DOWNLOAD_PRIORITY_GROUP (INT_MIN)
