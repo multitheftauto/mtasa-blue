@@ -24,6 +24,7 @@ class CAnimBlendAssocGroup;
 class CAnimBlendHierarchy;
 class CAnimBlock;
 class CAnimBlendAssociation;
+class CClientPed;
 struct RpClump;
 struct RwStream;
 struct AnimAssocDefinition;
@@ -102,6 +103,10 @@ public:
     virtual CAnimBlendAssocGroup *      GetAnimBlendAssocGroup                  ( CAnimBlendAssocGroupSAInterface * pInterface ) = 0;
     virtual CAnimBlock *                GetAnimBlock                            ( CAnimBlockSAInterface * pInterface ) = 0;
     virtual CAnimBlendHierarchy *       GetAnimBlendHierarchy                   ( CAnimBlendHierarchySAInterface * pInterface ) = 0;
+
+    virtual void                        InsertPedClumpToMap                     ( RpClump * pClump, CClientPed * pEntity ) = 0;
+    virtual void                        RemovePedClumpFromMap                   ( RpClump * pClump ) = 0;
+    virtual CClientPed *                GetClientPedFromClumpMap                ( RpClump * pClump ) = 0;
 };
 
 #endif

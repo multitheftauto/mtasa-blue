@@ -20,6 +20,7 @@
 
 #include "Common.h"
 #include <list>
+#include <map>
 
 #define FUNC_CAnimManager_Initialize                        0x5bf6b0
 #define FUNC_CAnimManager_Shutdown                          0x4d4130
@@ -78,6 +79,8 @@ public:
 
 class CAnimManagerSA : public CAnimManager
 {
+    typedef std::map < RpClump *, CClientPed * > ClumpMap_type;
+
 public:
                                 CAnimManagerSA                          ( void );
                                 ~CAnimManagerSA                         ( void );
@@ -146,12 +149,20 @@ public:
     CAnimBlendAssocGroup *      GetAnimBlendAssocGroup                  ( CAnimBlendAssocGroupSAInterface * pInterface );
     CAnimBlock *                GetAnimBlock                            ( CAnimBlockSAInterface * pInterface );
     CAnimBlendHierarchy *       GetAnimBlendHierarchy                   ( CAnimBlendHierarchySAInterface * pInterface );
+    
+    // This is used in AddAnimationHandler and AddAnimationAndSyncHandler for playing
+    // custom animations and to help in replacing and restoring animations 
+    void                        InsertPedClumpToMap                     ( RpClump * pClump, CClientPed * pClientPed );
+    void                        RemovePedClumpFromMap                   ( RpClump * pClump );
+    CClientPed *                GetClientPedFromClumpMap                ( RpClump * pClump );
 
 private:
     CAnimBlendAssocGroup *      m_pAnimAssocGroups [ MAX_ANIM_GROUPS ];
     CAnimBlendHierarchy *       m_pAnimations [ MAX_ANIMATIONS ];
     CAnimBlock *                m_pAnimBlocks [ MAX_ANIM_BLOCKS ];
-    std::list < CAnimBlendAssociation *  > m_Associations;
+    std::list < CAnimBlendAssociation *  > m_Associations;                   
+    ClumpMap_type               m_mapOfPedClumps; 
+
 };
 
 #endif

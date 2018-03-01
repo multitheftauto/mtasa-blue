@@ -760,3 +760,26 @@ CAnimBlendHierarchy * CAnimManagerSA::GetAnimBlendHierarchy ( CAnimBlendHierarch
     }
     return NULL;
 }
+
+void CAnimManagerSA::InsertPedClumpToMap ( RpClump * pClump, CClientPed * pClientPed )
+{
+    if ( m_mapOfPedClumps.count ( pClump ) == 0 )
+    { 
+        m_mapOfPedClumps [ pClump ] = pClientPed;
+    }
+}
+
+void CAnimManagerSA::RemovePedClumpFromMap ( RpClump * pClump )
+{
+    m_mapOfPedClumps.erase ( pClump );
+}
+
+CClientPed * CAnimManagerSA::GetClientPedFromClumpMap ( RpClump * pClump )
+{
+    ClumpMap_type::iterator it = m_mapOfPedClumps.find ( pClump );
+    if ( it != m_mapOfPedClumps.end ( ) )
+    {
+        return it->second;
+    }
+    return nullptr;
+}
