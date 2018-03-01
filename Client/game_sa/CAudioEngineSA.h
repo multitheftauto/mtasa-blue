@@ -113,7 +113,7 @@ public:
     short   m_wPlayingState;                // +104
     char    unk6[2];                        // +106
     float   m_fSoundHeadRoom;               // +108
-    short   unk7;                           // +112
+    short   m_wSoundLength;                 // +112
     short   unk8;                           // +114
 
 };
@@ -145,7 +145,7 @@ public:
     VOID                        SetWorldSoundEnabled            ( uint uiGroup, uint uiIndex, bool bEnabled, bool bImmediate );
     bool                        IsWorldSoundEnabled             ( uint uiGroup, uint uiIndex );
     void                        ResetWorldSounds                ( void );
-    void                        SetWorldSoundHandler            ( WorldSoundHandler * pHandler );
+    void                        SetWorldSoundHandler            ( WorldSoundHandler pHandler );
     void                        ReportBulletHit                 ( CEntity * pEntity, unsigned char ucSurfaceType, CVector * pvecPosition, float f_2 );
     void                        ReportWeaponEvent               ( int iEvent, eWeaponType weaponType, CPhysical * pPhysical );
 
@@ -153,14 +153,14 @@ public:
     bool                        OnWorldSound                    ( CAESound* pAESound );
 
 private:
-    bool            m_bRadioOn;
-    bool            m_bRadioMuted;
-    unsigned char   m_ucRadioChannel;
-    bool            m_bAmbientSoundsPaused;
-    bool            m_bAmbientGeneralEnabled;
-    bool            m_bAmbientGunfireEnabled;
-    CRanges         m_DisabledWorldSounds;
-    WorldSoundHandler* m_pWorldSoundHandler;
+    bool              m_bRadioOn;
+    bool              m_bRadioMuted;
+    unsigned char     m_ucRadioChannel;
+    bool              m_bAmbientSoundsPaused;
+    bool              m_bAmbientGeneralEnabled;
+    bool              m_bAmbientGunfireEnabled;
+    CRanges           m_DisabledWorldSounds;
+    WorldSoundHandler m_pWorldSoundHandler;
 
     CAudioEngineSAInterface *   m_pInterface;
 };
