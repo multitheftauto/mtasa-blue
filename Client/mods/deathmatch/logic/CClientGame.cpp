@@ -3985,10 +3985,15 @@ bool CClientGame::ChokingHandler ( unsigned char ucWeaponType )
 
 CAnimBlendAssociationSAInterface * CClientGame::AddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
 {
-    printf ( "AddAnimationHandler called! GroupID, AnimID: %d, %d\n", animGroup, animID );
+    printf ( "AddAnimationHandler called! pClump, GroupID, AnimID: %p, %d, %d\n", (void*)pClump, animGroup, animID );
 
     //CClientPed * pPed = m_pPedManager->Get ( pClump, true );
-
+    CClientPed * pClientPed = g_pGame->GetAnimManager()->GetClientPedFromClumpMap ( pClump );
+    if ( pClientPed != nullptr )
+    {
+        printf ("pClientPed found!\n");
+    }
+    
     std::unique_ptr < CAnimBlendAssocGroup >    pAnimAssocGroup  = g_pGame->CreateAnimBlendAssocGroup ( animGroup );
     CAnimBlendAssociationSAInterface         *  pAnimAssociation = pAnimAssocGroup->CopyAnimation ( animID );
 
