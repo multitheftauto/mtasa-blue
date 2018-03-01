@@ -4074,6 +4074,12 @@ void CClientPed::ReCreateModel ( void )
 
 void CClientPed::ModelRequestCallback ( CModelInfo* pModelInfo )
 {
+    RpClump * pOldClump = m_pPlayerPed->GetRpClump();
+
+    printf ("CClientPed::ModelRequestCallback Called! pOldClump: %p\n", pOldClump);
+    
+    g_pGame->GetAnimManager()->RemovePedClumpFromMap ( pOldClump );
+
     // If we have a player loaded
     if ( m_pPlayerPed )
     {
@@ -4085,6 +4091,11 @@ void CClientPed::ModelRequestCallback ( CModelInfo* pModelInfo )
         // If we don't have a player loaded, load it
         _CreateModel ();
     }
+
+    RpClump * pNewClump = m_pPlayerPed->GetRpClump();
+    g_pGame->GetAnimManager()->InsertPedClumpToMap ( pNewClump, this );
+
+    printf ("CClientPed::ModelRequestCallback: Model changed/created    |    pNewClump: %p\n", m_pPlayerPed->GetRpClump());
 }
 
 
