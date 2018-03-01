@@ -3989,15 +3989,8 @@ CAnimBlendAssociationSAInterface * CClientGame::AddAnimationHandler ( RpClump * 
 
     //CClientPed * pPed = m_pPedManager->Get ( pClump, true );
 
-    hCAnimBlendAssocGroup_CopyAnimation CAnimBlendAssocGroup_CopyAnimation = reinterpret_cast < hCAnimBlendAssocGroup_CopyAnimation > ( FUNC_CAnimBlendAssocGroup_CopyAnimation );
-
-    CAnimBlendAssocGroupSAInterface  * pAnimAssocGroup  = reinterpret_cast < CAnimBlendAssocGroupSAInterface * > ( ((DWORD*)*(DWORD*)0x00B4EA34)  + (5 * animGroup) );
-    CAnimBlendAssociationSAInterface * pAnimAssociation = CAnimBlendAssocGroup_CopyAnimation ( pAnimAssocGroup, animID );
-
-    printf ("pThis: %p | sAnimGroup: %d | sAnimID: %d\n\n", (void*)pAnimAssociation, pAnimAssociation->sAnimGroup, pAnimAssociation->sAnimID);
-    //CAnimBlendAssociation * pAnimAssociation = CAnimBlendAssocGroup_CopyAnimation ( pAnimAssocGroupInterface, animID );
-    //CAnimBlendAssocGroupSA pAssocGroupSA ( pAnimAssocGroupInterface );
-    //CAnimBlendAssociation  * pAnimAssociation = pAssocGroupSA.CopyAnimation ( animID );
+    std::unique_ptr < CAnimBlendAssocGroup >    pAnimAssocGroup  = g_pGame->CreateAnimBlendAssocGroup ( animGroup );
+    CAnimBlendAssociationSAInterface         *  pAnimAssociation = pAnimAssocGroup->CopyAnimation ( animID );
 
     return pAnimAssociation;
 }
