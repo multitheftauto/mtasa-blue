@@ -22,7 +22,7 @@ CAnimBlendAssocGroupSA::CAnimBlendAssocGroupSA ( CAnimBlendAssocGroupSAInterface
 CAnimBlendAssociationSAInterface * CAnimBlendAssocGroupSA::CopyAnimation ( unsigned int AnimID )
 {
     CAnimBlendAssociationSAInterface * pAnimAssociationReturn = nullptr;
-
+    
     DWORD dwThis = ( DWORD ) m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendAssocGroup_CopyAnimation;
     _asm
