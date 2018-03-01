@@ -103,6 +103,7 @@ struct SCheatSA {
 class CGameSA : public CGame
 {
     friend class COffsets;
+    typedef std::unique_ptr < CAnimBlendAssocGroup > AssocGroup_type;
 
 private:
     CWeaponInfo         * WeaponInfos[NUM_WeaponInfosTotal];
@@ -255,6 +256,10 @@ public:
     void                    SetPreWeaponFireHandler         ( PreWeaponFireHandler* pPreWeaponFireHandler )     { m_pPreWeaponFireHandler = pPreWeaponFireHandler; }
     void                    SetPostWeaponFireHandler        ( PostWeaponFireHandler* pPostWeaponFireHandler )   { m_pPostWeaponFireHandler = pPostWeaponFireHandler; }
     void                    SetTaskSimpleBeHitHandler       ( TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler ) { m_pTaskSimpleBeHitHandler = pTaskSimpleBeHitHandler; }
+
+    constexpr
+    CAnimBlendAssocGroupSAInterface * getAnimAssocGroupInterface ( AssocGroupId animGroup );
+    AssocGroup_type         CreateAnimBlendAssocGroup       ( AssocGroupId animGroup );
 
     PreWeaponFireHandler*   m_pPreWeaponFireHandler;
     PostWeaponFireHandler*  m_pPostWeaponFireHandler;
