@@ -117,6 +117,8 @@ struct SShaderReplacementStats
 
 class __declspec(novtable) CGame 
 {
+typedef std::unique_ptr < CAnimBlendAssocGroup > AssocGroup_type;
+
 public:
     virtual CPools              * GetPools()=0;
     virtual CPlayerInfo         * GetPlayerInfo()=0;
@@ -192,7 +194,7 @@ public:
     virtual void                Reset               ( void ) = 0;
     virtual void                Terminate ( void ) = 0;
 
-    virtual BOOL                InitLocalPlayer(  )=0;
+    virtual BOOL                InitLocalPlayer ( ) = 0;
 
     virtual float               GetGravity ( void ) = 0;
     virtual void                SetGravity ( float fGravity ) = 0;
@@ -203,13 +205,13 @@ public:
     virtual unsigned long       GetMinuteDuration ( void ) = 0;
     virtual void                SetMinuteDuration ( unsigned long ulDelay ) = 0;
 
-    virtual unsigned char       GetBlurLevel ( void ) = 0;
-    virtual void                SetBlurLevel ( unsigned char ucLevel ) = 0;
+    virtual unsigned char       GetBlurLevel                ( void ) = 0;
+    virtual void                SetBlurLevel                ( unsigned char ucLevel ) = 0;
 
     virtual void                SetJetpackWeaponEnabled     ( eWeaponType weaponType, bool bEnabled );
     virtual bool                GetJetpackWeaponEnabled     ( eWeaponType weaponType );
 
-    virtual eGameVersion        GetGameVersion ( void ) = 0;
+    virtual eGameVersion        GetGameVersion              ( void ) = 0;
 
     virtual bool                IsCheatEnabled              ( const char* szCheatName ) = 0;
     virtual bool                SetCheatEnabled             ( const char* szCheatName, bool bEnable ) = 0;
@@ -235,7 +237,7 @@ public:
     virtual bool                HasCreditScreenFadedOut         ( void ) = 0;
     virtual void                FlushPendingRestreamIPL         ( void ) = 0;
     virtual void                ResetModelLodDistances          ( void ) = 0;
-    virtual void                ResetAlphaTransparencies         ( void ) = 0;
+    virtual void                ResetAlphaTransparencies        ( void ) = 0;
     virtual void                DisableVSync                    ( void ) = 0;
 
     virtual void                OnPedContextChange              ( CPed* pPedContext ) = 0;
@@ -246,6 +248,8 @@ public:
     virtual void                SetPreWeaponFireHandler         ( PreWeaponFireHandler* pPreWeaponFireHandler ) = 0;
     virtual void                SetPostWeaponFireHandler        ( PostWeaponFireHandler* pPostWeaponFireHandler ) = 0;
     virtual void                SetTaskSimpleBeHitHandler       ( TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler ) = 0;
+
+    virtual AssocGroup_type     CreateAnimBlendAssocGroup       ( AssocGroupId animGroup ) = 0;
 };
 
 #endif
