@@ -14,7 +14,7 @@ CClientIFP::~CClientIFP ( void )
 
 bool CClientIFP::LoadIFP ( const char* szFilePath, const char* szBlockName )
 {
-    printf ("\nCClientIFP::LoadIFP: szFilePath %s\n szBlockName: %s\n\n", szFilePath, szBlockName);
+    //printf ("\nCClientIFP::LoadIFP: szFilePath %s\n szBlockName: %s\n\n", szFilePath, szBlockName);
 
     // Failed
     return false;
@@ -23,5 +23,5 @@ bool CClientIFP::LoadIFP ( const char* szFilePath, const char* szBlockName )
 
 void CClientIFP::UnloadIFP ( void )
 {
-    printf ("CClientIFP::UnloadIFP ( ) called!\n");
+    //printf ("CClientIFP::UnloadIFP ( ) called!\n");
 }
