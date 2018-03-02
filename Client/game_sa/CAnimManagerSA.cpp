@@ -256,9 +256,9 @@ CAnimBlendAssociation * CAnimManagerSA::CreateAnimAssociation ( AssocGroupId ani
 }
 
 
-CAnimBlendAssociation * CAnimManagerSA::GetAnimAssociation ( AssocGroupId animGroup, AnimationId animID )
+CAnimBlendStaticAssociationSAInterface * CAnimManagerSA::GetAnimStaticAssociation ( AssocGroupId animGroup, AnimationId animID )
 {
-    CAnimBlendAssociationSAInterface * pInterface;
+    CAnimBlendStaticAssociationSAInterface * pInterface;
     DWORD dwFunc = FUNC_CAnimManager_GetAnimAssociation;
     _asm
     {
@@ -268,7 +268,7 @@ CAnimBlendAssociation * CAnimManagerSA::GetAnimAssociation ( AssocGroupId animGr
         mov     pInterface, eax
         add     esp, 0x8
     }
-    return GetAnimBlendAssociation ( pInterface );
+    return pInterface;
 }
 
 
@@ -759,6 +759,11 @@ CAnimBlendHierarchy * CAnimManagerSA::GetAnimBlendHierarchy ( CAnimBlendHierarch
         }
     }
     return NULL;
+}
+ 
+bool CAnimManagerSA::isGateWayAnimationHierarchy ( CAnimBlendHierarchySAInterface * pInterface )
+{
+    return pGame->GetKeyGen()->GetUppercaseKey ( GATEWAY_ANIMATION_NAME.c_str ( ) ) == pInterface->iHashKey;
 }
 
 void CAnimManagerSA::InsertPedClumpToMap ( RpClump * pClump, CClientPed * pClientPed )
