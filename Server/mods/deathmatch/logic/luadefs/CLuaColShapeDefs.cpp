@@ -215,10 +215,12 @@ int CLuaColShapeDefs::CreateColRectangle ( lua_State* luaVM )
 int CLuaColShapeDefs::CreateColPolygon ( lua_State* luaVM )
 {
     //  colshape createColPolygon ( float fX, float fY, float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, ... )
+
     std::vector < CVector2D > vecPointList;
 
+    // Get position and first 3 required points
     CScriptArgReader argStream ( luaVM );
-    for ( uint i = 0; i < 4 || argStream.NextCouldBeNumber (); i++ )
+    for ( uint i = 0; i < 4; i++ )
     {
         CVector2D vecPoint;
         argStream.ReadVector2D ( vecPoint );
@@ -233,6 +235,14 @@ int CLuaColShapeDefs::CreateColPolygon ( lua_State* luaVM )
             CResource* pResource = pLuaMain->GetResource ();
             if ( pResource )
             {
+                // Get additional points
+                while ( argStream.NextIsVector2D () )
+                {
+                    CVector2D vecPoint;
+                    argStream.ReadVector2D ( vecPoint );
+                    vecPointList.push_back ( vecPoint );
+                }
+
                 CColPolygon* pShape = CStaticFunctionDefinitions::CreateColPolygon ( pResource, vecPointList );
                 if ( pShape )
                 {
