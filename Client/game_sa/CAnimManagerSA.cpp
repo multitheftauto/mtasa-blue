@@ -763,7 +763,7 @@ CAnimBlendHierarchy * CAnimManagerSA::GetAnimBlendHierarchy ( CAnimBlendHierarch
  
 bool CAnimManagerSA::isGateWayAnimationHierarchy ( CAnimBlendHierarchySAInterface * pInterface )
 {
-    return pGame->GetKeyGen()->GetUppercaseKey ( GATEWAY_ANIMATION_NAME.c_str ( ) ) == pInterface->iHashKey;
+    return pGame->GetKeyGen()->GetUppercaseKey ( m_kGateWayAnimationName.c_str ( ) ) == pInterface->iHashKey;
 }
 
 void CAnimManagerSA::InsertPedClumpToMap ( RpClump * pClump, CClientPed * pClientPed )

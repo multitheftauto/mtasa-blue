@@ -72,14 +72,6 @@
 #define FUNC_RpAnimBlendClumpGetNumAssociations             0x4d6b60
 #define FUNC_RpAnimBlendClumpUpdateAnimations               0x4d34f0
 
-// This animation name will allow us to play custom animations by simply playing 
-// this animation and then in AddAnimation and AddAnimationAndSync hook, we can 
-// return our custom animation in the hook instead of run_wuzi. This will trick GTA SA into thinking
-// that it is playing run_wuzi, but in reality, it's playing our custom animation, and Of course, we can
-// return run_wuzi animation within the hook if we want to play it instead. Why run_wuzi? 
-// We can also use another animation, but I've tested with this one mostly, so let's stick to this.
-const SString GATEWAY_ANIMATION_NAME = "run_wuzi";
-
 class CAnimManagerSAInterface
 {
 public:
@@ -173,6 +165,14 @@ private:
     CAnimBlock *                m_pAnimBlocks [ MAX_ANIM_BLOCKS ];
     std::list < CAnimBlendAssociation *  > m_Associations;                   
     ClumpMap_type               m_mapOfPedClumps; 
+
+    // This animation name will allow us to play custom animations by simply playing  this animation
+    // and then in AddAnimation and AddAnimationAndSync hook, we can return our custom animation in the 
+    // hook instead of run_wuzi. This will trick GTA SA into thinking that it is playing run_wuzi, but in 
+    // reality, it's playing our custom animation, and Of course, we can return run_wuzi animation within 
+    // the hook if we want to play it instead. Why run_wuzi? We can also use another animation, but I've 
+    // tested with this one mostly, so let's stick to this.
+    const SString m_kGateWayAnimationName = "run_wuzi";
 
 };
 
