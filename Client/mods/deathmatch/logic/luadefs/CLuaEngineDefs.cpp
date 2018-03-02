@@ -281,13 +281,13 @@ int CLuaEngineDefs::EngineLoadTXD ( lua_State* luaVM )
 
 int CLuaEngineDefs::EngineLoadIFP ( lua_State* luaVM )
 {
-    SString strFile = "";
-    bool bFilteringEnabled = true;
+    SString strFile      = "";
+    SString strBlockName = "";
+
     CScriptArgReader argStream ( luaVM );
-    // Grab the TXD filename or data
+    // Grab the IFP filename or data
     argStream.ReadString ( strFile );
-    if ( argStream.NextIsBool() )   // Some scripts have a number here (in error)
-        argStream.ReadBool ( bFilteringEnabled, true );
+    argStream.ReadString ( strBlockName );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -310,7 +310,7 @@ int CLuaEngineDefs::EngineLoadIFP ( lua_State* luaVM )
                     CClientIFP* pIFP = new CClientIFP ( m_pManager, INVALID_ELEMENT_ID );
 
                     // Try to load the IFP file
-                    if ( pIFP->LoadIFP ( strPath ) )
+                    if ( pIFP->LoadIFP ( strPath, strBlockName ) )
                     {
                         // Success loading the file. Set parent to IFP root
                         pIFP->SetParent ( pRoot );
