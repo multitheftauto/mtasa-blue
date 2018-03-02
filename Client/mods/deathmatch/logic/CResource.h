@@ -131,6 +131,7 @@ private:
     class CClientEntity*    m_pResourceDFFEntity;
     class CClientEntity*    m_pResourceGUIEntity;
     class CClientEntity*    m_pResourceTXDRoot;
+    class CClientEntity*    m_pResourceIFPRoot;
     unsigned short          m_usRemainingNoClientCacheScripts;
     bool                    m_bLoadAfterReceivingNoClientCacheScripts;
     SString                 m_strMinServerReq;
