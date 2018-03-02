@@ -3987,11 +3987,18 @@ CAnimBlendAssociationSAInterface * CClientGame::AddAnimationHandler ( RpClump * 
 {
     printf ( "AddAnimationHandler called! pClump, GroupID, AnimID: %p, %d, %d\n", (void*)pClump, animGroup, animID );
 
-    //CClientPed * pPed = m_pPedManager->Get ( pClump, true );
-    CClientPed * pClientPed = g_pGame->GetAnimManager()->GetClientPedFromClumpMap ( pClump );
+    CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
+    
+    CClientPed * pClientPed = pAnimationManager->GetClientPedFromClumpMap ( pClump );
     if ( pClientPed != nullptr )
     {
-        printf ("pClientPed found!\n");
+        // printf ("pClientPed found!   | GroupID: %d | AnimID: %d \n\n", pAnimStaticAssoc->sAnimGroup, pAnimStaticAssoc->sAnimID);
+
+        auto pAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( animGroup, animID );
+        if ( pAnimationManager->isGateWayAnimationHierarchy ( pAnimStaticAssoc->pAnimHeirarchy ) )
+        {
+
+        }
     }
     
     std::unique_ptr < CAnimBlendAssocGroup >    pAnimAssocGroup  = g_pGame->CreateAnimBlendAssocGroup ( animGroup );
