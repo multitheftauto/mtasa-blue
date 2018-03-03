@@ -46,12 +46,10 @@ public:
 
    
 private:
-    SString m_strBlockName;
-    bool isVersion1;
-    IFPHeaderV2 HeaderV2;
-    std::vector <_CAnimBlendHierarchy> AnimationHierarchies;
-    std::vector <_CAnimBlendSequence> AnimationSequences;
-    unsigned char * KeyFramesArray;
+    SString                         m_strBlockName;
+    std::vector < IFP_Animation >   m_Animations;
+    bool                            isVersion1;
+    IFPHeaderV2                     HeaderV2;
 
 };
 
