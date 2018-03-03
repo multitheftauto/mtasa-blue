@@ -52,6 +52,10 @@ struct IFP_ANIM
     int32_t  Unk;
     int32_t  Next;
     int32_t  Previous;
+
+    // According to https://www.gtamodding.com/wiki/IFP, Unk2 should not exist, but for some reason, it's there
+    // I don't know why. Let's just go with the flow and ignore it. The value "seems" to be always zero. 
+    int32_t  Unk2;
 };
 
 struct IFP_KFRM
@@ -128,13 +132,11 @@ struct IFPHeaderV2
     int32_t   TotalAnimations;
 };
 
-struct IFP : FileLoader
-{   
-    bool isVersion1;
-    IFPHeaderV2 HeaderV2;
-    std::vector <_CAnimBlendHierarchy> AnimationHierarchies;
-    std::vector <_CAnimBlendSequence> AnimationSequences;
-    unsigned char * KeyFramesArray;
+struct IFP_Animation
+{
+    _CAnimBlendHierarchy              Hierarchy;
+    //std::vector <_CAnimBlendSequence> Sequences;
+    char *                            pSequencesMemory;
 };
 
 struct Animation
@@ -204,16 +206,6 @@ typedef void *(__cdecl* hCMemoryMgr_Malloc)
     size_t TotalBytesToAllocate
 );
 
-
-void LoadIFPFile(const char * FilePath);
-void ReadIFPVersion1();
-void ReadIFPVersion2( bool anp3);
-
-void insertAnimDummySequence(bool anp3, _CAnimBlendHierarchy * pAnimHierarchy, size_t SequenceIndex);
-int32_t getBoneIDFromName(std::string const& BoneName);
-std::string getCorrectBoneNameFromName(std::string const& BoneName);
-std::string getCorrectBoneNameFromID(int32_t & BoneID);
-size_t getCorrectBoneIndexFromID(int32_t & BoneID);
 
 void _CAnimBlendHierarchy_Constructor(_CAnimBlendHierarchy * pAnimHierarchy);
 void _CAnimBlendSequence_Constructor(_CAnimBlendSequence * pSequence);
