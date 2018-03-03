@@ -266,6 +266,10 @@ SDefaultCommandBind g_dcbDefaultCommands[] =
 // HACK: our current shift key states
 bool bPreLeftShift = false, bPreRightShift = false;
 
+int iCommandLimit = 64;    // 64 commands per second
+int iCommandCurrent = 0;
+long long ms_LastSaveTime = 0;
+
 // Ensure zero length strings are NULL
 static void NullEmptyStrings( const char*& a, const char*& b = *(const char**)NULL, const char*& c = *(const char**)NULL, const char*& d = *(const char**)NULL, const char*& e = *(const char**)NULL )
 {
@@ -562,16 +566,32 @@ bool CKeyBinds::Call ( CKeyBind* pKeyBind )
         {
             case KEY_BIND_COMMAND:
             {
-                CCommandBind* pBind = static_cast < CCommandBind* > ( pKeyBind );
-                if ( pBind->bActive )
-                    m_pCore->GetCommands ()->Execute ( pBind->szCommand, pBind->szArguments, false, pBind->szResource != NULL );
+                if ( GetTickCount64_() - ms_LastSaveTime > 1000 )
+                {
+                    iCommandCurrent = 0;
+                }
+                ms_LastSaveTime = GetTickCount64_();
+                iCommandCurrent++;
+                if ( iCommandCurrent < iCommandLimit ) {
+                    CCommandBind* pBind = static_cast < CCommandBind* > ( pKeyBind );
+                    if ( pBind->bActive )
+                        m_pCore->GetCommands()->Execute(pBind->szCommand, pBind->szArguments, false, pBind->szResource != NULL);
+                }
                 break;
             }
             case KEY_BIND_FUNCTION:
             {
-                CKeyFunctionBind* pBind = static_cast < CKeyFunctionBind* > ( pKeyBind );
-                if ( pBind->Handler )
-                    pBind->Handler ( pBind );
+                if ( GetTickCount64_() - ms_LastSaveTime > 1000 )
+                {
+                    iCommandCurrent = 0;
+                }
+                ms_LastSaveTime = GetTickCount64_ ();
+                iCommandCurrent ++;
+                if ( iCommandCurrent < iCommandLimit ) {
+                    CKeyFunctionBind* pBind = static_cast < CKeyFunctionBind* > ( pKeyBind );
+                    if ( pBind->Handler )
+                        pBind->Handler( pBind );
+                }
                 break;
             }
             case KEY_BIND_CONTROL_FUNCTION:
