@@ -37,10 +37,23 @@ bool CClientIFP::LoadIFP ( const char* szFilePath, SString strBlockName )
     //return false;
 }
 
-
+// Temporary method to avoid memory leaks, we'll need to rewrite the entire thing ;)
 void CClientIFP::UnloadIFP ( void )
 {
-    //printf ("CClientIFP::UnloadIFP ( ) called!\n");
+    printf ("CClientIFP::UnloadIFP ( ) called!\n");
+    
+    for ( size_t i = 0; i < m_Animations.size(); i++ )
+    {
+        IFP_Animation * ifpAnimation = &m_Animations[i];
+        for (unsigned short SequenceIndex = 0; i < ifpAnimation->Hierarchy.m_nSeqCount; i++)
+        {
+            _CAnimBlendSequence * pSequence = (_CAnimBlendSequence*)((BYTE*)(ifpAnimation->Hierarchy.m_pSequences) + (sizeof(_CAnimBlendSequence) * SequenceIndex));
+            free ( pSequence->m_pFrames );
+        }
+        delete ifpAnimation->pSequencesMemory;
+    }
+
+    printf ("IFP unloaded sucessfully\n");
 }
 
 bool CClientIFP::LoadIFPFile(const char * FilePath)
@@ -67,7 +80,7 @@ bool CClientIFP::LoadIFPFile(const char * FilePath)
         {
             isVersion1 = true;
 
-            //ReadIFPVersion1 ( );
+            ReadIFPVersion1 ( );
         }
 
         // We are unloading the data because we don't need to read it anymore. 
@@ -95,12 +108,12 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
 {
     readBuffer < IFPHeaderV2 > ( &HeaderV2 );
 
-    AnimationHierarchies.resize(HeaderV2.TotalAnimations);
-
-
-    for (size_t i = 0; i < AnimationHierarchies.size(); i++)
+    m_Animations.resize ( HeaderV2.TotalAnimations );
+    for (size_t i = 0; i < m_Animations.size(); i++)
     {
-        _CAnimBlendHierarchy * pAnimHierarchy = &AnimationHierarchies[i];
+        IFP_Animation & ifpAnimation = m_Animations[i];
+
+        _CAnimBlendHierarchy * pAnimHierarchy = &ifpAnimation.Hierarchy;
 
         _CAnimBlendHierarchy_Constructor(pAnimHierarchy);
 
@@ -121,7 +134,7 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
 
             pAnimHierarchy->m_bRunningCompressed = AnimationNode.isCompressed & 1;
 
-            pKeyFrames = (unsigned char*)OLD_CMemoryMgr_Malloc(AnimationNode.FrameSize);
+            pKeyFrames = (unsigned char*)malloc(AnimationNode.FrameSize);
         }
 
         OLD__CAnimBlendHierarchy_SetName(pAnimHierarchy, AnimationNode.Name);
@@ -133,6 +146,9 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
         const unsigned short   TotalSequences = IFP_TOTAL_SEQUENCES + pAnimHierarchy->m_nSeqCount;
         char           * pNewSequencesMemory  = ( char * ) operator new ( 12 * TotalSequences + 4 ); //  Allocate memory for sequences ( 12 * seq_count + 4 )
         
+        // Okay, we have assigned the memory. We can free it when we want to
+        ifpAnimation.pSequencesMemory = pNewSequencesMemory;
+
         pAnimHierarchy->m_pSequences          = ( _CAnimBlendSequence * )( pNewSequencesMemory + 4 );
  
         std::map < std::string, _CAnimBlendSequence > MapOfSequences;
@@ -292,13 +308,13 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
             Call__CAnimBlendHierarchy_RemoveQuaternionFlips(pAnimHierarchy);
 
             Call__CAnimBlendHierarchy_CalcTotalTime(pAnimHierarchy);
-        } 
+        }  
   
     }
 }
 
 void CClientIFP::ReadIFPVersion1 (  )
-{
+{ 
     uint32_t OffsetEOF;
 
     readBuffer < uint32_t > ( &OffsetEOF );
@@ -312,12 +328,12 @@ void CClientIFP::ReadIFPVersion1 (  )
 
     //ofs << "Total Animations: " << Info.Entries << std::endl;
 
-    AnimationHierarchies.resize ( Info.Entries );
-
-
-    for (size_t i = 0; i < AnimationHierarchies.size(); i++)
+    m_Animations.resize ( Info.Entries );
+    for (size_t i = 0; i < m_Animations.size(); i++)
     {
-        _CAnimBlendHierarchy * pAnimHierarchy = &AnimationHierarchies[i];
+        IFP_Animation & ifpAnimation = m_Animations[i];
+
+        _CAnimBlendHierarchy * pAnimHierarchy = &ifpAnimation.Hierarchy;
 
         _CAnimBlendHierarchy_Constructor(pAnimHierarchy);
 
@@ -356,6 +372,9 @@ void CClientIFP::ReadIFPVersion1 (  )
         const unsigned short   TotalSequences = IFP_TOTAL_SEQUENCES + pAnimHierarchy->m_nSeqCount;
         char           * pNewSequencesMemory  = ( char * ) operator new ( 12 * TotalSequences + 4 ); //  Allocate memory for sequences ( 12 * seq_count + 4 )
         
+        // Okay, we have assigned the memory. We can free it when we want to
+        ifpAnimation.pSequencesMemory = pNewSequencesMemory;
+
         pAnimHierarchy->m_pSequences          = ( _CAnimBlendSequence * )( pNewSequencesMemory + 4 );
  
         std::map < std::string, _CAnimBlendSequence > MapOfSequences;
@@ -438,7 +457,7 @@ void CClientIFP::ReadIFPVersion1 (  )
 
             IFP_FrameType    FrameType           = getFrameTypeFromFourCC ( Kfrm.Base.FourCC );
             size_t           CompressedFrameSize = GetSizeOfCompressedFrame ( FrameType );
-            BYTE          *  pKeyFrames          = ( BYTE * ) OLD_CMemoryMgr_Malloc ( CompressedFrameSize * Anim.Frames );
+            BYTE          *  pKeyFrames          = ( BYTE * ) malloc ( CompressedFrameSize * Anim.Frames );
 
             bool bIsRoot = FrameType != IFP_FrameType::KR00;
             if (bUnknownSequence)
@@ -454,17 +473,17 @@ void CClientIFP::ReadIFPVersion1 (  )
             {
                 //ofs << "  |  FrameType: KRTS" << std::endl;
 
-                ReadKrtsFramesAsCompressed (  pKeyFrames, Anim.Frames );
+                ReadKrtsFramesAsCompressed ( pKeyFrames, Anim.Frames );
             }
             else if (FrameType == IFP_FrameType::KRT0)
             {
                 //ofs << "  |  FrameType: KRT0" << std::endl;
-                ReadKrt0FramesAsCompressed (  pKeyFrames, Anim.Frames );
+                ReadKrt0FramesAsCompressed ( pKeyFrames, Anim.Frames );
             }
             else if (FrameType == IFP_FrameType::KR00)
             {
                 //ofs << "  |  FrameType: KR00" << std::endl;
-                ReadKr00FramesAsCompressed (  pKeyFrames, Anim.Frames, BoneID );
+                ReadKr00FramesAsCompressed ( pKeyFrames, Anim.Frames, BoneID );
             }
 
             if (!bUnknownSequence)
@@ -473,7 +492,7 @@ void CClientIFP::ReadIFPVersion1 (  )
             }
        
         }
-  
+        
         std::map < std::string, _CAnimBlendSequence >::iterator it;
         for (size_t SequenceIndex = 0; SequenceIndex < IFP_TOTAL_SEQUENCES; SequenceIndex++)
         {
@@ -507,8 +526,8 @@ void CClientIFP::ReadIFPVersion1 (  )
             Call__CAnimBlendHierarchy_RemoveQuaternionFlips(pAnimHierarchy);
 
             Call__CAnimBlendHierarchy_CalcTotalTime(pAnimHierarchy);
-        } 
-    }
+        }  
+    } 
 }
 
 
@@ -655,7 +674,7 @@ void CClientIFP::insertAnimDummySequence ( bool anp3, _CAnimBlendHierarchy * pAn
 
     
 
-    pKeyFrames = (unsigned char*)OLD_CMemoryMgr_Malloc(FramesDataSizeInBytes);
+    pKeyFrames = (unsigned char*)malloc(FramesDataSizeInBytes);
 
     OLD__CAnimBlendSequence_SetNumFrames(pSequence, TotalFrames, bIsRoot, bIsCompressed, pKeyFrames);
 
