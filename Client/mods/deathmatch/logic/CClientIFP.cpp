@@ -45,11 +45,20 @@ void CClientIFP::UnloadIFP ( void )
     for ( size_t i = 0; i < m_Animations.size(); i++ )
     {
         IFP_Animation * ifpAnimation = &m_Animations[i];
-        for (unsigned short SequenceIndex = 0; i < ifpAnimation->Hierarchy.m_nSeqCount; i++)
-        {
-            _CAnimBlendSequence * pSequence = (_CAnimBlendSequence*)((BYTE*)(ifpAnimation->Hierarchy.m_pSequences) + (sizeof(_CAnimBlendSequence) * SequenceIndex));
-            free ( pSequence->m_pFrames );
+        if ( isVersion1 )
+        { 
+            for (unsigned short SequenceIndex = 0; SequenceIndex < ifpAnimation->Hierarchy.m_nSeqCount; SequenceIndex++)
+            {
+                
+                _CAnimBlendSequence * pSequence = (_CAnimBlendSequence*)((BYTE*)ifpAnimation->Hierarchy.m_pSequences + (sizeof(_CAnimBlendSequence) * SequenceIndex));
+                free ( pSequence->m_pFrames );
+            }
         }
+        else
+        {
+            free ( ifpAnimation->pFramesMemoryVersion2 );
+        }
+
         delete ifpAnimation->pSequencesMemory;
     }
 
@@ -135,6 +144,8 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
             pAnimHierarchy->m_bRunningCompressed = AnimationNode.isCompressed & 1;
 
             pKeyFrames = (unsigned char*)malloc(AnimationNode.FrameSize);
+
+            ifpAnimation.pFramesMemoryVersion2 = pKeyFrames;
         }
 
         OLD__CAnimBlendHierarchy_SetName(pAnimHierarchy, AnimationNode.Name);

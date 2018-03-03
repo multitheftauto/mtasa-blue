@@ -137,6 +137,7 @@ struct IFP_Animation
     _CAnimBlendHierarchy              Hierarchy;
     //std::vector <_CAnimBlendSequence> Sequences;
     char *                            pSequencesMemory;
+    unsigned char*                    pFramesMemoryVersion2; // only for IFP version 2;
 };
 
 struct Animation
