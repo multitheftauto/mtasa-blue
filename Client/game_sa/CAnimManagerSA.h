@@ -152,26 +152,29 @@ public:
     CAnimBlendHierarchy *       GetAnimBlendHierarchy                   ( CAnimBlendHierarchySAInterface * pInterface );
     
     bool                        isGateWayAnimationHierarchy             ( CAnimBlendHierarchySAInterface * pInterface );
+    const SString &             GetGateWayBlockName                     ( void );
+    const SString &             GetGateWayAnimationName                 ( void );
 
     // This is used in AddAnimationHandler and AddAnimationAndSyncHandler for playing
     // custom animations and to help in replacing and restoring animations 
-    void                        InsertPedClumpToMap                     ( RpClump * pClump, CClientPed * pClientPed );
-    void                        RemovePedClumpFromMap                   ( RpClump * pClump );
-    CClientPed *                GetClientPedFromClumpMap                ( RpClump * pClump );
+    void                        InsertPedPointerToMap                   ( RpClump * pClump, CClientPed * pClientPed );
+    void                        RemovePedPointerFromMap                 ( RpClump * pClump );
+    CClientPed *                GetPedPointerFromMap                    ( RpClump * pClump );
 
 private:
     CAnimBlendAssocGroup *      m_pAnimAssocGroups [ MAX_ANIM_GROUPS ];
     CAnimBlendHierarchy *       m_pAnimations [ MAX_ANIMATIONS ];
     CAnimBlock *                m_pAnimBlocks [ MAX_ANIM_BLOCKS ];
     std::list < CAnimBlendAssociation *  > m_Associations;                   
-    ClumpMap_type               m_mapOfPedClumps; 
+    ClumpMap_type               m_mapOfPedPointers; 
 
-    // This animation name will allow us to play custom animations by simply playing  this animation
+    // This "gateway" animation will allow us to play custom animations by simply playing this animation
     // and then in AddAnimation and AddAnimationAndSync hook, we can return our custom animation in the 
-    // hook instead of run_wuzi. This will trick GTA SA into thinking that it is playing run_wuzi, but in 
-    // reality, it's playing our custom animation, and Of course, we can return run_wuzi animation within 
-    // the hook if we want to play it instead. Why run_wuzi? We can also use another animation, but I've 
-    // tested with this one mostly, so let's stick to this.
+    // hook instead of run_wuzi. This will trick GTA SA into thinking that it is playing run_wuzi from
+    // ped block, but in reality, it's playing our custom animation, and Of course, we can return run_wuzi 
+    // animation within the hook if we want to play it instead. Why run_wuzi? We can also use another animation,
+    // but I've tested with this one mostly, so let's stick to this.
+    const SString m_kGateWayBlockName     = "ped";
     const SString m_kGateWayAnimationName = "run_wuzi";
 
 };

@@ -766,23 +766,33 @@ bool CAnimManagerSA::isGateWayAnimationHierarchy ( CAnimBlendHierarchySAInterfac
     return pGame->GetKeyGen()->GetUppercaseKey ( m_kGateWayAnimationName.c_str ( ) ) == pInterface->iHashKey;
 }
 
-void CAnimManagerSA::InsertPedClumpToMap ( RpClump * pClump, CClientPed * pClientPed )
+const SString & CAnimManagerSA::GetGateWayBlockName ( void )
 {
-    if ( m_mapOfPedClumps.count ( pClump ) == 0 )
+    return m_kGateWayBlockName;
+}
+
+const SString & CAnimManagerSA::GetGateWayAnimationName ( void )
+{
+    return m_kGateWayAnimationName;
+}
+
+void CAnimManagerSA::InsertPedPointerToMap ( RpClump * pClump, CClientPed * pClientPed )
+{
+    if ( m_mapOfPedPointers.count ( pClump ) == 0 )
     { 
-        m_mapOfPedClumps [ pClump ] = pClientPed;
+        m_mapOfPedPointers [ pClump ] = pClientPed;
     }
 }
 
-void CAnimManagerSA::RemovePedClumpFromMap ( RpClump * pClump )
+void CAnimManagerSA::RemovePedPointerFromMap ( RpClump * pClump )
 {
-    m_mapOfPedClumps.erase ( pClump );
+    m_mapOfPedPointers.erase ( pClump );
 }
 
-CClientPed * CAnimManagerSA::GetClientPedFromClumpMap ( RpClump * pClump )
+CClientPed * CAnimManagerSA::GetPedPointerFromMap ( RpClump * pClump )
 {
-    ClumpMap_type::iterator it = m_mapOfPedClumps.find ( pClump );
-    if ( it != m_mapOfPedClumps.end ( ) )
+    ClumpMap_type::iterator it = m_mapOfPedPointers.find ( pClump );
+    if ( it != m_mapOfPedPointers.end ( ) )
     {
         return it->second;
     }
