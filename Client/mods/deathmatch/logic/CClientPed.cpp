@@ -99,6 +99,7 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
 
     m_pRequester = pManager->GetModelRequestManager ();
 
+    m_bisNextAnimationCustom = false;
     m_iVehicleInOutState = VEHICLE_INOUT_NONE;
     m_pPlayerPed = NULL;
     m_pTaskManager = NULL;
@@ -4078,7 +4079,7 @@ void CClientPed::ModelRequestCallback ( CModelInfo* pModelInfo )
 
     printf ("CClientPed::ModelRequestCallback Called! pOldClump: %p\n", pOldClump);
     
-    g_pGame->GetAnimManager()->RemovePedClumpFromMap ( pOldClump );
+    g_pGame->GetAnimManager()->RemovePedPointerFromMap ( pOldClump );
 
     // If we have a player loaded
     if ( m_pPlayerPed )
@@ -4093,7 +4094,7 @@ void CClientPed::ModelRequestCallback ( CModelInfo* pModelInfo )
     }
 
     RpClump * pNewClump = m_pPlayerPed->GetRpClump();
-    g_pGame->GetAnimManager()->InsertPedClumpToMap ( pNewClump, this );
+    g_pGame->GetAnimManager()->InsertPedPointerToMap ( pNewClump, this );
 
     printf ("CClientPed::ModelRequestCallback: Model changed/created    |    pNewClump: %p\n", m_pPlayerPed->GetRpClump());
 }
