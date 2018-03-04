@@ -3989,15 +3989,20 @@ CAnimBlendAssociationSAInterface * CClientGame::AddAnimationHandler ( RpClump * 
 
     CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
     
-    CClientPed * pClientPed = pAnimationManager->GetClientPedFromClumpMap ( pClump );
+    CClientPed * pClientPed = pAnimationManager->GetPedPointerFromMap ( pClump );
     if ( pClientPed != nullptr )
     {
-        // printf ("pClientPed found!   | GroupID: %d | AnimID: %d \n\n", pAnimStaticAssoc->sAnimGroup, pAnimStaticAssoc->sAnimID);
+        if ( pClientPed->isNextAnimationCustom () )
+        { 
+            printf("pClientPed->isNextAnimationCustom () is true\n");
 
-        auto pAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( animGroup, animID );
-        if ( pAnimationManager->isGateWayAnimationHierarchy ( pAnimStaticAssoc->pAnimHeirarchy ) )
-        {
+            auto pAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( animGroup, animID );
+            if ( pAnimationManager->isGateWayAnimationHierarchy ( pAnimStaticAssoc->pAnimHeirarchy ) )
+            {
+                printf("pAnimationManager->isGateWayAnimationHierarchy() is true\n");
 
+                pClientPed->setNextAnimationNormal ( );
+            }
         }
     }
     
@@ -6740,4 +6745,27 @@ void CClientGame::RestreamModel ( unsigned short usModel )
     if ( CClientObjectManager::IsValidModel ( usModel ) && CVehicleUpgrades::IsUpgrade ( usModel ) )
         m_pManager->GetVehicleManager ()->RestreamVehicleUpgrades ( usModel );
 
+}
+
+void CClientGame::InsertIFPPointerToMap ( SString strBlockName, CClientIFP * pIFP )
+{
+    if ( m_mapOfIfpPointers.count ( strBlockName ) == 0 )
+    { 
+        m_mapOfIfpPointers [ strBlockName ] = pIFP;
+    }
+}
+
+void CClientGame::RemoveIFPPointerFromMap ( SString strBlockName )
+{
+    m_mapOfIfpPointers.erase ( strBlockName );
+}
+
+CClientIFP * CClientGame::GetIFPPointerFromMap ( SString strBlockName )
+{
+    std::map < SString, CClientIFP * >::iterator it = m_mapOfIfpPointers.find ( strBlockName );
+    if ( it != m_mapOfIfpPointers.end ( ) )
+    {
+        return it->second;
+    }
+    return nullptr;
 }
