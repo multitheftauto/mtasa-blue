@@ -24,12 +24,14 @@ class CAnimBlendHierarchy;
 
 class CAnimBlendStaticAssociationSAInterface
 {
+protected:
+    void *                              vTable;
 public:
-    BYTE                                pad [ 6 ];
+    unsigned short                      nNumBlendNodes;
     short                               sAnimID;
     short                               sAnimGroup;
     short                               sFlags;
-    BYTE                                pad2 [ 4 ];
+    DWORD *                             pAnimBlendNodesSequenceArray;
     CAnimBlendHierarchySAInterface *    pAnimHeirarchy;
 };
 

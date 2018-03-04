@@ -256,9 +256,9 @@ CAnimBlendAssociation * CAnimManagerSA::CreateAnimAssociation ( AssocGroupId ani
 }
 
 
-CAnimBlendAssociation * CAnimManagerSA::GetAnimAssociation ( AssocGroupId animGroup, AnimationId animID )
+CAnimBlendStaticAssociationSAInterface * CAnimManagerSA::GetAnimStaticAssociation ( AssocGroupId animGroup, AnimationId animID )
 {
-    CAnimBlendAssociationSAInterface * pInterface;
+    CAnimBlendStaticAssociationSAInterface * pInterface;
     DWORD dwFunc = FUNC_CAnimManager_GetAnimAssociation;
     _asm
     {
@@ -268,7 +268,7 @@ CAnimBlendAssociation * CAnimManagerSA::GetAnimAssociation ( AssocGroupId animGr
         mov     pInterface, eax
         add     esp, 0x8
     }
-    return GetAnimBlendAssociation ( pInterface );
+    return pInterface;
 }
 
 
@@ -760,24 +760,39 @@ CAnimBlendHierarchy * CAnimManagerSA::GetAnimBlendHierarchy ( CAnimBlendHierarch
     }
     return NULL;
 }
-
-void CAnimManagerSA::InsertPedClumpToMap ( RpClump * pClump, CClientPed * pClientPed )
+ 
+bool CAnimManagerSA::isGateWayAnimationHierarchy ( CAnimBlendHierarchySAInterface * pInterface )
 {
-    if ( m_mapOfPedClumps.count ( pClump ) == 0 )
+    return pGame->GetKeyGen()->GetUppercaseKey ( m_kGateWayAnimationName.c_str ( ) ) == pInterface->iHashKey;
+}
+
+const SString & CAnimManagerSA::GetGateWayBlockName ( void )
+{
+    return m_kGateWayBlockName;
+}
+
+const SString & CAnimManagerSA::GetGateWayAnimationName ( void )
+{
+    return m_kGateWayAnimationName;
+}
+
+void CAnimManagerSA::InsertPedPointerToMap ( RpClump * pClump, CClientPed * pClientPed )
+{
+    if ( m_mapOfPedPointers.count ( pClump ) == 0 )
     { 
-        m_mapOfPedClumps [ pClump ] = pClientPed;
+        m_mapOfPedPointers [ pClump ] = pClientPed;
     }
 }
 
-void CAnimManagerSA::RemovePedClumpFromMap ( RpClump * pClump )
+void CAnimManagerSA::RemovePedPointerFromMap ( RpClump * pClump )
 {
-    m_mapOfPedClumps.erase ( pClump );
+    m_mapOfPedPointers.erase ( pClump );
 }
 
-CClientPed * CAnimManagerSA::GetClientPedFromClumpMap ( RpClump * pClump )
+CClientPed * CAnimManagerSA::GetPedPointerFromMap ( RpClump * pClump )
 {
-    ClumpMap_type::iterator it = m_mapOfPedClumps.find ( pClump );
-    if ( it != m_mapOfPedClumps.end ( ) )
+    ClumpMap_type::iterator it = m_mapOfPedPointers.find ( pClump );
+    if ( it != m_mapOfPedPointers.end ( ) )
     {
         return it->second;
     }

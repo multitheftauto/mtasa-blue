@@ -21,6 +21,7 @@ public:
     LUA_DECLARE ( EngineLoadDFF );
     LUA_DECLARE ( EngineLoadTXD );
     LUA_DECLARE ( EngineLoadCOL );
+    LUA_DECLARE ( EngineLoadIFP );
     LUA_DECLARE ( EngineImportTXD );
     LUA_DECLARE ( EngineReplaceCOL );
     LUA_DECLARE ( EngineRestoreCOL );

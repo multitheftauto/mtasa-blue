@@ -3987,11 +3987,23 @@ CAnimBlendAssociationSAInterface * CClientGame::AddAnimationHandler ( RpClump * 
 {
     printf ( "AddAnimationHandler called! pClump, GroupID, AnimID: %p, %d, %d\n", (void*)pClump, animGroup, animID );
 
-    //CClientPed * pPed = m_pPedManager->Get ( pClump, true );
-    CClientPed * pClientPed = g_pGame->GetAnimManager()->GetClientPedFromClumpMap ( pClump );
+    CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
+    
+    CClientPed * pClientPed = pAnimationManager->GetPedPointerFromMap ( pClump );
     if ( pClientPed != nullptr )
     {
-        printf ("pClientPed found!\n");
+        if ( pClientPed->isNextAnimationCustom () )
+        { 
+            printf("pClientPed->isNextAnimationCustom () is true\n");
+
+            auto pAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( animGroup, animID );
+            if ( pAnimationManager->isGateWayAnimationHierarchy ( pAnimStaticAssoc->pAnimHeirarchy ) )
+            {
+                printf("pAnimationManager->isGateWayAnimationHierarchy() is true\n");
+
+                pClientPed->setNextAnimationNormal ( );
+            }
+        }
     }
     
     std::unique_ptr < CAnimBlendAssocGroup >    pAnimAssocGroup  = g_pGame->CreateAnimBlendAssocGroup ( animGroup );
@@ -6733,4 +6745,27 @@ void CClientGame::RestreamModel ( unsigned short usModel )
     if ( CClientObjectManager::IsValidModel ( usModel ) && CVehicleUpgrades::IsUpgrade ( usModel ) )
         m_pManager->GetVehicleManager ()->RestreamVehicleUpgrades ( usModel );
 
+}
+
+void CClientGame::InsertIFPPointerToMap ( SString strBlockName, CClientIFP * pIFP )
+{
+    if ( m_mapOfIfpPointers.count ( strBlockName ) == 0 )
+    { 
+        m_mapOfIfpPointers [ strBlockName ] = pIFP;
+    }
+}
+
+void CClientGame::RemoveIFPPointerFromMap ( SString strBlockName )
+{
+    m_mapOfIfpPointers.erase ( strBlockName );
+}
+
+CClientIFP * CClientGame::GetIFPPointerFromMap ( SString strBlockName )
+{
+    std::map < SString, CClientIFP * >::iterator it = m_mapOfIfpPointers.find ( strBlockName );
+    if ( it != m_mapOfIfpPointers.end ( ) )
+    {
+        return it->second;
+    }
+    return nullptr;
 }

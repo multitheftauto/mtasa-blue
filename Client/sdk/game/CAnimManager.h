@@ -20,10 +20,12 @@
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
 
+class SString;
 class CAnimBlendAssocGroup;
 class CAnimBlendHierarchy;
 class CAnimBlock;
 class CAnimBlendAssociation;
+class CAnimBlendStaticAssociationSAInterface;
 class CClientPed;
 struct RpClump;
 struct RwStream;
@@ -37,6 +39,8 @@ class CAnimBlockSAInterface;
 
 class CAnimManager
 {
+    typedef CAnimBlendStaticAssociationSAInterface * StaticAssocIntface_type;
+
     friend class CAnimBlendAssociation;
 public:
     virtual void                        Initialize                              ( void ) = 0;
@@ -62,7 +66,7 @@ public:
     virtual const char *                GetAnimBlockName                        ( AssocGroupId groupID ) = 0;
 
     virtual CAnimBlendAssociation *     CreateAnimAssociation                   ( AssocGroupId animGroup, AnimationId animID ) = 0;
-    virtual CAnimBlendAssociation *     GetAnimAssociation                      ( AssocGroupId animGroup, AnimationId animID ) = 0;
+    virtual StaticAssocIntface_type     GetAnimStaticAssociation                ( AssocGroupId animGroup, AnimationId animID ) = 0;
     virtual CAnimBlendAssociation *     GetAnimAssociation                      ( AssocGroupId animGroup, const char * szAnimName ) = 0;
     virtual CAnimBlendAssociation *     AddAnimation                            ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID ) = 0;
     virtual CAnimBlendAssociation *     AddAnimation                            ( RpClump * pClump, CAnimBlendHierarchy *, int ID ) = 0;
@@ -104,9 +108,13 @@ public:
     virtual CAnimBlock *                GetAnimBlock                            ( CAnimBlockSAInterface * pInterface ) = 0;
     virtual CAnimBlendHierarchy *       GetAnimBlendHierarchy                   ( CAnimBlendHierarchySAInterface * pInterface ) = 0;
 
-    virtual void                        InsertPedClumpToMap                     ( RpClump * pClump, CClientPed * pEntity ) = 0;
-    virtual void                        RemovePedClumpFromMap                   ( RpClump * pClump ) = 0;
-    virtual CClientPed *                GetClientPedFromClumpMap                ( RpClump * pClump ) = 0;
+    virtual bool                        isGateWayAnimationHierarchy             ( CAnimBlendHierarchySAInterface * pInterface ) = 0;
+    virtual const SString &             GetGateWayBlockName                     ( void ) = 0;
+    virtual const SString &             GetGateWayAnimationName                 ( void ) = 0;
+
+    virtual void                        InsertPedPointerToMap                   ( RpClump * pClump, CClientPed * pEntity ) = 0;
+    virtual void                        RemovePedPointerFromMap                 ( RpClump * pClump ) = 0;
+    virtual CClientPed *                GetPedPointerFromMap                    ( RpClump * pClump ) = 0;
 };
 
 #endif
