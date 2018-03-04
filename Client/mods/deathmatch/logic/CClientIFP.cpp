@@ -32,9 +32,6 @@ bool CClientIFP::LoadIFP ( const char* szFilePath, SString strBlockName )
     m_strBlockName = strBlockName;
 
     return LoadIFPFile ( szFilePath );
-
-    // Failed
-    //return false;
 }
 
 // Temporary method to avoid memory leaks, we'll need to rewrite the entire thing ;)
@@ -67,12 +64,13 @@ void CClientIFP::UnloadIFP ( void )
         free ( pKeyFrames );
     }
 
-    printf ("IFP unloaded sucessfully\n");
+    g_pClientGame->RemoveIFPPointerFromMap ( m_strBlockName );
+    printf ("IFP unloaded sucessfully, removed from map as well.\n");
 }
 
 bool CClientIFP::LoadIFPFile(const char * FilePath)
 {
-    createLoader(FilePath);
+    createLoader ( FilePath );
 
     if (loadFile())
     {
@@ -107,11 +105,7 @@ bool CClientIFP::LoadIFPFile(const char * FilePath)
         return false;
     }
 
-    // We need to keep this IFP somewhere, for now, insert into Animation Manager map here. 
-    //g_IFPs.push_back(IFPElement);
-
     printf("Exiting LoadIFPFile function\n");
-    //ofs << "Exiting LoadIFPFile function" << std::endl;
 
     return true;
 }
