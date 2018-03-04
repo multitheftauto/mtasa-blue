@@ -2133,6 +2133,26 @@ bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const 
                 Ped.RunNamedAnimation ( pBlock, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame );
                 return true;
             }
+            else
+            {
+                CClientIFP * pIFP = g_pClientGame->GetIFPPointerFromMap ( szBlockName );
+
+                // Is this a custom animation block?
+                if ( pIFP )
+                {   
+                    // Play the gateway animation
+                    const SString & strGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName ( );
+                    CAnimBlock    * pBlock              = g_pGame->GetAnimManager ()->GetAnimationBlock ( strGateWayBlockName );
+                    if ( pBlock )
+                    {
+                        Ped.setNextAnimationCustom ( szBlockName,  szAnimName );
+
+                        const SString & strGateWayAnimationName = g_pGame->GetAnimManager()->GetGateWayAnimationName ( );
+                        Ped.RunNamedAnimation ( pBlock, strGateWayAnimationName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame );
+                        return true;
+                    }
+                }
+            }
         }
         else
         {
