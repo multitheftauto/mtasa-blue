@@ -312,6 +312,9 @@ int CLuaEngineDefs::EngineLoadIFP ( lua_State* luaVM )
                     // Try to load the IFP file
                     if ( pIFP->LoadIFP ( strPath, strBlockName ) )
                     {
+                        // We can use the map to retrieve correct IFP by block name later
+                        g_pClientGame->InsertIFPPointerToMap ( strBlockName, pIFP );
+
                         // Success loading the file. Set parent to IFP root
                         pIFP->SetParent ( pRoot );
 
