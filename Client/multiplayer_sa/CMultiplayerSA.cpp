@@ -158,8 +158,13 @@ DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse =    0x4BA076;
 #define HOOKPOS_CAnimManager_AddAnimation                   0x4d3aa0
 DWORD RETURN_CAnimManager_AddAnimation =                    0x4D3AAA;
 DWORD RETURN_CAnimManager_AddAnimation_SkipCopyAnimation =  0x4D3ABC;
-#define HOOKPOS_CAnimManager_BlendAnimation                 0x4D4610
-DWORD RETURN_CAnimManager_BlendAnimation =                  0x4D4617;
+
+#define HOOKPOS_CAnimManager_AddAnimationAndSync                  0x4D3B30
+DWORD RETURN_CAnimManager_AddAnimationAndSync =                   0x4D3B3A;
+DWORD RETURN_CAnimManager_AddAnimationAndSync_SkipCopyAnimation = 0x4D3B4C;
+
+#define HOOKPOS_CAnimManager_BlendAnimation_Hierarchy       0x4D4410 //0x4D4425
+DWORD RETURN_CAnimManager_BlendAnimation_Hierarchy =        0x4D4417; //0x4D442D;
 
 #define HOOKPOS_CPed_GetWeaponSkill                         0x5e3b60
 DWORD RETURN_CPed_GetWeaponSkill =                          0x5E3B68;
@@ -424,7 +429,8 @@ void HOOK_RenderScene_end ();
 void HOOK_CPlantMgr_Render ();
 void HOOK_CEventHandler_ComputeKnockOffBikeResponse ();
 void HOOK_CAnimManager_AddAnimation ();
-void HOOK_CAnimManager_BlendAnimation ();
+void HOOK_CAnimManager_AddAnimationAndSync ();
+void HOOK_CAnimManager_BlendAnimation_Hierarchy ();
 void HOOK_CPed_GetWeaponSkill ();
 void HOOK_CPed_AddGogglesModel ();
 void HOOK_CPhysical_ProcessCollisionSectorList ();
@@ -631,7 +637,8 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10 );
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7 );
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10 ); 
-    HookInstall(HOOKPOS_CAnimManager_BlendAnimation, (DWORD)HOOK_CAnimManager_BlendAnimation, 7 );
+    HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10 ); 
+    HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 7 );
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8 );
     HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
     HookInstall(HOOKPOS_CPhysical_ProcessCollisionSectorList, (DWORD)HOOK_CPhysical_ProcessCollisionSectorList, 7 );
@@ -5372,17 +5379,67 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation ()
     } 
 }
 
-float animationBlendDelta;
-void _declspec(naked) HOOK_CAnimManager_BlendAnimation ()
+
+CAnimBlendAssociationSAInterface * pAnimAssociationToSyncWith = nullptr;
+void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync ()
 {
     _asm
     {        
         mov     eax, [esp+4]
         mov     animationClump, eax
         mov     eax, [esp+8]
-        mov     animationGroup, eax
+        mov     pAnimAssociationToSyncWith, eax
         mov     eax, [esp+12]
+        mov     animationGroup, eax
+        mov     eax, [esp+16]
         mov     animationID, eax
+        pushad
+    }
+    
+    if ( m_pAddAnimationHandler  )
+    {
+        pAnimAssociation = m_pAddAnimationHandler ( animationClump, animationGroup, animationID );
+    }
+    else 
+    {
+        // This will avoid crash if m_pAddAnimationHandler is removed
+        // continue the normal flow of AddAnimationAndSync function, instead of skipping CopyAnimation
+
+       _asm
+        {
+            popad
+            mov     eax,dword ptr [esp+0Ch] 
+            mov     edx,dword ptr ds:[0B4EA34h] 
+            jmp     RETURN_CAnimManager_AddAnimation
+        }
+    }
+
+
+    // As we are manually creating animation association, so skip CopyAnimation call
+    _asm
+    {
+        popad
+        push    esi
+        push    edi
+        mov     eax, pAnimAssociation
+        jmp     RETURN_CAnimManager_AddAnimation_SkipCopyAnimation
+    } 
+}
+
+
+CAnimBlendHierarchySAInterface * pAnimHierarchy = nullptr;
+int   flags = 0;
+float animationBlendDelta = 0.0f;
+void _declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy () 
+{
+    _asm
+    {        
+        mov     eax, [esp+4]
+        mov     animationClump, eax
+        mov     eax, [esp+8]
+        mov     pAnimHierarchy, eax
+        mov     eax, [esp+12]
+        mov     flags, eax
         mov     eax, [esp+16]
         mov     animationBlendDelta, eax
         pushad
@@ -5390,16 +5447,17 @@ void _declspec(naked) HOOK_CAnimManager_BlendAnimation ()
     
     if ( m_pBlendAnimationHandler  )
     {
-        m_pBlendAnimationHandler ( animationClump, animationGroup, animationID, animationBlendDelta );
+        m_pBlendAnimationHandler ( animationClump, pAnimHierarchy, flags, animationBlendDelta );
     }
 
     _asm
     {
         popad
-        sub     esp,14h 
-        mov     ecx,dword ptr [esp+18h]
-        jmp     RETURN_CAnimManager_BlendAnimation
+        push   0FFFFFFFFh
+        push   04D4410h
+        jmp    RETURN_CAnimManager_BlendAnimation_Hierarchy
     }
+
 }
 
 CPedSAInterface * weaponSkillPed;

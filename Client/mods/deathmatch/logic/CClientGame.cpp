@@ -3697,9 +3697,9 @@ CAnimBlendAssociationSAInterface * CClientGame::StaticAddAnimationHandler ( RpCl
     return g_pClientGame->AddAnimationHandler ( pClump, animGroup, animID );
 }
 
-void CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
+void CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta )
 {
-    g_pClientGame->BlendAnimationHandler ( pClump, animGroup, animID, fBlendDelta );
+    g_pClientGame->BlendAnimationHandler ( pClump, pAnimHierarchy, flags, fBlendDelta );
 }
 
 void CClientGame::StaticPreWorldProcessHandler ( void )
@@ -3994,8 +3994,6 @@ CAnimBlendAssociationSAInterface * CClientGame::AddAnimationHandler ( RpClump * 
     {
         if ( pClientPed->isNextAnimationCustom () )
         { 
-            printf("pClientPed->isNextAnimationCustom () is true\n");
-
             auto pAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( animGroup, animID );
             if ( pAnimationManager->isGateWayAnimationHierarchy ( pAnimStaticAssoc->pAnimHeirarchy ) )
             {
@@ -4012,9 +4010,10 @@ CAnimBlendAssociationSAInterface * CClientGame::AddAnimationHandler ( RpClump * 
     return pAnimAssociation;
 }
 
-void CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
+void CClientGame::BlendAnimationHandler ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta )
 {   
     //CClientPed * pPed = m_pPedManager->Get ( pClump, true );
+    printf ("CClientGame::BlendAnimationHandler called! pClump: %p\n", pClump);
 }
 
 bool CClientGame::ProcessCollisionHandler ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface )
