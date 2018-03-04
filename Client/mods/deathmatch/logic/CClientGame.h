@@ -586,6 +586,10 @@ public:
     void                                      SetFileCacheRoot                ( void );
     const char*                               GetFileCacheRoot                ( void )                                    { return m_strFileCacheRoot; }
 
+    void                                      InsertIFPPointerToMap           ( SString strBlockName, CClientIFP * pIFP );
+    void                                      RemoveIFPPointerFromMap         ( SString strBlockName );
+    CClientIFP *                              GetIFPPointerFromMap            ( SString strBlockName );
+
 private:
     eStatus                                   m_Status;
     eServerType                               m_ServerType;
@@ -798,6 +802,9 @@ private:
     SString                                   m_strFileCacheRoot;
 
     SharedUtil::CAsyncTaskScheduler*          m_pAsyncTaskScheduler;
+
+    // (SString) Key is custom block name that is supplied to engineLoadIFP
+    std::map < SString, CClientIFP * >        m_mapOfIfpPointers; 
 };
 
 extern CClientGame* g_pClientGame;
