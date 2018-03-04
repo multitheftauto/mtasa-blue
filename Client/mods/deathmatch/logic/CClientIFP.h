@@ -48,6 +48,7 @@ public:
 private:
     SString                         m_strBlockName;
     std::vector < IFP_Animation >   m_Animations;
+    std::vector < unsigned char * > m_DummySequencesKeyFrames;
     bool                            isVersion1;
     IFPHeaderV2                     HeaderV2;
 

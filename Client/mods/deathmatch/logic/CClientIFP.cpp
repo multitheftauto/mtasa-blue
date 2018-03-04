@@ -49,7 +49,6 @@ void CClientIFP::UnloadIFP ( void )
         { 
             for (unsigned short SequenceIndex = 0; SequenceIndex < ifpAnimation->Hierarchy.m_nSeqCount; SequenceIndex++)
             {
-                
                 _CAnimBlendSequence * pSequence = (_CAnimBlendSequence*)((BYTE*)ifpAnimation->Hierarchy.m_pSequences + (sizeof(_CAnimBlendSequence) * SequenceIndex));
                 free ( pSequence->m_pFrames );
             }
@@ -60,6 +59,12 @@ void CClientIFP::UnloadIFP ( void )
         }
 
         delete ifpAnimation->pSequencesMemory;
+    }
+
+    for (size_t DummySequenceIndex = 0; DummySequenceIndex <  m_DummySequencesKeyFrames.size(); DummySequenceIndex++)
+    {
+        unsigned char * pKeyFrames = m_DummySequencesKeyFrames [ DummySequenceIndex ];
+        free ( pKeyFrames );
     }
 
     printf ("IFP unloaded sucessfully\n");
@@ -686,6 +691,11 @@ void CClientIFP::insertAnimDummySequence ( bool anp3, _CAnimBlendHierarchy * pAn
     
 
     pKeyFrames = (unsigned char*)malloc(FramesDataSizeInBytes);
+
+    if ( !isVersion1 )
+    { 
+        m_DummySequencesKeyFrames.push_back ( pKeyFrames );
+    }
 
     OLD__CAnimBlendSequence_SetNumFrames(pSequence, TotalFrames, bIsRoot, bIsCompressed, pKeyFrames);
 
