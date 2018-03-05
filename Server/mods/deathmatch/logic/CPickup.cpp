@@ -67,7 +67,6 @@ CElement* CPickup::Clone ( bool* bAddEntity, CResource* pResource )
     if ( pTemp )
     {
         pTemp->SetPickupType ( GetPickupType () );
-        pTemp->SetPickupType ( GetPickupType () );
         pTemp->SetModel ( GetModel () );
         pTemp->SetWeaponType ( GetWeaponType () );
         pTemp->SetAmmo ( GetAmmo () );
