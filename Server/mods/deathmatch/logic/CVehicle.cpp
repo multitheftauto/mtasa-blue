@@ -179,6 +179,28 @@ CVehicle::~CVehicle ( void )
 }
 
 
+CElement* CVehicle::Clone ( bool* bAddEntity, CResource* pResource )
+{
+    CVehicle* pTemp = m_pVehicleManager->Create ( GetModel (), GetVariant (), GetVariant2 (), GetParentEntity () );
+    if ( pTemp )
+    {
+        CVector vecRotationDegrees;
+        GetRotationDegrees ( vecRotationDegrees );
+        pTemp->SetRotationDegrees ( vecRotationDegrees );
+
+        pTemp->SetHealth ( GetHealth () );
+        pTemp->SetColor ( GetColor () );
+        pTemp->SetUpgrades ( GetUpgrades () );
+        pTemp->m_ucDoorStates = m_ucDoorStates;
+        pTemp->m_ucWheelStates = m_ucWheelStates;
+        pTemp->m_ucPanelStates = m_ucPanelStates;
+        pTemp->m_ucLightStates = m_ucLightStates;
+    }
+    
+    return pTemp;
+}
+
+
 void CVehicle::Unlink ( void )
 {
     // Remove us from the vehicle manager

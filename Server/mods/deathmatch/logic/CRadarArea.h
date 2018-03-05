@@ -23,6 +23,8 @@ class CRadarArea : public CPerPlayerEntity
 public:
                                 ~CRadarArea                     ( void );
 
+    CElement*                   Clone                           ( bool* bAddEntity, CResource* pResource );
+
     void                        Unlink                          ( void );
 
     bool                        ReadSpecialData                 ( void );

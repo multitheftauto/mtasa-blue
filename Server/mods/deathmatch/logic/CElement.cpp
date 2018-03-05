@@ -1258,6 +1258,26 @@ void CElement::GetAttachedRotation ( CVector & vecRotation )
 }
 
 
+bool CElement::IsCloneable ( void )
+{
+    int iType = GetType ();
+    switch ( iType )
+    {
+        case CElement::DUMMY:
+        case CElement::VEHICLE:
+        case CElement::OBJECT:
+        case CElement::MARKER:
+        case CElement::BLIP:
+        case CElement::PICKUP:
+        case CElement::RADAR_AREA:
+        case CElement::PATH_NODE_UNUSED:
+            return true;
+        default:
+            return false;
+    }
+}
+
+
 unsigned char CElement::GenerateSyncTimeContext ( void )
 {
     // Increment the sync time index

@@ -35,6 +35,15 @@ CDummy::~CDummy ( void )
 }
 
 
+CElement* CDummy::Clone ( bool* bAddEntity, CResource* pResource )
+{
+    CElement* pNewElement = new CDummy ( g_pGame->GetGroups (), GetParentEntity () );
+    pNewElement->SetName ( GetName () );
+    pNewElement->SetTypeName ( GetTypeName () );
+    return pNewElement;
+}
+
+
 void CDummy::Unlink ( void )
 {
     // Remove us from groupmanager's list

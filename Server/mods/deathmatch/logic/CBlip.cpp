@@ -36,6 +36,24 @@ CBlip::~CBlip ( void )
 }
 
 
+CElement* CBlip::Clone ( bool* bAddEntity, CResource* pResource )
+{
+    CBlip* pTemp = m_pBlipManager->Create ( GetParentEntity () );
+    if ( pTemp )
+    {
+        pTemp->m_ucIcon = m_ucIcon;
+        pTemp->m_ucSize = m_ucSize;
+        pTemp->SetColor ( GetColor () );
+
+        if ( pResource->HasStarted () )
+            pTemp->Sync ( true );
+        *bAddEntity = false;
+    }
+
+    return pTemp;
+}
+
+
 void CBlip::Unlink ( void )
 {
     // Remove us from the manager's list

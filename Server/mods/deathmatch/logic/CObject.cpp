@@ -47,10 +47,21 @@ CObject::CObject ( const CObject& Copy ) : CElement ( Copy.m_pParent, Copy.m_pXM
     , m_pLowLodObject ( Copy.m_pLowLodObject )
 {
     // Init
+    m_iType = CElement::OBJECT;
+    SetTypeName ( "object" );
+
     m_pObjectManager = Copy.m_pObjectManager;
     m_usModel = Copy.m_usModel;
     m_vecPosition = Copy.m_vecPosition;
     m_vecRotation = Copy.m_vecRotation;
+    m_ucAlpha = Copy.m_ucAlpha;
+    m_vecScale = CVector ( Copy.m_vecScale.fX, Copy.m_vecScale.fY, Copy.m_vecScale.fZ );
+    m_fHealth = Copy.m_fHealth;
+    m_bSyncable = Copy.m_bSyncable;
+    m_pSyncer = Copy.m_pSyncer;
+    m_bIsFrozen = Copy.m_bIsFrozen;
+    m_bDoubleSided = Copy.m_bDoubleSided;
+    m_bBreakable = Copy.m_bBreakable;
     
     m_pMoveAnimation = NULL;
     if ( Copy.m_pMoveAnimation != NULL )
@@ -79,6 +90,12 @@ CObject::~CObject ( void )
 
     // Unlink us from manager
     Unlink ();
+}
+
+
+CElement* CObject::Clone ( bool* bAddEntity, CResource* pResource )
+{    
+    return new CObject ( *this ); 
 }
 
 

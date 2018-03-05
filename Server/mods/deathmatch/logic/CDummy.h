@@ -22,6 +22,8 @@ public:
                             CDummy              ( class CGroups* pGroups, CElement* pParent, CXMLNode* pNode = NULL );
                             ~CDummy             ( void );
 
+    CElement*               Clone               ( bool* bAddEntity, CResource* pResource );
+
     bool                    IsEntity            ( void )                    { return true; }
 
     void                    Unlink              ( void );

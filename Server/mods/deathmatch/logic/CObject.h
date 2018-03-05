@@ -31,6 +31,8 @@ public:
     explicit                    CObject                 ( const CObject& Copy );
                                 ~CObject                ( void );
 
+    CElement*                   Clone                   ( bool* bAddEntity, CResource* pResource );
+
     bool                        IsEntity                ( void )                    { return true; }
 
     void                        Unlink                  ( void );
