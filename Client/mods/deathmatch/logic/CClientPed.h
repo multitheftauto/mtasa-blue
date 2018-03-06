@@ -460,6 +460,8 @@ public:
     // This will indicate that we have played custom animation, so next animation can be internal GTA animation
     // You must call this function after playing a custom animation
     void                        setNextAnimationNormal  ( void ) { m_bisNextAnimationCustom = false; }
+    const SString  &            GetNextAnimationCustomBlockName ( void ) { return m_strCustomIFPBlockName; }
+    const SString  &            GetNextAnimationCustomName      ( void ) { return m_strCustomIFPAnimationName; }
 
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.

@@ -504,7 +504,7 @@ private:
     static void                               StaticPreFxRenderHandler        ( void );
     static void                               StaticPreHudRenderHandler       ( void );
     static CAnimBlendAssociationSAInterface * StaticAddAnimationHandler       ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
-    static void                               StaticBlendAnimationHandler     ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta );
+    static CAnimBlendHierarchySAInterface   * StaticBlendAnimationHandler     ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta );
     static bool                               StaticProcessCollisionHandler   ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     static bool                               StaticVehicleCollisionHandler   ( CVehicleSAInterface* pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity  );
     static bool                               StaticVehicleDamageHandler      ( CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType, const CVector& vecDamagePos, uchar ucTyre );
@@ -535,7 +535,7 @@ private:
     void                                      PreWorldProcessHandler          ( void );
     void                                      PostWorldProcessHandler         ( void );
     CAnimBlendAssociationSAInterface *        AddAnimationHandler             ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
-    void                                      BlendAnimationHandler           ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta );
+    CAnimBlendHierarchySAInterface   *        BlendAnimationHandler           ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta );
     bool                                      ProcessCollisionHandler         ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     bool                                      VehicleCollisionHandler         ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity  );
     bool                                      VehicleDamageHandler            ( CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType, const CVector& vecDamagePos, uchar ucTyre );
@@ -586,9 +586,9 @@ public:
     void                                      SetFileCacheRoot                ( void );
     const char*                               GetFileCacheRoot                ( void )                                    { return m_strFileCacheRoot; }
 
-    void                                      InsertIFPPointerToMap           ( SString strBlockName, CClientIFP * pIFP );
-    void                                      RemoveIFPPointerFromMap         ( SString strBlockName );
-    CClientIFP *                              GetIFPPointerFromMap            ( SString strBlockName );
+    void                                      InsertIFPPointerToMap           ( const SString & strBlockName, CClientIFP * pIFP );
+    void                                      RemoveIFPPointerFromMap         ( const SString & strBlockName );
+    CClientIFP *                              GetIFPPointerFromMap            ( const SString & strBlockName );
 
 private:
     eStatus                                   m_Status;

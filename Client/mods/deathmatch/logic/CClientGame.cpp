@@ -3697,9 +3697,9 @@ CAnimBlendAssociationSAInterface * CClientGame::StaticAddAnimationHandler ( RpCl
     return g_pClientGame->AddAnimationHandler ( pClump, animGroup, animID );
 }
 
-void CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta )
+CAnimBlendHierarchySAInterface * CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta )
 {
-    g_pClientGame->BlendAnimationHandler ( pClump, pAnimHierarchy, flags, fBlendDelta );
+    return g_pClientGame->BlendAnimationHandler ( pClump, pAnimHierarchy, flags, fBlendDelta );
 }
 
 void CClientGame::StaticPreWorldProcessHandler ( void )
@@ -3983,37 +3983,136 @@ bool CClientGame::ChokingHandler ( unsigned char ucWeaponType )
     return m_pLocalPlayer->CallEvent ( "onClientPlayerChoke", Arguments, true );
 }
 
+#include <../game_sa/CAnimBlendHierarchySA.h> // ---------------- REMOVE THIS LATER
+
 CAnimBlendAssociationSAInterface * CClientGame::AddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
 {
     printf ( "AddAnimationHandler called! pClump, GroupID, AnimID: %p, %d, %d\n", (void*)pClump, animGroup, animID );
+/*
+    hCAnimBlendAssocGroup_CopyAnimation CAnimBlendAssocGroup_CopyAnimation   = (hCAnimBlendAssocGroup_CopyAnimation)0x004CE130;
+    hUncompressAnimation                 UncompressAnimation                 = (hUncompressAnimation)0x4d41c0;
+    hCAnimBlendAssoc_Constructor_staticAssocRef OLD_CAnimBlendAssoc_Constructor_staticAssocRef = (hCAnimBlendAssoc_Constructor_staticAssocRef)0x4CF080;
+    hCAnimBlendStaticAssoc_Constructor OLD_CAnimBlendStaticAssoc_Constructor = *(hCAnimBlendStaticAssoc_Constructor)0x4CE940;
+    hCAnimBlendStaticAssoc_Init        OLD_CAnimBlendStaticAssoc_Init = (hCAnimBlendStaticAssoc_Init)0x004CEC20;
 
     CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
-    
+    auto pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( animGroup, animID );
+
+    CClientPed * pClientPed = pAnimationManager->GetPedPointerFromMap ( pClump );
+    if ( pClientPed != nullptr )
+    {
+        printf("AddAnimationHandler: found client ped pointer from map\n");
+
+        const SString & strBlockName = pClientPed->GetNextAnimationCustomBlockName ( );
+        CClientIFP * pIFP = GetIFPPointerFromMap ( strBlockName );
+        if ( pIFP )
+        { 
+            printf("AddAnimationHandler: found IFP pointer from map\n");
+
+            const SString & strAnimationName = pClientPed->GetNextAnimationCustomName ( );
+            _CAnimBlendHierarchy * pCustomAnimBlendHierarchy = (_CAnimBlendHierarchy *)pIFP->GetAnimationHierarchy ( strAnimationName );
+            if ( pCustomAnimBlendHierarchy != nullptr )
+            { 
+                printf("AddAnimationHandler:got custom animation hierarchy\n");
+                
+                if (  animGroup == 0 && animID == 55 ) // if it's crouch animation
+                {
+                    printf("AddAnimationHandler: Internal GTA Courch Animation Total Sequences: %d\n", pOriginalAnimStaticAssoc->pAnimHeirarchy->usNumSequences);
+
+            
+                    auto pCrouchAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( 0, 55 ); // 0, 55 for crouch animation
+            
+                    CAnimBlendStaticAssoc * pOriginalAnimStaticAssoc = (CAnimBlendStaticAssoc *)pCrouchAnimStaticAssoc;
+
+                    // let's play the original crouch animation instead for testing ^^
+                    pCustomAnimBlendHierarchy = pOriginalAnimStaticAssoc->m_pAnimBlendHier;
+
+                    pCustomAnimBlendHierarchy->m_hashKey      = pOriginalAnimStaticAssoc->m_pAnimBlendHier->m_hashKey;
+                    pCustomAnimBlendHierarchy->m_nAnimBlockId = pOriginalAnimStaticAssoc->m_pAnimBlendHier->m_nAnimBlockId;
+                
+                    CAnimBlendStaticAssoc CustomAnimStaticAssoc;
+                    OLD_CAnimBlendStaticAssoc_Constructor ( &CustomAnimStaticAssoc );
+
+                    CustomAnimStaticAssoc.m_nFlags = pOriginalAnimStaticAssoc->m_nFlags;
+
+                    OLD_CAnimBlendStaticAssoc_Init ( &CustomAnimStaticAssoc, pClump, pCustomAnimBlendHierarchy);
+
+                    CustomAnimStaticAssoc.m_nAnimGroup = pOriginalAnimStaticAssoc->m_nAnimGroup;
+                    CustomAnimStaticAssoc.m_nAnimID    = pOriginalAnimStaticAssoc->m_nAnimID;
+                    
+                    UncompressAnimation ( CustomAnimStaticAssoc.m_pAnimBlendHier );
+                    CAnimBlendAssoc * pAnimAssoc = (CAnimBlendAssoc *)malloc(sizeof(CAnimBlendAssoc));
+                    OLD_CAnimBlendAssoc_Constructor_staticAssocRef ( pAnimAssoc, CustomAnimStaticAssoc);
+                    
+                    pAnimAssoc->m_nAnimGroup = pOriginalAnimStaticAssoc->m_nAnimGroup;
+                    pAnimAssoc->m_nFlags     = pOriginalAnimStaticAssoc->m_nFlags;
+                    
+                    printf("AddAnimationHandler: returning pAnimAssoc\n");
+                    return (CAnimBlendAssociationSAInterface * ) pAnimAssoc;
+                    //auto pAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( 0, 55 ); // 0, 55 for crouch animation
+                    //return pAnimStaticAssoc->pAnimHeirarchy;
+                } 
+            }   
+            else
+            {
+                printf ("AddAnimationHandler: could not find IFP animation hierarchy '%s'\n", strAnimationName.c_str());
+            }
+        }
+        else
+        {
+            printf("AddAnimationHandler: could not find IFP block name '%s'\n", strBlockName.c_str());
+        }
+    }
+   
+    printf("AddAnimationHandler: executing normal flow instead of custom animation\n");
+*/
+    // normal flow
+    std::unique_ptr < CAnimBlendAssocGroup >    pAnimAssocGroup  = g_pGame->CreateAnimBlendAssocGroup ( animGroup );
+    CAnimBlendAssociationSAInterface         *  pAnimAssociation = pAnimAssocGroup->CopyAnimation ( animID );
+
+    printf("\n"); 
+
+    return pAnimAssociation;
+}
+
+CAnimBlendHierarchySAInterface * CClientGame::BlendAnimationHandler ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta )
+{   
+    printf("CClientGame::BlendAnimationHandler called\n");
+
+    CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
     CClientPed * pClientPed = pAnimationManager->GetPedPointerFromMap ( pClump );
     if ( pClientPed != nullptr )
     {
         if ( pClientPed->isNextAnimationCustom () )
         { 
-            auto pAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( animGroup, animID );
-            if ( pAnimationManager->isGateWayAnimationHierarchy ( pAnimStaticAssoc->pAnimHeirarchy ) )
+            const SString & strBlockName = pClientPed->GetNextAnimationCustomBlockName ( );
+            CClientIFP * pIFP = GetIFPPointerFromMap ( strBlockName );
+            if ( pIFP )
+            { 
+                const SString & strAnimationName = pClientPed->GetNextAnimationCustomName ( );
+                auto pCustomAnimBlendHierarchy   = pIFP->GetAnimationHierarchy ( strAnimationName );
+                if ( pCustomAnimBlendHierarchy != nullptr )
+                { 
+                    // Modifying a hierarchy like this is just bad, it's much better to create a new CAnimBlendHierarchySAInterface for every animation
+                    // and then delete it once animation is over
+                    pCustomAnimBlendHierarchy->iHashKey     = pAnimHierarchy->iHashKey;
+                    pCustomAnimBlendHierarchy->iAnimBlockID = pAnimHierarchy->iAnimBlockID;
+                    pClientPed->setNextAnimationNormal ( );
+                    return pCustomAnimBlendHierarchy;
+                }   
+                else
+                {
+                    printf ("BlendAnimationHandler: could not find IFP animation hierarchy '%s'\n", strAnimationName.c_str());
+                }
+            }
+            else
             {
-                printf("pAnimationManager->isGateWayAnimationHierarchy() is true\n");
-
-                pClientPed->setNextAnimationNormal ( );
+                printf("BlendAnimationHandler: could not find IFP block name '%s'\n", strBlockName.c_str());
             }
         }
+        pClientPed->setNextAnimationNormal ( );;
     }
-    
-    std::unique_ptr < CAnimBlendAssocGroup >    pAnimAssocGroup  = g_pGame->CreateAnimBlendAssocGroup ( animGroup );
-    CAnimBlendAssociationSAInterface         *  pAnimAssociation = pAnimAssocGroup->CopyAnimation ( animID );
-
-    return pAnimAssociation;
-}
-
-void CClientGame::BlendAnimationHandler ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta )
-{   
-    //CClientPed * pPed = m_pPedManager->Get ( pClump, true );
-    printf ("CClientGame::BlendAnimationHandler called! pClump: %p\n", pClump);
+    return pAnimHierarchy;
 }
 
 bool CClientGame::ProcessCollisionHandler ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface )
@@ -6746,22 +6845,24 @@ void CClientGame::RestreamModel ( unsigned short usModel )
 
 }
 
-void CClientGame::InsertIFPPointerToMap ( SString strBlockName, CClientIFP * pIFP )
+void CClientGame::InsertIFPPointerToMap ( const SString & strBlockName, CClientIFP * pIFP )
 {
-    if ( m_mapOfIfpPointers.count ( strBlockName ) == 0 )
+    const SString mapKey = strBlockName.ToLower ( );
+    if ( m_mapOfIfpPointers.count ( mapKey ) == 0 )
     { 
-        m_mapOfIfpPointers [ strBlockName ] = pIFP;
+        m_mapOfIfpPointers [ mapKey ] = pIFP;
     }
 }
 
-void CClientGame::RemoveIFPPointerFromMap ( SString strBlockName )
+void CClientGame::RemoveIFPPointerFromMap ( const SString & strBlockName )
 {
-    m_mapOfIfpPointers.erase ( strBlockName );
+    m_mapOfIfpPointers.erase ( strBlockName.ToLower ( ) );
 }
 
-CClientIFP * CClientGame::GetIFPPointerFromMap ( SString strBlockName )
+CClientIFP * CClientGame::GetIFPPointerFromMap ( const SString & strBlockName )
 {
-    std::map < SString, CClientIFP * >::iterator it = m_mapOfIfpPointers.find ( strBlockName );
+    const SString mapKey = strBlockName.ToLower ( );
+    std::map < SString, CClientIFP * >::iterator it = m_mapOfIfpPointers.find ( mapKey );
     if ( it != m_mapOfIfpPointers.end ( ) )
     {
         return it->second;
