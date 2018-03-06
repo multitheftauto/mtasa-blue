@@ -258,7 +258,7 @@ CAnimBlendAssociation * CAnimManagerSA::CreateAnimAssociation ( AssocGroupId ani
 
 CAnimBlendStaticAssociationSAInterface * CAnimManagerSA::GetAnimStaticAssociation ( AssocGroupId animGroup, AnimationId animID )
 {
-    CAnimBlendStaticAssociationSAInterface * pInterface;
+    CAnimBlendStaticAssociationSAInterface * pInterface = nullptr;
     DWORD dwFunc = FUNC_CAnimManager_GetAnimAssociation;
     _asm
     {
