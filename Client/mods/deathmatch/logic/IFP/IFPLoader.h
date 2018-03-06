@@ -134,6 +134,7 @@ struct IFPHeaderV2
 
 struct IFP_Animation
 {
+    SString                           Name;
     _CAnimBlendHierarchy              Hierarchy;
     //std::vector <_CAnimBlendSequence> Sequences;
     char *                            pSequencesMemory;
