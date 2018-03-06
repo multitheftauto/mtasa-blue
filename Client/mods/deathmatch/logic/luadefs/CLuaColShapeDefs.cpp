@@ -19,6 +19,8 @@ void CLuaColShapeDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "createColRectangle", CreateColRectangle );
     CLuaCFunctions::AddFunction ( "createColPolygon", CreateColPolygon );
     CLuaCFunctions::AddFunction ( "createColTube", CreateColTube );
+    CLuaCFunctions::AddFunction ( "getColShapeType", GetColShapeType);
+
 }
 
 void CLuaColShapeDefs::AddClass ( lua_State* luaVM )
@@ -39,6 +41,31 @@ void CLuaColShapeDefs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "shape", NULL, "getColShapeType" );
 
     lua_registerclass ( luaVM, "ColShape", "Element" );
+}
+
+int CLuaColShapeDefs::GetColShapeType ( lua_State* luaVM )
+{
+    // Verify the arguments
+    CClientColShape* pColShape = nullptr;
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pColShape );
+
+    if ( !argStream.HasErrors ( ) )
+    {
+        // Grab our VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+        if (pLuaMain)
+        {
+            lua_pushnumber ( luaVM, pColShape->GetShapeType( ) + 1 );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage ( ) );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaColShapeDefs::CreateColCircle ( lua_State* luaVM )

@@ -47,7 +47,6 @@ void CLuaElementDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getElementType", getElementType );
     CLuaCFunctions::AddFunction ( "getElementInterior", getElementInterior );
     CLuaCFunctions::AddFunction ( "getElementsWithinColShape", getElementsWithinColShape );
-    CLuaCFunctions::AddFunction ( "getColShapeType", getColShapeType );
     CLuaCFunctions::AddFunction ( "getElementDimension", getElementDimension );
     CLuaCFunctions::AddFunction ( "getElementZoneName", getElementZoneName );
     CLuaCFunctions::AddFunction ( "getElementColShape", getElementColShape );
@@ -962,31 +961,6 @@ int CLuaElementDefs::isElementWithinColShape ( lua_State* luaVM )
         m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
 
     lua_pushboolean ( luaVM, false );
-    return 1;
-}
-
-int CLuaElementDefs::getColShapeType ( lua_State* luaVM )
-{
-    // Verify the arguments
-    CColShape* pColShape = NULL;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pColShape );
-
-    if ( ! argStream.HasErrors ( ) )
-    {
-        // Grab our VM
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
-        if (pLuaMain)
-        {
-            lua_pushnumber ( luaVM, pColShape->GetShapeType ( ) + 1 );   // start from 1 not 0
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage ( ) );
-
-    // Failed
-    lua_pushboolean( luaVM, false );
     return 1;
 }
 
