@@ -37,6 +37,8 @@ bool CClientIFP::LoadIFP ( const char* szFilePath, SString strBlockName )
 // Temporary method to avoid memory leaks, we'll need to rewrite the entire thing ;)
 void CClientIFP::UnloadIFP ( void )
 {
+   printf ("CClientIFP::UnloadIFP ( ) called, but IFP is not unloaded, PLEASE FIX THIS LATER!\n");
+/*
     printf ("CClientIFP::UnloadIFP ( ) called!\n");
     
     for ( size_t i = 0; i < m_Animations.size(); i++ )
@@ -62,10 +64,10 @@ void CClientIFP::UnloadIFP ( void )
     {
         unsigned char * pKeyFrames = m_DummySequencesKeyFrames [ DummySequenceIndex ];
         free ( pKeyFrames );
-    }
+    }*/
 
     g_pClientGame->RemoveIFPPointerFromMap ( m_strBlockName );
-    printf ("IFP unloaded sucessfully, removed from map as well.\n");
+    //printf ("IFP unloaded sucessfully, removed from map as well.\n"); 
 }
 
 bool CClientIFP::LoadIFPFile(const char * FilePath)
@@ -91,7 +93,6 @@ bool CClientIFP::LoadIFPFile(const char * FilePath)
         else
         {
             isVersion1 = true;
-
             ReadIFPVersion1 ( );
         }
 
@@ -128,6 +129,7 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
         Animation AnimationNode;
 
         readCString((char *)&AnimationNode.Name, sizeof(Animation::Name));
+        ifpAnimation.Name = AnimationNode.Name;
         readBuffer < int32_t >(&AnimationNode.TotalObjects);
 
         //ofs << "Animation Name: " << AnimationNode.Name << "  |  Index: " << i << std::endl;
@@ -142,7 +144,7 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
 
             pAnimHierarchy->m_bRunningCompressed = AnimationNode.isCompressed & 1;
 
-            pKeyFrames = (unsigned char*)malloc(AnimationNode.FrameSize);
+            pKeyFrames = (unsigned char*) OLD_CMemoryMgr_Malloc(AnimationNode.FrameSize); //malloc(AnimationNode.FrameSize);
 
             ifpAnimation.pFramesMemoryVersion2 = pKeyFrames;
         }
@@ -353,6 +355,7 @@ void CClientIFP::ReadIFPVersion1 (  )
 
         char AnimationName [ 24 ];
         readCString (AnimationName, Name.Base.Size);
+        ifpAnimation.Name = AnimationName;
 
         //ofs << "Animation Name: " << AnimationName << "  |  Index: " << i << std::endl;
         printf("Animation Name: %s    |  Index: %d \n", AnimationName, i);
@@ -467,7 +470,7 @@ void CClientIFP::ReadIFPVersion1 (  )
 
             IFP_FrameType    FrameType           = getFrameTypeFromFourCC ( Kfrm.Base.FourCC );
             size_t           CompressedFrameSize = GetSizeOfCompressedFrame ( FrameType );
-            BYTE          *  pKeyFrames          = ( BYTE * ) malloc ( CompressedFrameSize * Anim.Frames );
+            BYTE          *  pKeyFrames          = ( BYTE * ) OLD_CMemoryMgr_Malloc ( CompressedFrameSize * Anim.Frames ); // malloc ( CompressedFrameSize * Anim.Frames );
 
             bool bIsRoot = FrameType != IFP_FrameType::KR00;
             if (bUnknownSequence)
@@ -682,9 +685,8 @@ void CClientIFP::insertAnimDummySequence ( bool anp3, _CAnimBlendHierarchy * pAn
     const size_t FramesDataSizeInBytes = FrameSize * TotalFrames;
     unsigned char* pKeyFrames = nullptr; 
 
-    
-
-    pKeyFrames = (unsigned char*)malloc(FramesDataSizeInBytes);
+    pKeyFrames = (unsigned char*)OLD_CMemoryMgr_Malloc(FramesDataSizeInBytes);
+    //pKeyFrames = (unsigned char*)malloc(FramesDataSizeInBytes);
 
     if ( !isVersion1 )
     { 
@@ -1168,6 +1170,18 @@ std::string CClientIFP::getCorrectBoneNameFromName(std::string const& BoneName)
     //ofs <<"ERROR: getCorrectBoneNameFromName: correct bone name could not be found for (BoneName):" << BoneName << std::endl;
 
     return BoneName;
+}
+
+CAnimBlendHierarchySAInterface * CClientIFP::GetAnimationHierarchy ( const SString & strAnimationName )
+{
+    for (auto it = m_Animations.begin(); it != m_Animations.end(); ++it) 
+    {
+        if (strAnimationName.ToLower() == it->Name.ToLower())
+        {
+            return (CAnimBlendHierarchySAInterface *)&it->Hierarchy;
+        }
+    }
+    return nullptr;
 }
 
 // ----------------------------------------------------------------------------------------------------------

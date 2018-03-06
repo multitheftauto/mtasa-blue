@@ -39,6 +39,8 @@ public:
     std::string                     getCorrectBoneNameFromID(int32_t & BoneID);
     size_t                          getCorrectBoneIndexFromID(int32_t & BoneID);
 
+    CAnimBlendHierarchySAInterface * GetAnimationHierarchy ( const SString & strAnimationName );
+
     // Sorta a hack that these are required by CClientEntity...
     void                            Unlink                  ( void ) {};
     void                            GetPosition             ( CVector& vecPosition ) const {};
