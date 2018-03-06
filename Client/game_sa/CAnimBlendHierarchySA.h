@@ -28,10 +28,10 @@ class CAnimBlendHierarchySAInterface
 public:
     int                                             GetIndex ( void );
     unsigned int                                    iHashKey;
-    CAnimBlendSequence *                            pSequences;
+    DWORD *                                         pSequences;
     unsigned short                                  usNumSequences;
-    BYTE                                            pad;
     bool                                            bRunningCompressed;
+    BYTE                                            pad;
     int                                             iAnimBlockID;
     float                                           fTotalTime;
     //class CLink<class CAnimBlendHierarchy *> *      pLinkPtr;
