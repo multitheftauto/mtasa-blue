@@ -111,10 +111,6 @@ public:
     virtual bool                        isGateWayAnimationHierarchy             ( CAnimBlendHierarchySAInterface * pInterface ) = 0;
     virtual const SString &             GetGateWayBlockName                     ( void ) = 0;
     virtual const SString &             GetGateWayAnimationName                 ( void ) = 0;
-
-    virtual void                        InsertPedPointerToMap                   ( RpClump * pClump, CClientPed * pEntity ) = 0;
-    virtual void                        RemovePedPointerFromMap                 ( RpClump * pClump ) = 0;
-    virtual CClientPed *                GetPedPointerFromMap                    ( RpClump * pClump ) = 0;
 };
 
 #endif
