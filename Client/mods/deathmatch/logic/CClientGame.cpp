@@ -3988,6 +3988,12 @@ bool CClientGame::ChokingHandler ( unsigned char ucWeaponType )
 CAnimBlendAssociationSAInterface * CClientGame::AddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
 {
     printf ( "AddAnimationHandler called! pClump, GroupID, AnimID: %p, %d, %d\n", (void*)pClump, animGroup, animID );
+
+    CClientPed * pClientPed =  GetClientPedByClump ( *pClump ); //pAnimationManager->GetPedPointerFromMap ( pClump ); //m_pRootEntity->GetClientPedByClump ( *pClump );
+    if ( pClientPed != nullptr )
+    {
+        //pClientPed->setCurrentAnimationCustom ( false );
+    }
 /*
     hCAnimBlendAssocGroup_CopyAnimation CAnimBlendAssocGroup_CopyAnimation   = (hCAnimBlendAssocGroup_CopyAnimation)0x004CE130;
     hUncompressAnimation                 UncompressAnimation                 = (hUncompressAnimation)0x4d41c0;
@@ -4077,12 +4083,13 @@ CAnimBlendAssociationSAInterface * CClientGame::AddAnimationHandler ( RpClump * 
 
 CAnimBlendHierarchySAInterface * CClientGame::BlendAnimationHandler ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta )
 {   
-    printf("CClientGame::BlendAnimationHandler called\n");
+    printf("CClientGame::BlendAnimationHandler called |  pClump: %p\n", (void*)pClump);
 
     CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
-    CClientPed * pClientPed = pAnimationManager->GetPedPointerFromMap ( pClump );
+    CClientPed * pClientPed =  GetClientPedByClump ( *pClump ); //pAnimationManager->GetPedPointerFromMap ( pClump ); //m_pRootEntity->GetClientPedByClump ( *pClump );
     if ( pClientPed != nullptr )
     {
+        printf ("BlendAnimationHandler: Found pClientPed\n");
         if ( pClientPed->isNextAnimationCustom () )
         { 
             const SString & strBlockName = pClientPed->GetNextAnimationCustomBlockName ( );
@@ -4093,6 +4100,10 @@ CAnimBlendHierarchySAInterface * CClientGame::BlendAnimationHandler ( RpClump * 
                 auto pCustomAnimBlendHierarchy   = pIFP->GetAnimationHierarchy ( strAnimationName );
                 if ( pCustomAnimBlendHierarchy != nullptr )
                 { 
+                    printf ("BlendAnimationHandler: Found Hierarchy, returning \n");
+
+                    pClientPed->setCurrentAnimationCustom ( true );
+
                     // Modifying a hierarchy like this is just bad, it's much better to create a new CAnimBlendHierarchySAInterface for every animation
                     // and then delete it once animation is over
                     pCustomAnimBlendHierarchy->iHashKey     = pAnimHierarchy->iHashKey;
@@ -4110,7 +4121,11 @@ CAnimBlendHierarchySAInterface * CClientGame::BlendAnimationHandler ( RpClump * 
                 printf("BlendAnimationHandler: could not find IFP block name '%s'\n", strBlockName.c_str());
             }
         }
-        pClientPed->setNextAnimationNormal ( );;
+        else
+        {
+            pClientPed->setCurrentAnimationCustom ( false );
+        }
+        pClientPed->setNextAnimationNormal ( );
     }
     return pAnimHierarchy;
 }
@@ -6866,6 +6881,39 @@ CClientIFP * CClientGame::GetIFPPointerFromMap ( const SString & strBlockName )
     if ( it != m_mapOfIfpPointers.end ( ) )
     {
         return it->second;
+    }
+    return nullptr;
+}
+
+void CClientGame::InsertPedPointerToMap ( CClientPed * pPed )
+{
+    if ( m_mapOfPedPointers.count ( pPed ) == 0 )
+    { 
+        m_mapOfPedPointers [ pPed ] = true;
+    }
+}
+
+void CClientGame::RemovePedPointerFromMap ( CClientPed * pPed )
+{
+    m_mapOfPedPointers.erase ( pPed );
+}
+
+CClientPed * CClientGame::GetClientPedByClump ( const RpClump & Clump )
+{
+    for ( auto it = m_mapOfPedPointers.begin(); it != m_mapOfPedPointers.end(); it++ )
+    {
+        CEntity * pEntity = it->first->GetGameEntity();
+        if ( pEntity != nullptr )
+        { 
+            if ( pEntity->GetRpClump() != nullptr)
+            { 
+                const RpClump & entityClump = *pEntity->GetRpClump();
+                if ( std::addressof ( entityClump ) == std::addressof ( Clump ) )
+                { 
+                    return it->first;
+                }
+            }
+        }
     }
     return nullptr;
 }

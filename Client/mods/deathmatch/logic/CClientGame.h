@@ -590,6 +590,11 @@ public:
     void                                      RemoveIFPPointerFromMap         ( const SString & strBlockName );
     CClientIFP *                              GetIFPPointerFromMap            ( const SString & strBlockName );
 
+    void                                      InsertPedPointerToMap ( CClientPed * pPed );
+    void                                      RemovePedPointerFromMap ( CClientPed * pPed );
+    CClientPed *                              GetClientPedByClump ( const RpClump & Clump );
+  
+
 private:
     eStatus                                   m_Status;
     eServerType                               m_ServerType;
@@ -805,6 +810,8 @@ private:
 
     // (SString) Key is custom block name that is supplied to engineLoadIFP
     std::map < SString, CClientIFP * >        m_mapOfIfpPointers; 
+
+    std::map < CClientPed *, bool >           m_mapOfPedPointers;
 };
 
 extern CClientGame* g_pClientGame;
