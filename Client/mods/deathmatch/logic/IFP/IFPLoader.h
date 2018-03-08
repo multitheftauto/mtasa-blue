@@ -209,6 +209,11 @@ typedef void *(__cdecl* hCMemoryMgr_Malloc)
 );
 
 
+typedef void *(__cdecl* hCMemoryMgr_Free)
+(
+    void *a1
+);
+
 void _CAnimBlendHierarchy_Constructor(_CAnimBlendHierarchy * pAnimHierarchy);
 void _CAnimBlendSequence_Constructor(_CAnimBlendSequence * pSequence);
 
