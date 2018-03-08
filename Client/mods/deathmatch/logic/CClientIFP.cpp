@@ -1,8 +1,11 @@
 #include <StdInc.h>
 
 h_CAnimBlendHierarchy_SetName OLD__CAnimBlendHierarchy_SetName = (h_CAnimBlendHierarchy_SetName)0x4CF2D0;
+hCAnimBlendHierarchy_RemoveAnimSequences OLD_CAnimBlendHierarchy_RemoveAnimSequences = (hCAnimBlendHierarchy_RemoveAnimSequences)0x4CF8E0;
+hCAnimBlendHierarchy_RemoveFromUncompressedCache OLD_CAnimBlendHierarchy_RemoveFromUncompressedCache = (hCAnimBlendHierarchy_RemoveFromUncompressedCache)0x004D42A0;
 
 hCMemoryMgr_Malloc               OLD_CMemoryMgr_Malloc = (hCMemoryMgr_Malloc)0x0072F420;
+hCMemoryMgr_Free                 OLD_CMemoryMgr_Free   = (hCMemoryMgr_Free)0x0072F430;
 h_CAnimBlendSequence_SetName      OLD__CAnimBlendSequence_SetName = (h_CAnimBlendSequence_SetName)0x4D0C50;
 h_CAnimBlendSequence_SetBoneTag   OLD__CAnimBlendSequence_SetBoneTag = (h_CAnimBlendSequence_SetBoneTag)0x4D0C70;
 h_CAnimBlendSequence_SetNumFrames OLD__CAnimBlendSequence_SetNumFrames = (h_CAnimBlendSequence_SetNumFrames)0x4D0CD0;
@@ -18,6 +21,7 @@ CClientIFP::CClientIFP ( class CClientManager* pManager, ElementID ID ) : CClien
     // Init
     m_pManager = pManager;
     SetTypeName ( "IFP" );
+    m_bisIFPLoaded = false;
 }
 
 CClientIFP::~CClientIFP ( void )
@@ -27,45 +31,59 @@ CClientIFP::~CClientIFP ( void )
 
 bool CClientIFP::LoadIFP ( const char* szFilePath, SString strBlockName )
 {
-    //printf ("\nCClientIFP::LoadIFP: szFilePath %s\n szBlockName: %s\n\n", szFilePath, szBlockName);
+    printf ("\nCClientIFP::LoadIFP: szFilePath %s\n szBlockName: %s\n\n", szFilePath, strBlockName.c_str());
     
     m_strBlockName = strBlockName;
 
-    return LoadIFPFile ( szFilePath );
+    if (LoadIFPFile(szFilePath))
+    {
+        m_bisIFPLoaded = true;
+        return true;
+    }
+    return false;
 }
 
-// Temporary method to avoid memory leaks, we'll need to rewrite the entire thing ;)
+
 void CClientIFP::UnloadIFP ( void )
 {
-    printf ("CClientIFP::UnloadIFP ( ) called!\n");
+    if ( m_bisIFPLoaded )
+    { 
+        printf ("CClientIFP::UnloadIFP ( ) called!\n");
     
-    for ( size_t i = 0; i < m_Animations.size(); i++ )
-    {
-        IFP_Animation * ifpAnimation = &m_Animations[i];
-        if ( isVersion1 )
-        { 
+        
+        for ( size_t i = 0; i < m_Animations.size(); i++ )
+        {
+            IFP_Animation * ifpAnimation = &m_Animations[i];
+        
+            OLD_CAnimBlendHierarchy_RemoveFromUncompressedCache ( (int)&ifpAnimation->Hierarchy );
+            
             for (unsigned short SequenceIndex = 0; SequenceIndex < ifpAnimation->Hierarchy.m_nSeqCount; SequenceIndex++)
             {
                 _CAnimBlendSequence * pSequence = (_CAnimBlendSequence*)((BYTE*)ifpAnimation->Hierarchy.m_pSequences + (sizeof(_CAnimBlendSequence) * SequenceIndex));
-                free ( pSequence->m_pFrames );
+
+                if ( !( (pSequence->m_nFlags >> 3) & 1 ) ) // If ( !OneBigChunkForAllSequences )
+                {
+                    OLD_CMemoryMgr_Free ( pSequence->m_pFrames ); //*(void **)(pThis + 8)); //pSequence->m_pFrames );
+                }
+                else
+                {
+                    if ( SequenceIndex == 0 )
+                    { 
+                        // All frames of all sequences are allocated on one memory block, so free that one
+                        // and break the loop 
+                        OLD_CMemoryMgr_Free ( pSequence->m_pFrames );
+                        break;
+                    }
+                }
+  
             }
-        }
-        else
-        {
-            free ( ifpAnimation->pFramesMemoryVersion2 );
+            delete ifpAnimation->pSequencesMemory;  
         }
 
-        delete ifpAnimation->pSequencesMemory;
-    }
+        g_pClientGame->RemoveIFPPointerFromMap ( m_strBlockName );
 
-    for (size_t DummySequenceIndex = 0; DummySequenceIndex <  m_DummySequencesKeyFrames.size(); DummySequenceIndex++)
-    {
-        unsigned char * pKeyFrames = m_DummySequencesKeyFrames [ DummySequenceIndex ];
-        free ( pKeyFrames );
+        printf ("IFP unloaded sucessfully, removed from map as well.\n");  
     }
-
-    g_pClientGame->RemoveIFPPointerFromMap ( m_strBlockName );
-    printf ("IFP unloaded sucessfully, removed from map as well.\n");
 }
 
 bool CClientIFP::LoadIFPFile(const char * FilePath)
@@ -91,7 +109,6 @@ bool CClientIFP::LoadIFPFile(const char * FilePath)
         else
         {
             isVersion1 = true;
-
             ReadIFPVersion1 ( );
         }
 
@@ -128,23 +145,19 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
         Animation AnimationNode;
 
         readCString((char *)&AnimationNode.Name, sizeof(Animation::Name));
+        ifpAnimation.Name = AnimationNode.Name;
         readBuffer < int32_t >(&AnimationNode.TotalObjects);
 
         //ofs << "Animation Name: " << AnimationNode.Name << "  |  Index: " << i << std::endl;
 
         printf("Animation Name: %s    |  Index: %d \n", AnimationNode.Name, i);
 
-        unsigned char * pKeyFrames = nullptr;
         if (anp3)
         {
             readBuffer < int32_t >(&AnimationNode.FrameSize);
             readBuffer < int32_t >(&AnimationNode.isCompressed);
 
-            pAnimHierarchy->m_bRunningCompressed = AnimationNode.isCompressed & 1;
-
-            pKeyFrames = (unsigned char*)malloc(AnimationNode.FrameSize);
-
-            ifpAnimation.pFramesMemoryVersion2 = pKeyFrames;
+            pAnimHierarchy->m_bRunningCompressed = AnimationNode.isCompressed & 1;      
         }
 
         OLD__CAnimBlendHierarchy_SetName(pAnimHierarchy, AnimationNode.Name);
@@ -154,12 +167,9 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
         pAnimHierarchy->field_B = 0;
 
         const unsigned short   TotalSequences = IFP_TOTAL_SEQUENCES + pAnimHierarchy->m_nSeqCount;
-        char           * pNewSequencesMemory  = ( char * ) operator new ( 12 * TotalSequences + 4 ); //  Allocate memory for sequences ( 12 * seq_count + 4 )
+        ifpAnimation.pSequencesMemory  = ( char * ) operator new ( 12 * TotalSequences + 4 ); //  Allocate memory for sequences ( 12 * seq_count + 4 )
         
-        // Okay, we have assigned the memory. We can free it when we want to
-        ifpAnimation.pSequencesMemory = pNewSequencesMemory;
-
-        pAnimHierarchy->m_pSequences          = ( _CAnimBlendSequence * )( pNewSequencesMemory + 4 );
+        pAnimHierarchy->m_pSequences          = ( _CAnimBlendSequence * )( ifpAnimation.pSequencesMemory + 4 );
  
         std::map < std::string, _CAnimBlendSequence > MapOfSequences;
         
@@ -263,6 +273,8 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
             }
             if (!bInvalidType)
             {
+                unsigned char * pKeyFrames = (unsigned char*) OLD_CMemoryMgr_Malloc ( data_size ); 
+                
                 if ( bUnknownSequence )
                 { 
                     OLD__CAnimBlendSequence_SetNumFrames ( pUnkownSequence, ObjectNode.TotalFrames, bIsRoot, bIsCompressed, pKeyFrames );
@@ -272,13 +284,7 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
                     OLD__CAnimBlendSequence_SetNumFrames ( &Sequence, ObjectNode.TotalFrames, bIsRoot, bIsCompressed, pKeyFrames );
                 }
 
-                readBytes ( Sequence.m_pFrames, data_size );
-
-                if (anp3)
-                {
-                    pKeyFrames += data_size;
-                    Sequence.m_nFlags |= 8u;
-                }
+                readBytes ( pKeyFrames, data_size );
 
                 if ( !bUnknownSequence )
                 { 
@@ -302,11 +308,11 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
             }
             else
             {
-                insertAnimDummySequence(anp3, pAnimHierarchy, SequenceIndex);
+                insertAnimDummySequence ( pAnimHierarchy, SequenceIndex );
             }
         }
-
-        *(DWORD *)pNewSequencesMemory = IFP_TOTAL_SEQUENCES + TotalUnknownSequences;
+        
+        *(DWORD *)ifpAnimation.pSequencesMemory = IFP_TOTAL_SEQUENCES + TotalUnknownSequences;
 
         // This order is very important. As we need support for all 32 bones, we must change the total sequences count
         pAnimHierarchy->m_nSeqCount = IFP_TOTAL_SEQUENCES + TotalUnknownSequences;
@@ -353,6 +359,7 @@ void CClientIFP::ReadIFPVersion1 (  )
 
         char AnimationName [ 24 ];
         readCString (AnimationName, Name.Base.Size);
+        ifpAnimation.Name = AnimationName;
 
         //ofs << "Animation Name: " << AnimationName << "  |  Index: " << i << std::endl;
         printf("Animation Name: %s    |  Index: %d \n", AnimationName, i);
@@ -380,12 +387,9 @@ void CClientIFP::ReadIFPVersion1 (  )
         pAnimHierarchy->field_B = 0;
 
         const unsigned short   TotalSequences = IFP_TOTAL_SEQUENCES + pAnimHierarchy->m_nSeqCount;
-        char           * pNewSequencesMemory  = ( char * ) operator new ( 12 * TotalSequences + 4 ); //  Allocate memory for sequences ( 12 * seq_count + 4 )
-        
-        // Okay, we have assigned the memory. We can free it when we want to
-        ifpAnimation.pSequencesMemory = pNewSequencesMemory;
+        ifpAnimation.pSequencesMemory  = ( char * ) operator new ( 12 * TotalSequences + 4 ); //  Allocate memory for sequences ( 12 * seq_count + 4 )
 
-        pAnimHierarchy->m_pSequences          = ( _CAnimBlendSequence * )( pNewSequencesMemory + 4 );
+        pAnimHierarchy->m_pSequences          = ( _CAnimBlendSequence * )( ifpAnimation.pSequencesMemory+ 4 );
  
         std::map < std::string, _CAnimBlendSequence > MapOfSequences;
         
@@ -467,7 +471,7 @@ void CClientIFP::ReadIFPVersion1 (  )
 
             IFP_FrameType    FrameType           = getFrameTypeFromFourCC ( Kfrm.Base.FourCC );
             size_t           CompressedFrameSize = GetSizeOfCompressedFrame ( FrameType );
-            BYTE          *  pKeyFrames          = ( BYTE * ) malloc ( CompressedFrameSize * Anim.Frames );
+            BYTE          *  pKeyFrames          = ( BYTE * ) OLD_CMemoryMgr_Malloc ( CompressedFrameSize * Anim.Frames ); // malloc ( CompressedFrameSize * Anim.Frames );
 
             bool bIsRoot = FrameType != IFP_FrameType::KR00;
             if (bUnknownSequence)
@@ -493,7 +497,7 @@ void CClientIFP::ReadIFPVersion1 (  )
             else if (FrameType == IFP_FrameType::KR00)
             {
                 //ofs << "  |  FrameType: KR00" << std::endl;
-                ReadKr00FramesAsCompressed ( pKeyFrames, Anim.Frames, BoneID );
+                ReadKr00FramesAsCompressed ( pKeyFrames, Anim.Frames );
             }
 
             if (!bUnknownSequence)
@@ -520,11 +524,11 @@ void CClientIFP::ReadIFPVersion1 (  )
             }
             else
             {
-                insertAnimDummySequence ( false, pAnimHierarchy, SequenceIndex );
+                insertAnimDummySequence ( pAnimHierarchy, SequenceIndex );
             }
         }
     
-        *(DWORD *)pNewSequencesMemory = IFP_TOTAL_SEQUENCES + TotalUnknownSequences;
+        *(DWORD *)ifpAnimation.pSequencesMemory = IFP_TOTAL_SEQUENCES + TotalUnknownSequences;
 
         // This order is very important. As we need support for all 32 bones, we must change the total sequences count
         pAnimHierarchy->m_nSeqCount = IFP_TOTAL_SEQUENCES + TotalUnknownSequences;
@@ -585,7 +589,7 @@ void CClientIFP::ReadKrt0FramesAsCompressed (  BYTE * pKeyFrames, int32_t TotalF
     }
 }
 
-void CClientIFP::ReadKr00FramesAsCompressed (  BYTE * pKeyFrames, int32_t TotalFrames, int32_t BoneID )
+void CClientIFP::ReadKr00FramesAsCompressed (  BYTE * pKeyFrames, int32_t TotalFrames )
 {
     for (int32_t FrameIndex = 0; FrameIndex < TotalFrames; FrameIndex++)
     {
@@ -651,7 +655,7 @@ IFP_FrameType CClientIFP::getFrameTypeFromFourCC ( char * FourCC )
 }
 
 
-void CClientIFP::insertAnimDummySequence ( bool anp3, _CAnimBlendHierarchy * pAnimHierarchy, size_t SequenceIndex)
+void CClientIFP::insertAnimDummySequence ( _CAnimBlendHierarchy * pAnimHierarchy, size_t SequenceIndex)
 {
     const char * BoneName = BoneNames [SequenceIndex ];
     DWORD        BoneID   = BoneIds   [SequenceIndex];
@@ -682,9 +686,8 @@ void CClientIFP::insertAnimDummySequence ( bool anp3, _CAnimBlendHierarchy * pAn
     const size_t FramesDataSizeInBytes = FrameSize * TotalFrames;
     unsigned char* pKeyFrames = nullptr; 
 
-    
-
-    pKeyFrames = (unsigned char*)malloc(FramesDataSizeInBytes);
+    pKeyFrames = (unsigned char*)OLD_CMemoryMgr_Malloc(FramesDataSizeInBytes);
+    //pKeyFrames = (unsigned char*)malloc(FramesDataSizeInBytes);
 
     if ( !isVersion1 )
     { 
@@ -925,11 +928,6 @@ void CClientIFP::insertAnimDummySequence ( bool anp3, _CAnimBlendHierarchy * pAn
             //ofs << " ERROR: BoneID is not being handled!" << std::endl;
         }
     }
-
-    if (anp3)
-    {
-        pSequence->m_nFlags |= 8u; //EXTERNAL_KEYFRAMES_MEM;
-    }
 }
 
 
@@ -1168,6 +1166,18 @@ std::string CClientIFP::getCorrectBoneNameFromName(std::string const& BoneName)
     //ofs <<"ERROR: getCorrectBoneNameFromName: correct bone name could not be found for (BoneName):" << BoneName << std::endl;
 
     return BoneName;
+}
+
+CAnimBlendHierarchySAInterface * CClientIFP::GetAnimationHierarchy ( const SString & strAnimationName )
+{
+    for (auto it = m_Animations.begin(); it != m_Animations.end(); ++it) 
+    {
+        if (strAnimationName.ToLower() == it->Name.ToLower())
+        {
+            return (CAnimBlendHierarchySAInterface *)&it->Hierarchy;
+        }
+    }
+    return nullptr;
 }
 
 // ----------------------------------------------------------------------------------------------------------

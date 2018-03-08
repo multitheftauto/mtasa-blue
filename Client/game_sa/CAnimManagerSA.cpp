@@ -258,7 +258,7 @@ CAnimBlendAssociation * CAnimManagerSA::CreateAnimAssociation ( AssocGroupId ani
 
 CAnimBlendStaticAssociationSAInterface * CAnimManagerSA::GetAnimStaticAssociation ( AssocGroupId animGroup, AnimationId animID )
 {
-    CAnimBlendStaticAssociationSAInterface * pInterface;
+    CAnimBlendStaticAssociationSAInterface * pInterface = nullptr;
     DWORD dwFunc = FUNC_CAnimManager_GetAnimAssociation;
     _asm
     {
@@ -776,25 +776,3 @@ const SString & CAnimManagerSA::GetGateWayAnimationName ( void )
     return m_kGateWayAnimationName;
 }
 
-void CAnimManagerSA::InsertPedPointerToMap ( RpClump * pClump, CClientPed * pClientPed )
-{
-    if ( m_mapOfPedPointers.count ( pClump ) == 0 )
-    { 
-        m_mapOfPedPointers [ pClump ] = pClientPed;
-    }
-}
-
-void CAnimManagerSA::RemovePedPointerFromMap ( RpClump * pClump )
-{
-    m_mapOfPedPointers.erase ( pClump );
-}
-
-CClientPed * CAnimManagerSA::GetPedPointerFromMap ( RpClump * pClump )
-{
-    ClumpMap_type::iterator it = m_mapOfPedPointers.find ( pClump );
-    if ( it != m_mapOfPedPointers.end ( ) )
-    {
-        return it->second;
-    }
-    return nullptr;
-}

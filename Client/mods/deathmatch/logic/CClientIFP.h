@@ -30,14 +30,13 @@ public:
     void                            ReadKrt0FramesAsCompressed (  BYTE * pKeyFrames, int32_t TotalFrames );
     void                            ReadKr00FramesAsCompressed (  BYTE * pKeyFrames, int32_t TotalFrames );
 
-    // Remove this ugly function and use ReadKr00FramesAsCompressed instead
-    void                            ReadKr00FramesAsCompressed (  BYTE * pKeyFrames, int32_t TotalFrames, int32_t BoneID );
-
-    void                            insertAnimDummySequence(bool anp3, _CAnimBlendHierarchy * pAnimHierarchy, size_t SequenceIndex);
+    void                            insertAnimDummySequence ( _CAnimBlendHierarchy * pAnimHierarchy, size_t SequenceIndex);
     int32_t                         getBoneIDFromName(std::string const& BoneName);
     std::string                     getCorrectBoneNameFromName(std::string const& BoneName);
     std::string                     getCorrectBoneNameFromID(int32_t & BoneID);
     size_t                          getCorrectBoneIndexFromID(int32_t & BoneID);
+
+    CAnimBlendHierarchySAInterface * GetAnimationHierarchy ( const SString & strAnimationName );
 
     // Sorta a hack that these are required by CClientEntity...
     void                            Unlink                  ( void ) {};
@@ -51,6 +50,7 @@ private:
     std::vector < unsigned char * > m_DummySequencesKeyFrames;
     bool                            isVersion1;
     IFPHeaderV2                     HeaderV2;
+    bool                            m_bisIFPLoaded;
 
 };
 

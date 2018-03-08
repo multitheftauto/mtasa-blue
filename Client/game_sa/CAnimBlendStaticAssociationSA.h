@@ -31,7 +31,7 @@ public:
     short                               sAnimID;
     short                               sAnimGroup;
     short                               sFlags;
-    DWORD *                             pAnimBlendNodesSequenceArray;
+    int *                               pAnimBlendNodesSequenceArray;
     CAnimBlendHierarchySAInterface *    pAnimHeirarchy;
 };
 

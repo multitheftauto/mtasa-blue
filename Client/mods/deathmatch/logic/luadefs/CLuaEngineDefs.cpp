@@ -305,28 +305,36 @@ int CLuaEngineDefs::EngineLoadIFP ( lua_State* luaVM )
                 {
                     // Grab the resource root entity
                     CClientEntity* pRoot = pResource->GetResourceTXDRoot ();
+                    
+                    // Check whether the IFP blockname exists or not
+                    if ( g_pClientGame->GetIFPPointerFromMap ( strBlockName ) == nullptr )
+                    { 
+                        // Create a IFP element
+                        CClientIFP* pIFP = new CClientIFP ( m_pManager, INVALID_ELEMENT_ID );
 
-                    // Create a IFP element
-                    CClientIFP* pIFP = new CClientIFP ( m_pManager, INVALID_ELEMENT_ID );
+                        // Try to load the IFP file
+                        if ( pIFP->LoadIFP ( strPath, strBlockName ) )
+                        {
+                            // We can use the map to retrieve correct IFP by block name later
+                            g_pClientGame->InsertIFPPointerToMap ( strBlockName, pIFP );
 
-                    // Try to load the IFP file
-                    if ( pIFP->LoadIFP ( strPath, strBlockName ) )
-                    {
-                        // We can use the map to retrieve correct IFP by block name later
-                        g_pClientGame->InsertIFPPointerToMap ( strBlockName, pIFP );
+                            // Success loading the file. Set parent to IFP root
+                            pIFP->SetParent ( pRoot );
 
-                        // Success loading the file. Set parent to IFP root
-                        pIFP->SetParent ( pRoot );
-
-                        // Return the IFP element
-                        lua_pushelement ( luaVM, pIFP );
-                        return 1;
-                     }
+                            // Return the IFP element
+                            lua_pushelement ( luaVM, pIFP );
+                            return 1;
+                         }
+                        else
+                        {
+                            // Delete it again
+                            delete pIFP;
+                            argStream.SetCustomError ( strFile, "Error loading IFP" );
+                        }
+                    }
                     else
                     {
-                        // Delete it again
-                        delete pIFP;
-                        argStream.SetCustomError ( strFile, "Error loading IFP" );
+                        argStream.SetCustomError ( strFile, "Block name already exists" );
                     }
                 }
                 else

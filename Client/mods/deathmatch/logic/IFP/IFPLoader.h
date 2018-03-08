@@ -134,6 +134,7 @@ struct IFPHeaderV2
 
 struct IFP_Animation
 {
+    SString                           Name;
     _CAnimBlendHierarchy              Hierarchy;
     //std::vector <_CAnimBlendSequence> Sequences;
     char *                            pSequencesMemory;
@@ -207,6 +208,11 @@ typedef void *(__cdecl* hCMemoryMgr_Malloc)
     size_t TotalBytesToAllocate
 );
 
+
+typedef void *(__cdecl* hCMemoryMgr_Free)
+(
+    void *a1
+);
 
 void _CAnimBlendHierarchy_Constructor(_CAnimBlendHierarchy * pAnimHierarchy);
 void _CAnimBlendSequence_Constructor(_CAnimBlendSequence * pSequence);

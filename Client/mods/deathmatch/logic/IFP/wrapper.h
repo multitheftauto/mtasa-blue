@@ -249,6 +249,9 @@ typedef void (__cdecl *  hUncompressAnimation)
 _CAnimBlendHierarchy * pAnimBlendHierarchy 
 );
 
+typedef int (__cdecl *  hCAnimBlendHierarchy_RemoveFromUncompressedCache)
+(int a1);
+
 typedef CAnimBlendAssoc * (__thiscall *  hCAnimBlendAssoc_Constructor_staticAssocRef)
 (
 CAnimBlendAssoc * pThis,
@@ -345,6 +348,8 @@ void __cdecl NEW_UncompressAnimation
 _CAnimBlendHierarchy * pAnimBlendHierarchy 
 );
 
+typedef void (__thiscall* hCAnimBlendHierarchy_RemoveAnimSequences) 
+( DWORD * pThis);
 
 const char * GetNameFromHash(DWORD Hash);
 int GetNumAnimations(void);

@@ -456,10 +456,13 @@ public:
 
     bool                        isNextAnimationCustom   ( ) { return m_bisNextAnimationCustom; }
     void                        setNextAnimationCustom  ( const SString & strBlockName, const SString & strAnimationName ) { m_bisNextAnimationCustom = true; m_strCustomIFPBlockName = strBlockName; m_strCustomIFPAnimationName = strAnimationName; }
-   
+    void                        setCurrentAnimationCustom ( bool bCustom ) { m_bisCurrentAnimationCustom = bCustom; }
+
     // This will indicate that we have played custom animation, so next animation can be internal GTA animation
     // You must call this function after playing a custom animation
     void                        setNextAnimationNormal  ( void ) { m_bisNextAnimationCustom = false; }
+    const SString  &            GetNextAnimationCustomBlockName ( void ) { return m_strCustomIFPBlockName; }
+    const SString  &            GetNextAnimationCustomName      ( void ) { return m_strCustomIFPAnimationName; }
 
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
@@ -658,6 +661,7 @@ public:
     // This is checked within AddAnimation and AddAnimationAndSync
     // It is set to false when custom animation is played.
     bool                        m_bisNextAnimationCustom;
+    bool                        m_bisCurrentAnimationCustom;
     SString                     m_strCustomIFPBlockName;
     SString                     m_strCustomIFPAnimationName;
 };
