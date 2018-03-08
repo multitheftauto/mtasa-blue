@@ -139,6 +139,7 @@ public:
         nPlayers = 0;
         nMaxPlayers = 0;
         nPing = 9999;
+        fResSize = 0;
         uiCacheNoReplyCount = 0;
         m_ElapsedTime.SetMaxIncrement ( 500 );
         m_ElapsedTime.Reset ();
@@ -191,6 +192,7 @@ public:
     unsigned short      nPlayers;      // Current players
     unsigned short      nMaxPlayers;   // Maximum players
     unsigned short      nPing;         // Ping time
+    float               fResSize;      // Resources size
     bool                bPassworded;    // Password protected
     bool                bSerials;       // Serial verification on
     bool                bScanned;

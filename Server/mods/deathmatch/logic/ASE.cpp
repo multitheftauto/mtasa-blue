@@ -477,7 +477,7 @@ std::string ASE::QueryLight ( void )
     CPlayer* pPlayer = NULL;
 
     // Keep the packet under 1350 bytes to try to avoid fragmentation 
-    int iBytesLeft = 1340 - (int)reply.tellp ();
+    int iBytesLeft = 1336 - (int)reply.tellp ();
     int iPlayersLeft = iJoinedPlayers;
 
     list < CPlayer* > ::const_iterator pIter = m_pPlayerManager->IterBegin ();
@@ -500,6 +500,9 @@ std::string ASE::QueryLight ( void )
             reply << strPlayerName.c_str ();
         }
     }
+
+    float fResSize = g_pGame->GetResourceManager()->GetTotalResourcesSize() / ( float ) 1024;
+    reply.write(reinterpret_cast < const char* > ( &fResSize ), sizeof ( float ) );
 
     return reply.str();
 }

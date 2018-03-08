@@ -188,6 +188,7 @@ protected:
     // Server list columns
     CGUIHandle          m_hVersion [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIHandle          m_hLocked [ SERVER_BROWSER_TYPE_COUNT ];
+    CGUIHandle          m_hResSize [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIHandle          m_hName [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIHandle          m_hPing [ SERVER_BROWSER_TYPE_COUNT ];
     CGUIHandle          m_hPlayers [ SERVER_BROWSER_TYPE_COUNT ];
