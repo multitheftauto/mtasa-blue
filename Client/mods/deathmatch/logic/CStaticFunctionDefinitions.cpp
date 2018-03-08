@@ -2142,8 +2142,9 @@ bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const 
                 {   
                     // Play the gateway animation
                     const SString & strGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName ( );
-                    CAnimBlock    * pBlock              = g_pGame->GetAnimManager ()->GetAnimationBlock ( strGateWayBlockName );
-                    if ( pBlock )
+                    CAnimBlock * pBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( strGateWayBlockName );
+                    auto pCustomAnimBlendHierarchy = pIFP->GetAnimationHierarchy ( szAnimName );
+                    if ( ( pBlock ) && ( pCustomAnimBlendHierarchy != nullptr ) )
                     {
                         Ped.setNextAnimationCustom ( szBlockName,  szAnimName );
 
