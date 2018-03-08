@@ -80,7 +80,6 @@ public:
 class CAnimManagerSA : public CAnimManager
 {
     typedef CAnimBlendStaticAssociationSAInterface * StaticAssocIntface_type;
-    typedef std::map < RpClump *, CClientPed * > ClumpMap_type;
 
 public:
                                 CAnimManagerSA                          ( void );
@@ -155,18 +154,11 @@ public:
     const SString &             GetGateWayBlockName                     ( void );
     const SString &             GetGateWayAnimationName                 ( void );
 
-    // This is used in AddAnimationHandler and AddAnimationAndSyncHandler for playing
-    // custom animations and to help in replacing and restoring animations 
-    void                        InsertPedPointerToMap                   ( RpClump * pClump, CClientPed * pClientPed );
-    void                        RemovePedPointerFromMap                 ( RpClump * pClump );
-    CClientPed *                GetPedPointerFromMap                    ( RpClump * pClump );
-
 private:
     CAnimBlendAssocGroup *      m_pAnimAssocGroups [ MAX_ANIM_GROUPS ];
     CAnimBlendHierarchy *       m_pAnimations [ MAX_ANIMATIONS ];
     CAnimBlock *                m_pAnimBlocks [ MAX_ANIM_BLOCKS ];
-    std::list < CAnimBlendAssociation *  > m_Associations;                   
-    ClumpMap_type               m_mapOfPedPointers; 
+    std::list < CAnimBlendAssociation *  > m_Associations;                    
 
     // This "gateway" animation will allow us to play custom animations by simply playing this animation
     // and then in AddAnimation and AddAnimationAndSync hook, we can return our custom animation in the 
