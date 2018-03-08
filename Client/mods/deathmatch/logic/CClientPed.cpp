@@ -100,6 +100,9 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
     m_pRequester = pManager->GetModelRequestManager ();
 
     m_bisNextAnimationCustom = false;
+    m_bisCurrentAnimationCustom = false;
+    m_strCustomIFPBlockName = "Default";
+    m_strCustomIFPAnimationName = "Default";
     m_iVehicleInOutState = VEHICLE_INOUT_NONE;
     m_pPlayerPed = NULL;
     m_pTaskManager = NULL;
@@ -243,11 +246,15 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
 
         SetArmor ( 0.0f );
     }
+   
+    g_pClientGame->InsertPedPointerToMap ( this );
 }
 
 
 CClientPed::~CClientPed ( void )
-{
+{ 
+    g_pClientGame->RemovePedPointerFromMap ( this );
+
     // Remove from the ped manager
     m_pManager->GetPedManager ()->RemoveFromList ( this );
 
@@ -1032,6 +1039,11 @@ bool CClientPed::SetModel ( unsigned long ulModel, bool bTemp )
         // Different model from what we have now?
         if ( m_ulModel != ulModel )
         {
+            if ( m_bisCurrentAnimationCustom )
+            {
+                m_bisNextAnimationCustom = true;
+            }
+
             if ( bTemp )
                 m_ulStoredModel = m_ulModel;
 
@@ -2862,6 +2874,12 @@ void CClientPed::StreamedInPulse ( bool bDoStandardPulses )
             // Is it loaded now?
             if ( m_pAnimationBlock->IsLoaded () )
             {
+                printf("\nstreamed in pulse for ped\n\n");
+                if ( m_bisCurrentAnimationCustom )
+                {
+                    m_bisNextAnimationCustom = true;
+                }
+
                 m_bRequestedAnimation = false;
 
                 // Copy our name incase it gets deleted
@@ -3722,6 +3740,11 @@ void CClientPed::_CreateModel ( void )
         // Are we still playing a looped animation?
         if ( m_bLoopAnimation && m_pAnimationBlock )
         {
+            printf("\n create model for ped\n\n");
+            if ( m_bisCurrentAnimationCustom )
+            {
+                m_bisNextAnimationCustom = true;
+            }
             // Copy our anim name incase it gets deleted
             SString strAnimName = m_strAnimationName;
             // Run our animation
@@ -4019,6 +4042,12 @@ void CClientPed::_ChangeModel ( void )
             // Are we still playing a looped animation?
             if ( m_bLoopAnimation && m_pAnimationBlock )
             {
+                printf("\nchange model for ped\n\n");
+                if ( m_bisCurrentAnimationCustom )
+                {
+                    m_bisNextAnimationCustom = true;
+                }
+
                 // Copy our anim name incase it gets deleted
                 SString strAnimName = m_strAnimationName;
                 // Run our animation
@@ -4074,13 +4103,7 @@ void CClientPed::ReCreateModel ( void )
 
 
 void CClientPed::ModelRequestCallback ( CModelInfo* pModelInfo )
-{
-    RpClump * pOldClump = m_pPlayerPed->GetRpClump();
-
-    printf ("CClientPed::ModelRequestCallback Called! pOldClump: %p\n", pOldClump);
-    
-    g_pGame->GetAnimManager()->RemovePedPointerFromMap ( pOldClump );
-
+{   
     // If we have a player loaded
     if ( m_pPlayerPed )
     {
@@ -4092,11 +4115,6 @@ void CClientPed::ModelRequestCallback ( CModelInfo* pModelInfo )
         // If we don't have a player loaded, load it
         _CreateModel ();
     }
-
-    RpClump * pNewClump = m_pPlayerPed->GetRpClump();
-    g_pGame->GetAnimManager()->InsertPedPointerToMap ( pNewClump, this );
-
-    printf ("CClientPed::ModelRequestCallback: Model changed/created    |    pNewClump: %p\n", m_pPlayerPed->GetRpClump());
 }
 
 
@@ -5262,6 +5280,7 @@ void CClientPed::Respawn ( CVector * pvecPosition, bool bRestoreState, bool bCam
     // We must not call CPed::Respawn for remote players
     if ( m_bIsLocalPlayer )
     {
+        setNextAnimationNormal ( );
         SetFrozenWaitingForGroundToLoad ( true );
         if ( m_pPlayerPed )
         {
@@ -5869,6 +5888,7 @@ void CClientPed::KillAnimation ( void )
     m_pAnimationBlock = NULL;
     m_strAnimationName = "";
     m_bRequestedAnimation = false;
+    setNextAnimationNormal ( );
 }
 
 void CClientPed::PostWeaponFire ( void )
