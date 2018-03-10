@@ -3989,96 +3989,65 @@ CAnimBlendAssociationSAInterface * CClientGame::AddAnimationHandler ( RpClump * 
 {
     printf ( "AddAnimationHandler called! pClump, GroupID, AnimID: %p, %d, %d\n", (void*)pClump, animGroup, animID );
 
-    CClientPed * pClientPed =  GetClientPedByClump ( *pClump ); //pAnimationManager->GetPedPointerFromMap ( pClump ); //m_pRootEntity->GetClientPedByClump ( *pClump );
-    if ( pClientPed != nullptr )
-    {
-        //pClientPed->setCurrentAnimationCustom ( false );
-    }
-/*
     hCAnimBlendAssocGroup_CopyAnimation CAnimBlendAssocGroup_CopyAnimation   = (hCAnimBlendAssocGroup_CopyAnimation)0x004CE130;
     hUncompressAnimation                 UncompressAnimation                 = (hUncompressAnimation)0x4d41c0;
     hCAnimBlendAssoc_Constructor_staticAssocRef OLD_CAnimBlendAssoc_Constructor_staticAssocRef = (hCAnimBlendAssoc_Constructor_staticAssocRef)0x4CF080;
     hCAnimBlendStaticAssoc_Constructor OLD_CAnimBlendStaticAssoc_Constructor = *(hCAnimBlendStaticAssoc_Constructor)0x4CE940;
     hCAnimBlendStaticAssoc_Init        OLD_CAnimBlendStaticAssoc_Init = (hCAnimBlendStaticAssoc_Init)0x004CEC20;
+    hCAnimBlendAssoc_SyncAnimation CAnimBlendAssoc_SyncAnimation = (hCAnimBlendAssoc_SyncAnimation)0x004CEB40;
+    hCAnimBlendAssoc_Start         CAnimBlendAssoc_Start         = (hCAnimBlendAssoc_Start)0x004CEB70;
 
-    CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
-    auto pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( animGroup, animID );
+  CAnimBlendAssoc * pAnimAssoc; // esi
+  int *clumpData; // edi
+  int *next; // eax
+  DWORD *tempAssoc; // eax
+  int *nextAssoc; // ecx
+                                                // We need to remove this line and add some code here for running animations simultaneously
+  pAnimAssoc = CAnimBlendAssocGroup_CopyAnimation((DWORD *) (*(DWORD*)0x00B4EA34) + 5 * animGroup, animID);
 
-    CClientPed * pClientPed = pAnimationManager->GetPedPointerFromMap ( pClump );
-    if ( pClientPed != nullptr )
-    {
-        printf("AddAnimationHandler: found client ped pointer from map\n");
+  ////ofs << "Done calling  CAnimBlendAssocGroup_CopyAnimation " << std::endl;
 
-        const SString & strBlockName = pClientPed->GetNextAnimationCustomBlockName ( );
-        CClientIFP * pIFP = GetIFPPointerFromMap ( strBlockName );
-        if ( pIFP )
-        { 
-            printf("AddAnimationHandler: found IFP pointer from map\n");
+  clumpData = *(int **)(   (*(DWORD*)0xB5F878) + ((int)pClump));
 
-            const SString & strAnimationName = pClientPed->GetNextAnimationCustomName ( );
-            _CAnimBlendHierarchy * pCustomAnimBlendHierarchy = (_CAnimBlendHierarchy *)pIFP->GetAnimationHierarchy ( strAnimationName );
-            if ( pCustomAnimBlendHierarchy != nullptr )
-            { 
-                printf("AddAnimationHandler:got custom animation hierarchy\n");
-                
-                if (  animGroup == 0 && animID == 55 ) // if it's crouch animation
-                {
-                    printf("AddAnimationHandler: Internal GTA Courch Animation Total Sequences: %d\n", pOriginalAnimStaticAssoc->pAnimHeirarchy->usNumSequences);
+  if ( !((*((BYTE *)pAnimAssoc + 46) >> 5) & 1) )
+    goto LABEL_5;
+  next = (int *)*clumpData;
+  if ( !*clumpData )
+    goto LABEL_5;
+  while ( !((*((BYTE *)next + 42) >> 5) & 1) )
+  {
+    next = (int *)*next;
+    if ( !next )
+      goto LABEL_5;
+  }
+  if ( next )
+  {
+    CAnimBlendAssoc_SyncAnimation(pAnimAssoc, (CAnimBlendAssoc *)(next - 1));
+    *((BYTE *)pAnimAssoc + 46) |= 1u;
+  }
+  else
+  {
+LABEL_5:
+    CAnimBlendAssoc_Start(pAnimAssoc, 0);
+  }
 
-            
-                    auto pCrouchAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( 0, 55 ); // 0, 55 for crouch animation
-            
-                    CAnimBlendStaticAssoc * pOriginalAnimStaticAssoc = (CAnimBlendStaticAssoc *)pCrouchAnimStaticAssoc;
+  tempAssoc = ((DWORD*)pAnimAssoc) + 1;
 
-                    // let's play the original crouch animation instead for testing ^^
-                    pCustomAnimBlendHierarchy = pOriginalAnimStaticAssoc->m_pAnimBlendHier;
+  if ( *clumpData )                             // clumpData->nextAssoc
+    *(DWORD *)(*clumpData + 4) = (DWORD)tempAssoc;
 
-                    pCustomAnimBlendHierarchy->m_hashKey      = pOriginalAnimStaticAssoc->m_pAnimBlendHier->m_hashKey;
-                    pCustomAnimBlendHierarchy->m_nAnimBlockId = pOriginalAnimStaticAssoc->m_pAnimBlendHier->m_nAnimBlockId;
-                
-                    CAnimBlendStaticAssoc CustomAnimStaticAssoc;
-                    OLD_CAnimBlendStaticAssoc_Constructor ( &CustomAnimStaticAssoc );
+  nextAssoc = (int *)*clumpData;
 
-                    CustomAnimStaticAssoc.m_nFlags = pOriginalAnimStaticAssoc->m_nFlags;
+  DWORD * dwpAnimAssoc = (DWORD*) pAnimAssoc;
 
-                    OLD_CAnimBlendStaticAssoc_Init ( &CustomAnimStaticAssoc, pClump, pCustomAnimBlendHierarchy);
+  dwpAnimAssoc[2] = (DWORD)clumpData;
+  //pAnimAssoc[2] = clumpData;
 
-                    CustomAnimStaticAssoc.m_nAnimGroup = pOriginalAnimStaticAssoc->m_nAnimGroup;
-                    CustomAnimStaticAssoc.m_nAnimID    = pOriginalAnimStaticAssoc->m_nAnimID;
-                    
-                    UncompressAnimation ( CustomAnimStaticAssoc.m_pAnimBlendHier );
-                    CAnimBlendAssoc * pAnimAssoc = (CAnimBlendAssoc *)malloc(sizeof(CAnimBlendAssoc));
-                    OLD_CAnimBlendAssoc_Constructor_staticAssocRef ( pAnimAssoc, CustomAnimStaticAssoc);
-                    
-                    pAnimAssoc->m_nAnimGroup = pOriginalAnimStaticAssoc->m_nAnimGroup;
-                    pAnimAssoc->m_nFlags     = pOriginalAnimStaticAssoc->m_nFlags;
-                    
-                    printf("AddAnimationHandler: returning pAnimAssoc\n");
-                    return (CAnimBlendAssociationSAInterface * ) pAnimAssoc;
-                    //auto pAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( 0, 55 ); // 0, 55 for crouch animation
-                    //return pAnimStaticAssoc->pAnimHeirarchy;
-                } 
-            }   
-            else
-            {
-                printf ("AddAnimationHandler: could not find IFP animation hierarchy '%s'\n", strAnimationName.c_str());
-            }
-        }
-        else
-        {
-            printf("AddAnimationHandler: could not find IFP block name '%s'\n", strBlockName.c_str());
-        }
-    }
-   
-    printf("AddAnimationHandler: executing normal flow instead of custom animation\n");
-*/
-    // normal flow
-    std::unique_ptr < CAnimBlendAssocGroup >    pAnimAssocGroup  = g_pGame->CreateAnimBlendAssocGroup ( animGroup );
-    CAnimBlendAssociationSAInterface         *  pAnimAssociation = pAnimAssocGroup->CopyAnimation ( animID );
+  *tempAssoc = (DWORD)nextAssoc;
 
-    printf("\n"); 
+  *clumpData = (int)tempAssoc;
 
-    return pAnimAssociation;
+    return (CAnimBlendAssociationSAInterface *)pAnimAssoc;
 }
 
 CAnimBlendHierarchySAInterface * CClientGame::BlendAnimationHandler ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta )

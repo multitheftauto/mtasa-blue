@@ -156,7 +156,7 @@ DWORD RETURN_CPlantMgr_Render_fail =                        0x5DBDAA;
 DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse =    0x4BA076;
 
 #define HOOKPOS_CAnimManager_AddAnimation                   0x4d3aa0
-DWORD RETURN_CAnimManager_AddAnimation =                    0x4D3AAA;
+DWORD RETURN_CAnimManager_AddAnimation =                    0x004D3B16; //0x4D3AAA;
 DWORD RETURN_CAnimManager_AddAnimation_SkipCopyAnimation =  0x4D3ABC;
 
 #define HOOKPOS_CAnimManager_AddAnimationAndSync                  0x4D3B30
@@ -637,7 +637,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10 );
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7 );
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10 ); 
-    HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10 ); 
+    //HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10 ); 
     HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 7 );
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8 );
     HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
@@ -5354,20 +5354,8 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation ()
     {
         pAnimAssociation = m_pAddAnimationHandler ( animationClump, animationGroup, animationID );
     }
-    else 
-    {
-        // This will avoid crash if m_pAddAnimationHandler is removed
-        // continue the normal flow of AddAnimation function, instead of skipping CopyAnimation
 
-       _asm
-        {
-            popad
-            mov     eax,dword ptr [esp+0Ch] 
-            mov     edx,dword ptr ds:[0B4EA34h] 
-            jmp     RETURN_CAnimManager_AddAnimation
-        }
-    }
-
+/*
     // As we are manually creating animation association, so skip CopyAnimation call
     _asm
     {
@@ -5376,6 +5364,14 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation ()
         push    edi
         mov     eax, pAnimAssociation
         jmp     RETURN_CAnimManager_AddAnimation_SkipCopyAnimation
+    } */
+
+    // As we are manually creating animation association, so skip CopyAnimation call
+    _asm
+    {
+        popad
+        mov     eax, pAnimAssociation
+        jmp     RETURN_CAnimManager_AddAnimation
     } 
 }
 
@@ -5410,10 +5406,11 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync ()
             popad
             mov     eax,dword ptr [esp+0Ch] 
             mov     edx,dword ptr ds:[0B4EA34h] 
-            jmp     RETURN_CAnimManager_AddAnimation
+            jmp     RETURN_CAnimManager_AddAnimationAndSync
         }
     }
 
+    printf("HOOK_CAnimManager_AddAnimationAndSync:  m_nAnimGroup: %d  |  m_nAnimID: %d\n\n", pAnimAssociation->sAnimGroup, pAnimAssociation->sAnimID);
 
     // As we are manually creating animation association, so skip CopyAnimation call
     _asm
@@ -5422,7 +5419,7 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync ()
         push    esi
         push    edi
         mov     eax, pAnimAssociation
-        jmp     RETURN_CAnimManager_AddAnimation_SkipCopyAnimation
+        jmp     RETURN_CAnimManager_AddAnimationAndSync_SkipCopyAnimation 
     } 
 }
 
