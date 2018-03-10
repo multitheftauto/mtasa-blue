@@ -178,7 +178,7 @@ void CTriangleBatcher::Flush ( void )
 //
 // CTriangleBatcher::ClearQueue
 //
-// Clears all triangles for current queue
+// Clears all triangles in current queue
 //
 ////////////////////////////////////////////////////////////////
 void CTriangleBatcher::ClearQueue ()

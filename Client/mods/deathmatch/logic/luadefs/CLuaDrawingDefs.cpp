@@ -139,7 +139,7 @@ void CLuaDrawingDefs::AddDxRenderTargetClass ( lua_State* luaVM )
 
 int CLuaDrawingDefs::DxDrawTriangle ( lua_State* luaVM )
 {
-    //  bool dxDrawLine ( int startX, int startY, int endX, int endY, int color, [float width=1, bool postGUI=false] )
+    //  bool dxDrawTriangle ( vec2 posVert1, vec2 posVert2, vec2 posVert3, [int colorVert1, int colorVert2, int colorVert3, bool postGUI=false] )
     CVector2D vecPos1; CVector2D vecPos2; CVector2D vecPos3; SColor ulColorVert1; SColor ulColorVert2; SColor ulColorVert3; bool bPostGUI;
 
     CScriptArgReader argStream ( luaVM );
