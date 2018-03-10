@@ -18,6 +18,7 @@ public:
     static void LoadFunctions ( void );
     static void AddClass ( lua_State* luaVM );
 
+    LUA_DECLARE ( DxDrawTriangle );
     LUA_DECLARE ( DxDrawLine );
     LUA_DECLARE ( DxDrawLine3D );
     LUA_DECLARE ( DxDrawMaterialLine3D );

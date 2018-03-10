@@ -30,6 +30,7 @@ class CGraphics;
 
 class CTileBatcher;
 class CLine3DBatcher;
+class CTriangleBatcher;
 class CMaterialLine3DBatcher;
 class CAspectRatioConverter;
 struct IDirect3DDevice9;
@@ -124,6 +125,14 @@ public:
     void                SetCursorPosition       ( int iX, int iY, DWORD Flags );
 
     // Queued up drawing funcs
+    void                DrawTriangleQueued      ( CVector2D vecPos1,
+                                                  CVector2D vecPos2,
+                                                  CVector2D vecPos3,
+                                                  unsigned long ulColorVert1,
+                                                  unsigned long ulColorVert2,
+                                                  unsigned long ulColorVert3,
+                                                  bool bPostGUI );
+
     void                DrawLineQueued          ( float fX1, float fY1,
                                                   float fX2, float fY2,
                                                   float fWidth,
@@ -241,6 +250,8 @@ private:
     CTileBatcher*               m_pTileBatcher;
     CLine3DBatcher*             m_pLine3DBatcherPreGUI;
     CLine3DBatcher*             m_pLine3DBatcherPostGUI;
+    CTriangleBatcher*           m_pTriangleBatcherPreGUI;
+    CTriangleBatcher*           m_pTriangleBatcherPostGUI;
     CMaterialLine3DBatcher*     m_pMaterialLine3DBatcher;
     CAspectRatioConverter*      m_pAspectRatioConverter;
 
