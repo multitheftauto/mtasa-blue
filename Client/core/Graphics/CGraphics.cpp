@@ -766,19 +766,23 @@ void CGraphics::DrawTriangleQueued ( CVector2D vecPos1,
                                      unsigned long ulColorVert3,
                                      bool bPostGUI )
 {
-    //if (g_pCore->IsWindowMinimized ())
-    //    return;
+    // Prevent queuing when minimized
+    if (g_pCore->IsWindowMinimized ())
+    {
+        m_pTriangleBatcherPreGUI->ClearQueue ();
+        m_pTriangleBatcherPostGUI->ClearQueue ();
+        return;
+    }
 
     vecPos1.fY = m_pAspectRatioConverter->ConvertPositionForAspectRatio ( vecPos1.fY );
     vecPos2.fY = m_pAspectRatioConverter->ConvertPositionForAspectRatio ( vecPos2.fY );
     vecPos3.fY = m_pAspectRatioConverter->ConvertPositionForAspectRatio ( vecPos3.fY );
 
     // Add it to the queue
-    if (bPostGUI)
+    if (bPostGUI && !CCore::GetSingleton ().IsMenuVisible ())
         m_pTriangleBatcherPostGUI->AddTriangle ( vecPos1, vecPos2, vecPos3, ulColorVert1, ulColorVert2, ulColorVert3 );
     else
         m_pTriangleBatcherPreGUI->AddTriangle ( vecPos1, vecPos2, vecPos3, ulColorVert1, ulColorVert2, ulColorVert3 );
-
 }
 
 void CGraphics::DrawLineQueued ( float fX1, float fY1,
@@ -1692,6 +1696,8 @@ void CGraphics::OnChangingRenderTarget ( uint uiNewViewportSizeX, uint uiNewView
     DrawPreGUIQueue ();
     // Inform tile batcher
     m_pTileBatcher->OnChangingRenderTarget ( uiNewViewportSizeX, uiNewViewportSizeY );
+    m_pTriangleBatcherPreGUI->OnChangingRenderTarget ( uiNewViewportSizeX, uiNewViewportSizeY );
+    m_pTriangleBatcherPostGUI->OnChangingRenderTarget ( uiNewViewportSizeX, uiNewViewportSizeY );
 }
 
 
