@@ -163,9 +163,7 @@ void CTriangleBatcher::Flush ( void )
     m_pDevice->DrawPrimitiveUP ( D3DPT_TRIANGLELIST, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride );
 
     // Clean up
-    size_t prevSize = m_triangleList.size ();
-    m_triangleList.clear ();
-    m_triangleList.reserve ( prevSize );
+    ClearQueue ();
 
     // Restore render states
     if (pSavedStateBlock)
