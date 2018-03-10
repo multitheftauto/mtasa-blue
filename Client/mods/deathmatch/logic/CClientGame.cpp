@@ -270,7 +270,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetPreFxRenderHandler ( CClientGame::StaticPreFxRenderHandler );
     g_pMultiplayer->SetPreHudRenderHandler ( CClientGame::StaticPreHudRenderHandler );
     g_pMultiplayer->SetAddAnimationHandler ( CClientGame::StaticAddAnimationHandler );
-    g_pMultiplayer->SetBlendAnimationHandler ( CClientGame::StaticBlendAnimationHandler );
+    g_pMultiplayer->SetAddAnimationAndSyncHandler ( CClientGame::StaticAddAnimationAndSyncHandler );
+    g_pMultiplayer->SetBlendAnimationHierarchyHandler ( CClientGame::StaticBlendAnimationHierarchyHandler );
     g_pMultiplayer->SetProcessCollisionHandler ( CClientGame::StaticProcessCollisionHandler );
     g_pMultiplayer->SetVehicleCollisionHandler( CClientGame::StaticVehicleCollisionHandler );
     g_pMultiplayer->SetVehicleDamageHandler ( CClientGame::StaticVehicleDamageHandler );
@@ -428,7 +429,8 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetPreFxRenderHandler ( NULL );
     g_pMultiplayer->SetPreHudRenderHandler ( NULL );
     g_pMultiplayer->SetAddAnimationHandler ( NULL );
-    g_pMultiplayer->SetBlendAnimationHandler ( NULL );
+    g_pMultiplayer->SetAddAnimationAndSyncHandler ( NULL );
+    g_pMultiplayer->SetBlendAnimationHierarchyHandler ( NULL );
     g_pMultiplayer->SetProcessCollisionHandler ( NULL );
     g_pMultiplayer->SetVehicleCollisionHandler( NULL );
     g_pMultiplayer->SetVehicleDamageHandler( NULL );
@@ -3697,9 +3699,14 @@ CAnimBlendAssociationSAInterface * CClientGame::StaticAddAnimationHandler ( RpCl
     return g_pClientGame->AddAnimationHandler ( pClump, animGroup, animID );
 }
 
-CAnimBlendHierarchySAInterface * CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta )
+CAnimBlendAssociationSAInterface * CClientGame::StaticAddAnimationAndSyncHandler ( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID )
 {
-    return g_pClientGame->BlendAnimationHandler ( pClump, pAnimHierarchy, flags, fBlendDelta );
+    return g_pClientGame->AddAnimationAndSyncHandler ( pClump, pAnimAssocToSyncWith, animGroup, animID );
+}
+
+CAnimBlendHierarchySAInterface * CClientGame::StaticBlendAnimationHierarchyHandler ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta )
+{
+    return g_pClientGame->BlendAnimationHierarchyHandler ( pClump, pAnimHierarchy, flags, fBlendDelta );
 }
 
 void CClientGame::StaticPreWorldProcessHandler ( void )
@@ -4002,7 +4009,15 @@ CAnimBlendAssociationSAInterface * CClientGame::AddAnimationHandler ( RpClump * 
   int *next; // eax
   DWORD *tempAssoc; // eax
   int *nextAssoc; // ecx
-                                                // We need to remove this line and add some code here for running animations simultaneously
+
+    CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
+    CAnimBlendStaticAssoc * pAnimOriginalStaticAssoc = (CAnimBlendStaticAssoc *)pAnimationManager->GetAnimStaticAssociation ( animGroup, animID );
+
+    UncompressAnimation ( pAnimOriginalStaticAssoc->m_pAnimBlendHier );
+    pAnimAssoc = (CAnimBlendAssoc *)malloc(sizeof(CAnimBlendAssoc));
+    OLD_CAnimBlendAssoc_Constructor_staticAssocRef ( pAnimAssoc, *pAnimOriginalStaticAssoc);
+
+ // We need to remove this line and add some code here for running animations simultaneously
   pAnimAssoc = CAnimBlendAssocGroup_CopyAnimation((DWORD *) (*(DWORD*)0x00B4EA34) + 5 * animGroup, animID);
 
   ////ofs << "Done calling  CAnimBlendAssocGroup_CopyAnimation " << std::endl;
@@ -4050,15 +4065,62 @@ LABEL_5:
     return (CAnimBlendAssociationSAInterface *)pAnimAssoc;
 }
 
-CAnimBlendHierarchySAInterface * CClientGame::BlendAnimationHandler ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta )
+CAnimBlendAssociationSAInterface * CClientGame::AddAnimationAndSyncHandler ( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID )
+{
+    printf ( "AddAnimationAndSyncHandler called! pClump, GroupID, AnimID: %p, %d, %d\n", (void*)pClump, animGroup, animID );
+
+    hCAnimBlendAssocGroup_CopyAnimation CAnimBlendAssocGroup_CopyAnimation   = (hCAnimBlendAssocGroup_CopyAnimation)0x004CE130;
+    hUncompressAnimation                 UncompressAnimation                 = (hUncompressAnimation)0x4d41c0;
+    hCAnimBlendAssoc_Constructor_staticAssocRef OLD_CAnimBlendAssoc_Constructor_staticAssocRef = (hCAnimBlendAssoc_Constructor_staticAssocRef)0x4CF080;
+    hCAnimBlendStaticAssoc_Constructor OLD_CAnimBlendStaticAssoc_Constructor = *(hCAnimBlendStaticAssoc_Constructor)0x4CE940;
+    hCAnimBlendStaticAssoc_Init        OLD_CAnimBlendStaticAssoc_Init = (hCAnimBlendStaticAssoc_Init)0x004CEC20;
+    hCAnimBlendAssoc_SyncAnimation CAnimBlendAssoc_SyncAnimation = (hCAnimBlendAssoc_SyncAnimation)0x004CEB40;
+    hCAnimBlendAssoc_Start         CAnimBlendAssoc_Start         = (hCAnimBlendAssoc_Start)0x004CEB70;
+
+  CAnimBlendAssoc * pAnimAssocToSyncWith2 = (CAnimBlendAssoc *)pAnimAssocToSyncWith;
+  CAnimBlendAssoc *pAnimAssoc; // esi
+  int *pClumpData; // edi
+  DWORD *tempAssoc; // eax
+  int nextAssoc; // ecx
+
+  pAnimAssoc = CAnimBlendAssocGroup_CopyAnimation((DWORD *) (*(DWORD*)0x00B4EA34) + 5 * animGroup, animID);
+  pClumpData = *(int **)(   (*(DWORD*)0xB5F878) + (int)pClump);
+  if ( (*((BYTE *)pAnimAssoc + 46) >> 5) & 1 && pAnimAssocToSyncWith2 )
+  {
+    CAnimBlendAssoc_SyncAnimation ( pAnimAssoc, pAnimAssocToSyncWith2);
+    *((BYTE *)pAnimAssoc + 46) |= 1u;
+  }
+  else
+  {
+    CAnimBlendAssoc_Start ( pAnimAssoc, 0);
+  }
+
+  tempAssoc = ((DWORD*)pAnimAssoc) + 1;
+
+  if ( *pClumpData )
+    *(DWORD *)(*pClumpData + 4) = (DWORD)tempAssoc;
+
+  nextAssoc = *pClumpData;
+
+   DWORD * dwpAnimAssoc = (DWORD*) pAnimAssoc;
+
+  dwpAnimAssoc[2] = (DWORD)pClumpData;
+
+  *tempAssoc = nextAssoc;
+
+  *pClumpData = (int)tempAssoc;
+    return (CAnimBlendAssociationSAInterface *)pAnimAssoc;
+}
+
+CAnimBlendHierarchySAInterface * CClientGame::BlendAnimationHierarchyHandler ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta )
 {   
-    printf("CClientGame::BlendAnimationHandler called |  pClump: %p\n", (void*)pClump);
+    printf("CClientGame::BlendAnimationHierarchyHandler called |  pClump: %p\n", (void*)pClump);
 
     CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
     CClientPed * pClientPed =  GetClientPedByClump ( *pClump ); //pAnimationManager->GetPedPointerFromMap ( pClump ); //m_pRootEntity->GetClientPedByClump ( *pClump );
     if ( pClientPed != nullptr )
     {
-        printf ("BlendAnimationHandler: Found pClientPed\n");
+        printf ("BlendAnimationHierarchyHandler: Found pClientPed\n");
         if ( pClientPed->isNextAnimationCustom () )
         { 
             const SString & strBlockName = pClientPed->GetNextAnimationCustomBlockName ( );
@@ -4069,7 +4131,7 @@ CAnimBlendHierarchySAInterface * CClientGame::BlendAnimationHandler ( RpClump * 
                 auto pCustomAnimBlendHierarchy   = pIFP->GetAnimationHierarchy ( strAnimationName );
                 if ( pCustomAnimBlendHierarchy != nullptr )
                 { 
-                    printf ("BlendAnimationHandler: Found Hierarchy, returning \n");
+                    printf ("BlendAnimationHierarchyHandler: Found Hierarchy, returning \n");
 
                     pClientPed->setCurrentAnimationCustom ( true );
 
@@ -4082,12 +4144,12 @@ CAnimBlendHierarchySAInterface * CClientGame::BlendAnimationHandler ( RpClump * 
                 }   
                 else
                 {
-                    printf ("BlendAnimationHandler: could not find IFP animation hierarchy '%s'\n", strAnimationName.c_str());
+                    printf ("BlendAnimationHierarchyHandler: could not find IFP animation hierarchy '%s'\n", strAnimationName.c_str());
                 }
             }
             else
             {
-                printf("BlendAnimationHandler: could not find IFP block name '%s'\n", strBlockName.c_str());
+                printf("BlendAnimationHierarchyHandler: could not find IFP block name '%s'\n", strBlockName.c_str());
             }
         }
         else

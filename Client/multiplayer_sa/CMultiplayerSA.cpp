@@ -156,11 +156,13 @@ DWORD RETURN_CPlantMgr_Render_fail =                        0x5DBDAA;
 DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse =    0x4BA076;
 
 #define HOOKPOS_CAnimManager_AddAnimation                   0x4d3aa0
-DWORD RETURN_CAnimManager_AddAnimation =                    0x004D3B16; //0x4D3AAA;
+DWORD RETURN_CAnimManager_AddAnimation =                    0x4D3AAA;
+DWORD RETURN_CAnimManager_AddAnimationEND =                 0x4D3B16;
 DWORD RETURN_CAnimManager_AddAnimation_SkipCopyAnimation =  0x4D3ABC;
 
 #define HOOKPOS_CAnimManager_AddAnimationAndSync                  0x4D3B30
 DWORD RETURN_CAnimManager_AddAnimationAndSync =                   0x4D3B3A;
+DWORD RETURN_CAnimManager_AddAnimationAndSyncEND =                0x4D3B9E;
 DWORD RETURN_CAnimManager_AddAnimationAndSync_SkipCopyAnimation = 0x4D3B4C;
 
 #define HOOKPOS_CAnimManager_BlendAnimation_Hierarchy       0x4D4410 //0x4D4425
@@ -366,7 +368,8 @@ IdleHandler * m_pIdleHandler = NULL;
 PreFxRenderHandler * m_pPreFxRenderHandler = NULL;
 PreHudRenderHandler * m_pPreHudRenderHandler = NULL;
 AddAnimationHandler* m_pAddAnimationHandler = NULL;
-BlendAnimationHandler* m_pBlendAnimationHandler = NULL;
+AddAnimationAndSyncHandler* m_pAddAnimationAndSyncHandler = nullptr;
+BlendAnimationHierarchyHandler* m_pBlendAnimationHierarchyHandler = NULL;
 ProcessCollisionHandler* m_pProcessCollisionHandler = NULL;
 VehicleCollisionHandler* m_pVehicleCollisionHandler = NULL;
 HeliKillHandler* m_pHeliKillHandler = NULL;
@@ -637,7 +640,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10 );
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7 );
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10 ); 
-    //HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10 ); 
+    HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10 ); 
     HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 7 );
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8 );
     HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
@@ -2223,9 +2226,14 @@ void CMultiplayerSA::SetAddAnimationHandler ( AddAnimationHandler * pHandler )
     m_pAddAnimationHandler = pHandler;
 }
 
-void CMultiplayerSA::SetBlendAnimationHandler ( BlendAnimationHandler * pHandler )
+void CMultiplayerSA::SetAddAnimationAndSyncHandler ( AddAnimationAndSyncHandler * pHandler )
 {
-    m_pBlendAnimationHandler = pHandler;
+    m_pAddAnimationAndSyncHandler = pHandler;
+}
+
+void CMultiplayerSA::SetBlendAnimationHierarchyHandler ( BlendAnimationHierarchyHandler * pHandler )
+{
+    m_pBlendAnimationHierarchyHandler = pHandler;
 }
 
 void CMultiplayerSA::SetProcessCollisionHandler ( ProcessCollisionHandler * pHandler )
@@ -5353,26 +5361,22 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation ()
     if ( m_pAddAnimationHandler  )
     {
         pAnimAssociation = m_pAddAnimationHandler ( animationClump, animationGroup, animationID );
+
+        _asm
+        {
+            popad
+            mov     eax, pAnimAssociation
+            jmp     RETURN_CAnimManager_AddAnimationEND
+        } 
     }
 
-/*
-    // As we are manually creating animation association, so skip CopyAnimation call
     _asm
     {
         popad
-        push    esi
-        push    edi
-        mov     eax, pAnimAssociation
-        jmp     RETURN_CAnimManager_AddAnimation_SkipCopyAnimation
-    } */
-
-    // As we are manually creating animation association, so skip CopyAnimation call
-    _asm
-    {
-        popad
-        mov     eax, pAnimAssociation
+        mov     eax,dword ptr [esp+0Ch] 
+        mov     edx,dword ptr ds:[0B4EA34h] 
         jmp     RETURN_CAnimManager_AddAnimation
-    } 
+    }
 }
 
 
@@ -5392,35 +5396,25 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync ()
         pushad
     }
     
-    if ( m_pAddAnimationHandler  )
+    if ( m_pAddAnimationAndSyncHandler  )
     {
-        pAnimAssociation = m_pAddAnimationHandler ( animationClump, animationGroup, animationID );
-    }
-    else 
-    {
-        // This will avoid crash if m_pAddAnimationHandler is removed
-        // continue the normal flow of AddAnimationAndSync function, instead of skipping CopyAnimation
+        pAnimAssociation = m_pAddAnimationAndSyncHandler ( animationClump, pAnimAssociationToSyncWith, animationGroup, animationID );
 
-       _asm
+        _asm
         {
             popad
-            mov     eax,dword ptr [esp+0Ch] 
-            mov     edx,dword ptr ds:[0B4EA34h] 
-            jmp     RETURN_CAnimManager_AddAnimationAndSync
-        }
+            mov     eax, pAnimAssociation
+            jmp     RETURN_CAnimManager_AddAnimationAndSyncEND
+        } 
     }
 
-    printf("HOOK_CAnimManager_AddAnimationAndSync:  m_nAnimGroup: %d  |  m_nAnimID: %d\n\n", pAnimAssociation->sAnimGroup, pAnimAssociation->sAnimID);
-
-    // As we are manually creating animation association, so skip CopyAnimation call
     _asm
     {
         popad
-        push    esi
-        push    edi
-        mov     eax, pAnimAssociation
-        jmp     RETURN_CAnimManager_AddAnimationAndSync_SkipCopyAnimation 
-    } 
+        mov     eax,dword ptr [esp+10h]
+        mov     edx,dword ptr ds:[0B4EA34h] 
+        jmp     RETURN_CAnimManager_AddAnimationAndSync
+    }
 }
 
 #include <../game_sa/CAnimBlendHierarchySA.h> // ---------------- REMOVE THIS LATER
@@ -5443,9 +5437,9 @@ void _declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy ()
         pushad
     }
 
-    if ( m_pBlendAnimationHandler  )
+    if ( m_pBlendAnimationHierarchyHandler  )
     {
-        pAnimHierarchy = m_pBlendAnimationHandler ( animationClump, pAnimHierarchy, flags, animationBlendDelta );
+        pAnimHierarchy = m_pBlendAnimationHierarchyHandler ( animationClump, pAnimHierarchy, flags, animationBlendDelta );
     }
 
     printf ("BlendAnimation_Hierarchy_Hook, pAnimHierarchy->usNumSequences: %d\n\n", pAnimHierarchy->usNumSequences);

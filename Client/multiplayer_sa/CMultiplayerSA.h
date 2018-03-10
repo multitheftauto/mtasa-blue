@@ -111,7 +111,8 @@ public:
     void                        SetPreFxRenderHandler       ( PreFxRenderHandler * pHandler );
     void                        SetPreHudRenderHandler      ( PreHudRenderHandler * pHandler );
     void                        SetAddAnimationHandler      ( AddAnimationHandler * pHandler );
-    void                        SetBlendAnimationHandler    ( BlendAnimationHandler * pHandler );
+    void                        SetAddAnimationAndSyncHandler ( AddAnimationAndSyncHandler * pHandler );
+    void                        SetBlendAnimationHierarchyHandler    ( BlendAnimationHierarchyHandler * pHandler );
     void                        SetProcessCollisionHandler  ( ProcessCollisionHandler * pHandler );
     void                        SetVehicleCollisionHandler  ( VehicleCollisionHandler * pHandler );
     void                        SetVehicleDamageHandler     ( VehicleDamageHandler * pHandler );
