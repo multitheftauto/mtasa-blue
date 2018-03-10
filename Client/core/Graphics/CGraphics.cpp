@@ -16,6 +16,7 @@
 #include "StdInc.h"
 #include "CTileBatcher.h"
 #include "CLine3DBatcher.h"
+#include "CTriangleBatcher.h"
 #include "CMaterialLine3DBatcher.h"
 #include "CAspectRatioConverter.h"
 extern CCore* g_pCore;
@@ -45,6 +46,8 @@ CGraphics::CGraphics ( CLocalGUI* pGUI )
     m_pTileBatcher = new CTileBatcher ();
     m_pLine3DBatcherPreGUI = new CLine3DBatcher ( true );
     m_pLine3DBatcherPostGUI = new CLine3DBatcher ( false );
+    m_pTriangleBatcherPreGUI = new CTriangleBatcher ( true );
+    m_pTriangleBatcherPostGUI = new CTriangleBatcher ( false );
     m_pMaterialLine3DBatcher = new CMaterialLine3DBatcher ();
 
     m_pScreenGrabber = NewScreenGrabber ();
@@ -67,6 +70,8 @@ CGraphics::~CGraphics ( void )
     SAFE_DELETE ( m_pTileBatcher );
     SAFE_DELETE ( m_pLine3DBatcherPreGUI );
     SAFE_DELETE ( m_pLine3DBatcherPostGUI );
+    SAFE_DELETE ( m_pTriangleBatcherPreGUI );
+    SAFE_DELETE ( m_pTriangleBatcherPostGUI );
     SAFE_DELETE ( m_pMaterialLine3DBatcher );
     SAFE_DELETE ( m_pScreenGrabber );
     SAFE_DELETE ( m_pPixelsManager );
@@ -753,6 +758,28 @@ void CGraphics::SetCursorPosition ( int iX, int iY, DWORD Flags )
     m_pDevice->SetCursorPosition ( iX, iY, Flags );
 }
 
+void CGraphics::DrawTriangleQueued ( CVector2D vecPos1,
+                                     CVector2D vecPos2,
+                                     CVector2D vecPos3,
+                                     unsigned long ulColorVert1,
+                                     unsigned long ulColorVert2,
+                                     unsigned long ulColorVert3,
+                                     bool bPostGUI )
+{
+    //if (g_pCore->IsWindowMinimized ())
+    //    return;
+
+    vecPos1.fY = m_pAspectRatioConverter->ConvertPositionForAspectRatio ( vecPos1.fY );
+    vecPos2.fY = m_pAspectRatioConverter->ConvertPositionForAspectRatio ( vecPos2.fY );
+    vecPos3.fY = m_pAspectRatioConverter->ConvertPositionForAspectRatio ( vecPos3.fY );
+
+    // Add it to the queue
+    if (bPostGUI)
+        m_pTriangleBatcherPostGUI->AddTriangle ( vecPos1, vecPos2, vecPos3, ulColorVert1, ulColorVert2, ulColorVert3 );
+    else
+        m_pTriangleBatcherPreGUI->AddTriangle ( vecPos1, vecPos2, vecPos3, ulColorVert1, ulColorVert2, ulColorVert3 );
+
+}
 
 void CGraphics::DrawLineQueued ( float fX1, float fY1,
                                  float fX2, float fY2,
@@ -1340,6 +1367,8 @@ void CGraphics::OnDeviceCreate ( IDirect3DDevice9 * pDevice )
     m_pTileBatcher->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
     m_pLine3DBatcherPreGUI->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
     m_pLine3DBatcherPostGUI->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
+    m_pTriangleBatcherPreGUI->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
+    m_pTriangleBatcherPostGUI->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
     m_pMaterialLine3DBatcher->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
     m_pRenderItemManager->OnDeviceCreate ( pDevice, GetViewportWidth (), GetViewportHeight () );
     m_pScreenGrabber->OnDeviceCreate ( pDevice );
@@ -1407,6 +1436,7 @@ void CGraphics::OnZBufferModified ( void )
 void CGraphics::DrawPreGUIQueue ( void )
 {
     m_pLine3DBatcherPreGUI->Flush ();
+    m_pTriangleBatcherPreGUI->Flush ();
     DrawQueue ( m_PreGUIQueue );
 }
 
@@ -1414,6 +1444,7 @@ void CGraphics::DrawPreGUIQueue ( void )
 void CGraphics::DrawPostGUIQueue ( void )
 {
     DrawQueue ( m_PostGUIQueue );
+    m_pTriangleBatcherPostGUI->Flush ();
     m_pLine3DBatcherPostGUI->Flush ();
 
     // Both queues should be empty now, and there should be no outstanding refs

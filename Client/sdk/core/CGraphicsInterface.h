@@ -105,6 +105,14 @@ public:
     virtual void                    DrawTexture         ( CTextureItem* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, float fRotation = 0.0f, float fCenterX = 0.0f, float fCenterY = 0.0f, DWORD dwColor = 0xFFFFFFFF, float fU = 0, float fV = 0, float fSizeU = 1, float fSizeV = 1, bool bRelativeUV = true ) = 0;
 
     // Queued up drawing
+    virtual void                    DrawTriangleQueued  ( CVector2D vecPos1,
+                                                          CVector2D vecPos2,
+                                                          CVector2D vecPos3,
+                                                          unsigned long ulColorVert1,
+                                                          unsigned long ulColorVert2,
+                                                          unsigned long ulColorVert3,
+                                                          bool bPostGUI ) = 0;
+
     virtual void                    DrawLineQueued      ( float fX1, float fY1,
                                                           float fX2, float fY2,
                                                           float fWidth,

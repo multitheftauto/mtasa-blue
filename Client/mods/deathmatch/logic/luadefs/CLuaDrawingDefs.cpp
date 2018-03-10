@@ -15,6 +15,7 @@ extern bool g_bAllowAspectRatioAdjustment;
 
 void CLuaDrawingDefs::LoadFunctions ( void )
 {
+    CLuaCFunctions::AddFunction ( "dxDrawTriangle", DxDrawTriangle );
     CLuaCFunctions::AddFunction ( "dxDrawLine", DxDrawLine );
     CLuaCFunctions::AddFunction ( "dxDrawMaterialLine3D", DxDrawMaterialLine3D );
     CLuaCFunctions::AddFunction ( "dxDrawMaterialSectionLine3D", DxDrawMaterialSectionLine3D );
@@ -134,6 +135,34 @@ void CLuaDrawingDefs::AddDxRenderTargetClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "setAsTarget", "dxSetRenderTarget" );
 
     lua_registerclass ( luaVM, "DxRenderTarget", "DxTexture" );
+}
+
+int CLuaDrawingDefs::DxDrawTriangle ( lua_State* luaVM )
+{
+    //  bool dxDrawLine ( int startX, int startY, int endX, int endY, int color, [float width=1, bool postGUI=false] )
+    CVector2D vecPos1; CVector2D vecPos2; CVector2D vecPos3; SColor ulColorVert1; SColor ulColorVert2; SColor ulColorVert3; bool bPostGUI;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadVector2D ( vecPos1 );
+    argStream.ReadVector2D ( vecPos2 );
+    argStream.ReadVector2D ( vecPos3 );
+    argStream.ReadColor ( ulColorVert1, 0xFFFFFFFF );
+    argStream.ReadColor ( ulColorVert2, ulColorVert1 );
+    argStream.ReadColor ( ulColorVert3, ulColorVert1 );
+    argStream.ReadBool ( bPostGUI, false );
+
+    if (!argStream.HasErrors ())
+    {
+        g_pCore->GetGraphics ()->DrawTriangleQueued ( vecPos1, vecPos2, vecPos3, ulColorVert1, ulColorVert2, ulColorVert3, bPostGUI );
+        lua_pushboolean ( luaVM, true );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    // Failed
+    lua_pushboolean ( luaVM, false );
+    return 1;
 }
 
 int CLuaDrawingDefs::DxDrawLine ( lua_State* luaVM )
