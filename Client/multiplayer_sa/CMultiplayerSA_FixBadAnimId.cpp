@@ -1,44 +1,44 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        multiplayer_sa/CMultiplayerSA_FixBadAnimId.cpp
-*  PORPOISE:    
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        multiplayer_sa/CMultiplayerSA_FixBadAnimId.cpp
+ *  PORPOISE:
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 #include "../game_sa/CAnimBlendAssocGroupSA.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Check for anims that will crash and change to one that wont. (The new anim will be wrong and look crap though)
-int _cdecl OnCAnimBlendAssocGroupCopyAnimation ( CAnimBlendAssocGroupSAInterface* pGroup, int iAnimId )
+int _cdecl OnCAnimBlendAssocGroupCopyAnimation(CAnimBlendAssocGroupSAInterface* pGroup, int iAnimId)
 {
     // Apply offset
     int iUseAnimId = iAnimId - pGroup->iIDOffset;
 
-    if ( pGroup->pAssociationsArray )
+    if (pGroup->pAssociationsArray)
     {
         CAnimBlendStaticAssociationSAInterface* pAssociation = pGroup->pAssociationsArray + iUseAnimId;
-        if ( pAssociation && pAssociation->pAnimHeirarchy == NULL )
+        if (pAssociation && pAssociation->pAnimHeirarchy == NULL)
         {
             // Choose another animId
             int iNewAnimId = iUseAnimId;
-            for ( int i = 0 ; i < pGroup->iNumAnimations ; i++ )
+            for (int i = 0; i < pGroup->iNumAnimations; i++)
             {
                 pAssociation = pGroup->pAssociationsArray + i;
-                if ( pAssociation->pAnimHeirarchy )
+                if (pAssociation->pAnimHeirarchy)
                 {
                     // Find closest valid anim id
-                    if ( abs( iUseAnimId - i ) < abs( iUseAnimId - iNewAnimId ) || iNewAnimId == iUseAnimId )
+                    if (abs(iUseAnimId - i) < abs(iUseAnimId - iNewAnimId) || iNewAnimId == iUseAnimId)
                         iNewAnimId = i;
                 }
             }
 
             iUseAnimId = iNewAnimId;
-            LogEvent ( 534, "CopyAnimation", "", SString ( "Group:%d replaced id:%d with id:%d", pGroup->groupID, iAnimId, iUseAnimId + pGroup->iIDOffset ) );
+            LogEvent(534, "CopyAnimation", "", SString("Group:%d replaced id:%d with id:%d", pGroup->groupID, iAnimId, iUseAnimId + pGroup->iIDOffset));
         }
     }
 
@@ -47,11 +47,10 @@ int _cdecl OnCAnimBlendAssocGroupCopyAnimation ( CAnimBlendAssocGroupSAInterface
     return iAnimId;
 }
 
-
 // Hook info
 #define HOOKPOS_CAnimBlendAssocGroupCopyAnimation        0x4CE130
 #define HOOKSIZE_CAnimBlendAssocGroupCopyAnimation       6
-DWORD RETURN_CAnimBlendAssocGroupCopyAnimation =         0x4CE136;
+DWORD RETURN_CAnimBlendAssocGroupCopyAnimation = 0x4CE136;
 void _declspec(naked) HOOK_CAnimBlendAssocGroupCopyAnimation()
 {
     _asm
@@ -69,7 +68,6 @@ void _declspec(naked) HOOK_CAnimBlendAssocGroupCopyAnimation()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Check for invalid RpHAnimHierarchy*
 void _cdecl OnGetAnimHierarchyFromSkinClump(RpClump* pRpClump, void* pRpHAnimHierarchyResult)
@@ -86,10 +84,9 @@ void _cdecl OnGetAnimHierarchyFromSkinClump(RpClump* pRpClump, void* pRpHAnimHie
     }
 }
 
-
 #define HOOKPOS_GetAnimHierarchyFromSkinClump        0x734A5D
 #define HOOKSIZE_GetAnimHierarchyFromSkinClump       7
-DWORD RETURN_GetAnimHierarchyFromSkinClump =         0x734A64;
+DWORD RETURN_GetAnimHierarchyFromSkinClump = 0x734A64;
 void _declspec(naked) HOOK_GetAnimHierarchyFromSkinClump()
 {
     _asm
@@ -107,14 +104,13 @@ void _declspec(naked) HOOK_GetAnimHierarchyFromSkinClump()
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_FixBadAnimId ( void )
+void CMultiplayerSA::InitHooks_FixBadAnimId(void)
 {
-   EZHookInstall ( CAnimBlendAssocGroupCopyAnimation );
-   EZHookInstall ( GetAnimHierarchyFromSkinClump );
+    EZHookInstall(CAnimBlendAssocGroupCopyAnimation);
+    EZHookInstall(GetAnimHierarchyFromSkinClump);
 }

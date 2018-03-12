@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        multiplayer_sa/multiplayer_keysync.h
-*  PURPOSE:     Multiplayer module keysync methods
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        multiplayer_sa/multiplayer_keysync.h
+ *  PURPOSE:     Multiplayer module keysync methods
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "multiplayersa_init.h"
 
@@ -17,7 +16,6 @@
 
 #include <game/CPlayerPed.h>
 #include <game/CStats.h>
-
 
 // our stuff
 VOID InitKeysyncHooks();
@@ -81,8 +79,5 @@ VOID HOOK_CHeli__ProcessControl();
 #define CODE_SetTargetRotation              0x535851
 
 #define VAR_CameraRotation                  0xB6F178
-
-
-
 
 #endif

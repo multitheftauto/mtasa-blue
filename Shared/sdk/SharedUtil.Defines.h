@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        SharedUtil.Defines.h
-*  PURPOSE:
-*  DEVELOPERS:  
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        SharedUtil.Defines.h
+ *  PURPOSE:
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 //
 // System wide defines
@@ -103,19 +102,16 @@
     #define NUMELMS(aa) (sizeof(aa)/sizeof((aa)[0]))
 #endif
 
-
 #ifdef WIN32
     #define PATH_SEPERATOR "\\"
 #else
     #define PATH_SEPERATOR "/"
 #endif
 
-
 // Auto clear a class when new'ed. (Won't work for inline creation.)
 #define ZERO_ON_NEW \
     void* operator new ( size_t size )              { void* ptr = ::operator new(size); memset(ptr,0,size); return ptr; } \
     void* operator new ( size_t size, void* where ) { memset(where,0,size); return where; }
-
 
 // As NDEBUG is not defined across most MTA projects, assert() will always be enabled
 // Use dassert for debug build only assertations
@@ -124,7 +120,7 @@
 #else
     #define dassert(_Expression)     ((void)0)
     #ifdef WIN32
-        // This, along with RedirectedSetUnhandledExceptionFilter means we can get reports from all crashes with the correct crash address in the file name
+// This, along with RedirectedSetUnhandledExceptionFilter means we can get reports from all crashes with the correct crash address in the file name
         #undef assert
         #define assert(_Expression) (void)( (!!(_Expression)) || ( *((int*)NULL) = 0) )
     #endif
@@ -149,9 +145,9 @@
 //
 // type     meaning in sprintf      meaning in swprintf
 //          Windows     POSIX       Windows     POSIX
-//ls or lS  wchar_t     wchar_t     wchar_t     wchar_t
-//s         char        char        wchar_t     char
-//S         wchar_t     char        char        ????
+// ls or lS  wchar_t     wchar_t     wchar_t     wchar_t
+// s         char        char        wchar_t     char
+// S         wchar_t     char        char        ????
 //
 #define PRSinS   "%s"       // i.e. SString (  "name:" PRSinS,  "dave" );
 #define PRWinS   "%ls"      // i.e. SString (  "name:" PRWinS, L"dave" );

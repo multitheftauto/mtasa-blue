@@ -1,23 +1,22 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientExplosionManager.cpp
-*  PURPOSE:     Explosion event manager class
-*  DEVELOPERS:  Jax <>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientExplosionManager.cpp
+ *  PURPOSE:     Explosion event manager class
+ *
+ *****************************************************************************/
 
 #include <StdInc.h>
 
 extern CClientGame* g_pClientGame;
 
-CClientExplosionManager * g_pExplosionManager = NULL;
+CClientExplosionManager* g_pExplosionManager = NULL;
 
-CClientExplosionManager::CClientExplosionManager ( CClientManager * pManager )
+CClientExplosionManager::CClientExplosionManager(CClientManager* pManager)
 {
-    CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientExplosionManager" ), &m_pLastCreator, NULL );
+    CClientEntityRefManager::AddEntityRefs(ENTITY_REF_DEBUG(this, "CClientExplosionManager"), &m_pLastCreator, NULL);
 
     g_pExplosionManager = this;
     m_pManager = pManager;
@@ -25,43 +24,44 @@ CClientExplosionManager::CClientExplosionManager ( CClientManager * pManager )
     m_pLastCreator = NULL;
 }
 
-
-CClientExplosionManager::~CClientExplosionManager ( void )
+CClientExplosionManager::~CClientExplosionManager(void)
 {
-    if ( g_pExplosionManager == this ) g_pExplosionManager = NULL;
+    if (g_pExplosionManager == this)
+        g_pExplosionManager = NULL;
 
-    CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pLastCreator, NULL );
+    CClientEntityRefManager::RemoveEntityRefs(0, &m_pLastCreator, NULL);
 }
 
-
-bool CClientExplosionManager::Hook_StaticExplosionCreation ( CEntity* pGameExplodingEntity, CEntity* pGameCreator, const CVector& vecPosition, eExplosionType explosionType )
+bool CClientExplosionManager::Hook_StaticExplosionCreation(CEntity* pGameExplodingEntity, CEntity* pGameCreator, const CVector& vecPosition,
+                                                           eExplosionType explosionType)
 {
-    return g_pExplosionManager->Hook_ExplosionCreation ( pGameExplodingEntity, pGameCreator, vecPosition, explosionType );
+    return g_pExplosionManager->Hook_ExplosionCreation(pGameExplodingEntity, pGameCreator, vecPosition, explosionType);
 }
 
-
-bool CClientExplosionManager::Hook_ExplosionCreation ( CEntity* pGameExplodingEntity, CEntity* pGameCreator, const CVector& vecPosition, eExplosionType explosionType )
+bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEntity, CEntity* pGameCreator, const CVector& vecPosition,
+                                                     eExplosionType explosionType)
 {
-    CClientPlayer * pLocalPlayer = m_pManager->GetPlayerManager ()->GetLocalPlayer ();
+    CClientPlayer* pLocalPlayer = m_pManager->GetPlayerManager()->GetLocalPlayer();
 
     // Grab the entity responsible
-    CClientEntity * pResponsible = NULL;
-    CEntity* pResponsibleGameEntity = ( pGameExplodingEntity ) ? pGameExplodingEntity : pGameCreator;
-    if ( pResponsibleGameEntity )
-        pResponsible = m_pManager->FindEntity ( pResponsibleGameEntity, false );
+    CClientEntity* pResponsible = NULL;
+    CEntity*       pResponsibleGameEntity = (pGameExplodingEntity) ? pGameExplodingEntity : pGameCreator;
+    if (pResponsibleGameEntity)
+        pResponsible = m_pManager->FindEntity(pResponsibleGameEntity, false);
 
     unsigned short usModel;
-    if ( pResponsible && ( pResponsible->IsLocalEntity () || ( CStaticFunctionDefinitions::GetElementModel ( *pResponsible, usModel ) && CClientObjectManager::IsBreakableModel ( usModel ) ) ) )
-        return true;    // Handle this explosion client side only if entity is local or breakable (i.e. barrel)
+    if (pResponsible && (pResponsible->IsLocalEntity() ||
+                         (CStaticFunctionDefinitions::GetElementModel(*pResponsible, usModel) && CClientObjectManager::IsBreakableModel(usModel))))
+        return true;            // Handle this explosion client side only if entity is local or breakable (i.e. barrel)
 
     eWeaponType explosionWeaponType;
-    switch ( explosionType )
+    switch (explosionType)
     {
         case EXP_TYPE_GRENADE:
         {
             // Grenade type explosions from vehicles should only be freefall bombs
             // TODO: need a way to check if its a freefall bomb if creator is a ped
-            if ( pGameCreator && pGameCreator->GetEntityType () == ENTITY_TYPE_VEHICLE )
+            if (pGameCreator && pGameCreator->GetEntityType() == ENTITY_TYPE_VEHICLE)
                 explosionWeaponType = WEAPONTYPE_FREEFALL_BOMB;
             else
                 explosionWeaponType = WEAPONTYPE_GRENADE;
@@ -83,42 +83,41 @@ bool CClientExplosionManager::Hook_ExplosionCreation ( CEntity* pGameExplodingEn
     }
 
     // Got a responsible entity?
-    if ( pResponsible )
+    if (pResponsible)
     {
         // Is the local player responsible for this?
-        bool bLocal = ( ( pResponsible == pLocalPlayer ) ||
-                      ( pResponsible == pLocalPlayer->GetOccupiedVehicle () ) ||
-                      ( g_pClientGame->GetUnoccupiedVehicleSync ()->Exists ( static_cast < CDeathmatchVehicle * > ( pResponsible ) ) ) );
+        bool bLocal = ((pResponsible == pLocalPlayer) || (pResponsible == pLocalPlayer->GetOccupiedVehicle()) ||
+                       (g_pClientGame->GetUnoccupiedVehicleSync()->Exists(static_cast<CDeathmatchVehicle*>(pResponsible))));
 
-        if ( bLocal )
+        if (bLocal)
         {
-            CClientEntity * pOriginSource = NULL;
+            CClientEntity* pOriginSource = NULL;
 
             // Is this an exploding vehicle?
-            if ( pGameExplodingEntity && pGameExplodingEntity->GetEntityType () == ENTITY_TYPE_VEHICLE )
+            if (pGameExplodingEntity && pGameExplodingEntity->GetEntityType() == ENTITY_TYPE_VEHICLE)
             {
                 // Set our origin-source to the vehicle
-                pOriginSource = m_pManager->FindEntity ( pGameExplodingEntity, false );
-            }                
+                pOriginSource = m_pManager->FindEntity(pGameExplodingEntity, false);
+            }
             // If theres other players, sync it relative to the closest (lag compensation)
-            else if ( m_pManager->GetPlayerManager ()->Count () > 1 )
+            else if (m_pManager->GetPlayerManager()->Count() > 1)
             {
-                switch ( explosionWeaponType )
+                switch (explosionWeaponType)
                 {
                     case WEAPONTYPE_ROCKET:
                     case WEAPONTYPE_ROCKET_HS:
                     {
-                        CClientPlayer * pPlayer = g_pClientGame->GetClosestRemotePlayer ( vecPosition, 200.0f );
-                        if ( pPlayer )
+                        CClientPlayer* pPlayer = g_pClientGame->GetClosestRemotePlayer(vecPosition, 200.0f);
+                        if (pPlayer)
                         {
                             pOriginSource = pPlayer;
                         }
                         break;
                     }
-                }                                   
+                }
             }
             // Request a new explosion
-            g_pClientGame->SendExplosionSync ( vecPosition, explosionType, pOriginSource );
+            g_pClientGame->SendExplosionSync(vecPosition, explosionType, pOriginSource);
         }
     }
 
@@ -126,28 +125,40 @@ bool CClientExplosionManager::Hook_ExplosionCreation ( CEntity* pGameExplodingEn
     return false;
 }
 
-
-CExplosion * CClientExplosionManager::Create ( eExplosionType explosionType, CVector & vecPosition, CClientEntity * pCreator, bool bMakeSound, float fCamShake, bool bNoDamage, eWeaponType responsibleWeapon )
+CExplosion* CClientExplosionManager::Create(eExplosionType explosionType, CVector& vecPosition, CClientEntity* pCreator, bool bMakeSound, float fCamShake,
+                                            bool bNoDamage, eWeaponType responsibleWeapon)
 {
-    CEntity * pGameCreator = NULL;
-    if ( pCreator ) pGameCreator = pCreator->GetGameEntity ();
+    CEntity* pGameCreator = NULL;
+    if (pCreator)
+        pGameCreator = pCreator->GetGameEntity();
 
     // Update our records first?
     m_pLastCreator = pCreator;
-    if ( responsibleWeapon != WEAPONTYPE_UNARMED ) m_LastWeaponType = responsibleWeapon;
+    if (responsibleWeapon != WEAPONTYPE_UNARMED)
+        m_LastWeaponType = responsibleWeapon;
     else
     {
-        switch ( explosionType )
+        switch (explosionType)
         {
-            case EXP_TYPE_GRENADE: m_LastWeaponType = WEAPONTYPE_GRENADE; break;
-            case EXP_TYPE_MOLOTOV: m_LastWeaponType = WEAPONTYPE_MOLOTOV; break;
+            case EXP_TYPE_GRENADE:
+                m_LastWeaponType = WEAPONTYPE_GRENADE;
+                break;
+            case EXP_TYPE_MOLOTOV:
+                m_LastWeaponType = WEAPONTYPE_MOLOTOV;
+                break;
             case EXP_TYPE_ROCKET:
-            case EXP_TYPE_ROCKET_WEAK: m_LastWeaponType = WEAPONTYPE_ROCKET; break;
-            case EXP_TYPE_TANK_GRENADE: m_LastWeaponType = WEAPONTYPE_TANK_GRENADE; break;
-            default: m_LastWeaponType = WEAPONTYPE_EXPLOSION; break;
+            case EXP_TYPE_ROCKET_WEAK:
+                m_LastWeaponType = WEAPONTYPE_ROCKET;
+                break;
+            case EXP_TYPE_TANK_GRENADE:
+                m_LastWeaponType = WEAPONTYPE_TANK_GRENADE;
+                break;
+            default:
+                m_LastWeaponType = WEAPONTYPE_EXPLOSION;
+                break;
         }
     }
 
-    CExplosion * pExplosion = g_pGame->GetExplosionManager ()->AddExplosion ( NULL, pGameCreator, explosionType, vecPosition, 0, bMakeSound, fCamShake, bNoDamage );
+    CExplosion* pExplosion = g_pGame->GetExplosionManager()->AddExplosion(NULL, pGameCreator, explosionType, vecPosition, 0, bMakeSound, fCamShake, bNoDamage);
     return pExplosion;
 }

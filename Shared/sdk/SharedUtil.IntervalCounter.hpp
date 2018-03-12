@@ -1,16 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        SharedUtil.IntervalCounter.hpp
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        SharedUtil.IntervalCounter.hpp
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 namespace SharedUtil
 {
-
     ///////////////////////////////////////////////////////////////
     //
     // CIntervalCounter
@@ -19,18 +18,18 @@ namespace SharedUtil
     // uiMinIntervalMs is the minimum time between incremenets. Actual interval could be slightly longer.
     //
     ///////////////////////////////////////////////////////////////
-    CIntervalCounter::CIntervalCounter( uint uiMinIntervalMs, T* pCounter )
+    CIntervalCounter::CIntervalCounter(uint uiMinIntervalMs, T* pCounter)
     {
         m_uiMinIntervalMs = uiMinIntervalMs;
         shared.m_pCounter = pCounter;
-        m_pServiceThreadHandle = new CThreadHandle( CIntervalCounter::StaticThreadProc, this );
+        m_pServiceThreadHandle = new CThreadHandle(CIntervalCounter::StaticThreadProc, this);
     }
 
-    CIntervalCounter::~CIntervalCounter( void )
+    CIntervalCounter::~CIntervalCounter(void)
     {
         // Stop and delete processing thread
-        StopThread ();
-        SAFE_DELETE ( m_pServiceThreadHandle );
+        StopThread();
+        SAFE_DELETE(m_pServiceThreadHandle);
     }
 
     ///////////////////////////////////////////////////////////////
@@ -40,26 +39,25 @@ namespace SharedUtil
     // Stop the processing thread
     //
     ///////////////////////////////////////////////////////////////
-    void CIntervalCounter::StopThread ( void )
+    void CIntervalCounter::StopThread(void)
     {
         // Stop the processing thread
-        shared.m_Mutex.Lock ();
+        shared.m_Mutex.Lock();
         shared.m_bTerminateThread = true;
-        shared.m_Mutex.Signal ();
-        shared.m_Mutex.Unlock ();
+        shared.m_Mutex.Signal();
+        shared.m_Mutex.Unlock();
 
-        for ( uint i = 0 ; i < m_uiMinIntervalMs * 2 ; i += 15 )
+        for (uint i = 0; i < m_uiMinIntervalMs * 2; i += 15)
         {
-            if ( shared.m_bThreadTerminated )
+            if (shared.m_bThreadTerminated)
                 return;
 
-            Sleep ( 15 );
+            Sleep(15);
         }
 
         // If thread not stopped, (async) cancel it
-        m_pServiceThreadHandle->Cancel ();
+        m_pServiceThreadHandle->Cancel();
     }
-
 
     ///////////////////////////////////////////////////////////////
     //
@@ -69,12 +67,11 @@ namespace SharedUtil
     // Thread entry point
     //
     ///////////////////////////////////////////////////////////////
-    void* CIntervalCounter::StaticThreadProc ( void* pContext )
+    void* CIntervalCounter::StaticThreadProc(void* pContext)
     {
-        CThreadHandle::AllowASyncCancel ();
-        return ((CIntervalCounter*)pContext)->ThreadProc ();
+        CThreadHandle::AllowASyncCancel();
+        return ((CIntervalCounter*)pContext)->ThreadProc();
     }
-
 
     ///////////////////////////////////////////////////////////////
     //
@@ -83,20 +80,19 @@ namespace SharedUtil
     // Thread loop
     //
     ///////////////////////////////////////////////////////////////
-    void* CIntervalCounter::ThreadProc ( void )
+    void* CIntervalCounter::ThreadProc(void)
     {
-        shared.m_Mutex.Lock ();
-        while ( !shared.m_bTerminateThread )
+        shared.m_Mutex.Lock();
+        while (!shared.m_bTerminateThread)
         {
             m_InternalCounter++;
             *shared.m_pCounter = m_InternalCounter;
-            shared.m_Mutex.Wait( m_uiMinIntervalMs );
+            shared.m_Mutex.Wait(m_uiMinIntervalMs);
         }
         shared.m_bThreadTerminated = true;
-        shared.m_Mutex.Unlock ();
+        shared.m_Mutex.Unlock();
         return NULL;
     }
-
 
     ///////////////////////////////////////////////////////////////
     //
@@ -105,16 +101,16 @@ namespace SharedUtil
     //
     //
     ///////////////////////////////////////////////////////////////
-    static CRefCountable*       g_pIntervalCounter = NULL;
-    static uchar                g_ucCounterValue = 0;
+    static CRefCountable* g_pIntervalCounter = NULL;
+    static uchar          g_ucCounterValue = 0;
 
-    void CElapsedTimeApprox::StaticInitialize( CElapsedTimeApprox* pTimer )
+    void CElapsedTimeApprox::StaticInitialize(CElapsedTimeApprox* pTimer)
     {
-        dassert( !pTimer->m_bInitialized );
+        dassert(!pTimer->m_bInitialized);
         pTimer->m_bInitialized = true;
 
-        if ( !g_pIntervalCounter )
-            g_pIntervalCounter = new CIntervalCounter( 100, &g_ucCounterValue );
+        if (!g_pIntervalCounter)
+            g_pIntervalCounter = new CIntervalCounter(100, &g_ucCounterValue);
         else
             g_pIntervalCounter->AddRef();
 
@@ -123,4 +119,4 @@ namespace SharedUtil
         pTimer->Reset();
     }
 
-}
+}            // namespace SharedUtil

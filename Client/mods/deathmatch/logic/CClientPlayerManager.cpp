@@ -1,15 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientPlayerManager.cpp
-*  PURPOSE:     Player entity manager class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientPlayerManager.cpp
+ *  PURPOSE:     Player entity manager class
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
@@ -18,7 +15,7 @@
 using std::list;
 using std::vector;
 
-CClientPlayerManager::CClientPlayerManager ( CClientManager* pManager )
+CClientPlayerManager::CClientPlayerManager(CClientManager* pManager)
 {
     // Initialize members
     m_pManager = pManager;
@@ -26,113 +23,109 @@ CClientPlayerManager::CClientPlayerManager ( CClientManager* pManager )
     m_pLocalPlayer = NULL;
 }
 
-
-CClientPlayerManager::~CClientPlayerManager ( void )
+CClientPlayerManager::~CClientPlayerManager(void)
 {
     // Destroy all players
-    DeleteAll ();
+    DeleteAll();
 }
 
-void CClientPlayerManager::DoPulse ( void )
+void CClientPlayerManager::DoPulse(void)
 {
-    unsigned long ulCurrentTime = CClientTime::GetTime ();
-    CClientPlayer * pPlayer = NULL;
-    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
-    for ( ; iter != m_Players.end (); ++iter )
+    unsigned long                          ulCurrentTime = CClientTime::GetTime();
+    CClientPlayer*                         pPlayer = NULL;
+    vector<CClientPlayer*>::const_iterator iter = m_Players.begin();
+    for (; iter != m_Players.end(); ++iter)
     {
         pPlayer = *iter;
 
-        if ( !pPlayer->IsLocalPlayer () )
+        if (!pPlayer->IsLocalPlayer())
         {
             // Pulse voice data if voice is enabled
-            if ( g_pClientGame->GetVoiceRecorder()->IsEnabled() && pPlayer->GetVoice() )
+            if (g_pClientGame->GetVoiceRecorder()->IsEnabled() && pPlayer->GetVoice())
                 pPlayer->GetVoice()->DoPulse();
 
             // Flag him with connection error if its been too long since last puresync and force his position
-            unsigned long ulLastPuresyncTime = pPlayer->GetLastPuresyncTime ();
-            bool bHasConnectionTrouble = ( ulLastPuresyncTime != 0 && ulCurrentTime >= ulLastPuresyncTime + REMOTE_PLAYER_CONNECTION_TROUBLE_TIME );
-            if ( bHasConnectionTrouble && !g_pClientGame->IsDownloadingBigPacket () && !pPlayer->IsDeadOnNetwork () )
+            unsigned long ulLastPuresyncTime = pPlayer->GetLastPuresyncTime();
+            bool          bHasConnectionTrouble = (ulLastPuresyncTime != 0 && ulCurrentTime >= ulLastPuresyncTime + REMOTE_PLAYER_CONNECTION_TROUBLE_TIME);
+            if (bHasConnectionTrouble && !g_pClientGame->IsDownloadingBigPacket() && !pPlayer->IsDeadOnNetwork())
             {
-                pPlayer->SetHasConnectionTrouble ( true );
+                pPlayer->SetHasConnectionTrouble(true);
 
                 // Reset his controller so he doesn't get stuck shooting or something
                 CControllerState State;
-                memset ( &State, 0, sizeof ( CControllerState ) );
-                pPlayer->SetControllerState ( State );
+                memset(&State, 0, sizeof(CControllerState));
+                pPlayer->SetControllerState(State);
 
                 // Grab his vehicle if any and force the position to where he was last sync
-                CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle ();
-                if ( pVehicle )
+                CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle();
+                if (pVehicle)
                 {
                     // Is he driving the vehicle?
-                    if ( pPlayer->GetOccupiedVehicleSeat () == 0 )
+                    if (pPlayer->GetOccupiedVehicleSeat() == 0)
                     {
                         // Force his position to where he was last sync
-                        pVehicle->SetPosition ( pPlayer->GetLastPuresyncPosition () );
-                        pVehicle->SetMoveSpeed ( CVector ( 0, 0, 0 ) );
-                        pVehicle->SetTurnSpeed ( CVector ( 0, 0, 0 ) );
-                        pPlayer->ResetInterpolation ();
+                        pVehicle->SetPosition(pPlayer->GetLastPuresyncPosition());
+                        pVehicle->SetMoveSpeed(CVector(0, 0, 0));
+                        pVehicle->SetTurnSpeed(CVector(0, 0, 0));
+                        pPlayer->ResetInterpolation();
                     }
                 }
                 else
                 {
                     // Force his position to where he was last sync
-                    pPlayer->SetPosition ( pPlayer->GetLastPuresyncPosition () );
-                    pPlayer->ResetInterpolation ();
-                    pPlayer->SetMoveSpeed ( CVector ( 0, 0, 0 ) );
-                    pPlayer->ResetInterpolation ();
+                    pPlayer->SetPosition(pPlayer->GetLastPuresyncPosition());
+                    pPlayer->ResetInterpolation();
+                    pPlayer->SetMoveSpeed(CVector(0, 0, 0));
+                    pPlayer->ResetInterpolation();
                 }
             }
             else
             {
-                pPlayer->SetHasConnectionTrouble ( false );
+                pPlayer->SetHasConnectionTrouble(false);
             }
         }
     }
 }
 
-
-void CClientPlayerManager::DeleteAll ( void )
+void CClientPlayerManager::DeleteAll(void)
 {
     // Delete all the players
     m_bCanRemoveFromList = false;
-    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
-    for ( ; iter != m_Players.end (); iter++ )
+    vector<CClientPlayer*>::const_iterator iter = m_Players.begin();
+    for (; iter != m_Players.end(); iter++)
     {
         delete *iter;
     }
 
     // Clear the list
-    m_Players.clear ();
+    m_Players.clear();
     m_bCanRemoveFromList = true;
 }
 
-
-CClientPlayer* CClientPlayerManager::Get ( ElementID ID )
+CClientPlayer* CClientPlayerManager::Get(ElementID ID)
 {
     // Grab the element with the given id. Check its type.
-    CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-    if ( pEntity && pEntity->GetType () == CCLIENTPLAYER )
+    CClientEntity* pEntity = CElementIDs::GetElement(ID);
+    if (pEntity && pEntity->GetType() == CCLIENTPLAYER)
     {
-        return static_cast < CClientPlayer* > ( pEntity );
+        return static_cast<CClientPlayer*>(pEntity);
     }
 
     return NULL;
 }
 
-
-CClientPlayer* CClientPlayerManager::Get ( const char* szNick, bool bCaseSensitive )
+CClientPlayer* CClientPlayerManager::Get(const char* szNick, bool bCaseSensitive)
 {
-    assert ( szNick );
+    assert(szNick);
 
     // Find a player with a matching nick in the list
-    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
-    for ( ; iter != m_Players.end (); iter++ )
+    vector<CClientPlayer*>::const_iterator iter = m_Players.begin();
+    for (; iter != m_Players.end(); iter++)
     {
-        const char* szPtr = (*iter)->GetNick ();
-        if ( szPtr )
+        const char* szPtr = (*iter)->GetNick();
+        if (szPtr)
         {
-            if ( bCaseSensitive && strcmp ( szNick, szPtr ) == 0 || !bCaseSensitive && stricmp ( szNick, szPtr ) == 0 )
+            if (bCaseSensitive && strcmp(szNick, szPtr) == 0 || !bCaseSensitive && stricmp(szNick, szPtr) == 0)
             {
                 return *iter;
             }
@@ -143,17 +136,17 @@ CClientPlayer* CClientPlayerManager::Get ( const char* szNick, bool bCaseSensiti
     return NULL;
 }
 
-
-CClientPlayer* CClientPlayerManager::Get ( CPlayerPed* pPlayer, bool bValidatePointer )
+CClientPlayer* CClientPlayerManager::Get(CPlayerPed* pPlayer, bool bValidatePointer)
 {
-    if ( !pPlayer ) return NULL;
+    if (!pPlayer)
+        return NULL;
 
-    if ( bValidatePointer )
+    if (bValidatePointer)
     {
-        vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
-        for ( ; iter != m_Players.end () ; iter++ )
+        vector<CClientPlayer*>::const_iterator iter = m_Players.begin();
+        for (; iter != m_Players.end(); iter++)
         {
-            if ( (*iter)->GetGamePlayer () == pPlayer )
+            if ((*iter)->GetGamePlayer() == pPlayer)
             {
                 return *iter;
             }
@@ -161,71 +154,53 @@ CClientPlayer* CClientPlayerManager::Get ( CPlayerPed* pPlayer, bool bValidatePo
     }
     else
     {
-        CClientPed* pPed = reinterpret_cast < CClientPed* > ( pPlayer->GetStoredPointer () );
-        if ( pPed->GetType () == CCLIENTPLAYER )
+        CClientPed* pPed = reinterpret_cast<CClientPed*>(pPlayer->GetStoredPointer());
+        if (pPed->GetType() == CCLIENTPLAYER)
         {
-            return static_cast < CClientPlayer * > ( pPed );
+            return static_cast<CClientPlayer*>(pPed);
         }
     }
 
     return NULL;
 }
 
-
-bool CClientPlayerManager::Exists ( CClientPlayer* pPlayer )
+bool CClientPlayerManager::Exists(CClientPlayer* pPlayer)
 {
-    return m_Players.Contains ( pPlayer );
+    return m_Players.Contains(pPlayer);
 }
 
-
-bool CClientPlayerManager::IsPlayerLimitReached ( void )
+bool CClientPlayerManager::IsPlayerLimitReached(void)
 {
-    return g_pGame->GetPools ()->GetPedCount () >= 110;
+    return g_pGame->GetPools()->GetPedCount() >= 110;
 
     return true;
 }
 
-
 bool CClientPlayerManager::IsValidModel(unsigned long ulModel)
 {
-    return (ulModel == 0 ||
-        ulModel == 1 ||
-        ulModel == 2 ||
-        ulModel == 7 ||
-        ulModel >= 9 &&
-        ulModel != 208 &&
-        ulModel != 149 &&
-        ulModel != 119 &&
-        ulModel != 86 &&
-        ulModel != 74 &&
-        ulModel != 65 &&
-        ulModel != 42 &&
-        ulModel <= 272 ||
-        ulModel >= 274 &&
-        ulModel <= 288 ||
-        ulModel >= 290 &&
-        ulModel <= 312);
+    return (ulModel == 0 || ulModel == 1 || ulModel == 2 || ulModel == 7 ||
+            ulModel >= 9 && ulModel != 208 && ulModel != 149 && ulModel != 119 && ulModel != 86 && ulModel != 74 && ulModel != 65 && ulModel != 42 &&
+                ulModel <= 272 ||
+            ulModel >= 274 && ulModel <= 288 || ulModel >= 290 && ulModel <= 312);
 }
 
-
-void CClientPlayerManager::ResetAll ( void )
+void CClientPlayerManager::ResetAll(void)
 {
-    vector < CClientPlayer* > ::const_iterator iter = m_Players.begin ();
-    for ( ; iter != m_Players.end (); iter++ )
+    vector<CClientPlayer*>::const_iterator iter = m_Players.begin();
+    for (; iter != m_Players.end(); iter++)
     {
-        CClientPlayer * pPlayer = *iter;
-        if ( pPlayer )
+        CClientPlayer* pPlayer = *iter;
+        if (pPlayer)
         {
-            pPlayer->Reset ();
+            pPlayer->Reset();
         }
     }
 }
 
-
-void CClientPlayerManager::RemoveFromList ( CClientPlayer* pPlayer )
+void CClientPlayerManager::RemoveFromList(CClientPlayer* pPlayer)
 {
-    if ( m_bCanRemoveFromList )
+    if (m_bCanRemoveFromList)
     {
-        m_Players.remove ( pPlayer );
+        m_Players.remove(pPlayer);
     }
 }

@@ -1,20 +1,20 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        multiplayer_sa/CMultiplayerSA_VehicleLights.cpp
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        multiplayer_sa/CMultiplayerSA_VehicleLights.cpp
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
 namespace
 {
     // Used to save state between CVehicle_DoTailLightEffect_Mid and CVehicle_DoTailLightEffect_Mid2
-    uint    bCameraFacingCorona = false;
-}
+    uint bCameraFacingCorona = false;
+}            // namespace
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -28,7 +28,7 @@ namespace
 #define HOOKPOS_CVehicle_DoTailLightEffect_Mid          0x006E18E5
 #define HOOKSIZE_CVehicle_DoTailLightEffect_Mid         6
 #define HOOKCHECK_CVehicle_DoTailLightEffect_Mid        0x0F
-DWORD RETURN_CVehicle_DoTailLightEffect_Mid =           0x006E18EB;
+DWORD RETURN_CVehicle_DoTailLightEffect_Mid = 0x006E18EB;
 void _declspec(naked) HOOK_CVehicle_DoTailLightEffect_Mid()
 {
     _asm
@@ -44,7 +44,6 @@ behind_corona:
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CVehicle::DoTailLightEffect hook 2
@@ -56,8 +55,8 @@ behind_corona:
 #define HOOKPOS_CVehicle_DoTailLightEffect_Mid2         0x006E19E6
 #define HOOKSIZE_CVehicle_DoTailLightEffect_Mid2        10
 #define HOOKCHECK_CVehicle_DoTailLightEffect_Mid2       0x8B
-DWORD RETURN_CVehicle_DoTailLightEffect_Mid2           = 0x006E19F0;
-DWORD RETURN_CVehicle_DoTailLightEffect_Mid2_NoCorona  = 0x006E1A32;
+DWORD RETURN_CVehicle_DoTailLightEffect_Mid2 = 0x006E19F0;
+DWORD RETURN_CVehicle_DoTailLightEffect_Mid2_NoCorona = 0x006E1A32;
 void _declspec(naked) HOOK_CVehicle_DoTailLightEffect_Mid2()
 {
     _asm
@@ -81,7 +80,6 @@ no_corona:
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CMultiplayerSA::InitHooks_VehicleDamage
@@ -89,8 +87,8 @@ no_corona:
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_VehicleLights( void )
+void CMultiplayerSA::InitHooks_VehicleLights(void)
 {
-   EZHookInstallChecked( CVehicle_DoTailLightEffect_Mid );
-   EZHookInstallChecked( CVehicle_DoTailLightEffect_Mid2 );
+    EZHookInstallChecked(CVehicle_DoTailLightEffect_Mid);
+    EZHookInstallChecked(CVehicle_DoTailLightEffect_Mid2);
 }

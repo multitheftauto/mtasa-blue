@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/game/CControllerConfigManager.h
-*  PURPOSE:     Controller configuration manager interface
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/game/CControllerConfigManager.h
+ *  PURPOSE:     Controller configuration manager interface
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CGAME_CONTROLLER_CONFIG_MANAGER
 #define __CGAME_CONTROLLER_CONFIG_MANAGER
@@ -133,7 +133,7 @@ FROM VC:
 #define JOY_STICK               3
 */
 
-enum eControllerType 
+enum eControllerType
 {
     KEYBOARD = 0,
     OPTIONAL_EXTRA,
@@ -144,7 +144,7 @@ enum eControllerType
 enum eControllerAction
 {
     FIRE = 0,
-    
+
     NEXT_WEAPON = 2,
     PREVIOUS_WEAPON,
     FORWARDS,
@@ -175,7 +175,7 @@ enum eControllerAction
     HORN,
     SUB_MISSION,
     HANDBRAKE,
-    
+
     VEHICLE_LOOK_LEFT = 0x22,
     VEHICLE_LOOK_RIGHT,
     VEHICLE_LOOK_BEHIND,
@@ -196,16 +196,16 @@ enum eControllerAction
 class CControllerConfigManager
 {
 public:
-    virtual void                SetControllerKeyAssociatedWithAction ( eControllerAction action, int iKey, eControllerType controllerType )=0;
-    virtual int                 GetControllerKeyAssociatedWithAction ( eControllerAction action, eControllerType controllerType )=0;
-    virtual void                SetClassicControls ( bool bClassicControls ) = 0;
-    virtual void                SetMouseInverted ( bool bInverted ) = 0;
-    virtual void                SetFlyWithMouse ( bool bFlyWithMouse ) = 0;
-    virtual void                SetSteerWithMouse ( bool bSteerWithMouse ) = 0;
-    virtual void                SuspendSteerAndFlyWithMouse ( bool bSuspend ) = 0;
-    virtual float               GetVerticalAimSensitivity         ( void ) = 0;
-    virtual void                SetVerticalAimSensitivity         ( float fSensitivity ) = 0;
-    virtual float               GetVerticalAimSensitivityRawValue ( void ) = 0;
-    virtual void                SetVerticalAimSensitivityRawValue ( float fRawValue ) = 0;
+    virtual void  SetControllerKeyAssociatedWithAction(eControllerAction action, int iKey, eControllerType controllerType) = 0;
+    virtual int   GetControllerKeyAssociatedWithAction(eControllerAction action, eControllerType controllerType) = 0;
+    virtual void  SetClassicControls(bool bClassicControls) = 0;
+    virtual void  SetMouseInverted(bool bInverted) = 0;
+    virtual void  SetFlyWithMouse(bool bFlyWithMouse) = 0;
+    virtual void  SetSteerWithMouse(bool bSteerWithMouse) = 0;
+    virtual void  SuspendSteerAndFlyWithMouse(bool bSuspend) = 0;
+    virtual float GetVerticalAimSensitivity(void) = 0;
+    virtual void  SetVerticalAimSensitivity(float fSensitivity) = 0;
+    virtual float GetVerticalAimSensitivityRawValue(void) = 0;
+    virtual void  SetVerticalAimSensitivityRawValue(float fRawValue) = 0;
 };
 #endif

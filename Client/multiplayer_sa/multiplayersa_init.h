@@ -1,15 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        multiplayer_sa/multiplayersa_init.h
-*  PURPOSE:     Multiplayer module entry
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        multiplayer_sa/multiplayersa_init.h
+ *  PURPOSE:     Multiplayer module entry
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __MULTIPLAYERSA_INIT
 #define __MULTIPLAYERSA_INIT
@@ -27,7 +25,7 @@
 #include "CMultiplayerSA.h"
 
 extern CGame* pGameInterface;
-//extern CMultiplayerSA* pMultiplayer;
+// extern CMultiplayerSA* pMultiplayer;
 
 /** Buffer overrun trace - attach debugger and watch out for EXCEPTION_GUARD_PAGE (0x80000001) **/
 #ifdef IJSIFY
@@ -36,62 +34,62 @@ extern CGame* pGameInterface;
     #include <windows.h>
     #include <math.h>
 
-    inline void* __cdecl operator new ( size_t size )
+inline void* __cdecl operator new(size_t size)
+{
+    DWORD dwOld;
+    DWORD dwPageSpan = ceil(size / 4096.0f) * 4096;
+
+    DWORD dwPage = 0;
+    while (dwPage == NULL)
     {
-        DWORD dwOld;
-        DWORD dwPageSpan = ceil ( size / 4096.0f ) * 4096;
+        dwPage = (DWORD)VirtualAlloc(NULL, dwPageSpan + 4096, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    }
+    VirtualProtect((LPVOID)(dwPage + dwPageSpan), 1, PAGE_EXECUTE_READWRITE | PAGE_GUARD, &dwOld);
+    dwPage += (dwPageSpan - size);
 
-        DWORD dwPage = 0;
-        while ( dwPage == NULL ) {
-            dwPage = (DWORD)VirtualAlloc ( NULL, dwPageSpan + 4096, MEM_COMMIT, PAGE_EXECUTE_READWRITE );
-        }
-        VirtualProtect ( (LPVOID)(dwPage + dwPageSpan), 1, PAGE_EXECUTE_READWRITE | PAGE_GUARD, &dwOld );
-        dwPage += ( dwPageSpan - size );
+    return (LPVOID)dwPage;
+};
 
-        return (LPVOID)dwPage;
-    };
+inline void* __cdecl operator new[](size_t size)
+{
+    DWORD dwOld;
+    DWORD dwPageSpan = ceil(size / 4096.0f) * 4096;
 
-    inline void* __cdecl operator new [] ( size_t size )
+    DWORD dwPage = 0;
+    while (dwPage == NULL)
     {
-        DWORD dwOld;
-        DWORD dwPageSpan = ceil ( size / 4096.0f ) * 4096;
+        dwPage = (DWORD)VirtualAlloc(NULL, dwPageSpan + 4096, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    }
+    VirtualProtect((LPVOID)(dwPage + dwPageSpan), 1, PAGE_EXECUTE_READWRITE | PAGE_GUARD, &dwOld);
+    dwPage += (dwPageSpan - size);
 
-        DWORD dwPage = 0;
-        while ( dwPage == NULL ) {
-            dwPage = (DWORD)VirtualAlloc ( NULL, dwPageSpan + 4096, MEM_COMMIT, PAGE_EXECUTE_READWRITE );
-        }
-        VirtualProtect ( (LPVOID)(dwPage + dwPageSpan), 1, PAGE_EXECUTE_READWRITE | PAGE_GUARD, &dwOld );
-        dwPage += ( dwPageSpan - size );
+    return (LPVOID)dwPage;
+};
 
-        return (LPVOID)dwPage;
-    };
+inline void __cdecl operator delete(LPVOID pPointer)
+{
+    VirtualFree(pPointer, NULL, MEM_RELEASE);
+};
 
-    inline void __cdecl operator delete ( LPVOID pPointer )
-    {
-        VirtualFree ( pPointer, NULL, MEM_RELEASE );
-    };
-
-    inline void __cdecl operator delete [] ( LPVOID pPointer )
-    {
-        VirtualFree ( pPointer, NULL, MEM_RELEASE );
-    };
+inline void __cdecl operator delete[](LPVOID pPointer)
+{
+    VirtualFree(pPointer, NULL, MEM_RELEASE);
+};
 #endif
-
 
 //
 // Use MemSet/Cpy/Put for non Mem*Fast memory regions
 //
 
-void MemSet ( void* dwDest, int cValue, uint uiAmount );
-void MemCpy ( void* dwDest, const void* dwSrc, uint uiAmount );
+void MemSet(void* dwDest, int cValue, uint uiAmount);
+void MemCpy(void* dwDest, const void* dwSrc, uint uiAmount);
 
-template < class T, class U >
-void MemPut ( U ptr, const T value )
+template <class T, class U>
+void MemPut(U ptr, const T value)
 {
-    if ( *(T*)ptr != value )
-        MemCpy ( (void*)ptr, &value, sizeof ( T ) );
+    if (*(T*)ptr != value)
+        MemCpy((void*)ptr, &value, sizeof(T));
 }
-
 
 //
 // Use Mem*Fast for the following memory regions:
@@ -115,37 +113,35 @@ void MemPut ( U ptr, const T value )
 // 0x742B00 - 0x742BFF
 //
 
-inline
-void MemCpyFast ( void* dwDest, const void* dwSrc, uint uiAmount )
+inline void MemCpyFast(void* dwDest, const void* dwSrc, uint uiAmount)
 {
-    DEBUG_CHECK_IS_FAST_MEM( dwDest, uiAmount );
-    memcpy ( dwDest, dwSrc, uiAmount );
+    DEBUG_CHECK_IS_FAST_MEM(dwDest, uiAmount);
+    memcpy(dwDest, dwSrc, uiAmount);
 }
 
-inline
-void MemSetFast ( void* dwDest, int cValue, uint uiAmount )
+inline void MemSetFast(void* dwDest, int cValue, uint uiAmount)
 {
-    DEBUG_CHECK_IS_FAST_MEM( dwDest, uiAmount );
-    memset ( dwDest, cValue, uiAmount );
+    DEBUG_CHECK_IS_FAST_MEM(dwDest, uiAmount);
+    memset(dwDest, cValue, uiAmount);
 }
 
-template < class T, class U >
-void MemPutFast ( U ptr, const T value )
+template <class T, class U>
+void MemPutFast(U ptr, const T value)
 {
-    DEBUG_CHECK_IS_FAST_MEM( ptr, sizeof( T ) );
+    DEBUG_CHECK_IS_FAST_MEM(ptr, sizeof(T));
     *(T*)ptr = value;
 }
 
-template < class T, class U >
-void MemSubFast ( U ptr, const T value )
+template <class T, class U>
+void MemSubFast(U ptr, const T value)
 {
-    DEBUG_CHECK_IS_FAST_MEM( ptr, sizeof( T ) );
+    DEBUG_CHECK_IS_FAST_MEM(ptr, sizeof(T));
     *(T*)ptr -= value;
 }
 
-bool GetDebugIdEnabled ( uint uiDebugId );
-void LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId = 0 );
-void CallGameEntityRenderHandler( CEntitySAInterface* pEntity );
+bool                            GetDebugIdEnabled(uint uiDebugId);
+void                            LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId = 0);
+void                            CallGameEntityRenderHandler(CEntitySAInterface* pEntity);
 extern GameEntityRenderHandler* pGameEntityRenderHandler;
 
 #endif

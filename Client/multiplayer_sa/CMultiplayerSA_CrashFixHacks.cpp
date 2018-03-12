@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp
-*  PORPOISE:    Home for the poke'n'hope crash fixes
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp
+ *  PORPOISE:    Home for the poke'n'hope crash fixes
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 #include "../game_sa/CTasksSA.h"
@@ -17,10 +17,10 @@ void CPlayerPed__ProcessControl_Abort();
 //
 // Support for crash stats
 //
-void OnCrashAverted ( uint uiId );
-void OnEnterCrashZone ( uint uiId );
+void OnCrashAverted(uint uiId);
+void OnEnterCrashZone(uint uiId);
 
-void _declspec(naked) CrashAverted ()
+void _declspec(naked) CrashAverted()
 {
     _asm
     {
@@ -35,12 +35,11 @@ void _declspec(naked) CrashAverted ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc1                              0x5D9A6E
 #define HOOKSIZE_CrashFix_Misc1                             6
-DWORD RETURN_CrashFix_Misc1 =                               0x5D9A74;
-void _declspec(naked) HOOK_CrashFix_Misc1 ()
+DWORD RETURN_CrashFix_Misc1 = 0x5D9A74;
+void _declspec(naked) HOOK_CrashFix_Misc1()
 {
     _asm
     {
@@ -60,13 +59,12 @@ void _declspec(naked) HOOK_CrashFix_Misc1 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc2                              0x6B18B0
 #define HOOKSIZE_CrashFix_Misc2                             9
-DWORD RETURN_CrashFix_Misc2 =                               0x6B18B9;
-DWORD RETURN_CrashFix_Misc2B =                              0x6B3775;
-void _declspec(naked) HOOK_CrashFix_Misc2 ()
+DWORD RETURN_CrashFix_Misc2 = 0x6B18B9;
+DWORD RETURN_CrashFix_Misc2B = 0x6B3775;
+void _declspec(naked) HOOK_CrashFix_Misc2()
 {
     _asm
     {
@@ -92,12 +90,11 @@ void _declspec(naked) HOOK_CrashFix_Misc2 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc3                              0x645FD9
 #define HOOKSIZE_CrashFix_Misc3                             6
-DWORD RETURN_CrashFix_Misc3 =                               0x645FDF;
-void _declspec(naked) HOOK_CrashFix_Misc3 ()
+DWORD RETURN_CrashFix_Misc3 = 0x645FDF;
+void _declspec(naked) HOOK_CrashFix_Misc3()
 {
     _asm
     {
@@ -113,13 +110,12 @@ void _declspec(naked) HOOK_CrashFix_Misc3 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc4                              0x4F02D2
 #define HOOKSIZE_CrashFix_Misc4                             5
-DWORD RETURN_CrashFix_Misc4 =                               0x4F02D7;
-DWORD RETURN_CrashFix_Misc4B =                              0x4F0B07;
-void _declspec(naked) HOOK_CrashFix_Misc4 ()
+DWORD RETURN_CrashFix_Misc4 = 0x4F02D7;
+DWORD RETURN_CrashFix_Misc4B = 0x4F0B07;
+void _declspec(naked) HOOK_CrashFix_Misc4()
 {
     _asm
     {
@@ -137,13 +133,12 @@ void _declspec(naked) HOOK_CrashFix_Misc4 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc5                              0x5DF949
 #define HOOKSIZE_CrashFix_Misc5                             7
-DWORD RETURN_CrashFix_Misc5 =                               0x5DF950;
-DWORD RETURN_CrashFix_Misc5B =                              0x5DFCC4;
-void _declspec(naked) HOOK_CrashFix_Misc5 ()
+DWORD RETURN_CrashFix_Misc5 = 0x5DF950;
+DWORD RETURN_CrashFix_Misc5B = 0x5DFCC4;
+void _declspec(naked) HOOK_CrashFix_Misc5()
 {
     _asm
     {
@@ -162,14 +157,13 @@ void _declspec(naked) HOOK_CrashFix_Misc5 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // #5465 2/2
 #define HOOKPOS_CrashFix_Misc6                              0x4D1750
 #define HOOKSIZE_CrashFix_Misc6                             5
-DWORD RETURN_CrashFix_Misc6 =                               0x4D1755;
-DWORD RETURN_CrashFix_Misc6B =                              0x4D1A44;
-void _declspec(naked) HOOK_CrashFix_Misc6 ()
+DWORD RETURN_CrashFix_Misc6 = 0x4D1755;
+DWORD RETURN_CrashFix_Misc6B = 0x4D1A44;
+void _declspec(naked) HOOK_CrashFix_Misc6()
 {
     _asm
     {
@@ -186,14 +180,13 @@ void _declspec(naked) HOOK_CrashFix_Misc6 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // #5466
 #define HOOKPOS_CrashFix_Misc7                              0x417BF8
 #define HOOKSIZE_CrashFix_Misc7                             5
-DWORD RETURN_CrashFix_Misc7 =                               0x417BFD;
-DWORD RETURN_CrashFix_Misc7B =                              0x417BFF;
-void _declspec(naked) HOOK_CrashFix_Misc7 ()
+DWORD RETURN_CrashFix_Misc7 = 0x417BFD;
+DWORD RETURN_CrashFix_Misc7B = 0x417BFF;
+void _declspec(naked) HOOK_CrashFix_Misc7()
 {
     _asm
     {
@@ -210,14 +203,13 @@ void _declspec(naked) HOOK_CrashFix_Misc7 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // #5468  1/3
 #define HOOKPOS_CrashFix_Misc8                              0x73485D
 #define HOOKSIZE_CrashFix_Misc8                             5
-DWORD RETURN_CrashFix_Misc8 =                               0x734862;
-DWORD RETURN_CrashFix_Misc8B =                              0x734871;
-void _declspec(naked) HOOK_CrashFix_Misc8 ()
+DWORD RETURN_CrashFix_Misc8 = 0x734862;
+DWORD RETURN_CrashFix_Misc8B = 0x734871;
+void _declspec(naked) HOOK_CrashFix_Misc8()
 {
     _asm
     {
@@ -234,14 +226,13 @@ void _declspec(naked) HOOK_CrashFix_Misc8 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // #5468  2/3
 #define HOOKPOS_CrashFix_Misc9                              0x738B64
 #define HOOKSIZE_CrashFix_Misc9                             6
-DWORD RETURN_CrashFix_Misc9 =                               0x738B6A;
-DWORD RETURN_CrashFix_Misc9B =                              0x73983A;
-void _declspec(naked) HOOK_CrashFix_Misc9 ()
+DWORD RETURN_CrashFix_Misc9 = 0x738B6A;
+DWORD RETURN_CrashFix_Misc9B = 0x73983A;
+void _declspec(naked) HOOK_CrashFix_Misc9()
 {
     _asm
     {
@@ -258,14 +249,13 @@ void _declspec(naked) HOOK_CrashFix_Misc9 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // #5468  3/3
 #define HOOKPOS_CrashFix_Misc10                             0x5334FE
 #define HOOKSIZE_CrashFix_Misc10                            6
-DWORD RETURN_CrashFix_Misc10 =                              0x533504;
-DWORD RETURN_CrashFix_Misc10B =                             0x533539;
-void _declspec(naked) HOOK_CrashFix_Misc10 ()
+DWORD RETURN_CrashFix_Misc10 = 0x533504;
+DWORD RETURN_CrashFix_Misc10B = 0x533539;
+void _declspec(naked) HOOK_CrashFix_Misc10()
 {
     _asm
     {
@@ -286,14 +276,13 @@ void _declspec(naked) HOOK_CrashFix_Misc10 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // #5576
 #define HOOKPOS_CrashFix_Misc11                             0x4D2C62
 #define HOOKSIZE_CrashFix_Misc11                            5
-DWORD RETURN_CrashFix_Misc11 =                              0x4D2C67;
-DWORD RETURN_CrashFix_Misc11B =                             0x4D2E03;
-void _declspec(naked) HOOK_CrashFix_Misc11 ()
+DWORD RETURN_CrashFix_Misc11 = 0x4D2C67;
+DWORD RETURN_CrashFix_Misc11B = 0x4D2E03;
+void _declspec(naked) HOOK_CrashFix_Misc11()
 {
     _asm
     {
@@ -310,14 +299,13 @@ void _declspec(naked) HOOK_CrashFix_Misc11 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // #5530
 #define HOOKPOS_CrashFix_Misc12                             0x4D41C5
 #define HOOKSIZE_CrashFix_Misc12                            5
-DWORD RETURN_CrashFix_Misc12 =                              0x4D41CA;
-DWORD RETURN_CrashFix_Misc12B =                             0x4D4222;
-void _declspec(naked) HOOK_CrashFix_Misc12 ()
+DWORD RETURN_CrashFix_Misc12 = 0x4D41CA;
+DWORD RETURN_CrashFix_Misc12B = 0x4D4222;
+void _declspec(naked) HOOK_CrashFix_Misc12()
 {
     _asm
     {
@@ -334,13 +322,12 @@ void _declspec(naked) HOOK_CrashFix_Misc12 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc13                             0x4D464E
 #define HOOKSIZE_CrashFix_Misc13                            6
-DWORD RETURN_CrashFix_Misc13 =                              0x4D4654;
-DWORD RETURN_CrashFix_Misc13B =                             0x4D4764;
-void _declspec(naked) HOOK_CrashFix_Misc13 ()
+DWORD RETURN_CrashFix_Misc13 = 0x4D4654;
+DWORD RETURN_CrashFix_Misc13B = 0x4D4764;
+void _declspec(naked) HOOK_CrashFix_Misc13()
 {
     _asm
     {
@@ -357,12 +344,11 @@ void _declspec(naked) HOOK_CrashFix_Misc13 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc14                             0x4DD4B5
 #define HOOKSIZE_CrashFix_Misc14                            6
-DWORD RETURN_CrashFix_Misc14 =                              0x4DD4BB;
-void _declspec(naked) HOOK_CrashFix_Misc14 ()
+DWORD RETURN_CrashFix_Misc14 = 0x4DD4BB;
+void _declspec(naked) HOOK_CrashFix_Misc14()
 {
     _asm
     {
@@ -380,15 +366,14 @@ void _declspec(naked) HOOK_CrashFix_Misc14 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-void _cdecl DoWait ( HANDLE hHandle )
+void _cdecl DoWait(HANDLE hHandle)
 {
     DWORD dwWait = 4000;
-    DWORD dwResult = WaitForSingleObject ( hHandle, dwWait );
-    if ( dwResult == WAIT_TIMEOUT )
+    DWORD dwResult = WaitForSingleObject(hHandle, dwWait);
+    if (dwResult == WAIT_TIMEOUT)
     {
-        AddReportLog ( 6211, SString ( "WaitForSingleObject timed out with %08x and %dms", hHandle, dwWait ) );
+        AddReportLog(6211, SString("WaitForSingleObject timed out with %08x and %dms", hHandle, dwWait));
         // This thread lock bug in GTA will have to be fixed one day.
         // Until then, a 5 second freeze should be long enough for the loading thread to have finished it's job.
 #if 0
@@ -400,7 +385,7 @@ void _cdecl DoWait ( HANDLE hHandle )
             ")
          , _CRT_WIDE(__FILE__), __LINE__);
 #endif
-        dwResult = WaitForSingleObject ( hHandle, 1000 );
+        dwResult = WaitForSingleObject(hHandle, 1000);
     }
 }
 
@@ -409,10 +394,10 @@ void _cdecl DoWait ( HANDLE hHandle )
 #define HOOKSIZE_FreezeFix_Misc15_US                        6
 #define HOOKPOS_FreezeFix_Misc15_EU                         0x156CDEE
 #define HOOKSIZE_FreezeFix_Misc15_EU                        6
-DWORD RETURN_FreezeFix_Misc15_US =                          0x156CDB4;
-DWORD RETURN_FreezeFix_Misc15_EU =                          0x156CDF4;
-DWORD RETURN_FreezeFix_Misc15_BOTH =                        0;
-void _declspec(naked) HOOK_FreezeFix_Misc15 ()
+DWORD RETURN_FreezeFix_Misc15_US = 0x156CDB4;
+DWORD RETURN_FreezeFix_Misc15_EU = 0x156CDF4;
+DWORD RETURN_FreezeFix_Misc15_BOTH = 0;
+void _declspec(naked) HOOK_FreezeFix_Misc15()
 {
     _asm
     {
@@ -429,13 +414,12 @@ void _declspec(naked) HOOK_FreezeFix_Misc15 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // Handle RpAnimBlendClumpGetFirstAssociation returning NULL
 #define HOOKPOS_CrashFix_Misc16                             0x5E5815
 #define HOOKSIZE_CrashFix_Misc16                            6
-DWORD RETURN_CrashFix_Misc16 =                              0x5E581B;
-void _declspec(naked) HOOK_CrashFix_Misc16 ()
+DWORD RETURN_CrashFix_Misc16 = 0x5E581B;
+void _declspec(naked) HOOK_CrashFix_Misc16()
 {
     _asm
     {
@@ -455,20 +439,19 @@ void _declspec(naked) HOOK_CrashFix_Misc16 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // Handle RwFrameSetStaticPluginsSize having NULL member at 0x90
 #define HOOKPOS_CrashFix_Misc17_US                          0x7F120E
 #define HOOKSIZE_CrashFix_Misc17_US                         6
 #define HOOKPOS_CrashFix_Misc17_EU                          0x7F124E
 #define HOOKSIZE_CrashFix_Misc17_EU                         6
-DWORD RETURN_CrashFix_Misc17_US =                           0x7F1214;
-DWORD RETURN_CrashFix_Misc17_EU =                           0x7F1254;
-DWORD RETURN_CrashFix_Misc17_BOTH =                         0;
-DWORD RETURN_CrashFix_Misc17B_US =                          0x7F1236;
-DWORD RETURN_CrashFix_Misc17B_EU =                          0x7F1276;
-DWORD RETURN_CrashFix_Misc17B_BOTH =                        0;
-void _declspec(naked) HOOK_CrashFix_Misc17 ()
+DWORD RETURN_CrashFix_Misc17_US = 0x7F1214;
+DWORD RETURN_CrashFix_Misc17_EU = 0x7F1254;
+DWORD RETURN_CrashFix_Misc17_BOTH = 0;
+DWORD RETURN_CrashFix_Misc17B_US = 0x7F1236;
+DWORD RETURN_CrashFix_Misc17B_EU = 0x7F1276;
+DWORD RETURN_CrashFix_Misc17B_BOTH = 0;
+void _declspec(naked) HOOK_CrashFix_Misc17()
 {
     _asm
     {
@@ -486,13 +469,12 @@ void _declspec(naked) HOOK_CrashFix_Misc17 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // Handle GetWheelPosition having wrong data
 #define HOOKPOS_CrashFix_Misc18                             0x4C7DAD
 #define HOOKSIZE_CrashFix_Misc18                            7
-DWORD RETURN_CrashFix_Misc18 =                              0x4C7DB4;
-void _declspec(naked) HOOK_CrashFix_Misc18 ()
+DWORD RETURN_CrashFix_Misc18 = 0x4C7DB4;
+void _declspec(naked) HOOK_CrashFix_Misc18()
 {
     _asm
     {
@@ -518,21 +500,19 @@ void _declspec(naked) HOOK_CrashFix_Misc18 ()
     }
 }
 
-
-
 ////////////////////////////////////////////////////////////////////////
 // Handle RwFrameCloneHierarchy having wrong data
 #define HOOKPOS_CrashFix_Misc19_US                          0x7F0BF7
 #define HOOKSIZE_CrashFix_Misc19_US                         6
 #define HOOKPOS_CrashFix_Misc19_EU                          0x7F0C37
 #define HOOKSIZE_CrashFix_Misc19_EU                         6
-DWORD RETURN_CrashFix_Misc19_US =                           0x7F0BFD;
-DWORD RETURN_CrashFix_Misc19_EU =                           0x7F0C3D;
-DWORD RETURN_CrashFix_Misc19_BOTH =                         0;
-DWORD RETURN_CrashFix_Misc19B_US =                          0x7F0C20;
-DWORD RETURN_CrashFix_Misc19B_EU =                          0x7F0C60;
-DWORD RETURN_CrashFix_Misc19B_BOTH =                        0;
-void _declspec(naked) HOOK_CrashFix_Misc19 ()
+DWORD RETURN_CrashFix_Misc19_US = 0x7F0BFD;
+DWORD RETURN_CrashFix_Misc19_EU = 0x7F0C3D;
+DWORD RETURN_CrashFix_Misc19_BOTH = 0;
+DWORD RETURN_CrashFix_Misc19B_US = 0x7F0C20;
+DWORD RETURN_CrashFix_Misc19B_EU = 0x7F0C60;
+DWORD RETURN_CrashFix_Misc19B_BOTH = 0;
+void _declspec(naked) HOOK_CrashFix_Misc19()
 {
     _asm
     {
@@ -556,8 +536,8 @@ void _declspec(naked) HOOK_CrashFix_Misc19 ()
 // Handle CPlaceable::RemoveMatrix having wrong data
 #define HOOKPOS_CrashFix_Misc20                             0x54F3B0
 #define HOOKSIZE_CrashFix_Misc20                            6
-DWORD RETURN_CrashFix_Misc20 =                              0x54F3B6;
-void _declspec(naked) HOOK_CrashFix_Misc20 ()
+DWORD RETURN_CrashFix_Misc20 = 0x54F3B6;
+void _declspec(naked) HOOK_CrashFix_Misc20()
 {
     _asm
     {
@@ -576,28 +556,27 @@ void _declspec(naked) HOOK_CrashFix_Misc20 ()
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Handle CTaskSimpleCarFallOut::FinishAnimFallOutCB having wrong data
 //
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-bool IsTaskSimpleCarFallOutValid( CAnimBlendAssociationSAInterface* pAnimBlendAssociation, CTaskSimpleCarFallOutSAInterface* pTask )
+bool IsTaskSimpleCarFallOutValid(CAnimBlendAssociationSAInterface* pAnimBlendAssociation, CTaskSimpleCarFallOutSAInterface* pTask)
 {
-    if ( pTask->VTBL != (TaskVTBL*)VTBL_CTaskSimpleCarFallOut )
+    if (pTask->VTBL != (TaskVTBL*)VTBL_CTaskSimpleCarFallOut)
     {
-        AddReportLog( 8530, SString( "IsTaskSimpleCarFallOutValid fail - pTask->VTBL: %08x", pTask->VTBL ), 5 );
+        AddReportLog(8530, SString("IsTaskSimpleCarFallOutValid fail - pTask->VTBL: %08x", pTask->VTBL), 5);
         return false;
     }
 
-    if ( pTask->pVehicle )
+    if (pTask->pVehicle)
     {
-        CVehicle* pVehicle = pGameInterface->GetPools ()->GetVehicle ( (DWORD*) pTask->pVehicle );
-        if ( !pVehicle )
+        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pTask->pVehicle);
+        if (!pVehicle)
         {
             // Task looks valid, but vehicle is not recognised by MTA
-            AddReportLog( 8531, SString( "IsTaskSimpleCarFallOutValid invalid vehicle ptr - pTask->pVehicle: %08x", pTask->pVehicle ), 5 );
+            AddReportLog(8531, SString("IsTaskSimpleCarFallOutValid invalid vehicle ptr - pTask->pVehicle: %08x", pTask->pVehicle), 5);
             pTask->pVehicle = NULL;
             return true;
         }
@@ -608,8 +587,8 @@ bool IsTaskSimpleCarFallOutValid( CAnimBlendAssociationSAInterface* pAnimBlendAs
 
 #define HOOKPOS_CrashFix_Misc21                             0x648EE0
 #define HOOKSIZE_CrashFix_Misc21                            7
-DWORD RETURN_CrashFix_Misc21 =                              0x648EE7;
-void _declspec(naked) HOOK_CrashFix_Misc21 ()
+DWORD RETURN_CrashFix_Misc21 = 0x648EE7;
+void _declspec(naked) HOOK_CrashFix_Misc21()
 {
     _asm
     {
@@ -634,13 +613,12 @@ void _declspec(naked) HOOK_CrashFix_Misc21 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // Handle CAnimBlendAssociation::Init having wrong data
 #define HOOKPOS_CrashFix_Misc22                             0x4CEF08
 #define HOOKSIZE_CrashFix_Misc22                            6
-DWORD RETURN_CrashFix_Misc22 =                              0x4CEF25;
-void _declspec(naked) HOOK_CrashFix_Misc22 ()
+DWORD RETURN_CrashFix_Misc22 = 0x4CEF25;
+void _declspec(naked) HOOK_CrashFix_Misc22()
 {
     _asm
     {
@@ -681,13 +659,12 @@ void _declspec(naked) HOOK_CrashFix_Misc22 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // Handle CVehicleAnimGroup::ComputeAnimDoorOffsets having wrong door index
 #define HOOKPOS_CrashFix_Misc23                             0x6E3D10
 #define HOOKSIZE_CrashFix_Misc23                            7
-DWORD RETURN_CrashFix_Misc23 =                              0x6E3D17;
-void _declspec(naked) HOOK_CrashFix_Misc23 ()
+DWORD RETURN_CrashFix_Misc23 = 0x6E3D17;
+void _declspec(naked) HOOK_CrashFix_Misc23()
 {
     _asm
     {
@@ -710,17 +687,16 @@ void _declspec(naked) HOOK_CrashFix_Misc23 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // Handle _RwFrameForAllChildren being called with NULL
 #define HOOKPOS_CrashFix_Misc24_US                          0x7F0DC8
 #define HOOKSIZE_CrashFix_Misc24_US                         6
 #define HOOKPOS_CrashFix_Misc24_EU                          0x7F0E08
 #define HOOKSIZE_CrashFix_Misc24_EU                         6
-DWORD RETURN_CrashFix_Misc24_US =                           0x7F0DCE;
-DWORD RETURN_CrashFix_Misc24_EU =                           0x7F0E0E;
-DWORD RETURN_CrashFix_Misc24_BOTH =                         0;
-void _declspec(naked) HOOK_CrashFix_Misc24 ()
+DWORD RETURN_CrashFix_Misc24_US = 0x7F0DCE;
+DWORD RETURN_CrashFix_Misc24_EU = 0x7F0E0E;
+DWORD RETURN_CrashFix_Misc24_BOTH = 0;
+void _declspec(naked) HOOK_CrashFix_Misc24()
 {
     _asm
     {
@@ -740,13 +716,12 @@ void _declspec(naked) HOOK_CrashFix_Misc24 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // Handle CTaskSimpleCarOpenDoorFromOutside::FinishAnimCarOpenDoorFromOutsideCB having zero pointer to vehicle
 #define HOOKPOS_CrashFix_Misc25                             0x646026
 #define HOOKSIZE_CrashFix_Misc25                            5
-DWORD RETURN_CrashFix_Misc25 =                              0x64602B;
-void _declspec(naked) HOOK_CrashFix_Misc25 ()
+DWORD RETURN_CrashFix_Misc25 = 0x64602B;
+void _declspec(naked) HOOK_CrashFix_Misc25()
 {
     _asm
     {
@@ -770,13 +745,12 @@ void _declspec(naked) HOOK_CrashFix_Misc25 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // Handle CShotInfo::Update having invalid item
 #define HOOKPOS_CrashFix_Misc26                             0x739FA0
 #define HOOKSIZE_CrashFix_Misc26                            6
-DWORD RETURN_CrashFix_Misc26 =                              0x739FA6;
-void _declspec(naked) HOOK_CrashFix_Misc26 ()
+DWORD RETURN_CrashFix_Misc26 = 0x739FA6;
+void _declspec(naked) HOOK_CrashFix_Misc26()
 {
     _asm
     {
@@ -801,13 +775,12 @@ void _declspec(naked) HOOK_CrashFix_Misc26 ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // Handle CTaskComplexDieInCar::ControlSubTask ped with no vehicle
 #define HOOKPOS_CrashFix_Misc27                             0x6377FB
 #define HOOKSIZE_CrashFix_Misc27                            7
-DWORD RETURN_CrashFix_Misc27 =                              0x637802;
-void _declspec(naked) HOOK_CrashFix_Misc27 ()
+DWORD RETURN_CrashFix_Misc27 = 0x637802;
+void _declspec(naked) HOOK_CrashFix_Misc27()
 {
     _asm
     {
@@ -828,14 +801,13 @@ cont:
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // Handle CObject::ProcessGarageDoorBehaviour object with no dummy
 #define HOOKPOS_CrashFix_Misc28                             0x44A4FD
 #define HOOKSIZE_CrashFix_Misc28                            6
-DWORD RETURN_CrashFix_Misc28 =                              0x44A503;
-DWORD RETURN_CrashFix_Misc28B =                             0x44A650;
-void _declspec(naked) HOOK_CrashFix_Misc28 ()
+DWORD RETURN_CrashFix_Misc28 = 0x44A503;
+DWORD RETURN_CrashFix_Misc28B = 0x44A650;
+void _declspec(naked) HOOK_CrashFix_Misc28()
 {
     _asm
     {
@@ -857,14 +829,13 @@ cont:
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // Handle CAEPCBankLoader::IsSoundBankLoaded with invalid argument
 #define HOOKPOS_CrashFix_Misc29                             0x4E022C
 #define HOOKSIZE_CrashFix_Misc29                            5
-DWORD RETURN_CrashFix_Misc29 =                              0x4E0231;
-DWORD RETURN_CrashFix_Misc29B =                             0x4E0227;
-void _declspec(naked) HOOK_CrashFix_Misc29 ()
+DWORD RETURN_CrashFix_Misc29 = 0x4E0231;
+DWORD RETURN_CrashFix_Misc29B = 0x4E0227;
+void _declspec(naked) HOOK_CrashFix_Misc29()
 {
     _asm
     {
@@ -886,15 +857,14 @@ cont:
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 // Handle CAnimBlendAssociation::SetFinishCallback with invalid ecx
 #define HOOKPOS_CrashFix_Misc30                             0x4CEBE8
 #define HOOKSIZE_CrashFix_Misc30                            7
 #define HOOKCHECK_CrashFix_Misc30                           0xC7
-DWORD RETURN_CrashFix_Misc30 =                              0x4CEBEF;
-DWORD RETURN_CrashFix_Misc30B =                             0x4CEBF5;
-void _declspec(naked) HOOK_CrashFix_Misc30 ()
+DWORD RETURN_CrashFix_Misc30 = 0x4CEBEF;
+DWORD RETURN_CrashFix_Misc30B = 0x4CEBF5;
+void _declspec(naked) HOOK_CrashFix_Misc30()
 {
     _asm
     {
@@ -915,56 +885,53 @@ cont:
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CClumpModelInfo::GetFrameFromId
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post ( RwFrame* pFrameResult, DWORD _ebx, DWORD _esi, DWORD _edi, DWORD calledFrom, RpClump* pClump, int id )
+RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _ebx, DWORD _esi, DWORD _edi, DWORD calledFrom, RpClump* pClump, int id)
 {
-    if ( pFrameResult )
+    if (pFrameResult)
         return pFrameResult;
 
     // Don't check frame if call can legitimately return NULL
-    if ( calledFrom == 0x6D308F       // CVehicle::SetWindowOpenFlag
-        || calledFrom == 0x6D30BF     // CVehicle::ClearWindowOpenFlag
-        || calledFrom == 0x4C7DDE     // CVehicleModelInfo::GetOriginalCompPosition
-        || calledFrom == 0x4C96BD )   // CVehicleModelInfo::CreateInstance
+    if (calledFrom == 0x6D308F                // CVehicle::SetWindowOpenFlag
+        || calledFrom == 0x6D30BF             // CVehicle::ClearWindowOpenFlag
+        || calledFrom == 0x4C7DDE             // CVehicleModelInfo::GetOriginalCompPosition
+        || calledFrom == 0x4C96BD)            // CVehicleModelInfo::CreateInstance
         return NULL;
 
     // Ignore external calls
-    if ( calledFrom < 0x401000 || calledFrom > 0x801000 )
+    if (calledFrom < 0x401000 || calledFrom > 0x801000)
         return NULL;
 
     // Now we have a NULL frame which will cause a crash
     // (Probably due to a custom vehicle with missing frames)
 
     // See if we can get the model id for reporting
-    int iModelId = 0;
+    int   iModelId = 0;
     DWORD pVehicle = NULL;
 
-    if ( calledFrom == 0x6D3847 )       // CVehicle::AddReplacementUpgrade
+    if (calledFrom == 0x6D3847)            // CVehicle::AddReplacementUpgrade
         pVehicle = _ebx;
-    else
-    if ( calledFrom == 0x6DFA61         // CVehicle::AddUpgrade
-        || calledFrom == 0x6D3A62 )     // CVehicle::GetReplacementUpgrade
+    else if (calledFrom == 0x6DFA61                // CVehicle::AddUpgrade
+             || calledFrom == 0x6D3A62)            // CVehicle::GetReplacementUpgrade
         pVehicle = _edi;
-    else
-    if ( calledFrom == 0x06AC740        // CAutomobile::PreRender (Forklift)
-        || calledFrom == 0x6D39F3       // CVehicle::RemoveReplacementUpgrade
-        || calledFrom == 0x6D3A32 )     // CVehicle::RemoveReplacementUpgrade2
+    else if (calledFrom == 0x06AC740               // CAutomobile::PreRender (Forklift)
+             || calledFrom == 0x6D39F3             // CVehicle::RemoveReplacementUpgrade
+             || calledFrom == 0x6D3A32)            // CVehicle::RemoveReplacementUpgrade2
         pVehicle = _esi;
 
-    if ( pVehicle > 0x1000 )
+    if (pVehicle > 0x1000)
         iModelId = ((CVehicleSAInterface*)pVehicle)->m_nModelIndex;
 
-    // Need a valid frame to replace the missing one - Find nearest other id     
-    for ( uint i = 2 ; i < 40 ; i++ )
+    // Need a valid frame to replace the missing one - Find nearest other id
+    for (uint i = 2; i < 40; i++)
     {
         RwFrame* pNewFrameResult = NULL;
-        uint uiNewId = id + ( i / 2 ) * ( ( i & 1 ) ? -1 : 1 );
-        DWORD dwFunc = 0x4C53C0;    // CClumpModelInfo::GetFrameFromId
+        uint     uiNewId = id + (i / 2) * ((i & 1) ? -1 : 1);
+        DWORD    dwFunc = 0x4C53C0;            // CClumpModelInfo::GetFrameFromId
         _asm
         {
             push    uiNewId
@@ -974,19 +941,19 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post ( RwFrame* pFrameResult, DWORD
             mov     pNewFrameResult,eax
         }
 
-        if ( pNewFrameResult )
+        if (pNewFrameResult)
         {
-            SString strMsg ( "No frame for vehicle:%d  frameId:%d  (replaced with:%d  calledfrom:%08x)", iModelId, id, uiNewId, calledFrom );
-            AddReportLog ( 5412, SString ( "GetFrameFromId - %s", *strMsg ) );
-            LogEvent ( 5412, "Model frame warning", "GetFrameFromId", strMsg );
+            SString strMsg("No frame for vehicle:%d  frameId:%d  (replaced with:%d  calledfrom:%08x)", iModelId, id, uiNewId, calledFrom);
+            AddReportLog(5412, SString("GetFrameFromId - %s", *strMsg));
+            LogEvent(5412, "Model frame warning", "GetFrameFromId", strMsg);
             return pNewFrameResult;
         }
     }
 
     // Couldn't find a replacement frame id
-    SString strMsg ( "No frame for vehicle:%d  frameId:%d  (calledfrom:%08x)", iModelId, id, calledFrom );
-    AddReportLog ( 5413, SString ( "GetFrameFromId - %s", *strMsg ) );
-    LogEvent ( 5413, "Model frame error", "GetFrameFromId", strMsg );
+    SString strMsg("No frame for vehicle:%d  frameId:%d  (calledfrom:%08x)", iModelId, id, calledFrom);
+    AddReportLog(5413, SString("GetFrameFromId - %s", *strMsg));
+    LogEvent(5413, "Model frame error", "GetFrameFromId", strMsg);
 
     return NULL;
 }
@@ -994,8 +961,8 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post ( RwFrame* pFrameResult, DWORD
 // Hook info
 #define HOOKPOS_CClumpModelInfo_GetFrameFromId                      0x4C53C0
 #define HOOKSIZE_CClumpModelInfo_GetFrameFromId                     7
-DWORD RETURN_CClumpModelInfo_GetFrameFromId =                       0x4C53C7;
-void _declspec(naked) HOOK_CClumpModelInfo_GetFrameFromId ()
+DWORD RETURN_CClumpModelInfo_GetFrameFromId = 0x4C53C7;
+void _declspec(naked) HOOK_CClumpModelInfo_GetFrameFromId()
 {
     _asm
     {
@@ -1026,7 +993,6 @@ inner:
     }
 }
 
-
 struct CStreamingInfo
 {
     DWORD gta_hash;
@@ -1038,7 +1004,7 @@ struct CStreamingInfo
     DWORD reqload;
 };
 
-CStreamingInfo* GetStreamingInfoFromModelId( uint id )
+CStreamingInfo* GetStreamingInfoFromModelId(uint id)
 {
     CStreamingInfo* pItemInfo = (CStreamingInfo*)(0x8E4CC0);
     return pItemInfo + id;
@@ -1051,42 +1017,35 @@ CStreamingInfo* GetStreamingInfoFromModelId( uint id )
 // Check if crash will occur
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CEntity_GetBoundRect( CEntitySAInterface* pEntity )
+void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
 {
-    ushort usModelId = pEntity->m_nModelIndex;
+    ushort                     usModelId = pEntity->m_nModelIndex;
     CBaseModelInfoSAInterface* pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelId];
-    if ( !pModelInfo )
+    if (!pModelInfo)
     {
         // Crash will occur at offset 00134131
-        LogEvent( 814, "Model info missing", "CEntity_GetBoundRect", SString( "No info for model:%d", usModelId ), 5414 );
+        LogEvent(814, "Model info missing", "CEntity_GetBoundRect", SString("No info for model:%d", usModelId), 5414);
         CArgMap argMap;
-        argMap.Set( "id", usModelId );
-        argMap.Set( "reason", "info" );
-        SetApplicationSetting( "diagnostics", "gta-model-fail", argMap.ToString() );
+        argMap.Set("id", usModelId);
+        argMap.Set("reason", "info");
+        SetApplicationSetting("diagnostics", "gta-model-fail", argMap.ToString());
     }
     else
     {
         CColModelSAInterface* pColModel = pModelInfo->pColModel;
-        if ( !pColModel )
+        if (!pColModel)
         {
             // Crash will occur at offset 00134134
-            CStreamingInfo* pStreamingInfo = GetStreamingInfoFromModelId( usModelId );
-            SString strDetails( "refs:%d txd:%d RwObj:%08x bOwn:%d bColStr:%d flg:%d off:%d size:%d reqload:%d"
-                                ,pModelInfo->usNumberOfRefs
-                                ,pModelInfo->usTextureDictionary
-                                ,pModelInfo->pRwObject
-                                ,pModelInfo->bDoWeOwnTheColModel
-                                ,pModelInfo->bCollisionWasStreamedWithModel
-                                ,pStreamingInfo->flg
-                                ,pStreamingInfo->offsetInBlocks
-                                ,pStreamingInfo->sizeInBlocks
-                                ,pStreamingInfo->reqload
-                            );
-            LogEvent( 815, "Model collision missing", "CEntity_GetBoundRect", SString( "No collision for model:%d %s", usModelId, *strDetails ), 5415 );
+            CStreamingInfo* pStreamingInfo = GetStreamingInfoFromModelId(usModelId);
+            SString         strDetails("refs:%d txd:%d RwObj:%08x bOwn:%d bColStr:%d flg:%d off:%d size:%d reqload:%d", pModelInfo->usNumberOfRefs,
+                               pModelInfo->usTextureDictionary, pModelInfo->pRwObject, pModelInfo->bDoWeOwnTheColModel,
+                               pModelInfo->bCollisionWasStreamedWithModel, pStreamingInfo->flg, pStreamingInfo->offsetInBlocks, pStreamingInfo->sizeInBlocks,
+                               pStreamingInfo->reqload);
+            LogEvent(815, "Model collision missing", "CEntity_GetBoundRect", SString("No collision for model:%d %s", usModelId, *strDetails), 5415);
             CArgMap argMap;
-            argMap.Set( "id", usModelId );
-            argMap.Set( "reason", "collision" );
-            SetApplicationSetting( "diagnostics", "gta-model-fail", argMap.ToString() );
+            argMap.Set("id", usModelId);
+            argMap.Set("reason", "collision");
+            SetApplicationSetting("diagnostics", "gta-model-fail", argMap.ToString());
         }
     }
 }
@@ -1095,7 +1054,7 @@ void OnMY_CEntity_GetBoundRect( CEntitySAInterface* pEntity )
 #define HOOKPOS_CEntity_GetBoundRect                      0x53412A
 #define HOOKSIZE_CEntity_GetBoundRect                     7
 #define HOOKCHECK_CEntity_GetBoundRect                    0x8B
-DWORD RETURN_CEntity_GetBoundRect =                       0x534131;
+DWORD RETURN_CEntity_GetBoundRect = 0x534131;
 void _declspec(naked) HOOK_CEntity_GetBoundRect()
 {
     _asm
@@ -1112,7 +1071,6 @@ void _declspec(naked) HOOK_CEntity_GetBoundRect()
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CVehicle_AddUpgrade
@@ -1120,25 +1078,25 @@ void _declspec(naked) HOOK_CEntity_GetBoundRect()
 // Record some variables in case crash occurs
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CVehicle_AddUpgrade_Pre( CVehicleSAInterface* pVehicle, int iUpgradeId, int iFrame )
+void OnMY_CVehicle_AddUpgrade_Pre(CVehicleSAInterface* pVehicle, int iUpgradeId, int iFrame)
 {
     CArgMap argMap;
-    argMap.Set( "vehid", pVehicle->m_nModelIndex );
-    argMap.Set( "upgid", iUpgradeId );
-    argMap.Set( "frame", iFrame );
-    SetApplicationSetting( "diagnostics", "gta-upgrade-fail", argMap.ToString() );
+    argMap.Set("vehid", pVehicle->m_nModelIndex);
+    argMap.Set("upgid", iUpgradeId);
+    argMap.Set("frame", iFrame);
+    SetApplicationSetting("diagnostics", "gta-upgrade-fail", argMap.ToString());
 }
 
-void OnMY_CVehicle_AddUpgrade_Post( void )
+void OnMY_CVehicle_AddUpgrade_Post(void)
 {
-    SetApplicationSetting( "diagnostics", "gta-upgrade-fail", "" );
+    SetApplicationSetting("diagnostics", "gta-upgrade-fail", "");
 }
 
 // Hook info
 #define HOOKPOS_CVehicle_AddUpgrade                      0x6DFA20
 #define HOOKSIZE_CVehicle_AddUpgrade                     6
 #define HOOKCHECK_CVehicle_AddUpgrade                    0x51
-DWORD RETURN_CVehicle_AddUpgrade =                       0x6DFA26;
+DWORD RETURN_CVehicle_AddUpgrade = 0x6DFA26;
 void _declspec(naked) HOOK_CVehicle_AddUpgrade()
 {
     _asm
@@ -1167,7 +1125,6 @@ inner:
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Train crossings: Detach barrier from post (to be able to create objects 1373 and 1374 separately)
@@ -1184,7 +1141,7 @@ inner:
 
 DWORD TrainCrossingFix_ReturnAddress, TrainCrossingFix_InvalidReturnAddress;
 template <DWORD ReturnAddress, DWORD InvalidReturnAddress>
-void _declspec(naked) HOOK_TrainCrossingBarrierCrashFix ()
+void _declspec(naked) HOOK_TrainCrossingBarrierCrashFix()
 {
     // We cannot use template parameters directly in inline assembly; the following instructions don't modify registers
     TrainCrossingFix_ReturnAddress = ReturnAddress;
@@ -1203,7 +1160,6 @@ jmp_invalid:
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // GTA doesn't reset the furniture object counter, so do it manually everytime before GTA furnishes an interior (Interior_c::Init)
@@ -1212,9 +1168,9 @@ jmp_invalid:
 #define HOOKPOS_ResetFurnitureObjectCounter 0x593BF0
 #define HOOKSIZE_ResetFurnitureObjectCounter 6
 DWORD RETURN_ResetFurnitureObjectCounter = 0x593BF6;
-void _declspec(naked) HOOK_ResetFurnitureObjectCounter ()
+void _declspec(naked) HOOK_ResetFurnitureObjectCounter()
 {
-    *(int*)0xBB3A18 = 0; // InteriorManager_c::ms_objectCounter
+    *(int*)0xBB3A18 = 0;            // InteriorManager_c::ms_objectCounter
 
     _asm
     {
@@ -1224,7 +1180,6 @@ void _declspec(naked) HOOK_ResetFurnitureObjectCounter ()
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CVolumetricShadowMgr_Render
@@ -1233,21 +1188,21 @@ void _declspec(naked) HOOK_ResetFurnitureObjectCounter ()
 // Record when volumetric shadows are being rendered so we can disable them if a crash occurs.
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CVolumetricShadowMgr_Render_Pre( void )
+void OnMY_CVolumetricShadowMgr_Render_Pre(void)
 {
-    OnEnterCrashZone( 1 );
+    OnEnterCrashZone(1);
 }
 
-void OnMY_CVolumetricShadowMgr_Render_Post( void )
+void OnMY_CVolumetricShadowMgr_Render_Post(void)
 {
-    OnEnterCrashZone( 0 );
+    OnEnterCrashZone(0);
 }
 
 // Hook info
 #define HOOKPOS_CVolumetricShadowMgr_Render                 0x7113B0
 #define HOOKSIZE_CVolumetricShadowMgr_Render                8
 #define HOOKCHECK_CVolumetricShadowMgr_Render               0x83
-DWORD RETURN_CVolumetricShadowMgr_Render =                  0x7113B8;
+DWORD RETURN_CVolumetricShadowMgr_Render = 0x7113B8;
 void _declspec(naked) HOOK_CVolumetricShadowMgr_Render()
 {
     _asm
@@ -1271,7 +1226,6 @@ inner:
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CVolumetricShadowMgr_Update
@@ -1280,21 +1234,21 @@ inner:
 // Record when volumetric shadows are being updated so we can disable them if a crash occurs.
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CVolumetricShadowMgr_Update_Pre( void )
+void OnMY_CVolumetricShadowMgr_Update_Pre(void)
 {
-    OnEnterCrashZone( 2 );
+    OnEnterCrashZone(2);
 }
 
-void OnMY_CVolumetricShadowMgr_Update_Post( void )
+void OnMY_CVolumetricShadowMgr_Update_Post(void)
 {
-    OnEnterCrashZone( 0 );
+    OnEnterCrashZone(0);
 }
 
 // Hook info
 #define HOOKPOS_CVolumetricShadowMgr_Update                 0x711D90
 #define HOOKSIZE_CVolumetricShadowMgr_Update                5
 #define HOOKCHECK_CVolumetricShadowMgr_Update               0xB9
-DWORD RETURN_CVolumetricShadowMgr_Update =                  0x711D95;
+DWORD RETURN_CVolumetricShadowMgr_Update = 0x711D95;
 void _declspec(naked) HOOK_CVolumetricShadowMgr_Update()
 {
     _asm
@@ -1319,7 +1273,6 @@ inner:
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CAnimManager_CreateAnimAssocGroups
@@ -1327,26 +1280,25 @@ inner:
 // A model (usually 7) has to be loaded to avoid a crash
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CAnimManager_CreateAnimAssocGroups( uint uiModelId )
+void OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
 {
-    CModelInfo* pModelInfo = pGameInterface->GetModelInfo( uiModelId );
-    if ( pModelInfo->GetInterface()->pRwObject == NULL )
+    CModelInfo* pModelInfo = pGameInterface->GetModelInfo(uiModelId);
+    if (pModelInfo->GetInterface()->pRwObject == NULL)
     {
         // Crash will occur at offset 00349b7b
-        LogEvent( 816, "Model not loaded", "CAnimManager_CreateAnimAssocGroups", SString( "No RwObject for model:%d", uiModelId ), 5416 );
+        LogEvent(816, "Model not loaded", "CAnimManager_CreateAnimAssocGroups", SString("No RwObject for model:%d", uiModelId), 5416);
         CArgMap argMap;
-        argMap.Set( "id", uiModelId );
-        argMap.Set( "reason", "createanim" );
-        SetApplicationSetting( "diagnostics", "gta-model-fail", argMap.ToString() );
+        argMap.Set("id", uiModelId);
+        argMap.Set("reason", "createanim");
+        SetApplicationSetting("diagnostics", "gta-model-fail", argMap.ToString());
     }
 }
-
 
 // Hook info
 #define HOOKPOS_CAnimManager_CreateAnimAssocGroups                 0x4D3D52
 #define HOOKSIZE_CAnimManager_CreateAnimAssocGroups                5
 #define HOOKCHECK_CAnimManager_CreateAnimAssocGroups               0x8B
-DWORD RETURN_CAnimManager_CreateAnimAssocGroups =                  0x4D3D59;
+DWORD RETURN_CAnimManager_CreateAnimAssocGroups = 0x4D3D59;
 void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
 {
     _asm
@@ -1363,7 +1315,6 @@ void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Something called from CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask
@@ -1374,11 +1325,11 @@ void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
 //////////////////////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask   0x6485AC
 #define HOOKSIZE_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask  6
-DWORD RETURN_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask =    0x6485B2;
+DWORD RETURN_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask = 0x6485B2;
 DWORD RETURN_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask_Invalid = 0x6485E1;
-void OnMY_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask()
+void  OnMY_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask()
 {
-    LogEvent( 817, "CTaskComplexCarSlowBeDraggedOut", "", "CTaskComplexCarSlowBeDraggedOut race condition" );
+    LogEvent(817, "CTaskComplexCarSlowBeDraggedOut", "", "CTaskComplexCarSlowBeDraggedOut race condition");
 }
 
 void _declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask()
@@ -1399,7 +1350,6 @@ void _declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 //
 // OnMY_printf
@@ -1407,32 +1357,31 @@ void _declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask()
 // GTA outputs stuff via printf which we can use to help diagnose problems
 //
 ////////////////////////////////////////////////////////////////////////
-void _cdecl OnMY_printf ( DWORD dwCalledFrom, const char* szMessage )
+void _cdecl OnMY_printf(DWORD dwCalledFrom, const char* szMessage)
 {
-    SString strMessage = SStringX( szMessage ).Replace( "\n", "" );
+    SString strMessage = SStringX(szMessage).Replace("\n", "");
 
     // Ignore unimportant messages
-    if ( strMessage == "Initialised SoundManager" || strMessage == "%f" )
+    if (strMessage == "Initialised SoundManager" || strMessage == "%f")
     {
         return;
     }
 
-    SString strContext( "GTALOG Called from 0x%08x", dwCalledFrom );
-    LogEvent ( 6311, "printf", strContext, strMessage, 6311 );
+    SString strContext("GTALOG Called from 0x%08x", dwCalledFrom);
+    LogEvent(6311, "printf", strContext, strMessage, 6311);
 
     // Check for known issues
-    if ( strMessage == "Error subrastering" )
+    if (strMessage == "Error subrastering")
     {
         // Couldn't create render target for CPostEffects
-        BrowseToSolution ( "error-subrastering", EXIT_GAME_FIRST | ASK_GO_ONLINE, _( "Problem with graphics driver" ) );
+        BrowseToSolution("error-subrastering", EXIT_GAME_FIRST | ASK_GO_ONLINE, _("Problem with graphics driver"));
     }
-    else
-    if ( strMessage == "Too many objects without modelinfo structures" )
+    else if (strMessage == "Too many objects without modelinfo structures")
     {
         // An img file contains errors
-        if ( GetApplicationSetting ( "diagnostics", "img-file-corrupt" ).empty () )
+        if (GetApplicationSetting("diagnostics", "img-file-corrupt").empty())
         {
-            SetApplicationSetting ( "diagnostics", "img-file-corrupt", "gta3.img" );
+            SetApplicationSetting("diagnostics", "img-file-corrupt", "gta3.img");
         }
     }
 }
@@ -1444,10 +1393,10 @@ void _cdecl OnMY_printf ( DWORD dwCalledFrom, const char* szMessage )
 #define HOOKPOS_printf_EU                         0x8219C2
 #define HOOKSIZE_printf_EU                        7
 #define HOOKCHECK_printf_EU                       0x6A
-DWORD RETURN_printf_US =                          0x821989;
-DWORD RETURN_printf_EU =                          0x8219C9;
-DWORD RETURN_printf_BOTH =                        0;
-void _declspec(naked) HOOK_printf ()
+DWORD RETURN_printf_US = 0x821989;
+DWORD RETURN_printf_EU = 0x8219C9;
+DWORD RETURN_printf_BOTH = 0;
+void _declspec(naked) HOOK_printf()
 {
     _asm
     {
@@ -1465,7 +1414,6 @@ void _declspec(naked) HOOK_printf ()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 //
 // RwMatrixMultiply
@@ -1479,9 +1427,9 @@ void _declspec(naked) HOOK_printf ()
 #define HOOKPOS_RwMatrixMultiply_EU             0x7F18F0
 #define HOOKSIZE_RwMatrixMultiply_EU            6
 #define HOOKCHECK_RwMatrixMultiply_EU           0x8B
-DWORD RETURN_RwMatrixMultiply_US =              0x7F18B6;
-DWORD RETURN_RwMatrixMultiply_EU =              0x7F18F6;
-DWORD RETURN_RwMatrixMultiply_BOTH =            0;
+DWORD RETURN_RwMatrixMultiply_US = 0x7F18B6;
+DWORD RETURN_RwMatrixMultiply_EU = 0x7F18F6;
+DWORD RETURN_RwMatrixMultiply_BOTH = 0;
 void _declspec(naked) HOOK_RwMatrixMultiply()
 {
     _asm
@@ -1500,60 +1448,59 @@ cont:
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Setup hooks for CrashFixHacks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_CrashFixHacks ( void )
+void CMultiplayerSA::InitHooks_CrashFixHacks(void)
 {
-    EZHookInstall ( CrashFix_Misc1 );
-    EZHookInstall ( CrashFix_Misc2 );
-    //EZHookInstall ( CrashFix_Misc3 );
-    EZHookInstall ( CrashFix_Misc4 );
-    EZHookInstall ( CrashFix_Misc5 );
-    EZHookInstall ( CrashFix_Misc6 );
-    EZHookInstall ( CrashFix_Misc7 );
-    EZHookInstall ( CrashFix_Misc8 );
-    EZHookInstall ( CrashFix_Misc9 );
-    EZHookInstall ( CrashFix_Misc10 );
-    EZHookInstall ( CrashFix_Misc11 );
-    //EZHookInstall ( CrashFix_Misc12 );
-    EZHookInstall ( CrashFix_Misc13 );
-    EZHookInstall ( CrashFix_Misc14 );
-    EZHookInstall ( FreezeFix_Misc15 );
-    EZHookInstall ( CrashFix_Misc16 );
-    //EZHookInstall ( CrashFix_Misc17 );
-    EZHookInstall ( CrashFix_Misc18 );
-    //EZHookInstall ( CrashFix_Misc19 );
-    EZHookInstall ( CrashFix_Misc20 );
-    EZHookInstall ( CrashFix_Misc21 );
-    EZHookInstall ( CrashFix_Misc22 );
-    EZHookInstall ( CrashFix_Misc23 );
-    EZHookInstall ( CrashFix_Misc24 );
-    EZHookInstall ( CrashFix_Misc25 );
-    EZHookInstall ( CrashFix_Misc26 );
-    EZHookInstall ( CrashFix_Misc27 );
-    EZHookInstall ( CrashFix_Misc28 );
-    EZHookInstall ( CrashFix_Misc29 );
-    EZHookInstallChecked ( CrashFix_Misc30 );
-    EZHookInstall ( CClumpModelInfo_GetFrameFromId );
-    EZHookInstallChecked ( CEntity_GetBoundRect );
-    EZHookInstallChecked ( CVehicle_AddUpgrade );
-    EZHookInstall ( ResetFurnitureObjectCounter );
-    EZHookInstallChecked ( CVolumetricShadowMgr_Render );
-    EZHookInstallChecked ( CVolumetricShadowMgr_Update );
-    EZHookInstallChecked ( CAnimManager_CreateAnimAssocGroups );
-    EZHookInstall ( CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask );
-    EZHookInstallChecked ( printf );
-    EZHookInstallChecked ( RwMatrixMultiply );
+    EZHookInstall(CrashFix_Misc1);
+    EZHookInstall(CrashFix_Misc2);
+    // EZHookInstall ( CrashFix_Misc3 );
+    EZHookInstall(CrashFix_Misc4);
+    EZHookInstall(CrashFix_Misc5);
+    EZHookInstall(CrashFix_Misc6);
+    EZHookInstall(CrashFix_Misc7);
+    EZHookInstall(CrashFix_Misc8);
+    EZHookInstall(CrashFix_Misc9);
+    EZHookInstall(CrashFix_Misc10);
+    EZHookInstall(CrashFix_Misc11);
+    // EZHookInstall ( CrashFix_Misc12 );
+    EZHookInstall(CrashFix_Misc13);
+    EZHookInstall(CrashFix_Misc14);
+    EZHookInstall(FreezeFix_Misc15);
+    EZHookInstall(CrashFix_Misc16);
+    // EZHookInstall ( CrashFix_Misc17 );
+    EZHookInstall(CrashFix_Misc18);
+    // EZHookInstall ( CrashFix_Misc19 );
+    EZHookInstall(CrashFix_Misc20);
+    EZHookInstall(CrashFix_Misc21);
+    EZHookInstall(CrashFix_Misc22);
+    EZHookInstall(CrashFix_Misc23);
+    EZHookInstall(CrashFix_Misc24);
+    EZHookInstall(CrashFix_Misc25);
+    EZHookInstall(CrashFix_Misc26);
+    EZHookInstall(CrashFix_Misc27);
+    EZHookInstall(CrashFix_Misc28);
+    EZHookInstall(CrashFix_Misc29);
+    EZHookInstallChecked(CrashFix_Misc30);
+    EZHookInstall(CClumpModelInfo_GetFrameFromId);
+    EZHookInstallChecked(CEntity_GetBoundRect);
+    EZHookInstallChecked(CVehicle_AddUpgrade);
+    EZHookInstall(ResetFurnitureObjectCounter);
+    EZHookInstallChecked(CVolumetricShadowMgr_Render);
+    EZHookInstallChecked(CVolumetricShadowMgr_Update);
+    EZHookInstallChecked(CAnimManager_CreateAnimAssocGroups);
+    EZHookInstall(CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask);
+    EZHookInstallChecked(printf);
+    EZHookInstallChecked(RwMatrixMultiply);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;
-    HookInstall ( HOOKPOS_CObject_Destructor_TrainCrossing_Check, (DWORD)temp, 5 );
+    HookInstall(HOOKPOS_CObject_Destructor_TrainCrossing_Check, (DWORD)temp, 5);
     temp = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_ProcessTrainCrossingBehavior1_Check, RETURN_CObject_ProcessTrainCrossingBehavior_Invalid>;
-    HookInstall ( HOOKPOS_CObject_ProcessTrainCrossingBehavior1, (DWORD)temp, 5 );
+    HookInstall(HOOKPOS_CObject_ProcessTrainCrossingBehavior1, (DWORD)temp, 5);
     temp = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_ProcessTrainCrossingBehavior2_Check, RETURN_CObject_ProcessTrainCrossingBehavior_Invalid>;
-    HookInstall ( HOOKPOS_CObject_ProcessTrainCrossingBehavior2, (DWORD)temp, 5 );
+    HookInstall(HOOKPOS_CObject_ProcessTrainCrossingBehavior2, (DWORD)temp, 5);
 }

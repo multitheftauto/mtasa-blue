@@ -1,19 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CResourceManager.h
-*  PURPOSE:     Header for resource manager class
-*  DEVELOPERS:  Kevin Whiteside <kevuwk@gmail.com>
-*               Ed Lyons <eai@opencoding.net>
-*               Cecill Etheredge <ijsf@gmx.net>
-*               Jax <>
-*               Christian Myhre Lundheim <>
-*               Derek Abdine <>
-*               
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CResourceManager.h
+ *  PURPOSE:     Header for resource manager class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 class CResourceManager;
 
@@ -32,39 +26,38 @@ enum eAccessType
 };
 
 class CResourceManager
-{  
-
+{
 public:
-                                  CResourceManager            ( void );
-                                  ~CResourceManager           ( void );
+    CResourceManager(void);
+    ~CResourceManager(void);
 
-    CResource*                    Add                         ( unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity, const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP );
-    CResource*                    GetResource                 ( const char* szResourceName );
-    CResource*                    GetResourceFromNetID        ( unsigned short usNetID );
-    CResource*                    GetResourceFromScriptID     ( uint uiScriptID );
-    CResource*                    GetResourceFromLuaState     ( struct lua_State* luaVM );
-    SString                       GetResourceName             ( struct lua_State* luaVM );
-    
-    bool                          RemoveResource              ( unsigned short usID );
-    void                          Remove                      ( CResource* pResource );
-    bool                          Exists                      ( CResource* pResource );
-    void                          StopAll                     ( void );
+    CResource* Add(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
+                   const SString& strMinServerReq, const SString& strMinClientReq, bool bEnableOOP);
+    CResource* GetResource(const char* szResourceName);
+    CResource* GetResourceFromNetID(unsigned short usNetID);
+    CResource* GetResourceFromScriptID(uint uiScriptID);
+    CResource* GetResourceFromLuaState(struct lua_State* luaVM);
+    SString    GetResourceName(struct lua_State* luaVM);
 
-    void                          OnDownloadGroupFinished     ( void );
+    bool RemoveResource(unsigned short usID);
+    void Remove(CResource* pResource);
+    bool Exists(CResource* pResource);
+    void StopAll(void);
 
-    void                          OnAddResourceFile           ( CDownloadableResource* pResourceFile );
-    void                          OnRemoveResourceFile        ( CDownloadableResource* pResourceFile );
-    void                          OnDownloadedResourceFile    ( const SString& strFilename );
-    bool                          IsResourceFile              ( const SString& strFilename );
-    void                          OnFileModifedByScript       ( const SString& strFilename, const SString& strReason );
-    void                          ValidateResourceFile        ( const SString& strFilename, const CBuffer& fileData );
-    inline CDownloadableResource* GetDownloadableResourceFile ( const SString& strFilename ) { return MapFindRef ( m_ResourceFileMap, strFilename ); }
+    void OnDownloadGroupFinished(void);
 
-    static bool                   ParseResourcePathInput      ( std::string strInput, CResource* &pResource, std::string* pStrPath, std::string* pStrMetaPath = nullptr );
+    void                   OnAddResourceFile(CDownloadableResource* pResourceFile);
+    void                   OnRemoveResourceFile(CDownloadableResource* pResourceFile);
+    void                   OnDownloadedResourceFile(const SString& strFilename);
+    bool                   IsResourceFile(const SString& strFilename);
+    void                   OnFileModifedByScript(const SString& strFilename, const SString& strReason);
+    void                   ValidateResourceFile(const SString& strFilename, const CBuffer& fileData);
+    CDownloadableResource* GetDownloadableResourceFile(const SString& strFilename) { return MapFindRef(m_ResourceFileMap, strFilename); }
+
+    static bool ParseResourcePathInput(std::string strInput, CResource*& pResource, std::string* pStrPath, std::string* pStrMetaPath = nullptr);
 
 private:
-
-    CMappedList < CResource* >          m_resources;
-    std::map < ushort, CResource* >     m_NetIdResourceMap;
-    std::map < SString, CDownloadableResource* > m_ResourceFileMap;
+    CMappedList<CResource*>                   m_resources;
+    std::map<ushort, CResource*>              m_NetIdResourceMap;
+    std::map<SString, CDownloadableResource*> m_ResourceFileMap;
 };
