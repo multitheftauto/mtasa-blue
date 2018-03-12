@@ -1216,14 +1216,6 @@ void CGame::JoinPlayer(CPlayer& Player)
     CTimeUsMarker<20> marker;
     marker.Set("Start");
 
-    // Set the root element as his parent
-    // NOTE: Make sure he doesn't get any entities sent to him because we're sending him soon
-    Player.SetDoNotSendEntities(true);
-    Player.SetParentObject(m_pMapManager->GetRootElement());
-    Player.SetDoNotSendEntities(false);
-
-    marker.Set("SetParentObject");
-
     // Let him join
     Player.Send(CPlayerJoinCompletePacket(
         Player.GetID(), m_pPlayerManager->Count(), m_pMapManager->GetRootElement()->GetID(), m_pMainConfig->GetHTTPDownloadType(), m_pMainConfig->GetHTTPPort(),
@@ -1241,6 +1233,14 @@ void CGame::InitialDataStream(CPlayer& Player)
 {
     CTimeUsMarker<20> marker;
     marker.Set("Start");
+
+    // Set the root element as his parent
+    // NOTE: Make sure he doesn't get any entities sent to him because we're sending him soon
+    Player.SetDoNotSendEntities(true);
+    Player.SetParentObject(m_pMapManager->GetRootElement());
+    Player.SetDoNotSendEntities(false);
+
+    marker.Set("SetParentObject");
 
     // He's joined now
     Player.SetStatus(STATUS_JOINED);
