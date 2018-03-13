@@ -590,7 +590,7 @@ void _declspec(naked) HOOK_Camera_CollisionDetection()
         call DoCameraCollisionDetectionPokes
         popad
         sub         esp,24h
-        push        ebx 
+        push        ebx
         push        ebp
         jmp         RETURN_Camera_CollisionDetection
     }

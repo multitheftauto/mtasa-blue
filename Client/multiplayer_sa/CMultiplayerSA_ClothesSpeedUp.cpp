@@ -87,7 +87,7 @@ void _declspec(naked) HOOK_LoadingPlayerImgDir()
         popad
 
         // Standard code to load img directory
-        push    0BBCDC8h 
+        push    0BBCDC8h
         jmp     RETURN_LoadingPlayerImgDirA
 
         // Skip loading img directory

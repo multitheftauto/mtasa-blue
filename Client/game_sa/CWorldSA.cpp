@@ -102,7 +102,7 @@ void CWorldSA::Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId
     /*  mov     ecx, entityInterface
         mov     esi, [ecx]
         push    1
-        call    dword ptr [esi+8]*/             
+        call    dword ptr [esi+8]*/
     }
 }
 
@@ -203,9 +203,9 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
         push    flags.bCheckBuildings
         lea     eax, targetEntity
         push    eax
-        push    pColPointSAInterface    
+        push    pColPointSAInterface
         push    vecEnd
-        push    vecStart    
+        push    vecStart
         call    dwFunc
         mov     bReturn, al
         add     esp, 0x30
@@ -418,7 +418,7 @@ bool CWorldSA::IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd
         push    flags.bCheckVehicles
         push    flags.bCheckBuildings
         push    vecEnd
-        push    vecStart    
+        push    vecStart
         call    dwFunc
         mov     bReturn, al
         add     esp, 0x24
@@ -437,7 +437,7 @@ bool CWorldSA::HasCollisionBeenLoaded(CVector* vecPosition)
         call    dwFunc
         mov     bRet, al
         add     esp, 8
-    } 
+    }
     return bRet;
 }
 

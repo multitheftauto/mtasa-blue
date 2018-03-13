@@ -93,7 +93,7 @@ void _declspec(naked) HOOK_CTxdStore_SetupTxdParent()
         popad
 
         // orig
-        mov     esi, ds:00C8800Ch 
+        mov     esi, ds:00C8800Ch
         jmp     RETURN_CTxdStore_SetupTxdParent  // 731D5B
     }
 }

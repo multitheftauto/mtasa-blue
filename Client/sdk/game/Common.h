@@ -30,7 +30,7 @@
 #define MAX_ENTRY_INFO_NODES                ( MAX_ENTRY_INFO_NODES_MTA + 600 )      // 72600
 #define MAX_POINTER_SINGLE_LINKS            ( MAX_POINTER_SINGLE_LINKS_MTA + 5000 ) // 70000
 #define MAX_POINTER_DOUBLE_LINKS            ( MAX_POINTER_DOUBLE_LINKS_MTA + 800 )  // 74800
-#define MAX_RWOBJECT_INSTANCES              2500            
+#define MAX_RWOBJECT_INSTANCES              2500
 
 /**
  * Flags used to define weapon characteristics
@@ -58,10 +58,10 @@
 #define WEAPONTYPE_LONG_RELOAD_TIME (0x008000)  // force a longer reload time!
 
 // these are area effect/shot options
-#define WEAPONTYPE_SLOWS_DOWN       (0x010000)  // 
-#define WEAPONTYPE_RANDOM_SPEED     (0x020000)  // 
+#define WEAPONTYPE_SLOWS_DOWN       (0x010000)  //
+#define WEAPONTYPE_RANDOM_SPEED     (0x020000)  //
 #define WEAPONTYPE_FORCE_FINISH_ANIM (0x040000)  // force the anim to finish player after aim/fire rather than blending out
-#define WEAPONTYPE_EXPANDS          (0x080000)  // 
+#define WEAPONTYPE_EXPANDS          (0x080000)  //
 
 enum eRadarSprite
 {

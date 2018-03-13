@@ -8,7 +8,7 @@ namespace EmbeddedLuaCode
     Provide extra utility scripting functions:
         string inspect ( arg )  --Provides a human description of any argument, i.e. string,bool,table,element,xml etc
         string iprint ( ... ) --Prints any number of arguments in human readable format
-        
+
     Table output adapted from inspect.lua provided by Kikito with minor modifiactions (License below)
 --]]
 inspect ={
@@ -370,7 +370,7 @@ function Inspector:putUserdata(v)
             local pType
             if getPickupType(v) == 0 then pType = "health"
             elseif getPickupType(v) == 1 then pType = "armor"
-            elseif getPickupType(v) == 2 then pType = "weapon["..getWeaponNameFromID(getPickupWeapon(v)).."]" 
+            elseif getPickupType(v) == 2 then pType = "weapon["..getWeaponNameFromID(getPickupWeapon(v)).."]"
             else pType = "custom["..getElementModel(v).."]"    end
             o = "elem:"..etype.."["..pType.."]"..ptr
         elseif etype == "marker" then
@@ -395,8 +395,8 @@ function Inspector:putUserdata(v)
     else
         o = human..ptr
     end
-    
-    self:puts(o) 
+
+    self:puts(o)
 end
 
 function iprint(...)

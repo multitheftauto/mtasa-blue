@@ -36,7 +36,7 @@ class CPedIntelligenceSAInterface;
 #define SIZEOF_CPLAYERPED                           1956
 
 #define FUNC_SetModelIndex                          0x5E4880 // ##SA##
-#define FUNC_AttachPedToBike                        0x5E7E60 
+#define FUNC_AttachPedToBike                        0x5E7E60
 #define FUNC_AttachPedToEntity                      0x5E7CB0
 #define FUNC_CanSeeEntity                           0x5E0730
 #define FUNC_GiveObjectToPedToHold                  0x5E4390
@@ -71,7 +71,7 @@ class CPedIntelligenceSAInterface;
 #define FUNC_TakeOffGoggles             0x5E6010 // ##SA##
 #define FUNC_PutOnGoggles               0x5E3AE0 // ##SA##
 #define FUNC_RemoveWeaponModel          0x5E3990 // ##SA## (call with -1 to remove any model, I think)
-#define FUNC_RemoveGogglesModel         0x5DF170 // ##SA## 
+#define FUNC_RemoveGogglesModel         0x5DF170 // ##SA##
 #define FUNC_ClearWeapon                0x5E62B0 // ##SA##
 #define FUNC_GetHealth                  0x4ABC20
 #define FUNC_SetCurrentWeaponFromID     0x4FF8E0

@@ -303,8 +303,8 @@ VOID _declspec(naked) HOOK_CTaskSimpleUsegun_ProcessPed()
         mov         pAPed, eax
 
         // Replace original code
-        push        0FFFFFFFFh 
-        mov         eax,dword ptr fs:[00000000h] 
+        push        0FFFFFFFFh
+        mov         eax,dword ptr fs:[00000000h]
 
         // Jump back to func. I think we can use EDX here
         mov         edx, HOOKPOS_CTaskSimpleUsegun_ProcessPed
@@ -437,8 +437,8 @@ VOID _declspec(naked) HOOK_IKChainManager_PointArm()
         popad
 
         // Run the instructions we replaced when this hook was added
-        push        0FFFFFFFFh 
-        push        83F0D6h 
+        push        0FFFFFFFFh
+        push        83F0D6h
 
         // Continue execution where we intercepted
         mov     edx, HOOKPOS_IKChainManager_PointArm
@@ -502,8 +502,8 @@ VOID _declspec(naked) HOOK_IKChainManager_LookAt()
         popad
 
         // Run the instructions we replaced when this hook was added
-        push    0FFFFFFFFh 
-        push    83F0B6h 
+        push    0FFFFFFFFh
+        push    83F0B6h
 
         // Continue execution where we intercepted
         mov     edx, HOOKPOS_IKChainManager_LookAt
@@ -529,7 +529,7 @@ VOID _declspec(naked) HOOK_CWeapon__Fire()
         pop     ebx
 
         pushad
-    }    
+    }
 
     // Weapon inaccuracy and animations problems may be fixed by blanking out the CWeapon variables nTimer and beyond.
 
@@ -712,10 +712,10 @@ void _declspec(naked) HOOK_CWeapon__Fire_Sniper()
             popad
             mov     ecx, HOOKPOS_CWeapon__Fire_Sniper
             add     ecx, 6
-            
+
             mov     eax, dword ptr [esp+0x14]
             test    eax, eax
-            
+
             jmp     ecx
         }
     }
@@ -767,9 +767,9 @@ void _declspec(naked) HOOK_CEventDamage__AffectsPed()
 
     _asm
     {
-        push    esi  
-    
-        mov     esi, [esp+8]        
+        push    esi
+
+        mov     esi, [esp+8]
         mov     affectsPed, esi // store the ped
         mov     event, ecx // store the event pointer
 
@@ -784,7 +784,7 @@ void _declspec(naked) HOOK_CEventDamage__AffectsPed()
         _asm
         {
             popad
-            
+
             sub     esp, 0xC        // replacement code
             push    esi
             mov     esi, ecx
@@ -1145,8 +1145,8 @@ void _declspec(naked) HOOK_CWeapon_FireInstantHit_Mid()
         popad
 
         // Do original code and continue
-        mov         ecx,dword ptr [esp+14h] 
-        push        eax 
+        mov         ecx,dword ptr [esp+14h]
+        push        eax
         jmp     RETURN_CWeapon_FireInstantHit_Mid
     }
 }
@@ -1201,8 +1201,8 @@ void _declspec(naked) HOOK_CWeapon_FireSniper_Mid()
     _asm
     {
         // Do original code
-        fstp        dword ptr [esp+4Ch] 
-        fstp        dword ptr [esp+50h] 
+        fstp        dword ptr [esp+4Ch]
+        fstp        dword ptr [esp+50h]
 
         pushad
 
@@ -1303,25 +1303,25 @@ void _declspec(naked) HOOK_CWeapon_FireInstantHit()
     */
     _asm
     {
-        push        1    
-        push        0    
-        push        0    
-        push        1    
-        push        1    
-        push        1    
-        push        1    
-        push        1    
+        push        1
+        push        0
+        push        0
+        push        1
+        push        1
+        push        1
+        push        1
+        push        1
         lea         eax,[esp+58h]
         mov         ppInstantHitEntity, eax
-        push        eax  
+        push        eax
         lea         ecx,[esp+0C4h]
         mov         ppInstantHitColPoint, ecx
-        push        ecx  
+        push        ecx
         lea         edx,[esp+48h]
         mov         pInstantHitEnd, edx
         lea         eax,[esp+64h]
         mov         pInstantHitStart, eax
-        push        edx  
+        push        edx
         push        eax
         pushad
     }
@@ -1504,23 +1504,23 @@ VOID _declspec(naked) HOOK_CCamera__Find3rdPersonCamTargetVector()
 
         pushad
     }
-        
+
     if(IsNotInLocalContext() && GetContextSwitchPedID())
     {
         // its a remote player, so replace the data with the net data
-        sprintf(szDebug, "Switched Target Vectors to %f  %f  %f", 
-            RemotePlayerTargetVectors[GetContextSwitchPedID()].fX, 
-            RemotePlayerTargetVectors[GetContextSwitchPedID()].fY, 
+        sprintf(szDebug, "Switched Target Vectors to %f  %f  %f",
+            RemotePlayerTargetVectors[GetContextSwitchPedID()].fX,
+            RemotePlayerTargetVectors[GetContextSwitchPedID()].fY,
             RemotePlayerTargetVectors[GetContextSwitchPedID()].fZ);
         OutputDebugString(szDebug);
 
-        sprintf(szDebug, "Switched Start Vectors to %f  %f  %f", 
-            RemotePlayerStartVectors[GetContextSwitchPedID()].fX, 
-            RemotePlayerStartVectors[GetContextSwitchPedID()].fY, 
+        sprintf(szDebug, "Switched Start Vectors to %f  %f  %f",
+            RemotePlayerStartVectors[GetContextSwitchPedID()].fX,
+            RemotePlayerStartVectors[GetContextSwitchPedID()].fY,
             RemotePlayerStartVectors[GetContextSwitchPedID()].fZ);
         OutputDebugString(szDebug);
-        
-        
+
+
         MemCpy (vecTargetVector, &RemotePlayerTargetVectors[GetContextSwitchPedID()], sizeof(CVector));
         MemCpy (vecStartVector, &RemotePlayerStartVectors[GetContextSwitchPedID()], sizeof(CVector));
     }
@@ -1529,23 +1529,23 @@ VOID _declspec(naked) HOOK_CCamera__Find3rdPersonCamTargetVector()
         // Its the Local Player, so save the data so it can be sent
         MemCpy (&LocalPlayerShotOriginVector, vecShotOrigin, sizeof(CVector));
 
-        sprintf(szDebug, "Saved Local Shot Origin Vector  %f  %f  %f", 
-            LocalPlayerShotOriginVector.fX, 
-            LocalPlayerShotOriginVector.fY, 
+        sprintf(szDebug, "Saved Local Shot Origin Vector  %f  %f  %f",
+            LocalPlayerShotOriginVector.fX,
+            LocalPlayerShotOriginVector.fY,
             LocalPlayerShotOriginVector.fZ);
         OutputDebugString(szDebug);*/
     /*  MemCpy (&LocalPlayerTargetVector, vecTargetVector, sizeof(CVector));
         MemCpy (&LocalPlayerStartVector, vecStartVector, sizeof(CVector));
-        
-        sprintf(szDebug, "Saved Local Target Vectors  %f  %f  %f", 
-            LocalPlayerTargetVector.fX, 
-            LocalPlayerTargetVector.fY, 
+
+        sprintf(szDebug, "Saved Local Target Vectors  %f  %f  %f",
+            LocalPlayerTargetVector.fX,
+            LocalPlayerTargetVector.fY,
             LocalPlayerTargetVector.fZ);
         OutputDebugString(szDebug);
 
-        sprintf(szDebug, "Saved Local Start Vectors  %f  %f  %f", 
-            LocalPlayerStartVector.fX, 
-            LocalPlayerStartVector.fY, 
+        sprintf(szDebug, "Saved Local Start Vectors  %f  %f  %f",
+            LocalPlayerStartVector.fX,
+            LocalPlayerStartVector.fY,
             LocalPlayerStartVector.fZ);
         OutputDebugString(szDebug);*/
     }
@@ -1558,7 +1558,7 @@ VOID _declspec(naked) HOOK_CCamera__Find3rdPersonCamTargetVector()
         pop     esi
         pop     ebx
         retn    0x18
-    }   
+    }
 }
 
 VOID _declspec(naked) HOOK_CWeapon__FireShotgun()
@@ -1592,9 +1592,9 @@ VOID _declspec(naked) HOOK_CWeapon__FireShotgun()
 
             pushad
         }
-        sprintf(szDebug, "Switched Cross Products to %f  %f  %f (0x%X)", 
-            RemotePlayerCrossProducts[GetContextSwitchPedID()].fX, 
-            RemotePlayerCrossProducts[GetContextSwitchPedID()].fY, 
+        sprintf(szDebug, "Switched Cross Products to %f  %f  %f (0x%X)",
+            RemotePlayerCrossProducts[GetContextSwitchPedID()].fX,
+            RemotePlayerCrossProducts[GetContextSwitchPedID()].fY,
             RemotePlayerCrossProducts[GetContextSwitchPedID()].fZ, vecCrossProduct);
         OutputDebugString(szDebug);
         MemSet (vecCrossProduct,0,sizeof(CVector));
@@ -1620,9 +1620,9 @@ VOID _declspec(naked) HOOK_CWeapon__FireShotgun()
         }
 
         MemCpy (&LocalPlayerCrossProduct, vecCrossProduct, sizeof(CVector));
-        sprintf(szDebug, "SHOTGUN: Saved Local Cross Product  %f  %f  %f", 
-            LocalPlayerCrossProduct.fX, 
-            LocalPlayerCrossProduct.fY, 
+        sprintf(szDebug, "SHOTGUN: Saved Local Cross Product  %f  %f  %f",
+            LocalPlayerCrossProduct.fX,
+            LocalPlayerCrossProduct.fY,
             LocalPlayerCrossProduct.fZ);
         OutputDebugString(szDebug);
     }
@@ -1634,7 +1634,7 @@ VOID _declspec(naked) HOOK_CWeapon__FireShotgun()
         mov     edx, HOOKPOS_CWeapon__FireShotgun
         add     edx, 20
         jmp     edx
-    }   
+    }
 }
 #endif
 
@@ -1662,7 +1662,7 @@ void _declspec(naked) HOOK_CEventVehicleExplosion__AffectsPed()
         pop     edi
         setz    al
         pop esi
-        
+
         // Verify that the ped is affected
         cmp al, 1
         jnz return_from
@@ -1670,7 +1670,7 @@ void _declspec(naked) HOOK_CEventVehicleExplosion__AffectsPed()
         // Verify that this call is from the correct location
         cmp [esp], 0x4ab4c4
         jnz return_from
-        
+
         pushad
     }
 
@@ -1678,7 +1678,7 @@ void _declspec(naked) HOOK_CEventVehicleExplosion__AffectsPed()
     CEventVehicleExplosion_NotifyDeathmatch();
 
     _asm
-    {  
+    {
         popad
 
 return_from:

@@ -2335,8 +2335,8 @@ void _declspec(naked) HOOK_FindPlayerCoors()
         mov     eax, edi
         movsd
         movsd
-        movsd           
-        retn    
+        movsd
+        retn
 
         // Continue. Don't replace the world center.
         dontset:
@@ -2499,7 +2499,7 @@ void _declspec(naked) HOOK_FindPlayerCentreOfWorld()
         mov     edx, CMultiplayerSA::HOOKPOS_FindPlayerCentreOfWorld
         add     edx, 6
         jmp     edx
-        
+
 
         hascenter:
         lea     eax, vecCenterOfWorld
@@ -2697,7 +2697,7 @@ void _declspec(naked) HOOK_CExplosion_AddExplosion()
 
         // If they are, just return now
         retn
-        
+
         // Check the explosion handler. So we can call it if it exists. Jump over the explosion
         // handler part if we have none
         checkexplosionhandler:
@@ -2836,7 +2836,7 @@ void _declspec(naked) HOOK_CTaskComplexJump__CreateSubTask()
             popad
             mov     eax, 0x67DAD1
             jmp     eax
-        }   
+        }
     }
 }
 
@@ -2921,9 +2921,9 @@ void _declspec(naked) HOOK_FxManager_DestroyFxSystem()
         popad
 
             // The original code we replaced
-        push        ecx  
-        push        ebx  
-        push        edi  
+        push        ecx
+        push        ebx
+        push        edi
         mov         edi, [esp+10h]
 
         // Jump back to the rest of the function we hooked
@@ -2975,7 +2975,7 @@ void _declspec(naked) HOOK_Render3DStuff()
 {
     _asm
     {
-        pushad    
+        pushad
     }
     if (m_pRender3DStuffHandler) m_pRender3DStuffHandler();
 
@@ -3456,7 +3456,7 @@ void _declspec(naked) HOOK_CObject_Render()
     _asm
     {
         mov         dwAlphaEntity, ecx
-        pushad 
+        pushad
     }
 
     TIMING_CHECKPOINT("+ObjRndr");
@@ -3966,7 +3966,7 @@ void _declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState()
 {
     _asm
     {
-        pushad    
+        pushad
     }
 
     if (ucTrafficLightState == 0 || ucTrafficLightState == 5 || ucTrafficLightState == 8)
@@ -3995,7 +3995,7 @@ void _declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState()
 {
     _asm
     {
-        pushad    
+        pushad
     }
 
     if (ucTrafficLightState == 3 || ucTrafficLightState == 5 || ucTrafficLightState == 7)
@@ -4024,7 +4024,7 @@ void _declspec(naked) HOOK_CTrafficLights_DisplayActualLight()
 {
     _asm
     {
-        pushad    
+        pushad
     }
 
     if (ucTrafficLightState == 2)
@@ -4416,7 +4416,7 @@ void _declspec(naked) HOOK_VehicleCamUp()
 
         cmp al, 2                   // Is it a vehicle?
         jz docustom
-        
+
         mov ecx, edx
         mov eax, 0x509CE0           // CCam::GetVectorsReadyForRW
         jmp eax
@@ -4756,8 +4756,8 @@ void _declspec(naked) HOOK_CVehicle_DoVehicleLights()
     _asm
     {
         mov     pLightsVehicleInterface, ecx
-        mov     al,byte ptr ds:[00C1CC18h] 
-        sub     esp,3Ch 
+        mov     al,byte ptr ds:[00C1CC18h]
+        sub     esp,3Ch
         jmp     RETURN_CVehicle_DoVehicleLights
     }
 }
@@ -4786,7 +4786,7 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam_1()
         mov     pHeadLightBeamVehicleInterface, ecx
         sub     esp, 94h
         jmp     RETURN_CVehicle_DoHeadLightBeam_1
-    }        
+    }
 }
 
 RwVertex*    pHeadLightVerts = NULL;
@@ -4810,7 +4810,7 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam_2()
         mov     eax, [esp]
         mov     pHeadLightVerts, eax
         mov     eax, [esp+4]
-        mov     uiHeadLightNumVerts, eax 
+        mov     uiHeadLightNumVerts, eax
         pushad
     }
 
@@ -4819,7 +4819,7 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam_2()
     _asm
     {
         popad
-        mov     dword ptr ds:[0C4B950h],5 
+        mov     dword ptr ds:[0C4B950h],5
         jmp     RETURN_CVehicle_DoHeadLightBeam_2
     }
 }
@@ -4829,7 +4829,7 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect_1()
 {
     _asm
     {
-        pushad    
+        pushad
     }
 
     CVehicle_GetHeadLightColor(pLightsVehicleInterface, 160.0f, 160.0f, 140.0f);
@@ -4846,7 +4846,7 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect_1()
         //mov     eax, ulHeadLightA
         //mov     [esp+20], eax
 
-        call    dwCCoronas_RegisterCorona 
+        call    dwCCoronas_RegisterCorona
         add     esp,54h
         jmp     RETURN_CVehicle_DoHeadLightEffect_1
     }
@@ -4856,7 +4856,7 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect_2()
 {
     _asm
     {
-        pushad    
+        pushad
     }
 
     CVehicle_GetHeadLightColor(pLightsVehicleInterface, 160.0f, 160.0f, 140.0f);
@@ -4873,7 +4873,7 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect_2()
         //mov     eax, ulHeadLightA
         //mov     [esp+20], eax
 
-        call    dwCCoronas_RegisterCorona 
+        call    dwCCoronas_RegisterCorona
         add     esp, 54h
         jmp     RETURN_CVehicle_DoHeadLightEffect_2
     }
@@ -4884,7 +4884,7 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin()
 {
     _asm
     {
-        pushad    
+        pushad
     }
 
     CVehicle_GetHeadLightColor(pLightsVehicleInterface, 45.0f, 45.0f, 45.0f);
@@ -4902,14 +4902,14 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin()
         call    dwCShadows_StoreCarLightShadow
         add     esp, 4Ch
         jmp     RETURN_CVehicle_DoHeadLightReflectionTwin
-    }    
+    }
 }
 
 void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle()
 {
     _asm
     {
-        pushad    
+        pushad
     }
 
     CVehicle_GetHeadLightColor(pLightsVehicleInterface, 45.0f, 45.0f, 45.0f);
@@ -4972,7 +4972,7 @@ void _declspec(naked) HOOK_CFire_ProcessFire()
         call eax
         test eax, eax
         jz fail
-        mov ecx, [esi+0x14] 
+        mov ecx, [esi+0x14]
         mov [eax+0x14], ecx
 fail:
         jmp RETURN_CFire_ProcessFire
@@ -5103,7 +5103,7 @@ void _declspec(naked) HOOK_RenderScene_Plants()
         pushad
         call    CPlantMgr_Render_Pre
         popad
-        
+
         push 1                  // bRenderingBeforeWater
         movzx eax, bl           // bCamBelowWater
         push eax
@@ -5168,7 +5168,7 @@ void _declspec(naked) HOOK_CPlantMgr_Render()
         add esp, 4
         test al, al
         jnz watercheck          // only compare plant.z to water level if there actually is water here
-        
+
         xor eax, eax            // if there's no water, assume "plant above water"
         jmp rendercheck
 
@@ -5177,7 +5177,7 @@ watercheck:
         push [ebp+8]
         call IsPlantBelowWater
         add esp, 8
-        
+
 rendercheck:
         xor eax, [esp+0x88+4]   // Decide whether or not to draw the plant right now
         cmp eax, [esp+0x88+8]
@@ -5244,7 +5244,7 @@ AnimationId  animationID = 0;
 void _declspec(naked) HOOK_CAnimManager_AddAnimation()
 {
     _asm
-    {        
+    {
         mov     eax, [esp+4]
         mov     animationClump, eax
         mov     eax, [esp+8]
@@ -5262,8 +5262,8 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation()
     _asm
     {
         popad
-        mov     eax,dword ptr [esp+0Ch] 
-        mov     edx,dword ptr ds:[0B4EA34h] 
+        mov     eax,dword ptr [esp+0Ch]
+        mov     edx,dword ptr ds:[0B4EA34h]
         jmp     RETURN_CAnimManager_AddAnimation
     }
 }
@@ -5272,7 +5272,7 @@ float animationBlendDelta;
 void _declspec(naked) HOOK_CAnimManager_BlendAnimation()
 {
     _asm
-    {        
+    {
         mov     eax, [esp+4]
         mov     animationClump, eax
         mov     eax, [esp+8]
@@ -5292,7 +5292,7 @@ void _declspec(naked) HOOK_CAnimManager_BlendAnimation()
     _asm
     {
         popad
-        sub     esp,14h 
+        sub     esp,14h
         mov     ecx,dword ptr [esp+18h]
         jmp     RETURN_CAnimManager_BlendAnimation
     }
@@ -5598,9 +5598,9 @@ void _declspec(naked) HOOK_VehCol()
         mov         dl, 3
         mov         al, 2
         mov         cl, 1
-        push        edx  
-        xor         edx,edx 
-        mov         dl,byte ptr [esi+434h] 
+        push        edx
+        xor         edx,edx
+        mov         dl,byte ptr [esi+434h]
         mov         dl, 0
 
         jmp     RETURN_VehCol  // 006D660C
@@ -5614,13 +5614,13 @@ void _declspec(naked) HOOK_VehColCB()
         // Hooked from 004C838D  29 bytes
 
         // Apply vehColors for this vehicle
-        mov         cl,byte ptr [esi*4+vehColors.R] 
+        mov         cl,byte ptr [esi*4+vehColors.R]
         mov         byte ptr [eax+4],cl
 
-        mov         cl,byte ptr [esi*4+vehColors.G] 
+        mov         cl,byte ptr [esi*4+vehColors.G]
         mov         byte ptr [eax+5],cl
 
-        mov         cl,byte ptr [esi*4+vehColors.B] 
+        mov         cl,byte ptr [esi*4+vehColors.B]
         mov         byte ptr [eax+6],cl
 
         jmp     RETURN_VehColCB  // 004C83AA
@@ -5741,7 +5741,7 @@ void _declspec(naked) HOOK_ProcessVehicleCollision()
             pop edx
 
             push eax
-            
+
                 push edx
                 push esi
                 call SetModelSuspensionLines
@@ -6512,7 +6512,7 @@ void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision()
         _asm
         {
             popad
-            
+
             sub esp, 68h
             push esi
             mov esi, [esp+6Ch+4]
@@ -6830,7 +6830,7 @@ void _declspec(naked) HOOK_CAERadioTrackManager__ChooseMusicTrackIndex()
     {
         // pop the stack
         popad
-        // this number of tracks needs fixing because we need the game to know about the deletions here as it is used for the wrap around logic of radio 
+        // this number of tracks needs fixing because we need the game to know about the deletions here as it is used for the wrap around logic of radio
         mov ecx, dwNumberOfTracks
         // jump back to normal processing
         jmp RETURN_CAERadioTrackManager__ChooseMusicTrackIndex

@@ -438,7 +438,7 @@ bool CResourceChecker::CheckLuaDeobfuscateRequirements(const string& strFileCont
         if (bClientScript && IsLuaCompiledScript(strFileContents.c_str(), strFileContents.length()))
         {
             // Compiled client script with no version info
-    #if MTA_DM_VERSION < 0x135 
+    #if MTA_DM_VERSION < 0x135
             SString strMessage("%s is invalid and will not work in future versions. Please re-compile at http://luac.mtasa.com/", strFileName.c_str());
             CLogger::LogPrint(SString("WARNING: %s %s\n", strResourceName.c_str(), *strMessage));
     #else

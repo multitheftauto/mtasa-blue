@@ -283,7 +283,7 @@ void CPhysicalSA::DetachEntityFromEntity(float fUnkX, float fUnkY, float fUnkZ, 
         push    fUnkY
         push    fUnkX
         mov     ecx, dwThis
-        call    dwFunc 
+        call    dwFunc
     }
 }
 
@@ -306,7 +306,7 @@ bool CPhysicalSA::InternalAttachEntityToEntity(DWORD dwEntityInterface, const CV
         push    dwEntityInterface
         mov     ecx, dwThis
         call    dwFunc
-        mov     dwReturn, eax   
+        mov     dwReturn, eax
     }
     return (dwReturn != NULL);
 }

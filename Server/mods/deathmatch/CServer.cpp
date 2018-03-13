@@ -15,7 +15,7 @@
 #include "SharedUtil.Thread.h"
 #include "SharedUtil.IntervalCounter.h"
 #include "SharedUtil.IntervalCounter.hpp"
-#if defined(MTA_DEBUG) 
+#if defined(MTA_DEBUG)
     #include "SharedUtil.Tests.hpp"
 #endif
 
@@ -40,7 +40,7 @@ void CServer::ServerInitialize(CServerInterface* pServerInterface)
     g_pServerInterface = pServerInterface;
     g_pNetServer = pServerInterface->GetNetwork();
     g_pRealNetServer = g_pNetServer;
-    #if defined(MTA_DEBUG) 
+    #if defined(MTA_DEBUG)
     SharedUtil_Tests();
     #endif
 }

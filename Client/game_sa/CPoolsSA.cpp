@@ -943,15 +943,15 @@ CVehicle* CPoolsSA::AddTrain(CVector* vecPosition, DWORD dwModels[], int iSize, 
         push    iNodeId // node to start at (-1 for closest node)
         lea     ecx, pTrainEnd
         push    ecx // end of train
-        lea     ecx, pTrainBeginning 
+        lea     ecx, pTrainBeginning
         push    ecx // begining of train
         push    0 // train type (always use 0 as thats where we're writing to)
-        push    bDirection // direction 
+        push    bDirection // direction
         push    fZ // z
         push    fY // y
         push    fX // x
         call    dwFunc
-        add     esp, 0x28   
+        add     esp, 0x28
     }
 
     // Enable GetVehicle

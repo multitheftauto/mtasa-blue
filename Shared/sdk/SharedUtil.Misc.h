@@ -45,7 +45,7 @@ namespace SharedUtil
     //
     #ifdef _WINDOWS_
     int MessageBoxUTF8(HWND hWnd, SString lpText, SString lpCaption, UINT uType);
-    #endif 
+    #endif
 
     //
     // Get startup directory as saved in the registry by the launcher

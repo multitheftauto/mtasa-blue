@@ -74,7 +74,7 @@ void _declspec(naked) HOOK_Rtl_fopen()
 
 inner:
         push    40h
-        push    [esp+0x0c] 
+        push    [esp+0x0c]
         jmp     RETURN_Rtl_fopen_BOTH
     }
 }
@@ -112,7 +112,7 @@ void _declspec(naked) HOOK_Rtl_fclose()
         popad
 
         push    0Ch
-        push    0x887EC8 
+        push    0x887EC8
         jmp     RETURN_Rtl_fclose_BOTH
     }
 }

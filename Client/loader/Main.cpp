@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 #include "SharedUtil.Win32Utf8FileHooks.hpp"
-#if defined(MTA_DEBUG) 
+#if defined(MTA_DEBUG)
     #include "SharedUtil.Tests.hpp"
 #endif
 
@@ -30,7 +30,7 @@ MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LP
 {
     AddUtf8FileHooks();
 
-#if defined(MTA_DEBUG) 
+#if defined(MTA_DEBUG)
     SharedUtil_Tests();
 #endif
 

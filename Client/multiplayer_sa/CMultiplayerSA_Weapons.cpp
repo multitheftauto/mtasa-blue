@@ -69,8 +69,8 @@ void _declspec(naked) HOOK_CWeapon_GenerateDamageEvent()
         add     esp, 4*6+4
         popad
 
-        push    0FFFFFFFFh 
-        push    848E10h 
+        push    0FFFFFFFFh
+        push    848E10h
         jmp     RETURN_CWeapon_GenerateDamageEvent
     }
 }
@@ -109,7 +109,7 @@ void Call_CShotInfo_Update(void)
         call inner
         jmp  done
     inner:
-        push    ebp  
+        push    ebp
         mov     ebp, esp
         and     esp, 0FFFFFFF8h
         jmp     RETURN_CShotInfo_Update

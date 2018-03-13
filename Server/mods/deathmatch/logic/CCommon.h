@@ -786,7 +786,7 @@ DECLARE_ENUM(eJSONPrettyType);
 #define WEAPONTYPE_LONG_RELOAD_TIME (0x008000)  // force a longer reload time!
 
 // these are area effect/shot options
-#define WEAPONTYPE_SLOWS_DOWN       (0x010000)  // 
-#define WEAPONTYPE_RANDOM_SPEED     (0x020000)  // 
+#define WEAPONTYPE_SLOWS_DOWN       (0x010000)  //
+#define WEAPONTYPE_RANDOM_SPEED     (0x020000)  //
 #define WEAPONTYPE_FORCE_FINISH_ANIM (0x040000)  // force the anim to finish player after aim/fire rather than blending out
 #define WEAPONTYPE_EXPANDS (0x080000)            //

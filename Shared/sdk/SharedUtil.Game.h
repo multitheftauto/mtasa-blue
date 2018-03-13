@@ -124,7 +124,7 @@ namespace SharedUtil
     #define WD_SECTION_STARTUP_FREEZE                       "L3"                // Opened in loader, closed when loading screen is shown, or a startup problem is handled elsewhere
     #define WD_SECTION_NOT_USED_MAIN_MENU                   "L4"                // Opened in loader, closed when main menu is used
     #define WD_SECTION_POST_INSTALL                         "L5"                // Opened in when installer runs, closed when main menu is used
-    #define WD_SECTION_IS_QUITTING                          "Q0"                // Open during quit 
+    #define WD_SECTION_IS_QUITTING                          "Q0"                // Open during quit
     #define WD_COUNTER_CRASH_CHAIN_BEFORE_ONLINE_GAME       "CR1"               // Counts consecutive crashes before the online game starts
     #define WD_COUNTER_CRASH_CHAIN_BEFORE_LOADING_SCREEN    "CR2"               // Counts consecutive crashes before the loading screen is shown
     #define WD_COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU    "CR3"               // Counts consecutive crashes before the main menu is used

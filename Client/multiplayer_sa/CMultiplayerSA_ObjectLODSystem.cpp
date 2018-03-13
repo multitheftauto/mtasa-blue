@@ -117,9 +117,9 @@ void _declspec(naked) HOOK_CRenderer_SetupEntityVisibility()
         retn
 
 second:
-        sub     esp,14h 
-        push    esi  
-        mov     esi,dword ptr [esp+1Ch] 
+        sub     esp,14h
+        push    esi
+        mov     esi,dword ptr [esp+1Ch]
         jmp     RETURN_CRenderer_SetupEntityVisibility   // 0x554238
     }
 }

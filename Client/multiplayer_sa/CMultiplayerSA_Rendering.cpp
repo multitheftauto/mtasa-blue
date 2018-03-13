@@ -131,10 +131,10 @@ void _declspec(naked) HOOK_CEntity_Render()
         retn
 
 inner:
-        push    ecx  
-        push    esi  
-        mov     esi,ecx 
-        mov     eax,dword ptr [esi+18h] 
+        push    ecx
+        push    esi
+        mov     esi,ecx
+        mov     eax,dword ptr [esi+18h]
         jmp     RETURN_CEntity_Render
     }
 }
@@ -191,7 +191,7 @@ skip_render:
         retn
 
 inner:
-        push    esi  
+        push    esi
         mov     esi, [esp+08h]
         jmp     RETURN_CEntity_RenderOneNonRoad
     }
@@ -253,8 +253,8 @@ void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_End()
         popad
 
         // Continue original code
-        pop         esi  
-        add         esp,0Ch 
+        pop         esi
+        add         esp,0Ch
         ret
     }
 }

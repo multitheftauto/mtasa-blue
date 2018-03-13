@@ -272,7 +272,7 @@ char* CModelInfoSA::GetNameIfVehicle()
     DWORD dwReturn = 0;
 
         _asm
-        {       
+        {
             push    eax
             push    ebx
             push    ecx
@@ -1215,15 +1215,15 @@ void _declspec(naked) HOOK_CFileLoader_LoadCollisionFile_Mid()
         jz      skip
 
         popad
-        sub     edx,18h 
-        add     ebp,2 
+        sub     edx,18h
+        add     ebp,2
         jmp     RETURN_CFileLoader_LoadCollisionFile_Mid
 
 skip:
         popad
-        sub     edx,18h 
-        add     ebp,2 
-        mov     dword ptr [esp+4Ch],edx 
+        sub     edx,18h
+        add     ebp,2
+        mov     dword ptr [esp+4Ch],edx
         jmp     RETURN_CFileLoader_LoadCollisionFile_Mid_Skip
     }
 }

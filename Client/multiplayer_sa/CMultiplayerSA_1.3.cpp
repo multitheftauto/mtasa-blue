@@ -583,7 +583,7 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle()
             push eax
             mov eax, dwRed
             push eax
-            
+
             // return back to SA
             JMP RETN_CVehicle_ProcessStuff_PostPushSirenPositionSingle
         }
@@ -623,7 +623,7 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeDual()
 {
     _asm
     {
-        // Grab our default siren type into edi 
+        // Grab our default siren type into edi
         movzx edi, byte ptr ds:[edi+06ACDACh]
         pushad
         // Store our Vehicle interface
@@ -794,7 +794,7 @@ void _declspec(naked) HOOK_CVehicle_DoesVehicleUseSiren()
     {
         _asm
         {
-            popad 
+            popad
             // Move 1 into AL (true)
             mov al, 1
             // Return

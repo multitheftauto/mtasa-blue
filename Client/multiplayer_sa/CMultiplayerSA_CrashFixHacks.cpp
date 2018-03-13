@@ -30,7 +30,7 @@ void _declspec(naked) CrashAverted()
         call    OnCrashAverted
         add     esp, 4
         popad
-        popfd    
+        popfd
         retn    4
     }
 }
@@ -44,10 +44,10 @@ void _declspec(naked) HOOK_CrashFix_Misc1()
     _asm
     {
         mov     eax,dword ptr [esp+18h]
-        test    eax,eax 
+        test    eax,eax
         je      cont
 
-        mov     eax,dword ptr ds:[008D12CCh] 
+        mov     eax,dword ptr ds:[008D12CCh]
         mov     ecx,dword ptr [eax+esi]     // If [eax+esi] is 0, it causes a crash
         test    ecx,ecx
         jne     cont
@@ -68,23 +68,23 @@ void _declspec(naked) HOOK_CrashFix_Misc2()
 {
     _asm
     {
-        test    eax,eax 
+        test    eax,eax
         je      cont        // Skip much code if eax is zero (vehicle has no colmodel)
 
-        mov     eax,dword ptr [eax+2Ch] 
+        mov     eax,dword ptr [eax+2Ch]
 
-        test    eax,eax 
+        test    eax,eax
         je      cont        // Skip much code if eax is zero (colmodel has no coldata)
 
-        mov     ebx,dword ptr [eax+10h] 
+        mov     ebx,dword ptr [eax+10h]
 
-        test    ebx,ebx 
+        test    ebx,ebx
         je      cont        // Skip much code if ebx is zero (coldata has no suspension lines)
 
         mov     cl,byte ptr [esi+429h]
         jmp     RETURN_CrashFix_Misc2
     cont:
-        push    2 
+        push    2
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc2B
     }
@@ -98,13 +98,13 @@ void _declspec(naked) HOOK_CrashFix_Misc3()
 {
     _asm
     {
-        test    ecx,ecx 
+        test    ecx,ecx
         je      cont        // Skip much code if ecx is zero (ped has no something)
 
         mov     edx,dword ptr [ecx+384h]
         jmp     RETURN_CrashFix_Misc3
     cont:
-        push    3 
+        push    3
         call    CrashAverted
         jmp     CPlayerPed__ProcessControl_Abort
     }
@@ -119,15 +119,15 @@ void _declspec(naked) HOOK_CrashFix_Misc4()
 {
     _asm
     {
-        test    ecx,ecx 
+        test    ecx,ecx
         je      cont        // Skip much code if ecx is zero (avoid divide by zero in soundmanager::service)
 
-        cdq  
-        idiv    ecx  
-        add     edx, ebp  
+        cdq
+        idiv    ecx
+        add     edx, ebp
         jmp     RETURN_CrashFix_Misc4
     cont:
-        push    4 
+        push    4
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc4B
     }
@@ -143,14 +143,14 @@ void _declspec(naked) HOOK_CrashFix_Misc5()
     _asm
     {
         mov     edi, dword ptr [ecx*4+0A9B0C8h]
-        mov     edi, dword ptr [edi+5Ch]     
-        test    edi, edi 
+        mov     edi, dword ptr [edi+5Ch]
+        test    edi, edi
         je      cont        // Skip much code if edi is zero (ped has no model)
 
         mov     edi, dword ptr [ecx*4+0A9B0C8h]
         jmp     RETURN_CrashFix_Misc5
     cont:
-        push    5 
+        push    5
         call    CrashAverted
         pop edi
         jmp     RETURN_CrashFix_Misc5B
@@ -167,14 +167,14 @@ void _declspec(naked) HOOK_CrashFix_Misc6()
 {
     _asm
     {
-        test    ecx, ecx 
+        test    ecx, ecx
         je      cont        // Skip much code if ecx is zero (ped has no anim something)
 
         mov     eax, dword ptr [ecx+10h]
         test    eax, eax
         jmp     RETURN_CrashFix_Misc6
     cont:
-        push    6 
+        push    6
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc6B
     }
@@ -190,14 +190,14 @@ void _declspec(naked) HOOK_CrashFix_Misc7()
 {
     _asm
     {
-        test    ecx, ecx 
+        test    ecx, ecx
         je      cont        // Skip much code if ecx is zero (no colmodel)
 
-        mov     esi, dword ptr [ecx+2Ch] 
+        mov     esi, dword ptr [ecx+2Ch]
         test    esi, esi
         jmp     RETURN_CrashFix_Misc7
     cont:
-        push    7 
+        push    7
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc7B
     }
@@ -213,14 +213,14 @@ void _declspec(naked) HOOK_CrashFix_Misc8()
 {
     _asm
     {
-        test    ecx, ecx 
+        test    ecx, ecx
         je      cont        // Skip much code if ecx is zero (no 2d effect plugin)
 
-        mov     ecx, dword ptr [edx+ecx] 
-        test    ecx, ecx 
+        mov     ecx, dword ptr [edx+ecx]
+        test    ecx, ecx
         jmp     RETURN_CrashFix_Misc8
     cont:
-        push    8 
+        push    8
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc8B
     }
@@ -236,14 +236,14 @@ void _declspec(naked) HOOK_CrashFix_Misc9()
 {
     _asm
     {
-        test    esi, esi 
+        test    esi, esi
         je      cont        // Skip much code if esi is zero (invalid projectile)
 
-        mov     eax, dword ptr [esi+40h] 
+        mov     eax, dword ptr [esi+40h]
         test    ah, 1
         jmp     RETURN_CrashFix_Misc9
     cont:
-        push    9 
+        push    9
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc9B
     }
@@ -262,11 +262,11 @@ void _declspec(naked) HOOK_CrashFix_Misc10()
         cmp     ecx, 0x80
         jb      cont  // Skip much code if ecx is small (invalid vector pointer)
 
-        mov     edx, dword ptr [ecx] 
+        mov     edx, dword ptr [ecx]
         mov     dword ptr [esp], edx
         jmp     RETURN_CrashFix_Misc10
     cont:
-        push    10 
+        push    10
         call    CrashAverted
         mov     ecx, dword ptr [esp+1Ch]
         mov     dword ptr [ecx],0
@@ -286,14 +286,14 @@ void _declspec(naked) HOOK_CrashFix_Misc11()
 {
     _asm
     {
-        test    ecx, ecx 
+        test    ecx, ecx
         je      cont  // Skip much code if ecx is zero (invalid anim somthing)
 
-        mov     eax, dword ptr [ecx+10h] 
-        test    eax, eax 
+        mov     eax, dword ptr [ecx+10h]
+        test    eax, eax
         jmp     RETURN_CrashFix_Misc11
     cont:
-        push    11 
+        push    11
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc11B
     }
@@ -309,14 +309,14 @@ void _declspec(naked) HOOK_CrashFix_Misc12()
 {
     _asm
     {
-        test    edi, edi 
+        test    edi, edi
         je      cont  // Skip much code if edi is zero (invalid anim somthing)
 
-        mov     al, byte ptr [edi+0Bh] 
-        test    al, al 
+        mov     al, byte ptr [edi+0Bh]
+        test    al, al
         jmp     RETURN_CrashFix_Misc12
     cont:
-        push    12 
+        push    12
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc12B
     }
@@ -334,11 +334,11 @@ void _declspec(naked) HOOK_CrashFix_Misc13()
         cmp     eax, 0x2480
         jb      cont  // Skip much code if eax is less than 0x480 (invalid anim)
 
-        mov     al, byte ptr [eax+0Ah] 
+        mov     al, byte ptr [eax+0Ah]
         shr     al, 5
         jmp     RETURN_CrashFix_Misc13
     cont:
-        push    13 
+        push    13
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc13B
     }
@@ -359,7 +359,7 @@ void _declspec(naked) HOOK_CrashFix_Misc14()
         sub     esp, 0D4h
         jmp     RETURN_CrashFix_Misc14
     cont:
-        push    14 
+        push    14
         call    CrashAverted
         add     esp, 12
         retn    12
@@ -432,7 +432,7 @@ void _declspec(naked) HOOK_CrashFix_Misc16()
         jmp     RETURN_CrashFix_Misc16
 
     cont:
-        push    16 
+        push    16
         call    CrashAverted
         add     esp, 96
         retn
@@ -463,7 +463,7 @@ void _declspec(naked) HOOK_CrashFix_Misc17()
         jmp     RETURN_CrashFix_Misc17_BOTH
 
     cont:
-        push    17 
+        push    17
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc17B_BOTH
     }
@@ -482,21 +482,21 @@ void _declspec(naked) HOOK_CrashFix_Misc18()
         je      cont  // Skip much code if ebp is zero
 
         // continue standard path
-        mov         edx,dword ptr [ebp+40h] 
-        mov         eax,dword ptr [esp+10h] 
+        mov         edx,dword ptr [ebp+40h]
+        mov         eax,dword ptr [esp+10h]
         jmp     RETURN_CrashFix_Misc18
 
     cont:
-        push    18 
+        push    18
         call    CrashAverted
-        mov         edx,0 
+        mov         edx,0
         mov         eax,dword ptr [esp+10h]
-        mov         dword ptr [eax],edx 
-        mov         dword ptr [eax+4],edx 
-        pop         esi  
-        mov         dword ptr [eax+8],edx 
-        pop         ebp  
-        ret         0Ch  
+        mov         dword ptr [eax],edx
+        mov         dword ptr [eax+4],edx
+        pop         esi
+        mov         dword ptr [eax+8],edx
+        pop         ebp
+        ret         0Ch
     }
 }
 
@@ -520,13 +520,13 @@ void _declspec(naked) HOOK_CrashFix_Misc19()
         je      cont  // Skip much code if esi is zero
 
         // continue standard path
-        mov     eax, [esi+98h] 
+        mov     eax, [esi+98h]
         jmp     RETURN_CrashFix_Misc19_BOTH
 
     cont:
-        push    19 
+        push    19
         call    CrashAverted
-        mov     edx,dword ptr [ecx+98h] 
+        mov     edx,dword ptr [ecx+98h]
         test    edx,edx
         jmp     RETURN_CrashFix_Misc19B_BOTH
     }
@@ -545,12 +545,12 @@ void _declspec(naked) HOOK_CrashFix_Misc20()
         je      cont        // Skip much code if ecx is zero
 
         // continue standard path
-        sub     esp, 10h 
-        mov     eax, [ecx+14h] 
+        sub     esp, 10h
+        mov     eax, [ecx+14h]
         jmp     RETURN_CrashFix_Misc20
 
     cont:
-        push    20 
+        push    20
         call    CrashAverted
         retn
     }
@@ -607,7 +607,7 @@ void _declspec(naked) HOOK_CrashFix_Misc21()
         jmp     RETURN_CrashFix_Misc21
 
     cont:
-        push    21 
+        push    21
         call    CrashAverted
         retn
     }
@@ -622,39 +622,39 @@ void _declspec(naked) HOOK_CrashFix_Misc22()
 {
     _asm
     {
-        mov         edx,dword ptr [edi+0Ch] 
+        mov         edx,dword ptr [edi+0Ch]
 
         cmp     edx, 0x480
         jb      altcode  // Fill output with zeros if edx is low
 
         // do standard code
     lp1:
-        mov         edx,dword ptr [edi+0Ch] 
-        mov         edx,dword ptr [edx+eax*4] 
-        mov         ebx,dword ptr [esi+10h] 
-        mov         dword ptr [ebx+ecx+10h],edx 
-        mov         edx,dword ptr [esi+10h] 
-        mov         dword ptr [edx+ecx+14h],esi 
-        movsx       edx,word ptr [esi+0Ch] 
-        inc         eax  
-        add         ecx,18h 
-        cmp         eax,edx 
-        jl          lp1 
+        mov         edx,dword ptr [edi+0Ch]
+        mov         edx,dword ptr [edx+eax*4]
+        mov         ebx,dword ptr [esi+10h]
+        mov         dword ptr [ebx+ecx+10h],edx
+        mov         edx,dword ptr [esi+10h]
+        mov         dword ptr [edx+ecx+14h],esi
+        movsx       edx,word ptr [esi+0Ch]
+        inc         eax
+        add         ecx,18h
+        cmp         eax,edx
+        jl          lp1
         jmp     RETURN_CrashFix_Misc22
 
         // do alternate code
     altcode:
-        push    22 
+        push    22
         call    CrashAverted
         mov     edx,0
-        mov         ebx,dword ptr [esi+10h] 
-        mov         dword ptr [ebx+ecx+10h],edx 
-        mov         dword ptr [ebx+ecx+14h],edx 
-        movsx       edx,word ptr [esi+0Ch] 
-        inc         eax  
-        add         ecx,18h 
-        cmp         eax,edx 
-        jl          altcode 
+        mov         ebx,dword ptr [esi+10h]
+        mov         dword ptr [ebx+ecx+10h],edx
+        mov         dword ptr [ebx+ecx+14h],edx
+        movsx       edx,word ptr [esi+0Ch]
+        inc         eax
+        add         ecx,18h
+        cmp         eax,edx
+        jl          altcode
         jmp     RETURN_CrashFix_Misc22
     }
 }
@@ -676,7 +676,7 @@ void _declspec(naked) HOOK_CrashFix_Misc23()
         // zero if out of range
         mov     edx,0
         mov     [esp+8], edx
-        push    23 
+        push    23
         call    CrashAverted
 
     ok:
@@ -708,7 +708,7 @@ void _declspec(naked) HOOK_CrashFix_Misc24()
         jmp     RETURN_CrashFix_Misc24_BOTH
 
     cont:
-        push    24 
+        push    24
         call    CrashAverted
         mov     ebp, 0
         mov     eax, 0
@@ -736,7 +736,7 @@ void _declspec(naked) HOOK_CrashFix_Misc25()
         jmp     RETURN_CrashFix_Misc25
 
     fix:
-        push    25 
+        push    25
         call    CrashAverted
         // Do special thing
         pop     esi
@@ -759,18 +759,18 @@ void _declspec(naked) HOOK_CrashFix_Misc26()
         jz      fix
 
         // Continue standard path
-        mov     edi,dword ptr [ebx+ebp*4] 
-        dec     ebp  
-        test    edi,edi 
+        mov     edi,dword ptr [ebx+ebp*4]
+        dec     ebp
+        test    edi,edi
         jmp     RETURN_CrashFix_Misc26
 
     fix:
-        push    26 
+        push    26
         call    CrashAverted
         // Do special thing
-        mov     edi, 0 
-        dec     ebp  
-        test    edi,edi 
+        mov     edi, 0
+        dec     ebp
+        test    edi,edi
         jmp     RETURN_CrashFix_Misc26
     }
 }
@@ -792,7 +792,7 @@ void _declspec(naked) HOOK_CrashFix_Misc27()
         mov     ecx, [edi+58Ch]
         test    ecx, ecx
         jne     cont
-        push    27 
+        push    27
         call    CrashAverted
 
 cont:
@@ -818,7 +818,7 @@ void _declspec(naked) HOOK_CrashFix_Misc28()
         test    eax, eax
         jne     cont
 
-        push    28 
+        push    28
         call    CrashAverted
         // Skip much code
         jmp     RETURN_CrashFix_Misc28B
@@ -850,7 +850,7 @@ void _declspec(naked) HOOK_CrashFix_Misc29()
         jmp     RETURN_CrashFix_Misc29
 
 cont:
-        push    29 
+        push    29
         call    CrashAverted
         // Skip much code
         jmp     RETURN_CrashFix_Misc29B
@@ -878,7 +878,7 @@ void _declspec(naked) HOOK_CrashFix_Misc30()
         jmp     RETURN_CrashFix_Misc30
 
 cont:
-        push    30 
+        push    30
         call    CrashAverted
         // Skip much code
         jmp     RETURN_CrashFix_Misc30B
@@ -987,8 +987,8 @@ void _declspec(naked) HOOK_CClumpModelInfo_GetFrameFromId()
         retn
 
 inner:
-        sub     esp,8 
-        mov     eax,dword ptr [esp+10h] 
+        sub     esp,8
+        mov     eax,dword ptr [esp+10h]
         jmp     RETURN_CClumpModelInfo_GetFrameFromId
     }
 }
@@ -1066,7 +1066,7 @@ void _declspec(naked) HOOK_CEntity_GetBoundRect()
         popad
 
         // Continue replaced code
-        mov     ecx,dword ptr [eax*4+0A9B0C8h] 
+        mov     ecx,dword ptr [eax*4+0A9B0C8h]
         jmp     RETURN_CEntity_GetBoundRect
     }
 }
@@ -1220,8 +1220,8 @@ void _declspec(naked) HOOK_CVolumetricShadowMgr_Render()
 
 inner:
         // Replaced code
-        sub     esp, 18h  
-        mov     ecx, 0A9AE00h 
+        sub     esp, 18h
+        mov     ecx, 0A9AE00h
         jmp     RETURN_CVolumetricShadowMgr_Render
     }
 }
@@ -1268,7 +1268,7 @@ void _declspec(naked) HOOK_CVolumetricShadowMgr_Update()
 
 inner:
         // Replaced code
-        mov     ecx, 0A9AE00h  
+        mov     ecx, 0A9AE00h
         jmp     RETURN_CVolumetricShadowMgr_Update
     }
 }
@@ -1310,7 +1310,7 @@ void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
         popad
 
         // Replaced code
-        mov     eax, 0x0A9B0C8[eax*4] 
+        mov     eax, 0x0A9B0C8[eax*4]
         jmp     RETURN_CAnimManager_CreateAnimAssocGroups
     }
 }
@@ -1438,11 +1438,11 @@ void _declspec(naked) HOOK_RwMatrixMultiply()
         cmp     eax, 0x480
         jb      cont  // Skip code if eax is low
 
-        mov     ecx, dword ptr ds:[0C979BCh] 
+        mov     ecx, dword ptr ds:[0C979BCh]
         jmp     RETURN_RwMatrixMultiply_BOTH
 
 cont:
-        push    31 
+        push    31
         call    CrashAverted
         retn
     }

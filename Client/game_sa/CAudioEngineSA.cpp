@@ -54,7 +54,8 @@ VOID CAudioEngineSA::StopRadio()
     // DWORD dwFunc = FUNC_StopRadio;
     DWORD dwFunc = 0x4E9823;            // Some function CAudio::StopRadio jumps to immediately
 
-    _asm {
+    _asm
+    {
         // This doesn't work anymore because we've
         // returned out the function.
         /*
@@ -70,15 +71,15 @@ VOID CAudioEngineSA::StopRadio()
         push        0
         push        retpoint
 
-            // Do what CAudio::StopRadio does. Mov the AERadioTrackManager class instance into 'ecx' (this)
+        // Do what CAudio::StopRadio does. Mov the AERadioTrackManager class instance into 'ecx' (this)
         mov         ecx, CLASS_AERadioTrackManager
 
-            // Do what this global func we've removed does in the beginning.
-        push        ebx  
-        push        ebp  
+        // Do what this global func we've removed does in the beginning.
+        push        ebx
+        push        ebp
         push        esi
 
-                // Jump to behind the return code we've replaced.
+        // Jump to behind the return code we've replaced.
         jmp         dwFunc
 
         retpoint:
@@ -97,7 +98,8 @@ VOID CAudioEngineSA::StartRadio(unsigned int station)
 
     DWORD dwFunc = 0x4DBEC3;
     DWORD dwFunc2 = 0x4EB3C3;
-    _asm {
+    _asm
+    {
         // We can't do this anymore as we've returned out StartRadio
         /*
         push    0
@@ -110,32 +112,32 @@ VOID CAudioEngineSA::StartRadio(unsigned int station)
         push        0
         push        station
 
-            // Call something, skip 3 bytes that we have our return instruction on (no arguments)
-        mov         ecx,CLASS_AECutsceneTrackManager 
-        mov         eax,dword ptr [ecx+8] 
+        // Call something, skip 3 bytes that we have our return instruction on (no arguments)
+        mov         ecx,CLASS_AECutsceneTrackManager
+        mov         eax,dword ptr [ecx+8]
         call        dwFunc
 
-            // Check the return value, eventually skip
-        test        al,al 
+        // Check the return value, eventually skip
+        test        al,al
         jne         skip
 
-        mov         eax,dword ptr [esp+4] 
+        mov         eax,dword ptr [esp+4]
         mov         ecx,dword ptr [esp]
 
         // Push arguments to some other function
         push        0
         push        0
-        push        eax  
+        push        eax
         push        ecx
 
-            // Call it (emulate call instruction)
-        mov         ecx,8CB6F8h 
+        // Call it (emulate call instruction)
+        mov         ecx,8CB6F8h
         push        done
-        push        ebx  
-        mov         bl,byte ptr [esp+8] 
+        push        ebx
+        mov         bl,byte ptr [esp+8]
         jmp         dwFunc2
 
-            // Pop our arguments back
+        // Pop our arguments back
         done:
         pop         eax
         pop         eax
@@ -525,7 +527,7 @@ void _declspec(naked) HOOK_CAESoundManager_RequestNewSound()
         push    edi
         xor     esi, esi
         jmp     RETURN_CAESoundManager_RequestNewSound
-       
+
 skip:   // Skip playing sound
         popad
         xor     eax, eax

@@ -6031,7 +6031,7 @@ void CClientPed::HandleWaitingForGroundToLoad(void)
         SetFrozenWaitingForGroundToLoad(false);
         #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
         OutputDebugLine("[AsyncLoading]   FreezeUntilCollisionLoaded - Early stop");
-        #endif 
+        #endif
         return;
     }
 

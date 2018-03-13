@@ -43,7 +43,7 @@ VOID HOOK_CHeli__ProcessControl();
 #define FUNC_CPlayerPed__ProcessControl     0x60EA90
 #define VTBL_CPlayerPed__ProcessControl     0x86D190
 
-#define FUNC_CAutomobile__ProcessControl    0x6B1880    
+#define FUNC_CAutomobile__ProcessControl    0x6B1880
 #define VTBL_CAutomobile__ProcessControl    0x871148
 
 #define FUNC_CMonsterTruck__ProcessControl  0x6C8250
@@ -64,13 +64,13 @@ VOID HOOK_CHeli__ProcessControl();
 #define FUNC_CTrain__ProcessControl         0x6F86A0
 #define VTBL_CTrain__ProcessControl         0x872398
 
-#define FUNC_CBoat__ProcessControl          0x6F1770    
+#define FUNC_CBoat__ProcessControl          0x6F1770
 #define VTBL_CBoat__ProcessControl          0x8721C8
 
-#define FUNC_CBike__ProcessControl          0x6B9250    
+#define FUNC_CBike__ProcessControl          0x6B9250
 #define VTBL_CBike__ProcessControl          0x871388
 
-#define FUNC_CHeli__ProcessControl          0x6C7050    
+#define FUNC_CHeli__ProcessControl          0x6C7050
 #define VTBL_CHeli__ProcessControl          0x8716A8
 
 //#define FUNC_CVehicle__ProcessUnknown     0x593030

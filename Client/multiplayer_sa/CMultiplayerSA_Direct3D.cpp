@@ -62,15 +62,15 @@ void _declspec(naked) HOOK_PreCreateDevice()
     _asm
     {
         // Run replaced code
-        mov     ecx,dword ptr ds:[0C97C20h] 
-        push    0C97C28h 
-        push    0C9C040h 
-        push    eax  
+        mov     ecx,dword ptr ds:[0C97C20h]
+        push    0C97C28h
+        push    0C9C040h
+        push    eax
         mov     eax,dword ptr ds:[00C97C1Ch]
-        mov     edx,  [ecx] 
-        push    eax  
+        mov     edx,  [ecx]
+        push    eax
         mov     eax,dword ptr ds:[008E2428h]
-        push    eax  
+        push    eax
 
         mov     eax, ds:0x0C97C24       // __RwD3DAdapterIndex
         push    eax

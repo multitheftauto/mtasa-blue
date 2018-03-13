@@ -72,7 +72,7 @@ CAnimBlendStaticAssociation* CAnimBlendAssocGroupSA::GetAnimation(unsigned int I
     DWORD                        dwThis = (DWORD)m_pInterface;
     DWORD                        dwFunc = FUNC_CAnimBlendAssocGroup_GetAnimation;
     _asm
-    {        
+    {
         mov     ecx, dwThis
         push    ID
         call    dwFunc

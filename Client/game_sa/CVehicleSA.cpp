@@ -150,7 +150,7 @@ CVehicleSA::CVehicleSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsig
         push    0
         push    0
         push    0           // spawn at 0,0,0
-        push    dwModelID   
+        push    dwModelID
         call    dwFunc
         add     esp, 0x14
         mov     dwReturn, eax
@@ -162,7 +162,7 @@ CVehicleSA::CVehicleSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsig
 
     m_pInterface->bStreamingDontDelete = true;
     m_pInterface->bDontStream = true;
-    
+
     // store our CVehicleSA pointer in the vehicle's time of creation member (as it won't get modified later and as far as I know it isn't used for something important)
     GetVehicleInterface ()->m_pVehicle = this;
 
@@ -1706,7 +1706,7 @@ bool CVehicleSA::BreakTowLink(void)
 
     _asm
     {
-        mov     ecx, dwThis       
+        mov     ecx, dwThis
         call    dwFunc
         mov     bReturn, al
     }
@@ -1792,7 +1792,7 @@ CPhysical* CVehicleSA::QueryPickedUpEntityWithWinch()
     CPhysical*            physRet;
     _asm
     {
-        mov     ecx, dwThis       
+        mov     ecx, dwThis
         call    dwFunc
         mov     phys, eax
     }

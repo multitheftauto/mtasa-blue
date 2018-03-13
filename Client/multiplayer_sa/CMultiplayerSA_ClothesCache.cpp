@@ -383,7 +383,7 @@ done:
 
 inside:
         // Original code
-        sub     esp, 0D4h 
+        sub     esp, 0D4h
         jmp     RETURN_CClothesBuilderCreateSkinnedClump
     }
 }

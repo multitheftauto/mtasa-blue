@@ -400,12 +400,12 @@ BOOL CJoystickManager::DoEnumObjectsCallback(const DIDEVICEOBJECTINSTANCE* pdido
             CCore::GetSingleton ().GetConsole ()->Printf(
                             "%p  dwHow:%d  dwObj:%d  guid:%x  index:%d  lMin:%d  lMax:%d"
                             ,m_DevInfo.pDevice
-                            ,range.diph.dwHow            
-                            ,range.diph.dwObj            
-                            ,pdidoi->guidType.Data1            
-                            ,axisIndex            
-                            ,range.lMin            
-                            ,range.lMax            
+                            ,range.diph.dwHow
+                            ,range.diph.dwObj
+                            ,pdidoi->guidType.Data1
+                            ,axisIndex
+                            ,range.lMin
+                            ,range.lMax
                             );
 
 #endif

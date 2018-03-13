@@ -62,7 +62,7 @@ CExplosion *CExplosionManagerSA::AddExplosion(CEntity *pExplodingEntity, CEntity
         mov     ebx, dwFunc // Now jump in 6 bytes later (6 bytes might be used for our patch-jump in Multiplayer)
         add     ebx, 6
         jmp     ebx
-        
+
 returnhere:
         add     esp, 0x28
         mov     bReturn, al

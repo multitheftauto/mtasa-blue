@@ -15,7 +15,7 @@
 #include <game/CDamageManager.h>
 #include "Common.h"
 
-#define FUNC_GetEngineStatus        0x6c22c0 
+#define FUNC_GetEngineStatus        0x6c22c0
 #define FUNC_SetEngineStatus        0x6c22a0
 #define FUNC_GetDoorStatus          0x6c2230
 #define FUNC_SetDoorStatus          0x6c21c0

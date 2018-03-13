@@ -41,14 +41,17 @@ goto:eof
 :doformat
 echo Processing directory "%1"
 
-echo Tabs to spaces
-call:searchInReplaced %FINDANDREPLACE% --dir "%1" --useRegEx --find "\t" --replace "    "
-
 :: Use 0A end-of-line marker for the duration of formatting
 set EOL=\n
 echo Conform line endings
 call:searchInReplaced %FINDANDREPLACE% --dir "%1" --useRegEx --useEscapeChars --find "\r\n" --replace "%EOL%"
 call:searchInReplaced %FINDANDREPLACE% --dir "%1" --useRegEx --useEscapeChars --find "\r" --replace "%EOL%"
+
+echo Tabs to spaces
+call:searchInReplaced %FINDANDREPLACE% --dir "%1" --useRegEx --find "\t" --replace "    "
+
+echo Remove trailing spaces
+call:searchInReplaced %FINDANDREPLACE% --dir "%1" --useRegEx --useEscapeChars --find " +%EOL%" --replace "%EOL%"
 
 echo Remove DEVELOPERS
 call:searchInReplaced %FINDANDREPLACE% --dir "%1" --useRegEx --find ".*DEVELOPERS.*(%EOL%.*\w.*)*%EOL%(.*)" --replace "$2"
@@ -57,7 +60,7 @@ echo Remove inline from class methods
 call:searchInReplaced %FINDANDREPLACE% --dir "%1" --useRegEx --find "^(class(.*%EOL%)*)( +)inline +((.*%EOL%)*})" --replace "$1$3$4"
 
 echo Exclude _asm blocks
-%FINDANDREPLACE% --dir "%1" --useRegEx --useEscapeChars --find "(^.*_asm(%EOL%)? *{(.*%EOL%)*?.*}.*)" --replace "// clang-format off%EOL%//TEMP%EOL%$1%EOL%//TEMP%EOL%// clang-format on"
+%FINDANDREPLACE% --dir "%1" --useRegEx --useEscapeChars --find "(^.*_asm *(%EOL%)? *{(.*%EOL%)*?.*}.*)" --replace "// clang-format off%EOL%//TEMP%EOL%$1%EOL%//TEMP%EOL%// clang-format on"
 
 echo Exclude preprocessor directives
 %FINDANDREPLACE% --dir "%1" --useRegEx --useEscapeChars --find "^( *?#(.*?\\%EOL%)*(.*?%EOL%))" --replace "#dummy%EOL%// clang-format off%EOL%//TEMP%EOL%$1//TEMP%EOL%// clang-format on%EOL%#dummy%EOL%"

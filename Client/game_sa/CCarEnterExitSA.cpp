@@ -61,7 +61,7 @@ bool CCarEnterExitSA::GetNearestCarPassengerDoor(CPed* pPed, CVehicle* pVehicle,
             push    ebx
             mov     bl, bUnknown
             push    ebx
-            push    pDoor 
+            push    pDoor
             push    pVector
             push    pVehicleInterface
             push    pPedInterface

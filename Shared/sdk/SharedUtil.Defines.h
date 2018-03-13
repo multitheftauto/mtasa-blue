@@ -115,7 +115,7 @@
 
 // As NDEBUG is not defined across most MTA projects, assert() will always be enabled
 // Use dassert for debug build only assertations
-#if defined(MTA_DEBUG) || defined(DEBUG) || defined(_DEBUG) 
+#if defined(MTA_DEBUG) || defined(DEBUG) || defined(_DEBUG)
     #define dassert assert
 #else
     #define dassert(_Expression)     ((void)0)

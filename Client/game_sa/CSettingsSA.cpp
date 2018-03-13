@@ -372,7 +372,7 @@ void _declspec(naked) HOOK_GetFxQuality()
         mov     dwFxQualityValue, eax
 
         mov     eax, [esp+32]           // Address GetFxQuality was called from
-        push    eax                     
+        push    eax
         call    MaybeAlterFxQualityValue
         add     esp, 4
 
@@ -391,7 +391,7 @@ void _declspec(naked) HOOK_StoreShadowForVehicle()
         mov     eax, [esp+4]        // Get vehicle
         mov     ax, [eax+34]        // pEntity->m_nModelIndex
         mov     usCallingForVehicleModel, ax
-        sub     esp, 44h 
+        sub     esp, 44h
         push    ebx
         mov     eax, 0x70F9B0       // CVolumetricShadowMgr::IsAvailable
         call    eax

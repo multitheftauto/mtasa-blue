@@ -189,7 +189,7 @@ VOID _declspec(naked) HOOK_CPopulation__RemovePed()
 
     _asm
     {
-        
+
         push    esi
         mov     esi, [esp+8]
         push    esi

@@ -153,7 +153,7 @@ void CPedSA::AttachPedToBike(CEntity* entity, CVector* vector, unsigned short sU
         mov     ecx, dwThis
         push    dwEntityInterface
         call    dwFunc
-    }   
+    }
 }
 
 bool CPedSA::AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity)
@@ -1771,14 +1771,14 @@ void _declspec(naked) HOOK_CPed_PreRenderAfterTest()
         mov     eax,[esp-32-4*1]    // Get result temp
 
         // Replaced code
-        sub         esp,70h 
-        push        ebx  
+        sub         esp,70h
+        push        ebx
         push        ebp
-        push        esi  
-        mov         ebp,ecx 
-        mov         ecx,dword ptr [ebp+47Ch] 
-        push        edi 
- 
+        push        esi
+        mov         ebp,ecx
+        mov         ecx,dword ptr [ebp+47Ch]
+        push        edi
+
         // Check what to do
         cmp     eax,0
         jnz     skip_rotation_update

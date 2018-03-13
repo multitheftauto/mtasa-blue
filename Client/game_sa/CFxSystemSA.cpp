@@ -175,9 +175,9 @@ void _declspec(naked) HOOK_FxSystem_c_Update_MidA()
         retn    8
 
 inner:
-        sub     esp, 10h  
-        push    ebx  
-        push    ebp  
+        sub     esp, 10h
+        push    ebx
+        push    ebp
         jmp     RETURN_FxSystem_c_Update_MidA
     }
 }

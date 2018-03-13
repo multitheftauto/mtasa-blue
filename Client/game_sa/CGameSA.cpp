@@ -480,7 +480,7 @@ void CGameSA::Terminate(void)
     delete this;
 
     // Dump any memory leaks if DETECT_LEAK is defined
-    #ifdef DETECT_LEAKS    
+    #ifdef DETECT_LEAKS
     DumpUnfreed();
     #endif
 }

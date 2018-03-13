@@ -40,7 +40,7 @@
 #define VAR_CameraRotation                  0xB6F178 // used for controling where the player faces
 #define VAR_VehicleCameraView               0xB6F0DC
 
-#define MAX_CAMS                            3 
+#define MAX_CAMS                            3
 
 #define MAX_NUM_OF_NODES                    800 // for trains
 
@@ -139,9 +139,9 @@ public:
     bool          m_bAllowShootingWith2PlayersInCar;
     bool          m_bDisableFirstPersonInCar;
     static bool   m_bUseMouse3rdPerson;
-#ifndef FINALBUILD  
+#ifndef FINALBUILD
     bool bStaticFrustum;
-#endif  
+#endif
 
     // for debug keyboard stuff
 #ifndef MASTER

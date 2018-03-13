@@ -34,7 +34,7 @@ BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
 }
 #endif
 
-#ifdef WIN_x86 
+#ifdef WIN_x86
 
 #include <cstdlib>
 #include <tchar.h>

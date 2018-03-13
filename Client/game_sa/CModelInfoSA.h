@@ -47,8 +47,8 @@ class CPedModelInfoSAInterface;
 #define     FUNC_IsHeliModel                0x4c5b00
 #define     FUNC_IsPlaneModel               0x4c5b30
 #define     FUNC_IsBikeModel                0x4c5b60
-#define     FUNC_IsFakePlaneModel           0x4c5b90    
-#define     FUNC_IsMonsterTruckModel        0x4c5bc0        
+#define     FUNC_IsFakePlaneModel           0x4c5b90
+#define     FUNC_IsMonsterTruckModel        0x4c5bc0
 #define     FUNC_IsQuadBikeModel            0x4c5bf0
 #define     FUNC_IsBmxModel                 0x4c5c20
 #define     FUNC_IsTrailerModel             0x4c5c50

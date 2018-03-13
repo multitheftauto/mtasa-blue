@@ -85,8 +85,8 @@ namespace SharedUtil
         const char* szClockSectionTag = tag
 
     #define CLOCK1(name)        CLOCK( szClockSectionTag, name )
-    #define UNCLOCK1(name)      UNCLOCK( szClockSectionTag, name) 
-    #define CLOCK_CALL1(code)   CLOCK_CALL( szClockSectionTag, code ) 
+    #define UNCLOCK1(name)      UNCLOCK( szClockSectionTag, name)
+    #define CLOCK_CALL1(code)   CLOCK_CALL( szClockSectionTag, code )
 
     //
     // Performance stat resulting

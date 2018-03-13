@@ -46,7 +46,7 @@ void CTaskManagerSA::SetTask(CTaskSA* pTaskPrimary, const int iTaskPriority, con
         push    taskInterface
         mov     ecx, dwInterface
         call    dwFunc
-    }    
+    }
 }
 
 CTask* CTaskManagerSA::GetTask(const int iTaskPriority)

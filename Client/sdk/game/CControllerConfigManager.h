@@ -13,7 +13,7 @@
 #define __CGAME_CONTROLLER_CONFIG_MANAGER
 
 // FROM VC, unlikely that they were changed though
-#define GTA_KEY_NO_MOUSE_BUTTON 0   
+#define GTA_KEY_NO_MOUSE_BUTTON 0
 #define GTA_KEY_LMOUSE          1
 #define GTA_KEY_MMOUSE          2
 #define GTA_KEY_RMOUSE          3
@@ -117,7 +117,7 @@
 #define GTA_KEY_RETURN          1045    /* Enter on main keyboard */
 #define GTA_KEY_LSHIFT          1046
 #define GTA_KEY_RSHIFT          1047
-#define GTA_KEY_LCONTROL        1049    
+#define GTA_KEY_LCONTROL        1049
 #define GTA_KEY_RCONTROL        1050
 #define GTA_KEY_LMENU           1051    /* left Alt */
 #define GTA_KEY_RMENU           1052    /* right Alt */

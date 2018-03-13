@@ -62,8 +62,8 @@ void _declspec(naked) HOOK_CWorld_ProcessLineOfSight()
         add     esp, 4*2
         popad
 
-        sub     esp, 60h 
-        cmp     word ptr ds:[0B7CD78h], 0FFFFh 
+        sub     esp, 60h
+        cmp     word ptr ds:[0B7CD78h], 0FFFFh
         jmp     RETURN_CWorld_ProcessLineOfSight
     }
 }

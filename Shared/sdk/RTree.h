@@ -929,7 +929,7 @@ bool RTREE_QUAL::InsertRect(Rect* a_rect, const DATATYPE& a_id, Node** a_root, i
     {
         ASSERT(a_rect->m_min[index] <= a_rect->m_max[index]);
     }
-#endif //_DEBUG  
+#endif //_DEBUG
 
     Node*  newRoot;
     Node*  newNode;
@@ -1164,7 +1164,7 @@ ELEMTYPEREAL RTREE_QUAL::CalcRectVolume(Rect* a_rect)
     return RectSphericalVolume(a_rect);            // Slower but helps certain merge cases
 #else // RTREE_USE_SPHERICAL_VOLUME
     return RectVolume(a_rect);            // Faster but can cause poor merges
-#endif // RTREE_USE_SPHERICAL_VOLUME  
+#endif // RTREE_USE_SPHERICAL_VOLUME
 }
 
 // Load branch buffer with branches from full node plus the extra branch.

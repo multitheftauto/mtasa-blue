@@ -149,7 +149,7 @@ bool CProjectileInfoSA::AddProjectile(CEntity* creator, eWeaponType eWeapon, CVe
     _asm
     {
         push    eax
-            
+
         push    targetVC
         push    target
         push    fForce

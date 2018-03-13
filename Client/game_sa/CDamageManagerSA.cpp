@@ -287,5 +287,5 @@ VOID CDamageManagerSA::FuckCarCompletely(BOOL bKeepWheels)
         mov     ecx, dwPointer
         push    bKeepWheels
         call    dwFunc
-    }   
+    }
 }

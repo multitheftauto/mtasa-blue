@@ -375,7 +375,7 @@ EPatchResult UpdatePatchStatusDep(const SString& strGTAEXEPath, EPatchMode mode)
 //////////////////////////////////////////////////////////
 namespace
 {
-    #define EU_VERSION_BYTE 0x004A1AA0     // Zero if US version 
+    #define EU_VERSION_BYTE 0x004A1AA0     // Zero if US version
 
     uint oldExportDir[] = {0, 0};
     uint newExportDir[] = {0x004a32d0, 0x00000060};
