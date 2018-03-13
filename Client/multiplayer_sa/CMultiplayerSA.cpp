@@ -160,8 +160,12 @@ DWORD RETURN_CPlantMgr_Render_fail =                        0x5DBDAA;
 #define HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse   0x4BA06F
 DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse =    0x4BA076;
 
-#define HOOKPOS_CAnimBlendAssocGroup_CopyAnimation          0x4CE130  //  mov     ecx, [ecx+4]
-DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation =           0x4CE158; //  test    esi, esi
+DWORD FUNC_NEW_OPERATOR = 0x082119A;
+DWORD FUNC_CAnimBlendAssociation_Constructor = 0x04CF080;
+
+#define HOOKPOS_CAnimBlendAssocGroup_CopyAnimation          0x4CE14C  
+DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation =           0x4CE187; 
+DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation_ERROR =     0x4CE199;
 
 #define HOOKPOS_CAnimManager_AddAnimation                   0x4d3aa0
 DWORD RETURN_CAnimManager_AddAnimation =                    0x4D3AB1;
@@ -647,7 +651,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7 );
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10 ); 
     HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10 ); 
-    HookInstall(HOOKPOS_CAnimBlendAssocGroup_CopyAnimation, (DWORD)HOOK_CAnimBlendAssocGroup_CopyAnimation, 6 ); 
+    HookInstall(HOOKPOS_CAnimBlendAssocGroup_CopyAnimation, (DWORD)HOOK_CAnimBlendAssocGroup_CopyAnimation, 5 ); 
     HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 7 );
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8 );
     HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
@@ -5347,17 +5351,18 @@ void _declspec(naked) HOOK_CEventHandler_ComputeKnockOffBikeResponse ()
     }
 }
 
-CAnimBlendStaticAssociationSAInterface * getAnimStaticAssociation ( DWORD * pAnimAssocGroup, DWORD AnimID )
+void CreateAnimStaticAssociation ( CAnimBlendStaticAssociationSAInterface * pAnimStaticAssoc, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, DWORD AnimID )
 {
-    auto pAnimStaticAssoc = (CAnimBlendStaticAssociationSAInterface *)( pAnimAssocGroup[1] + 20 * (AnimID - pAnimAssocGroup[3]) );
+    DWORD * pdwAnimAssocGroup = reinterpret_cast < DWORD * > ( pAnimAssocGroup );
+    auto pOriginalAnimStaticAssoc = (CAnimBlendStaticAssociationSAInterface *)( pdwAnimAssocGroup[1] + 20 * (AnimID - pdwAnimAssocGroup[3]) );
     //auto pAnimStaticAssoc = (CAnimBlendStaticAssociationSAInterface *)malloc ( sizeof(CAnimBlendStaticAssociationSAInterface));
 
-    return pAnimStaticAssoc;
+    *pAnimStaticAssoc = *pOriginalAnimStaticAssoc;
 }
 
-//CAnimBlendAssocGroupSAInterface * pAnimAssocGroup = nullptr;
+CAnimBlendAssocGroupSAInterface * pAnimAssocGroup = nullptr;
+CAnimBlendStaticAssociationSAInterface AnimStaticAssoc;
 CAnimBlendStaticAssociationSAInterface * pAnimStaticAssoc = nullptr;
-DWORD * pAnimAssocGroup = nullptr;
 DWORD AnimID = 0;
 RpClump * pClump = nullptr;
 void _declspec(naked)  HOOK_CAnimBlendAssocGroup_CopyAnimation ()
@@ -5365,22 +5370,14 @@ void _declspec(naked)  HOOK_CAnimBlendAssocGroup_CopyAnimation ()
     _asm
     {
         mov     pClump, edi
-        
-        mov     eax,  fs:0
-        push    0FFFFFFFFh
-        push    083BCABh
-        push    eax
-        mov     eax, [esp+10h]
-        mov     fs:0, esp
-        mov     edx, [ecx+0Ch]
-
         mov     pAnimAssocGroup, ecx
         mov     AnimID, eax
         pushad
     }
 
-    pAnimStaticAssoc = getAnimStaticAssociation ( pAnimAssocGroup, AnimID );
-
+    CreateAnimStaticAssociation ( &AnimStaticAssoc, pAnimAssocGroup, AnimID );
+    pAnimStaticAssoc = &AnimStaticAssoc;
+  
     _asm 
     {
         popad
@@ -5388,7 +5385,26 @@ void _declspec(naked)  HOOK_CAnimBlendAssocGroup_CopyAnimation ()
         sub     eax, edx
         push    esi
         mov     esi, pAnimStaticAssoc
+        test    esi, esi
+        jz      ERROR_CopyAnimation
+        mov     eax, [esi+10h]
+        push    eax
+        mov     eax, 04D41C0h
+        call    eax
+        push    3Ch   
+        call    FUNC_NEW_OPERATOR
+        add     esp, 8
+        mov     [esp+14h], eax
+        test    eax, eax
+        mov     [esp+0Ch], 0
+        jz      ERROR_CopyAnimation
+        push    esi
+        mov     ecx, eax
+        call    FUNC_CAnimBlendAssociation_Constructor
         jmp     RETURN_CAnimBlendAssocGroup_CopyAnimation
+
+ERROR_CopyAnimation:
+        jmp    RETURN_CAnimBlendAssocGroup_CopyAnimation_ERROR
     }
 }
 
