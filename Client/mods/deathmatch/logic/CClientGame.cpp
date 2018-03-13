@@ -26,6 +26,7 @@
 #include <net/SyncStructures.h>
 #include <../Client/game_sa/CAnimBlendAssocGroupSA.h>
 #include <../Client/game_sa/CAnimBlendAssociationSA.h>
+#include <../game_sa/CAnimBlendHierarchySA.h> 
 
 SString StringZeroPadout ( const SString& strInput, uint uiPadoutSize )
 {
@@ -3990,126 +3991,19 @@ bool CClientGame::ChokingHandler ( unsigned char ucWeaponType )
     return m_pLocalPlayer->CallEvent ( "onClientPlayerChoke", Arguments, true );
 }
 
-#include <../game_sa/CAnimBlendHierarchySA.h> // ---------------- REMOVE THIS LATER
+
+
 
 CAnimBlendAssociationSAInterface * CClientGame::AddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
 {
     printf ( "AddAnimationHandler called! pClump, GroupID, AnimID: %p, %d, %d\n", (void*)pClump, animGroup, animID );
-
-    hCAnimBlendAssocGroup_CopyAnimation CAnimBlendAssocGroup_CopyAnimation   = (hCAnimBlendAssocGroup_CopyAnimation)0x004CE130;
-    hUncompressAnimation                 UncompressAnimation                 = (hUncompressAnimation)0x4d41c0;
-    hCAnimBlendAssoc_Constructor_staticAssocRef OLD_CAnimBlendAssoc_Constructor_staticAssocRef = (hCAnimBlendAssoc_Constructor_staticAssocRef)0x4CF080;
-    hCAnimBlendStaticAssoc_Constructor OLD_CAnimBlendStaticAssoc_Constructor = *(hCAnimBlendStaticAssoc_Constructor)0x4CE940;
-    hCAnimBlendStaticAssoc_Init        OLD_CAnimBlendStaticAssoc_Init = (hCAnimBlendStaticAssoc_Init)0x004CEC20;
-    hCAnimBlendAssoc_SyncAnimation CAnimBlendAssoc_SyncAnimation = (hCAnimBlendAssoc_SyncAnimation)0x004CEB40;
-    hCAnimBlendAssoc_Start         CAnimBlendAssoc_Start         = (hCAnimBlendAssoc_Start)0x004CEB70;
-
-  CAnimBlendAssoc * pAnimAssoc; // esi
-  int *clumpData; // edi
-  int *next; // eax
-  DWORD *tempAssoc; // eax
-  int *nextAssoc; // ecx
-
-    CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
-    CAnimBlendStaticAssoc * pAnimOriginalStaticAssoc = (CAnimBlendStaticAssoc *)pAnimationManager->GetAnimStaticAssociation ( animGroup, animID );
-
-    UncompressAnimation ( pAnimOriginalStaticAssoc->m_pAnimBlendHier );
-    pAnimAssoc = (CAnimBlendAssoc *)malloc(sizeof(CAnimBlendAssoc));
-    OLD_CAnimBlendAssoc_Constructor_staticAssocRef ( pAnimAssoc, *pAnimOriginalStaticAssoc);
-
- // We need to remove this line and add some code here for running animations simultaneously
-  pAnimAssoc = CAnimBlendAssocGroup_CopyAnimation((DWORD *) (*(DWORD*)0x00B4EA34) + 5 * animGroup, animID);
-
-  ////ofs << "Done calling  CAnimBlendAssocGroup_CopyAnimation " << std::endl;
-
-  clumpData = *(int **)(   (*(DWORD*)0xB5F878) + ((int)pClump));
-
-  if ( !((*((BYTE *)pAnimAssoc + 46) >> 5) & 1) )
-    goto LABEL_5;
-  next = (int *)*clumpData;
-  if ( !*clumpData )
-    goto LABEL_5;
-  while ( !((*((BYTE *)next + 42) >> 5) & 1) )
-  {
-    next = (int *)*next;
-    if ( !next )
-      goto LABEL_5;
-  }
-  if ( next )
-  {
-    CAnimBlendAssoc_SyncAnimation(pAnimAssoc, (CAnimBlendAssoc *)(next - 1));
-    *((BYTE *)pAnimAssoc + 46) |= 1u;
-  }
-  else
-  {
-LABEL_5:
-    CAnimBlendAssoc_Start(pAnimAssoc, 0);
-  }
-
-  tempAssoc = ((DWORD*)pAnimAssoc) + 1;
-
-  if ( *clumpData )                             // clumpData->nextAssoc
-    *(DWORD *)(*clumpData + 4) = (DWORD)tempAssoc;
-
-  nextAssoc = (int *)*clumpData;
-
-  DWORD * dwpAnimAssoc = (DWORD*) pAnimAssoc;
-
-  dwpAnimAssoc[2] = (DWORD)clumpData;
-  //pAnimAssoc[2] = clumpData;
-
-  *tempAssoc = (DWORD)nextAssoc;
-
-  *clumpData = (int)tempAssoc;
-
-    return (CAnimBlendAssociationSAInterface *)pAnimAssoc;
+    return nullptr;
 }
 
 CAnimBlendAssociationSAInterface * CClientGame::AddAnimationAndSyncHandler ( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID )
 {
     printf ( "AddAnimationAndSyncHandler called! pClump, GroupID, AnimID: %p, %d, %d\n", (void*)pClump, animGroup, animID );
-
-    hCAnimBlendAssocGroup_CopyAnimation CAnimBlendAssocGroup_CopyAnimation   = (hCAnimBlendAssocGroup_CopyAnimation)0x004CE130;
-    hUncompressAnimation                 UncompressAnimation                 = (hUncompressAnimation)0x4d41c0;
-    hCAnimBlendAssoc_Constructor_staticAssocRef OLD_CAnimBlendAssoc_Constructor_staticAssocRef = (hCAnimBlendAssoc_Constructor_staticAssocRef)0x4CF080;
-    hCAnimBlendStaticAssoc_Constructor OLD_CAnimBlendStaticAssoc_Constructor = *(hCAnimBlendStaticAssoc_Constructor)0x4CE940;
-    hCAnimBlendStaticAssoc_Init        OLD_CAnimBlendStaticAssoc_Init = (hCAnimBlendStaticAssoc_Init)0x004CEC20;
-    hCAnimBlendAssoc_SyncAnimation CAnimBlendAssoc_SyncAnimation = (hCAnimBlendAssoc_SyncAnimation)0x004CEB40;
-    hCAnimBlendAssoc_Start         CAnimBlendAssoc_Start         = (hCAnimBlendAssoc_Start)0x004CEB70;
-
-  CAnimBlendAssoc * pAnimAssocToSyncWith2 = (CAnimBlendAssoc *)pAnimAssocToSyncWith;
-  CAnimBlendAssoc *pAnimAssoc; // esi
-  int *pClumpData; // edi
-  DWORD *tempAssoc; // eax
-  int nextAssoc; // ecx
-
-  pAnimAssoc = CAnimBlendAssocGroup_CopyAnimation((DWORD *) (*(DWORD*)0x00B4EA34) + 5 * animGroup, animID);
-  pClumpData = *(int **)(   (*(DWORD*)0xB5F878) + (int)pClump);
-  if ( (*((BYTE *)pAnimAssoc + 46) >> 5) & 1 && pAnimAssocToSyncWith2 )
-  {
-    CAnimBlendAssoc_SyncAnimation ( pAnimAssoc, pAnimAssocToSyncWith2);
-    *((BYTE *)pAnimAssoc + 46) |= 1u;
-  }
-  else
-  {
-    CAnimBlendAssoc_Start ( pAnimAssoc, 0);
-  }
-
-  tempAssoc = ((DWORD*)pAnimAssoc) + 1;
-
-  if ( *pClumpData )
-    *(DWORD *)(*pClumpData + 4) = (DWORD)tempAssoc;
-
-  nextAssoc = *pClumpData;
-
-   DWORD * dwpAnimAssoc = (DWORD*) pAnimAssoc;
-
-  dwpAnimAssoc[2] = (DWORD)pClumpData;
-
-  *tempAssoc = nextAssoc;
-
-  *pClumpData = (int)tempAssoc;
-    return (CAnimBlendAssociationSAInterface *)pAnimAssoc;
+    return nullptr;
 }
 
 CAnimBlendHierarchySAInterface * CClientGame::BlendAnimationHierarchyHandler ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta )
