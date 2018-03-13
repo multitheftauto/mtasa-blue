@@ -25,6 +25,11 @@
 #include "..\game_sa\CBuildingSA.h"
 #include "..\game_sa\CPedSA.h"
 #include "..\game_sa\common.h"
+#include <../game_sa/CAnimBlendHierarchySA.h> // ---------------- REMOVE THIS LATER
+#include <../game_sa/CAnimBlendStaticAssociationSA.h>
+#include <../game_sa/CAnimBlendAssociationSA.h>
+#include <../game_sa/CAnimBlendAssocGroupSA.h>
+
 extern CCoreInterface* g_pCore;
 extern CMultiplayerSA* pMultiplayer;
 
@@ -155,15 +160,15 @@ DWORD RETURN_CPlantMgr_Render_fail =                        0x5DBDAA;
 #define HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse   0x4BA06F
 DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse =    0x4BA076;
 
-#define HOOKPOS_CAnimManager_AddAnimation                   0x4d3aa0
-DWORD RETURN_CAnimManager_AddAnimation =                    0x4D3AAA;
-DWORD RETURN_CAnimManager_AddAnimationEND =                 0x4D3B16;
-DWORD RETURN_CAnimManager_AddAnimation_SkipCopyAnimation =  0x4D3ABC;
+#define HOOKPOS_CAnimBlendAssocGroup_CopyAnimation          0x4CE130  //  mov     ecx, [ecx+4]
+DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation =           0x4CE158; //  test    esi, esi
 
-#define HOOKPOS_CAnimManager_AddAnimationAndSync                  0x4D3B30
-DWORD RETURN_CAnimManager_AddAnimationAndSync =                   0x4D3B3A;
-DWORD RETURN_CAnimManager_AddAnimationAndSyncEND =                0x4D3B9E;
-DWORD RETURN_CAnimManager_AddAnimationAndSync_SkipCopyAnimation = 0x4D3B4C;
+#define HOOKPOS_CAnimManager_AddAnimation                   0x4d3aa0
+DWORD RETURN_CAnimManager_AddAnimation =                    0x4D3AB1;
+
+#define HOOKPOS_CAnimManager_AddAnimationAndSync            0x4D3B30
+DWORD RETURN_CAnimManager_AddAnimationAndSync =             0x4D3B41;
+
 
 #define HOOKPOS_CAnimManager_BlendAnimation_Hierarchy       0x4D4410 //0x4D4425
 DWORD RETURN_CAnimManager_BlendAnimation_Hierarchy =        0x4D4417; //0x4D442D;
@@ -433,6 +438,7 @@ void HOOK_CPlantMgr_Render ();
 void HOOK_CEventHandler_ComputeKnockOffBikeResponse ();
 void HOOK_CAnimManager_AddAnimation ();
 void HOOK_CAnimManager_AddAnimationAndSync ();
+void HOOK_CAnimBlendAssocGroup_CopyAnimation ();
 void HOOK_CAnimManager_BlendAnimation_Hierarchy ();
 void HOOK_CPed_GetWeaponSkill ();
 void HOOK_CPed_AddGogglesModel ();
@@ -641,6 +647,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7 );
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10 ); 
     HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10 ); 
+    HookInstall(HOOKPOS_CAnimBlendAssocGroup_CopyAnimation, (DWORD)HOOK_CAnimBlendAssocGroup_CopyAnimation, 6 ); 
     HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 7 );
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8 );
     HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
@@ -5340,6 +5347,60 @@ void _declspec(naked) HOOK_CEventHandler_ComputeKnockOffBikeResponse ()
     }
 }
 
+CAnimBlendStaticAssociationSAInterface * getAnimStaticAssociation ( DWORD * pAnimAssocGroup, DWORD AnimID )
+{
+    auto pAnimStaticAssoc = (CAnimBlendStaticAssociationSAInterface *)( pAnimAssocGroup[1] + 20 * (AnimID - pAnimAssocGroup[3]) );
+    //auto pAnimStaticAssoc = (CAnimBlendStaticAssociationSAInterface *)malloc ( sizeof(CAnimBlendStaticAssociationSAInterface));
+
+    return pAnimStaticAssoc;
+}
+
+//CAnimBlendAssocGroupSAInterface * pAnimAssocGroup = nullptr;
+CAnimBlendStaticAssociationSAInterface * pAnimStaticAssoc = nullptr;
+DWORD * pAnimAssocGroup = nullptr;
+DWORD AnimID = 0;
+RpClump * pClump = nullptr;
+void _declspec(naked)  HOOK_CAnimBlendAssocGroup_CopyAnimation ()
+{
+    _asm
+    {
+        mov     pClump, edi
+        
+        mov     eax,  fs:0
+        push    0FFFFFFFFh
+        push    083BCABh
+        push    eax
+        mov     eax, [esp+10h]
+        mov     fs:0, esp
+        mov     edx, [ecx+0Ch]
+
+        mov     pAnimAssocGroup, ecx
+        mov     AnimID, eax
+        pushad
+    }
+
+    pAnimStaticAssoc = getAnimStaticAssociation ( pAnimAssocGroup, AnimID );
+
+    _asm 
+    {
+        popad
+        mov     ecx, [ecx+4]
+        sub     eax, edx
+        push    esi
+        mov     esi, pAnimStaticAssoc
+        jmp     RETURN_CAnimBlendAssocGroup_CopyAnimation
+    }
+}
+
+int _cdecl OnCAnimBlendAssocGroupCopyAnimation ( CAnimBlendAssocGroupSAInterface* pGroup, int iAnimId );
+
+CAnimBlendAssocGroupSAInterface * getAnimAssocGroupInterface ( AssocGroupId animGroup )
+{
+    DWORD * pAnimAssocGroupsArray = reinterpret_cast < DWORD * > ( *(DWORD*)0xb4ea34 );
+    return reinterpret_cast < CAnimBlendAssocGroupSAInterface * > ( pAnimAssocGroupsArray  + 5 * animGroup );
+}
+
+CAnimBlendAssocGroupSAInterface * pAnimAssocGroupInterface = nullptr;
 
 RpClump * animationClump = NULL;
 AssocGroupId animationGroup = 0;
@@ -5357,17 +5418,13 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation ()
         mov     animationID, eax
         pushad
     }
-    
+  
+    pAnimAssocGroupInterface = getAnimAssocGroupInterface ( animationGroup );
+    animationID = OnCAnimBlendAssocGroupCopyAnimation ( pAnimAssocGroupInterface, animationID );
+
     if ( m_pAddAnimationHandler  )
     {
         pAnimAssociation = m_pAddAnimationHandler ( animationClump, animationGroup, animationID );
-
-        _asm
-        {
-            popad
-            mov     eax, pAnimAssociation
-            jmp     RETURN_CAnimManager_AddAnimationEND
-        } 
     }
 
     _asm
@@ -5375,10 +5432,15 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation ()
         popad
         mov     eax,dword ptr [esp+0Ch] 
         mov     edx,dword ptr ds:[0B4EA34h] 
+        push    esi
+        push    edi
+        mov     eax, animationID
+        push    eax
+        mov     eax, [esp+14h]
+        mov     edi, animationClump
         jmp     RETURN_CAnimManager_AddAnimation
     }
 }
-
 
 CAnimBlendAssociationSAInterface * pAnimAssociationToSyncWith = nullptr;
 void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync ()
@@ -5396,16 +5458,12 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync ()
         pushad
     }
     
+    pAnimAssocGroupInterface = getAnimAssocGroupInterface ( animationGroup );
+    animationID = OnCAnimBlendAssocGroupCopyAnimation ( pAnimAssocGroupInterface, animationID );
+
     if ( m_pAddAnimationAndSyncHandler  )
     {
         pAnimAssociation = m_pAddAnimationAndSyncHandler ( animationClump, pAnimAssociationToSyncWith, animationGroup, animationID );
-
-        _asm
-        {
-            popad
-            mov     eax, pAnimAssociation
-            jmp     RETURN_CAnimManager_AddAnimationAndSyncEND
-        } 
     }
 
     _asm
@@ -5413,11 +5471,15 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync ()
         popad
         mov     eax,dword ptr [esp+10h]
         mov     edx,dword ptr ds:[0B4EA34h] 
+        push    esi
+        push    edi
+        mov     eax, animationID
+        push    eax
+        mov     eax, [esp+18h]
+        mov     edi, animationClump
         jmp     RETURN_CAnimManager_AddAnimationAndSync
     }
 }
-
-#include <../game_sa/CAnimBlendHierarchySA.h> // ---------------- REMOVE THIS LATER
 
 CAnimBlendHierarchySAInterface * pAnimHierarchy = nullptr;
 int   flags = 0;
@@ -5441,8 +5503,6 @@ void _declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy ()
     {
         pAnimHierarchy = m_pBlendAnimationHierarchyHandler ( animationClump, pAnimHierarchy, flags, animationBlendDelta );
     }
-
-    printf ("BlendAnimation_Hierarchy_Hook, pAnimHierarchy->usNumSequences: %d\n\n", pAnimHierarchy->usNumSequences);
 
     _asm
     {
