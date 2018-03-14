@@ -378,6 +378,7 @@ PreFxRenderHandler * m_pPreFxRenderHandler = NULL;
 PreHudRenderHandler * m_pPreHudRenderHandler = NULL;
 AddAnimationHandler* m_pAddAnimationHandler = NULL;
 AddAnimationAndSyncHandler* m_pAddAnimationAndSyncHandler = nullptr;
+AssocGroupCopyAnimationHandler* m_pAssocGroupCopyAnimationHandler = nullptr;
 BlendAnimationHierarchyHandler* m_pBlendAnimationHierarchyHandler = NULL;
 ProcessCollisionHandler* m_pProcessCollisionHandler = NULL;
 VehicleCollisionHandler* m_pVehicleCollisionHandler = NULL;
@@ -389,6 +390,8 @@ DrivebyAnimationHandler* m_pDrivebyAnimationHandler = NULL;
 
 CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
+
+int _cdecl OnCAnimBlendAssocGroupCopyAnimation ( AssocGroupId animGroup, int iAnimId );
 
 void HOOK_FindPlayerCoors();
 void HOOK_FindPlayerCentreOfWorld();
@@ -2240,6 +2243,11 @@ void CMultiplayerSA::SetAddAnimationHandler ( AddAnimationHandler * pHandler )
 void CMultiplayerSA::SetAddAnimationAndSyncHandler ( AddAnimationAndSyncHandler * pHandler )
 {
     m_pAddAnimationAndSyncHandler = pHandler;
+}
+
+void CMultiplayerSA::SetAssocGroupCopyAnimationHandler ( AssocGroupCopyAnimationHandler * pHandler )
+{
+    m_pAssocGroupCopyAnimationHandler = pHandler;
 }
 
 void CMultiplayerSA::SetBlendAnimationHierarchyHandler ( BlendAnimationHierarchyHandler * pHandler )
@@ -5351,15 +5359,6 @@ void _declspec(naked) HOOK_CEventHandler_ComputeKnockOffBikeResponse ()
     }
 }
 
-void CreateAnimStaticAssociation ( CAnimBlendStaticAssociationSAInterface * pAnimStaticAssoc, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, DWORD AnimID )
-{
-    DWORD * pdwAnimAssocGroup = reinterpret_cast < DWORD * > ( pAnimAssocGroup );
-    auto pOriginalAnimStaticAssoc = (CAnimBlendStaticAssociationSAInterface *)( pdwAnimAssocGroup[1] + 20 * (AnimID - pdwAnimAssocGroup[3]) );
-    //auto pAnimStaticAssoc = (CAnimBlendStaticAssociationSAInterface *)malloc ( sizeof(CAnimBlendStaticAssociationSAInterface));
-
-    *pAnimStaticAssoc = *pOriginalAnimStaticAssoc;
-}
-
 CAnimBlendAssocGroupSAInterface * pAnimAssocGroup = nullptr;
 CAnimBlendStaticAssociationSAInterface AnimStaticAssoc;
 CAnimBlendStaticAssociationSAInterface * pAnimStaticAssoc = nullptr;
@@ -5375,9 +5374,11 @@ void _declspec(naked)  HOOK_CAnimBlendAssocGroup_CopyAnimation ()
         pushad
     }
 
-    CreateAnimStaticAssociation ( &AnimStaticAssoc, pAnimAssocGroup, AnimID );
-    pAnimStaticAssoc = &AnimStaticAssoc;
-  
+    if ( m_pAssocGroupCopyAnimationHandler )
+    {
+    	m_pAssocGroupCopyAnimationHandler ( &AnimStaticAssoc, pClump, pAnimAssocGroup, AnimID );
+    	pAnimStaticAssoc = &AnimStaticAssoc;
+	}
     _asm 
     {
         popad
@@ -5408,14 +5409,6 @@ ERROR_CopyAnimation:
     }
 }
 
-int _cdecl OnCAnimBlendAssocGroupCopyAnimation ( CAnimBlendAssocGroupSAInterface* pGroup, int iAnimId );
-
-CAnimBlendAssocGroupSAInterface * getAnimAssocGroupInterface ( AssocGroupId animGroup )
-{
-    DWORD * pAnimAssocGroupsArray = reinterpret_cast < DWORD * > ( *(DWORD*)0xb4ea34 );
-    return reinterpret_cast < CAnimBlendAssocGroupSAInterface * > ( pAnimAssocGroupsArray  + 5 * animGroup );
-}
-
 CAnimBlendAssocGroupSAInterface * pAnimAssocGroupInterface = nullptr;
 
 RpClump * animationClump = NULL;
@@ -5435,8 +5428,7 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation ()
         pushad
     }
   
-    pAnimAssocGroupInterface = getAnimAssocGroupInterface ( animationGroup );
-    animationID = OnCAnimBlendAssocGroupCopyAnimation ( pAnimAssocGroupInterface, animationID );
+    animationID = OnCAnimBlendAssocGroupCopyAnimation ( animationGroup, animationID );
 
     if ( m_pAddAnimationHandler  )
     {
@@ -5474,8 +5466,7 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync ()
         pushad
     }
     
-    pAnimAssocGroupInterface = getAnimAssocGroupInterface ( animationGroup );
-    animationID = OnCAnimBlendAssocGroupCopyAnimation ( pAnimAssocGroupInterface, animationID );
+    animationID = OnCAnimBlendAssocGroupCopyAnimation ( animationGroup, animationID );
 
     if ( m_pAddAnimationAndSyncHandler  )
     {

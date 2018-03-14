@@ -272,6 +272,7 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetPreHudRenderHandler ( CClientGame::StaticPreHudRenderHandler );
     g_pMultiplayer->SetAddAnimationHandler ( CClientGame::StaticAddAnimationHandler );
     g_pMultiplayer->SetAddAnimationAndSyncHandler ( CClientGame::StaticAddAnimationAndSyncHandler );
+    g_pMultiplayer->SetAssocGroupCopyAnimationHandler ( CClientGame::StaticAssocGroupCopyAnimationHandler );
     g_pMultiplayer->SetBlendAnimationHierarchyHandler ( CClientGame::StaticBlendAnimationHierarchyHandler );
     g_pMultiplayer->SetProcessCollisionHandler ( CClientGame::StaticProcessCollisionHandler );
     g_pMultiplayer->SetVehicleCollisionHandler( CClientGame::StaticVehicleCollisionHandler );
@@ -431,6 +432,7 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetPreHudRenderHandler ( NULL );
     g_pMultiplayer->SetAddAnimationHandler ( NULL );
     g_pMultiplayer->SetAddAnimationAndSyncHandler ( NULL );
+    g_pMultiplayer->SetAssocGroupCopyAnimationHandler ( NULL );
     g_pMultiplayer->SetBlendAnimationHierarchyHandler ( NULL );
     g_pMultiplayer->SetProcessCollisionHandler ( NULL );
     g_pMultiplayer->SetVehicleCollisionHandler( NULL );
@@ -3705,6 +3707,11 @@ CAnimBlendAssociationSAInterface * CClientGame::StaticAddAnimationAndSyncHandler
     return g_pClientGame->AddAnimationAndSyncHandler ( pClump, pAnimAssocToSyncWith, animGroup, animID );
 }
 
+void CClientGame::StaticAssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID )
+{
+    g_pClientGame->AssocGroupCopyAnimationHandler ( pOutAnimStaticAssoc, pClump, pAnimAssocGroup, animID );
+}
+
 CAnimBlendHierarchySAInterface * CClientGame::StaticBlendAnimationHierarchyHandler ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta )
 {
     return g_pClientGame->BlendAnimationHierarchyHandler ( pClump, pAnimHierarchy, flags, fBlendDelta );
@@ -4004,6 +4011,15 @@ CAnimBlendAssociationSAInterface * CClientGame::AddAnimationAndSyncHandler ( RpC
 {
     printf ( "AddAnimationAndSyncHandler called! pClump, GroupID, AnimID: %p, %d, %d\n", (void*)pClump, animGroup, animID );
     return nullptr;
+}
+
+void CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID )
+{
+    printf ("AssocGroupCopyAnimationHandler called!\n");
+    CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
+    auto pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( pAnimAssocGroup->groupID, animID );
+
+    *pOutAnimStaticAssoc = *pOriginalAnimStaticAssoc;
 }
 
 CAnimBlendHierarchySAInterface * CClientGame::BlendAnimationHierarchyHandler ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta )
