@@ -4013,13 +4013,29 @@ CAnimBlendAssociationSAInterface * CClientGame::AddAnimationAndSyncHandler ( RpC
     return nullptr;
 }
 
+typedef void (__thiscall* hCAnimBlendStaticAssociation_Init)
+(
+    CAnimBlendStaticAssociationSAInterface * pThis,
+    RpClump * Clump,
+    CAnimBlendHierarchySAInterface * pAnimBlendHierarchy
+);
+
 void CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID )
 {
     printf ("AssocGroupCopyAnimationHandler called!\n");
+
+    auto CAnimBlendStaticAssociation_Init = (hCAnimBlendStaticAssociation_Init)0x4CEC20;
+
     CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
     auto pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( pAnimAssocGroup->groupID, animID );
 
-    *pOutAnimStaticAssoc = *pOriginalAnimStaticAssoc;
+    CAnimBlendStaticAssociation_Init ( pOutAnimStaticAssoc, pClump, pOriginalAnimStaticAssoc->pAnimHeirarchy );
+    pOutAnimStaticAssoc->sAnimGroup = static_cast < short > ( pAnimAssocGroup->groupID );
+    pOutAnimStaticAssoc->sAnimID = static_cast < short > ( animID );
+
+    // Total bones in clump. GTA SA is using 32 bones for peds/players
+    pOutAnimStaticAssoc->nNumBlendNodes = pOriginalAnimStaticAssoc->nNumBlendNodes;
+    pOutAnimStaticAssoc->sFlags = pOriginalAnimStaticAssoc->sFlags;
 }
 
 CAnimBlendHierarchySAInterface * CClientGame::BlendAnimationHierarchyHandler ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta )
