@@ -12,10 +12,18 @@
 #include "StdInc.h"
 #include "../game_sa/CAnimBlendAssocGroupSA.h"
 
+constexpr CAnimBlendAssocGroupSAInterface * getAnimAssocGroupInterface ( AssocGroupId animGroup )
+{
+    DWORD * pAnimAssocGroupsArray = reinterpret_cast < DWORD * > ( *(DWORD*)0xb4ea34 );
+    return reinterpret_cast < CAnimBlendAssocGroupSAInterface * > ( pAnimAssocGroupsArray  + 5 * animGroup );
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Check for anims that will crash and change to one that wont. (The new anim will be wrong and look crap though)
-int _cdecl OnCAnimBlendAssocGroupCopyAnimation ( CAnimBlendAssocGroupSAInterface* pGroup, int iAnimId )
+int _cdecl OnCAnimBlendAssocGroupCopyAnimation ( AssocGroupId animGroup, int iAnimId )
 {
+    auto pGroup = getAnimAssocGroupInterface ( animGroup );
+
     // Apply offset
     int iUseAnimId = iAnimId - pGroup->iIDOffset;
 
