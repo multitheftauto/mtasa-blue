@@ -25,6 +25,12 @@
 #include "CLimitsSA.h"
 
 #include "CRemoteDataSA.h"
+
+typedef void (__thiscall* hCAnimBlendStaticAssociation_FreeSequenceArray)
+(
+    CAnimBlendStaticAssociationSAInterface * pThis
+);
+
 class CRemoteDataSA;
 #define DEFAULT_NEAR_CLIP_DISTANCE  ( 0.3f )
 
