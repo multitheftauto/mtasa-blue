@@ -5449,113 +5449,139 @@ void _declspec(naked)  HOOK_CAnimBlendAssocGroup_CopyAnimation ()
     }
 }
 
-CAnimBlendAssocGroupSAInterface * pAnimAssocGroupInterface = nullptr;
-
-RpClump * animationClump = NULL;
-AssocGroupId animationGroup = 0;
-AnimationId animationID = 0;
-CAnimBlendAssociationSAInterface * pAnimAssociation = nullptr;
 void _declspec(naked) HOOK_CAnimManager_AddAnimation ()
 {
     _asm
-    {        
-        mov     eax, [esp+4]
-        mov     animationClump, eax
-        mov     eax, [esp+8]
-        mov     animationGroup, eax
-        mov     eax, [esp+12]
-        mov     animationID, eax
+    {
         pushad
     }
-  
-    animationID = OnCAnimBlendAssocGroupCopyAnimation ( animationGroup, animationID );
 
-    if ( m_pAddAnimationHandler  )
+    if ( m_pAddAnimationHandler )
     {
-        pAnimAssociation = m_pAddAnimationHandler ( animationClump, animationGroup, animationID );
+        _asm
+        {    
+            popad
+            mov     ecx, [esp+4]  // animationClump
+            mov     edx, [esp+8]  // animationGroup
+            mov     eax, [esp+12] // animationID
+            push    eax
+            push    edx
+            call    OnCAnimBlendAssocGroupCopyAnimation
+            add     esp, 8
+            mov     [esp+12], eax // replace animationID
+            
+            // call our handler function
+            push    eax 
+            push    edx
+            mov     ecx, [esp+12] // animationClump
+            push    ecx
+            call    m_pAddAnimationHandler
+            add     esp, 0Ch
+            pushad
+            jmp     NORMAL_FLOW_AddAnimation
+        }
     }
 
     _asm
     {
+        NORMAL_FLOW_AddAnimation:
         popad
-        mov     eax,dword ptr [esp+0Ch] 
-        mov     edx,dword ptr ds:[0B4EA34h] 
+        mov     eax, dword ptr [esp+0Ch] 
+        mov     edx, dword ptr ds:[0B4EA34h] 
         push    esi
         push    edi
-        mov     eax, animationID
         push    eax
-        mov     eax, [esp+14h]
-        mov     edi, animationClump
+        mov     eax, dword ptr [esp+14h] // animationGroup
+        mov     edi, dword ptr [esp+10h] // animationClump
         jmp     RETURN_CAnimManager_AddAnimation
-    }
+    } 
 }
 
-CAnimBlendAssociationSAInterface * pAnimAssociationToSyncWith = nullptr;
 void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync ()
 {
     _asm
-    {        
-        mov     eax, [esp+4]
-        mov     animationClump, eax
-        mov     eax, [esp+8]
-        mov     pAnimAssociationToSyncWith, eax
-        mov     eax, [esp+12]
-        mov     animationGroup, eax
-        mov     eax, [esp+16]
-        mov     animationID, eax
+    {
         pushad
     }
-    
-    animationID = OnCAnimBlendAssocGroupCopyAnimation ( animationGroup, animationID );
 
-    if ( m_pAddAnimationAndSyncHandler  )
+    if ( m_pAddAnimationAndSyncHandler )
     {
-        pAnimAssociation = m_pAddAnimationAndSyncHandler ( animationClump, pAnimAssociationToSyncWith, animationGroup, animationID );
+         _asm
+        {    
+            popad
+            mov     ecx, [esp+4]  // animationClump
+            mov     ebx, [esp+8]  // pAnimAssociationToSyncWith
+            mov     edx, [esp+12] // animationGroup
+            mov     eax, [esp+16] // animationID
+            push    eax
+            push    edx
+            call    OnCAnimBlendAssocGroupCopyAnimation
+            add     esp, 8
+            mov     [esp+16], eax // replace animationID
+            
+            // call our handler function
+            push    eax
+            push    edx
+            push    ebx
+            mov     ecx, [esp+16] // animationClump
+            push    ecx
+            call    m_pAddAnimationAndSyncHandler
+            add     esp, 10h
+            pushad
+            jmp     NORMAL_FLOW_AddAnimationAndSync
+        }
     }
 
     _asm
     {
+        NORMAL_FLOW_AddAnimationAndSync:
         popad
-        mov     eax,dword ptr [esp+10h]
-        mov     edx,dword ptr ds:[0B4EA34h] 
+        mov     eax, dword ptr [esp+10h]
+        mov     edx, dword ptr ds:[0B4EA34h] 
         push    esi
         push    edi
-        mov     eax, animationID
         push    eax
-        mov     eax, [esp+18h]
-        mov     edi, animationClump
+        mov     eax, dword ptr [esp+18h] // animationGroup
+        mov     edi, dword ptr [esp+10h] // animationClump
         jmp     RETURN_CAnimManager_AddAnimationAndSync
     }
 }
 
-CAnimBlendHierarchySAInterface * pAnimHierarchy = nullptr;
-int   flags = 0;
-float animationBlendDelta = 0.0f;
 void _declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy () 
 {
     _asm
-    {        
-        mov     eax, [esp+4]
-        mov     animationClump, eax
-        mov     eax, [esp+8]
-        mov     pAnimHierarchy, eax
-        mov     eax, [esp+12]
-        mov     flags, eax
-        mov     eax, [esp+16]
-        mov     animationBlendDelta, eax
+    {
         pushad
     }
 
     if ( m_pBlendAnimationHierarchyHandler  )
     {
-        pAnimHierarchy = m_pBlendAnimationHierarchyHandler ( animationClump, pAnimHierarchy, flags, animationBlendDelta );
+        _asm
+        {        
+            popad
+            //mov     edx, [esp+4]  // animationClump
+            mov     eax, [esp+8]  // pAnimHierarchy
+            mov     ecx, [esp+12] // flags
+            mov     edx, [esp+16] // animationBlendDelta
+
+            // call our handler function
+            push    edx
+            mov     edx, [esp+8] // animationClump
+            push    ecx
+            push    eax
+            push    edx
+            call    m_pBlendAnimationHierarchyHandler
+            add     esp, 10h
+            mov    [esp+8], eax // replace pAnimHierarchy
+            pushad
+            jmp NORMAL_FLOW_BlendAnimation_Hierarchy
+        }
     }
 
     _asm
     {
+        NORMAL_FLOW_BlendAnimation_Hierarchy:
         popad
-        mov    eax, pAnimHierarchy  
-        mov    [esp+8], eax
         push   0FFFFFFFFh
         push   04D4410h
         jmp    RETURN_CAnimManager_BlendAnimation_Hierarchy
