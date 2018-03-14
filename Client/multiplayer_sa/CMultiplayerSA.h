@@ -25,6 +25,12 @@
 #include "CLimitsSA.h"
 
 #include "CRemoteDataSA.h"
+
+typedef void (__thiscall* hCAnimBlendStaticAssociation_FreeSequenceArray)
+(
+    CAnimBlendStaticAssociationSAInterface * pThis
+);
+
 class CRemoteDataSA;
 #define DEFAULT_NEAR_CLIP_DISTANCE  ( 0.3f )
 
@@ -111,7 +117,9 @@ public:
     void                        SetPreFxRenderHandler       ( PreFxRenderHandler * pHandler );
     void                        SetPreHudRenderHandler      ( PreHudRenderHandler * pHandler );
     void                        SetAddAnimationHandler      ( AddAnimationHandler * pHandler );
-    void                        SetBlendAnimationHandler    ( BlendAnimationHandler * pHandler );
+    void                        SetAddAnimationAndSyncHandler ( AddAnimationAndSyncHandler * pHandler );
+    void                        SetAssocGroupCopyAnimationHandler ( AssocGroupCopyAnimationHandler * pHandler );
+    void                        SetBlendAnimationHierarchyHandler    ( BlendAnimationHierarchyHandler * pHandler );
     void                        SetProcessCollisionHandler  ( ProcessCollisionHandler * pHandler );
     void                        SetVehicleCollisionHandler  ( VehicleCollisionHandler * pHandler );
     void                        SetVehicleDamageHandler     ( VehicleDamageHandler * pHandler );
