@@ -128,7 +128,7 @@ HRESULT CProxyDirect3DVertexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, voi
         } info;
         if (hr == D3D_OK)
             info = {"result NULL", 8621, 621};
-        else if (hr == E_BOUNDS)
+        else if (hr == STATUS_ARRAY_BOUNDS_EXCEEDED)
             info = {"offset out of range", 8622, 622};
         else if (hr == STATUS_ACCESS_VIOLATION)
             info = {"access violation", 8623, 623};
@@ -158,7 +158,7 @@ HRESULT CProxyDirect3DVertexBuffer::DoLock(UINT OffsetToLock, UINT SizeToLock, v
     {
         if (OffsetToLock > m_iMemUsed)
         {
-            return E_BOUNDS;
+            return STATUS_ARRAY_BOUNDS_EXCEEDED;
         }
         SizeToLock = m_iMemUsed - OffsetToLock;
     }
