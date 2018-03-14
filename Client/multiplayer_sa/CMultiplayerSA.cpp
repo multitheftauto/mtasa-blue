@@ -164,6 +164,7 @@ DWORD FUNC_NEW_OPERATOR = 0x082119A;
 DWORD FUNC_CAnimBlendAssociation_Constructor = 0x04CF080;
 
 #define HOOKPOS_CAnimBlendAssocGroup_CopyAnimation          0x4CE14C  
+DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation_NORMALFLOW =0x4CE151; 
 DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation =           0x4CE187; 
 DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation_ERROR =     0x4CE199;
 
@@ -392,6 +393,7 @@ CEntitySAInterface * dwSavedPlayerPointer = 0;
 CEntitySAInterface * activeEntityForStreaming = 0; // the entity that the streaming system considers active
 
 int _cdecl OnCAnimBlendAssocGroupCopyAnimation ( AssocGroupId animGroup, int iAnimId );
+auto CAnimBlendStaticAssociation_FreeSequenceArray = (hCAnimBlendStaticAssociation_FreeSequenceArray)0x4ce9a0;
 
 void HOOK_FindPlayerCoors();
 void HOOK_FindPlayerCentreOfWorld();
@@ -5359,53 +5361,91 @@ void _declspec(naked) HOOK_CEventHandler_ComputeKnockOffBikeResponse ()
     }
 }
 
-CAnimBlendAssocGroupSAInterface * pAnimAssocGroup = nullptr;
-CAnimBlendStaticAssociationSAInterface AnimStaticAssoc;
-CAnimBlendStaticAssociationSAInterface * pAnimStaticAssoc = nullptr;
-DWORD AnimID = 0;
-RpClump * pClump = nullptr;
+CAnimBlendStaticAssociationSAInterface * __cdecl AllocateStaticAssociationMemory ( void )
+{
+    return new CAnimBlendStaticAssociationSAInterface;
+}
+
+void __cdecl DeleteStaticAssociation ( CAnimBlendStaticAssociationSAInterface * pAnimStaticAssoc )
+{
+    CAnimBlendStaticAssociation_FreeSequenceArray ( pAnimStaticAssoc );
+    delete pAnimStaticAssoc;
+}
+
+
 void _declspec(naked)  HOOK_CAnimBlendAssocGroup_CopyAnimation ()
 {
     _asm
     {
-        mov     pClump, edi
-        mov     pAnimAssocGroup, ecx
-        mov     AnimID, eax
         pushad
     }
 
     if ( m_pAssocGroupCopyAnimationHandler )
     {
-    	m_pAssocGroupCopyAnimationHandler ( &AnimStaticAssoc, pClump, pAnimAssocGroup, AnimID );
-    	pAnimStaticAssoc = &AnimStaticAssoc;
-	}
-    _asm 
+        _asm
+        {
+            popad
+            push    eax
+            push    ecx
+            push    edi
+            
+            // Allocate memory for our new static association
+            call    AllocateStaticAssociationMemory
+            mov     edi, eax
+            
+            // push the static association
+            push    edi
+            call    m_pAssocGroupCopyAnimationHandler //CAnimBlendAssocGroup_CopyAnimation
+            add     esp, 10h
+
+            mov     ecx, [ecx+4]
+            sub     eax, edx
+            push    esi
+
+            // copy the static association to esi
+            mov     esi, edi 
+            test    esi, esi
+            jz      ERROR_CopyAnimation
+            mov     eax, [esi+10h]
+            push    eax
+            mov     eax, 04D41C0h
+            call    eax
+            push    3Ch   
+            call    FUNC_NEW_OPERATOR
+            add     esp, 8
+            mov     [esp+14h], eax
+            test    eax, eax
+            mov     [esp+0Ch], 0
+            jz      ERROR_CopyAnimation
+            push    esi
+            mov     ecx, eax
+            call    FUNC_CAnimBlendAssociation_Constructor
+            mov     edi, eax
+
+            // Delete our static association, since we no longer need it 
+            push    esi
+            call    DeleteStaticAssociation
+            add     esp, 4 
+            
+            // put CAnimBlendAssociation in eax
+            mov     eax, edi
+            jmp     RETURN_CAnimBlendAssocGroup_CopyAnimation
+
+            ERROR_CopyAnimation:
+            // Delete our static association first 
+            push    edi
+            call    DeleteStaticAssociation
+            add     esp, 4 
+            jmp    RETURN_CAnimBlendAssocGroup_CopyAnimation_ERROR
+        }
+    }
+
+    _asm
     {
         popad
         mov     ecx, [ecx+4]
         sub     eax, edx
-        push    esi
-        mov     esi, pAnimStaticAssoc
-        test    esi, esi
-        jz      ERROR_CopyAnimation
-        mov     eax, [esi+10h]
-        push    eax
-        mov     eax, 04D41C0h
-        call    eax
-        push    3Ch   
-        call    FUNC_NEW_OPERATOR
-        add     esp, 8
-        mov     [esp+14h], eax
-        test    eax, eax
-        mov     [esp+0Ch], 0
-        jz      ERROR_CopyAnimation
-        push    esi
-        mov     ecx, eax
-        call    FUNC_CAnimBlendAssociation_Constructor
-        jmp     RETURN_CAnimBlendAssocGroup_CopyAnimation
-
-ERROR_CopyAnimation:
-        jmp    RETURN_CAnimBlendAssocGroup_CopyAnimation_ERROR
+        jmp RETURN_CAnimBlendAssocGroup_CopyAnimation_NORMALFLOW
     }
 }
 
