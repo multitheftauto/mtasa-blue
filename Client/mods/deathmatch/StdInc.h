@@ -154,5 +154,3 @@
 #include "logic/CStaticFunctionDefinitions.h"
 #include "logic/CResourceFileDownloadManager.h"
 #include "../../version.h"
-
-

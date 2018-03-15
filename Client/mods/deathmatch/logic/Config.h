@@ -1,21 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CScriptDebugging.cpp
-*  PURPOSE:     Script debugging
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*               Jax <>
-*               Ed Lyons <eai@opencoding.net>
-*               Kevin Whiteside <kevuwk@gmail.com>
-*               Chris McArthur <>
-*               Stanislav Bobrov <lil_toady@hotmail.com>
-*               Alberto Alonso <rydencillo@gmail.com>
-*               
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CScriptDebugging.cpp
+ *  PURPOSE:     Script debugging
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CONFIG_H
 #define __CONFIG_H
@@ -31,21 +23,31 @@ typedef int socklen_t;
 #define MTA_OS_STRING "Windows"
 
 /*** va_pass() (passing of ... variable length arguments ***/
-template<BYTE count>
-struct SVaPassNext{
-    SVaPassNext<count-1> big;
-    DWORD dw;
+template <BYTE count>
+struct SVaPassNext
+{
+    SVaPassNext<count - 1> big;
+    DWORD                  dw;
 };
-template<> struct SVaPassNext<0>{};
-//SVaPassNext - is generator of structure of any size at compile time.
+template <>
+struct SVaPassNext<0>
+{
+};
+// SVaPassNext - is generator of structure of any size at compile time.
 
-class CVaPassNext{
+class CVaPassNext
+{
 public:
     SVaPassNext<50> svapassnext;
-    CVaPassNext(va_list & args){
-        try{//to avoid access violation
+    CVaPassNext(va_list& args)
+    {
+        try
+        {            // to avoid access violation
             memcpy(&svapassnext, args, sizeof(svapassnext));
-        } catch (...) {}
+        }
+        catch (...)
+        {
+        }
     }
 };
 #define va_pass(valist) CVaPassNext(valist).svapassnext
@@ -90,7 +92,6 @@ public:
 // Max ban string length that can be sent
 #define MIN_BAN_REASON_LENGTH 1
 #define MAX_BAN_REASON_LENGTH 64
-
 
 // Couple of defines to ensure proper configuration
 #if MAX_CHAT_LENGTH > 255

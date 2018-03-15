@@ -1,32 +1,29 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CMarkerManager.cpp
-*  PURPOSE:     Marker entity manager class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CMarkerManager.cpp
+ *  PURPOSE:     Marker entity manager class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-CMarkerManager::CMarkerManager ( CColManager* pColManager )
+CMarkerManager::CMarkerManager(CColManager* pColManager)
 {
     // Init
     m_pColManager = pColManager;
 }
 
-
-CMarker* CMarkerManager::Create ( CElement* pParent, CXMLNode* pNode )
+CMarker* CMarkerManager::Create(CElement* pParent, CXMLNode* pNode)
 {
     // Create the marker
-    CMarker* pMarker = new CMarker ( this, m_pColManager, pParent, pNode );
+    CMarker* pMarker = new CMarker(this, m_pColManager, pParent, pNode);
 
     // Load the data from XML
-    if ( pMarker->GetID () == INVALID_ELEMENT_ID )
+    if (pMarker->GetID() == INVALID_ELEMENT_ID)
     {
         delete pMarker;
         return NULL;
@@ -36,15 +33,13 @@ CMarker* CMarkerManager::Create ( CElement* pParent, CXMLNode* pNode )
     return pMarker;
 }
 
-
-CMarker* CMarkerManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CEvents* pEvents )
+CMarker* CMarkerManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
 {
     // Create the marker
-    CMarker* pMarker = new CMarker ( this, m_pColManager, pParent, &Node );
+    CMarker* pMarker = new CMarker(this, m_pColManager, pParent, &Node);
 
     // Load the data from XML
-    if ( pMarker->GetID () == INVALID_ELEMENT_ID ||
-         !pMarker->LoadFromCustomData ( pEvents ) )
+    if (pMarker->GetID() == INVALID_ELEMENT_ID || !pMarker->LoadFromCustomData(pEvents))
     {
         delete pMarker;
         return NULL;
@@ -54,39 +49,36 @@ CMarker* CMarkerManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CEve
     return pMarker;
 }
 
-
-void CMarkerManager::DeleteAll ( void )
+void CMarkerManager::DeleteAll(void)
 {
     // Delete all markers in the list
-    DeletePointersAndClearList ( m_Markers );
+    DeletePointersAndClearList(m_Markers);
 }
 
-
-bool CMarkerManager::Exists ( CMarker* pMarker )
+bool CMarkerManager::Exists(CMarker* pMarker)
 {
-    return ListContains ( m_Markers, pMarker );
+    return ListContains(m_Markers, pMarker);
 }
 
-
-int CMarkerManager::StringToType ( const char* szString )
+int CMarkerManager::StringToType(const char* szString)
 {
-    if ( strcmp ( szString, "default" ) == 0 || strcmp ( szString, "checkpoint" ) == 0 )
+    if (strcmp(szString, "default") == 0 || strcmp(szString, "checkpoint") == 0)
     {
         return CMarker::TYPE_CHECKPOINT;
     }
-    else if ( strcmp ( szString, "ring" ) == 0 )
+    else if (strcmp(szString, "ring") == 0)
     {
         return CMarker::TYPE_RING;
     }
-    else if ( strcmp ( szString, "cylinder" ) == 0 )
+    else if (strcmp(szString, "cylinder") == 0)
     {
         return CMarker::TYPE_CYLINDER;
     }
-    else if ( strcmp ( szString, "arrow" ) == 0 )
+    else if (strcmp(szString, "arrow") == 0)
     {
         return CMarker::TYPE_ARROW;
     }
-    else if ( strcmp ( szString, "corona" ) == 0 )
+    else if (strcmp(szString, "corona") == 0)
     {
         return CMarker::TYPE_CORONA;
     }
@@ -96,55 +88,52 @@ int CMarkerManager::StringToType ( const char* szString )
     }
 }
 
-
-bool CMarkerManager::TypeToString ( unsigned int uiType, char* szString )
+bool CMarkerManager::TypeToString(unsigned int uiType, char* szString)
 {
-    switch ( uiType )
+    switch (uiType)
     {
         case CMarker::TYPE_CHECKPOINT:
-            strcpy ( szString, "checkpoint" );
+            strcpy(szString, "checkpoint");
             return true;
 
         case CMarker::TYPE_RING:
-            strcpy ( szString, "ring" );
+            strcpy(szString, "ring");
             return true;
 
         case CMarker::TYPE_CYLINDER:
-            strcpy ( szString, "cylinder" );
+            strcpy(szString, "cylinder");
             return true;
 
         case CMarker::TYPE_ARROW:
-            strcpy ( szString, "arrow" );
+            strcpy(szString, "arrow");
             return true;
 
         case CMarker::TYPE_CORONA:
-            strcpy ( szString, "corona" );
+            strcpy(szString, "corona");
             return true;
 
         default:
-            strcpy ( szString, "invalid" );
+            strcpy(szString, "invalid");
             return false;
     }
 }
 
-
-void CMarkerManager::RemoveFromList ( CMarker* pMarker )
+void CMarkerManager::RemoveFromList(CMarker* pMarker)
 {
-    m_Markers.remove ( pMarker );
+    m_Markers.remove(pMarker);
 }
 
-
-unsigned char CMarkerManager::StringToIcon ( const char* szString )
+unsigned char CMarkerManager::StringToIcon(const char* szString)
 {
-    if ( strcmp ( szString, "none" ) == 0 )
+    if (strcmp(szString, "none") == 0)
     {
         return CMarker::ICON_NONE;
     }
-    else if ( strcmp ( szString, "arrow" ) == 0 )
+    else if (strcmp(szString, "arrow") == 0)
     {
         return CMarker::ICON_ARROW;
     }
-    else if ( strcmp ( szString, "finish" ) == 0 )
+    else if (strcmp(szString, "finish") == 0)
     {
         return CMarker::ICON_FINISH;
     }
@@ -154,25 +143,24 @@ unsigned char CMarkerManager::StringToIcon ( const char* szString )
     }
 }
 
-
-bool CMarkerManager::IconToString ( unsigned char ucIcon, char* szString )
+bool CMarkerManager::IconToString(unsigned char ucIcon, char* szString)
 {
-    switch ( ucIcon )
+    switch (ucIcon)
     {
         case CMarker::ICON_NONE:
-            strcpy ( szString, "none" );
+            strcpy(szString, "none");
             return true;
 
         case CMarker::ICON_ARROW:
-            strcpy ( szString, "arrow" );
+            strcpy(szString, "arrow");
             return true;
 
         case CMarker::ICON_FINISH:
-            strcpy ( szString, "finish" );
+            strcpy(szString, "finish");
             return true;
 
         default:
-            strcpy ( szString, "invalid" );
+            strcpy(szString, "invalid");
             return false;
     }
 }

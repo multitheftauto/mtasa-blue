@@ -24,28 +24,21 @@ namespace SharedUtil
             virtual void ProcessResult() = 0;
         };
 
-        template<typename ResultType>
+        template <typename ResultType>
         struct STask : public SBaseTask
         {
             using TaskFunction_t = std::function<ResultType()>;
             using ReadyFunction_t = std::function<void(const ResultType&)>;
 
-            TaskFunction_t m_TaskFunction;
+            TaskFunction_t  m_TaskFunction;
             ReadyFunction_t m_ReadyFunction;
-            ResultType m_Result;
+            ResultType      m_Result;
 
-            STask(const TaskFunction_t& taskFunc, const ReadyFunction_t& readyFunc) : m_TaskFunction(taskFunc), m_ReadyFunction(readyFunc)
-            {}
+            STask(const TaskFunction_t& taskFunc, const ReadyFunction_t& readyFunc) : m_TaskFunction(taskFunc), m_ReadyFunction(readyFunc) {}
 
-            void Execute() override
-            {
-                m_Result = std::move(m_TaskFunction());
-            }
+            void Execute() override { m_Result = std::move(m_TaskFunction()); }
 
-            void ProcessResult() override
-            {
-                m_ReadyFunction(m_Result);
-            }
+            void ProcessResult() override { m_ReadyFunction(m_Result); }
         };
 
     public:
@@ -67,12 +60,12 @@ namespace SharedUtil
         // taskFunc: Time-consuming function that is executed on the secondary thread (be aware of thread safety!)
         // readyFunc: Function that is called once the result is ready (called on the main thread)
         //
-        template<typename ResultType>
+        template <typename ResultType>
         void PushTask(const std::function<ResultType()>& taskFunc, const std::function<void(const ResultType&)>& readyFunc)
         {
-            std::unique_ptr<SBaseTask> pTask{ new STask<ResultType>{ taskFunc, readyFunc } };
+            std::unique_ptr<SBaseTask> pTask{new STask<ResultType>{taskFunc, readyFunc}};
 
-            std::lock_guard<std::mutex>{ m_TasksMutex };
+            std::lock_guard<std::mutex>{m_TasksMutex};
             m_Tasks.push(std::move(pTask));
         }
 
@@ -88,12 +81,12 @@ namespace SharedUtil
 
     private:
         std::vector<std::thread> m_Workers;
-        bool m_Running = true;
+        bool                     m_Running = true;
 
         std::queue<std::unique_ptr<SBaseTask>> m_Tasks;
-        std::mutex m_TasksMutex;
+        std::mutex                             m_TasksMutex;
 
         std::vector<std::unique_ptr<SBaseTask>> m_TaskResults;
-        std::mutex m_TaskResultsMutex;
+        std::mutex                              m_TaskResultsMutex;
     };
-}
+}            // namespace SharedUtil

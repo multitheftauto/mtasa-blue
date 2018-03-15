@@ -1,46 +1,45 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/TaskCarSA.cpp
-*  PURPOSE:     Car game tasks
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Christian Myhre Lundheim <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/TaskCarSA.cpp
+ *  PURPOSE:     Car game tasks
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
 // ##############################################################################
-// ## Name:    CTaskComplexEnterCar                                    
+// ## Name:    CTaskComplexEnterCar
 // ## Purpose: Makes the ped enter the specified vehicle
 // ## Notes:   Shouldn't be used directly, use CTaskComplexEnterCarAsDriver or
 // ##          CTaskComplexEnterCarAsPassenger instead
 // ##############################################################################
 
-CTaskComplexEnterCarSA::CTaskComplexEnterCarSA ( CVehicle* pTargetVehicle, const bool bAsDriver, const bool bQuitAfterOpeningDoor, const bool bQuitAfterDraggingPedOut, const bool bCarryOnAfterFallingOff ):CTaskComplexSA ( )
+CTaskComplexEnterCarSA::CTaskComplexEnterCarSA(CVehicle* pTargetVehicle, const bool bAsDriver, const bool bQuitAfterOpeningDoor,
+                                               const bool bQuitAfterDraggingPedOut, const bool bCarryOnAfterFallingOff)
+    : CTaskComplexSA()
 {
-
 }
 
 // ##############################################################################
-// ## Name:    CTaskComplexEnterCarAsDriver                                    
+// ## Name:    CTaskComplexEnterCarAsDriver
 // ## Purpose: Makes the ped enter the specified vehicle
 // ##############################################################################
 
-CTaskComplexEnterCarAsDriverSA::CTaskComplexEnterCarAsDriverSA ( CVehicle* pTargetVehicle):CTaskComplexEnterCarSA ( pTargetVehicle, true, false, false, false )
+CTaskComplexEnterCarAsDriverSA::CTaskComplexEnterCarAsDriverSA(CVehicle* pTargetVehicle) : CTaskComplexEnterCarSA(pTargetVehicle, true, false, false, false)
 {
     DEBUG_TRACE("CTaskComplexEnterCarAsDriverSA::CTaskComplexEnterCarAsDriverSA(CVehicle* pTargetVehicle)");
 
-    CVehicleSA* pTargetVehicleSA = dynamic_cast < CVehicleSA* > ( pTargetVehicle );
+    CVehicleSA* pTargetVehicleSA = dynamic_cast<CVehicleSA*>(pTargetVehicle);
 
-    if ( pTargetVehicleSA )
+    if (pTargetVehicleSA)
     {
         this->CreateTaskInterface(sizeof(CTaskComplexEnterCarAsDriverSAInterface));
-        if ( !IsValid () ) return;
+        if (!IsValid())
+            return;
         DWORD dwFunc = FUNC_CTaskComplexEnterCarAsDriver__Constructor;
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)this->GetInterface();
@@ -51,29 +50,32 @@ CTaskComplexEnterCarAsDriverSA::CTaskComplexEnterCarAsDriverSA ( CVehicle* pTarg
             push    dwVehiclePtr
             call    dwFunc
         }
-    } else {
+    }
+    else
+    {
         DEBUG_TRACE("pTargetVehicleSA was invalid!");
     }
 }
-
 
 // ##############################################################################
 // ## Name:    CTaskComplexEnterCarAsPassenger
 // ## Purpose: Makes the ped enter the specified vehicle as a passenger
 // ##############################################################################
 
-CTaskComplexEnterCarAsPassengerSA::CTaskComplexEnterCarAsPassengerSA ( CVehicle* pTargetVehicle, const int iTargetSeat, const bool bCarryOnAfterFallingOff ):CTaskComplexEnterCarSA ( pTargetVehicle, false, false, false, false )
+CTaskComplexEnterCarAsPassengerSA::CTaskComplexEnterCarAsPassengerSA(CVehicle* pTargetVehicle, const int iTargetSeat, const bool bCarryOnAfterFallingOff)
+    : CTaskComplexEnterCarSA(pTargetVehicle, false, false, false, false)
 {
     DEBUG_TRACE("CTaskComplexEnterCarAsPassengerSA::CTaskComplexEnterCarAsPassengerSA(CVehicle* pTargetVehicle)");
 
-    CVehicleSA* pTargetVehicleSA = dynamic_cast < CVehicleSA* > ( pTargetVehicle );
+    CVehicleSA* pTargetVehicleSA = dynamic_cast<CVehicleSA*>(pTargetVehicle);
 
-    if ( pTargetVehicleSA )
+    if (pTargetVehicleSA)
     {
         this->CreateTaskInterface(sizeof(CTaskComplexEnterCarAsPassengerSAInterface));
-        if ( !IsValid () ) return;
+        if (!IsValid())
+            return;
         DWORD dwFunc = FUNC_CTaskComplexEnterCarAsPassenger__Constructor;
-        DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface ();
+        DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)this->GetInterface();
 
         _asm
@@ -88,7 +90,9 @@ CTaskComplexEnterCarAsPassengerSA::CTaskComplexEnterCarAsPassengerSA ( CVehicle*
             call    dwFunc
             pop     edx
         }
-    } else {
+    }
+    else
+    {
         DEBUG_TRACE("pTargetVehicleSA was invalid!");
     }
 }
@@ -98,16 +102,17 @@ CTaskComplexEnterCarAsPassengerSA::CTaskComplexEnterCarAsPassengerSA ( CVehicle*
 // ## Purpose: Makes the ped enter the specified boat as the driver
 // ##############################################################################
 
-CTaskComplexEnterBoatAsDriverSA::CTaskComplexEnterBoatAsDriverSA ( CVehicle* pTargetVehicle ):CTaskComplexSA ( )
+CTaskComplexEnterBoatAsDriverSA::CTaskComplexEnterBoatAsDriverSA(CVehicle* pTargetVehicle) : CTaskComplexSA()
 {
     DEBUG_TRACE("CTaskComplexEnterBoatAsDriverSA::CTaskComplexEnterBoatAsDriverSA(CVehicle* pTargetVehicle)");
 
-    CVehicleSA* pTargetVehicleSA = dynamic_cast < CVehicleSA* > ( pTargetVehicle );
+    CVehicleSA* pTargetVehicleSA = dynamic_cast<CVehicleSA*>(pTargetVehicle);
 
-    if ( pTargetVehicleSA )
+    if (pTargetVehicleSA)
     {
         this->CreateTaskInterface(sizeof(CTaskComplexEnterBoatAsDriverSAInterface));
-        if ( !IsValid () ) return;
+        if (!IsValid())
+            return;
         DWORD dwFunc = FUNC_CTaskComplexEnterBoatAsDriver__Constructor;
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)this->GetInterface();
@@ -118,34 +123,40 @@ CTaskComplexEnterBoatAsDriverSA::CTaskComplexEnterBoatAsDriverSA ( CVehicle* pTa
             push    dwVehiclePtr
             call    dwFunc
         }
-    } else {
+    }
+    else
+    {
         DEBUG_TRACE("pTargetVehicleSA was invalid!");
     }
 }
 
-
 // ##############################################################################
-// ## Name:    CTaskComplexLeaveCar                                    
+// ## Name:    CTaskComplexLeaveCar
 // ## Purpose: Makes the ped leave a specific vehicle
 // ##############################################################################
 
-CTaskComplexLeaveCarSA::CTaskComplexLeaveCarSA( CVehicle* pTargetVehicle, const int iTargetDoor, const int iDelayTime, const bool bSensibleLeaveCar, const bool bForceGetOut ):CTaskComplexSA ( )
+CTaskComplexLeaveCarSA::CTaskComplexLeaveCarSA(CVehicle* pTargetVehicle, const int iTargetDoor, const int iDelayTime, const bool bSensibleLeaveCar,
+                                               const bool bForceGetOut)
+    : CTaskComplexSA()
 {
-    DEBUG_TRACE("CTaskComplexLeaveCarSA::CTaskComplexLeaveCarSA( CVehicle* pTargetVehicle, const int iTargetDoor, const int iDelayTime, const bool bSensibleLeaveCar, const bool bForceGetOut )");
+    DEBUG_TRACE(
+        "CTaskComplexLeaveCarSA::CTaskComplexLeaveCarSA( CVehicle* pTargetVehicle, const int iTargetDoor, const int iDelayTime, const bool bSensibleLeaveCar, "
+        "const bool bForceGetOut )");
 
-    CVehicleSA* pTargetVehicleSA = dynamic_cast < CVehicleSA* > ( pTargetVehicle );
+    CVehicleSA* pTargetVehicleSA = dynamic_cast<CVehicleSA*>(pTargetVehicle);
 
-    if ( pTargetVehicleSA )
+    if (pTargetVehicleSA)
     {
         this->CreateTaskInterface(sizeof(CTaskComplexLeaveCarSAInterface));
-        if ( !IsValid () ) return;
-        DWORD dwFunc = FUNC_CTaskComplexLeaveCar__Constructor;
-        DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
-        DWORD dwThisInterface = (DWORD)this->GetInterface();
-        DWORD dwDoorIdx = 0;
-        static int s_iCarNodeIndexes [6] = { 0x10, 0x11, 0x0A, 0x08, 0x0B, 0x09 };
+        if (!IsValid())
+            return;
+        DWORD      dwFunc = FUNC_CTaskComplexLeaveCar__Constructor;
+        DWORD      dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
+        DWORD      dwThisInterface = (DWORD)this->GetInterface();
+        DWORD      dwDoorIdx = 0;
+        static int s_iCarNodeIndexes[6] = {0x10, 0x11, 0x0A, 0x08, 0x0B, 0x09};
 
-        if ( iTargetDoor >= 0 && iTargetDoor <= 5 )
+        if (iTargetDoor >= 0 && iTargetDoor <= 5)
             dwDoorIdx = s_iCarNodeIndexes[iTargetDoor];
 
         _asm
@@ -163,7 +174,9 @@ CTaskComplexLeaveCarSA::CTaskComplexLeaveCarSA( CVehicle* pTargetVehicle, const 
             call    dwFunc
             pop     ebx
         }
-    } else {
+    }
+    else
+    {
         DEBUG_TRACE("pTargetVehicleSA was invalid!");
     }
 }

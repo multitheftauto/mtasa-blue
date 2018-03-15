@@ -1,19 +1,19 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CMemStats.h
-*               
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CMemStats.h
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 struct SModelCacheStats
 {
-    uint            uiMaxNumPedModels;
-    uint            uiMaxNumVehicleModels;
-    uint            uiNumPedModels;
-    uint            uiNumVehicleModels;
+    uint uiMaxNumPedModels;
+    uint uiMaxNumVehicleModels;
+    uint uiNumPedModels;
+    uint uiNumVehicleModels;
 };
 
 //
@@ -24,16 +24,16 @@ struct SMemStatsInfo
     ZERO_ON_NEW
 
     CProxyDirect3DDevice9::SMemoryState d3dMemory;
-    CProxyDirect3DDevice9::SFrameStats frameStats;
-    SDxStatus dxStatus;
-    int iProcessMemSizeKB;
-    int iProcessTotalVirtualKB;
-    int iStreamingMemoryUsed;
-    int iStreamingMemoryAvailable;
-    SRwResourceStats rwResourceStats;
-    SClothesCacheStats clothesCacheStats;
-    SShaderReplacementStats shaderReplacementStats;
-    SModelCacheStats modelCacheStats;
+    CProxyDirect3DDevice9::SFrameStats  frameStats;
+    SDxStatus                           dxStatus;
+    int                                 iProcessMemSizeKB;
+    int                                 iProcessTotalVirtualKB;
+    int                                 iStreamingMemoryUsed;
+    int                                 iStreamingMemoryAvailable;
+    SRwResourceStats                    rwResourceStats;
+    SClothesCacheStats                  clothesCacheStats;
+    SShaderReplacementStats             shaderReplacementStats;
+    SModelCacheStats                    modelCacheStats;
 
     union {
         uint uiArray[14];
@@ -57,19 +57,18 @@ struct SMemStatsInfo
     } modelInfo;
 };
 
-
 //
 // CMemStatsInterface for measuring and displaying memory usage info
 //
 class CMemStatsInterface
 {
 public:
-    virtual             ~CMemStatsInterface   ( void ) {}
+    virtual ~CMemStatsInterface(void) {}
 
-    virtual void        Draw                    ( void ) = 0;
-    virtual void        SetEnabled              ( bool bEnabled ) = 0;
-    virtual bool        IsEnabled               ( void ) = 0;
-    virtual void        SampleState             ( SMemStatsInfo& memStatsInfo ) = 0;
+    virtual void Draw(void) = 0;
+    virtual void SetEnabled(bool bEnabled) = 0;
+    virtual bool IsEnabled(void) = 0;
+    virtual void SampleState(SMemStatsInfo& memStatsInfo) = 0;
 };
 
-CMemStatsInterface* GetMemStats ( void );
+CMemStatsInterface* GetMemStats(void);

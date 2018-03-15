@@ -1,19 +1,18 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/data/clinkedlist.h
-*  PURPOSE:     Linked list template class
-*  DEVELOPERS:  Derek Abdine <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*  The following code deals with implementing a templated
-*  linked list with a built-in public iterator class.  This
-*  allows for extremely easy traversal back and forth through
-*  this list and extremely fast access to the data within.
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/data/clinkedlist.h
+ *  PURPOSE:     Linked list template class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *  The following code deals with implementing a templated
+ *  linked list with a built-in public iterator class.  This
+ *  allows for extremely easy traversal back and forth through
+ *  this list and extremely fast access to the data within.
+ *
+ *****************************************************************************/
 
 #ifndef __CLINKEDLIST_H
 #define __CLINKEDLIST_H
@@ -32,17 +31,16 @@ private:
     {
         friend class CLinkedList<TN>;
         friend class CIterator;
+
     private:
-        TN m_data;
+        TN         m_data;
         CNode<TN>* m_pNext;
         CNode<TN>* m_pPrev;
-    public:
-        CNode ()
-        {
-            m_pNext = m_pPrev = NULL;
-        };
 
-        CNode (TN data, CNode<TN>* pNextNode = NULL, CNode<TN>* pPrevNode = NULL)
+    public:
+        CNode() { m_pNext = m_pPrev = NULL; };
+
+        CNode(TN data, CNode<TN>* pNextNode = NULL, CNode<TN>* pPrevNode = NULL)
         {
             m_data = data;
             m_pNext = pNextNode;
@@ -51,99 +49,81 @@ private:
     };
 
 public:
-    class CIterator 
+    class CIterator
     {
         friend class CLinkedList<T>;
+
     private:
         CNode<T>* m_pCurrent;
 
-        inline CIterator (CNode<T>* pNode)
-        {
-            m_pCurrent = pNode;
-        };
+        CIterator(CNode<T>* pNode) { m_pCurrent = pNode; };
+
     public:
-        inline CIterator ()
-        {
-            m_pCurrent = NULL;
-        };
+        CIterator() { m_pCurrent = NULL; };
 
-        inline T& operator* () const
-        {
-            return m_pCurrent->m_data;
-        };
+        T& operator*() const { return m_pCurrent->m_data; };
 
-        inline T* operator-> () const
-        {
-            return &m_pCurrent->m_data;
-        };
+        T* operator->() const { return &m_pCurrent->m_data; };
 
-        inline CIterator& operator++ ()
+        CIterator& operator++()
         {
             m_pCurrent = m_pCurrent->m_pNext;
             return *this;
         };
-        
-        inline T& operator[] (int j) const
+
+        T& operator[](int j) const
         {
             CNode<T>* m_pTrans = m_pCurrent;
-            for (int i=0; i<j; i++)
+            for (int i = 0; i < j; i++)
             {
-                if (m_pTrans) m_pTrans = m_pTrans->m_pNext;
+                if (m_pTrans)
+                    m_pTrans = m_pTrans->m_pNext;
             }
             return m_pTrans->m_data;
         };
-        
-        inline CIterator operator++ (int iDummy)
+
+        CIterator operator++(int iDummy)
         {
-            CIterator itRetVal (*this);
+            CIterator itRetVal(*this);
             m_pCurrent = m_pCurrent->m_pNext;
             return itRetVal;
         };
 
-        inline CIterator& operator-- ()
+        CIterator& operator--()
         {
             m_pCurrent = m_pCurrent->m_pPrev;
             return *this;
         };
 
-        inline CIterator operator-- (int iDummy)
+        CIterator operator--(int iDummy)
         {
-            CIterator itRetVal (*this);
+            CIterator itRetVal(*this);
             m_pCurrent = m_pCurrent->m_pPrev;
             return itRetVal;
         };
 
-        inline BOOL operator== (const CIterator& itNode) const
-        {
-            return (m_pCurrent == itNode.m_pCurrent);
-        };
+        BOOL operator==(const CIterator& itNode) const { return (m_pCurrent == itNode.m_pCurrent); };
 
-        inline BOOL operator!= (const CIterator& itNode) const
-        {
-            return !(m_pCurrent == itNode.m_pCurrent);
-        };
+        BOOL operator!=(const CIterator& itNode) const { return !(m_pCurrent == itNode.m_pCurrent); };
     };
 
 private:
     unsigned int m_iNumElements;
-    CNode<T>* m_pHead;
-    CNode<T>* m_pTail;
-public:
+    CNode<T>*    m_pHead;
+    CNode<T>*    m_pTail;
 
-    inline CLinkedList ()
+public:
+    CLinkedList()
     {
         m_iNumElements = 0;
         m_pHead = m_pTail = NULL;
     };
 
-    inline ~CLinkedList ()
-    {
-        removeAllNodes ();
-    };
+    ~CLinkedList() { removeAllNodes(); };
 
-    inline BOOL doesContain (const T& data)
+    BOOL doesContain(const T& data)
     {
-        if (find (data) != getEnd ())
+        if (find(data) != getEnd())
         {
             return TRUE;
         }
@@ -151,15 +131,12 @@ public:
         return FALSE;
     };
 
-    inline CIterator find (const T& data)
-    {
-        return findAfter (data, getBegin ());
-    };
+    CIterator find(const T& data) { return findAfter(data, getBegin()); };
 
-    inline CIterator findAfter (const T& data, CIterator itStart)
+    CIterator findAfter(const T& data, CIterator itStart)
     {
         CIterator itRetVal = itStart;
-        while (itRetVal != getEnd () && *itRetVal != data)
+        while (itRetVal != getEnd() && *itRetVal != data)
         {
             itRetVal++;
         }
@@ -167,44 +144,34 @@ public:
         return itRetVal;
     };
 
-    inline CIterator getElementAt( UINT n )
+    CIterator getElementAt(UINT n)
     {
-        CIterator itRetVal = CIterator (m_pHead);
-        if (n < m_iNumElements) for (UINT i=0; i<n; i++) itRetVal++;
+        CIterator itRetVal = CIterator(m_pHead);
+        if (n < m_iNumElements)
+            for (UINT i = 0; i < n; i++)
+                itRetVal++;
         return itRetVal;
     }
 
-    inline CIterator getBegin ()
-    {
-        return CIterator (m_pHead);
-    };
+    CIterator getBegin() { return CIterator(m_pHead); };
 
-    inline CIterator getEnd ()
-    {
-        return CIterator (NULL);
-    };
+    CIterator getEnd() { return CIterator(NULL); };
 
-    inline unsigned int getNumElements ()
-    {
-        return m_iNumElements;
-    };
+    unsigned int getNumElements() { return m_iNumElements; };
 
     // the only case this would be needed is if they wanted to do a reverse iterate
-    inline CIterator getTail ()
-    {
-        return CIterator (m_pTail);
-    };
+    CIterator getTail() { return CIterator(m_pTail); };
 
-    inline void insertAfter (CIterator& itNode, T data)
+    void insertAfter(CIterator& itNode, T data)
     {
-        //if (itNode == m_pHead)
-        if (isEmpty ())
+        // if (itNode == m_pHead)
+        if (isEmpty())
         {
-            insertAtFront (data);
+            insertAtFront(data);
         }
         else
         {
-            CNode<T> * pNewNode = new CNode<T> (data, itNode.m_pCurrent->m_pNext, itNode.m_pCurrent);
+            CNode<T>* pNewNode = new CNode<T>(data, itNode.m_pCurrent->m_pNext, itNode.m_pCurrent);
 
             if (itNode.m_pCurrent->m_pNext)
             {
@@ -222,25 +189,25 @@ public:
         }
     };
 
-    inline void insertBefore (CIterator& itNode, T data)
+    void insertBefore(CIterator& itNode, T data)
     {
         if (itNode != m_pHead)
         {
-//          CIterator itInsert = --itNode;
-//          insertAfter (itInsert, data);
-            insertAfter (--itNode, data);
+            //          CIterator itInsert = --itNode;
+            //          insertAfter (itInsert, data);
+            insertAfter(--itNode, data);
         }
         else
         {
-            CNode<T> * pNewNode = new CNode<T> (data, m_pHead);
-            //pNewNode->m_pPrev = pNewNode; //stuck in a loop!
+            CNode<T>* pNewNode = new CNode<T>(data, m_pHead);
+            // pNewNode->m_pPrev = pNewNode; //stuck in a loop!
 
             if (m_pHead)
             {
                 m_pHead->m_pPrev = pNewNode;
             }
 
-            if (getNumElements () == 0)
+            if (getNumElements() == 0)
             {
                 m_pTail = pNewNode;
             }
@@ -250,65 +217,62 @@ public:
         }
     };
 
-    inline void insertAtBack (T data)
+    void insertAtBack(T data)
     {
-        CIterator itInsert = getTail ();
-        insertAfter (itInsert, data);
+        CIterator itInsert = getTail();
+        insertAfter(itInsert, data);
     };
 
-    inline void insertAtFront (T data)
+    void insertAtFront(T data)
     {
-        CIterator itInsert = getBegin ();
-        insertBefore (itInsert, data);
+        CIterator itInsert = getBegin();
+        insertBefore(itInsert, data);
     };
 
-    inline void insertSorted (T data, BOOL bAscending = TRUE)
+    void insertSorted(T data, BOOL bAscending = TRUE)
     {
         BOOL bInserted = FALSE;
 
-        for (CIterator itLL = getBegin (); itLL != getEnd () && !bInserted; itLL++)
+        for (CIterator itLL = getBegin(); itLL != getEnd() && !bInserted; itLL++)
         {
             if ((bAscending && data < *itLL) || (!bAscending && data > *itLL))
             {
-                insertBefore (itLL, data);
+                insertBefore(itLL, data);
                 bInserted = TRUE;
             }
         }
 
         if (!bInserted)
         {
-            insertAtBack (data);
+            insertAtBack(data);
         }
     };
 
-    inline void insertPointerSorted (T data, BOOL bAscending = TRUE)
+    void insertPointerSorted(T data, BOOL bAscending = TRUE)
     {
         BOOL bInserted = FALSE;
 
-        for (CIterator itLL = getBegin (); itLL != getEnd () && !bInserted; itLL++)
+        for (CIterator itLL = getBegin(); itLL != getEnd() && !bInserted; itLL++)
         {
             if ((bAscending && *data < **itLL) || (!bAscending && *data > **itLL))
             {
-                insertBefore (itLL, data);
+                insertBefore(itLL, data);
                 bInserted = TRUE;
             }
         }
 
         if (!bInserted)
         {
-            insertAtBack (data);
+            insertAtBack(data);
         }
     };
 
-    inline BOOL isEmpty ()
-    {
-        return (m_iNumElements == 0);
-    };
+    BOOL isEmpty() { return (m_iNumElements == 0); };
 
-    inline void remove (CIterator& itNode, BOOL bIterateForwards = TRUE)
+    void remove(CIterator& itNode, BOOL bIterateForwards = TRUE)
     {
-        CNode<T> * pTempNode = itNode.m_pCurrent;
-        CNode<T> * pTempSingleNode = NULL; // will be used if only a single node remains
+        CNode<T>* pTempNode = itNode.m_pCurrent;
+        CNode<T>* pTempSingleNode = NULL;            // will be used if only a single node remains
 
         BOOL bIteratorSet = FALSE;
 
@@ -351,7 +315,7 @@ public:
         {
             pTempNode->m_pNext->m_pPrev = pTempNode->m_pPrev;
         }
-        
+
         delete pTempNode;
 
         m_iNumElements--;
@@ -368,24 +332,21 @@ public:
         }
     };
 
-    inline void removeAllNodes ()
+    void removeAllNodes()
     {
         CIterator itRemove;
-        
-//          remove (getTail ());
 
-        while (!isEmpty ())
+        //          remove (getTail ());
+
+        while (!isEmpty())
         {
-            itRemove = getTail ();
-            remove (itRemove);
-        }       
+            itRemove = getTail();
+            remove(itRemove);
+        }
 
         m_iNumElements = 0;
         m_pHead = m_pTail = NULL;
     };
 };
 
-
 #endif
-
-

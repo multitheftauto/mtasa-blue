@@ -304,4 +304,4 @@ struct SAclRequest;
 #include "../../version.h"
 
 extern CNetServer* g_pRealNetServer;
-extern CGame* g_pGame;
+extern CGame*      g_pGame;
