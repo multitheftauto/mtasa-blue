@@ -149,7 +149,7 @@ public:
     // CefDisplayHandler methods
     virtual void OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title) override;
     virtual bool OnTooltip(CefRefPtr<CefBrowser> browser, CefString& text) override;
-    virtual bool OnConsoleMessage(CefRefPtr<CefBrowser> browser, cef_log_severity_t level, const CefString& message, const CefString& source,
+    virtual bool OnConsoleMessage(CefRefPtr<CefBrowser> browser, const CefString& message, const CefString& source,
                                   int line) override;
 
     // CefContextMenuHandler methods

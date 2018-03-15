@@ -995,7 +995,7 @@ bool CWebView::OnTooltip(CefRefPtr<CefBrowser> browser, CefString& title)
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnConsoleMessage(CefRefPtr<CefBrowser> browser, cef_log_severity_t level, const CefString& message, const CefString& source, int line)
+bool CWebView::OnConsoleMessage(CefRefPtr<CefBrowser> browser, const CefString& message, const CefString& source, int line)
 {
     // Redirect console message to debug window (if development mode is enabled)
     if (g_pCore->GetWebCore()->IsTestModeEnabled())
