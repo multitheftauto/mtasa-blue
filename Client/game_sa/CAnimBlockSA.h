@@ -27,7 +27,9 @@ public:
     bool                bLoaded;    // ?
     BYTE                pad [ 1 ];
     unsigned short      usRefs;
-    BYTE                pad2 [ 12 ];
+    int                 idOffset;
+    size_t              nAnimations;
+    DWORD               dwAssocGroup;
 };
 
 class CAnimBlockSA : public CAnimBlock
