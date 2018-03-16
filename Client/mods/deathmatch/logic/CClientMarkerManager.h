@@ -23,20 +23,12 @@ class CClientMarkerManager
 public:
     unsigned int          Count(void) { return static_cast<unsigned int>(m_Markers.size()); };
     static CClientMarker* Get(ElementID ID);
-    bool                  Exists(CClientMarker* pMarker);
-
-    void Delete(int ID);
-    void DeleteAll(void);
-
-    CFastList<CClientMarker*>::const_iterator IterBegin(void) { return m_Markers.begin(); };
-    CFastList<CClientMarker*>::const_iterator IterEnd(void) { return m_Markers.end(); };
+    void                  DeleteAll(void);
 
 private:
     CClientMarkerManager(class CClientManager* pManager);
     ~CClientMarkerManager(void);
-
     void DoPulse(void);
-
     void AddToList(CClientMarker* pCheckpoint) { m_Markers.push_back(pCheckpoint); };
     void RemoveFromList(CClientMarker* pCheckpoint)
     {

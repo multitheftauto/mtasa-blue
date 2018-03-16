@@ -398,8 +398,9 @@ msgid "shows the frame timing graph"
 msgstr "frame grafikon mutatása"
 
 #: C:\mtasa-blue\Client\core\CCore.h:55
+#, fuzzy
 msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
-msgstr ""
+msgstr "Copyright (C) 2003 - 2016 Multi Theft Auto"
 
 #: C:\mtasa-blue\Client\core\CCredits.cpp:32
 msgid "Programming"
@@ -1298,11 +1299,11 @@ msgstr "Egér fixálás"
 #. Cache path info
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1108
 msgid "Client resource files:"
-msgstr ""
+msgstr "Kliens oldali resource-ok:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1112
 msgid "Show in Explorer"
-msgstr ""
+msgstr "Megjelenítés az Intézőben"
 
 #. Auto updater section label
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1127
@@ -1393,12 +1394,13 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1955
 msgid "Layout"
-msgstr ""
+msgstr "Elrendezés"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1956
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2217
+#, fuzzy
 msgid "Options"
-msgstr ""
+msgstr "Beállítások:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1962
 msgid "Chat Background"
@@ -1446,7 +1448,7 @@ msgstr "mp"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2047
 msgid "Fading"
-msgstr ""
+msgstr "Halványulás"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2053
 msgid "Fade out old lines"
@@ -1490,8 +1492,9 @@ msgid "Bottom"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2181
+#, fuzzy
 msgid "Font"
-msgstr ""
+msgstr "Betűtípus:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2223
 msgid "Hide background when not typing"
@@ -1507,7 +1510,7 @@ msgstr "Ablak villogás engedélyezése"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2238
 msgid "Allow tray balloon notifications"
-msgstr ""
+msgstr "Asztali értesítések engedélyezése"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2243
 msgid "Chat text black/white outline"
@@ -2864,7 +2867,7 @@ msgstr "A GTA:SA összeomlott jármű tuningolás miatt."
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1960
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
-msgstr ""
+msgstr "GTA:SA hibákat talált a '%s' fájlban"
 
 #. Ask user to confirm
 #: C:\mtasa-blue\Client\loader\Utils.cpp:2035
@@ -3317,7 +3320,7 @@ msgstr "Csatlakozási hiba"
 #. Couldn't create render target for CPostEffects
 #: C:\mtasa-blue\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1427
 msgid "Problem with graphics driver"
-msgstr ""
+msgstr "Probléma a grafikus illesztőprogrammal"
 
 #: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:89
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
