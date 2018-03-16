@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -12,8 +12,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"Translators: Francisco Arias; otoutou; ccw\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: Francisco \"WolfPire\" Arias; otoutou; ccw\n"
 "X-POOTLE-MTIME: 1501098943.0\n"
 
 #. GET_XPVISTA_PLEASE
@@ -237,8 +237,10 @@ msgid ""
 "$\n"
 "Please reinstall if there are problems later."
 msgstr ""
-"Grand Theft Auto: San Andreasは発見されませんでした。$\r$\n"
-"ところが、インストールは続きますが、$\r$\n"
+"Grand Theft Auto: San Andreasは発見されませんでした。$\r"
+"$\n"
+"ところが、インストールは続きますが、$\r"
+"$\n"
 "問題が発生したら、再インストールしてください。"
 
 #. INST_SEC_CORE_RESOURCES
@@ -287,8 +289,10 @@ msgid ""
 "$\n"
 "Run the new installer to upgrade and preserve your settings."
 msgstr ""
-"アップデートする前にアンインストールしますか?$\r$\n"
-"新しいMTA:SAバージョンをインストールする時はアンインストールする必要がありません$\r$\n"
+"アップデートする前にアンインストールしますか?$\r"
+"$\n"
+"新しいMTA:SAバージョンをインストールする時はアンインストールする必要がありません$\r"
+"$\n"
 "インストーラを実行すると自動的にアップデートできます。"
 
 #. UNINST_DATA_REQUEST
@@ -297,7 +301,8 @@ msgid ""
 "Would you like to keep your data files (such as resources, screenshots and "
 "server configuration)? If you click no, any resources, configurations or "
 "screenshots you have created will be lost."
-msgstr "個人的なものを保ったいですか。（資源、スクリーンショットとサーバーコンフィグレーション）？「いいえ」にクリックしたら、個人的なものを失います。"
+msgstr ""
+"個人的なものを保ったいですか。（資源、スクリーンショットとサーバーコンフィグレーション）？「いいえ」にクリックしたら、個人的なものを失います。"
 
 #. MSGBOX_PATCH_FAIL1
 #: ../Shared/installer/nightly.nsi:1144
@@ -482,8 +487,10 @@ msgstr "ファイアウォールにブロックされていないのを確認し
 #~ "$\n"
 #~ "Please reinstall if there are problems later."
 #~ msgstr ""
-#~ "Microsoft Visual Studio 2008 SP1 Redistributableはダウンロードできませんでした。。$\r$\n"
-#~ "ところが、インストールは続きます。$\r$\n"
+#~ "Microsoft Visual Studio 2008 SP1 Redistributableはダウンロードできませんでした。。$\r"
+#~ "$\n"
+#~ "ところが、インストールは続きます。$\r"
+#~ "$\n"
 #~ "問題があったら、あとで再インストールしてください。"
 
 #~ msgid "Unable to download Microsoft Visual Studio 2013 redistributable"
@@ -499,6 +506,8 @@ msgstr "ファイアウォールにブロックされていないのを確認し
 #~ "$\n"
 #~ "Please reinstall if there are problems later."
 #~ msgstr ""
-#~ "Microsoft Visual Studio 2013 再頒布可能パッケージのダウンロードが失敗しました。$\r$\n"
-#~ "インストールは続きますが$\r$\n"
+#~ "Microsoft Visual Studio 2013 再頒布可能パッケージのダウンロードが失敗しました。$\r"
+#~ "$\n"
+#~ "インストールは続きますが$\r"
+#~ "$\n"
 #~ "もし問題が発生した場合には,再インストールしてください。"

@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -11,10 +11,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
-"n%100==4 ? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
+"Translators: PrimoXD; Boštjan Kozar; Bine; Talidan; ccw\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: PrimoXD; Boštjan \"DrEspy\" Kozar; Bine; Talidan; ccw\n"
 "X-POOTLE-MTIME: 1402776805.0\n"
 
 #. GET_XPVISTA_PLEASE
@@ -31,8 +30,10 @@ msgid ""
 "download the newest version from www.mtasa.com."
 msgstr ""
 
-# [Možno je, da bo za operacijo potrebno dovoljenje sistemskega administratorja v Windows Vista in novejših različicah operacijskega sistema Windows]
 #. WELCOME_TEXT
+# [Možno je, da bo za operacijo potrebno dovoljenje sistemskega
+# administratorja v Windows Vista in novejših različicah operacijskega sistema
+# Windows]
 #: ../Shared/installer/nightly.nsi:188
 msgid ""
 "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n"
@@ -43,13 +44,11 @@ msgid ""
 "\n"
 "Click Next to continue."
 msgstr ""
-"Ta čarovnik vas bo vodil skozi nameščanje ali posodabljanje programa "
-"$(^Name) ${REVISION_TAG}\n"
+"Ta čarovnik vas bo vodil skozi nameščanje ali posodabljanje programa $(^Name) ${REVISION_TAG}\n"
 "\n"
 "Priporočeno je, da pred nameščanjem zaprete vse ostale aplikacije.\n"
 "\n"
-"[Možno je, da bo za operacijo potrebno dovoljenje dovoljenje administratorja "
-"v Windows Vista in novejših različicah operacijskega sistema Windows]\n"
+"[Možno je, da bo za operacijo potrebno dovoljenje dovoljenje administratorja v Windows Vista in novejših različicah operacijskega sistema Windows]\n"
 "\n"
 "Klikni naprej za nadaljevanje."
 
@@ -63,8 +62,9 @@ msgstr "Lokacija Grand Theft Auto: San Andreas"
 msgid "Grand Theft Auto: San Andreas folder"
 msgstr "Grand Theft Auto: San Andreas mapa"
 
-# Če želite uporabljati MTA:SA morate imeti naloženo aplikacijo Grand Theft Auto: San Andreas 1.0.
 #. DIRECTORY_Text_Top
+# Če želite uporabljati MTA:SA morate imeti naloženo aplikacijo Grand Theft
+# Auto: San Andreas 1.0.
 #: ../Shared/installer/nightly.nsi:191
 msgid ""
 "Please select your Grand Theft Auto: San Andreas folder.$\n"
@@ -75,8 +75,7 @@ msgid ""
 msgstr ""
 "Prosimo izberite mapo, kjer je nameščen Grand Theft Auto: San Andreas.$\n"
 "$\n"
-"Nameščen mora biti Grand Theft Auto: San Andreas različica 1.0, MTA:SA ne "
-"podpira drugih različic.$\n"
+"Nameščen mora biti Grand Theft Auto: San Andreas različica 1.0, MTA:SA ne podpira drugih različic.$\n"
 "$\n"
 "Kliknite Namestitev za začetek nameščanja."
 
@@ -251,9 +250,10 @@ msgid ""
 "$\n"
 "Please reinstall if there are problems later."
 msgstr ""
-"Veljavne Windows različice Grand Theft Auto: San Andreas ni bilo mogoče "
-"najti.$\r$\n"
-"Namestitev se bo nadaljevala.$\r$\n"
+"Veljavne Windows različice Grand Theft Auto: San Andreas ni bilo mogoče najti.$\r"
+"$\n"
+"Namestitev se bo nadaljevala.$\r"
+"$\n"
 "Prosimo, da ponovno namestite program, če se pozneje pojavijo problemi."
 
 #. INST_SEC_CORE_RESOURCES
@@ -340,7 +340,8 @@ msgstr "Za nameščanje potrebujete dovoljenje administratorja, poskusite znova"
 #. UAC_RIGHTS_UN
 #: ../Shared/installer/nightly.nsi:1182
 msgid "This uninstaller requires admin access, try again"
-msgstr "Za odstranitev potrebujete dovoljenje administratorja, poskusite znova"
+msgstr ""
+"Za odstranitev potrebujete dovoljenje administratorja, poskusite znova"
 
 #. UAC_RIGHTS3
 #: ../Shared/installer/nightly.nsi:1183
@@ -500,8 +501,10 @@ msgstr ""
 #~ "$\n"
 #~ "Please reinstall if there are problems later."
 #~ msgstr ""
-#~ "Ni mogoče naložiti Microsoft Visual Studio 2008 SP1 redistributable.$\r$\n"
-#~ "Namestitev se bo nadaljevala.$\r$\n"
+#~ "Ni mogoče naložiti Microsoft Visual Studio 2008 SP1 redistributable.$\r"
+#~ "$\n"
+#~ "Namestitev se bo nadaljevala.$\r"
+#~ "$\n"
 #~ "Prosimo, da program ponovno namestite, če se pozneje pojavijo problemi."
 
 #, fuzzy

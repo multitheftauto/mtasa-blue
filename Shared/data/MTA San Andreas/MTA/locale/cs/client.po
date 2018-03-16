@@ -7,43 +7,45 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:11+0000\n"
-"PO-Revision-Date: 2014-07-20 06:34+0000\n"
-"Last-Translator: ccw <ccw808@googlemail.com>\n"
+"PO-Revision-Date: 2018-03-07 14:14+0000\n"
+"Last-Translator: Rataj <rataj@fabulasoft.cz>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"Translators: MIKI785; LilDollaTechZone\n"
+"Translators: MIKI785; Rataj; pyrodojo; LilDollaTechZone\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1405838097.0\n"
+"X-POOTLE-MTIME: 1520432052.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
-msgstr ""
+msgstr "Požadavky stránek"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:26
 msgid ""
 "The server requests the following websites in order to load them (later):"
 msgstr ""
+"Server požaduje tvé povolení následujících stránek pro jejich (pozdější) "
+"načtení:"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:31
 msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr ""
+msgstr "NIKDY NEZADÁVEJTE CITLIVÉ INFORMACE PRO OCHRANU PŘED ODCIZENÍM"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:43
 msgid "Remember decision"
-msgstr ""
+msgstr "Pamatovat výběr"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:48
 #: C:\mtasa-blue\Client\core\CSettings.cpp:903
 msgid "Allow"
-msgstr ""
+msgstr "Povolit"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:54
 msgid "Deny"
-msgstr ""
+msgstr "Odmítnout"
 
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:36
 msgid "***[ COMMAND HELP ]***\n"
@@ -56,7 +58,7 @@ msgstr "* Právě je %d:%02d:%02d"
 
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:279
 msgid "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"
-msgstr "connect: Správný tvar je 'connect <host> <port> [<nick> <pass>]'"
+msgstr "connect: Správný tvar je 'connect <ip> <port> [<jméno> <heslo>]'"
 
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:287
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:338
@@ -67,17 +69,17 @@ msgstr "connect: Špatné číslo portu"
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:353
 #, c-format
 msgid "connect: Connecting to %s:%u..."
-msgstr "connect: Připojuji k %s:%u..."
+msgstr "connect: Připojuji se k %s:%u..."
 
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:307
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:357
 #, c-format
 msgid "connect: could not connect to %s:%u!"
-msgstr "connect: nelze připojit k %s:%u!"
+msgstr "connect: nelze se připojit k %s:%u!"
 
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:312
 msgid "connect: Failed to unload current mod"
-msgstr "connect: Selhalo vypínání aktualního módu"
+msgstr "connect: Selhalo vypínání aktuálního módu"
 
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:391
 msgid "Bound all controls from GTA"
@@ -281,7 +283,7 @@ msgstr "Ano"
 #: C:\mtasa-blue\Client\loader\CInstallManager.cpp:683
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr ""
+msgstr "MTA:SA nemůže pokračovat, protože na disku %s není dostatek místa."
 
 #: C:\mtasa-blue\Client\core\CCore.cpp:772
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:152
@@ -290,7 +292,7 @@ msgstr "Fatální chyba"
 
 #: C:\mtasa-blue\Client\core\CCore.cpp:924
 msgid "TO FIX, REMOVE THIS FILE:"
-msgstr ""
+msgstr "PRO OPRAVU ODSTRAŇ TENTO SOUBOR:"
 
 #: C:\mtasa-blue\Client\core\CCore.cpp:957
 #, c-format
@@ -304,13 +306,13 @@ msgstr "Chyba při otevírání URL"
 #: C:\mtasa-blue\Client\core\CCore.cpp:1299
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
-msgstr "Chyba při spouštění módu specifikovaný v příkazové řádce ('%s')"
+msgstr "Chyba při spouštění módu specifikovaného v příkazové řádce ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
 #: C:\mtasa-blue\Client\core\CCore.cpp:1386
 msgid "this help screen"
-msgstr "tato pomoc"
+msgstr "toto pomocné okno"
 
 #: C:\mtasa-blue\Client\core\CCore.cpp:1387
 #: C:\mtasa-blue\Client\core\CCore.cpp:1388
@@ -363,11 +365,11 @@ msgstr "uloží screenshot"
 
 #: C:\mtasa-blue\Client\core\CCore.cpp:1408
 msgid "immediately saves the config"
-msgstr "okamžitě uloží config"
+msgstr "okamžitě uloží konfiguraci"
 
 #: C:\mtasa-blue\Client\core\CCore.cpp:1410
 msgid "clears the debug view"
-msgstr "vyčistí debug"
+msgstr "vyčistí okno ladění"
 
 #: C:\mtasa-blue\Client\core\CCore.cpp:1411
 msgid "scrolls the chatbox upwards"
@@ -383,7 +385,7 @@ msgstr "zaroluje debugem nahoru"
 
 #: C:\mtasa-blue\Client\core\CCore.cpp:1414
 msgid "scrolls the debug view downwards"
-msgstr "zaroluje debugem dolů"
+msgstr "zaroluje oknem ladění dolů"
 
 #: C:\mtasa-blue\Client\core\CCore.cpp:1417
 msgid "shows the memory statistics"
@@ -395,7 +397,7 @@ msgstr "zobrazí graf časování snímku"
 
 #: C:\mtasa-blue\Client\core\CCore.h:55
 msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
-msgstr ""
+msgstr "Copyright (C) 2003 - 2018 Multi Theft Auto"
 
 #: C:\mtasa-blue\Client\core\CCredits.cpp:32
 msgid "Programming"
@@ -415,7 +417,7 @@ msgstr "Patch přispěvatelé"
 
 #: C:\mtasa-blue\Client\core\CCredits.cpp:146
 msgid "Language Localization"
-msgstr "jazyková lokalizace"
+msgstr "Jazyková lokalizace"
 
 #: C:\mtasa-blue\Client\core\CCredits.cpp:152
 msgid "Special Thanks"
@@ -431,7 +433,8 @@ msgid ""
 "The skin you selected could not be loaded, and the default skin also could "
 "not be loaded, please reinstall MTA."
 msgstr ""
-"Vybraný skin nemůže být načten a výchozí skin taktéž, prosím reinstaluj MTA."
+"Vybraný skin nemůže být načten a výchozí skin taktéž, prosím přeinstaluj "
+"MTA."
 
 #: C:\mtasa-blue\Client\core\CJoystickManager.cpp:1628
 msgid "Accelerate Axis"
@@ -533,11 +536,11 @@ msgstr "Vozidlo vpravo"
 #. 20
 #: C:\mtasa-blue\Client\core\CKeyBinds.cpp:208
 msgid "Steer forwards/down"
-msgstr "Řízení dopředu / dolů"
+msgstr "Stáčení dopředu/dolů"
 
 #: C:\mtasa-blue\Client\core\CKeyBinds.cpp:209
 msgid "Steer backwards/up"
-msgstr "Řízení dozadu / nahoru"
+msgstr "Stáčení dozadu/nahoru"
 
 #: C:\mtasa-blue\Client\core\CKeyBinds.cpp:210
 msgid "Accelerate"
@@ -557,7 +560,7 @@ msgstr "Předchozí rádio"
 
 #: C:\mtasa-blue\Client\core\CKeyBinds.cpp:214
 msgid "Radio user track skip"
-msgstr "Radio přeskočit user track"
+msgstr "Přeskočit uživatelskou stopu v rádiu"
 
 #: C:\mtasa-blue\Client\core\CKeyBinds.cpp:215
 msgid "Horn"
@@ -630,6 +633,8 @@ msgid ""
 "You are using a feature-branch build! This is a test build only which cannot"
 " be used to connect to public servers!"
 msgstr ""
+"Právě používáš verzi pro zkoušení aktualizací! Tato verze je pouze pro "
+"testování a nemůže být použita pro připojení k veřejným serverům!"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
 msgid ""
@@ -647,7 +652,7 @@ msgstr "VAROVÁNÍ O ODPOJENÍ"
 
 #: C:\mtasa-blue\Client\core\CQuickConnect.cpp:149
 msgid "No host specified!"
-msgstr "Není určen žádný hostitel."
+msgstr "Není určen žádný hostitel!"
 
 #: C:\mtasa-blue\Client\core\CQuickConnect.cpp:158
 msgid "No port specified!"
@@ -701,7 +706,7 @@ msgstr "Rozhraní"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:126
 msgid "Web Browser"
-msgstr ""
+msgstr "Internetový prohlížeč"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:127
 msgid "Advanced"
@@ -824,7 +829,7 @@ msgstr "ALT. TLAČÍTKO"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:365
 #: C:\mtasa-blue\Client\core\CSettings.cpp:368
 msgid "Nick:"
-msgstr "Nick:"
+msgstr "Přezdívka:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:378
 msgid "Save server passwords"
@@ -836,15 +841,15 @@ msgstr "Auto-obnova prohlížeče serverů"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:388
 msgid "Allow screen upload"
-msgstr "Povolit upload screenů"
+msgstr "Povolit nahrávání screenů"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:393
 msgid "Use customized GTA:SA files"
-msgstr "Používat změněné GTA:SA soubory"
+msgstr "Používat upravené soubory GTA:SA"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:398
 msgid "Map rendering options"
-msgstr "Možnosti renderingu mapy"
+msgstr "Možnosti vykreslování mapy"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:404
 #: C:\mtasa-blue\Client\core\CSettings.cpp:592
@@ -889,27 +894,27 @@ msgstr "Obecné"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:517
 msgid "Mute Radio sounds when minimized"
-msgstr "Ztlumit zvuky Rádia když minimalizováno"
+msgstr "Ztlumit zvuky rádia, když je hra minimalizována"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:522
 msgid "Mute SFX sounds when minimized"
-msgstr "Ztlumit SFX zvuky když minimalizováno"
+msgstr "Ztlumit SFX zvuky, když je hra minimalizována"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:527
 msgid "Mute MTA sounds when minimized"
-msgstr "Ztlumit MTA zvuky když minimalizováno"
+msgstr "Ztlumit MTA zvuky, když je hra minimalizována"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:532
 msgid "Mute Voice sounds when minimized"
-msgstr "Ztlumit zvuky Hlasu (Voice) když minimalizováno"
+msgstr "Ztlumit hlasy, když je hra minimalizována"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:539
 msgid "Radio Equalizer"
-msgstr "Rádio Equalizér"
+msgstr "Ekvalizér rádia"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:543
 msgid "Radio Auto-tune"
-msgstr "Radio Auto-tune"
+msgstr "Auto-tune rádia"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:548
 msgid "Usertrack options"
@@ -932,7 +937,7 @@ msgstr "Sekvenční"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:567
 msgid "Automatic Media Scan"
-msgstr "Automatické Media Scan"
+msgstr "Automatické skenování médií"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:584
 #: C:\mtasa-blue\Client\core\CSettings.cpp:601
@@ -942,7 +947,7 @@ msgstr "Rozlišení:"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:585
 #: C:\mtasa-blue\Client\core\CSettings.cpp:642
 msgid "FOV:"
-msgstr ""
+msgstr "Zorné pole:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:586
 #: C:\mtasa-blue\Client\core\CSettings.cpp:658
@@ -988,7 +993,7 @@ msgstr "Celoobrazový režim:"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:628
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1506
 msgid "Standard"
-msgstr "Standartní"
+msgstr "Standardní"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:629
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1507
@@ -999,7 +1004,7 @@ msgstr "Okno bez okraje"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:630
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1508
 msgid "Borderless keep res"
-msgstr "Borderless keep res"
+msgstr "Bez okraje, zachovat rozlišení"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:634
 msgid "Mip Mapping"
@@ -1060,7 +1065,7 @@ msgstr "3x"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1450
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2952
 msgid "Auto"
-msgstr "Auto"
+msgstr "Automaticky"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:761
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1451
@@ -1079,7 +1084,7 @@ msgstr "16:9"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:766
 msgid "HUD Match Aspect Ratio"
-msgstr ""
+msgstr "Přizpůsobit HUD poměru stran"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:772
 msgid "Volumetric Shadows"
@@ -1091,15 +1096,15 @@ msgstr "Efekt trávy"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:780
 msgid "Heat haze"
-msgstr "Tetelící se vzduch"
+msgstr "Tetelení"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:784
 msgid "Tyre Smoke etc"
-msgstr ""
+msgstr "Kouř pneumatik, atd.."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:788
 msgid "Render vehicles always in high detail"
-msgstr ""
+msgstr "Vykreslovat vozidla vždy ve vysoké kvalitě"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:793
 msgid "Full Screen Minimize"
@@ -1111,43 +1116,43 @@ msgstr "Povolit Dialog Zvolení Zařízení"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:817
 msgid "Show unsafe resolutions"
-msgstr ""
+msgstr "Zobrazit nebezpečná rozlišení"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:853
 msgid "Enable remote websites"
-msgstr ""
+msgstr "Povolit vzdálené stránky"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:858
 msgid "Enable Javascript on remote websites"
-msgstr ""
+msgstr "Povolit Javascript na vzdálených stránkách"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:863
 msgid "Custom blacklist"
-msgstr ""
+msgstr "Vlastní černá listina"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:873
 #: C:\mtasa-blue\Client\core\CSettings.cpp:901
 msgid "Enter a domain e.g. google.com"
-msgstr ""
+msgstr "Zadej doménu, např.: google.com"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:875
 msgid "Block"
-msgstr ""
+msgstr "Zablokovat"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:883
 #: C:\mtasa-blue\Client\core\CSettings.cpp:911
 msgid "Domain"
-msgstr ""
+msgstr "Doména"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:885
 #: C:\mtasa-blue\Client\core\CSettings.cpp:913
 msgid "Remove domain"
-msgstr ""
+msgstr "Odstranit doménu"
 
 #. Reset vecTemp
 #: C:\mtasa-blue\Client\core\CSettings.cpp:891
 msgid "Custom whitelist"
-msgstr ""
+msgstr "Vlastní bílá listina"
 
 #. Misc section label
 #: C:\mtasa-blue\Client\core\CSettings.cpp:926
@@ -1180,14 +1185,14 @@ msgstr "Jednotné spojení:"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:990
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4360
 msgid "Packet tag:"
-msgstr ""
+msgstr "Označení paketu:"
 
 #. Progress animation
 #: C:\mtasa-blue\Client\core\CSettings.cpp:937
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1003
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4362
 msgid "Progress animation:"
-msgstr ""
+msgstr "Animace průběhu:"
 
 #. Process priority
 #: C:\mtasa-blue\Client\core\CSettings.cpp:939
@@ -1220,7 +1225,7 @@ msgstr "Typ aktualizací:"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:943
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1134
 msgid "Install important updates:"
-msgstr ""
+msgstr "Instalace důležitých aktualizací:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:957
 #: C:\mtasa-blue\Client\core\CSettings.cpp:985
@@ -1260,12 +1265,12 @@ msgstr "Rychle"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1023
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2943
 msgid "Normal"
-msgstr ""
+msgstr "Normální"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1024
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2944
 msgid "Above normal"
-msgstr ""
+msgstr "Vyšší, než normální"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1060
 msgid "Min"
@@ -1278,40 +1283,39 @@ msgstr "Max"
 #. Windows 8 compatibility
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1080
 msgid "Windows 8 compatibility:"
-msgstr ""
+msgstr "Kompatibilita s Windows 8:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1085
 msgid "16-bit color"
-msgstr ""
+msgstr "16bitové barvy"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1090
 msgid "Mouse fix"
-msgstr ""
+msgstr "Fixace myši"
 
 #. Cache path info
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1108
 msgid "Client resource files:"
-msgstr ""
+msgstr "Klientové soubory:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1112
 msgid "Show in Explorer"
-msgstr ""
+msgstr "Zobrazit v průzkumníku"
 
 #. Auto updater section label
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1127
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1130
 msgid "Auto updater"
-msgstr "Auto updater"
+msgstr "Automatické aktualizace"
 
 #. Check for updates
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1168
 msgid "Check for update now"
-msgstr "Zkontrolovat updaty nyní"
+msgstr "Zkontrolovat aktualizace nyní"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1312
-#, fuzzy
 msgid "Some settings will be changed when you next start MTA"
-msgstr "Some settings bude změněno při příštím spuštěním MTA"
+msgstr "Některá nastavení budou změněna až při příštím spuštění MTA"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1313
 msgid ""
@@ -1329,10 +1333,9 @@ msgstr "POTŘEBNÝ RESTART"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1338
 msgid "Some settings will be changed when you disconnect the current server"
-msgstr ""
+msgstr "Některá nastavení budou změněna až po odpojení ze serveru"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1339
-#, fuzzy
 msgid ""
 "\n"
 "\n"
@@ -1340,11 +1343,11 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Chceš provést restart teď?"
+"Chceš se nyní odpojit?"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1342
 msgid "DISCONNECT REQUIRED"
-msgstr ""
+msgstr "NUTNÉ ODPOJENÍ"
 
 #. Update the joystick name
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1631
@@ -1357,7 +1360,7 @@ msgstr "Bindovací osa"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1793
 msgid "Move an axis to bind, or escape to clear"
-msgstr "Posuň osou pro nabindování, nebo escape pro zrušení"
+msgstr "Posuň osou pro bindování, nebo ESC pro zrušení"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1872
 msgid "Language:"
@@ -1381,20 +1384,20 @@ msgstr "Načíst"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1954
 msgid "Colors"
-msgstr ""
+msgstr "Barvy"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1955
 msgid "Layout"
-msgstr ""
+msgstr "Uspořádání"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1956
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2217
 msgid "Options"
-msgstr ""
+msgstr "Možnosti"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1962
 msgid "Chat Background"
-msgstr ""
+msgstr "Pozadí chatu"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1963
 msgid "Chat Text"
@@ -1402,11 +1405,11 @@ msgstr "Chat Text"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1964
 msgid "Input Background"
-msgstr ""
+msgstr "Pozadí vstupu"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1965
 msgid "Input Text"
-msgstr "Input Text"
+msgstr "Vstupní text"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1988
 msgid "Lines:"
@@ -1422,7 +1425,7 @@ msgstr "Šířka:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1993
 msgid "Size"
-msgstr ""
+msgstr "Velikost"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2042
 msgid "after"
@@ -1438,7 +1441,7 @@ msgstr "sek"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2047
 msgid "Fading"
-msgstr ""
+msgstr "Přechod"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2053
 msgid "Fade out old lines"
@@ -1446,44 +1449,44 @@ msgstr "Skrýt staré řádky"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2093
 msgid "Horizontal:"
-msgstr ""
+msgstr "Horizontální:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2094
 msgid "Vertical:"
-msgstr ""
+msgstr "Vertikální:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2095
 msgid "Text-Align:"
-msgstr ""
+msgstr "Zarovnání textu:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2096
 msgid "X-Offset:"
-msgstr ""
+msgstr "Odsazení X:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2097
 msgid "Y-Offset:"
-msgstr ""
+msgstr "Odsazení Y:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2103
 msgid "Position"
-msgstr ""
+msgstr "Pozice"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2118
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2132
 msgid "Center"
-msgstr ""
+msgstr "Uprostřed"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2131
 msgid "Top"
-msgstr ""
+msgstr "Nahoře"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2133
 msgid "Bottom"
-msgstr ""
+msgstr "Dole"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2181
 msgid "Font"
-msgstr ""
+msgstr "Písmo"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2223
 msgid "Hide background when not typing"
@@ -1491,19 +1494,19 @@ msgstr "Skrýt pozadí když nepíši"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2228
 msgid "Nickname completion using the \"Tab\" key"
-msgstr ""
+msgstr "Dokončení rozepsaného jména klávesou \"Tab\""
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2233
 msgid "Allow server to flash the window"
-msgstr ""
+msgstr "Povolit serveru zablikat oknem"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2238
 msgid "Allow tray balloon notifications"
-msgstr ""
+msgstr "Povolit notifikace v liště"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2243
 msgid "Chat text black/white outline"
-msgstr ""
+msgstr "Černé/bílé obtažení textu v chatu"
 
 #. Create a messagebox to notify the user
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'",
@@ -1514,7 +1517,7 @@ msgstr ""
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2494
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2501
 msgid "Press a key to bind, or escape to clear"
-msgstr "Zmáčkni klávesu pro bind, nebo escape pro zrušení"
+msgstr "Stiskni klávesu pro bindování, nebo ESC pro zrušení"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2495
 msgid "Binding a primary key"
@@ -1555,16 +1558,15 @@ msgstr "Průhlednost:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:3502
 msgid "Color"
-msgstr ""
+msgstr "Barva"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:3579
 msgid "Preview"
-msgstr ""
+msgstr "Ukázka"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:3888
-#, fuzzy
 msgid "Please disconnect before changing language"
-msgstr "Prosím odpoj se před změnou skinu"
+msgstr "Prosím, odpoj se, před změnou jazyku"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:3917
 msgid "Please disconnect before changing skin"
@@ -1576,9 +1578,9 @@ msgid ""
 "\n"
 "Are you sure you want to enable them?"
 msgstr ""
-"Volmetrické stíny můžou zpomalit něaké sustémy.\n"
+"Volumetrické stíny mohou zpomalit tvůj počítač.\n"
 "\n"
-"Jsi si jist že je chceš povolit?"
+"Jsi si jist, že je chceš povolit?"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4160
 msgid "PERFORMANCE WARNING"
@@ -1590,13 +1592,13 @@ msgid ""
 "\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr ""
-"Upload screenů je vyžadován některými servery pro anti-cheat.\n"
+"Nahrávání screenů je vyžadováno některými servery pro účely anti-cheat ochran.\n"
 "\n"
-"(Chat box a GUI nejsou zahrnuty při uploadu)\n"
+"(Okno chatu a GUI nejsou zahrnuty při nahrávání)\n"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4181
 msgid "SCREEN UPLOAD INFORMATION"
-msgstr "INFORMACE O UPLOADU SCREENŮ"
+msgstr "INFORMACE O NAHRÁVÁNÍ SCREENŮ"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4202
 msgid ""
@@ -1607,12 +1609,12 @@ msgid ""
 "\n"
 "Are you sure you want to use them?"
 msgstr ""
-"Některé soubory v tvém GTA:SA adresáři jsou upravené.\n"
-"MTA bude používat tyto soubory jen pokuď je tento check box zaškrtnutý.\n"
+"Některé soubory ve tvém GTA:SA adresáři jsou upravené.\n"
+"MTA bude používat tyto soubory jen pokud je toto pole zaškrtnuto.\n"
 "\n"
 "Nicméně, UPRAVENÉ GTA:SA SOUBORY JSOU BLOKOVÁNY NA SPOUSTĚ SERVERŮ\n"
 "\n"
-"Jsi si jist že je chceš použít?"
+"Jsi si jist, že je chceš použít?"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4208
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2120
@@ -1628,8 +1630,8 @@ msgid ""
 "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
 msgstr ""
-"Prosím vlož svůj nick pro použití ve hře. \n"
-"Toto bude tvé jméno pro připojení a hraní na serveru"
+"Prosím vlož svoji přezdívku, která bude použita ve hře.  \n"
+"Toto bude tvé jméno zobrazované při připojení a hraní na serveru"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4352
 msgid "Very experimental feature."
@@ -1637,23 +1639,23 @@ msgstr "Velmi experimentální prvek."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4354
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
-msgstr "Předchází zpomalování s variacemi CJ-je (Použije 65MB více RAM)"
+msgstr "Předchází zpomalování s variacemi CJe (Použije 65MB, či více RAM)"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4356
 msgid "Older routers may require a slower scan speed."
-msgstr "Starší routery můžou vyžadovat pomalejší rychlost skanování."
+msgstr "Starší routery mohou vyžadovat pomalejší rychlost skenování."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4358
 msgid "Switch on to use only one connection when downloading."
-msgstr "Povol pro použítí pouze jednoho spojení při stahování."
+msgstr "Povol pro použití pouze jednoho spojení při stahování."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4360
 msgid "Tag network packets to help ISPs identify MTA traffic."
-msgstr ""
+msgstr "Označ síťové pakety a pomož tak ISP identifikovat vytížení MTA."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4362
 msgid "Spinning circle animation at the bottom of the screen"
-msgstr ""
+msgstr "Animace otáčejícího kolečka na spodu obrazovky"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4364
 msgid "Select default always. (This setting is not saved)"
@@ -1666,7 +1668,7 @@ msgstr "Maximum je většinou nejlepší"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4368
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4370
 msgid "Auto updater:"
-msgstr "Auto updater:"
+msgstr "Automatické aktualizace:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4368
 msgid "Select default unless you like filling out bug reports."
@@ -1674,23 +1676,23 @@ msgstr "Zvol výchozí jestliže nemáš rád vypisování ohlášení bugů."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4370
 msgid "Select default to automatically install important updates."
-msgstr ""
+msgstr "Vyber výchozí pro automatickou instalaci důležitých aktualizací."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4372
 msgid "16-bit color:"
-msgstr ""
+msgstr "16ti bitové barvy:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4372
 msgid "Enable 16 bit color modes - Requires MTA restart"
-msgstr ""
+msgstr "Povolit režim 16ti bitových barev - Vyžaduje restart MTA"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4374
 msgid "Mouse fix:"
-msgstr ""
+msgstr "Fixace myši:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4374
 msgid "Mouse movement fix - May need PC restart"
-msgstr ""
+msgstr "Fixace pohybu myši - Může vyžadovat restart počítače"
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:637
 msgid "Busy"
@@ -1698,14 +1700,14 @@ msgstr "Zaneprázdněn"
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:637
 msgid "Can't check for updates right now"
-msgstr "Nyní nelze zkontrolovat updaty"
+msgstr "Nyní nelze zkontrolovat aktualizace"
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1579
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1599
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1618
 #, c-format
 msgid "MTA:SA %s required"
-msgstr "MTA:SA %s zapotřebí"
+msgstr "MTA:SA %s je potřeba"
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1580
 #, c-format
@@ -1721,7 +1723,7 @@ msgstr ""
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1600
 #, c-format
 msgid "Do you want to launch MTA:SA %s and connect to this server ?"
-msgstr "Chceš spustit MTA:SA %s a připojit k tomuto serveru ?"
+msgstr "Chceš spustit MTA:SA %s a připojit se k tomuto serveru?"
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1619
 msgid ""
@@ -1749,11 +1751,11 @@ msgstr "KONTROLUJI"
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1847
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1945
 msgid "UPDATE CHECK"
-msgstr "KONTROLA UPDATU"
+msgstr "KONTROLA AKTUALIZACÍ"
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1848
 msgid "No update needed"
-msgstr "Není třeba žádný update"
+msgstr "Není třeba žádná aktualizace"
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1866
 msgid "DOWNLOADING"
@@ -1765,7 +1767,7 @@ msgstr "čekám..."
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1884
 msgid "MANDATORY UPDATE"
-msgstr "POTŘEBNÝ UPDATE"
+msgstr "POTŘEBNÁ AKTUALIZACE"
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1885
 msgid ""
@@ -1773,13 +1775,13 @@ msgid ""
 "\n"
 " Do you want to update now ?"
 msgstr ""
-"Pro připojení k tomuto serveru musíš updatovat MTA.\n"
+"Pro připojení k tomuto serveru musíš aktualizovat MTA.\n"
 "\n"
-"Chceš updatovat nyní?"
+"Chceš aktualizovat nyní?"
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1904
 msgid "OPTIONAL UPDATE"
-msgstr "VOLITELNÝ UPDATE"
+msgstr "VOLITELNÁ AKTUALIZACE"
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1905
 msgid ""
@@ -1787,9 +1789,9 @@ msgid ""
 "\n"
 " Do you want to update now ?"
 msgstr ""
-"Server říka že je doporučen update, ale není třeba.\n"
+"Server doporučuje aktualizaci, která však není nutná.\n"
 "\n"
-" Chceš updatovat nyní?"
+"Chceš aktualizovat nyní?"
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1946
 msgid ""
@@ -1797,9 +1799,9 @@ msgid ""
 "\n"
 "Please check www.mtasa.com"
 msgstr ""
-"Update není nyní k dispozici.\n"
+"Aktualizace nyní není k dispozici.\n"
 "\n"
-"Prosím zkontroluj www.mtasa.com"
+"Prosím, zkontroluj www.mtasa.com"
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1968
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2158
@@ -1821,12 +1823,12 @@ msgstr "CHYBA STAHOVÁNÍ"
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1979
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2169
 msgid "The downloaded file appears to be incorrect."
-msgstr "Soubor ke stažení se zdá být nekorektní."
+msgstr "Stažený soubor se zdá být nesprávný."
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1988
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2178
 msgid "For some reason."
-msgstr "Z něakého důvodu."
+msgstr "Z nějakého důvodu."
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2000
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2192
@@ -1853,10 +1855,10 @@ msgid ""
 "\n"
 "Please reinstall MTA:SA"
 msgstr ""
-"Některé MTA:SA data soubory nenalezeny.\n"
+"Některé soubory dat MTA:SA nebyli nenalezeny.\n"
 "\n"
 "\n"
-"Prosím reinstaluj MTA:SA"
+"Prosím přeinstaluj MTA:SA"
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2777
 #, c-format
@@ -1872,7 +1874,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Čekám na odpověď - %-3d"
+"Čekám na odpověď  -  %-3d"
 
 #: C:\mtasa-blue\Client\core\DXHook\CDirect3DEvents9.cpp:233
 #, c-format
@@ -1927,7 +1929,7 @@ msgid ""
 msgstr ""
 "PRO RYCHLÉ PŘIPOJENÍ:\n"
 "\n"
-"Napiš adresu a port do aresního řádku.\n"
+"Napiš adresu a port do adresního řádku.\n"
 "Nebo zvol server z historie a stiskni 'Připojit'"
 
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:210
@@ -2020,7 +2022,7 @@ msgstr "Plný"
 
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:508
 msgid "Locked"
-msgstr "Uzamčený"
+msgstr "Zamčený"
 
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:520
 msgid "Offline"
@@ -2130,7 +2132,7 @@ msgstr "Zavřít"
 #. Join Game button
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:158
 msgid "Join Game"
-msgstr "Připojit do hry"
+msgstr "Připojit se do hry"
 
 #. Please enter password label
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:172
@@ -2142,7 +2144,7 @@ msgstr "Prosím vložte heslo pro tento server:"
 #. using a newline (\n).
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:182
 msgid "Join the server as soon as a player slot is available."
-msgstr "Připojit se k serveru hned jak se uvolní slot."
+msgstr "Připojit se k serveru hned, jakmile se uvolní místo."
 
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:313
 msgid "PLEASE ENTER SERVER PASSWORD"
@@ -2184,17 +2186,17 @@ msgstr[2] "serverů"
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:249
 #, c-format
 msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "Chytám master server seznam (%lu ms uběhlo)"
+msgstr "Načítám hlavní seznam serverů (uběhlo %lu ms)"
 
 #. Abort
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:263
 msgid "Master server list could not be parsed."
-msgstr "Master server seznam nemohl být zprostředkován."
+msgstr "Hlavní seznam serverů nemohl být získán."
 
 #. Abort
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:270
 msgid "Master server list could not be retrieved."
-msgstr "Nemohl být získán master server seznam."
+msgstr "Hlavní seznam serverů se nepodařilo načíst."
 
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:280
 msgid "(Backup server list)"
@@ -2210,17 +2212,17 @@ msgstr "Pokouším se najít LAN servery"
 
 #: C:\mtasa-blue\Client\game_sa\CSettingsSA.cpp:701
 msgid "Can't find valid screen resolution."
-msgstr ""
+msgstr "Nelze nalézt platné rozlišení obrazovky."
 
 #. Confirm that res should be used
 #: C:\mtasa-blue\Client\game_sa\CSettingsSA.cpp:778
 msgid "Are you sure you want to use this screen resolution?"
-msgstr ""
+msgstr "Opravdu chcete použít toto rozlišení obrazovky?"
 
 #: C:\mtasa-blue\Client\game_sa\CSettingsSA.cpp:780
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:94
 msgid "MTA: San Andreas"
-msgstr ""
+msgstr "MTA: San Andreas"
 
 #: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:158
 msgid "Update Aero setting"
@@ -2228,25 +2230,26 @@ msgstr "Aktualizovat nastavení Aero"
 
 #: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:160
 msgid "Update Large Memory setting"
-msgstr "Updatovat Large Memory nastavení"
+msgstr "Aktualizovat nastavení Large Memory"
 
 #: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:162
-#, fuzzy
 msgid "Update DEP setting"
-msgstr "Aktualizovat nastavení Aero"
+msgstr "Aktualizovat nastavení DEP"
 
 #: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:164
 msgid "Update graphics driver compliance"
-msgstr ""
+msgstr "Aktualizovat poddajnost grafickým ovladačům"
 
 #: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:166
 #: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:168
 msgid "Fix file issues"
-msgstr ""
+msgstr "Opravit problémy se souborem"
 
 #: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:169
 msgid "Copy main executable to avoid graphic driver issues"
 msgstr ""
+"Zkopíruj hlavní spustitelný soubor pro zabránění možných problémů s "
+"grafickým ovladačem"
 
 #: C:\mtasa-blue\Client\loader\CInstallManager.cpp:335
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1268
@@ -2258,7 +2261,7 @@ msgid ""
 "\n"
 "Please confirm in the next window."
 msgstr ""
-"MTA:SA potřebuje Admin přístup pro následující operaci:\n"
+"MTA:SA potřebuje Administrátorská oprávnění pro následující operaci:\n"
 "\n"
 "  '%s'\n"
 "\n"
@@ -2281,7 +2284,7 @@ msgid ""
 "\n"
 "** Please update your graphics drivers **"
 msgstr ""
-"** Pád byl způsoben ovladači grafické karty **\n"
+"** Pád byl způsoben chybou v ovladačích grafické karty **\n"
 "\n"
 "** Prosím aktualizuj ovladače tvé grafické karty **"
 
@@ -2294,21 +2297,22 @@ msgid ""
 "Could not update due to file conflicts. Please close other applications and "
 "retry"
 msgstr ""
-"Nemohl proběhnout updatu kvůli souborovým konfliktům. Ukonči ostatní "
+"Nemohly proběhnout aktualizace kvůli souborovým konfliktům. Ukonči ostatní "
 "aplikace a zkus to znovu"
 
 #: C:\mtasa-blue\Client\loader\CInstallManager.cpp:541
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Multi Theft Auto nebylo nainstalováno správně, prosím reinstaluj. %s"
+msgstr ""
+"Multi Theft Auto nebylo nainstalováno správně, prosím přeinstaluj jej. %s"
 
 #: C:\mtasa-blue\Client\loader\CInstallManager.cpp:740
 msgid "Missing file:"
-msgstr ""
+msgstr "Chybějící soubor:"
 
 #: C:\mtasa-blue\Client\loader\CInstallManager.cpp:744
 msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr ""
+msgstr "Pokud načtení MTA selže, přeinstalujte, prosím, GTA:SA"
 
 #: C:\mtasa-blue\Client\loader\CInstallManager.cpp:869
 msgid "Update install settings"
@@ -2316,42 +2320,45 @@ msgstr "Aktualizovat nastavení instalace"
 
 #: C:\mtasa-blue\Client\loader\CInstallManager.cpp:981
 msgid "Update compatibility settings"
-msgstr ""
+msgstr "Aktualizovat nastavení kompatibility"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:35
 msgid "Quit"
-msgstr ""
+msgstr "Ukončit"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:51
 msgid "MTA: San Andreas has encountered a problem"
-msgstr ""
+msgstr "V aplikaci MTA: San Andreas došlo k problému"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:52
 msgid "Crash information"
-msgstr ""
+msgstr "Informace o pádu"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:53
 msgid ""
 "Tick the check box to send this crash info to MTA devs using the 'internet'"
 msgstr ""
+"Zaškrtněte pro odeslání informace o pádu vývojářům MTA prostřednictvím "
+"internetu"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:54
 msgid "Doing so will increase the chance of this crash being fixed."
-msgstr ""
+msgstr "Pokud tak učiníte, zvýšíte šanci na opravení této chyby."
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:55
 msgid "Do you want to restart MTA: San Andreas ?"
-msgstr ""
+msgstr "Chcete restartovat MTA: San Andreas?"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:62
 msgid "MTA: San Andreas - Warning"
-msgstr ""
+msgstr "MTA: San Andreas - Varování"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:63
 msgid ""
 "Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll "
 "file:"
 msgstr ""
+"Instalační adresář Grand Theft Auto: San Andreas obsahuje soubor d3d9.dll:"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:64
 msgid ""
@@ -2359,74 +2366,77 @@ msgid ""
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
+"Tento soubor není potřebný a může být v konfliktu s grafickými funkcemi v této verzi MTA:SA.\n"
+"\n"
+"Doporučuje se soubor d3d9.dll odstranit nebo přejmenovat."
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:66
 msgid "Do not tell me about this d3d9.dll again"
-msgstr ""
+msgstr "Již se nezmiňovat o souboru d3d9.dll"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:67
 msgid "Show me the file"
-msgstr ""
+msgstr "Ukázat soubor"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:68
 msgid "Play MTA:SA"
-msgstr ""
+msgstr "Hrát MTA:SA"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:75
 msgid "MTA: San Andreas - Confusing options"
-msgstr ""
+msgstr "MTA: San Andreas - Matoucí nastavení"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:76
 msgid "NVidia Optimus detected!"
-msgstr ""
+msgstr "Technologie NVidia Optimus byla detekována!"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:77
 msgid "Try each option and see what works:"
-msgstr ""
+msgstr "Zkuste každou možnost a uvidíte, která funguje:"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:78
 msgid "A - Standard NVidia"
-msgstr ""
+msgstr "A - Standardní NVidia"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:79
 msgid "B - Alternate NVidia"
-msgstr ""
+msgstr "B - Alternativní NVidia"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:80
 msgid "C - Standard NVidia with exe rename"
-msgstr ""
+msgstr "C - Standardní NVidia s přejmenovaným .exe"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:81
 msgid "D - Alternate NVidia with exe rename"
-msgstr ""
+msgstr "D - Alternativní NVidia s přejmenovaným .exe"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:82
 msgid "E - Standard Intel"
-msgstr ""
+msgstr "E - Standardní Intel"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:83
 msgid "F - Alternate Intel"
-msgstr ""
+msgstr "F - Alternativní Intel"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:84
 msgid "G - Standard Intel with exe rename"
-msgstr ""
+msgstr "G - Standardní Intel s přejmenovaným .exe"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:85
 msgid "H - Alternate Intel with exe rename"
-msgstr ""
+msgstr "H - Alternativní Intel s přejmenovaným .exe"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:86
 msgid "If you get desperate, this might help:"
-msgstr ""
+msgstr "Pokud jsi zoufalý, toto ti může pomoct:"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:87
 msgid "Force windowed mode"
-msgstr ""
+msgstr "Vynutit režim v okně"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:95
 msgid "Warning: Could not detect anti-virus product"
-msgstr ""
+msgstr "Varování: Nebyl nalezen žádný antivirus"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:96
 msgid ""
@@ -2436,16 +2446,23 @@ msgid ""
 "\n"
 "Press 'Help' for more information."
 msgstr ""
+"MTA nenalezlo žádný antivir ve vašem počítači.\n"
+"\n"
+"Viry ovlivňují MTA a mohou kazit váš herní zážitek.\n"
+"\n"
+"Klikňete na tlačíto 'Nápověda' pro více informací."
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:99
 msgid "I have already installed an anti-virus"
-msgstr ""
+msgstr "Antivir mám již nainstalovaný"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:100
 msgid ""
 "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr ""
+"Nehodlám si antvir nainstalovat.\n"
+"Chci, aby se můj počítač sekal a byl součástí botnetu."
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:702
 #: C:\mtasa-blue\Client\loader\Utils.cpp:786
@@ -2460,12 +2477,12 @@ msgstr "Prosím spusť Grand Theft Auto San Andreas"
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:713
 #: C:\mtasa-blue\Client\loader\Install.cpp:189
 msgid "Installing update..."
-msgstr ""
+msgstr "Instaluji aktualizace..."
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:721
 #: C:\mtasa-blue\Client\loader\Install.cpp:291
 msgid "Extracting files..."
-msgstr ""
+msgstr "Rozbaluji soubory..."
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:726
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1713
@@ -2489,7 +2506,7 @@ msgstr "Hotovo!"
 
 #: C:\mtasa-blue\Client\loader\Install.cpp:95
 msgid "Do you want to terminate the MTA Server and continue updating?"
-msgstr ""
+msgstr "Chcete ukončit MTA Server a pokračovat v aktualizaci?"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:235
 msgid ""
@@ -2503,11 +2520,11 @@ msgid ""
 msgstr ""
 "Potíže při restartování MTA:SA\n"
 "\n"
-"Pokuď problém přetrvává, otevři správce úloh a\n"
-"ukonči 'gta_sa.exe' a 'Multi Theft Auto.exe' procesy\n"
+"Pokud problém přetrvává, otevři správce úloh a\n"
+"ukonči procesy 'gta_sa.exe' a 'Multi Theft Auto.exe'\n"
 "\n"
 "\n"
-"Zkusit znovu spuštění MTA:SA?"
+"Zkusit znovu spustit MTA:SA?"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:252
 msgid ""
@@ -2517,7 +2534,7 @@ msgid ""
 msgstr ""
 "Jiná instance MTA již běží.\n"
 "\n"
-"Pokuď tento problém přetrvává, restartuj svůj PC"
+"Pokud tento problém přetrvává, restartuj svůj PC"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:255
 msgid ""
@@ -2575,7 +2592,7 @@ msgid ""
 msgstr ""
 "Máš problémy se spouštěním MTA:SA?.\n"
 "\n"
-"Chceš se podívat na něakou online pomoc?"
+"Chceš se podívat na online pomoc?"
 
 #. Inform user
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:365
@@ -2584,6 +2601,9 @@ msgid ""
 "\n"
 "Do you want to change the following setting?"
 msgstr ""
+"Máte problémy se spuštěním MTA:SA?\n"
+"\n"
+"Chcete změnit následující nastavení?"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:409
 msgid ""
@@ -2591,6 +2611,9 @@ msgid ""
 "\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr ""
+"Máte problémy se spuštěním MTA:SA?\n"
+"\n"
+"Zkuste vypnout následující programy pro GTA a MTA:"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:443
 msgid ""
@@ -2600,11 +2623,16 @@ msgid ""
 "Please run a virus scan to ensure your system is secure.\n"
 "\n"
 msgstr ""
+"VAROVÁNÍ\n"
+"\n"
+"MTA:SA zaznamenalo neobvyklou aktivitu.\n"
+"Zapněte, prosím, virový sken, abyste se ujistili, že je váš systém v bezpečí.\n"
+"\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:446
 #, c-format
 msgid "The detected file was:  %s\n"
-msgstr ""
+msgstr "Odhalený soubor:  %s\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:583
 msgid ""
@@ -2619,8 +2647,8 @@ msgid ""
 "Unable to terminate GTA: San Andreas. If the problem persists, please "
 "restart your computer."
 msgstr ""
-"Nelze terminovat GTA: San Andreas. Pokuď problém přetrvává zkus zrestartovat"
-" tvůj počítač."
+"Nelze ukončit GTA: San Andreas. Pokud problém přetrvává, zkus zrestartovat "
+"tvůj počítač."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:611
 msgid ""
@@ -2662,8 +2690,8 @@ msgstr ""
 "Cesta k tvé instalaci 'MTA:SA' nebo 'GTA: San Andreas'\n"
 "obsahuje ';' (středník).\n"
 "\n"
-" Pokuď budeš mít potíže s během MTA:SA,\n"
-" přesuň tvojí instalaci(e) do cesty která neobsahuje středník."
+" Pokud budeš mít potíže s MTA:SA,\n"
+" přesuň tvojí instalaci(e) do cesty, která neobsahuje středník."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:773
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:780
@@ -2696,7 +2724,7 @@ msgstr ""
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:812
 #, c-format
 msgid "Main file has an incorrect name (%s)"
-msgstr ""
+msgstr "Hlavní soubor má nesprávné jméno (%s)"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:823
 msgid ""
@@ -2704,6 +2732,9 @@ msgid ""
 "\n"
 "See online help if MTA does not work correctly."
 msgstr ""
+"Hlavní soubor není podepsaný. Potenciální virová aktivita.\n"
+"\n"
+"Pokud MTA nepracuje správně, podívej se na online nápovědu."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:851
 msgid ""
@@ -2711,6 +2742,9 @@ msgid ""
 "\n"
 "See online help if MTA does not work correctly."
 msgstr ""
+"Soubory s daty jsou upravené. Potenciální virová aktivita.\n"
+"\n"
+"Pokud MTA nepracuje správně, podívej se na online nápovědu."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:862
 msgid ""
@@ -2718,15 +2752,20 @@ msgid ""
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
+"V instalačním adresáři 'MTA:SA' nebo 'GTA: San Andreas' se nachází .asi soubory.\n"
+"\n"
+"Pokud zaznamenáváte potíže s MTA:SA, odstraňte tyto .asi soubory."
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:926
 msgid ""
 "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr ""
+"Verze souboru se liší. Pokud zaznamenáváte problémy, přeinstalujte MTA:SA.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:935
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr ""
+"Některé soubory chybí. Pokud zaznamenáváte problémy, přeinstalujte MTA:SA.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:947
 msgid ""
@@ -2734,15 +2773,18 @@ msgid ""
 "\n"
 "Please restart your PC.\n"
 msgstr ""
+"MTA:SA není kompatibilní s nouzovým režimem systému Windows.\n"
+"\n"
+"Prosím, restartujte svůj počítač.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1103
 msgid "Fix configuration issue"
-msgstr ""
+msgstr "Opravit problémy s konfigurací"
 
 #. Try to relaunch as admin if not done so already
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1154
 msgid "Fix elevation required error"
-msgstr ""
+msgstr "Opravit chybu s potřebnou elevací"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1161
 #, c-format
@@ -2751,7 +2793,7 @@ msgid ""
 "\n"
 "[%s]"
 msgstr ""
-"Nelze spustit Grand Theft Auto: San Andreas.  Prosím zkus restart, nebo pokuď problém přetrvává, zkontaktuj MTA na www.multitheftauto.com. \n"
+"Nelze spustit Grand Theft Auto: San Andreas.  Prosím, zkus to znovu, nebo pokud problém přetrvává, kontaktuj MTA na www.multitheftauto.com. \n"
 "\n"
 "[%s]"
 
@@ -2777,42 +2819,46 @@ msgid ""
 "\n"
 "Do you want to copy your settings from %s ?"
 msgstr ""
+"Byla zaznamenána nová instalace %s.\n"
+"\n"
+"Chcete vaše nastavení zkopírovat z %s?"
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1863
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
-msgstr ""
+msgstr "GTA:SA mělo potíže při otevírání souboru '%s'"
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1886
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
-msgstr ""
+msgstr "GTA:SA zaznamenalo chybějící soubor '%s'."
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1912
 msgid "GTA:SA had trouble loading a model."
-msgstr ""
+msgstr "GTA:SA objevilo potíže při načítání modelu."
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1914
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr ""
+"Pokud jsi v nedávné době upravoval gta3.img, zkus přeinstalovat GTA:SA."
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1940
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr ""
+msgstr "GTA:SA odhalilo problém při pokusu o přidání vylepšení na vozidlo."
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1960
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
-msgstr ""
+msgstr "GTA:SA nalezlo chyby v souboru '%s'"
 
 #. Ask user to confirm
 #: C:\mtasa-blue\Client\loader\Utils.cpp:2035
 msgid "Did your computer restart when playing MTA:SA?"
-msgstr ""
+msgstr "Restartoval se tvůj počítač při hraní MTA:SA?"
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:2103
 msgid "Please terminate the following programs before continuing:"
-msgstr ""
+msgstr "Ukonči, prosím, následující programy před pokračováním:"
 
 #: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:41
 msgid "This version has expired."
@@ -2913,7 +2959,7 @@ msgstr "přepne na předchozí zbraň když jsi ve vozidle"
 
 #: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:88
 msgid "outputs info about the current server"
-msgstr ""
+msgstr "vypisuje informace o aktuálním serveru"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
 #: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:91
@@ -3115,7 +3161,7 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:521
 msgid "Disconnected: Nick already in use"
-msgstr "Odpojeno: Nick se již používá"
+msgstr "Odpojeno: Tuto přezdívku již někdo používá"
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:524
 msgid "Disconnected: Player Element Could not be created."
@@ -3147,7 +3193,7 @@ msgstr "Odpojeno: Byl jsi zabanován hráčem: %s"
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:555
 msgid "Disconnected: Server shutdown or restarting"
-msgstr ""
+msgstr "Odpojeno: Server byl vypnut, nebo se restartuje"
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:578
 msgid "Time Remaining: "
@@ -3181,9 +3227,9 @@ msgstr[2] "%d minut"
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d vteřina"
+msgstr[1] "%d vteřiny"
+msgstr[2] "%d vteřin"
 
 #. Display the error
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:598
@@ -3233,7 +3279,7 @@ msgid ""
 "Fatal error (%u). If this problem persists, please check out mtasa.com for "
 "support."
 msgstr ""
-"Fatální chyba(%u). Pokuď problém přetrvává, podívej se na mtasa.com pro "
+"Fatální chyba (%u). Pokud problém přetrvává, podívej se na mtasa.com pro "
 "podporu."
 
 #. #ifdef MTA_DEBUG
@@ -3246,7 +3292,7 @@ msgid ""
 "Protocol error (%u). If this problem persists, please check out mtasa.com "
 "for support."
 msgstr ""
-"Chyba protokolu (%u). Pokuď problém přetrvává, podívej se na mtasa.com pro "
+"Chyba protokolu (%u). Pokud problém přetrvává, podívej se na mtasa.com pro "
 "podporu."
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:169
@@ -3256,7 +3302,7 @@ msgstr "Chyba připojení"
 #. Couldn't create render target for CPostEffects
 #: C:\mtasa-blue\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1427
 msgid "Problem with graphics driver"
-msgstr ""
+msgstr "Problém s grafickým ovladačem"
 
 #: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:89
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
@@ -3268,9 +3314,9 @@ msgid ""
 "\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr ""
-"Tvůj prohlížeč nyní zobrazí web stránku s něakou pomocí.\n"
+"Tvůj prohlížeč nyní zobrazí webovou stránku s nápovědou.\n"
 "\n"
-"(Pokuď se stránka nenačte, vlož (CTRL-V) URL do tvého webového prohlížeče)"
+"(Pokud se stránka nenačte, vlož (CTRL-V) URL do tvého webového prohlížeče)"
 
 #~ msgid "Services currently unavailable"
 #~ msgstr "Služba je momentálně nedostupná"
