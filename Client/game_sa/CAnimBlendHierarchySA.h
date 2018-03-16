@@ -34,6 +34,7 @@ public:
     BYTE                                            pad;
     int                                             iAnimBlockID;
     float                                           fTotalTime;
+    DWORD *                                         pLinkPtr;
     //class CLink<class CAnimBlendHierarchy *> *      pLinkPtr;
 };
 

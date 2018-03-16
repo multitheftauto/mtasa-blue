@@ -50,7 +50,12 @@ void CClientIFP::UnloadIFP ( void )
     { 
         printf ("CClientIFP::UnloadIFP ( ) called!\n");
     
-        
+        // first remove IFP from map, so we can indicate that it does not exist
+        g_pClientGame->RemoveIFPPointerFromMap ( m_strBlockName );
+
+        // remove IFP animations from replaced animations of peds/players
+        g_pClientGame->onClientIFPUnload ( *this );
+
         for ( size_t i = 0; i < m_Animations.size(); i++ )
         {
             IFP_Animation * ifpAnimation = &m_Animations[i];
@@ -80,9 +85,7 @@ void CClientIFP::UnloadIFP ( void )
             delete ifpAnimation->pSequencesMemory;  
         }
 
-        g_pClientGame->RemoveIFPPointerFromMap ( m_strBlockName );
-
-        printf ("IFP unloaded sucessfully, removed from map as well.\n");  
+        printf ("IFP unloaded sucessfully with block name '%s'\n", m_strBlockName.c_str());  
     }
 }
 

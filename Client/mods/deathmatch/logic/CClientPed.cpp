@@ -6191,6 +6191,61 @@ CAnimBlendAssociation * CClientPed::GetFirstAnimation ( void )
     return NULL;
 }
 
+void CClientPed::ReplaceAnimation ( CAnimBlendHierarchy * pInternalAnimHierarchy, CClientIFP * pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy )
+{
+    SReplacedAnimation replacedAnimation;
+    replacedAnimation.pIFP =  pIFP;
+    replacedAnimation.pAnimationHierarchy = pCustomAnimHierarchy;
+
+    m_mapOfReplacedAnimations [ pInternalAnimHierarchy->GetInterface () ] = replacedAnimation;
+}
+
+void CClientPed::RestoreAnimation ( CAnimBlendHierarchy * pInternalAnimHierarchy )
+{
+    m_mapOfReplacedAnimations.erase ( pInternalAnimHierarchy->GetInterface () );
+}
+
+void CClientPed::RestoreAnimations ( const CClientIFP & IFP )
+{
+    for ( auto const& x : m_mapOfReplacedAnimations )
+    {
+        const CClientIFP & replacedAnimationIFP = *x.second.pIFP;
+        if ( std::addressof ( IFP ) == std::addressof ( replacedAnimationIFP ) )
+        {
+             m_mapOfReplacedAnimations.erase ( x.first );
+        }
+    }
+}
+
+#include "../game_sa/CAnimBlockSA.h" // REMOVE THIS LATER, USE FACTORY METHOD!!!!!!
+
+void CClientPed::RestoreAnimations ( CAnimBlock & animationBlock )
+{
+    const CAnimBlockSAInterface * pInternalBlockInterface = animationBlock.GetInterface ( );
+    DWORD iAnimationIndex = pInternalBlockInterface->idOffset;
+    for ( size_t i = 0; i < pInternalBlockInterface->nAnimations; i++ )
+    {
+        auto pAnimHierarchyInterface = (CAnimBlendHierarchySAInterface*)((BYTE*)ARRAY_CAnimManager_Animations + sizeof(CAnimBlendHierarchySAInterface) * iAnimationIndex);
+        m_mapOfReplacedAnimations.erase ( pAnimHierarchyInterface );
+        iAnimationIndex ++;
+    }
+}
+
+void CClientPed::RestoreAllAnimations ( void )
+{
+    m_mapOfReplacedAnimations.clear ( );
+}
+
+CAnimBlendHierarchySAInterface * CClientPed::getReplacedAnimation ( CAnimBlendHierarchySAInterface * pInternalHierarchyInterface )
+{
+    CClientPed::ReplacedAnim_type::iterator it;
+    it = m_mapOfReplacedAnimations.find ( pInternalHierarchyInterface );
+    if ( it != m_mapOfReplacedAnimations.end ( ) )
+    {
+        return it->second.pAnimationHierarchy;
+    }
+    return nullptr;
+}
 
 CSphere CClientPed::GetWorldBoundingSphere ( void )
 {
