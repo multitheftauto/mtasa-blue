@@ -49,6 +49,8 @@ void CClientIFP::UnloadIFP ( void )
     if ( m_bisIFPLoaded )
     { 
         printf ("CClientIFP::UnloadIFP ( ) called!\n");
+
+        m_bisIFPLoaded = false;
     
         // first remove IFP from map, so we can indicate that it does not exist
         g_pClientGame->RemoveIFPPointerFromMap ( m_strBlockName );
@@ -1173,11 +1175,14 @@ std::string CClientIFP::getCorrectBoneNameFromName(std::string const& BoneName)
 
 CAnimBlendHierarchySAInterface * CClientIFP::GetAnimationHierarchy ( const SString & strAnimationName )
 {
-    for (auto it = m_Animations.begin(); it != m_Animations.end(); ++it) 
-    {
-        if (strAnimationName.ToLower() == it->Name.ToLower())
+    if ( m_bisIFPLoaded )
+    { 
+        for (auto it = m_Animations.begin(); it != m_Animations.end(); ++it) 
         {
-            return (CAnimBlendHierarchySAInterface *)&it->Hierarchy;
+            if (strAnimationName.ToLower() == it->Name.ToLower())
+            {
+                return (CAnimBlendHierarchySAInterface *)&it->Hierarchy;
+            }
         }
     }
     return nullptr;
