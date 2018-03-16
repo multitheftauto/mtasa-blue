@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -108,8 +108,6 @@ typedef struct _SockInfo
   GlobalInfo *global;
 } SockInfo;
 
-
-
 /* Update the event timer after curl_multi library calls */
 static int multi_timer_cb(CURLM *multi, long timeout_ms, GlobalInfo *g)
 {
@@ -119,6 +117,16 @@ static int multi_timer_cb(CURLM *multi, long timeout_ms, GlobalInfo *g)
   timeout.tv_sec = timeout_ms/1000;
   timeout.tv_usec = (timeout_ms%1000)*1000;
   fprintf(MSG_OUT, "multi_timer_cb: Setting timeout to %ld ms\n", timeout_ms);
+
+  /* TODO
+   *
+   * if timeout_ms is 0, call curl_multi_socket_action() at once!
+   *
+   * if timeout_ms is -1, just delete the timer
+   *
+   * for all other values of timeout_ms, this should set or *update*
+   * the timer to the new value
+   */
   evtimer_add(g->timer_event, &timeout);
   return 0;
 }
@@ -129,15 +137,15 @@ static void mcode_or_die(const char *where, CURLMcode code)
   if(CURLM_OK != code) {
     const char *s;
     switch(code) {
-      case     CURLM_BAD_HANDLE:         s="CURLM_BAD_HANDLE";         break;
-      case     CURLM_BAD_EASY_HANDLE:    s="CURLM_BAD_EASY_HANDLE";    break;
-      case     CURLM_OUT_OF_MEMORY:      s="CURLM_OUT_OF_MEMORY";      break;
-      case     CURLM_INTERNAL_ERROR:     s="CURLM_INTERNAL_ERROR";     break;
-      case     CURLM_UNKNOWN_OPTION:     s="CURLM_UNKNOWN_OPTION";     break;
-      case     CURLM_LAST:               s="CURLM_LAST";               break;
-      default: s="CURLM_unknown";
+      case     CURLM_BAD_HANDLE:         s = "CURLM_BAD_HANDLE";         break;
+      case     CURLM_BAD_EASY_HANDLE:    s = "CURLM_BAD_EASY_HANDLE";    break;
+      case     CURLM_OUT_OF_MEMORY:      s = "CURLM_OUT_OF_MEMORY";      break;
+      case     CURLM_INTERNAL_ERROR:     s = "CURLM_INTERNAL_ERROR";     break;
+      case     CURLM_UNKNOWN_OPTION:     s = "CURLM_UNKNOWN_OPTION";     break;
+      case     CURLM_LAST:               s = "CURLM_LAST";               break;
+      default: s = "CURLM_unknown";
         break;
-    case     CURLM_BAD_SOCKET:         s="CURLM_BAD_SOCKET";
+    case     CURLM_BAD_SOCKET:         s = "CURLM_BAD_SOCKET";
       fprintf(MSG_OUT, "ERROR: %s returns %s\n", where, s);
       /* ignore this error */
       return;
@@ -351,15 +359,15 @@ static void new_conn(char *url, GlobalInfo *g)
 static void fifo_cb(int fd, short event, void *arg)
 {
   char s[1024];
-  long int rv=0;
-  int n=0;
+  long int rv = 0;
+  int n = 0;
   GlobalInfo *g = (GlobalInfo *)arg;
   (void)fd; /* unused */
   (void)event; /* unused */
 
   do {
     s[0]='\0';
-    rv=fscanf(g->input, "%1023s%n", s, &n);
+    rv = fscanf(g->input, "%1023s%n", s, &n);
     s[n]='\0';
     if(n && s[0]) {
       new_conn(s, arg);  /* if we read a URL, go get it! */
