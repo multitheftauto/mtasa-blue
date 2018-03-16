@@ -488,7 +488,8 @@ void CServerListItem::Query(void)
         ioctlsocket(m_Socket, FIONBIO, &flag);
     }
 
-    g_pCore->GetNetwork()->SendTo(m_Socket, "r", 1, 0, (sockaddr*)&addr, sizeof(addr));
+    // Trailing data to work around 1 byte UDP packet filtering
+    g_pCore->GetNetwork()->SendTo(m_Socket, "r mtasa", 1, 0, (sockaddr*)&addr, sizeof(addr));
     m_ElapsedTime.Reset();
 }
 
