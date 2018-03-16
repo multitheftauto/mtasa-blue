@@ -22,6 +22,8 @@ void CLuaEngineDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "engineRestoreCOL", EngineRestoreCOL );
     CLuaCFunctions::AddFunction ( "engineReplaceModel", EngineReplaceModel );
     CLuaCFunctions::AddFunction ( "engineRestoreModel", EngineRestoreModel );
+    CLuaCFunctions::AddFunction ( "engineReplaceAnimation", EngineReplaceAnimation );
+    CLuaCFunctions::AddFunction ( "engineRestoreAnimation", EngineRestoreAnimation );
     CLuaCFunctions::AddFunction ( "engineGetModelLODDistance", EngineGetModelLODDistance );
     CLuaCFunctions::AddFunction ( "engineSetModelLODDistance", EngineSetModelLODDistance );
     CLuaCFunctions::AddFunction ( "engineSetAsynchronousLoading", EngineSetAsynchronousLoading );
@@ -304,7 +306,7 @@ int CLuaEngineDefs::EngineLoadIFP ( lua_State* luaVM )
                 if ( CResourceManager::ParseResourcePathInput( strFile, pResource, &strPath ) )
                 {
                     // Grab the resource root entity
-                    CClientEntity* pRoot = pResource->GetResourceTXDRoot ();
+                    CClientEntity* pRoot = pResource->GetResourceIFPRoot ();
                     
                     // Check whether the IFP blockname exists or not
                     if ( g_pClientGame->GetIFPPointerFromMap ( strBlockName ) == nullptr )
@@ -502,6 +504,131 @@ int CLuaEngineDefs::EngineRestoreModel ( lua_State* luaVM )
     }
 
     // Failure
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaEngineDefs::EngineReplaceAnimation ( lua_State* luaVM )
+{
+    CClientEntity * pEntity = nullptr;
+    SString strInternalBlockName = "";
+    SString strInternalAnimName = "";
+    SString strCustomBlockName = "";
+    SString strCustomAnimName = "";
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadString ( strInternalBlockName );
+    argStream.ReadString ( strInternalAnimName );
+    argStream.ReadString ( strCustomBlockName );
+    argStream.ReadString ( strCustomAnimName );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( IS_PED ( pEntity ) )
+        { 
+            CClientPed& Ped = static_cast < CClientPed& > ( *pEntity );
+
+            CAnimBlock * pInternalBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( strInternalBlockName );
+            CClientIFP * pCustomIFP = g_pClientGame->GetIFPPointerFromMap ( strCustomBlockName );
+            if ( pInternalBlock && pCustomIFP )
+            {
+                CAnimBlendHierarchy * pInternalAnimHierarchy = g_pGame->GetAnimManager ()->GetAnimation ( strInternalAnimName, pInternalBlock );
+                CAnimBlendHierarchySAInterface * pCustomAnimHierarchyInterface = pCustomIFP->GetAnimationHierarchy ( strCustomAnimName );
+                if ( pInternalAnimHierarchy && pCustomAnimHierarchyInterface )
+                { 
+                    Ped.ReplaceAnimation ( pInternalAnimHierarchy, pCustomIFP, pCustomAnimHierarchyInterface );
+                    lua_pushboolean ( luaVM, true );
+                    return 1;
+                }    
+                else
+                    argStream.SetCustomError ( "Incorrect Animation name" ); 
+            }
+            else
+                argStream.SetCustomError ( "Incorrect Block name" );
+        }
+    }
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
+int CLuaEngineDefs::EngineRestoreAnimation ( lua_State* luaVM )
+{
+    CClientEntity * pEntity = nullptr;
+    bool bRestoreAllAnimations = false;
+    bool bRestoreBlockAnimations = false;
+    SString strInternalBlockName = "";
+    SString strInternalAnimName = "";
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    if ( argStream.NextIsNil ( ) || argStream.NextIsNone ( ) )
+    {
+        bRestoreAllAnimations = true;
+    }
+    else 
+    { 
+        argStream.ReadString ( strInternalBlockName );
+        if ( argStream.NextIsNil ( ) || argStream.NextIsNone ( ) )
+        { 
+            bRestoreBlockAnimations = true;
+        }
+        else
+        {
+            argStream.ReadString ( strInternalAnimName );
+        }
+    }
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( IS_PED ( pEntity ) )
+        { 
+            CClientEntity & Entity = *pEntity;
+            CClientPed& Ped = static_cast < CClientPed& > ( Entity );
+        
+            if ( bRestoreAllAnimations )
+            {
+                Ped.RestoreAllAnimations ( );
+                lua_pushboolean ( luaVM, true );
+                return 1;
+            }
+            else
+            { 
+                CAnimBlock * pInternalBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( strInternalBlockName );
+                if ( pInternalBlock )
+                {
+                    if ( bRestoreBlockAnimations )
+                    {
+                        Ped.RestoreAnimations ( *pInternalBlock );
+                        lua_pushboolean ( luaVM, true );
+                        return 1;
+                    }
+                    else 
+                    { 
+                        CAnimBlendHierarchy * pInternalAnimHierarchy = g_pGame->GetAnimManager ()->GetAnimation ( strInternalAnimName, pInternalBlock );
+                        if ( pInternalAnimHierarchy )
+                        { 
+                            Ped.RestoreAnimation ( pInternalAnimHierarchy );
+                            lua_pushboolean ( luaVM, true );
+                            return 1;
+                        }    
+                        else
+                            argStream.SetCustomError ( "Incorrect Animation name" ); 
+                    }
+                }
+                else
+                    argStream.SetCustomError ( "Incorrect Block name" );
+            }
+        }
+    }
+    if ( argStream.HasErrors () )
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () ); 
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }

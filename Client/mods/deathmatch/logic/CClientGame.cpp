@@ -4029,7 +4029,24 @@ void CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSA
     CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
     auto pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( pAnimAssocGroup->groupID, animID );
 
-    CAnimBlendStaticAssociation_Init ( pOutAnimStaticAssoc, pClump, pOriginalAnimStaticAssoc->pAnimHeirarchy );
+    CClientPed * pClientPed =  GetClientPedByClump ( *pClump ); 
+    if ( pClientPed != nullptr )
+    {
+        auto pReplacedAnimHeirarchyInterface = pClientPed->getReplacedAnimation ( pOriginalAnimStaticAssoc->pAnimHeirarchy );
+        if ( pReplacedAnimHeirarchyInterface != nullptr )
+        {   // Play our custom animation instead of default
+            CAnimBlendStaticAssociation_Init ( pOutAnimStaticAssoc, pClump, pReplacedAnimHeirarchyInterface );
+        }
+        else
+        {   // Play default internal animation
+            CAnimBlendStaticAssociation_Init ( pOutAnimStaticAssoc, pClump, pOriginalAnimStaticAssoc->pAnimHeirarchy );
+        }
+    }
+    else
+    {   // Play default internal animation
+        CAnimBlendStaticAssociation_Init ( pOutAnimStaticAssoc, pClump, pOriginalAnimStaticAssoc->pAnimHeirarchy );
+    }
+
     pOutAnimStaticAssoc->sAnimGroup = static_cast < short > ( pAnimAssocGroup->groupID );
     pOutAnimStaticAssoc->sAnimID = static_cast < short > ( animID );
 
@@ -6873,4 +6890,17 @@ CClientPed * CClientGame::GetClientPedByClump ( const RpClump & Clump )
         }
     }
     return nullptr;
+}
+
+void CClientGame::onClientIFPUnload ( const CClientIFP & IFP )
+{   
+    // remove IFP animations from replaced animations of peds/players
+    for ( auto it = m_mapOfPedPointers.begin(); it != m_mapOfPedPointers.end(); it++ )
+    {
+        CEntity * pEntity = it->first->GetGameEntity();
+        if ( pEntity != nullptr )
+        { 
+            it->first->RestoreAnimations ( IFP );
+        }
+    }
 }

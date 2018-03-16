@@ -594,11 +594,12 @@ public:
     void                                      RemoveIFPPointerFromMap         ( const SString & strBlockName );
     CClientIFP *                              GetIFPPointerFromMap            ( const SString & strBlockName );
 
-    void                                      InsertPedPointerToMap ( CClientPed * pPed );
-    void                                      RemovePedPointerFromMap ( CClientPed * pPed );
-    CClientPed *                              GetClientPedByClump ( const RpClump & Clump );
-  
+    void                                      InsertPedPointerToMap           ( CClientPed * pPed );
+    void                                      RemovePedPointerFromMap         ( CClientPed * pPed );
+    CClientPed *                              GetClientPedByClump             ( const RpClump & Clump );
 
+    void                                      onClientIFPUnload               ( const CClientIFP & IFP );
+ 
 private:
     eStatus                                   m_Status;
     eServerType                               m_ServerType;

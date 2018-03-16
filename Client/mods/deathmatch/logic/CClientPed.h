@@ -24,6 +24,8 @@ class CClientPed;
 
 #include <multiplayer/CMultiplayer.h>
 #include "CClientPad.h"
+#include <../game_sa/CAnimBlendHierarchySA.h>
+#include <memory>
 
 class CClientCamera;
 class CClientManager;
@@ -116,6 +118,14 @@ struct SRestoreWeaponItem
     eWeaponType         eWeaponID;
 };
 
+class CClientIFP;
+
+struct SReplacedAnimation
+{
+    CClientIFP *                     pIFP;
+    CAnimBlendHierarchySAInterface * pAnimationHierarchy;
+};
+
 class CClientObject;
 
 // To hide the ugly "pointer truncation from DWORD* to unsigned long warning
@@ -124,6 +134,7 @@ class CClientObject;
 class CClientPed : public CClientStreamElement, public CAntiCheatModule
 {
     DECLARE_CLASS( CClientPed, CClientStreamElement )
+    typedef std::map < CAnimBlendHierarchySAInterface *, SReplacedAnimation > ReplacedAnim_type;
     friend class CClientCamera;
     friend class CClientPlayer;
     friend class CClientVehicle;
@@ -464,6 +475,12 @@ public:
     const SString  &            GetNextAnimationCustomBlockName ( void ) { return m_strCustomIFPBlockName; }
     const SString  &            GetNextAnimationCustomName      ( void ) { return m_strCustomIFPAnimationName; }
 
+    void                        ReplaceAnimation        ( CAnimBlendHierarchy * pInternalAnimHierarchy, CClientIFP * pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy );
+    void                        RestoreAnimation        ( CAnimBlendHierarchy * pInternalAnimHierarchy );
+    void                        RestoreAnimations       ( const CClientIFP & IFP );
+    void                        RestoreAnimations       ( CAnimBlock & animationBlock );
+    void                        RestoreAllAnimations    ( void );
+    CAnimBlendHierarchySAInterface * getReplacedAnimation ( CAnimBlendHierarchySAInterface * pInternalHierarchyInterface );
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
                                 CClientPed                  ( CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer );
@@ -664,6 +681,9 @@ public:
     bool                        m_bisCurrentAnimationCustom;
     SString                     m_strCustomIFPBlockName;
     SString                     m_strCustomIFPAnimationName;
+
+    // Key: Internal GTA animation, Value: Custom Animation
+    ReplacedAnim_type m_mapOfReplacedAnimations;
 };
 
 #endif
