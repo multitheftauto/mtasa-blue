@@ -93,6 +93,18 @@
 #  include "config-vxworks.h"
 #endif
 
+#ifdef __linux__
+#  include "config-linux.h"
+#endif
+
+#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+#  include "config-linux.h"
+#endif
+
+#ifdef __APPLE__ && __MACH__
+#  include "config-osx.h"
+#endif
+
 #endif /* HAVE_CONFIG_H */
 
 /* ================================================================ */
