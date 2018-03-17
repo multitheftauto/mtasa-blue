@@ -60,7 +60,5 @@ void CClientMarkerManager::DoPulse(void)
     {
         (*iter)->DoPulse();
     }
-    if (!m_Markers.empty())
-        m_Markers.remove(m_Markers.front());
     m_Markers.ResumeModifyOperations();
 }
