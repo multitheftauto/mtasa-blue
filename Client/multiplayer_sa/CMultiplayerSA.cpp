@@ -5384,20 +5384,42 @@ void _declspec(naked)  HOOK_CAnimBlendAssocGroup_CopyAnimation ()
     {
         _asm
         {
-            popad
+            popad                        
+ 
+            push    ecx
+            push    ebp   
+            mov     ebp, esp
+            sub esp, 4
+
             push    eax
             push    ecx
             push    edi
             
+            lea     eax, [ebp-4]
+            push    eax 
+
             // Allocate memory for our new static association
             call    AllocateStaticAssociationMemory
             mov     edi, eax
-            
+
             // push the static association
             push    edi
-            call    m_pAssocGroupCopyAnimationHandler //CAnimBlendAssocGroup_CopyAnimation
-            add     esp, 10h
+            call    m_pAssocGroupCopyAnimationHandler 
+            add     esp, 14h
+            
+            mov     ecx, [ebp-4] 
 
+            add     esp, 4 // remove space for local var
+            mov     esp, ebp
+            pop     ebp
+
+            // save eax and ecx for later to check whether current animation is custom or not 
+            // after calling FUNC_CAnimBlendAssociation_Constructor function
+            push    eax
+            push    ecx
+
+            // get "this" from stack that we pushed first
+            mov     ecx, [esp+8]
             mov     ecx, [ecx+4]
             sub     eax, edx
             push    esi
@@ -5413,9 +5435,9 @@ void _declspec(naked)  HOOK_CAnimBlendAssocGroup_CopyAnimation ()
             push    3Ch   
             call    FUNC_NEW_OPERATOR
             add     esp, 8
-            mov     [esp+14h], eax
+            mov     [esp+20h], eax 
             test    eax, eax
-            mov     [esp+0Ch], 0
+            mov     [esp+18h], 0   
             jz      ERROR_CopyAnimation
             push    esi
             mov     ecx, eax
@@ -5427,8 +5449,19 @@ void _declspec(naked)  HOOK_CAnimBlendAssocGroup_CopyAnimation ()
             call    DeleteStaticAssociation
             add     esp, 4 
             
+            pop     ecx
+            pop     eax 
+            
+            // Check wether this is a custom animation or not 
+            cmp     al, 0
+            je      NOT_CUSTOM_ANIMATION_CopyAnimation  
+
+            // It's a custom animation, store it in a map
+            
+            NOT_CUSTOM_ANIMATION_CopyAnimation: 
             // put CAnimBlendAssociation in eax
             mov     eax, edi
+            add     esp, 4
             jmp     RETURN_CAnimBlendAssocGroup_CopyAnimation
 
             ERROR_CopyAnimation:
