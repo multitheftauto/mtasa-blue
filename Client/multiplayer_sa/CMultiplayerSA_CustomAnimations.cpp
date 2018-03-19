@@ -8,6 +8,8 @@
 DWORD FUNC_NEW_OPERATOR = 0x082119A;
 DWORD FUNC_CAnimBlendAssociation_Constructor = 0x04CF080;
 
+DWORD RETURN_CAnimBlendAssoc_Hierarchy_Constructor =        0x4CEFC5;
+DWORD RETURN_CAnimBlendAssoc_destructor =                   0x4CECF6;
 DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation_NORMALFLOW =0x4CE151; 
 DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation =           0x4CE187; 
 DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation_ERROR =     0x4CE199;
@@ -15,6 +17,8 @@ DWORD RETURN_CAnimManager_AddAnimation =                    0x4D3AB1;
 DWORD RETURN_CAnimManager_AddAnimationAndSync =             0x4D3B41;
 DWORD RETURN_CAnimManager_BlendAnimation_Hierarchy =        0x4D4417; 
 
+CAnimBlendAssocHierConstructorHandler * m_pCAnimBlendAssocHierConstructorHandler = nullptr;
+CAnimBlendAssocDestructorHandler * m_pCAnimBlendAssocDestructorHandler = nullptr;
 AddAnimationHandler * m_pAddAnimationHandler = nullptr;
 AddAnimationAndSyncHandler * m_pAddAnimationAndSyncHandler = nullptr;
 AssocGroupCopyAnimationHandler * m_pAssocGroupCopyAnimationHandler = nullptr;
@@ -22,6 +26,16 @@ BlendAnimationHierarchyHandler * m_pBlendAnimationHierarchyHandler = nullptr;
 
 int _cdecl OnCAnimBlendAssocGroupCopyAnimation ( AssocGroupId animGroup, int iAnimId );
 auto CAnimBlendStaticAssociation_FreeSequenceArray = (hCAnimBlendStaticAssociation_FreeSequenceArray)0x4ce9a0;
+
+void CMultiplayerSA::SetCAnimBlendAssocHierConstructorHandler ( CAnimBlendAssocHierConstructorHandler * pHandler )
+{
+    m_pCAnimBlendAssocHierConstructorHandler = pHandler;
+}
+
+void CMultiplayerSA::SetCAnimBlendAssocDestructorHandler ( CAnimBlendAssocDestructorHandler * pHandler )
+{
+    m_pCAnimBlendAssocDestructorHandler = pHandler;
+}
 
 void CMultiplayerSA::SetAddAnimationHandler ( AddAnimationHandler * pHandler )
 {
@@ -43,6 +57,74 @@ void CMultiplayerSA::SetBlendAnimationHierarchyHandler ( BlendAnimationHierarchy
     m_pBlendAnimationHierarchyHandler = pHandler;
 }
 
+void _declspec(naked) HOOK_CAnimBlendAssoc_Hierarchy_Constructor ()
+{
+    _asm
+    {
+        pushad
+    }
+    
+    if ( m_pCAnimBlendAssocHierConstructorHandler )
+    {
+        _asm
+        {
+            popad
+            push    ecx
+            mov     eax, dword ptr [esp+0Ch] // pAnimHierarchy
+            push    eax
+            mov     eax, dword ptr [esp+0Ch] // pClump
+            push    eax 
+            push    ecx                      // this
+            call    m_pCAnimBlendAssocHierConstructorHandler
+            add     esp, 0Ch
+            pop     ecx
+            pushad
+            jmp     NORMAL_FLOW_CAnimBlendAssoc_Hierarchy_Constructor
+        }
+    }
+
+    _asm
+    {
+        NORMAL_FLOW_CAnimBlendAssoc_Hierarchy_Constructor:
+        popad
+        xor     eax, eax
+        push    esi
+        mov     esi, ecx
+        jmp     RETURN_CAnimBlendAssoc_Hierarchy_Constructor
+    }
+}
+
+void _declspec(naked) HOOK_CAnimBlendAssoc_destructor ()
+{
+    _asm
+    {
+        pushad
+    }
+    
+    if ( m_pCAnimBlendAssocDestructorHandler )
+    {
+        _asm
+        {
+            popad
+            push    ecx  // this
+            call    m_pCAnimBlendAssocDestructorHandler
+            pop     ecx
+            pushad
+            jmp     NORMAL_FLOW_CAnimBlendAssoc_destructor
+        }
+    }
+
+    _asm
+    {
+        NORMAL_FLOW_CAnimBlendAssoc_destructor:
+        popad
+        push    esi
+        mov     esi, ecx
+        mov     eax, [esi+10h]
+        jmp     RETURN_CAnimBlendAssoc_destructor
+    }
+}
+
 CAnimBlendStaticAssociationSAInterface * __cdecl AllocateStaticAssociationMemory ( void )
 {
     return new CAnimBlendStaticAssociationSAInterface;
@@ -54,7 +136,7 @@ void __cdecl DeleteStaticAssociation ( CAnimBlendStaticAssociationSAInterface * 
     delete pAnimStaticAssoc;
 }
 
-void _declspec(naked)  HOOK_CAnimBlendAssocGroup_CopyAnimation ()
+void _declspec(naked) HOOK_CAnimBlendAssocGroup_CopyAnimation ()
 {
     _asm
     {

@@ -503,6 +503,8 @@ private:
     static void                               StaticPostWorldProcessHandler   ( void );
     static void                               StaticPreFxRenderHandler        ( void );
     static void                               StaticPreHudRenderHandler       ( void );
+    static void                               StaticCAnimBlendAssocHierConstructorHandler ( CAnimBlendAssociationSAInterface * pThis, RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy );
+    static void                               StaticCAnimBlendAssocDestructorHandler ( CAnimBlendAssociationSAInterface * pThis );
     static CAnimBlendAssociationSAInterface * StaticAddAnimationHandler       ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     static CAnimBlendAssociationSAInterface * StaticAddAnimationAndSyncHandler( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID );
     static bool                               StaticAssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, SIFPAnimations ** pOutIFPAnimations, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID );
@@ -536,6 +538,8 @@ private:
     bool                                      ChokingHandler                  ( unsigned char ucWeaponType );
     void                                      PreWorldProcessHandler          ( void );
     void                                      PostWorldProcessHandler         ( void );
+    void                                      CAnimBlendAssocHierConstructorHandler ( CAnimBlendAssociationSAInterface * pThis, RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy );
+    void                                      CAnimBlendAssocDestructorHandler ( CAnimBlendAssociationSAInterface * pThis );
     CAnimBlendAssociationSAInterface *        AddAnimationHandler             ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     CAnimBlendAssociationSAInterface *        AddAnimationAndSyncHandler      ( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID );
     bool                                      AssocGroupCopyAnimationHandler  ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, SIFPAnimations ** pOutIFPAnimations, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID );

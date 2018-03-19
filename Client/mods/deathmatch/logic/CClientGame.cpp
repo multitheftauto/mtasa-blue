@@ -270,6 +270,8 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetPostWorldProcessHandler ( CClientGame::StaticPostWorldProcessHandler );
     g_pMultiplayer->SetPreFxRenderHandler ( CClientGame::StaticPreFxRenderHandler );
     g_pMultiplayer->SetPreHudRenderHandler ( CClientGame::StaticPreHudRenderHandler );
+    g_pMultiplayer->SetCAnimBlendAssocHierConstructorHandler ( CClientGame::StaticCAnimBlendAssocHierConstructorHandler );
+    g_pMultiplayer->SetCAnimBlendAssocDestructorHandler ( CClientGame::StaticCAnimBlendAssocDestructorHandler );
     g_pMultiplayer->SetAddAnimationHandler ( CClientGame::StaticAddAnimationHandler );
     g_pMultiplayer->SetAddAnimationAndSyncHandler ( CClientGame::StaticAddAnimationAndSyncHandler );
     g_pMultiplayer->SetAssocGroupCopyAnimationHandler ( CClientGame::StaticAssocGroupCopyAnimationHandler );
@@ -430,6 +432,8 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetPostWorldProcessHandler (  NULL );
     g_pMultiplayer->SetPreFxRenderHandler ( NULL );
     g_pMultiplayer->SetPreHudRenderHandler ( NULL );
+    g_pMultiplayer->SetCAnimBlendAssocHierConstructorHandler ( NULL );
+    g_pMultiplayer->SetCAnimBlendAssocDestructorHandler ( NULL );
     g_pMultiplayer->SetAddAnimationHandler ( NULL );
     g_pMultiplayer->SetAddAnimationAndSyncHandler ( NULL );
     g_pMultiplayer->SetAssocGroupCopyAnimationHandler ( NULL );
@@ -3697,6 +3701,16 @@ bool CClientGame::StaticChokingHandler ( unsigned char ucWeaponType )
     return g_pClientGame->ChokingHandler ( ucWeaponType );
 }
 
+void CClientGame::StaticCAnimBlendAssocHierConstructorHandler ( CAnimBlendAssociationSAInterface * pThis, RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy )
+{
+    g_pClientGame->CAnimBlendAssocHierConstructorHandler ( pThis, pClump, pAnimHierarchy );
+}
+
+void CClientGame::StaticCAnimBlendAssocDestructorHandler ( CAnimBlendAssociationSAInterface * pThis )
+{
+    g_pClientGame->CAnimBlendAssocDestructorHandler ( pThis );
+}
+
 CAnimBlendAssociationSAInterface * CClientGame::StaticAddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
 {
     return g_pClientGame->AddAnimationHandler ( pClump, animGroup, animID );
@@ -3999,6 +4013,16 @@ bool CClientGame::ChokingHandler ( unsigned char ucWeaponType )
 }
 
 
+void CClientGame::CAnimBlendAssocHierConstructorHandler ( CAnimBlendAssociationSAInterface * pThis, RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy )
+{
+    printf("CClientGame::CAnimBlendAssocHierConstructorHandler called! sAnimID: %d\n", pThis->sAnimID);
+}
+
+
+void CClientGame::CAnimBlendAssocDestructorHandler ( CAnimBlendAssociationSAInterface * pThis )
+{
+    //printf("CClientGame::CAnimBlendAssocDestructorHandler called! sAnimID: %d\n", pThis->sAnimID);
+}
 
 
 CAnimBlendAssociationSAInterface * CClientGame::AddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
@@ -4007,11 +4031,13 @@ CAnimBlendAssociationSAInterface * CClientGame::AddAnimationHandler ( RpClump * 
     return nullptr;
 }
 
+
 CAnimBlendAssociationSAInterface * CClientGame::AddAnimationAndSyncHandler ( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID )
 {
     //printf ( "AddAnimationAndSyncHandler called! pClump, GroupID, AnimID: %p, %d, %d\n", (void*)pClump, animGroup, animID );
     return nullptr;
 }
+
 
 typedef void (__thiscall* hCAnimBlendStaticAssociation_Init)
 (
@@ -4019,6 +4045,7 @@ typedef void (__thiscall* hCAnimBlendStaticAssociation_Init)
     RpClump * Clump,
     CAnimBlendHierarchySAInterface * pAnimBlendHierarchy
 );
+
 
 bool CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, SIFPAnimations ** pOutIFPAnimations, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID )
 {
@@ -4058,6 +4085,7 @@ bool CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSA
     printf(" CClientGame::AssocGroupCopyAnimationHandler: About to return!\n");
     return isCustomAnimationToPlay;
 }
+
 
 CAnimBlendHierarchySAInterface * CClientGame::BlendAnimationHierarchyHandler ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta )
 {   
@@ -4107,6 +4135,7 @@ CAnimBlendHierarchySAInterface * CClientGame::BlendAnimationHierarchyHandler ( R
     }
     return pAnimHierarchy;
 }
+
 
 bool CClientGame::ProcessCollisionHandler ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface )
 {

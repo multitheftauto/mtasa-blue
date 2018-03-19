@@ -72,6 +72,8 @@ typedef void ( PreFxRenderHandler ) ( void );
 typedef void ( PreHudRenderHandler ) ( void );
 typedef CAnimBlendAssociationSAInterface * ( AddAnimationHandler )   ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
 typedef CAnimBlendAssociationSAInterface * ( AddAnimationAndSyncHandler )   ( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID );
+typedef void ( CAnimBlendAssocHierConstructorHandler ) ( CAnimBlendAssociationSAInterface * pThis, RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy );
+typedef void ( CAnimBlendAssocDestructorHandler ) ( CAnimBlendAssociationSAInterface * pThis );
 typedef bool ( AssocGroupCopyAnimationHandler )   ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, SIFPAnimations ** pOutIFPAnimations, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID );
 typedef CAnimBlendHierarchySAInterface   * ( BlendAnimationHierarchyHandler ) ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta );
 typedef bool ( ProcessCollisionHandler ) ( class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface );
@@ -185,6 +187,8 @@ public:
     virtual void                        SetIdleHandler              ( IdleHandler * pHandler ) = 0;
     virtual void                        SetPreFxRenderHandler       ( PreFxRenderHandler * pHandler ) = 0;
     virtual void                        SetPreHudRenderHandler      ( PreHudRenderHandler * pHandler ) = 0;
+    virtual void                        SetCAnimBlendAssocHierConstructorHandler ( CAnimBlendAssocHierConstructorHandler * pHandler ) = 0;
+    virtual void                        SetCAnimBlendAssocDestructorHandler ( CAnimBlendAssocDestructorHandler * pHandler ) = 0;
     virtual void                        SetAddAnimationHandler      ( AddAnimationHandler * pHandler ) = 0;
     virtual void                        SetAddAnimationAndSyncHandler ( AddAnimationAndSyncHandler * pHandler ) = 0;
     virtual void                        SetAssocGroupCopyAnimationHandler ( AssocGroupCopyAnimationHandler * pHandler ) = 0;
