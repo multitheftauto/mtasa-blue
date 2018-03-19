@@ -45,8 +45,9 @@ public:
 
    
 private:
+    SIFPAnimations *                m_pIFPAnimations;
     SString                         m_strBlockName;
-    std::vector < IFP_Animation >   m_Animations;
+    std::vector < IFP_Animation > * m_pVecAnimations;
     std::vector < unsigned char * > m_DummySequencesKeyFrames;
     bool                            isVersion1;
     IFPHeaderV2                     HeaderV2;
