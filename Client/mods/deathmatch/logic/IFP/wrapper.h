@@ -1,3 +1,5 @@
+#ifndef IFP_WRAPPER_H
+#define IFP_WRAPPER_H
 #include <Windows.h>
 #include "GTASA_classes.h"
 #include <vector>
@@ -145,16 +147,7 @@ typedef const char *(__cdecl * hGetAnimBlockName)
     DWORD groupID
 );
 
-typedef CAnimBlock *(__cdecl * hGetAnimationBlock)
-(
-    const char * szName
-);
 
-typedef _CAnimBlendHierarchy *(__cdecl * hGetAnimation)
-(
-    const char * szName,
-    CAnimBlock * pBlock
-);
 
 typedef CAnimBlendAssoc *(__cdecl * hAddAnimation_hier)
 (
@@ -358,3 +351,5 @@ void printAnimBlocks(void);
 bool isAnimationHierarchyLoaded(const char * AnimationName);
 _CAnimBlendHierarchy * GetAnimHierachyBy_GroupId_AnimId (DWORD GroupID, DWORD AnimID);
 CAnimBlendStaticAssoc * GetAnimStaticAssocBy_GroupId_AnimId(DWORD GroupID, DWORD AnimID);
+
+#endif
