@@ -21,6 +21,7 @@
 #include "CLimits.h"
 #include <../Client/game_sa/CAnimBlendAssociationSA.h>
 #include <../Client/game_sa/CAnimBlendStaticAssociationSA.h>
+#include <../Client/mods/deathmatch/logic/IFP/IFPLoader.h>
 
 struct SRwResourceStats
 {
@@ -41,6 +42,7 @@ struct SClothesCacheStats
 class CAnimBlendAssociationSAInterface;
 class CAnimBlendStaticAssociationSAInterface;
 class CAnimBlendAssocGroupSAInterface;
+struct SIFPAnimations;
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
 
@@ -70,7 +72,7 @@ typedef void ( PreFxRenderHandler ) ( void );
 typedef void ( PreHudRenderHandler ) ( void );
 typedef CAnimBlendAssociationSAInterface * ( AddAnimationHandler )   ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
 typedef CAnimBlendAssociationSAInterface * ( AddAnimationAndSyncHandler )   ( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID );
-typedef void ( AssocGroupCopyAnimationHandler )   ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID );
+typedef bool ( AssocGroupCopyAnimationHandler )   ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, SIFPAnimations ** pOutIFPAnimations, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID );
 typedef CAnimBlendHierarchySAInterface   * ( BlendAnimationHierarchyHandler ) ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta );
 typedef bool ( ProcessCollisionHandler ) ( class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface );
 typedef bool ( VehicleCollisionHandler ) ( class CVehicleSAInterface* pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity );
