@@ -66,12 +66,12 @@ CResource::CResource ( unsigned short usNetID, const char* szResourceName, CClie
     // Make it a system entity so nothing but us can delete it.
     m_pResourceTXDRoot = new CClientDummy ( g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "txdroot" );
     m_pResourceTXDRoot->MakeSystemEntity ();
-
+    
     // Create our IFP root element. We set its parent when we're loaded.
     // Make it a system entity so nothing but us can delete it.
     m_pResourceIFPRoot = new CClientDummy ( g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "ifproot" );
     m_pResourceIFPRoot->MakeSystemEntity ();
-
+    
     m_strResourceDirectoryPath = SString ( "%s/resources/%s", g_pClientGame->GetFileCacheRoot (), *m_strResourceName );
     m_strResourcePrivateDirectoryPath = PathJoin ( CServerIdManager::GetSingleton ( )->GetConnectionPrivateDirectory (), m_strResourceName );
 
@@ -109,11 +109,11 @@ CResource::~CResource ( void )
     // Destroy the txd root so all dff elements are deleted except those moved out
     g_pClientGame->GetElementDeleter ()->DeleteRecursive ( m_pResourceTXDRoot );
     m_pResourceTXDRoot = NULL;
-
+    
     // Destroy the ifp root so all ifp elements are deleted except those moved out
     g_pClientGame->GetElementDeleter ()->DeleteRecursive ( m_pResourceIFPRoot );
     m_pResourceIFPRoot = NULL;
-
+    
     // Destroy the ddf root so all dff elements are deleted except those moved out
     g_pClientGame->GetElementDeleter ()->DeleteRecursive ( m_pResourceDFFEntity );
     m_pResourceDFFEntity = NULL;
