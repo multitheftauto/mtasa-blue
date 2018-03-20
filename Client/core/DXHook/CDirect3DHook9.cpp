@@ -73,6 +73,8 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9(UINT SDKVersion)
     CDirect3DHook9* pThis = CDirect3DHook9::GetSingletonPtr();
     assert(pThis && "API_Direct3DCreate9: No CDirect3DHook9");
 
+    // Override GTA supplied SDK version
+    SDKVersion = D3D_SDK_VERSION;
     if (pThis->m_bDirect3DCreate9Suspended)
         return pThis->m_pfnDirect3DCreate9(SDKVersion);
 
@@ -89,13 +91,13 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9(UINT SDKVersion)
     }
 
     // D3DX_SDK_VERSION checks
-    // August 2009 SDK required for shaders to work properly
-    #if D3DX_SDK_VERSION != 42
+    // June 2010 SDK required for shaders to work properly
+    #if D3DX_SDK_VERSION != 43
     WriteDebugEvent("D3DX_SDK_VERSION incorrect " QUOTE_DEFINE(D3DX_SDK_VERSION));
-        #pragma message( "WARNING: Microsoft DirectX SDK (August 2009) includes missing" )
+        #pragma message( "WARNING: Microsoft DirectX SDK (June 2010) includes missing" )
         #ifndef CI_BUILD
             #ifndef MTA_DEBUG
-                #error "Microsoft DirectX SDK (August 2009) includes missing"
+                #error "Microsoft DirectX SDK (June 2010) includes missing"
             #endif
         #endif
     #endif

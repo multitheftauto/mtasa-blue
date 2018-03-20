@@ -111,7 +111,11 @@ HRESULT CProxyDirect3D9::CheckDeviceFormatConversion(UINT Adapter, D3DDEVTYPE De
 
 HRESULT CProxyDirect3D9::GetDeviceCaps(UINT Adapter, D3DDEVTYPE DeviceType, D3DCAPS9* pCaps)
 {
-    return m_pDevice->GetDeviceCaps(Adapter, DeviceType, pCaps);
+    HRESULT hr = m_pDevice->GetDeviceCaps(Adapter, DeviceType, pCaps);
+    // Make GTA not use shaders
+    pCaps->VertexShaderVersion = 0;
+    pCaps->PixelShaderVersion = 0;
+    return hr;
 }
 
 HMONITOR CProxyDirect3D9::GetAdapterMonitor(UINT Adapter)
