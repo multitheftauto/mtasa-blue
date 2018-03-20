@@ -4049,7 +4049,6 @@ typedef void (__thiscall* hCAnimBlendStaticAssociation_Init)
 
 bool CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, SIFPAnimations ** pOutIFPAnimations, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID )
 {
-    printf ("AssocGroupCopyAnimationHandler called!\n");
     auto CAnimBlendStaticAssociation_Init = (hCAnimBlendStaticAssociation_Init)0x4CEC20;
 
     bool isCustomAnimationToPlay = false;
@@ -4059,10 +4058,14 @@ bool CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSA
     CClientPed * pClientPed =  GetClientPedByClump ( *pClump ); 
     if ( pClientPed != nullptr )
     {
-        auto pReplacedAnimHeirarchyInterface = pClientPed->getReplacedAnimation ( pOriginalAnimStaticAssoc->pAnimHeirarchy );
-        if ( pReplacedAnimHeirarchyInterface != nullptr )
-        {   // Play our custom animation instead of default
-            CAnimBlendStaticAssociation_Init ( pOutAnimStaticAssoc, pClump, pReplacedAnimHeirarchyInterface );
+        auto pReplacedAnimation = pClientPed->getReplacedAnimation ( pOriginalAnimStaticAssoc->pAnimHeirarchy );
+        if ( pReplacedAnimation != nullptr )
+        {   
+            SIFPAnimations * pIFPAnimations = pReplacedAnimation->pIFP->GetIFPAnimationsPointer ();
+            printf("\nAssocGroupCopyAnimationHandler: pIFPAnimations: %p\n\n", pIFPAnimations);
+            // Play our custom animation instead of default
+            *pOutIFPAnimations = pIFPAnimations;
+            CAnimBlendStaticAssociation_Init ( pOutAnimStaticAssoc, pClump, pReplacedAnimation->pAnimationHierarchy );
             isCustomAnimationToPlay = true;
         }
         else
@@ -4082,7 +4085,7 @@ bool CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSA
     pOutAnimStaticAssoc->nNumBlendNodes = pOriginalAnimStaticAssoc->nNumBlendNodes;
     pOutAnimStaticAssoc->sFlags = pOriginalAnimStaticAssoc->sFlags;
 
-    printf(" CClientGame::AssocGroupCopyAnimationHandler: About to return!\n");
+    printf(" CClientGame::AssocGroupCopyAnimationHandler: About to return sAnimGroup: %d | sAnimID: %d !\n", pOutAnimStaticAssoc->sAnimGroup, pOutAnimStaticAssoc->sAnimID);
     return isCustomAnimationToPlay;
 }
 
