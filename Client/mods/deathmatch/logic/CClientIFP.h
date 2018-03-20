@@ -37,6 +37,7 @@ public:
     size_t                          getCorrectBoneIndexFromID(int32_t & BoneID);
 
     CAnimBlendHierarchySAInterface * GetAnimationHierarchy ( const SString & strAnimationName );
+    inline SIFPAnimations *         GetIFPAnimationsPointer ( void ) { return m_pIFPAnimations; }
 
     // Sorta a hack that these are required by CClientEntity...
     void                            Unlink                  ( void ) {};
