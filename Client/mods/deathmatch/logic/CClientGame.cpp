@@ -3701,9 +3701,9 @@ bool CClientGame::StaticChokingHandler ( unsigned char ucWeaponType )
     return g_pClientGame->ChokingHandler ( ucWeaponType );
 }
 
-void CClientGame::StaticCAnimBlendAssocHierConstructorHandler ( CAnimBlendAssociationSAInterface * pThis, RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy )
+bool CClientGame::StaticCAnimBlendAssocHierConstructorHandler ( SIFPAnimations ** pOutIFPAnimations, CAnimBlendAssociationSAInterface * pThis, RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy )
 {
-    g_pClientGame->CAnimBlendAssocHierConstructorHandler ( pThis, pClump, pAnimHierarchy );
+    return g_pClientGame->CAnimBlendAssocHierConstructorHandler ( pOutIFPAnimations, pThis, pClump, pAnimHierarchy );
 }
 
 void CClientGame::StaticCAnimBlendAssocDestructorHandler ( CAnimBlendAssociationSAInterface * pThis )
@@ -4013,9 +4013,24 @@ bool CClientGame::ChokingHandler ( unsigned char ucWeaponType )
 }
 
 
-void CClientGame::CAnimBlendAssocHierConstructorHandler ( CAnimBlendAssociationSAInterface * pThis, RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy )
+bool CClientGame::CAnimBlendAssocHierConstructorHandler ( SIFPAnimations ** pOutIFPAnimations, CAnimBlendAssociationSAInterface * pThis, RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy )
 {
     printf("CClientGame::CAnimBlendAssocHierConstructorHandler called! sAnimID: %d\n", pThis->sAnimID);
+    bool isCustomAnimationToPlay = false;
+
+    CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
+    CClientPed * pClientPed =  GetClientPedByClump ( *pClump ); 
+    if ( pClientPed != nullptr )
+    {
+        printf("CAnimBlendAssocHierConstructorHandler: got pClientPed\n\n");
+        if ( pClientPed->IsCurrentAnimationCustom ( ) )
+        {
+            printf("CAnimBlendAssocHierConstructorHandler: current animation is custom\n\n");
+            *pOutIFPAnimations = pClientPed->GetIFPAnimationsPointer ();
+            isCustomAnimationToPlay = true;
+        }
+    }
+    return isCustomAnimationToPlay;
 }
 
 
@@ -4109,15 +4124,14 @@ CAnimBlendHierarchySAInterface * CClientGame::BlendAnimationHierarchyHandler ( R
                 auto pCustomAnimBlendHierarchy   = pIFP->GetAnimationHierarchy ( strAnimationName );
                 if ( pCustomAnimBlendHierarchy != nullptr )
                 { 
-                    printf ("BlendAnimationHierarchyHandler: Found Hierarchy, returning \n");
-
                     pClientPed->setCurrentAnimationCustom ( true );
-
+                    pClientPed->SetIFPAnimationsPointer ( pIFP->GetIFPAnimationsPointer () );
                     // Modifying a hierarchy like this is just bad, it's much better to create a new CAnimBlendHierarchySAInterface for every animation
                     // and then delete it once animation is over
                     pCustomAnimBlendHierarchy->iHashKey     = pAnimHierarchy->iHashKey;
                     pCustomAnimBlendHierarchy->iAnimBlockID = pAnimHierarchy->iAnimBlockID;
                     pClientPed->setNextAnimationNormal ( );
+                    printf ("BlendAnimationHierarchyHandler: Found Hierarchy, returning \n");
                     return pCustomAnimBlendHierarchy;
                 }   
                 else
@@ -4130,10 +4144,8 @@ CAnimBlendHierarchySAInterface * CClientGame::BlendAnimationHierarchyHandler ( R
                 printf("BlendAnimationHierarchyHandler: could not find IFP block name '%s'\n", strBlockName.c_str());
             }
         }
-        else
-        {
-            pClientPed->setCurrentAnimationCustom ( false );
-        }
+
+        pClientPed->setCurrentAnimationCustom ( false );
         pClientPed->setNextAnimationNormal ( );
     }
     return pAnimHierarchy;

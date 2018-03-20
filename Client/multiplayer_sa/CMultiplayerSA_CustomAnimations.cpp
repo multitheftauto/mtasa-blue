@@ -65,7 +65,7 @@ void InsertAnimationAssociationToMap ( CAnimBlendAssociationSAInterface * pAnimA
     // We don't increment pIFPAnimations->iReferences here because it's done 
     // in custom animation handler functions in CClientGame.cpp
     //mapOfCustomAnimationAssociations [ pAnimAssociation ] = pIFPAnimations;
-    //printf("InsertAnimationAssociationToMap: sAnimID: %d | iReferences: %d \n", pAnimAssociation->sAnimID, pIFPAnimations->iReferences);
+    printf("InsertAnimationAssociationToMap: sAnimID: %d | iReferences: %d \n", pAnimAssociation->sAnimID, pIFPAnimations->iReferences);
 }
 
 void RemoveAnimationAssociationFromMap ( CAnimBlendAssociationSAInterface * pAnimAssociation )
@@ -96,15 +96,43 @@ void _declspec(naked) HOOK_CAnimBlendAssoc_Hierarchy_Constructor ()
         _asm
         {
             popad
+            push    edx
             push    ecx
-            mov     eax, dword ptr [esp+0Ch] // pAnimHierarchy
+  
+            push    ebp   
+            mov     ebp, esp
+            sub     esp, 4
+
+            mov     eax, dword ptr [esp+18h] // pAnimHierarchy  [esp+0Ch]
             push    eax
-            mov     eax, dword ptr [esp+0Ch] // pClump
+            mov     eax, dword ptr [esp+18h] // pClump          [esp+0Ch]
             push    eax 
             push    ecx                      // this
+            lea     edx, [ebp-4]             
+            push    edx
             call    m_pCAnimBlendAssocHierConstructorHandler
-            add     esp, 0Ch
+            add     esp, 10h
+            
+            // It's a custom animation, store it in a map
+            mov     edx, [ebp-4]
+
+            add     esp, 4 // remove space for local var
+            mov     esp, ebp
+            pop     ebp
+          
+            // Check if it's a custom animation or not
+            cmp     eax, 00
+            je      NOT_CUSTOM_ANIMATION_CAnimBlendAssoc_Hierarchy_Constructor  
+
+            push    edx // pIFPAnimations
+            mov     ecx, [esp]
+            push    ecx // pAnimAssociation
+            call    InsertAnimationAssociationToMap
+            add     esp, 8
+            
+            NOT_CUSTOM_ANIMATION_CAnimBlendAssoc_Hierarchy_Constructor:
             pop     ecx
+            pop     edx
             pushad
             jmp     NORMAL_FLOW_CAnimBlendAssoc_Hierarchy_Constructor
         }

@@ -72,7 +72,7 @@ typedef void ( PreFxRenderHandler ) ( void );
 typedef void ( PreHudRenderHandler ) ( void );
 typedef CAnimBlendAssociationSAInterface * ( AddAnimationHandler )   ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
 typedef CAnimBlendAssociationSAInterface * ( AddAnimationAndSyncHandler )   ( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID );
-typedef void ( CAnimBlendAssocHierConstructorHandler ) ( CAnimBlendAssociationSAInterface * pThis, RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy );
+typedef bool ( CAnimBlendAssocHierConstructorHandler ) ( SIFPAnimations ** pOutIFPAnimations, CAnimBlendAssociationSAInterface * pThis, RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy );
 typedef void ( CAnimBlendAssocDestructorHandler ) ( CAnimBlendAssociationSAInterface * pThis );
 typedef bool ( AssocGroupCopyAnimationHandler )   ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, SIFPAnimations ** pOutIFPAnimations, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID );
 typedef CAnimBlendHierarchySAInterface   * ( BlendAnimationHierarchyHandler ) ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta );
