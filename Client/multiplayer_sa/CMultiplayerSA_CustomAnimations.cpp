@@ -5,6 +5,9 @@
 #include <../game_sa/CAnimBlendAssociationSA.h>
 #include <../game_sa/CAnimBlendAssocGroupSA.h>
 
+typedef std::map < CAnimBlendAssociationSAInterface *, SIFPAnimations * > AnimAssociations_type;
+static AnimAssociations_type mapOfCustomAnimationAssociations;
+
 DWORD FUNC_NEW_OPERATOR = 0x082119A;
 DWORD FUNC_CAnimBlendAssociation_Constructor = 0x04CF080;
 
@@ -57,6 +60,30 @@ void CMultiplayerSA::SetBlendAnimationHierarchyHandler ( BlendAnimationHierarchy
     m_pBlendAnimationHierarchyHandler = pHandler;
 }
 
+void InsertAnimationAssociationToMap ( CAnimBlendAssociationSAInterface * pAnimAssociation, SIFPAnimations * pIFPAnimations )
+{
+    // We don't increment pIFPAnimations->iReferences here because it's done 
+    // in custom animation handler functions in CClientGame.cpp
+    //mapOfCustomAnimationAssociations [ pAnimAssociation ] = pIFPAnimations;
+    //printf("InsertAnimationAssociationToMap: sAnimID: %d | iReferences: %d \n", pAnimAssociation->sAnimID, pIFPAnimations->iReferences);
+}
+
+void RemoveAnimationAssociationFromMap ( CAnimBlendAssociationSAInterface * pAnimAssociation )
+{
+    AnimAssociations_type::iterator it;
+    it = mapOfCustomAnimationAssociations.find ( pAnimAssociation );
+    if ( it != mapOfCustomAnimationAssociations.end ( ) )
+    {
+        it->second->iReferences --;
+        if ( ( it->second->bUnloadOnZeroReferences == true ) && ( it->second->iReferences == 0 ) )
+        {
+            // iReferences are zero, custom animation hierarchies are not being used anywhere.
+            // It's safe to unload IFP animations here.
+        }
+        mapOfCustomAnimationAssociations.erase ( pAnimAssociation );
+    }
+}
+
 void _declspec(naked) HOOK_CAnimBlendAssoc_Hierarchy_Constructor ()
 {
     _asm
@@ -94,30 +121,21 @@ void _declspec(naked) HOOK_CAnimBlendAssoc_Hierarchy_Constructor ()
     }
 }
 
+void CAnimBlendAssoc_destructor ( CAnimBlendAssociationSAInterface * pThis )
+{
+    if ( m_pCAnimBlendAssocDestructorHandler )
+    {
+        m_pCAnimBlendAssocDestructorHandler ( pThis );
+    }
+}
+
 void _declspec(naked) HOOK_CAnimBlendAssoc_destructor ()
 {
     _asm
     {
-        pushad
-    }
-    
-    if ( m_pCAnimBlendAssocDestructorHandler )
-    {
-        _asm
-        {
-            popad
-            push    ecx  // this
-            call    m_pCAnimBlendAssocDestructorHandler
-            pop     ecx
-            pushad
-            jmp     NORMAL_FLOW_CAnimBlendAssoc_destructor
-        }
-    }
-
-    _asm
-    {
-        NORMAL_FLOW_CAnimBlendAssoc_destructor:
-        popad
+        push    ecx  // this
+        call    CAnimBlendAssoc_destructor
+        pop     ecx
         push    esi
         mov     esi, ecx
         mov     eax, [esi+10h]
@@ -178,8 +196,8 @@ void _declspec(naked) HOOK_CAnimBlendAssocGroup_CopyAnimation ()
 
             // save eax and ecx for later to check whether current animation is custom or not 
             // after calling FUNC_CAnimBlendAssociation_Constructor function
-            push    eax
-            push    ecx
+            push    eax // isCustomAnimation ( bool )
+            push    ecx // pIFPAnimations
 
             // get "this" from stack that we pushed first
             mov     ecx, [esp+8]
@@ -212,26 +230,31 @@ void _declspec(naked) HOOK_CAnimBlendAssocGroup_CopyAnimation ()
             call    DeleteStaticAssociation
             add     esp, 4 
             
-            pop     ecx
-            pop     eax 
+            mov     ecx, [esp+4] // pIFPAnimations
+            mov     eax, [esp+8] // pAnimAssociation
             
             // Check wether this is a custom animation or not 
-            cmp     al, 0
+            cmp     eax, 00
             je      NOT_CUSTOM_ANIMATION_CopyAnimation  
 
             // It's a custom animation, store it in a map
-            
+            push    ecx // pIFPAnimations
+            push    edi // pAnimAssociation
+            call    InsertAnimationAssociationToMap
+            add     esp, 8
+
             NOT_CUSTOM_ANIMATION_CopyAnimation: 
             // put CAnimBlendAssociation in eax
             mov     eax, edi
-            add     esp, 4
+            add     esp, 0Ch
             jmp     RETURN_CAnimBlendAssocGroup_CopyAnimation
 
             ERROR_CopyAnimation:
-            // Delete our static association first 
+            add     esp, 0Ch
+            // Delete our static association
             push    edi
             call    DeleteStaticAssociation
-            add     esp, 4 
+            add     esp, 4
             jmp    RETURN_CAnimBlendAssocGroup_CopyAnimation_ERROR
         }
     }
