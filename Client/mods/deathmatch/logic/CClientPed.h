@@ -480,7 +480,7 @@ public:
     void                        RestoreAnimations       ( const CClientIFP & IFP );
     void                        RestoreAnimations       ( CAnimBlock & animationBlock );
     void                        RestoreAllAnimations    ( void );
-    CAnimBlendHierarchySAInterface * getReplacedAnimation ( CAnimBlendHierarchySAInterface * pInternalHierarchyInterface );
+    SReplacedAnimation *        getReplacedAnimation    ( CAnimBlendHierarchySAInterface * pInternalHierarchyInterface );
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
                                 CClientPed                  ( CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer );
