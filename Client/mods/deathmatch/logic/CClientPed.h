@@ -465,22 +465,25 @@ public:
     CAnimBlendAssociation *     GetAnimation            ( AnimationId id );
     CAnimBlendAssociation *     GetFirstAnimation       ( void );
 
-    bool                        isNextAnimationCustom   ( ) { return m_bisNextAnimationCustom; }
-    void                        setNextAnimationCustom  ( const SString & strBlockName, const SString & strAnimationName ) { m_bisNextAnimationCustom = true; m_strCustomIFPBlockName = strBlockName; m_strCustomIFPAnimationName = strAnimationName; }
-    void                        setCurrentAnimationCustom ( bool bCustom ) { m_bisCurrentAnimationCustom = bCustom; }
+    inline bool                 isNextAnimationCustom   ( ) { return m_bisNextAnimationCustom; }
+    inline void                 setNextAnimationCustom  ( const SString & strBlockName, const SString & strAnimationName ) { m_bisNextAnimationCustom = true; m_strCustomIFPBlockName = strBlockName; m_strCustomIFPAnimationName = strAnimationName; }
+    inline void                 setCurrentAnimationCustom ( bool bCustom ) { m_bisCurrentAnimationCustom = bCustom; }
+    inline bool                 IsCurrentAnimationCustom ( void ) { return m_bisCurrentAnimationCustom; }
+    inline SIFPAnimations *     GetIFPAnimationsPointer ( void ) { return m_pIFPAnimations; }
+    inline void                 SetIFPAnimationsPointer ( SIFPAnimations * pIFPAnimations ) { m_pIFPAnimations = pIFPAnimations; }
 
     // This will indicate that we have played custom animation, so next animation can be internal GTA animation
     // You must call this function after playing a custom animation
-    void                        setNextAnimationNormal  ( void ) { m_bisNextAnimationCustom = false; }
-    const SString  &            GetNextAnimationCustomBlockName ( void ) { return m_strCustomIFPBlockName; }
-    const SString  &            GetNextAnimationCustomName      ( void ) { return m_strCustomIFPAnimationName; }
+    inline void                 setNextAnimationNormal  ( void ) { m_bisNextAnimationCustom = false; }
+    inline const SString  &     GetNextAnimationCustomBlockName ( void ) { return m_strCustomIFPBlockName; }
+    inline const SString  &     GetNextAnimationCustomName      ( void ) { return m_strCustomIFPAnimationName; }
 
-    void                        ReplaceAnimation        ( CAnimBlendHierarchy * pInternalAnimHierarchy, CClientIFP * pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy );
+    bool                        ReplaceAnimation        ( CAnimBlendHierarchy * pInternalAnimHierarchy, CClientIFP * pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy );
     void                        RestoreAnimation        ( CAnimBlendHierarchy * pInternalAnimHierarchy );
     void                        RestoreAnimations       ( const CClientIFP & IFP );
     void                        RestoreAnimations       ( CAnimBlock & animationBlock );
     void                        RestoreAllAnimations    ( void );
-    CAnimBlendHierarchySAInterface * getReplacedAnimation ( CAnimBlendHierarchySAInterface * pInternalHierarchyInterface );
+    SReplacedAnimation *        getReplacedAnimation    ( CAnimBlendHierarchySAInterface * pInternalHierarchyInterface );
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
                                 CClientPed                  ( CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer );
@@ -681,6 +684,7 @@ public:
     bool                        m_bisCurrentAnimationCustom;
     SString                     m_strCustomIFPBlockName;
     SString                     m_strCustomIFPAnimationName;
+    SIFPAnimations *            m_pIFPAnimations;
 
     // Key: Internal GTA animation, Value: Custom Animation
     ReplacedAnim_type m_mapOfReplacedAnimations;

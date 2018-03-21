@@ -6191,13 +6191,18 @@ CAnimBlendAssociation * CClientPed::GetFirstAnimation ( void )
     return NULL;
 }
 
-void CClientPed::ReplaceAnimation ( CAnimBlendHierarchy * pInternalAnimHierarchy, CClientIFP * pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy )
+bool CClientPed::ReplaceAnimation ( CAnimBlendHierarchy * pInternalAnimHierarchy, CClientIFP * pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy )
 {
-    SReplacedAnimation replacedAnimation;
-    replacedAnimation.pIFP =  pIFP;
-    replacedAnimation.pAnimationHierarchy = pCustomAnimHierarchy;
+    if ( pIFP->isIFPLoaded ( ) )
+    {
+        SReplacedAnimation replacedAnimation;
+        replacedAnimation.pIFP =  pIFP;
+        replacedAnimation.pAnimationHierarchy = pCustomAnimHierarchy;
 
-    m_mapOfReplacedAnimations [ pInternalAnimHierarchy->GetInterface () ] = replacedAnimation;
+        m_mapOfReplacedAnimations [ pInternalAnimHierarchy->GetInterface () ] = replacedAnimation;
+        return true;
+    }
+    return false;
 }
 
 void CClientPed::RestoreAnimation ( CAnimBlendHierarchy * pInternalAnimHierarchy )
@@ -6236,13 +6241,13 @@ void CClientPed::RestoreAllAnimations ( void )
     m_mapOfReplacedAnimations.clear ( );
 }
 
-CAnimBlendHierarchySAInterface * CClientPed::getReplacedAnimation ( CAnimBlendHierarchySAInterface * pInternalHierarchyInterface )
+SReplacedAnimation * CClientPed::getReplacedAnimation ( CAnimBlendHierarchySAInterface * pInternalHierarchyInterface )
 {
     CClientPed::ReplacedAnim_type::iterator it;
     it = m_mapOfReplacedAnimations.find ( pInternalHierarchyInterface );
     if ( it != m_mapOfReplacedAnimations.end ( ) )
     {
-        return it->second.pAnimationHierarchy;
+        return &it->second;
     }
     return nullptr;
 }

@@ -136,9 +136,7 @@ struct IFP_Animation
 {
     SString                           Name;
     _CAnimBlendHierarchy              Hierarchy;
-    //std::vector <_CAnimBlendSequence> Sequences;
     char *                            pSequencesMemory;
-    unsigned char*                    pFramesMemoryVersion2; // only for IFP version 2;
 };
 
 struct Animation
@@ -202,6 +200,24 @@ enum BoneType
     R_FOOT      = 53,
     R_TOE_0     = 54    
 };
+
+struct SIFPAnimations
+{
+    // This is set to true when unloadIFP function is called, it means that animations
+    // can be unloaded when iReferences reaches zero, if this boolean is set to true
+	bool  bUnloadOnZeroReferences; 
+    // incremented when a new CAnimBlendAssociationSAInteface is created and decremented 
+    // when destructor of that animation is called 
+	DWORD iReferences; 
+	std::vector < IFP_Animation > vecAnimations;	
+
+    SIFPAnimations()
+    {
+        bUnloadOnZeroReferences = false;
+        iReferences = 0;
+    }
+};
+
 
 typedef void *(__cdecl* hCMemoryMgr_Malloc)
 (

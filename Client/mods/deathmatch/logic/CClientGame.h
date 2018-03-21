@@ -503,10 +503,11 @@ private:
     static void                               StaticPostWorldProcessHandler   ( void );
     static void                               StaticPreFxRenderHandler        ( void );
     static void                               StaticPreHudRenderHandler       ( void );
+    static void                               StaticCAnimBlendAssocDestructorHandler ( CAnimBlendAssociationSAInterface * pThis );
     static CAnimBlendAssociationSAInterface * StaticAddAnimationHandler       ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     static CAnimBlendAssociationSAInterface * StaticAddAnimationAndSyncHandler( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID );
-    static void                               StaticAssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID );
-    static CAnimBlendHierarchySAInterface   * StaticBlendAnimationHierarchyHandler ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta );
+    static bool                               StaticAssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, SIFPAnimations ** pOutIFPAnimations, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID );
+    static bool                               StaticBlendAnimationHierarchyHandler ( SIFPAnimations ** pOutIFPAnimations, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, RpClump * pClump );
     static bool                               StaticProcessCollisionHandler   ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     static bool                               StaticVehicleCollisionHandler   ( CVehicleSAInterface* pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity  );
     static bool                               StaticVehicleDamageHandler      ( CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType, const CVector& vecDamagePos, uchar ucTyre );
@@ -536,10 +537,11 @@ private:
     bool                                      ChokingHandler                  ( unsigned char ucWeaponType );
     void                                      PreWorldProcessHandler          ( void );
     void                                      PostWorldProcessHandler         ( void );
+    void                                      CAnimBlendAssocDestructorHandler ( CAnimBlendAssociationSAInterface * pThis );
     CAnimBlendAssociationSAInterface *        AddAnimationHandler             ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     CAnimBlendAssociationSAInterface *        AddAnimationAndSyncHandler      ( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID );
-    void                                      AssocGroupCopyAnimationHandler  ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID );
-    CAnimBlendHierarchySAInterface   *        BlendAnimationHierarchyHandler  ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimHierarchy, int flags, float fBlendDelta );
+    bool                                      AssocGroupCopyAnimationHandler  ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, SIFPAnimations ** pOutIFPAnimations, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID );
+    bool                                      BlendAnimationHierarchyHandler  ( SIFPAnimations ** pOutIFPAnimations, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, RpClump * pClump );
     bool                                      ProcessCollisionHandler         ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     bool                                      VehicleCollisionHandler         ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity  );
     bool                                      VehicleDamageHandler            ( CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType, const CVector& vecDamagePos, uchar ucTyre );
@@ -598,8 +600,9 @@ public:
     void                                      RemovePedPointerFromMap         ( CClientPed * pPed );
     CClientPed *                              GetClientPedByClump             ( const RpClump & Clump );
 
-    void                                      onClientIFPUnload               ( const CClientIFP & IFP );
- 
+    void                                      OnClientIFPUnload               ( const CClientIFP & IFP );
+    void                                      DeleteIFPAnimations             ( SIFPAnimations * pIFPAnimations );
+
 private:
     eStatus                                   m_Status;
     eServerType                               m_ServerType;

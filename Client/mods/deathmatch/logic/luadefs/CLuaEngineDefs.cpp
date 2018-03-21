@@ -538,9 +538,11 @@ int CLuaEngineDefs::EngineReplaceAnimation ( lua_State* luaVM )
                 CAnimBlendHierarchySAInterface * pCustomAnimHierarchyInterface = pCustomIFP->GetAnimationHierarchy ( strCustomAnimName );
                 if ( pInternalAnimHierarchy && pCustomAnimHierarchyInterface )
                 { 
-                    Ped.ReplaceAnimation ( pInternalAnimHierarchy, pCustomIFP, pCustomAnimHierarchyInterface );
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
+                    if ( Ped.ReplaceAnimation ( pInternalAnimHierarchy, pCustomIFP, pCustomAnimHierarchyInterface ) )
+                    { 
+                        lua_pushboolean ( luaVM, true );
+                        return 1;
+                    }
                 }    
                 else
                     argStream.SetCustomError ( "Incorrect Animation name" ); 

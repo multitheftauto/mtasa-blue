@@ -15,6 +15,7 @@ public:
 
     virtual eClientEntityType       GetType                 ( void ) const              { return CCLIENTIFP; }
 
+    bool                            isIFPLoaded             ( void ) { return m_bisIFPLoaded; }
     bool                            LoadIFP                 ( const char* szFilePath, SString strBlockName );
     void                            UnloadIFP               ( void );
 
@@ -37,6 +38,7 @@ public:
     size_t                          getCorrectBoneIndexFromID(int32_t & BoneID);
 
     CAnimBlendHierarchySAInterface * GetAnimationHierarchy ( const SString & strAnimationName );
+    inline SIFPAnimations *         GetIFPAnimationsPointer ( void ) { return m_pIFPAnimations; }
 
     // Sorta a hack that these are required by CClientEntity...
     void                            Unlink                  ( void ) {};
@@ -45,8 +47,9 @@ public:
 
    
 private:
+    SIFPAnimations *                m_pIFPAnimations;
     SString                         m_strBlockName;
-    std::vector < IFP_Animation >   m_Animations;
+    std::vector < IFP_Animation > * m_pVecAnimations;
     std::vector < unsigned char * > m_DummySequencesKeyFrames;
     bool                            isVersion1;
     IFPHeaderV2                     HeaderV2;

@@ -116,6 +116,7 @@ public:
     void                        SetIdleHandler              ( IdleHandler * pHandler );
     void                        SetPreFxRenderHandler       ( PreFxRenderHandler * pHandler );
     void                        SetPreHudRenderHandler      ( PreHudRenderHandler * pHandler );
+    void                        SetCAnimBlendAssocDestructorHandler ( CAnimBlendAssocDestructorHandler * pHandler );
     void                        SetAddAnimationHandler      ( AddAnimationHandler * pHandler );
     void                        SetAddAnimationAndSyncHandler ( AddAnimationAndSyncHandler * pHandler );
     void                        SetAssocGroupCopyAnimationHandler ( AssocGroupCopyAnimationHandler * pHandler );

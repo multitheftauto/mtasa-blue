@@ -22,6 +22,7 @@ CClientIFP::CClientIFP ( class CClientManager* pManager, ElementID ID ) : CClien
     m_pManager = pManager;
     SetTypeName ( "IFP" );
     m_bisIFPLoaded = false;
+    m_pIFPAnimations = nullptr;
 }
 
 CClientIFP::~CClientIFP ( void )
@@ -34,58 +35,43 @@ bool CClientIFP::LoadIFP ( const char* szFilePath, SString strBlockName )
     printf ("\nCClientIFP::LoadIFP: szFilePath %s\n szBlockName: %s\n\n", szFilePath, strBlockName.c_str());
     
     m_strBlockName = strBlockName;
+    m_pIFPAnimations = new SIFPAnimations;
+    m_pVecAnimations = &m_pIFPAnimations->vecAnimations;
 
-    if (LoadIFPFile(szFilePath))
+    if ( LoadIFPFile ( szFilePath ) )
     {
         m_bisIFPLoaded = true;
-        return true;
     }
-    return false;
+    else
+    {
+        delete m_pIFPAnimations;
+    }
+    return m_bisIFPLoaded;
 }
-
 
 void CClientIFP::UnloadIFP ( void )
 {
     if ( m_bisIFPLoaded )
     { 
         printf ("CClientIFP::UnloadIFP ( ) called!\n");
-    
-        // first remove IFP from map, so we can indicate that it does not exist
+
+        m_bisIFPLoaded = false;
+
+        // Remove IFP from map, so we can indicate that it does not exist
         g_pClientGame->RemoveIFPPointerFromMap ( m_strBlockName );
 
-        // remove IFP animations from replaced animations of peds/players
-        g_pClientGame->onClientIFPUnload ( *this );
+        // Remove IFP animations from replaced animations of peds/players
+        g_pClientGame->OnClientIFPUnload ( *this );
 
-        for ( size_t i = 0; i < m_Animations.size(); i++ )
-        {
-            IFP_Animation * ifpAnimation = &m_Animations[i];
+        // When all animations from this IFP block stop playing, and 
+        // the reference count reaches zero, IFP animations will be unloaded
+        m_pIFPAnimations->bUnloadOnZeroReferences = true;
         
-            OLD_CAnimBlendHierarchy_RemoveFromUncompressedCache ( (int)&ifpAnimation->Hierarchy );
-            
-            for (unsigned short SequenceIndex = 0; SequenceIndex < ifpAnimation->Hierarchy.m_nSeqCount; SequenceIndex++)
-            {
-                _CAnimBlendSequence * pSequence = (_CAnimBlendSequence*)((BYTE*)ifpAnimation->Hierarchy.m_pSequences + (sizeof(_CAnimBlendSequence) * SequenceIndex));
-
-                if ( !( (pSequence->m_nFlags >> 3) & 1 ) ) // If ( !OneBigChunkForAllSequences )
-                {
-                    OLD_CMemoryMgr_Free ( pSequence->m_pFrames ); //*(void **)(pThis + 8)); //pSequence->m_pFrames );
-                }
-                else
-                {
-                    if ( SequenceIndex == 0 )
-                    { 
-                        // All frames of all sequences are allocated on one memory block, so free that one
-                        // and break the loop 
-                        OLD_CMemoryMgr_Free ( pSequence->m_pFrames );
-                        break;
-                    }
-                }
-  
-            }
-            delete ifpAnimation->pSequencesMemory;  
+        // unload IFP animations, if reference count is zero
+        if ( m_pIFPAnimations->iReferences == 0 )
+        { 
+            g_pClientGame->DeleteIFPAnimations ( m_pIFPAnimations ); 
         }
-
-        printf ("IFP unloaded sucessfully with block name '%s'\n", m_strBlockName.c_str());  
     }
 }
 
@@ -136,10 +122,10 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
 {
     readBuffer < IFPHeaderV2 > ( &HeaderV2 );
 
-    m_Animations.resize ( HeaderV2.TotalAnimations );
-    for (size_t i = 0; i < m_Animations.size(); i++)
+    m_pVecAnimations->resize ( HeaderV2.TotalAnimations );
+    for (size_t i = 0; i < m_pVecAnimations->size(); i++)
     {
-        IFP_Animation & ifpAnimation = m_Animations[i];
+        IFP_Animation & ifpAnimation = m_pVecAnimations->at ( i );
 
         _CAnimBlendHierarchy * pAnimHierarchy = &ifpAnimation.Hierarchy;
 
@@ -347,10 +333,10 @@ void CClientIFP::ReadIFPVersion1 (  )
 
     //ofs << "Total Animations: " << Info.Entries << std::endl;
 
-    m_Animations.resize ( Info.Entries );
-    for (size_t i = 0; i < m_Animations.size(); i++)
+    m_pVecAnimations->resize ( Info.Entries );
+    for (size_t i = 0; i < m_pVecAnimations->size(); i++)
     {
-        IFP_Animation & ifpAnimation = m_Animations[i];
+        IFP_Animation & ifpAnimation = m_pVecAnimations->at ( i );
 
         _CAnimBlendHierarchy * pAnimHierarchy = &ifpAnimation.Hierarchy;
 
@@ -1173,14 +1159,20 @@ std::string CClientIFP::getCorrectBoneNameFromName(std::string const& BoneName)
 
 CAnimBlendHierarchySAInterface * CClientIFP::GetAnimationHierarchy ( const SString & strAnimationName )
 {
-    for (auto it = m_Animations.begin(); it != m_Animations.end(); ++it) 
+    CAnimBlendHierarchySAInterface * pAnimHierarchyInterface = nullptr;
+
+    for (auto it = m_pVecAnimations->begin(); it != m_pVecAnimations->end(); ++it) 
     {
         if (strAnimationName.ToLower() == it->Name.ToLower())
         {
-            return (CAnimBlendHierarchySAInterface *)&it->Hierarchy;
+            if ( m_bisIFPLoaded )
+            { 
+                pAnimHierarchyInterface = (CAnimBlendHierarchySAInterface *)&it->Hierarchy;
+            }
+            break;
         }
     }
-    return nullptr;
+    return pAnimHierarchyInterface;
 }
 
 // ----------------------------------------------------------------------------------------------------------
