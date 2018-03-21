@@ -4076,20 +4076,21 @@ bool CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSA
         auto pReplacedAnimation = pClientPed->getReplacedAnimation ( pOriginalAnimStaticAssoc->pAnimHeirarchy );
         if ( pReplacedAnimation != nullptr )
         {   
-            SIFPAnimations * pIFPAnimations = pReplacedAnimation->pIFP->GetIFPAnimationsPointer ();
-            printf("\nAssocGroupCopyAnimationHandler: pIFPAnimations: %p\n\n", pIFPAnimations);
-            // Play our custom animation instead of default
-            *pOutIFPAnimations = pIFPAnimations;
-            CAnimBlendStaticAssociation_Init ( pOutAnimStaticAssoc, pClump, pReplacedAnimation->pAnimationHierarchy );
-            isCustomAnimationToPlay = true;
-        }
-        else
-        {   // Play default internal animation
-            CAnimBlendStaticAssociation_Init ( pOutAnimStaticAssoc, pClump, pOriginalAnimStaticAssoc->pAnimHeirarchy );
+            if ( pReplacedAnimation->pIFP->isIFPLoaded ( ) )
+            { 
+                SIFPAnimations * pIFPAnimations = pReplacedAnimation->pIFP->GetIFPAnimationsPointer ();
+                pIFPAnimations->iReferences ++;
+                // Play our custom animation instead of default
+                *pOutIFPAnimations = pIFPAnimations;
+                CAnimBlendStaticAssociation_Init ( pOutAnimStaticAssoc, pClump, pReplacedAnimation->pAnimationHierarchy );
+                isCustomAnimationToPlay = true;
+            }
         }
     }
-    else
-    {   // Play default internal animation
+
+    if ( !isCustomAnimationToPlay )
+    {
+        // Play default internal animation
         CAnimBlendStaticAssociation_Init ( pOutAnimStaticAssoc, pClump, pOriginalAnimStaticAssoc->pAnimHeirarchy );
     }
 
@@ -4124,15 +4125,22 @@ CAnimBlendHierarchySAInterface * CClientGame::BlendAnimationHierarchyHandler ( R
                 auto pCustomAnimBlendHierarchy   = pIFP->GetAnimationHierarchy ( strAnimationName );
                 if ( pCustomAnimBlendHierarchy != nullptr )
                 { 
-                    pClientPed->setCurrentAnimationCustom ( true );
-                    pClientPed->SetIFPAnimationsPointer ( pIFP->GetIFPAnimationsPointer () );
-                    // Modifying a hierarchy like this is just bad, it's much better to create a new CAnimBlendHierarchySAInterface for every animation
-                    // and then delete it once animation is over
-                    pCustomAnimBlendHierarchy->iHashKey     = pAnimHierarchy->iHashKey;
-                    pCustomAnimBlendHierarchy->iAnimBlockID = pAnimHierarchy->iAnimBlockID;
-                    pClientPed->setNextAnimationNormal ( );
-                    printf ("BlendAnimationHierarchyHandler: Found Hierarchy, returning \n");
-                    return pCustomAnimBlendHierarchy;
+                    if ( pIFP->isIFPLoaded ( ) )
+                    { 
+                        SIFPAnimations * pIFPAnimations = pIFP->GetIFPAnimationsPointer ();
+                        pIFPAnimations->iReferences ++;
+
+                        pClientPed->setCurrentAnimationCustom ( true );
+                        pClientPed->SetIFPAnimationsPointer ( pIFPAnimations );
+                        // Modifying a hierarchy like this is just bad, it's much better to create a new CAnimBlendHierarchySAInterface for every animation
+                        // and then delete it once animation is over
+                        pCustomAnimBlendHierarchy->iHashKey     = pAnimHierarchy->iHashKey;
+                        pCustomAnimBlendHierarchy->iAnimBlockID = pAnimHierarchy->iAnimBlockID;
+                        pClientPed->setNextAnimationNormal ( );
+
+                        printf ("BlendAnimationHierarchyHandler: Found Hierarchy, returning \n");
+                        return pCustomAnimBlendHierarchy;
+                    }
                 }   
                 else
                 {
@@ -6953,7 +6961,7 @@ void CClientGame::OnClientIFPUnload ( const CClientIFP & IFP )
     }
 }
 
-void CClientGame::UnloadIFPAnimations ( SIFPAnimations * pIFPAnimations )
+void CClientGame::DeleteIFPAnimations ( SIFPAnimations * pIFPAnimations )
 {
     if ( pIFPAnimations->iReferences == 0 )
     { 
@@ -6990,6 +6998,7 @@ void CClientGame::UnloadIFPAnimations ( SIFPAnimations * pIFPAnimations )
             }
             delete ifpAnimation->pSequencesMemory;  
         }
+        delete pIFPAnimations;
         printf("CClientGame::UnloadIFPAnimations (): IFP Animations have been unloaded successfully!\n");
     }
 }

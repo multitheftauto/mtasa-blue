@@ -60,15 +60,58 @@ void CMultiplayerSA::SetBlendAnimationHierarchyHandler ( BlendAnimationHierarchy
     m_pBlendAnimationHierarchyHandler = pHandler;
 }
 
-void InsertAnimationAssociationToMap ( CAnimBlendAssociationSAInterface * pAnimAssociation, SIFPAnimations * pIFPAnimations )
+void DeleteIFPAnimations ( SIFPAnimations * pIFPAnimations )
+{
+    if ( pIFPAnimations->iReferences == 0 )
+    { 
+        printf("CClientGame::UnloadIFPAnimations (): iReferences are Zero\n");
+
+        hCMemoryMgr_Free OLD_CMemoryMgr_Free = (hCMemoryMgr_Free)0x0072F430;
+        auto OLD_CAnimBlendHierarchy_RemoveFromUncompressedCache = (hCAnimBlendHierarchy_RemoveFromUncompressedCache)0x004D42A0;
+
+        for ( size_t i = 0; i < pIFPAnimations->vecAnimations.size(); i++ )
+        {
+            IFP_Animation * ifpAnimation = &pIFPAnimations->vecAnimations[i];
+        
+            OLD_CAnimBlendHierarchy_RemoveFromUncompressedCache ( (int)&ifpAnimation->Hierarchy );
+            
+            for (unsigned short SequenceIndex = 0; SequenceIndex < ifpAnimation->Hierarchy.m_nSeqCount; SequenceIndex++)
+            {
+                _CAnimBlendSequence * pSequence = (_CAnimBlendSequence*)((BYTE*)ifpAnimation->Hierarchy.m_pSequences + (sizeof(_CAnimBlendSequence) * SequenceIndex));
+
+                if ( !( (pSequence->m_nFlags >> 3) & 1 ) ) // If ( !OneBigChunkForAllSequences )
+                {
+                    OLD_CMemoryMgr_Free ( pSequence->m_pFrames ); //*(void **)(pThis + 8)); //pSequence->m_pFrames );
+                }
+                else
+                {
+                    if ( SequenceIndex == 0 )
+                    { 
+                        // All frames of all sequences are allocated on one memory block, so free that one
+                        // and break the loop 
+                        OLD_CMemoryMgr_Free ( pSequence->m_pFrames );
+                        break;
+                    }
+                }
+  
+            }
+            delete ifpAnimation->pSequencesMemory;  
+        }
+        delete pIFPAnimations;
+        printf("CClientGame::UnloadIFPAnimations (): IFP Animations have been unloaded successfully!\n");
+    }
+}
+
+void __cdecl InsertAnimationAssociationToMap ( CAnimBlendAssociationSAInterface * pAnimAssociation, SIFPAnimations * pIFPAnimations )
 {
     // We don't increment pIFPAnimations->iReferences here because it's done 
     // in custom animation handler functions in CClientGame.cpp
-    //mapOfCustomAnimationAssociations [ pAnimAssociation ] = pIFPAnimations;
+    mapOfCustomAnimationAssociations [ pAnimAssociation ] = pIFPAnimations;
+
     printf("InsertAnimationAssociationToMap: sAnimID: %d | iReferences: %d \n", pAnimAssociation->sAnimID, pIFPAnimations->iReferences);
 }
 
-void RemoveAnimationAssociationFromMap ( CAnimBlendAssociationSAInterface * pAnimAssociation )
+void __cdecl RemoveAnimationAssociationFromMap ( CAnimBlendAssociationSAInterface * pAnimAssociation )
 {
     AnimAssociations_type::iterator it;
     it = mapOfCustomAnimationAssociations.find ( pAnimAssociation );
@@ -79,6 +122,7 @@ void RemoveAnimationAssociationFromMap ( CAnimBlendAssociationSAInterface * pAni
         {
             // iReferences are zero, custom animation hierarchies are not being used anywhere.
             // It's safe to unload IFP animations here.
+            DeleteIFPAnimations ( it->second );
         }
         mapOfCustomAnimationAssociations.erase ( pAnimAssociation );
     }
@@ -125,7 +169,7 @@ void _declspec(naked) HOOK_CAnimBlendAssoc_Hierarchy_Constructor ()
             je      NOT_CUSTOM_ANIMATION_CAnimBlendAssoc_Hierarchy_Constructor  
 
             push    edx // pIFPAnimations
-            mov     ecx, [esp]
+            mov     ecx, [esp+4]
             push    ecx // pAnimAssociation
             call    InsertAnimationAssociationToMap
             add     esp, 8
@@ -151,6 +195,8 @@ void _declspec(naked) HOOK_CAnimBlendAssoc_Hierarchy_Constructor ()
 
 void CAnimBlendAssoc_destructor ( CAnimBlendAssociationSAInterface * pThis )
 {
+    RemoveAnimationAssociationFromMap ( pThis );
+
     if ( m_pCAnimBlendAssocDestructorHandler )
     {
         m_pCAnimBlendAssocDestructorHandler ( pThis );
