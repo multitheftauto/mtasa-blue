@@ -603,7 +603,7 @@ public:
     CClientPed *                              GetClientPedByClump             ( const RpClump & Clump );
 
     void                                      OnClientIFPUnload               ( const CClientIFP & IFP );
-    void                                      UnloadIFPAnimations             ( SIFPAnimations * pIFPAnimations );
+    void                                      DeleteIFPAnimations             ( SIFPAnimations * pIFPAnimations );
 
 private:
     eStatus                                   m_Status;
