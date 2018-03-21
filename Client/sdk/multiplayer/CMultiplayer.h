@@ -72,7 +72,6 @@ typedef void ( PreFxRenderHandler ) ( void );
 typedef void ( PreHudRenderHandler ) ( void );
 typedef CAnimBlendAssociationSAInterface * ( AddAnimationHandler )   ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
 typedef CAnimBlendAssociationSAInterface * ( AddAnimationAndSyncHandler )   ( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID );
-typedef bool ( CAnimBlendAssocHierConstructorHandler ) ( SIFPAnimations ** pOutIFPAnimations, CAnimBlendAssociationSAInterface * pThis, RpClump * pClump, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy );
 typedef void ( CAnimBlendAssocDestructorHandler ) ( CAnimBlendAssociationSAInterface * pThis );
 typedef bool ( AssocGroupCopyAnimationHandler )   ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, SIFPAnimations ** pOutIFPAnimations, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID );
 typedef bool ( BlendAnimationHierarchyHandler ) ( SIFPAnimations ** pOutIFPAnimations, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, RpClump * pClump );
@@ -187,7 +186,6 @@ public:
     virtual void                        SetIdleHandler              ( IdleHandler * pHandler ) = 0;
     virtual void                        SetPreFxRenderHandler       ( PreFxRenderHandler * pHandler ) = 0;
     virtual void                        SetPreHudRenderHandler      ( PreHudRenderHandler * pHandler ) = 0;
-    virtual void                        SetCAnimBlendAssocHierConstructorHandler ( CAnimBlendAssocHierConstructorHandler * pHandler ) = 0;
     virtual void                        SetCAnimBlendAssocDestructorHandler ( CAnimBlendAssocDestructorHandler * pHandler ) = 0;
     virtual void                        SetAddAnimationHandler      ( AddAnimationHandler * pHandler ) = 0;
     virtual void                        SetAddAnimationAndSyncHandler ( AddAnimationAndSyncHandler * pHandler ) = 0;

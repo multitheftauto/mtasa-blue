@@ -503,7 +503,6 @@ private:
     static void                               StaticPostWorldProcessHandler   ( void );
     static void                               StaticPreFxRenderHandler        ( void );
     static void                               StaticPreHudRenderHandler       ( void );
-    static bool                               StaticCAnimBlendAssocHierConstructorHandler ( SIFPAnimations ** pOutIFPAnimations, CAnimBlendAssociationSAInterface * pThis, RpClump * pClump, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy );
     static void                               StaticCAnimBlendAssocDestructorHandler ( CAnimBlendAssociationSAInterface * pThis );
     static CAnimBlendAssociationSAInterface * StaticAddAnimationHandler       ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     static CAnimBlendAssociationSAInterface * StaticAddAnimationAndSyncHandler( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID );
@@ -538,7 +537,6 @@ private:
     bool                                      ChokingHandler                  ( unsigned char ucWeaponType );
     void                                      PreWorldProcessHandler          ( void );
     void                                      PostWorldProcessHandler         ( void );
-    bool                                      CAnimBlendAssocHierConstructorHandler ( SIFPAnimations ** pOutIFPAnimations, CAnimBlendAssociationSAInterface * pThis, RpClump * pClump, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy );
     void                                      CAnimBlendAssocDestructorHandler ( CAnimBlendAssociationSAInterface * pThis );
     CAnimBlendAssociationSAInterface *        AddAnimationHandler             ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     CAnimBlendAssociationSAInterface *        AddAnimationAndSyncHandler      ( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID );

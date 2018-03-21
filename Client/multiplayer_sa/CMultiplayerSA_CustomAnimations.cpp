@@ -14,7 +14,6 @@ DWORD FUNC_CAnimBlendAssociation__ReferenceAnimBlock =              0x4CEA50;
 DWORD FUNC_UncompressAnimation =                                    0x4D41C0;
 DWORD FUNC_CAnimBlendAssociation__CAnimBlendAssociation_hierarchy = 0x4CEFC0;
 
-DWORD RETURN_CAnimBlendAssoc_Hierarchy_Constructor =        0x4CEFC5;
 DWORD RETURN_CAnimBlendAssoc_destructor =                   0x4CECF6;
 DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation_NORMALFLOW =0x4CE151; 
 DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation =           0x4CE187; 
@@ -23,7 +22,6 @@ DWORD RETURN_CAnimManager_AddAnimation =                    0x4D3AB1;
 DWORD RETURN_CAnimManager_AddAnimationAndSync =             0x4D3B41;
 DWORD RETURN_CAnimManager_BlendAnimation_Hierarchy =        0x4D4577; 
 
-CAnimBlendAssocHierConstructorHandler * m_pCAnimBlendAssocHierConstructorHandler = nullptr;
 CAnimBlendAssocDestructorHandler * m_pCAnimBlendAssocDestructorHandler = nullptr;
 AddAnimationHandler * m_pAddAnimationHandler = nullptr;
 AddAnimationAndSyncHandler * m_pAddAnimationAndSyncHandler = nullptr;
@@ -32,11 +30,6 @@ BlendAnimationHierarchyHandler * m_pBlendAnimationHierarchyHandler = nullptr;
 
 int _cdecl OnCAnimBlendAssocGroupCopyAnimation ( AssocGroupId animGroup, int iAnimId );
 auto CAnimBlendStaticAssociation_FreeSequenceArray = (hCAnimBlendStaticAssociation_FreeSequenceArray)0x4ce9a0;
-
-void CMultiplayerSA::SetCAnimBlendAssocHierConstructorHandler ( CAnimBlendAssocHierConstructorHandler * pHandler )
-{
-    m_pCAnimBlendAssocHierConstructorHandler = pHandler;
-}
 
 void CMultiplayerSA::SetCAnimBlendAssocDestructorHandler ( CAnimBlendAssocDestructorHandler * pHandler )
 {
@@ -128,82 +121,6 @@ void __cdecl RemoveAnimationAssociationFromMap ( CAnimBlendAssociationSAInterfac
             DeleteIFPAnimations ( it->second );
         }
         mapOfCustomAnimationAssociations.erase ( pAnimAssociation );
-    }
-}
-
-void _declspec(naked) HOOK_CAnimBlendAssoc_Hierarchy_Constructor ()
-{
-    _asm
-    {
-        pushad
-    }
-    
-    if ( m_pCAnimBlendAssocHierConstructorHandler )
-    {
-        _asm
-        {
-            popad
-            // Here [esp+8] is pAnimHierarchy 
-            push    ebx
-            push    edx
-            push    ecx
-  
-            push    ebp   
-            mov     ebp, esp
-            sub     esp, 8
-            
-            mov     eax, dword ptr [esp+8+24]
-            mov    [ebp-4], eax
-            lea     eax, [ebp-4]
-            //mov     eax, dword ptr [esp+20h] // pAnimHierarchy  [esp+18h]
-            push    eax
-            mov     eax, dword ptr [esp+20h] // pClump          [esp+18h]
-            push    eax 
-            push    ecx                      // this
-            lea     edx, [ebp-8]             
-            push    edx
-            call    m_pCAnimBlendAssocHierConstructorHandler
-            add     esp, 10h
-            
-            mov     ebx, [ebp-4]
-            mov     edx, [ebp-8]
-
-            add     esp, 8 // remove space for local var
-            mov     esp, ebp
-            pop     ebp
-          
-            // Check if it's a custom animation or not
-            cmp     eax, 00
-            je      NOT_CUSTOM_ANIMATION_CAnimBlendAssoc_Hierarchy_Constructor  
-    
-            // replace animation hierarchy with custom hierarchy
-            mov     [esp+8+12], ebx 
-            // pAnimHierarchy = 8
-            mov     [esp+28h+8h+18h], ebx
-
-            push    edx // pIFPAnimations
-            mov     ecx, [esp+4]
-            push    ecx // pAnimAssociation
-            call    InsertAnimationAssociationToMap
-            add     esp, 8
-            
-            NOT_CUSTOM_ANIMATION_CAnimBlendAssoc_Hierarchy_Constructor:
-            pop     ecx
-            pop     edx
-            pop     ebx
-            pushad
-            jmp     NORMAL_FLOW_CAnimBlendAssoc_Hierarchy_Constructor
-        }
-    }
-
-    _asm
-    {
-        NORMAL_FLOW_CAnimBlendAssoc_Hierarchy_Constructor:
-        popad
-        xor     eax, eax
-        push    esi
-        mov     esi, ecx
-        jmp     RETURN_CAnimBlendAssoc_Hierarchy_Constructor
     }
 }
 
