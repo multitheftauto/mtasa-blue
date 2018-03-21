@@ -15,6 +15,7 @@ public:
 
     virtual eClientEntityType       GetType                 ( void ) const              { return CCLIENTIFP; }
 
+    bool                            isIFPLoaded             ( void ) { return m_bisIFPLoaded; }
     bool                            LoadIFP                 ( const char* szFilePath, SString strBlockName );
     void                            UnloadIFP               ( void );
 
@@ -53,6 +54,7 @@ private:
     bool                            isVersion1;
     IFPHeaderV2                     HeaderV2;
     bool                            m_bisIFPLoaded;
+    static DWORD                    s_iAnimationSearchReferences;
 
 };
 
