@@ -54,7 +54,6 @@ private:
     bool                            isVersion1;
     IFPHeaderV2                     HeaderV2;
     bool                            m_bisIFPLoaded;
-    DWORD                           iAnimationSearchReferences;
 
 };
 

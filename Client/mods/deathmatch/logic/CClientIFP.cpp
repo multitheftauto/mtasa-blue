@@ -23,7 +23,6 @@ CClientIFP::CClientIFP ( class CClientManager* pManager, ElementID ID ) : CClien
     SetTypeName ( "IFP" );
     m_bisIFPLoaded = false;
     m_pIFPAnimations = nullptr;
-    iAnimationSearchReferences = 0;
 }
 
 CClientIFP::~CClientIFP ( void )
@@ -69,7 +68,7 @@ void CClientIFP::UnloadIFP ( void )
         m_pIFPAnimations->bUnloadOnZeroReferences = true;
         
         // unload IFP animations, if reference count is zero
-        if ( ( m_pIFPAnimations->iReferences == 0 ) && ( iAnimationSearchReferences == 0 ) )
+        if ( m_pIFPAnimations->iReferences == 0 )
         { 
             g_pClientGame->DeleteIFPAnimations ( m_pIFPAnimations ); 
         }
@@ -1161,18 +1160,17 @@ std::string CClientIFP::getCorrectBoneNameFromName(std::string const& BoneName)
 CAnimBlendHierarchySAInterface * CClientIFP::GetAnimationHierarchy ( const SString & strAnimationName )
 {
     CAnimBlendHierarchySAInterface * pAnimHierarchyInterface = nullptr;
-    if ( m_bisIFPLoaded )
-    { 
-        iAnimationSearchReferences ++;
-        for (auto it = m_pVecAnimations->begin(); it != m_pVecAnimations->end(); ++it) 
+
+    for (auto it = m_pVecAnimations->begin(); it != m_pVecAnimations->end(); ++it) 
+    {
+        if (strAnimationName.ToLower() == it->Name.ToLower())
         {
-            if (strAnimationName.ToLower() == it->Name.ToLower())
-            {
+            if ( m_bisIFPLoaded )
+            { 
                 pAnimHierarchyInterface = (CAnimBlendHierarchySAInterface *)&it->Hierarchy;
-                break;
             }
+            break;
         }
-        iAnimationSearchReferences --;
     }
     return pAnimHierarchyInterface;
 }
