@@ -6191,13 +6191,18 @@ CAnimBlendAssociation * CClientPed::GetFirstAnimation ( void )
     return NULL;
 }
 
-void CClientPed::ReplaceAnimation ( CAnimBlendHierarchy * pInternalAnimHierarchy, CClientIFP * pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy )
+bool CClientPed::ReplaceAnimation ( CAnimBlendHierarchy * pInternalAnimHierarchy, CClientIFP * pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy )
 {
-    SReplacedAnimation replacedAnimation;
-    replacedAnimation.pIFP =  pIFP;
-    replacedAnimation.pAnimationHierarchy = pCustomAnimHierarchy;
+    if ( pIFP->isIFPLoaded ( ) )
+    {
+        SReplacedAnimation replacedAnimation;
+        replacedAnimation.pIFP =  pIFP;
+        replacedAnimation.pAnimationHierarchy = pCustomAnimHierarchy;
 
-    m_mapOfReplacedAnimations [ pInternalAnimHierarchy->GetInterface () ] = replacedAnimation;
+        m_mapOfReplacedAnimations [ pInternalAnimHierarchy->GetInterface () ] = replacedAnimation;
+        return true;
+    }
+    return false;
 }
 
 void CClientPed::RestoreAnimation ( CAnimBlendHierarchy * pInternalAnimHierarchy )
