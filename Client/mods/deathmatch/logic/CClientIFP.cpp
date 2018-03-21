@@ -1172,6 +1172,7 @@ CAnimBlendHierarchySAInterface * CClientIFP::GetAnimationHierarchy ( const SStri
             if (strAnimationName.ToLower() == it->Name.ToLower())
             {
                 pAnimHierarchyInterface = (CAnimBlendHierarchySAInterface *)&it->Hierarchy;
+                break;
             }
         }
         s_iAnimationSearchReferences --;
