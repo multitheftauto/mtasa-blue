@@ -162,7 +162,7 @@ DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse =    0x4BA076;
 #define HOOKPOS_CAnimBlendAssocGroup_CopyAnimation          0x4CE14C  
 #define HOOKPOS_CAnimManager_AddAnimation                   0x4d3aa0
 #define HOOKPOS_CAnimManager_AddAnimationAndSync            0x4D3B30
-#define HOOKPOS_CAnimManager_BlendAnimation_Hierarchy       0x4D4410
+#define HOOKPOS_CAnimManager_BlendAnimation_Hierarchy       0x4D453E
 
 #define HOOKPOS_CPed_GetWeaponSkill                         0x5e3b60
 DWORD RETURN_CPed_GetWeaponSkill =                          0x5E3B68;
@@ -636,12 +636,12 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CGame_Process, (DWORD)HOOK_CGame_Process, 10 );
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10 );
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7 );
-    HookInstall(HOOKPOS_CAnimBlendAssoc_Hierarchy_Constructor, (DWORD)HOOK_CAnimBlendAssoc_Hierarchy_Constructor, 5 ); 
+    //HookInstall(HOOKPOS_CAnimBlendAssoc_Hierarchy_Constructor, (DWORD)HOOK_CAnimBlendAssoc_Hierarchy_Constructor, 5 ); 
     HookInstall(HOOKPOS_CAnimBlendAssoc_destructor, (DWORD)HOOK_CAnimBlendAssoc_destructor, 6 ); 
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10 ); 
     HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10 ); 
     HookInstall(HOOKPOS_CAnimBlendAssocGroup_CopyAnimation, (DWORD)HOOK_CAnimBlendAssocGroup_CopyAnimation, 5 ); 
-    HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 7 );
+    HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5 );
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8 );
     HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
     HookInstall(HOOKPOS_CPhysical_ProcessCollisionSectorList, (DWORD)HOOK_CPhysical_ProcessCollisionSectorList, 7 );

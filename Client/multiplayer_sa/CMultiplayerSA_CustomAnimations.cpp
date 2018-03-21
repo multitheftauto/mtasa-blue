@@ -8,8 +8,11 @@
 typedef std::map < CAnimBlendAssociationSAInterface *, SIFPAnimations * > AnimAssociations_type;
 static AnimAssociations_type mapOfCustomAnimationAssociations;
 
-DWORD FUNC_NEW_OPERATOR = 0x082119A;
-DWORD FUNC_CAnimBlendAssociation_Constructor = 0x04CF080;
+DWORD FUNC_NEW_OPERATOR =                                           0x082119A;
+DWORD FUNC_CAnimBlendAssociation_Constructor =                      0x04CF080;
+DWORD FUNC_CAnimBlendAssociation__ReferenceAnimBlock =              0x4CEA50;
+DWORD FUNC_UncompressAnimation =                                    0x4D41C0;
+DWORD FUNC_CAnimBlendAssociation__CAnimBlendAssociation_hierarchy = 0x4CEFC0;
 
 DWORD RETURN_CAnimBlendAssoc_Hierarchy_Constructor =        0x4CEFC5;
 DWORD RETURN_CAnimBlendAssoc_destructor =                   0x4CECF6;
@@ -18,7 +21,7 @@ DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation =           0x4CE187;
 DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation_ERROR =     0x4CE199;
 DWORD RETURN_CAnimManager_AddAnimation =                    0x4D3AB1;
 DWORD RETURN_CAnimManager_AddAnimationAndSync =             0x4D3B41;
-DWORD RETURN_CAnimManager_BlendAnimation_Hierarchy =        0x4D4417; 
+DWORD RETURN_CAnimManager_BlendAnimation_Hierarchy =        0x4D4577; 
 
 CAnimBlendAssocHierConstructorHandler * m_pCAnimBlendAssocHierConstructorHandler = nullptr;
 CAnimBlendAssocDestructorHandler * m_pCAnimBlendAssocDestructorHandler = nullptr;
@@ -140,33 +143,43 @@ void _declspec(naked) HOOK_CAnimBlendAssoc_Hierarchy_Constructor ()
         _asm
         {
             popad
+            // Here [esp+8] is pAnimHierarchy 
+            push    ebx
             push    edx
             push    ecx
   
             push    ebp   
             mov     ebp, esp
-            sub     esp, 4
-
-            mov     eax, dword ptr [esp+18h] // pAnimHierarchy  [esp+0Ch]
+            sub     esp, 8
+            
+            mov     eax, dword ptr [esp+8+24]
+            mov    [ebp-4], eax
+            lea     eax, [ebp-4]
+            //mov     eax, dword ptr [esp+20h] // pAnimHierarchy  [esp+18h]
             push    eax
-            mov     eax, dword ptr [esp+18h] // pClump          [esp+0Ch]
+            mov     eax, dword ptr [esp+20h] // pClump          [esp+18h]
             push    eax 
             push    ecx                      // this
-            lea     edx, [ebp-4]             
+            lea     edx, [ebp-8]             
             push    edx
             call    m_pCAnimBlendAssocHierConstructorHandler
             add     esp, 10h
             
-            // It's a custom animation, store it in a map
-            mov     edx, [ebp-4]
+            mov     ebx, [ebp-4]
+            mov     edx, [ebp-8]
 
-            add     esp, 4 // remove space for local var
+            add     esp, 8 // remove space for local var
             mov     esp, ebp
             pop     ebp
           
             // Check if it's a custom animation or not
             cmp     eax, 00
             je      NOT_CUSTOM_ANIMATION_CAnimBlendAssoc_Hierarchy_Constructor  
+    
+            // replace animation hierarchy with custom hierarchy
+            mov     [esp+8+12], ebx 
+            // pAnimHierarchy = 8
+            mov     [esp+28h+8h+18h], ebx
 
             push    edx // pIFPAnimations
             mov     ecx, [esp+4]
@@ -177,6 +190,7 @@ void _declspec(naked) HOOK_CAnimBlendAssoc_Hierarchy_Constructor ()
             NOT_CUSTOM_ANIMATION_CAnimBlendAssoc_Hierarchy_Constructor:
             pop     ecx
             pop     edx
+            pop     ebx
             pushad
             jmp     NORMAL_FLOW_CAnimBlendAssoc_Hierarchy_Constructor
         }
@@ -308,7 +322,7 @@ void _declspec(naked) HOOK_CAnimBlendAssocGroup_CopyAnimation ()
             mov     eax, [esp+8] // pAnimAssociation
             
             // Check wether this is a custom animation or not 
-            cmp     eax, 00
+            cmp     al, 00
             je      NOT_CUSTOM_ANIMATION_CopyAnimation  
 
             // It's a custom animation, store it in a map
@@ -452,31 +466,72 @@ void _declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy ()
         _asm
         {        
             popad
-            //mov     edx, [esp+4]  // animationClump
-            mov     eax, [esp+8]  // pAnimHierarchy
-            mov     ecx, [esp+12] // flags
-            mov     edx, [esp+16] // animationBlendDelta
+            push    eax // pAnimAssociation
+            push    ecx // pAnimHierarchy
 
+            push    ebp   
+            mov     ebp, esp
+            sub     esp, 8
+            
             // call our handler function
-            push    edx
-            mov     edx, [esp+8] // animationClump
-            push    ecx
-            push    eax
-            push    edx
+            mov     edx, [ebp+28h+4+12] 
+            push    edx  // pClump
+            lea     edx, [ebp-4]
+            push    edx  //  CAnimBlendHierarchySAInterface ** pOutAnimHierarchy
+            lea     edx, [ebp-8]
+            push    edx  // SIFPAnimations ** pOutIFPAnimations
             call    m_pBlendAnimationHierarchyHandler
-            add     esp, 10h
-            mov    [esp+8], eax // replace pAnimHierarchy
+            add     esp, 0Ch
+ 
+            mov     ecx, [ebp-4] // pCustomAnimHierarchy
+            mov     edx, [ebp-8] // pIFPAnimations
+
+            add     esp, 8 // remove space for local var
+            mov     esp, ebp
+            pop     ebp
+          
+             // Check if it's a custom animation or not
+            cmp     al, 00
+            je      NOT_CUSTOM_ANIMATION_CAnimManager_BlendAnimation_Hierarchy
+            
+            // Replace animation hierarchy with our custom one
+            mov     [esp], ecx 
+            mov     [esp+28h+8+8], ecx
+
+            // It's a custom animation, insert it to map
+            push    edx // pIFPAnimations
+            mov     edx, [esp+8]
+            push    edx // pAnimAssociation
+            call    InsertAnimationAssociationToMap
+            add     esp, 8
+
+            NOT_CUSTOM_ANIMATION_CAnimManager_BlendAnimation_Hierarchy:
+            pop ecx
+            pop eax
             pushad
             jmp NORMAL_FLOW_BlendAnimation_Hierarchy
-        }
+        } 
     }
 
     _asm
     {
         NORMAL_FLOW_BlendAnimation_Hierarchy:
         popad
-        push   0FFFFFFFFh
-        push   04D4410h
+        mov     edx, [esp+28h+4] 
+        push    ecx      // pAnimHierarchy
+        push    edx      // pClump
+        mov     ecx, eax // pAnimAssociation
+        call    FUNC_CAnimBlendAssociation__CAnimBlendAssociation_hierarchy
+        mov     esi, eax
+        mov     ax, word ptr [esp+28h+0Ch] // flags
+        mov     ecx, esi
+        mov     [esp+28h-4], 0FFFFFFFFh // var_4
+        mov     [esp+28h-18h], esi
+        mov     [esi+2Eh], ax
+        call    FUNC_CAnimBlendAssociation__ReferenceAnimBlock
+        mov     ecx, [esp+28h+8] // pAnimHierarchy
+        push    ecx
+        call    FUNC_UncompressAnimation
         jmp    RETURN_CAnimManager_BlendAnimation_Hierarchy
     }
 
