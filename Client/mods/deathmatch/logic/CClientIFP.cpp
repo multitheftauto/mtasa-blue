@@ -16,6 +16,8 @@ h_CAnimBlendHierarchy_CalcTotalTime         OLD__CAnimBlendHierarchy_CalcTotalTi
 extern DWORD BoneIds[];
 extern char BoneNames[][24];
 
+DWORD CClientIFP::s_iAnimationSearchReferences = 0;
+
 CClientIFP::CClientIFP ( class CClientManager* pManager, ElementID ID ) : CClientEntity ( ID )
 {
     // Init
@@ -68,7 +70,7 @@ void CClientIFP::UnloadIFP ( void )
         m_pIFPAnimations->bUnloadOnZeroReferences = true;
         
         // unload IFP animations, if reference count is zero
-        if ( m_pIFPAnimations->iReferences == 0 )
+        if ( ( m_pIFPAnimations->iReferences == 0 ) && ( s_iAnimationSearchReferences == 0 ) )
         { 
             g_pClientGame->UnloadIFPAnimations ( m_pIFPAnimations ); 
 
@@ -1161,17 +1163,20 @@ std::string CClientIFP::getCorrectBoneNameFromName(std::string const& BoneName)
 
 CAnimBlendHierarchySAInterface * CClientIFP::GetAnimationHierarchy ( const SString & strAnimationName )
 {
+    CAnimBlendHierarchySAInterface * pAnimHierarchyInterface = nullptr;
     if ( m_bisIFPLoaded )
     { 
+        s_iAnimationSearchReferences ++;
         for (auto it = m_pVecAnimations->begin(); it != m_pVecAnimations->end(); ++it) 
         {
             if (strAnimationName.ToLower() == it->Name.ToLower())
             {
-                return (CAnimBlendHierarchySAInterface *)&it->Hierarchy;
+                pAnimHierarchyInterface = (CAnimBlendHierarchySAInterface *)&it->Hierarchy;
             }
         }
+        s_iAnimationSearchReferences --;
     }
-    return nullptr;
+    return pAnimHierarchyInterface;
 }
 
 // ----------------------------------------------------------------------------------------------------------
