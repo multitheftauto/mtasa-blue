@@ -259,7 +259,7 @@ void CEffectTemplateImpl::CreateUnderlyingData(const SString& strFilename, const
     macroList.back().Definition = NULL;
 
     // Compile effect
-    DWORD dwFlags = 0;            // D3DXSHADER_PARTIALPRECISION, D3DXSHADER_DEBUG, D3DXFX_NOT_CLONEABLE;
+    DWORD dwFlags = D3DXFX_LARGEADDRESSAWARE;            // D3DXSHADER_PARTIALPRECISION, D3DXSHADER_DEBUG, D3DXFX_NOT_CLONEABLE;
     if (bDebug)
         dwFlags |= D3DXSHADER_DEBUG;
 
