@@ -1,4 +1,6 @@
 #include <StdInc.h>
+#include "../game_sa/CAnimBlendSequenceSA.h"
+//#include "../game_sa//CAnimManagerSA.h"
 
 h_CAnimBlendHierarchy_SetName OLD__CAnimBlendHierarchy_SetName = (h_CAnimBlendHierarchy_SetName)0x4CF2D0;
 hCAnimBlendHierarchy_RemoveAnimSequences OLD_CAnimBlendHierarchy_RemoveAnimSequences = (hCAnimBlendHierarchy_RemoveAnimSequences)0x4CF8E0;
@@ -125,6 +127,8 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
     m_pVecAnimations->resize ( HeaderV2.TotalAnimations );
     for (size_t i = 0; i < m_pVecAnimations->size(); i++)
     {
+        CAnimManager * pAnimManager = g_pGame->GetAnimManager ( ); 
+
         IFP_Animation & ifpAnimation = m_pVecAnimations->at ( i );
 
         _CAnimBlendHierarchy * pAnimHierarchy = &ifpAnimation.Hierarchy;
@@ -197,32 +201,20 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
             memset (ObjectNode.Name, 0, sizeof(Object::Name));
             strncpy (ObjectNode.Name, CorrectBoneName.c_str(), CorrectBoneName.size() +1);
 
-            _CAnimBlendSequence Sequence;
-            _CAnimBlendSequence * pUnkownSequence = nullptr;
+            
+            CAnimBlendSequenceSAInterface AnimationSequence;
+            CAnimBlendSequenceSAInterface * pAnimationSequenceInterface = &AnimationSequence;
             if (bUnknownSequence)
             {
-             
                 size_t UnkownSequenceIndex     = IFP_TOTAL_SEQUENCES + TotalUnknownSequences;
-                pUnkownSequence = (_CAnimBlendSequence*)((BYTE*)pAnimHierarchy->m_pSequences + (sizeof(_CAnimBlendSequence) * UnkownSequenceIndex));
-                
-                //ofs << "Initializing unknown sequence: UnkownSequenceIndex: " << UnkownSequenceIndex << std::endl;
-
-                _CAnimBlendSequence_Constructor ( pUnkownSequence );
-
-                OLD__CAnimBlendSequence_SetName ( pUnkownSequence, ObjectNode.Name);
-
-                OLD__CAnimBlendSequence_SetBoneTag ( pUnkownSequence, ObjectNode.BoneID);
-
+                pAnimationSequenceInterface = ( CAnimBlendSequenceSAInterface *)((BYTE*)pAnimHierarchy->m_pSequences + (sizeof(_CAnimBlendSequence) * UnkownSequenceIndex));
                 TotalUnknownSequences ++;
             }
-            else
-            { 
-                _CAnimBlendSequence_Constructor(&Sequence);
 
-                OLD__CAnimBlendSequence_SetName(&Sequence, ObjectNode.Name);
-
-                OLD__CAnimBlendSequence_SetBoneTag(&Sequence, ObjectNode.BoneID);
-            }
+            std::unique_ptr < CAnimBlendSequence > pAnimationSequence = pAnimManager->GetAnimBlendSequence ( pAnimationSequenceInterface );
+            pAnimationSequence->Initialize ( );
+            pAnimationSequence->SetName ( ObjectNode.Name );
+            pAnimationSequence->SetBoneTag ( ObjectNode.BoneID );
 
             if (bFirstSeq)
             {
@@ -264,20 +256,14 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
             {
                 unsigned char * pKeyFrames = (unsigned char*) OLD_CMemoryMgr_Malloc ( data_size ); 
                 
-                if ( bUnknownSequence )
-                { 
-                    OLD__CAnimBlendSequence_SetNumFrames ( pUnkownSequence, ObjectNode.TotalFrames, bIsRoot, bIsCompressed, pKeyFrames );
-                }
-                else
-                {
-                    OLD__CAnimBlendSequence_SetNumFrames ( &Sequence, ObjectNode.TotalFrames, bIsRoot, bIsCompressed, pKeyFrames );
-                }
+                pAnimationSequence->SetKeyFrames ( ObjectNode.TotalFrames, bIsRoot, bIsCompressed, pKeyFrames );
 
                 readBytes ( pKeyFrames, data_size );
 
                 if ( !bUnknownSequence )
                 { 
-                    MapOfSequences [ CorrectBoneName ] = Sequence;
+                    _CAnimBlendSequence * pAnimSequenceInterface = (_CAnimBlendSequence*)pAnimationSequence->GetInterface();
+                    MapOfSequences [ CorrectBoneName ] = (_CAnimBlendSequence)*pAnimSequenceInterface;
                 }
             }
         }
@@ -320,7 +306,7 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
 
 void CClientIFP::ReadIFPVersion1 (  )
 { 
-    uint32_t OffsetEOF;
+    /*uint32_t OffsetEOF;
 
     readBuffer < uint32_t > ( &OffsetEOF );
     ROUNDSIZE (OffsetEOF);
@@ -530,7 +516,7 @@ void CClientIFP::ReadIFPVersion1 (  )
 
             Call__CAnimBlendHierarchy_CalcTotalTime(pAnimHierarchy);
         }  
-    } 
+    }*/
 }
 
 
