@@ -760,7 +760,12 @@ CAnimBlendHierarchy * CAnimManagerSA::GetAnimBlendHierarchy ( CAnimBlendHierarch
     }
     return NULL;
 }
- 
+
+std::unique_ptr < CAnimBlendSequence > CAnimManagerSA::GetAnimBlendSequence ( CAnimBlendSequenceSAInterface * pInterface )
+{
+    return std::make_unique < CAnimBlendSequenceSA > ( pInterface );
+}
+
 bool CAnimManagerSA::isGateWayAnimationHierarchy ( CAnimBlendHierarchySAInterface * pInterface )
 {
     return pGame->GetKeyGen()->GetUppercaseKey ( m_kGateWayAnimationName.c_str ( ) ) == pInterface->iHashKey;

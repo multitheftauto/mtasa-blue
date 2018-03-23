@@ -149,7 +149,10 @@ public:
     CAnimBlendAssocGroup *      GetAnimBlendAssocGroup                  ( CAnimBlendAssocGroupSAInterface * pInterface );
     CAnimBlock *                GetAnimBlock                            ( CAnimBlockSAInterface * pInterface );
     CAnimBlendHierarchy *       GetAnimBlendHierarchy                   ( CAnimBlendHierarchySAInterface * pInterface );
-    
+
+    // MTA members, but use this strictly for custom animations only
+    std::unique_ptr < CAnimBlendSequence > GetAnimBlendSequence         ( CAnimBlendSequenceSAInterface * pInterface );
+
     bool                        isGateWayAnimationHierarchy             ( CAnimBlendHierarchySAInterface * pInterface );
     const SString &             GetGateWayBlockName                     ( void );
     const SString &             GetGateWayAnimationName                 ( void );
