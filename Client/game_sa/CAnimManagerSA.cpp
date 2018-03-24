@@ -761,7 +761,12 @@ CAnimBlendHierarchy * CAnimManagerSA::GetAnimBlendHierarchy ( CAnimBlendHierarch
     return NULL;
 }
 
-std::unique_ptr < CAnimBlendSequence > CAnimManagerSA::GetAnimBlendSequence ( CAnimBlendSequenceSAInterface * pInterface )
+std::unique_ptr < CAnimBlendHierarchy > CAnimManagerSA::GetCustomAnimBlendHierarchy ( CAnimBlendHierarchySAInterface * pInterface )
+{
+    return std::make_unique < CAnimBlendHierarchySA > ( pInterface );
+}
+
+std::unique_ptr < CAnimBlendSequence > CAnimManagerSA::GetCustomAnimBlendSequence ( CAnimBlendSequenceSAInterface * pInterface )
 {
     return std::make_unique < CAnimBlendSequenceSA > ( pInterface );
 }
