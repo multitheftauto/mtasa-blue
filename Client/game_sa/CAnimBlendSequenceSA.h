@@ -36,7 +36,6 @@ class CAnimBlendSequenceSA : public CAnimBlendSequence
 {
 public:
                                             CAnimBlendSequenceSA   ( CAnimBlendSequenceSAInterface * pInterface ) { m_pInterface = pInterface; }
-                                            ~CAnimBlendSequenceSA  ( void ) { }
     void                                    Initialize             ( void );
     void                                    SetName                ( const char * szName );
     void                                    SetBoneTag             ( int32_t i32BoneID );
