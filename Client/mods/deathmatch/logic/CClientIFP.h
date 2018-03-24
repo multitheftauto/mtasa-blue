@@ -31,7 +31,7 @@ public:
     void                            ReadKrt0FramesAsCompressed (  BYTE * pKeyFrames, int32_t TotalFrames );
     void                            ReadKr00FramesAsCompressed (  BYTE * pKeyFrames, int32_t TotalFrames );
 
-    void                            insertAnimDummySequence ( _CAnimBlendHierarchy * pAnimHierarchy, size_t SequenceIndex);
+    void                            InsertAnimationDummySequence ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, std::string & BoneName, DWORD & BoneID );
     int32_t                         getBoneIDFromName(std::string const& BoneName);
     std::string                     getCorrectBoneNameFromName(std::string const& BoneName);
     std::string                     getCorrectBoneNameFromID(int32_t & BoneID);
