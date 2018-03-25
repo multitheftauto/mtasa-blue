@@ -4090,7 +4090,7 @@ bool CClientGame::BlendAnimationHierarchyHandler (  SIFPAnimations ** pOutIFPAni
         if ( pClientPed->isNextAnimationCustom () )
         { 
             const SString & strBlockName = pClientPed->GetNextAnimationCustomBlockName ( );
-            CClientIFP * pIFP = GetIFPPointerFromMap ( strBlockName );
+            std::shared_ptr < CClientIFP > pIFP = GetIFPPointerFromMap ( strBlockName );
             if ( pIFP )
             { 
                 const SString & strAnimationName = pClientPed->GetNextAnimationCustomName ( );
@@ -6859,7 +6859,7 @@ void CClientGame::RestreamModel ( unsigned short usModel )
 
 }
 
-void CClientGame::InsertIFPPointerToMap ( const SString & strBlockName, CClientIFP * pIFP )
+void CClientGame::InsertIFPPointerToMap ( const SString & strBlockName, const std::shared_ptr < CClientIFP > & pIFP )
 {
     const SString mapKey = strBlockName.ToLower ( );
     if ( m_mapOfIfpPointers.count ( mapKey ) == 0 )
@@ -6873,16 +6873,17 @@ void CClientGame::RemoveIFPPointerFromMap ( const SString & strBlockName )
     m_mapOfIfpPointers.erase ( strBlockName.ToLower ( ) );
 }
 
-CClientIFP * CClientGame::GetIFPPointerFromMap ( const SString & strBlockName )
+std::shared_ptr < CClientIFP > CClientGame::GetIFPPointerFromMap ( const SString & strBlockName )
 {
     const SString mapKey = strBlockName.ToLower ( );
-    std::map < SString, CClientIFP * >::iterator it = m_mapOfIfpPointers.find ( mapKey );
+    auto it = m_mapOfIfpPointers.find ( mapKey );
     if ( it != m_mapOfIfpPointers.end ( ) )
     {
         return it->second;
     }
     return nullptr;
 }
+
 
 void CClientGame::InsertPedPointerToMap ( CClientPed * pPed )
 {
@@ -6917,7 +6918,7 @@ CClientPed * CClientGame::GetClientPedByClump ( const RpClump & Clump )
     return nullptr;
 }
 
-void CClientGame::OnClientIFPUnload ( const CClientIFP & IFP )
+void CClientGame::OnClientIFPUnload ( const std::shared_ptr < CClientIFP > & IFP )
 {   
     // remove IFP animations from replaced animations of peds/players
     for ( auto it = m_mapOfPedPointers.begin(); it != m_mapOfPedPointers.end(); it++ )

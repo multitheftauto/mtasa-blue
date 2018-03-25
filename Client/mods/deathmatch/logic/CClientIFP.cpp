@@ -59,12 +59,6 @@ void CClientIFP::UnloadIFP ( void )
 
         m_bisIFPLoaded = false;
 
-        // Remove IFP from map, so we can indicate that it does not exist
-        g_pClientGame->RemoveIFPPointerFromMap ( m_strBlockName );
-
-        // Remove IFP animations from replaced animations of peds/players
-        g_pClientGame->OnClientIFPUnload ( *this );
-
         // When all animations from this IFP block stop playing, and 
         // the reference count reaches zero, IFP animations will be unloaded
         m_pIFPAnimations->bUnloadOnZeroReferences = true;

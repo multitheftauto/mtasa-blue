@@ -6191,12 +6191,12 @@ CAnimBlendAssociation * CClientPed::GetFirstAnimation ( void )
     return NULL;
 }
 
-bool CClientPed::ReplaceAnimation ( CAnimBlendHierarchy * pInternalAnimHierarchy, CClientIFP * pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy )
+bool CClientPed::ReplaceAnimation ( CAnimBlendHierarchy * pInternalAnimHierarchy, const std::shared_ptr < CClientIFP > & pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy )
 {
     if ( pIFP->isIFPLoaded ( ) )
     {
         SReplacedAnimation replacedAnimation;
-        replacedAnimation.pIFP =  pIFP;
+        replacedAnimation.pIFP = pIFP;
         replacedAnimation.pAnimationHierarchy = pCustomAnimHierarchy;
 
         m_mapOfReplacedAnimations [ pInternalAnimHierarchy->GetInterface () ] = replacedAnimation;
@@ -6210,12 +6210,11 @@ void CClientPed::RestoreAnimation ( CAnimBlendHierarchy * pInternalAnimHierarchy
     m_mapOfReplacedAnimations.erase ( pInternalAnimHierarchy->GetInterface () );
 }
 
-void CClientPed::RestoreAnimations ( const CClientIFP & IFP )
+void CClientPed::RestoreAnimations ( const std::shared_ptr < CClientIFP > & IFP )
 {
     for ( auto const& x : m_mapOfReplacedAnimations )
     {
-        const CClientIFP & replacedAnimationIFP = *x.second.pIFP;
-        if ( std::addressof ( IFP ) == std::addressof ( replacedAnimationIFP ) )
+        if ( std::addressof ( *IFP.get ( ) ) == std::addressof ( *x.second.pIFP.get ( ) ) )
         {
              m_mapOfReplacedAnimations.erase ( x.first );
         }

@@ -312,7 +312,7 @@ int CLuaEngineDefs::EngineLoadIFP ( lua_State* luaVM )
                     if ( g_pClientGame->GetIFPPointerFromMap ( strBlockName ) == nullptr )
                     { 
                         // Create a IFP element
-                        CClientIFP* pIFP = new CClientIFP ( m_pManager, INVALID_ELEMENT_ID );
+                        std::shared_ptr < CClientIFP > pIFP ( new CClientIFP ( m_pManager, INVALID_ELEMENT_ID ) );
 
                         // Try to load the IFP file
                         if ( pIFP->LoadIFP ( strPath, strBlockName ) )
@@ -324,13 +324,13 @@ int CLuaEngineDefs::EngineLoadIFP ( lua_State* luaVM )
                             pIFP->SetParent ( pRoot );
 
                             // Return the IFP element
-                            lua_pushelement ( luaVM, pIFP );
+                            lua_pushelement ( luaVM, pIFP.get ( ) );
                             return 1;
                          }
                         else
                         {
                             // Delete it again
-                            delete pIFP;
+                            //delete pIFP;
                             argStream.SetCustomError ( strFile, "Error loading IFP" );
                         }
                     }
@@ -531,7 +531,7 @@ int CLuaEngineDefs::EngineReplaceAnimation ( lua_State* luaVM )
             CClientPed& Ped = static_cast < CClientPed& > ( *pEntity );
 
             CAnimBlock * pInternalBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( strInternalBlockName );
-            CClientIFP * pCustomIFP = g_pClientGame->GetIFPPointerFromMap ( strCustomBlockName );
+            std::shared_ptr < CClientIFP > pCustomIFP = g_pClientGame->GetIFPPointerFromMap ( strCustomBlockName );
             if ( pInternalBlock && pCustomIFP )
             {
                 CAnimBlendHierarchy * pInternalAnimHierarchy = g_pGame->GetAnimManager ()->GetAnimation ( strInternalAnimName, pInternalBlock );

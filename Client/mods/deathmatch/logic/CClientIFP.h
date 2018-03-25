@@ -15,6 +15,7 @@ public:
 
     virtual eClientEntityType       GetType                 ( void ) const              { return CCLIENTIFP; }
 
+    const SString &                 GetBlockName            ( void ) { return m_strBlockName; }
     bool                            isIFPLoaded             ( void ) { return m_bisIFPLoaded; }
     bool                            LoadIFP                 ( const char* szFilePath, SString strBlockName );
     void                            UnloadIFP               ( void );

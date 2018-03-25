@@ -122,7 +122,7 @@ class CClientIFP;
 
 struct SReplacedAnimation
 {
-    CClientIFP *                     pIFP;
+    std::shared_ptr < CClientIFP >   pIFP;
     CAnimBlendHierarchySAInterface * pAnimationHierarchy;
 };
 
@@ -478,9 +478,9 @@ public:
     inline const SString  &     GetNextAnimationCustomBlockName ( void ) { return m_strCustomIFPBlockName; }
     inline const SString  &     GetNextAnimationCustomName      ( void ) { return m_strCustomIFPAnimationName; }
 
-    bool                        ReplaceAnimation        ( CAnimBlendHierarchy * pInternalAnimHierarchy, CClientIFP * pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy );
+    bool                        ReplaceAnimation        ( CAnimBlendHierarchy * pInternalAnimHierarchy, const std::shared_ptr < CClientIFP > & pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy );
     void                        RestoreAnimation        ( CAnimBlendHierarchy * pInternalAnimHierarchy );
-    void                        RestoreAnimations       ( const CClientIFP & IFP );
+    void                        RestoreAnimations       ( const std::shared_ptr < CClientIFP > & IFP );
     void                        RestoreAnimations       ( CAnimBlock & animationBlock );
     void                        RestoreAllAnimations    ( void );
     SReplacedAnimation *        getReplacedAnimation    ( CAnimBlendHierarchySAInterface * pInternalHierarchyInterface );

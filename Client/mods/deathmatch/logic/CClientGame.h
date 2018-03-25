@@ -592,15 +592,15 @@ public:
     void                                      SetFileCacheRoot                ( void );
     const char*                               GetFileCacheRoot                ( void )                                    { return m_strFileCacheRoot; }
 
-    void                                      InsertIFPPointerToMap           ( const SString & strBlockName, CClientIFP * pIFP );
+    void                                      InsertIFPPointerToMap           ( const SString & strBlockName, const std::shared_ptr < CClientIFP > & pIFP );
     void                                      RemoveIFPPointerFromMap         ( const SString & strBlockName );
-    CClientIFP *                              GetIFPPointerFromMap            ( const SString & strBlockName );
+    std::shared_ptr < CClientIFP >            GetIFPPointerFromMap            ( const SString & strBlockName );
 
     void                                      InsertPedPointerToMap           ( CClientPed * pPed );
     void                                      RemovePedPointerFromMap         ( CClientPed * pPed );
     CClientPed *                              GetClientPedByClump             ( const RpClump & Clump );
 
-    void                                      OnClientIFPUnload               ( const CClientIFP & IFP );
+    void                                      OnClientIFPUnload               ( const std::shared_ptr < CClientIFP > & IFP );
     void                                      DeleteIFPAnimations             ( SIFPAnimations * pIFPAnimations );
 
 private:
@@ -817,7 +817,7 @@ private:
     SharedUtil::CAsyncTaskScheduler*          m_pAsyncTaskScheduler;
 
     // (SString) Key is custom block name that is supplied to engineLoadIFP
-    std::map < SString, CClientIFP * >        m_mapOfIfpPointers; 
+    std::map < SString, std::shared_ptr < CClientIFP > > m_mapOfIfpPointers; 
 
     std::map < CClientPed *, bool >           m_mapOfPedPointers;
 };
