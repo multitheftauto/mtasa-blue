@@ -22,9 +22,9 @@ void CIFPAnimations::DeleteAnimations ( void )
         
         OLD_CAnimBlendHierarchy_RemoveFromUncompressedCache ( (int)&ifpAnimation->Hierarchy );
             
-        for (unsigned short SequenceIndex = 0; SequenceIndex < ifpAnimation->Hierarchy.m_nSeqCount; SequenceIndex++)
+        for (unsigned short SequenceIndex = 0; SequenceIndex < ifpAnimation->Hierarchy.usNumSequences; SequenceIndex++)
         {
-            _CAnimBlendSequence * pSequence = (_CAnimBlendSequence*)((BYTE*)ifpAnimation->Hierarchy.m_pSequences + (sizeof(_CAnimBlendSequence) * SequenceIndex));
+            _CAnimBlendSequence * pSequence = (_CAnimBlendSequence*)((BYTE*)ifpAnimation->Hierarchy.pSequences + (sizeof(_CAnimBlendSequence) * SequenceIndex));
 
             if ( !( (pSequence->m_nFlags >> 3) & 1 ) ) // If ( !OneBigChunkForAllSequences )
             {

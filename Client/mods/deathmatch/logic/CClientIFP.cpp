@@ -122,14 +122,14 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
         pAnimationHierarchy->SetNumSequences ( AnimationNode.TotalObjects );
         pAnimationHierarchy->SetAnimationBlockID ( 0 ); 
 
-        const unsigned short   TotalSequences = IFP_TOTAL_SEQUENCES + pAnimationHierarchy->GetNumSequences ( );
+        const unsigned short TotalSequences = cIFPSequences + pAnimationHierarchy->GetNumSequences ( );
         ifpAnimation.pSequencesMemory  = ( char * ) operator new ( 12 * TotalSequences + 4 ); //  Allocate memory for sequences ( 12 * seq_count + 4 )
         
         pAnimationHierarchy->SetSequences ( reinterpret_cast < CAnimBlendSequenceSAInterface * > ( ifpAnimation.pSequencesMemory + 4 ) );
  
-        std::map < std::string, _CAnimBlendSequence > MapOfSequences;
+        std::map < std::string, CAnimBlendSequenceSAInterface > MapOfSequences;
         
-        unsigned short TotalUnknownSequences = 0;
+        WORD wUnknownSequences = 0;
 
         bool bFirstSeq = true;
         for (size_t SequenceIndex = 0; SequenceIndex  < pAnimationHierarchy->GetNumSequences ( ); SequenceIndex++)
@@ -138,40 +138,18 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
 
             readBuffer < Object >(&ObjectNode);
             
-            std::string BoneName        = convertStringToMapKey (ObjectNode.Name);
-            std::string CorrectBoneName;
-            
-            bool bUnknownSequence = false;
-            if (ObjectNode.BoneID == -1)
-            {
-                ObjectNode.BoneID = getBoneIDFromName(BoneName);
-                if (ObjectNode.BoneID == -1)
-                {
-                    bUnknownSequence = true;
-                }
+            std::string strCorrectBoneName;
+            ParseSequenceObject ( ObjectNode, strCorrectBoneName );
 
-                CorrectBoneName = getCorrectBoneNameFromName(BoneName);
-            }
-            else
-            {
-                CorrectBoneName = getCorrectBoneNameFromID(ObjectNode.BoneID);
-                if (CorrectBoneName == "Unknown")
-                {
-                    CorrectBoneName = getCorrectBoneNameFromName(BoneName);
-                }
-            }
-
-            memset (ObjectNode.Name, 0, sizeof(Object::Name));
-            strncpy (ObjectNode.Name, CorrectBoneName.c_str(), CorrectBoneName.size() +1);
-
-            
             CAnimBlendSequenceSAInterface AnimationSequence;
             CAnimBlendSequenceSAInterface * pAnimationSequenceInterface = &AnimationSequence;
+
+            bool bUnknownSequence = ObjectNode.BoneID == -1;
             if (bUnknownSequence)
             {
-                size_t UnkownSequenceIndex  = IFP_TOTAL_SEQUENCES + TotalUnknownSequences;
+                size_t UnkownSequenceIndex  = cIFPSequences + wUnknownSequences;
                 pAnimationSequenceInterface = pAnimationHierarchy->GetSequence ( UnkownSequenceIndex );
-                TotalUnknownSequences ++;
+                wUnknownSequences ++;
             }
 
             std::unique_ptr < CAnimBlendSequence > pAnimationSequence = pAnimManager->GetCustomAnimBlendSequence ( pAnimationSequenceInterface );
@@ -225,36 +203,17 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
 
                 if ( !bUnknownSequence )
                 { 
-                    _CAnimBlendSequence * pAnimSequenceInterface = (_CAnimBlendSequence*)pAnimationSequence->GetInterface();
-                    MapOfSequences [ CorrectBoneName ] = (_CAnimBlendSequence)*pAnimSequenceInterface;
+                    MapOfSequences [ strCorrectBoneName ] = *pAnimationSequence->GetInterface();
                 }
             }
         }
         
-        std::map < std::string, _CAnimBlendSequence >::iterator it;
-        for (size_t SequenceIndex = 0; SequenceIndex < IFP_TOTAL_SEQUENCES; SequenceIndex++)
-        {
-            std::string BoneName = BoneNames[SequenceIndex];
-            DWORD        BoneID = BoneIds[SequenceIndex];
-            
-            CAnimBlendSequenceSAInterface * pAnimationSequenceInterface = pAnimationHierarchy->GetSequence ( SequenceIndex );
+        CopySequencesWithDummies ( pAnimManager, pAnimationHierarchy, MapOfSequences );
 
-            it = MapOfSequences.find(BoneName);
-            if (it != MapOfSequences.end())
-            {
-                memcpy ( pAnimationSequenceInterface, &it->second, sizeof ( CAnimBlendSequenceSAInterface ) );
-            }
-            else
-            {
-                std::unique_ptr < CAnimBlendSequence > pAnimationSequence = pAnimManager->GetCustomAnimBlendSequence ( pAnimationSequenceInterface );
-                InsertAnimationDummySequence ( pAnimationSequence, BoneName, BoneID );
-            }
-        }
-        
-        *(DWORD *)ifpAnimation.pSequencesMemory = IFP_TOTAL_SEQUENCES + TotalUnknownSequences;
+        *(DWORD *)ifpAnimation.pSequencesMemory = cIFPSequences + wUnknownSequences;
 
         // This order is very important. As we need support for all 32 bones, we must change the total sequences count
-        pAnimationHierarchy->SetNumSequences ( IFP_TOTAL_SEQUENCES + TotalUnknownSequences );
+        pAnimationHierarchy->SetNumSequences ( cIFPSequences + wUnknownSequences );
 
         if ( !pAnimationHierarchy->isRunningCompressed ( ) )
         {
@@ -265,16 +224,39 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
     }
 }
 
+void CClientIFP::CopySequencesWithDummies ( CAnimManager * pAnimManager, std::unique_ptr < CAnimBlendHierarchy > & pAnimationHierarchy, std::map < std::string, CAnimBlendSequenceSAInterface > & mapOfSequences )
+{
+    std::map < std::string, CAnimBlendSequenceSAInterface >::iterator it;
+    for (size_t SequenceIndex = 0; SequenceIndex < cIFPSequences; SequenceIndex++)
+    {
+        std::string BoneName = BoneNames[SequenceIndex];
+        DWORD        BoneID = BoneIds[SequenceIndex];
+            
+        CAnimBlendSequenceSAInterface * pAnimationSequenceInterface = pAnimationHierarchy->GetSequence ( SequenceIndex );
+
+        it = mapOfSequences.find(BoneName);
+        if (it != mapOfSequences.end())
+        {
+            memcpy ( pAnimationSequenceInterface, &it->second, sizeof ( CAnimBlendSequenceSAInterface ) );
+        }
+        else
+        {
+            std::unique_ptr < CAnimBlendSequence > pAnimationSequence = pAnimManager->GetCustomAnimBlendSequence ( pAnimationSequenceInterface );
+            InsertAnimationDummySequence ( pAnimationSequence, BoneName, BoneID );
+        }
+    }
+}
+
 void CClientIFP::ReadIFPVersion1 (  )
 { 
     /*uint32_t OffsetEOF;
 
     readBuffer < uint32_t > ( &OffsetEOF );
-    ROUNDSIZE (OffsetEOF);
+    RoundSize (OffsetEOF);
 
     IFP_INFO Info;
     readBytes ( &Info, sizeof ( IFP_BASE ) );
-    ROUNDSIZE (Info.Base.Size);
+    RoundSize (Info.Base.Size);
 
     readBytes(&Info.Entries, Info.Base.Size);
 
@@ -291,7 +273,7 @@ void CClientIFP::ReadIFPVersion1 (  )
 
         IFP_NAME Name;
         readBuffer < IFP_NAME > ( &Name );
-        ROUNDSIZE ( Name.Base.Size );
+        RoundSize ( Name.Base.Size );
 
         char AnimationName [ 24 ];
         readCString (AnimationName, Name.Base.Size);
@@ -309,8 +291,8 @@ void CClientIFP::ReadIFPVersion1 (  )
 
         IFP_DGAN Dgan;
         readBytes ( &Dgan, sizeof ( IFP_BASE ) * 2 );
-        ROUNDSIZE ( Dgan.Base.Size );
-        ROUNDSIZE ( Dgan.Info.Base.Size );
+        RoundSize ( Dgan.Base.Size );
+        RoundSize ( Dgan.Info.Base.Size );
 
         //ofs << "going to read Dgan.Info.Entries  |  Dgan.Info.Base.Size : " << Dgan.Info.Base.Size << std::endl;
 
@@ -322,23 +304,23 @@ void CClientIFP::ReadIFPVersion1 (  )
         pAnimHierarchy->m_nAnimBlockId = 0;
         pAnimHierarchy->field_B = 0;
 
-        const unsigned short   TotalSequences = IFP_TOTAL_SEQUENCES + pAnimHierarchy->m_nSeqCount;
+        const unsigned short   TotalSequences = cIFPSequences + pAnimHierarchy->m_nSeqCount;
         ifpAnimation.pSequencesMemory  = ( char * ) operator new ( 12 * TotalSequences + 4 ); //  Allocate memory for sequences ( 12 * seq_count + 4 )
 
         pAnimHierarchy->m_pSequences          = ( _CAnimBlendSequence * )( ifpAnimation.pSequencesMemory+ 4 );
  
         std::map < std::string, _CAnimBlendSequence > MapOfSequences;
         
-        unsigned short TotalUnknownSequences = 0;
+        unsigned short wUnknownSequences = 0;
         for (size_t SequenceIndex = 0; SequenceIndex < pAnimHierarchy->m_nSeqCount; SequenceIndex++)
         {
             IFP_CPAN Cpan;
             readBuffer < IFP_CPAN > ( &Cpan );
-            ROUNDSIZE ( Cpan.Base.Size );
+            RoundSize ( Cpan.Base.Size );
 
             IFP_ANIM Anim;
             readBytes ( &Anim, sizeof ( IFP_BASE ) );
-            ROUNDSIZE ( Anim.Base.Size );
+            RoundSize ( Anim.Base.Size );
             
             readBytes ( &Anim.Name, Anim.Base.Size );
 
@@ -381,7 +363,7 @@ void CClientIFP::ReadIFPVersion1 (  )
             _CAnimBlendSequence * pUnkownSequence = nullptr;
             if (bUnknownSequence)
             {
-                size_t UnkownSequenceIndex     = IFP_TOTAL_SEQUENCES + TotalUnknownSequences;
+                size_t UnkownSequenceIndex     = cIFPSequences + wUnknownSequences;
                 pUnkownSequence = (_CAnimBlendSequence*)((BYTE*)pAnimHierarchy->m_pSequences + (sizeof(_CAnimBlendSequence) * UnkownSequenceIndex));
                 
                 _CAnimBlendSequence_Constructor ( pUnkownSequence );
@@ -390,7 +372,7 @@ void CClientIFP::ReadIFPVersion1 (  )
 
                 OLD__CAnimBlendSequence_SetBoneTag ( pUnkownSequence, BoneID );
 
-                TotalUnknownSequences ++;
+                wUnknownSequences ++;
             }
             else
             {
@@ -444,7 +426,7 @@ void CClientIFP::ReadIFPVersion1 (  )
         }
         
         std::map < std::string, _CAnimBlendSequence >::iterator it;
-        for (size_t SequenceIndex = 0; SequenceIndex < IFP_TOTAL_SEQUENCES; SequenceIndex++)
+        for (size_t SequenceIndex = 0; SequenceIndex < cIFPSequences; SequenceIndex++)
         {
             std::string BoneName = BoneNames[SequenceIndex];
             DWORD        BoneID = BoneIds[SequenceIndex];
@@ -464,10 +446,10 @@ void CClientIFP::ReadIFPVersion1 (  )
             }
         }
     
-        *(DWORD *)ifpAnimation.pSequencesMemory = IFP_TOTAL_SEQUENCES + TotalUnknownSequences;
+        *(DWORD *)ifpAnimation.pSequencesMemory = cIFPSequences + wUnknownSequences;
 
         // This order is very important. As we need support for all 32 bones, we must change the total sequences count
-        pAnimHierarchy->m_nSeqCount = IFP_TOTAL_SEQUENCES + TotalUnknownSequences;
+        pAnimHierarchy->m_nSeqCount = cIFPSequences + wUnknownSequences;
 
         //ofs << std::endl << std::endl;
 
@@ -572,7 +554,7 @@ std::string CClientIFP::convertStringToMapKey (char * String)
     return ConvertedString;
 }
 
-IFP_FrameType CClientIFP::getFrameTypeFromFourCC ( char * FourCC )
+CClientIFP::IFP_FrameType CClientIFP::getFrameTypeFromFourCC ( char * FourCC )
 {
     if (strncmp(FourCC, "KRTS", 4) == 0)
     {
@@ -1085,6 +1067,35 @@ std::string CClientIFP::getCorrectBoneNameFromName(std::string const& BoneName)
     //ofs <<"ERROR: getCorrectBoneNameFromName: correct bone name could not be found for (BoneName):" << BoneName << std::endl;
 
     return BoneName;
+}
+
+constexpr void CClientIFP::RoundSize ( uint32_t & u32Size ) 
+{ 
+    if( u32Size & 3 ) 
+    { 
+        u32Size += 4 - ( u32Size & 3 ); 
+    }
+}
+
+void CClientIFP::ParseSequenceObject ( Object & ObjectNode, std::string & CorrectBoneName )
+{
+    std::string BoneName = convertStringToMapKey ( ObjectNode.Name );
+
+    if (ObjectNode.BoneID == -1)
+    {
+        ObjectNode.BoneID = getBoneIDFromName ( BoneName );
+        CorrectBoneName = getCorrectBoneNameFromName ( BoneName );
+    }
+    else
+    {
+        CorrectBoneName = getCorrectBoneNameFromID ( ObjectNode.BoneID );
+        if ( CorrectBoneName == "Unknown" )
+        {
+            CorrectBoneName = getCorrectBoneNameFromName ( BoneName );
+        }
+    }
+
+    strncpy ( ObjectNode.Name, CorrectBoneName.c_str(), CorrectBoneName.size() +1 );
 }
 
 CAnimBlendHierarchySAInterface * CClientIFP::GetAnimationHierarchy ( const SString & strAnimationName )
