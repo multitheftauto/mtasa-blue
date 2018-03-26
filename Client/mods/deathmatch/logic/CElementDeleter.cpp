@@ -81,11 +81,6 @@ void CElementDeleter::DeleteRecursive ( class CClientEntity* pElement )
 // because element has been deleted
 bool CElementDeleter::DeleteElementSpecial ( CClientEntity* pElement )
 {
-    // Mark us as being deleted, unlink from parent and unlink from manager classes eventually
-    pElement->SetBeingDeleted ( true );
-    pElement->SetParent ( NULL );
-    pElement->Unlink ();
-
     if ( IS_IFP ( pElement ) )
     {
         DeleteIFP  ( pElement );
