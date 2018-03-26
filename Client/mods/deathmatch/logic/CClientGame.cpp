@@ -3714,14 +3714,14 @@ CAnimBlendAssociationSAInterface * CClientGame::StaticAddAnimationAndSyncHandler
     return g_pClientGame->AddAnimationAndSyncHandler ( pClump, pAnimAssocToSyncWith, animGroup, animID );
 }
 
-bool CClientGame::StaticAssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, SIFPAnimations ** pOutIFPAnimations, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID )
+bool CClientGame::StaticAssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, CAnimBlendAssociationSAInterface * pAnimAssoc, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID )
 {
-    return g_pClientGame->AssocGroupCopyAnimationHandler ( pOutAnimStaticAssoc, pOutIFPAnimations, pClump, pAnimAssocGroup, animID );
+    return g_pClientGame->AssocGroupCopyAnimationHandler ( pOutAnimStaticAssoc, pAnimAssoc, pClump, pAnimAssocGroup, animID );
 }
 
-bool CClientGame::StaticBlendAnimationHierarchyHandler ( SIFPAnimations ** pOutIFPAnimations, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, RpClump * pClump )
+bool CClientGame::StaticBlendAnimationHierarchyHandler ( CAnimBlendAssociationSAInterface * pAnimAssoc, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, RpClump * pClump )
 {
-    return g_pClientGame->BlendAnimationHierarchyHandler ( pOutIFPAnimations, pOutAnimHierarchy, pClump );
+    return g_pClientGame->BlendAnimationHierarchyHandler ( pAnimAssoc, pOutAnimHierarchy, pClump );
 }
 
 void CClientGame::StaticPreWorldProcessHandler ( void )
@@ -4009,6 +4009,7 @@ bool CClientGame::ChokingHandler ( unsigned char ucWeaponType )
 void CClientGame::CAnimBlendAssocDestructorHandler ( CAnimBlendAssociationSAInterface * pThis )
 {
     //printf("CClientGame::CAnimBlendAssocDestructorHandler called! sAnimID: %d\n", pThis->sAnimID);
+    RemoveAnimationAssociationFromMap ( pThis );
 }
 
 
@@ -4034,11 +4035,12 @@ typedef void (__thiscall* hCAnimBlendStaticAssociation_Init)
 );
 
 
-bool CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, SIFPAnimations ** pOutIFPAnimations, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID )
+bool CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, CAnimBlendAssociationSAInterface * pAnimAssoc, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID )
 {
     auto CAnimBlendStaticAssociation_Init = (hCAnimBlendStaticAssociation_Init)0x4CEC20;
 
     bool isCustomAnimationToPlay = false;
+
     CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
     auto pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( pAnimAssocGroup->groupID, animID );
 
@@ -4050,10 +4052,10 @@ bool CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSA
         {   
             if ( pReplacedAnimation->pIFP->isIFPLoaded ( ) )
             { 
-                SIFPAnimations * pIFPAnimations = pReplacedAnimation->pIFP->GetIFPAnimationsPointer ();
-                pIFPAnimations->iReferences ++;
+                std::shared_ptr < CIFPAnimations > pIFPAnimations = pReplacedAnimation->pIFP->GetIFPAnimationsPointer ();
+                InsertAnimationAssociationToMap ( pAnimAssoc, pIFPAnimations );
+               
                 // Play our custom animation instead of default
-                *pOutIFPAnimations = pIFPAnimations;
                 CAnimBlendStaticAssociation_Init ( pOutAnimStaticAssoc, pClump, pReplacedAnimation->pAnimationHierarchy );
                 isCustomAnimationToPlay = true;
             }
@@ -4074,13 +4076,14 @@ bool CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSA
     pOutAnimStaticAssoc->sFlags = pOriginalAnimStaticAssoc->sFlags;
 
     printf(" CClientGame::AssocGroupCopyAnimationHandler: About to return sAnimGroup: %d | sAnimID: %d !\n", pOutAnimStaticAssoc->sAnimGroup, pOutAnimStaticAssoc->sAnimID);
+
     return isCustomAnimationToPlay;
 }
 
 
-bool CClientGame::BlendAnimationHierarchyHandler (  SIFPAnimations ** pOutIFPAnimations, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, RpClump * pClump )
+bool CClientGame::BlendAnimationHierarchyHandler ( CAnimBlendAssociationSAInterface * pAnimAssoc, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, RpClump * pClump )
 {   
-     bool isCustomAnimationToPlay = false;
+    bool isCustomAnimationToPlay = false;
 
     CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
     CClientPed * pClientPed =  GetClientPedByClump ( *pClump ); 
@@ -4099,13 +4102,12 @@ bool CClientGame::BlendAnimationHierarchyHandler (  SIFPAnimations ** pOutIFPAni
                 { 
                     if ( pIFP->isIFPLoaded ( ) )
                     { 
-                        SIFPAnimations * pIFPAnimations = pIFP->GetIFPAnimationsPointer ();
-                        pIFPAnimations->iReferences ++;
+                        std::shared_ptr < CIFPAnimations > pIFPAnimations = pIFP->GetIFPAnimationsPointer ();
+                        InsertAnimationAssociationToMap ( pAnimAssoc, pIFPAnimations );
 
                         pClientPed->setCurrentAnimationCustom ( true );
                         pClientPed->setNextAnimationNormal ( );
 
-                        *pOutIFPAnimations = pIFPAnimations;
                         *pOutAnimHierarchy = pCustomAnimBlendHierarchy;
                         isCustomAnimationToPlay = true;
                         return isCustomAnimationToPlay;
@@ -6931,44 +6933,12 @@ void CClientGame::OnClientIFPUnload ( const std::shared_ptr < CClientIFP > & IFP
     }
 }
 
-void CClientGame::DeleteIFPAnimations ( SIFPAnimations * pIFPAnimations )
+void CClientGame::InsertAnimationAssociationToMap ( CAnimBlendAssociationSAInterface * pAnimAssociation, const std::shared_ptr < CIFPAnimations > & pIFPAnimations )
 {
-    if ( pIFPAnimations->iReferences == 0 )
-    { 
-        printf("CClientGame::UnloadIFPAnimations (): iReferences are Zero\n");
+    m_mapOfCustomAnimationAssociations [ pAnimAssociation ] = pIFPAnimations;
+}
 
-        hCMemoryMgr_Free OLD_CMemoryMgr_Free = (hCMemoryMgr_Free)0x0072F430;
-        auto OLD_CAnimBlendHierarchy_RemoveFromUncompressedCache = (hCAnimBlendHierarchy_RemoveFromUncompressedCache)0x004D42A0;
-
-        for ( size_t i = 0; i < pIFPAnimations->vecAnimations.size(); i++ )
-        {
-            IFP_Animation * ifpAnimation = &pIFPAnimations->vecAnimations[i];
-        
-            OLD_CAnimBlendHierarchy_RemoveFromUncompressedCache ( (int)&ifpAnimation->Hierarchy );
-            
-            for (unsigned short SequenceIndex = 0; SequenceIndex < ifpAnimation->Hierarchy.m_nSeqCount; SequenceIndex++)
-            {
-                _CAnimBlendSequence * pSequence = (_CAnimBlendSequence*)((BYTE*)ifpAnimation->Hierarchy.m_pSequences + (sizeof(_CAnimBlendSequence) * SequenceIndex));
-
-                if ( !( (pSequence->m_nFlags >> 3) & 1 ) ) // If ( !OneBigChunkForAllSequences )
-                {
-                    OLD_CMemoryMgr_Free ( pSequence->m_pFrames ); //*(void **)(pThis + 8)); //pSequence->m_pFrames );
-                }
-                else
-                {
-                    if ( SequenceIndex == 0 )
-                    { 
-                        // All frames of all sequences are allocated on one memory block, so free that one
-                        // and break the loop 
-                        OLD_CMemoryMgr_Free ( pSequence->m_pFrames );
-                        break;
-                    }
-                }
-  
-            }
-            delete ifpAnimation->pSequencesMemory;  
-        }
-        delete pIFPAnimations;
-        printf("CClientGame::UnloadIFPAnimations (): IFP Animations have been unloaded successfully!\n");
-    }
+void CClientGame::RemoveAnimationAssociationFromMap ( CAnimBlendAssociationSAInterface * pAnimAssociation )
+{
+    m_mapOfCustomAnimationAssociations.erase ( pAnimAssociation );
 }

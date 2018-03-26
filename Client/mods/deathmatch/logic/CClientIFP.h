@@ -5,6 +5,7 @@
 
 #include "CClientEntity.h"
 #include "IFP/IFPLoader.h"
+#include "IFP/CIFPAnimations.h"
 #include <algorithm>
 
 class CClientIFP: public CClientEntity, FileLoader
@@ -39,7 +40,7 @@ public:
     size_t                          getCorrectBoneIndexFromID(int32_t & BoneID);
 
     CAnimBlendHierarchySAInterface * GetAnimationHierarchy ( const SString & strAnimationName );
-    inline SIFPAnimations *         GetIFPAnimationsPointer ( void ) { return m_pIFPAnimations; }
+    inline std::shared_ptr < CIFPAnimations > GetIFPAnimationsPointer ( void ) { return m_pIFPAnimations; }
 
     // Sorta a hack that these are required by CClientEntity...
     void                            Unlink                  ( void ) {};
@@ -48,7 +49,7 @@ public:
 
    
 private:
-    SIFPAnimations *                m_pIFPAnimations;
+    std::shared_ptr < CIFPAnimations > m_pIFPAnimations;
     SString                         m_strBlockName;
     std::vector < IFP_Animation > * m_pVecAnimations;
     std::vector < unsigned char * > m_DummySequencesKeyFrames;

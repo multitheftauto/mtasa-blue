@@ -24,7 +24,8 @@ CClientIFP::CClientIFP ( class CClientManager* pManager, ElementID ID ) : CClien
     m_pManager = pManager;
     SetTypeName ( "IFP" );
     m_bisIFPLoaded = false;
-    m_pIFPAnimations = nullptr;
+    //m_pIFPAnimations = nullptr;
+     m_pIFPAnimations = std::make_shared < CIFPAnimations > ();
 }
 
 CClientIFP::~CClientIFP ( void )
@@ -37,16 +38,12 @@ bool CClientIFP::LoadIFP ( const char* szFilePath, SString strBlockName )
     printf ("\nCClientIFP::LoadIFP: szFilePath %s\n szBlockName: %s\n\n", szFilePath, strBlockName.c_str());
     
     m_strBlockName = strBlockName;
-    m_pIFPAnimations = new SIFPAnimations;
+    //m_pIFPAnimations ( new CIFPAnimations () );
     m_pVecAnimations = &m_pIFPAnimations->vecAnimations;
 
     if ( LoadIFPFile ( szFilePath ) )
     {
         m_bisIFPLoaded = true;
-    }
-    else
-    {
-        delete m_pIFPAnimations;
     }
     return m_bisIFPLoaded;
 }
@@ -58,7 +55,7 @@ void CClientIFP::UnloadIFP ( void )
         printf ("CClientIFP::UnloadIFP ( ) called!\n");
 
         m_bisIFPLoaded = false;
-
+/*
         // When all animations from this IFP block stop playing, and 
         // the reference count reaches zero, IFP animations will be unloaded
         m_pIFPAnimations->bUnloadOnZeroReferences = true;
@@ -67,7 +64,7 @@ void CClientIFP::UnloadIFP ( void )
         if ( m_pIFPAnimations->iReferences == 0 )
         { 
             g_pClientGame->DeleteIFPAnimations ( m_pIFPAnimations ); 
-        }
+        }*/
     }
 }
 

@@ -84,6 +84,7 @@ struct SMiscGameSettings
 class CClientGame
 {
     friend class CPacketHandler;
+    typedef std::map < CAnimBlendAssociationSAInterface *, std::shared_ptr < CIFPAnimations > > AnimAssociations_type;
 
 public:
     enum eStatus
@@ -506,8 +507,8 @@ private:
     static void                               StaticCAnimBlendAssocDestructorHandler ( CAnimBlendAssociationSAInterface * pThis );
     static CAnimBlendAssociationSAInterface * StaticAddAnimationHandler       ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     static CAnimBlendAssociationSAInterface * StaticAddAnimationAndSyncHandler( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID );
-    static bool                               StaticAssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, SIFPAnimations ** pOutIFPAnimations, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID );
-    static bool                               StaticBlendAnimationHierarchyHandler ( SIFPAnimations ** pOutIFPAnimations, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, RpClump * pClump );
+    static bool                               StaticAssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, CAnimBlendAssociationSAInterface * pAnimAssoc, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID );
+    static bool                               StaticBlendAnimationHierarchyHandler ( CAnimBlendAssociationSAInterface * pAnimAssoc, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, RpClump * pClump );
     static bool                               StaticProcessCollisionHandler   ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     static bool                               StaticVehicleCollisionHandler   ( CVehicleSAInterface* pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity  );
     static bool                               StaticVehicleDamageHandler      ( CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType, const CVector& vecDamagePos, uchar ucTyre );
@@ -540,8 +541,8 @@ private:
     void                                      CAnimBlendAssocDestructorHandler ( CAnimBlendAssociationSAInterface * pThis );
     CAnimBlendAssociationSAInterface *        AddAnimationHandler             ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     CAnimBlendAssociationSAInterface *        AddAnimationAndSyncHandler      ( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID );
-    bool                                      AssocGroupCopyAnimationHandler  ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, SIFPAnimations ** pOutIFPAnimations, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID );
-    bool                                      BlendAnimationHierarchyHandler  ( SIFPAnimations ** pOutIFPAnimations, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, RpClump * pClump );
+    bool                                      AssocGroupCopyAnimationHandler  ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, CAnimBlendAssociationSAInterface * pAnimAssoc, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID );
+    bool                                      BlendAnimationHierarchyHandler  ( CAnimBlendAssociationSAInterface * pAnimAssoc, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, RpClump * pClump );
     bool                                      ProcessCollisionHandler         ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     bool                                      VehicleCollisionHandler         ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity  );
     bool                                      VehicleDamageHandler            ( CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType, const CVector& vecDamagePos, uchar ucTyre );
@@ -601,7 +602,9 @@ public:
     CClientPed *                              GetClientPedByClump             ( const RpClump & Clump );
 
     void                                      OnClientIFPUnload               ( const std::shared_ptr < CClientIFP > & IFP );
-    void                                      DeleteIFPAnimations             ( SIFPAnimations * pIFPAnimations );
+
+    void                                      InsertAnimationAssociationToMap ( CAnimBlendAssociationSAInterface * pAnimAssociation, const std::shared_ptr < CIFPAnimations > & pIFPAnimations );
+    void                                      RemoveAnimationAssociationFromMap ( CAnimBlendAssociationSAInterface * pAnimAssociation );
 
 private:
     eStatus                                   m_Status;
@@ -819,7 +822,8 @@ private:
     // (SString) Key is custom block name that is supplied to engineLoadIFP
     std::map < SString, std::shared_ptr < CClientIFP > > m_mapOfIfpPointers; 
 
-    std::map < CClientPed *, bool >           m_mapOfPedPointers;
+    std::map < CClientPed *, bool > m_mapOfPedPointers;
+    AnimAssociations_type           m_mapOfCustomAnimationAssociations;
 };
 
 extern CClientGame* g_pClientGame;

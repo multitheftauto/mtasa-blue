@@ -5,9 +5,6 @@
 #include <../game_sa/CAnimBlendAssociationSA.h>
 #include <../game_sa/CAnimBlendAssocGroupSA.h>
 
-typedef std::map < CAnimBlendAssociationSAInterface *, SIFPAnimations * > AnimAssociations_type;
-static AnimAssociations_type mapOfCustomAnimationAssociations;
-
 DWORD FUNC_NEW_OPERATOR =                                           0x082119A;
 DWORD FUNC_CAnimBlendAssociation_Constructor =                      0x04CF080;
 DWORD FUNC_CAnimBlendAssociation__ReferenceAnimBlock =              0x4CEA50;
@@ -56,78 +53,8 @@ void CMultiplayerSA::SetBlendAnimationHierarchyHandler ( BlendAnimationHierarchy
     m_pBlendAnimationHierarchyHandler = pHandler;
 }
 
-void DeleteIFPAnimations ( SIFPAnimations * pIFPAnimations )
-{
-    if ( pIFPAnimations->iReferences == 0 )
-    { 
-        printf("CClientGame::UnloadIFPAnimations (): iReferences are Zero\n");
-
-        hCMemoryMgr_Free OLD_CMemoryMgr_Free = (hCMemoryMgr_Free)0x0072F430;
-        auto OLD_CAnimBlendHierarchy_RemoveFromUncompressedCache = (hCAnimBlendHierarchy_RemoveFromUncompressedCache)0x004D42A0;
-
-        for ( size_t i = 0; i < pIFPAnimations->vecAnimations.size(); i++ )
-        {
-            IFP_Animation * ifpAnimation = &pIFPAnimations->vecAnimations[i];
-        
-            OLD_CAnimBlendHierarchy_RemoveFromUncompressedCache ( (int)&ifpAnimation->Hierarchy );
-            
-            for (unsigned short SequenceIndex = 0; SequenceIndex < ifpAnimation->Hierarchy.m_nSeqCount; SequenceIndex++)
-            {
-                _CAnimBlendSequence * pSequence = (_CAnimBlendSequence*)((BYTE*)ifpAnimation->Hierarchy.m_pSequences + (sizeof(_CAnimBlendSequence) * SequenceIndex));
-
-                if ( !( (pSequence->m_nFlags >> 3) & 1 ) ) // If ( !OneBigChunkForAllSequences )
-                {
-                    OLD_CMemoryMgr_Free ( pSequence->m_pFrames ); //*(void **)(pThis + 8)); //pSequence->m_pFrames );
-                }
-                else
-                {
-                    if ( SequenceIndex == 0 )
-                    { 
-                        // All frames of all sequences are allocated on one memory block, so free that one
-                        // and break the loop 
-                        OLD_CMemoryMgr_Free ( pSequence->m_pFrames );
-                        break;
-                    }
-                }
-  
-            }
-            delete ifpAnimation->pSequencesMemory;  
-        }
-        delete pIFPAnimations;
-        printf("CClientGame::UnloadIFPAnimations (): IFP Animations have been unloaded successfully!\n");
-    }
-}
-
-void __cdecl InsertAnimationAssociationToMap ( CAnimBlendAssociationSAInterface * pAnimAssociation, SIFPAnimations * pIFPAnimations )
-{
-    // We don't increment pIFPAnimations->iReferences here because it's done 
-    // in custom animation handler functions in CClientGame.cpp
-    mapOfCustomAnimationAssociations [ pAnimAssociation ] = pIFPAnimations;
-
-    printf("InsertAnimationAssociationToMap: sAnimID: %d | iReferences: %d \n", pAnimAssociation->sAnimID, pIFPAnimations->iReferences);
-}
-
-void __cdecl RemoveAnimationAssociationFromMap ( CAnimBlendAssociationSAInterface * pAnimAssociation )
-{
-    AnimAssociations_type::iterator it;
-    it = mapOfCustomAnimationAssociations.find ( pAnimAssociation );
-    if ( it != mapOfCustomAnimationAssociations.end ( ) )
-    {
-        it->second->iReferences --;
-        if ( ( it->second->bUnloadOnZeroReferences == true ) && ( it->second->iReferences == 0 ) )
-        {
-            // iReferences are zero, custom animation hierarchies are not being used anywhere.
-            // It's safe to unload IFP animations here.
-            DeleteIFPAnimations ( it->second );
-        }
-        mapOfCustomAnimationAssociations.erase ( pAnimAssociation );
-    }
-}
-
 void CAnimBlendAssoc_destructor ( CAnimBlendAssociationSAInterface * pThis )
 {
-    RemoveAnimationAssociationFromMap ( pThis );
-
     if ( m_pCAnimBlendAssocDestructorHandler )
     {
         m_pCAnimBlendAssocDestructorHandler ( pThis );
@@ -181,7 +108,12 @@ void _declspec(naked) HOOK_CAnimBlendAssocGroup_CopyAnimation ()
             push    ecx
             push    edi
             
-            lea     eax, [ebp-4]
+            // create CAnimBlendAssociation
+            push    3Ch   
+            call    FUNC_NEW_OPERATOR
+            add     esp, 4
+
+            mov     [ebp-4], eax
             push    eax 
 
             // Allocate memory for our new static association
@@ -190,7 +122,7 @@ void _declspec(naked) HOOK_CAnimBlendAssocGroup_CopyAnimation ()
 
             // push the static association
             push    edi
-            call    m_pAssocGroupCopyAnimationHandler 
+            call    m_pAssocGroupCopyAnimationHandler //CAnimBlendAssocGroup_CopyAnimation
             add     esp, 14h
             
             mov     ecx, [ebp-4] 
@@ -218,9 +150,8 @@ void _declspec(naked) HOOK_CAnimBlendAssocGroup_CopyAnimation ()
             push    eax
             mov     eax, 04D41C0h
             call    eax
-            push    3Ch   
-            call    FUNC_NEW_OPERATOR
-            add     esp, 8
+            add     esp, 4
+            mov     eax, [esp+4] // pAnimAssociation
             mov     [esp+20h], eax 
             test    eax, eax
             mov     [esp+18h], 0   
@@ -236,19 +167,8 @@ void _declspec(naked) HOOK_CAnimBlendAssocGroup_CopyAnimation ()
             add     esp, 4 
             
             mov     ecx, [esp+4] // pIFPAnimations
-            mov     eax, [esp+8] // pAnimAssociation
+            mov     eax, [esp+8] // isCustomAnimation
             
-            // Check wether this is a custom animation or not 
-            cmp     al, 00
-            je      NOT_CUSTOM_ANIMATION_CopyAnimation  
-
-            // It's a custom animation, store it in a map
-            push    ecx // pIFPAnimations
-            push    edi // pAnimAssociation
-            call    InsertAnimationAssociationToMap
-            add     esp, 8
-
-            NOT_CUSTOM_ANIMATION_CopyAnimation: 
             // put CAnimBlendAssociation in eax
             mov     eax, edi
             add     esp, 0Ch
@@ -395,13 +315,12 @@ void _declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy ()
             push    edx  // pClump
             lea     edx, [ebp-4]
             push    edx  //  CAnimBlendHierarchySAInterface ** pOutAnimHierarchy
-            lea     edx, [ebp-8]
-            push    edx  // SIFPAnimations ** pOutIFPAnimations
-            call    m_pBlendAnimationHierarchyHandler
+            mov     edx, [esp+24]
+            push    edx  // pAnimAssociation
+            call    m_pBlendAnimationHierarchyHandler //CAnimManager_BlendAnimation_Hierarchy
             add     esp, 0Ch
  
             mov     ecx, [ebp-4] // pCustomAnimHierarchy
-            mov     edx, [ebp-8] // pIFPAnimations
 
             add     esp, 8 // remove space for local var
             mov     esp, ebp
@@ -414,13 +333,6 @@ void _declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy ()
             // Replace animation hierarchy with our custom one
             mov     [esp], ecx 
             mov     [esp+28h+8+8], ecx
-
-            // It's a custom animation, insert it to map
-            push    edx // pIFPAnimations
-            mov     edx, [esp+8]
-            push    edx // pAnimAssociation
-            call    InsertAnimationAssociationToMap
-            add     esp, 8
 
             NOT_CUSTOM_ANIMATION_CAnimManager_BlendAnimation_Hierarchy:
             pop ecx

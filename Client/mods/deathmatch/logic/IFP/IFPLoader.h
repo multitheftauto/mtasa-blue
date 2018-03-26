@@ -201,24 +201,6 @@ enum BoneType
     R_TOE_0     = 54    
 };
 
-struct SIFPAnimations
-{
-    // This is set to true when unloadIFP function is called, it means that animations
-    // can be unloaded when iReferences reaches zero, if this boolean is set to true
-	bool  bUnloadOnZeroReferences; 
-    // incremented when a new CAnimBlendAssociationSAInteface is created and decremented 
-    // when destructor of that animation is called 
-	DWORD iReferences; 
-	std::vector < IFP_Animation > vecAnimations;	
-
-    SIFPAnimations()
-    {
-        bUnloadOnZeroReferences = false;
-        iReferences = 0;
-    }
-};
-
-
 typedef void *(__cdecl* hCMemoryMgr_Malloc)
 (
     size_t TotalBytesToAllocate
