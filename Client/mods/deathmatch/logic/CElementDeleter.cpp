@@ -102,9 +102,6 @@ void CElementDeleter::DeleteIFP  ( CClientEntity * pElement )
 
         // Remove IFP animations from replaced animations of peds/players
         g_pClientGame->OnClientIFPUnload ( pIFP );
-
-        //delete pElement; //------------------- REMOVE      THIS      LATER
-        printf ("done calling g_pClientGame->OnClientIFPUnload\n");
     }
 }
 
