@@ -17,9 +17,7 @@ public:
     virtual eClientEntityType       GetType                 ( void ) const              { return CCLIENTIFP; }
 
     const SString &                 GetBlockName            ( void ) { return m_strBlockName; }
-    bool                            isIFPLoaded             ( void ) { return m_bisIFPLoaded; }
     bool                            LoadIFP                 ( const char* szFilePath, SString strBlockName );
-    void                            UnloadIFP               ( void );
 
     bool                            LoadIFPFile(const char * FilePath);
     void                            ReadIFPVersion1();
@@ -50,12 +48,10 @@ public:
    
 private:
     std::shared_ptr < CIFPAnimations > m_pIFPAnimations;
-    SString                         m_strBlockName;
-    std::vector < IFP_Animation > * m_pVecAnimations;
-    std::vector < unsigned char * > m_DummySequencesKeyFrames;
-    bool                            isVersion1;
-    IFPHeaderV2                     HeaderV2;
-    bool                            m_bisIFPLoaded;
+    SString                            m_strBlockName;
+    std::vector < IFP_Animation > *    m_pVecAnimations;
+    bool                               isVersion1;
+    IFPHeaderV2                        HeaderV2;
 
 };
 

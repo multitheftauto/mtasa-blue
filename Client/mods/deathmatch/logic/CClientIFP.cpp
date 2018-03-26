@@ -23,14 +23,11 @@ CClientIFP::CClientIFP ( class CClientManager* pManager, ElementID ID ) : CClien
     // Init
     m_pManager = pManager;
     SetTypeName ( "IFP" );
-    m_bisIFPLoaded = false;
-    //m_pIFPAnimations = nullptr;
-     m_pIFPAnimations = std::make_shared < CIFPAnimations > ();
+    m_pIFPAnimations = std::make_shared < CIFPAnimations > ();
 }
 
 CClientIFP::~CClientIFP ( void )
 {
-    UnloadIFP ( );
 }
 
 bool CClientIFP::LoadIFP ( const char* szFilePath, SString strBlockName )
@@ -38,34 +35,13 @@ bool CClientIFP::LoadIFP ( const char* szFilePath, SString strBlockName )
     printf ("\nCClientIFP::LoadIFP: szFilePath %s\n szBlockName: %s\n\n", szFilePath, strBlockName.c_str());
     
     m_strBlockName = strBlockName;
-    //m_pIFPAnimations ( new CIFPAnimations () );
     m_pVecAnimations = &m_pIFPAnimations->vecAnimations;
 
     if ( LoadIFPFile ( szFilePath ) )
     {
-        m_bisIFPLoaded = true;
+        return true;
     }
-    return m_bisIFPLoaded;
-}
-
-void CClientIFP::UnloadIFP ( void )
-{
-    if ( m_bisIFPLoaded )
-    { 
-        printf ("CClientIFP::UnloadIFP ( ) called!\n");
-
-        m_bisIFPLoaded = false;
-/*
-        // When all animations from this IFP block stop playing, and 
-        // the reference count reaches zero, IFP animations will be unloaded
-        m_pIFPAnimations->bUnloadOnZeroReferences = true;
-        
-        // unload IFP animations, if reference count is zero
-        if ( m_pIFPAnimations->iReferences == 0 )
-        { 
-            g_pClientGame->DeleteIFPAnimations ( m_pIFPAnimations ); 
-        }*/
-    }
+    return false;
 }
 
 bool CClientIFP::LoadIFPFile(const char * FilePath)
@@ -1113,20 +1089,14 @@ std::string CClientIFP::getCorrectBoneNameFromName(std::string const& BoneName)
 
 CAnimBlendHierarchySAInterface * CClientIFP::GetAnimationHierarchy ( const SString & strAnimationName )
 {
-    CAnimBlendHierarchySAInterface * pAnimHierarchyInterface = nullptr;
-
-    for (auto it = m_pVecAnimations->begin(); it != m_pVecAnimations->end(); ++it) 
+    for ( auto it = m_pVecAnimations->begin(); it != m_pVecAnimations->end(); ++it ) 
     {
         if (strAnimationName.ToLower() == it->Name.ToLower())
         {
-            if ( m_bisIFPLoaded )
-            { 
-                pAnimHierarchyInterface = (CAnimBlendHierarchySAInterface *)&it->Hierarchy;
-            }
-            break;
+            return (CAnimBlendHierarchySAInterface *)&it->Hierarchy;
         }
     }
-    return pAnimHierarchyInterface;
+    return nullptr;
 }
 
 // ----------------------------------------------------------------------------------------------------------

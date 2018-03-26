@@ -478,7 +478,7 @@ public:
     inline const SString  &     GetNextAnimationCustomBlockName ( void ) { return m_strCustomIFPBlockName; }
     inline const SString  &     GetNextAnimationCustomName      ( void ) { return m_strCustomIFPAnimationName; }
 
-    bool                        ReplaceAnimation        ( CAnimBlendHierarchy * pInternalAnimHierarchy, const std::shared_ptr < CClientIFP > & pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy );
+    void                        ReplaceAnimation        ( CAnimBlendHierarchy * pInternalAnimHierarchy, const std::shared_ptr < CClientIFP > & pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy );
     void                        RestoreAnimation        ( CAnimBlendHierarchy * pInternalAnimHierarchy );
     void                        RestoreAnimations       ( const std::shared_ptr < CClientIFP > & IFP );
     void                        RestoreAnimations       ( CAnimBlock & animationBlock );

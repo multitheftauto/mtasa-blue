@@ -4050,15 +4050,12 @@ bool CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSA
         auto pReplacedAnimation = pClientPed->getReplacedAnimation ( pOriginalAnimStaticAssoc->pAnimHeirarchy );
         if ( pReplacedAnimation != nullptr )
         {   
-            if ( pReplacedAnimation->pIFP->isIFPLoaded ( ) )
-            { 
-                std::shared_ptr < CIFPAnimations > pIFPAnimations = pReplacedAnimation->pIFP->GetIFPAnimationsPointer ();
-                InsertAnimationAssociationToMap ( pAnimAssoc, pIFPAnimations );
+            std::shared_ptr < CIFPAnimations > pIFPAnimations = pReplacedAnimation->pIFP->GetIFPAnimationsPointer ();
+            InsertAnimationAssociationToMap ( pAnimAssoc, pIFPAnimations );
                
-                // Play our custom animation instead of default
-                CAnimBlendStaticAssociation_Init ( pOutAnimStaticAssoc, pClump, pReplacedAnimation->pAnimationHierarchy );
-                isCustomAnimationToPlay = true;
-            }
+            // Play our custom animation instead of default
+            CAnimBlendStaticAssociation_Init ( pOutAnimStaticAssoc, pClump, pReplacedAnimation->pAnimationHierarchy );
+            isCustomAnimationToPlay = true;
         }
     }
 
@@ -4100,18 +4097,15 @@ bool CClientGame::BlendAnimationHierarchyHandler ( CAnimBlendAssociationSAInterf
                 auto pCustomAnimBlendHierarchy   = pIFP->GetAnimationHierarchy ( strAnimationName );
                 if ( pCustomAnimBlendHierarchy != nullptr )
                 { 
-                    if ( pIFP->isIFPLoaded ( ) )
-                    { 
-                        std::shared_ptr < CIFPAnimations > pIFPAnimations = pIFP->GetIFPAnimationsPointer ();
-                        InsertAnimationAssociationToMap ( pAnimAssoc, pIFPAnimations );
+                    std::shared_ptr < CIFPAnimations > pIFPAnimations = pIFP->GetIFPAnimationsPointer ();
+                    InsertAnimationAssociationToMap ( pAnimAssoc, pIFPAnimations );
 
-                        pClientPed->setCurrentAnimationCustom ( true );
-                        pClientPed->setNextAnimationNormal ( );
+                    pClientPed->setCurrentAnimationCustom ( true );
+                    pClientPed->setNextAnimationNormal ( );
 
-                        *pOutAnimHierarchy = pCustomAnimBlendHierarchy;
-                        isCustomAnimationToPlay = true;
-                        return isCustomAnimationToPlay;
-                    }
+                    *pOutAnimHierarchy = pCustomAnimBlendHierarchy;
+                    isCustomAnimationToPlay = true;
+                    return isCustomAnimationToPlay;
                 }   
                 else
                 {
