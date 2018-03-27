@@ -232,7 +232,8 @@ public:
 
     constexpr void                  RoundSize           ( uint32_t & u32Size );
     constexpr bool                  isKeyFramesTypeRoot ( IFP_FrameType iFrameType );
-    void                            ParseSequenceObject ( Object & ObjectNode, std::string & CorrectBoneName );
+    int32_t                         ParseSequenceVersion1 ( IFP_ANIM Anim, std::string & strCorrectBoneName );
+    void                            ParseSequenceVersion2 ( Object & ObjectNode, std::string & strCorrectBoneName );
 
     CAnimBlendHierarchySAInterface *          GetAnimationHierarchy ( const SString & strAnimationName );
     inline std::shared_ptr < CIFPAnimations > GetIFPAnimationsPointer ( void ) { return m_pIFPAnimations; }
