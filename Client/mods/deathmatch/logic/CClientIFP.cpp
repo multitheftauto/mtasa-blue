@@ -1,19 +1,8 @@
 #include <StdInc.h>
 #include "../game_sa/CAnimBlendSequenceSA.h"
-//#include "../game_sa//CAnimManagerSA.h"
-
-h_CAnimBlendHierarchy_SetName OLD__CAnimBlendHierarchy_SetName = (h_CAnimBlendHierarchy_SetName)0x4CF2D0;
-hCAnimBlendHierarchy_RemoveAnimSequences OLD_CAnimBlendHierarchy_RemoveAnimSequences = (hCAnimBlendHierarchy_RemoveAnimSequences)0x4CF8E0;
-hCAnimBlendHierarchy_RemoveFromUncompressedCache OLD_CAnimBlendHierarchy_RemoveFromUncompressedCache = (hCAnimBlendHierarchy_RemoveFromUncompressedCache)0x004D42A0;
 
 hCMemoryMgr_Malloc               OLD_CMemoryMgr_Malloc = (hCMemoryMgr_Malloc)0x0072F420;
 hCMemoryMgr_Free                 OLD_CMemoryMgr_Free   = (hCMemoryMgr_Free)0x0072F430;
-h_CAnimBlendSequence_SetName      OLD__CAnimBlendSequence_SetName = (h_CAnimBlendSequence_SetName)0x4D0C50;
-h_CAnimBlendSequence_SetBoneTag   OLD__CAnimBlendSequence_SetBoneTag = (h_CAnimBlendSequence_SetBoneTag)0x4D0C70;
-h_CAnimBlendSequence_SetNumFrames OLD__CAnimBlendSequence_SetNumFrames = (h_CAnimBlendSequence_SetNumFrames)0x4D0CD0;
-
-h_CAnimBlendHierarchy_RemoveQuaternionFlips OLD__CAnimBlendHierarchy_RemoveQuaternionFlips = (h_CAnimBlendHierarchy_RemoveQuaternionFlips)0x4CF4E0;
-h_CAnimBlendHierarchy_CalcTotalTime         OLD__CAnimBlendHierarchy_CalcTotalTime = (h_CAnimBlendHierarchy_CalcTotalTime)0x4CF2F0;
 
 extern DWORD BoneIds[];
 extern char BoneNames[][24];
@@ -101,8 +90,8 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
 
         Animation AnimationNode;
 
-        readCString((char *)&AnimationNode.Name, sizeof(Animation::Name));
-        readBuffer < int32_t >(&AnimationNode.TotalObjects);
+        readCString ( ( char * ) &AnimationNode.Name, sizeof ( Animation::Name ) );
+        readBuffer < int32_t > ( &AnimationNode.TotalObjects );
 
         it->Name = AnimationNode.Name;
         printf("Animation Name: %s    \n", AnimationNode.Name );
@@ -119,12 +108,11 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
         pAnimationHierarchy->SetRunningCompressed ( m_kbAllKeyFramesCompressed );
 
         const WORD TotalSequences = m_kcIFPSequences + pAnimationHierarchy->GetNumSequences ( );
-        it->pSequencesMemory  = ( char * ) operator new ( 12 * TotalSequences + 4 ); //  Allocate memory for sequences ( 12 * seq_count + 4 )
+        it->pSequencesMemory  = ( char * ) operator new ( 12 * TotalSequences + 4 ); 
         
         pAnimationHierarchy->SetSequences ( reinterpret_cast < CAnimBlendSequenceSAInterface * > ( it->pSequencesMemory + 4 ) );
  
         std::map < std::string, CAnimBlendSequenceSAInterface > MapOfSequences;
-        
         WORD wUnknownSequences = 0;
 
         for (size_t SequenceIndex = 0; SequenceIndex  < pAnimationHierarchy->GetNumSequences ( ); SequenceIndex++)
@@ -134,7 +122,7 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
             readBuffer < Object >(&ObjectNode);
             
             std::string strCorrectBoneName;
-            ParseSequenceObject ( ObjectNode, strCorrectBoneName );
+            ParseSequenceVersion2 ( ObjectNode, strCorrectBoneName );
 
             CAnimBlendSequenceSAInterface AnimationSequence;
             CAnimBlendSequenceSAInterface * pAnimationSequenceInterface = &AnimationSequence;
@@ -157,9 +145,8 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
             if ( iCompressedFrameSize )
             {
                 BYTE * pKeyFrames = static_cast < BYTE * > (  OLD_CMemoryMgr_Malloc ( iCompressedFrameSize * ObjectNode.TotalFrames ) ); 
-                
+              
                 pAnimationSequence->SetKeyFrames ( ObjectNode.TotalFrames, isKeyFramesTypeRoot ( iFrameType ), m_kbAllKeyFramesCompressed, pKeyFrames );
-
                 ReadKeyFramesAsCompressed ( iFrameType, pKeyFrames, ObjectNode.TotalFrames );
 
                 if ( !bUnknownSequence )
@@ -172,8 +159,7 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
         CopySequencesWithDummies ( pAnimManager, pAnimationHierarchy, MapOfSequences );
 
         *(DWORD *)it->pSequencesMemory = m_kcIFPSequences + wUnknownSequences;
-
-        // This order is very important. As we need support for all 32 bones, we must change the total sequences count
+        // As we need support for all 32 bones, we must change the total sequences count
         pAnimationHierarchy->SetNumSequences ( m_kcIFPSequences + wUnknownSequences );
 
         if ( !pAnimationHierarchy->isRunningCompressed ( ) )
@@ -210,217 +196,117 @@ void CClientIFP::CopySequencesWithDummies ( CAnimManager * pAnimManager, std::un
 
 void CClientIFP::ReadIFPVersion1 (  )
 { 
-    /*uint32_t OffsetEOF;
-
+    uint32_t OffsetEOF;
     readBuffer < uint32_t > ( &OffsetEOF );
     RoundSize (OffsetEOF);
-
     IFP_INFO Info;
     readBytes ( &Info, sizeof ( IFP_BASE ) );
     RoundSize (Info.Base.Size);
-
     readBytes(&Info.Entries, Info.Base.Size);
-
     //ofs << "Total Animations: " << Info.Entries << std::endl;
-
     m_pVecAnimations->resize ( Info.Entries );
-    for (size_t i = 0; i < m_pVecAnimations->size(); i++)
+    for ( auto it = m_pVecAnimations->begin(); it != m_pVecAnimations->end(); ++it ) 
     {
-        IFP_Animation & ifpAnimation = m_pVecAnimations->at ( i );
+        CAnimManager * pAnimManager = g_pGame->GetAnimManager ( ); 
+        std::unique_ptr < CAnimBlendHierarchy > pAnimationHierarchy = pAnimManager->GetCustomAnimBlendHierarchy ( &it->Hierarchy );
 
-        _CAnimBlendHierarchy * pAnimHierarchy = &ifpAnimation.Hierarchy;
-
-        _CAnimBlendHierarchy_Constructor(pAnimHierarchy);
+        pAnimationHierarchy->Initialize ( );
 
         IFP_NAME Name;
         readBuffer < IFP_NAME > ( &Name );
         RoundSize ( Name.Base.Size );
 
         char AnimationName [ 24 ];
-        readCString (AnimationName, Name.Base.Size);
-        ifpAnimation.Name = AnimationName;
+        readCString ( AnimationName, Name.Base.Size );
+        it->Name = AnimationName;
 
-        //ofs << "Animation Name: " << AnimationName << "  |  Index: " << i << std::endl;
-        printf("Animation Name: %s    |  Index: %d \n", AnimationName, i);
+        printf("Animation Name: %s  \n", AnimationName);
       
-        OLD__CAnimBlendHierarchy_SetName(pAnimHierarchy, AnimationName);
-
-        // We are going to keep it compressed, just like IFP_V2        
-        pAnimHierarchy->m_bRunningCompressed = true;
-        
-        //ofs << "going to read Dgan " << std::endl;
+        pAnimationHierarchy->SetName ( AnimationName );
+        pAnimationHierarchy->SetRunningCompressed ( m_kbAllKeyFramesCompressed );
 
         IFP_DGAN Dgan;
         readBytes ( &Dgan, sizeof ( IFP_BASE ) * 2 );
         RoundSize ( Dgan.Base.Size );
         RoundSize ( Dgan.Info.Base.Size );
 
-        //ofs << "going to read Dgan.Info.Entries  |  Dgan.Info.Base.Size : " << Dgan.Info.Base.Size << std::endl;
-
         readBytes ( &Dgan.Info.Entries, Dgan.Info.Base.Size );
-    
-        //ofs << "Total Sequences: " << Dgan.Info.Entries << std::endl;
 
-        pAnimHierarchy->m_nSeqCount = Dgan.Info.Entries;
-        pAnimHierarchy->m_nAnimBlockId = 0;
-        pAnimHierarchy->field_B = 0;
+        pAnimationHierarchy->SetNumSequences ( Dgan.Info.Entries );
+        pAnimationHierarchy->SetAnimationBlockID ( 0 ); 
 
-        const unsigned short   TotalSequences = m_kcIFPSequences + pAnimHierarchy->m_nSeqCount;
-        ifpAnimation.pSequencesMemory  = ( char * ) operator new ( 12 * TotalSequences + 4 ); //  Allocate memory for sequences ( 12 * seq_count + 4 )
-
-        pAnimHierarchy->m_pSequences          = ( _CAnimBlendSequence * )( ifpAnimation.pSequencesMemory+ 4 );
+        const WORD TotalSequences = m_kcIFPSequences + pAnimationHierarchy->GetNumSequences ( );
+        it->pSequencesMemory  = ( char * ) operator new ( 12 * TotalSequences + 4 ); 
+        
+        pAnimationHierarchy->SetSequences ( reinterpret_cast < CAnimBlendSequenceSAInterface * > ( it->pSequencesMemory + 4 ) );
  
-        std::map < std::string, _CAnimBlendSequence > MapOfSequences;
+        std::map < std::string, CAnimBlendSequenceSAInterface > MapOfSequences;
         
         unsigned short wUnknownSequences = 0;
-        for (size_t SequenceIndex = 0; SequenceIndex < pAnimHierarchy->m_nSeqCount; SequenceIndex++)
+        for (size_t SequenceIndex = 0; SequenceIndex < pAnimationHierarchy->GetNumSequences ( ); SequenceIndex++)
         {
             IFP_CPAN Cpan;
             readBuffer < IFP_CPAN > ( &Cpan );
             RoundSize ( Cpan.Base.Size );
-
             IFP_ANIM Anim;
             readBytes ( &Anim, sizeof ( IFP_BASE ) );
             RoundSize ( Anim.Base.Size );
             
             readBytes ( &Anim.Name, Anim.Base.Size );
-
             if (Anim.Frames == 0)
             {
                 continue;
             }
-
-            int32_t BoneID = -1;
             
+            std::string strCorrectBoneName;
+            int32_t iBoneID = ParseSequenceVersion1 ( Anim, strCorrectBoneName );
 
-            //ofs << "[REAL] Anim.Name: " << Anim.Name << "   |  BoneID: " << BoneID << "    |   ";
+            CAnimBlendSequenceSAInterface AnimationSequence;
+            CAnimBlendSequenceSAInterface * pAnimationSequenceInterface = &AnimationSequence;
 
-            if (Anim.Base.Size == 0x2C)
-            {
-                BoneID = Anim.Next;
-            }
-            if (Anim.Unk)
-            {
-                break;
-            }
-
-            std::string BoneName = convertStringToMapKey(Anim.Name);
-    
-            bool bUnknownSequence = false;
-            BoneID = getBoneIDFromName(BoneName);
-            if (BoneID == -1)
-            {
-                bUnknownSequence = true;
-            }
-            std::string CorrectBoneName = getCorrectBoneNameFromName(BoneName);
-
-            memset(Anim.Name, 0, sizeof(IFP_ANIM::Name));
-            strncpy(Anim.Name, CorrectBoneName.c_str(), CorrectBoneName.size() + 1);
-    
-            //ofs << "Anim.Name: " << Anim.Name << "   |  BoneID: " << BoneID; ///<< std::endl;
-
-            _CAnimBlendSequence Sequence;
-        
-            _CAnimBlendSequence * pUnkownSequence = nullptr;
+            bool bUnknownSequence = iBoneID == -1;
             if (bUnknownSequence)
             {
-                size_t UnkownSequenceIndex     = m_kcIFPSequences + wUnknownSequences;
-                pUnkownSequence = (_CAnimBlendSequence*)((BYTE*)pAnimHierarchy->m_pSequences + (sizeof(_CAnimBlendSequence) * UnkownSequenceIndex));
-                
-                _CAnimBlendSequence_Constructor ( pUnkownSequence );
-
-                OLD__CAnimBlendSequence_SetName ( pUnkownSequence, Anim.Name );
-
-                OLD__CAnimBlendSequence_SetBoneTag ( pUnkownSequence, BoneID );
-
+                size_t UnkownSequenceIndex  = m_kcIFPSequences + wUnknownSequences;
+                pAnimationSequenceInterface = pAnimationHierarchy->GetSequence ( UnkownSequenceIndex );
                 wUnknownSequences ++;
             }
-            else
-            {
-                _CAnimBlendSequence_Constructor(&Sequence);
 
-                OLD__CAnimBlendSequence_SetName(&Sequence, Anim.Name);
-
-                OLD__CAnimBlendSequence_SetBoneTag(&Sequence, BoneID);
-            }
+            std::unique_ptr < CAnimBlendSequence > pAnimationSequence = pAnimManager->GetCustomAnimBlendSequence ( pAnimationSequenceInterface );
+            pAnimationSequence->Initialize ( );
+            pAnimationSequence->SetName ( Anim.Name  );
+            pAnimationSequence->SetBoneTag ( iBoneID );
             
             size_t   FrameSizeInBytes = 0;
             IFP_KFRM Kfrm;
             readBuffer < IFP_KFRM > ( &Kfrm );
+            IFP_FrameType    iFrameType           = getFrameTypeFromFourCC ( Kfrm.Base.FourCC );
+            size_t           CompressedFrameSize = GetSizeOfCompressedFrame ( iFrameType );
+            BYTE          *  pKeyFrames          = ( BYTE * ) OLD_CMemoryMgr_Malloc ( CompressedFrameSize * Anim.Frames );
 
-            IFP_FrameType    FrameType           = getFrameTypeFromFourCC ( Kfrm.Base.FourCC );
-            size_t           CompressedFrameSize = GetSizeOfCompressedFrame ( FrameType );
-            BYTE          *  pKeyFrames          = ( BYTE * ) OLD_CMemoryMgr_Malloc ( CompressedFrameSize * Anim.Frames ); // malloc ( CompressedFrameSize * Anim.Frames );
-
-            bool bIsRoot = FrameType != IFP_FrameType::KR00;
-            if (bUnknownSequence)
-            {
-                OLD__CAnimBlendSequence_SetNumFrames ( pUnkownSequence, Anim.Frames, bIsRoot, m_kbAllKeyFramesCompressed, pKeyFrames );
-            }
-            else
-            {
-                OLD__CAnimBlendSequence_SetNumFrames ( &Sequence, Anim.Frames, bIsRoot, m_kbAllKeyFramesCompressed, pKeyFrames );
-            }
-
-            if (FrameType == IFP_FrameType::KRTS)
-            {
-                //ofs << "  |  FrameType: KRTS" << std::endl;
-
-                ReadKrtsFramesAsCompressed ( pKeyFrames, Anim.Frames );
-            }
-            else if (FrameType == IFP_FrameType::KRT0)
-            {
-                //ofs << "  |  FrameType: KRT0" << std::endl;
-                ReadKrt0FramesAsCompressed ( pKeyFrames, Anim.Frames );
-            }
-            else if (FrameType == IFP_FrameType::KR00)
-            {
-                //ofs << "  |  FrameType: KR00" << std::endl;
-                ReadKr00FramesAsCompressed ( pKeyFrames, Anim.Frames );
-            }
+            pAnimationSequence->SetKeyFrames ( Anim.Frames, isKeyFramesTypeRoot ( iFrameType ), m_kbAllKeyFramesCompressed, pKeyFrames );
+            ReadKeyFramesAsCompressed ( iFrameType, pKeyFrames, Anim.Frames );
 
             if (!bUnknownSequence)
             {
-                MapOfSequences [ CorrectBoneName ] = Sequence;
+                MapOfSequences [ strCorrectBoneName ] = *pAnimationSequence->GetInterface();
             }
        
         }
         
-        std::map < std::string, _CAnimBlendSequence >::iterator it;
-        for (size_t SequenceIndex = 0; SequenceIndex < m_kcIFPSequences; SequenceIndex++)
-        {
-            std::string BoneName = BoneNames[SequenceIndex];
-            DWORD        BoneID = BoneIds[SequenceIndex];
-            
-            it = MapOfSequences.find(BoneName);
-            if (it != MapOfSequences.end())
-            {
-                _CAnimBlendSequence * pSequence = (_CAnimBlendSequence*)((BYTE*)pAnimHierarchy->m_pSequences + (sizeof(_CAnimBlendSequence) * SequenceIndex));
-
-               ////ofs << "Sequence: " << BoneName << " | TotalFrames: " << it->second.m_nFrameCount << std::endl; //<< " | pSequence->m_pFrames Address: " << std::hex << it->second.m_pFrames << std::dec << std::endl;
-
-                memcpy (pSequence, &it->second, sizeof(_CAnimBlendSequence));
-            }
-            else
-            {
-                insertAnimDummySequence ( pAnimHierarchy, SequenceIndex );
-            }
-        }
+        CopySequencesWithDummies ( pAnimManager, pAnimationHierarchy, MapOfSequences );
     
-        *(DWORD *)ifpAnimation.pSequencesMemory = m_kcIFPSequences + wUnknownSequences;
+        *(DWORD *)it->pSequencesMemory = m_kcIFPSequences + wUnknownSequences;
 
-        // This order is very important. As we need support for all 32 bones, we must change the total sequences count
-        pAnimHierarchy->m_nSeqCount = m_kcIFPSequences + wUnknownSequences;
+        // As we need support for all 32 bones, we must change the total sequences count
+        pAnimationHierarchy->SetNumSequences ( m_kcIFPSequences + wUnknownSequences );
 
-        //ofs << std::endl << std::endl;
-
-        if (!pAnimHierarchy->m_bRunningCompressed)
+        if ( !pAnimationHierarchy->isRunningCompressed ( ) )
         {
-            Call__CAnimBlendHierarchy_RemoveQuaternionFlips(pAnimHierarchy);
-
-            Call__CAnimBlendHierarchy_CalcTotalTime(pAnimHierarchy);
-        }  
-    }*/
+            pAnimationHierarchy->RemoveQuaternionFlips ( );
+            pAnimationHierarchy->CalculateTotalTime ( );
+        }    
+    }
 }
 
 
@@ -1108,25 +994,41 @@ constexpr bool CClientIFP::isKeyFramesTypeRoot ( IFP_FrameType iFrameType )
     return true;   
 }
 
-void CClientIFP::ParseSequenceObject ( Object & ObjectNode, std::string & CorrectBoneName )
+int32_t CClientIFP::ParseSequenceVersion1 ( IFP_ANIM Anim, std::string & strCorrectBoneName )
+{
+    int32_t iBoneID = -1;
+    if ( Anim.Base.Size == 0x2C )
+    {
+        iBoneID = Anim.Next;
+    }
+
+    std::string BoneName = convertStringToMapKey ( Anim.Name );
+    iBoneID = getBoneIDFromName ( BoneName );
+
+    strCorrectBoneName = getCorrectBoneNameFromName ( BoneName );
+    strncpy ( Anim.Name, strCorrectBoneName.c_str ( ), strCorrectBoneName.size ( ) + 1 );
+    return iBoneID;
+}
+
+void CClientIFP::ParseSequenceVersion2 ( Object & ObjectNode, std::string & strCorrectBoneName )
 {
     std::string BoneName = convertStringToMapKey ( ObjectNode.Name );
 
     if (ObjectNode.BoneID == -1)
     {
         ObjectNode.BoneID = getBoneIDFromName ( BoneName );
-        CorrectBoneName = getCorrectBoneNameFromName ( BoneName );
+        strCorrectBoneName = getCorrectBoneNameFromName ( BoneName );
     }
     else
     {
-        CorrectBoneName = getCorrectBoneNameFromID ( ObjectNode.BoneID );
-        if ( CorrectBoneName == "Unknown" )
+        strCorrectBoneName = getCorrectBoneNameFromID ( ObjectNode.BoneID );
+        if ( strCorrectBoneName == "Unknown" )
         {
-            CorrectBoneName = getCorrectBoneNameFromName ( BoneName );
+            strCorrectBoneName = getCorrectBoneNameFromName ( BoneName );
         }
     }
 
-    strncpy ( ObjectNode.Name, CorrectBoneName.c_str(), CorrectBoneName.size() +1 );
+    strncpy ( ObjectNode.Name, strCorrectBoneName.c_str(), strCorrectBoneName.size() +1 );
 }
 
 CAnimBlendHierarchySAInterface * CClientIFP::GetAnimationHierarchy ( const SString & strAnimationName )
@@ -1139,34 +1041,4 @@ CAnimBlendHierarchySAInterface * CClientIFP::GetAnimationHierarchy ( const SStri
         }
     }
     return nullptr;
-}
-
-// ----------------------------------------------------------------------------------------------------------
-// --------------------------------------  For Hierarchy ----------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------
-void Call__CAnimBlendHierarchy_RemoveQuaternionFlips(_CAnimBlendHierarchy * pAnimHierarchy)
-{
-    __asm
-    {
-        push ecx;
-        mov ecx, pAnimHierarchy;
-    };
-
-    OLD__CAnimBlendHierarchy_RemoveQuaternionFlips();
-
-    __asm pop ecx;
-}
-
-void Call__CAnimBlendHierarchy_CalcTotalTime(_CAnimBlendHierarchy * pAnimHierarchy)
-{
-
-    __asm
-    {
-        push ecx;
-        mov ecx, pAnimHierarchy;
-    };
-
-    OLD__CAnimBlendHierarchy_CalcTotalTime();
-
-    __asm pop ecx;
 }
