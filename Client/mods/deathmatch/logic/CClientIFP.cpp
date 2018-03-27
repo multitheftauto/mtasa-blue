@@ -92,30 +92,25 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
     readBuffer < IFPHeaderV2 > ( &HeaderV2 );
 
     m_pVecAnimations->resize ( HeaderV2.TotalAnimations );
-    for (size_t i = 0; i < m_pVecAnimations->size(); i++)
+    for ( auto it = m_pVecAnimations->begin(); it != m_pVecAnimations->end(); ++it ) 
     {
-        IFP_Animation & ifpAnimation = m_pVecAnimations->at ( i );
-
         CAnimManager * pAnimManager = g_pGame->GetAnimManager ( ); 
-        std::unique_ptr < CAnimBlendHierarchy > pAnimationHierarchy = pAnimManager->GetCustomAnimBlendHierarchy ( &ifpAnimation.Hierarchy );
+        std::unique_ptr < CAnimBlendHierarchy > pAnimationHierarchy = pAnimManager->GetCustomAnimBlendHierarchy ( &it->Hierarchy );
        
         pAnimationHierarchy->Initialize ( );
 
         Animation AnimationNode;
 
         readCString((char *)&AnimationNode.Name, sizeof(Animation::Name));
-        ifpAnimation.Name = AnimationNode.Name;
         readBuffer < int32_t >(&AnimationNode.TotalObjects);
 
-        //ofs << "Animation Name: " << AnimationNode.Name << "  |  Index: " << i << std::endl;
-
-        printf("Animation Name: %s    |  Index: %d \n", AnimationNode.Name, i);
+        it->Name = AnimationNode.Name;
+        printf("Animation Name: %s    \n", AnimationNode.Name );
 
         if (anp3)
         {
-            readBuffer < int32_t >(&AnimationNode.FrameSize);
-            readBuffer < int32_t >(&AnimationNode.isCompressed);
-            pAnimationHierarchy->SetRunningCompressed ( AnimationNode.isCompressed & 1 );
+            readBuffer < int32_t > ( &AnimationNode.FrameSize );
+            readBuffer < int32_t > ( &AnimationNode.isCompressed );
         }
 
         pAnimationHierarchy->SetName ( AnimationNode.Name );
@@ -123,16 +118,15 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
         pAnimationHierarchy->SetAnimationBlockID ( 0 ); 
         pAnimationHierarchy->SetRunningCompressed ( m_kbAllKeyFramesCompressed );
 
-        const unsigned short TotalSequences = m_kcIFPSequences + pAnimationHierarchy->GetNumSequences ( );
-        ifpAnimation.pSequencesMemory  = ( char * ) operator new ( 12 * TotalSequences + 4 ); //  Allocate memory for sequences ( 12 * seq_count + 4 )
+        const WORD TotalSequences = m_kcIFPSequences + pAnimationHierarchy->GetNumSequences ( );
+        it->pSequencesMemory  = ( char * ) operator new ( 12 * TotalSequences + 4 ); //  Allocate memory for sequences ( 12 * seq_count + 4 )
         
-        pAnimationHierarchy->SetSequences ( reinterpret_cast < CAnimBlendSequenceSAInterface * > ( ifpAnimation.pSequencesMemory + 4 ) );
+        pAnimationHierarchy->SetSequences ( reinterpret_cast < CAnimBlendSequenceSAInterface * > ( it->pSequencesMemory + 4 ) );
  
         std::map < std::string, CAnimBlendSequenceSAInterface > MapOfSequences;
         
         WORD wUnknownSequences = 0;
 
-        bool bFirstSeq = true;
         for (size_t SequenceIndex = 0; SequenceIndex  < pAnimationHierarchy->GetNumSequences ( ); SequenceIndex++)
         {
             Object ObjectNode;
@@ -177,7 +171,7 @@ void CClientIFP::ReadIFPVersion2( bool anp3)
         
         CopySequencesWithDummies ( pAnimManager, pAnimationHierarchy, MapOfSequences );
 
-        *(DWORD *)ifpAnimation.pSequencesMemory = m_kcIFPSequences + wUnknownSequences;
+        *(DWORD *)it->pSequencesMemory = m_kcIFPSequences + wUnknownSequences;
 
         // This order is very important. As we need support for all 32 bones, we must change the total sequences count
         pAnimationHierarchy->SetNumSequences ( m_kcIFPSequences + wUnknownSequences );
