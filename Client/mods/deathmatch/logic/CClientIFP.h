@@ -123,10 +123,12 @@ public:
 
     enum IFP_FrameType
     {
-        UNKNOWN_FRAME = -1,
-        KR00 = 0,
-        KRT0 = 1,
-        KRTS = 2
+        UNKNOWN_FRAME   = -1,
+        KR00            = 0,
+        KRT0            = 1,
+        KRTS            = 2,
+        KR00_COMPRESSED = 3,
+        KRT0_COMPRESSED = 4,
     };
 
     struct IFPHeaderV2
@@ -215,9 +217,12 @@ public:
     IFP_FrameType                   getFrameTypeFromFourCC(char * FourCC);
     size_t                          GetSizeOfCompressedFrame ( IFP_FrameType FrameType );
 
+    void                            ReadKeyFramesAsCompressed  ( IFP_FrameType iFrameType, BYTE * pKeyFrames, int32_t iFrames );
     void                            ReadKrtsFramesAsCompressed (  BYTE * pKeyFrames, int32_t TotalFrames );
     void                            ReadKrt0FramesAsCompressed (  BYTE * pKeyFrames, int32_t TotalFrames );
     void                            ReadKr00FramesAsCompressed (  BYTE * pKeyFrames, int32_t TotalFrames );
+    void                            ReadKr00CompressedFrames   (  BYTE * pKeyFrames, int32_t TotalFrames );
+    void                            ReadKrt0CompressedFrames   (  BYTE * pKeyFrames, int32_t TotalFrames );
 
     void                            InsertAnimationDummySequence ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, std::string & BoneName, DWORD & BoneID );
     int32_t                         getBoneIDFromName(std::string const& BoneName);
@@ -226,6 +231,7 @@ public:
     size_t                          getCorrectBoneIndexFromID(int32_t & BoneID);
 
     constexpr void                  RoundSize           ( uint32_t & u32Size );
+    constexpr bool                  isKeyFramesTypeRoot ( IFP_FrameType iFrameType );
     void                            ParseSequenceObject ( Object & ObjectNode, std::string & CorrectBoneName );
 
     CAnimBlendHierarchySAInterface *          GetAnimationHierarchy ( const SString & strAnimationName );
@@ -245,7 +251,10 @@ private:
     IFPHeaderV2                        HeaderV2;
 
     // 32 because there are 32 bones in a ped model 
-    const unsigned short               cIFPSequences = 32;
+    const unsigned short               m_kcIFPSequences = 32;
+    // We'll keep all key frames compressed by default. GTA:SA will decompress
+    // them, when it's going to play the animation. We don't need to worry about it.
+    const bool                         m_kbAllKeyFramesCompressed = true;
 
 };
 
