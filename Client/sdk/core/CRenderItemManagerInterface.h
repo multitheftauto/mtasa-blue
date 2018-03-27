@@ -38,6 +38,7 @@ struct SShaderItemLayers;
 typedef CShaderItem CSHADERDUMMY;
 enum eAspectRatio;
 class CWebViewInterface;
+class CEffectTemplate;
 
 #define RDEFAULT            ((uint) -1)
 
@@ -221,6 +222,7 @@ enum eRenderItemClassTypes
     CLASS_CGuiFontItem,
     CLASS_CMaterialItem,
     CLASS_CEffectWrap,
+    CLASS_CEffectParameters,
     CLASS_CEffectTemplate,
     CLASS_CShaderItem,
     CLASS_CShaderInstance,
@@ -311,35 +313,19 @@ class CEffectWrap : public CRenderItem
 {
     DECLARE_CLASS(CEffectWrap, CRenderItem)
     CEffectWrap(void) : ClassInit(this) {}
-    virtual bool    ApplyCommonHandles(void) = 0;
-    virtual bool    ApplyMappedHandles(void) = 0;
-    virtual void    ReadParameterHandles(void) = 0;
-    virtual HRESULT Begin(UINT* pPasses, DWORD Flags, bool bWorldRender = true) = 0;
-    virtual HRESULT End(void) = 0;
+    virtual void PostConstruct(CRenderItemManager* pManager, CEffectTemplate* pEffectTemplate);
+    virtual void PreDestruct(void);
+    virtual bool IsValid(void);
+    virtual void OnLostDevice(void);
+    virtual void OnResetDevice(void);
+    HRESULT      Begin(UINT* pPasses, DWORD Flags, bool bWorldRender = true);
+    HRESULT      End(void);
+    bool         ApplyCommonHandles(void);
+    bool         ApplyMappedHandles(void);
 
-    ID3DXEffect** m_ppD3DEffect;
-    ID3DXEffect*  m_pD3DEffect;
-    D3DXHANDLE    hWorld, hView, hProjection, hWorldView, hWorldViewProj;
-    D3DXHANDLE    hViewProj, hViewInv, hWorldInvTr, hViewInvTr;
-    D3DXHANDLE    hCamPos, hCamDir;
-    D3DXHANDLE    hTime;
-    D3DXHANDLE    hLightAmbient, hLightDiffuse, hLightSpecular, hLightDirection;
-    D3DXHANDLE    hDepthBuffer;
-    D3DXHANDLE    hViewMainScene, hWorldMainScene, hProjectionMainScene;
-    bool          m_bUsesCommonHandles;
-
-    std::map<SString, D3DXHANDLE> m_texureHandleMap;
-    std::map<SString, D3DXHANDLE> m_valueHandleMap;
-    std::vector<D3DXHANDLE>       m_SecondaryRenderTargetList;
-    D3DXHANDLE                    m_hFirstTexture;
-    bool                          m_bRequiresNormals;
-    bool                          m_bUsesVertexShader;
-    bool                          m_bUsesDepthBuffer;
-    uint                          m_uiSaveStateFlags;
-    SString                       m_strName;
+    CEffectTemplate* m_pEffectTemplate;
+    ID3DXEffect*     m_pD3DEffect;
 };
-
-CEffectWrap* NewEffectWrap(CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug);
 
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -428,6 +414,8 @@ class CShaderInstance : public CMaterialItem
     SShaderTransform                   m_Transform;
     bool                               m_bHasModifiedTransform;
     std::map<D3DXHANDLE, SShaderValue> m_currentSetValues;
+    uint                               m_uiModifiedParametersRevision;
+    std::vector<D3DXHANDLE>            m_requiredDefaultValuesList;
 };
 
 ////////////////////////////////////////////////////////////////

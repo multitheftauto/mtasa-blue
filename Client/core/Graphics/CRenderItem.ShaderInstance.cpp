@@ -8,6 +8,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CRenderItem.EffectTemplate.h"
 
 ////////////////////////////////////////////////////////////////
 //
@@ -98,6 +99,8 @@ void CShaderInstance::CreateUnderlyingData(CShaderItem* pShaderItem)
         m_uiTessellationY = pShaderItem->m_pShaderInstance->m_uiTessellationY;
         m_Transform = pShaderItem->m_pShaderInstance->m_Transform;
         m_bHasModifiedTransform = pShaderItem->m_pShaderInstance->m_bHasModifiedTransform;
+        m_uiModifiedParametersRevision = pShaderItem->m_pShaderInstance->m_uiModifiedParametersRevision;
+        m_requiredDefaultValuesList = pShaderItem->m_pShaderInstance->m_requiredDefaultValuesList;
 
         // Increment refs on cloned texture values
         for (std::map<D3DXHANDLE, SShaderValue>::iterator iter = m_currentSetValues.begin(); iter != m_currentSetValues.end(); ++iter)
@@ -234,6 +237,7 @@ SShaderValue* CShaderInstance::GetParam(D3DXHANDLE hHandle)
     SShaderValue* pParam = MapFind(m_currentSetValues, hHandle);
     if (!pParam)
     {
+        m_pEffectWrap->m_pEffectTemplate->NotifyModifiedParameter(hHandle);
         MapSet(m_currentSetValues, hHandle, SShaderValue());
         pParam = MapFind(m_currentSetValues, hHandle);
         pParam->cType = 0;
@@ -250,6 +254,29 @@ SShaderValue* CShaderInstance::GetParam(D3DXHANDLE hHandle)
 ////////////////////////////////////////////////////////////////
 void CShaderInstance::ApplyShaderParameters(void)
 {
+    // Update list of values that will require the default setting
+    if (m_pEffectWrap->m_pEffectTemplate->m_uiModifiedParametersRevision != m_uiModifiedParametersRevision)
+    {
+        m_uiModifiedParametersRevision = m_pEffectWrap->m_pEffectTemplate->m_uiModifiedParametersRevision;
+        m_requiredDefaultValuesList.clear();
+        const std::set<D3DXHANDLE>& modifiedParametersList = m_pEffectWrap->m_pEffectTemplate->GetModifiedParameters();
+        if (m_currentSetValues.size() < modifiedParametersList.size())
+        {
+            for (auto hParameter : modifiedParametersList)
+            {
+                if (!MapContains(m_currentSetValues, hParameter))
+                {
+                    // If another CShaderInstance is using this value, but this CShaderInstance is not, then will need to set default here
+                    m_requiredDefaultValuesList.push_back(hParameter);
+                }
+            }
+        }
+    }
+
+    // Apply default values
+    m_pEffectWrap->m_pEffectTemplate->RestoreParametersDefaultValue(m_requiredDefaultValuesList);
+
+    // Apply custom values
     ID3DXEffect* pD3DEffect = m_pEffectWrap->m_pD3DEffect;
     for (std::map<D3DXHANDLE, SShaderValue>::iterator iter = m_currentSetValues.begin(); iter != m_currentSetValues.end(); ++iter)
     {
