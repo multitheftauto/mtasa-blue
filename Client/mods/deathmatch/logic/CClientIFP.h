@@ -166,6 +166,7 @@ public:
 
     enum BoneType 
     {
+        UNKNOWN     = -1,
         NORMAL      = 0, // Normal or Root, both are same
         PELVIS      = 1,
         SPINE       = 2,
@@ -207,25 +208,24 @@ public:
     const SString &                 GetBlockName                 ( void ) { return m_strBlockName; }
     bool                            LoadIFP                      ( const char* szFilePath, SString strBlockName );
 
-    bool                            LoadIFPFile                  ( const char * FilePath );
+    bool                            LoadIFPFile                  ( const char * szFilePath );
     void                            ReadIFPVersion1              ( void );
     void                            ReadIFPVersion2              ( bool bAnp3 );
 
-    void                            InitializeAnimationHierarchy ( std::unique_ptr < CAnimBlendHierarchy > & pAnimationHierarchy, const char * szAnimationName, const int32_t iSequences );
-
+    WORD                            ReadSequencesWithDummies     ( std::unique_ptr < CAnimBlendHierarchy > & pAnimationHierarchy );
+    WORD                            ReadSequences                ( std::unique_ptr < CAnimBlendHierarchy > & pAnimationHierarchy, std::map < DWORD, CAnimBlendSequenceSAInterface > & MapOfSequences );
     WORD                            ReadSequencesVersion1        ( std::unique_ptr < CAnimBlendHierarchy > & pAnimationHierarchy, std::map < DWORD, CAnimBlendSequenceSAInterface > & MapOfSequences );
     WORD                            ReadSequencesVersion2        ( std::unique_ptr < CAnimBlendHierarchy > & pAnimationHierarchy, std::map < DWORD, CAnimBlendSequenceSAInterface > & MapOfSequences );
-    void                            CopySequencesWithDummies     ( std::unique_ptr < CAnimBlendHierarchy > & pAnimationHierarchy, std::map < DWORD, CAnimBlendSequenceSAInterface > & mapOfSequences );
-
-    std::string                     convertStringToMapKey        ( char * String );
-    IFP_FrameType                   getFrameTypeFromFourCC       ( char * FourCC );
-    size_t                          GetSizeOfCompressedFrame     ( IFP_FrameType FrameType );
+    int32_t                         ReadSequenceVersion1         ( IFP_ANIM & Anim );
+    void                            ReadSequenceVersion2         ( Object & ObjectNode );
 
     void                            ReadHeaderVersion1           ( IFP_INFO & Info );
     void                            ReadAnimationNameVersion1    ( SString & strAnimationName);
     void                            ReadDgan                     ( IFP_DGAN & Dgan );
+    CClientIFP::IFP_FrameType       ReadKfrm                     ( void );
     void                            ReadAnimationHeaderVersion2  ( Animation & AnimationNode, bool bAnp3 );
 
+    bool                            ReadSequenceKeyFrames        ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, IFP_FrameType iFrameType, int32_t iFrames );
     void                            ReadKeyFramesAsCompressed    ( IFP_FrameType iFrameType, BYTE * pKeyFrames, int32_t iFrames );
     void                            ReadKrtsFramesAsCompressed   (  BYTE * pKeyFrames, int32_t TotalFrames );
     void                            ReadKrt0FramesAsCompressed   (  BYTE * pKeyFrames, int32_t TotalFrames );
@@ -233,17 +233,24 @@ public:
     void                            ReadKr00CompressedFrames     (  BYTE * pKeyFrames, int32_t TotalFrames );
     void                            ReadKrt0CompressedFrames     (  BYTE * pKeyFrames, int32_t TotalFrames );
 
+    void                            InitializeAnimationHierarchy ( std::unique_ptr < CAnimBlendHierarchy > & pAnimationHierarchy, const char * szAnimationName, const int32_t iSequences );
+    void                            InitializeAnimationSequence  ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, const char * szName, const int32_t iBoneID );
+    void                            PreProcessAnimationHierarchy ( std::unique_ptr < CAnimBlendHierarchy > & pAnimationHierarchy );    
+    void                            CopySequencesWithDummies     ( std::unique_ptr < CAnimBlendHierarchy > & pAnimationHierarchy, std::map < DWORD, CAnimBlendSequenceSAInterface > & mapOfSequences );
+    BYTE *                          AllocateSequencesMemory      ( std::unique_ptr < CAnimBlendHierarchy > & pAnimationHierarchy );
+
     void                            InsertAnimationDummySequence ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, std::string & BoneName, DWORD & dwBoneID );
     void                            CopyDummyKeyFrameByBoneID    ( BYTE * pKeyFrames, DWORD dwBoneID );
-    int32_t                         getBoneIDFromName            ( std::string const& BoneName );
-    std::string                     getCorrectBoneNameFromName   ( std::string const& BoneName );
-    std::string                     getCorrectBoneNameFromID     ( int32_t & BoneID );
-    size_t                          getCorrectBoneIndexFromID    ( int32_t & BoneID );
+    std::string                     ConvertStringToMapKey        ( const char * szString );
 
     constexpr void                  RoundSize                    ( uint32_t & u32Size );
-    constexpr bool                  isKeyFramesTypeRoot          ( IFP_FrameType iFrameType );
-    int32_t                         ReadSequenceVersion1         ( IFP_ANIM & Anim );
-    void                            ReadSequenceVersion2         ( Object & ObjectNode );
+    constexpr bool                  IsKeyFramesTypeRoot          ( IFP_FrameType iFrameType );
+
+    IFP_FrameType                   GetFrameTypeFromFourCC       ( char * FourCC );
+    size_t                          GetSizeOfCompressedFrame     ( IFP_FrameType FrameType );
+    int32_t                         GetBoneIDFromName            ( std::string const& BoneName );
+    std::string                     GetCorrectBoneNameFromName   ( std::string const& BoneName );
+    std::string                     GetCorrectBoneNameFromID     ( int32_t & BoneID );
 
     CAnimBlendHierarchySAInterface *          GetAnimationHierarchy   ( const SString & strAnimationName );
     inline std::shared_ptr < CIFPAnimations > GetIFPAnimationsPointer ( void ) { return m_pIFPAnimations; }
@@ -258,7 +265,7 @@ private:
     std::shared_ptr < CIFPAnimations > m_pIFPAnimations;
     SString                            m_strBlockName;
     std::vector < IFP_Animation > *    m_pVecAnimations;
-    bool                               isVersion1;
+    bool                               m_bVersion1;
     CAnimManager *                     m_pAnimManager;
 
     // 32 because there are 32 bones in a ped model 
