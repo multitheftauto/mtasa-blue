@@ -9,6 +9,7 @@
  *
  *****************************************************************************/
 
+#include <shlobj.h>
 #include "detours/include/detours.h"
 
 /*
@@ -82,29 +83,38 @@ namespace SharedUtil
     /////////////////////////////////////////////////////////////
     SString MakeSurePathIsUTF8(const SString& strOriginal)
     {
-        if (strOriginal.Contains("GTA San Andreas User Files"))
+        static SString strLaunchPathCP, strLaunchPathUTF8;
+        if (strLaunchPathCP.empty())
         {
-            // Fix gta save path
-            SString strPathTail = strOriginal.SplitRight("GTA San Andreas User Files");
-            SString strNewPathName = PathJoin(GetSystemPersonalPath(), "GTA San Andreas User Files", strPathTail);
+            char szLaunchPath[2048];
+            GetModuleFileNameA(NULL, szLaunchPath, NUMELMS(szLaunchPath) - 1);
+            strLaunchPathCP = ExtractPath(szLaunchPath);
+            strLaunchPathUTF8 = GetLaunchPath();
+        }
+        if (strOriginal.BeginsWithI(strLaunchPathCP))
+        {
+            // Fix gta install path
+            SString strPathTail = strOriginal.SubStr(strLaunchPathCP.length());
+            SString strNewPathName = PathJoin(strLaunchPathUTF8, strPathTail);
             return strNewPathName;
         }
-        else
+
+        static SString strProfilePathCP, strProfilePathUTF8;
+        if (strProfilePathCP.empty())
         {
-            static SString LaunchPathA;
-            if (LaunchPathA.empty())
-            {
-                char szBuffer[2048];
-                GetModuleFileNameA(NULL, szBuffer, NUMELMS(szBuffer) - 1);
-                LaunchPathA = ExtractPath(szBuffer);
-            }
-            if (strOriginal.BeginsWithI(LaunchPathA))
-            {
-                // Fix gta install path
-                SString strPathTail = strOriginal.SubStr(LaunchPathA.length());
-                SString strNewPathName = PathJoin(GetLaunchPath(), strPathTail);
-                return strNewPathName;
-            }
+            char szProfilePath[MAX_PATH] = "";
+            wchar_t wszProfilePath[MAX_PATH] = L"";
+            SHGetFolderPathA(NULL, CSIDL_PROFILE, NULL, 0, szProfilePath);
+            SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, 0, wszProfilePath);
+            strProfilePathCP = szProfilePath;
+            strProfilePathUTF8 = ToUTF8(wszProfilePath);
+        }
+        if (strOriginal.BeginsWithI(strProfilePathCP))
+        {
+            // Fix username path
+            SString strPathTail = strOriginal.SubStr(strProfilePathCP.length());
+            SString strNewPathName = PathJoin(strProfilePathUTF8, strPathTail);
+            return strNewPathName;
         }
         return strOriginal;
     }
@@ -153,7 +163,15 @@ namespace SharedUtil
 
     BOOL WINAPI MyRemoveFontResourceExA(__in LPCSTR name, __in DWORD fl, __reserved PVOID pdv) { return RemoveFontResourceExW(FromUTF8(name), fl, pdv); }
 
-    BOOL WINAPI MyRemoveDirectoryA(__in LPCSTR lpPathName) { return RemoveDirectoryW(FromUTF8(lpPathName)); }
+    BOOL WINAPI MyRemoveDirectoryA(__in LPCSTR lpPathName)
+    {
+        SString strPathName = lpPathName;
+#ifdef MTA_CLIENT
+        if (IsGTAProcess())
+            strPathName = MakeSurePathIsUTF8(lpPathName);
+#endif
+        return RemoveDirectoryW(FromUTF8(strPathName));
+    }
 
     BOOL WINAPI MyGetDiskFreeSpaceExA(__in_opt LPCSTR lpDirectoryName, __out_opt PULARGE_INTEGER lpFreeBytesAvailableToCaller,
                                       __out_opt PULARGE_INTEGER lpTotalNumberOfBytes, __out_opt PULARGE_INTEGER lpTotalNumberOfFreeBytes)
@@ -163,9 +181,25 @@ namespace SharedUtil
 
     DWORD
     WINAPI
-    MyGetFileAttributesA(__in LPCSTR lpFileName) { return GetFileAttributesW(FromUTF8(lpFileName)); }
+    MyGetFileAttributesA(__in LPCSTR lpFileName)
+    {
+        SString strFileName = lpFileName;
+#ifdef MTA_CLIENT
+        if (IsGTAProcess())
+            strFileName = MakeSurePathIsUTF8(strFileName);
+#endif
+        return GetFileAttributesW(FromUTF8(strFileName));
+    }
 
-    BOOL WINAPI MySetFileAttributesA(__in LPCSTR lpFileName, __in DWORD dwFileAttributes) { return SetFileAttributesW(FromUTF8(lpFileName), dwFileAttributes); }
+    BOOL WINAPI MySetFileAttributesA(__in LPCSTR lpFileName, __in DWORD dwFileAttributes)
+    {
+        SString strFileName = lpFileName;
+#ifdef MTA_CLIENT
+        if (IsGTAProcess())
+            strFileName = MakeSurePathIsUTF8(strFileName);
+#endif
+        return SetFileAttributesW(FromUTF8(strFileName), dwFileAttributes);
+    }
 
     HINSTANCE STDAPICALLTYPE MyShellExecuteA(HWND hwnd, LPCSTR lpOperation, LPCSTR lpFile, LPCSTR lpParameters, LPCSTR lpDirectory, INT nShowCmd)
     {
@@ -192,7 +226,15 @@ namespace SharedUtil
         return MoveFileW(FromUTF8(lpExistingFileName), FromUTF8(lpNewFileName));
     }
 
-    BOOL WINAPI MyDeleteFileA(__in LPCSTR lpFileName) { return DeleteFileW(FromUTF8(lpFileName)); }
+    BOOL WINAPI MyDeleteFileA(__in LPCSTR lpFileName)
+    {
+        SString strFileName = lpFileName;
+#ifdef MTA_CLIENT
+        if (IsGTAProcess())
+            strFileName = MakeSurePathIsUTF8(strFileName);
+#endif
+        return DeleteFileW(FromUTF8(strFileName));
+    }
 
     HMODULE
     WINAPI
