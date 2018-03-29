@@ -21,7 +21,6 @@
 #include "CLimits.h"
 #include <../Client/game_sa/CAnimBlendAssociationSA.h>
 #include <../Client/game_sa/CAnimBlendStaticAssociationSA.h>
-#include <../Client/mods/deathmatch/logic/IFP/IFPLoader.h>
 
 struct SRwResourceStats
 {
