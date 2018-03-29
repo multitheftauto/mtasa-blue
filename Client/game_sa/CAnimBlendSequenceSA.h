@@ -35,16 +35,17 @@ public:
 class CAnimBlendSequenceSA : public CAnimBlendSequence
 {
 public:
-                                            CAnimBlendSequenceSA   ( CAnimBlendSequenceSAInterface * pInterface ) { m_pInterface = pInterface; }
-    void                                    Initialize             ( void );
-    void                                    SetName                ( const char * szName );
-    void                                    SetBoneTag             ( int32_t i32BoneID );
-    void                                    SetKeyFrames           ( size_t cKeyFrames, bool bRoot, bool bCompressed, void * pKeyFrames );
-    uint32_t                                GetHash                ( void ) { return m_pInterface->m_hash; }
-    uint16_t                                GetBoneTag             ( void ) { return m_pInterface->m_boneId; }
-    void *                                  GetKeyFrames           ( void ) { return m_pInterface->pKeyFrames; }
-    unsigned short                          GetKeyFramesCount      ( void ) { return m_pInterface->sNumKeyFrames; }
-    CAnimBlendSequenceSAInterface *         GetInterface           ( void ) { return m_pInterface; }
+                                            CAnimBlendSequenceSA       ( CAnimBlendSequenceSAInterface * pInterface ) { m_pInterface = pInterface; }
+    void                                    Initialize                 ( void );
+    void                                    SetName                    ( const char * szName );
+    void                                    SetBoneTag                 ( int32_t i32BoneID );
+    void                                    SetKeyFrames               ( size_t cKeyFrames, bool bRoot, bool bCompressed, void * pKeyFrames );
+    uint32_t                                GetHash                    ( void ) { return m_pInterface->m_hash; }
+    uint16_t                                GetBoneTag                 ( void ) { return m_pInterface->m_boneId; }
+    void *                                  GetKeyFrames               ( void ) { return m_pInterface->pKeyFrames; }
+    unsigned short                          GetKeyFramesCount          ( void ) { return m_pInterface->sNumKeyFrames; }
+    bool                                    IsBigChunkForAllSequences  ( void ) { return ( ( m_pInterface->sFlags >> 3) & 1 ); }
+    CAnimBlendSequenceSAInterface *         GetInterface               ( void ) { return m_pInterface; }
 
 protected:
     CAnimBlendSequenceSAInterface *        m_pInterface;

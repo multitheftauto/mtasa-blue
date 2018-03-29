@@ -230,8 +230,8 @@ public:
     void                            ReadKrtsFramesAsCompressed   (  BYTE * pKeyFrames, int32_t TotalFrames );
     void                            ReadKrt0FramesAsCompressed   (  BYTE * pKeyFrames, int32_t TotalFrames );
     void                            ReadKr00FramesAsCompressed   (  BYTE * pKeyFrames, int32_t TotalFrames );
-    void                            ReadKr00CompressedFrames     (  BYTE * pKeyFrames, int32_t TotalFrames );
-    void                            ReadKrt0CompressedFrames     (  BYTE * pKeyFrames, int32_t TotalFrames );
+    inline void                     ReadKr00CompressedFrames     (  BYTE * pKeyFrames, int32_t TotalFrames );
+    inline void                     ReadKrt0CompressedFrames     (  BYTE * pKeyFrames, int32_t TotalFrames );
 
     void                            InitializeAnimationHierarchy ( std::unique_ptr < CAnimBlendHierarchy > & pAnimationHierarchy, const char * szAnimationName, const int32_t iSequences );
     void                            InitializeAnimationSequence  ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, const char * szName, const int32_t iBoneID );

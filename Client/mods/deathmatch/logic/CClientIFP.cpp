@@ -54,7 +54,7 @@ bool CClientIFP::LoadIFPFile ( const char * szFilePath )
         }
 
         // We are unloading the data because we don't need to read it anymore. 
-        // This function does not unload IFP, to unload ifp call unloadIFP function
+        // This function does not unload IFP, to unload ifp, use destroyElement from lua
         UnloadFile ( );
     }
     else
@@ -407,13 +407,13 @@ void CClientIFP::ReadKr00FramesAsCompressed (  BYTE * pKeyFrames, int32_t TotalF
     }
 }
 
-void CClientIFP::ReadKr00CompressedFrames (  BYTE * pKeyFrames, int32_t TotalFrames )
+inline void CClientIFP::ReadKr00CompressedFrames (  BYTE * pKeyFrames, int32_t TotalFrames )
 {
     size_t iSizeInBytes = sizeof ( IFP_Compressed_KR00 ) * TotalFrames;
     ReadBytes ( pKeyFrames, iSizeInBytes );
 }
 
-void CClientIFP::ReadKrt0CompressedFrames (  BYTE * pKeyFrames, int32_t TotalFrames )
+inline void CClientIFP::ReadKrt0CompressedFrames (  BYTE * pKeyFrames, int32_t TotalFrames )
 {
     size_t iSizeInBytes = sizeof ( IFP_Compressed_KRT0 ) * TotalFrames;
     ReadBytes ( pKeyFrames, iSizeInBytes );
