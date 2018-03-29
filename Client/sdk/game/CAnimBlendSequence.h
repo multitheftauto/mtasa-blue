@@ -15,6 +15,15 @@
 class CAnimBlendSequence
 {
 public:
+    virtual void                                Initialize         ( void ) = 0;
+    virtual void                                SetName            ( const char * szName ) = 0;
+    virtual void                                SetBoneTag         ( int32_t i32BoneID ) = 0;
+    virtual void                                SetKeyFrames       ( size_t cKeyFrames, bool bRoot, bool bCompressed, void * pKeyFrames ) = 0;
+    virtual uint32_t                            GetHash            ( void ) = 0;
+    virtual uint16_t                            GetBoneTag         ( void ) = 0;
+    virtual void *                              GetKeyFrames       ( void ) = 0;
+    virtual unsigned short                      GetKeyFramesCount  ( void ) = 0;
+    virtual CAnimBlendSequenceSAInterface *     GetInterface       ( void ) = 0;
 };
 
 #endif

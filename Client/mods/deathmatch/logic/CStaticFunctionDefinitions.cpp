@@ -2135,7 +2135,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation ( CClientEntity& Entity, const 
             }
             else
             {
-                CClientIFP * pIFP = g_pClientGame->GetIFPPointerFromMap ( szBlockName );
+                std::shared_ptr < CClientIFP > pIFP = g_pClientGame->GetIFPPointerFromMap ( szBlockName );
 
                 // Is this a custom animation block?
                 if ( pIFP )

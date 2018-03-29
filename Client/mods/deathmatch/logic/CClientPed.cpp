@@ -6191,18 +6191,13 @@ CAnimBlendAssociation * CClientPed::GetFirstAnimation ( void )
     return NULL;
 }
 
-bool CClientPed::ReplaceAnimation ( CAnimBlendHierarchy * pInternalAnimHierarchy, CClientIFP * pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy )
+void CClientPed::ReplaceAnimation ( CAnimBlendHierarchy * pInternalAnimHierarchy, const std::shared_ptr < CClientIFP > & pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy )
 {
-    if ( pIFP->isIFPLoaded ( ) )
-    {
-        SReplacedAnimation replacedAnimation;
-        replacedAnimation.pIFP =  pIFP;
-        replacedAnimation.pAnimationHierarchy = pCustomAnimHierarchy;
+    SReplacedAnimation replacedAnimation;
+    replacedAnimation.pIFP = pIFP;
+    replacedAnimation.pAnimationHierarchy = pCustomAnimHierarchy;
 
-        m_mapOfReplacedAnimations [ pInternalAnimHierarchy->GetInterface () ] = replacedAnimation;
-        return true;
-    }
-    return false;
+    m_mapOfReplacedAnimations [ pInternalAnimHierarchy->GetInterface () ] = replacedAnimation;
 }
 
 void CClientPed::RestoreAnimation ( CAnimBlendHierarchy * pInternalAnimHierarchy )
@@ -6210,12 +6205,11 @@ void CClientPed::RestoreAnimation ( CAnimBlendHierarchy * pInternalAnimHierarchy
     m_mapOfReplacedAnimations.erase ( pInternalAnimHierarchy->GetInterface () );
 }
 
-void CClientPed::RestoreAnimations ( const CClientIFP & IFP )
+void CClientPed::RestoreAnimations ( const std::shared_ptr < CClientIFP > & IFP )
 {
     for ( auto const& x : m_mapOfReplacedAnimations )
     {
-        const CClientIFP & replacedAnimationIFP = *x.second.pIFP;
-        if ( std::addressof ( IFP ) == std::addressof ( replacedAnimationIFP ) )
+        if ( std::addressof ( *IFP.get ( ) ) == std::addressof ( *x.second.pIFP.get ( ) ) )
         {
              m_mapOfReplacedAnimations.erase ( x.first );
         }
@@ -6228,9 +6222,10 @@ void CClientPed::RestoreAnimations ( CAnimBlock & animationBlock )
 {
     const CAnimBlockSAInterface * pInternalBlockInterface = animationBlock.GetInterface ( );
     DWORD iAnimationIndex = pInternalBlockInterface->idOffset;
+    DWORD dwARRAY_CAnimManager_Animations = 0xb4ea40;
     for ( size_t i = 0; i < pInternalBlockInterface->nAnimations; i++ )
     {
-        auto pAnimHierarchyInterface = (CAnimBlendHierarchySAInterface*)((BYTE*)ARRAY_CAnimManager_Animations + sizeof(CAnimBlendHierarchySAInterface) * iAnimationIndex);
+        auto pAnimHierarchyInterface = (CAnimBlendHierarchySAInterface*)((BYTE*)dwARRAY_CAnimManager_Animations + sizeof(CAnimBlendHierarchySAInterface) * iAnimationIndex);
         m_mapOfReplacedAnimations.erase ( pAnimHierarchyInterface );
         iAnimationIndex ++;
     }

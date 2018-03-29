@@ -77,6 +77,34 @@ void CElementDeleter::DeleteRecursive ( class CClientEntity* pElement )
     pElement->Unlink ();
 }
 
+// If DeleteElementSpecial returns true then do not access pElement
+// because element has been deleted
+bool CElementDeleter::DeleteElementSpecial ( CClientEntity* pElement )
+{
+    if ( IS_IFP ( pElement ) )
+    {
+        DeleteIFP  ( pElement );
+        return true;       
+    }
+    return false;
+}
+
+
+void CElementDeleter::DeleteIFP  ( CClientEntity * pElement )
+{
+    CClientIFP & IFP = static_cast < CClientIFP& > ( *pElement );
+    const SString & strBlockName = IFP.GetBlockName ( );
+    std::shared_ptr < CClientIFP > pIFP = g_pClientGame->GetIFPPointerFromMap ( strBlockName );
+    if ( pIFP )
+    { 
+        // Remove IFP from map, so we can indicate that it does not exist
+        g_pClientGame->RemoveIFPPointerFromMap ( strBlockName );
+
+        // Remove IFP animations from replaced animations of peds/players
+        g_pClientGame->OnClientIFPUnload ( pIFP );
+    }
+}
+
 
 void CElementDeleter::DoDeleteAll ( void )
 {
@@ -89,8 +117,11 @@ void CElementDeleter::DoDeleteAll ( void )
     {
         CClientEntity* pEntity = *iter;
 
-        // Delete the entity and put the next element in the list in the iterator
-        delete pEntity;
+        if ( !DeleteElementSpecial ( pEntity ) )
+        { 
+            // Delete the entity and put the next element in the list in the iterator
+            delete pEntity;
+        }
         iter = m_List.erase ( iter );
     }
 

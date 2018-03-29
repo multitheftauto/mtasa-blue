@@ -25,6 +25,8 @@ public:
 
     void                        Delete                  ( class CClientEntity* pElement );
     void                        DeleteRecursive         ( class CClientEntity* pElement );
+    bool                        DeleteElementSpecial    ( CClientEntity* pElement );
+    void                        DeleteIFP               ( CClientEntity * pElement );
 
     void                        DoDeleteAll             ( void );
 

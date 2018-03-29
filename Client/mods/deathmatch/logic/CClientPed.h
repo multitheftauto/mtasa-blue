@@ -122,7 +122,7 @@ class CClientIFP;
 
 struct SReplacedAnimation
 {
-    CClientIFP *                     pIFP;
+    std::shared_ptr < CClientIFP >   pIFP;
     CAnimBlendHierarchySAInterface * pAnimationHierarchy;
 };
 
@@ -469,8 +469,8 @@ public:
     inline void                 setNextAnimationCustom  ( const SString & strBlockName, const SString & strAnimationName ) { m_bisNextAnimationCustom = true; m_strCustomIFPBlockName = strBlockName; m_strCustomIFPAnimationName = strAnimationName; }
     inline void                 setCurrentAnimationCustom ( bool bCustom ) { m_bisCurrentAnimationCustom = bCustom; }
     inline bool                 IsCurrentAnimationCustom ( void ) { return m_bisCurrentAnimationCustom; }
-    inline SIFPAnimations *     GetIFPAnimationsPointer ( void ) { return m_pIFPAnimations; }
-    inline void                 SetIFPAnimationsPointer ( SIFPAnimations * pIFPAnimations ) { m_pIFPAnimations = pIFPAnimations; }
+    inline CIFPAnimations *     GetIFPAnimationsPointer ( void ) { return m_pIFPAnimations; }
+    inline void                 SetIFPAnimationsPointer ( CIFPAnimations * pIFPAnimations ) { m_pIFPAnimations = pIFPAnimations; }
 
     // This will indicate that we have played custom animation, so next animation can be internal GTA animation
     // You must call this function after playing a custom animation
@@ -478,9 +478,9 @@ public:
     inline const SString  &     GetNextAnimationCustomBlockName ( void ) { return m_strCustomIFPBlockName; }
     inline const SString  &     GetNextAnimationCustomName      ( void ) { return m_strCustomIFPAnimationName; }
 
-    bool                        ReplaceAnimation        ( CAnimBlendHierarchy * pInternalAnimHierarchy, CClientIFP * pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy );
+    void                        ReplaceAnimation        ( CAnimBlendHierarchy * pInternalAnimHierarchy, const std::shared_ptr < CClientIFP > & pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy );
     void                        RestoreAnimation        ( CAnimBlendHierarchy * pInternalAnimHierarchy );
-    void                        RestoreAnimations       ( const CClientIFP & IFP );
+    void                        RestoreAnimations       ( const std::shared_ptr < CClientIFP > & IFP );
     void                        RestoreAnimations       ( CAnimBlock & animationBlock );
     void                        RestoreAllAnimations    ( void );
     SReplacedAnimation *        getReplacedAnimation    ( CAnimBlendHierarchySAInterface * pInternalHierarchyInterface );
@@ -684,7 +684,7 @@ public:
     bool                        m_bisCurrentAnimationCustom;
     SString                     m_strCustomIFPBlockName;
     SString                     m_strCustomIFPAnimationName;
-    SIFPAnimations *            m_pIFPAnimations;
+    CIFPAnimations *            m_pIFPAnimations;
 
     // Key: Internal GTA animation, Value: Custom Animation
     ReplacedAnim_type m_mapOfReplacedAnimations;
