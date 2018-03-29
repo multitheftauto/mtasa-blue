@@ -57,6 +57,8 @@
 #define FUNC_CAnimManager_LoadAnimFile                      0x4d55d0
 #define FUNC_CAnimManager_LoadAnimFile_stream               0x4d47f0
 #define FUNC_CAnimManager_LoadAnimFiles                     0x4d5620
+#define FUNC_CAnimManager_AllocateKeyFramesMemory           0x72F420       
+#define FUNC_CAnimManager_FreeKeyFramesMemory               0x72F430 
 #define ARRAY_CAnimManager_AnimAssocGroups                  0xb4ea34
 #define ARRAY_CAnimManager_Animations                       0xb4ea40
 #define ARRAY_CAnimManager_AnimBlocks                       0xb5d4a0
@@ -128,11 +130,13 @@ public:
 
     void                        UncompressAnimation                     ( CAnimBlendHierarchy * pHierarchy );
     void                        RemoveFromUncompressedCache             ( CAnimBlendHierarchy * pHierarchy );
-
+    void                        RemoveFromUncompressedCache             ( CAnimBlendHierarchySAInterface * pInterface );
     void                        LoadAnimFile                            ( const char * szFile );
     void                        LoadAnimFile                            ( RwStream * pStream, bool b1, const char * sz1 );
     void                        LoadAnimFiles                           ( void );
     void                        RemoveLastAnimFile                      ( void );
+    BYTE *                      AllocateKeyFramesMemory                 ( uint32_t u32BytesToAllocate );
+    void                        FreeKeyFramesMemory                     ( void * pKeyFrames );
 
     // Non members
     bool                        HasAnimGroupLoaded                      ( AssocGroupId groupID );

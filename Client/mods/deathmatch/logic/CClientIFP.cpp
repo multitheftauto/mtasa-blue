@@ -1,12 +1,6 @@
 #include <StdInc.h>
 #include "../game_sa/CAnimBlendSequenceSA.h"
 
-hCMemoryMgr_Malloc               OLD_CMemoryMgr_Malloc = (hCMemoryMgr_Malloc)0x0072F420;
-hCMemoryMgr_Free                 OLD_CMemoryMgr_Free   = (hCMemoryMgr_Free)0x0072F430;
-
-extern DWORD BoneIds[];
-extern char BoneNames[][24];
-
 CClientIFP::CClientIFP ( class CClientManager* pManager, ElementID ID ) : CClientEntity ( ID )
 {
     // Init
@@ -21,7 +15,7 @@ CClientIFP::~CClientIFP ( void )
 {
 }
 
-bool CClientIFP::LoadIFP ( const char* szFilePath, SString strBlockName )
+bool CClientIFP::LoadIFP ( const char* szFilePath, const SString & strBlockName )
 {
     printf ("\nCClientIFP::LoadIFP: szFilePath %s\n szBlockName: %s\n\n", szFilePath, strBlockName.c_str());
     
@@ -37,14 +31,14 @@ bool CClientIFP::LoadIFP ( const char* szFilePath, SString strBlockName )
 
 bool CClientIFP::LoadIFPFile ( const char * szFilePath )
 {
-    createLoader ( szFilePath );
+    CreateLoader ( szFilePath );
 
-    if ( loadFile ( ) )
+    if ( LoadFile ( ) )
     {
         printf("IfpLoader: File loaded. Parsing it now.\n");
         
         char Version [ 4 ];
-        readBytes ( Version, sizeof ( Version ) );
+        ReadBytes ( Version, sizeof ( Version ) );
 
         bool bAnp3 = strncmp ( Version, "ANP3", sizeof ( Version ) ) == 0;
         bool bAnp2 = strncmp ( Version, "ANP2", sizeof ( Version ) ) == 0;
@@ -61,7 +55,7 @@ bool CClientIFP::LoadIFPFile ( const char * szFilePath )
 
         // We are unloading the data because we don't need to read it anymore. 
         // This function does not unload IFP, to unload ifp call unloadIFP function
-        unloadFile ( );
+        UnloadFile ( );
     }
     else
     {
@@ -80,11 +74,9 @@ void CClientIFP::ReadIFPVersion1 (  )
     ReadHeaderVersion1 ( Info );
 
     m_pVecAnimations->resize ( Info.Entries );
-
     for ( auto it = m_pVecAnimations->begin(); it != m_pVecAnimations->end(); ++it ) 
     {
         ReadAnimationNameVersion1 ( it->Name );
-     
         printf("Animation Name: %s  \n", it->Name.c_str ( ) );
       
         IFP_DGAN Dgan;
@@ -104,7 +96,7 @@ void CClientIFP::ReadIFPVersion1 (  )
 void CClientIFP::ReadIFPVersion2 ( bool bAnp3 )
 {
     IFPHeaderV2 Header;
-    readBuffer < IFPHeaderV2 > ( &Header );
+    ReadBuffer < IFPHeaderV2 > ( &Header );
 
     m_pVecAnimations->resize ( Header.TotalAnimations );
     for ( auto it = m_pVecAnimations->begin(); it != m_pVecAnimations->end(); ++it ) 
@@ -218,11 +210,11 @@ WORD CClientIFP::ReadSequencesVersion2 ( std::unique_ptr < CAnimBlendHierarchy >
 int32_t CClientIFP::ReadSequenceVersion1 ( IFP_ANIM & Anim )
 {
     IFP_CPAN Cpan;
-    readBuffer < IFP_CPAN > ( &Cpan );
+    ReadBuffer < IFP_CPAN > ( &Cpan );
     RoundSize ( Cpan.Base.Size );
-    readBytes ( &Anim, sizeof ( IFP_BASE ) );
+    ReadBytes ( &Anim, sizeof ( IFP_BASE ) );
     RoundSize ( Anim.Base.Size );
-    readBytes ( &Anim.Name, Anim.Base.Size );
+    ReadBytes ( &Anim.Name, Anim.Base.Size );
 
     int32_t iBoneID = -1;
     if ( Anim.Base.Size == 0x2C )
@@ -240,7 +232,7 @@ int32_t CClientIFP::ReadSequenceVersion1 ( IFP_ANIM & Anim )
 
 void CClientIFP::ReadSequenceVersion2 ( Object & ObjectNode )
 {
-    readBuffer < Object > ( &ObjectNode );
+    ReadBuffer < Object > ( &ObjectNode );
     std::string BoneName = ConvertStringToMapKey ( ObjectNode.Name );
     std::string strCorrectBoneName;
     if (ObjectNode.BoneID == -1)
@@ -266,7 +258,7 @@ bool CClientIFP::ReadSequenceKeyFrames ( std::unique_ptr < CAnimBlendSequence > 
     size_t iCompressedFrameSize = GetSizeOfCompressedFrame ( iFrameType );
     if ( iCompressedFrameSize )
     {
-        BYTE * pKeyFrames = static_cast < BYTE * > (  OLD_CMemoryMgr_Malloc ( iCompressedFrameSize * iFrames ) ); 
+        BYTE * pKeyFrames = m_pAnimManager->AllocateKeyFramesMemory ( iCompressedFrameSize * iFrames ); 
         pAnimationSequence->SetKeyFrames ( iFrames, IsKeyFramesTypeRoot ( iFrameType ), m_kbAllKeyFramesCompressed, pKeyFrames );
         ReadKeyFramesAsCompressed ( iFrameType, pKeyFrames, iFrames );
         return true;
@@ -277,47 +269,47 @@ bool CClientIFP::ReadSequenceKeyFrames ( std::unique_ptr < CAnimBlendSequence > 
 void CClientIFP::ReadHeaderVersion1 ( IFP_INFO & Info )
 {
     uint32_t OffsetEOF;
-    readBuffer < uint32_t > ( &OffsetEOF );
+    ReadBuffer < uint32_t > ( &OffsetEOF );
     RoundSize ( OffsetEOF );
-    readBytes ( &Info, sizeof ( IFP_BASE ) );
+    ReadBytes ( &Info, sizeof ( IFP_BASE ) );
     RoundSize ( Info.Base.Size );
-    readBytes ( &Info.Entries, Info.Base.Size );
+    ReadBytes ( &Info.Entries, Info.Base.Size );
 }
 
 void CClientIFP::ReadAnimationNameVersion1 ( SString & strAnimationName )
 {
     IFP_NAME Name;
-    readBuffer < IFP_NAME > ( &Name );
+    ReadBuffer < IFP_NAME > ( &Name );
     RoundSize ( Name.Base.Size );
 
     char szAnimationName [ 24 ];
-    readCString ( szAnimationName, Name.Base.Size );
+    ReadCString ( szAnimationName, Name.Base.Size );
     strAnimationName = szAnimationName;
 }
 
 void CClientIFP::ReadDgan ( IFP_DGAN & Dgan )
 {
-    readBytes ( &Dgan, sizeof ( IFP_BASE ) * 2 );
+    ReadBytes ( &Dgan, sizeof ( IFP_BASE ) * 2 );
     RoundSize ( Dgan.Base.Size );
     RoundSize ( Dgan.Info.Base.Size );
-    readBytes ( &Dgan.Info.Entries, Dgan.Info.Base.Size );
+    ReadBytes ( &Dgan.Info.Entries, Dgan.Info.Base.Size );
 }
 
 CClientIFP::IFP_FrameType CClientIFP::ReadKfrm ( void )
 {
     IFP_KFRM Kfrm;
-    readBuffer < IFP_KFRM > ( &Kfrm );
+    ReadBuffer < IFP_KFRM > ( &Kfrm );
     return GetFrameTypeFromFourCC ( Kfrm.Base.FourCC );
 }
 
 void CClientIFP::ReadAnimationHeaderVersion2 ( Animation & AnimationNode, bool bAnp3 )
 {
-    readCString ( ( char * ) &AnimationNode.Name, sizeof ( Animation::Name ) );
-    readBuffer < int32_t > ( &AnimationNode.TotalObjects );
+    ReadCString ( ( char * ) &AnimationNode.Name, sizeof ( Animation::Name ) );
+    ReadBuffer < int32_t > ( &AnimationNode.TotalObjects );
     if ( bAnp3 )
     {
-        readBuffer < int32_t > ( &AnimationNode.FrameSize );
-        readBuffer < int32_t > ( &AnimationNode.isCompressed );
+        ReadBuffer < int32_t > ( &AnimationNode.FrameSize );
+        ReadBuffer < int32_t > ( &AnimationNode.isCompressed );
     }
 }
 
@@ -360,7 +352,7 @@ void CClientIFP::ReadKrtsFramesAsCompressed (  BYTE * pKeyFrames, int32_t TotalF
         IFP_Compressed_KRT0 * CompressedKrt0 = (IFP_Compressed_KRT0 *)((BYTE*)pKeyFrames + sizeof(IFP_Compressed_KRT0) * FrameIndex);
 
         IFP_KRTS Krts;
-        readBuffer < IFP_KRTS >(&Krts);
+        ReadBuffer < IFP_KRTS >(&Krts);
 
         CompressedKrt0->Rotation.X    = static_cast < int16_t > ( ((-Krts.Rotation.X) * 4096.0f) );
         CompressedKrt0->Rotation.Y    = static_cast < int16_t > ( ((-Krts.Rotation.Y) * 4096.0f) );
@@ -382,7 +374,7 @@ void CClientIFP::ReadKrt0FramesAsCompressed (  BYTE * pKeyFrames, int32_t TotalF
         IFP_Compressed_KRT0 * CompressedKrt0 = (IFP_Compressed_KRT0 *)((BYTE*)pKeyFrames + sizeof(IFP_Compressed_KRT0) * FrameIndex);
 
         IFP_KRT0 Krt0;
-        readBuffer < IFP_KRT0 > ( &Krt0 );
+        ReadBuffer < IFP_KRT0 > ( &Krt0 );
 
         CompressedKrt0->Rotation.X = static_cast < int16_t > ( ((-Krt0.Rotation.X) * 4096.0f) );
         CompressedKrt0->Rotation.Y = static_cast < int16_t > ( ((-Krt0.Rotation.Y) * 4096.0f) );
@@ -404,7 +396,7 @@ void CClientIFP::ReadKr00FramesAsCompressed (  BYTE * pKeyFrames, int32_t TotalF
         IFP_Compressed_KR00 * CompressedKr00 = (IFP_Compressed_KR00 *)((BYTE*)pKeyFrames + sizeof(IFP_Compressed_KR00) * FrameIndex);
 
         IFP_KR00 Kr00;
-        readBuffer < IFP_KR00 > ( &Kr00 );
+        ReadBuffer < IFP_KR00 > ( &Kr00 );
 
         CompressedKr00->Rotation.X = static_cast < int16_t > ( ((-Kr00.Rotation.X) * 4096.0f) );
         CompressedKr00->Rotation.Y = static_cast < int16_t > ( ((-Kr00.Rotation.Y) * 4096.0f) );
@@ -418,13 +410,13 @@ void CClientIFP::ReadKr00FramesAsCompressed (  BYTE * pKeyFrames, int32_t TotalF
 void CClientIFP::ReadKr00CompressedFrames (  BYTE * pKeyFrames, int32_t TotalFrames )
 {
     size_t iSizeInBytes = sizeof ( IFP_Compressed_KR00 ) * TotalFrames;
-    readBytes ( pKeyFrames, iSizeInBytes );
+    ReadBytes ( pKeyFrames, iSizeInBytes );
 }
 
 void CClientIFP::ReadKrt0CompressedFrames (  BYTE * pKeyFrames, int32_t TotalFrames )
 {
     size_t iSizeInBytes = sizeof ( IFP_Compressed_KRT0 ) * TotalFrames;
-    readBytes ( pKeyFrames, iSizeInBytes );
+    ReadBytes ( pKeyFrames, iSizeInBytes );
 }  
 
 size_t CClientIFP::GetSizeOfCompressedFrame ( IFP_FrameType iFrameType )
@@ -484,8 +476,8 @@ void CClientIFP::CopySequencesWithDummies ( std::unique_ptr < CAnimBlendHierarch
 {
     for (size_t SequenceIndex = 0; SequenceIndex < m_kcIFPSequences; SequenceIndex++)
     {
-        std::string  BoneName = BoneNames[SequenceIndex];
-        DWORD        BoneID   = BoneIds[SequenceIndex];
+        std::string  BoneName = m_karrstrBoneNames[SequenceIndex];
+        DWORD        BoneID   = m_karruBoneIds[SequenceIndex];
             
         CAnimBlendSequenceSAInterface * pAnimationSequenceInterface = pAnimationHierarchy->GetSequence ( SequenceIndex );
         auto it = mapOfSequences.find ( BoneID );
@@ -507,17 +499,17 @@ BYTE * CClientIFP::AllocateSequencesMemory ( std::unique_ptr < CAnimBlendHierarc
     return static_cast < BYTE * > ( operator new ( 12 * cMaxSequences + 4 ) ); 
 }
 
-CClientIFP::IFP_FrameType CClientIFP::GetFrameTypeFromFourCC ( char * FourCC )
+CClientIFP::IFP_FrameType CClientIFP::GetFrameTypeFromFourCC ( const char * szFourCC )
 {
-    if (strncmp(FourCC, "KRTS", 4) == 0)
+    if ( strncmp ( szFourCC, "KRTS", 4 ) == 0)
     {
         return IFP_FrameType::KRTS;
     }
-    else if (strncmp(FourCC, "KRT0", 4) == 0)
+    else if ( strncmp ( szFourCC, "KRT0", 4 ) == 0)
     {
         return IFP_FrameType::KRT0;
     }
-    else if (strncmp(FourCC, "KR00", 4) == 0)
+    else if ( strncmp ( szFourCC, "KR00", 4 ) == 0)
     {
         return IFP_FrameType::KR00;
     }
@@ -549,7 +541,7 @@ void CClientIFP::InsertAnimationDummySequence ( std::unique_ptr < CAnimBlendSequ
     }
 
     const size_t FramesDataSizeInBytes = FrameSize * cKeyFrames;
-    BYTE * pKeyFrames =  static_cast < BYTE * > ( OLD_CMemoryMgr_Malloc ( FramesDataSizeInBytes ) );
+    BYTE * pKeyFrames = m_pAnimManager->AllocateKeyFramesMemory ( FramesDataSizeInBytes );
     pAnimationSequence->SetKeyFrames ( cKeyFrames, bHasTranslationValues, bKeyFrameCompressed, pKeyFrames );
     CopyDummyKeyFrameByBoneID ( pKeyFrames, dwBoneID );
 }
@@ -769,7 +761,7 @@ std::string CClientIFP::ConvertStringToMapKey ( const char * szString )
 
 constexpr void CClientIFP::RoundSize ( uint32_t & u32Size ) 
 { 
-    if( u32Size & 3 ) 
+    if ( u32Size & 3 ) 
     { 
         u32Size += 4 - ( u32Size & 3 ); 
     }

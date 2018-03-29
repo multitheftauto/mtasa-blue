@@ -4,11 +4,11 @@
 #define __CCLIENTIFP_H
 
 #include "CClientEntity.h"
-#include "IFP/IFPLoader.h"
-#include "IFP/CIFPAnimations.h"
+#include "CFileReader.h"
+#include "CIFPAnimations.h"
 #include <algorithm>
 
-class CClientIFP: public CClientEntity, FileLoader
+class CClientIFP: public CClientEntity, CFileReader
 {
 public:
     typedef CIFPAnimations::IFP_Animation IFP_Animation;
@@ -206,7 +206,7 @@ public:
     virtual eClientEntityType       GetType                      ( void ) const              { return CCLIENTIFP; }
 
     const SString &                 GetBlockName                 ( void ) { return m_strBlockName; }
-    bool                            LoadIFP                      ( const char* szFilePath, SString strBlockName );
+    bool                            LoadIFP                      ( const char* szFilePath, const SString & strBlockName );
 
     bool                            LoadIFPFile                  ( const char * szFilePath );
     void                            ReadIFPVersion1              ( void );
@@ -246,7 +246,7 @@ public:
     constexpr void                  RoundSize                    ( uint32_t & u32Size );
     constexpr bool                  IsKeyFramesTypeRoot          ( IFP_FrameType iFrameType );
 
-    IFP_FrameType                   GetFrameTypeFromFourCC       ( char * FourCC );
+    IFP_FrameType                   GetFrameTypeFromFourCC       ( const char * szFourCC );
     size_t                          GetSizeOfCompressedFrame     ( IFP_FrameType FrameType );
     int32_t                         GetBoneIDFromName            ( std::string const& BoneName );
     std::string                     GetCorrectBoneNameFromName   ( std::string const& BoneName );
@@ -274,6 +274,16 @@ private:
     // them, when it's going to play the animation. We don't need to worry about it.
     const bool                         m_kbAllKeyFramesCompressed = true;
 
+    const DWORD m_karruBoneIds [ 32 ] = 
+    { 
+        0, 1, 2, 3, 4, 5, 8, 6, 7, 31, 32, 33, 34, 35, 36, 21, 22, 23, 24, 25, 26, 302, 301, 201, 41, 42, 43, 44, 51, 52, 53, 54 
+    };
+    const char m_karrstrBoneNames [ 32 ] [ 24 ] = 
+    {
+        "Normal", "Pelvis", "Spine", "Spine1", "Neck", "Head", "Jaw", "L Brow", "R Brow", "Bip01 L Clavicle", "L UpperArm", 
+        "L ForeArm", "L Hand", "L Finger", "L Finger01", "Bip01 R Clavicle", "R UpperArm", "R ForeArm", "R Hand", "R Finger", 
+        "R Finger01", "L breast", "R breast", "Belly", "L Thigh", "L Calf", "L Foot", "L Toe0", "R Thigh", "R Calf", "R Foot", "R Toe0"
+    };
 };
 
 #endif

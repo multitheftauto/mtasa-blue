@@ -521,6 +521,16 @@ void CAnimManagerSA::RemoveFromUncompressedCache ( CAnimBlendHierarchy * pHierar
     }
 }
 
+void CAnimManagerSA::RemoveFromUncompressedCache ( CAnimBlendHierarchySAInterface * pHierarchyInterface )
+{
+    DWORD dwFunc = FUNC_CAnimManager_RemoveFromUncompressedCache;
+    _asm
+    {
+        push    pHierarchyInterface
+        call    dwFunc
+        add     esp, 0x4
+    }
+}
 
 void CAnimManagerSA::LoadAnimFile ( const char * szFile )
 {
@@ -564,6 +574,33 @@ void CAnimManagerSA::RemoveLastAnimFile ( void )
     _asm
     {
         call    dwFunc
+    }
+}
+
+
+BYTE * CAnimManagerSA::AllocateKeyFramesMemory ( uint32_t u32BytesToAllocate )
+{
+    BYTE * pKeyFrames = nullptr;
+    DWORD dwFunc = FUNC_CAnimManager_AllocateKeyFramesMemory;
+    _asm
+    {
+        push    u32BytesToAllocate
+        call    dwFunc
+        add     esp, 0x4
+        mov     pKeyFrames, eax
+    }
+    return pKeyFrames;
+}
+
+
+void CAnimManagerSA::FreeKeyFramesMemory ( void * pKeyFrames )
+{
+    DWORD dwFunc = FUNC_CAnimManager_FreeKeyFramesMemory;
+    _asm
+    {
+        push    pKeyFrames
+        call    dwFunc
+        add     esp, 0x4
     }
 }
 

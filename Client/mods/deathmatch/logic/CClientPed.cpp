@@ -6222,9 +6222,10 @@ void CClientPed::RestoreAnimations ( CAnimBlock & animationBlock )
 {
     const CAnimBlockSAInterface * pInternalBlockInterface = animationBlock.GetInterface ( );
     DWORD iAnimationIndex = pInternalBlockInterface->idOffset;
+    DWORD dwARRAY_CAnimManager_Animations = 0xb4ea40;
     for ( size_t i = 0; i < pInternalBlockInterface->nAnimations; i++ )
     {
-        auto pAnimHierarchyInterface = (CAnimBlendHierarchySAInterface*)((BYTE*)ARRAY_CAnimManager_Animations + sizeof(CAnimBlendHierarchySAInterface) * iAnimationIndex);
+        auto pAnimHierarchyInterface = (CAnimBlendHierarchySAInterface*)((BYTE*)dwARRAY_CAnimManager_Animations + sizeof(CAnimBlendHierarchySAInterface) * iAnimationIndex);
         m_mapOfReplacedAnimations.erase ( pAnimHierarchyInterface );
         iAnimationIndex ++;
     }

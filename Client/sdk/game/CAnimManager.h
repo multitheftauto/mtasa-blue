@@ -91,11 +91,14 @@ public:
 
     virtual void                        UncompressAnimation                     ( CAnimBlendHierarchy * pHierarchy ) = 0;
     virtual void                        RemoveFromUncompressedCache             ( CAnimBlendHierarchy * pHierarchy ) = 0;
+    virtual void                        RemoveFromUncompressedCache             ( CAnimBlendHierarchySAInterface * pInterface ) = 0;
 
     virtual void                        LoadAnimFile                            ( const char * szFile ) = 0;
     virtual void                        LoadAnimFile                            ( RwStream * pStream, bool b1, const char * sz1 ) = 0;
     virtual void                        LoadAnimFiles                           ( void ) = 0;
     virtual void                        RemoveLastAnimFile                      ( void ) = 0;
+    virtual BYTE *                      AllocateKeyFramesMemory                 ( uint32_t u32BytesToAllocate ) = 0;
+    virtual void                        FreeKeyFramesMemory                     ( void * pKeyFrames ) = 0;
 
     // Non members
     virtual bool                        HasAnimGroupLoaded                      ( AssocGroupId groupID ) = 0;
