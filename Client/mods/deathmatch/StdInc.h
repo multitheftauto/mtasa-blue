@@ -94,6 +94,7 @@
 #include <CLogger.h>
 #include <CMapEventManager.h>
 #include <CModelNames.h>
+#include <CIFPEngine.h>
 #include <CScriptFile.h>
 #include <CWeaponNames.h>
 #include <CVehicleNames.h>

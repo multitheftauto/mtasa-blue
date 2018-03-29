@@ -305,39 +305,15 @@ int CLuaEngineDefs::EngineLoadIFP ( lua_State* luaVM )
                 // Is this a legal filepath?
                 if ( CResourceManager::ParseResourcePathInput( strFile, pResource, &strPath ) )
                 {
-                    // Grab the resource root entity
-                    CClientEntity* pRoot = pResource->GetResourceIFPRoot ();
-                    
-                    // Check whether the IFP blockname exists or not
-                    if ( g_pClientGame->GetIFPPointerFromMap ( strBlockName ) == nullptr )
-                    { 
-                        // Create a IFP element
-                        std::shared_ptr < CClientIFP > pIFP ( new CClientIFP ( m_pManager, INVALID_ELEMENT_ID ) );
-
-                        // Try to load the IFP file
-                        if ( pIFP->LoadIFP ( strPath, strBlockName ) )
-                        {
-                            // We can use the map to retrieve correct IFP by block name later
-                            g_pClientGame->InsertIFPPointerToMap ( strBlockName, pIFP );
-
-                            // Success loading the file. Set parent to IFP root
-                            pIFP->SetParent ( pRoot );
-
-                            // Return the IFP element
-                            lua_pushelement ( luaVM, pIFP.get ( ) );
-                            return 1;
-                         }
-                        else
-                        {
-                            // Delete it again
-                            //delete pIFP;
-                            argStream.SetCustomError ( strFile, "Error loading IFP" );
-                        }
+                    std::shared_ptr < CClientIFP > pIFP = CIFPEngine::EngineLoadIFP ( pResource, m_pManager, strPath, strBlockName );
+                    if ( pIFP != nullptr )
+                    {
+                        // Return the IFP element
+                        lua_pushelement ( luaVM, pIFP.get ( ) );
+                        return 1;
                     }
                     else
-                    {
-                        argStream.SetCustomError ( strFile, "Block name already exists" );
-                    }
+                        argStream.SetCustomError ( strFile, "Error loading IFP" );
                 }
                 else
                     argStream.SetCustomError ( strFile, "Bad file path" );
@@ -526,27 +502,10 @@ int CLuaEngineDefs::EngineReplaceAnimation ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( IS_PED ( pEntity ) )
-        { 
-            CClientPed& Ped = static_cast < CClientPed& > ( *pEntity );
-
-            CAnimBlock * pInternalBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( strInternalBlockName );
-            std::shared_ptr < CClientIFP > pCustomIFP = g_pClientGame->GetIFPPointerFromMap ( strCustomBlockName );
-            if ( pInternalBlock && pCustomIFP )
-            {
-                CAnimBlendHierarchy * pInternalAnimHierarchy = g_pGame->GetAnimManager ()->GetAnimation ( strInternalAnimName, pInternalBlock );
-                CAnimBlendHierarchySAInterface * pCustomAnimHierarchyInterface = pCustomIFP->GetAnimationHierarchy ( strCustomAnimName );
-                if ( pInternalAnimHierarchy && pCustomAnimHierarchyInterface )
-                { 
-                    Ped.ReplaceAnimation ( pInternalAnimHierarchy, pCustomIFP, pCustomAnimHierarchyInterface );
-                    lua_pushboolean ( luaVM, true );
-                    return 1;
-                }    
-                else
-                    argStream.SetCustomError ( "Incorrect Animation name" ); 
-            }
-            else
-                argStream.SetCustomError ( "Incorrect Block name" );
+        if ( CIFPEngine::EngineReplaceAnimation ( pEntity, strInternalBlockName, strInternalAnimName, strCustomBlockName, strCustomAnimName ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
     }
     if ( argStream.HasErrors () )
@@ -560,8 +519,7 @@ int CLuaEngineDefs::EngineReplaceAnimation ( lua_State* luaVM )
 int CLuaEngineDefs::EngineRestoreAnimation ( lua_State* luaVM )
 {
     CClientEntity * pEntity = nullptr;
-    bool bRestoreAllAnimations = false;
-    bool bRestoreBlockAnimations = false;
+    CIFPEngine::eRestoreAnimation eRestoreType = CIFPEngine::eRestoreAnimation::SINGLE;
     SString strInternalBlockName = "";
     SString strInternalAnimName = "";
 
@@ -569,14 +527,14 @@ int CLuaEngineDefs::EngineRestoreAnimation ( lua_State* luaVM )
     argStream.ReadUserData ( pEntity );
     if ( argStream.NextIsNil ( ) || argStream.NextIsNone ( ) )
     {
-        bRestoreAllAnimations = true;
+        eRestoreType = CIFPEngine::eRestoreAnimation::ALL;
     }
     else 
     { 
         argStream.ReadString ( strInternalBlockName );
         if ( argStream.NextIsNil ( ) || argStream.NextIsNone ( ) )
         { 
-            bRestoreBlockAnimations = true;
+            eRestoreType = CIFPEngine::eRestoreAnimation::BLOCK;
         }
         else
         {
@@ -586,44 +544,10 @@ int CLuaEngineDefs::EngineRestoreAnimation ( lua_State* luaVM )
 
     if ( !argStream.HasErrors () )
     {
-        if ( IS_PED ( pEntity ) )
-        { 
-            CClientEntity & Entity = *pEntity;
-            CClientPed& Ped = static_cast < CClientPed& > ( Entity );
-        
-            if ( bRestoreAllAnimations )
-            {
-                Ped.RestoreAllAnimations ( );
-                lua_pushboolean ( luaVM, true );
-                return 1;
-            }
-            else
-            { 
-                CAnimBlock * pInternalBlock = g_pGame->GetAnimManager ()->GetAnimationBlock ( strInternalBlockName );
-                if ( pInternalBlock )
-                {
-                    if ( bRestoreBlockAnimations )
-                    {
-                        Ped.RestoreAnimations ( *pInternalBlock );
-                        lua_pushboolean ( luaVM, true );
-                        return 1;
-                    }
-                    else 
-                    { 
-                        CAnimBlendHierarchy * pInternalAnimHierarchy = g_pGame->GetAnimManager ()->GetAnimation ( strInternalAnimName, pInternalBlock );
-                        if ( pInternalAnimHierarchy )
-                        { 
-                            Ped.RestoreAnimation ( pInternalAnimHierarchy );
-                            lua_pushboolean ( luaVM, true );
-                            return 1;
-                        }    
-                        else
-                            argStream.SetCustomError ( "Incorrect Animation name" ); 
-                    }
-                }
-                else
-                    argStream.SetCustomError ( "Incorrect Block name" );
-            }
+        if ( CIFPEngine::EngineRestoreAnimation ( pEntity, strInternalBlockName, strInternalAnimName, eRestoreType ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
         }
     }
     if ( argStream.HasErrors () )
