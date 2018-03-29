@@ -1,4 +1,5 @@
 #include <StdInc.h>
+#include "../game_sa/CAnimBlendSequenceSA.h"
 
 CIFPAnimations::CIFPAnimations ( void )
 {
@@ -13,22 +14,20 @@ CIFPAnimations::~CIFPAnimations ( void )
 
 void CIFPAnimations::DeleteAnimations ( void )
 {
-    hCMemoryMgr_Free OLD_CMemoryMgr_Free = (hCMemoryMgr_Free)0x0072F430;
-    auto OLD_CAnimBlendHierarchy_RemoveFromUncompressedCache = (hCAnimBlendHierarchy_RemoveFromUncompressedCache)0x004D42A0;
-
+    CAnimManager * pAnimManager = g_pGame->GetAnimManager ( );
     for ( size_t i = 0; i < vecAnimations.size(); i++ )
     {
         IFP_Animation * ifpAnimation = &vecAnimations[i];
         
-        OLD_CAnimBlendHierarchy_RemoveFromUncompressedCache ( (int)&ifpAnimation->Hierarchy );
-            
+        pAnimManager->RemoveFromUncompressedCache ( &ifpAnimation->Hierarchy );
+
         for (unsigned short SequenceIndex = 0; SequenceIndex < ifpAnimation->Hierarchy.usNumSequences; SequenceIndex++)
         {
-            _CAnimBlendSequence * pSequence = (_CAnimBlendSequence*)((BYTE*)ifpAnimation->Hierarchy.pSequences + (sizeof(_CAnimBlendSequence) * SequenceIndex));
+            auto pSequence = (CAnimBlendSequenceSAInterface*)((BYTE*)ifpAnimation->Hierarchy.pSequences + (sizeof(CAnimBlendSequenceSAInterface) * SequenceIndex));
 
-            if ( !( (pSequence->m_nFlags >> 3) & 1 ) ) // If ( !OneBigChunkForAllSequences )
+            if ( !( (pSequence->sFlags >> 3) & 1 ) ) // If ( !OneBigChunkForAllSequences )
             {
-                OLD_CMemoryMgr_Free ( pSequence->m_pFrames ); //*(void **)(pThis + 8)); //pSequence->m_pFrames );
+                pAnimManager->FreeKeyFramesMemory ( pSequence->pKeyFrames ); //*(void **)(pThis + 8)); //pSequence->m_pFrames );
             }
             else
             {
@@ -36,7 +35,7 @@ void CIFPAnimations::DeleteAnimations ( void )
                 { 
                     // All frames of all sequences are allocated on one memory block, so free that one
                     // and break the loop 
-                    OLD_CMemoryMgr_Free ( pSequence->m_pFrames );
+                    pAnimManager->FreeKeyFramesMemory ( pSequence->pKeyFrames );
                     break;
                 }
             }
