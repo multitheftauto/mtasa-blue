@@ -10,6 +10,8 @@
 
 #include "StdInc.h"
 
+using std::list;
+
 CClientMarkerManager::CClientMarkerManager(CClientManager* pManager)
 {
     // Init
@@ -35,6 +37,21 @@ CClientMarker* CClientMarkerManager::Get(ElementID ID)
     return NULL;
 }
 
+bool CClientMarkerManager::Exists(CClientMarker* pMarker)
+{
+    return m_Markers.contains(pMarker);
+}
+
+void CClientMarkerManager::Delete(int ID)
+{
+    // Grab it and eventually delete it
+    CClientMarker* pMarker = Get(ID);
+    if (pMarker)
+    {
+        delete pMarker;
+    }
+}
+
 void CClientMarkerManager::DeleteAll(void)
 {
     // Delete each checkpoint
@@ -53,12 +70,10 @@ void CClientMarkerManager::DeleteAll(void)
 
 void CClientMarkerManager::DoPulse(void)
 {
-    m_Markers.SuspendModifyOperations();
     // Pulse all our markers
     CFastList<CClientMarker*>::const_iterator iter = m_Markers.begin();
     for (; iter != m_Markers.end(); iter++)
     {
         (*iter)->DoPulse();
     }
-    m_Markers.ResumeModifyOperations();
 }

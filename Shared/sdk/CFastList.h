@@ -36,27 +36,14 @@ public:
     typedef typename std::map<uint, T>  MapType;
     typedef typename std::pair<uint, T> MapTypePair;
     typedef typename std::map<T, uint>  InfoType;
-    enum class EOperation
-    {
-        PushBack,
-        PushFront,
-        Remove,
-    };
-    struct SSuspendedOperation
-    {
-        EOperation operation;
-        T item;
-    };
 
     uint     uiRevision;                  // Incremented every time the ordered map changes
     uint     uiNextFrontIndex;            // Next (decrementing) index to use as a map key for items added to the front
     uint     uiNextBackIndex;             // Next (incrementing) index to use as a map key for items added to the back
     MapType  orderedMap;                  // Ordered map of items
     InfoType infoMap;                     // info for each item
-    bool     m_bSuspendingModifyOperations;
-    std::vector<SSuspendedOperation> m_SuspendedOperationList;
 
-    CFastList(void) : uiRevision(1), uiNextFrontIndex(UINT_MAX / 2 - 1), uiNextBackIndex(UINT_MAX / 2), m_bSuspendingModifyOperations(false)
+    CFastList(void) : uiRevision(1), uiNextFrontIndex(UINT_MAX / 2 - 1), uiNextBackIndex(UINT_MAX / 2)
     {
         #ifdef MTA_DEBUG
         // T must be a pointer
@@ -69,18 +56,12 @@ public:
 
     void pop_front(void)
     {
-        dassert(!m_bSuspendingModifyOperations);
         T item = front();
         remove(item);
     }
 
     void push_front(const T& item)
     {
-        if (m_bSuspendingModifyOperations)
-        {
-            m_SuspendedOperationList.push_back({EOperation::PushFront, item});
-            return;
-        }
         // Check if indexing will wrap (and so destroy map order)
         if (uiNextFrontIndex < 5000)
             Reindex();
@@ -94,11 +75,6 @@ public:
 
     void push_back(const T& item)
     {
-        if (m_bSuspendingModifyOperations)
-        {
-            m_SuspendedOperationList.push_back({EOperation::PushBack, item});
-            return;
-        }
         // Check if indexing will wrap (and so destroy map order)
         if (uiNextBackIndex > UINT_MAX - 5000)
             Reindex();
@@ -118,7 +94,6 @@ public:
 
     void clear(void)
     {
-        dassert(!m_bSuspendingModifyOperations);
         orderedMap.clear();
         uiRevision++;
         infoMap.clear();
@@ -128,11 +103,6 @@ public:
 
     void remove(const T& item)
     {
-        if (m_bSuspendingModifyOperations)
-        {
-            m_SuspendedOperationList.push_back({EOperation::Remove, item});
-            return;
-        }
         if (uint uiIndex = GetItemIndex(item))
         {
             typename MapType::iterator it = orderedMap.find(uiIndex);
@@ -145,32 +115,6 @@ public:
     }
 
     uint GetRevision(void) const { return uiRevision; }
-
-    // Queue remove/push_back/push_front operations until ResumeModifyOperations is called
-    void SuspendModifyOperations(void)
-    {
-        dassert(!m_bSuspendingModifyOperations);
-        m_bSuspendingModifyOperations = true;
-    }
-
-    // Replay queued operations
-    void ResumeModifyOperations(void)
-    {
-        dassert(m_bSuspendingModifyOperations);
-        m_bSuspendingModifyOperations = false;
-        for (const auto& suspendedOperation : m_SuspendedOperationList)
-        {
-            if (suspendedOperation.operation == EOperation::PushBack)
-                push_back(suspendedOperation.item);
-            else
-            if (suspendedOperation.operation == EOperation::PushFront)
-                push_front(suspendedOperation.item);
-            else
-            if (suspendedOperation.operation == EOperation::Remove)
-                remove(suspendedOperation.item);
-        }
-        m_SuspendedOperationList.clear();
-    }
 
 protected:
     // Reset indexing
