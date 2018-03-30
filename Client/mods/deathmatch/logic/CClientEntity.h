@@ -287,7 +287,7 @@ public:
     void RemoveOriginSourceUser(CClientPed* pModel) { m_OriginSourceUsers.remove(pModel); }
 
     void AddContact(CClientPed* pModel) { m_Contacts.push_back(pModel); }
-    void RemoveContact(CClientPed* pModel) { m_Contacts.remove(pModel); }
+    void RemoveContact(CClientPed* pModel) { ListRemove(m_Contacts, pModel); }
 
     virtual CEntity*       GetGameEntity(void) { return NULL; }
     virtual const CEntity* GetGameEntity(void) const { return NULL; }
@@ -356,7 +356,7 @@ protected:
     CFastList<class CClientColShape*> m_Collisions;
     CElementGroup*                    m_pElementGroup;
     std::list<CClientPed*>            m_OriginSourceUsers;
-    std::list<CClientPed*>            m_Contacts;
+    std::vector<CClientPed*>          m_Contacts;
     unsigned char                     m_ucInterior;
     std::map<CClientEntity*, bool>    m_DisabledCollisions;
     bool                              m_bDoubleSided;

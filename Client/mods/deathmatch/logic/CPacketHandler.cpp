@@ -1415,21 +1415,12 @@ void CPacketHandler::Packet_DebugEcho(NetBitStreamInterface& bitStream)
 
         if (!strFileName.empty())
         {
-            // get the date/time now
-            struct tm* today;
-            time_t     ltime;
-            time(&ltime);
-            today = localtime(&ltime);
-            char date[100];
-            strftime(date, 30, "%Y-%m-%d %H:%M:%S", today);
-            date[29] = '\0';
-
             // open the file for append access
             FILE* pFile = File::Fopen(strFileName.c_str(), "a");
             if (pFile)
             {
                 // write out the data
-                fprintf(pFile, "[%s] %s\n", date, szMessage);
+                fprintf(pFile, "[%s] %s\n", *GetLocalTimeString(true), szMessage);
                 fclose(pFile);
             }
         }

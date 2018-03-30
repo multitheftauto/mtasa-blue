@@ -141,14 +141,7 @@ void CScriptDebugging::PrintLog(const char* szText)
     if (m_pLogFile)
     {
         // Log it, timestamped
-        char   szBuffer[64];
-        time_t timeNow;
-        time(&timeNow);
-        SString strInput;
-
-        strftime(szBuffer, 32, "[%Y-%m-%d %H:%M:%S]", localtime(&timeNow));
-        strInput.Format("%s %s\n", szBuffer, szText);
-
+        SString strInput("[%s] %s\n", *GetLocalTimeString(true), szText);
         fwrite(strInput.c_str(), strInput.length(), 1, m_pLogFile);
     }
 }
