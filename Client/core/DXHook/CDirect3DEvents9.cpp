@@ -18,6 +18,7 @@
 #include "CAdditionalVertexStreamManager.h"
 #include "CVertexStreamBoundingBoxManager.h"
 #include "CProxyDirect3DVertexDeclaration.h"
+#include "Graphics/CRenderItem.EffectTemplate.h"
 
 bool g_bInMTAScene = false;
 
@@ -343,10 +344,6 @@ HRESULT CDirect3DEvents9::DrawPrimitiveShader(IDirect3DDevice9* pDevice, D3DPRIM
         // Yes shader for this texture
         CShaderInstance* pShaderInstance = pShaderItem->m_pShaderInstance;
 
-        // Save some debugging info
-        g_pDeviceState->CallState.strShaderName = pShaderInstance->m_pEffectWrap->m_strName;
-        g_pDeviceState->CallState.bShaderRequiresNormals = pShaderInstance->m_pEffectWrap->m_bRequiresNormals;
-
         // Apply custom parameters
         pShaderInstance->ApplyShaderParameters();
         // Apply common parameters
@@ -361,7 +358,7 @@ HRESULT CDirect3DEvents9::DrawPrimitiveShader(IDirect3DDevice9* pDevice, D3DPRIM
         // Do shader passes
         ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
 
-        DWORD dwFlags = pShaderInstance->m_pEffectWrap->m_uiSaveStateFlags;            // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
+        DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;            // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
         uint  uiNumPasses = 0;
         pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags);
 
@@ -384,8 +381,6 @@ HRESULT CDirect3DEvents9::DrawPrimitiveShader(IDirect3DDevice9* pDevice, D3DPRIM
             pDevice->SetVertexShader(pOriginalVertexShader);
             pDevice->SetPixelShader(NULL);
         }
-
-        g_pDeviceState->CallState.strShaderName = "";
     }
 
     return D3D_OK;
@@ -529,12 +524,8 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
         // Yes shader for this texture
         CShaderInstance* pShaderInstance = pShaderItem->m_pShaderInstance;
 
-        // Save some debugging info
-        g_pDeviceState->CallState.strShaderName = pShaderInstance->m_pEffectWrap->m_strName;
-        g_pDeviceState->CallState.bShaderRequiresNormals = pShaderInstance->m_pEffectWrap->m_bRequiresNormals;
-
         // Add normal stream if shader wants it
-        if (pShaderInstance->m_pEffectWrap->m_bRequiresNormals)
+        if (pShaderInstance->m_pEffectWrap->m_pEffectTemplate->m_bRequiresNormals)
         {
             // Find/create/set additional vertex stream
             CAdditionalVertexStreamManager::GetSingleton()->MaybeSetAdditionalVertexStream(PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices,
@@ -555,7 +546,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
         // Do shader passes
         ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
 
-        DWORD dwFlags = pShaderInstance->m_pEffectWrap->m_uiSaveStateFlags;            // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
+        DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;            // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
         uint  uiNumPasses = 0;
         pShaderInstance->m_pEffectWrap->Begin(&uiNumPasses, dwFlags);
 
@@ -590,8 +581,6 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
 
         // Unset additional vertex stream
         CAdditionalVertexStreamManager::GetSingleton()->MaybeUnsetAdditionalVertexStream();
-
-        g_pDeviceState->CallState.strShaderName = "";
     }
 
     return D3D_OK;
@@ -623,8 +612,6 @@ void CDirect3DEvents9::CloseActiveShader(void)
 
     // Unset additional vertex stream
     CAdditionalVertexStreamManager::GetSingleton()->MaybeUnsetAdditionalVertexStream();
-
-    g_pDeviceState->CallState.strShaderName = "";
 }
 
 /////////////////////////////////////////////////////////////

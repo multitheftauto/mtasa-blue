@@ -3,51 +3,13 @@
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        core/CRenderItem.EffectTemplate.cpp
- *  PURPOSE:
+ *  PURPOSE:     A compiled effect to clone d3d effects from
  *
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CRenderItem.EffectCloner.h"
+#include "CRenderItem.EffectTemplate.h"
 #include <DXHook/CProxyDirect3DEffect.h>
-
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-//
-// CEffectTemplateImpl
-//
-class CEffectTemplateImpl : public CEffectTemplate
-{
-public:
-    ZERO_ON_NEW
-
-    virtual void PostConstruct(CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug);
-    virtual void PreDestruct(void);
-    virtual bool IsValid(void);
-    virtual void OnLostDevice(void);
-    virtual void OnResetDevice(void);
-
-    // CEffectTemplate
-    virtual bool              HaveFilesChanged(void);
-    virtual int               GetTicksSinceLastUsed(void);
-    virtual ID3DXEffect*      CloneD3DEffect(SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer, HRESULT& outHResult);
-    virtual void              UnCloneD3DEffect(ID3DXEffect* pD3DEffect);
-    virtual const SDebugInfo& GetDebugInfo(void) { return m_DebugInfo; }
-
-    // CEffectTemplateImpl
-    void CreateUnderlyingData(const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug);
-    void ReleaseUnderlyingData(void);
-    bool ValidateDepthBufferUsage(D3DXHANDLE hTechnique, SString& strOutErrorExtra);
-
-    ID3DXEffect*               m_pD3DEffect;
-    bool                       m_bUsesDepthBuffer;
-    bool                       m_bHaveFilesChanged;
-    std::map<SString, SString> m_FileMD5Map;
-    CTickCount                 m_TickCountLastUsed;
-    uint                       m_uiCloneCount;
-    SDebugInfo                 m_DebugInfo;
-    HRESULT                    m_CreateHResult;
-};
 
 ///////////////////////////////////////////////////////////////
 //
@@ -57,7 +19,7 @@ public:
 CEffectTemplate* NewEffectTemplate(CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug,
                                    HRESULT& outHResult)
 {
-    CEffectTemplateImpl* pEffectTemplate = new CEffectTemplateImpl();
+    CEffectTemplate* pEffectTemplate = new CEffectTemplate();
     pEffectTemplate->PostConstruct(pManager, strFilename, strRootPath, strOutStatus, bDebug);
 
     outHResult = pEffectTemplate->m_CreateHResult;
@@ -154,13 +116,12 @@ namespace
 
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::PostConstruct
+// CEffectTemplate::PostConstruct
 //
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplateImpl::PostConstruct(CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus,
-                                        bool bDebug)
+void CEffectTemplate::PostConstruct(CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug)
 {
     Super::PostConstruct(pManager);
 
@@ -170,12 +131,12 @@ void CEffectTemplateImpl::PostConstruct(CRenderItemManager* pManager, const SStr
 
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::PreDestruct
+// CEffectTemplate::PreDestruct
 //
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplateImpl::PreDestruct(void)
+void CEffectTemplate::PreDestruct(void)
 {
     ReleaseUnderlyingData();
     Super::PreDestruct();
@@ -183,12 +144,12 @@ void CEffectTemplateImpl::PreDestruct(void)
 
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::GetTicksSinceLastBeingUsed
+// CEffectTemplate::GetTicksSinceLastBeingUsed
 //
 //
 //
 ////////////////////////////////////////////////////////////////
-int CEffectTemplateImpl::GetTicksSinceLastUsed(void)
+int CEffectTemplate::GetTicksSinceLastUsed(void)
 {
     if (m_uiCloneCount != 0)
         return 0;            // Used right now
@@ -199,51 +160,50 @@ int CEffectTemplateImpl::GetTicksSinceLastUsed(void)
 
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::IsValid
+// CEffectTemplate::IsValid
 //
 // Check underlying data is present
 //
 ////////////////////////////////////////////////////////////////
-bool CEffectTemplateImpl::IsValid(void)
+bool CEffectTemplate::IsValid(void)
 {
     return m_pD3DEffect != NULL;
 }
 
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::OnLostDevice
+// CEffectTemplate::OnLostDevice
 //
 // Release device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplateImpl::OnLostDevice(void)
+void CEffectTemplate::OnLostDevice(void)
 {
     m_pD3DEffect->OnLostDevice();
 }
 
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::OnResetDevice
+// CEffectTemplate::OnResetDevice
 //
 // Recreate device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplateImpl::OnResetDevice(void)
+void CEffectTemplate::OnResetDevice(void)
 {
     m_pD3DEffect->OnResetDevice();
 }
 
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::CreateUnderlyingData
+// CEffectTemplate::CreateUnderlyingData
 //
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplateImpl::CreateUnderlyingData(const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug)
+void CEffectTemplate::CreateUnderlyingData(const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug)
 {
     assert(!m_pD3DEffect);
-    m_DebugInfo.createTime = CTickCount::Now();
 
     // Make defines
     bool bUsesRAWZ = CGraphics::GetSingleton().GetRenderItemManager()->GetDepthBufferFormat() == RFORMAT_RAWZ;
@@ -344,10 +304,30 @@ void CEffectTemplateImpl::CreateUnderlyingData(const SString& strFilename, const
     // Set technique
     m_pD3DEffect->SetTechnique(hTechnique);
 
+    // Get/cache parameter handles
+    ReadParameterHandles();
+
     // Inform user of technique name
     D3DXTECHNIQUE_DESC TechniqueDesc;
     m_pD3DEffect->GetTechniqueDesc(hTechnique, &TechniqueDesc);
-    strOutStatus = TechniqueDesc.Name;
+    m_strTechniqueName = TechniqueDesc.Name;
+    strOutStatus = m_strTechniqueName;
+
+    // Check if any technique uses a vertex shader
+    m_bUsesVertexShader = false;
+    for (uint i = 0; i < EffectDesc.Techniques; i++)
+    {
+        D3DXHANDLE         hTechnique = m_pD3DEffect->GetTechnique(i);
+        D3DXTECHNIQUE_DESC TechniqueDesc;
+        m_pD3DEffect->GetTechniqueDesc(hTechnique, &TechniqueDesc);
+        for (uint i = 0; i < TechniqueDesc.Passes; i++)
+        {
+            D3DXPASS_DESC PassDesc;
+            m_pD3DEffect->GetPassDesc(m_pD3DEffect->GetPass(hTechnique, i), &PassDesc);
+            if (PassDesc.pVertexShaderFunction)
+                m_bUsesVertexShader = true;
+        }
+    }
 
     if (bDebug)
     {
@@ -376,13 +356,13 @@ void CEffectTemplateImpl::CreateUnderlyingData(const SString& strFilename, const
 
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::ValidateDepthBufferUsage
+// CEffectTemplate::ValidateDepthBufferUsage
 //
 // Check if technique passes our rules
 // Returns false if should fail validation
 //
 ////////////////////////////////////////////////////////////////
-bool CEffectTemplateImpl::ValidateDepthBufferUsage(D3DXHANDLE hTechnique, SString& strOutErrorExtra)
+bool CEffectTemplate::ValidateDepthBufferUsage(D3DXHANDLE hTechnique, SString& strOutErrorExtra)
 {
     m_bUsesDepthBuffer = false;
 
@@ -414,83 +394,40 @@ bool CEffectTemplateImpl::ValidateDepthBufferUsage(D3DXHANDLE hTechnique, SStrin
 
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::ReleaseUnderlyingData
+// CEffectTemplate::ReleaseUnderlyingData
 //
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplateImpl::ReleaseUnderlyingData(void)
+void CEffectTemplate::ReleaseUnderlyingData(void)
 {
     SAFE_RELEASE(m_pD3DEffect);
 }
 
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::CloneD3DEffect
+// CEffectTemplate::CloneD3DEffect
 //
 // Clone the d3d effect
 //
 ////////////////////////////////////////////////////////////////
-ID3DXEffect* CEffectTemplateImpl::CloneD3DEffect(SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer, HRESULT& outHResult)
+CEffectWrap* CEffectTemplate::CloneD3DEffect(SString& strOutStatus)
 {
-    // Clone D3DXEffect
-    ID3DXEffect* pNewD3DEffect = NULL;
-    outHResult = D3D_OK;
-    pNewD3DEffect = m_pD3DEffect;
-    pNewD3DEffect->AddRef();
-
-    m_DebugInfo.cloneResult = outHResult;
-    if (!pNewD3DEffect)
-    {
-        m_DebugInfo.uiCloneFailCount++;
-        return NULL;
-    }
-    m_DebugInfo.uiCloneSuccessCount++;
-
-    // Set the same technique
-    {
-        D3DXHANDLE         hTechnique = m_pD3DEffect->GetCurrentTechnique();
-        D3DXTECHNIQUE_DESC TechniqueDesc;
-        m_pD3DEffect->GetTechniqueDesc(hTechnique, &TechniqueDesc);
-        pNewD3DEffect->SetTechnique(pNewD3DEffect->GetTechniqueByName(TechniqueDesc.Name));
-
-        // Output technique name
-        strOutStatus = TechniqueDesc.Name;
-    }
-
-    // Check if any technique uses a vertex shader
-    bOutUsesVertexShader = false;
-    D3DXEFFECT_DESC EffectDesc;
-    m_pD3DEffect->GetDesc(&EffectDesc);
-    for (uint i = 0; i < EffectDesc.Techniques; i++)
-    {
-        D3DXHANDLE         hTechnique = m_pD3DEffect->GetTechnique(i);
-        D3DXTECHNIQUE_DESC TechniqueDesc;
-        m_pD3DEffect->GetTechniqueDesc(hTechnique, &TechniqueDesc);
-        for (uint i = 0; i < TechniqueDesc.Passes; i++)
-        {
-            D3DXPASS_DESC PassDesc;
-            m_pD3DEffect->GetPassDesc(m_pD3DEffect->GetPass(hTechnique, i), &PassDesc);
-            if (PassDesc.pVertexShaderFunction)
-                bOutUsesVertexShader = true;
-        }
-    }
-
-    bOutUsesDepthBuffer = m_bUsesDepthBuffer;
-
-    // Add to list of clones
+    CEffectWrap* pEffectWrap = new CEffectWrap();
+    pEffectWrap->PostConstruct(m_pManager, this);
+    strOutStatus = m_strTechniqueName;
     m_uiCloneCount++;
-    return pNewD3DEffect;
+    return pEffectWrap;
 }
 
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::UnCloneD3DEffect
+// CEffectTemplate::UnCloneD3DEffect
 //
 // Remove from list and release
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplateImpl::UnCloneD3DEffect(ID3DXEffect* pOldD3DEffect)
+void CEffectTemplate::UnCloneD3DEffect(CEffectWrap* pEffectWrap)
 {
     assert(m_uiCloneCount > 0);
     m_uiCloneCount--;
@@ -498,17 +435,17 @@ void CEffectTemplateImpl::UnCloneD3DEffect(ID3DXEffect* pOldD3DEffect)
     if (m_uiCloneCount == 0)
         m_TickCountLastUsed = CTickCount::Now(true);
 
-    SAFE_RELEASE(pOldD3DEffect);
+    SAFE_RELEASE(pEffectWrap);
 }
 
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::HaveFilesChanged
+// CEffectTemplate::HaveFilesChanged
 //
 // Recheck MD5's to see if the content has changed
 //
 ////////////////////////////////////////////////////////////////
-bool CEffectTemplateImpl::HaveFilesChanged(void)
+bool CEffectTemplate::HaveFilesChanged(void)
 {
     if (!m_bHaveFilesChanged)
     {

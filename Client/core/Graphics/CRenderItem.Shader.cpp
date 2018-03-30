@@ -8,6 +8,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CRenderItem.EffectCloner.h"
+#include "CRenderItem.EffectTemplate.h"
 
 uint CShaderItem::ms_uiCreateTimeCounter = 0;
 
@@ -55,7 +57,7 @@ void CShaderItem::PreDestruct(void)
 ////////////////////////////////////////////////////////////////
 bool CShaderItem::IsValid(void)
 {
-    return m_pEffectWrap && m_pEffectWrap->m_pD3DEffect;
+    return m_pEffectWrap;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -94,83 +96,12 @@ void CShaderItem::CreateUnderlyingData(const SString& strFilename, const SString
     assert(!m_pEffectWrap);
     assert(!m_pShaderInstance);
 
-    m_pEffectWrap = NewEffectWrap(m_pManager, strFilename, strRootPath, strOutStatus, bDebug);
-
-    if (!m_pEffectWrap->IsValid())
-    {
-        SAFE_RELEASE(m_pEffectWrap);
+    m_pEffectWrap = m_pManager->GetEffectCloner()->CreateD3DEffect(strFilename, strRootPath, strOutStatus, bDebug);
+    if (!m_pEffectWrap)
         return;
-    }
 
-    m_pEffectWrap->ReadParameterHandles();
-
-    struct
-    {
-        D3DXHANDLE& hHandle;
-        SString     strNames;
-    } handleNames[] = {
-        m_pEffectWrap->hWorld,
-        "WORLD",
-        m_pEffectWrap->hView,
-        "VIEW",
-        m_pEffectWrap->hProjection,
-        "PROJECTION",
-        m_pEffectWrap->hWorldView,
-        "WORLDVIEW",
-        m_pEffectWrap->hWorldViewProj,
-        "WORLDVIEWPROJECTION",
-        m_pEffectWrap->hViewProj,
-        "VIEWPROJECTION",
-        m_pEffectWrap->hViewInv,
-        "VIEWINVERSE",
-        m_pEffectWrap->hWorldInvTr,
-        "WORLDINVERSETRANSPOSE",
-        m_pEffectWrap->hViewInvTr,
-        "VIEWINVERSETRANSPOSE",
-        m_pEffectWrap->hCamPos,
-        "CAMERAPOSITION",
-        m_pEffectWrap->hCamDir,
-        "CAMERADIRECTION",
-        m_pEffectWrap->hTime,
-        "TIME",
-        m_pEffectWrap->hLightAmbient,
-        "LIGHTAMBIENT",
-        m_pEffectWrap->hLightDiffuse,
-        "LIGHTDIFFUSE",
-        m_pEffectWrap->hLightSpecular,
-        "LIGHTSPECULAR",
-        m_pEffectWrap->hLightDirection,
-        "LIGHTDIRECTION",
-        m_pEffectWrap->hDepthBuffer,
-        "DEPTHBUFFER",
-        m_pEffectWrap->hViewMainScene,
-        "VIEW_MAIN_SCENE",
-        m_pEffectWrap->hWorldMainScene,
-        "WORLD_MAIN_SCENE",
-        m_pEffectWrap->hProjectionMainScene,
-        "PROJECTION_MAIN_SCENE",
-    };
-
-    for (uint h = 0; h < NUMELMS(handleNames); h++)
-    {
-        std::vector<SString> parts;
-        handleNames[h].strNames.Split(",", parts);
-        D3DXHANDLE* phHandle = NULL;
-        for (uint n = 0; n < parts.size() && phHandle == NULL; n++)
-        {
-            phHandle = MapFind(m_pEffectWrap->m_valueHandleMap, parts[n]);
-            if (!phHandle)
-                phHandle = MapFind(m_pEffectWrap->m_texureHandleMap, parts[n]);
-        }
-        if (phHandle)
-        {
-            handleNames[h].hHandle = *phHandle;
-            m_pEffectWrap->m_bUsesCommonHandles = true;
-        }
-    }
-
-    m_pManager->NotifyShaderItemUsesDepthBuffer(this, m_pEffectWrap->m_bUsesDepthBuffer);
-    m_pManager->NotifyShaderItemUsesMultipleRenderTargets(this, !m_pEffectWrap->m_SecondaryRenderTargetList.empty());
+    m_pManager->NotifyShaderItemUsesDepthBuffer(this, m_pEffectWrap->m_pEffectTemplate->m_bUsesDepthBuffer);
+    m_pManager->NotifyShaderItemUsesMultipleRenderTargets(this, !m_pEffectWrap->m_pEffectTemplate->m_SecondaryRenderTargetList.empty());
 
     // Create instance to store param values
     RenewShaderInstance();
@@ -187,7 +118,8 @@ void CShaderItem::ReleaseUnderlyingData(void)
 {
     m_pManager->NotifyShaderItemUsesDepthBuffer(this, false);
     m_pManager->NotifyShaderItemUsesMultipleRenderTargets(this, false);
-    SAFE_RELEASE(m_pEffectWrap)
+    if (m_pEffectWrap)
+        m_pManager->GetEffectCloner()->ReleaseD3DEffect(m_pEffectWrap);
     SAFE_RELEASE(m_pShaderInstance);
 }
 
@@ -200,7 +132,7 @@ void CShaderItem::ReleaseUnderlyingData(void)
 ////////////////////////////////////////////////////////////////
 bool CShaderItem::SetValue(const SString& strName, CTextureItem* pTextureItem)
 {
-    if (D3DXHANDLE* phParameter = MapFind(m_pEffectWrap->m_texureHandleMap, strName.ToUpper()))
+    if (D3DXHANDLE* phParameter = MapFind(m_pEffectWrap->m_pEffectTemplate->m_textureHandleMap, strName.ToUpper()))
     {
         // Check if value is changing
         if (!m_pShaderInstance->CmpTextureValue(*phParameter, pTextureItem))
@@ -208,7 +140,7 @@ bool CShaderItem::SetValue(const SString& strName, CTextureItem* pTextureItem)
             // Check if we need a new shader instance
             MaybeRenewShaderInstance();
 
-            if (*phParameter == m_pEffectWrap->m_hFirstTexture)
+            if (*phParameter == m_pEffectWrap->m_pEffectTemplate->m_hFirstTexture)
             {
                 // Mirror size of first texture declared in effect file
                 m_uiSizeX = pTextureItem->m_uiSizeX;
@@ -233,7 +165,7 @@ bool CShaderItem::SetValue(const SString& strName, CTextureItem* pTextureItem)
 ////////////////////////////////////////////////////////////////
 bool CShaderItem::SetValue(const SString& strName, bool bValue)
 {
-    if (D3DXHANDLE* phParameter = MapFind(m_pEffectWrap->m_valueHandleMap, strName.ToUpper()))
+    if (D3DXHANDLE* phParameter = MapFind(m_pEffectWrap->m_pEffectTemplate->m_valueHandleMap, strName.ToUpper()))
     {
         // Check if value is changing
         if (!m_pShaderInstance->CmpBoolValue(*phParameter, bValue))
@@ -256,7 +188,7 @@ bool CShaderItem::SetValue(const SString& strName, bool bValue)
 ////////////////////////////////////////////////////////////////
 bool CShaderItem::SetValue(const SString& strName, const float* pfValues, uint uiCount)
 {
-    if (D3DXHANDLE* phParameter = MapFind(m_pEffectWrap->m_valueHandleMap, strName.ToUpper()))
+    if (D3DXHANDLE* phParameter = MapFind(m_pEffectWrap->m_pEffectTemplate->m_valueHandleMap, strName.ToUpper()))
     {
         // Check if value is changing
         if (!m_pShaderInstance->CmpFloatsValue(*phParameter, pfValues, uiCount))
@@ -343,5 +275,5 @@ void CShaderItem::RenewShaderInstance(void)
 ////////////////////////////////////////////////////////////////
 bool CShaderItem::GetUsesVertexShader(void)
 {
-    return m_pEffectWrap->m_bUsesVertexShader;
+    return m_pEffectWrap->m_pEffectTemplate->m_bUsesVertexShader;
 }

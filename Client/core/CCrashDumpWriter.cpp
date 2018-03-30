@@ -841,8 +841,8 @@ void CCrashDumpWriter::GetD3DInfo(CBuffer& buffer)
     stream.WriteString(strTextureName);
 
     // Write shader name if being used
-    stream.WriteString((const char*)g_pDeviceState->CallState.strShaderName);
-    stream.Write(g_pDeviceState->CallState.bShaderRequiresNormals);
+    stream.WriteString("");
+    stream.Write(false);
 
     // TODO - Vertex state and vertex/index buffer if readable
 }

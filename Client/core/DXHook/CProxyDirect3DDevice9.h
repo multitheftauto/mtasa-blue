@@ -463,11 +463,9 @@ public:
             DRAW_PRIMITIVE,
             DRAW_INDEXED_PRIMITIVE,
         };
-        eD3DCallType     callType;
-        uint             uiNumArgs;
-        int              args[10];
-        SFixedString<32> strShaderName;
-        bool             bShaderRequiresNormals;
+        eD3DCallType callType;
+        uint         uiNumArgs;
+        int          args[10];
     };
 
     struct SResourceMemory
