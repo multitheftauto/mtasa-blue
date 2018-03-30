@@ -35,6 +35,9 @@ bool CIFPEngine::EngineReplaceAnimation ( CClientEntity * pEntity, const SString
         std::shared_ptr < CClientIFP > pCustomIFP = g_pClientGame->GetIFPPointerFromMap ( strCustomBlockName );
         if ( pInternalBlock && pCustomIFP )
         {
+            // Try to load the block, if it's not loaded already
+            pInternalBlock->Request ( BLOCKING, true );
+ 
             CAnimBlendHierarchy * pInternalAnimHierarchy = g_pGame->GetAnimManager ()->GetAnimation ( strInternalAnimName, pInternalBlock );
             CAnimBlendHierarchySAInterface * pCustomAnimHierarchyInterface = pCustomIFP->GetAnimationHierarchy ( strCustomAnimName );
             if ( pInternalAnimHierarchy && pCustomAnimHierarchyInterface )
