@@ -9,6 +9,7 @@ CClientIFP::CClientIFP ( class CClientManager* pManager, ElementID ID ) : CClien
     m_pIFPAnimations = std::make_shared < CIFPAnimations > ();
     m_pAnimManager = g_pGame->GetAnimManager ( );
     m_bVersion1    = false; 
+    m_u32Hashkey   = 0;
 }
 
 CClientIFP::~CClientIFP ( void )
@@ -24,6 +25,7 @@ bool CClientIFP::LoadIFP ( const char* szFilePath, const SString & strBlockName 
 
     if ( LoadIFPFile ( szFilePath ) )
     {
+        m_u32Hashkey = g_pGame->GetKeyGen()->GetUppercaseKey ( strBlockName );
         return true;
     }
     return false;
@@ -246,7 +248,6 @@ void CClientIFP::ReadSequenceVersion2 ( Object & ObjectNode )
         if ( strCorrectBoneName.size ( ) == 0 )
         {
             strCorrectBoneName = GetCorrectBoneNameFromName ( BoneName );
-            printf("yes, size is zero\n");
         }
     }
 
@@ -260,7 +261,7 @@ bool CClientIFP::ReadSequenceKeyFrames ( std::unique_ptr < CAnimBlendSequence > 
     {
         BYTE * pKeyFrames = m_pAnimManager->AllocateKeyFramesMemory ( iCompressedFrameSize * iFrames ); 
         pAnimationSequence->SetKeyFrames ( iFrames, IsKeyFramesTypeRoot ( iFrameType ), m_kbAllKeyFramesCompressed, pKeyFrames );
-        ReadKeyFramesAsCompressed ( iFrameType, pKeyFrames, iFrames );
+        ReadKeyFramesAsCompressed ( pAnimationSequence, iFrameType, iFrames );
         return true;
     }
     return false;
@@ -313,111 +314,96 @@ void CClientIFP::ReadAnimationHeaderVersion2 ( Animation & AnimationNode, bool b
     }
 }
 
-void CClientIFP::ReadKeyFramesAsCompressed ( IFP_FrameType iFrameType, BYTE * pKeyFrames, int32_t iFrames )
+void CClientIFP::ReadKeyFramesAsCompressed ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, IFP_FrameType iFrameType, int32_t iFrames )
 {
     switch ( iFrameType )
     { 
         case IFP_FrameType::KRTS:
         {
-            ReadKrtsFramesAsCompressed ( pKeyFrames, iFrames );
+            ReadKrtsFramesAsCompressed ( pAnimationSequence, iFrames );
             break;
         }
         case IFP_FrameType::KRT0:
         {
-            ReadKrt0FramesAsCompressed ( pKeyFrames, iFrames );
+            ReadKrt0FramesAsCompressed ( pAnimationSequence, iFrames );
             break;
         }
         case IFP_FrameType::KR00:
         {
-            ReadKr00FramesAsCompressed ( pKeyFrames, iFrames );
+            ReadKr00FramesAsCompressed ( pAnimationSequence, iFrames );
             break;
         }
         case IFP_FrameType::KR00_COMPRESSED:
         {
-            ReadKr00CompressedFrames ( pKeyFrames, iFrames );
+            ReadCompressedFrames < IFP_Compressed_KR00 >  ( pAnimationSequence, iFrames );
             break;
         }
         case IFP_FrameType::KRT0_COMPRESSED:
         {
-            ReadKrt0CompressedFrames ( pKeyFrames, iFrames );
+            ReadCompressedFrames < IFP_Compressed_KRT0 >  ( pAnimationSequence, iFrames );
             break;
         }
     }
 }
 
-void CClientIFP::ReadKrtsFramesAsCompressed (  BYTE * pKeyFrames, int32_t TotalFrames )
+void CClientIFP::ReadKrtsFramesAsCompressed ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, int32_t TotalFrames )
 {
-    for (int32_t FrameIndex = 0; FrameIndex < TotalFrames; FrameIndex++)
+    for ( int32_t FrameIndex = 0; FrameIndex < TotalFrames; FrameIndex++ )
     {
-        IFP_Compressed_KRT0 * CompressedKrt0 = (IFP_Compressed_KRT0 *)((BYTE*)pKeyFrames + sizeof(IFP_Compressed_KRT0) * FrameIndex);
-
+        IFP_Compressed_KRT0 * CompressedKrt0 = static_cast < IFP_Compressed_KRT0 * > ( pAnimationSequence->GetKeyFrame ( FrameIndex, sizeof ( IFP_Compressed_KRT0 ) ) );
         IFP_KRTS Krts;
-        ReadBuffer < IFP_KRTS >(&Krts);
+        ReadBuffer < IFP_KRTS > ( &Krts );
 
-        CompressedKrt0->Rotation.X    = static_cast < int16_t > ( ((-Krts.Rotation.X) * 4096.0f) );
-        CompressedKrt0->Rotation.Y    = static_cast < int16_t > ( ((-Krts.Rotation.Y) * 4096.0f) );
-        CompressedKrt0->Rotation.Z    = static_cast < int16_t > ( ((-Krts.Rotation.Z) * 4096.0f) );
-        CompressedKrt0->Rotation.W    = static_cast < int16_t > ( (Krts.Rotation.W  * 4096.0f) );
+        CompressedKrt0->Rotation.X    = static_cast < int16_t > ( ( ( -Krts.Rotation.X ) * 4096.0f ) );
+        CompressedKrt0->Rotation.Y    = static_cast < int16_t > ( ( ( -Krts.Rotation.Y ) * 4096.0f ) );
+        CompressedKrt0->Rotation.Z    = static_cast < int16_t > ( ( ( -Krts.Rotation.Z ) * 4096.0f ) );
+        CompressedKrt0->Rotation.W    = static_cast < int16_t > ( ( Krts.Rotation.W  * 4096.0f ) );
 
-        CompressedKrt0->Time          = static_cast < int16_t > ( (Krts.Time * 60.0f + 0.5f) );
+        CompressedKrt0->Time          = static_cast < int16_t > ( ( Krts.Time * 60.0f + 0.5f ) );
 
-        CompressedKrt0->Translation.X = static_cast < int16_t > ( (Krts.Translation.X * 1024.0f) );
-        CompressedKrt0->Translation.Y = static_cast < int16_t > ( (Krts.Translation.Y * 1024.0f) );
-        CompressedKrt0->Translation.Z = static_cast < int16_t > ( (Krts.Translation.Z * 1024.0f) );
+        CompressedKrt0->Translation.X = static_cast < int16_t > ( ( Krts.Translation.X * 1024.0f ) );
+        CompressedKrt0->Translation.Y = static_cast < int16_t > ( ( Krts.Translation.Y * 1024.0f ) );
+        CompressedKrt0->Translation.Z = static_cast < int16_t > ( ( Krts.Translation.Z * 1024.0f ) );
     }
 }
 
-void CClientIFP::ReadKrt0FramesAsCompressed (  BYTE * pKeyFrames, int32_t TotalFrames )
+void CClientIFP::ReadKrt0FramesAsCompressed ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, int32_t TotalFrames )
 {
-    for (int32_t FrameIndex = 0; FrameIndex < TotalFrames; FrameIndex++)
+    for ( int32_t FrameIndex = 0; FrameIndex < TotalFrames; FrameIndex++ )
     {
-        IFP_Compressed_KRT0 * CompressedKrt0 = (IFP_Compressed_KRT0 *)((BYTE*)pKeyFrames + sizeof(IFP_Compressed_KRT0) * FrameIndex);
-
+        IFP_Compressed_KRT0 * CompressedKrt0 = static_cast < IFP_Compressed_KRT0 * > ( pAnimationSequence->GetKeyFrame ( FrameIndex, sizeof ( IFP_Compressed_KRT0 ) ) );
         IFP_KRT0 Krt0;
         ReadBuffer < IFP_KRT0 > ( &Krt0 );
 
-        CompressedKrt0->Rotation.X = static_cast < int16_t > ( ((-Krt0.Rotation.X) * 4096.0f) );
-        CompressedKrt0->Rotation.Y = static_cast < int16_t > ( ((-Krt0.Rotation.Y) * 4096.0f) );
-        CompressedKrt0->Rotation.Z = static_cast < int16_t > ( ((-Krt0.Rotation.Z) * 4096.0f) );
-        CompressedKrt0->Rotation.W = static_cast < int16_t > ( (Krt0.Rotation.W  * 4096.0f) );
+        CompressedKrt0->Rotation.X = static_cast < int16_t > ( ( ( -Krt0.Rotation.X ) * 4096.0f ) );
+        CompressedKrt0->Rotation.Y = static_cast < int16_t > ( ( ( -Krt0.Rotation.Y ) * 4096.0f ) );
+        CompressedKrt0->Rotation.Z = static_cast < int16_t > ( ( ( -Krt0.Rotation.Z ) * 4096.0f ) );
+        CompressedKrt0->Rotation.W = static_cast < int16_t > ( ( Krt0.Rotation.W  * 4096.0f ) );
 
-        CompressedKrt0->Time = static_cast < int16_t > ( (Krt0.Time * 60.0f + 0.5f) );
+        CompressedKrt0->Time = static_cast < int16_t > ( ( Krt0.Time * 60.0f + 0.5f ) );
 
-        CompressedKrt0->Translation.X = static_cast < int16_t > ( (Krt0.Translation.X * 1024.0f) ); 
-        CompressedKrt0->Translation.Y = static_cast < int16_t > ( (Krt0.Translation.Y * 1024.0f) );
-        CompressedKrt0->Translation.Z = static_cast < int16_t > ( (Krt0.Translation.Z * 1024.0f) );
+        CompressedKrt0->Translation.X = static_cast < int16_t > ( ( Krt0.Translation.X * 1024.0f ) ); 
+        CompressedKrt0->Translation.Y = static_cast < int16_t > ( ( Krt0.Translation.Y * 1024.0f ) );
+        CompressedKrt0->Translation.Z = static_cast < int16_t > ( ( Krt0.Translation.Z * 1024.0f ) );
     }
 }
 
-void CClientIFP::ReadKr00FramesAsCompressed (  BYTE * pKeyFrames, int32_t TotalFrames )
+void CClientIFP::ReadKr00FramesAsCompressed ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, int32_t TotalFrames )
 {
-    for (int32_t FrameIndex = 0; FrameIndex < TotalFrames; FrameIndex++)
+    for ( int32_t FrameIndex = 0; FrameIndex < TotalFrames; FrameIndex++ )
     {
-        IFP_Compressed_KR00 * CompressedKr00 = (IFP_Compressed_KR00 *)((BYTE*)pKeyFrames + sizeof(IFP_Compressed_KR00) * FrameIndex);
-
+        IFP_Compressed_KR00 * CompressedKr00 = static_cast < IFP_Compressed_KR00 * > ( pAnimationSequence->GetKeyFrame ( FrameIndex, sizeof ( IFP_Compressed_KR00 ) ) );
         IFP_KR00 Kr00;
         ReadBuffer < IFP_KR00 > ( &Kr00 );
 
-        CompressedKr00->Rotation.X = static_cast < int16_t > ( ((-Kr00.Rotation.X) * 4096.0f) );
-        CompressedKr00->Rotation.Y = static_cast < int16_t > ( ((-Kr00.Rotation.Y) * 4096.0f) );
-        CompressedKr00->Rotation.Z = static_cast < int16_t > ( ((-Kr00.Rotation.Z) * 4096.0f) );
-        CompressedKr00->Rotation.W = static_cast < int16_t > ( (Kr00.Rotation.W  * 4096.0f) );
+        CompressedKr00->Rotation.X = static_cast < int16_t > ( ( ( -Kr00.Rotation.X ) * 4096.0f ) );
+        CompressedKr00->Rotation.Y = static_cast < int16_t > ( ( ( -Kr00.Rotation.Y ) * 4096.0f ) );
+        CompressedKr00->Rotation.Z = static_cast < int16_t > ( ( ( -Kr00.Rotation.Z ) * 4096.0f ) );
+        CompressedKr00->Rotation.W = static_cast < int16_t > ( ( Kr00.Rotation.W  * 4096.0f ) );
 
         CompressedKr00->Time = static_cast < int16_t > ( (Kr00.Time * 60.0f + 0.5f) );
     }
 }
-
-inline void CClientIFP::ReadKr00CompressedFrames (  BYTE * pKeyFrames, int32_t TotalFrames )
-{
-    size_t iSizeInBytes = sizeof ( IFP_Compressed_KR00 ) * TotalFrames;
-    ReadBytes ( pKeyFrames, iSizeInBytes );
-}
-
-inline void CClientIFP::ReadKrt0CompressedFrames (  BYTE * pKeyFrames, int32_t TotalFrames )
-{
-    size_t iSizeInBytes = sizeof ( IFP_Compressed_KRT0 ) * TotalFrames;
-    ReadBytes ( pKeyFrames, iSizeInBytes );
-}  
 
 size_t CClientIFP::GetSizeOfCompressedFrame ( IFP_FrameType iFrameType )
 {

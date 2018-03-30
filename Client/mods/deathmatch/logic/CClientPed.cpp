@@ -6216,18 +6216,13 @@ void CClientPed::RestoreAnimations ( const std::shared_ptr < CClientIFP > & IFP 
     }
 }
 
-#include "../game_sa/CAnimBlockSA.h" // REMOVE THIS LATER, USE FACTORY METHOD!!!!!!
-
 void CClientPed::RestoreAnimations ( CAnimBlock & animationBlock )
 {
-    const CAnimBlockSAInterface * pInternalBlockInterface = animationBlock.GetInterface ( );
-    DWORD iAnimationIndex = pInternalBlockInterface->idOffset;
-    DWORD dwARRAY_CAnimManager_Animations = 0xb4ea40;
-    for ( size_t i = 0; i < pInternalBlockInterface->nAnimations; i++ )
+    const size_t cAnimations = animationBlock.GetAnimationCount ( );
+    for ( size_t i = 0; i < cAnimations; i++)
     {
-        auto pAnimHierarchyInterface = (CAnimBlendHierarchySAInterface*)((BYTE*)dwARRAY_CAnimManager_Animations + sizeof(CAnimBlendHierarchySAInterface) * iAnimationIndex);
+        auto pAnimHierarchyInterface = animationBlock.GetAnimationHierarchyInterface ( i );
         m_mapOfReplacedAnimations.erase ( pAnimHierarchyInterface );
-        iAnimationIndex ++;
     }
 }
 

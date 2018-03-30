@@ -45,3 +45,14 @@ void CAnimBlockSA::Request ( EModelRequestType requestType, bool bAllowBlockingF
         AddRef ();
     }
 }
+
+CAnimBlendHierarchySAInterface * CAnimBlockSA::GetAnimationHierarchyInterface ( size_t iAnimation )
+{
+    if ( !IsLoaded ( ) )
+        return nullptr;
+
+    iAnimation += m_pInterface->idOffset;
+    BYTE * arrAnimations = reinterpret_cast < BYTE * > ( ARRAY_CAnimManager_Animations );
+    return reinterpret_cast < CAnimBlendHierarchySAInterface * > ( arrAnimations + sizeof ( CAnimBlendHierarchySAInterface ) * iAnimation );
+}
+

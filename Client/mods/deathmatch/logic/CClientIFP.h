@@ -226,12 +226,18 @@ public:
     void                            ReadAnimationHeaderVersion2  ( Animation & AnimationNode, bool bAnp3 );
 
     bool                            ReadSequenceKeyFrames        ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, IFP_FrameType iFrameType, int32_t iFrames );
-    void                            ReadKeyFramesAsCompressed    ( IFP_FrameType iFrameType, BYTE * pKeyFrames, int32_t iFrames );
-    void                            ReadKrtsFramesAsCompressed   (  BYTE * pKeyFrames, int32_t TotalFrames );
-    void                            ReadKrt0FramesAsCompressed   (  BYTE * pKeyFrames, int32_t TotalFrames );
-    void                            ReadKr00FramesAsCompressed   (  BYTE * pKeyFrames, int32_t TotalFrames );
-    inline void                     ReadKr00CompressedFrames     (  BYTE * pKeyFrames, int32_t TotalFrames );
-    inline void                     ReadKrt0CompressedFrames     (  BYTE * pKeyFrames, int32_t TotalFrames );
+    void                            ReadKeyFramesAsCompressed    ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, IFP_FrameType iFrameType, int32_t iFrames );
+    void                            ReadKrtsFramesAsCompressed   ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, int32_t TotalFrames );
+    void                            ReadKrt0FramesAsCompressed   ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, int32_t TotalFrames );
+    void                            ReadKr00FramesAsCompressed   ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, int32_t TotalFrames );
+
+    template < class T > 
+    void                            ReadCompressedFrames         ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, int32_t TotalFrames )
+    {
+        BYTE * pKeyFrames = pAnimationSequence->GetKeyFrames ( );
+        size_t iSizeInBytes = sizeof ( T ) * TotalFrames;
+        ReadBytes ( pKeyFrames, iSizeInBytes );
+    }  
 
     void                            InitializeAnimationHierarchy ( std::unique_ptr < CAnimBlendHierarchy > & pAnimationHierarchy, const char * szAnimationName, const int32_t iSequences );
     void                            InitializeAnimationSequence  ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, const char * szName, const int32_t iBoneID );
@@ -264,6 +270,7 @@ public:
 private:
     std::shared_ptr < CIFPAnimations > m_pIFPAnimations;
     SString                            m_strBlockName;
+    unsigned int                       m_u32Hashkey;
     std::vector < IFP_Animation > *    m_pVecAnimations;
     bool                               m_bVersion1;
     CAnimManager *                     m_pAnimManager;

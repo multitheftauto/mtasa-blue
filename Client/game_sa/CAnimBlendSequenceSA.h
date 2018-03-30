@@ -29,7 +29,7 @@ public:
     };       
     unsigned short sFlags; 
     unsigned short sNumKeyFrames; 
-    void *         pKeyFrames;
+    BYTE *         pKeyFrames;
 };
 
 class CAnimBlendSequenceSA : public CAnimBlendSequence
@@ -40,9 +40,10 @@ public:
     void                                    SetName                    ( const char * szName );
     void                                    SetBoneTag                 ( int32_t i32BoneID );
     void                                    SetKeyFrames               ( size_t cKeyFrames, bool bRoot, bool bCompressed, void * pKeyFrames );
+    void *                                  GetKeyFrame                ( size_t iFrame, uint32_t u32FrameSizeInBytes );
     uint32_t                                GetHash                    ( void ) { return m_pInterface->m_hash; }
     uint16_t                                GetBoneTag                 ( void ) { return m_pInterface->m_boneId; }
-    void *                                  GetKeyFrames               ( void ) { return m_pInterface->pKeyFrames; }
+    BYTE *                                  GetKeyFrames               ( void ) { return m_pInterface->pKeyFrames; }
     unsigned short                          GetKeyFramesCount          ( void ) { return m_pInterface->sNumKeyFrames; }
     bool                                    IsBigChunkForAllSequences  ( void ) { return ( ( m_pInterface->sFlags >> 3) & 1 ); }
     CAnimBlendSequenceSAInterface *         GetInterface               ( void ) { return m_pInterface; }
