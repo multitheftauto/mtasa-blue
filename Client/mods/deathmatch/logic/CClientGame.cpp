@@ -3719,9 +3719,9 @@ bool CClientGame::StaticAssocGroupCopyAnimationHandler ( CAnimBlendStaticAssocia
     return g_pClientGame->AssocGroupCopyAnimationHandler ( pOutAnimStaticAssoc, pAnimAssoc, pClump, pAnimAssocGroup, animID );
 }
 
-bool CClientGame::StaticBlendAnimationHierarchyHandler ( CAnimBlendAssociationSAInterface * pAnimAssoc, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, RpClump * pClump )
+bool CClientGame::StaticBlendAnimationHierarchyHandler ( CAnimBlendAssociationSAInterface * pAnimAssoc, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, int * pFlags, RpClump * pClump )
 {
-    return g_pClientGame->BlendAnimationHierarchyHandler ( pAnimAssoc, pOutAnimHierarchy, pClump );
+    return g_pClientGame->BlendAnimationHierarchyHandler ( pAnimAssoc, pOutAnimHierarchy, pFlags, pClump );
 }
 
 void CClientGame::StaticPreWorldProcessHandler ( void )
@@ -4038,7 +4038,6 @@ typedef void (__thiscall* hCAnimBlendStaticAssociation_Init)
 bool CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, CAnimBlendAssociationSAInterface * pAnimAssoc, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID )
 {
     auto CAnimBlendStaticAssociation_Init = (hCAnimBlendStaticAssociation_Init)0x4CEC20;
-
     bool isCustomAnimationToPlay = false;
 
     CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
@@ -4047,7 +4046,7 @@ bool CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSA
     CClientPed * pClientPed =  GetClientPedByClump ( *pClump ); 
     if ( pClientPed != nullptr )
     {
-        auto pReplacedAnimation = pClientPed->getReplacedAnimation ( pOriginalAnimStaticAssoc->pAnimHeirarchy );
+        auto pReplacedAnimation = pClientPed->GetReplacedAnimation ( pOriginalAnimStaticAssoc->pAnimHeirarchy );
         if ( pReplacedAnimation != nullptr )
         {   
             std::shared_ptr < CIFPAnimations > pIFPAnimations = pReplacedAnimation->pIFP->GetIFPAnimationsPointer ();
@@ -4071,14 +4070,11 @@ bool CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSA
     // Total bones in clump. GTA SA is using 32 bones for peds/players
     pOutAnimStaticAssoc->nNumBlendNodes = pOriginalAnimStaticAssoc->nNumBlendNodes;
     pOutAnimStaticAssoc->sFlags = pOriginalAnimStaticAssoc->sFlags;
-
-    printf(" CClientGame::AssocGroupCopyAnimationHandler: About to return sAnimGroup: %d | sAnimID: %d !\n", pOutAnimStaticAssoc->sAnimGroup, pOutAnimStaticAssoc->sAnimID);
-
     return isCustomAnimationToPlay;
 }
 
 
-bool CClientGame::BlendAnimationHierarchyHandler ( CAnimBlendAssociationSAInterface * pAnimAssoc, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, RpClump * pClump )
+bool CClientGame::BlendAnimationHierarchyHandler ( CAnimBlendAssociationSAInterface * pAnimAssoc, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, int * pFlags, RpClump * pClump )
 {   
     bool isCustomAnimationToPlay = false;
 
@@ -4086,40 +4082,34 @@ bool CClientGame::BlendAnimationHierarchyHandler ( CAnimBlendAssociationSAInterf
     CClientPed * pClientPed =  GetClientPedByClump ( *pClump ); 
     if ( pClientPed != nullptr )
     {
-        printf ("CClientGame::BlendAnimationHierarchyHandler: Found pClientPed\n");
-        if ( pClientPed->isNextAnimationCustom () )
+        if ( pClientPed->IsNextAnimationCustom () )
         { 
-            const SString & strBlockName = pClientPed->GetNextAnimationCustomBlockName ( );
-            std::shared_ptr < CClientIFP > pIFP = GetIFPPointerFromMap ( strBlockName );
+            std::shared_ptr < CClientIFP > pIFP = pClientPed->GetCustomAnimationIFP ( );
             if ( pIFP )
             { 
                 const SString & strAnimationName = pClientPed->GetNextAnimationCustomName ( );
                 auto pCustomAnimBlendHierarchy   = pIFP->GetAnimationHierarchy ( strAnimationName );
                 if ( pCustomAnimBlendHierarchy != nullptr )
                 { 
-                    std::shared_ptr < CIFPAnimations > pIFPAnimations = pIFP->GetIFPAnimationsPointer ();
+                    std::shared_ptr < CIFPAnimations > pIFPAnimations = pIFP->GetIFPAnimationsPointer ( );
                     InsertAnimationAssociationToMap ( pAnimAssoc, pIFPAnimations );
 
-                    pClientPed->setCurrentAnimationCustom ( true );
-                    pClientPed->setNextAnimationNormal ( );
-
+                    pClientPed->SetCurrentAnimationCustom ( true );
+                    pClientPed->SetNextAnimationNormal ( );
+                
+                    if ( pIFP->IsUnloading ( ) )
+                    {
+                        pClientPed->DereferenceCustomAnimationBlock ();
+                    }
                     *pOutAnimHierarchy = pCustomAnimBlendHierarchy;
                     isCustomAnimationToPlay = true;
                     return isCustomAnimationToPlay;
                 }   
-                else
-                {
-                    printf ("CClientGame::BlendAnimationHierarchyHandler: could not find IFP animation hierarchy '%s'\n", strAnimationName.c_str());
-                }
-            }
-            else
-            {
-                printf("CClientGame::BlendAnimationHierarchyHandler: could not find IFP block name '%s'\n", strBlockName.c_str());
             }
         }
 
-        pClientPed->setCurrentAnimationCustom ( false );
-        pClientPed->setNextAnimationNormal ( );
+        pClientPed->SetCurrentAnimationCustom ( false );
+        pClientPed->SetNextAnimationNormal ( );   
     }
     return isCustomAnimationToPlay;
 }
@@ -6855,43 +6845,14 @@ void CClientGame::RestreamModel ( unsigned short usModel )
 
 }
 
-void CClientGame::InsertIFPPointerToMap ( const SString & strBlockName, const std::shared_ptr < CClientIFP > & pIFP )
+std::shared_ptr < CClientIFP > CClientGame::GetIFPPointerFromMap ( const unsigned int u32BlockNameHash )
 {
-    const SString mapKey = strBlockName.ToLower ( );
-    if ( m_mapOfIfpPointers.count ( mapKey ) == 0 )
-    { 
-        m_mapOfIfpPointers [ mapKey ] = pIFP;
-    }
-}
-
-void CClientGame::RemoveIFPPointerFromMap ( const SString & strBlockName )
-{
-    m_mapOfIfpPointers.erase ( strBlockName.ToLower ( ) );
-}
-
-std::shared_ptr < CClientIFP > CClientGame::GetIFPPointerFromMap ( const SString & strBlockName )
-{
-    const SString mapKey = strBlockName.ToLower ( );
-    auto it = m_mapOfIfpPointers.find ( mapKey );
+    auto it = m_mapOfIfpPointers.find ( u32BlockNameHash );
     if ( it != m_mapOfIfpPointers.end ( ) )
     {
         return it->second;
     }
     return nullptr;
-}
-
-
-void CClientGame::InsertPedPointerToMap ( CClientPed * pPed )
-{
-    if ( m_mapOfPedPointers.count ( pPed ) == 0 )
-    { 
-        m_mapOfPedPointers [ pPed ] = true;
-    }
-}
-
-void CClientGame::RemovePedPointerFromMap ( CClientPed * pPed )
-{
-    m_mapOfPedPointers.erase ( pPed );
 }
 
 CClientPed * CClientGame::GetClientPedByClump ( const RpClump & Clump )
@@ -6916,13 +6877,28 @@ CClientPed * CClientGame::GetClientPedByClump ( const RpClump & Clump )
 
 void CClientGame::OnClientIFPUnload ( const std::shared_ptr < CClientIFP > & IFP )
 {   
-    // remove IFP animations from replaced animations of peds/players
+    IFP->MarkAsUnloading ( );
     for ( auto it = m_mapOfPedPointers.begin(); it != m_mapOfPedPointers.end(); it++ )
     {
-        CEntity * pEntity = it->first->GetGameEntity();
-        if ( pEntity != nullptr )
-        { 
-            it->first->RestoreAnimations ( IFP );
+        // Remove IFP animations from replaced animations of peds/players 
+        it->first->RestoreAnimations ( IFP );
+
+        // Make sure that streamed in pulses or changing model does not accidently
+        // play our custom animation. We can do that by making the custom animation 
+        // untriggerable
+        if ( it->first->GetCustomAnimationBlockNameHash ( ) == IFP->GetBlockNameHash ( ) )
+        {
+            if ( it->first->IsCustomAnimationPlaying ( ) )
+            {
+                it->first->SetCustomAnimationUntriggerable ( );
+            }
+
+            // Important! As we are using a shared_ptr, we need to decrement the reference counter 
+            // by setting the shared_ptr to nullptr, this will avoid memory leak
+            if ( !it->first->IsNextAnimationCustom ( ) && it->first->IsCurrentAnimationCustom ( ) )
+            { 
+                it->first->DereferenceCustomAnimationBlock ();
+            }
         }
     }
 }
