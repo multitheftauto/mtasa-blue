@@ -5280,7 +5280,7 @@ void CClientPed::Respawn ( CVector * pvecPosition, bool bRestoreState, bool bCam
     // We must not call CPed::Respawn for remote players
     if ( m_bIsLocalPlayer )
     {
-        setNextAnimationNormal ( );
+        SetNextAnimationNormal ( );
         SetFrozenWaitingForGroundToLoad ( true );
         if ( m_pPlayerPed )
         {
@@ -5821,7 +5821,11 @@ void CClientPed::RunNamedAnimation ( CAnimBlock * pBlock, const char * szAnimNam
 
         if ( pBlock->IsLoaded() )
         {
-            int flags = 0x10; // // Stops jaw fucking up, some speaking flag maybe   
+            /*
+             Saml1er: Setting flags to 0x10 will tell GTA:SA that animation needs to be decompressed.
+                      If not, animation will either crash or do some weird things.   
+            */
+            int flags = 0x10; // Stops jaw fucking up, some speaking flag maybe   
             if ( bLoop ) flags |= 0x2; // flag that triggers the loop (Maccer)
             if ( bUpdatePosition ) 
             {
@@ -5888,7 +5892,7 @@ void CClientPed::KillAnimation ( void )
     m_pAnimationBlock = NULL;
     m_strAnimationName = "";
     m_bRequestedAnimation = false;
-    setNextAnimationNormal ( );
+    SetNextAnimationNormal ( );
 }
 
 void CClientPed::PostWeaponFire ( void )
@@ -6191,6 +6195,16 @@ CAnimBlendAssociation * CClientPed::GetFirstAnimation ( void )
     return NULL;
 }
 
+void CClientPed::SetNextAnimationCustom  ( const std::shared_ptr < CClientIFP > & pIFP, const SString & strAnimationName ) 
+{
+    m_bisNextAnimationCustom = true; 
+    m_pCustomAnimationIFP = pIFP;
+    m_strCustomIFPBlockName = pIFP->GetBlockName ( ); 
+    m_strCustomIFPAnimationName = strAnimationName; 
+    m_u32CustomBlockNameHash = pIFP->GetBlockNameHash ( );
+    m_u32CustomAnimationNameHash = HashString ( strAnimationName.ToLower ( ) );
+}
+
 void CClientPed::ReplaceAnimation ( CAnimBlendHierarchy * pInternalAnimHierarchy, const std::shared_ptr < CClientIFP > & pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy )
 {
     SReplacedAnimation replacedAnimation;
@@ -6198,11 +6212,6 @@ void CClientPed::ReplaceAnimation ( CAnimBlendHierarchy * pInternalAnimHierarchy
     replacedAnimation.pAnimationHierarchy = pCustomAnimHierarchy;
 
     m_mapOfReplacedAnimations [ pInternalAnimHierarchy->GetInterface () ] = replacedAnimation;
-}
-
-void CClientPed::RestoreAnimation ( CAnimBlendHierarchy * pInternalAnimHierarchy )
-{
-    m_mapOfReplacedAnimations.erase ( pInternalAnimHierarchy->GetInterface () );
 }
 
 void CClientPed::RestoreAnimations ( const std::shared_ptr < CClientIFP > & IFP )
@@ -6226,12 +6235,7 @@ void CClientPed::RestoreAnimations ( CAnimBlock & animationBlock )
     }
 }
 
-void CClientPed::RestoreAllAnimations ( void )
-{
-    m_mapOfReplacedAnimations.clear ( );
-}
-
-SReplacedAnimation * CClientPed::getReplacedAnimation ( CAnimBlendHierarchySAInterface * pInternalHierarchyInterface )
+SReplacedAnimation * CClientPed::GetReplacedAnimation ( CAnimBlendHierarchySAInterface * pInternalHierarchyInterface )
 {
     CClientPed::ReplacedAnim_type::iterator it;
     it = m_mapOfReplacedAnimations.find ( pInternalHierarchyInterface );

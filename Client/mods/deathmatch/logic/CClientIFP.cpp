@@ -8,7 +8,8 @@ CClientIFP::CClientIFP ( class CClientManager* pManager, ElementID ID ) : CClien
     SetTypeName ( "IFP" );
     m_pIFPAnimations = std::make_shared < CIFPAnimations > ();
     m_pAnimManager = g_pGame->GetAnimManager ( );
-    m_bVersion1    = false; 
+    m_bVersion1    = false;
+    m_bUnloading   = false;
     m_u32Hashkey   = 0;
 }
 
@@ -18,14 +19,12 @@ CClientIFP::~CClientIFP ( void )
 
 bool CClientIFP::LoadIFP ( const char* szFilePath, const SString & strBlockName )
 {
-    printf ("\nCClientIFP::LoadIFP: szFilePath %s\n szBlockName: %s\n\n", szFilePath, strBlockName.c_str());
-    
     m_strBlockName = strBlockName;
     m_pVecAnimations = &m_pIFPAnimations->vecAnimations;
 
     if ( LoadIFPFile ( szFilePath ) )
     {
-        m_u32Hashkey = g_pGame->GetKeyGen()->GetUppercaseKey ( strBlockName );
+        m_u32Hashkey = HashString ( strBlockName.ToLower ( ) );
         return true;
     }
     return false;
@@ -37,8 +36,6 @@ bool CClientIFP::LoadIFPFile ( const char * szFilePath )
 
     if ( LoadFile ( ) )
     {
-        printf("IfpLoader: File loaded. Parsing it now.\n");
-        
         char Version [ 4 ];
         ReadBytes ( Version, sizeof ( Version ) );
 
@@ -56,17 +53,13 @@ bool CClientIFP::LoadIFPFile ( const char * szFilePath )
         }
 
         // We are unloading the data because we don't need to read it anymore. 
-        // This function does not unload IFP, to unload ifp, use destroyElement from lua
+        // This function does not unload IFP, to unload ifp, use destroyElement from Lua
         UnloadFile ( );
     }
     else
     {
-        printf("ERROR: LoadIFPFile: failed to load file.\n");
         return false;
     }
-
-    printf("Exiting LoadIFPFile function\n");
-
     return true;
 }
 
@@ -78,8 +71,7 @@ void CClientIFP::ReadIFPVersion1 (  )
     m_pVecAnimations->resize ( Info.Entries );
     for ( auto it = m_pVecAnimations->begin(); it != m_pVecAnimations->end(); ++it ) 
     {
-        ReadAnimationNameVersion1 ( it->Name );
-        printf("Animation Name: %s  \n", it->Name.c_str ( ) );
+        ReadAnimationNameVersion1 ( *it );
       
         IFP_DGAN Dgan;
         ReadDgan ( Dgan );
@@ -107,7 +99,7 @@ void CClientIFP::ReadIFPVersion2 ( bool bAnp3 )
         ReadAnimationHeaderVersion2 ( AnimationNode, bAnp3 );
 
         it->Name = AnimationNode.Name;
-        printf("Animation Name: %s    \n", AnimationNode.Name );
+        it->u32NameHash = HashString ( it->Name.ToLower ( ) );
 
         auto pAnimationHierarchy = m_pAnimManager->GetCustomAnimBlendHierarchy ( &it->Hierarchy );
         InitializeAnimationHierarchy ( pAnimationHierarchy, AnimationNode.Name, AnimationNode.TotalObjects );
@@ -277,7 +269,7 @@ void CClientIFP::ReadHeaderVersion1 ( IFP_INFO & Info )
     ReadBytes ( &Info.Entries, Info.Base.Size );
 }
 
-void CClientIFP::ReadAnimationNameVersion1 ( SString & strAnimationName )
+void CClientIFP::ReadAnimationNameVersion1 ( IFP_Animation & IfpAnimation )
 {
     IFP_NAME Name;
     ReadBuffer < IFP_NAME > ( &Name );
@@ -285,7 +277,8 @@ void CClientIFP::ReadAnimationNameVersion1 ( SString & strAnimationName )
 
     char szAnimationName [ 24 ];
     ReadCString ( szAnimationName, Name.Base.Size );
-    strAnimationName = szAnimationName;
+    IfpAnimation.Name = szAnimationName;
+    IfpAnimation.u32NameHash = HashString ( IfpAnimation.Name.ToLower ( ) );
 }
 
 void CClientIFP::ReadDgan ( IFP_DGAN & Dgan )
@@ -511,7 +504,7 @@ void CClientIFP::InsertAnimationDummySequence ( std::unique_ptr < CAnimBlendSequ
     pAnimationSequence->SetBoneTag ( dwBoneID );
 
     bool bKeyFrameCompressed = true;
-    bool bRootBone = dwBoneID == BoneType::NORMAL;
+    bool bRootBone = dwBoneID == eBoneType::NORMAL;
     bool bHasTranslationValues = false;
 
     // We only need 1 dummy key frame to make the animation work
@@ -536,194 +529,194 @@ void CClientIFP::CopyDummyKeyFrameByBoneID ( BYTE * pKeyFrames, DWORD dwBoneID )
 {
     switch ( dwBoneID )
     {
-        case BoneType::NORMAL: // Normal or Root, both are same
+        case eBoneType::NORMAL: // Normal or Root, both are same
         {     
             // This is a root frame. It contains translation as well, but it's compressed just like quaternion                                
             BYTE FrameData[16] = { 0x1F, 0x00, 0x00, 0x00, 0x53, 0x0B, 0x4D, 0x0B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::PELVIS: 
+        case eBoneType::PELVIS: 
         {
             BYTE FrameData[10] = { 0xB0, 0xF7, 0xB0, 0xF7, 0x55, 0xF8, 0xAB, 0x07, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::SPINE: 
+        case eBoneType::SPINE: 
         {
             BYTE FrameData[10] = { 0x0E, 0x00, 0x15, 0x00, 0xBE, 0xFF, 0xFF, 0x0F, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::SPINE1: 
+        case eBoneType::SPINE1: 
         {
             BYTE FrameData[10] = { 0x29, 0x00, 0xD9, 0x00, 0xB5, 0x00, 0xF5, 0x0F, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::NECK: 
+        case eBoneType::NECK: 
         {
             BYTE FrameData[10] = { 0x86, 0xFF, 0xB6, 0xFF, 0x12, 0x02, 0xDA, 0x0F, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::HEAD:
+        case eBoneType::HEAD:
         {
             BYTE FrameData[10] = { 0xFA, 0x00, 0x0C, 0x01, 0x96, 0xFE, 0xDF, 0x0F, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::JAW:
+        case eBoneType::JAW:
         {
             BYTE FrameData[10] = { 0x00, 0x00, 0x00, 0x00, 0x2B, 0x0D, 0x16, 0x09, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::L_BROW:
+        case eBoneType::L_BROW:
         {
             BYTE FrameData[10] = { 0xC4, 0x00, 0xFF, 0xFE, 0x47, 0x09, 0xF8, 0x0C, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::R_BROW: 
+        case eBoneType::R_BROW: 
         {
             BYTE FrameData[10] = { 0xA2, 0xFF, 0xF8, 0x00, 0x4F, 0x09, 0xF8, 0x0C, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::L_CLAVICLE:
+        case eBoneType::L_CLAVICLE:
         {
             BYTE FrameData[10] = { 0x7E, 0xF5, 0x82, 0x02, 0x37, 0xF4, 0x6A, 0xFF, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::L_UPPER_ARM: 
+        case eBoneType::L_UPPER_ARM: 
         {
             BYTE FrameData[10] = { 0xA8, 0x02, 0x6D, 0x09, 0x1F, 0xFD, 0x51, 0x0C, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::L_FORE_ARM: 
+        case eBoneType::L_FORE_ARM: 
         {
             BYTE FrameData[10] = { 0x00, 0x00, 0x00, 0x00, 0x3A, 0xFE, 0xE6, 0x0F, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::L_HAND: 
+        case eBoneType::L_HAND: 
         {
             BYTE FrameData[10] = { 0x9D, 0xF5, 0xBA, 0xFF, 0xEA, 0xFF, 0x29, 0x0C, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::L_FINGER: 
+        case eBoneType::L_FINGER: 
         {
             BYTE FrameData[10] = { 0xFF, 0xFF, 0x00, 0x00, 0xD8, 0x04, 0x3F, 0x0F, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::L_FINGER_01: 
+        case eBoneType::L_FINGER_01: 
         {
             BYTE FrameData[10] = { 0x00, 0x00, 0x00, 0x00, 0x54, 0x06, 0xB1, 0x0E, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::R_CLAVICLE:
+        case eBoneType::R_CLAVICLE:
         {
             BYTE FrameData[10] = { 0x0B, 0x0A, 0x3D, 0xFE, 0xBB, 0xF3, 0xCF, 0xFE, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::R_UPPER_ARM: 
+        case eBoneType::R_UPPER_ARM: 
         {
             BYTE FrameData[10] = { 0xF7, 0xFD, 0xED, 0xF6, 0xEB, 0xFD, 0xD9, 0x0C, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::R_FORE_ARM: 
+        case eBoneType::R_FORE_ARM: 
         {
             BYTE FrameData[10] = { 0x00, 0x00, 0x00, 0x00, 0x42, 0xFF, 0xFB, 0x0F, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::R_HAND:
+        case eBoneType::R_HAND:
         {
             BYTE FrameData[10] = { 0xE9, 0x0B, 0x94, 0x00, 0x25, 0x02, 0x72, 0x0A, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::R_FINGER:
+        case eBoneType::R_FINGER:
         {
             BYTE FrameData[10] = { 0x37, 0x00, 0xCB, 0xFF, 0x10, 0x09, 0x2E, 0x0D, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::R_FINGER_01:
+        case eBoneType::R_FINGER_01:
         {
             BYTE FrameData[10] = { 0x00, 0x00, 0x00, 0x00, 0x60, 0x06, 0xAC, 0x0E, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::L_BREAST: 
+        case eBoneType::L_BREAST: 
         {
             BYTE FrameData[10] = { 0xC5, 0x01, 0x2B, 0x01, 0x53, 0x0A, 0x09, 0x0C, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::R_BREAST:
+        case eBoneType::R_BREAST:
         {
             BYTE FrameData[10] = { 0x2F, 0xFF, 0xA5, 0xFF, 0xBA, 0x0A, 0xD6, 0x0B, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::BELLY:
+        case eBoneType::BELLY:
         {
             BYTE FrameData[10] = { 0x00, 0x00, 0x00, 0x00, 0x20, 0x0B, 0x7F, 0x0B, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::L_THIGH: 
+        case eBoneType::L_THIGH: 
         {
             BYTE FrameData[10] = { 0x23, 0xFE, 0x44, 0xF0, 0x19, 0xFE, 0x25, 0x01, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::L_CALF: 
+        case eBoneType::L_CALF: 
         {
             BYTE FrameData[10] = { 0x00, 0x00, 0x00, 0x00, 0x1E, 0xFC, 0x85, 0x0F, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::L_FOOT:
+        case eBoneType::L_FOOT:
         {
             BYTE FrameData[10] = { 0xBB, 0xFE, 0x3E, 0xFF, 0xD2, 0x01, 0xD3, 0x0F, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::L_TOE_0: 
+        case eBoneType::L_TOE_0: 
         {
             BYTE FrameData[10] = { 0x00, 0x00, 0x01, 0x00, 0x8D, 0x0B, 0x12, 0x0B, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::R_THIGH: 
+        case eBoneType::R_THIGH: 
         {
             BYTE FrameData[10] = { 0x0F, 0xFF, 0x19, 0xF0, 0x44, 0x01, 0xBB, 0x00, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::R_CALF:
+        case eBoneType::R_CALF:
         {
             BYTE FrameData[10] = { 0x00, 0x00, 0x00, 0x00, 0x64, 0xFD, 0xC9, 0x0F, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::R_FOOT:
+        case eBoneType::R_FOOT:
         {
             BYTE FrameData[10] = { 0x11, 0x01, 0x9F, 0xFF, 0x9E, 0x01, 0xE0, 0x0F, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
             break;
         }
-        case BoneType::R_TOE_0:
+        case eBoneType::R_TOE_0:
         {
             BYTE FrameData[10] = { 0x00, 0x00, 0x00, 0x00, 0x50, 0x0B, 0x4F, 0x0B, 0x00, 0x00 };
             memcpy ( pKeyFrames, FrameData, sizeof ( FrameData ) );
@@ -771,115 +764,115 @@ constexpr bool CClientIFP::IsKeyFramesTypeRoot ( IFP_FrameType iFrameType )
 
 int32_t CClientIFP::GetBoneIDFromName ( std::string const& BoneName )
 {
-    if (BoneName == "root") return BoneType::NORMAL;
-    if (BoneName == "normal") return BoneType::NORMAL;
+    if ( BoneName == "root" ) return eBoneType::NORMAL;
+    if ( BoneName == "normal" ) return eBoneType::NORMAL;
 
    
-    if (BoneName == "pelvis") return BoneType::PELVIS;
-    if (BoneName == "spine") return BoneType::SPINE;
-    if (BoneName == "spine1") return BoneType::SPINE1;
-    if (BoneName == "neck") return BoneType::NECK; 
-    if (BoneName == "head") return BoneType::HEAD;
-    if (BoneName == "jaw") return BoneType::JAW; 
-    if (BoneName == "lbrow") return BoneType::L_BROW;
-    if (BoneName == "rbrow") return BoneType::R_BROW;
-    if (BoneName == "bip01lclavicle") return BoneType::L_CLAVICLE;
-    if (BoneName == "lupperarm") return BoneType::L_UPPER_ARM;
-    if (BoneName == "lforearm") return BoneType::L_FORE_ARM;
-    if (BoneName == "lhand") return BoneType::L_HAND;
+    if ( BoneName == "pelvis" ) return eBoneType::PELVIS;
+    if ( BoneName == "spine" ) return eBoneType::SPINE;
+    if ( BoneName == "spine1" ) return eBoneType::SPINE1;
+    if ( BoneName == "neck" ) return eBoneType::NECK; 
+    if ( BoneName == "head" ) return eBoneType::HEAD;
+    if ( BoneName == "jaw" ) return eBoneType::JAW; 
+    if ( BoneName == "lbrow" ) return eBoneType::L_BROW;
+    if ( BoneName == "rbrow" ) return eBoneType::R_BROW;
+    if ( BoneName == "bip01lclavicle" ) return eBoneType::L_CLAVICLE;
+    if ( BoneName == "lupperarm" ) return eBoneType::L_UPPER_ARM;
+    if ( BoneName == "lforearm" ) return eBoneType::L_FORE_ARM;
+    if ( BoneName == "lhand" ) return eBoneType::L_HAND;
 
-    if (BoneName == "lfingers") return BoneType::L_FINGER;
-    if (BoneName == "lfinger") return BoneType::L_FINGER;
+    if ( BoneName == "lfingers" ) return eBoneType::L_FINGER;
+    if ( BoneName == "lfinger" ) return eBoneType::L_FINGER;
 
-    if (BoneName == "lfinger01") return BoneType::L_FINGER_01;
-    if (BoneName == "bip01rclavicle") return BoneType::R_CLAVICLE;
-    if (BoneName == "rupperarm") return BoneType::R_UPPER_ARM;
-    if (BoneName == "rforearm") return BoneType::R_FORE_ARM;
-    if (BoneName == "rhand") return BoneType::R_HAND;
+    if ( BoneName == "lfinger01" ) return eBoneType::L_FINGER_01;
+    if ( BoneName == "bip01rclavicle" ) return eBoneType::R_CLAVICLE;
+    if ( BoneName == "rupperarm" ) return eBoneType::R_UPPER_ARM;
+    if ( BoneName == "rforearm" ) return eBoneType::R_FORE_ARM;
+    if ( BoneName == "rhand" ) return eBoneType::R_HAND;
 
-    if (BoneName == "rfingers") return BoneType::R_FINGER;
-    if (BoneName == "rfinger") return BoneType::R_FINGER;
+    if ( BoneName == "rfingers" ) return eBoneType::R_FINGER;
+    if ( BoneName == "rfinger" ) return eBoneType::R_FINGER;
 
-    if (BoneName == "rfinger01") return BoneType::R_FINGER_01;
-    if (BoneName == "lbreast") return BoneType::L_BREAST;
-    if (BoneName == "rbreast") return BoneType::R_BREAST;
-    if (BoneName == "belly") return BoneType::BELLY;
-    if (BoneName == "lthigh") return BoneType::L_THIGH;
-    if (BoneName == "lcalf") return BoneType::L_CALF;
-    if (BoneName == "lfoot") return BoneType::L_FOOT;
-    if (BoneName == "ltoe0") return BoneType::L_TOE_0;
-    if (BoneName == "rthigh") return BoneType::R_THIGH;
-    if (BoneName == "rcalf") return BoneType::R_CALF;
-    if (BoneName == "rfoot") return BoneType::R_FOOT;
-    if (BoneName == "rtoe0") return BoneType::R_TOE_0;
+    if ( BoneName == "rfinger01" ) return eBoneType::R_FINGER_01;
+    if ( BoneName == "lbreast" ) return eBoneType::L_BREAST;
+    if ( BoneName == "rbreast" ) return eBoneType::R_BREAST;
+    if ( BoneName == "belly" ) return eBoneType::BELLY;
+    if ( BoneName == "lthigh" ) return eBoneType::L_THIGH;
+    if ( BoneName == "lcalf" ) return eBoneType::L_CALF;
+    if ( BoneName == "lfoot" ) return eBoneType::L_FOOT;
+    if ( BoneName == "ltoe0" ) return eBoneType::L_TOE_0;
+    if ( BoneName == "rthigh" ) return eBoneType::R_THIGH;
+    if ( BoneName == "rcalf" ) return eBoneType::R_CALF;
+    if ( BoneName == "rfoot" ) return eBoneType::R_FOOT;
+    if ( BoneName == "rtoe0" ) return eBoneType::R_TOE_0;
 
     // for GTA 3
-    if (BoneName == "player") return BoneType::NORMAL;
+    if ( BoneName == "player" ) return eBoneType::NORMAL;
 
-    if (BoneName == "swaist") return BoneType::PELVIS;
-    if (BoneName == "smid") return BoneType::SPINE;
-    if (BoneName == "storso") return BoneType::SPINE1;
-    if (BoneName == "shead") return BoneType::HEAD;
+    if ( BoneName == "swaist" ) return eBoneType::PELVIS;
+    if ( BoneName == "smid" ) return eBoneType::SPINE;
+    if ( BoneName == "storso" ) return eBoneType::SPINE1;
+    if ( BoneName == "shead" ) return eBoneType::HEAD;
 
-    if (BoneName == "supperarml") return BoneType::L_UPPER_ARM;
-    if (BoneName == "slowerarml") return BoneType::L_FORE_ARM;
-    if (BoneName == "supperarmr") return BoneType::R_UPPER_ARM;
-    if (BoneName == "slowerarmr") return BoneType::R_FORE_ARM;
+    if ( BoneName == "supperarml" ) return eBoneType::L_UPPER_ARM;
+    if ( BoneName == "slowerarml" ) return eBoneType::L_FORE_ARM;
+    if ( BoneName == "supperarmr" ) return eBoneType::R_UPPER_ARM;
+    if ( BoneName == "slowerarmr" ) return eBoneType::R_FORE_ARM;
 
-    if (BoneName == "srhand") return BoneType::R_HAND;
-    if (BoneName == "slhand") return BoneType::L_HAND;
+    if ( BoneName == "srhand" ) return eBoneType::R_HAND;
+    if ( BoneName == "slhand" ) return eBoneType::L_HAND;
 
-    if (BoneName == "supperlegr") return BoneType::R_THIGH;
-    if (BoneName == "slowerlegr") return BoneType::R_CALF;
-    if (BoneName == "sfootr") return BoneType::R_FOOT;
+    if ( BoneName == "supperlegr" ) return eBoneType::R_THIGH;
+    if ( BoneName == "slowerlegr" ) return eBoneType::R_CALF;
+    if ( BoneName == "sfootr" ) return eBoneType::R_FOOT;
 
-    if (BoneName == "supperlegl") return BoneType::L_THIGH;
-    if (BoneName == "slowerlegl") return BoneType::L_CALF;
-    if (BoneName == "sfootl") return BoneType::L_FOOT;
+    if ( BoneName == "supperlegl" ) return eBoneType::L_THIGH;
+    if ( BoneName == "slowerlegl" ) return eBoneType::L_CALF;
+    if ( BoneName == "sfootl" ) return eBoneType::L_FOOT;
 
-    return BoneType::UNKNOWN; 
+    return eBoneType::UNKNOWN; 
 }
 
 
 std::string CClientIFP::GetCorrectBoneNameFromID ( int32_t & BoneID )
 {
-    if (BoneID == BoneType::NORMAL) return "Normal";
+    if ( BoneID == eBoneType::NORMAL ) return "Normal";
  
-    if (BoneID == BoneType::PELVIS) return "Pelvis";
-    if (BoneID == BoneType::SPINE) return "Spine";
-    if (BoneID == BoneType::SPINE1) return "Spine1";
-    if (BoneID == BoneType::NECK) return "Neck";
-    if (BoneID == BoneType::HEAD) return "Head";
-    if (BoneID == BoneType::JAW) return "Jaw";
-    if (BoneID == BoneType::L_BROW) return "L Brow";
-    if (BoneID == BoneType::R_BROW) return "R Brow";
-    if (BoneID == BoneType::L_CLAVICLE) return "Bip01 L Clavicle";
-    if (BoneID == BoneType::L_UPPER_ARM) return "L UpperArm";
-    if (BoneID == BoneType::L_FORE_ARM) return "L ForeArm";
-    if (BoneID == BoneType::L_HAND) return "L Hand";
+    if ( BoneID == eBoneType::PELVIS ) return "Pelvis";
+    if ( BoneID == eBoneType::SPINE ) return "Spine";
+    if ( BoneID == eBoneType::SPINE1 ) return "Spine1";
+    if ( BoneID == eBoneType::NECK ) return "Neck";
+    if ( BoneID == eBoneType::HEAD ) return "Head";
+    if ( BoneID == eBoneType::JAW ) return "Jaw";
+    if ( BoneID == eBoneType::L_BROW ) return "L Brow";
+    if ( BoneID == eBoneType::R_BROW ) return "R Brow";
+    if ( BoneID == eBoneType::L_CLAVICLE ) return "Bip01 L Clavicle";
+    if ( BoneID == eBoneType::L_UPPER_ARM ) return "L UpperArm";
+    if ( BoneID == eBoneType::L_FORE_ARM ) return "L ForeArm";
+    if ( BoneID == eBoneType::L_HAND ) return "L Hand";
 
-    if (BoneID == BoneType::L_FINGER) return "L Finger";
+    if ( BoneID == eBoneType::L_FINGER ) return "L Finger";
 
-    if (BoneID == BoneType::L_FINGER_01) return "L Finger01";
-    if (BoneID == BoneType::R_CLAVICLE) return "Bip01 R Clavicle";
-    if (BoneID == BoneType::R_UPPER_ARM) return "R UpperArm";
-    if (BoneID == BoneType::R_FORE_ARM) return "R ForeArm";
-    if (BoneID == BoneType::R_HAND) return "R Hand";
+    if ( BoneID == eBoneType::L_FINGER_01 ) return "L Finger01";
+    if ( BoneID == eBoneType::R_CLAVICLE ) return "Bip01 R Clavicle";
+    if ( BoneID == eBoneType::R_UPPER_ARM ) return "R UpperArm";
+    if ( BoneID == eBoneType::R_FORE_ARM ) return "R ForeArm";
+    if ( BoneID == eBoneType::R_HAND ) return "R Hand";
 
-    if (BoneID == BoneType::R_FINGER) return "R Finger";
+    if ( BoneID == eBoneType::R_FINGER ) return "R Finger";
 
-    if (BoneID == BoneType::R_FINGER_01) return "R Finger01";
-    if (BoneID == BoneType::L_BREAST) return "L breast";
-    if (BoneID == BoneType::R_BREAST) return "R breast";
-    if (BoneID == BoneType::BELLY) return "Belly";
-    if (BoneID == BoneType::L_THIGH) return "L Thigh";
-    if (BoneID == BoneType::L_CALF) return "L Calf";
-    if (BoneID == BoneType::L_FOOT) return "L Foot";
-    if (BoneID == BoneType::L_TOE_0) return "L Toe0";
-    if (BoneID == BoneType::R_THIGH) return "R Thigh";
-    if (BoneID == BoneType::R_CALF) return "R Calf";
-    if (BoneID == BoneType::R_FOOT) return "R Foot";
-    if (BoneID == BoneType::R_TOE_0) return "R Toe0";
+    if ( BoneID == eBoneType::R_FINGER_01 ) return "R Finger01";
+    if ( BoneID == eBoneType::L_BREAST ) return "L breast";
+    if ( BoneID == eBoneType::R_BREAST ) return "R breast";
+    if ( BoneID == eBoneType::BELLY ) return "Belly";
+    if ( BoneID == eBoneType::L_THIGH ) return "L Thigh";
+    if ( BoneID == eBoneType::L_CALF ) return "L Calf";
+    if ( BoneID == eBoneType::L_FOOT ) return "L Foot";
+    if ( BoneID == eBoneType::L_TOE_0 ) return "L Toe0";
+    if ( BoneID == eBoneType::R_THIGH ) return "R Thigh";
+    if ( BoneID == eBoneType::R_CALF ) return "R Calf";
+    if ( BoneID == eBoneType::R_FOOT ) return "R Foot";
+    if ( BoneID == eBoneType::R_TOE_0 ) return "R Toe0";
     
     return "";
 }
@@ -887,77 +880,78 @@ std::string CClientIFP::GetCorrectBoneNameFromID ( int32_t & BoneID )
 std::string CClientIFP::GetCorrectBoneNameFromName ( std::string const& BoneName )
 {
 
-    if (BoneName == "root") return "Normal";
-    if (BoneName == "normal") return "Normal";
+    if ( BoneName == "root" ) return "Normal";
+    if ( BoneName == "normal" ) return "Normal";
 
 
-    if (BoneName == "pelvis") return "Pelvis";
-    if (BoneName == "spine") return "Spine";
-    if (BoneName == "spine1") return "Spine1";
-    if (BoneName == "neck") return "Neck";
-    if (BoneName == "head") return "Head";
-    if (BoneName == "jaw") return "Jaw";
-    if (BoneName == "lbrow") return "L Brow";
-    if (BoneName == "rbrow") return "R Brow";
-    if (BoneName == "bip01lclavicle") return "Bip01 L Clavicle";
-    if (BoneName == "lupperarm") return "L UpperArm";
-    if (BoneName == "lforearm") return "L ForeArm";
-    if (BoneName == "lhand") return "L Hand";
+    if ( BoneName == "pelvis" ) return "Pelvis";
+    if ( BoneName == "spine" ) return "Spine";
+    if ( BoneName == "spine1" ) return "Spine1";
+    if ( BoneName == "neck" ) return "Neck";
+    if ( BoneName == "head" ) return "Head";
+    if ( BoneName == "jaw" ) return "Jaw";
+    if ( BoneName == "lbrow" ) return "L Brow";
+    if ( BoneName == "rbrow" ) return "R Brow";
+    if ( BoneName == "bip01lclavicle" ) return "Bip01 L Clavicle";
+    if ( BoneName == "lupperarm" ) return "L UpperArm";
+    if ( BoneName == "lforearm" ) return "L ForeArm";
+    if ( BoneName == "lhand" ) return "L Hand";
 
-    if (BoneName == "lfingers") return "L Finger";
-    if (BoneName == "lfinger") return "L Finger";
+    if ( BoneName == "lfingers" ) return "L Finger";
+    if ( BoneName == "lfinger" ) return "L Finger";
 
-    if (BoneName == "lfinger01") return "L Finger01";
-    if (BoneName == "bip01rclavicle") return "Bip01 R Clavicle";
-    if (BoneName == "rupperarm") return "R UpperArm";
-    if (BoneName == "rforearm") return "R ForeArm";
-    if (BoneName == "rhand") return "R Hand";
+    if ( BoneName == "lfinger01" ) return "L Finger01";
+    if ( BoneName == "bip01rclavicle" ) return "Bip01 R Clavicle";
+    if ( BoneName == "rupperarm" ) return "R UpperArm";
+    if ( BoneName == "rforearm" ) return "R ForeArm";
+    if ( BoneName == "rhand" ) return "R Hand";
 
-    if (BoneName == "rfingers") return "R Finger";
-    if (BoneName == "rfinger") return "R Finger";
+    if ( BoneName == "rfingers" ) return "R Finger";
+    if ( BoneName == "rfinger" ) return "R Finger";
 
-    if (BoneName == "rfinger01") return "R Finger01";
-    if (BoneName == "lbreast") return "L Breast";
-    if (BoneName == "rbreast") return "R Breast";
-    if (BoneName == "belly") return "Belly";
-    if (BoneName == "lthigh") return "L Thigh";
-    if (BoneName == "lcalf") return "L Calf";
-    if (BoneName == "lfoot") return "L Foot";
-    if (BoneName == "ltoe0") return "L Toe0";
-    if (BoneName == "rthigh") return "R Thigh";
-    if (BoneName == "rcalf") return "R Calf";
-    if (BoneName == "rfoot") return "R Foot";
-    if (BoneName == "rtoe0") return "R Toe0";
+    if ( BoneName == "rfinger01" ) return "R Finger01";
+    if ( BoneName == "lbreast" ) return "L Breast";
+    if ( BoneName == "rbreast" ) return "R Breast";
+    if ( BoneName == "belly" ) return "Belly";
+    if ( BoneName == "lthigh" ) return "L Thigh";
+    if ( BoneName == "lcalf" ) return "L Calf";
+    if ( BoneName == "lfoot" ) return "L Foot";
+    if ( BoneName == "ltoe0" ) return "L Toe0";
+    if ( BoneName == "rthigh" ) return "R Thigh";
+    if ( BoneName == "rcalf" ) return "R Calf";
+    if ( BoneName == "rfoot" ) return "R Foot";
+    if ( BoneName == "rtoe0" ) return "R Toe0";
     
     // For GTA 3
-    if (BoneName == "player") return "Normal";
-    if (BoneName == "swaist") return "Pelvis";
-    if (BoneName == "smid") return "Spine";
-    if (BoneName == "storso") return "Spine1";
-    if (BoneName == "shead") return "Head";
+    if ( BoneName == "player" ) return "Normal";
+    if ( BoneName == "swaist" ) return "Pelvis";
+    if ( BoneName == "smid" ) return "Spine";
+    if ( BoneName == "storso" ) return "Spine1";
+    if ( BoneName == "shead" ) return "Head";
 
-    if (BoneName == "supperarml") return "L UpperArm";
-    if (BoneName == "slowerarml") return "L ForeArm";
-    if (BoneName == "supperarmr") return "R UpperArm";
-    if (BoneName == "slowerarmr") return "R ForeArm";
+    if ( BoneName == "supperarml" ) return "L UpperArm";
+    if ( BoneName == "slowerarml" ) return "L ForeArm";
+    if ( BoneName == "supperarmr" ) return "R UpperArm";
+    if ( BoneName == "slowerarmr" ) return "R ForeArm";
 
-    if (BoneName == "srhand") return "R Hand";
-    if (BoneName == "slhand") return "L Hand";
-    if (BoneName == "supperlegr") return "R Thigh";
-    if (BoneName == "slowerlegr") return "R Calf";
-    if (BoneName == "sfootr") return "R Foot";
-    if (BoneName == "supperlegl") return "L Thigh";
-    if (BoneName == "slowerlegl") return "L Calf";
-    if (BoneName == "sfootl") return "L Foot";
+    if ( BoneName == "srhand" ) return "R Hand";
+    if ( BoneName == "slhand" ) return "L Hand";
+    if ( BoneName == "supperlegr" ) return "R Thigh";
+    if ( BoneName == "slowerlegr" ) return "R Calf";
+    if ( BoneName == "sfootr" ) return "R Foot";
+    if ( BoneName == "supperlegl" ) return "L Thigh";
+    if ( BoneName == "slowerlegl" ) return "L Calf";
+    if ( BoneName == "sfootl" ) return "L Foot";
 
     return BoneName;
 }
 
 CAnimBlendHierarchySAInterface * CClientIFP::GetAnimationHierarchy ( const SString & strAnimationName )
 {
+    const unsigned int u32AnimationNameHash = HashString ( strAnimationName.ToLower ( ) );
     for ( auto it = m_pVecAnimations->begin(); it != m_pVecAnimations->end(); ++it ) 
     {
-        if (strAnimationName.ToLower() == it->Name.ToLower())
+        if ( u32AnimationNameHash == it->u32NameHash )
         {
             return &it->Hierarchy;
         }

@@ -93,12 +93,12 @@ bool CElementDeleter::DeleteElementSpecial ( CClientEntity* pElement )
 void CElementDeleter::DeleteIFP  ( CClientEntity * pElement )
 {
     CClientIFP & IFP = static_cast < CClientIFP& > ( *pElement );
-    const SString & strBlockName = IFP.GetBlockName ( );
-    std::shared_ptr < CClientIFP > pIFP = g_pClientGame->GetIFPPointerFromMap ( strBlockName );
+    const unsigned int u32BlockNameHash = IFP.GetBlockNameHash ( );
+    std::shared_ptr < CClientIFP > pIFP = g_pClientGame->GetIFPPointerFromMap ( u32BlockNameHash );
     if ( pIFP )
     { 
         // Remove IFP from map, so we can indicate that it does not exist
-        g_pClientGame->RemoveIFPPointerFromMap ( strBlockName );
+        g_pClientGame->RemoveIFPPointerFromMap ( u32BlockNameHash );
 
         // Remove IFP animations from replaced animations of peds/players
         g_pClientGame->OnClientIFPUnload ( pIFP );

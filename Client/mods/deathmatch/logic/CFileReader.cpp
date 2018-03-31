@@ -30,7 +30,7 @@ BOOL CFileReader::LoadFile ( void )
     if ( !LoadToMemory ( ) )
         return FALSE;
 
-    std::cout << "Length: " << u32FileLength << std::endl;
+    //std::cout << "Length: " << u32FileLength << std::endl;
     return TRUE;
 }
 

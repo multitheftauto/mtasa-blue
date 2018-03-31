@@ -10,6 +10,7 @@ class CIFPAnimations
     struct IFP_Animation
     {
         SString                           Name;
+        unsigned int                      u32NameHash;
         CAnimBlendHierarchySAInterface    Hierarchy;
         char *                            pSequencesMemory;
     };
