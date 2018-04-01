@@ -312,13 +312,15 @@ void _declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy ()
             
             // call our handler function
             mov     edx, [ebp+28h+4+12] 
-            push    edx  // pClump
-            lea     edx, [ebp-4]
+            lea     ecx, [ebp+28h+4+20]
+            push    edx  // pClump 
+            push    ecx  // pFlags
+            lea     edx, [ebp-4] 
             push    edx  //  CAnimBlendHierarchySAInterface ** pOutAnimHierarchy
-            mov     edx, [esp+24]
+            mov     edx, [esp+28]  
             push    edx  // pAnimAssociation
             call    m_pBlendAnimationHierarchyHandler //CAnimManager_BlendAnimation_Hierarchy
-            add     esp, 0Ch
+            add     esp, 10h
  
             mov     ecx, [ebp-4] // pCustomAnimHierarchy
 

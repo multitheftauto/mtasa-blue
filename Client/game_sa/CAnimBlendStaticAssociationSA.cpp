@@ -12,7 +12,15 @@
 
 #include "StdInc.h"
 
-CAnimBlendHierarchy * CAnimBlendStaticAssociationSA::GetAnimHierachy ( void )
+void CAnimBlendStaticAssociationSA::Initialize ( RpClump * pClump, CAnimBlendHierarchySAInterface * pAnimBlendHierarchyInterface )
 {
-    return NULL;
+    DWORD dwThis = ( DWORD ) m_pInterface;
+    DWORD dwFunc = FUNC_CAnimBlendStaticAssociation_Initialize;
+    _asm
+    {
+        push    pAnimBlendHierarchyInterface
+        push    pClump
+        mov     ecx, dwThis
+        call    dwFunc
+    }
 }

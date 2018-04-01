@@ -248,8 +248,6 @@ public:
     virtual void                SetPreWeaponFireHandler         ( PreWeaponFireHandler* pPreWeaponFireHandler ) = 0;
     virtual void                SetPostWeaponFireHandler        ( PostWeaponFireHandler* pPostWeaponFireHandler ) = 0;
     virtual void                SetTaskSimpleBeHitHandler       ( TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler ) = 0;
-
-    virtual AssocGroup_type     CreateAnimBlendAssocGroup       ( AssocGroupId animGroup ) = 0;
 };
 
 #endif

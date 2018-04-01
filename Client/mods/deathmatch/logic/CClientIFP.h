@@ -164,7 +164,7 @@ public:
         int16_t x, y, z, w, time;
     };
 
-    enum BoneType 
+    enum eBoneType 
     {
         UNKNOWN     = -1,
         NORMAL      = 0, // Normal or Root, both are same
@@ -205,9 +205,10 @@ public:
 
     virtual eClientEntityType       GetType                      ( void ) const              { return CCLIENTIFP; }
 
-    const SString &                 GetBlockName                 ( void ) { return m_strBlockName; }
-    bool                            LoadIFP                      ( const char* szFilePath, const SString & strBlockName );
+    void                            MarkAsUnloading              ( void ) { m_bUnloading = true; }
+    bool                            IsUnloading                  ( void ) { return m_bUnloading; }
 
+    bool                            LoadIFP                      ( const char* szFilePath, const SString & strBlockName );
     bool                            LoadIFPFile                  ( const char * szFilePath );
     void                            ReadIFPVersion1              ( void );
     void                            ReadIFPVersion2              ( bool bAnp3 );
@@ -220,18 +221,24 @@ public:
     void                            ReadSequenceVersion2         ( Object & ObjectNode );
 
     void                            ReadHeaderVersion1           ( IFP_INFO & Info );
-    void                            ReadAnimationNameVersion1    ( SString & strAnimationName);
+    void                            ReadAnimationNameVersion1    ( IFP_Animation & IfpAnimation );
     void                            ReadDgan                     ( IFP_DGAN & Dgan );
     CClientIFP::IFP_FrameType       ReadKfrm                     ( void );
     void                            ReadAnimationHeaderVersion2  ( Animation & AnimationNode, bool bAnp3 );
 
     bool                            ReadSequenceKeyFrames        ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, IFP_FrameType iFrameType, int32_t iFrames );
-    void                            ReadKeyFramesAsCompressed    ( IFP_FrameType iFrameType, BYTE * pKeyFrames, int32_t iFrames );
-    void                            ReadKrtsFramesAsCompressed   (  BYTE * pKeyFrames, int32_t TotalFrames );
-    void                            ReadKrt0FramesAsCompressed   (  BYTE * pKeyFrames, int32_t TotalFrames );
-    void                            ReadKr00FramesAsCompressed   (  BYTE * pKeyFrames, int32_t TotalFrames );
-    void                            ReadKr00CompressedFrames     (  BYTE * pKeyFrames, int32_t TotalFrames );
-    void                            ReadKrt0CompressedFrames     (  BYTE * pKeyFrames, int32_t TotalFrames );
+    void                            ReadKeyFramesAsCompressed    ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, IFP_FrameType iFrameType, int32_t iFrames );
+    void                            ReadKrtsFramesAsCompressed   ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, int32_t TotalFrames );
+    void                            ReadKrt0FramesAsCompressed   ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, int32_t TotalFrames );
+    void                            ReadKr00FramesAsCompressed   ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, int32_t TotalFrames );
+
+    template < class T > 
+    void                            ReadCompressedFrames         ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, int32_t iFrames )
+    {
+        BYTE * pKeyFrames = pAnimationSequence->GetKeyFrames ( );
+        size_t iSizeInBytes = sizeof ( T ) * iFrames;
+        ReadBytes ( pKeyFrames, iSizeInBytes );
+    }  
 
     void                            InitializeAnimationHierarchy ( std::unique_ptr < CAnimBlendHierarchy > & pAnimationHierarchy, const char * szAnimationName, const int32_t iSequences );
     void                            InitializeAnimationSequence  ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, const char * szName, const int32_t iBoneID );
@@ -252,6 +259,9 @@ public:
     std::string                     GetCorrectBoneNameFromName   ( std::string const& BoneName );
     std::string                     GetCorrectBoneNameFromID     ( int32_t & BoneID );
 
+    const SString &                 GetBlockName                 ( void ) { return m_strBlockName; }
+    const unsigned int &            GetBlockNameHash             ( void ) { return m_u32Hashkey; }
+
     CAnimBlendHierarchySAInterface *          GetAnimationHierarchy   ( const SString & strAnimationName );
     inline std::shared_ptr < CIFPAnimations > GetIFPAnimationsPointer ( void ) { return m_pIFPAnimations; }
 
@@ -264,8 +274,10 @@ public:
 private:
     std::shared_ptr < CIFPAnimations > m_pIFPAnimations;
     SString                            m_strBlockName;
+    unsigned int                       m_u32Hashkey;
     std::vector < IFP_Animation > *    m_pVecAnimations;
     bool                               m_bVersion1;
+    bool                               m_bUnloading;
     CAnimManager *                     m_pAnimManager;
 
     // 32 because there are 32 bones in a ped model 

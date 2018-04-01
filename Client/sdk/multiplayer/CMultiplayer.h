@@ -73,7 +73,7 @@ typedef CAnimBlendAssociationSAInterface * ( AddAnimationHandler )   ( RpClump *
 typedef CAnimBlendAssociationSAInterface * ( AddAnimationAndSyncHandler )   ( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID );
 typedef void ( CAnimBlendAssocDestructorHandler ) ( CAnimBlendAssociationSAInterface * pThis );
 typedef bool ( AssocGroupCopyAnimationHandler )   ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, CAnimBlendAssociationSAInterface * pAnimAssoc, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID );
-typedef bool ( BlendAnimationHierarchyHandler ) ( CAnimBlendAssociationSAInterface * pAnimAssoc, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, RpClump * pClump );
+typedef bool ( BlendAnimationHierarchyHandler ) ( CAnimBlendAssociationSAInterface * pAnimAssoc, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, int * pFlags, RpClump * pClump );
 typedef bool ( ProcessCollisionHandler ) ( class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface );
 typedef bool ( VehicleCollisionHandler ) ( class CVehicleSAInterface* pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity );
 typedef bool ( VehicleDamageHandler ) ( CEntitySAInterface* pVehicle, float fLoss, CEntitySAInterface* pAttacker, eWeaponType weaponType, const CVector& vecDamagePos, uchar ucTyre );

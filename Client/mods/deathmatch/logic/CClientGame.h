@@ -508,7 +508,7 @@ private:
     static CAnimBlendAssociationSAInterface * StaticAddAnimationHandler       ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     static CAnimBlendAssociationSAInterface * StaticAddAnimationAndSyncHandler( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID );
     static bool                               StaticAssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, CAnimBlendAssociationSAInterface * pAnimAssoc, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID );
-    static bool                               StaticBlendAnimationHierarchyHandler ( CAnimBlendAssociationSAInterface * pAnimAssoc, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, RpClump * pClump );
+    static bool                               StaticBlendAnimationHierarchyHandler ( CAnimBlendAssociationSAInterface * pAnimAssoc, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, int * pFlags, RpClump * pClump );
     static bool                               StaticProcessCollisionHandler   ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     static bool                               StaticVehicleCollisionHandler   ( CVehicleSAInterface* pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity  );
     static bool                               StaticVehicleDamageHandler      ( CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType, const CVector& vecDamagePos, uchar ucTyre );
@@ -542,7 +542,7 @@ private:
     CAnimBlendAssociationSAInterface *        AddAnimationHandler             ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID );
     CAnimBlendAssociationSAInterface *        AddAnimationAndSyncHandler      ( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID );
     bool                                      AssocGroupCopyAnimationHandler  ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, CAnimBlendAssociationSAInterface * pAnimAssoc, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID );
-    bool                                      BlendAnimationHierarchyHandler  ( CAnimBlendAssociationSAInterface * pAnimAssoc, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, RpClump * pClump );
+    bool                                      BlendAnimationHierarchyHandler  ( CAnimBlendAssociationSAInterface * pAnimAssoc, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, int * pFlags, RpClump * pClump );
     bool                                      ProcessCollisionHandler         ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface );
     bool                                      VehicleCollisionHandler         ( CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity  );
     bool                                      VehicleDamageHandler            ( CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType, const CVector& vecDamagePos, uchar ucTyre );
@@ -593,12 +593,13 @@ public:
     void                                      SetFileCacheRoot                ( void );
     const char*                               GetFileCacheRoot                ( void )                                    { return m_strFileCacheRoot; }
 
-    void                                      InsertIFPPointerToMap           ( const SString & strBlockName, const std::shared_ptr < CClientIFP > & pIFP );
-    void                                      RemoveIFPPointerFromMap         ( const SString & strBlockName );
-    std::shared_ptr < CClientIFP >            GetIFPPointerFromMap            ( const SString & strBlockName );
+    void                                      CopyStaticAssociationProperties ( std::unique_ptr < CAnimBlendStaticAssociation > & pOutAnimStaticAssoc, std::unique_ptr < CAnimBlendStaticAssociation > & pOriginalAnimStaticAssoc );
+    void                                      InsertIFPPointerToMap           ( const unsigned int u32BlockNameHash, const std::shared_ptr < CClientIFP > & pIFP );
+    void                                      RemoveIFPPointerFromMap         ( const unsigned int u32BlockNameHash );
+    std::shared_ptr < CClientIFP >            GetIFPPointerFromMap            ( const unsigned int u32BlockNameHash );
 
-    void                                      InsertPedPointerToMap           ( CClientPed * pPed );
-    void                                      RemovePedPointerFromMap         ( CClientPed * pPed );
+    void                                      InsertPedPointerToSet           ( CClientPed * pPed );
+    void                                      RemovePedPointerFromSet         ( CClientPed * pPed );
     CClientPed *                              GetClientPedByClump             ( const RpClump & Clump );
 
     void                                      OnClientIFPUnload               ( const std::shared_ptr < CClientIFP > & IFP );
@@ -819,11 +820,15 @@ private:
 
     SharedUtil::CAsyncTaskScheduler*          m_pAsyncTaskScheduler;
 
-    // (SString) Key is custom block name that is supplied to engineLoadIFP
-    std::map < SString, std::shared_ptr < CClientIFP > > m_mapOfIfpPointers; 
+    // (unsigned int) Key is the hash of custom block name that is supplied to engineLoadIFP
+    std::map < unsigned int, std::shared_ptr < CClientIFP > > m_mapOfIfpPointers; 
+    mutable std::mutex m_MutexOfIfpPointersMap;
 
-    std::map < CClientPed *, bool > m_mapOfPedPointers;
-    AnimAssociations_type           m_mapOfCustomAnimationAssociations;
+    std::set < CClientPed * > m_setOfPedPointers;
+    mutable std::mutex m_MutexOfPedPointersSet;
+
+    AnimAssociations_type m_mapOfCustomAnimationAssociations;
+    mutable std::mutex m_MutexOfAnimationAssociationsMap;
 };
 
 extern CClientGame* g_pClientGame;

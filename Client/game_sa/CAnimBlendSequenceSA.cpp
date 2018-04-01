@@ -58,3 +58,8 @@ void CAnimBlendSequenceSA::SetKeyFrames ( size_t cKeyFrames, bool bRoot, bool bC
         call    dwFunc
     }
 }
+
+void * CAnimBlendSequenceSA::GetKeyFrame ( size_t iFrame, uint32_t u32FrameSizeInBytes )
+{
+    return ( m_pInterface->pKeyFrames + u32FrameSizeInBytes * iFrame );
+}
