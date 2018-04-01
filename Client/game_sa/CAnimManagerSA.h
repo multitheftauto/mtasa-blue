@@ -81,7 +81,7 @@ public:
 
 class CAnimManagerSA : public CAnimManager
 {
-    typedef CAnimBlendStaticAssociationSAInterface * StaticAssocIntface_type;
+    typedef std::unique_ptr < CAnimBlendStaticAssociation > StaticAssocIntface_type;
 
 public:
                                 CAnimManagerSA                          ( void );
@@ -153,6 +153,8 @@ public:
     CAnimBlendAssocGroup *      GetAnimBlendAssocGroup                  ( CAnimBlendAssocGroupSAInterface * pInterface );
     CAnimBlock *                GetAnimBlock                            ( CAnimBlockSAInterface * pInterface );
     CAnimBlendHierarchy *       GetAnimBlendHierarchy                   ( CAnimBlendHierarchySAInterface * pInterface );
+
+    StaticAssocIntface_type     GetAnimStaticAssociation                ( CAnimBlendStaticAssociationSAInterface * pInterface );
 
     // MTA members, but use this strictly for custom animations only
     std::unique_ptr < CAnimBlendHierarchy > GetCustomAnimBlendHierarchy ( CAnimBlendHierarchySAInterface * pInterface );

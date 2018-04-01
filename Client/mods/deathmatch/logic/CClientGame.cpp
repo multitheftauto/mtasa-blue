@@ -4027,33 +4027,24 @@ CAnimBlendAssociationSAInterface * CClientGame::AddAnimationAndSyncHandler ( RpC
 }
 
 
-typedef void (__thiscall* hCAnimBlendStaticAssociation_Init)
-(
-    CAnimBlendStaticAssociationSAInterface * pThis,
-    RpClump * Clump,
-    CAnimBlendHierarchySAInterface * pAnimBlendHierarchy
-);
-
-
-bool CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, CAnimBlendAssociationSAInterface * pAnimAssoc, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID )
+bool CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssocInterface, CAnimBlendAssociationSAInterface * pAnimAssoc, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID )
 {
-    auto CAnimBlendStaticAssociation_Init = (hCAnimBlendStaticAssociation_Init)0x4CEC20;
     bool isCustomAnimationToPlay = false;
-
     CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
     auto pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( pAnimAssocGroup->groupID, animID );
-
+    auto pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierachyInterface ( );
+    auto pOutAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( pOutAnimStaticAssocInterface );
     CClientPed * pClientPed =  GetClientPedByClump ( *pClump ); 
     if ( pClientPed != nullptr )
     {
-        auto pReplacedAnimation = pClientPed->GetReplacedAnimation ( pOriginalAnimStaticAssoc->pAnimHeirarchy );
+        auto pReplacedAnimation = pClientPed->GetReplacedAnimation ( pOriginalAnimHierarchyInterface );
         if ( pReplacedAnimation != nullptr )
         {   
             std::shared_ptr < CIFPAnimations > pIFPAnimations = pReplacedAnimation->pIFP->GetIFPAnimationsPointer ();
             InsertAnimationAssociationToMap ( pAnimAssoc, pIFPAnimations );
                
             // Play our custom animation instead of default
-            CAnimBlendStaticAssociation_Init ( pOutAnimStaticAssoc, pClump, pReplacedAnimation->pAnimationHierarchy );
+            pOutAnimStaticAssoc->Initialize ( pClump, pReplacedAnimation->pAnimationHierarchy );
             isCustomAnimationToPlay = true;
         }
     }
@@ -4061,15 +4052,10 @@ bool CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSA
     if ( !isCustomAnimationToPlay )
     {
         // Play default internal animation
-        CAnimBlendStaticAssociation_Init ( pOutAnimStaticAssoc, pClump, pOriginalAnimStaticAssoc->pAnimHeirarchy );
+        pOutAnimStaticAssoc->Initialize ( pClump, pOriginalAnimHierarchyInterface );
     }
 
-    pOutAnimStaticAssoc->sAnimGroup = static_cast < short > ( pAnimAssocGroup->groupID );
-    pOutAnimStaticAssoc->sAnimID = static_cast < short > ( animID );
-
-    // Total bones in clump. GTA SA is using 32 bones for peds/players
-    pOutAnimStaticAssoc->nNumBlendNodes = pOriginalAnimStaticAssoc->nNumBlendNodes;
-    pOutAnimStaticAssoc->sFlags = pOriginalAnimStaticAssoc->sFlags;
+    CopyStaticAssociationProperties ( pOutAnimStaticAssoc, pOriginalAnimStaticAssoc );
     return isCustomAnimationToPlay;
 }
 
@@ -4077,7 +4063,6 @@ bool CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSA
 bool CClientGame::BlendAnimationHierarchyHandler ( CAnimBlendAssociationSAInterface * pAnimAssoc, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, int * pFlags, RpClump * pClump )
 {   
     bool isCustomAnimationToPlay = false;
-
     CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
     CClientPed * pClientPed =  GetClientPedByClump ( *pClump ); 
     if ( pClientPed != nullptr )
@@ -6845,11 +6830,24 @@ void CClientGame::RestreamModel ( unsigned short usModel )
 
 }
 
+
+void CClientGame::CopyStaticAssociationProperties ( std::unique_ptr < CAnimBlendStaticAssociation > & pOutAnimStaticAssoc, std::unique_ptr < CAnimBlendStaticAssociation > & pOriginalAnimStaticAssoc )
+{
+    pOutAnimStaticAssoc->SetAnimGroup ( pOriginalAnimStaticAssoc->GetAnimGroup ( ) );
+    pOutAnimStaticAssoc->SetAnimID ( pOriginalAnimStaticAssoc->GetAnimID ( ) );
+
+    // Total bones in clump. GTA SA is using 32 bones for peds/players
+    pOutAnimStaticAssoc->SetNumBlendNodes ( pOriginalAnimStaticAssoc->GetNumBlendNodes ( ) );
+    pOutAnimStaticAssoc->SetFlags ( pOriginalAnimStaticAssoc->GetFlags ( ) );
+}
+
+
 void CClientGame::InsertIFPPointerToMap ( const unsigned int u32BlockNameHash, const std::shared_ptr < CClientIFP > & pIFP ) 
 { 
     std::lock_guard < std::mutex > mutexGuardedLock ( m_MutexOfIfpPointersMap );
     m_mapOfIfpPointers [ u32BlockNameHash ] = pIFP; 
 }
+
 
 std::shared_ptr < CClientIFP > CClientGame::GetIFPPointerFromMap ( const unsigned int u32BlockNameHash )
 {
@@ -6861,6 +6859,7 @@ std::shared_ptr < CClientIFP > CClientGame::GetIFPPointerFromMap ( const unsigne
     }
     return nullptr;
 }
+
 
 void CClientGame::RemoveIFPPointerFromMap ( const unsigned int u32BlockNameHash ) 
 { 
@@ -6875,11 +6874,13 @@ void  CClientGame::InsertPedPointerToSet ( CClientPed * pPed )
     m_setOfPedPointers.insert ( pPed );
 }
 
+
 void  CClientGame::RemovePedPointerFromSet ( CClientPed * pPed ) 
 { 
     std::lock_guard < std::mutex > mutexGuardedLock ( m_MutexOfPedPointersSet );
     m_setOfPedPointers.erase ( pPed ); 
 }
+
 
 CClientPed * CClientGame::GetClientPedByClump ( const RpClump & Clump )
 {
@@ -6901,6 +6902,7 @@ CClientPed * CClientGame::GetClientPedByClump ( const RpClump & Clump )
     }
     return nullptr;
 }
+
 
 void CClientGame::OnClientIFPUnload ( const std::shared_ptr < CClientIFP > & IFP )
 {   
@@ -6931,11 +6933,13 @@ void CClientGame::OnClientIFPUnload ( const std::shared_ptr < CClientIFP > & IFP
     }
 }
 
+
 void CClientGame::InsertAnimationAssociationToMap ( CAnimBlendAssociationSAInterface * pAnimAssociation, const std::shared_ptr < CIFPAnimations > & pIFPAnimations )
 {
     std::lock_guard < std::mutex > mutexGuardedLock ( m_MutexOfAnimationAssociationsMap );
     m_mapOfCustomAnimationAssociations [ pAnimAssociation ] = pIFPAnimations;
 }
+
 
 void CClientGame::RemoveAnimationAssociationFromMap ( CAnimBlendAssociationSAInterface * pAnimAssociation )
 {

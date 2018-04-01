@@ -593,6 +593,7 @@ public:
     void                                      SetFileCacheRoot                ( void );
     const char*                               GetFileCacheRoot                ( void )                                    { return m_strFileCacheRoot; }
 
+    void                                      CopyStaticAssociationProperties ( std::unique_ptr < CAnimBlendStaticAssociation > & pOutAnimStaticAssoc, std::unique_ptr < CAnimBlendStaticAssociation > & pOriginalAnimStaticAssoc );
     void                                      InsertIFPPointerToMap           ( const unsigned int u32BlockNameHash, const std::shared_ptr < CClientIFP > & pIFP );
     void                                      RemoveIFPPointerFromMap         ( const unsigned int u32BlockNameHash );
     std::shared_ptr < CClientIFP >            GetIFPPointerFromMap            ( const unsigned int u32BlockNameHash );

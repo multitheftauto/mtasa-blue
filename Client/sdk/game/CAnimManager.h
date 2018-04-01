@@ -28,6 +28,7 @@ class CAnimBlendHierarchy;
 class CAnimBlendSequence;
 class CAnimBlock;
 class CAnimBlendAssociation;
+class CAnimBlendStaticAssociation;
 class CAnimBlendStaticAssociationSAInterface;
 class CClientPed;
 struct RpClump;
@@ -46,7 +47,7 @@ class CAnimManager
 
     friend class CAnimBlendAssociation;
 public:
-    typedef CAnimBlendStaticAssociationSAInterface * StaticAssocIntface_type;
+    typedef std::unique_ptr < CAnimBlendStaticAssociation > StaticAssocIntface_type;
 
     virtual void                        Initialize                              ( void ) = 0;
     virtual void                        Shutdown                                ( void ) = 0;
@@ -115,6 +116,8 @@ public:
     virtual CAnimBlendAssocGroup *      GetAnimBlendAssocGroup                  ( CAnimBlendAssocGroupSAInterface * pInterface ) = 0;
     virtual CAnimBlock *                GetAnimBlock                            ( CAnimBlockSAInterface * pInterface ) = 0;
     virtual CAnimBlendHierarchy *       GetAnimBlendHierarchy                   ( CAnimBlendHierarchySAInterface * pInterface ) = 0;
+
+    virtual StaticAssocIntface_type     GetAnimStaticAssociation                ( CAnimBlendStaticAssociationSAInterface * pInterface ) = 0;
 
     // MTA members, but use this strictly for custom animations only
     virtual std::unique_ptr < CAnimBlendHierarchy > GetCustomAnimBlendHierarchy ( CAnimBlendHierarchySAInterface * pInterface ) = 0;
