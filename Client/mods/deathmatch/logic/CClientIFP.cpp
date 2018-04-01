@@ -65,7 +65,7 @@ bool CClientIFP::LoadIFPFile ( const char * szFilePath )
 
 void CClientIFP::ReadIFPVersion1 (  )
 { 
-    IFP_INFO Info;
+    SInfo Info;
     ReadHeaderVersion1 ( Info );
 
     m_pVecAnimations->resize ( Info.Entries );
@@ -73,7 +73,7 @@ void CClientIFP::ReadIFPVersion1 (  )
     {
         ReadAnimationNameVersion1 ( *it );
       
-        IFP_DGAN Dgan;
+        SDgan Dgan;
         ReadDgan ( Dgan );
 
         std::unique_ptr < CAnimBlendHierarchy > pAnimationHierarchy = m_pAnimManager->GetCustomAnimBlendHierarchy ( &it->Hierarchy );
@@ -89,13 +89,13 @@ void CClientIFP::ReadIFPVersion1 (  )
 
 void CClientIFP::ReadIFPVersion2 ( bool bAnp3 )
 {
-    IFPHeaderV2 Header;
-    ReadBuffer < IFPHeaderV2 > ( &Header );
+    SIFPHeaderV2 Header;
+    ReadBuffer < SIFPHeaderV2 > ( &Header );
 
     m_pVecAnimations->resize ( Header.TotalAnimations );
     for ( auto it = m_pVecAnimations->begin(); it != m_pVecAnimations->end(); ++it ) 
     {
-        Animation AnimationNode;
+        SAnimationHeaderV2 AnimationNode;
         ReadAnimationHeaderVersion2 ( AnimationNode, bAnp3 );
 
         it->Name = AnimationNode.Name;
@@ -140,7 +140,7 @@ WORD CClientIFP::ReadSequencesVersion1 ( std::unique_ptr < CAnimBlendHierarchy >
     WORD wUnknownSequences = 0;
     for (size_t SequenceIndex = 0; SequenceIndex < pAnimationHierarchy->GetNumSequences ( ); SequenceIndex++)
     {
-        IFP_ANIM Anim;
+        SAnim Anim;
         int32_t iBoneID = ReadSequenceVersion1 ( Anim );
         if ( Anim.Frames == 0 )
         {
@@ -161,7 +161,7 @@ WORD CClientIFP::ReadSequencesVersion1 ( std::unique_ptr < CAnimBlendHierarchy >
         std::unique_ptr < CAnimBlendSequence > pAnimationSequence = m_pAnimManager->GetCustomAnimBlendSequence ( pAnimationSequenceInterface );
         InitializeAnimationSequence ( pAnimationSequence, Anim.Name, iBoneID );
     
-        IFP_FrameType iFrameType = ReadKfrm ( );
+        eFrameType iFrameType = ReadKfrm ( );
         if ( ( ReadSequenceKeyFrames ( pAnimationSequence, iFrameType, Anim.Frames ) ) && ( !bUnknownSequence ) )
         {
             MapOfSequences [ iBoneID ] = *pAnimationSequence->GetInterface();
@@ -175,7 +175,7 @@ WORD CClientIFP::ReadSequencesVersion2 ( std::unique_ptr < CAnimBlendHierarchy >
     WORD wUnknownSequences = 0;
     for (size_t SequenceIndex = 0; SequenceIndex  < pAnimationHierarchy->GetNumSequences ( ); SequenceIndex++)
     {
-        Object ObjectNode;
+        SSequenceHeaderV2 ObjectNode;
         ReadSequenceVersion2 ( ObjectNode );
 
         bool bUnknownSequence = ObjectNode.BoneID == -1;
@@ -192,7 +192,7 @@ WORD CClientIFP::ReadSequencesVersion2 ( std::unique_ptr < CAnimBlendHierarchy >
         std::unique_ptr < CAnimBlendSequence > pAnimationSequence = m_pAnimManager->GetCustomAnimBlendSequence ( pAnimationSequenceInterface );
         InitializeAnimationSequence ( pAnimationSequence, ObjectNode.Name, ObjectNode.BoneID );
 
-        IFP_FrameType iFrameType = static_cast < IFP_FrameType > ( ObjectNode.FrameType );
+        eFrameType iFrameType = static_cast < eFrameType > ( ObjectNode.FrameType );
         if ( ( ReadSequenceKeyFrames ( pAnimationSequence, iFrameType, ObjectNode.TotalFrames ) ) && ( !bUnknownSequence ) )
         {
             MapOfSequences [ ObjectNode.BoneID ] = *pAnimationSequence->GetInterface();
@@ -201,12 +201,12 @@ WORD CClientIFP::ReadSequencesVersion2 ( std::unique_ptr < CAnimBlendHierarchy >
     return wUnknownSequences;
 }
 
-int32_t CClientIFP::ReadSequenceVersion1 ( IFP_ANIM & Anim )
+int32_t CClientIFP::ReadSequenceVersion1 ( SAnim & Anim )
 {
-    IFP_CPAN Cpan;
-    ReadBuffer < IFP_CPAN > ( &Cpan );
+    SCpan Cpan;
+    ReadBuffer < SCpan > ( &Cpan );
     RoundSize ( Cpan.Base.Size );
-    ReadBytes ( &Anim, sizeof ( IFP_BASE ) );
+    ReadBytes ( &Anim, sizeof ( SBase ) );
     RoundSize ( Anim.Base.Size );
     ReadBytes ( &Anim.Name, Anim.Base.Size );
 
@@ -224,9 +224,9 @@ int32_t CClientIFP::ReadSequenceVersion1 ( IFP_ANIM & Anim )
     return iBoneID;
 }
 
-void CClientIFP::ReadSequenceVersion2 ( Object & ObjectNode )
+void CClientIFP::ReadSequenceVersion2 ( SSequenceHeaderV2 & ObjectNode )
 {
-    ReadBuffer < Object > ( &ObjectNode );
+    ReadBuffer < SSequenceHeaderV2 > ( &ObjectNode );
     std::string BoneName = ConvertStringToMapKey ( ObjectNode.Name );
     std::string strCorrectBoneName;
     if (ObjectNode.BoneID == -1)
@@ -246,7 +246,7 @@ void CClientIFP::ReadSequenceVersion2 ( Object & ObjectNode )
     strncpy ( ObjectNode.Name, strCorrectBoneName.c_str(), strCorrectBoneName.size() +1 );
 }
 
-bool CClientIFP::ReadSequenceKeyFrames ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, IFP_FrameType iFrameType, int32_t iFrames )
+bool CClientIFP::ReadSequenceKeyFrames ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, eFrameType iFrameType, int32_t iFrames )
 {
     size_t iCompressedFrameSize = GetSizeOfCompressedFrame ( iFrameType );
     if ( iCompressedFrameSize )
@@ -259,20 +259,20 @@ bool CClientIFP::ReadSequenceKeyFrames ( std::unique_ptr < CAnimBlendSequence > 
     return false;
 }
 
-void CClientIFP::ReadHeaderVersion1 ( IFP_INFO & Info )
+void CClientIFP::ReadHeaderVersion1 ( SInfo & Info )
 {
     uint32_t OffsetEOF;
     ReadBuffer < uint32_t > ( &OffsetEOF );
     RoundSize ( OffsetEOF );
-    ReadBytes ( &Info, sizeof ( IFP_BASE ) );
+    ReadBytes ( &Info, sizeof ( SBase ) );
     RoundSize ( Info.Base.Size );
     ReadBytes ( &Info.Entries, Info.Base.Size );
 }
 
-void CClientIFP::ReadAnimationNameVersion1 ( IFP_Animation & IfpAnimation )
+void CClientIFP::ReadAnimationNameVersion1 ( SAnimation & IfpAnimation )
 {
-    IFP_NAME Name;
-    ReadBuffer < IFP_NAME > ( &Name );
+    SName Name;
+    ReadBuffer < SName > ( &Name );
     RoundSize ( Name.Base.Size );
 
     char szAnimationName [ 24 ];
@@ -281,24 +281,24 @@ void CClientIFP::ReadAnimationNameVersion1 ( IFP_Animation & IfpAnimation )
     IfpAnimation.u32NameHash = HashString ( IfpAnimation.Name.ToLower ( ) );
 }
 
-void CClientIFP::ReadDgan ( IFP_DGAN & Dgan )
+void CClientIFP::ReadDgan ( SDgan & Dgan )
 {
-    ReadBytes ( &Dgan, sizeof ( IFP_BASE ) * 2 );
+    ReadBytes ( &Dgan, sizeof ( SBase ) * 2 );
     RoundSize ( Dgan.Base.Size );
     RoundSize ( Dgan.Info.Base.Size );
     ReadBytes ( &Dgan.Info.Entries, Dgan.Info.Base.Size );
 }
 
-CClientIFP::IFP_FrameType CClientIFP::ReadKfrm ( void )
+CClientIFP::eFrameType CClientIFP::ReadKfrm ( void )
 {
-    IFP_KFRM Kfrm;
-    ReadBuffer < IFP_KFRM > ( &Kfrm );
+    SKfrm Kfrm;
+    ReadBuffer < SKfrm > ( &Kfrm );
     return GetFrameTypeFromFourCC ( Kfrm.Base.FourCC );
 }
 
-void CClientIFP::ReadAnimationHeaderVersion2 ( Animation & AnimationNode, bool bAnp3 )
+void CClientIFP::ReadAnimationHeaderVersion2 ( SAnimationHeaderV2 & AnimationNode, bool bAnp3 )
 {
-    ReadCString ( ( char * ) &AnimationNode.Name, sizeof ( Animation::Name ) );
+    ReadCString ( ( char * ) &AnimationNode.Name, sizeof ( SAnimationHeaderV2::Name ) );
     ReadBuffer < int32_t > ( &AnimationNode.TotalObjects );
     if ( bAnp3 )
     {
@@ -307,33 +307,33 @@ void CClientIFP::ReadAnimationHeaderVersion2 ( Animation & AnimationNode, bool b
     }
 }
 
-void CClientIFP::ReadKeyFramesAsCompressed ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, IFP_FrameType iFrameType, int32_t iFrames )
+void CClientIFP::ReadKeyFramesAsCompressed ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, eFrameType iFrameType, int32_t iFrames )
 {
     switch ( iFrameType )
     { 
-        case IFP_FrameType::KRTS:
+        case eFrameType::KRTS:
         {
             ReadKrtsFramesAsCompressed ( pAnimationSequence, iFrames );
             break;
         }
-        case IFP_FrameType::KRT0:
+        case eFrameType::KRT0:
         {
             ReadKrt0FramesAsCompressed ( pAnimationSequence, iFrames );
             break;
         }
-        case IFP_FrameType::KR00:
+        case eFrameType::KR00:
         {
             ReadKr00FramesAsCompressed ( pAnimationSequence, iFrames );
             break;
         }
-        case IFP_FrameType::KR00_COMPRESSED:
+        case eFrameType::KR00_COMPRESSED:
         {
-            ReadCompressedFrames < IFP_Compressed_KR00 >  ( pAnimationSequence, iFrames );
+            ReadCompressedFrames < SCompressed_KR00 >  ( pAnimationSequence, iFrames );
             break;
         }
-        case IFP_FrameType::KRT0_COMPRESSED:
+        case eFrameType::KRT0_COMPRESSED:
         {
-            ReadCompressedFrames < IFP_Compressed_KRT0 >  ( pAnimationSequence, iFrames );
+            ReadCompressedFrames < SCompressed_KRT0 >  ( pAnimationSequence, iFrames );
             break;
         }
     }
@@ -343,9 +343,9 @@ void CClientIFP::ReadKrtsFramesAsCompressed ( std::unique_ptr < CAnimBlendSequen
 {
     for ( int32_t FrameIndex = 0; FrameIndex < TotalFrames; FrameIndex++ )
     {
-        IFP_Compressed_KRT0 * CompressedKrt0 = static_cast < IFP_Compressed_KRT0 * > ( pAnimationSequence->GetKeyFrame ( FrameIndex, sizeof ( IFP_Compressed_KRT0 ) ) );
-        IFP_KRTS Krts;
-        ReadBuffer < IFP_KRTS > ( &Krts );
+        SCompressed_KRT0 * CompressedKrt0 = static_cast < SCompressed_KRT0 * > ( pAnimationSequence->GetKeyFrame ( FrameIndex, sizeof ( SCompressed_KRT0 ) ) );
+        SKrts Krts;
+        ReadBuffer < SKrts > ( &Krts );
 
         CompressedKrt0->Rotation.X    = static_cast < int16_t > ( ( ( -Krts.Rotation.X ) * 4096.0f ) );
         CompressedKrt0->Rotation.Y    = static_cast < int16_t > ( ( ( -Krts.Rotation.Y ) * 4096.0f ) );
@@ -364,9 +364,9 @@ void CClientIFP::ReadKrt0FramesAsCompressed ( std::unique_ptr < CAnimBlendSequen
 {
     for ( int32_t FrameIndex = 0; FrameIndex < TotalFrames; FrameIndex++ )
     {
-        IFP_Compressed_KRT0 * CompressedKrt0 = static_cast < IFP_Compressed_KRT0 * > ( pAnimationSequence->GetKeyFrame ( FrameIndex, sizeof ( IFP_Compressed_KRT0 ) ) );
-        IFP_KRT0 Krt0;
-        ReadBuffer < IFP_KRT0 > ( &Krt0 );
+        SCompressed_KRT0 * CompressedKrt0 = static_cast < SCompressed_KRT0 * > ( pAnimationSequence->GetKeyFrame ( FrameIndex, sizeof ( SCompressed_KRT0 ) ) );
+        SKrt0 Krt0;
+        ReadBuffer < SKrt0 > ( &Krt0 );
 
         CompressedKrt0->Rotation.X = static_cast < int16_t > ( ( ( -Krt0.Rotation.X ) * 4096.0f ) );
         CompressedKrt0->Rotation.Y = static_cast < int16_t > ( ( ( -Krt0.Rotation.Y ) * 4096.0f ) );
@@ -385,9 +385,9 @@ void CClientIFP::ReadKr00FramesAsCompressed ( std::unique_ptr < CAnimBlendSequen
 {
     for ( int32_t FrameIndex = 0; FrameIndex < TotalFrames; FrameIndex++ )
     {
-        IFP_Compressed_KR00 * CompressedKr00 = static_cast < IFP_Compressed_KR00 * > ( pAnimationSequence->GetKeyFrame ( FrameIndex, sizeof ( IFP_Compressed_KR00 ) ) );
-        IFP_KR00 Kr00;
-        ReadBuffer < IFP_KR00 > ( &Kr00 );
+        SCompressed_KR00 * CompressedKr00 = static_cast < SCompressed_KR00 * > ( pAnimationSequence->GetKeyFrame ( FrameIndex, sizeof ( SCompressed_KR00 ) ) );
+        SKr00 Kr00;
+        ReadBuffer < SKr00 > ( &Kr00 );
 
         CompressedKr00->Rotation.X = static_cast < int16_t > ( ( ( -Kr00.Rotation.X ) * 4096.0f ) );
         CompressedKr00->Rotation.Y = static_cast < int16_t > ( ( ( -Kr00.Rotation.Y ) * 4096.0f ) );
@@ -398,29 +398,29 @@ void CClientIFP::ReadKr00FramesAsCompressed ( std::unique_ptr < CAnimBlendSequen
     }
 }
 
-size_t CClientIFP::GetSizeOfCompressedFrame ( IFP_FrameType iFrameType )
+size_t CClientIFP::GetSizeOfCompressedFrame ( eFrameType iFrameType )
 {
     switch ( iFrameType )
     { 
-        case IFP_FrameType::KRTS:
+        case eFrameType::KRTS:
         {
-            return sizeof ( IFP_Compressed_KRT0 );
+            return sizeof ( SCompressed_KRT0 );
         }
-        case IFP_FrameType::KRT0:
+        case eFrameType::KRT0:
         {
-            return sizeof ( IFP_Compressed_KRT0 );
+            return sizeof ( SCompressed_KRT0 );
         }
-        case IFP_FrameType::KR00:
+        case eFrameType::KR00:
         {
-            return sizeof ( IFP_Compressed_KR00 );
+            return sizeof ( SCompressed_KR00 );
         }
-        case IFP_FrameType::KR00_COMPRESSED:
+        case eFrameType::KR00_COMPRESSED:
         {
-            return sizeof ( IFP_Compressed_KR00 );
+            return sizeof ( SCompressed_KR00 );
         }
-        case IFP_FrameType::KRT0_COMPRESSED:
+        case eFrameType::KRT0_COMPRESSED:
         {
-            return sizeof ( IFP_Compressed_KRT0 );
+            return sizeof ( SCompressed_KRT0 );
         }
     }
     return 0;
@@ -478,22 +478,22 @@ BYTE * CClientIFP::AllocateSequencesMemory ( std::unique_ptr < CAnimBlendHierarc
     return static_cast < BYTE * > ( operator new ( 12 * cMaxSequences + 4 ) ); 
 }
 
-CClientIFP::IFP_FrameType CClientIFP::GetFrameTypeFromFourCC ( const char * szFourCC )
+CClientIFP::eFrameType CClientIFP::GetFrameTypeFromFourCC ( const char * szFourCC )
 {
     if ( strncmp ( szFourCC, "KRTS", 4 ) == 0)
     {
-        return IFP_FrameType::KRTS;
+        return eFrameType::KRTS;
     }
     else if ( strncmp ( szFourCC, "KRT0", 4 ) == 0)
     {
-        return IFP_FrameType::KRT0;
+        return eFrameType::KRT0;
     }
     else if ( strncmp ( szFourCC, "KR00", 4 ) == 0)
     {
-        return IFP_FrameType::KR00;
+        return eFrameType::KR00;
     }
 
-    return IFP_FrameType::UNKNOWN_FRAME;
+    return eFrameType::UNKNOWN_FRAME;
 }
 
 
@@ -510,12 +510,12 @@ void CClientIFP::InsertAnimationDummySequence ( std::unique_ptr < CAnimBlendSequ
     // We only need 1 dummy key frame to make the animation work
     const size_t cKeyFrames = 1;
     // KR00 is child key frame and KRT0 is Root key frame
-    size_t FrameSize = sizeof ( IFP_Compressed_KR00 );
+    size_t FrameSize = sizeof ( SCompressed_KR00 );
 
     if ( bRootBone )
     {
         // This key frame will have translation values.
-        FrameSize = sizeof ( IFP_Compressed_KRT0 );
+        FrameSize = sizeof ( SCompressed_KRT0 );
         bHasTranslationValues = true;
     }
 
@@ -746,15 +746,15 @@ constexpr void CClientIFP::RoundSize ( uint32_t & u32Size )
     }
 }
 
-constexpr bool CClientIFP::IsKeyFramesTypeRoot ( IFP_FrameType iFrameType )
+constexpr bool CClientIFP::IsKeyFramesTypeRoot ( eFrameType iFrameType )
 {
     switch ( iFrameType )
     { 
-        case IFP_FrameType::KR00:
+        case eFrameType::KR00:
         {
             return false;
         }
-        case IFP_FrameType::KR00_COMPRESSED:
+        case eFrameType::KR00_COMPRESSED:
         {
             return false;
         }

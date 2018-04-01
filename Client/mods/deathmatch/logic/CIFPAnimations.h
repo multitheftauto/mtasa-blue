@@ -7,7 +7,7 @@ class CIFPAnimations
 {
     public:
 
-    struct IFP_Animation
+    struct SAnimation
     {
         SString                           Name;
         unsigned int                      u32NameHash;
@@ -15,7 +15,7 @@ class CIFPAnimations
         char *                            pSequencesMemory;
     };
 
-	std::vector < IFP_Animation > vecAnimations;	
+	std::vector < SAnimation > vecAnimations;	
 
 public:
             CIFPAnimations   ( void );

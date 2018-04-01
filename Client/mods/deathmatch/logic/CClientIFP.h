@@ -11,46 +11,46 @@
 class CClientIFP: public CClientEntity, CFileReader
 {
 public:
-    typedef CIFPAnimations::IFP_Animation IFP_Animation;
+    typedef CIFPAnimations::SAnimation SAnimation;
 
-    struct IFP_BASE 
+    struct SBase 
     {
         char     FourCC[4];
         uint32_t Size;
     };
 
-    struct IFP_INFO
+    struct SInfo
     {
-        IFP_BASE Base;
+        SBase    Base;
         int32_t  Entries;
         char     Name[24];
     };
 
-    struct IFP_ANPK
+    struct SAnpk
     {
-        IFP_BASE Base;
-        IFP_INFO Info;
+        SBase Base;
+        SInfo Info;
     };
 
-    struct IFP_NAME
+    struct SName
     {
-        IFP_BASE Base;
+        SBase Base;
     };
 
-    struct IFP_DGAN 
+    struct SDgan 
     {
-        IFP_BASE Base;
-        IFP_INFO Info;
+        SBase Base;
+        SInfo Info;
     };
 
-    struct IFP_CPAN 
+    struct SCpan 
     {
-        IFP_BASE Base;
+        SBase Base;
     };
 
-    struct IFP_ANIM 
+    struct SAnim 
     {
-        IFP_BASE Base;
+        SBase    Base;
         char     Name[28];
         int32_t  Frames;
         int32_t  Unk;
@@ -62,66 +62,66 @@ public:
         int32_t  Unk2;
     };
 
-    struct IFP_KFRM
+    struct SKfrm
     {
-        IFP_BASE Base;
+        SBase Base;
     };
 
-    struct Quaternion
+    struct SQuaternion
     {
         float X, Y, Z, W;
     };
 
-    struct IFP_CVector
+    struct SVector
     {
         float X, Y, Z;
     };
 
-    struct IFP_KR00
+    struct SKr00
     {
-        Quaternion Rotation;
-        float      Time;
+        SQuaternion Rotation;
+        float       Time;
     };
 
-    struct IFP_KRT0
+    struct SKrt0
     {
-        Quaternion Rotation;
-        IFP_CVector    Translation;
-        float      Time;
+        SQuaternion Rotation;
+        SVector     Translation;
+        float       Time;
     };
 
-    struct IFP_KRTS
+    struct SKrts
     {
-        Quaternion Rotation;
-        IFP_CVector    Translation;
-        IFP_CVector    Scale;
-        float      Time;
+        SQuaternion Rotation;
+        SVector     Translation;
+        SVector     Scale;
+        float       Time;
     };
 
-    struct CompressedQuaternion
+    struct SCompressedQuaternion
     {
         int16_t X, Y, Z, W;
     };
 
-    struct CompressedCVector
+    struct SCompressedCVector
     {
         int16_t X, Y, Z;
     };
 
 
-    struct IFP_Compressed_KR00
+    struct SCompressed_KR00
     {
-        CompressedQuaternion Rotation;
-        int16_t              Time;
+        SCompressedQuaternion Rotation;
+        int16_t               Time;
     };
 
-    struct IFP_Compressed_KRT0 : IFP_Compressed_KR00
+    struct SCompressed_KRT0 : SCompressed_KR00
     {
-        CompressedCVector Translation;
+        SCompressedCVector Translation;
     };
 
 
-    enum IFP_FrameType
+    enum eFrameType
     {
         UNKNOWN_FRAME   = -1,
         KR00            = 0,
@@ -131,14 +131,14 @@ public:
         KRT0_COMPRESSED = 4,
     };
 
-    struct IFPHeaderV2
+    struct SIFPHeaderV2
     {
         int32_t   OffsetEOF;
-        char      InternalFileName[24];
+        char      InternalFilSName[24];
         int32_t   TotalAnimations;
     };
 
-    struct Animation
+    struct SAnimationHeaderV2
     {
         // 24 + 4 + 4 + 4 = 36 bytes
 
@@ -149,7 +149,7 @@ public:
     };
 
 
-    struct Object
+    struct SSequenceHeaderV2
     {
         // 24 + 4 + 4 + 4 = 36 bytes
 
@@ -157,11 +157,6 @@ public:
         int32_t   FrameType;
         int32_t   TotalFrames;
         int32_t   BoneID;
-    };
-
-    struct IFP2_ChildFrame
-    {
-        int16_t x, y, z, w, time;
     };
 
     enum eBoneType 
@@ -217,17 +212,17 @@ public:
     WORD                            ReadSequences                ( std::unique_ptr < CAnimBlendHierarchy > & pAnimationHierarchy, std::map < DWORD, CAnimBlendSequenceSAInterface > & MapOfSequences );
     WORD                            ReadSequencesVersion1        ( std::unique_ptr < CAnimBlendHierarchy > & pAnimationHierarchy, std::map < DWORD, CAnimBlendSequenceSAInterface > & MapOfSequences );
     WORD                            ReadSequencesVersion2        ( std::unique_ptr < CAnimBlendHierarchy > & pAnimationHierarchy, std::map < DWORD, CAnimBlendSequenceSAInterface > & MapOfSequences );
-    int32_t                         ReadSequenceVersion1         ( IFP_ANIM & Anim );
-    void                            ReadSequenceVersion2         ( Object & ObjectNode );
+    int32_t                         ReadSequenceVersion1         ( SAnim & Anim );
+    void                            ReadSequenceVersion2         ( SSequenceHeaderV2 & ObjectNode );
 
-    void                            ReadHeaderVersion1           ( IFP_INFO & Info );
-    void                            ReadAnimationNameVersion1    ( IFP_Animation & IfpAnimation );
-    void                            ReadDgan                     ( IFP_DGAN & Dgan );
-    CClientIFP::IFP_FrameType       ReadKfrm                     ( void );
-    void                            ReadAnimationHeaderVersion2  ( Animation & AnimationNode, bool bAnp3 );
+    void                            ReadHeaderVersion1           ( SInfo & Info );
+    void                            ReadAnimationNameVersion1    ( SAnimation & IfpAnimation );
+    void                            ReadDgan                     ( SDgan & Dgan );
+    CClientIFP::eFrameType          ReadKfrm                     ( void );
+    void                            ReadAnimationHeaderVersion2  ( SAnimationHeaderV2 & AnimationNode, bool bAnp3 );
 
-    bool                            ReadSequenceKeyFrames        ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, IFP_FrameType iFrameType, int32_t iFrames );
-    void                            ReadKeyFramesAsCompressed    ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, IFP_FrameType iFrameType, int32_t iFrames );
+    bool                            ReadSequenceKeyFrames        ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, eFrameType iFrameType, int32_t iFrames );
+    void                            ReadKeyFramesAsCompressed    ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, eFrameType iFrameType, int32_t iFrames );
     void                            ReadKrtsFramesAsCompressed   ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, int32_t TotalFrames );
     void                            ReadKrt0FramesAsCompressed   ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, int32_t TotalFrames );
     void                            ReadKr00FramesAsCompressed   ( std::unique_ptr < CAnimBlendSequence > & pAnimationSequence, int32_t TotalFrames );
@@ -251,10 +246,10 @@ public:
     std::string                     ConvertStringToMapKey        ( const char * szString );
 
     constexpr void                  RoundSize                    ( uint32_t & u32Size );
-    constexpr bool                  IsKeyFramesTypeRoot          ( IFP_FrameType iFrameType );
+    constexpr bool                  IsKeyFramesTypeRoot          ( eFrameType iFrameType );
 
-    IFP_FrameType                   GetFrameTypeFromFourCC       ( const char * szFourCC );
-    size_t                          GetSizeOfCompressedFrame     ( IFP_FrameType FrameType );
+    eFrameType                      GetFrameTypeFromFourCC       ( const char * szFourCC );
+    size_t                          GetSizeOfCompressedFrame     ( eFrameType FrameType );
     int32_t                         GetBoneIDFromName            ( std::string const& BoneName );
     std::string                     GetCorrectBoneNameFromName   ( std::string const& BoneName );
     std::string                     GetCorrectBoneNameFromID     ( int32_t & BoneID );
@@ -275,7 +270,7 @@ private:
     std::shared_ptr < CIFPAnimations > m_pIFPAnimations;
     SString                            m_strBlockName;
     unsigned int                       m_u32Hashkey;
-    std::vector < IFP_Animation > *    m_pVecAnimations;
+    std::vector < SAnimation > *       m_pVecAnimations;
     bool                               m_bVersion1;
     bool                               m_bUnloading;
     CAnimManager *                     m_pAnimManager;
