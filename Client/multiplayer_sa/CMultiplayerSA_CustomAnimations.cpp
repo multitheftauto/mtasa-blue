@@ -53,7 +53,7 @@ void CMultiplayerSA::SetBlendAnimationHierarchyHandler ( BlendAnimationHierarchy
     m_pBlendAnimationHierarchyHandler = pHandler;
 }
 
-void CAnimBlendAssoc_destructor ( CAnimBlendAssociationSAInterface * pThis )
+void __cdecl CAnimBlendAssoc_destructor ( CAnimBlendAssociationSAInterface * pThis )
 {
     if ( m_pCAnimBlendAssocDestructorHandler )
     {
@@ -65,9 +65,14 @@ void _declspec(naked) HOOK_CAnimBlendAssoc_destructor ()
 {
     _asm
     {
-        push    ecx  // this
+        push    ecx 
+        
+        push    ecx 
         call    CAnimBlendAssoc_destructor
+        add     esp, 0x4
+
         pop     ecx
+
         push    esi
         mov     esi, ecx
         mov     eax, [esi+10h]
