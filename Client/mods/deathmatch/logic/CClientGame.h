@@ -593,12 +593,12 @@ public:
     void                                      SetFileCacheRoot                ( void );
     const char*                               GetFileCacheRoot                ( void )                                    { return m_strFileCacheRoot; }
 
-    inline void                               InsertIFPPointerToMap           ( const unsigned int u32BlockNameHash, const std::shared_ptr < CClientIFP > & pIFP ) { m_mapOfIfpPointers [ u32BlockNameHash ] = pIFP; }
-    inline void                               RemoveIFPPointerFromMap         ( const unsigned int u32BlockNameHash ) { m_mapOfIfpPointers.erase ( u32BlockNameHash ); }
+    void                                      InsertIFPPointerToMap           ( const unsigned int u32BlockNameHash, const std::shared_ptr < CClientIFP > & pIFP );
+    void                                      RemoveIFPPointerFromMap         ( const unsigned int u32BlockNameHash );
     std::shared_ptr < CClientIFP >            GetIFPPointerFromMap            ( const unsigned int u32BlockNameHash );
 
-    void                                      InsertPedPointerToMap           ( CClientPed * pPed ) { m_mapOfPedPointers [ pPed ] = true; }
-    void                                      RemovePedPointerFromMap         ( CClientPed * pPed ) { m_mapOfPedPointers.erase ( pPed ); }
+    void                                      InsertPedPointerToSet           ( CClientPed * pPed );
+    void                                      RemovePedPointerFromSet         ( CClientPed * pPed );
     CClientPed *                              GetClientPedByClump             ( const RpClump & Clump );
 
     void                                      OnClientIFPUnload               ( const std::shared_ptr < CClientIFP > & IFP );
@@ -821,9 +821,13 @@ private:
 
     // (unsigned int) Key is the hash of custom block name that is supplied to engineLoadIFP
     std::map < unsigned int, std::shared_ptr < CClientIFP > > m_mapOfIfpPointers; 
+    mutable std::mutex m_MutexOfIfpPointersMap;
 
-    std::map < CClientPed *, bool > m_mapOfPedPointers;
-    AnimAssociations_type           m_mapOfCustomAnimationAssociations;
+    std::set < CClientPed * > m_setOfPedPointers;
+    mutable std::mutex m_MutexOfPedPointersSet;
+
+    AnimAssociations_type m_mapOfCustomAnimationAssociations;
+    mutable std::mutex m_MutexOfAnimationAssociationsMap;
 };
 
 extern CClientGame* g_pClientGame;

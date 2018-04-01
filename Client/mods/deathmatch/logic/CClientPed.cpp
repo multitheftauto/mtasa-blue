@@ -247,13 +247,13 @@ void CClientPed::Init ( CClientManager* pManager, unsigned long ulModelID, bool 
         SetArmor ( 0.0f );
     }
    
-    g_pClientGame->InsertPedPointerToMap ( this );
+    g_pClientGame->InsertPedPointerToSet ( this );
 }
 
 
 CClientPed::~CClientPed ( void )
 { 
-    g_pClientGame->RemovePedPointerFromMap ( this );
+    g_pClientGame->RemovePedPointerFromSet ( this );
 
     // Remove from the ped manager
     m_pManager->GetPedManager ()->RemoveFromList ( this );
@@ -6210,7 +6210,6 @@ void CClientPed::ReplaceAnimation ( CAnimBlendHierarchy * pInternalAnimHierarchy
     SReplacedAnimation replacedAnimation;
     replacedAnimation.pIFP = pIFP;
     replacedAnimation.pAnimationHierarchy = pCustomAnimHierarchy;
-
     m_mapOfReplacedAnimations [ pInternalAnimHierarchy->GetInterface () ] = replacedAnimation;
 }
 
@@ -6228,7 +6227,7 @@ void CClientPed::RestoreAnimations ( const std::shared_ptr < CClientIFP > & IFP 
 void CClientPed::RestoreAnimations ( CAnimBlock & animationBlock )
 {
     const size_t cAnimations = animationBlock.GetAnimationCount ( );
-    for ( size_t i = 0; i < cAnimations; i++)
+    for ( size_t i = 0; i < cAnimations; i++ )
     {
         auto pAnimHierarchyInterface = animationBlock.GetAnimationHierarchyInterface ( i );
         m_mapOfReplacedAnimations.erase ( pAnimHierarchyInterface );
