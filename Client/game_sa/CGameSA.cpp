@@ -857,16 +857,3 @@ CPed* CGameSA::GetPedContext ( void )
         m_pPedContext = pGame->GetPools ()->GetPedFromRef ( (DWORD)1 );
     return m_pPedContext;
 }
-
-constexpr 
-CAnimBlendAssocGroupSAInterface * CGameSA::getAnimAssocGroupInterface ( AssocGroupId animGroup )
-{
-    DWORD * pAnimAssocGroupsArray = reinterpret_cast < DWORD * > ( *(DWORD*)ARRAY_CAnimManager_AnimAssocGroups );
-    return reinterpret_cast < CAnimBlendAssocGroupSAInterface * > ( pAnimAssocGroupsArray  + 5 * animGroup );
-}
-
-CGameSA::AssocGroup_type CGameSA::CreateAnimBlendAssocGroup ( AssocGroupId animGroup )
-{
-    auto pAnimAssocGroupInterface = getAnimAssocGroupInterface ( animGroup );
-    return std::make_unique < CAnimBlendAssocGroupSA > ( pAnimAssocGroupInterface );
-}

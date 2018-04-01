@@ -257,10 +257,6 @@ public:
     void                    SetPostWeaponFireHandler        ( PostWeaponFireHandler* pPostWeaponFireHandler )   { m_pPostWeaponFireHandler = pPostWeaponFireHandler; }
     void                    SetTaskSimpleBeHitHandler       ( TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler ) { m_pTaskSimpleBeHitHandler = pTaskSimpleBeHitHandler; }
 
-    constexpr
-    CAnimBlendAssocGroupSAInterface * getAnimAssocGroupInterface ( AssocGroupId animGroup );
-    AssocGroup_type         CreateAnimBlendAssocGroup       ( AssocGroupId animGroup );
-
     PreWeaponFireHandler*   m_pPreWeaponFireHandler;
     PostWeaponFireHandler*  m_pPostWeaponFireHandler;
     TaskSimpleBeHitHandler* m_pTaskSimpleBeHitHandler;
