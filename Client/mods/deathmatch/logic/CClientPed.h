@@ -485,10 +485,10 @@ public:
     inline const unsigned int & GetCustomAnimationNameHash      ( void ) { return m_u32CustomAnimationNameHash; }
 
     void                        ReplaceAnimation                ( CAnimBlendHierarchy * pInternalAnimHierarchy, const std::shared_ptr < CClientIFP > & pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy );
-    inline void                 RestoreAnimation                ( CAnimBlendHierarchy * pInternalAnimHierarchy ) { m_mapOfReplacedAnimations.erase ( pInternalAnimHierarchy->GetInterface () ); }
+    void                        RestoreAnimation                ( CAnimBlendHierarchy * pInternalAnimHierarchy );
     void                        RestoreAnimations               ( const std::shared_ptr < CClientIFP > & IFP );
     void                        RestoreAnimations               ( CAnimBlock & animationBlock );
-    inline void                 RestoreAllAnimations            ( void ) { m_mapOfReplacedAnimations.clear ( ); }
+    void                        RestoreAllAnimations            ( void );
     SReplacedAnimation *        GetReplacedAnimation            ( CAnimBlendHierarchySAInterface * pInternalHierarchyInterface );
 
 protected:
@@ -698,6 +698,7 @@ public:
 
     // Key: Internal GTA animation, Value: Custom Animation
     ReplacedAnim_type m_mapOfReplacedAnimations;
+    mutable std::mutex m_MutexOfReplacedAnimationsMap;
 };
 
 #endif
