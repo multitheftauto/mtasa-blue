@@ -1490,43 +1490,6 @@ void CClientEntity::GetEntitiesFromRoot ( unsigned int uiTypeHash, lua_State* lu
     }    
 }
 
-CClientPed * CClientEntity::GetClientPedByClump ( const RpClump & Clump )
-{
-    SString arrstrEntityTypes [2] = { "player", "ped" };
-
-    for ( size_t uiTypeIndex = 0; 
-          uiTypeIndex < sizeof ( arrstrEntityTypes); 
-          uiTypeIndex ++ )
-    {
-        unsigned int uiTypeHash = HashString ( arrstrEntityTypes [ uiTypeIndex ].c_str ( ) ); 
-
-        t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find ( uiTypeHash );
-        if ( find != ms_mapEntitiesFromRoot.end () )
-        {
-            CFromRootListType& listEntities = find->second;
-            CClientEntity* pEntity;
-            unsigned int uiIndex = 0;
-
-            for ( CFromRootListType::reverse_iterator i = listEntities.rbegin ();
-                  i != listEntities.rend ();
-                  ++i )
-            {
-                pEntity = *i;
-
-                if ( !pEntity->IsBeingDeleted ( ) )
-                {
-                    const RpClump & entityClump = *pEntity->GetClump ();
-                    if ( std::addressof ( entityClump ) == std::addressof ( Clump ) )
-                    {
-                        return static_cast < CClientPed * > ( pEntity );
-                    }
-                }
-            }
-        }    
-    }
-    return nullptr;
-}
-
 #if CHECK_ENTITIES_FROM_ROOT
 
 //

@@ -326,8 +326,6 @@ public:
     bool                                        IsCallPropagationEnabled    ( void )                { return m_bCallPropagationEnabled; }
     virtual void                                SetCallPropagationEnabled   ( bool bEnabled )       { m_bCallPropagationEnabled = bEnabled; }
 
-    CClientPed *                                GetClientPedByClump         ( const RpClump & Clump );
-
 protected:
     CClientManager*                             m_pManager;
     CClientEntity*                              m_pParent;
