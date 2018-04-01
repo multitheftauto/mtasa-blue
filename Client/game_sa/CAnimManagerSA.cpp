@@ -813,13 +813,3 @@ bool CAnimManagerSA::isGateWayAnimationHierarchy ( CAnimBlendHierarchySAInterfac
     return pGame->GetKeyGen()->GetUppercaseKey ( m_kGateWayAnimationName.c_str ( ) ) == pInterface->iHashKey;
 }
 
-const SString & CAnimManagerSA::GetGateWayBlockName ( void )
-{
-    return m_kGateWayBlockName;
-}
-
-const SString & CAnimManagerSA::GetGateWayAnimationName ( void )
-{
-    return m_kGateWayAnimationName;
-}
-

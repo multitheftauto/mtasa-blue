@@ -159,8 +159,8 @@ public:
     std::unique_ptr < CAnimBlendSequence >  GetCustomAnimBlendSequence  ( CAnimBlendSequenceSAInterface * pInterface );
 
     bool                        isGateWayAnimationHierarchy             ( CAnimBlendHierarchySAInterface * pInterface );
-    const SString &             GetGateWayBlockName                     ( void );
-    const SString &             GetGateWayAnimationName                 ( void );
+    const SString &             GetGateWayBlockName                     ( void ) { return m_kGateWayBlockName; };
+    const SString &             GetGateWayAnimationName                 ( void ) { return m_kGateWayAnimationName; };
 
 private:
     CAnimBlendAssocGroup *      m_pAnimAssocGroups [ MAX_ANIM_GROUPS ];
