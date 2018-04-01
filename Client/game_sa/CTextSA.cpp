@@ -43,6 +43,7 @@ void CTextSA::SetText(char* szKey, char* szValue)
     }
 }
 
+__declspec(noinline)
 char* GetReplacementText(char* szKey)
 {
     // NOTE: This is really slow (0.8% of program time spent here) so needs to be

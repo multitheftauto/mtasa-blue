@@ -492,6 +492,7 @@ int GetAnimPose(int iAnim)
 // Returns anim to use
 //
 ////////////////////////////////////////////////////////////////
+__declspec(noinline)
 int _cdecl OnCPlayerPed_ProcessAnimGroups_Mid(CPlayerPedSAInterface *pPlayerPedSAInterface, int iReqMoveAnim)
 {
     CPed *pPed = pGame->GetPools()->GetPed((DWORD *)pPlayerPedSAInterface);
@@ -553,6 +554,7 @@ void _declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
 // Returns MOVE_PLAYER, MOVE_PLAYER_F or MOVE_PLAYER_M
 //
 ////////////////////////////////////////////////////////////////
+__declspec(noinline)
 int _cdecl OnCClothes_GetDefaultPlayerMotionGroup(int iReqMoveAnim)
 {
     CPed *pPed = g_pCore->GetMultiplayer()->GetContextSwitchedPed();

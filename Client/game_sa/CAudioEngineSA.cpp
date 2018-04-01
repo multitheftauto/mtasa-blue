@@ -426,6 +426,7 @@ VOID CAudioEngineSA::UpdateAmbientSoundSettings(void)
         MemPut<BYTE>(0x507814, 0x33);            // No gunfire
 }
 
+__declspec(noinline)
 bool _cdecl IsAmbientSoundGeneralEnabled(void)
 {
     if (pGame)
@@ -505,6 +506,7 @@ bool CAudioEngineSA::OnWorldSound(CAESound* pAESound)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Return false to skip sound
+__declspec(noinline)
 bool _cdecl On_CAESoundManager_RequestNewSound(CAESound* pAESound)
 {
     return g_pAudioSA->OnWorldSound(pAESound);
