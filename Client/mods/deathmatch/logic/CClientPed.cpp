@@ -2874,7 +2874,6 @@ void CClientPed::StreamedInPulse ( bool bDoStandardPulses )
             // Is it loaded now?
             if ( m_pAnimationBlock->IsLoaded () )
             {
-                printf("\nstreamed in pulse for ped\n\n");
                 if ( m_bisCurrentAnimationCustom )
                 {
                     m_bisNextAnimationCustom = true;
@@ -3740,7 +3739,6 @@ void CClientPed::_CreateModel ( void )
         // Are we still playing a looped animation?
         if ( m_bLoopAnimation && m_pAnimationBlock )
         {
-            printf("\n create model for ped\n\n");
             if ( m_bisCurrentAnimationCustom )
             {
                 m_bisNextAnimationCustom = true;
@@ -4042,7 +4040,6 @@ void CClientPed::_ChangeModel ( void )
             // Are we still playing a looped animation?
             if ( m_bLoopAnimation && m_pAnimationBlock )
             {
-                printf("\nchange model for ped\n\n");
                 if ( m_bisCurrentAnimationCustom )
                 {
                     m_bisNextAnimationCustom = true;

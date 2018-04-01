@@ -8,7 +8,6 @@ CIFPAnimations::CIFPAnimations ( void )
 
 CIFPAnimations::~CIFPAnimations ( void )
 {
-    printf("~CIFPAnimations(): Going to call DeleteAnimations\n");
     DeleteAnimations ( );
 }
 
@@ -40,5 +39,4 @@ void CIFPAnimations::DeleteAnimations ( void )
         }
         delete it->pSequencesMemory;  
     }
-    printf("CIFPAnimations::DeleteAnimations: IFP Animations have been unloaded successfully!\n");
 }
