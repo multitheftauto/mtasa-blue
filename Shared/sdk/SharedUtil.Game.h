@@ -99,6 +99,7 @@ namespace SharedUtil
             LUA_TRACE_0000,
             RESIZE_ALWAYS_0000,
             RESIZE_NEVER_0000,
+            MARKER_PULSE,
             MAX,
         };
     };
