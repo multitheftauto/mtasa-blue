@@ -60,6 +60,7 @@ CClientEntity::CClientEntity(ElementID ID) : ClassInit(this)
     g_pCore->UpdateDummyProgress();
 }
 
+#pragma inline_depth(0)
 CClientEntity::~CClientEntity(void)
 {
     // Make sure we won't get deleted later by the element deleter if we've been requested so
@@ -164,6 +165,7 @@ CClientEntity::~CClientEntity(void)
     g_pCore->GetGraphics()->GetRenderItemManager()->RemoveClientEntityRefs(this);
     g_pCore->UpdateDummyProgress();
 }
+#pragma inline_depth(254)
 
 // Static function
 // bool CClientEntity::IsValidEntity ( CClientEntity* pEntity )

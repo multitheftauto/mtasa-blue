@@ -53,15 +53,43 @@ void CClientMarkerManager::DeleteAll(void)
 
 void CClientMarkerManager::DoPulse(void)
 {
-    bool bDisableCrashFix = (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::MARKER_PULSE);
-    if (!bDisableCrashFix)
-        m_Markers.SuspendModifyOperations();
+    uint uiSkipCount = 0;
+    uint uiAddCount = 0;
+    m_Markers.SuspendModifyOperations();
     // Pulse all our markers
     CFastList<CClientMarker*>::const_iterator iter = m_Markers.begin();
     for (; iter != m_Markers.end(); iter++)
     {
-        (*iter)->DoPulse();
+        bool bSkip = false;
+        for (auto suspended : m_Markers.m_SuspendedOperationList)
+        {
+            if (suspended.item == (*iter))
+                bSkip = true;
+        }
+        if (!bSkip)
+            (*iter)->DoPulse();
+        else
+            uiSkipCount++;
     }
-    if (!bDisableCrashFix)
-        m_Markers.ResumeModifyOperations();
+
+    for (uint i = 0; i < m_Markers.m_SuspendedOperationList.size(); i++)   
+    {
+        auto suspended = m_Markers.m_SuspendedOperationList[i];
+        if (suspended.operation != CFastList<CClientMarker*>::EOperation::Remove)
+        {
+            suspended.item->DoPulse();
+            uiAddCount++;
+        }
+    }
+    m_Markers.ResumeModifyOperations();
+
+    // Debug logging
+    static uint uiSkipCountNonZeroes = 0;
+    static uint uiAddCountNonZeroes = 0;
+    if ((uiSkipCount && uiSkipCountNonZeroes < 5) || (uiAddCount && uiAddCountNonZeroes < 5))
+    {
+        uiSkipCountNonZeroes += (uiSkipCount ? 1 : 0);
+        uiAddCountNonZeroes += (uiAddCount ? 1 : 0);
+        AddReportLog(4450, SString("CClientMarkerManager::DoPulse uiSkipCount:%d uiAddCount:%d", uiSkipCount, uiAddCount));
+    }
 }
