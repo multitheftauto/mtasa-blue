@@ -72,7 +72,7 @@ void CClientMarkerManager::DoPulse(void)
             uiSkipCount++;
     }
 
-    for (uint i = 0; i < m_Markers.m_SuspendedOperationList.size(); i++)   
+    for (uint i = 0; i < m_Markers.m_SuspendedOperationList.size(); i++)
     {
         auto suspended = m_Markers.m_SuspendedOperationList[i];
         if (suspended.operation != CFastList<CClientMarker*>::EOperation::Remove)

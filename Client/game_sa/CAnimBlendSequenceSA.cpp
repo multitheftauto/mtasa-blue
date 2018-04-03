@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CAnimBlendSequenceSA::Initialize ( void )
+void CAnimBlendSequenceSA::Initialize(void)
 {
     m_pInterface->m_boneId = -1;
     m_pInterface->sFlags = 0;
@@ -19,9 +19,9 @@ void CAnimBlendSequenceSA::Initialize ( void )
     m_pInterface->pKeyFrames = 0;
 }
 
-void CAnimBlendSequenceSA::SetName ( const char * szName )
+void CAnimBlendSequenceSA::SetName(const char* szName)
 {
-    DWORD dwThis = ( DWORD ) m_pInterface;
+    DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendSequence_SetName;
     _asm
     {
@@ -31,9 +31,9 @@ void CAnimBlendSequenceSA::SetName ( const char * szName )
     }
 }
 
-void CAnimBlendSequenceSA::SetBoneTag ( int32_t i32BoneID )
+void CAnimBlendSequenceSA::SetBoneTag(int32_t i32BoneID)
 {
-    DWORD dwThis = ( DWORD ) m_pInterface;
+    DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendSequence_SetBoneTag;
     _asm
     {
@@ -43,9 +43,9 @@ void CAnimBlendSequenceSA::SetBoneTag ( int32_t i32BoneID )
     }
 }
 
-void CAnimBlendSequenceSA::SetKeyFrames ( size_t cKeyFrames, bool bRoot, bool bCompressed, void * pKeyFrames )
+void CAnimBlendSequenceSA::SetKeyFrames(size_t cKeyFrames, bool bRoot, bool bCompressed, void* pKeyFrames)
 {
-    DWORD dwThis = ( DWORD ) m_pInterface;
+    DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendSequence_SetKeyFrames;
     _asm
     {
@@ -58,7 +58,7 @@ void CAnimBlendSequenceSA::SetKeyFrames ( size_t cKeyFrames, bool bRoot, bool bC
     }
 }
 
-void * CAnimBlendSequenceSA::GetKeyFrame ( size_t iFrame, uint32_t u32FrameSizeInBytes )
+void* CAnimBlendSequenceSA::GetKeyFrame(size_t iFrame, uint32_t u32FrameSizeInBytes)
 {
-    return ( m_pInterface->pKeyFrames + u32FrameSizeInBytes * iFrame );
+    return (m_pInterface->pKeyFrames + u32FrameSizeInBytes * iFrame);
 }

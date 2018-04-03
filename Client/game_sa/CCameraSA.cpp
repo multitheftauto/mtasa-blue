@@ -568,8 +568,7 @@ void CCameraSA::GetCameraClip(bool &bObjects, bool &bVehicles)
     bVehicles = bCameraClipVehicles;
 }
 
-__declspec(noinline)
-void _cdecl DoCameraCollisionDetectionPokes()
+__declspec(noinline) void _cdecl DoCameraCollisionDetectionPokes()
 {
     if (!bCameraClipObjects)
     {

@@ -5,23 +5,21 @@
 
 class CIFPAnimations
 {
-    public:
-
+public:
     struct SAnimation
     {
-        SString                           Name;
-        unsigned int                      u32NameHash;
-        CAnimBlendHierarchySAInterface    Hierarchy;
-        char *                            pSequencesMemory;
+        SString                        Name;
+        unsigned int                   u32NameHash;
+        CAnimBlendHierarchySAInterface Hierarchy;
+        char*                          pSequencesMemory;
     };
 
-	std::vector < SAnimation > vecAnimations;	
+    std::vector<SAnimation> vecAnimations;
 
 public:
-            CIFPAnimations   ( void );
-            ~CIFPAnimations  ( void );
+    CIFPAnimations(void);
+    ~CIFPAnimations(void);
 
-    void    DeleteAnimations ( void );
-
+    void DeleteAnimations(void);
 };
 #endif

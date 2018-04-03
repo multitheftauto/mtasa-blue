@@ -98,7 +98,7 @@ struct SCheatSA
 class CGameSA : public CGame
 {
     friend class COffsets;
-    typedef std::unique_ptr < CAnimBlendAssocGroup > AssocGroup_type;
+    typedef std::unique_ptr<CAnimBlendAssocGroup> AssocGroup_type;
 
 private:
     CWeaponInfo* WeaponInfos[NUM_WeaponInfosTotal];

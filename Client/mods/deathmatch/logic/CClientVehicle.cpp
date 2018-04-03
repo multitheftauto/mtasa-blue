@@ -3062,7 +3062,7 @@ bool CClientVehicle::SetTowedVehicle(CClientVehicle* pVehicle, const CVector* ve
             pVehicle->SetTrainTrack(pChainEngine->GetTrainTrack());
             pVehicle->SetTrainPosition(pChainEngine->GetTrainPosition());
             pVehicle->SetTrainDirection(pChainEngine->GetTrainDirection());
-    
+
             CVector vecPosition;
             pChainEngine->GetPosition(vecPosition);
             pVehicle->SetPosition(vecPosition);
@@ -3739,8 +3739,8 @@ void CClientVehicle::UpdateTargetPosition(void)
 #endif
 
         // Update our contact players
-        CVector                     vecPlayerPosition;
-        CVector                     vecOffset;
+        CVector vecPlayerPosition;
+        CVector vecOffset;
         for (uint i = 0; i < m_Contacts.size(); i++)
         {
             CClientPed* pModel = m_Contacts[i];
