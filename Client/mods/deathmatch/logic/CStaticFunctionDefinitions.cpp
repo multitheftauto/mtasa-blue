@@ -1927,7 +1927,7 @@ bool CStaticFunctionDefinitions::SetPlayerNametagShowing(CClientEntity& Entity, 
 {
     RUN_CHILDREN(SetPlayerNametagShowing(**iter, bShowing))
 
-    if (IS_PED(&Entity))
+    if (IS_PLAYER(&Entity))
     {
         CClientPlayer& Player = static_cast<CClientPlayer&>(Entity);
 
