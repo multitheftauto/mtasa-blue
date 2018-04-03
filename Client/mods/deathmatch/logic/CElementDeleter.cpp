@@ -35,6 +35,8 @@ void CElementDeleter::Delete ( class CClientEntity* pElement )
         // Add it to our list
         if ( !pElement->IsBeingDeleted () )
         {
+            // Just to be clear, not a Lua event
+            OnClientSpecialElementDestroy ( pElement );
             m_List.push_back ( pElement );
         }
 
@@ -68,6 +70,8 @@ void CElementDeleter::DeleteRecursive ( class CClientEntity* pElement )
     // Add it to our list over deleting objects
     if ( !pElement->IsBeingDeleted () )
     {
+        // Just to be clear, not a Lua event
+        OnClientSpecialElementDestroy ( pElement );
         m_List.push_back ( pElement );
     }
 
@@ -94,15 +98,14 @@ void CElementDeleter::DeleteIFP  ( CClientEntity * pElement )
 {
     CClientIFP & IFP = static_cast < CClientIFP& > ( *pElement );
     const unsigned int u32BlockNameHash = IFP.GetBlockNameHash ( );
-    std::shared_ptr < CClientIFP > pIFP = g_pClientGame->GetIFPPointerFromMap ( u32BlockNameHash );
-    if ( pIFP )
-    { 
-        // Remove IFP from map, so we can indicate that it does not exist
-        g_pClientGame->RemoveIFPPointerFromMap ( u32BlockNameHash );
-
-        // Remove IFP animations from replaced animations of peds/players
-        g_pClientGame->OnClientIFPUnload ( pIFP );
-    }
+    for ( auto it = m_vecIFPElements.begin ( ); it != m_vecIFPElements.end ( ); ++it ) 
+    {
+        if ( (*it)->GetBlockNameHash ( ) == u32BlockNameHash )
+        {
+            m_vecIFPElements.erase ( it );
+            break;
+        }
+    }   
 }
 
 
@@ -127,6 +130,38 @@ void CElementDeleter::DoDeleteAll ( void )
 
     // We can now allow unrefernecs again
     m_bAllowUnreference = true;
+}
+
+
+bool CElementDeleter::OnClientSpecialElementDestroy ( CClientEntity* pElement )
+{
+    if ( IS_IFP ( pElement ) )
+    {
+        OnClientIFPElementDestroy ( pElement );
+        return true;       
+    }
+    return false;
+}
+
+
+void CElementDeleter::OnClientIFPElementDestroy  ( CClientEntity * pElement )
+{
+    CClientIFP & IFP = static_cast < CClientIFP& > ( *pElement );
+    const unsigned int u32BlockNameHash = IFP.GetBlockNameHash ( );
+
+    std::shared_ptr < CClientIFP > pIFP = g_pClientGame->GetIFPPointerFromMap ( u32BlockNameHash );
+    if ( pIFP )
+    { 
+        // Remove IFP from map, so we can indicate that it does not exist
+        g_pClientGame->RemoveIFPPointerFromMap ( u32BlockNameHash );
+
+        // Remove IFP animations from replaced animations of peds/players
+        g_pClientGame->OnClientIFPUnload ( pIFP );
+
+        // keep a reference to shared_ptr CClientIFP in list, so it does not get 
+        // destroyed after exiting this function
+        m_vecIFPElements.push_back ( pIFP );
+    }
 }
 
 

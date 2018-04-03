@@ -15,6 +15,7 @@ CClientIFP::CClientIFP ( class CClientManager* pManager, ElementID ID ) : CClien
 
 CClientIFP::~CClientIFP ( void )
 {
+   //g_pCore->GetConsole ()->Printf( "CClientIFP::~CClientIFP called! BlockName: %s", m_strBlockName.c_str ( ) );
 }
 
 bool CClientIFP::LoadIFP ( const char* szFilePath, const SString & strBlockName )
