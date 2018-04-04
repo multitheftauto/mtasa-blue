@@ -5323,8 +5323,14 @@ void CStaticFunctionDefinitions::GUIMoveToBack(CClientEntity& Entity)
     {
         CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
 
+        bool bConsoleHadInputFocus = g_pCore->GetConsole()->IsInputActive();
+
         // Move it to the back
         GUIElement.GetCGUIElement()->MoveToBack();
+
+        // Restore input focus to the console if required
+        if (bConsoleHadInputFocus)
+            g_pCore->GetConsole()->ActivateInput();
     }
 }
 
