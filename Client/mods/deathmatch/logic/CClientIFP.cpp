@@ -13,17 +13,12 @@ CClientIFP::CClientIFP(class CClientManager* pManager, ElementID ID) : CClientEn
     m_u32Hashkey = 0;
 }
 
-CClientIFP::~CClientIFP(void)
-{
-    // g_pCore->GetConsole ()->Printf( "CClientIFP::~CClientIFP called! BlockName: %s", m_strBlockName.c_str ( ) );
-}
-
-bool CClientIFP::LoadIFP(const char* szFilePath, const SString& strBlockName)
+bool CClientIFP::LoadIFP(const SString& strFilePath, const SString& strBlockName)
 {
     m_strBlockName = strBlockName;
     m_pVecAnimations = &m_pIFPAnimations->vecAnimations;
 
-    if (LoadIFPFile(szFilePath))
+    if (LoadIFPFile(strFilePath))
     {
         m_u32Hashkey = HashString(strBlockName.ToLower());
         return true;
@@ -31,11 +26,9 @@ bool CClientIFP::LoadIFP(const char* szFilePath, const SString& strBlockName)
     return false;
 }
 
-bool CClientIFP::LoadIFPFile(const char* szFilePath)
+bool CClientIFP::LoadIFPFile(const SString& strFilePath)
 {
-    CreateLoader(szFilePath);
-
-    if (LoadFile())
+    if (LoadFileToMemory(strFilePath))
     {
         char Version[4];
         ReadBytes(Version, sizeof(Version));
@@ -53,9 +46,9 @@ bool CClientIFP::LoadIFPFile(const char* szFilePath)
             ReadIFPVersion1();
         }
 
-        // We are unloading the data because we don't need to read it anymore.
+        // We are freeing the file reader memory because we don't need to read it anymore.
         // This function does not unload IFP, to unload ifp, use destroyElement from Lua
-        UnloadFile();
+        FreeFileReaderMemory();
     }
     else
     {
@@ -279,7 +272,7 @@ void CClientIFP::ReadAnimationNameVersion1(SAnimation& IfpAnimation)
     RoundSize(Name.Base.Size);
 
     char szAnimationName[24];
-    ReadCString(szAnimationName, Name.Base.Size);
+    ReadStringNullTerminated(szAnimationName, Name.Base.Size);
     IfpAnimation.Name = szAnimationName;
     IfpAnimation.u32NameHash = HashString(IfpAnimation.Name.ToLower());
 }
@@ -301,7 +294,7 @@ CClientIFP::eFrameType CClientIFP::ReadKfrm(void)
 
 void CClientIFP::ReadAnimationHeaderVersion2(SAnimationHeaderV2& AnimationNode, bool bAnp3)
 {
-    ReadCString((char*)&AnimationNode.Name, sizeof(SAnimationHeaderV2::Name));
+    ReadStringNullTerminated((char*)&AnimationNode.Name, sizeof(SAnimationHeaderV2::Name));
     ReadBuffer<int32_t>(&AnimationNode.TotalObjects);
     if (bAnp3)
     {
@@ -354,9 +347,7 @@ void CClientIFP::ReadKrtsFramesAsCompressed(std::unique_ptr<CAnimBlendSequence>&
         CompressedKrt0->Rotation.Y = static_cast<int16_t>(((-Krts.Rotation.Y) * 4096.0f));
         CompressedKrt0->Rotation.Z = static_cast<int16_t>(((-Krts.Rotation.Z) * 4096.0f));
         CompressedKrt0->Rotation.W = static_cast<int16_t>((Krts.Rotation.W * 4096.0f));
-
         CompressedKrt0->Time = static_cast<int16_t>((Krts.Time * 60.0f + 0.5f));
-
         CompressedKrt0->Translation.X = static_cast<int16_t>((Krts.Translation.X * 1024.0f));
         CompressedKrt0->Translation.Y = static_cast<int16_t>((Krts.Translation.Y * 1024.0f));
         CompressedKrt0->Translation.Z = static_cast<int16_t>((Krts.Translation.Z * 1024.0f));
@@ -375,9 +366,7 @@ void CClientIFP::ReadKrt0FramesAsCompressed(std::unique_ptr<CAnimBlendSequence>&
         CompressedKrt0->Rotation.Y = static_cast<int16_t>(((-Krt0.Rotation.Y) * 4096.0f));
         CompressedKrt0->Rotation.Z = static_cast<int16_t>(((-Krt0.Rotation.Z) * 4096.0f));
         CompressedKrt0->Rotation.W = static_cast<int16_t>((Krt0.Rotation.W * 4096.0f));
-
         CompressedKrt0->Time = static_cast<int16_t>((Krt0.Time * 60.0f + 0.5f));
-
         CompressedKrt0->Translation.X = static_cast<int16_t>((Krt0.Translation.X * 1024.0f));
         CompressedKrt0->Translation.Y = static_cast<int16_t>((Krt0.Translation.Y * 1024.0f));
         CompressedKrt0->Translation.Z = static_cast<int16_t>((Krt0.Translation.Z * 1024.0f));
@@ -396,7 +385,6 @@ void CClientIFP::ReadKr00FramesAsCompressed(std::unique_ptr<CAnimBlendSequence>&
         CompressedKr00->Rotation.Y = static_cast<int16_t>(((-Kr00.Rotation.Y) * 4096.0f));
         CompressedKr00->Rotation.Z = static_cast<int16_t>(((-Kr00.Rotation.Z) * 4096.0f));
         CompressedKr00->Rotation.W = static_cast<int16_t>((Kr00.Rotation.W * 4096.0f));
-
         CompressedKr00->Time = static_cast<int16_t>((Kr00.Time * 60.0f + 0.5f));
     }
 }

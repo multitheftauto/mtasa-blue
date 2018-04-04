@@ -92,13 +92,15 @@ void CElementDeleter::DeleteIFP(CClientEntity* pElement)
 {
     CClientIFP&        IFP = static_cast<CClientIFP&>(*pElement);
     const unsigned int u32BlockNameHash = IFP.GetBlockNameHash();
-    for (auto it = m_vecIFPElements.begin(); it != m_vecIFPElements.end(); ++it)
+
+    auto it = std::find_if(m_vecIFPElements.begin(), m_vecIFPElements.end(),
+    [&u32BlockNameHash](std::shared_ptr<CClientIFP> const& pIFP)
     {
-        if ((*it)->GetBlockNameHash() == u32BlockNameHash)
-        {
-            m_vecIFPElements.erase(it);
-            break;
-        }
+		return pIFP->GetBlockNameHash() == u32BlockNameHash;
+	});
+    if(it != m_vecIFPElements.end())
+    {
+        m_vecIFPElements.erase(it);
     }
 }
 
@@ -151,7 +153,7 @@ void CElementDeleter::OnClientIFPElementDestroy(CClientEntity* pElement)
 
         // keep a reference to shared_ptr CClientIFP in list, so it does not get
         // destroyed after exiting this function
-        m_vecIFPElements.push_back(pIFP);
+        m_vecIFPElements.emplace_back(pIFP);
     }
 }
 

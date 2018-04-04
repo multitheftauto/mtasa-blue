@@ -1,46 +1,36 @@
-#pragma once
 #ifndef CFILEREADER_H
 #define CFILEREADER_H
 
-#include <Windows.h>
-#include <iostream>
-#include <fstream>
+#include <cstdint>
 
 class CFileReader
 {
 public:
-    CFileReader(void);
-    ~CFileReader(void);
+    enum eIFSTREAM
+    { 
+        SIZE_ERROR = -1
+    };
 
-    BOOL CreateLoader(const char* szFileToRead);
-    BOOL LoadFile(void);
-    void UnloadFile(void);
+    CFileReader(void);
+    bool LoadFileToMemory(const SString& strFilePath);
+    // Do not call any file reader functions after calling this function
+    void FreeFileReaderMemory(void);
 
     template <class T>
     void ReadBuffer(T* pDestination)
     {
-        const UINT u32ReadOffset = u32BytesReadFromBuffer;
+        const std::uint32_t u32ReadOffset = u32BytesReadFromBuffer;
         u32BytesReadFromBuffer += sizeof(T);
-        *pDestination = *reinterpret_cast<T*>(pFileDataBuffer + u32ReadOffset);
+        *pDestination = *reinterpret_cast<T*>(&vecFileDataBuffer[u32ReadOffset]);
     }
 
-    void        ReadBytes(void* pDestination, const UINT u32BytesToRead);
-    std::string ReadString(UINT u32SizeInBytes);
-    void        ReadCString(char* pDestination, const UINT u32BytesToRead);
-    void        SkipBytes(UINT u32BytesToSkip);
+    void        ReadBytes(void* pDestination, const std::uint32_t u32BytesToRead);
+    void        ReadStringNullTerminated(char* pDestination, const std::uint32_t u32BytesToRead);
+    void        SkipBytes(const std::uint32_t u32BytesToSkip);
 
 private:
-    void SetLoaderFilePath(const char* szFileToRead);
-    BOOL OpenFile(void);
-    BOOL GetFileLength(void);
-    void AllocateBufferMemory(void);
-    BOOL LoadToMemory(void);
-
-    const char* pFilePath;
-    FILE*       pFilePointer;
-    char*       pFileDataBuffer;
-    UINT        u32FileLength;
-    UINT        u32BytesReadFromBuffer;
+    std::vector<char> vecFileDataBuffer;
+    std::uint32_t     u32BytesReadFromBuffer;
 };
 
 #endif

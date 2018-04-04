@@ -6820,9 +6820,9 @@ void CClientGame::RemovePedPointerFromSet(CClientPed* pPed)
 CClientPed* CClientGame::GetClientPedByClump(const RpClump& Clump)
 {
     std::lock_guard<std::mutex> mutexGuardedLock(m_MutexOfPedPointersSet);
-    for (auto it = m_setOfPedPointers.begin(); it != m_setOfPedPointers.end(); it++)
+    for (auto &pPed : m_setOfPedPointers)
     {
-        CEntity* pEntity = (*it)->GetGameEntity();
+        CEntity* pEntity = pPed->GetGameEntity();
         if (pEntity != nullptr)
         {
             if (pEntity->GetRpClump() != nullptr)
@@ -6830,7 +6830,7 @@ CClientPed* CClientGame::GetClientPedByClump(const RpClump& Clump)
                 const RpClump& entityClump = *pEntity->GetRpClump();
                 if (std::addressof(entityClump) == std::addressof(Clump))
                 {
-                    return *it;
+                    return pPed;
                 }
             }
         }
@@ -6842,26 +6842,26 @@ void CClientGame::OnClientIFPUnload(const std::shared_ptr<CClientIFP>& IFP)
 {
     std::lock_guard<std::mutex> mutexGuardedLock(m_MutexOfPedPointersSet);
     IFP->MarkAsUnloading();
-    for (auto it = m_setOfPedPointers.begin(); it != m_setOfPedPointers.end(); it++)
+    for (auto &pPed : m_setOfPedPointers)
     {
         // Remove IFP animations from replaced animations of peds/players
-        (*it)->RestoreAnimations(IFP);
+        pPed->RestoreAnimations(IFP);
 
         // Make sure that streamed in pulses or changing model does not accidently
         // play our custom animation. We can do that by making the custom animation
         // untriggerable
-        if ((*it)->GetCustomAnimationBlockNameHash() == IFP->GetBlockNameHash())
+        if (pPed->GetCustomAnimationBlockNameHash() == IFP->GetBlockNameHash())
         {
-            if ((*it)->IsCustomAnimationPlaying())
+            if (pPed->IsCustomAnimationPlaying())
             {
-                (*it)->SetCustomAnimationUntriggerable();
+                pPed->SetCustomAnimationUntriggerable();
             }
 
             // Important! As we are using a shared_ptr, we need to decrement the reference counter
             // by setting the shared_ptr to nullptr, this will avoid memory leak
-            if (!(*it)->IsNextAnimationCustom() && (*it)->IsCurrentAnimationCustom())
+            if (!pPed->IsNextAnimationCustom() && pPed->IsCurrentAnimationCustom())
             {
-                (*it)->DereferenceCustomAnimationBlock();
+                pPed->DereferenceCustomAnimationBlock();
             }
         }
     }

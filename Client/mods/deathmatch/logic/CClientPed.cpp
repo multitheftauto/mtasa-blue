@@ -94,6 +94,8 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_bisCurrentAnimationCustom = false;
     m_strCustomIFPBlockName = "Default";
     m_strCustomIFPAnimationName = "Default";
+    m_u32CustomBlockNameHash = 0;
+    m_u32CustomAnimationNameHash = 0;
     m_iVehicleInOutState = VEHICLE_INOUT_NONE;
     m_pPlayerPed = NULL;
     m_pTaskManager = NULL;

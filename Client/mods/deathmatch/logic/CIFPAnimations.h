@@ -17,9 +17,7 @@ public:
     std::vector<SAnimation> vecAnimations;
 
 public:
-    CIFPAnimations(void);
     ~CIFPAnimations(void);
-
     void DeleteAnimations(void);
 };
 #endif

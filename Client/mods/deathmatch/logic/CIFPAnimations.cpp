@@ -1,10 +1,6 @@
 #include <StdInc.h>
 #include "../game_sa/CAnimBlendSequenceSA.h"
 
-CIFPAnimations::CIFPAnimations(void)
-{
-}
-
 CIFPAnimations::~CIFPAnimations(void)
 {
     DeleteAnimations();

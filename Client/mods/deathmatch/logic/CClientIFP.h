@@ -1,12 +1,9 @@
-#pragma once
-
 #ifndef __CCLIENTIFP_H
 #define __CCLIENTIFP_H
 
 #include "CClientEntity.h"
 #include "CFileReader.h"
 #include "CIFPAnimations.h"
-#include <algorithm>
 
 class CClientIFP : public CClientEntity, CFileReader
 {
@@ -132,14 +129,12 @@ public:
     struct SIFPHeaderV2
     {
         int32_t OffsetEOF;
-        char    InternalFilSName[24];
+        char    InternalFileName[24];
         int32_t TotalAnimations;
     };
 
     struct SAnimationHeaderV2
     {
-        // 24 + 4 + 4 + 4 = 36 bytes
-
         char    Name[24];
         int32_t TotalObjects;
         int32_t FrameSize;
@@ -192,16 +187,29 @@ public:
         R_FOOT = 53,
         R_TOE_0 = 54
     };
+
     CClientIFP(class CClientManager* pManager, ElementID ID);
-    ~CClientIFP(void);
 
     virtual eClientEntityType GetType(void) const { return CCLIENTIFP; }
 
     void MarkAsUnloading(void) { m_bUnloading = true; }
     bool IsUnloading(void) { return m_bUnloading; }
 
-    bool LoadIFP(const char* szFilePath, const SString& strBlockName);
-    bool LoadIFPFile(const char* szFilePath);
+    bool LoadIFP(const SString& strFilePath, const SString& strBlockName);
+
+    const SString&      GetBlockName(void) { return m_strBlockName; }
+    const unsigned int& GetBlockNameHash(void) { return m_u32Hashkey; }
+
+    CAnimBlendHierarchySAInterface* GetAnimationHierarchy(const SString& strAnimationName);
+    std::shared_ptr<CIFPAnimations> GetIFPAnimationsPointer(void) { return m_pIFPAnimations; }
+
+    // Sorta a hack that these are required by CClientEntity...
+    void Unlink(void){};
+    void GetPosition(CVector& vecPosition) const {};
+    void SetPosition(const CVector& vecPosition){};
+
+private:
+    bool LoadIFPFile(const SString& strFilePath);
     void ReadIFPVersion1(void);
     void ReadIFPVersion2(bool bAnp3);
 
@@ -251,18 +259,6 @@ public:
     std::string GetCorrectBoneNameFromName(std::string const& BoneName);
     std::string GetCorrectBoneNameFromID(int32_t& BoneID);
 
-    const SString&      GetBlockName(void) { return m_strBlockName; }
-    const unsigned int& GetBlockNameHash(void) { return m_u32Hashkey; }
-
-    CAnimBlendHierarchySAInterface* GetAnimationHierarchy(const SString& strAnimationName);
-    std::shared_ptr<CIFPAnimations> GetIFPAnimationsPointer(void) { return m_pIFPAnimations; }
-
-    // Sorta a hack that these are required by CClientEntity...
-    void Unlink(void){};
-    void GetPosition(CVector& vecPosition) const {};
-    void SetPosition(const CVector& vecPosition){};
-
-private:
     std::shared_ptr<CIFPAnimations> m_pIFPAnimations;
     SString                         m_strBlockName;
     unsigned int                    m_u32Hashkey;
