@@ -303,6 +303,7 @@ CTaskSimpleFight* CTasksSA::CreateTaskSimpleFight(CEntity* pTargetEntity, int nC
 // Detect when GTA will start the 'be hit' task
 //
 ////////////////////////////////////////////////////////////////
+__declspec(noinline)
 void _cdecl OnCEventHandler_ComputeDamageResponse_Mid(CPedSAInterface* pPedVictim, CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide,
                                                       int weaponId)
 {

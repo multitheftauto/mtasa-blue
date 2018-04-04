@@ -242,6 +242,11 @@ CTask* CTaskManagementSystemSA::CreateAppropriateTask(CTaskSAInterface* pTaskInt
 }
 
 // HOOKS
+__declspec(noinline)
+void OnMY_Task_Operator_Delete(CTaskSAInterface* pTaskInterface)
+{
+    ((CTaskManagementSystemSA*)(pGame->GetTaskManagementSystem()))->RemoveTask(pTempTaskInterface);
+}
 
 VOID _declspec(naked) HOOK_CTask_Operator_Delete()
 {
@@ -253,7 +258,7 @@ VOID _declspec(naked) HOOK_CTask_Operator_Delete()
         pushad
         }
 
-    ((CTaskManagementSystemSA*)(pGame->GetTaskManagementSystem()))->RemoveTask(pTempTaskInterface);
+    OnMY_Task_Operator_Delete(pTempTaskInterface);
 
     // Continue on our merry way....
     _asm

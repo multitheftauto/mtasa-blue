@@ -332,6 +332,7 @@ void CSettingsSA::SetVolumetricShadowsSuspended(bool bSuspended)
 DWORD dwFxQualityValue = 0;
 WORD  usCallingForVehicleModel = 0;
 
+__declspec(noinline)
 void _cdecl MaybeAlterFxQualityValue(DWORD dwAddrCalledFrom)
 {
     // Handle all calls from CVolumetricShadowMgr
@@ -829,6 +830,7 @@ int CSettingsSA::OnSelectDevice(void)
 //   * Choose whether to show the device selection dialog box
 //
 //////////////////////////////////////////////////////////////////////////////////////////
+__declspec(noinline)
 int OnMY_SelectDevice(void)
 {
     CSettingsSA* gameSettings = (CSettingsSA*)pGame->GetSettings();

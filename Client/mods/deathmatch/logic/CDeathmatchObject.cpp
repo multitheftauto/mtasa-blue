@@ -178,10 +178,9 @@ void CDeathmatchObject::UpdateContacting(const CVector& vecCenterOfRotation, con
         return;
 
     // Step through each contacting ped
-    list<CClientPed*>::iterator iter = m_Contacts.begin();
-    for (; iter != m_Contacts.end(); ++iter)
+    for (uint i = 0; i < m_Contacts.size(); i++)
     {
-        CClientPed* pPed = *iter;
+        CClientPed* pPed = m_Contacts[i];
 
         // Do not move the ped if it is frozen
         if (pPed->IsFrozen())

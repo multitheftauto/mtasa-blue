@@ -129,10 +129,9 @@ CClientEntity::~CClientEntity(void)
     }
 
     // Unlink our contacts
-    list<CClientPed*>::iterator iterContacts = m_Contacts.begin();
-    for (; iterContacts != m_Contacts.end(); iterContacts++)
+    for (uint i = 0; i < m_Contacts.size(); i++)
     {
-        CClientPed* pModel = *iterContacts;
+        CClientPed* pModel = m_Contacts[i];
         if (pModel->GetCurrentContactEntity() == this)
         {
             pModel->SetCurrentContactEntity(NULL);
@@ -1052,15 +1051,7 @@ void CClientEntity::GetChildrenByType(const char* szType, lua_State* luaVM)
 
 bool CClientEntity::CollisionExists(CClientColShape* pShape)
 {
-    CFastList<CClientColShape*>::iterator iter = m_Collisions.begin();
-    for (; iter != m_Collisions.end(); iter++)
-    {
-        if (*iter == pShape)
-        {
-            return true;
-        }
-    }
-    return false;
+    return ListContains(m_Collisions, pShape);
 }
 
 void CClientEntity::RemoveAllCollisions(void)
@@ -1076,14 +1067,7 @@ void CClientEntity::RemoveAllCollisions(void)
 
 bool CClientEntity::IsEntityAttached(CClientEntity* pEntity)
 {
-    std::vector<CClientEntity*>::iterator iter = m_AttachedEntities.begin();
-    for (; iter != m_AttachedEntities.end(); iter++)
-    {
-        if (*iter == pEntity)
-            return true;
-    }
-
-    return false;
+    return ListContains(m_AttachedEntities, pEntity);
 }
 
 void CClientEntity::ReattachEntities(void)

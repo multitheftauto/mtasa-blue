@@ -3057,13 +3057,16 @@ bool CClientVehicle::SetTowedVehicle(CClientVehicle* pVehicle, const CVector* ve
         CVehicle*       pTowedGameVehicle = pVehicle->GetGameVehicle();
         SetNextTrainCarriage(pVehicle);
 
-        pVehicle->SetTrainTrack(pChainEngine->GetTrainTrack());
-        pVehicle->SetTrainPosition(pChainEngine->GetTrainPosition());
-        pVehicle->SetTrainDirection(pChainEngine->GetTrainDirection());
-
-        CVector vecPosition;
-        pChainEngine->GetPosition(vecPosition);
-        pVehicle->SetPosition(vecPosition);
+        if (pChainEngine)
+        {
+            pVehicle->SetTrainTrack(pChainEngine->GetTrainTrack());
+            pVehicle->SetTrainPosition(pChainEngine->GetTrainPosition());
+            pVehicle->SetTrainDirection(pChainEngine->GetTrainDirection());
+    
+            CVector vecPosition;
+            pChainEngine->GetPosition(vecPosition);
+            pVehicle->SetPosition(vecPosition);
+        }
 
         if (m_pVehicle && pTowedGameVehicle)
         {
@@ -3738,10 +3741,9 @@ void CClientVehicle::UpdateTargetPosition(void)
         // Update our contact players
         CVector                     vecPlayerPosition;
         CVector                     vecOffset;
-        list<CClientPed*>::iterator iter = m_Contacts.begin();
-        for (; iter != m_Contacts.end(); iter++)
+        for (uint i = 0; i < m_Contacts.size(); i++)
         {
-            CClientPed* pModel = *iter;
+            CClientPed* pModel = m_Contacts[i];
             pModel->GetPosition(vecPlayerPosition);
             vecOffset = vecPlayerPosition - vecCurrentPosition;
             vecPlayerPosition = vecNewPosition + vecOffset;

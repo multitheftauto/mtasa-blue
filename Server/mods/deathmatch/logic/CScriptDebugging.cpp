@@ -136,12 +136,7 @@ void CScriptDebugging::PrintLog(const char* szText)
     if (m_pLogFile)
     {
         // Log it, timestamped
-        char   szBuffer[64];
-        time_t timeNow;
-        time(&timeNow);
-        strftime(szBuffer, 32, "[%Y-%m-%d %H:%M:%S]", localtime(&timeNow));
-
-        fprintf(m_pLogFile, "%s %s\n", szBuffer, szText);
+        fprintf(m_pLogFile, "[%s] %s\n", *GetLocalTimeString(true), szText);
         fflush(m_pLogFile);
     }
 }

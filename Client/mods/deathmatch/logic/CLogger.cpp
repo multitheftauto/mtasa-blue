@@ -109,18 +109,7 @@ void CLogger::HandleLogPrint(bool bTimeStamp, const char* szPrePend, const char*
     string strOutputLong;
     if (bTimeStamp)
     {
-        char   szBuffer[MAX_STRING_LENGTH] = {"\0"};
-        time_t timeNow;
-        time(&timeNow);
-        tm* pCurrentTime = localtime(&timeNow);
-#if 0
-        if ( !strftime ( szBuffer, MAX_STRING_LENGTH - 1, "[%H:%M:%S] ", pCurrentTime ) )
-            szBuffer[0] = 0;
-        strOutputShort = szBuffer;
-#endif
-        if (!strftime(szBuffer, MAX_STRING_LENGTH - 1, "[%Y-%m-%d %H:%M:%S] ", pCurrentTime))
-            szBuffer[0] = 0;
-        strOutputLong = szBuffer;
+        strOutputLong = SString("[%s] ", *GetLocalTimeString(true));
     }
 
     // Build the final string

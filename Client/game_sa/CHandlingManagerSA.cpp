@@ -27,6 +27,7 @@ CHandlingEntrySA* CHandlingManagerSA::m_pOriginalEntries[HT_MAX];
 
 DWORD m_dwStore_Calculate = 0;
 
+__declspec(noinline)
 void DumpHandlingData(tHandlingDataSA* pData)
 {
     unsigned int iCounter = pData->iVehicleID;

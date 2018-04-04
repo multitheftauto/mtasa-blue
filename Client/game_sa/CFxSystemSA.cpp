@@ -123,6 +123,7 @@ bool CFxSystemSA::HasCustomDrawDistance(void)
 // Poke new draw distance for the FxSystem
 //
 //////////////////////////////////////////////////////////////////////////////////////////
+__declspec(noinline)
 void OnMY_FxSystem_c_Update_MidA_Pre(CFxSystemSAInterface* pFxSystemSAInterface)
 {
     CFxSystemSA* pFxSystemSA = pGame->GetFxManagerSA()->GetFxSystem(pFxSystemSAInterface);
@@ -138,6 +139,7 @@ void OnMY_FxSystem_c_Update_MidA_Pre(CFxSystemSAInterface* pFxSystemSAInterface)
         ms_fUsingDrawDistance = 0;
 }
 
+__declspec(noinline)
 void OnMY_FxSystem_c_Update_MidA_Post(void)
 {
     if (ms_pUsingFxSystemSAInterface)
@@ -189,6 +191,7 @@ inner:
 // Poke new draw distances for each emitter
 //
 //////////////////////////////////////////////////////////////////////////////////////////
+__declspec(noinline)
 void OnMY_FxSystem_c_Update_MidB_Pre(CFxEmitterSAInterface* pFxEmitterSAInterface)
 {
     if (ms_fUsingDrawDistance)
@@ -206,6 +209,7 @@ void OnMY_FxSystem_c_Update_MidB_Pre(CFxEmitterSAInterface* pFxEmitterSAInterfac
     }
 }
 
+__declspec(noinline)
 void OnMY_FxSystem_c_Update_MidB_Post(void)
 {
     if (ms_pUsingFxEmitterSAInterface)
