@@ -94,11 +94,8 @@ void CElementDeleter::DeleteIFP(CClientEntity* pElement)
     const unsigned int u32BlockNameHash = IFP.GetBlockNameHash();
 
     auto it = std::find_if(m_vecIFPElements.begin(), m_vecIFPElements.end(),
-    [&u32BlockNameHash](std::shared_ptr<CClientIFP> const& pIFP)
-    {
-		return pIFP->GetBlockNameHash() == u32BlockNameHash;
-	});
-    if(it != m_vecIFPElements.end())
+                           [&u32BlockNameHash](std::shared_ptr<CClientIFP> const& pIFP) { return pIFP->GetBlockNameHash() == u32BlockNameHash; });
+    if (it != m_vecIFPElements.end())
     {
         m_vecIFPElements.erase(it);
     }

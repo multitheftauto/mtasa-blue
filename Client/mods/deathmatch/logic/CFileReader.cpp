@@ -8,7 +8,7 @@ CFileReader::CFileReader(void)
 
 void CFileReader::FreeFileReaderMemory(void)
 {
-    std::vector<char>().swap( vecFileDataBuffer );
+    std::vector<char>().swap(vecFileDataBuffer);
     u32BytesReadFromBuffer = 0;
 }
 
@@ -34,7 +34,7 @@ void CFileReader::SkipBytes(const std::uint32_t u32BytesToSkip)
 
 bool CFileReader::LoadFileToMemory(const SString& strFilePath)
 {
-    std::ifstream fileStream(strFilePath, std::ios::binary | std::ios::ate); 
+    std::ifstream   fileStream(strFilePath, std::ios::binary | std::ios::ate);
     std::streamsize iFileSize = fileStream.tellg();
     if (iFileSize == eIFSTREAM::SIZE_ERROR)
     {
@@ -42,7 +42,7 @@ bool CFileReader::LoadFileToMemory(const SString& strFilePath)
     }
 
     fileStream.seekg(0, std::ios::beg);
-    vecFileDataBuffer.reserve (static_cast < size_t > ( iFileSize ));
+    vecFileDataBuffer.reserve(static_cast<size_t>(iFileSize));
     if (fileStream.read(vecFileDataBuffer.data(), iFileSize))
     {
         return true;

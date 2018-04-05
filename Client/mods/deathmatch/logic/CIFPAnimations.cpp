@@ -9,9 +9,9 @@ CIFPAnimations::~CIFPAnimations(void)
 void CIFPAnimations::DeleteAnimations(void)
 {
     CAnimManager* pAnimManager = g_pGame->GetAnimManager();
-    for (auto it = vecAnimations.begin(); it != vecAnimations.end(); ++it)
+    for (auto& Animation : vecAnimations)
     {
-        auto pAnimationHierarchy = pAnimManager->GetCustomAnimBlendHierarchy(&it->Hierarchy);
+        auto pAnimationHierarchy = pAnimManager->GetCustomAnimBlendHierarchy(&Animation.Hierarchy);
         for (unsigned short SequenceIndex = 0; SequenceIndex < pAnimationHierarchy->GetNumSequences(); SequenceIndex++)
         {
             pAnimManager->RemoveFromUncompressedCache(pAnimationHierarchy->GetInterface());
@@ -32,6 +32,6 @@ void CIFPAnimations::DeleteAnimations(void)
                 }
             }
         }
-        delete it->pSequencesMemory;
+        delete Animation.pSequencesMemory;
     }
 }

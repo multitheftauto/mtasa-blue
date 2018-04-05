@@ -7,7 +7,7 @@ class CFileReader
 {
 public:
     enum eIFSTREAM
-    { 
+    {
         SIZE_ERROR = -1
     };
 
@@ -24,9 +24,9 @@ public:
         *pDestination = *reinterpret_cast<T*>(&vecFileDataBuffer[u32ReadOffset]);
     }
 
-    void        ReadBytes(void* pDestination, const std::uint32_t u32BytesToRead);
-    void        ReadStringNullTerminated(char* pDestination, const std::uint32_t u32BytesToRead);
-    void        SkipBytes(const std::uint32_t u32BytesToSkip);
+    void ReadBytes(void* pDestination, const std::uint32_t u32BytesToRead);
+    void ReadStringNullTerminated(char* pDestination, const std::uint32_t u32BytesToRead);
+    void SkipBytes(const std::uint32_t u32BytesToSkip);
 
 private:
     std::vector<char> vecFileDataBuffer;

@@ -95,6 +95,8 @@
 #include <CMapEventManager.h>
 #include <CModelNames.h>
 #include <CIFPEngine.h>
+#include <CFileReader.h>
+#include <CIFPAnimations.h>
 #include <CScriptFile.h>
 #include <CWeaponNames.h>
 #include <CVehicleNames.h>

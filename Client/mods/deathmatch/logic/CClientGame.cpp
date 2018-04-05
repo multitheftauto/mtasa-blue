@@ -6820,7 +6820,7 @@ void CClientGame::RemovePedPointerFromSet(CClientPed* pPed)
 CClientPed* CClientGame::GetClientPedByClump(const RpClump& Clump)
 {
     std::lock_guard<std::mutex> mutexGuardedLock(m_MutexOfPedPointersSet);
-    for (auto &pPed : m_setOfPedPointers)
+    for (auto& pPed : m_setOfPedPointers)
     {
         CEntity* pEntity = pPed->GetGameEntity();
         if (pEntity != nullptr)
@@ -6842,7 +6842,7 @@ void CClientGame::OnClientIFPUnload(const std::shared_ptr<CClientIFP>& IFP)
 {
     std::lock_guard<std::mutex> mutexGuardedLock(m_MutexOfPedPointersSet);
     IFP->MarkAsUnloading();
-    for (auto &pPed : m_setOfPedPointers)
+    for (auto& pPed : m_setOfPedPointers)
     {
         // Remove IFP animations from replaced animations of peds/players
         pPed->RestoreAnimations(IFP);

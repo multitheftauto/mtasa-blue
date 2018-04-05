@@ -63,20 +63,20 @@ void CClientIFP::ReadIFPVersion1()
     ReadHeaderVersion1(Info);
 
     m_pVecAnimations->resize(Info.Entries);
-    for (auto it = m_pVecAnimations->begin(); it != m_pVecAnimations->end(); ++it)
+    for (auto& Animation : m_pIFPAnimations->vecAnimations)
     {
-        ReadAnimationNameVersion1(*it);
+        ReadAnimationNameVersion1(Animation);
 
         SDgan Dgan;
         ReadDgan(Dgan);
 
-        std::unique_ptr<CAnimBlendHierarchy> pAnimationHierarchy = m_pAnimManager->GetCustomAnimBlendHierarchy(&it->Hierarchy);
-        InitializeAnimationHierarchy(pAnimationHierarchy, it->Name, Dgan.Info.Entries);
-        it->pSequencesMemory = (char*)AllocateSequencesMemory(pAnimationHierarchy);
+        std::unique_ptr<CAnimBlendHierarchy> pAnimationHierarchy = m_pAnimManager->GetCustomAnimBlendHierarchy(&Animation.Hierarchy);
+        InitializeAnimationHierarchy(pAnimationHierarchy, Animation.Name, Dgan.Info.Entries);
+        Animation.pSequencesMemory = AllocateSequencesMemory(pAnimationHierarchy);
 
-        pAnimationHierarchy->SetSequences(reinterpret_cast<CAnimBlendSequenceSAInterface*>(it->pSequencesMemory + 4));
+        pAnimationHierarchy->SetSequences(reinterpret_cast<CAnimBlendSequenceSAInterface*>(Animation.pSequencesMemory + 4));
 
-        *(DWORD*)it->pSequencesMemory = ReadSequencesWithDummies(pAnimationHierarchy);
+        *(DWORD*)Animation.pSequencesMemory = ReadSequencesWithDummies(pAnimationHierarchy);
         PreProcessAnimationHierarchy(pAnimationHierarchy);
     }
 }
@@ -87,21 +87,21 @@ void CClientIFP::ReadIFPVersion2(bool bAnp3)
     ReadBuffer<SIFPHeaderV2>(&Header);
 
     m_pVecAnimations->resize(Header.TotalAnimations);
-    for (auto it = m_pVecAnimations->begin(); it != m_pVecAnimations->end(); ++it)
+    for (auto& Animation : m_pIFPAnimations->vecAnimations)
     {
         SAnimationHeaderV2 AnimationNode;
         ReadAnimationHeaderVersion2(AnimationNode, bAnp3);
 
-        it->Name = AnimationNode.Name;
-        it->u32NameHash = HashString(it->Name.ToLower());
+        Animation.Name = AnimationNode.Name;
+        Animation.uiNameHash = HashString(Animation.Name.ToLower());
 
-        auto pAnimationHierarchy = m_pAnimManager->GetCustomAnimBlendHierarchy(&it->Hierarchy);
+        auto pAnimationHierarchy = m_pAnimManager->GetCustomAnimBlendHierarchy(&Animation.Hierarchy);
         InitializeAnimationHierarchy(pAnimationHierarchy, AnimationNode.Name, AnimationNode.TotalObjects);
 
-        it->pSequencesMemory = (char*)AllocateSequencesMemory(pAnimationHierarchy);
-        pAnimationHierarchy->SetSequences(reinterpret_cast<CAnimBlendSequenceSAInterface*>(it->pSequencesMemory + 4));
+        Animation.pSequencesMemory = AllocateSequencesMemory(pAnimationHierarchy);
+        pAnimationHierarchy->SetSequences(reinterpret_cast<CAnimBlendSequenceSAInterface*>(Animation.pSequencesMemory + 4));
 
-        *(DWORD*)it->pSequencesMemory = ReadSequencesWithDummies(pAnimationHierarchy);
+        *(DWORD*)Animation.pSequencesMemory = ReadSequencesWithDummies(pAnimationHierarchy);
         PreProcessAnimationHierarchy(pAnimationHierarchy);
     }
 }
@@ -135,8 +135,8 @@ WORD CClientIFP::ReadSequencesVersion1(std::unique_ptr<CAnimBlendHierarchy>&    
     WORD wUnknownSequences = 0;
     for (size_t SequenceIndex = 0; SequenceIndex < pAnimationHierarchy->GetNumSequences(); SequenceIndex++)
     {
-        SAnim   Anim;
-        int32_t iBoneID = ReadSequenceVersion1(Anim);
+        SAnim        Anim;
+        std::int32_t iBoneID = ReadSequenceVersion1(Anim);
         if (Anim.Frames == 0)
         {
             continue;
@@ -145,7 +145,7 @@ WORD CClientIFP::ReadSequencesVersion1(std::unique_ptr<CAnimBlendHierarchy>&    
         CAnimBlendSequenceSAInterface  AnimationSequence;
         CAnimBlendSequenceSAInterface* pAnimationSequenceInterface = &AnimationSequence;
 
-        bool bUnknownSequence = iBoneID == -1;
+        bool bUnknownSequence = iBoneID == eBoneType::UNKNOWN;
         if (bUnknownSequence)
         {
             size_t UnkownSequenceIndex = m_kcIFPSequences + wUnknownSequences;
@@ -174,7 +174,7 @@ WORD CClientIFP::ReadSequencesVersion2(std::unique_ptr<CAnimBlendHierarchy>&    
         SSequenceHeaderV2 ObjectNode;
         ReadSequenceVersion2(ObjectNode);
 
-        bool bUnknownSequence = ObjectNode.BoneID == -1;
+        bool bUnknownSequence = ObjectNode.BoneID == eBoneType::UNKNOWN;
 
         CAnimBlendSequenceSAInterface  AnimationSequence;
         CAnimBlendSequenceSAInterface* pAnimationSequenceInterface = &AnimationSequence;
@@ -197,7 +197,7 @@ WORD CClientIFP::ReadSequencesVersion2(std::unique_ptr<CAnimBlendHierarchy>&    
     return wUnknownSequences;
 }
 
-int32_t CClientIFP::ReadSequenceVersion1(SAnim& Anim)
+std::int32_t CClientIFP::ReadSequenceVersion1(SAnim& Anim)
 {
     SCpan Cpan;
     ReadBuffer<SCpan>(&Cpan);
@@ -206,50 +206,50 @@ int32_t CClientIFP::ReadSequenceVersion1(SAnim& Anim)
     RoundSize(Anim.Base.Size);
     ReadBytes(&Anim.Name, Anim.Base.Size);
 
-    int32_t iBoneID = -1;
+    std::int32_t iBoneID = eBoneType::UNKNOWN;
     if (Anim.Base.Size == 0x2C)
     {
         iBoneID = Anim.Next;
     }
 
-    std::string BoneName = ConvertStringToMapKey(Anim.Name);
-    iBoneID = GetBoneIDFromName(BoneName);
+    SString strBoneName = ConvertStringToKey(Anim.Name);
+    iBoneID = GetBoneIDFromName(strBoneName);
 
-    std::string strCorrectBoneName = GetCorrectBoneNameFromName(BoneName);
-    strncpy(Anim.Name, strCorrectBoneName.c_str(), strCorrectBoneName.size() + 1);
+    SString strCorrectBoneName = GetCorrectBoneNameFromName(strBoneName);
+    strncpy(Anim.Name, strCorrectBoneName, strCorrectBoneName.size() + 1);
     return iBoneID;
 }
 
 void CClientIFP::ReadSequenceVersion2(SSequenceHeaderV2& ObjectNode)
 {
     ReadBuffer<SSequenceHeaderV2>(&ObjectNode);
-    std::string BoneName = ConvertStringToMapKey(ObjectNode.Name);
-    std::string strCorrectBoneName;
-    if (ObjectNode.BoneID == -1)
+    SString strBoneName = ConvertStringToKey(ObjectNode.Name);
+    SString strCorrectBoneName;
+    if (ObjectNode.BoneID == eBoneType::UNKNOWN)
     {
-        ObjectNode.BoneID = GetBoneIDFromName(BoneName);
-        strCorrectBoneName = GetCorrectBoneNameFromName(BoneName);
+        ObjectNode.BoneID = GetBoneIDFromName(strBoneName);
+        strCorrectBoneName = GetCorrectBoneNameFromName(strBoneName);
     }
     else
     {
         strCorrectBoneName = GetCorrectBoneNameFromID(ObjectNode.BoneID);
         if (strCorrectBoneName.size() == 0)
         {
-            strCorrectBoneName = GetCorrectBoneNameFromName(BoneName);
+            strCorrectBoneName = GetCorrectBoneNameFromName(strBoneName);
         }
     }
 
-    strncpy(ObjectNode.Name, strCorrectBoneName.c_str(), strCorrectBoneName.size() + 1);
+    strncpy(ObjectNode.Name, strCorrectBoneName, strCorrectBoneName.size() + 1);
 }
 
-bool CClientIFP::ReadSequenceKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, int32_t iFrames)
+bool CClientIFP::ReadSequenceKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames)
 {
     size_t iCompressedFrameSize = GetSizeOfCompressedFrame(iFrameType);
     if (iCompressedFrameSize)
     {
-        BYTE* pKeyFrames = m_pAnimManager->AllocateKeyFramesMemory(iCompressedFrameSize * iFrames);
-        pAnimationSequence->SetKeyFrames(iFrames, IsKeyFramesTypeRoot(iFrameType), m_kbAllKeyFramesCompressed, pKeyFrames);
-        ReadKeyFramesAsCompressed(pAnimationSequence, iFrameType, iFrames);
+        BYTE* pKeyFrames = m_pAnimManager->AllocateKeyFramesMemory(iCompressedFrameSize * cFrames);
+        pAnimationSequence->SetKeyFrames(cFrames, IsKeyFramesTypeRoot(iFrameType), m_kbAllKeyFramesCompressed, pKeyFrames);
+        ReadKeyFramesAsCompressed(pAnimationSequence, iFrameType, cFrames);
         return true;
     }
     return false;
@@ -257,8 +257,8 @@ bool CClientIFP::ReadSequenceKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAni
 
 void CClientIFP::ReadHeaderVersion1(SInfo& Info)
 {
-    uint32_t OffsetEOF;
-    ReadBuffer<uint32_t>(&OffsetEOF);
+    std::uint32_t OffsetEOF;
+    ReadBuffer<std::uint32_t>(&OffsetEOF);
     RoundSize(OffsetEOF);
     ReadBytes(&Info, sizeof(SBase));
     RoundSize(Info.Base.Size);
@@ -274,7 +274,7 @@ void CClientIFP::ReadAnimationNameVersion1(SAnimation& IfpAnimation)
     char szAnimationName[24];
     ReadStringNullTerminated(szAnimationName, Name.Base.Size);
     IfpAnimation.Name = szAnimationName;
-    IfpAnimation.u32NameHash = HashString(IfpAnimation.Name.ToLower());
+    IfpAnimation.uiNameHash = HashString(IfpAnimation.Name.ToLower());
 }
 
 void CClientIFP::ReadDgan(SDgan& Dgan)
@@ -295,49 +295,49 @@ CClientIFP::eFrameType CClientIFP::ReadKfrm(void)
 void CClientIFP::ReadAnimationHeaderVersion2(SAnimationHeaderV2& AnimationNode, bool bAnp3)
 {
     ReadStringNullTerminated((char*)&AnimationNode.Name, sizeof(SAnimationHeaderV2::Name));
-    ReadBuffer<int32_t>(&AnimationNode.TotalObjects);
+    ReadBuffer<std::int32_t>(&AnimationNode.TotalObjects);
     if (bAnp3)
     {
-        ReadBuffer<int32_t>(&AnimationNode.FrameSize);
-        ReadBuffer<int32_t>(&AnimationNode.isCompressed);
+        ReadBuffer<std::int32_t>(&AnimationNode.FrameSize);
+        ReadBuffer<std::int32_t>(&AnimationNode.isCompressed);
     }
 }
 
-void CClientIFP::ReadKeyFramesAsCompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, int32_t iFrames)
+void CClientIFP::ReadKeyFramesAsCompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames)
 {
     switch (iFrameType)
     {
         case eFrameType::KRTS:
         {
-            ReadKrtsFramesAsCompressed(pAnimationSequence, iFrames);
+            ReadKrtsFramesAsCompressed(pAnimationSequence, cFrames);
             break;
         }
         case eFrameType::KRT0:
         {
-            ReadKrt0FramesAsCompressed(pAnimationSequence, iFrames);
+            ReadKrt0FramesAsCompressed(pAnimationSequence, cFrames);
             break;
         }
         case eFrameType::KR00:
         {
-            ReadKr00FramesAsCompressed(pAnimationSequence, iFrames);
+            ReadKr00FramesAsCompressed(pAnimationSequence, cFrames);
             break;
         }
         case eFrameType::KR00_COMPRESSED:
         {
-            ReadCompressedFrames<SCompressed_KR00>(pAnimationSequence, iFrames);
+            ReadCompressedFrames<SCompressed_KR00>(pAnimationSequence, cFrames);
             break;
         }
         case eFrameType::KRT0_COMPRESSED:
         {
-            ReadCompressedFrames<SCompressed_KRT0>(pAnimationSequence, iFrames);
+            ReadCompressedFrames<SCompressed_KRT0>(pAnimationSequence, cFrames);
             break;
         }
     }
 }
 
-void CClientIFP::ReadKrtsFramesAsCompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, int32_t TotalFrames)
+void CClientIFP::ReadKrtsFramesAsCompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const std::int32_t& cFrames)
 {
-    for (int32_t FrameIndex = 0; FrameIndex < TotalFrames; FrameIndex++)
+    for (std::int32_t FrameIndex = 0; FrameIndex < cFrames; FrameIndex++)
     {
         SCompressed_KRT0* CompressedKrt0 = static_cast<SCompressed_KRT0*>(pAnimationSequence->GetKeyFrame(FrameIndex, sizeof(SCompressed_KRT0)));
         SKrts             Krts;
@@ -354,9 +354,9 @@ void CClientIFP::ReadKrtsFramesAsCompressed(std::unique_ptr<CAnimBlendSequence>&
     }
 }
 
-void CClientIFP::ReadKrt0FramesAsCompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, int32_t TotalFrames)
+void CClientIFP::ReadKrt0FramesAsCompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const std::int32_t& cFrames)
 {
-    for (int32_t FrameIndex = 0; FrameIndex < TotalFrames; FrameIndex++)
+    for (std::int32_t FrameIndex = 0; FrameIndex < cFrames; FrameIndex++)
     {
         SCompressed_KRT0* CompressedKrt0 = static_cast<SCompressed_KRT0*>(pAnimationSequence->GetKeyFrame(FrameIndex, sizeof(SCompressed_KRT0)));
         SKrt0             Krt0;
@@ -373,9 +373,9 @@ void CClientIFP::ReadKrt0FramesAsCompressed(std::unique_ptr<CAnimBlendSequence>&
     }
 }
 
-void CClientIFP::ReadKr00FramesAsCompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, int32_t TotalFrames)
+void CClientIFP::ReadKr00FramesAsCompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const std::int32_t& cFrames)
 {
-    for (int32_t FrameIndex = 0; FrameIndex < TotalFrames; FrameIndex++)
+    for (std::int32_t FrameIndex = 0; FrameIndex < cFrames; FrameIndex++)
     {
         SCompressed_KR00* CompressedKr00 = static_cast<SCompressed_KR00*>(pAnimationSequence->GetKeyFrame(FrameIndex, sizeof(SCompressed_KR00)));
         SKr00             Kr00;
@@ -417,19 +417,20 @@ size_t CClientIFP::GetSizeOfCompressedFrame(eFrameType iFrameType)
     return 0;
 }
 
-void CClientIFP::InitializeAnimationHierarchy(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, const char* szAnimationName, const int32_t iSequences)
+void CClientIFP::InitializeAnimationHierarchy(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, const SString& strAnimationName,
+                                              const std::int32_t& iSequences)
 {
     pAnimationHierarchy->Initialize();
-    pAnimationHierarchy->SetName(szAnimationName);
+    pAnimationHierarchy->SetName(strAnimationName);
     pAnimationHierarchy->SetNumSequences(iSequences);
     pAnimationHierarchy->SetAnimationBlockID(0);
     pAnimationHierarchy->SetRunningCompressed(m_kbAllKeyFramesCompressed);
 }
 
-void CClientIFP::InitializeAnimationSequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const char* szName, const int32_t iBoneID)
+void CClientIFP::InitializeAnimationSequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const SString& strName, const std::int32_t& iBoneID)
 {
     pAnimationSequence->Initialize();
-    pAnimationSequence->SetName(szName);
+    pAnimationSequence->SetName(strName);
     pAnimationSequence->SetBoneTag(iBoneID);
 }
 
@@ -447,14 +448,14 @@ void CClientIFP::CopySequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& 
 {
     for (size_t SequenceIndex = 0; SequenceIndex < m_kcIFPSequences; SequenceIndex++)
     {
-        std::string BoneName = m_karrstrBoneNames[SequenceIndex];
-        DWORD       BoneID = m_karruBoneIds[SequenceIndex];
+        SString BoneName = m_karrstrBoneNames[SequenceIndex];
+        DWORD   BoneID = m_karruBoneIds[SequenceIndex];
 
         CAnimBlendSequenceSAInterface* pAnimationSequenceInterface = pAnimationHierarchy->GetSequence(SequenceIndex);
         auto                           it = mapOfSequences.find(BoneID);
         if (it != mapOfSequences.end())
         {
-            memcpy(pAnimationSequenceInterface, &it->second, sizeof(CAnimBlendSequenceSAInterface));
+            *pAnimationSequenceInterface = it->second;
         }
         else
         {
@@ -488,13 +489,10 @@ CClientIFP::eFrameType CClientIFP::GetFrameTypeFromFourCC(const char* szFourCC)
     return eFrameType::UNKNOWN_FRAME;
 }
 
-void CClientIFP::InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, std::string& BoneName, DWORD& dwBoneID)
+void CClientIFP::InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const SString& BoneName, const DWORD& dwBoneID)
 {
-    pAnimationSequence->Initialize();
-    pAnimationSequence->SetName(BoneName.c_str());
-    pAnimationSequence->SetBoneTag(dwBoneID);
+    InitializeAnimationSequence(pAnimationSequence, BoneName, dwBoneID);
 
-    bool bKeyFrameCompressed = true;
     bool bRootBone = dwBoneID == eBoneType::NORMAL;
     bool bHasTranslationValues = false;
 
@@ -512,7 +510,7 @@ void CClientIFP::InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence
 
     const size_t FramesDataSizeInBytes = FrameSize * cKeyFrames;
     BYTE*        pKeyFrames = m_pAnimManager->AllocateKeyFramesMemory(FramesDataSizeInBytes);
-    pAnimationSequence->SetKeyFrames(cKeyFrames, bHasTranslationValues, bKeyFrameCompressed, pKeyFrames);
+    pAnimationSequence->SetKeyFrames(cKeyFrames, bHasTranslationValues, m_kbAllKeyFramesCompressed, pKeyFrames);
     CopyDummyKeyFrameByBoneID(pKeyFrames, dwBoneID);
 }
 
@@ -719,17 +717,15 @@ void CClientIFP::CopyDummyKeyFrameByBoneID(BYTE* pKeyFrames, DWORD dwBoneID)
     }
 }
 
-std::string CClientIFP::ConvertStringToMapKey(const char* szString)
+SString CClientIFP::ConvertStringToKey(const SString& strBoneName)
 {
-    std::string ConvertedString(szString);
-    std::transform(ConvertedString.begin(), ConvertedString.end(), ConvertedString.begin(), ::tolower);            // convert the bone name to lowercase
-
-    ConvertedString.erase(std::remove(ConvertedString.begin(), ConvertedString.end(), ' '), ConvertedString.end());            // remove white spaces
-
+    SString ConvertedString = strBoneName.ToLower();
+    // Remove white spaces
+    ConvertedString.erase(std::remove(ConvertedString.begin(), ConvertedString.end(), ' '), ConvertedString.end());
     return ConvertedString;
 }
 
-constexpr void CClientIFP::RoundSize(uint32_t& u32Size)
+constexpr void CClientIFP::RoundSize(std::uint32_t& u32Size)
 {
     if (u32Size & 3)
     {
@@ -753,331 +749,330 @@ constexpr bool CClientIFP::IsKeyFramesTypeRoot(eFrameType iFrameType)
     return true;
 }
 
-int32_t CClientIFP::GetBoneIDFromName(std::string const& BoneName)
+std::int32_t CClientIFP::GetBoneIDFromName(const SString& strBoneName)
 {
-    if (BoneName == "root")
+    if (strBoneName == "root")
         return eBoneType::NORMAL;
-    if (BoneName == "normal")
+    if (strBoneName == "normal")
         return eBoneType::NORMAL;
 
-    if (BoneName == "pelvis")
+    if (strBoneName == "pelvis")
         return eBoneType::PELVIS;
-    if (BoneName == "spine")
+    if (strBoneName == "spine")
         return eBoneType::SPINE;
-    if (BoneName == "spine1")
+    if (strBoneName == "spine1")
         return eBoneType::SPINE1;
-    if (BoneName == "neck")
+    if (strBoneName == "neck")
         return eBoneType::NECK;
-    if (BoneName == "head")
+    if (strBoneName == "head")
         return eBoneType::HEAD;
-    if (BoneName == "jaw")
+    if (strBoneName == "jaw")
         return eBoneType::JAW;
-    if (BoneName == "lbrow")
+    if (strBoneName == "lbrow")
         return eBoneType::L_BROW;
-    if (BoneName == "rbrow")
+    if (strBoneName == "rbrow")
         return eBoneType::R_BROW;
-    if (BoneName == "bip01lclavicle")
+    if (strBoneName == "bip01lclavicle")
         return eBoneType::L_CLAVICLE;
-    if (BoneName == "lupperarm")
+    if (strBoneName == "lupperarm")
         return eBoneType::L_UPPER_ARM;
-    if (BoneName == "lforearm")
+    if (strBoneName == "lforearm")
         return eBoneType::L_FORE_ARM;
-    if (BoneName == "lhand")
+    if (strBoneName == "lhand")
         return eBoneType::L_HAND;
 
-    if (BoneName == "lfingers")
+    if (strBoneName == "lfingers")
         return eBoneType::L_FINGER;
-    if (BoneName == "lfinger")
+    if (strBoneName == "lfinger")
         return eBoneType::L_FINGER;
 
-    if (BoneName == "lfinger01")
+    if (strBoneName == "lfinger01")
         return eBoneType::L_FINGER_01;
-    if (BoneName == "bip01rclavicle")
+    if (strBoneName == "bip01rclavicle")
         return eBoneType::R_CLAVICLE;
-    if (BoneName == "rupperarm")
+    if (strBoneName == "rupperarm")
         return eBoneType::R_UPPER_ARM;
-    if (BoneName == "rforearm")
+    if (strBoneName == "rforearm")
         return eBoneType::R_FORE_ARM;
-    if (BoneName == "rhand")
+    if (strBoneName == "rhand")
         return eBoneType::R_HAND;
 
-    if (BoneName == "rfingers")
+    if (strBoneName == "rfingers")
         return eBoneType::R_FINGER;
-    if (BoneName == "rfinger")
+    if (strBoneName == "rfinger")
         return eBoneType::R_FINGER;
 
-    if (BoneName == "rfinger01")
+    if (strBoneName == "rfinger01")
         return eBoneType::R_FINGER_01;
-    if (BoneName == "lbreast")
+    if (strBoneName == "lbreast")
         return eBoneType::L_BREAST;
-    if (BoneName == "rbreast")
+    if (strBoneName == "rbreast")
         return eBoneType::R_BREAST;
-    if (BoneName == "belly")
+    if (strBoneName == "belly")
         return eBoneType::BELLY;
-    if (BoneName == "lthigh")
+    if (strBoneName == "lthigh")
         return eBoneType::L_THIGH;
-    if (BoneName == "lcalf")
+    if (strBoneName == "lcalf")
         return eBoneType::L_CALF;
-    if (BoneName == "lfoot")
+    if (strBoneName == "lfoot")
         return eBoneType::L_FOOT;
-    if (BoneName == "ltoe0")
+    if (strBoneName == "ltoe0")
         return eBoneType::L_TOE_0;
-    if (BoneName == "rthigh")
+    if (strBoneName == "rthigh")
         return eBoneType::R_THIGH;
-    if (BoneName == "rcalf")
+    if (strBoneName == "rcalf")
         return eBoneType::R_CALF;
-    if (BoneName == "rfoot")
+    if (strBoneName == "rfoot")
         return eBoneType::R_FOOT;
-    if (BoneName == "rtoe0")
+    if (strBoneName == "rtoe0")
         return eBoneType::R_TOE_0;
 
     // for GTA 3
-    if (BoneName == "player")
+    if (strBoneName == "player")
         return eBoneType::NORMAL;
 
-    if (BoneName == "swaist")
+    if (strBoneName == "swaist")
         return eBoneType::PELVIS;
-    if (BoneName == "smid")
+    if (strBoneName == "smid")
         return eBoneType::SPINE;
-    if (BoneName == "storso")
+    if (strBoneName == "storso")
         return eBoneType::SPINE1;
-    if (BoneName == "shead")
+    if (strBoneName == "shead")
         return eBoneType::HEAD;
 
-    if (BoneName == "supperarml")
+    if (strBoneName == "supperarml")
         return eBoneType::L_UPPER_ARM;
-    if (BoneName == "slowerarml")
+    if (strBoneName == "slowerarml")
         return eBoneType::L_FORE_ARM;
-    if (BoneName == "supperarmr")
+    if (strBoneName == "supperarmr")
         return eBoneType::R_UPPER_ARM;
-    if (BoneName == "slowerarmr")
+    if (strBoneName == "slowerarmr")
         return eBoneType::R_FORE_ARM;
 
-    if (BoneName == "srhand")
+    if (strBoneName == "srhand")
         return eBoneType::R_HAND;
-    if (BoneName == "slhand")
+    if (strBoneName == "slhand")
         return eBoneType::L_HAND;
 
-    if (BoneName == "supperlegr")
+    if (strBoneName == "supperlegr")
         return eBoneType::R_THIGH;
-    if (BoneName == "slowerlegr")
+    if (strBoneName == "slowerlegr")
         return eBoneType::R_CALF;
-    if (BoneName == "sfootr")
+    if (strBoneName == "sfootr")
         return eBoneType::R_FOOT;
 
-    if (BoneName == "supperlegl")
+    if (strBoneName == "supperlegl")
         return eBoneType::L_THIGH;
-    if (BoneName == "slowerlegl")
+    if (strBoneName == "slowerlegl")
         return eBoneType::L_CALF;
-    if (BoneName == "sfootl")
+    if (strBoneName == "sfootl")
         return eBoneType::L_FOOT;
 
     return eBoneType::UNKNOWN;
 }
 
-std::string CClientIFP::GetCorrectBoneNameFromID(int32_t& BoneID)
+SString CClientIFP::GetCorrectBoneNameFromID(const std::int32_t& iBoneID)
 {
-    if (BoneID == eBoneType::NORMAL)
+    if (iBoneID == eBoneType::NORMAL)
         return "Normal";
 
-    if (BoneID == eBoneType::PELVIS)
+    if (iBoneID == eBoneType::PELVIS)
         return "Pelvis";
-    if (BoneID == eBoneType::SPINE)
+    if (iBoneID == eBoneType::SPINE)
         return "Spine";
-    if (BoneID == eBoneType::SPINE1)
+    if (iBoneID == eBoneType::SPINE1)
         return "Spine1";
-    if (BoneID == eBoneType::NECK)
+    if (iBoneID == eBoneType::NECK)
         return "Neck";
-    if (BoneID == eBoneType::HEAD)
+    if (iBoneID == eBoneType::HEAD)
         return "Head";
-    if (BoneID == eBoneType::JAW)
+    if (iBoneID == eBoneType::JAW)
         return "Jaw";
-    if (BoneID == eBoneType::L_BROW)
+    if (iBoneID == eBoneType::L_BROW)
         return "L Brow";
-    if (BoneID == eBoneType::R_BROW)
+    if (iBoneID == eBoneType::R_BROW)
         return "R Brow";
-    if (BoneID == eBoneType::L_CLAVICLE)
+    if (iBoneID == eBoneType::L_CLAVICLE)
         return "Bip01 L Clavicle";
-    if (BoneID == eBoneType::L_UPPER_ARM)
+    if (iBoneID == eBoneType::L_UPPER_ARM)
         return "L UpperArm";
-    if (BoneID == eBoneType::L_FORE_ARM)
+    if (iBoneID == eBoneType::L_FORE_ARM)
         return "L ForeArm";
-    if (BoneID == eBoneType::L_HAND)
+    if (iBoneID == eBoneType::L_HAND)
         return "L Hand";
 
-    if (BoneID == eBoneType::L_FINGER)
+    if (iBoneID == eBoneType::L_FINGER)
         return "L Finger";
 
-    if (BoneID == eBoneType::L_FINGER_01)
+    if (iBoneID == eBoneType::L_FINGER_01)
         return "L Finger01";
-    if (BoneID == eBoneType::R_CLAVICLE)
+    if (iBoneID == eBoneType::R_CLAVICLE)
         return "Bip01 R Clavicle";
-    if (BoneID == eBoneType::R_UPPER_ARM)
+    if (iBoneID == eBoneType::R_UPPER_ARM)
         return "R UpperArm";
-    if (BoneID == eBoneType::R_FORE_ARM)
+    if (iBoneID == eBoneType::R_FORE_ARM)
         return "R ForeArm";
-    if (BoneID == eBoneType::R_HAND)
+    if (iBoneID == eBoneType::R_HAND)
         return "R Hand";
 
-    if (BoneID == eBoneType::R_FINGER)
+    if (iBoneID == eBoneType::R_FINGER)
         return "R Finger";
 
-    if (BoneID == eBoneType::R_FINGER_01)
+    if (iBoneID == eBoneType::R_FINGER_01)
         return "R Finger01";
-    if (BoneID == eBoneType::L_BREAST)
+    if (iBoneID == eBoneType::L_BREAST)
         return "L breast";
-    if (BoneID == eBoneType::R_BREAST)
+    if (iBoneID == eBoneType::R_BREAST)
         return "R breast";
-    if (BoneID == eBoneType::BELLY)
+    if (iBoneID == eBoneType::BELLY)
         return "Belly";
-    if (BoneID == eBoneType::L_THIGH)
+    if (iBoneID == eBoneType::L_THIGH)
         return "L Thigh";
-    if (BoneID == eBoneType::L_CALF)
+    if (iBoneID == eBoneType::L_CALF)
         return "L Calf";
-    if (BoneID == eBoneType::L_FOOT)
+    if (iBoneID == eBoneType::L_FOOT)
         return "L Foot";
-    if (BoneID == eBoneType::L_TOE_0)
+    if (iBoneID == eBoneType::L_TOE_0)
         return "L Toe0";
-    if (BoneID == eBoneType::R_THIGH)
+    if (iBoneID == eBoneType::R_THIGH)
         return "R Thigh";
-    if (BoneID == eBoneType::R_CALF)
+    if (iBoneID == eBoneType::R_CALF)
         return "R Calf";
-    if (BoneID == eBoneType::R_FOOT)
+    if (iBoneID == eBoneType::R_FOOT)
         return "R Foot";
-    if (BoneID == eBoneType::R_TOE_0)
+    if (iBoneID == eBoneType::R_TOE_0)
         return "R Toe0";
 
     return "";
 }
 
-std::string CClientIFP::GetCorrectBoneNameFromName(std::string const& BoneName)
+SString CClientIFP::GetCorrectBoneNameFromName(const SString& strBoneName)
 {
-    if (BoneName == "root")
+    if (strBoneName == "root")
         return "Normal";
-    if (BoneName == "normal")
+    if (strBoneName == "normal")
         return "Normal";
 
-    if (BoneName == "pelvis")
+    if (strBoneName == "pelvis")
         return "Pelvis";
-    if (BoneName == "spine")
+    if (strBoneName == "spine")
         return "Spine";
-    if (BoneName == "spine1")
+    if (strBoneName == "spine1")
         return "Spine1";
-    if (BoneName == "neck")
+    if (strBoneName == "neck")
         return "Neck";
-    if (BoneName == "head")
+    if (strBoneName == "head")
         return "Head";
-    if (BoneName == "jaw")
+    if (strBoneName == "jaw")
         return "Jaw";
-    if (BoneName == "lbrow")
+    if (strBoneName == "lbrow")
         return "L Brow";
-    if (BoneName == "rbrow")
+    if (strBoneName == "rbrow")
         return "R Brow";
-    if (BoneName == "bip01lclavicle")
+    if (strBoneName == "bip01lclavicle")
         return "Bip01 L Clavicle";
-    if (BoneName == "lupperarm")
+    if (strBoneName == "lupperarm")
         return "L UpperArm";
-    if (BoneName == "lforearm")
+    if (strBoneName == "lforearm")
         return "L ForeArm";
-    if (BoneName == "lhand")
+    if (strBoneName == "lhand")
         return "L Hand";
 
-    if (BoneName == "lfingers")
+    if (strBoneName == "lfingers")
         return "L Finger";
-    if (BoneName == "lfinger")
+    if (strBoneName == "lfinger")
         return "L Finger";
 
-    if (BoneName == "lfinger01")
+    if (strBoneName == "lfinger01")
         return "L Finger01";
-    if (BoneName == "bip01rclavicle")
+    if (strBoneName == "bip01rclavicle")
         return "Bip01 R Clavicle";
-    if (BoneName == "rupperarm")
+    if (strBoneName == "rupperarm")
         return "R UpperArm";
-    if (BoneName == "rforearm")
+    if (strBoneName == "rforearm")
         return "R ForeArm";
-    if (BoneName == "rhand")
+    if (strBoneName == "rhand")
         return "R Hand";
 
-    if (BoneName == "rfingers")
+    if (strBoneName == "rfingers")
         return "R Finger";
-    if (BoneName == "rfinger")
+    if (strBoneName == "rfinger")
         return "R Finger";
 
-    if (BoneName == "rfinger01")
+    if (strBoneName == "rfinger01")
         return "R Finger01";
-    if (BoneName == "lbreast")
+    if (strBoneName == "lbreast")
         return "L Breast";
-    if (BoneName == "rbreast")
+    if (strBoneName == "rbreast")
         return "R Breast";
-    if (BoneName == "belly")
+    if (strBoneName == "belly")
         return "Belly";
-    if (BoneName == "lthigh")
+    if (strBoneName == "lthigh")
         return "L Thigh";
-    if (BoneName == "lcalf")
+    if (strBoneName == "lcalf")
         return "L Calf";
-    if (BoneName == "lfoot")
+    if (strBoneName == "lfoot")
         return "L Foot";
-    if (BoneName == "ltoe0")
+    if (strBoneName == "ltoe0")
         return "L Toe0";
-    if (BoneName == "rthigh")
+    if (strBoneName == "rthigh")
         return "R Thigh";
-    if (BoneName == "rcalf")
+    if (strBoneName == "rcalf")
         return "R Calf";
-    if (BoneName == "rfoot")
+    if (strBoneName == "rfoot")
         return "R Foot";
-    if (BoneName == "rtoe0")
+    if (strBoneName == "rtoe0")
         return "R Toe0";
 
     // For GTA 3
-    if (BoneName == "player")
+    if (strBoneName == "player")
         return "Normal";
-    if (BoneName == "swaist")
+    if (strBoneName == "swaist")
         return "Pelvis";
-    if (BoneName == "smid")
+    if (strBoneName == "smid")
         return "Spine";
-    if (BoneName == "storso")
+    if (strBoneName == "storso")
         return "Spine1";
-    if (BoneName == "shead")
+    if (strBoneName == "shead")
         return "Head";
 
-    if (BoneName == "supperarml")
+    if (strBoneName == "supperarml")
         return "L UpperArm";
-    if (BoneName == "slowerarml")
+    if (strBoneName == "slowerarml")
         return "L ForeArm";
-    if (BoneName == "supperarmr")
+    if (strBoneName == "supperarmr")
         return "R UpperArm";
-    if (BoneName == "slowerarmr")
+    if (strBoneName == "slowerarmr")
         return "R ForeArm";
 
-    if (BoneName == "srhand")
+    if (strBoneName == "srhand")
         return "R Hand";
-    if (BoneName == "slhand")
+    if (strBoneName == "slhand")
         return "L Hand";
-    if (BoneName == "supperlegr")
+    if (strBoneName == "supperlegr")
         return "R Thigh";
-    if (BoneName == "slowerlegr")
+    if (strBoneName == "slowerlegr")
         return "R Calf";
-    if (BoneName == "sfootr")
+    if (strBoneName == "sfootr")
         return "R Foot";
-    if (BoneName == "supperlegl")
+    if (strBoneName == "supperlegl")
         return "L Thigh";
-    if (BoneName == "slowerlegl")
+    if (strBoneName == "slowerlegl")
         return "L Calf";
-    if (BoneName == "sfootl")
+    if (strBoneName == "sfootl")
         return "L Foot";
 
-    return BoneName;
+    return strBoneName;
 }
 
 CAnimBlendHierarchySAInterface* CClientIFP::GetAnimationHierarchy(const SString& strAnimationName)
 {
-    const unsigned int u32AnimationNameHash = HashString(strAnimationName.ToLower());
-    for (auto it = m_pVecAnimations->begin(); it != m_pVecAnimations->end(); ++it)
+    const unsigned int uiAnimationNameHash = HashString(strAnimationName.ToLower());
+    auto               it = std::find_if(m_pVecAnimations->begin(), m_pVecAnimations->end(),
+                           [&uiAnimationNameHash](SAnimation const& Animation) { return Animation.uiNameHash == uiAnimationNameHash; });
+    if (it != m_pVecAnimations->end())
     {
-        if (u32AnimationNameHash == it->u32NameHash)
-        {
-            return &it->Hierarchy;
-        }
+        return &it->Hierarchy;
     }
     return nullptr;
 }

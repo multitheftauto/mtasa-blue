@@ -1,4 +1,3 @@
-#pragma
 #ifndef __CIFPANIMATIONS_H
 #define __CIFPANIMATIONS_H
 #include "../Client/mods/deathmatch/logic/CClientIFP.h"
@@ -9,9 +8,9 @@ public:
     struct SAnimation
     {
         SString                        Name;
-        unsigned int                   u32NameHash;
+        unsigned int                   uiNameHash;
         CAnimBlendHierarchySAInterface Hierarchy;
-        char*                          pSequencesMemory;
+        BYTE*                          pSequencesMemory;
     };
 
     std::vector<SAnimation> vecAnimations;
