@@ -24,7 +24,7 @@ namespace SharedUtil
 
     void CAsyncTaskScheduler::CollectResults()
     {
-        std::lock_guard<std::mutex>{m_TaskResultsMutex};
+        std::lock_guard<std::mutex> lock{m_TaskResultsMutex};
 
         for (auto& pTask : m_TaskResults)
         {
@@ -58,7 +58,7 @@ namespace SharedUtil
 
             // Put into result queue
             {
-                std::lock_guard<std::mutex>{m_TaskResultsMutex};
+                std::lock_guard<std::mutex> lock{m_TaskResultsMutex};
 
                 m_TaskResults.push_back(std::move(pTask));
             }
