@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:11+0000\n"
-"PO-Revision-Date: 2018-01-05 00:02+0000\n"
+"PO-Revision-Date: 2018-04-05 18:35+0000\n"
 "Last-Translator: HIKC <thenix50@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: uk\n"
@@ -15,9 +15,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"Translators: _Under\n"
+"Translators: _Under; HIKC\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1459713463.0\n"
+"X-POOTLE-MTIME: 1522953334.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -873,7 +873,7 @@ msgstr "Гучність MTA:"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:429
 #: C:\mtasa-blue\Client\core\CSettings.cpp:496
 msgid "Voice volume:"
-msgstr "Ручність мовлення:"
+msgstr "Гучність мовлення:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:430
 #: C:\mtasa-blue\Client\core\CSettings.cpp:554
@@ -909,7 +909,7 @@ msgstr "Заглушити голосовий чат, коли гра згорн
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:539
 msgid "Radio Equalizer"
-msgstr "еквалайзер радіо"
+msgstr "Еквалайзер радіо"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:543
 msgid "Radio Auto-tune"
@@ -1099,7 +1099,7 @@ msgstr "Ефект спеки"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:784
 msgid "Tyre Smoke etc"
-msgstr "Дим шин тощо"
+msgstr "Дим шин, тощо"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:788
 msgid "Render vehicles always in high detail"
