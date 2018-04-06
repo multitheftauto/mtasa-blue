@@ -54,7 +54,7 @@ bool CIFPEngine::EngineReplaceAnimation(CClientEntity* pEntity, const SString& s
 }
 
 bool CIFPEngine::EngineRestoreAnimation(CClientEntity* pEntity, const SString& strInternalBlockName, const SString& strInternalAnimName,
-                                        eRestoreAnimation eRestoreType)
+ const eRestoreAnimation& eRestoreType)
 {
     if (IS_PED(pEntity))
     {

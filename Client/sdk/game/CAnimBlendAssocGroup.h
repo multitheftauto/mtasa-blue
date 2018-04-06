@@ -28,6 +28,7 @@ public:
     virtual int                               GetNumAnimations(void) = 0;
     virtual CAnimBlock*                       GetAnimBlock(void) = 0;
     virtual CAnimBlendStaticAssociation*      GetAnimation(unsigned int ID) = 0;
+    virtual AssocGroupId                      GetGroupID(void) = 0;
     virtual void                              CreateAssociations(const char* szBlockName) = 0;
     virtual bool                              IsLoaded(void) = 0;
     virtual void                              SetIDOffset(int iOffset) = 0;

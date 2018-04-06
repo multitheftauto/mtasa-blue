@@ -122,6 +122,8 @@ public:
     // MTA members, but use this strictly for custom animations only
     virtual std::unique_ptr<CAnimBlendHierarchy> GetCustomAnimBlendHierarchy(CAnimBlendHierarchySAInterface *pInterface) = 0;
     virtual std::unique_ptr<CAnimBlendSequence>  GetCustomAnimBlendSequence(CAnimBlendSequenceSAInterface *pInterface) = 0;
+    virtual std::unique_ptr<CAnimBlendHierarchy> GetCustomAnimBlendHierarchy(void) = 0;
+    virtual std::unique_ptr<CAnimBlendSequence>  GetCustomAnimBlendSequence(void) = 0;
 
     virtual bool           isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface *pInterface) = 0;
     virtual const SString &GetGateWayBlockName(void) = 0;

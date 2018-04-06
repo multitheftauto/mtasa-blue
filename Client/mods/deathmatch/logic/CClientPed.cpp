@@ -9,7 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-
+#include "game/CAnimBlendHierarchy.h"
 using std::list;
 using std::vector;
 

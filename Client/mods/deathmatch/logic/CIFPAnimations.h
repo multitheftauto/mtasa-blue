@@ -1,6 +1,6 @@
 #ifndef __CIFPANIMATIONS_H
 #define __CIFPANIMATIONS_H
-#include "../Client/mods/deathmatch/logic/CClientIFP.h"
+#include "CClientIFP.h"
 
 class CIFPAnimations
 {
@@ -9,7 +9,7 @@ public:
     {
         SString                        Name;
         unsigned int                   uiNameHash;
-        CAnimBlendHierarchySAInterface Hierarchy;
+        std::unique_ptr<CAnimBlendHierarchy> pHierarchy;
         BYTE*                          pSequencesMemory;
     };
 

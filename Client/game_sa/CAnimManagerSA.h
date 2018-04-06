@@ -159,6 +159,10 @@ public:
     std::unique_ptr<CAnimBlendHierarchy> GetCustomAnimBlendHierarchy(CAnimBlendHierarchySAInterface *pInterface);
     std::unique_ptr<CAnimBlendSequence>  GetCustomAnimBlendSequence(CAnimBlendSequenceSAInterface *pInterface);
 
+    // Warning! These two functions will create a new interface ( dynamic memory memory allocation ) 
+    std::unique_ptr<CAnimBlendHierarchy> GetCustomAnimBlendHierarchy(void);
+    std::unique_ptr<CAnimBlendSequence>  GetCustomAnimBlendSequence(void);
+
     bool           isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface *pInterface);
     const SString &GetGateWayBlockName(void) { return m_kGateWayBlockName; };
     const SString &GetGateWayAnimationName(void) { return m_kGateWayAnimationName; };

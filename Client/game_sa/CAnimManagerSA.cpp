@@ -764,6 +764,18 @@ std::unique_ptr<CAnimBlendSequence> CAnimManagerSA::GetCustomAnimBlendSequence(C
     return std::make_unique<CAnimBlendSequenceSA>(pInterface);
 }
 
+std::unique_ptr<CAnimBlendHierarchy> CAnimManagerSA::GetCustomAnimBlendHierarchy(void)
+{
+    auto pInterface = new CAnimBlendHierarchySAInterface;
+    return std::make_unique<CAnimBlendHierarchySA>(pInterface);
+}
+
+std::unique_ptr<CAnimBlendSequence> CAnimManagerSA::GetCustomAnimBlendSequence(void)
+{
+    auto pInterface = new CAnimBlendSequenceSAInterface;
+    return std::make_unique<CAnimBlendSequenceSA>(pInterface);
+}
+
 bool CAnimManagerSA::isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface* pInterface)
 {
     return pGame->GetKeyGen()->GetUppercaseKey(m_kGateWayAnimationName.c_str()) == pInterface->iHashKey;

@@ -1,5 +1,6 @@
 #include <StdInc.h>
-#include "../game_sa/CAnimBlendSequenceSA.h"
+#include "game/CAnimBlendSequence.h"
+#include "game/CAnimBlendHierarchy.h"
 
 CIFPAnimations::~CIFPAnimations(void)
 {
@@ -11,11 +12,10 @@ void CIFPAnimations::DeleteAnimations(void)
     CAnimManager* pAnimManager = g_pGame->GetAnimManager();
     for (auto& Animation : vecAnimations)
     {
-        auto pAnimationHierarchy = pAnimManager->GetCustomAnimBlendHierarchy(&Animation.Hierarchy);
-        for (unsigned short SequenceIndex = 0; SequenceIndex < pAnimationHierarchy->GetNumSequences(); SequenceIndex++)
+        for (unsigned short SequenceIndex = 0; SequenceIndex < Animation.pHierarchy->GetNumSequences(); SequenceIndex++)
         {
-            pAnimManager->RemoveFromUncompressedCache(pAnimationHierarchy->GetInterface());
-            auto  pAnimationSequence = pAnimManager->GetCustomAnimBlendSequence(pAnimationHierarchy->GetSequence(SequenceIndex));
+            pAnimManager->RemoveFromUncompressedCache(Animation.pHierarchy->GetInterface());
+            auto  pAnimationSequence = pAnimManager->GetCustomAnimBlendSequence(Animation.pHierarchy->GetSequence(SequenceIndex));
             void* pKeyFrames = pAnimationSequence->GetKeyFrames();
             if (!pAnimationSequence->IsBigChunkForAllSequences())
             {
@@ -33,5 +33,6 @@ void CIFPAnimations::DeleteAnimations(void)
             }
         }
         delete Animation.pSequencesMemory;
+        delete Animation.pHierarchy->GetInterface();
     }
 }

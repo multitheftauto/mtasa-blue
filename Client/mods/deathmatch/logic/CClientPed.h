@@ -19,7 +19,6 @@ class CClientPed;
 
 #include <multiplayer/CMultiplayer.h>
 #include "CClientPad.h"
-#include <../game_sa/CAnimBlendHierarchySA.h>
 #include <memory>
 
 class CClientCamera;

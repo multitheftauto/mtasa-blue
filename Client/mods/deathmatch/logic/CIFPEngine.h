@@ -1,4 +1,3 @@
-#pragma
 #ifndef __CIFPENGINE_H
 #define __CIFPENGINE_H
 
@@ -16,7 +15,7 @@ public:
     static bool                        EngineReplaceAnimation(CClientEntity* pEntity, const SString& strInternalBlockName, const SString& strInternalAnimName,
                                                               const SString& strCustomBlockName, const SString& strCustomAnimName);
     static bool                        EngineRestoreAnimation(CClientEntity* pEntity, const SString& strInternalBlockName, const SString& strInternalAnimName,
-                                                              eRestoreAnimation RestoreType);
+                                                              const eRestoreAnimation& eRestoreType);
 };
 
 #endif

@@ -11,9 +11,9 @@
 
 #include "StdInc.h"
 #include <net/SyncStructures.h>
-#include <../Client/game_sa/CAnimBlendAssocGroupSA.h>
-#include <../Client/game_sa/CAnimBlendAssociationSA.h>
-#include <../game_sa/CAnimBlendHierarchySA.h>
+#include "game/CAnimBlendAssocGroup.h"
+#include "game/CAnimBlendAssociation.h"
+#include "game/CAnimBlendHierarchy.h"
 
 SString StringZeroPadout(const SString& strInput, uint uiPadoutSize)
 {
@@ -3961,11 +3961,12 @@ CAnimBlendAssociationSAInterface* CClientGame::AddAnimationAndSyncHandler(RpClum
 
 bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendStaticAssociationSAInterface* pOutAnimStaticAssocInterface,
                                                  CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump,
-                                                 CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, AnimationId animID)
+                                                 CAnimBlendAssocGroupSAInterface* pAnimAssocGroupInterface, AnimationId animID)
 {
     bool          isCustomAnimationToPlay = false;
     CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
-    auto          pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(pAnimAssocGroup->groupID, animID);
+    auto          pAnimAssocGroup   = pAnimationManager->GetAnimBlendAssocGroup (pAnimAssocGroupInterface);
+    auto          pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(pAnimAssocGroup->GetGroupID(), animID);
     auto          pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierachyInterface();
     auto          pOutAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(pOutAnimStaticAssocInterface);
     CClientPed*   pClientPed = GetClientPedByClump(*pClump);
