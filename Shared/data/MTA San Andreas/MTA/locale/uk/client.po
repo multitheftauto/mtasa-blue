@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:11+0000\n"
-"PO-Revision-Date: 2018-04-05 18:35+0000\n"
+"PO-Revision-Date: 2018-04-07 15:12+0000\n"
 "Last-Translator: HIKC <thenix50@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: uk\n"
@@ -15,9 +15,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"Translators: _Under; HIKC\n"
+"Translators: HIKC; _Under; d9.error\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1522953334.0\n"
+"X-POOTLE-MTIME: 1523113949.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -32,7 +32,7 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:31
 msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "НЕ ВВОДЬТЕ КОНФІДЕЦІЙНИХ ДАНИХ, ЩОБ ЗАХИСТИТИ ЇХ ВІД КРАДІЖКИ"
+msgstr "НІКОЛИ НЕ ВВОДЬТЕ КОНФІДЕНЦІЙНІ ДАНІ, ЩОБ ЗАХИСТИТИ ЇХ ВІД КРАДІЖКИ"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:43
 msgid "Remember decision"
@@ -45,7 +45,7 @@ msgstr "Дозволити"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:54
 msgid "Deny"
-msgstr "Заборона"
+msgstr "Заперечення"
 
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:36
 msgid "***[ COMMAND HELP ]***\n"
@@ -398,7 +398,7 @@ msgstr "показати графік продуктивності"
 
 #: C:\mtasa-blue\Client\core\CCore.h:55
 msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
-msgstr ""
+msgstr "Copyright (C) 2003 - 2018 Multi Theft Auto"
 
 #: C:\mtasa-blue\Client\core\CCredits.cpp:32
 msgid "Programming"
@@ -434,7 +434,7 @@ msgid ""
 "The skin you selected could not be loaded, and the default skin also could "
 "not be loaded, please reinstall MTA."
 msgstr ""
-"Обрана вами графічна тема не може бути завантажена, тема за замовчуванням "
+"Обрана вами графічна тема не може бути завантажена, тема за промовчанням "
 "також не може бути завантажена, перевстановіть MTA для вирішення проблеми."
 
 #: C:\mtasa-blue\Client\core\CJoystickManager.cpp:1628
@@ -479,11 +479,11 @@ msgstr "Праворуч"
 
 #: C:\mtasa-blue\Client\core\CKeyBinds.cpp:194
 msgid "Zoom in"
-msgstr "Збільшити"
+msgstr "Збільшити масштаб"
 
 #: C:\mtasa-blue\Client\core\CKeyBinds.cpp:195
 msgid "Zoom out"
-msgstr "Зменшити"
+msgstr "Зменшити масштаб"
 
 #: C:\mtasa-blue\Client\core\CKeyBinds.cpp:196
 msgid "Enter/Exit"
@@ -524,7 +524,7 @@ msgstr "Транспорт: Вогонь"
 
 #: C:\mtasa-blue\Client\core\CKeyBinds.cpp:205
 msgid "Vehicle secondary fire"
-msgstr "Транспорт: Огонь (2)"
+msgstr "Транспорт: Вогонь (2)"
 
 #: C:\mtasa-blue\Client\core\CKeyBinds.cpp:206
 msgid "Vehicle left"
@@ -634,6 +634,8 @@ msgid ""
 "You are using a feature-branch build! This is a test build only which cannot"
 " be used to connect to public servers!"
 msgstr ""
+"Ви використовуєте функціональну структуру! Це лише тестова побудова, яка не "
+"може бути використана для підключення до загальнодоступних серверів!"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
 msgid ""
@@ -693,7 +695,7 @@ msgstr "Звук"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:123
 msgid "Binds"
-msgstr "Клавіша"
+msgstr "Клавіші"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:124
 msgid "Controls"
@@ -800,7 +802,7 @@ msgstr "Насиченість"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:292
 msgid "Use the 'Binds' tab for joypad buttons."
-msgstr "Перейдіть на вкладку 'Клавіші' для налаштування джойстика"
+msgstr "Перейдіть в вкладку 'Клавіші' для налаштування джойстика"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:335
 msgid "Left Stick"
@@ -1265,20 +1267,20 @@ msgstr "Швидко"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1023
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2943
 msgid "Normal"
-msgstr ""
+msgstr "Середнє"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1024
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2944
 msgid "Above normal"
-msgstr ""
+msgstr "Вище норми"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1060
 msgid "Min"
-msgstr "Мін"
+msgstr "Мін."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1073
 msgid "Max"
-msgstr "Макс"
+msgstr "Макс."
 
 #. Windows 8 compatibility
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1080
@@ -1296,11 +1298,11 @@ msgstr "Виправлення миші"
 #. Cache path info
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1108
 msgid "Client resource files:"
-msgstr ""
+msgstr "Шлях завантаження ресурсів:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1112
 msgid "Show in Explorer"
-msgstr ""
+msgstr "Відкрити теку"
 
 #. Auto updater section label
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1127
@@ -1385,28 +1387,29 @@ msgstr "Завантажити"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1954
 msgid "Colors"
-msgstr ""
+msgstr "Кольори"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1955
 msgid "Layout"
-msgstr ""
+msgstr "Макет чату"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1956
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2217
 msgid "Options"
-msgstr ""
+msgstr "Параметри"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1962
 msgid "Chat Background"
-msgstr ""
+msgstr "Тло чату"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1963
 msgid "Chat Text"
 msgstr "Текст чату"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1964
+#, fuzzy
 msgid "Input Background"
-msgstr ""
+msgstr "Тло введення"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1965
 msgid "Input Text"
@@ -1426,7 +1429,7 @@ msgstr "Ширина:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1993
 msgid "Size"
-msgstr ""
+msgstr "Величина"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2042
 msgid "after"
@@ -1442,7 +1445,7 @@ msgstr "сек"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2047
 msgid "Fading"
-msgstr ""
+msgstr "Згасання"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2053
 msgid "Fade out old lines"
@@ -1450,11 +1453,11 @@ msgstr "Згасання повідомлень"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2093
 msgid "Horizontal:"
-msgstr ""
+msgstr "Горизонтально:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2094
 msgid "Vertical:"
-msgstr ""
+msgstr "Вертикально:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2095
 msgid "Text-Align:"
@@ -1469,25 +1472,27 @@ msgid "Y-Offset:"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2103
+#, fuzzy
 msgid "Position"
-msgstr ""
+msgstr "Позиція"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2118
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2132
+#, fuzzy
 msgid "Center"
-msgstr ""
+msgstr "Центер"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2131
 msgid "Top"
-msgstr ""
+msgstr "Верх"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2133
 msgid "Bottom"
-msgstr ""
+msgstr "Низ"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2181
 msgid "Font"
-msgstr ""
+msgstr "Шрифт"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2223
 msgid "Hide background when not typing"
@@ -1503,7 +1508,7 @@ msgstr "Дозволити серверу кліпати вікном додат
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2238
 msgid "Allow tray balloon notifications"
-msgstr ""
+msgstr "Показувати повідомлення в області повідомлень"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2243
 msgid "Chat text black/white outline"
@@ -1559,11 +1564,12 @@ msgstr "Прозорість:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:3502
 msgid "Color"
-msgstr ""
+msgstr "Колір"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:3579
+#, fuzzy
 msgid "Preview"
-msgstr ""
+msgstr "Попередній перегляд "
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:3888
 msgid "Please disconnect before changing language"
@@ -1649,7 +1655,7 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4358
 msgid "Switch on to use only one connection when downloading."
-msgstr "Використовувати однопточне під'єднання при завантаженні файлів."
+msgstr "Використовувати одноточне під'єднання при завантаженні файлів."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4360
 msgid "Tag network packets to help ISPs identify MTA traffic."
@@ -1706,7 +1712,7 @@ msgstr "Зайнято"
 
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:637
 msgid "Can't check for updates right now"
-msgstr "Неможливо перевірити оновлення в даний момент"
+msgstr "Неможливо перевірити оновлення на даний момент"
 
 # будь ласка, поправте, якщо щось не так
 #: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1579
@@ -1922,11 +1928,11 @@ msgstr "Локальна мережа"
 
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:141
 msgid "Favourites"
-msgstr "Уподобання"
+msgstr "Вподобане"
 
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:142
 msgid "Recent"
-msgstr "Останні"
+msgstr "Нещодавні"
 
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:197
 msgid ""
@@ -1947,12 +1953,12 @@ msgstr "ДОПОМОГА"
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:220
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:266
 msgid "Refresh"
-msgstr "ОНОВИТИ"
+msgstr "Оновити"
 
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:221
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:267
 msgid "Add Favorite"
-msgstr "Додати в обране"
+msgstr "Вподобати"
 
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:222
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:268
@@ -1979,7 +1985,7 @@ msgstr "Пошук по гравцям"
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:228
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:272
 msgid "Start search"
-msgstr "Почати пошук"
+msgstr "Здійснити пошук"
 
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:314
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1642
@@ -2030,7 +2036,7 @@ msgstr "Заповнені"
 
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:508
 msgid "Locked"
-msgstr "Під паролем"
+msgstr "Запаролені"
 
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:520
 msgid "Offline"
@@ -2194,7 +2200,7 @@ msgstr[2] "серверах"
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:249
 #, c-format
 msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "Получение списка серверов (%lu мс прошло)"
+msgstr "Отримання списку серверів (%lu мс пройшло)"
 
 #. Abort
 #: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:263
@@ -2335,7 +2341,7 @@ msgstr "Вийти"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:51
 msgid "MTA: San Andreas has encountered a problem"
-msgstr "MTA: San Andreas виявила помилку"
+msgstr "MTA: San Andreas виявив помилку"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:52
 msgid "Crash information"
@@ -2460,7 +2466,7 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:99
 msgid "I have already installed an anti-virus"
-msgstr "В мене вже інсталював антивірус"
+msgstr "Я вже інсталював антивірус"
 
 #: C:\mtasa-blue\Client\loader\Dialogs.cpp:100
 msgid ""
@@ -2770,13 +2776,14 @@ msgid ""
 "\n"
 "Please restart your PC.\n"
 msgstr ""
-"MTA:SA не працює в 'Безпечний режим'.\n"
+"MTA:SA не працює в 'Безпечному режимі'.\n"
 "\n"
 "Перезапустіть ваш комп'ютер.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1103
+#, fuzzy
 msgid "Fix configuration issue"
-msgstr ""
+msgstr "Виправити проблему конфігурації"
 
 #. Try to relaunch as admin if not done so already
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1154
@@ -2846,7 +2853,7 @@ msgstr "GTA:SA не зміг додати апґрейд транспортно�
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1960
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
-msgstr ""
+msgstr "GTA:SA знайшов помилки в файлі '%s"
 
 #. Ask user to confirm
 #: C:\mtasa-blue\Client\loader\Utils.cpp:2035
@@ -3179,7 +3186,7 @@ msgstr "Від'єднання: не вдалася перевірка серій
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:534
 #, c-format
 msgid "Disconnected: Connection desync %s"
-msgstr "Від'єднання: під'єднання десинхронизовано %s"
+msgstr "Від'єднання: під'єднання десинхронізовано %s"
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:542
 #, c-format
@@ -3227,9 +3234,9 @@ msgstr[2] "%d хвилини"
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "секунда"
+msgstr[1] "секунд"
+msgstr[2] "секунди"
 
 #. Display the error
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:598
@@ -3304,7 +3311,7 @@ msgstr "Помилка з'єднання"
 #. Couldn't create render target for CPostEffects
 #: C:\mtasa-blue\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1427
 msgid "Problem with graphics driver"
-msgstr ""
+msgstr "Проблема з графічним драйвером"
 
 #: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:89
 msgid "Multi Theft Auto has not been installed properly, please reinstall."

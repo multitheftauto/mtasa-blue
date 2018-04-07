@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:23\n"
-"PO-Revision-Date: 2018-04-04 20:36+0000\n"
+"PO-Revision-Date: 2018-04-07 14:13+0000\n"
 "Last-Translator: HIKC <thenix50@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: uk\n"
@@ -12,19 +12,18 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"Translators: _Under; HIKC\n"
+"Translators: HIKC; _Under; d9.error\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1522874187.0\n"
+"X-POOTLE-MTIME: 1523110426.0\n"
 
 #. GET_XPVISTA_PLEASE
 #: ../Shared/installer/nightly.nsi:183
-#, fuzzy
 msgid ""
 "The version of MTA:SA you've downloaded does not support Windows XP or "
 "Vista.  Please download an alternative version from www.mtasa.com."
 msgstr ""
 "Версія МТА:SA, які ви завантажили, не підтримує Windows XP або Vista. Будь "
-"ласка, скачайте альтернативну версію www.mtasa.com."
+"ласка, завантажте альтернативну версію www.mtasa.com."
 
 #. GET_MASTER_PLEASE
 #: ../Shared/installer/nightly.nsi:184
@@ -32,6 +31,8 @@ msgid ""
 "The version of MTA:SA is designed for old versions of Windows.  Please "
 "download the newest version from www.mtasa.com."
 msgstr ""
+"Версія МТА:SA призначена для старих версій Windows. Будь ласка, завантажте "
+"нову версію з www.mtasa.com."
 
 #. WELCOME_TEXT
 #: ../Shared/installer/nightly.nsi:188
@@ -101,7 +102,7 @@ msgstr "Додати в теку \"Ігри\" (Якщо у вас є)."
 #. DESC_DirectX
 #: ../Shared/installer/nightly.nsi:198
 msgid "Install or update DirectX (if required)."
-msgstr ""
+msgstr "Інсталювати або оновити DirectX (якщо потрібно)"
 
 #. DESC_Section1
 #: ../Shared/installer/nightly.nsi:199
@@ -209,7 +210,7 @@ msgstr "Додати в теку \"Ігри\""
 #. INST_DIRECTX
 #: ../Shared/installer/nightly.nsi:428
 msgid "Install DirectX"
-msgstr ""
+msgstr "Інсталяція DirectX"
 
 #. INST_SEC_CLIENT
 #: ../Shared/installer/nightly.nsi:462
@@ -317,7 +318,7 @@ msgid ""
 "screenshots you have created will be lost."
 msgstr ""
 "Бажаєте зберегти ваші дані (ресурси, знімки та налаштування сервера)? Якщо "
-"ні, то всі ваші ресурси, налаштування і знімкі буде втрачено."
+"ні, то всі ваші ресурси, налаштування і знімки буде втрачено."
 
 #. MSGBOX_PATCH_FAIL1
 #: ../Shared/installer/nightly.nsi:1144
