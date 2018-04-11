@@ -5,13 +5,10 @@
 #include <../game_sa/CAnimBlendAssociationSA.h>
 #include <../game_sa/CAnimBlendAssocGroupSA.h>
 
-DWORD FUNC_NEW_OPERATOR = 0x082119A;
-DWORD FUNC_CAnimBlendAssociation_Constructor = 0x04CF080;
 DWORD FUNC_CAnimBlendAssociation__ReferenceAnimBlock = 0x4CEA50;
 DWORD FUNC_UncompressAnimation = 0x4D41C0;
 DWORD FUNC_CAnimBlendAssociation__CAnimBlendAssociation_hierarchy = 0x4CEFC0;
 
-DWORD RETURN_CAnimBlendAssoc_destructor = 0x4CECF6;
 DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation_NORMALFLOW = 0x4CE151;
 DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation = 0x4CE187;
 DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation_ERROR = 0x4CE199;
@@ -19,19 +16,17 @@ DWORD RETURN_CAnimManager_AddAnimation = 0x4D3AB1;
 DWORD RETURN_CAnimManager_AddAnimationAndSync = 0x4D3B41;
 DWORD RETURN_CAnimManager_BlendAnimation_Hierarchy = 0x4D4577;
 
-CAnimBlendAssocDestructorHandler* m_pCAnimBlendAssocDestructorHandler = nullptr;
+auto CAnimBlendStaticAssociation_FreeSequenceArray = (hCAnimBlendStaticAssociation_FreeSequenceArray)0x4ce9a0;
+auto UncompressAnimation = (hUncompressAnimation)0x4d41c0;
+auto CAnimBlendAssociation_NewOperator = (hCAnimBlendAssociation_NewOperator)0x082119A;
+auto CAnimBlendAssociation_Constructor_staticAssocByReference = (hCAnimBlendAssociation_Constructor_staticAssocByReference)0x4CF080;
+
 AddAnimationHandler*              m_pAddAnimationHandler = nullptr;
 AddAnimationAndSyncHandler*       m_pAddAnimationAndSyncHandler = nullptr;
 AssocGroupCopyAnimationHandler*   m_pAssocGroupCopyAnimationHandler = nullptr;
 BlendAnimationHierarchyHandler*   m_pBlendAnimationHierarchyHandler = nullptr;
 
 int _cdecl OnCAnimBlendAssocGroupCopyAnimation(AssocGroupId animGroup, int iAnimId);
-auto CAnimBlendStaticAssociation_FreeSequenceArray = (hCAnimBlendStaticAssociation_FreeSequenceArray)0x4ce9a0;
-
-void CMultiplayerSA::SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler)
-{
-    m_pCAnimBlendAssocDestructorHandler = pHandler;
-}
 
 void CMultiplayerSA::SetAddAnimationHandler(AddAnimationHandler* pHandler)
 {
@@ -53,42 +48,22 @@ void CMultiplayerSA::SetBlendAnimationHierarchyHandler(BlendAnimationHierarchyHa
     m_pBlendAnimationHierarchyHandler = pHandler;
 }
 
-void __cdecl CAnimBlendAssoc_destructor(CAnimBlendAssociationSAInterface* pThis)
+CAnimBlendAssociationSAInterface * __cdecl CAnimBlendAssocGroup_CopyAnimation ( RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroupInterface, AnimationId animID )
 {
-    if (m_pCAnimBlendAssocDestructorHandler)
-    {
-        m_pCAnimBlendAssocDestructorHandler(pThis);
-    }
-}
+	auto pAnimAssociationInterface = reinterpret_cast < CAnimBlendAssociationSAInterface * > (CAnimBlendAssociation_NewOperator ( sizeof (CAnimBlendAssociationSAInterface)));
+	if (pAnimAssociationInterface)
+	{
+		CAnimBlendStaticAssociationSAInterface staticAnimAssociationInterface;
 
-void _declspec(naked) HOOK_CAnimBlendAssoc_destructor()
-{
-    _asm
-    {
-        push    ecx
+		m_pAssocGroupCopyAnimationHandler(&staticAnimAssociationInterface, pAnimAssociationInterface, pClump, pAnimAssocGroupInterface, animID);
 
-        push    ecx
-        call    CAnimBlendAssoc_destructor
-        add     esp, 0x4
+		UncompressAnimation(staticAnimAssociationInterface.pAnimHeirarchy);
 
-        pop     ecx
+		CAnimBlendAssociation_Constructor_staticAssocByReference(pAnimAssociationInterface, staticAnimAssociationInterface);
 
-        push    esi
-        mov     esi, ecx
-        mov     eax, [esi+10h]
-        jmp     RETURN_CAnimBlendAssoc_destructor
-    }
-}
-
-CAnimBlendStaticAssociationSAInterface* __cdecl AllocateStaticAssociationMemory(void)
-{
-    return new CAnimBlendStaticAssociationSAInterface;
-}
-
-void __cdecl DeleteStaticAssociation(CAnimBlendStaticAssociationSAInterface* pAnimStaticAssoc)
-{
-    CAnimBlendStaticAssociation_FreeSequenceArray(pAnimStaticAssoc);
-    delete pAnimStaticAssoc;
+		CAnimBlendStaticAssociation_FreeSequenceArray(&staticAnimAssociationInterface);
+	}
+	return pAnimAssociationInterface;
 }
 
 void _declspec(naked) HOOK_CAnimBlendAssocGroup_CopyAnimation()
@@ -104,88 +79,21 @@ void _declspec(naked) HOOK_CAnimBlendAssocGroup_CopyAnimation()
         {
             popad
 
-            push    ecx
-            push    ebp
-            mov     ebp, esp
-            sub esp, 4
+			push    esi
 
-            push    eax
-            push    ecx
-            push    edi
+            push    eax // animID
+            push    ecx // pAnimAssocGroupInterface
+            push    edi // pClump
+			call    CAnimBlendAssocGroup_CopyAnimation
+			add     esp, 0Ch
 
-            // create CAnimBlendAssociation
-            push    3Ch
-            call    FUNC_NEW_OPERATOR
-            add     esp, 4
-
-            mov     [ebp-4], eax
-            push    eax
-
-            // Allocate memory for our new static association
-            call    AllocateStaticAssociationMemory
-            mov     edi, eax
-
-            // push the static association
-            push    edi
-            call    m_pAssocGroupCopyAnimationHandler //CAnimBlendAssocGroup_CopyAnimation
-            add     esp, 14h
-
-            mov     ecx, [ebp-4]
-
-            add     esp, 4 // remove space for local var
-            mov     esp, ebp
-            pop     ebp
-
-            // save eax and ecx for later to check whether current animation is custom or not
-            // after calling FUNC_CAnimBlendAssociation_Constructor function
-            push    eax // isCustomAnimation ( bool )
-            push    ecx // pIFPAnimations
-
-            // get "this" from stack that we pushed first
-            mov     ecx, [esp+8]
-            mov     ecx, [ecx+4]
-            sub     eax, edx
-            push    esi
-
-            // copy the static association to esi
-            mov     esi, edi
-            test    esi, esi
-            jz      ERROR_CopyAnimation
-            mov     eax, [esi+10h]
-            push    eax
-            mov     eax, 04D41C0h
-            call    eax
-            add     esp, 4
-            mov     eax, [esp+4] // pAnimAssociation
-            mov     [esp+20h], eax
             test    eax, eax
-            mov     [esp+18h], 0
             jz      ERROR_CopyAnimation
-            push    esi
-            mov     ecx, eax
-            call    FUNC_CAnimBlendAssociation_Constructor
-            mov     edi, eax
 
-            // Delete our static association, since we no longer need it
-            push    esi
-            call    DeleteStaticAssociation
-            add     esp, 4
-
-            mov     ecx, [esp+4] // pIFPAnimations
-            mov     eax, [esp+8] // isCustomAnimation
-
-            // put CAnimBlendAssociation in eax
-            mov     eax, edi
-            add     esp, 0Ch
             jmp     RETURN_CAnimBlendAssocGroup_CopyAnimation
 
-            ERROR_CopyAnimation:
-            add     esp, 0Ch
-            // Delete our static association
-            push    edi
-            call    DeleteStaticAssociation
-            add     esp, 4
-            jmp    RETURN_CAnimBlendAssocGroup_CopyAnimation_ERROR
+			ERROR_CopyAnimation:
+			jmp		RETURN_CAnimBlendAssocGroup_CopyAnimation_ERROR
         }
     }
 

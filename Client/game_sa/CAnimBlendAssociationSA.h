@@ -35,6 +35,9 @@ public:
     short                           sAnimID;                        // 44
     short                           sFlags;                         // or1 = started?, or64 = referenced?   // 46
     DWORD*                          pCallback;                      // 48
+    DWORD*                          pCallbackFunc;                  // 52
+    DWORD*                          pCallbackData;                  // 56
+                                                                    // Total: 60 bytes
 };
 
 class CAnimBlendAssociationSA : public CAnimBlendAssociation

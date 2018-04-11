@@ -13,6 +13,7 @@
 
 namespace
 {
+	CAnimBlendAssocDestructorHandler* m_pCAnimBlendAssocDestructorHandler = nullptr;
     GameObjectDestructHandler*     pGameObjectDestructHandler = NULL;
     GameVehicleDestructHandler*    pGameVehicleDestructHandler = NULL;
     GamePlayerDestructHandler*     pGamePlayerDestructHandler = NULL;
@@ -140,6 +141,34 @@ namespace
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 //
+void __cdecl CAnimBlendAssoc_destructor(CAnimBlendAssociationSAInterface* pThis)
+{
+	if (m_pCAnimBlendAssocDestructorHandler)
+	{
+		m_pCAnimBlendAssocDestructorHandler(pThis);
+	}
+}
+
+DWORD RETURN_CAnimBlendAssoc_destructor = 0x4CECF6;
+void _declspec(naked) HOOK_CAnimBlendAssoc_destructor()
+{
+	_asm
+	{
+		push    ecx
+
+		push    ecx
+		call    CAnimBlendAssoc_destructor
+		add     esp, 0x4
+
+		pop     ecx
+
+		push    esi
+		mov     esi, ecx
+		mov     eax, [esi + 10h]
+		jmp     RETURN_CAnimBlendAssoc_destructor
+	}
+}
+
 void _cdecl OnCObjectDestructor(DWORD calledFrom, CObjectSAInterface* pObject)
 {
     // Tell client to check for things going away
@@ -489,6 +518,11 @@ void _declspec(naked) HOOK_CStreamingRemoveModel()
 // Set handlers
 //
 //////////////////////////////////////////////////////////////////////////////////////////
+void CMultiplayerSA::SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler)
+{
+	m_pCAnimBlendAssocDestructorHandler = pHandler;
+}
+
 void CMultiplayerSA::SetGameObjectDestructHandler(GameObjectDestructHandler* pHandler)
 {
     pGameObjectDestructHandler = pHandler;
