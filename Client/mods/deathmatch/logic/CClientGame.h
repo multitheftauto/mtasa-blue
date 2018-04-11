@@ -831,13 +831,8 @@ private:
 
     // (unsigned int) Key is the hash of custom block name that is supplied to engineLoadIFP
     std::map<unsigned int, std::shared_ptr<CClientIFP> > m_mapOfIfpPointers;
-    mutable std::mutex                                   m_MutexOfIfpPointersMap;
-
     std::set<CClientPed*> m_setOfPedPointers;
-    mutable std::mutex    m_MutexOfPedPointersSet;
-
     AnimAssociations_type m_mapOfCustomAnimationAssociations;
-    mutable std::mutex    m_MutexOfAnimationAssociationsMap;
 };
 
 extern CClientGame* g_pClientGame;

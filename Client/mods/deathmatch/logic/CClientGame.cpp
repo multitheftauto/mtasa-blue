@@ -6785,13 +6785,11 @@ void CClientGame::CopyStaticAssociationProperties(std::unique_ptr<CAnimBlendStat
 
 void CClientGame::InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP)
 {
-    std::lock_guard<std::mutex> mutexGuardedLock(m_MutexOfIfpPointersMap);
     m_mapOfIfpPointers[u32BlockNameHash] = pIFP;
 }
 
 std::shared_ptr<CClientIFP> CClientGame::GetIFPPointerFromMap(const unsigned int u32BlockNameHash)
 {
-    std::lock_guard<std::mutex> mutexGuardedLock(m_MutexOfIfpPointersMap);
     auto                        it = m_mapOfIfpPointers.find(u32BlockNameHash);
     if (it != m_mapOfIfpPointers.end())
     {
@@ -6802,25 +6800,21 @@ std::shared_ptr<CClientIFP> CClientGame::GetIFPPointerFromMap(const unsigned int
 
 void CClientGame::RemoveIFPPointerFromMap(const unsigned int u32BlockNameHash)
 {
-    std::lock_guard<std::mutex> mutexGuardedLock(m_MutexOfIfpPointersMap);
     m_mapOfIfpPointers.erase(u32BlockNameHash);
 }
 
 void CClientGame::InsertPedPointerToSet(CClientPed* pPed)
 {
-    std::lock_guard<std::mutex> mutexGuardedLock(m_MutexOfPedPointersSet);
     m_setOfPedPointers.insert(pPed);
 }
 
 void CClientGame::RemovePedPointerFromSet(CClientPed* pPed)
 {
-    std::lock_guard<std::mutex> mutexGuardedLock(m_MutexOfPedPointersSet);
     m_setOfPedPointers.erase(pPed);
 }
 
 CClientPed* CClientGame::GetClientPedByClump(const RpClump& Clump)
 {
-    std::lock_guard<std::mutex> mutexGuardedLock(m_MutexOfPedPointersSet);
     for (auto& pPed : m_setOfPedPointers)
     {
         CEntity* pEntity = pPed->GetGameEntity();
@@ -6841,7 +6835,6 @@ CClientPed* CClientGame::GetClientPedByClump(const RpClump& Clump)
 
 void CClientGame::OnClientIFPUnload(const std::shared_ptr<CClientIFP>& IFP)
 {
-    std::lock_guard<std::mutex> mutexGuardedLock(m_MutexOfPedPointersSet);
     IFP->MarkAsUnloading();
     for (auto& pPed : m_setOfPedPointers)
     {
@@ -6870,12 +6863,10 @@ void CClientGame::OnClientIFPUnload(const std::shared_ptr<CClientIFP>& IFP)
 
 void CClientGame::InsertAnimationAssociationToMap(CAnimBlendAssociationSAInterface* pAnimAssociation, const std::shared_ptr<CIFPAnimations>& pIFPAnimations)
 {
-    std::lock_guard<std::mutex> mutexGuardedLock(m_MutexOfAnimationAssociationsMap);
     m_mapOfCustomAnimationAssociations[pAnimAssociation] = pIFPAnimations;
 }
 
 void CClientGame::RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation)
 {
-    std::lock_guard<std::mutex> mutexGuardedLock(m_MutexOfAnimationAssociationsMap);
     m_mapOfCustomAnimationAssociations.erase(pAnimAssociation);
 }

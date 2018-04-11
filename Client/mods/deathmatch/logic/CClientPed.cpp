@@ -6041,20 +6041,16 @@ void CClientPed::ReplaceAnimation(CAnimBlendHierarchy* pInternalAnimHierarchy, c
     SReplacedAnimation replacedAnimation;
     replacedAnimation.pIFP = pIFP;
     replacedAnimation.pAnimationHierarchy = pCustomAnimHierarchy;
-
-    std::lock_guard<std::mutex> mutexGuardedLock(m_MutexOfReplacedAnimationsMap);
     m_mapOfReplacedAnimations[pInternalAnimHierarchy->GetInterface()] = replacedAnimation;
 }
 
 void CClientPed::RestoreAnimation(CAnimBlendHierarchy* pInternalAnimHierarchy)
 {
-    std::lock_guard<std::mutex> mutexGuardedLock(m_MutexOfReplacedAnimationsMap);
     m_mapOfReplacedAnimations.erase(pInternalAnimHierarchy->GetInterface());
 }
 
 void CClientPed::RestoreAnimations(const std::shared_ptr<CClientIFP>& IFP)
 {
-    std::lock_guard<std::mutex> mutexGuardedLock(m_MutexOfReplacedAnimationsMap);
     for (auto const& x : m_mapOfReplacedAnimations)
     {
         if (std::addressof(*IFP.get()) == std::addressof(*x.second.pIFP.get()))
@@ -6066,7 +6062,6 @@ void CClientPed::RestoreAnimations(const std::shared_ptr<CClientIFP>& IFP)
 
 void CClientPed::RestoreAnimations(CAnimBlock& animationBlock)
 {
-    std::lock_guard<std::mutex> mutexGuardedLock(m_MutexOfReplacedAnimationsMap);
     const size_t                cAnimations = animationBlock.GetAnimationCount();
     for (size_t i = 0; i < cAnimations; i++)
     {
@@ -6077,13 +6072,11 @@ void CClientPed::RestoreAnimations(CAnimBlock& animationBlock)
 
 void CClientPed::RestoreAllAnimations(void)
 {
-    std::lock_guard<std::mutex> mutexGuardedLock(m_MutexOfReplacedAnimationsMap);
     m_mapOfReplacedAnimations.clear();
 }
 
 SReplacedAnimation* CClientPed::GetReplacedAnimation(CAnimBlendHierarchySAInterface* pInternalHierarchyInterface)
 {
-    std::lock_guard<std::mutex>             mutexGuardedLock(m_MutexOfReplacedAnimationsMap);
     CClientPed::ReplacedAnim_type::iterator it;
     it = m_mapOfReplacedAnimations.find(pInternalHierarchyInterface);
     if (it != m_mapOfReplacedAnimations.end())

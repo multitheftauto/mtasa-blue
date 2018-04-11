@@ -708,7 +708,6 @@ public:
 
     // Key: Internal GTA animation, Value: Custom Animation
     ReplacedAnim_type  m_mapOfReplacedAnimations;
-    mutable std::mutex m_MutexOfReplacedAnimationsMap;
 };
 
 #endif
