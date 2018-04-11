@@ -8,7 +8,7 @@
 class CClientIFP : public CClientEntity, CFileReader
 {
 public:
-    typedef CIFPAnimations::SAnimation SAnimation;
+    typedef CIFPAnimations::SAnimation                           SAnimation;
     typedef std::map<DWORD, std::unique_ptr<CAnimBlendSequence>> SequenceMapType;
 
     struct SBase
@@ -212,10 +212,10 @@ private:
     void ReadIFPVersion1(void);
     void ReadIFPVersion2(bool bAnp3);
 
-    WORD ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy);
-    WORD ReadSequences(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences);
-    WORD ReadSequencesVersion1(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences);
-    WORD ReadSequencesVersion2(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences);
+    WORD         ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy);
+    WORD         ReadSequences(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences);
+    WORD         ReadSequencesVersion1(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences);
+    WORD         ReadSequencesVersion2(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences);
     std::int32_t ReadSequenceVersion1(SAnim& Anim);
     void         ReadSequenceVersion2(SSequenceHeaderV2& ObjectNode);
 
@@ -243,7 +243,8 @@ private:
                                        const std::int32_t& iSequences);
     void  InitializeAnimationSequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const SString& strName, const std::int32_t& iBoneID);
     void  PreProcessAnimationHierarchy(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy);
-    void  MoveSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, std::map<DWORD, std::unique_ptr<CAnimBlendSequence>>& mapOfSequences);
+    void  MoveSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>&                 pAnimationHierarchy,
+                                   std::map<DWORD, std::unique_ptr<CAnimBlendSequence>>& mapOfSequences);
     BYTE* AllocateSequencesMemory(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy);
 
     void    InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const SString& BoneName, const DWORD& dwBoneID);

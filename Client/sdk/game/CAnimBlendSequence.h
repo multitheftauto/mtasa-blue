@@ -25,7 +25,7 @@ public:
     virtual BYTE*                          GetKeyFrames(void) = 0;
     virtual unsigned short                 GetKeyFramesCount(void) = 0;
     virtual bool                           IsBigChunkForAllSequences(void) = 0;
-    virtual void                           CopySequenceProperties(CAnimBlendSequenceSAInterface * pAnimSequenceInterface) = 0;
+    virtual void                           CopySequenceProperties(CAnimBlendSequenceSAInterface* pAnimSequenceInterface) = 0;
     virtual CAnimBlendSequenceSAInterface* GetInterface(void) = 0;
 };
 

@@ -58,7 +58,7 @@ void CAnimBlendSequenceSA::SetKeyFrames(size_t cKeyFrames, bool bRoot, bool bCom
     }
 }
 
-void CAnimBlendSequenceSA::CopySequenceProperties( CAnimBlendSequenceSAInterface * pAnimSequenceInterface )
+void CAnimBlendSequenceSA::CopySequenceProperties(CAnimBlendSequenceSAInterface* pAnimSequenceInterface)
 {
     *m_pInterface = *pAnimSequenceInterface;
 }

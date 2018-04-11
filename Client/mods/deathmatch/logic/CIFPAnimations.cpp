@@ -33,6 +33,6 @@ void CIFPAnimations::DeleteAnimations(void)
             }
         }
         delete Animation.pSequencesMemory;
-        delete Animation.pHierarchy->GetInterface();
+        pAnimManager->DeleteCustomAnimHierarchyInterface(Animation.pHierarchy->GetInterface());
     }
 }

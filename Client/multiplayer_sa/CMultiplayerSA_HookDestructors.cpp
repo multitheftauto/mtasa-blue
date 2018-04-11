@@ -13,12 +13,12 @@
 
 namespace
 {
-	CAnimBlendAssocDestructorHandler* m_pCAnimBlendAssocDestructorHandler = nullptr;
-    GameObjectDestructHandler*     pGameObjectDestructHandler = NULL;
-    GameVehicleDestructHandler*    pGameVehicleDestructHandler = NULL;
-    GamePlayerDestructHandler*     pGamePlayerDestructHandler = NULL;
-    GameProjectileDestructHandler* pGameProjectileDestructHandler = NULL;
-    GameModelRemoveHandler*        pGameModelRemoveHandler = NULL;
+    CAnimBlendAssocDestructorHandler* m_pCAnimBlendAssocDestructorHandler = nullptr;
+    GameObjectDestructHandler*        pGameObjectDestructHandler = NULL;
+    GameVehicleDestructHandler*       pGameVehicleDestructHandler = NULL;
+    GamePlayerDestructHandler*        pGamePlayerDestructHandler = NULL;
+    GameProjectileDestructHandler*    pGameProjectileDestructHandler = NULL;
+    GameModelRemoveHandler*           pGameModelRemoveHandler = NULL;
 
     #define FUNC_CPtrListSingleLink_Remove  0x0533610
     #define FUNC_CPtrListDoubleLink_Remove  0x05336B0
@@ -143,30 +143,30 @@ namespace
 //
 void __cdecl CAnimBlendAssoc_destructor(CAnimBlendAssociationSAInterface* pThis)
 {
-	if (m_pCAnimBlendAssocDestructorHandler)
-	{
-		m_pCAnimBlendAssocDestructorHandler(pThis);
-	}
+    if (m_pCAnimBlendAssocDestructorHandler)
+    {
+        m_pCAnimBlendAssocDestructorHandler(pThis);
+    }
 }
 
 DWORD RETURN_CAnimBlendAssoc_destructor = 0x4CECF6;
 void _declspec(naked) HOOK_CAnimBlendAssoc_destructor()
 {
-	_asm
-	{
-		push    ecx
+    _asm
+    {
+        push    ecx
 
-		push    ecx
-		call    CAnimBlendAssoc_destructor
-		add     esp, 0x4
+        push    ecx
+        call    CAnimBlendAssoc_destructor
+        add     esp, 0x4
 
-		pop     ecx
+        pop     ecx
 
-		push    esi
-		mov     esi, ecx
-		mov     eax, [esi + 10h]
-		jmp     RETURN_CAnimBlendAssoc_destructor
-	}
+        push    esi
+        mov     esi, ecx
+        mov     eax, [esi + 10h]
+        jmp     RETURN_CAnimBlendAssoc_destructor
+    }
 }
 
 void _cdecl OnCObjectDestructor(DWORD calledFrom, CObjectSAInterface* pObject)
@@ -520,7 +520,7 @@ void _declspec(naked) HOOK_CStreamingRemoveModel()
 //////////////////////////////////////////////////////////////////////////////////////////
 void CMultiplayerSA::SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler)
 {
-	m_pCAnimBlendAssocDestructorHandler = pHandler;
+    m_pCAnimBlendAssocDestructorHandler = pHandler;
 }
 
 void CMultiplayerSA::SetGameObjectDestructHandler(GameObjectDestructHandler* pHandler)

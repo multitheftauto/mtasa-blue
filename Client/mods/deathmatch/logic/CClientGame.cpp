@@ -3965,7 +3965,7 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendStaticAssociationSAIn
 {
     bool          isCustomAnimationToPlay = false;
     CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
-    auto          pAnimAssocGroup   = pAnimationManager->GetAnimBlendAssocGroup (pAnimAssocGroupInterface);
+    auto          pAnimAssocGroup = pAnimationManager->GetAnimBlendAssocGroup(pAnimAssocGroupInterface);
     auto          pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(pAnimAssocGroup->GetGroupID(), animID);
     auto          pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierachyInterface();
     auto          pOutAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(pOutAnimStaticAssocInterface);
@@ -6790,7 +6790,7 @@ void CClientGame::InsertIFPPointerToMap(const unsigned int u32BlockNameHash, con
 
 std::shared_ptr<CClientIFP> CClientGame::GetIFPPointerFromMap(const unsigned int u32BlockNameHash)
 {
-    auto                        it = m_mapOfIfpPointers.find(u32BlockNameHash);
+    auto it = m_mapOfIfpPointers.find(u32BlockNameHash);
     if (it != m_mapOfIfpPointers.end())
     {
         return it->second;

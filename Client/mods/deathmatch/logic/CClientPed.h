@@ -707,7 +707,7 @@ public:
     std::shared_ptr<CClientIFP> m_pCustomAnimationIFP;
 
     // Key: Internal GTA animation, Value: Custom Animation
-    ReplacedAnim_type  m_mapOfReplacedAnimations;
+    ReplacedAnim_type m_mapOfReplacedAnimations;
 };
 
 #endif

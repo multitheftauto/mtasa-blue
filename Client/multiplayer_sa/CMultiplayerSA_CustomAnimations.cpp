@@ -21,10 +21,10 @@ auto UncompressAnimation = (hUncompressAnimation)0x4d41c0;
 auto CAnimBlendAssociation_NewOperator = (hCAnimBlendAssociation_NewOperator)0x082119A;
 auto CAnimBlendAssociation_Constructor_staticAssocByReference = (hCAnimBlendAssociation_Constructor_staticAssocByReference)0x4CF080;
 
-AddAnimationHandler*              m_pAddAnimationHandler = nullptr;
-AddAnimationAndSyncHandler*       m_pAddAnimationAndSyncHandler = nullptr;
-AssocGroupCopyAnimationHandler*   m_pAssocGroupCopyAnimationHandler = nullptr;
-BlendAnimationHierarchyHandler*   m_pBlendAnimationHierarchyHandler = nullptr;
+AddAnimationHandler*            m_pAddAnimationHandler = nullptr;
+AddAnimationAndSyncHandler*     m_pAddAnimationAndSyncHandler = nullptr;
+AssocGroupCopyAnimationHandler* m_pAssocGroupCopyAnimationHandler = nullptr;
+BlendAnimationHierarchyHandler* m_pBlendAnimationHierarchyHandler = nullptr;
 
 int _cdecl OnCAnimBlendAssocGroupCopyAnimation(AssocGroupId animGroup, int iAnimId);
 
@@ -48,22 +48,24 @@ void CMultiplayerSA::SetBlendAnimationHierarchyHandler(BlendAnimationHierarchyHa
     m_pBlendAnimationHierarchyHandler = pHandler;
 }
 
-CAnimBlendAssociationSAInterface * __cdecl CAnimBlendAssocGroup_CopyAnimation ( RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroupInterface, AnimationId animID )
+CAnimBlendAssociationSAInterface* __cdecl CAnimBlendAssocGroup_CopyAnimation(RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroupInterface,
+                                                                             AnimationId animID)
 {
-	auto pAnimAssociationInterface = reinterpret_cast < CAnimBlendAssociationSAInterface * > (CAnimBlendAssociation_NewOperator ( sizeof (CAnimBlendAssociationSAInterface)));
-	if (pAnimAssociationInterface)
-	{
-		CAnimBlendStaticAssociationSAInterface staticAnimAssociationInterface;
+    auto pAnimAssociationInterface =
+        reinterpret_cast<CAnimBlendAssociationSAInterface*>(CAnimBlendAssociation_NewOperator(sizeof(CAnimBlendAssociationSAInterface)));
+    if (pAnimAssociationInterface)
+    {
+        CAnimBlendStaticAssociationSAInterface staticAnimAssociationInterface;
 
-		m_pAssocGroupCopyAnimationHandler(&staticAnimAssociationInterface, pAnimAssociationInterface, pClump, pAnimAssocGroupInterface, animID);
+        m_pAssocGroupCopyAnimationHandler(&staticAnimAssociationInterface, pAnimAssociationInterface, pClump, pAnimAssocGroupInterface, animID);
 
-		UncompressAnimation(staticAnimAssociationInterface.pAnimHeirarchy);
+        UncompressAnimation(staticAnimAssociationInterface.pAnimHeirarchy);
 
-		CAnimBlendAssociation_Constructor_staticAssocByReference(pAnimAssociationInterface, staticAnimAssociationInterface);
+        CAnimBlendAssociation_Constructor_staticAssocByReference(pAnimAssociationInterface, staticAnimAssociationInterface);
 
-		CAnimBlendStaticAssociation_FreeSequenceArray(&staticAnimAssociationInterface);
-	}
-	return pAnimAssociationInterface;
+        CAnimBlendStaticAssociation_FreeSequenceArray(&staticAnimAssociationInterface);
+    }
+    return pAnimAssociationInterface;
 }
 
 void _declspec(naked) HOOK_CAnimBlendAssocGroup_CopyAnimation()
@@ -79,21 +81,21 @@ void _declspec(naked) HOOK_CAnimBlendAssocGroup_CopyAnimation()
         {
             popad
 
-			push    esi
+            push    esi
 
             push    eax // animID
             push    ecx // pAnimAssocGroupInterface
             push    edi // pClump
-			call    CAnimBlendAssocGroup_CopyAnimation
-			add     esp, 0Ch
+            call    CAnimBlendAssocGroup_CopyAnimation
+            add     esp, 0Ch
 
             test    eax, eax
             jz      ERROR_CopyAnimation
 
             jmp     RETURN_CAnimBlendAssocGroup_CopyAnimation
 
-			ERROR_CopyAnimation:
-			jmp		RETURN_CAnimBlendAssocGroup_CopyAnimation_ERROR
+            ERROR_CopyAnimation:
+            jmp        RETURN_CAnimBlendAssocGroup_CopyAnimation_ERROR
         }
     }
 

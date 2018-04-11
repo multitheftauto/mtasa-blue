@@ -7,10 +7,10 @@ class CIFPAnimations
 public:
     struct SAnimation
     {
-        SString                        Name;
-        unsigned int                   uiNameHash;
+        SString                              Name;
+        unsigned int                         uiNameHash;
         std::unique_ptr<CAnimBlendHierarchy> pHierarchy;
-        BYTE*                          pSequencesMemory;
+        BYTE*                                pSequencesMemory;
     };
 
     std::vector<SAnimation> vecAnimations;

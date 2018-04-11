@@ -41,11 +41,11 @@ enum eRadioStationID
 };
 
 typedef void(__thiscall* hCAnimBlendStaticAssociation_FreeSequenceArray)(CAnimBlendStaticAssociationSAInterface* pThis);
-typedef void(__cdecl *  hUncompressAnimation) (CAnimBlendHierarchySAInterface * pAnimBlendHierarchyInterface);
-typedef void *(__cdecl *  hCAnimBlendAssociation_NewOperator) (size_t iSizeInBytes);
+typedef void(__cdecl* hUncompressAnimation)(CAnimBlendHierarchySAInterface* pAnimBlendHierarchyInterface);
+typedef void*(__cdecl* hCAnimBlendAssociation_NewOperator)(size_t iSizeInBytes);
 
-typedef CAnimBlendAssociationSAInterface * (__thiscall *  hCAnimBlendAssociation_Constructor_staticAssocByReference)
-(CAnimBlendAssociationSAInterface * pThis, CAnimBlendStaticAssociationSAInterface& StaticAssociationByReference);
+typedef CAnimBlendAssociationSAInterface*(__thiscall* hCAnimBlendAssociation_Constructor_staticAssocByReference)(
+    CAnimBlendAssociationSAInterface* pThis, CAnimBlendStaticAssociationSAInterface& StaticAssociationByReference);
 
 class CMultiplayerSA : public CMultiplayer
 {

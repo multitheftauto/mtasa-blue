@@ -44,7 +44,7 @@ public:
     BYTE*                          GetKeyFrames(void) { return m_pInterface->pKeyFrames; }
     unsigned short                 GetKeyFramesCount(void) { return m_pInterface->sNumKeyFrames; }
     bool                           IsBigChunkForAllSequences(void) { return ((m_pInterface->sFlags >> 3) & 1); }
-    void                           CopySequenceProperties(CAnimBlendSequenceSAInterface * pAnimSequenceInterface);
+    void                           CopySequenceProperties(CAnimBlendSequenceSAInterface* pAnimSequenceInterface);
     CAnimBlendSequenceSAInterface* GetInterface(void) { return m_pInterface; }
 
 protected:

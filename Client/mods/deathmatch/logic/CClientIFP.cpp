@@ -108,7 +108,7 @@ void CClientIFP::ReadIFPVersion2(bool bAnp3)
 WORD CClientIFP::ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy)
 {
     SequenceMapType MapOfSequences;
-    WORD wUnknownSequences = ReadSequences(pAnimationHierarchy, MapOfSequences);
+    WORD            wUnknownSequences = ReadSequences(pAnimationHierarchy, MapOfSequences);
 
     MoveSequencesWithDummies(pAnimationHierarchy, MapOfSequences);
     WORD cSequences = m_kcIFPSequences + wUnknownSequences;
@@ -140,16 +140,16 @@ WORD CClientIFP::ReadSequencesVersion1(std::unique_ptr<CAnimBlendHierarchy>& pAn
         }
 
         std::unique_ptr<CAnimBlendSequence> pAnimationSequence;
-        bool bUnknownSequence = iBoneID == eBoneType::UNKNOWN;
+        bool                                bUnknownSequence = iBoneID == eBoneType::UNKNOWN;
         if (bUnknownSequence)
         {
             size_t UnkownSequenceIndex = m_kcIFPSequences + wUnknownSequences;
-            auto pAnimationSequenceInterface = pAnimationHierarchy->GetSequence(UnkownSequenceIndex);
+            auto   pAnimationSequenceInterface = pAnimationHierarchy->GetSequence(UnkownSequenceIndex);
             pAnimationSequence = m_pAnimManager->GetCustomAnimBlendSequence(pAnimationSequenceInterface);
             wUnknownSequences++;
         }
         else
-        { 
+        {
             pAnimationSequence = m_pAnimManager->GetCustomAnimBlendSequence();
         }
         InitializeAnimationSequence(pAnimationSequence, Anim.Name, iBoneID);
@@ -157,13 +157,13 @@ WORD CClientIFP::ReadSequencesVersion1(std::unique_ptr<CAnimBlendHierarchy>& pAn
         eFrameType iFrameType = ReadKfrm();
         if ((ReadSequenceKeyFrames(pAnimationSequence, iFrameType, Anim.Frames)) && (!bUnknownSequence))
         {
-            MapOfSequences[iBoneID] = std::move (pAnimationSequence);
+            MapOfSequences[iBoneID] = std::move(pAnimationSequence);
         }
     }
     return wUnknownSequences;
 }
 
-WORD CClientIFP::ReadSequencesVersion2(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy,SequenceMapType& MapOfSequences)
+WORD CClientIFP::ReadSequencesVersion2(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences)
 {
     WORD wUnknownSequences = 0;
     for (size_t SequenceIndex = 0; SequenceIndex < pAnimationHierarchy->GetNumSequences(); SequenceIndex++)
@@ -177,7 +177,7 @@ WORD CClientIFP::ReadSequencesVersion2(std::unique_ptr<CAnimBlendHierarchy>& pAn
         if (bUnknownSequence)
         {
             size_t UnkownSequenceIndex = m_kcIFPSequences + wUnknownSequences;
-            auto pAnimationSequenceInterface = pAnimationHierarchy->GetSequence(UnkownSequenceIndex);
+            auto   pAnimationSequenceInterface = pAnimationHierarchy->GetSequence(UnkownSequenceIndex);
             pAnimationSequence = m_pAnimManager->GetCustomAnimBlendSequence(pAnimationSequenceInterface);
             wUnknownSequences++;
         }
@@ -451,13 +451,13 @@ void CClientIFP::MoveSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& 
 
         auto pAnimationSequenceInterface = pAnimationHierarchy->GetSequence(SequenceIndex);
         auto pAnimationSequence = m_pAnimManager->GetCustomAnimBlendSequence(pAnimationSequenceInterface);
-        auto                           it = mapOfSequences.find(BoneID);
+        auto it = mapOfSequences.find(BoneID);
         if (it != mapOfSequences.end())
         {
             auto pMapAnimSequenceInterface = it->second->GetInterface();
-            pAnimationSequence->CopySequenceProperties (pMapAnimSequenceInterface);
+            pAnimationSequence->CopySequenceProperties(pMapAnimSequenceInterface);
             // Delete the interface because we are moving, not copying
-            delete pMapAnimSequenceInterface;
+            m_pAnimManager->DeleteCustomAnimSequenceInterface(pMapAnimSequenceInterface);
         }
         else
         {

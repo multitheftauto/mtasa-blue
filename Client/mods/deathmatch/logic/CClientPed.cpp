@@ -6062,7 +6062,7 @@ void CClientPed::RestoreAnimations(const std::shared_ptr<CClientIFP>& IFP)
 
 void CClientPed::RestoreAnimations(CAnimBlock& animationBlock)
 {
-    const size_t                cAnimations = animationBlock.GetAnimationCount();
+    const size_t cAnimations = animationBlock.GetAnimationCount();
     for (size_t i = 0; i < cAnimations; i++)
     {
         auto pAnimHierarchyInterface = animationBlock.GetAnimationHierarchyInterface(i);
