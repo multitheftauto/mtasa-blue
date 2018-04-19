@@ -4,17 +4,17 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:23\n"
-"PO-Revision-Date: 2018-04-15 12:51+0000\n"
-"Last-Translator: Mert <mert.mte@gmail.com>\n"
+"PO-Revision-Date: 2018-04-15 22:09+0000\n"
+"Last-Translator: Mercy <Dimitar.Milosevski@yahoo.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: tr\n"
+"Language: mk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"Translators: Furkan Özden; Avenger; Mert \"MaXenon\"; Darkneblade; Semih; Oguzcan Uyar; Colegon; Samurai; Mert; Talidan; WindowsOttoman; RaceXtreme; Oguzcan; ccw; Eren Yücel; Cynydlan; TRFURKAN; velona77; Wickness\n"
+"Plural-Forms: nplurals=2; plural=n==1 || n%10==1 ? 0 : 1;\n"
+"Translators: Mercy; ccw; Rilind\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1523796677.0\n"
+"X-POOTLE-MTIME: 1523830179.0\n"
 
 #. GET_XPVISTA_PLEASE
 #: ../Shared/installer/nightly.nsi:183
@@ -22,8 +22,8 @@ msgid ""
 "The version of MTA:SA you've downloaded does not support Windows XP or "
 "Vista.  Please download an alternative version from www.mtasa.com."
 msgstr ""
-"İndirmiş olduğunuz MTA:SA sürümü Windows XP veya Vista'yı desteklemiyor. "
-"Lütfen www.mtasa.com adresinden alternatif bir sürüm indiriniz."
+"Верзијата од MTA:SA што сте ја симнале не продржува Windows XP или Vista.   "
+"Ве молиме симнете друга верзија од www.mtasa.com."
 
 #. GET_MASTER_PLEASE
 #: ../Shared/installer/nightly.nsi:184
@@ -31,8 +31,8 @@ msgid ""
 "The version of MTA:SA is designed for old versions of Windows.  Please "
 "download the newest version from www.mtasa.com."
 msgstr ""
-"MTA:SA'nın bu sürümü, Windows'un eski sürümleri için tasarlandı. Lütfen "
-"www.mtasa.com adresinden en son sürümü indiriniz."
+"Верзијата од MTA:SA е дизајнирана за постари верзии од Windows.   Ве молиме "
+"симнете ја најновата верзија од www.mtasa.com."
 
 #. WELCOME_TEXT
 #: ../Shared/installer/nightly.nsi:188
@@ -45,23 +45,23 @@ msgid ""
 "\n"
 "Click Next to continue."
 msgstr ""
-"Bu sihirbaz kurulum ve güncelleştirme için size eşlik edecek. $(^Name) ${REVISION_TAG}\n"
+"Волшебникот ќе те води преку инсталацијата или упдате на $(^Name) ${REVISION_TAG}\n"
 "\n"
-"Kurulum başlamadan önce arka planda çalışan uygulamaları kapatmanız önerilir. Setup.\n"
+"Се препорачувана дека сите други програми да бидаат затворени пред да се стартува Сетапот.\n"
 "\n"
-"[Admin access may be requested for Vista and up]\n"
+"[Пристап на админот може да се бара за Vista и подобри верзии]\n"
 "\n"
-"Devam etmek için tıklayın."
+"Стиснете Next за да продолжиш."
 
 #. HEADER_Text
 #: ../Shared/installer/nightly.nsi:189
 msgid "Grand Theft Auto: San Andreas location"
-msgstr "Grand Theft Auto: San Andreas konumu"
+msgstr "Grand Theft Auto: San Andreas локација"
 
 #. DIRECTORY_Text_Dest
 #: ../Shared/installer/nightly.nsi:190
 msgid "Grand Theft Auto: San Andreas folder"
-msgstr "Grand Theft Auto: San Andreas klasörü"
+msgstr "Grand Theft Auto: San Andreas фолдер"
 
 #. DIRECTORY_Text_Top
 #: ../Shared/installer/nightly.nsi:191
@@ -72,46 +72,48 @@ msgid ""
 "$\n"
 "Click Install to begin installing."
 msgstr ""
-"Lütfen Grand Theft Auto: San Andreas folder.$\n"
-" oyununun kurulu olduğu yeri seçin.$\n"
-"Grand Theft Auto: San Andreas 1.0 yüklü olması gerekir. MTA:SA, diğer sürümleri desteklemez.$\n"
+"Ве молиме селектирајте го вашиот Grand Theft Auto: San Andreas фолдер.$\n"
 "$\n"
-"Kurulumu başlatmak için tıklayın."
+"Вие мора да ја имате Grand Theft Auto: San Andreas 1.0 верзијата инсталирано за да го користите MTA:SA, ниедна друга верзија не подржува.$\n"
+"$\n"
+"Кликнете на Инсталирај за да започне инсталирањето."
 
 #. DESC_Section10
 #: ../Shared/installer/nightly.nsi:194
 msgid "Create a Start Menu group for installed applications"
-msgstr "Yüklü uygulamalar için başlat menüsü grubu oluştur."
+msgstr "Креирај Старт Мену група за инсталираните апликации."
 
 #. DESC_Section11
 #: ../Shared/installer/nightly.nsi:195
 msgid "Create a Desktop Shortcut for the MTA:SA Client."
-msgstr "MTA:SA masaüstü kısayolu oluştur."
+msgstr "Креирај Декстоп кратенка за MTA:SA Клиентот"
 
 #. DESC_Section12
 #: ../Shared/installer/nightly.nsi:196
 msgid "Register mtasa:// protocol for browser clickable-ness."
-msgstr "Tarayıcınızda tıklanabilir mtasa:// protokolü için kaydolun."
+msgstr ""
+"Регистрирај mtasa:// протокол за да може да се притисне на прелистувачот. "
 
 #. DESC_Section13
 #: ../Shared/installer/nightly.nsi:197
 msgid "Add to Windows Games Explorer (if present)."
-msgstr "Windows Games Tarayıcısına ekleyin. (Varsa)"
+msgstr "Додај во прозорецот за пребарување на игри (доколку е претставен)"
 
 #. DESC_DirectX
 #: ../Shared/installer/nightly.nsi:198
 msgid "Install or update DirectX (if required)."
-msgstr "DirectX'i yükle veya güncelle (eğer gerekliyse)."
+msgstr "Инсталирај или надгради го DirectX (доколку се бара)."
 
 #. DESC_Section1
 #: ../Shared/installer/nightly.nsi:199
 msgid "The core components required to run Multi Theft Auto."
-msgstr "Temel bileşenler Multi Theft Auto çalıştırmak için gerekli."
+msgstr ""
+"Основните компоненти се потребни за да може да се стартува Multi Theft Auto."
 
 #. DESC_Section2
 #: ../Shared/installer/nightly.nsi:200
 msgid "The MTA:SA modification, allowing you to play online."
-msgstr "MTA : SA Değişiktir . Online oynamak için sizi bekliyor ."
+msgstr "Модификацијата на MTA:SA, ти дозволува да играш онлајн."
 
 #. DESC_SectionGroupServer
 #: ../Shared/installer/nightly.nsi:203
@@ -119,29 +121,28 @@ msgid ""
 "The Multi Theft Auto Server. This allows you to host games from your "
 "computer. This requires a fast internet connection."
 msgstr ""
-"Multi Theft Auto Sunucusu. Bu bilgisayarınızdan oyunlar için ev sahipliği "
-"sağlar. Bu hızlı bir internet bağlantısı gerektirir."
+"Multi Theft Auto серверот ти овозможува да хостираш игра од твојот "
+"компјутер.За тоа ти треба брза интернет конекција."
 
 #. DESC_Section4
 #: ../Shared/installer/nightly.nsi:204
 msgid "The Multi Theft Auto server. This is a required component."
-msgstr "Multi Theft Auto sunucusu. Bu gerekli bir bileşenidir."
+msgstr "Multi Theft Auto серверот е задолжителна компонента."
 
 #. DESC_Section5
 #: ../Shared/installer/nightly.nsi:205
 msgid "The MTA:SA modification for the server."
-msgstr "MTA:SA bu sunucu için özelleştirilmiş."
+msgstr "MTA:SA модификација за серверот."
 
 #. DESC_Section6
 #: ../Shared/installer/nightly.nsi:206
 msgid "This is a set of required resources for your server."
-msgstr "Bu sunucu için gerekli kaynakların listesi."
+msgstr "Ова е сет од задолжителни ресурси за твојот сервер."
 
 #. DESC_Section7
 #: ../Shared/installer/nightly.nsi:207
 msgid "This is an optional set of gamemodes and maps for your server."
-msgstr ""
-"Bu sunucu için oyun modları ve haritaların isteğe bağlı bir kümesidir."
+msgstr "Ова е оптимален сет од модови за игри и мапи за твојот сервер."
 
 #. DESC_Section8
 #: ../Shared/installer/nightly.nsi:208
@@ -149,8 +150,8 @@ msgid ""
 "The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps "
 "for use in gamemodes for MTA."
 msgstr ""
-"MTA:SA 1.0 Harita Editörü. Kendi haritalarınızı oluşturmak için "
-"kullanabilirsiniz."
+"Едиторот на мапа за MTA:SA 1.0. ~ ~ Ова може да се употреби за креирање на "
+"мапи во модовите на игри за MTA."
 
 #. DESC_Section9
 #: ../Shared/installer/nightly.nsi:209
@@ -158,8 +159,8 @@ msgid ""
 "This is the SDK for creating binary modules for the MTA server. Only install"
 " if you have a good understanding of C++!"
 msgstr ""
-"SDK, MTA sunucuları için ikili modül oluşturmada kullanılır. Sadece C++ "
-"dilini biliyorsanız kurun!"
+"Ова е SDK за креирање на бинарни модели за MTA серверот. Инсталирај го само "
+"доколку имаш добри познавање на C++!"
 
 #. DESC_SectionGroupDev
 #: ../Shared/installer/nightly.nsi:211
@@ -167,80 +168,80 @@ msgid ""
 "Development code and tools that aid in the creation of mods for Multi Theft "
 "Auto"
 msgstr ""
-"Geliştirici kodları ve araçlar Multi Theft Auto için mod oluşturmada "
-"yardımcı olur"
+"Кодот за развој и алатки што помага во креирање на модови за Мulti Theft "
+"Auto."
 
 #. DESC_SectionGroupClient
 #: ../Shared/installer/nightly.nsi:212
 msgid "The client is the program you run to play on a Multi Theft Auto server"
 msgstr ""
-"İstemci bir Multi Theft Auto sunucusu üzerinde oynamak için çalışan bir "
-"programdır"
+"Овој клиент е програмата што ја користиш за да можеш да играш на Multi Theft"
+" Auto серверите."
 
 #. INST_CLIENTSERVER
 #: ../Shared/installer/nightly.nsi:409
 msgid "Client and Server"
-msgstr "İstemci ve Sunucu"
+msgstr "Клиент и Сервер"
 
 #. INST_SERVER
 #: ../Shared/installer/nightly.nsi:410
 msgid "Server only"
-msgstr "Sadece sunucu"
+msgstr "Само сервер"
 
 #. INST_STARTMENU_GROUP
 #: ../Shared/installer/nightly.nsi:424
 msgid "Start menu group"
-msgstr "Başlat menüsü"
+msgstr "Start menu група"
 
 #. INST_DESKTOP_ICON
 #: ../Shared/installer/nightly.nsi:425
 msgid "Desktop icon"
-msgstr "Masaüstü simgesi"
+msgstr "Десктоп икона"
 
 #. INST_PROTOCOL
 #: ../Shared/installer/nightly.nsi:426
 msgid "Register mtasa:// protocol"
-msgstr "mtasa:// protokolüne kaydol"
+msgstr "Регистрирај mtasa:// протокол"
 
 #. INST_GAMES_EXPLORER
 #: ../Shared/installer/nightly.nsi:427
 msgid "Add to Games Explorer"
-msgstr "Oyun tarayıcısına ekle"
+msgstr "Додај во истражувачот на игри"
 
 #. INST_DIRECTX
 #: ../Shared/installer/nightly.nsi:428
 msgid "Install DirectX"
-msgstr "DirectX'i kur"
+msgstr "Инсталирање на DirectX"
 
 #. INST_SEC_CLIENT
 #: ../Shared/installer/nightly.nsi:462
 msgid "Game client"
-msgstr "Oyun istemcisi"
+msgstr "Клиент за игра"
 
 #. INST_SEC_SERVER
 #: ../Shared/installer/nightly.nsi:463
 msgid "Dedicated server"
-msgstr "Özel sunucu"
+msgstr "Посветен сервер"
 
 #. INST_SEC_CORE
 #: ../Shared/installer/nightly.nsi:464
 msgid "Core components"
-msgstr "Çekirdek bileşenleri"
+msgstr "Основни компоненти"
 
 #. INST_SEC_GAME
 #: ../Shared/installer/nightly.nsi:465
 msgid "Game module"
-msgstr "Oyun Modülü"
+msgstr "Модел на игра "
 
 #. INFO_INPLACE_UPGRADE
 #: ../Shared/installer/nightly.nsi:467
 msgid "Performing in-place upgrade..."
-msgstr "Yerinde yükseltme gerçekleştirme ..."
+msgstr "Извршување на место надградба..."
 
 #. INFO_UPDATE_PERMISSIONS
 #: ../Shared/installer/nightly.nsi:468
 msgid "Updating permissions. This could take a few minutes..."
-msgstr "Güncelleme Yapılıyor . Birkaç dakika alabilir ..."
+msgstr "Ажурирање на барање. Ова може да потрае неколку минути..."
 
 #. MSGBOX_INVALID_GTASA
 #: ../Shared/installer/nightly.nsi:471
@@ -251,48 +252,49 @@ msgid ""
 "$\n"
 "Please reinstall if there are problems later."
 msgstr ""
-"Grand Theft Auto : San Andreas ' ın gerekli versiyonuna ulaşılamadı.$\r"
+"Валидна верзија од Grand Theft Auto: San Andreas не беше детектирана.$\r"
 "$\n"
-"Ancak kurulum devam edecektir.$\r"
-"$\n"
-"Eğer sorunlar devam ederse terkar yükleyin."
+"Сепак инсталацијата ќе продолжи.$\r"
+"$/nВе молиме ре-инсталирајте доколку имате проблеми подоцна."
 
 #. INST_SEC_CORE_RESOURCES
 #: ../Shared/installer/nightly.nsi:472
 msgid "Core Resources"
-msgstr "Çekirdek Dosyaları"
+msgstr "Основни ресурси"
 
 #. INST_SEC_OPTIONAL_RESOURCES
 #: ../Shared/installer/nightly.nsi:473
 msgid "Optional Resources"
-msgstr "Opyisonal Kanyaklar"
+msgstr "Оптимални ресурси"
 
 #. INST_SEC_EDITOR
 #: ../Shared/installer/nightly.nsi:474
 msgid "Editor"
-msgstr "Dünleyici"
+msgstr "Уредник"
 
 #. INST_SEC_DEVELOPER
 #: ../Shared/installer/nightly.nsi:967
 msgid "Development"
-msgstr "Geliştirme"
+msgstr "Развој"
 
 #. UNINST_SUCCESS
 #: ../Shared/installer/nightly.nsi:1015
 msgid "$(^Name) was successfully removed from your computer."
-msgstr "$(^Name) sizin bilgisayarınızdan sorunsuz bir şekilde silindi ."
+msgstr "$(^Име) беше успешно отстрането од вашиот компјутер."
 
 #. UNINST_FAIL
 #: ../Shared/installer/nightly.nsi:1022
 msgid "Uninstallation has failed!"
-msgstr "Kaldırma hatası oluştu !"
+msgstr "Деинсталирањето е неуспешно!"
 
 #. UNINST_REQUEST
 #: ../Shared/installer/nightly.nsi:1030
 msgid ""
 "Are you sure you want to completely remove $(^Name) and all of its "
 "components?"
-msgstr "Tamamen $(^Name) bileşenlerini kaldırmak istiyormusunuz"
+msgstr ""
+"Дали сте сигурни дека сакате комплетно да го отстраните $(^Име) и сите други"
+" компоненти?"
 
 #. UNINST_REQUEST_NOTE
 #: ../Shared/installer/nightly.nsi:1033
@@ -303,11 +305,11 @@ msgid ""
 "$\n"
 "Run the new installer to upgrade and preserve your settings."
 msgstr ""
-"Güncellemeden önce kaldırılıyor ?$\r"
+"Деинсталирање пред надградување?$\r"
 "$\n"
-"Yeni versiyonu yüklemek için MTA:SA'yı kaldırmanıza gerek yok.$\r"
+"Не е потребно да се деинсталира нова верзија од MTA:SA пред инсталирање$\r"
 "$\n"
-"Ayarlarınızı korumak ve güncellemek için yeni kurulum sihirbazını çalıştırın."
+"Вклучете ја новата инсталација за да надградете и вратете старите конфигурации."
 
 #. UNINST_DATA_REQUEST
 #: ../Shared/installer/nightly.nsi:1044
@@ -316,45 +318,47 @@ msgid ""
 "server configuration)? If you click no, any resources, configurations or "
 "screenshots you have created will be lost."
 msgstr ""
-"Güncellemeden önce kaldırılıyor ?$\r"
-"$\n"
-"Yeni versiyonu yüklemek için MTA:SA'yı kaldırmanıza gerek yok.$\r"
-"$\n"
-"Ayarlarınızı korumak ve güncellemek için yeni kurulum sihirbazını çalıştırın."
+"Дали сакате да ги задржите вашите фајлови (како на пример ресурси, слики и "
+"конфигурации од серверот)? Доколку притиснете не, било каква ресурса, "
+"конфигурација или слика што сте ги креирале ќе биде изгубена."
 
 #. MSGBOX_PATCH_FAIL1
 #: ../Shared/installer/nightly.nsi:1144
 msgid ""
 "Unable to download the patch file for your version of Grand Theft Auto: San "
 "Andreas"
-msgstr "Grand Theft Auto: San Andreas patch dosyası indirilemiyor "
+msgstr ""
+"Печ фајлот  за вашата верзија од Grand Theft Auto: San Andreas не може да се"
+" симне"
 
 #. MSGBOX_PATCH_FAIL2
 #: ../Shared/installer/nightly.nsi:1145
 msgid ""
 "Unable to install the patch file for your version of Grand Theft Auto: San "
 "Andreas"
-msgstr "Grand Theft Auto: San Andreas versiyon paketin indirilemiyor"
+msgstr ""
+"Печ фајлот за вашата верзија од Grand Theft Auto: San Andreas не може да се "
+"инсталира"
 
 #. UAC_RIGHTS1
 #: ../Shared/installer/nightly.nsi:1181
 msgid "This installer requires admin access, try again"
-msgstr "Bu kurcu admin ulaşımı gerektiriyor , tekrar deneyin"
+msgstr "Инсталацијата бара пристап на админот, пробајте повторно "
 
 #. UAC_RIGHTS_UN
 #: ../Shared/installer/nightly.nsi:1182
 msgid "This uninstaller requires admin access, try again"
-msgstr "Bu kurucu admin ulaşımı istiyor , tekrar deneyin"
+msgstr "Деинсталацијата бара пристап до админот, пробајте повторно"
 
 #. UAC_RIGHTS3
 #: ../Shared/installer/nightly.nsi:1183
 msgid "Logon service not running, aborting!"
-msgstr "Oturum Açma hizmeti iptal, çalışmıyor!"
+msgstr "Сервисот за логирање не е во употреба, исклучување!"
 
 #. UAC_RIGHTS4
 #: ../Shared/installer/nightly.nsi:1184
 msgid "Unable to elevate"
-msgstr "Yükseltilemedi"
+msgstr "Грешка во подигање"
 
 #. INST_MTA_CONFLICT
 #: ../Shared/installer/nightly.nsi:1775
@@ -364,10 +368,10 @@ msgid ""
 "MTA is designed for major versions to be installed in different paths.$\n"
 " Are you sure you want to overwrite MTA $1 at $INSTDIR ?"
 msgstr ""
-"MTA ($1) farklı bir ana sürüm zaten yolda bulunmaktadır. $\n"
+"Поинаква поголема верзија од MTA ($1) веќе постои во таа локација.$\n"
 "$\n"
-"MTA farklı yollar kurulacak büyük sürümleri için tasarlanmıştır. $\n"
-"Eğer  $INSTDIR de MTA $1 üzerine yazmak istediğinizden emin misiniz?"
+"МТА е дизајнирана за поголеми верзии за да бидат инсталирана во ралзични локации.$\n"
+"~Дали сте сигурни дека сакате да ја пребришете MTA $1 во $INSTDIR ?"
 
 #. INST_GTA_CONFLICT
 #: ../Shared/installer/nightly.nsi:1778
@@ -377,9 +381,9 @@ msgid ""
 "Do you want to use the default install directory$\n"
 "$DEFAULT_INSTDIR ?"
 msgstr ""
-"MTA, GTA:SA ile aynı dizine kurulamaz.$\n"
+"MTA не може да се инсталира во истата дирекција како GTA:SA.$\n"
 "$\n"
-"Varsayılan dizine kurmak ister misiniz?$\n"
+"Дали сакате да ја користите нормалната дирекција за инсталирање$\n"
 "$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
@@ -389,9 +393,9 @@ msgid ""
 "$\n"
 "Please select the GTA:SA install directory"
 msgstr ""
-"Seçilmiş sözlük bulunamiyor.$\n"
+"Селектираниот фолдер не постои.$\n"
 "$\n"
-"Lütfen GTA:SA kurulum yerini seçiniz"
+"Ве молиме селектирајте го инсталациониот фолдер на GTA:SA"
 
 #. INST_GTA_ERROR2
 #: ../Shared/installer/nightly.nsi:1782
@@ -400,14 +404,14 @@ msgid ""
 "$\n"
 "Are you sure you want to continue ?"
 msgstr ""
-"GTA:SA , $GTA_DIR da bulunamıyor $\n"
+"Не може да се најде инсталацијата на GTA:SA во $GTA_DIR $\n"
 "$\n"
-"Devam etmek istediğinize eminmisiniz"
+"Дали сте сигурни дека сакате да продолжите ?"
 
 #. INST_CHOOSE_LOC_TOP
 #: ../Shared/installer/nightly.nsi:1905
 msgid "Choose Install Location"
-msgstr "Kurulum dilini seçiniz"
+msgstr "Изберете место за инсталација"
 
 #. INST_CHOOSE_LOC
 #: ../Shared/installer/nightly.nsi:1906
@@ -415,7 +419,8 @@ msgid ""
 "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} "
 "${PRODUCT_VERSION}"
 msgstr ""
-"Lütfen ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION},kurulacak klorsörü seçiniz"
+"Изберете фолдер во кој ќе инсталирате ${PRODUCT_NAME_NO_VER} "
+"${PRODUCT_VERSION}"
 
 #. INST_CHOOSE_LOC2
 #: ../Shared/installer/nightly.nsi:1908
@@ -425,98 +430,73 @@ msgid ""
 "$\n"
 " Click Next to continue."
 msgstr ""
-"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} kurulacaktır takip edilecek klosöre.$\n"
-"Önemli bir klosore kurmak için Browseye basın ve başka bir klosör seçin$\n"
+"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} ќе се инсталира во следниот фолдер.$\n"
+"За да инсталирате во различен фолдер кликнете Пребарување и селектирајте го другиот фолдер.$\n"
 "$\n"
-"Devam için Next'e basın"
+"~Кликнете Следно за да продолжите."
 
 #. INST_CHOOSE_LOC3
 #: ../Shared/installer/nightly.nsi:1909
 msgid "Destination Folder"
-msgstr "Hedef Klosör"
+msgstr "Дестинација на фолдерот"
 
 #. INST_CHOOSE_LOC_BROWSE
 #: ../Shared/installer/nightly.nsi:1910
 msgid "Browse..."
-msgstr "Gözat..."
+msgstr "Пребарување..."
 
 #. INST_CHOOSE_LOC_DEFAULT
 #: ../Shared/installer/nightly.nsi:1911
 msgid "Default"
-msgstr "Varolan"
+msgstr "Стандарно"
 
 #. INST_CHOOSE_LOC_LAST_USED
 #: ../Shared/installer/nightly.nsi:1912
 msgid "Last used"
-msgstr "Son kullanılmış"
+msgstr "Последно употребувано"
 
 #. INST_CHOOSE_LOC_CUSTOM
 #: ../Shared/installer/nightly.nsi:1913
 msgid "Custom"
-msgstr "Özel"
+msgstr "Обично"
 
 #. INST_CHOOSE_LOC4
 #: ../Shared/installer/nightly.nsi:2091
 msgid ""
 "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
-msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} dosyasını burada seçiniz :"
+msgstr ""
+"Селектирајте го фолдерот за да инсталирате ${PRODUCT_NAME_NO_VER} "
+"${PRODUCT_VERSION} во:"
 
 #. INST_LOC_OW
 #: ../Shared/installer/nightly.nsi:2109
 msgid ""
 "Warning: A different major version of MTA ($1) already exists at that path."
-msgstr "Uyarı : Önemli bir major sürümü zaten bu sürümde çıkar"
+msgstr ""
+"Предупредување: Поинаква поголема верзија од MTA ($1) веќе постои на тоа "
+"место."
 
 #. INST_LOC_UPGRADE
 #: ../Shared/installer/nightly.nsi:2110
 msgid "Installation type:  Upgrade"
-msgstr "Kurulum tipi:~ ~ güncelleme"
+msgstr "Вид на инсталација: ~ ~ Надградба"
 
 #. NETTEST_TITLE1
 #: ../Shared/installer/nightly.nsi:2353
 msgid "Online update"
-msgstr "Çevrimiçi güncelleme"
+msgstr "Онлјан надградба"
 
 #. NETTEST_TITLE2
 #: ../Shared/installer/nightly.nsi:2354
 msgid "Checking for update information"
-msgstr "Güncelleme bilgileri kontrol ediliyor"
+msgstr "Проверка на информација за надградба"
 
 #. NETTEST_STATUS1
 #: ../Shared/installer/nightly.nsi:2355
 msgid "Checking for installer update information..."
-msgstr "Kurulum sihirbazı güncellemesi kontrol ediliyor..."
+msgstr "Проверка на информација за надградба на инсталацијата"
 
 #. NETTEST_STATUS2
 #: ../Shared/installer/nightly.nsi:2356
 msgid "Please ensure your firewall is not blocking"
-msgstr "Lütfen güvenlik duvarınızın engel olmadığına emin olun"
-
-#~ msgid "Unable to download Microsoft Visual Studio 2008 SP1 redistributable"
-#~ msgstr ""
-#~ "Microsoft Visual Studio 2008 SP1 yeniden dağıtılabilir , indirilemiyor ."
-
-#~ msgid "Unable to install Microsoft Visual Studio 2008 SP1 redistributable"
-#~ msgstr "Microsoft Visual Studio 2008 SP1 redistributable , indirilemiyor"
-
-#~ msgid ""
-#~ "Unable to download Microsoft Visual Studio 2008 SP1 redistributable.$\r"
-#~ "$\n"
-#~ "However installation will continue.$\r"
-#~ "$\n"
-#~ "Please reinstall if there are problems later."
-#~ msgstr ""
-#~ "Microsoft Visual Studio 2008 SP1 redistributable , indiriliemiyor .$\r"
-#~ "$\n"
-#~ "Ancak kurulum devam edecektir.$\r"
-#~ "$\n"
-#~ "Lütfen tekrar kurun eğer bir sorun olursa"
-
-#, fuzzy
-#~ msgid "Unable to download Microsoft Visual Studio 2013 redistributable"
-#~ msgstr ""
-#~ "Microsoft Visual Studio 2008 SP1 yeniden dağıtılabilir , indirilemiyor ."
-
-#, fuzzy
-#~ msgid "Unable to install Microsoft Visual Studio 2013 redistributable"
-#~ msgstr "Microsoft Visual Studio 2008 SP1 redistributable , indirilemiyor"
+msgstr "Ве молиме осигурајте се вашиот firewall да не блокира"

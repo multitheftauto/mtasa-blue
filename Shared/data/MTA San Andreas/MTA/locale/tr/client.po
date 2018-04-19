@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:11+0000\n"
-"PO-Revision-Date: 2018-03-02 00:14+0000\n"
+"PO-Revision-Date: 2018-04-15 12:51+0000\n"
 "Last-Translator: Mert <mert.mte@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: tr\n"
@@ -15,9 +15,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"Translators: Furkan Özden; Avenger; Darkneblade; Semih; MaXenon; Oguzcan Uyar; Colegon; Samurai; Mert; WindowsOttoman; RaceXtreme; Oguzcan; Eren Yücel; Cynydlan; Wickness; velona77; TRFURKAN\n"
+"Translators: Furkan Özden; Avenger; Mert \"MaXenon\"; Darkneblade; Semih; Oguzcan Uyar; Colegon; Samurai; Mert; WindowsOttoman; RaceXtreme; Oguzcan; Eren Yücel; Cynydlan; TRFURKAN; velona77; Wickness\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1519949665.0\n"
+"X-POOTLE-MTIME: 1523796697.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -29,12 +29,10 @@ msgid ""
 msgstr "Sunucu, (sonradan) yükleme yapmak için şu siteleri talep ediyor:"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:31
-#, fuzzy
 msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "ÇALINMASINI ÖNLEMEK İÇİN ASLA HASSAS DETAYLI BİLGİLERİ GİRMEYİN"
+msgstr "ÇALINMASINI ÖNLEMEK İÇİN ASLA ÖNEMLİ BİLGİLERİ GİRMEYİN"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:43
-#, fuzzy
 msgid "Remember decision"
 msgstr "Kararı hatırla"
 
@@ -949,7 +947,6 @@ msgstr "Çözünürlük:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:585
 #: C:\mtasa-blue\Client\core\CSettings.cpp:642
-#, fuzzy
 msgid "FOV:"
 msgstr "Görüş Açısı:"
 
@@ -1127,7 +1124,6 @@ msgid "Enable remote websites"
 msgstr "Uzak web sayfalarını etkinleştir"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:858
-#, fuzzy
 msgid "Enable Javascript on remote websites"
 msgstr "Uzak web sayfalarında Javascript'i etkinleştirin."
 
@@ -1275,7 +1271,7 @@ msgstr "Normal"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1024
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2944
 msgid "Above normal"
-msgstr ""
+msgstr "Normal üstü"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1060
 msgid "Min"
@@ -1301,11 +1297,11 @@ msgstr "Fareyi düzelt"
 #. Cache path info
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1108
 msgid "Client resource files:"
-msgstr ""
+msgstr "Kişinin kaynak dosyaları: "
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1112
 msgid "Show in Explorer"
-msgstr ""
+msgstr "Tarayıcıda göster"
 
 #. Auto updater section label
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1127
@@ -1319,9 +1315,8 @@ msgid "Check for update now"
 msgstr "Güncellemeleri kontrol et"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1312
-#, fuzzy
 msgid "Some settings will be changed when you next start MTA"
-msgstr "Some settings bir daha MTA başlattığında değişmiş olacak"
+msgstr "Bazı ayarlar MTA'yı bir sonraki başlattığınızda değişmiş olacak"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1313
 msgid ""
@@ -1339,10 +1334,9 @@ msgstr "YENİDEN BAŞLATMAK GEREKİYOR"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1338
 msgid "Some settings will be changed when you disconnect the current server"
-msgstr ""
+msgstr "Şu anki sunucudan çıktığınızda bazı ayarlar değiştirilicektir."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1339
-#, fuzzy
 msgid ""
 "\n"
 "\n"
@@ -1350,7 +1344,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Tekrar başlatmak ister misin ?"
+"Bağlantıyı şimdi kesmek ister misiniz?"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1342
 msgid "DISCONNECT REQUIRED"
@@ -1447,7 +1441,6 @@ msgid "sec"
 msgstr "saniye"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2047
-#, fuzzy
 msgid "Fading"
 msgstr "Soluyor"
 
@@ -1461,39 +1454,38 @@ msgstr "Yatay:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2094
 msgid "Vertical:"
-msgstr ""
+msgstr "Dikey:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2095
 msgid "Text-Align:"
-msgstr ""
+msgstr "Yazı-Hizası:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2096
 msgid "X-Offset:"
-msgstr ""
+msgstr "X-Dengesi:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2097
 msgid "Y-Offset:"
-msgstr ""
+msgstr "Y-Dengesi:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2103
 msgid "Position"
-msgstr ""
+msgstr "Pozisyon"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2118
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2132
 msgid "Center"
-msgstr ""
+msgstr "Merkez"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2131
 msgid "Top"
-msgstr ""
+msgstr "En Üst"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2133
 msgid "Bottom"
-msgstr ""
+msgstr "En Alt"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2181
-#, fuzzy
 msgid "Font"
 msgstr "Yazı tipi"
 
@@ -1514,7 +1506,6 @@ msgid "Allow tray balloon notifications"
 msgstr "Balon bildirimlerine izin ver"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2243
-#, fuzzy
 msgid "Chat text black/white outline"
 msgstr "Siyah/beyaz konuşma çıktısı"
 
@@ -1688,6 +1679,7 @@ msgstr "Eğer hata raporu doldurmayı sevmiyorsanız varsayılanı seçiniz."
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4370
 msgid "Select default to automatically install important updates."
 msgstr ""
+"Önemli güncelleştirmeleri otomatik olarak yüklemek için varsayılan'ı seçin."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4372
 msgid "16-bit color:"
@@ -1889,9 +1881,9 @@ msgstr ""
 "Cevap bekleniyor %-3d"
 
 #: C:\mtasa-blue\Client\core\DXHook\CDirect3DEvents9.cpp:233
-#, c-format, c-format, fuzzy
+#, c-format, c-format
 msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Ekran görüntüsü  %d boyutunda %d"
+msgstr "Ekran görüntüsü  %d boyutunda, ancak %d olması gerekiyor"
 
 #: C:\mtasa-blue\Client\core\DXHook\CDirect3DEvents9.cpp:239
 msgid "Screenshot failed"
@@ -2241,9 +2233,8 @@ msgid "Update Large Memory setting"
 msgstr "Geniş bellek ayarlarını güncelle"
 
 #: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:162
-#, fuzzy
 msgid "Update DEP setting"
-msgstr "Aero ayarlarını güncelle"
+msgstr "Veri Yürütme Engeli(DEP) ayarlanızı güncelleyin."
 
 #: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:164
 msgid "Update graphics driver compliance"
@@ -2514,6 +2505,7 @@ msgstr "Bitti!"
 #: C:\mtasa-blue\Client\loader\Install.cpp:95
 msgid "Do you want to terminate the MTA Server and continue updating?"
 msgstr ""
+"MTA Sunucusunu sonlandırmak ve güncellemeye devam etmek istiyor musunuz?"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:235
 msgid ""
@@ -2608,6 +2600,9 @@ msgid ""
 "\n"
 "Do you want to change the following setting?"
 msgstr ""
+"MTA:SA'yı çalıştırırken sorun yaşıyor musunuz?.\n"
+"\n"
+"Aşağıdaki ayarı değiştirmek istiyor musunuz?"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:409
 msgid ""
@@ -2615,6 +2610,9 @@ msgid ""
 "\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr ""
+"MTA:SA'yı çalıştırırken sorun yaşıyor musunuz?.\n"
+"\n"
+"Aşşağıdaki ürünleri GTA ve MTA için devre dışı bırakmayı deneyin:"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:443
 msgid ""
