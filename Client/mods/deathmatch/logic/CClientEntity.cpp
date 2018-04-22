@@ -282,7 +282,7 @@ void CClientEntity::SetID(ElementID ID)
     }
 }
 
-CLuaArgument* CClientEntity::GetCustomData(const char* szName, bool bInheritData)
+CLuaArgument* CClientEntity::GetCustomData(const char* szName, bool bInheritData, bool* pbIsSynced)
 {
     assert(szName);
 
@@ -290,13 +290,15 @@ CLuaArgument* CClientEntity::GetCustomData(const char* szName, bool bInheritData
     SCustomData* pData = m_pCustomData->Get(szName);
     if (pData)
     {
+        if (pbIsSynced)
+            *pbIsSynced = pData->bSynchronized;
         return &pData->Variable;
     }
 
     // If none, try returning parent's custom data
     if (bInheritData && m_pParent)
     {
-        return m_pParent->GetCustomData(szName, true);
+        return m_pParent->GetCustomData(szName, true, pbIsSynced);
     }
 
     // None available
@@ -458,7 +460,7 @@ bool CClientEntity::GetCustomDataBool(const char* szName, bool& bOut, bool bInhe
     return false;
 }
 
-void CClientEntity::SetCustomData(const char* szName, const CLuaArgument& Variable)
+void CClientEntity::SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized)
 {
     assert(szName);
     if (strlen(szName) > MAX_CUSTOMDATA_NAME_LENGTH)
@@ -477,7 +479,7 @@ void CClientEntity::SetCustomData(const char* szName, const CLuaArgument& Variab
     }
 
     // Set the new data
-    m_pCustomData->Set(szName, Variable);
+    m_pCustomData->Set(szName, Variable, bSynchronized);
 
     // Trigger the onClientElementDataChange event on us
     CLuaArguments Arguments;
