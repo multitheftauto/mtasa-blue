@@ -172,6 +172,9 @@ int CLuaBrowserDefs::RequestBrowserDomains(lua_State* luaVM)
         {
             for (auto& strURL : pages)
             {
+                if (!strURL.empty())
+                    continue;
+
                 strURL = g_pCore->GetWebCore()->GetDomainFromURL(strURL);
             }
         }
