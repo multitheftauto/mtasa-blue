@@ -65,7 +65,7 @@ namespace SharedUtil
         {
             std::unique_ptr<SBaseTask> pTask{new STask<ResultType>{taskFunc, readyFunc}};
 
-            std::lock_guard<std::mutex>{m_TasksMutex};
+            std::lock_guard<std::mutex> lock{m_TasksMutex};
             m_Tasks.push(std::move(pTask));
         }
 

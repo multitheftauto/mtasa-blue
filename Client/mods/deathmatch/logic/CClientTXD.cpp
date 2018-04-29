@@ -109,7 +109,7 @@ bool CClientTXD::Import(unsigned short usModelID)
         if (m_bIsRawData && !m_bUsingFileDataForClothes)
         {
             // This means the texture can't be used for clothes now
-            m_FileData.Clear();
+            m_FileData = CBuffer();
         }
 
         // Have we got textures and haven't already imported into this model?

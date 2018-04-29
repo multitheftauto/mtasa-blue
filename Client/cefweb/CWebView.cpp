@@ -613,7 +613,7 @@ bool CWebView::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnPopupShow(CefRefPtr<CefBrowser> browser, bool show)
 {
-    std::lock_guard<std::mutex>(m_RenderData.dataMutex);
+    std::lock_guard<std::mutex> lock{m_RenderData.dataMutex};
     m_RenderData.popupShown = show;
 
     // Free popup buffer memory if hidden
@@ -629,7 +629,7 @@ void CWebView::OnPopupShow(CefRefPtr<CefBrowser> browser, bool show)
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnPopupSize(CefRefPtr<CefBrowser> browser, const CefRect& rect)
 {
-    std::lock_guard<std::mutex>(m_RenderData.dataMutex);
+    std::lock_guard<std::mutex> lock{m_RenderData.dataMutex};
 
     // Update rect
     m_RenderData.popupRect = rect;

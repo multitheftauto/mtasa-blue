@@ -396,8 +396,9 @@ msgid "shows the frame timing graph"
 msgstr "показать график производительности"
 
 #: C:\mtasa-blue\Client\core\CCore.h:55
+#, fuzzy
 msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
-msgstr ""
+msgstr "Права защищены (C) 2003 - 2016 Multi Theft Auto"
 
 #: C:\mtasa-blue\Client\core\CCredits.cpp:32
 msgid "Programming"
@@ -1295,11 +1296,11 @@ msgstr "Исправление мыши"
 #. Cache path info
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1108
 msgid "Client resource files:"
-msgstr ""
+msgstr "Путь загрузки ресурсов:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1112
 msgid "Show in Explorer"
-msgstr ""
+msgstr "Открыть папку"
 
 #. Auto updater section label
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1127
@@ -1387,12 +1388,13 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1955
 msgid "Layout"
-msgstr ""
+msgstr "Макет чата"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1956
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2217
+#, fuzzy
 msgid "Options"
-msgstr ""
+msgstr "Опции:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1962
 msgid "Chat Background"
@@ -1440,7 +1442,7 @@ msgstr "сек"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2047
 msgid "Fading"
-msgstr ""
+msgstr "Затухание"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2053
 msgid "Fade out old lines"
@@ -1484,8 +1486,9 @@ msgid "Bottom"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2181
+#, fuzzy
 msgid "Font"
-msgstr ""
+msgstr "Шрифт:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2223
 msgid "Hide background when not typing"
@@ -1501,7 +1504,7 @@ msgstr "Разрешить серверу моргать окном прилож
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2238
 msgid "Allow tray balloon notifications"
-msgstr ""
+msgstr "Показывать сообщения в области уведомлений"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2243
 msgid "Chat text black/white outline"
@@ -2843,7 +2846,7 @@ msgstr "GTA:SA не смогла добавить апгрейд транспо�
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1960
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
-msgstr ""
+msgstr "GTA:SA нашла ошибки в файле '%s'"
 
 #. Ask user to confirm
 #: C:\mtasa-blue\Client\loader\Utils.cpp:2035
@@ -3301,7 +3304,7 @@ msgstr "Ошибка соединения"
 #. Couldn't create render target for CPostEffects
 #: C:\mtasa-blue\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1427
 msgid "Problem with graphics driver"
-msgstr ""
+msgstr "Проблема с графическим драйвером"
 
 #: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:89
 msgid "Multi Theft Auto has not been installed properly, please reinstall."

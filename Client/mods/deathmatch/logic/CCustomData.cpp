@@ -32,7 +32,7 @@ SCustomData* CCustomData::Get(const char* szName)
     return NULL;
 }
 
-void CCustomData::Set(const char* szName, const CLuaArgument& Variable)
+void CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized)
 {
     assert(szName);
 
@@ -42,12 +42,14 @@ void CCustomData::Set(const char* szName, const CLuaArgument& Variable)
     {
         // Update existing
         pData->Variable = Variable;
+        pData->bSynchronized = bSynchronized;
     }
     else
     {
         // Add new
         SCustomData newData;
         newData.Variable = Variable;
+        newData.bSynchronized = bSynchronized;
         m_Data[szName] = newData;
     }
 }

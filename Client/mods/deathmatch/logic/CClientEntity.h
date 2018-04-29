@@ -194,12 +194,12 @@ public:
     void      SetID(ElementID ID);
 
     CCustomData*  GetCustomDataPointer(void) { return m_pCustomData; }
-    CLuaArgument* GetCustomData(const char* szName, bool bInheritData);
+    CLuaArgument* GetCustomData(const char* szName, bool bInheritData, bool* pbIsSynced = nullptr);
     bool          GetCustomDataString(const char* szKey, SString& strOut, bool bInheritData);
     bool          GetCustomDataFloat(const char* szKey, float& fOut, bool bInheritData);
     bool          GetCustomDataInt(const char* szKey, int& iOut, bool bInheritData);
     bool          GetCustomDataBool(const char* szKey, bool& bOut, bool bInheritData);
-    void          SetCustomData(const char* szName, const CLuaArgument& Variable);
+    void          SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true);
     void          DeleteCustomData(const char* szName);
 
     virtual bool GetMatrix(CMatrix& matrix) const;
