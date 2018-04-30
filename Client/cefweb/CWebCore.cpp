@@ -308,10 +308,6 @@ void CWebCore::RequestPages(const std::vector<SString>& pages, WebRequestCallbac
     bool bNewItem = false;
     for (const auto& page : pages)
     {
-        // If the page URL isn't empty, continue.
-        if (page.EqualsI("") || page.empty())
-            continue;
-
         eURLState status = GetDomainState(page);
         if (status == eURLState::WEBPAGE_ALLOWED || status == eURLState::WEBPAGE_DISALLOWED)
             continue;

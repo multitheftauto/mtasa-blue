@@ -92,9 +92,6 @@ bool CWebView::LoadURL(const SString& strURL, bool bFilterEnabled, const SString
     if (!m_pWebView)
         return false;
 
-    if (strURL.EqualsI(""))
-        return false;
-
     CefURLParts urlParts;
     if (!CefParseURL(strURL, urlParts))
         return false;            // Invalid URL
