@@ -167,14 +167,29 @@ int CLuaBrowserDefs::RequestBrowserDomains(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        bool bIsURLEmpty = false;
+        //// Check if the URL being requested is empty or not
         // Convert to domains if we got a list of URLs
         if (bIsURL)
         {
             for (auto& strURL : pages)
             {
-                strURL = g_pCore->GetWebCore()->GetDomainFromURL(strURL);
+                if (strURL.empty() || strURL.length() <= 0) {
+                    bIsURLEmpty = true;
+                    break;
+                }
+                else {
+                    strURL = g_pCore->GetWebCore()->GetDomainFromURL(strURL);
+                }
+                //continue;
             }
         }
+
+        if (bIsURLEmpty) {
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
 
         WebRequestCallback callback = [=](bool bAllow, const std::unordered_set<SString>& domains) {
             // Test if luaVM is still available
@@ -226,6 +241,12 @@ int CLuaBrowserDefs::LoadBrowserURL(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        // Check if the string is empty, if so then return false..
+        if (strURL.empty()) {
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
         // Are we dealing with a remote website?
         if (strURL.substr(0, 7) == "http://" || strURL.substr(0, 8) == "https://")
         {
