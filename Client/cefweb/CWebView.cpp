@@ -93,7 +93,7 @@ bool CWebView::LoadURL(const SString& strURL, bool bFilterEnabled, const SString
         return false;
 
     CefURLParts urlParts;
-    if (!CefParseURL(strURL, urlParts))
+    if (strURL.empty() || !CefParseURL(strURL, urlParts))
         return false;            // Invalid URL
 
     // Are we allowed to browse this website?

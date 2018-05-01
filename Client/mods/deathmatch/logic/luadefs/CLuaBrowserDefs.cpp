@@ -167,14 +167,12 @@ int CLuaBrowserDefs::RequestBrowserDomains(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        // Remove empty URLs
+        pages.erase(std::remove_if(pages.begin(), pages.end(), [](const auto& url) { return url.empty(); }));
+
         // Convert to domains if we got a list of URLs
         if (bIsURL)
-        {
-            for (auto& strURL : pages)
-            {
-                strURL = g_pCore->GetWebCore()->GetDomainFromURL(strURL);
-            }
-        }
+            std::transform(pages.begin(), pages.end(), pages.begin(), [](const auto& url) { return g_pCore->GetWebCore()->GetDomainFromURL(url); });
 
         WebRequestCallback callback = [=](bool bAllow, const std::unordered_set<SString>& domains) {
             // Test if luaVM is still available
