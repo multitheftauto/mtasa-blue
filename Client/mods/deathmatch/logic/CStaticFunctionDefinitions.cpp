@@ -3617,37 +3617,37 @@ bool CStaticFunctionDefinitions::GetObjectMass(CClientObject& Object, float& fMa
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetObjectTurnMass ( CClientObject& Object, float& fTurnMass )
+bool CStaticFunctionDefinitions::GetObjectTurnMass(CClientObject& Object, float& fTurnMass)
 {
-    fTurnMass = Object.GetTurnMass ();
+    fTurnMass = Object.GetTurnMass();
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetObjectAirResistance ( CClientObject& Object, float& fAirResistance )
+bool CStaticFunctionDefinitions::GetObjectAirResistance(CClientObject& Object, float& fAirResistance)
 {
-    fAirResistance = Object.GetAirResistance ();
+    fAirResistance = Object.GetAirResistance();
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetObjectElasticity ( CClientObject& Object, float& fElasticity )
+bool CStaticFunctionDefinitions::GetObjectElasticity(CClientObject& Object, float& fElasticity)
 {
-    fElasticity = Object.GetElasticity ();
+    fElasticity = Object.GetElasticity();
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetObjectBuoyancyConstant ( CClientObject& Object, float& fBuoyancyConstant )
+bool CStaticFunctionDefinitions::GetObjectBuoyancyConstant(CClientObject& Object, float& fBuoyancyConstant)
 {
-    fBuoyancyConstant = Object.GetBuoyancyConstant ();
+    fBuoyancyConstant = Object.GetBuoyancyConstant();
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetObjectCenterOfMass ( CClientObject & Object, CVector& vecCenterOfMass )
+bool CStaticFunctionDefinitions::GetObjectCenterOfMass(CClientObject & Object, CVector& vecCenterOfMass)
 {
-    Object.GetCenterOfMass ( vecCenterOfMass );
+    Object.GetCenterOfMass(vecCenterOfMass);
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetObjectRotation ( CClientEntity& Entity, const CVector& vecRotation )
+bool CStaticFunctionDefinitions::SetObjectRotation(CClientEntity& Entity, const CVector& vecRotation)
 {
     RUN_CHILDREN(SetObjectRotation(**iter, vecRotation))
 
@@ -3817,76 +3817,76 @@ bool CStaticFunctionDefinitions::SetObjectMass(CClientEntity& Entity, float fMas
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetObjectTurnMass ( CClientEntity& Entity, float fTurnMass )
+bool CStaticFunctionDefinitions::SetObjectTurnMass(CClientEntity& Entity, float fTurnMass)
 {
-    if ( fTurnMass >= 0.0f )
+    if (fTurnMass >= 0.0f)
     {
-        RUN_CHILDREN ( SetObjectTurnMass ( **iter, fTurnMass ) )
+        RUN_CHILDREN(SetObjectTurnMass(**iter, fTurnMass))
 
-        if ( IS_OBJECT ( &Entity ) )
+        if (IS_OBJECT(&Entity))
         {
-            CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
-            Object.SetTurnMass ( fTurnMass );
+            CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
+            Object.SetTurnMass(fTurnMass);
             return true;
         }
     }
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetObjectAirResistance ( CClientEntity& Entity, float fAirResistance )
+bool CStaticFunctionDefinitions::SetObjectAirResistance(CClientEntity& Entity, float fAirResistance)
 {
-    RUN_CHILDREN ( SetObjectAirResistance ( **iter, fAirResistance ) )
+    RUN_CHILDREN(SetObjectAirResistance(**iter, fAirResistance))
 
-    if ( IS_OBJECT ( &Entity ) )
+    if (IS_OBJECT(&Entity))
     {
-        CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
-        Object.SetAirResistance ( fAirResistance );
+        CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
+        Object.SetAirResistance(fAirResistance);
         return true;
     }
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetObjectElasticity ( CClientEntity& Entity, float fElasticity )
+bool CStaticFunctionDefinitions::SetObjectElasticity(CClientEntity& Entity, float fElasticity)
 {
-    RUN_CHILDREN ( SetObjectElasticity ( **iter, fElasticity ) )
+    RUN_CHILDREN(SetObjectElasticity(**iter, fElasticity))
 
-    if ( IS_OBJECT ( &Entity ) )
+    if (IS_OBJECT(&Entity))
     {
-        CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
-        Object.SetElasticity ( fElasticity );
+        CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
+        Object.SetElasticity(fElasticity);
         return true;
     }
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetObjectBuoyancyConstant ( CClientEntity& Entity, float fBuoyancyConstant )
+bool CStaticFunctionDefinitions::SetObjectBuoyancyConstant(CClientEntity& Entity, float fBuoyancyConstant)
 {
-    RUN_CHILDREN ( SetObjectBuoyancyConstant ( **iter, fBuoyancyConstant ) )
+    RUN_CHILDREN(SetObjectBuoyancyConstant(**iter, fBuoyancyConstant))
 
-    if ( IS_OBJECT ( &Entity ) )
+    if (IS_OBJECT(&Entity))
     {
-        CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
-        Object.SetBuoyancyConstant ( fBuoyancyConstant );
+        CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
+        Object.SetBuoyancyConstant(fBuoyancyConstant);
         return true;
     }
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetObjectCenterOfMass ( CClientEntity& Entity, const CVector& vecCenterOfMass )
+bool CStaticFunctionDefinitions::SetObjectCenterOfMass(CClientEntity& Entity, const CVector& vecCenterOfMass)
 {
-    RUN_CHILDREN ( SetObjectCenterOfMass ( **iter, vecCenterOfMass ) )
+    RUN_CHILDREN(SetObjectCenterOfMass(**iter, vecCenterOfMass))
 
-    if ( IS_OBJECT ( &Entity ) )
+    if (IS_OBJECT(&Entity))
     {
-        CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
-        Object.SetCenterOfMass ( vecCenterOfMass );
+        CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
+        Object.SetCenterOfMass(vecCenterOfMass);
         return true;
     }
 
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetObjectVisibleInAllDimensions ( CClientEntity& Entity, bool bVisible, unsigned short usNewDimension )
+bool CStaticFunctionDefinitions::SetObjectVisibleInAllDimensions(CClientEntity& Entity, bool bVisible, unsigned short usNewDimension)
 {
     RUN_CHILDREN(SetObjectVisibleInAllDimensions(**iter, bVisible, usNewDimension))
 

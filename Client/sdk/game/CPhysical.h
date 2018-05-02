@@ -24,18 +24,18 @@ public:
     virtual void     SetMoveSpeed(CVector* vecMoveSpeed) = 0;
     virtual void     SetTurnSpeed(CVector* vecTurnSpeed) = 0;
 
-    virtual float       GetMass                     ( void ) = 0;
-    virtual void        SetMass                     ( float fMass ) = 0;
-    virtual float       GetTurnMass                 ( void ) = 0;
-    virtual void        SetTurnMass                 ( float fTurnMass ) = 0;
-    virtual float       GetAirResistance            ( void ) = 0;
-    virtual void        SetAirResistance            ( float fAirResistance ) = 0;
-    virtual float       GetElasticity               ( void ) = 0;
-    virtual void        SetElasticity               ( float fElasticity ) = 0;
-    virtual float       GetBuoyancyConstant         ( void ) = 0;
-    virtual void        SetBuoyancyConstant         ( float fBuoyancyConstant ) = 0;
-    virtual void        GetCenterOfMass             ( CVector & vecCenterOfMass ) = 0;
-    virtual void        SetCenterOfMass             ( CVector & vecCenterOfMass ) = 0;
+    virtual float GetMass(void) = 0;
+    virtual void  SetMass(float fMass) = 0;
+    virtual float GetTurnMass(void) = 0;
+    virtual void  SetTurnMass(float fTurnMass) = 0;
+    virtual float GetAirResistance(void) = 0;
+    virtual void  SetAirResistance(float fAirResistance) = 0;
+    virtual float GetElasticity(void) = 0;
+    virtual void  SetElasticity(float fElasticity) = 0;
+    virtual float GetBuoyancyConstant(void) = 0;
+    virtual void  SetBuoyancyConstant(float fBuoyancyConstant) = 0;
+    virtual void  GetCenterOfMass(CVector & vecCenterOfMass) = 0;
+    virtual void  SetCenterOfMass(CVector & vecCenterOfMass) = 0;
 
     virtual void ProcessCollision(void) = 0;
     virtual void AddToMovingList(void) = 0;

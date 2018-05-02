@@ -517,14 +517,18 @@ void CClientObject::Create(void)
                 m_pObject->SetHealth(m_fHealth);
 
                 // Set object properties
-                if ( m_fMass != -1.0f )             m_pObject->SetMass ( m_fMass );
-                if ( m_fTurnMass != -1.0f )         m_pObject->SetTurnMass ( m_fTurnMass );
-                if ( m_fAirResistance != -1.0f )    m_pObject->SetAirResistance ( m_fAirResistance );
-                if ( m_fElasticity != -1.0f )       m_pObject->SetElasticity( m_fElasticity );
-                if ( m_fBuoyancyConstant != -1.0f ) m_pObject->SetBuoyancyConstant( m_fBuoyancyConstant );
-                if ( m_vecCenterOfMass.fX != 0.0f ||
-                     m_vecCenterOfMass.fY != 0.0f ||
-                     m_vecCenterOfMass.fZ != 0.0f)  m_pObject->SetCenterOfMass( m_vecCenterOfMass );
+                if (m_fMass != -1.0f)
+                    m_pObject->SetMass(m_fMass);
+                if (m_fTurnMass != -1.0f)
+                    m_pObject->SetTurnMass(m_fTurnMass);
+                if (m_fAirResistance != -1.0f)
+                    m_pObject->SetAirResistance(m_fAirResistance);
+                if (m_fElasticity != -1.0f)
+                    m_pObject->SetElasticity(m_fElasticity);
+                if (m_fBuoyancyConstant != -1.0f)
+                    m_pObject->SetBuoyancyConstant(m_fBuoyancyConstant);
+                if (m_vecCenterOfMass.fX != 0.0f || m_vecCenterOfMass.fY != 0.0f || m_vecCenterOfMass.fZ != 0.0f)
+                    m_pObject->SetCenterOfMass(m_vecCenterOfMass);
                 
                 // Reattach to an entity + any entities attached to this
                 ReattachEntities();
@@ -726,7 +730,7 @@ bool CClientObject::Break(void)
 }
 
 
-float CClientObject::GetMass ( void )
+float CClientObject::GetMass(void)
 {
     if (m_pObject)
         return m_pObject->GetMass();
@@ -735,7 +739,7 @@ float CClientObject::GetMass ( void )
 }
 
 
-void CClientObject::SetMass ( float fMass )
+void CClientObject::SetMass(float fMass)
 {
     if (m_pObject)
         m_pObject->SetMass(fMass);
@@ -744,102 +748,97 @@ void CClientObject::SetMass ( float fMass )
 }
 
 
-float CClientObject::GetTurnMass ( void )
+float CClientObject::GetTurnMass(void)
 {
-    if ( m_pObject )
-        return m_pObject->GetTurnMass ();
+    if (m_pObject)
+        return m_pObject->GetTurnMass();
 
     return m_fTurnMass;
 }
 
 
-void CClientObject::SetTurnMass ( float fTurnMass )
+void CClientObject::SetTurnMass(float fTurnMass)
 {
-    if ( m_pObject )
-        m_pObject->SetTurnMass ( fTurnMass );
+    if (m_pObject)
+        m_pObject->SetTurnMass(fTurnMass);
 
     m_fTurnMass = fTurnMass;
 }
 
 
-float CClientObject::GetAirResistance ( void )
+float CClientObject::GetAirResistance(void)
 {
-    if ( m_pObject )
-        return m_pObject->GetAirResistance ();
+    if (m_pObject)
+        return m_pObject->GetAirResistance();
 
     return m_fAirResistance;
 }
 
 
-void CClientObject::SetAirResistance ( float fAirResistance )
+void CClientObject::SetAirResistance(float fAirResistance)
 {
-    if ( m_pObject )
-        m_pObject->SetAirResistance ( fAirResistance );
+    if (m_pObject)
+        m_pObject->SetAirResistance(fAirResistance);
 
     m_fAirResistance = fAirResistance;
 }
 
 
-float CClientObject::GetElasticity ( void )
+float CClientObject::GetElasticity(void)
 {
-    if ( m_pObject )
-        return m_pObject->GetElasticity ();
+    if (m_pObject)
+        return m_pObject->GetElasticity();
 
     return m_fElasticity;
 }
 
 
-void CClientObject::SetElasticity ( float fElasticity )
+void CClientObject::SetElasticity(float fElasticity)
 {
-    if ( m_pObject )
-        m_pObject->SetElasticity ( fElasticity );
+    if (m_pObject)
+        m_pObject->SetElasticity(fElasticity);
 
     m_fElasticity = fElasticity;
 }
 
 
-float CClientObject::GetBuoyancyConstant ( void )
+float CClientObject::GetBuoyancyConstant(void)
 {
-    if ( m_pObject )
-        return m_pObject->GetBuoyancyConstant ();
+    if (m_pObject)
+        return m_pObject->GetBuoyancyConstant();
 
     return m_fBuoyancyConstant;
 }
 
 
-void CClientObject::SetBuoyancyConstant ( float fBuoyancyConstant )
+void CClientObject::SetBuoyancyConstant(float fBuoyancyConstant)
 {
-    if ( m_pObject )
-        m_pObject->SetBuoyancyConstant ( fBuoyancyConstant );
+    if (m_pObject)
+        m_pObject->SetBuoyancyConstant(fBuoyancyConstant);
 
     m_fBuoyancyConstant = fBuoyancyConstant;
 }
 
 
-void CClientObject::GetCenterOfMass ( CVector& vecCenterOfMass ) const
+void CClientObject::GetCenterOfMass(CVector& vecCenterOfMass) const
 {
-    if ( m_pObject )
-    {
-        m_pObject->GetCenterOfMass ( vecCenterOfMass );
-    }
+    if (m_pObject)
+        m_pObject->GetCenterOfMass(vecCenterOfMass);
     else
-    {
         vecCenterOfMass = m_vecCenterOfMass;
-    }
 }
 
 
-void CClientObject::SetCenterOfMass ( const CVector& vecCenterOfMass )
+void CClientObject::SetCenterOfMass(const CVector& vecCenterOfMass)
 {
-    if ( m_pObject )
-    {
-        m_pObject->SetCenterOfMass ( const_cast < CVector& > ( vecCenterOfMass ) );
-    }
+    if (m_pObject)
+        m_pObject->SetCenterOfMass(const_cast<CVector&>(vecCenterOfMass));
+
     m_vecCenterOfMass = vecCenterOfMass;
 }
 
 
-void CClientObject::SetVisibleInAllDimensions ( bool bVisible, unsigned short usNewDimension )
+void CClientObject::SetVisibleInAllDimensions(bool bVisible, unsigned short usNewDimension)
 {
     m_bVisibleInAllDimensions = bVisible;
 

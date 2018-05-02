@@ -22,21 +22,21 @@ public:
     LUA_DECLARE(CreateObject);
 
     // Object get funcs
-    LUA_DECLARE ( IsObjectStatic );
-    LUA_DECLARE ( GetObjectScale );
-    LUA_DECLARE ( IsObjectBreakable );
-    LUA_DECLARE (GetObjectProperty);
-    LUA_DECLARE (GetObjectProperties);
+    LUA_DECLARE(IsObjectStatic);
+    LUA_DECLARE(GetObjectScale);
+    LUA_DECLARE(IsObjectBreakable);
+    LUA_DECLARE(GetObjectProperty);
+    LUA_DECLARE(GetObjectProperties);
 
     // Object set funcs
-    LUA_DECLARE ( SetObjectRotation );
-    LUA_DECLARE ( MoveObject );
-    LUA_DECLARE ( StopObject );
-    LUA_DECLARE ( SetObjectScale );
-    LUA_DECLARE ( SetObjectStatic );
-    LUA_DECLARE ( SetObjectBreakable );
-    LUA_DECLARE ( BreakObject );
-    LUA_DECLARE ( RespawnObject );
-    LUA_DECLARE ( ToggleObjectRespawn );
-    LUA_DECLARE (SetObjectProperty);
+    LUA_DECLARE(SetObjectRotation);
+    LUA_DECLARE(MoveObject);
+    LUA_DECLARE(StopObject);
+    LUA_DECLARE(SetObjectScale);
+    LUA_DECLARE(SetObjectStatic);
+    LUA_DECLARE(SetObjectBreakable);
+    LUA_DECLARE(BreakObject);
+    LUA_DECLARE(RespawnObject);
+    LUA_DECLARE(ToggleObjectRespawn);
+    LUA_DECLARE(SetObjectProperty);
 };

@@ -87,16 +87,16 @@ public:
 
     float GetHealth(void);
     void  SetHealth(float fHealth);
-    float                           GetTurnMass             ( void );
-    void                            SetTurnMass             ( float fTurnMass );
-    float                           GetAirResistance        ( void );
-    void                            SetAirResistance        ( float fAirResistance );
-    float                           GetElasticity           ( void );
-    void                            SetElasticity           ( float fElasticity );
-    float                           GetBuoyancyConstant     ( void );
-    void                            SetBuoyancyConstant     ( float fBuoyancyConstant );
-    void                            GetCenterOfMass         ( CVector& vecCenterOfMass) const;
-    void                            SetCenterOfMass         ( const CVector& vecCenterOfMass);
+    float GetTurnMass(void);
+    void  SetTurnMass(float fTurnMass);
+    float GetAirResistance(void);
+    void  SetAirResistance(float fAirResistance);
+    float GetElasticity(void);
+    void  SetElasticity(float fElasticity);
+    float GetBuoyancyConstant(void);
+    void  SetBuoyancyConstant(float fBuoyancyConstant);
+    void  GetCenterOfMass(CVector& vecCenterOfMass) const;
+    void  SetCenterOfMass(const CVector& vecCenterOfMass);
 
     bool IsBreakable(bool bCheckModelList = true);
     bool SetBreakable(bool bBreakable);
@@ -133,24 +133,24 @@ protected:
 
     unsigned short m_usModel;
 
-    CVector                             m_vecPosition;
-    CVector                             m_vecRotation;
-    bool                                m_bIsVisible;
-    bool                                m_bIsFrozen;
-    bool                                m_bUsesCollision;
-    unsigned char                       m_ucAlpha;
-    CVector                             m_vecScale;
-    float                               m_fHealth;
-    bool                                m_bBreakingDisabled;
-    bool                                m_bBeingRespawned;
-    bool                                m_bRespawnEnabled;
-    float                               m_fMass;
-    float                               m_fTurnMass;
-    float                               m_fAirResistance;
-    float                               m_fElasticity;
-    float                               m_fBuoyancyConstant;
-    CVector                             m_vecCenterOfMass;
-    bool                                m_bVisibleInAllDimensions = false;
+    CVector       m_vecPosition;
+    CVector       m_vecRotation;
+    bool          m_bIsVisible;
+    bool          m_bIsFrozen;
+    bool          m_bUsesCollision;
+    unsigned char m_ucAlpha;
+    CVector       m_vecScale;
+    float         m_fHealth;
+    bool          m_bBreakingDisabled;
+    bool          m_bBeingRespawned;
+    bool          m_bRespawnEnabled;
+    float         m_fMass;
+    float         m_fTurnMass;
+    float         m_fAirResistance;
+    float         m_fElasticity;
+    float         m_fBuoyancyConstant;
+    CVector       m_vecCenterOfMass;
+    bool          m_bVisibleInAllDimensions = false;
 
     CVector m_vecMoveSpeed;
     CVector m_vecTurnSpeed;

@@ -121,18 +121,18 @@ public:
     void         SetMoveSpeed(CVector* vecMoveSpeed);
     void         SetTurnSpeed(CVector* vecTurnSpeed);
 
-    float       GetMass                     ( void );
-    void        SetMass                     ( float fMass );
-    float       GetTurnMass                 ( void );
-    void        SetTurnMass                 ( float fTurnMass );
-    float       GetAirResistance            ( void );
-    void        SetAirResistance            ( float fAirResistance );
-    float       GetElasticity               ( void );
-    void        SetElasticity               ( float fElasticity );
-    float       GetBuoyancyConstant         ( void );
-    void        SetBuoyancyConstant         ( float fBuoyancyConstant );
-    void        GetCenterOfMass             ( CVector & vecCenterOfMass );
-    void        SetCenterOfMass             ( CVector & vecCenterOfMass );
+    float GetMass(void);
+    void  SetMass(float fMass);
+    float GetTurnMass(void);
+    void  SetTurnMass(float fTurnMass);
+    float GetAirResistance(void);
+    void  SetAirResistance(float fAirResistance);
+    float GetElasticity(void);
+    void  SetElasticity(float fElasticity);
+    float GetBuoyancyConstant(void);
+    void  SetBuoyancyConstant(float fBuoyancyConstant);
+    void  GetCenterOfMass(CVector & vecCenterOfMass);
+    void  SetCenterOfMass(CVector & vecCenterOfMass);
 
     void ProcessCollision(void);
     void AddToMovingList(void);
@@ -159,10 +159,6 @@ public:
     /*
     VOID        SetMassMultiplier(FLOAT fMassMultiplier);
     FLOAT       GetMassMultiplier();
-    VOID        SetAirResistance(FLOAT fAirResistance);
-    FLOAT       GetAirResistance();
-    VOID        SetCenterOfMass(CVector * vecCenterOfMass);
-    CVector * GetCenterOfMass();
 
     BOOL        GetExtraHeavy();
     VOID        SetExtraHeavy(BOOL bExtraHeavy);

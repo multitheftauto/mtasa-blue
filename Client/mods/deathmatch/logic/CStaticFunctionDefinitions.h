@@ -264,34 +264,34 @@ public:
     static bool SetVehicleWindowOpen(CClientVehicle& Vehicle, uchar ucWindow, bool bOpen);
 
     // Object get funcs
-    static CClientObject*               CreateObject                        ( CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod );
-    static bool                         GetObjectScale                      ( CClientObject& Object, CVector& vecScale );
-    static bool                         IsObjectBreakable                   ( CClientObject& Object, bool& bBreakable );
-    static bool                         GetObjectMass                       ( CClientObject& Object, float& fMass );
-    static bool                         GetObjectTurnMass                   ( CClientObject& Object, float& fTurnMass );
-    static bool                         GetObjectAirResistance              ( CClientObject& Object, float& fAirResistance );
-    static bool                         GetObjectElasticity                 ( CClientObject& Object, float& fElasticity );
-    static bool                         GetObjectBuoyancyConstant           ( CClientObject& Object, float& fBuoyancyConstant );
-    static bool                         GetObjectCenterOfMass               ( CClientObject& Object, CVector& vecCenterOfMass );
-    static bool                         IsObjectVisibleInAllDimensions      ( CClientEntity& Entity );
+    static CClientObject* CreateObject(CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod);
+    static bool           GetObjectScale(CClientObject& Object, CVector& vecScale);
+    static bool           IsObjectBreakable(CClientObject& Object, bool& bBreakable);
+    static bool           GetObjectMass(CClientObject& Object, float& fMass);
+    static bool           GetObjectTurnMass(CClientObject& Object, float& fTurnMass);
+    static bool           GetObjectAirResistance(CClientObject& Object, float& fAirResistance);
+    static bool           GetObjectElasticity(CClientObject& Object, float& fElasticity);
+    static bool           GetObjectBuoyancyConstant(CClientObject& Object, float& fBuoyancyConstant);
+    static bool           GetObjectCenterOfMass(CClientObject& Object, CVector& vecCenterOfMass);
+    static bool           IsObjectVisibleInAllDimensions(CClientEntity& Entity);
 
     // Object set funcs
-    static bool                         SetObjectRotation                   ( CClientEntity& Entity, const CVector& vecRotation );
-    static bool                         MoveObject                          ( CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation, CEasingCurve::eType a_eEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot );
-    static bool                         StopObject                          ( CClientEntity& Entity );
-    static bool                         SetObjectScale                      ( CClientEntity& Entity, const CVector& vecScale  );
-    static bool                         SetObjectStatic                     ( CClientEntity& Entity, bool bStatic );
-    static bool                         SetObjectBreakable                  ( CClientEntity& Entity, bool bBreakable );
-    static bool                         BreakObject                         ( CClientEntity& Entity );
-    static bool                         RespawnObject                       ( CClientEntity& Entity );
-    static bool                         ToggleObjectRespawn                 ( CClientEntity& Entity, bool bRespawn );
-    static bool                         SetObjectMass                       ( CClientEntity& Entity, float fMass );
-    static bool                         SetObjectTurnMass                   ( CClientEntity& Entity, float fTurnMass );
-    static bool                         SetObjectAirResistance              ( CClientEntity& Entity, float fAirResistance );
-    static bool                         SetObjectElasticity                 ( CClientEntity& Entity, float fElasticity );
-    static bool                         SetObjectBuoyancyConstant           ( CClientEntity& Entity, float fBuoyancyConstant );
-    static bool                         SetObjectCenterOfMass               ( CClientEntity& Entity, const CVector& vecCenterOfMass );
-    static bool                         SetObjectVisibleInAllDimensions     ( CClientEntity& Entity, bool bVisible, unsigned short usNewDimension = 0 );
+    static bool SetObjectRotation(CClientEntity& Entity, const CVector& vecRotation);
+    static bool MoveObject(CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation, CEasingCurve::eType a_eEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot);
+    static bool StopObject(CClientEntity& Entity);
+    static bool SetObjectScale(CClientEntity& Entity, const CVector& vecScale);
+    static bool SetObjectStatic(CClientEntity& Entity, bool bStatic);
+    static bool SetObjectBreakable(CClientEntity& Entity, bool bBreakable);
+    static bool BreakObject(CClientEntity& Entity);
+    static bool RespawnObject(CClientEntity& Entity);
+    static bool ToggleObjectRespawn(CClientEntity& Entity, bool bRespawn);
+    static bool SetObjectMass(CClientEntity& Entity, float fMass);
+    static bool SetObjectTurnMass(CClientEntity& Entity, float fTurnMass);
+    static bool SetObjectAirResistance(CClientEntity& Entity, float fAirResistance);
+    static bool SetObjectElasticity(CClientEntity& Entity, float fElasticity);
+    static bool SetObjectBuoyancyConstant(CClientEntity& Entity, float fBuoyancyConstant);
+    static bool SetObjectCenterOfMass(CClientEntity& Entity, const CVector& vecCenterOfMass);
+    static bool SetObjectVisibleInAllDimensions(CClientEntity& Entity, bool bVisible, unsigned short usNewDimension = 0);
 
     // Radar-area get funcs
     static CClientRadarArea* CreateRadarArea(CResource& Resource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color);
