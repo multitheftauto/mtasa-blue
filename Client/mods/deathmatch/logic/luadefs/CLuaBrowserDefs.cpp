@@ -168,7 +168,7 @@ int CLuaBrowserDefs::RequestBrowserDomains(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Remove empty URLs
-        pages.erase(std::remove_if(pages.begin(), pages.end(), [](const auto& url) { return url.empty(); }));
+        pages.erase(std::remove_if(pages.begin(), pages.end(), [](const auto& url) { return url.empty(); }), pages.end());
 
         // Convert to domains if we got a list of URLs
         if (bIsURL)
