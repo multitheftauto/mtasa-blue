@@ -11,8 +11,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CAUDIOCONTAINERLOOKUPTABLESA_H
-#define __CAUDIOCONTAINERLOOKUPTABLESA_H
+#pragma once
 
 #include <fstream>
 
@@ -44,5 +43,3 @@ struct SAudioLookupEntrySA
     uint32 length;
 }; // size = 12 = 0xC
 static_assert ( sizeof ( SAudioLookupEntrySA ) == 0xC, "Invalid size for SAudioLookupEntrySA");
-
-#endif

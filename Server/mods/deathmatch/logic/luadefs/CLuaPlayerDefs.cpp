@@ -509,6 +509,7 @@ int CLuaPlayerDefs::GetPlayerWantedLevel ( lua_State* luaVM )
 int CLuaPlayerDefs::GetAlivePlayers ( lua_State* luaVM )
 {
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+
     if ( pLuaMain )
     {
         // Create a new table
@@ -516,18 +517,22 @@ int CLuaPlayerDefs::GetAlivePlayers ( lua_State* luaVM )
 
         // Add all alive players
         unsigned int uiIndex = 0;
-        list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-        for ( ; iter != m_pPlayerManager->IterEnd (); ++iter )
+        
+        for ( auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); ++iter )
         {
-            if ( ( *iter )->IsSpawned () && !( *iter )->IsBeingDeleted () )
+            CPlayer* pPlayer = *iter;
+
+            if ( pPlayer->IsJoined() && pPlayer->IsSpawned() && !pPlayer->IsBeingDeleted() )
             {
                 lua_pushnumber ( luaVM, ++uiIndex );
-                lua_pushelement ( luaVM, *iter );
+                lua_pushelement ( luaVM, pPlayer );
                 lua_settable ( luaVM, -3 );
             }
         }
+
         return 1;
     }
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }
@@ -536,25 +541,30 @@ int CLuaPlayerDefs::GetAlivePlayers ( lua_State* luaVM )
 int CLuaPlayerDefs::GetDeadPlayers ( lua_State* luaVM )
 {
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
+
     if ( pLuaMain )
     {
         // Create a new table
         lua_newtable ( luaVM );
 
-        // Add all alive players
+        // Add all dead players
         unsigned int uiIndex = 0;
-        list < CPlayer* > ::const_iterator iter = m_pPlayerManager->IterBegin ();
-        for ( ; iter != m_pPlayerManager->IterEnd (); ++iter )
+
+        for ( auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); ++iter )
         {
-            if ( !( *iter )->IsSpawned () && !( *iter )->IsBeingDeleted () )
+            CPlayer* pPlayer = *iter;
+
+            if ( pPlayer->IsJoined() && !pPlayer->IsSpawned() && !pPlayer->IsBeingDeleted() )
             {
                 lua_pushnumber ( luaVM, ++uiIndex );
-                lua_pushelement ( luaVM, *iter );
+                lua_pushelement ( luaVM, pPlayer );
                 lua_settable ( luaVM, -3 );
             }
         }
+
         return 1;
     }
+
     lua_pushboolean ( luaVM, false );
     return 1;
 }

@@ -85,6 +85,7 @@ namespace SharedUtil
     // For tracking results of new features
     //
     void            AddReportLog                    ( uint uiId, const SString& strText, uint uiAmountLimit = 0 );
+    void            AddExceptionReportLog           ( uint uiId, const char* szExceptionName, const char* szExceptionText );
     void            SetReportLogContents            ( const SString& strText );
     SString         GetReportLogContents            ( void );
     SString         GetReportLogProcessTag          ( void );
@@ -630,8 +631,8 @@ namespace SharedUtil
             if ( m_Queue.size () > 0 )
             {
                 T ID = m_Queue.back();
-                m_Queue.pop_back ();
                 dest = ID;
+                m_Queue.pop_back ();
                 return true;
             }
 
@@ -1513,7 +1514,7 @@ namespace SharedUtil
             AddString ( strFilterDesc );
         }
 
-        bool IsFiltered ( int iValue )
+        bool IsFiltered ( int iValue ) const
         {
             if ( MapContains ( idMap, iValue ) )
                 return cDefaultType == '+';

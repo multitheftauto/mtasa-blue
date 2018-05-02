@@ -54,7 +54,6 @@ void CTaskManagerSA::SetTask(CTaskSA* pTaskPrimary, const int iTaskPriority, con
 
 CTask* CTaskManagerSA::GetTask(const int iTaskPriority)
 {
-    //_asm int 3
     DEBUG_TRACE("CTask* CTaskManagerSA::GetTask(const int iTaskPriority)");
     CTaskManagerSAInterface * pTaskManagerInterface = this->GetInterface();
     return m_pTaskManagementSystem->GetTask ( pTaskManagerInterface->m_tasks[iTaskPriority] );
@@ -196,7 +195,6 @@ CTask* CTaskManagerSA::GetTaskSecondary(const int iType)
 
 bool CTaskManagerSA::HasTaskSecondary(const CTask* pTaskSecondary)
 {
-    _asm int 3
     DEBUG_TRACE("bool CTaskManagerSA::HasTaskSecondary(const CTask* pTaskSecondary)");
     DWORD dwFunc = FUNC_HasTaskSecondary;
     bool bReturn = false;

@@ -141,7 +141,7 @@ int CLuaObjectDefs::IsObjectStatic ( lua_State* luaVM )
 
 int CLuaObjectDefs::GetObjectScale ( lua_State* luaVM )
 {
-//  float getObjectScale ( object theObject )
+//  float, float, float getObjectScale ( object theObject )
     CClientObject* pObject;
 
     CScriptArgReader argStream ( luaVM );

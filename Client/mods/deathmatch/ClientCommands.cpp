@@ -830,7 +830,10 @@ void COMMAND_Breakpoint ( const char* szCmdLine )
 {
     if ( !(szCmdLine && szCmdLine[0]) )
         return;
-    _asm int 3
+    _asm
+    {
+        int 3
+    }
     // Make our main pointer easily accessable
     // Added by slush:  You're a lazy ass if you use this.
     g_pClientGame;
@@ -1002,7 +1005,8 @@ CClientVehicle *v, *vnew;
 
 void COMMAND_Debug3 ( const char *szCmdLine )
 {
-    _asm {
+    _asm
+    {
         pushad
         mov     ecx, 0x8CB6F8
         mov     eax, 0x4E7F80

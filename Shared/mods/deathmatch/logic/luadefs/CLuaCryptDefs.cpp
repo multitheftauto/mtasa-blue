@@ -21,6 +21,8 @@ void CLuaCryptDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "base64Decode", Base64decode );
     CLuaCFunctions::AddFunction("passwordHash", PasswordHash);
     CLuaCFunctions::AddFunction("passwordVerify", PasswordVerify);
+    CLuaCFunctions::AddFunction ( "encodeString", EncodeString );
+    CLuaCFunctions::AddFunction ( "decodeString", DecodeString );
 }
 
 int CLuaCryptDefs::Md5 ( lua_State* luaVM )
@@ -323,5 +325,97 @@ int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaCryptDefs::EncodeString ( lua_State* luaVM )
+{
+    StringEncryptFunction algorithm;
+    SString data;
+    CStringMap options;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( algorithm );
+    argStream.ReadString ( data );
+    argStream.ReadStringMap ( options );
+
+    if ( !argStream.HasErrors () )
+    {
+        switch ( algorithm )
+        {
+            case StringEncryptFunction::TEA:
+            {
+                SString &key = options["key"];
+
+                if ( key.empty () )
+                {
+                    m_pScriptDebugging->LogCustom ( luaVM, "Invalid value for field 'key'" );
+                    lua_pushboolean ( luaVM, false );
+                    return 1;
+                }
+
+                SString result;
+                SharedUtil::TeaEncode ( data, key, &result );
+                lua_pushlstring ( luaVM, result, result.length () );
+                return 1;
+            }
+            default:
+            {
+                m_pScriptDebugging->LogCustom ( luaVM, "Unknown encryption algorithm" );
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaCryptDefs::DecodeString ( lua_State* luaVM )
+{
+    StringEncryptFunction algorithm;
+    SString data;
+    CStringMap options;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadEnumString ( algorithm );
+    argStream.ReadString ( data );
+    argStream.ReadStringMap ( options );
+
+    if ( !argStream.HasErrors () )
+    {
+        switch ( algorithm )
+        {
+            case StringEncryptFunction::TEA:
+            {
+                SString &key = options["key"];
+
+                if ( key.empty () )
+                {
+                    m_pScriptDebugging->LogCustom ( luaVM, "Invalid value for field 'key'" );
+                    lua_pushboolean ( luaVM, false );
+                    return 1;
+                }
+
+                SString result;
+                SharedUtil::TeaDecode ( data, key, &result );
+                lua_pushlstring ( luaVM, result, result.length () );
+                return 1;
+            }
+            default:
+            {
+                m_pScriptDebugging->LogCustom ( luaVM, "Unknown encryption algorithm" );
+                lua_pushboolean ( luaVM, false );
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+
+    lua_pushboolean ( luaVM, false );
     return 1;
 }

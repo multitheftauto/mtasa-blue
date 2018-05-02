@@ -65,7 +65,7 @@ CResourceManager::~CResourceManager ( void )
 // Load the complete list of resources and create their objects
 // DOES NOT reload already loaded resources, we need a special function for lua for that (e.g. reloadResource)
 // Talidan: yes it did, noob.  Not as of r897 - use bRefreshAll to do already loaded resources.
-bool CResourceManager::Refresh ( bool bRefreshAll, const SString& strJustThisResource, bool bShowTiming )
+bool CResourceManager::Refresh ( bool bRefreshAll, const SString strJustThisResource, bool bShowTiming )
 {
     CTimeUsMarker < 20 > marker;
     marker.Set( "Start" );
@@ -850,11 +850,11 @@ void CResourceManager::ProcessQueue ( void )
         }
         else if ( sItem.eQueue == QUEUE_REFRESH )
         {
-            Refresh();
+            Refresh( false, sItem.pResource ? sItem.pResource->GetName() : "" );
         }
         else if ( sItem.eQueue == QUEUE_REFRESHALL )
         {
-            Refresh( true );
+            Refresh( true, sItem.pResource ? sItem.pResource->GetName() : "" );
         }
     }
 

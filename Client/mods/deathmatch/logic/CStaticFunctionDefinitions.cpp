@@ -3998,49 +3998,40 @@ bool CStaticFunctionDefinitions::SetObjectTurnMass ( CClientEntity& Entity, floa
 
 bool CStaticFunctionDefinitions::SetObjectAirResistance ( CClientEntity& Entity, float fAirResistance )
 {
-    //if ( fAirResistance > 0.0f && fAirResistance <= 1.0f )
-    //{
-        RUN_CHILDREN ( SetObjectAirResistance ( **iter, fAirResistance ) )
+    RUN_CHILDREN ( SetObjectAirResistance ( **iter, fAirResistance ) )
 
-        if ( IS_OBJECT ( &Entity ) )
-        {
-            CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
-            Object.SetAirResistance ( fAirResistance );
-            return true;
-        }
-    //}
+    if ( IS_OBJECT ( &Entity ) )
+    {
+        CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
+        Object.SetAirResistance ( fAirResistance );
+        return true;
+    }
     return false;
 }
 
 bool CStaticFunctionDefinitions::SetObjectElasticity ( CClientEntity& Entity, float fElasticity )
 {
-    //if ( fElasticity >= 0.0f )
-    //{
-        RUN_CHILDREN ( SetObjectElasticity ( **iter, fElasticity ) )
+    RUN_CHILDREN ( SetObjectElasticity ( **iter, fElasticity ) )
 
-        if ( IS_OBJECT ( &Entity ) )
-        {
-            CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
-            Object.SetElasticity ( fElasticity );
-            return true;
-        }
-    //}
+    if ( IS_OBJECT ( &Entity ) )
+    {
+        CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
+        Object.SetElasticity ( fElasticity );
+        return true;
+    }
     return false;
 }
 
 bool CStaticFunctionDefinitions::SetObjectBuoyancyConstant ( CClientEntity& Entity, float fBuoyancyConstant )
 {
-    //if ( fElasticity >= 0.0f )
-    //{
-        RUN_CHILDREN ( SetObjectBuoyancyConstant ( **iter, fBuoyancyConstant ) )
+    RUN_CHILDREN ( SetObjectBuoyancyConstant ( **iter, fBuoyancyConstant ) )
 
-        if ( IS_OBJECT ( &Entity ) )
-        {
-            CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
-            Object.SetBuoyancyConstant ( fBuoyancyConstant );
-            return true;
-        }
-    //}
+    if ( IS_OBJECT ( &Entity ) )
+    {
+        CDeathmatchObject& Object = static_cast < CDeathmatchObject& > ( Entity );
+        Object.SetBuoyancyConstant ( fBuoyancyConstant );
+        return true;
+    }
     return false;
 }
 
@@ -4170,22 +4161,28 @@ bool CStaticFunctionDefinitions::SetRadarAreaFlashing ( CClientRadarArea* RadarA
 
 bool CStaticFunctionDefinitions::IsInsideRadarArea ( CClientRadarArea* RadarArea, CVector2D vecPosition, bool& inside )
 {
-    if ( RadarArea )
+    assert ( RadarArea );
+
+    CVector2D vecAreaPosition = RadarArea->GetPosition ();
+    CVector2D vecAreaSize = RadarArea->GetSize ();
+
+    inside = false;
+
+    // Calculate boundaries and make sure they're in ascending order,
+    // so it is always safe to start checking from the bottom-left corner
+    std::pair<float, float> fHorizontalBounds = std::minmax ( vecAreaPosition.fX, vecAreaPosition.fX + vecAreaSize.fX );
+    std::pair<float, float> fVerticalBounds = std::minmax ( vecAreaPosition.fY, vecAreaPosition.fY + vecAreaSize.fY );
+
+    // Do the calc from the bottom-left corner
+    if ( vecPosition.fX >= fHorizontalBounds.first && vecPosition.fX <= fHorizontalBounds.second )
     {
-        CVector2D vecRadarPos = RadarArea->GetPosition();
-        CVector2D vecRadarSize = RadarArea->GetSize();
-        float fMaxX = vecRadarPos.fX + vecRadarSize.fX;
-        float fMaxY = vecRadarPos.fY + vecRadarSize.fY;
-        if ( vecPosition.fX >= vecRadarPos.fX && vecPosition.fX <= fMaxX )
+        if ( vecPosition.fY >= fVerticalBounds.first && vecPosition.fY <= fVerticalBounds.second )
         {
-            if ( vecPosition.fY >= vecRadarPos.fY && vecPosition.fY <= fMaxY )
-            {
-                inside = true;
-            }
+            inside = true;
         }
-        return true;
     }
-    return false;
+
+    return true;
 }
 
 
@@ -4377,9 +4374,9 @@ bool CStaticFunctionDefinitions::ResetAmbientSounds ( void )
 }
 
 
-bool CStaticFunctionDefinitions::SetWorldSoundEnabled ( uint uiGroup, uint uiIndex, bool bMute )
+bool CStaticFunctionDefinitions::SetWorldSoundEnabled ( uint uiGroup, uint uiIndex, bool bMute, bool bImmediate )
 {
-    g_pGame->GetAudio ()->SetWorldSoundEnabled ( uiGroup, uiIndex, bMute );
+    g_pGame->GetAudio ()->SetWorldSoundEnabled ( uiGroup, uiIndex, bMute, bImmediate );
     return true;
 }
 

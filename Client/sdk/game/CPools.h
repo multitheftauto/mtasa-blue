@@ -107,10 +107,9 @@ public:
     virtual CBuilding*      AddBuilding             ( DWORD dwModelID ) = 0;
     virtual CVehicle*       AddTrain                ( CVector* vecPosition, DWORD dwModels[], int iSize, bool iDirection, uchar ucTrackId = 0xFF ) = 0;
     virtual CEntity*        GetEntity               ( DWORD* pGameInterface ) = 0;
+    virtual uint            GetModelIdFromClump     (RpClump* pRpClump) = 0;
 
     virtual int             GetNumberOfUsedSpaces   ( ePools pool ) = 0;
-    virtual void            DumpPoolsStatus         ( ) = 0;
-
     virtual int             GetPoolDefaultCapacity  ( ePools pool ) = 0;
     virtual int             GetPoolCapacity         ( ePools pool ) = 0;
     virtual void            SetPoolCapacity         ( ePools pool, int iValue ) = 0;

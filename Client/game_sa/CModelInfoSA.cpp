@@ -485,17 +485,21 @@ BOOL CModelInfoSA::IsLoaded ( )
 
 BOOL CModelInfoSA::DoIsLoaded ( )
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsLoaded ( )");
+    DEBUG_TRACE("BOOL CModelInfoSA::DoIsLoaded ( )");
 
     //return (BOOL)*(BYTE *)(ARRAY_ModelLoaded + 20*dwModelID);
     BOOL bLoaded = pGame->GetStreaming()->HasModelLoaded(m_dwModelID);
-    m_pInterface = ppModelInfo [ m_dwModelID ];
 
-    if ( bLoaded && m_dwModelID < 20000 )
+    if ( m_dwModelID < 20000 )
     {
-        // Check rw object is there
-        if ( !m_pInterface || !m_pInterface->pRwObject )
-            return false;
+        m_pInterface = ppModelInfo[m_dwModelID];
+
+        if ( bLoaded )
+        {
+            // Check rw object is there
+            if (!m_pInterface || !m_pInterface->pRwObject)
+                return false;
+        }
     }
     return bLoaded;
 }
@@ -532,6 +536,7 @@ CBoundingBox * CModelInfoSA::GetBoundingBox ( )
 
 bool CModelInfoSA::IsValid ( )
 {
+    if ( m_dwModelID >= 20000 && m_dwModelID < MODELINFO_MAX ) return true;
     return ppModelInfo [ m_dwModelID ] != 0;
 }
 
@@ -677,7 +682,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
             {
                 if ( !pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered )
                 {
-                    __asm
+                    _asm
                     {
                         mov ecx, pEntity
                         mov eax, [ecx]
@@ -701,7 +706,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL ( void )
             {
                 if ( !pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered )
                 {
-                    __asm
+                    _asm
                     {
                         mov ecx, pEntity
                         mov eax, [ecx]
@@ -1067,7 +1072,8 @@ void CModelInfoSA::SetColModel ( CColModel* pColModel )
 
         // public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
         DWORD func = 0x5B2C20;
-        __asm {
+        _asm
+        {
             push    pColModelInterface
             push    ModelID
             call    func
@@ -1117,7 +1123,8 @@ void CModelInfoSA::RestoreColModel ( void )
 
             // public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
             DWORD func = 0x5B2C20;
-            __asm {
+            _asm
+            {
                 push    dwOriginalColModelInterface
                 push    ModelID
                 call    func

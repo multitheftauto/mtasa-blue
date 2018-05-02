@@ -527,7 +527,7 @@ void CPickup::Callback_OnLeave ( CColShape& Shape, CElement& Element )
                 // Is he alive?
                 if ( !Player.IsDead () )
                 {
-                    // Call the onPickupHit event
+                    // Call the onPickupLeave event
                     CLuaArguments Arguments;
                     Arguments.PushElement ( &Player );
                     CallEvent ( "onPickupLeave", Arguments );

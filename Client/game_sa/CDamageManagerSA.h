@@ -58,8 +58,8 @@ public:
     VOID            SetEngineStatus         ( BYTE bEngineState );
     BYTE            GetDoorStatus           ( eDoors bDoor );
     VOID            SetDoorStatus           ( eDoors bDoor, BYTE bDoorStatus );
-    BYTE            GetWheelStatus          ( eWheels bWheel );
-    VOID            SetWheelStatus          ( eWheels bWheel, BYTE bTireStatus );
+    BYTE            GetWheelStatus          ( eWheelPosition bWheel );
+    VOID            SetWheelStatus          ( eWheelPosition bWheel, BYTE bTireStatus );
     BYTE            GetPanelStatus          ( BYTE bPanel );
     unsigned long   GetPanelStatus          ( void );
     VOID            SetPanelStatus          ( BYTE bPanel, BYTE bPanelStatus );

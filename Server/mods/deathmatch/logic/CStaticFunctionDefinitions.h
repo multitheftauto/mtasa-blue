@@ -637,12 +637,16 @@ public:
     static bool                 IsGuestAccount                      ( CAccount* pAccount, bool& bGuest );
     static std::shared_ptr<CLuaArgument> GetAccountData             ( CAccount* pAccount, const char* szKey );
     static bool                 GetAllAccountData                   ( lua_State* pLua, CAccount* pAccount );
+    static bool                 GetAccountsByData                   ( const SString& dataName, const SString& value, std::vector<CAccount*>& outAccounts );
     static bool                 GetAccountSerial                    ( CAccount* pAccount, SString& strSerial );
     static bool                 GetAccountsBySerial                 ( const SString& strSerial, std::vector<CAccount*>& outAccounts );
+    static bool                 GetAccountIP                        ( CAccount* pAccount, SString& strIP );
+    static bool                 GetAccountsByIP                     ( const SString& strIP, std::vector<CAccount*>& outAccounts );
 
     // Account set funcs
     static CAccount*            AddAccount                          ( const SString& strName, const SString& strPassword, bool bAllowCaseVariations, SString& strOutError );
     static bool                 RemoveAccount                       ( CAccount* pAccount );
+    static bool                 SetAccountName                      ( CAccount* pAccount, SString strNewName, bool bAllowCaseVariations, SString& strOutError );
     static bool                 SetAccountPassword                  ( CAccount* pAccount, SString szPassword, CAccountPassword::EAccountPasswordType ePasswordType );
     static bool                 SetAccountData                      ( CAccount* pAccount, const char* szKey, CLuaArgument * pArgument );
     static bool                 CopyAccountData                     ( CAccount* pAccount, CAccount* pFromAccount );

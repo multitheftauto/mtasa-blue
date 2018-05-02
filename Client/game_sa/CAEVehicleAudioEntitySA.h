@@ -123,9 +123,6 @@
 
 #define VAR_CAEVehicleAudioEntity__s_pPlayerDriver                                     0xB6B990
 
-#define FUNC_CAESoundManager__CancelSoundsInBankSlot                                   0x4EFC60
-#define VAR_pAESoundManager                                                            0xB62CB0
-
 struct tVehicleAudioSettings
 {
     char    m_nVehicleSoundType;
@@ -256,6 +253,7 @@ public:
                                         CAEVehicleAudioEntitySA                 ( CAEVehicleAudioEntitySAInterface * pInterface );
     void                                JustGotInVehicleAsDriver                ( void );
     void                                JustGotOutOfVehicleAsDriver             ( void );
+    void                                TurnOnRadioForVehicle                   ( void );
     void                                StopVehicleEngineSound                  ( unsigned char ucSlot );
 
 private:

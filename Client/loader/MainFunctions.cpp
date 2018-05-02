@@ -56,7 +56,7 @@ void InitLocalization( bool bShowErrors )
         if ( !bShowErrors )
             return;
         DisplayErrorMessageBox ( ("Load failed.  Please ensure that "
-                            "the file core.dll is in the modules "
+                            "the file " MTA_DLL_NAME " is in the modules "
                             "directory within the MTA root directory."), _E("CL23"), "core-missing" ); // Core.dll missing
 
         return ExitProcess( EXIT_ERROR );
@@ -391,26 +391,30 @@ void HandleNotUsedMainMenu ( void )
     // Check if problem processes are active
     struct
     {
-        const char* szFilename;
+        std::vector<SString> matchTextList;
         const char* szProductName;
         const char* szTrouble;
     } procItems[] = {
-        {"Evolve", "Evolve", "not-used-menu-evolve"},
-        {"GbpSv.exe", "GAS Tecnologia - G-Buster Browser Defense", "not-used-menu-gbpsv"}};
+        {{"\\Evolve"}, "Evolve", "not-used-menu-evolve"},
+        {{"\\GbpSv.exe", "Diebold\\Warsaw"}, "GAS Tecnologia - G-Buster Browser Defense", "not-used-menu-gbpsv"}};
     for (uint i = 0; i < NUMELMS(procItems); i++ )
     {
         for ( auto processId : MyEnumProcesses( true ) )
         {
-            SString strFilename = GetProcessFilename( processId );
-            if ( strFilename.BeginsWithI( procItems[i].szFilename ) )
+            SString strProcessFilename = GetProcessPathFilename(processId);    
+            for (auto strMatchText : procItems[i].matchTextList)
             {
-                SString strMessage = _("Are you having problems running MTA:SA?.\n\nTry disabling the following products for GTA and MTA:");
-                strMessage += "\n\n";
-                strMessage += procItems[i].szProductName;
-                DisplayErrorMessageBox ( strMessage, _E("CL43"), procItems[i].szTrouble );
-                break;
+                if (strProcessFilename.ContainsI(strMatchText))
+                {
+                    SString strMessage = _("Are you having problems running MTA:SA?.\n\nTry disabling the following products for GTA and MTA:");
+                    strMessage += "\n\n";
+                    strMessage += procItems[i].szProductName;
+                    DisplayErrorMessageBox ( strMessage, _E("CL43"), procItems[i].szTrouble );
+                    goto done;
+                }
             }
         }
+        done:;
     }
 }
 
