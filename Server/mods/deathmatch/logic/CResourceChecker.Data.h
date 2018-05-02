@@ -326,6 +326,8 @@ namespace
 
         { false, "getComponentPosition",           "will return 3 floats instead of a Vector3", "1.5.5-9.11710" },
         { false, "getComponentRotation",           "will return 3 floats instead of a Vector3", "1.5.5-9.11710" },
+        { false, "getObjectMass",                  "getObjectProperty" },
+        { false, "setObjectMass",                  "setObjectProperty" },
     };
 
 
