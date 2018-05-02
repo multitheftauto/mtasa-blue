@@ -1,107 +1,106 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        SharedUtil.File.h
-*  PURPOSE:
-*  DEVELOPERS:  
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        SharedUtil.File.h
+ *  PURPOSE:
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 namespace SharedUtil
 {
     //
     // Returns true if the file/directory exists
     //
-    bool            FileExists                      ( const SString& strFilename );
-    bool            DirectoryExists                 ( const SString& strPath );
+    bool FileExists(const SString& strFilename);
+    bool DirectoryExists(const SString& strPath);
 
     //
     // Load from a file
     //
-    bool            FileLoad                        ( const SString& strFilename, std::vector < char >& buffer, int iMaxSize = INT_MAX, int iOffset = 0 );
-    bool            FileLoad                        ( const SString& strFilename, SString& strBuffer, int iMaxSize = INT_MAX, int iOffset = 0 );
+    bool FileLoad(const SString& strFilename, std::vector<char>& buffer, int iMaxSize = INT_MAX, int iOffset = 0);
+    bool FileLoad(const SString& strFilename, SString& strBuffer, int iMaxSize = INT_MAX, int iOffset = 0);
 
     //
     // Save to a file
     //
-    bool            FileSave                        ( const SString& strFilename, const void* pBuffer, unsigned long ulSize, bool bForce = true );
-    bool            FileSave                        ( const SString& strFilename, const SString& strBuffer, bool bForce = true );
+    bool FileSave(const SString& strFilename, const void* pBuffer, unsigned long ulSize, bool bForce = true);
+    bool FileSave(const SString& strFilename, const SString& strBuffer, bool bForce = true);
 
     //
     // Append to a file
     //
-    bool            FileAppend                      ( const SString& strFilename, const void* pBuffer, unsigned long ulSize, bool bForce = true );
-    bool            FileAppend                      ( const SString& strFilename, const SString& strBuffer, bool bForce = true );
+    bool FileAppend(const SString& strFilename, const void* pBuffer, unsigned long ulSize, bool bForce = true);
+    bool FileAppend(const SString& strFilename, const SString& strBuffer, bool bForce = true);
 
     //
     // Get a file size
     //
-    uint64          FileSize                        ( const SString& strFilename );
+    uint64 FileSize(const SString& strFilename);
 
     //
     // Ensure all directories exist to the file
     //
-    void            MakeSureDirExists               ( const SString& strPath );
+    void MakeSureDirExists(const SString& strPath);
 
-    SString         PathConform                     ( const SString& strInPath );
-    SString         PathJoin                        ( const SString& str1, const SString& str2 );
-    SString         PathJoin                        ( const SString& str1, const SString& str2, const SString& str3, const SString& str4 = "", const SString& str5 = "" );
-    SString         PathMakeRelative                ( const SString& strInBasePath, const SString& strInAbsPath );
-    void            ExtractFilename                 ( const SString& strPathFilename, SString* strPath, SString* strFilename );
-    bool            ExtractExtension                ( const SString& strFilename, SString* strRest, SString* strExt );
-    SString         ExtractPath                     ( const SString& strPathFilename );
-    SString         ExtractFilename                 ( const SString& strPathFilename );
-    SString         ExtractExtension                ( const SString& strPathFilename );
-    SString         ExtractBeforeExtension          ( const SString& strPathFilename );
+    SString PathConform(const SString& strInPath);
+    SString PathJoin(const SString& str1, const SString& str2);
+    SString PathJoin(const SString& str1, const SString& str2, const SString& str3, const SString& str4 = "", const SString& str5 = "");
+    SString PathMakeRelative(const SString& strInBasePath, const SString& strInAbsPath);
+    void    ExtractFilename(const SString& strPathFilename, SString* strPath, SString* strFilename);
+    bool    ExtractExtension(const SString& strFilename, SString* strRest, SString* strExt);
+    SString ExtractPath(const SString& strPathFilename);
+    SString ExtractFilename(const SString& strPathFilename);
+    SString ExtractExtension(const SString& strPathFilename);
+    SString ExtractBeforeExtension(const SString& strPathFilename);
 
-    bool            FileDelete                      ( const SString& strFilename, bool bForce = true );
-    bool            FileRename                      ( const SString& strFilenameOld, const SString& strFilenameNew );
-    bool            DelTree                         ( const SString& strPath, const SString& strInsideHere );
-    bool            MkDir                           ( const SString& strInPath, bool bTree = true );
-    bool            FileCopy                        ( const SString& strSrc, const SString& strDest, bool bForce = true );
-    std::vector < SString > FindFiles               ( const SString& strMatch, bool bFiles, bool bDirectories, bool bSortByDate = false );
-    SString         MakeUniquePath                  ( const SString& strPathFilename );
-    SString         ConformPathForSorting           ( const SString& strPathFilename );
-    bool            IsAbsolutePath                  ( const SString& strPath );
+    bool                 FileDelete(const SString& strFilename, bool bForce = true);
+    bool                 FileRename(const SString& strFilenameOld, const SString& strFilenameNew);
+    bool                 DelTree(const SString& strPath, const SString& strInsideHere);
+    bool                 MkDir(const SString& strInPath, bool bTree = true);
+    bool                 FileCopy(const SString& strSrc, const SString& strDest, bool bForce = true);
+    std::vector<SString> FindFiles(const SString& strMatch, bool bFiles, bool bDirectories, bool bSortByDate = false);
+    SString              MakeUniquePath(const SString& strPathFilename);
+    SString              ConformPathForSorting(const SString& strPathFilename);
+    bool                 IsAbsolutePath(const SString& strPath);
 
-    SString         GetSystemCurrentDirectory       ( void );
-    SString         GetSystemDllDirectory           ( void );
-    SString         GetSystemLocalAppDataPath       ( void );
-    SString         GetSystemCommonAppDataPath      ( void );
-    SString         GetSystemPersonalPath           ( void );
-    SString         GetSystemWindowsPath            ( void );
-    SString         GetSystemSystemPath             ( void );
-    SString         GetSystemTempPath               ( void );
-    SString         GetMTADataPath                  ( void );
-    SString         GetMTADataPathCommon            ( void );
-    SString         GetMTATempPath                  ( void );
+    SString GetSystemCurrentDirectory(void);
+    SString GetSystemDllDirectory(void);
+    SString GetSystemLocalAppDataPath(void);
+    SString GetSystemCommonAppDataPath(void);
+    SString GetSystemPersonalPath(void);
+    SString GetSystemWindowsPath(void);
+    SString GetSystemSystemPath(void);
+    SString GetSystemTempPath(void);
+    SString GetMTADataPath(void);
+    SString GetMTADataPathCommon(void);
+    SString GetMTATempPath(void);
 
-    bool            IsShortPathName                 ( const char* szPath );
-    bool            IsShortPathName                 ( const wchar_t* szPath );
-    SString         GetSystemShortPathName          ( const SString& strPath );
-    SString         GetSystemLongPathName           ( const SString& strPath );
+    bool    IsShortPathName(const char* szPath);
+    bool    IsShortPathName(const wchar_t* szPath);
+    SString GetSystemShortPathName(const SString& strPath);
+    SString GetSystemLongPathName(const SString& strPath);
 
-    SString         GetLaunchPathFilename           ( void );
-    SString         GetLaunchPath                   ( void );
-    SString         GetLaunchFilename               ( void );
+    SString GetLaunchPathFilename(void);
+    SString GetLaunchPath(void);
+    SString GetLaunchFilename(void);
 
-    SString         GetPathDriveName                ( const SString& strPath );
-    uint            GetPathFreeSpaceMB              ( const SString& strPath );
-    SString         GetDriveNameWithNotEnoughSpace  ( uint uiResourcesPathMinMB = 10, uint uiDataPathMinMB = 10 );
+    SString GetPathDriveName(const SString& strPath);
+    uint    GetPathFreeSpaceMB(const SString& strPath);
+    SString GetDriveNameWithNotEnoughSpace(uint uiResourcesPathMinMB = 10, uint uiDataPathMinMB = 10);
 
-    WString         FromUTF8                        ( const SString& strPath );
-    SString         ToUTF8                          ( const WString& strPath );
+    WString FromUTF8(const SString& strPath);
+    SString ToUTF8(const WString& strPath);
 
     namespace File
     {
-        FILE*       Fopen                           (const char* szFilename, const char* szMode);
-        int         Mkdir                           (const char* szPath, int iMode=0775);
-        int         Chdir                           (const char* szPath);
-        int         Rmdir                           (const char* szPath);
-        int         Delete                          (const char* szFilename);
-        int         Rename                          (const char* szOldFilename, const char * szNewFilename);
-    }
-}
+        FILE* Fopen(const char* szFilename, const char* szMode);
+        int   Mkdir(const char* szPath, int iMode = 0775);
+        int   Chdir(const char* szPath);
+        int   Rmdir(const char* szPath);
+        int   Delete(const char* szFilename);
+        int   Rename(const char* szOldFilename, const char* szNewFilename);
+    }            // namespace File
+}            // namespace SharedUtil

@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -12,8 +12,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Pootle 2.5.0-rc1\n"
 "Translators: Nidecker; Waileer; tinostar91; ccw\n"
+"X-Generator: Pootle 2.5.0-rc1\n"
 "X-POOTLE-MTIME: 1369147739.0\n"
 
 #. GET_XPVISTA_PLEASE
@@ -41,8 +41,7 @@ msgid ""
 "\n"
 "Click Next to continue."
 msgstr ""
-"Tento sprievodca Vás povedie počas inštalácie alebo aktualizácie $(^Name) "
-"${REVISION_TAG}\n"
+"Tento sprievodca Vás povedie počas inštalácie alebo aktualizácie $(^Name) ${REVISION_TAG}\n"
 "\n"
 "Odporúča sa zavrieť všetky ostatné aplikácie pred začatím Inštalácie.\n"
 "\n"
@@ -71,8 +70,7 @@ msgid ""
 msgstr ""
 "Prosím vyberte priečinok s Grand Theft Auto: San Andreas.$\n"
 "$\n"
-"Pre inštaláciu MTA:SA MUSÍTE mať Grand Theft Auto: San Andreas vo verzií "
-"1.0, iné verzie nie sú podporované.$\n"
+"Pre inštaláciu MTA:SA MUSÍTE mať Grand Theft Auto: San Andreas vo verzií 1.0, iné verzie nie sú podporované.$\n"
 "$\n"
 "Pre začatie inštalácie kliknite na Inštalovať."
 
@@ -117,8 +115,8 @@ msgid ""
 "The Multi Theft Auto Server. This allows you to host games from your "
 "computer. This requires a fast internet connection."
 msgstr ""
-"Multi Theft Auto Server. Umožňuje vytvoriť server spustený z Vášho počítača. "
-"Vyžaduje sa rýchle internetové pripojenie."
+"Multi Theft Auto Server. Umožňuje vytvoriť server spustený z Vášho počítača."
+" Vyžaduje sa rýchle internetové pripojenie."
 
 #. DESC_Section4
 #: ../Shared/installer/nightly.nsi:204
@@ -146,8 +144,8 @@ msgid ""
 "The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps "
 "for use in gamemodes for MTA."
 msgstr ""
-"MTA:SA 1.0 mapový editor. Môžete ho použiť na vytvorenie vlastnej mapy ktorú "
-"použijete v niektorom hernom móde MTA."
+"MTA:SA 1.0 mapový editor. Môžete ho použiť na vytvorenie vlastnej mapy ktorú"
+" použijete v niektorom hernom móde MTA."
 
 #. DESC_Section9
 #: ../Shared/installer/nightly.nsi:209
@@ -170,7 +168,8 @@ msgstr ""
 #. DESC_SectionGroupClient
 #: ../Shared/installer/nightly.nsi:212
 msgid "The client is the program you run to play on a Multi Theft Auto server"
-msgstr "Klient je program ktorý spustíte pre hranie na Multi Theft Auto serveri"
+msgstr ""
+"Klient je program ktorý spustíte pre hranie na Multi Theft Auto serveri"
 
 #. INST_CLIENTSERVER
 #: ../Shared/installer/nightly.nsi:409
@@ -246,8 +245,10 @@ msgid ""
 "$\n"
 "Please reinstall if there are problems later."
 msgstr ""
-"Platná Windows verzia hry Grand Theft Auto: San Andreas nebola nájdená.$\r$\n"
-"Inštalácia bude napriek tomu pokračovať.$\r$\n"
+"Platná Windows verzia hry Grand Theft Auto: San Andreas nebola nájdená.$\r"
+"$\n"
+"Inštalácia bude napriek tomu pokračovať.$\r"
+"$\n"
 "Preinštalujte MTA v prípade neskorších problémov."
 
 #. INST_SEC_CORE_RESOURCES
@@ -306,8 +307,8 @@ msgid ""
 "screenshots you have created will be lost."
 msgstr ""
 "Chcete ponechať Vaše osobné súbory (ako doplnky, screenshoty a nastavenie "
-"servera)? Ak kliknete na nie, všetky doplnky, nastavenia a screenshoty ktoré "
-"ste vytvorili budú zmazané."
+"servera)? Ak kliknete na nie, všetky doplnky, nastavenia a screenshoty ktoré"
+" ste vytvorili budú zmazané."
 
 #. MSGBOX_PATCH_FAIL1
 #: ../Shared/installer/nightly.nsi:1144
@@ -357,8 +358,7 @@ msgid ""
 msgstr ""
 "Odlišná hlavná verzia MTA ($1) existuje v danom umiestnení.$\n"
 "$\n"
-"MTA je navrhnutý tak, aby boli hlavné verzie inštalované do rozličných "
-"umiestnení.$\n"
+"MTA je navrhnutý tak, aby boli hlavné verzie inštalované do rozličných umiestnení.$\n"
 "Ste si istý, že chcete nahradiť MTA $1 v $INSTDIR ?"
 
 #. INST_GTA_CONFLICT
@@ -414,10 +414,8 @@ msgid ""
 "$\n"
 " Click Next to continue."
 msgstr ""
-"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} bude nainštalovaný do "
-"nasledujúceho priečinka.$\n"
-"Pre inštaláciu do iného priečinka kliknite na Prehľadávať a zvoľte iný "
-"priečinok.$\n"
+"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} bude nainštalovaný do nasledujúceho priečinka.$\n"
+"Pre inštaláciu do iného priečinka kliknite na Prehľadávať a zvoľte iný priečinok.$\n"
 "$\n"
 "Kliknite na Ďalej pre pokračovanie."
 
@@ -457,7 +455,8 @@ msgstr ""
 #: ../Shared/installer/nightly.nsi:2109
 msgid ""
 "Warning: A different major version of MTA ($1) already exists at that path."
-msgstr "Varovanie: Odlišná hlavná verzia MTA ($1) existuje v danom umiestnení."
+msgstr ""
+"Varovanie: Odlišná hlavná verzia MTA ($1) existuje v danom umiestnení."
 
 #. INST_LOC_UPGRADE
 #: ../Shared/installer/nightly.nsi:2110
@@ -497,8 +496,10 @@ msgstr ""
 #~ "$\n"
 #~ "Please reinstall if there are problems later."
 #~ msgstr ""
-#~ "Nemožno stiahnuť Microsoft Visual Studio 2008 SP1 redistributable.$\r$\n"
-#~ "Inštalácia bude napriek tomu pokračovať.$\r$\n"
+#~ "Nemožno stiahnuť Microsoft Visual Studio 2008 SP1 redistributable.$\r"
+#~ "$\n"
+#~ "Inštalácia bude napriek tomu pokračovať.$\r"
+#~ "$\n"
 #~ "Preinštalujte MTA v prípade neskorších problémov."
 
 #, fuzzy

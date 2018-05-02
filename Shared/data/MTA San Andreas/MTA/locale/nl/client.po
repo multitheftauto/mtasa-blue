@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Translators: MCvarial; MittellBuurman; JaJa; Winky; iam2noob4u; Tim Ossenblok; RaceXtreme; HOLLAND; Lukkie; Blokker_1999; Boštjan Kozar\n"
+"Translators: MCvarial; MittellBuurman; Winky; JaJa; iam2noob4u; Tim Ossenblok; RaceXtreme; HOLLAND; Lukkie; Blokker_1999; Boštjan Kozar\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
 "X-POOTLE-MTIME: 1406144014.0\n"
 
@@ -395,8 +395,9 @@ msgid "shows the frame timing graph"
 msgstr "toont de frame tijdsgrafiek"
 
 #: C:\mtasa-blue\Client\core\CCore.h:55
+#, fuzzy
 msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
-msgstr ""
+msgstr "Copyright (C) 2003 - 2014 Multi Theft Auto"
 
 #: C:\mtasa-blue\Client\core\CCredits.cpp:32
 msgid "Programming"
@@ -1341,11 +1342,15 @@ msgid "Some settings will be changed when you disconnect the current server"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1339
+#, fuzzy
 msgid ""
 "\n"
 "\n"
 "Do you want to disconnect now?"
 msgstr ""
+"\n"
+"\n"
+"Wil je nu herstarten?"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1342
 msgid "DISCONNECT REQUIRED"
@@ -1487,8 +1492,9 @@ msgid "Bottom"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2181
+#, fuzzy
 msgid "Font"
-msgstr ""
+msgstr "Lettertype:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2223
 msgid "Hide background when not typing"
@@ -1567,8 +1573,9 @@ msgid "Preview"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:3888
+#, fuzzy
 msgid "Please disconnect before changing language"
-msgstr ""
+msgstr "Gelieve de verbinding te verbreken voordat u uw thema verandert"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:3917
 msgid "Please disconnect before changing skin"

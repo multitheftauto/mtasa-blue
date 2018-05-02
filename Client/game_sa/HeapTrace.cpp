@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/HeapTrace.cpp
-*  PURPOSE:     Heap trace handler
-*  DEVELOPERS:  Ed Lyons
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/HeapTrace.cpp
+ *  PURPOSE:     Heap trace handler
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
@@ -18,42 +17,41 @@ using namespace std;
 
 struct ALLOC_INFO
 {
-    void*           pAddress;
-    unsigned int    uiSize;
-    char            szFile [64];
-    int             iLine;
+    void*        pAddress;
+    unsigned int uiSize;
+    char         szFile[64];
+    int          iLine;
 };
 
-static bool bHookEnabled = true;
-static list < ALLOC_INFO* >* pAllocList;
-static unsigned int uiTotalNews = 0;
-static unsigned int uiTotalFrees = 0;
+static bool               bHookEnabled = true;
+static list<ALLOC_INFO*>* pAllocList;
+static unsigned int       uiTotalNews = 0;
+static unsigned int       uiTotalFrees = 0;
 
-
-void AddTrack ( void* pAddress, size_t size, const char* szFile, int iLine )
+void AddTrack(void* pAddress, size_t size, const char* szFile, int iLine)
 {
     // Prevent an infinite loop (self-hooks)
     static bool bAlreadyIn = false;
-    if ( !bAlreadyIn && bHookEnabled )
+    if (!bAlreadyIn && bHookEnabled)
     {
         bAlreadyIn = true;
 
         // Create a struct and copy over the info
         ALLOC_INFO* pTemp = new ALLOC_INFO;
         pTemp->pAddress = pAddress;
-        pTemp->uiSize = static_cast < unsigned int > ( size );
-        strncpy ( pTemp->szFile, szFile, 63 );
-        pTemp->szFile [63] = 0;
+        pTemp->uiSize = static_cast<unsigned int>(size);
+        strncpy(pTemp->szFile, szFile, 63);
+        pTemp->szFile[63] = 0;
         pTemp->iLine = iLine;
 
         // Make sure we got a list
-        if ( !pAllocList )
+        if (!pAllocList)
         {
-            pAllocList = new list < ALLOC_INFO* >;
+            pAllocList = new list<ALLOC_INFO*>;
         }
 
         // Put it in
-        pAllocList->insert ( pAllocList->begin (), pTemp );
+        pAllocList->insert(pAllocList->begin(), pTemp);
 
         // Inc the new counter
         ++uiTotalNews;
@@ -63,17 +61,17 @@ void AddTrack ( void* pAddress, size_t size, const char* szFile, int iLine )
     }
 };
 
-void RemoveTrack ( void* pAddress )
+void RemoveTrack(void* pAddress)
 {
     // Make sure we got an alloc list
-    if ( !pAllocList )
+    if (!pAllocList)
     {
         return;
     }
 
     // Prevent an infinite loop (self-hooks)
     static bool bAlreadyIn = false;
-    if ( !bAlreadyIn && bHookEnabled )
+    if (!bAlreadyIn && bHookEnabled)
     {
         bAlreadyIn = true;
 
@@ -81,14 +79,14 @@ void RemoveTrack ( void* pAddress )
         ++uiTotalFrees;
 
         // Look for the address in our list
-        ALLOC_INFO* pTemp;
-        list < ALLOC_INFO* > ::iterator iter = pAllocList->begin ();
-        for( ; iter != pAllocList->end() ; iter++ )
+        ALLOC_INFO*                 pTemp;
+        list<ALLOC_INFO*>::iterator iter = pAllocList->begin();
+        for (; iter != pAllocList->end(); iter++)
         {
             pTemp = *iter;
-            if ( pTemp->pAddress == pAddress )
+            if (pTemp->pAddress == pAddress)
             {
-                pAllocList->remove ( pTemp );
+                pAllocList->remove(pTemp);
                 delete pTemp;
                 break;
             }
@@ -99,58 +97,54 @@ void RemoveTrack ( void* pAddress )
     }
 }
 
-
-void DumpUnfreed ( void )
+void DumpUnfreed(void)
 {
     // Make sure we got a list
-    if ( !pAllocList )
+    if (!pAllocList)
     {
         return;
     }
 
     // Create a dump file
-    FILE* pFile = fopen ( "memoryleaks_gamesa.txt", "w+" );
-    if ( pFile )
+    FILE* pFile = fopen("memoryleaks_gamesa.txt", "w+");
+    if (pFile)
     {
         // Any unfreed items?
-        if ( pAllocList->size () > 0 )
+        if (pAllocList->size() > 0)
         {
             // Dump each unfreed item to a file
-            unsigned int uiTotalSize = 0;
-            list < ALLOC_INFO* > ::iterator iter = pAllocList->begin ();
-            for ( ; iter != pAllocList->end (); iter++ )
+            unsigned int                uiTotalSize = 0;
+            list<ALLOC_INFO*>::iterator iter = pAllocList->begin();
+            for (; iter != pAllocList->end(); iter++)
             {
                 // Grab the item and append the size to the total size
                 ALLOC_INFO* pInfo = *iter;
                 uiTotalSize += pInfo->uiSize;
 
                 // Write the current info to the file
-                fprintf ( pFile, "Address: %p\n"
-                                 "Size:    %u\n"
-                                 "File:    %s\n"
-                                 "Line:    %i\n\n",
-                                 pInfo->pAddress,
-                                 pInfo->uiSize,
-                                 pInfo->szFile,
-                                 pInfo->iLine );
+                fprintf(pFile,
+                        "Address: %p\n"
+                        "Size:    %u\n"
+                        "File:    %s\n"
+                        "Line:    %i\n\n",
+                        pInfo->pAddress, pInfo->uiSize, pInfo->szFile, pInfo->iLine);
             }
 
             // Total size
-            fprintf ( pFile, "----------------\n"
-                             "Total 'new' allocs: %u\n"
-                             "Total 'delete' frees: %u\n"
-                             "Total bytes leaked: %u\n",
-                             uiTotalNews,
-                             uiTotalFrees,
-                             uiTotalSize );
+            fprintf(pFile,
+                    "----------------\n"
+                    "Total 'new' allocs: %u\n"
+                    "Total 'delete' frees: %u\n"
+                    "Total bytes leaked: %u\n",
+                    uiTotalNews, uiTotalFrees, uiTotalSize);
         }
         else
         {
-            fprintf ( pFile, "%s", "No memoryleaks\n" );
+            fprintf(pFile, "%s", "No memoryleaks\n");
         }
 
         // Close the file
-        fclose ( pFile );
+        fclose(pFile);
     }
 
     // Delete our alloc list
@@ -159,7 +153,13 @@ void DumpUnfreed ( void )
 };
 
 #else
-void AddTrack ( void* pAddress, size_t size, const char* szFile, int iLine ) {}
-void RemoveTrack ( void* pAddress ) {}
-void DumpUnfreed ( void ) {}
+void AddTrack(void* pAddress, size_t size, const char* szFile, int iLine)
+{
+}
+void RemoveTrack(void* pAddress)
+{
+}
+void DumpUnfreed(void)
+{
+}
 #endif

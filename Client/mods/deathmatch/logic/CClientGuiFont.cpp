@@ -1,16 +1,14 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientGuiFont.cpp
-*  PURPOSE:     Custom font bucket
-*  DEVELOPERS:  qwerty
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientGuiFont.cpp
+ *  PURPOSE:     Custom font bucket
+ *
+ *****************************************************************************/
 
 #include <StdInc.h>
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -19,12 +17,11 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientGuiFont::CClientGuiFont ( CClientManager* pManager, ElementID ID, CGuiFontItem* pFontItem ) : ClassInit ( this ), CClientRenderElement ( pManager, ID )
+CClientGuiFont::CClientGuiFont(CClientManager* pManager, ElementID ID, CGuiFontItem* pFontItem) : ClassInit(this), CClientRenderElement(pManager, ID)
 {
-    SetTypeName ( "gui-font" );
+    SetTypeName("gui-font");
     m_pRenderItem = pFontItem;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -33,11 +30,10 @@ CClientGuiFont::CClientGuiFont ( CClientManager* pManager, ElementID ID, CGuiFon
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientGuiFont::~CClientGuiFont ( void )
+CClientGuiFont::~CClientGuiFont(void)
 {
-    Unlink ();
+    Unlink();
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -46,15 +42,14 @@ CClientGuiFont::~CClientGuiFont ( void )
 // Remove from manager lists
 //
 ////////////////////////////////////////////////////////////////
-void CClientGuiFont::Unlink ( void )
+void CClientGuiFont::Unlink(void)
 {
     // Make sure GUI elements are not using us
-    while ( m_GUIElementUserList.size () )
-        (*m_GUIElementUserList.begin ())->SetFont ( "", NULL );
+    while (m_GUIElementUserList.size())
+        (*m_GUIElementUserList.begin())->SetFont("", NULL);
 
-    CClientRenderElement::Unlink ();
+    CClientRenderElement::Unlink();
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -63,11 +58,10 @@ void CClientGuiFont::Unlink ( void )
 // Get name CEGUI uses for this custom font
 //
 ////////////////////////////////////////////////////////////////
-const SString& CClientGuiFont::GetCEGUIFontName ( void )
+const SString& CClientGuiFont::GetCEGUIFontName(void)
 {
-    return GetGuiFontItem ()->m_strCEGUIFontName;
+    return GetGuiFontItem()->m_strCEGUIFontName;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -76,12 +70,11 @@ const SString& CClientGuiFont::GetCEGUIFontName ( void )
 // Keep track of GUI elements using this font
 //
 ////////////////////////////////////////////////////////////////
-void CClientGuiFont::NotifyGUIElementAttach ( CClientGUIElement* pGUIElement )
+void CClientGuiFont::NotifyGUIElementAttach(CClientGUIElement* pGUIElement)
 {
-    assert ( !MapContains ( m_GUIElementUserList, pGUIElement ) );
-    MapInsert ( m_GUIElementUserList, pGUIElement );
+    assert(!MapContains(m_GUIElementUserList, pGUIElement));
+    MapInsert(m_GUIElementUserList, pGUIElement);
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -90,8 +83,8 @@ void CClientGuiFont::NotifyGUIElementAttach ( CClientGUIElement* pGUIElement )
 // Keep track of GUI elements using this font
 //
 ////////////////////////////////////////////////////////////////
-void CClientGuiFont::NotifyGUIElementDetach ( CClientGUIElement* pGUIElement )
+void CClientGuiFont::NotifyGUIElementDetach(CClientGUIElement* pGUIElement)
 {
-    assert ( MapContains ( m_GUIElementUserList, pGUIElement ) );
-    MapRemove ( m_GUIElementUserList, pGUIElement );
+    assert(MapContains(m_GUIElementUserList, pGUIElement));
+    MapRemove(m_GUIElementUserList, pGUIElement);
 }

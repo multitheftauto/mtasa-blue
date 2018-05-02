@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CAERadioTrackManagerSA.cpp
-*  PURPOSE:     Header file for audio entity radio track manager class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CAERadioTrackManagerSA.cpp
+ *  PURPOSE:     Header file for audio entity radio track manager class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CGAMESA_AERADIOTRACKMANAGER
 #define __CGAMESA_AERADIOTRACKMANAGER
@@ -45,13 +44,13 @@
 class CAERadioTrackManagerSA : public CAERadioTrackManager
 {
 public:
-    BYTE    GetCurrentRadioStationID();
-    BYTE    IsVehicleRadioActive();
-    char    * GetRadioStationName(BYTE bStationID);
-    BOOL    IsRadioOn();
-    VOID    SetBassSetting(DWORD dwBass);
-    VOID    Reset();
-    VOID    StartRadio(BYTE bStationID, BYTE bUnknown);
+    BYTE  GetCurrentRadioStationID();
+    BYTE  IsVehicleRadioActive();
+    char* GetRadioStationName(BYTE bStationID);
+    BOOL  IsRadioOn();
+    VOID  SetBassSetting(DWORD dwBass);
+    VOID  Reset();
+    VOID  StartRadio(BYTE bStationID, BYTE bUnknown);
 };
 
 #endif

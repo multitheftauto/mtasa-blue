@@ -7,43 +7,43 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:11+0000\n"
-"PO-Revision-Date: 2014-07-25 15:29+0000\n"
-"Last-Translator: Talidan <danthetaliban@gmail.com>\n"
+"PO-Revision-Date: 2018-04-15 12:51+0000\n"
+"Last-Translator: Mert <mert.mte@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"Translators: Furkan Özden; Avenger; Darkneblade; Semih; Oguzcan Uyar; Colegon; Samurai; Mert; WindowsOttoman; RaceXtreme; Oguzcan; Cynydlan; Eren Yücel; TRFURKAN; velona77\n"
+"Translators: Furkan Özden; Avenger; Mert \"MaXenon\"; Darkneblade; Semih; Oguzcan Uyar; Colegon; Samurai; Mert; WindowsOttoman; RaceXtreme; Oguzcan; Eren Yücel; Cynydlan; TRFURKAN; velona77; Wickness\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1406302144.0\n"
+"X-POOTLE-MTIME: 1523796697.0\n"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
-msgstr ""
+msgstr "Website istekleri"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:26
 msgid ""
 "The server requests the following websites in order to load them (later):"
-msgstr ""
+msgstr "Sunucu, (sonradan) yükleme yapmak için şu siteleri talep ediyor:"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:31
 msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr ""
+msgstr "ÇALINMASINI ÖNLEMEK İÇİN ASLA ÖNEMLİ BİLGİLERİ GİRMEYİN"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:43
 msgid "Remember decision"
-msgstr ""
+msgstr "Kararı hatırla"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:48
 #: C:\mtasa-blue\Client\core\CSettings.cpp:903
 msgid "Allow"
-msgstr ""
+msgstr "İzin ver"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:54
 msgid "Deny"
-msgstr ""
+msgstr "Reddet"
 
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:36
 msgid "***[ COMMAND HELP ]***\n"
@@ -56,7 +56,9 @@ msgstr "* Saat %d:%02d:%02d"
 
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:279
 msgid "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"
-msgstr "bağlantı: Sözdizimi 'connect <sunucu> <port> [<nick> <şifre>]'"
+msgstr ""
+"bağlan (/connect): Sözdizimi 'connect <sunucu ip> <port> [<kullanıcı adı> "
+"<şifre>]'"
 
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:287
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:338
@@ -67,40 +69,40 @@ msgstr "Bağlantı: Yanlış port adresi"
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:353
 #, c-format
 msgid "connect: Connecting to %s:%u..."
-msgstr "bağlantı:  %s:%u...'e bağlanılıyor"
+msgstr "bağlantı:  %s:%u...'e Bağlanılıyor"
 
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:307
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:357
 #, c-format
 msgid "connect: could not connect to %s:%u!"
-msgstr "bağlantı: Bağlanılamadı %s:%u!"
+msgstr "Bağlantı:  %s:%u'e bağlanılamadı %s:%u!"
 
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:312
 msgid "connect: Failed to unload current mod"
-msgstr "Yamalar yüklenemedi"
+msgstr "Bağlantı: Mevcut modu devre dışı bırakılamadı"
 
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:391
 msgid "Bound all controls from GTA"
-msgstr "GTA tüm kontrolleri Bound"
+msgstr "Tüm kontrol atamaları GTA'dan alındı"
 
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:405
 msgid "Saved configuration file"
-msgstr "Yapılandırma dosyalarını kaydet"
+msgstr "Yapılandırma dosyası kaydedildi"
 
 #. Print it
 #: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:468
 #, c-format
 msgid "* Your serial is: %s"
-msgstr "* Senin serialin:%s"
+msgstr "* Seri numaran: %s"
 
 #. Unknown command
 #: C:\mtasa-blue\Client\core\CCommands.cpp:213
 msgid "Unknown command or cvar: "
-msgstr "Bilinmeyen komut veya fiil"
+msgstr "Bilinmeyen komut veya fiil : "
 
 #: C:\mtasa-blue\Client\core\CConnectManager.cpp:84
 msgid "Connecting failed. Invalid nick provided!"
-msgstr "Bağlanma hatası. Geçersiz takma adı!"
+msgstr "Bağlantı başarısız. Geçersiz kullanıcı adı!"
 
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
@@ -152,22 +154,22 @@ msgstr "Bağlanma hatası. Geçersiz takma adı!"
 #: C:\mtasa-blue\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp:374
 #: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:89
 msgid "Error"
-msgstr "Sorun oluştu"
+msgstr "Hata"
 
 #: C:\mtasa-blue\Client\core\CConnectManager.cpp:115
 msgid "Connecting failed. Invalid host provided!"
-msgstr "Bağlantı hatası. Geçersiz sunucu!"
+msgstr "Bağlantı başarısız. Geçersiz sunucu!"
 
 #: C:\mtasa-blue\Client\core\CConnectManager.cpp:131
 #, c-format
 msgid "Connecting to %s at port %u failed!"
-msgstr "Bağlanma adresi yanlış! %s %u"
+msgstr "%s sunucusuna %u portundan yapılan bağlantı başarısız!"
 
 #. Display the status box
 #: C:\mtasa-blue\Client\core\CConnectManager.cpp:152
 #, c-format
 msgid "Connecting to %s:%u ..."
-msgstr "Bağlanılıyor %s:%u ..."
+msgstr "%s:%u'a bağlanılıyor %s:%u ..."
 
 #. Display the status box
 #: C:\mtasa-blue\Client\core\CConnectManager.cpp:153
@@ -184,28 +186,28 @@ msgstr "Bağlantı zaman aşımına uğradı"
 #: C:\mtasa-blue\Client\core\CConnectManager.cpp:288
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1225
 msgid "Disconnected: unknown protocol error"
-msgstr "Bağlantı Koptu : Bilinmeyen protokol hatası"
+msgstr "Bağlantı Kesildi : Bilinmeyen protokol hatası"
 
 #: C:\mtasa-blue\Client\core\CConnectManager.cpp:291
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1228
 msgid "Disconnected: disconnected remotely"
-msgstr "Bağlı Değil: uzaktan bağlantısı"
+msgstr "Bağlantı kesildi: bağlantı uzaktan kesildi."
 
 #: C:\mtasa-blue\Client\core\CConnectManager.cpp:294
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1231
 msgid "Disconnected: connection lost remotely"
-msgstr "Bağlı Değil: bağlantı uzaktan kaybetti"
+msgstr "Bağlanti Kesildi: bağlantı uzaktan kaybedildi"
 
 # Bağlantı koptu: Bu sunucudan uzaklaştırıldınız
 #: C:\mtasa-blue\Client\core\CConnectManager.cpp:297
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1234
 msgid "Disconnected: you are banned from this server"
-msgstr "Bağlantı koptu: Bu sunucudan uzaklaştırıldınız"
+msgstr "Bağlantı kesildi: Bu sunucudan yasaklandınız"
 
 #: C:\mtasa-blue\Client\core\CConnectManager.cpp:303
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1240
 msgid "Disconnected: disconnected from the server"
-msgstr "Bağlantı koptu"
+msgstr "Bağlantı kesildi: sunucu ile olan bağlantı kesildi"
 
 #: C:\mtasa-blue\Client\core\CConnectManager.cpp:306
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1243
@@ -291,7 +293,7 @@ msgstr "Ölümcül hata"
 
 #: C:\mtasa-blue\Client\core\CCore.cpp:924
 msgid "TO FIX, REMOVE THIS FILE:"
-msgstr ""
+msgstr "DÜZELTMEK İÇİN, ŞU DOSYAYI SİL:"
 
 #: C:\mtasa-blue\Client\core\CCore.cpp:957
 #, c-format
@@ -396,7 +398,7 @@ msgstr "Çerçeve zamanlama grafiğini gösterir"
 
 #: C:\mtasa-blue\Client\core\CCore.h:55
 msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
-msgstr ""
+msgstr "Tüm Hakları (C) 2003-2018 Multi Theft Auto' ya aittir"
 
 #: C:\mtasa-blue\Client\core\CCredits.cpp:32
 msgid "Programming"
@@ -632,6 +634,8 @@ msgid ""
 "You are using a feature-branch build! This is a test build only which cannot"
 " be used to connect to public servers!"
 msgstr ""
+"Yeni özelliklerin olduğu bir versiyon kullanıyorsun! Bu versiyon sadece "
+"deneme amaçlıdır ve herhangi bir sunucuya bağlanmak için kullanılamaz!"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
 msgid ""
@@ -703,7 +707,7 @@ msgstr "Arayüz"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:126
 msgid "Web Browser"
-msgstr ""
+msgstr "İnternet Tarayıcısı"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:127
 msgid "Advanced"
@@ -944,7 +948,7 @@ msgstr "Çözünürlük:"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:585
 #: C:\mtasa-blue\Client\core\CSettings.cpp:642
 msgid "FOV:"
-msgstr ""
+msgstr "Görüş Açısı:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:586
 #: C:\mtasa-blue\Client\core\CSettings.cpp:658
@@ -1101,7 +1105,7 @@ msgstr "Lastik dumanı vs."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:788
 msgid "Render vehicles always in high detail"
-msgstr ""
+msgstr "Araçları her zaman yüksek detaylı olarak göster."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:793
 msgid "Full Screen Minimize"
@@ -1117,39 +1121,39 @@ msgstr "Güvenli olmayan çözünürlükleri göster"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:853
 msgid "Enable remote websites"
-msgstr ""
+msgstr "Uzak web sayfalarını etkinleştir"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:858
 msgid "Enable Javascript on remote websites"
-msgstr ""
+msgstr "Uzak web sayfalarında Javascript'i etkinleştirin."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:863
 msgid "Custom blacklist"
-msgstr ""
+msgstr "Özel karaliste"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:873
 #: C:\mtasa-blue\Client\core\CSettings.cpp:901
 msgid "Enter a domain e.g. google.com"
-msgstr ""
+msgstr "Bir alan adı girin, örnek: google.com"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:875
 msgid "Block"
-msgstr ""
+msgstr "Engelle"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:883
 #: C:\mtasa-blue\Client\core\CSettings.cpp:911
 msgid "Domain"
-msgstr ""
+msgstr "Alan Adı"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:885
 #: C:\mtasa-blue\Client\core\CSettings.cpp:913
 msgid "Remove domain"
-msgstr ""
+msgstr "Alan adını kaldır"
 
 #. Reset vecTemp
 #: C:\mtasa-blue\Client\core\CSettings.cpp:891
 msgid "Custom whitelist"
-msgstr ""
+msgstr "Özel beyazliste"
 
 #. Misc section label
 #: C:\mtasa-blue\Client\core\CSettings.cpp:926
@@ -1182,14 +1186,14 @@ msgstr "Tek Bağlantı"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:990
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4360
 msgid "Packet tag:"
-msgstr ""
+msgstr "Paket etiketi:"
 
 #. Progress animation
 #: C:\mtasa-blue\Client\core\CSettings.cpp:937
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1003
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4362
 msgid "Progress animation:"
-msgstr ""
+msgstr "İlerleme Animasyonu:"
 
 #. Process priority
 #: C:\mtasa-blue\Client\core\CSettings.cpp:939
@@ -1222,7 +1226,7 @@ msgstr "Güncelle yapım türü:"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:943
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1134
 msgid "Install important updates:"
-msgstr ""
+msgstr "Önemli güncellemeleri kur:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:957
 #: C:\mtasa-blue\Client\core\CSettings.cpp:985
@@ -1262,12 +1266,12 @@ msgstr "hızlı"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1023
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2943
 msgid "Normal"
-msgstr ""
+msgstr "Normal"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1024
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2944
 msgid "Above normal"
-msgstr ""
+msgstr "Normal üstü"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1060
 msgid "Min"
@@ -1293,11 +1297,11 @@ msgstr "Fareyi düzelt"
 #. Cache path info
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1108
 msgid "Client resource files:"
-msgstr ""
+msgstr "Kişinin kaynak dosyaları: "
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1112
 msgid "Show in Explorer"
-msgstr ""
+msgstr "Tarayıcıda göster"
 
 #. Auto updater section label
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1127
@@ -1311,9 +1315,8 @@ msgid "Check for update now"
 msgstr "Güncellemeleri kontrol et"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1312
-#, fuzzy
 msgid "Some settings will be changed when you next start MTA"
-msgstr "Some settings bir daha MTA başlattığında değişmiş olacak"
+msgstr "Bazı ayarlar MTA'yı bir sonraki başlattığınızda değişmiş olacak"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1313
 msgid ""
@@ -1331,10 +1334,9 @@ msgstr "YENİDEN BAŞLATMAK GEREKİYOR"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1338
 msgid "Some settings will be changed when you disconnect the current server"
-msgstr ""
+msgstr "Şu anki sunucudan çıktığınızda bazı ayarlar değiştirilicektir."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1339
-#, fuzzy
 msgid ""
 "\n"
 "\n"
@@ -1342,11 +1344,11 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Tekrar başlatmak ister misin ?"
+"Bağlantıyı şimdi kesmek ister misiniz?"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1342
 msgid "DISCONNECT REQUIRED"
-msgstr ""
+msgstr "BAĞLANTINIZI KESMENİZ GEREKMEKTEDİR"
 
 #. Update the joystick name
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1631
@@ -1383,20 +1385,20 @@ msgstr "Yükle"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1954
 msgid "Colors"
-msgstr ""
+msgstr "Renkler"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1955
 msgid "Layout"
-msgstr ""
+msgstr "Düzen"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1956
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2217
 msgid "Options"
-msgstr ""
+msgstr "Seçenekler"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1962
 msgid "Chat Background"
-msgstr ""
+msgstr "Konuşma Arka Planı"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1963
 msgid "Chat Text"
@@ -1404,7 +1406,7 @@ msgstr "Sohbet Yazısı"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1964
 msgid "Input Background"
-msgstr ""
+msgstr "Giriş Arka Planı"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1965
 msgid "Input Text"
@@ -1424,7 +1426,7 @@ msgstr "Genişlik"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1993
 msgid "Size"
-msgstr ""
+msgstr "Boyut"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2042
 msgid "after"
@@ -1440,7 +1442,7 @@ msgstr "saniye"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2047
 msgid "Fading"
-msgstr ""
+msgstr "Soluyor"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2053
 msgid "Fade out old lines"
@@ -1448,44 +1450,44 @@ msgstr "Eski satırları karart"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2093
 msgid "Horizontal:"
-msgstr ""
+msgstr "Yatay:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2094
 msgid "Vertical:"
-msgstr ""
+msgstr "Dikey:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2095
 msgid "Text-Align:"
-msgstr ""
+msgstr "Yazı-Hizası:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2096
 msgid "X-Offset:"
-msgstr ""
+msgstr "X-Dengesi:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2097
 msgid "Y-Offset:"
-msgstr ""
+msgstr "Y-Dengesi:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2103
 msgid "Position"
-msgstr ""
+msgstr "Pozisyon"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2118
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2132
 msgid "Center"
-msgstr ""
+msgstr "Merkez"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2131
 msgid "Top"
-msgstr ""
+msgstr "En Üst"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2133
 msgid "Bottom"
-msgstr ""
+msgstr "En Alt"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2181
 msgid "Font"
-msgstr ""
+msgstr "Yazı tipi"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2223
 msgid "Hide background when not typing"
@@ -1493,19 +1495,19 @@ msgstr "yazı yazmazken arka planı gizle"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2228
 msgid "Nickname completion using the \"Tab\" key"
-msgstr ""
+msgstr "\"Tab\" tuşuyla isim tamamlama"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2233
 msgid "Allow server to flash the window"
-msgstr ""
+msgstr "Pencereyi açması için sunucuya izin ver"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2238
 msgid "Allow tray balloon notifications"
-msgstr ""
+msgstr "Balon bildirimlerine izin ver"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2243
 msgid "Chat text black/white outline"
-msgstr ""
+msgstr "Siyah/beyaz konuşma çıktısı"
 
 #. Create a messagebox to notify the user
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'",
@@ -1557,16 +1559,15 @@ msgstr "Şeffaflık"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:3502
 msgid "Color"
-msgstr ""
+msgstr "Renk"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:3579
 msgid "Preview"
-msgstr ""
+msgstr "Önizleme"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:3888
-#, fuzzy
 msgid "Please disconnect before changing language"
-msgstr "Lütfen Şeklinizi değiştirmeden önce sunucudun ayrılın"
+msgstr "Lütfen dilinizi değiştirmeden önce sunucudan ayrılın"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:3917
 msgid "Please disconnect before changing skin"
@@ -1651,10 +1652,12 @@ msgstr "İndirme işlemi uygularken sadece bir bağlantı için tuşa tıklayın
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4360
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr ""
+"Ağ paketlerini etiketleyerek MTA trafiğini tanıyabilmesi için Internet "
+"Servis Sağlayıcılarına yardımcı olun."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4362
 msgid "Spinning circle animation at the bottom of the screen"
-msgstr ""
+msgstr "Ekranın alt kısmındaki dönen daire animasyonu"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4364
 msgid "Select default always. (This setting is not saved)"
@@ -1676,6 +1679,7 @@ msgstr "Eğer hata raporu doldurmayı sevmiyorsanız varsayılanı seçiniz."
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4370
 msgid "Select default to automatically install important updates."
 msgstr ""
+"Önemli güncelleştirmeleri otomatik olarak yüklemek için varsayılan'ı seçin."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:4372
 msgid "16-bit color:"
@@ -1877,9 +1881,9 @@ msgstr ""
 "Cevap bekleniyor %-3d"
 
 #: C:\mtasa-blue\Client\core\DXHook\CDirect3DEvents9.cpp:233
-#, c-format, c-format, fuzzy
+#, c-format, c-format
 msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Ekran görüntüsü  %d boyutunda %d"
+msgstr "Ekran görüntüsü  %d boyutunda, ancak %d olması gerekiyor"
 
 #: C:\mtasa-blue\Client\core\DXHook\CDirect3DEvents9.cpp:239
 msgid "Screenshot failed"
@@ -2229,9 +2233,8 @@ msgid "Update Large Memory setting"
 msgstr "Geniş bellek ayarlarını güncelle"
 
 #: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:162
-#, fuzzy
 msgid "Update DEP setting"
-msgstr "Aero ayarlarını güncelle"
+msgstr "Veri Yürütme Engeli(DEP) ayarlanızı güncelleyin."
 
 #: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:164
 msgid "Update graphics driver compliance"
@@ -2502,6 +2505,7 @@ msgstr "Bitti!"
 #: C:\mtasa-blue\Client\loader\Install.cpp:95
 msgid "Do you want to terminate the MTA Server and continue updating?"
 msgstr ""
+"MTA Sunucusunu sonlandırmak ve güncellemeye devam etmek istiyor musunuz?"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:235
 msgid ""
@@ -2596,6 +2600,9 @@ msgid ""
 "\n"
 "Do you want to change the following setting?"
 msgstr ""
+"MTA:SA'yı çalıştırırken sorun yaşıyor musunuz?.\n"
+"\n"
+"Aşağıdaki ayarı değiştirmek istiyor musunuz?"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:409
 msgid ""
@@ -2603,6 +2610,9 @@ msgid ""
 "\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr ""
+"MTA:SA'yı çalıştırırken sorun yaşıyor musunuz?.\n"
+"\n"
+"Aşşağıdaki ürünleri GTA ve MTA için devre dışı bırakmayı deneyin:"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:443
 msgid ""
@@ -2766,15 +2776,18 @@ msgid ""
 "\n"
 "Please restart your PC.\n"
 msgstr ""
+"MTA:SA Windows 'güvenli mod' ile uyumlu değildir.\n"
+"\n"
+"Lütfen bilgisayarınızı yeniden başlatın.\n"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1103
 msgid "Fix configuration issue"
-msgstr ""
+msgstr "Kurulum hatasını düzelt"
 
 #. Try to relaunch as admin if not done so already
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1154
 msgid "Fix elevation required error"
-msgstr ""
+msgstr "Yükseltme gerektiren hatayı düzelt"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1161
 #, c-format
@@ -2830,6 +2843,8 @@ msgstr "GTA:SA model yüklerken sorunla karşılaştı."
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1914
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr ""
+"Eğer yakın zamanda gta3.img dosyasını değiştirdiyseniz, GTA:SA'yı tekrar "
+"yüklemeyi deneyin."
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1940
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
@@ -2838,7 +2853,7 @@ msgstr "GTA:SA arabaya modifiye eklerken sorunla karşılaştı."
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1960
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
-msgstr ""
+msgstr "GTA:SA '%s' dosyasında hatalar buldu"
 
 #. Ask user to confirm
 #: C:\mtasa-blue\Client\loader\Utils.cpp:2035
@@ -3178,7 +3193,7 @@ msgstr "Bağlantı kesildi: %s tarafından yasaklandınız."
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:555
 msgid "Disconnected: Server shutdown or restarting"
-msgstr ""
+msgstr "Bağlantı Koptu: Server kapatıldı veya yeniden başlatılıyor"
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:578
 msgid "Time Remaining: "
@@ -3206,7 +3221,7 @@ msgstr[0] "%d dakika"
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] ""
+msgstr[0] "%d saniye%d saniye"
 
 #. Display the error
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:598
@@ -3279,7 +3294,7 @@ msgstr "Bağlantı hatası"
 #. Couldn't create render target for CPostEffects
 #: C:\mtasa-blue\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1427
 msgid "Problem with graphics driver"
-msgstr ""
+msgstr "Grafik sürücüsü ile problem"
 
 #: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:89
 msgid "Multi Theft Auto has not been installed properly, please reinstall."

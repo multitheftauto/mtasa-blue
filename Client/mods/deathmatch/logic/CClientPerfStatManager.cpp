@@ -1,17 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CClientPerfStatManager.cpp
-*  PURPOSE:     Performance stats manager class
-*  DEVELOPERS:  Mr OCD
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CClientPerfStatManager.cpp
+ *  PURPOSE:     Performance stats manager class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -22,23 +20,22 @@
 class CClientPerfStatManagerImpl : public CClientPerfStatManager
 {
 public:
-                                CClientPerfStatManagerImpl       ( void );
-    virtual                     ~CClientPerfStatManagerImpl      ( void );
+    CClientPerfStatManagerImpl(void);
+    virtual ~CClientPerfStatManagerImpl(void);
 
     // CClientPerfStatManager
-    virtual void                DoPulse                     ( void );
-    virtual void                GetStats                    ( CClientPerfStatResult* pOutResult, const SString& strCategory, const SString& strOptions, const SString& strFilter );
+    virtual void DoPulse(void);
+    virtual void GetStats(CClientPerfStatResult* pOutResult, const SString& strCategory, const SString& strOptions, const SString& strFilter);
 
     // CClientPerfStatManagerImpl
-    void                        AddModule                   ( CClientPerfStatModule* pModule );
-    void                        RemoveModule                ( CClientPerfStatModule* pModule );
-    uint                        GetModuleCount              ( void );
-    CClientPerfStatModule*      GetModuleByIndex            ( uint uiIndex );
-    CClientPerfStatModule*      GetModuleByCategoryName     ( const SString& strCategory );
+    void                   AddModule(CClientPerfStatModule* pModule);
+    void                   RemoveModule(CClientPerfStatModule* pModule);
+    uint                   GetModuleCount(void);
+    CClientPerfStatModule* GetModuleByIndex(uint uiIndex);
+    CClientPerfStatModule* GetModuleByCategoryName(const SString& strCategory);
 
-    std::vector < CClientPerfStatModule* >    m_ModuleList;
+    std::vector<CClientPerfStatModule*> m_ModuleList;
 };
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -49,14 +46,13 @@ public:
 ///////////////////////////////////////////////////////////////
 static CClientPerfStatManagerImpl* g_pClientPerfStatManagerImp = NULL;
 
-CClientPerfStatManager* CClientPerfStatManager::GetSingleton ( void )
+CClientPerfStatManager* CClientPerfStatManager::GetSingleton(void)
 {
-    if ( !g_pClientPerfStatManagerImp )
-        g_pClientPerfStatManagerImp = new CClientPerfStatManagerImpl ();
+    if (!g_pClientPerfStatManagerImp)
+        g_pClientPerfStatManagerImp = new CClientPerfStatManagerImpl();
     return g_pClientPerfStatManagerImp;
 }
 
-
 ///////////////////////////////////////////////////////////////
 //
 // CClientPerfStatManagerImpl::CClientPerfStatManagerImpl
@@ -64,15 +60,14 @@ CClientPerfStatManager* CClientPerfStatManager::GetSingleton ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-CClientPerfStatManagerImpl::CClientPerfStatManagerImpl ( void )
+CClientPerfStatManagerImpl::CClientPerfStatManagerImpl(void)
 {
-    AddModule ( CClientPerfStatLuaTiming::GetSingleton () );
-    AddModule ( CClientPerfStatLuaMemory::GetSingleton () );
-    AddModule ( CClientPerfStatLibMemory::GetSingleton () );
-    AddModule ( CClientPerfStatPacketUsage::GetSingleton () );
+    AddModule(CClientPerfStatLuaTiming::GetSingleton());
+    AddModule(CClientPerfStatLuaMemory::GetSingleton());
+    AddModule(CClientPerfStatLibMemory::GetSingleton());
+    AddModule(CClientPerfStatPacketUsage::GetSingleton());
 }
 
-
 ///////////////////////////////////////////////////////////////
 //
 // CClientPerfStatManagerImpl::CClientPerfStatManagerImpl
@@ -80,15 +75,14 @@ CClientPerfStatManagerImpl::CClientPerfStatManagerImpl ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-CClientPerfStatManagerImpl::~CClientPerfStatManagerImpl ( void )
+CClientPerfStatManagerImpl::~CClientPerfStatManagerImpl(void)
 {
-    for ( uint i = 0 ; i < GetModuleCount () ; i++ )
+    for (uint i = 0; i < GetModuleCount(); i++)
     {
-        CClientPerfStatModule* pModule = GetModuleByIndex ( i );
+        CClientPerfStatModule* pModule = GetModuleByIndex(i);
         delete pModule;
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -97,14 +91,13 @@ CClientPerfStatManagerImpl::~CClientPerfStatManagerImpl ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CClientPerfStatManagerImpl::AddModule ( CClientPerfStatModule* pModule )
+void CClientPerfStatManagerImpl::AddModule(CClientPerfStatModule* pModule)
 {
-    if ( !ListContains ( m_ModuleList, pModule ) )
+    if (!ListContains(m_ModuleList, pModule))
     {
-        m_ModuleList.push_back ( pModule );
+        m_ModuleList.push_back(pModule);
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -113,11 +106,10 @@ void CClientPerfStatManagerImpl::AddModule ( CClientPerfStatModule* pModule )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CClientPerfStatManagerImpl::RemoveModule ( CClientPerfStatModule* pModule )
+void CClientPerfStatManagerImpl::RemoveModule(CClientPerfStatModule* pModule)
 {
-    ListRemove ( m_ModuleList, pModule );
+    ListRemove(m_ModuleList, pModule);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -126,11 +118,10 @@ void CClientPerfStatManagerImpl::RemoveModule ( CClientPerfStatModule* pModule )
 //
 //
 ///////////////////////////////////////////////////////////////
-uint CClientPerfStatManagerImpl::GetModuleCount ( void )
+uint CClientPerfStatManagerImpl::GetModuleCount(void)
 {
-    return m_ModuleList.size ();
+    return m_ModuleList.size();
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -139,13 +130,12 @@ uint CClientPerfStatManagerImpl::GetModuleCount ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-CClientPerfStatModule* CClientPerfStatManagerImpl::GetModuleByIndex ( uint uiIndex )
+CClientPerfStatModule* CClientPerfStatManagerImpl::GetModuleByIndex(uint uiIndex)
 {
-    if ( uiIndex < m_ModuleList.size () )
-        return m_ModuleList[ uiIndex ];
+    if (uiIndex < m_ModuleList.size())
+        return m_ModuleList[uiIndex];
     return NULL;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -154,17 +144,16 @@ CClientPerfStatModule* CClientPerfStatManagerImpl::GetModuleByIndex ( uint uiInd
 //
 //
 ///////////////////////////////////////////////////////////////
-CClientPerfStatModule* CClientPerfStatManagerImpl::GetModuleByCategoryName ( const SString& strCategory )
+CClientPerfStatModule* CClientPerfStatManagerImpl::GetModuleByCategoryName(const SString& strCategory)
 {
-    for ( uint i = 0 ; i < GetModuleCount () ; i++ )
+    for (uint i = 0; i < GetModuleCount(); i++)
     {
-        CClientPerfStatModule* pModule = GetModuleByIndex ( i );
-        if ( pModule->GetCategoryName () == strCategory )
+        CClientPerfStatModule* pModule = GetModuleByIndex(i);
+        if (pModule->GetCategoryName() == strCategory)
             return pModule;
     }
     return NULL;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -173,15 +162,14 @@ CClientPerfStatModule* CClientPerfStatManagerImpl::GetModuleByCategoryName ( con
 //
 //
 ///////////////////////////////////////////////////////////////
-void CClientPerfStatManagerImpl::DoPulse ( void )
+void CClientPerfStatManagerImpl::DoPulse(void)
 {
-    for ( uint i = 0 ; i < GetModuleCount () ; i++ )
+    for (uint i = 0; i < GetModuleCount(); i++)
     {
-        CClientPerfStatModule* pModule = GetModuleByIndex ( i );
-        pModule->DoPulse ();
+        CClientPerfStatModule* pModule = GetModuleByIndex(i);
+        pModule->DoPulse();
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -190,50 +178,50 @@ void CClientPerfStatManagerImpl::DoPulse ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CClientPerfStatManagerImpl::GetStats ( CClientPerfStatResult* pResult, const SString& strCategory, const SString& strOptions, const SString& strFilter )
+void CClientPerfStatManagerImpl::GetStats(CClientPerfStatResult* pResult, const SString& strCategory, const SString& strOptions, const SString& strFilter)
 {
-    pResult->Clear ();
+    pResult->Clear();
 
-    if ( strCategory == "" )
+    if (strCategory == "")
     {
         // List all modules
-        pResult->AddColumn ( "Categories" );
-        for ( uint i = 0 ; i < GetModuleCount () ; i++ )
+        pResult->AddColumn("Categories");
+        for (uint i = 0; i < GetModuleCount(); i++)
         {
-            CClientPerfStatModule* pModule = GetModuleByIndex ( i );
-            pResult->AddRow ()[0] = pModule->GetCategoryName ();
+            CClientPerfStatModule* pModule = GetModuleByIndex(i);
+            pResult->AddRow()[0] = pModule->GetCategoryName();
         }
-        pResult->AddRow ()[0] ="Help";
+        pResult->AddRow()[0] = "Help";
         return;
     }
 
     // Handle help
-    if ( strCategory == "Help" )
+    if (strCategory == "Help")
     {
-        pResult->AddColumn ( "Help" );
-        pResult->AddRow ()[0] ="Comma separate multiple options";
-        pResult->AddRow ()[0] ="Type h in options and select a category to see help for that category";
+        pResult->AddColumn("Help");
+        pResult->AddRow()[0] = "Comma separate multiple options";
+        pResult->AddRow()[0] = "Type h in options and select a category to see help for that category";
         return;
     }
 
     // Put options in a map
-    std::map < SString, int > strOptionMap;
+    std::map<SString, int> strOptionMap;
     {
-        std::vector < SString > strParts;
-        strOptions.Split ( ",", strParts );
-        for ( unsigned int i = 0 ; i < strParts.size (); i++ )
-            MapSet ( strOptionMap, strParts[i], 1 );
+        std::vector<SString> strParts;
+        strOptions.Split(",", strParts);
+        for (unsigned int i = 0; i < strParts.size(); i++)
+            MapSet(strOptionMap, strParts[i], 1);
     }
 
     // Find module
-    CClientPerfStatModule* pModule = GetModuleByCategoryName ( strCategory );
-    if ( !pModule )
+    CClientPerfStatModule* pModule = GetModuleByCategoryName(strCategory);
+    if (!pModule)
     {
-        pResult->AddColumn ( "Error" );
-        pResult->AddRow ()[0] = "Error: Unknown category '" + strCategory + "'";
+        pResult->AddColumn("Error");
+        pResult->AddRow()[0] = "Error: Unknown category '" + strCategory + "'";
         return;
     }
 
     // Get stats from module
-    pModule->GetStats ( pResult, strOptionMap, strFilter );
+    pModule->GetStats(pResult, strOptionMap, strFilter);
 }

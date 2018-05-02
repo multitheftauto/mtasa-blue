@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -11,14 +11,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Translators: Easterdie; Александр Шилякин; CoolDark; Kenix; Dr.CrazY; Nexus_; GTA-Multiplayer.com; Stanislav Zverev; Alexander Romanov; SalwadoR; lil_Toady; Gallardo994; Pavel Andreychenko; Nikita Obrekht; MeowCola; ccw; The_Creator; Talidan; FranklinRoosevelt; Rocketman\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: Easterdie; Александр \"Ethical\" Шилякин; CoolDark; Kenix; "
-"Dr.CrazY; Nexus_; GTA-Multiplayer.com; Stanislav \"Sarrum\" Zverev; SalwadoR; "
-"Alexander \"Lex128\" Romanov; lil_Toady; Gallardo994; Pavel \"MB116\" "
-"Andreychenko; Nikita \"Strix\" Obrekht; MeowCola; The_Creator; Talidan; "
-"FranklinRoosevelt; Rocketman; ccw\n"
 "X-POOTLE-MTIME: 1511258918.0\n"
 
 #. GET_XPVISTA_PLEASE
@@ -46,8 +41,7 @@ msgid ""
 "\n"
 "Click Next to continue."
 msgstr ""
-"Этот установщик будет сопровождать вас во время установки или обновления "
-"$(^Name) ${REVISION_TAG}\n"
+"Этот установщик будет сопровождать вас во время установки или обновления $(^Name) ${REVISION_TAG}\n"
 "\n"
 "Рекомендуется закрыть все другие приложения перед началом установки.\n"
 "\n"
@@ -76,8 +70,7 @@ msgid ""
 msgstr ""
 "Пожалуйста, выберите папку Grand Theft Auto: San Andreas.$\n"
 "$\n"
-"Для использования MTA:SA необходима Grand Theft Auto: San Andreas версии "
-"1.0, другие версии не поддерживаются.$\n"
+"Для использования MTA:SA необходима Grand Theft Auto: San Andreas версии 1.0, другие версии не поддерживаются.$\n"
 "$\n"
 "Нажмите Установить для начала установки."
 
@@ -95,8 +88,8 @@ msgstr "Создать ярлык на рабочем столе."
 #: ../Shared/installer/nightly.nsi:196
 msgid "Register mtasa:// protocol for browser clickable-ness."
 msgstr ""
-"Зарегистрировать протокол mtasa:// для подключения с помощью "
-"интернет-браузера."
+"Зарегистрировать протокол mtasa:// для подключения с помощью интернет-"
+"браузера."
 
 #. DESC_Section13
 #: ../Shared/installer/nightly.nsi:197
@@ -156,8 +149,8 @@ msgstr ""
 "Редактор карт MTA:SA 1.0. Используется для создания своих собственных карт, "
 "используемых в игровых режимах для MTA."
 
-# двоичных / бинарных
 #. DESC_Section9
+# двоичных / бинарных
 #: ../Shared/installer/nightly.nsi:209
 msgid ""
 "This is the SDK for creating binary modules for the MTA server. Only install"
@@ -172,8 +165,8 @@ msgid ""
 "Development code and tools that aid in the creation of mods for Multi Theft "
 "Auto"
 msgstr ""
-"Программный код и средства, которые помогут в создании модификаций для Multi "
-"Theft Auto"
+"Программный код и средства, которые помогут в создании модификаций для Multi"
+" Theft Auto"
 
 #. DESC_SectionGroupClient
 #: ../Shared/installer/nightly.nsi:212
@@ -256,8 +249,10 @@ msgid ""
 "$\n"
 "Please reinstall if there are problems later."
 msgstr ""
-"Допустимая Windows-версия Grand Theft Auto: San Andreas не найдена.$\r$\n"
-"Однако установка будет продолжена.$\r$\n"
+"Допустимая Windows-версия Grand Theft Auto: San Andreas не найдена.$\r"
+"$\n"
+"Однако установка будет продолжена.$\r"
+"$\n"
 "Пожалуйста, выполните переустановку, если появятся проблемы."
 
 #. INST_SEC_CORE_RESOURCES
@@ -295,7 +290,8 @@ msgstr "Ошибка удаления!"
 msgid ""
 "Are you sure you want to completely remove $(^Name) and all of its "
 "components?"
-msgstr "Вы уверены, что хотите полностью удалить $(^Name) и все её компоненты?"
+msgstr ""
+"Вы уверены, что хотите полностью удалить $(^Name) и все её компоненты?"
 
 #. UNINST_REQUEST_NOTE
 #: ../Shared/installer/nightly.nsi:1033
@@ -306,8 +302,10 @@ msgid ""
 "$\n"
 "Run the new installer to upgrade and preserve your settings."
 msgstr ""
-"Удалить перед обновлением?$\r$\n"
-"Удаление старой версии необязательно перед установкой новой версии MTA:SA$\r$\n"
+"Удалить перед обновлением?$\r"
+"$\n"
+"Удаление старой версии необязательно перед установкой новой версии MTA:SA$\r"
+"$\n"
 "Запустите новый файл установки для обновления и сохранения ваших данных."
 
 #. UNINST_DATA_REQUEST
@@ -317,8 +315,8 @@ msgid ""
 "server configuration)? If you click no, any resources, configurations or "
 "screenshots you have created will be lost."
 msgstr ""
-"Желаете сохранить ваши данные (ресурсы, скриншоты и настройки сервера)? Если "
-"нет, то все ваши ресурсы, настройки и скриншоты будут утеряны."
+"Желаете сохранить ваши данные (ресурсы, скриншоты и настройки сервера)? Если"
+" нет, то все ваши ресурсы, настройки и скриншоты будут утеряны."
 
 #. MSGBOX_PATCH_FAIL1
 #: ../Shared/installer/nightly.nsi:1144
@@ -333,7 +331,8 @@ msgstr ""
 msgid ""
 "Unable to install the patch file for your version of Grand Theft Auto: San "
 "Andreas"
-msgstr "Не удается установить патч на вашу версию Grand Theft Auto: San Andreas"
+msgstr ""
+"Не удается установить патч на вашу версию Grand Theft Auto: San Andreas"
 
 #. UAC_RIGHTS1
 #: ../Shared/installer/nightly.nsi:1181
@@ -365,8 +364,7 @@ msgid ""
 msgstr ""
 "Версия новее MTA ($1) уже установлена по этому адресу.$\n"
 "$\n"
-"MTA предусматривает возможность установки нескольких копий в разные "
-"директории.$\n"
+"MTA предусматривает возможность установки нескольких копий в разные директории.$\n"
 "Вы уверены, что хотите перезаписать MTA $1 в $INSTDIR ?"
 
 #. INST_GTA_CONFLICT
@@ -414,7 +412,8 @@ msgstr "Выберите директорию установки"
 msgid ""
 "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} "
 "${PRODUCT_VERSION}"
-msgstr "Выберите папку для установки ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
+msgstr ""
+"Выберите папку для установки ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 
 #. INST_CHOOSE_LOC2
 #: ../Shared/installer/nightly.nsi:1908
@@ -424,8 +423,7 @@ msgid ""
 "$\n"
 " Click Next to continue."
 msgstr ""
-"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} будет установлена в выбранную "
-"папку.$\n"
+"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} будет установлена в выбранную папку.$\n"
 "Для установки в другую папку нажмите Выбрать и выберите нужную папку.$\n"
 "$\n"
 "Нажмите Далее для продолжения."
@@ -459,7 +457,8 @@ msgstr "Другой"
 #: ../Shared/installer/nightly.nsi:2091
 msgid ""
 "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
-msgstr "Выберите папку для установки ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}:"
+msgstr ""
+"Выберите папку для установки ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}:"
 
 #. INST_LOC_OW
 #: ../Shared/installer/nightly.nsi:2109
@@ -496,7 +495,8 @@ msgstr "Пожалуйста, убедитесь, что ваш брандмау
 #~ msgstr "Не удается загрузить Microsoft Visual Studio 2008 SP1 Redistributable"
 
 #~ msgid "Unable to install Microsoft Visual Studio 2008 SP1 redistributable"
-#~ msgstr "Не удается установить Microsoft Visual Studio 2008 SP1 Redistributable"
+#~ msgstr ""
+#~ "Не удается установить Microsoft Visual Studio 2008 SP1 Redistributable"
 
 #~ msgid ""
 #~ "Unable to download Microsoft Visual Studio 2008 SP1 redistributable.$\r"
@@ -505,9 +505,10 @@ msgstr "Пожалуйста, убедитесь, что ваш брандмау
 #~ "$\n"
 #~ "Please reinstall if there are problems later."
 #~ msgstr ""
-#~ "Невозможно загрузить распространяемый файл Microsoft Visual Studio 2008 "
-#~ "SP1.$\r$\n"
-#~ "Однако, процесс установки будет продолжен.$\r$\n"
+#~ "Невозможно загрузить распространяемый файл Microsoft Visual Studio 2008 SP1.$\r"
+#~ "$\n"
+#~ "Однако, процесс установки будет продолжен.$\r"
+#~ "$\n"
 #~ "Пожалуйста, выполните переустановку, если появятся проблемы."
 
 #~ msgid "Unable to download Microsoft Visual Studio 2013 redistributable"
@@ -523,8 +524,10 @@ msgstr "Пожалуйста, убедитесь, что ваш брандмау
 #~ "$\n"
 #~ "Please reinstall if there are problems later."
 #~ msgstr ""
-#~ "Не удалось загрузить Microsoft Visual Studio 2013 redistributable.$\r$\n"
-#~ "Однако, установка будет продолжена.$\r$\n"
+#~ "Не удалось загрузить Microsoft Visual Studio 2013 redistributable.$\r"
+#~ "$\n"
+#~ "Однако, установка будет продолжена.$\r"
+#~ "$\n"
 #~ "Переустановите её в дальнейшем, если будут проблемы."
 
 #~ msgid "Set default"

@@ -1,94 +1,85 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientPedManager.cpp
-*  PURPOSE:     Ped entity manager class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientPedManager.cpp
+ *  PURPOSE:     Ped entity manager class
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
 using std::list;
 using std::vector;
 
-CClientPedManager::CClientPedManager ( CClientManager* pManager )
+CClientPedManager::CClientPedManager(CClientManager* pManager)
 {
     m_pManager = pManager;
     m_bRemoveFromList = true;
 }
 
-
-CClientPedManager::~CClientPedManager ( void )
+CClientPedManager::~CClientPedManager(void)
 {
-    DeleteAll ();
+    DeleteAll();
 }
 
-
-void CClientPedManager::DeleteAll ( void )
+void CClientPedManager::DeleteAll(void)
 {
     m_bRemoveFromList = false;
-    vector < CClientPed* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    vector<CClientPed*>::iterator iter = m_List.begin();
+    for (; iter != m_List.end(); iter++)
     {
         delete *iter;
     }
-    m_List.clear ();
+    m_List.clear();
     m_bRemoveFromList = true;
 }
 
-
-void CClientPedManager::DoPulse ( bool bDoStandardPulses )
+void CClientPedManager::DoPulse(bool bDoStandardPulses)
 {
-    CClientPed * pPed = NULL;
+    CClientPed* pPed = NULL;
     // Loop through our streamed-in peds
-    vector < CClientPed * > List = m_StreamedIn;
-    vector < CClientPed* > ::iterator iter = List.begin ();
-    for ( ; iter != List.end (); ++iter )
+    vector<CClientPed*>           List = m_StreamedIn;
+    vector<CClientPed*>::iterator iter = List.begin();
+    for (; iter != List.end(); ++iter)
     {
         pPed = *iter;
         // We should have a game ped here
-        assert ( pPed->GetGamePlayer () );
-        pPed->StreamedInPulse ( bDoStandardPulses );
+        assert(pPed->GetGamePlayer());
+        pPed->StreamedInPulse(bDoStandardPulses);
     }
 }
 
-
-CClientPed* CClientPedManager::Get ( ElementID ID, bool bCheckPlayers )
+CClientPed* CClientPedManager::Get(ElementID ID, bool bCheckPlayers)
 {
     // Grab the element with the given id. Check its type.
-    CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-    if ( pEntity && ( pEntity->GetType () == CCLIENTPED || ( bCheckPlayers && pEntity->GetType () == CCLIENTPLAYER ) ) )
+    CClientEntity* pEntity = CElementIDs::GetElement(ID);
+    if (pEntity && (pEntity->GetType() == CCLIENTPED || (bCheckPlayers && pEntity->GetType() == CCLIENTPLAYER)))
     {
-        return static_cast < CClientPed* > ( pEntity );
+        return static_cast<CClientPed*>(pEntity);
     }
 
     return NULL;
 }
 
-
-CClientPed* CClientPedManager::Get ( CPlayerPed* pPlayer, bool bValidatePointer, bool bCheckPlayers )
+CClientPed* CClientPedManager::Get(CPlayerPed* pPlayer, bool bValidatePointer, bool bCheckPlayers)
 {
-    return g_pClientGame->GetGameEntityXRefManager ()->FindClientPed ( pPlayer );
+    return g_pClientGame->GetGameEntityXRefManager()->FindClientPed(pPlayer);
 }
 
-
-CClientPed* CClientPedManager::GetSafe ( CEntity * pEntity, bool bCheckPlayers )
+CClientPed* CClientPedManager::GetSafe(CEntity* pEntity, bool bCheckPlayers)
 {
-    return g_pClientGame->GetGameEntityXRefManager ()->FindClientPed ( pEntity );
+    return g_pClientGame->GetGameEntityXRefManager()->FindClientPed(pEntity);
 }
 
-
-bool CClientPedManager::Exists ( CClientPed* pPed )
+bool CClientPedManager::Exists(CClientPed* pPed)
 {
     // Is it in our list?
-    vector < CClientPed* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    vector<CClientPed*>::iterator iter = m_List.begin();
+    for (; iter != m_List.end(); iter++)
     {
-        if ( *iter == pPed )
+        if (*iter == pPed)
             return true;
     }
 
@@ -96,83 +87,78 @@ bool CClientPedManager::Exists ( CClientPed* pPed )
     return false;
 }
 
-
-void CClientPedManager::RemoveFromList ( CClientPed* pPed )
+void CClientPedManager::RemoveFromList(CClientPed* pPed)
 {
-    if ( m_bRemoveFromList )
+    if (m_bRemoveFromList)
     {
-        ListRemove ( m_List, pPed );
+        ListRemove(m_List, pPed);
     }
 }
 
-
-void CClientPedManager::OnCreation ( CClientPed * pPed )
+void CClientPedManager::OnCreation(CClientPed* pPed)
 {
     // Check not already in the list to avoid multiple calls to pPed->StreamedInPulse() later
-    if ( !ListContains ( m_StreamedIn, pPed ) )
-        m_StreamedIn.push_back ( pPed );
+    if (!ListContains(m_StreamedIn, pPed))
+        m_StreamedIn.push_back(pPed);
 }
 
-
-void CClientPedManager::OnDestruction ( CClientPed * pPed )
+void CClientPedManager::OnDestruction(CClientPed* pPed)
 {
-    ListRemove ( m_StreamedIn, pPed );
+    ListRemove(m_StreamedIn, pPed);
 }
 
-void CClientPedManager::RestreamPeds ( unsigned short usModel )
+void CClientPedManager::RestreamPeds(unsigned short usModel)
 {
-    g_pClientGame->GetModelCacheManager ()->OnRestreamModel ( usModel );
+    g_pClientGame->GetModelCacheManager()->OnRestreamModel(usModel);
 
     // Store the affected vehicles
-    CClientPed* pPed;
-    std::vector < CClientPed* > ::const_iterator iter = IterBegin ();
-    for ( ; iter != IterEnd (); iter++ )
+    CClientPed*                              pPed;
+    std::vector<CClientPed*>::const_iterator iter = IterBegin();
+    for (; iter != IterEnd(); iter++)
     {
         pPed = *iter;
 
         // Streamed in and same vehicle ID?
-        if ( pPed->IsStreamedIn () && pPed->GetModel () == usModel )
+        if (pPed->IsStreamedIn() && pPed->GetModel() == usModel)
         {
             // Stream it out for a while until streamed decides to stream it
             // back in eventually
-            pPed->StreamOutForABit ();
+            pPed->StreamOutForABit();
             // Hack fix for Players not unloading.
-            if ( IS_PLAYER ( pPed ) )
+            if (IS_PLAYER(pPed))
             {
                 // Awesome hack skills + 1, change him to another model while we unload for the lulz
-                // Translation: My hack level has increased to ninety eight and we need to wait a frame before reloading the model ID in question so that the custom model unloads properly.
-                // To do this we set him to CJ (Impossible to mod to my knowledge) and then set him back in CPed::StreamedInPulse
-                pPed->SetModel ( 0, true );
+                // Translation: My hack level has increased to ninety eight and we need to wait a frame before reloading the model ID in question so that the
+                // custom model unloads properly. To do this we set him to CJ (Impossible to mod to my knowledge) and then set him back in CPed::StreamedInPulse
+                pPed->SetModel(0, true);
             }
         }
     }
 }
-void CClientPedManager::RestreamWeapon ( unsigned short usModel )
-{    
-    eWeaponSlot eSlot = (eWeaponSlot) GetWeaponSlotFromModel ( usModel );
+void CClientPedManager::RestreamWeapon(unsigned short usModel)
+{
+    eWeaponSlot eSlot = (eWeaponSlot)GetWeaponSlotFromModel(usModel);
     // Store the affected vehicles
-    CClientPed* pPed;
-    std::vector < CClientPed* > ::const_iterator iter = IterBegin ();
-    for ( ; iter != IterEnd (); iter++ )
+    CClientPed*                              pPed;
+    std::vector<CClientPed*>::const_iterator iter = IterBegin();
+    for (; iter != IterEnd(); iter++)
     {
         pPed = *iter;
 
         // Streamed in and same vehicle ID?
-        if ( pPed->IsStreamedIn () && 
-            pPed->GetWeapon ( eSlot ) && 
-            pPed->GetWeapon ( eSlot )->GetInfo ( WEAPONSKILL_STD )->GetModel () == usModel )
+        if (pPed->IsStreamedIn() && pPed->GetWeapon(eSlot) && pPed->GetWeapon(eSlot)->GetInfo(WEAPONSKILL_STD)->GetModel() == usModel)
         {
             // Awesome hack skills + 1, change him to another model while we unload for the lulz
-            // Translation: My hack level has increased to ninety nine and we need to wait a frame before reloading the model ID in question so that the custom model unloads properly.
-            // To do this we take away the weapon and give it back in CPed::StreamedInPulse ergo reloading the model info
-            pPed->StreamOutWeaponForABit ( eSlot );
+            // Translation: My hack level has increased to ninety nine and we need to wait a frame before reloading the model ID in question so that the custom
+            // model unloads properly. To do this we take away the weapon and give it back in CPed::StreamedInPulse ergo reloading the model info
+            pPed->StreamOutWeaponForABit(eSlot);
         }
     }
 }
 
-unsigned short CClientPedManager::GetWeaponSlotFromModel ( DWORD dwModel )
+unsigned short CClientPedManager::GetWeaponSlotFromModel(DWORD dwModel)
 {
-    switch ( dwModel )
+    switch (dwModel)
     {
         case 0:
         case 331:
@@ -261,63 +247,63 @@ unsigned short CClientPedManager::GetWeaponSlotFromModel ( DWORD dwModel )
     return 0;
 }
 
-bool CClientPedManager::IsValidWeaponModel ( DWORD dwModel )
+bool CClientPedManager::IsValidWeaponModel(DWORD dwModel)
 {
-    switch ( dwModel )
+    switch (dwModel)
     {
         case 0:
-        case 321:   // Regular_Dildo
-        case 322:   // Vibrator
-        case 323:   // White_Dildo
-       //    324    // Vibrator_unused
-        case 325:   // Flowers
-        case 326:   // Cane
-       //    327
-       //    328
-       //    329
-       //    330
-        case 331:   // Brass_Knuckles
-       //    332
-        case 333:   // Golf_Club
-        case 334:   // Night_Strick
-        case 335:   // Knife
-        case 336:   // Baseball_Bat
-        case 337:   // Shovel
-        case 338:   // Pool_Cue
-        case 339:   // Katana
-       //    340
-        case 341:   // Chainsaw
-        case 342:   // Grenade
-        case 343:   // Tear_Gas
-        case 344:   // Molotov_Cocktail
-       //    345    // Missile
-        case 346:   // Pistol
-        case 347:   // Silenced_Pistol
-        case 348:   // Desert_Eagle
-        case 349:   // Shotgun
-        case 350:   // Sawn-Off_Shotgun
-        case 351:   // Combat_Shotgun
-        case 352:   // Uzi
-        case 353:   // MP5
-       //    354    // Hydra_Flare
-        case 355:   // AK47
-        case 356:   // M4
-        case 357:   // Country_Rifle
-        case 358:   // Sniper_Rifle
-        case 359:   // Rocket_Launcher
-        case 360:   // Heat_Seeking_Rocket_Launcher
-        case 361:   // Flamethrower
-        case 362:   // Minigun
-        case 363:   // Satchel_Charge
-        case 364:   // Detonator
-        case 365:   // Spray_Can
-        case 366:   // Fire_Extinguisher
-        case 367:   // Camera
-        case 368:   // Night_Vision_Goggles
-        case 369:   // Infra-Red_Goggles
+        case 321:            // Regular_Dildo
+        case 322:            // Vibrator
+        case 323:            // White_Dildo
+                             //    324    // Vibrator_unused
+        case 325:            // Flowers
+        case 326:            // Cane
+                             //    327
+                             //    328
+                             //    329
+                             //    330
+        case 331:            // Brass_Knuckles
+                             //    332
+        case 333:            // Golf_Club
+        case 334:            // Night_Strick
+        case 335:            // Knife
+        case 336:            // Baseball_Bat
+        case 337:            // Shovel
+        case 338:            // Pool_Cue
+        case 339:            // Katana
+                             //    340
+        case 341:            // Chainsaw
+        case 342:            // Grenade
+        case 343:            // Tear_Gas
+        case 344:            // Molotov_Cocktail
+                             //    345    // Missile
+        case 346:            // Pistol
+        case 347:            // Silenced_Pistol
+        case 348:            // Desert_Eagle
+        case 349:            // Shotgun
+        case 350:            // Sawn-Off_Shotgun
+        case 351:            // Combat_Shotgun
+        case 352:            // Uzi
+        case 353:            // MP5
+                             //    354    // Hydra_Flare
+        case 355:            // AK47
+        case 356:            // M4
+        case 357:            // Country_Rifle
+        case 358:            // Sniper_Rifle
+        case 359:            // Rocket_Launcher
+        case 360:            // Heat_Seeking_Rocket_Launcher
+        case 361:            // Flamethrower
+        case 362:            // Minigun
+        case 363:            // Satchel_Charge
+        case 364:            // Detonator
+        case 365:            // Spray_Can
+        case 366:            // Fire_Extinguisher
+        case 367:            // Camera
+        case 368:            // Night_Vision_Goggles
+        case 369:            // Infra-Red_Goggles
         //    370   // Jet_Pack
-        case 371:   // Parachute
-        case 372:   // Tec-9
+        case 371:            // Parachute
+        case 372:            // Tec-9
         {
             return true;
         }

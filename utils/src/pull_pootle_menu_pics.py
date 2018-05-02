@@ -15,6 +15,7 @@ import shutil
 import urllib2
 import urlparse
 import polib
+import sys
 from optparse import OptionParser
 
 parser = OptionParser()
@@ -117,3 +118,6 @@ for lang in (options.languages).replace(" ","").split(","):
                 print ( "Read '%s' and written to '%s'"%(url,output) )
         except urllib2.HTTPError as e:
             print ( "HTTPError %d '%s' '%s'"%(e.code,e.reason,url) )
+        except:
+            e = sys.exc_info()[0]
+            print ( "%s '%s'"%(str(e),url) )

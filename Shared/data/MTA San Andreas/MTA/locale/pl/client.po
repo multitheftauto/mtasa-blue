@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"Translators: Jacek Hałas vel Łagoda; pcpl2; RootKiller; guix; Jurandovsky; pkpawelo; 105NWr; ThePiotrek; Bober; SKmedix; XJMLN; GabVVas; Ardo\n"
+"Translators: Jacek Hałas vel Łagoda; pcpl2; RootKiller; guix; pkpawelo; Jurandovsky; 105NWr; ThePiotrek; Bober; SKmedix; XJMLN; GabVVas\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
 "X-POOTLE-MTIME: 1475502817.0\n"
 
@@ -38,7 +38,7 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:43
 msgid "Remember decision"
-msgstr ""
+msgstr "Zapamiętaj wybór"
 
 #: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:48
 #: C:\mtasa-blue\Client\core\CSettings.cpp:903
@@ -402,8 +402,9 @@ msgid "shows the frame timing graph"
 msgstr "pokazuje wykres czasu klatek"
 
 #: C:\mtasa-blue\Client\core\CCore.h:55
+#, fuzzy
 msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
-msgstr ""
+msgstr "Copyright (C) 2003 - 2016 Multi Theft Auto."
 
 #: C:\mtasa-blue\Client\core\CCredits.cpp:32
 msgid "Programming"
@@ -710,7 +711,7 @@ msgstr "Interfejs"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:126
 msgid "Web Browser"
-msgstr ""
+msgstr "Przeglądarka internetowa"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:127
 msgid "Advanced"
@@ -951,7 +952,7 @@ msgstr "Rozdzielczość:"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:585
 #: C:\mtasa-blue\Client\core\CSettings.cpp:642
 msgid "FOV:"
-msgstr ""
+msgstr "Pole widzenia:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:586
 #: C:\mtasa-blue\Client\core\CSettings.cpp:658
@@ -1300,11 +1301,11 @@ msgstr "Poprawka dla ruchu myszy"
 #. Cache path info
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1108
 msgid "Client resource files:"
-msgstr ""
+msgstr "Pliki zasobów po stronie klienta:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1112
 msgid "Show in Explorer"
-msgstr ""
+msgstr "Pokaż w Eksploratorze"
 
 #. Auto updater section label
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1127
@@ -1395,12 +1396,13 @@ msgstr ""
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1955
 msgid "Layout"
-msgstr ""
+msgstr "Układ"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1956
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2217
+#, fuzzy
 msgid "Options"
-msgstr ""
+msgstr "Opcje:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1962
 msgid "Chat Background"
@@ -1448,7 +1450,7 @@ msgstr "sek"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2047
 msgid "Fading"
-msgstr ""
+msgstr "Cieniowanie"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2053
 msgid "Fade out old lines"
@@ -1492,8 +1494,9 @@ msgid "Bottom"
 msgstr ""
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2181
+#, fuzzy
 msgid "Font"
-msgstr ""
+msgstr "Czcionka:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2223
 msgid "Hide background when not typing"
@@ -1501,15 +1504,15 @@ msgstr "Ukryj tło gdy tekst nie jest wpisywany"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2228
 msgid "Nickname completion using the \"Tab\" key"
-msgstr ""
+msgstr "Autouzupełnianie nicków używając klawisza \"Tab\""
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2233
 msgid "Allow server to flash the window"
-msgstr ""
+msgstr "Pozwól serwerowi migać oknem"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2238
 msgid "Allow tray balloon notifications"
-msgstr ""
+msgstr "Zezwalaj na powiadomienia w zasobniku systemowym"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2243
 msgid "Chat text black/white outline"
@@ -2521,7 +2524,7 @@ msgstr "Gotowe!"
 
 #: C:\mtasa-blue\Client\loader\Install.cpp:95
 msgid "Do you want to terminate the MTA Server and continue updating?"
-msgstr ""
+msgstr "Czy chcesz wyłączyć aplikację MTA Server i kontynuować aktualizację?"
 
 #: C:\mtasa-blue\Client\loader\MainFunctions.cpp:235
 msgid ""
@@ -2853,6 +2856,7 @@ msgstr "GTA:SA miało problem z załadowaniem modelu."
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1914
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr ""
+"Jeżeli modyfikowałeś ostatnio plik gta3.img, spróbuj przeinstalować GTA:SA."
 
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1940
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
@@ -2861,7 +2865,7 @@ msgstr "GTA:SA miało problem z dodaniem ulepszenia do pojazdu."
 #: C:\mtasa-blue\Client\loader\Utils.cpp:1960
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
-msgstr ""
+msgstr "GTA:SA znalazło błędy w pliku '%s'"
 
 #. Ask user to confirm
 #: C:\mtasa-blue\Client\loader\Utils.cpp:2035
@@ -3210,7 +3214,7 @@ msgstr "Rozłączono: Zostałeś zbanowany przez %s"
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:555
 msgid "Disconnected: Server shutdown or restarting"
-msgstr ""
+msgstr "Rozłączono: Serwer został wyłączony lub zrestartowany."
 
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:578
 msgid "Time Remaining: "
@@ -3321,7 +3325,7 @@ msgstr "Błąd połączenia"
 #. Couldn't create render target for CPostEffects
 #: C:\mtasa-blue\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1427
 msgid "Problem with graphics driver"
-msgstr ""
+msgstr "Problem ze sterownikiem karty graficznej"
 
 #: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:89
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
