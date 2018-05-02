@@ -38,6 +38,7 @@ DECLARE_ENUM( EEntityTypeMask );
 DECLARE_ENUM( eWeaponState );
 DECLARE_ENUM( eWeaponFlags );
 DECLARE_ENUM( eVehicleComponent );
+DECLARE_ENUM( eObjectProperty );
 DECLARE_ENUM( eFontType );
 DECLARE_ENUM( eFontQuality );
 DECLARE_ENUM( eAudioLookupIndex );

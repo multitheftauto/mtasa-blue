@@ -25,12 +25,8 @@ public:
     LUA_DECLARE ( IsObjectStatic );
     LUA_DECLARE ( GetObjectScale );
     LUA_DECLARE ( IsObjectBreakable );
-    LUA_DECLARE ( GetObjectMass );
-    LUA_DECLARE ( GetObjectTurnMass );
-    LUA_DECLARE ( GetObjectAirResistance );
-    LUA_DECLARE ( GetObjectElasticity );
-    LUA_DECLARE ( GetObjectBuoyancyConstant );
-    LUA_DECLARE ( GetObjectCenterOfMass );
+    LUA_DECLARE (GetObjectProperty);
+    LUA_DECLARE (GetObjectProperties);
 
     // Object set funcs
     LUA_DECLARE ( SetObjectRotation );
@@ -42,10 +38,5 @@ public:
     LUA_DECLARE ( BreakObject );
     LUA_DECLARE ( RespawnObject );
     LUA_DECLARE ( ToggleObjectRespawn );
-    LUA_DECLARE ( SetObjectMass );
-    LUA_DECLARE ( SetObjectTurnMass );
-    LUA_DECLARE ( SetObjectAirResistance );
-    LUA_DECLARE ( SetObjectElasticity );
-    LUA_DECLARE ( SetObjectBuoyancyConstant );
-    LUA_DECLARE ( SetObjectCenterOfMass );
+    LUA_DECLARE (SetObjectProperty);
 };
