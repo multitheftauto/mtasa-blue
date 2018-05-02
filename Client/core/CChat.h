@@ -157,7 +157,7 @@ public:
     CChat(CGUI* pManager, const CVector2D& vecPosition);
     ~CChat(void);
 
-    virtual void Draw(bool bUseCacheTexture);
+    virtual void Draw(bool bUseCacheTexture, bool bAllowOutline);
     virtual void Output(const char* szText, bool bColorCoded = true);
     void         Clear(void);
     void         ClearInput(void);
@@ -202,7 +202,8 @@ protected:
     void UpdatePosition(void);
     void UpdateSmoothScroll(float* pfPixelScroll, int* piLineScroll);
     void DrawDrawList(const SDrawList& drawList, const CVector2D& topLeftOffset = CVector2D(0, 0));
-    void GetDrawList(SDrawList& outDrawList);
+    void GetDrawList(SDrawList& outDrawList, bool bUsingOutline);
+    void DrawInputLine(bool bUsingOutline);
 
     CChatLine      m_Lines[CHAT_MAX_LINES];            // Circular buffer
     int            m_iScrollState;                     // 1 up, 0 stop, -1 down
