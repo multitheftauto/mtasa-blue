@@ -1226,27 +1226,28 @@ bool CStaticFunctionDefinitions::GetElementVelocity(CElement* pElement, CVector&
 }
 
 
-bool CStaticFunctionDefinitions::GetElementTurnVelocity ( CElement* pElement, CVector& vecTurnVelocity )
+bool CStaticFunctionDefinitions::GetElementTurnVelocity(CElement* pElement, CVector& vecTurnVelocity)
 {
-    assert ( pElement );
+    assert(pElement);
 
-    int iType = pElement->GetType ();
-    switch ( iType )
+    int iType = pElement->GetType();
+    switch (iType)
     {
         case CElement::VEHICLE:
         {
-            CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-            vecTurnVelocity = pVehicle->GetTurnSpeed ();
+            CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+            vecTurnVelocity = pVehicle->GetTurnSpeed();
 
             break;
         }
-        default: return false;
+        default:
+            return false;
     }
     return true;
 }
 
 
-bool CStaticFunctionDefinitions::SetElementMatrix ( CElement* pElement, const CMatrix& matrix )
+bool CStaticFunctionDefinitions::SetElementMatrix(CElement* pElement, const CMatrix& matrix)
 {
     RUN_CHILDREN(SetElementMatrix(*iter, matrix))
 
@@ -1403,13 +1404,13 @@ bool CStaticFunctionDefinitions::SetElementVelocity(CElement* pElement, const CV
 }
 
 
-bool CStaticFunctionDefinitions::SetElementTurnVelocity ( CElement* pElement, const CVector& vecTurnVelocity )
+bool CStaticFunctionDefinitions::SetElementTurnVelocity(CElement* pElement, const CVector& vecTurnVelocity)
 {
-    assert ( pElement );
-    RUN_CHILDREN( SetElementTurnVelocity ( *iter, vecTurnVelocity ) )
+    assert(pElement);
+    RUN_CHILDREN(SetElementTurnVelocity(*iter, vecTurnVelocity))
 
-    int iType = pElement->GetType ();
-    switch ( iType )
+    int iType = pElement->GetType();
+    switch (iType)
     {
         case CElement::PED:
         case CElement::PLAYER:
@@ -1419,8 +1420,8 @@ bool CStaticFunctionDefinitions::SetElementTurnVelocity ( CElement* pElement, co
         }
         case CElement::VEHICLE:
         {
-            CVehicle* pVehicle = static_cast < CVehicle* > ( pElement );
-            pVehicle->SetTurnSpeed ( vecTurnVelocity );
+            CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+            pVehicle->SetTurnSpeed(vecTurnVelocity);
 
             break;
         }
@@ -1430,20 +1431,21 @@ bool CStaticFunctionDefinitions::SetElementTurnVelocity ( CElement* pElement, co
             // Don't store velocity serverside (requires potentially needless additional sizeof(CVector) bytes per object)
             break;
         }
-        default: return false;
+        default:
+            return false;
     }
 
     CBitStream BitStream;
-    BitStream.pBitStream->Write ( vecTurnVelocity.fX );
-    BitStream.pBitStream->Write ( vecTurnVelocity.fY );
-    BitStream.pBitStream->Write ( vecTurnVelocity.fZ );
-    m_pPlayerManager->BroadcastOnlyJoined ( CElementRPCPacket ( pElement, SET_ELEMENT_TURNSPEED, *BitStream.pBitStream ) );
+    BitStream.pBitStream->Write(vecTurnVelocity.fX);
+    BitStream.pBitStream->Write(vecTurnVelocity.fY);
+    BitStream.pBitStream->Write(vecTurnVelocity.fZ);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_TURNSPEED, *BitStream.pBitStream));
 
     return true;
 }
 
 
-bool CStaticFunctionDefinitions::SetElementVisibleTo ( CElement* pElement, CElement* pReference, bool bVisible )
+bool CStaticFunctionDefinitions::SetElementVisibleTo(CElement* pElement, CElement* pReference, bool bVisible)
 {
     RUN_CHILDREN(SetElementVisibleTo(*iter, pReference, bVisible))
 

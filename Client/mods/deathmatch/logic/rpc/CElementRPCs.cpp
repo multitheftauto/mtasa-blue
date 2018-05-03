@@ -17,37 +17,37 @@ using std::list;
 
 void CElementRPCs::LoadFunctions(void)
 {
-    AddHandler ( SET_ELEMENT_PARENT,             SetElementParent,            "SetElementParent" );
-    AddHandler ( SET_ELEMENT_DATA,               SetElementData,              "SetElementData" );
-    AddHandler ( REMOVE_ELEMENT_DATA,            RemoveElementData,           "RemoveElementData" );
-    AddHandler ( SET_ELEMENT_POSITION,           SetElementPosition,          "SetElementPosition" );
-    AddHandler ( SET_ELEMENT_VELOCITY,           SetElementVelocity,          "SetElementVelocity" );
-    AddHandler ( SET_ELEMENT_TURNSPEED,          SetElementTurnVelocity,      "SetElementTurnVelocity" );
-    AddHandler ( SET_ELEMENT_INTERIOR,           SetElementInterior,          "SetElementInterior" );
-    AddHandler ( SET_ELEMENT_DIMENSION,          SetElementDimension,         "SetElementDimension" );
-    AddHandler ( ATTACH_ELEMENTS,                AttachElements,              "AttachElements" );
-    AddHandler ( DETACH_ELEMENTS,                DetachElements,              "DetachElements" );
-    AddHandler ( SET_ELEMENT_ALPHA,              SetElementAlpha,             "SetElementAlpha" );
-    AddHandler ( SET_ELEMENT_NAME,               SetElementName,              "SetElementName" );
-    AddHandler ( SET_ELEMENT_HEALTH,             SetElementHealth,            "SetElementHealth" );
-    AddHandler ( SET_ELEMENT_MODEL,              SetElementModel,             "SetElementModel" );
-    AddHandler ( SET_ELEMENT_ATTACHED_OFFSETS,   SetElementAttachedOffsets,   "SetElementAttachedOffsets" );
-    AddHandler ( SET_ELEMENT_DOUBLESIDED,        SetElementDoubleSided,       "SetElementDoubleSided" );
-    AddHandler ( SET_ELEMENT_COLLISIONS_ENABLED, SetElementCollisionsEnabled, "SetElementCollisionsEnabled" );
-    AddHandler ( SET_ELEMENT_FROZEN,             SetElementFrozen,            "SetElementFrozen" );
-    AddHandler ( SET_LOW_LOD_ELEMENT,            SetLowLodElement,            "SetLowLodElement" );
-    AddHandler ( FIRE_CUSTOM_WEAPON,             FireCustomWeapon,            "fireWeapon" );
-    AddHandler ( SET_CUSTOM_WEAPON_STATE,        SetCustomWeaponState,        "setWeaponState" );
-    AddHandler ( SET_CUSTOM_WEAPON_CLIP_AMMO,    SetCustomWeaponClipAmmo,     "setWeaponClipAmmo" );
-    AddHandler ( SET_CUSTOM_WEAPON_AMMO,         SetCustomWeaponAmmo,         "setWeaponAmmo" );
-    AddHandler ( SET_CUSTOM_WEAPON_TARGET,       SetCustomWeaponTarget,       "setWeaponTarget" );
-    AddHandler ( RESET_CUSTOM_WEAPON_TARGET,     ResetCustomWeaponTarget,     "resetWeaponTarget" );
-    AddHandler ( SET_CUSTOM_WEAPON_FLAGS,        SetCustomWeaponFlags,        "setWeaponFlags" );
-    AddHandler ( SET_CUSTOM_WEAPON_FIRING_RATE,  SetCustomWeaponFiringRate,   "setWeaponFiringRate" );
-    AddHandler ( RESET_CUSTOM_WEAPON_FIRING_RATE,ResetCustomWeaponFiringRate, "resetWeaponFiringRate" );
-    AddHandler ( SET_WEAPON_OWNER,               SetWeaponOwner,              "setWeaponOwner" );
-    AddHandler ( SET_CUSTOM_WEAPON_FLAGS,        SetWeaponConfig,             "setWeaponFlags" );
-    AddHandler ( SET_PROPAGATE_CALLS_ENABLED,    SetCallPropagationEnabled,   "setCallPropagationEnabled" );
+    AddHandler(SET_ELEMENT_PARENT, SetElementParent, "SetElementParent");
+    AddHandler(SET_ELEMENT_DATA, SetElementData, "SetElementData");
+    AddHandler(REMOVE_ELEMENT_DATA, RemoveElementData, "RemoveElementData");
+    AddHandler(SET_ELEMENT_POSITION, SetElementPosition, "SetElementPosition");
+    AddHandler(SET_ELEMENT_VELOCITY, SetElementVelocity, "SetElementVelocity");
+    AddHandler(SET_ELEMENT_TURNSPEED, SetElementTurnVelocity, "SetElementTurnVelocity");
+    AddHandler(SET_ELEMENT_INTERIOR, SetElementInterior, "SetElementInterior");
+    AddHandler(SET_ELEMENT_DIMENSION, SetElementDimension, "SetElementDimension");
+    AddHandler(ATTACH_ELEMENTS, AttachElements, "AttachElements");
+    AddHandler(DETACH_ELEMENTS, DetachElements, "DetachElements");
+    AddHandler(SET_ELEMENT_ALPHA, SetElementAlpha, "SetElementAlpha");
+    AddHandler(SET_ELEMENT_NAME, SetElementName, "SetElementName");
+    AddHandler(SET_ELEMENT_HEALTH, SetElementHealth, "SetElementHealth");
+    AddHandler(SET_ELEMENT_MODEL, SetElementModel, "SetElementModel");
+    AddHandler(SET_ELEMENT_ATTACHED_OFFSETS, SetElementAttachedOffsets, "SetElementAttachedOffsets");
+    AddHandler(SET_ELEMENT_DOUBLESIDED, SetElementDoubleSided, "SetElementDoubleSided");
+    AddHandler(SET_ELEMENT_COLLISIONS_ENABLED, SetElementCollisionsEnabled, "SetElementCollisionsEnabled");
+    AddHandler(SET_ELEMENT_FROZEN, SetElementFrozen, "SetElementFrozen");
+    AddHandler(SET_LOW_LOD_ELEMENT, SetLowLodElement, "SetLowLodElement");
+    AddHandler(FIRE_CUSTOM_WEAPON, FireCustomWeapon, "fireWeapon");
+    AddHandler(SET_CUSTOM_WEAPON_STATE, SetCustomWeaponState, "setWeaponState");
+    AddHandler(SET_CUSTOM_WEAPON_CLIP_AMMO, SetCustomWeaponClipAmmo, "setWeaponClipAmmo");
+    AddHandler(SET_CUSTOM_WEAPON_AMMO, SetCustomWeaponAmmo, "setWeaponAmmo");
+    AddHandler(SET_CUSTOM_WEAPON_TARGET, SetCustomWeaponTarget, "setWeaponTarget");
+    AddHandler(RESET_CUSTOM_WEAPON_TARGET, ResetCustomWeaponTarget, "resetWeaponTarget");
+    AddHandler(SET_CUSTOM_WEAPON_FLAGS, SetCustomWeaponFlags, "setWeaponFlags");
+    AddHandler(SET_CUSTOM_WEAPON_FIRING_RATE, SetCustomWeaponFiringRate, "setWeaponFiringRate");
+    AddHandler(RESET_CUSTOM_WEAPON_FIRING_RATE, ResetCustomWeaponFiringRate, "resetWeaponFiringRate");
+    AddHandler(SET_WEAPON_OWNER, SetWeaponOwner, "setWeaponOwner");
+    AddHandler(SET_CUSTOM_WEAPON_FLAGS, SetWeaponConfig, "setWeaponFlags");
+    AddHandler(SET_PROPAGATE_CALLS_ENABLED, SetCallPropagationEnabled, "setCallPropagationEnabled");
 }
 
 #define RUN_CHILDREN_SERVER( func ) \
@@ -212,37 +212,35 @@ void CElementRPCs::SetElementVelocity(CClientEntity* pSource, NetBitStreamInterf
 }
 
 
-void CElementRPCs::SetElementTurnVelocity ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CElementRPCs::SetElementTurnVelocity(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the entity id and the turn speed
     CVector vecTurnVelocity;
-    if ( bitStream.Read ( vecTurnVelocity.fX ) &&
-         bitStream.Read ( vecTurnVelocity.fY ) &&
-         bitStream.Read ( vecTurnVelocity.fZ ) )
+    if (bitStream.Read(vecTurnVelocity.fX) && bitStream.Read(vecTurnVelocity.fY) && bitStream.Read(vecTurnVelocity.fZ))
     {
-        switch ( pSource->GetType () )
+        switch (pSource->GetType())
         {
             case CCLIENTPED:
             case CCLIENTPLAYER:
             {
-                CClientPed* pPed = static_cast < CClientPed* > ( pSource );
+                CClientPed* pPed = static_cast<CClientPed*>(pSource);
 
-                pPed->SetTurnSpeed ( vecTurnVelocity );
+                pPed->SetTurnSpeed(vecTurnVelocity);
 
                 break;
             }
             case CCLIENTVEHICLE:
             {
-                CClientVehicle* pVehicle = static_cast < CClientVehicle* > ( pSource );                    
-                pVehicle->SetTurnSpeed ( vecTurnVelocity );
+                CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);                    
+                pVehicle->SetTurnSpeed(vecTurnVelocity);
 
                 break;
             }
             case CCLIENTOBJECT:
             case CCLIENTWEAPON:
             {
-                CClientObject * pObject = static_cast < CClientObject * > ( pSource );
-                pObject->SetTurnSpeed ( vecTurnVelocity );
+                CClientObject* pObject = static_cast<CClientObject*>(pSource);
+                pObject->SetTurnSpeed(vecTurnVelocity);
                 
                 break;
             }
@@ -251,7 +249,7 @@ void CElementRPCs::SetElementTurnVelocity ( CClientEntity* pSource, NetBitStream
 }
 
 
-void CElementRPCs::SetElementInterior ( CClientEntity* pSource, NetBitStreamInterface& bitStream )
+void CElementRPCs::SetElementInterior(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     unsigned char ucInterior, ucSetPosition;
     if (bitStream.Read(ucInterior) && bitStream.Read(ucSetPosition))
