@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CAnimBlendHierarchySA.cpp
-*  PURPOSE:     Header file for animation blend hierarchy class
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CAnimBlendHierarchySA.cpp
+ *  PURPOSE:     Header file for animation blend hierarchy class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 /* CAnimBlendHierarchy: data tree on animation blending?*/
 
@@ -26,27 +25,27 @@ class CAnimBlendSequence;
 class CAnimBlendHierarchySAInterface
 {
 public:
-    int                                             GetIndex ( void );
-    int                                             iHashKey;
-    CAnimBlendSequence *                            pSequences;
-    unsigned short                                  usNumSequences;
-    BYTE                                            pad;
-    bool                                            bRunningCompressed;
-    int                                             iAnimBlockID;
-    float                                           fTotalTime;
-    //class CLink<class CAnimBlendHierarchy *> *      pLinkPtr;
+    int                 GetIndex(void);
+    int                 iHashKey;
+    CAnimBlendSequence* pSequences;
+    unsigned short      usNumSequences;
+    BYTE                pad;
+    bool                bRunningCompressed;
+    int                 iAnimBlockID;
+    float               fTotalTime;
+    // class CLink<class CAnimBlendHierarchy *> *      pLinkPtr;
 };
 
 class CAnimBlendHierarchySA : public CAnimBlendHierarchy
 {
 public:
-                                            CAnimBlendHierarchySA   ( CAnimBlendHierarchySAInterface * pInterface )     { m_pInterface = pInterface; }
+    CAnimBlendHierarchySA(CAnimBlendHierarchySAInterface* pInterface) { m_pInterface = pInterface; }
 
-    CAnimBlendHierarchySAInterface *        GetInterface            ( void )    { return m_pInterface; }
-    int                                     GetAnimBlockID          ( void )    { return m_pInterface->iAnimBlockID; }
+    CAnimBlendHierarchySAInterface* GetInterface(void) { return m_pInterface; }
+    int                             GetAnimBlockID(void) { return m_pInterface->iAnimBlockID; }
 
 protected:
-    CAnimBlendHierarchySAInterface *        m_pInterface;
+    CAnimBlendHierarchySAInterface* m_pInterface;
 };
 
 #endif

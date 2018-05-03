@@ -1,12 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/luadefs/CLuaElementDefs.h
-*  PURPOSE:     Lua element definitions class header
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/luadefs/CLuaElementDefs.h
+ *  PURPOSE:     Lua element definitions class header
+ *
+ *****************************************************************************/
 
 #pragma once
 #include "CLuaDefs.h"
@@ -14,8 +14,8 @@
 class CLuaElementDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions ( void );
-    static void AddClass ( lua_State* luaVM );
+    static void LoadFunctions(void);
+    static void AddClass(lua_State* luaVM);
 
     // Element get functions
     LUA_DECLARE ( GetRootElement );

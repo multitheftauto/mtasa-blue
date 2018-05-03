@@ -1,21 +1,18 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/luadefs/CLuaElementDefs.h
-*  PURPOSE:     Lua element definitions class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*               lil_Toady <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/luadefs/CLuaElementDefs.h
+ *  PURPOSE:     Lua element definitions class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #pragma once
 #include "CLuaDefs.h"
 
-class CLuaElementDefs: public CLuaDefs
+class CLuaElementDefs : public CLuaDefs
 {
 public:
     static void     LoadFunctions                       ( void );

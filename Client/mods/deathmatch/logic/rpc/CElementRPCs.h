@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/rpc/CElementRPCs.h
-*  PURPOSE:     Header for element RPC class
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/rpc/CElementRPCs.h
+ *  PURPOSE:     Header for element RPC class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CElementRPCs_H
 #define __CElementRPCs_H
@@ -18,7 +17,7 @@
 class CElementRPCs : public CRPCFunctions
 {
 public:
-    static void                 LoadFunctions           ( void );
+    static void LoadFunctions(void);
 
     DECLARE_ELEMENT_RPC ( SetElementParent );
     DECLARE_ELEMENT_RPC ( SetElementData );

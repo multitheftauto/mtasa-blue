@@ -1,16 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/TaskBasicSA.h
-*  PURPOSE:     Basic game tasks
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*               Alberto Alonso <rydencillo@gmail.com>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/TaskBasicSA.h
+ *  PURPOSE:     Basic game tasks
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CGAMESA_TASKBASIC
 #define __CGAMESA_TASKBASIC
@@ -34,26 +31,24 @@
 #define VTBL_CTaskSimpleCarFallOut                          0x86EFD0
 
 ///////////////////////
-//Use a mobile phone
+// Use a mobile phone
 ///////////////////////
 
 class CTaskComplexUseMobilePhoneSAInterface : public CTaskComplexSAInterface
 {
 public:
-    int m_iDuration;
+    int        m_iDuration;
     CTaskTimer m_timer;
-    bool m_bIsAborting;
-    bool m_bQuit;
+    bool       m_bIsAborting;
+    bool       m_bQuit;
 };
-
 
 class CTaskComplexUseMobilePhoneSA : public virtual CTaskComplexSA, public virtual CTaskComplexUseMobilePhone
 {
 public:
-    CTaskComplexUseMobilePhoneSA ( void ) {};
-    CTaskComplexUseMobilePhoneSA ( const int iDuration ); // Default is -1
+    CTaskComplexUseMobilePhoneSA(void){};
+    CTaskComplexUseMobilePhoneSA(const int iDuration);            // Default is -1
 };
-
 
 // temporary
 class CAnimBlendAssociation;
@@ -61,80 +56,62 @@ class CAnimBlendHierarchy;
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
 
-
-class CTaskSimpleAnimSAInterface: public CTaskSimpleSAInterface
+class CTaskSimpleAnimSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    CAnimBlendAssociation*      m_pAnim;
-    char                        m_bIsFinished       :1;
-    char                        m_bDontInterrupt    :1;
-    char                        m_bHoldLastFrame    :1;
+    CAnimBlendAssociation* m_pAnim;
+    char                   m_bIsFinished : 1;
+    char                   m_bDontInterrupt : 1;
+    char                   m_bHoldLastFrame : 1;
 
     // These flags are used in CTaskSimpleRunAnim only
-    char                        m_bDontBlendOut     :1;
+    char m_bDontBlendOut : 1;
 
     // These flags are used in  CTaskSimpleRunNamedAnim only
-    char                        m_bRunInSequence    :1;
-    char                        m_bOffsetAtEnd      :1;
-    char                        m_bOffsetAvailable  :1;
+    char m_bRunInSequence : 1;
+    char m_bOffsetAtEnd : 1;
+    char m_bOffsetAvailable : 1;
 };
-
-
 
 class CTaskSimpleAnimSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleAnim
 {
 public:
-    CTaskSimpleAnimSA ( void ) {};
+    CTaskSimpleAnimSA(void){};
 };
-
-
-
 
 class CTaskSimpleRunAnimSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleRunAnim
 {
 public:
-    CTaskSimpleRunAnimSA ( void ) {};
-    CTaskSimpleRunAnimSA ( const AssocGroupId animGroup,
-                           const AnimationId animID, 
-                           const float fBlendDelta, 
-                           const int iTaskType,
-                           const char* pTaskName,
-                           const bool bHoldLastFrame = false );
+    CTaskSimpleRunAnimSA(void){};
+    CTaskSimpleRunAnimSA(const AssocGroupId animGroup, const AnimationId animID, const float fBlendDelta, const int iTaskType, const char* pTaskName,
+                         const bool bHoldLastFrame = false);
 };
-
-
 
 #define ANIM_NAMELEN 24
 #define ANIMBLOCK_NAMELEN 16
 
-class CTaskSimpleRunNamedAnimSAInterface: public CTaskSimpleAnimSAInterface
+class CTaskSimpleRunNamedAnimSAInterface : public CTaskSimpleAnimSAInterface
 {
 public:
-    char                    m_animName [ANIM_NAMELEN];
-    char                    m_animGroupName [ANIMBLOCK_NAMELEN];
+    char m_animName[ANIM_NAMELEN];
+    char m_animGroupName[ANIMBLOCK_NAMELEN];
 
-    float                   m_fBlendDelta;
-    CAnimBlendHierarchy*    m_pAnimHierarchy;
-    int                     m_iTime;
-    CTaskTimer              m_timer;
-    CVector                 m_offsetAtEnd;
-    int                   m_flags;    
-    short                   m_animID;   
+    float                m_fBlendDelta;
+    CAnimBlendHierarchy* m_pAnimHierarchy;
+    int                  m_iTime;
+    CTaskTimer           m_timer;
+    CVector              m_offsetAtEnd;
+    int                  m_flags;
+    short                m_animID;
 };
 
 class CTaskSimpleRunNamedAnimSA : public virtual CTaskSimpleAnimSA, public virtual CTaskSimpleRunNamedAnim
 {
 public:
-    CTaskSimpleRunNamedAnimSA ( void ) {};
-    CTaskSimpleRunNamedAnimSA ( const char* pAnimName,
-                                const char* pAnimGroupName,
-                                const int flags,
-                                const float fBlendDelta,
-                                const int iTime = -1,
-                                const bool bDontInterrupt = false,
-                                const bool bRunInSequence = false,
-                                const bool bOffsetPed = false,
-                                const bool bHoldLastFrame = false );
+    CTaskSimpleRunNamedAnimSA(void){};
+    CTaskSimpleRunNamedAnimSA(const char* pAnimName, const char* pAnimGroupName, const int flags, const float fBlendDelta, const int iTime = -1,
+                              const bool bDontInterrupt = false, const bool bRunInSequence = false, const bool bOffsetPed = false,
+                              const bool bHoldLastFrame = false);
 };
 
 class CTaskComplexDieSAInterface : public CTaskComplexSAInterface
@@ -145,16 +122,11 @@ public:
 class CTaskComplexDieSA : public virtual CTaskComplexSA, public virtual CTaskComplexDie
 {
 public:
-    CTaskComplexDieSA ( void ) {};
-    CTaskComplexDieSA ( const eWeaponType eMeansOfDeath/*=WEAPONTYPE_UNARMED*/,
-                        const AssocGroupId animGroup=0/*ANIM_STD_PED*/,
-                        const AnimationId anim=0/*ANIM_STD_KO_FRONT*/, 
-                        const float fBlendDelta=4.0f,
-                        const float fAnimSpeed=0.0f,
-                        const bool bBeingKilledByStealth=false,
-                        const bool bFallingToDeath=false,
-                        const int iFallToDeathDir=0,
-                        const bool bFallToDeathOverRailing=false );
+    CTaskComplexDieSA(void){};
+    CTaskComplexDieSA(const eWeaponType eMeansOfDeath /*=WEAPONTYPE_UNARMED*/, const AssocGroupId animGroup = 0 /*ANIM_STD_PED*/,
+                      const AnimationId anim = 0 /*ANIM_STD_KO_FRONT*/, const float fBlendDelta = 4.0f, const float fAnimSpeed = 0.0f,
+                      const bool bBeingKilledByStealth = false, const bool bFallingToDeath = false, const int iFallToDeathDir = 0,
+                      const bool bFallToDeathOverRailing = false);
 };
 
 class CTaskSimpleStealthKillInterface : public CTaskSimpleSAInterface
@@ -165,89 +137,83 @@ public:
 class CTaskSimpleStealthKillSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleStealthKill
 {
 public:
-    CTaskSimpleStealthKillSA ( void ) {};
-    CTaskSimpleStealthKillSA ( bool bKiller,
-                               class CPed * pPed,
-                               const AssocGroupId animGroup );
+    CTaskSimpleStealthKillSA(void){};
+    CTaskSimpleStealthKillSA(bool bKiller, class CPed* pPed, const AssocGroupId animGroup);
 };
 
 class CTaskSimpleDeadSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    unsigned int    uiDeathTimeMS;
-    bool            bUnk2;
+    unsigned int uiDeathTimeMS;
+    bool         bUnk2;
 };
 
 class CTaskSimpleDeadSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleDead
 {
 public:
-    CTaskSimpleDeadSA ( void ) {};
-    CTaskSimpleDeadSA ( unsigned int uiDeathTimeMS, bool bUnk2 );
+    CTaskSimpleDeadSA(void){};
+    CTaskSimpleDeadSA(unsigned int uiDeathTimeMS, bool bUnk2);
 };
-
 
 class CTaskSimpleBeHitSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    CPed*   pPedAttacker;   // 0x08
-    uchar   a;              // 0x0c
-    uchar   b;              // 0x0d
-    uchar   c;              // 0x0e
-    uchar   d;              // 0x0f
-    uint    e;              // 0x10   inited with 0x000000BF
-    uint    f;              // 0x14   inited with 0
-    uint    hitBodyPart;    // 0x18
-    uint    weaponType;     // 0x1C
-    uint    hitBodySide;    // 0x20
-    uint    g;              // 0x24   inited with 0
+    CPed* pPedAttacker;            // 0x08
+    uchar a;                       // 0x0c
+    uchar b;                       // 0x0d
+    uchar c;                       // 0x0e
+    uchar d;                       // 0x0f
+    uint  e;                       // 0x10   inited with 0x000000BF
+    uint  f;                       // 0x14   inited with 0
+    uint  hitBodyPart;             // 0x18
+    uint  weaponType;              // 0x1C
+    uint  hitBodySide;             // 0x20
+    uint  g;                       // 0x24   inited with 0
 };
 
 class CTaskSimpleBeHitSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleBeHit
 {
 public:
-    CTaskSimpleBeHitSA ( void ) {};
-    CTaskSimpleBeHitSA ( CPed* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId );
+    CTaskSimpleBeHitSA(void){};
+    CTaskSimpleBeHitSA(CPed* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
 };
-
 
 class CTaskSimpleCarFallOutSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    uint    a;                      // 0x08
-    uint    b;                      // 0x0c
-    CVehicleSAInterface* pVehicle;  // 0x10
-    uint    doorIndex;              // 0x14
+    uint                 a;                    // 0x08
+    uint                 b;                    // 0x0c
+    CVehicleSAInterface* pVehicle;             // 0x10
+    uint                 doorIndex;            // 0x14
 };
-
 
 class CAnimBlock;
 
 class CTaskComplexSunbatheSAInterface : public CTaskComplexSAInterface
 {
 public:
-    bool                m_bStartStanding;
-    bool                m_bBathing;
-    bool                m_bBeachAnimsReferenced;
-    bool                m_bSunbatheAnimsReferenced;
-    bool                m_bAborted;
-    CTaskTimer          m_BathingTimer;
-    eSunbatherType      m_SunbatherType;
-    CAnimBlock*         m_pBeachAnimBlock;
-    CAnimBlock*         m_pSunbatheAnimBlock;
-    int               m_BeachAnimBlockIndex;
-    int               m_SunbatheAnimBlockIndex;
-    CObject*            m_pTowel;
+    bool           m_bStartStanding;
+    bool           m_bBathing;
+    bool           m_bBeachAnimsReferenced;
+    bool           m_bSunbatheAnimsReferenced;
+    bool           m_bAborted;
+    CTaskTimer     m_BathingTimer;
+    eSunbatherType m_SunbatherType;
+    CAnimBlock*    m_pBeachAnimBlock;
+    CAnimBlock*    m_pSunbatheAnimBlock;
+    int            m_BeachAnimBlockIndex;
+    int            m_SunbatheAnimBlockIndex;
+    CObject*       m_pTowel;
 };
 
 class CTaskComplexSunbatheSA : public virtual CTaskComplexSA, public virtual CTaskComplexSunbathe
 {
 public:
-                        CTaskComplexSunbatheSA ( void ) {};
-                        CTaskComplexSunbatheSA ( class CObject* pTowel, const bool bStartStanding );
+    CTaskComplexSunbatheSA(void){};
+    CTaskComplexSunbatheSA(class CObject* pTowel, const bool bStartStanding);
 
-    void                SetEndTime ( DWORD dwTime );
+    void SetEndTime(DWORD dwTime);
 };
-
 
 ////////////////////
 // Player on foot //
@@ -261,9 +227,8 @@ public:
 class CTaskSimplePlayerOnFootSA : public virtual CTaskSimpleSA, public virtual CTaskSimplePlayerOnFoot
 {
 public:
-    CTaskSimplePlayerOnFootSA ( void );
+    CTaskSimplePlayerOnFootSA(void);
 };
-
 
 ////////////////////
 // Complex facial //
@@ -277,7 +242,7 @@ public:
 class CTaskComplexFacialSA : public virtual CTaskComplexSA, public virtual CTaskComplexFacial
 {
 public:
-    CTaskComplexFacialSA ( void );
+    CTaskComplexFacialSA(void);
 };
 
 #endif

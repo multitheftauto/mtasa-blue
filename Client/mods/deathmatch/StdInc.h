@@ -39,7 +39,6 @@
 #include <CVector.h>
 #include <CVector4D.h>
 #include <CMatrix4.h>
-#include <CQuat.h>
 #include <CSphere.h>
 #include <CBox.h>
 #include <ijsify.h>
@@ -155,5 +154,3 @@
 #include "logic/CStaticFunctionDefinitions.h"
 #include "logic/CResourceFileDownloadManager.h"
 #include "../../version.h"
-
-

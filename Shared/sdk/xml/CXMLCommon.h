@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/xml/CXMLCommon.h
-*  PURPOSE:     XML module common interface
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/xml/CXMLCommon.h
+ *  PURPOSE:     XML module common interface
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CXMLCOMMON_H
 #define __CXMLCOMMON_H
@@ -25,10 +24,10 @@ enum eXMLClass
 class CXMLCommon
 {
 public:
-    virtual                     ~CXMLCommon             ( void ) {};
+    virtual ~CXMLCommon(void){};
 
-    virtual eXMLClass           GetClassType            ( void ) = 0;
-    virtual unsigned long       GetID                   ( void ) = 0;
+    virtual eXMLClass     GetClassType(void) = 0;
+    virtual unsigned long GetID(void) = 0;
 };
 
 #endif

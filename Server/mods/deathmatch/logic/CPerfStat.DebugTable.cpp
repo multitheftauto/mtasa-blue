@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CPerfStat.DebugTable.cpp
-*  PURPOSE:
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CPerfStat.DebugTable.cpp
+ *  PURPOSE:
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
@@ -15,11 +15,11 @@ namespace
 {
     struct SLineInfo
     {
-        std::vector < SString > strCellList;
-        CTickCount endTickCount;
-        bool bHasEndTime;
+        std::vector<SString> strCellList;
+        CTickCount           endTickCount;
+        bool                 bHasEndTime;
     };
-}
+}            // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -33,24 +33,23 @@ class CPerfStatDebugTableImpl : public CPerfStatDebugTable
 public:
     ZERO_ON_NEW
 
-                                CPerfStatDebugTableImpl  ( void );
-    virtual                     ~CPerfStatDebugTableImpl ( void );
+    CPerfStatDebugTableImpl(void);
+    virtual ~CPerfStatDebugTableImpl(void);
 
     // CPerfStatModule
-    virtual const SString&      GetCategoryName         ( void );
-    virtual void                DoPulse                 ( void );
-    virtual void                GetStats                ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter );
+    virtual const SString& GetCategoryName(void);
+    virtual void           DoPulse(void);
+    virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CPerfStatDebugTable
-    virtual void                RemoveLines             ( const SString& strKeyMatch );
-    virtual void                UpdateLine              ( const SString& strKey, int iLifeTimeMs, ... );
+    virtual void RemoveLines(const SString& strKeyMatch);
+    virtual void UpdateLine(const SString& strKey, int iLifeTimeMs, ...);
 
-    SString                             m_strCategoryName;
-    CElapsedTime                        m_TimeSinceRemoveOld;
-    std::map < SString, SLineInfo >     m_LineMap;
-    CCriticalSection                    m_CS;           // Required as some methods are called from the database thread
+    SString                      m_strCategoryName;
+    CElapsedTime                 m_TimeSinceRemoveOld;
+    std::map<SString, SLineInfo> m_LineMap;
+    CCriticalSection             m_CS;            // Required as some methods are called from the database thread
 };
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -61,14 +60,13 @@ public:
 ///////////////////////////////////////////////////////////////
 static std::unique_ptr<CPerfStatDebugTableImpl> g_pPerfStatDebugTableImp;
 
-CPerfStatDebugTable* CPerfStatDebugTable::GetSingleton ()
+CPerfStatDebugTable* CPerfStatDebugTable::GetSingleton()
 {
-    if ( !g_pPerfStatDebugTableImp )
-        g_pPerfStatDebugTableImp.reset(new CPerfStatDebugTableImpl ());
+    if (!g_pPerfStatDebugTableImp)
+        g_pPerfStatDebugTableImp.reset(new CPerfStatDebugTableImpl());
     return g_pPerfStatDebugTableImp.get();
 }
 
-
 ///////////////////////////////////////////////////////////////
 //
 // CPerfStatDebugTableImpl::CPerfStatDebugTableImpl
@@ -76,13 +74,12 @@ CPerfStatDebugTable* CPerfStatDebugTable::GetSingleton ()
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatDebugTableImpl::CPerfStatDebugTableImpl ( void )
+CPerfStatDebugTableImpl::CPerfStatDebugTableImpl(void)
 {
-    m_TimeSinceRemoveOld.SetMaxIncrement ( 500, true );
+    m_TimeSinceRemoveOld.SetMaxIncrement(500, true);
     m_strCategoryName = "Debug table";
 }
 
-
 ///////////////////////////////////////////////////////////////
 //
 // CPerfStatDebugTableImpl::CPerfStatDebugTableImpl
@@ -90,10 +87,9 @@ CPerfStatDebugTableImpl::CPerfStatDebugTableImpl ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatDebugTableImpl::~CPerfStatDebugTableImpl ( void )
+CPerfStatDebugTableImpl::~CPerfStatDebugTableImpl(void)
 {
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -102,11 +98,10 @@ CPerfStatDebugTableImpl::~CPerfStatDebugTableImpl ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CPerfStatDebugTableImpl::GetCategoryName ( void )
+const SString& CPerfStatDebugTableImpl::GetCategoryName(void)
 {
     return m_strCategoryName;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -115,28 +110,27 @@ const SString& CPerfStatDebugTableImpl::GetCategoryName ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatDebugTableImpl::DoPulse ( void )
+void CPerfStatDebugTableImpl::DoPulse(void)
 {
     // Do remove old once every second
-    if ( m_TimeSinceRemoveOld.Get () < 1000 )
+    if (m_TimeSinceRemoveOld.Get() < 1000)
         return;
-    m_TimeSinceRemoveOld.Reset ();
+    m_TimeSinceRemoveOld.Reset();
 
-    LOCK_SCOPE ( m_CS );
+    LOCK_SCOPE(m_CS);
 
-    CTickCount nowTickCount = CTickCount::Now ( true );
+    CTickCount nowTickCount = CTickCount::Now(true);
 
     // Remove old
-    for ( std::map < SString, SLineInfo >::iterator iter = m_LineMap.begin () ; iter != m_LineMap.end () ; )
+    for (std::map<SString, SLineInfo>::iterator iter = m_LineMap.begin(); iter != m_LineMap.end();)
     {
         SLineInfo& info = iter->second;
-        if ( info.bHasEndTime && info.endTickCount < nowTickCount )
-            m_LineMap.erase ( iter++ );
+        if (info.bHasEndTime && info.endTickCount < nowTickCount)
+            m_LineMap.erase(iter++);
         else
             ++iter;
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -145,18 +139,18 @@ void CPerfStatDebugTableImpl::DoPulse ( void )
 // Remove one or several lines. Use wildcard match for multiple removes
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatDebugTableImpl::RemoveLines ( const SString& strKeyMatch )
+void CPerfStatDebugTableImpl::RemoveLines(const SString& strKeyMatch)
 {
-    LOCK_SCOPE ( m_CS );
+    LOCK_SCOPE(m_CS);
 
-    if ( strKeyMatch.Contains ( "*" ) || strKeyMatch.Contains ( "?" ) )
+    if (strKeyMatch.Contains("*") || strKeyMatch.Contains("?"))
     {
         // Wildcard remove
-        for ( std::map < SString, SLineInfo >::iterator iter = m_LineMap.begin () ; iter != m_LineMap.end () ; )
+        for (std::map<SString, SLineInfo>::iterator iter = m_LineMap.begin(); iter != m_LineMap.end();)
         {
             // Find each row match
-            if ( WildcardMatch ( strKeyMatch, iter->first ) )
-                m_LineMap.erase ( iter++ );
+            if (WildcardMatch(strKeyMatch, iter->first))
+                m_LineMap.erase(iter++);
             else
                 ++iter;
         }
@@ -164,10 +158,9 @@ void CPerfStatDebugTableImpl::RemoveLines ( const SString& strKeyMatch )
     else
     {
         // Standard remove
-        MapRemove ( m_LineMap, strKeyMatch );
+        MapRemove(m_LineMap, strKeyMatch);
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -176,35 +169,34 @@ void CPerfStatDebugTableImpl::RemoveLines ( const SString& strKeyMatch )
 // Add/update a line by a string key.
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatDebugTableImpl::UpdateLine ( const SString& strKey, int iLifeTimeMs, ... )
+void CPerfStatDebugTableImpl::UpdateLine(const SString& strKey, int iLifeTimeMs, ...)
 {
-    LOCK_SCOPE ( m_CS );
+    LOCK_SCOPE(m_CS);
 
-    SLineInfo& info = MapGet( m_LineMap, strKey );
-    info.strCellList.clear ();
+    SLineInfo& info = MapGet(m_LineMap, strKey);
+    info.strCellList.clear();
 
     // Get cells
     va_list vl;
-    va_start ( vl, iLifeTimeMs );
+    va_start(vl, iLifeTimeMs);
 
-    while ( true )
+    while (true)
     {
-        char* szText = va_arg ( vl, char* );
-        if ( !szText )
+        char* szText = va_arg(vl, char*);
+        if (!szText)
             break;
-        info.strCellList.push_back ( szText );
+        info.strCellList.push_back(szText);
     }
-    va_end ( vl );
+    va_end(vl);
 
-    if ( info.strCellList.empty () )
-        info.strCellList.push_back ( "" );
+    if (info.strCellList.empty())
+        info.strCellList.push_back("");
 
     // Update end time
-    info.bHasEndTime = ( iLifeTimeMs > 0 );
-    if ( info.bHasEndTime )
-        info.endTickCount = CTickCount::Now ( true ) + CTickCount ( (long long)iLifeTimeMs );
+    info.bHasEndTime = (iLifeTimeMs > 0);
+    if (info.bHasEndTime)
+        info.endTickCount = CTickCount::Now(true) + CTickCount((long long)iLifeTimeMs);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -213,43 +205,43 @@ void CPerfStatDebugTableImpl::UpdateLine ( const SString& strKey, int iLifeTimeM
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatDebugTableImpl::GetStats ( CPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter )
+void CPerfStatDebugTableImpl::GetStats(CPerfStatResult* pResult, const std::map<SString, int>& strOptionMap, const SString& strFilter)
 {
-    LOCK_SCOPE ( m_CS );
+    LOCK_SCOPE(m_CS);
 
     //
     // Set option flags
     //
-    bool bHelp = MapContains ( strOptionMap, "h" );
+    bool bHelp = MapContains(strOptionMap, "h");
 
     //
     // Process help
     //
-    if ( bHelp )
+    if (bHelp)
     {
-        pResult->AddColumn ( "Debug table help" );
-        pResult->AddRow ()[0] = "Option h - This help";
+        pResult->AddColumn("Debug table help");
+        pResult->AddRow()[0] = "Option h - This help";
         return;
     }
 
     // Add columns
     const int iNumColumns = 4;
-    for ( int i = 0 ; i < iNumColumns ; i++ )
-        pResult->AddColumn ( "" );
+    for (int i = 0; i < iNumColumns; i++)
+        pResult->AddColumn("");
 
-    for ( std::map < SString, SLineInfo >::iterator iter = m_LineMap.begin () ; iter != m_LineMap.end () ; ++iter )
+    for (std::map<SString, SLineInfo>::iterator iter = m_LineMap.begin(); iter != m_LineMap.end(); ++iter)
     {
         const SLineInfo& info = iter->second;
 
         // Apply filter
-        if ( !strFilter.empty () && !info.strCellList[0].ContainsI ( strFilter ) )
+        if (!strFilter.empty() && !info.strCellList[0].ContainsI(strFilter))
             continue;
 
-        SString* row = pResult->AddRow ();
-        int c = 0;
+        SString* row = pResult->AddRow();
+        int      c = 0;
 
         // Add cells
-        for ( uint i = 0 ; i < info.strCellList.size () && c < iNumColumns ; i++ )
+        for (uint i = 0; i < info.strCellList.size() && c < iNumColumns; i++)
             row[c++] = info.strCellList[i];
     }
 }

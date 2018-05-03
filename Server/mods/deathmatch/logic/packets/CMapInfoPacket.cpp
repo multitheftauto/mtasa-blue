@@ -1,75 +1,28 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/packets/CMapInfoPacket.h
-*  PURPOSE:     Map/game information packet class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*               lil_Toady <>
-*               Alberto Alonso <rydencillo@gmail.com>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/packets/CMapInfoPacket.h
+ *  PURPOSE:     Map/game information packet class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
-                                 unsigned char ucWeatherBlendingTo,
-                                 unsigned char ucBlendedWeatherHour,
-                                 unsigned char ucClockHour,
-                                 unsigned char ucClockMin,
-                                 unsigned long ulMinuteDuration,
-                                 bool bShowNametags,
-                                 bool bShowRadar,
-                                 float fGravity,
-                                 float fGameSpeed,
-                                 float fWaveHeight,
-                                 const SWorldWaterLevelInfo& worldWaterLevelInfo,
-                                 bool bHasSkyGradient,
-                                 const SGarageStates& garageStates,
-                                 unsigned char ucSkyGradientTR,
-                                 unsigned char ucSkyGradientTG,
-                                 unsigned char ucSkyGradientTB,
-                                 unsigned char ucSkyGradientBR,
-                                 unsigned char ucSkyGradientBG,
-                                 unsigned char ucSkyGradientBB,
-                                 bool bHasHeatHaze,
-                                 const SHeatHazeSettings& heatHazeSettings,
-                                 unsigned short usFPSLimit,
-                                 bool bCloudsEnabled,
-                                 float fJetpackMaxHeight,
-                                 bool bOverrideWaterColor,
-                                 unsigned char ucWaterRed,
-                                 unsigned char ucWaterGreen,
-                                 unsigned char ucWaterBlue,
-                                 unsigned char ucWaterAlpha,
-                                 bool bInteriorSoundsEnabled,
-                                 bool bOverrideRainLevel,
-                                 float fRainLevel,
-                                 bool bOverrideSunSize,
-                                 float fSunSize,
-                                 bool bOverrideSunColor,
-                                 unsigned char ucSunCoreR,
-                                 unsigned char ucSunCoreG,
-                                 unsigned char ucSunCoreB,
-                                 unsigned char ucSunCoronaR,
-                                 unsigned char ucSunCoronaG,
-                                 unsigned char ucSunCoronaB,
-                                 bool bOverrideWindVelocity,
-                                 float fWindVelX,
-                                 float fWindVelY,
-                                 float fWindVelZ,
-                                 bool bOverrideFarClipDistance,
-                                 float fFarClip,
-                                 bool bOverrideFogDistance,
-                                 float fFogDistance,
-                                 float fAircraftMaxHeight,
-                                 float fAircraftMaxVelocity,
-                                 bool bOverrideMoonSize,
-                                 int iMoonSize )
+CMapInfoPacket::CMapInfoPacket(unsigned char ucWeather, unsigned char ucWeatherBlendingTo, unsigned char ucBlendedWeatherHour, unsigned char ucClockHour,
+                               unsigned char ucClockMin, unsigned long ulMinuteDuration, bool bShowNametags, bool bShowRadar, float fGravity, float fGameSpeed,
+                               float fWaveHeight, const SWorldWaterLevelInfo& worldWaterLevelInfo, bool bHasSkyGradient, const SGarageStates& garageStates,
+                               unsigned char ucSkyGradientTR, unsigned char ucSkyGradientTG, unsigned char ucSkyGradientTB, unsigned char ucSkyGradientBR,
+                               unsigned char ucSkyGradientBG, unsigned char ucSkyGradientBB, bool bHasHeatHaze, const SHeatHazeSettings& heatHazeSettings,
+                               unsigned short usFPSLimit, bool bCloudsEnabled, float fJetpackMaxHeight, bool bOverrideWaterColor, unsigned char ucWaterRed,
+                               unsigned char ucWaterGreen, unsigned char ucWaterBlue, unsigned char ucWaterAlpha, bool bInteriorSoundsEnabled,
+                               bool bOverrideRainLevel, float fRainLevel, bool bOverrideSunSize, float fSunSize, bool bOverrideSunColor,
+                               unsigned char ucSunCoreR, unsigned char ucSunCoreG, unsigned char ucSunCoreB, unsigned char ucSunCoronaR,
+                               unsigned char ucSunCoronaG, unsigned char ucSunCoronaB, bool bOverrideWindVelocity, float fWindVelX, float fWindVelY,
+                               float fWindVelZ, bool bOverrideFarClipDistance, float fFarClip, bool bOverrideFogDistance, float fFogDistance,
+                               float fAircraftMaxHeight, float fAircraftMaxVelocity, bool bOverrideMoonSize, int iMoonSize)
 {
     m_ucWeather = ucWeather;
     m_ucWeatherBlendingTo = ucWeatherBlendingTo;
@@ -127,176 +80,175 @@ CMapInfoPacket::CMapInfoPacket ( unsigned char ucWeather,
     m_iMoonSize = iMoonSize;
 }
 
-
-bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
+bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
 {
     // Write the map weather
-    BitStream.Write ( m_ucWeather );
-    BitStream.Write ( m_ucWeatherBlendingTo );
-    BitStream.Write ( m_ucBlendedWeatherHour );
+    BitStream.Write(m_ucWeather);
+    BitStream.Write(m_ucWeatherBlendingTo);
+    BitStream.Write(m_ucBlendedWeatherHour);
 
-    BitStream.WriteBit ( m_bHasSkyGradient );
-    if ( m_bHasSkyGradient )
+    BitStream.WriteBit(m_bHasSkyGradient);
+    if (m_bHasSkyGradient)
     {
-        BitStream.Write ( m_ucSkyGradientTR );
-        BitStream.Write ( m_ucSkyGradientTG );
-        BitStream.Write ( m_ucSkyGradientTB );
-        BitStream.Write ( m_ucSkyGradientBR );
-        BitStream.Write ( m_ucSkyGradientBG );
-        BitStream.Write ( m_ucSkyGradientBB );
+        BitStream.Write(m_ucSkyGradientTR);
+        BitStream.Write(m_ucSkyGradientTG);
+        BitStream.Write(m_ucSkyGradientTB);
+        BitStream.Write(m_ucSkyGradientBR);
+        BitStream.Write(m_ucSkyGradientBG);
+        BitStream.Write(m_ucSkyGradientBB);
     }
 
     // Write heat haze
-    BitStream.WriteBit ( m_bHasHeatHaze );
-    if ( m_bHasHeatHaze )
+    BitStream.WriteBit(m_bHasHeatHaze);
+    if (m_bHasHeatHaze)
     {
-        SHeatHazeSync heatHaze ( m_HeatHazeSettings );
-        BitStream.Write ( &heatHaze );
+        SHeatHazeSync heatHaze(m_HeatHazeSettings);
+        BitStream.Write(&heatHaze);
     }
 
     // Write the map hour
-    BitStream.Write ( m_ucClockHour );
-    BitStream.Write ( m_ucClockMin );
+    BitStream.Write(m_ucClockHour);
+    BitStream.Write(m_ucClockMin);
 
-    BitStream.WriteCompressed ( m_ulMinuteDuration );
+    BitStream.WriteCompressed(m_ulMinuteDuration);
 
     // Write the map flags
     SMapInfoFlagsSync flags;
-    flags.data.bShowNametags  = m_bShowNametags;
-    flags.data.bShowRadar     = m_bShowRadar;
+    flags.data.bShowNametags = m_bShowNametags;
+    flags.data.bShowRadar = m_bShowRadar;
     flags.data.bCloudsEnabled = m_bCloudsEnabled;
-    BitStream.Write ( &flags );
+    BitStream.Write(&flags);
 
     // Write any other world conditions
-    BitStream.Write ( m_fGravity );
-    if ( m_fGameSpeed == 1.0f )
-        BitStream.WriteBit ( true );
+    BitStream.Write(m_fGravity);
+    if (m_fGameSpeed == 1.0f)
+        BitStream.WriteBit(true);
     else
     {
-        BitStream.WriteBit ( false );
-        BitStream.Write ( m_fGameSpeed );
+        BitStream.WriteBit(false);
+        BitStream.Write(m_fGameSpeed);
     }
-    BitStream.Write ( m_fWaveHeight );
+    BitStream.Write(m_fWaveHeight);
     // Write world water level
-    BitStream.Write ( m_WorldWaterLevelInfo.fSeaLevel );
-    BitStream.WriteBit ( m_WorldWaterLevelInfo.bNonSeaLevelSet );
-    if ( m_WorldWaterLevelInfo.bNonSeaLevelSet )
-        BitStream.Write ( m_WorldWaterLevelInfo.fNonSeaLevel );
+    BitStream.Write(m_WorldWaterLevelInfo.fSeaLevel);
+    BitStream.WriteBit(m_WorldWaterLevelInfo.bNonSeaLevelSet);
+    if (m_WorldWaterLevelInfo.bNonSeaLevelSet)
+        BitStream.Write(m_WorldWaterLevelInfo.fNonSeaLevel);
 
-    BitStream.WriteCompressed ( m_usFPSLimit );
+    BitStream.WriteCompressed(m_usFPSLimit);
 
     // Write the garage states
-    for ( unsigned char i = 0 ; i < MAX_GARAGES ; i++ )
+    for (unsigned char i = 0; i < MAX_GARAGES; i++)
     {
         const SGarageStates& garageStates = *m_pGarageStates;
-        BitStream.WriteBit( garageStates[i] );
+        BitStream.WriteBit(garageStates[i]);
     }
 
     // Write the fun bugs state
     SFunBugsStateSync funBugs;
-    funBugs.data.bQuickReload = g_pGame->IsGlitchEnabled ( CGame::GLITCH_QUICKRELOAD );
-    funBugs.data.bFastFire    = g_pGame->IsGlitchEnabled ( CGame::GLITCH_FASTFIRE );
-    funBugs.data.bFastMove    = g_pGame->IsGlitchEnabled ( CGame::GLITCH_FASTMOVE );
-    funBugs.data.bCrouchBug   = g_pGame->IsGlitchEnabled ( CGame::GLITCH_CROUCHBUG );
-    funBugs.data.bCloseRangeDamage = g_pGame->IsGlitchEnabled ( CGame::GLITCH_CLOSEDAMAGE );
-    funBugs.data2.bHitAnim    = g_pGame->IsGlitchEnabled ( CGame::GLITCH_HITANIM );
-    funBugs.data3.bFastSprint = g_pGame->IsGlitchEnabled ( CGame::GLITCH_FASTSPRINT );
-    funBugs.data4.bBadDrivebyHitboxes = g_pGame->IsGlitchEnabled( CGame::GLITCH_BADDRIVEBYHITBOX );
-    funBugs.data5.bQuickStand = g_pGame->IsGlitchEnabled( CGame::GLITCH_QUICKSTAND );
-    BitStream.Write ( &funBugs );
+    funBugs.data.bQuickReload = g_pGame->IsGlitchEnabled(CGame::GLITCH_QUICKRELOAD);
+    funBugs.data.bFastFire = g_pGame->IsGlitchEnabled(CGame::GLITCH_FASTFIRE);
+    funBugs.data.bFastMove = g_pGame->IsGlitchEnabled(CGame::GLITCH_FASTMOVE);
+    funBugs.data.bCrouchBug = g_pGame->IsGlitchEnabled(CGame::GLITCH_CROUCHBUG);
+    funBugs.data.bCloseRangeDamage = g_pGame->IsGlitchEnabled(CGame::GLITCH_CLOSEDAMAGE);
+    funBugs.data2.bHitAnim = g_pGame->IsGlitchEnabled(CGame::GLITCH_HITANIM);
+    funBugs.data3.bFastSprint = g_pGame->IsGlitchEnabled(CGame::GLITCH_FASTSPRINT);
+    funBugs.data4.bBadDrivebyHitboxes = g_pGame->IsGlitchEnabled(CGame::GLITCH_BADDRIVEBYHITBOX);
+    funBugs.data5.bQuickStand = g_pGame->IsGlitchEnabled(CGame::GLITCH_QUICKSTAND);
+    BitStream.Write(&funBugs);
 
-    BitStream.Write ( m_fJetpackMaxHeight );
+    BitStream.Write(m_fJetpackMaxHeight);
 
-    BitStream.WriteBit ( m_bOverrideWaterColor );
-    if ( m_bOverrideWaterColor )
+    BitStream.WriteBit(m_bOverrideWaterColor);
+    if (m_bOverrideWaterColor)
     {
-        BitStream.Write ( m_ucWaterRed );
-        BitStream.Write ( m_ucWaterGreen );
-        BitStream.Write ( m_ucWaterBlue );
-        BitStream.Write ( m_ucWaterAlpha );
+        BitStream.Write(m_ucWaterRed);
+        BitStream.Write(m_ucWaterGreen);
+        BitStream.Write(m_ucWaterBlue);
+        BitStream.Write(m_ucWaterAlpha);
     }
 
     // Interior sounds
-    BitStream.WriteBit ( m_bInteriorSoundsEnabled );
+    BitStream.WriteBit(m_bInteriorSoundsEnabled);
 
     // Rain level
-    BitStream.WriteBit ( m_bOverrideRainLevel );
-    if ( m_bOverrideRainLevel )
+    BitStream.WriteBit(m_bOverrideRainLevel);
+    if (m_bOverrideRainLevel)
     {
-        BitStream.Write ( m_fRainLevel );
+        BitStream.Write(m_fRainLevel);
     }
 
     // Moon size
-    if ( BitStream.Version () >= 0x40 )
+    if (BitStream.Version() >= 0x40)
     {
-        BitStream.WriteBit ( m_bOverrideMoonSize );
-        if ( m_bOverrideMoonSize )
+        BitStream.WriteBit(m_bOverrideMoonSize);
+        if (m_bOverrideMoonSize)
         {
-            BitStream.Write ( m_iMoonSize );
+            BitStream.Write(m_iMoonSize);
         }
     }
 
     // Sun size
-    BitStream.WriteBit ( m_bOverrideSunSize );
-    if ( m_bOverrideSunSize )
+    BitStream.WriteBit(m_bOverrideSunSize);
+    if (m_bOverrideSunSize)
     {
-        BitStream.Write ( m_fSunSize );
+        BitStream.Write(m_fSunSize);
     }
 
     // Sun color
-    BitStream.WriteBit ( m_bOverrideSunColor );
-    if ( m_bOverrideSunColor )
+    BitStream.WriteBit(m_bOverrideSunColor);
+    if (m_bOverrideSunColor)
     {
-        BitStream.Write ( m_ucSunCoreR );
-        BitStream.Write ( m_ucSunCoreG );
-        BitStream.Write ( m_ucSunCoreB );
-        BitStream.Write ( m_ucSunCoronaR );
-        BitStream.Write ( m_ucSunCoronaG );
-        BitStream.Write ( m_ucSunCoronaB );
+        BitStream.Write(m_ucSunCoreR);
+        BitStream.Write(m_ucSunCoreG);
+        BitStream.Write(m_ucSunCoreB);
+        BitStream.Write(m_ucSunCoronaR);
+        BitStream.Write(m_ucSunCoronaG);
+        BitStream.Write(m_ucSunCoronaB);
     }
 
     // Wind velocity
-    BitStream.WriteBit ( m_bOverrideWindVelocity );
-    if ( m_bOverrideWindVelocity )
+    BitStream.WriteBit(m_bOverrideWindVelocity);
+    if (m_bOverrideWindVelocity)
     {
-        BitStream.Write ( m_fWindVelX );
-        BitStream.Write ( m_fWindVelY );
-        BitStream.Write ( m_fWindVelZ );
+        BitStream.Write(m_fWindVelX);
+        BitStream.Write(m_fWindVelY);
+        BitStream.Write(m_fWindVelZ);
     }
 
     // Far clip distance
-    BitStream.WriteBit ( m_bOverrideFarClipDistance );
-    if ( m_bOverrideFarClipDistance )
+    BitStream.WriteBit(m_bOverrideFarClipDistance);
+    if (m_bOverrideFarClipDistance)
     {
-        BitStream.Write ( m_fFarClip );
+        BitStream.Write(m_fFarClip);
     }
 
     // Fog distance
-    BitStream.WriteBit ( m_bOverrideFogDistance );
-    if ( m_bOverrideFogDistance )
+    BitStream.WriteBit(m_bOverrideFogDistance);
+    if (m_bOverrideFogDistance)
     {
-        BitStream.Write ( m_fFogDistance );
+        BitStream.Write(m_fFogDistance);
     }
 
-    BitStream.Write ( m_fAircraftMaxHeight );
+    BitStream.Write(m_fAircraftMaxHeight);
 
-    if ( BitStream.Version () >= 0x3E ) 
-        BitStream.Write ( m_fAircraftMaxVelocity );
-    
-    if ( BitStream.Version () >= 0x30 )
+    if (BitStream.Version() >= 0x3E)
+        BitStream.Write(m_fAircraftMaxVelocity);
+
+    if (BitStream.Version() >= 0x30)
     {
         for (int i = WEAPONTYPE_BRASSKNUCKLE; i < WEAPONTYPE_PISTOL; i++)
         {
             bool bEnabled;
-            bEnabled = g_pGame->GetJetpackWeaponEnabled ( (eWeaponType) i );
-            BitStream.WriteBit ( bEnabled );
+            bEnabled = g_pGame->GetJetpackWeaponEnabled((eWeaponType)i);
+            BitStream.WriteBit(bEnabled);
         }
     }
-    for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_EXTINGUISHER;i++)
+    for (int i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_EXTINGUISHER; i++)
     {
         sWeaponPropertySync WeaponProperty;
-        CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager ()->GetWeaponStats( (eWeaponType)i );
-        BitStream.WriteBit ( true );
+        CWeaponStat*        pWeaponStat = g_pGame->GetWeaponStatManager()->GetWeaponStats((eWeaponType)i);
+        BitStream.WriteBit(true);
         WeaponProperty.data.weaponType = (int)pWeaponStat->GetWeaponType();
         WeaponProperty.data.fAccuracy = pWeaponStat->GetAccuracy();
         WeaponProperty.data.fMoveSpeed = pWeaponStat->GetMoveSpeed();
@@ -315,20 +267,20 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
         WeaponProperty.data.anim2_loop_bullet_fire = pWeaponStat->GetWeaponAnim2LoopFireTime();
 
         WeaponProperty.data.anim_breakout_time = pWeaponStat->GetWeaponAnimBreakoutTime();
-        BitStream.Write( &WeaponProperty );
-        if ( BitStream.Version () >= 0x30 )
+        BitStream.Write(&WeaponProperty);
+        if (BitStream.Version() >= 0x30)
         {
-            BitStream.WriteBit ( g_pGame->GetJetpackWeaponEnabled ( (eWeaponType) i ) );
+            BitStream.WriteBit(g_pGame->GetJetpackWeaponEnabled((eWeaponType)i));
         }
     }
 
-    for (int i = WEAPONTYPE_PISTOL;i <= WEAPONTYPE_TEC9;i++)
+    for (int i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_TEC9; i++)
     {
         sWeaponPropertySync WeaponProperty;
-        BitStream.WriteBit ( true );
-        for (int j = 0; j <= 2;j++)
+        BitStream.WriteBit(true);
+        for (int j = 0; j <= 2; j++)
         {
-            CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager ()->GetWeaponStats( (eWeaponType)i, (eWeaponSkill)j );
+            CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager()->GetWeaponStats((eWeaponType)i, (eWeaponSkill)j);
             WeaponProperty.data.weaponType = (int)pWeaponStat->GetWeaponType();
             WeaponProperty.data.fAccuracy = pWeaponStat->GetAccuracy();
             WeaponProperty.data.fMoveSpeed = pWeaponStat->GetMoveSpeed();
@@ -347,44 +299,44 @@ bool CMapInfoPacket::Write ( NetBitStreamInterface& BitStream ) const
             WeaponProperty.data.anim2_loop_bullet_fire = pWeaponStat->GetWeaponAnim2LoopFireTime();
 
             WeaponProperty.data.anim_breakout_time = pWeaponStat->GetWeaponAnimBreakoutTime();
-            BitStream.Write( &WeaponProperty );
+            BitStream.Write(&WeaponProperty);
         }
-        if ( BitStream.Version () >= 0x36 )
+        if (BitStream.Version() >= 0x36)
         {
-            BitStream.WriteBit ( g_pGame->GetJetpackWeaponEnabled ( (eWeaponType) i ) );
+            BitStream.WriteBit(g_pGame->GetJetpackWeaponEnabled((eWeaponType)i));
         }
     }
-    if ( BitStream.Version () >= 0x30 )
+    if (BitStream.Version() >= 0x30)
     {
         for (int i = WEAPONTYPE_CAMERA; i <= WEAPONTYPE_PARACHUTE; i++)
         {
             bool bEnabled;
-            bEnabled = g_pGame->GetJetpackWeaponEnabled ( (eWeaponType) i );
-            BitStream.WriteBit ( bEnabled );
+            bEnabled = g_pGame->GetJetpackWeaponEnabled((eWeaponType)i);
+            BitStream.WriteBit(bEnabled);
         }
     }
 
-    multimap< unsigned short, CBuildingRemoval* >::const_iterator iter = g_pGame->GetBuildingRemovalManager ( )->IterBegin();
-    for (; iter != g_pGame->GetBuildingRemovalManager ( )->IterEnd();++iter)
+    multimap<unsigned short, CBuildingRemoval*>::const_iterator iter = g_pGame->GetBuildingRemovalManager()->IterBegin();
+    for (; iter != g_pGame->GetBuildingRemovalManager()->IterEnd(); ++iter)
     {
-        CBuildingRemoval * pBuildingRemoval = (*iter).second;
-        BitStream.WriteBit( true );
-        BitStream.Write( pBuildingRemoval->GetModel ( ) );
-        BitStream.Write( pBuildingRemoval->GetRadius ( ) );
-        BitStream.Write( pBuildingRemoval->GetPosition ( ).fX );
-        BitStream.Write( pBuildingRemoval->GetPosition ( ).fY );
-        BitStream.Write( pBuildingRemoval->GetPosition ( ).fZ );
-        if ( BitStream.Version() >= 0x039 )
+        CBuildingRemoval* pBuildingRemoval = (*iter).second;
+        BitStream.WriteBit(true);
+        BitStream.Write(pBuildingRemoval->GetModel());
+        BitStream.Write(pBuildingRemoval->GetRadius());
+        BitStream.Write(pBuildingRemoval->GetPosition().fX);
+        BitStream.Write(pBuildingRemoval->GetPosition().fY);
+        BitStream.Write(pBuildingRemoval->GetPosition().fZ);
+        if (BitStream.Version() >= 0x039)
         {
-            BitStream.Write ( pBuildingRemoval->GetInterior ( ) );
+            BitStream.Write(pBuildingRemoval->GetInterior());
         }
     }
-    BitStream.WriteBit( false );
+    BitStream.WriteBit(false);
 
-    if ( BitStream.Version () >= 0x25 )
+    if (BitStream.Version() >= 0x25)
     {
-        bool bOcclusionsEnabled = g_pGame->GetOcclusionsEnabled ();
-        BitStream.WriteBit( bOcclusionsEnabled );
+        bool bOcclusionsEnabled = g_pGame->GetOcclusionsEnabled();
+        BitStream.WriteBit(bOcclusionsEnabled);
     }
 
     return true;

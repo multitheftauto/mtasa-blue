@@ -49,8 +49,6 @@ project "Deathmatch"
 		"../../../Shared/mods/deathmatch/logic/**.h",
 		"../../../Shared/animation/CEasingCurve.cpp", 
 		"../../../Shared/animation/CPositionRotationAnimation.cpp",
-		"../../sdk/MTAPlatform.cpp",
-		"../../sdk/MTAPlatform.h",
 		"../../version.h",
 		-- Todo: Replace these two by using the CryptoPP functions instead
 		"../../../vendor/bochs/bochs_internal/crc32.cpp",

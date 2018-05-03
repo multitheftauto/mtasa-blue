@@ -1,60 +1,56 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientColModelManager.cpp
-*  PURPOSE:     Model collision entity manager class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientColModelManager.cpp
+ *  PURPOSE:     Model collision entity manager class
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 #include "CClientColModelManager.h"
 #include "CClientObjectManager.h"
 
-CClientColModelManager::CClientColModelManager ( class CClientManager* pManager )
+CClientColModelManager::CClientColModelManager(class CClientManager* pManager)
 {
     // Init
     m_bRemoveFromList = true;
 }
 
-
-CClientColModelManager::~CClientColModelManager ( void )
+CClientColModelManager::~CClientColModelManager(void)
 {
     // Remove all items
-    RemoveAll ();
+    RemoveAll();
 }
 
-
-void CClientColModelManager::RemoveAll ( void )
+void CClientColModelManager::RemoveAll(void)
 {
     // Make sure they don't remove themselves from the list
     m_bRemoveFromList = false;
 
     // Delete all the items
-    std::list < CClientColModel* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    std::list<CClientColModel*>::iterator iter = m_List.begin();
+    for (; iter != m_List.end(); iter++)
     {
         delete *iter;
     }
 
     // Clear the list
-    m_List.clear ();
+    m_List.clear();
 
     // They can now remove themselves again
     m_bRemoveFromList = true;
 }
 
-
-bool CClientColModelManager::Exists ( CClientColModel* pCol )
+bool CClientColModelManager::Exists(CClientColModel* pCol)
 {
     // Item exists in list?
-    std::list < CClientColModel* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    std::list<CClientColModel*>::iterator iter = m_List.begin();
+    for (; iter != m_List.end(); iter++)
     {
         // Same element?
-        if ( pCol == *iter )
+        if (pCol == *iter)
         {
             return true;
         }
@@ -64,16 +60,14 @@ bool CClientColModelManager::Exists ( CClientColModel* pCol )
     return false;
 }
 
-
-CClientColModel* CClientColModelManager::GetElementThatReplaced ( unsigned short usModel, CClientColModel* pDontSearch )
+CClientColModel* CClientColModelManager::GetElementThatReplaced(unsigned short usModel, CClientColModel* pDontSearch)
 {
     // Item exists in list?
-    std::list < CClientColModel* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    std::list<CClientColModel*>::iterator iter = m_List.begin();
+    for (; iter != m_List.end(); iter++)
     {
         // Has this element replaced the given model?
-        if ( *iter != pDontSearch &&
-             (*iter)->HasReplaced ( usModel ) )
+        if (*iter != pDontSearch && (*iter)->HasReplaced(usModel))
         {
             // Return the item
             return *iter;
@@ -84,22 +78,20 @@ CClientColModel* CClientColModelManager::GetElementThatReplaced ( unsigned short
     return NULL;
 }
 
-
-bool CClientColModelManager::IsReplacableModel ( unsigned short usModel )
+bool CClientColModelManager::IsReplacableModel(unsigned short usModel)
 {
     // We can only replace object collisions atm
-    return CClientObjectManager::IsValidModel ( usModel );
+    return CClientObjectManager::IsValidModel(usModel);
 }
 
-
-bool CClientColModelManager::RestoreModel ( unsigned short usModel )
+bool CClientColModelManager::RestoreModel(unsigned short usModel)
 {
     // Grab the item that replaced that model
-    CClientColModel* pCol = GetElementThatReplaced ( usModel );
-    if ( pCol )
+    CClientColModel* pCol = GetElementThatReplaced(usModel);
+    if (pCol)
     {
         // Restore it
-        pCol->Restore ( usModel );
+        pCol->Restore(usModel);
 
         // Success
         return true;
@@ -109,12 +101,11 @@ bool CClientColModelManager::RestoreModel ( unsigned short usModel )
     return false;
 }
 
-
-void CClientColModelManager::RemoveFromList ( CClientColModel* pCol )
+void CClientColModelManager::RemoveFromList(CClientColModel* pCol)
 {
     // Remove it from the list if we can
-    if ( m_bRemoveFromList )
+    if (m_bRemoveFromList)
     {
-        m_List.remove ( pCol );
+        m_List.remove(pCol);
     }
 }

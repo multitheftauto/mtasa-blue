@@ -1,29 +1,27 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientDummy.cpp
-*  PURPOSE:     Dummy entity class
-*  DEVELOPERS:  Chris McArthur <>
-*               Jax <>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientDummy.cpp
+ *  PURPOSE:     Dummy entity class
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-CClientDummy::CClientDummy ( CClientManager* pManager, ElementID ID, const char * szTypeName ) : ClassInit ( this ), CClientEntity ( ID )
+CClientDummy::CClientDummy(CClientManager* pManager, ElementID ID, const char* szTypeName) : ClassInit(this), CClientEntity(ID)
 {
-    SetTypeName ( szTypeName );
+    SetTypeName(szTypeName);
 
     m_pManager = pManager;
-    if ( pManager )
+    if (pManager)
     {
-        m_pGroups = pManager->GetGroups ();
+        m_pGroups = pManager->GetGroups();
 
-        if ( m_pGroups )
+        if (m_pGroups)
         {
-            m_pGroups->AddToList ( this );
+            m_pGroups->AddToList(this);
         }
     }
     else
@@ -32,17 +30,15 @@ CClientDummy::CClientDummy ( CClientManager* pManager, ElementID ID, const char 
     }
 }
 
-CClientDummy::~CClientDummy ( void )
+CClientDummy::~CClientDummy(void)
 {
-    Unlink ();
+    Unlink();
 }
 
-
-void CClientDummy::Unlink ( void )
+void CClientDummy::Unlink(void)
 {
-    if ( m_pGroups )
+    if (m_pGroups)
     {
-        m_pGroups->RemoveFromList ( this );
+        m_pGroups->RemoveFromList(this);
     }
 }
-

@@ -15,6 +15,7 @@
 #include <Psapi.h>
 #include <time.h>
 #include <fstream>
+#include <winternl.h>
 
 #include "..\sdk\core\CLocalizationInterface.h"
 extern CLocalizationInterface* g_pLocalization;
