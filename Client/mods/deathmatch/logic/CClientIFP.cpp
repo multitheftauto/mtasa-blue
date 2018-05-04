@@ -1,3 +1,13 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Client/mods/deathmatch/logic/CClientIFP.cpp
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
 #include <StdInc.h>
 #include "game/CAnimBlendSequence.h"
 #include "game/CAnimBlendHierarchy.h"
@@ -31,34 +41,41 @@ bool CClientIFP::LoadIFPFile(const SString& strFilePath)
 {
     if (LoadFileToMemory(strFilePath))
     {
-        char Version[4];
-        ReadBytes(Version, sizeof(Version));
-
-        bool bAnp3 = strncmp(Version, "ANP3", sizeof(Version)) == 0;
-        bool bAnp2 = strncmp(Version, "ANP2", sizeof(Version)) == 0;
-        if (bAnp2 || bAnp3)
+        if (ReadIFPByVersion())
         {
-            m_bVersion1 = false;
-            ReadIFPVersion2(bAnp3);
+            // We are freeing the file reader memory because we don't need to read it anymore.
+            // This function does not unload IFP, to unload ifp, use destroyElement from Lua
+            FreeFileReaderMemory();
+            return true;
         }
-        else
-        {
-            m_bVersion1 = true;
-            ReadIFPVersion1();
-        }
-
-        // We are freeing the file reader memory because we don't need to read it anymore.
-        // This function does not unload IFP, to unload ifp, use destroyElement from Lua
-        FreeFileReaderMemory();
     }
-    else
-    {
-        return false;
-    }
-    return true;
+    return false;
 }
 
-void CClientIFP::ReadIFPVersion1()
+bool CClientIFP::ReadIFPByVersion(void)
+{
+    char Version[4];
+    ReadBytes(Version, sizeof(Version));
+
+    bool bAnp3 = strncmp(Version, "ANP3", sizeof(Version)) == 0;
+    bool bAnp2 = strncmp(Version, "ANP2", sizeof(Version)) == 0;
+    bool bAnpk = strncmp(Version, "ANPK", sizeof(Version)) == 0;
+
+    if (bAnp2 || bAnp3)
+    {
+        ReadIFPVersion2(bAnp3);
+        return true;
+    }
+    else if (bAnpk)
+    {
+        m_bVersion1 = true;
+        ReadIFPVersion1();
+        return true;
+    }
+    return false;
+}
+
+void CClientIFP::ReadIFPVersion1(void)
 {
     SInfo Info;
     ReadHeaderVersion1(Info);

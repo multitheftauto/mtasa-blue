@@ -1,5 +1,17 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Client/mods/deathmatch/logic/CIFPAnimations.h
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
 #ifndef __CIFPANIMATIONS_H
 #define __CIFPANIMATIONS_H
+#pragma once
+
 #include "CClientIFP.h"
 
 class CIFPAnimations

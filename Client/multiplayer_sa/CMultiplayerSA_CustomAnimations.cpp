@@ -1,3 +1,13 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Client/multiplayer_sa/CMultiplayerSA_CustomAnimations.cpp
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
 #include "StdInc.h"
 
 #include <../game_sa/CAnimBlendHierarchySA.h>

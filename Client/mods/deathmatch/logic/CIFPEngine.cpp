@@ -1,3 +1,13 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Client/mods/deathmatch/logic/CIFPEngine.cpp
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
 #include <StdInc.h>
 
 std::shared_ptr<CClientIFP> CIFPEngine::EngineLoadIFP(CResource* pResource, CClientManager* pManager, const SString& strPath, const SString& strBlockName)

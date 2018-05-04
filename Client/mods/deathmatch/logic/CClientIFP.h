@@ -1,5 +1,16 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Client/mods/deathmatch/logic/CClientIFP.h
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
 #ifndef __CCLIENTIFP_H
 #define __CCLIENTIFP_H
+#pragma once
 
 #include "CClientEntity.h"
 #include "CFileReader.h"
@@ -129,9 +140,9 @@ public:
 
     struct SIFPHeaderV2
     {
-        std::int32_t OffsetEOF;
-        char         InternalFileName[24];
-        std::int32_t TotalAnimations;
+        std::uint32_t OffsetEOF;
+        char          InternalFileName[24];
+        std::int32_t  TotalAnimations;
     };
 
     struct SAnimationHeaderV2
@@ -209,6 +220,7 @@ public:
 
 private:
     bool LoadIFPFile(const SString& strFilePath);
+    bool ReadIFPByVersion(void);
     void ReadIFPVersion1(void);
     void ReadIFPVersion2(bool bAnp3);
 

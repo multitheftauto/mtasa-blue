@@ -1,5 +1,16 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Client/mods/deathmatch/logic/CIFPEngine.h
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
 #ifndef __CIFPENGINE_H
 #define __CIFPENGINE_H
+#pragma once
 
 class CIFPEngine
 {

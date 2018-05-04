@@ -119,6 +119,5 @@ void _declspec(naked) HOOK_GetAnimHierarchyFromSkinClump()
 //////////////////////////////////////////////////////////////////////////////////////////
 void CMultiplayerSA::InitHooks_FixBadAnimId(void)
 {
-    // EZHookInstall ( CAnimBlendAssocGroupCopyAnimation );
     EZHookInstall(GetAnimHierarchyFromSkinClump);
 }
