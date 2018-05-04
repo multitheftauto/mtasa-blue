@@ -1,5 +1,16 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Client/mods/deathmatch/logic/CFileReader.h
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
 #ifndef CFILEREADER_H
 #define CFILEREADER_H
+#pragma once
 
 #include <cstdint>
 
@@ -19,9 +30,9 @@ public:
     template <class T>
     void ReadBuffer(T* pDestination)
     {
-        const std::uint32_t u32ReadOffset = u32BytesReadFromBuffer;
-        u32BytesReadFromBuffer += sizeof(T);
-        *pDestination = *reinterpret_cast<T*>(&vecFileDataBuffer[u32ReadOffset]);
+        const std::uint32_t u32ReadOffset = m_u32BytesReadFromBuffer;
+        m_u32BytesReadFromBuffer += sizeof(T);
+        *pDestination = *reinterpret_cast<T*>(&m_vecFileDataBuffer[u32ReadOffset]);
     }
 
     void ReadBytes(void* pDestination, const std::uint32_t u32BytesToRead);
@@ -29,8 +40,8 @@ public:
     void SkipBytes(const std::uint32_t u32BytesToSkip);
 
 private:
-    std::vector<char> vecFileDataBuffer;
-    std::uint32_t     u32BytesReadFromBuffer;
+    std::vector<char> m_vecFileDataBuffer;
+    std::uint32_t     m_u32BytesReadFromBuffer;
 };
 
 #endif
