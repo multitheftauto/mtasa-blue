@@ -746,11 +746,6 @@ public:
     static bool                  GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string& strValue);
     static bool                  GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int& uiValue);
     static bool                  GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char& ucValue);
-    /*static bool                  GetEntryHandling(const CHandlingEntry* pEntry, eHandlingProperty eProperty, float& fValue);
-    static bool                  GetEntryHandling(const CHandlingEntry* pEntry, eHandlingProperty eProperty, CVector vecValue);
-    static bool                  GetEntryHandling(const CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string& strValue);
-    static bool                  GetEntryHandling(const CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int& uiValue);
-    static bool                  GetEntryHandling(const CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char& ucValue);*/
     static bool                  ResetVehicleHandling(CClientVehicle* pVehicle);
     static bool                  ResetVehicleHandlingProperty(CClientVehicle* pVehicle, eHandlingProperty eProperty);
     static bool                  SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, float fValue);
