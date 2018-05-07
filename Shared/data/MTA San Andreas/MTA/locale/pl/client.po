@@ -296,7 +296,7 @@ msgstr "Błąd krytyczny"
 
 #: C:\mtasa-blue\Client\core\CCore.cpp:924
 msgid "TO FIX, REMOVE THIS FILE:"
-msgstr ""
+msgstr "ABY NAPRAWIĆ, USUŃ TEN PLIK:"
 
 #: C:\mtasa-blue\Client\core\CCore.cpp:957
 #, c-format
@@ -640,6 +640,8 @@ msgid ""
 "You are using a feature-branch build! This is a test build only which cannot"
 " be used to connect to public servers!"
 msgstr ""
+"Używasz kompilacji gałęzi-funkcji! Jest to tylko wersja testowa, której nie można"
+" użyć do połączenia z serwerami publicznymi!"
 
 #: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
 msgid ""
@@ -1109,7 +1111,7 @@ msgstr "Dymiące opony itd."
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:788
 msgid "Render vehicles always in high detail"
-msgstr ""
+msgstr "Renderuj pojazdy zawsze w wysokich detalach"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:793
 msgid "Full Screen Minimize"
@@ -1270,12 +1272,12 @@ msgstr "Szybka"
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1023
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2943
 msgid "Normal"
-msgstr ""
+msgstr "Normalna"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1024
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2944
 msgid "Above normal"
-msgstr ""
+msgstr "Ponad normę"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1060
 msgid "Min"
@@ -1406,7 +1408,7 @@ msgstr "Opcje:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1962
 msgid "Chat Background"
-msgstr ""
+msgstr "Tło czatu"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1963
 msgid "Chat Text"
@@ -1414,7 +1416,7 @@ msgstr "Tekst czatu"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1964
 msgid "Input Background"
-msgstr ""
+msgstr "Tło wejścia"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1965
 msgid "Input Text"
@@ -1434,7 +1436,7 @@ msgstr "Szerokość:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:1993
 msgid "Size"
-msgstr ""
+msgstr "Rozmiar"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2042
 msgid "after"
@@ -1458,40 +1460,40 @@ msgstr "Usuwaj stare wiersze"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2093
 msgid "Horizontal:"
-msgstr ""
+msgstr "Poziomo:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2094
 msgid "Vertical:"
-msgstr ""
+msgstr "Pionowo:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2095
 msgid "Text-Align:"
-msgstr ""
+msgstr "Wyrównanie tekstu:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2096
 msgid "X-Offset:"
-msgstr ""
+msgstr "X-Offset:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2097
 msgid "Y-Offset:"
-msgstr ""
+msgstr "Y-Offset:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2103
 msgid "Position"
-msgstr ""
+msgstr "Pozycja"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2118
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2132
 msgid "Center"
-msgstr ""
+msgstr "Środek"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2131
 msgid "Top"
-msgstr ""
+msgstr "Góra"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2133
 msgid "Bottom"
-msgstr ""
+msgstr "Dół"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2181
 #, fuzzy
@@ -1516,7 +1518,7 @@ msgstr "Zezwalaj na powiadomienia w zasobniku systemowym"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:2243
 msgid "Chat text black/white outline"
-msgstr ""
+msgstr "Czarno biały kontur tekstu czatu"
 
 #. Create a messagebox to notify the user
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'",
@@ -1569,11 +1571,11 @@ msgstr "Przezroczystość:"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:3502
 msgid "Color"
-msgstr ""
+msgstr "Kolor"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:3579
 msgid "Preview"
-msgstr ""
+msgstr "Podgląd"
 
 #: C:\mtasa-blue\Client\core\CSettings.cpp:3888
 #, fuzzy
@@ -3248,9 +3250,9 @@ msgstr[2] "%d minut"
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d sekunda"
+msgstr[1] "%d sekundy"
+msgstr[2] "%d sekund"
 
 #. Display the error
 #: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:598
