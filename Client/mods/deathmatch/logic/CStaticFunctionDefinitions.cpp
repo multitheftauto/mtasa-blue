@@ -6761,6 +6761,13 @@ CClientColShape* CStaticFunctionDefinitions::GetElementColShape(CClientEntity* p
     return pColShape;
 }
 
+bool CStaticFunctionDefinitions::IsInsideColShape(CClientColShape* pColShape, const CVector& vecPosition, bool& inside)
+{
+    inside = pColShape->DoHitDetection(vecPosition, 0);
+
+    return true;
+}
+
 bool CStaticFunctionDefinitions::GetWeaponNameFromID(unsigned char ucID, SString& strOutName)
 {
     if (ucID <= 59)

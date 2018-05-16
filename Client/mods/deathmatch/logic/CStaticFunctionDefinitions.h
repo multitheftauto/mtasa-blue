@@ -631,6 +631,7 @@ public:
     static CClientColPolygon*   CreateColPolygon(CResource& Resource, const CVector2D& vecPosition);
     static CClientColTube*      CreateColTube(CResource& Resource, const CVector& vecPosition, float fRadius, float fHeight);
     static CClientColShape*     GetElementColShape(CClientEntity* pEntity);
+    static bool                 IsInsideColShape(CClientColShape* pColShape, const CVector& vecPosition, bool& inside);
     static void                 RefreshColShapeColliders(CClientColShape* pColShape);
 
     // Weapon funcs

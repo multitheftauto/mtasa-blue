@@ -442,6 +442,7 @@ public:
     static CColRectangle* CreateColRectangle(CResource* pResource, const CVector2D& vecPosition, const CVector2D& vecSize);
     static CColPolygon*   CreateColPolygon(CResource* pResource, const std::vector<CVector2D>& vecPointList);
     static CColTube*      CreateColTube(CResource* pResource, const CVector& vecPosition, float fRadius, float fHeight);
+    static bool           IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside);
     static void           RefreshColShapeColliders(CColShape* pColShape);
 
     // Weapon funcs

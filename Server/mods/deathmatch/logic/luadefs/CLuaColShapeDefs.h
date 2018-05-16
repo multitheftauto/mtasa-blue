@@ -25,4 +25,5 @@ public:
     LUA_DECLARE(CreateColRectangle);
     LUA_DECLARE(CreateColPolygon);
     LUA_DECLARE(CreateColTube);
+    LUA_DECLARE(IsInsideColShape);
 };

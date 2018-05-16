@@ -9323,6 +9323,13 @@ CColTube* CStaticFunctionDefinitions::CreateColTube(CResource* pResource, const 
     return pColShape;
 }
 
+bool CStaticFunctionDefinitions::IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside)
+{
+    inside = pColShape->DoHitDetection(vecPosition);
+
+    return true;
+}
+
 // Make sure all colliders for a colshape are up to date
 void CStaticFunctionDefinitions::RefreshColShapeColliders(CColShape* pColShape)
 {

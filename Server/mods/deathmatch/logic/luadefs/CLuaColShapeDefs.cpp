@@ -20,6 +20,7 @@ void CLuaColShapeDefs::LoadFunctions()
     CLuaCFunctions::AddFunction("createColRectangle", CreateColRectangle);
     CLuaCFunctions::AddFunction("createColPolygon", CreateColPolygon);
     CLuaCFunctions::AddFunction("createColTube", CreateColTube);
+    CLuaCFunctions::AddFunction("isInsideColShape", IsInsideColShape);
 }
 
 void CLuaColShapeDefs::AddClass(lua_State* luaVM)
@@ -34,6 +35,7 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "Polygon", "createColPolygon");
 
     lua_classfunction(luaVM, "getElementsWithin", "getElementsWithinColShape");
+    lua_classfunction(luaVM, "isInside", "isInsideColShape");
     lua_registerclass(luaVM, "ColShape", "Element");
 }
 
@@ -289,6 +291,32 @@ int CLuaColShapeDefs::CreateColTube(lua_State* luaVM)
                     return 1;
                 }
             }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaColShapeDefs::IsInsideColShape(lua_State* luaVM)
+{
+    //  bool isInsideColShape ( colshape theColShape, float posX, float posY, float posZ )
+    CColShape* pColShape;
+    CVector         vecPosition;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pColShape);
+    argStream.ReadVector3D(vecPosition);
+
+    if (!argStream.HasErrors())
+    {
+        bool bInside = false;
+        if (CStaticFunctionDefinitions::IsInsideColShape(pColShape, vecPosition, bInside))
+        {
+            lua_pushboolean(luaVM, bInside);
+            return 1;
         }
     }
     else
