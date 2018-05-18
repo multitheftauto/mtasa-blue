@@ -38,7 +38,7 @@ void CLuaColShapeDefs::AddClass ( lua_State* luaVM )
     lua_classfunction ( luaVM, "getShapeType", "getColShapeType" );
 
     lua_classvariable ( luaVM, "elementsWithin", NULL, "getElementsWithinColShape" );
-    lua_classvariable ( luaVM, "shape", NULL, "getColShapeType" );
+    lua_classvariable ( luaVM, "shapeType", NULL, "getColShapeType" );
 
     lua_registerclass ( luaVM, "ColShape", "Element" );
 }
@@ -56,7 +56,29 @@ int CLuaColShapeDefs::GetColShapeType ( lua_State* luaVM )
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine ( luaVM );
         if (pLuaMain)
         {
-            lua_pushnumber ( luaVM, pColShape->GetShapeType( ) + 1 );
+            switch ( pColShape->GetShapeType( ) )
+            {
+            case 0:
+                lua_pushstring(luaVM, "Circle");
+                break;
+            case 1:
+                lua_pushstring(luaVM, "Cuboid");
+                break;
+            case 2:
+                lua_pushstring(luaVM, "Sphere");
+                break;
+            case 3:
+                lua_pushstring(luaVM, "Rectangle");
+                break;
+            case 4:
+                lua_pushstring(luaVM, "Polygon");
+                break;
+            case 5:
+                lua_pushstring(luaVM, "Tube");
+                break;
+            default:
+                lua_pushboolean(luaVM, false);
+            }
             return 1;
         }
     }
