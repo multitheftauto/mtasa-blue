@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CEXCEPTIONINFORMATION_H
-#define __CEXCEPTIONINFORMATION_H
+#pragma once
 
 class CExceptionInformation
 {
@@ -38,5 +37,3 @@ public:
     virtual unsigned long GetSS(void) = 0;
     virtual unsigned long GetEFlags(void) = 0;
 };
-
-#endif

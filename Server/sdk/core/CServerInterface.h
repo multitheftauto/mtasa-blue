@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CSERVERINTERFACE_H
-#define __CSERVERINTERFACE_H
+#pragma once
 
 #include "net/CNetServer.h"
 #include "CModManager.h"
@@ -29,5 +28,3 @@ public:
     virtual void Printf(const char* szFormat, ...) = 0;
     virtual bool IsRequestingExit(void) = 0;
 };
-
-#endif
