@@ -145,7 +145,7 @@ void CChat::LoadCVars(void)
 //
 // Draw
 //
-void CChat::Draw(bool bUseCacheTexture)
+void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
 {
     // Are we visible?
     if (!m_bVisible)
@@ -159,9 +159,12 @@ void CChat::Draw(bool bUseCacheTexture)
         UpdateGUI();
     }
 
+    bool bUsingOutline = m_bTextBlackOutline && bAllowOutline && bUseCacheTexture;
+    DrawInputLine(bUsingOutline);
+
     // Get drawList for the chat box text
     SDrawList drawList;
-    GetDrawList(drawList);
+    GetDrawList(drawList, bUsingOutline);
 
     // Calc some size info
     CVector2D chatTopLeft(drawList.renderBounds.fX1, drawList.renderBounds.fY1);
@@ -212,6 +215,7 @@ void CChat::Draw(bool bUseCacheTexture)
     // If we can't get a rendertarget for some reason, just render the text directly to the screen
     if (!m_pCacheTexture)
     {
+        drawList.bOutline = false;      // Outline too slow without cache texture
         DrawDrawList(drawList, chatTopLeft);
         return;
     }
@@ -270,15 +274,14 @@ void CChat::DrawDrawList(const SDrawList& drawList, const CVector2D& topLeftOffs
 //
 // Get list of text lines to draw
 //
-void CChat::GetDrawList(SDrawList& outDrawList)
+void CChat::GetDrawList(SDrawList& outDrawList, bool bUsingOutline)
 {
     float     fLineDifference = CChat::GetFontHeight(m_vecScale.fY);
     CVector2D vecPosition(m_vecBackgroundPosition.fX + (5.0f * m_vecScale.fX), m_vecBackgroundPosition.fY + m_vecBackgroundSize.fY - (fLineDifference * 1.25f));
     float     fMaxLineWidth = m_vecBackgroundSize.fX - (10.0f * m_vecScale.fX);
     unsigned long ulTime = GetTickCount32();
     float         fRcpChatLineFadeOut = 1.0f / m_ulChatLineFadeOut;
-    bool          bShadow = (m_Color.A * m_fBackgroundAlpha == 0.f) && !m_bTextBlackOutline;
-    bool          bInputShadow = (m_InputColor.A * m_fInputBackgroundAlpha == 0.f) && !m_bTextBlackOutline;
+    bool          bShadow = (m_Color.A * m_fBackgroundAlpha == 0.f) && !bUsingOutline;
 
     if (m_Color.A * m_fBackgroundAlpha > 0.f)
     {
@@ -304,7 +307,7 @@ void CChat::GetDrawList(SDrawList& outDrawList)
 
     outDrawList.renderBounds = RenderBounds;
     outDrawList.bShadow = bShadow;
-    outDrawList.bOutline = m_bTextBlackOutline;
+    outDrawList.bOutline = bUsingOutline;
 
     // Smooth scroll
     int   iLineScroll;
@@ -351,7 +354,13 @@ void CChat::GetDrawList(SDrawList& outDrawList)
         if (uiLine == m_uiMostRecentLine)            // Went through all lines?
             break;
     }
+}
 
+//
+// CChat::DrawInputLine
+//
+void CChat::DrawInputLine(bool bUsingOutline)
+{
     if (m_InputColor.A * m_fInputBackgroundAlpha > 0.f)
     {
         if (m_pInput)
@@ -366,8 +375,10 @@ void CChat::GetDrawList(SDrawList& outDrawList)
 
     if (m_bInputVisible)
     {
+        float     fLineDifference = CChat::GetFontHeight(m_vecScale.fY);
+        bool      bInputShadow = (m_InputColor.A * m_fInputBackgroundAlpha == 0.f) && !bUsingOutline;
         CVector2D vecPosition(m_vecInputPosition.fX + (5.0f * m_vecScale.fX), m_vecInputPosition.fY + (fLineDifference * 0.125f));
-        m_InputLine.Draw(vecPosition, 255, bInputShadow, m_bTextBlackOutline);
+        m_InputLine.Draw(vecPosition, 255, bInputShadow, bUsingOutline);
     }
 }
 

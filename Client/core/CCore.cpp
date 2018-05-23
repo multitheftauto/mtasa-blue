@@ -2243,3 +2243,9 @@ bool CCore::GetRightSizeTxdEnabled(void)
 
     return false;
 }
+
+SString CCore::GetBlueCopyrightString(void)
+{
+    SString strCopyright = BLUE_COPYRIGHT_STRING;
+    return strCopyright.Replace("%BUILD_YEAR%", std::to_string(BUILD_YEAR).c_str());
+}

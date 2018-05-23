@@ -299,9 +299,9 @@ void CLocalGUI::Draw(void)
     UpdateCursor();
 
     // Draw the chat
-    m_pChat->Draw(true);
+    m_pChat->Draw(true, true);
     // Draw the debugger
-    m_pDebugView->Draw(false);
+    m_pDebugView->Draw(true, false);
 
     // If we're not at the loadingscreen
     static bool bDelayedFrame = false;

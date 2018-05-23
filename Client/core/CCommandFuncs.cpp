@@ -75,7 +75,7 @@ void CCommandFuncs::Ver(const char* szParameters)
     if (usNetRel > 0)
         strVersion += SString(".%03d", usNetRel);
     strVersion += "\n";
-    strVersion += _(BLUE_COPYRIGHT_STRING);
+    strVersion += g_pCore->GetBlueCopyrightString();
     CLocalGUI::GetSingleton().EchoConsole(strVersion);
 }
 

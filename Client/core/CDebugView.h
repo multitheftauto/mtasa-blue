@@ -24,7 +24,7 @@ class CDebugView : public CChat
 public:
     CDebugView(CGUI* pManager, const CVector2D& vecPosition);
 
-    void Draw(bool bUseCacheTexture);
+    void Draw(bool bUseCacheTexture, bool bAllowOutline);
     void Output(const char* szText, bool bColorCoded);
 
 protected:
