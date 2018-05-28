@@ -62,6 +62,7 @@ enum eDir
 {
     eDirNeg,
     eDirPos,
+    eDirNegToPos,
     eDirMax
 };
 
@@ -79,7 +80,7 @@ enum eStick
 struct SMappingLine
 {
     eJoy   SourceAxisIndex;            // 0 - 7
-    eDir   SourceAxisDir;              // 0 - 1
+    eDir   SourceAxisDir;              // 0 - 2
     eStick OutputAxisIndex;            // 0/1 2/3 4 5
     eDir   OutputAxisDir;              // 0 - 1
     bool   bEnabled;
@@ -652,6 +653,7 @@ void CJoystickManager::DoPulse(void)
         // See if any axes have changed to over 0.75
         for (int i = 0; i < NUMELMS(m_JoystickState.rgfAxis); i++)
         {
+            // Half axis movement (0 to 1)
             if (fabs(m_JoystickState.rgfAxis[i]) > 0.75f)
                 if (fabs(m_PreBindJoystickState.rgfAxis[i]) < 0.75f)
                 {
@@ -660,6 +662,18 @@ void CJoystickManager::DoPulse(void)
                     m_currentMapping[m_iCaptureOutputIndex].bEnabled = true;
                     m_currentMapping[m_iCaptureOutputIndex].SourceAxisIndex = (eJoy)i;
                     m_currentMapping[m_iCaptureOutputIndex].SourceAxisDir = m_JoystickState.rgfAxis[i] < 0.f ? eDirNeg : eDirPos;
+                    m_SettingsRevision++;
+                }
+
+            // Full axis movement (-1 to 1)
+            if (m_JoystickState.rgfAxis[i] > 0.75f)
+                if (m_PreBindJoystickState.rgfAxis[i] < -0.75f)
+                {
+                    m_bCaptureAxis = false;
+                    // Save the mapping
+                    m_currentMapping[m_iCaptureOutputIndex].bEnabled = true;
+                    m_currentMapping[m_iCaptureOutputIndex].SourceAxisIndex = (eJoy)i;
+                    m_currentMapping[m_iCaptureOutputIndex].SourceAxisDir = eDirNegToPos;
                     m_SettingsRevision++;
                 }
         }
@@ -1037,7 +1051,11 @@ void CJoystickManager::ApplyAxes(CControllerState& cs, bool bInVehicle)
         if (line.SourceAxisDir == eDirPos)
             value = std::max(0.f, value);
         else
+        if (line.SourceAxisDir == eDirNeg)
             value = -std::min(0.f, value);
+        else
+        if (line.SourceAxisDir == eDirNegToPos)
+            value = value * 0.5f + 0.5f;
 
         if (line.OutputAxisDir == eDirNeg)
             value = -value;
@@ -1575,6 +1593,8 @@ static string ToString(eDir value)
         return "-";
     if (value == eDirPos)
         return "+";
+    if (value == eDirNegToPos)
+        return " ";
     return "unknown";
 }
 
