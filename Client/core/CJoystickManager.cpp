@@ -363,36 +363,44 @@ BOOL CJoystickManager::DoEnumObjectsCallback(const DIDEVICEOBJECTINSTANCE* pdido
         int axisIndex = -1;
 
         if (pdidoi->guidType == GUID_XAxis)
-            axisIndex = 0;
+            axisIndex = eJoyX;
         if (pdidoi->guidType == GUID_YAxis)
-            axisIndex = 1;
+            axisIndex = eJoyY;
         if (pdidoi->guidType == GUID_ZAxis)
-            axisIndex = 2;
+            axisIndex = eJoyZ;
         if (pdidoi->guidType == GUID_RxAxis)
-            axisIndex = 3;
+            axisIndex = eJoyRx;
         if (pdidoi->guidType == GUID_RyAxis)
-            axisIndex = 4;
+            axisIndex = eJoyRy;
         if (pdidoi->guidType == GUID_RzAxis)
-            axisIndex = 5;
+            axisIndex = eJoyRz;
         if (pdidoi->guidType == GUID_Slider)
-            axisIndex = 6;
+            axisIndex = eJoyS1;
 
+        SString strStatus;
         // Save the range and the axis index
         if (axisIndex >= 0 && axisIndex < NUMELMS(m_DevInfo.axis) && range.lMin < range.lMax)
         {
-            m_DevInfo.axis[axisIndex].lMin = range.lMin;
-            m_DevInfo.axis[axisIndex].lMax = range.lMax;
-            m_DevInfo.axis[axisIndex].bEnabled = true;
-            m_DevInfo.axis[axisIndex].dwType = pdidoi->dwType;
+            if (!m_DevInfo.axis[axisIndex].bEnabled)
+            {
+                m_DevInfo.axis[axisIndex].lMin = range.lMin;
+                m_DevInfo.axis[axisIndex].lMax = range.lMax;
+                m_DevInfo.axis[axisIndex].bEnabled = true;
+                m_DevInfo.axis[axisIndex].dwType = pdidoi->dwType;
 
-            m_DevInfo.iAxisCount++;
-            WriteDebugEvent(
-                SString("                    Added axis index %d. lMin:%d lMax:%d (iAxisCount:%d)", axisIndex, range.lMin, range.lMax, m_DevInfo.iAxisCount));
+                m_DevInfo.iAxisCount++;
+                strStatus = SString("Added axis index %d. lMin:%d lMax:%d (iAxisCount:%d)", axisIndex, range.lMin, range.lMax, m_DevInfo.iAxisCount);
+            }
+            else
+            {
+                strStatus = SString("Ignoring duplicate axis index %d", axisIndex);
+            }
         }
         else
         {
-            WriteDebugEvent(SStringX("                 Failed to recognise axis"));
+            strStatus = "Failed to recognise axis";
         }
+        WriteDebugEvent("                    " + strStatus);
 
 #ifdef MTA_DEBUG
 #if 0
