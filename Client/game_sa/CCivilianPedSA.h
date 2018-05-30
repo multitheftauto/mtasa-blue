@@ -1,15 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CCivilianPedSA.h
-*  PURPOSE:     Header file for civilian ped entity class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CCivilianPedSA.h
+ *  PURPOSE:     Header file for civilian ped entity class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CGAMESA_CIVILIANPED
 #define __CGAMESA_CIVILIANPED
@@ -27,20 +25,18 @@
 
 #define SIZEOF_CCIVILIANPED             1948
 
-class CCivilianPedSAInterface : public CPedSAInterface 
+class CCivilianPedSAInterface : public CPedSAInterface
 {
 public:
-
 };
 
 class CCivilianPedSA : public virtual CCivilianPed, public virtual CPedSA
 {
 private:
-
 public:
-                CCivilianPedSA( ePedModel pedType );
-                CCivilianPedSA( CPedSAInterface * ped );
-                ~CCivilianPedSA(  );
+    CCivilianPedSA(ePedModel pedType);
+    CCivilianPedSA(CPedSAInterface* ped);
+    ~CCivilianPedSA();
 
     /*
     float       GetSprintEnergy ( void ) { return 1000.0f; };

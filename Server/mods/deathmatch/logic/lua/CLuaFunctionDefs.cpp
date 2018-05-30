@@ -1,30 +1,19 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/lua/CLuaFunctionDefs.cpp
-*  PURPOSE:     Lua function definitions class
-*  DEVELOPERS:  Kent Simon <>
-*               Christian Myhre Lundheim <>
-*               Cecill Etheredge <>
-*               Ed Lyons <>
-*               Oliver Brown <>
-*               Jax <>
-*               Chris McArthur <>
-*               Kevin Whiteside <>
-*               lil_Toady <>
-*               Alberto Alonso <rydencillo@gmail.com>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/lua/CLuaFunctionDefs.cpp
+ *  PURPOSE:     Lua function definitions class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
 extern CGame* g_pGame;
 
-CTimeUsMarker < 20 > markerLatentEvent; // For timing triggerLatentClientEvent
+CTimeUsMarker<20> markerLatentEvent;            // For timing triggerLatentClientEvent
 
 CBlipManager*              CLuaFunctionDefs::m_pBlipManager;
 CLuaManager*               CLuaFunctionDefs::m_pLuaManager;
@@ -44,23 +33,23 @@ CResourceManager*          CLuaFunctionDefs::m_pResourceManager;
 CAccessControlListManager* CLuaFunctionDefs::m_pACLManager;
 CLuaModuleManager*         CLuaFunctionDefs::m_pLuaModuleManager;
 
-void CLuaFunctionDefs::Initialize( CLuaManager* pLuaManager, CGame* pGame )
+void CLuaFunctionDefs::Initialize(CLuaManager* pLuaManager, CGame* pGame)
 {
     m_pLuaManager = pLuaManager;
-    m_pLuaModuleManager = pLuaManager->GetLuaModuleManager ();
-    m_pBlipManager = pGame->GetBlipManager ();
-    m_pMarkerManager = pGame->GetMarkerManager ();
-    m_pObjectManager = pGame->GetObjectManager ();
-    m_pPickupManager = pGame->GetPickupManager ();
-    m_pPlayerManager = pGame->GetPlayerManager ();
-    m_pRadarAreaManager = pGame->GetRadarAreaManager ();
-    m_pTeamManager = pGame->GetTeamManager ();
-    m_pAccountManager = pGame->GetAccountManager ();
-    m_pRegisteredCommands = pGame->GetRegisteredCommands ();
-    m_pRootElement = pGame->GetMapManager ()->GetRootElement ();
-    m_pScriptDebugging = pGame->GetScriptDebugging ();
-    m_pVehicleManager = pGame->GetVehicleManager ();
-    m_pColManager = pGame->GetColManager ();
-    m_pResourceManager = pGame->GetResourceManager ();
-    m_pACLManager = pGame->GetACLManager ();
+    m_pLuaModuleManager = pLuaManager->GetLuaModuleManager();
+    m_pBlipManager = pGame->GetBlipManager();
+    m_pMarkerManager = pGame->GetMarkerManager();
+    m_pObjectManager = pGame->GetObjectManager();
+    m_pPickupManager = pGame->GetPickupManager();
+    m_pPlayerManager = pGame->GetPlayerManager();
+    m_pRadarAreaManager = pGame->GetRadarAreaManager();
+    m_pTeamManager = pGame->GetTeamManager();
+    m_pAccountManager = pGame->GetAccountManager();
+    m_pRegisteredCommands = pGame->GetRegisteredCommands();
+    m_pRootElement = pGame->GetMapManager()->GetRootElement();
+    m_pScriptDebugging = pGame->GetScriptDebugging();
+    m_pVehicleManager = pGame->GetVehicleManager();
+    m_pColManager = pGame->GetColManager();
+    m_pResourceManager = pGame->GetResourceManager();
+    m_pACLManager = pGame->GetACLManager();
 }

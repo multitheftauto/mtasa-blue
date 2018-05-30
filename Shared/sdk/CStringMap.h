@@ -1,17 +1,17 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        CStringMap.h    
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        CStringMap.h
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 //
 // String map with parsing helpers like CScriptArgReader
 //
-template<class V>
+template <class V>
 class CStringMapReader : public std::map<SString, V>
 {
 public:
@@ -21,7 +21,7 @@ public:
         strOutValue = pstrValue ? **pstrValue : szDefaultValue;
     }
 
-    template<typename T, typename U>
+    template <typename T, typename U>
     void ReadNumber(const SString& strKeyName, T& outValue, const U& defaultValue)
     {
         V* pstrValue = MapFind(*this, strKeyName);
@@ -34,12 +34,9 @@ public:
         outValue = defaultValue;
     }
 
-    void ReadBool(const SString& strKeyName, bool& bOutValue, const bool bDefaultValue)
-    {
-        ReadNumber(strKeyName, bOutValue, bDefaultValue);
-    }
+    void ReadBool(const SString& strKeyName, bool& bOutValue, const bool bDefaultValue) { ReadNumber(strKeyName, bOutValue, bDefaultValue); }
 
-    template<typename T>
+    template <typename T>
     void ReadStringMap(const SString& strKeyName, T& outMap)
     {
         V* pstrValue = MapFind(*this, strKeyName);

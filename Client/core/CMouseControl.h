@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CMouseControl.h
-*  PURPOSE:     Simulates the 'Fly with mouse' and 'Steer with mouse' controls
-*  DEVELOPERS:  Talidan
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CMouseControl.h
+ *  PURPOSE:     Simulates the 'Fly with mouse' and 'Steer with mouse' controls
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include <game/CPad.h>
 
@@ -23,20 +22,19 @@ enum MouseControlVehicleType
     TYPE_NONE,
 };
 
-
 class CMouseControl
 {
 public:
-                        CMouseControl           ( void );
-                        ~CMouseControl          ( void );
+    CMouseControl(void);
+    ~CMouseControl(void);
 
-    void                Reset                   ( void );
-    bool                ProcessMouseMove        ( UINT uMsg, WPARAM wParam, LPARAM lParam );
-    void                ApplyAxes               ( CControllerState& cs );
+    void Reset(void);
+    bool ProcessMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam);
+    void ApplyAxes(CControllerState& cs);
 
 protected:
-    short                           m_usLeftStickX;
-    short                           m_usLeftStickY;
+    short m_usLeftStickX;
+    short m_usLeftStickY;
 };
 
 #endif

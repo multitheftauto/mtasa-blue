@@ -1,19 +1,18 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        
-*  PURPOSE:
-*  DEVELOPERS:
-*
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:
+ *  PURPOSE:
+ *
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 //
 //
-// Do not remove this file or change any usage of DECLARE_PROFILER_SECTION 
+// Do not remove this file or change any usage of DECLARE_PROFILER_SECTION
 //
 // They are to assist our AQtest plugin identify files when testing the released version
 //

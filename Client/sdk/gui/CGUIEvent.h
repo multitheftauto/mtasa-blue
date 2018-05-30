@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/gui/CGUIEvent.h
-*  PURPOSE:     Event interface
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/gui/CGUIEvent.h
+ *  PURPOSE:     Event interface
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CGUI_EVENT_H
 #define __CGUI_EVENT_H
@@ -17,35 +17,35 @@
 
 struct CGUIEventArgs
 {
-    CGUIElement*    pWindow;
+    CGUIElement* pWindow;
 };
 
 struct CGUIKeyEventArgs
 {
-    CGUIElement*    pWindow;
+    CGUIElement* pWindow;
 
-    unsigned int    codepoint;
-    CGUIKeys::Scan  scancode;
-    unsigned int    sysKeys;
+    unsigned int   codepoint;
+    CGUIKeys::Scan scancode;
+    unsigned int   sysKeys;
 };
 
 struct CGUIMouseEventArgs
 {
-    CGUIElement*                pWindow;
+    CGUIElement* pWindow;
 
-    CGUIPosition                position;
-    CVector2D                   moveDelta;
-    CGUIMouse::MouseButton      button;
-    unsigned int                sysKeys;
-    float                       wheelChange;
-    unsigned int                clickCount;
-    CGUIElement*                pSwitchedWindow;
+    CGUIPosition           position;
+    CVector2D              moveDelta;
+    CGUIMouse::MouseButton button;
+    unsigned int           sysKeys;
+    float                  wheelChange;
+    unsigned int           clickCount;
+    CGUIElement*           pSwitchedWindow;
 };
 
 struct CGUIFocusEventArgs
 {
-    CGUIElement*                pActivatedWindow;
-    CGUIElement*                pDeactivatedWindow;
+    CGUIElement* pActivatedWindow;
+    CGUIElement* pDeactivatedWindow;
 };
 
 #endif

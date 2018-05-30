@@ -1,16 +1,14 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientRenderElement.cpp
-*  PURPOSE:     Client module's version of something renderable
-*  DEVELOPERS:  idiot
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientRenderElement.cpp
+ *  PURPOSE:     Client module's version of something renderable
+ *
+ *****************************************************************************/
 
 #include <StdInc.h>
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -19,13 +17,12 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientRenderElement::CClientRenderElement ( CClientManager* pManager, ElementID ID ) : ClassInit ( this ), CClientEntity ( ID )
+CClientRenderElement::CClientRenderElement(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
-    m_pRenderElementManager = pManager->GetRenderElementManager ();
+    m_pRenderElementManager = pManager->GetRenderElementManager();
     bDoneUnlink = false;
     m_pRenderItem = NULL;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -34,11 +31,10 @@ CClientRenderElement::CClientRenderElement ( CClientManager* pManager, ElementID
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientRenderElement::~CClientRenderElement ( void )
+CClientRenderElement::~CClientRenderElement(void)
 {
-    Unlink ();
+    Unlink();
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -47,11 +43,11 @@ CClientRenderElement::~CClientRenderElement ( void )
 // Remove from manager lists
 //
 ////////////////////////////////////////////////////////////////
-void CClientRenderElement::Unlink ( void )
+void CClientRenderElement::Unlink(void)
 {
-    if ( !bDoneUnlink )
+    if (!bDoneUnlink)
     {
         bDoneUnlink = true;
-        m_pRenderElementManager->Remove ( this );
+        m_pRenderElementManager->Remove(this);
     }
 }

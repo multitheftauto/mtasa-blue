@@ -1,16 +1,14 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CRenderItem.DxFont.cpp
-*  PURPOSE:
-*  DEVELOPERS:  xidiot
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CRenderItem.DxFont.cpp
+ *  PURPOSE:
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 #include "utils/XFont.h"
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -19,15 +17,14 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-void CDxFontItem::PostConstruct ( CRenderItemManager* pManager, const SString& strFullFilePath, uint uiSize, bool bBold, DWORD ulQuality )
+void CDxFontItem::PostConstruct(CRenderItemManager* pManager, const SString& strFullFilePath, uint uiSize, bool bBold, DWORD ulQuality)
 {
-    Super::PostConstruct ( pManager );
+    Super::PostConstruct(pManager);
     m_strFullFilePath = strFullFilePath;
 
     // Initial creation of d3d data
-    CreateUnderlyingData ( uiSize, bBold, ulQuality );
+    CreateUnderlyingData(uiSize, bBold, ulQuality);
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -36,12 +33,11 @@ void CDxFontItem::PostConstruct ( CRenderItemManager* pManager, const SString& s
 //
 //
 ////////////////////////////////////////////////////////////////
-void CDxFontItem::PreDestruct ( void )
+void CDxFontItem::PreDestruct(void)
 {
-    ReleaseUnderlyingData ();
-    Super::PreDestruct ();
+    ReleaseUnderlyingData();
+    Super::PreDestruct();
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -50,11 +46,10 @@ void CDxFontItem::PreDestruct ( void )
 // Check underlying data is present
 //
 ////////////////////////////////////////////////////////////////
-bool CDxFontItem::IsValid ( void )
+bool CDxFontItem::IsValid(void)
 {
     return m_pFntNormal != NULL;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -63,11 +58,10 @@ bool CDxFontItem::IsValid ( void )
 // Release device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CDxFontItem::OnLostDevice ( void )
+void CDxFontItem::OnLostDevice(void)
 {
-    m_pFntNormal->OnLostDevice ();
+    m_pFntNormal->OnLostDevice();
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -76,11 +70,10 @@ void CDxFontItem::OnLostDevice ( void )
 // Recreate device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CDxFontItem::OnResetDevice ( void )
+void CDxFontItem::OnResetDevice(void)
 {
-    m_pFntNormal->OnResetDevice ();
+    m_pFntNormal->OnResetDevice();
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -89,30 +82,30 @@ void CDxFontItem::OnResetDevice ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-void CDxFontItem::CreateUnderlyingData ( uint uiSize, bool bBold, DWORD ulQuality )
+void CDxFontItem::CreateUnderlyingData(uint uiSize, bool bBold, DWORD ulQuality)
 {
-    assert ( !m_pFntNormal );
+    assert(!m_pFntNormal);
 
-    uiSize = ( uiSize < 5 ) ? 5 : ( ( uiSize > 150 ) ? 150 : uiSize );
+    uiSize = (uiSize < 5) ? 5 : ((uiSize > 150) ? 150 : uiSize);
 
     // Create the D3DX fonts
     FONT_PROPERTIES sFontProps;
-    if ( GetFontProperties ( LPCTSTR ( m_strFullFilePath.c_str () ), &sFontProps ) )
-        CCore::GetSingleton ().GetGraphics()->LoadAdditionalDXFont ( m_strFullFilePath, sFontProps.csName, static_cast < int > ( std::floor ( uiSize * 1.75f ) ), bBold, ulQuality, &m_pFntNormal );
+    if (GetFontProperties(LPCTSTR(m_strFullFilePath.c_str()), &sFontProps))
+        CCore::GetSingleton().GetGraphics()->LoadAdditionalDXFont(m_strFullFilePath, sFontProps.csName, static_cast<int>(std::floor(uiSize * 1.75f)), bBold,
+                                                                  ulQuality, &m_pFntNormal);
 
-    if ( !m_pFntNormal )
+    if (!m_pFntNormal)
         return;
 
     // Memory usage - complete guess
-    int iCharHeight = CCore::GetSingleton ().GetGraphics ()->GetDXFontHeight ( 1, m_pFntNormal );
-    int iCharWidth = CCore::GetSingleton ().GetGraphics ()->GetDXTextExtent ( "A", 1, m_pFntNormal );
+    int iCharHeight = CCore::GetSingleton().GetGraphics()->GetDXFontHeight(1, m_pFntNormal);
+    int iCharWidth = CCore::GetSingleton().GetGraphics()->GetDXTextExtent("A", 1, m_pFntNormal);
     int iNumChars = 256;
     int iBodgeFactor = 1;
     int iBPP = 32;
     int iMemoryUsed = iCharHeight * iCharWidth * iBPP / 8 * iNumChars * iBodgeFactor;
     m_iMemoryKBUsed = iMemoryUsed / 1024;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -121,8 +114,8 @@ void CDxFontItem::CreateUnderlyingData ( uint uiSize, bool bBold, DWORD ulQualit
 //
 //
 ////////////////////////////////////////////////////////////////
-void CDxFontItem::ReleaseUnderlyingData ( void )
+void CDxFontItem::ReleaseUnderlyingData(void)
 {
     // Release the D3DX font data
-    CCore::GetSingleton ().GetGraphics()->DestroyAdditionalDXFont ( m_strFullFilePath, m_pFntNormal );
+    CCore::GetSingleton().GetGraphics()->DestroyAdditionalDXFont(m_strFullFilePath, m_pFntNormal);
 }

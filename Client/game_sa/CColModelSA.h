@@ -1,15 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CColModelSA.h
-*  PURPOSE:     Header file for collision model entity class
-*  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
-*               Alberto Alonso <rydencillo@gmail.com>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CColModelSA.h
+ *  PURPOSE:     Header file for collision model entity class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CGAMESA_COLMODELSA
 #define __CGAMESA_COLMODELSA
@@ -22,88 +20,83 @@
 
 typedef struct
 {
-    CVector     vecMin;
-    CVector     vecMax;
-    CVector     vecOffset;
-    FLOAT       fRadius;
+    CVector vecMin;
+    CVector vecMax;
+    CVector vecOffset;
+    FLOAT   fRadius;
 } CBoundingBoxSA;
 
-
 typedef struct
 {
-    CVector     vecCenter;
-    float       fRadius;
+    CVector vecCenter;
+    float   fRadius;
 } CColSphereSA;
 
-
 typedef struct
 {
-    CVector     min;
-    CVector     max;
+    CVector min;
+    CVector max;
 } CColBoxSA;
 
-
 typedef struct
 {
-    unsigned short  v1;
-    unsigned short  v2;
-    unsigned short  v3;
-    EColSurface     material;
-    CColLighting    lighting;
+    unsigned short v1;
+    unsigned short v2;
+    unsigned short v3;
+    EColSurface    material;
+    CColLighting   lighting;
 } CColTriangleSA;
 
-
 typedef struct
 {
-    BYTE pad0 [ 12 ];
+    BYTE pad0[12];
 } CColTrianglePlaneSA;
 
-
 typedef struct
 {
-    char version[4];
+    char  version[4];
     DWORD size;
-    char name[0x18];
+    char  name[0x18];
 } ColModelFileHeader;
 
 typedef struct
 {
-    WORD                            numColSpheres;
-    WORD                            numColBoxes;
-    WORD                            numColTriangles;
-    BYTE                            ucNumWheels;
-    BYTE                            pad3;
-    CColSphereSA*                   pColSpheres;
-    CColBoxSA*                      pColBoxes;
-    void*                           pSuspensionLines;
-    void*                           pUnknown;
-    CColTriangleSA*                 pColTriangles;
-    CColTrianglePlaneSA*            pColTrianglePlanes;
+    WORD                 numColSpheres;
+    WORD                 numColBoxes;
+    WORD                 numColTriangles;
+    BYTE                 ucNumWheels;
+    BYTE                 pad3;
+    CColSphereSA*        pColSpheres;
+    CColBoxSA*           pColBoxes;
+    void*                pSuspensionLines;
+    void*                pUnknown;
+    CColTriangleSA*      pColTriangles;
+    CColTrianglePlaneSA* pColTrianglePlanes;
 } CColDataSA;
 
 class CColModelSAInterface
 {
 public:
-    CBoundingBoxSA                  boundingBox;
-    BYTE                            level;
-    BYTE                            unknownFlags;
-    BYTE                            pad [ 2 ];
-    CColDataSA*                     pColData;
+    CBoundingBoxSA boundingBox;
+    BYTE           level;
+    BYTE           unknownFlags;
+    BYTE           pad[2];
+    CColDataSA*    pColData;
 };
 
 class CColModelSA : public CColModel
 {
 public:
-                                    CColModelSA     ( void );
-                                    CColModelSA     ( CColModelSAInterface * pInterface );
-                                    ~CColModelSA    ( void );
+    CColModelSA(void);
+    CColModelSA(CColModelSAInterface* pInterface);
+    ~CColModelSA(void);
 
-    inline CColModelSAInterface *   GetInterface    ( void ) { return m_pInterface; }
-    inline void                     Destroy         ( void ) { delete this; }
+    CColModelSAInterface* GetInterface(void) { return m_pInterface; }
+    void                  Destroy(void) { delete this; }
 
 private:
-    CColModelSAInterface *          m_pInterface;
-    bool                            m_bDestroyInterface;
+    CColModelSAInterface* m_pInterface;
+    bool                  m_bDestroyInterface;
 };
 
 #endif
