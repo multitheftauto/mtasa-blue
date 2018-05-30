@@ -19,7 +19,7 @@ void CLuaColShapeDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("createColRectangle", CreateColRectangle);
     CLuaCFunctions::AddFunction("createColPolygon", CreateColPolygon);
     CLuaCFunctions::AddFunction("createColTube", CreateColTube);
-    CLuaCFunctions::AddFunction ("getColShapeType", GetColShapeType);
+    CLuaCFunctions::AddFunction("getColShapeType", GetColShapeType);
 }
 
 void CLuaColShapeDefs::AddClass(lua_State* luaVM)
