@@ -131,7 +131,6 @@ void CLuaResourceDefs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "state", NULL, "getResourceState" );
     lua_classvariable ( luaVM, "archived", NULL, "isResourceArchived" );
     lua_classvariable ( luaVM, "loadFailureReason", NULL, "getResourceLoadFailureReason" );
-    lua_classvariable ( luaVM, "orignalFunction", NULL, "getOriginalFunction");
     //lua_classvariable ( luaVM, "info", "setResourceInfo", "getResourceInfo", CLuaOOPDefs::SetResourceInfo, CLuaOOPDefs::GetResourceInfo ); // .key[value]
     //lua_classvariable ( luaVM, "defaultSetting", "setResourceDefaultSetting", NULL, CLuaOOPDefs::SetResourceDefaultSetting, NULL ); // .key[value]
 
