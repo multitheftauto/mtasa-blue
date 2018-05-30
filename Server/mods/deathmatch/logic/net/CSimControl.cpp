@@ -1,23 +1,22 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 #include "SimHeaders.h"
 
 namespace
 {
-    bool                ms_bEnabled = false;
-    bool                ms_bEnableRequest = false;
-    CNetServerBuffer*   ms_pNetServerBuffer = NULL;
-    CSimPlayerManager*  ms_pSimPlayerManager = NULL;
-}
-
+    bool               ms_bEnabled = false;
+    bool               ms_bEnableRequest = false;
+    CNetServerBuffer*  ms_pNetServerBuffer = NULL;
+    CSimPlayerManager* ms_pSimPlayerManager = NULL;
+}            // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -26,17 +25,16 @@ namespace
 //
 //
 ///////////////////////////////////////////////////////////////
-void CSimControl::Startup ( void )
+void CSimControl::Startup(void)
 {
-    ms_pSimPlayerManager = new CSimPlayerManager ();
+    ms_pSimPlayerManager = new CSimPlayerManager();
 
     // Check packet flags are what we are expecting
-    dassert( CPlayerPuresyncPacket().HasSimHandler() );
-    dassert( CVehiclePuresyncPacket().HasSimHandler() );
-    dassert( CKeysyncPacket().HasSimHandler() );
-    dassert( CBulletsyncPacket().HasSimHandler() );
+    dassert(CPlayerPuresyncPacket().HasSimHandler());
+    dassert(CVehiclePuresyncPacket().HasSimHandler());
+    dassert(CKeysyncPacket().HasSimHandler());
+    dassert(CBulletsyncPacket().HasSimHandler());
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -45,12 +43,11 @@ void CSimControl::Startup ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CSimControl::Shutdown ( void )
+void CSimControl::Shutdown(void)
 {
-    EnableSimSystem ( false );
-    SAFE_DELETE( ms_pSimPlayerManager );
+    EnableSimSystem(false);
+    SAFE_DELETE(ms_pSimPlayerManager);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -60,13 +57,12 @@ void CSimControl::Shutdown ( void )
 // Not applied until the next pulse unless bApplyNow is set
 //
 ///////////////////////////////////////////////////////////////
-void CSimControl::EnableSimSystem ( bool bEnable, bool bApplyNow )
+void CSimControl::EnableSimSystem(bool bEnable, bool bApplyNow)
 {
     ms_bEnableRequest = bEnable;
-    if ( bApplyNow )
-        DoPulse ();
+    if (bApplyNow)
+        DoPulse();
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -75,47 +71,46 @@ void CSimControl::EnableSimSystem ( bool bEnable, bool bApplyNow )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CSimControl::DoPulse ( void )
+void CSimControl::DoPulse(void)
 {
-    if ( ms_bEnableRequest == ms_bEnabled )
+    if (ms_bEnableRequest == ms_bEnabled)
         return;
     ms_bEnabled = ms_bEnableRequest;
 
-    if ( ms_bEnabled )
+    if (ms_bEnabled)
     {
         // Startup NetServerBuffer
-        assert ( !ms_pNetServerBuffer );
-        ms_pNetServerBuffer = new CNetServerBuffer ( ms_pSimPlayerManager );
+        assert(!ms_pNetServerBuffer);
+        ms_pNetServerBuffer = new CNetServerBuffer(ms_pSimPlayerManager);
 
         // Replace g_pNetServer
         g_pNetServer = ms_pNetServerBuffer;
 
         // Replace packet handler
-        ms_pNetServerBuffer->RegisterPacketHandler ( CGame::StaticProcessPacket );
+        ms_pNetServerBuffer->RegisterPacketHandler(CGame::StaticProcessPacket);
 
         // Let the pulsing begin
-        ms_pNetServerBuffer->SetAutoPulseEnabled ( true );
+        ms_pNetServerBuffer->SetAutoPulseEnabled(true);
     }
     else
     {
         // Stop the sync thread from doing anything by itself
-        ms_pNetServerBuffer->SetAutoPulseEnabled ( false );
+        ms_pNetServerBuffer->SetAutoPulseEnabled(false);
 
         // Restore g_pNetServer
         g_pNetServer = g_pRealNetServer;
 
         // Restore packet handler - This is blocking so will drain the outgoing queue
-        ms_pNetServerBuffer->RegisterPacketHandler ( NULL );
-        g_pRealNetServer->RegisterPacketHandler ( CGame::StaticProcessPacket );
+        ms_pNetServerBuffer->RegisterPacketHandler(NULL);
+        g_pRealNetServer->RegisterPacketHandler(CGame::StaticProcessPacket);
 
         // Drain the incoming queue
-        ms_pNetServerBuffer->ProcessIncoming ();
+        ms_pNetServerBuffer->ProcessIncoming();
 
         // Kaboooom
-        SAFE_DELETE ( ms_pNetServerBuffer );
+        SAFE_DELETE(ms_pNetServerBuffer);
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -124,11 +119,10 @@ void CSimControl::DoPulse ( void )
 // Check if sim system is on
 //
 ///////////////////////////////////////////////////////////////
-bool CSimControl::IsSimSystemEnabled ( void )
+bool CSimControl::IsSimSystemEnabled(void)
 {
     return ms_bEnabled;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -137,11 +131,10 @@ bool CSimControl::IsSimSystemEnabled ( void )
 // Add a joining player
 //
 ///////////////////////////////////////////////////////////////
-void CSimControl::AddSimPlayer ( CPlayer* pPlayer )
+void CSimControl::AddSimPlayer(CPlayer* pPlayer)
 {
-    ms_pSimPlayerManager->AddSimPlayer ( pPlayer );
+    ms_pSimPlayerManager->AddSimPlayer(pPlayer);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -150,11 +143,10 @@ void CSimControl::AddSimPlayer ( CPlayer* pPlayer )
 // Remove a leaving player
 //
 ///////////////////////////////////////////////////////////////
-void CSimControl::RemoveSimPlayer ( CPlayer* pPlayer )
+void CSimControl::RemoveSimPlayer(CPlayer* pPlayer)
 {
-    ms_pSimPlayerManager->RemoveSimPlayer ( pPlayer );
+    ms_pSimPlayerManager->RemoveSimPlayer(pPlayer);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -163,7 +155,7 @@ void CSimControl::RemoveSimPlayer ( CPlayer* pPlayer )
 // Update a player at pure sync (and other) times
 //
 ///////////////////////////////////////////////////////////////
-void CSimControl::UpdateSimPlayer ( CPlayer* pPlayer )
+void CSimControl::UpdateSimPlayer(CPlayer* pPlayer)
 {
-    ms_pSimPlayerManager->UpdateSimPlayer ( pPlayer );
+    ms_pSimPlayerManager->UpdateSimPlayer(pPlayer);
 }

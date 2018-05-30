@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CLightsyncManager.h
-*  PURPOSE:     Lightweight synchronization manager class
-*  DEVELOPERS:  Alberto Alonso <rydencillo@gmail.com>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CLightsyncManager.h
+ *  PURPOSE:     Lightweight synchronization manager class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #pragma once
 
@@ -25,14 +24,14 @@ typedef int64_t __int64;
 class CLightsyncManager
 {
 public:
-                    CLightsyncManager       ();
-                    ~CLightsyncManager      ();
+    CLightsyncManager();
+    ~CLightsyncManager();
 
-    void            DoPulse                 ();
+    void DoPulse();
 
-    void            RegisterPlayer          ( CPlayer* pPlayer );
-    void            UnregisterPlayer        ( CPlayer* pPlayer );
-    CPlayer*        FindPlayer              ( const char* szArguments );
+    void     RegisterPlayer(CPlayer* pPlayer);
+    void     UnregisterPlayer(CPlayer* pPlayer);
+    CPlayer* FindPlayer(const char* szArguments);
 
 private:
     enum EEntryType
@@ -44,11 +43,11 @@ private:
 
     struct SEntry
     {
-        __int64             ullTime;
-        CPlayer*            pPlayer;
-        EEntryType          eType;
-        unsigned int        uiContext;
+        __int64      ullTime;
+        CPlayer*     pPlayer;
+        EEntryType   eType;
+        unsigned int uiContext;
     };
 
-    std::list < SEntry >     m_Queue;
+    std::list<SEntry> m_Queue;
 };

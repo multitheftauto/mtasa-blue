@@ -1,89 +1,83 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientCivilian.cpp
-*  PURPOSE:     Civilian ped entity class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Christian Myhre Lundheim <>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientCivilian.cpp
+ *  PURPOSE:     Civilian ped entity class
+ *
+ *****************************************************************************/
 
 #include <StdInc.h>
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-CClientCivilian::CClientCivilian ( CClientManager* pManager, ElementID ID, int iModel ) : ClassInit ( this ), CClientEntity ( ID )
+CClientCivilian::CClientCivilian(CClientManager* pManager, ElementID ID, int iModel) : ClassInit(this), CClientEntity(ID)
 {
     // Initialize members
     m_pManager = pManager;
-    m_pCivilianManager = pManager->GetCivilianManager ();
+    m_pCivilianManager = pManager->GetCivilianManager();
     m_iModel = iModel;
 
     m_pCivilianPed = NULL;
 
     // Add this civilian to the civilian list
-    m_pCivilianManager->AddToList ( this );
+    m_pCivilianManager->AddToList(this);
 
     // Show us by default
-    Create ();
+    Create();
 }
 
-
-CClientCivilian::CClientCivilian ( CClientManager* pManager, ElementID ID, CCivilianPed * pCivilianPed ) : ClassInit ( this ), CClientEntity ( ID )
+CClientCivilian::CClientCivilian(CClientManager* pManager, ElementID ID, CCivilianPed* pCivilianPed) : ClassInit(this), CClientEntity(ID)
 {
     // Initialize members
     m_pManager = pManager;
-    m_pCivilianManager = pManager->GetCivilianManager ();
+    m_pCivilianManager = pManager->GetCivilianManager();
     m_iModel = 0;
 
     // Store the given civilian. Also make sure we set our pointer in its stored pointer data.
     m_pCivilianPed = pCivilianPed;
-    if ( m_pCivilianPed )
+    if (m_pCivilianPed)
     {
-        m_pCivilianPed->SetStoredPointer ( this );
+        m_pCivilianPed->SetStoredPointer(this);
     }
 
     // Add our pointer to the manager list
-    m_pCivilianManager->AddToList ( this );
+    m_pCivilianManager->AddToList(this);
 }
 
-
-CClientCivilian::~CClientCivilian( void )
+CClientCivilian::~CClientCivilian(void)
 {
     // Reset the stored pointer in the civilian ped if neccessary
-    if ( m_pCivilianPed )
+    if (m_pCivilianPed)
     {
-        m_pCivilianPed->SetStoredPointer ( NULL );
+        m_pCivilianPed->SetStoredPointer(NULL);
     }
 
     // Destroy the civilian
-    Destroy ();
+    Destroy();
 
     // Remove us from the civilian list
-    Unlink ();
+    Unlink();
 }
 
-
-void CClientCivilian::Unlink ( void )
+void CClientCivilian::Unlink(void)
 {
-    m_pCivilianManager->RemoveFromList ( this );
+    m_pCivilianManager->RemoveFromList(this);
 }
 
-
-int CClientCivilian::GetRotation ( void )
+int CClientCivilian::GetRotation(void)
 {
-    int iRotation = 0;
+    int    iRotation = 0;
     double dRotation;
 
     CMatrix pMat;
-    m_pCivilianPed->GetMatrix ( &pMat );
+    m_pCivilianPed->GetMatrix(&pMat);
 
     float fX = pMat.vFront.fX;
     float fY = pMat.vFront.fY;
-    dRotation = acos ( fY );
+    dRotation = acos(fY);
 
     if (fX <= 0)
     {
@@ -97,150 +91,129 @@ int CClientCivilian::GetRotation ( void )
     return iRotation;
 }
 
-
-void CClientCivilian::GetRotationRadians ( CVector& vecRotation ) const
+void CClientCivilian::GetRotationRadians(CVector& vecRotation) const
 {
-//    vecRotation = m_vecRotation;
+    //    vecRotation = m_vecRotation;
 }
 
-
-void CClientCivilian::SetRotationRadians ( const CVector& vecRotation )
+void CClientCivilian::SetRotationRadians(const CVector& vecRotation)
 {
-    if ( m_pCivilianPed )
+    if (m_pCivilianPed)
     {
-        m_pCivilianPed->SetOrientation ( vecRotation.fX, vecRotation.fY, vecRotation.fZ );
+        m_pCivilianPed->SetOrientation(vecRotation.fX, vecRotation.fY, vecRotation.fZ);
     }
 
-//    m_vecRotation = vecRotation;
+    //    m_vecRotation = vecRotation;
 }
 
-
-void CClientCivilian::SetRotation ( int iRotation )
+void CClientCivilian::SetRotation(int iRotation)
 {
     // Convert
-    float fX = static_cast < float > ( iRotation ) / 57.29577951f;
+    float fX = static_cast<float>(iRotation) / 57.29577951f;
 
     // Eventually apply it to the vehicle
-    if ( m_pCivilianPed )
+    if (m_pCivilianPed)
     {
-        m_pCivilianPed->SetOrientation ( fX, 0, 0 );
+        m_pCivilianPed->SetOrientation(fX, 0, 0);
     }
 
     // Store the rotation vector
-//    m_vecRotation = CVector ( fX, 0, 0 );
+    //    m_vecRotation = CVector ( fX, 0, 0 );
 
     CMatrix pMat;
-    m_pCivilianPed->GetMatrix ( &pMat );
+    m_pCivilianPed->GetMatrix(&pMat);
 
-    m_pCivilianPed->SetMatrix ( &pMat );
+    m_pCivilianPed->SetMatrix(&pMat);
 }
 
-
-float CClientCivilian::GetDistanceFromCentreOfMassToBaseOfModel ( void )
+float CClientCivilian::GetDistanceFromCentreOfMassToBaseOfModel(void)
 {
-    if ( m_pCivilianPed )
+    if (m_pCivilianPed)
     {
-        return m_pCivilianPed->GetDistanceFromCentreOfMassToBaseOfModel ();
+        return m_pCivilianPed->GetDistanceFromCentreOfMassToBaseOfModel();
     }
-   return 0.0f;
+    return 0.0f;
 }
 
-
-bool CClientCivilian::GetMatrix ( CMatrix& Matrix ) const
+bool CClientCivilian::GetMatrix(CMatrix& Matrix) const
 {
-    m_pCivilianPed->GetMatrix ( &Matrix );
+    m_pCivilianPed->GetMatrix(&Matrix);
     return true;
 }
 
-
-bool CClientCivilian::SetMatrix ( const CMatrix& Matrix )
+bool CClientCivilian::SetMatrix(const CMatrix& Matrix)
 {
-    m_pCivilianPed->SetMatrix ( const_cast < CMatrix* > ( &Matrix ) );
+    m_pCivilianPed->SetMatrix(const_cast<CMatrix*>(&Matrix));
     return true;
 }
 
-
-void CClientCivilian::GetMoveSpeed ( CVector& vecMoveSpeed ) const
+void CClientCivilian::GetMoveSpeed(CVector& vecMoveSpeed) const
 {
-    m_pCivilianPed->GetMoveSpeed ( &vecMoveSpeed );
+    m_pCivilianPed->GetMoveSpeed(&vecMoveSpeed);
 }
 
-
-void CClientCivilian::SetMoveSpeed ( const CVector& vecMoveSpeed )
+void CClientCivilian::SetMoveSpeed(const CVector& vecMoveSpeed)
 {
-    m_pCivilianPed->SetMoveSpeed ( const_cast < CVector* > ( &vecMoveSpeed ) );
+    m_pCivilianPed->SetMoveSpeed(const_cast<CVector*>(&vecMoveSpeed));
 }
 
-
-void CClientCivilian::GetTurnSpeed ( CVector& vecTurnSpeed ) const
+void CClientCivilian::GetTurnSpeed(CVector& vecTurnSpeed) const
 {
-    m_pCivilianPed->GetTurnSpeed ( &vecTurnSpeed );
+    m_pCivilianPed->GetTurnSpeed(&vecTurnSpeed);
 }
 
-
-void CClientCivilian::SetTurnSpeed ( const CVector& vecTurnSpeed )
+void CClientCivilian::SetTurnSpeed(const CVector& vecTurnSpeed)
 {
-    m_pCivilianPed->SetTurnSpeed ( const_cast < CVector* > ( &vecTurnSpeed ) );
+    m_pCivilianPed->SetTurnSpeed(const_cast<CVector*>(&vecTurnSpeed));
 }
 
-
-bool CClientCivilian::IsVisible ( void )
+bool CClientCivilian::IsVisible(void)
 {
-    return m_pCivilianPed->IsVisible ();
+    return m_pCivilianPed->IsVisible();
 }
 
-
-void CClientCivilian::SetVisible ( bool bVisible )
+void CClientCivilian::SetVisible(bool bVisible)
 {
-    m_pCivilianPed->SetVisible ( bVisible );
-    m_pCivilianPed->SetUsesCollision ( bVisible );
+    m_pCivilianPed->SetVisible(bVisible);
+    m_pCivilianPed->SetUsesCollision(bVisible);
 }
 
-
-float CClientCivilian::GetHealth ( void ) const
+float CClientCivilian::GetHealth(void) const
 {
-    return m_pCivilianPed->GetHealth ();
+    return m_pCivilianPed->GetHealth();
 }
 
-
-void CClientCivilian::SetHealth ( float fHealth )
+void CClientCivilian::SetHealth(float fHealth)
 {
     // Set the health
-    m_pCivilianPed->SetHealth ( fHealth );
+    m_pCivilianPed->SetHealth(fHealth);
 }
 
-int CClientCivilian::GetModelID ( void )
+int CClientCivilian::GetModelID(void)
 {
-    //return m_iVehicleModel;
+    // return m_iVehicleModel;
     return 0;
 }
 
-
-void CClientCivilian::SetModelID ( int iModelID )
+void CClientCivilian::SetModelID(int iModelID)
 {
-
 }
 
-
-void CClientCivilian::Dump ( FILE* pFile, bool bDumpDetails, unsigned int uiIndex )
+void CClientCivilian::Dump(FILE* pFile, bool bDumpDetails, unsigned int uiIndex)
 {
-
 }
 
-void CClientCivilian::Create ( void )
+void CClientCivilian::Create(void)
 {
-
 }
 
-void CClientCivilian::Destroy ( void )
+void CClientCivilian::Destroy(void)
 {
- 
 }
 
-
-void CClientCivilian::ReCreate ( void )
+void CClientCivilian::ReCreate(void)
 {
     // Re-create the vehicle
-    Destroy ();
-    Create ();
+    Destroy();
+    Create();
 }
