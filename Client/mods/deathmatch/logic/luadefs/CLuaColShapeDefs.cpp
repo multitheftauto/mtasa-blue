@@ -36,7 +36,6 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getElementsWithin", "getElementsWithinColShape");
     lua_classvariable(luaVM, "elementsWithin", NULL, "getElementsWithinColShape");
   
-  
     lua_classvariable(luaVM, "elementsWithin", NULL, "getElementsWithinColShape");
     lua_classvariable(luaVM, "shapeType", NULL, "getColShapeType");
 
