@@ -256,6 +256,12 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
     // Deobfuscate if required
     const char* cpBuffer;
     uint uiSize;
+
+    // Disable overwriting
+    lua_pushstring( m_luaVM, "getOriginalFunction" );
+    lua_pushcclosure( m_luaVM, CLuaResourceDefs::getOriginalFunction, 1 );
+    lua_setglobal( m_luaVM, "getOriginalFunction" );
+
     if ( !g_pRealNetServer->DeobfuscateScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, strNiceFilename ) )
     {
         SString strMessage( "%s is invalid. Please re-compile at http://luac.mtasa.com/", *strNiceFilename ); 

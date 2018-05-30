@@ -57,6 +57,7 @@ void CLuaResourceDefs::LoadFunctions ( void )
     CLuaCFunctions::AddFunction ( "getResourceExportedFunctions", getResourceExportedFunctions );
     CLuaCFunctions::AddFunction ( "getResourceOrganizationalPath", getResourceOrganizationalPath);
     CLuaCFunctions::AddFunction ( "isResourceArchived", isResourceArchived );
+    CLuaCFunctions::AddFunction ( "getOriginalFunction", getOriginalFunction );
 
     // Set stuff
     CLuaCFunctions::AddFunction ( "setResourceInfo", setResourceInfo );
@@ -130,6 +131,7 @@ void CLuaResourceDefs::AddClass ( lua_State* luaVM )
     lua_classvariable ( luaVM, "state", NULL, "getResourceState" );
     lua_classvariable ( luaVM, "archived", NULL, "isResourceArchived" );
     lua_classvariable ( luaVM, "loadFailureReason", NULL, "getResourceLoadFailureReason" );
+    lua_classvariable ( luaVM, "orignalFunction", NULL, "getOriginalFunction");
     //lua_classvariable ( luaVM, "info", "setResourceInfo", "getResourceInfo", CLuaOOPDefs::SetResourceInfo, CLuaOOPDefs::GetResourceInfo ); // .key[value]
     //lua_classvariable ( luaVM, "defaultSetting", "setResourceDefaultSetting", NULL, CLuaOOPDefs::SetResourceDefaultSetting, NULL ); // .key[value]
 
@@ -1456,4 +1458,26 @@ int CLuaResourceDefs::isResourceArchived (lua_State* luaVM)
 
     lua_pushnil ( luaVM );
     return 1;
+}
+
+int CLuaResourceDefs::getOriginalFunction(lua_State* luaVM)
+{
+    SString strFunction;
+
+    CScriptArgReader argStream( luaVM );
+    argStream.ReadString( strFunction );
+
+    if ( !argStream.HasErrors( ) )
+    {
+        CLuaCFunction* cFunc = CLuaCFunctions::GetOriginalFunction( strFunction );
+        if (cFunc)
+            lua_pushcclosure( luaVM, cFunc->GetAddress(), 1 );
+        else
+            lua_pushboolean( luaVM, false );
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage( ) );
+
+    lua_pushboolean( luaVM, false );
 }

@@ -59,6 +59,7 @@ public:
     LUA_DECLARE ( getResourceExportedFunctions );
     LUA_DECLARE ( getResourceOrganizationalPath );
     LUA_DECLARE ( isResourceArchived );
+    LUA_DECLARE ( getOriginalFunction );
 
     // Set stuff
     LUA_DECLARE ( setResourceInfo );

@@ -17,6 +17,7 @@
 
 CFastHashMap < lua_CFunction, CLuaCFunction* > CLuaCFunctions::ms_Functions;
 CFastHashMap < SString, CLuaCFunction* > CLuaCFunctions::ms_FunctionsByName;
+CFastHashMap < SString, CLuaCFunction* > CLuaCFunctions::ms_FunctionsByNameOriginal;
 void* CLuaCFunctions::ms_pFunctionPtrLow = (void*)0xffffffff;
 void* CLuaCFunctions::ms_pFunctionPtrHigh = 0;
 
@@ -59,6 +60,7 @@ CLuaCFunction* CLuaCFunctions::AddFunction ( const char* szName, lua_CFunction f
         ms_Functions [ f ] = pFunction;
     }
     ms_FunctionsByName [ szName ] = pFunction;
+    ms_FunctionsByNameOriginal[ szName ] = pFunction;
     return pFunction;
 }
 
@@ -70,6 +72,7 @@ void CLuaCFunctions::RemoveFunction ( const SString& strName )
     {
         ms_Functions.erase ( iter->second->GetAddress () );
         ms_FunctionsByName.erase ( iter );
+        ms_FunctionsByNameOriginal.erase ( iter );
         delete iter->second;
     }
 }
@@ -100,6 +103,15 @@ CLuaCFunction* CLuaCFunctions::GetFunction ( const char* szName )
     return it->second;
 }
 
+CLuaCFunction* CLuaCFunctions::GetOriginalFunction(const char* szName)
+{
+    CFastHashMap < SString, CLuaCFunction* >::iterator it;
+    it = ms_FunctionsByNameOriginal.find(szName);
+    if (it == ms_FunctionsByNameOriginal.end())
+        return NULL;
+
+    return it->second;
+}
 
 //
 // Returns true if definitely not a registered function.

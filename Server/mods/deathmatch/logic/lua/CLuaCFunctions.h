@@ -48,6 +48,7 @@ public:
     static void                 RemoveFunction              ( const SString& strName );
     static CLuaCFunction*       GetFunction                 ( lua_CFunction f );
     static CLuaCFunction*       GetFunction                 ( const char* szName );
+    static CLuaCFunction*       GetOriginalFunction         ( const char* szName );
     static bool                 IsNotFunction               ( lua_CFunction f );
 
     static void                 RegisterFunctionsWithVM     ( lua_State* luaVM );
@@ -57,6 +58,7 @@ public:
 private:
     static CFastHashMap < lua_CFunction, CLuaCFunction* >               ms_Functions;
     static CFastHashMap < SString, CLuaCFunction* >                     ms_FunctionsByName;
+    static CFastHashMap < SString, CLuaCFunction* >                     ms_FunctionsByNameOriginal;
     static void*                                                        ms_pFunctionPtrLow;
     static void*                                                        ms_pFunctionPtrHigh;
 };
