@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CPointLightsSA.h
-*  PURPOSE:     Header file for PointLights entity class
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CPointLightsSA.h
+ *  PURPOSE:     Header file for PointLights entity class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CGAMESA_POINTLIGHTS
 #define __CGAMESA_POINTLIGHTS
@@ -23,11 +22,13 @@
 class CPointLightsSA : public CPointLights
 {
 public:
-    virtual void      AddLight                ( int iMode, const CVector vecPosition, CVector vecDirection, float fRadius, SColor color, unsigned char uc_8, bool bCreatesShadow, CEntity * pAffected ) override;
-    
-    virtual void      PreRenderHeliLights     () override;
-    virtual void      PostRenderHeliLights    () override;
-    virtual void      RenderHeliLight         ( const CVector& vecStart, const CVector& vecEnd, float startRadius, float endRadius, bool renderSpot ) override;;
+    virtual void AddLight(int iMode, const CVector vecPosition, CVector vecDirection, float fRadius, SColor color, unsigned char uc_8, bool bCreatesShadow,
+                          CEntity* pAffected) override;
+
+    virtual void PreRenderHeliLights() override;
+    virtual void PostRenderHeliLights() override;
+    virtual void RenderHeliLight(const CVector& vecStart, const CVector& vecEnd, float startRadius, float endRadius, bool renderSpot) override;
+    ;
 };
 
 #endif

@@ -61,6 +61,7 @@
 #include "CAudioEngineSA.h"
 #include "CAEAudioHardwareSA.h"
 #include "CAEVehicleAudioEntitySA.h"
+#include "CAESoundManagerSA.h"
 #include "CAudioContainerSA.h"
 #include "CPlayerInfoSA.h"
 #include "CPopulationSA.h"

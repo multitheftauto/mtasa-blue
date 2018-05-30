@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CVersionUpdater
-*  PURPOSE:     Version update check and message dialog class
-*  DEVELOPERS:  
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CVersionUpdater
+ *  PURPOSE:     Version update check and message dialog class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 class CVersionUpdater;
 
@@ -33,7 +32,8 @@ class CVersionUpdater;
     <version>
         <serverlist>
             <server priority="3">http://updatesa.mtasa.com/sa/version/?v=%VERSION%&amp;id=%ID%&amp;ty=%TYPE%&amp;da=%DATA%&amp;be=%BETA%&amp;re=%REFER%</server>
-            <server priority="3">http://updatesa.multitheftauto.com/sa/version/?v=%VERSION%&amp;id=%ID%&amp;ty=%TYPE%&amp;da=%DATA%&amp;be=%BETA%&amp;re=%REFER%</server>
+            <server
+priority="3">http://updatesa.multitheftauto.com/sa/version/?v=%VERSION%&amp;id=%ID%&amp;ty=%TYPE%&amp;da=%DATA%&amp;be=%BETA%&amp;re=%REFER%</server>
         </serverlist>
         <interval>12h</interval>
     </version>
@@ -127,22 +127,18 @@ namespace
     enum
     {
         BUTTON_NONE = -1,
-        BUTTON_0    = 0,
+        BUTTON_0 = 0,
         BUTTON_1,
         BUTTON_2,
         BUTTON_3,
     };
 
-    CQuestionBox& GetQuestionBox ( void )
-    {
-        return *CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
-    }
+    CQuestionBox& GetQuestionBox(void) { return *CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow(); }
 
-}
+}            // namespace
 
 namespace
 {
-
     ///////////////////////////////////////////////////////////////
     //
     // CValue
@@ -153,10 +149,9 @@ namespace
     class CValue
     {
     public:
-        virtual bool        SetFromString   ( const SString& str ) = 0;
-        virtual SString     ToString        ( void ) const = 0;
+        virtual bool    SetFromString(const SString& str) = 0;
+        virtual SString ToString(void) const = 0;
     };
-
 
     ///////////////////////////////////////////////////////////////
     //
@@ -168,27 +163,18 @@ namespace
     class CValueInt : public CValue
     {
         int m_iValue;
+
     public:
-        CValueInt ( int iValue = 0 ) : m_iValue ( iValue ) {}
-        void operator= ( int iValue )
+        CValueInt(int iValue = 0) : m_iValue(iValue) {}
+        void         operator=(int iValue) { m_iValue = iValue; }
+                     operator int(void) const { return m_iValue; }
+        virtual bool SetFromString(const SString& str)
         {
-            m_iValue = iValue;
-        }
-        operator int ( void ) const
-        {
-            return m_iValue;
-        }
-        virtual bool SetFromString ( const SString& str )
-        {
-            m_iValue = atoi ( str );
+            m_iValue = atoi(str);
             return true;
         }
-        virtual SString ToString ( void ) const
-        {
-            return SString ( "%d", m_iValue );
-        }
+        virtual SString ToString(void) const { return SString("%d", m_iValue); }
     };
-
 
     ///////////////////////////////////////////////////////////////
     //
@@ -200,25 +186,31 @@ namespace
     class CTimeSpan : public CValue
     {
         time_t m_Seconds;
+
     public:
-        CTimeSpan ( void ) : m_Seconds ( 0 ) {}
-        CTimeSpan ( const SString& strSpan ) { SetFromString ( strSpan ); }
+        CTimeSpan(void) : m_Seconds(0) {}
+        CTimeSpan(const SString& strSpan) { SetFromString(strSpan); }
 
-        void SetFromSeconds ( time_t seconds )
-        {
-            m_Seconds = seconds;
-        }
+        void SetFromSeconds(time_t seconds) { m_Seconds = seconds; }
 
-        bool SetFromString ( const SString& strSpan )
+        bool SetFromString(const SString& strSpan)
         {
-            int iSpan = atoi ( strSpan );
+            int iSpan = atoi(strSpan);
             // Last character ie either s(seconds) m(minutes) h(hours) d(days)
-            switch ( strSpan.Right ( 1 ).ToLower ()[0] )
+            switch (strSpan.Right(1).ToLower()[0])
             {
-                case 's': m_Seconds = iSpan; break;
-                case 'm': m_Seconds = iSpan * 60; break;
-                case 'h': m_Seconds = iSpan * 60 * 60; break;
-                case 'd': m_Seconds = iSpan * 60 * 60 * 24; break;
+                case 's':
+                    m_Seconds = iSpan;
+                    break;
+                case 'm':
+                    m_Seconds = iSpan * 60;
+                    break;
+                case 'h':
+                    m_Seconds = iSpan * 60 * 60;
+                    break;
+                case 'd':
+                    m_Seconds = iSpan * 60 * 60 * 24;
+                    break;
                 default:
                     m_Seconds = 0;
                     return false;
@@ -226,23 +218,19 @@ namespace
             return true;
         }
 
-        time_t ToSeconds ( void ) const
-        {
-            return m_Seconds;
-        }
+        time_t ToSeconds(void) const { return m_Seconds; }
 
-        SString ToString ( void ) const
+        SString ToString(void) const
         {
-            if ( m_Seconds < 60 )
-                return SString ( "%ds", m_Seconds );
-            if ( m_Seconds < 60 * 60 )
-                return SString ( "%dm", m_Seconds / 60 );
-            if ( m_Seconds < 60 * 60 * 24 )
-                return SString ( "%dh", m_Seconds / 60 / 60 );
-            return SString ( "%dd", m_Seconds / 60 / 60 / 24 );
+            if (m_Seconds < 60)
+                return SString("%ds", m_Seconds);
+            if (m_Seconds < 60 * 60)
+                return SString("%dm", m_Seconds / 60);
+            if (m_Seconds < 60 * 60 * 24)
+                return SString("%dh", m_Seconds / 60 / 60);
+            return SString("%dd", m_Seconds / 60 / 60 / 24);
         }
     };
-
 
     ///////////////////////////////////////////////////////////////
     //
@@ -254,84 +242,78 @@ namespace
     class CDateTime : public CValue
     {
         time_t m_Seconds;
-    public:
-        CDateTime ( void ) : m_Seconds ( 0 ) {}
-        CDateTime ( const SString& strDate ) { SetFromString ( strDate ); }
 
-        CDateTime operator - ( const CDateTime& other ) const
+    public:
+        CDateTime(void) : m_Seconds(0) {}
+        CDateTime(const SString& strDate) { SetFromString(strDate); }
+
+        CDateTime operator-(const CDateTime& other) const
         {
             CDateTime result;
-            result.SetFromSeconds ( ToSeconds () - other.ToSeconds () );
+            result.SetFromSeconds(ToSeconds() - other.ToSeconds());
             return result;
         }
 
-        static CDateTime Now ( bool bLocal = false )
+        static CDateTime Now(bool bLocal = false)
         {
             CDateTime date;
-            date.SetFromSeconds ( time ( NULL ) );
+            date.SetFromSeconds(time(NULL));
             return date;
         }
 
-        void SetFromSeconds ( time_t seconds )
-        {
-            m_Seconds = seconds;
-        }
+        void SetFromSeconds(time_t seconds) { m_Seconds = seconds; }
 
-        bool SetFromString ( const SString& strDate )
+        bool SetFromString(const SString& strDate)
         {
-            std::vector < int > numbers;
+            std::vector<int> numbers;
 
             bool bWasDigit = false;
             // Get first 6 non-digit delimited digits
-            for ( uint i = 0 ; i < strDate.length () ; i++ )
+            for (uint i = 0; i < strDate.length(); i++)
             {
-                bool bIsDigit = isdigit ( (uchar)strDate[i] ) != 0;
-                if ( bIsDigit && !bWasDigit )
-                    numbers.push_back ( atoi ( &strDate[i] ) );
+                bool bIsDigit = isdigit((uchar)strDate[i]) != 0;
+                if (bIsDigit && !bWasDigit)
+                    numbers.push_back(atoi(&strDate[i]));
                 bWasDigit = bIsDigit;
             }
 
-            if ( numbers.size () < 6 )
+            if (numbers.size() < 6)
                 return false;
 
             tm timeinfo;
-            memset ( &timeinfo, 0, sizeof ( timeinfo ) );
+            memset(&timeinfo, 0, sizeof(timeinfo));
             uint i = 0;
-            timeinfo.tm_year    = numbers[i++] - 1900;
-            timeinfo.tm_mon     = numbers[i++] - 1;
-            timeinfo.tm_mday    = numbers[i++];
-            timeinfo.tm_hour    = numbers[i++];
-            timeinfo.tm_min     = numbers[i++];
-            timeinfo.tm_sec     = numbers[i++];
+            timeinfo.tm_year = numbers[i++] - 1900;
+            timeinfo.tm_mon = numbers[i++] - 1;
+            timeinfo.tm_mday = numbers[i++];
+            timeinfo.tm_hour = numbers[i++];
+            timeinfo.tm_min = numbers[i++];
+            timeinfo.tm_sec = numbers[i++];
 
-            m_Seconds = mktime ( &timeinfo );
-            if ( m_Seconds == -1 )
+            m_Seconds = mktime(&timeinfo);
+            if (m_Seconds == -1)
                 m_Seconds = 0;
             return true;
         }
 
-        time_t ToSeconds ( void ) const
-        {
-            return m_Seconds;
-        }
+        time_t ToSeconds(void) const { return m_Seconds; }
 
-        SString ToString ( void ) const
+        SString ToString(void) const
         {
-            time_t t = ToSeconds ();
-            tm* tmp = localtime ( &t );
-            if ( tmp == nullptr )
+            time_t t = ToSeconds();
+            tm*    tmp = localtime(&t);
+            if (tmp == nullptr)
             {
                 t = 0;
-                tmp = localtime ( &t );
+                tmp = localtime(&t);
             }
-            assert ( tmp );
+            assert(tmp);
 
-            char outstr[200] = { 0 };
-            strftime ( outstr, sizeof ( outstr ), "%Y-%m-%d %H:%M:%S", tmp );
+            char outstr[200] = {0};
+            strftime(outstr, sizeof(outstr), "%Y-%m-%d %H:%M:%S", tmp);
             return outstr;
         }
     };
-
 
     ///////////////////////////////////////////////////////////////
     //
@@ -343,85 +325,79 @@ namespace
     class CXMLBuffer
     {
     public:
-        SString m_strTempFileName;
+        SString   m_strTempFileName;
         CXMLFile* m_pXMLFile;
         CXMLNode* m_pRoot;
 
-        CXMLBuffer ()
+        CXMLBuffer()
         {
             m_pXMLFile = NULL;
             m_pRoot = NULL;
         }
 
-        ~CXMLBuffer ()
+        ~CXMLBuffer()
         {
             // Close XML file
-            if ( m_pXMLFile )
+            if (m_pXMLFile)
             {
                 delete m_pXMLFile;
                 m_pXMLFile = NULL;
                 m_pRoot = NULL;
             }
             // Attempt to delete temp file
-            FileDelete ( m_strTempFileName );
+            FileDelete(m_strTempFileName);
         }
 
-        CXMLNode* SetFromData ( char* data, uint uiSize )
+        CXMLNode* SetFromData(char* data, uint uiSize)
         {
-            assert ( !m_pXMLFile );
+            assert(!m_pXMLFile);
 
             // Try to save
-            m_strTempFileName = MakeUniquePath ( PathJoin ( GetMTADataPath (), "temp", "buffer.xml" ) );
-            if ( !FileSave ( m_strTempFileName, &data[0], uiSize ) )
+            m_strTempFileName = MakeUniquePath(PathJoin(GetMTADataPath(), "temp", "buffer.xml"));
+            if (!FileSave(m_strTempFileName, &data[0], uiSize))
             {
-                AddReportLog ( 2501, SString ( "CXMLBuffer::SetFromBuffer: Could not save %s", m_strTempFileName.c_str () ) );
+                AddReportLog(2501, SString("CXMLBuffer::SetFromBuffer: Could not save %s", m_strTempFileName.c_str()));
                 return NULL;
             }
 
-            m_pXMLFile = CCore::GetSingleton ().GetXML ()->CreateXML ( m_strTempFileName );
-            if ( !m_pXMLFile )
+            m_pXMLFile = CCore::GetSingleton().GetXML()->CreateXML(m_strTempFileName);
+            if (!m_pXMLFile)
             {
-                AddReportLog ( 2502, SString ( "CXMLBuffer::SetFromBuffer: Could not CreateXML %s", m_strTempFileName.c_str () ) );
+                AddReportLog(2502, SString("CXMLBuffer::SetFromBuffer: Could not CreateXML %s", m_strTempFileName.c_str()));
                 return NULL;
             }
-            if ( !m_pXMLFile->Parse () )
+            if (!m_pXMLFile->Parse())
             {
-                AddReportLog ( 2503, SString ( "CXMLBuffer::SetFromBuffer: Could not parse %s", m_strTempFileName.c_str () ) );
+                AddReportLog(2503, SString("CXMLBuffer::SetFromBuffer: Could not parse %s", m_strTempFileName.c_str()));
                 return NULL;
             }
-            m_pRoot = m_pXMLFile->GetRootNode ();
-            if ( !m_pRoot )
+            m_pRoot = m_pXMLFile->GetRootNode();
+            if (!m_pRoot)
             {
-                AddReportLog ( 2504, SString ( "CXMLBuffer::SetFromBuffer: No root node in %s", m_strTempFileName.c_str () ) );
+                AddReportLog(2504, SString("CXMLBuffer::SetFromBuffer: No root node in %s", m_strTempFileName.c_str()));
                 return NULL;
             }
 
             return m_pRoot;
         }
-
     };
-
-
 
     // A node and its attributes
     struct SDataInfoItem
     {
-        SString strName;
-        SString strValue;
-        std::map < SString, SString > attributeMap;
-        SString GetAttribute ( const SString& strName ) const
+        SString                    strName;
+        SString                    strValue;
+        std::map<SString, SString> attributeMap;
+        SString                    GetAttribute(const SString& strName) const
         {
-            const SString* pValue = MapFind ( attributeMap, strName );
+            const SString* pValue = MapFind(attributeMap, strName);
             return pValue ? *pValue : "";
         }
-        void SetAttribute ( const SString& strName, const SString& strValue )
-        {
-            MapSet ( attributeMap, strName, strValue );
-        }
+        void SetAttribute(const SString& strName, const SString& strValue) { MapSet(attributeMap, strName, strValue); }
     };
 
     // A list of subnodes and their attributes
-    class CDataInfoSet : public std::vector < SDataInfoItem >
+    class CDataInfoSet : public std::vector<SDataInfoItem>
     {
     public:
     };
@@ -438,81 +414,78 @@ namespace
     public:
         CXMLNode* m_pRoot;
 
-        CXMLAccess ( CXMLNode* pNode )
-        {
-            m_pRoot = pNode;
-        }
+        CXMLAccess(CXMLNode* pNode) { m_pRoot = pNode; }
 
         // Get/create node at path
-        CXMLNode* GetSubNode ( const SString& strPath, bool bCreateIfRequired = false )
+        CXMLNode* GetSubNode(const SString& strPath, bool bCreateIfRequired = false)
         {
-            std::vector < SString > parts;
-            strPath.Split ( ".", parts );
+            std::vector<SString> parts;
+            strPath.Split(".", parts);
             // Follow path
             CXMLNode* pNode = m_pRoot;
-            for ( uint i = 0 ; i < parts.size () && pNode ; i++ )
+            for (uint i = 0; i < parts.size() && pNode; i++)
             {
-                CXMLNode* pNext = pNode->FindSubNode ( parts[i], 0 );
-                if ( !pNext )
-                    pNext = pNode->CreateSubNode ( parts[i] );
+                CXMLNode* pNext = pNode->FindSubNode(parts[i], 0);
+                if (!pNext)
+                    pNext = pNode->CreateSubNode(parts[i]);
                 pNode = pNext;
             }
             return pNode;
         }
 
         // Set value from a CValue
-        bool SetSubNodeValue ( const SString& strPath, const CValue& strValue )
+        bool SetSubNodeValue(const SString& strPath, const CValue& strValue)
         {
-            if ( CXMLNode* pNode = GetSubNode ( strPath, true ) )
+            if (CXMLNode* pNode = GetSubNode(strPath, true))
             {
-                pNode->SetTagContent ( strValue.ToString () );
+                pNode->SetTagContent(strValue.ToString());
                 return true;
             }
             return false;
         }
 
         // Set value from a string
-        bool SetSubNodeValue ( const SString& strPath, const SString& strValue )
+        bool SetSubNodeValue(const SString& strPath, const SString& strValue)
         {
-            if ( CXMLNode* pNode = GetSubNode ( strPath, true ) )
+            if (CXMLNode* pNode = GetSubNode(strPath, true))
             {
-                pNode->SetTagContent ( strValue );
+                pNode->SetTagContent(strValue);
                 return true;
             }
             return false;
         }
 
         // Set subnodes values from a string list
-        bool SetSubNodeValue ( const SString& strPath, const std::vector < SString > & valueList, const SString& strKey = "item" )
+        bool SetSubNodeValue(const SString& strPath, const std::vector<SString>& valueList, const SString& strKey = "item")
         {
-            if ( CXMLNode* pNode = GetSubNode ( strPath, true ) )
+            if (CXMLNode* pNode = GetSubNode(strPath, true))
             {
                 // Process each subnode
-                for ( uint i = 0 ; i < valueList.size () ; i++ )
-                    if ( CXMLNode* pSubNode = pNode->CreateSubNode ( strKey ) )
-                        pSubNode->SetTagContent ( valueList[i] );
+                for (uint i = 0; i < valueList.size(); i++)
+                    if (CXMLNode* pSubNode = pNode->CreateSubNode(strKey))
+                        pSubNode->SetTagContent(valueList[i]);
                 return true;
             }
             return false;
         }
 
         // Set subnodes values from a CDataInfoSet
-        bool SetSubNodeValue ( const SString& strPath, const CDataInfoSet& dataInfoSet )
+        bool SetSubNodeValue(const SString& strPath, const CDataInfoSet& dataInfoSet)
         {
-            if ( CXMLNode* pNode = GetSubNode ( strPath ) )
+            if (CXMLNode* pNode = GetSubNode(strPath))
             {
                 // Process each subnode
-                for ( uint i = 0 ; i < dataInfoSet.size () ; i++ )
+                for (uint i = 0; i < dataInfoSet.size(); i++)
                 {
                     const SDataInfoItem& item = dataInfoSet[i];
-                    if ( CXMLNode* pSubNode = pNode->CreateSubNode ( item.strName ) )
+                    if (CXMLNode* pSubNode = pNode->CreateSubNode(item.strName))
                     {
-                        pSubNode->SetTagContent ( item.strValue );
-                        CXMLAttributes& attributes = pSubNode->GetAttributes ();
-                        for ( std::map < SString, SString >::const_iterator iter = item.attributeMap.begin () ; iter != item.attributeMap.end () ; ++iter )
+                        pSubNode->SetTagContent(item.strValue);
+                        CXMLAttributes& attributes = pSubNode->GetAttributes();
+                        for (std::map<SString, SString>::const_iterator iter = item.attributeMap.begin(); iter != item.attributeMap.end(); ++iter)
                         {
-                            CXMLAttribute* attrib = attributes.Create ( iter->first );
-                            attrib->SetValue ( iter->second );
+                            CXMLAttribute* attrib = attributes.Create(iter->first);
+                            attrib->SetValue(iter->second);
                         }
                     }
                 }
@@ -522,25 +495,25 @@ namespace
         }
 
         // First result as CValue
-        bool GetSubNodeValue ( const SString& strPath, CValue& strOut, const char* szDefault = "" )
+        bool GetSubNodeValue(const SString& strPath, CValue& strOut, const char* szDefault = "")
         {
-            assert ( szDefault );
-            if ( CXMLNode* pNode = GetSubNode ( strPath ) )
+            assert(szDefault);
+            if (CXMLNode* pNode = GetSubNode(strPath))
             {
-                strOut.SetFromString ( pNode->GetTagContent () );
+                strOut.SetFromString(pNode->GetTagContent());
                 return true;
             }
-            strOut.SetFromString ( szDefault );
+            strOut.SetFromString(szDefault);
             return false;
         }
 
         // First result as string
-        bool GetSubNodeValue ( const SString& strPath, SString& strOut, const char* szDefault = "" )
+        bool GetSubNodeValue(const SString& strPath, SString& strOut, const char* szDefault = "")
         {
-            assert ( szDefault );
-            if ( CXMLNode* pNode = GetSubNode ( strPath ) )
+            assert(szDefault);
+            if (CXMLNode* pNode = GetSubNode(strPath))
             {
-                strOut = pNode->GetTagContent ();
+                strOut = pNode->GetTagContent();
                 return true;
             }
             strOut = szDefault;
@@ -548,45 +521,44 @@ namespace
         }
 
         // All subnodes values as a string list
-        bool GetSubNodeValue ( const SString& strPath, std::vector < SString > & outList )
+        bool GetSubNodeValue(const SString& strPath, std::vector<SString>& outList)
         {
-            if ( CXMLNode* pNode = GetSubNode ( strPath ) )
+            if (CXMLNode* pNode = GetSubNode(strPath))
             {
                 // Process each subnode
-                for ( uint i = 0 ; i < pNode->GetSubNodeCount () ; i++ )
-                    outList.push_back ( pNode->GetSubNode ( i )->GetTagContent () );
+                for (uint i = 0; i < pNode->GetSubNodeCount(); i++)
+                    outList.push_back(pNode->GetSubNode(i)->GetTagContent());
                 return true;
             }
             return false;
-       }
+        }
 
         // All subnodes as a CDataInfoSet
-        bool GetSubNodeValue ( const SString& strPath, CDataInfoSet& outMap )
+        bool GetSubNodeValue(const SString& strPath, CDataInfoSet& outMap)
         {
-            if ( CXMLNode* pNode = GetSubNode ( strPath ) )
+            if (CXMLNode* pNode = GetSubNode(strPath))
             {
                 // Process each subnode
-                for ( uint i = 0 ; i < pNode->GetSubNodeCount () ; i++ )
+                for (uint i = 0; i < pNode->GetSubNodeCount(); i++)
                 {
-                    CXMLNode* pSubNode = pNode->GetSubNode ( i );
+                    CXMLNode* pSubNode = pNode->GetSubNode(i);
 
                     SDataInfoItem item;
-                    item.strName = pSubNode->GetTagName ();
-                    item.strValue = pSubNode->GetTagContent ();
-                    CXMLAttributes& attributes = pSubNode->GetAttributes ();
-                    for ( uint i = 0 ; i < attributes.Count () ; i++ )
+                    item.strName = pSubNode->GetTagName();
+                    item.strValue = pSubNode->GetTagContent();
+                    CXMLAttributes& attributes = pSubNode->GetAttributes();
+                    for (uint i = 0; i < attributes.Count(); i++)
                     {
-                        CXMLAttribute* attribute = attributes.Get ( i );
-                        MapSet ( item.attributeMap, SString ( attribute->GetName () ), SString ( attribute->GetValue () ) );
+                        CXMLAttribute* attribute = attributes.Get(i);
+                        MapSet(item.attributeMap, SString(attribute->GetName()), SString(attribute->GetValue()));
                     }
-                    outMap.push_back ( item );
+                    outMap.push_back(item);
                 }
                 return true;
             }
             return false;
         }
     };
-
 
     ///////////////////////////////////////////////////////////////
     //
@@ -597,112 +569,97 @@ namespace
     ///////////////////////////////////////////////////////////////
     class CReportWrap
     {
-        SString strFilter;
-        int iMinSize;
-        int iMaxSize;
+        SString          strFilter;
+        int              iMinSize;
+        int              iMaxSize;
         const static int DEFAULT_MIN_SIZE = 1;
         const static int DEFAULT_MAX_SIZE = 5000;
+
     public:
+        CReportWrap() : iMinSize(DEFAULT_MIN_SIZE), iMaxSize(DEFAULT_MAX_SIZE) { LoadReportSettings(); }
 
-        CReportWrap ()
-            : iMinSize ( DEFAULT_MIN_SIZE )
-            , iMaxSize ( DEFAULT_MAX_SIZE )
+        void SaveReportSettings(void) const
         {
-            LoadReportSettings ();
+            CArgMap m_ArgMap("@", ";");
+            m_ArgMap.Set("filter2", strFilter);
+            m_ArgMap.Set("min", iMinSize);
+            m_ArgMap.Set("max", iMaxSize);
+            CVARS_SET("reportsettings", m_ArgMap.ToString());
+            SetApplicationSetting("reportsettings", m_ArgMap.ToString());
         }
 
-        void SaveReportSettings ( void ) const
-        {
-            CArgMap m_ArgMap ( "@", ";" );
-            m_ArgMap.Set ( "filter2", strFilter );
-            m_ArgMap.Set ( "min", iMinSize );
-            m_ArgMap.Set ( "max", iMaxSize );
-            CVARS_SET ( "reportsettings", m_ArgMap.ToString () );
-            SetApplicationSetting ( "reportsettings", m_ArgMap.ToString () );
-        }
-
-        void LoadReportSettings ( void )
+        void LoadReportSettings(void)
         {
             SString strSettings;
-            CVARS_GET ( "reportsettings", strSettings );
-            SetSettings ( strSettings );
+            CVARS_GET("reportsettings", strSettings);
+            SetSettings(strSettings);
         }
 
-        void SetSettings ( const SString& strSettings )
+        void SetSettings(const SString& strSettings)
         {
-            CArgMap m_ArgMap ( "@", ";" );
-            m_ArgMap.SetFromString ( strSettings );
+            CArgMap m_ArgMap("@", ";");
+            m_ArgMap.SetFromString(strSettings);
             // If build is 30 days old, default no report logging
-            m_ArgMap.Get ( "filter2", strFilter, GetBuildAge () < 30 ? "+all" : "-all" );
-            m_ArgMap.Get ( "min", iMinSize, DEFAULT_MIN_SIZE );
-            m_ArgMap.Get ( "max", iMaxSize, DEFAULT_MAX_SIZE );
-            SaveReportSettings ();
+            m_ArgMap.Get("filter2", strFilter, GetBuildAge() < 30 ? "+all" : "-all");
+            m_ArgMap.Get("min", iMinSize, DEFAULT_MIN_SIZE);
+            m_ArgMap.Get("max", iMaxSize, DEFAULT_MAX_SIZE);
+            SaveReportSettings();
         }
 
-        SString GetFilter ( void ) const
-        {
-            return strFilter != "" ? strFilter : "+all";
-        }
+        SString GetFilter(void) const { return strFilter != "" ? strFilter : "+all"; }
 
-        int GetMinSize ( void ) const
-        {
-            return iMinSize;
-        }
+        int GetMinSize(void) const { return iMinSize; }
 
-        int GetMaxSize ( void ) const
-        {
-            return iMaxSize;
-        }
+        int GetMaxSize(void) const { return iMaxSize; }
 
-        static void ClearLogContents ( const SString& strIdFilter )
+        static void ClearLogContents(const SString& strIdFilter)
         {
-            if ( strIdFilter == "-all" && FileExists ( CalcMTASAPath ( "_keep_report_" ) ) )
+            if (strIdFilter == "-all" && FileExists(CalcMTASAPath("_keep_report_")))
                 return;
-            if ( FileExists ( CalcMTASAPath ( "_keep_report_all_" ) ) )
+            if (FileExists(CalcMTASAPath("_keep_report_all_")))
                 return;
-            SetReportLogContents ( GetLogContents ( strIdFilter ) );
+            SetReportLogContents(GetLogContents(strIdFilter));
         }
 
-        static SString GetLogContents ( const SString& strIdFilter, int iMaxSize = 0 )
+        static SString GetLogContents(const SString& strIdFilter, int iMaxSize = 0)
         {
-            CFilterMap filterMap ( strIdFilter );
+            CFilterMap filterMap(strIdFilter);
 
             // Load file into a string
-            SString strContent = GetReportLogContents ();
+            SString strContent = GetReportLogContents();
 
             // Split into lines
-            std::vector < SString > lines;
-            strContent.Split ( "\n", lines );
+            std::vector<SString> lines;
+            strContent.Split("\n", lines);
 
             // Filter each line
-            int iSize = 0;
-            std::vector < SString > filteredLines;
-            for ( int i = lines.size () - 1 ; i  >= 0 ; i-- )
+            int                  iSize = 0;
+            std::vector<SString> filteredLines;
+            for (int i = lines.size() - 1; i >= 0; i--)
             {
                 const SString& strLine = lines[i];
-                if ( !strLine.empty () && !filterMap.IsFiltered ( atoi ( strLine ) ) )
+                if (!strLine.empty() && !filterMap.IsFiltered(atoi(strLine)))
                 {
-                    iSize += strLine.length ();
-                    if ( iMaxSize && iSize > iMaxSize )
+                    iSize += strLine.length();
+                    if (iMaxSize && iSize > iMaxSize)
                         break;
-                    filteredLines.push_back ( strLine );
+                    filteredLines.push_back(strLine);
                 }
             }
 
             // Compose final output
             SString strResult;
-            for ( int i = filteredLines.size () - 1 ; i  >= 0 ; i-- )
+            for (int i = filteredLines.size() - 1; i >= 0; i--)
                 strResult += filteredLines[i] + "\n";
 
             return strResult;
         }
     };
 
-}
+}            // namespace
 
 namespace
 {
-
     ///////////////////////////////////////////////////////////////
     //
     //
@@ -712,12 +669,12 @@ namespace
     ///////////////////////////////////////////////////////////////
     struct SUpdaterVarConfig
     {
-        CDateTime       master_lastCheckTime;
-        SString         master_highestNotifyRevision;
-        CDateTime       version_lastCheckTime;
-        CDateTime       news_lastCheckTime;
-        SString         news_lastNewsDate;
-        CDataInfoSet    crashdump_history;
+        CDateTime    master_lastCheckTime;
+        SString      master_highestNotifyRevision;
+        CDateTime    version_lastCheckTime;
+        CDateTime    news_lastCheckTime;
+        SString      news_lastNewsDate;
+        CDataInfoSet crashdump_history;
     };
 
     ///////////////////////////////////////////////////////////////
@@ -729,76 +686,79 @@ namespace
     ///////////////////////////////////////////////////////////////
     struct SUpdaterMasterConfig
     {
-        struct {
-            SString         strRevision;
-            CDataInfoSet    serverInfoMap;
-            CTimeSpan       interval;
+        struct
+        {
+            SString      strRevision;
+            CDataInfoSet serverInfoMap;
+            CTimeSpan    interval;
         } master;
 
-        struct {
-            CDataInfoSet    serverInfoMap;
-            CTimeSpan       interval;
+        struct
+        {
+            CDataInfoSet serverInfoMap;
+            CTimeSpan    interval;
         } version;
 
-        struct {
-            CDataInfoSet    serverInfoMap;
-            CTimeSpan       interval;
-            SString         strFilter;
-            CValueInt       iMinSize;
-            CValueInt       iMaxSize;
+        struct
+        {
+            CDataInfoSet serverInfoMap;
+            CTimeSpan    interval;
+            SString      strFilter;
+            CValueInt    iMinSize;
+            CValueInt    iMaxSize;
         } report;
 
-        struct {
-            CDataInfoSet    serverInfoMap;
-            CValueInt       iDuplicates;
-            CValueInt       iMaxHistoryLength;
+        struct
+        {
+            CDataInfoSet serverInfoMap;
+            CValueInt    iDuplicates;
+            CValueInt    iMaxHistoryLength;
         } crashdump;
 
-        struct {
-            CDataInfoSet    serverInfoMap;
+        struct
+        {
+            CDataInfoSet serverInfoMap;
         } trouble;
 
-        struct {
-            CDataInfoSet    serverInfoMap;
+        struct
+        {
+            CDataInfoSet serverInfoMap;
         } ase;
 
-        struct {
-            CDataInfoSet    serverInfoMap;
-            CDataInfoSet    nobrowseInfoMap;
-            CDataInfoSet    onlybrowseInfoMap;
+        struct
+        {
+            CDataInfoSet serverInfoMap;
+            CDataInfoSet nobrowseInfoMap;
+            CDataInfoSet onlybrowseInfoMap;
         } sidegrade;
 
-        struct {
-            CDataInfoSet    serverInfoMap;
-            CTimeSpan       interval;
-            SString         strOldestPost;
-            CValueInt       iMaxHistoryLength;
+        struct
+        {
+            CDataInfoSet serverInfoMap;
+            CTimeSpan    interval;
+            SString      strOldestPost;
+            CValueInt    iMaxHistoryLength;
         } news;
 
-        struct {
-            struct {
-                SString         strFilter;
+        struct
+        {
+            struct
+            {
+                SString strFilter;
             } debug;
         } misc;
 
-        bool IsValid () const
+        bool IsValid() const
         {
-            return master.strRevision.length ()
-                    && version.serverInfoMap.size ()
-                    && report.serverInfoMap.size ()
-                    && crashdump.serverInfoMap.size ()
-                    && trouble.serverInfoMap.size ()
-                    && ase.serverInfoMap.size ()
-                    && !news.strOldestPost.empty ()
-                    ;
+            return master.strRevision.length() && version.serverInfoMap.size() && report.serverInfoMap.size() && crashdump.serverInfoMap.size() &&
+                   trouble.serverInfoMap.size() && ase.serverInfoMap.size() && !news.strOldestPost.empty();
         }
     };
 
-}
+}            // namespace
 
 namespace
 {
-
     ///////////////////////////////////////////////////////////////
     //
     //
@@ -808,102 +768,100 @@ namespace
     ///////////////////////////////////////////////////////////////
     struct SJobInfo
     {
-                                SJobInfo ( void )
-                                    : iMaxServersToTry ( 3 )
-                                    , iTimeoutConnect ( 10000 )
-                                    , iTimeoutTransfer ( 25000 )
-                                    , bShowDownloadPercent ( true )
-                                    , bPostContentBinary ( false )
-                                    , iCurrent ( 0 )
-                                    , iRetryCount ( 0 )
-                                    , iIdleTime ( 0 )
-                                    , iIdleTimeLeft ( 0 )
-                                    , uiBytesDownloaded ( 0 )
-                                    , downloadStatus ( EDownloadStatus::None )
-                                    , iDownloadResultCode ( 0 )
-                                    , iFilesize ( 0 )
-                                {
-                                    exe.iFilesize = 0;
-                                    sig.iFilesize = 0;
-                                    rar.iFilesize = 0;
-                                    slim.iFilesize = 0;
-                                }
+        SJobInfo(void)
+            : iMaxServersToTry(3),
+              iTimeoutConnect(10000),
+              iTimeoutTransfer(25000),
+              bShowDownloadPercent(true),
+              bPostContentBinary(false),
+              iCurrent(0),
+              iRetryCount(0),
+              iIdleTime(0),
+              iIdleTimeLeft(0),
+              uiBytesDownloaded(0),
+              downloadStatus(EDownloadStatus::None),
+              iDownloadResultCode(0),
+              iFilesize(0)
+        {
+            exe.iFilesize = 0;
+            sig.iFilesize = 0;
+            rar.iFilesize = 0;
+            slim.iFilesize = 0;
+        }
         // Input
-        int                     iMaxServersToTry;
-        int                     iTimeoutConnect;
-        int                     iTimeoutTransfer;
-        bool                    bShowDownloadPercent;
-        std::vector < SString > serverList;
-        std::vector < char >    postContent;
-        bool                    bPostContentBinary;
-        SString                 strPostFilename;
+        int                  iMaxServersToTry;
+        int                  iTimeoutConnect;
+        int                  iTimeoutTransfer;
+        bool                 bShowDownloadPercent;
+        std::vector<SString> serverList;
+        std::vector<char>    postContent;
+        bool                 bPostContentBinary;
+        SString              strPostFilename;
 
         // Using
-        int                     iCurrent;
-        int                     iRetryCount;
-        int                     iIdleTime;
-        int                     iIdleTimeLeft;
-        unsigned int            uiBytesDownloaded;
-        EDownloadStatus         downloadStatus;
-        int                     iDownloadResultCode;
-        SString                 strResumableSaveLocation;
+        int             iCurrent;
+        int             iRetryCount;
+        int             iIdleTime;
+        int             iIdleTimeLeft;
+        unsigned int    uiBytesDownloaded;
+        EDownloadStatus downloadStatus;
+        int             iDownloadResultCode;
+        SString         strResumableSaveLocation;
 
         // Result
-        std::vector < char >    downloadBuffer;
-        SString                 strStatus;
-        SString                 strParameters;
-        SString                 strTitle;
-        SString                 strMsg;
-        SString                 strMsg2;
-        SString                 strYes;
-        SString                 strNo;
-        SString                 strPriority;
-        SString                 strFilename;
-        CValueInt               iFilesize;
-        CDataInfoSet            serverInfoMap;
-        SString                 strMD5;
-        SString                 strSaveLocation;
+        std::vector<char> downloadBuffer;
+        SString           strStatus;
+        SString           strParameters;
+        SString           strTitle;
+        SString           strMsg;
+        SString           strMsg2;
+        SString           strYes;
+        SString           strNo;
+        SString           strPriority;
+        SString           strFilename;
+        CValueInt         iFilesize;
+        CDataInfoSet      serverInfoMap;
+        SString           strMD5;
+        SString           strSaveLocation;
 
         struct
         {
-            SString                 strFilename;
-            CValueInt               iFilesize;
-            CDataInfoSet            serverInfoMap;
-            SString                 strMD5;
+            SString      strFilename;
+            CValueInt    iFilesize;
+            CDataInfoSet serverInfoMap;
+            SString      strMD5;
         } exe;
 
         struct
         {
-            SString                 strFilename;
-            CValueInt               iFilesize;
-            CDataInfoSet            serverInfoMap;
-            SString                 strMD5;
+            SString      strFilename;
+            CValueInt    iFilesize;
+            CDataInfoSet serverInfoMap;
+            SString      strMD5;
         } sig;
 
         struct
         {
-            SString                 strFilename;
-            CValueInt               iFilesize;
-            CDataInfoSet            serverInfoMap;
-            SString                 strMD5;
+            SString      strFilename;
+            CValueInt    iFilesize;
+            CDataInfoSet serverInfoMap;
+            SString      strMD5;
         } rar;
 
         struct
         {
-            SString                 strFilename;
-            CValueInt               iFilesize;
-            CDataInfoSet            serverInfoMap;
-            SString                 strMD5;
-            CDataInfoSet            dependencyInfoMap;
+            SString      strFilename;
+            CValueInt    iFilesize;
+            CDataInfoSet serverInfoMap;
+            SString      strMD5;
+            CDataInfoSet dependencyInfoMap;
         } slim;
-
     };
 
-}
+}            // namespace
 
 namespace
 {
-
     struct CStringPair
     {
         SString strValue1;
@@ -917,52 +875,50 @@ namespace
     //
     //
     ///////////////////////////////////////////////////////////////
-    class CConditionMap : public std::map < SString, CStringPair >
+    class CConditionMap : public std::map<SString, CStringPair>
     {
     public:
-
-        void SetCondition ( const SString& strType, const SString& strValue1, const SString& strValue2 = "" )
+        void SetCondition(const SString& strType, const SString& strValue1, const SString& strValue2 = "")
         {
             CStringPair pair;
-            pair.strValue1 = strValue1.ToLower ();
-            pair.strValue2 = strValue2.ToLower ();
+            pair.strValue1 = strValue1.ToLower();
+            pair.strValue2 = strValue2.ToLower();
     #if MTA_DEBUG
-            CStringPair* pPair = MapFind ( *this, strType.ToLower () );
-            if ( !pPair || pPair->strValue1 != pair.strValue1 || pPair->strValue2 != pair.strValue2 )
-                OutputDebugLine ( SString ( "[Updater] SetCondition %s %s %s", strType.c_str (), strValue1.c_str (), strValue2.c_str () ) );
+            CStringPair* pPair = MapFind(*this, strType.ToLower());
+            if (!pPair || pPair->strValue1 != pair.strValue1 || pPair->strValue2 != pair.strValue2)
+                OutputDebugLine(SString("[Updater] SetCondition %s %s %s", strType.c_str(), strValue1.c_str(), strValue2.c_str()));
     #endif
-            MapSet ( *this, strType.ToLower (), pair );
+            MapSet(*this, strType.ToLower(), pair);
         }
 
-        bool IsConditionTrue ( const SString& strCondition )
+        bool IsConditionTrue(const SString& strCondition)
         {
-            if ( strCondition.length () == 0 )
+            if (strCondition.length() == 0)
                 return true;
 
             bool bResult = false;
 
             SString strType, strTemp, strValue1, strValue2;
-            strCondition.ToLower ().Split( ".", &strType, &strTemp );
-            strTemp.Split( ".", &strValue1, &strValue2 );
+            strCondition.ToLower().Split(".", &strType, &strTemp);
+            strTemp.Split(".", &strValue1, &strValue2);
 
             bool bInvert = strValue1[0] == '!';
-            if ( bInvert )
-                strValue1 = strValue1.substr ( 1 );
+            if (bInvert)
+                strValue1 = strValue1.substr(1);
 
-            if ( CStringPair *pPair = MapFind ( *this, strType ) )
+            if (CStringPair* pPair = MapFind(*this, strType))
             {
-                bResult = ( !strValue1.size () || pPair->strValue1 == strValue1 )
-                       && ( !strValue2.size () || pPair->strValue2 == strValue2 );
+                bResult = (!strValue1.size() || pPair->strValue1 == strValue1) && (!strValue2.size() || pPair->strValue2 == strValue2);
             }
 
-            if ( bInvert )
+            if (bInvert)
                 bResult = !bResult;
 
             return bResult;
         }
     };
 
-    typedef void (CVersionUpdater::*PFNVOIDVOID) ( void );
+    typedef void (CVersionUpdater::*PFNVOIDVOID)(void);
 
     enum class EUpdaterProgramType
     {
@@ -983,4 +939,4 @@ namespace
     class ExceptionQuitProgram : public std::exception
     {
     };
-}
+}            // namespace

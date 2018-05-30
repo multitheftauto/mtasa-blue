@@ -1,15 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientGUIElement.cpp
-*  PURPOSE:     GUI wrapper entity class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Cecill Etheredge <ijsf@gmx.net>
-*               Jax <>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientGUIElement.cpp
+ *  PURPOSE:     GUI wrapper entity class
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
@@ -17,19 +14,20 @@ using std::list;
 
 extern CClientGame* g_pClientGame;
 
-CClientGUIElement::CClientGUIElement ( CClientManager * pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID ) : ClassInit ( this ), CClientEntity ( ID )
+CClientGUIElement::CClientGUIElement(CClientManager* pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
     m_pManager = pManager;
-    m_pGUIManager = pManager->GetGUIManager ();
+    m_pGUIManager = pManager->GetGUIManager();
     m_pCGUIElement = pCGUIElement;
     m_pLuaMain = pLuaMain;
     m_pFontElement = NULL;
 
     // Store the this-pointer in the userdata variable
-    CGUI_SET_CCLIENTGUIELEMENT ( pCGUIElement, this );
+    CGUI_SET_CCLIENTGUIELEMENT(pCGUIElement, this);
 
     // Generate the CGUI type name variable
-    switch ( m_pCGUIElement->GetType () ) {
+    switch (m_pCGUIElement->GetType())
+    {
         case CGUI_BUTTON:
             m_strCGUITypeName = "button";
             break;
@@ -82,121 +80,116 @@ CClientGUIElement::CClientGUIElement ( CClientManager * pManager, CLuaMain* pLua
             m_strCGUITypeName = "unknown";
             break;
     }
-    SetTypeName ( SString ( "gui-%s", *m_strCGUITypeName ) );
+    SetTypeName(SString("gui-%s", *m_strCGUITypeName));
 
     // Add us to the list in the manager
-    m_pGUIManager->Add ( this );
+    m_pGUIManager->Add(this);
 }
 
-
-CClientGUIElement::~CClientGUIElement ( void )
+CClientGUIElement::~CClientGUIElement(void)
 {
     // Remove us from the list in the manager
-    Unlink ();
+    Unlink();
 
-    if ( m_pCGUIElement )
+    if (m_pCGUIElement)
         delete m_pCGUIElement;
 }
 
-void CClientGUIElement::Unlink ( void )
+void CClientGUIElement::Unlink(void)
 {
     // Detach from any custom font
-    if ( m_pFontElement )
-        SetFont( "", NULL );
+    if (m_pFontElement)
+        SetFont("", NULL);
 
-    m_pGUIManager->Remove ( this );
+    m_pGUIManager->Remove(this);
 }
 
-
-void CClientGUIElement::SetEvents ( const char* szFunc1, const char* szFunc2 )
+void CClientGUIElement::SetEvents(const char* szFunc1, const char* szFunc2)
 {
-    if ( szFunc1 && strlen ( szFunc1 ) < MAX_EVENT_NAME )
+    if (szFunc1 && strlen(szFunc1) < MAX_EVENT_NAME)
         _strCallbackFunc1 = szFunc1;
 
-    if ( szFunc2 && strlen ( szFunc2 ) < MAX_EVENT_NAME )
+    if (szFunc2 && strlen(szFunc2) < MAX_EVENT_NAME)
         _strCallbackFunc2 = szFunc2;
 }
 
-
-bool CClientGUIElement::_CallbackEvent1 ( CGUIElement* pCGUIElement )
+bool CClientGUIElement::_CallbackEvent1(CGUIElement* pCGUIElement)
 {
     CLuaArguments Arg;
-    if ( pCGUIElement )
+    if (pCGUIElement)
     {
-        CClientGUIElement* pElement = m_pGUIManager->Get ( pCGUIElement );
-        if ( pElement )
+        CClientGUIElement* pElement = m_pGUIManager->Get(pCGUIElement);
+        if (pElement)
         {
-            Arg.PushElement ( pElement );
-            pElement->CallEvent ( _strCallbackFunc1, Arg, true );
+            Arg.PushElement(pElement);
+            pElement->CallEvent(_strCallbackFunc1, Arg, true);
             return true;
         }
     }
     return false;
 }
 
-
-bool CClientGUIElement::_CallbackEvent2 ( CGUIElement* pCGUIElement )
+bool CClientGUIElement::_CallbackEvent2(CGUIElement* pCGUIElement)
 {
     CLuaArguments Arg;
-    if ( pCGUIElement )
+    if (pCGUIElement)
     {
-        CClientGUIElement* pElement = m_pGUIManager->Get ( pCGUIElement );
-        if ( pElement )
+        CClientGUIElement* pElement = m_pGUIManager->Get(pCGUIElement);
+        if (pElement)
         {
-            Arg.PushElement ( pElement );
-            pElement->CallEvent ( _strCallbackFunc2, Arg, true );
+            Arg.PushElement(pElement);
+            pElement->CallEvent(_strCallbackFunc2, Arg, true);
             return true;
         }
     }
     return false;
 }
-
 
 //
 // Get which font name and font element we are using now
 //
-SString CClientGUIElement::GetFont ( CClientGuiFont** ppFontElement )
+SString CClientGUIElement::GetFont(CClientGuiFont** ppFontElement)
 {
     *ppFontElement = m_pFontElement;
-    return GetCGUIElement ()->GetFont ();
+    return GetCGUIElement()->GetFont();
 }
 
 //
 // Change font
 //
-bool CClientGUIElement::SetFont ( const SString& strInFontName, CClientGuiFont* pFontElement )
+bool CClientGUIElement::SetFont(const SString& strInFontName, CClientGuiFont* pFontElement)
 {
     SString strFontName = strInFontName;
 
-    if ( pFontElement )
-        strFontName = pFontElement->GetCEGUIFontName ();
-    else
-    if ( strFontName.empty () )
+    if (pFontElement)
+        strFontName = pFontElement->GetCEGUIFontName();
+    else if (strFontName.empty())
         strFontName = "default-normal";
 
-    if ( GetCGUIElement ()->SetFont ( strFontName ) )
+    if (GetCGUIElement()->SetFont(strFontName))
     {
-        if ( m_pFontElement )   m_pFontElement->NotifyGUIElementDetach ( this );
+        if (m_pFontElement)
+            m_pFontElement->NotifyGUIElementDetach(this);
         m_pFontElement = pFontElement;
-        if ( m_pFontElement )   m_pFontElement->NotifyGUIElementAttach ( this );
+        if (m_pFontElement)
+            m_pFontElement->NotifyGUIElementAttach(this);
         return true;
     }
     return false;
 }
 
-
 //
 // Change call propagation behaviour (overrides CClientEntity::SetCallPropagationEnabled)
-void CClientGUIElement::SetCallPropagationEnabled ( bool bEnabled )
+void CClientGUIElement::SetCallPropagationEnabled(bool bEnabled)
 {
-    CClientEntity::SetCallPropagationEnabled ( bEnabled );
+    CClientEntity::SetCallPropagationEnabled(bEnabled);
 
-    for ( CFastList<CClientEntity*>::iterator iter = m_Children.begin (); iter != m_Children.end (); ++iter )
+    for (CFastList<CClientEntity*>::iterator iter = m_Children.begin(); iter != m_Children.end(); ++iter)
     {
-        if ( (*iter)->GetType () == CCLIENTGUI )
+        if ((*iter)->GetType() == CCLIENTGUI)
         {
-            CClientGUIElement* pGUIElement = static_cast < CClientGUIElement* > ( *iter );
-            pGUIElement->GetCGUIElement()->SetInheritsAlpha ( bEnabled );
+            CClientGUIElement* pGUIElement = static_cast<CClientGUIElement*>(*iter);
+            pGUIElement->GetCGUIElement()->SetInheritsAlpha(bEnabled);
         }
     }
 }

@@ -5,12 +5,12 @@
 class CMasterServerManagerInterface
 {
 public:
-    virtual                 ~CMasterServerManagerInterface  ( void ) {}
+    virtual ~CMasterServerManagerInterface(void) {}
 
     // CMasterServerManagerInterface
-    virtual void            Refresh                     ( void ) = 0;
-    virtual bool            HasData                     ( void ) = 0;
-    virtual bool            ParseList                   ( CServerListItemList& itemList ) = 0;
+    virtual void Refresh(void) = 0;
+    virtual bool HasData(void) = 0;
+    virtual bool ParseList(CServerListItemList& itemList) = 0;
 };
 
-CMasterServerManagerInterface* NewMasterServerManager ( void );
+CMasterServerManagerInterface* NewMasterServerManager(void);
