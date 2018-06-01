@@ -1870,12 +1870,12 @@ void CCore::OnDeviceRestore(void)
 void CCore::OnPreFxRender(void)
 {
     // Don't do nothing if nothing won't be drawn
-    if (!CGraphics::GetSingleton().HasMaterialLine3DQueueItems())
+    if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems())
         return;
 
     CGraphics::GetSingleton().EnteringMTARenderZone();
 
-    CGraphics::GetSingleton().DrawMaterialLine3DQueue();
+    CGraphics::GetSingleton().DrawLine3DPreGUIQueue();
 
     CGraphics::GetSingleton().LeavingMTARenderZone();
 }
