@@ -68,8 +68,7 @@ static CMappedArray<STxdStreamEvent> ms_txdStreamEventList;
 ////////////////////////////////////////////////////////////////
 // Txd created
 ////////////////////////////////////////////////////////////////
-__declspec(noinline)
-void _cdecl OnStreamingAddedTxd(DWORD dwTxdId)
+__declspec(noinline) void _cdecl OnStreamingAddedTxd(DWORD dwTxdId)
 {
     ushort usTxdId = (ushort)dwTxdId;
     // Ensure there are no previous events for this txd
@@ -102,8 +101,7 @@ void _declspec(naked) HOOK_CTxdStore_SetupTxdParent()
 ////////////////////////////////////////////////////////////////
 // Txd remove
 ////////////////////////////////////////////////////////////////
-__declspec(noinline)
-void _cdecl OnStreamingRemoveTxd(DWORD dwTxdId)
+__declspec(noinline) void _cdecl OnStreamingRemoveTxd(DWORD dwTxdId)
 {
     ushort usTxdId = (ushort)dwTxdId - 20000;
     // Ensure there are no previous events for this txd
@@ -670,8 +668,7 @@ void CRenderWareSA::SetGTAVertexShadersEnabled(bool bEnable)
 // Check each created texture, so we can add special ones to the shader system
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-__declspec(noinline)
-void OnMY_RwTextureSetName(DWORD dwAddrCalledFrom, RwTexture* pTexture, const char* szName)
+__declspec(noinline) void OnMY_RwTextureSetName(DWORD dwAddrCalledFrom, RwTexture* pTexture, const char* szName)
 {
     SString strReplacementName;
     if (dwAddrCalledFrom == ADDR_CCustomCarPlateMgr_CreatePlateTexture_TextureSetName)
@@ -718,8 +715,7 @@ void _declspec(naked) HOOK_RwTextureSetName()
 // Check each destroyed texture, so we can remove special ones from the shader system
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-__declspec(noinline)
-void OnMY_RwTextureDestroy_Mid(RwTexture* pTexture)
+__declspec(noinline) void OnMY_RwTextureDestroy_Mid(RwTexture* pTexture)
 {
     pGame->GetRenderWareSA()->SpecialRemovedTexture(pTexture);
 }
@@ -754,8 +750,7 @@ void _declspec(naked) HOOK_RwTextureDestroy_Mid()
 // Classify what is going on here
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-__declspec(noinline)
-void OnMY_RwIm3DRenderIndexedPrimitive_Pre(DWORD dwAddrCalledFrom)
+__declspec(noinline) void OnMY_RwIm3DRenderIndexedPrimitive_Pre(DWORD dwAddrCalledFrom)
 {
     if (dwAddrCalledFrom == ADDR_CVehicle_DoHeadLightBeam_RenderPrimitive || dwAddrCalledFrom == ADDR_CHeli_SearchLightCone_RenderPrimitive ||
         dwAddrCalledFrom == ADDR_CWaterCannon_Render_RenderPrimitive)
@@ -768,8 +763,7 @@ void OnMY_RwIm3DRenderIndexedPrimitive_Pre(DWORD dwAddrCalledFrom)
     }
 }
 
-__declspec(noinline)
-void OnMY_RwIm3DRenderIndexedPrimitive_Post(DWORD dwAddrCalledFrom)
+__declspec(noinline) void OnMY_RwIm3DRenderIndexedPrimitive_Post(DWORD dwAddrCalledFrom)
 {
     CRenderWareSA::ms_iRenderingType = RT_NONE;
 }
@@ -817,14 +811,12 @@ inner:
 // Note that RwIm3DRenderPrimitive is being called to render something
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-__declspec(noinline)
-void OnMY_RwIm3DRenderPrimitive_Pre(DWORD dwAddrCalledFrom)
+__declspec(noinline) void OnMY_RwIm3DRenderPrimitive_Pre(DWORD dwAddrCalledFrom)
 {
     CRenderWareSA::ms_iRenderingType = RT_3DNI;
 }
 
-__declspec(noinline)
-void OnMY_RwIm3DRenderPrimitive_Post(DWORD dwAddrCalledFrom)
+__declspec(noinline) void OnMY_RwIm3DRenderPrimitive_Post(DWORD dwAddrCalledFrom)
 {
     CRenderWareSA::ms_iRenderingType = RT_NONE;
 }
@@ -872,14 +864,12 @@ inner:
 // Note that RwIm2DRenderIndexedPrimitive is being called to render something
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-__declspec(noinline)
-void OnMY_RwIm2DRenderIndexedPrimitive_Pre(DWORD dwAddrCalledFrom)
+__declspec(noinline) void OnMY_RwIm2DRenderIndexedPrimitive_Pre(DWORD dwAddrCalledFrom)
 {
     CRenderWareSA::ms_iRenderingType = RT_2DI;
 }
 
-__declspec(noinline)
-void OnMY_RwIm2DRenderIndexedPrimitive_Post(DWORD dwAddrCalledFrom)
+__declspec(noinline) void OnMY_RwIm2DRenderIndexedPrimitive_Post(DWORD dwAddrCalledFrom)
 {
     CRenderWareSA::ms_iRenderingType = RT_NONE;
 }
@@ -929,14 +919,12 @@ inner:
 // Note that RwIm2DRenderPrimitive is being called to render something
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-__declspec(noinline)
-void OnMY_RwIm2DRenderPrimitive_Pre(DWORD dwAddrCalledFrom)
+__declspec(noinline) void OnMY_RwIm2DRenderPrimitive_Pre(DWORD dwAddrCalledFrom)
 {
     CRenderWareSA::ms_iRenderingType = RT_2DNI;
 }
 
-__declspec(noinline)
-void OnMY_RwIm2DRenderPrimitive_Post(DWORD dwAddrCalledFrom)
+__declspec(noinline) void OnMY_RwIm2DRenderPrimitive_Post(DWORD dwAddrCalledFrom)
 {
     CRenderWareSA::ms_iRenderingType = RT_NONE;
 }

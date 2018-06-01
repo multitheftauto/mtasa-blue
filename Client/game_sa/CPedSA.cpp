@@ -1745,8 +1745,7 @@ ePedState CPedSA::GetPedState()
 // Check if they have already been applied.
 //
 ////////////////////////////////////////////////////////////////
-__declspec(noinline)
-int _cdecl OnCPed_PreRenderAfterTest(CPedSAInterface* pPedInterface)
+__declspec(noinline) int _cdecl OnCPed_PreRenderAfterTest(CPedSAInterface* pPedInterface)
 {
     if (pPedInterface->pedFlags.bCalledPreRender)
         return 1;            // Skip slope and swim rotations
