@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CREGISTRYMANAGER_H
-#define __CREGISTRYMANAGER_H
+#pragma once
 
 class CRegistry;
 
@@ -26,4 +25,3 @@ private:
     std::vector<CRegistry*> m_RegistryList;
 };
 
-#endif

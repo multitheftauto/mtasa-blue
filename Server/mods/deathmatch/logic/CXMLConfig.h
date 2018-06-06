@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CXMLConfig_H
-#define __CXMLConfig_H
+#pragma once
 
 #include "CCommon.h"
 #include <string>
@@ -51,4 +50,3 @@ protected:
     CXMLFile*   m_pFile;
 };
 
-#endif

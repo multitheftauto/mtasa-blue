@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CCHATECHOPACKET_H
-#define __PACKETS_CCHATECHOPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include "../../Config.h"
@@ -50,4 +49,3 @@ private:
     bool          m_bColorCoded;
 };
 
-#endif

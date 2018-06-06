@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CVEHICLENAMES_H
-#define __CVEHICLENAMES_H
+#pragma once
 
 class CVehicleNames
 {
@@ -23,4 +22,3 @@ public:
     static const char* GetVehicleTypeName(unsigned long ulModel);
 };
 
-#endif

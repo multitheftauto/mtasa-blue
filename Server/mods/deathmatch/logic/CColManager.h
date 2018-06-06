@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOLMANAGER_H
-#define __CCOLMANAGER_H
+#pragma once
 
 #include "CColShape.h"
 #include <list>
@@ -45,4 +44,3 @@ private:
     std::vector<CColShape*> m_TrashCan;
 };
 
-#endif

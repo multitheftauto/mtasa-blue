@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CPICKUPHITCONFIRMPACKET_H
-#define __PACKETS_CPICKUPHITCONFIRMPACKET_H
+#pragma once
 
 #include "CPacket.h"
 
@@ -33,4 +32,3 @@ private:
     bool           m_bPlaySound;
 };
 
-#endif

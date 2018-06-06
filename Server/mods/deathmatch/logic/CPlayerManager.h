@@ -11,8 +11,7 @@
 
 class CPlayerManager;
 
-#ifndef __CPLAYERMANAGER_H
-#define __CPLAYERMANAGER_H
+#pragma once
 
 #include "CCommon.h"
 #include "packets/CPacket.h"
@@ -75,5 +74,3 @@ private:
     SString                               m_strLowestConnectedPlayerVersion;
     CElapsedTime                          m_ZombieCheckTimer;
 };
-
-#endif

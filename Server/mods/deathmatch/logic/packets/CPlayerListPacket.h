@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CPLAYERLISTPACKET_H
-#define __PACKETS_CPLAYERLISTPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include <list>
@@ -35,4 +34,3 @@ private:
     bool                m_bShowInChat;
 };
 
-#endif

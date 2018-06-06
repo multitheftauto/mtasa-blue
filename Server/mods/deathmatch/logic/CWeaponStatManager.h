@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CWEAPONSTATMANAGER_H
-#define __CWEAPONSTATMANAGER_H
+#pragma once
 
 #include <list>
 #include "CCommon.h"
@@ -97,4 +96,3 @@ private:
     static SFixedArray<sWeaponInfo, WEAPONTYPE_MAX + 1> OriginalHitmanWeaponData;
 };
 
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMAPINFOPACKET_H
-#define __CMAPINFOPACKET_H
+#pragma once
 
 #include "CPacket.h"
 
@@ -96,4 +95,3 @@ private:
     int                  m_iMoonSize;
 };
 
-#endif

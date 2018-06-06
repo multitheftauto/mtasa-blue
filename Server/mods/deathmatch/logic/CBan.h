@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CBAN_H
-#define __CBAN_H
+#pragma once
 
 #include "CCommon.h"
 #include <string>
@@ -97,4 +96,3 @@ private:
     bool        m_bBeingDeleted;
 };
 
-#endif

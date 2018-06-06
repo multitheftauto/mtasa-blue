@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CLUAARGUMENT_H
-#define __CLUAARGUMENT_H
+#pragma once
 
 #include <string>
 
@@ -87,4 +86,3 @@ private:
     void DeleteTableData(void);
 };
 
-#endif

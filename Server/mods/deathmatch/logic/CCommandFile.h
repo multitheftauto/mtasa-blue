@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOMMANDFILE_H
-#define __CCOMMANDFILE_H
+#pragma once
 
 #include "stdio.h"
 class CConsole;
@@ -39,4 +38,3 @@ private:
     bool  m_bEcho;
 };
 
-#endif

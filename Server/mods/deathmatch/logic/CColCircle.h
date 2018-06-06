@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOLCIRCLE_H
-#define __CCOLCIRCLE_H
+#pragma once
 
 #include "CColShape.h"
 
@@ -38,4 +37,3 @@ protected:
     float m_fRadius;
 };
 
-#endif

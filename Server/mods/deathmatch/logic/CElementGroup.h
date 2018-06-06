@@ -11,8 +11,7 @@
 
 class CElementGroup;
 
-#ifndef CELEMENTGROUP_H
-#define CELEMENTGROUP_H
+#pragma once
 
 #include "CElement.h"
 
@@ -30,5 +29,3 @@ public:
     CFastList<CElement*>::const_iterator IterBegin(void) { return m_elements.begin(); }
     CFastList<CElement*>::const_iterator IterEnd(void) { return m_elements.end(); }
 };
-
-#endif

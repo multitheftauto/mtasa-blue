@@ -11,8 +11,7 @@
 
 class CPickup;
 
-#ifndef __CPICKUP_H
-#define __CPICKUP_H
+#pragma once
 
 #include "CColCallback.h"
 #include "CColManager.h"
@@ -172,5 +171,3 @@ private:
     bool m_bSpawned;
     bool m_bDoneDelayHack;
 };
-
-#endif

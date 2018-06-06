@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CRPCFunctions_H
-#define __CRPCFunctions_H
+#pragma once
 
 #include "CCommon.h"
 #include <vector>
@@ -70,4 +69,3 @@ public:
     };
 };
 
-#endif

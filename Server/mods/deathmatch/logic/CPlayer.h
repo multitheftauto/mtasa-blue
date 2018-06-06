@@ -11,8 +11,7 @@
 
 class CPlayer;
 
-#ifndef __CPLAYER_H
-#define __CPLAYER_H
+#pragma once
 
 #include "CPed.h"
 #include "CCommon.h"
@@ -41,8 +40,8 @@ enum eVoiceState
     VOICESTATE_TRANSMITTING_IGNORED,
 };
 
-#define MOVEMENT_UPDATE_THRESH      (5)
-#define DISTANCE_FOR_NEAR_VIEWER    (310)
+#define MOVEMENT_UPDATE_THRESH (5)
+#define DISTANCE_FOR_NEAR_VIEWER (310)
 
 struct SViewerInfo
 {
@@ -462,5 +461,3 @@ private:
     ushort  m_usPrevDimension;
     SString m_strQuitReasonForLog;
 };
-
-#endif

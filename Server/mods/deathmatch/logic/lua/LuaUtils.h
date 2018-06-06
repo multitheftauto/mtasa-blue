@@ -9,8 +9,6 @@
  *
  *****************************************************************************/
 
-#ifndef __LUAUTILS_H
-#define __LUAUTILS_H
+#pragma once
 SString GetDebugMessage(lua_State* luaVM);
 
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCUSTOMDATA_H
-#define __CCUSTOMDATA_H
+#pragma once
 
 #include <core/CServerInterface.h>
 #include "lua/CLuaArgument.h"
@@ -54,4 +53,3 @@ private:
     std::map<std::string, SCustomData> m_SyncedData;
 };
 
-#endif

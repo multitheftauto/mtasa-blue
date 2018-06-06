@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CSCRIPTDEBUGGING_H
-#define __CSCRIPTDEBUGGING_H
+#pragma once
 
 #include "lua/CLuaManager.h"
 #include "packets/CPacket.h"
@@ -85,4 +84,3 @@ private:
     CDuplicateLineFilter<SLogLine> m_DuplicateLineFilter;
 };
 
-#endif

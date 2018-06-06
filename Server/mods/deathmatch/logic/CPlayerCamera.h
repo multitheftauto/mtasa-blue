@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPlayerCamera_H
-#define __CPlayerCamera_H
+#pragma once
 
 #include <CVector.h>
 
@@ -73,4 +72,3 @@ private:
     uchar         m_ucSyncTimeContext;
 };
 
-#endif

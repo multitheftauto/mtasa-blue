@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CFILE_H
-#define __CFILE_H
+#pragma once
 
 #include "CElement.h"
 #include <stdio.h>
@@ -63,4 +62,3 @@ private:
     unsigned long m_ulMaxSize;
 };
 
-#endif

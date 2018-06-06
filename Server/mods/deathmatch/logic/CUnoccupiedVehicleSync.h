@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CUNOCCUPIEDVEHICLESYNC_H
-#define __CUNOCCUPIEDVEHICLESYNC_H
+#pragma once
 
 #include "CPlayerManager.h"
 #include "CVehicleManager.h"
@@ -46,4 +45,3 @@ private:
     CElapsedTime m_UpdateTimer;
 };
 
-#endif

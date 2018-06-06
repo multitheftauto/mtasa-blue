@@ -11,8 +11,7 @@
 
 class CGame;
 
-#ifndef __CGAME_H
-#define __CGAME_H
+#pragma once
 
 #include "CCommon.h"
 #include <net/CNetServer.h>
@@ -648,5 +647,3 @@ private:
 
     bool m_DevelopmentModeEnabled;
 };
-
-#endif

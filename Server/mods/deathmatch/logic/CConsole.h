@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCONSOLE_H
-#define __CCONSOLE_H
+#pragma once
 
 #include "CConsoleCommand.h"
 #include <list>
@@ -56,4 +55,3 @@ private:
     list<CConsoleCommand*> m_Commands;
 };
 
-#endif

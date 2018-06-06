@@ -11,8 +11,7 @@
 
 class CTeam;
 
-#ifndef __CTEAM_H
-#define __CTEAM_H
+#pragma once
 
 #include "CElement.h"
 #include "CPlayer.h"
@@ -63,5 +62,3 @@ private:
 
     bool m_bFriendlyFire;
 };
-
-#endif

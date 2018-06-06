@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CWHOWAS_H
-#define __CWHOWAS_H
+#pragma once
 
 #include "../Config.h"
 #include <list>
@@ -39,4 +38,3 @@ private:
     std::list<SWhoWasEntry> m_List;
 };
 
-#endif

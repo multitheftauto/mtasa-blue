@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOLSPHERE_H
-#define __CCOLSPHERE_H
+#pragma once
 
 #include "CColShape.h"
 
@@ -38,4 +37,3 @@ protected:
     float m_fRadius;
 };
 
-#endif

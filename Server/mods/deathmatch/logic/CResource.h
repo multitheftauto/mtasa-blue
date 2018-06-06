@@ -12,8 +12,7 @@
 // This class controls a single resource, being a zip file
 // or a folder that contains a number of files
 
-#ifndef CRESOURCE_H
-#define CRESOURCE_H
+#pragma once
 
 #include "packets/CResourceStartPacket.h"
 #include "packets/CResourceStopPacket.h"
@@ -390,4 +389,3 @@ protected:
     bool FindAclRequest(SAclRequest& request);
 };
 
-#endif

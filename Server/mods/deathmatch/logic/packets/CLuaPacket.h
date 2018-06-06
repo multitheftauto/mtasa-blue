@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CLUAPACKET_H
-#define __PACKETS_CLUAPACKET_H
+#pragma once
 
 #include "CPacket.h"
 
@@ -29,4 +28,3 @@ private:
     NetBitStreamInterface& m_BitStream;
 };
 
-#endif
