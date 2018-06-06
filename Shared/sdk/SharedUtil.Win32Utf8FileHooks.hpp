@@ -102,7 +102,7 @@ namespace SharedUtil
         static SString strProfilePathCP, strProfilePathUTF8;
         if (strProfilePathCP.empty())
         {
-            char    szProfilePath[MAX_PATH] = "";
+            char szProfilePath[MAX_PATH] = "";
             wchar_t wszProfilePath[MAX_PATH] = L"";
             SHGetFolderPathA(NULL, CSIDL_PROFILE, NULL, 0, szProfilePath);
             SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, 0, wszProfilePath);
