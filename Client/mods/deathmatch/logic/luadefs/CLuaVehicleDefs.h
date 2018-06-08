@@ -70,7 +70,7 @@ public:
     LUA_DECLARE(GetVehicleHeadLightColor);
     LUA_DECLARE(GetVehicleCurrentGear);
     LUA_DECLARE(GetVehicleHandling);
-    LUA_DECLARE(GetOriginalHandling)
+    LUA_DECLARE(GetOriginalHandling);
     LUA_DECLARE(GetVehicleDoorOpenRatio);
     LUA_DECLARE(IsVehicleNitroRecharging);
     LUA_DECLARE(IsVehicleNitroActivated);
@@ -125,6 +125,7 @@ public:
     LUA_DECLARE(SetVehicleHeadLightColor);
     LUA_DECLARE(SetVehicleTurretPosition);
     LUA_DECLARE(SetVehicleDoorOpenRatio);
+    LUA_DECLARE(SetVehicleHandling);
     LUA_DECLARE(SetVehicleSirens);
     LUA_DECLARE(GetVehicleSirens);
     LUA_DECLARE(GetVehicleSirenParams);

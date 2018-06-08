@@ -735,16 +735,29 @@ public:
     static bool   GetSoundPan(CClientPlayer& Player, float& fPan);
 
     // Handling funcs
-    static eHandlingProperty GetVehicleHandlingEnum(std::string strProperty);
-    static bool              GetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, float& fValue);
-    static bool              GetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, CVector& vecValue);
-    static bool              GetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, std::string& strValue);
-    static bool              GetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned int& uiValue);
-    static bool              GetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned char& ucValue);
-    static bool              GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, float& fValue);
-    static bool              GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string& strValue);
-    static bool              GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int& uiValue);
-    static bool              GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char& ucValue);
+    static eHandlingProperty     GetVehicleHandlingEnum(std::string strProperty);
+    static bool                  GetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, float& fValue);
+    static bool                  GetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, CVector& vecValue);
+    static bool                  GetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, std::string& strValue);
+    static bool                  GetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned int& uiValue);
+    static bool                  GetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned char& ucValue);
+    static bool                  GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, float& fValue);
+    static bool                  GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, CVector& vecValue);
+    static bool                  GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string& strValue);
+    static bool                  GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int& uiValue);
+    static bool                  GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char& ucValue);
+    static bool                  ResetVehicleHandling(CClientVehicle* pVehicle);
+    static bool                  ResetVehicleHandlingProperty(CClientVehicle* pVehicle, eHandlingProperty eProperty);
+    static bool                  SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, float fValue);
+    static bool                  SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, CVector vecValue);
+    static bool                  SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, std::string strValue);
+    static bool                  SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned int uiValue);
+    static bool                  SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned char ucValue);
+    static bool                  SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, float fValue);
+    static bool                  SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, CVector vecValue);
+    static bool                  SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string strValue);
+    static bool                  SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int uiValue);
+    static bool                  SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char ucValue);
 
     // Version funcs
     static unsigned long GetVersion();

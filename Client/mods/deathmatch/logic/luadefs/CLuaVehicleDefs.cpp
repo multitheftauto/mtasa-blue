@@ -113,6 +113,7 @@ void CLuaVehicleDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("setVehicleHeadLightColor", SetVehicleHeadLightColor);
     CLuaCFunctions::AddFunction("setVehicleTurretPosition", SetVehicleTurretPosition);
     CLuaCFunctions::AddFunction("setVehicleDoorOpenRatio", SetVehicleDoorOpenRatio);
+    CLuaCFunctions::AddFunction("setVehicleHandling", SetVehicleHandling);
     CLuaCFunctions::AddFunction("setVehicleSirens", SetVehicleSirens);
     CLuaCFunctions::AddFunction("setVehicleComponentPosition", SetVehicleComponentPosition);
     CLuaCFunctions::AddFunction("getVehicleComponentPosition", GetVehicleComponentPosition);
@@ -214,6 +215,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setWheelStates", "setVehicleWheelStates");
     lua_classfunction(luaVM, "setDoorOpenRatio", "setVehicleDoorOpenRatio");
     lua_classfunction(luaVM, "setDoorsUndamageable", "setVehicleDoorsUndamageable");
+    lua_classfunction(luaVM, "setHandling", "setVehicleHandling");
     lua_classfunction(luaVM, "setDoorState", "setVehicleDoorState");
     lua_classfunction(luaVM, "setLandingGearDown", "setVehicleLandingGearDown");
     lua_classfunction(luaVM, "setEngineState", "setVehicleEngineState");
@@ -2449,6 +2451,175 @@ int CLuaVehicleDefs::SetVehicleTurretPosition(lua_State* luaVM)
         pVehicle->SetTurretRotation(fHorizontal, fVertical);
         lua_pushboolean(luaVM, true);
         return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::SetVehicleHandling(lua_State* luaVM)
+{
+    //  bool setVehicleHandling ( element theVehicle, string property, var value )
+    CClientVehicle* pVehicle;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+
+    if (!argStream.HasErrors())
+    {
+        if (argStream.NextIsString())
+        {
+            SString strProperty;
+            argStream.ReadString(strProperty);
+
+            eHandlingProperty eProperty = g_pGame->GetHandlingManager()->GetPropertyEnumFromName(strProperty);
+            if (eProperty)
+            {
+                if (argStream.NextIsNil())
+                {
+                    if (CStaticFunctionDefinitions::ResetVehicleHandlingProperty(pVehicle, eProperty))
+                    {
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                }
+                else
+                {
+                    switch (eProperty)
+                    {
+                    case HANDLING_MASS:
+                    case HANDLING_TURNMASS:
+                    case HANDLING_DRAGCOEFF:
+                    case HANDLING_TRACTIONMULTIPLIER:
+                    case HANDLING_ENGINEACCELERATION:
+                    case HANDLING_ENGINEINERTIA:
+                    case HANDLING_MAXVELOCITY:
+                    case HANDLING_BRAKEDECELERATION:
+                    case HANDLING_BRAKEBIAS:
+                    case HANDLING_STEERINGLOCK:
+                    case HANDLING_TRACTIONLOSS:
+                    case HANDLING_TRACTIONBIAS:
+                    case HANDLING_SUSPENSION_FORCELEVEL:
+                    case HANDLING_SUSPENSION_DAMPING:
+                    case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
+                    case HANDLING_SUSPENSION_UPPER_LIMIT:
+                    case HANDLING_SUSPENSION_LOWER_LIMIT:
+                    case HANDLING_SUSPENSION_FRONTREARBIAS:
+                    case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
+                    case HANDLING_COLLISIONDAMAGEMULTIPLIER:
+                    case HANDLING_SEATOFFSETDISTANCE:
+                    {
+                        float fValue;
+                        argStream.ReadNumber(fValue);
+                        if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, fValue))
+                        {
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
+                        break;
+                    }
+                    case HANDLING_PERCENTSUBMERGED:            // unsigned int
+                                                               // case HANDLING_MONETARY:
+                    case HANDLING_HANDLINGFLAGS:
+                    case HANDLING_MODELFLAGS:
+                    {
+                        unsigned int uiValue;
+                        argStream.ReadNumber(uiValue);
+                        if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, uiValue))
+                        {
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
+                        break;
+                    }
+                    case HANDLING_NUMOFGEARS:
+                    case HANDLING_ANIMGROUP:
+                    {
+                        unsigned char ucValue;
+                        argStream.ReadNumber(ucValue);
+                        if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, ucValue))
+                        {
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
+                        break;
+                    }
+                    case HANDLING_CENTEROFMASS:
+                    {
+                        if (argStream.NextIsTable())
+                        {
+                            lua_pushnumber(luaVM, 1);
+                            lua_gettable(luaVM, 3);
+                            float fX = static_cast<float>(lua_tonumber(luaVM, -1));
+                            lua_pop(luaVM, 1);
+
+                            lua_pushnumber(luaVM, 2);
+                            lua_gettable(luaVM, 3);
+                            float fY = static_cast<float>(lua_tonumber(luaVM, -1));
+                            lua_pop(luaVM, 1);
+
+                            lua_pushnumber(luaVM, 3);
+                            lua_gettable(luaVM, 3);
+                            float fZ = static_cast<float>(lua_tonumber(luaVM, -1));
+                            lua_pop(luaVM, 1);
+
+                            CVector vecCenterOfMass(fX, fY, fZ);
+
+                            if (CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, vecCenterOfMass))
+                            {
+                                lua_pushboolean(luaVM, true);
+                                return 1;
+                            }
+                        }
+                        argStream.SetTypeError("table");
+                        break;
+                    }
+                    case HANDLING_DRIVETYPE:
+                    case HANDLING_ENGINETYPE:
+                        // case HANDLING_HEADLIGHT:
+                        // case HANDLING_TAILLIGHT:
+                    {
+                        SString strValue;
+                        argStream.ReadString(strValue);
+                        if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, strValue))
+                        {
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
+                        break;
+                    }
+                    case HANDLING_ABS:
+                    {
+                        bool bValue;
+                        argStream.ReadBool(bValue);
+                        if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, bValue ? 1.0f : 0.0f))
+                        {
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
+                        break;
+                    }
+                    case HANDLING_MAX:
+                    {
+                        argStream.SetCustomError("Invalid property");
+                        break;
+                    }
+                    default:
+                        break;
+                    }
+                }
+            }
+        }
+        else if (argStream.NextIsNil())
+        {
+            if (CStaticFunctionDefinitions::ResetVehicleHandling(pVehicle))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
