@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CSERVER_H
-#define __CSERVER_H
+#pragma once
 
 #include <core/CServerBase.h>
 
@@ -37,5 +36,3 @@ private:
     CServerInterface* m_pServerInterface;
     class CGame*      m_pGame;
 };
-
-#endif

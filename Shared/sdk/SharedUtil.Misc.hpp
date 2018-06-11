@@ -1191,28 +1191,13 @@ bool SharedUtil::IsMainThread(void)
 #ifdef WIN32
     #include <time.h>
 
-    #define YEAR ((((__DATE__ [7]-'0')*10+(__DATE__ [8]-'0'))*10+(__DATE__ [9]-'0'))*10+(__DATE__ [10]-'0'))
-
-/* Month: 0 - 11 */
-    #define MONTH (__DATE__ [2] == 'n' ? (__DATE__ [1] == 'a' ? 0 : 5) \
-                  : __DATE__ [2] == 'b' ? 1 \
-                  : __DATE__ [2] == 'r' ? (__DATE__ [0] == 'M'? 2 : 3) \
-                  : __DATE__ [2] == 'y' ? 4 \
-                  : __DATE__ [2] == 'l' ? 6 \
-                  : __DATE__ [2] == 'g' ? 7 \
-                  : __DATE__ [2] == 'p' ? 8 \
-                  : __DATE__ [2] == 't' ? 9 \
-                  : __DATE__ [2] == 'v' ? 10 : 11)
-
-    #define DAY ((__DATE__ [4]==' ' ? 0 : __DATE__[4]-'0')*10+(__DATE__[5]-'0'))
-
 int SharedUtil::GetBuildAge(void)
 {
     tm when;
     memset(&when, 0, sizeof(when));
-    when.tm_year = YEAR - 1900;
-    when.tm_mon = MONTH;
-    when.tm_mday = DAY;
+    when.tm_year = BUILD_YEAR - 1900;
+    when.tm_mon = BUILD_MONTH;
+    when.tm_mday = BUILD_DAY;
     return (int)(time(NULL) - mktime(&when)) / (60 * 60 * 24);
 }
 
@@ -1221,9 +1206,9 @@ int SharedUtil::GetDaysUntilExpire(void)
 {
     tm when;
     memset(&when, 0, sizeof(when));
-    when.tm_year = YEAR - 1900;
-    when.tm_mon = MONTH;
-    when.tm_mday = DAY + MTA_DM_EXPIRE_DAYS;
+    when.tm_year = BUILD_YEAR - 1900;
+    when.tm_mon = BUILD_MONTH;
+    when.tm_mday = BUILD_DAY + MTA_DM_EXPIRE_DAYS;
     return (int)(mktime(&when) - time(NULL)) / (60 * 60 * 24);
 }
 

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef CRESOURCECHECKER_H
-#define CRESOURCECHECKER_H
+#pragma once
 
 #include <unzip.h>
 #ifdef WIN32
@@ -83,4 +82,3 @@ protected:
     SString        m_strReqServerReason;
 };
 
-#endif

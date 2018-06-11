@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CELEMENTDELETER_H
-#define __CELEMENTDELETER_H
+#pragma once
 
 #include <list>
 
@@ -31,4 +30,3 @@ private:
     CElementListType m_List;
 };
 
-#endif

@@ -219,7 +219,7 @@ eURLState CWebCore::GetDomainState(const SString& strURL, bool bOutputDebug)
 SString CWebCore::GetDomainFromURL(const SString& strURL)
 {
     CefURLParts urlParts;
-    if (!CefParseURL(strURL, urlParts) || !urlParts.host.str)
+    if (strURL.empty() || !CefParseURL(strURL, urlParts) || !urlParts.host.str)
         return "";
 
     return UTF16ToMbUTF8(urlParts.host.str);

@@ -11,8 +11,7 @@
 
 class CAccessControlListGroup;
 
-#ifndef __CACCESSCONTROLLISTGROUP_H
-#define __CACCESSCONTROLLISTGROUP_H
+#pragma once
 
 #include "../Config.h"
 #include <xml/CXMLNode.h>
@@ -91,5 +90,3 @@ private:
     ObjectMap  m_ObjectsById;
     uint       m_uiScriptID;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CDYNAMICLIBRARY_H
-#define __CDYNAMICLIBRARY_H
+#pragma once
 
 #ifdef WIN32
 #include <windows.h>
@@ -38,4 +37,3 @@ private:
     #endif
 };
 
-#endif

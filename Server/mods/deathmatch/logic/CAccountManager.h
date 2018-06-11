@@ -11,8 +11,7 @@
 
 class CAccountManager;
 
-#ifndef __CACCOUNTMANAGER_H
-#define __CACCOUNTMANAGER_H
+#pragma once
 
 #include "CAccount.h"
 typedef uint SDbConnectionId;
@@ -184,5 +183,3 @@ protected:
     int                m_iAccounts;
     SString            m_strDbPathFilename;
 };
-
-#endif

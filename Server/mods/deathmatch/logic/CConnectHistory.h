@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCONNECTHISTORY_H
-#define __CCONNECTHISTORY_H
+#pragma once
 
 typedef CFastHashMap<SString, struct CConnectHistoryItem> HistoryItemMap;
 typedef std::vector<long long>                            JoinTimesMap;
@@ -46,4 +45,3 @@ private:
     long long      m_llDebugTickCountOffset;
 };
 
-#endif

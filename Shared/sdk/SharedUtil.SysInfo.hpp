@@ -306,13 +306,17 @@ long long SharedUtil::GetWMITotalPhysicalMemory(void)
 
         QueryWMI(result, "Win32_ComputerSystem", "TotalPhysicalMemory");
 
-        if (result.empty())
-            return 0;
-
-        const SString& strTotalPhysicalMemory = result[0][0];
-        llResult = _atoi64(strTotalPhysicalMemory);
+        if (!result.empty())
+        {
+            const SString& strTotalPhysicalMemory = result[0][0];
+            llResult = _atoi64(strTotalPhysicalMemory);
+        }
     }
 
+    if (llResult == 0)
+    {
+        llResult = 2LL * 1024 * 1024 * 1024;            // 2GB
+    }
     return llResult;
 }
 
@@ -388,6 +392,10 @@ long long SharedUtil::GetWMIVideoAdapterMemorySize(const SString& strDisplay)
         }
     }
 
+    if (llResult == 0)
+    {
+        llResult = 2LL * 1024 * 1024 * 1024;            // 2GB
+    }
     return llResult;
 }
 

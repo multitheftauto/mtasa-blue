@@ -32,7 +32,7 @@ class CMaterialLine3DBatcher
 {
 public:
     ZERO_ON_NEW
-    CMaterialLine3DBatcher(void);
+    CMaterialLine3DBatcher(bool bPreGUI);
     ~CMaterialLine3DBatcher(void);
 
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
@@ -44,6 +44,7 @@ public:
 protected:
     void DrawBatch(const CVector& vecCameraPos, uint* pBatchIndices, uint uiNumBatchLines, CMaterialItem* pMaterial);
 
+    bool                             m_bPreGUI;
     IDirect3DDevice9*                m_pDevice;
     std::vector<SMaterialLine3DItem> m_LineList;
     static SMaterialLine3DItem*      ms_pLines;            // Used in sort callback

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CRESOURCESTARTPACKET_H
-#define __PACKETS_CRESOURCESTARTPACKET_H
+#pragma once
 
 #include <list>
 #include "../packets/CPacket.h"
@@ -31,4 +30,3 @@ private:
     CResource*  m_pResource;
 };
 
-#endif

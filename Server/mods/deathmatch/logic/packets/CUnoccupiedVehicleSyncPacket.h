@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CUNOCCUPIEDVEHICLESYNCPACKET_H
-#define __CUNOCCUPIEDVEHICLESYNCPACKET_H
+#pragma once
 
 #include <CVector.h>
 #include "CPacket.h"
@@ -42,4 +41,3 @@ public:
     std::vector<SyncData> m_Syncs;
 };
 
-#endif

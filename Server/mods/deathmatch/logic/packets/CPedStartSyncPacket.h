@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CPEDSTARTSYNCPACKET_H
-#define __PACKETS_CPEDSTARTSYNCPACKET_H
+#pragma once
 
 #include "CPacket.h"
 class CPed;
@@ -29,4 +28,3 @@ private:
     CPed* m_pPed;
 };
 
-#endif

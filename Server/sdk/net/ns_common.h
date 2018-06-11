@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __NS_COMMON_H
-#define __NS_COMMON_H
+#pragma once
 
 #include "net/bitstream.h"
 #include "net/packetenums.h"
@@ -167,5 +166,3 @@ enum ePacketOrdering
 typedef NetServerPlayerID          NetPlayerID;
 typedef NetServerPacketPriority    NetPacketPriority;
 typedef NetServerPacketReliability NetPacketReliability;
-
-#endif

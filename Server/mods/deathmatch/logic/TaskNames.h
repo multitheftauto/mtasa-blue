@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __TaskNames_H
-#define __TaskNames_H
+#pragma once
 
 struct sTaskName
 {
@@ -21,4 +20,3 @@ extern char sNoTaskName[100];
 
 extern sTaskName TaskNames[1802];
 
-#endif

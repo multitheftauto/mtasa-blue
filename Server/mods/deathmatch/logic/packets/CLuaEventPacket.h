@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CLUAEVENTPACKET_H
-#define __PACKETS_CLUAEVENTPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include "../lua/CLuaArguments.h"
@@ -38,4 +37,3 @@ private:
     CLuaArguments* m_pArguments;
 };
 
-#endif

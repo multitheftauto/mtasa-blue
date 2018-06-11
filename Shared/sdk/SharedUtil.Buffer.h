@@ -220,11 +220,12 @@ namespace SharedUtil
             if (bByteLength)
             {
                 uchar ucLength = 0;
-                Read(ucLength);
+                if (!Read(ucLength))
+                    return false;
                 usLength = ucLength;
             }
-            else
-                Read(usLength);
+            else if (!Read(usLength))
+                return false;
 
             if (bDoesLengthIncludeLengthOfLength && usLength)
                 usLength -= bByteLength ? 1 : 2;

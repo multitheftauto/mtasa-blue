@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCUSTOMWEAPON_H
-#define __CCUSTOMWEAPON_H
+#pragma once
 #include "CCommon.h"
 #include "CCustomWeaponManager.h"
 #include "CWeaponStat.h"
@@ -127,4 +126,3 @@ private:
 
     CCustomWeaponManager* m_pWeaponManager;
 };
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CLUAFUNCTIONREF_H
-#define __CLUAFUNCTIONREF_H
+#pragma once
 
 #define LUA_REFNIL      (-1)
 #define VERIFY_FUNCTION(func) ( (func).ToInt () != LUA_REFNIL )
@@ -40,4 +39,3 @@ protected:
     static CIntrusiveList<CLuaFunctionRef> ms_AllRefList;
 };
 
-#endif

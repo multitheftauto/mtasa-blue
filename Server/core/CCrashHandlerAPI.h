@@ -17,8 +17,7 @@
 Copyright (c) 1997-2000 John Robbins -- All rights reserved.
 ----------------------------------------------------------------------*/
 
-#ifndef _CRASHHANDLER_H
-#define _CRASHHANDLER_H
+#pragma once
 
 #ifdef WIN32
 
@@ -245,5 +244,3 @@ RETURNS         :
 #endif  //__cplusplus
 
 #endif
-
-#endif  // _CRASHHANDLER_H

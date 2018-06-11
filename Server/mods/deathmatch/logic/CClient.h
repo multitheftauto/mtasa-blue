@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENT_H
-#define __CCLIENT_H
+#pragma once
 
 class CAccount;
 class CElement;
@@ -56,4 +55,3 @@ protected:
     CAccount* m_pAccount;
 };
 
-#endif

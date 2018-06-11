@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __UTILS_H
-#define __UTILS_H
+#pragma once
 
 #include <CVector.h>
 #include <CVector2D.h>
@@ -202,4 +201,3 @@ void DeletePointersAndClearList(T& elementList)
     }
 }
 
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CProjectileSYNCPACKET_H
-#define __CProjectileSYNCPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include <CVector.h>
@@ -38,4 +37,3 @@ public:
     unsigned short m_usModel;
 };
 
-#endif

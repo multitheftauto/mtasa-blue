@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CPLAYERTIMEOUTPACKET_H
-#define __PACKETS_CPLAYERTIMEOUTPACKET_H
+#pragma once
 
 #include "CPacket.h"
 
@@ -24,4 +23,3 @@ public:
     bool Write(NetBitStreamInterface& BitStream) const { return true; };
 };
 
-#endif

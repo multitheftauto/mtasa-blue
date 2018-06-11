@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CVEHICLETRAILERPACKET_H
-#define __PACKETS_CVEHICLETRAILERPACKET_H
+#pragma once
 
 #include "../CVehicle.h"
 #include "../CCommon.h"
@@ -44,4 +43,3 @@ private:
     CVector   m_vecTurnSpeed;
 };
 
-#endif

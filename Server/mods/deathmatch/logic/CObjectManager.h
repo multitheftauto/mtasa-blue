@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __COBJECTMANAGER_H
-#define __COBJECTMANAGER_H
+#pragma once
 
 #include "CObject.h"
 #include <list>
@@ -48,4 +47,3 @@ private:
     CObjectListType m_List;
 };
 
-#endif

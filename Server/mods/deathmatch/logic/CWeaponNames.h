@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CWEAPONNAMES_H
-#define __CWEAPONNAMES_H
+#pragma once
 
 #define NUMBER_OF_WEAPON_NAMES 60
 
@@ -40,4 +39,3 @@ public:
     }
 };
 
-#endif

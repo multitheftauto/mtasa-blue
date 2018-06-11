@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMODMANAGER_H
-#define __CMODMANAGER_H
+#pragma once
 
 class CModManager
 {
@@ -21,5 +20,3 @@ public:
     virtual const char* GetModPath(void) = 0;
     virtual SString     GetAbsolutePath(const char* szRelative) = 0;
 };
-
-#endif

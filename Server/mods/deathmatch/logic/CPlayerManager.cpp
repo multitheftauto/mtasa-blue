@@ -46,7 +46,7 @@ void CPlayerManager::PulseZombieCheck(void)
     {
         CPlayer* pPlayer = *iter;
 
-        if (pPlayer->GetStatus() == STATUS_CONNECTED)
+        if (pPlayer->IsJoined() == false)
         {
             // Remove any players that have been connected for very long (90 sec) but haven't reached the verifying step
             if (pPlayer->GetTimeSinceConnected() > 90000)
@@ -95,14 +95,14 @@ CPlayer* CPlayerManager::Create(const NetServerPlayerID& PlayerSocket)
     return pPlayer;
 }
 
-unsigned int CPlayerManager::CountWithStatus(int iStatus)
+unsigned int CPlayerManager::CountJoined(void)
 {
     // Count each ingame player
     unsigned int                   uiCount = 0;
     list<CPlayer*>::const_iterator iter = m_Players.begin();
     for (; iter != m_Players.end(); iter++)
     {
-        if ((*iter)->GetStatus() == iStatus)
+        if ((*iter)->IsJoined())
         {
             ++uiCount;
         }

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CPLAYERCLOTHESPACKET_H
-#define __PACKETS_CPLAYERCLOTHESPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include "../CPlayerClothes.h"
@@ -40,4 +39,3 @@ private:
     vector<SPlayerClothes*> m_List;
 };
 
-#endif

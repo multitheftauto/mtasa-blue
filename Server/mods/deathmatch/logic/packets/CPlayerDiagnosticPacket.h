@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CPLAYERDIAGNOSTICPACKET_H
-#define __PACKETS_CPLAYERDIAGNOSTICPACKET_H
+#pragma once
 
 class CPlayerDiagnosticPacket : public CPacket
 {
@@ -24,4 +23,3 @@ public:
     SString m_strMessage;
 };
 
-#endif

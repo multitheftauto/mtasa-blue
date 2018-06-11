@@ -76,7 +76,7 @@ CDebugView::CDebugView(CGUI* pManager, const CVector2D& vecPosition) : CChat()
     UpdateGUI();
 }
 
-void CDebugView::Draw(bool bUseCacheTexture)
+void CDebugView::Draw(bool bUseCacheTexture, bool bAllowOutline)
 {
     // Are we visible?
     if (!m_bVisible)
@@ -91,9 +91,11 @@ void CDebugView::Draw(bool bUseCacheTexture)
     CVector2D vecResolution = m_pManager->GetResolution();
     float     height = m_uiNumLines * GetFontHeight(1) * m_vecScale.fY;
     m_vecBackgroundPosition = vecPosition * vecResolution - CVector2D(0, height);
+    m_vecBackgroundPosition.fX = Round(m_vecBackgroundPosition.fX);
+    m_vecBackgroundPosition.fY = Round(m_vecBackgroundPosition.fY);
     m_pBackground->SetPosition(m_vecBackgroundPosition);
 
-    CChat::Draw(bUseCacheTexture);
+    CChat::Draw(bUseCacheTexture, bAllowOutline);
     g_pChat = pChat;
 }
 

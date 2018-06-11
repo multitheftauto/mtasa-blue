@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPLAYERPURESYNCPACKET_H
-#define __CPLAYERPURESYNCPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include "CPlayer.h"
@@ -29,4 +28,3 @@ public:
     bool Write(NetBitStreamInterface& BitStream) const;
 };
 
-#endif

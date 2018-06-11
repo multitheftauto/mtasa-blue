@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CDEBUGECHOPACKET_H
-#define __PACKETS_CDEBUGECHOPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include "../../Config.h"
@@ -45,4 +44,3 @@ private:
     SString       m_strMessage;
 };
 
-#endif
