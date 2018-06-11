@@ -26,13 +26,6 @@ class CPlayer;
 class CKeyBinds;
 class CPlayerCamera;
 
-enum
-{
-    STATUS_CONNECTED,
-    STATUS_VERIFYING,
-    STATUS_JOINED,
-};
-
 enum eVoiceState
 {
     VOICESTATE_IDLE = 0,
@@ -106,12 +99,8 @@ public:
 
     bool IsMuted(void) { return m_bIsMuted; };
     void SetMuted(bool bSetMuted) { m_bIsMuted = bSetMuted; };
-
-    int  GetStatus(void) { return m_iStatus; };
-    void SetStatus(int iStatus) { m_iStatus = iStatus; };
-
-    bool IsIngame(void) { return m_iStatus >= STATUS_VERIFYING; };
-    bool IsJoined(void) { return m_iStatus == STATUS_JOINED; };
+    bool IsJoined(void) { return m_bIsJoined; }
+    void SetJoined(void) { m_bIsJoined = true; }
 
     float GetCameraRotation(void) { return m_fCameraRotation; };
     void  SetCameraRotation(float fRotation) { m_fCameraRotation = fRotation; };
@@ -359,7 +348,7 @@ private:
     unsigned short m_usBitStreamVersion;
     SString        m_strPlayerVersion;
     bool           m_bIsMuted;
-    int            m_iStatus;
+    bool           m_bIsJoined;
 
     bool m_bNametagColorOverridden;
 

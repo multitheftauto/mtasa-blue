@@ -34,14 +34,9 @@ public:
     CPlayer* Create(const NetServerPlayerID& PlayerSocket);
     void     DeleteAll(void);
 
-    unsigned int Count(void)
-    {
-        return static_cast<unsigned int>(m_Players.size());
-        ;
-    };
-    unsigned int CountJoined(void) { return CountWithStatus(STATUS_JOINED); };
-    unsigned int CountWithStatus(int iStatus);
-    bool         Exists(CPlayer* pPlayer);
+    unsigned int Count(void) { return static_cast<unsigned int>(m_Players.size()); }
+    unsigned int CountJoined(void);
+    bool Exists(CPlayer* pPlayer);
 
     CPlayer* Get(const NetServerPlayerID& PlayerSocket);
     CPlayer* Get(const char* szNick, bool bCaseSensitive = false);

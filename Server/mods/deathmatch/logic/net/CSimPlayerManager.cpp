@@ -127,7 +127,7 @@ void CSimPlayerManager::UpdateSimPlayer(CPlayer* pPlayer)
     //
     CVehicle* pVehicle = pPlayer->GetOccupiedVehicle();
 
-    pSim->m_iStatus = pPlayer->GetStatus();
+    pSim->m_bIsJoined = pPlayer->IsJoined();
     pSim->m_usBitStreamVersion = pPlayer->GetBitStreamVersion();
     pSim->m_bHasOccupiedVehicle = pVehicle != NULL;
     pSim->m_PlayerID = pPlayer->GetID();
