@@ -24,6 +24,8 @@ class CClientPed;
 
 #include <multiplayer/CMultiplayer.h>
 #include "CClientPad.h"
+#include <../game_sa/CAnimBlendHierarchySA.h>
+#include <memory>
 
 class CClientCamera;
 class CClientManager;
@@ -116,6 +118,14 @@ struct SRestoreWeaponItem
     eWeaponType         eWeaponID;
 };
 
+class CClientIFP;
+
+struct SReplacedAnimation
+{
+    std::shared_ptr < CClientIFP >   pIFP;
+    CAnimBlendHierarchySAInterface * pAnimationHierarchy;
+};
+
 class CClientObject;
 
 // To hide the ugly "pointer truncation from DWORD* to unsigned long warning
@@ -124,6 +134,7 @@ class CClientObject;
 class CClientPed : public CClientStreamElement, public CAntiCheatModule
 {
     DECLARE_CLASS( CClientPed, CClientStreamElement )
+    typedef std::map < CAnimBlendHierarchySAInterface *, SReplacedAnimation > ReplacedAnim_type;
     friend class CClientCamera;
     friend class CClientPlayer;
     friend class CClientVehicle;
@@ -454,6 +465,32 @@ public:
     CAnimBlendAssociation *     GetAnimation            ( AnimationId id );
     CAnimBlendAssociation *     GetFirstAnimation       ( void );
 
+    inline void                 DereferenceCustomAnimationBlock ( void ) { m_pCustomAnimationIFP = nullptr; }
+    inline std::shared_ptr < CClientIFP > GetCustomAnimationIFP ( void ) { return m_pCustomAnimationIFP; }
+    inline bool                 IsCustomAnimationPlaying        ( void ) { return ( ( m_bRequestedAnimation || m_bLoopAnimation ) && m_pAnimationBlock && m_bisCurrentAnimationCustom ); }
+    inline void                 SetCustomAnimationUntriggerable ( void ) { m_bRequestedAnimation = false; m_bLoopAnimation = false;}
+    inline bool                 IsNextAnimationCustom           ( void ) { return m_bisNextAnimationCustom; }
+    void                        SetNextAnimationCustom          ( const std::shared_ptr < CClientIFP > & pIFP, const SString & strAnimationName );
+    inline void                 SetCurrentAnimationCustom       ( bool bCustom ) { m_bisCurrentAnimationCustom = bCustom; }
+    inline bool                 IsCurrentAnimationCustom        ( void ) { return m_bisCurrentAnimationCustom; }
+    inline CIFPAnimations *     GetIFPAnimationsPointer         ( void ) { return m_pIFPAnimations; }
+    inline void                 SetIFPAnimationsPointer         ( CIFPAnimations * pIFPAnimations ) { m_pIFPAnimations = pIFPAnimations; }
+
+    // This will indicate that we have played custom animation, so next animation can be internal GTA animation
+    // You must call this function after playing a custom animation
+    inline void                 SetNextAnimationNormal          ( void ) { m_bisNextAnimationCustom = false; }
+    inline const SString  &     GetNextAnimationCustomBlockName ( void ) { return m_strCustomIFPBlockName; }
+    inline const SString  &     GetNextAnimationCustomName      ( void ) { return m_strCustomIFPAnimationName; }
+    inline const unsigned int & GetCustomAnimationBlockNameHash ( void ) { return m_u32CustomBlockNameHash; }
+    inline const unsigned int & GetCustomAnimationNameHash      ( void ) { return m_u32CustomAnimationNameHash; }
+
+    void                        ReplaceAnimation                ( CAnimBlendHierarchy * pInternalAnimHierarchy, const std::shared_ptr < CClientIFP > & pIFP, CAnimBlendHierarchySAInterface * pCustomAnimHierarchy );
+    void                        RestoreAnimation                ( CAnimBlendHierarchy * pInternalAnimHierarchy );
+    void                        RestoreAnimations               ( const std::shared_ptr < CClientIFP > & IFP );
+    void                        RestoreAnimations               ( CAnimBlock & animationBlock );
+    void                        RestoreAllAnimations            ( void );
+    SReplacedAnimation *        GetReplacedAnimation            ( CAnimBlendHierarchySAInterface * pInternalHierarchyInterface );
+
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
                                 CClientPed                  ( CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer );
@@ -647,6 +684,21 @@ public:
 
     CVector                     m_vecPrevTargetPosition;
     uint                        m_uiForceLocalCounter;
+
+    // This is checked within AddAnimation and AddAnimationAndSync
+    // It is set to false when custom animation is played.
+    bool                        m_bisNextAnimationCustom;
+    bool                        m_bisCurrentAnimationCustom;
+    SString                     m_strCustomIFPBlockName;
+    SString                     m_strCustomIFPAnimationName;
+    unsigned int                m_u32CustomBlockNameHash;
+    unsigned int                m_u32CustomAnimationNameHash;
+    CIFPAnimations *            m_pIFPAnimations;
+    std::shared_ptr < CClientIFP > m_pCustomAnimationIFP;
+
+    // Key: Internal GTA animation, Value: Custom Animation
+    ReplacedAnim_type m_mapOfReplacedAnimations;
+    mutable std::mutex m_MutexOfReplacedAnimationsMap;
 };
 
 #endif

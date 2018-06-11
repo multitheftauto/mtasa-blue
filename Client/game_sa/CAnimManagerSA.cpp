@@ -256,9 +256,9 @@ CAnimBlendAssociation * CAnimManagerSA::CreateAnimAssociation ( AssocGroupId ani
 }
 
 
-CAnimBlendAssociation * CAnimManagerSA::GetAnimAssociation ( AssocGroupId animGroup, AnimationId animID )
+CAnimManagerSA::StaticAssocIntface_type CAnimManagerSA::GetAnimStaticAssociation ( AssocGroupId animGroup, AnimationId animID )
 {
-    CAnimBlendAssociationSAInterface * pInterface;
+    CAnimBlendStaticAssociationSAInterface * pInterface = nullptr;
     DWORD dwFunc = FUNC_CAnimManager_GetAnimAssociation;
     _asm
     {
@@ -268,7 +268,7 @@ CAnimBlendAssociation * CAnimManagerSA::GetAnimAssociation ( AssocGroupId animGr
         mov     pInterface, eax
         add     esp, 0x8
     }
-    return GetAnimBlendAssociation ( pInterface );
+    return std::make_unique < CAnimBlendStaticAssociationSA > ( pInterface );
 }
 
 
@@ -521,6 +521,16 @@ void CAnimManagerSA::RemoveFromUncompressedCache ( CAnimBlendHierarchy * pHierar
     }
 }
 
+void CAnimManagerSA::RemoveFromUncompressedCache ( CAnimBlendHierarchySAInterface * pHierarchyInterface )
+{
+    DWORD dwFunc = FUNC_CAnimManager_RemoveFromUncompressedCache;
+    _asm
+    {
+        push    pHierarchyInterface
+        call    dwFunc
+        add     esp, 0x4
+    }
+}
 
 void CAnimManagerSA::LoadAnimFile ( const char * szFile )
 {
@@ -564,6 +574,33 @@ void CAnimManagerSA::RemoveLastAnimFile ( void )
     _asm
     {
         call    dwFunc
+    }
+}
+
+
+BYTE * CAnimManagerSA::AllocateKeyFramesMemory ( uint32_t u32BytesToAllocate )
+{
+    BYTE * pKeyFrames = nullptr;
+    DWORD dwFunc = FUNC_CAnimManager_AllocateKeyFramesMemory;
+    _asm
+    {
+        push    u32BytesToAllocate
+        call    dwFunc
+        add     esp, 0x4
+        mov     pKeyFrames, eax
+    }
+    return pKeyFrames;
+}
+
+
+void CAnimManagerSA::FreeKeyFramesMemory ( void * pKeyFrames )
+{
+    DWORD dwFunc = FUNC_CAnimManager_FreeKeyFramesMemory;
+    _asm
+    {
+        push    pKeyFrames
+        call    dwFunc
+        add     esp, 0x4
     }
 }
 
@@ -760,3 +797,24 @@ CAnimBlendHierarchy * CAnimManagerSA::GetAnimBlendHierarchy ( CAnimBlendHierarch
     }
     return NULL;
 }
+
+CAnimManagerSA::StaticAssocIntface_type CAnimManagerSA::GetAnimStaticAssociation ( CAnimBlendStaticAssociationSAInterface * pInterface )
+{
+    return std::make_unique < CAnimBlendStaticAssociationSA > ( pInterface );
+}
+
+std::unique_ptr < CAnimBlendHierarchy > CAnimManagerSA::GetCustomAnimBlendHierarchy ( CAnimBlendHierarchySAInterface * pInterface )
+{
+    return std::make_unique < CAnimBlendHierarchySA > ( pInterface );
+}
+
+std::unique_ptr < CAnimBlendSequence > CAnimManagerSA::GetCustomAnimBlendSequence ( CAnimBlendSequenceSAInterface * pInterface )
+{
+    return std::make_unique < CAnimBlendSequenceSA > ( pInterface );
+}
+
+bool CAnimManagerSA::isGateWayAnimationHierarchy ( CAnimBlendHierarchySAInterface * pInterface )
+{
+    return pGame->GetKeyGen()->GetUppercaseKey ( m_kGateWayAnimationName.c_str ( ) ) == pInterface->iHashKey;
+}
+

@@ -24,6 +24,9 @@
 
 #include "StdInc.h"
 #include <net/SyncStructures.h>
+#include <../Client/game_sa/CAnimBlendAssocGroupSA.h>
+#include <../Client/game_sa/CAnimBlendAssociationSA.h>
+#include <../game_sa/CAnimBlendHierarchySA.h> 
 
 SString StringZeroPadout ( const SString& strInput, uint uiPadoutSize )
 {
@@ -267,8 +270,11 @@ CClientGame::CClientGame ( bool bLocalPlay )
     g_pMultiplayer->SetPostWorldProcessHandler ( CClientGame::StaticPostWorldProcessHandler );
     g_pMultiplayer->SetPreFxRenderHandler ( CClientGame::StaticPreFxRenderHandler );
     g_pMultiplayer->SetPreHudRenderHandler ( CClientGame::StaticPreHudRenderHandler );
+    g_pMultiplayer->SetCAnimBlendAssocDestructorHandler ( CClientGame::StaticCAnimBlendAssocDestructorHandler );
     g_pMultiplayer->SetAddAnimationHandler ( CClientGame::StaticAddAnimationHandler );
-    g_pMultiplayer->SetBlendAnimationHandler ( CClientGame::StaticBlendAnimationHandler );
+    g_pMultiplayer->SetAddAnimationAndSyncHandler ( CClientGame::StaticAddAnimationAndSyncHandler );
+    g_pMultiplayer->SetAssocGroupCopyAnimationHandler ( CClientGame::StaticAssocGroupCopyAnimationHandler );
+    g_pMultiplayer->SetBlendAnimationHierarchyHandler ( CClientGame::StaticBlendAnimationHierarchyHandler );
     g_pMultiplayer->SetProcessCollisionHandler ( CClientGame::StaticProcessCollisionHandler );
     g_pMultiplayer->SetVehicleCollisionHandler( CClientGame::StaticVehicleCollisionHandler );
     g_pMultiplayer->SetVehicleDamageHandler ( CClientGame::StaticVehicleDamageHandler );
@@ -425,8 +431,11 @@ CClientGame::~CClientGame ( void )
     g_pMultiplayer->SetPostWorldProcessHandler (  NULL );
     g_pMultiplayer->SetPreFxRenderHandler ( NULL );
     g_pMultiplayer->SetPreHudRenderHandler ( NULL );
+    g_pMultiplayer->SetCAnimBlendAssocDestructorHandler ( NULL );
     g_pMultiplayer->SetAddAnimationHandler ( NULL );
-    g_pMultiplayer->SetBlendAnimationHandler ( NULL );
+    g_pMultiplayer->SetAddAnimationAndSyncHandler ( NULL );
+    g_pMultiplayer->SetAssocGroupCopyAnimationHandler ( NULL );
+    g_pMultiplayer->SetBlendAnimationHierarchyHandler ( NULL );
     g_pMultiplayer->SetProcessCollisionHandler ( NULL );
     g_pMultiplayer->SetVehicleCollisionHandler( NULL );
     g_pMultiplayer->SetVehicleDamageHandler( NULL );
@@ -3690,14 +3699,29 @@ bool CClientGame::StaticChokingHandler ( unsigned char ucWeaponType )
     return g_pClientGame->ChokingHandler ( ucWeaponType );
 }
 
-void CClientGame::StaticAddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
+void CClientGame::StaticCAnimBlendAssocDestructorHandler ( CAnimBlendAssociationSAInterface * pThis )
 {
-    g_pClientGame->AddAnimationHandler ( pClump, animGroup, animID );
+    g_pClientGame->CAnimBlendAssocDestructorHandler ( pThis );
 }
 
-void CClientGame::StaticBlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
+CAnimBlendAssociationSAInterface * CClientGame::StaticAddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
 {
-    g_pClientGame->BlendAnimationHandler ( pClump, animGroup, animID, fBlendDelta );
+    return g_pClientGame->AddAnimationHandler ( pClump, animGroup, animID );
+}
+
+CAnimBlendAssociationSAInterface * CClientGame::StaticAddAnimationAndSyncHandler ( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID )
+{
+    return g_pClientGame->AddAnimationAndSyncHandler ( pClump, pAnimAssocToSyncWith, animGroup, animID );
+}
+
+bool CClientGame::StaticAssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssoc, CAnimBlendAssociationSAInterface * pAnimAssoc, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID )
+{
+    return g_pClientGame->AssocGroupCopyAnimationHandler ( pOutAnimStaticAssoc, pAnimAssoc, pClump, pAnimAssocGroup, animID );
+}
+
+bool CClientGame::StaticBlendAnimationHierarchyHandler ( CAnimBlendAssociationSAInterface * pAnimAssoc, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, int * pFlags, RpClump * pClump )
+{
+    return g_pClientGame->BlendAnimationHierarchyHandler ( pAnimAssoc, pOutAnimHierarchy, pFlags, pClump );
 }
 
 void CClientGame::StaticPreWorldProcessHandler ( void )
@@ -3982,15 +4006,99 @@ bool CClientGame::ChokingHandler ( unsigned char ucWeaponType )
 }
 
 
-void CClientGame::AddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
+void CClientGame::CAnimBlendAssocDestructorHandler ( CAnimBlendAssociationSAInterface * pThis )
 {
-    //CClientPed * pPed = m_pPedManager->Get ( pClump, true );
+    //printf("CClientGame::CAnimBlendAssocDestructorHandler called! sAnimID: %d\n", pThis->sAnimID);
+    RemoveAnimationAssociationFromMap ( pThis );
 }
 
-void CClientGame::BlendAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta )
-{   
-    //CClientPed * pPed = m_pPedManager->Get ( pClump, true );
+
+CAnimBlendAssociationSAInterface * CClientGame::AddAnimationHandler ( RpClump * pClump, AssocGroupId animGroup, AnimationId animID )
+{
+    //printf ( "AddAnimationHandler called! pClump, GroupID, AnimID: %p, %d, %d\n", (void*)pClump, animGroup, animID );
+    return nullptr;
 }
+
+
+CAnimBlendAssociationSAInterface * CClientGame::AddAnimationAndSyncHandler ( RpClump * pClump, CAnimBlendAssociationSAInterface * pAnimAssocToSyncWith, AssocGroupId animGroup, AnimationId animID )
+{
+    //printf ( "AddAnimationAndSyncHandler called! pClump, GroupID, AnimID: %p, %d, %d\n", (void*)pClump, animGroup, animID );
+    return nullptr;
+}
+
+
+bool CClientGame::AssocGroupCopyAnimationHandler ( CAnimBlendStaticAssociationSAInterface * pOutAnimStaticAssocInterface, CAnimBlendAssociationSAInterface * pAnimAssoc, RpClump * pClump, CAnimBlendAssocGroupSAInterface * pAnimAssocGroup, AnimationId animID )
+{
+    bool isCustomAnimationToPlay = false;
+    CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
+    auto pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( pAnimAssocGroup->groupID, animID );
+    auto pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierachyInterface ( );
+    auto pOutAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation ( pOutAnimStaticAssocInterface );
+    CClientPed * pClientPed =  GetClientPedByClump ( *pClump ); 
+    if ( pClientPed != nullptr )
+    {
+        auto pReplacedAnimation = pClientPed->GetReplacedAnimation ( pOriginalAnimHierarchyInterface );
+        if ( pReplacedAnimation != nullptr )
+        {   
+            std::shared_ptr < CIFPAnimations > pIFPAnimations = pReplacedAnimation->pIFP->GetIFPAnimationsPointer ();
+            InsertAnimationAssociationToMap ( pAnimAssoc, pIFPAnimations );
+               
+            // Play our custom animation instead of default
+            pOutAnimStaticAssoc->Initialize ( pClump, pReplacedAnimation->pAnimationHierarchy );
+            isCustomAnimationToPlay = true;
+        }
+    }
+
+    if ( !isCustomAnimationToPlay )
+    {
+        // Play default internal animation
+        pOutAnimStaticAssoc->Initialize ( pClump, pOriginalAnimHierarchyInterface );
+    }
+
+    CopyStaticAssociationProperties ( pOutAnimStaticAssoc, pOriginalAnimStaticAssoc );
+    return isCustomAnimationToPlay;
+}
+
+
+bool CClientGame::BlendAnimationHierarchyHandler ( CAnimBlendAssociationSAInterface * pAnimAssoc, CAnimBlendHierarchySAInterface ** pOutAnimHierarchy, int * pFlags, RpClump * pClump )
+{   
+    bool isCustomAnimationToPlay = false;
+    CAnimManager * pAnimationManager = g_pGame->GetAnimManager();
+    CClientPed * pClientPed =  GetClientPedByClump ( *pClump ); 
+    if ( pClientPed != nullptr )
+    {
+        if ( pClientPed->IsNextAnimationCustom () )
+        { 
+            std::shared_ptr < CClientIFP > pIFP = pClientPed->GetCustomAnimationIFP ( );
+            if ( pIFP )
+            { 
+                const SString & strAnimationName = pClientPed->GetNextAnimationCustomName ( );
+                auto pCustomAnimBlendHierarchy   = pIFP->GetAnimationHierarchy ( strAnimationName );
+                if ( pCustomAnimBlendHierarchy != nullptr )
+                { 
+                    std::shared_ptr < CIFPAnimations > pIFPAnimations = pIFP->GetIFPAnimationsPointer ( );
+                    InsertAnimationAssociationToMap ( pAnimAssoc, pIFPAnimations );
+
+                    pClientPed->SetCurrentAnimationCustom ( true );
+                    pClientPed->SetNextAnimationNormal ( );
+                
+                    if ( pIFP->IsUnloading ( ) )
+                    {
+                        pClientPed->DereferenceCustomAnimationBlock ();
+                    }
+                    *pOutAnimHierarchy = pCustomAnimBlendHierarchy;
+                    isCustomAnimationToPlay = true;
+                    return isCustomAnimationToPlay;
+                }   
+            }
+        }
+
+        pClientPed->SetCurrentAnimationCustom ( false );
+        pClientPed->SetNextAnimationNormal ( );   
+    }
+    return isCustomAnimationToPlay;
+}
+
 
 bool CClientGame::ProcessCollisionHandler ( CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface )
 {
@@ -6720,4 +6828,121 @@ void CClientGame::RestreamModel ( unsigned short usModel )
     if ( CClientObjectManager::IsValidModel ( usModel ) && CVehicleUpgrades::IsUpgrade ( usModel ) )
         m_pManager->GetVehicleManager ()->RestreamVehicleUpgrades ( usModel );
 
+}
+
+
+void CClientGame::CopyStaticAssociationProperties ( std::unique_ptr < CAnimBlendStaticAssociation > & pOutAnimStaticAssoc, std::unique_ptr < CAnimBlendStaticAssociation > & pOriginalAnimStaticAssoc )
+{
+    pOutAnimStaticAssoc->SetAnimGroup ( pOriginalAnimStaticAssoc->GetAnimGroup ( ) );
+    pOutAnimStaticAssoc->SetAnimID ( pOriginalAnimStaticAssoc->GetAnimID ( ) );
+
+    // Total bones in clump. GTA SA is using 32 bones for peds/players
+    pOutAnimStaticAssoc->SetNumBlendNodes ( pOriginalAnimStaticAssoc->GetNumBlendNodes ( ) );
+    pOutAnimStaticAssoc->SetFlags ( pOriginalAnimStaticAssoc->GetFlags ( ) );
+}
+
+
+void CClientGame::InsertIFPPointerToMap ( const unsigned int u32BlockNameHash, const std::shared_ptr < CClientIFP > & pIFP ) 
+{ 
+    std::lock_guard < std::mutex > mutexGuardedLock ( m_MutexOfIfpPointersMap );
+    m_mapOfIfpPointers [ u32BlockNameHash ] = pIFP; 
+}
+
+
+std::shared_ptr < CClientIFP > CClientGame::GetIFPPointerFromMap ( const unsigned int u32BlockNameHash )
+{
+    std::lock_guard < std::mutex > mutexGuardedLock ( m_MutexOfIfpPointersMap );
+    auto it = m_mapOfIfpPointers.find ( u32BlockNameHash );
+    if ( it != m_mapOfIfpPointers.end ( ) )
+    {
+        return it->second;
+    }
+    return nullptr;
+}
+
+
+void CClientGame::RemoveIFPPointerFromMap ( const unsigned int u32BlockNameHash ) 
+{ 
+    std::lock_guard < std::mutex > mutexGuardedLock ( m_MutexOfIfpPointersMap );
+    m_mapOfIfpPointers.erase ( u32BlockNameHash ); 
+}
+
+
+void  CClientGame::InsertPedPointerToSet ( CClientPed * pPed ) 
+{ 
+    std::lock_guard < std::mutex > mutexGuardedLock ( m_MutexOfPedPointersSet );
+    m_setOfPedPointers.insert ( pPed );
+}
+
+
+void  CClientGame::RemovePedPointerFromSet ( CClientPed * pPed ) 
+{ 
+    std::lock_guard < std::mutex > mutexGuardedLock ( m_MutexOfPedPointersSet );
+    m_setOfPedPointers.erase ( pPed ); 
+}
+
+
+CClientPed * CClientGame::GetClientPedByClump ( const RpClump & Clump )
+{
+    std::lock_guard < std::mutex > mutexGuardedLock ( m_MutexOfPedPointersSet );
+    for ( auto it = m_setOfPedPointers.begin ( ); it != m_setOfPedPointers.end ( ); it++ )
+    {
+        CEntity * pEntity = (*it)->GetGameEntity();
+        if ( pEntity != nullptr )
+        { 
+            if ( pEntity->GetRpClump() != nullptr )
+            { 
+                const RpClump & entityClump = *pEntity->GetRpClump();
+                if ( std::addressof ( entityClump ) == std::addressof ( Clump ) )
+                { 
+                    return *it;
+                }
+            }
+        }
+    }
+    return nullptr;
+}
+
+
+void CClientGame::OnClientIFPUnload ( const std::shared_ptr < CClientIFP > & IFP )
+{   
+    std::lock_guard < std::mutex > mutexGuardedLock ( m_MutexOfPedPointersSet );
+    IFP->MarkAsUnloading ( );
+    for ( auto it = m_setOfPedPointers.begin ( ); it != m_setOfPedPointers.end ( ); it++ )
+    {
+        // Remove IFP animations from replaced animations of peds/players 
+        (*it)->RestoreAnimations ( IFP );
+
+        // Make sure that streamed in pulses or changing model does not accidently
+        // play our custom animation. We can do that by making the custom animation 
+        // untriggerable
+        if ( (*it)->GetCustomAnimationBlockNameHash ( ) == IFP->GetBlockNameHash ( ) )
+        {
+            if ( (*it)->IsCustomAnimationPlaying ( ) )
+            {
+                (*it)->SetCustomAnimationUntriggerable ( );
+            }
+
+            // Important! As we are using a shared_ptr, we need to decrement the reference counter 
+            // by setting the shared_ptr to nullptr, this will avoid memory leak
+            if ( !(*it)->IsNextAnimationCustom ( ) && (*it)->IsCurrentAnimationCustom ( ) )
+            { 
+                (*it)->DereferenceCustomAnimationBlock ();
+            }
+        }
+    }
+}
+
+
+void CClientGame::InsertAnimationAssociationToMap ( CAnimBlendAssociationSAInterface * pAnimAssociation, const std::shared_ptr < CIFPAnimations > & pIFPAnimations )
+{
+    std::lock_guard < std::mutex > mutexGuardedLock ( m_MutexOfAnimationAssociationsMap );
+    m_mapOfCustomAnimationAssociations [ pAnimAssociation ] = pIFPAnimations;
+}
+
+
+void CClientGame::RemoveAnimationAssociationFromMap ( CAnimBlendAssociationSAInterface * pAnimAssociation )
+{
+    std::lock_guard < std::mutex > mutexGuardedLock ( m_MutexOfAnimationAssociationsMap );
+    m_mapOfCustomAnimationAssociations.erase ( pAnimAssociation );
 }

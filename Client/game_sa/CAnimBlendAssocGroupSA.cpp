@@ -19,6 +19,22 @@ CAnimBlendAssocGroupSA::CAnimBlendAssocGroupSA ( CAnimBlendAssocGroupSAInterface
     SetupAnimBlock ();
 }
 
+CAnimBlendAssociationSAInterface * CAnimBlendAssocGroupSA::CopyAnimation ( unsigned int AnimID )
+{
+    CAnimBlendAssociationSAInterface * pAnimAssociationReturn = nullptr;
+    
+    DWORD dwThis = ( DWORD ) m_pInterface;
+    DWORD dwFunc = FUNC_CAnimBlendAssocGroup_CopyAnimation;
+    _asm
+    {
+        mov     ecx, dwThis
+        push    AnimID
+        call    dwFunc
+        mov     pAnimAssociationReturn, eax
+    }
+    return pAnimAssociationReturn;
+}
+
 void CAnimBlendAssocGroupSA::InitEmptyAssociations ( RpClump * pClump )
 {
     DWORD dwThis = ( DWORD ) m_pInterface;

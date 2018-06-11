@@ -1490,7 +1490,6 @@ void CClientEntity::GetEntitiesFromRoot ( unsigned int uiTypeHash, lua_State* lu
     }    
 }
 
-
 #if CHECK_ENTITIES_FROM_ROOT
 
 //

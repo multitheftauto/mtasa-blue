@@ -18,6 +18,7 @@
 #include "Common.h"
 
 #define FUNC_CAnimBlendAssocGroup_InitEmptyAssociations 0x4cdfb0
+#define FUNC_CAnimBlendAssocGroup_CopyAnimation         0x4ce130
 #define FUNC_CAnimBlendAssocGroup_IsCreated             0x4d37a0
 #define FUNC_CAnimBlendAssocGroup_GetNumAnimations      0x45b050
 #define FUNC_CAnimBlendAssocGroup_GetAnimBlock          0x45b060
@@ -45,11 +46,12 @@ class CAnimBlendAssocGroupSA : public CAnimBlendAssocGroup
 public:
                                         CAnimBlendAssocGroupSA  ( CAnimBlendAssocGroupSAInterface * pInterface );
 
+    CAnimBlendAssociationSAInterface *  CopyAnimation           ( unsigned int AnimID );
     void                                InitEmptyAssociations   ( RpClump * pClump );
     bool                                IsCreated               ( void );
     int                                 GetNumAnimations        ( void );
-    CAnimBlock *                        GetAnimBlock            ( void );
-    CAnimBlendStaticAssociation *       GetAnimation            ( unsigned int ID );
+    CAnimBlock                       *  GetAnimBlock            ( void );
+    CAnimBlendStaticAssociation      *  GetAnimation            ( unsigned int ID );
     void                                CreateAssociations      ( const char * szBlockName );
 
     bool                                IsLoaded                ( void );
@@ -58,8 +60,8 @@ public:
 protected:
     void                                SetupAnimBlock          ( void );
 
-    CAnimBlendAssocGroupSAInterface *   m_pInterface;
-    CAnimBlockSA                    *   m_pAnimBlock;
+    CAnimBlendAssocGroupSAInterface  *  m_pInterface;
+    CAnimBlockSA                     *  m_pAnimBlock;
 };
 
 #endif
