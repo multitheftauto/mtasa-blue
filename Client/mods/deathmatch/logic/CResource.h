@@ -86,6 +86,7 @@ public:
     CClientEntity*       GetResourceCOLModelRoot(void) { return m_pResourceCOLRoot; };
     CClientEntity*       GetResourceDFFRoot(void) { return m_pResourceDFFEntity; };
     CClientEntity*       GetResourceTXDRoot(void) { return m_pResourceTXDRoot; };
+    CClientEntity*       GetResourceIFPRoot(void) { return m_pResourceIFPRoot; };
 
     // This is to delete all the elements created in this resource that are created locally in this client
     void DeleteClientChildren(void);
@@ -125,6 +126,7 @@ private:
     class CClientEntity* m_pResourceDFFEntity;
     class CClientEntity* m_pResourceGUIEntity;
     class CClientEntity* m_pResourceTXDRoot;
+    class CClientEntity* m_pResourceIFPRoot;
     unsigned short       m_usRemainingNoClientCacheScripts;
     bool                 m_bLoadAfterReceivingNoClientCacheScripts;
     SString              m_strMinServerReq;

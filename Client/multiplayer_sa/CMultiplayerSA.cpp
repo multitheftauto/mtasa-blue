@@ -17,14 +17,15 @@
 #include "..\game_sa\CBuildingSA.h"
 #include "..\game_sa\CPedSA.h"
 #include "..\game_sa\common.h"
-extern CCoreInterface* g_pCore;
-extern CMultiplayerSA* pMultiplayer;
+
+extern CCoreInterface *g_pCore;
+extern CMultiplayerSA *pMultiplayer;
 
 using namespace std;
 
-char* CMultiplayerSA::ms_PlayerImgCachePtr = NULL;
+char *CMultiplayerSA::ms_PlayerImgCachePtr = NULL;
 
-extern CGame* pGameInterface;
+extern CGame *pGameInterface;
 
 unsigned long CMultiplayerSA::HOOKPOS_FindPlayerCoors;
 unsigned long CMultiplayerSA::HOOKPOS_FindPlayerCentreOfWorld;
@@ -147,10 +148,11 @@ DWORD RETURN_CPlantMgr_Render_fail = 0x5DBDAA;
 #define HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse   0x4BA06F
 DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse = 0x4BA076;
 
+#define HOOKPOS_CAnimBlendAssoc_destructor                  0x4CECF0
+#define HOOKPOS_CAnimBlendAssocGroup_CopyAnimation          0x4CE14C
 #define HOOKPOS_CAnimManager_AddAnimation                   0x4d3aa0
-DWORD RETURN_CAnimManager_AddAnimation = 0x4D3AAA;
-#define HOOKPOS_CAnimManager_BlendAnimation                 0x4D4610
-DWORD RETURN_CAnimManager_BlendAnimation = 0x4D4617;
+#define HOOKPOS_CAnimManager_AddAnimationAndSync            0x4D3B30
+#define HOOKPOS_CAnimManager_BlendAnimation_Hierarchy       0x4D453E
 
 #define HOOKPOS_CPed_GetWeaponSkill                         0x5e3b60
 DWORD RETURN_CPed_GetWeaponSkill = 0x5E3B68;
@@ -160,8 +162,8 @@ DWORD RETURN_CPed_AddGogglesModel = 0x5E3AD4;
 
 #define FUNC_CWorld_Remove                                  0x563280
 #define FUNC_CTagManager_ShutdownForRestart                 0x49CC60
-unsigned int* VAR_NumTags = (unsigned int*)0xA9AD70;
-DWORD**       VAR_TagInfoArray = (DWORD**)0xA9A8C0;
+unsigned int *VAR_NumTags = (unsigned int *)0xA9AD70;
+DWORD **      VAR_TagInfoArray = (DWORD **)0xA9A8C0;
 
 #define HOOKPOS_CPhysical_ProcessCollisionSectorList        0x54BB93
 DWORD RETURN_CPhysical_ProcessCollisionSectorList = 0x54BB9A;
@@ -289,7 +291,7 @@ DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIHeli = FUNC_CAEVehicleAudioEntity__
 DWORD RETURN_CAEVEhicleAudioEntity__ProcessDummyProp = 0x4FDFAB;
 DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIProp = FUNC_CAEVehicleAudioEntity__ProcessAIProp;
 
-CPed*         pContextSwitchedPed = 0;
+CPed *        pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
 FLOAT         fFalseHeading;
 bool          bSetCenterOfWorld;
@@ -327,40 +329,38 @@ CStatsData  localStatsData;
 bool        bLocalStatsStatic = true;
 extern bool bWeaponFire;
 
-PreContextSwitchHandler*    m_pPreContextSwitchHandler = NULL;
-PostContextSwitchHandler*   m_pPostContextSwitchHandler = NULL;
-PreWeaponFireHandler*       m_pPreWeaponFireHandler = NULL;
-PostWeaponFireHandler*      m_pPostWeaponFireHandler = NULL;
-BulletImpactHandler*        m_pBulletImpactHandler = NULL;
-BulletFireHandler*          m_pBulletFireHandler = NULL;
-DamageHandler*              m_pDamageHandler = NULL;
-DeathHandler*               m_pDeathHandler = NULL;
-FireHandler*                m_pFireHandler = NULL;
-ProjectileHandler*          m_pProjectileHandler = NULL;
-ProjectileStopHandler*      m_pProjectileStopHandler = NULL;
-ProcessCamHandler*          m_pProcessCamHandler = NULL;
-ChokingHandler*             m_pChokingHandler = NULL;
-ExplosionHandler*           m_pExplosionHandler = NULL;
-BreakTowLinkHandler*        m_pBreakTowLinkHandler = NULL;
-DrawRadarAreasHandler*      m_pDrawRadarAreasHandler = NULL;
-Render3DStuffHandler*       m_pRender3DStuffHandler = NULL;
-PreWorldProcessHandler*     m_pPreWorldProcessHandler = NULL;
-PostWorldProcessHandler*    m_pPostWorldProcessHandler = NULL;
-IdleHandler*                m_pIdleHandler = NULL;
-PreFxRenderHandler*         m_pPreFxRenderHandler = NULL;
-PreHudRenderHandler*        m_pPreHudRenderHandler = NULL;
-AddAnimationHandler*        m_pAddAnimationHandler = NULL;
-BlendAnimationHandler*      m_pBlendAnimationHandler = NULL;
-ProcessCollisionHandler*    m_pProcessCollisionHandler = NULL;
-VehicleCollisionHandler*    m_pVehicleCollisionHandler = NULL;
-HeliKillHandler*            m_pHeliKillHandler = NULL;
-ObjectDamageHandler*        m_pObjectDamageHandler = NULL;
-ObjectBreakHandler*         m_pObjectBreakHandler = NULL;
-FxSystemDestructionHandler* m_pFxSystemDestructionHandler = NULL;
-DrivebyAnimationHandler*    m_pDrivebyAnimationHandler = NULL;
+PreContextSwitchHandler *   m_pPreContextSwitchHandler = NULL;
+PostContextSwitchHandler *  m_pPostContextSwitchHandler = NULL;
+PreWeaponFireHandler *      m_pPreWeaponFireHandler = NULL;
+PostWeaponFireHandler *     m_pPostWeaponFireHandler = NULL;
+BulletImpactHandler *       m_pBulletImpactHandler = NULL;
+BulletFireHandler *         m_pBulletFireHandler = NULL;
+DamageHandler *             m_pDamageHandler = NULL;
+DeathHandler *              m_pDeathHandler = NULL;
+FireHandler *               m_pFireHandler = NULL;
+ProjectileHandler *         m_pProjectileHandler = NULL;
+ProjectileStopHandler *     m_pProjectileStopHandler = NULL;
+ProcessCamHandler *         m_pProcessCamHandler = NULL;
+ChokingHandler *            m_pChokingHandler = NULL;
+ExplosionHandler *          m_pExplosionHandler = NULL;
+BreakTowLinkHandler *       m_pBreakTowLinkHandler = NULL;
+DrawRadarAreasHandler *     m_pDrawRadarAreasHandler = NULL;
+Render3DStuffHandler *      m_pRender3DStuffHandler = NULL;
+PreWorldProcessHandler *    m_pPreWorldProcessHandler = NULL;
+PostWorldProcessHandler *   m_pPostWorldProcessHandler = NULL;
+IdleHandler *               m_pIdleHandler = NULL;
+PreFxRenderHandler *        m_pPreFxRenderHandler = NULL;
+PreHudRenderHandler *       m_pPreHudRenderHandler = NULL;
+ProcessCollisionHandler *   m_pProcessCollisionHandler = NULL;
+VehicleCollisionHandler *   m_pVehicleCollisionHandler = NULL;
+HeliKillHandler *           m_pHeliKillHandler = NULL;
+ObjectDamageHandler *       m_pObjectDamageHandler = NULL;
+ObjectBreakHandler *        m_pObjectBreakHandler = NULL;
+FxSystemDestructionHandler *m_pFxSystemDestructionHandler = NULL;
+DrivebyAnimationHandler *   m_pDrivebyAnimationHandler = NULL;
 
-CEntitySAInterface* dwSavedPlayerPointer = 0;
-CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active
+CEntitySAInterface *dwSavedPlayerPointer = 0;
+CEntitySAInterface *activeEntityForStreaming = 0;            // the entity that the streaming system considers active
 
 void HOOK_FindPlayerCoors();
 void HOOK_FindPlayerCentreOfWorld();
@@ -412,8 +412,12 @@ void HOOK_RenderScene_Plants();
 void HOOK_RenderScene_end();
 void HOOK_CPlantMgr_Render();
 void HOOK_CEventHandler_ComputeKnockOffBikeResponse();
+void HOOK_CAnimBlendAssoc_Hierarchy_Constructor();
+void HOOK_CAnimBlendAssoc_destructor();
 void HOOK_CAnimManager_AddAnimation();
-void HOOK_CAnimManager_BlendAnimation();
+void HOOK_CAnimManager_AddAnimationAndSync();
+void HOOK_CAnimBlendAssocGroup_CopyAnimation();
+void HOOK_CAnimManager_BlendAnimation_Hierarchy();
 void HOOK_CPed_GetWeaponSkill();
 void HOOK_CPed_AddGogglesModel();
 void HOOK_CPhysical_ProcessCollisionSectorList();
@@ -576,7 +580,7 @@ void CMultiplayerSA::InitHooks()
     MemPutFast<int>(0x8a5a84, 127);
 
     // DISABLE CGameLogic::Update
-    MemSet((void*)0x442AD0, 0xC3, 1);
+    MemSet((void *)0x442AD0, 0xC3, 1);
 
     // STOP IT TRYING TO LOAD THE SCM
     MemPut<BYTE>(0x468EB5, 0xEB);
@@ -627,8 +631,11 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CGame_Process, (DWORD)HOOK_CGame_Process, 10);
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10);
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7);
+    HookInstall(HOOKPOS_CAnimBlendAssoc_destructor, (DWORD)HOOK_CAnimBlendAssoc_destructor, 6);
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
-    HookInstall(HOOKPOS_CAnimManager_BlendAnimation, (DWORD)HOOK_CAnimManager_BlendAnimation, 7);
+    HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
+    HookInstall(HOOKPOS_CAnimBlendAssocGroup_CopyAnimation, (DWORD)HOOK_CAnimBlendAssocGroup_CopyAnimation, 5);
+    HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8);
     HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
     HookInstall(HOOKPOS_CPhysical_ProcessCollisionSectorList, (DWORD)HOOK_CPhysical_ProcessCollisionSectorList, 7);
@@ -730,7 +737,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyProp, (DWORD)HOOK_CAEVehicleAudioEntity__ProcessDummyProp, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
-    MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
+    MemSet((void *)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
 
     // Disable GTA being able to call CAudio::StopRadio ()
     // Well this isn't really CAudio::StopRadio, it's some global class
@@ -935,16 +942,16 @@ void CMultiplayerSA::InitHooks()
     */
 
     // DISABLE PLAYING REPLAYS
-    MemSet((void*)0x460390, 0xC3, 1);
+    MemSet((void *)0x460390, 0xC3, 1);
 
-    MemSet((void*)0x4600F0, 0xC3, 1);
+    MemSet((void *)0x4600F0, 0xC3, 1);
 
-    MemSet((void*)0x45F050, 0xC3, 1);
+    MemSet((void *)0x45F050, 0xC3, 1);
 
     // DISABLE CHEATS
-    MemSet((void*)0x439AF0, 0xC3, 1);
+    MemSet((void *)0x439AF0, 0xC3, 1);
 
-    MemSet((void*)0x438370, 0xC3, 1);
+    MemSet((void *)0x438370, 0xC3, 1);
 
     // DISABLE GARAGES
     MemPut<BYTE>(0x44AA89 + 0, 0xE9);
@@ -993,13 +1000,13 @@ void CMultiplayerSA::InitHooks()
     */
 
     // DISABLE STATS DECREMENTING
-    MemSet((void*)0x559FD5, 0x90, 7);
-    MemSet((void*)0x559FEB, 0x90, 7);
+    MemSet((void *)0x559FD5, 0x90, 7);
+    MemSet((void *)0x559FEB, 0x90, 7);
 
     // DISABLE STATS MESSAGES
-    MemSet((void*)0x55B980, 0xC3, 1);
+    MemSet((void *)0x55B980, 0xC3, 1);
 
-    MemSet((void*)0x559760, 0xC3, 1);
+    MemSet((void *)0x559760, 0xC3, 1);
 
     // ALLOW more than 8 players (crash with more if this isn't done)
     // 0060D64D   90               NOP
@@ -1018,7 +1025,7 @@ void CMultiplayerSA::InitHooks()
     LPVOID patchAddress = NULL;
     // ALLOW ALT+TABBING WITHOUT PAUSING
     // if ( pGameInterface->GetGameVersion() == GAME_VERSION_US ) // won't work as pGameInterface isn't inited
-    if (*(BYTE*)0x748ADD == 0xFF && *(BYTE*)0x748ADE == 0x53)
+    if (*(BYTE *)0x748ADD == 0xFF && *(BYTE *)0x748ADE == 0x53)
         patchAddress = (LPVOID)0x748A8D;
     else
         patchAddress = (LPVOID)0x748ADD;
@@ -1114,7 +1121,7 @@ void CMultiplayerSA::InitHooks()
     006F208D   90               NOP
     */
     MemPut<BYTE>(0x6F2089, 0x58);
-    MemSet((void*)0x6F208A, 0x90, 4);
+    MemSet((void *)0x6F208A, 0x90, 4);
 
     // Prevent the game deleting _any_ far away vehicles - will cause issues for population vehicles in the future
     MemPut<BYTE>(0x42CD10, 0xC3);
@@ -1163,10 +1170,10 @@ void CMultiplayerSA::InitHooks()
     MemPut<BYTE>(0x561FA5, 0x90);
 
     // DISABLE  CWanted__UpdateEachFrame
-    MemSet((void*)0x53BFF6, 0x90, 5);
+    MemSet((void *)0x53BFF6, 0x90, 5);
 
     // DISABLE CWanted__Update
-    MemSet((void*)0x60EBCC, 0x90, 5);
+    MemSet((void *)0x60EBCC, 0x90, 5);
 
     // Disable armour-increase upon entering an enforcer
     MemPut<BYTE>(0x6D189B, 0x06);
@@ -1190,13 +1197,13 @@ void CMultiplayerSA::InitHooks()
     MemPut<BYTE>(0x644C19, 0xE9);
 
     // Stop CPlayerPed::ProcessControl from calling CVisibilityPlugins::SetClumpAlpha
-    MemSet((void*)0x5E8E84, 0x90, 5);
+    MemSet((void *)0x5E8E84, 0x90, 5);
 
     // Stop CVehicle::UpdateClumpAlpha from calling CVisibilityPlugins::SetClumpAlpha
-    MemSet((void*)0x6D29CB, 0x90, 5);
+    MemSet((void *)0x6D29CB, 0x90, 5);
 
     // Disable CVehicle::DoDriveByShootings
-    MemSet((void*)0x741FD0, 0x90, 3);
+    MemSet((void *)0x741FD0, 0x90, 3);
     MemPut<BYTE>(0x741FD0, 0xC3);
 
     // Disable CTaskSimplePlayerOnFoot::PlayIdleAnimations (ret 4)
@@ -1226,7 +1233,7 @@ void CMultiplayerSA::InitHooks()
     MemPut<BYTE>(0x6D1762, 0x00);
 
     // Prevent CVehicle::RecalcTrainRailPosition from changing train speed
-    MemSet((void*)0x6F701D, 0x90, 6);
+    MemSet((void *)0x6F701D, 0x90, 6);
     MemPut<BYTE>(0x6F7069, 0xEB);
 
     // The instanthit function for bullets ignores the first few bullets shot by
@@ -1236,7 +1243,7 @@ void CMultiplayerSA::InitHooks()
     MemPut<BYTE>(0x73FDF9, 0xEB);
 
     // Allow turning on vehicle lights even if the engine is off
-    MemSet((void*)0x6E1DBC, 0x90, 8);
+    MemSet((void *)0x6E1DBC, 0x90, 8);
 
     // Fix vehicle back lights both using light state 3 (SA bug)
     MemPut<BYTE>(0x6E1D4F, 2);
@@ -1248,7 +1255,7 @@ void CMultiplayerSA::InitHooks()
     MemPut<BYTE>(0x5E1E77, 0x90);
 
     // Avoid GTA setting vehicle first color to white after changing the paintjob
-    MemSet((void*)0x6D65C5, 0x90, 11);
+    MemSet((void *)0x6D65C5, 0x90, 11);
 
     // Disable GTA vehicle detachment at rotation awkwardness
     MemPut<BYTE>(0x547441, 0xE9);
@@ -1261,10 +1268,10 @@ void CMultiplayerSA::InitHooks()
     MemPut<BYTE>(0x522C80, 0xC3);
 
     // Ignore camera fade state in rendering routine
-    MemSet((void*)0x53E9C6, 0x90, 6);
+    MemSet((void *)0x53E9C6, 0x90, 6);
 
     // Disable radar map hiding when pressing TAB (action key) while on foot
-    MemSet((void*)0x58FC3E, 0x90, 14);
+    MemSet((void *)0x58FC3E, 0x90, 14);
 
     // No intro movies kthx
     if (version == VERSION_US_10)
@@ -1281,7 +1288,7 @@ void CMultiplayerSA::InitHooks()
     }
 
     // Force triggering of the damage event for players on fire
-    MemSet((void*)0x633695, 0x90, 6);
+    MemSet((void *)0x633695, 0x90, 6);
     MemPut<BYTE>(0x633720, 0);
 
     // Make CCreepingFire::TryToStartFireAtCoors return the fire pointer rather than a bool
@@ -1299,28 +1306,28 @@ void CMultiplayerSA::InitHooks()
     MemPut<BYTE>(0x53A982, 0xEB);
 
     // Disable stealth-kill aiming (holding knife up)
-    MemSet((void*)0x685DFB, 0x90, 5);
+    MemSet((void *)0x685DFB, 0x90, 5);
     MemPut<BYTE>(0x685DFB, 0x33);
     MemPut<BYTE>(0x685DFC, 0xC0);
-    MemSet((void*)0x685C3E, 0x90, 5);
+    MemSet((void *)0x685C3E, 0x90, 5);
     MemPut<BYTE>(0x685C3E, 0x33);
     MemPut<BYTE>(0x685C3F, 0xC0);
-    MemSet((void*)0x685DC4, 0x90, 5);
+    MemSet((void *)0x685DC4, 0x90, 5);
     MemPut<BYTE>(0x685DC4, 0x33);
     MemPut<BYTE>(0x685DC5, 0xC0);
-    MemSet((void*)0x685DE6, 0x90, 5);
+    MemSet((void *)0x685DE6, 0x90, 5);
     MemPut<BYTE>(0x685DE6, 0x33);
     MemPut<BYTE>(0x685DE7, 0xC0);
 
     // #4937, Disable stealth-kill rotation in CTaskSimpleStealthKill::ProcessPed
     // Used to face the dying ped away from the killer.
-    MemSet((void*)0x62E63F, 0x90, 6);
+    MemSet((void *)0x62E63F, 0x90, 6);
     MemPut<BYTE>(0x62E63F, 0xDD);
     MemPut<BYTE>(0x62E640, 0xD8);
-    MemSet((void*)0x62E659, 0x90, 6);
+    MemSet((void *)0x62E659, 0x90, 6);
     MemPut<BYTE>(0x62E659, 0xDD);
     MemPut<BYTE>(0x62E65A, 0xD8);
-    MemSet((void*)0x62E692, 0x90, 6);
+    MemSet((void *)0x62E692, 0x90, 6);
     MemPut<BYTE>(0x62E692, 0xDD);
     MemPut<BYTE>(0x62E693, 0xD8);
 
@@ -1351,21 +1358,21 @@ void CMultiplayerSA::InitHooks()
     MemPut<BYTE>(0x53E94C, 0x00);
 
     // Disable the GTASA main menu.
-    MemSet((void*)0x57BA57, 0x90, 6);
+    MemSet((void *)0x57BA57, 0x90, 6);
 
     // Disable the loading screen tune.
     if (version == VERSION_US_10)
-        MemSet((void*)0x748CF6, 0x90, 5);
+        MemSet((void *)0x748CF6, 0x90, 5);
     else if (version == VERSION_EU_10)
-        MemSet((void*)0x748D46, 0x90, 5);
+        MemSet((void *)0x748D46, 0x90, 5);
 
     // Do not render the loading screen.
-    MemSet((void*)0x590D7C, 0x90, 5);
-    MemSet((void*)0x590DB3, 0x90, 5);
-    MemCpy((void*)0x590D9F, "\xC3\x90\x90\x90\x90", 5);
+    MemSet((void *)0x590D7C, 0x90, 5);
+    MemSet((void *)0x590DB3, 0x90, 5);
+    MemCpy((void *)0x590D9F, "\xC3\x90\x90\x90\x90", 5);
 
     // Disable ped to player conversations.
-    MemSet((void*)0x53C127, 0x90, 10);
+    MemSet((void *)0x53C127, 0x90, 10);
 
 #if 0
     // Mute peds (would break setPedVoice).
@@ -1373,12 +1380,12 @@ void CMultiplayerSA::InitHooks()
 #endif
 
     // Clip camera also outside the world bounds.
-    MemSet((void*)0x41AD12, 0x90, 2);
-    MemSet((void*)0x41ADA7, 0x90, 2);
-    MemSet((void*)0x41ADF3, 0x90, 2);
+    MemSet((void *)0x41AD12, 0x90, 2);
+    MemSet((void *)0x41ADA7, 0x90, 2);
+    MemSet((void *)0x41ADF3, 0x90, 2);
 
     // Allow Player Garages to shut with players inside.
-    MemSet((void*)0x44C6FA, 0x90, 4);
+    MemSet((void *)0x44C6FA, 0x90, 4);
 
     // Stop the loading of ambient traffic models and textures
     // by skipping CStreaming::StreamVehiclesAndPeds() and CStreaming::StreamZoneModels()
@@ -1419,14 +1426,14 @@ void CMultiplayerSA::InitHooks()
 
     // Disable calls to CFireManager::ExtinguishPoint and CWorld::ExtinguishAllCarFiresInArea
     // from CWorld::ClearExcitingStuffFromArea
-    MemSet((void*)0x56A404, 0x90, 0x56A446 - 0x56A404);
+    MemSet((void *)0x56A404, 0x90, 0x56A446 - 0x56A404);
 
     // Disable setting the occupied's vehicles health to 75.0f when a burning ped enters it
     // in CFire::ProcessFire
-    MemSet((void*)0x53A651, 0x90, 0xA);
+    MemSet((void *)0x53A651, 0x90, 0xA);
 
     // Prevent money change (+12$) when entering a taxi/cabbie (fix for #8332)
-    MemSet((void*)0x6D1741, 0x90, 0x6D175F - 0x6D1741);
+    MemSet((void *)0x6D1741, 0x90, 0x6D175F - 0x6D1741);
 
     // Increase intensity of vehicle tail light corona
     MemPut<BYTE>(0x6E1A22, 0xF0);
@@ -1438,14 +1445,14 @@ void CMultiplayerSA::InitHooks()
     MemPut(0x6E594B, &m_fMaddDoggPoolLevel);
     MemPut(0x6E5995, &m_fMaddDoggPoolLevel);
 
-    MemCpy((void*)0x6E5871, "\x40\x74", 2);
-    MemCpy((void*)0x6E58C5, "\x40\x74", 2);
-    MemCpy((void*)0x6E5951, "\x40\x74", 2);
-    MemCpy((void*)0x6E599D, "\x40\x74", 2);
+    MemCpy((void *)0x6E5871, "\x40\x74", 2);
+    MemCpy((void *)0x6E58C5, "\x40\x74", 2);
+    MemCpy((void *)0x6E5951, "\x40\x74", 2);
+    MemCpy((void *)0x6E599D, "\x40\x74", 2);
 
     // Skip vehicle type check in CVehicle::SetupRender & CVehicle::ResetAfterRender (fix for #8158)
-    MemSet((void*)0x6D6517, 0x90, 2);
-    MemSet((void*)0x6D0E43, 0x90, 2);
+    MemSet((void *)0x6D6517, 0x90, 2);
+    MemSet((void *)0x6D0E43, 0x90, 2);
 
     // Fix killing ped during car jacking (#4319)
     // by using CTaskComplexLeaveCar instead of CTaskComplexLeaveCarAndDie
@@ -1453,11 +1460,11 @@ void CMultiplayerSA::InitHooks()
 
     // Disable vehicle audio driver logic so MTA can reimplement it (#9681)
     // Disable updating m_bPlayerDriver in CAEVehicleAudioEntity::Service
-    MemSetFast((void*)0x5023B2, 0x90, 6);
+    MemSetFast((void *)0x5023B2, 0x90, 6);
     // Disable call to CAEVehicleAudioEntity::JustGotInVehicleAsDriver
-    MemSetFast((void*)0x5023E1, 0x90, 5);
+    MemSetFast((void *)0x5023E1, 0x90, 5);
     // Disable call to CAEVehicleAudioEntity::JustGotOutOfVehicleAsDriver
-    MemSetFast((void*)0x502341, 0x90, 5);
+    MemSetFast((void *)0x502341, 0x90, 5);
 
     InitHooks_CrashFixHacks();
 
@@ -1472,17 +1479,17 @@ void CMultiplayerSA::InitHooks()
 
 // Used to store copied pointers for explosions in the FxSystem
 
-std::list<DWORD*> Pointers_FxSystem;
+std::list<DWORD *> Pointers_FxSystem;
 
-void AddFxSystemPointer(DWORD* pPointer)
+void AddFxSystemPointer(DWORD *pPointer)
 {
     Pointers_FxSystem.push_front(pPointer);
 }
 
-void RemoveFxSystemPointer(DWORD* pPointer)
+void RemoveFxSystemPointer(DWORD *pPointer)
 {
     // Look through our list for the pointer
-    std::list<DWORD*>::iterator iter = Pointers_FxSystem.begin();
+    std::list<DWORD *>::iterator iter = Pointers_FxSystem.begin();
     for (; iter != Pointers_FxSystem.end(); ++iter)
     {
         // It exists in our list?
@@ -1498,32 +1505,32 @@ void RemoveFxSystemPointer(DWORD* pPointer)
     }
 }
 
-CRemoteDataStorage* CMultiplayerSA::CreateRemoteDataStorage()
+CRemoteDataStorage *CMultiplayerSA::CreateRemoteDataStorage()
 {
     return new CRemoteDataStorageSA();
 }
 
-void CMultiplayerSA::DestroyRemoteDataStorage(CRemoteDataStorage* pData)
+void CMultiplayerSA::DestroyRemoteDataStorage(CRemoteDataStorage *pData)
 {
-    delete (CRemoteDataStorageSA*)pData;
+    delete (CRemoteDataStorageSA *)pData;
 }
 
-void CMultiplayerSA::AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData)
+void CMultiplayerSA::AddRemoteDataStorage(CPlayerPed *pPed, CRemoteDataStorage *pData)
 {
     CRemoteDataSA::AddRemoteDataStorage(pPed, pData);
 }
 
-CRemoteDataStorage* CMultiplayerSA::GetRemoteDataStorage(CPlayerPed* pPed)
+CRemoteDataStorage *CMultiplayerSA::GetRemoteDataStorage(CPlayerPed *pPed)
 {
     return CRemoteDataSA::GetRemoteDataStorage(pPed);
 }
 
-void CMultiplayerSA::RemoveRemoteDataStorage(CPlayerPed* pPed)
+void CMultiplayerSA::RemoveRemoteDataStorage(CPlayerPed *pPed)
 {
     CRemoteDataSA::RemoveRemoteDataStorage(pPed);
 }
 
-CPed* CMultiplayerSA::GetContextSwitchedPed(void)
+CPed *CMultiplayerSA::GetContextSwitchedPed(void)
 {
     return pContextSwitchedPed;
 }
@@ -1548,7 +1555,7 @@ void CMultiplayerSA::AllowWindowsCursorShowing(bool bAllow)
     }
 }
 
-CShotSyncData* CMultiplayerSA::GetLocalShotSyncData()
+CShotSyncData *CMultiplayerSA::GetLocalShotSyncData()
 {
     return GetLocalPedShotSyncData();
 }
@@ -1562,20 +1569,20 @@ void CMultiplayerSA::DisablePadHandler(bool bDisabled)
         MemPut<BYTE>(0x7449F0, 0x8B);
 }
 
-void CMultiplayerSA::GetHeatHaze(SHeatHazeSettings& settings)
+void CMultiplayerSA::GetHeatHaze(SHeatHazeSettings &settings)
 {
-    settings.ucIntensity = *(int*)0x8D50E8;
-    settings.ucRandomShift = *(int*)0xC402C0;
-    settings.usSpeedMin = *(int*)0x8D50EC;
-    settings.usSpeedMax = *(int*)0x8D50F0;
-    settings.sScanSizeX = *(int*)0xC40304;
-    settings.sScanSizeY = *(int*)0xC40308;
-    settings.usRenderSizeX = *(int*)0xC4030C;
-    settings.usRenderSizeY = *(int*)0xC40310;
-    settings.bInsideBuilding = *(bool*)0xC402BA;
+    settings.ucIntensity = *(int *)0x8D50E8;
+    settings.ucRandomShift = *(int *)0xC402C0;
+    settings.usSpeedMin = *(int *)0x8D50EC;
+    settings.usSpeedMax = *(int *)0x8D50F0;
+    settings.sScanSizeX = *(int *)0xC40304;
+    settings.sScanSizeY = *(int *)0xC40308;
+    settings.usRenderSizeX = *(int *)0xC4030C;
+    settings.usRenderSizeY = *(int *)0xC40310;
+    settings.bInsideBuilding = *(bool *)0xC402BA;
 }
 
-void DoSetHeatHazePokes(const SHeatHazeSettings& settings, int iHourStart, int iHourEnd, float fFadeSpeed, float fInsideBuildingFadeSpeed,
+void DoSetHeatHazePokes(const SHeatHazeSettings &settings, int iHourStart, int iHourEnd, float fFadeSpeed, float fInsideBuildingFadeSpeed,
                         bool bAllowAutoTypeChange)
 {
     MemPutFast<int>(0x8D50D4, iHourStart);
@@ -1600,7 +1607,7 @@ void DoSetHeatHazePokes(const SHeatHazeSettings& settings, int iHourStart, int i
         MemPut<BYTE>(0x701455, 0xC3);            // retn
 }
 
-void CMultiplayerSA::SetHeatHaze(const SHeatHazeSettings& settings)
+void CMultiplayerSA::SetHeatHaze(const SHeatHazeSettings &settings)
 {
     if (settings.ucIntensity != 0)
         DoSetHeatHazePokes(settings, 0, 24, 1.0f, 1.0f, false);            // 24 hrs
@@ -1739,14 +1746,14 @@ void CMultiplayerSA::SetInteriorFurnitureEnabled(char cRoomId, bool bEnabled)
 
     if (bEnabled)
     {
-        MemCpy((void*)originalCodeAddresses[cRoomId], &originalCodes[cRoomId], 5);
+        MemCpy((void *)originalCodeAddresses[cRoomId], &originalCodes[cRoomId], 5);
 
         if (cRoomId == 0)
             MemPut<BYTE>(0x593CFD, 0x50);
     }
     else
     {
-        MemSet((void*)originalCodeAddresses[cRoomId], 0x90, 5);
+        MemSet((void *)originalCodeAddresses[cRoomId], 0x90, 5);
 
         if (cRoomId == 0)
             MemPut<BYTE>(0x593CFD, 0x90);
@@ -1778,11 +1785,11 @@ void CMultiplayerSA::SetWindVelocity(float fX, float fY, float fZ)
     MemPutFast<float>(0xC813E8, fZ);
 }
 
-void CMultiplayerSA::GetWindVelocity(float& fX, float& fY, float& fZ)
+void CMultiplayerSA::GetWindVelocity(float &fX, float &fY, float &fZ)
 {
-    fX = *(float*)0xC813E0;
-    fY = *(float*)0xC813E4;
-    fZ = *(float*)0xC813E8;
+    fX = *(float *)0xC813E0;
+    fY = *(float *)0xC813E4;
+    fZ = *(float *)0xC813E8;
 }
 
 void CMultiplayerSA::RestoreWindVelocity(void)
@@ -1804,13 +1811,13 @@ void CMultiplayerSA::RestoreWindVelocity(void)
 
 float CMultiplayerSA::GetFarClipDistance()
 {
-    return *(float*)0xB7C4F0;
+    return *(float *)0xB7C4F0;
 }
 
 void CMultiplayerSA::SetFarClipDistance(float fDistance)
 {
     BYTE newFstp[3] = {0xDD, 0xD8, 0x90};
-    if (*(BYTE*)0x55FCC8 != newFstp[0])
+    if (*(BYTE *)0x55FCC8 != newFstp[0])
     {
         MemCpy((LPVOID)0x55FCC8, &newFstp, 3);
         MemCpy((LPVOID)0x5613A3, &newFstp, 3);
@@ -1826,7 +1833,7 @@ void CMultiplayerSA::SetFarClipDistance(float fDistance)
 void CMultiplayerSA::RestoreFarClipDistance()
 {
     BYTE originalFstp[3] = {0xD9, 0x5E, 0x50};
-    if (*(BYTE*)0x55FCC8 != originalFstp[0])
+    if (*(BYTE *)0x55FCC8 != originalFstp[0])
     {
         MemCpy((LPVOID)0x55FCC8, &originalFstp, 3);
         MemCpy((LPVOID)0x5613A3, &originalFstp, 3);
@@ -1854,13 +1861,13 @@ void CMultiplayerSA::RestoreNearClipDistance(void)
 
 float CMultiplayerSA::GetFogDistance()
 {
-    return *(float*)0xB7C4F4;
+    return *(float *)0xB7C4F4;
 }
 
 void CMultiplayerSA::SetFogDistance(float fDistance)
 {
     BYTE newFstp[3] = {0xDD, 0xD8, 0x90};
-    if (*(BYTE*)0x55FCDB != newFstp[0])
+    if (*(BYTE *)0x55FCDB != newFstp[0])
     {
         MemCpy((LPVOID)0x55FCDB, &newFstp, 3);
         MemCpy((LPVOID)0x560D60, &newFstp, 3);
@@ -1872,23 +1879,23 @@ void CMultiplayerSA::SetFogDistance(float fDistance)
 void CMultiplayerSA::RestoreFogDistance()
 {
     BYTE originalFstp[3] = {0xD9, 0x5E, 0x54};
-    if (*(BYTE*)0x55FCDB != originalFstp[0])
+    if (*(BYTE *)0x55FCDB != originalFstp[0])
     {
         MemCpy((LPVOID)0x55FCDB, &originalFstp, 3);
         MemCpy((LPVOID)0x560D60, &originalFstp, 3);
     }
 }
 
-void CMultiplayerSA::GetSunColor(unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed,
-                                 unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue)
+void CMultiplayerSA::GetSunColor(unsigned char &ucCoreRed, unsigned char &ucCoreGreen, unsigned char &ucCoreBlue, unsigned char &ucCoronaRed,
+                                 unsigned char &ucCoronaGreen, unsigned char &ucCoronaBlue)
 {
-    ucCoreRed = *(BYTE*)0xB7C4D0;
-    ucCoreGreen = *(BYTE*)0xB7C4D2;
-    ucCoreBlue = *(BYTE*)0xB7C4D4;
+    ucCoreRed = *(BYTE *)0xB7C4D0;
+    ucCoreGreen = *(BYTE *)0xB7C4D2;
+    ucCoreBlue = *(BYTE *)0xB7C4D4;
 
-    ucCoronaRed = *(BYTE*)0xB7C4D6;
-    ucCoronaGreen = *(BYTE*)0xB7C4D8;
-    ucCoronaBlue = *(BYTE*)0xB7C4DA;
+    ucCoronaRed = *(BYTE *)0xB7C4D6;
+    ucCoronaGreen = *(BYTE *)0xB7C4D8;
+    ucCoronaBlue = *(BYTE *)0xB7C4DA;
 }
 
 void CMultiplayerSA::SetSunColor(unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed,
@@ -1931,7 +1938,7 @@ void CMultiplayerSA::ResetSunColor()
 
 float CMultiplayerSA::GetSunSize()
 {
-    return *(float*)0xB7C4DC / 10;
+    return *(float *)0xB7C4DC / 10;
 }
 
 void CMultiplayerSA::SetSunSize(float fSize)
@@ -1986,8 +1993,8 @@ bool CMultiplayerSA::HasSkyColor()
     return bUsingCustomSkyGradient;
 }
 
-void CMultiplayerSA::GetSkyColor(unsigned char& TopRed, unsigned char& TopGreen, unsigned char& TopBlue, unsigned char& BottomRed, unsigned char& BottomGreen,
-                                 unsigned char& BottomBlue)
+void CMultiplayerSA::GetSkyColor(unsigned char &TopRed, unsigned char &TopGreen, unsigned char &TopBlue, unsigned char &BottomRed, unsigned char &BottomGreen,
+                                 unsigned char &BottomBlue)
 {
     if (HasSkyColor())
     {
@@ -2001,13 +2008,13 @@ void CMultiplayerSA::GetSkyColor(unsigned char& TopRed, unsigned char& TopGreen,
     }
     else
     {
-        TopRed = *(BYTE*)0xB7C4C4;
-        TopGreen = *(BYTE*)0xB7C4C6;
-        TopBlue = *(BYTE*)0xB7C4C8;
+        TopRed = *(BYTE *)0xB7C4C4;
+        TopGreen = *(BYTE *)0xB7C4C6;
+        TopBlue = *(BYTE *)0xB7C4C8;
 
-        BottomRed = *(BYTE*)0xB7C4CA;
-        BottomGreen = *(BYTE*)0xB7C4CC;
-        BottomBlue = *(BYTE*)0xB7C4CE;
+        BottomRed = *(BYTE *)0xB7C4CA;
+        BottomGreen = *(BYTE *)0xB7C4CC;
+        BottomBlue = *(BYTE *)0xB7C4CE;
     }
 }
 
@@ -2035,7 +2042,7 @@ void CMultiplayerSA::SetMoonSize(int iSize)
 
 int CMultiplayerSA::GetMoonSize()
 {
-    return *(BYTE*)0x8D4B60;
+    return *(BYTE *)0x8D4B60;
 }
 
 void CMultiplayerSA::ResetMoonSize()
@@ -2049,7 +2056,7 @@ bool CMultiplayerSA::HasWaterColor()
     return bUsingCustomWaterColor;
 }
 
-void CMultiplayerSA::GetWaterColor(float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha)
+void CMultiplayerSA::GetWaterColor(float &fWaterRed, float &fWaterGreen, float &fWaterBlue, float &fWaterAlpha)
 {
     if (HasWaterColor())
     {
@@ -2060,10 +2067,10 @@ void CMultiplayerSA::GetWaterColor(float& fWaterRed, float& fWaterGreen, float& 
     }
     else
     {
-        fWaterRed = *(float*)0xB7C508;
-        fWaterGreen = *(float*)0xB7C50C;
-        fWaterBlue = *(float*)0xB7C510;
-        fWaterAlpha = *(float*)0xB7C514;
+        fWaterRed = *(float *)0xB7C508;
+        fWaterGreen = *(float *)0xB7C50C;
+        fWaterBlue = *(float *)0xB7C510;
+        fWaterAlpha = *(float *)0xB7C514;
     }
 }
 
@@ -2104,127 +2111,117 @@ void CMultiplayerSA::DisableExplosions(bool bDisabled)
     m_bExplosionsDisabled = bDisabled;
 }
 
-void CMultiplayerSA::SetExplosionHandler(ExplosionHandler* pExplosionHandler)
+void CMultiplayerSA::SetExplosionHandler(ExplosionHandler *pExplosionHandler)
 {
     m_pExplosionHandler = pExplosionHandler;
 }
 
-void CMultiplayerSA::SetProjectileHandler(ProjectileHandler* pProjectileHandler)
+void CMultiplayerSA::SetProjectileHandler(ProjectileHandler *pProjectileHandler)
 {
     m_pProjectileHandler = pProjectileHandler;
 }
 
-void CMultiplayerSA::SetProjectileStopHandler(ProjectileStopHandler* pProjectileHandler)
+void CMultiplayerSA::SetProjectileStopHandler(ProjectileStopHandler *pProjectileHandler)
 {
     m_pProjectileStopHandler = pProjectileHandler;
 }
 
-void CMultiplayerSA::SetBreakTowLinkHandler(BreakTowLinkHandler* pBreakTowLinkHandler)
+void CMultiplayerSA::SetBreakTowLinkHandler(BreakTowLinkHandler *pBreakTowLinkHandler)
 {
     m_pBreakTowLinkHandler = pBreakTowLinkHandler;
 }
 
-void CMultiplayerSA::SetDrawRadarAreasHandler(DrawRadarAreasHandler* pRadarAreasHandler)
+void CMultiplayerSA::SetDrawRadarAreasHandler(DrawRadarAreasHandler *pRadarAreasHandler)
 {
     m_pDrawRadarAreasHandler = pRadarAreasHandler;
 }
 
-void CMultiplayerSA::SetRender3DStuffHandler(Render3DStuffHandler* pHandler)
+void CMultiplayerSA::SetRender3DStuffHandler(Render3DStuffHandler *pHandler)
 {
     m_pRender3DStuffHandler = pHandler;
 }
 
-void CMultiplayerSA::SetDamageHandler(DamageHandler* pDamageHandler)
+void CMultiplayerSA::SetDamageHandler(DamageHandler *pDamageHandler)
 {
     m_pDamageHandler = pDamageHandler;
 }
 
-void CMultiplayerSA::SetDeathHandler(DeathHandler* pDeathHandler)
+void CMultiplayerSA::SetDeathHandler(DeathHandler *pDeathHandler)
 {
     m_pDeathHandler = pDeathHandler;
 }
 
-void CMultiplayerSA::SetFireHandler(FireHandler* pFireHandler)
+void CMultiplayerSA::SetFireHandler(FireHandler *pFireHandler)
 {
     m_pFireHandler = pFireHandler;
 }
 
-void CMultiplayerSA::SetProcessCamHandler(ProcessCamHandler* pProcessCamHandler)
+void CMultiplayerSA::SetProcessCamHandler(ProcessCamHandler *pProcessCamHandler)
 {
     m_pProcessCamHandler = pProcessCamHandler;
 }
 
-void CMultiplayerSA::SetChokingHandler(ChokingHandler* pChokingHandler)
+void CMultiplayerSA::SetChokingHandler(ChokingHandler *pChokingHandler)
 {
     m_pChokingHandler = pChokingHandler;
 }
 
-void CMultiplayerSA::SetPreWorldProcessHandler(PreWorldProcessHandler* pHandler)
+void CMultiplayerSA::SetPreWorldProcessHandler(PreWorldProcessHandler *pHandler)
 {
     m_pPreWorldProcessHandler = pHandler;
 }
 
-void CMultiplayerSA::SetPostWorldProcessHandler(PostWorldProcessHandler* pHandler)
+void CMultiplayerSA::SetPostWorldProcessHandler(PostWorldProcessHandler *pHandler)
 {
     m_pPostWorldProcessHandler = pHandler;
 }
 
-void CMultiplayerSA::SetIdleHandler(IdleHandler* pHandler)
+void CMultiplayerSA::SetIdleHandler(IdleHandler *pHandler)
 {
     m_pIdleHandler = pHandler;
 }
 
-void CMultiplayerSA::SetPreFxRenderHandler(PreFxRenderHandler* pHandler)
+void CMultiplayerSA::SetPreFxRenderHandler(PreFxRenderHandler *pHandler)
 {
     m_pPreFxRenderHandler = pHandler;
 }
 
-void CMultiplayerSA::SetPreHudRenderHandler(PreHudRenderHandler* pHandler)
+void CMultiplayerSA::SetPreHudRenderHandler(PreHudRenderHandler *pHandler)
 {
     m_pPreHudRenderHandler = pHandler;
 }
 
-void CMultiplayerSA::SetAddAnimationHandler(AddAnimationHandler* pHandler)
-{
-    m_pAddAnimationHandler = pHandler;
-}
-
-void CMultiplayerSA::SetBlendAnimationHandler(BlendAnimationHandler* pHandler)
-{
-    m_pBlendAnimationHandler = pHandler;
-}
-
-void CMultiplayerSA::SetProcessCollisionHandler(ProcessCollisionHandler* pHandler)
+void CMultiplayerSA::SetProcessCollisionHandler(ProcessCollisionHandler *pHandler)
 {
     m_pProcessCollisionHandler = pHandler;
 }
 
-void CMultiplayerSA::SetVehicleCollisionHandler(VehicleCollisionHandler* pHandler)
+void CMultiplayerSA::SetVehicleCollisionHandler(VehicleCollisionHandler *pHandler)
 {
     m_pVehicleCollisionHandler = pHandler;
 }
 
-void CMultiplayerSA::SetHeliKillHandler(HeliKillHandler* pHandler)
+void CMultiplayerSA::SetHeliKillHandler(HeliKillHandler *pHandler)
 {
     m_pHeliKillHandler = pHandler;
 }
 
-void CMultiplayerSA::SetObjectDamageHandler(ObjectDamageHandler* pHandler)
+void CMultiplayerSA::SetObjectDamageHandler(ObjectDamageHandler *pHandler)
 {
     m_pObjectDamageHandler = pHandler;
 }
 
-void CMultiplayerSA::SetObjectBreakHandler(ObjectBreakHandler* pHandler)
+void CMultiplayerSA::SetObjectBreakHandler(ObjectBreakHandler *pHandler)
 {
     m_pObjectBreakHandler = pHandler;
 }
 
-void CMultiplayerSA::SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler)
+void CMultiplayerSA::SetFxSystemDestructionHandler(FxSystemDestructionHandler *pHandler)
 {
     m_pFxSystemDestructionHandler = pHandler;
 }
 
-void CMultiplayerSA::SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler)
+void CMultiplayerSA::SetDrivebyAnimationHandler(DrivebyAnimationHandler *pHandler)
 {
     m_pDrivebyAnimationHandler = pHandler;
 }
@@ -2251,7 +2248,7 @@ void CMultiplayerSA::AllowMouseMovement(bool bAllow)
 void CMultiplayerSA::DoSoundHacksOnLostFocus(bool bLostFocus)
 {
     if (bLostFocus)
-        MemSet((void*)0x4D9888, 0x90, 5);
+        MemSet((void *)0x4D9888, 0x90, 5);
     else
     {
         // 004D9888   . E8 03 F1 FF FF    CALL gta_sa_u.004D8990
@@ -2263,7 +2260,7 @@ void CMultiplayerSA::DoSoundHacksOnLostFocus(bool bLostFocus)
     }
 }
 
-void CMultiplayerSA::SetCenterOfWorld(CEntity* entity, CVector* vecPosition, FLOAT fHeading)
+void CMultiplayerSA::SetCenterOfWorld(CEntity *entity, CVector *vecPosition, FLOAT fHeading)
 {
     if (vecPosition)
     {
@@ -2275,7 +2272,7 @@ void CMultiplayerSA::SetCenterOfWorld(CEntity* entity, CVector* vecPosition, FLO
 
         if (entity)
         {
-            CEntitySA* pEntitySA = dynamic_cast<CEntitySA*>(entity);
+            CEntitySA *pEntitySA = dynamic_cast<CEntitySA *>(entity);
             if (pEntitySA)
                 activeEntityForStreaming = pEntitySA->GetInterface();
         }
@@ -2558,9 +2555,9 @@ no_render:
     }
 }
 
-bool CallBreakTowLinkHandler(CVehicleSAInterface* vehicle)
+bool CallBreakTowLinkHandler(CVehicleSAInterface *vehicle)
 {
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)vehicle);
+    CVehicle *pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD *)vehicle);
     if (pVehicle && m_pBreakTowLinkHandler)
     {
         return m_pBreakTowLinkHandler(pVehicle);
@@ -2584,7 +2581,7 @@ void _declspec(naked) HOOK_CRadar__DrawRadarGangOverlay()
     }
 }
 
-CVehicleSAInterface* towingVehicle;
+CVehicleSAInterface *towingVehicle;
 
 void _declspec(naked) HOOK_Trailer_BreakTowLink()
 {
@@ -2626,10 +2623,10 @@ DWORD          explosionEntity = 0;
 bool CallExplosionHandler(void)
 {
     // Find out who the creator is
-    CEntity*            pExplosionCreator = NULL;
-    CEntity*            pExplodingEntity = NULL;
-    CEntitySAInterface* pInterface = (CEntitySAInterface*)explosionCreator;
-    CEntitySAInterface* pExplodingEntityInterface = (CEntitySAInterface*)explosionEntity;
+    CEntity *           pExplosionCreator = NULL;
+    CEntity *           pExplodingEntity = NULL;
+    CEntitySAInterface *pInterface = (CEntitySAInterface *)explosionCreator;
+    CEntitySAInterface *pExplodingEntityInterface = (CEntitySAInterface *)explosionEntity;
 
     if (pInterface)
     {
@@ -2638,19 +2635,19 @@ bool CallExplosionHandler(void)
         {
             case ENTITY_TYPE_PED:
             {
-                pExplosionCreator = pGameInterface->GetPools()->GetPed((DWORD*)pInterface);
+                pExplosionCreator = pGameInterface->GetPools()->GetPed((DWORD *)pInterface);
                 break;
             }
 
             case ENTITY_TYPE_VEHICLE:
             {
-                pExplosionCreator = pGameInterface->GetPools()->GetVehicle((DWORD*)pInterface);
+                pExplosionCreator = pGameInterface->GetPools()->GetVehicle((DWORD *)pInterface);
                 break;
             }
 
             case ENTITY_TYPE_OBJECT:
             {
-                pExplosionCreator = pGameInterface->GetPools()->GetObject((DWORD*)pInterface);
+                pExplosionCreator = pGameInterface->GetPools()->GetObject((DWORD *)pInterface);
                 break;
             }
         }
@@ -2663,19 +2660,19 @@ bool CallExplosionHandler(void)
         {
             case ENTITY_TYPE_PED:
             {
-                pExplodingEntity = dynamic_cast<CEntity*>(pGameInterface->GetPools()->GetPed((DWORD*)pExplodingEntityInterface));
+                pExplodingEntity = dynamic_cast<CEntity *>(pGameInterface->GetPools()->GetPed((DWORD *)pExplodingEntityInterface));
                 break;
             }
 
             case ENTITY_TYPE_VEHICLE:
             {
-                pExplodingEntity = dynamic_cast<CEntity*>(pGameInterface->GetPools()->GetVehicle((DWORD*)pExplodingEntityInterface));
+                pExplodingEntity = dynamic_cast<CEntity *>(pGameInterface->GetPools()->GetVehicle((DWORD *)pExplodingEntityInterface));
                 break;
             }
 
             case ENTITY_TYPE_OBJECT:
             {
-                pExplodingEntity = pGameInterface->GetPools()->GetObject((DWORD*)pExplodingEntityInterface);
+                pExplodingEntity = pGameInterface->GetPools()->GetObject((DWORD *)pExplodingEntityInterface);
                 break;
             }
         }
@@ -2781,10 +2778,10 @@ dontclear:
     }
 }
 
-CEntitySAInterface* entity;
-float*              entityEdgeHeight;
+CEntitySAInterface *entity;
+float *             entityEdgeHeight;
 float               edgeHeight;
-CVector*            pedPosition;
+CVector *           pedPosition;
 
 bool processGrab()
 {
@@ -2840,9 +2837,9 @@ void _declspec(naked) HOOK_CTaskComplexJump__CreateSubTask()
     }
 }
 
-char*  szCreateFxSystem_ExplosionType = 0;
-DWORD* pCreateFxSystem_Matrix = 0;
-DWORD* pNewCreateFxSystem_Matrix = 0;
+char * szCreateFxSystem_ExplosionType = 0;
+DWORD *pCreateFxSystem_Matrix = 0;
+DWORD *pNewCreateFxSystem_Matrix = 0;
 
 void _declspec(naked) HOOK_FxManager_CreateFxSystem()
 {
@@ -2864,7 +2861,7 @@ void _declspec(naked) HOOK_FxManager_CreateFxSystem()
     if (pCreateFxSystem_Matrix != 0 && strncmp(szCreateFxSystem_ExplosionType, "explosion", 9) == 0)
     {
         // Copy the matrix so we don't crash if the owner of this matrix is deleted
-        pNewCreateFxSystem_Matrix = (DWORD*)malloc(64);
+        pNewCreateFxSystem_Matrix = (DWORD *)malloc(64);
         MemCpyFast(pNewCreateFxSystem_Matrix, pCreateFxSystem_Matrix, 64);
 
         // Add it to the list over FxSystem matrices we've copied
@@ -2881,11 +2878,11 @@ void _declspec(naked) HOOK_FxManager_CreateFxSystem()
         // Restore the registers
         popad
 
-            // Put the new vector back onto the stack
+        // Put the new vector back onto the stack
         mov         eax, pNewCreateFxSystem_Matrix
         mov         [esp+12], eax
 
-            // The original code we replaced
+        // The original code we replaced
         mov         eax, [esp+16]
         mov         edx, [esp+8]
 
@@ -2895,7 +2892,7 @@ void _declspec(naked) HOOK_FxManager_CreateFxSystem()
 }
 
 DWORD  dwDestroyFxSystem_Pointer = 0;
-DWORD* pDestroyFxSystem_Matrix = 0;
+DWORD *pDestroyFxSystem_Matrix = 0;
 
 void _declspec(naked) HOOK_FxManager_DestroyFxSystem()
 {
@@ -2910,7 +2907,7 @@ void _declspec(naked) HOOK_FxManager_DestroyFxSystem()
     }
 
     // Grab the matrix pointer in it
-    pDestroyFxSystem_Matrix = *((DWORD**)(dwDestroyFxSystem_Pointer + 12));
+    pDestroyFxSystem_Matrix = *((DWORD **)(dwDestroyFxSystem_Pointer + 12));
 
     // Delete it if it's in our list
     RemoveFxSystemPointer(pDestroyFxSystem_Matrix);
@@ -2920,7 +2917,7 @@ void _declspec(naked) HOOK_FxManager_DestroyFxSystem()
         // Restore the registers
         popad
 
-            // The original code we replaced
+        // The original code we replaced
         push        ecx
         push        ebx
         push        edi
@@ -2931,9 +2928,9 @@ void _declspec(naked) HOOK_FxManager_DestroyFxSystem()
     }
 }
 
-bool CCam_ProcessFixed(class CCamSAInterface* pCamInterface)
+bool CCam_ProcessFixed(class CCamSAInterface *pCamInterface)
 {
-    CCam* pCam = static_cast<CCameraSA*>(pGameInterface->GetCamera())->GetCam(pCamInterface);
+    CCam *pCam = static_cast<CCameraSA *>(pGameInterface->GetCamera())->GetCam(pCamInterface);
 
     if (m_pProcessCamHandler && pCam)
     {
@@ -2942,7 +2939,7 @@ bool CCam_ProcessFixed(class CCamSAInterface* pCamInterface)
     return false;
 }
 
-CCamSAInterface* CCam_ProcessFixed_pCam;
+CCamSAInterface *CCam_ProcessFixed_pCam;
 
 void _declspec(naked) HOOK_CCam_ProcessFixed()
 {
@@ -2987,16 +2984,16 @@ void _declspec(naked) HOOK_Render3DStuff()
     }
 }
 
-CPedSAInterface* pProcessPlayerWeaponPed = NULL;
+CPedSAInterface *pProcessPlayerWeaponPed = NULL;
 bool             ProcessPlayerWeapon()
 {
     if (IsLocalPlayer(pProcessPlayerWeaponPed))
         return true;
 
-    CPlayerPed* pPed = dynamic_cast<CPlayerPed*>(pGameInterface->GetPools()->GetPed((DWORD*)pProcessPlayerWeaponPed));
+    CPlayerPed *pPed = dynamic_cast<CPlayerPed *>(pGameInterface->GetPools()->GetPed((DWORD *)pProcessPlayerWeaponPed));
     if (pPed)
     {
-        CRemoteDataStorageSA* pData = CRemoteDataSA::GetRemoteDataStorage(pPed);
+        CRemoteDataStorageSA *pData = CRemoteDataSA::GetRemoteDataStorage(pPed);
         if (pData)
         {
             if (pData->ProcessPlayerWeapon())
@@ -3041,7 +3038,7 @@ void _declspec(naked) HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon()
     }
 }
 
-CPedSAInterface* pIsPlayerPed = NULL;
+CPedSAInterface *pIsPlayerPed = NULL;
 bool             IsPlayer()
 {
     return true;
@@ -3082,7 +3079,7 @@ void CRunningScript_Process(void)
 {
     if (!bHasProcessedScript)
     {
-        CCamera* pCamera = pGameInterface->GetCamera();
+        CCamera *pCamera = pGameInterface->GetCamera();
         pCamera->SetFadeColor(0, 0, 0);
         pCamera->Fade(0.0f, FADE_OUT);
 
@@ -3204,7 +3201,7 @@ void _declspec(naked) HOOK_CRunningScript_Process()
     }
 }
 
-static CVehicleSAInterface* pDerailingTrain = NULL;
+static CVehicleSAInterface *pDerailingTrain = NULL;
 void _declspec(naked) HOOK_CTrain_ProcessControl_Derail()
 {
     // If the train wouldn't derail, don't modify anything
@@ -3274,20 +3271,20 @@ static void SetEntityAlphaHooked(DWORD dwEntity, DWORD dwCallback, DWORD dwAlpha
     }
 }
 
-static RpMaterial* HOOK_GetAlphaValues(RpMaterial* pMaterial, unsigned char ucAlpha)
+static RpMaterial *HOOK_GetAlphaValues(RpMaterial *pMaterial, unsigned char ucAlpha)
 {
     ucCurrentAlpha[uiAlphaIdx] = pMaterial->color.a;
     uiAlphaIdx = std::min(uiAlphaIdx + 1, NUMELMS(ucCurrentAlpha) - 1);
 
     return pMaterial;
 }
-static RpMaterial* HOOK_SetAlphaValues(RpMaterial* pMaterial, unsigned char ucAlpha)
+static RpMaterial *HOOK_SetAlphaValues(RpMaterial *pMaterial, unsigned char ucAlpha)
 {
     pMaterial->color.a = static_cast<unsigned char>((float)(pMaterial->color.a) * (float)ucAlpha / 255.0f);
 
     return pMaterial;
 }
-static RpMaterial* HOOK_RestoreAlphaValues(RpMaterial* pMaterial, unsigned char ucAlpha)
+static RpMaterial *HOOK_RestoreAlphaValues(RpMaterial *pMaterial, unsigned char ucAlpha)
 {
     pMaterial->color.a = ucCurrentAlpha[uiAlphaIdx];
     uiAlphaIdx = std::min(uiAlphaIdx + 1, NUMELMS(ucCurrentAlpha) - 1);
@@ -3319,9 +3316,9 @@ static void RestoreAlphaValues()
 /**
  ** Vehicles
  **/
-static RpAtomic* CVehicle_EAEG(RpAtomic* pAtomic, void*)
+static RpAtomic *CVehicle_EAEG(RpAtomic *pAtomic, void *)
 {
-    RwFrame* pFrame = ((RwFrame*)(((RwObject*)(pAtomic))->parent));
+    RwFrame *pFrame = ((RwFrame *)(((RwObject *)(pAtomic))->parent));
     if (pFrame)
     {
         switch (pFrame->szName[0])
@@ -3347,7 +3344,7 @@ static RpAtomic* CVehicle_EAEG(RpAtomic* pAtomic, void*)
 
 static void SetVehicleAlpha()
 {
-    CVehicleSAInterface* pInterface = ((CVehicleSAInterface*)dwAlphaEntity);
+    CVehicleSAInterface *pInterface = ((CVehicleSAInterface *)dwAlphaEntity);
     unsigned char        ucAlpha = pInterface->m_pVehicle->GetAlpha();
 
     if (ucAlpha < 255)
@@ -3415,7 +3412,7 @@ static void SetObjectAlpha()
 
     if (dwAlphaEntity)
     {
-        CObject* pObject = pGameInterface->GetPools()->GetObject((DWORD*)dwAlphaEntity);
+        CObject *pObject = pGameInterface->GetPools()->GetObject((DWORD *)dwAlphaEntity);
         if (pObject)
         {
             if (pObject->IsAGangTag())
@@ -3663,90 +3660,90 @@ void CMultiplayerSA::DisableEnterExitVehicleKey(bool bDisabled)
     // CPad__ExitVehicleJustDown
     if (!bDisabled)
     {
-        MemSet((void*)0x540120, 0x90, 1);
-        MemSet((void*)0x540121, 0x90, 1);
-        MemSet((void*)0x540122, 0x90, 1);
+        MemSet((void *)0x540120, 0x90, 1);
+        MemSet((void *)0x540121, 0x90, 1);
+        MemSet((void *)0x540122, 0x90, 1);
     }
     else
     {
-        MemSet((void*)0x540120, 0x32, 1);
-        MemSet((void*)0x540121, 0xC0, 1);
-        MemSet((void*)0x540122, 0xC3, 1);
+        MemSet((void *)0x540120, 0x32, 1);
+        MemSet((void *)0x540121, 0xC0, 1);
+        MemSet((void *)0x540122, 0xC3, 1);
     }
 }
 
 void CMultiplayerSA::PreventLeavingVehicles()
 {
-    MemSet((void*)0x6B5A10, 0xC3, 1);
+    MemSet((void *)0x6B5A10, 0xC3, 1);
 
     // 006B7449     E9 FF000000    JMP gta_sa.006B754D
-    MemSet((void*)0x6B7449, 0xE9, 1);
-    MemSet((void*)(0x6B7449 + 1), 0xFF, 1);
-    MemSet((void*)(0x6B7449 + 2), 0x00, 1);
+    MemSet((void *)0x6B7449, 0xE9, 1);
+    MemSet((void *)(0x6B7449 + 1), 0xFF, 1);
+    MemSet((void *)(0x6B7449 + 2), 0x00, 1);
 
     // 006B763C     E9 01010000    JMP gta_sa.006B7742
-    MemSet((void*)0x6B763C, 0xE9, 1);
-    MemSet((void*)(0x6B763C + 1), 0x01, 1);
-    MemSet((void*)(0x6B763C + 2), 0x01, 1);
-    MemSet((void*)(0x6B763C + 3), 0x00, 1);
+    MemSet((void *)0x6B763C, 0xE9, 1);
+    MemSet((void *)(0x6B763C + 1), 0x01, 1);
+    MemSet((void *)(0x6B763C + 2), 0x01, 1);
+    MemSet((void *)(0x6B763C + 3), 0x00, 1);
 
     // 006B7617     E9 26010000    JMP gta_sa.006B7742
-    MemSet((void*)0x6B7617, 0xE9, 1);
-    MemSet((void*)(0x6B7617 + 1), 0x26, 1);
-    MemSet((void*)(0x6B7617 + 2), 0x01, 1);
-    MemSet((void*)(0x6B7617 + 3), 0x00, 1);
-    MemSet((void*)(0x6B7617 + 4), 0x00, 1);
+    MemSet((void *)0x6B7617, 0xE9, 1);
+    MemSet((void *)(0x6B7617 + 1), 0x26, 1);
+    MemSet((void *)(0x6B7617 + 2), 0x01, 1);
+    MemSet((void *)(0x6B7617 + 3), 0x00, 1);
+    MemSet((void *)(0x6B7617 + 4), 0x00, 1);
 
     // 006B62A7     EB 74          JMP SHORT gta_sa.006B631D
-    MemSet((void*)0x6B62A7, 0xEB, 1);
+    MemSet((void *)0x6B62A7, 0xEB, 1);
 
     // 006B7642     E9 FB000000    JMP gta_sa_u.006B7742
-    MemSet((void*)0x6B7642, 0xE9, 1);
-    MemSet((void*)(0x6B7642 + 1), 0xFB, 1);
-    MemSet((void*)(0x6B7642 + 2), 0x00, 1);
-    MemSet((void*)(0x6B7642 + 3), 0x00, 1);
-    MemSet((void*)(0x6B7642 + 4), 0x00, 1);
+    MemSet((void *)0x6B7642, 0xE9, 1);
+    MemSet((void *)(0x6B7642 + 1), 0xFB, 1);
+    MemSet((void *)(0x6B7642 + 2), 0x00, 1);
+    MemSet((void *)(0x6B7642 + 3), 0x00, 1);
+    MemSet((void *)(0x6B7642 + 4), 0x00, 1);
 
     // 006B7449     E9 FF000000    JMP gta_sa_u.006B754D
-    MemSet((void*)0x6B7449, 0xE9, 1);
-    MemSet((void*)(0x6B7449 + 1), 0xFF, 1);
-    MemSet((void*)(0x6B7449 + 2), 0x00, 1);
+    MemSet((void *)0x6B7449, 0xE9, 1);
+    MemSet((void *)(0x6B7449 + 1), 0xFF, 1);
+    MemSet((void *)(0x6B7449 + 2), 0x00, 1);
 
     // For quadbikes hitting water
     // 006A90D8   E9 29020000      JMP gta_sa.006A9306
-    MemSet((void*)0x6A90D8, 0xE9, 1);
-    MemSet((void*)(0x6A90D8 + 1), 0x29, 1);
-    MemSet((void*)(0x6A90D8 + 2), 0x02, 1);
-    MemSet((void*)(0x6A90D8 + 3), 0x00, 1);
-    MemSet((void*)(0x6A90D8 + 4), 0x00, 1);
+    MemSet((void *)0x6A90D8, 0xE9, 1);
+    MemSet((void *)(0x6A90D8 + 1), 0x29, 1);
+    MemSet((void *)(0x6A90D8 + 2), 0x02, 1);
+    MemSet((void *)(0x6A90D8 + 3), 0x00, 1);
+    MemSet((void *)(0x6A90D8 + 4), 0x00, 1);
 }
 
-void CMultiplayerSA::SetPreContextSwitchHandler(PreContextSwitchHandler* pHandler)
+void CMultiplayerSA::SetPreContextSwitchHandler(PreContextSwitchHandler *pHandler)
 {
     m_pPreContextSwitchHandler = pHandler;
 }
 
-void CMultiplayerSA::SetPostContextSwitchHandler(PostContextSwitchHandler* pHandler)
+void CMultiplayerSA::SetPostContextSwitchHandler(PostContextSwitchHandler *pHandler)
 {
     m_pPostContextSwitchHandler = pHandler;
 }
 
-void CMultiplayerSA::SetPreWeaponFireHandler(PreWeaponFireHandler* pHandler)
+void CMultiplayerSA::SetPreWeaponFireHandler(PreWeaponFireHandler *pHandler)
 {
     m_pPreWeaponFireHandler = pHandler;
 }
 
-void CMultiplayerSA::SetPostWeaponFireHandler(PostWeaponFireHandler* pHandler)
+void CMultiplayerSA::SetPostWeaponFireHandler(PostWeaponFireHandler *pHandler)
 {
     m_pPostWeaponFireHandler = pHandler;
 }
 
-void CMultiplayerSA::SetBulletImpactHandler(BulletImpactHandler* pHandler)
+void CMultiplayerSA::SetBulletImpactHandler(BulletImpactHandler *pHandler)
 {
     m_pBulletImpactHandler = pHandler;
 }
 
-void CMultiplayerSA::SetBulletFireHandler(BulletFireHandler* pHandler)
+void CMultiplayerSA::SetBulletFireHandler(BulletFireHandler *pHandler)
 {
     m_pBulletFireHandler = pHandler;
 }
@@ -3767,10 +3764,10 @@ void CMultiplayerSA::Reset(void)
     m_pFxSystemDestructionHandler = NULL;
 }
 
-void CMultiplayerSA::ConvertEulerAnglesToMatrix(CMatrix& Matrix, float fX, float fY, float fZ)
+void CMultiplayerSA::ConvertEulerAnglesToMatrix(CMatrix &Matrix, float fX, float fY, float fZ)
 {
     CMatrix_Padded  matrixPadded(Matrix);
-    CMatrix_Padded* pMatrixPadded = &matrixPadded;
+    CMatrix_Padded *pMatrixPadded = &matrixPadded;
     DWORD           dwFunc = FUNC_CMatrix__ConvertFromEulerAngles;
     int             iUnknown = 21;
     _asm
@@ -3787,18 +3784,18 @@ void CMultiplayerSA::ConvertEulerAnglesToMatrix(CMatrix& Matrix, float fX, float
     matrixPadded.ConvertToMatrix(Matrix);
 }
 
-void CMultiplayerSA::ConvertMatrixToEulerAngles(const CMatrix& Matrix, float& fX, float& fY, float& fZ)
+void CMultiplayerSA::ConvertMatrixToEulerAngles(const CMatrix &Matrix, float &fX, float &fY, float &fZ)
 {
     // Convert the given matrix to a padded matrix
     CMatrix_Padded matrixPadded(Matrix);
 
     // Grab its pointer and call gta's func
-    CMatrix_Padded* pMatrixPadded = &matrixPadded;
+    CMatrix_Padded *pMatrixPadded = &matrixPadded;
     DWORD           dwFunc = FUNC_CMatrix__ConvertToEulerAngles;
 
-    float* pfX = &fX;
-    float* pfY = &fY;
-    float* pfZ = &fZ;
+    float *pfX = &fX;
+    float *pfY = &fY;
+    float *pfZ = &fZ;
     int    iUnknown = 21;
     _asm
     {
@@ -3811,12 +3808,12 @@ void CMultiplayerSA::ConvertMatrixToEulerAngles(const CMatrix& Matrix, float& fX
     }
 }
 
-void CMultiplayerSA::RebuildMultiplayerPlayer(CPed* player)
+void CMultiplayerSA::RebuildMultiplayerPlayer(CPed *player)
 {
     TIMING_CHECKPOINT("+RebuldMulplrPlr");
 
-    CPlayerPed*           playerPed = dynamic_cast<CPlayerPed*>(player);
-    CRemoteDataStorageSA* data = NULL;
+    CPlayerPed *          playerPed = dynamic_cast<CPlayerPed *>(player);
+    CRemoteDataStorageSA *data = NULL;
 
     if (playerPed)
         data = CRemoteDataSA::GetRemoteDataStorage(playerPed);
@@ -3826,21 +3823,21 @@ void CMultiplayerSA::RebuildMultiplayerPlayer(CPed* player)
         CStatsData localStats;
 
         // Store the local player stats
-        MemCpyFast(&localStats.StatTypesFloat, (void*)0xb79380, sizeof(float) * MAX_FLOAT_STATS);
-        MemCpyFast(&localStats.StatTypesInt, (void*)0xb79000, sizeof(int) * MAX_INT_STATS);
-        MemCpyFast(&localStats.StatReactionValue, (void*)0xb78f10, sizeof(float) * MAX_REACTION_STATS);
+        MemCpyFast(&localStats.StatTypesFloat, (void *)0xb79380, sizeof(float) * MAX_FLOAT_STATS);
+        MemCpyFast(&localStats.StatTypesInt, (void *)0xb79000, sizeof(int) * MAX_INT_STATS);
+        MemCpyFast(&localStats.StatReactionValue, (void *)0xb78f10, sizeof(float) * MAX_REACTION_STATS);
 
         // Change the local player's stats to the remote player's
-        MemCpyFast((void*)0xb79380, data->m_stats.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS);
-        MemCpyFast((void*)0xb79000, data->m_stats.StatTypesInt, sizeof(int) * MAX_INT_STATS);
-        MemCpyFast((void*)0xb78f10, data->m_stats.StatReactionValue, sizeof(float) * MAX_REACTION_STATS);
+        MemCpyFast((void *)0xb79380, data->m_stats.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS);
+        MemCpyFast((void *)0xb79000, data->m_stats.StatTypesInt, sizeof(int) * MAX_INT_STATS);
+        MemCpyFast((void *)0xb78f10, data->m_stats.StatReactionValue, sizeof(float) * MAX_REACTION_STATS);
 
         player->RebuildPlayer();
 
         // Restore the local player stats
-        MemCpyFast((void*)0xb79380, &localStats.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS);
-        MemCpyFast((void*)0xb79000, &localStats.StatTypesInt, sizeof(int) * MAX_INT_STATS);
-        MemCpyFast((void*)0xb78f10, &localStats.StatReactionValue, sizeof(float) * MAX_REACTION_STATS);
+        MemCpyFast((void *)0xb79380, &localStats.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS);
+        MemCpyFast((void *)0xb79000, &localStats.StatTypesInt, sizeof(int) * MAX_INT_STATS);
+        MemCpyFast((void *)0xb78f10, &localStats.StatReactionValue, sizeof(float) * MAX_REACTION_STATS);
     }
     TIMING_CHECKPOINT("-RebuldMulplrPlr");
 }
@@ -3871,12 +3868,12 @@ void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled)
 
 bool CMultiplayerSA::IsNightVisionEnabled()
 {
-    return (*(BYTE*)0xC402B8 == 1);
+    return (*(BYTE *)0xC402B8 == 1);
 }
 
 bool CMultiplayerSA::IsThermalVisionEnabled()
 {
-    return (*(BYTE*)0xC402B9 == 1);
+    return (*(BYTE *)0xC402B9 == 1);
 }
 
 float CMultiplayerSA::GetGlobalGravity(void)
@@ -3944,7 +3941,7 @@ void CMultiplayerSA::SetDebugVars(float f1, float f2, float f3)
 
 void _declspec(naked) HOOK_CollisionStreamRead()
 {
-    if (*(DWORD*)VAR_CollisionStreamRead_ModelInfo)
+    if (*(DWORD *)VAR_CollisionStreamRead_ModelInfo)
     {
         _asm
         {
@@ -4042,7 +4039,7 @@ void _declspec(naked) HOOK_CTrafficLights_DisplayActualLight()
     }
 }
 
-static CVehicleSAInterface* pHandlingDriveTypeVeh = NULL;
+static CVehicleSAInterface *pHandlingDriveTypeVeh = NULL;
 unsigned char               ucDriveType = '4';
 void                        GetVehicleDriveType()
 {
@@ -4118,18 +4115,18 @@ void CMultiplayerSA::AllowCreatedObjectsInVerticalLineTest(bool bOn)
     {
         // Done initialization?
         if (bufOriginalData[0] == 0)
-            MemCpyFast(bufOriginalData, (void*)0x59FABC, 90);
+            MemCpyFast(bufOriginalData, (void *)0x59FABC, 90);
 
         bState = bOn;
         if (bOn)
         {
             // Make created objects to have a control code, so they can be checked for vertical line test HOOK
-            MemSet((void*)0x59FABC, 0x90, 90);
+            MemSet((void *)0x59FABC, 0x90, 90);
         }
         else
         {
             // Make created objects not be checked for vertical line test HOOK
-            MemCpy((void*)0x59FABC, bufOriginalData, 90);
+            MemCpy((void *)0x59FABC, bufOriginalData, 90);
         }
     }
 }
@@ -4147,12 +4144,12 @@ void _cdecl CPhysical_ApplyGravity(DWORD dwThis)
         mov dwType, eax
     }
 
-    float fTimeStep = *(float*)0xB7CB5C;
-    float fGravity = *(float*)0x863984;
+    float fTimeStep = *(float *)0xB7CB5C;
+    float fGravity = *(float *)0x863984;
     if (dwType == 2)
     {
         // It's a vehicle, use the gravity vector
-        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)dwThis);
+        CVehicle *pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD *)dwThis);
         if (!pVehicle)
             return;
 
@@ -4182,7 +4179,7 @@ void _declspec(naked) HOOK_CPhysical_ApplyGravity()
 
 // ---------------------------------------------------
 
-void GetMatrixForGravity(const CVector& vecGravity, CMatrix& mat)
+void GetMatrixForGravity(const CVector &vecGravity, CMatrix &mat)
 {
     // Calculates a basis where the z axis is the inverse of the gravity
     if (vecGravity.Length() > 0.0001f)
@@ -4226,7 +4223,7 @@ bool _cdecl VehicleCamStart(DWORD dwCam, DWORD pVehicleInterface)
     // This way SA's gravity-goes-downward assumptive code can calculate the camera
     // spherical coords correctly. Of course we restore these after the camera function
     // completes.
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle *pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD *)pVehicleInterface);
     if (!pVehicle)
         return false;
 
@@ -4270,7 +4267,7 @@ fail:
 
 // ---------------------------------------------------
 
-void _cdecl VehicleCamTargetZTweak(CVector* pvecCamTarget, float fTargetZTweak)
+void _cdecl VehicleCamTargetZTweak(CVector *pvecCamTarget, float fTargetZTweak)
 {
     // Replacement for "vecCamTarget = vecCarPosition + (0, 0, 1)*fZTweak"
     *pvecCamTarget += gravcam_matGravity.vUp * fTargetZTweak;
@@ -4309,7 +4306,7 @@ void _cdecl VehicleCamLookDir1(DWORD dwCam, DWORD pVehicleInterface)
 {
     // For the same reason as in VehicleCamStart, inverse transform the camera's lookdir
     // at this point
-    CVector* pvecLookDir = (CVector*)(dwCam + 0x190);
+    CVector *pvecLookDir = (CVector *)(dwCam + 0x190);
     *pvecLookDir = gravcam_matInvertGravity * (*pvecLookDir);
 }
 
@@ -4336,8 +4333,8 @@ bool _cdecl VehicleCamLookDir2(DWORD dwCam)
     // Calculates the look direction vector for the vehicle camera. This vector
     // is later multiplied by a factor and added to the vehicle position by SA
     // to obtain the final camera position.
-    float fPhi = *(float*)(dwCam + 0xBC);
-    float fTheta = *(float*)(dwCam + 0xAC);
+    float fPhi = *(float *)(dwCam + 0xBC);
+    float fTheta = *(float *)(dwCam + 0xAC);
 
     MemPutFast<CVector>(dwCam + 0x190, -gravcam_matGravity.vRight * cos(fPhi) * cos(fTheta) - gravcam_matGravity.vFront * sin(fPhi) * cos(fTheta) +
                                            gravcam_matGravity.vUp * sin(fTheta));
@@ -4363,13 +4360,13 @@ void _declspec(naked) HOOK_VehicleCamLookDir2()
 
 // ---------------------------------------------------
 
-void _cdecl VehicleCamHistory(DWORD dwCam, CVector* pvecTarget, float fTargetTheta, float fRadius, float fZoom)
+void _cdecl VehicleCamHistory(DWORD dwCam, CVector *pvecTarget, float fTargetTheta, float fRadius, float fZoom)
 {
-    float   fPhi = *(float*)(dwCam + 0xBC);
+    float   fPhi = *(float *)(dwCam + 0xBC);
     CVector vecDir = -gravcam_matGravity.vRight * cos(fPhi) * cos(fTargetTheta) - gravcam_matGravity.vFront * sin(fPhi) * cos(fTargetTheta) +
                      gravcam_matGravity.vUp * sin(fTargetTheta);
-    ((CVector*)(dwCam + 0x1D8))[0] = *pvecTarget - vecDir * fRadius;
-    ((CVector*)(dwCam + 0x1D8))[1] = *pvecTarget - vecDir * fZoom;
+    ((CVector *)(dwCam + 0x1D8))[0] = *pvecTarget - vecDir * fRadius;
+    ((CVector *)(dwCam + 0x1D8))[1] = *pvecTarget - vecDir * fZoom;
 }
 
 void _declspec(naked) HOOK_VehicleCamHistory()
@@ -4395,8 +4392,8 @@ void _declspec(naked) HOOK_VehicleCamHistory()
 void _cdecl VehicleCamUp(DWORD dwCam)
 {
     // Calculates the up vector for the vehicle camera.
-    CVector* pvecUp = (CVector*)(dwCam + 0x1B4);
-    CVector* pvecLookDir = (CVector*)(dwCam + 0x190);
+    CVector *pvecUp = (CVector *)(dwCam + 0x1B4);
+    CVector *pvecLookDir = (CVector *)(dwCam + 0x190);
 
     pvecLookDir->Normalize();
     *pvecUp = *pvecLookDir;
@@ -4434,7 +4431,7 @@ docustom:
 void _cdecl VehicleCamEnd(DWORD pVehicleInterface)
 {
     // Restore the things that we inverse transformed in VehicleCamStart
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle *pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD *)pVehicleInterface);
     if (!pVehicle)
         return;
 
@@ -4458,7 +4455,7 @@ void _declspec(naked) HOOK_VehicleCamEnd()
 
 // ---------------------------------------------------
 
-void _cdecl VehicleLookBehind(DWORD dwCam, CVector* pvecEntityPos, float fDistance)
+void _cdecl VehicleLookBehind(DWORD dwCam, CVector *pvecEntityPos, float fDistance)
 {
     // Custom calculation of the camera position when looking behind while in
     // vehicle cam mode, taking in account custom gravity
@@ -4493,7 +4490,7 @@ void _declspec(naked) HOOK_VehicleLookBehind()
 
 // ---------------------------------------------------
 
-void _cdecl VehicleLookAside(DWORD dwCam, CVector* pvecEntityPos, float fDirectionFactor, float fDistance)
+void _cdecl VehicleLookAside(DWORD dwCam, CVector *pvecEntityPos, float fDirectionFactor, float fDistance)
 {
     // Custom calculation of the camera position when looking left/right while in
     // vehicle cam mode, taking in account custom gravity
@@ -4525,7 +4522,7 @@ float _cdecl VehicleBurnCheck(DWORD pVehicleInterface)
     // To check if a vehicle is lying upside down on its roof, SA checks if the z coordinate
     // of the vehicle's up vector is negative. We replace this z by the dot product of the up vector
     // and the negated gravity vector.
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle *pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD *)pVehicleInterface);
     if (!pVehicle)
         return 1.0f;
 
@@ -4567,7 +4564,7 @@ void _cdecl ApplyVehicleBlowHop(DWORD pVehicleInterface)
 {
     // Custom application of the little jump that vehicles make when they blow up,
     // taking into account custom gravity
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle *pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD *)pVehicleInterface);
     if (!pVehicle)
         return;
 
@@ -4744,13 +4741,13 @@ void vehicle_lights_init(void)
     HookInstall(HOOKPOS_CVehicle_DoHeadLightReflectionSingle, (DWORD)HOOK_CVehicle_DoHeadLightReflectionSingle, 8);
 
     // Allow turning on vehicle lights even if the engine is off
-    MemSet((void*)0x6E1DBC, 0x90, 8);
+    MemSet((void *)0x6E1DBC, 0x90, 8);
 
     // Fix vehicle back lights both using light state 3 (SA bug)
     MemPut<BYTE>(0x6E1D4F, 2);
 }
 
-CVehicleSAInterface* pLightsVehicleInterface = NULL;
+CVehicleSAInterface *pLightsVehicleInterface = NULL;
 void _declspec(naked) HOOK_CVehicle_DoVehicleLights()
 {
     _asm
@@ -4763,10 +4760,10 @@ void _declspec(naked) HOOK_CVehicle_DoVehicleLights()
 }
 
 unsigned long ulHeadLightR = 0, ulHeadLightG = 0, ulHeadLightB = 0;
-void          CVehicle_GetHeadLightColor(CVehicleSAInterface* pInterface, float fR, float fG, float fB)
+void          CVehicle_GetHeadLightColor(CVehicleSAInterface *pInterface, float fR, float fG, float fB)
 {
     SColor    color = SColorRGBA(255, 255, 255, 255);
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pInterface);
+    CVehicle *pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD *)pInterface);
     if (pVehicle)
     {
         color = pVehicle->GetHeadLightColor();
@@ -4778,7 +4775,7 @@ void          CVehicle_GetHeadLightColor(CVehicleSAInterface* pInterface, float 
     ulHeadLightB = (unsigned char)std::min(255.f, color.B * (1 / 255.0f) * fB);
 }
 
-CVehicleSAInterface* pHeadLightBeamVehicleInterface = NULL;
+CVehicleSAInterface *pHeadLightBeamVehicleInterface = NULL;
 void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam_1()
 {
     _asm
@@ -4789,7 +4786,7 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam_1()
     }
 }
 
-RwVertex*    pHeadLightVerts = NULL;
+RwVertex *   pHeadLightVerts = NULL;
 unsigned int uiHeadLightNumVerts = 0;
 void         CVehicle_DoHeadLightBeam()
 {
@@ -5044,7 +5041,7 @@ void CMultiplayerSA::SetAltWaterOrderEnabled(bool bEnable)
         // Save memory before we blat it
         CBufferWriteStream stream(savedMem);
         for (uint i = 0; i < NUMELMS(memoryList); i++)
-            stream.WriteBytes((void*)memoryList[i].dwAddress, memoryList[i].uiSize);
+            stream.WriteBytes((void *)memoryList[i].dwAddress, memoryList[i].uiSize);
 
         // Add hooks and things
         // Always render water after other entities (otherwise underwater LODs and trees are rendered
@@ -5054,7 +5051,7 @@ void CMultiplayerSA::SetAltWaterOrderEnabled(bool bEnable)
         // Disable some stack management instructions as we need ebx for a bit longer. We replicate
         // these in HOOK_RenderScene_end
         MemPut<BYTE>(0x53E132, 0x90);
-        MemSet((void*)0x53E156, 0x90, 3);
+        MemSet((void *)0x53E156, 0x90, 3);
         // Use 0.5 instead of 0.0 for underwater threshold
         MemPut<DWORD>(0x53DF4B, 0x858B8C);
 
@@ -5071,7 +5068,7 @@ void CMultiplayerSA::SetAltWaterOrderEnabled(bool bEnable)
             BYTE temp[10];
             assert(sizeof(temp) >= memoryList[i].uiSize);
             stream.ReadBytes(temp, memoryList[i].uiSize);
-            MemCpy((void*)memoryList[i].dwAddress, temp, memoryList[i].uiSize);
+            MemCpy((void *)memoryList[i].dwAddress, temp, memoryList[i].uiSize);
         }
     }
 }
@@ -5197,19 +5194,19 @@ fail:
    damage calculation is made *before* CEventDamage::AffectsPed (our damage hook) is called.
    * Fixes 'falling off bike' damage being 0 in CClientGame::DamageHandler.
 */
-CEventDamageSAInterface* pBikeDamageInterface;
-CPedSAInterface*         pBikePedInterface;
+CEventDamageSAInterface *pBikeDamageInterface;
+CPedSAInterface *        pBikePedInterface;
 float                    fBikeDamage;
 void                     CEventHandler_ComputeKnockOffBikeResponse()
 {
-    CEventDamage* pEvent = pGameInterface->GetEventList()->GetEventDamage(pBikeDamageInterface);
-    CPed*         pPed = pGameInterface->GetPools()->GetPed((DWORD*)pBikePedInterface);
+    CEventDamage *pEvent = pGameInterface->GetEventList()->GetEventDamage(pBikeDamageInterface);
+    CPed *        pPed = pGameInterface->GetPools()->GetPed((DWORD *)pBikePedInterface);
     if (pEvent && pPed)
     {
-        CPedDamageResponse* pResponse = pEvent->GetDamageResponse();
+        CPedDamageResponse *pResponse = pEvent->GetDamageResponse();
         if (pResponse)
         {
-            pResponse->Calculate((CEntity*)pPed, fBikeDamage, pEvent->GetWeaponUsed(), pEvent->GetPedPieceType(), true, false);
+            pResponse->Calculate((CEntity *)pPed, fBikeDamage, pEvent->GetWeaponUsed(), pEvent->GetPedPieceType(), true, false);
         }
     }
     if (pEvent)
@@ -5238,88 +5235,28 @@ void _declspec(naked) HOOK_CEventHandler_ComputeKnockOffBikeResponse()
     }
 }
 
-RpClump*     animationClump = NULL;
-AssocGroupId animationGroup = 0;
-AnimationId  animationID = 0;
-void _declspec(naked) HOOK_CAnimManager_AddAnimation()
-{
-    _asm
-    {
-        mov     eax, [esp+4]
-        mov     animationClump, eax
-        mov     eax, [esp+8]
-        mov     animationGroup, eax
-        mov     eax, [esp+12]
-        mov     animationID, eax
-        pushad
-    }
-
-    if (m_pAddAnimationHandler)
-    {
-        m_pAddAnimationHandler(animationClump, animationGroup, animationID);
-    }
-
-    _asm
-    {
-        popad
-        mov     eax,dword ptr [esp+0Ch]
-        mov     edx,dword ptr ds:[0B4EA34h]
-        jmp     RETURN_CAnimManager_AddAnimation
-    }
-}
-
-float animationBlendDelta;
-void _declspec(naked) HOOK_CAnimManager_BlendAnimation()
-{
-    _asm
-    {
-        mov     eax, [esp+4]
-        mov     animationClump, eax
-        mov     eax, [esp+8]
-        mov     animationGroup, eax
-        mov     eax, [esp+12]
-        mov     animationID, eax
-        mov     eax, [esp+16]
-        mov     animationBlendDelta, eax
-        pushad
-    }
-
-    if (m_pBlendAnimationHandler)
-    {
-        m_pBlendAnimationHandler(animationClump, animationGroup, animationID, animationBlendDelta);
-    }
-
-    _asm
-    {
-        popad
-        sub     esp,14h
-        mov     ecx,dword ptr [esp+18h]
-        jmp     RETURN_CAnimManager_BlendAnimation
-    }
-}
-
-CPedSAInterface* weaponSkillPed;
+CPedSAInterface *weaponSkillPed;
 eWeaponType      weaponSkillWeapon;
 BYTE             weaponSkill;
 bool             CPed_GetWeaponSkill()
 {
-    CPed* pPed = pGameInterface->GetPools()->GetPed((DWORD*)weaponSkillPed);
+    CPed *pPed = pGameInterface->GetPools()->GetPed((DWORD *)weaponSkillPed);
     if (pPed)
     {
-        CPed* pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);
+        CPed *pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);
         if (pPed != pLocalPlayerPed)
         {
             if (weaponSkillWeapon >= WEAPONTYPE_PISTOL && weaponSkillWeapon <= WEAPONTYPE_TEC9)
             {
-                CPlayerPed* playerPed = dynamic_cast<CPlayerPed*>(pPed);
+                CPlayerPed *playerPed = dynamic_cast<CPlayerPed *>(pPed);
                 if (playerPed)
                 {
-                    CRemoteDataStorageSA* data = CRemoteDataSA::GetRemoteDataStorage(playerPed);
+                    CRemoteDataStorageSA *data = CRemoteDataSA::GetRemoteDataStorage(playerPed);
                     float                 stat = data->m_stats.StatTypesFloat[pGameInterface->GetStats()->GetSkillStatIndex(weaponSkillWeapon)];
 
-                    CWeaponInfo* pPoor = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_POOR);
-                    CWeaponInfo* pStd = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_STD);
-                    CWeaponInfo* pPro = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_PRO);
+                    CWeaponInfo *pPoor = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_POOR);
+                    CWeaponInfo *pStd = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_STD);
+                    CWeaponInfo *pPro = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_PRO);
 
                     if (stat >= pPro->GetRequiredStatLevel())
                         weaponSkill = WEAPONSKILL_PRO;
@@ -5369,9 +5306,9 @@ void _declspec(naked) HOOK_CPed_GetWeaponSkill()
 
 // Actually check if the ped putting on goggles is the local player before
 // applying the visual effect
-bool _cdecl CPed_AddGogglesModelCheck(void* pPedInterface)
+bool _cdecl CPed_AddGogglesModelCheck(void *pPedInterface)
 {
-    return pGameInterface->GetPools()->GetPed((DWORD*)pPedInterface) == pGameInterface->GetPools()->GetPedFromRef(1);
+    return pGameInterface->GetPools()->GetPed((DWORD *)pPedInterface) == pGameInterface->GetPools()->GetPedFromRef(1);
 }
 
 void _declspec(naked) HOOK_CPed_AddGogglesModel()
@@ -5405,7 +5342,7 @@ void CMultiplayerSA::DeleteAndDisableGangTags()
 
         for (unsigned int i = 0; i < *VAR_NumTags; ++i)
         {
-            DWORD* pTagInterface = VAR_TagInfoArray[i << 1];
+            DWORD *pTagInterface = VAR_TagInfoArray[i << 1];
             if (pTagInterface)
             {
                 _asm
@@ -5428,10 +5365,10 @@ void CMultiplayerSA::DeleteAndDisableGangTags()
         // xor eax, eax
         // ret
         // to make it always return false
-        MemSet((void*)0x49CCE0, 0x90, 74);
+        MemSet((void *)0x49CCE0, 0x90, 74);
         MemPut<DWORD>(0x49CCE0, 0x90C3C033);
         // Remove also some hardcoded and inlined checks for if it's a tag
-        MemSet((void*)0x53374A, 0x90, 56);
+        MemSet((void *)0x53374A, 0x90, 56);
         MemPut<BYTE>(0x4C4403, 0xEB);
 
         // Force all tags to have zero tagged alpha
@@ -5450,8 +5387,8 @@ void CMultiplayerSA::DeleteAndDisableGangTags()
         //
         // No need to worry about the push esi, because at 0x49CE8E the stack is restored.
         // CVisibilityPlugins::GetUserValue is a cdecl.
-        MemSet((void*)0x49CE58, 0x90, 5);
-        MemSet((void*)0x49CE5E, 0x90, 11);
+        MemSet((void *)0x49CE58, 0x90, 5);
+        MemSet((void *)0x49CE5E, 0x90, 11);
         MemPut<unsigned short>(0x49CE5E, 0xC033);
         MemPut<unsigned short>(0x49CE60, 0xFF33);
     }
@@ -5506,10 +5443,10 @@ void _declspec(naked) HOOK_CPhysical_ProcessCollisionSectorList()
 
 // Ped animation matrix array gets corrupted sometimes by unknown thing
 // Hack fix for now is to validate each matrix before it is used
-void _cdecl CheckMatrix(float* pMatrix)
+void _cdecl CheckMatrix(float *pMatrix)
 {
     // Peek at IEEE 754 float data to quickly check if any element is outside range of -2 to 2 or is NaN
-    int* p = (int*)pMatrix;
+    int *p = (int *)pMatrix;
     int  RotBits = p[0] | p[1] | p[2] | p[4] | p[5] | p[6] | p[8] | p[9] | p[10];
 
     int PosBits = p[12] | p[13] | p[14];
@@ -5576,7 +5513,7 @@ static SColor vehColors[4];
 
 void _cdecl SaveVehColors(DWORD dwThis)
 {
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)dwThis);
+    CVehicle *pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD *)dwThis);
     if (pVehicle)
     {
         pVehicle->GetColor(&vehColors[0], &vehColors[1], &vehColors[2], &vehColors[3], true);
@@ -5633,7 +5570,7 @@ static const DWORD dwSwingingRet1 = 0x6A9DB6;
 static const DWORD dwSwingingRet2 = 0x6AA1DA;
 static bool        AllowSwingingDoors()
 {
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)dwSwingingDoorAutomobile);
+    CVehicle *pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD *)dwSwingingDoorAutomobile);
     if (pVehicle == 0 || pVehicle->AreSwingingDoorsAllowed())
         return true;
     else
@@ -5667,35 +5604,35 @@ void _declspec(naked) HOOK_CAutomobile__ProcessSwingingDoor()
     }
 }
 
-void* SetModelSuspensionLinesToVehiclePrivate(CVehicleSAInterface* pVehicleIntf)
+void *SetModelSuspensionLinesToVehiclePrivate(CVehicleSAInterface *pVehicleIntf)
 {
     // Set the per-model suspension line data of the vehicle's model to the per-vehicle
     // suspension line data so that collision processing will use that instead.
-    CVehicle*   pVehicle = pVehicleIntf->m_pVehicle;
-    CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicle->GetModelIndex());
+    CVehicle *  pVehicle = pVehicleIntf->m_pVehicle;
+    CModelInfo *pModelInfo = pGameInterface->GetModelInfo(pVehicle->GetModelIndex());
     return pModelInfo->SetVehicleSuspensionData(pVehicle->GetPrivateSuspensionLines());
 }
 
-void SetModelSuspensionLines(CVehicleSAInterface* pVehicleIntf, void* pSuspensionLines)
+void SetModelSuspensionLines(CVehicleSAInterface *pVehicleIntf, void *pSuspensionLines)
 {
-    CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicleIntf->m_pVehicle->GetModelIndex());
+    CModelInfo *pModelInfo = pGameInterface->GetModelInfo(pVehicleIntf->m_pVehicle->GetModelIndex());
     pModelInfo->SetVehicleSuspensionData(pSuspensionLines);
 }
 // Some variables.
 DWORD                dwSuspensionChangedJump = 0x4185C0;
 bool                 bSuspensionChanged = false;
-CVehicleSAInterface* pSuspensionInterface = NULL;
+CVehicleSAInterface *pSuspensionInterface = NULL;
 bool                 CheckHasSuspensionChanged(void)
 {
     // Make sure we have a valid suspension interface
     if (pSuspensionInterface)
     {
         // Check our suspension interface has a valid vehicle and return the suspension changed marker
-        CVehicle* pVehicle = pSuspensionInterface->m_pVehicle;
+        CVehicle *pVehicle = pSuspensionInterface->m_pVehicle;
         if (!pVehicle)
             return false;
 
-        CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicle->GetModelIndex());
+        CModelInfo *pModelInfo = pGameInterface->GetModelInfo(pVehicle->GetModelIndex());
         if (pModelInfo && (pModelInfo->IsCar() || pModelInfo->IsMonsterTruck()))
             return pVehicle->GetHandlingData()->HasSuspensionChanged();
         else
@@ -5785,8 +5722,8 @@ void CMultiplayerSA::SetSuspensionEnabled(bool bEnabled)
 }
 
 // Variables
-SIPLInst*           pEntityWorldAdd = NULL;
-CEntitySAInterface* pLODInterface = NULL;
+SIPLInst *          pEntityWorldAdd = NULL;
+CEntitySAInterface *pLODInterface = NULL;
 bool                bNextHookSetModel = false;
 bool                bCodePathCheck = false;
 
@@ -5796,7 +5733,7 @@ bool CheckRemovedModelNoSet()
     bNextHookSetModel = false;
     bCodePathCheck = bNextHookSetModel;
     pLODInterface = NULL;
-    CWorld* pWorld = pGameInterface->GetWorld();
+    CWorld *pWorld = pGameInterface->GetWorld();
     // You never know.
     if (pWorld)
     {
@@ -5853,9 +5790,9 @@ void HideEntitySomehow()
     if (bNextHookSetModel && pLODInterface)
     {
         // Init pInterface with the Initial model
-        CEntitySAInterface* pInterface = pLODInterface;
+        CEntitySAInterface *pInterface = pLODInterface;
         // Grab the removal for the interface
-        SBuildingRemoval* pBuildingRemoval = pGameInterface->GetWorld()->GetBuildingRemoval(pInterface);
+        SBuildingRemoval *pBuildingRemoval = pGameInterface->GetWorld()->GetBuildingRemoval(pInterface);
         // Remove down the LOD tree
         if (pBuildingRemoval && pInterface && pInterface != NULL && pInterface->bIsProcObject == 0 &&
             (pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY))
@@ -5871,7 +5808,7 @@ void HideEntitySomehow()
     else if (bCodePathCheck && pLODInterface)
     {
         // Init pInterface with the Initial model
-        CEntitySAInterface* pInterface = pLODInterface;
+        CEntitySAInterface *pInterface = pLODInterface;
         if (pInterface && pInterface != NULL && pInterface->bIsProcObject == 0 &&
             (pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY))
         {
@@ -5900,7 +5837,7 @@ void _declspec(naked) HOOK_CWorld_LOD_SETUP()
     }
 }
 
-CEntitySAInterface* pBuildingAdd = NULL;
+CEntitySAInterface *pBuildingAdd = NULL;
 void                StorePointerToBuilding()
 {
     if (pBuildingAdd != NULL)
@@ -5932,7 +5869,7 @@ bool CheckForRemoval()
     if (pLODInterface)
     {
         // Init pInterface with the Initial model
-        CEntitySAInterface* pInterface = pLODInterface;
+        CEntitySAInterface *pInterface = pLODInterface;
         // Remove down the LOD tree
         if (pGameInterface->GetWorld()->IsObjectRemoved(pInterface))
         {
@@ -5963,7 +5900,7 @@ void _declspec(naked) Hook_CWorld_ADD_CPopulation_ConvertToRealObject()
 void RemoveObjectIfNeeded()
 {
     TIMING_CHECKPOINT("+RemoveObjectIfNeeded");
-    SBuildingRemoval* pBuildingRemoval = pGameInterface->GetWorld()->GetBuildingRemoval(pLODInterface);
+    SBuildingRemoval *pBuildingRemoval = pGameInterface->GetWorld()->GetBuildingRemoval(pLODInterface);
     if (pBuildingRemoval != NULL)
     {
         if ((DWORD)(pBuildingAdd->vtbl) != VTBL_CPlaceable)
@@ -6007,7 +5944,7 @@ void _declspec(naked) HOOK_ConvertToObject_CPopulationManageDummy()
     }
 }
 
-CEntitySAInterface* pBuildingRemove = NULL;
+CEntitySAInterface *pBuildingRemove = NULL;
 void                RemovePointerToBuilding()
 {
     if (pBuildingRemove->nType == ENTITY_TYPE_BUILDING || pBuildingRemove->nType == ENTITY_TYPE_DUMMY || pBuildingRemove->nType == ENTITY_TYPE_OBJECT)
@@ -6042,7 +5979,7 @@ void _declspec(naked) HOOK_CWorld_Remove_CPopulation_ConvertToDummyObject()
 // if it's replaced get rid of it
 void RemoveDummyIfReplaced()
 {
-    SBuildingRemoval* pBuildingRemoval = pGameInterface->GetWorld()->GetBuildingRemoval(pLODInterface);
+    SBuildingRemoval *pBuildingRemoval = pGameInterface->GetWorld()->GetBuildingRemoval(pLODInterface);
     if (pBuildingRemoval != NULL)
     {
         if ((DWORD)(pBuildingAdd->vtbl) != VTBL_CPlaceable)
@@ -6169,12 +6106,12 @@ IsOnScreen_IsObject:
         jmp     JMP_CEntity_IsOnScreen_FixObjectsScale
     }
 }
-CVehicleSAInterface* pCollisionVehicle = NULL;
+CVehicleSAInterface *pCollisionVehicle = NULL;
 void                 TriggerVehicleCollisionEvent()
 {
     if (pCollisionVehicle)
     {
-        CEntitySAInterface* pEntity = pCollisionVehicle->m_pCollidedEntity;
+        CEntitySAInterface *pEntity = pCollisionVehicle->m_pCollidedEntity;
         if (pEntity)
         {
             // Not handled because it triggers too much
@@ -6185,7 +6122,7 @@ void                 TriggerVehicleCollisionEvent()
                     TIMING_CHECKPOINT("+TriggerVehColEvent");
                     if (pEntity->nType == ENTITY_TYPE_VEHICLE)
                     {
-                        CVehicleSAInterface* pInterface = static_cast<CVehicleSAInterface*>(pEntity);
+                        CVehicleSAInterface *pInterface = static_cast<CVehicleSAInterface *>(pEntity);
                         m_pVehicleCollisionHandler(pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude,
                                                    pInterface->m_fDamageImpulseMagnitude, pCollisionVehicle->m_usPieceType,
                                                    pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity);
@@ -6311,17 +6248,17 @@ void CMultiplayerSA::SetAutomaticVehicleStartupOnPedEnter(bool bSet)
 {
     static BYTE originalCode[6] = {0};
     if (originalCode[0] == '\0')
-        MemCpyFast(&originalCode[0], (const void*)0x64BC0D, 6);
+        MemCpyFast(&originalCode[0], (const void *)0x64BC0D, 6);
 
     if (bSet)
-        MemCpy((char*)0x64BC0D, originalCode, 6);
+        MemCpy((char *)0x64BC0D, originalCode, 6);
     else
-        MemSet((char*)0x64BC0D, 0x90, 6);
+        MemSet((char *)0x64BC0D, 0x90, 6);
 }
 
 // Storage
-CVehicleSAInterface* pHeliKiller = NULL;
-CEntitySAInterface*  pHitByHeli = NULL;
+CVehicleSAInterface *pHeliKiller = NULL;
+CEntitySAInterface * pHitByHeli = NULL;
 bool                 CallHeliKillEvent()
 {
     // Is our handler alive
@@ -6377,8 +6314,8 @@ lp1:        jmp RETURN_CHeli_ProcessHeliKill_6DB437h
     }
 }
 
-CObjectSAInterface* pDamagedObject = NULL;
-CEntitySAInterface* pObjectAttacker = NULL;
+CObjectSAInterface *pDamagedObject = NULL;
+CEntitySAInterface *pObjectAttacker = NULL;
 float               fNewObjectHealth = NULL;
 bool                bObjectDamaged = true;
 
@@ -6386,7 +6323,7 @@ bool TriggerObjectDamageEvent()
 {
     if (m_pObjectDamageHandler && pDamagedObject && fNewObjectHealth)
     {
-        float fHealth = *(float*)((DWORD)pDamagedObject + 340);
+        float fHealth = *(float *)((DWORD)pDamagedObject + 340);
         float fLoss = fHealth - fNewObjectHealth;
 
         return m_pObjectDamageHandler(pDamagedObject, fLoss, pObjectAttacker);
@@ -6448,7 +6385,7 @@ void _declspec(naked) HOOK_CObject_ProcessBreak()
     {
         pushad
     }
-    ucColDamageEffect = *(unsigned char*)((DWORD)pDamagedObject + 324);
+    ucColDamageEffect = *(unsigned char *)((DWORD)pDamagedObject + 324);
 
     if (ucColDamageEffect != NULL)
     {
@@ -6564,7 +6501,7 @@ void _declspec(naked) HOOK_CGlass__BreakGlassPhysically()
     }
 }
 
-void* pFxSystemToBeDestroyed;
+void *pFxSystemToBeDestroyed;
 void  FxManager_c__DestroyFxSystem()
 {
     if (m_pFxSystemDestructionHandler)
@@ -6599,8 +6536,8 @@ void _declspec(naked) HOOK_FxManager_c__DestroyFxSystem()
 DWORD pProcessedGangDriveBySimpleTask;
 void  CTaskSimpleGangDriveBy__ProcessPed()
 {
-    AnimationId* pRequiredAnim = ((AnimationId*)(pProcessedGangDriveBySimpleTask + 0x24));
-    AssocGroupId requiredAnimGroup = *((AssocGroupId*)(pProcessedGangDriveBySimpleTask + 0x28));
+    AnimationId *pRequiredAnim = ((AnimationId *)(pProcessedGangDriveBySimpleTask + 0x24));
+    AssocGroupId requiredAnimGroup = *((AssocGroupId *)(pProcessedGangDriveBySimpleTask + 0x28));
 
     if (m_pDrivebyAnimationHandler != NULL)
         *pRequiredAnim = m_pDrivebyAnimationHandler(*pRequiredAnim, requiredAnimGroup);
