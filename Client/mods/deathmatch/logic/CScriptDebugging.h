@@ -42,6 +42,7 @@ public:
 
     void LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, const char* szFormat, ...);
     void LogInformation(lua_State* luaVM, const char* szFormat, ...);
+    void LogInformationv(lua_State* luaVM, const char* szFormat, va_list marker);
     void LogWarning(lua_State* luaVM, const char* szFormat, ...);
     void LogError(lua_State* luaVM, const char* szFormat, ...);
     void LogBadPointer(lua_State* luaVM, const char* szArgumentType, unsigned int uiArgument);
