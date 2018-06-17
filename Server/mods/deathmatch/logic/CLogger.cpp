@@ -35,6 +35,16 @@ void CLogger::LogPrintf(const char* szFormat, ...)
     HandleLogPrint(true, "", szBuffer, true, true, false);
 }
 
+void CLogger::LogPrintfv(const char* szFormat, va_list marker)
+{
+    // Compose the formatted message
+    char    szBuffer[MAX_STRING_LENGTH];
+    VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
+
+    // Timestamp and send to the console and logfile
+    HandleLogPrint(true, "", szBuffer, true, true, false);
+}
+
 void CLogger::LogPrint(const char* szText)
 {
     // Timestamp and send to the console and logfile
@@ -50,6 +60,16 @@ void CLogger::LogPrintf(eLogLevel logLevel, const char* szFormat, ...)
     va_start(marker, szFormat);
     VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
     va_end(marker);
+
+    // Timestamp and send to the console and logfile
+    HandleLogPrint(true, "", szBuffer, true, true, false, logLevel);
+}
+
+void CLogger::LogPrintfv(eLogLevel logLevel, const char* szFormat, va_list marker)
+{
+    // Compose the formatted message
+    char    szBuffer[MAX_STRING_LENGTH];
+    VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
 
     // Timestamp and send to the console and logfile
     HandleLogPrint(true, "", szBuffer, true, true, false, logLevel);
@@ -116,6 +136,36 @@ void CLogger::AuthPrintf(const char* szFormat, ...)
     va_start(marker, szFormat);
     VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
     va_end(marker);
+
+    // Timestamp and send to the console, logfile and authfile
+    HandleLogPrint(true, "", szBuffer, true, true, true);
+}
+
+void CLogger::ErrorPrintfv(const char* szFormat, va_list marker)
+{
+    // Compose the formatted message
+    char    szBuffer[MAX_STRING_LENGTH];
+    VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
+
+    // Timestamp and send to the console and logfile
+    HandleLogPrint(true, "ERROR: ", szBuffer, true, true, false);
+}
+void CLogger::DebugPrintfv(const char* szFormat, va_list marker)
+{
+#ifdef MTA_DEBUG
+    // Compose the formatted message
+    char    szBuffer[MAX_STRING_LENGTH];
+    VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
+
+    // Timestamp and send to the console and logfile
+    HandleLogPrint(true, "DEBUG: ", szBuffer, true, true, false);
+#endif
+}
+void CLogger::AuthPrintfv(const char* szFormat, va_list marker)
+{
+    // Compose the formatted message
+    char    szBuffer[MAX_STRING_LENGTH];
+    VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
 
     // Timestamp and send to the console, logfile and authfile
     HandleLogPrint(true, "", szBuffer, true, true, true);

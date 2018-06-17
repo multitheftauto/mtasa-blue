@@ -73,6 +73,18 @@ void CScriptDebugging::LogInformation(lua_State* luaVM, const char* szFormat, ..
     LogString("INFO: ", GetLuaDebugInfo(luaVM), szBuffer, 3);
 }
 
+void CScriptDebugging::LogInformationv(lua_State* luaVM, const char* szFormat, va_list marker)
+{
+    assert(szFormat);
+
+    // Compose the formatted message
+    char    szBuffer[MAX_STRING_LENGTH];
+    VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
+
+    // Log it
+    LogString("INFO: ", GetLuaDebugInfo(luaVM), szBuffer, 3);
+}
+
 void CScriptDebugging::LogWarning(lua_State* luaVM, const char* szFormat, ...)
 {
     assert(szFormat);
