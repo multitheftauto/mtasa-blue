@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CEventGroupSA.h
-*  PURPOSE:     Header file for base event group class
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CEventGroupSA.h
+ *  PURPOSE:     Header file for base event group class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CGAMESA_EVENTGROUP
 #define __CGAMESA_EVENTGROUP
@@ -25,12 +24,12 @@ public:
 class CEventGroupSA : public CEventGroup
 {
 public:
-                                CEventGroupSA       ( CEventGroupSAInterface * pInterface )  { m_pInterface = pInterface; }
+    CEventGroupSA(CEventGroupSAInterface* pInterface) { m_pInterface = pInterface; }
 
-    CEvent *                    Add                 ( CEvent * pEvent, bool b_1 );
+    CEvent* Add(CEvent* pEvent, bool b_1);
 
 protected:
-    CEventGroupSAInterface *    m_pInterface;
+    CEventGroupSAInterface* m_pInterface;
 };
 
 #endif

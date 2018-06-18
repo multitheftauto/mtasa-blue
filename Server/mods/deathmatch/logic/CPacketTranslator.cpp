@@ -1,37 +1,30 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CPacketTranslator.cpp
-*  PURPOSE:     Network packet translator class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Kent Simon <>
-*               Jax <>
-*               lil_Toady <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CPacketTranslator.cpp
+ *  PURPOSE:     Network packet translator class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-CPacketTranslator::CPacketTranslator ( CPlayerManager* pPlayerManager )
+CPacketTranslator::CPacketTranslator(CPlayerManager* pPlayerManager)
 {
     m_pPlayerManager = pPlayerManager;
 }
 
-
-CPacketTranslator::~CPacketTranslator ( void )
+CPacketTranslator::~CPacketTranslator(void)
 {
-
 }
 
-
-CPacket* CPacketTranslator::Translate ( const NetServerPlayerID& Socket, ePacketID PacketID, NetBitStreamInterface& BitStream, SNetExtraInfo* pNetExtraInfo )
+CPacket* CPacketTranslator::Translate(const NetServerPlayerID& Socket, ePacketID PacketID, NetBitStreamInterface& BitStream, SNetExtraInfo* pNetExtraInfo)
 {
     // Create the packet class
     CPacket* pTemp = NULL;
-    switch ( (int)PacketID )
+    switch ((int)PacketID)
     {
         case PACKET_ID_PLAYER_JOIN:
             pTemp = new CPlayerJoinPacket;
@@ -172,42 +165,44 @@ CPacket* CPacketTranslator::Translate ( const NetServerPlayerID& Socket, ePacket
         case PACKET_ID_PLAYER_NO_SOCKET:
             pTemp = new CPlayerNoSocketPacket;
             break;
- 
+
         case PACKET_ID_PLAYER_NETWORK_STATUS:
             pTemp = new CPlayerNetworkStatusPacket;
             break;
 
-        default: break;
+        default:
+            break;
     }
 
     // Could we create the packet?
-    if ( pTemp )
+    if (pTemp)
     {
         // Set the source socket and player
-        pTemp->SetSourceSocket ( Socket );
+        pTemp->SetSourceSocket(Socket);
 
         // Make sure players that have just disconnected don't get their packet processed
-        CPlayer* pSourcePlayer = m_pPlayerManager->Get ( Socket );
-        if ( pSourcePlayer && pSourcePlayer->IsBeingDeleted () ) pSourcePlayer = NULL;
+        CPlayer* pSourcePlayer = m_pPlayerManager->Get(Socket);
+        if (pSourcePlayer && pSourcePlayer->IsBeingDeleted())
+            pSourcePlayer = NULL;
 
-        if ( pSourcePlayer && pNetExtraInfo )
+        if (pSourcePlayer && pNetExtraInfo)
         {
-            if ( pNetExtraInfo->m_bHasPing )
-                pSourcePlayer->SetPing ( pNetExtraInfo->m_uiPing );
+            if (pNetExtraInfo->m_bHasPing)
+                pSourcePlayer->SetPing(pNetExtraInfo->m_uiPing);
         }
 
         // Set the source player
-        pTemp->SetSourceElement ( pSourcePlayer );
+        pTemp->SetSourceElement(pSourcePlayer);
 
         // Check we have a source player if the packet type needs it
-        if ( !pSourcePlayer && pTemp->RequiresSourcePlayer () )
+        if (!pSourcePlayer && pTemp->RequiresSourcePlayer())
         {
             delete pTemp;
             pTemp = NULL;
         }
         else
-        // Attempt to read the content, if we fail, delete the packet again
-        if ( !pTemp->Read ( BitStream ) )
+            // Attempt to read the content, if we fail, delete the packet again
+            if (!pTemp->Read(BitStream))
         {
             delete pTemp;
             pTemp = NULL;

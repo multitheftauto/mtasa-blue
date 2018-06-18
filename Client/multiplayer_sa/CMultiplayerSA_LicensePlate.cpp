@@ -1,12 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        multiplayer_sa/CMultiplayerSA_LicensePlate.cpp
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        multiplayer_sa/CMultiplayerSA_LicensePlate.cpp
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 #include "..\game_sa\gamesa_renderware.h"
@@ -15,15 +15,14 @@ namespace
 {
     struct SPlateInfo
     {
-        std::vector < RpMaterial* > plateMaterialList;
+        std::vector<RpMaterial*> plateMaterialList;
     };
 
-    std::map < CVehicleModelInfoSAInterface*, SPlateInfo >  ms_ModelPlateMaterialsMap;
-    std::vector < RwTexture* >                              ms_SavedTextureList;
-    CVehicleModelInfoSAInterface*                           ms_pProcessingVehicleModelInfo = NULL;
-    RwTexture*                                              ms_pLastGeneratedPlateText = NULL;
-}
-
+    std::map<CVehicleModelInfoSAInterface*, SPlateInfo> ms_ModelPlateMaterialsMap;
+    std::vector<RwTexture*>                             ms_SavedTextureList;
+    CVehicleModelInfoSAInterface*                       ms_pProcessingVehicleModelInfo = NULL;
+    RwTexture*                                          ms_pLastGeneratedPlateText = NULL;
+}            // namespace
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -32,28 +31,28 @@ namespace
 // Swap custom plate textures (GTA only does one, we do the rest here)
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CAutomobile_CustomCarPlate_BeforeRenderingStart( CVehicleSAInterface* pVehicle, CVehicleModelInfoSAInterface* pVehicleModelInfo )
+void OnMY_CAutomobile_CustomCarPlate_BeforeRenderingStart(CVehicleSAInterface* pVehicle, CVehicleModelInfoSAInterface* pVehicleModelInfo)
 {
-    if ( !pVehicle->m_pCustomPlateTexture )
+    if (!pVehicle->m_pCustomPlateTexture)
         return;
 
-    SPlateInfo* pPlateInfo = MapFind( ms_ModelPlateMaterialsMap, pVehicleModelInfo );
-    if ( pPlateInfo && !pPlateInfo->plateMaterialList.empty() )
+    SPlateInfo* pPlateInfo = MapFind(ms_ModelPlateMaterialsMap, pVehicleModelInfo);
+    if (pPlateInfo && !pPlateInfo->plateMaterialList.empty())
     {
         // Copy custom plate texture (for this vehicle) into the model 'carplate' materials
-        for ( uint i = 0 ; i < pPlateInfo->plateMaterialList.size() ; i++ )
+        for (uint i = 0; i < pPlateInfo->plateMaterialList.size(); i++)
         {
             RpMaterial* pMaterial = pPlateInfo->plateMaterialList[i];
             // Only do replace if it's not the material that GTA is handling
-            if ( pMaterial != pVehicleModelInfo->pPlateMaterial )
+            if (pMaterial != pVehicleModelInfo->pPlateMaterial)
             {
                 RwTexture* pOldTexture = pMaterial->texture;
                 pOldTexture->refs++;
-                ms_SavedTextureList.push_back( pOldTexture );
-                RpMaterialSetTexture( pMaterial, pVehicle->m_pCustomPlateTexture );
+                ms_SavedTextureList.push_back(pOldTexture);
+                RpMaterialSetTexture(pMaterial, pVehicle->m_pCustomPlateTexture);
             }
             else
-                ms_SavedTextureList.push_back( NULL );
+                ms_SavedTextureList.push_back(NULL);
         }
     }
 }
@@ -61,7 +60,7 @@ void OnMY_CAutomobile_CustomCarPlate_BeforeRenderingStart( CVehicleSAInterface* 
 // Hook info
 #define HOOKPOS_CAutomobile_CustomCarPlate_BeforeRenderingStart                         0x006A2F00
 #define HOOKSIZE_CAutomobile_CustomCarPlate_BeforeRenderingStart                        7
-DWORD RETURN_CAutomobile_CustomCarPlate_BeforeRenderingStart =                          0x006A2F07;
+DWORD RETURN_CAutomobile_CustomCarPlate_BeforeRenderingStart = 0x006A2F07;
 void _declspec(naked) HOOK_CAutomobile_CustomCarPlate_BeforeRenderingStart()
 {
     _asm
@@ -79,7 +78,6 @@ void _declspec(naked) HOOK_CAutomobile_CustomCarPlate_BeforeRenderingStart()
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CAutomobile::CustomCarPlate_AfterRenderingStop
@@ -87,28 +85,28 @@ void _declspec(naked) HOOK_CAutomobile_CustomCarPlate_BeforeRenderingStart()
 // Restore custom plate textures
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CAutomobile_CustomCarPlate_AfterRenderingStop( CVehicleModelInfoSAInterface* pVehicleModelInfo )
+void OnMY_CAutomobile_CustomCarPlate_AfterRenderingStop(CVehicleModelInfoSAInterface* pVehicleModelInfo)
 {
-    if ( ms_SavedTextureList.empty() )
+    if (ms_SavedTextureList.empty())
         return;
 
-    SPlateInfo* pPlateInfo = MapFind( ms_ModelPlateMaterialsMap, pVehicleModelInfo );
-    if ( pPlateInfo )
+    SPlateInfo* pPlateInfo = MapFind(ms_ModelPlateMaterialsMap, pVehicleModelInfo);
+    if (pPlateInfo)
     {
         // Restore custom plate texture (for this vehicle) from the model 'carplate' materials
-        for ( uint i = 0 ; i < pPlateInfo->plateMaterialList.size() ; i++ )
+        for (uint i = 0; i < pPlateInfo->plateMaterialList.size(); i++)
         {
             RpMaterial* pMaterial = pPlateInfo->plateMaterialList[i];
-            RwTexture* pOldTexture = ms_SavedTextureList[i];
+            RwTexture*  pOldTexture = ms_SavedTextureList[i];
             // Only do restore if it's not the one that GTA handled
-            if ( pMaterial != pVehicleModelInfo->pPlateMaterial )
+            if (pMaterial != pVehicleModelInfo->pPlateMaterial)
             {
-                assert( pOldTexture );
-                RpMaterialSetTexture( pMaterial, pOldTexture );
-                RwTextureDestroy( pOldTexture );
+                assert(pOldTexture);
+                RpMaterialSetTexture(pMaterial, pOldTexture);
+                RwTextureDestroy(pOldTexture);
             }
             else
-                assert( pOldTexture == NULL );
+                assert(pOldTexture == NULL);
         }
         ms_SavedTextureList.clear();
     }
@@ -117,7 +115,7 @@ void OnMY_CAutomobile_CustomCarPlate_AfterRenderingStop( CVehicleModelInfoSAInte
 // Hook info
 #define HOOKPOS_CAutomobile_CustomCarPlate_AfterRenderingStop                         0x006A2F30
 #define HOOKSIZE_CAutomobile_CustomCarPlate_AfterRenderingStop                        7
-DWORD RETURN_CAutomobile_CustomCarPlate_AfterRenderingStop =                          0x006A2F37;
+DWORD RETURN_CAutomobile_CustomCarPlate_AfterRenderingStop = 0x006A2F37;
 void _declspec(naked) HOOK_CAutomobile_CustomCarPlate_AfterRenderingStop()
 {
     _asm
@@ -134,7 +132,6 @@ void _declspec(naked) HOOK_CAutomobile_CustomCarPlate_AfterRenderingStop()
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CCustomCarPlateMgr::SetupMaterialPlateTexture
@@ -142,19 +139,19 @@ void _declspec(naked) HOOK_CAutomobile_CustomCarPlate_AfterRenderingStop()
 // Save plate material for using later (in BeforeRenderingStart())
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CCustomCarPlateMgr_SetupMaterialPlateTexture( struct RpMaterial * a, char * b, unsigned char c )
+void OnMY_CCustomCarPlateMgr_SetupMaterialPlateTexture(struct RpMaterial* a, char* b, unsigned char c)
 {
-    if ( ms_pProcessingVehicleModelInfo )
+    if (ms_pProcessingVehicleModelInfo)
     {
-        SPlateInfo& info = MapGet( ms_ModelPlateMaterialsMap, ms_pProcessingVehicleModelInfo );
-        info.plateMaterialList.push_back( a );
+        SPlateInfo& info = MapGet(ms_ModelPlateMaterialsMap, ms_pProcessingVehicleModelInfo);
+        info.plateMaterialList.push_back(a);
     }
 }
 
 // Hook info
 #define HOOKPOS_CCustomCarPlateMgr_SetupMaterialPlateTexture                         0x006FE020
 #define HOOKSIZE_CCustomCarPlateMgr_SetupMaterialPlateTexture                        5
-DWORD RETURN_CCustomCarPlateMgr_SetupMaterialPlateTexture =                          0x006FE025;
+DWORD RETURN_CCustomCarPlateMgr_SetupMaterialPlateTexture = 0x006FE025;
 void _declspec(naked) HOOK_CCustomCarPlateMgr_SetupMaterialPlateTexture()
 {
     _asm
@@ -173,7 +170,6 @@ void _declspec(naked) HOOK_CCustomCarPlateMgr_SetupMaterialPlateTexture()
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CVehicleModelInfo::SetCarCustomPlate
@@ -181,15 +177,15 @@ void _declspec(naked) HOOK_CCustomCarPlateMgr_SetupMaterialPlateTexture()
 // Prepare to receive list of plate materials for this vehicle type
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CVehicleModelInfo_SetCarCustomPlate( CVehicleModelInfoSAInterface* pVehicleModelInfo )
+void OnMY_CVehicleModelInfo_SetCarCustomPlate(CVehicleModelInfoSAInterface* pVehicleModelInfo)
 {
-    assert( !ms_pLastGeneratedPlateText );
+    assert(!ms_pLastGeneratedPlateText);
     ms_pProcessingVehicleModelInfo = pVehicleModelInfo;
-    SPlateInfo& info = MapGet( ms_ModelPlateMaterialsMap, ms_pProcessingVehicleModelInfo );
+    SPlateInfo& info = MapGet(ms_ModelPlateMaterialsMap, ms_pProcessingVehicleModelInfo);
     info.plateMaterialList.clear();
 }
 
-void OnMY_CVehicleModelInfo_SetCarCustomPlate_Post( void )
+void OnMY_CVehicleModelInfo_SetCarCustomPlate_Post(void)
 {
     // Done
     ms_pProcessingVehicleModelInfo = NULL;
@@ -199,7 +195,7 @@ void OnMY_CVehicleModelInfo_SetCarCustomPlate_Post( void )
 // Hook info
 #define HOOKPOS_CVehicleModelInfo_SetCarCustomPlate                         0x004C9450
 #define HOOKSIZE_CVehicleModelInfo_SetCarCustomPlate                        6
-DWORD RETURN_CVehicleModelInfo_SetCarCustomPlate =                          0x004C9456;
+DWORD RETURN_CVehicleModelInfo_SetCarCustomPlate = 0x004C9456;
 void _declspec(naked) HOOK_CVehicleModelInfo_SetCarCustomPlate()
 {
     _asm
@@ -225,7 +221,6 @@ inner:
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CCustomCarPlateMgr::CreatePlateTexture
@@ -236,7 +231,7 @@ inner:
 //////////////////////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CCustomCarPlateMgr_CreatePlateTexture                         0x006FDEA0
 #define HOOKSIZE_CCustomCarPlateMgr_CreatePlateTexture                        5
-DWORD RETURN_CCustomCarPlateMgr_CreatePlateTexture =                          0x006FDEA5;
+DWORD RETURN_CCustomCarPlateMgr_CreatePlateTexture = 0x006FDEA5;
 void _declspec(naked) HOOK_CCustomCarPlateMgr_CreatePlateTexture()
 {
     _asm
@@ -268,7 +263,6 @@ inner:
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CMultiplayerSA::InitHooks_LicensePlate
@@ -276,11 +270,11 @@ inner:
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_LicensePlate ( void )
+void CMultiplayerSA::InitHooks_LicensePlate(void)
 {
-    EZHookInstall ( CAutomobile_CustomCarPlate_BeforeRenderingStart );
-    EZHookInstall ( CAutomobile_CustomCarPlate_AfterRenderingStop );
-    EZHookInstall ( CCustomCarPlateMgr_SetupMaterialPlateTexture );
-    EZHookInstall ( CVehicleModelInfo_SetCarCustomPlate );
-    EZHookInstall ( CCustomCarPlateMgr_CreatePlateTexture );
+    EZHookInstall(CAutomobile_CustomCarPlate_BeforeRenderingStart);
+    EZHookInstall(CAutomobile_CustomCarPlate_AfterRenderingStop);
+    EZHookInstall(CCustomCarPlateMgr_SetupMaterialPlateTexture);
+    EZHookInstall(CVehicleModelInfo_SetCarCustomPlate);
+    EZHookInstall(CCustomCarPlateMgr_CreatePlateTexture);
 }

@@ -1,18 +1,18 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.x
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CWebDevTools.cpp
-*  PURPOSE:     Web dev tools class
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.x
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CWebDevTools.cpp
+ *  PURPOSE:     Web dev tools class
+ *
+ *****************************************************************************/
 #include "StdInc.h"
 #include "CWebDevTools.h"
 
-bool CWebDevTools::Show ( CWebView* pWebView )
+bool CWebDevTools::Show(CWebView* pWebView)
 {
-    auto pBrowser = pWebView->GetCefBrowser ();
+    auto pBrowser = pWebView->GetCefBrowser();
     if (!pBrowser)
         return false;
 
@@ -20,23 +20,22 @@ bool CWebDevTools::Show ( CWebView* pWebView )
     CefBrowserSettings settings;
 
     CefWindowInfo windowInfo;
-    windowInfo.SetAsPopup ( NULL, "CEF Dev Tools (MTA:SA)" );
-    
+    windowInfo.SetAsPopup(NULL, "CEF Dev Tools (MTA:SA)");
+
     // Create independent CefClient (to bypass access restrictions)
-    CefRefPtr<CefClient> client { new CDevToolsClient };
+    CefRefPtr<CefClient> client{new CDevToolsClient};
 
     // ...and show the devtools
-    pBrowser->GetHost ()->ShowDevTools ( windowInfo, client, settings, CefPoint () );
+    pBrowser->GetHost()->ShowDevTools(windowInfo, client, settings, CefPoint());
     return true;
 }
 
-bool CWebDevTools::Close ( CWebView* pWebView )
+bool CWebDevTools::Close(CWebView* pWebView)
 {
     auto pBrowser = pWebView->GetCefBrowser();
     if (!pBrowser)
         return false;
 
-    pBrowser->GetHost ()->CloseDevTools ();
+    pBrowser->GetHost()->CloseDevTools();
     return true;
 }
-

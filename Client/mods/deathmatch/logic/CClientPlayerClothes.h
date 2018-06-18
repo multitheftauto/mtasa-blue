@@ -1,14 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientPlayerClothes.h
-*  PURPOSE:     Player entity clothes manager header
-*  DEVELOPERS:  Jax <>
-*               Christian Myhre Lundheim <>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientPlayerClothes.h
+ *  PURPOSE:     Player entity clothes manager header
+ *
+ *****************************************************************************/
 
 class CClientPlayerClothes;
 
@@ -51,36 +49,34 @@ struct SPlayerClothing
 class CClientPlayerClothes
 {
 public:
-                                CClientPlayerClothes        ( CClientPed* pPed );
-                                ~CClientPlayerClothes       ( void );
+    CClientPlayerClothes(CClientPed* pPed);
+    ~CClientPlayerClothes(void);
 
-    const SPlayerClothing*      GetClothing                 ( unsigned char ucType );
-    void                        AddClothes                  ( const char* szTexture, const char* szModel, unsigned char ucType, bool bAddToModel = true );
-    void                        InternalAddClothes          ( const SPlayerClothing* pClothing, unsigned char ucType );
-    bool                        RemoveClothes               ( unsigned char ucType, bool bRemoveFromModel = true );
-    
-    void                        AddAllToModel               ( void );
-    void                        RemoveAll                   ( bool bRemoveFromModel = true );
+    const SPlayerClothing* GetClothing(unsigned char ucType);
+    void                   AddClothes(const char* szTexture, const char* szModel, unsigned char ucType, bool bAddToModel = true);
+    void                   InternalAddClothes(const SPlayerClothing* pClothing, unsigned char ucType);
+    bool                   RemoveClothes(unsigned char ucType, bool bRemoveFromModel = true);
 
-    void                        DefaultClothes              ( bool bAddToModel = true );
+    void AddAllToModel(void);
+    void RemoveAll(bool bRemoveFromModel = true);
 
-    static bool                 HasEmptyClothing            ( unsigned char ucType );
-    static bool                 IsEmptyClothing             ( const SPlayerClothing * pClothing, unsigned char ucType );
-    static const char*          GetClothingName             ( unsigned char ucType );
+    void DefaultClothes(bool bAddToModel = true);
 
-    static const SPlayerClothing*   GetClothingGroup        ( unsigned char ucType );
-    static const int            GetClothingGroupMax         ( unsigned char ucType );
+    static bool        HasEmptyClothing(unsigned char ucType);
+    static bool        IsEmptyClothing(const SPlayerClothing* pClothing, unsigned char ucType);
+    static const char* GetClothingName(unsigned char ucType);
+
+    static const SPlayerClothing* GetClothingGroup(unsigned char ucType);
+    static const int              GetClothingGroupMax(unsigned char ucType);
 
 private:
-    static const SPlayerClothing*   GetClothing             ( const char* szTexture, const char* szModel, unsigned char ucType );
+    static const SPlayerClothing* GetClothing(const char* szTexture, const char* szModel, unsigned char ucType);
 
-    CClientPed*                 m_pPlayerModel;
+    CClientPed* m_pPlayerModel;
 
-    SFixedArray < const SPlayerClothing*, PLAYER_CLOTHING_SLOTS >         m_Clothes;
-    static SFixedArray < const SPlayerClothing*, PLAYER_CLOTHING_SLOTS >  m_GlobalClothes;
-    static bool                 m_bStaticInit;
+    SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS>        m_Clothes;
+    static SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS> m_GlobalClothes;
+    static bool                                                       m_bStaticInit;
 };
 
 #endif
-
-        

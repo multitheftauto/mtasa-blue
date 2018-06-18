@@ -29,23 +29,21 @@ AUTOMAKE_OPTIONS = foreign nostdinc
 # being currently built and tested are searched before the library which
 # might possibly already be installed in the system.
 #
-# $(top_builddir)/include/curl for generated curlbuild.h included from curl.h
-# $(top_builddir)/include for generated curlbuild.h inc. from lib/curl_setup.h
 # $(top_srcdir)/include is for libcurl's external include files
 # $(top_builddir)/lib is for libcurl's generated lib/curl_config.h file
 # $(top_builddir)/src is for curl's generated src/curl_config.h file
 # $(top_srcdir)/lib for libcurl's lib/curl_setup.h and other "borrowed" files
 # $(top_srcdir)/src is for curl's src/tool_setup.h and "curl-private" files
 
-AM_CPPFLAGS = -I$(top_builddir)/include/curl \
-              -I$(top_builddir)/include      \
-              -I$(top_srcdir)/include        \
+AM_CPPFLAGS = -I$(top_srcdir)/include        \
               -I$(top_builddir)/lib          \
               -I$(top_builddir)/src          \
               -I$(top_srcdir)/lib            \
               -I$(top_srcdir)/src
 
 bin_PROGRAMS = curl
+
+SUBDIRS = ../docs
 
 if USE_CPPFLAG_CURL_STATICLIB
 AM_CPPFLAGS += -DCURL_STATICLIB
@@ -71,6 +69,10 @@ endif
 curl_LDFLAGS = @LIBMETALINK_LDFLAGS@
 curl_CPPFLAGS = $(AM_CPPFLAGS) $(LIBMETALINK_CPPFLAGS)
 
+@CODE_COVERAGE_RULES@
+curl_LDFLAGS += $(CODE_COVERAGE_LDFLAGS)
+CFLAGS += $(CODE_COVERAGE_CFLAGS)
+
 # if unit tests are enabled, build a static library to link them with
 if BUILD_UNITTESTS
 noinst_LTLIBRARIES = libcurltool.la
@@ -81,7 +83,6 @@ libcurltool_la_LDFLAGS = -static $(LINKFLAGS)
 libcurltool_la_SOURCES = $(curl_SOURCES)
 endif
 
-BUILT_SOURCES = tool_hugehelp.c
 CLEANFILES = tool_hugehelp.c
 # Use the C locale to ensure that only ASCII characters appear in the
 # embedded text.
@@ -92,7 +93,8 @@ EXTRA_DIST = mkhelp.pl makefile.dj Makefile.b32		\
  macos/src/curl_GUSIConfig.cpp macos/src/macos_main.cpp makefile.amiga	\
  curl.rc Makefile.netware Makefile.inc Makefile.Watcom CMakeLists.txt
 
-MANPAGE=$(top_builddir)/docs/curl.1
+# Use absolute directory to disable VPATH
+MANPAGE=$(abs_top_builddir)/docs/curl.1
 README=$(top_srcdir)/docs/MANUAL
 MKHELP=$(top_srcdir)/src/mkhelp.pl
 HUGE=tool_hugehelp.c
@@ -101,25 +103,23 @@ if USE_MANUAL
 # Here are the stuff to create a built-in manual
 
 $(MANPAGE):
-	cd $(top_builddir)/docs && $(MAKE) curl.1
+	cd $(top_builddir)/docs && $(MAKE)
 
 if HAVE_LIBZ
 # This generates the tool_hugehelp.c file in both uncompressed and
-# compressed formats. $(MANPAGE) must be the first dependency so it
-# can be referenced with $< which points to the correct location in
-# the VPATH.
+# compressed formats.
 $(HUGE): $(MANPAGE) $(README) $(MKHELP)
 	echo '#include "tool_setup.h"' > $(HUGE)
 	echo '#ifndef HAVE_LIBZ' >> $(HUGE)
-	$(NROFF) $< | $(PERL) $(MKHELP) $(README) >> $(HUGE)
+	$(NROFF) $(MANPAGE) | $(PERL) $(MKHELP) $(README) >> $(HUGE)
 	echo '#else' >> $(HUGE)
-	$(NROFF) $< | $(PERL) $(MKHELP) -c $(README) >> $(HUGE)
+	$(NROFF) $(MANPAGE) | $(PERL) $(MKHELP) -c $(README) >> $(HUGE)
 	echo '#endif /* HAVE_LIBZ */' >> $(HUGE)
 else # HAVE_LIBZ
 # This generates the tool_hugehelp.c file uncompressed only
-$(HUGE): $(MANPAGE) $(README) mkhelp.pl
+$(HUGE): $(MANPAGE) $(README) $(MKHELP)
 	echo '#include "tool_setup.h"' > $(HUGE)
-	$(NROFF) $< | $(PERL) $(MKHELP) $(README) >> $(HUGE)
+	$(NROFF) $(MANPAGE) | $(PERL) $(MKHELP) $(README) >> $(HUGE)
 endif
 
 else # USE_MANUAL

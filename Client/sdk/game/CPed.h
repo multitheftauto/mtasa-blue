@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/game/CPed.h
-*  PURPOSE:     Ped entity interface
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/game/CPed.h
+ *  PURPOSE:     Ped entity interface
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CGAME_PED
 #define __CGAME_PED
@@ -29,7 +29,8 @@ class CVehicle;
 class CObject;
 class CWeaponStat;
 
-enum ePedPieceTypes {
+enum ePedPieceTypes
+{
     PED_PIECE_UNKNOWN = 0,
 
     PED_PIECE_TORSO = 3,
@@ -41,7 +42,8 @@ enum ePedPieceTypes {
     PED_PIECE_HEAD
 };
 
-enum eBone { 
+enum eBone
+{
     BONE_PELVIS1 = 1,
     BONE_PELVIS,
     BONE_SPINE1,
@@ -72,13 +74,15 @@ enum eBone {
     BONE_RIGHTFOOT
 };
 
-enum {
+enum
+{
     BIKE_KNOCK_OFF_DEFAULT = 0,
     BIKE_KNOCK_OFF_NEVER,
     BIKE_KNOCK_OFF_ALWAYS_NORMAL,
 };
 
-enum {
+enum
+{
     ATTACH_DIRECTION_FRONT = 0,
     ATTACH_DIRECTION_LEFT,
     ATTACH_DIRECTION_BACK,
@@ -139,14 +143,16 @@ enum eMoveAnim
     MOVE_SKATE,
 };
 
-inline bool IsValidMoveAnim( uint iMoveAnim )
+inline bool IsValidMoveAnim(uint iMoveAnim)
 {
-    return ( iMoveAnim == MOVE_DEFAULT ) ||
-           ( iMoveAnim >= MOVE_PLAYER && iMoveAnim <= MOVE_JETPACK ) ||
-           ( iMoveAnim >= MOVE_MAN    && iMoveAnim <= MOVE_SKATE );
+    return (iMoveAnim == MOVE_DEFAULT) || (iMoveAnim >= MOVE_PLAYER && iMoveAnim <= MOVE_JETPACK) || (iMoveAnim >= MOVE_MAN && iMoveAnim <= MOVE_SKATE);
 }
 
-enum { PLAYER_PED, CIVILIAN_PED };
+enum
+{
+    PLAYER_PED,
+    CIVILIAN_PED
+};
 
 namespace EPedWeaponAudioEvent
 {
@@ -160,104 +166,103 @@ using EPedWeaponAudioEvent::EPedWeaponAudioEventType;
 class CPed : public virtual CPhysical
 {
 public:
-    virtual                 ~CPed ( void ) {};
+    virtual ~CPed(void){};
 
-    virtual class CPedSAInterface * GetPedInterface ( void ) = 0;
+    virtual class CPedSAInterface* GetPedInterface(void) = 0;
 
-    virtual void            AttachPedToBike(CEntity * entity, CVector * vector, unsigned short sUnk, FLOAT fUnk, FLOAT fUnk2, eWeaponType weaponType)=0;
-    virtual void            DetachPedFromEntity ( void )=0;
+    virtual void AttachPedToBike(CEntity* entity, CVector* vector, unsigned short sUnk, FLOAT fUnk, FLOAT fUnk2, eWeaponType weaponType) = 0;
+    virtual void DetachPedFromEntity(void) = 0;
 
-    virtual bool            CanSeeEntity(CEntity * entity, FLOAT fDistance)=0;
-    virtual CVehicle        * GetVehicle()=0;
-    virtual void            Respawn (CVector * position,bool bCameraCut)=0;
+    virtual bool      CanSeeEntity(CEntity* entity, FLOAT fDistance) = 0;
+    virtual CVehicle* GetVehicle() = 0;
+    virtual void      Respawn(CVector* position, bool bCameraCut) = 0;
 
-    virtual void            SetModelIndex       ( unsigned long ulModel ) = 0;
-    virtual void            RemoveGeometryRef   ( void ) = 0;
+    virtual void SetModelIndex(unsigned long ulModel) = 0;
+    virtual void RemoveGeometryRef(void) = 0;
 
-    virtual FLOAT           GetHealth ()=0;
-    virtual void            SetHealth ( float fHealth )=0;
-    virtual float           GetArmor () = 0;
-    virtual void            SetArmor ( float fArmor ) = 0;
-    virtual float           GetOxygenLevel () = 0;
-    virtual void            SetOxygenLevel ( float fOxygen ) = 0;
-    virtual bool            AddProjectile ( eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector * target, CEntity * targetEntity )=0;
-    virtual CWeapon *       GiveWeapon ( eWeaponType weaponType, unsigned int uiAmmo, eWeaponSkill weaponSkill )=0;
-    virtual CWeapon *       GetWeapon ( eWeaponSlot weaponSlot )=0;
-    virtual CWeapon *       GetWeapon ( eWeaponType weaponType )=0;
-    virtual void            ClearWeapons        ( void ) = 0;
-    virtual void            RemoveWeaponModel ( int iModel ) = 0;
-    virtual void            ClearWeapon     ( eWeaponType weaponType )=0;
+    virtual FLOAT    GetHealth() = 0;
+    virtual void     SetHealth(float fHealth) = 0;
+    virtual float    GetArmor() = 0;
+    virtual void     SetArmor(float fArmor) = 0;
+    virtual float    GetOxygenLevel() = 0;
+    virtual void     SetOxygenLevel(float fOxygen) = 0;
+    virtual bool     AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity) = 0;
+    virtual CWeapon* GiveWeapon(eWeaponType weaponType, unsigned int uiAmmo, eWeaponSkill weaponSkill) = 0;
+    virtual CWeapon* GetWeapon(eWeaponSlot weaponSlot) = 0;
+    virtual CWeapon* GetWeapon(eWeaponType weaponType) = 0;
+    virtual void     ClearWeapons(void) = 0;
+    virtual void     RemoveWeaponModel(int iModel) = 0;
+    virtual void     ClearWeapon(eWeaponType weaponType) = 0;
 
-    virtual void            SetIsStanding( bool bStanding )=0;
-    virtual DWORD           GetType ()=0;
-    virtual CPedIntelligence *  GetPedIntelligence()=0;
-    virtual CPedSound *         GetPedSound () = 0;
-    virtual DWORD *         GetMemoryValue ( DWORD dwOffset )=0;
+    virtual void              SetIsStanding(bool bStanding) = 0;
+    virtual DWORD             GetType() = 0;
+    virtual CPedIntelligence* GetPedIntelligence() = 0;
+    virtual CPedSound*        GetPedSound() = 0;
+    virtual DWORD*            GetMemoryValue(DWORD dwOffset) = 0;
 
+    virtual FLOAT       GetCurrentRotation() = 0;
+    virtual FLOAT       GetTargetRotation() = 0;
+    virtual void        SetCurrentRotation(FLOAT fRotation) = 0;
+    virtual void        SetTargetRotation(FLOAT fRotation) = 0;
+    virtual eWeaponSlot GetCurrentWeaponSlot() = 0;
+    virtual void        SetCurrentWeaponSlot(eWeaponSlot weaponSlot) = 0;
 
-    virtual FLOAT           GetCurrentRotation()=0;
-    virtual FLOAT           GetTargetRotation()=0;
-    virtual void            SetCurrentRotation(FLOAT fRotation)=0;
-    virtual void            SetTargetRotation(FLOAT fRotation)=0;
-    virtual eWeaponSlot     GetCurrentWeaponSlot()=0;
-    virtual void            SetCurrentWeaponSlot ( eWeaponSlot weaponSlot )=0;
+    virtual CVector* GetBonePosition(eBone bone, CVector* vecPosition) = 0;
+    virtual CVector* GetTransformedBonePosition(eBone bone, CVector* vecPosition) = 0;
 
-    virtual CVector *       GetBonePosition ( eBone bone, CVector * vecPosition )=0;
-    virtual CVector *       GetTransformedBonePosition ( eBone bone, CVector * vecPosition )=0;
+    virtual bool IsDucking(void) = 0;
+    virtual void SetDucking(bool bDuck) = 0;
+    virtual bool IsInWater(void) = 0;
+    virtual int  GetCantBeKnockedOffBike(void) = 0;
+    virtual void SetCantBeKnockedOffBike(int iCantBeKnockedOffBike) = 0;
+    virtual void QuitEnteringCar(CVehicle* vehicle, int iSeat, bool bUnknown) = 0;
 
-    virtual bool            IsDucking ( void )=0;
-    virtual void            SetDucking ( bool bDuck )=0;
-    virtual bool            IsInWater ( void )=0;
-    virtual int             GetCantBeKnockedOffBike ( void )=0;
-    virtual void            SetCantBeKnockedOffBike ( int iCantBeKnockedOffBike )=0;
-    virtual void            QuitEnteringCar ( CVehicle * vehicle, int iSeat, bool bUnknown )=0;
+    virtual bool IsWearingGoggles(void) = 0;
+    virtual void SetGogglesState(bool bIsWearingThem) = 0;
 
-    virtual bool            IsWearingGoggles ( void )=0;
-    virtual void            SetGogglesState ( bool bIsWearingThem )=0;
+    virtual void SetClothesTextureAndModel(const char* szModel, const char* szModelLocationName, int iTexture) = 0;
+    virtual void RebuildPlayer(void) = 0;
 
-    virtual void            SetClothesTextureAndModel ( const char* szModel, const char* szModelLocationName, int iTexture ) = 0;
-    virtual void            RebuildPlayer ( void ) = 0;
+    virtual eFightingStyle GetFightingStyle(void) = 0;
+    virtual void           SetFightingStyle(eFightingStyle style, BYTE bStyleExtra) = 0;
 
-    virtual eFightingStyle  GetFightingStyle ( void ) = 0;
-    virtual void            SetFightingStyle ( eFightingStyle style, BYTE bStyleExtra ) = 0;
+    virtual CEntity* GetContactEntity(void) = 0;
 
-    virtual CEntity*        GetContactEntity ( void ) = 0;
+    virtual unsigned char GetRunState(void) = 0;
 
-    virtual unsigned char   GetRunState ( void ) = 0;
+    virtual CEntity* GetTargetedEntity(void) = 0;
+    virtual void     SetTargetedEntity(CEntity* pEntity) = 0;
 
-    virtual CEntity*        GetTargetedEntity ( void ) = 0;
-    virtual void            SetTargetedEntity ( CEntity* pEntity ) = 0;
+    virtual bool GetCanBeShotInVehicle(void) = 0;
+    virtual bool GetTestForShotInVehicle(void) = 0;
 
-    virtual bool            GetCanBeShotInVehicle       ( void ) = 0;
-    virtual bool            GetTestForShotInVehicle     ( void ) = 0;
+    virtual void SetCanBeShotInVehicle(bool bShot) = 0;
+    virtual void SetTestForShotInVehicle(bool bTest) = 0;
 
-    virtual void            SetCanBeShotInVehicle       ( bool bShot ) = 0;
-    virtual void            SetTestForShotInVehicle     ( bool bTest ) = 0;
+    virtual BYTE GetOccupiedSeat(void) = 0;
+    virtual void SetOccupiedSeat(BYTE seat) = 0;
 
-    virtual BYTE            GetOccupiedSeat ( void ) = 0;
-    virtual void            SetOccupiedSeat ( BYTE seat ) = 0;
+    virtual void RemoveBodyPart(int i, char c) = 0;
 
-    virtual void            RemoveBodyPart ( int i, char c ) = 0;
+    virtual void         SetFootBlood(unsigned int uiFootBlood) = 0;
+    virtual unsigned int GetFootBlood(void) = 0;
 
-    virtual void            SetFootBlood ( unsigned int uiFootBlood ) = 0;
-    virtual unsigned int    GetFootBlood ( void ) = 0;
+    virtual bool IsOnFire(void) = 0;
+    virtual void SetOnFire(bool bOnFire) = 0;
 
-    virtual bool            IsOnFire ( void ) = 0;
-    virtual void            SetOnFire ( bool bOnFire ) = 0;
+    virtual bool GetStayInSamePlace(void) = 0;
+    virtual void SetStayInSamePlace(bool bStay) = 0;
 
-    virtual bool            GetStayInSamePlace ( void ) = 0;
-    virtual void            SetStayInSamePlace ( bool bStay ) = 0;
+    virtual void GetVoice(short* psVoiceType, short* psVoiceID) = 0;
+    virtual void GetVoice(const char** pszVoiceType, const char** pszVoice) = 0;
+    virtual void SetVoice(short sVoiceType, short sVoiceID) = 0;
+    virtual void SetVoice(const char* szVoiceType, const char* szVoice) = 0;
 
-    virtual void            GetVoice           ( short* psVoiceType, short* psVoiceID ) = 0;
-    virtual void            GetVoice           ( const char** pszVoiceType, const char** pszVoice ) = 0;
-    virtual void            SetVoice           ( short sVoiceType, short sVoiceID ) = 0;
-    virtual void            SetVoice           ( const char* szVoiceType, const char* szVoice ) = 0;
+    virtual CWeaponStat* GetCurrentWeaponStat(void) = 0;
+    virtual float        GetCurrentWeaponRange(void) = 0;
+    virtual void         AddWeaponAudioEvent(EPedWeaponAudioEventType audioEventType) = 0;
 
-    virtual CWeaponStat*    GetCurrentWeaponStat    ( void ) = 0;
-    virtual float           GetCurrentWeaponRange   ( void ) = 0;
-    virtual void            AddWeaponAudioEvent     ( EPedWeaponAudioEventType audioEventType ) = 0;
-
-    virtual int             GetCustomMoveAnim       ( void ) = 0;
+    virtual int GetCustomMoveAnim(void) = 0;
 };
 
 #endif
