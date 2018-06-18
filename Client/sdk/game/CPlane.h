@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/game/CPlane.h
-*  PURPOSE:     Plane vehicle entity interface
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/game/CPlane.h
+ *  PURPOSE:     Plane vehicle entity interface
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CGAME_PLANE
 #define __CGAME_PLANE
@@ -17,7 +17,7 @@
 class CPlane : public virtual CVehicle
 {
 public:
-    virtual             ~CPlane ( void ) {};
+    virtual ~CPlane(void){};
 };
 
 #endif

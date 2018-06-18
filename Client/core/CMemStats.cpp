@@ -1,41 +1,41 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CMemStats.cpp
-*               
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CMemStats.cpp
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include <StdInc.h>
 #include <Psapi.h>
 #include <game/CGame.h>
 #include "CModelCacheManager.h"
 
-DECLARE_ENUM( ePools );
-IMPLEMENT_ENUM_BEGIN( ePools )
-    ADD_ENUM1( BUILDING_POOL )
-    ADD_ENUM1( PED_POOL )
-    ADD_ENUM1( OBJECT_POOL )
-    ADD_ENUM1( DUMMY_POOL )
-    ADD_ENUM1( VEHICLE_POOL )
-    ADD_ENUM1( COL_MODEL_POOL )
-    ADD_ENUM1( TASK_POOL )
-    ADD_ENUM1( EVENT_POOL )
-    ADD_ENUM1( TASK_ALLOCATOR_POOL )
-    ADD_ENUM1( PED_INTELLIGENCE_POOL )
-    ADD_ENUM1( PED_ATTRACTOR_POOL )
-    ADD_ENUM1( ENTRY_INFO_NODE_POOL )
-    ADD_ENUM1( NODE_ROUTE_POOL )
-    ADD_ENUM1( PATROL_ROUTE_POOL )
-    ADD_ENUM1( POINT_ROUTE_POOL )
-    ADD_ENUM1( POINTER_DOUBLE_LINK_POOL )
-    ADD_ENUM1( POINTER_SINGLE_LINK_POOL )
-    ADD_ENUM1( ENV_MAP_MATERIAL_POOL )
-    ADD_ENUM1( ENV_MAP_ATOMIC_POOL )
-    ADD_ENUM1( SPEC_MAP_MATERIAL_POOL )
-IMPLEMENT_ENUM_END( "ePools" )
+DECLARE_ENUM(ePools);
+IMPLEMENT_ENUM_BEGIN(ePools)
+ADD_ENUM1(BUILDING_POOL)
+ADD_ENUM1(PED_POOL)
+ADD_ENUM1(OBJECT_POOL)
+ADD_ENUM1(DUMMY_POOL)
+ADD_ENUM1(VEHICLE_POOL)
+ADD_ENUM1(COL_MODEL_POOL)
+ADD_ENUM1(TASK_POOL)
+ADD_ENUM1(EVENT_POOL)
+ADD_ENUM1(TASK_ALLOCATOR_POOL)
+ADD_ENUM1(PED_INTELLIGENCE_POOL)
+ADD_ENUM1(PED_ATTRACTOR_POOL)
+ADD_ENUM1(ENTRY_INFO_NODE_POOL)
+ADD_ENUM1(NODE_ROUTE_POOL)
+ADD_ENUM1(PATROL_ROUTE_POOL)
+ADD_ENUM1(POINT_ROUTE_POOL)
+ADD_ENUM1(POINTER_DOUBLE_LINK_POOL)
+ADD_ENUM1(POINTER_SINGLE_LINK_POOL)
+ADD_ENUM1(ENV_MAP_MATERIAL_POOL)
+ADD_ENUM1(ENV_MAP_ATOMIC_POOL)
+ADD_ENUM1(SPEC_MAP_MATERIAL_POOL)
+IMPLEMENT_ENUM_END("ePools")
 
 namespace
 {
@@ -46,7 +46,7 @@ namespace
     //
     // Commas in big numbers
     //
-    template<class T>
+    template <class T>
     static SString FormatNumberWithCommas(T value, int numberOfDecimalPlaces = 0)
     {
 #if 0
@@ -63,9 +63,8 @@ namespace
         std::stringstream ss;
         ss << value;
 #endif
-        return SString ( ss.str() );
+        return SString(ss.str());
     }
-
 
     //
     // For drawing tables with nice neat columns in D3D
@@ -75,127 +74,120 @@ namespace
     public:
         struct SColumn
         {
-            uint uiWidth;
-            uint uiAlignment;
+            uint    uiWidth;
+            uint    uiAlignment;
             SString strText;
         };
 
-        CDxTable ( const SString& strColumnDivider = "," )
-            : m_strColumnDivider ( strColumnDivider )
-            , m_uiTotalWidth ( 0 )
-            , m_uiNumRows ( 0 )
-        {
-        }
+        CDxTable(const SString& strColumnDivider = ",") : m_strColumnDivider(strColumnDivider), m_uiTotalWidth(0), m_uiNumRows(0) {}
 
         // Setup number of columns and the width/alignment of each column
         // This also resets the table
-        void SetColumnWidths ( const SString& strWidths )
+        void SetColumnWidths(const SString& strWidths)
         {
-            m_ColumnList.clear ();
+            m_ColumnList.clear();
             m_uiTotalWidth = 0;
             m_uiNumRows = 0;
 
-            CSplitString splitString ( strWidths, ",", 0, m_ColumnList.size () );
+            CSplitString splitString(strWidths, ",", 0, m_ColumnList.size());
 
-            for ( uint i = 0 ; i < splitString.size () ; i++ )
+            for (uint i = 0; i < splitString.size(); i++)
             {
-                CSplitString splitString2 ( splitString[i], ":", 0, 2 );
-                uint uiWidth = atoi ( splitString2[0] );
-                const char* szAlignment = splitString2[1];
+                CSplitString splitString2(splitString[i], ":", 0, 2);
+                uint         uiWidth = atoi(splitString2[0]);
+                const char*  szAlignment = splitString2[1];
 
                 SColumn column;
                 column.uiWidth = uiWidth;
                 column.uiAlignment = szAlignment[0] == 'R' ? DT_RIGHT : szAlignment[0] == 'C' ? DT_CENTER : DT_LEFT;
-                m_ColumnList.push_back ( column );
+                m_ColumnList.push_back(column);
 
                 m_uiTotalWidth += uiWidth;
             }
         }
 
         // For cell colors depending on cell value
-        void SetNumberColors ( const SString& strTag, const SString& strColorInfo )
+        void SetNumberColors(const SString& strTag, const SString& strColorInfo)
         {
-            std::map < int, SString >& valueColorCodeMap = MapGet ( m_ValueColorCodeMapMap, strTag );
+            std::map<int, SString>& valueColorCodeMap = MapGet(m_ValueColorCodeMapMap, strTag);
 
-            valueColorCodeMap.clear ();
+            valueColorCodeMap.clear();
 
-            CSplitString splitString ( strColorInfo, "," );
+            CSplitString splitString(strColorInfo, ",");
 
-            for ( uint i = 0 ; i < splitString.size () ; i++ )
+            for (uint i = 0; i < splitString.size(); i++)
             {
                 const char* szItem = splitString[i];
-                if ( strlen ( szItem ) < 8 )
+                if (strlen(szItem) < 8)
                     continue;
 
-                int iValue =  atoi ( szItem + 7 );
-                MapSet ( valueColorCodeMap, iValue, SStringX ( szItem ).SubStr ( 0, 7 ) );
+                int iValue = atoi(szItem + 7);
+                MapSet(valueColorCodeMap, iValue, SStringX(szItem).SubStr(0, 7));
             }
         }
 
         // Add a new row of data
-        void AddRow ( const SString& strRow )
+        void AddRow(const SString& strRow)
         {
-            CSplitString splitString ( strRow, m_strColumnDivider, 0, m_ColumnList.size () );
+            CSplitString splitString(strRow, m_strColumnDivider, 0, m_ColumnList.size());
 
             SString strTemp;
-            for ( uint i = 0 ; i < splitString.size () && i < m_ColumnList.size() ; i++ )
+            for (uint i = 0; i < splitString.size() && i < m_ColumnList.size(); i++)
             {
                 SColumn& column = m_ColumnList[i];
 
                 const char* szText = splitString[i];
 
                 // Replace ~X0 with X
-                if ( const char* szPos = strchr ( szText, '~' ) )
+                if (const char* szPos = strchr(szText, '~'))
                 {
-                    uint iPos = (uint)szPos - (uint)szText;
-                    SStringX strText ( szText );
-                    if ( szPos[2] == '0' )
+                    uint     iPos = (uint)szPos - (uint)szText;
+                    SStringX strText(szText);
+                    if (szPos[2] == '0')
                     {
-                        strTemp = strText.SubStr ( 0, iPos ) + strText.SubStr ( iPos + 1, 1 ) + strText.SubStr ( iPos + 3 );
+                        strTemp = strText.SubStr(0, iPos) + strText.SubStr(iPos + 1, 1) + strText.SubStr(iPos + 3);
                     }
                     else
                     {
-                        strTemp = strText.SubStr ( 0, iPos ) + strText.SubStr ( iPos + 2 );
+                        strTemp = strText.SubStr(0, iPos) + strText.SubStr(iPos + 2);
                     }
                     szText = strTemp;
                 }
 
                 // If it starts with ^, eval following number and prepend color code
-                if ( szText[0] == '^' && szText[1] )
+                if (szText[0] == '^' && szText[1])
                 {
-                    const std::map < int, SString >& valueColorCodeMap = MapGet ( m_ValueColorCodeMapMap, std::string ( szText, 2 ) );
+                    const std::map<int, SString>& valueColorCodeMap = MapGet(m_ValueColorCodeMapMap, std::string(szText, 2));
 
                     const char* szValue = szText + 2;
-                    int iValue = atoi ( szValue );
-                    SString strColorCode = "#00FFFF";
+                    int         iValue = atoi(szValue);
+                    SString     strColorCode = "#00FFFF";
 
-                    std::map < int, SString >::const_iterator iterNext = valueColorCodeMap.begin ();
-                    if ( iterNext != valueColorCodeMap.end () )
+                    std::map<int, SString>::const_iterator iterNext = valueColorCodeMap.begin();
+                    if (iterNext != valueColorCodeMap.end())
                     {
-                        std::map < int, SString >::const_iterator iterCur = iterNext++;
-                        for ( ; iterNext != valueColorCodeMap.end () ; ++iterCur, ++iterNext )
+                        std::map<int, SString>::const_iterator iterCur = iterNext++;
+                        for (; iterNext != valueColorCodeMap.end(); ++iterCur, ++iterNext)
                         {
-                            if ( iValue < 0 )
+                            if (iValue < 0)
                             {
-                                if ( iValue < iterNext->first )
+                                if (iValue < iterNext->first)
                                 {
                                     strColorCode = iterCur->second;
                                     break;
                                 }
                             }
-                            else
-                            if ( iValue == 0 )
+                            else if (iValue == 0)
                             {
-                                if ( iValue == iterCur->first )
+                                if (iValue == iterCur->first)
                                 {
                                     strColorCode = iterCur->second;
                                     break;
                                 }
                             }
-                            else
-                            if ( iValue > 0 )
+                            else if (iValue > 0)
                             {
-                                if ( iValue <= iterNext->first )
+                                if (iValue <= iterNext->first)
                                 {
                                     strColorCode = iterNext->second;
                                     break;
@@ -215,49 +207,43 @@ namespace
             m_uiNumRows++;
         }
 
-        uint GetPixelWidth ( void ) const
-        {
-            return m_uiTotalWidth;
-        }
+        uint GetPixelWidth(void) const { return m_uiTotalWidth; }
 
-        uint GetPixelHeight ( void ) const
-        {
-            return m_uiNumRows * 15;
-        }
+        uint GetPixelHeight(void) const { return m_uiNumRows * 15; }
 
         // Draw the table with D3D
-        void Draw ( float fX, float fY, DWORD dwBackColor, uint uiBorderLeft, uint uiBorderRight, uint uiBorderUp, uint uiBorderDown )
+        void Draw(float fX, float fY, DWORD dwBackColor, uint uiBorderLeft, uint uiBorderRight, uint uiBorderUp, uint uiBorderDown)
         {
             // Draw background if required
-            if ( dwBackColor )
-                g_pGraphics->DrawRectQueued (   fX - uiBorderLeft, fY - uiBorderUp, GetPixelWidth () + uiBorderLeft + uiBorderRight, GetPixelHeight () + uiBorderUp + uiBorderDown, dwBackColor, true );
+            if (dwBackColor)
+                g_pGraphics->DrawRectQueued(fX - uiBorderLeft, fY - uiBorderUp, GetPixelWidth() + uiBorderLeft + uiBorderRight,
+                                            GetPixelHeight() + uiBorderUp + uiBorderDown, dwBackColor, true);
 
             // Draw each column
-            for ( uint i = 0 ; i < m_ColumnList.size () ; i++ )
+            for (uint i = 0; i < m_ColumnList.size(); i++)
             {
                 const SColumn& column = m_ColumnList[i];
-                g_pGraphics->DrawTextQueued ( fX, fY, fX + column.uiWidth, fY, 0xFFFFFFFF, column.strText, 1, 1, DT_NOCLIP | column.uiAlignment, NULL, true, true );
+                g_pGraphics->DrawStringQueued(fX, fY, fX + column.uiWidth, fY, 0xFFFFFFFF, column.strText, 1, 1, DT_NOCLIP | column.uiAlignment, NULL, true,
+                                              true);
                 fX += column.uiWidth;
             }
         }
 
     protected:
-        std::map < SString, std::map < int, SString > >  m_ValueColorCodeMapMap;
-        SString                         m_strColumnDivider;
-        uint                            m_uiTotalWidth;
-        uint                            m_uiNumRows;
-        std::vector < SColumn >         m_ColumnList;
+        std::map<SString, std::map<int, SString> > m_ValueColorCodeMapMap;
+        SString                                    m_strColumnDivider;
+        uint                                       m_uiTotalWidth;
+        uint                                       m_uiNumRows;
+        std::vector<SColumn>                       m_ColumnList;
     };
 
-
     // Clear SMemStatsInfo struct
-    void MemStatsInfoClear ( SMemStatsInfo& memStats )
+    void MemStatsInfoClear(SMemStatsInfo& memStats)
     {
-        static SMemStatsInfo* pZeroed = new SMemStatsInfo ();
+        static SMemStatsInfo* pZeroed = new SMemStatsInfo();
         memStats = *pZeroed;
     }
-}
-
+}            // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -268,30 +254,29 @@ class CMemStats : public CMemStatsInterface
 {
 public:
     ZERO_ON_NEW
-                        CMemStats               ( void );
-                        ~CMemStats              ( void );
+    CMemStats(void);
+    ~CMemStats(void);
 
     // CMemStatsInterface methods
-    virtual void        Draw                    ( void );
-    virtual void        SetEnabled              ( bool bEnabled );
-    virtual bool        IsEnabled               ( void );
-    virtual void        SampleState             ( SMemStatsInfo& memStatsInfo );
+    virtual void Draw(void);
+    virtual void SetEnabled(bool bEnabled);
+    virtual bool IsEnabled(void);
+    virtual void SampleState(SMemStatsInfo& memStatsInfo);
 
 protected:
-    void                UpdateFrameStats        ( void );
-    void                UpdateIntervalStats     ( void );
-    void                CreateTables            ( void );
+    void UpdateFrameStats(void);
+    void UpdateIntervalStats(void);
+    void CreateTables(void);
 
-    CElapsedTime            m_UpdateTimer;
-    bool                    m_bEnabled;
-    SMemStatsInfo           m_MemStatsNow;
-    SMemStatsInfo           m_MemStatsPrev;
-    SMemStatsInfo           m_MemStatsDelta;
-    SMemStatsInfo           m_MemStatsMax;
-    std::list < CDxTable >  m_TableList;
-    float                   m_fPosY;
+    CElapsedTime        m_UpdateTimer;
+    bool                m_bEnabled;
+    SMemStatsInfo       m_MemStatsNow;
+    SMemStatsInfo       m_MemStatsPrev;
+    SMemStatsInfo       m_MemStatsDelta;
+    SMemStatsInfo       m_MemStatsMax;
+    std::list<CDxTable> m_TableList;
+    float               m_fPosY;
 };
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -300,27 +285,25 @@ protected:
 ///////////////////////////////////////////////////////////////
 CMemStats* g_pMemStats = NULL;
 
-CMemStatsInterface* GetMemStats ( void )
+CMemStatsInterface* GetMemStats(void)
 {
-    if ( !g_pMemStats )
-        g_pMemStats = new CMemStats ();
+    if (!g_pMemStats)
+        g_pMemStats = new CMemStats();
     return g_pMemStats;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
 // CVideoModeManager implementation
 //
 ///////////////////////////////////////////////////////////////
-CMemStats::CMemStats ( void )
+CMemStats::CMemStats(void)
 {
 }
 
-CMemStats::~CMemStats ( void )
+CMemStats::~CMemStats(void)
 {
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -329,21 +312,20 @@ CMemStats::~CMemStats ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CMemStats::SetEnabled ( bool bEnabled )
+void CMemStats::SetEnabled(bool bEnabled)
 {
-    if ( m_bEnabled != bEnabled )
+    if (m_bEnabled != bEnabled)
     {
         m_bEnabled = bEnabled;
         // Clear accumulated changes for first display
-        if ( m_bEnabled )
+        if (m_bEnabled)
         {
-            UpdateIntervalStats ();
-            UpdateIntervalStats ();
-            CreateTables ();
+            UpdateIntervalStats();
+            UpdateIntervalStats();
+            CreateTables();
         }
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -352,11 +334,10 @@ void CMemStats::SetEnabled ( bool bEnabled )
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CMemStats::IsEnabled (void )
+bool CMemStats::IsEnabled(void)
 {
     return m_bEnabled;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -365,58 +346,56 @@ bool CMemStats::IsEnabled (void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CMemStats::Draw ( void )
+void CMemStats::Draw(void)
 {
-    if ( !m_bEnabled )
+    if (!m_bEnabled)
         return;
 
-    UpdateFrameStats ();
+    UpdateFrameStats();
 
     // Time to update?
-    if ( m_UpdateTimer.Get () > 2000 )
+    if (m_UpdateTimer.Get() > 2000)
     {
-        m_UpdateTimer.Reset ();
-        UpdateIntervalStats ();
-        CreateTables ();
+        m_UpdateTimer.Reset();
+        UpdateIntervalStats();
+        CreateTables();
     }
 
-    float fResWidth = static_cast < float > ( g_pGraphics->GetViewportWidth () );
-    float fResHeight = static_cast < float > ( g_pGraphics->GetViewportHeight () );
+    float fResWidth = static_cast<float>(g_pGraphics->GetViewportWidth());
+    float fResHeight = static_cast<float>(g_pGraphics->GetViewportHeight());
     float fTotalHeight = 0;
 
     // Draw tables
-    if ( !m_TableList.empty () )
+    if (!m_TableList.empty())
     {
-
-        float fX = fResWidth - m_TableList.front ().GetPixelWidth () - 15;
+        float fX = fResWidth - m_TableList.front().GetPixelWidth() - 15;
         float fY = 200 - m_fPosY;
 
-        for ( std::list < CDxTable >::iterator iter = m_TableList.begin () ; iter != m_TableList.end () ; ++iter )
+        for (std::list<CDxTable>::iterator iter = m_TableList.begin(); iter != m_TableList.end(); ++iter)
         {
             CDxTable& table = *iter;
-            table.Draw ( fX, fY, 0x78000000, 10, 10, 8, 8 );
-            float fHeight = table.GetPixelHeight () + 20;
+            table.Draw(fX, fY, 0x78000000, 10, 10, 8, 8);
+            float fHeight = table.GetPixelHeight() + 20;
             fY += fHeight;
             fTotalHeight += fHeight;
         }
     }
 
     // Handle scrolling
-    bool bHoldingPageUp = ( GetAsyncKeyState ( VK_PRIOR ) & 0x8000 ) != 0;
-    bool bHoldingPageDown = ( GetAsyncKeyState ( VK_NEXT ) & 0x8000 ) != 0;
+    bool bHoldingPageUp = (GetAsyncKeyState(VK_PRIOR) & 0x8000) != 0;
+    bool bHoldingPageDown = (GetAsyncKeyState(VK_NEXT) & 0x8000) != 0;
 
-    if ( bHoldingPageUp )
+    if (bHoldingPageUp)
     {
-        m_fPosY = std::max ( 0.f, m_fPosY - 10 );
+        m_fPosY = std::max(0.f, m_fPosY - 10);
     }
-    if ( bHoldingPageDown )
+    if (bHoldingPageDown)
     {
-        float fScrollHeight = fTotalHeight - ( fResHeight - 200 );
-        if ( fScrollHeight > 0 )
-            m_fPosY = std::min ( fScrollHeight, m_fPosY + 10 );
+        float fScrollHeight = fTotalHeight - (fResHeight - 200);
+        if (fScrollHeight > 0)
+            m_fPosY = std::min(fScrollHeight, m_fPosY + 10);
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -425,33 +404,40 @@ void CMemStats::Draw ( void )
 // Update values that are measured each frame
 //
 ///////////////////////////////////////////////////////////////
-void CMemStats::UpdateFrameStats ( void )
+void CMemStats::UpdateFrameStats(void)
 {
-
     m_MemStatsNow.d3dMemory = g_pDeviceState->MemoryState;
 
-    static CProxyDirect3DDevice9::SResourceMemory* const nowList[] = {    &m_MemStatsNow.d3dMemory.StaticVertexBuffer, &m_MemStatsNow.d3dMemory.DynamicVertexBuffer,
-                                                                                &m_MemStatsNow.d3dMemory.StaticIndexBuffer, &m_MemStatsNow.d3dMemory.DynamicIndexBuffer,
-                                                                                &m_MemStatsNow.d3dMemory.StaticTexture, &m_MemStatsNow.d3dMemory.DynamicTexture,
-                                                                                &m_MemStatsNow.d3dMemory.Effect };
+    static CProxyDirect3DDevice9::SResourceMemory* const nowList[] = {&m_MemStatsNow.d3dMemory.StaticVertexBuffer,
+                                                                      &m_MemStatsNow.d3dMemory.DynamicVertexBuffer,
+                                                                      &m_MemStatsNow.d3dMemory.StaticIndexBuffer,
+                                                                      &m_MemStatsNow.d3dMemory.DynamicIndexBuffer,
+                                                                      &m_MemStatsNow.d3dMemory.StaticTexture,
+                                                                      &m_MemStatsNow.d3dMemory.DynamicTexture,
+                                                                      &m_MemStatsNow.d3dMemory.Effect};
 
-    static CProxyDirect3DDevice9::SResourceMemory* const maxList[] = {    &m_MemStatsMax.d3dMemory.StaticVertexBuffer, &m_MemStatsMax.d3dMemory.DynamicVertexBuffer,
-                                                                                &m_MemStatsMax.d3dMemory.StaticIndexBuffer, &m_MemStatsMax.d3dMemory.DynamicIndexBuffer,
-                                                                                &m_MemStatsMax.d3dMemory.StaticTexture, &m_MemStatsMax.d3dMemory.DynamicTexture,
-                                                                                &m_MemStatsMax.d3dMemory.Effect };
+    static CProxyDirect3DDevice9::SResourceMemory* const maxList[] = {&m_MemStatsMax.d3dMemory.StaticVertexBuffer,
+                                                                      &m_MemStatsMax.d3dMemory.DynamicVertexBuffer,
+                                                                      &m_MemStatsMax.d3dMemory.StaticIndexBuffer,
+                                                                      &m_MemStatsMax.d3dMemory.DynamicIndexBuffer,
+                                                                      &m_MemStatsMax.d3dMemory.StaticTexture,
+                                                                      &m_MemStatsMax.d3dMemory.DynamicTexture,
+                                                                      &m_MemStatsMax.d3dMemory.Effect};
 
-    CProxyDirect3DDevice9::SResourceMemory* const prevList[] = {   &m_MemStatsPrev.d3dMemory.StaticVertexBuffer, &m_MemStatsPrev.d3dMemory.DynamicVertexBuffer,
-                                                                                &m_MemStatsPrev.d3dMemory.StaticIndexBuffer, &m_MemStatsPrev.d3dMemory.DynamicIndexBuffer,
-                                                                                &m_MemStatsPrev.d3dMemory.StaticTexture, &m_MemStatsPrev.d3dMemory.DynamicTexture,
-                                                                                &m_MemStatsPrev.d3dMemory.Effect };
+    CProxyDirect3DDevice9::SResourceMemory* const prevList[] = {&m_MemStatsPrev.d3dMemory.StaticVertexBuffer,
+                                                                &m_MemStatsPrev.d3dMemory.DynamicVertexBuffer,
+                                                                &m_MemStatsPrev.d3dMemory.StaticIndexBuffer,
+                                                                &m_MemStatsPrev.d3dMemory.DynamicIndexBuffer,
+                                                                &m_MemStatsPrev.d3dMemory.StaticTexture,
+                                                                &m_MemStatsPrev.d3dMemory.DynamicTexture,
+                                                                &m_MemStatsPrev.d3dMemory.Effect};
 
-    for ( uint i = 0 ; i < NUMELMS( nowList ) ; i++ )
+    for (uint i = 0; i < NUMELMS(nowList); i++)
     {
-        maxList[i]->iLockedCount = std::max ( maxList[i]->iLockedCount, nowList[i]->iLockedCount - prevList[i]->iLockedCount );
+        maxList[i]->iLockedCount = std::max(maxList[i]->iLockedCount, nowList[i]->iLockedCount - prevList[i]->iLockedCount);
         prevList[i]->iLockedCount = nowList[i]->iLockedCount;
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -460,9 +446,9 @@ void CMemStats::UpdateFrameStats ( void )
 // Sample current memory state
 //
 ///////////////////////////////////////////////////////////////
-void CMemStats::SampleState ( SMemStatsInfo& memStatsInfo )
+void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
 {
-    MemStatsInfoClear ( memStatsInfo );
+    MemStatsInfoClear(memStatsInfo);
 
     //
     // Update 'now' state
@@ -470,54 +456,66 @@ void CMemStats::SampleState ( SMemStatsInfo& memStatsInfo )
     memStatsInfo.d3dMemory = g_pDeviceState->MemoryState;
     memStatsInfo.frameStats = g_pDeviceState->FrameStats;
 
-    g_pGraphics->GetRenderItemManager ()->GetDxStatus ( memStatsInfo.dxStatus );
+    g_pGraphics->GetRenderItemManager()->GetDxStatus(memStatsInfo.dxStatus);
 
-    PROCESS_MEMORY_COUNTERS psmemCounters;  
-    if ( GetProcessMemoryInfo ( GetCurrentProcess (), &psmemCounters, sizeof ( psmemCounters ) ) )
+    PROCESS_MEMORY_COUNTERS psmemCounters;
+    if (GetProcessMemoryInfo(GetCurrentProcess(), &psmemCounters, sizeof(psmemCounters)))
         memStatsInfo.iProcessMemSizeKB = psmemCounters.WorkingSetSize / 1024LL;
 
-	MEMORYSTATUSEX status;
+    MEMORYSTATUSEX status;
     status.dwLength = sizeof(status);
-    if ( GlobalMemoryStatusEx(&status))
+    if (GlobalMemoryStatusEx(&status))
     {
-	    //32bit LARGEADDRESSAWARE OFF : 2GB TotalVirtual
-	    //32bit LARGEADDRESSAWARE ON  : 4GB TotalVirtual
+        // 32bit LARGEADDRESSAWARE OFF : 2GB TotalVirtual
+        // 32bit LARGEADDRESSAWARE ON  : 4GB TotalVirtual
         memStatsInfo.iProcessTotalVirtualKB = status.ullTotalVirtual / 1024LL;
     }
 
-    memStatsInfo.iStreamingMemoryUsed                  = *(int*)0x08E4CB4;
-    memStatsInfo.iStreamingMemoryAvailable             = *(int*)0x08A5A80;
+    memStatsInfo.iStreamingMemoryUsed = *(int*)0x08E4CB4;
+    memStatsInfo.iStreamingMemoryAvailable = *(int*)0x08A5A80;
 
     uint* pModelInfoArray = (uint*)0x08E4CC0;
-    for ( uint i = 0 ; i < 25755 ; i++ )
+    for (uint i = 0; i < 25755; i++)
     {
         uint* pModelInfo = pModelInfoArray + 5 * i;
-        uint uiLoadedFlag = pModelInfo[4];
-        if ( uiLoadedFlag )
+        uint  uiLoadedFlag = pModelInfo[4];
+        if (uiLoadedFlag)
         {
             memStatsInfo.modelInfo.uiTotal++;
-            if ( i < 313 )          memStatsInfo.modelInfo.uiPlayerModels_0_312++;
-            else if ( i < 318 )     memStatsInfo.modelInfo.uiUnknown_313_317++;
-            else if ( i < 373 )     memStatsInfo.modelInfo.uiWeaponModels_318_372++;
-            else if ( i < 400 )     memStatsInfo.modelInfo.uiUnknown_373_399++;
-            else if ( i < 612 )     memStatsInfo.modelInfo.uiVehicles_400_611++;
-            else if ( i < 1000 )    memStatsInfo.modelInfo.uiUnknown_612_999++;
-            else if ( i < 1194 )    memStatsInfo.modelInfo.uiUpgrades_1000_1193++;
-            else if ( i < 20000 )   memStatsInfo.modelInfo.uiUnknown_1194_19999++;
-            else if ( i < 25000 )   memStatsInfo.modelInfo.uiTextures_20000_24999++;
-            else if ( i < 25255 )   memStatsInfo.modelInfo.uiCollisions_25000_25254++;
-            else if ( i < 25511 )   memStatsInfo.modelInfo.uiIpls_25255_25510++;
-            else if ( i < 25575 )   memStatsInfo.modelInfo.uiPaths_25511_25574++;
-            else if ( i < 25755 )   memStatsInfo.modelInfo.uiAnims_25575_25754++;
+            if (i < 313)
+                memStatsInfo.modelInfo.uiPlayerModels_0_312++;
+            else if (i < 318)
+                memStatsInfo.modelInfo.uiUnknown_313_317++;
+            else if (i < 373)
+                memStatsInfo.modelInfo.uiWeaponModels_318_372++;
+            else if (i < 400)
+                memStatsInfo.modelInfo.uiUnknown_373_399++;
+            else if (i < 612)
+                memStatsInfo.modelInfo.uiVehicles_400_611++;
+            else if (i < 1000)
+                memStatsInfo.modelInfo.uiUnknown_612_999++;
+            else if (i < 1194)
+                memStatsInfo.modelInfo.uiUpgrades_1000_1193++;
+            else if (i < 20000)
+                memStatsInfo.modelInfo.uiUnknown_1194_19999++;
+            else if (i < 25000)
+                memStatsInfo.modelInfo.uiTextures_20000_24999++;
+            else if (i < 25255)
+                memStatsInfo.modelInfo.uiCollisions_25000_25254++;
+            else if (i < 25511)
+                memStatsInfo.modelInfo.uiIpls_25255_25510++;
+            else if (i < 25575)
+                memStatsInfo.modelInfo.uiPaths_25511_25574++;
+            else if (i < 25755)
+                memStatsInfo.modelInfo.uiAnims_25575_25754++;
         }
     }
 
-    CCore::GetSingleton ().GetMultiplayer ()->GetRwResourceStats ( memStatsInfo.rwResourceStats );
-    CCore::GetSingleton ().GetMultiplayer ()->GetClothesCacheStats ( memStatsInfo.clothesCacheStats );
-    CCore::GetSingleton ().GetGame ()->GetShaderReplacementStats ( memStatsInfo.shaderReplacementStats );
-    CCore::GetSingleton ().GetModelCacheManager ()->GetStats ( memStatsInfo.modelCacheStats );
+    CCore::GetSingleton().GetMultiplayer()->GetRwResourceStats(memStatsInfo.rwResourceStats);
+    CCore::GetSingleton().GetMultiplayer()->GetClothesCacheStats(memStatsInfo.clothesCacheStats);
+    CCore::GetSingleton().GetGame()->GetShaderReplacementStats(memStatsInfo.shaderReplacementStats);
+    CCore::GetSingleton().GetModelCacheManager()->GetStats(memStatsInfo.modelCacheStats);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -526,15 +524,15 @@ void CMemStats::SampleState ( SMemStatsInfo& memStatsInfo )
 // Update stats which are sampled at regular intervals
 //
 ///////////////////////////////////////////////////////////////
-void CMemStats::UpdateIntervalStats ( void )
+void CMemStats::UpdateIntervalStats(void)
 {
-    MemStatsInfoClear ( m_MemStatsNow );
-    MemStatsInfoClear ( m_MemStatsDelta );
+    MemStatsInfoClear(m_MemStatsNow);
+    MemStatsInfoClear(m_MemStatsDelta);
 
     //
     // Update 'now' state
     //
-    SampleState ( m_MemStatsNow );
+    SampleState(m_MemStatsNow);
 
     //
     // Calculate 'delta'
@@ -542,86 +540,102 @@ void CMemStats::UpdateIntervalStats ( void )
     m_MemStatsDelta.iProcessMemSizeKB = m_MemStatsNow.iProcessMemSizeKB - m_MemStatsPrev.iProcessMemSizeKB;
     m_MemStatsDelta.iProcessTotalVirtualKB = m_MemStatsNow.iProcessTotalVirtualKB - m_MemStatsPrev.iProcessTotalVirtualKB;
 
-    m_MemStatsDelta.dxStatus.videoMemoryKB.iFreeForMTA              = m_MemStatsNow.dxStatus.videoMemoryKB.iFreeForMTA          - m_MemStatsPrev.dxStatus.videoMemoryKB.iFreeForMTA;
-    m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByFonts             = m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByFonts         - m_MemStatsPrev.dxStatus.videoMemoryKB.iUsedByFonts;
-    m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByTextures          = m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByTextures      - m_MemStatsPrev.dxStatus.videoMemoryKB.iUsedByTextures;
-    m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByRenderTargets     = m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByRenderTargets - m_MemStatsPrev.dxStatus.videoMemoryKB.iUsedByRenderTargets;
+    m_MemStatsDelta.dxStatus.videoMemoryKB.iFreeForMTA = m_MemStatsNow.dxStatus.videoMemoryKB.iFreeForMTA - m_MemStatsPrev.dxStatus.videoMemoryKB.iFreeForMTA;
+    m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByFonts =
+        m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByFonts - m_MemStatsPrev.dxStatus.videoMemoryKB.iUsedByFonts;
+    m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByTextures =
+        m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByTextures - m_MemStatsPrev.dxStatus.videoMemoryKB.iUsedByTextures;
+    m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByRenderTargets =
+        m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByRenderTargets - m_MemStatsPrev.dxStatus.videoMemoryKB.iUsedByRenderTargets;
 
-    m_MemStatsDelta.iStreamingMemoryAvailable   = m_MemStatsNow.iStreamingMemoryAvailable   - m_MemStatsPrev.iStreamingMemoryAvailable;
-    m_MemStatsDelta.iStreamingMemoryUsed        = m_MemStatsNow.iStreamingMemoryUsed        - m_MemStatsPrev.iStreamingMemoryUsed;
+    m_MemStatsDelta.iStreamingMemoryAvailable = m_MemStatsNow.iStreamingMemoryAvailable - m_MemStatsPrev.iStreamingMemoryAvailable;
+    m_MemStatsDelta.iStreamingMemoryUsed = m_MemStatsNow.iStreamingMemoryUsed - m_MemStatsPrev.iStreamingMemoryUsed;
 
-    for ( uint i = 0 ; i < sizeof ( m_MemStatsDelta.modelInfo ) / sizeof ( uint ) ; i++ )
+    for (uint i = 0; i < sizeof(m_MemStatsDelta.modelInfo) / sizeof(uint); i++)
     {
-        m_MemStatsDelta.modelInfo.uiArray[i]  = m_MemStatsNow.modelInfo.uiArray[i]  - m_MemStatsPrev.modelInfo.uiArray[i];
+        m_MemStatsDelta.modelInfo.uiArray[i] = m_MemStatsNow.modelInfo.uiArray[i] - m_MemStatsPrev.modelInfo.uiArray[i];
     }
 
-    static const CProxyDirect3DDevice9::SResourceMemory* const nowList[] = {    &m_MemStatsNow.d3dMemory.StaticVertexBuffer, &m_MemStatsNow.d3dMemory.DynamicVertexBuffer,
-                                                                                &m_MemStatsNow.d3dMemory.StaticIndexBuffer, &m_MemStatsNow.d3dMemory.DynamicIndexBuffer,
-                                                                                &m_MemStatsNow.d3dMemory.StaticTexture, &m_MemStatsNow.d3dMemory.DynamicTexture,
-                                                                                &m_MemStatsNow.d3dMemory.Effect };
+    static const CProxyDirect3DDevice9::SResourceMemory* const nowList[] = {&m_MemStatsNow.d3dMemory.StaticVertexBuffer,
+                                                                            &m_MemStatsNow.d3dMemory.DynamicVertexBuffer,
+                                                                            &m_MemStatsNow.d3dMemory.StaticIndexBuffer,
+                                                                            &m_MemStatsNow.d3dMemory.DynamicIndexBuffer,
+                                                                            &m_MemStatsNow.d3dMemory.StaticTexture,
+                                                                            &m_MemStatsNow.d3dMemory.DynamicTexture,
+                                                                            &m_MemStatsNow.d3dMemory.Effect};
 
-    static const CProxyDirect3DDevice9::SResourceMemory* const prevList[] = {   &m_MemStatsPrev.d3dMemory.StaticVertexBuffer, &m_MemStatsPrev.d3dMemory.DynamicVertexBuffer,
-                                                                                &m_MemStatsPrev.d3dMemory.StaticIndexBuffer, &m_MemStatsPrev.d3dMemory.DynamicIndexBuffer,
-                                                                                &m_MemStatsPrev.d3dMemory.StaticTexture, &m_MemStatsPrev.d3dMemory.DynamicTexture,
-                                                                                &m_MemStatsPrev.d3dMemory.Effect };
+    static const CProxyDirect3DDevice9::SResourceMemory* const prevList[] = {&m_MemStatsPrev.d3dMemory.StaticVertexBuffer,
+                                                                             &m_MemStatsPrev.d3dMemory.DynamicVertexBuffer,
+                                                                             &m_MemStatsPrev.d3dMemory.StaticIndexBuffer,
+                                                                             &m_MemStatsPrev.d3dMemory.DynamicIndexBuffer,
+                                                                             &m_MemStatsPrev.d3dMemory.StaticTexture,
+                                                                             &m_MemStatsPrev.d3dMemory.DynamicTexture,
+                                                                             &m_MemStatsPrev.d3dMemory.Effect};
 
-    static CProxyDirect3DDevice9::SResourceMemory* const deltaList[] = {        &m_MemStatsDelta.d3dMemory.StaticVertexBuffer, &m_MemStatsDelta.d3dMemory.DynamicVertexBuffer,
-                                                                                &m_MemStatsDelta.d3dMemory.StaticIndexBuffer, &m_MemStatsDelta.d3dMemory.DynamicIndexBuffer,
-                                                                                &m_MemStatsDelta.d3dMemory.StaticTexture, &m_MemStatsDelta.d3dMemory.DynamicTexture,
-                                                                                &m_MemStatsDelta.d3dMemory.Effect };
+    static CProxyDirect3DDevice9::SResourceMemory* const deltaList[] = {&m_MemStatsDelta.d3dMemory.StaticVertexBuffer,
+                                                                        &m_MemStatsDelta.d3dMemory.DynamicVertexBuffer,
+                                                                        &m_MemStatsDelta.d3dMemory.StaticIndexBuffer,
+                                                                        &m_MemStatsDelta.d3dMemory.DynamicIndexBuffer,
+                                                                        &m_MemStatsDelta.d3dMemory.StaticTexture,
+                                                                        &m_MemStatsDelta.d3dMemory.DynamicTexture,
+                                                                        &m_MemStatsDelta.d3dMemory.Effect};
 
-    static const CProxyDirect3DDevice9::SResourceMemory* const maxList[] = {    &m_MemStatsMax.d3dMemory.StaticVertexBuffer, &m_MemStatsMax.d3dMemory.DynamicVertexBuffer,
-                                                                                &m_MemStatsMax.d3dMemory.StaticIndexBuffer, &m_MemStatsMax.d3dMemory.DynamicIndexBuffer,
-                                                                                &m_MemStatsMax.d3dMemory.StaticTexture, &m_MemStatsMax.d3dMemory.DynamicTexture,
-                                                                                &m_MemStatsMax.d3dMemory.Effect };
+    static const CProxyDirect3DDevice9::SResourceMemory* const maxList[] = {&m_MemStatsMax.d3dMemory.StaticVertexBuffer,
+                                                                            &m_MemStatsMax.d3dMemory.DynamicVertexBuffer,
+                                                                            &m_MemStatsMax.d3dMemory.StaticIndexBuffer,
+                                                                            &m_MemStatsMax.d3dMemory.DynamicIndexBuffer,
+                                                                            &m_MemStatsMax.d3dMemory.StaticTexture,
+                                                                            &m_MemStatsMax.d3dMemory.DynamicTexture,
+                                                                            &m_MemStatsMax.d3dMemory.Effect};
 
-    for ( uint i = 0 ; i < NUMELMS( nowList ) ; i++ )
+    for (uint i = 0; i < NUMELMS(nowList); i++)
     {
-        deltaList[i]->iCreatedCount     = nowList[i]->iCreatedCount - prevList[i]->iCreatedCount;
-        deltaList[i]->iCreatedBytes     = nowList[i]->iCreatedBytes - prevList[i]->iCreatedBytes;
-        deltaList[i]->iDestroyedCount   = nowList[i]->iDestroyedCount - prevList[i]->iDestroyedCount;
-        deltaList[i]->iDestroyedBytes   = nowList[i]->iDestroyedBytes - prevList[i]->iDestroyedBytes;
-        deltaList[i]->iLockedCount      = maxList[i]->iLockedCount;     // Use per-frame max for lock stats
+        deltaList[i]->iCreatedCount = nowList[i]->iCreatedCount - prevList[i]->iCreatedCount;
+        deltaList[i]->iCreatedBytes = nowList[i]->iCreatedBytes - prevList[i]->iCreatedBytes;
+        deltaList[i]->iDestroyedCount = nowList[i]->iDestroyedCount - prevList[i]->iDestroyedCount;
+        deltaList[i]->iDestroyedBytes = nowList[i]->iDestroyedBytes - prevList[i]->iDestroyedBytes;
+        deltaList[i]->iLockedCount = maxList[i]->iLockedCount;            // Use per-frame max for lock stats
     }
 
-    m_MemStatsDelta.rwResourceStats.uiTextures      = m_MemStatsNow.rwResourceStats.uiTextures   - m_MemStatsPrev.rwResourceStats.uiTextures;
-    m_MemStatsDelta.rwResourceStats.uiRasters       = m_MemStatsNow.rwResourceStats.uiRasters    - m_MemStatsPrev.rwResourceStats.uiRasters;
-    m_MemStatsDelta.rwResourceStats.uiGeometries    = m_MemStatsNow.rwResourceStats.uiGeometries - m_MemStatsPrev.rwResourceStats.uiGeometries;
+    m_MemStatsDelta.rwResourceStats.uiTextures = m_MemStatsNow.rwResourceStats.uiTextures - m_MemStatsPrev.rwResourceStats.uiTextures;
+    m_MemStatsDelta.rwResourceStats.uiRasters = m_MemStatsNow.rwResourceStats.uiRasters - m_MemStatsPrev.rwResourceStats.uiRasters;
+    m_MemStatsDelta.rwResourceStats.uiGeometries = m_MemStatsNow.rwResourceStats.uiGeometries - m_MemStatsPrev.rwResourceStats.uiGeometries;
 
-    m_MemStatsDelta.clothesCacheStats.uiCacheHit    = m_MemStatsNow.clothesCacheStats.uiCacheHit   - m_MemStatsPrev.clothesCacheStats.uiCacheHit;
-    m_MemStatsDelta.clothesCacheStats.uiCacheMiss   = m_MemStatsNow.clothesCacheStats.uiCacheMiss  - m_MemStatsPrev.clothesCacheStats.uiCacheMiss;
-    m_MemStatsDelta.clothesCacheStats.uiNumTotal    = m_MemStatsNow.clothesCacheStats.uiNumTotal   - m_MemStatsPrev.clothesCacheStats.uiNumTotal;
-    m_MemStatsDelta.clothesCacheStats.uiNumUnused   = m_MemStatsNow.clothesCacheStats.uiNumUnused  - m_MemStatsPrev.clothesCacheStats.uiNumUnused;
-    m_MemStatsDelta.clothesCacheStats.uiNumRemoved  = m_MemStatsNow.clothesCacheStats.uiNumRemoved - m_MemStatsPrev.clothesCacheStats.uiNumRemoved;
+    m_MemStatsDelta.clothesCacheStats.uiCacheHit = m_MemStatsNow.clothesCacheStats.uiCacheHit - m_MemStatsPrev.clothesCacheStats.uiCacheHit;
+    m_MemStatsDelta.clothesCacheStats.uiCacheMiss = m_MemStatsNow.clothesCacheStats.uiCacheMiss - m_MemStatsPrev.clothesCacheStats.uiCacheMiss;
+    m_MemStatsDelta.clothesCacheStats.uiNumTotal = m_MemStatsNow.clothesCacheStats.uiNumTotal - m_MemStatsPrev.clothesCacheStats.uiNumTotal;
+    m_MemStatsDelta.clothesCacheStats.uiNumUnused = m_MemStatsNow.clothesCacheStats.uiNumUnused - m_MemStatsPrev.clothesCacheStats.uiNumUnused;
+    m_MemStatsDelta.clothesCacheStats.uiNumRemoved = m_MemStatsNow.clothesCacheStats.uiNumRemoved - m_MemStatsPrev.clothesCacheStats.uiNumRemoved;
 
-    m_MemStatsDelta.modelCacheStats.uiNumPedModels          = m_MemStatsNow.modelCacheStats.uiNumPedModels          - m_MemStatsPrev.modelCacheStats.uiNumPedModels;
-    m_MemStatsDelta.modelCacheStats.uiNumVehicleModels      = m_MemStatsNow.modelCacheStats.uiNumVehicleModels      - m_MemStatsPrev.modelCacheStats.uiNumVehicleModels;
-    m_MemStatsDelta.modelCacheStats.uiMaxNumPedModels       = m_MemStatsNow.modelCacheStats.uiMaxNumPedModels       - m_MemStatsPrev.modelCacheStats.uiMaxNumPedModels;
-    m_MemStatsDelta.modelCacheStats.uiMaxNumVehicleModels   = m_MemStatsNow.modelCacheStats.uiMaxNumVehicleModels   - m_MemStatsPrev.modelCacheStats.uiMaxNumVehicleModels;
+    m_MemStatsDelta.modelCacheStats.uiNumPedModels = m_MemStatsNow.modelCacheStats.uiNumPedModels - m_MemStatsPrev.modelCacheStats.uiNumPedModels;
+    m_MemStatsDelta.modelCacheStats.uiNumVehicleModels = m_MemStatsNow.modelCacheStats.uiNumVehicleModels - m_MemStatsPrev.modelCacheStats.uiNumVehicleModels;
+    m_MemStatsDelta.modelCacheStats.uiMaxNumPedModels = m_MemStatsNow.modelCacheStats.uiMaxNumPedModels - m_MemStatsPrev.modelCacheStats.uiMaxNumPedModels;
+    m_MemStatsDelta.modelCacheStats.uiMaxNumVehicleModels =
+        m_MemStatsNow.modelCacheStats.uiMaxNumVehicleModels - m_MemStatsPrev.modelCacheStats.uiMaxNumVehicleModels;
 
     {
-        SShaderReplacementStats& now   = m_MemStatsNow.shaderReplacementStats;
-        SShaderReplacementStats& prev  = m_MemStatsPrev.shaderReplacementStats;
+        SShaderReplacementStats& now = m_MemStatsNow.shaderReplacementStats;
+        SShaderReplacementStats& prev = m_MemStatsPrev.shaderReplacementStats;
         SShaderReplacementStats& delta = m_MemStatsDelta.shaderReplacementStats;
 
         delta.uiNumReplacementRequests = now.uiNumReplacementRequests - prev.uiNumReplacementRequests;
-        delta.uiNumReplacementMatches  = now.uiNumReplacementMatches  - prev.uiNumReplacementMatches;
-        delta.uiTotalTextures          = now.uiTotalTextures          - prev.uiTotalTextures;
-        delta.uiTotalShaders           = now.uiTotalShaders           - prev.uiTotalShaders;
-        delta.uiTotalEntitesRefed      = now.uiTotalEntitesRefed      - prev.uiTotalEntitesRefed;
+        delta.uiNumReplacementMatches = now.uiNumReplacementMatches - prev.uiNumReplacementMatches;
+        delta.uiTotalTextures = now.uiTotalTextures - prev.uiTotalTextures;
+        delta.uiTotalShaders = now.uiTotalShaders - prev.uiTotalShaders;
+        delta.uiTotalEntitesRefed = now.uiTotalEntitesRefed - prev.uiTotalEntitesRefed;
 
-        for ( std::map < uint, SMatchChannelStats >::iterator iter = now.channelStatsList.begin () ; iter != now.channelStatsList.end () ; ++iter )
+        for (std::map<uint, SMatchChannelStats>::iterator iter = now.channelStatsList.begin(); iter != now.channelStatsList.end(); ++iter)
         {
-            uint uiId = iter->first;
+            uint                      uiId = iter->first;
             const SMatchChannelStats& channelStatsNow = iter->second;
-            SMatchChannelStats* pChannelStatsPrev = MapFind ( prev.channelStatsList, uiId );
-            SMatchChannelStats channelStatsDelta = channelStatsNow;
-            if ( pChannelStatsPrev )
+            SMatchChannelStats*       pChannelStatsPrev = MapFind(prev.channelStatsList, uiId);
+            SMatchChannelStats        channelStatsDelta = channelStatsNow;
+            if (pChannelStatsPrev)
             {
                 channelStatsDelta.uiNumMatchedTextures -= pChannelStatsPrev->uiNumMatchedTextures;
                 channelStatsDelta.uiNumShaderAndEntities -= pChannelStatsPrev->uiNumShaderAndEntities;
             }
-            MapSet ( delta.channelStatsList, uiId, channelStatsDelta );      
+            MapSet(delta.channelStatsList, uiId, channelStatsDelta);
         }
     }
 
@@ -631,9 +645,8 @@ void CMemStats::UpdateIntervalStats ( void )
     m_MemStatsPrev = m_MemStatsNow;
 
     // Clear max records
-    MemStatsInfoClear ( m_MemStatsMax );
+    MemStatsInfoClear(m_MemStatsMax);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -642,9 +655,9 @@ void CMemStats::UpdateIntervalStats ( void )
 // Create formatted tables for drawing with
 //
 ///////////////////////////////////////////////////////////////
-void CMemStats::CreateTables ( void )
+void CMemStats::CreateTables(void)
 {
-    m_TableList.clear ();
+    m_TableList.clear();
 
     //
     // Color setups
@@ -669,47 +682,21 @@ void CMemStats::CreateTables ( void )
     #define HEADER1(text) LT_CYAN text WHITE
 
     // Cell colour depending upon the value
-    SString strNumberColorsCreat =
-                        GREY "0,"
-                        CYAN "999999,"
-                        ;
+    SString strNumberColorsCreat = GREY "0," CYAN "999999,";
 
-    SString strNumberColorsDstry =
-                        GREY "0,"
-                        PURPLE "999999,"
-                        ;
+    SString strNumberColorsDstry = GREY "0," PURPLE "999999,";
 
-    SString strNumberColorsLockStatic =
-                        GREY "0,"
-                        YELLOW "999999,"
-                        ;
+    SString strNumberColorsLockStatic = GREY "0," YELLOW "999999,";
 
-    SString strNumberColorsLockDynamic =
-                        WHITE "0,"
-                        WHITE "999999,"
-                        ;
+    SString strNumberColorsLockDynamic = WHITE "0," WHITE "999999,";
 
-    SString strNumberColorsMtaVidMem =
-                        LT_GREEN "-999999,"
-                        GREY "0,"
-                        LT_RED "999999,"
-                        ;
+    SString strNumberColorsMtaVidMem = LT_GREEN "-999999," GREY "0," LT_RED "999999,";
 
-    SString strNumberColorsModels =
-                        LT_GREEN "-99999,"
-                        GREY "0,"
-                        LT_RED "999999,"
-                        ;
+    SString strNumberColorsModels = LT_GREEN "-99999," GREY "0," LT_RED "999999,";
 
-    SString strNumberColorsWhite =
-                        WHITE "0,"
-                        WHITE "999999,"
-                        ;
+    SString strNumberColorsWhite = WHITE "0," WHITE "999999,";
 
-    SString strNumberColorsGrey =
-                        GREY "0,"
-                        GREY "999999,"
-                        ;
+    SString strNumberColorsGrey = GREY "0," GREY "999999,";
 
     //
     // Key for weird codes in table.AddRow string:
@@ -720,269 +707,275 @@ void CMemStats::CreateTables ( void )
     //
 
     {
-/*
-    GTA vidmemory         Lock Create Destroy Total TotalKB
-    StaticVertexBuffer      1     1      1      10     1000
-    DynamicVertexBuffer     1     1      1      10     1000
-    StaticIndexBuffer       1     1      1      10     1000
-    DynamicIndexBuffer      1     1      1      10     1000
-    StaticTexture           1     1      1      10     1000
-    DynamicTexture          1     1      1      10     1000
-    Effect                  1     1      1      10     1000
-*/
-        static const char* const nameList[] = {  "Vertices", "Vertices dynamic", "Indices", "Indices dynamic", "Textures", "Textures dynamic", "Effects" };
+        /*
+            GTA vidmemory         Lock Create Destroy Total TotalKB
+            StaticVertexBuffer      1     1      1      10     1000
+            DynamicVertexBuffer     1     1      1      10     1000
+            StaticIndexBuffer       1     1      1      10     1000
+            DynamicIndexBuffer      1     1      1      10     1000
+            StaticTexture           1     1      1      10     1000
+            DynamicTexture          1     1      1      10     1000
+            Effect                  1     1      1      10     1000
+        */
+        static const char* const nameList[] = {"Vertices", "Vertices dynamic", "Indices", "Indices dynamic", "Textures", "Textures dynamic", "Effects"};
 
-        static const CProxyDirect3DDevice9::SResourceMemory* const nowList[] = {    &m_MemStatsNow.d3dMemory.StaticVertexBuffer, &m_MemStatsNow.d3dMemory.DynamicVertexBuffer,
-                                                                                    &m_MemStatsNow.d3dMemory.StaticIndexBuffer, &m_MemStatsNow.d3dMemory.DynamicIndexBuffer,
-                                                                                    &m_MemStatsNow.d3dMemory.StaticTexture, &m_MemStatsNow.d3dMemory.DynamicTexture,
-                                                                                    &m_MemStatsNow.d3dMemory.Effect };
+        static const CProxyDirect3DDevice9::SResourceMemory* const nowList[] = {&m_MemStatsNow.d3dMemory.StaticVertexBuffer,
+                                                                                &m_MemStatsNow.d3dMemory.DynamicVertexBuffer,
+                                                                                &m_MemStatsNow.d3dMemory.StaticIndexBuffer,
+                                                                                &m_MemStatsNow.d3dMemory.DynamicIndexBuffer,
+                                                                                &m_MemStatsNow.d3dMemory.StaticTexture,
+                                                                                &m_MemStatsNow.d3dMemory.DynamicTexture,
+                                                                                &m_MemStatsNow.d3dMemory.Effect};
 
-        static const CProxyDirect3DDevice9::SResourceMemory* const deltaList[] = {  &m_MemStatsDelta.d3dMemory.StaticVertexBuffer, &m_MemStatsDelta.d3dMemory.DynamicVertexBuffer,
-                                                                                    &m_MemStatsDelta.d3dMemory.StaticIndexBuffer, &m_MemStatsDelta.d3dMemory.DynamicIndexBuffer,
-                                                                                    &m_MemStatsDelta.d3dMemory.StaticTexture, &m_MemStatsDelta.d3dMemory.DynamicTexture,
-                                                                                    &m_MemStatsDelta.d3dMemory.Effect };
+        static const CProxyDirect3DDevice9::SResourceMemory* const deltaList[] = {&m_MemStatsDelta.d3dMemory.StaticVertexBuffer,
+                                                                                  &m_MemStatsDelta.d3dMemory.DynamicVertexBuffer,
+                                                                                  &m_MemStatsDelta.d3dMemory.StaticIndexBuffer,
+                                                                                  &m_MemStatsDelta.d3dMemory.DynamicIndexBuffer,
+                                                                                  &m_MemStatsDelta.d3dMemory.StaticTexture,
+                                                                                  &m_MemStatsDelta.d3dMemory.DynamicTexture,
+                                                                                  &m_MemStatsDelta.d3dMemory.Effect};
 
-        m_TableList.push_back ( CDxTable ( "|" ) );
-        CDxTable& table = m_TableList.back ();
-        table.SetColumnWidths( "100,45:R,40:R,40:R,50:R,60:R" );
-        table.SetNumberColors ( "^1", strNumberColorsLockStatic );
-        table.SetNumberColors ( "^2", strNumberColorsLockDynamic );
-        table.SetNumberColors ( "^3", strNumberColorsCreat );
-        table.SetNumberColors ( "^4", strNumberColorsDstry );
-        table.AddRow ( HEADER1( "GTA vid memory" ) "|" HEADER1( "Lock" ) "|" HEADER1( "Creat" ) BLUE "|" HEADER1( "Dstry" ) "|" HEADER1( "Count" ) "|" HEADER1( "Using KB" ) );
-        for ( uint i = 0 ; i < NUMELMS( nameList ) ; i++ )
+        m_TableList.push_back(CDxTable("|"));
+        CDxTable& table = m_TableList.back();
+        table.SetColumnWidths("100,45:R,40:R,40:R,50:R,60:R");
+        table.SetNumberColors("^1", strNumberColorsLockStatic);
+        table.SetNumberColors("^2", strNumberColorsLockDynamic);
+        table.SetNumberColors("^3", strNumberColorsCreat);
+        table.SetNumberColors("^4", strNumberColorsDstry);
+        table.AddRow(HEADER1("GTA vid memory") "|" HEADER1("Lock") "|" HEADER1("Creat") BLUE "|" HEADER1("Dstry") "|" HEADER1("Count") "|" HEADER1("Using KB"));
+        for (uint i = 0; i < NUMELMS(nameList); i++)
         {
-            if ( i & 1 )
-                table.AddRow( SString ( "%s|^2~ %d|^3~.%d|^4~.%d|%d|%s"
-                                            ,nameList[i]
-                                            ,deltaList[i]->iLockedCount
-                                            ,deltaList[i]->iCreatedCount
-                                            ,deltaList[i]->iDestroyedCount
-                                            ,nowList[i]->iCurrentCount
-                                            ,*FormatNumberWithCommas ( nowList[i]->iCurrentBytes / 1024  )
-                                      ) );
+            if (i & 1)
+                table.AddRow(SString("%s|^2~ %d|^3~.%d|^4~.%d|%d|%s", nameList[i], deltaList[i]->iLockedCount, deltaList[i]->iCreatedCount,
+                                     deltaList[i]->iDestroyedCount, nowList[i]->iCurrentCount, *FormatNumberWithCommas(nowList[i]->iCurrentBytes / 1024)));
             else
-                table.AddRow( SString ( "%s|^1~ %d|^3~.%d|^4~.%d|%d|%s"
-                                            ,nameList[i]
-                                            ,deltaList[i]->iLockedCount
-                                            ,deltaList[i]->iCreatedCount
-                                            ,deltaList[i]->iDestroyedCount
-                                            ,nowList[i]->iCurrentCount
-                                            ,*FormatNumberWithCommas ( nowList[i]->iCurrentBytes / 1024  )
-                                      ) );
+                table.AddRow(SString("%s|^1~ %d|^3~.%d|^4~.%d|%d|%s", nameList[i], deltaList[i]->iLockedCount, deltaList[i]->iCreatedCount,
+                                     deltaList[i]->iDestroyedCount, nowList[i]->iCurrentCount, *FormatNumberWithCommas(nowList[i]->iCurrentBytes / 1024)));
         }
     }
 
     {
-/*
-    MTA videoMemory           ChangeKB        TotalKB
-    FreeForMTA                  -100            1000
-    UsedByFonts                 -100            1000
-    UsedByTextures              -100            1000
-    UsedByRenderTargets         -100            1000
-*/
-        m_TableList.push_back ( CDxTable ( "|" ) );
-        CDxTable& table = m_TableList.back ();
-        table.SetColumnWidths( "110,80:R,80:R" );
-        table.SetNumberColors ( "^1", strNumberColorsMtaVidMem );
-        table.AddRow ( HEADER1( "MTA vid memory" ) "|" HEADER1( "Change KB" ) "|" HEADER1( "Using KB" ) );
-        table.AddRow ( SString ( "FreeForMTA|^1~.%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.dxStatus.videoMemoryKB.iFreeForMTA ), *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoMemoryKB.iFreeForMTA ) ) );
-        table.AddRow ( SString ( "Fonts|^1~.%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByFonts ), *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByFonts ) ) );
-        table.AddRow ( SString ( "Textures|^1~.%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByTextures ), *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByTextures ) ) );
-        table.AddRow ( SString ( "RenderTargets|^1~.%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByRenderTargets ), *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByRenderTargets ) ) );
+        /*
+            MTA videoMemory           ChangeKB        TotalKB
+            FreeForMTA                  -100            1000
+            UsedByFonts                 -100            1000
+            UsedByTextures              -100            1000
+            UsedByRenderTargets         -100            1000
+        */
+        m_TableList.push_back(CDxTable("|"));
+        CDxTable& table = m_TableList.back();
+        table.SetColumnWidths("110,80:R,80:R");
+        table.SetNumberColors("^1", strNumberColorsMtaVidMem);
+        table.AddRow(HEADER1("MTA vid memory") "|" HEADER1("Change KB") "|" HEADER1("Using KB"));
+        table.AddRow(SString("FreeForMTA|^1~.%s|%s", *FormatNumberWithCommas(m_MemStatsDelta.dxStatus.videoMemoryKB.iFreeForMTA),
+                             *FormatNumberWithCommas(m_MemStatsNow.dxStatus.videoMemoryKB.iFreeForMTA)));
+        table.AddRow(SString("Fonts|^1~.%s|%s", *FormatNumberWithCommas(m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByFonts),
+                             *FormatNumberWithCommas(m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByFonts)));
+        table.AddRow(SString("Textures|^1~.%s|%s", *FormatNumberWithCommas(m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByTextures),
+                             *FormatNumberWithCommas(m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByTextures)));
+        table.AddRow(SString("RenderTargets|^1~.%s|%s", *FormatNumberWithCommas(m_MemStatsDelta.dxStatus.videoMemoryKB.iUsedByRenderTargets),
+                             *FormatNumberWithCommas(m_MemStatsNow.dxStatus.videoMemoryKB.iUsedByRenderTargets)));
     }
 
     {
-/*
-    GTA memory                ChangeKB        TotalKB
-    iProcessMemSizeKB            -100            1000
-    streamMemSizeKB             -100            1000
-*/
-        m_TableList.push_back ( CDxTable ( "|" ) );
-        CDxTable& table = m_TableList.back ();
-        table.SetColumnWidths( "110,30:R,50:R,80:R" );
-        table.SetNumberColors ( "^1", strNumberColorsMtaVidMem );
-        table.AddRow ( HEADER1( "GTA memory" ) "| |" HEADER1( "Change KB" ) "|" HEADER1( "Using KB" ) );
-        table.AddRow ( SString ( "Process memory| | |%s", *FormatNumberWithCommas ( m_MemStatsNow.iProcessMemSizeKB - m_MemStatsNow.iStreamingMemoryUsed / 1024 ) ) );
-        table.AddRow ( SString ( "Streaming memory| |^1~.%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.iStreamingMemoryUsed / 1024 ), *FormatNumberWithCommas ( m_MemStatsNow.iStreamingMemoryUsed / 1024 ) ) );
-        table.AddRow ( SString ( "|Total:|^1~.%s|%s", *FormatNumberWithCommas ( m_MemStatsDelta.iProcessMemSizeKB ), *FormatNumberWithCommas ( m_MemStatsNow.iProcessMemSizeKB ) ) );
+        /*
+            GTA memory                ChangeKB        TotalKB
+            iProcessMemSizeKB            -100            1000
+            streamMemSizeKB             -100            1000
+        */
+        m_TableList.push_back(CDxTable("|"));
+        CDxTable& table = m_TableList.back();
+        table.SetColumnWidths("110,30:R,50:R,80:R");
+        table.SetNumberColors("^1", strNumberColorsMtaVidMem);
+        table.AddRow(HEADER1("GTA memory") "| |" HEADER1("Change KB") "|" HEADER1("Using KB"));
+        table.AddRow(SString("Process memory| | |%s", *FormatNumberWithCommas(m_MemStatsNow.iProcessMemSizeKB - m_MemStatsNow.iStreamingMemoryUsed / 1024)));
+        table.AddRow(SString("Streaming memory| |^1~.%s|%s", *FormatNumberWithCommas(m_MemStatsDelta.iStreamingMemoryUsed / 1024),
+                             *FormatNumberWithCommas(m_MemStatsNow.iStreamingMemoryUsed / 1024)));
+        table.AddRow(
+            SString("|Total:|^1~.%s|%s", *FormatNumberWithCommas(m_MemStatsDelta.iProcessMemSizeKB), *FormatNumberWithCommas(m_MemStatsNow.iProcessMemSizeKB)));
     }
 
     {
-/*
-    Settings                                AmountKB
-    videoCardInstalledMemoryKB                 2000
-    streamMemSettingKB                         2000
-*/
-        m_TableList.push_back ( CDxTable ( "|" ) );
-        CDxTable& table = m_TableList.back ();
-        table.SetColumnWidths( "140,130:R" );
-        table.AddRow ( HEADER1( "GTA settings" ) "|" HEADER1( "Setting KB" ) );
-        table.AddRow ( SString ( "Video card installed memory|%s", *FormatNumberWithCommas ( m_MemStatsNow.dxStatus.videoCard.iInstalledMemoryKB ) ) );
-        table.AddRow ( SString ( "Streaming memory limit|%s", *FormatNumberWithCommas ( m_MemStatsNow.iStreamingMemoryAvailable / 1024 ) ) );
-        table.AddRow ( SString ( "Process memory limit|%s", *FormatNumberWithCommas ( m_MemStatsNow.iProcessTotalVirtualKB ) ) );
+        /*
+            Settings                                AmountKB
+            videoCardInstalledMemoryKB                 2000
+            streamMemSettingKB                         2000
+        */
+        m_TableList.push_back(CDxTable("|"));
+        CDxTable& table = m_TableList.back();
+        table.SetColumnWidths("140,130:R");
+        table.AddRow(HEADER1("GTA settings") "|" HEADER1("Setting KB"));
+        table.AddRow(SString("Video card installed memory|%s", *FormatNumberWithCommas(m_MemStatsNow.dxStatus.videoCard.iInstalledMemoryKB)));
+        table.AddRow(SString("Streaming memory limit|%s", *FormatNumberWithCommas(m_MemStatsNow.iStreamingMemoryAvailable / 1024)));
+        table.AddRow(SString("Process memory limit|%s", *FormatNumberWithCommas(m_MemStatsNow.iProcessTotalVirtualKB)));
     }
 
     {
-/*
-    RW resources            Change    Count
-    Textures                            0
-    Rasters                             0
-    Geometries                          0
-*/
-        m_TableList.push_back ( CDxTable ( "|" ) );
-        CDxTable& table = m_TableList.back ();
-        table.SetColumnWidths( "140,50:R,60:R" );
-        table.SetNumberColors ( "^1", strNumberColorsModels );
-        table.AddRow ( HEADER1( "RW resources" ) "|" HEADER1( "Change" ) "|" HEADER1( "Count" ) );
-        table.AddRow ( SString ( "Textures|^1~.%d|%d", m_MemStatsDelta.rwResourceStats.uiTextures, m_MemStatsNow.rwResourceStats.uiTextures ) );
-        table.AddRow ( SString ( "Rasters|^1~.%d|%d", m_MemStatsDelta.rwResourceStats.uiRasters, m_MemStatsNow.rwResourceStats.uiRasters ) );
-        table.AddRow ( SString ( "Geometries|^1~.%d|%d", m_MemStatsDelta.rwResourceStats.uiGeometries, m_MemStatsNow.rwResourceStats.uiGeometries ) );
+        /*
+            RW resources            Change    Count
+            Textures                            0
+            Rasters                             0
+            Geometries                          0
+        */
+        m_TableList.push_back(CDxTable("|"));
+        CDxTable& table = m_TableList.back();
+        table.SetColumnWidths("140,50:R,60:R");
+        table.SetNumberColors("^1", strNumberColorsModels);
+        table.AddRow(HEADER1("RW resources") "|" HEADER1("Change") "|" HEADER1("Count"));
+        table.AddRow(SString("Textures|^1~.%d|%d", m_MemStatsDelta.rwResourceStats.uiTextures, m_MemStatsNow.rwResourceStats.uiTextures));
+        table.AddRow(SString("Rasters|^1~.%d|%d", m_MemStatsDelta.rwResourceStats.uiRasters, m_MemStatsNow.rwResourceStats.uiRasters));
+        table.AddRow(SString("Geometries|^1~.%d|%d", m_MemStatsDelta.rwResourceStats.uiGeometries, m_MemStatsNow.rwResourceStats.uiGeometries));
     }
 
     {
-/*
-    Clothes cache           Change    Count
-    Cache hit                           0
-    Cache miss                          0
-    Clothes in use                      0
-    Clothes ready for use               0
-    Old removed                         0
-*/
-        m_TableList.push_back ( CDxTable ( "|" ) );
-        CDxTable& table = m_TableList.back ();
-        table.SetColumnWidths( "140,50:R,60:R" );
-        table.SetNumberColors ( "^0", strNumberColorsWhite );
-        table.SetNumberColors ( "^1", strNumberColorsModels );
-        table.SetNumberColors ( "^3", strNumberColorsCreat );
-        table.SetNumberColors ( "^4", strNumberColorsLockStatic );
-        table.SetNumberColors ( "^5", strNumberColorsGrey );
-        table.AddRow ( HEADER1( "Clothes cache" ) "|" HEADER1( "Change" ) "|" HEADER1( "Count" ) );
-        table.AddRow ( SString ( "Cache hit|^3~ %d|^5~.%d", m_MemStatsDelta.clothesCacheStats.uiCacheHit, m_MemStatsNow.clothesCacheStats.uiCacheHit ) );
-        table.AddRow ( SString ( "Cache miss|^4~ %d|^5~.%d", m_MemStatsDelta.clothesCacheStats.uiCacheMiss, m_MemStatsNow.clothesCacheStats.uiCacheMiss ) );
-        table.AddRow ( SString ( "Clothes in use|^1~.%d|^0%d", m_MemStatsDelta.clothesCacheStats.uiNumTotal - m_MemStatsDelta.clothesCacheStats.uiNumUnused, m_MemStatsNow.clothesCacheStats.uiNumTotal - m_MemStatsNow.clothesCacheStats.uiNumUnused ) );
-        table.AddRow ( SString ( "Clothes ready for use|^1~.%d|%d", m_MemStatsDelta.clothesCacheStats.uiNumUnused, m_MemStatsNow.clothesCacheStats.uiNumUnused ) );
-        table.AddRow ( SString ( "Old removed|^1~.%d|^5%d", m_MemStatsDelta.clothesCacheStats.uiNumRemoved, m_MemStatsNow.clothesCacheStats.uiNumRemoved ) );
+        /*
+            Clothes cache           Change    Count
+            Cache hit                           0
+            Cache miss                          0
+            Clothes in use                      0
+            Clothes ready for use               0
+            Old removed                         0
+        */
+        m_TableList.push_back(CDxTable("|"));
+        CDxTable& table = m_TableList.back();
+        table.SetColumnWidths("140,50:R,60:R");
+        table.SetNumberColors("^0", strNumberColorsWhite);
+        table.SetNumberColors("^1", strNumberColorsModels);
+        table.SetNumberColors("^3", strNumberColorsCreat);
+        table.SetNumberColors("^4", strNumberColorsLockStatic);
+        table.SetNumberColors("^5", strNumberColorsGrey);
+        table.AddRow(HEADER1("Clothes cache") "|" HEADER1("Change") "|" HEADER1("Count"));
+        table.AddRow(SString("Cache hit|^3~ %d|^5~.%d", m_MemStatsDelta.clothesCacheStats.uiCacheHit, m_MemStatsNow.clothesCacheStats.uiCacheHit));
+        table.AddRow(SString("Cache miss|^4~ %d|^5~.%d", m_MemStatsDelta.clothesCacheStats.uiCacheMiss, m_MemStatsNow.clothesCacheStats.uiCacheMiss));
+        table.AddRow(SString("Clothes in use|^1~.%d|^0%d", m_MemStatsDelta.clothesCacheStats.uiNumTotal - m_MemStatsDelta.clothesCacheStats.uiNumUnused,
+                             m_MemStatsNow.clothesCacheStats.uiNumTotal - m_MemStatsNow.clothesCacheStats.uiNumUnused));
+        table.AddRow(SString("Clothes ready for use|^1~.%d|%d", m_MemStatsDelta.clothesCacheStats.uiNumUnused, m_MemStatsNow.clothesCacheStats.uiNumUnused));
+        table.AddRow(SString("Old removed|^1~.%d|^5%d", m_MemStatsDelta.clothesCacheStats.uiNumRemoved, m_MemStatsNow.clothesCacheStats.uiNumRemoved));
     }
 
     {
-        m_TableList.push_back ( CDxTable ( "|" ) );
-        CDxTable& table = m_TableList.back ();
-        table.SetColumnWidths( "110,50:R,60:R,60:R" );
-        table.SetNumberColors ( "^0", strNumberColorsWhite );
-        table.SetNumberColors ( "^1", strNumberColorsModels );
-        table.SetNumberColors ( "^3", strNumberColorsCreat );
-        table.SetNumberColors ( "^4", strNumberColorsLockStatic );
-        table.SetNumberColors ( "^5", strNumberColorsGrey );
-        table.AddRow ( HEADER1( "Model cache" ) "|" HEADER1( "Max" ) "|" HEADER1( "Change" ) "|" HEADER1( "Count" ) );
-        table.AddRow ( SString ( "Players|^3~ %d|^5~.%d|^1~.%d", m_MemStatsNow.modelCacheStats.uiMaxNumPedModels, m_MemStatsDelta.modelCacheStats.uiNumPedModels, m_MemStatsNow.modelCacheStats.uiNumPedModels ) );
-        table.AddRow ( SString ( "Vehicles|^3~ %d|^5~.%d|^1~.%d", m_MemStatsNow.modelCacheStats.uiMaxNumVehicleModels, m_MemStatsDelta.modelCacheStats.uiNumVehicleModels, m_MemStatsNow.modelCacheStats.uiNumVehicleModels ) );
-    }
-
-
-    {
-/*
-    Model usage                 Change   Amount
-    0-288           Players         1       10
-    289-399         Other1          1       10
-    400-611         Vehicles        1       10
-    612-999         Other2          1       10
-    1000-1193       Upgrades        1       10
-    1194-19999      Other3          1       10
-    20000-24999     Textures        1       10
-    24999-27000     Other4          1       10
-                    Total           1       10
-*/
-        m_TableList.push_back ( CDxTable ( "|" ) );
-        CDxTable& table = m_TableList.back ();
-        table.SetColumnWidths( "90,50,50:R,60:R" );
-        table.SetNumberColors ( "^1", strNumberColorsModels );
-        table.AddRow ( HEADER1( "Models in memory" ) "| |" HEADER1( "Change" ) "|" HEADER1( "Count" ) );
-        table.AddRow ( SString ( "0-312|(Players)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiPlayerModels_0_312, m_MemStatsNow.modelInfo.uiPlayerModels_0_312 ) );
-        table.AddRow ( SString ( "313-317| |^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_313_317, m_MemStatsNow.modelInfo.uiUnknown_313_317 ) );
-        table.AddRow ( SString ( "318-372|(Weapons)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiWeaponModels_318_372, m_MemStatsNow.modelInfo.uiWeaponModels_318_372 ) );
-        table.AddRow ( SString ( "373-399| |^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_373_399, m_MemStatsNow.modelInfo.uiUnknown_373_399 ) );
-        table.AddRow ( SString ( "400-611|(Vehicles)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiVehicles_400_611, m_MemStatsNow.modelInfo.uiVehicles_400_611 ) );
-        table.AddRow ( SString ( "612-999| |^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_612_999, m_MemStatsNow.modelInfo.uiUnknown_612_999 ) );
-        table.AddRow ( SString ( "1000-1193|(Upgrades)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUpgrades_1000_1193, m_MemStatsNow.modelInfo.uiUpgrades_1000_1193 ) );
-        table.AddRow ( SString ( "1194-19999|(World)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_1194_19999, m_MemStatsNow.modelInfo.uiUnknown_1194_19999 ) );
-        table.AddRow ( SString ( "20000-24999|(Textures)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiTextures_20000_24999, m_MemStatsNow.modelInfo.uiTextures_20000_24999 ) );
-        table.AddRow ( SString ( "25000-25254|(Collisions)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiCollisions_25000_25254, m_MemStatsNow.modelInfo.uiCollisions_25000_25254 ) );
-        table.AddRow ( SString ( "25255-25510|(Ipls)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiIpls_25255_25510, m_MemStatsNow.modelInfo.uiIpls_25255_25510 ) );
-        table.AddRow ( SString ( "25511-25574|(Paths)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiPaths_25511_25574, m_MemStatsNow.modelInfo.uiPaths_25511_25574 ) );
-        table.AddRow ( SString ( "25575-25754|(Anims)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiAnims_25575_25754, m_MemStatsNow.modelInfo.uiAnims_25575_25754 ) );
-        table.AddRow ( SString ( "|Total:|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiTotal, m_MemStatsNow.modelInfo.uiTotal ) );
+        m_TableList.push_back(CDxTable("|"));
+        CDxTable& table = m_TableList.back();
+        table.SetColumnWidths("110,50:R,60:R,60:R");
+        table.SetNumberColors("^0", strNumberColorsWhite);
+        table.SetNumberColors("^1", strNumberColorsModels);
+        table.SetNumberColors("^3", strNumberColorsCreat);
+        table.SetNumberColors("^4", strNumberColorsLockStatic);
+        table.SetNumberColors("^5", strNumberColorsGrey);
+        table.AddRow(HEADER1("Model cache") "|" HEADER1("Max") "|" HEADER1("Change") "|" HEADER1("Count"));
+        table.AddRow(SString("Players|^3~ %d|^5~.%d|^1~.%d", m_MemStatsNow.modelCacheStats.uiMaxNumPedModels, m_MemStatsDelta.modelCacheStats.uiNumPedModels,
+                             m_MemStatsNow.modelCacheStats.uiNumPedModels));
+        table.AddRow(SString("Vehicles|^3~ %d|^5~.%d|^1~.%d", m_MemStatsNow.modelCacheStats.uiMaxNumVehicleModels,
+                             m_MemStatsDelta.modelCacheStats.uiNumVehicleModels, m_MemStatsNow.modelCacheStats.uiNumVehicleModels));
     }
 
     {
-/*
-    World shader replacements       Change    Count
-    World texture draws                         0
-    World shader draws                          0
-    World texture total                         0             
-    World shader total                          0             
-    Entites explicitly shadered                 0    
-*/
-        m_TableList.push_back ( CDxTable ( "|" ) );
-        CDxTable& table = m_TableList.back ();
-        table.SetColumnWidths( "160,50:R,60:R" );
-        table.AddRow ( HEADER1( "World shader replacements" ) "|" HEADER1( "Change" ) "|" HEADER1( "Count" ) );
-        table.AddRow ( SString ( "World texture draws|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiNumReplacementRequests, m_MemStatsNow.shaderReplacementStats.uiNumReplacementRequests ) );
-        table.AddRow ( SString ( "World shader draws|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiNumReplacementMatches, m_MemStatsNow.shaderReplacementStats.uiNumReplacementMatches ) );
-        table.AddRow ( SString ( "World shader full setup|^1~ %d|%d", m_MemStatsDelta.frameStats.iNumShadersFullSetup, m_MemStatsNow.frameStats.iNumShadersFullSetup ) );
-        table.AddRow ( SString ( "World shader reuse setup|^1~ %d|%d", m_MemStatsDelta.frameStats.iNumShadersReuseSetup, m_MemStatsNow.frameStats.iNumShadersReuseSetup ) );
-        table.AddRow ( SString ( "World texture total|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiTotalTextures, m_MemStatsNow.shaderReplacementStats.uiTotalTextures ) );
-        table.AddRow ( SString ( "World shader total|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiTotalShaders, m_MemStatsNow.shaderReplacementStats.uiTotalShaders ) );
-        table.AddRow ( SString ( "Known entities|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiTotalEntitesRefed, m_MemStatsNow.shaderReplacementStats.uiTotalEntitesRefed ) );
+        /*
+            Model usage                 Change   Amount
+            0-288           Players         1       10
+            289-399         Other1          1       10
+            400-611         Vehicles        1       10
+            612-999         Other2          1       10
+            1000-1193       Upgrades        1       10
+            1194-19999      Other3          1       10
+            20000-24999     Textures        1       10
+            24999-27000     Other4          1       10
+                            Total           1       10
+        */
+        m_TableList.push_back(CDxTable("|"));
+        CDxTable& table = m_TableList.back();
+        table.SetColumnWidths("90,50,50:R,60:R");
+        table.SetNumberColors("^1", strNumberColorsModels);
+        table.AddRow(HEADER1("Models in memory") "| |" HEADER1("Change") "|" HEADER1("Count"));
+        table.AddRow(SString("0-312|(Players)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiPlayerModels_0_312, m_MemStatsNow.modelInfo.uiPlayerModels_0_312));
+        table.AddRow(SString("313-317| |^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_313_317, m_MemStatsNow.modelInfo.uiUnknown_313_317));
+        table.AddRow(SString("318-372|(Weapons)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiWeaponModels_318_372, m_MemStatsNow.modelInfo.uiWeaponModels_318_372));
+        table.AddRow(SString("373-399| |^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_373_399, m_MemStatsNow.modelInfo.uiUnknown_373_399));
+        table.AddRow(SString("400-611|(Vehicles)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiVehicles_400_611, m_MemStatsNow.modelInfo.uiVehicles_400_611));
+        table.AddRow(SString("612-999| |^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_612_999, m_MemStatsNow.modelInfo.uiUnknown_612_999));
+        table.AddRow(SString("1000-1193|(Upgrades)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUpgrades_1000_1193, m_MemStatsNow.modelInfo.uiUpgrades_1000_1193));
+        table.AddRow(SString("1194-19999|(World)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_1194_19999, m_MemStatsNow.modelInfo.uiUnknown_1194_19999));
+        table.AddRow(
+            SString("20000-24999|(Textures)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiTextures_20000_24999, m_MemStatsNow.modelInfo.uiTextures_20000_24999));
+        table.AddRow(SString("25000-25254|(Collisions)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiCollisions_25000_25254,
+                             m_MemStatsNow.modelInfo.uiCollisions_25000_25254));
+        table.AddRow(SString("25255-25510|(Ipls)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiIpls_25255_25510, m_MemStatsNow.modelInfo.uiIpls_25255_25510));
+        table.AddRow(SString("25511-25574|(Paths)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiPaths_25511_25574, m_MemStatsNow.modelInfo.uiPaths_25511_25574));
+        table.AddRow(SString("25575-25754|(Anims)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiAnims_25575_25754, m_MemStatsNow.modelInfo.uiAnims_25575_25754));
+        table.AddRow(SString("|Total:|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiTotal, m_MemStatsNow.modelInfo.uiTotal));
     }
 
     {
-/*
-    World shader channels       NumTex     Shader+Entites
-    *blah                       .   0          .   0
-*/
-        SShaderReplacementStats& now   = m_MemStatsNow.shaderReplacementStats;
+        /*
+            World shader replacements       Change    Count
+            World texture draws                         0
+            World shader draws                          0
+            World texture total                         0
+            World shader total                          0
+            Entites explicitly shadered                 0
+        */
+        m_TableList.push_back(CDxTable("|"));
+        CDxTable& table = m_TableList.back();
+        table.SetColumnWidths("160,50:R,60:R");
+        table.AddRow(HEADER1("World shader replacements") "|" HEADER1("Change") "|" HEADER1("Count"));
+        table.AddRow(SString("World texture draws|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiNumReplacementRequests,
+                             m_MemStatsNow.shaderReplacementStats.uiNumReplacementRequests));
+        table.AddRow(SString("World shader draws|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiNumReplacementMatches,
+                             m_MemStatsNow.shaderReplacementStats.uiNumReplacementMatches));
+        table.AddRow(
+            SString("World shader full setup|^1~ %d|%d", m_MemStatsDelta.frameStats.iNumShadersFullSetup, m_MemStatsNow.frameStats.iNumShadersFullSetup));
+        table.AddRow(
+            SString("World shader reuse setup|^1~ %d|%d", m_MemStatsDelta.frameStats.iNumShadersReuseSetup, m_MemStatsNow.frameStats.iNumShadersReuseSetup));
+        table.AddRow(SString("World texture total|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiTotalTextures,
+                             m_MemStatsNow.shaderReplacementStats.uiTotalTextures));
+        table.AddRow(SString("World shader total|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiTotalShaders,
+                             m_MemStatsNow.shaderReplacementStats.uiTotalShaders));
+        table.AddRow(SString("Known entities|^1~ %d|%d", m_MemStatsDelta.shaderReplacementStats.uiTotalEntitesRefed,
+                             m_MemStatsNow.shaderReplacementStats.uiTotalEntitesRefed));
+    }
+
+    {
+        /*
+            World shader channels       NumTex     Shader+Entites
+            *blah                       .   0          .   0
+        */
+        SShaderReplacementStats& now = m_MemStatsNow.shaderReplacementStats;
         SShaderReplacementStats& delta = m_MemStatsDelta.shaderReplacementStats;
 
-        m_TableList.push_back ( CDxTable ( "|" ) );
-        CDxTable& table = m_TableList.back ();
-        table.SetNumberColors ( "^1", strNumberColorsModels );
-        table.SetColumnWidths( "180,40:R,35:R,40:R,35:R" );
-        table.AddRow ( HEADER1( "World shader channels" ) "|" HEADER1( " " ) "|" HEADER1( "NumTex" ) "|" HEADER1( " " ) "|" HEADER1( "Shad&Ent" ) );
-        for ( std::map < uint, SMatchChannelStats >::iterator iter = now.channelStatsList.begin () ; iter != now.channelStatsList.end () ; ++iter )
+        m_TableList.push_back(CDxTable("|"));
+        CDxTable& table = m_TableList.back();
+        table.SetNumberColors("^1", strNumberColorsModels);
+        table.SetColumnWidths("180,40:R,35:R,40:R,35:R");
+        table.AddRow(HEADER1("World shader channels") "|" HEADER1(" ") "|" HEADER1("NumTex") "|" HEADER1(" ") "|" HEADER1("Shad&Ent"));
+        for (std::map<uint, SMatchChannelStats>::iterator iter = now.channelStatsList.begin(); iter != now.channelStatsList.end(); ++iter)
         {
-            uint uiId = iter->first;
+            uint                      uiId = iter->first;
             const SMatchChannelStats& channelStatsNow = iter->second;
-            SMatchChannelStats* pChannelStatsDelta = MapFind ( delta.channelStatsList, uiId );
-            assert ( pChannelStatsDelta );
-            table.AddRow( SString ( "%s|^1~.%d|%d|^1~.%d|%d"
-                                        ,*channelStatsNow.strTag
-                                        ,pChannelStatsDelta->uiNumMatchedTextures
-                                        ,channelStatsNow.uiNumMatchedTextures
-                                        ,pChannelStatsDelta->uiNumShaderAndEntities
-                                        ,channelStatsNow.uiNumShaderAndEntities
-                                  ) );
+            SMatchChannelStats*       pChannelStatsDelta = MapFind(delta.channelStatsList, uiId);
+            assert(pChannelStatsDelta);
+            table.AddRow(SString("%s|^1~.%d|%d|^1~.%d|%d", *channelStatsNow.strTag, pChannelStatsDelta->uiNumMatchedTextures,
+                                 channelStatsNow.uiNumMatchedTextures, pChannelStatsDelta->uiNumShaderAndEntities, channelStatsNow.uiNumShaderAndEntities));
         }
     }
 
     {
-/*
-    Pool sizes       Capacity   Used
-    NAME                100       10   10%
-*/
-        m_TableList.push_back ( CDxTable ( "|" ) );
-        CDxTable& table = m_TableList.back ();
-        table.SetColumnWidths( "170,50:R,50:R,40:R" );
-        table.SetNumberColors ( "^1", strNumberColorsModels );
-        table.AddRow ( HEADER1( "Pool sizes" ) "|" HEADER1( "Capacity" ) "|" HEADER1( "Used" ) "|" HEADER1( "" ) );
-        for ( int i = 0; i < MAX_POOLS ; i++ )
+        /*
+            Pool sizes       Capacity   Used
+            NAME                100       10   10%
+        */
+        m_TableList.push_back(CDxTable("|"));
+        CDxTable& table = m_TableList.back();
+        table.SetColumnWidths("170,50:R,50:R,40:R");
+        table.SetNumberColors("^1", strNumberColorsModels);
+        table.AddRow(HEADER1("Pool sizes") "|" HEADER1("Capacity") "|" HEADER1("Used") "|" HEADER1(""));
+        for (int i = 0; i < MAX_POOLS; i++)
         {
-            SString strName = EnumToString( (ePools)i );
-            int iDefCapacity = g_pCore->GetGame()->GetPools()->GetPoolDefaultCapacity ( (ePools)i );
-            int iCapacity = g_pCore->GetGame()->GetPools()->GetPoolCapacity ( (ePools)i );
-            int iUsedSpaces = g_pCore->GetGame()->GetPools()->GetNumberOfUsedSpaces ( (ePools)i );
-            int iUsedPercent = iUsedSpaces * 100 / iCapacity;
-            table.AddRow ( SString ( "%s|%d|%d|%d%%", *strName, iCapacity, iUsedSpaces, iUsedPercent ) );
+            SString strName = EnumToString((ePools)i);
+            int     iDefCapacity = g_pCore->GetGame()->GetPools()->GetPoolDefaultCapacity((ePools)i);
+            int     iCapacity = g_pCore->GetGame()->GetPools()->GetPoolCapacity((ePools)i);
+            int     iUsedSpaces = g_pCore->GetGame()->GetPools()->GetNumberOfUsedSpaces((ePools)i);
+            int     iUsedPercent = iUsedSpaces * 100 / iCapacity;
+            table.AddRow(SString("%s|%d|%d|%d%%", *strName, iCapacity, iUsedSpaces, iUsedPercent));
         }
     }
 }

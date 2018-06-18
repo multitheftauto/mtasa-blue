@@ -2,7 +2,7 @@
  *
  * Copyright (c) 1995, 1996, 1997, 1998, 1999 Kungliga Tekniska Högskolan
  * (Royal Institute of Technology, Stockholm, Sweden).
- * Copyright (c) 2004 - 2012 Daniel Stenberg
+ * Copyright (c) 2004 - 2017 Daniel Stenberg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,13 +34,7 @@
 
 #include "curl_setup.h"
 
-#ifndef CURL_DISABLE_FTP
-#ifdef HAVE_GSSAPI
-
-#ifdef HAVE_OLD_GSSMIT
-#define GSS_C_NT_HOSTBASED_SERVICE gss_nt_service_name
-#define NCOMPAT 1
-#endif
+#if defined(HAVE_GSSAPI) && !defined(CURL_DISABLE_FTP)
 
 #ifdef HAVE_NETDB_H
 #include <netdb.h>
@@ -51,18 +45,13 @@
 #include "ftp.h"
 #include "curl_gssapi.h"
 #include "sendf.h"
-#include "krb4.h"
-#include "curl_memory.h"
+#include "curl_sec.h"
 #include "warnless.h"
 
-#define _MPRINTF_REPLACE /* use our functions only */
-#include <curl/mprintf.h>
-
-/* The last #include file should be: */
+/* The last 3 #include files should be in this order */
+#include "curl_printf.h"
+#include "curl_memory.h"
 #include "memdebug.h"
-
-#define LOCAL_ADDR (&conn->local_addr)
-#define REMOTE_ADDR conn->ip_addr->ai_addr
 
 static int
 krb5_init(void *app_data)
@@ -96,7 +85,7 @@ krb5_decode(void *app_data, void *buf, int len,
 
   enc.value = buf;
   enc.length = len;
-  maj = gss_unseal(&min, *context, &enc, &dec, NULL, NULL);
+  maj = gss_unwrap(&min, *context, &enc, &dec, NULL, NULL);
   if(maj != GSS_S_COMPLETE) {
     if(len >= 4)
       strcpy(buf, "599 ");
@@ -121,8 +110,7 @@ krb5_overhead(void *app_data, int level, int len)
 }
 
 static int
-krb5_encode(void *app_data, const void *from, int length, int level, void **to,
-            struct connectdata *conn UNUSED_PARAM)
+krb5_encode(void *app_data, const void *from, int length, int level, void **to)
 {
   gss_ctx_id_t *context = app_data;
   gss_buffer_desc dec, enc;
@@ -130,15 +118,12 @@ krb5_encode(void *app_data, const void *from, int length, int level, void **to,
   int state;
   int len;
 
-  /* shut gcc up */
-  conn = NULL;
-
   /* NOTE that the cast is safe, neither of the krb5, gnu gss and heimdal
-   * libraries modify the input buffer in gss_seal()
+   * libraries modify the input buffer in gss_wrap()
    */
-  dec.value = (void*)from;
+  dec.value = (void *)from;
   dec.length = length;
-  maj = gss_seal(&min, *context,
+  maj = gss_wrap(&min, *context,
                  level == PROT_PRIVATE,
                  GSS_C_QOP_DEFAULT,
                  &dec, &state, &enc);
@@ -165,28 +150,32 @@ krb5_auth(void *app_data, struct connectdata *conn)
   const char *host = conn->host.name;
   ssize_t nread;
   curl_socklen_t l = sizeof(conn->local_addr);
-  struct SessionHandle *data = conn->data;
+  struct Curl_easy *data = conn->data;
   CURLcode result;
-  const char *service = "ftp", *srv_host = "host";
+  const char *service = data->set.str[STRING_SERVICE_NAME] ?
+                        data->set.str[STRING_SERVICE_NAME] :
+                        "ftp";
+  const char *srv_host = "host";
   gss_buffer_desc input_buffer, output_buffer, _gssresp, *gssresp;
   OM_uint32 maj, min;
   gss_name_t gssname;
   gss_ctx_id_t *context = app_data;
   struct gss_channel_bindings_struct chan;
   size_t base64_sz = 0;
+  struct sockaddr_in **remote_addr =
+    (struct sockaddr_in **)&conn->ip_addr->ai_addr;
+  char *stringp;
 
   if(getsockname(conn->sock[FIRSTSOCKET],
-                 (struct sockaddr *)LOCAL_ADDR, &l) < 0)
+                 (struct sockaddr *)&conn->local_addr, &l) < 0)
     perror("getsockname()");
 
   chan.initiator_addrtype = GSS_C_AF_INET;
   chan.initiator_address.length = l - 4;
-  chan.initiator_address.value =
-    &((struct sockaddr_in *)LOCAL_ADDR)->sin_addr.s_addr;
+  chan.initiator_address.value = &conn->local_addr.sin_addr.s_addr;
   chan.acceptor_addrtype = GSS_C_AF_INET;
   chan.acceptor_address.length = l - 4;
-  chan.acceptor_address.value =
-    &((struct sockaddr_in *)REMOTE_ADDR)->sin_addr.s_addr;
+  chan.acceptor_address.value = &(*remote_addr)->sin_addr.s_addr;
   chan.application_data.length = 0;
   chan.application_data.value = NULL;
 
@@ -194,10 +183,10 @@ krb5_auth(void *app_data, struct connectdata *conn)
   for(;;) {
     /* this really shouldn't be repeated here, but can't help it */
     if(service == srv_host) {
-      result = Curl_ftpsendf(conn, "AUTH GSSAPI");
-
+      result = Curl_ftpsend(conn, "AUTH GSSAPI");
       if(result)
         return -2;
+
       if(Curl_GetFTPResponse(&nread, conn, NULL))
         return -1;
 
@@ -205,16 +194,19 @@ krb5_auth(void *app_data, struct connectdata *conn)
         return -1;
     }
 
-    input_buffer.value = data->state.buffer;
-    input_buffer.length = snprintf(input_buffer.value, BUFSIZE, "%s@%s",
-                                   service, host);
+    stringp = aprintf("%s@%s", service, host);
+    if(!stringp)
+      return -2;
+
+    input_buffer.value = stringp;
+    input_buffer.length = strlen(stringp);
     maj = gss_import_name(&min, &input_buffer, GSS_C_NT_HOSTBASED_SERVICE,
                           &gssname);
+    free(stringp);
     if(maj != GSS_S_COMPLETE) {
       gss_release_name(&min, &gssname);
       if(service == srv_host) {
-        Curl_failf(data, "Error importing service name %s",
-                   input_buffer.value);
+        Curl_failf(data, "Error importing service name %s@%s", service, host);
         return AUTH_ERROR;
       }
       service = srv_host;
@@ -236,9 +228,11 @@ krb5_auth(void *app_data, struct connectdata *conn)
                                       &min,
                                       context,
                                       gssname,
+                                      &Curl_krb5_mech_oid,
                                       &chan,
                                       gssresp,
                                       &output_buffer,
+                                      TRUE,
                                       NULL);
 
       if(gssresp) {
@@ -253,15 +247,22 @@ krb5_auth(void *app_data, struct connectdata *conn)
       }
 
       if(output_buffer.length != 0) {
+        char *cmd;
+
         result = Curl_base64_encode(data, (char *)output_buffer.value,
                                     output_buffer.length, &p, &base64_sz);
         if(result) {
-          Curl_infof(data,"base64-encoding: %s\n", curl_easy_strerror(result));
-          ret = AUTH_CONTINUE;
+          Curl_infof(data, "base64-encoding: %s\n",
+                     curl_easy_strerror(result));
+          ret = AUTH_ERROR;
           break;
         }
 
-        result = Curl_ftpsendf(conn, "ADAT %s", p);
+        cmd = aprintf("ADAT %s", p);
+        if(cmd)
+          result = Curl_ftpsend(conn, cmd);
+        else
+          result = CURLE_OUT_OF_MEMORY;
 
         free(p);
 
@@ -281,6 +282,7 @@ krb5_auth(void *app_data, struct connectdata *conn)
           break;
         }
 
+        _gssresp.value = NULL; /* make sure it is initialized */
         p = data->state.buffer + 4;
         p = strstr(p, "ADAT=");
         if(p) {
@@ -288,7 +290,8 @@ krb5_auth(void *app_data, struct connectdata *conn)
                                       (unsigned char **)&_gssresp.value,
                                       &_gssresp.length);
           if(result) {
-            Curl_failf(data,"base64-decoding: %s", curl_easy_strerror(result));
+            Curl_failf(data, "base64-decoding: %s",
+                       curl_easy_strerror(result));
             ret = AUTH_CONTINUE;
             break;
           }
@@ -337,5 +340,4 @@ struct Curl_sec_client_mech Curl_krb5_client_mech = {
     krb5_decode
 };
 
-#endif /* HAVE_GSSAPI */
-#endif /* CURL_DISABLE_FTP */
+#endif /* HAVE_GSSAPI && !CURL_DISABLE_FTP */

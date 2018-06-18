@@ -5,7 +5,6 @@
 #include "StdInc.h"
 #include "CServerBrowser.RemoteMasterServer.h"
 
-
 ///////////////////////////////////////////////////////////////
 //
 //
@@ -17,33 +16,33 @@ class CRemoteMasterServer : public CRemoteMasterServerInterface
 {
 public:
     ZERO_ON_NEW
-                            CRemoteMasterServer        ( void );
-                            ~CRemoteMasterServer       ( void );
+    CRemoteMasterServer(void);
+    ~CRemoteMasterServer(void);
 
     // CRemoteMasterServerInterface
-    virtual void            Refresh                     ( void );
-    virtual bool            HasData                     ( void );
-    virtual bool            ParseList                   ( CServerListItemList& itemList );
+    virtual void Refresh(void);
+    virtual bool HasData(void);
+    virtual bool ParseList(CServerListItemList& itemList);
 
     // CRemoteMasterServer
-    void                    Init                        ( const SString& strURL );
+    void Init(const SString& strURL);
+
 protected:
-    bool                    CheckParsable               ( void );
-    bool                    CheckParsableVer0           ( void );
-    bool                    CheckParsableVer2           ( void );
-    bool                    ParseListVer0               ( CServerListItemList& itemList );
-    bool                    ParseListVer2               ( CServerListItemList& itemList );
-    CServerListItem*        GetServerListItem           ( CServerListItemList& itemList, in_addr Address, ushort usGamePort );
-    CNetHTTPDownloadManagerInterface* GetHTTP           ( void );
-    static void             StaticDownloadFinished     ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode );
-    void                    DownloadFinished           ( char* pCompletedData, size_t completedLength, bool bSuccess, int iErrorCode );
+    bool                              CheckParsable(void);
+    bool                              CheckParsableVer0(void);
+    bool                              CheckParsableVer2(void);
+    bool                              ParseListVer0(CServerListItemList& itemList);
+    bool                              ParseListVer2(CServerListItemList& itemList);
+    CServerListItem*                  GetServerListItem(CServerListItemList& itemList, in_addr Address, ushort usGamePort);
+    CNetHTTPDownloadManagerInterface* GetHTTP(void);
+    static void                       StaticDownloadFinished(const SHttpDownloadResult& result);
+    void                              DownloadFinished(const SHttpDownloadResult& result);
 
-    long long               m_llLastRefreshTime;
-    SString                 m_strStage;
-    SString                 m_strURL;
-    CBuffer                 m_Data;
+    long long m_llLastRefreshTime;
+    SString   m_strStage;
+    SString   m_strURL;
+    CBuffer   m_Data;
 };
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -52,13 +51,12 @@ protected:
 //
 //
 ///////////////////////////////////////////////////////////////
-CRemoteMasterServerInterface* NewRemoteMasterServer ( const SString& strURL )
+CRemoteMasterServerInterface* NewRemoteMasterServer(const SString& strURL)
 {
-    CRemoteMasterServer* pMasterServer = new CRemoteMasterServer ();
-    pMasterServer->Init ( strURL );
+    CRemoteMasterServer* pMasterServer = new CRemoteMasterServer();
+    pMasterServer->Init(strURL);
     return pMasterServer;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -67,10 +65,9 @@ CRemoteMasterServerInterface* NewRemoteMasterServer ( const SString& strURL )
 //
 //
 ///////////////////////////////////////////////////////////////
-CRemoteMasterServer::CRemoteMasterServer ( void )
+CRemoteMasterServer::CRemoteMasterServer(void)
 {
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -79,10 +76,9 @@ CRemoteMasterServer::CRemoteMasterServer ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-CRemoteMasterServer::~CRemoteMasterServer ( void )
+CRemoteMasterServer::~CRemoteMasterServer(void)
 {
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -91,12 +87,11 @@ CRemoteMasterServer::~CRemoteMasterServer ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CRemoteMasterServer::Init ( const SString& strURL )
+void CRemoteMasterServer::Init(const SString& strURL)
 {
     m_strURL = strURL;
-    GetHTTP()->SetMaxConnections( 5 );
+    GetHTTP()->SetMaxConnections(5);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -105,11 +100,10 @@ void CRemoteMasterServer::Init ( const SString& strURL )
 //
 //
 ///////////////////////////////////////////////////////////////
-CNetHTTPDownloadManagerInterface* CRemoteMasterServer::GetHTTP( void )
+CNetHTTPDownloadManagerInterface* CRemoteMasterServer::GetHTTP(void)
 {
-    return g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadMode::CORE_ASE_LIST );
+    return g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::CORE_ASE_LIST);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -118,19 +112,18 @@ CNetHTTPDownloadManagerInterface* CRemoteMasterServer::GetHTTP( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CRemoteMasterServer::Refresh ( void )
+void CRemoteMasterServer::Refresh(void)
 {
     // If it's been less than a minute and we has data, don't send a new request
-    if ( GetTickCount64_ () - m_llLastRefreshTime < 60000 && m_strStage == "hasdata" )
+    if (GetTickCount64_() - m_llLastRefreshTime < 60000 && m_strStage == "hasdata")
         return;
 
     // Send new request
     m_strStage = "waitingreply";
-    m_llLastRefreshTime = GetTickCount64_ ();
-    AddRef();   // Keep alive
-    GetHTTP()->QueueFile( m_strURL, NULL, 0, NULL, 0, false, this, &CRemoteMasterServer::StaticDownloadFinished, false, 1 );
+    m_llLastRefreshTime = GetTickCount64_();
+    AddRef();            // Keep alive
+    GetHTTP()->QueueFile(m_strURL, NULL, NULL, 0, false, this, &CRemoteMasterServer::StaticDownloadFinished, false, 1);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -139,13 +132,12 @@ void CRemoteMasterServer::Refresh ( void )
 // Callback during ProcessQueuedFiles
 //
 ///////////////////////////////////////////////////////////////
-void CRemoteMasterServer::StaticDownloadFinished( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+void CRemoteMasterServer::StaticDownloadFinished(const SHttpDownloadResult& result)
 {
-    CRemoteMasterServer* pRemoteMasterServer = (CRemoteMasterServer*)pObj;
-    pRemoteMasterServer->DownloadFinished( pCompletedData, completedLength, bSuccess, iErrorCode );
-    pRemoteMasterServer->Release(); // Unkeep alive
+    CRemoteMasterServer* pRemoteMasterServer = (CRemoteMasterServer*)result.pObj;
+    pRemoteMasterServer->DownloadFinished(result);
+    pRemoteMasterServer->Release();            // Unkeep alive
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -154,20 +146,19 @@ void CRemoteMasterServer::StaticDownloadFinished( char* pCompletedData, size_t c
 // Callback during ProcessQueuedFiles
 //
 ///////////////////////////////////////////////////////////////
-void CRemoteMasterServer::DownloadFinished( char* pCompletedData, size_t completedLength, bool bSuccess, int iErrorCode )
+void CRemoteMasterServer::DownloadFinished(const SHttpDownloadResult& result)
 {
-    if ( bSuccess )
+    if (result.bSuccess)
     {
-        if ( m_strStage == "waitingreply" )
+        if (m_strStage == "waitingreply")
         {
             m_strStage = "hasdata";
-            m_Data = CBuffer ( pCompletedData, completedLength );
-            if ( !CheckParsable() )
+            m_Data = CBuffer(result.pData, result.dataSize);
+            if (!CheckParsable())
                 m_strStage = "nogood";
         }
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -176,12 +167,11 @@ void CRemoteMasterServer::DownloadFinished( char* pCompletedData, size_t complet
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CRemoteMasterServer::HasData ( void )
+bool CRemoteMasterServer::HasData(void)
 {
     GetHTTP()->ProcessQueuedFiles();
     return m_strStage == "hasdata";
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -190,26 +180,24 @@ bool CRemoteMasterServer::HasData ( void )
 // Return true if data looks usable
 //
 ///////////////////////////////////////////////////////////////
-bool CRemoteMasterServer::CheckParsable ( void )
+bool CRemoteMasterServer::CheckParsable(void)
 {
-    CBufferReadStream stream ( m_Data, true );
+    CBufferReadStream stream(m_Data, true);
 
     // Figure out which type of list it is
     unsigned short usVersion = 0;
     unsigned short usCount = 0;
-    stream.Read ( usCount );
-    if ( usCount == 0 )
-        stream.Read ( usVersion );
+    stream.Read(usCount);
+    if (usCount == 0)
+        stream.Read(usVersion);
 
-    if ( usVersion == 0 )
-        return CheckParsableVer0 ();
-    else
-    if ( usVersion == 2 )
-        return CheckParsableVer2 ();
+    if (usVersion == 0)
+        return CheckParsableVer0();
+    else if (usVersion == 2)
+        return CheckParsableVer2();
     else
         return false;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -219,25 +207,24 @@ bool CRemoteMasterServer::CheckParsable ( void )
 // Return true if data looks usable
 //
 ///////////////////////////////////////////////////////////////
-bool CRemoteMasterServer::CheckParsableVer0 ( void )
+bool CRemoteMasterServer::CheckParsableVer0(void)
 {
-    CBufferReadStream stream ( m_Data, true );
+    CBufferReadStream stream(m_Data, true);
 
-    if ( stream.GetSize () < 2 )
+    if (stream.GetSize() < 2)
         return false;
 
     unsigned short usCount = 0;
-    stream.Read ( usCount );
+    stream.Read(usCount);
 
     int iMinSize = 2 + usCount * 6;
     int iMaxSize = iMinSize + 128;
 
-    if ( stream.GetSize () < iMinSize || stream.GetSize () > iMaxSize )
+    if (stream.GetSize() < iMinSize || stream.GetSize() > iMaxSize)
         return false;
-   
+
     return true;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -247,21 +234,19 @@ bool CRemoteMasterServer::CheckParsableVer0 ( void )
 // Return true if data looks usable
 //
 ///////////////////////////////////////////////////////////////
-bool CRemoteMasterServer::CheckParsableVer2 ( void )
+bool CRemoteMasterServer::CheckParsableVer2(void)
 {
-    CBufferReadStream stream ( m_Data, true );
+    CBufferReadStream stream(m_Data, true);
 
     // Check EOF marker
-    stream.Seek ( stream.GetSize () - 4 );
+    stream.Seek(stream.GetSize() - 4);
     uint uiEOFMarker = 0;
-    stream.Read ( uiEOFMarker );
-    if ( uiEOFMarker != 0x12345679 )
+    stream.Read(uiEOFMarker);
+    if (uiEOFMarker != 0x12345679)
         return false;
 
     return true;
 }
-
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -270,26 +255,24 @@ bool CRemoteMasterServer::CheckParsableVer2 ( void )
 // Parse reply from master server
 //
 ///////////////////////////////////////////////////////////////
-bool CRemoteMasterServer::ParseList ( CServerListItemList& itemList )
+bool CRemoteMasterServer::ParseList(CServerListItemList& itemList)
 {
-    CBufferReadStream stream ( m_Data, true );
+    CBufferReadStream stream(m_Data, true);
 
     // Figure out which type of list it is
     unsigned short usVersion = 0;
     unsigned short usCount = 0;
-    stream.Read ( usCount );
-    if ( usCount == 0 )
-        stream.Read ( usVersion );
+    stream.Read(usCount);
+    if (usCount == 0)
+        stream.Read(usVersion);
 
-    if ( usVersion == 0 )
-        return ParseListVer0 ( itemList );
-    else
-    if ( usVersion == 2 )
-        return ParseListVer2 ( itemList );
+    if (usVersion == 0)
+        return ParseListVer0(itemList);
+    else if (usVersion == 2)
+        return ParseListVer2(itemList);
     else
         return true;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -298,39 +281,39 @@ bool CRemoteMasterServer::ParseList ( CServerListItemList& itemList )
 // Standard Game Monitor reply
 //
 ///////////////////////////////////////////////////////////////
-bool CRemoteMasterServer::ParseListVer0 ( CServerListItemList& itemList )
+bool CRemoteMasterServer::ParseListVer0(CServerListItemList& itemList)
 {
-    CBufferReadStream stream ( m_Data, true );
+    CBufferReadStream stream(m_Data, true);
 
-    if ( stream.GetSize () < 2 )
+    if (stream.GetSize() < 2)
         return false;
 
     unsigned short usCount = 0;
-    stream.Read ( usCount );
+    stream.Read(usCount);
 
 #if MTA_DEBUG
     uint uiNumServers = usCount;
     uint uiNumServersUpdated = 0;
-    uint uiNumServersBefore = itemList.size ();
+    uint uiNumServersBefore = itemList.size();
 #endif
 
-    while ( !stream.AtEnd ( 6 ) && usCount-- )
+    while (!stream.AtEnd(6) && usCount--)
     {
-        in_addr             Address;        // IP-address
-        unsigned short      usQueryPort;    // Query port
+        in_addr        Address;                // IP-address
+        unsigned short usQueryPort;            // Query port
 
-        stream.Read ( Address.S_un.S_un_b.s_b1 );
-        stream.Read ( Address.S_un.S_un_b.s_b2 );
-        stream.Read ( Address.S_un.S_un_b.s_b3 );
-        stream.Read ( Address.S_un.S_un_b.s_b4 );
-        stream.Read ( usQueryPort );
+        stream.Read(Address.S_un.S_un_b.s_b1);
+        stream.Read(Address.S_un.S_un_b.s_b2);
+        stream.Read(Address.S_un.S_un_b.s_b3);
+        stream.Read(Address.S_un.S_un_b.s_b4);
+        stream.Read(usQueryPort);
 
         // Add or find item to update
-        CServerListItem* pItem = GetServerListItem ( itemList, Address, usQueryPort - SERVER_LIST_QUERY_PORT_OFFSET );
+        CServerListItem* pItem = GetServerListItem(itemList, Address, usQueryPort - SERVER_LIST_QUERY_PORT_OFFSET);
 
-        if ( pItem->ShouldAllowDataQuality ( SERVER_INFO_ASE_0 ) )
+        if (pItem->ShouldAllowDataQuality(SERVER_INFO_ASE_0))
         {
-            pItem->SetDataQuality ( SERVER_INFO_ASE_0 );
+            pItem->SetDataQuality(SERVER_INFO_ASE_0);
 #if MTA_DEBUG
             uiNumServersUpdated++;
 #endif
@@ -338,12 +321,12 @@ bool CRemoteMasterServer::ParseListVer0 ( CServerListItemList& itemList )
     }
 
 #if MTA_DEBUG
-    OutputDebugLine ( SString ( "[Browser] %d servers (%d added, %d updated) from %s", uiNumServers, itemList.size () - uiNumServersBefore, uiNumServersUpdated, *m_strURL ) );
+    OutputDebugLine(
+        SString("[Browser] %d servers (%d added, %d updated) from %s", uiNumServers, itemList.size() - uiNumServersBefore, uiNumServersUpdated, *m_strURL));
 #endif
 
     return true;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -352,55 +335,53 @@ bool CRemoteMasterServer::ParseListVer0 ( CServerListItemList& itemList )
 // Extended reply
 //
 ///////////////////////////////////////////////////////////////
-bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
+bool CRemoteMasterServer::ParseListVer2(CServerListItemList& itemList)
 {
-    CBufferReadStream stream ( m_Data, true );
+    CBufferReadStream stream(m_Data, true);
 
     // Check EOF marker
-    stream.Seek ( stream.GetSize () - 4 );
+    stream.Seek(stream.GetSize() - 4);
     uint uiEOFMarker = 0;
-    stream.Read ( uiEOFMarker );
-    if ( uiEOFMarker != 0x12345679 )
+    stream.Read(uiEOFMarker);
+    if (uiEOFMarker != 0x12345679)
         return false;
 
     // Skip header
-    stream.Seek ( 4 );
+    stream.Seek(4);
 
     // Read flags
     uint uiFlags = 0;
-    stream.Read ( uiFlags );
+    stream.Read(uiFlags);
 
-    //bool bHasAddress        = ( uiFlags & ASE_FLAG_ADDRESS ) != 0;
-    //bool bHasPort           = ( uiFlags & ASE_FLAG_PORT ) != 0;
-    bool bHasPlayerCount    = ( uiFlags & ASE_FLAG_PLAYER_COUNT ) != 0;
-    bool bHasMaxPlayerCount = ( uiFlags & ASE_FLAG_MAX_PLAYER_COUNT ) != 0;
-    bool bHasGameName       = ( uiFlags & ASE_FLAG_GAME_NAME ) != 0;
-    bool bHasName           = ( uiFlags & ASE_FLAG_NAME ) != 0;
-    bool bHasGameMode       = ( uiFlags & ASE_FLAG_GAME_MODE ) != 0;
-    bool bHasMap            = ( uiFlags & ASE_FLAG_MAP ) != 0;
-    bool bHasVersion        = ( uiFlags & ASE_FLAG_VERSION ) != 0;
-    bool bHasPassworded     = ( uiFlags & ASE_FLAG_PASSWORDED ) != 0;
-    bool bHasSerials        = ( uiFlags & ASE_FLAG_SERIALS ) != 0;
-    bool bHasPlayers        = ( uiFlags & ASE_FLAG_PLAYER_LIST ) != 0;
-    bool bHasRespondingFlag = ( uiFlags & ASE_FLAG_RESPONDING ) != 0;
-    bool bHasRestrictionFlags = ( uiFlags & ASE_FLAG_RESTRICTIONS ) != 0;
-    bool bHasSearchIgnoreSections = ( uiFlags & ASE_FLAG_SEARCH_IGNORE_SECTIONS ) != 0;
-    bool bHasKeepFlag       = ( uiFlags & ASE_FLAG_KEEP ) != 0;
-    bool bHasHttpPort       = ( uiFlags & ASE_FLAG_HTTP_PORT ) != 0;
-    bool bHasSpecialFlags   = ( uiFlags & ASE_FLAG_SPECIAL_FLAGS ) != 0;
+    bool bHasPlayerCount = (uiFlags & ASE_HAS_PLAYER_COUNT) != 0;
+    bool bHasMaxPlayerCount = (uiFlags & ASE_HAS_MAX_PLAYER_COUNT) != 0;
+    bool bHasGameName = (uiFlags & ASE_HAS_GAME_NAME) != 0;
+    bool bHasName = (uiFlags & ASE_HAS_SERVER_NAME) != 0;
+    bool bHasGameMode = (uiFlags & ASE_HAS_GAME_MODE) != 0;
+    bool bHasMap = (uiFlags & ASE_HAS_MAP_NAME) != 0;
+    bool bHasVersion = (uiFlags & ASE_HAS_SERVER_VERSION) != 0;
+    bool bHasPassworded = (uiFlags & ASE_HAS_PASSWORDED_FLAG) != 0;
+    bool bHasSerials = (uiFlags & ASE_HAS_SERIALS_FLAG) != 0;
+    bool bHasPlayers = (uiFlags & ASE_HAS_PLAYER_LIST) != 0;
+    bool bHasRespondingFlag = (uiFlags & ASE_HAS_RESPONDING_FLAG) != 0;
+    bool bHasRestrictionFlags = (uiFlags & ASE_HAS_RESTRICTION_FLAGS) != 0;
+    bool bHasSearchIgnoreSections = (uiFlags & ASE_HAS_SEARCH_IGNORE_SECTIONS) != 0;
+    bool bHasKeepFlag = (uiFlags & ASE_HAS_KEEP_FLAG) != 0;
+    bool bHasHttpPort = (uiFlags & ASE_HAS_HTTP_PORT) != 0;
+    bool bHasSpecialFlags = (uiFlags & ASE_HAS_SPECIAL_FLAGS) != 0;
 
     // Rate quality of data supplied here
     uint uiDataQuality = SERVER_INFO_ASE_2;
-    if ( bHasSearchIgnoreSections )
+    if (bHasSearchIgnoreSections)
         uiDataQuality = SERVER_INFO_ASE_2b;
 
     // Read sequence number
     uint uiSequenceNumber = 0;
-    stream.Read ( uiSequenceNumber );
+    stream.Read(uiSequenceNumber);
 
     // Read server count
     uint uiCount = 0;
-    stream.Read ( uiCount );
+    stream.Read(uiCount);
 
 #if MTA_DEBUG
     struct SItem
@@ -408,127 +389,136 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
         int iTotal;
         int iNoResponse;
     };
-    std::map < SString, SItem > totalMap;
+    std::map<SString, SItem> totalMap;
 
     uint uiNumServers = uiCount;
     uint uiNumServersUpdated = 0;
-    uint uiNumServersBefore = itemList.size ();
+    uint uiNumServersBefore = itemList.size();
 #endif
 
     // Add all servers until we hit the count or run out of data
-    while ( !stream.AtEnd ( 6 ) && uiCount-- )
+    while (!stream.AtEnd(6) && uiCount--)
     {
-        ushort usLength = 0;        // Length of data for this server
-        stream.Read ( usLength );
-        uint uiSkipPos = stream.Tell () + usLength - 2;
+        ushort usLength = 0;            // Length of data for this server
+        stream.Read(usLength);
+        uint uiSkipPos = stream.Tell() + usLength - 2;
 
-        in_addr             Address;        // IP-address
-        unsigned short      usGamePort;     // Game port
+        in_addr        Address;               // IP-address
+        unsigned short usGamePort;            // Game port
 
-        stream.Read ( Address.S_un.S_addr );
-        stream.Read ( usGamePort );
+        stream.Read(Address.S_un.S_addr);
+        stream.Read(usGamePort);
 
         // Add or find item to update
-        CServerListItem* pItem = GetServerListItem ( itemList, Address, usGamePort );
+        CServerListItem* pItem = GetServerListItem(itemList, Address, usGamePort);
 
-        if ( pItem->ShouldAllowDataQuality ( uiDataQuality ) )
+        if (pItem->ShouldAllowDataQuality(uiDataQuality))
         {
-            pItem->SetDataQuality ( uiDataQuality );
+            pItem->SetDataQuality(uiDataQuality);
 
-            if ( bHasPlayerCount )          stream.Read ( pItem->nPlayers );
-            if ( bHasMaxPlayerCount )       stream.Read ( pItem->nMaxPlayers );
-            if ( bHasGameName )             stream.ReadString ( pItem->strGameName, true );
-            if ( bHasName )                 stream.ReadString ( pItem->strName, true );
-            if ( bHasGameMode )             stream.ReadString ( pItem->strGameMode, true );
-            if ( bHasMap )                  stream.ReadString ( pItem->strMap, true );
-            if ( bHasVersion )              stream.ReadString ( pItem->strVersion, true );
-            if ( bHasPassworded )           stream.Read ( pItem->bPassworded );
-            if ( bHasSerials )              stream.Read ( pItem->bSerials );
+            if (bHasPlayerCount)
+                stream.Read(pItem->nPlayers);
+            if (bHasMaxPlayerCount)
+                stream.Read(pItem->nMaxPlayers);
+            if (bHasGameName)
+                stream.ReadString(pItem->strGameName, true);
+            if (bHasName)
+                stream.ReadString(pItem->strName, true);
+            if (bHasGameMode)
+                stream.ReadString(pItem->strGameMode, true);
+            if (bHasMap)
+                stream.ReadString(pItem->strMap, true);
+            if (bHasVersion)
+                stream.ReadString(pItem->strVersion, true);
+            if (bHasPassworded)
+                stream.Read(pItem->bPassworded);
+            if (bHasSerials)
+                stream.Read(pItem->bSerials);
 
-            if ( bHasPlayers )
+            if (bHasPlayers)
             {
-                pItem->vecPlayers.clear ();
+                pItem->vecPlayers.clear();
 
                 ushort usPlayerListSize = 0;
-                stream.Read ( usPlayerListSize );
+                stream.Read(usPlayerListSize);
 
-                for ( uint i = 0 ; i < usPlayerListSize ; i++ )
+                for (uint i = 0; i < usPlayerListSize; i++)
                 {
                     SString strPlayer;
-                    stream.ReadString ( strPlayer, true );
-                    pItem->vecPlayers.push_back ( strPlayer );
+                    stream.ReadString(strPlayer, true);
+                    pItem->vecPlayers.push_back(strPlayer);
                 }
             }
 
-            if ( bHasRespondingFlag )
+            if (bHasRespondingFlag)
             {
-                stream.Read ( pItem->bMasterServerSaysNoResponse );
+                stream.Read(pItem->bMasterServerSaysNoResponse);
             }
 
-            if ( bHasRestrictionFlags )
+            if (bHasRestrictionFlags)
             {
-                stream.Read ( pItem->uiMasterServerSaysRestrictions );
+                stream.Read(pItem->uiMasterServerSaysRestrictions);
             }
 
-            if ( bHasSearchIgnoreSections )
+            if (bHasSearchIgnoreSections)
             {
                 // Construct searchable name
                 pItem->strSearchableName = pItem->strName;
                 uchar ucNumItems = 0;
-                stream.Read ( ucNumItems );
-                while ( ucNumItems-- )
+                stream.Read(ucNumItems);
+                while (ucNumItems--)
                 {
                     // Read section of name to remove
                     uchar ucOffset = 0;
                     uchar ucLength = 0;
-                    stream.Read ( ucOffset );
-                    stream.Read ( ucLength );
-                    for ( uint i = ucOffset ; i < (uint)( ucOffset + ucLength ) ; i++ )
-                        if ( i < pItem->strSearchableName.length () )
+                    stream.Read(ucOffset);
+                    stream.Read(ucLength);
+                    for (uint i = ucOffset; i < (uint)(ucOffset + ucLength); i++)
+                        if (i < pItem->strSearchableName.length())
                             pItem->strSearchableName[i] = '\1';
                 }
             }
 
-            if ( bHasKeepFlag )
+            if (bHasKeepFlag)
             {
                 uchar ucKeepFlag = 0;
-                stream.Read ( ucKeepFlag );
+                stream.Read(ucKeepFlag);
                 pItem->bKeepFlag = ucKeepFlag ? true : false;
             }
 
-            if ( bHasHttpPort )
+            if (bHasHttpPort)
             {
-                stream.Read ( pItem->m_usHttpPort );
+                stream.Read(pItem->m_usHttpPort);
             }
 
-            if ( bHasSpecialFlags )
+            if (bHasSpecialFlags)
             {
-                stream.Read ( pItem->m_ucSpecialFlags );
+                stream.Read(pItem->m_ucSpecialFlags);
             }
 
-            pItem->PostChange ();
+            pItem->PostChange();
 
 #if MTA_DEBUG
             uiNumServersUpdated++;
-            totalMap[ pItem->strVersion ].iTotal += 1;
-            if ( pItem->bMasterServerSaysNoResponse )
-                totalMap[ pItem->strVersion ].iNoResponse += 1;
+            totalMap[pItem->strVersion].iTotal += 1;
+            if (pItem->bMasterServerSaysNoResponse)
+                totalMap[pItem->strVersion].iNoResponse += 1;
 #endif
         }
 
         // Make sure past all data for this server
-        stream.Seek ( uiSkipPos );
+        stream.Seek(uiSkipPos);
     }
 
 #if MTA_DEBUG
-    OutputDebugLine ( SString ( "[Browser] %d servers (%d added, %d updated) from %s", uiNumServers, itemList.size () - uiNumServersBefore, uiNumServersUpdated, *m_strURL ) );
-    for ( std::map < SString, SItem >::iterator iter = totalMap.begin () ; iter != totalMap.end () ; ++iter )
-        OutputDebugLine ( SString ( "[Browser] version '%s' - %d total  %d noresponse", *iter->first, iter->second.iTotal, iter->second.iNoResponse ) );
+    OutputDebugLine(
+        SString("[Browser] %d servers (%d added, %d updated) from %s", uiNumServers, itemList.size() - uiNumServersBefore, uiNumServersUpdated, *m_strURL));
+    for (std::map<SString, SItem>::iterator iter = totalMap.begin(); iter != totalMap.end(); ++iter)
+        OutputDebugLine(SString("[Browser] version '%s' - %d total  %d noresponse", *iter->first, iter->second.iTotal, iter->second.iNoResponse));
 #endif
 
     return true;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -537,12 +527,11 @@ bool CRemoteMasterServer::ParseListVer2 ( CServerListItemList& itemList )
 // Find or add list item for the address and port
 //
 ///////////////////////////////////////////////////////////////
-CServerListItem* CRemoteMasterServer::GetServerListItem ( CServerListItemList& itemList, in_addr Address, ushort usGamePort )
+CServerListItem* CRemoteMasterServer::GetServerListItem(CServerListItemList& itemList, in_addr Address, ushort usGamePort)
 {
-    CServerListItem* pItem = itemList.Find ( Address, usGamePort );
-    if ( pItem )
+    CServerListItem* pItem = itemList.Find(Address, usGamePort);
+    if (pItem)
         return pItem;
 
-    return itemList.AddUnique ( Address, usGamePort );
+    return itemList.AddUnique(Address, usGamePort);
 }
-

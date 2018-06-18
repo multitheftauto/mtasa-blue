@@ -27,7 +27,9 @@ project "Launcher"
 		}
 
 	filter "system:linux"
-		links { "dl", "pthread" }
+		links { "dl" }
+		buildoptions { "-pthread", "-fvisibility=default" }
+		linkoptions { "-pthread", "-rdynamic" }
 
 	filter {"system:linux", "platforms:x86"}
 		targetname "mta-server"

@@ -34,7 +34,6 @@
 #include <iomanip>
 #include <functional>
 
-
 // Localization
 #include "../../vendor/tinygettext/tinygettext.hpp"
 #include "CLocalization.h"

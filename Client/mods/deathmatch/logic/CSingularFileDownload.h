@@ -1,15 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CSingularFileDownload.h
-*  PURPOSE:     Header for singular file download
-*  DEVELOPERS:  Kevin Whiteside <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
-
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CSingularFileDownload.h
+ *  PURPOSE:     Header for singular file download
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef CSINGULARFILEDOWNLOAD_H
 #define CSINGULARFILEDOWNLOAD_H
@@ -26,41 +24,38 @@
 
 class CSingularFileDownload
 {
-    
 public:
-                        CSingularFileDownload           ( CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CChecksum serverChecksum );
-                        ~CSingularFileDownload          ( void );
+    CSingularFileDownload(CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CChecksum serverChecksum);
+    ~CSingularFileDownload(void);
 
-        static void     DownloadFinishedCallBack       ( char * data, size_t dataLength, void * obj, bool bSuccess, int iErrorCode );
+    static void DownloadFinishedCallBack(const SHttpDownloadResult& result);
 
-        bool            DoesClientAndServerChecksumMatch ( void );
+    bool DoesClientAndServerChecksumMatch(void);
 
-        inline const char*      GetName                         ( void ) { return m_strName; };
-        inline const char*      GetShortName                    ( void ) { return m_strNameShort; };
+    const char* GetName(void) { return m_strName; };
+    const char* GetShortName(void) { return m_strNameShort; };
 
-        inline CResource*       GetResource                     ( void ) { return m_pResource; };
+    CResource* GetResource(void) { return m_pResource; };
 
-        inline void             SetComplete                     ( void ) { m_bComplete = true; };
-        inline bool             GetComplete                     ( void ) { return m_bComplete; };
+    void SetComplete(void) { m_bComplete = true; };
+    bool GetComplete(void) { return m_bComplete; };
 
-        void                    CallFinished                    ( bool bSuccess );
-        void                    Cancel                          ( void );
+    void CallFinished(bool bSuccess);
+    void Cancel(void);
 
-        CChecksum               GenerateClientChecksum          ( void );
+    CChecksum GenerateClientChecksum(void);
 
 protected:
+    SString m_strName;
+    SString m_strNameShort;
 
-    SString             m_strName;
-    SString             m_strNameShort;
+    CResource* m_pResource;
 
-    CResource*          m_pResource;
+    bool m_bComplete;
+    bool m_bBeingDeleted;
 
-    bool                m_bComplete;
-    bool                m_bBeingDeleted;
-
-    CChecksum           m_LastClientChecksum;
-    CChecksum           m_ServerChecksum;
-
+    CChecksum m_LastClientChecksum;
+    CChecksum m_ServerChecksum;
 };
 
 #endif

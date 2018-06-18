@@ -1,43 +1,41 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CHudSA.cpp
-*  PURPOSE:     HUD display
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CHudSA.cpp
+ *  PURPOSE:     HUD display
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
 char szVehicleName[50] = {'\0'};
 char szZoneName[50] = {'\0'};
 
-CHudSA::CHudSA ( void )
+CHudSA::CHudSA(void)
 {
-    InitComponentList ();
+    InitComponentList();
 
     // Set the default values
     m_fSniperCrosshairScale = 210.0f;
 
-    m_pfCameraCrosshairScale = (float*) VAR_CameraCrosshairScale;
-    MemPut < float > ( m_pfCameraCrosshairScale, 192.0f );
-    m_pfAspectRatioMultiplicator = (float*) VAR_AspectRatioMult;
-    MemPut < float > ( m_pfAspectRatioMultiplicator, 0.002232143f );
+    m_pfCameraCrosshairScale = (float*)VAR_CameraCrosshairScale;
+    MemPut<float>(m_pfCameraCrosshairScale, 192.0f);
+    m_pfAspectRatioMultiplicator = (float*)VAR_AspectRatioMult;
+    MemPut<float>(m_pfAspectRatioMultiplicator, 0.002232143f);
 
     // Patch xrefs to 0x863B34, because this variable seems to be shared (2 other functions without any context access to it; probably a compiler optimization)
-    MemPut < DWORD > ( 0x58E7D4 + 2, (DWORD)&m_fSniperCrosshairScale );
-    MemPut < DWORD > ( 0x58E7EA + 2, (DWORD)&m_fSniperCrosshairScale );
-    MemPut < DWORD > ( 0x53E3ED + 2, (DWORD)&m_fSniperCrosshairScale );
-    MemPut < DWORD > ( 0x53E41A + 2, (DWORD)&m_fSniperCrosshairScale );
-    MemPut < DWORD > ( 0x53E488 + 2, (DWORD)&m_fSniperCrosshairScale );
-    MemPut < DWORD > ( 0x53E4BF + 2, (DWORD)&m_fSniperCrosshairScale );
+    MemPut<DWORD>(0x58E7D4 + 2, (DWORD)&m_fSniperCrosshairScale);
+    MemPut<DWORD>(0x58E7EA + 2, (DWORD)&m_fSniperCrosshairScale);
+    MemPut<DWORD>(0x53E3ED + 2, (DWORD)&m_fSniperCrosshairScale);
+    MemPut<DWORD>(0x53E41A + 2, (DWORD)&m_fSniperCrosshairScale);
+    MemPut<DWORD>(0x53E488 + 2, (DWORD)&m_fSniperCrosshairScale);
+    MemPut<DWORD>(0x53E4BF + 2, (DWORD)&m_fSniperCrosshairScale);
 }
 
-VOID CHudSA::SetHelpMessage( char * szMessage )
+VOID CHudSA::SetHelpMessage(char* szMessage)
 {
     DEBUG_TRACE("VOID CHudSA::SetHelpMessage( char * szMessage )");
     wchar_t szHelp[255] = {'\0'};
@@ -58,7 +56,7 @@ VOID CHudSA::SetHelpMessage( char * szMessage )
 /**
  * \todo Find out what param 2 is
  */
-VOID CHudSA::SetBigMessage( char * szBigMessage )
+VOID CHudSA::SetBigMessage(char* szBigMessage)
 {
     DEBUG_TRACE("VOID CHudSA::SetBigMessage( char * szBigMessage )");
     wchar_t wszBigMessage[255] = {'\0'};
@@ -75,18 +73,18 @@ VOID CHudSA::SetBigMessage( char * szBigMessage )
     }
 }
 
-/** 
+/**
  * \todo Fix: doesn't work
  */
-VOID CHudSA::SetVehicleName( char * szName )
+VOID CHudSA::SetVehicleName(char* szName)
 {
     DEBUG_TRACE("VOID CHudSA::SetVehicleName( char * szName )");
-    char * szVehicleNamePtr = (char *)VAR_VehicleNamePtr;
-    if(szName != 0)
+    char* szVehicleNamePtr = (char*)VAR_VehicleNamePtr;
+    if (szName != 0)
     {
-//          wchar_t szHelp[255] = {'\0'};
-    //MultiByteToWideChar(CP_ACP, 0, szMessage, -1, szHelp, 255);
-        if(strlen(szName) < 50)
+        //          wchar_t szHelp[255] = {'\0'};
+        // MultiByteToWideChar(CP_ACP, 0, szMessage, -1, szHelp, 255);
+        if (strlen(szName) < 50)
         {
             strcpy(szVehicleName, szName);
             szVehicleNamePtr = szVehicleName;
@@ -94,20 +92,20 @@ VOID CHudSA::SetVehicleName( char * szName )
     }
     else
     {
-        MemPutFast < DWORD > ( VAR_VehicleNamePtr, 0 );
+        MemPutFast<DWORD>(VAR_VehicleNamePtr, 0);
     }
 }
 
-/** 
+/**
  * \todo Fix: doesn't work
  */
-VOID CHudSA::SetZoneName( char * szName )
+VOID CHudSA::SetZoneName(char* szName)
 {
     DEBUG_TRACE("VOID CHudSA::SetZoneName( char * szName )");
-    char * szZoneNamePtr = (char *)VAR_ZoneNamePtr;
-    if(szName != 0)
+    char* szZoneNamePtr = (char*)VAR_ZoneNamePtr;
+    if (szName != 0)
     {
-        if(strlen(szName) < 50)
+        if (strlen(szName) < 50)
         {
             strcpy(szZoneName, szName);
             szZoneNamePtr = szZoneName;
@@ -115,33 +113,33 @@ VOID CHudSA::SetZoneName( char * szName )
     }
     else
     {
-        MemPutFast < DWORD > ( VAR_ZoneNamePtr, 0 );
+        MemPutFast<DWORD>(VAR_ZoneNamePtr, 0);
     }
 }
 
-VOID CHudSA::Disable ( bool bDisabled )
+VOID CHudSA::Disable(bool bDisabled)
 {
     DEBUG_TRACE("VOID CHudSA::Disable ( bool bDisabled )");
-    if ( bDisabled )
-        MemPut < BYTE > ( FUNC_Draw, 0xC3 );
+    if (bDisabled)
+        MemPut<BYTE>(FUNC_Draw, 0xC3);
     else
-        MemPut < BYTE > ( FUNC_Draw, 0x80 );
+        MemPut<BYTE>(FUNC_Draw, 0x80);
 
     // Also disable the radar as the above code will not hide it before the local player has spawned
-    if ( bDisabled )
-        MemPut < BYTE > ( FUNC_DrawRadarPlanB, 0xC3 );
+    if (bDisabled)
+        MemPut<BYTE>(FUNC_DrawRadarPlanB, 0xC3);
     else
-        MemPut < BYTE > ( FUNC_DrawRadarPlanB, 0x83 );
+        MemPut<BYTE>(FUNC_DrawRadarPlanB, 0x83);
 }
 
-bool CHudSA::IsDisabled ( void )
+bool CHudSA::IsDisabled(void)
 {
     return *(BYTE*)FUNC_Draw == 0xC3;
 }
 
-VOID CHudSA::DrawBarChart ( float fX, float fY, DWORD dwWidth, DWORD dwHeight, float fPercentage, DWORD dwForeColor, DWORD dwBorderColor )
+VOID CHudSA::DrawBarChart(float fX, float fY, DWORD dwWidth, DWORD dwHeight, float fPercentage, DWORD dwForeColor, DWORD dwBorderColor)
 {
-    DWORD dwFunc= FUNC_DrawBarChart;
+    DWORD dwFunc = FUNC_DrawBarChart;
     _asm
     {
         push    dwBorderColor
@@ -159,10 +157,10 @@ VOID CHudSA::DrawBarChart ( float fX, float fY, DWORD dwWidth, DWORD dwHeight, f
     }
 }
 
-bool CHudSA::CalcScreenCoors ( CVector * vecPosition1, CVector * vecPosition2, float * fX, float * fY, bool bSetting1, bool bSetting2 )
+bool CHudSA::CalcScreenCoors(CVector* vecPosition1, CVector* vecPosition2, float* fX, float* fY, bool bSetting1, bool bSetting2)
 {
     DWORD dwFunc = 0x71DA00;
-    bool bReturn = false;
+    bool  bReturn = false;
     _asm
     {
         //push  bSetting2
@@ -179,7 +177,7 @@ bool CHudSA::CalcScreenCoors ( CVector * vecPosition1, CVector * vecPosition2, f
     return bReturn;
 }
 
-void CHudSA::Draw2DPolygon ( float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, float fX4, float fY4, DWORD dwColor )
+void CHudSA::Draw2DPolygon(float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, float fX4, float fY4, DWORD dwColor)
 {
     DWORD dwFunc = FUNC_Draw2DPolygon;
     _asm
@@ -202,70 +200,70 @@ void CHudSA::Draw2DPolygon ( float fX1, float fY1, float fX2, float fY2, float f
 //
 // CHudSA::InitComponentList
 //
-void CHudSA::InitComponentList ( void )
+void CHudSA::InitComponentList(void)
 {
     SHudComponent componentList[] = {
-                { 1, HUD_AMMO, 1, FUNC_DrawAmmo, 1, 0xCC, 0xC3 },
-                { 1, HUD_WEAPON, 1, FUNC_DrawWeaponIcon, 1, 0xCC, 0xC3 },
-                { 1, HUD_HEALTH, 1, FUNC_PrintHealthForPlayer, 1, 0xCC, 0xC3 },
-                { 1, HUD_BREATH, 1, FUNC_PrintBreathForPlayer, 1, 0xCC, 0xC3 },
-                { 1, HUD_ARMOUR, 1, FUNC_PrintArmourForPlayer, 1, 0xCC, 0xC3 },
-                { 1, HUD_MONEY, 1, CODE_ShowMoney, 2, 0xCCCC, 0xE990 },
-                { 1, HUD_VEHICLE_NAME, 1, FUNC_DrawVehicleName, 1, 0xCC, 0xC3 },
-                { 1, HUD_AREA_NAME, 1, FUNC_DrawAreaName, 1, 0xCC, 0xC3 },
-                { 1, HUD_RADAR, 1, FUNC_DrawRadar, 1, 0xCC, 0xC3 },
-                { 1, HUD_CLOCK, 0, VAR_DisableClock, 1, 1, 0 },
-                { 1, HUD_RADIO, 1, FUNC_DrawRadioName, 1, 0xCC, 0xC3 },
-                { 1, HUD_WANTED, 1, FUNC_DrawWantedLevel, 1, 0xCC, 0xC3 },
-                { 1, HUD_CROSSHAIR, 1, FUNC_DrawCrosshair, 1, 0xCC, 0xC3 },
-                { 1, HUD_VITAL_STATS, 1, FUNC_DrawVitalStats, 1, 0xCC, 0xC3 },
-                { 0, HUD_HELP_TEXT, 1, FUNC_DrawHelpText, 1, 0xCC, 0xC3 },
-            };
+        {1, HUD_AMMO, 1, FUNC_DrawAmmo, 1, 0xCC, 0xC3},
+        {1, HUD_WEAPON, 1, FUNC_DrawWeaponIcon, 1, 0xCC, 0xC3},
+        {1, HUD_HEALTH, 1, FUNC_PrintHealthForPlayer, 1, 0xCC, 0xC3},
+        {1, HUD_BREATH, 1, FUNC_PrintBreathForPlayer, 1, 0xCC, 0xC3},
+        {1, HUD_ARMOUR, 1, FUNC_PrintArmourForPlayer, 1, 0xCC, 0xC3},
+        {1, HUD_MONEY, 1, CODE_ShowMoney, 2, 0xCCCC, 0xE990},
+        {1, HUD_VEHICLE_NAME, 1, FUNC_DrawVehicleName, 1, 0xCC, 0xC3},
+        {1, HUD_AREA_NAME, 1, FUNC_DrawAreaName, 1, 0xCC, 0xC3},
+        {1, HUD_RADAR, 1, FUNC_DrawRadar, 1, 0xCC, 0xC3},
+        {1, HUD_CLOCK, 0, VAR_DisableClock, 1, 1, 0},
+        {1, HUD_RADIO, 1, FUNC_DrawRadioName, 1, 0xCC, 0xC3},
+        {1, HUD_WANTED, 1, FUNC_DrawWantedLevel, 1, 0xCC, 0xC3},
+        {1, HUD_CROSSHAIR, 1, FUNC_DrawCrosshair, 1, 0xCC, 0xC3},
+        {1, HUD_VITAL_STATS, 1, FUNC_DrawVitalStats, 1, 0xCC, 0xC3},
+        {0, HUD_HELP_TEXT, 1, FUNC_DrawHelpText, 1, 0xCC, 0xC3},
+    };
 
-    for ( uint i = 0 ; i < NUMELMS( componentList ) ; i++ )
+    for (uint i = 0; i < NUMELMS(componentList); i++)
     {
-        const SHudComponent& component = componentList[i]; 
-        MapSet ( m_HudComponentMap, component.type, component );
+        const SHudComponent& component = componentList[i];
+        MapSet(m_HudComponentMap, component.type, component);
     }
 }
 
 //
 // CHudSA::SetComponentVisible
 //
-void CHudSA::SetComponentVisible ( eHudComponent component, bool bVisible )
+void CHudSA::SetComponentVisible(eHudComponent component, bool bVisible)
 {
     // Handle ALL option
-    if ( component == HUD_ALL )
+    if (component == HUD_ALL)
     {
-        for ( std::map < eHudComponent, SHudComponent >::iterator iter = m_HudComponentMap.begin () ; iter != m_HudComponentMap.end () ; ++iter )
+        for (std::map<eHudComponent, SHudComponent>::iterator iter = m_HudComponentMap.begin(); iter != m_HudComponentMap.end(); ++iter)
         {
             const SHudComponent& component = iter->second;
-            if ( component.bIsPartOfAll )
-                SetComponentVisible ( component.type, bVisible );
+            if (component.bIsPartOfAll)
+                SetComponentVisible(component.type, bVisible);
         }
         return;
     }
 
     // Set visiblity of one component
-    SHudComponent* pComponent = MapFind ( m_HudComponentMap, component );
-    if ( pComponent )
+    SHudComponent* pComponent = MapFind(m_HudComponentMap, component);
+    if (pComponent)
     {
         // Save original bytes if requred
-        if ( pComponent->bSaveOriginalBytes )
+        if (pComponent->bSaveOriginalBytes)
         {
             pComponent->origData = *(DWORD*)pComponent->uiDataAddr;
             pComponent->bSaveOriginalBytes = false;
         }
 
         // Poke bytes
-        uchar* pSrc = (uchar*)( bVisible ? &pComponent->origData : &pComponent->disabledData );
-        uchar* pDest = (uchar*)( pComponent->uiDataAddr );
-        for ( uint i = 0 ; i < pComponent->uiDataSize ; i++ )
+        uchar* pSrc = (uchar*)(bVisible ? &pComponent->origData : &pComponent->disabledData);
+        uchar* pDest = (uchar*)(pComponent->uiDataAddr);
+        for (uint i = 0; i < pComponent->uiDataSize; i++)
         {
-            if ( pComponent->type != HUD_CLOCK )
-                MemPut < BYTE > ( pDest + i, pSrc[i] );
+            if (pComponent->type != HUD_CLOCK)
+                MemPut<BYTE>(pDest + i, pSrc[i]);
             else
-                MemPutFast < BYTE > ( pDest + i, pSrc[i] );
+                MemPutFast<BYTE>(pDest + i, pSrc[i]);
         }
     }
 }
@@ -273,16 +271,16 @@ void CHudSA::SetComponentVisible ( eHudComponent component, bool bVisible )
 //
 // CHudSA::IsComponentVisible
 //
-bool CHudSA::IsComponentVisible ( eHudComponent component )
+bool CHudSA::IsComponentVisible(eHudComponent component)
 {
-    SHudComponent* pComponent = MapFind ( m_HudComponentMap, component );
-    if ( pComponent )
+    SHudComponent* pComponent = MapFind(m_HudComponentMap, component);
+    if (pComponent)
     {
         // Determine if invisible by matching data with disabled values
-        uchar* pSrc = (uchar*)( &pComponent->disabledData );
-        uchar* pDest = (uchar*)( pComponent->uiDataAddr );
-        if ( memcmp ( pDest, pSrc, pComponent->uiDataSize ) == 0 )
-            return false;   // Matches disabled bytes
+        uchar* pSrc = (uchar*)(&pComponent->disabledData);
+        uchar* pDest = (uchar*)(pComponent->uiDataAddr);
+        if (memcmp(pDest, pSrc, pComponent->uiDataSize) == 0)
+            return false;            // Matches disabled bytes
         return true;
     }
     return false;
@@ -291,26 +289,27 @@ bool CHudSA::IsComponentVisible ( eHudComponent component )
 //
 // CHudSA::AdjustComponents
 //
-void CHudSA::AdjustComponents ( float fAspectRatio )
+void CHudSA::AdjustComponents(float fAspectRatio)
 {
     // Fix for #7400 (HUD elements do not scale correctly for widescreen)
-    // 0x859524: GTA multiplies all HUD and menu transformation variables by this floating point value. It is equal to 1/448, so just translate it to 16/10 / 16/9
-    MemPut < float > ( m_pfAspectRatioMultiplicator, 0.002232143f / (4.0f/3.0f) * fAspectRatio );
+    // 0x859524: GTA multiplies all HUD and menu transformation variables by this floating point value. It is equal to 1/448, so just translate it to 16/10 /
+    // 16/9
+    MemPut<float>(m_pfAspectRatioMultiplicator, 0.002232143f / (4.0f / 3.0f) * fAspectRatio);
 
     // Set the sniper crosshair scale (fix for #7659)
-    m_fSniperCrosshairScale = 210.0f * (4.0f/3.0f) / fAspectRatio;
+    m_fSniperCrosshairScale = 210.0f * (4.0f / 3.0f) / fAspectRatio;
 
     // Set the camera crosshair scale (same display flaw as in #7659)
-    MemPut < float > ( m_pfCameraCrosshairScale, 192.0f * (4.0f/3.0f) / fAspectRatio );
+    MemPut<float>(m_pfCameraCrosshairScale, 192.0f * (4.0f / 3.0f) / fAspectRatio);
 }
 
 //
 // CHudSA::ResetComponentAdjustment
 //
-void CHudSA::ResetComponentAdjustment ( void )
+void CHudSA::ResetComponentAdjustment(void)
 {
     // Restore default values (4:3 aspect ratio)
-    MemPut < float > ( m_pfAspectRatioMultiplicator, 0.002232143f );
-    MemPut < float > ( m_pfCameraCrosshairScale, 192.0f );
+    MemPut<float>(m_pfAspectRatioMultiplicator, 0.002232143f);
+    MemPut<float>(m_pfCameraCrosshairScale, 192.0f);
     m_fSniperCrosshairScale = 210.0f;
 }

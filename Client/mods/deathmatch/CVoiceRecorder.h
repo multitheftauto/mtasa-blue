@@ -1,18 +1,16 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CVoiceRecorder.h
-*  PURPOSE:     Header for voice class
-*  DEVELOPERS:  Philip Farquharson <philip@philipfarquharson.co.uk>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CVoiceRecorder.h
+ *  PURPOSE:     Header for voice class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CVOICE_H
 #define __CVOICE_H
-
 
 #define VOICE_BUFFER_LENGTH             200000
 #define VOICE_FREQUENCY                 44100
@@ -52,51 +50,52 @@ enum eServerSampleRate
 class CVoiceRecorder
 {
 public:
-                                        CVoiceRecorder           	( void );
-                                        ~CVoiceRecorder          	( void );
+    CVoiceRecorder(void);
+    ~CVoiceRecorder(void);
 
-    void                                Init                        ( bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate );
+    void Init(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate);
 
-    bool                                IsEnabled                   ( void )                        { return m_bEnabled; }
+    bool IsEnabled(void) { return m_bEnabled; }
 
-    void                                DoPulse                     ( void );
+    void DoPulse(void);
 
-    void                                UpdatePTTState              ( unsigned int uiState );
+    void UpdatePTTState(unsigned int uiState);
 
-    unsigned int                        GetSampleRate               ( void )                        { return m_SampleRate; }
-    unsigned char                       GetSampleQuality            ( void )                        { return m_ucQuality; }
+    unsigned int  GetSampleRate(void) { return m_SampleRate; }
+    unsigned char GetSampleQuality(void) { return m_ucQuality; }
 
-    const SpeexMode*                    getSpeexModeFromSampleRate  ( void );
+    const SpeexMode* getSpeexModeFromSampleRate(void);
 
-private:  
-    void                                DeInit                      ( void );
-    void                                SendFrame                   ( const void* inputBuffer );
+private:
+    void DeInit(void);
+    void SendFrame(const void* inputBuffer);
 
-    static int                          PACallback                  ( const void *inputBuffer, void *outputBuffer, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData );
+    static int PACallback(const void* inputBuffer, void* outputBuffer, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo,
+                          PaStreamCallbackFlags statusFlags, void* userData);
 
-    bool                                m_bEnabled;
-    eVoiceState                         m_VoiceState;
+    bool        m_bEnabled;
+    eVoiceState m_VoiceState;
 
-    PaStream*                           m_pAudioStream;
+    PaStream* m_pAudioStream;
 
-    void*                               m_pSpeexEncoderState;
-    SpeexPreprocessState*               m_pSpeexPreprocState;
+    void*                 m_pSpeexEncoderState;
+    SpeexPreprocessState* m_pSpeexPreprocState;
 
-    char*                               m_pOutgoingBuffer;
-    int                                 m_iSpeexOutgoingFrameSampleCount;
-    unsigned int                        m_uiOutgoingReadIndex;
-    unsigned int                        m_uiOutgoingWriteIndex;
-    bool                                m_bIsSendingVoiceData;
+    char*        m_pOutgoingBuffer;
+    int          m_iSpeexOutgoingFrameSampleCount;
+    unsigned int m_uiOutgoingReadIndex;
+    unsigned int m_uiOutgoingWriteIndex;
+    bool         m_bIsSendingVoiceData;
 
-    unsigned long                       m_ulTimeOfLastSend;
+    unsigned long m_ulTimeOfLastSend;
 
-    unsigned int                        m_uiBufferSizeBytes;
-    eSampleRate                         convertServerSampleRate         ( unsigned int uiServerSampleRate );
+    unsigned int m_uiBufferSizeBytes;
+    eSampleRate  convertServerSampleRate(unsigned int uiServerSampleRate);
 
-    eSampleRate                         m_SampleRate;
-    unsigned char                       m_ucQuality;
+    eSampleRate   m_SampleRate;
+    unsigned char m_ucQuality;
 
-    std::list < SString >               m_EventQueue;
-    CCriticalSection                    m_CS;
+    std::list<SString> m_EventQueue;
+    CCriticalSection   m_CS;
 };
 #endif
