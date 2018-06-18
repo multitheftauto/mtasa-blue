@@ -17,6 +17,7 @@
 #include "Common.h"
 
 #define FUNC_CAnimBlendAssocGroup_InitEmptyAssociations 0x4cdfb0
+#define FUNC_CAnimBlendAssocGroup_CopyAnimation         0x4ce130
 #define FUNC_CAnimBlendAssocGroup_IsCreated             0x4d37a0
 #define FUNC_CAnimBlendAssocGroup_GetNumAnimations      0x45b050
 #define FUNC_CAnimBlendAssocGroup_GetAnimBlock          0x45b060
@@ -44,12 +45,14 @@ class CAnimBlendAssocGroupSA : public CAnimBlendAssocGroup
 public:
     CAnimBlendAssocGroupSA(CAnimBlendAssocGroupSAInterface* pInterface);
 
-    void                         InitEmptyAssociations(RpClump* pClump);
-    bool                         IsCreated(void);
-    int                          GetNumAnimations(void);
-    CAnimBlock*                  GetAnimBlock(void);
-    CAnimBlendStaticAssociation* GetAnimation(unsigned int ID);
-    void                         CreateAssociations(const char* szBlockName);
+    CAnimBlendAssociationSAInterface* CopyAnimation(unsigned int AnimID);
+    void                              InitEmptyAssociations(RpClump* pClump);
+    bool                              IsCreated(void);
+    int                               GetNumAnimations(void);
+    CAnimBlock*                       GetAnimBlock(void);
+    CAnimBlendStaticAssociation*      GetAnimation(unsigned int ID);
+    AssocGroupId                      GetGroupID(void) { return m_pInterface->groupID; };
+    void                              CreateAssociations(const char* szBlockName);
 
     bool IsLoaded(void);
     void SetIDOffset(int iOffset) { m_pInterface->iIDOffset = iOffset; }

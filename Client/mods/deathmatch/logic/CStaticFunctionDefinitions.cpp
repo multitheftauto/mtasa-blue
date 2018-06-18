@@ -1621,8 +1621,16 @@ bool CStaticFunctionDefinitions::GetPedAnimation(CClientPed& Ped, SString& strBl
 {
     if (Ped.IsRunningAnimation())
     {
-        strBlockName = Ped.GetAnimationBlock()->GetName();
-        strAnimName = Ped.GetAnimationName();
+        if (Ped.IsCustomAnimationPlaying())
+        {
+            strBlockName = Ped.GetNextAnimationCustomBlockName();
+            strAnimName = Ped.GetNextAnimationCustomName();
+        }
+        else
+        {
+            strBlockName = Ped.GetAnimationBlock()->GetName();
+            strAnimName = Ped.GetAnimationName();
+        }
         return true;
     }
     return false;
@@ -2031,21 +2039,44 @@ bool CStaticFunctionDefinitions::SetPedCanBeKnockedOffBike(CClientEntity& Entity
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const char* szBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop,
+bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SString& strBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop,
                                                  bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame)
 {
-    RUN_CHILDREN(SetPedAnimation(**iter, szBlockName, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame))
+    RUN_CHILDREN(SetPedAnimation(**iter, strBlockName, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame))
 
     if (IS_PED(&Entity))
     {
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
-        if (szBlockName && szAnimName)
+        if (strBlockName && szAnimName)
         {
-            CAnimBlock* pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(szBlockName);
+            CAnimBlock* pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
             if (pBlock)
             {
+                Ped.SetCurrentAnimationCustom(false);
+                Ped.SetNextAnimationNormal();
                 Ped.RunNamedAnimation(pBlock, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
                 return true;
+            }
+            else
+            {
+                std::shared_ptr<CClientIFP> pIFP = g_pClientGame->GetIFPPointerFromMap(HashString(strBlockName.ToLower()));
+
+                // Is this a custom animation block?
+                if (pIFP)
+                {
+                    // Play the gateway animation
+                    const SString& strGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName();
+                    CAnimBlock*    pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strGateWayBlockName);
+                    auto           pCustomAnimBlendHierarchy = pIFP->GetAnimationHierarchy(szAnimName);
+                    if ((pBlock) && (pCustomAnimBlendHierarchy != nullptr))
+                    {
+                        Ped.SetNextAnimationCustom(pIFP, szAnimName);
+
+                        const SString& strGateWayAnimationName = g_pGame->GetAnimManager()->GetGateWayAnimationName();
+                        Ped.RunNamedAnimation(pBlock, strGateWayAnimationName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
+                        return true;
+                    }
+                }
             }
         }
         else
