@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef CRESOURCEHTMLITEM_H
-#define CRESOURCEHTMLITEM_H
+#pragma once
 
 #include "CResourceFile.h"
 #include "ehs/ehs.h"
@@ -58,4 +57,3 @@ private:
     HttpResponse* m_currentResponse;
 };
 
-#endif

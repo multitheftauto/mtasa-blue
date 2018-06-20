@@ -62,6 +62,7 @@ enum eDir
 {
     eDirNeg,
     eDirPos,
+    eDirNegToPos,
     eDirMax
 };
 
@@ -79,7 +80,7 @@ enum eStick
 struct SMappingLine
 {
     eJoy   SourceAxisIndex;            // 0 - 7
-    eDir   SourceAxisDir;              // 0 - 1
+    eDir   SourceAxisDir;              // 0 - 2
     eStick OutputAxisIndex;            // 0/1 2/3 4 5
     eDir   OutputAxisDir;              // 0 - 1
     bool   bEnabled;
@@ -363,36 +364,44 @@ BOOL CJoystickManager::DoEnumObjectsCallback(const DIDEVICEOBJECTINSTANCE* pdido
         int axisIndex = -1;
 
         if (pdidoi->guidType == GUID_XAxis)
-            axisIndex = 0;
+            axisIndex = eJoyX;
         if (pdidoi->guidType == GUID_YAxis)
-            axisIndex = 1;
+            axisIndex = eJoyY;
         if (pdidoi->guidType == GUID_ZAxis)
-            axisIndex = 2;
+            axisIndex = eJoyZ;
         if (pdidoi->guidType == GUID_RxAxis)
-            axisIndex = 3;
+            axisIndex = eJoyRx;
         if (pdidoi->guidType == GUID_RyAxis)
-            axisIndex = 4;
+            axisIndex = eJoyRy;
         if (pdidoi->guidType == GUID_RzAxis)
-            axisIndex = 5;
+            axisIndex = eJoyRz;
         if (pdidoi->guidType == GUID_Slider)
-            axisIndex = 6;
+            axisIndex = eJoyS1;
 
+        SString strStatus;
         // Save the range and the axis index
         if (axisIndex >= 0 && axisIndex < NUMELMS(m_DevInfo.axis) && range.lMin < range.lMax)
         {
-            m_DevInfo.axis[axisIndex].lMin = range.lMin;
-            m_DevInfo.axis[axisIndex].lMax = range.lMax;
-            m_DevInfo.axis[axisIndex].bEnabled = true;
-            m_DevInfo.axis[axisIndex].dwType = pdidoi->dwType;
+            if (!m_DevInfo.axis[axisIndex].bEnabled)
+            {
+                m_DevInfo.axis[axisIndex].lMin = range.lMin;
+                m_DevInfo.axis[axisIndex].lMax = range.lMax;
+                m_DevInfo.axis[axisIndex].bEnabled = true;
+                m_DevInfo.axis[axisIndex].dwType = pdidoi->dwType;
 
-            m_DevInfo.iAxisCount++;
-            WriteDebugEvent(
-                SString("                    Added axis index %d. lMin:%d lMax:%d (iAxisCount:%d)", axisIndex, range.lMin, range.lMax, m_DevInfo.iAxisCount));
+                m_DevInfo.iAxisCount++;
+                strStatus = SString("Added axis index %d. lMin:%d lMax:%d (iAxisCount:%d)", axisIndex, range.lMin, range.lMax, m_DevInfo.iAxisCount);
+            }
+            else
+            {
+                strStatus = SString("Ignoring duplicate axis index %d", axisIndex);
+            }
         }
         else
         {
-            WriteDebugEvent(SStringX("                 Failed to recognise axis"));
+            strStatus = "Failed to recognise axis";
         }
+        WriteDebugEvent("                    " + strStatus);
 
 #ifdef MTA_DEBUG
 #if 0
@@ -644,6 +653,7 @@ void CJoystickManager::DoPulse(void)
         // See if any axes have changed to over 0.75
         for (int i = 0; i < NUMELMS(m_JoystickState.rgfAxis); i++)
         {
+            // Half axis movement (0 to 1)
             if (fabs(m_JoystickState.rgfAxis[i]) > 0.75f)
                 if (fabs(m_PreBindJoystickState.rgfAxis[i]) < 0.75f)
                 {
@@ -652,6 +662,18 @@ void CJoystickManager::DoPulse(void)
                     m_currentMapping[m_iCaptureOutputIndex].bEnabled = true;
                     m_currentMapping[m_iCaptureOutputIndex].SourceAxisIndex = (eJoy)i;
                     m_currentMapping[m_iCaptureOutputIndex].SourceAxisDir = m_JoystickState.rgfAxis[i] < 0.f ? eDirNeg : eDirPos;
+                    m_SettingsRevision++;
+                }
+
+            // Full axis movement (-1 to 1)
+            if (m_JoystickState.rgfAxis[i] > 0.75f)
+                if (m_PreBindJoystickState.rgfAxis[i] < -0.75f)
+                {
+                    m_bCaptureAxis = false;
+                    // Save the mapping
+                    m_currentMapping[m_iCaptureOutputIndex].bEnabled = true;
+                    m_currentMapping[m_iCaptureOutputIndex].SourceAxisIndex = (eJoy)i;
+                    m_currentMapping[m_iCaptureOutputIndex].SourceAxisDir = eDirNegToPos;
                     m_SettingsRevision++;
                 }
         }
@@ -1028,8 +1050,10 @@ void CJoystickManager::ApplyAxes(CControllerState& cs, bool bInVehicle)
 
         if (line.SourceAxisDir == eDirPos)
             value = std::max(0.f, value);
-        else
+        else if (line.SourceAxisDir == eDirNeg)
             value = -std::min(0.f, value);
+        else if (line.SourceAxisDir == eDirNegToPos)
+            value = value * 0.5f + 0.5f;
 
         if (line.OutputAxisDir == eDirNeg)
             value = -value;
@@ -1567,6 +1591,8 @@ static string ToString(eDir value)
         return "-";
     if (value == eDirPos)
         return "+";
+    if (value == eDirNegToPos)
+        return " ";
     return "unknown";
 }
 

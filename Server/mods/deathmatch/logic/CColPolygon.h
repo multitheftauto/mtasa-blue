@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOLPOLYGON_H
-#define __CCOLPOLYGON_H
+#pragma once
 
 #include "CColShape.h"
 
@@ -45,4 +44,3 @@ protected:
     float m_fRadius;
 };
 
-#endif

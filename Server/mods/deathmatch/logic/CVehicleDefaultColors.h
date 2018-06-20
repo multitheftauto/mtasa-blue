@@ -9,9 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CVEHICLEDEFAULTCOLORS_H
-#define __CVEHICLEDEFAULTCOLORS_H
+#pragma once
 
 extern char szDefaultVehicleColors[];
 
-#endif

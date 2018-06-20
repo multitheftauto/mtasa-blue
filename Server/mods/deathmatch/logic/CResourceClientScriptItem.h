@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef CRESOURCECLIENTSCRIPTITEM_H
-#define CRESOURCECLIENTSCRIPTITEM_H
+#pragma once
 
 #include "CResourceFile.h"
 
@@ -33,4 +32,3 @@ private:
     SString m_sourceCode;
 };
 
-#endif

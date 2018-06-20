@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CKeyBinds_H
-#define __CKeyBinds_H
+#pragma once
 
 #include "lua/LuaCommon.h"
 #include "lua/CLuaArguments.h"
@@ -128,4 +127,3 @@ protected:
     bool                 m_bProcessingKey;
 };
 
-#endif

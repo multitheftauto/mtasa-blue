@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CPLAYERTRANSGRESSIONPACKET_H
-#define __PACKETS_CPLAYERTRANSGRESSIONPACKET_H
+#pragma once
 
 class CPlayerTransgressionPacket : public CPacket
 {
@@ -24,4 +23,3 @@ public:
     SString m_strMessage;
 };
 
-#endif

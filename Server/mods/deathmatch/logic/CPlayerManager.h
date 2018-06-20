@@ -11,8 +11,7 @@
 
 class CPlayerManager;
 
-#ifndef __CPLAYERMANAGER_H
-#define __CPLAYERMANAGER_H
+#pragma once
 
 #include "CCommon.h"
 #include "packets/CPacket.h"
@@ -35,14 +34,9 @@ public:
     CPlayer* Create(const NetServerPlayerID& PlayerSocket);
     void     DeleteAll(void);
 
-    unsigned int Count(void)
-    {
-        return static_cast<unsigned int>(m_Players.size());
-        ;
-    };
-    unsigned int CountJoined(void) { return CountWithStatus(STATUS_JOINED); };
-    unsigned int CountWithStatus(int iStatus);
-    bool         Exists(CPlayer* pPlayer);
+    unsigned int Count(void) { return static_cast<unsigned int>(m_Players.size()); }
+    unsigned int CountJoined(void);
+    bool Exists(CPlayer* pPlayer);
 
     CPlayer* Get(const NetServerPlayerID& PlayerSocket);
     CPlayer* Get(const char* szNick, bool bCaseSensitive = false);
@@ -75,5 +69,3 @@ private:
     SString                               m_strLowestConnectedPlayerVersion;
     CElapsedTime                          m_ZombieCheckTimer;
 };
-
-#endif

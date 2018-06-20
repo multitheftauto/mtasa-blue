@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CKEYSYNCPACKET_H
-#define __PACKETS_CKEYSYNCPACKET_H
+#pragma once
 
 #include "../CCommon.h"
 #include "CPacket.h"
@@ -33,4 +32,3 @@ private:
     void WriteVehicleSpecific(class CVehicle* pVehicle, NetBitStreamInterface& BitStream) const;
 };
 
-#endif

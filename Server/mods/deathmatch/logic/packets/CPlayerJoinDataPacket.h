@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CPLAYERJOINDATAPACKET_H
-#define __PACKETS_CPLAYERJOINDATAPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include "../../Config.h"
@@ -57,4 +56,3 @@ private:
     SString        m_strPlayerVersion;
 };
 
-#endif

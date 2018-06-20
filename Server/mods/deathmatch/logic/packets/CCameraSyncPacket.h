@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CCAMERASYNCPACKET_H
-#define __PACKETS_CCAMERASYNCPACKET_H
+#pragma once
 
 #include "../CCommon.h"
 #include "CPacket.h"
@@ -29,4 +28,3 @@ public:
     ElementID m_TargetID;
 };
 
-#endif

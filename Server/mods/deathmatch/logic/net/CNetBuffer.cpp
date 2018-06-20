@@ -1227,6 +1227,20 @@ void CNetServerBuffer::ProcessPacket(unsigned char ucPacketID, const NetServerPl
         // Reset bitstream pointer so game can also read the packet data
         BitStream->ResetReadPointer();
     }
+    else if (ucPacketID == PACKET_ID_SERVER_DISCONNECTED)
+    {
+        // Handle request from net module to immediately send disconnected packet
+        uchar   m_eType;
+        SString strReason;
+        BitStream->Read(m_eType);
+        BitStream->ReadString(strReason);
+        NetBitStreamInterface*    pSendBitStream = g_pRealNetServer->AllocateNetServerBitStream(BitStream->Version());
+        CPlayerDisconnectedPacket packet((CPlayerDisconnectedPacket::ePlayerDisconnectType)m_eType, strReason);
+        packet.Write(*pSendBitStream);
+        g_pRealNetServer->SendPacket(packet.GetPacketID(), Socket, pSendBitStream, false, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+        g_pRealNetServer->DeallocateNetServerBitStream(pSendBitStream);
+        return;
+    }
 
     ms_StatsRecvNumMessages++;
 

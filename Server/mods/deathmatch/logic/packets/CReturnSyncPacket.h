@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CRETURNSYNCPACKET_H
-#define __CRETURNSYNCPACKET_H
+#pragma once
 
 #include "CPacket.h"
 
@@ -25,4 +24,3 @@ public:
     bool Write(NetBitStreamInterface& BitStream) const;
 };
 
-#endif

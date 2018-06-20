@@ -11,8 +11,7 @@
 
 class CSettings;
 
-#ifndef __CSETTINGS_H
-#define __CSETTINGS_H
+#pragma once
 
 #include "CClient.h"
 #include "CXMLConfig.h"
@@ -59,5 +58,3 @@ private:
 
     CResourceManager *m_pResourceManager;
 };
-
-#endif

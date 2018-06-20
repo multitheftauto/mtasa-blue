@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CFIRESYNCPACKET_H
-#define __PACKETS_CFIRESYNCPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include <CVector.h>
@@ -32,4 +31,3 @@ private:
     float   m_fSize;
 };
 
-#endif

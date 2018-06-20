@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CELEMENTIDS_H
-#define __CELEMENTIDS_H
+#pragma once
 
 #include "CElement.h"
 
@@ -30,4 +29,3 @@ private:
     static SFixedArray<CElement*, MAX_SERVER_ELEMENTS> m_Elements;
 };
 
-#endif

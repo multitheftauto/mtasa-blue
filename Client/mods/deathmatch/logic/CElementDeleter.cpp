@@ -31,6 +31,8 @@ void CElementDeleter::Delete(class CClientEntity* pElement)
         // Add it to our list
         if (!pElement->IsBeingDeleted())
         {
+            // Just to be clear, not a Lua event
+            OnClientSpecialElementDestroy(pElement);
             m_List.push_back(pElement);
         }
 
@@ -63,6 +65,8 @@ void CElementDeleter::DeleteRecursive(class CClientEntity* pElement)
     // Add it to our list over deleting objects
     if (!pElement->IsBeingDeleted())
     {
+        // Just to be clear, not a Lua event
+        OnClientSpecialElementDestroy(pElement);
         m_List.push_back(pElement);
     }
 
@@ -70,6 +74,31 @@ void CElementDeleter::DeleteRecursive(class CClientEntity* pElement)
     pElement->SetBeingDeleted(true);
     pElement->SetParent(NULL);
     pElement->Unlink();
+}
+
+// If DeleteElementSpecial returns true then do not access pElement
+// because element has been deleted
+bool CElementDeleter::DeleteElementSpecial(CClientEntity* pElement)
+{
+    if (IS_IFP(pElement))
+    {
+        DeleteIFP(pElement);
+        return true;
+    }
+    return false;
+}
+
+void CElementDeleter::DeleteIFP(CClientEntity* pElement)
+{
+    CClientIFP&        IFP = static_cast<CClientIFP&>(*pElement);
+    const unsigned int u32BlockNameHash = IFP.GetBlockNameHash();
+
+    auto it = std::find_if(m_vecIFPElements.begin(), m_vecIFPElements.end(),
+                           [&u32BlockNameHash](std::shared_ptr<CClientIFP> const& pIFP) { return pIFP->GetBlockNameHash() == u32BlockNameHash; });
+    if (it != m_vecIFPElements.end())
+    {
+        m_vecIFPElements.erase(it);
+    }
 }
 
 void CElementDeleter::DoDeleteAll(void)
@@ -83,13 +112,46 @@ void CElementDeleter::DoDeleteAll(void)
     {
         CClientEntity* pEntity = *iter;
 
-        // Delete the entity and put the next element in the list in the iterator
-        delete pEntity;
+        if (!DeleteElementSpecial(pEntity))
+        {
+            // Delete the entity and put the next element in the list in the iterator
+            delete pEntity;
+        }
         iter = m_List.erase(iter);
     }
 
     // We can now allow unrefernecs again
     m_bAllowUnreference = true;
+}
+
+bool CElementDeleter::OnClientSpecialElementDestroy(CClientEntity* pElement)
+{
+    if (IS_IFP(pElement))
+    {
+        OnClientIFPElementDestroy(pElement);
+        return true;
+    }
+    return false;
+}
+
+void CElementDeleter::OnClientIFPElementDestroy(CClientEntity* pElement)
+{
+    CClientIFP&        IFP = static_cast<CClientIFP&>(*pElement);
+    const unsigned int u32BlockNameHash = IFP.GetBlockNameHash();
+
+    std::shared_ptr<CClientIFP> pIFP = g_pClientGame->GetIFPPointerFromMap(u32BlockNameHash);
+    if (pIFP)
+    {
+        // Remove IFP from map, so we can indicate that it does not exist
+        g_pClientGame->RemoveIFPPointerFromMap(u32BlockNameHash);
+
+        // Remove IFP animations from replaced animations of peds/players
+        g_pClientGame->OnClientIFPUnload(pIFP);
+
+        // keep a reference to shared_ptr CClientIFP in list, so it does not get
+        // destroyed after exiting this function
+        m_vecIFPElements.emplace_back(pIFP);
+    }
 }
 
 bool CElementDeleter::IsBeingDeleted(CClientEntity* pElement)

@@ -206,6 +206,7 @@ int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
     CClientMaterial* pMaterial;
     float            fWidth;
     SColor           color;
+    bool             bPostGUI;
     CVector          vecFaceToward;
     bool             bUseFaceToward = false;
 
@@ -215,6 +216,7 @@ int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
     argStream.ReadUserData(pMaterial);
     argStream.ReadNumber(fWidth);
     argStream.ReadColor(color, 0xFFFFFFFF);
+    argStream.ReadIfNextIsBool(bPostGUI, false);
     if (argStream.NextIsVector3D())
     {
         argStream.ReadVector3D(vecFaceToward);
@@ -224,7 +226,7 @@ int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         g_pCore->GetGraphics()->DrawMaterialLine3DQueued(vecBegin, vecEnd, fWidth, color, pMaterial->GetMaterialItem(), 0, 0, 1, 1, true, bUseFaceToward,
-                                                         vecFaceToward);
+                                                         vecFaceToward, bPostGUI);
         lua_pushboolean(luaVM, true);
         return 1;
     }
@@ -248,6 +250,7 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
     CClientMaterial* pMaterial;
     float            fWidth;
     SColor           color;
+    bool             bPostGUI;
     CVector          vecFaceToward;
     bool             bUseFaceToward = false;
 
@@ -259,6 +262,7 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
     argStream.ReadUserData(pMaterial);
     argStream.ReadNumber(fWidth);
     argStream.ReadColor(color, 0xFFFFFFFF);
+    argStream.ReadIfNextIsBool(bPostGUI, false);
     if (argStream.NextIsVector3D())
     {
         argStream.ReadVector3D(vecFaceToward);
@@ -268,7 +272,7 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         g_pCore->GetGraphics()->DrawMaterialLine3DQueued(vecBegin, vecEnd, fWidth, color, pMaterial->GetMaterialItem(), vecSectionPos.fX, vecSectionPos.fY,
-                                                         vecSectionSize.fX, vecSectionSize.fY, false, bUseFaceToward, vecFaceToward);
+                                                         vecSectionSize.fX, vecSectionSize.fY, false, bUseFaceToward, vecFaceToward, bPostGUI);
         lua_pushboolean(luaVM, true);
         return 1;
     }

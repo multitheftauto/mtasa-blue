@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOMMANDLINEPARSER_H
-#define __CCOMMANDLINEPARSER_H
+#pragma once
 
 #include "../Config.h"
 
@@ -68,4 +67,3 @@ private:
     bool           m_bDisableVoice;
 };
 
-#endif

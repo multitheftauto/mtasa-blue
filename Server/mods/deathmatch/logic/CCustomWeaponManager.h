@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCUSTOMWEAPONMANAGER_H
-#define __CCUSTOMWEAPONMANAGER_H
+#pragma once
 
 #include <list>
 #include "CCommon.h"
@@ -38,4 +37,3 @@ private:
 
     CCustomWeaponListType m_List;
 };
-#endif

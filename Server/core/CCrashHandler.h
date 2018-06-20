@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCRASHHANDLER_H
-#define __CCRASHHANDLER_H
+#pragma once
 
 #include "CCrashHandlerAPI.h"
 
@@ -39,5 +38,3 @@ private:
 
     #endif
 };
-
-#endif

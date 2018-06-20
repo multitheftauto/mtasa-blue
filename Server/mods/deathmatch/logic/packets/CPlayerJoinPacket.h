@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CPLAYERJOINPACKET_H
-#define __PACKETS_CPLAYERJOINPACKET_H
+#pragma once
 
 #include "CPacket.h"
 
@@ -24,4 +23,3 @@ public:
     bool Read(NetBitStreamInterface& BitStream) { return true; };
 };
 
-#endif

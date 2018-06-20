@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CPLAYERQUITPACKET_H
-#define __PACKETS_CPLAYERQUITPACKET_H
+#pragma once
 
 #include "CPacket.h"
 
@@ -36,4 +35,3 @@ private:
     unsigned char m_ucQuitReason;
 };
 
-#endif

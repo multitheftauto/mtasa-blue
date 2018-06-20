@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef CRESOURCECLIENTCONFIGITEM_H
-#define CRESOURCECLIENTCONFIGITEM_H
+#pragma once
 
 #include "CGame.h"
 #include "CResourceFile.h"
@@ -33,4 +32,3 @@ private:
     bool m_bInvalid;            // it failed to load
 };
 
-#endif

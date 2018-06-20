@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CUNOCCUPIEDVEHICLESTOPSYNCPACKET_H
-#define __CUNOCCUPIEDVEHICLESTOPSYNCPACKET_H
+#pragma once
 
 #include "CPacket.h"
 
@@ -32,4 +31,3 @@ private:
     ElementID m_ID;
 };
 
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CEXPLOSIONSYNCPACKET_H
-#define __PACKETS_CEXPLOSIONSYNCPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include <CVector.h>
@@ -49,4 +48,3 @@ public:
     unsigned char m_ucType;
 };
 
-#endif

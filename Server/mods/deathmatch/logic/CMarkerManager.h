@@ -11,8 +11,7 @@
 
 class CMarkerManager;
 
-#ifndef __CMarkerManager_H
-#define __CMarkerManager_H
+#pragma once
 
 #include "CColManager.h"
 #include "CMarker.h"
@@ -48,5 +47,3 @@ private:
     CColManager*   m_pColManager;
     list<CMarker*> m_Markers;
 };
-
-#endif

@@ -11,8 +11,7 @@
 
 // This class implements the webserver, it uses EHS to do this
 
-#ifndef CHTTPD_H
-#define CHTTPD_H
+#pragma once
 
 #include <string>
 #include <list>
@@ -59,4 +58,3 @@ private:
     CElapsedTime           m_WarnMessageTimer;
 };
 
-#endif

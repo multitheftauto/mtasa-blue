@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef CRESOURCEMAPITEM_H
-#define CRESOURCEMAPITEM_H
+#pragma once
 
 #include "CElementGroup.h"
 #include "CBlipManager.h"
@@ -75,4 +74,3 @@ private:
     CElementGroup* m_pElementGroup;            // contains all the elements in this map
 };
 
-#endif

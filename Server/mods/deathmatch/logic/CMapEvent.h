@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMAPEVENT_H
-#define __CMAPEVENT_H
+#pragma once
 
 #define MAPEVENT_MAX_LENGTH_NAME 100
 
@@ -48,4 +47,3 @@ private:
     float              m_fPriorityMod;
 };
 
-#endif

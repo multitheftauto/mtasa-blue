@@ -11,8 +11,7 @@
 
 class CLanBroadcastDLL;
 
-#ifndef __CLANBROADCASTDLL_H
-#define __CLANBROADCASTDLL_H
+#pragma once
 
 #include <Common.h>
 #include <iostream>
@@ -46,5 +45,3 @@ private:
     std::string m_strClientMessage;
     std::string m_strServerMessage;
 };
-
-#endif

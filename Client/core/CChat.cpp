@@ -215,7 +215,7 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
     // If we can't get a rendertarget for some reason, just render the text directly to the screen
     if (!m_pCacheTexture)
     {
-        drawList.bOutline = false;      // Outline too slow without cache texture
+        drawList.bOutline = false;            // Outline too slow without cache texture
         DrawDrawList(drawList, chatTopLeft);
         return;
     }

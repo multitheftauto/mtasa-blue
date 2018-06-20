@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPERPLAYERENTITY_H
-#define __CPERPLAYERENTITY_H
+#pragma once
 
 #include "CElement.h"
 #include "packets/CPacket.h"
@@ -71,4 +70,3 @@ private:
     static std::set<CPerPlayerEntity*> ms_AllPerPlayerEntityMap;
 };
 
-#endif

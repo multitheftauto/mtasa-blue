@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CACCOUNT_H
-#define __CACCOUNT_H
+#pragma once
 
 #include <list>
 #include <string>
@@ -158,4 +157,3 @@ private:
     int         m_iType;
 };
 
-#endif

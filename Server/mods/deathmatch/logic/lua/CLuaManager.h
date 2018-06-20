@@ -12,8 +12,7 @@
 // This class manages all the CLuaMain instances (Virtual Machines)
 class CLuaManager;
 
-#ifndef __CLUAMANAGER_H
-#define __CLUAMANAGER_H
+#pragma once
 
 #include <list>
 #include "../CEvents.h"
@@ -67,5 +66,3 @@ private:
     CFastHashMap<lua_State*, CLuaMain*> m_VirtualMachineMap;
     list<CLuaMain*>                     m_virtualMachines;
 };
-
-#endif

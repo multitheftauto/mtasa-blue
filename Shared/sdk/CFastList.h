@@ -45,15 +45,15 @@ public:
     struct SSuspendedOperation
     {
         EOperation operation;
-        T item;
+        T          item;
     };
 
-    uint     uiRevision;                  // Incremented every time the ordered map changes
-    uint     uiNextFrontIndex;            // Next (decrementing) index to use as a map key for items added to the front
-    uint     uiNextBackIndex;             // Next (incrementing) index to use as a map key for items added to the back
-    MapType  orderedMap;                  // Ordered map of items
-    InfoType infoMap;                     // info for each item
-    bool     m_bSuspendingModifyOperations;
+    uint                             uiRevision;                  // Incremented every time the ordered map changes
+    uint                             uiNextFrontIndex;            // Next (decrementing) index to use as a map key for items added to the front
+    uint                             uiNextBackIndex;             // Next (incrementing) index to use as a map key for items added to the back
+    MapType                          orderedMap;                  // Ordered map of items
+    InfoType                         infoMap;                     // info for each item
+    bool                             m_bSuspendingModifyOperations;
     std::vector<SSuspendedOperation> m_SuspendedOperationList;
 
     CFastList(void) : uiRevision(1), uiNextFrontIndex(UINT_MAX / 2 - 1), uiNextBackIndex(UINT_MAX / 2), m_bSuspendingModifyOperations(false)
@@ -162,11 +162,9 @@ public:
         {
             if (suspendedOperation.operation == EOperation::PushBack)
                 push_back(suspendedOperation.item);
-            else
-            if (suspendedOperation.operation == EOperation::PushFront)
+            else if (suspendedOperation.operation == EOperation::PushFront)
                 push_front(suspendedOperation.item);
-            else
-            if (suspendedOperation.operation == EOperation::Remove)
+            else if (suspendedOperation.operation == EOperation::Remove)
                 remove(suspendedOperation.item);
         }
         m_SuspendedOperationList.clear();

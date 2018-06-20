@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CDUMMY_H
-#define __CDUMMY_H
+#pragma once
 
 #include "CElement.h"
 
@@ -29,4 +28,3 @@ private:
     class CGroups* m_pGroups;
 };
 
-#endif

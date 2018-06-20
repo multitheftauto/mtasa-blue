@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CNETSERVER_H
-#define __CNETSERVER_H
+#pragma once
 
 #include "ns_common.h"
 #include "net/bitstream.h"
@@ -166,5 +165,3 @@ public:
         return false;
     }
 };
-
-#endif

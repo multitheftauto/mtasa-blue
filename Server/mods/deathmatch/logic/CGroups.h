@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGROUPS_H
-#define __CGROUPS_H
+#pragma once
 
 #include "CDummy.h"
 #include "CElement.h"
@@ -40,4 +39,3 @@ private:
     list<CDummy*> m_List;
 };
 
-#endif

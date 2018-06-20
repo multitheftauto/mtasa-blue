@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CDETONATESATCHELSPACKET_H
-#define __PACKETS_CDETONATESATCHELSPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include <CVector.h>
@@ -29,4 +28,3 @@ public:
 private:
 };
 
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CPLAYERSPAWNPACKET_H
-#define __PACKETS_CPLAYERSPAWNPACKET_H
+#pragma once
 
 #include "../CCommon.h"
 #include "CPacket.h"
@@ -54,4 +53,3 @@ private:
     unsigned char  m_ucTimeContext;
 };
 
-#endif
