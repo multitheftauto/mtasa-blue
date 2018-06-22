@@ -26,4 +26,3 @@ public:
 private:
     unsigned short m_usID;
 };
-

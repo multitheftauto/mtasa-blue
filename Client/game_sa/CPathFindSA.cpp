@@ -11,12 +11,12 @@
 
 #include "StdInc.h"
 
-CNodeAddress *CPathFindSA::FindNthNodeClosestToCoors(CVector *vecCoors, int iNodeNumber, int iType, CNodeAddress *pNodeAddress, float fDistance)
+CNodeAddress* CPathFindSA::FindNthNodeClosestToCoors(CVector* vecCoors, int iNodeNumber, int iType, CNodeAddress* pNodeAddress, float fDistance)
 {
     DWORD dwFunc = FUNC_FindNthNodeClosestToCoors;
 
     CNodeAddress  node;
-    CNodeAddress *nodeptr;
+    CNodeAddress* nodeptr;
 
     _asm
     {
@@ -43,7 +43,7 @@ CNodeAddress *CPathFindSA::FindNthNodeClosestToCoors(CVector *vecCoors, int iNod
     return pNodeAddress;
 }
 
-CPathNode *CPathFindSA::GetPathNode(CNodeAddress *node)
+CPathNode* CPathFindSA::GetPathNode(CNodeAddress* node)
 {
     DWORD dwFunc = FUNC_FindNodePointer;
     if (node->sRegion >= 0 && node->sIndex >= 0)
@@ -56,12 +56,12 @@ CPathNode *CPathFindSA::GetPathNode(CNodeAddress *node)
             call    dwFunc
             mov     dwPathNode, eax
         }
-        return (CPathNode *)dwPathNode;
+        return (CPathNode*)dwPathNode;
     }
     return NULL;
 }
 
-CVector *CPathFindSA::GetNodePosition(CPathNode *pNode, CVector *pPosition)
+CVector* CPathFindSA::GetNodePosition(CPathNode* pNode, CVector* pPosition)
 {
     DWORD dwFunc = FUNC_CPathNode_GetCoors;
     _asm
@@ -73,13 +73,13 @@ CVector *CPathFindSA::GetNodePosition(CPathNode *pNode, CVector *pPosition)
     return pPosition;
 }
 
-CVector *CPathFindSA::GetNodePosition(CNodeAddress *pNode, CVector *pPosition)
+CVector* CPathFindSA::GetNodePosition(CNodeAddress* pNode, CVector* pPosition)
 {
-    CPathNode *pPathNode = GetPathNode(pNode);
+    CPathNode* pPathNode = GetPathNode(pNode);
     return GetNodePosition(pPathNode, pPosition);
 }
 
-void CPathFindSA::SwitchRoadsOffInArea(CVector *vecAreaCorner1, CVector *vecAreaCorner2, bool bEnable)
+void CPathFindSA::SwitchRoadsOffInArea(CVector* vecAreaCorner1, CVector* vecAreaCorner2, bool bEnable)
 {
     float fX1 = vecAreaCorner1->fX;
     float fY1 = vecAreaCorner1->fY;
@@ -109,7 +109,7 @@ void CPathFindSA::SwitchRoadsOffInArea(CVector *vecAreaCorner1, CVector *vecArea
     }
 }
 
-void CPathFindSA::SwitchPedRoadsOffInArea(CVector *vecAreaCorner1, CVector *vecAreaCorner2, bool bEnable)
+void CPathFindSA::SwitchPedRoadsOffInArea(CVector* vecAreaCorner1, CVector* vecAreaCorner2, bool bEnable)
 {
     float fX1 = vecAreaCorner1->fX;
     float fY1 = vecAreaCorner1->fY;

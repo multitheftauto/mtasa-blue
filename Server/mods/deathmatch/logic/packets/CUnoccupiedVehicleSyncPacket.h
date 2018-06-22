@@ -40,4 +40,3 @@ public:
 
     std::vector<SyncData> m_Syncs;
 };
-

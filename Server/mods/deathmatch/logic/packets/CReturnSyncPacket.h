@@ -23,4 +23,3 @@ public:
 
     bool Write(NetBitStreamInterface& BitStream) const;
 };
-

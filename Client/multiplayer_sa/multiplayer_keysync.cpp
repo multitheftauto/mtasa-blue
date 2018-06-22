@@ -18,7 +18,7 @@
 #include "../game_sa/CVehicleSA.h"
 #include "../game_sa/CPadSA.h"
 
-extern CMultiplayerSA *pMultiplayer;
+extern CMultiplayerSA* pMultiplayer;
 
 DWORD dwCurrentPlayerPed = 0;            // stores the player ped temporarily during hooks
 DWORD dwCurrentVehicle = 0;              // stores the current vehicle during the hooks
@@ -46,8 +46,8 @@ extern bool       bCustomCameraRotation;
 extern float      fGlobalGravity;
 extern float      fLocalPlayerGravity;
 
-extern PreContextSwitchHandler * m_pPreContextSwitchHandler;
-extern PostContextSwitchHandler *m_pPostContextSwitchHandler;
+extern PreContextSwitchHandler*  m_pPreContextSwitchHandler;
+extern PostContextSwitchHandler* m_pPostContextSwitchHandler;
 
 VOID InitKeysyncHooks()
 {
@@ -67,18 +67,18 @@ VOID InitKeysyncHooks()
 
     // not strictly for keysync, to make CPlayerPed::GetPlayerInfoForThisPlayerPed always return the local playerinfo
     // 00609FF2     EB 1F          JMP SHORT gta_sa_u.0060A013
-    MemSet((void *)0x609FF2, 0xEB, 1);
-    MemSet((void *)0x609FF3, 0x1F, 1);
-    MemSet((void *)0x609FF4, 0x90, 1);
-    MemSet((void *)0x609FF5, 0x90, 1);
-    MemSet((void *)0x609FF6, 0x90, 1);
+    MemSet((void*)0x609FF2, 0xEB, 1);
+    MemSet((void*)0x609FF3, 0x1F, 1);
+    MemSet((void*)0x609FF4, 0x90, 1);
+    MemSet((void*)0x609FF5, 0x90, 1);
+    MemSet((void*)0x609FF6, 0x90, 1);
 
     // and this is to fix bike sync (I hope)
     // 006BC9EB   9090               NOP NOP
-    MemSet((void *)0x6BC9EB, 0x90, 2);
+    MemSet((void*)0x6BC9EB, 0x90, 2);
 }
 
-extern CPed *pContextSwitchedPed;
+extern CPed* pContextSwitchedPed;
 void         PostContextSwitch(void)
 {
     // Prevent the game making remote player's weapons get switched by the local player's
@@ -185,9 +185,9 @@ void         PostContextSwitch(void)
 
     // ChrML: This causes the aiming issues
     // Restore the local player stats
-    MemCpyFast((void *)0xb79380, &localStatsData.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS);
-    MemCpyFast((void *)0xb79000, &localStatsData.StatTypesInt, sizeof(int) * MAX_INT_STATS);
-    MemCpyFast((void *)0xb78f10, &localStatsData.StatReactionValue, sizeof(float) * MAX_REACTION_STATS);
+    MemCpyFast((void*)0xb79380, &localStatsData.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS);
+    MemCpyFast((void*)0xb79000, &localStatsData.StatTypesInt, sizeof(int) * MAX_INT_STATS);
+    MemCpyFast((void*)0xb78f10, &localStatsData.StatReactionValue, sizeof(float) * MAX_REACTION_STATS);
 }
 
 VOID ReturnContextToLocalPlayer()
@@ -195,15 +195,15 @@ VOID ReturnContextToLocalPlayer()
     if (bNotInLocalContext)
     {
         // Grab the remote data storage for the player we context switched to
-        CPlayerPed *pContextSwitchedPlayerPed = dynamic_cast<CPlayerPed *>(pContextSwitchedPed);
+        CPlayerPed* pContextSwitchedPlayerPed = dynamic_cast<CPlayerPed*>(pContextSwitchedPed);
         if (pContextSwitchedPlayerPed)
         {
-            CRemoteDataStorageSA *data = CRemoteDataSA::GetRemoteDataStorage(pContextSwitchedPlayerPed);
+            CRemoteDataStorageSA* data = CRemoteDataSA::GetRemoteDataStorage(pContextSwitchedPlayerPed);
             if (data)
             {
                 // Store any changes the game has made to the pad
-                CPad *           pLocalPad = pGameInterface->GetPad();
-                CPadSAInterface *pLocalPadInterface = ((CPadSA *)pLocalPad)->GetInterface();
+                CPad*            pLocalPad = pGameInterface->GetPad();
+                CPadSAInterface* pLocalPadInterface = ((CPadSA*)pLocalPad)->GetInterface();
                 MemCpyFast(&data->m_pad, pLocalPadInterface, sizeof(CPadSAInterface));
             }
         }
@@ -214,11 +214,11 @@ VOID ReturnContextToLocalPlayer()
 
         bNotInLocalContext = false;
 
-        CPed *  pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);            // the player
-        CPedSA *pLocalPlayerPedSA = dynamic_cast<CPedSA *>(pLocalPlayerPed);
+        CPed*   pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);            // the player
+        CPedSA* pLocalPlayerPedSA = dynamic_cast<CPedSA*>(pLocalPlayerPed);
         if (pLocalPlayerPedSA)
         {
-            CEntitySAInterface *ped = pLocalPlayerPedSA->GetInterface();
+            CEntitySAInterface* ped = pLocalPlayerPedSA->GetInterface();
             MemPutFast<DWORD>(0xB7CD98, (DWORD)ped);
         }
 
@@ -236,22 +236,22 @@ VOID ReturnContextToLocalPlayer()
         if (!bLocalStatsStatic)
         {
             assert(0);            // bLocalStatsStatic is always true
-            MemCpyFast(&localStatsData.StatTypesFloat, (void *)0xb79380, sizeof(float) * MAX_FLOAT_STATS);
-            MemCpyFast(&localStatsData.StatTypesInt, (void *)0xb79000, sizeof(int) * MAX_INT_STATS);
-            MemCpyFast(&localStatsData.StatReactionValue, (void *)0xb78f10, sizeof(float) * MAX_REACTION_STATS);
+            MemCpyFast(&localStatsData.StatTypesFloat, (void*)0xb79380, sizeof(float) * MAX_FLOAT_STATS);
+            MemCpyFast(&localStatsData.StatTypesInt, (void*)0xb79000, sizeof(int) * MAX_INT_STATS);
+            MemCpyFast(&localStatsData.StatReactionValue, (void*)0xb78f10, sizeof(float) * MAX_REACTION_STATS);
         }
     }
 
     // radio change on startup hack
     // 0050237C   90               NOP
-    MemSetFast((void *)0x50237C, 0x90, 5);
-    MemSetFast((void *)0x5023A3, 0x90, 5);
+    MemSetFast((void*)0x50237C, 0x90, 5);
+    MemSetFast((void*)0x5023A3, 0x90, 5);
 
     // We need to set this back, even if its the local player
     pGameInterface->SetGravity(fGlobalGravity);
 }
 
-void SwitchContext(CPed *thePed)
+void SwitchContext(CPed* thePed)
 {
     if (thePed == NULL)
         return;
@@ -261,9 +261,9 @@ void SwitchContext(CPed *thePed)
     if (!bNotInLocalContext)
     {
         // Grab the local ped and the local pad
-        CPed *           pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);            // the player
-        CPad *           pLocalPad = pGameInterface->GetPad();
-        CPadSAInterface *pLocalPadInterface = ((CPadSA *)pLocalPad)->GetInterface();
+        CPed*            pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);            // the player
+        CPad*            pLocalPad = pGameInterface->GetPad();
+        CPadSAInterface* pLocalPadInterface = ((CPadSA*)pLocalPad)->GetInterface();
 
         // We're not switching to local player
         if (thePed != pLocalPlayerPed)
@@ -272,17 +272,17 @@ void SwitchContext(CPed *thePed)
             pLocalPad->Store();            // store a copy of the local pad internally
 
             // Grab the remote data storage for the player we're context switching to
-            CPlayerPed *thePlayerPed = dynamic_cast<CPlayerPed *>(thePed);
+            CPlayerPed* thePlayerPed = dynamic_cast<CPlayerPed*>(thePed);
             if (thePlayerPed)
             {
-                CRemoteDataStorageSA *data = CRemoteDataSA::GetRemoteDataStorage(thePlayerPed);
+                CRemoteDataStorageSA* data = CRemoteDataSA::GetRemoteDataStorage(thePlayerPed);
                 if (data)
                 {
                     // We want the player to be seen as in targeting mode if they are right clicking and with weapons
-                    CWeapon *         pWeapon = thePed->GetWeapon(thePed->GetCurrentWeaponSlot());
+                    CWeapon*          pWeapon = thePed->GetWeapon(thePed->GetCurrentWeaponSlot());
                     eWeaponType       currentWeapon = pWeapon->GetType();
-                    CControllerState *cs = data->CurrentControllerState();
-                    CWeaponStat *     pWeaponStat = NULL;
+                    CControllerState* cs = data->CurrentControllerState();
+                    CWeaponStat*      pWeaponStat = NULL;
                     if (currentWeapon >= WEAPONTYPE_PISTOL && currentWeapon <= WEAPONTYPE_TEC9)
                     {
                         float fValue = data->m_stats.StatTypesFloat[pGameInterface->GetStats()->GetSkillStatIndex(currentWeapon)];
@@ -310,7 +310,7 @@ void SwitchContext(CPed *thePed)
                     pLocalPad->SetLastTimeTouched(pGameInterface->GetSystemTime());
 
                     // this is to make movement work correctly
-                    fLocalPlayerCameraRotation = *(float *)VAR_CameraRotation;
+                    fLocalPlayerCameraRotation = *(float*)VAR_CameraRotation;
                     MemPutFast<float>(VAR_CameraRotation, data->m_fCameraRotation);
 
                     // Change the gravity to the remote player's
@@ -328,19 +328,19 @@ void SwitchContext(CPed *thePed)
                             bDisableMouseLook = false;
                         }
                     }
-                    bMouseLookEnabled = *(bool *)0xB6EC2E;
+                    bMouseLookEnabled = *(bool*)0xB6EC2E;
                     if (bDisableMouseLook)
-                        *(bool *)0xB6EC2E = false;
+                        *(bool*)0xB6EC2E = false;
 
                     // Disable the goggles
-                    bInfraredVisionEnabled = *(bool *)0xC402B9;
+                    bInfraredVisionEnabled = *(bool*)0xC402B9;
                     MemPutFast<bool>(0xC402B9, false);
-                    bNightVisionEnabled = *(bool *)0xC402B8;
+                    bNightVisionEnabled = *(bool*)0xC402B8;
                     MemPutFast<bool>(0xC402B8, false);
 
                     // Remove the code making players cough on fire extinguisher and teargas
-                    MemSetFast((void *)0x4C03F0, 0x90, 3);
-                    MemSetFast((void *)0x4C03F8, 0x90, 7);
+                    MemSetFast((void*)0x4C03F0, 0x90, 3);
+                    MemSetFast((void*)0x4C03F8, 0x90, 7);
 
                     // Prevent it calling ClearWeaponTarget for remote players
                     MemPutFast<BYTE>(0x609C80, 0xC3);
@@ -376,9 +376,9 @@ void SwitchContext(CPed *thePed)
                     // Change the local player's stats to the remote player's
                     if (data)
                     {
-                        MemCpyFast((void *)0xb79380, data->m_stats.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS);
-                        MemCpyFast((void *)0xb79000, data->m_stats.StatTypesInt, sizeof(int) * MAX_INT_STATS);
-                        MemCpyFast((void *)0xb78f10, data->m_stats.StatReactionValue, sizeof(float) * MAX_REACTION_STATS);
+                        MemCpyFast((void*)0xb79380, data->m_stats.StatTypesFloat, sizeof(float) * MAX_FLOAT_STATS);
+                        MemCpyFast((void*)0xb79000, data->m_stats.StatTypesInt, sizeof(int) * MAX_INT_STATS);
+                        MemCpyFast((void*)0xb78f10, data->m_stats.StatReactionValue, sizeof(float) * MAX_REACTION_STATS);
                     }
 
                     /*
@@ -399,10 +399,10 @@ void SwitchContext(CPed *thePed)
                     pfStats [ 79 ] = 999.0f;
                     */
 
-                    CPedSA *thePedSA = dynamic_cast<CPedSA *>(thePed);
+                    CPedSA* thePedSA = dynamic_cast<CPedSA*>(thePed);
                     if (thePedSA)
                     {
-                        CEntitySAInterface *ped = thePedSA->GetInterface();
+                        CEntitySAInterface* ped = thePedSA->GetInterface();
                         MemPutFast<DWORD>(0xB7CD98, (DWORD)ped);
                     }
 
@@ -412,7 +412,7 @@ void SwitchContext(CPed *thePed)
                     // Call the pre-context switch handler we might have
                     if (m_pPreContextSwitchHandler)
                     {
-                        CPlayerPed *pPlayerPed = dynamic_cast<CPlayerPed *>(thePed);
+                        CPlayerPed* pPlayerPed = dynamic_cast<CPlayerPed*>(thePed);
                         if (pPlayerPed)
                             m_pPreContextSwitchHandler(pPlayerPed);
                     }
@@ -431,27 +431,27 @@ void SwitchContext(CPed *thePed)
     pGameInterface->OnPedContextChange(thePed);
 }
 
-void SwitchContext(CPedSAInterface *ped)
+void SwitchContext(CPedSAInterface* ped)
 {
-    CPed *thePed = pGameInterface->GetPools()->GetPed((DWORD *)ped);
+    CPed* thePed = pGameInterface->GetPools()->GetPed((DWORD*)ped);
     if (thePed)
     {
         SwitchContext(thePed);
     }
 }
 
-void SwitchContext(CVehicle *pVehicle)
+void SwitchContext(CVehicle* pVehicle)
 {
     if (!pVehicle)
         return;
 
     // Grab the vehicle's internal interface
-    CVehicleSA *pVehicleSA = dynamic_cast<CVehicleSA *>(pVehicle);
+    CVehicleSA* pVehicleSA = dynamic_cast<CVehicleSA*>(pVehicle);
 
     DWORD dwVehicle = (DWORD)pVehicleSA->GetInterface();
 
     // Grab the driver of the vehicle
-    CPed *thePed = pVehicle->GetDriver();
+    CPed* thePed = pVehicle->GetDriver();
     if (thePed)
     {
         // Switch the context to the driver of the vehiclee
@@ -499,11 +499,11 @@ void SwitchContext(CVehicle *pVehicle)
     }
 }
 
-void SwitchContext(CVehicleSAInterface *pVehicleInterface)
+void SwitchContext(CVehicleSAInterface* pVehicleInterface)
 {
     // Grab the CVehicle for the given vehicle interface
-    CPoolsSA *pool = (CPoolsSA *)pGameInterface->GetPools();
-    CVehicle *pVehicle = pool->GetVehicle((DWORD *)pVehicleInterface);
+    CPoolsSA* pool = (CPoolsSA*)pGameInterface->GetPools();
+    CVehicle* pVehicle = pool->GetVehicle((DWORD*)pVehicleInterface);
     if (pVehicle)
     {
         SwitchContext(pVehicle);
@@ -537,7 +537,7 @@ VOID _declspec(naked) HOOK_CPlayerPed__ProcessControl()
         pushad
     }
 
-    SwitchContext((CPedSAInterface *)dwCurrentPlayerPed);
+    SwitchContext((CPedSAInterface*)dwCurrentPlayerPed);
 
     _asm
     {
@@ -591,7 +591,7 @@ VOID _declspec(naked) HOOK_CAutomobile__ProcessControl()
         pushad
     }
 
-    SwitchContext((CVehicleSAInterface *)dwCurrentVehicle);
+    SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
     {
@@ -620,7 +620,7 @@ VOID _declspec(naked) HOOK_CMonsterTruck__ProcessControl()
         pushad
     }
 
-    SwitchContext((CVehicleSAInterface *)dwCurrentVehicle);
+    SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
     {
@@ -649,7 +649,7 @@ VOID _declspec(naked) HOOK_CTrailer__ProcessControl()
         pushad
     }
 
-    SwitchContext((CVehicleSAInterface *)dwCurrentVehicle);
+    SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
     {
@@ -678,7 +678,7 @@ VOID _declspec(naked) HOOK_CQuadBike__ProcessControl()
         pushad
     }
 
-    SwitchContext((CVehicleSAInterface *)dwCurrentVehicle);
+    SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
     {
@@ -707,7 +707,7 @@ VOID _declspec(naked) HOOK_CPlane__ProcessControl()
         pushad
     }
 
-    SwitchContext((CVehicleSAInterface *)dwCurrentVehicle);
+    SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
     {
@@ -736,7 +736,7 @@ VOID _declspec(naked) HOOK_CBmx__ProcessControl()
         pushad
     }
 
-    SwitchContext((CVehicleSAInterface *)dwCurrentVehicle);
+    SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
     {
@@ -765,7 +765,7 @@ VOID _declspec(naked) HOOK_CTrain__ProcessControl()
         pushad
     }
 
-    SwitchContext((CVehicleSAInterface *)dwCurrentVehicle);
+    SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
     {
@@ -794,7 +794,7 @@ VOID _declspec(naked) HOOK_CBoat__ProcessControl()
         pushad
     }
 
-    SwitchContext((CVehicleSAInterface *)dwCurrentVehicle);
+    SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
     {
@@ -823,7 +823,7 @@ VOID _declspec(naked) HOOK_CBike__ProcessControl()
         pushad
     }
 
-    SwitchContext((CVehicleSAInterface *)dwCurrentVehicle);
+    SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
     {
@@ -852,7 +852,7 @@ VOID _declspec(naked) HOOK_CHeli__ProcessControl()
         pushad
     }
 
-    SwitchContext((CVehicleSAInterface *)dwCurrentVehicle);
+    SwitchContext((CVehicleSAInterface*)dwCurrentVehicle);
 
     _asm
     {

@@ -43,4 +43,3 @@ private:
     unsigned int  m_uiLevel;
     SString       m_strMessage;
 };
-

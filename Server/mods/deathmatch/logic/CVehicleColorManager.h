@@ -39,4 +39,3 @@ public:
 private:
     SFixedArray<CVehicleColors, 212> m_Colors;
 };
-

@@ -11,7 +11,7 @@
 #include "StdInc.h"
 #include "net/SyncStructures.h"
 
-CBulletsyncPacket::CBulletsyncPacket(CPlayer *pPlayer)
+CBulletsyncPacket::CBulletsyncPacket(CPlayer* pPlayer)
 {
     m_pSourceElement = pPlayer;
     m_WeaponType = WEAPONTYPE_UNARMED;
@@ -21,7 +21,7 @@ CBulletsyncPacket::CBulletsyncPacket(CPlayer *pPlayer)
     m_DamagedPlayerID = INVALID_ELEMENT_ID;
 }
 
-bool CBulletsyncPacket::Read(NetBitStreamInterface &BitStream)
+bool CBulletsyncPacket::Read(NetBitStreamInterface& BitStream)
 {
     // Got a player?
     if (m_pSourceElement)
@@ -30,8 +30,8 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface &BitStream)
         BitStream.Read(cWeaponType);
         m_WeaponType = (eWeaponType)cWeaponType;
 
-        BitStream.Read((char *)&m_vecStart, sizeof(CVector));
-        BitStream.Read((char *)&m_vecEnd, sizeof(CVector));
+        BitStream.Read((char*)&m_vecStart, sizeof(CVector));
+        BitStream.Read((char*)&m_vecEnd, sizeof(CVector));
 
         // Duplicate packet protection
         if (!BitStream.Read(m_ucOrderCounter))
@@ -50,12 +50,12 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface &BitStream)
 }
 
 // Note: Relays a previous Read()
-bool CBulletsyncPacket::Write(NetBitStreamInterface &BitStream) const
+bool CBulletsyncPacket::Write(NetBitStreamInterface& BitStream) const
 {
     // Got a player to write?
     if (m_pSourceElement)
     {
-        CPlayer *pSourcePlayer = static_cast<CPlayer *>(m_pSourceElement);
+        CPlayer* pSourcePlayer = static_cast<CPlayer*>(m_pSourceElement);
 
         // Write the source player id
         ElementID PlayerID = pSourcePlayer->GetID();
@@ -63,8 +63,8 @@ bool CBulletsyncPacket::Write(NetBitStreamInterface &BitStream) const
 
         // Write the bulletsync data
         BitStream.Write((char)m_WeaponType);
-        BitStream.Write((const char *)&m_vecStart, sizeof(CVector));
-        BitStream.Write((const char *)&m_vecEnd, sizeof(CVector));
+        BitStream.Write((const char*)&m_vecStart, sizeof(CVector));
+        BitStream.Write((const char*)&m_vecEnd, sizeof(CVector));
 
         // Duplicate packet protection
         BitStream.Write(m_ucOrderCounter);

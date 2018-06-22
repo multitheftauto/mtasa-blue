@@ -34,4 +34,3 @@ private:
     ElementID     m_PlayerID;
     unsigned char m_ucQuitReason;
 };
-

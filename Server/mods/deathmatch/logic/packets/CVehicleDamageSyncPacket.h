@@ -31,4 +31,3 @@ public:
     ElementID          m_Vehicle;
     SVehicleDamageSync m_damage;
 };
-

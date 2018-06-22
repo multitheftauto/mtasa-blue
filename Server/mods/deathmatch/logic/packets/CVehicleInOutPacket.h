@@ -62,4 +62,3 @@ private:
     unsigned char m_ucDoor;
     float         m_fDoorAngle;
 };
-

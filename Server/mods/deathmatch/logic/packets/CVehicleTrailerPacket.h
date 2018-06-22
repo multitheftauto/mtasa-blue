@@ -42,4 +42,3 @@ private:
     CVector   m_vecRotationDegrees;
     CVector   m_vecTurnSpeed;
 };
-

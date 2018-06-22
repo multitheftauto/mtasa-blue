@@ -45,4 +45,3 @@ private:
     typedef std::multimap<SString, CMapEvent*>::iterator       EventsIter;
     typedef std::pair<EventsIter, EventsIter>                  EventsIterPair;
 };
-

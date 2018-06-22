@@ -27,4 +27,3 @@ public:
 private:
     CVehicle* m_pVehicle;
 };
-

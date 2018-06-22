@@ -68,4 +68,3 @@ public:
         REQUEST_STEALTH_KILL,
     };
 };
-

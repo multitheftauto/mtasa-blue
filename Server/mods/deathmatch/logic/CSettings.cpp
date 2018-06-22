@@ -13,7 +13,7 @@
 
 #define ERROR_BUFFER            32
 
-CSettings::CSettings(CResourceManager *pResourceManager)
+CSettings::CSettings(CResourceManager* pResourceManager)
 {
     m_pResourceManager = pResourceManager;
     m_pNodeGlobalSettings = NULL;
@@ -64,10 +64,10 @@ CSettings::~CSettings(void)
 // Returns the XML node in pNode
 //
 // Status values: NotFound (none found), NoAccess (no access/error) or Found (found)
-CXMLNode *CSettings::Get(CXMLNode *pSource, CXMLNode *pStorage, const char *szSourceResource, const char *szLocalResource, const char *szSetting,
-                         bool &bDeleteNode, SettingStatus &eStatus, CXMLNode *pMultiresultParentNode)
+CXMLNode* CSettings::Get(CXMLNode* pSource, CXMLNode* pStorage, const char* szSourceResource, const char* szLocalResource, const char* szSetting,
+                         bool& bDeleteNode, SettingStatus& eStatus, CXMLNode* pMultiresultParentNode)
 {
-    CXMLNode *   pNode = NULL;
+    CXMLNode*    pNode = NULL;
     unsigned int uiCurrentIndex = 0, uiResourceNameLength = 0;
     char         szQueryResource[MAX_RESOURCE_LENGTH] = {0}, szResource[MAX_RESOURCE_LENGTH] = {0};
     const char * szName, *szQueryName = NULL;
@@ -113,8 +113,8 @@ CXMLNode *CSettings::Get(CXMLNode *pSource, CXMLNode *pStorage, const char *szSo
         std::string  strContent;
         unsigned int uiResourceNameLength = 0;
 
-        CXMLAttribute *pName = pNode->GetAttributes().Find("name");
-        CXMLAttribute *pValue = pNode->GetAttributes().Find(strAttribute);
+        CXMLAttribute* pName = pNode->GetAttributes().Find("name");
+        CXMLAttribute* pValue = pNode->GetAttributes().Find(strAttribute);
 
         // Check if both attibutes exist (otherwise ignore the entry)
         if (pName && pValue)
@@ -189,17 +189,17 @@ CXMLNode *CSettings::Get(CXMLNode *pSource, CXMLNode *pStorage, const char *szSo
 // Returns the XML node.
 //
 // If ( bDeleteNode == TRUE ), always remove the XML node after you're done with it!
-CXMLNode *CSettings::Get(const char *szLocalResource, const char *szSetting, bool &bDeleteNode)
+CXMLNode* CSettings::Get(const char* szLocalResource, const char* szSetting, bool& bDeleteNode)
 {
-    CResource *   pResource;
-    CXMLNode *    pNode = NULL;
+    CResource*    pResource;
+    CXMLNode*     pNode = NULL;
     char          szQueryResource[MAX_RESOURCE_LENGTH] = {0};
     SettingStatus eStatus = NotFound;
     bDeleteNode = false;
 
     // Get the temporary storage node associated with this resource
-    CResource *pLocalResource = m_pResourceManager->GetResource(szLocalResource);
-    CXMLNode * pStorage = pLocalResource ? pLocalResource->GetStorageNode() : nullptr;
+    CResource* pLocalResource = m_pResourceManager->GetResource(szLocalResource);
+    CXMLNode*  pStorage = pLocalResource ? pLocalResource->GetStorageNode() : nullptr;
 
     // Get the actual resource name from the specified setting, and get the resource class
     if (!GetResourceName(szSetting, szQueryResource, MAX_RESOURCE_LENGTH - 1))
@@ -213,7 +213,7 @@ CXMLNode *CSettings::Get(const char *szLocalResource, const char *szSetting, boo
     // If we have a valid resource
     if (pResource)
     {
-        CXMLNode *pSource = pResource->GetSettingsNode();
+        CXMLNode* pSource = pResource->GetSettingsNode();
 
         // Try to get the value for the appropriate setting from the settings registry
         if (pStorage)
@@ -223,7 +223,7 @@ CXMLNode *CSettings::Get(const char *szLocalResource, const char *szSetting, boo
             if (bDeleteNode)
             {
                 SettingStatus eMetaStatus = NotFound;
-                CXMLNode *    pMetaNode = Get(pSource, pStorage, pResource->GetName().c_str(), szLocalResource, szSetting, bDeleteNode, eMetaStatus, pNode);
+                CXMLNode*     pMetaNode = Get(pSource, pStorage, pResource->GetName().c_str(), szLocalResource, szSetting, bDeleteNode, eMetaStatus, pNode);
                 if (eMetaStatus == Found)
                 {
                     eStatus = eMetaStatus;
@@ -256,11 +256,11 @@ CXMLNode *CSettings::Get(const char *szLocalResource, const char *szSetting, boo
 }
 
 // Creates a new setting and adds it to the destination node
-CXMLNode *CSettings::CreateSetting(CXMLNode *pDst, const char *szName, const char *szContent)
+CXMLNode* CSettings::CreateSetting(CXMLNode* pDst, const char* szName, const char* szContent)
 {
     // Create the node
-    CXMLNode *      pNode = pDst->CreateSubNode("setting");
-    CXMLAttributes *pAttributes = &(pNode->GetAttributes());
+    CXMLNode*       pNode = pDst->CreateSubNode("setting");
+    CXMLAttributes* pAttributes = &(pNode->GetAttributes());
 
     // Add the attributes with the corresponding values
     pAttributes->Create("name")->SetValue(szName);
@@ -270,11 +270,11 @@ CXMLNode *CSettings::CreateSetting(CXMLNode *pDst, const char *szName, const cha
 }
 
 // Set ( resource requesting the query, setting name, content )
-bool CSettings::Set(const char *szLocalResource, const char *szSetting, const char *szContent)
+bool CSettings::Set(const char* szLocalResource, const char* szSetting, const char* szContent)
 {
-    CXMLNode *      pNode;
-    CResource *     pResource;
-    CXMLAttributes *pAttributes;
+    CXMLNode*       pNode;
+    CResource*      pResource;
+    CXMLAttributes* pAttributes;
     char            szBuffer[MAX_SETTINGS_LENGTH] = {0};
     char            szQueryResource[MAX_RESOURCE_LENGTH] = {0};
     SettingStatus   eStatus;
@@ -297,7 +297,7 @@ bool CSettings::Set(const char *szLocalResource, const char *szSetting, const ch
     // If we have a valid resource
     if (pResource)
     {
-        CXMLNode *pSource = pResource->GetSettingsNode();
+        CXMLNode* pSource = pResource->GetSettingsNode();
 
         // Check whether the setting exists in the settings registry
         pNode = Get(m_pNodeGlobalSettings, NULL, "", szLocalResource, szSetting, bDeleteNode, eStatus);
@@ -415,9 +415,9 @@ CSettings::AccessType CSettings::GetAccessType(char cCharacter)
 }
 
 // Parses the name and returns the resource name associated with the setting
-inline const char *CSettings::GetResourceName(const char *szSetting, char *szBuffer, unsigned int uiLength)
+inline const char* CSettings::GetResourceName(const char* szSetting, char* szBuffer, unsigned int uiLength)
 {
-    const char *szChr = strchr(szSetting, SETTINGS_DELIMITER);
+    const char* szChr = strchr(szSetting, SETTINGS_DELIMITER);
     if (szChr == NULL)
         return NULL;            // Not found? Return NULL, because there's no resource name.
 
@@ -436,20 +436,20 @@ inline const char *CSettings::GetResourceName(const char *szSetting, char *szBuf
 }
 
 // Parses the name and returns whether a resource name was specified
-inline bool CSettings::HasResourceName(const char *szSetting)
+inline bool CSettings::HasResourceName(const char* szSetting)
 {
     return (strchr(szSetting, SETTINGS_DELIMITER) != NULL);
 }
 
 // Parses the name and returns the actual name of the variable
-inline const char *CSettings::GetName(const char *szSetting, unsigned int uiResourceLength)
+inline const char* CSettings::GetName(const char* szSetting, unsigned int uiResourceLength)
 {
     // Only calculate the resource length if it's not already specified
     if (HasPrefix(szSetting[0]))
         szSetting++;
 
     // Since we know the resource length, we just return the pointer to whereever the resource part ends (and the name begins)
-    const char *szName = (szSetting + uiResourceLength);
+    const char* szName = (szSetting + uiResourceLength);
 
     // If we don't have a name, return
     if (szName[0] == 0)

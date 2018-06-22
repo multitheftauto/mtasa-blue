@@ -66,4 +66,3 @@ private:
     unsigned int   m_uiMaxPlayers;
     bool           m_bDisableVoice;
 };
-

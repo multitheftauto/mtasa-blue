@@ -35,4 +35,3 @@ private:
 
     bool m_bInvalid;
 };
-

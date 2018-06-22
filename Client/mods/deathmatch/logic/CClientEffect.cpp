@@ -9,7 +9,7 @@
  *****************************************************************************/
 #include "StdInc.h"
 
-CClientEffect::CClientEffect(CClientManager *pManager, CFxSystem *pFx, SString strEffectName, ElementID ID) : ClassInit(this), CClientEntity(ID)
+CClientEffect::CClientEffect(CClientManager* pManager, CFxSystem* pFx, SString strEffectName, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
     m_pFxSystem = pFx;
     m_pManager = pManager;
@@ -37,23 +37,23 @@ void CClientEffect::Unlink()
     }
 }
 
-void CClientEffect::GetPosition(CVector &vecPosition) const
+void CClientEffect::GetPosition(CVector& vecPosition) const
 {
     m_pFxSystem->GetPosition(vecPosition);
 }
 
-void CClientEffect::SetPosition(const CVector &vecPosition)
+void CClientEffect::SetPosition(const CVector& vecPosition)
 {
     m_pFxSystem->SetPosition(vecPosition);
 }
 
-bool CClientEffect::GetMatrix(CMatrix &matrix) const
+bool CClientEffect::GetMatrix(CMatrix& matrix) const
 {
     m_pFxSystem->GetMatrix(matrix);
     return true;
 }
 
-bool CClientEffect::SetMatrix(const CMatrix &matrix)
+bool CClientEffect::SetMatrix(const CMatrix& matrix)
 {
     m_pFxSystem->SetMatrix(matrix);
     return true;
@@ -97,7 +97,7 @@ float CClientEffect::GetDrawDistance() const
     return m_pFxSystem->GetDrawDistance();
 }
 
-void CClientEffect::SetRotationRadians(const CVector &vecRotation)
+void CClientEffect::SetRotationRadians(const CVector& vecRotation)
 {
     CMatrix matrix;
     GetMatrix(matrix);
@@ -105,7 +105,7 @@ void CClientEffect::SetRotationRadians(const CVector &vecRotation)
     SetMatrix(matrix);
 }
 
-void CClientEffect::GetRotationRadians(CVector &vecRotation) const
+void CClientEffect::GetRotationRadians(CVector& vecRotation) const
 {
     CMatrix matrix;
     GetMatrix(matrix);

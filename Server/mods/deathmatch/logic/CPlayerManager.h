@@ -36,7 +36,7 @@ public:
 
     unsigned int Count(void) { return static_cast<unsigned int>(m_Players.size()); }
     unsigned int CountJoined(void);
-    bool Exists(CPlayer* pPlayer);
+    bool         Exists(CPlayer* pPlayer);
 
     CPlayer* Get(const NetServerPlayerID& PlayerSocket);
     CPlayer* Get(const char* szNick, bool bCaseSensitive = false);

@@ -2489,125 +2489,125 @@ int CLuaVehicleDefs::SetVehicleHandling(lua_State* luaVM)
                 {
                     switch (eProperty)
                     {
-                    case HANDLING_MASS:
-                    case HANDLING_TURNMASS:
-                    case HANDLING_DRAGCOEFF:
-                    case HANDLING_TRACTIONMULTIPLIER:
-                    case HANDLING_ENGINEACCELERATION:
-                    case HANDLING_ENGINEINERTIA:
-                    case HANDLING_MAXVELOCITY:
-                    case HANDLING_BRAKEDECELERATION:
-                    case HANDLING_BRAKEBIAS:
-                    case HANDLING_STEERINGLOCK:
-                    case HANDLING_TRACTIONLOSS:
-                    case HANDLING_TRACTIONBIAS:
-                    case HANDLING_SUSPENSION_FORCELEVEL:
-                    case HANDLING_SUSPENSION_DAMPING:
-                    case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
-                    case HANDLING_SUSPENSION_UPPER_LIMIT:
-                    case HANDLING_SUSPENSION_LOWER_LIMIT:
-                    case HANDLING_SUSPENSION_FRONTREARBIAS:
-                    case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
-                    case HANDLING_COLLISIONDAMAGEMULTIPLIER:
-                    case HANDLING_SEATOFFSETDISTANCE:
-                    {
-                        float fValue;
-                        argStream.ReadNumber(fValue);
-                        if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, fValue))
+                        case HANDLING_MASS:
+                        case HANDLING_TURNMASS:
+                        case HANDLING_DRAGCOEFF:
+                        case HANDLING_TRACTIONMULTIPLIER:
+                        case HANDLING_ENGINEACCELERATION:
+                        case HANDLING_ENGINEINERTIA:
+                        case HANDLING_MAXVELOCITY:
+                        case HANDLING_BRAKEDECELERATION:
+                        case HANDLING_BRAKEBIAS:
+                        case HANDLING_STEERINGLOCK:
+                        case HANDLING_TRACTIONLOSS:
+                        case HANDLING_TRACTIONBIAS:
+                        case HANDLING_SUSPENSION_FORCELEVEL:
+                        case HANDLING_SUSPENSION_DAMPING:
+                        case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
+                        case HANDLING_SUSPENSION_UPPER_LIMIT:
+                        case HANDLING_SUSPENSION_LOWER_LIMIT:
+                        case HANDLING_SUSPENSION_FRONTREARBIAS:
+                        case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
+                        case HANDLING_COLLISIONDAMAGEMULTIPLIER:
+                        case HANDLING_SEATOFFSETDISTANCE:
                         {
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                        break;
-                    }
-                    case HANDLING_PERCENTSUBMERGED:            // unsigned int
-                                                               // case HANDLING_MONETARY:
-                    case HANDLING_HANDLINGFLAGS:
-                    case HANDLING_MODELFLAGS:
-                    {
-                        unsigned int uiValue;
-                        argStream.ReadNumber(uiValue);
-                        if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, uiValue))
-                        {
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                        break;
-                    }
-                    case HANDLING_NUMOFGEARS:
-                    case HANDLING_ANIMGROUP:
-                    {
-                        unsigned char ucValue;
-                        argStream.ReadNumber(ucValue);
-                        if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, ucValue))
-                        {
-                            lua_pushboolean(luaVM, true);
-                            return 1;
-                        }
-                        break;
-                    }
-                    case HANDLING_CENTEROFMASS:
-                    {
-                        if (argStream.NextIsTable())
-                        {
-                            lua_pushnumber(luaVM, 1);
-                            lua_gettable(luaVM, 3);
-                            float fX = static_cast<float>(lua_tonumber(luaVM, -1));
-                            lua_pop(luaVM, 1);
-
-                            lua_pushnumber(luaVM, 2);
-                            lua_gettable(luaVM, 3);
-                            float fY = static_cast<float>(lua_tonumber(luaVM, -1));
-                            lua_pop(luaVM, 1);
-
-                            lua_pushnumber(luaVM, 3);
-                            lua_gettable(luaVM, 3);
-                            float fZ = static_cast<float>(lua_tonumber(luaVM, -1));
-                            lua_pop(luaVM, 1);
-
-                            CVector vecCenterOfMass(fX, fY, fZ);
-
-                            if (CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, vecCenterOfMass))
+                            float fValue;
+                            argStream.ReadNumber(fValue);
+                            if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, fValue))
                             {
                                 lua_pushboolean(luaVM, true);
                                 return 1;
                             }
+                            break;
                         }
-                        argStream.SetTypeError("table");
-                        break;
-                    }
-                    case HANDLING_DRIVETYPE:
-                    case HANDLING_ENGINETYPE:
-                        // case HANDLING_HEADLIGHT:
-                        // case HANDLING_TAILLIGHT:
-                    {
-                        SString strValue;
-                        argStream.ReadString(strValue);
-                        if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, strValue))
+                        case HANDLING_PERCENTSUBMERGED:            // unsigned int
+                                                                   // case HANDLING_MONETARY:
+                        case HANDLING_HANDLINGFLAGS:
+                        case HANDLING_MODELFLAGS:
                         {
-                            lua_pushboolean(luaVM, true);
-                            return 1;
+                            unsigned int uiValue;
+                            argStream.ReadNumber(uiValue);
+                            if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, uiValue))
+                            {
+                                lua_pushboolean(luaVM, true);
+                                return 1;
+                            }
+                            break;
                         }
-                        break;
-                    }
-                    case HANDLING_ABS:
-                    {
-                        bool bValue;
-                        argStream.ReadBool(bValue);
-                        if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, bValue ? 1.0f : 0.0f))
+                        case HANDLING_NUMOFGEARS:
+                        case HANDLING_ANIMGROUP:
                         {
-                            lua_pushboolean(luaVM, true);
-                            return 1;
+                            unsigned char ucValue;
+                            argStream.ReadNumber(ucValue);
+                            if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, ucValue))
+                            {
+                                lua_pushboolean(luaVM, true);
+                                return 1;
+                            }
+                            break;
                         }
-                        break;
-                    }
-                    case HANDLING_MAX:
-                    {
-                        argStream.SetCustomError("Invalid property");
-                        break;
-                    }
-                    default:
-                        break;
+                        case HANDLING_CENTEROFMASS:
+                        {
+                            if (argStream.NextIsTable())
+                            {
+                                lua_pushnumber(luaVM, 1);
+                                lua_gettable(luaVM, 3);
+                                float fX = static_cast<float>(lua_tonumber(luaVM, -1));
+                                lua_pop(luaVM, 1);
+
+                                lua_pushnumber(luaVM, 2);
+                                lua_gettable(luaVM, 3);
+                                float fY = static_cast<float>(lua_tonumber(luaVM, -1));
+                                lua_pop(luaVM, 1);
+
+                                lua_pushnumber(luaVM, 3);
+                                lua_gettable(luaVM, 3);
+                                float fZ = static_cast<float>(lua_tonumber(luaVM, -1));
+                                lua_pop(luaVM, 1);
+
+                                CVector vecCenterOfMass(fX, fY, fZ);
+
+                                if (CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, vecCenterOfMass))
+                                {
+                                    lua_pushboolean(luaVM, true);
+                                    return 1;
+                                }
+                            }
+                            argStream.SetTypeError("table");
+                            break;
+                        }
+                        case HANDLING_DRIVETYPE:
+                        case HANDLING_ENGINETYPE:
+                            // case HANDLING_HEADLIGHT:
+                            // case HANDLING_TAILLIGHT:
+                            {
+                                SString strValue;
+                                argStream.ReadString(strValue);
+                                if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, strValue))
+                                {
+                                    lua_pushboolean(luaVM, true);
+                                    return 1;
+                                }
+                                break;
+                            }
+                        case HANDLING_ABS:
+                        {
+                            bool bValue;
+                            argStream.ReadBool(bValue);
+                            if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, bValue ? 1.0f : 0.0f))
+                            {
+                                lua_pushboolean(luaVM, true);
+                                return 1;
+                            }
+                            break;
+                        }
+                        case HANDLING_MAX:
+                        {
+                            argStream.SetCustomError("Invalid property");
+                            break;
+                        }
+                        default:
+                            break;
                     }
                 }
             }

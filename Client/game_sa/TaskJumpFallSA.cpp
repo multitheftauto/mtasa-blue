@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntity *pClimbEnt, const CVector &vecTarget, float fHeading, unsigned char nSurfaceType, char nHeight,
+CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, char nHeight,
                                        const bool bForceClimb)
 {
     DEBUG_TRACE(
@@ -42,7 +42,7 @@ CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntity *pClimbEnt, const CVector &vecTar
 // ## Purpose: Allows the player to use a jetpack to 'fly' around
 // ##############################################################################
 
-CTaskSimpleJetPackSA::CTaskSimpleJetPackSA(const CVector *pVecTargetPos, float fCruiseHeight, int nHoverTime)
+CTaskSimpleJetPackSA::CTaskSimpleJetPackSA(const CVector* pVecTargetPos, float fCruiseHeight, int nHoverTime)
 {
     DEBUG_TRACE("CTaskSimpleJetPackSA::CTaskSimpleJetPackSA(const CVector *pVecTargetPos = NULL, float fCruiseHeight = 10.0f, int nHoverTime = 0)");
     this->CreateTaskInterface(sizeof(CTaskSimpleJetPackSAInterface));

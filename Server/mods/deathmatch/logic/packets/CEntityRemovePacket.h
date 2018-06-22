@@ -28,4 +28,3 @@ public:
 private:
     std::vector<class CElement*> m_List;
 };
-
