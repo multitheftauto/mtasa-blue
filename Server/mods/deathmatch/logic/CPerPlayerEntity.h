@@ -69,4 +69,3 @@ private:
 
     static std::set<CPerPlayerEntity*> ms_AllPerPlayerEntityMap;
 };
-

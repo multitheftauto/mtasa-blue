@@ -52,4 +52,3 @@ private:
     unsigned short m_usDimension;
     unsigned char  m_ucTimeContext;
 };
-

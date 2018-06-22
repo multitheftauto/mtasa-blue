@@ -48,4 +48,3 @@ private:
     SString       m_strMessage;
     bool          m_bColorCoded;
 };
-

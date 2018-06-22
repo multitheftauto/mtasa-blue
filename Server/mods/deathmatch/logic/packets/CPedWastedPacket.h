@@ -41,4 +41,3 @@ public:
     unsigned char  m_ucTimeContext;
     unsigned long  m_AnimGroup, m_AnimID;
 };
-

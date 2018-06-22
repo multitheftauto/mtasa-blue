@@ -35,4 +35,3 @@ protected:
     SString   m_strNick;
     CConsole* m_pConsole;
 };
-

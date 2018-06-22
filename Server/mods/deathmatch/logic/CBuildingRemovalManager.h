@@ -26,4 +26,3 @@ public:
 private:
     std::multimap<unsigned short, CBuildingRemoval*> m_BuildingRemovals;
 };
-

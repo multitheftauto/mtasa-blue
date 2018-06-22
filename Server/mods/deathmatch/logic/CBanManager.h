@@ -71,4 +71,3 @@ private:
     bool        m_bAllowSave;
     static bool ms_bSaveRequired;
 };
-

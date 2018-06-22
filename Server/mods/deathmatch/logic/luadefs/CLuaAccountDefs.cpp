@@ -28,7 +28,7 @@ void CLuaAccountDefs::LoadFunctions()
     CLuaCFunctions::AddFunction("getAccountsByData", GetAccountsByData);
     CLuaCFunctions::AddFunction("getAccountSerial", GetAccountSerial);
     CLuaCFunctions::AddFunction("getAccountsBySerial", GetAccountsBySerial);
-    CLuaCFunctions::AddFunction("getAccountID", GetAccountID);		
+    CLuaCFunctions::AddFunction("getAccountID", GetAccountID);
     CLuaCFunctions::AddFunction("getAccountByID", GetAccountByID);
     CLuaCFunctions::AddFunction("getAccountIP", GetAccountIP);
     CLuaCFunctions::AddFunction("getAccountsByIP", GetAccountsByIP);
@@ -380,7 +380,7 @@ int CLuaAccountDefs::GetAccountID(lua_State* luaVM)
 {
     // int getAccountID ( account theAccount )
     CAccount* pAccount;
-		
+
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pAccount);
 
@@ -399,7 +399,7 @@ int CLuaAccountDefs::GetAccountID(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
-		
+
 int CLuaAccountDefs::GetAccountByID(lua_State* luaVM)
 {
     // account getAccountByID ( int ID )

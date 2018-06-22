@@ -11,4 +11,3 @@
 
 #pragma once
 SString GetDebugMessage(lua_State* luaVM);
-

@@ -36,4 +36,3 @@ protected:
 
     CVector m_vecSize;
 };
-

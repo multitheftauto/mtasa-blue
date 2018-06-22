@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
     if (Core.Load(LIB_CORE))
     {
         // Grab the entrypoint
-        typedef int(Main_t)(int, char* []);
+        typedef int(Main_t)(int, char*[]);
         Main_t* pfnEntryPoint = reinterpret_cast<Main_t*>((long long)(Core.GetProcedureAddress("Run")));
         if (pfnEntryPoint)
         {

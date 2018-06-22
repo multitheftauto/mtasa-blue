@@ -47,4 +47,3 @@ public:
     CVector       m_vecPosition;
     unsigned char m_ucType;
 };
-

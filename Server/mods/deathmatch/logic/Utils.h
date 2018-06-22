@@ -200,4 +200,3 @@ void DeletePointersAndClearList(T& elementList)
         delete *iter;
     }
 }
-

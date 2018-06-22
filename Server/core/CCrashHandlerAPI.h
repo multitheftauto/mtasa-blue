@@ -31,9 +31,9 @@ Copyright (c) 1997-2000 John Robbins -- All rights reserved.
 static DWORD __stdcall Win95GetModuleBaseName(HANDLE hProcess, HMODULE hModule, LPSTR lpBaseName, DWORD nSize);
 BOOL __stdcall IsNT(void);
 DWORD __stdcall NTGetModuleBaseName(HANDLE hProcess, HMODULE hModule, LPTSTR lpBaseName, DWORD nSize);
-BOOL __stdcall NT4GetLoadedModules(DWORD dwPID, UINT uiCount, HMODULE *paModArray, LPDWORD pdwRealCount);
-BOOL __stdcall TLHELPGetLoadedModules(DWORD dwPID, UINT uiCount, HMODULE *paModArray, LPDWORD pdwRealCount);
-BOOL BUGSUTIL_DLLINTERFACE __stdcall GetLoadedModules(DWORD dwPID, UINT uiCount, HMODULE *paModArray, LPDWORD pdwRealCount);
+BOOL __stdcall NT4GetLoadedModules(DWORD dwPID, UINT uiCount, HMODULE* paModArray, LPDWORD pdwRealCount);
+BOOL __stdcall TLHELPGetLoadedModules(DWORD dwPID, UINT uiCount, HMODULE* paModArray, LPDWORD pdwRealCount);
+BOOL BUGSUTIL_DLLINTERFACE __stdcall GetLoadedModules(DWORD dwPID, UINT uiCount, HMODULE* paModArray, LPDWORD pdwRealCount);
 DWORD __stdcall NTGetModuleFileNameEx(DWORD /*dwPID*/, HANDLE hProcess, HMODULE hModule, LPTSTR szFilename, DWORD nSize);
 DWORD __stdcall TLHELPGetModuleFileNameEx(DWORD dwPID, HANDLE /*hProcess*/, HMODULE hModule, LPTSTR szFilename, DWORD nSize);
 
@@ -46,7 +46,7 @@ extern "C"
                                 Type Definitions
     //////////////////////////////////////////////////////////////////////*/
     // The type for the filter function called by the Crash Handler API.
-    typedef LONG(__stdcall *PFNCHFILTFN)(EXCEPTION_POINTERS *pExPtrs);
+    typedef LONG(__stdcall* PFNCHFILTFN)(EXCEPTION_POINTERS* pExPtrs);
 
     /*//////////////////////////////////////////////////////////////////////
                        Crash Handler Function Definitions
@@ -116,7 +116,7 @@ RETURNS         :
 #define GLMA_BADPARAM       -1
 #define GLMA_BUFFTOOSMALL   -2
 #define GLMA_FAILURE        0
-    int BUGSUTIL_DLLINTERFACE __stdcall GetLimitModulesArray(HMODULE *pahMod, UINT uiSize);
+    int BUGSUTIL_DLLINTERFACE __stdcall GetLimitModulesArray(HMODULE* pahMod, UINT uiSize);
 
     /*//////////////////////////////////////////////////////////////////////
               EXCEPTION_POINTER Translation Functions Declarations
@@ -135,7 +135,7 @@ RETURNS         :
         !NULL - The constant string that describes the fault.
         NULL  - There was a problem translating the string.
     ----------------------------------------------------------------------*/
-    LPCTSTR BUGSUTIL_DLLINTERFACE __stdcall GetFaultReason(EXCEPTION_POINTERS *pExPtrs);
+    LPCTSTR BUGSUTIL_DLLINTERFACE __stdcall GetFaultReason(EXCEPTION_POINTERS* pExPtrs);
 
     /*----------------------------------------------------------------------
     FUNCTION        :   GetFaultReasonVB
@@ -150,7 +150,7 @@ RETURNS         :
         TRUE  - The buffer is filled.
         FALSE - There was a problem.
     ----------------------------------------------------------------------*/
-    BOOL BUGSUTIL_DLLINTERFACE __stdcall GetFaultReasonVB(EXCEPTION_POINTERS *pExPtrs, LPTSTR szBuff, UINT uiSize);
+    BOOL BUGSUTIL_DLLINTERFACE __stdcall GetFaultReasonVB(EXCEPTION_POINTERS* pExPtrs, LPTSTR szBuff, UINT uiSize);
 
 /*----------------------------------------------------------------------
 FUNCTION        :   GetFirstStackTraceString
@@ -180,8 +180,8 @@ RETURNS         :
 #define GSTSO_MODULE    0x02
 #define GSTSO_SYMBOL    0x04
 #define GSTSO_SRCLINE   0x08
-    LPCTSTR BUGSUTIL_DLLINTERFACE __stdcall GetFirstStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS *pExPtrs);
-    LPCTSTR BUGSUTIL_DLLINTERFACE __stdcall GetNextStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS *pExPtrs);
+    LPCTSTR BUGSUTIL_DLLINTERFACE __stdcall GetFirstStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* pExPtrs);
+    LPCTSTR BUGSUTIL_DLLINTERFACE __stdcall GetNextStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* pExPtrs);
 
     /*----------------------------------------------------------------------
     FUNCTION        :   GetFirstStackTraceStringVB
@@ -207,8 +207,8 @@ RETURNS         :
         TRUE  - The string was copied into szBuff.
         FALSE - There was a problem.
     ----------------------------------------------------------------------*/
-    BOOL BUGSUTIL_DLLINTERFACE __stdcall GetFirstStackTraceStringVB(DWORD dwOpts, EXCEPTION_POINTERS *pExPtrs, LPTSTR szBuff, UINT uiSize);
-    BOOL BUGSUTIL_DLLINTERFACE __stdcall GetNextStackTraceStringVB(DWORD dwOpts, EXCEPTION_POINTERS *pExPtrs, LPTSTR szBuff, UINT uiSize);
+    BOOL BUGSUTIL_DLLINTERFACE __stdcall GetFirstStackTraceStringVB(DWORD dwOpts, EXCEPTION_POINTERS* pExPtrs, LPTSTR szBuff, UINT uiSize);
+    BOOL BUGSUTIL_DLLINTERFACE __stdcall GetNextStackTraceStringVB(DWORD dwOpts, EXCEPTION_POINTERS* pExPtrs, LPTSTR szBuff, UINT uiSize);
 
     /*----------------------------------------------------------------------
     FUNCTION        :   GetRegisterString
@@ -222,7 +222,7 @@ RETURNS         :
         !NULL - The requested register string.
         NULL  - There was a problem.
     ----------------------------------------------------------------------*/
-    LPCTSTR BUGSUTIL_DLLINTERFACE __stdcall GetRegisterString(EXCEPTION_POINTERS *pExPtrs);
+    LPCTSTR BUGSUTIL_DLLINTERFACE __stdcall GetRegisterString(EXCEPTION_POINTERS* pExPtrs);
 
     /*----------------------------------------------------------------------
     FUNCTION        :   GetRegisterStringVB
@@ -237,7 +237,7 @@ RETURNS         :
         TRUE  - The string was copied into szBuff.
         FALSE - There was a problem.
     ----------------------------------------------------------------------*/
-    BOOL BUGSUTIL_DLLINTERFACE __stdcall GetRegisterStringVB(EXCEPTION_POINTERS *pExPtrs, LPTSTR szBuff, UINT uiSize);
+    BOOL BUGSUTIL_DLLINTERFACE __stdcall GetRegisterStringVB(EXCEPTION_POINTERS* pExPtrs, LPTSTR szBuff, UINT uiSize);
 
 #ifdef __cplusplus
 }

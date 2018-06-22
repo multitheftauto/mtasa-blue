@@ -46,4 +46,3 @@ private:
 
     CObjectListType m_List;
 };
-

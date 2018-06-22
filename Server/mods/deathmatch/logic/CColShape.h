@@ -72,4 +72,3 @@ private:
 
     bool m_bPartnered;
 };
-

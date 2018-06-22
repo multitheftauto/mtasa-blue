@@ -35,4 +35,3 @@ private:
     unsigned long m_ulUniqueId;
     bool          m_bDeletable;
 };
-

@@ -21,4 +21,3 @@ public:
 
     static const char* GetVehicleTypeName(unsigned long ulModel);
 };
-

@@ -35,4 +35,3 @@ private:
     char*        m_szName;
     CLuaArgument m_Value;
 };
-

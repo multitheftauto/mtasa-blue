@@ -57,10 +57,10 @@ public:
 class CPlayerPedDataSAInterface
 {
 public:
-    CWantedSAInterface *m_Wanted;              // 0
-    CPedClothesDesc *   m_pClothes;            // 4
+    CWantedSAInterface* m_Wanted;              // 0
+    CPedClothesDesc*    m_pClothes;            // 4
 
-    CPedSAInterface *m_ArrestingOfficer;            // actually CCopPed *        // 8
+    CPedSAInterface* m_ArrestingOfficer;            // actually CCopPed *        // 8
 
     CVector2D m_vecFightMovement;            // 12
     FLOAT     m_moveBlendRatio;              // 20
@@ -73,7 +73,7 @@ public:
     long         m_nStandStillTimer;                // 32
     DWORD        m_nHitAnimDelayTimer;              // 36
     FLOAT        m_fAttackButtonCounter;            // 40
-    CAutomobile *m_pDangerCar;                      // 44
+    CAutomobile* m_pDangerCar;                      // 44
 
     DWORD m_bStoppedMoving : 1;            // 48
     DWORD m_bAdrenaline : 1;
@@ -114,7 +114,7 @@ public:
     FLOAT m_fSkateBoardSpeed;
     FLOAT m_fSkateBoardLean;
 
-    DWORD *m_pSpecialAtomic;            // was rpAtomic
+    DWORD* m_pSpecialAtomic;            // was rpAtomic
     FLOAT  m_fGunSpinSpeed;
     FLOAT  m_fGunSpinAngle;
 
@@ -138,15 +138,15 @@ public:
 
     // used for doing lock-on with HS missiles
     DWORD               m_FireHSMissilePressedTime;
-    CEntitySAInterface *m_LastHSMissileTarget;
+    CEntitySAInterface* m_LastHSMissileTarget;
 
     long m_nModelIndexOfLastBuildingShot;
 
     DWORD m_LastHSMissileLOSTime : 31;
     DWORD m_bLastHSMissileLOS : 1;
 
-    CPedSAInterface *m_pCurrentProstitutePed;
-    CPedSAInterface *m_pLastProstituteShagged;
+    CPedSAInterface* m_pCurrentProstitutePed;
+    CPedSAInterface* m_pLastProstituteShagged;
 };
 static_assert(sizeof(CPlayerPedDataSAInterface) == 172, "Invalid size for CPlayerPedDataSAInterface");
 #pragma pack(pop)
@@ -163,10 +163,10 @@ public:
         PLAYERSTATE_LEFTGAME
     };
 
-    class CPlayerPedSAInterface *pPed;                            // Pointer to the player ped (should always be set)
+    class CPlayerPedSAInterface* pPed;                            // Pointer to the player ped (should always be set)
     CPlayerPedDataSAInterface    PlayerPedData;                   // instance of player variables
-    CVehicleSAInterface *        pRemoteVehicle;                  // Pointer to vehicle player is driving remotely at the moment.(NULL if on foot)
-    CVehicleSAInterface *        pSpecCar;                        // which car is using the special collision model
+    CVehicleSAInterface*         pRemoteVehicle;                  // Pointer to vehicle player is driving remotely at the moment.(NULL if on foot)
+    CVehicleSAInterface*         pSpecCar;                        // which car is using the special collision model
     long                         Score;                           // Points for this player
     long                         DisplayScore;                    // Points as they would be displayed
     long                         CollectablesPickedUp;            // How many bags of sugar do we have
@@ -180,7 +180,7 @@ public:
     bool  m_bTryingToExitCar;              // if player holds exit car button, want to trigger getout once car slowed enough
                                            //  with a passenger
 
-    CVehicleSAInterface *pLastTargetVehicle;            // Last vehicle player tried to enter.
+    CVehicleSAInterface* pLastTargetVehicle;            // Last vehicle player tried to enter.
 
     BYTE PlayerState;            // What's going on.
 
@@ -243,7 +243,7 @@ public:
     CPlayerCrossHairSAInterface CrossHair;
 
     char       m_skinName[32];
-    RwTexture *m_pSkinTexture;
+    RwTexture* m_pSkinTexture;
 
     bool  m_bParachuteReferenced;
     DWORD m_nRequireParachuteTimer;
@@ -252,11 +252,11 @@ public:
 class CPlayerInfoSA : public CPlayerInfo
 {
 private:
-    CPlayerInfoSAInterface *internalInterface;
-    CWantedSA *             wanted;
+    CPlayerInfoSAInterface* internalInterface;
+    CWantedSA*              wanted;
 
 public:
-    CPlayerInfoSA(CPlayerInfoSAInterface *playerInfoInterface)
+    CPlayerInfoSA(CPlayerInfoSAInterface* playerInfoInterface)
     {
         this->internalInterface = playerInfoInterface;
         this->wanted = NULL;            // we can't init it yet, as our interface hasn't been inited yet
@@ -270,14 +270,14 @@ public:
         }
     }
 
-    CPlayerInfoSAInterface *GetInterface(void) { return internalInterface; }
+    CPlayerInfoSAInterface* GetInterface(void) { return internalInterface; }
 
-    CPlayerPed *GetPlayerPed();
-    CWanted *   GetWanted();
+    CPlayerPed* GetPlayerPed();
+    CWanted*    GetWanted();
     long        GetPlayerMoney(void);
     void        SetPlayerMoney(long lMoney, bool bInstant);
 
-    void GetCrossHair(bool &bActivated, float &fTargetX, float &fTargetY);
+    void GetCrossHair(bool& bActivated, float& fTargetX, float& fTargetY);
 
     VOID GivePlayerParachute(VOID);
     VOID StreamParachuteWeapon(bool bAllowParachute);
@@ -286,13 +286,13 @@ public:
     void  SetLastTimeEaten(short sTime);
 
     VOID MakePlayerSafe(BOOL boolSafe);
-    VOID CancelPlayerEnteringCars(CVehicle *vehicle);
+    VOID CancelPlayerEnteringCars(CVehicle* vehicle);
     VOID ArrestPlayer();
     VOID KillPlayer();
 
-    CVehicle *GivePlayerRemoteControlledCar(eVehicleTypes vehicletype);            // these are really members of CRemote, but they make more sense here
+    CVehicle* GivePlayerRemoteControlledCar(eVehicleTypes vehicletype);            // these are really members of CRemote, but they make more sense here
     VOID      TakeRemoteControlledCarFromPlayer();
-    CVehicle *GetPlayerRemoteControlledCar();
+    CVehicle* GetPlayerRemoteControlledCar();
 
     float GetFPSMoveHeading(void);
 

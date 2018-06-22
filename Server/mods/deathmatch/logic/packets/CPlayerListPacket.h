@@ -33,4 +33,3 @@ private:
     std::list<CPlayer*> m_List;
     bool                m_bShowInChat;
 };
-

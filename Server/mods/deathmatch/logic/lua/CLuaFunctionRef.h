@@ -38,4 +38,3 @@ protected:
     // Global list to track function refs and make sure they can't be used after a VM has closed
     static CIntrusiveList<CLuaFunctionRef> ms_AllRefList;
 };
-

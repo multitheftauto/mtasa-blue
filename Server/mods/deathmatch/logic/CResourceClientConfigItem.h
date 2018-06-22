@@ -31,4 +31,3 @@ private:
 
     bool m_bInvalid;            // it failed to load
 };
-

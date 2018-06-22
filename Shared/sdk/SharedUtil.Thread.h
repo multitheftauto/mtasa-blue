@@ -23,7 +23,7 @@ struct timeval
 
 namespace SharedUtil
 {
-    typedef void *(*PFN_ThreadStart)(void *);
+    typedef void* (*PFN_ThreadStart)(void*);
 
     // Wrap pthread
     class CThreadHandle
@@ -32,7 +32,7 @@ namespace SharedUtil
         pthread_t handle;
 
     public:
-        CThreadHandle(PFN_ThreadStart threadStart, void *arg) { res = pthread_create(&handle, NULL, threadStart, arg); }
+        CThreadHandle(PFN_ThreadStart threadStart, void* arg) { res = pthread_create(&handle, NULL, threadStart, arg); }
 
         static void AllowASyncCancel(void) { pthread_setcancelstate(PTHREAD_CANCEL_ASYNCHRONOUS, NULL); }
 

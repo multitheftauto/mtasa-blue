@@ -37,4 +37,3 @@ public:
 private:
     std::list<SWhoWasEntry> m_List;
 };
-

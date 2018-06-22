@@ -95,4 +95,3 @@ private:
     uint        m_uiScriptID;
     bool        m_bBeingDeleted;
 };
-

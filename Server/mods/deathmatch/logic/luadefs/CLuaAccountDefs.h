@@ -33,7 +33,7 @@ public:
     LUA_DECLARE(GetAccountsByData);
     LUA_DECLARE(GetAccountSerial);
     LUA_DECLARE(GetAccountsBySerial);
-    LUA_DECLARE(GetAccountID);		
+    LUA_DECLARE(GetAccountID);
     LUA_DECLARE(GetAccountByID);
     LUA_DECLARE(GetAccountIP);
     LUA_DECLARE(GetAccountsByIP);

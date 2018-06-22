@@ -55,4 +55,3 @@ private:
     SString        m_strSerialUser;
     SString        m_strPlayerVersion;
 };
-

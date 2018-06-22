@@ -40,4 +40,3 @@ private:
     unsigned short m_usDataBufferSize;
     unsigned short m_usActualDataLength;
 };
-

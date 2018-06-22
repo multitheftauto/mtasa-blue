@@ -27,4 +27,3 @@ private:
     unsigned char          m_ucActionID;
     NetBitStreamInterface& m_BitStream;
 };
-

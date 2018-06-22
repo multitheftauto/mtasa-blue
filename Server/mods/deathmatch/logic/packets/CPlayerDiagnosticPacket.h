@@ -22,4 +22,3 @@ public:
     uint    m_uiLevel;
     SString m_strMessage;
 };
-

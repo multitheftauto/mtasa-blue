@@ -298,4 +298,3 @@ private:
 };
 
 typedef CElement::EElementType EElementType;
-

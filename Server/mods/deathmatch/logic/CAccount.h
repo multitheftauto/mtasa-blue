@@ -156,4 +156,3 @@ private:
     std::string m_strValue;
     int         m_iType;
 };
-

@@ -44,4 +44,3 @@ private:
 
     CElapsedTime m_UpdateTimer;
 };
-

@@ -35,11 +35,11 @@ CCivilianPedSA::CCivilianPedSA(ePedModel pedType)
         push    1 // ped type
         call    CCivilianPedConstructor
     }
-    this->SetInterface((CEntitySAInterface *)dwPedPointer);
+    this->SetInterface((CEntitySAInterface*)dwPedPointer);
     this->Init();            // init our interfaces
-    CPoolsSA *pools = (CPoolsSA *)pGame->GetPools();
-    this->internalID = pools->GetPedRef((DWORD *)this->GetInterface());
-    CWorldSA *world = (CWorldSA *)pGame->GetWorld();
+    CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
+    this->internalID = pools->GetPedRef((DWORD*)this->GetInterface());
+    CWorldSA* world = (CWorldSA*)pGame->GetWorld();
     world->Add(this->GetInterface(), CCivPed_Constructor);
     this->SetModelIndex(pedType);
     this->BeingDeleted = FALSE;
@@ -59,7 +59,7 @@ CCivilianPedSA::~CCivilianPedSA()
 
         if ((DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable)
         {
-            CWorldSA *world = (CWorldSA *)pGame->GetWorld();
+            CWorldSA* world = (CWorldSA*)pGame->GetWorld();
             world->Remove(this->GetInterface(), CCivPed_Destructor);
 
             DWORD dwThis = (DWORD)this->GetInterface();
@@ -72,15 +72,15 @@ CCivilianPedSA::~CCivilianPedSA()
             }
         }
         this->BeingDeleted = true;
-        ((CPoolsSA *)pGame->GetPools())->RemovePed((CPed *)(CPedSA *)this, false);
+        ((CPoolsSA*)pGame->GetPools())->RemovePed((CPed*)(CPedSA*)this, false);
     }
 }
 
-CCivilianPedSA::CCivilianPedSA(CPedSAInterface *ped)
+CCivilianPedSA::CCivilianPedSA(CPedSAInterface* ped)
 {
     DEBUG_TRACE("CCivilianPedSA::CCivilianPedSA( CPedSAInterface * ped )");
 
-    this->SetInterface((CEntitySAInterface *)ped);
+    this->SetInterface((CEntitySAInterface*)ped);
     this->Init();
     this->SetType(CIVILIAN_PED);
 }

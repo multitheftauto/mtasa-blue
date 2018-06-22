@@ -32,4 +32,3 @@ public:
 private:
     ElementID m_PlayerID;
 };
-

@@ -28,4 +28,3 @@ public:
 private:
     bool m_bClientAutoDownload;
 };
-

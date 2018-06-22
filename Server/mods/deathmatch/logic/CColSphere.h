@@ -36,4 +36,3 @@ protected:
 
     float m_fRadius;
 };
-

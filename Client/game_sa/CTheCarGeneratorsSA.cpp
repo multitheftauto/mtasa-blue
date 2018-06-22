@@ -15,7 +15,7 @@ CTheCarGeneratorsSA::CTheCarGeneratorsSA()
 {
     DEBUG_TRACE("CTheCarGeneratorsSA::CTheCarGeneratorsSA()");
     for (int i = 0; i < MAX_CAR_GENERATORS; i++)
-        CarGenerators[i] = new CCarGeneratorSA((CCarGeneratorSAInterface *)(ARRAY_CarGenerators + i * sizeof(CCarGeneratorSAInterface)));
+        CarGenerators[i] = new CCarGeneratorSA((CCarGeneratorSAInterface*)(ARRAY_CarGenerators + i * sizeof(CCarGeneratorSAInterface)));
 }
 
 CTheCarGeneratorsSA::~CTheCarGeneratorsSA(void)
@@ -26,7 +26,7 @@ CTheCarGeneratorsSA::~CTheCarGeneratorsSA(void)
     }
 }
 
-CCarGenerator *CTheCarGeneratorsSA::GetCarGenerator(DWORD dwIndex)
+CCarGenerator* CTheCarGeneratorsSA::GetCarGenerator(DWORD dwIndex)
 {
     DEBUG_TRACE("CCarGenerator * CTheCarGeneratorsSA::GetCarGenerator(DWORD dwIndex)");
     if (dwIndex < MAX_CAR_GENERATORS)

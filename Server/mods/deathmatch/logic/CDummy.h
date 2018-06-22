@@ -27,4 +27,3 @@ public:
 private:
     class CGroups* m_pGroups;
 };
-
