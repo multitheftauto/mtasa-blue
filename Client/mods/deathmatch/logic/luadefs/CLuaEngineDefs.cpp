@@ -35,7 +35,7 @@ void CLuaEngineDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("engineGetVisibleTextureNames", EngineGetVisibleTextureNames);
 
     CLuaCFunctions::AddFunction("engineDFFGetProperties", EngineDFFGetProperties);
-  
+
     // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
     // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
     // CLuaCFunctions::AddFunction ( "enginePositionAtomic", EnginePositionAtomic );
@@ -182,7 +182,7 @@ int CLuaEngineDefs::EngineLoadDFF(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (pResource)
             {
-                bool bIsRawData = CClientDFF::IsDFFData(strFile);
+                bool    bIsRawData = CClientDFF::IsDFFData(strFile);
                 SString strPath;
                 // Is this a legal filepath?
                 if (bIsRawData || CResourceManager::ParseResourcePathInput(strFile, pResource, &strPath))
@@ -199,10 +199,10 @@ int CLuaEngineDefs::EngineLoadDFF(lua_State* luaVM)
                         // Success loading the file. Set parent to DFF root
                         pDFF->SetParent(pRoot);
 
-                        if ( strModelName != "" )
+                        if (strModelName != "")
                         {
-                            ushort usModelID = CModelNames::ResolveModelID ( strModelName );
-                            if ( usModelID != INVALID_MODEL_ID )
+                            ushort usModelID = CModelNames::ResolveModelID(strModelName);
+                            if (usModelID != INVALID_MODEL_ID)
                                 pDFF->m_usModelID = usModelID;
 
                             if (!CClientDFFManager::IsReplacableModel(usModelID))
@@ -230,8 +230,8 @@ int CLuaEngineDefs::EngineLoadDFF(lua_State* luaVM)
             }
         }
     }
-    if ( argStream.HasErrors())
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage());
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // We failed
     lua_pushboolean(luaVM, false);
@@ -459,9 +459,9 @@ int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         ushort usModelID = INVALID_MODEL_ID;
-        if ( pDFF->m_strModelName != "")
+        if (pDFF->m_strModelName != "")
         {
-            usModelID = CModelNames::ResolveModelID ( pDFF->m_strModelName );
+            usModelID = CModelNames::ResolveModelID(pDFF->m_strModelName);
         }
         else
         {
@@ -480,7 +480,7 @@ int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
         else
             argStream.SetCustomError("Expected valid model ID or name at argument 2");
     }
-    if ( argStream.HasErrors())
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
@@ -944,120 +944,119 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineDFFGetProperties(lua_State* luaVM)
 {
-    CClientDFF* pDFF;
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pDFF );
+    CClientDFF*      pDFF;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pDFF);
 
-    if ( !argStream.HasErrors ( ) )
+    if (!argStream.HasErrors())
     {
         ushort usModelID = pDFF->m_usModelID;
-        if ( usModelID != INVALID_MODEL_ID )
+        if (usModelID != INVALID_MODEL_ID)
         {
-            RpClump* pClump = pDFF->GetLoadedClump ( usModelID );
-            if ( pClump )
+            RpClump* pClump = pDFF->GetLoadedClump(usModelID);
+            if (pClump)
             {
-                RpAtomic* pAtomic = pClump->getAtomic ( );
-                if ( !pAtomic )
+                RpAtomic* pAtomic = pClump->getAtomic();
+                if (!pAtomic)
                 {
-                    lua_pushboolean ( luaVM, false );
+                    lua_pushboolean(luaVM, false);
                     return 1;
                 }
-                RwFrame* pFrame = pAtomic->getFrame ( );
-                if ( !pFrame )
+                RwFrame* pFrame = pAtomic->getFrame();
+                if (!pFrame)
                 {
-                    lua_pushboolean ( luaVM, false );
+                    lua_pushboolean(luaVM, false);
                     return 1;
                 }
                 RpGeometry* pGeometry = pAtomic->geometry;
-                if ( !pGeometry )
+                if (!pGeometry)
                 {
-                    lua_pushboolean ( luaVM, false );
+                    lua_pushboolean(luaVM, false);
                     return 1;
                 }
-                lua_newtable ( luaVM );
+                lua_newtable(luaVM);
 
-                lua_pushstring ( luaVM, "model" );
-                lua_pushnumber ( luaVM, usModelID );
-                lua_settable ( luaVM, -3 );
+                lua_pushstring(luaVM, "model");
+                lua_pushnumber(luaVM, usModelID);
+                lua_settable(luaVM, -3);
 
-                lua_pushstring ( luaVM, "verticesCount" );
-                lua_pushnumber ( luaVM, pGeometry->vertices_size );
-                lua_settable ( luaVM, -3 );
+                lua_pushstring(luaVM, "verticesCount");
+                lua_pushnumber(luaVM, pGeometry->vertices_size);
+                lua_settable(luaVM, -3);
 
-                lua_pushstring ( luaVM, "trianglesCount" );
-                lua_pushnumber ( luaVM, pGeometry->triangles_size );
-                lua_settable  (luaVM, -3 );
+                lua_pushstring(luaVM, "trianglesCount");
+                lua_pushnumber(luaVM, pGeometry->triangles_size);
+                lua_settable(luaVM, -3);
 
-                lua_pushstring ( luaVM, "materialsCount" );
-                lua_pushnumber ( luaVM, pGeometry->materials.entries );
-                lua_settable ( luaVM, -3 );
+                lua_pushstring(luaVM, "materialsCount");
+                lua_pushnumber(luaVM, pGeometry->materials.entries);
+                lua_settable(luaVM, -3);
 
-                lua_pushstring ( luaVM, "morphTargetCount" );
-                lua_pushnumber ( luaVM, pGeometry->morphTarget_size );
-                lua_settable ( luaVM, -3 );
+                lua_pushstring(luaVM, "morphTargetCount");
+                lua_pushnumber(luaVM, pGeometry->morphTarget_size);
+                lua_settable(luaVM, -3);
 
                 lua_pushstring(luaVM, "meshCount");
-                lua_pushnumber (luaVM, pGeometry->header->numMeshes );
-                lua_settable ( luaVM, -3 );
+                lua_pushnumber(luaVM, pGeometry->header->numMeshes);
+                lua_settable(luaVM, -3);
 
-                lua_pushstring (luaVM, "uvCoordsCount" );
-                lua_pushnumber ( luaVM, pGeometry->texcoords_size );
-                lua_settable ( luaVM, -3 );
+                lua_pushstring(luaVM, "uvCoordsCount");
+                lua_pushnumber(luaVM, pGeometry->texcoords_size);
+                lua_settable(luaVM, -3);
 
-                lua_pushstring ( luaVM, "flags" );
-                lua_pushnumber ( luaVM, pGeometry->flags );
-                lua_settable ( luaVM, -3 );
+                lua_pushstring(luaVM, "flags");
+                lua_pushnumber(luaVM, pGeometry->flags);
+                lua_settable(luaVM, -3);
 
                 CVector vecMin;
                 CVector vecMax;
-                for ( ushort i = 0; i < pGeometry->vertices_size; i++ )
+                for (ushort i = 0; i < pGeometry->vertices_size; i++)
                 {
-                    RwV3d vVert = pGeometry->morphTarget->verts [ i ];
-                    if ( vVert.x < vecMin.fX )
+                    RwV3d vVert = pGeometry->morphTarget->verts[i];
+                    if (vVert.x < vecMin.fX)
                         vecMin.fX = vVert.x;
-                    if ( vVert.y < vecMin.fY )
+                    if (vVert.y < vecMin.fY)
                         vecMin.fZ = vVert.y;
-                    if ( vVert.z < vecMin.fZ )
+                    if (vVert.z < vecMin.fZ)
                         vecMin.fZ = vVert.z;
 
-                    if ( vVert.x > vecMax.fX )
+                    if (vVert.x > vecMax.fX)
                         vecMax.fX = vVert.x;
-                    if ( vVert.y > vecMax.fY )
+                    if (vVert.y > vecMax.fY)
                         vecMax.fZ = vVert.y;
-                    if ( vVert.z > vecMax.fZ )
+                    if (vVert.z > vecMax.fZ)
                         vecMax.fZ = vVert.z;
                 }
 
+                lua_pushstring(luaVM, "boundingBox");
+                lua_newtable(luaVM);
+                lua_pushstring(luaVM, "radius");
+                lua_pushnumber(luaVM, pAtomic->bsphereLocal.radius);
+                lua_settable(luaVM, -3);
 
-                lua_pushstring ( luaVM, "boundingBox" );
-                lua_newtable ( luaVM );
-                lua_pushstring ( luaVM, "radius" );
-                lua_pushnumber ( luaVM, pAtomic->bsphereLocal.radius );
-                lua_settable ( luaVM, -3 );
+                lua_pushstring(luaVM, "center");
+                lua_pushvector(luaVM, pAtomic->bsphereLocal.position.getVector());
+                lua_settable(luaVM, -3);
 
-                lua_pushstring ( luaVM, "center" );
-                lua_pushvector ( luaVM, pAtomic->bsphereLocal.position.getVector ( ) );
-                lua_settable ( luaVM, -3 );
+                lua_pushstring(luaVM, "min");
+                lua_pushvector(luaVM, vecMin);
+                lua_settable(luaVM, -3);
 
-                lua_pushstring ( luaVM, "min" );
-                lua_pushvector ( luaVM, vecMin );
-                lua_settable ( luaVM, -3 );
-
-                lua_pushstring ( luaVM, "max" );
-                lua_pushvector ( luaVM, vecMax );
-                lua_settable  (luaVM, -3 );
-                lua_settable ( luaVM, -3 );
+                lua_pushstring(luaVM, "max");
+                lua_pushvector(luaVM, vecMax);
+                lua_settable(luaVM, -3);
+                lua_settable(luaVM, -3);
                 return 1;
             }
             else
-                argStream.SetCustomError ( SString ( "Model ID %d failed", usModelID ) );
+                argStream.SetCustomError(SString("Model ID %d failed", usModelID));
         }
         else
-            argStream.SetCustomError ( "Expected valid model ID or name at argument 2" );
+            argStream.SetCustomError("Expected valid model ID or name at argument 2");
     }
-    if ( argStream.HasErrors ( ) )
-        m_pScriptDebugging->LogCustom( luaVM, argStream.GetFullErrorMessage ( ) );
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }

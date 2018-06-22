@@ -47,12 +47,13 @@ public:
 
     // Sorta a hack that these are required by CClientEntity...
 
-    void Unlink(void){};
-    void GetPosition(CVector& vecPosition) const {};
-    void SetPosition(const CVector& vecPosition){};
-    RpClump* GetLoadedClump ( ushort usModelId );
-    ushort m_usModelID;
-    SString m_strModelName;
+    void     Unlink(void){};
+    void     GetPosition(CVector& vecPosition) const {};
+    void     SetPosition(const CVector& vecPosition){};
+    RpClump* GetLoadedClump(ushort usModelId);
+    ushort   m_usModelID;
+    SString  m_strModelName;
+
 protected:
     bool DoReplaceModel(unsigned short usModel, bool bAlphaTransparency);
     void UnloadDFF(void);
