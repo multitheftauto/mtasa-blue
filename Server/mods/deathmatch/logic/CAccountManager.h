@@ -140,6 +140,7 @@ public:
 
     void GetAccountsBySerial(const SString& strSerial, std::vector<CAccount*>& outAccounts);
     void GetAccountsByIP(const SString& strIP, std::vector<CAccount*>& outAccounts);
+    CAccount* GetAccountByID(int ID);
     void GetAccountsByData(const SString& dataName, const SString& value, std::vector<CAccount*>& outAccounts);
 
     CAccount* AddGuestAccount(const SString& strName);
