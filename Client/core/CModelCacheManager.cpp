@@ -1,11 +1,11 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 #include "CModelCacheManager.h"
@@ -14,15 +14,14 @@ namespace
 {
     struct SModelCacheInfo
     {
-        SModelCacheInfo ( void ) : fClosestDistSq ( 0 ), bIsModelCachedHere ( false ), bIsModelLoadedByGame ( false ) {}
+        SModelCacheInfo(void) : fClosestDistSq(0), bIsModelCachedHere(false), bIsModelLoadedByGame(false) {}
         CTickCount lastNeeded;
         CTickCount firstNeeded;
-        float fClosestDistSq;
-        bool bIsModelCachedHere;
-        bool bIsModelLoadedByGame;
+        float      fClosestDistSq;
+        bool       bIsModelCachedHere;
+        bool       bIsModelLoadedByGame;
     };
-}
-
+}            // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -37,38 +36,37 @@ public:
     ZERO_ON_NEW
 
     // CModelCacheManager interface
-    virtual void                DoPulse                             ( void );
-    virtual void                GetStats                            ( SModelCacheStats& outStats );
-    virtual bool                UnloadModel                         ( ushort usModelId );
-    virtual void                OnRestreamModel                     ( ushort usModelId );
-    virtual void                OnClientClose                       ( void );
-    virtual void                UpdatePedModelCaching               ( const std::map < ushort, float >& newNeedCacheList );
-    virtual void                UpdateVehicleModelCaching           ( const std::map < ushort, float >& newNeedCacheList );
-    virtual void                AddModelToPersistentCache           ( ushort usModelId );
+    virtual void DoPulse(void);
+    virtual void GetStats(SModelCacheStats& outStats);
+    virtual bool UnloadModel(ushort usModelId);
+    virtual void OnRestreamModel(ushort usModelId);
+    virtual void OnClientClose(void);
+    virtual void UpdatePedModelCaching(const std::map<ushort, float>& newNeedCacheList);
+    virtual void UpdateVehicleModelCaching(const std::map<ushort, float>& newNeedCacheList);
+    virtual void AddModelToPersistentCache(ushort usModelId);
 
     // CModelCacheManagerImpl methods
-                                CModelCacheManagerImpl              ( void );
-                                ~CModelCacheManagerImpl             ( void );
+    CModelCacheManagerImpl(void);
+    ~CModelCacheManagerImpl(void);
 
-    void                        PreLoad                             ( void );
-    void                        RemoveCacheRefs                     ( std::map < ushort, SModelCacheInfo >& currentCacheInfoMap );
-    void                        UpdateModelCaching                  ( const std::map < ushort, float >& newNeededList, std::map < ushort, SModelCacheInfo >& currentCacheInfoMap, uint uiMaxCachedAllowed );
-    int                         GetModelRefCount                    ( ushort usModelId );
-    void                        AddModelRefCount                    ( ushort usModelId );
-    void                        SubModelRefCount                    ( ushort usModelId );
+    void PreLoad(void);
+    void RemoveCacheRefs(std::map<ushort, SModelCacheInfo>& currentCacheInfoMap);
+    void UpdateModelCaching(const std::map<ushort, float>& newNeededList, std::map<ushort, SModelCacheInfo>& currentCacheInfoMap, uint uiMaxCachedAllowed);
+    int  GetModelRefCount(ushort usModelId);
+    void AddModelRefCount(ushort usModelId);
+    void SubModelRefCount(ushort usModelId);
 
 protected:
-    CGame*                      m_pGame;
-    int                         m_iFrameCounter;
-    CTickCount                  m_TickCountNow;
-    bool                        m_bDonePreLoad;
-    uint                        m_uiMaxCachedPedModels;
-    uint                        m_uiMaxCachedVehicleModels;
-    std::map < ushort, SModelCacheInfo >    m_PedModelCacheInfoMap;
-    std::map < ushort, SModelCacheInfo >    m_VehicleModelCacheInfoMap;
-    std::set < ushort >         m_PermoLoadedModels;
+    CGame*                            m_pGame;
+    int                               m_iFrameCounter;
+    CTickCount                        m_TickCountNow;
+    bool                              m_bDonePreLoad;
+    uint                              m_uiMaxCachedPedModels;
+    uint                              m_uiMaxCachedVehicleModels;
+    std::map<ushort, SModelCacheInfo> m_PedModelCacheInfoMap;
+    std::map<ushort, SModelCacheInfo> m_VehicleModelCacheInfoMap;
+    std::set<ushort>                  m_PermoLoadedModels;
 };
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -76,22 +74,20 @@ protected:
 //
 //
 ///////////////////////////////////////////////////////////////
-CModelCacheManager* NewModelCacheManager ()
+CModelCacheManager* NewModelCacheManager()
 {
-    return new CModelCacheManagerImpl ();
+    return new CModelCacheManagerImpl();
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
 // CModelCacheManagerImpl::CModelCacheManagerImpl
 //
 ///////////////////////////////////////////////////////////////
-CModelCacheManagerImpl::CModelCacheManagerImpl ( void )
+CModelCacheManagerImpl::CModelCacheManagerImpl(void)
 {
-    m_pGame = CCore::GetSingleton ().GetGame ();
+    m_pGame = CCore::GetSingleton().GetGame();
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -100,10 +96,9 @@ CModelCacheManagerImpl::CModelCacheManagerImpl ( void )
 // Clean up when quitting
 //
 ///////////////////////////////////////////////////////////////
-CModelCacheManagerImpl::~CModelCacheManagerImpl ( void )
+CModelCacheManagerImpl::~CModelCacheManagerImpl(void)
 {
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -112,11 +107,10 @@ CModelCacheManagerImpl::~CModelCacheManagerImpl ( void )
 // Clean up when client.dll unloads
 //
 ///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::OnClientClose ( void )
+void CModelCacheManagerImpl::OnClientClose(void)
 {
     // Remove all extra refs applied here
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -131,14 +125,14 @@ void CModelCacheManagerImpl::OnClientClose ( void )
 // Vehicles(500-599) KB:   14,888
 //
 ///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::PreLoad ( void )
+void CModelCacheManagerImpl::PreLoad(void)
 {
-    if ( m_bDonePreLoad )
+    if (m_bDonePreLoad)
         return;
 
     m_bDonePreLoad = true;
 
-    CTickCount startTicks = CTickCount::Now ();
+    CTickCount startTicks = CTickCount::Now();
 #if 0
     for ( uint i = 321 ; i <= 372 ; i++ )
     {
@@ -146,86 +140,84 @@ void CModelCacheManagerImpl::PreLoad ( void )
             AddModelRefCount ( i );
     }
 #endif
-    m_pGame->GetStreaming()->LoadAllRequestedModels ( false );
+    m_pGame->GetStreaming()->LoadAllRequestedModels(false);
 
     // Get current limits
-    int bSlowMethod = GetApplicationSettingInt( DIAG_PRELOAD_UPGRADES_SLOW );
-    int iLowestUnsafeUpgrade = GetApplicationSettingInt( DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE );
-    SetApplicationSetting( DIAG_CRASH_EXTRA_MSG, "** AUTO FIXING CRASH (Step 1/2) **\n\n** Please continue and connect to a server **" );
+    int bSlowMethod = GetApplicationSettingInt(DIAG_PRELOAD_UPGRADES_SLOW);
+    int iLowestUnsafeUpgrade = GetApplicationSettingInt(DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE);
+    SetApplicationSetting(DIAG_CRASH_EXTRA_MSG, "** AUTO FIXING CRASH (Step 1/2) **\n\n** Please continue and connect to a server **");
 
     // Crashed during previous PreLoad?
-    if ( WatchDogIsSectionOpen( WD_SECTION_PRELOAD_UPGRADES ) )
+    if (WatchDogIsSectionOpen(WD_SECTION_PRELOAD_UPGRADES))
     {
-        AddReportLog( 8545, SString( "PreLoad Upgrades - Crash detect - bSlowMethod:%d  iLowestUnsafeUpgrade:%d", bSlowMethod, iLowestUnsafeUpgrade ) );
-        iLowestUnsafeUpgrade = GetApplicationSettingInt( DIAG_PRELOAD_UPGRADE_ATTEMPT_ID );
+        AddReportLog(8545, SString("PreLoad Upgrades - Crash detect - bSlowMethod:%d  iLowestUnsafeUpgrade:%d", bSlowMethod, iLowestUnsafeUpgrade));
+        iLowestUnsafeUpgrade = GetApplicationSettingInt(DIAG_PRELOAD_UPGRADE_ATTEMPT_ID);
         bSlowMethod = 1;
-        SetApplicationSettingInt( DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE, iLowestUnsafeUpgrade );
-        SetApplicationSettingInt( DIAG_PRELOAD_UPGRADES_SLOW, bSlowMethod );
-        SetApplicationSetting( DIAG_CRASH_EXTRA_MSG, "** AUTO FIXING CRASH (Step 2/2) **\n\n** Please continue and connect to a server **" );
+        SetApplicationSettingInt(DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE, iLowestUnsafeUpgrade);
+        SetApplicationSettingInt(DIAG_PRELOAD_UPGRADES_SLOW, bSlowMethod);
+        SetApplicationSetting(DIAG_CRASH_EXTRA_MSG, "** AUTO FIXING CRASH (Step 2/2) **\n\n** Please continue and connect to a server **");
     }
 
-    if ( iLowestUnsafeUpgrade == 0 )
+    if (iLowestUnsafeUpgrade == 0)
         iLowestUnsafeUpgrade = 1194;
 
     // PreLoad upgrades
-    WatchDogBeginSection( WD_SECTION_PRELOAD_UPGRADES );
+    WatchDogBeginSection(WD_SECTION_PRELOAD_UPGRADES);
     {
-        for ( int i = 1000 ; i < iLowestUnsafeUpgrade ; i++ )
+        for (int i = 1000; i < iLowestUnsafeUpgrade; i++)
         {
-            if ( bSlowMethod )
-                SetApplicationSettingInt( DIAG_PRELOAD_UPGRADE_ATTEMPT_ID, i );
-            AddModelRefCount ( i );
-            if ( bSlowMethod )
-                m_pGame->GetStreaming()->LoadAllRequestedModels ( false );
+            if (bSlowMethod)
+                SetApplicationSettingInt(DIAG_PRELOAD_UPGRADE_ATTEMPT_ID, i);
+            AddModelRefCount(i);
+            if (bSlowMethod)
+                m_pGame->GetStreaming()->LoadAllRequestedModels(false);
         }
-        m_pGame->GetStreaming()->LoadAllRequestedModels ( false );
+        m_pGame->GetStreaming()->LoadAllRequestedModels(false);
     }
-    WatchDogCompletedSection( WD_SECTION_PRELOAD_UPGRADES );
-    SetApplicationSetting( DIAG_CRASH_EXTRA_MSG, "" );
+    WatchDogCompletedSection(WD_SECTION_PRELOAD_UPGRADES);
+    SetApplicationSetting(DIAG_CRASH_EXTRA_MSG, "");
 
     // Report if LowestUnsafeUpgrade has fallen
-    int iPrevHiScore = GetApplicationSettingInt( DIAG_PRELOAD_UPGRADES_HISCORE );
-    SetApplicationSettingInt( DIAG_PRELOAD_UPGRADES_HISCORE, iLowestUnsafeUpgrade );
-    if ( iPrevHiScore > iLowestUnsafeUpgrade )
-        AddReportLog( 8544, SString( "PreLoad Upgrades - LowestUnsafeUpgrade fallen from %d to %d", iPrevHiScore, iLowestUnsafeUpgrade ) );
+    int iPrevHiScore = GetApplicationSettingInt(DIAG_PRELOAD_UPGRADES_HISCORE);
+    SetApplicationSettingInt(DIAG_PRELOAD_UPGRADES_HISCORE, iLowestUnsafeUpgrade);
+    if (iPrevHiScore > iLowestUnsafeUpgrade)
+        AddReportLog(8544, SString("PreLoad Upgrades - LowestUnsafeUpgrade fallen from %d to %d", iPrevHiScore, iLowestUnsafeUpgrade));
 
-    CTickCount deltaTicks = CTickCount::Now () - startTicks;
-    OutputDebugLine ( SString ( "CModelCacheManagerImpl::PreLoad completed in %d ms", deltaTicks.ToInt () ) );
+    CTickCount deltaTicks = CTickCount::Now() - startTicks;
+    OutputDebugLine(SString("CModelCacheManagerImpl::PreLoad completed in %d ms", deltaTicks.ToInt()));
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
 // CModelCacheManagerImpl::GetStats
 //
 ///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::GetStats ( SModelCacheStats& outStats )
+void CModelCacheManagerImpl::GetStats(SModelCacheStats& outStats)
 {
     outStats.uiMaxNumPedModels = m_uiMaxCachedPedModels;
     outStats.uiMaxNumVehicleModels = m_uiMaxCachedVehicleModels;
     outStats.uiNumPedModels = 0;
     outStats.uiNumVehicleModels = 0;
 
-    for ( std::map < ushort, SModelCacheInfo >::const_iterator iter = m_PedModelCacheInfoMap.begin () ; iter != m_PedModelCacheInfoMap.end () ; ++iter )
-        if ( iter->second.bIsModelCachedHere )
+    for (std::map<ushort, SModelCacheInfo>::const_iterator iter = m_PedModelCacheInfoMap.begin(); iter != m_PedModelCacheInfoMap.end(); ++iter)
+        if (iter->second.bIsModelCachedHere)
             outStats.uiNumPedModels++;
 
-    for ( std::map < ushort, SModelCacheInfo >::const_iterator iter = m_VehicleModelCacheInfoMap.begin () ; iter != m_VehicleModelCacheInfoMap.end () ; ++iter )
-        if ( iter->second.bIsModelCachedHere )
+    for (std::map<ushort, SModelCacheInfo>::const_iterator iter = m_VehicleModelCacheInfoMap.begin(); iter != m_VehicleModelCacheInfoMap.end(); ++iter)
+        if (iter->second.bIsModelCachedHere)
             outStats.uiNumVehicleModels++;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
 // CModelCacheManagerImpl::DoPulse
 //
 ///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::DoPulse ( void )
+void CModelCacheManagerImpl::DoPulse(void)
 {
-    m_TickCountNow = CTickCount::Now ();
+    m_TickCountNow = CTickCount::Now();
 
-    PreLoad ();
+    PreLoad();
 
     // Adjust cache numbers depending on amount of streaming memory allocated
     //
@@ -234,16 +226,14 @@ void CModelCacheManagerImpl::DoPulse ( void )
     //  128MB streaming = 8+8 MB for peds & vehicles        36 peds + 56 veh
     //  256MB streaming = 16+8 MB for peds & vehicles       72 peds + 56 veh
     //
-    int iStreamingMemoryAvailableKB             = *(int*)0x08A5A80;
+    int iStreamingMemoryAvailableKB = *(int*)0x08A5A80;
 
-    SSamplePoint < float > pedPoints[] = { {65536, 9},  {98304, 18},   {131072, 36},   {262144, 72} };
-    SSamplePoint < float > vehPoints[] = { {65536, 7},  {98304, 28},   {131072, 56},   {262144, 56} };
+    SSamplePoint<float> pedPoints[] = {{65536, 9}, {98304, 18}, {131072, 36}, {262144, 72}};
+    SSamplePoint<float> vehPoints[] = {{65536, 7}, {98304, 28}, {131072, 56}, {262144, 56}};
 
-    m_uiMaxCachedPedModels = (int)EvalSamplePosition < float > ( pedPoints, NUMELMS ( pedPoints ), (float)iStreamingMemoryAvailableKB );
-    m_uiMaxCachedVehicleModels = (int)EvalSamplePosition < float > ( vehPoints, NUMELMS ( vehPoints ), (float)iStreamingMemoryAvailableKB );
-
+    m_uiMaxCachedPedModels = (int)EvalSamplePosition<float>(pedPoints, NUMELMS(pedPoints), (float)iStreamingMemoryAvailableKB);
+    m_uiMaxCachedVehicleModels = (int)EvalSamplePosition<float>(vehPoints, NUMELMS(vehPoints), (float)iStreamingMemoryAvailableKB);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -252,15 +242,14 @@ void CModelCacheManagerImpl::DoPulse ( void )
 // Keep this model around 4 evar now
 //
 ///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::AddModelToPersistentCache ( ushort usModelId )
+void CModelCacheManagerImpl::AddModelToPersistentCache(ushort usModelId)
 {
-    if ( !MapContains ( m_PermoLoadedModels, usModelId ) )
+    if (!MapContains(m_PermoLoadedModels, usModelId))
     {
-        AddModelRefCount ( usModelId );
-        MapInsert ( m_PermoLoadedModels, usModelId );
+        AddModelRefCount(usModelId);
+        MapInsert(m_PermoLoadedModels, usModelId);
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -269,12 +258,11 @@ void CModelCacheManagerImpl::AddModelToPersistentCache ( ushort usModelId )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::UpdatePedModelCaching ( const std::map < ushort, float >& newNeedCacheList )
+void CModelCacheManagerImpl::UpdatePedModelCaching(const std::map<ushort, float>& newNeedCacheList)
 {
-    DoPulse ();
-    UpdateModelCaching ( newNeedCacheList, m_PedModelCacheInfoMap, m_uiMaxCachedPedModels );
+    DoPulse();
+    UpdateModelCaching(newNeedCacheList, m_PedModelCacheInfoMap, m_uiMaxCachedPedModels);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -283,202 +271,194 @@ void CModelCacheManagerImpl::UpdatePedModelCaching ( const std::map < ushort, fl
 //
 //
 ///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::UpdateVehicleModelCaching ( const std::map < ushort, float >& newNeedCacheList )
+void CModelCacheManagerImpl::UpdateVehicleModelCaching(const std::map<ushort, float>& newNeedCacheList)
 {
-    DoPulse ();
-    UpdateModelCaching ( newNeedCacheList, m_VehicleModelCacheInfoMap, m_uiMaxCachedVehicleModels );
+    DoPulse();
+    UpdateModelCaching(newNeedCacheList, m_VehicleModelCacheInfoMap, m_uiMaxCachedVehicleModels);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
 // CModelCacheManagerImpl::RemoveCacheRefs
 //
 ///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::RemoveCacheRefs ( std::map < ushort, SModelCacheInfo >& currentCacheInfoMap )
+void CModelCacheManagerImpl::RemoveCacheRefs(std::map<ushort, SModelCacheInfo>& currentCacheInfoMap)
 {
-    for ( std::map < ushort, SModelCacheInfo >::iterator iter = currentCacheInfoMap.begin () ; iter != currentCacheInfoMap.end () ; ++iter )
+    for (std::map<ushort, SModelCacheInfo>::iterator iter = currentCacheInfoMap.begin(); iter != currentCacheInfoMap.end(); ++iter)
     {
-        const ushort usModelId = iter->first;
+        const ushort     usModelId = iter->first;
         SModelCacheInfo& info = iter->second;
 
-        if ( info.bIsModelCachedHere )
+        if (info.bIsModelCachedHere)
         {
-            SubModelRefCount ( usModelId );
+            SubModelRefCount(usModelId);
             info.bIsModelCachedHere = false;
         }
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
 // CModelCacheManagerImpl::UpdateModelCaching
 //
 ///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::UpdateModelCaching ( const std::map < ushort, float >& newNeedCacheList, std::map < ushort, SModelCacheInfo >& currentCacheInfoMap, uint uiMaxCachedAllowed )
+void CModelCacheManagerImpl::UpdateModelCaching(const std::map<ushort, float>& newNeedCacheList, std::map<ushort, SModelCacheInfo>& currentCacheInfoMap,
+                                                uint uiMaxCachedAllowed)
 {
     // Update some flags and remove info for uncached and unneeded
-    for ( std::map < ushort, SModelCacheInfo >::iterator iter = currentCacheInfoMap.begin () ; iter != currentCacheInfoMap.end () ; )
+    for (std::map<ushort, SModelCacheInfo>::iterator iter = currentCacheInfoMap.begin(); iter != currentCacheInfoMap.end();)
     {
-        const ushort usModelId = iter->first;
+        const ushort     usModelId = iter->first;
         SModelCacheInfo& info = iter->second;
 
-        info.bIsModelLoadedByGame = GetModelRefCount ( usModelId ) > ( info.bIsModelCachedHere ? 1 : 0 );
+        info.bIsModelLoadedByGame = GetModelRefCount(usModelId) > (info.bIsModelCachedHere ? 1 : 0);
 
-        if ( !info.bIsModelLoadedByGame && !info.bIsModelCachedHere )
+        if (!info.bIsModelLoadedByGame && !info.bIsModelCachedHere)
         {
-            if ( ( m_TickCountNow - info.lastNeeded ).ToInt () > 1000 )
+            if ((m_TickCountNow - info.lastNeeded).ToInt() > 1000)
             {
                 // Not loaded, cached or needed for 1 second, so remove info
-                currentCacheInfoMap.erase ( iter++ );
+                currentCacheInfoMap.erase(iter++);
                 continue;
             }
         }
         ++iter;
     }
 
-
-    // Update current from new needed 
-    for ( std::map < ushort, float >::const_iterator iter = newNeedCacheList.begin () ; iter != newNeedCacheList.end () ; ++iter )
+    // Update current from new needed
+    for (std::map<ushort, float>::const_iterator iter = newNeedCacheList.begin(); iter != newNeedCacheList.end(); ++iter)
     {
-        SModelCacheInfo& info = MapGet ( currentCacheInfoMap, iter->first );
+        SModelCacheInfo& info = MapGet(currentCacheInfoMap, iter->first);
         info.fClosestDistSq = iter->second;
         info.lastNeeded = m_TickCountNow;
-        if ( info.firstNeeded.ToInt () == 0 )
+        if (info.firstNeeded.ToInt() == 0)
             info.firstNeeded = m_TickCountNow;
     }
 
-
     uint uiNumModelsCachedHereOnly = 0;
 
-    std::map < uint, ushort > maybeUncacheUnneededList;
-    std::map < uint, ushort > maybeUncacheNeededList;
-    std::map < uint, ushort > maybeCacheList;
+    std::map<uint, ushort> maybeUncacheUnneededList;
+    std::map<uint, ushort> maybeUncacheNeededList;
+    std::map<uint, ushort> maybeCacheList;
 
-    // Update active 
-    for ( std::map < ushort, SModelCacheInfo >::iterator iter = currentCacheInfoMap.begin () ; iter != currentCacheInfoMap.end () ; ++iter )
+    // Update active
+    for (std::map<ushort, SModelCacheInfo>::iterator iter = currentCacheInfoMap.begin(); iter != currentCacheInfoMap.end(); ++iter)
     {
-        const ushort usModelId = iter->first;
+        const ushort     usModelId = iter->first;
         SModelCacheInfo& info = iter->second;
 
-        if ( info.bIsModelLoadedByGame )
+        if (info.bIsModelLoadedByGame)
         {
             info.lastNeeded = m_TickCountNow;
 
             // Add cache ref here so when game tries to unload the model, we can keep it loaded
-            if ( !info.bIsModelCachedHere )
+            if (!info.bIsModelCachedHere)
             {
-                AddModelRefCount ( usModelId );
+                AddModelRefCount(usModelId);
                 info.bIsModelCachedHere = true;
             }
         }
         else
         {
-            if ( info.bIsModelCachedHere )
+            if (info.bIsModelCachedHere)
             {
                 uiNumModelsCachedHereOnly++;
                 // Update cached models that could be uncached
-                uint uiTicksSinceLastNeeded = ( m_TickCountNow - info.lastNeeded ).ToInt ();
-                if ( uiTicksSinceLastNeeded > 0 )
-                    MapSet ( maybeUncacheUnneededList, uiTicksSinceLastNeeded, usModelId );
+                uint uiTicksSinceLastNeeded = (m_TickCountNow - info.lastNeeded).ToInt();
+                if (uiTicksSinceLastNeeded > 0)
+                    MapSet(maybeUncacheUnneededList, uiTicksSinceLastNeeded, usModelId);
                 else
-                    MapSet ( maybeUncacheNeededList, (int)info.fClosestDistSq, usModelId );
+                    MapSet(maybeUncacheNeededList, (int)info.fClosestDistSq, usModelId);
             }
             else
             {
-                if ( info.lastNeeded == m_TickCountNow )
+                if (info.lastNeeded == m_TickCountNow)
                 {
                     // Update uncached models that could be cached
-                    uint uiTicksSinceFirstNeeded = ( m_TickCountNow - info.firstNeeded ).ToInt ();
-                    MapSet ( maybeCacheList, uiTicksSinceFirstNeeded, usModelId );
+                    uint uiTicksSinceFirstNeeded = (m_TickCountNow - info.firstNeeded).ToInt();
+                    MapSet(maybeCacheList, uiTicksSinceFirstNeeded, usModelId);
                 }
             }
         }
     }
 
     // If at or above cache limit, try to uncache unneeded first
-    if ( uiNumModelsCachedHereOnly >= uiMaxCachedAllowed && !maybeUncacheUnneededList.empty () )
+    if (uiNumModelsCachedHereOnly >= uiMaxCachedAllowed && !maybeUncacheUnneededList.empty())
     {
-        const ushort usModelId = maybeUncacheUnneededList.rbegin ()->second;
-        SModelCacheInfo* pInfo = MapFind ( currentCacheInfoMap, usModelId );
-        assert ( pInfo );
-        assert ( pInfo->bIsModelCachedHere );
-        SubModelRefCount ( usModelId );
+        const ushort     usModelId = maybeUncacheUnneededList.rbegin()->second;
+        SModelCacheInfo* pInfo = MapFind(currentCacheInfoMap, usModelId);
+        assert(pInfo);
+        assert(pInfo->bIsModelCachedHere);
+        SubModelRefCount(usModelId);
         pInfo->bIsModelCachedHere = false;
-        MapRemove ( currentCacheInfoMap, usModelId );
-        OutputDebugLine ( SString ( "[Cache] End caching model %d  (UncacheUnneeded)", usModelId ) );
+        MapRemove(currentCacheInfoMap, usModelId);
+        OutputDebugLine(SString("[Cache] End caching model %d  (UncacheUnneeded)", usModelId));
     }
-    else
-    if ( uiNumModelsCachedHereOnly > uiMaxCachedAllowed && !maybeUncacheNeededList.empty () )
+    else if (uiNumModelsCachedHereOnly > uiMaxCachedAllowed && !maybeUncacheNeededList.empty())
     {
         // Only uncache from the needed list if above limit
 
         // Uncache furthest away model
-        const ushort usModelId = maybeUncacheNeededList.rbegin ()->second;
-        SModelCacheInfo* pInfo = MapFind ( currentCacheInfoMap, usModelId );
-        assert ( pInfo );
-        assert ( pInfo->bIsModelCachedHere );
-        SubModelRefCount ( usModelId );
+        const ushort     usModelId = maybeUncacheNeededList.rbegin()->second;
+        SModelCacheInfo* pInfo = MapFind(currentCacheInfoMap, usModelId);
+        assert(pInfo);
+        assert(pInfo->bIsModelCachedHere);
+        SubModelRefCount(usModelId);
         pInfo->bIsModelCachedHere = false;
-        MapRemove ( currentCacheInfoMap, usModelId );
-        OutputDebugLine ( SString ( "[Cache] End caching model %d  (UncacheNeeded)", usModelId ) );
+        MapRemove(currentCacheInfoMap, usModelId);
+        OutputDebugLine(SString("[Cache] End caching model %d  (UncacheNeeded)", usModelId));
     }
 
     // Cache if room
-    if ( !maybeCacheList.empty () && uiNumModelsCachedHereOnly < uiMaxCachedAllowed )
+    if (!maybeCacheList.empty() && uiNumModelsCachedHereOnly < uiMaxCachedAllowed)
     {
         // Cache one which has been waiting the longest
-        const ushort usModelId = maybeCacheList.rbegin ()->second;
-        SModelCacheInfo* pInfo = MapFind ( currentCacheInfoMap, usModelId );
-        assert ( pInfo );
-        assert ( !pInfo->bIsModelCachedHere );
-        AddModelRefCount ( usModelId );
+        const ushort     usModelId = maybeCacheList.rbegin()->second;
+        SModelCacheInfo* pInfo = MapFind(currentCacheInfoMap, usModelId);
+        assert(pInfo);
+        assert(!pInfo->bIsModelCachedHere);
+        AddModelRefCount(usModelId);
         pInfo->bIsModelCachedHere = true;
-        OutputDebugLine ( SString ( "[Cache] Start caching model %d", usModelId ) );
+        OutputDebugLine(SString("[Cache] Start caching model %d", usModelId));
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
 // CModelCacheManagerImpl::GetModelRefCount
 //
 ///////////////////////////////////////////////////////////////
-int CModelCacheManagerImpl::GetModelRefCount ( ushort usModelId )
+int CModelCacheManagerImpl::GetModelRefCount(ushort usModelId)
 {
-    CModelInfo* pModelInfo = m_pGame->GetModelInfo ( usModelId );
-    if ( pModelInfo )
-        return pModelInfo->GetRefCount ();
+    CModelInfo* pModelInfo = m_pGame->GetModelInfo(usModelId);
+    if (pModelInfo)
+        return pModelInfo->GetRefCount();
     return 0;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
 // CModelCacheManagerImpl::AddModelRefCount
 //
 ///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::AddModelRefCount ( ushort usModelId )
+void CModelCacheManagerImpl::AddModelRefCount(ushort usModelId)
 {
-    CModelInfo* pModelInfo = m_pGame->GetModelInfo ( usModelId );
-    if ( pModelInfo )
-        pModelInfo->ModelAddRef ( NON_BLOCKING, "cache" );
+    CModelInfo* pModelInfo = m_pGame->GetModelInfo(usModelId);
+    if (pModelInfo)
+        pModelInfo->ModelAddRef(NON_BLOCKING, "cache");
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
 // CModelCacheManagerImpl::SubModelRefCount
 //
 ///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::SubModelRefCount ( ushort usModelId )
+void CModelCacheManagerImpl::SubModelRefCount(ushort usModelId)
 {
-    CModelInfo* pModelInfo = m_pGame->GetModelInfo ( usModelId );
-    if ( pModelInfo )
-        pModelInfo->RemoveRef ();
+    CModelInfo* pModelInfo = m_pGame->GetModelInfo(usModelId);
+    if (pModelInfo)
+        pModelInfo->RemoveRef();
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -487,24 +467,23 @@ void CModelCacheManagerImpl::SubModelRefCount ( ushort usModelId )
 // Remove model and associated txd from memory
 //
 ///////////////////////////////////////////////////////////////
-bool CModelCacheManagerImpl::UnloadModel ( ushort usModelId )
+bool CModelCacheManagerImpl::UnloadModel(ushort usModelId)
 {
     // Stream out usages in the client module
     CClientBase* pClientBase = CModManager::GetSingleton().GetCurrentMod();
-    if ( pClientBase )
-        pClientBase->RestreamModel( usModelId );
+    if (pClientBase)
+        pClientBase->RestreamModel(usModelId);
 
     // Uncache usages here
-    OnRestreamModel( usModelId );
+    OnRestreamModel(usModelId);
 
     // Ensure model and txd are removed
-    CModelInfo* pModelInfo = m_pGame->GetModelInfo( usModelId );
-    if ( pModelInfo )
+    CModelInfo* pModelInfo = m_pGame->GetModelInfo(usModelId);
+    if (pModelInfo)
         return pModelInfo->ForceUnload();
 
     return false;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -513,32 +492,32 @@ bool CModelCacheManagerImpl::UnloadModel ( ushort usModelId )
 // Uncache here, now.
 //
 ///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::OnRestreamModel ( ushort usModelId )
+void CModelCacheManagerImpl::OnRestreamModel(ushort usModelId)
 {
-    std::map < ushort, SModelCacheInfo >* mapList[] = { &m_PedModelCacheInfoMap, &m_VehicleModelCacheInfoMap };
+    std::map<ushort, SModelCacheInfo>* mapList[] = {&m_PedModelCacheInfoMap, &m_VehicleModelCacheInfoMap};
 
-    for ( uint i = 0 ; i < NUMELMS( mapList ) ; i++ )
+    for (uint i = 0; i < NUMELMS(mapList); i++)
     {
-        std::map < ushort, SModelCacheInfo >& cacheInfoMap = *mapList[i];
+        std::map<ushort, SModelCacheInfo>& cacheInfoMap = *mapList[i];
 
-        SModelCacheInfo* pInfo = MapFind ( cacheInfoMap, usModelId );
-        if ( pInfo )
+        SModelCacheInfo* pInfo = MapFind(cacheInfoMap, usModelId);
+        if (pInfo)
         {
-            if ( pInfo->bIsModelCachedHere )
+            if (pInfo->bIsModelCachedHere)
             {
-                SubModelRefCount ( usModelId );
+                SubModelRefCount(usModelId);
                 pInfo->bIsModelCachedHere = false;
-                MapRemove ( cacheInfoMap, usModelId );
-                OutputDebugLine ( SString ( "[Cache] End caching model %d  (OnRestreamModel)", usModelId ) );
+                MapRemove(cacheInfoMap, usModelId);
+                OutputDebugLine(SString("[Cache] End caching model %d  (OnRestreamModel)", usModelId));
             }
         }
     }
 
     // Also check the permo list
-    if ( MapContains ( m_PermoLoadedModels, usModelId ) )
+    if (MapContains(m_PermoLoadedModels, usModelId))
     {
-        SubModelRefCount ( usModelId );
-        MapRemove ( m_PermoLoadedModels, usModelId );
-        OutputDebugLine ( SString ( "[Cache] End permo-caching model %d  (OnRestreamModel)", usModelId ) );
+        SubModelRefCount(usModelId);
+        MapRemove(m_PermoLoadedModels, usModelId);
+        OutputDebugLine(SString("[Cache] End permo-caching model %d  (OnRestreamModel)", usModelId));
     }
 }

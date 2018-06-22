@@ -1,45 +1,41 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/C3DMarkerSA.cpp
-*  PURPOSE:     3D Marker entity
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Christian Myhre Lundheim <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/C3DMarkerSA.cpp
+ *  PURPOSE:     3D Marker entity
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-void C3DMarkerSA::GetMatrix ( CMatrix * pMatrix )
+void C3DMarkerSA::GetMatrix(CMatrix* pMatrix)
 {
-    CMatrix_Padded * mat = &GetInterface ()->m_mat;
-    MemCpyFast ( &pMatrix->vPos, &mat->vPos, sizeof ( CVector ) );
-    MemCpyFast ( &pMatrix->vFront, &mat->vFront, sizeof ( CVector ) );
-    MemCpyFast ( &pMatrix->vRight, &mat->vRight, sizeof ( CVector ) );
-    MemCpyFast ( &pMatrix->vUp, &mat->vUp, sizeof ( CVector ) );
+    CMatrix_Padded* mat = &GetInterface()->m_mat;
+    MemCpyFast(&pMatrix->vPos, &mat->vPos, sizeof(CVector));
+    MemCpyFast(&pMatrix->vFront, &mat->vFront, sizeof(CVector));
+    MemCpyFast(&pMatrix->vRight, &mat->vRight, sizeof(CVector));
+    MemCpyFast(&pMatrix->vUp, &mat->vUp, sizeof(CVector));
 }
 
-
-void C3DMarkerSA::SetMatrix ( CMatrix * pMatrix )
+void C3DMarkerSA::SetMatrix(CMatrix* pMatrix)
 {
-    CMatrix_Padded * mat = &GetInterface ()->m_mat;
-    MemCpyFast ( &mat->vPos, &pMatrix->vPos, sizeof ( CVector ) );
-    MemCpyFast ( &mat->vFront, &pMatrix->vFront, sizeof ( CVector ) );
-    MemCpyFast ( &mat->vRight, &pMatrix->vRight, sizeof ( CVector ) );
-    MemCpyFast ( &mat->vUp, &pMatrix->vUp, sizeof ( CVector ) );
+    CMatrix_Padded* mat = &GetInterface()->m_mat;
+    MemCpyFast(&mat->vPos, &pMatrix->vPos, sizeof(CVector));
+    MemCpyFast(&mat->vFront, &pMatrix->vFront, sizeof(CVector));
+    MemCpyFast(&mat->vRight, &pMatrix->vRight, sizeof(CVector));
+    MemCpyFast(&mat->vUp, &pMatrix->vUp, sizeof(CVector));
 }
 
-VOID C3DMarkerSA::SetPosition(CVector * vecPosition)
+VOID C3DMarkerSA::SetPosition(CVector* vecPosition)
 {
     DEBUG_TRACE("VOID C3DMarkerSA::SetPosition(CVector * vecPosition)");
     this->GetInterface()->m_mat.vPos = *vecPosition;
 }
 
-CVector * C3DMarkerSA::GetPosition()
+CVector* C3DMarkerSA::GetPosition()
 {
     DEBUG_TRACE("CVector * C3DMarkerSA::GetPosition()");
     return &this->GetInterface()->m_mat.vPos;
@@ -74,10 +70,10 @@ SColor C3DMarkerSA::GetColor()
     DEBUG_TRACE("RGBA C3DMarkerSA::GetColor()");
     // From ABGR
     unsigned long ulABGR = this->GetInterface()->rwColour;
-    SColor color;
-    color.A = ( ulABGR >> 24 ) & 0xff;
-    color.B = ( ulABGR >> 16 ) & 0xff;
-    color.G = ( ulABGR >> 8 ) & 0xff;
+    SColor        color;
+    color.A = (ulABGR >> 24) & 0xff;
+    color.B = (ulABGR >> 16) & 0xff;
+    color.G = (ulABGR >> 8) & 0xff;
     color.R = ulABGR & 0xff;
     return color;
 }
@@ -85,7 +81,7 @@ SColor C3DMarkerSA::GetColor()
 VOID C3DMarkerSA::SetColor(const SColor color)
 {
     // To ABGR
-    this->GetInterface()->rwColour = ( color.A << 24 ) | ( color.B << 16 ) | ( color.G << 8 ) | color.R;
+    this->GetInterface()->rwColour = (color.A << 24) | (color.B << 16) | (color.G << 8) | color.R;
 }
 
 VOID C3DMarkerSA::SetPulsePeriod(WORD wPulsePeriod)
@@ -142,15 +138,15 @@ FLOAT C3DMarkerSA::GetPulseFraction()
     return this->GetInterface()->m_fPulseFraction;
 }
 
-VOID C3DMarkerSA::Disable ()
+VOID C3DMarkerSA::Disable()
 {
     DEBUG_TRACE("VOID C3DMarkerSA::Disable ()");
     this->GetInterface()->m_nIdentifier = 0;
 }
 
-VOID C3DMarkerSA::DeleteMarkerObject ()
+VOID C3DMarkerSA::DeleteMarkerObject()
 {
-    if ( this->GetInterface()->m_pRwObject )
+    if (this->GetInterface()->m_pRwObject)
     {
         DWORD dwFunc = FUNC_DeleteMarkerObject;
         DWORD dwThis = (DWORD)this->GetInterface();
@@ -160,11 +156,11 @@ VOID C3DMarkerSA::DeleteMarkerObject ()
             call    dwFunc
         }
 
-        //OutputDebugString ( "Object destroyed!" );
+        // OutputDebugString ( "Object destroyed!" );
     }
     else
     {
-        //OutputDebugString ( "No object to destroy!" );
+        // OutputDebugString ( "No object to destroy!" );
     }
 }
 

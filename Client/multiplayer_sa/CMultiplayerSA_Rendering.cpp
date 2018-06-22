@@ -1,18 +1,18 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        multiplayer_sa/CMultiplayerSA_Rendering.cpp
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        multiplayer_sa/CMultiplayerSA_Rendering.cpp
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
-extern CCoreInterface* g_pCore;
+extern CCoreInterface*   g_pCore;
 GameEntityRenderHandler* pGameEntityRenderHandler = nullptr;
-PreRenderSkyHandler* pPreRenderSkyHandlerHandler = nullptr;
-RenderHeliLightHandler* pRenderHeliLightHandler = nullptr;
+PreRenderSkyHandler*     pPreRenderSkyHandlerHandler = nullptr;
+RenderHeliLightHandler*  pRenderHeliLightHandler = nullptr;
 
 #define VAR_CCullZones_NumMirrorAttributeZones  0x0C87AC4   // int
 #define VAR_CMirrors_d3dRestored                0x0C7C729   // uchar
@@ -21,9 +21,9 @@ namespace
 {
     CEntitySAInterface* ms_Rendering = NULL;
     CEntitySAInterface* ms_RenderingOneNonRoad = NULL;
-    bool ms_bIsMinimizedAndNotConnected = false;
-    int ms_iSavedNumMirrorZones = 0;
-}
+    bool                ms_bIsMinimizedAndNotConnected = false;
+    int                 ms_iSavedNumMirrorZones = 0;
+}            // namespace
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -32,21 +32,21 @@ namespace
 // Profile call to function 'Idle'
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CallIdle_Pre( DWORD calledFrom )
+void OnMY_CallIdle_Pre(DWORD calledFrom)
 {
-    TIMING_CHECKPOINT( "+CallIdle1" );
+    TIMING_CHECKPOINT("+CallIdle1");
 }
 
-void OnMY_CallIdle_Post( RwGeometry* pGeometry, DWORD calledFrom )
+void OnMY_CallIdle_Post(RwGeometry* pGeometry, DWORD calledFrom)
 {
-    TIMING_CHECKPOINT( "-CallIdle2" );
+    TIMING_CHECKPOINT("-CallIdle2");
 }
 
 // Hook info
 #define HOOKPOS_CallIdle                         0x53ECBD
 #define HOOKSIZE_CallIdle                        5
-DWORD RETURN_CallIdle =                          0x53ECC2;
-DWORD DO_CallIdle =                          0x53E920;
+DWORD RETURN_CallIdle = 0x53ECC2;
+DWORD DO_CallIdle = 0x53E920;
 void _declspec(naked) HOOK_CallIdle()
 {
     _asm
@@ -67,7 +67,6 @@ void _declspec(naked) HOOK_CallIdle()
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // IsEntityRenderable
@@ -75,17 +74,16 @@ void _declspec(naked) HOOK_CallIdle()
 // Return false if should not render
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-bool IsEntityRenderable( CEntitySAInterface* pEntity )
+bool IsEntityRenderable(CEntitySAInterface* pEntity)
 {
     bool bIsPlaceable = ((DWORD)(pEntity->vtbl) == VTBL_CPlaceable);
     bool bHasRwObject = (pEntity->m_pRwObject != nullptr);
     if (bIsPlaceable || !bHasRwObject)
     {
-        AddReportLog( 8645, SString( "Error in render list: IsPlaceable:%d HasRwObject:%d", bIsPlaceable, bHasRwObject ) );
+        AddReportLog(8645, SString("Error in render list: IsPlaceable:%d HasRwObject:%d", bIsPlaceable, bHasRwObject));
     }
     return !bIsPlaceable && bHasRwObject;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -94,27 +92,27 @@ bool IsEntityRenderable( CEntitySAInterface* pEntity )
 // Detect entity rendering
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CEntity_Render_Pre( CEntitySAInterface* pEntity )
+void OnMY_CEntity_Render_Pre(CEntitySAInterface* pEntity)
 {
     ms_Rendering = pEntity;
 
-    if ( ms_Rendering )
-        CallGameEntityRenderHandler ( ms_Rendering );
+    if (ms_Rendering)
+        CallGameEntityRenderHandler(ms_Rendering);
 }
 
-void OnMY_CEntity_Render_Post( void )
+void OnMY_CEntity_Render_Post(void)
 {
-    if ( ms_Rendering )
+    if (ms_Rendering)
     {
         ms_Rendering = NULL;
-        CallGameEntityRenderHandler ( ms_RenderingOneNonRoad ); // restore value set in RenderOneNonRoad
+        CallGameEntityRenderHandler(ms_RenderingOneNonRoad);            // restore value set in RenderOneNonRoad
     }
 }
 
 // Hook info
 #define HOOKPOS_CEntity_Render                         0x534310
 #define HOOKSIZE_CEntity_Render                        6
-DWORD RETURN_CEntity_Render =                          0x534317;
+DWORD RETURN_CEntity_Render = 0x534317;
 void _declspec(naked) HOOK_CEntity_Render()
 {
     _asm
@@ -133,14 +131,13 @@ void _declspec(naked) HOOK_CEntity_Render()
         retn
 
 inner:
-        push    ecx  
-        push    esi  
-        mov     esi,ecx 
-        mov     eax,dword ptr [esi+18h] 
+        push    ecx
+        push    esi
+        mov     esi,ecx
+        mov     eax,dword ptr [esi+18h]
         jmp     RETURN_CEntity_Render
     }
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -149,26 +146,26 @@ inner:
 // Detect entity rendering
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-bool OnMY_CEntity_RenderOneNonRoad_Pre( CEntitySAInterface* pEntity )
+bool OnMY_CEntity_RenderOneNonRoad_Pre(CEntitySAInterface* pEntity)
 {
     ms_RenderingOneNonRoad = pEntity;
-    CallGameEntityRenderHandler ( ms_RenderingOneNonRoad );
-    return IsEntityRenderable( pEntity );
+    CallGameEntityRenderHandler(ms_RenderingOneNonRoad);
+    return IsEntityRenderable(pEntity);
 }
 
-void OnMY_CEntity_RenderOneNonRoad_Post( CEntitySAInterface* pEntity )
+void OnMY_CEntity_RenderOneNonRoad_Post(CEntitySAInterface* pEntity)
 {
-    if ( ms_RenderingOneNonRoad )
+    if (ms_RenderingOneNonRoad)
     {
         ms_RenderingOneNonRoad = NULL;
-        CallGameEntityRenderHandler ( ms_RenderingOneNonRoad );
+        CallGameEntityRenderHandler(ms_RenderingOneNonRoad);
     }
 }
 
 // Hook info
 #define HOOKPOS_CEntity_RenderOneNonRoad                         0x553260
 #define HOOKSIZE_CEntity_RenderOneNonRoad                        5
-DWORD RETURN_CEntity_RenderOneNonRoad =                          0x553265;
+DWORD RETURN_CEntity_RenderOneNonRoad = 0x553265;
 void _declspec(naked) HOOK_CEntity_RenderOneNonRoad()
 {
     _asm
@@ -194,12 +191,11 @@ skip_render:
         retn
 
 inner:
-        push    esi  
+        push    esi
         mov     esi, [esp+08h]
         jmp     RETURN_CEntity_RenderOneNonRoad
     }
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -208,15 +204,15 @@ inner:
 // Detect next ped weapon rendering
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_Mid( CPedSAInterface* pEntity )
+void OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_Mid(CPedSAInterface* pEntity)
 {
-    CallGameEntityRenderHandler( pEntity );
+    CallGameEntityRenderHandler(pEntity);
 }
 
 // Hook info
 #define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC_Mid                0x733080
 #define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC_Mid               6
-DWORD RETURN_CVisibilityPlugins_RenderWeaponPedsForPC_Mid =                 0x733086;
+DWORD RETURN_CVisibilityPlugins_RenderWeaponPedsForPC_Mid = 0x733086;
 void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_Mid()
 {
     _asm
@@ -233,7 +229,6 @@ void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_Mid()
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CVisibilityPlugin::RenderWeaponPedsForPC_End
@@ -241,9 +236,9 @@ void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_Mid()
 // End of all ped weapon rendering
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_End( void )
+void OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_End(void)
 {
-    CallGameEntityRenderHandler( NULL );
+    CallGameEntityRenderHandler(NULL);
 }
 
 // Hook info
@@ -258,12 +253,11 @@ void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_End()
         popad
 
         // Continue original code
-        pop         esi  
-        add         esp,0Ch 
+        pop         esi
+        add         esp,0Ch
         ret
     }
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -275,7 +269,7 @@ void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_End()
 // Hook info
 #define HOOKPOS_Check_NoOfVisibleLods                         0x5534F9
 #define HOOKSIZE_Check_NoOfVisibleLods                        6
-DWORD RETURN_Check_NoOfVisibleLods =                          0x5534FF;
+DWORD RETURN_Check_NoOfVisibleLods = 0x5534FF;
 void _declspec(naked) HOOK_Check_NoOfVisibleLods()
 {
     _asm
@@ -289,7 +283,6 @@ limit:
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Check_NoOfVisibleEntities
@@ -300,7 +293,7 @@ limit:
 // Hook info
 #define HOOKPOS_Check_NoOfVisibleEntities                         0x55352D
 #define HOOKSIZE_Check_NoOfVisibleEntities                        6
-DWORD RETURN_Check_NoOfVisibleEntities =                          0x553533;
+DWORD RETURN_Check_NoOfVisibleEntities = 0x553533;
 void _declspec(naked) HOOK_Check_NoOfVisibleEntities()
 {
     _asm
@@ -314,16 +307,15 @@ limit:
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // WinLoop
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_WinLoop( void )
+void OnMY_WinLoop(void)
 {
-    if ( ms_bIsMinimizedAndNotConnected )
-        Sleep ( 10 );
+    if (ms_bIsMinimizedAndNotConnected)
+        Sleep(10);
 }
 
 // Hook info
@@ -331,10 +323,10 @@ void OnMY_WinLoop( void )
 #define HOOKPOS_WinLoop_EU                         0x748AE3
 #define HOOKSIZE_WinLoop_US                        5
 #define HOOKSIZE_WinLoop_EU                        5
-DWORD RETURN_WinLoop_US =                          0x748A98;
-DWORD RETURN_WinLoop_EU =                          0x748AE8;
-DWORD RETURN_WinLoop_BOTH =                        0;
-void _declspec(naked) HOOK_WinLoop ()
+DWORD RETURN_WinLoop_US = 0x748A98;
+DWORD RETURN_WinLoop_EU = 0x748AE8;
+DWORD RETURN_WinLoop_BOTH = 0;
+void _declspec(naked) HOOK_WinLoop()
 {
     _asm
     {
@@ -347,46 +339,45 @@ void _declspec(naked) HOOK_WinLoop ()
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Photograph screen grab in windowed mode
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_psGrabScreen_GetRect( HWND hWnd, LPRECT pRect )
+void OnMY_psGrabScreen_GetRect(HWND hWnd, LPRECT pRect)
 {
     // Get the window client area
-    GetClientRect( hWnd, pRect );
+    GetClientRect(hWnd, pRect);
     LPPOINT pPoints = (LPPOINT)pRect;
-    ClientToScreen( hWnd, pPoints );
-    ClientToScreen( hWnd, pPoints + 1 );
+    ClientToScreen(hWnd, pPoints);
+    ClientToScreen(hWnd, pPoints + 1);
 
     // Clip to desktop
     RECT desktopRect;
-    GetWindowRect( GetDesktopWindow(), &desktopRect );
-    pRect->left = std::max( pRect->left, desktopRect.left );
-    pRect->top = std::max( pRect->top, desktopRect.top );
-    pRect->right = std::min( pRect->right, desktopRect.right );
-    pRect->bottom = std::min( pRect->bottom, desktopRect.bottom );
+    GetWindowRect(GetDesktopWindow(), &desktopRect);
+    pRect->left = std::max(pRect->left, desktopRect.left);
+    pRect->top = std::max(pRect->top, desktopRect.top);
+    pRect->right = std::min(pRect->right, desktopRect.right);
+    pRect->bottom = std::min(pRect->bottom, desktopRect.bottom);
 
-    // Ensure at least 1 pixel 
-    pRect->bottom = std::max( pRect->bottom, pRect->top + 1 );
-    pRect->right = std::max( pRect->right, pRect->left + 1 );
+    // Ensure at least 1 pixel
+    pRect->bottom = std::max(pRect->bottom, pRect->top + 1);
+    pRect->right = std::max(pRect->right, pRect->left + 1);
 }
 
-bool OnMY_psGrabScreen_ShouldUseRect( void )
+bool OnMY_psGrabScreen_ShouldUseRect(void)
 {
     bool bWindowed;
-    g_pCore->GetCVars()->Get( "display_windowed", bWindowed );
+    g_pCore->GetCVars()->Get("display_windowed", bWindowed);
     return bWindowed;
 }
 
 // Hook info
 #define HOOKPOS_psGrabScreen                        0x7452FC
 #define HOOKSIZE_psGrabScreen                       5
-DWORD RETURN_psGrabScreen_YesChange =               0x745311;
-DWORD RETURN_psGrabScreen_NoChange =                0x745336;
-void _declspec(naked) HOOK_psGrabScreen ()
+DWORD RETURN_psGrabScreen_YesChange = 0x745311;
+DWORD RETURN_psGrabScreen_NoChange = 0x745336;
+void _declspec(naked) HOOK_psGrabScreen()
 {
     _asm
     {
@@ -412,7 +403,6 @@ use_rect:
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CClouds::RenderSkyPolys
@@ -420,9 +410,9 @@ use_rect:
 // This is the first thing drawn by GTA
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CClouds_RenderSkyPolys( void )
+void OnMY_CClouds_RenderSkyPolys(void)
 {
-    if ( pPreRenderSkyHandlerHandler )
+    if (pPreRenderSkyHandlerHandler)
         pPreRenderSkyHandlerHandler();
 }
 
@@ -430,8 +420,8 @@ void OnMY_CClouds_RenderSkyPolys( void )
 #define HOOKCHECK_CClouds_RenderSkyPolys            0xA1
 #define HOOKPOS_CClouds_RenderSkyPolys              0x714650
 #define HOOKSIZE_CClouds_RenderSkyPolys             5
-DWORD RETURN_CClouds_RenderSkyPolys =               0x714655;
-void _declspec(naked) HOOK_CClouds_RenderSkyPolys ()
+DWORD RETURN_CClouds_RenderSkyPolys = 0x714655;
+void _declspec(naked) HOOK_CClouds_RenderSkyPolys()
 {
     _asm
     {
@@ -444,7 +434,6 @@ void _declspec(naked) HOOK_CClouds_RenderSkyPolys ()
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // RwCameraSetNearClipPlane
@@ -454,31 +443,31 @@ void _declspec(naked) HOOK_CClouds_RenderSkyPolys ()
 //  - The higher values are used to reduce z-flicker when flying etc
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-float OnMY_RwCameraSetNearClipPlane( DWORD dwCalledFrom, void* pUnknown, float fDistance )
+float OnMY_RwCameraSetNearClipPlane(DWORD dwCalledFrom, void* pUnknown, float fDistance)
 {
     float fSetting = pMultiplayer->GetNearClipDistance();
-    if ( fSetting == DEFAULT_NEAR_CLIP_DISTANCE )
+    if (fSetting == DEFAULT_NEAR_CLIP_DISTANCE)
     {
         // Do nothing if setting is default value
         return fDistance;
     }
 
     // Don't process calls from RenderScene as they are restoring saved values (which have already been processed here)
-    if ( dwCalledFrom > 0x53DF40 && dwCalledFrom < 0x53E160 )
+    if (dwCalledFrom > 0x53DF40 && dwCalledFrom < 0x53E160)
     {
         return fDistance;
     }
 
-    if ( fSetting < DEFAULT_NEAR_CLIP_DISTANCE )
+    if (fSetting < DEFAULT_NEAR_CLIP_DISTANCE)
     {
         // If required setting is lower than default, ensure value used is not higher.
-        return std::min( fSetting, fDistance );
+        return std::min(fSetting, fDistance);
     }
     else
     {
         // If required setting is higher than default, converge value towards it.
-        float fAlpha = UnlerpClamped( DEFAULT_NEAR_CLIP_DISTANCE, fSetting, DEFAULT_NEAR_CLIP_DISTANCE * 3 );
-        return Lerp( fDistance, fAlpha, fSetting );
+        float fAlpha = UnlerpClamped(DEFAULT_NEAR_CLIP_DISTANCE, fSetting, DEFAULT_NEAR_CLIP_DISTANCE * 3);
+        return Lerp(fDistance, fAlpha, fSetting);
     }
 }
 
@@ -489,10 +478,10 @@ float OnMY_RwCameraSetNearClipPlane( DWORD dwCalledFrom, void* pUnknown, float f
 #define HOOKPOS_RwCameraSetNearClipPlane_EU         0x7EE210
 #define HOOKSIZE_RwCameraSetNearClipPlane_US        5
 #define HOOKSIZE_RwCameraSetNearClipPlane_EU        5
-DWORD RETURN_RwCameraSetNearClipPlane_US =          0x7EE1D5;
-DWORD RETURN_RwCameraSetNearClipPlane_EU =          0x7EE215;
-DWORD RETURN_RwCameraSetNearClipPlane_BOTH =        0;
-void _declspec(naked) HOOK_RwCameraSetNearClipPlane ()
+DWORD RETURN_RwCameraSetNearClipPlane_US = 0x7EE1D5;
+DWORD RETURN_RwCameraSetNearClipPlane_EU = 0x7EE215;
+DWORD RETURN_RwCameraSetNearClipPlane_BOTH = 0;
+void _declspec(naked) HOOK_RwCameraSetNearClipPlane()
 {
     _asm
     {
@@ -515,21 +504,23 @@ void _declspec(naked) HOOK_RwCameraSetNearClipPlane ()
 //
 // Rendering heli search lights (in RenderEffects at 0x53E170)
 //
-// Render our own heli search lights (we have to do that here as 
+// Render our own heli search lights (we have to do that here as
 // it requires some render states
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 // Hook info
 #define HOOKPOS_RenderEffects_HeliLight                           0x53E1B9
 #define HOOKSIZE_RenderEffects_HeliLight                          5
-DWORD RETURN_RenderEffects_HeliLight =                            0x53E1BE;
-void _declspec(naked) HOOK_RenderEffects_HeliLight ()
+DWORD RETURN_RenderEffects_HeliLight = 0x53E1BE;
+void _declspec(naked) HOOK_RenderEffects_HeliLight()
 {
-    _asm pushad
+    _asm
+    {
+        pushad
+    }
 
     // Call render handler
-    if ( pRenderHeliLightHandler )
-        pRenderHeliLightHandler ();
+    if (pRenderHeliLightHandler) pRenderHeliLightHandler();
 
     _asm
     {
@@ -539,18 +530,16 @@ void _declspec(naked) HOOK_RenderEffects_HeliLight ()
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CMultiplayerSA::SetGameEntityRenderHandler
 //
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::SetGameEntityRenderHandler ( GameEntityRenderHandler * pHandler )
+void CMultiplayerSA::SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler)
 {
     pGameEntityRenderHandler = pHandler;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -558,11 +547,10 @@ void CMultiplayerSA::SetGameEntityRenderHandler ( GameEntityRenderHandler * pHan
 //
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::SetPreRenderSkyHandler ( PreRenderSkyHandler * pHandler )
+void CMultiplayerSA::SetPreRenderSkyHandler(PreRenderSkyHandler* pHandler)
 {
     pPreRenderSkyHandlerHandler = pHandler;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -570,11 +558,10 @@ void CMultiplayerSA::SetPreRenderSkyHandler ( PreRenderSkyHandler * pHandler )
 //
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::SetRenderHeliLightHandler ( RenderHeliLightHandler* pHandler )
+void CMultiplayerSA::SetRenderHeliLightHandler(RenderHeliLightHandler* pHandler)
 {
     pRenderHeliLightHandler = pHandler;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -582,11 +569,10 @@ void CMultiplayerSA::SetRenderHeliLightHandler ( RenderHeliLightHandler* pHandle
 //
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::SetIsMinimizedAndNotConnected ( bool bIsMinimizedAndNotConnected )
+void CMultiplayerSA::SetIsMinimizedAndNotConnected(bool bIsMinimizedAndNotConnected)
 {
     ms_bIsMinimizedAndNotConnected = bIsMinimizedAndNotConnected;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -596,12 +582,12 @@ void CMultiplayerSA::SetIsMinimizedAndNotConnected ( bool bIsMinimizedAndNotConn
 // Forces mirror render buffer recreation when enabling.
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::SetMirrorsEnabled ( bool bEnabled )
+void CMultiplayerSA::SetMirrorsEnabled(bool bEnabled)
 {
-    int& iNumMirrorZones = *(int*)VAR_CCullZones_NumMirrorAttributeZones;
+    int&   iNumMirrorZones = *(int*)VAR_CCullZones_NumMirrorAttributeZones;
     uchar& bResetMirror = *(uchar*)VAR_CMirrors_d3dRestored;
 
-    if ( !bEnabled )
+    if (!bEnabled)
     {
         // Remove mirror zones
         ms_iSavedNumMirrorZones += iNumMirrorZones;
@@ -609,7 +595,7 @@ void CMultiplayerSA::SetMirrorsEnabled ( bool bEnabled )
     }
     else
     {
-        if ( ms_iSavedNumMirrorZones )
+        if (ms_iSavedNumMirrorZones)
         {
             // Restore mirror zones
             iNumMirrorZones += ms_iSavedNumMirrorZones;
@@ -621,7 +607,6 @@ void CMultiplayerSA::SetMirrorsEnabled ( bool bEnabled )
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CMultiplayerSA::InitHooks_Rendering
@@ -629,18 +614,18 @@ void CMultiplayerSA::SetMirrorsEnabled ( bool bEnabled )
 // Setup hook
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_Rendering ( void )
+void CMultiplayerSA::InitHooks_Rendering(void)
 {
-    EZHookInstall ( CallIdle );
-    EZHookInstall ( CEntity_Render );
-    EZHookInstall ( CEntity_RenderOneNonRoad );
-    EZHookInstall ( CVisibilityPlugins_RenderWeaponPedsForPC_Mid );
-    EZHookInstall ( CVisibilityPlugins_RenderWeaponPedsForPC_End );
-    EZHookInstall ( Check_NoOfVisibleLods );
-    EZHookInstall ( Check_NoOfVisibleEntities );
-    EZHookInstall ( WinLoop );
-    EZHookInstall ( psGrabScreen );
-    EZHookInstallChecked ( CClouds_RenderSkyPolys );
-    EZHookInstallChecked ( RwCameraSetNearClipPlane );
-    EZHookInstall ( RenderEffects_HeliLight );
+    EZHookInstall(CallIdle);
+    EZHookInstall(CEntity_Render);
+    EZHookInstall(CEntity_RenderOneNonRoad);
+    EZHookInstall(CVisibilityPlugins_RenderWeaponPedsForPC_Mid);
+    EZHookInstall(CVisibilityPlugins_RenderWeaponPedsForPC_End);
+    EZHookInstall(Check_NoOfVisibleLods);
+    EZHookInstall(Check_NoOfVisibleEntities);
+    EZHookInstall(WinLoop);
+    EZHookInstall(psGrabScreen);
+    EZHookInstallChecked(CClouds_RenderSkyPolys);
+    EZHookInstallChecked(RwCameraSetNearClipPlane);
+    EZHookInstall(RenderEffects_HeliLight);
 }

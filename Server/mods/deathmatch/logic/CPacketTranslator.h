@@ -1,20 +1,17 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CPacketTranslator.h
-*  PURPOSE:     Network packet translator class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Kent Simon <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CPacketTranslator.h
+ *  PURPOSE:     Network packet translator class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 class CPacketTranslator;
 
-#ifndef __CPACKETTRANSLATOR_H
-#define __CPACKETTRANSLATOR_H
+#pragma once
 
 #include "CCommon.h"
 #include "CPlayerManager.h"
@@ -26,13 +23,11 @@ class CPacketTranslator;
 class CPacketTranslator
 {
 public:
-                            CPacketTranslator       ( CPlayerManager* pPlayerManager );
-                            ~CPacketTranslator      ( void );
+    CPacketTranslator(CPlayerManager* pPlayerManager);
+    ~CPacketTranslator(void);
 
-    CPacket*                Translate               ( const NetServerPlayerID& Socket, ePacketID PacketID, NetBitStreamInterface& BitStream, SNetExtraInfo* pNetExtraInfo );
+    CPacket* Translate(const NetServerPlayerID& Socket, ePacketID PacketID, NetBitStreamInterface& BitStream, SNetExtraInfo* pNetExtraInfo);
 
 private:
-    CPlayerManager*         m_pPlayerManager;
+    CPlayerManager* m_pPlayerManager;
 };
-
-#endif

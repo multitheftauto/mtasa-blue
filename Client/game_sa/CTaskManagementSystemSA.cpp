@@ -1,17 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CTaskManagementSystemSA.cpp
-*  PURPOSE:     Task management system
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Christian Myhre Lundheim <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CTaskManagementSystemSA.cpp
+ *  PURPOSE:     Task management system
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
@@ -19,57 +15,56 @@ using namespace std;
 
 VOID HOOK_CTask_Operator_Delete();
 
-CTaskSAInterface * pTempTaskInterface = 0;
+CTaskSAInterface* pTempTaskInterface = 0;
 
-CTaskManagementSystemSA::CTaskManagementSystemSA ( void )
+CTaskManagementSystemSA::CTaskManagementSystemSA(void)
 {
     // Install our hook used to delete our tasks when GTA does
-    HookInstall ( FUNC_CTask_Operator_Delete, (DWORD)HOOK_CTask_Operator_Delete, 6 );
+    HookInstall(FUNC_CTask_Operator_Delete, (DWORD)HOOK_CTask_Operator_Delete, 6);
 }
 
-CTaskManagementSystemSA::~CTaskManagementSystemSA ( void )
+CTaskManagementSystemSA::~CTaskManagementSystemSA(void)
 {
     // Delete all the entries
-    list < STaskListItem* > ::const_iterator iter = m_TaskList.begin ();
-    for ( ; iter != m_TaskList.end (); iter++ )
+    list<STaskListItem*>::const_iterator iter = m_TaskList.begin();
+    for (; iter != m_TaskList.end(); iter++)
     {
         delete *iter;
     }
 
     // Clear the list
-    m_TaskList.clear ();
+    m_TaskList.clear();
 }
 
-
-CTask * CTaskManagementSystemSA::AddTask ( CTaskSA * pTask )
+CTask* CTaskManagementSystemSA::AddTask(CTaskSA* pTask)
 {
-    if ( !pTask )
+    if (!pTask)
         return NULL;
-    assert ( pTask->IsValid () );
+    assert(pTask->IsValid());
     STaskListItem* pItem = new STaskListItem;
     pItem->pTaskSA = pTask;
-    pItem->taskInterface = pTask->GetInterface ();
-    m_TaskList.push_back ( pItem );
+    pItem->taskInterface = pTask->GetInterface();
+    m_TaskList.push_back(pItem);
 
     return pTask;
 }
 
 // Only called from HOOK_CTask_Operator_Delete
-void CTaskManagementSystemSA::RemoveTask ( CTaskSAInterface * pTaskInterface )
+void CTaskManagementSystemSA::RemoveTask(CTaskSAInterface* pTaskInterface)
 {
     // Stops crash on exit
-    if ( m_TaskList.size () == 0 )
+    if (m_TaskList.size() == 0)
         return;
 
-    assert ( pTaskInterface );
+    assert(pTaskInterface);
 
     // Find it in our list
-    STaskListItem* pItem;
-    list < STaskListItem* > ::iterator iter = m_TaskList.begin ();
-    for ( ; iter != m_TaskList.end (); iter++ )
+    STaskListItem*                 pItem;
+    list<STaskListItem*>::iterator iter = m_TaskList.begin();
+    for (; iter != m_TaskList.end(); iter++)
     {
         pItem = *iter;
-        if ( pItem->taskInterface == pTaskInterface )
+        if (pItem->taskInterface == pTaskInterface)
         {
             // Grab the task SA
             CTaskSA* pTaskSA = pItem->pTaskSA;
@@ -78,11 +73,11 @@ void CTaskManagementSystemSA::RemoveTask ( CTaskSAInterface * pTaskInterface )
             delete pItem;
 
             // Remove from list
-            m_TaskList.erase ( iter );
+            m_TaskList.erase(iter);
 
             // Eventually destroy the task
-            if ( pTaskSA )
-                pTaskSA->DestroyJustThis ();
+            if (pTaskSA)
+                pTaskSA->DestroyJustThis();
 
             // Done (don't continue or we waste resources/crash)
             return;
@@ -90,20 +85,20 @@ void CTaskManagementSystemSA::RemoveTask ( CTaskSAInterface * pTaskInterface )
     }
 }
 
-
-CTask * CTaskManagementSystemSA::GetTask ( CTaskSAInterface * pTaskInterface )
+CTask* CTaskManagementSystemSA::GetTask(CTaskSAInterface* pTaskInterface)
 {
     // Return NULL if we got passed NULL
-    if ( pTaskInterface == 0 ) return NULL;
+    if (pTaskInterface == 0)
+        return NULL;
 
     // Find it in our list
-    STaskListItem* pListItem;
-    list < STaskListItem* > ::const_iterator iter = m_TaskList.begin ();
-    for ( ; iter != m_TaskList.end (); iter++ )
+    STaskListItem*                       pListItem;
+    list<STaskListItem*>::const_iterator iter = m_TaskList.begin();
+    for (; iter != m_TaskList.end(); iter++)
     {
         // Matches?
         pListItem = *iter;
-        if ( pListItem->taskInterface == pTaskInterface && pListItem->pTaskSA )
+        if (pListItem->taskInterface == pTaskInterface && pListItem->pTaskSA)
         {
             // Yes it has existed before, return it
             return pListItem->pTaskSA;
@@ -112,9 +107,9 @@ CTask * CTaskManagementSystemSA::GetTask ( CTaskSAInterface * pTaskInterface )
 
     // its not existed before, lets create the task
     // First, we create a temp task
-    int iTaskType = 9999;
+    int   iTaskType = 9999;
     DWORD dwFunc = pTaskInterface->VTBL->GetTaskType;
-    if ( dwFunc && dwFunc != 0x82263A )
+    if (dwFunc && dwFunc != 0x82263A)
     {
         _asm
         {
@@ -125,23 +120,23 @@ CTask * CTaskManagementSystemSA::GetTask ( CTaskSAInterface * pTaskInterface )
     }
 
     // Create it and add it to our list
-    CTaskSA * pTask = dynamic_cast < CTaskSA* > ( CreateAppropriateTask ( pTaskInterface, iTaskType ) );
-    if ( pTask )
+    CTaskSA* pTask = dynamic_cast<CTaskSA*>(CreateAppropriateTask(pTaskInterface, iTaskType));
+    if (pTask)
     {
         pListItem = new STaskListItem;
         pListItem->pTaskSA = pTask;
         pListItem->taskInterface = pTaskInterface;
-        m_TaskList.push_back ( pListItem );
+        m_TaskList.push_back(pListItem);
     }
 
     return pTask;
 }
 
-CTask * CTaskManagementSystemSA::CreateAppropriateTask ( CTaskSAInterface * pTaskInterface, int iTaskType )
+CTask* CTaskManagementSystemSA::CreateAppropriateTask(CTaskSAInterface* pTaskInterface, int iTaskType)
 {
     CTaskSA* pTaskSA = NULL;
 
-    switch ( iTaskType )
+    switch (iTaskType)
     {
         // Attack
         case TASK_SIMPLE_GANG_DRIVEBY:
@@ -153,7 +148,7 @@ CTask * CTaskManagementSystemSA::CreateAppropriateTask ( CTaskSAInterface * pTas
         case TASK_SIMPLE_FIGHT:
             pTaskSA = new CTaskSimpleFightSA;
             break;
-        
+
         // Basic
         case TASK_COMPLEX_USE_MOBILE_PHONE:
             pTaskSA = new CTaskComplexUseMobilePhoneSA;
@@ -173,7 +168,7 @@ CTask * CTaskManagementSystemSA::CreateAppropriateTask ( CTaskSAInterface * pTas
         case TASK_COMPLEX_SUNBATHE:
             pTaskSA = new CTaskComplexSunbatheSA;
             break;
-    
+
         // Car accessories
         case TASK_SIMPLE_CAR_SET_PED_IN_AS_PASSENGER:
             pTaskSA = new CTaskSimpleCarSetPedInAsPassengerSA;
@@ -220,7 +215,7 @@ CTask * CTaskManagementSystemSA::CreateAppropriateTask ( CTaskSAInterface * pTas
             pTaskSA = new CTaskSimpleClimbSA;
             break;
         case TASK_SIMPLE_JETPACK:
-            pTaskSA = new CTaskSimpleJetPackSA;  
+            pTaskSA = new CTaskSimpleJetPackSA;
             break;
 
         // Physical response
@@ -231,7 +226,7 @@ CTask * CTaskManagementSystemSA::CreateAppropriateTask ( CTaskSAInterface * pTas
         // Secondary
         case TASK_SIMPLE_DUCK:
             pTaskSA = new CTaskSimpleDuckSA;
-            break;    
+            break;
 
         // Just create the baseclass
         default:
@@ -239,26 +234,30 @@ CTask * CTaskManagementSystemSA::CreateAppropriateTask ( CTaskSAInterface * pTas
             break;
     }
 
-    assert ( pTaskSA && !pTaskSA->GetInterface () );
+    assert(pTaskSA && !pTaskSA->GetInterface());
 
     // Set the internal interface
-    pTaskSA->SetInterface ( pTaskInterface );
+    pTaskSA->SetInterface(pTaskInterface);
     return pTaskSA;
 }
 
 // HOOKS
+__declspec(noinline) void OnMY_Task_Operator_Delete(CTaskSAInterface* pTaskInterface)
+{
+    ((CTaskManagementSystemSA*)(pGame->GetTaskManagementSystem()))->RemoveTask(pTempTaskInterface);
+}
 
 VOID _declspec(naked) HOOK_CTask_Operator_Delete()
 {
-    _asm 
-    {
+    _asm
+        {
         mov     eax, [esp+4]
         mov     pTempTaskInterface, eax
 
         pushad
-    }
+        }
 
-    ((CTaskManagementSystemSA *)(pGame->GetTaskManagementSystem()))->RemoveTask ( pTempTaskInterface );
+    OnMY_Task_Operator_Delete(pTempTaskInterface);
 
     // Continue on our merry way....
     _asm

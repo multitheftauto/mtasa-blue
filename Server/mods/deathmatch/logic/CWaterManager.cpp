@@ -1,18 +1,17 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CWaterManager.cpp
-*  PURPOSE:     Water entity manager class
-*  DEVELOPERS:  arc_
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CWaterManager.cpp
+ *  PURPOSE:     Water entity manager class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-CWaterManager::CWaterManager ()
+CWaterManager::CWaterManager()
 {
     m_WorldWaterLevelInfo.bNonSeaLevelSet = false;
     m_WorldWaterLevelInfo.fSeaLevel = 0;
@@ -20,15 +19,15 @@ CWaterManager::CWaterManager ()
     m_fGlobalWaveHeight = 0.0f;
 }
 
-CWaterManager::~CWaterManager ()
+CWaterManager::~CWaterManager()
 {
-    DeleteAll ();
+    DeleteAll();
 }
 
-CWater* CWaterManager::Create ( CWater::EWaterType waterType, CElement* pParent, CXMLNode* pNode )
+CWater* CWaterManager::Create(CWater::EWaterType waterType, CElement* pParent, CXMLNode* pNode)
 {
-    CWater* pWater = new CWater ( this, pParent, pNode, waterType );
-    if ( pWater->GetID () == INVALID_ELEMENT_ID )
+    CWater* pWater = new CWater(this, pParent, pNode, waterType);
+    if (pWater->GetID() == INVALID_ELEMENT_ID)
     {
         delete pWater;
         return NULL;
@@ -36,10 +35,10 @@ CWater* CWaterManager::Create ( CWater::EWaterType waterType, CElement* pParent,
     return pWater;
 }
 
-CWater* CWaterManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CEvents* pEvents )
+CWater* CWaterManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
 {
-    CWater* pWater = new CWater ( this, pParent, &Node );
-    if ( pWater->GetID () == INVALID_ELEMENT_ID || !pWater->LoadFromCustomData ( pEvents ) )
+    CWater* pWater = new CWater(this, pParent, &Node);
+    if (pWater->GetID() == INVALID_ELEMENT_ID || !pWater->LoadFromCustomData(pEvents))
     {
         delete pWater;
         pWater = NULL;
@@ -47,56 +46,49 @@ CWater* CWaterManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CEvent
     return pWater;
 }
 
-
-void CWaterManager::SetElementWaterLevel ( CWater* pWater, float fLevel )
+void CWaterManager::SetElementWaterLevel(CWater* pWater, float fLevel)
 {
-    pWater->SetLevel ( fLevel );
+    pWater->SetLevel(fLevel);
 }
 
-
-void CWaterManager::SetAllElementWaterLevel ( float fLevel )
+void CWaterManager::SetAllElementWaterLevel(float fLevel)
 {
-    std::list < CWater* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); ++iter )
+    std::list<CWater*>::const_iterator iter = m_List.begin();
+    for (; iter != m_List.end(); ++iter)
     {
-        SetElementWaterLevel ( *iter, fLevel );
+        SetElementWaterLevel(*iter, fLevel);
     }
 }
 
-
-void CWaterManager::SetWorldWaterLevel ( float fLevel, bool bIncludeWorldNonSeaLevel )
+void CWaterManager::SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLevel)
 {
     m_WorldWaterLevelInfo.fSeaLevel = fLevel;
-    if ( bIncludeWorldNonSeaLevel )
+    if (bIncludeWorldNonSeaLevel)
     {
         m_WorldWaterLevelInfo.bNonSeaLevelSet = true;
         m_WorldWaterLevelInfo.fNonSeaLevel = fLevel;
     }
 }
 
-
-void CWaterManager::ResetWorldWaterLevel ( void )
+void CWaterManager::ResetWorldWaterLevel(void)
 {
     m_WorldWaterLevelInfo.bNonSeaLevelSet = false;
     m_WorldWaterLevelInfo.fSeaLevel = 0;
     m_WorldWaterLevelInfo.fNonSeaLevel = 0;
 }
 
-
-void CWaterManager::DeleteAll ()
+void CWaterManager::DeleteAll()
 {
     // Delete all items
-    DeletePointersAndClearList ( m_List );
+    DeletePointersAndClearList(m_List);
 }
 
-
-void CWaterManager::RemoveFromList ( CWater* pWater )
+void CWaterManager::RemoveFromList(CWater* pWater)
 {
-    m_List.remove ( pWater );
+    m_List.remove(pWater);
 }
 
-
-bool CWaterManager::Exists ( CWater* pWater )
+bool CWaterManager::Exists(CWater* pWater)
 {
-    return ListContains ( m_List, pWater );
+    return ListContains(m_List, pWater);
 }

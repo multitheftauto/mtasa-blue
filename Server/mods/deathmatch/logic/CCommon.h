@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CCommon.h
-*  PURPOSE:     Common definitions and enumerations header
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CCommon.h
+ *  PURPOSE:     Common definitions and enumerations header
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #pragma once
 
@@ -22,7 +22,7 @@
 
 // Globals
 extern CServerInterface* g_pServerInterface;
-extern CNetServer* g_pNetServer;
+extern CNetServer*       g_pNetServer;
 
 #define REMOTE_ADMIN_ID 254
 #define CONSOLE_ID 255
@@ -101,7 +101,7 @@ enum eVehicleTypes
     VT_SKIMMER,
     VT_PCJ600,
     VT_FAGGIO,
-    VT_FREEWAY, 
+    VT_FREEWAY,
     VT_RCBARON,
     VT_RCRAIDER,
     VT_GLENDALE,
@@ -124,7 +124,7 @@ enum eVehicleTypes
     VT_CAMPER,
     VT_MARQUIS,
     VT_BAGGAGE,
-    VT_DOZER,   
+    VT_DOZER,
     VT_MAVERICK,
     VT_VCNMAV,
     VT_RANCHER,
@@ -550,27 +550,27 @@ enum eWeaponProperty
     WEAPON_DEFAULT_COMBO,
     WEAPON_COMBOS_AVAILABLE,
 
-    WEAPON_FLAG_AIM_NO_AUTO,                    // 0x000001 - cant auto target to aim       (disable automatic up/down adjustment when firing without aiming)
+    WEAPON_FLAG_AIM_NO_AUTO,            // 0x000001 - cant auto target to aim       (disable automatic up/down adjustment when firing without aiming)
     WEAPON_FLAG_FIRST = WEAPON_FLAG_AIM_NO_AUTO,
-    WEAPON_FLAG_AIM_ARM,                        // 0x000002 - only needs arm to aim         (ie pistol/shotgun/tec9/uzi)
-    WEAPON_FLAG_AIM_1ST_PERSON,                 // 0x000004 - uses 1st person aim           (ie sniper/rpg-hs
-    WEAPON_FLAG_AIM_FREE,                       // 0x000008 - can only use free aiming      (ie country sniper/flame thrower/minigun/fire extinguisher)
-    WEAPON_FLAG_MOVE_AND_AIM,                   // 0x000010 - can move and aim at same time 
-    WEAPON_FLAG_MOVE_AND_SHOOT,                 // 0x000020 - can move and fire at same time 
+    WEAPON_FLAG_AIM_ARM,                   // 0x000002 - only needs arm to aim         (ie pistol/shotgun/tec9/uzi)
+    WEAPON_FLAG_AIM_1ST_PERSON,            // 0x000004 - uses 1st person aim           (ie sniper/rpg-hs
+    WEAPON_FLAG_AIM_FREE,                  // 0x000008 - can only use free aiming      (ie country sniper/flame thrower/minigun/fire extinguisher)
+    WEAPON_FLAG_MOVE_AND_AIM,              // 0x000010 - can move and aim at same time
+    WEAPON_FLAG_MOVE_AND_SHOOT,            // 0x000020 - can move and fire at same time
     WEAPON_FLAG_UNKNOWN_0040,
     WEAPON_FLAG_UNKNOWN_0080,
-    WEAPON_FLAG_TYPE_THROW,                     // 0x000100 - is a throwing weapon          (ie satchel)
-    WEAPON_FLAG_TYPE_HEAVY,                     // 0x000200 - heavy weapon - can't jump     (ie flame thrower/rpgs/minigun)
-    WEAPON_FLAG_TYPE_CONSTANT,                  // 0x000400 - fires every frame within loop (ie paint spray) 
-    WEAPON_FLAG_TYPE_DUAL,                      // 0x000800 - can use 2x guns at same time  (ie pistol/shotgun/tec9/uzi)
-    WEAPON_FLAG_ANIM_RELOAD,                    // 0x001000 - weapon has reload anims       (ie everything except shotgun/snipers/flame thrower/rpgs/minigun/satchel)
-    WEAPON_FLAG_ANIM_CROUCH,                    // 0x002000 - weapon has crouching anims    (ie everything except flame thrower/rpgs/minigun/satchel)
-    WEAPON_FLAG_ANIM_RELOAD_LOOP,               // 0x004000 - loop from end of reload to fire loop start
-    WEAPON_FLAG_ANIM_RELOAD_LONG,               // 0x008000 - force a longer reload time!   (ie rpgs/snipers)
-    WEAPON_FLAG_SHOT_SLOWS,                     // 0x010000 - slows down                    (ie flame thrower)
-    WEAPON_FLAG_SHOT_RAND_SPEED,                // 0x020000 - random speed                  (ie flame thrower)
-    WEAPON_FLAG_SHOT_ANIM_ABRUPT,               // 0x040000 - force the anim to finish player after aim/fire rather than blending out   (ie rpgs)
-    WEAPON_FLAG_SHOT_EXPANDS,                   // 0x080000 - expands
+    WEAPON_FLAG_TYPE_THROW,               // 0x000100 - is a throwing weapon          (ie satchel)
+    WEAPON_FLAG_TYPE_HEAVY,               // 0x000200 - heavy weapon - can't jump     (ie flame thrower/rpgs/minigun)
+    WEAPON_FLAG_TYPE_CONSTANT,            // 0x000400 - fires every frame within loop (ie paint spray)
+    WEAPON_FLAG_TYPE_DUAL,                // 0x000800 - can use 2x guns at same time  (ie pistol/shotgun/tec9/uzi)
+    WEAPON_FLAG_ANIM_RELOAD,              // 0x001000 - weapon has reload anims       (ie everything except shotgun/snipers/flame thrower/rpgs/minigun/satchel)
+    WEAPON_FLAG_ANIM_CROUCH,              // 0x002000 - weapon has crouching anims    (ie everything except flame thrower/rpgs/minigun/satchel)
+    WEAPON_FLAG_ANIM_RELOAD_LOOP,            // 0x004000 - loop from end of reload to fire loop start
+    WEAPON_FLAG_ANIM_RELOAD_LONG,            // 0x008000 - force a longer reload time!   (ie rpgs/snipers)
+    WEAPON_FLAG_SHOT_SLOWS,                  // 0x010000 - slows down                    (ie flame thrower)
+    WEAPON_FLAG_SHOT_RAND_SPEED,             // 0x020000 - random speed                  (ie flame thrower)
+    WEAPON_FLAG_SHOT_ANIM_ABRUPT,            // 0x040000 - force the anim to finish player after aim/fire rather than blending out   (ie rpgs)
+    WEAPON_FLAG_SHOT_EXPANDS,                // 0x080000 - expands
     WEAPON_FLAG_LAST = WEAPON_FLAG_SHOT_EXPANDS,
 };
 
@@ -579,7 +579,7 @@ enum eWeaponSkill
     WEAPONSKILL_POOR = 0,
     WEAPONSKILL_STD,
     WEAPONSKILL_PRO,
-    WEAPONSKILL_SPECIAL,    // for cops using pistols differently for example
+    WEAPONSKILL_SPECIAL,            // for cops using pistols differently for example
     WEAPONSKILL_MAX_NUMBER
 };
 
@@ -605,8 +605,8 @@ enum eWeaponState
 };
 enum eWeaponType
 {
-    WEAPONTYPE_UNARMED=0,
-    WEAPONTYPE_BRASSKNUCKLE, 
+    WEAPONTYPE_UNARMED = 0,
+    WEAPONTYPE_BRASSKNUCKLE,
     WEAPONTYPE_GOLFCLUB,
     WEAPONTYPE_NIGHTSTICK,
     WEAPONTYPE_KNIFE,
@@ -615,9 +615,9 @@ enum eWeaponType
     WEAPONTYPE_POOL_CUE,
     WEAPONTYPE_KATANA,
     WEAPONTYPE_CHAINSAW,
-    
+
     // gifts
-    WEAPONTYPE_DILDO1, // 10
+    WEAPONTYPE_DILDO1,            // 10
     WEAPONTYPE_DILDO2,
     WEAPONTYPE_VIBE1,
     WEAPONTYPE_VIBE2,
@@ -628,31 +628,31 @@ enum eWeaponType
     WEAPONTYPE_TEARGAS,
     WEAPONTYPE_MOLOTOV,
     WEAPONTYPE_ROCKET,
-    WEAPONTYPE_ROCKET_HS, // 20
+    WEAPONTYPE_ROCKET_HS,            // 20
     WEAPONTYPE_FREEFALL_BOMB,
 
     // FIRST SKILL WEAPON
-    WEAPONTYPE_PISTOL,          // handguns
+    WEAPONTYPE_PISTOL,            // handguns
     WEAPONTYPE_PISTOL_SILENCED,
     WEAPONTYPE_DESERT_EAGLE,
-    WEAPONTYPE_SHOTGUN,         // shotguns
-    WEAPONTYPE_SAWNOFF_SHOTGUN, // one handed
+    WEAPONTYPE_SHOTGUN,                    // shotguns
+    WEAPONTYPE_SAWNOFF_SHOTGUN,            // one handed
     WEAPONTYPE_SPAS12_SHOTGUN,
-    WEAPONTYPE_MICRO_UZI,       // submachine guns
+    WEAPONTYPE_MICRO_UZI,            // submachine guns
     WEAPONTYPE_MP5,
-    WEAPONTYPE_AK47, // 30      // machine guns 
-    WEAPONTYPE_M4,          
+    WEAPONTYPE_AK47,            // 30      // machine guns
+    WEAPONTYPE_M4,
     WEAPONTYPE_TEC9,            // this uses stat from the micro_uzi
     // END SKILL WEAPONS
-    
-    WEAPONTYPE_COUNTRYRIFLE,    // rifles
-    WEAPONTYPE_SNIPERRIFLE, 
-    WEAPONTYPE_ROCKETLAUNCHER,  // specials
+
+    WEAPONTYPE_COUNTRYRIFLE,            // rifles
+    WEAPONTYPE_SNIPERRIFLE,
+    WEAPONTYPE_ROCKETLAUNCHER,            // specials
     WEAPONTYPE_ROCKETLAUNCHER_HS,
     WEAPONTYPE_FLAMETHROWER,
     WEAPONTYPE_MINIGUN,
     WEAPONTYPE_REMOTE_SATCHEL_CHARGE,
-    WEAPONTYPE_DETONATOR, // 40 // plastic explosive
+    WEAPONTYPE_DETONATOR,            // 40 // plastic explosive
     WEAPONTYPE_SPRAYCAN,
     WEAPONTYPE_EXTINGUISHER,
     WEAPONTYPE_CAMERA,
@@ -664,12 +664,12 @@ enum eWeaponType
     WEAPONTYPE_ARMOUR,
     // these are possible ways to die
     WEAPONTYPE_RAMMEDBYCAR,
-    WEAPONTYPE_RUNOVERBYCAR, // 50
+    WEAPONTYPE_RUNOVERBYCAR,            // 50
     WEAPONTYPE_EXPLOSION,
     WEAPONTYPE_UZI_DRIVEBY,
     WEAPONTYPE_DROWNING,
     WEAPONTYPE_FALL,
-    WEAPONTYPE_UNIDENTIFIED,    // Used for damage being done
+    WEAPONTYPE_UNIDENTIFIED,            // Used for damage being done
     WEAPONTYPE_ANYMELEE,
     WEAPONTYPE_ANYWEAPON,
     WEAPONTYPE_FLARE,
@@ -683,21 +683,21 @@ enum eWeaponSlot
     WEAPONSLOT_TYPE_MELEE,
     WEAPONSLOT_TYPE_HANDGUN,
     WEAPONSLOT_TYPE_SHOTGUN,
-    WEAPONSLOT_TYPE_SMG,        //4
-    WEAPONSLOT_TYPE_MG, 
+    WEAPONSLOT_TYPE_SMG,            // 4
+    WEAPONSLOT_TYPE_MG,
     WEAPONSLOT_TYPE_RIFLE,
     WEAPONSLOT_TYPE_HEAVY,
     WEAPONSLOT_TYPE_THROWN,
-    WEAPONSLOT_TYPE_SPECIAL,    //9
-    WEAPONSLOT_TYPE_GIFT,       //10
-    WEAPONSLOT_TYPE_PARACHUTE,  //11
-    WEAPONSLOT_TYPE_DETONATOR,  //12
+    WEAPONSLOT_TYPE_SPECIAL,              // 9
+    WEAPONSLOT_TYPE_GIFT,                 // 10
+    WEAPONSLOT_TYPE_PARACHUTE,            // 11
+    WEAPONSLOT_TYPE_DETONATOR,            // 12
 
     WEAPONSLOT_MAX
 };
 enum eWeaponModel
 {
-    WEAPONMODEL_CELLPHONE=258,
+    WEAPONMODEL_CELLPHONE = 258,
     WEAPONMODEL_BRASSKNUCKLE,
     WEAPONMODEL_SCREWDRIVER,
     WEAPONMODEL_GOLFCLUB,
@@ -755,10 +755,10 @@ enum eWeaponFlags
 enum eJSONPrettyType
 {
     JSONPRETTY_SPACES = JSON_C_TO_STRING_PRETTY,
-    JSONPRETTY_NONE   = -1,
+    JSONPRETTY_NONE = -1,
     JSONPRETTY_TABS = JSON_C_TO_STRING_PRETTY | JSON_C_TO_STRING_PRETTY_TAB
 };
-DECLARE_ENUM ( eJSONPrettyType );
+DECLARE_ENUM(eJSONPrettyType);
 
 //////////////////////////////////////////////
 // flags used to define weapon characteristics
@@ -786,7 +786,7 @@ DECLARE_ENUM ( eJSONPrettyType );
 #define WEAPONTYPE_LONG_RELOAD_TIME (0x008000)  // force a longer reload time!
 
 // these are area effect/shot options
-#define WEAPONTYPE_SLOWS_DOWN       (0x010000)  // 
-#define WEAPONTYPE_RANDOM_SPEED     (0x020000)  // 
+#define WEAPONTYPE_SLOWS_DOWN       (0x010000)  //
+#define WEAPONTYPE_RANDOM_SPEED     (0x020000)  //
 #define WEAPONTYPE_FORCE_FINISH_ANIM (0x040000)  // force the anim to finish player after aim/fire rather than blending out
-#define WEAPONTYPE_EXPANDS          (0x080000)  // 
+#define WEAPONTYPE_EXPANDS (0x080000)            //
