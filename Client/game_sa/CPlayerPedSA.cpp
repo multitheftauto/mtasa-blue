@@ -1,20 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CPlayerPedSA.cpp
-*  PURPOSE:     Player ped entity
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Christian Myhre Lundheim <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*               Jax <>
-*               Alberto Alonso <rydencillo@gmail.com>
-*               Stanislav Bobrov <lil_toady@hotmail.com>
-*               aru <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CPlayerPedSA.cpp
+ *  PURPOSE:     Player ped entity
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
@@ -22,11 +15,11 @@
  * Constructor for CPlayerPedSA
  */
 
-static CPedClothesDesc* pLocalClothes = 0;
+static CPedClothesDesc*    pLocalClothes = 0;
 static CWantedSAInterface* pLocalWanted = 0;
-static std::set < SString > ms_DoneAnimBlockRefMap;
+static std::set<SString>   ms_DoneAnimBlockRefMap;
 
-CPlayerPedSA::CPlayerPedSA( ePedModel pedType )
+CPlayerPedSA::CPlayerPedSA(ePedModel pedType)
 {
     DEBUG_TRACE("CPlayerPedSA::CPlayerPedSA( ePedModel pedType )");
     // based on CPlayerPed::SetupPlayerPed (R*)
@@ -48,29 +41,29 @@ CPlayerPedSA::CPlayerPedSA( ePedModel pedType )
         call    CPlayerPedConstructor
     }
 
-    this->SetInterface((CEntitySAInterface *)dwPedPointer);
+    this->SetInterface((CEntitySAInterface*)dwPedPointer);
 
-    this->Init(); // init our interfaces 
-    CPoolsSA * pools = (CPoolsSA *)pGame->GetPools ( );
-    this->internalID =  pools->GetPedRef ( (DWORD *)this->GetInterface () );
-    CWorldSA * world = (CWorldSA *)pGame->GetWorld();
-    
+    this->Init();            // init our interfaces
+    CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
+    this->internalID = pools->GetPedRef((DWORD*)this->GetInterface());
+    CWorldSA* world = (CWorldSA*)pGame->GetWorld();
+
     this->SetModelIndex(pedType);
     this->BeingDeleted = FALSE;
     this->DoNotRemoveFromGame = FALSE;
-    this->SetType ( PLAYER_PED );
+    this->SetType(PLAYER_PED);
 
     // Allocate a player data struct and set it as the players
     m_bIsLocal = false;
     m_pData = new CPlayerPedDataSAInterface;
 
     // Copy the local player data so we're defaulted to something good
-    CPlayerPedSA* pLocalPlayerSA = dynamic_cast < CPlayerPedSA* > ( pools->GetPedFromRef ( (DWORD)1 ) );
-    if ( pLocalPlayerSA )
-        MemCpyFast ( m_pData, ((CPlayerPedSAInterface*)pLocalPlayerSA->GetInterface ())->pPlayerData, sizeof ( CPlayerPedDataSAInterface ) );
+    CPlayerPedSA* pLocalPlayerSA = dynamic_cast<CPlayerPedSA*>(pools->GetPedFromRef((DWORD)1));
+    if (pLocalPlayerSA)
+        MemCpyFast(m_pData, ((CPlayerPedSAInterface*)pLocalPlayerSA->GetInterface())->pPlayerData, sizeof(CPlayerPedDataSAInterface));
 
     // Replace the player ped data in our ped interface with the one we just created
-    GetPlayerPedInterface ()->pPlayerData = m_pData;
+    GetPlayerPedInterface()->pPlayerData = m_pData;
 
     // Set default stuff
     m_pData->m_bRenderWeapon = true;
@@ -85,94 +78,89 @@ CPlayerPedSA::CPlayerPedSA( ePedModel pedType )
     // processed as if they would be standing on some surface, screwing velocity calculations
     // for players floating in air (using superman script, for example) because GTA:SA will
     // try to apply the floor friction to their velocity.
-    //SetIsStanding ( true );
+    // SetIsStanding ( true );
 
-    GetPlayerPedInterface ()->pedFlags.bCanBeShotInVehicle = true;
-    GetPlayerPedInterface ()->pedFlags.bTestForShotInVehicle = true;
+    GetPlayerPedInterface()->pedFlags.bCanBeShotInVehicle = true;
+    GetPlayerPedInterface()->pedFlags.bTestForShotInVehicle = true;
     // Stop remote players targeting eachother, this also stops the local player targeting them (needs to be fixed)
-    GetPlayerPedInterface ()->pedFlags.bNeverEverTargetThisPed = true;
-    GetPlayerPedInterface ()->pedFlags.bIsLanding = false;
-    GetPlayerPedInterface ()->fRotationSpeed = 7.5;
+    GetPlayerPedInterface()->pedFlags.bNeverEverTargetThisPed = true;
+    GetPlayerPedInterface()->pedFlags.bIsLanding = false;
+    GetPlayerPedInterface()->fRotationSpeed = 7.5;
     m_pInterface->bStreamingDontDelete = true;
     m_pInterface->bDontStream = true;
-    world->Add ( m_pInterface, CPlayerPed_Constructor );
+    world->Add(m_pInterface, CPlayerPed_Constructor);
 }
 
-
-CPlayerPedSA::CPlayerPedSA ( CPlayerPedSAInterface * pPlayer )
+CPlayerPedSA::CPlayerPedSA(CPlayerPedSAInterface* pPlayer)
 {
     DEBUG_TRACE("CPlayerPedSA::CPlayerPedSA( CPedSAInterface * ped )");
     // based on CPlayerPed::SetupPlayerPed (R*)
-    this->SetInterface((CEntitySAInterface *)pPlayer);
+    this->SetInterface((CEntitySAInterface*)pPlayer);
 
     this->Init();
-    CPoolsSA * pools = (CPoolsSA *)pGame->GetPools();
-    this->internalID =  pools->GetPedRef ( (DWORD *)this->GetInterface () );
-    this->SetType ( PLAYER_PED );
+    CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
+    this->internalID = pools->GetPedRef((DWORD*)this->GetInterface());
+    this->SetType(PLAYER_PED);
     this->BeingDeleted = FALSE;
 
     m_bIsLocal = true;
     DoNotRemoveFromGame = true;
-    m_pData = GetPlayerPedInterface ()->pPlayerData;
+    m_pData = GetPlayerPedInterface()->pPlayerData;
     m_pWanted = NULL;
 
-    GetPlayerPedInterface ()->pedFlags.bCanBeShotInVehicle = true;
-    GetPlayerPedInterface ()->pedFlags.bTestForShotInVehicle = true;    
-    GetPlayerPedInterface ()->pedFlags.bIsLanding = false;
-    GetPlayerPedInterface ()->fRotationSpeed = 7.5;
-
+    GetPlayerPedInterface()->pedFlags.bCanBeShotInVehicle = true;
+    GetPlayerPedInterface()->pedFlags.bTestForShotInVehicle = true;
+    GetPlayerPedInterface()->pedFlags.bIsLanding = false;
+    GetPlayerPedInterface()->fRotationSpeed = 7.5;
 
     pLocalClothes = m_pData->m_pClothes;
     pLocalWanted = m_pData->m_Wanted;
 
-    GetPlayerPedInterface ()->pedFlags.bCanBeShotInVehicle = true;
+    GetPlayerPedInterface()->pedFlags.bCanBeShotInVehicle = true;
     // Something resets this, constantly
-    GetPlayerPedInterface ()->pedFlags.bTestForShotInVehicle = true;
+    GetPlayerPedInterface()->pedFlags.bTestForShotInVehicle = true;
     // Stop remote players targeting the local (need to stop them targeting eachother too)
-    GetPlayerPedInterface ()->pedFlags.bNeverEverTargetThisPed = true;
+    GetPlayerPedInterface()->pedFlags.bNeverEverTargetThisPed = true;
 }
 
-
-CPlayerPedSA::~CPlayerPedSA ( void )
+CPlayerPedSA::~CPlayerPedSA(void)
 {
     DEBUG_TRACE("CPlayerPedSA::~CPlayerPedSA( )");
-    if(!this->BeingDeleted && DoNotRemoveFromGame == false)
+    if (!this->BeingDeleted && DoNotRemoveFromGame == false)
     {
-        DWORD dwInterface = (DWORD) m_pInterface;
-        
-        if ( (DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable )
+        DWORD dwInterface = (DWORD)m_pInterface;
+
+        if ((DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable)
         {
-            CWorldSA * world = (CWorldSA *)pGame->GetWorld();
-            world->Remove ( m_pInterface, CPlayerPed_Destructor );
-        
-            DWORD dwThis = (DWORD) m_pInterface;
-            DWORD dwFunc = m_pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
-            _asm    
+            CWorldSA* world = (CWorldSA*)pGame->GetWorld();
+            world->Remove(m_pInterface, CPlayerPed_Destructor);
+
+            DWORD dwThis = (DWORD)m_pInterface;
+            DWORD dwFunc = m_pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR;            // we use the vtbl so we can be type independent
+            _asm
             {
                 mov     ecx, dwThis
-                push    1           //delete too
+                push    1            // delete too
                 call    dwFunc
             }
         }
         this->BeingDeleted = true;
-        ((CPoolsSA *)pGame->GetPools())->RemovePed((CPed *)(CPedSA *)this, false);
+        ((CPoolsSA*)pGame->GetPools())->RemovePed((CPed*)(CPedSA*)this, false);
     }
 
     // Delete the player data
-    if ( !m_bIsLocal )
+    if (!m_bIsLocal)
     {
         delete m_pData;
     }
 }
 
-
-CWanted* CPlayerPedSA::GetWanted ( void )
+CWanted* CPlayerPedSA::GetWanted(void)
 {
     return m_pWanted;
 }
 
-
-float CPlayerPedSA::GetSprintEnergy ( void )
+float CPlayerPedSA::GetSprintEnergy(void)
 {
     /*
     OutputDebugString("GetSprintEnergy HACK\n");
@@ -192,18 +180,16 @@ float CPlayerPedSA::GetSprintEnergy ( void )
     return m_pData->m_fSprintEnergy;
 }
 
-
-void CPlayerPedSA::SetSprintEnergy ( float fSprintEnergy )
+void CPlayerPedSA::SetSprintEnergy(float fSprintEnergy)
 {
     m_pData->m_fSprintEnergy = fSprintEnergy;
 }
 
-
-void CPlayerPedSA::SetInitialState ( void )
+void CPlayerPedSA::SetInitialState(void)
 {
     DWORD dwUnknown = 1;
     DWORD dwFunction = FUNC_SetInitialState;
-    DWORD dwThis = (DWORD) m_pInterface;
+    DWORD dwThis = (DWORD)m_pInterface;
     _asm
     {
         push    dwUnknown
@@ -212,59 +198,56 @@ void CPlayerPedSA::SetInitialState ( void )
     }
 
     // Avoid direction locks for respawning after a jump
-    GetPlayerPedInterface ()->pedFlags.bIsLanding = false;
+    GetPlayerPedInterface()->pedFlags.bIsLanding = false;
     // Avoid direction locks for respawning after a sprint stop
-    GetPlayerPedInterface ()->fRotationSpeed = 7.5;
+    GetPlayerPedInterface()->fRotationSpeed = 7.5;
     // This seems to also be causing some movement / direction locks
     GetPlayerPedInterface()->pedFlags.bStayInSamePlace = false;
 }
 
-eMoveAnim CPlayerPedSA::GetMoveAnim ( void )
+eMoveAnim CPlayerPedSA::GetMoveAnim(void)
 {
-    CPedSAInterface *pedInterface = ( CPedSAInterface * ) this->GetInterface();
+    CPedSAInterface* pedInterface = (CPedSAInterface*)this->GetInterface();
     return (eMoveAnim)pedInterface->iMoveAnimGroup;
 }
 
-
 // Helper for SetMoveAnim
-bool IsBlendAssocGroupLoaded( int iGroup )
+bool IsBlendAssocGroupLoaded(int iGroup)
 {
     CAnimBlendAssocGroupSAInterface* pBlendAssocGroup = *(CAnimBlendAssocGroupSAInterface**)0xB4EA34;
     pBlendAssocGroup += iGroup;
     return pBlendAssocGroup->pAnimBlock != NULL;
 }
 
-
 // Helper for SetMoveAnim
-bool IsBlendAssocGroupValid( int iGroup )
+bool IsBlendAssocGroupValid(int iGroup)
 {
     CAnimBlendAssocGroupSAInterface* pBlendAssocGroup = *(CAnimBlendAssocGroupSAInterface**)0xB4EA34;
     pBlendAssocGroup += iGroup;
-    if ( pBlendAssocGroup->pAnimBlock == NULL )
+    if (pBlendAssocGroup->pAnimBlock == NULL)
         return false;
-    if ( pBlendAssocGroup->pAssociationsArray == NULL )
+    if (pBlendAssocGroup->pAssociationsArray == NULL)
         return false;
-    int moveIds[] = { 0, 1, 2, 3, 5 };
-    for( uint i = 0 ; i < NUMELMS( moveIds ) ; i++ )
+    int moveIds[] = {0, 1, 2, 3, 5};
+    for (uint i = 0; i < NUMELMS(moveIds); i++)
     {
-        int iUseAnimId = moveIds[i] - pBlendAssocGroup->iIDOffset;
+        int                                     iUseAnimId = moveIds[i] - pBlendAssocGroup->iIDOffset;
         CAnimBlendStaticAssociationSAInterface* pAssociation = pBlendAssocGroup->pAssociationsArray + iUseAnimId;
-        if ( pAssociation == NULL )
+        if (pAssociation == NULL)
             return false;
-        if ( pAssociation->pAnimHeirarchy == NULL )
+        if (pAssociation->pAnimHeirarchy == NULL)
             return false;
     }
     return true;
 }
 
-
-void CPlayerPedSA::SetMoveAnim ( eMoveAnim iAnimGroup )
+void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
 {
     // Range check
-    if ( !IsValidMoveAnim( iAnimGroup ) )
+    if (!IsValidMoveAnim(iAnimGroup))
         return;
 
-    if ( iAnimGroup == MOVE_DEFAULT )
+    if (iAnimGroup == MOVE_DEFAULT)
     {
         m_iCustomMoveAnim = 0;
         return;
@@ -272,13 +255,21 @@ void CPlayerPedSA::SetMoveAnim ( eMoveAnim iAnimGroup )
 
     // Find which anim block to load
     SString strBlockName;
-    switch ( iAnimGroup )
+    switch (iAnimGroup)
     {
-        case 55: case 58: case 61: case 64: case 67:
+        case 55:
+        case 58:
+        case 61:
+        case 64:
+        case 67:
             strBlockName = "fat";
             break;
 
-        case 56: case 59: case 62: case 65: case 68:
+        case 56:
+        case 59:
+        case 62:
+        case 65:
+        case 68:
             strBlockName = "muscular";
             break;
 
@@ -292,43 +283,43 @@ void CPlayerPedSA::SetMoveAnim ( eMoveAnim iAnimGroup )
     }
 
     // Need to load ?
-    if ( !IsBlendAssocGroupLoaded( iAnimGroup ) )
+    if (!IsBlendAssocGroupLoaded(iAnimGroup))
     {
-        CAnimBlock* pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock ( strBlockName );
+        CAnimBlock* pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
 
         // Try load
-        if ( pAnimBlock && !pAnimBlock->IsLoaded() )
+        if (pAnimBlock && !pAnimBlock->IsLoaded())
         {
-            pAnimBlock->Request( BLOCKING, true );
-            MapInsert( ms_DoneAnimBlockRefMap, strBlockName );  // Request() adds a ref for us
+            pAnimBlock->Request(BLOCKING, true);
+            MapInsert(ms_DoneAnimBlockRefMap, strBlockName);            // Request() adds a ref for us
         }
 
         // Load fail?
-        if ( !IsBlendAssocGroupLoaded( iAnimGroup ) )
+        if (!IsBlendAssocGroupLoaded(iAnimGroup))
             return;
     }
 
     // Check it all looks good
-    if ( !IsBlendAssocGroupValid( iAnimGroup ) )
+    if (!IsBlendAssocGroupValid(iAnimGroup))
         return;
 
     // Ensure we add a ref to this block, even if it wasn't loaded by us
-    CAnimBlock* pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock ( strBlockName );
-    if ( !pAnimBlock )
+    CAnimBlock* pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
+    if (!pAnimBlock)
         return;
-    if ( !MapContains( ms_DoneAnimBlockRefMap, strBlockName ) )
+    if (!MapContains(ms_DoneAnimBlockRefMap, strBlockName))
     {
-        MapInsert( ms_DoneAnimBlockRefMap, strBlockName );
+        MapInsert(ms_DoneAnimBlockRefMap, strBlockName);
         pAnimBlock->AddRef();
     }
 
     m_iCustomMoveAnim = iAnimGroup;
 
     // Set the the new move animation group now, although it does get updated through the hooks as well
-    CPedSAInterface *pedInterface = ( CPedSAInterface * ) this->GetInterface();
+    CPedSAInterface* pedInterface = (CPedSAInterface*)this->GetInterface();
     pedInterface->iMoveAnimGroup = (int)iAnimGroup;
 
-    DWORD dwThis = ( DWORD ) pedInterface;
+    DWORD dwThis = (DWORD)pedInterface;
     DWORD dwFunc = FUNC_CPlayerPed_ReApplyMoveAnims;
     _asm
     {
@@ -341,9 +332,9 @@ void CPlayerPedSA::SetMoveAnim ( eMoveAnim iAnimGroup )
  * Gets information on the player's wanted status
  * @return Pointer to a CWanted class containing the wanted information for the PlayerPed.
  */
-//CWanted   * CPlayerPedSA::GetWanted (  )
+// CWanted   * CPlayerPedSA::GetWanted (  )
 //{
-    //return internalInterface->Wanted;
+// return internalInterface->Wanted;
 //}
 
 /**
@@ -356,7 +347,7 @@ void CPlayerPedSA::SetMoveAnim ( eMoveAnim iAnimGroup )
     return internalInterface->CurrentWeapon;
 }*/
 
-/** 
+/**
  * Gets the time the last shot was fired by the playerped
  * @return DWORD containing a system time value
  */
@@ -406,7 +397,6 @@ VOID CPlayerPedSA::ClearWeaponTarget (  )
         call    dwFunction
     }
 }*/
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -465,35 +455,34 @@ VOID CPlayerPedSA::ClearWeaponTarget (  )
         MOVE_SKATE,
 */
 
-bool IsAnimJetPack( int iAnim )
+bool IsAnimJetPack(int iAnim)
 {
     return iAnim == MOVE_JETPACK;
 }
 
 // True if anim has Std/Fat/Muscular variants
-bool IsAnimPhysiqueBased( int iAnim )
+bool IsAnimPhysiqueBased(int iAnim)
 {
-    return ( iAnim >= MOVE_PLAYER ) && ( iAnim <= MOVE_CSAW_M );
+    return (iAnim >= MOVE_PLAYER) && (iAnim <= MOVE_CSAW_M);
 }
 
 // Special pose is MOVE_ROCKET, MOVE_ARMED, MOVE_BBBAT or MOVE_CSAW
-bool IsAnimSpecialPose( int iAnim )
+bool IsAnimSpecialPose(int iAnim)
 {
-    return ( iAnim >= MOVE_ROCKET ) && ( iAnim <= MOVE_CSAW_M );
+    return (iAnim >= MOVE_ROCKET) && (iAnim <= MOVE_CSAW_M);
 }
 
 // 0-Std  1-Fat  2-Muscular
-int GetAnimPhysiqueIndex( int iAnim )
+int GetAnimPhysiqueIndex(int iAnim)
 {
-    return ( iAnim - MOVE_PLAYER ) % 3;
+    return (iAnim - MOVE_PLAYER) % 3;
 }
 
 // Pose is MOVE_PLAYER, MOVE_ROCKET, MOVE_ARMED, MOVE_BBBAT or MOVE_CSAW
-int GetAnimPose( int iAnim )
+int GetAnimPose(int iAnim)
 {
-    return iAnim - GetAnimPhysiqueIndex( iAnim );
+    return iAnim - GetAnimPhysiqueIndex(iAnim);
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -503,24 +492,25 @@ int GetAnimPose( int iAnim )
 // Returns anim to use
 //
 ////////////////////////////////////////////////////////////////
-int _cdecl OnCPlayerPed_ProcessAnimGroups_Mid( CPlayerPedSAInterface* pPlayerPedSAInterface, int iReqMoveAnim )
+__declspec(noinline) int _cdecl OnCPlayerPed_ProcessAnimGroups_Mid(CPlayerPedSAInterface* pPlayerPedSAInterface, int iReqMoveAnim)
 {
-    CPed* pPed = pGame->GetPools ()->GetPed( (DWORD *)pPlayerPedSAInterface );
+    CPed* pPed = pGame->GetPools()->GetPed((DWORD*)pPlayerPedSAInterface);
 
-    if ( pPed )
+    if (pPed)
     {
         int iCustomAnim = pPed->GetCustomMoveAnim();
-        if ( iCustomAnim )
+        if (iCustomAnim)
         {
             // If iReqMoveAnim is jetpack, use iReqMoveAnim
-            if ( IsAnimJetPack( iReqMoveAnim ) )
+            if (IsAnimJetPack(iReqMoveAnim))
                 return iReqMoveAnim;
 
-            // If iCustomAnim is physique based without special pose, and iReqMoveAnim is physique based, then use pose from iReqMoveAnim and physique from iCustomAnim
-            if ( IsAnimPhysiqueBased( iCustomAnim ) && !IsAnimSpecialPose( iCustomAnim ) && IsAnimPhysiqueBased( iReqMoveAnim ) )
+            // If iCustomAnim is physique based without special pose, and iReqMoveAnim is physique based, then use pose from iReqMoveAnim and physique from
+            // iCustomAnim
+            if (IsAnimPhysiqueBased(iCustomAnim) && !IsAnimSpecialPose(iCustomAnim) && IsAnimPhysiqueBased(iReqMoveAnim))
             {
-                int iPhysique = GetAnimPhysiqueIndex( iCustomAnim );
-                int iPose = GetAnimPose( iReqMoveAnim );
+                int iPhysique = GetAnimPhysiqueIndex(iCustomAnim);
+                int iPose = GetAnimPose(iReqMoveAnim);
                 return iPose + iPhysique;
             }
 
@@ -532,11 +522,10 @@ int _cdecl OnCPlayerPed_ProcessAnimGroups_Mid( CPlayerPedSAInterface* pPlayerPed
     return iReqMoveAnim;
 }
 
-
 // Hook info
 #define HOOKPOS_CPlayerPed_ProcessAnimGroups_Mid        0x0609A44
 #define HOOKSIZE_CPlayerPed_ProcessAnimGroups_Mid       6
-DWORD RETURN_CPlayerPed_ProcessAnimGroups_Mid =         0x0609A4A;
+DWORD RETURN_CPlayerPed_ProcessAnimGroups_Mid = 0x0609A4A;
 void _declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
 {
     _asm
@@ -556,7 +545,6 @@ void _declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////
 //
 // CClothes_GetDefaultPlayerMotionGroup
@@ -565,18 +553,18 @@ void _declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
 // Returns MOVE_PLAYER, MOVE_PLAYER_F or MOVE_PLAYER_M
 //
 ////////////////////////////////////////////////////////////////
-int _cdecl OnCClothes_GetDefaultPlayerMotionGroup( int iReqMoveAnim )
+__declspec(noinline) int _cdecl OnCClothes_GetDefaultPlayerMotionGroup(int iReqMoveAnim)
 {
     CPed* pPed = g_pCore->GetMultiplayer()->GetContextSwitchedPed();
 
-    if ( pPed )
+    if (pPed)
     {
         int iCustomAnim = pPed->GetCustomMoveAnim();
-        if ( iCustomAnim )
+        if (iCustomAnim)
         {
-            if ( IsAnimPhysiqueBased( iCustomAnim ) )
+            if (IsAnimPhysiqueBased(iCustomAnim))
             {
-                int iPhysique = GetAnimPhysiqueIndex( iCustomAnim );
+                int iPhysique = GetAnimPhysiqueIndex(iCustomAnim);
                 int iBaseAnim = MOVE_PLAYER + iPhysique;
                 return iBaseAnim;
             }
@@ -586,11 +574,10 @@ int _cdecl OnCClothes_GetDefaultPlayerMotionGroup( int iReqMoveAnim )
     return iReqMoveAnim;
 }
 
-
 // Hook info
 #define HOOKPOS_CClothes_GetDefaultPlayerMotionGroup        0x05A81B0
 #define HOOKSIZE_CClothes_GetDefaultPlayerMotionGroup       5
-DWORD RETURN_CClothes_GetDefaultPlayerMotionGroup =         0x05A81B5;
+DWORD RETURN_CClothes_GetDefaultPlayerMotionGroup = 0x05A81B5;
 void _declspec(naked) HOOK_CClothes_GetDefaultPlayerMotionGroup()
 {
     _asm
@@ -610,15 +597,13 @@ void _declspec(naked) HOOK_CClothes_GetDefaultPlayerMotionGroup()
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CPlayerPedSA::StaticSetHooks( void )
+void CPlayerPedSA::StaticSetHooks(void)
 {
-   EZHookInstall( CPlayerPed_ProcessAnimGroups_Mid );
-   EZHookInstall( CClothes_GetDefaultPlayerMotionGroup );
+    EZHookInstall(CPlayerPed_ProcessAnimGroups_Mid);
+    EZHookInstall(CClothes_GetDefaultPlayerMotionGroup);
 }
-

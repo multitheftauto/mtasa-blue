@@ -1,18 +1,17 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CStatsSA.cpp
-*  PURPOSE:     Game statistics
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CStatsSA.cpp
+ *  PURPOSE:     Game statistics
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-float CStatsSA::GetStatValue ( unsigned short usIndex )
+float CStatsSA::GetStatValue(unsigned short usIndex)
 {
     DWORD dwFunc = FUNC_GetStatValue;
     float fReturn = 0.0f;
@@ -28,7 +27,7 @@ float CStatsSA::GetStatValue ( unsigned short usIndex )
     return fReturn;
 }
 
-void CStatsSA::ModifyStat ( unsigned short usIndex, float fAmmount )
+void CStatsSA::ModifyStat(unsigned short usIndex, float fAmmount)
 {
     DWORD dwFunc = FUNC_ModifyStat;
     DWORD dwStatIndex = usIndex;
@@ -42,7 +41,7 @@ void CStatsSA::ModifyStat ( unsigned short usIndex, float fAmmount )
     }
 }
 
-void CStatsSA::IncrementStat ( unsigned short usIndex, float fAmmount )
+void CStatsSA::IncrementStat(unsigned short usIndex, float fAmmount)
 {
     DWORD dwFunc = FUNC_IncrementStat;
     DWORD dwStatIndex = usIndex;
@@ -56,7 +55,7 @@ void CStatsSA::IncrementStat ( unsigned short usIndex, float fAmmount )
     }
 }
 
-void CStatsSA::DecrementStat ( unsigned short usIndex, float fAmmount )
+void CStatsSA::DecrementStat(unsigned short usIndex, float fAmmount)
 {
     DWORD dwFunc = FUNC_DecrementStat;
     DWORD dwStatIndex = usIndex;
@@ -70,7 +69,7 @@ void CStatsSA::DecrementStat ( unsigned short usIndex, float fAmmount )
     }
 }
 
-void CStatsSA::SetStatValue ( unsigned short usIndex, float fAmmount )
+void CStatsSA::SetStatValue(unsigned short usIndex, float fAmmount)
 {
     DWORD dwFunc = FUNC_SetStatValue;
     DWORD dwStatIndex = usIndex;
@@ -84,10 +83,10 @@ void CStatsSA::SetStatValue ( unsigned short usIndex, float fAmmount )
     }
 }
 
-unsigned short CStatsSA::GetSkillStatIndex ( eWeaponType type )
+unsigned short CStatsSA::GetSkillStatIndex(eWeaponType type)
 {
-    int weaponType = ( int ) type;
-    int iIndex;
+    int   weaponType = (int)type;
+    int   iIndex;
     DWORD dwFunc = FUNC_CWeaponInfo_GetSkillStatIndex;
     _asm
     {
@@ -96,5 +95,5 @@ unsigned short CStatsSA::GetSkillStatIndex ( eWeaponType type )
         add     esp, 0x4
         mov     iIndex, eax
     }
-    return ( unsigned short ) iIndex;
+    return (unsigned short)iIndex;
 }

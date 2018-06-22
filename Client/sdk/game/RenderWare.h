@@ -1,15 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/game/RenderWare.h
-*  PURPOSE:     RenderWare-compatible definitions for
-*               Grand Theft Auto: San Andreas
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*  RenderWare is © Criterion Software
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/game/RenderWare.h
+ *  PURPOSE:     RenderWare-compatible definitions for
+ *               Grand Theft Auto: San Andreas
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  RenderWare is © Criterion Software
+ *
+ *****************************************************************************/
 
 #ifndef __RENDERWARE_COMPAT
 #define __RENDERWARE_COMPAT
@@ -24,39 +24,39 @@
 #define RW_FRAME_NAME_LENGTH      23
 #define RW_MAX_TEXTURE_COORDS     8
 
-typedef struct RwV2d RwV2d;
-typedef struct RwV3d RwV3d;
-typedef struct RwPlane RwPlane;
-typedef struct RwBBox RwBBox;
-typedef struct RpGeometry RpGeometry;
-typedef void   RpWorld;
-typedef struct RpClump RpClump;
-typedef struct RwRaster RwRaster;
-typedef struct RpMaterialLighting RpMaterialLighting;
-typedef struct RpMaterialList RpMaterialList;
-typedef struct RpMaterial RpMaterial;
-typedef struct RpTriangle RpTriangle;
+typedef struct RwV2d                RwV2d;
+typedef struct RwV3d                RwV3d;
+typedef struct RwPlane              RwPlane;
+typedef struct RwBBox               RwBBox;
+typedef struct RpGeometry           RpGeometry;
+typedef void                        RpWorld;
+typedef struct RpClump              RpClump;
+typedef struct RwRaster             RwRaster;
+typedef struct RpMaterialLighting   RpMaterialLighting;
+typedef struct RpMaterialList       RpMaterialList;
+typedef struct RpMaterial           RpMaterial;
+typedef struct RpTriangle           RpTriangle;
 typedef struct RwTextureCoordinates RwTextureCoordinates;
-typedef struct RwColor      RwColor;
-typedef struct RwColorFloat RwColorFloat;
-typedef struct RwObjectFrame RwObjectFrame;
-typedef struct RpAtomic RpAtomic;
-typedef struct RwCamera RwCamera;
-typedef struct RpLight RpLight;
+typedef struct RwColor              RwColor;
+typedef struct RwColorFloat         RwColorFloat;
+typedef struct RwObjectFrame        RwObjectFrame;
+typedef struct RpAtomic             RpAtomic;
+typedef struct RwCamera             RwCamera;
+typedef struct RpLight              RpLight;
 
-typedef RwCamera *(*RwCameraPreCallback) (RwCamera * camera);
-typedef RwCamera *(*RwCameraPostCallback) (RwCamera * camera);
-typedef RpAtomic *(*RpAtomicCallback) (RpAtomic * atomic);
-typedef RpClump  *(*RpClumpCallback) (RpClump * clump, void *data);
+typedef RwCamera* (*RwCameraPreCallback)(RwCamera* camera);
+typedef RwCamera* (*RwCameraPostCallback)(RwCamera* camera);
+typedef RpAtomic* (*RpAtomicCallback)(RpAtomic* atomic);
+typedef RpClump* (*RpClumpCallback)(RpClump* clump, void* data);
 
 // RenderWare primitive types
 struct RwV2d
-{   // 8-byte
-    float x,y;
+{            // 8-byte
+    float x, y;
 };
 struct RwV3d
-{   // 12-byte
-    float x,y,z;
+{            // 12-byte
+    float x, y, z;
 };
 struct RwPlane
 {
@@ -74,15 +74,15 @@ struct RwSphere
     float radius;
 };
 struct RwMatrix
-{   // 16-byte padded
-    RwV3d          right;  // 0
-    unsigned int   flags;  // 12
-    RwV3d          up;     // 16
-    unsigned int   pad1;   // 28
-    RwV3d          at;     // 32
-    unsigned int   pad2;   // 44
-    RwV3d          pos;    // 48
-    unsigned int   pad3;   // 60
+{                                  // 16-byte padded
+    RwV3d        right;            // 0
+    unsigned int flags;            // 12
+    RwV3d        up;               // 16
+    unsigned int pad1;             // 28
+    RwV3d        at;               // 32
+    unsigned int pad2;             // 44
+    RwV3d        pos;              // 48
+    unsigned int pad3;             // 60
 };
 
 // RenderWare enumerations
@@ -126,10 +126,10 @@ enum RwTransformOrder
 enum RpLightType
 {
     LIGHT_TYPE_NULL = 0,
-    
+
     LIGHT_TYPE_DIRECTIONAL = 1,
     LIGHT_TYPE_AMBIENT = 2,
-    
+
     LIGHT_TYPE_POINT = 0x80,
     LIGHT_TYPE_SPOT_1 = 0x81,
     LIGHT_TYPE_SPOT_2 = 0x82,
@@ -150,18 +150,18 @@ struct RwObject
     unsigned char subtype;
     unsigned char flags;
     unsigned char privateFlags;
-    void *parent;                // should be RwFrame with RpClump
+    void*         parent;            // should be RwFrame with RpClump
 };
 struct RwVertex
 {
     RwV3d        position;
     RwV3d        normal;
     unsigned int color;
-    float        u,v;
+    float        u, v;
 };
 struct RwListEntry
 {
-    RwListEntry *next,*prev;
+    RwListEntry *next, *prev;
 };
 struct RwList
 {
@@ -169,73 +169,73 @@ struct RwList
 };
 struct RwFrame
 {
-    RwObject         object;            // 0
-    void             *pad1,*pad2;       // 8
-    RwMatrix         modelling;         // 16
-    RwMatrix         ltm;               // 32
-    RwList           objects;           // 48
-    struct RwFrame   *child;            // 56
-    struct RwFrame   *next;             // 60
-    struct RwFrame   *root;             // 64
+    RwObject        object;                 // 0
+    void *          pad1, *pad2;            // 8
+    RwMatrix        modelling;              // 16
+    RwMatrix        ltm;                    // 32
+    RwList          objects;                // 48
+    struct RwFrame* child;                  // 56
+    struct RwFrame* next;                   // 60
+    struct RwFrame* root;                   // 64
 
     // Rockstar Frame extension (0x253F2FE) (24 bytes)
-    unsigned char    pluginData[8];                       // padding
-    char             szName[RW_FRAME_NAME_LENGTH+1];        // name (as stored in the frame extension)
+    unsigned char pluginData[8];                               // padding
+    char          szName[RW_FRAME_NAME_LENGTH + 1];            // name (as stored in the frame extension)
 };
 struct RwTexDictionary
 {
-    RwObject     object;
-    RwList       textures;
-    RwListEntry  globalTXDs;
+    RwObject    object;
+    RwList      textures;
+    RwListEntry globalTXDs;
 };
 struct RwTexture
 {
-    RwRaster           *raster;
-    RwTexDictionary    *txd;
-    RwListEntry        TXDList;
-    char               name[RW_TEXTURE_NAME_LENGTH];
-    char               mask[RW_TEXTURE_NAME_LENGTH];
-    unsigned int       flags;
-    int                refs;
+    RwRaster*        raster;
+    RwTexDictionary* txd;
+    RwListEntry      TXDList;
+    char             name[RW_TEXTURE_NAME_LENGTH];
+    char             mask[RW_TEXTURE_NAME_LENGTH];
+    unsigned int     flags;
+    int              refs;
 };
 struct RwTextureCoordinates
 {
-    float u,v;
+    float u, v;
 };
 struct RwRaster
 {
-    RwRaster        *parent;               // 0
-    unsigned char   *pixels;               // 4
-    unsigned char   *palette;              // 8
-    int             width, height, depth;  // 12, 16 / 0x10, 20
-    int             numLevels;             // 24 / 0x18
-    short           u, v;
-    unsigned char   type;
-    unsigned char   flags;
-    unsigned char   privateFlags;
-    unsigned char   format;
-    unsigned char   *origPixels;
-    int             origWidth, origHeight, origDepth;
-    void*           renderResource;         // RwD3D9Raster continues from here
+    RwRaster*      parent;                          // 0
+    unsigned char* pixels;                          // 4
+    unsigned char* palette;                         // 8
+    int            width, height, depth;            // 12, 16 / 0x10, 20
+    int            numLevels;                       // 24 / 0x18
+    short          u, v;
+    unsigned char  type;
+    unsigned char  flags;
+    unsigned char  privateFlags;
+    unsigned char  format;
+    unsigned char* origPixels;
+    int            origWidth, origHeight, origDepth;
+    void*          renderResource;            // RwD3D9Raster continues from here
 };
 struct RwColorFloat
 {
-    float r,g,b,a;
+    float r, g, b, a;
 };
 struct RwColor
 {
-    unsigned char r,g,b,a;
+    unsigned char r, g, b, a;
 };
 struct RwObjectFrame
 {
-    RwObject     object;
-    RwListEntry  lFrame;
-    void         *callback;
+    RwObject    object;
+    RwListEntry lFrame;
+    void*       callback;
 };
 struct RwCameraFrustum
 {
     RwPlane       plane;
-    unsigned char x,y,z;
+    unsigned char x, y, z;
     unsigned char unknown1;
 };
 struct RwCamera
@@ -245,8 +245,8 @@ struct RwCamera
     RwCameraPreCallback  preCallback;
     RwCameraPostCallback postCallback;
     RwMatrix             matrix;
-    RwRaster             *bufferColor;
-    RwRaster             *bufferDepth;
+    RwRaster*            bufferColor;
+    RwRaster*            bufferDepth;
     RwV2d                screen;
     RwV2d                screenInverse;
     RwV2d                screenOffset;
@@ -261,50 +261,51 @@ struct RwCamera
 };
 struct RwGeometry
 {
-    unsigned char   unknown1[14];
-    unsigned short  refs;
+    unsigned char  unknown1[14];
+    unsigned short refs;
 };
 struct RpInterpolation
 {
-    unsigned int     unknown1;
-    unsigned int     unknown2;
-    float            unknown3;
-    float            unknown4;
-    float            unknown5;
+    unsigned int unknown1;
+    unsigned int unknown2;
+    float        unknown3;
+    float        unknown4;
+    float        unknown5;
 };
 struct RpAtomic
 {
     RwObjectFrame    object;
-    void             *info;
-    RpGeometry       *geometry;
+    void*            info;
+    RpGeometry*      geometry;
     RwSphere         bsphereLocal;
     RwSphere         bsphereWorld;
-    RpClump          *clump;
+    RpClump*         clump;
     RwListEntry      globalClumps;
     RpAtomicCallback renderCallback;
     RpInterpolation  interpolation;
     unsigned short   frame;
     unsigned short   unknown7;
     RwList           sectors;
-    void             *render;
+    void*            render;
 };
-struct RpAtomicContainer {
-    RpAtomic    *atomic;
-    char        szName[17];
+struct RpAtomicContainer
+{
+    RpAtomic* atomic;
+    char      szName[17];
 };
 struct RpLight
 {
-    RwObjectFrame   object;
-    float           radius;
-    RwColorFloat    color;
-    float           unknown1;
-    RwList          sectors;
-    RwListEntry     globalLights;
-    unsigned short  frame;
-    unsigned short  unknown2;
+    RwObjectFrame  object;
+    float          radius;
+    RwColorFloat   color;
+    float          unknown1;
+    RwList         sectors;
+    RwListEntry    globalLights;
+    unsigned short frame;
+    unsigned short unknown2;
 };
 struct RpClump
-{   // RenderWare (plugin) Clump (used by GTA)
+{            // RenderWare (plugin) Clump (used by GTA)
     RwObject        object;
     RwList          atomics;
     RwList          lights;
@@ -318,18 +319,18 @@ struct RpMaterialLighting
 };
 struct RpMaterial
 {
-    RwTexture*          texture;
-    RwColor             color;
-    void                *render;
-    RpMaterialLighting  lighting;
-    short               refs;
-    short               id;
+    RwTexture*         texture;
+    RwColor            color;
+    void*              render;
+    RpMaterialLighting lighting;
+    short              refs;
+    short              id;
 };
 struct RpMaterials
 {
-    RpMaterial **materials;
-    int        entries;
-    int        unknown;
+    RpMaterial** materials;
+    int          entries;
+    int          unknown;
 };
 struct RpTriangle
 {
@@ -338,23 +339,23 @@ struct RpTriangle
 };
 struct RpGeometry
 {
-    RwObject             object;
-    unsigned int         flags;
-    unsigned short       unknown1;
-    short                refs;
+    RwObject       object;
+    unsigned int   flags;
+    unsigned short unknown1;
+    short          refs;
 
-    int                  triangles_size;
-    int                  vertices_size;
-    int                  unknown_size;
-    int                  texcoords_size;
+    int triangles_size;
+    int vertices_size;
+    int unknown_size;
+    int texcoords_size;
 
-    RpMaterials          materials;
-    RpTriangle           *triangles;
-    RwColor              *colors;
-    RwTextureCoordinates *texcoords[RW_MAX_TEXTURE_COORDS];
-    void                 *unknown2;
-    void                 *info;
-    void                 *unknown3;
+    RpMaterials           materials;
+    RpTriangle*           triangles;
+    RwColor*              colors;
+    RwTextureCoordinates* texcoords[RW_MAX_TEXTURE_COORDS];
+    void*                 unknown2;
+    void*                 info;
+    void*                 unknown3;
 };
 
 /*****************************************************************************/
@@ -362,10 +363,10 @@ struct RpGeometry
 /*****************************************************************************/
 
 // RenderWare type definitions
-typedef int          (* RwIOCallbackClose) (void *data);
-typedef unsigned int (* RwIOCallbackRead)  (void *data, void *buffer, unsigned int length);
-typedef int          (* RwIOCallbackWrite) (void *data, const void *buffer, unsigned int length);
-typedef int          (* RwIOCallbackOther) (void *data, unsigned int offset);
+typedef int (*RwIOCallbackClose)(void* data);
+typedef unsigned int (*RwIOCallbackRead)(void* data, void* buffer, unsigned int length);
+typedef int (*RwIOCallbackWrite)(void* data, const void* buffer, unsigned int length);
+typedef int (*RwIOCallbackOther)(void* data, unsigned int offset);
 
 // RenderWare enumerations
 enum RwStreamType
@@ -389,38 +390,40 @@ enum RwStreamMode
 // RenderWare base types
 struct RwBuffer
 {
-    void            *ptr;
-    unsigned int    size;
+    void*        ptr;
+    unsigned int size;
 };
-union RwStreamTypeData
-{
-    struct {
-        unsigned int      position;
-        unsigned int      size;
-        void              *ptr_file;
+union RwStreamTypeData {
+    struct
+    {
+        unsigned int position;
+        unsigned int size;
+        void*        ptr_file;
     };
-    struct {
-        void              *file;
+    struct
+    {
+        void* file;
     };
-    struct {
+    struct
+    {
         RwIOCallbackClose callbackClose;
         RwIOCallbackRead  callbackRead;
         RwIOCallbackWrite callbackWrite;
         RwIOCallbackOther callbackOther;
-        void              *ptr_callback;
+        void*             ptr_callback;
     };
 };
 struct RwStream
 {
-    RwStreamType        type;
-    RwStreamMode        mode;
-    int                 pos;
-    RwStreamTypeData    data;
-    int                 id;
+    RwStreamType     type;
+    RwStreamMode     mode;
+    int              pos;
+    RwStreamTypeData data;
+    int              id;
 };
 struct RwError
 {
-    int err1,err2;
+    int err1, err2;
 };
 
 #endif

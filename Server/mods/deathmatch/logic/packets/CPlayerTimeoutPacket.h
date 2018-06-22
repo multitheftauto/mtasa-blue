@@ -1,28 +1,24 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/packets/CPlayerTimeoutPacket.h
-*  PURPOSE:     Player timeout packet class
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/packets/CPlayerTimeoutPacket.h
+ *  PURPOSE:     Player timeout packet class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __PACKETS_CPLAYERTIMEOUTPACKET_H
-#define __PACKETS_CPLAYERTIMEOUTPACKET_H
+#pragma once
 
 #include "CPacket.h"
 
 class CPlayerTimeoutPacket : public CPacket
 {
 public:
-    inline ePacketID        GetPacketID                 ( void ) const                                      { return static_cast < ePacketID > ( PACKET_ID_PLAYER_TIMEOUT ); };
-    inline unsigned long    GetFlags                    ( void ) const                                      { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID(void) const { return static_cast<ePacketID>(PACKET_ID_PLAYER_TIMEOUT); };
+    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    inline bool             Read                        ( NetBitStreamInterface& BitStream )                { return true; };
-    inline bool             Write                       ( NetBitStreamInterface& BitStream ) const          { return true; };
+    bool Read(NetBitStreamInterface& BitStream) { return true; };
+    bool Write(NetBitStreamInterface& BitStream) const { return true; };
 };
-
-#endif

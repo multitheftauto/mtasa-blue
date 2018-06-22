@@ -1,16 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CControllerConfigManagerSA.cpp
-*  PURPOSE:     Controller configuration manager
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Jax <>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CControllerConfigManagerSA.cpp
+ *  PURPOSE:     Controller configuration manager
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
@@ -20,9 +17,9 @@
 #define VAR_SteerWithMouse  ( ( BYTE * ) ( 0xC1CC02 ) )
 #define VAR_VerticalAimSensitivity  ( ( FLOAT * ) ( 0xB6EC18 ) )
 
-static const float VERTICAL_AIM_SENSITIVITY_MIN     = 0.000312f;
+static const float VERTICAL_AIM_SENSITIVITY_MIN = 0.000312f;
 static const float VERTICAL_AIM_SENSITIVITY_DEFAULT = 0.0015f;
-static const float VERTICAL_AIM_SENSITIVITY_MAX     = VERTICAL_AIM_SENSITIVITY_DEFAULT * 2 - VERTICAL_AIM_SENSITIVITY_MIN;
+static const float VERTICAL_AIM_SENSITIVITY_MAX = VERTICAL_AIM_SENSITIVITY_DEFAULT * 2 - VERTICAL_AIM_SENSITIVITY_MIN;
 
 CControllerConfigManagerSA::CControllerConfigManagerSA()
 {
@@ -30,10 +27,10 @@ CControllerConfigManagerSA::CControllerConfigManagerSA()
     // Get initial settings
     m_bSteerWithMouse = *VAR_FlyWithMouse != 0;
     m_bFlyWithMouse = *VAR_SteerWithMouse != 0;
-    MemSet( (void*)0x5BC7B4, 0x90, 10 );   // Stop vertical aim sensitivity value reset
+    MemSet((void*)0x5BC7B4, 0x90, 10);            // Stop vertical aim sensitivity value reset
 }
 
-void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction ( eControllerAction action, int iKey, eControllerType controllerType )
+void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction(eControllerAction action, int iKey, eControllerType controllerType)
 {
     DWORD dwFunc = FUNC_SetControllerKeyAssociatedWithAction;
     _asm
@@ -46,9 +43,9 @@ void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction ( eControl
     }
 }
 
-int CControllerConfigManagerSA::GetControllerKeyAssociatedWithAction ( eControllerAction action, eControllerType controllerType )
+int CControllerConfigManagerSA::GetControllerKeyAssociatedWithAction(eControllerAction action, eControllerType controllerType)
 {
-    int iReturn = 0;
+    int   iReturn = 0;
     DWORD dwFunc = FUNC_GetControllerKeyAssociatedWithAction;
     _asm
     {
@@ -61,9 +58,9 @@ int CControllerConfigManagerSA::GetControllerKeyAssociatedWithAction ( eControll
     return iReturn;
 }
 
-int CControllerConfigManagerSA::GetNumOfSettingsForAction ( eControllerAction action )
+int CControllerConfigManagerSA::GetNumOfSettingsForAction(eControllerAction action)
 {
-    int iReturn = 0;
+    int   iReturn = 0;
     DWORD dwFunc = FUNC_GetNumOfSettingsForAction;
     _asm
     {
@@ -75,7 +72,7 @@ int CControllerConfigManagerSA::GetNumOfSettingsForAction ( eControllerAction ac
     return iReturn;
 }
 
-void CControllerConfigManagerSA::ClearSettingsAssociatedWithAction ( eControllerAction action, eControllerType controllerType )
+void CControllerConfigManagerSA::ClearSettingsAssociatedWithAction(eControllerAction action, eControllerType controllerType)
 {
     DWORD dwFunc = FUNC_ClearSettingsAssociatedWithAction;
     _asm
@@ -87,37 +84,37 @@ void CControllerConfigManagerSA::ClearSettingsAssociatedWithAction ( eController
     }
 }
 
-void CControllerConfigManagerSA::SetClassicControls ( bool bClassicControls )
+void CControllerConfigManagerSA::SetClassicControls(bool bClassicControls)
 {
-    MemPutFast < unsigned char > ( VAR_InputType, bClassicControls ? 0 : 1 );
+    MemPutFast<unsigned char>(VAR_InputType, bClassicControls ? 0 : 1);
 }
 
-void CControllerConfigManagerSA::SetMouseInverted ( bool bInverted )
+void CControllerConfigManagerSA::SetMouseInverted(bool bInverted)
 {
-    MemPutFast < BYTE > ( VAR_MouseInverted, ( bInverted ) ? 0 : 1 );
+    MemPutFast<BYTE>(VAR_MouseInverted, (bInverted) ? 0 : 1);
 }
 
-void CControllerConfigManagerSA::SetFlyWithMouse ( bool bFlyWithMouse )
+void CControllerConfigManagerSA::SetFlyWithMouse(bool bFlyWithMouse)
 {
     m_bFlyWithMouse = bFlyWithMouse;
-    ApplySteerAndFlyWithMouseSettings ();
+    ApplySteerAndFlyWithMouseSettings();
 }
 
-void CControllerConfigManagerSA::SetSteerWithMouse ( bool bSteerWithMouse )
+void CControllerConfigManagerSA::SetSteerWithMouse(bool bSteerWithMouse)
 {
     m_bSteerWithMouse = bSteerWithMouse;
-    ApplySteerAndFlyWithMouseSettings ();
+    ApplySteerAndFlyWithMouseSettings();
 }
 
-void CControllerConfigManagerSA::SuspendSteerAndFlyWithMouse ( bool bSuspend )
+void CControllerConfigManagerSA::SuspendSteerAndFlyWithMouse(bool bSuspend)
 {
     m_bSuspendSteerAndFlyWithMouse = bSuspend;
-    ApplySteerAndFlyWithMouseSettings ();
+    ApplySteerAndFlyWithMouseSettings();
 }
 
-void CControllerConfigManagerSA::ApplySteerAndFlyWithMouseSettings ( void )
+void CControllerConfigManagerSA::ApplySteerAndFlyWithMouseSettings(void)
 {
-    if ( m_bSuspendSteerAndFlyWithMouse )
+    if (m_bSuspendSteerAndFlyWithMouse)
     {
         *VAR_FlyWithMouse = 0;
         *VAR_SteerWithMouse = 0;
@@ -129,25 +126,25 @@ void CControllerConfigManagerSA::ApplySteerAndFlyWithMouseSettings ( void )
     }
 }
 
-float CControllerConfigManagerSA::GetVerticalAimSensitivity ( )
+float CControllerConfigManagerSA::GetVerticalAimSensitivity()
 {
     float fRawValue = GetVerticalAimSensitivityRawValue();
-    return UnlerpClamped( VERTICAL_AIM_SENSITIVITY_MIN, fRawValue, VERTICAL_AIM_SENSITIVITY_MAX );    // Remap to 0-1
+    return UnlerpClamped(VERTICAL_AIM_SENSITIVITY_MIN, fRawValue, VERTICAL_AIM_SENSITIVITY_MAX);            // Remap to 0-1
 }
 
-void CControllerConfigManagerSA::SetVerticalAimSensitivity ( float fSensitivity )
+void CControllerConfigManagerSA::SetVerticalAimSensitivity(float fSensitivity)
 {
-    float fRawValue = Lerp( VERTICAL_AIM_SENSITIVITY_MIN, fSensitivity, VERTICAL_AIM_SENSITIVITY_MAX );
-    SetVerticalAimSensitivityRawValue( fRawValue );
+    float fRawValue = Lerp(VERTICAL_AIM_SENSITIVITY_MIN, fSensitivity, VERTICAL_AIM_SENSITIVITY_MAX);
+    SetVerticalAimSensitivityRawValue(fRawValue);
 }
 
 // Raw value used for saving so range can be changed without affecting user setting
-float CControllerConfigManagerSA::GetVerticalAimSensitivityRawValue ( )
+float CControllerConfigManagerSA::GetVerticalAimSensitivityRawValue()
 {
-    return *(FLOAT *)VAR_VerticalAimSensitivity;
+    return *(FLOAT*)VAR_VerticalAimSensitivity;
 }
 
-void CControllerConfigManagerSA::SetVerticalAimSensitivityRawValue ( float fRawValue )
+void CControllerConfigManagerSA::SetVerticalAimSensitivityRawValue(float fRawValue)
 {
-    MemPutFast < FLOAT > ( VAR_VerticalAimSensitivity, fRawValue );
+    MemPutFast<FLOAT>(VAR_VerticalAimSensitivity, fRawValue);
 }

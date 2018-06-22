@@ -1,15 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientGUIElement.h
-*  PURPOSE:     GUI wrapper entity class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Cecill Etheredge <ijsf@gmx.net>
-*               Jax <>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientGUIElement.h
+ *  PURPOSE:     GUI wrapper entity class
+ *
+ *****************************************************************************/
 
 class CClientGUIElement;
 
@@ -49,51 +46,51 @@ class CClientGUIElement;
 
 class CClientGUIElement : public CClientEntity
 {
-    DECLARE_CLASS( CClientGUIElement, CClientEntity )
+    DECLARE_CLASS(CClientGUIElement, CClientEntity)
     friend class CClientGUIManager;
 
 public:
-                                CClientGUIElement           ( CClientManager* pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID = INVALID_ELEMENT_ID );
-    virtual                     ~CClientGUIElement          ( void );
+    CClientGUIElement(CClientManager* pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID = INVALID_ELEMENT_ID);
+    virtual ~CClientGUIElement(void);
 
-    void                        Unlink                      ( void );
+    void Unlink(void);
 
-    inline eClientEntityType    GetType                     ( void ) const                  { return CCLIENTGUI; };
-    inline eCGUIType            GetCGUIType                 ( void ) const                  { return m_pCGUIElement->GetType (); };
-    inline const char*          GetCGUITypeName             ( void ) const                  { return m_strCGUITypeName; };
+    eClientEntityType GetType(void) const { return CCLIENTGUI; };
+    eCGUIType         GetCGUIType(void) const { return m_pCGUIElement->GetType(); };
+    const char*       GetCGUITypeName(void) const { return m_strCGUITypeName; };
 
-    inline GUI_CALLBACK         GetCallback1                ( void )                        { return GUI_CALLBACK ( &CClientGUIElement::_CallbackEvent1, this ); };
-    inline GUI_CALLBACK         GetCallback2                ( void )                        { return GUI_CALLBACK ( &CClientGUIElement::_CallbackEvent2, this ); };
+    GUI_CALLBACK GetCallback1(void) { return GUI_CALLBACK(&CClientGUIElement::_CallbackEvent1, this); };
+    GUI_CALLBACK GetCallback2(void) { return GUI_CALLBACK(&CClientGUIElement::_CallbackEvent2, this); };
 
-    void                        SetEvents                   ( const char* szFunc1, const char* szFunc2 = NULL );
+    void SetEvents(const char* szFunc1, const char* szFunc2 = NULL);
 
-    inline CLuaMain*            GetVirtualMachine           ( void )                        { return m_pLuaMain; }
+    CLuaMain* GetVirtualMachine(void) { return m_pLuaMain; }
 
     // dummy overrides
-    inline void                 SetPosition                 ( const CVector& vecDummy )     {};
-    inline void                 GetPosition                 ( CVector& vecDummy ) const     {};
+    void SetPosition(const CVector& vecDummy){};
+    void GetPosition(CVector& vecDummy) const {};
 
     // cgui element access
-    inline CGUIElement*         GetCGUIElement              ( void )                        { return m_pCGUIElement; };
-    inline void                 SetCGUIElement              ( CGUIElement *pCGUIElement )   { m_pCGUIElement = pCGUIElement; };
+    CGUIElement* GetCGUIElement(void) { return m_pCGUIElement; };
+    void         SetCGUIElement(CGUIElement* pCGUIElement) { m_pCGUIElement = pCGUIElement; };
 
-    SString                     GetFont                     ( class CClientGuiFont** ppFontElement );
-    bool                        SetFont                     ( const SString& strFontName, CClientGuiFont* pFontElement );
+    SString GetFont(class CClientGuiFont** ppFontElement);
+    bool    SetFont(const SString& strFontName, CClientGuiFont* pFontElement);
 
-    virtual void                SetCallPropagationEnabled   ( bool bEnabled );
+    virtual void SetCallPropagationEnabled(bool bEnabled);
 
 private:
-    bool                        _CallbackEvent1             ( CGUIElement *pCGUIElement );
-    bool                        _CallbackEvent2             ( CGUIElement *pCGUIElement );
+    bool _CallbackEvent1(CGUIElement* pCGUIElement);
+    bool _CallbackEvent2(CGUIElement* pCGUIElement);
 
-    SString                     _strCallbackFunc1;
-    SString                     _strCallbackFunc2;
+    SString _strCallbackFunc1;
+    SString _strCallbackFunc2;
 
-    SString                     m_strCGUITypeName;
-    CClientGUIManager*          m_pGUIManager;
-    CGUIElement*                m_pCGUIElement;
-    CClientGuiFont*             m_pFontElement;
-    CLuaMain*                   m_pLuaMain;
+    SString            m_strCGUITypeName;
+    CClientGUIManager* m_pGUIManager;
+    CGUIElement*       m_pCGUIElement;
+    CClientGuiFont*    m_pFontElement;
+    CLuaMain*          m_pLuaMain;
 };
 
 #endif

@@ -1,25 +1,26 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CPointLightsSA.cpp
-*  PURPOSE:     PointLights entity
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CPointLightsSA.cpp
+ *  PURPOSE:     PointLights entity
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 #include "StdInc.h"
 
-using CHeli_SearchLightCone_t = void(__cdecl *)(int handleId, CVector startPos, CVector endPos, float radius1, float unknownConstant,
-    int unkown1, bool renderSpot, CVector* unkown3, CVector* unkown4, CVector* unknown5, int unknown6, float radius2);
-using CHeli_PreSearchLightCone_t = int(__cdecl *)();
-using CHeli_PostSearchLightCone_t = int(__cdecl *)();
+using CHeli_SearchLightCone_t = void(__cdecl*)(int handleId, CVector startPos, CVector endPos, float radius1, float unknownConstant, int unkown1,
+                                               bool renderSpot, CVector* unkown3, CVector* unkown4, CVector* unknown5, int unknown6, float radius2);
+using CHeli_PreSearchLightCone_t = int(__cdecl*)();
+using CHeli_PostSearchLightCone_t = int(__cdecl*)();
 
-void CPointLightsSA::AddLight ( int iMode, const CVector vecPosition, CVector vecDirection, float fRadius, SColor color, unsigned char uc_8, bool bCreatesShadow, CEntity * pAffected )
+void CPointLightsSA::AddLight(int iMode, const CVector vecPosition, CVector vecDirection, float fRadius, SColor color, unsigned char uc_8, bool bCreatesShadow,
+                              CEntity* pAffected)
 {
     DWORD dwEntityInterface = 0;
-    if ( pAffected ) dwEntityInterface = ( DWORD ) pAffected->GetInterface ();
+    if (pAffected)
+        dwEntityInterface = (DWORD)pAffected->GetInterface();
     DWORD dwFunc = FUNC_CPointLights_AddLight;
     float fPosX = vecPosition.fX, fPosY = vecPosition.fY, fPosZ = vecPosition.fZ;
     float fDirX = vecDirection.fX, fDirY = vecDirection.fY, fDirZ = vecDirection.fZ;
@@ -45,25 +46,25 @@ void CPointLightsSA::AddLight ( int iMode, const CVector vecPosition, CVector ve
     }
 }
 
-void CPointLightsSA::PreRenderHeliLights ()
+void CPointLightsSA::PreRenderHeliLights()
 {
     auto CHeli_PreSearchLightCone = (CHeli_PreSearchLightCone_t)FUNC_CHeli_Pre_SearchLightCone;
-    CHeli_PreSearchLightCone ();
+    CHeli_PreSearchLightCone();
 }
 
-void CPointLightsSA::PostRenderHeliLights ()
+void CPointLightsSA::PostRenderHeliLights()
 {
     auto CHeli_PostSearchLightCone = (CHeli_PostSearchLightCone_t)FUNC_CHeli_Post_SearchLightCone;
-    CHeli_PostSearchLightCone ();
+    CHeli_PostSearchLightCone();
 }
 
-void CPointLightsSA::RenderHeliLight ( const CVector& vecStart, const CVector& vecEnd, float startRadius, float endRadius, bool renderSpot )
+void CPointLightsSA::RenderHeliLight(const CVector& vecStart, const CVector& vecEnd, float startRadius, float endRadius, bool renderSpot)
 {
     auto CHeli_SearchLightCone = (CHeli_SearchLightCone_t)FUNC_CHeli_SearchLightCone;
-    
+
     // 3x3 translation matrix (initialised by the game)
-    CVector mat[] = { CVector(), CVector(), CVector() };
+    CVector mat[] = {CVector(), CVector(), CVector()};
 
     // Set render states and render
-    CHeli_SearchLightCone ( 0, vecStart, vecEnd, endRadius, 1.0f, 0, renderSpot, &mat[0], &mat[1], &mat[2], 1, startRadius );
+    CHeli_SearchLightCone(0, vecStart, vecEnd, endRadius, 1.0f, 0, renderSpot, &mat[0], &mat[1], &mat[2], 1, startRadius);
 }

@@ -1,18 +1,17 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CVisibilityPluginsSA.cpp
-*  PURPOSE:     RenderWare entity visibility plugin
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CVisibilityPluginsSA.cpp
+ *  PURPOSE:     RenderWare entity visibility plugin
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-void CVisibilityPluginsSA::SetClumpAlpha ( RpClump * pClump, int iAlpha )
+void CVisibilityPluginsSA::SetClumpAlpha(RpClump* pClump, int iAlpha)
 {
     DWORD dwFunc = FUNC_CVisiblityPlugins_SetClumpAlpha;
     _asm
@@ -38,10 +37,10 @@ void CVisibilityPluginsSA::SetClumpAlpha ( RpClump * pClump, int iAlpha )
 //      0x0100 - Front door flag?
 //      0x0200 - Rear door flag?
 //      0x8000 - Some door flag?
-int CVisibilityPluginsSA::GetAtomicId ( RwObject * pAtomic )
+int CVisibilityPluginsSA::GetAtomicId(RwObject* pAtomic)
 {
     DWORD dwFunc = FUNC_CVisibilityPlugins_GetAtomicId;
-    int iResult = 0;
+    int   iResult = 0;
     _asm
     {
         push    pAtomic

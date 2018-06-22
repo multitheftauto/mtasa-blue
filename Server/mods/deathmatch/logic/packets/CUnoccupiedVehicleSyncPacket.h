@@ -1,18 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/packets/CUnoccupiedVehicleSyncPacket.h
-*  PURPOSE:     Unoccupied vehicle synchronization packet class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/packets/CUnoccupiedVehicleSyncPacket.h
+ *  PURPOSE:     Unoccupied vehicle synchronization packet class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CUNOCCUPIEDVEHICLESYNCPACKET_H
-#define __CUNOCCUPIEDVEHICLESYNCPACKET_H
+#pragma once
 
 #include <CVector.h>
 #include "CPacket.h"
@@ -24,24 +21,22 @@ class CUnoccupiedVehicleSyncPacket : public CPacket
 public:
     struct SyncData
     {
-        bool                    bSend;
-        SUnoccupiedVehicleSync  syncStructure;
+        bool                   bSend;
+        SUnoccupiedVehicleSync syncStructure;
     };
 
 public:
-                            CUnoccupiedVehicleSyncPacket            ( void )                        {};
-                            ~CUnoccupiedVehicleSyncPacket           ( void );
-            
-    inline ePacketID                GetPacketID                     ( void ) const                  { return PACKET_ID_UNOCCUPIED_VEHICLE_SYNC; };
-    inline unsigned long            GetFlags                        ( void ) const                  { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    CUnoccupiedVehicleSyncPacket(void){};
+    ~CUnoccupiedVehicleSyncPacket(void);
 
-    bool                    Read                                    ( NetBitStreamInterface& BitStream );
-    bool                    Write                                   ( NetBitStreamInterface& BitStream ) const;
+    ePacketID     GetPacketID(void) const { return PACKET_ID_UNOCCUPIED_VEHICLE_SYNC; };
+    unsigned long GetFlags(void) const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
 
-    inline std::vector < SyncData > ::iterator          IterBegin       ( void )                        { return m_Syncs.begin (); };
-    inline std::vector < SyncData > ::iterator          IterEnd         ( void )                        { return m_Syncs.end (); };
+    bool Read(NetBitStreamInterface& BitStream);
+    bool Write(NetBitStreamInterface& BitStream) const;
 
-    std::vector < SyncData > m_Syncs;
+    std::vector<SyncData>::iterator IterBegin(void) { return m_Syncs.begin(); };
+    std::vector<SyncData>::iterator IterEnd(void) { return m_Syncs.end(); };
+
+    std::vector<SyncData> m_Syncs;
 };
-
-#endif

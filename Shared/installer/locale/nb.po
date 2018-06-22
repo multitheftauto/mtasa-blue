@@ -1,10 +1,10 @@
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-18 20:19\n"
-"PO-Revision-Date: 2015-12-23 16:33+0000\n"
+"POT-Creation-Date: 2018-02-03 05:23\n"
+"PO-Revision-Date: 2016-11-14 14:31+0000\n"
 "Last-Translator: SirTerning <omgsjokk@hotmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: nb\n"
@@ -12,12 +12,26 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Translators: SirTerning; Plugin; LilDollaTechZone; ccw; Geryha\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: SirTerning; Plugin; LilDollaTechZone; Geryha; ccw\n"
-"X-POOTLE-MTIME: 1450888430.0\n"
+"X-POOTLE-MTIME: 1479133914.0\n"
+
+#. GET_XPVISTA_PLEASE
+#: ../Shared/installer/nightly.nsi:183
+msgid ""
+"The version of MTA:SA you've downloaded does not support Windows XP or "
+"Vista.  Please download an alternative version from www.mtasa.com."
+msgstr ""
+
+#. GET_MASTER_PLEASE
+#: ../Shared/installer/nightly.nsi:184
+msgid ""
+"The version of MTA:SA is designed for old versions of Windows.  Please "
+"download the newest version from www.mtasa.com."
+msgstr ""
 
 #. WELCOME_TEXT
-#: ../Shared/installer/nightly.nsi:183
+#: ../Shared/installer/nightly.nsi:188
 msgid ""
 "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n"
 "\n"
@@ -27,28 +41,26 @@ msgid ""
 "\n"
 "Click Next to continue."
 msgstr ""
-"Denne veiviseren vil guide deg gjennom installasjonen eller oppdateringen av "
-"$(^Name) ${REVISION_TAG}\n"
+"Denne veiviseren vil guide deg gjennom installasjonen eller oppdateringen av $(^Name) ${REVISION_TAG}\n"
 "\n"
-"Det anbefales at du lukker alle andre programmer før du starter "
-"installasjonen.\n"
+"Det anbefales at du lukker alle andre programmer før du starter installasjonen.\n"
 "\n"
 "[Administrator tilgang kan kreves for Vista og nyere]\n"
 "\n"
 "Klikk Neste for å fortsette."
 
 #. HEADER_Text
-#: ../Shared/installer/nightly.nsi:184
+#: ../Shared/installer/nightly.nsi:189
 msgid "Grand Theft Auto: San Andreas location"
 msgstr "Grand Theft Auto: San Andreas plassering"
 
 #. DIRECTORY_Text_Dest
-#: ../Shared/installer/nightly.nsi:185
+#: ../Shared/installer/nightly.nsi:190
 msgid "Grand Theft Auto: San Andreas folder"
 msgstr "Grand Theft Auto: San Andreas mappe"
 
 #. DIRECTORY_Text_Top
-#: ../Shared/installer/nightly.nsi:186
+#: ../Shared/installer/nightly.nsi:191
 msgid ""
 "Please select your Grand Theft Auto: San Andreas folder.$\n"
 "$\n"
@@ -58,43 +70,47 @@ msgid ""
 msgstr ""
 "Vennligst velg din Grand Theft Auto: San Andreas mappe.$\n"
 "$\n"
-"Du MÅ ha Grand Theft Auto: San Andreas 1.0 installert for å bruke MTA:SA, "
-"den støtter ingen andre versjoner.$\n"
+"Du MÅ ha Grand Theft Auto: San Andreas 1.0 installert for å bruke MTA:SA, den støtter ingen andre versjoner.$\n"
 "$\n"
 "Trykk Installer for å begynne installasjonen."
 
 #. DESC_Section10
-#: ../Shared/installer/nightly.nsi:189
+#: ../Shared/installer/nightly.nsi:194
 msgid "Create a Start Menu group for installed applications"
 msgstr "Opprett en Start Meny gruppe for installerte programmer"
 
 #. DESC_Section11
-#: ../Shared/installer/nightly.nsi:190
+#: ../Shared/installer/nightly.nsi:195
 msgid "Create a Desktop Shortcut for the MTA:SA Client."
 msgstr "Opprett en snarvei på skrivebordet for MTA:SA klienten."
 
 #. DESC_Section12
-#: ../Shared/installer/nightly.nsi:191
+#: ../Shared/installer/nightly.nsi:196
 msgid "Register mtasa:// protocol for browser clickable-ness."
 msgstr "Registrer mtasa:// protokoll for nettleser klikkbar-somhet."
 
 #. DESC_Section13
-#: ../Shared/installer/nightly.nsi:192
+#: ../Shared/installer/nightly.nsi:197
 msgid "Add to Windows Games Explorer (if present)."
 msgstr "Legg til i Windows Spill Utforsker (hvis den finnes)."
 
+#. DESC_DirectX
+#: ../Shared/installer/nightly.nsi:198
+msgid "Install or update DirectX (if required)."
+msgstr ""
+
 #. DESC_Section1
-#: ../Shared/installer/nightly.nsi:193
+#: ../Shared/installer/nightly.nsi:199
 msgid "The core components required to run Multi Theft Auto."
 msgstr "Grunnkomponentene som trenges for å kjøre Multi Theft Auto."
 
 #. DESC_Section2
-#: ../Shared/installer/nightly.nsi:194
+#: ../Shared/installer/nightly.nsi:200
 msgid "The MTA:SA modification, allowing you to play online."
 msgstr "MTA:SA modifikasjonen tillater deg å spille på nettet."
 
 #. DESC_SectionGroupServer
-#: ../Shared/installer/nightly.nsi:197
+#: ../Shared/installer/nightly.nsi:203
 msgid ""
 "The Multi Theft Auto Server. This allows you to host games from your "
 "computer. This requires a fast internet connection."
@@ -103,36 +119,36 @@ msgstr ""
 "datamaskin. Dette krever en rask Internett tilkobling."
 
 #. DESC_Section4
-#: ../Shared/installer/nightly.nsi:198
+#: ../Shared/installer/nightly.nsi:204
 msgid "The Multi Theft Auto server. This is a required component."
 msgstr "Multi Theft Auto server. Dette er en nødvendig komponent."
 
 #. DESC_Section5
-#: ../Shared/installer/nightly.nsi:199
+#: ../Shared/installer/nightly.nsi:205
 msgid "The MTA:SA modification for the server."
 msgstr "MTA:SA modifikasjonen for serveren."
 
 #. DESC_Section6
-#: ../Shared/installer/nightly.nsi:200
+#: ../Shared/installer/nightly.nsi:206
 msgid "This is a set of required resources for your server."
 msgstr "Dette er et sett av nødvendige ressurser for serveren din."
 
 #. DESC_Section7
-#: ../Shared/installer/nightly.nsi:201
+#: ../Shared/installer/nightly.nsi:207
 msgid "This is an optional set of gamemodes and maps for your server."
 msgstr "Dette er ett sett av valgfrie spillmoduler og kart for serveren din."
 
 #. DESC_Section8
-#: ../Shared/installer/nightly.nsi:202
+#: ../Shared/installer/nightly.nsi:208
 msgid ""
 "The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps "
 "for use in gamemodes for MTA."
 msgstr ""
-"MTA:SA 1.0 Kart Editor.  Denne kan bli brukt til å skape dine helt egne kart "
-"for bruk i spillmoduser for MTA."
+"MTA:SA 1.0 Kart Editor.  Denne kan bli brukt til å skape dine helt egne kart"
+" for bruk i spillmoduser for MTA."
 
 #. DESC_Section9
-#: ../Shared/installer/nightly.nsi:203
+#: ../Shared/installer/nightly.nsi:209
 msgid ""
 "This is the SDK for creating binary modules for the MTA server. Only install"
 " if you have a good understanding of C++!"
@@ -141,7 +157,7 @@ msgstr ""
 "hvis du har en god forståelse for C++!"
 
 #. DESC_SectionGroupDev
-#: ../Shared/installer/nightly.nsi:205
+#: ../Shared/installer/nightly.nsi:211
 msgid ""
 "Development code and tools that aid in the creation of mods for Multi Theft "
 "Auto"
@@ -150,73 +166,78 @@ msgstr ""
 "Multi Theft Auto"
 
 #. DESC_SectionGroupClient
-#: ../Shared/installer/nightly.nsi:206
+#: ../Shared/installer/nightly.nsi:212
 msgid "The client is the program you run to play on a Multi Theft Auto server"
 msgstr ""
 "Klienten er programmet du kjører for å spille på en Multi Theft Auto server"
 
 #. INST_CLIENTSERVER
-#: ../Shared/installer/nightly.nsi:406
+#: ../Shared/installer/nightly.nsi:409
 msgid "Client and Server"
 msgstr "Klient og Server"
 
 #. INST_SERVER
-#: ../Shared/installer/nightly.nsi:407
+#: ../Shared/installer/nightly.nsi:410
 msgid "Server only"
 msgstr "Kun server"
 
 #. INST_STARTMENU_GROUP
-#: ../Shared/installer/nightly.nsi:421
+#: ../Shared/installer/nightly.nsi:424
 msgid "Start menu group"
 msgstr "Start meny gruppe"
 
 #. INST_DESKTOP_ICON
-#: ../Shared/installer/nightly.nsi:422
+#: ../Shared/installer/nightly.nsi:425
 msgid "Desktop icon"
 msgstr "Skrivebordsikon"
 
 #. INST_PROTOCOL
-#: ../Shared/installer/nightly.nsi:423
+#: ../Shared/installer/nightly.nsi:426
 msgid "Register mtasa:// protocol"
 msgstr "Registrer mtasa:// protokoll"
 
 #. INST_GAMES_EXPLORER
-#: ../Shared/installer/nightly.nsi:424
+#: ../Shared/installer/nightly.nsi:427
 msgid "Add to Games Explorer"
 msgstr "Legg til i Spill Utforsker"
 
+#. INST_DIRECTX
+#: ../Shared/installer/nightly.nsi:428
+msgid "Install DirectX"
+msgstr ""
+
 #. INST_SEC_CLIENT
-#: ../Shared/installer/nightly.nsi:446
+#: ../Shared/installer/nightly.nsi:462
 msgid "Game client"
 msgstr "Spill klient"
 
 #. INST_SEC_SERVER
-#: ../Shared/installer/nightly.nsi:447
+#: ../Shared/installer/nightly.nsi:463
 msgid "Dedicated server"
 msgstr "Dedikert server"
 
 #. INST_SEC_CORE
-#: ../Shared/installer/nightly.nsi:448
+#: ../Shared/installer/nightly.nsi:464
 msgid "Core components"
 msgstr "Kjernekomponenter"
 
 #. INST_SEC_GAME
-#: ../Shared/installer/nightly.nsi:449
+#: ../Shared/installer/nightly.nsi:465
 msgid "Game module"
 msgstr "Spill modul"
 
 #. INFO_INPLACE_UPGRADE
-#: ../Shared/installer/nightly.nsi:451
+#: ../Shared/installer/nightly.nsi:467
 msgid "Performing in-place upgrade..."
 msgstr "Utfører direkte oppgradering..."
 
 #. INFO_UPDATE_PERMISSIONS
-#: ../Shared/installer/nightly.nsi:452
+#: ../Shared/installer/nightly.nsi:468
 msgid "Updating permissions. This could take a few minutes..."
 msgstr "Oppdaterer tillatelser. Dette kan ta noen minutter..."
 
 #. MSGBOX_INVALID_GTASA
-#: ../Shared/installer/nightly.nsi:455
+#: ../Shared/installer/nightly.nsi:471
 msgid ""
 "A valid Windows version of Grand Theft Auto: San Andreas was not detected.$\r"
 "$\n"
@@ -224,43 +245,44 @@ msgid ""
 "$\n"
 "Please reinstall if there are problems later."
 msgstr ""
-"En gyldig Windows versjon av Grand Theft Auto: San Andreas ble ikke funnet.$"
-"\r$\n"
-"Installasjonen vill fortsette uansett.$\r$\n"
+"En gyldig Windows versjon av Grand Theft Auto: San Andreas ble ikke funnet.$\r"
+"$\n"
+"Installasjonen vill fortsette uansett.$\r"
+"$\n"
 "Vennligst installer på nytt om problemer oppstår senere."
 
 #. INST_SEC_CORE_RESOURCES
-#: ../Shared/installer/nightly.nsi:456
+#: ../Shared/installer/nightly.nsi:472
 msgid "Core Resources"
 msgstr "Kjerne Ressurser"
 
 #. INST_SEC_OPTIONAL_RESOURCES
-#: ../Shared/installer/nightly.nsi:457
+#: ../Shared/installer/nightly.nsi:473
 msgid "Optional Resources"
 msgstr "Valgfrie Ressurser"
 
 #. INST_SEC_EDITOR
-#: ../Shared/installer/nightly.nsi:458
+#: ../Shared/installer/nightly.nsi:474
 msgid "Editor"
 msgstr "Redigerings verktøy"
 
 #. INST_SEC_DEVELOPER
-#: ../Shared/installer/nightly.nsi:973
+#: ../Shared/installer/nightly.nsi:967
 msgid "Development"
 msgstr "Utvikling"
 
 #. UNINST_SUCCESS
-#: ../Shared/installer/nightly.nsi:1018
+#: ../Shared/installer/nightly.nsi:1015
 msgid "$(^Name) was successfully removed from your computer."
 msgstr "$(^Name) ble fjernet fra din datamaskin."
 
 #. UNINST_FAIL
-#: ../Shared/installer/nightly.nsi:1025
+#: ../Shared/installer/nightly.nsi:1022
 msgid "Uninstallation has failed!"
 msgstr "Avinstallasjonen har feilet!"
 
 #. UNINST_REQUEST
-#: ../Shared/installer/nightly.nsi:1033
+#: ../Shared/installer/nightly.nsi:1030
 msgid ""
 "Are you sure you want to completely remove $(^Name) and all of its "
 "components?"
@@ -269,7 +291,7 @@ msgstr ""
 "komponenter?"
 
 #. UNINST_REQUEST_NOTE
-#: ../Shared/installer/nightly.nsi:1036
+#: ../Shared/installer/nightly.nsi:1033
 msgid ""
 "Uninstalling before update?$\r"
 "$\n"
@@ -277,14 +299,14 @@ msgid ""
 "$\n"
 "Run the new installer to upgrade and preserve your settings."
 msgstr ""
-"Avinstallere før oppdatering?$\r$\n"
-"Det er ikke nødvendig å avinstallere før du installerer en nyere versjon av "
-"MTA:SA$\r$\n"
-"Kjør det nye installasjonsprogrammet for å oppgradere og bevare dine "
-"innstillinger."
+"Avinstallere før oppdatering?$\r"
+"$\n"
+"Det er ikke nødvendig å avinstallere før du installerer en nyere versjon av MTA:SA$\r"
+"$\n"
+"Kjør det nye installasjonsprogrammet for å oppgradere og bevare dine innstillinger."
 
 #. UNINST_DATA_REQUEST
-#: ../Shared/installer/nightly.nsi:1047
+#: ../Shared/installer/nightly.nsi:1044
 msgid ""
 "Would you like to keep your data files (such as resources, screenshots and "
 "server configuration)? If you click no, any resources, configurations or "
@@ -294,54 +316,8 @@ msgstr ""
 "skjermdumper og server konfigurasjon)? Om du trykker nei, vil alle "
 "ressurser, konfigureringer og skjermdumper du har laget bli slettet."
 
-#. MSGBOX_VSRED_ERROR1
-#: ../Shared/installer/nightly.nsi:1142
-msgid "Unable to download Microsoft Visual Studio 2008 SP1 redistributable"
-msgstr "Kunne ikke laste ned Microsoft Visual Studio 2008 SP1 redistributable"
-
-#. MSGBOX_VSRED_ERROR2
-#: ../Shared/installer/nightly.nsi:1143
-msgid "Unable to install Microsoft Visual Studio 2008 SP1 redistributable"
-msgstr "Kunne ikke installere Microsoft Visual Sutdio 2008 SP1 redistributable"
-
-#. MSGBOX_VSRED_ERROR3
-#: ../Shared/installer/nightly.nsi:1146
-msgid ""
-"Unable to download Microsoft Visual Studio 2008 SP1 redistributable.$\r"
-"$\n"
-"However installation will continue.$\r"
-"$\n"
-"Please reinstall if there are problems later."
-msgstr ""
-"Kunne ikke laste ned Microsoft Visual Studio 2008 SP1 redistributable.$\r$\n"
-"Installasjonen vill fortsette uansett.$\r$\n"
-"Vennligst installer på nytt om problemer oppstår senere."
-
-#. MSGBOX_VC12RED_ERROR1
-#: ../Shared/installer/nightly.nsi:1193
-msgid "Unable to download Microsoft Visual Studio 2013 redistributable"
-msgstr "Kunne ikke laste ned Microsoft Visual Studio 2013 redistributable"
-
-#. MSGBOX_VC12RED_ERROR2
-#: ../Shared/installer/nightly.nsi:1194
-msgid "Unable to install Microsoft Visual Studio 2013 redistributable"
-msgstr "Kunne ikke installere Microsoft Visual Sutdio 2013 redistributable"
-
-#. MSGBOX_VC12RED_ERROR3
-#: ../Shared/installer/nightly.nsi:1197
-msgid ""
-"Unable to download Microsoft Visual Studio 2013 redistributable.$\r"
-"$\n"
-"However installation will continue.$\r"
-"$\n"
-"Please reinstall if there are problems later."
-msgstr ""
-"Kunne ikke laste ned Microsoft Visual Studio 2013 redistributable.$\r$\n"
-"Men installasjonen vil fortsette.$\r$\n"
-"Vennligst installer på nytt om problemer oppstår."
-
 #. MSGBOX_PATCH_FAIL1
-#: ../Shared/installer/nightly.nsi:1244
+#: ../Shared/installer/nightly.nsi:1144
 msgid ""
 "Unable to download the patch file for your version of Grand Theft Auto: San "
 "Andreas"
@@ -350,7 +326,7 @@ msgstr ""
 "Andreas"
 
 #. MSGBOX_PATCH_FAIL2
-#: ../Shared/installer/nightly.nsi:1245
+#: ../Shared/installer/nightly.nsi:1145
 msgid ""
 "Unable to install the patch file for your version of Grand Theft Auto: San "
 "Andreas"
@@ -359,27 +335,27 @@ msgstr ""
 "Andreas"
 
 #. UAC_RIGHTS1
-#: ../Shared/installer/nightly.nsi:1286
+#: ../Shared/installer/nightly.nsi:1181
 msgid "This installer requires admin access, try again"
 msgstr "Dette installasjons verktøyet krever admin tilgang, prøv igjen"
 
 #. UAC_RIGHTS_UN
-#: ../Shared/installer/nightly.nsi:1287
+#: ../Shared/installer/nightly.nsi:1182
 msgid "This uninstaller requires admin access, try again"
 msgstr "Dette avinstallasjonsverktøyet krever admin tilgang, prøv igjen"
 
 #. UAC_RIGHTS3
-#: ../Shared/installer/nightly.nsi:1288
+#: ../Shared/installer/nightly.nsi:1183
 msgid "Logon service not running, aborting!"
 msgstr "Logon-tjenesten kjører ikke, avbryter!"
 
 #. UAC_RIGHTS4
-#: ../Shared/installer/nightly.nsi:1289
+#: ../Shared/installer/nightly.nsi:1184
 msgid "Unable to elevate"
 msgstr "Kunne ikke oppheve"
 
 #. INST_MTA_CONFLICT
-#: ../Shared/installer/nightly.nsi:1843
+#: ../Shared/installer/nightly.nsi:1775
 msgid ""
 "A different major version of MTA ($1) already exists at that path.$\n"
 "$\n"
@@ -392,7 +368,7 @@ msgstr ""
 " Er du sikker på at du vil overskrive MTA $1 på $INSTDIR ?"
 
 #. INST_GTA_CONFLICT
-#: ../Shared/installer/nightly.nsi:1846
+#: ../Shared/installer/nightly.nsi:1778
 msgid ""
 "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
@@ -405,7 +381,7 @@ msgstr ""
 "$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
-#: ../Shared/installer/nightly.nsi:1848
+#: ../Shared/installer/nightly.nsi:1780
 msgid ""
 "The selected directory does not exist.$\n"
 "$\n"
@@ -416,7 +392,7 @@ msgstr ""
 "Vennligst velg GTA:SA installasjons målmappe"
 
 #. INST_GTA_ERROR2
-#: ../Shared/installer/nightly.nsi:1850
+#: ../Shared/installer/nightly.nsi:1782
 msgid ""
 "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
@@ -427,12 +403,12 @@ msgstr ""
 "Er du sikker på at du vill fortsette ?"
 
 #. INST_CHOOSE_LOC_TOP
-#: ../Shared/installer/nightly.nsi:1966
+#: ../Shared/installer/nightly.nsi:1905
 msgid "Choose Install Location"
 msgstr "Velg Målmappe"
 
 #. INST_CHOOSE_LOC
-#: ../Shared/installer/nightly.nsi:1967
+#: ../Shared/installer/nightly.nsi:1906
 msgid ""
 "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} "
 "${PRODUCT_VERSION}"
@@ -440,79 +416,117 @@ msgstr ""
 "Velg mappe hvor ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} skal installeres"
 
 #. INST_CHOOSE_LOC2
-#: ../Shared/installer/nightly.nsi:1969
+#: ../Shared/installer/nightly.nsi:1908
 msgid ""
 "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n"
 "To install in a different folder, click Browse and select another folder.$\n"
 "$\n"
 " Click Next to continue."
 msgstr ""
-"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} vill bli installert i følgende "
-"mappe.$\n"
+"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} vill bli installert i følgende mappe.$\n"
 "For å installere i en annen mappe, klikk Bla og velg en annen mappe.$\n"
 "$\n"
 " Klikk Neste for å fortsette."
 
 #. INST_CHOOSE_LOC3
-#: ../Shared/installer/nightly.nsi:1970
+#: ../Shared/installer/nightly.nsi:1909
 msgid "Destination Folder"
 msgstr "Målmappe"
 
 #. INST_CHOOSE_LOC_BROWSE
-#: ../Shared/installer/nightly.nsi:1971
+#: ../Shared/installer/nightly.nsi:1910
 msgid "Browse..."
 msgstr "Bla gjennom..."
 
 #. INST_CHOOSE_LOC_DEFAULT
-#: ../Shared/installer/nightly.nsi:1972
+#: ../Shared/installer/nightly.nsi:1911
 msgid "Default"
 msgstr "Standard"
 
 #. INST_CHOOSE_LOC_LAST_USED
-#: ../Shared/installer/nightly.nsi:1973
+#: ../Shared/installer/nightly.nsi:1912
 msgid "Last used"
 msgstr "Sist brukt"
 
 #. INST_CHOOSE_LOC_CUSTOM
-#: ../Shared/installer/nightly.nsi:1974
+#: ../Shared/installer/nightly.nsi:1913
 msgid "Custom"
 msgstr "Tilpasset"
 
 #. INST_CHOOSE_LOC4
-#: ../Shared/installer/nightly.nsi:2145
+#: ../Shared/installer/nightly.nsi:2091
 msgid ""
 "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
 msgstr ""
 "Velg mappe for å installere ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} i:"
 
 #. INST_LOC_OW
-#: ../Shared/installer/nightly.nsi:2163
+#: ../Shared/installer/nightly.nsi:2109
 msgid ""
 "Warning: A different major version of MTA ($1) already exists at that path."
 msgstr ""
 "Advarsel: En annen stor versjon av MTA ($1) finnes allerede i den banen."
 
 #. INST_LOC_UPGRADE
-#: ../Shared/installer/nightly.nsi:2164
+#: ../Shared/installer/nightly.nsi:2110
 msgid "Installation type:  Upgrade"
 msgstr "Installasjon type: Oppgrader"
 
 #. NETTEST_TITLE1
-#: ../Shared/installer/nightly.nsi:2407
+#: ../Shared/installer/nightly.nsi:2353
 msgid "Online update"
 msgstr "Nettoppdatering"
 
 #. NETTEST_TITLE2
-#: ../Shared/installer/nightly.nsi:2408
+#: ../Shared/installer/nightly.nsi:2354
 msgid "Checking for update information"
 msgstr "Ser etter oppdaterings informasjon"
 
 #. NETTEST_STATUS1
-#: ../Shared/installer/nightly.nsi:2409
+#: ../Shared/installer/nightly.nsi:2355
 msgid "Checking for installer update information..."
 msgstr "Ser etter oppdaterings informasjon for installasjonsprogrammet..."
 
 #. NETTEST_STATUS2
-#: ../Shared/installer/nightly.nsi:2410
+#: ../Shared/installer/nightly.nsi:2356
 msgid "Please ensure your firewall is not blocking"
 msgstr "Vennligst sikre at brannmuren ikke blokkerer"
+
+#~ msgid "Unable to download Microsoft Visual Studio 2008 SP1 redistributable"
+#~ msgstr "Kunne ikke laste ned Microsoft Visual Studio 2008 SP1 redistributable"
+
+#~ msgid "Unable to install Microsoft Visual Studio 2008 SP1 redistributable"
+#~ msgstr ""
+#~ "Kunne ikke installere Microsoft Visual Sutdio 2008 SP1 redistributable"
+
+#~ msgid ""
+#~ "Unable to download Microsoft Visual Studio 2008 SP1 redistributable.$\r"
+#~ "$\n"
+#~ "However installation will continue.$\r"
+#~ "$\n"
+#~ "Please reinstall if there are problems later."
+#~ msgstr ""
+#~ "Kunne ikke laste ned Microsoft Visual Studio 2008 SP1 redistributable.$\r"
+#~ "$\n"
+#~ "Installasjonen vill fortsette uansett.$\r"
+#~ "$\n"
+#~ "Vennligst installer på nytt om problemer oppstår senere."
+
+#~ msgid "Unable to download Microsoft Visual Studio 2013 redistributable"
+#~ msgstr "Kunne ikke laste ned Microsoft Visual Studio 2013 redistributable"
+
+#~ msgid "Unable to install Microsoft Visual Studio 2013 redistributable"
+#~ msgstr "Kunne ikke installere Microsoft Visual Sutdio 2013 redistributable"
+
+#~ msgid ""
+#~ "Unable to download Microsoft Visual Studio 2013 redistributable.$\r"
+#~ "$\n"
+#~ "However installation will continue.$\r"
+#~ "$\n"
+#~ "Please reinstall if there are problems later."
+#~ msgstr ""
+#~ "Kunne ikke laste ned Microsoft Visual Studio 2013 redistributable.$\r"
+#~ "$\n"
+#~ "Men installasjonen vil fortsette.$\r"
+#~ "$\n"
+#~ "Vennligst installer på nytt om problemer oppstår."

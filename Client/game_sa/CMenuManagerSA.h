@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CMenuManagerSA.h
-*  PURPOSE:     Header file for game menu manager class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CMenuManagerSA.h
+ *  PURPOSE:     Header file for game menu manager class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CGAMESA_MENUMANAGER
 #define __CGAMESA_MENUMANAGER
@@ -35,16 +34,17 @@ public:
 class CMenuManagerSA : public CMenuManager
 {
 private:
-    CMenuManagerSAInterface * internalInterface;
+    CMenuManagerSAInterface* internalInterface;
+
 public:
-    CMenuManagerSA() { internalInterface = (CMenuManagerSAInterface *)CLASS_CMenuManager; }
+    CMenuManagerSA() { internalInterface = (CMenuManagerSAInterface*)CLASS_CMenuManager; }
 
-    CMenuManagerSAInterface * GetInterface() { return internalInterface; }
+    CMenuManagerSAInterface* GetInterface() { return internalInterface; }
 
-    BYTE    GetCurrentScreen();
-    BYTE    GetPreviousScreen();
-    void    SwitchToNewScreen(BYTE ScreenID);
-    void    DisplayHelpText ( char * szHelpText );
+    BYTE GetCurrentScreen();
+    BYTE GetPreviousScreen();
+    void SwitchToNewScreen(BYTE ScreenID);
+    void DisplayHelpText(char* szHelpText);
 };
 
 #endif

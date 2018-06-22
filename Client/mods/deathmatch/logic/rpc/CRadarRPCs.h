@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/rpc/CRadarRPCs.h
-*  PURPOSE:     Header for radar rpc class
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/rpc/CRadarRPCs.h
+ *  PURPOSE:     Header for radar rpc class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CRadarRPCs_H
 #define __CRadarRPCs_H
@@ -18,12 +17,12 @@
 class CRadarRPCs : public CRPCFunctions
 {
 public:
-    static void                 LoadFunctions           ( void );
+    static void LoadFunctions(void);
 
-    DECLARE_RPC ( DestroyAllRadarAreas );
-    DECLARE_ELEMENT_RPC ( SetRadarAreaSize );
-    DECLARE_ELEMENT_RPC ( SetRadarAreaColor );
-    DECLARE_ELEMENT_RPC ( SetRadarAreaFlashing );
+    DECLARE_RPC(DestroyAllRadarAreas);
+    DECLARE_ELEMENT_RPC(SetRadarAreaSize);
+    DECLARE_ELEMENT_RPC(SetRadarAreaColor);
+    DECLARE_ELEMENT_RPC(SetRadarAreaFlashing);
 };
 
 #endif

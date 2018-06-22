@@ -1,17 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/packets/CObjectSyncPacket.h
-*  PURPOSE:     Header for object sync packet class
-*  DEVELOPERS:  Stanislav Izmalkov <izstas@live.ru>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/packets/CObjectSyncPacket.h
+ *  PURPOSE:     Header for object sync packet class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __PACKETS_COBJECTSYNCPACKET_H
-#define __PACKETS_COBJECTSYNCPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include <CVector.h>
@@ -22,28 +20,26 @@ class CObjectSyncPacket : public CPacket
 public:
     struct SyncData
     {
-        ElementID               ID;
-        CVector                 vecPosition;
-        CVector                 vecRotation;
-        float                   fHealth;
-        unsigned char           ucSyncTimeContext;
-        unsigned char           ucFlags;
-        bool                    bSend;
+        ElementID     ID;
+        CVector       vecPosition;
+        CVector       vecRotation;
+        float         fHealth;
+        unsigned char ucSyncTimeContext;
+        unsigned char ucFlags;
+        bool          bSend;
     };
 
 public:
-                            ~CObjectSyncPacket                      ( void );
-            
-    inline ePacketID                GetPacketID                     ( void ) const                  { return PACKET_ID_OBJECT_SYNC; };
-    inline unsigned long            GetFlags                        ( void ) const                  { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    ~CObjectSyncPacket(void);
 
-    bool                    Read                                    ( NetBitStreamInterface& BitStream );
-    bool                    Write                                   ( NetBitStreamInterface& BitStream ) const;
+    ePacketID     GetPacketID(void) const { return PACKET_ID_OBJECT_SYNC; };
+    unsigned long GetFlags(void) const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
 
-    inline std::vector < SyncData* > ::const_iterator     IterBegin ( void )                        { return m_Syncs.begin (); };
-    inline std::vector < SyncData* > ::const_iterator     IterEnd   ( void )                        { return m_Syncs.end (); };
+    bool Read(NetBitStreamInterface& BitStream);
+    bool Write(NetBitStreamInterface& BitStream) const;
 
-    std::vector < SyncData* > m_Syncs;
+    std::vector<SyncData*>::const_iterator IterBegin(void) { return m_Syncs.begin(); };
+    std::vector<SyncData*>::const_iterator IterEnd(void) { return m_Syncs.end(); };
+
+    std::vector<SyncData*> m_Syncs;
 };
-
-#endif

@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/gui/CGUICallback.h
-*  PURPOSE:     Event callback interface
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/gui/CGUICallback.h
+ *  PURPOSE:     Event callback interface
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CGUICALLBACK_H
 #define __CGUICALLBACK_H
@@ -21,110 +21,85 @@ class CGUIElement;
 #define GUI_CALLBACK_FOCUS      CGUICallback < bool, CGUIFocusEventArgs >
 
 // Represents any callback
-template < typename Ret, typename Arguments >
+template <typename Ret, typename Arguments>
 class CGUICallbackInterface
 {
 public:
-    virtual Ret     operator ()                 ( Arguments ) const = 0;
+    virtual Ret operator()(Arguments) const = 0;
 };
-
 
 // Callback to a static function
-template < typename Ret, typename Arguments >
-class CGUICallbackFree : public CGUICallbackInterface < Ret, Arguments > 
+template <typename Ret, typename Arguments>
+class CGUICallbackFree : public CGUICallbackInterface<Ret, Arguments>
 {
-    typedef Ret ( *F )( Arguments );
+    typedef Ret (*F)(Arguments);
 
 public:
-    CGUICallbackFree ( F f ) : m_pfnCallback ( f ) {}
+    CGUICallbackFree(F f) : m_pfnCallback(f) {}
 
-    virtual Ret operator() ( Arguments Args ) const
-    {
-        return m_pfnCallback ( Args );
-    }
+    virtual Ret operator()(Arguments Args) const { return m_pfnCallback(Args); }
 
 protected:
-    F    m_pfnCallback;
+    F m_pfnCallback;
 };
-
 
 // Callback to a method
-template < class T, typename Ret, typename Arguments >
-class CGUICallbackMethod : public CGUICallbackInterface < Ret, Arguments >
+template <class T, typename Ret, typename Arguments>
+class CGUICallbackMethod : public CGUICallbackInterface<Ret, Arguments>
 {
-    typedef Ret ( T::*F )( Arguments );
+    typedef Ret (T::*F)(Arguments);
 
 public:
-    CGUICallbackMethod ( F pfnMethod, T* pObj ) : m_pfnMethod ( pfnMethod ), m_pObj ( pObj ) {}
+    CGUICallbackMethod(F pfnMethod, T* pObj) : m_pfnMethod(pfnMethod), m_pObj(pObj) {}
 
-    virtual Ret operator () ( Arguments Args ) const
-    {
-        return ( m_pObj->*m_pfnMethod )( Args );
-    }
+    virtual Ret operator()(Arguments Args) const { return (m_pObj->*m_pfnMethod)(Args); }
 
 protected:
-    F   m_pfnMethod;
-    T*  m_pObj;
+    F  m_pfnMethod;
+    T* m_pObj;
 };
 
-
 // Class representing any callback
-template < typename Ret, typename Arguments >
+template <typename Ret, typename Arguments>
 class CGUICallback
 {
 public:
     // Default constructor
-    CGUICallback ( void )
-    {
-        memset ( m_Callback, 0, sizeof(m_Callback) );
-    }
+    CGUICallback(void) { memset(m_Callback, 0, sizeof(m_Callback)); }
 
     // Construct from a static function pointer
-    CGUICallback ( Ret ( *pF )( Arguments ) )
+    CGUICallback(Ret (*pF)(Arguments))
     {
-        memset ( m_Callback, 0, sizeof(m_Callback) );
-        if ( pF )
+        memset(m_Callback, 0, sizeof(m_Callback));
+        if (pF)
         {
-            new(m_Callback) CGUICallbackFree < Ret, Arguments > ( pF );
+            new (m_Callback) CGUICallbackFree<Ret, Arguments>(pF);
         }
     }
 
     // Construct from a method with a 'this' pointer
-    template < class T >
-    CGUICallback ( Ret ( T::*pF )( Arguments ), T* pObj )
+    template <class T>
+    CGUICallback(Ret (T::*pF)(Arguments), T* pObj)
     {
-        memset ( m_Callback, 0, sizeof(m_Callback) );
-        if ( pF )
+        memset(m_Callback, 0, sizeof(m_Callback));
+        if (pF)
         {
-            new(m_Callback) CGUICallbackMethod < T, Ret, Arguments > ( pF, pObj );
+            new (m_Callback) CGUICallbackMethod<T, Ret, Arguments>(pF, pObj);
         }
     }
 
     // Copy constructor
-    CGUICallback ( const CGUICallback < Ret, Arguments > & copy )
-    {
-        *this = copy;
-    }
+    CGUICallback(const CGUICallback<Ret, Arguments>& copy) { *this = copy; }
 
-    void operator = ( const CGUICallback < Ret, Arguments > & copy )
-    {
-        memcpy ( m_Callback, copy.m_Callback, sizeof(m_Callback) );
-    }
+    void operator=(const CGUICallback<Ret, Arguments>& copy) { memcpy(m_Callback, copy.m_Callback, sizeof(m_Callback)); }
 
     // Call operator
-    Ret operator () ( Arguments Args ) const
-    {
-        return ( *(CGUICallbackInterface < Ret, Arguments > *)m_Callback )( Args );
-    }
+    Ret operator()(Arguments Args) const { return (*(CGUICallbackInterface<Ret, Arguments>*)m_Callback)(Args); }
 
-    operator bool () const
-    {
-        return *(DWORD *)m_Callback != NULL;
-    }
+    operator bool() const { return *(DWORD*)m_Callback != NULL; }
 
 protected:
-    char m_Callback [ 4 + 4 + 20 ];       // vtable + pObj + pMemFn
+    char m_Callback[4 + 4 + 20];            // vtable + pObj + pMemFn
 };
 
 #endif
-

@@ -1,12 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        SharedUtil.Legacy.h
-*  PURPOSE:     Home for stuff removed from SharedUtil files.
-*               To prevent breaking other projects which depend on SharedUtil.
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        SharedUtil.Legacy.h
+ *  PURPOSE:     Home for stuff removed from SharedUtil files.
+ *               To prevent breaking other projects which depend on SharedUtil.
+ *
+ *****************************************************************************/
 
 // NOMINMAX after windows.h has been included
 #undef min
@@ -14,18 +14,18 @@
 
 namespace SharedUtil
 {
-   template < class T >
-    T Min ( const T& a, const T& b )
+    template <class T>
+    T Min(const T& a, const T& b)
     {
         return a < b ? a : b;
     }
 
-    template < class T >
-    T Max ( const T& a, const T& b )
+    template <class T>
+    T Max(const T& a, const T& b)
     {
         return a > b ? a : b;
     }
-}
+}            // namespace SharedUtil
 
 #define PRId64  "lld"
 #define PRIx64  "llx"

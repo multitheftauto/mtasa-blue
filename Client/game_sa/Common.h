@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/Common.h
-*  PURPOSE:     Common game layer include file
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/Common.h
+ *  PURPOSE:     Common game layer include file
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CGAMESA_COMMON
 #define __CGAMESA_COMMON
@@ -24,16 +24,16 @@
     #include <stdio.h>
     #include <time.h>
 
-    static FILE* fDebugFile;
+static FILE* fDebugFile;
 
-    static void OutputDebugText ( char * szDebugText )
-    {
+static void OutputDebugText(char* szDebugText)
+{
         #ifdef MTA_DEBUG
-        char szDebug[500];
-        sprintf ( szDebug, "%s\n", szDebugText );
-        OutputDebugString ( szDebug );
+    char szDebug[500];
+    sprintf(szDebug, "%s\n", szDebugText);
+    OutputDebugString(szDebug);
         #endif
-    }
+}
 
     #ifdef MTA_DEBUG
         #define DEBUG_TRACE(szText) \

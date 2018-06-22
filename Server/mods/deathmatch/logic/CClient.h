@@ -1,18 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CClient.h
-*  PURPOSE:     Connected client class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CClient.h
+ *  PURPOSE:     Connected client class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CCLIENT_H
-#define __CCLIENT_H
+#pragma once
 
 class CAccount;
 class CElement;
@@ -38,24 +35,22 @@ public:
     };
 
 public:
-                            CClient                 ( bool bAddGuestAccount = true );
-                            ~CClient                ( void );
+    CClient(bool bAddGuestAccount = true);
+    ~CClient(void);
 
-    virtual int             GetClientType           ( void ) = 0;
-    virtual const char*     GetNick                 ( void ) = 0;
+    virtual int         GetClientType(void) = 0;
+    virtual const char* GetNick(void) = 0;
 
-    bool                    IsRegistered            ( void );
+    bool IsRegistered(void);
 
-    virtual void            SendEcho                ( const char* szEcho ) = 0;
-    virtual void            SendConsole             ( const char* szEcho ) = 0;
+    virtual void SendEcho(const char* szEcho) = 0;
+    virtual void SendConsole(const char* szEcho) = 0;
 
-    inline CAccount*        GetAccount              ( void )                    { return m_pAccount; }
-    inline void             SetAccount              ( CAccount* pAccount )      { m_pAccount = pAccount; }
+    CAccount* GetAccount(void) { return m_pAccount; }
+    void      SetAccount(CAccount* pAccount) { m_pAccount = pAccount; }
 
-    CElement*               GetElement              ( void );
+    CElement* GetElement(void);
 
 protected:
-    CAccount*               m_pAccount;
+    CAccount* m_pAccount;
 };
-
-#endif

@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/game/TaskAttack.h
-*  PURPOSE:     Attack task interface
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/game/TaskAttack.h
+ *  PURPOSE:     Attack task interface
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CGAME_TASKATTACK
 #define __CGAME_TASKATTACK
@@ -17,7 +17,7 @@
 class CTaskSimpleGangDriveBy : public virtual CTaskSimple
 {
 public:
-    virtual                     ~CTaskSimpleGangDriveBy ( void ) {};
+    virtual ~CTaskSimpleGangDriveBy(void){};
 };
 
 enum eGunCommand
@@ -37,17 +37,17 @@ class CVector2D;
 class CTaskSimpleUseGun : public virtual CTaskSimple
 {
 public:
-    virtual                     ~CTaskSimpleUseGun  ( void ) {};
+    virtual ~CTaskSimpleUseGun(void){};
 
-    virtual bool                ControlGun          ( CPed* pPed, CEntity *pTargetEntity, char nCommand ) = 0;
-    virtual bool                ControlGunMove      ( CVector2D * pMoveVec ) = 0;
-    virtual void                Reset               ( CPed *pPed, CEntity *pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength = 1 ) = 0;
+    virtual bool ControlGun(CPed* pPed, CEntity* pTargetEntity, char nCommand) = 0;
+    virtual bool ControlGunMove(CVector2D* pMoveVec) = 0;
+    virtual void Reset(CPed* pPed, CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength = 1) = 0;
 };
 
 class CTaskSimpleFight : public virtual CTaskSimple
 {
 public:
-    virtual                     ~CTaskSimpleFight  ( void ) {};
+    virtual ~CTaskSimpleFight(void){};
 };
 
 #endif

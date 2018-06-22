@@ -1,22 +1,22 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CFxManagerSA.cpp
-*  PURPOSE:     Game effects handling
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CFxManagerSA.cpp
+ *  PURPOSE:     Game effects handling
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-
-CFxSystem* CFxManagerSA::CreateFxSystem( const char * szBlueprint, const CVector & vecPosition, RwMatrix * pRwMatrixTag, unsigned char bSkipCameraFrustumCheck, bool bSoundEnable )
+CFxSystem* CFxManagerSA::CreateFxSystem(const char* szBlueprint, const CVector& vecPosition, RwMatrix* pRwMatrixTag, unsigned char bSkipCameraFrustumCheck,
+                                        bool bSoundEnable)
 {
-    const CVector * pvecPosition = &vecPosition;
-    DWORD dwThis = ( DWORD ) m_pInterface;
-    DWORD dwFunc = FUNC_FxManager_c__CreateFxSystem;
+    const CVector*        pvecPosition = &vecPosition;
+    DWORD                 dwThis = (DWORD)m_pInterface;
+    DWORD                 dwFunc = FUNC_FxManager_c__CreateFxSystem;
     CFxSystemSAInterface* pFxSystem;
 
     _asm
@@ -43,10 +43,10 @@ CFxSystem* CFxManagerSA::CreateFxSystem( const char * szBlueprint, const CVector
 
 void CFxManagerSA::DestroyFxSystem(CFxSystem* pFxSystem)
 {
-    DWORD dwThis = ( DWORD ) m_pInterface;
+    DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_FxManager_c__DestroyFxSystem;
 
-    void * pFxSA = pFxSystem->GetInterface();
+    void* pFxSA = pFxSystem->GetInterface();
 
     _asm
     {
@@ -59,31 +59,31 @@ void CFxManagerSA::DestroyFxSystem(CFxSystem* pFxSystem)
 //
 // Called when GTA deletes an FxSystem
 //
-void CFxManagerSA::OnFxSystemSAInterfaceDestroyed ( CFxSystemSAInterface* pFxSystemSAInterface )
+void CFxManagerSA::OnFxSystemSAInterfaceDestroyed(CFxSystemSAInterface* pFxSystemSAInterface)
 {
     // Delete our wrapper object if we have one
-    CFxSystemSA* pFxSystemSA = GetFxSystem( pFxSystemSAInterface );
-    if ( pFxSystemSA )
+    CFxSystemSA* pFxSystemSA = GetFxSystem(pFxSystemSAInterface);
+    if (pFxSystemSA)
         delete pFxSystemSA;
 }
 
 //
 // AddToList/RemoveFromList called from CFxSystemSA constructor/destructor
 //
-void CFxManagerSA::AddToList( CFxSystemSAInterface* pFxSystemSAInterface, CFxSystemSA* pFxSystemSA )
+void CFxManagerSA::AddToList(CFxSystemSAInterface* pFxSystemSAInterface, CFxSystemSA* pFxSystemSA)
 {
-    MapSet( m_FxInterfaceMap, pFxSystemSAInterface, pFxSystemSA );
+    MapSet(m_FxInterfaceMap, pFxSystemSAInterface, pFxSystemSA);
 }
 
-void CFxManagerSA::RemoveFromList( CFxSystemSA* pFxSystemSA )
+void CFxManagerSA::RemoveFromList(CFxSystemSA* pFxSystemSA)
 {
-    MapRemoveByValue( m_FxInterfaceMap, pFxSystemSA );
+    MapRemoveByValue(m_FxInterfaceMap, pFxSystemSA);
 }
 
 //
 // Find our wrapper object for the GTA object
 //
-CFxSystemSA* CFxManagerSA::GetFxSystem( CFxSystemSAInterface* pFxSystemSAInterface )
+CFxSystemSA* CFxManagerSA::GetFxSystem(CFxSystemSAInterface* pFxSystemSAInterface)
 {
-    return MapFindRef( m_FxInterfaceMap, pFxSystemSAInterface );
+    return MapFindRef(m_FxInterfaceMap, pFxSystemSAInterface);
 }
