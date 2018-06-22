@@ -385,7 +385,7 @@ struct RpGeometry
 
     int triangles_size;
     int vertices_size;
-    int unknown_size;
+    int morphTarget_size;
     int texcoords_size;
 
     RpMaterials           materials;
