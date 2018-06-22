@@ -10907,6 +10907,22 @@ bool CStaticFunctionDefinitions::GetAccountsBySerial(const SString& strSerial, s
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetAccountID(CAccount* pAccount, unsigned& ID) 
+{		
+    bool bRegistered = pAccount->IsRegistered();		
+    if ( bRegistered )		
+        ID = pAccount->GetID();		
+		
+    return bRegistered;		
+}		
+		
+		
+bool CStaticFunctionDefinitions::GetAccountByID(const unsigned& ID, CAccount* outAccount) 
+{		
+    m_pAccountManager->GetAccountByID(ID, outAccount);		
+    return true;		
+}
+
 bool CStaticFunctionDefinitions::GetAccountIP(CAccount* pAccount, SString& strIP)
 {
     bool bRegistered = pAccount->IsRegistered();

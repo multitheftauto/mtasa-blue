@@ -651,6 +651,8 @@ public:
     static bool                          GetAccountsByData(const SString& dataName, const SString& value, std::vector<CAccount*>& outAccounts);
     static bool                          GetAccountSerial(CAccount* pAccount, SString& strSerial);
     static bool                          GetAccountsBySerial(const SString& strSerial, std::vector<CAccount*>& outAccounts);
+    static bool                          GetAccountID(CAccount* pAccount, unsigned& ID);		
+    static bool                          GetAccountByID(const unsigned& ID, CAccount* outAccount);
     static bool                          GetAccountIP(CAccount* pAccount, SString& strIP);
     static bool                          GetAccountsByIP(const SString& strIP, std::vector<CAccount*>& outAccounts);
 
