@@ -771,6 +771,7 @@ bool CKeyBinds::SetCommandActive(const char* szKey, const char* szCommand, bool 
     NullEmptyStrings(szKey, szCommand, szArguments);
 
     list<CKeyBind*>::const_iterator iter = m_pList->begin();
+    bool ret = false;
     for (; iter != m_pList->end(); iter++)
     {
         if ((*iter)->GetType() == KEY_BIND_COMMAND)
@@ -787,7 +788,10 @@ bool CKeyBinds::SetCommandActive(const char* szKey, const char* szCommand, bool 
                             if (!szArguments || (pBind->szArguments && strcmp(pBind->szArguments, szArguments) == 0))
                             {
                                 pBind->bActive = bActive;
-                                return true;
+                                if (strcmp(pBind->szCommand, "chatbox") != 0)
+                                    return true;
+                                else
+                                    ret = true;
                             }
                         }
                     }
@@ -795,7 +799,7 @@ bool CKeyBinds::SetCommandActive(const char* szKey, const char* szCommand, bool 
             }
         }
     }
-    return false;
+    return ret;
 }
 
 void CKeyBinds::SetAllCommandsActive(const char* szResource, bool bActive, const char* szCommand, bool bState, const char* szArguments, bool checkHitState)
