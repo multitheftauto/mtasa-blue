@@ -954,10 +954,13 @@ int CLuaEngineDefs::EngineDFFGetProperties(lua_State* luaVM)
     }
     else
     {
-        CClientDFF*      pDFF;
-        argStream.ReadUserData(pDFF);
-        usModelID = pDFF->m_usModelID;
-        pClump = pDFF->GetLoadedClump(usModelID);
+        if (argStream.NextIsUserData())
+        {
+            CClientDFF*      pDFF;
+            argStream.ReadUserData(pDFF);
+            usModelID = pDFF->m_usModelID;
+            pClump = pDFF->GetLoadedClump(usModelID);
+        }
     }
     if (!argStream.HasErrors())
     {
@@ -1052,8 +1055,6 @@ int CLuaEngineDefs::EngineDFFGetProperties(lua_State* luaVM)
 
                 return 1;
             }
-            else
-                argStream.SetCustomError(SString("Model ID %d failed", usModelID));
         }
         else
             argStream.SetCustomError("Expected DFF or valid model ID or name at argument 1");
