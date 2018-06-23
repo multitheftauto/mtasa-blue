@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "../game_sa/CPoolsSA.h"
 
 CClientDFFManager::CClientDFFManager(CClientManager* pManager)
 {
@@ -106,4 +107,22 @@ void CClientDFFManager::RemoveFromList(CClientDFF* pDFF)
     {
         m_List.remove(pDFF);
     }
+}
+
+RpClump* CClientDFFManager::GetClumpFromModelId(ushort usModel)
+{
+
+    if (usModel > 0 && usModel < 20000)
+    {
+        CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
+        if (ppModelInfo)
+        {
+            CBaseModelInfoSAInterface* m_pInterface = ppModelInfo[usModel];
+            if (m_pInterface && m_pInterface->pRwObject)
+            {
+                return (RpClump*)m_pInterface->pRwObject;
+            }
+        }
+    }
+    return 0;
 }

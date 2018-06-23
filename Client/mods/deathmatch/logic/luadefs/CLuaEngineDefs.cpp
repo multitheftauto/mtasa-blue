@@ -944,26 +944,29 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineDFFGetProperties(lua_State* luaVM)
 {
-    CClientDFF*      pDFF;
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pDFF);
-
+    RpClump* pClump;
+    ushort usModelID;
+    if (argStream.NextIsNumber())
+    {
+        argStream.ReadNumber(usModelID);
+        pClump = CClientDFFManager::GetClumpFromModelId(usModelID);
+    }
+    else
+    {
+        CClientDFF*      pDFF;
+        argStream.ReadUserData(pDFF);
+        usModelID = pDFF->m_usModelID;
+        pClump = pDFF->GetLoadedClump(usModelID);
+    }
     if (!argStream.HasErrors())
     {
-        ushort usModelID = pDFF->m_usModelID;
         if (usModelID != INVALID_MODEL_ID)
         {
-            RpClump* pClump = pDFF->GetLoadedClump(usModelID);
             if (pClump)
             {
                 RpAtomic* pAtomic = pClump->getAtomic();
                 if (!pAtomic)
-                {
-                    lua_pushboolean(luaVM, false);
-                    return 1;
-                }
-                RwFrame* pFrame = pAtomic->getFrame();
-                if (!pFrame)
                 {
                     lua_pushboolean(luaVM, false);
                     return 1;
@@ -1046,13 +1049,14 @@ int CLuaEngineDefs::EngineDFFGetProperties(lua_State* luaVM)
                 lua_pushvector(luaVM, vecMax);
                 lua_settable(luaVM, -3);
                 lua_settable(luaVM, -3);
+
                 return 1;
             }
             else
                 argStream.SetCustomError(SString("Model ID %d failed", usModelID));
         }
         else
-            argStream.SetCustomError("Expected valid model ID or name at argument 2");
+            argStream.SetCustomError("Expected DFF or valid model ID or name at argument 1");
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

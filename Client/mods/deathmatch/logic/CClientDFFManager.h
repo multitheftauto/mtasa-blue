@@ -31,7 +31,7 @@ public:
 
     static bool IsReplacableModel(unsigned short usModel);
     bool        RestoreModel(unsigned short usModel);
-
+    static RpClump* GetClumpFromModelId( ushort usModel);
     std::list<CClientDFF*>::const_iterator IterBegin(void) { return m_List.begin(); }
     std::list<CClientDFF*>::const_iterator IterEnd(void) { return m_List.end(); }
 
