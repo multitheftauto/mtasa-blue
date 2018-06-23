@@ -787,11 +787,12 @@ bool CKeyBinds::SetCommandActive(const char* szKey, const char* szCommand, bool 
                         {
                             if (!szArguments || (pBind->szArguments && strcmp(pBind->szArguments, szArguments) == 0))
                             {
+                                bool oldval = pBind->bActive;
                                 pBind->bActive = bActive;
                                 if (szArguments)
                                     return true;
                                 else
-                                    ret = true;
+                                    ret = ret || oldval != bActive;
                             }
                         }
                     }
