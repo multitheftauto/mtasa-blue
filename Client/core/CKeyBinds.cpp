@@ -785,7 +785,7 @@ bool CKeyBinds::SetCommandActive(const char* szKey, const char* szCommand, bool 
                     {
                         if (!checkHitState || (pBind->bHitState == bState))
                         {
-                            if (!szArguments || (pBind->szArguments && strcmp(pBind->szArguments, szArguments) == 0))
+                            if (!szArguments && (!bActive || !pBind->szArguments) || szArguments && (pBind->szArguments && strcmp(pBind->szArguments, szArguments) == 0))
                             {
                                 bool oldval = pBind->bActive;
                                 pBind->bActive = bActive;
