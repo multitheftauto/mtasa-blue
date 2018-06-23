@@ -788,7 +788,7 @@ bool CKeyBinds::SetCommandActive(const char* szKey, const char* szCommand, bool 
                             if (!szArguments || (pBind->szArguments && strcmp(pBind->szArguments, szArguments) == 0))
                             {
                                 pBind->bActive = bActive;
-                                if (strcmp(pBind->szCommand, "chatbox") != 0)
+                                if (szArguments)
                                     return true;
                                 else
                                     ret = true;
