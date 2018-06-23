@@ -945,8 +945,8 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
 int CLuaEngineDefs::EngineDFFGetProperties(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
-    RpClump* pClump;
-    ushort usModelID;
+    RpClump*         pClump;
+    ushort           usModelID;
     if (argStream.NextIsNumber())
     {
         argStream.ReadNumber(usModelID);
@@ -956,7 +956,7 @@ int CLuaEngineDefs::EngineDFFGetProperties(lua_State* luaVM)
     {
         if (argStream.NextIsUserData())
         {
-            CClientDFF*      pDFF;
+            CClientDFF* pDFF;
             argStream.ReadUserData(pDFF);
             usModelID = pDFF->m_usModelID;
             pClump = pDFF->GetLoadedClump(usModelID);

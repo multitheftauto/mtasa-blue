@@ -111,7 +111,6 @@ void CClientDFFManager::RemoveFromList(CClientDFF* pDFF)
 
 RpClump* CClientDFFManager::GetClumpFromModelId(ushort usModel)
 {
-
     if (usModel > 0 && usModel < 20000)
     {
         CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
