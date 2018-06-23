@@ -5228,10 +5228,10 @@ bool CStaticFunctionDefinitions::FixVehicle(CElement* pElement)
     return false;
 }
 
-bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement, bool bExplode)
+bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement)
 {
     assert(pElement);
-    RUN_CHILDREN(BlowVehicle(*iter, bExplode))
+    RUN_CHILDREN(BlowVehicle(*iter))
 
     if (IS_VEHICLE(pElement))
     {
@@ -5247,8 +5247,7 @@ bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement, bool bExplode)
             pVehicle->CallEvent("onVehicleExplode", Arguments);
         }
         pVehicle->SetHealth(0.0f);
-        if (!bExplode)
-            pVehicle->SetIsBlown(true);
+        pVehicle->SetIsBlown(true);
 
         // Update our engine State
         pVehicle->SetEngineOn(false);

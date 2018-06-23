@@ -1741,15 +1741,13 @@ int CLuaVehicleDefs::FixVehicle(lua_State* luaVM)
 int CLuaVehicleDefs::BlowVehicle(lua_State* luaVM)
 {
     CElement* pElement;
-    bool      bExplode;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
-    argStream.ReadBool(bExplode, true);
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::BlowVehicle(pElement, bExplode))
+        if (CStaticFunctionDefinitions::BlowVehicle(pElement))
         {
             lua_pushboolean(luaVM, true);
             return 1;
