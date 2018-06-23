@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CLUAPACKET_H
-#define __PACKETS_CLUAPACKET_H
+#pragma once
 
 #include "CPacket.h"
 
@@ -28,5 +27,3 @@ private:
     unsigned char          m_ucActionID;
     NetBitStreamInterface& m_BitStream;
 };
-
-#endif

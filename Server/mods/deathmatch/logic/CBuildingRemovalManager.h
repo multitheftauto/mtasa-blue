@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCBUILDINGREMOVALMANAGER_H
-#define __CCBUILDINGREMOVALMANAGER_H
+#pragma once
 
 #include <map>
 
@@ -27,5 +26,3 @@ public:
 private:
     std::multimap<unsigned short, CBuildingRemoval*> m_BuildingRemovals;
 };
-
-#endif

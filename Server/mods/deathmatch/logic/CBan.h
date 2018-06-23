@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CBAN_H
-#define __CBAN_H
+#pragma once
 
 #include "CCommon.h"
 #include <string>
@@ -96,5 +95,3 @@ private:
     uint        m_uiScriptID;
     bool        m_bBeingDeleted;
 };
-
-#endif

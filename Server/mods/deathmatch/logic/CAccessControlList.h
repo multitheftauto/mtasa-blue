@@ -11,8 +11,7 @@
 
 class CAccessControlList;
 
-#ifndef __CACCESSCONTROLLIST_H
-#define __CACCESSCONTROLLIST_H
+#pragma once
 
 #include <list>
 #include "CAccessControlListRight.h"
@@ -49,5 +48,3 @@ private:
     class CAccessControlListManager* m_pACLManager;
     uint                             m_uiScriptID;
 };
-
-#endif

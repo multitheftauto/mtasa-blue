@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOLTUBE_H
-#define __CCOLTUBE_H
+#pragma once
 
 #include "CColShape.h"
 
@@ -43,5 +42,3 @@ protected:
     float m_fRadius;
     float m_fHeight;
 };
-
-#endif

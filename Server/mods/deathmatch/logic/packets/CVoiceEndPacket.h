@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CVOICEENDPACKET_H
-#define __PACKETS_CVOICEENDPACKET_H
+#pragma once
 
 #include "CPacket.h"
 
@@ -33,5 +32,3 @@ public:
 private:
     ElementID m_PlayerID;
 };
-
-#endif

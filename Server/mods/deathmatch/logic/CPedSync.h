@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPEDSYNC_H
-#define __CPEDSYNC_H
+#pragma once
 
 #include "CPlayerManager.h"
 #include "CPedManager.h"
@@ -42,5 +41,3 @@ private:
 
     CElapsedTime m_UpdateTimer;
 };
-
-#endif

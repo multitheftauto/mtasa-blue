@@ -11,8 +11,7 @@
 
 class CAccessControlListManager;
 
-#ifndef __CACCESSCONTROLLISTMANAGER_H
-#define __CACCESSCONTROLLISTMANAGER_H
+#pragma once
 
 #include <list>
 #include "CAccessControlListRight.h"
@@ -90,5 +89,3 @@ private:
     CElapsedTime m_AutoSaveTimer;
     uint         m_uiGlobalRevision;
 };
-
-#endif

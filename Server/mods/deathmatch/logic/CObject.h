@@ -8,8 +8,7 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-#ifndef __COBJECT_H
-#define __COBJECT_H
+#pragma once
 
 // Kayl: There is now too many includes here, try to make it work with StdInc.h if possible
 #include "CElement.h"
@@ -102,5 +101,3 @@ protected:
 public:
     CPositionRotationAnimation* m_pMoveAnimation;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CPLAYERJOINCOMPLETEPACKET_H
-#define __PACKETS_CPLAYERJOINCOMPLETEPACKET_H
+#pragma once
 
 #include "../CCommon.h"
 #include "CPacket.h"
@@ -43,5 +42,3 @@ private:
     unsigned char     m_ucQuality;
     unsigned int      m_uiBitrate;
 };
-
-#endif

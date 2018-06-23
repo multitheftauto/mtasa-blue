@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CRADARAREA_H
-#define __CRADARAREA_H
+#pragma once
 
 #include "CPerPlayerEntity.h"
 #include <CVector2D.h>
@@ -44,5 +43,3 @@ private:
     SColor    m_Color;
     bool      m_bIsFlashing;
 };
-
-#endif

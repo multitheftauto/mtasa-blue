@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CPICKUPHIDESHOWPACKET_H
-#define __PACKETS_CPICKUPHIDESHOWPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include <vector>
@@ -36,5 +35,3 @@ private:
     bool                        m_bShow;
     std::vector<class CPickup*> m_List;
 };
-
-#endif

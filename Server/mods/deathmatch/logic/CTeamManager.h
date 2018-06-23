@@ -11,8 +11,7 @@
 
 class CTeamManager;
 
-#ifndef __CTEAMMANAGER_H
-#define __CTEAMMANAGER_H
+#pragma once
 
 #include <list>
 #include "CTeam.h"
@@ -38,5 +37,3 @@ public:
 private:
     std::list<CTeam*> m_List;
 };
-
-#endif

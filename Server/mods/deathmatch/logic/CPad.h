@@ -11,8 +11,7 @@
 
 class CPad;
 
-#ifndef __CPAD_H
-#define __CPAD_H
+#pragma once
 
 #include <stdio.h>
 #include <string.h>
@@ -172,5 +171,3 @@ protected:
     SFixedArray<bool, NUM_MTA_CONTROL_STATES>         m_MTAEnabledControls;
     bool                                              m_bUpdatedKeys;
 };
-
-#endif

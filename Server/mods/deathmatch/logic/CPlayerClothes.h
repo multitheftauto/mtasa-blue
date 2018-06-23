@@ -11,8 +11,7 @@
 
 class CPlayerClothes;
 
-#ifndef __PLAYERCLOTHES_H
-#define __PLAYERCLOTHES_H
+#pragma once
 
 #include "CCommon.h"
 
@@ -73,5 +72,3 @@ public:
 
     SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS> m_Clothes;
 };
-
-#endif

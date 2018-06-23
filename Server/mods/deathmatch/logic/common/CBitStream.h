@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CBITSTREAM_H
-#define __CBITSTREAM_H
+#pragma once
 
 #include "../CCommon.h"
 
@@ -37,5 +36,3 @@ public:
 
     NetBitStreamInterface* pBitStream;
 };
-
-#endif

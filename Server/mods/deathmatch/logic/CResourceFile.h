@@ -17,8 +17,7 @@
 
 class CResourceFile;
 
-#ifndef CRESOURCEFILE_H
-#define CRESOURCEFILE_H
+#pragma once
 #include "ehs/ehs.h"
 
 class CResourceFile
@@ -70,5 +69,3 @@ public:
     string  GetMetaFileAttribute(const string& key) { return m_attributeMap[key]; }
     SString GetCachedPathFilename(bool bForceClientCachePath = false);
 };
-
-#endif

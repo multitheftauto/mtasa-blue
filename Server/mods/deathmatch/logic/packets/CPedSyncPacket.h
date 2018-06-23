@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CPEDSYNCPACKET_H
-#define __PACKETS_CPEDSYNCPACKET_H
+#pragma once
 
 #include <CVector.h>
 #include "CPacket.h"
@@ -49,5 +48,3 @@ public:
 
     std::vector<SyncData*> m_Syncs;
 };
-
-#endif

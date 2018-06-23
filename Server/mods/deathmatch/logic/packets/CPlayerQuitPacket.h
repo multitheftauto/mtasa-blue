@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CPLAYERQUITPACKET_H
-#define __PACKETS_CPLAYERQUITPACKET_H
+#pragma once
 
 #include "CPacket.h"
 
@@ -35,5 +34,3 @@ private:
     ElementID     m_PlayerID;
     unsigned char m_ucQuitReason;
 };
-
-#endif

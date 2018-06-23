@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CBANMANAGER_H
-#define __CBANMANAGER_H
+#pragma once
 
 #include "CClient.h"
 #include "CPlayerManager.h"
@@ -72,5 +71,3 @@ private:
     bool        m_bAllowSave;
     static bool ms_bSaveRequired;
 };
-
-#endif

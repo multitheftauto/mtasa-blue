@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CRESOURCESTOPPACKET_H
-#define __PACKETS_CRESOURCESTOPPACKET_H
+#pragma once
 
 #include "../packets/CPacket.h"
 
@@ -27,5 +26,3 @@ public:
 private:
     unsigned short m_usID;
 };
-
-#endif

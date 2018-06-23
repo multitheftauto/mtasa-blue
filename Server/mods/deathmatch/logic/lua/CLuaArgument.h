@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CLUAARGUMENT_H
-#define __CLUAARGUMENT_H
+#pragma once
 
 #include <string>
 
@@ -86,5 +85,3 @@ private:
     bool CompareRecursive(const CLuaArgument& Argument, std::set<CLuaArguments*>* pKnownTables = NULL);
     void DeleteTableData(void);
 };
-
-#endif

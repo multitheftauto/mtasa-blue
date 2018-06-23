@@ -11,14 +11,13 @@
 
 class CLuaTimer;
 
-#ifndef __CLUATIMER_H
-#define __CLUATIMER_H
+#pragma once
 
 // Define includes
 #include "LuaCommon.h"
 #include "CLuaArguments.h"
 
-#define LUA_TIMER_MIN_INTERVAL      50
+#define LUA_TIMER_MIN_INTERVAL 50
 
 class CLuaTimer
 {
@@ -54,5 +53,3 @@ private:
     uint            m_uiScriptID;
     SLuaDebugInfo   m_LuaDebugInfo;
 };
-
-#endif

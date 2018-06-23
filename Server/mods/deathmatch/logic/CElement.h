@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CELEMENT_H
-#define __CELEMENT_H
+#pragma once
 
 #include <core/CServerInterface.h>
 #include <CVector.h>
@@ -299,5 +298,3 @@ private:
 };
 
 typedef CElement::EElementType EElementType;
-
-#endif

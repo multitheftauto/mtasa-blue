@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CRADARAREAMANAGER_H
-#define __CRADARAREAMANAGER_H
+#pragma once
 
 #include "CRadarArea.h"
 #include <list>
@@ -39,5 +38,3 @@ private:
 
     list<CRadarArea*> m_List;
 };
-
-#endif

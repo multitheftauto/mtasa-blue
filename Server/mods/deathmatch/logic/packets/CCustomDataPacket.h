@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CCUSTOMDATAPACKET_H
-#define __PACKETS_CCUSTOMDATAPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include "../lua/CLuaArguments.h"
@@ -36,5 +35,3 @@ private:
     char*        m_szName;
     CLuaArgument m_Value;
 };
-
-#endif

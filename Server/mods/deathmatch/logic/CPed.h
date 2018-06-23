@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPed_H
-#define __CPed_H
+#pragma once
 
 #include "CCommon.h"
 #include "CElement.h"
@@ -311,5 +310,3 @@ protected:
 private:
     CPedManager* m_pPedManager;
 };
-
-#endif

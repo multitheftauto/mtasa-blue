@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPLAYERWASTEDPACKET_H
-#define __CPLAYERWASTEDPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include <CVector.h>
@@ -42,5 +41,3 @@ public:
     unsigned char  m_ucTimeContext;
     unsigned long  m_AnimGroup, m_AnimID;
 };
-
-#endif

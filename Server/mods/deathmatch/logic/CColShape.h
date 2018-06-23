@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOLSHAPE_H
-#define __CCOLSHAPE_H
+#pragma once
 
 #include "CElement.h"
 
@@ -73,5 +72,3 @@ private:
 
     bool m_bPartnered;
 };
-
-#endif

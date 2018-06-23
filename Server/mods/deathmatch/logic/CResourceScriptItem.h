@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef CRESOURCESCRIPTITEM_H
-#define CRESOURCESCRIPTITEM_H
+#pragma once
 
 #include "CResourceFile.h"
 
@@ -25,5 +24,3 @@ public:
 
 private:
 };
-
-#endif

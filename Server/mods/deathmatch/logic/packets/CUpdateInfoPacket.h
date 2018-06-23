@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CUPDATEINFOPACKET_H
-#define __PACKETS_CUPDATEINFOPACKET_H
+#pragma once
 
 class CUpdateInfoPacket : public CPacket
 {
@@ -27,5 +26,3 @@ private:
     SString m_strType;
     SString m_strData;
 };
-
-#endif

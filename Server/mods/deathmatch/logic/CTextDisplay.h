@@ -11,8 +11,7 @@
 
 class CTextDisplay;
 
-#ifndef __CTEXTDISPLAY_H
-#define __CTEXTDISPLAY_H
+#pragma once
 
 #include <list>
 #include "CPlayer.h"
@@ -41,5 +40,3 @@ private:
     std::list<CTextItem*>          m_contents;
     uint                           m_uiScriptID;
 };
-
-#endif

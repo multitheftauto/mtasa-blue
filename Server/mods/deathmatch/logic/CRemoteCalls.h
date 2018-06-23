@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CREMOTECALLS_H
-#define __CREMOTECALLS_H
+#pragma once
 #include "lua/CLuaArguments.h"
 #define CALL_REMOTE_DEFAULT_QUEUE_NAME  "default"
 
@@ -77,4 +76,3 @@ public:
     EDownloadModeType GetDownloadModeForQueueName(const SString& strQueueName);
     EDownloadModeType GetDownloadModeFromQueueIndex(uint uiIndex);
 };
-#endif

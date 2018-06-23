@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __COBJECTSYNC_H
-#define __COBJECTSYNC_H
+#pragma once
 
 #ifdef WITH_OBJECT_SYNC
 
@@ -44,7 +43,5 @@ private:
 
     CElapsedTime m_UpdateTimer;
 };
-
-#endif
 
 #endif

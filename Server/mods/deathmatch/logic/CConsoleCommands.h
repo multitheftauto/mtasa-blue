@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCONSOLECOMMANDS_H
-#define __CCONSOLECOMMANDS_H
+#pragma once
 
 #include "CClient.h"
 
@@ -71,5 +70,3 @@ public:
     static bool DebugUpTime(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
     static bool FakeLag(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
 };
-
-#endif

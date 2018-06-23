@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPlayerCamera_H
-#define __CPlayerCamera_H
+#pragma once
 
 #include <CVector.h>
 
@@ -72,5 +71,3 @@ private:
     float         m_fFOV;
     uchar         m_ucSyncTimeContext;
 };
-
-#endif

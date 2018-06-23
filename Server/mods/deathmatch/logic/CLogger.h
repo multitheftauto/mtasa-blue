@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CLOGGER_H
-#define __CLOGGER_H
+#pragma once
 
 #include <cstdio>
 #include "../Config.h"
@@ -61,5 +60,3 @@ private:
     static bool             m_bCaptureConsole;
     static CCriticalSection m_CaptureBufferMutex;
 };
-
-#endif

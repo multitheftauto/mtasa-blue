@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CBLENDEDWEATHER_H
-#define __CBLENDEDWEATHER_H
+#pragma once
 
 #include "CClock.h"
 
@@ -40,5 +39,3 @@ private:
 
     CClock* m_pClock;
 };
-
-#endif

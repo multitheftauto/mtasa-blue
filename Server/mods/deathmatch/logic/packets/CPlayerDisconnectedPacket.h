@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CPLAYERDISCONNECTEDPACKET_H
-#define __PACKETS_CPLAYERDISCONNECTEDPACKET_H
+#pragma once
 
 #include "../packets/CPacket.h"
 
@@ -60,5 +59,3 @@ private:
     ePlayerDisconnectType m_eType;
     time_t                m_Duration;
 };
-
-#endif

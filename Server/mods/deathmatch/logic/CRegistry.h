@@ -11,8 +11,7 @@
 
 typedef CAutoRefedPointer<struct CRegistryResultData> CRegistryResult;
 
-#ifndef __CREGISTRY_H
-#define __CREGISTRY_H
+#pragma once
 
 #include "CLogger.h"
 #include <list>
@@ -164,5 +163,3 @@ struct CRegistryResultData
     CRegistryResultIterator begin(void) const { return Data.begin(); }
     CRegistryResultIterator end(void) const { return Data.end(); }
 };
-
-#endif

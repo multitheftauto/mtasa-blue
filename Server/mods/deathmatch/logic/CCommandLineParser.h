@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOMMANDLINEPARSER_H
-#define __CCOMMANDLINEPARSER_H
+#pragma once
 
 #include "../Config.h"
 
@@ -67,5 +66,3 @@ private:
     unsigned int   m_uiMaxPlayers;
     bool           m_bDisableVoice;
 };
-
-#endif

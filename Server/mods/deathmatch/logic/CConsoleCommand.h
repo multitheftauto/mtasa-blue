@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCONSOLECOMMAND_H
-#define __CCONSOLECOMMAND_H
+#pragma once
 
 #include "CClient.h"
 
@@ -32,5 +31,3 @@ private:
     char*            m_szCommand;
     bool             m_bRestricted;
 };
-
-#endif

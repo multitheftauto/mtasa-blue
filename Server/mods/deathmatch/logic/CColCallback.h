@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOLCALLBACK_H
-#define __CCOLCALLBACK_H
+#pragma once
 
 #include "CColShape.h"
 
@@ -21,5 +20,3 @@ public:
     virtual void Callback_OnLeave(CColShape& Shape, CElement& Element) = 0;
     virtual void Callback_OnCollisionDestroy(CColShape* pShape) = 0;
 };
-
-#endif

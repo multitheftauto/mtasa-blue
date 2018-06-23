@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CCOMMANDPACKET_H
-#define __PACKETS_CCOMMANDPACKET_H
+#pragma once
 
 #include "CPacket.h"
 
@@ -30,5 +29,3 @@ public:
 private:
     std::string m_strCommand;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CUNOCCUPIEDVEHICLEPUSHSYNCPACKET_H
-#define __CUNOCCUPIEDVEHICLEPUSHSYNCPACKET_H
+#pragma once
 
 #include "CPacket.h"
 class CVehicle;
@@ -27,5 +26,3 @@ public:
 
     SUnoccupiedPushSync vehicle;
 };
-
-#endif

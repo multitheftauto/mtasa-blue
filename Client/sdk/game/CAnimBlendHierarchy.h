@@ -17,8 +17,22 @@ class CAnimBlendHierarchySAInterface;
 class CAnimBlendHierarchy
 {
 public:
-    virtual CAnimBlendHierarchySAInterface* GetInterface(void) = 0;
+    virtual void                            Initialize(void) = 0;
+    virtual void                            SetName(const char* szName) = 0;
+    virtual void                            SetSequences(CAnimBlendSequenceSAInterface* pSequences) = 0;
+    virtual void                            SetNumSequences(unsigned short uNumSequences) = 0;
+    virtual void                            SetRunningCompressed(bool bCompressed) = 0;
+    virtual void                            SetAnimationBlockID(int iBlockID) = 0;
+    virtual void                            RemoveAnimSequences(void) = 0;
+    virtual void                            RemoveFromUncompressedCache(void) = 0;
+    virtual void                            RemoveQuaternionFlips(void) = 0;
+    virtual void                            CalculateTotalTime(void) = 0;
+    virtual CAnimBlendSequenceSAInterface*  GetSequence(DWORD dwIndex) = 0;
+    virtual CAnimBlendSequenceSAInterface*  GetSequences(void) = 0;
+    virtual unsigned short                  GetNumSequences(void) = 0;
+    virtual bool                            isRunningCompressed(void) = 0;
     virtual int                             GetAnimBlockID(void) = 0;
+    virtual CAnimBlendHierarchySAInterface* GetInterface(void) = 0;
 };
 
 #endif

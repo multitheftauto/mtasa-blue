@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_COBJECTSTOPSYNCPACKET_H
-#define __PACKETS_COBJECTSTOPSYNCPACKET_H
+#pragma once
 
 #include "CPacket.h"
 
@@ -31,5 +30,3 @@ public:
 private:
     CObject* m_pObject;
 };
-
-#endif

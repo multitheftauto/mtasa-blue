@@ -86,7 +86,7 @@ void CRPCFunctions::PlayerInGameNotice(NetBitStreamInterface& bitStream)
 {
     CLOCK("NetServerPulse::RPC", "PlayerInGameNotice");
     // Already ingame? Protocol error
-    if (m_pSourcePlayer->IsIngame())
+    if (m_pSourcePlayer->IsJoined())
     {
         DisconnectPlayer(g_pGame, *m_pSourcePlayer, "Protocol error: Already ingame");
     }
