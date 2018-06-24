@@ -47,12 +47,14 @@ public:
 
     // Sorta a hack that these are required by CClientEntity...
 
-    void     Unlink(void){};
+    void     Unlink(void) {};
     void     GetPosition(CVector& vecPosition) const {};
-    void     SetPosition(const CVector& vecPosition){};
+    void     SetPosition(const CVector& vecPosition) {};
+    ushort   GetModelID(void) { return m_usModelID };
+    void     SetModelID( ushort usModelID ) { m_usModelID = usModelID };
+    SString  GetModelName(void) { return m_strModelName};
+    void     SetModelName(SString strModelName) { m_strModelName = strModelName };
     RpClump* GetLoadedClump(ushort usModelId);
-    ushort   m_usModelID;
-    SString  m_strModelName;
 
 protected:
     bool DoReplaceModel(unsigned short usModel, bool bAlphaTransparency);
@@ -72,6 +74,9 @@ protected:
     std::map<ushort, SLoadedClumpInfo> m_LoadedClumpInfoMap;
 
     std::list<unsigned short> m_Replaced;
+
+    ushort   m_usModelID;
+    SString  m_strModelName;
 };
 
 #endif

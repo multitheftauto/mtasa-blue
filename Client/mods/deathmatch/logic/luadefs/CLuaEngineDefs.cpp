@@ -34,7 +34,7 @@ void CLuaEngineDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("engineGetModelTextureNames", EngineGetModelTextureNames);
     CLuaCFunctions::AddFunction("engineGetVisibleTextureNames", EngineGetVisibleTextureNames);
 
-    CLuaCFunctions::AddFunction("engineDFFGetProperties", EngineDFFGetProperties);
+    CLuaCFunctions::AddFunction("engineGetDFFProperties", EngineGetDFFProperties);
 
     // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
     // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -101,7 +101,7 @@ void CLuaEngineDefs::AddEngineDffClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "getProperties", "engineDFFGetProperties");
 
-    lua_classvariable(luaVM, "properties", NULL, "engineDFFGetProperties");
+    lua_classvariable(luaVM, "properties", nullptr, "engineDFFGetProperties");
 
     lua_registerclass(luaVM, "EngineDFF", "Element");
 }
@@ -199,11 +199,11 @@ int CLuaEngineDefs::EngineLoadDFF(lua_State* luaVM)
                         // Success loading the file. Set parent to DFF root
                         pDFF->SetParent(pRoot);
 
-                        if (strModelName != "")
+                        if (!strModelName.empty())
                         {
                             ushort usModelID = CModelNames::ResolveModelID(strModelName);
                             if (usModelID != INVALID_MODEL_ID)
-                                pDFF->m_usModelID = usModelID;
+                                pDFF->SetModelID( usModelID );
 
                             if (!CClientDFFManager::IsReplacableModel(usModelID))
                             {
@@ -212,7 +212,7 @@ int CLuaEngineDefs::EngineLoadDFF(lua_State* luaVM)
                                 lua_pushboolean(luaVM, false);
                                 return 1;
                             }
-                            pDFF->m_strModelName = strModelName;
+                            pDFF->SetModelName(strModelName);
                         }
                         // Return the DFF
                         lua_pushelement(luaVM, pDFF);
@@ -459,9 +459,9 @@ int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         ushort usModelID = INVALID_MODEL_ID;
-        if (pDFF->m_strModelName != "")
+        if (!pDFF->GetModelName().empty())
         {
-            usModelID = CModelNames::ResolveModelID(pDFF->m_strModelName);
+            usModelID = CModelNames::ResolveModelID(pDFF->GetModelName());
         }
         else
         {
@@ -942,7 +942,7 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
     return 1;
 }
 
-int CLuaEngineDefs::EngineDFFGetProperties(lua_State* luaVM)
+int CLuaEngineDefs::EngineGetDFFProperties(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
     RpClump*         pClump;
@@ -958,7 +958,7 @@ int CLuaEngineDefs::EngineDFFGetProperties(lua_State* luaVM)
         {
             CClientDFF* pDFF;
             argStream.ReadUserData(pDFF);
-            usModelID = pDFF->m_usModelID;
+            usModelID = pDFF->GetModelID();
             pClump = pDFF->GetLoadedClump(usModelID);
         }
     }
