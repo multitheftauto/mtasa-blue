@@ -15,8 +15,8 @@
  * Constructor for CPlayerPedSA
  */
 
-static CPedClothesDesc *   pLocalClothes = 0;
-static CWantedSAInterface *pLocalWanted = 0;
+static CPedClothesDesc*    pLocalClothes = 0;
+static CWantedSAInterface* pLocalWanted = 0;
 static std::set<SString>   ms_DoneAnimBlockRefMap;
 
 CPlayerPedSA::CPlayerPedSA(ePedModel pedType)
@@ -41,12 +41,12 @@ CPlayerPedSA::CPlayerPedSA(ePedModel pedType)
         call    CPlayerPedConstructor
     }
 
-    this->SetInterface((CEntitySAInterface *)dwPedPointer);
+    this->SetInterface((CEntitySAInterface*)dwPedPointer);
 
     this->Init();            // init our interfaces
-    CPoolsSA *pools = (CPoolsSA *)pGame->GetPools();
-    this->internalID = pools->GetPedRef((DWORD *)this->GetInterface());
-    CWorldSA *world = (CWorldSA *)pGame->GetWorld();
+    CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
+    this->internalID = pools->GetPedRef((DWORD*)this->GetInterface());
+    CWorldSA* world = (CWorldSA*)pGame->GetWorld();
 
     this->SetModelIndex(pedType);
     this->BeingDeleted = FALSE;
@@ -58,9 +58,9 @@ CPlayerPedSA::CPlayerPedSA(ePedModel pedType)
     m_pData = new CPlayerPedDataSAInterface;
 
     // Copy the local player data so we're defaulted to something good
-    CPlayerPedSA *pLocalPlayerSA = dynamic_cast<CPlayerPedSA *>(pools->GetPedFromRef((DWORD)1));
+    CPlayerPedSA* pLocalPlayerSA = dynamic_cast<CPlayerPedSA*>(pools->GetPedFromRef((DWORD)1));
     if (pLocalPlayerSA)
-        MemCpyFast(m_pData, ((CPlayerPedSAInterface *)pLocalPlayerSA->GetInterface())->pPlayerData, sizeof(CPlayerPedDataSAInterface));
+        MemCpyFast(m_pData, ((CPlayerPedSAInterface*)pLocalPlayerSA->GetInterface())->pPlayerData, sizeof(CPlayerPedDataSAInterface));
 
     // Replace the player ped data in our ped interface with the one we just created
     GetPlayerPedInterface()->pPlayerData = m_pData;
@@ -91,15 +91,15 @@ CPlayerPedSA::CPlayerPedSA(ePedModel pedType)
     world->Add(m_pInterface, CPlayerPed_Constructor);
 }
 
-CPlayerPedSA::CPlayerPedSA(CPlayerPedSAInterface *pPlayer)
+CPlayerPedSA::CPlayerPedSA(CPlayerPedSAInterface* pPlayer)
 {
     DEBUG_TRACE("CPlayerPedSA::CPlayerPedSA( CPedSAInterface * ped )");
     // based on CPlayerPed::SetupPlayerPed (R*)
-    this->SetInterface((CEntitySAInterface *)pPlayer);
+    this->SetInterface((CEntitySAInterface*)pPlayer);
 
     this->Init();
-    CPoolsSA *pools = (CPoolsSA *)pGame->GetPools();
-    this->internalID = pools->GetPedRef((DWORD *)this->GetInterface());
+    CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
+    this->internalID = pools->GetPedRef((DWORD*)this->GetInterface());
     this->SetType(PLAYER_PED);
     this->BeingDeleted = FALSE;
 
@@ -132,7 +132,7 @@ CPlayerPedSA::~CPlayerPedSA(void)
 
         if ((DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable)
         {
-            CWorldSA *world = (CWorldSA *)pGame->GetWorld();
+            CWorldSA* world = (CWorldSA*)pGame->GetWorld();
             world->Remove(m_pInterface, CPlayerPed_Destructor);
 
             DWORD dwThis = (DWORD)m_pInterface;
@@ -145,7 +145,7 @@ CPlayerPedSA::~CPlayerPedSA(void)
             }
         }
         this->BeingDeleted = true;
-        ((CPoolsSA *)pGame->GetPools())->RemovePed((CPed *)(CPedSA *)this, false);
+        ((CPoolsSA*)pGame->GetPools())->RemovePed((CPed*)(CPedSA*)this, false);
     }
 
     // Delete the player data
@@ -155,7 +155,7 @@ CPlayerPedSA::~CPlayerPedSA(void)
     }
 }
 
-CWanted *CPlayerPedSA::GetWanted(void)
+CWanted* CPlayerPedSA::GetWanted(void)
 {
     return m_pWanted;
 }
@@ -207,14 +207,14 @@ void CPlayerPedSA::SetInitialState(void)
 
 eMoveAnim CPlayerPedSA::GetMoveAnim(void)
 {
-    CPedSAInterface *pedInterface = (CPedSAInterface *)this->GetInterface();
+    CPedSAInterface* pedInterface = (CPedSAInterface*)this->GetInterface();
     return (eMoveAnim)pedInterface->iMoveAnimGroup;
 }
 
 // Helper for SetMoveAnim
 bool IsBlendAssocGroupLoaded(int iGroup)
 {
-    CAnimBlendAssocGroupSAInterface *pBlendAssocGroup = *(CAnimBlendAssocGroupSAInterface **)0xB4EA34;
+    CAnimBlendAssocGroupSAInterface* pBlendAssocGroup = *(CAnimBlendAssocGroupSAInterface**)0xB4EA34;
     pBlendAssocGroup += iGroup;
     return pBlendAssocGroup->pAnimBlock != NULL;
 }
@@ -222,7 +222,7 @@ bool IsBlendAssocGroupLoaded(int iGroup)
 // Helper for SetMoveAnim
 bool IsBlendAssocGroupValid(int iGroup)
 {
-    CAnimBlendAssocGroupSAInterface *pBlendAssocGroup = *(CAnimBlendAssocGroupSAInterface **)0xB4EA34;
+    CAnimBlendAssocGroupSAInterface* pBlendAssocGroup = *(CAnimBlendAssocGroupSAInterface**)0xB4EA34;
     pBlendAssocGroup += iGroup;
     if (pBlendAssocGroup->pAnimBlock == NULL)
         return false;
@@ -232,7 +232,7 @@ bool IsBlendAssocGroupValid(int iGroup)
     for (uint i = 0; i < NUMELMS(moveIds); i++)
     {
         int                                     iUseAnimId = moveIds[i] - pBlendAssocGroup->iIDOffset;
-        CAnimBlendStaticAssociationSAInterface *pAssociation = pBlendAssocGroup->pAssociationsArray + iUseAnimId;
+        CAnimBlendStaticAssociationSAInterface* pAssociation = pBlendAssocGroup->pAssociationsArray + iUseAnimId;
         if (pAssociation == NULL)
             return false;
         if (pAssociation->pAnimHeirarchy == NULL)
@@ -285,7 +285,7 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
     // Need to load ?
     if (!IsBlendAssocGroupLoaded(iAnimGroup))
     {
-        CAnimBlock *pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
+        CAnimBlock* pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
 
         // Try load
         if (pAnimBlock && !pAnimBlock->IsLoaded())
@@ -304,7 +304,7 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
         return;
 
     // Ensure we add a ref to this block, even if it wasn't loaded by us
-    CAnimBlock *pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
+    CAnimBlock* pAnimBlock = pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
     if (!pAnimBlock)
         return;
     if (!MapContains(ms_DoneAnimBlockRefMap, strBlockName))
@@ -316,7 +316,7 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
     m_iCustomMoveAnim = iAnimGroup;
 
     // Set the the new move animation group now, although it does get updated through the hooks as well
-    CPedSAInterface *pedInterface = (CPedSAInterface *)this->GetInterface();
+    CPedSAInterface* pedInterface = (CPedSAInterface*)this->GetInterface();
     pedInterface->iMoveAnimGroup = (int)iAnimGroup;
 
     DWORD dwThis = (DWORD)pedInterface;
@@ -492,9 +492,9 @@ int GetAnimPose(int iAnim)
 // Returns anim to use
 //
 ////////////////////////////////////////////////////////////////
-__declspec(noinline) int _cdecl OnCPlayerPed_ProcessAnimGroups_Mid(CPlayerPedSAInterface *pPlayerPedSAInterface, int iReqMoveAnim)
+__declspec(noinline) int _cdecl OnCPlayerPed_ProcessAnimGroups_Mid(CPlayerPedSAInterface* pPlayerPedSAInterface, int iReqMoveAnim)
 {
-    CPed *pPed = pGame->GetPools()->GetPed((DWORD *)pPlayerPedSAInterface);
+    CPed* pPed = pGame->GetPools()->GetPed((DWORD*)pPlayerPedSAInterface);
 
     if (pPed)
     {
@@ -555,7 +555,7 @@ void _declspec(naked) HOOK_CPlayerPed_ProcessAnimGroups_Mid()
 ////////////////////////////////////////////////////////////////
 __declspec(noinline) int _cdecl OnCClothes_GetDefaultPlayerMotionGroup(int iReqMoveAnim)
 {
-    CPed *pPed = g_pCore->GetMultiplayer()->GetContextSwitchedPed();
+    CPed* pPed = g_pCore->GetMultiplayer()->GetContextSwitchedPed();
 
     if (pPed)
     {

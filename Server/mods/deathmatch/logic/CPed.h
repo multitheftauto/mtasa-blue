@@ -310,4 +310,3 @@ protected:
 private:
     CPedManager* m_pPedManager;
 };
-

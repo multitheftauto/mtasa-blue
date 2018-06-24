@@ -26,4 +26,3 @@ public:
 private:
     CObject* m_pObject;
 };
-

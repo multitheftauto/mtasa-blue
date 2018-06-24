@@ -24,4 +24,3 @@ public:
 private:
     std::vector<CRegistry*> m_RegistryList;
 };
-

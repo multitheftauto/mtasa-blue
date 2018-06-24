@@ -83,4 +83,3 @@ private:
     std::list<CLuaMain*>           m_LuaMainStack;
     CDuplicateLineFilter<SLogLine> m_DuplicateLineFilter;
 };
-

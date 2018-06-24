@@ -1,6 +1,6 @@
 /*
 	BASSWMA 2.4 C/C++ header file
-	Copyright (c) 2002-2010 Un4seen Developments Ltd.
+	Copyright (c) 2002-2014 Un4seen Developments Ltd.
 
 	See the BASSWMA.CHM file for more detailed documentation
 */
@@ -38,6 +38,7 @@ typedef DWORD HWMENCODE;	// WMA encoding handle
 #define BASS_CONFIG_WMA_BASSFILE	0x10103
 #define BASS_CONFIG_WMA_NETSEEK		0x10104
 #define BASS_CONFIG_WMA_VIDEO		0x10105
+#define BASS_CONFIG_WMA_BUFTIME		0x10106
 
 // additional WMA sync types
 #define BASS_SYNC_WMA_CHANGE		0x10100
@@ -52,6 +53,8 @@ typedef DWORD HWMENCODE;	// WMA encoding handle
 #define BASS_WMA_ENCODE_24BIT		0x8000	// 24-bit
 #define BASS_WMA_ENCODE_PCM			0x10000	// uncompressed PCM
 #define BASS_WMA_ENCODE_SCRIPT		0x20000	// set script (mid-stream tags) in the WMA encoding
+#define BASS_WMA_ENCODE_QUEUE		0x40000	// queue data to feed encoder asynchronously
+#define BASS_WMA_ENCODE_SOURCE		0x80000	// use a BASS channel as source
 
 // Additional flag for use with BASS_WMA_EncodeGetRates
 #define BASS_WMA_ENCODE_RATES_VBR	0x10000	// get available VBR quality settings
@@ -95,7 +98,7 @@ HSTREAM BASSWMADEF(BASS_WMA_StreamCreateFile)(BOOL mem, const void *file, QWORD 
 HSTREAM BASSWMADEF(BASS_WMA_StreamCreateFileAuth)(BOOL mem, const void *file, QWORD offset, QWORD length, DWORD flags, const char *user, const char *pass);
 HSTREAM BASSWMADEF(BASS_WMA_StreamCreateFileUser)(DWORD system, DWORD flags, const BASS_FILEPROCS *procs, void *user);
 
-const char *BASSWMADEF(BASS_WMA_GetTags)(const void *file, DWORD flags);
+const char *BASSWMADEF(BASS_WMA_GetTags)(const char *file, DWORD flags);
 
 const DWORD *BASSWMADEF(BASS_WMA_EncodeGetRates)(DWORD freq, DWORD chans, DWORD flags);
 HWMENCODE BASSWMADEF(BASS_WMA_EncodeOpen)(DWORD freq, DWORD chans, DWORD flags, DWORD bitrate, WMENCODEPROC *proc, void *user);
@@ -114,6 +117,36 @@ BOOL BASSWMADEF(BASS_WMA_EncodeClose)(HWMENCODE handle);
 void *BASSWMADEF(BASS_WMA_GetWMObject)(DWORD handle);
 
 #ifdef __cplusplus
+}
+
+static inline HSTREAM BASS_WMA_StreamCreateFile(BOOL mem, const WCHAR *file, QWORD offset, QWORD length, DWORD flags)
+{
+	return BASS_WMA_StreamCreateFile(mem, (const void*)file, offset, length, flags|BASS_UNICODE);
+}
+
+static inline HSTREAM BASS_WMA_StreamCreateFileAuth(BOOL mem, const WCHAR *file, QWORD offset, QWORD length, DWORD flags, const char *user, const char *pass)
+{
+	return BASS_WMA_StreamCreateFileAuth(mem, (const void*)file, offset, length, flags|BASS_UNICODE, (const char*)user, (const char*)pass);
+}
+
+static inline const char *BASS_WMA_GetTags(const WCHAR *file, DWORD flags)
+{
+	return BASS_WMA_GetTags((const char*)file, flags|BASS_UNICODE);
+}
+
+static inline HWMENCODE BASS_WMA_EncodeOpenFile(DWORD freq, DWORD chans, DWORD flags, DWORD bitrate, const WCHAR *file)
+{
+	return BASS_WMA_EncodeOpenFile(freq, chans, flags|BASS_UNICODE, bitrate, (const char*)file);
+}
+
+static inline HWMENCODE BASS_WMA_EncodeOpenPublish(DWORD freq, DWORD chans, DWORD flags, DWORD bitrate, const WCHAR *url, const WCHAR *user, const WCHAR *pass)
+{
+	return BASS_WMA_EncodeOpenPublish(freq, chans, flags|BASS_UNICODE, bitrate, (const char*)url, (const char*)user, (const char*)pass);
+}
+
+static inline HWMENCODE BASS_WMA_EncodeOpenPublishMulti(DWORD freq, DWORD chans, DWORD flags, const DWORD *bitrates, const WCHAR *url, const WCHAR *user, const WCHAR *pass)
+{
+	return BASS_WMA_EncodeOpenPublishMulti(freq, chans, flags|BASS_UNICODE, bitrates, (const char*)url, (const char*)user, (const char*)pass);
 }
 #endif
 

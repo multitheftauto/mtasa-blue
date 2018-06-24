@@ -61,4 +61,3 @@ private:
     SString       m_strFilename;
     unsigned long m_ulMaxSize;
 };
-

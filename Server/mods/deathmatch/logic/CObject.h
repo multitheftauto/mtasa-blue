@@ -101,4 +101,3 @@ protected:
 public:
     CPositionRotationAnimation* m_pMoveAnimation;
 };
-

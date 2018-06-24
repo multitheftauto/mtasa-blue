@@ -38,4 +38,3 @@ public:
 private:
     vector<SPlayerClothes*> m_List;
 };
-

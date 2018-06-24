@@ -95,4 +95,3 @@ private:
     static SFixedArray<sWeaponInfo, WEAPONTYPE_MAX + 1> OriginalNormalWeaponData;
     static SFixedArray<sWeaponInfo, WEAPONTYPE_MAX + 1> OriginalHitmanWeaponData;
 };
-

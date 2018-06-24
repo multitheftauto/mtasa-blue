@@ -63,7 +63,8 @@ void CMultiplayerSA::SetBlendAnimationHierarchyHandler(BlendAnimationHierarchyHa
 CAnimBlendAssociationSAInterface* __cdecl CAnimBlendAssocGroup_CopyAnimation(RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroupInterface,
                                                                              AnimationId animID)
 {
-    auto CAnimBlendAssociation_NewOperator = pGameInterface->GetGameVersion() == VERSION_EU_10 ? CAnimBlendAssociation_NewOperator_EU : CAnimBlendAssociation_NewOperator_US;
+    auto CAnimBlendAssociation_NewOperator =
+        pGameInterface->GetGameVersion() == VERSION_EU_10 ? CAnimBlendAssociation_NewOperator_EU : CAnimBlendAssociation_NewOperator_US;
     auto pAnimAssociationInterface =
         reinterpret_cast<CAnimBlendAssociationSAInterface*>(CAnimBlendAssociation_NewOperator(sizeof(CAnimBlendAssociationSAInterface)));
 

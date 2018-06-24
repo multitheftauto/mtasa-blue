@@ -388,4 +388,3 @@ protected:
     void CommitAclRequest(const SAclRequest& request);
     bool FindAclRequest(SAclRequest& request);
 };
-

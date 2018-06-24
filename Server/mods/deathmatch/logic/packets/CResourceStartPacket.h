@@ -29,4 +29,3 @@ private:
     std::string m_strResourceName;
     CResource*  m_pResource;
 };
-

@@ -71,4 +71,3 @@ private:
     float         m_fFOV;
     uchar         m_ucSyncTimeContext;
 };
-

@@ -36,4 +36,3 @@ private:
     CLuaArguments  m_ArgumentsStore;
     CLuaArguments* m_pArguments;
 };
-

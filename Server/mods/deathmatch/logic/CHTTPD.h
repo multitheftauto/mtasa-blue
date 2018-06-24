@@ -57,4 +57,3 @@ private:
     SString                m_strWarnMessageForIp;
     CElapsedTime           m_WarnMessageTimer;
 };
-

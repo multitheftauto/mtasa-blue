@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CPickupSA::CPickupSA(CPickupSAInterface *pickupInterface)
+CPickupSA::CPickupSA(CPickupSAInterface* pickupInterface)
 {
     DEBUG_TRACE("CPickupSA::CPickupSA(CPickupSAInterface * pickupInterface)");
     this->internalInterface = pickupInterface;
@@ -19,21 +19,21 @@ CPickupSA::CPickupSA(CPickupSAInterface *pickupInterface)
     this->object = 0;
 }
 
-VOID CPickupSA::SetPosition(CVector *vecPosition)
+VOID CPickupSA::SetPosition(CVector* vecPosition)
 {
     DEBUG_TRACE("VOID CPickupSA::SetPosition(CVector * vecPosition)");
     this->GetInterface()->bIsPickupNearby = 0;
 
-    CPickupSAInterface *iPickup = this->GetInterface();
+    CPickupSAInterface* iPickup = this->GetInterface();
     iPickup->CoorsX = (short)(vecPosition->fX * 8);
     iPickup->CoorsY = (short)(vecPosition->fY * 8);
     iPickup->CoorsZ = (short)(vecPosition->fZ * 8);
 }
 
-CVector *CPickupSA::GetPosition(CVector *vecPosition)
+CVector* CPickupSA::GetPosition(CVector* vecPosition)
 {
     DEBUG_TRACE("CVector * CPickupSA::GetPosition(CVector * vecPosition)");
-    CPickupSAInterface *iPickup = this->GetInterface();
+    CPickupSAInterface* iPickup = this->GetInterface();
     vecPosition->fX = iPickup->CoorsX / 8.0f;
     vecPosition->fY = iPickup->CoorsY / 8.0f;
     vecPosition->fZ = iPickup->CoorsZ / 8.0f;
@@ -153,7 +153,7 @@ VOID CPickupSA::GiveUsAPickUpObject(int ForcedObjectIndex)
     {
         if (this->object)
         {
-            ((CEntitySA *)this->object)->DoNotRemoveFromGame = true;
+            ((CEntitySA*)this->object)->DoNotRemoveFromGame = true;
             delete this->object;
         }
 
@@ -165,11 +165,11 @@ VOID CPickupSA::GetRidOfObjects()
 {
     DEBUG_TRACE("VOID CPickupSA::GetRidOfObjects()");
     if (this->GetInterface()->pObject)
-        ((CWorldSA *)pGame->GetWorld())->Remove(this->GetInterface()->pObject, CPickup_Destructor);
+        ((CWorldSA*)pGame->GetWorld())->Remove(this->GetInterface()->pObject, CPickup_Destructor);
 
     if (this->object)
     {
-        ((CEntitySA *)this->object)->DoNotRemoveFromGame = true;
+        ((CEntitySA*)this->object)->DoNotRemoveFromGame = true;
         delete this->object;
         this->object = NULL;
     }
@@ -188,7 +188,7 @@ VOID CPickupSA::Remove()
     // CPickup::Remove also destroys the owned object, so we need to delete our CObjectSA class
     if (this->object)
     {
-        ((CEntitySA *)this->object)->DoNotRemoveFromGame = true;
+        ((CEntitySA*)this->object)->DoNotRemoveFromGame = true;
         delete this->object;
         this->object = NULL;
     }

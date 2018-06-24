@@ -26,4 +26,3 @@ private:
     unsigned long long m_ullMidnightTime;
     unsigned long      m_ulMinuteDuration;
 };
-

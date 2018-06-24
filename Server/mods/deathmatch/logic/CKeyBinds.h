@@ -126,4 +126,3 @@ protected:
     std::list<CKeyBind*> m_List;
     bool                 m_bProcessingKey;
 };
-

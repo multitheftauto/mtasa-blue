@@ -37,4 +37,3 @@ private:
     FILE* m_pFile;
     bool  m_bEcho;
 };
-

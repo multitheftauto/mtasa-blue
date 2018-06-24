@@ -43,4 +43,3 @@ private:
     SColor    m_Color;
     bool      m_bIsFlashing;
 };
-

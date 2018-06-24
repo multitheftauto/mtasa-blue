@@ -59,4 +59,3 @@ private:
     ePlayerDisconnectType m_eType;
     time_t                m_Duration;
 };
-

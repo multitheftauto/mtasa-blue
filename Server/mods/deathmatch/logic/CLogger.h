@@ -60,4 +60,3 @@ private:
     static bool             m_bCaptureConsole;
     static CCriticalSection m_CaptureBufferMutex;
 };
-

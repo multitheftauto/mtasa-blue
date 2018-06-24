@@ -22,4 +22,3 @@ public:
     bool Read(NetBitStreamInterface& BitStream) { return true; };
     bool Write(NetBitStreamInterface& BitStream) const { return true; };
 };
-

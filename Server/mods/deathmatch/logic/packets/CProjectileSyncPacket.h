@@ -36,4 +36,3 @@ public:
     CVector        m_vecMoveSpeed;
     unsigned short m_usModel;
 };
-

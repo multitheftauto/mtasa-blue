@@ -42,4 +42,3 @@ protected:
     float m_fRadius;
     float m_fHeight;
 };
-

@@ -52,4 +52,3 @@ private:
     std::map<std::string, SCustomData> m_Data;
     std::map<std::string, SCustomData> m_SyncedData;
 };
-

@@ -40,4 +40,3 @@ public:
 private:
     map<unsigned short, sPlayerStat> m_List;
 };
-

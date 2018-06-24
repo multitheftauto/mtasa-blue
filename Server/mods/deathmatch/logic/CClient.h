@@ -54,4 +54,3 @@ public:
 protected:
     CAccount* m_pAccount;
 };
-
