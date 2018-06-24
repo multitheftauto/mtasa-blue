@@ -39,4 +39,3 @@ private:
 
     CClock* m_pClock;
 };
-

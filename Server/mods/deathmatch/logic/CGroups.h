@@ -38,4 +38,3 @@ private:
 
     list<CDummy*> m_List;
 };
-

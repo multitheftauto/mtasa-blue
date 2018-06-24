@@ -101,4 +101,3 @@ public:
 private:
     std::vector<CLuaArgument*> m_Arguments;
 };
-

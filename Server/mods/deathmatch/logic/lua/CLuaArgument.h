@@ -85,4 +85,3 @@ private:
     bool CompareRecursive(const CLuaArgument& Argument, std::set<CLuaArguments*>* pKnownTables = NULL);
     void DeleteTableData(void);
 };
-

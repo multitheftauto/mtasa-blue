@@ -31,4 +31,3 @@ private:
     void ReadVehicleSpecific(class CVehicle* pVehicle, NetBitStreamInterface& BitStream);
     void WriteVehicleSpecific(class CVehicle* pVehicle, NetBitStreamInterface& BitStream) const;
 };
-

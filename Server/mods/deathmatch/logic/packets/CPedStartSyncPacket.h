@@ -27,4 +27,3 @@ public:
 private:
     CPed* m_pPed;
 };
-

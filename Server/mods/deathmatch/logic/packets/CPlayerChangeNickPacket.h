@@ -30,4 +30,3 @@ public:
 private:
     SString m_strNewNick;
 };
-

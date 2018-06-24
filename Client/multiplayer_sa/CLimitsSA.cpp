@@ -84,9 +84,9 @@ int CLimitsSA::GetStreamingMemory() const
 bool CLimitsSA::SetStreamingMemory(int value)
 {
     MemPutFast<int>(0x8A5A80, value);
-    MemSet((void *)0x5B8E64, 0x90, 10);
-    MemSet((void *)0x5BCD50, 0x90, 5);
-    MemSet((void *)0x5BCD78, 0x90, 5);
+    MemSet((void*)0x5B8E64, 0x90, 10);
+    MemSet((void*)0x5BCD50, 0x90, 5);
+    MemSet((void*)0x5BCD78, 0x90, 5);
     return true;
 }
 
@@ -100,7 +100,7 @@ bool CLimitsSA::SetStreamingVehicles(int value)
     MemPut<unsigned char>(0x611C3D, 0x83);
     MemPut<unsigned char>(0x611C3E, 0xFA);
     MemPut<unsigned char>(0x611C3F, static_cast<unsigned char>(value));
-    MemSet((void *)0x5BCD9C, 0x90, 5);
-    MemSet((void *)0x5B8E6E, 0x90, 10);
+    MemSet((void*)0x5BCD9C, 0x90, 5);
+    MemSet((void*)0x5B8E6E, 0x90, 10);
     return true;
 }

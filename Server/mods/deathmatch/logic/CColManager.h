@@ -43,4 +43,3 @@ private:
     bool                    m_bIteratingList;
     std::vector<CColShape*> m_TrashCan;
 };
-

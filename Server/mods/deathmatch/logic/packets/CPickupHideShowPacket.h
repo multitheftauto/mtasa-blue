@@ -35,4 +35,3 @@ private:
     bool                        m_bShow;
     std::vector<class CPickup*> m_List;
 };
-

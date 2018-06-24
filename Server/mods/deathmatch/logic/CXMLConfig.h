@@ -49,4 +49,3 @@ protected:
     std::string m_strFileName;
     CXMLFile*   m_pFile;
 };
-

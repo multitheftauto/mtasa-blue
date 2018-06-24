@@ -81,4 +81,3 @@ protected:
     SString        m_strReqClientReason;
     SString        m_strReqServerReason;
 };
-

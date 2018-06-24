@@ -26,11 +26,11 @@ VOID CRestartSA::CancelOverrideRestart()
  * @param vecPosition CVector * containing the position to restart at
  * @param fRotation Rotation in radians to face once restarted
  */
-VOID CRestartSA::OverrideNextRestart(CVector *vecPosition, FLOAT fRotation)
+VOID CRestartSA::OverrideNextRestart(CVector* vecPosition, FLOAT fRotation)
 {
     DEBUG_TRACE("VOID CRestartSA::OverrideNextRestart ( CVector * vecPosition, FLOAT fRotation )");
     MemPutFast<BYTE>(VAR_OverrideNextRestart, 1);
-    MemCpyFast((void *)VAR_OverrideNextRestartPosition, vecPosition, sizeof(CVector));
+    MemCpyFast((void*)VAR_OverrideNextRestartPosition, vecPosition, sizeof(CVector));
     MemPut<FLOAT>(VAR_OverrideNextRestartRotation, fRotation);
 }
 
@@ -40,7 +40,7 @@ VOID CRestartSA::OverrideNextRestart(CVector *vecPosition, FLOAT fRotation)
  * @param vecClosestRestartPoint CVector * that returns the position of the closest restart point
  * @param fRotation FLOAT * that returns the rotation at which the restart point restarts the player
  */
-VOID CRestartSA::FindClosestPoliceRestartPoint(CVector *vecClosestTo, CVector *vecClosestRestartPoint, FLOAT *fRotation)
+VOID CRestartSA::FindClosestPoliceRestartPoint(CVector* vecClosestTo, CVector* vecClosestRestartPoint, FLOAT* fRotation)
 {
     DEBUG_TRACE("VOID CRestartSA::FindClosestPoliceRestartPoint ( CVector * vecClosestTo, CVector * vecClosestRestartPoint, FLOAT * fRotation )");
     DWORD dwFunction = FUNC_FindClosestPoliceRestartPoint;
@@ -60,7 +60,7 @@ VOID CRestartSA::FindClosestPoliceRestartPoint(CVector *vecClosestTo, CVector *v
  * @param vecClosestRestartPoint CVector * that returns the position of the closest restart point
  * @param fRotation FLOAT * that returns the rotation at which the restart point restarts the player
  */
-VOID CRestartSA::FindClosestHospitalRestartPoint(CVector *vecClosestTo, CVector *vecClosestRestartPoint, FLOAT *fRotation)
+VOID CRestartSA::FindClosestHospitalRestartPoint(CVector* vecClosestTo, CVector* vecClosestRestartPoint, FLOAT* fRotation)
 {
     DEBUG_TRACE("VOID CRestartSA::FindClosestHospitalRestartPoint ( CVector * vecClosestTo, CVector * vecClosestRestartPoint, FLOAT * fRotation )");
     DWORD dwFunction = FUNC_FindClosestHospitalRestartPoint;
@@ -80,7 +80,7 @@ VOID CRestartSA::FindClosestHospitalRestartPoint(CVector *vecClosestTo, CVector 
  * @param vecPosition CVector * containing the desired position for the restart point
  * @param fRotation FLOAT containing the desired initial rotation for the player
  */
-VOID CRestartSA::AddPoliceRestartPoint(CVector *vecPosition, FLOAT fRotation)
+VOID CRestartSA::AddPoliceRestartPoint(CVector* vecPosition, FLOAT fRotation)
 {
     DEBUG_TRACE("VOID CRestartSA::AddPoliceRestartPoint ( CVector * vecPosition, FLOAT fRotation )");
     DWORD dwFunction = FUNC_AddPoliceRestartPoint;
@@ -99,7 +99,7 @@ VOID CRestartSA::AddPoliceRestartPoint(CVector *vecPosition, FLOAT fRotation)
  * @param vecPosition CVector * containing the desired position for the restart point
  * @param fRotation FLOAT containing the desired initial rotation for the player
  */
-VOID CRestartSA::AddHospitalRestartPoint(CVector *vecPosition, FLOAT fRotation)
+VOID CRestartSA::AddHospitalRestartPoint(CVector* vecPosition, FLOAT fRotation)
 {
     DEBUG_TRACE("VOID CRestartSA::AddHospitalRestartPoint ( CVector * vecPosition, FLOAT fRotation )");
     DWORD dwFunction = FUNC_AddHospitalRestartPoint;

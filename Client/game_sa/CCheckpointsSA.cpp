@@ -16,7 +16,7 @@ CCheckpointsSA::CCheckpointsSA()
 {
     DEBUG_TRACE("CCheckpointsSA::CCheckpointsSA()");
     for (int i = 0; i < MAX_CHECKPOINTS; i++)
-        this->Checkpoints[i] = new CCheckpointSA((CCheckpointSAInterface *)(ARRAY_CHECKPOINTS + i * sizeof(CCheckpointSAInterface)));
+        this->Checkpoints[i] = new CCheckpointSA((CCheckpointSAInterface*)(ARRAY_CHECKPOINTS + i * sizeof(CCheckpointSAInterface)));
 }
 
 CCheckpointsSA::~CCheckpointsSA(void)
@@ -30,7 +30,7 @@ CCheckpointsSA::~CCheckpointsSA(void)
 /**
  * \todo Update default color to SA's orange instead of VC's pink
  */
-CCheckpoint *CCheckpointsSA::CreateCheckpoint(DWORD Identifier, WORD wType, CVector *vecPosition, CVector *vecPointDir, FLOAT fSize, FLOAT fPulseFraction,
+CCheckpoint* CCheckpointsSA::CreateCheckpoint(DWORD Identifier, WORD wType, CVector* vecPosition, CVector* vecPointDir, FLOAT fSize, FLOAT fPulseFraction,
                                               const SColor color)
 {
     DEBUG_TRACE(
@@ -41,18 +41,18 @@ CCheckpoint *CCheckpointsSA::CreateCheckpoint(DWORD Identifier, WORD wType, CVec
     float fSize, unsigned char r, unsigned char g, unsigned char b, unsigned char a, unsigned short nPeriod, float fPulseFrac, short nRotRate);
     */
 
-    CCheckpoint *Checkpoint = FindFreeMarker();
+    CCheckpoint* Checkpoint = FindFreeMarker();
     if (Checkpoint)
     {
-        ((CCheckpointSA *)(Checkpoint))->SetIdentifier(Identifier);
-        ((CCheckpointSA *)(Checkpoint))->Activate();
-        ((CCheckpointSA *)(Checkpoint))->SetType(wType);
+        ((CCheckpointSA*)(Checkpoint))->SetIdentifier(Identifier);
+        ((CCheckpointSA*)(Checkpoint))->Activate();
+        ((CCheckpointSA*)(Checkpoint))->SetType(wType);
         Checkpoint->SetPosition(vecPosition);
         Checkpoint->SetPointDirection(vecPointDir);
         Checkpoint->SetSize(fSize);
         Checkpoint->SetColor(color);
         Checkpoint->SetPulsePeriod(1024);
-        ((CCheckpointSA *)(Checkpoint))->SetPulseFraction(fPulseFraction);
+        ((CCheckpointSA*)(Checkpoint))->SetPulseFraction(fPulseFraction);
         Checkpoint->SetRotateRate(1);
 
         return Checkpoint;
@@ -91,7 +91,7 @@ CCheckpoint *CCheckpointsSA::CreateCheckpoint(DWORD Identifier, WORD wType, CVec
     return NULL;
 }
 
-CCheckpoint *CCheckpointsSA::FindFreeMarker()
+CCheckpoint* CCheckpointsSA::FindFreeMarker()
 {
     DEBUG_TRACE("CCheckpoint * CCheckpointsSA::FindFreeMarker()");
     for (int i = 0; i < MAX_CHECKPOINTS; i++)

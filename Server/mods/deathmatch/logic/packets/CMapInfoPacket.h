@@ -94,4 +94,3 @@ private:
     bool                 m_bOverrideMoonSize;
     int                  m_iMoonSize;
 };
-

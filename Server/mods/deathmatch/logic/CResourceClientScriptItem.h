@@ -31,4 +31,3 @@ private:
     bool    m_bIsNoClientCache;
     SString m_sourceCode;
 };
-

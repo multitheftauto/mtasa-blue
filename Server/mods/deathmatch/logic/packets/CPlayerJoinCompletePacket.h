@@ -42,4 +42,3 @@ private:
     unsigned char     m_ucQuality;
     unsigned int      m_uiBitrate;
 };
-

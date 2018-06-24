@@ -31,4 +31,3 @@ private:
     class CPickup* m_pPickup;
     bool           m_bPlaySound;
 };
-

@@ -12,4 +12,3 @@
 #pragma once
 
 extern char szDefaultVehicleColors[];
-

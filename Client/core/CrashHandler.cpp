@@ -59,7 +59,7 @@ static PFNCHFILTFN g_pfnCallBack = NULL;
 static LPTOP_LEVEL_EXCEPTION_FILTER g_pfnOrigFilt = NULL;
 
 // The array of modules to limit crash handler to
-static HMODULE *g_ahMod = NULL;
+static HMODULE* g_ahMod = NULL;
 // The size, in items, of g_ahMod
 static UINT g_uiModCount = 0;
 
@@ -83,13 +83,13 @@ static BOOL g_bSymEngInit = FALSE;
                     File Scope Function Declarations
 //////////////////////////////////////////////////////////////////////*/
 // The exception handler
-LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS *pExPtrs);
+LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs);
 
 // Converts a simple exception to a string value
 LPCTSTR ConvertSimpleException(DWORD dwExcept);
 
 // The internal function that does all the stack walking
-LPCTSTR __stdcall InternalGetStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS *pExPtrs);
+LPCTSTR __stdcall InternalGetStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* pExPtrs);
 
 // The internal SymGetLineFromAddr function
 BOOL InternalSymGetLineFromAddr(IN HANDLE hProcess, IN DWORD dwAddr, OUT PDWORD pdwDisplacement, OUT PIMAGEHLP_LINE Line);
@@ -171,7 +171,7 @@ BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
             // Stop the OS from turning off our handler
             // Ref: http://www.codeproject.com/Articles/154686/SetUnhandledExceptionFilter-and-the-C-C-Runtime-Li
             LONG(WINAPI * RedirectedSetUnhandledExceptionFilter)
-            (EXCEPTION_POINTERS *) = [](EXCEPTION_POINTERS * /*ExceptionInfo*/) -> LONG {
+            (EXCEPTION_POINTERS*) = [](EXCEPTION_POINTERS * /*ExceptionInfo*/) -> LONG {
                 // When the CRT calls SetUnhandledExceptionFilter with NULL parameter
                 // our handler will not get removed.
                 return 0;
@@ -196,7 +196,7 @@ BOOL __stdcall AddCrashHandlerLimitModule(HMODULE hMod)
     // memory that's guaranteed to be around even if the process is
     // toasting. If the process is toasting, the RTL heap probably isn't
     // safe, so I allocate the temporary array from the process heap.
-    HMODULE *phTemp = (HMODULE *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY | HEAP_GENERATE_EXCEPTIONS, (sizeof(HMODULE) * (g_uiModCount + 1)));
+    HMODULE* phTemp = (HMODULE*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY | HEAP_GENERATE_EXCEPTIONS, (sizeof(HMODULE) * (g_uiModCount + 1)));
     ASSERT(NULL != phTemp);
     if (NULL == phTemp)
     {
@@ -230,7 +230,7 @@ UINT __stdcall GetLimitModuleCount(void)
     return (g_uiModCount);
 }
 
-int __stdcall GetLimitModulesArray(HMODULE *pahMod, UINT uiSize)
+int __stdcall GetLimitModulesArray(HMODULE* pahMod, UINT uiSize)
 {
     int iRet;
 
@@ -260,7 +260,7 @@ int __stdcall GetLimitModulesArray(HMODULE *pahMod, UINT uiSize)
     return (iRet);
 }
 
-LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS *pExPtrs)
+LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
 {
     LONG lRet = EXCEPTION_CONTINUE_SEARCH;
 
@@ -360,7 +360,7 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS *pExPtrs)
          EXCEPTION_POINTER Translation Functions Implementation
 //////////////////////////////////////////////////////////////////////*/
 
-LPCTSTR __stdcall GetFaultReason(EXCEPTION_POINTERS *pExPtrs)
+LPCTSTR __stdcall GetFaultReason(EXCEPTION_POINTERS* pExPtrs)
 {
     ASSERT(FALSE == IsBadReadPtr(pExPtrs, sizeof(EXCEPTION_POINTERS)));
     if (TRUE == IsBadReadPtr(pExPtrs, sizeof(EXCEPTION_POINTERS)))
@@ -509,7 +509,7 @@ LPCTSTR __stdcall GetFaultReason(EXCEPTION_POINTERS *pExPtrs)
     return (szRet);
 }
 
-BOOL __stdcall GetFaultReasonVB(EXCEPTION_POINTERS *pExPtrs, LPTSTR szBuff, UINT uiSize)
+BOOL __stdcall GetFaultReasonVB(EXCEPTION_POINTERS* pExPtrs, LPTSTR szBuff, UINT uiSize)
 {
     ASSERT(FALSE == IsBadWritePtr(szBuff, uiSize));
     if (TRUE == IsBadWritePtr(szBuff, uiSize))
@@ -537,7 +537,7 @@ BOOL __stdcall GetFaultReasonVB(EXCEPTION_POINTERS *pExPtrs, LPTSTR szBuff, UINT
     return (NULL != szRet);
 }
 
-LPCTSTR BUGSUTIL_DLLINTERFACE __stdcall GetFirstStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS *pExPtrs)
+LPCTSTR BUGSUTIL_DLLINTERFACE __stdcall GetFirstStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* pExPtrs)
 {
     // All the error checking is in the InternalGetStackTraceString
     // function.
@@ -566,7 +566,7 @@ LPCTSTR BUGSUTIL_DLLINTERFACE __stdcall GetFirstStackTraceString(DWORD dwOpts, E
     return (InternalGetStackTraceString(dwOpts, pExPtrs));
 }
 
-LPCTSTR BUGSUTIL_DLLINTERFACE __stdcall GetNextStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS *pExPtrs)
+LPCTSTR BUGSUTIL_DLLINTERFACE __stdcall GetNextStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* pExPtrs)
 {
     // All error checking is in InternalGetStackTraceString.
     // Assume that GetFirstStackTraceString has already initialized the
@@ -580,7 +580,7 @@ BOOL __stdcall CH_ReadProcessMemory(HANDLE, LPCVOID lpBaseAddress, LPVOID lpBuff
 }
 
 // The internal function that does all the stack walking
-LPCTSTR __stdcall InternalGetStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS *pExPtrs)
+LPCTSTR __stdcall InternalGetStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* pExPtrs)
 {
     ASSERT(FALSE == IsBadReadPtr(pExPtrs, sizeof(EXCEPTION_POINTERS)));
     if (TRUE == IsBadReadPtr(pExPtrs, sizeof(EXCEPTION_POINTERS)))
@@ -751,7 +751,7 @@ LPCTSTR __stdcall InternalGetStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS *
     return (szRet);
 }
 
-BOOL __stdcall GetFirstStackTraceStringVB(DWORD dwOpts, EXCEPTION_POINTERS *pExPtrs, LPTSTR szBuff, UINT uiSize)
+BOOL __stdcall GetFirstStackTraceStringVB(DWORD dwOpts, EXCEPTION_POINTERS* pExPtrs, LPTSTR szBuff, UINT uiSize)
 {
     ASSERT(FALSE == IsBadWritePtr(szBuff, uiSize));
     if (TRUE == IsBadWritePtr(szBuff, uiSize))
@@ -777,7 +777,7 @@ BOOL __stdcall GetFirstStackTraceStringVB(DWORD dwOpts, EXCEPTION_POINTERS *pExP
     return (NULL != szRet);
 }
 
-BOOL __stdcall GetNextStackTraceStringVB(DWORD dwOpts, EXCEPTION_POINTERS *pExPtrs, LPTSTR szBuff, UINT uiSize)
+BOOL __stdcall GetNextStackTraceStringVB(DWORD dwOpts, EXCEPTION_POINTERS* pExPtrs, LPTSTR szBuff, UINT uiSize)
 {
     ASSERT(FALSE == IsBadWritePtr(szBuff, uiSize));
     if (TRUE == IsBadWritePtr(szBuff, uiSize))
@@ -803,7 +803,7 @@ BOOL __stdcall GetNextStackTraceStringVB(DWORD dwOpts, EXCEPTION_POINTERS *pExPt
     return (NULL != szRet);
 }
 
-LPCTSTR __stdcall GetRegisterString(EXCEPTION_POINTERS *pExPtrs)
+LPCTSTR __stdcall GetRegisterString(EXCEPTION_POINTERS* pExPtrs)
 {
     // Check the parameter.
     ASSERT(FALSE == IsBadReadPtr(pExPtrs, sizeof(EXCEPTION_POINTERS)));
@@ -832,7 +832,7 @@ LPCTSTR __stdcall GetRegisterString(EXCEPTION_POINTERS *pExPtrs)
     return (g_szBuff);
 }
 
-BOOL __stdcall GetRegisterStringVB(EXCEPTION_POINTERS *pExPtrs, LPTSTR szBuff, UINT uiSize)
+BOOL __stdcall GetRegisterStringVB(EXCEPTION_POINTERS* pExPtrs, LPTSTR szBuff, UINT uiSize)
 {
     ASSERT(FALSE == IsBadWritePtr(szBuff, uiSize));
     if (TRUE == IsBadWritePtr(szBuff, uiSize))
@@ -1093,7 +1093,7 @@ static DWORD __stdcall Win95GetModuleBaseName(HANDLE /*hProcess*/, HMODULE hModu
     }
 
     // Find the last '\' mark.
-    char *pStart = strrchr(szBuff, '\\');
+    char* pStart = strrchr(szBuff, '\\');
     int   iMin;
     if (NULL != pStart)
     {
@@ -1148,7 +1148,7 @@ DWORD BUGSUTIL_DLLINTERFACE __stdcall BSUSymInitialize(DWORD dwPID, HANDLE hProc
             return (FALSE);
         }
         // Allocate something big enough to hold the list.
-        HMODULE *paMods = new HMODULE[dwCount];
+        HMODULE* paMods = new HMODULE[dwCount];
 
         // Get the list for real.
         if (FALSE == GetLoadedModules(dwPID, dwCount, paMods, &dwCount))
@@ -1217,11 +1217,11 @@ DWORD __stdcall BSUGetModuleFileNameEx(DWORD dwPID, HANDLE hProcess, HMODULE hMo
                                 Typedefs
 //////////////////////////////////////////////////////////////////////*/
 // The typedefs for the PSAPI.DLL functions used by this module.
-typedef BOOL(WINAPI *ENUMPROCESSMODULES)(HANDLE hProcess, HMODULE *lphModule, DWORD cb, LPDWORD lpcbNeeded);
+typedef BOOL(WINAPI* ENUMPROCESSMODULES)(HANDLE hProcess, HMODULE* lphModule, DWORD cb, LPDWORD lpcbNeeded);
 
-typedef DWORD(WINAPI *GETMODULEBASENAME)(HANDLE hProcess, HMODULE hModule, LPTSTR lpBaseName, DWORD nSize);
+typedef DWORD(WINAPI* GETMODULEBASENAME)(HANDLE hProcess, HMODULE hModule, LPTSTR lpBaseName, DWORD nSize);
 
-typedef DWORD(WINAPI *GETMODULEFILENAMEEX)(HANDLE hProcess, HMODULE hModule, LPTSTR lpFilename, DWORD nSize);
+typedef DWORD(WINAPI* GETMODULEFILENAMEEX)(HANDLE hProcess, HMODULE hModule, LPTSTR lpFilename, DWORD nSize);
 
 /*//////////////////////////////////////////////////////////////////////
                             File Static Data
@@ -1318,7 +1318,7 @@ RETURNS         :
     TRUE  - The function succeeded.  See the parameter discussion for
             the output parameters.
 ----------------------------------------------------------------------*/
-BOOL __stdcall NT4GetLoadedModules(DWORD dwPID, UINT uiCount, HMODULE *paModArray, LPDWORD pdwRealCount)
+BOOL __stdcall NT4GetLoadedModules(DWORD dwPID, UINT uiCount, HMODULE* paModArray, LPDWORD pdwRealCount)
 {
     // Initialize PSAPI.DLL, if needed.
     if (FALSE == InitPSAPI())
@@ -1412,7 +1412,7 @@ DWORD __stdcall NTGetModuleFileNameEx(DWORD /*dwPID*/, HANDLE hProcess, HMODULE 
 }
 
 // The documentation for this function is in BugslayerUtil.h.
-BOOL BUGSUTIL_DLLINTERFACE __stdcall GetLoadedModules(DWORD dwPID, UINT uiCount, HMODULE *paModArray, LPDWORD pdwRealCount)
+BOOL BUGSUTIL_DLLINTERFACE __stdcall GetLoadedModules(DWORD dwPID, UINT uiCount, HMODULE* paModArray, LPDWORD pdwRealCount)
 {
     // Do the debug checking.
     ASSERT(NULL != pdwRealCount);
@@ -1467,10 +1467,10 @@ BOOL BUGSUTIL_DLLINTERFACE __stdcall GetLoadedModules(DWORD dwPID, UINT uiCount,
 //////////////////////////////////////////////////////////////////////*/
 // The typedefs for the TOOLHELP32.DLL functions used by this module.
 // Type definitions for pointers to call tool help functions.
-typedef BOOL(WINAPI *MODULEWALK)(HANDLE hSnapshot, LPMODULEENTRY32 lpme);
-typedef BOOL(WINAPI *THREADWALK)(HANDLE hSnapshot, LPTHREADENTRY32 lpte);
-typedef BOOL(WINAPI *PROCESSWALK)(HANDLE hSnapshot, LPPROCESSENTRY32 lppe);
-typedef HANDLE(WINAPI *CREATESNAPSHOT)(DWORD dwFlags, DWORD th32ProcessID);
+typedef BOOL(WINAPI* MODULEWALK)(HANDLE hSnapshot, LPMODULEENTRY32 lpme);
+typedef BOOL(WINAPI* THREADWALK)(HANDLE hSnapshot, LPTHREADENTRY32 lpte);
+typedef BOOL(WINAPI* PROCESSWALK)(HANDLE hSnapshot, LPPROCESSENTRY32 lppe);
+typedef HANDLE(WINAPI* CREATESNAPSHOT)(DWORD dwFlags, DWORD th32ProcessID);
 
 /*//////////////////////////////////////////////////////////////////////
                             File Static Data
@@ -1582,7 +1582,7 @@ RETURNS         :
     TRUE  - The function succeeded.  See the parameter discussion for
             the output parameters.
 ----------------------------------------------------------------------*/
-BOOL __stdcall TLHELPGetLoadedModules(DWORD dwPID, UINT uiCount, HMODULE *paModArray, LPDWORD pdwRealCount)
+BOOL __stdcall TLHELPGetLoadedModules(DWORD dwPID, UINT uiCount, HMODULE* paModArray, LPDWORD pdwRealCount)
 {
     // Always set pdwRealCount to a know value before anything else.
     *pdwRealCount = 0;

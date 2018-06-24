@@ -27,4 +27,3 @@ public:
     CVector   m_vecPosition, m_vecLookAt;
     ElementID m_TargetID;
 };
-

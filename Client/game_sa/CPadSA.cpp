@@ -11,27 +11,27 @@
 
 #include "StdInc.h"
 
-CControllerState *CPadSA::GetCurrentControllerState(CControllerState *ControllerState)
+CControllerState* CPadSA::GetCurrentControllerState(CControllerState* ControllerState)
 {
     DEBUG_TRACE("CControllerState * CPadSA::GetCurrentControllerState(CControllerState * ControllerState)");
     MemCpyFast(ControllerState, &this->internalInterface->NewState, sizeof(CControllerState));
     return ControllerState;
 }
 
-CControllerState *CPadSA::GetLastControllerState(CControllerState *ControllerState)
+CControllerState* CPadSA::GetLastControllerState(CControllerState* ControllerState)
 {
     DEBUG_TRACE("CControllerState * CPadSA::GetLastControllerState(CControllerState * ControllerState)");
     MemCpyFast(ControllerState, &this->internalInterface->OldState, sizeof(CControllerState));
     return ControllerState;
 }
 
-VOID CPadSA::SetCurrentControllerState(CControllerState *ControllerState)
+VOID CPadSA::SetCurrentControllerState(CControllerState* ControllerState)
 {
     DEBUG_TRACE("VOID CPadSA::SetCurrentControllerState(CControllerState * ControllerState)");
     MemCpyFast(&this->internalInterface->NewState, ControllerState, sizeof(CControllerState));
 }
 
-VOID CPadSA::SetLastControllerState(CControllerState *ControllerState)
+VOID CPadSA::SetLastControllerState(CControllerState* ControllerState)
 {
     DEBUG_TRACE("VOID CPadSA::SetLastControllerState(CControllerState * ControllerState)");
     MemCpyFast(&this->internalInterface->OldState, ControllerState, sizeof(CControllerState));
@@ -51,7 +51,7 @@ VOID CPadSA::Restore()
 
 bool CPadSA::IsEnabled(void)
 {
-    bool bEnabled = *(BYTE *)FUNC_CPad_UpdatePads == 0x56;
+    bool bEnabled = *(BYTE*)FUNC_CPad_UpdatePads == 0x56;
     return bEnabled;
 }
 

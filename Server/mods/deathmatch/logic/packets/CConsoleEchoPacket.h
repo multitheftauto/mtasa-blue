@@ -31,4 +31,3 @@ public:
 private:
     SString m_strMessage;
 };
-

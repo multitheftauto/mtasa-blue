@@ -38,4 +38,3 @@ private:
 
     list<CRadarArea*> m_List;
 };
-

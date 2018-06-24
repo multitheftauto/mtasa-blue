@@ -46,4 +46,3 @@ private:
     EEventPriorityType m_eventPriority;
     float              m_fPriorityMod;
 };
-

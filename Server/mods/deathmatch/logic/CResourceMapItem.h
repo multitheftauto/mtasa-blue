@@ -73,4 +73,3 @@ private:
 
     CElementGroup* m_pElementGroup;            // contains all the elements in this map
 };
-

@@ -26,4 +26,3 @@ private:
     SString m_strType;
     SString m_strData;
 };
-

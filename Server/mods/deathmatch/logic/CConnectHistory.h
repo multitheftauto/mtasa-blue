@@ -44,4 +44,3 @@ private:
     long long      m_llTimeLastRemoveExpired;
     long long      m_llDebugTickCountOffset;
 };
-

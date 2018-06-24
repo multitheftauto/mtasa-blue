@@ -31,7 +31,7 @@ VOID CFireSA::Extinguish()
  * Gets the position the fire is burning at
  * @return CVector * containing the fire's position
  */
-CVector *CFireSA::GetPosition()
+CVector* CFireSA::GetPosition()
 {
     DEBUG_TRACE("CVector * CFireSA::GetPosition ( )");
     return &internalInterface->vecPosition;
@@ -42,7 +42,7 @@ CVector *CFireSA::GetPosition()
  * @param vecPosition CVector * containing the desired position for the fire.
  * @see CFireSA::SetTarget
  */
-VOID CFireSA::SetPosition(CVector &vecPosition)
+VOID CFireSA::SetPosition(CVector& vecPosition)
 {
     DEBUG_TRACE("VOID CFireSA::SetPosition ( CVector & vecPosition )");
     this->internalInterface->entityTarget = 0;
@@ -65,21 +65,21 @@ DWORD CFireSA::GetTimeToBurnOut()
     return internalInterface->nTimeToBurn;
 }
 
-CEntity *CFireSA::GetCreator()
+CEntity* CFireSA::GetCreator()
 {
     DEBUG_TRACE("CEntity * CFireSA::GetCreator (  )");
-    CEntity *           creatorEntity = NULL;
-    CEntitySAInterface *createEntitySA = internalInterface->entityCreator;
-    CPoolsSA *          pPools = ((CPoolsSA *)pGame->GetPools());
+    CEntity*            creatorEntity = NULL;
+    CEntitySAInterface* createEntitySA = internalInterface->entityCreator;
+    CPoolsSA*           pPools = ((CPoolsSA*)pGame->GetPools());
     if (pPools && createEntitySA)
     {
         switch (createEntitySA->nType)
         {
             case ENTITY_TYPE_PED:
-                creatorEntity = pPools->GetPed((DWORD *)createEntitySA);
+                creatorEntity = pPools->GetPed((DWORD*)createEntitySA);
                 break;
             case ENTITY_TYPE_VEHICLE:
-                creatorEntity = pPools->GetVehicle((DWORD *)createEntitySA);
+                creatorEntity = pPools->GetVehicle((DWORD*)createEntitySA);
                 break;
             default:
                 creatorEntity = NULL;
@@ -88,21 +88,21 @@ CEntity *CFireSA::GetCreator()
     return creatorEntity;
 }
 
-CEntity *CFireSA::GetEntityOnFire()
+CEntity* CFireSA::GetEntityOnFire()
 {
     DEBUG_TRACE("CEntity * CFireSA::GetEntityOnFire (  )");
-    CEntity *           TargetEntity = NULL;
-    CEntitySAInterface *TargetEntitySA = internalInterface->entityTarget;
-    CPoolsSA *          pPools = ((CPoolsSA *)pGame->GetPools());
+    CEntity*            TargetEntity = NULL;
+    CEntitySAInterface* TargetEntitySA = internalInterface->entityTarget;
+    CPoolsSA*           pPools = ((CPoolsSA*)pGame->GetPools());
     if (pPools && TargetEntitySA)
     {
         switch (TargetEntitySA->nType)
         {
             case ENTITY_TYPE_PED:
-                TargetEntity = pPools->GetPed((DWORD *)TargetEntitySA);
+                TargetEntity = pPools->GetPed((DWORD*)TargetEntitySA);
                 break;
             case ENTITY_TYPE_VEHICLE:
-                TargetEntity = pPools->GetVehicle((DWORD *)TargetEntitySA);
+                TargetEntity = pPools->GetVehicle((DWORD*)TargetEntitySA);
                 break;
             default:
                 TargetEntity = NULL;
@@ -111,13 +111,13 @@ CEntity *CFireSA::GetEntityOnFire()
     return TargetEntity;
 }
 
-VOID CFireSA::SetTarget(CEntity *entity)
+VOID CFireSA::SetTarget(CEntity* entity)
 {
     DEBUG_TRACE("VOID CFireSA::SetTarget ( CEntity * entity  )");
 
     if (entity)
     {
-        CEntitySA *pEntitySA = dynamic_cast<CEntitySA *>(entity);
+        CEntitySA* pEntitySA = dynamic_cast<CEntitySA*>(entity);
         if (pEntitySA)
             internalInterface->entityTarget = pEntitySA->GetInterface();
     }
@@ -159,7 +159,7 @@ VOID CFireSA::Ignite()
     DEBUG_TRACE("VOID CFireSA::Ignite( )");
     this->internalInterface->bActive = TRUE;
 
-    CVector *vecPosition = this->GetPosition();
+    CVector* vecPosition = this->GetPosition();
     DWORD    dwFunc = FUNC_CreateFxSysForStrength;
     DWORD    dwThis = (DWORD)this->internalInterface;
     _asm

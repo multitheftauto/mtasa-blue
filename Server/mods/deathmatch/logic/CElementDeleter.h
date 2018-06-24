@@ -29,4 +29,3 @@ public:
 private:
     CElementListType m_List;
 };
-

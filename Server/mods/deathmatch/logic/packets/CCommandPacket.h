@@ -29,4 +29,3 @@ public:
 private:
     std::string m_strCommand;
 };
-

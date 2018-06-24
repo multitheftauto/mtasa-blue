@@ -56,4 +56,3 @@ private:
     ResponseCode  m_responseCode;
     HttpResponse* m_currentResponse;
 };
-

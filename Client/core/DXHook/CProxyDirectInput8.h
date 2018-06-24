@@ -20,15 +20,15 @@
 class CProxyDirectInput8 : public IDirectInput8A
 {
 public:
-    CProxyDirectInput8(IDirectInput8A *pDevice);
+    CProxyDirectInput8(IDirectInput8A* pDevice);
     ~CProxyDirectInput8();
     /*** IUnknown methods ***/
-    virtual HRESULT __stdcall QueryInterface(REFIID riid, LPVOID *ppvObj);
+    virtual HRESULT __stdcall QueryInterface(REFIID riid, LPVOID* ppvObj);
     virtual ULONG __stdcall AddRef(VOID);
     virtual ULONG __stdcall Release(VOID);
 
     /*** IDirectInput8A methods ***/
-    virtual HRESULT __stdcall CreateDevice(REFGUID, LPDIRECTINPUTDEVICE8A *, LPUNKNOWN);
+    virtual HRESULT __stdcall CreateDevice(REFGUID, LPDIRECTINPUTDEVICE8A*, LPUNKNOWN);
     virtual HRESULT __stdcall EnumDevices(DWORD, LPDIENUMDEVICESCALLBACKA, LPVOID, DWORD);
     virtual HRESULT __stdcall GetDeviceStatus(REFGUID);
     virtual HRESULT __stdcall RunControlPanel(HWND, DWORD);
@@ -38,7 +38,7 @@ public:
     virtual HRESULT __stdcall ConfigureDevices(LPDICONFIGUREDEVICESCALLBACK, LPDICONFIGUREDEVICESPARAMSA, DWORD, LPVOID);
 
 private:
-    IDirectInput8A *m_pDevice;
+    IDirectInput8A* m_pDevice;
 };
 
 #endif

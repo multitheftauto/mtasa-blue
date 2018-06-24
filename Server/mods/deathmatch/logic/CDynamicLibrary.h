@@ -36,4 +36,3 @@ private:
     void* m_hModule;
     #endif
 };
-

@@ -31,4 +31,3 @@ private:
     char*            m_szCommand;
     bool             m_bRestricted;
 };
-
