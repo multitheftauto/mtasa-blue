@@ -50,10 +50,10 @@ public:
     void     Unlink(void) {};
     void     GetPosition(CVector& vecPosition) const {};
     void     SetPosition(const CVector& vecPosition) {};
-    ushort   GetModelID(void) { return m_usModelID };
-    void     SetModelID( ushort usModelID ) { m_usModelID = usModelID };
-    SString  GetModelName(void) { return m_strModelName};
-    void     SetModelName(SString strModelName) { m_strModelName = strModelName };
+    ushort   GetModelID(void) { return m_usModelID; };
+    void     SetModelID(ushort usModelID) { m_usModelID = usModelID; };
+    SString  GetModelName(void) { return m_strModelName;  };
+    void     SetModelName(SString strModelName) { m_strModelName = strModelName; };
     RpClump* GetLoadedClump(ushort usModelId);
 
 protected:
