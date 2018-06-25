@@ -424,6 +424,19 @@ void CBassAudio::CompleteStreamConnect(HSTREAM pSound)
                 }
             }
         }
+
+        const char* szMeta = BASS_ChannelGetTags(pSound, BASS_TAG_META);
+        if (szMeta)
+        {
+            SString strMeta = szMeta;
+            if (!strMeta.empty())
+            {
+                m_pVars->criticalSection.Lock();
+                m_pVars->onClientSoundChangedMetaQueue.push_back(strMeta);
+                m_pVars->criticalSection.Unlock();
+            }
+        }
+
         // set sync for stream titles
         m_hSyncMeta = BASS_ChannelSetSync(pSound, BASS_SYNC_META, 0, &MetaSync, m_uiCallbackId);            // Shoutcast
         // g_pCore->GetConsole()->Printf ( "BASS ERROR %d in BASS_SYNC_META", BASS_ErrorGetCode() );
