@@ -99,9 +99,9 @@ void CLuaEngineDefs::AddEngineDffClass(lua_State* luaVM)
     lua_classfunction(luaVM, "create", "engineLoadDFF");
     lua_classfunction(luaVM, "replace", "engineReplaceModel");
 
-    lua_classfunction(luaVM, "getProperties", "engineDFFGetProperties");
+    lua_classfunction(luaVM, "getProperties", "engineGetDFFProperties");
 
-    lua_classvariable(luaVM, "properties", nullptr, "engineDFFGetProperties");
+    lua_classvariable(luaVM, "properties", nullptr, "engineGetDFFProperties");
 
     lua_registerclass(luaVM, "EngineDFF", "Element");
 }
