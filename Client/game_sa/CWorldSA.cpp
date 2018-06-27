@@ -18,6 +18,7 @@ CWorldSA::CWorldSA()
 
     InstallHooks();
 }
+
 void HOOK_FallenPeds();
 
 void CWorldSA::InstallHooks(void)
@@ -26,9 +27,12 @@ void CWorldSA::InstallHooks(void)
     if (g_pCore)
         g_pCore->GetConsole()->Print("installhooks...");
     HookInstall(0x565CB0, (DWORD)HOOK_FallenPeds, 5);
+
+
 }
 
-DWORD RETURN_CWorld_FallenPeds_SkipFunction = 0x565E7E;
+DWORD RETURN_CWorld_FallenPeds_SkipFunction = 0x00565E7E;
+
 void _declspec(naked) HOOK_FallenPeds()
 {
     if (g_pCore)
@@ -40,6 +44,9 @@ void _declspec(naked) HOOK_FallenPeds()
     }
 
 }
+
+
+
 void CWorldSA::Add(CEntity* pEntity, eDebugCaller CallerId)
 {
     DEBUG_TRACE("VOID CWorldSA::Add ( CEntity * pEntity )");
