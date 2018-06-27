@@ -307,6 +307,7 @@ public:
 
     // Fire funcs
     static bool CreateFire(CVector& vecPosition, float fSize);
+    static bool ExtinguishFireInRadius(CVector& vecPosition, float fRadius);
 
     // Light funcs
     static CClientPointLights* CreateLight(CResource& Resource, int iMode, const CVector& vecPosition, float fRadius, SColor color, CVector& vecDirection);

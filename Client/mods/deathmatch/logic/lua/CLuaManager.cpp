@@ -244,6 +244,7 @@ void CLuaManager::LoadCFunctions(void)
 
     // Fire funcs
     CLuaCFunctions::AddFunction("createFire", CLuaFunctionDefs::CreateFire);
+    CLuaCFunctions::AddFunction("extinguishFireInRadius", CLuaFunctionDefs::ExtinguishFireInRadius);
 
     // Cursor funcs
     CLuaCFunctions::AddFunction("getCursorPosition", CLuaFunctionDefs::GetCursorPosition);
