@@ -1911,3 +1911,76 @@ int CLuaFunctionDefs::FetchRemote(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
+
+int CLuaFunctionDefs::SetFallenPedsEnabled(lua_State* luaVM)
+{
+    // bool setFallenPedsEnabled ( bool enabled )
+    bool bEnabled;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadBool(bEnabled);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetFallenPedsEnabled(bEnabled))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+
+int CLuaFunctionDefs::SetFallenCarsEnabled(lua_State* luaVM)
+{
+    // bool setFallenPedsEnabled ( bool enabled )
+    bool bEnabled;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadBool(bEnabled);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetFallenCarsEnabled(bEnabled))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFunctionDefs::GetFallenPedsEnabled(lua_State* luaVM)
+{
+    bool bEnabled;
+    if (CStaticFunctionDefinitions::GetFallenPedsEnabled(bEnabled))
+    {
+        lua_pushboolean(luaVM, bEnabled);
+        return 1;
+    }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFunctionDefs::GetFallenCarsEnabled(lua_State* luaVM)
+{
+    bool bEnabled;
+    if (CStaticFunctionDefinitions::GetFallenCarsEnabled(bEnabled))
+    {
+        lua_pushboolean(luaVM, bEnabled);
+        return 1;
+    }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}

@@ -9317,3 +9317,27 @@ CClientSearchLight* CStaticFunctionDefinitions::CreateSearchLight(CResource& Res
 
     return nullptr;
 }
+
+bool CStaticFunctionDefinitions::SetFallenPedsEnabled(bool bEnabled)
+{
+    g_pCore->SetFallenPedsEnabled(bEnabled);
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetFallenCarsEnabled(bool bEnabled)
+{
+    g_pCore->SetFallenCarsEnabled(bEnabled);
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetFallenPedsEnabled(bool& bEnabled )
+{
+    bEnabled = g_pCore->GetFallenPedsEnabled();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetFallenCarsEnabled(bool& bEnabled)
+{
+    bEnabled = g_pCore->GetFallenCarsEnabled();
+    return true;
+}

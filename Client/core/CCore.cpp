@@ -2249,3 +2249,25 @@ SString CCore::GetBlueCopyrightString(void)
     SString strCopyright = BLUE_COPYRIGHT_STRING;
     return strCopyright.Replace("%BUILD_YEAR%", std::to_string(BUILD_YEAR).c_str());
 }
+
+bool CCore::SetFallenPedsEnabled(bool bEnabled)
+{
+    m_bFallenPeds = bEnabled;
+    return true;
+}
+
+bool CCore::SetFallenCarsEnabled(bool bEnabled)
+{
+    m_bFallenCars = bEnabled;
+    return true;
+}
+
+bool CCore::GetFallenPedsEnabled()
+{
+    return m_bFallenPeds;
+}
+
+bool CCore::GetFallenCarsEnabled()
+{
+    return m_bFallenCars;
+}

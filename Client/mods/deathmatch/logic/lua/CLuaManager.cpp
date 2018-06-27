@@ -303,6 +303,10 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("setFPSLimit", CLuaFunctionDefs::SetFPSLimit);
     CLuaCFunctions::AddFunction("getFPSLimit", CLuaFunctionDefs::GetFPSLimit);
     CLuaCFunctions::AddFunction("fetchRemote", CLuaFunctionDefs::FetchRemote);
+    CLuaCFunctions::AddFunction("setFallenPedsEnabled", CLuaFunctionDefs::SetFallenPedsEnabled);
+    CLuaCFunctions::AddFunction("setFallenCarsEnabled", CLuaFunctionDefs::SetFallenCarsEnabled);
+    CLuaCFunctions::AddFunction("getFallenPedsEnabled", CLuaFunctionDefs::GetFallenPedsEnabled);
+    CLuaCFunctions::AddFunction("getFallenCarsEnabled", CLuaFunctionDefs::GetFallenCarsEnabled);
 
     // World set funcs
     CLuaCFunctions::AddFunction("setTime", CLuaFunctionDefs::SetTime);
@@ -352,6 +356,10 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("getBirdsEnabled", CLuaFunctionDefs::GetBirdsEnabled);
     CLuaCFunctions::AddFunction("setPedTargetingMarkerEnabled", CLuaFunctionDefs::SetPedTargetingMarkerEnabled);
     CLuaCFunctions::AddFunction("isPedTargetingMarkerEnabled", CLuaFunctionDefs::IsPedTargetingMarkerEnabled);
+    CLuaCFunctions::AddFunction("setFallenPedsEnabled", CLuaFunctionDefs::SetFallenPedsEnabled);
+    CLuaCFunctions::AddFunction("setFallenCarsEnabled", CLuaFunctionDefs::IsPedTargetingMarkerEnabled);
+    CLuaCFunctions::AddFunction("getFallenPedsEnabled", CLuaFunctionDefs::IsPedTargetingMarkerEnabled);
+    CLuaCFunctions::AddFunction("getFallenCarsEnabled", CLuaFunctionDefs::IsPedTargetingMarkerEnabled);
 
     // Input functions
     CLuaCFunctions::AddFunction("bindKey", CLuaFunctionDefs::BindKey);

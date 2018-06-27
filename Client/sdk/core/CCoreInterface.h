@@ -172,6 +172,11 @@ public:
     virtual const char* GetProductVersion(void) = 0;
     virtual void        SetFakeLagCommandEnabled(bool bEnabled) = 0;
     virtual SString     GetBlueCopyrightString(void) = 0;
+
+    virtual bool        SetFallenPedsEnabled(bool) = 0;
+    virtual bool        SetFallenCarsEnabled(bool) = 0;
+    virtual bool        GetFallenPedsEnabled(void) = 0;
+    virtual bool        GetFallenCarsEnabled(void) = 0;
 };
 
 class CClientTime

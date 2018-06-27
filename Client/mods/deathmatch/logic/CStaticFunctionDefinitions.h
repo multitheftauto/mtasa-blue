@@ -604,6 +604,10 @@ public:
     static bool SetMoonSize(int iSize);
     static bool SetFPSLimit(int iLimit);
     static bool GetFPSLimit(int& iLimit);
+    static bool SetFallenPedsEnabled(bool bEnabled);
+    static bool SetFallenCarsEnabled(bool bEnabled);
+    static bool GetFallenPedsEnabled(bool& bEnabled);
+    static bool GetFallenCarsEnabled(bool& bEnabled);
 
     // Input functions
     static bool BindKey(const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments);
