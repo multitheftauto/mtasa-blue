@@ -141,13 +141,11 @@ void _declspec(naked) HOOK_PedTakeStep()
     _asm
     {
         // esp has the return address, esp+4 for first parameter, esp+8 for second, etc..
-        //mov eax, [esp + 4] // Ped
-        //mov eax, [esp + 4] // Ped
-        //mov eax, [esp + 4] // Ped
+        //mov eax, [esp + 4] // CVector pos
 
         // push pos on stack (size = 4 bytes)
         //push eax
-        call HOOK_ONPedTakeStep
+        //call CWeather_UpdateWeatherRegion
 
         // remove pos variable from stack by add instruction
         //add  esp, 4
@@ -162,7 +160,8 @@ void _declspec(naked) HOOK_PedTakeStep()
         // if you uncomment the jump (RETURN_CWeather_UpdateWeatherRegion_SkipFunction) before this,
         // then you have to comment these two:
 
-        // mov eax, TheCamera_Placeable_pMatrix
+        // mov eax, TheCamera_Placeable_pMatrix                // mov eax, TheCamera_Placeable_pMatrix
+        //popad
         jmp HOOK_ONPedTakeStep_NormalFlow
     }
 
