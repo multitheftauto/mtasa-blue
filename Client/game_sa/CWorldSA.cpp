@@ -32,14 +32,16 @@ void CWorldSA::InstallHooks(void)
 }
 
 DWORD RETURN_CWorld_FallenPeds_SkipFunction = 0x00565E7E;
-DWORD RETURN_CWorld_FallenPeds_ContinueFunction = 0x00565E8A;
+DWORD CONTINUE_CWorld_FallenPeds = 0x00565E8A;
 
 void _declspec(naked) HOOK_FallenPeds()
 {
     _asm
     {
-        mov eax, RETURN_CWorld_FallenPeds_ContinueFunction
-        jmp eax;
+        sub esp, 0x2C
+        push ebx
+        mov ebx, ds:0xB74490
+        jmp CONTINUE_CWorld_FallenPeds
 
     }
     // skip
