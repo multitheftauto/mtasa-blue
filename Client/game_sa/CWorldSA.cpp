@@ -15,8 +15,31 @@ CWorldSA::CWorldSA()
     m_pBuildingRemovals = new std::multimap<unsigned short, SBuildingRemoval*>;
     m_pDataBuildings = new std::multimap<unsigned short, sDataBuildingRemovalItem*>;
     m_pBinaryBuildings = new std::multimap<unsigned short, sBuildingRemovalItem*>;
+
+    InstallHooks();
+}
+void HOOK_FallenPeds();
+
+void CWorldSA::InstallHooks(void)
+{
+
+    if (g_pCore)
+        g_pCore->GetConsole()->Print("installhooks...");
+    HookInstall(0x565CB0, (DWORD)HOOK_FallenPeds, 5);
 }
 
+DWORD RETURN_CWorld_FallenPeds_SkipFunction = 0x565E7E;
+void _declspec(naked) HOOK_FallenPeds()
+{
+    if (g_pCore)
+        g_pCore->GetConsole()->Print("checkFallenPeds...");
+
+    _asm
+    {
+        jmp RETURN_CWorld_FallenPeds_SkipFunction
+    }
+
+}
 void CWorldSA::Add(CEntity* pEntity, eDebugCaller CallerId)
 {
     DEBUG_TRACE("VOID CWorldSA::Add ( CEntity * pEntity )");
