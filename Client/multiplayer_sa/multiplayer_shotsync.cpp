@@ -83,6 +83,8 @@ CPools* m_pools = 0;
 void InitFireInstantHit_MidHooks(void);
 void InitFireSniper_MidHooks(void);
 
+void HOOK_PedTakeStep(void);
+
 VOID InitShotsyncHooks()
 {
     HookInstall(HOOKPOS_CWeapon__Fire, (DWORD)HOOK_CWeapon__Fire, 6);
@@ -105,6 +107,7 @@ VOID InitShotsyncHooks()
     HookInstall(HOOKPOS_CWeapon_FireInstantHit_CameraMode, (DWORD)HOOK_CWeapon_FireInstantHit_CameraMode, 6);
     HookInstall(HOOKPOS_CWeapon_FireInstantHit_IsPlayer, (DWORD)HOOK_CWeapon_FireInstantHit_IsPlayer, 7);
     HookInstall(HOOKPOS_CWeapon_DoBulletImpact, (DWORD)HOOK_CWeapon_DoBulletImpact, 7);
+    HookInstall(0x5E5380, (DWORD)HOOK_PedTakeStep, 5);
 
     InitFireInstantHit_MidHooks();
     InitFireSniper_MidHooks();
@@ -114,6 +117,55 @@ VOID InitShotsyncHooks()
     */
 
     m_pools = pGameInterface->GetPools();
+}
+
+// void __thiscall CPed::DoFootLanded(CPed *this, int footId, char a3)
+// CPed::DoFootLanded(bool,uchar)	.text	005E5380	0000046A	00000060	00000005	R	.	.	.	.	.	.
+DWORD HOOK_ONPedTakeStep_NormalFlow = 0x005E5380;
+
+
+extern CCoreInterface* g_pCore;
+void __cdecl HOOK_ONPedTakeStep() // CPed* ped, int footId, char a3
+{
+    if (g_pCore)
+        g_pCore->GetConsole()->Print("take a step");
+    // Your code here, you can write anything here, this is outside of the hook,
+    // so be worry free
+    
+}
+
+void _declspec(naked) HOOK_PedTakeStep()
+{
+    // Save the registers by pushing them on stack before executing any code, 
+    // so you can recover them when you return
+    _asm
+    {
+        // esp has the return address, esp+4 for first parameter, esp+8 for second, etc..
+        //mov eax, [esp + 4] // Ped
+        //mov eax, [esp + 4] // Ped
+        //mov eax, [esp + 4] // Ped
+
+        // push pos on stack (size = 4 bytes)
+        //push eax
+        call HOOK_ONPedTakeStep
+
+        // remove pos variable from stack by add instruction
+        //add  esp, 4
+
+        // return back to the original function, otherwise game will crash
+        // as GTA:SA is running on a single thread
+
+        // uncomment this line if you want to skip the code inside original function
+        //jmp RETURN_CWeather_UpdateWeatherRegion_SkipFunction
+
+
+        // if you uncomment the jump (RETURN_CWeather_UpdateWeatherRegion_SkipFunction) before this,
+        // then you have to comment these two:
+
+        // mov eax, TheCamera_Placeable_pMatrix
+        jmp HOOK_ONPedTakeStep_NormalFlow
+    }
+
 }
 
 CShotSyncData* GetLocalPedShotSyncData()
