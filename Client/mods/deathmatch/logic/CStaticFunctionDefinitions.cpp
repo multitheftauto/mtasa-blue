@@ -4112,6 +4112,12 @@ bool CStaticFunctionDefinitions::ExtinguishFireInRadius(CVector& vecPosition, fl
     return true;
 }
 
+bool CStaticFunctionDefinitions::ExtinguishAllFires()
+{
+    g_pGame->GetFireManager()->ExtinguishAllFires();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::PlaySoundFrontEnd(unsigned char ucSound)
 {
     g_pGame->GetAudioEngine()->PlayFrontEndSound(ucSound);

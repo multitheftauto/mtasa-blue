@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "../luadefs/CLuaFireDefs.h"
 
 using std::list;
 
@@ -242,10 +243,6 @@ void CLuaManager::LoadCFunctions(void)
     // Explosion funcs
     CLuaCFunctions::AddFunction("createExplosion", CLuaFunctionDefs::CreateExplosion);
 
-    // Fire funcs
-    CLuaCFunctions::AddFunction("createFire", CLuaFunctionDefs::CreateFire);
-    CLuaCFunctions::AddFunction("extinguishFireInRadius", CLuaFunctionDefs::ExtinguishFireInRadius);
-
     // Cursor funcs
     CLuaCFunctions::AddFunction("getCursorPosition", CLuaFunctionDefs::GetCursorPosition);
     CLuaCFunctions::AddFunction("setCursorPosition", CLuaFunctionDefs::SetCursorPosition);
@@ -403,6 +400,7 @@ void CLuaManager::LoadCFunctions(void)
     CLuaEffectDefs::LoadFunctions();
     CLuaElementDefs::LoadFunctions();
     CLuaEngineDefs::LoadFunctions();
+    CLuaFireDefs::LoadFunctions();
     CLuaGUIDefs::LoadFunctions();
     CLuaMarkerDefs::LoadFunctions();
     CLuaObjectDefs::LoadFunctions();

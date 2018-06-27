@@ -67,10 +67,6 @@ public:
     // Explosion functions
     LUA_DECLARE(CreateExplosion);
 
-    // Fire functions
-    LUA_DECLARE(CreateFire);
-    LUA_DECLARE(ExtinguishFireInRadius);
-
     // Cursor funcs
     LUA_DECLARE(GetCursorPosition);
     LUA_DECLARE(SetCursorPosition);
