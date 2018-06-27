@@ -115,6 +115,7 @@ public:
     CModelTexturesInfo* GetModelTexturesInfo(ushort usModelId);
 
     RwFrame* GetFrameFromName(RpClump* pRoot, SString strName);
+    RpClump* GetClumpFromModelId(ushort usModel);
 
     static void  StaticSetHooks(void);
     static void  StaticSetClothesReplacingHooks(void);

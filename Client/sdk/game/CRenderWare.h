@@ -101,6 +101,7 @@ public:
     virtual RwFrame* GetFrameFromName(RpClump* pRoot, SString strName) = 0;
     virtual bool     RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit) = 0;
     virtual void     TxdForceUnload(ushort usTxdId, bool bDestroyTextures) = 0;
+    virtual RpClump* GetClumpFromModelId(ushort usModel) = 0;
 };
 
 #endif
