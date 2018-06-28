@@ -85,6 +85,7 @@ void InitFireSniper_MidHooks(void);
 
 void HOOK_PedTakeStep(void);
 
+static DWORD HOOK_CPed__DoFootLanded = 0x5E5380;
 VOID InitShotsyncHooks()
 {
     HookInstall(HOOKPOS_CWeapon__Fire, (DWORD)HOOK_CWeapon__Fire, 6);
@@ -107,7 +108,7 @@ VOID InitShotsyncHooks()
     HookInstall(HOOKPOS_CWeapon_FireInstantHit_CameraMode, (DWORD)HOOK_CWeapon_FireInstantHit_CameraMode, 6);
     HookInstall(HOOKPOS_CWeapon_FireInstantHit_IsPlayer, (DWORD)HOOK_CWeapon_FireInstantHit_IsPlayer, 7);
     HookInstall(HOOKPOS_CWeapon_DoBulletImpact, (DWORD)HOOK_CWeapon_DoBulletImpact, 7);
-    HookInstall(0x5E5380, (DWORD)HOOK_PedTakeStep, 5);
+    HookInstall(HOOK_CPed__DoFootLanded, (DWORD)HOOK_PedTakeStep, 6);
 
     InitFireInstantHit_MidHooks();
     InitFireSniper_MidHooks();
@@ -122,38 +123,36 @@ VOID InitShotsyncHooks()
 // void __thiscall CPed::DoFootLanded(CPed *this, int footId, char a3)
 // CPed::DoFootLanded(bool,uchar)	.text	005E5380	0000046A	00000060	00000005	R	.	.	.	.	.	.
 DWORD HOOK_ONPedTakeStep_NormalFlow = 0x005E5386;
-DWORD jmp1 = 0x005E53B5;
-DWORD jmp2 = 0x005E53BC;
-DWORD jmp3 = 0x005E57E3;
+
 
 extern CCoreInterface* g_pCore;
-void __cdecl HOOK_ONPedTakeStep(CPed* ped, int footId, char a3) // CPed* ped, int footId, char a3
-{
+
+void __cdecl HOOK_ONPedTakeStep(CPed* ped, bool footId, uchar a3) // CPed* ped, int footId, char a3
+{   // CPed* ped, bool footId, uchar a3
     //if (g_pCore)
-    //    g_pCore->GetConsole()->Print("take a step ...");
+    //    g_pCore->GetConsole()->Printf("take a step ... ped: %x footId: %s a3: %u\n", ped, footId?"true":"false", a3);
     
 }
 
+static DWORD CONTINUE_CPed__DoFootLanded = 0x5E5386;
+
 void _declspec(naked) HOOK_PedTakeStep()
 {
-
+    // void __thiscall CPed::DoFootLanded(bool, unsigned char)
     _asm
     {
-        // CPed* ped, int footId, char a3
-        mov eax, [esp + 4]
-        mov eax, [esp + 8]
-        mov eax, [esp + 12]
+        pushad
+        push DWORD PTR[ebp - 12]
+        push DWORD PTR[ebp - 8]
+        push ecx
+        call    HOOK_ONPedTakeStep
+        add esp, 12
+        popad
 
-        push eax
-        call HOOK_ONPedTakeStep
-
-        add  esp, 12
-
-        // working below
         sub     esp, 30h
         push    esi
         mov     esi, ecx
-        jmp     HOOK_ONPedTakeStep_NormalFlow
+        jmp     CONTINUE_CPed__DoFootLanded
     }
 }
 
