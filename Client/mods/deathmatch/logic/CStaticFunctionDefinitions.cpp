@@ -4106,6 +4106,18 @@ bool CStaticFunctionDefinitions::CreateFire(CVector& vecPosition, float fSize)
     return g_pGame->GetFireManager()->StartFire(vecPosition, fSize) != NULL;
 }
 
+bool CStaticFunctionDefinitions::ExtinguishFireInRadius(CVector& vecPosition, float fRadius)
+{
+    g_pGame->GetFireManager()->ExtinguishPoint(vecPosition, fRadius);
+    return true;
+}
+
+bool CStaticFunctionDefinitions::ExtinguishAllFires()
+{
+    g_pGame->GetFireManager()->ExtinguishAllFires();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::PlaySoundFrontEnd(unsigned char ucSound)
 {
     g_pGame->GetAudioEngine()->PlayFrontEndSound(ucSound);
@@ -6408,6 +6420,24 @@ bool CStaticFunctionDefinitions::BindKey(const char* szKey, const char* szHitSta
     return bSuccess;
 }
 
+static inline void BindKeyAtHitState(CKeyBindsInterface* pKeyBinds, const char* szKey, const char* szCommandName, const char* szArguments, const char* szResource, const bool bHitState, bool& bSuccess)
+{    
+    // Check if its binded already (dont rebind)
+    if (!pKeyBinds->CommandExists(szKey, szCommandName, true, bHitState, szArguments, szResource, true, true))
+    {
+        if (pKeyBinds->AddCommand(szKey, szCommandName, szArguments, bHitState, szResource, true))
+        {
+            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, szArguments, szResource, true, true);
+            bSuccess = true;
+        }
+    }
+    else 
+    {
+        pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, szArguments, szResource, true, true);
+        bSuccess = true;
+    }
+}
+
 bool CStaticFunctionDefinitions::BindKey(const char* szKey, const char* szHitState, const char* szCommandName, const char* szArguments, const char* szResource)
 {
     assert(szKey);
@@ -6419,30 +6449,13 @@ bool CStaticFunctionDefinitions::BindKey(const char* szKey, const char* szHitSta
     bool                bKey = pKeyBinds->IsKey(szKey);
     if (bKey)
     {
-        bool bHitState = true;
-        // Activate all keys for this command
-        pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true);
-        // Check if its binded already (dont rebind)
-        if (pKeyBinds->CommandExists(szKey, szCommandName, true, bHitState, szArguments, szResource, true, true))
-            return true;
-
-        if ((!stricmp(szHitState, "down") || !stricmp(szHitState, "both")) &&
-            pKeyBinds->AddCommand(szKey, szCommandName, szArguments, bHitState, szResource, true))
+        if (!stricmp(szHitState, "down") || !stricmp(szHitState, "both")) 
         {
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, szArguments, szResource, true, true);
-            bSuccess = true;
+            BindKeyAtHitState(pKeyBinds, szKey, szCommandName, szArguments, szResource, true, bSuccess);
         }
-
-        bHitState = false;
-        pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true);
-        if (pKeyBinds->CommandExists(szKey, szCommandName, true, bHitState, szArguments, szResource, true, true))
-            return true;
-
-        if ((!stricmp(szHitState, "up") || !stricmp(szHitState, "both")) &&
-            pKeyBinds->AddCommand(szKey, szCommandName, szArguments, bHitState, szResource, true))
+        if (!stricmp(szHitState, "up") || !stricmp(szHitState, "both"))
         {
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, szArguments, szResource, true, true);
-            bSuccess = true;
+            BindKeyAtHitState(pKeyBinds, szKey, szCommandName, szArguments, szResource, false, bSuccess);
         }
     }
     return bSuccess;
@@ -6498,29 +6511,14 @@ bool CStaticFunctionDefinitions::UnbindKey(const char* szKey, const char* szHitS
     bool                bKey = pKeyBinds->IsKey(szKey);
     if (bKey)
     {
-        bool bCheckHitState = false, bHitState = true;
-        if (szHitState)
-        {
-            if (stricmp(szHitState, "down") == 0)
-            {
-                bCheckHitState = true, bHitState = true;
-            }
-            else if (stricmp(szHitState, "up") == 0)
-            {
-                bCheckHitState = true, bHitState = false;
-            }
-        }
         if ((!stricmp(szHitState, "down") || !stricmp(szHitState, "both")) &&
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true))
+            pKeyBinds->SetCommandActive(szKey, szCommandName, true, NULL, szResource, false, true))
         {
-            pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true);
             bSuccess = true;
         }
-        bHitState = false;
         if ((!stricmp(szHitState, "up") || !stricmp(szHitState, "both")) &&
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true))
+            pKeyBinds->SetCommandActive(szKey, szCommandName, false, NULL, szResource, false, true))
         {
-            pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true);
             bSuccess = true;
         }
     }
