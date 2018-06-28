@@ -871,7 +871,7 @@ void CheckDataFiles(void)
             "bassmix.dll",
         },
         {
-            "5D2FAC97EBA0165DFF8AEFC1E8C97638",
+            "02C9E8F0288D15FF290DD31EB1C7BFBC",
             "basswma.dll",
         },
         {
