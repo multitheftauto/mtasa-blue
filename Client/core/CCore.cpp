@@ -2250,24 +2250,24 @@ SString CCore::GetBlueCopyrightString(void)
     return strCopyright.Replace("%BUILD_YEAR%", std::to_string(BUILD_YEAR).c_str());
 }
 
-bool CCore::SetFallenPedsEnabled(bool bEnabled)
+bool CCore::SetFallenPedsUnderMapEnabled(bool bEnabled)
 {
     m_bFallenPeds = bEnabled;
     return true;
 }
 
-bool CCore::SetFallenCarsEnabled(bool bEnabled)
+bool CCore::SetFallenCarsUnderMapEnabled(bool bEnabled)
 {
     m_bFallenCars = bEnabled;
     return true;
 }
 
-bool CCore::GetFallenPedsEnabled()
+bool CCore::GetFallenPedsUnderMapEnabled()
 {
     return m_bFallenPeds;
 }
 
-bool CCore::GetFallenCarsEnabled()
+bool CCore::GetFallenCarsUnderMapEnabled()
 {
     return m_bFallenCars;
 }

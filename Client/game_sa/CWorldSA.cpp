@@ -20,49 +20,63 @@ CWorldSA::CWorldSA()
 }
 
 void HOOK_FallenPeds();
+void HOOK_FallenCars();
 
 void CWorldSA::InstallHooks(void)
 {
 
     //if (g_pCore)
      //   g_pCore->GetConsole()->Print("installhooks...");
-    HookInstall(0x565CB0, (DWORD)HOOK_FallenPeds, 10);
+    HookInstall(0x565CB0, (DWORD)HOOK_FallenPeds, 5);
+    HookInstall(0x565E80, (DWORD)HOOK_FallenCars, 5);
 
 
 }
 
-DWORD RETURN_CWorld_FallenPeds_SkipFunction = 0x00565E7E;
-DWORD CONTINUE_CWorld_FallenPeds = 0x00565E8A;
+DWORD CONTINUE_CWorld_FallenPeds = 0x00565CBA;
+DWORD CONTINUE_CWorld_FallenCars = 0x00565E8A;
 
 void _declspec(naked) HOOK_FallenPeds()
 {
-    _asm
+    if (g_pCore && !g_pCore->GetFallenPedsUnderMapEnabled())
     {
-        sub esp, 0x2C
-        push ebx
-        mov ebx, ds:0xB74490
-        jmp CONTINUE_CWorld_FallenPeds
-
+        _asm
+        {
+            sub esp, 2Ch
+            push ebx
+            mov ebx, ds:0B74490h
+            jmp CONTINUE_CWorld_FallenPeds
+        }
     }
-    // skip
-    /*
-    _asm
+    else
     {
-        push ebp
-        mov ebp, esp
-        sub esp, __LOCAL_SIZE
+        _asm
+        {
+            ret
+        }
     }
+}
 
-    if (g_pCore)
-        g_pCore->GetConsole()->Print("checkFallenPeds...");
 
-    _asm
+void _declspec(naked) HOOK_FallenCars()
+{
+    if (g_pCore && !g_pCore->GetFallenCarsUnderMapEnabled())
     {
-        mov esp, ebp
-        pop ebp
-        ret
-    }*/
-
+        _asm
+        {
+            sub esp, 2Ch
+            push ebx
+            mov ebx, ds:0B74494h
+            jmp CONTINUE_CWorld_FallenCars
+        }
+    }
+    else
+    {
+        _asm
+        {
+            ret
+        }
+    }
 }
 
 

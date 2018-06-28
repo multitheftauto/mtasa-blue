@@ -9320,24 +9320,24 @@ CClientSearchLight* CStaticFunctionDefinitions::CreateSearchLight(CResource& Res
 
 bool CStaticFunctionDefinitions::SetFallenPedsEnabled(bool bEnabled)
 {
-    g_pCore->SetFallenPedsEnabled(bEnabled);
+    g_pCore->SetFallenPedsUnderMapEnabled(bEnabled);
     return true;
 }
 
 bool CStaticFunctionDefinitions::SetFallenCarsEnabled(bool bEnabled)
 {
-    g_pCore->SetFallenCarsEnabled(bEnabled);
+    g_pCore->SetFallenCarsUnderMapEnabled(bEnabled);
     return true;
 }
 
 bool CStaticFunctionDefinitions::GetFallenPedsEnabled(bool& bEnabled )
 {
-    bEnabled = g_pCore->GetFallenPedsEnabled();
+    bEnabled = g_pCore->GetFallenPedsUnderMapEnabled();
     return true;
 }
 
 bool CStaticFunctionDefinitions::GetFallenCarsEnabled(bool& bEnabled)
 {
-    bEnabled = g_pCore->GetFallenCarsEnabled();
+    bEnabled = g_pCore->GetFallenCarsUnderMapEnabled();
     return true;
 }
