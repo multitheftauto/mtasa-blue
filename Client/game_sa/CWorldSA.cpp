@@ -24,13 +24,8 @@ void HOOK_FallenCars();
 
 void CWorldSA::InstallHooks(void)
 {
-
-    //if (g_pCore)
-     //   g_pCore->GetConsole()->Print("installhooks...");
     HookInstall(0x565CB0, (DWORD)HOOK_FallenPeds, 5);
     HookInstall(0x565E80, (DWORD)HOOK_FallenCars, 5);
-
-
 }
 
 DWORD CONTINUE_CWorld_FallenPeds = 0x00565CBA;
