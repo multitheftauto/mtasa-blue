@@ -120,32 +120,30 @@ VOID InitShotsyncHooks()
     m_pools = pGameInterface->GetPools();
 }
 
-// void __thiscall CPed::DoFootLanded(CPed *this, int footId, char a3)
-// CPed::DoFootLanded(bool,uchar)	.text	005E5380	0000046A	00000060	00000005	R	.	.	.	.	.	.
 DWORD HOOK_ONPedTakeStep_NormalFlow = 0x005E5386;
 
 
 extern CCoreInterface* g_pCore;
 
-void __cdecl HOOK_ONPedTakeStep(CPed* ped, bool footId, uchar a3) // CPed* ped, int footId, char a3
-{   // CPed* ped, bool footId, uchar a3
-    //if (g_pCore)
-    //    g_pCore->GetConsole()->Printf("take a step ... ped: %x footId: %s a3: %u\n", ped, footId?"true":"false", a3);
-    
+void __cdecl HOOK_ONPedTakeStep(CPed* ped, short footId, char unknown1)
+{
+    if (g_pCore)
+    {
+        g_pCore->GetConsole()->Printf("take a step ... ped: %x foot: %s\n", ped, footId == 1 ? "left" : "right");
+    }
 }
 
 static DWORD CONTINUE_CPed__DoFootLanded = 0x5E5386;
 
 void _declspec(naked) HOOK_PedTakeStep()
 {
-    // void __thiscall CPed::DoFootLanded(bool, unsigned char)
     _asm
     {
         pushad
-        push DWORD PTR[ebp - 12]
-        push DWORD PTR[ebp - 8]
+        push[esp + 32 + 4]
+        push[esp + 32 + 8]
         push ecx
-        call    HOOK_ONPedTakeStep
+        call HOOK_ONPedTakeStep
         add esp, 12
         popad
 
