@@ -121,50 +121,40 @@ VOID InitShotsyncHooks()
 
 // void __thiscall CPed::DoFootLanded(CPed *this, int footId, char a3)
 // CPed::DoFootLanded(bool,uchar)	.text	005E5380	0000046A	00000060	00000005	R	.	.	.	.	.	.
-DWORD HOOK_ONPedTakeStep_NormalFlow = 0x005E5380;
-
+DWORD HOOK_ONPedTakeStep_NormalFlow = 0x005E5386;
+DWORD jmp1 = 0x005E53B5;
+DWORD jmp2 = 0x005E53BC;
+DWORD jmp3 = 0x005E57E3;
 
 extern CCoreInterface* g_pCore;
-void __cdecl HOOK_ONPedTakeStep() // CPed* ped, int footId, char a3
+void __cdecl HOOK_ONPedTakeStep(CPed* ped, int footId, char a3) // CPed* ped, int footId, char a3
 {
-    if (g_pCore)
-        g_pCore->GetConsole()->Print("take a step");
-    // Your code here, you can write anything here, this is outside of the hook,
-    // so be worry free
+    //if (g_pCore)
+    //    g_pCore->GetConsole()->Print("take a step ...");
     
 }
 
 void _declspec(naked) HOOK_PedTakeStep()
 {
-    // Save the registers by pushing them on stack before executing any code, 
-    // so you can recover them when you return
+
     _asm
     {
-        // esp has the return address, esp+4 for first parameter, esp+8 for second, etc..
-        //mov eax, [esp + 4] // CVector pos
+        // CPed* ped, int footId, char a3
+        mov eax, [esp + 4]
+        mov eax, [esp + 8]
+        mov eax, [esp + 12]
 
-        // push pos on stack (size = 4 bytes)
-        //push eax
-        //call CWeather_UpdateWeatherRegion
+        push eax
+        call HOOK_ONPedTakeStep
 
-        // remove pos variable from stack by add instruction
-        //add  esp, 4
+        add  esp, 12
 
-        // return back to the original function, otherwise game will crash
-        // as GTA:SA is running on a single thread
-
-        // uncomment this line if you want to skip the code inside original function
-        //jmp RETURN_CWeather_UpdateWeatherRegion_SkipFunction
-
-
-        // if you uncomment the jump (RETURN_CWeather_UpdateWeatherRegion_SkipFunction) before this,
-        // then you have to comment these two:
-
-        // mov eax, TheCamera_Placeable_pMatrix                // mov eax, TheCamera_Placeable_pMatrix
-        //popad
-        jmp HOOK_ONPedTakeStep_NormalFlow
+        // working below
+        sub     esp, 30h
+        push    esi
+        mov     esi, ecx
+        jmp     HOOK_ONPedTakeStep_NormalFlow
     }
-
 }
 
 CShotSyncData* GetLocalPedShotSyncData()
