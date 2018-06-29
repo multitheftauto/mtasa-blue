@@ -770,7 +770,6 @@ bool CKeyBinds::SetCommandActive(const char* szKey, const char* szCommand, bool 
 {
     NullEmptyStrings(szKey, szCommand, szArguments);
 
-    bool bReturn = false;
     list<CKeyBind*>::const_iterator iter = m_pList->begin();
     for (; iter != m_pList->end(); iter++)
     {
@@ -785,17 +784,10 @@ bool CKeyBinds::SetCommandActive(const char* szKey, const char* szCommand, bool 
                     {
                         if (!checkHitState || (pBind->bHitState == bState))
                         {
-                            if ((!szArguments && (!bActive || !pBind->szArguments)) 
-                                || (szArguments && pBind->szArguments && strcmp(pBind->szArguments, szArguments) == 0))
+                            if (!szArguments || (pBind->szArguments && strcmp(pBind->szArguments, szArguments) == 0))
                             {
-                                bool bOldActive = pBind->bActive;
                                 pBind->bActive = bActive;
-                                if (szArguments)
-                                {
-                                    return true;
-                                }
-                                else
-                                    bReturn = (bReturn || bOldActive != bActive);
+                                return true;
                             }
                         }
                     }
@@ -803,7 +795,7 @@ bool CKeyBinds::SetCommandActive(const char* szKey, const char* szCommand, bool 
             }
         }
     }
-    return bReturn;
+    return false;
 }
 
 void CKeyBinds::SetAllCommandsActive(const char* szResource, bool bActive, const char* szCommand, bool bState, const char* szArguments, bool checkHitState)
