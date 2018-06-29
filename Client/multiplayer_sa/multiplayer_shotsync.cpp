@@ -75,9 +75,9 @@ extern TakeAStepHandler*      m_pTakeAStepHandler;
 
 char szDebug[255] = {'\0'};
 
-DWORD   RETURN_CProjectile__AddProjectile = 0x401C3D;
-DWORD   RETURN_CProjectile__CProjectile = 0x4037B3;
-DWORD   CONTINUE_CPed_DoFootLanded = 0x5E5386;
+DWORD                RETURN_CProjectile__AddProjectile = 0x401C3D;
+DWORD                RETURN_CProjectile__CProjectile = 0x4037B3;
+static const DWORD   CONTINUE_CPed_DoFootLanded = 0x5E5386;
 
 CPools* m_pools = 0;
 
@@ -86,7 +86,7 @@ CPools* m_pools = 0;
 void InitFireInstantHit_MidHooks(void);
 void InitFireSniper_MidHooks(void);
 
-void HOOK_PedTakeStep(void);
+static void HOOK_PedTakeStep(void);
 
 VOID InitShotsyncHooks()
 {
@@ -124,7 +124,7 @@ VOID InitShotsyncHooks()
 
 void __cdecl HOOK_ONPedTakeStep(CPedSAInterface* pPedSAInterface, short footId, char unknown1)
 {
-    m_pTakeAStepHandler(pPedSAInterface, footId == 1 ? true : false);
+    m_pTakeAStepHandler(pPedSAInterface, footId == LANDED_PED_LEFT_FOOT ? true : false);
 }
 
 

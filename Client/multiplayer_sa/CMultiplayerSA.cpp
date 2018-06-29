@@ -358,7 +358,7 @@ ObjectDamageHandler*        m_pObjectDamageHandler = NULL;
 ObjectBreakHandler*         m_pObjectBreakHandler = NULL;
 FxSystemDestructionHandler* m_pFxSystemDestructionHandler = NULL;
 DrivebyAnimationHandler*    m_pDrivebyAnimationHandler = NULL;
-TakeAStepHandler*           m_pTakeAStepHandler = NULL;
+TakeAStepHandler*           m_pTakeAStepHandler = nullptr;
 
 CEntitySAInterface* dwSavedPlayerPointer = 0;
 CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active

@@ -437,6 +437,7 @@ CClientGame::~CClientGame(void)
     g_pMultiplayer->SetGameModelRemoveHandler(NULL);
     g_pMultiplayer->SetGameEntityRenderHandler(NULL);
     g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
+    g_pMultiplayer->SetTakePedAStepHandler(nullptr);
     g_pGame->SetPreWeaponFireHandler(NULL);
     g_pGame->SetPostWeaponFireHandler(NULL);
     g_pGame->SetTaskSimpleBeHitHandler(NULL);
@@ -455,7 +456,6 @@ CClientGame::~CClientGame(void)
     pKeyBinds->SetAllControlsEnabled(true, true, true);
     g_pCore->ForceCursorVisible(false);
     SetCursorEventsEnabled(false);
-    g_pMultiplayer->SetTakePedAStepHandler(NULL);
 
     // Destroy our stuff
     SAFE_DELETE(m_pManager);            // Will trigger onClientResourceStop
@@ -2778,7 +2778,7 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientPedChoke", "", NULL, false);
     m_Events.AddEvent("onClientPedHeliKilled", "heli", NULL, false);
     m_Events.AddEvent("onClientPedHitByWaterCannon", "vehicle", NULL, false);
-    m_Events.AddEvent("onClientPedStep", "foot", NULL, false);
+    m_Events.AddEvent("onClientPedStep", "foot", nullptr, false);
 
     // Vehicle events
     m_Events.AddEvent("onClientVehicleRespawn", "", NULL, false);
