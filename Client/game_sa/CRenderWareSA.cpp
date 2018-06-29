@@ -838,18 +838,17 @@ RwFrame* CRenderWareSA::GetFrameFromName(RpClump* pRoot, SString strName)
 {
     return RwFrameFindFrame(RpGetFrame(pRoot), strName);
 }
+
 RpClump* CRenderWareSA::GetClumpFromModelId(ushort usModel)
 {
-    if (usModel > 0 && usModel < 20000)
-    {
-        CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
-        if (ppModelInfo)
-        {
-            CBaseModelInfoSAInterface* m_pInterface = ppModelInfo[usModel];
-            if (m_pInterface && m_pInterface->pRwObject)
-            {
-                return (RpClump*)m_pInterface->pRwObject;
-            }
-        }
-    }
+    if (usModel < 0 || usModel >= 20000)
+        return nullptr;
+
+    CBaseModelInfoSAInterface** ppModelInfoArray = reinterpret_cast<CBaseModelInfoSAInterface **>(ARRAY_ModelInfo);
+    CBaseModelInfoSAInterface*  pModelInfo = ppModelInfoArray[usModel];
+
+    if (pModelInfo && pModelInfo->pRwObject)
+        return reinterpret_cast<RpClump *>(pModelInfo->pRwObject);
+
+    return nullptr;
 }
