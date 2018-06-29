@@ -358,6 +358,7 @@ ObjectDamageHandler*        m_pObjectDamageHandler = NULL;
 ObjectBreakHandler*         m_pObjectBreakHandler = NULL;
 FxSystemDestructionHandler* m_pFxSystemDestructionHandler = NULL;
 DrivebyAnimationHandler*    m_pDrivebyAnimationHandler = NULL;
+TakeAStepHandler*           m_pTakeAStepHandler = NULL;
 
 CEntitySAInterface* dwSavedPlayerPointer = 0;
 CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active
@@ -2224,6 +2225,11 @@ void CMultiplayerSA::SetFxSystemDestructionHandler(FxSystemDestructionHandler* p
 void CMultiplayerSA::SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler)
 {
     m_pDrivebyAnimationHandler = pHandler;
+}
+
+void CMultiplayerSA::SetTakePedAStepHandler(TakeAStepHandler* pHandler)
+{
+    m_pTakeAStepHandler = pHandler;
 }
 
 // What we do here is check if the idle handler has been set

@@ -71,11 +71,14 @@ extern DeathHandler*          m_pDeathHandler;
 extern FireHandler*           m_pFireHandler;
 extern ProjectileHandler*     m_pProjectileHandler;
 extern ProjectileStopHandler* m_pProjectileStopHandler;
+extern TakeAStepHandler*      m_pTakeAStepHandler;
 
 char szDebug[255] = {'\0'};
 
 DWORD   RETURN_CProjectile__AddProjectile = 0x401C3D;
 DWORD   RETURN_CProjectile__CProjectile = 0x4037B3;
+DWORD   CONTINUE_CPed_DoFootLanded = 0x5E5386;
+
 CPools* m_pools = 0;
 
 #define VAR_CWorld_IncludeCarTyres 0xb7cd70 // Used for CWorld_ProcessLineOfSight
@@ -85,7 +88,6 @@ void InitFireSniper_MidHooks(void);
 
 void HOOK_PedTakeStep(void);
 
-static DWORD HOOK_CPed__DoFootLanded = 0x5E5380;
 VOID InitShotsyncHooks()
 {
     HookInstall(HOOKPOS_CWeapon__Fire, (DWORD)HOOK_CWeapon__Fire, 6);
@@ -108,7 +110,7 @@ VOID InitShotsyncHooks()
     HookInstall(HOOKPOS_CWeapon_FireInstantHit_CameraMode, (DWORD)HOOK_CWeapon_FireInstantHit_CameraMode, 6);
     HookInstall(HOOKPOS_CWeapon_FireInstantHit_IsPlayer, (DWORD)HOOK_CWeapon_FireInstantHit_IsPlayer, 7);
     HookInstall(HOOKPOS_CWeapon_DoBulletImpact, (DWORD)HOOK_CWeapon_DoBulletImpact, 7);
-    HookInstall(HOOK_CPed__DoFootLanded, (DWORD)HOOK_PedTakeStep, 6);
+    HookInstall(HOOKPOS_CPed_DoFootLanded, (DWORD)HOOK_PedTakeStep, 6);
 
     InitFireInstantHit_MidHooks();
     InitFireSniper_MidHooks();
@@ -120,37 +122,29 @@ VOID InitShotsyncHooks()
     m_pools = pGameInterface->GetPools();
 }
 
-DWORD HOOK_ONPedTakeStep_NormalFlow = 0x005E5386;
-
-
-extern CCoreInterface* g_pCore;
-
-void __cdecl HOOK_ONPedTakeStep(CPed* ped, short footId, char unknown1)
+void __cdecl HOOK_ONPedTakeStep(CPedSAInterface* pPedSAInterface, short footId, char unknown1)
 {
-    if (g_pCore)
-    {
-        g_pCore->GetConsole()->Printf("take a step ... ped: %x foot: %s\n", ped, footId == 1 ? "left" : "right");
-    }
+    m_pTakeAStepHandler(pPedSAInterface, footId == 1 ? true : false);
 }
 
-static DWORD CONTINUE_CPed__DoFootLanded = 0x5E5386;
 
 void _declspec(naked) HOOK_PedTakeStep()
 {
     _asm
     {
         pushad
-        push[esp + 32 + 4]
-        push[esp + 32 + 8]
-        push ecx
-        call HOOK_ONPedTakeStep
-        add esp, 12
+        push    [esp + 32 + 4]
+        push    [esp + 32 + 8]
+        push    ecx
+        call    HOOK_ONPedTakeStep
+        add     esp, 12
         popad
 
+        // Continue
         sub     esp, 30h
         push    esi
         mov     esi, ecx
-        jmp     CONTINUE_CPed__DoFootLanded
+        jmp     CONTINUE_CPed_DoFootLanded
     }
 }
 

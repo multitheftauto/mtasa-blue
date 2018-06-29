@@ -40,6 +40,7 @@
 #define HOOKPOS_CWeapon_FireInstantHit_CameraMode       0x74036D
 #define HOOKPOS_CWeapon_FireInstantHit_IsPlayer         0x74034C
 #define HOOKPOS_CWeapon_DoBulletImpact                  0x73B550
+#define HOOKPOS_CPed_DoFootLanded                       0x5E5380
 
 // our stuff
 VOID           InitShotsyncHooks();

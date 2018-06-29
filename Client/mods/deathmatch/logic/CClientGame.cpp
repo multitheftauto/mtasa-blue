@@ -278,6 +278,7 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->SetGameEntityRenderHandler(CClientGame::StaticGameEntityRenderHandler);
     g_pMultiplayer->SetFxSystemDestructionHandler(CClientGame::StaticFxSystemDestructionHandler);
     g_pMultiplayer->SetDrivebyAnimationHandler(CClientGame::StaticDrivebyAnimationHandler);
+    g_pMultiplayer->SetTakePedAStepHandler(CClientGame::StaticPedTakeAStepHandler);
     g_pGame->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pGame->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
     g_pGame->SetTaskSimpleBeHitHandler(CClientGame::StaticTaskSimpleBeHitHandler);
@@ -454,6 +455,7 @@ CClientGame::~CClientGame(void)
     pKeyBinds->SetAllControlsEnabled(true, true, true);
     g_pCore->ForceCursorVisible(false);
     SetCursorEventsEnabled(false);
+    g_pMultiplayer->SetTakePedAStepHandler(NULL);
 
     // Destroy our stuff
     SAFE_DELETE(m_pManager);            // Will trigger onClientResourceStop
@@ -2768,6 +2770,7 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientPlayerPickupHit", "pickup, matchingDimension", NULL, false);
     m_Events.AddEvent("onClientPlayerPickupLeave", "pickup, matchingDimension", NULL, false);
     m_Events.AddEvent("onClientPlayerNetworkStatus", "type, ticks", NULL, false);
+    m_Events.AddEvent("onClientPlayerTakeAStep", "foot", NULL, false);
 
     // Ped events
     m_Events.AddEvent("onClientPedDamage", "attacker, weapon, bodypart", NULL, false);
@@ -2776,6 +2779,7 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientPedChoke", "", NULL, false);
     m_Events.AddEvent("onClientPedHeliKilled", "heli", NULL, false);
     m_Events.AddEvent("onClientPedHitByWaterCannon", "vehicle", NULL, false);
+    m_Events.AddEvent("onClientPedTakeAStep", "foot", NULL, false);
 
     // Vehicle events
     m_Events.AddEvent("onClientVehicleRespawn", "", NULL, false);
@@ -3797,6 +3801,11 @@ void CClientGame::StaticFxSystemDestructionHandler(void* pFxSAInterface)
 AnimationId CClientGame::StaticDrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId)
 {
     return g_pClientGame->DrivebyAnimationHandler(animGroup, animId);
+}
+
+void CClientGame::StaticPedTakeAStepHandler(CPedSAInterface* pPed, bool bFoot)
+{
+    return g_pClientGame->PedTakeAStepHandler(pPed, bFoot);
 }
 
 void CClientGame::DrawRadarAreasHandler(void)
@@ -6869,4 +6878,16 @@ void CClientGame::InsertAnimationAssociationToMap(CAnimBlendAssociationSAInterfa
 void CClientGame::RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation)
 {
     m_mapOfCustomAnimationAssociations.erase(pAnimAssociation);
+}
+
+void CClientGame::PedTakeAStepHandler(CPedSAInterface* pPedSA, bool bFoot)
+{    
+    CLuaArguments Arguments;
+    CClientPed* pClientPed = DynamicCast<CClientPed>(GetGameEntityXRefManager()->FindClientEntity((CEntitySAInterface*)pPedSA));
+    Arguments.PushBoolean(bFoot);
+    //pPed->CallEvent("onClientPlayerTakeAStep", Arguments, true);
+    if (IS_PLAYER(pClientPed))
+        pClientPed->CallEvent("onClientPlayerTakeAStep", Arguments, true);
+    else
+        pClientPed->CallEvent("onClientPedTakeAStep", Arguments, true);
 }
