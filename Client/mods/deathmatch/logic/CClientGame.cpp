@@ -2770,7 +2770,6 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientPlayerPickupHit", "pickup, matchingDimension", NULL, false);
     m_Events.AddEvent("onClientPlayerPickupLeave", "pickup, matchingDimension", NULL, false);
     m_Events.AddEvent("onClientPlayerNetworkStatus", "type, ticks", NULL, false);
-    m_Events.AddEvent("onClientPlayerTakeAStep", "foot", NULL, false);
 
     // Ped events
     m_Events.AddEvent("onClientPedDamage", "attacker, weapon, bodypart", NULL, false);
@@ -2779,7 +2778,7 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientPedChoke", "", NULL, false);
     m_Events.AddEvent("onClientPedHeliKilled", "heli", NULL, false);
     m_Events.AddEvent("onClientPedHitByWaterCannon", "vehicle", NULL, false);
-    m_Events.AddEvent("onClientPedTakeAStep", "foot", NULL, false);
+    m_Events.AddEvent("onClientPedStep", "foot", NULL, false);
 
     // Vehicle events
     m_Events.AddEvent("onClientVehicleRespawn", "", NULL, false);
@@ -6885,9 +6884,5 @@ void CClientGame::PedTakeAStepHandler(CPedSAInterface* pPedSA, bool bFoot)
     CLuaArguments Arguments;
     CClientPed* pClientPed = DynamicCast<CClientPed>(GetGameEntityXRefManager()->FindClientEntity((CEntitySAInterface*)pPedSA));
     Arguments.PushBoolean(bFoot);
-    //pPed->CallEvent("onClientPlayerTakeAStep", Arguments, true);
-    if (IS_PLAYER(pClientPed))
-        pClientPed->CallEvent("onClientPlayerTakeAStep", Arguments, true);
-    else
-        pClientPed->CallEvent("onClientPedTakeAStep", Arguments, true);
+    pClientPed->CallEvent("onClientPedStep", Arguments, true);
 }
