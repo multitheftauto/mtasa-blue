@@ -469,6 +469,8 @@ void CGame::DoPulse(void)
 
     CLOCK_CALL1(m_pAsyncTaskScheduler->CollectResults());
 
+    CLOCK_CALL1(m_pMapManager->GetWeather()->DoPulse(););
+
     PrintLogOutputFromNetModule();
     m_pScriptDebugging->UpdateLogOutput();
 
