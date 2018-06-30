@@ -163,6 +163,8 @@ public:
 
     virtual void BlowUp(CEntity* pCreator, unsigned long ulUnknown) = 0;
     virtual void BlowUpCutSceneNoExtras(unsigned long ulUnknown1, unsigned long ulUnknown2, unsigned long ulUnknown3, unsigned long ulUnknown4) = 0;
+    virtual void SetWillExplode(bool bExplode) = 0;
+    virtual bool GetWillExplode() = 0;
 
     virtual CDamageManager* GetDamageManager() = 0;
     virtual void            FadeOut(bool bFadeOut) = 0;
