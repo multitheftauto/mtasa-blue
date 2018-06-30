@@ -53,6 +53,7 @@ CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, CXMLNode
     m_bRespawnEnabled = false;
     m_ulBlowRespawnInterval = 10000;
     m_ulIdleRespawnInterval = 60000;
+    m_bExplodeBroadcasted = true;
 
     m_bEngineOn = false;
     for (unsigned int i = 0; i < 6; ++i)
@@ -699,6 +700,7 @@ void CVehicle::SpawnAt(const CVector& vecPosition, const CVector& vecRotation)
 {
     SetHealth(GetRespawnHealth());
     SetIsBlown(false);
+    SetExplodeBroadcasted(true);
     StopIdleTimer();
     ResetDoorsWheelsPanelsLights();
     SetLandingGearDown(true);
@@ -863,6 +865,11 @@ bool CVehicle::GetIsBlown(void)
 bool CVehicle::IsBlowTimerFinished(void)
 {
     return GetIsBlown() && CTickCount::Now() > m_llBlowTime + CTickCount((long long)m_ulBlowRespawnInterval);
+}
+
+void CVehicle::SetExplodeBroadcasted(bool bExplodeBroadcasted)
+{
+    m_bExplodeBroadcasted = bExplodeBroadcasted;
 }
 
 void CVehicle::StopIdleTimer(void)

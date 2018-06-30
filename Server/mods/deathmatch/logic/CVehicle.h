@@ -339,6 +339,8 @@ public:
     void SetIsBlown(bool bBlown);
     bool GetIsBlown(void);
     bool IsBlowTimerFinished(void);
+    void SetExplodeBroadcasted(bool bExplodeBroadcasted);
+    bool IsExplodeBroadcasted(void) { return m_bExplodeBroadcasted; };
     void StopIdleTimer(void);
     void RestartIdleTimer(void);
     bool IsIdleTimerRunning(void);
@@ -364,6 +366,7 @@ private:
     float          m_fLastSyncedHealthHealth;
     CTickCount     m_llBlowTime;
     CTickCount     m_llIdleTime;
+    bool           m_bExplodeBroadcasted;
 
     unsigned char m_ucMaxPassengersOverride;
 
