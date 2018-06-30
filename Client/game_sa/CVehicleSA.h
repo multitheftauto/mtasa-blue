@@ -527,6 +527,7 @@ private:
     unsigned char                    m_ucVariant;
     unsigned char                    m_ucVariant2;
     unsigned char                    m_ucVariantCount;
+    bool                             m_bExplode;
 
 public:
     CVehicleSA();
@@ -647,6 +648,9 @@ public:
 
     void FadeOut(bool bFadeOut);
     bool IsFadingOut();
+
+    void  SetWillExplode(bool bExplode);
+    bool  GetWillExplode(void) { return m_bExplode; };
 
     void       SetWinchType(eWinchType winchType);
     void       PickupEntityWithWinch(CEntity* pEntity);

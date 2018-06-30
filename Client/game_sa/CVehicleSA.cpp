@@ -268,6 +268,7 @@ void CVehicleSA::Init(void)
 
     this->internalID = pGame->GetPools()->GetVehicleRef((DWORD*)this->GetVehicleInterface());
 
+    m_bExplode = true;
     m_bIsDerailable = true;
     m_ucAlpha = 255;
     m_vecGravity = CVector(0.0f, 0.0f, -1.0f);
@@ -1658,6 +1659,11 @@ bool CVehicleSA::IsFadingOut(void)
 {
     CVehicleSAInterface* vehicle = (CVehicleSAInterface*)this->GetInterface();
     return vehicle->m_nVehicleFlags.bFadeOut;
+}
+
+void CVehicleSA::SetWillExplode(bool bExplode)
+{
+    m_bExplode = bExplode;
 }
 
 unsigned char CVehicleSA::GetNumberGettingIn(void)
