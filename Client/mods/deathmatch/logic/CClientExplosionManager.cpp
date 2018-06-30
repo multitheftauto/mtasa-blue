@@ -98,6 +98,9 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
             {
                 // Set our origin-source to the vehicle
                 pOriginSource = m_pManager->FindEntity(pGameExplodingEntity, false);
+                // Reset "will explode" 
+                CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pOriginSource);
+                pVehicle->SetWillExplode(true);
             }
             // If theres other players, sync it relative to the closest (lag compensation)
             else if (m_pManager->GetPlayerManager()->Count() > 1)
