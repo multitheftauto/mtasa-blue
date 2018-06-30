@@ -4359,8 +4359,13 @@ void CPacketHandler::Packet_ExplosionSync(NetBitStreamInterface& bitStream)
                 // Make sure the vehicle's blown
                 CClientVehicle* pExplodingVehicle = static_cast<CClientVehicle*>(pOrigin);
                 pExplodingVehicle->Blow(false);
+                if (!pExplodingVehicle->GetWillExplode())
+                    bCancelExplosion = true;
+                // Reset "will explode"
+                pExplodingVehicle->SetWillExplode(true);
 
                 // Call onClientVehicleExplode
+                // Bonus: This way "onClientVehicleExplode will only get called for serversided vehicles.
                 CLuaArguments Arguments;
                 pExplodingVehicle->CallEvent("onClientVehicleExplode", Arguments, true);
 
