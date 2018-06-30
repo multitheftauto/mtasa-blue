@@ -88,7 +88,8 @@ void CVehicleRPCs::BlowVehicle(CClientEntity* pSource, NetBitStreamInterface& bi
         if (pVehicle)
         {
             // Send the event when there is no "real" explosion
-            if (!bExplode) {
+            if (!bExplode) 
+            {
                 CLuaArguments Arguments;
                 pVehicle->CallEvent("onClientVehicleExplode", Arguments, true);
             }
