@@ -2558,6 +2558,7 @@ void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
                                 if (pVehicle->GetIsBlown() == false)
                                 {
                                     pVehicle->SetIsBlown(true);
+                                    pVehicle->SetExplodeBroadcasted(true);
 
                                     // Call the onVehicleExplode event
                                     CLuaArguments Arguments;
@@ -2565,10 +2566,12 @@ void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
                                     // Update our engine State
                                     pVehicle->SetEngineOn(false);
                                 }
-                                else
+                                else if (pVehicle->IsExplodeBroadcasted())
                                 {
                                     bBroadcast = false;
                                 }
+                                else
+                                    pVehicle->SetExplodeBroadcasted(true);
                             }
                         }
                         break;
