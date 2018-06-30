@@ -5216,6 +5216,7 @@ bool CStaticFunctionDefinitions::FixVehicle(CElement* pElement)
         pVehicle->SetHealth(DEFAULT_VEHICLE_HEALTH);
         pVehicle->ResetDoorsWheelsPanelsLights();
         pVehicle->SetIsBlown(false);
+        pVehicle->SetExplodeBroadcasted(true);
 
         // Tell everyone
         CBitStream BitStream;
@@ -5238,8 +5239,7 @@ bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement, bool bExplode)
         CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
 
         // Blow it up on our records. Also change the sync time context or this vehicle
-        // is likely to blow up twice, call the events twice and all that if someone's
-        // nearby and syncing it.
+        // is likely to blow up twice
         if (IsVehicleBlown(pVehicle) == false)
         {
             // Call the onVehicleExplode event
@@ -5247,14 +5247,15 @@ bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement, bool bExplode)
             pVehicle->CallEvent("onVehicleExplode", Arguments);
         }
         pVehicle->SetHealth(0.0f);
-        if (!bExplode)
-            pVehicle->SetIsBlown(true);
+        pVehicle->SetIsBlown(true);
+        pVehicle->SetExplodeBroadcasted(false);
 
         // Update our engine State
         pVehicle->SetEngineOn(false);
 
         CBitStream BitStream;
         BitStream.pBitStream->Write(pVehicle->GenerateSyncTimeContext());
+        BitStream.pBitStream->WriteBit(bExplode);
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, BLOW_VEHICLE, *BitStream.pBitStream));
         return true;
     }
@@ -6687,6 +6688,7 @@ bool CStaticFunctionDefinitions::ResetVehicleExplosionTime(CElement* pElement)
     {
         CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
         pVehicle->SetIsBlown(false);
+        pVehicle->SetExplodeBroadcasted(true);
 
         return true;
     }
