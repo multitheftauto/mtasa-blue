@@ -80,14 +80,19 @@ void CVehicleRPCs::BlowVehicle(CClientEntity* pSource, NetBitStreamInterface& bi
 {
     // Read out the vehicle id
     unsigned char ucTimeContext;
-    if (bitStream.Read(ucTimeContext))
+    bool bExplode;
+    if (bitStream.Read(ucTimeContext) && bitStream.ReadBit(bExplode))
     {
         // Grab the vehicle
         CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
         if (pVehicle)
         {
-            // Blow it and change the time context
-            pVehicle->Blow(true);
+            // Send the event when there is no "real" explosion
+            if (!bExplode) {
+                CLuaArguments Arguments;
+                pVehicle->CallEvent("onClientVehicleExplode", Arguments, true);
+            }
+            CStaticFunctionDefinitions::BlowVehicle(*pVehicle, bExplode);
             pVehicle->SetSyncTimeContext(ucTimeContext);
         }
     }
