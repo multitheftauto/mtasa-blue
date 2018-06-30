@@ -2641,7 +2641,10 @@ bool CallExplosionHandler(void)
 
             case ENTITY_TYPE_VEHICLE:
             {
-                pExplosionCreator = pGameInterface->GetPools()->GetVehicle((DWORD*)pInterface);
+                CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pInterface);
+                if (!pVehicle->GetWillExplode())
+                    return false;
+                pExplosionCreator = pVehicle;
                 break;
             }
 
@@ -2666,7 +2669,10 @@ bool CallExplosionHandler(void)
 
             case ENTITY_TYPE_VEHICLE:
             {
-                pExplodingEntity = dynamic_cast<CEntity*>(pGameInterface->GetPools()->GetVehicle((DWORD*)pExplodingEntityInterface));
+                CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pExplodingEntityInterface);
+                if (!pVehicle->GetWillExplode())
+                    return false;
+                pExplodingEntity = dynamic_cast<CEntity*>(pVehicle);
                 break;
             }
 
