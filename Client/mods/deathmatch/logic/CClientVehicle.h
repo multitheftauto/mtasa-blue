@@ -195,6 +195,8 @@ public:
     void  Fix(void);
     void  Blow(bool bAllowMovement = false);
     bool  IsVehicleBlown(void) { return m_bBlown; };
+    void  SetWillExplode(bool bExplode);
+    bool  GetWillExplode(void) { return m_pVehicle->GetWillExplode(); };
 
     CVehicleColor& GetColor(void);
     void           SetColor(const CVehicleColor& color);

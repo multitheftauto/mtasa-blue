@@ -927,6 +927,11 @@ void CClientVehicle::Blow(bool bAllowMovement)
     m_bBlown = true;
 }
 
+void CClientVehicle::SetWillExplode(bool bExplode)
+{
+    m_pVehicle->SetWillExplode(bExplode);
+}
+
 CVehicleColor& CClientVehicle::GetColor(void)
 {
     if (m_pVehicle)
