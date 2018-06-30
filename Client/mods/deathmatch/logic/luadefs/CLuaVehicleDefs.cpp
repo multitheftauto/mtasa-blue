@@ -1514,12 +1514,14 @@ int CLuaVehicleDefs::FixVehicle(lua_State* luaVM)
 int CLuaVehicleDefs::BlowVehicle(lua_State* luaVM)
 {
     CClientEntity*   pEntity = NULL;
+    bool             bExplode = true;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
+    argStream.ReadBool(bExplode);
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::BlowVehicle(*pEntity))
+        if (CStaticFunctionDefinitions::BlowVehicle(*pEntity, bExplode))
         {
             lua_pushboolean(luaVM, true);
             return 1;
