@@ -46,31 +46,6 @@ int CLuaFunctionDefs::CreateExplosion(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::CreateFire(lua_State* luaVM)
-{
-    //  bool createFire ( float x, float y, float z [, float size = 1.8 ] )
-    CVector vecPosition;
-    float   fSize;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadNumber(fSize, 1.8f);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::CreateFire(vecPosition, fSize))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
 int CLuaFunctionDefs::GetTime_(lua_State* luaVM)
 {
     // Get the time

@@ -18,6 +18,8 @@ class CBlendedWeather
 public:
     CBlendedWeather(CClock* pClock);
 
+    void DoPulse(void);
+
     void SetWeather(unsigned char ucWeather);
     void SetWeatherBlended(unsigned char ucWeather, unsigned char ucHour);
 
