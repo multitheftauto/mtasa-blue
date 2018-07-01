@@ -55,29 +55,7 @@ int CLuaColShapeDefs::GetColShapeType(lua_State* luaVM)
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain)
         {
-            switch (pColShape->GetShapeType())
-            {
-                case 0:
-                    lua_pushstring(luaVM, "Circle");
-                    break;
-                case 1:
-                    lua_pushstring(luaVM, "Cuboid");
-                    break;
-                case 2:
-                    lua_pushstring(luaVM, "Sphere");
-                    break;
-                case 3:
-                    lua_pushstring(luaVM, "Rectangle");
-                    break;
-                case 4:
-                    lua_pushstring(luaVM, "Polygon");
-                    break;
-                case 5:
-                    lua_pushstring(luaVM, "Tube");
-                    break;
-                default:
-                    lua_pushboolean(luaVM, false);
-            }
+            lua_pushnumber(luaVM, pColShape->GetShapeType());
             return 1;
         }
     }
