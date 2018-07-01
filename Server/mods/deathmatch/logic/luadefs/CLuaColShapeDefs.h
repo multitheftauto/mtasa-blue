@@ -26,5 +26,6 @@ public:
     LUA_DECLARE(CreateColPolygon);
     LUA_DECLARE(CreateColTube);
 
+    LUA_DECLARE(IsInsideColShape);
     LUA_DECLARE(GetColShapeType);
 };
