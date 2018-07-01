@@ -33,7 +33,7 @@ DWORD CONTINUE_CWorld_FallenCars = 0x00565E8A;
 
 void _declspec(naked) HOOK_FallenPeds()
 {
-    if (g_pCore && !g_pCore->GetFallenPedsUnderMapEnabled())
+    if (pGame && pGame->IsUnderWorldWarpEnabled())
     {
         _asm
         {
@@ -55,7 +55,7 @@ void _declspec(naked) HOOK_FallenPeds()
 
 void _declspec(naked) HOOK_FallenCars()
 {
-    if (g_pCore && !g_pCore->GetFallenCarsUnderMapEnabled())
+    if (pGame && !pGame->IsUnderWorldWarpEnabled())
     {
         _asm
         {
@@ -73,8 +73,6 @@ void _declspec(naked) HOOK_FallenCars()
         }
     }
 }
-
-
 
 void CWorldSA::Add(CEntity* pEntity, eDebugCaller CallerId)
 {

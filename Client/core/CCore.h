@@ -273,10 +273,6 @@ public:
     void        SetFakeLagCommandEnabled(bool bEnabled) { m_bFakeLagCommandEnabled = bEnabled; }
     bool        IsFakeLagCommandEnabled(void) { return m_bFakeLagCommandEnabled; }
     SString     GetBlueCopyrightString(void);
-    bool        SetFallenPedsUnderMapEnabled(bool);
-    bool        SetFallenCarsUnderMapEnabled(bool);
-    bool        GetFallenPedsUnderMapEnabled(void);
-    bool        GetFallenCarsUnderMapEnabled(void);
 
 private:
     // Core devices.
@@ -366,8 +362,6 @@ private:
     bool                 m_bDummyProgressUpdateAlways;
     bool                 m_bIsRenderingGrass;
     bool                 m_bFakeLagCommandEnabled;
-    bool                 m_bFallenPeds;
-    bool                 m_bFallenCars;
 
     // Command line
     static void                        ParseCommandLine(std::map<std::string, std::string>& options, const char*& szArgs, const char** pszNoValOptions = NULL);

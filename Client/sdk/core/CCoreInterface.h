@@ -173,10 +173,6 @@ public:
     virtual void        SetFakeLagCommandEnabled(bool bEnabled) = 0;
     virtual SString     GetBlueCopyrightString(void) = 0;
 
-    virtual bool        SetFallenPedsUnderMapEnabled(bool) = 0;
-    virtual bool        SetFallenCarsUnderMapEnabled(bool) = 0;
-    virtual bool        GetFallenPedsUnderMapEnabled(void) = 0;
-    virtual bool        GetFallenCarsUnderMapEnabled(void) = 0;
 };
 
 class CClientTime
