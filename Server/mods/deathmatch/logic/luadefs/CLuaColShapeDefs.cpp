@@ -55,7 +55,7 @@ int CLuaColShapeDefs::GetColShapeType(lua_State* luaVM)
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain)
         {
-            lua_pushnumber(luaVM, pColShape->GetShapeType() + 1);            // start from 1 not 0
+            lua_pushnumber(luaVM, pColShape->GetShapeType());
             return 1;
         }
     }
