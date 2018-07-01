@@ -176,10 +176,6 @@ public:
     LUA_DECLARE(SetFPSLimit);
     LUA_DECLARE(GetFPSLimit);
     LUA_DECLARE(FetchRemote);
-    LUA_DECLARE(SetFallenPedsEnabled);
-    LUA_DECLARE(SetFallenCarsEnabled);
-    LUA_DECLARE(GetFallenPedsEnabled);
-    LUA_DECLARE(GetFallenCarsEnabled);
 
     // Input functions
     LUA_DECLARE(BindKey);
