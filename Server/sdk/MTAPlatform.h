@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PLATFORM_H
-#define __PLATFORM_H
+#pragma once
 
 extern "C" bool g_bSilent;
 extern "C" bool g_bNoTopBar;
@@ -93,7 +92,5 @@ typedef int socklen_t;
     #ifndef Sleep
         #define Sleep(duration) usleep(duration * 1000)
     #endif
-
-#endif
 
 #endif

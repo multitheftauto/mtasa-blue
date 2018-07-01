@@ -21,11 +21,14 @@ public:
     LUA_DECLARE(EngineLoadDFF);
     LUA_DECLARE(EngineLoadTXD);
     LUA_DECLARE(EngineLoadCOL);
+    LUA_DECLARE(EngineLoadIFP);
     LUA_DECLARE(EngineImportTXD);
     LUA_DECLARE(EngineReplaceCOL);
     LUA_DECLARE(EngineRestoreCOL);
     LUA_DECLARE(EngineReplaceModel);
     LUA_DECLARE(EngineRestoreModel);
+    LUA_DECLARE(EngineReplaceAnimation);
+    LUA_DECLARE(EngineRestoreAnimation);
     LUA_DECLARE(EngineReplaceMatchingAtomics);
     LUA_DECLARE(EngineReplaceWheelAtomics);
     LUA_DECLARE(EnginePositionAtomic);

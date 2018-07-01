@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CLUAARGUMENTS_H
-#define __CLUAARGUMENTS_H
+#pragma once
 
 extern "C"
 {
@@ -102,5 +101,3 @@ public:
 private:
     std::vector<CLuaArgument*> m_Arguments;
 };
-
-#endif

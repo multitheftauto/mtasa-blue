@@ -19,6 +19,8 @@
 #include <game/CStats.h>
 #include "CPopulationMP.h"
 #include "CLimits.h"
+#include <../Client/game_sa/CAnimBlendAssociationSA.h>
+#include <../Client/game_sa/CAnimBlendStaticAssociationSA.h>
 
 struct SRwResourceStats
 {
@@ -36,6 +38,10 @@ struct SClothesCacheStats
     uint uiNumRemoved;
 };
 
+class CAnimBlendAssociationSAInterface;
+class CAnimBlendStaticAssociationSAInterface;
+class CAnimBlendAssocGroupSAInterface;
+class CIFPAnimations;
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
 
@@ -65,8 +71,14 @@ typedef void(PostWorldProcessHandler)(void);
 typedef void(IdleHandler)(void);
 typedef void(PreFxRenderHandler)(void);
 typedef void(PreHudRenderHandler)(void);
-typedef void(AddAnimationHandler)(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
-typedef void(BlendAnimationHandler)(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta);
+typedef CAnimBlendAssociationSAInterface*(AddAnimationHandler)(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
+typedef CAnimBlendAssociationSAInterface*(AddAnimationAndSyncHandler)(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
+                                                                      AssocGroupId animGroup, AnimationId animID);
+typedef void(CAnimBlendAssocDestructorHandler)(CAnimBlendAssociationSAInterface* pThis);
+typedef bool(AssocGroupCopyAnimationHandler)(CAnimBlendStaticAssociationSAInterface* pOutAnimStaticAssoc, CAnimBlendAssociationSAInterface* pAnimAssoc,
+                                             RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, AnimationId animID);
+typedef bool(BlendAnimationHierarchyHandler)(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy, int* pFlags,
+                                             RpClump* pClump);
 typedef bool(ProcessCollisionHandler)(class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface);
 typedef bool(VehicleCollisionHandler)(class CVehicleSAInterface* pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, int iModelIndex,
                                       float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos,
@@ -181,8 +193,11 @@ public:
     virtual void SetIdleHandler(IdleHandler* pHandler) = 0;
     virtual void SetPreFxRenderHandler(PreFxRenderHandler* pHandler) = 0;
     virtual void SetPreHudRenderHandler(PreHudRenderHandler* pHandler) = 0;
+    virtual void SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler) = 0;
     virtual void SetAddAnimationHandler(AddAnimationHandler* pHandler) = 0;
-    virtual void SetBlendAnimationHandler(BlendAnimationHandler* pHandler) = 0;
+    virtual void SetAddAnimationAndSyncHandler(AddAnimationAndSyncHandler* pHandler) = 0;
+    virtual void SetAssocGroupCopyAnimationHandler(AssocGroupCopyAnimationHandler* pHandler) = 0;
+    virtual void SetBlendAnimationHierarchyHandler(BlendAnimationHierarchyHandler* pHandler) = 0;
     virtual void SetProcessCollisionHandler(ProcessCollisionHandler* pHandler) = 0;
     virtual void SetVehicleCollisionHandler(VehicleCollisionHandler* pHandler) = 0;
     virtual void SetVehicleDamageHandler(VehicleDamageHandler* pHandler) = 0;

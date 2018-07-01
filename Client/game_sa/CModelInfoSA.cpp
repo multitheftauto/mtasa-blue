@@ -1189,8 +1189,7 @@ void CModelInfoSA::MakePedModel(char* szTexture)
 // Skip loading GTA collision model if we have replaced it
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-__declspec(noinline)
-bool OnMY_CFileLoader_LoadCollisionFile_Mid(int iModelId)
+__declspec(noinline) bool OnMY_CFileLoader_LoadCollisionFile_Mid(int iModelId)
 {
     if (MapContains(CModelInfoSA::ms_ReplacedColModels, iModelId))
         return false;
@@ -1236,8 +1235,7 @@ skip:
 // Ignore extra characters in dff frame name
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-__declspec(noinline)
-void OnMY_NodeNameStreamRead(RwStream* stream, char* pDest, uint uiSize)
+__declspec(noinline) void OnMY_NodeNameStreamRead(RwStream* stream, char* pDest, uint uiSize)
 {
     // Calc sizes
     const uint uiMaxBufferSize = 24;

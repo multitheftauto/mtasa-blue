@@ -263,22 +263,21 @@ void CResourceManager::ValidateResourceFile(const SString& strInFilename, const 
                 checksum = CChecksum::GenerateChecksumFromFile(strInFilename);
             if (checksum != pResourceFile->GetServerChecksum())
             {
+                char szMd5[33];
+                CMD5Hasher::ConvertToHex(checksum.md5, szMd5);
+                char szMd5Wanted[33];
+                CMD5Hasher::ConvertToHex(pResourceFile->GetServerChecksum().md5, szMd5Wanted);
+                SString strMessage("%s [Expected Size:%d MD5:%s][Got Size:%d MD5:%s] ", *ConformResourcePath(strInFilename), pResourceFile->GetDownloadSize(),
+                                   szMd5Wanted, (int)FileSize(strInFilename), szMd5);
                 if (pResourceFile->IsDownloaded())
                 {
-                    char szMd5[33];
-                    CMD5Hasher::ConvertToHex(checksum.md5, szMd5);
-                    char szMd5Wanted[33];
-                    CMD5Hasher::ConvertToHex(pResourceFile->GetServerChecksum().md5, szMd5Wanted);
-                    SString strMessage("Resource file checksum failed: %s [Size:%d MD5:%s][Wanted:%s][datasize:%d] ", *ConformResourcePath(strInFilename),
-                                       (int)FileSize(strInFilename), szMd5, szMd5Wanted, fileData.GetSize());
+                    strMessage = "Resource file unexpected change: " + strMessage;
                     g_pClientGame->TellServerSomethingImportant(1007, strMessage);
+                    g_pClientGame->GetScriptDebugging()->LogWarning(NULL, strMessage);
                 }
                 else if (pResourceFile->IsAutoDownload())
                 {
-                    char szMd5[33];
-                    CMD5Hasher::ConvertToHex(checksum.md5, szMd5);
-                    SString strMessage("Attempt to load resource file before it is ready: %s [Size:%d MD5:%s] ", *ConformResourcePath(strInFilename),
-                                       (int)FileSize(strInFilename), szMd5);
+                    strMessage = "Attempt to load resource file before it is ready: " + strMessage;
                     g_pClientGame->TellServerSomethingImportant(1008, strMessage);
                 }
             }

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CBLENDEDWEATHER_H
-#define __CBLENDEDWEATHER_H
+#pragma once
 
 #include "CClock.h"
 
@@ -18,6 +17,8 @@ class CBlendedWeather
 {
 public:
     CBlendedWeather(CClock* pClock);
+
+    void DoPulse(void);
 
     void SetWeather(unsigned char ucWeather);
     void SetWeatherBlended(unsigned char ucWeather, unsigned char ucHour);
@@ -40,5 +41,3 @@ private:
 
     CClock* m_pClock;
 };
-
-#endif

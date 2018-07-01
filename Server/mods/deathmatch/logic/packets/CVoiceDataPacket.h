@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CVOICEDATAPACKET_H
-#define __PACKETS_CVOICEDATAPACKET_H
+#pragma once
 
 #include "CPacket.h"
 
@@ -41,5 +40,3 @@ private:
     unsigned short m_usDataBufferSize;
     unsigned short m_usActualDataLength;
 };
-
-#endif

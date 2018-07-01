@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPLAYERSTATSPACKET_H
-#define __CPLAYERSTATSPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include <CVector.h>
@@ -41,5 +40,3 @@ public:
 private:
     map<unsigned short, sPlayerStat> m_List;
 };
-
-#endif

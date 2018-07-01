@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CSERVERBASE_H
-#define __CSERVERBASE_H
+#pragma once
 
 #include "CServerInterface.h"
 
@@ -29,5 +28,3 @@ public:
     virtual bool PendingWorkToDo(void) = 0;
     virtual bool GetSleepIntervals(int& iSleepBusyMs, int& iSleepIdleMs, int& iLogicFpsLimit) = 0;
 };
-
-#endif

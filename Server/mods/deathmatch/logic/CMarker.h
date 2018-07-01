@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMARKER_H
-#define __CMARKER_H
+#pragma once
 
 #include <CVector.h>
 #include "CColCallback.h"
@@ -86,5 +85,3 @@ private:
 
     CColShape* m_pCollision;
 };
-
-#endif

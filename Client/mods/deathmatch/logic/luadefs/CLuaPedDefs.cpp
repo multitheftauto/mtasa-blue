@@ -139,7 +139,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getTargetEnd", "getPedTargetEnd");
     lua_classfunction(luaVM, "getTargetStart", "getPedTargetStart");
     lua_classfunction(luaVM, "getWeaponMuzzlePosition", "getPedWeaponMuzzlePosition");
-    lua_classfunction(luaVM, "getBonePosition", "getPedBonePosition");
+    lua_classfunction(luaVM, "getBonePosition", OOP_GetPedBonePosition);
     lua_classfunction(luaVM, "getCameraRotation", "getPedCameraRotation");
     lua_classfunction(luaVM, "getWeaponSlot", "getPedWeaponSlot");
     lua_classfunction(luaVM, "getWalkingStyle", "getPedWalkingStyle");
@@ -936,6 +936,35 @@ int CLuaPedDefs::GetPedBonePosition(lua_State* luaVM)
                 lua_pushnumber(luaVM, vecPosition.fY);
                 lua_pushnumber(luaVM, vecPosition.fZ);
                 return 3;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPedDefs::OOP_GetPedBonePosition(lua_State* luaVM)
+{
+    // Verify the argument
+    CClientPed*      pPed = NULL;
+    unsigned char    ucBone = 0;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPed);
+    argStream.ReadNumber(ucBone);
+
+    if (!argStream.HasErrors())
+    {
+        if (ucBone <= BONE_RIGHTFOOT)
+        {
+            eBone   bone = (eBone)ucBone;
+            CVector vecPosition;
+            if (CStaticFunctionDefinitions::GetPedBonePosition(*pPed, bone, vecPosition))
+            {
+                lua_pushvector(luaVM, vecPosition);
+                return 1;
             }
         }
     }

@@ -315,7 +315,7 @@ long long SharedUtil::GetWMITotalPhysicalMemory(void)
 
     if (llResult == 0)
     {
-        llResult = 2LL * 1024 * 1024 * 1024;  // 2GB
+        llResult = 2LL * 1024 * 1024 * 1024;            // 2GB
     }
     return llResult;
 }
@@ -394,7 +394,7 @@ long long SharedUtil::GetWMIVideoAdapterMemorySize(const SString& strDisplay)
 
     if (llResult == 0)
     {
-        llResult = 2LL * 1024 * 1024 * 1024;  // 2GB
+        llResult = 2LL * 1024 * 1024 * 1024;            // 2GB
     }
     return llResult;
 }

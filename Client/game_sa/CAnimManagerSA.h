@@ -19,6 +19,7 @@
 
 #include "Common.h"
 #include <list>
+#include <map>
 
 #define FUNC_CAnimManager_Initialize                        0x5bf6b0
 #define FUNC_CAnimManager_Shutdown                          0x4d4130
@@ -55,6 +56,8 @@
 #define FUNC_CAnimManager_LoadAnimFile                      0x4d55d0
 #define FUNC_CAnimManager_LoadAnimFile_stream               0x4d47f0
 #define FUNC_CAnimManager_LoadAnimFiles                     0x4d5620
+#define FUNC_CAnimManager_AllocateKeyFramesMemory           0x72F420
+#define FUNC_CAnimManager_FreeKeyFramesMemory               0x72F430
 #define ARRAY_CAnimManager_AnimAssocGroups                  0xb4ea34
 #define ARRAY_CAnimManager_Animations                       0xb4ea40
 #define ARRAY_CAnimManager_AnimBlocks                       0xb5d4a0
@@ -77,6 +80,8 @@ public:
 
 class CAnimManagerSA : public CAnimManager
 {
+    typedef std::unique_ptr<CAnimBlendStaticAssociation> StaticAssocIntface_type;
+
 public:
     CAnimManagerSA(void);
     ~CAnimManagerSA(void);
@@ -88,29 +93,29 @@ public:
     int GetNumAnimBlocks(void);
     int GetNumAnimAssocDefinitions(void);
 
-    CAnimBlendHierarchy *GetAnimation(int ID);
-    CAnimBlendHierarchy *GetAnimation(const char *szName, CAnimBlock *pBlock);
-    CAnimBlendHierarchy *GetAnimation(unsigned int uiIndex, CAnimBlock *pBlock);
+    CAnimBlendHierarchy* GetAnimation(int ID);
+    CAnimBlendHierarchy* GetAnimation(const char* szName, CAnimBlock* pBlock);
+    CAnimBlendHierarchy* GetAnimation(unsigned int uiIndex, CAnimBlock* pBlock);
 
-    CAnimBlock *GetAnimationBlock(int ID);
-    CAnimBlock *GetAnimationBlock(const char *szName);
-    int         GetAnimationBlockIndex(const char *szName);
-    int         RegisterAnimBlock(const char *szName);
+    CAnimBlock* GetAnimationBlock(int ID);
+    CAnimBlock* GetAnimationBlock(const char* szName);
+    int         GetAnimationBlockIndex(const char* szName);
+    int         RegisterAnimBlock(const char* szName);
 
-    CAnimBlendAssocGroup *GetAnimBlendAssoc(AssocGroupId groupID);
-    AssocGroupId          GetFirstAssocGroup(const char *szName);
+    CAnimBlendAssocGroup* GetAnimBlendAssoc(AssocGroupId groupID);
+    AssocGroupId          GetFirstAssocGroup(const char* szName);
 
-    const char *GetAnimGroupName(AssocGroupId groupID);
-    const char *GetAnimBlockName(AssocGroupId groupID);
+    const char* GetAnimGroupName(AssocGroupId groupID);
+    const char* GetAnimBlockName(AssocGroupId groupID);
 
-    CAnimBlendAssociation *CreateAnimAssociation(AssocGroupId animGroup, AnimationId animID);
-    CAnimBlendAssociation *GetAnimAssociation(AssocGroupId animGroup, AnimationId animID);
-    CAnimBlendAssociation *GetAnimAssociation(AssocGroupId animGroup, const char *szAnimName);
-    CAnimBlendAssociation *AddAnimation(RpClump *pClump, AssocGroupId animGroup, AnimationId animID);
-    CAnimBlendAssociation *AddAnimation(RpClump *pClump, CAnimBlendHierarchy *, int ID);
-    CAnimBlendAssociation *AddAnimationAndSync(RpClump *pClump, CAnimBlendAssociation *pAssociation, AssocGroupId animGroup, AnimationId animID);
-    CAnimBlendAssociation *BlendAnimation(RpClump *pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta);
-    CAnimBlendAssociation *BlendAnimation(RpClump *pClump, CAnimBlendHierarchy *pHierarchy, int ID, float fBlendDelta);
+    CAnimBlendAssociation*  CreateAnimAssociation(AssocGroupId animGroup, AnimationId animID);
+    StaticAssocIntface_type GetAnimStaticAssociation(AssocGroupId animGroup, AnimationId animID);
+    CAnimBlendAssociation*  GetAnimAssociation(AssocGroupId animGroup, const char* szAnimName);
+    CAnimBlendAssociation*  AddAnimation(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
+    CAnimBlendAssociation*  AddAnimation(RpClump* pClump, CAnimBlendHierarchy*, int ID);
+    CAnimBlendAssociation*  AddAnimationAndSync(RpClump* pClump, CAnimBlendAssociation* pAssociation, AssocGroupId animGroup, AnimationId animID);
+    CAnimBlendAssociation*  BlendAnimation(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta);
+    CAnimBlendAssociation*  BlendAnimation(RpClump* pClump, CAnimBlendHierarchy* pHierarchy, int ID, float fBlendDelta);
 
     void AddAnimBlockRef(int ID);
     void RemoveAnimBlockRef(int ID);
@@ -118,39 +123,67 @@ public:
     int  GetNumRefsToAnimBlock(int ID);
     void RemoveAnimBlock(int ID);
 
-    AnimAssocDefinition *AddAnimAssocDefinition(const char *szBlockName, const char *szAnimName, AssocGroupId animGroup, AnimationId animID,
-                                                AnimDescriptor *pDescriptor);
+    AnimAssocDefinition* AddAnimAssocDefinition(const char* szBlockName, const char* szAnimName, AssocGroupId animGroup, AnimationId animID,
+                                                AnimDescriptor* pDescriptor);
     void                 ReadAnimAssociationDefinitions(void);
     void                 CreateAnimAssocGroups(void);
 
-    void UncompressAnimation(CAnimBlendHierarchy *pHierarchy);
-    void RemoveFromUncompressedCache(CAnimBlendHierarchy *pHierarchy);
-
-    void LoadAnimFile(const char *szFile);
-    void LoadAnimFile(RwStream *pStream, bool b1, const char *sz1);
-    void LoadAnimFiles(void);
-    void RemoveLastAnimFile(void);
+    void  UncompressAnimation(CAnimBlendHierarchy* pHierarchy);
+    void  RemoveFromUncompressedCache(CAnimBlendHierarchy* pHierarchy);
+    void  RemoveFromUncompressedCache(CAnimBlendHierarchySAInterface* pInterface);
+    void  LoadAnimFile(const char* szFile);
+    void  LoadAnimFile(RwStream* pStream, bool b1, const char* sz1);
+    void  LoadAnimFiles(void);
+    void  RemoveLastAnimFile(void);
+    BYTE* AllocateKeyFramesMemory(uint32_t u32BytesToAllocate);
+    void  FreeKeyFramesMemory(void* pKeyFrames);
 
     // Non members
     bool                   HasAnimGroupLoaded(AssocGroupId groupID);
-    CAnimBlendAssociation *RpAnimBlendClumpGetFirstAssociation(RpClump *pClump);
-    CAnimBlendAssociation *RpAnimBlendClumpGetAssociation(RpClump *pClump, const char *szAnimName);
-    CAnimBlendAssociation *RpAnimBlendClumpGetAssociation(RpClump *pClump, AnimationId animID);
-    CAnimBlendAssociation *RpAnimBlendGetNextAssociation(CAnimBlendAssociation *pAssociation);
-    int                    RpAnimBlendClumpGetNumAssociations(RpClump *pClump);
-    void                   RpAnimBlendClumpUpdateAnimations(RpClump *pClump, float f1, bool b1);
+    CAnimBlendAssociation* RpAnimBlendClumpGetFirstAssociation(RpClump* pClump);
+    CAnimBlendAssociation* RpAnimBlendClumpGetAssociation(RpClump* pClump, const char* szAnimName);
+    CAnimBlendAssociation* RpAnimBlendClumpGetAssociation(RpClump* pClump, AnimationId animID);
+    CAnimBlendAssociation* RpAnimBlendGetNextAssociation(CAnimBlendAssociation* pAssociation);
+    int                    RpAnimBlendClumpGetNumAssociations(RpClump* pClump);
+    void                   RpAnimBlendClumpUpdateAnimations(RpClump* pClump, float f1, bool b1);
 
     // MTA members
-    CAnimBlendAssociation *GetAnimBlendAssociation(CAnimBlendAssociationSAInterface *pInterface);
-    CAnimBlendAssocGroup * GetAnimBlendAssocGroup(CAnimBlendAssocGroupSAInterface *pInterface);
-    CAnimBlock *           GetAnimBlock(CAnimBlockSAInterface *pInterface);
-    CAnimBlendHierarchy *  GetAnimBlendHierarchy(CAnimBlendHierarchySAInterface *pInterface);
+    CAnimBlendAssociation* GetAnimBlendAssociation(CAnimBlendAssociationSAInterface* pInterface);
+    CAnimBlendAssocGroup*  GetAnimBlendAssocGroup(CAnimBlendAssocGroupSAInterface* pInterface);
+    CAnimBlock*            GetAnimBlock(CAnimBlockSAInterface* pInterface);
+    CAnimBlendHierarchy*   GetAnimBlendHierarchy(CAnimBlendHierarchySAInterface* pInterface);
+
+    StaticAssocIntface_type GetAnimStaticAssociation(CAnimBlendStaticAssociationSAInterface* pInterface);
+
+    // MTA members, but use this strictly for custom animations only
+    std::unique_ptr<CAnimBlendHierarchy> GetCustomAnimBlendHierarchy(CAnimBlendHierarchySAInterface* pInterface);
+    std::unique_ptr<CAnimBlendSequence>  GetCustomAnimBlendSequence(CAnimBlendSequenceSAInterface* pInterface);
+
+    // Warning! These two functions will create a new interface ( dynamic memory memory allocation )
+    std::unique_ptr<CAnimBlendHierarchy> GetCustomAnimBlendHierarchy(void);
+    std::unique_ptr<CAnimBlendSequence>  GetCustomAnimBlendSequence(void);
+
+    void DeleteCustomAnimHierarchyInterface(CAnimBlendHierarchySAInterface* pInterface);
+    void DeleteCustomAnimSequenceInterface(CAnimBlendSequenceSAInterface* pInterface);
+
+    bool           isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface* pInterface);
+    const SString& GetGateWayBlockName(void) { return m_kGateWayBlockName; };
+    const SString& GetGateWayAnimationName(void) { return m_kGateWayAnimationName; };
 
 private:
-    CAnimBlendAssocGroup *             m_pAnimAssocGroups[MAX_ANIM_GROUPS];
-    CAnimBlendHierarchy *              m_pAnimations[MAX_ANIMATIONS];
-    CAnimBlock *                       m_pAnimBlocks[MAX_ANIM_BLOCKS];
-    std::list<CAnimBlendAssociation *> m_Associations;
+    CAnimBlendAssocGroup*             m_pAnimAssocGroups[MAX_ANIM_GROUPS];
+    CAnimBlendHierarchy*              m_pAnimations[MAX_ANIMATIONS];
+    CAnimBlock*                       m_pAnimBlocks[MAX_ANIM_BLOCKS];
+    std::list<CAnimBlendAssociation*> m_Associations;
+
+    // This "gateway" animation will allow us to play custom animations by simply playing this animation
+    // and then in AddAnimation and AddAnimationAndSync hook, we can return our custom animation in the
+    // hook instead of run_wuzi. This will trick GTA SA into thinking that it is playing run_wuzi from
+    // ped block, but in reality, it's playing our custom animation, and Of course, we can return run_wuzi
+    // animation within the hook if we want to play it instead. Why run_wuzi? We can also use another animation,
+    // but I've tested with this one mostly, so let's stick to this.
+    const SString m_kGateWayBlockName = "ped";
+    const SString m_kGateWayAnimationName = "run_wuzi";
 };
 
 #endif

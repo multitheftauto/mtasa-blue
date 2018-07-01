@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __NS_PLAYERID_H
-#define __NS_PLAYERID_H
+#pragma once
 
 #include <MTAPlatform.h>
 
@@ -68,5 +67,3 @@ public:
     unsigned long  GetBinaryAddress(void) const { return m_uiBinaryAddress; };
     unsigned short GetPort(void) const { return m_usPort; };
 };
-
-#endif

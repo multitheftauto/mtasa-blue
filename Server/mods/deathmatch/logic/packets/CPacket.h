@@ -11,8 +11,7 @@
 
 class CPacket;
 
-#ifndef __CPACKET_H
-#define __CPACKET_H
+#pragma once
 
 #include "../../Config.h"
 #include <net/CNetServer.h>
@@ -58,5 +57,3 @@ protected:
     CElement*         m_pSourceElement;
     NetServerPlayerID m_Source;
 };
-
-#endif

@@ -17,8 +17,7 @@ typedef void* HMODULE;
 
 class CLuaModule;
 
-#ifndef __CLUAMODULE_H
-#define __CLUAMODULE_H
+#pragma once
 
 typedef bool (*DefaultModuleFunc)(void);
 typedef void (*RegisterModuleFunc)(lua_State*);
@@ -93,5 +92,3 @@ private:
     CScriptDebugging*  m_pScriptDebugging;
     CLuaModuleManager* m_pLuaModuleManager;
 };
-
-#endif
