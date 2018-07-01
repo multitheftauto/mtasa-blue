@@ -19,6 +19,9 @@ void CLuaColShapeDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("createColRectangle", CreateColRectangle);
     CLuaCFunctions::AddFunction("createColPolygon", CreateColPolygon);
     CLuaCFunctions::AddFunction("createColTube", CreateColTube);
+
+    CLuaCFunctions::AddFunction("isInsideColShape", IsInsideColShape);
+    CLuaCFunctions::AddFunction("getColShapeType", GetColShapeType);
 }
 
 void CLuaColShapeDefs::AddClass(lua_State* luaVM)
@@ -33,9 +36,38 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "Polygon", "createColPolygon");
 
     lua_classfunction(luaVM, "getElementsWithin", "getElementsWithinColShape");
-    lua_classvariable(luaVM, "elementsWithin", NULL, "getElementsWithinColShape");
+    lua_classfunction(luaVM, "isInside", "isInsideColShape");
+    lua_classfunction(luaVM, "getShapeType", "getColShapeType");
+
+    lua_classvariable(luaVM, "elementsWithin", nullptr, "getElementsWithinColShape");
+    lua_classvariable(luaVM, "shapeType", nullptr, "getColShapeType");
 
     lua_registerclass(luaVM, "ColShape", "Element");
+}
+
+int CLuaColShapeDefs::GetColShapeType(lua_State* luaVM)
+{
+    // Verify the arguments
+    CClientColShape* pColShape = nullptr;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pColShape);
+
+    if (!argStream.HasErrors())
+    {
+        // Grab our VM
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
+        {
+            lua_pushnumber(luaVM, pColShape->GetShapeType());
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
 }
 
 int CLuaColShapeDefs::CreateColCircle(lua_State* luaVM)
@@ -304,6 +336,32 @@ int CLuaColShapeDefs::CreateColTube(lua_State* luaVM)
     }
     else
         m_pScriptDebugging->LogBadType(luaVM);
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaColShapeDefs::IsInsideColShape(lua_State* luaVM)
+{
+    //  bool isInsideColShape ( colshape theColShape, float posX, float posY, float posZ )
+    CClientColShape* pColShape;
+    CVector          vecPosition;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pColShape);
+    argStream.ReadVector3D(vecPosition);
+
+    if (!argStream.HasErrors())
+    {
+        bool bInside = false;
+        if (CStaticFunctionDefinitions::IsInsideColShape(pColShape, vecPosition, bInside))
+        {
+            lua_pushboolean(luaVM, bInside);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
