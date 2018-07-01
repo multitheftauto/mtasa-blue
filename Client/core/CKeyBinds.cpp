@@ -278,7 +278,7 @@ CKeyBinds::CKeyBinds(CCore* pCore)
     m_pList = new list<CKeyBind*>;
     m_bMouseWheel = false;
     m_bInVehicle = false;
-    m_pChatBoxBind = NULL;
+    m_pChatBoxBind = nullptr;
     m_bProcessingKeyStroke = false;
     m_KeyStrokeHandler = NULL;
     m_CharacterKeyHandler = NULL;
@@ -363,7 +363,7 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
 
     // Search through binds
     bool                            bFound = false;
-    CKeyBind*                       pBind = NULL;
+    CKeyBind*                       pBind = nullptr;
     list<CCommandBind*>             processedList;
     list<CKeyBind*>                 cloneList = *m_pList;
     list<CKeyBind*>::const_iterator iter = cloneList.begin();
@@ -553,7 +553,7 @@ bool CKeyBinds::Call(CKeyBind* pKeyBind)
             {
                 CCommandBind* pBind = static_cast<CCommandBind*>(pKeyBind);
                 if (pBind->bActive)
-                    m_pCore->GetCommands()->Execute(pBind->szCommand, pBind->szArguments, false, pBind->szResource != NULL);
+                    m_pCore->GetCommands()->Execute(pBind->szCommand, pBind->szArguments, false, pBind->szResource != nullptr);
                 break;
             }
             case KEY_BIND_FUNCTION:
@@ -583,7 +583,7 @@ bool CKeyBinds::AddCommand(const char* szKey, const char* szCommand, const char*
 {
     NullEmptyStrings(szCommand, szArguments, szResource);
 
-    if (szKey == NULL || szCommand == NULL)
+    if (szKey == nullptr || szCommand == nullptr)
         return false;
 
     const SBindableKey* boundKey = GetBindableFromKey(szKey);
@@ -593,7 +593,7 @@ bool CKeyBinds::AddCommand(const char* szKey, const char* szCommand, const char*
         if (szResource && bScriptCreated)
         {
             // Check if there is a waiting replacement
-            CCommandBind* pUserAddedBind = FindCommandMatch(NULL, szCommand, szArguments, szResource, szKey, true, bState, true, false);
+            CCommandBind* pUserAddedBind = FindCommandMatch(nullptr, szCommand, szArguments, szResource, szKey, true, bState, true, false);
             if (pUserAddedBind)
             {
                 // Upgrade
@@ -638,7 +638,7 @@ bool CKeyBinds::AddCommand(const SBindableKey* pKey, const char* szCommand, cons
 {
     NullEmptyStrings(szCommand, szArguments);
 
-    if (pKey == NULL || szCommand == NULL)
+    if (pKey == nullptr || szCommand == nullptr)
         return false;
 
     CCommandBind* bind = new CCommandBind;
@@ -651,7 +651,7 @@ bool CKeyBinds::AddCommand(const SBindableKey* pKey, const char* szCommand, cons
         strcpy(bind->szArguments, szArguments);
     }
     else
-        bind->szArguments = NULL;
+        bind->szArguments = nullptr;
 
     bind->bHitState = bState;
     bind->bState = false;
@@ -662,7 +662,7 @@ bool CKeyBinds::AddCommand(const SBindableKey* pKey, const char* szCommand, cons
 
 bool CKeyBinds::RemoveCommand(const char* szKey, const char* szCommand, bool bCheckState, bool bState)
 {
-    if (szKey == NULL || szCommand == NULL)
+    if (szKey == nullptr || szCommand == nullptr)
         return false;
 
     bool                      bFound = false;
@@ -704,7 +704,7 @@ bool CKeyBinds::RemoveCommand(const char* szKey, const char* szCommand, bool bCh
 
 bool CKeyBinds::RemoveAllCommands(const char* szKey, bool bCheckState, bool bState)
 {
-    if (szKey == NULL)
+    if (szKey == nullptr)
         return false;
 
     bool                      bFound = false;
@@ -751,12 +751,12 @@ bool CKeyBinds::RemoveAllCommands(void)
 bool CKeyBinds::CommandExists(const char* szKey, const char* szCommand, bool bCheckState, bool bState, const char* szArguments, const char* szResource,
                               bool bCheckScriptCreated, bool bScriptCreated)
 {
-    const char* szOriginalScriptKey = NULL;
+    const char* szOriginalScriptKey = nullptr;
     if (bCheckScriptCreated && bScriptCreated)
     {
         // If looking for script created command, check original key instead of current key
         szOriginalScriptKey = szKey;
-        szKey = NULL;
+        szKey = nullptr;
     }
 
     if (FindCommandMatch(szKey, szCommand, szArguments, szResource, szOriginalScriptKey, bCheckState, bState, bCheckScriptCreated, bScriptCreated))
@@ -848,10 +848,10 @@ CCommandBind* CKeyBinds::GetBindFromCommand(const char* szCommand, const char* s
 
             if ((bMatchCase && strcmp(szBindCommand, szCommand) == 0) || (!bMatchCase && stricmp(szBindCommand, szCommand) == 0))
             {
-                if (szArguments == NULL || (szBindArguments && (bMatchCase && strcmp(szBindArguments, szArguments) == 0) ||
+                if (szArguments == nullptr || (szBindArguments && (bMatchCase && strcmp(szBindArguments, szArguments) == 0) ||
                                             (!bMatchCase && stricmp(szBindArguments, szArguments) == 0)))
                 {
-                    if ((szKey == NULL) || (stricmp(pBind->boundKey->szKey, szKey) == 0))
+                    if ((szKey == nullptr) || (stricmp(pBind->boundKey->szKey, szKey) == 0))
                     {
                         if ((!bCheckHitState) || (bState == pBind->bHitState))
                         {
@@ -863,7 +863,7 @@ CCommandBind* CKeyBinds::GetBindFromCommand(const char* szCommand, const char* s
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szCommand, const char* szArguments, const char* szResource,
@@ -901,7 +901,7 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
             }
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 //
@@ -909,7 +909,7 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
 //
 CCommandBind* CKeyBinds::FindMatchingUpBind(CCommandBind* pBind)
 {
-    return FindCommandMatch(pBind->boundKey->szKey, pBind->szCommand, NULL, pBind->szResource, pBind->strOriginalScriptKey, true, false, true,
+    return FindCommandMatch(pBind->boundKey->szKey, pBind->szCommand, nullptr, pBind->szResource, pBind->strOriginalScriptKey, true, false, true,
                             pBind->bScriptCreated);
 }
 
@@ -1016,7 +1016,7 @@ bool CKeyBinds::GetBoundCommands(const char* szCommand, list<CCommandBind*>& com
 
 bool CKeyBinds::AddGTAControl(const char* szKey, const char* szControl)
 {
-    if (szKey == NULL || szControl == NULL)
+    if (szKey == nullptr || szControl == nullptr)
         return false;
 
     const SBindableKey*  boundKey = GetBindableFromKey(szKey);
@@ -1056,7 +1056,7 @@ bool CKeyBinds::AddGTAControl(const SBindableKey* pKey, SBindableGTAControl* pCo
 
 bool CKeyBinds::RemoveGTAControl(const char* szKey, const char* szControl)
 {
-    if (szKey == NULL || szControl == NULL)
+    if (szKey == nullptr || szControl == nullptr)
         return false;
 
     list<CKeyBind*>::iterator iter = m_pList->begin();
@@ -1083,7 +1083,7 @@ bool CKeyBinds::RemoveGTAControl(const char* szKey, const char* szControl)
 
 bool CKeyBinds::RemoveAllGTAControls(const char* szKey)
 {
-    if (szKey == NULL)
+    if (szKey == nullptr)
         return false;
 
     bool                      bFound = false;
@@ -1417,7 +1417,7 @@ bool CKeyBinds::GetBoundControls(SBindableGTAControl* pControl, list<CGTAControl
 
 bool CKeyBinds::AddFunction(const char* szKey, KeyFunctionBindHandler Handler, bool bState, bool bIgnoreGUI)
 {
-    if (szKey == NULL)
+    if (szKey == nullptr)
         return false;
 
     const SBindableKey* boundKey = GetBindableFromKey(szKey);
@@ -1581,7 +1581,7 @@ bool CKeyBinds::FunctionExists(const SBindableKey* pKey, KeyFunctionBindHandler 
 
 bool CKeyBinds::AddControlFunction(const char* szControl, ControlFunctionBindHandler Handler, bool bState)
 {
-    if (szControl == NULL || Handler == NULL)
+    if (szControl == nullptr || Handler == NULL)
         return false;
 
     SBindableGTAControl* boundControl = GetBindableFromControl(szControl);
@@ -1589,7 +1589,7 @@ bool CKeyBinds::AddControlFunction(const char* szControl, ControlFunctionBindHan
     if (boundControl)
     {
         CControlFunctionBind* pBind = new CControlFunctionBind;
-        pBind->boundKey = NULL;
+        pBind->boundKey = nullptr;
         pBind->control = boundControl;
         pBind->Handler = Handler;
         pBind->bHitState = bState;
@@ -1611,7 +1611,7 @@ bool CKeyBinds::AddControlFunction(SBindableGTAControl* pControl, ControlFunctio
     if (pControl)
     {
         CControlFunctionBind* pBind = new CControlFunctionBind;
-        pBind->boundKey = NULL;
+        pBind->boundKey = nullptr;
         pBind->control = pControl;
         pBind->Handler = Handler;
         pBind->bHitState = bState;
@@ -1772,7 +1772,7 @@ const SBindableKey* CKeyBinds::GetBindableFromKey(const char* szKey)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 SBindableGTAControl* CKeyBinds::GetBindableFromAction(eControllerAction action)
@@ -1786,7 +1786,7 @@ SBindableGTAControl* CKeyBinds::GetBindableFromAction(eControllerAction action)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool CKeyBinds::IsKey(const char* szKey)
@@ -1808,11 +1808,11 @@ const SBindableKey* CKeyBinds::GetBindableFromMessage(UINT uMsg, WPARAM wParam, 
     if (uMsg != WM_KEYDOWN && uMsg != WM_KEYUP && uMsg != WM_SYSKEYDOWN && uMsg != WM_SYSKEYUP && uMsg != WM_LBUTTONDOWN && uMsg != WM_LBUTTONUP &&
         uMsg != WM_RBUTTONDOWN && uMsg != WM_RBUTTONUP && uMsg != WM_MBUTTONDOWN && uMsg != WM_MBUTTONUP && uMsg != WM_XBUTTONDOWN && uMsg != WM_XBUTTONUP &&
         uMsg != WM_MOUSEWHEEL)
-        return NULL;
+        return nullptr;
 
     // Prevents a simulated lctrl with Alt Gr keys
     if (IsFakeCtrl_L(uMsg, wParam, lParam))
-        return NULL;
+        return nullptr;
 
     bool bFirstHit = (lParam & 0x40000000) ? false : true;
     if (uMsg == WM_MBUTTONDOWN || uMsg == WM_MBUTTONUP || uMsg == WM_XBUTTONDOWN || uMsg == WM_XBUTTONUP || uMsg == WM_MOUSEWHEEL)
@@ -1881,7 +1881,7 @@ const SBindableKey* CKeyBinds::GetBindableFromMessage(UINT uMsg, WPARAM wParam, 
                     {
                         // Grab the correct key
                         if (!bindable->ucNumpadRelative)
-                            return NULL;
+                            return nullptr;
 
                         // m_pCore->GetConsole ()->Printf ( "returned: %s", g_bkKeys [ bindable->ucNumpadRelative ].szKey );
                         return &g_bkKeys[bindable->ucNumpadRelative];
@@ -1892,7 +1892,7 @@ const SBindableKey* CKeyBinds::GetBindableFromMessage(UINT uMsg, WPARAM wParam, 
             }
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 SBindableGTAControl* CKeyBinds::GetBindableFromControl(const char* szControl)
@@ -1906,7 +1906,7 @@ SBindableGTAControl* CKeyBinds::GetBindableFromControl(const char* szControl)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 const SBindableKey* CKeyBinds::GetBindableFromGTARelative(int iGTAKey)
@@ -1920,7 +1920,7 @@ const SBindableKey* CKeyBinds::GetBindableFromGTARelative(int iGTAKey)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool CKeyBinds::IsControl(const char* szControl)
@@ -2024,7 +2024,7 @@ void CKeyBinds::DoPreFramePulse(void)
     if (m_pChatBoxBind)
     {
         Call(m_pChatBoxBind);
-        m_pChatBoxBind = NULL;
+        m_pChatBoxBind = nullptr;
     }
 
     // HACK: shift keys
@@ -2212,7 +2212,7 @@ bool CKeyBinds::LoadFromXML(CXMLNode* pMainNode)
     bool bLoadDefaults = false;
     if (pMainNode)
     {
-        CXMLNode*    pNode = NULL;
+        CXMLNode*    pNode = nullptr;
         unsigned int uiCount = pMainNode->GetSubNodeCount();
 
         if (uiCount == 0)
@@ -2222,7 +2222,7 @@ bool CKeyBinds::LoadFromXML(CXMLNode* pMainNode)
         {
             pNode = pMainNode->GetSubNode(i);
 
-            if (pNode == NULL)
+            if (pNode == nullptr)
                 continue;
 
             std::string strValue;
@@ -2321,19 +2321,19 @@ bool CKeyBinds::LoadFromXML(CXMLNode* pMainNode)
 
 bool CKeyBinds::SaveToXML(CXMLNode* pMainNode)
 {
-    CXMLAttribute* pA = NULL;
+    CXMLAttribute* pA = nullptr;
     if (pMainNode)
     {
         // Clear our current bind nodes
         pMainNode->DeleteAllSubNodes();
 
         // Iterate the key binds adding them to the XML tree
-        CXMLNode*                       pNode = NULL;
+        CXMLNode*                       pNode = nullptr;
         CXMLAttributes*                 pAttributes;
         list<CKeyBind*>::const_iterator iter = m_pList->begin();
         for (; iter != m_pList->end(); iter++)
         {
-            if ((*iter)->boundKey == NULL)
+            if ((*iter)->boundKey == nullptr)
                 continue;
 
             // Create the new 'bind' node
@@ -2436,7 +2436,7 @@ void CKeyBinds::LoadDefaultCommands(bool bForce)
     for (int i = 0; *g_dcbDefaultCommands[i].szKey != NULL; i++)
     {
         SDefaultCommandBind* temp = &g_dcbDefaultCommands[i];
-        if (bForce || !CommandExists(NULL, temp->szCommand, true, temp->bState, temp->szArguments))
+        if (bForce || !CommandExists(nullptr, temp->szCommand, true, temp->bState, temp->szArguments))
             AddCommand(temp->szKey, temp->szCommand, temp->szArguments, temp->bState);
     }
 }
@@ -2496,7 +2496,7 @@ void CKeyBinds::BindCommand(const char* szCmdLine)
     CConsoleInterface* pConsole = m_pCore->GetConsole();
 
     char* szError = "* Syntax: bind <defaults/key> [<up/down>] <command> [<arguments>]";
-    if (szCmdLine == NULL)
+    if (szCmdLine == nullptr)
     {
         pConsole->Print(szError);
         return;
@@ -2508,7 +2508,7 @@ void CKeyBinds::BindCommand(const char* szCmdLine)
 
     // Split it up into bind key, command and arguments
     char* szKey = strtok(szTemp, " ");
-    char* szCommand = strtok(NULL, " ");
+    char* szCommand = strtok(nullptr, " ");
 
     if (szKey)
     {
@@ -2537,12 +2537,12 @@ void CKeyBinds::BindCommand(const char* szCmdLine)
                 if (strcmp(szCommand, "up") == 0 || strcmp(szCommand, "down") == 0)
                 {
                     bState = (strcmp(szCommand, "down") == 0);
-                    szCommand = strtok(NULL, " ");
+                    szCommand = strtok(nullptr, " ");
                 }
 
                 if (szCommand)
                 {
-                    char*   szArguments = strtok(NULL, "\0");
+                    char*   szArguments = strtok(nullptr, "\0");
                     SString strKeyState("%s", bState ? "down" : "up");
                     SString strCommandAndArguments("%s%s%s", szCommand, szArguments ? " " : "", szArguments ? szArguments : "");
 
@@ -2574,7 +2574,7 @@ void CKeyBinds::UnbindCommand(const char* szCmdLine)
     CConsoleInterface* pConsole = m_pCore->GetConsole();
 
     char* szError = "* Syntax: unbind <all/key> [<up/down> <command>]";
-    if (szCmdLine == NULL)
+    if (szCmdLine == nullptr)
     {
         pConsole->Print(szError);
         return;
@@ -2586,7 +2586,7 @@ void CKeyBinds::UnbindCommand(const char* szCmdLine)
 
     // Split it up into bind key and command
     char* szKey = strtok(szTemp, " ");
-    char* szCommand = strtok(NULL, " ");
+    char* szCommand = strtok(nullptr, " ");
 
     if (szKey)
     {
@@ -2611,7 +2611,7 @@ void CKeyBinds::UnbindCommand(const char* szCmdLine)
                 if (strcmp(szCommand, "up") == 0 || strcmp(szCommand, "down") == 0)
                 {
                     bState = (strcmp(szCommand, "down") == 0);
-                    szCommand = strtok(NULL, " ");
+                    szCommand = strtok(nullptr, " ");
                 }
 
                 if (szCommand)
@@ -2647,8 +2647,8 @@ void CKeyBinds::PrintBindsCommand(const char* szCmdLine)
     CConsoleInterface* pConsole = m_pCore->GetConsole();
 
     // Get the key
-    char* szTemp = NULL;
-    char* szKey = NULL;
+    char* szTemp = nullptr;
+    char* szKey = nullptr;
 
     if (szCmdLine)
     {

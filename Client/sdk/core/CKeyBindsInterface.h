@@ -158,17 +158,17 @@ public:
     virtual std::list<CKeyBind*>::const_iterator IterEnd(void) = 0;
 
     // Command-bind funcs
-    virtual bool AddCommand(const char* szKey, const char* szCommand, const char* szArguments, bool bState, const char* szResource = NULL,
-                            bool bScriptCreated = false, const char* szOriginalScriptKey = NULL) = 0;
-    virtual bool AddCommand(const SBindableKey* pKey, const char* szCommand, const char* szArguments = NULL, bool bState = true) = 0;
-    virtual bool CommandExists(const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szArguments = NULL,
-                               const char* szResource = NULL, bool bCheckScriptCreated = false, bool bScriptCreated = false) = 0;
+    virtual bool AddCommand(const char* szKey, const char* szCommand, const char* szArguments, bool bState, const char* szResource = nullptr,
+                            bool bScriptCreated = false, const char* szOriginalScriptKey = nullptr) = 0;
+    virtual bool AddCommand(const SBindableKey* pKey, const char* szCommand, const char* szArguments = nullptr, bool bState = true) = 0;
+    virtual bool CommandExists(const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szArguments = nullptr,
+                               const char* szResource = nullptr, bool bCheckScriptCreated = false, bool bScriptCreated = false) = 0;
     virtual bool SetCommandActive(const char* szKey, const char* szCommand, bool bState, const char* szArguments, const char* szResource, bool bActive,
                                   bool checkHitState, bool bConsiderDefaultKey = false) = 0;
-    virtual void SetAllCommandsActive(const char* szResource, bool bActive, const char* szCommand = NULL, bool bState = true, const char* szArguments = NULL,
-                                      bool checkHitState = false, const char* szOnlyWithDefaultKey = NULL) = 0;
-    virtual CCommandBind* GetBindFromCommand(const char* szCommand, const char* szArguments = NULL, bool bMatchCase = true, const char* szKey = NULL,
-                                             bool bCheckHitState = false, bool bState = NULL) = 0;
+    virtual void SetAllCommandsActive(const char* szResource, bool bActive, const char* szCommand = nullptr, bool bState = true, const char* szArguments = nullptr,
+                                      bool checkHitState = false, const char* szOnlyWithDefaultKey = nullptr) = 0;
+    virtual CCommandBind* GetBindFromCommand(const char* szCommand, const char* szArguments = nullptr, bool bMatchCase = true, const char* szKey = nullptr,
+                                             bool bCheckHitState = false, bool bState = false) = 0;
     virtual bool          GetBoundCommands(const char* szCommand, std::list<CCommandBind*>& commandsList) = 0;
     virtual void          UserChangeCommandBoundKey(CCommandBind* pBind, const SBindableKey* pNewBoundKey) = 0;
     virtual void          UserRemoveCommandBoundKey(CCommandBind* pBind) = 0;
