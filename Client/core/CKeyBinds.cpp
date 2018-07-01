@@ -766,7 +766,7 @@ bool CKeyBinds::CommandExists(const char* szKey, const char* szCommand, bool bCh
 }
 
 bool CKeyBinds::SetCommandActive(const char* szKey, const char* szCommand, bool bState, const char* szArguments, const char* szResource, bool bActive,
-                                 bool checkHitState, bool bCanWithOriginalKeyInstead)
+                                 bool checkHitState, bool bConsiderDefaultKey)
 {
     NullEmptyStrings(szKey, szCommand, szArguments);
 
@@ -778,7 +778,7 @@ bool CKeyBinds::SetCommandActive(const char* szKey, const char* szCommand, bool 
             CCommandBind* pBind = static_cast<CCommandBind*>(*iter);
             if (!szKey 
                 || (stricmp(pBind->boundKey->szKey, szKey) == 0)
-                || (bCanWithOriginalKeyInstead && pBind->bIsReplacingScriptKey && stricmp(pBind->strOriginalScriptKey, szKey) == 0))
+                || (bConsiderDefaultKey && pBind->bIsReplacingScriptKey && stricmp(pBind->strOriginalScriptKey, szKey) == 0))
             {
                 if (pBind->szResource && (strcmp(pBind->szResource, szResource) == 0))
                 {

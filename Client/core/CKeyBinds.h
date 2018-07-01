@@ -63,7 +63,7 @@ public:
     bool CommandExists(const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szArguments = NULL,
                        const char* szResource = NULL, bool bCheckScriptCreated = false, bool bScriptCreated = false);
     bool SetCommandActive(const char* szKey, const char* szCommand, bool bState, const char* szArguments, const char* szResource, bool bActive,
-                          bool checkHitState, bool bCanWithOriginalKeyInstead = false);
+                          bool checkHitState, bool bConsiderDefaultKey = false);
     void SetAllCommandsActive(const char* szResource, bool bActive, const char* szCommand = NULL, bool bState = true, const char* szArguments = NULL,
                               bool checkHitState = false, const char* szOnlyWithDefaultKey = NULL);
     CCommandBind* GetBindFromCommand(const char* szCommand, const char* szArguments = NULL, bool bMatchCase = true, const char* szKey = NULL,
