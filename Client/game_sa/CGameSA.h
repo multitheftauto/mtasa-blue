@@ -509,7 +509,7 @@ private:
     static float*         VAR_OldTimeStep;
     static float*         VAR_TimeStep;
     static unsigned long* VAR_Framelimiter;
-    
+
     std::map<std::string, SCheatSA*> m_Cheats;
 
     SFixedArray<bool, WEAPONTYPE_LAST_WEAPONTYPE> m_JetpackWeapons;
