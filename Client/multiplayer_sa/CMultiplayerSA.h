@@ -135,7 +135,7 @@ public:
     void SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler);
     void SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler);
     void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler);
-    void SetTakePedAStepHandler(TakeAStepHandler* pHandler);
+    void SetPedStepHandler(TakeAStepHandler* pHandler);
 
     void  AllowMouseMovement(bool bAllow);
     void  DoSoundHacksOnLostFocus(bool bLostFocus);

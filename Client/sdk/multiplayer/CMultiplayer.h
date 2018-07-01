@@ -215,7 +215,7 @@ public:
     virtual void SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler) = 0;
     virtual void SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler) = 0;
     virtual void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler) = 0;
-    virtual void SetTakePedAStepHandler(TakeAStepHandler* pHandler) = 0;
+    virtual void SetPedStepHandler(TakeAStepHandler* pHandler) = 0;
 
     virtual void  AllowMouseMovement(bool bAllow) = 0;
     virtual void  DoSoundHacksOnLostFocus(bool bLostFocus) = 0;

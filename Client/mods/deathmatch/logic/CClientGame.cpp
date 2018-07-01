@@ -278,7 +278,7 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->SetGameEntityRenderHandler(CClientGame::StaticGameEntityRenderHandler);
     g_pMultiplayer->SetFxSystemDestructionHandler(CClientGame::StaticFxSystemDestructionHandler);
     g_pMultiplayer->SetDrivebyAnimationHandler(CClientGame::StaticDrivebyAnimationHandler);
-    g_pMultiplayer->SetTakePedAStepHandler(CClientGame::StaticPedTakeAStepHandler);
+    g_pMultiplayer->SetPedStepHandler(CClientGame::StaticPedTakeAStepHandler);
     g_pGame->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pGame->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
     g_pGame->SetTaskSimpleBeHitHandler(CClientGame::StaticTaskSimpleBeHitHandler);
@@ -437,7 +437,7 @@ CClientGame::~CClientGame(void)
     g_pMultiplayer->SetGameModelRemoveHandler(NULL);
     g_pMultiplayer->SetGameEntityRenderHandler(NULL);
     g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
-    g_pMultiplayer->SetTakePedAStepHandler(nullptr);
+    g_pMultiplayer->SetPedStepHandler(nullptr);
     g_pGame->SetPreWeaponFireHandler(NULL);
     g_pGame->SetPostWeaponFireHandler(NULL);
     g_pGame->SetTaskSimpleBeHitHandler(NULL);

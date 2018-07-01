@@ -2227,7 +2227,7 @@ void CMultiplayerSA::SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandle
     m_pDrivebyAnimationHandler = pHandler;
 }
 
-void CMultiplayerSA::SetTakePedAStepHandler(TakeAStepHandler* pHandler)
+void CMultiplayerSA::SetPedStepHandler(TakeAStepHandler* pHandler)
 {
     m_pTakeAStepHandler = pHandler;
 }
