@@ -71,7 +71,7 @@ extern DeathHandler*          m_pDeathHandler;
 extern FireHandler*           m_pFireHandler;
 extern ProjectileHandler*     m_pProjectileHandler;
 extern ProjectileStopHandler* m_pProjectileStopHandler;
-extern TakeAStepHandler*      m_pTakeAStepHandler;
+extern PedStepHandler*      m_pPedStepHandler;
 
 char szDebug[255] = {'\0'};
 
@@ -86,7 +86,7 @@ CPools* m_pools = 0;
 void InitFireInstantHit_MidHooks(void);
 void InitFireSniper_MidHooks(void);
 
-static void HOOK_PedTakeStep(void);
+static void HOOK_PedStep(void);
 
 VOID InitShotsyncHooks()
 {
@@ -110,7 +110,7 @@ VOID InitShotsyncHooks()
     HookInstall(HOOKPOS_CWeapon_FireInstantHit_CameraMode, (DWORD)HOOK_CWeapon_FireInstantHit_CameraMode, 6);
     HookInstall(HOOKPOS_CWeapon_FireInstantHit_IsPlayer, (DWORD)HOOK_CWeapon_FireInstantHit_IsPlayer, 7);
     HookInstall(HOOKPOS_CWeapon_DoBulletImpact, (DWORD)HOOK_CWeapon_DoBulletImpact, 7);
-    HookInstall(HOOKPOS_CPed_DoFootLanded, (DWORD)HOOK_PedTakeStep, 6);
+    HookInstall(HOOKPOS_CPed_DoFootLanded, (DWORD)HOOK_PedStep, 6);
 
     InitFireInstantHit_MidHooks();
     InitFireSniper_MidHooks();
@@ -122,13 +122,12 @@ VOID InitShotsyncHooks()
     m_pools = pGameInterface->GetPools();
 }
 
-void __cdecl HOOK_ONPedTakeStep(CPedSAInterface* pPedSAInterface, short footId, char unknown1)
+void __cdecl HOOK_ONPedStep(CPedSAInterface* pPedSAInterface, short footId, char unknown1)
 {
-    m_pTakeAStepHandler(pPedSAInterface, footId == LANDED_PED_LEFT_FOOT ? true : false);
+    m_pPedStepHandler(pPedSAInterface, footId == LANDED_PED_LEFT_FOOT ? true : false);
 }
 
-
-void _declspec(naked) HOOK_PedTakeStep()
+void _declspec(naked) HOOK_PedStep()
 {
     _asm
     {
@@ -136,7 +135,7 @@ void _declspec(naked) HOOK_PedTakeStep()
         push    [esp + 32 + 4]
         push    [esp + 32 + 8]
         push    ecx
-        call    HOOK_ONPedTakeStep
+        call    HOOK_ONPedStep
         add     esp, 12
         popad
 

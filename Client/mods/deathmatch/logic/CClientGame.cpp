@@ -278,7 +278,7 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->SetGameEntityRenderHandler(CClientGame::StaticGameEntityRenderHandler);
     g_pMultiplayer->SetFxSystemDestructionHandler(CClientGame::StaticFxSystemDestructionHandler);
     g_pMultiplayer->SetDrivebyAnimationHandler(CClientGame::StaticDrivebyAnimationHandler);
-    g_pMultiplayer->SetPedStepHandler(CClientGame::StaticPedTakeAStepHandler);
+    g_pMultiplayer->SetPedStepHandler(CClientGame::StaticPedStepHandler);
     g_pGame->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pGame->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
     g_pGame->SetTaskSimpleBeHitHandler(CClientGame::StaticTaskSimpleBeHitHandler);
@@ -3802,9 +3802,9 @@ AnimationId CClientGame::StaticDrivebyAnimationHandler(AnimationId animGroup, As
     return g_pClientGame->DrivebyAnimationHandler(animGroup, animId);
 }
 
-void CClientGame::StaticPedTakeAStepHandler(CPedSAInterface* pPed, bool bFoot)
+void CClientGame::StaticPedStepHandler(CPedSAInterface* pPed, bool bFoot)
 {
-    return g_pClientGame->PedTakeAStepHandler(pPed, bFoot);
+    return g_pClientGame->PedStepHandler(pPed, bFoot);
 }
 
 void CClientGame::DrawRadarAreasHandler(void)
@@ -6879,7 +6879,7 @@ void CClientGame::RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInter
     m_mapOfCustomAnimationAssociations.erase(pAnimAssociation);
 }
 
-void CClientGame::PedTakeAStepHandler(CPedSAInterface* pPedSA, bool bFoot)
+void CClientGame::PedStepHandler(CPedSAInterface* pPedSA, bool bFoot)
 {    
     CLuaArguments Arguments;
     CClientPed* pClientPed = DynamicCast<CClientPed>(GetGameEntityXRefManager()->FindClientEntity((CEntitySAInterface*)pPedSA));

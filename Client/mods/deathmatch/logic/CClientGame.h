@@ -527,7 +527,7 @@ private:
     static void StaticGameEntityRenderHandler(CEntitySAInterface* pEntity);
     static void StaticTaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     static void StaticFxSystemDestructionHandler(void* pFxSAInterface);
-    static void StaticPedTakeAStepHandler(CPedSAInterface* pPed, bool bFoot);
+    static void StaticPedStepHandler(CPedSAInterface* pPed, bool bFoot);
     static AnimationId StaticDrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
 
     bool                              DamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
@@ -615,7 +615,7 @@ public:
 
     void InsertAnimationAssociationToMap(CAnimBlendAssociationSAInterface* pAnimAssociation, const std::shared_ptr<CIFPAnimations>& pIFPAnimations);
     void RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation);
-    void PedTakeAStepHandler(CPedSAInterface* pPed, bool bFoot);
+    void PedStepHandler(CPedSAInterface* pPed, bool bFoot);
 private:
     eStatus       m_Status;
     eServerType   m_ServerType;
