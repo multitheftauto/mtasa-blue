@@ -38,7 +38,6 @@ public:
     LUA_DECLARE(IsElementWithinColShape);
     LUA_DECLARE(IsElementWithinMarker);
     LUA_DECLARE(GetElementsWithinColShape);
-    LUA_DECLARE(GetColShapeType);
     LUA_DECLARE(GetElementDimension);
     LUA_DECLARE(GetElementZoneName);
     LUA_DECLARE(GetElementBoundingBox);
