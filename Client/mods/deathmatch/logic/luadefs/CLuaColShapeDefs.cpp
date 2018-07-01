@@ -345,7 +345,7 @@ int CLuaColShapeDefs::IsInsideColShape(lua_State* luaVM)
 {
     //  bool isInsideColShape ( colshape theColShape, float posX, float posY, float posZ )
     CClientColShape* pColShape;
-    CVector         vecPosition;
+    CVector          vecPosition;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pColShape);
