@@ -13,8 +13,6 @@
 
 void CLuaColShapeDefs::LoadFunctions()
 {
-    // Shape create funcs
-
     CLuaCFunctions::AddFunction("createColCircle", CreateColCircle);
     CLuaCFunctions::AddFunction("createColCuboid", CreateColCuboid);
     CLuaCFunctions::AddFunction("createColSphere", CreateColSphere);
@@ -34,6 +32,7 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "Sphere", "createColSphere");
     lua_classfunction(luaVM, "Tube", "createColTube");
     lua_classfunction(luaVM, "Polygon", "createColPolygon");
+
     lua_classfunction(luaVM, "getElementsWithin", "getElementsWithinColShape");
     lua_classfunction(luaVM, "getShapeType", "getColShapeType");
 

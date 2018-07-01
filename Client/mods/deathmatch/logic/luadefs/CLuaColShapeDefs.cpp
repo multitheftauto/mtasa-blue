@@ -34,10 +34,9 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "Polygon", "createColPolygon");
 
     lua_classfunction(luaVM, "getElementsWithin", "getElementsWithinColShape");
-    lua_classvariable(luaVM, "elementsWithin", NULL, "getElementsWithinColShape");
+    lua_classfunction(luaVM, "getShapeType", "getColShapeType");
 
-    lua_classvariable(luaVM, "elementsWithin", NULL, "getElementsWithinColShape");
-    lua_classvariable(luaVM, "shapeType", NULL, "getColShapeType");
+    lua_classvariable(luaVM, "shapeType", nullptr, "getColShapeType");
 
     lua_registerclass(luaVM, "ColShape", "Element");
 }
