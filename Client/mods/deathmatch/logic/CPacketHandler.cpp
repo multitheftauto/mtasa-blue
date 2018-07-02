@@ -69,8 +69,16 @@ bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfa
             Packet_ChatEcho(bitStream);
             return true;
 
+        case PACKET_ID_CHAT_CLEAR:
+            Packet_ChatClear(bitStream);
+            return true;
+
         case PACKET_ID_CONSOLE_ECHO:
             Packet_ConsoleEcho(bitStream);
+            return true;
+
+        case PACKET_ID_CONSOLE_CLEAR:
+            Packet_ConsoleClear(bitStream);
             return true;
 
         case PACKET_ID_DEBUG_ECHO:
@@ -1333,6 +1341,11 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
     }
 }
 
+void CPacketHandler::Packet_ChatClear(NetBitStreamInterface& bitStream)
+{
+    CStaticFunctionDefinitions::ClearChatBox();
+}
+
 void CPacketHandler::Packet_ConsoleEcho(NetBitStreamInterface& bitStream)
 {
     // unsigned char    (x)     - message
@@ -1352,6 +1365,11 @@ void CPacketHandler::Packet_ConsoleEcho(NetBitStreamInterface& bitStream)
         // Echo it
         g_pCore->GetConsole()->Echo(szMessage);
     }
+}
+
+void CPacketHandler::Packet_ConsoleClear(NetBitStreamInterface& bitStream)
+{
+    CStaticFunctionDefinitions::ClearConsole();
 }
 
 void CPacketHandler::Packet_DebugEcho(NetBitStreamInterface& bitStream)

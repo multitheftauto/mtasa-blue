@@ -539,6 +539,8 @@ public:
                               CLuaMain* pLuaMain);
     static bool OutputConsole(const char* szText, CElement* pElement);
     static bool SetServerPassword(const SString& strPassword, bool bSave);
+    static bool ClearChatBox(CElement* pElement);
+    static bool ClearConsole(CElement* pElement);
 
     // General world get funcs
     static bool GetTime(unsigned char& ucHour, unsigned char& ucMinute);

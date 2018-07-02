@@ -48,3 +48,16 @@ private:
     SString       m_strMessage;
     bool          m_bColorCoded;
 };
+
+class CChatClear : public CPacket
+{
+public:
+    CChatClear() {};
+
+    // Chat uses low priority channel to avoid getting queued behind large map downloads #6877
+    ePacketID               GetPacketID(void) const { return PACKET_ID_CHAT_CLEAR; };
+    unsigned long           GetFlags(void) const { return PACKET_LOW_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    virtual ePacketOrdering GetPacketOrdering(void) const { return PACKET_ORDERING_CHAT; }
+
+    bool Write(NetBitStreamInterface& BitStream) const { return true; };
+};

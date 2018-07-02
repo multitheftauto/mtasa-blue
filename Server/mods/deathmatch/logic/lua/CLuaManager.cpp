@@ -232,6 +232,8 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("setServerPassword", CLuaFunctionDefs::SetServerPassword);
     CLuaCFunctions::AddFunction("getServerConfigSetting", CLuaFunctionDefs::GetServerConfigSetting);
     CLuaCFunctions::AddFunction("setServerConfigSetting", CLuaFunctionDefs::SetServerConfigSetting, true);
+    CLuaCFunctions::AddFunction("clearChatBox", CLuaFunctionDefs::ClearChatBox);
+    CLuaCFunctions::AddFunction("clearConsole", CLuaFunctionDefs::ClearConsole);
 
     CLuaCFunctions::AddFunction("shutdown", CLuaFunctionDefs::shutdown, true);
 
