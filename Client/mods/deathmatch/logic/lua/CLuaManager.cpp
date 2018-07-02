@@ -423,5 +423,4 @@ void CLuaManager::LoadCFunctions(void)
     CLuaWaterDefs::LoadFunctions();
     CLuaWeaponDefs::LoadFunctions();
     CLuaXMLDefs::LoadFunctions();
-    CLuaPathFindDefs::LoadFunctions();
 }
