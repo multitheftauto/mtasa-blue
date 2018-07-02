@@ -486,6 +486,27 @@ bool CCore::IsChatVisible(void)
     return false;
 }
 
+bool CCore::ClearConsole(void)
+{
+    if (m_pLocalGUI)
+    {
+        m_pLocalGUI->GetConsole()->Clear();
+        return true;
+    }
+    return false;
+}
+
+bool CCore::ClearChat(void)
+{
+    if (m_pLocalGUI)
+    {
+        CChat* pChat = m_pLocalGUI->GetChat();
+        pChat->Clear();
+        return true;
+    }
+    return false;
+}
+
 void CCore::TakeScreenShot(void)
 {
     bScreenShot = true;

@@ -114,7 +114,7 @@ public:
     void DebugEchoColor(const char* szText, unsigned char R, unsigned char G, unsigned char B);
     void DebugPrintfColor(const char* szFormat, unsigned char R, unsigned char G, unsigned char B, ...);
     void DebugClear(void);
-
+    
     // Chat
     void ChatEcho(const char* szText, bool bColorCoded = false);
     void ChatEchoColor(const char* szText, unsigned char R, unsigned char G, unsigned char B, bool bColorCoded = false);
@@ -124,6 +124,8 @@ public:
     bool IsChatVisible(void);
     void EnableChatInput(char* szCommand, DWORD dwColor);
     bool IsChatInputEnabled(void);
+    bool ClearChat(void);
+    bool ClearConsole(void);
 
     // Screenshots
     void TakeScreenShot(void);
