@@ -83,6 +83,7 @@
 #define PROP_RANDOM_FOLIAGE         "randomfoliage"
 #define PROP_SNIPER_MOON            "snipermoon"
 #define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
+#define PROP_UNDERWORLD_WARP        "underworldwarp"
 
 struct SCheatSA
 {
@@ -399,6 +400,9 @@ public:
     bool IsExtraAirResistanceEnabled();
     void SetExtraAirResistanceEnabled(bool bEnable);
 
+    bool IsUnderWorldWarpEnabled();
+    void SetUnderWorldWarpEnabled(bool bEnable);
+
     bool VerifySADataFileNames();
     bool PerformChecks();
     int& GetCheckStatus(void) { return m_iCheckStatus; }
@@ -489,6 +493,7 @@ private:
     bool         m_bAsyncScriptForced;
     bool         m_bASyncLoadingSuspended;
     int          m_iCheckStatus;
+    bool         m_bUnderworldWarp;
 
     static unsigned long* VAR_SystemTime;
     static unsigned long* VAR_IsAtMenu;
