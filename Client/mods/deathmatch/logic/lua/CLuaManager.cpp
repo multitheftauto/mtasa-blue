@@ -11,7 +11,6 @@
 
 #include "StdInc.h"
 #include "../luadefs/CLuaFireDefs.h"
-#include "../luadefs/CLuaPathFindDefs.h"
 
 using std::list;
 
