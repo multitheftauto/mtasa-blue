@@ -9839,12 +9839,12 @@ bool CStaticFunctionDefinitions::ClearChatBox(CElement* pElement)
 
     RUN_CHILDREN(ClearChatBox(*iter))
 
-        if (IS_PLAYER(pElement))
-        {
-            CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
-            pPlayer->Send(CChatClear());
-            return true;
-        }
+    if (IS_PLAYER(pElement))
+    {
+        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
+        pPlayer->Send(CChatClear());
+        return true;
+    }
     return false;
 }
 
@@ -9870,12 +9870,12 @@ bool CStaticFunctionDefinitions::ClearConsole(CElement* pElement)
 
     RUN_CHILDREN(ClearConsole(*iter))
 
-        if (IS_PLAYER(pElement))
-        {
-            CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
-            pPlayer->Send(CConsoleClear());
-            return true;
-        }
+    if (IS_PLAYER(pElement))
+    {
+        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
+        pPlayer->Send(CConsoleClear());
+        return true;
+    }
     return false;
 }
 

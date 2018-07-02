@@ -37,7 +37,7 @@ class CConsoleClear : public CPacket
 public:
     CConsoleClear() {};
 
-    // Chat uses low priority channel to avoid getting queued behind large map downloads #6877
+    // Console uses low priority channel to avoid getting queued behind large map downloads #6877
     ePacketID               GetPacketID(void) const { return PACKET_ID_CONSOLE_CLEAR; };
     unsigned long           GetFlags(void) const { return PACKET_LOW_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
     virtual ePacketOrdering GetPacketOrdering(void) const { return PACKET_ORDERING_CHAT; }
