@@ -490,8 +490,12 @@ bool CCore::ClearConsole(void)
 {
     if (m_pLocalGUI)
     {
-        m_pLocalGUI->GetConsole()->Clear();
-        return true;
+        CConsole* pConsole = m_pLocalGUI->GetConsole();
+        if (pConsole)
+        {
+            pConsole->Clear();
+            return true;
+        }
     }
     return false;
 }
@@ -501,8 +505,11 @@ bool CCore::ClearChat(void)
     if (m_pLocalGUI)
     {
         CChat* pChat = m_pLocalGUI->GetChat();
-        pChat->Clear();
-        return true;
+        if (pChat)
+        {
+            pChat->Clear();
+            return true;
+        }
     }
     return false;
 }
