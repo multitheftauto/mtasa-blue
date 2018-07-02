@@ -2826,14 +2826,12 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientDebugMessage", "message, level, file, line", NULL, false);
 
     // Game events
-
     m_Events.AddEvent("onClientPreRender", "", NULL, false);
     m_Events.AddEvent("onClientHUDRender", "", NULL, false);
     m_Events.AddEvent("onClientRender", "", NULL, false);
     m_Events.AddEvent("onClientMinimize", "", NULL, false);
     m_Events.AddEvent("onClientRestore", "", NULL, false);
-    m_Events.AddEvent("onClientFocus", "", NULL, false);
-    m_Events.AddEvent("onClientLostFocus", "", NULL, false);
+    m_Events.AddEvent("onClientMTAFocusChange", "", NULL, false);
 
     // Cursor events
     m_Events.AddEvent("onClientClick", "button, state, screenX, screenY, worldX, worldY, worldZ, gui_clicked", NULL, false);
@@ -3930,7 +3928,8 @@ void CClientGame::IdleHandler(void)
         {
             m_bWasFocused = true;
             CLuaArguments Arguments;
-            m_pRootEntity->CallEvent("onClientMTAFocus", Arguments, false);
+            Arguments.PushBoolean(true);
+            m_pRootEntity->CallEvent("onClientMTAFocusChange", Arguments, false);
         }
     }
     else
@@ -3939,7 +3938,8 @@ void CClientGame::IdleHandler(void)
         {
             m_bWasFocused = false;
             CLuaArguments Arguments;
-            m_pRootEntity->CallEvent("onClientMTALostFocus", Arguments, false);
+            Arguments.PushBoolean(false);
+            m_pRootEntity->CallEvent("onClientMTAFocusChange", Arguments, false);
         }
     }
 

@@ -191,7 +191,7 @@ public:
     pfnProcessMessage GetClientMessageProcessor(void) { return m_pfnMessageProcessor; }
     void              ChangeResolution(long width, long height, long depth);
 
-    bool IsFocused(void) { return (GetForegroundWindow() == GetHookedWindow()); };
+    bool IsFocused(void) { return GetForegroundWindow() == GetHookedWindow(); };
     bool IsWindowMinimized(void);
     void UpdateIsWindowMinimized(void);
 
