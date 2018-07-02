@@ -258,6 +258,8 @@ public:
 
     bool IsTransferBoxVisible(void) { return m_bTransferBoxVisible; };
     void SetTransferBoxVisible(bool bVisible) { m_bTransferBoxVisible = bVisible; };
+    void SetTransferBoxEnabled(bool bEnabled) { m_bTransferBoxEnabled = bEnabled; };
+    bool IsTransferBoxEnabled(void) { return m_bTransferBoxEnabled; };
 
     bool Event_CharacterKey(const CEGUI::EventArgs& e);
     bool Event_KeyDown(const CEGUI::EventArgs& e);
@@ -351,6 +353,7 @@ private:
     std::list<SString> m_GuiWorkingDirectoryStack;
 
     bool m_bTransferBoxVisible;
+    bool m_bTransferBoxEnabled = true;
 
     bool         m_HasSchemeLoaded;
     SString      m_CurrentSchemeName;

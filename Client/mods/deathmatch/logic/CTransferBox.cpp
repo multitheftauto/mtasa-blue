@@ -98,9 +98,7 @@ CTransferBox::~CTransferBox(void)
 void CTransferBox::Show(void)
 {
     m_dTotalSize = 0;
-    CLuaArguments Arguments;
-    Arguments.PushString("show");
-    if (g_pClientGame->GetLocalPlayer()->CallEvent("onTransferBoxProgressChange", Arguments, false) )
+    if (IsEnabled())
     {
         m_pWindow->SetVisible(true);
         g_pCore->GetGUI()->SetTransferBoxVisible(true);
@@ -111,9 +109,6 @@ void CTransferBox::Hide(void)
 {
     m_pWindow->SetVisible(false);
     g_pCore->GetGUI()->SetTransferBoxVisible(false);
-    CLuaArguments Arguments;
-    Arguments.PushString("hide");
-    g_pClientGame->GetLocalPlayer()->CallEvent("onTransferBoxProgressChange", Arguments, false);
     m_dTotalSize = 0;
 }
 

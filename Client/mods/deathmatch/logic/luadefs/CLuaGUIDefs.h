@@ -29,6 +29,8 @@ public:
     LUA_DECLARE(GUIIsMainMenuActive);
     LUA_DECLARE(GUIIsMTAWindowActive);
     LUA_DECLARE(GUIIsTransferBoxActive);
+    LUA_DECLARE(GUIIsTransferBoxEnabled);
+    LUA_DECLARE(GUISetTransferBoxEnabled);
     LUA_DECLARE(GUICreateWindow);
     LUA_DECLARE(GUICreateLabel);
     LUA_DECLARE(GUICreateButton);

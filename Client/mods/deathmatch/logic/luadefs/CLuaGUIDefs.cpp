@@ -24,7 +24,10 @@ void CLuaGUIDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("setDebugViewActive", GUISetDebugViewActive);
     CLuaCFunctions::AddFunction("isMainMenuActive", GUIIsMainMenuActive);
     CLuaCFunctions::AddFunction("isMTAWindowActive", GUIIsMTAWindowActive);
+
     CLuaCFunctions::AddFunction("isTransferBoxActive", GUIIsTransferBoxActive);
+    CLuaCFunctions::AddFunction("isTransferBoxEnabled", GUIIsTransferBoxEnabled);
+    CLuaCFunctions::AddFunction("setTransferBoxEnabled", GUISetTransferBoxEnabled);
 
     CLuaCFunctions::AddFunction("guiCreateWindow", GUICreateWindow);
     CLuaCFunctions::AddFunction("guiCreateLabel", GUICreateLabel);
@@ -635,6 +638,30 @@ int CLuaGUIDefs::GUIIsMTAWindowActive(lua_State* luaVM)
 int CLuaGUIDefs::GUIIsTransferBoxActive(lua_State* luaVM)
 {
     lua_pushboolean(luaVM, g_pClientGame->GetTransferBox()->IsVisible());
+    return 1;
+}
+
+int CLuaGUIDefs::GUISetTransferBoxEnabled(lua_State* luaVM)
+{
+    bool bEnabled;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadBool(bEnabled);
+
+    if (!argStream.HasErrors())
+    {
+        g_pClientGame->GetTransferBox()->SetEnabled(bEnabled);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    return 1;
+}
+
+int CLuaGUIDefs::GUIIsTransferBoxEnabled(lua_State* luaVM)
+{
+    lua_pushboolean(luaVM, g_pClientGame->GetTransferBox()->IsEnabled());
     return 1;
 }
 

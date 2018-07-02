@@ -141,7 +141,6 @@ void CResourceFileDownloadManager::DoPulse(void)
     GetTransferBox()->DoPulse();
 
     CLuaArguments Arguments;
-    Arguments.PushString( "progress" );
     Arguments.PushNumber( uiDownloadSizeTotal );
     Arguments.PushNumber( GetTransferBox()->GetTotalSize() );
     g_pClientGame->GetLocalPlayer()->CallEvent( "onTransferBoxProgressChange", Arguments, false );
@@ -229,6 +228,7 @@ bool CResourceFileDownloadManager::BeginResourceFileDownload(CDownloadableResour
 
     SString* pstrContext = MakeDownloadContextString(pResourceFile);
     SString  strFilename = pResourceFile->GetName();
+
     bool     bUniqueDownload = pHTTP->QueueFile(strHTTPDownloadURLFull, strFilename, NULL, 0, false, pstrContext, StaticDownloadFinished,
                                             g_pClientGame->IsLocalGame(), serverInfo.uiConnectionAttempts, serverInfo.uiConnectTimeoutMs, true);
     if (!bUniqueDownload)

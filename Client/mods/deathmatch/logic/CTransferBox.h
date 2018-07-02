@@ -41,9 +41,12 @@ public:
     bool OnCancelClick(CGUIElement* pElement);
 
     bool IsVisible(void) { return m_pWindow->IsVisible(); };
+    bool IsEnabled(void) { return m_bEnabled; };
+    void SetEnabled(bool bEnabled) { m_bEnabled = bEnabled; };
 
     void AddToTotalSize(double dSize) { m_dTotalSize += dSize; };
 
+    double GetTotalSize(void) { return m_dTotalSize; };
 private:
     CGUIWindow*                                       m_pWindow;
     SFixedArray<CGUIStaticImage*, TRANSFERBOX_FRAMES> m_pIcon;
@@ -51,6 +54,7 @@ private:
     CGUIProgressBar*                                  m_pProgress;
 
     bool m_bMultipleDownloads;
+    bool m_bEnabled;
 
     unsigned int m_uiVisible;
     CElapsedTime m_AnimTimer;
