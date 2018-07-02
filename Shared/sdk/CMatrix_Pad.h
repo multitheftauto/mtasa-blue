@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/CMatrix_Pad.h
-*  PURPOSE:     4x3 GTA padded matrix
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/CMatrix_Pad.h
+ *  PURPOSE:     4x3 GTA padded matrix
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CMATRIX_PAD_H
 #define __CMATRIX_PAD_H
@@ -21,26 +21,20 @@
 class CMatrix_Padded
 {
 public:
-    CVector vRight; // 0            RIGHT
-    DWORD    dwPadRoll; // 12
-    CVector vFront; // 16   FOREWARDS
-    DWORD    dwPadDirection; // 28
-    CVector vUp; // 32          UP
-    DWORD    dwPadWas; // 44    
-    CVector vPos;  // 48        TRANSLATE
-    DWORD    dwPadPos; // 60
+    CVector vRight;                    // 0            RIGHT
+    DWORD   dwPadRoll;                 // 12
+    CVector vFront;                    // 16   FOREWARDS
+    DWORD   dwPadDirection;            // 28
+    CVector vUp;                       // 32          UP
+    DWORD   dwPadWas;                  // 44
+    CVector vPos;                      // 48        TRANSLATE
+    DWORD   dwPadPos;                  // 60
 
-    CMatrix_Padded()
-    {
-        memset ( this, 0, sizeof ( CMatrix_Padded ) );
-    }
+    CMatrix_Padded() { memset(this, 0, sizeof(CMatrix_Padded)); }
 
-    CMatrix_Padded ( const CMatrix& Matrix )
-    {
-        SetFromMatrix ( Matrix );
-    }
+    CMatrix_Padded(const CMatrix& Matrix) { SetFromMatrix(Matrix); }
 
-    void ConvertToMatrix ( CMatrix& Matrix ) const
+    void ConvertToMatrix(CMatrix& Matrix) const
     {
         Matrix.vPos = vPos;
         Matrix.vFront = vFront;
@@ -48,7 +42,7 @@ public:
         Matrix.vRight = vRight;
     }
 
-    void SetFromMatrix ( const CMatrix& Matrix )
+    void SetFromMatrix(const CMatrix& Matrix)
     {
         vPos = Matrix.vPos;
         dwPadPos = 0;
@@ -63,14 +57,13 @@ public:
         dwPadRoll = 0;
     }
 
-    void SetFromMatrixSkipPadding ( const CMatrix& Matrix )
+    void SetFromMatrixSkipPadding(const CMatrix& Matrix)
     {
         vPos = Matrix.vPos;
         vFront = Matrix.vFront;
         vUp = Matrix.vUp;
         vRight = Matrix.vRight;
     }
-
 };
 
 #endif

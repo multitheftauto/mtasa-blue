@@ -1,19 +1,17 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CVehicleUpgrades.h
-*  PURPOSE:     GTA vehicle upgrade definitions class
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CVehicleUpgrades.h
+ *  PURPOSE:     GTA vehicle upgrade definitions class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 class CVehicleUpgrades;
 
-#ifndef __CVEHICLEUPGRADES_H
-#define __CVEHICLEUPGRADES_H
+#pragma once
 
 #define VEHICLE_UPGRADE_SLOTS 17
 
@@ -27,31 +25,28 @@ enum eVehicleUpgrade
     VEHICLEUPGRADE_HYDRAULICS = 1087,
 };
 
-
-typedef SFixedArray < unsigned short, VEHICLE_UPGRADE_SLOTS > SSlotStates;
+typedef SFixedArray<unsigned short, VEHICLE_UPGRADE_SLOTS> SSlotStates;
 
 class CVehicleUpgrades
 {
 public:
-                            CVehicleUpgrades            ( CVehicle* pVehicle );
-                            CVehicleUpgrades            ( CVehicle* pVehicle, CVehicleUpgrades* pUpgrades );
+    CVehicleUpgrades(CVehicle* pVehicle);
+    CVehicleUpgrades(CVehicle* pVehicle, CVehicleUpgrades* pUpgrades);
 
-    bool                    IsUpgradeCompatible         ( unsigned short usUpgrade );
-    static bool             GetSlotFromUpgrade          ( unsigned short usUpgrade, unsigned char& ucSlot );
-    void                    SetSlotState                ( unsigned char ucSlot, unsigned short usUpgrade );
-    unsigned short          GetSlotState                ( unsigned char ucSlot );
-    bool                    AddUpgrade                  ( unsigned short usUpgrade );
-    void                    AddAllUpgrades              ( void );
-    bool                    HasUpgrade                  ( unsigned short usUpgrade );
-    const SSlotStates&      GetSlotStates               ( void )        { return m_SlotStates; }
-    unsigned char           Count                       ( void );
-    
-    static const char*      GetSlotName                 ( unsigned char ucSlot );
-    static bool             IsValidUpgrade              ( unsigned short usUpgrade );
+    bool               IsUpgradeCompatible(unsigned short usUpgrade);
+    static bool        GetSlotFromUpgrade(unsigned short usUpgrade, unsigned char& ucSlot);
+    void               SetSlotState(unsigned char ucSlot, unsigned short usUpgrade);
+    unsigned short     GetSlotState(unsigned char ucSlot);
+    bool               AddUpgrade(unsigned short usUpgrade);
+    void               AddAllUpgrades(void);
+    bool               HasUpgrade(unsigned short usUpgrade);
+    const SSlotStates& GetSlotStates(void) { return m_SlotStates; }
+    unsigned char      Count(void);
+
+    static const char* GetSlotName(unsigned char ucSlot);
+    static bool        IsValidUpgrade(unsigned short usUpgrade);
 
 protected:
-    SSlotStates             m_SlotStates;
-    CVehicle*               m_pVehicle;
+    SSlotStates m_SlotStates;
+    CVehicle*   m_pVehicle;
 };
-
-#endif

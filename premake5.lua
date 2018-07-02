@@ -88,10 +88,10 @@ workspace "MTASA"
 		flags { "StaticRuntime" }
 		defines { "WIN32", "_WIN32" }
 		includedirs { 
-			dxdir.."Include"
+			path.join(dxdir, "Include")
 		}
 		libdirs {
-			dxdir.."Lib/x86"
+			path.join(dxdir, "Lib/x86")
 		}
 	
 	filter {"system:windows", "configurations:Debug"}
@@ -138,7 +138,8 @@ workspace "MTASA"
 		include "Server/dbconmy"
 		include "Server/launcher"
 		include "Server/mods/deathmatch"
-		
+		include "Server/sdk"
+
 		group "Shared"
 		include "Shared"
 		include "Shared/XML"

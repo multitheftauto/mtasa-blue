@@ -1,59 +1,30 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CRenderItem.EffectCloner.h
-*  PURPOSE:
-*
-*****************************************************************************/
-
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CRenderItem.EffectCloner.h
+ *  PURPOSE:
+ *
+ *****************************************************************************/
 
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 //
 // CEffectCloner
 //
-// Maintain a list of active CEffectTemplate objects and clones d3d effects from them when needed
+// Maintain a list of active CEffectTemplate objects and clone d3d effects from them when needed
 //
 class CEffectCloner
 {
 public:
-    virtual                 ~CEffectCloner      ( void ) {}
-    virtual void            DoPulse             ( void ) = 0;
-    virtual ID3DXEffect**   CreateD3DEffect     ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer, bool bDebug ) = 0;
-    virtual void            ReleaseD3DEffect    ( ID3DXEffect** pD3DEffect ) = 0;
+    CEffectCloner(CRenderItemManager* pManager);
+    void         DoPulse(void);
+    CEffectWrap* CreateD3DEffect(const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug);
+    void         ReleaseD3DEffect(CEffectWrap* pD3DEffect);
+    void         MaybeTidyUp(bool bForceDrasticMeasures = false);
+
+    CElapsedTime                        m_TidyupTimer;
+    CRenderItemManager*                 m_pManager;
+    std::map<SString, CEffectTemplate*> m_ValidMap;            // Active and files not changed since first created
+    std::vector<CEffectTemplate*>       m_OldList;             // Active but files changed since first created
 };
-
-CEffectCloner* NewEffectCloner ( CRenderItemManager* pManager );
-
-
-
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-//
-// CEffectTemplate
-//
-// A compiled effect with which to clone d3d effects from
-//
-class CEffectTemplate : public CRenderItem
-{
-    DECLARE_CLASS( CEffectTemplate, CRenderItem )
-                    CEffectTemplate                 ( void ) : ClassInit ( this ) {}
-
-    virtual bool            HaveFilesChanged        ( void ) = 0;
-    virtual int             GetTicksSinceLastUsed   ( void ) = 0;
-    virtual ID3DXEffect*    CloneD3DEffect          ( SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer, HRESULT& outHResult ) = 0;
-    virtual void            UnCloneD3DEffect        ( ID3DXEffect* pD3DEffect ) = 0;
-
-    // Debugging #9085 - CloneEffect fail
-    struct SDebugInfo
-    {
-        HRESULT     cloneResult;
-        uint        uiCloneSuccessCount;
-        uint        uiCloneFailCount;
-        CTickCount  createTime;
-    };
-    virtual const SDebugInfo& GetDebugInfo          ( void ) = 0;
-};
-
-CEffectTemplate* NewEffectTemplate ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug, HRESULT& outHResult );

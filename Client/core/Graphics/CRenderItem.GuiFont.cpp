@@ -1,15 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CRenderItem.GuiFont.cpp
-*  PURPOSE:
-*  DEVELOPERS:  xidiot
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CRenderItem.GuiFont.cpp
+ *  PURPOSE:
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -18,14 +16,13 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-void CGuiFontItem::PostConstruct ( CRenderItemManager* pManager, const SString& strFullFilePath, const SString& strFontName, uint uiSize )
+void CGuiFontItem::PostConstruct(CRenderItemManager* pManager, const SString& strFullFilePath, const SString& strFontName, uint uiSize)
 {
-    Super::PostConstruct ( pManager );
+    Super::PostConstruct(pManager);
 
     // Initial creation of cegui data
-    CreateUnderlyingData ( strFullFilePath, strFontName, uiSize );
+    CreateUnderlyingData(strFullFilePath, strFontName, uiSize);
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -34,12 +31,11 @@ void CGuiFontItem::PostConstruct ( CRenderItemManager* pManager, const SString& 
 //
 //
 ////////////////////////////////////////////////////////////////
-void CGuiFontItem::PreDestruct ( void )
+void CGuiFontItem::PreDestruct(void)
 {
-    ReleaseUnderlyingData ();
-    Super::PreDestruct ();
+    ReleaseUnderlyingData();
+    Super::PreDestruct();
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -48,11 +44,10 @@ void CGuiFontItem::PreDestruct ( void )
 // Check underlying data is present
 //
 ////////////////////////////////////////////////////////////////
-bool CGuiFontItem::IsValid ( void )
+bool CGuiFontItem::IsValid(void)
 {
     return m_pFntCEGUI != NULL;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -61,11 +56,10 @@ bool CGuiFontItem::IsValid ( void )
 // Release device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CGuiFontItem::OnLostDevice ( void )
+void CGuiFontItem::OnLostDevice(void)
 {
     // Nothing required for CGuiFontItem
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -74,11 +68,10 @@ void CGuiFontItem::OnLostDevice ( void )
 // Recreate device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CGuiFontItem::OnResetDevice ( void )
+void CGuiFontItem::OnResetDevice(void)
 {
     // Nothing required for CGuiFontItem
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -87,22 +80,22 @@ void CGuiFontItem::OnResetDevice ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-void CGuiFontItem::CreateUnderlyingData ( const SString& strFullFilePath, const SString& strFontName, uint uiSize )
+void CGuiFontItem::CreateUnderlyingData(const SString& strFullFilePath, const SString& strFontName, uint uiSize)
 {
-    assert ( !m_pFntCEGUI );
+    assert(!m_pFntCEGUI);
 
-    uiSize = ( uiSize < 5 ) ? 5 : ( ( uiSize > 150 ) ? 150 : uiSize );
+    uiSize = (uiSize < 5) ? 5 : ((uiSize > 150) ? 150 : uiSize);
 
     // Find unused font name
     int iCounter = 0;
     do
-        m_strCEGUIFontName = SString ( "%s*%d*%d", *strFontName, uiSize, iCounter++ );
-    while ( CCore::GetSingleton ().GetGUI ()->IsFontPresent ( m_strCEGUIFontName ) );
+        m_strCEGUIFontName = SString("%s*%d*%d", *strFontName, uiSize, iCounter++);
+    while (CCore::GetSingleton().GetGUI()->IsFontPresent(m_strCEGUIFontName));
 
     // Create the CEGUI font
     try
     {
-        m_pFntCEGUI = CCore::GetSingleton ().GetGUI ()->CreateFnt ( m_strCEGUIFontName, strFullFilePath, uiSize );
+        m_pFntCEGUI = CCore::GetSingleton().GetGUI()->CreateFnt(m_strCEGUIFontName, strFullFilePath, uiSize);
     }
     catch (...)
     {
@@ -110,19 +103,18 @@ void CGuiFontItem::CreateUnderlyingData ( const SString& strFullFilePath, const 
         // TODO - Cleanup open file handle
     }
 
-    if ( !m_pFntCEGUI )
+    if (!m_pFntCEGUI)
         return;
 
     // Memory usage - complete guess
-    int iCharHeight = m_pFntCEGUI->GetFontHeight ( 1 );
-    int iCharWidth = m_pFntCEGUI->GetTextExtent ( "A", 1 );
+    int iCharHeight = m_pFntCEGUI->GetFontHeight(1);
+    int iCharWidth = m_pFntCEGUI->GetTextExtent("A", 1);
     int iNumChars = 256;
     int iBodgeFactor = 4;
     int iBPP = 32;
     int iMemoryUsed = iCharHeight * iCharWidth * iBPP / 8 * iNumChars * iBodgeFactor;
     m_iMemoryKBUsed = iMemoryUsed / 1024;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -131,7 +123,7 @@ void CGuiFontItem::CreateUnderlyingData ( const SString& strFullFilePath, const 
 //
 //
 ////////////////////////////////////////////////////////////////
-void CGuiFontItem::ReleaseUnderlyingData ( void )
+void CGuiFontItem::ReleaseUnderlyingData(void)
 {
-    SAFE_DELETE( m_pFntCEGUI );
+    SAFE_DELETE(m_pFntCEGUI);
 }

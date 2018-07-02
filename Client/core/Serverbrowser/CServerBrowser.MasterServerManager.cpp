@@ -6,7 +6,6 @@
 #include "CServerBrowser.MasterServerManager.h"
 #include "CServerBrowser.RemoteMasterServer.h"
 
-
 ///////////////////////////////////////////////////////////////
 //
 //
@@ -18,22 +17,20 @@ class CMasterServerManager : public CMasterServerManagerInterface
 {
 public:
     ZERO_ON_NEW
-                            CMasterServerManager        ( void );
-                            ~CMasterServerManager       ( void );
+    CMasterServerManager(void);
+    ~CMasterServerManager(void);
 
     // CMasterServerManagerInterface
-    virtual void            Refresh                     ( void );
-    virtual bool            HasData                     ( void );
-    virtual bool            ParseList                   ( CServerListItemList& itemList );
+    virtual void Refresh(void);
+    virtual bool HasData(void);
+    virtual bool ParseList(CServerListItemList& itemList);
 
     // CMasterServerManager
 protected:
-
-    CElapsedTime                                    m_ElapsedTime;
-    std::vector < CRemoteMasterServerInterface* >   m_MasterServerList;
-    uint                                            m_iActiveAmount;
+    CElapsedTime                               m_ElapsedTime;
+    std::vector<CRemoteMasterServerInterface*> m_MasterServerList;
+    uint                                       m_iActiveAmount;
 };
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -42,11 +39,10 @@ protected:
 //
 //
 ///////////////////////////////////////////////////////////////
-CMasterServerManagerInterface* NewMasterServerManager ( void )
+CMasterServerManagerInterface* NewMasterServerManager(void)
 {
-    return new CMasterServerManager ();
+    return new CMasterServerManager();
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -55,11 +51,10 @@ CMasterServerManagerInterface* NewMasterServerManager ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-CMasterServerManager::CMasterServerManager ( void )
+CMasterServerManager::CMasterServerManager(void)
 {
-    m_ElapsedTime.SetMaxIncrement ( 500 );
+    m_ElapsedTime.SetMaxIncrement(500);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -68,14 +63,13 @@ CMasterServerManager::CMasterServerManager ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-CMasterServerManager::~CMasterServerManager ( void )
+CMasterServerManager::~CMasterServerManager(void)
 {
-    for ( uint i = 0 ; i < m_MasterServerList.size () ; i++ )
-        SAFE_RELEASE( m_MasterServerList[i] );
+    for (uint i = 0; i < m_MasterServerList.size(); i++)
+        SAFE_RELEASE(m_MasterServerList[i]);
 
-    m_MasterServerList.clear ();
+    m_MasterServerList.clear();
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -84,26 +78,25 @@ CMasterServerManager::~CMasterServerManager ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CMasterServerManager::Refresh ( void )
+void CMasterServerManager::Refresh(void)
 {
     // Create master server list if required
-    if ( m_MasterServerList.empty () )
+    if (m_MasterServerList.empty())
     {
-        std::vector < SString > resultList;
-        GetVersionUpdater ()->GetAseServerList ( resultList );
+        std::vector<SString> resultList;
+        GetVersionUpdater()->GetAseServerList(resultList);
 
-        for ( uint i = 0 ; i < resultList.size () ; i++ )
-            m_MasterServerList.push_back ( NewRemoteMasterServer ( resultList[i] ) );
+        for (uint i = 0; i < resultList.size(); i++)
+            m_MasterServerList.push_back(NewRemoteMasterServer(resultList[i]));
     }
 
     // Pass on refresh request to first two servers
-    m_iActiveAmount = std::min < uint > ( 2, m_MasterServerList.size () );
-    for ( uint i = 0 ; i < m_MasterServerList.size () && i < m_iActiveAmount ; i++ )
-        m_MasterServerList[i]->Refresh ();
+    m_iActiveAmount = std::min<uint>(2, m_MasterServerList.size());
+    for (uint i = 0; i < m_MasterServerList.size() && i < m_iActiveAmount; i++)
+        m_MasterServerList[i]->Refresh();
 
-    m_ElapsedTime.Reset ();
+    m_ElapsedTime.Reset();
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -112,35 +105,34 @@ void CMasterServerManager::Refresh ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CMasterServerManager::HasData ( void )
+bool CMasterServerManager::HasData(void)
 {
     // Count how many server have responded
     uint uiHasDataCount = 0;
 
-    for ( uint i = 0 ; i < m_MasterServerList.size () && i < m_iActiveAmount ; i++ )
-        if ( m_MasterServerList[i]->HasData () )
+    for (uint i = 0; i < m_MasterServerList.size() && i < m_iActiveAmount; i++)
+        if (m_MasterServerList[i]->HasData())
             uiHasDataCount++;
 
     // If two servers responded, then success
-    if ( uiHasDataCount >= 2 )
+    if (uiHasDataCount >= 2)
         return true;
 
     // If less than 2 servers responded, and it's been 2.5 seconds, try to add a new server
-    if ( uiHasDataCount < 2 && m_ElapsedTime.Get () > 2500 )
+    if (uiHasDataCount < 2 && m_ElapsedTime.Get() > 2500)
     {
-        if ( m_iActiveAmount <= 2 && m_MasterServerList.size () > m_iActiveAmount )
+        if (m_iActiveAmount <= 2 && m_MasterServerList.size() > m_iActiveAmount)
         {
-            m_MasterServerList[ m_iActiveAmount++ ]->Refresh ();
+            m_MasterServerList[m_iActiveAmount++]->Refresh();
         }
     }
 
     // If one server responded, and it's been 5 seconds, then success
-    if ( uiHasDataCount >= 1 && m_ElapsedTime.Get () > 5000 )
+    if (uiHasDataCount >= 1 && m_ElapsedTime.Get() > 5000)
         return true;
 
     return false;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -149,13 +141,13 @@ bool CMasterServerManager::HasData ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CMasterServerManager::ParseList ( CServerListItemList& itemList )
+bool CMasterServerManager::ParseList(CServerListItemList& itemList)
 {
     uint uiParsedCount = 0;
 
-    for ( uint i = 0 ; i < m_MasterServerList.size () && i < m_iActiveAmount ; i++ )
-        if ( m_MasterServerList[i]->HasData () )
-            if ( m_MasterServerList[i]->ParseList ( itemList ) )
+    for (uint i = 0; i < m_MasterServerList.size() && i < m_iActiveAmount; i++)
+        if (m_MasterServerList[i]->HasData())
+            if (m_MasterServerList[i]->ParseList(itemList))
                 uiParsedCount++;
 
     return uiParsedCount > 0;

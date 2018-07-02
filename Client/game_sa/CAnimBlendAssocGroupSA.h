@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CAnimBlendAssocGroupSA.h
-*  PURPOSE:     Header file for animation blend association group class
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CAnimBlendAssocGroupSA.h
+ *  PURPOSE:     Header file for animation blend association group class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CAnimBlendAssocGroupSA_H
 #define __CAnimBlendAssocGroupSA_H
@@ -18,6 +17,7 @@
 #include "Common.h"
 
 #define FUNC_CAnimBlendAssocGroup_InitEmptyAssociations 0x4cdfb0
+#define FUNC_CAnimBlendAssocGroup_CopyAnimation         0x4ce130
 #define FUNC_CAnimBlendAssocGroup_IsCreated             0x4d37a0
 #define FUNC_CAnimBlendAssocGroup_GetNumAnimations      0x45b050
 #define FUNC_CAnimBlendAssocGroup_GetAnimBlock          0x45b060
@@ -38,28 +38,30 @@ public:
     AssocGroupId                            groupID;
 };
 
-
 class CAnimBlendAssocGroupSA : public CAnimBlendAssocGroup
 {
     friend class CAnimManagerSA;
+
 public:
-                                        CAnimBlendAssocGroupSA  ( CAnimBlendAssocGroupSAInterface * pInterface );
+    CAnimBlendAssocGroupSA(CAnimBlendAssocGroupSAInterface* pInterface);
 
-    void                                InitEmptyAssociations   ( RpClump * pClump );
-    bool                                IsCreated               ( void );
-    int                                 GetNumAnimations        ( void );
-    CAnimBlock *                        GetAnimBlock            ( void );
-    CAnimBlendStaticAssociation *       GetAnimation            ( unsigned int ID );
-    void                                CreateAssociations      ( const char * szBlockName );
+    CAnimBlendAssociationSAInterface* CopyAnimation(unsigned int AnimID);
+    void                              InitEmptyAssociations(RpClump* pClump);
+    bool                              IsCreated(void);
+    int                               GetNumAnimations(void);
+    CAnimBlock*                       GetAnimBlock(void);
+    CAnimBlendStaticAssociation*      GetAnimation(unsigned int ID);
+    AssocGroupId                      GetGroupID(void) { return m_pInterface->groupID; };
+    void                              CreateAssociations(const char* szBlockName);
 
-    bool                                IsLoaded                ( void );
-    void                                SetIDOffset             ( int iOffset )     { m_pInterface->iIDOffset = iOffset; }
+    bool IsLoaded(void);
+    void SetIDOffset(int iOffset) { m_pInterface->iIDOffset = iOffset; }
 
 protected:
-    void                                SetupAnimBlock          ( void );
+    void SetupAnimBlock(void);
 
-    CAnimBlendAssocGroupSAInterface *   m_pInterface;
-    CAnimBlockSA                    *   m_pAnimBlock;
+    CAnimBlendAssocGroupSAInterface* m_pInterface;
+    CAnimBlockSA*                    m_pAnimBlock;
 };
 
 #endif

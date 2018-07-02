@@ -1,12 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        CDebugHookManager.h
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        CDebugHookManager.h
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 #pragma once
 
 #ifdef MTA_CLIENT
@@ -16,9 +16,9 @@
 
 struct SDebugHookCallInfo
 {
-    CLuaFunctionRef functionRef;
-    CLuaMain* pLuaMain;
-    CFastHashSet < SString > allowedNameMap;
+    CLuaFunctionRef       functionRef;
+    CLuaMain*             pLuaMain;
+    CFastHashSet<SString> allowedNameMap;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -32,30 +32,34 @@ class CDebugHookManager
 {
 public:
     ZERO_ON_NEW
-                        CDebugHookManager           ( void );
-                        ~CDebugHookManager          ( void );
-    bool                AddDebugHook                ( EDebugHookType hookType, const CLuaFunctionRef& functionRef, const std::vector < SString >& allowedNameList );
-    bool                RemoveDebugHook             ( EDebugHookType hookType, const CLuaFunctionRef& functionRef );
-    void                OnLuaMainDestroy            ( CLuaMain* pLuaMain );
+    CDebugHookManager(void);
+    ~CDebugHookManager(void);
+    bool AddDebugHook(EDebugHookType hookType, const CLuaFunctionRef& functionRef, const std::vector<SString>& allowedNameList);
+    bool RemoveDebugHook(EDebugHookType hookType, const CLuaFunctionRef& functionRef);
+    void OnLuaMainDestroy(CLuaMain* pLuaMain);
 
-    bool                OnPreFunction               ( lua_CFunction f, lua_State* luaVM, bool bAllowed );
-    void                OnPostFunction              ( lua_CFunction f, lua_State* luaVM );
-    bool                OnPreEvent                  ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller );
-    void                OnPostEvent                 ( const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller );
-
-    bool                HasPostFunctionHooks        ( void ) const      { return !m_PostFunctionHookList.empty() || m_uiPostFunctionOverride; }
+    bool OnPreFunction(lua_CFunction f, lua_State* luaVM, bool bAllowed);
+    void OnPostFunction(lua_CFunction f, lua_State* luaVM);
+    bool OnPreEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller);
+    void OnPostEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller);
+    bool OnPreEventFunction(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent);
+    void OnPostEventFunction(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent);
+    bool HasPostFunctionHooks(void) const { return !m_PostFunctionHookList.empty() || m_uiPostFunctionOverride; }
 
 protected:
-    std::vector < SDebugHookCallInfo >& GetHookInfoListForType ( EDebugHookType hookType );
-    bool                CallHook                    ( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList, const CLuaArguments& Arguments, bool bNameMustBeExplicitlyAllowed = false );
-    bool                IsNameAllowed               ( const char* szName, const std::vector < SDebugHookCallInfo >& eventHookList, bool bNameMustBeExplicitlyAllowed = false );
-    bool                MustNameBeExplicitlyAllowed ( const SString& strName );
-    void                MaybeMaskArgumentValues     ( const SString& strFunctionName, CLuaArguments& FunctionArguments );
+    std::vector<SDebugHookCallInfo>& GetHookInfoListForType(EDebugHookType hookType);
+    bool                             CallHook(const char* szName, const std::vector<SDebugHookCallInfo>& eventHookList, const CLuaArguments& Arguments,
+                                              bool bNameMustBeExplicitlyAllowed = false);
+    bool IsNameAllowed(const char* szName, const std::vector<SDebugHookCallInfo>& eventHookList, bool bNameMustBeExplicitlyAllowed = false);
+    bool MustNameBeExplicitlyAllowed(const SString& strName);
+    void MaybeMaskArgumentValues(const SString& strFunctionName, CLuaArguments& FunctionArguments);
 
-    uint                                m_uiPostFunctionOverride;
-    std::vector < SDebugHookCallInfo >  m_PreEventHookList;
-    std::vector < SDebugHookCallInfo >  m_PostEventHookList;
-    std::vector < SDebugHookCallInfo >  m_PreFunctionHookList;
-    std::vector < SDebugHookCallInfo >  m_PostFunctionHookList;
-    std::map< SString, std::vector<uint> > m_MaskArgumentsMap;
+    uint                                  m_uiPostFunctionOverride;
+    std::vector<SDebugHookCallInfo>       m_PreEventHookList;
+    std::vector<SDebugHookCallInfo>       m_PostEventHookList;
+    std::vector<SDebugHookCallInfo>       m_PreFunctionHookList;
+    std::vector<SDebugHookCallInfo>       m_PostFunctionHookList;
+    std::vector<SDebugHookCallInfo>       m_PreEventFunctionHookList;
+    std::vector<SDebugHookCallInfo>       m_PostEventFunctionHookList;
+    std::map<SString, std::vector<uint> > m_MaskArgumentsMap;
 };

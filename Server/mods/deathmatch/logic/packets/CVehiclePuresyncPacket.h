@@ -1,19 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/packets/CVehiclePuresyncPacket.h
-*  PURPOSE:     Vehicle pure synchronization packet class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*               Cecill Etheredge <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/packets/CVehiclePuresyncPacket.h
+ *  PURPOSE:     Vehicle pure synchronization packet class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __PACKETS_CVEHICLEPURESYNCPACKET_H
-#define __PACKETS_CVEHICLEPURESYNCPACKET_H
+#pragma once
 
 #include "CCommon.h"
 #include "CPacket.h"
@@ -24,19 +20,17 @@ class CVehicle;
 class CVehiclePuresyncPacket : public CPacket
 {
 public:
-    inline                      CVehiclePuresyncPacket      ( void )                        {};
-    inline explicit             CVehiclePuresyncPacket      ( class CPlayer* pPlayer )      { m_pSourceElement = pPlayer; };
+    CVehiclePuresyncPacket(void){};
+    explicit CVehiclePuresyncPacket(class CPlayer* pPlayer) { m_pSourceElement = pPlayer; };
 
-    bool                            HasSimHandler           ( void ) const                  { return true; }
-    inline ePacketID                GetPacketID             ( void ) const                  { return PACKET_ID_PLAYER_VEHICLE_PURESYNC; };
-    inline unsigned long            GetFlags                ( void ) const                  { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    bool          HasSimHandler(void) const { return true; }
+    ePacketID     GetPacketID(void) const { return PACKET_ID_PLAYER_VEHICLE_PURESYNC; };
+    unsigned long GetFlags(void) const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
 
-    bool                        Read                        ( NetBitStreamInterface& BitStream );
-    bool                        Write                       ( NetBitStreamInterface& BitStream ) const;
+    bool Read(NetBitStreamInterface& BitStream);
+    bool Write(NetBitStreamInterface& BitStream) const;
 
 private:
-    void                        ReadVehicleSpecific         ( class CVehicle* pVehicle, NetBitStreamInterface& BitStream, int iRemoteModel );
-    void                        WriteVehicleSpecific        ( class CVehicle* pVehicle, NetBitStreamInterface& BitStream ) const;
+    void ReadVehicleSpecific(class CVehicle* pVehicle, NetBitStreamInterface& BitStream, int iRemoteModel);
+    void WriteVehicleSpecific(class CVehicle* pVehicle, NetBitStreamInterface& BitStream) const;
 };
-
-#endif

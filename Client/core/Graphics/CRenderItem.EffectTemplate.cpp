@@ -1,74 +1,35 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CRenderItem.EffectTemplate.cpp
-*  PURPOSE:
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CRenderItem.EffectTemplate.cpp
+ *  PURPOSE:     A compiled effect to clone d3d effects from
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
-#include "CRenderItem.EffectCloner.h"
+#include "CRenderItem.EffectTemplate.h"
 #include <DXHook/CProxyDirect3DEffect.h>
-
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-//
-// CEffectTemplateImpl
-//
-class CEffectTemplateImpl : public CEffectTemplate
-{
-public:
-    ZERO_ON_NEW
-
-    virtual void            PostConstruct           ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
-    virtual void            PreDestruct             ( void );
-    virtual bool            IsValid                 ( void );
-    virtual void            OnLostDevice            ( void );
-    virtual void            OnResetDevice           ( void );
-
-    // CEffectTemplate
-    virtual bool            HaveFilesChanged        ( void );
-    virtual int             GetTicksSinceLastUsed   ( void );
-    virtual ID3DXEffect*    CloneD3DEffect          ( SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer, HRESULT& outHResult );
-    virtual void            UnCloneD3DEffect        ( ID3DXEffect* pD3DEffect );
-    virtual const SDebugInfo& GetDebugInfo          ( void )            { return m_DebugInfo; }
-
-    // CEffectTemplateImpl
-    void                    CreateUnderlyingData    ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug );
-    void                    ReleaseUnderlyingData   ( void );
-    bool                    ValidateDepthBufferUsage ( D3DXHANDLE hTechnique, SString& strOutErrorExtra );
-
-    ID3DXEffect*                        m_pD3DEffect;
-    bool                                m_bUsesDepthBuffer;
-    bool                                m_bHaveFilesChanged;
-    std::map < SString, SString >       m_FileMD5Map;
-    CTickCount                          m_TickCountLastUsed;
-    uint                                m_uiCloneCount;
-    SDebugInfo                          m_DebugInfo;
-    HRESULT                             m_CreateHResult;
-};
-
 
 ///////////////////////////////////////////////////////////////
 //
 // CEffectTemplate instantiation
 //
 ///////////////////////////////////////////////////////////////
-CEffectTemplate* NewEffectTemplate ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug, HRESULT& outHResult )
+CEffectTemplate* NewEffectTemplate(CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug,
+                                   HRESULT& outHResult)
 {
-    CEffectTemplateImpl* pEffectTemplate = new CEffectTemplateImpl ();
-    pEffectTemplate->PostConstruct ( pManager, strFilename, strRootPath, strOutStatus, bDebug );
+    CEffectTemplate* pEffectTemplate = new CEffectTemplate();
+    pEffectTemplate->PostConstruct(pManager, strFilename, strRootPath, strOutStatus, bDebug);
 
     outHResult = pEffectTemplate->m_CreateHResult;
-    if ( !pEffectTemplate->IsValid () )
+    if (!pEffectTemplate->IsValid())
     {
-        SAFE_RELEASE ( pEffectTemplate );
+        SAFE_RELEASE(pEffectTemplate);
     }
 
     return pEffectTemplate;
 }
-
 
 namespace
 {
@@ -81,11 +42,12 @@ namespace
     {
         SString m_strRootPath;
         SString m_strCurrentPath;
-    public:
-        SString m_strReport;
-        std::map < SString, SString > m_FileMD5Map;
 
-        CIncludeManager::CIncludeManager( const SString& strRootPath, const SString& strCurrentPath )
+    public:
+        SString                    m_strReport;
+        std::map<SString, SString> m_FileMD5Map;
+
+        CIncludeManager::CIncludeManager(const SString& strRootPath, const SString& strCurrentPath)
         {
             m_strRootPath = strRootPath;
             m_strCurrentPath = strCurrentPath;
@@ -93,52 +55,51 @@ namespace
 
         // * Include paths in the source are relative to the first .fx file
         // * Except include paths that starts with a \ are based from the resource's directory
-        STDMETHOD(Open)(D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes)
+        STDMETHOD(Open)(D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
         {
-            SString strPathFilename = PathConform ( pFileName );
+            SString strPathFilename = PathConform(pFileName);
 
             // Prepend file name with m_strRootPath + m_strCurrentPath, unless it starts with a PATH_SEPERATOR, then just prepend m_strRootPath
-            if ( strPathFilename.Left ( 1 ) == PATH_SEPERATOR )
-                strPathFilename = PathJoin ( m_strRootPath, strPathFilename );
+            if (strPathFilename.Left(1) == PATH_SEPERATOR)
+                strPathFilename = PathJoin(m_strRootPath, strPathFilename);
             else
-                strPathFilename = PathJoin ( m_strRootPath, m_strCurrentPath, strPathFilename );
+                strPathFilename = PathJoin(m_strRootPath, m_strCurrentPath, strPathFilename);
 
             // Check for illegal characters
-            if ( strPathFilename.Contains ( ".." ) )
+            if (strPathFilename.Contains(".."))
             {
-                SString strMsg ( "[CIncludeManager: Illegal path %s]", *strPathFilename );
+                SString strMsg("[CIncludeManager: Illegal path %s]", *strPathFilename);
                 m_strReport += strMsg;
-                OutputDebugLine ( SStringX ( "[Shader] " ) + strMsg );
+                OutputDebugLine(SStringX("[Shader] ") + strMsg);
                 return E_FAIL;
             }
 
             // Load file
-            std::vector < char > buffer;
-            if ( !FileLoad ( strPathFilename, buffer ) || buffer.empty () )
+            std::vector<char> buffer;
+            if (!FileLoad(strPathFilename, buffer) || buffer.empty())
             {
-                SString strMsg ( "[CIncludeManager: Can't find %s]", *strPathFilename );
+                SString strMsg("[CIncludeManager: Can't find %s]", *strPathFilename);
                 m_strReport += strMsg;
-                OutputDebugLine ( SStringX ( "[Shader] " ) + strMsg );
+                OutputDebugLine(SStringX("[Shader] ") + strMsg);
                 return E_FAIL;
             }
 
-
             // Allocate memory for file contents
-            uint uiSize = buffer.size ();
-            BYTE* pData = static_cast < BYTE* > ( malloc ( uiSize ) );
-            memcpy( pData, &buffer[0], uiSize );
+            uint  uiSize = buffer.size();
+            BYTE* pData = static_cast<BYTE*>(malloc(uiSize));
+            memcpy(pData, &buffer[0], uiSize);
 
             // Set result
             *ppData = pData;
             *pBytes = uiSize;
 
-            if ( !MapContains ( m_FileMD5Map, ConformPathForSorting ( strPathFilename ) ) )
+            if (!MapContains(m_FileMD5Map, ConformPathForSorting(strPathFilename)))
             {
                 // Add MD5 for this file
-                SString strMD5 = CMD5Hasher::CalculateHexString ( pData, uiSize );
-                MapSet ( m_FileMD5Map, ConformPathForSorting ( strPathFilename ), strMD5 );
+                SString strMD5 = CMD5Hasher::CalculateHexString(pData, uiSize);
+                MapSet(m_FileMD5Map, ConformPathForSorting(strPathFilename), strMD5);
 
-                m_strReport += SString ( "[Loaded '%s' (%d bytes)]", *strPathFilename, uiSize );
+                m_strReport += SString("[Loaded '%s' (%d bytes)]", *strPathFilename, uiSize);
             }
 
             return S_OK;
@@ -151,167 +112,160 @@ namespace
             return S_OK;
         }
     };
-}
-
+}            // namespace
 
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::PostConstruct
+// CEffectTemplate::PostConstruct
 //
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplateImpl::PostConstruct ( CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug )
+void CEffectTemplate::PostConstruct(CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug)
 {
-    Super::PostConstruct ( pManager );
+    Super::PostConstruct(pManager);
 
     // Initial creation of d3d data
-    CreateUnderlyingData ( strFilename, strRootPath, strOutStatus, bDebug );
+    CreateUnderlyingData(strFilename, strRootPath, strOutStatus, bDebug);
 }
 
-
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::PreDestruct
+// CEffectTemplate::PreDestruct
 //
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplateImpl::PreDestruct ( void )
+void CEffectTemplate::PreDestruct(void)
 {
-    ReleaseUnderlyingData ();
-    Super::PreDestruct ();
+    ReleaseUnderlyingData();
+    Super::PreDestruct();
 }
 
-
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::GetTicksSinceLastBeingUsed
+// CEffectTemplate::GetTicksSinceLastBeingUsed
 //
 //
 //
 ////////////////////////////////////////////////////////////////
-int CEffectTemplateImpl::GetTicksSinceLastUsed ( void )
+int CEffectTemplate::GetTicksSinceLastUsed(void)
 {
-    if ( m_uiCloneCount != 0 )
-        return 0;   // Used right now
+    if (m_uiCloneCount != 0)
+        return 0;            // Used right now
 
-    CTickCount delta = CTickCount::Now ( true ) - m_TickCountLastUsed;
-    return static_cast < int > ( delta.ToLongLong () ) + 1;
+    CTickCount delta = CTickCount::Now(true) - m_TickCountLastUsed;
+    return static_cast<int>(delta.ToLongLong()) + 1;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::IsValid
+// CEffectTemplate::IsValid
 //
 // Check underlying data is present
 //
 ////////////////////////////////////////////////////////////////
-bool CEffectTemplateImpl::IsValid ( void )
+bool CEffectTemplate::IsValid(void)
 {
     return m_pD3DEffect != NULL;
 }
 
-
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::OnLostDevice
+// CEffectTemplate::OnLostDevice
 //
 // Release device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplateImpl::OnLostDevice ( void )
+void CEffectTemplate::OnLostDevice(void)
 {
-    m_pD3DEffect->OnLostDevice ();
+    m_pD3DEffect->OnLostDevice();
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::OnResetDevice
+// CEffectTemplate::OnResetDevice
 //
 // Recreate device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplateImpl::OnResetDevice ( void )
+void CEffectTemplate::OnResetDevice(void)
 {
-    m_pD3DEffect->OnResetDevice ();
+    m_pD3DEffect->OnResetDevice();
 }
 
-
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::CreateUnderlyingData
+// CEffectTemplate::CreateUnderlyingData
 //
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplateImpl::CreateUnderlyingData ( const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug )
+void CEffectTemplate::CreateUnderlyingData(const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug)
 {
-    assert ( !m_pD3DEffect );
-    m_DebugInfo.createTime = CTickCount::Now();
+    assert(!m_pD3DEffect);
 
     // Make defines
-    bool bUsesRAWZ = CGraphics::GetSingleton ().GetRenderItemManager ()->GetDepthBufferFormat () == RFORMAT_RAWZ;
+    bool bUsesRAWZ = CGraphics::GetSingleton().GetRenderItemManager()->GetDepthBufferFormat() == RFORMAT_RAWZ;
 
-    std::vector < D3DXMACRO > macroList;
+    std::vector<D3DXMACRO> macroList;
 
-    macroList.push_back ( D3DXMACRO () );
-    macroList.back ().Name = "IS_DEPTHBUFFER_RAWZ";
-    macroList.back ().Definition = bUsesRAWZ ? "1" : "0";
+    macroList.push_back(D3DXMACRO());
+    macroList.back().Name = "IS_DEPTHBUFFER_RAWZ";
+    macroList.back().Definition = bUsesRAWZ ? "1" : "0";
 
-    macroList.push_back ( D3DXMACRO () );
-    macroList.back ().Name = NULL;
-    macroList.back ().Definition = NULL;
+    macroList.push_back(D3DXMACRO());
+    macroList.back().Name = NULL;
+    macroList.back().Definition = NULL;
 
     // Compile effect
-    DWORD dwFlags = 0;      // D3DXSHADER_PARTIALPRECISION, D3DXSHADER_DEBUG, D3DXFX_NOT_CLONEABLE;
-    if ( bDebug )
+    DWORD dwFlags = D3DXFX_LARGEADDRESSAWARE;            // D3DXSHADER_PARTIALPRECISION, D3DXSHADER_DEBUG, D3DXFX_NOT_CLONEABLE;
+    if (bDebug)
         dwFlags |= D3DXSHADER_DEBUG;
 
-    SString strMetaPath = strFilename.Right ( strFilename.length () - strRootPath.length () );
-    CIncludeManager IncludeManager ( strRootPath, ExtractPath ( strMetaPath ) );
-    LPD3DXBUFFER pBufferErrors = NULL;
-    m_CreateHResult = MyD3DXCreateEffectFromFile( m_pDevice, ExtractFilename ( strMetaPath ), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors );            
+    SString         strMetaPath = strFilename.Right(strFilename.length() - strRootPath.length());
+    CIncludeManager IncludeManager(strRootPath, ExtractPath(strMetaPath));
+    LPD3DXBUFFER    pBufferErrors = NULL;
+    m_CreateHResult =
+        MyD3DXCreateEffectFromFile(m_pDevice, ExtractFilename(strMetaPath), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors);
 
     // Handle compile errors
     strOutStatus = "";
-    if( pBufferErrors != NULL )
+    if (pBufferErrors != NULL)
     {
-        strOutStatus = SStringX ( (CHAR*)pBufferErrors->GetBufferPointer() ).TrimEnd ( "\n" );
+        strOutStatus = SStringX((CHAR*)pBufferErrors->GetBufferPointer()).TrimEnd("\n");
 
         // Error messages sometimes contain the current directory. Remove that here.
         SString strCurrentDirectory = GetSystemCurrentDirectory();
-        strOutStatus = strOutStatus.ReplaceI ( strCurrentDirectory + "\\", "" );
-        strOutStatus = strOutStatus.ReplaceI ( strCurrentDirectory, "" );
+        strOutStatus = strOutStatus.ReplaceI(strCurrentDirectory + "\\", "");
+        strOutStatus = strOutStatus.ReplaceI(strCurrentDirectory, "");
     }
-    SAFE_RELEASE( pBufferErrors );
+    SAFE_RELEASE(pBufferErrors);
 
-    if( !m_pD3DEffect )
+    if (!m_pD3DEffect)
     {
-        if ( strOutStatus.empty () )
-            strOutStatus = SString ( "[D3DXCreateEffectFromFile failed (%08x)%s]", m_CreateHResult, *IncludeManager.m_strReport );
+        if (strOutStatus.empty())
+            strOutStatus = SString("[D3DXCreateEffectFromFile failed (%08x)%s]", m_CreateHResult, *IncludeManager.m_strReport);
         return;
     }
 
     // Find first valid technique
-    D3DXHANDLE hTechnique = NULL;
+    D3DXHANDLE      hTechnique = NULL;
     D3DXEFFECT_DESC EffectDesc;
-    m_pD3DEffect->GetDesc ( &EffectDesc );
+    m_pD3DEffect->GetDesc(&EffectDesc);
 
-    for ( uint uiAttempt = 0 ; true ; uiAttempt++ )
+    for (uint uiAttempt = 0; true; uiAttempt++)
     {
         SString strProblemInfo = "";
-        for ( uint i = 0 ; i < EffectDesc.Techniques ; i++ )
+        for (uint i = 0; i < EffectDesc.Techniques; i++)
         {
-            SString strErrorExtra;
-            D3DXHANDLE hTemp = m_pD3DEffect->GetTechnique ( i );
-            HRESULT hr = m_pD3DEffect->ValidateTechnique ( hTemp );
-            if ( SUCCEEDED( hr ) )
+            SString    strErrorExtra;
+            D3DXHANDLE hTemp = m_pD3DEffect->GetTechnique(i);
+            HRESULT    hr = m_pD3DEffect->ValidateTechnique(hTemp);
+            if (SUCCEEDED(hr))
             {
                 // Check depth buffer rules
-                if ( ValidateDepthBufferUsage ( hTemp, strErrorExtra ) )
+                if (ValidateDepthBufferUsage(hTemp, strErrorExtra))
                 {
                     hTechnique = hTemp;
                     break;
@@ -320,94 +274,112 @@ void CEffectTemplateImpl::CreateUnderlyingData ( const SString& strFilename, con
 
             // Update problem string
             D3DXTECHNIQUE_DESC TechniqueDesc;
-            m_pD3DEffect->GetTechniqueDesc( hTemp, &TechniqueDesc );
-            strProblemInfo += SString ( "['%s' (%d/%d) failed (%08x)%s]", TechniqueDesc.Name, i, EffectDesc.Techniques, hr, *strErrorExtra );
+            m_pD3DEffect->GetTechniqueDesc(hTemp, &TechniqueDesc);
+            strProblemInfo += SString("['%s' (%d/%d) failed (%08x)%s]", TechniqueDesc.Name, i, EffectDesc.Techniques, hr, *strErrorExtra);
         }
 
         // Found valid technique
-        if ( hTechnique )
+        if (hTechnique)
             break;
 
         // Error if can't find a valid technique after 2nd attempt
-        if ( uiAttempt > 0 )
+        if (uiAttempt > 0)
         {
-            strOutStatus = SString ( "No valid technique; [Techniques:%d %s]%s", EffectDesc.Techniques, *strProblemInfo, *IncludeManager.m_strReport );
-            SAFE_RELEASE ( m_pD3DEffect );
+            strOutStatus = SString("No valid technique; [Techniques:%d %s]%s", EffectDesc.Techniques, *strProblemInfo, *IncludeManager.m_strReport);
+            SAFE_RELEASE(m_pD3DEffect);
             return;
         }
 
         // Try resetting samplers if 1st attempt failed
         LPDIRECT3DDEVICE9 pDevice;
-        m_pD3DEffect->GetDevice ( &pDevice );
-        for ( uint i = 0 ; i < 16 ; i++ )
+        m_pD3DEffect->GetDevice(&pDevice);
+        for (uint i = 0; i < 16; i++)
         {
-            pDevice->SetSamplerState ( i, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
-            pDevice->SetSamplerState ( i, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
-            pDevice->SetSamplerState ( i, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
+            pDevice->SetSamplerState(i, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+            pDevice->SetSamplerState(i, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+            pDevice->SetSamplerState(i, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
         }
     }
 
-
     // Set technique
-    m_pD3DEffect->SetTechnique( hTechnique );
+    m_pD3DEffect->SetTechnique(hTechnique);
+
+    // Get/cache parameter handles
+    ReadParameterHandles();
 
     // Inform user of technique name
     D3DXTECHNIQUE_DESC TechniqueDesc;
-    m_pD3DEffect->GetTechniqueDesc( hTechnique, &TechniqueDesc );
-    strOutStatus = TechniqueDesc.Name;
+    m_pD3DEffect->GetTechniqueDesc(hTechnique, &TechniqueDesc);
+    m_strTechniqueName = TechniqueDesc.Name;
+    strOutStatus = m_strTechniqueName;
 
-    if ( bDebug )
+    // Check if any technique uses a vertex shader
+    m_bUsesVertexShader = false;
+    for (uint i = 0; i < EffectDesc.Techniques; i++)
+    {
+        D3DXHANDLE         hTechnique = m_pD3DEffect->GetTechnique(i);
+        D3DXTECHNIQUE_DESC TechniqueDesc;
+        m_pD3DEffect->GetTechniqueDesc(hTechnique, &TechniqueDesc);
+        for (uint i = 0; i < TechniqueDesc.Passes; i++)
+        {
+            D3DXPASS_DESC PassDesc;
+            m_pD3DEffect->GetPassDesc(m_pD3DEffect->GetPass(hTechnique, i), &PassDesc);
+            if (PassDesc.pVertexShaderFunction)
+                m_bUsesVertexShader = true;
+        }
+    }
+
+    if (bDebug)
     {
         // Disassemble effect
         LPD3DXBUFFER pDisassembly = NULL;
-        if ( SUCCEEDED( D3DXDisassembleEffect( m_pD3DEffect, false, &pDisassembly ) ) && pDisassembly )
+        if (SUCCEEDED(D3DXDisassembleEffect(m_pD3DEffect, false, &pDisassembly)) && pDisassembly)
         {
             LPVOID pData = pDisassembly->GetBufferPointer();
-            DWORD Size = pDisassembly->GetBufferSize();
+            DWORD  Size = pDisassembly->GetBufferSize();
 
-            if( pData && Size )
+            if (pData && Size)
             {
                 SString strDisassemblyContents;
-                strDisassemblyContents.assign ( (const char*)pData, Size - 1 );
-                FileSave ( strFilename + ".dis", strDisassemblyContents );
+                strDisassemblyContents.assign((const char*)pData, Size - 1);
+                FileSave(strFilename + ".dis", strDisassemblyContents);
             }
 
-            SAFE_RELEASE( pDisassembly );
+            SAFE_RELEASE(pDisassembly);
         }
     }
 
     // Copy MD5s of all loaded files
     m_FileMD5Map = IncludeManager.m_FileMD5Map;
-    dassert ( !HaveFilesChanged() );
+    dassert(!HaveFilesChanged());
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::ValidateDepthBufferUsage
+// CEffectTemplate::ValidateDepthBufferUsage
 //
 // Check if technique passes our rules
 // Returns false if should fail validation
 //
 ////////////////////////////////////////////////////////////////
-bool CEffectTemplateImpl::ValidateDepthBufferUsage ( D3DXHANDLE hTechnique, SString& strOutErrorExtra )
+bool CEffectTemplate::ValidateDepthBufferUsage(D3DXHANDLE hTechnique, SString& strOutErrorExtra)
 {
     m_bUsesDepthBuffer = false;
 
     // Check depthbuffer handle
-    D3DXHANDLE hDepthBuffer = m_pD3DEffect->GetParameterByName ( NULL, "DEPTHBUFFER" );
-    if ( !hDepthBuffer )
-        hDepthBuffer = m_pD3DEffect->GetParameterBySemantic ( NULL, "DEPTHBUFFER" );
-    if ( hDepthBuffer )
+    D3DXHANDLE hDepthBuffer = m_pD3DEffect->GetParameterByName(NULL, "DEPTHBUFFER");
+    if (!hDepthBuffer)
+        hDepthBuffer = m_pD3DEffect->GetParameterBySemantic(NULL, "DEPTHBUFFER");
+    if (hDepthBuffer)
     {
         D3DXPARAMETER_DESC ParameterDesc;
-        m_pD3DEffect->GetParameterDesc ( hDepthBuffer, &ParameterDesc );
-        if ( ParameterDesc.Type >= D3DXPT_TEXTURE && ParameterDesc.Type <= D3DXPT_TEXTURECUBE )
+        m_pD3DEffect->GetParameterDesc(hDepthBuffer, &ParameterDesc);
+        if (ParameterDesc.Type >= D3DXPT_TEXTURE && ParameterDesc.Type <= D3DXPT_TEXTURECUBE)
         {
-            if ( m_pD3DEffect->IsParameterUsed ( hDepthBuffer, hTechnique ) )
+            if (m_pD3DEffect->IsParameterUsed(hDepthBuffer, hTechnique))
             {
-                ERenderFormat depthBufferFormat = m_pManager->GetDepthBufferFormat ();
-                if ( depthBufferFormat == RFORMAT_UNKNOWN )
+                ERenderFormat depthBufferFormat = m_pManager->GetDepthBufferFormat();
+                if (depthBufferFormat == RFORMAT_UNKNOWN)
                 {
                     strOutErrorExtra += " DEPTHBUFFER used, but readable depth buffer is not available";
                     return false;
@@ -420,118 +392,71 @@ bool CEffectTemplateImpl::ValidateDepthBufferUsage ( D3DXHANDLE hTechnique, SStr
     return true;
 }
 
-
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::ReleaseUnderlyingData
+// CEffectTemplate::ReleaseUnderlyingData
 //
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplateImpl::ReleaseUnderlyingData ( void )
+void CEffectTemplate::ReleaseUnderlyingData(void)
 {
-    SAFE_RELEASE ( m_pD3DEffect );
+    SAFE_RELEASE(m_pD3DEffect);
 }
 
-
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::CloneD3DEffect
+// CEffectTemplate::CloneD3DEffect
 //
 // Clone the d3d effect
 //
 ////////////////////////////////////////////////////////////////
-ID3DXEffect* CEffectTemplateImpl::CloneD3DEffect ( SString& strOutStatus, bool& bOutUsesVertexShader, bool& bOutUsesDepthBuffer, HRESULT& outHResult )
+CEffectWrap* CEffectTemplate::CloneD3DEffect(SString& strOutStatus)
 {
-    // Clone D3DXEffect
-    ID3DXEffect* pNewD3DEffect = NULL;
-    outHResult = D3D_OK;
-    pNewD3DEffect = m_pD3DEffect;
-    pNewD3DEffect->AddRef();
-
-    m_DebugInfo.cloneResult = outHResult;
-    if ( !pNewD3DEffect )
-    {
-        m_DebugInfo.uiCloneFailCount++;
-        return NULL;
-    }
-    m_DebugInfo.uiCloneSuccessCount++;
-
-    // Set the same technique
-    {
-        D3DXHANDLE hTechnique = m_pD3DEffect->GetCurrentTechnique ();
-        D3DXTECHNIQUE_DESC TechniqueDesc;
-        m_pD3DEffect->GetTechniqueDesc( hTechnique, &TechniqueDesc );
-        pNewD3DEffect->SetTechnique ( pNewD3DEffect->GetTechniqueByName ( TechniqueDesc.Name ) );
-
-        // Output technique name
-        strOutStatus = TechniqueDesc.Name;
-    }
-
-    // Check if any technique uses a vertex shader
-    bOutUsesVertexShader = false;
-    D3DXEFFECT_DESC EffectDesc;
-    m_pD3DEffect->GetDesc ( &EffectDesc );
-    for ( uint i = 0 ; i < EffectDesc.Techniques ; i++ )
-    {
-        D3DXHANDLE hTechnique = m_pD3DEffect->GetTechnique ( i );
-        D3DXTECHNIQUE_DESC TechniqueDesc;
-        m_pD3DEffect->GetTechniqueDesc( hTechnique, &TechniqueDesc );
-        for ( uint i = 0 ; i < TechniqueDesc.Passes ; i++ )
-        {
-            D3DXPASS_DESC PassDesc;
-            m_pD3DEffect->GetPassDesc ( m_pD3DEffect->GetPass ( hTechnique, i ), &PassDesc );
-            if ( PassDesc.pVertexShaderFunction )
-                bOutUsesVertexShader = true;
-        }
-    }
-
-    bOutUsesDepthBuffer = m_bUsesDepthBuffer;
-
-    // Add to list of clones
+    CEffectWrap* pEffectWrap = new CEffectWrap();
+    pEffectWrap->PostConstruct(m_pManager, this);
+    strOutStatus = m_strTechniqueName;
     m_uiCloneCount++;
-    return pNewD3DEffect;
+    return pEffectWrap;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::UnCloneD3DEffect
+// CEffectTemplate::UnCloneD3DEffect
 //
 // Remove from list and release
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplateImpl::UnCloneD3DEffect ( ID3DXEffect* pOldD3DEffect )
+void CEffectTemplate::UnCloneD3DEffect(CEffectWrap* pEffectWrap)
 {
-    assert( m_uiCloneCount > 0 );
+    assert(m_uiCloneCount > 0);
     m_uiCloneCount--;
 
-    if ( m_uiCloneCount == 0 )
-        m_TickCountLastUsed = CTickCount::Now ( true );
+    if (m_uiCloneCount == 0)
+        m_TickCountLastUsed = CTickCount::Now(true);
 
-    SAFE_RELEASE( pOldD3DEffect );
+    SAFE_RELEASE(pEffectWrap);
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
-// CEffectTemplateImpl::HaveFilesChanged
+// CEffectTemplate::HaveFilesChanged
 //
 // Recheck MD5's to see if the content has changed
 //
 ////////////////////////////////////////////////////////////////
-bool CEffectTemplateImpl::HaveFilesChanged ( void )
+bool CEffectTemplate::HaveFilesChanged(void)
 {
-    if ( !m_bHaveFilesChanged )
+    if (!m_bHaveFilesChanged)
     {
-        for ( std::map < SString, SString >::const_iterator iter = m_FileMD5Map.begin () ; iter != m_FileMD5Map.end () ; ++iter )
+        for (std::map<SString, SString>::const_iterator iter = m_FileMD5Map.begin(); iter != m_FileMD5Map.end(); ++iter)
         {
             const SString& strPathFilename = iter->first;
             const SString& strMD5 = iter->second;
-            SString strNewMD5 = CMD5Hasher::CalculateHexString ( strPathFilename );
-            if ( strNewMD5 != strMD5 )
+            SString        strNewMD5 = CMD5Hasher::CalculateHexString(strPathFilename);
+            if (strNewMD5 != strMD5)
             {
-                OutputDebugLine ( SString ( "[Shader] %s file has changed from %s to %s", *strPathFilename, *strMD5, *strNewMD5 ) );
+                OutputDebugLine(SString("[Shader] %s file has changed from %s to %s", *strPathFilename, *strMD5, *strNewMD5));
                 m_bHaveFilesChanged = true;
             }
         }

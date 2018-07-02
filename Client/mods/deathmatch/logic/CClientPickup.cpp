@@ -1,26 +1,23 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientPickup.cpp
-*  PURPOSE:     Pickup entity class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Kevin Whiteside <kevuwk@gmail.com>
-*               Jax <>
-*               Stanislav Bobrov <lil_toady@hotmail.com>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientPickup.cpp
+ *  PURPOSE:     Pickup entity class
+ *
+ *****************************************************************************/
 
 #include <StdInc.h>
 
 extern CClientGame* g_pClientGame;
 
-CClientPickup::CClientPickup ( CClientManager* pManager, ElementID ID, unsigned short usModel, CVector vecPosition ) : ClassInit ( this ), CClientStreamElement ( pManager->GetPickupStreamer (), ID )
+CClientPickup::CClientPickup(CClientManager* pManager, ElementID ID, unsigned short usModel, CVector vecPosition)
+    : ClassInit(this), CClientStreamElement(pManager->GetPickupStreamer(), ID)
 {
     // Initialize
     m_pManager = pManager;
-    m_pPickupManager = pManager->GetPickupManager ();
+    m_pPickupManager = pManager->GetPickupManager();
     m_usModel = usModel;
     m_bVisible = true;
     m_pPickup = NULL;
@@ -28,142 +25,136 @@ CClientPickup::CClientPickup ( CClientManager* pManager, ElementID ID, unsigned 
     m_pCollision = NULL;
 
     // Add us to pickup manager's list
-    m_pPickupManager->m_List.push_back ( this );
+    m_pPickupManager->m_List.push_back(this);
 
-    SetTypeName ( "pickup" );
+    SetTypeName("pickup");
     m_ucType = CClientPickup::WEAPON;
     m_ucWeaponType = CClientPickup::WEAPON_BRASSKNUCKLE;
     m_fAmount = 0.0f;
     m_usAmmo = 0;
 
     // Make sure our streamer knows where we are to start with
-    UpdateStreamPosition ( m_vecPosition = vecPosition );
+    UpdateStreamPosition(m_vecPosition = vecPosition);
 }
 
-
-CClientPickup::~CClientPickup ( void )
+CClientPickup::~CClientPickup(void)
 {
-    AttachTo ( NULL );
+    AttachTo(NULL);
 
     // Make sure our pickup is destroyed
-    Destroy ();
+    Destroy();
 
     // Remove us from the pickup manager's list
-    Unlink ();
+    Unlink();
 }
 
-
-void CClientPickup::Unlink ( void )
+void CClientPickup::Unlink(void)
 {
-    m_pPickupManager->RemoveFromList ( this );
+    m_pPickupManager->RemoveFromList(this);
 }
 
-
-void CClientPickup::SetPosition ( const CVector& vecPosition )
+void CClientPickup::SetPosition(const CVector& vecPosition)
 {
     // Different from our current position?
-    if ( m_vecPosition != vecPosition )
+    if (m_vecPosition != vecPosition)
     {
         // Set the new position and recreate it
         m_vecPosition = vecPosition;
-        ReCreate ();
+        ReCreate();
 
         // Update our streaming position
-        UpdateStreamPosition ( vecPosition );
+        UpdateStreamPosition(vecPosition);
     }
 }
 
-
-void CClientPickup::SetModel ( unsigned short usModel )
+void CClientPickup::SetModel(unsigned short usModel)
 {
     // Different from our current id?
-    if ( m_usModel != usModel )
+    if (m_usModel != usModel)
     {
         // Set the model and recreate the pickup
         m_usModel = usModel;
-        UpdateSpatialData ();
-        ReCreate ();
+        UpdateSpatialData();
+        ReCreate();
     }
 }
 
-
-void CClientPickup::SetVisible ( bool bVisible )
+void CClientPickup::SetVisible(bool bVisible)
 {
     // Update the flag
     m_bVisible = bVisible;
 
     // Only update visible state if we're streamed in
-    if ( IsStreamedIn () )
+    if (IsStreamedIn())
     {
-        if ( bVisible ) Create ();
-        else Destroy ();
+        if (bVisible)
+            Create();
+        else
+            Destroy();
     }
 }
 
-
-void CClientPickup::StreamIn ( bool bInstantly )
+void CClientPickup::StreamIn(bool bInstantly)
 {
     // Create it
-    Create ();
+    Create();
 
     // Notify the streamer we've created it
-    NotifyCreate ();
+    NotifyCreate();
 }
 
-
-void CClientPickup::StreamOut ( void )
+void CClientPickup::StreamOut(void)
 {
     // Destroy it
-    Destroy ();
+    Destroy();
 }
 
-
-void CClientPickup::Create ( void )
+void CClientPickup::Create(void)
 {
-    if ( !m_pPickup && m_bVisible )
+    if (!m_pPickup && m_bVisible)
     {
         // Create the pickup
-        m_pPickup = g_pGame->GetPickups ()->CreatePickup ( &m_vecPosition, m_usModel, PICKUP_ONCE );
+        m_pPickup = g_pGame->GetPickups()->CreatePickup(&m_vecPosition, m_usModel, PICKUP_ONCE);
         m_pObject = NULL;
-        if ( m_pPickup )
+        if (m_pPickup)
         {
             // Grab the attributes from the MTA interface for this pickup
-            unsigned char ucAreaCode = GetInterior ();
-            unsigned short usDimension = GetDimension ();
+            unsigned char  ucAreaCode = GetInterior();
+            unsigned short usDimension = GetDimension();
 
             // Make sure we have an object
-            if ( !m_pPickup->GetObject () ) m_pPickup->GiveUsAPickUpObject ();
+            if (!m_pPickup->GetObject())
+                m_pPickup->GiveUsAPickUpObject();
 
             // Store our pickup's object
-            m_pObject = m_pPickup->GetObject ();
+            m_pObject = m_pPickup->GetObject();
 
             // Create our collision
-            m_pCollision = new CClientColSphere ( g_pClientGame->GetManager(), NULL, m_vecPosition, 1.0f );
+            m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), NULL, m_vecPosition, 1.0f);
             m_pCollision->m_pOwningPickup = this;
-            m_pCollision->SetHitCallback ( this );
+            m_pCollision->SetHitCallback(this);
 
             // Increment pickup counter
             ++m_pPickupManager->m_uiPickupCount;
 
             // Restore the attributes
-            SetInterior ( ucAreaCode );
-            SetDimension ( usDimension );
+            SetInterior(ucAreaCode);
+            SetDimension(usDimension);
         }
     }
 }
 
-
-void CClientPickup::Destroy ( void )
+void CClientPickup::Destroy(void)
 {
-    if ( m_pCollision )
+    if (m_pCollision)
     {
         delete m_pCollision;
         m_pCollision = NULL;
     }
-    if ( m_pPickup )
+    if (m_pPickup)
     {
         // Delete the pickup
-        m_pPickup->Remove ();
+        m_pPickup->Remove();
         m_pPickup = NULL;
         m_pObject = NULL;
 
@@ -172,55 +163,52 @@ void CClientPickup::Destroy ( void )
     }
 }
 
-
-void CClientPickup::ReCreate ( void )
+void CClientPickup::ReCreate(void)
 {
     // If we had a pickup, destroy and recreate it
-    if ( m_pPickup )
+    if (m_pPickup)
     {
-        Destroy ();
-        Create ();
+        Destroy();
+        Create();
     }
 }
 
-
-void CClientPickup::Callback_OnCollision ( CClientColShape& Shape, CClientEntity& Entity )
+void CClientPickup::Callback_OnCollision(CClientColShape& Shape, CClientEntity& Entity)
 {
-    if ( IS_PLAYER ( &Entity ) )
+    if (IS_PLAYER(&Entity))
     {
-        bool bMatchingDimensions = (GetDimension () == Entity.GetDimension ()); // Matching dimensions?
+        bool bMatchingDimensions = (GetDimension() == Entity.GetDimension());            // Matching dimensions?
 
         // Call the pickup hit event (source = pickup that was hit)
         CLuaArguments Arguments;
-        Arguments.PushElement ( &Entity ); // The element that hit the pickup
-        Arguments.PushBoolean ( bMatchingDimensions );
-        CallEvent ( "onClientPickupHit", Arguments, true );
+        Arguments.PushElement(&Entity);            // The element that hit the pickup
+        Arguments.PushBoolean(bMatchingDimensions);
+        CallEvent("onClientPickupHit", Arguments, true);
 
         // Call the player pickup hit (source = player that hit the pickup)
         CLuaArguments Arguments2;
-        Arguments2.PushElement ( this ); // The pickup that was hit
-        Arguments2.PushBoolean ( bMatchingDimensions );
-        Entity.CallEvent ( "onClientPlayerPickupHit", Arguments2, true );
+        Arguments2.PushElement(this);            // The pickup that was hit
+        Arguments2.PushBoolean(bMatchingDimensions);
+        Entity.CallEvent("onClientPlayerPickupHit", Arguments2, true);
     }
 }
 
-
-void CClientPickup::Callback_OnLeave ( CClientColShape& Shape, CClientEntity& Entity )
+void CClientPickup::Callback_OnLeave(CClientColShape& Shape, CClientEntity& Entity)
 {
-    if ( IS_PLAYER ( &Entity ) )
+    if (IS_PLAYER(&Entity))
     {
-        bool bMatchingDimensions = (GetDimension () == Entity.GetDimension ()); // Matching dimensions?
+        bool bMatchingDimensions = (GetDimension() == Entity.GetDimension());            // Matching dimensions?
 
         // Call the pickup leave event (source = the pickup that was left)
         CLuaArguments Arguments;
-        Arguments.PushElement ( &Entity ); // The element that left the pickup
-        Arguments.PushBoolean ( bMatchingDimensions );
-        CallEvent ( "onClientPickupLeave", Arguments, true);
+        Arguments.PushElement(&Entity);            // The element that left the pickup
+        Arguments.PushBoolean(bMatchingDimensions);
+        CallEvent("onClientPickupLeave", Arguments, true);
 
         // Call the player pickup leave event (source = the player that left the pickup)
         CLuaArguments Arguments2;
-        Arguments2.PushElement ( this ); // The pickup that was left (this)
-        Arguments2.PushBoolean ( bMatchingDimensions );
-        Entity.CallEvent ( "onClientPlayerPickupLeave", Arguments2, true );
+        Arguments2.PushElement(this);            // The pickup that was left (this)
+        Arguments2.PushBoolean(bMatchingDimensions);
+        Entity.CallEvent("onClientPlayerPickupLeave", Arguments2, true);
     }
 }

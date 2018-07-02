@@ -1,19 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CRegisteredCommands.h
-*  PURPOSE:     Registered (lua) command manager class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Ed Lyons <>
-*               Jax <>
-*               Oliver Brown <>
-*               Alberto Alonso <rydencillo@gmail.com>
-*               lil_Toady <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CRegisteredCommands.h
+ *  PURPOSE:     Registered (lua) command manager class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #pragma once
 
@@ -27,37 +21,37 @@ class CRegisteredCommands
     struct SCommand
     {
         class CLuaMain* pLuaMain;
-        SString strKey;
+        SString         strKey;
         CLuaFunctionRef iLuaFunction;
-        bool bRestricted;
-        bool bCaseSensitive;
+        bool            bRestricted;
+        bool            bCaseSensitive;
     };
 
 public:
-                                        CRegisteredCommands             ( class CAccessControlListManager* pACLManager );
-                                        ~CRegisteredCommands            ( void );
+    CRegisteredCommands(class CAccessControlListManager* pACLManager);
+    ~CRegisteredCommands(void);
 
-    bool                                AddCommand                      ( class CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction, bool bRestricted, bool bCaseSensitive );
-    bool                                RemoveCommand                   ( class CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef () );
-    void                                ClearCommands                   ( void );
-    void                                CleanUpForVM                    ( class CLuaMain* pLuaMain );
+    bool AddCommand(class CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction, bool bRestricted, bool bCaseSensitive);
+    bool RemoveCommand(class CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef());
+    void ClearCommands(void);
+    void CleanUpForVM(class CLuaMain* pLuaMain);
 
-    bool                                CommandExists                   ( const char* szKey, class CLuaMain* pLuaMain = NULL );
+    bool CommandExists(const char* szKey, class CLuaMain* pLuaMain = NULL);
 
-    void                                GetCommands                     ( lua_State* luaVM );
-    void                                GetCommands                     ( lua_State* luaVM, CLuaMain* pTargetLuaMain );
+    void GetCommands(lua_State* luaVM);
+    void GetCommands(lua_State* luaVM, CLuaMain* pTargetLuaMain);
 
-    bool                                ProcessCommand                  ( const char* szKey, const char* szArguments, class CClient* pClient );
+    bool ProcessCommand(const char* szKey, const char* szArguments, class CClient* pClient);
 
 private:
-    SCommand*                           GetCommand                      ( const char* szKey, class CLuaMain* pLuaMain = NULL );
-    void                                CallCommandHandler              ( class CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, const char* szKey, const char* szArguments, class CClient* pClient );
+    SCommand* GetCommand(const char* szKey, class CLuaMain* pLuaMain = NULL);
+    void CallCommandHandler(class CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, const char* szKey, const char* szArguments, class CClient* pClient);
 
-    void                                TakeOutTheTrash                 ( void );
+    void TakeOutTheTrash(void);
 
-    list < SCommand* >                  m_Commands;
-    list < SCommand* >                  m_TrashCan;
-    bool                                m_bIteratingList;
+    list<SCommand*> m_Commands;
+    list<SCommand*> m_TrashCan;
+    bool            m_bIteratingList;
 
-    class CAccessControlListManager*    m_pACLManager;
+    class CAccessControlListManager* m_pACLManager;
 };

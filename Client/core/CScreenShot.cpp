@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CScreenShot.cpp
-*  PURPOSE:     Screen capture file handling
-*  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CScreenShot.cpp
+ *  PURPOSE:     Screen capture file handling
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 #include <libpng/png.h>
@@ -20,25 +19,24 @@ static bool bIsChatVisible = false;
 static bool bIsDebugVisible = false;
 
 // Variables used for saving the screen shot file on a separate thread
-static bool     ms_bIsSaving        = false;
-static uint     ms_uiWidth          = 0;
-static uint     ms_uiHeight         = 0;
-static void*    ms_pData            = NULL;
-static uint     ms_uiDataSize       = 0;
-static bool     ms_bHideChatBox     = false;        // TODO - Make setting
-static SString  ms_strFileName;
+static bool    ms_bIsSaving = false;
+static uint    ms_uiWidth = 0;
+static uint    ms_uiHeight = 0;
+static void*   ms_pData = NULL;
+static uint    ms_uiDataSize = 0;
+static bool    ms_bHideChatBox = false;            // TODO - Make setting
+static SString ms_strFileName;
 
-
-SString CScreenShot::PreScreenShot ()
+SString CScreenShot::PreScreenShot()
 {
-    bIsChatVisible = g_pCore->IsChatVisible ();
-    bIsDebugVisible = g_pCore->IsDebugVisible ();
+    bIsChatVisible = g_pCore->IsChatVisible();
+    bIsDebugVisible = g_pCore->IsDebugVisible();
 
     // make the chat and debug windows invisible
-    if ( ms_bHideChatBox )
+    if (ms_bHideChatBox)
     {
-        g_pCore->SetChatVisible ( false );
-        g_pCore->SetDebugVisible ( false );
+        g_pCore->SetChatVisible(false);
+        g_pCore->SetDebugVisible(false);
     }
 
     SString strScreenShotName = GetValidScreenshotFilename();
@@ -46,101 +44,107 @@ SString CScreenShot::PreScreenShot ()
     return strScreenShotName;
 }
 
-void CScreenShot::PostScreenShot ( const SString& strFileName )
+void CScreenShot::PostScreenShot(const SString& strFileName)
 {
     // print a notice
-    if ( !strFileName.empty () )
-        g_pCore->GetConsole()->Printf ( _("Screenshot taken: '%s'"), *strFileName );
+    if (!strFileName.empty())
+        g_pCore->GetConsole()->Printf(_("Screenshot taken: '%s'"), *strFileName);
 
     // make the chat and debug windows visible again
-    g_pCore->SetChatVisible ( bIsChatVisible );
-    g_pCore->SetDebugVisible ( bIsDebugVisible );
+    g_pCore->SetChatVisible(bIsChatVisible);
+    g_pCore->SetDebugVisible(bIsDebugVisible);
 }
 
-void CScreenShot::SetPath ( const char *szPath )
+void CScreenShot::SetPath(const char* szPath)
 {
-    strncpy ( szScreenShotPath, szPath, MAX_PATH - 1 );
+    strncpy(szScreenShotPath, szPath, MAX_PATH - 1);
 
     // make sure the directory exists
-    File::Mkdir ( szPath );
+    File::Mkdir(szPath);
 }
 
-int CScreenShot::GetScreenShots ( void )
+int CScreenShot::GetScreenShots(void)
 {
-    int iNumberOfFiles = 0;
-    HANDLE hFind;
+    int              iNumberOfFiles = 0;
+    HANDLE           hFind;
     WIN32_FIND_DATAW fdFindData;
-    //Create a search string
-    SString strScreenShotName ( "%s\\mta-screen*.png", &szScreenShotPath[0] );
+    // Create a search string
+    SString strScreenShotName("%s\\mta-screen*.png", &szScreenShotPath[0]);
     // Find the first match
-    hFind = FindFirstFileW(FromUTF8( strScreenShotName ), &fdFindData); 
+    hFind = FindFirstFileW(FromUTF8(strScreenShotName), &fdFindData);
     // Check if the first match failed
-    if ( hFind != INVALID_HANDLE_VALUE) {
+    if (hFind != INVALID_HANDLE_VALUE)
+    {
         iNumberOfFiles++;
-        //Loop through and count the files
-        while (FindNextFileW(hFind, &fdFindData)) { 
-            //Keep going until we find the last file
+        // Loop through and count the files
+        while (FindNextFileW(hFind, &fdFindData))
+        {
+            // Keep going until we find the last file
             iNumberOfFiles++;
         }
     }
-    //Close the file handle
+    // Close the file handle
     FindClose(hFind);
     return iNumberOfFiles;
 }
 
-SString CScreenShot::GetValidScreenshotFilename ( void )
+SString CScreenShot::GetValidScreenshotFilename(void)
 {
-    //Get the system time
+    // Get the system time
     SYSTEMTIME sysTime;
-    GetLocalTime( &sysTime );
-    return SString("%s\\mta-screen_%d-%02d-%02d_%02d-%02d-%02d.png" ,&szScreenShotPath[0],sysTime.wYear, sysTime.wMonth, sysTime.wDay, sysTime.wHour, sysTime.wMinute, sysTime.wSecond);
+    GetLocalTime(&sysTime);
+    return SString("%s\\mta-screen_%d-%02d-%02d_%02d-%02d-%02d.png", &szScreenShotPath[0], sysTime.wYear, sysTime.wMonth, sysTime.wDay, sysTime.wHour,
+                   sysTime.wMinute, sysTime.wSecond);
 }
 
-SString CScreenShot::GetScreenShotPath ( int iNumber )
+SString CScreenShot::GetScreenShotPath(int iNumber)
 {
-    //Create a search string
-    SString strScreenShotName ( "%s\\mta-screen*.png", &szScreenShotPath[0] );
-    HANDLE hFind;
-    SString strReturn = "";
+    // Create a search string
+    SString          strScreenShotName("%s\\mta-screen*.png", &szScreenShotPath[0]);
+    HANDLE           hFind;
+    SString          strReturn = "";
     WIN32_FIND_DATAW fdFindData;
-    int i = 1;
-    //Find the first match
-    hFind = FindFirstFileW(FromUTF8( strScreenShotName ), &fdFindData);
-    //Check if the first match failed
-    if ( hFind != INVALID_HANDLE_VALUE) {
-        if (iNumber == 1) {
-            //We wanted the first file
-            strReturn = SString("%s\\%s",&szScreenShotPath[0],fdFindData.cFileName);
+    int              i = 1;
+    // Find the first match
+    hFind = FindFirstFileW(FromUTF8(strScreenShotName), &fdFindData);
+    // Check if the first match failed
+    if (hFind != INVALID_HANDLE_VALUE)
+    {
+        if (iNumber == 1)
+        {
+            // We wanted the first file
+            strReturn = SString("%s\\%s", &szScreenShotPath[0], fdFindData.cFileName);
         }
         else
         {
-            //Loop through and find all occurences of the file
-            while (FindNextFileW(hFind, &fdFindData)) { 
-                //Keep going until we find the last file
+            // Loop through and find all occurences of the file
+            while (FindNextFileW(hFind, &fdFindData))
+            {
+                // Keep going until we find the last file
                 i++;
-                if (iNumber == i) {
-                    strReturn = SString("%s\\%s",&szScreenShotPath[0], fdFindData.cFileName);
+                if (iNumber == i)
+                {
+                    strReturn = SString("%s\\%s", &szScreenShotPath[0], fdFindData.cFileName);
                     break;
                 }
             }
         }
     }
-    FindClose(hFind); //Close the file handle
+    FindClose(hFind);            // Close the file handle
     // Get Return the file directory
     return strReturn;
 }
 
-
 // Callback for threaded save
 // Static function
-DWORD CScreenShot::ThreadProc ( LPVOID lpdwThreadParam )
+DWORD CScreenShot::ThreadProc(LPVOID lpdwThreadParam)
 {
     unsigned long ulScreenHeight = ms_uiHeight;
     unsigned long ulScreenWidth = ms_uiWidth;
-    uint uiReqDataSize = ulScreenHeight * ulScreenWidth * 4;
-    uint uiLinePitch = ulScreenWidth * 4;
+    uint          uiReqDataSize = ulScreenHeight * ulScreenWidth * 4;
+    uint          uiLinePitch = ulScreenWidth * 4;
 
-    if ( uiReqDataSize != ms_uiDataSize )
+    if (uiReqDataSize != ms_uiDataSize)
     {
         ms_bIsSaving = false;
         return 0;
@@ -148,48 +152,54 @@ DWORD CScreenShot::ThreadProc ( LPVOID lpdwThreadParam )
 
     // Create the screen data buffer
     BYTE** ppScreenData = NULL;
-    ppScreenData = new BYTE* [ ulScreenHeight ];
-    for ( unsigned short y = 0; y < ulScreenHeight; y++ ) {
-        ppScreenData[y] = new BYTE [ ulScreenWidth * 4 ];
+    ppScreenData = new BYTE*[ulScreenHeight];
+    for (unsigned short y = 0; y < ulScreenHeight; y++)
+    {
+        ppScreenData[y] = new BYTE[ulScreenWidth * 4];
     }
 
     // Copy the surface data into a row-based buffer for libpng
     #define BYTESPERPIXEL 4
     unsigned long ulLineWidth = ulScreenWidth * 4;
-    for ( unsigned int i = 0; i < ulScreenHeight; i++ ) {
-        memcpy ( ppScreenData[i], (BYTE*) ms_pData + i* uiLinePitch, ulLineWidth );
-        for ( unsigned int j = 3; j < ulLineWidth; j += BYTESPERPIXEL ) {
+    for (unsigned int i = 0; i < ulScreenHeight; i++)
+    {
+        memcpy(ppScreenData[i], (BYTE*)ms_pData + i * uiLinePitch, ulLineWidth);
+        for (unsigned int j = 3; j < ulLineWidth; j += BYTESPERPIXEL)
+        {
             ppScreenData[i][j] = 0xFF;
         }
     }
 
-    MakeSureDirExists( ms_strFileName );
-    FILE *file = File::Fopen (ms_strFileName, "wb");
-    if ( file )
+    MakeSureDirExists(ms_strFileName);
+    FILE* file = File::Fopen(ms_strFileName, "wb");
+    if (file)
     {
-        png_struct* png_ptr = png_create_write_struct ( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
-        png_info* info_ptr = png_create_info_struct ( png_ptr );
-        png_init_io ( png_ptr, file );
-        png_set_filter ( png_ptr, 0, PNG_FILTER_NONE );
-        png_set_compression_level ( png_ptr, 1 );
-        png_set_IHDR ( png_ptr, info_ptr, ulScreenWidth, ulScreenHeight, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT );
-        png_set_rows ( png_ptr, info_ptr, ppScreenData );
-        png_write_png ( png_ptr, info_ptr, PNG_TRANSFORM_BGR | PNG_TRANSFORM_STRIP_ALPHA, NULL );
-        png_write_end ( png_ptr, info_ptr );
-        png_destroy_write_struct ( &png_ptr, &info_ptr );
+        png_struct* png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+        png_info*   info_ptr = png_create_info_struct(png_ptr);
+        png_init_io(png_ptr, file);
+        png_set_filter(png_ptr, 0, PNG_FILTER_NONE);
+        png_set_compression_level(png_ptr, 1);
+        png_set_IHDR(png_ptr, info_ptr, ulScreenWidth, ulScreenHeight, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+                     PNG_FILTER_TYPE_DEFAULT);
+        png_set_rows(png_ptr, info_ptr, ppScreenData);
+        png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_BGR | PNG_TRANSFORM_STRIP_ALPHA, NULL);
+        png_write_end(png_ptr, info_ptr);
+        png_destroy_write_struct(&png_ptr, &info_ptr);
         fclose(file);
     }
     else
     {
-        CCore::GetSingleton ().GetConsole ()->Printf ( "Could not create screenshot file '%s'", *ms_strFileName );
+        CCore::GetSingleton().GetConsole()->Printf("Could not create screenshot file '%s'", *ms_strFileName);
     }
 
     // Clean up the screen data buffer
-    if ( ppScreenData ) {
-        for ( unsigned short y = 0; y < ulScreenHeight; y++ ) {
-            delete [] ppScreenData[y];
+    if (ppScreenData)
+    {
+        for (unsigned short y = 0; y < ulScreenHeight; y++)
+        {
+            delete[] ppScreenData[y];
         }
-        delete [] ppScreenData;
+        delete[] ppScreenData;
     }
 
     ms_bIsSaving = false;
@@ -197,9 +207,9 @@ DWORD CScreenShot::ThreadProc ( LPVOID lpdwThreadParam )
 }
 
 // Static function
-void CScreenShot::BeginSave ( const char *szFileName, void* pData, uint uiDataSize, uint uiWidth, uint uiHeight )
+void CScreenShot::BeginSave(const char* szFileName, void* pData, uint uiDataSize, uint uiWidth, uint uiHeight)
 {
-    if ( ms_bIsSaving )
+    if (ms_bIsSaving)
         return;
 
     ms_strFileName = szFileName;
@@ -208,21 +218,21 @@ void CScreenShot::BeginSave ( const char *szFileName, void* pData, uint uiDataSi
     ms_uiWidth = uiWidth;
     ms_uiHeight = uiHeight;
 
-    HANDLE hThread = CreateThread ( NULL, 0, (LPTHREAD_START_ROUTINE)CScreenShot::ThreadProc, NULL, CREATE_SUSPENDED, NULL );
-    if ( !hThread )
+    HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CScreenShot::ThreadProc, NULL, CREATE_SUSPENDED, NULL);
+    if (!hThread)
     {
-        CCore::GetSingleton ().GetConsole ()->Printf ( "Could not create screenshot thread." );
+        CCore::GetSingleton().GetConsole()->Printf("Could not create screenshot thread.");
     }
     else
     {
         ms_bIsSaving = true;
-        SetThreadPriority ( hThread, THREAD_PRIORITY_LOWEST );
-        ResumeThread ( hThread );
+        SetThreadPriority(hThread, THREAD_PRIORITY_LOWEST);
+        ResumeThread(hThread);
     }
 }
 
 // Static function
-bool CScreenShot::IsSaving ( void )
+bool CScreenShot::IsSaving(void)
 {
     return ms_bIsSaving;
 }

@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CBikeSA.h
-*  PURPOSE:     Header file for bike vehicle entity class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CBikeSA.h
+ *  PURPOSE:     Header file for bike vehicle entity class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CGAMESA_BIKE
 #define __CGAMESA_BIKE
@@ -26,12 +25,12 @@ class CBikeSAInterface : public CVehicleSAInterface
 class CBikeSA : public virtual CBike, public virtual CVehicleSA
 {
 public:
-    CBikeSA (  ){};
+    CBikeSA(){};
 
-    CBikeSA( CBikeSAInterface * bike );
-    CBikeSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 );
+    CBikeSA(CBikeSAInterface* bike);
+    CBikeSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
 
-    //void                    PlaceOnRoadProperly ( void );
+    // void                    PlaceOnRoadProperly ( void );
 };
 
 #endif

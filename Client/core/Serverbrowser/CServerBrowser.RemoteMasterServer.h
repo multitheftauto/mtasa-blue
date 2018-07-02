@@ -9,14 +9,13 @@
 class CRemoteMasterServerInterface : public CRefCountable
 {
 protected:
-    virtual                 ~CRemoteMasterServerInterface  ( void ) {}
-public:
+    virtual ~CRemoteMasterServerInterface(void) {}
 
+public:
     // CRemoteMasterServerInterface
-    virtual void            Refresh                     ( void ) = 0;
-    virtual bool            HasData                     ( void ) = 0;
-    virtual bool            ParseList                   ( CServerListItemList& itemList ) = 0;
+    virtual void Refresh(void) = 0;
+    virtual bool HasData(void) = 0;
+    virtual bool ParseList(CServerListItemList& itemList) = 0;
 };
 
-CRemoteMasterServerInterface* NewRemoteMasterServer ( const SString& strURL );
-
+CRemoteMasterServerInterface* NewRemoteMasterServer(const SString& strURL);

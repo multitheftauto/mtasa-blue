@@ -1,18 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CColShape.h
-*  PURPOSE:     Base shaped collision entity class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CColShape.h
+ *  PURPOSE:     Base shaped collision entity class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CCOLSHAPE_H
-#define __CCOLSHAPE_H
+#pragma once
 
 #include "CElement.h"
 
@@ -29,50 +26,49 @@ enum eColShapeType
 class CColShape : public CElement
 {
 public:
-                                CColShape           ( class CColManager* pManager, CElement* pParent, CXMLNode* pNode = NULL, bool bIsPartnered = false );
-    virtual                     ~CColShape          ( void );
+    CColShape(class CColManager* pManager, CElement* pParent, CXMLNode* pNode = NULL, bool bIsPartnered = false);
+    virtual ~CColShape(void);
 
-    virtual eColShapeType       GetShapeType        ( void ) = 0;
+    virtual eColShapeType GetShapeType(void) = 0;
 
-    void                        Unlink              ( void );
+    void Unlink(void);
 
-    virtual bool                DoHitDetection      ( const CVector& vecNowPosition ) = 0;
+    virtual bool DoHitDetection(const CVector& vecNowPosition) = 0;
 
-    inline bool                 IsEnabled           ( void )                            { return m_bIsEnabled; };
-    inline void                 SetEnabled          ( bool bEnabled )                   { m_bIsEnabled = bEnabled; };
+    bool IsEnabled(void) { return m_bIsEnabled; };
+    void SetEnabled(bool bEnabled) { m_bIsEnabled = bEnabled; };
 
-    const CVector&              GetPosition         ( void );
-    virtual void                SetPosition         ( const CVector& vecPosition );
+    const CVector& GetPosition(void);
+    virtual void   SetPosition(const CVector& vecPosition);
 
-    void                        CallHitCallback     ( CElement& Element );
-    void                        CallLeaveCallback   ( CElement& Element );
-    inline class CColCallback*  SetCallback         ( class CColCallback* pCallback )   { return ( m_pCallback = pCallback ); };   
+    void                CallHitCallback(CElement& Element);
+    void                CallLeaveCallback(CElement& Element);
+    class CColCallback* SetCallback(class CColCallback* pCallback) { return (m_pCallback = pCallback); };
 
-    inline bool                 GetAutoCallEvent    ( void )                            { return m_bAutoCallEvent; };
-    inline void                 SetAutoCallEvent    ( bool bAutoCallEvent )             { m_bAutoCallEvent = bAutoCallEvent; };
+    bool GetAutoCallEvent(void) { return m_bAutoCallEvent; };
+    void SetAutoCallEvent(bool bAutoCallEvent) { m_bAutoCallEvent = bAutoCallEvent; };
 
-    void                        AddCollider         ( CElement* pElement )              { m_Colliders.push_back ( pElement ); }
-    void                        RemoveCollider      ( CElement* pElement )              { m_Colliders.remove ( pElement ); }
-    bool                        ColliderExists      ( CElement* pElement );
-    void                        RemoveAllColliders  ( void );
-    list < CElement* > ::iterator  CollidersBegin   ( void )                            { return m_Colliders.begin (); }
-    list < CElement* > ::iterator  CollidersEnd     ( void )                            { return m_Colliders.end (); }
+    void                      AddCollider(CElement* pElement) { m_Colliders.push_back(pElement); }
+    void                      RemoveCollider(CElement* pElement) { m_Colliders.remove(pElement); }
+    bool                      ColliderExists(CElement* pElement);
+    void                      RemoveAllColliders(void);
+    list<CElement*>::iterator CollidersBegin(void) { return m_Colliders.begin(); }
+    list<CElement*>::iterator CollidersEnd(void) { return m_Colliders.end(); }
 
-    inline bool                 IsPartnered         ( void )                            { return m_bPartnered; }
+    bool IsPartnered(void) { return m_bPartnered; }
 
-    void                        SizeChanged         ( void );
+    void SizeChanged(void);
+
 protected:
-    CVector                     m_vecPosition;
+    CVector m_vecPosition;
 
 private:
-    bool                        m_bIsEnabled;
-    class CColManager*          m_pManager;
-    class CColCallback*         m_pCallback;
-    bool                        m_bAutoCallEvent;
+    bool                m_bIsEnabled;
+    class CColManager*  m_pManager;
+    class CColCallback* m_pCallback;
+    bool                m_bAutoCallEvent;
 
-    list < CElement* >          m_Colliders;
+    list<CElement*> m_Colliders;
 
-    bool                        m_bPartnered;
+    bool m_bPartnered;
 };
-
-#endif

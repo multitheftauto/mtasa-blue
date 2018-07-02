@@ -1,19 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CUnoccupiedVehicleSync.h
-*  PURPOSE:     Unoccupied vehicle entity synchronization class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*               lil_Toady <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CUnoccupiedVehicleSync.h
+ *  PURPOSE:     Unoccupied vehicle entity synchronization class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CUNOCCUPIEDVEHICLESYNC_H
-#define __CUNOCCUPIEDVEHICLESYNC_H
+#pragma once
 
 #include "CPlayerManager.h"
 #include "CVehicleManager.h"
@@ -23,30 +19,28 @@
 class CUnoccupiedVehicleSync
 {
 public:
-                            CUnoccupiedVehicleSync              ( CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager );
+    CUnoccupiedVehicleSync(CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager);
 
-    void                    DoPulse                             ( void );
-    bool                    ProcessPacket                       ( CPacket& Packet );
+    void DoPulse(void);
+    bool ProcessPacket(CPacket& Packet);
 
-    void                    OverrideSyncer                      ( CVehicle* pVehicle, CPlayer* pPlayer );
-    CPlayer*                FindPlayerCloseToVehicle            ( CVehicle* pVehicle, float fMaxDistance );
-    void                    ResyncForPlayer                     ( CPlayer* pPlayer );
+    void     OverrideSyncer(CVehicle* pVehicle, CPlayer* pPlayer);
+    CPlayer* FindPlayerCloseToVehicle(CVehicle* pVehicle, float fMaxDistance);
+    void     ResyncForPlayer(CPlayer* pPlayer);
 
 private:
-    void                    Update                              ( void );
-    void                    UpdateVehicle                       ( CVehicle* pVehicle );
-    void                    FindSyncer                          ( CVehicle* pVehicle );
-    
-    void                    StartSync                           ( CPlayer* pPlayer, CVehicle* pVehicle );
-    void                    StopSync                            ( CVehicle* pVehicle );
+    void Update(void);
+    void UpdateVehicle(CVehicle* pVehicle);
+    void FindSyncer(CVehicle* pVehicle);
 
-    void                    Packet_UnoccupiedVehicleSync        ( CUnoccupiedVehicleSyncPacket& Packet );
-    void                    Packet_UnoccupiedVehiclePushSync    ( CUnoccupiedVehiclePushPacket& Packet );
+    void StartSync(CPlayer* pPlayer, CVehicle* pVehicle);
+    void StopSync(CVehicle* pVehicle);
 
-    CPlayerManager*         m_pPlayerManager;
-    CVehicleManager*        m_pVehicleManager;
+    void Packet_UnoccupiedVehicleSync(CUnoccupiedVehicleSyncPacket& Packet);
+    void Packet_UnoccupiedVehiclePushSync(CUnoccupiedVehiclePushPacket& Packet);
 
-    CElapsedTime            m_UpdateTimer;
+    CPlayerManager*  m_pPlayerManager;
+    CVehicleManager* m_pVehicleManager;
+
+    CElapsedTime m_UpdateTimer;
 };
-
-#endif
