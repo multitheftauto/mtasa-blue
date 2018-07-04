@@ -2470,7 +2470,7 @@ bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName(unsigned short usUpgr
 bool CStaticFunctionDefinitions::GetVehicleNameFromModel(unsigned short usModel, SString& strOutName)
 {
     strOutName = CVehicleNames::GetVehicleName(usModel);
-    return true;
+    return !strOutName.empty();
 }
 
 bool CStaticFunctionDefinitions::GetHelicopterRotorSpeed(CClientVehicle& Vehicle, float& fSpeed)
