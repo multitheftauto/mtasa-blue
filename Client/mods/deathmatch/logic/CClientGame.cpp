@@ -2740,7 +2740,7 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientElementStreamIn", "", NULL, false);
     m_Events.AddEvent("onClientElementStreamOut", "", NULL, false);
     m_Events.AddEvent("onClientElementDestroy", "", NULL, false);
-    m_Events.AddEvent("onClientElementCreated", "", NULL, false);
+    m_Events.AddEvent("onClientElementCreate", "", NULL, false);
 
 
     // Player events

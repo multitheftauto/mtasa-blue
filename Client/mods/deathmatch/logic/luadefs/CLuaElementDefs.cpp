@@ -1551,7 +1551,7 @@ int CLuaElementDefs::CreateElement(lua_State* luaVM)
 
                     CLuaArguments Arguments;
                     Arguments.PushBoolean(false);
-                    pDummy->CallEvent("onClientElementCreated", Arguments, false);
+                    pDummy->CallEvent("onClientElementCreate", Arguments, false);
 
                     // Return it
                     lua_pushelement(luaVM, pDummy);

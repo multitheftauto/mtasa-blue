@@ -662,7 +662,7 @@ int CLuaGUIDefs::GUICreateWindow(lua_State* luaVM)
             
             CLuaArguments Arguments;
             Arguments.PushBoolean(false);
-            pGUIElement->CallEvent("onClientElementCreated", Arguments, false);
+            pGUIElement->CallEvent("onClientElementCreate", Arguments, false);
 
             lua_pushelement(luaVM, pGUIElement);
             return 1;
@@ -702,7 +702,7 @@ int CLuaGUIDefs::GUICreateLabel(lua_State* luaVM)
             
             CLuaArguments Arguments;
             Arguments.PushBoolean(false);
-            pGUIElement->CallEvent("onClientElementCreated", Arguments, false);
+            pGUIElement->CallEvent("onClientElementCreate", Arguments, false);
 
             lua_pushelement(luaVM, pGUIElement);
             return 1;
@@ -746,7 +746,7 @@ int CLuaGUIDefs::GUICreateStaticImage(lua_State* luaVM)
                 
                 CLuaArguments Arguments;
                 Arguments.PushBoolean(false);
-                pGUIElement->CallEvent("onClientElementCreated", Arguments, false);
+                pGUIElement->CallEvent("onClientElementCreate", Arguments, false);
 
                 lua_pushelement(luaVM, pGUIElement);
                 return 1;
@@ -789,7 +789,7 @@ int CLuaGUIDefs::GUICreateButton(lua_State* luaVM)
             
             CLuaArguments Arguments;
             Arguments.PushBoolean(false);
-            pGUIElement->CallEvent("onClientElementCreated", Arguments, false);
+            pGUIElement->CallEvent("onClientElementCreate", Arguments, false);
 
             lua_pushelement(luaVM, pGUIElement);
             return 1;
@@ -827,7 +827,7 @@ int CLuaGUIDefs::GUICreateProgressBar(lua_State* luaVM)
             
             CLuaArguments Arguments;
             Arguments.PushBoolean(false);
-            pGUIElement->CallEvent("onClientElementCreated", Arguments, false);
+            pGUIElement->CallEvent("onClientElementCreate", Arguments, false);
 
             lua_pushelement(luaVM, pGUIElement);
             return 1;
@@ -869,7 +869,7 @@ int CLuaGUIDefs::GUICreateCheckBox(lua_State* luaVM)
             
             CLuaArguments Arguments;
             Arguments.PushBoolean(false);
-            pGUIElement->CallEvent("onClientElementCreated", Arguments, false);
+            pGUIElement->CallEvent("onClientElementCreate", Arguments, false);
 
             lua_pushelement(luaVM, pGUIElement);
             return 1;
@@ -909,7 +909,7 @@ int CLuaGUIDefs::GUICreateRadioButton(lua_State* luaVM)
             
             CLuaArguments Arguments;
             Arguments.PushBoolean(false);
-            pGUIElement->CallEvent("onClientElementCreated", Arguments, false);
+            pGUIElement->CallEvent("onClientElementCreate", Arguments, false);
 
             lua_pushelement(luaVM, pGUIElement);
             return 1;
@@ -949,7 +949,7 @@ int CLuaGUIDefs::GUICreateEdit(lua_State* luaVM)
             
             CLuaArguments Arguments;
             Arguments.PushBoolean(false);
-            pGUIElement->CallEvent("onClientElementCreated", Arguments, false);
+            pGUIElement->CallEvent("onClientElementCreate", Arguments, false);
 
             lua_pushelement(luaVM, pGUIElement);
             return 1;
@@ -989,7 +989,7 @@ int CLuaGUIDefs::GUICreateMemo(lua_State* luaVM)
             
             CLuaArguments Arguments;
             Arguments.PushBoolean(false);
-            pGUIElement->CallEvent("onClientElementCreated", Arguments, false);
+            pGUIElement->CallEvent("onClientElementCreate", Arguments, false);
             
             lua_pushelement(luaVM, pGUIElement);
             return 1;
@@ -1027,7 +1027,7 @@ int CLuaGUIDefs::GUICreateGridList(lua_State* luaVM)
             
             CLuaArguments Arguments;
             Arguments.PushBoolean(false);
-            pGUIElement->CallEvent("onClientElementCreated", Arguments, false);
+            pGUIElement->CallEvent("onClientElementCreate", Arguments, false);
             
             lua_pushelement(luaVM, pGUIElement);
             return 1;
@@ -1065,7 +1065,7 @@ int CLuaGUIDefs::GUICreateScrollPane(lua_State* luaVM)
             
             CLuaArguments Arguments;
             Arguments.PushBoolean(false);
-            pGUIElement->CallEvent("onClientElementCreated", Arguments, false);
+            pGUIElement->CallEvent("onClientElementCreate", Arguments, false);
 
             lua_pushelement(luaVM, pGUIElement);
             return 1;
@@ -1105,7 +1105,7 @@ int CLuaGUIDefs::GUICreateScrollBar(lua_State* luaVM)
             
             CLuaArguments Arguments;
             Arguments.PushBoolean(false);
-            pGUIElement->CallEvent("onClientElementCreated", Arguments, false);
+            pGUIElement->CallEvent("onClientElementCreate", Arguments, false);
 
             lua_pushelement(luaVM, pGUIElement);
             return 1;
@@ -1143,7 +1143,7 @@ int CLuaGUIDefs::GUICreateTabPanel(lua_State* luaVM)
             
             CLuaArguments Arguments;
             Arguments.PushBoolean(false);
-            pGUIElement->CallEvent("onClientElementCreated", Arguments, false);
+            pGUIElement->CallEvent("onClientElementCreate", Arguments, false);
 
             lua_pushelement(luaVM, pGUIElement);
             return 1;
@@ -1241,7 +1241,7 @@ int CLuaGUIDefs::GUICreateTab(lua_State* luaVM)
             
             CLuaArguments Arguments;
             Arguments.PushBoolean(false);
-            pGUIElement->CallEvent("onClientElementCreated", Arguments, false);
+            pGUIElement->CallEvent("onClientElementCreate", Arguments, false);
 
             lua_pushelement(luaVM, pGUIElement);
             return 1;
@@ -3595,7 +3595,7 @@ int CLuaGUIDefs::GUICreateComboBox(lua_State* luaVM)
             
             CLuaArguments Arguments;
             Arguments.PushBoolean(false);
-            pGUIElement->CallEvent("onClientElementCreated", Arguments, false);
+            pGUIElement->CallEvent("onClientElementCreate", Arguments, false);
 
             lua_pushelement(luaVM, pGUIElement);
             return 1;
@@ -3802,7 +3802,7 @@ int CLuaGUIDefs::GUICreateFont(lua_State* luaVM)
 
                         CLuaArguments Arguments;
                         Arguments.PushBoolean(false);
-                        pGuiFont->CallEvent("onClientElementCreated", Arguments, false);
+                        pGuiFont->CallEvent("onClientElementCreate", Arguments, false);
 
                         lua_pushelement(luaVM, pGuiFont);
                         return 1;

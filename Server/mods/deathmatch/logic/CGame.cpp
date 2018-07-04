@@ -1338,7 +1338,7 @@ void CGame::InitialDataStream(CPlayer& Player)
 
     marker.Set("onPlayerJoin");
 
-    Player.CallEvent("onElementCreated", Arguments);
+    Player.CallEvent("onElementCreate", Arguments);
 
     // Register them on the lightweight sync manager.
     m_lightsyncManager.RegisterPlayer(&Player);
@@ -1499,7 +1499,7 @@ void CGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onElementClicked", "button, state, clicker, posX, posY, posZ", NULL, false);
     m_Events.AddEvent("onElementDataChange", "key, oldValue", NULL, false);
     m_Events.AddEvent("onElementDestroy", "", NULL, false);
-    m_Events.AddEvent("onElementCreated", "", NULL, false);
+    m_Events.AddEvent("onElementCreate", "", NULL, false);
     m_Events.AddEvent("onElementStartSync", "newSyncer", NULL, false);
     m_Events.AddEvent("onElementStopSync", "oldSyncer", NULL, false);
     m_Events.AddEvent("onElementModelChange", "oldModel, newModel", NULL, false);

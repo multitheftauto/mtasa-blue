@@ -101,7 +101,7 @@ int CLuaBlipDefs::CreateBlip(lua_State* luaVM)
 
                     CLuaArguments Arguments;
                     Arguments.PushBoolean(false);
-                    pMarker->CallEvent("onClientElementCreated", Arguments, false);
+                    pMarker->CallEvent("onClientElementCreate", Arguments, false);
 
                     lua_pushelement(luaVM, pMarker);
                     return 1;
@@ -162,7 +162,7 @@ int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
 
                     CLuaArguments Arguments;
                     Arguments.PushBoolean(false);
-                    pMarker->CallEvent("onClientElementCreated", Arguments, false);
+                    pMarker->CallEvent("onClientElementCreate", Arguments, false);
 
                     lua_pushelement(luaVM, pMarker);
                     return 1;
