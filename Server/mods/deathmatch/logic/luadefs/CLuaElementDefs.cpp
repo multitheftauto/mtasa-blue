@@ -231,7 +231,7 @@ int CLuaElementDefs::createElement(lua_State* luaVM)
                     }
 
                     CLuaArguments Arguments;
-                    pDummy->CallEvent("onElementCreate", Arguments, false);
+                    pDummy->CallEvent("onElementCreate", Arguments);
 
                     lua_pushelement(luaVM, pDummy);
                     return 1;
