@@ -2431,7 +2431,7 @@ CClientPed* CStaticFunctionDefinitions::CreatePed(CResource& Resource, unsigned 
 
         CLuaArguments Arguments;
         Arguments.PushBoolean(false);
-        pPed->CallEvent("onClientElementCreated", Arguments, false);
+        pPed->CallEvent("onClientElementCreate", Arguments, false);
 
         return pPed;
     }
@@ -3631,7 +3631,7 @@ CClientObject* CStaticFunctionDefinitions::CreateObject(CResource& Resource, uns
 
             CLuaArguments Arguments;
             Arguments.PushBoolean(false);
-            pObject->CallEvent("onClientElementCreated", Arguments, false);
+            pObject->CallEvent("onClientElementCreate", Arguments, false);
 
             return pObject;
         }
@@ -3867,7 +3867,7 @@ CClientRadarArea* CStaticFunctionDefinitions::CreateRadarArea(CResource& Resourc
 
         CLuaArguments Arguments;
         Arguments.PushBoolean(false);
-        pRadarArea->CallEvent("onClientElementCreated", Arguments, false);
+        pRadarArea->CallEvent("onClientElementCreate", Arguments, false);
 
         return pRadarArea;
     }
@@ -4331,7 +4331,7 @@ CClientMarker* CStaticFunctionDefinitions::CreateMarker(CResource& Resource, con
 
         CLuaArguments Arguments;
         Arguments.PushBoolean(false);
-        pMarker->CallEvent("onClientElementCreated", Arguments, false);
+        pMarker->CallEvent("onClientElementCreate", Arguments, false);
 
         // Return it
         return pMarker;
@@ -6733,7 +6733,7 @@ CClientProjectile* CStaticFunctionDefinitions::CreateProjectile(CResource& Resou
 
                             CLuaArguments Arguments;
                             Arguments.PushBoolean(false);
-                            pProjectile->CallEvent("onClientElementCreated", Arguments, false);
+                            pProjectile->CallEvent("onClientElementCreate", Arguments, false);
 
                             return pProjectile;
                         }
@@ -6777,7 +6777,7 @@ CClientColSphere* CStaticFunctionDefinitions::CreateColSphere(CResource& Resourc
     
     CLuaArguments Arguments;
     Arguments.PushBoolean(false);
-    pShape->CallEvent("onClientElementCreated", Arguments, false);
+    pShape->CallEvent("onClientElementCreate", Arguments, false);
     return pShape;
 }
 

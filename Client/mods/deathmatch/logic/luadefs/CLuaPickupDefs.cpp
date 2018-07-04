@@ -76,7 +76,7 @@ int CLuaPickupDefs::CreatePickup(lua_State* luaVM)
 
                     CLuaArguments Arguments;
                     Arguments.PushBoolean(false);
-                    pPickup->CallEvent("onClientElementCreated", Arguments, false);
+                    pPickup->CallEvent("onClientElementCreate", Arguments, false);
 
                     // Return the handle
                     lua_pushelement(luaVM, pPickup);

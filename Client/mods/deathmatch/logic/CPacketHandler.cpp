@@ -3997,7 +3997,7 @@ retry:
 
         CLuaArguments Arguments;
         Arguments.PushBoolean(true);
-        pTempEntity->CallEvent("onClientElementCreated", Arguments, false);
+        pTempEntity->CallEvent("onClientElementCreate", Arguments, false);
 
         delete pEntityStuff;
     }

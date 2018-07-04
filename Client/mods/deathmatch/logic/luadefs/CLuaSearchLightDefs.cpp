@@ -79,7 +79,7 @@ int CLuaSearchLightDefs::CreateSearchLight(lua_State* luaVM)
 
                 CLuaArguments Arguments;
                 Arguments.PushBoolean(false);
-                pLight->CallEvent("onClientElementCreated", Arguments, false);
+                pLight->CallEvent("onClientElementCreate", Arguments, false);
 
                 lua_pushelement(luaVM, pLight);
                 return 1;
