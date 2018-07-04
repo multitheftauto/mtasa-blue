@@ -21,6 +21,7 @@ void CLuaDrawingDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("dxDrawLine3D", DxDrawLine3D);
     CLuaCFunctions::AddFunction("dxDrawText", DxDrawText);
     CLuaCFunctions::AddFunction("dxDrawRectangle", DxDrawRectangle);
+    CLuaCFunctions::AddFunction("dxDrawCircle", DxDrawCircle);
     CLuaCFunctions::AddFunction("dxDrawImage", DxDrawImage);
     CLuaCFunctions::AddFunction("dxDrawImageSection", DxDrawImageSection);
     CLuaCFunctions::AddFunction("dxGetTextWidth", DxGetTextWidth);
@@ -372,6 +373,37 @@ int CLuaDrawingDefs::DxDrawText(lua_State* luaVM)
 }
 
 int CLuaDrawingDefs::DxDrawRectangle(lua_State* luaVM)
+{
+    //  bool dxDrawRectangle ( float startX, float startY, float width, float height [, int color = white, bool postGUI = false, bool subPixelPositioning=false]
+    //  )
+    CVector2D vecPosition;
+    CVector2D vecSize;
+    SColor    color;
+    bool      bPostGUI;
+    bool      bSubPixelPositioning;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadVector2D(vecPosition);
+    argStream.ReadVector2D(vecSize);
+    argStream.ReadColor(color, 0xFFFFFFFF);
+    argStream.ReadBool(bPostGUI, false);
+    argStream.ReadBool(bSubPixelPositioning, false);
+
+    if (!argStream.HasErrors())
+    {
+        g_pCore->GetGraphics()->DrawRectQueued(vecPosition.fX, vecPosition.fY, vecSize.fX, vecSize.fY, color, bPostGUI, bSubPixelPositioning);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
 {
     //  bool dxDrawRectangle ( float startX, float startY, float width, float height [, int color = white, bool postGUI = false, bool subPixelPositioning=false]
     //  )

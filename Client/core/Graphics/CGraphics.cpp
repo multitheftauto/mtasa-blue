@@ -795,6 +795,23 @@ void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, 
     AddQueueItem(Item, bPostGUI);
 }
 
+void CGraphics::DrawCircleQueued(float fX, float fY, float fRadiusMin, float fRadiusMax, ushort startAngle, ushort stopAngle, bool bPostGUI, bool bSubPixelPositioning)
+{
+
+    // Set up a queue item
+    sDrawQueueItem Item;
+    Item.eType = QUEUE_CIRCLE;
+    Item.blendMode = m_ActiveBlendMode;
+    Item.Circle.fX = fX;
+    Item.Circle.fY = fY;
+    Item.Circle.fRadiusMin = fRadiusMin;
+    Item.Circle.fRadiusMax = fRadiusMax;
+    Item.Circle.startAngle = startAngle;
+    Item.Circle.stopAngle = stopAngle;
+    // Add it to the queue
+    AddQueueItem(Item, bPostGUI);
+}
+
 void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeight, float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV,
                                   CMaterialItem* pMaterial, float fRotation, float fRotCenOffX, float fRotCenOffY, unsigned long ulColor, bool bPostGUI)
 {
@@ -1433,6 +1450,13 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
             DrawRectangleInternal(Item.Rect.fX, Item.Rect.fY, Item.Rect.fWidth, Item.Rect.fHeight, Item.Rect.ulColor, Item.Rect.bSubPixelPositioning);
             break;
         }
+        case QUEUE_CIRCLE:
+        {
+            CheckModes(EDrawMode::DX_SPRITE, Item.blendMode);
+            DrawRectangleInternal(Item.Rect.fX, Item.Rect.fY, Item.Rect.fWidth, Item.Rect.fHeight, Item.Rect.ulColor, Item.Rect.bSubPixelPositioning);
+            break;
+        }
+
         case QUEUE_TEXT:
         {
             RECT rect;
