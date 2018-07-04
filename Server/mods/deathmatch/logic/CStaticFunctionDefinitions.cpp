@@ -2088,7 +2088,7 @@ CPed* CStaticFunctionDefinitions::CreatePed(CResource* pResource, unsigned short
             }
 
             CLuaArguments Arguments;
-            pPed->CallEvent("onElementCreate", Arguments);
+            pPed->CallEvent("onElementCreated", Arguments);
 
             return pPed;
         }
@@ -4747,7 +4747,7 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsign
             }
 
             CLuaArguments Arguments;
-            pVehicle->CallEvent("onElementCreate", Arguments);
+            pVehicle->CallEvent("onElementCreated", Arguments);
 
             return pVehicle;
         }
@@ -7532,7 +7532,7 @@ CMarker* CStaticFunctionDefinitions::CreateMarker(CResource* pResource, const CV
                 pMarker->Sync(true);
 
             CLuaArguments Arguments;
-            pMarker->CallEvent("onElementCreate", Arguments);
+            pMarker->CallEvent("onElementCreated", Arguments);
 
             return pMarker;
         }
@@ -7723,7 +7723,7 @@ CBlip* CStaticFunctionDefinitions::CreateBlip(CResource* pResource, const CVecto
                 pBlip->Sync(true);
 
             CLuaArguments Arguments;
-            pBlip->CallEvent("onElementCreate", Arguments);
+            pBlip->CallEvent("onElementCreated", Arguments);
 
             return pBlip;
         }
@@ -7966,7 +7966,7 @@ CObject* CStaticFunctionDefinitions::CreateObject(CResource* pResource, unsigned
         }
 
         CLuaArguments Arguments;
-        pObject->CallEvent("onElementCreate", Arguments);
+        pObject->CallEvent("onElementCreated", Arguments);
 
         return pObject;
     }
@@ -8169,7 +8169,7 @@ CRadarArea* CStaticFunctionDefinitions::CreateRadarArea(CResource* pResource, co
             pRadarArea->Sync(true);
 
         CLuaArguments Arguments;
-        pRadarArea->CallEvent("onElementCreate", Arguments);
+        pRadarArea->CallEvent("onElementCreated", Arguments);
 
         return pRadarArea;
     }
@@ -8346,7 +8346,7 @@ CPickup* CStaticFunctionDefinitions::CreatePickup(CResource* pResource, const CV
         }
 
         CLuaArguments Arguments;
-        pPickup->CallEvent("onElementCreate", Arguments);
+        pPickup->CallEvent("onElementCreated", Arguments);
     }
 
     return pPickup;
@@ -8951,7 +8951,7 @@ CTeam* CStaticFunctionDefinitions::CreateTeam(CResource* pResource, const char* 
     }
 
     CLuaArguments Arguments;
-    pTeam->CallEvent("onElementCreate", Arguments);
+    pTeam->CallEvent("onElementCreated", Arguments);
 
     return pTeam;
 }
@@ -9247,7 +9247,7 @@ CColCircle* CStaticFunctionDefinitions::CreateColCircle(CResource* pResource, co
     }
 
     CLuaArguments Arguments;
-    pColShape->CallEvent("onElementCreate", Arguments);
+    pColShape->CallEvent("onElementCreated", Arguments);
 
     return pColShape;
 }
@@ -9269,7 +9269,7 @@ CColCuboid* CStaticFunctionDefinitions::CreateColCuboid(CResource* pResource, co
     }
 
     CLuaArguments Arguments;
-    pColShape->CallEvent("onElementCreate", Arguments);
+    pColShape->CallEvent("onElementCreated", Arguments);
 
     return pColShape;
 }
@@ -9291,7 +9291,7 @@ CColSphere* CStaticFunctionDefinitions::CreateColSphere(CResource* pResource, co
     }
 
     CLuaArguments Arguments;
-    pColShape->CallEvent("onElementCreate", Arguments);
+    pColShape->CallEvent("onElementCreated", Arguments);
 
     return pColShape;
 }
@@ -9313,7 +9313,7 @@ CColRectangle* CStaticFunctionDefinitions::CreateColRectangle(CResource* pResour
     }
 
     CLuaArguments Arguments;
-    pColShape->CallEvent("onElementCreate", Arguments);
+    pColShape->CallEvent("onElementCreated", Arguments);
 
     return pColShape;
 }
@@ -9343,7 +9343,7 @@ CColPolygon* CStaticFunctionDefinitions::CreateColPolygon(CResource* pResource, 
     }
 
     CLuaArguments Arguments;
-    pColShape->CallEvent("onElementCreate", Arguments);
+    pColShape->CallEvent("onElementCreated", Arguments);
 
     return pColShape;
 }
@@ -9365,7 +9365,7 @@ CColTube* CStaticFunctionDefinitions::CreateColTube(CResource* pResource, const 
     }
 
     CLuaArguments Arguments;
-    pColShape->CallEvent("onElementCreate", Arguments);
+    pColShape->CallEvent("onElementCreated", Arguments);
 
     return pColShape;
 }

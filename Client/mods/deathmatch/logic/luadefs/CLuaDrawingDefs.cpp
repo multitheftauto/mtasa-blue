@@ -704,7 +704,7 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
 
                         CLuaArguments Arguments;
                         Arguments.PushBoolean(false);
-                        pTexture->CallEvent("onClientElementCreate", Arguments, false);
+                        pTexture->CallEvent("onClientElementCreated", Arguments, false);
 
                         lua_pushelement(luaVM, pTexture);
                         return 1;
@@ -794,7 +794,7 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
 
                         CLuaArguments Arguments;
                         Arguments.PushBoolean(false);
-                        pShader->CallEvent("onClientElementCreate", Arguments, false);
+                        pShader->CallEvent("onClientElementCreated", Arguments, false);
 
                         lua_pushelement(luaVM, pShader);
                         lua_pushstring(luaVM, strStatus);            // String containing name of technique being used.
@@ -1144,7 +1144,7 @@ int CLuaDrawingDefs::DxCreateFont(lua_State* luaVM)
 
                         CLuaArguments Arguments;
                         Arguments.PushBoolean(false);
-                        pDxFont->CallEvent("onClientElementCreate", Arguments, false);
+                        pDxFont->CallEvent("onClientElementCreated", Arguments, false);
 
                         lua_pushelement(luaVM, pDxFont);
                         return 1;

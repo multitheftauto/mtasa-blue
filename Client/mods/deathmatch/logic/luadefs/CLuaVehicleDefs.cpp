@@ -1479,7 +1479,7 @@ int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
 
                     CLuaArguments Arguments;
                     Arguments.PushBoolean(false);
-                    pVehicle->CallEvent("onClientElementCreate", Arguments, false);
+                    pVehicle->CallEvent("onClientElementCreated", Arguments, false);
 
                     lua_pushelement(luaVM, pVehicle);
                     return 1;

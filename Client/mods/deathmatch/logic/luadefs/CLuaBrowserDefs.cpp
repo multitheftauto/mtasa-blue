@@ -144,7 +144,7 @@ int CLuaBrowserDefs::CreateBrowser(lua_State* luaVM)
 
             CLuaArguments Arguments;
             Arguments.PushBoolean(false);
-            pBrowserTexture->CallEvent("onClientElementCreate", Arguments, false);
+            pBrowserTexture->CallEvent("onClientElementCreated", Arguments, false);
 
             lua_pushelement(luaVM, pBrowserTexture);
             return 1;
@@ -904,7 +904,7 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
             
             CLuaArguments Arguments;
             Arguments.PushBoolean(false);
-            pGUIElement->CallEvent("onClientElementCreate", Arguments, false);
+            pGUIElement->CallEvent("onClientElementCreated", Arguments, false);
             
             lua_pushelement(luaVM, pGUIElement);
             return 1;

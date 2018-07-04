@@ -168,7 +168,7 @@ int CLuaWeaponDefs::CreateWeapon(lua_State* luaVM)
 
                     CLuaArguments Arguments;
                     Arguments.PushBoolean(false);
-                    pWeapon->CallEvent("onClientElementCreate", Arguments, false);
+                    pWeapon->CallEvent("onClientElementCreated", Arguments, false);
 
                     lua_pushelement(luaVM, pWeapon);
                     return 1;

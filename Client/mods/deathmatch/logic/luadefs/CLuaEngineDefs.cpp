@@ -136,7 +136,7 @@ int CLuaEngineDefs::EngineLoadCOL(lua_State* luaVM)
 
                         CLuaArguments Arguments;
                         Arguments.PushBoolean(false);
-                        pCol->CallEvent("onClientElementCreate", Arguments, false);
+                        pCol->CallEvent("onClientElementCreated", Arguments, false);
 
                         // Return the created col model
                         lua_pushelement(luaVM, pCol);
@@ -200,7 +200,7 @@ int CLuaEngineDefs::EngineLoadDFF(lua_State* luaVM)
 
                         CLuaArguments Arguments;
                         Arguments.PushBoolean(false);
-                        pDFF->CallEvent("onClientElementCreate", Arguments, false);
+                        pDFF->CallEvent("onClientElementCreated", Arguments, false);
 
                         lua_pushelement(luaVM, pDFF);
                         return 1;
@@ -264,7 +264,7 @@ int CLuaEngineDefs::EngineLoadTXD(lua_State* luaVM)
 
                         CLuaArguments Arguments;
                         Arguments.PushBoolean(false);
-                        pTXD->CallEvent("onClientElementCreate", Arguments, false);
+                        pTXD->CallEvent("onClientElementCreated", Arguments, false);
 
                         // Return the TXD
                         lua_pushelement(luaVM, pTXD);
@@ -319,7 +319,7 @@ int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
                     {
                         CLuaArguments Arguments;
                         Arguments.PushBoolean(false);
-                        pIFP.get()->CallEvent("onClientElementCreate", Arguments, false);
+                        pIFP.get()->CallEvent("onClientElementCreated", Arguments, false);
 
                         // Return the IFP element
                         lua_pushelement(luaVM, pIFP.get());

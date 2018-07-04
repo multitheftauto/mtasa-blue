@@ -165,7 +165,7 @@ int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
                 }
 
                 CLuaArguments Arguments;
-                pBlip->CallEvent("onElementCreate", Arguments);
+                pBlip->CallEvent("onElementCreated", Arguments);
 
                 lua_pushelement(luaVM, pBlip);
                 return 1;

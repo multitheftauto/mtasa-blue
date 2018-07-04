@@ -525,7 +525,7 @@ int CLuaEffectDefs::CreateEffect(lua_State* luaVM)
 
                     CLuaArguments Arguments;
                     Arguments.PushBoolean(false);
-                    pFx->CallEvent("onClientElementCreate", Arguments, false);
+                    pFx->CallEvent("onClientElementCreated", Arguments, false);
 
                     lua_pushelement(luaVM, pFx);
                     return 1;
