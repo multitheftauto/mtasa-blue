@@ -305,7 +305,7 @@ int CLuaElementDefs::cloneElement(lua_State* luaVM)
                     }
 
                     CLuaArguments Arguments;
-                    pNewElement->CallEvent("onElementCreate", Arguments, false);
+                    pNewElement->CallEvent("onElementCreate", Arguments);
 
                     lua_pushelement(luaVM, pNewElement);
                     return 1;
