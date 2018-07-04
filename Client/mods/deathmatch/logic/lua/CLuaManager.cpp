@@ -11,7 +11,6 @@
 
 #include "StdInc.h"
 #include "../luadefs/CLuaFireDefs.h"
-#include "../luadefs/CLuaPathFindDefs.h"
 
 using std::list;
 
@@ -421,5 +420,4 @@ void CLuaManager::LoadCFunctions(void)
     CLuaWaterDefs::LoadFunctions();
     CLuaWeaponDefs::LoadFunctions();
     CLuaXMLDefs::LoadFunctions();
-    CLuaPathFindDefs::LoadFunctions();
 }
