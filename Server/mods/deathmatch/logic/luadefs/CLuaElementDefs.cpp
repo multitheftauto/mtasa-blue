@@ -229,6 +229,10 @@ int CLuaElementDefs::createElement(lua_State* luaVM)
                     {
                         pGroup->Add(pDummy);
                     }
+
+                    CLuaArguments Arguments;
+                    pDummy->CallEvent("onElementCreated", Arguments, false);
+
                     lua_pushelement(luaVM, pDummy);
                     return 1;
                 }
@@ -299,6 +303,10 @@ int CLuaElementDefs::cloneElement(lua_State* luaVM)
                     {
                         pGroup->Add(pNewElement);
                     }
+
+                    CLuaArguments Arguments;
+                    pNewElement->CallEvent("onElementCreated", Arguments, false);
+
                     lua_pushelement(luaVM, pNewElement);
                     return 1;
                 }

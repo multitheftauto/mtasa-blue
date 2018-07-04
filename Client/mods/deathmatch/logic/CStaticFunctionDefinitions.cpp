@@ -6758,11 +6758,6 @@ CClientColCircle* CStaticFunctionDefinitions::CreateColCircle(CResource& Resourc
     CClientColCircle* pShape = new CClientColCircle(m_pManager, INVALID_ELEMENT_ID, vecPosition, fRadius);
     pShape->SetParent(Resource.GetResourceDynamicEntity());
     // CStaticFunctionDefinitions::RefreshColShapeColliders ( pShape );   ** Not applied to maintain compatibility with existing scrips **
-    
-    CLuaArguments Arguments;
-    Arguments.PushBoolean(false);
-    pShape->CallEvent("onClientElementCreated", Arguments, false);
-
     return pShape;
 }
 
@@ -6771,11 +6766,6 @@ CClientColCuboid* CStaticFunctionDefinitions::CreateColCuboid(CResource& Resourc
     CClientColCuboid* pShape = new CClientColCuboid(m_pManager, INVALID_ELEMENT_ID, vecPosition, vecSize);
     pShape->SetParent(Resource.GetResourceDynamicEntity());
     // CStaticFunctionDefinitions::RefreshColShapeColliders ( pShape );   ** Not applied to maintain compatibility with existing scrips **
-    
-    CLuaArguments Arguments;
-    Arguments.PushBoolean(false);
-    pShape->CallEvent("onClientElementCreated", Arguments, false);
-
     return pShape;
 }
 
@@ -6788,7 +6778,6 @@ CClientColSphere* CStaticFunctionDefinitions::CreateColSphere(CResource& Resourc
     CLuaArguments Arguments;
     Arguments.PushBoolean(false);
     pShape->CallEvent("onClientElementCreated", Arguments, false);
-
     return pShape;
 }
 
@@ -6797,11 +6786,6 @@ CClientColRectangle* CStaticFunctionDefinitions::CreateColRectangle(CResource& R
     CClientColRectangle* pShape = new CClientColRectangle(m_pManager, INVALID_ELEMENT_ID, vecPosition, vecSize);
     pShape->SetParent(Resource.GetResourceDynamicEntity());
     // CStaticFunctionDefinitions::RefreshColShapeColliders ( pShape );   ** Not applied to maintain compatibility with existing scrips **
-    
-    CLuaArguments Arguments;
-    Arguments.PushBoolean(false);
-    pShape->CallEvent("onClientElementCreated", Arguments, false);
-
     return pShape;
 }
 
@@ -6810,11 +6794,6 @@ CClientColPolygon* CStaticFunctionDefinitions::CreateColPolygon(CResource& Resou
     CClientColPolygon* pShape = new CClientColPolygon(m_pManager, INVALID_ELEMENT_ID, vecPosition);
     pShape->SetParent(Resource.GetResourceDynamicEntity());
     // CStaticFunctionDefinitions::RefreshColShapeColliders ( pShape );   ** Not applied to maintain compatibility with existing scrips **
-    
-    CLuaArguments Arguments;
-    Arguments.PushBoolean(false);
-    pShape->CallEvent("onClientElementCreated", Arguments, false);
-
     return pShape;
 }
 
@@ -6823,11 +6802,6 @@ CClientColTube* CStaticFunctionDefinitions::CreateColTube(CResource& Resource, c
     CClientColTube* pShape = new CClientColTube(m_pManager, INVALID_ELEMENT_ID, vecPosition, fRadius, fHeight);
     pShape->SetParent(Resource.GetResourceDynamicEntity());
     // CStaticFunctionDefinitions::RefreshColShapeColliders ( pShape );   ** Not applied to maintain compatibility with existing scrips **
-    
-    CLuaArguments Arguments;
-    Arguments.PushBoolean(false);
-    pShape->CallEvent("onClientElementCreated", Arguments, false);
-
     return pShape;
 }
 
