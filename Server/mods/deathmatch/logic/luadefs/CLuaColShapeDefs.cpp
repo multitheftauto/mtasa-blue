@@ -22,6 +22,7 @@ void CLuaColShapeDefs::LoadFunctions()
 
     CLuaCFunctions::AddFunction("isInsideColShape", IsInsideColShape);
     CLuaCFunctions::AddFunction("getColShapeType", GetColShapeType);
+    CLuaCFunctions::AddFunction("doHitDetection", DoHitDetection);
 }
 
 void CLuaColShapeDefs::AddClass(lua_State* luaVM)
@@ -40,6 +41,7 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "getShapeType", "getColShapeType");
     lua_classvariable(luaVM, "shapeType", nullptr, "getColShapeType");
+    lua_classvariable(luaVM, "doHitDetection", nullptr, "doHitDetection");
 
     lua_registerclass(luaVM, "ColShape", "Element");
 }
@@ -348,6 +350,27 @@ int CLuaColShapeDefs::IsInsideColShape(lua_State* luaVM)
             lua_pushboolean(luaVM, bInside);
             return 1;
         }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaColShapeDefs::DoHitDetection(lua_State* luaVM)
+{
+    //  bool doHitDetection ( colshape theColShape )
+    CColShape* pColShape;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pColShape);
+
+    if (!argStream.HasErrors())
+    {
+        CStaticFunctionDefinitions::RefreshColShapeColliders(pColShape);
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
