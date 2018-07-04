@@ -141,6 +141,11 @@ int CLuaBrowserDefs::CreateBrowser(lua_State* luaVM)
                 // Set our owner resource
                 pBrowserTexture->SetResource(pParentResource);
             }
+
+            CLuaArguments Arguments;
+            Arguments.PushBoolean(false);
+            pBrowserTexture->CallEvent("onClientElementCreated", Arguments, false);
+
             lua_pushelement(luaVM, pBrowserTexture);
             return 1;
         }
@@ -896,6 +901,11 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
         {
             CClientGUIElement* pGUIElement =
                 CStaticFunctionDefinitions::GUICreateBrowser(*pLuaMain, position, size, bIsLocal, bIsTransparent, bIsRelative, parent);
+            
+            CLuaArguments Arguments;
+            Arguments.PushBoolean(false);
+            pGUIElement->CallEvent("onClientElementCreated", Arguments, false);
+            
             lua_pushelement(luaVM, pGUIElement);
             return 1;
         }

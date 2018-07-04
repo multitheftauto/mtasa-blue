@@ -2428,6 +2428,11 @@ CClientPed* CStaticFunctionDefinitions::CreatePed(CResource& Resource, unsigned 
         Resource.AddToElementGroup(pPed);
         pPed->SetPosition(vecPosition);
         pPed->SetCurrentRotationNew(fRotationRadians);
+
+        CLuaArguments Arguments;
+        Arguments.PushBoolean(false);
+        pPed->CallEvent("onClientElementCreated", Arguments, false);
+
         return pPed;
     }
 
@@ -3624,6 +3629,10 @@ CClientObject* CStaticFunctionDefinitions::CreateObject(CResource& Resource, uns
             pObject->SetPosition(vecPosition);
             pObject->SetRotationDegrees(vecRotation);
 
+            CLuaArguments Arguments;
+            Arguments.PushBoolean(false);
+            pObject->CallEvent("onClientElementCreated", Arguments, false);
+
             return pObject;
         }
     }
@@ -3855,6 +3864,10 @@ CClientRadarArea* CStaticFunctionDefinitions::CreateRadarArea(CResource& Resourc
         pRadarArea->SetPosition(vecPosition2D);
         pRadarArea->SetSize(vecSize);
         pRadarArea->SetColor(color);
+
+        CLuaArguments Arguments;
+        Arguments.PushBoolean(false);
+        pRadarArea->CallEvent("onClientElementCreated", Arguments, false);
 
         return pRadarArea;
     }
@@ -4315,6 +4328,10 @@ CClientMarker* CStaticFunctionDefinitions::CreateMarker(CResource& Resource, con
         pMarker->SetPosition(vecPosition);
         pMarker->SetColor(color);
         pMarker->SetSize(fSize);
+
+        CLuaArguments Arguments;
+        Arguments.PushBoolean(false);
+        pMarker->CallEvent("onClientElementCreated", Arguments, false);
 
         // Return it
         return pMarker;
@@ -6713,6 +6730,11 @@ CClientProjectile* CStaticFunctionDefinitions::CreateProjectile(CResource& Resou
                             // Set our intiation data, which will be used on the next frame
                             pProjectile->Initiate(vecOrigin, vecRotation, vecVelocity, usModel);
                             pProjectile->SetParent(Resource.GetResourceDynamicEntity());
+
+                            CLuaArguments Arguments;
+                            Arguments.PushBoolean(false);
+                            pProjectile->CallEvent("onClientElementCreated", Arguments, false);
+
                             return pProjectile;
                         }
                     }
@@ -6736,6 +6758,11 @@ CClientColCircle* CStaticFunctionDefinitions::CreateColCircle(CResource& Resourc
     CClientColCircle* pShape = new CClientColCircle(m_pManager, INVALID_ELEMENT_ID, vecPosition, fRadius);
     pShape->SetParent(Resource.GetResourceDynamicEntity());
     // CStaticFunctionDefinitions::RefreshColShapeColliders ( pShape );   ** Not applied to maintain compatibility with existing scrips **
+    
+    CLuaArguments Arguments;
+    Arguments.PushBoolean(false);
+    pShape->CallEvent("onClientElementCreated", Arguments, false);
+
     return pShape;
 }
 
@@ -6744,6 +6771,11 @@ CClientColCuboid* CStaticFunctionDefinitions::CreateColCuboid(CResource& Resourc
     CClientColCuboid* pShape = new CClientColCuboid(m_pManager, INVALID_ELEMENT_ID, vecPosition, vecSize);
     pShape->SetParent(Resource.GetResourceDynamicEntity());
     // CStaticFunctionDefinitions::RefreshColShapeColliders ( pShape );   ** Not applied to maintain compatibility with existing scrips **
+    
+    CLuaArguments Arguments;
+    Arguments.PushBoolean(false);
+    pShape->CallEvent("onClientElementCreated", Arguments, false);
+
     return pShape;
 }
 
@@ -6752,6 +6784,11 @@ CClientColSphere* CStaticFunctionDefinitions::CreateColSphere(CResource& Resourc
     CClientColSphere* pShape = new CClientColSphere(m_pManager, INVALID_ELEMENT_ID, vecPosition, fRadius);
     pShape->SetParent(Resource.GetResourceDynamicEntity());
     // CStaticFunctionDefinitions::RefreshColShapeColliders ( pShape );   ** Not applied to maintain compatibility with existing scrips **
+    
+    CLuaArguments Arguments;
+    Arguments.PushBoolean(false);
+    pShape->CallEvent("onClientElementCreated", Arguments, false);
+
     return pShape;
 }
 
@@ -6760,6 +6797,11 @@ CClientColRectangle* CStaticFunctionDefinitions::CreateColRectangle(CResource& R
     CClientColRectangle* pShape = new CClientColRectangle(m_pManager, INVALID_ELEMENT_ID, vecPosition, vecSize);
     pShape->SetParent(Resource.GetResourceDynamicEntity());
     // CStaticFunctionDefinitions::RefreshColShapeColliders ( pShape );   ** Not applied to maintain compatibility with existing scrips **
+    
+    CLuaArguments Arguments;
+    Arguments.PushBoolean(false);
+    pShape->CallEvent("onClientElementCreated", Arguments, false);
+
     return pShape;
 }
 
@@ -6768,6 +6810,11 @@ CClientColPolygon* CStaticFunctionDefinitions::CreateColPolygon(CResource& Resou
     CClientColPolygon* pShape = new CClientColPolygon(m_pManager, INVALID_ELEMENT_ID, vecPosition);
     pShape->SetParent(Resource.GetResourceDynamicEntity());
     // CStaticFunctionDefinitions::RefreshColShapeColliders ( pShape );   ** Not applied to maintain compatibility with existing scrips **
+    
+    CLuaArguments Arguments;
+    Arguments.PushBoolean(false);
+    pShape->CallEvent("onClientElementCreated", Arguments, false);
+
     return pShape;
 }
 
@@ -6776,6 +6823,11 @@ CClientColTube* CStaticFunctionDefinitions::CreateColTube(CResource& Resource, c
     CClientColTube* pShape = new CClientColTube(m_pManager, INVALID_ELEMENT_ID, vecPosition, fRadius, fHeight);
     pShape->SetParent(Resource.GetResourceDynamicEntity());
     // CStaticFunctionDefinitions::RefreshColShapeColliders ( pShape );   ** Not applied to maintain compatibility with existing scrips **
+    
+    CLuaArguments Arguments;
+    Arguments.PushBoolean(false);
+    pShape->CallEvent("onClientElementCreated", Arguments, false);
+
     return pShape;
 }
 

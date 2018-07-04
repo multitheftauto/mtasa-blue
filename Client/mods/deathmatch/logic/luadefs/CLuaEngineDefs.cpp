@@ -134,6 +134,10 @@ int CLuaEngineDefs::EngineLoadCOL(lua_State* luaVM)
                         // Success. Make it a child of the resource collision root
                         pCol->SetParent(pRoot);
 
+                        CLuaArguments Arguments;
+                        Arguments.PushBoolean(false);
+                        pCol->CallEvent("onClientElementCreated", Arguments, false);
+
                         // Return the created col model
                         lua_pushelement(luaVM, pCol);
                         return 1;
@@ -193,6 +197,11 @@ int CLuaEngineDefs::EngineLoadDFF(lua_State* luaVM)
                         pDFF->SetParent(pRoot);
 
                         // Return the DFF
+
+                        CLuaArguments Arguments;
+                        Arguments.PushBoolean(false);
+                        pDFF->CallEvent("onClientElementCreated", Arguments, false);
+
                         lua_pushelement(luaVM, pDFF);
                         return 1;
                     }
@@ -253,6 +262,10 @@ int CLuaEngineDefs::EngineLoadTXD(lua_State* luaVM)
                         // Success loading the file. Set parent to TXD root
                         pTXD->SetParent(pRoot);
 
+                        CLuaArguments Arguments;
+                        Arguments.PushBoolean(false);
+                        pTXD->CallEvent("onClientElementCreated", Arguments, false);
+
                         // Return the TXD
                         lua_pushelement(luaVM, pTXD);
                         return 1;
@@ -304,6 +317,10 @@ int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
                     std::shared_ptr<CClientIFP> pIFP = CIFPEngine::EngineLoadIFP(pResource, m_pManager, strPath, strBlockName);
                     if (pIFP != nullptr)
                     {
+                        CLuaArguments Arguments;
+                        Arguments.PushBoolean(false);
+                        pIFP.get()->CallEvent("onClientElementCreated", Arguments, false);
+
                         // Return the IFP element
                         lua_pushelement(luaVM, pIFP.get());
                         return 1;

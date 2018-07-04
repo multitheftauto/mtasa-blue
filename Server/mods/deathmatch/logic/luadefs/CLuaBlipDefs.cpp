@@ -163,6 +163,10 @@ int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
                 {
                     group->Add(pBlip);
                 }
+
+                CLuaArguments Arguments;
+                pBlip->CallEvent("onElementCreated", Arguments, false);
+
                 lua_pushelement(luaVM, pBlip);
                 return 1;
             }

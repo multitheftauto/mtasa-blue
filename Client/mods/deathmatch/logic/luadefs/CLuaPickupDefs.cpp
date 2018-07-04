@@ -74,6 +74,10 @@ int CLuaPickupDefs::CreatePickup(lua_State* luaVM)
                         pGroup->Add((CClientEntity*)pPickup);
                     }
 
+                    CLuaArguments Arguments;
+                    Arguments.PushBoolean(false);
+                    pPickup->CallEvent("onClientElementCreated", Arguments, false);
+
                     // Return the handle
                     lua_pushelement(luaVM, pPickup);
                     return 1;

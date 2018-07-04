@@ -82,6 +82,11 @@ int CLuaPointLightDefs::CreateLight(lua_State* luaVM)
                 {
                     pGroup->Add((CClientEntity*)pLight);
                 }
+
+                CLuaArguments Arguments;
+                Arguments.PushBoolean(false);
+                pLight->CallEvent("onClientElementCreated", Arguments, false);
+
                 lua_pushelement(luaVM, pLight);
                 return 1;
             }

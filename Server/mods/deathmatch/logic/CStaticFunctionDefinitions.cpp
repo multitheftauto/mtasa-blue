@@ -2088,7 +2088,6 @@ CPed* CStaticFunctionDefinitions::CreatePed(CResource* pResource, unsigned short
             }
 
             CLuaArguments Arguments;
-            Arguments.PushResource(pResource);
             pPed->CallEvent("onElementCreated", Arguments);
 
             return pPed;
@@ -4748,7 +4747,6 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsign
             }
 
             CLuaArguments Arguments;
-            Arguments.PushResource(pResource);
             pVehicle->CallEvent("onElementCreated", Arguments);
 
             return pVehicle;
@@ -7534,7 +7532,6 @@ CMarker* CStaticFunctionDefinitions::CreateMarker(CResource* pResource, const CV
                 pMarker->Sync(true);
 
             CLuaArguments Arguments;
-            Arguments.PushResource(pResource);
             pMarker->CallEvent("onElementCreated", Arguments);
 
             return pMarker;
@@ -7726,7 +7723,6 @@ CBlip* CStaticFunctionDefinitions::CreateBlip(CResource* pResource, const CVecto
                 pBlip->Sync(true);
 
             CLuaArguments Arguments;
-            Arguments.PushResource(pResource);
             pBlip->CallEvent("onElementCreated", Arguments);
 
             return pBlip;
@@ -7970,7 +7966,6 @@ CObject* CStaticFunctionDefinitions::CreateObject(CResource* pResource, unsigned
         }
 
         CLuaArguments Arguments;
-        Arguments.PushResource(pResource);
         pObject->CallEvent("onElementCreated", Arguments);
 
         return pObject;
@@ -8174,7 +8169,6 @@ CRadarArea* CStaticFunctionDefinitions::CreateRadarArea(CResource* pResource, co
             pRadarArea->Sync(true);
 
         CLuaArguments Arguments;
-        Arguments.PushResource(pResource);
         pRadarArea->CallEvent("onElementCreated", Arguments);
 
         return pRadarArea;
@@ -8352,7 +8346,6 @@ CPickup* CStaticFunctionDefinitions::CreatePickup(CResource* pResource, const CV
         }
 
         CLuaArguments Arguments;
-        Arguments.PushResource(pResource);
         pPickup->CallEvent("onElementCreated", Arguments);
     }
 
@@ -8958,7 +8951,6 @@ CTeam* CStaticFunctionDefinitions::CreateTeam(CResource* pResource, const char* 
     }
 
     CLuaArguments Arguments;
-    Arguments.PushResource(pResource);
     pTeam->CallEvent("onElementCreated", Arguments);
 
     return pTeam;
@@ -9255,7 +9247,6 @@ CColCircle* CStaticFunctionDefinitions::CreateColCircle(CResource* pResource, co
     }
 
     CLuaArguments Arguments;
-    Arguments.PushResource(pResource);
     pColShape->CallEvent("onElementCreated", Arguments);
 
     return pColShape;
@@ -9278,7 +9269,6 @@ CColCuboid* CStaticFunctionDefinitions::CreateColCuboid(CResource* pResource, co
     }
 
     CLuaArguments Arguments;
-    Arguments.PushResource(pResource);
     pColShape->CallEvent("onElementCreated", Arguments);
 
     return pColShape;
@@ -9301,7 +9291,6 @@ CColSphere* CStaticFunctionDefinitions::CreateColSphere(CResource* pResource, co
     }
 
     CLuaArguments Arguments;
-    Arguments.PushResource(pResource);
     pColShape->CallEvent("onElementCreated", Arguments);
 
     return pColShape;
@@ -9324,7 +9313,6 @@ CColRectangle* CStaticFunctionDefinitions::CreateColRectangle(CResource* pResour
     }
 
     CLuaArguments Arguments;
-    Arguments.PushResource(pResource);
     pColShape->CallEvent("onElementCreated", Arguments);
 
     return pColShape;
@@ -9355,7 +9343,6 @@ CColPolygon* CStaticFunctionDefinitions::CreateColPolygon(CResource* pResource, 
     }
 
     CLuaArguments Arguments;
-    Arguments.PushResource(pResource);
     pColShape->CallEvent("onElementCreated", Arguments);
 
     return pColShape;
@@ -9378,7 +9365,6 @@ CColTube* CStaticFunctionDefinitions::CreateColTube(CResource* pResource, const 
     }
 
     CLuaArguments Arguments;
-    Arguments.PushResource(pResource);
     pColShape->CallEvent("onElementCreated", Arguments);
 
     return pColShape;

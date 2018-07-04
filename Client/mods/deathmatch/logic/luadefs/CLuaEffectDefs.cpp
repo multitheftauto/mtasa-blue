@@ -522,6 +522,11 @@ int CLuaEffectDefs::CreateEffect(lua_State* luaVM)
                 {
                     pFx->SetRotationDegrees(vecRotation);
                     pFx->SetDrawDistance(fDrawDistance);
+
+                    CLuaArguments Arguments;
+                    Arguments.PushBoolean(false);
+                    pFx->CallEvent("onClientElementCreated", Arguments, false);
+
                     lua_pushelement(luaVM, pFx);
                     return 1;
                 }

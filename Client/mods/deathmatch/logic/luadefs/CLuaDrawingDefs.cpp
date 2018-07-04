@@ -701,6 +701,11 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
                             // ElementGroup? **
                             pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
                         }
+
+                        CLuaArguments Arguments;
+                        Arguments.PushBoolean(false);
+                        pTexture->CallEvent("onClientElementCreated", Arguments, false);
+
                         lua_pushelement(luaVM, pTexture);
                         return 1;
                     }
@@ -786,6 +791,11 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
                         // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's
                         // ElementGroup? **
                         pShader->SetParent(pParentResource->GetResourceDynamicEntity());
+
+                        CLuaArguments Arguments;
+                        Arguments.PushBoolean(false);
+                        pShader->CallEvent("onClientElementCreated", Arguments, false);
+
                         lua_pushelement(luaVM, pShader);
                         lua_pushstring(luaVM, strStatus);            // String containing name of technique being used.
                         return 2;
@@ -1131,6 +1141,11 @@ int CLuaDrawingDefs::DxCreateFont(lua_State* luaVM)
                         // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's
                         // ElementGroup? **
                         pDxFont->SetParent(pParentResource->GetResourceDynamicEntity());
+
+                        CLuaArguments Arguments;
+                        Arguments.PushBoolean(false);
+                        pDxFont->CallEvent("onClientElementCreated", Arguments, false);
+
                         lua_pushelement(luaVM, pDxFont);
                         return 1;
                     }

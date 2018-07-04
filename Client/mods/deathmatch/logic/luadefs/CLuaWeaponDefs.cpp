@@ -166,6 +166,10 @@ int CLuaWeaponDefs::CreateWeapon(lua_State* luaVM)
                         pGroup->Add((CClientEntity*)pWeapon);
                     }
 
+                    CLuaArguments Arguments;
+                    Arguments.PushBoolean(false);
+                    pWeapon->CallEvent("onClientElementCreated", Arguments, false);
+
                     lua_pushelement(luaVM, pWeapon);
                     return 1;
                 }

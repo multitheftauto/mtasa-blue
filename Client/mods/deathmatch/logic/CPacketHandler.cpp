@@ -3995,6 +3995,10 @@ retry:
                 pTempObject->SetLowLodObject(pLowLodObject);
         }
 
+        CLuaArguments Arguments;
+        Arguments.PushBoolean(true);
+        pTempEntity->CallEvent("onClientElementCreated", Arguments, false);
+
         delete pEntityStuff;
     }
     newEntitiesStuff.clear();
