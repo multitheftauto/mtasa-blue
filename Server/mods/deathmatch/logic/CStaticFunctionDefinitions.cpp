@@ -4903,7 +4903,7 @@ bool CStaticFunctionDefinitions::GetVehicleName(CVehicle* pVehicle, SString& str
 bool CStaticFunctionDefinitions::GetVehicleNameFromModel(unsigned short usModel, SString& strOutName)
 {
     strOutName = CVehicleNames::GetVehicleName(usModel);
-    return true;
+    return !strOutName.empty();
 }
 
 CPed* CStaticFunctionDefinitions::GetVehicleOccupant(CVehicle* pVehicle, unsigned int uiSeat)
@@ -9321,6 +9321,13 @@ CColTube* CStaticFunctionDefinitions::CreateColTube(CResource* pResource, const 
     }
 
     return pColShape;
+}
+
+bool CStaticFunctionDefinitions::IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside)
+{
+    inside = pColShape->DoHitDetection(vecPosition);
+
+    return true;
 }
 
 // Make sure all colliders for a colshape are up to date

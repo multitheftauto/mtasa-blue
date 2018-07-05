@@ -941,6 +941,7 @@ CVehicleColor& CClientVehicle::GetColor(void)
 void CClientVehicle::SetColor(const CVehicleColor& color)
 {
     m_Color = color;
+    m_bColorSaved = true;
     if (m_pVehicle)
     {
         m_pVehicle->SetColor(m_Color.GetRGBColor(0), m_Color.GetRGBColor(1), m_Color.GetRGBColor(2), m_Color.GetRGBColor(3), 0);

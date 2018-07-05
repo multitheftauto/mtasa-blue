@@ -44,7 +44,7 @@ void CFileReader::SkipBytes(const std::uint32_t u32BytesToSkip)
 
 bool CFileReader::LoadFileToMemory(const SString& strFilePath)
 {
-    std::ifstream   fileStream(strFilePath, std::ios::binary | std::ios::ate);
+    std::ifstream   fileStream(FromUTF8(strFilePath), std::ios::binary | std::ios::ate);
     std::streamsize m_iFileSize = fileStream.tellg();
     if (m_iFileSize == eIFSTREAM::SIZE_ERROR)
     {

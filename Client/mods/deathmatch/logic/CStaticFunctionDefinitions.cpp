@@ -2470,7 +2470,7 @@ bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName(unsigned short usUpgr
 bool CStaticFunctionDefinitions::GetVehicleNameFromModel(unsigned short usModel, SString& strOutName)
 {
     strOutName = CVehicleNames::GetVehicleName(usModel);
-    return true;
+    return !strOutName.empty();
 }
 
 bool CStaticFunctionDefinitions::GetHelicopterRotorSpeed(CClientVehicle& Vehicle, float& fSpeed)
@@ -6433,7 +6433,7 @@ bool CStaticFunctionDefinitions::BindKey(const char* szKey, const char* szHitSta
     {
         bool bHitState = true;
         // Activate all keys for this command
-        pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true);
+        pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true, szKey);
         // Check if its binded already (dont rebind)
         if (pKeyBinds->CommandExists(szKey, szCommandName, true, bHitState, szArguments, szResource, true, true))
             return true;
@@ -6446,7 +6446,7 @@ bool CStaticFunctionDefinitions::BindKey(const char* szKey, const char* szHitSta
         }
 
         bHitState = false;
-        pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true);
+        pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true, szKey);
         if (pKeyBinds->CommandExists(szKey, szCommandName, true, bHitState, szArguments, szResource, true, true))
             return true;
 
@@ -6523,16 +6523,16 @@ bool CStaticFunctionDefinitions::UnbindKey(const char* szKey, const char* szHitS
             }
         }
         if ((!stricmp(szHitState, "down") || !stricmp(szHitState, "both")) &&
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true))
+            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true, true))
         {
-            pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true);
+            pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true, szKey);
             bSuccess = true;
         }
         bHitState = false;
         if ((!stricmp(szHitState, "up") || !stricmp(szHitState, "both")) &&
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true))
+            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true, true))
         {
-            pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true);
+            pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true, szKey);
             bSuccess = true;
         }
     }
@@ -6802,6 +6802,13 @@ CClientColShape* CStaticFunctionDefinitions::GetElementColShape(CClientEntity* p
             break;
     }
     return pColShape;
+}
+
+bool CStaticFunctionDefinitions::IsInsideColShape(CClientColShape* pColShape, const CVector& vecPosition, bool& inside)
+{
+    inside = pColShape->DoHitDetection(vecPosition, 0);
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetWeaponNameFromID(unsigned char ucID, SString& strOutName)
