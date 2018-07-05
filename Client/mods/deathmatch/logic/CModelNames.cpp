@@ -2411,7 +2411,7 @@ struct
     330,   "Phone",
     331,   "Brass_Knuckles",
     333,   "Golf_Club",
-    334,   "Night_Strick", // typo here retained for BC
+    334,   "Night_Strick",            // typo here retained for BC
     334,   "Night_Stick",
     335,   "Knife",
     336,   "Baseball_Bat",
