@@ -47,6 +47,7 @@ class CAnimManager
     friend class CAnimBlendAssociation;
 
 public:
+    typedef std::unique_ptr<CAnimBlendAssociation>       AnimBlendAssoc_type;
     typedef std::unique_ptr<CAnimBlendStaticAssociation> StaticAssocIntface_type;
 
     virtual void Initialize(void) = 0;
@@ -117,6 +118,7 @@ public:
     virtual CAnimBlock*            GetAnimBlock(CAnimBlockSAInterface* pInterface) = 0;
     virtual CAnimBlendHierarchy*   GetAnimBlendHierarchy(CAnimBlendHierarchySAInterface* pInterface) = 0;
 
+    virtual AnimBlendAssoc_type     GetAnimBlendAssociation2(CAnimBlendAssociationSAInterface* pInterface) = 0;
     virtual StaticAssocIntface_type GetAnimStaticAssociation(CAnimBlendStaticAssociationSAInterface* pInterface) = 0;
 
     // MTA members, but use this strictly for custom animations only

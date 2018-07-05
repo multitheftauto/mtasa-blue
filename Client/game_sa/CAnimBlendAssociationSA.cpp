@@ -13,6 +13,31 @@
 
 extern CGameSA* pGame;
 
+CAnimBlendAssociationSAInterface* CAnimBlendAssociationSA::Constructor(CAnimBlendStaticAssociationSAInterface& staticAssociationByReference)
+{
+    DWORD DwFunc = 0x4CF080;
+    DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
+    _asm
+    {
+        mov     ecx, DwThisInterface
+        push    staticAssociationByReference
+        call    DwFunc
+    };
+}
+
+CAnimBlendAssociationSAInterface* CAnimBlendAssociationSA::Constructor(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy)
+{
+    DWORD DwFunc = 0x4CEFC0;
+    DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
+    _asm
+    {
+        mov     ecx, DwThisInterface
+        push    pAnimHierarchy
+        push    pClump
+        call    DwFunc
+    };
+}
+
 CAnimBlendHierarchy* CAnimBlendAssociationSA::GetAnimHierarchy(void)
 {
     return pGame->GetAnimManager()->GetAnimBlendHierarchy(m_pInterface->pAnimHierarchy);
