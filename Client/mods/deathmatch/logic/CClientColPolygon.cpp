@@ -28,6 +28,11 @@ bool CClientColPolygon::DoHitDetection(const CVector& vecNowPosition, float fRad
     if (!IsInBounds(vecNowPosition))
         return false;
 
+    float z = vecNowPosition.fZ;
+
+    if (z > m_fCeil || z < m_fFloor)
+        return false;
+
     bool collides = false;
 
     int j = m_Points.size() - 1;
@@ -137,14 +142,17 @@ void CClientColPolygon::DebugRender(const CVector& vecPosition, float fDrawRadiu
         {
             float fZ = vecPosition.fZ - fDrawRadius + fDrawRadius * 2.0f * (s / (float)(uiNumSlices - 1));
             fZ += 4;            // Extra bit so a slice is on the same Z coord as the camera
-            for (uint i = 0; i < uiNumPoints; i++)
+            if (m_fFloor < fZ && fZ < m_fCeil)
             {
-                const CVector2D& vecPointBegin = m_Points[i];
-                const CVector2D& vecPointEnd = m_Points[(i + 1) % uiNumPoints];
+                for (uint i = 0; i < uiNumPoints; i++)
+                {
+                    const CVector2D& vecPointBegin = m_Points[i];
+                    const CVector2D& vecPointEnd = m_Points[(i + 1) % uiNumPoints];
 
-                CVector vecBegin(vecPointBegin.fX, vecPointBegin.fY, fZ);
-                CVector vecEnd(vecPointEnd.fX, vecPointEnd.fY, fZ);
-                pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
+                    CVector vecBegin(vecPointBegin.fX, vecPointBegin.fY, fZ);
+                    CVector vecEnd(vecPointEnd.fX, vecPointEnd.fY, fZ);
+                    pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
+                }
             }
         }
     }
@@ -155,9 +163,31 @@ void CClientColPolygon::DebugRender(const CVector& vecPosition, float fDrawRadiu
         {
             const CVector2D& vecPoint = m_Points[i];
 
-            CVector vecBegin(vecPoint.fX, vecPoint.fY, vecPosition.fZ - fDrawRadius);
-            CVector vecEnd(vecPoint.fX, vecPoint.fY, vecPosition.fZ + fDrawRadius);
+            CVector vecBegin(vecPoint.fX, vecPoint.fY, std::max(vecPosition.fZ - fDrawRadius, m_fFloor));
+            CVector vecEnd(vecPoint.fX, vecPoint.fY, std::min(vecPosition.fZ + fDrawRadius, m_fCeil));
             pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
         }
     }
+
+    // Draw top and bottom
+    for (uint i = 0; i < uiNumPoints; i++)
+    {
+        const CVector2D& vecPointBegin = m_Points[i];
+        const CVector2D& vecPointEnd = m_Points[(i + 1) % uiNumPoints];
+
+        CVector vecBegin(vecPointBegin.fX, vecPointBegin.fY, m_fFloor);
+        CVector vecEnd(vecPointEnd.fX, vecPointEnd.fY, m_fFloor);
+        pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
+    }
+
+    for (uint i = 0; i < uiNumPoints; i++)
+    {
+        const CVector2D& vecPointBegin = m_Points[i];
+        const CVector2D& vecPointEnd = m_Points[(i + 1) % uiNumPoints];
+
+        CVector vecBegin(vecPointBegin.fX, vecPointBegin.fY, m_fCeil);
+        CVector vecEnd(vecPointEnd.fX, vecPointEnd.fY, m_fCeil);
+        pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
+    }
+
 }

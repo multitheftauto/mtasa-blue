@@ -29,6 +29,9 @@ public:
 
     void AddPoint(CVector2D vecPoint);
 
+    void SetFloorAndCeil(float fFloor, float fCeil) { m_fFloor = fFloor; m_fCeil = fCeil; };
+    void GetFloorAndCeil(float &fFloor, float &fCeil) { fFloor = m_fFloor; fCeil = m_fCeil; };
+
     unsigned int                           CountPoints(void) const { return static_cast<unsigned int>(m_Points.size()); };
     std::vector<CVector2D>::const_iterator IterBegin(void) { return m_Points.begin(); };
     std::vector<CVector2D>::const_iterator IterEnd(void) { return m_Points.end(); };
@@ -41,6 +44,8 @@ protected:
     bool IsInBounds(CVector vecPoint);
 
     float m_fRadius;
+    float m_fFloor = std::numeric_limits<float>::min();
+    float m_fCeil = std::numeric_limits<float>::max();
 };
 
 #endif
