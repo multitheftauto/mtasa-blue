@@ -47,11 +47,12 @@ public:
     void SetAnimGroup(short sAnimGroup) { m_pInterface->sAnimGroup = sAnimGroup; }
     void SetFlags(short sFlags) { m_pInterface->sFlags = sFlags; }
 
-    unsigned short                  GetNumBlendNodes(void) { return m_pInterface->nNumBlendNodes; };
-    short                           GetAnimID(void) { return m_pInterface->sAnimID; }
-    short                           GetAnimGroup(void) { return m_pInterface->sAnimGroup; }
-    short                           GetFlags(void) { return m_pInterface->sFlags; }
-    CAnimBlendHierarchySAInterface* GetAnimHierachyInterface(void) { return m_pInterface->pAnimHeirarchy; }
+    unsigned short                          GetNumBlendNodes(void) { return m_pInterface->nNumBlendNodes; };
+    short                                   GetAnimID(void) { return m_pInterface->sAnimID; }
+    short                                   GetAnimGroup(void) { return m_pInterface->sAnimGroup; }
+    short                                   GetFlags(void) { return m_pInterface->sFlags; }
+    CAnimBlendHierarchySAInterface*         GetAnimHierachyInterface(void) { return m_pInterface->pAnimHeirarchy; }
+    CAnimBlendStaticAssociationSAInterface* GetInterface(void) { return m_pInterface; }
 
 protected:
     CAnimBlendStaticAssociationSAInterface* m_pInterface;

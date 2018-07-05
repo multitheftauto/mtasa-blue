@@ -503,8 +503,8 @@ private:
     static CAnimBlendAssociationSAInterface* StaticAddAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
     static CAnimBlendAssociationSAInterface* StaticAddAnimationAndSyncHandler(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
                                                                               AssocGroupId animGroup, AnimationId animID);
-    static bool StaticAssocGroupCopyAnimationHandler(CAnimBlendStaticAssociationSAInterface* pOutAnimStaticAssoc, CAnimBlendAssociationSAInterface* pAnimAssoc,
-                                                     RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, AnimationId animID);
+    static bool                              StaticAssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump,
+                                                                                  CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, AnimationId animID);
     static bool StaticBlendAnimationHierarchyHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy,
                                                      int* pFlags, RpClump* pClump);
     static bool StaticProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface);
@@ -543,8 +543,8 @@ private:
     CAnimBlendAssociationSAInterface* AddAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
     CAnimBlendAssociationSAInterface* AddAnimationAndSyncHandler(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
                                                                  AssocGroupId animGroup, AnimationId animID);
-    bool        AssocGroupCopyAnimationHandler(CAnimBlendStaticAssociationSAInterface* pOutAnimStaticAssoc, CAnimBlendAssociationSAInterface* pAnimAssoc,
-                                               RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, AnimationId animID);
+    bool        AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroup,
+                                               AnimationId animID);
     bool        BlendAnimationHierarchyHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy, int* pFlags,
                                                RpClump* pClump);
     bool        ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface);
@@ -601,8 +601,6 @@ public:
     void                           SetFileCacheRoot(void);
     const char*                    GetFileCacheRoot(void) { return m_strFileCacheRoot; }
 
-    void                        CopyStaticAssociationProperties(std::unique_ptr<CAnimBlendStaticAssociation>& pOutAnimStaticAssoc,
-                                                                std::unique_ptr<CAnimBlendStaticAssociation>& pOriginalAnimStaticAssoc);
     void                        InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP);
     void                        RemoveIFPPointerFromMap(const unsigned int u32BlockNameHash);
     std::shared_ptr<CClientIFP> GetIFPPointerFromMap(const unsigned int u32BlockNameHash);

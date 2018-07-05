@@ -153,7 +153,8 @@ public:
     CAnimBlock*            GetAnimBlock(CAnimBlockSAInterface* pInterface);
     CAnimBlendHierarchy*   GetAnimBlendHierarchy(CAnimBlendHierarchySAInterface* pInterface);
 
-    StaticAssocIntface_type GetAnimStaticAssociation(CAnimBlendStaticAssociationSAInterface* pInterface);
+    std::unique_ptr<CAnimBlendAssociation> GetAnimBlendAssociation2(CAnimBlendAssociationSAInterface* pInterface);
+    StaticAssocIntface_type                GetAnimStaticAssociation(CAnimBlendStaticAssociationSAInterface* pInterface);
 
     // MTA members, but use this strictly for custom animations only
     std::unique_ptr<CAnimBlendHierarchy> GetCustomAnimBlendHierarchy(CAnimBlendHierarchySAInterface* pInterface);
