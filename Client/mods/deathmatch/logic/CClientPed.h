@@ -465,10 +465,10 @@ public:
     bool IsStealthAiming(void) { return m_bStealthAiming; }
     void SetStealthAiming(bool bAiming);
 
-    CAnimBlendAssociation* AddAnimation(AssocGroupId group, AnimationId id);
-    CAnimBlendAssociation* BlendAnimation(AssocGroupId group, AnimationId id, float fBlendDelta);
-    CAnimBlendAssociation* GetAnimation(AnimationId id);
-    CAnimBlendAssociation* GetFirstAnimation(void);
+    std::unique_ptr<CAnimBlendAssociation> AddAnimation(AssocGroupId group, AnimationId id);
+    std::unique_ptr<CAnimBlendAssociation> BlendAnimation(AssocGroupId group, AnimationId id, float fBlendDelta);
+    std::unique_ptr<CAnimBlendAssociation> GetAnimation(AnimationId id);
+    std::unique_ptr<CAnimBlendAssociation> GetFirstAnimation(void);
 
     void                        DereferenceCustomAnimationBlock(void) { m_pCustomAnimationIFP = nullptr; }
     std::shared_ptr<CClientIFP> GetCustomAnimationIFP(void) { return m_pCustomAnimationIFP; }
@@ -493,9 +493,9 @@ public:
     const unsigned int& GetCustomAnimationBlockNameHash(void) { return m_u32CustomBlockNameHash; }
     const unsigned int& GetCustomAnimationNameHash(void) { return m_u32CustomAnimationNameHash; }
 
-    void                ReplaceAnimation(CAnimBlendHierarchy* pInternalAnimHierarchy, const std::shared_ptr<CClientIFP>& pIFP,
+    void                ReplaceAnimation(std::unique_ptr<CAnimBlendHierarchy> & pInternalAnimHierarchy, const std::shared_ptr<CClientIFP>& pIFP,
                                          CAnimBlendHierarchySAInterface* pCustomAnimHierarchy);
-    void                RestoreAnimation(CAnimBlendHierarchy* pInternalAnimHierarchy);
+    void                RestoreAnimation(std::unique_ptr<CAnimBlendHierarchy> & pInternalAnimHierarchy);
     void                RestoreAnimations(const std::shared_ptr<CClientIFP>& IFP);
     void                RestoreAnimations(CAnimBlock& animationBlock);
     void                RestoreAllAnimations(void);

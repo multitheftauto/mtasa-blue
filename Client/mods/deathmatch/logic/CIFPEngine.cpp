@@ -51,7 +51,7 @@ bool CIFPEngine::EngineReplaceAnimation(CClientEntity* pEntity, const SString& s
             // Try to load the block, if it's not loaded already
             pInternalBlock->Request(BLOCKING, true);
 
-            CAnimBlendHierarchy*            pInternalAnimHierarchy = g_pGame->GetAnimManager()->GetAnimation(strInternalAnimName, pInternalBlock);
+            auto                            pInternalAnimHierarchy = g_pGame->GetAnimManager()->GetAnimation(strInternalAnimName, pInternalBlock);
             CAnimBlendHierarchySAInterface* pCustomAnimHierarchyInterface = pCustomIFP->GetAnimationHierarchy(strCustomAnimName);
             if (pInternalAnimHierarchy && pCustomAnimHierarchyInterface)
             {
@@ -87,7 +87,7 @@ bool CIFPEngine::EngineRestoreAnimation(CClientEntity* pEntity, const SString& s
                 }
                 else
                 {
-                    CAnimBlendHierarchy* pInternalAnimHierarchy = g_pGame->GetAnimManager()->GetAnimation(strInternalAnimName, pInternalBlock);
+                    auto pInternalAnimHierarchy = g_pGame->GetAnimManager()->GetAnimation(strInternalAnimName, pInternalBlock);
                     if (pInternalAnimHierarchy)
                     {
                         Ped.RestoreAnimation(pInternalAnimHierarchy);

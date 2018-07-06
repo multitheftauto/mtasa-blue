@@ -2098,11 +2098,10 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CClientEntity& Entity, 
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         if (!strAnimName.empty())
         {
-            CAnimBlendAssociation* pA = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(Ped.GetClump(), strAnimName);
-
-            if (pA)
+            auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(Ped.GetClump(), strAnimName);
+            if (pAnimAssociation)
             {
-                pA->SetCurrentProgress(fProgress);
+                pAnimAssociation->SetCurrentProgress(fProgress);
                 return true;
             }
         }

@@ -8,7 +8,7 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-
+ 
 #ifndef __CMULTIPLAYER
 #define __CMULTIPLAYER
 
@@ -75,8 +75,8 @@ typedef CAnimBlendAssociationSAInterface*(AddAnimationHandler)(RpClump* pClump, 
 typedef CAnimBlendAssociationSAInterface*(AddAnimationAndSyncHandler)(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
                                                                       AssocGroupId animGroup, AnimationId animID);
 typedef void(CAnimBlendAssocDestructorHandler)(CAnimBlendAssociationSAInterface* pThis);
-typedef bool(AssocGroupCopyAnimationHandler)(CAnimBlendStaticAssociationSAInterface* pOutAnimStaticAssoc, CAnimBlendAssociationSAInterface* pAnimAssoc,
-                                             RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, AnimationId animID);
+typedef bool(AssocGroupCopyAnimationHandler)(CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroup,
+                                             AnimationId animID);
 typedef bool(BlendAnimationHierarchyHandler)(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy, int* pFlags,
                                              RpClump* pClump);
 typedef bool(ProcessCollisionHandler)(class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface);
