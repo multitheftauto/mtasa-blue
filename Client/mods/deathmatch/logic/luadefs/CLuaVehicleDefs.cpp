@@ -3751,20 +3751,21 @@ int CLuaVehicleDefs::IsVehicleWindowOpen(lua_State* luaVM)
 
 int CLuaVehicleDefs::SetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 {
-    // bool setVehicleModelExhaustPosition(int modelID, float x, float y, float z)
-    unsigned short modelID;
-    CVector        position;
+    // bool setVehicleModelExhaustPosition ( int modelID, float x, float y, float z )
+    unsigned short usModel;
+    CVector        vecPosition;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(modelID);
-    argStream.ReadVector3D(position);
+    argStream.ReadNumber(usModel);
+    argStream.ReadVector3D(vecPosition);
 
     if (!argStream.HasErrors())
     {
-        CClientVehicle::SetModelExhaustFumesPosition(modelID, position);
-
-        lua_pushboolean(luaVM, true);
-        return 1;
+        if (CStaticFunctionDefinitions::SetModelExhaustFumesPosition(usModel, vecPosition))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -3775,20 +3776,23 @@ int CLuaVehicleDefs::SetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 
 int CLuaVehicleDefs::GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 {
-    // bool getVehicleModelExhaustPosition(int modelID)
-    unsigned short modelID;
+    // float, float, float getVehicleModelExhaustPosition ( int modelID )
+    unsigned short usModel;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(modelID);
+    argStream.ReadNumber(usModel);
 
     if (!argStream.HasErrors())
     {
-        CVector position = CClientVehicle::GetModelExhaustFumesPosition(modelID);
-
-        lua_pushnumber(luaVM, position.fX);
-        lua_pushnumber(luaVM, position.fY);
-        lua_pushnumber(luaVM, position.fZ);
-        return 3;
+        CVector vecPosition;
+        
+        if (CStaticFunctionDefinitions::GetModelExhaustFumesPosition(usModel, vecPosition))
+        {
+            lua_pushnumber(luaVM, vecPosition.fX);
+            lua_pushnumber(luaVM, vecPosition.fY);
+            lua_pushnumber(luaVM, vecPosition.fZ);
+            return 3;
+        }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
