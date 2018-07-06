@@ -3417,7 +3417,7 @@ bool CStaticFunctionDefinitions::IsVehicleWindowOpen(CClientVehicle& Vehicle, uc
 
 bool CStaticFunctionDefinitions::SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition)
 {
-    if (CVehicleNames::IsValidModel(usModel))
+    if (CClientVehicleManager::IsValidModel(usModel))
     {
         auto pModelInfo = g_pGame->GetModelInfo(usModel);
         if (pModelInfo)
@@ -3431,7 +3431,7 @@ bool CStaticFunctionDefinitions::SetVehicleModelExhaustFumesPosition(unsigned sh
 
 bool CStaticFunctionDefinitions::GetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition)
 {
-    if (CVehicleNames::IsValidModel(usModel))
+    if (CClientVehicleManager::IsValidModel(usModel))
     {
         auto pModelInfo = g_pGame->GetModelInfo(usModel);
         if (pModelInfo)
