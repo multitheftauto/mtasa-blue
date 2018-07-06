@@ -3647,10 +3647,11 @@ CAnimBlendAssociationSAInterface* CClientGame::StaticAddAnimationAndSyncHandler(
     return g_pClientGame->AddAnimationAndSyncHandler(pClump, pAnimAssocToSyncWith, animGroup, animID);
 }
 
-bool CClientGame::StaticAssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump,
+bool CClientGame::StaticAssocGroupCopyAnimationHandler(CAnimBlendStaticAssociationSAInterface* pOutAnimStaticAssoc,
+                                                       CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump,
                                                        CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, AnimationId animID)
 {
-    return g_pClientGame->AssocGroupCopyAnimationHandler(pAnimAssoc, pClump, pAnimAssocGroup, animID);
+    return g_pClientGame->AssocGroupCopyAnimationHandler(pOutAnimStaticAssoc, pAnimAssoc, pClump, pAnimAssocGroup, animID);
 }
 
 bool CClientGame::StaticBlendAnimationHierarchyHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy,
@@ -3958,7 +3959,8 @@ CAnimBlendAssociationSAInterface* CClientGame::AddAnimationAndSyncHandler(RpClum
     return nullptr;
 }
 
-bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterface* pAnimAssocInterface, RpClump* pClump,
+bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendStaticAssociationSAInterface* pOutAnimStaticAssocInterface,
+                                                 CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump,
                                                  CAnimBlendAssocGroupSAInterface* pAnimAssocGroupInterface, AnimationId animID)
 {
     bool          isCustomAnimationToPlay = false;
@@ -3966,36 +3968,29 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
     auto          pAnimAssocGroup = pAnimationManager->GetAnimBlendAssocGroup(pAnimAssocGroupInterface);
     auto          pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(pAnimAssocGroup->GetGroupID(), animID);
     auto          pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierachyInterface();
-    auto          pAnimAssociation = pAnimationManager->GetAnimBlendAssociation2(pAnimAssocInterface);
-
-    CClientPed* pClientPed = GetClientPedByClump(*pClump);
+    auto          pOutAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(pOutAnimStaticAssocInterface);
+    CClientPed*   pClientPed = GetClientPedByClump(*pClump);
     if (pClientPed != nullptr)
     {
         auto pReplacedAnimation = pClientPed->GetReplacedAnimation(pOriginalAnimHierarchyInterface);
         if (pReplacedAnimation != nullptr)
         {
             std::shared_ptr<CIFPAnimations> pIFPAnimations = pReplacedAnimation->pIFP->GetIFPAnimationsPointer();
-            InsertAnimationAssociationToMap(pAnimAssocInterface, pIFPAnimations);
+            InsertAnimationAssociationToMap(pAnimAssoc, pIFPAnimations);
 
             // Play our custom animation instead of default
-            auto pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pReplacedAnimation->pAnimationHierarchy);
-            pAnimationManager->UncompressAnimation(pAnimHierarchy.get());
-            pAnimAssociation->Constructor(pClump, pAnimHierarchy->GetInterface());
-            pAnimAssociation->SetFlags(pOriginalAnimStaticAssoc->GetFlags());
-            pAnimAssociation->SetAnimID(pOriginalAnimStaticAssoc->GetAnimID());
-            pAnimAssociation->SetAnimGroup(pOriginalAnimStaticAssoc->GetAnimGroup());
+            pOutAnimStaticAssoc->Initialize(pClump, pReplacedAnimation->pAnimationHierarchy);
             isCustomAnimationToPlay = true;
         }
     }
 
     if (!isCustomAnimationToPlay)
     {
-        auto pAnimHierarchy = pAnimationManager->GetAnimBlendHierarchy(pOriginalAnimHierarchyInterface);
-
         // Play default internal animation
-        pAnimationManager->UncompressAnimation(pAnimHierarchy);
-        pAnimAssociation->Constructor(*pOriginalAnimStaticAssoc->GetInterface());
+        pOutAnimStaticAssoc->Initialize(pClump, pOriginalAnimHierarchyInterface);
     }
+
+    CopyStaticAssociationProperties(pOutAnimStaticAssoc, pOriginalAnimStaticAssoc);
     return isCustomAnimationToPlay;
 }
 
@@ -6775,6 +6770,17 @@ void CClientGame::RestreamModel(unsigned short usModel)
         // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
         if (CClientObjectManager::IsValidModel(usModel) && CVehicleUpgrades::IsUpgrade(usModel))
         m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
+}
+
+void CClientGame::CopyStaticAssociationProperties(std::unique_ptr<CAnimBlendStaticAssociation>& pOutAnimStaticAssoc,
+                                                  std::unique_ptr<CAnimBlendStaticAssociation>& pOriginalAnimStaticAssoc)
+{
+    pOutAnimStaticAssoc->SetAnimGroup(pOriginalAnimStaticAssoc->GetAnimGroup());
+    pOutAnimStaticAssoc->SetAnimID(pOriginalAnimStaticAssoc->GetAnimID());
+
+    // Total bones in clump. GTA SA is using 32 bones for peds/players
+    pOutAnimStaticAssoc->SetNumBlendNodes(pOriginalAnimStaticAssoc->GetNumBlendNodes());
+    pOutAnimStaticAssoc->SetFlags(pOriginalAnimStaticAssoc->GetFlags());
 }
 
 void CClientGame::InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP)
