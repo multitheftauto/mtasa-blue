@@ -218,8 +218,8 @@ public:
     static bool            GetVehicleNitroLevel(CClientVehicle& Vehicle, float& fLevel);
     static bool            GetHeliBladeCollisionsEnabled(CClientVehicle& Vehicle);
     static bool            IsVehicleWindowOpen(CClientVehicle& Vehicle, uchar ucWindow);
-    static bool            SetModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
-    static bool            GetModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
+    static bool            SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
+    static bool            GetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
 
     // Vehicle set functions
     static bool FixVehicle(CClientEntity& Entity);

@@ -3763,7 +3763,7 @@ int CLuaVehicleDefs::SetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetModelExhaustFumesPosition(usModel, vecPosition))
+        if (CStaticFunctionDefinitions::SetVehicleModelExhaustFumesPosition(usModel, vecPosition))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -3788,7 +3788,7 @@ int CLuaVehicleDefs::GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
     {
         CVector vecPosition;
         
-        if (CStaticFunctionDefinitions::GetModelExhaustFumesPosition(usModel, vecPosition))
+        if (CStaticFunctionDefinitions::GetVehicleModelExhaustFumesPosition(usModel, vecPosition))
         {
             lua_pushnumber(luaVM, vecPosition.fX);
             lua_pushnumber(luaVM, vecPosition.fY);
@@ -3815,7 +3815,7 @@ int CLuaVehicleDefs::OOP_GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
     {
         CVector vecPosition;
         
-        if (CStaticFunctionDefinitions::GetModelExhaustFumesPosition(usModel, vecPosition))
+        if (CStaticFunctionDefinitions::GetVehicleModelExhaustFumesPosition(usModel, vecPosition))
         {
             lua_pushvector(luaVM, vecPosition);
             return 1;
