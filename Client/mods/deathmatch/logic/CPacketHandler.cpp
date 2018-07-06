@@ -3862,6 +3862,10 @@ retry:
                                 pPolygon->AddPoint(vertex.data.vecPosition);
                             }
                             pEntity = pShape = pPolygon;
+                            float fFloor, fCeil;
+                            bitStream.Read(fFloor);
+                            bitStream.Read(fCeil);
+                            pPolygon->SetFloorAndCeil(fFloor, fCeil);
                             break;
                         }
                         default:

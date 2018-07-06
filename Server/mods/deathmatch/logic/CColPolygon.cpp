@@ -25,6 +25,11 @@ bool CColPolygon::DoHitDetection(const CVector& vecNowPosition)
     if (!IsInBounds(vecNowPosition))
         return false;
 
+    float z = vecNowPosition.fZ;
+
+    if (z > m_fCeil || z < m_fFloor)
+        return false;
+
     bool collides = false;
 
     int j = m_Points.size() - 1;

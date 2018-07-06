@@ -381,8 +381,7 @@ int CLuaColShapeDefs::GetColPolygonHeight(lua_State* luaVM)
         if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
         {
             CClientColPolygon* pColPolygon = (CClientColPolygon*)pColShape;
-            float fFloor;
-            float fCeil;
+            float fFloor, fCeil;
             pColPolygon->GetFloorAndCeil(fFloor, fCeil);
             if (fFloor == std::numeric_limits<float>::min())
             {
