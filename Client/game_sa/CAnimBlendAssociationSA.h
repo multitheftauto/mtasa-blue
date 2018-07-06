@@ -45,8 +45,6 @@ class CAnimBlendAssociationSA : public CAnimBlendAssociation
 public:
     CAnimBlendAssociationSA(CAnimBlendAssociationSAInterface* pInterface) { m_pInterface = pInterface; }
 
-    CAnimBlendAssociationSAInterface* Constructor(CAnimBlendStaticAssociationSAInterface& StaticAssociationByReference);
-    CAnimBlendAssociationSAInterface* Constructor(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy);
     CAnimBlendAssociationSAInterface* GetInterface(void) { return m_pInterface; }
     AssocGroupId                      GetAnimGroup(void) { return (AssocGroupId)m_pInterface->sAnimGroup; }
     AnimationId                       GetAnimID(void) { return (AnimationId)m_pInterface->sAnimID; }
@@ -54,10 +52,8 @@ public:
 
     float GetBlendAmount(void) { return m_pInterface->fBlendAmount; }
     void  SetBlendAmount(float fAmount) { m_pInterface->fBlendAmount = fAmount; }
-    void  SetCurrentProgress(float fProgress);
-    void  SetAnimID(short sAnimID) { m_pInterface->sAnimID = sAnimID; }
-    void  SetAnimGroup(short sAnimGroup) { m_pInterface->sAnimGroup = sAnimGroup; }
-    void  SetFlags(short sFlags) { m_pInterface->sFlags = sFlags; }
+
+    void SetCurrentProgress(float fProgress);
 
 protected:
     CAnimBlendAssociationSAInterface* m_pInterface;

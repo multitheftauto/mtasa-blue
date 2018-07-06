@@ -749,11 +749,6 @@ CAnimBlendHierarchy* CAnimManagerSA::GetAnimBlendHierarchy(CAnimBlendHierarchySA
     return NULL;
 }
 
-std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::GetAnimBlendAssociation2(CAnimBlendAssociationSAInterface* pInterface)
-{
-    return std::make_unique<CAnimBlendAssociationSA>(pInterface);
-}
-
 CAnimManagerSA::StaticAssocIntface_type CAnimManagerSA::GetAnimStaticAssociation(CAnimBlendStaticAssociationSAInterface* pInterface)
 {
     return std::make_unique<CAnimBlendStaticAssociationSA>(pInterface);
