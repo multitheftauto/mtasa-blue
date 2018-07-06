@@ -29,7 +29,7 @@ public:
 
     void AddPoint(CVector2D vecPoint);
 
-    void SetFloorAndCeil(float fFloor, float fCeil) { m_fFloor = fFloor; m_fCeil = fCeil; };
+    void SetFloorAndCeil(float fFloor, float fCeil);
     void GetFloorAndCeil(float &fFloor, float &fCeil) { fFloor = m_fFloor; fCeil = m_fCeil; };
 
     unsigned int                           CountPoints(void) const { return static_cast<unsigned int>(m_Points.size()); };

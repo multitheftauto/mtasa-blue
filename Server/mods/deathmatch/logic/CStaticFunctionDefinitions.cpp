@@ -11900,5 +11900,6 @@ void CStaticFunctionDefinitions::SetColPolygonFloorAndCeil(CColShape* pElement, 
     CBitStream BitStream;
     BitStream.pBitStream->Write(fFloor);
     BitStream.pBitStream->Write(fCeil);
+    m_pColManager->DoHitDetection(pElement->GetPosition(), pElement);
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, COLSHAPE_POLYGON_SET_HEIGHT, *BitStream.pBitStream));
 }

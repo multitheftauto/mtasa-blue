@@ -119,6 +119,13 @@ CSphere CClientColPolygon::GetWorldBoundingSphere(void)
     return sphere;
 }
 
+void CClientColPolygon::SetFloorAndCeil(float fFloor, float fCeil)
+{
+    m_fFloor = fFloor;
+    m_fCeil = fCeil;
+    CStaticFunctionDefinitions::RefreshColShapeColliders(this);
+}
+
 //
 // Draw wireframe polygon
 //
