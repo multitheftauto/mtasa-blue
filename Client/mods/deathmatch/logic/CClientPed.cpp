@@ -6035,7 +6035,7 @@ void CClientPed::SetNextAnimationCustom(const std::shared_ptr<CClientIFP>& pIFP,
     m_u32CustomAnimationNameHash = HashString(strAnimationName.ToLower());
 }
 
-void CClientPed::ReplaceAnimation(std::unique_ptr<CAnimBlendHierarchy> & pInternalAnimHierarchy, const std::shared_ptr<CClientIFP>& pIFP,
+void CClientPed::ReplaceAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInternalAnimHierarchy, const std::shared_ptr<CClientIFP>& pIFP,
                                   CAnimBlendHierarchySAInterface* pCustomAnimHierarchy)
 {
     SReplacedAnimation replacedAnimation;
@@ -6044,7 +6044,7 @@ void CClientPed::ReplaceAnimation(std::unique_ptr<CAnimBlendHierarchy> & pIntern
     m_mapOfReplacedAnimations[pInternalAnimHierarchy->GetInterface()] = replacedAnimation;
 }
 
-void CClientPed::RestoreAnimation(std::unique_ptr<CAnimBlendHierarchy> & pInternalAnimHierarchy)
+void CClientPed::RestoreAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInternalAnimHierarchy)
 {
     m_mapOfReplacedAnimations.erase(pInternalAnimHierarchy->GetInterface());
 }

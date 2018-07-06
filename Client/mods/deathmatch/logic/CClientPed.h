@@ -493,9 +493,9 @@ public:
     const unsigned int& GetCustomAnimationBlockNameHash(void) { return m_u32CustomBlockNameHash; }
     const unsigned int& GetCustomAnimationNameHash(void) { return m_u32CustomAnimationNameHash; }
 
-    void                ReplaceAnimation(std::unique_ptr<CAnimBlendHierarchy> & pInternalAnimHierarchy, const std::shared_ptr<CClientIFP>& pIFP,
+    void                ReplaceAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInternalAnimHierarchy, const std::shared_ptr<CClientIFP>& pIFP,
                                          CAnimBlendHierarchySAInterface* pCustomAnimHierarchy);
-    void                RestoreAnimation(std::unique_ptr<CAnimBlendHierarchy> & pInternalAnimHierarchy);
+    void                RestoreAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInternalAnimHierarchy);
     void                RestoreAnimations(const std::shared_ptr<CClientIFP>& IFP);
     void                RestoreAnimations(CAnimBlock& animationBlock);
     void                RestoreAllAnimations(void);
