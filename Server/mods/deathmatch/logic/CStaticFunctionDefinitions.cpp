@@ -11894,3 +11894,11 @@ SString CStaticFunctionDefinitions::GetVersionSortable()
 {
     return SString("%d.%d.%d-%d.%05d.%d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD, 0);
 }
+
+void CStaticFunctionDefinitions::SetColPolygonFloorAndCeil(CColShape* pElement, float fFloor, float fCeil)
+{
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(fFloor);
+    BitStream.pBitStream->Write(fCeil);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, COLSHAPE_POLYGON_SET_HEIGHT, *BitStream.pBitStream));
+}

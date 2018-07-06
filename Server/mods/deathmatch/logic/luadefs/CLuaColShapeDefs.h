@@ -28,4 +28,6 @@ public:
 
     LUA_DECLARE(IsInsideColShape);
     LUA_DECLARE(GetColShapeType);
+    LUA_DECLARE(SetColPolygonHeight);
+    LUA_DECLARE(GetColPolygonHeight);
 };

@@ -98,6 +98,7 @@ public:
     void Packet_LatentTransfer(NetBitStreamInterface& bitStream);
     void Packet_SyncSettings(NetBitStreamInterface& bitStream);
     void Packet_PedTask(NetBitStreamInterface& bitStream);
+    void Packet_PolygonHeight(NetBitStreamInterface& bitStream);
 
     // For debugging protocol errors during ENTITY_ADD packet
     void    EntityAddDebugBegin(uint uiNumEntities, NetBitStreamInterface* pBitStream);

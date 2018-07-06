@@ -22,8 +22,8 @@ void CLuaColShapeDefs::LoadFunctions(void)
 
     CLuaCFunctions::AddFunction("isInsideColShape", IsInsideColShape);
     CLuaCFunctions::AddFunction("getColShapeType", GetColShapeType);
-    CLuaCFunctions::AddFunction("setColPolygonHeigth", SetColPolygonHeigth);
-    CLuaCFunctions::AddFunction("getColPolygonHeigth", GetColPolygonHeigth);
+    CLuaCFunctions::AddFunction("setColPolygonHeight", SetColPolygonHeight);
+    CLuaCFunctions::AddFunction("getColPolygonHeight", GetColPolygonHeight);
 }
 
 void CLuaColShapeDefs::AddClass(lua_State* luaVM)
@@ -369,7 +369,7 @@ int CLuaColShapeDefs::IsInsideColShape(lua_State* luaVM)
     return 1;
 }
 
-int CLuaColShapeDefs::GetColPolygonHeigth(lua_State* luaVM)
+int CLuaColShapeDefs::GetColPolygonHeight(lua_State* luaVM)
 {
     CClientColShape* pColShape;
 
@@ -398,9 +398,9 @@ int CLuaColShapeDefs::GetColPolygonHeigth(lua_State* luaVM)
     return 1;
 }
 
-int CLuaColShapeDefs::SetColPolygonHeigth(lua_State* luaVM)
+int CLuaColShapeDefs::SetColPolygonHeight(lua_State* luaVM)
 {
-    //  bool SetColPolygonHeigth ( colshape theColShape, float floor, float ceil )
+    //  bool SetColPolygonHeight ( colshape theColShape, float floor, float ceil )
     CClientColShape* pColShape;
     float            fFloor;
     float            fCeil;
@@ -425,7 +425,7 @@ int CLuaColShapeDefs::SetColPolygonHeigth(lua_State* luaVM)
                 argStream.SetCustomError("Colshape have to be type: Polygon to use this function!");
         }
         else
-            argStream.SetCustomError("Floor heigth have to be greater then ceil heigth!");
+            argStream.SetCustomError("Floor Height have to be greater then ceil Height!");
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

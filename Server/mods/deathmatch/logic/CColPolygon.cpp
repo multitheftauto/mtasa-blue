@@ -111,3 +111,10 @@ CSphere CColPolygon::GetWorldBoundingSphere(void)
     sphere.fRadius = m_fRadius;
     return sphere;
 }
+
+void CColPolygon::SetFloorAndCeil(float fFloor, float fCeil )
+{
+    m_fFloor = fFloor;
+    m_fCeil = fCeil;
+    CStaticFunctionDefinitions::SetColPolygonFloorAndCeil(this, fFloor, fCeil);
+}

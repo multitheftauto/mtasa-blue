@@ -22,6 +22,8 @@ void CLuaColShapeDefs::LoadFunctions()
 
     CLuaCFunctions::AddFunction("isInsideColShape", IsInsideColShape);
     CLuaCFunctions::AddFunction("getColShapeType", GetColShapeType);
+    CLuaCFunctions::AddFunction("setColPolygonHeight", SetColPolygonHeight);
+    CLuaCFunctions::AddFunction("getColPolygonHeight", GetColPolygonHeight);
 }
 
 void CLuaColShapeDefs::AddClass(lua_State* luaVM)
@@ -348,6 +350,72 @@ int CLuaColShapeDefs::IsInsideColShape(lua_State* luaVM)
             lua_pushboolean(luaVM, bInside);
             return 1;
         }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+
+int CLuaColShapeDefs::GetColPolygonHeight(lua_State* luaVM)
+{
+    CColShape* pColShape;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pColShape);
+
+    if (!argStream.HasErrors())
+    {
+        if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
+        {
+            CColPolygon* pColPolygon = (CColPolygon*)pColShape;
+            float fFloor;
+            float fCeil;
+            pColPolygon->GetFloorAndCeil(fFloor, fCeil);
+            lua_pushnumber(luaVM, fFloor);
+            lua_pushnumber(luaVM, fCeil);
+            return 2;
+        }
+        else
+            argStream.SetCustomError("Colshape have to be type: Polygon to use this function!");
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaColShapeDefs::SetColPolygonHeight(lua_State* luaVM)
+{
+    //  bool SetColPolygonHeight ( colshape theColShape, float floor, float ceil )
+    CColShape* pColShape;
+    float            fFloor;
+    float            fCeil;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pColShape);
+    argStream.ReadNumber(fFloor, std::numeric_limits<float>::min());
+    argStream.ReadNumber(fCeil, std::numeric_limits<float>::max());
+
+    if (!argStream.HasErrors())
+    {
+        if (fCeil > fFloor)
+        {
+            if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
+            {
+                CColPolygon* pColPolygon = (CColPolygon*)pColShape;
+                pColPolygon->SetFloorAndCeil(fFloor, fCeil);
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+            else
+                argStream.SetCustomError("Colshape have to be type: Polygon to use this function!");
+        }
+        else
+            argStream.SetCustomError("Floor Height have to be greater then ceil Height!");
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
