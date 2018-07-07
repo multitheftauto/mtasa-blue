@@ -855,15 +855,15 @@ void CheckDataFiles(void)
             "bass_ac3.dll",
         },
         {
-            "C55E0F0FC9F2F4FF91AF7D24551CEBB0",
+            "E7F4494BDF7B1C49A303FE56C6B52DC9",
             "bass_fx.dll",
         },
         {
-            "437A8DBF495C0161CC889827AF8DBB0C",
+            "3CA82F8E39DE39A50C13474905EF2D65",
             "bassflac.dll",
         },
         {
-            "22D6CD2368A952509B503346F77D6E40",
+            "13A3F5637A93F0340161A40C6FBD3F1F",
             "bassmidi.dll",
         },
         {
