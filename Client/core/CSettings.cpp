@@ -551,7 +551,7 @@ void CSettings::CreateGUI(void)
     m_pCheckBoxUserAutoscan->GetPosition(vecTemp, false);
 
     vecTemp.fX = fIndentX + 260;
-    m_pAudioMuteLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Mute settings")));
+    m_pAudioMuteLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Mute options")));
     m_pAudioMuteLabel->SetPosition(CVector2D(vecTemp.fX, 13.0f));
     m_pAudioMuteLabel->GetPosition(vecTemp, false);
     m_pAudioMuteLabel->AutoSize(NULL, 5.0f);
