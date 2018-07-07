@@ -12,6 +12,9 @@
 #define __CIFPENGINE_H
 #pragma once
 
+#include "game/CAnimBlendHierarchy.h"
+class CAnimBlendHierarchy;
+
 class CIFPEngine
 {
 public:

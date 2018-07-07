@@ -2882,7 +2882,7 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
     if (m_bStealthAiming)
     {
         // Grab our current anim
-        CAnimBlendAssociation* pAssoc = GetFirstAnimation();
+        std::unique_ptr<CAnimBlendAssociation> pAssoc = GetFirstAnimation();
         if (pAssoc)
         {
             // Check we're not doing any important animations
@@ -5951,7 +5951,7 @@ bool CClientPed::ShouldBeStealthAiming(void)
                             if (DistanceBetweenPoints3D(vecPos, vecPos_2) <= STEALTH_KILL_RANGE)
                             {
                                 // Grab our current anim
-                                CAnimBlendAssociation* pAssoc = GetFirstAnimation();
+                                std::unique_ptr<CAnimBlendAssociation> pAssoc = GetFirstAnimation();
                                 if (pAssoc)
                                 {
                                     // Our game checks for stealth killing
@@ -5978,7 +5978,7 @@ void CClientPed::SetStealthAiming(bool bAiming)
         if (!bAiming)
         {
             // Do we have the aiming animation?
-            CAnimBlendAssociation* pAssoc = GetAnimation(ANIM_ID_STEALTH_AIM);
+            std::unique_ptr<CAnimBlendAssociation> pAssoc = GetAnimation(ANIM_ID_STEALTH_AIM);
             if (pAssoc)
             {
                 // Stop our animation
@@ -5989,40 +5989,40 @@ void CClientPed::SetStealthAiming(bool bAiming)
     }
 }
 
-CAnimBlendAssociation* CClientPed::AddAnimation(AssocGroupId group, AnimationId id)
+std::unique_ptr<CAnimBlendAssociation> CClientPed::AddAnimation(AssocGroupId group, AnimationId id)
 {
     if (m_pPlayerPed)
     {
         return g_pGame->GetAnimManager()->AddAnimation(m_pPlayerPed->GetRpClump(), group, id);
     }
-    return NULL;
+    return nullptr;
 }
 
-CAnimBlendAssociation* CClientPed::BlendAnimation(AssocGroupId group, AnimationId id, float fBlendDelta)
+std::unique_ptr<CAnimBlendAssociation> CClientPed::BlendAnimation(AssocGroupId group, AnimationId id, float fBlendDelta)
 {
     if (m_pPlayerPed)
     {
         return g_pGame->GetAnimManager()->BlendAnimation(m_pPlayerPed->GetRpClump(), group, id, fBlendDelta);
     }
-    return NULL;
+    return nullptr;
 }
 
-CAnimBlendAssociation* CClientPed::GetAnimation(AnimationId id)
+std::unique_ptr<CAnimBlendAssociation> CClientPed::GetAnimation(AnimationId id)
 {
     if (m_pPlayerPed)
     {
         return g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(m_pPlayerPed->GetRpClump(), id);
     }
-    return NULL;
+    return nullptr;
 }
 
-CAnimBlendAssociation* CClientPed::GetFirstAnimation(void)
+std::unique_ptr<CAnimBlendAssociation> CClientPed::GetFirstAnimation(void)
 {
     if (m_pPlayerPed)
     {
         return g_pGame->GetAnimManager()->RpAnimBlendClumpGetFirstAssociation(m_pPlayerPed->GetRpClump());
     }
-    return NULL;
+    return nullptr;
 }
 
 void CClientPed::SetNextAnimationCustom(const std::shared_ptr<CClientIFP>& pIFP, const SString& strAnimationName)
@@ -6035,7 +6035,7 @@ void CClientPed::SetNextAnimationCustom(const std::shared_ptr<CClientIFP>& pIFP,
     m_u32CustomAnimationNameHash = HashString(strAnimationName.ToLower());
 }
 
-void CClientPed::ReplaceAnimation(CAnimBlendHierarchy* pInternalAnimHierarchy, const std::shared_ptr<CClientIFP>& pIFP,
+void CClientPed::ReplaceAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInternalAnimHierarchy, const std::shared_ptr<CClientIFP>& pIFP,
                                   CAnimBlendHierarchySAInterface* pCustomAnimHierarchy)
 {
     SReplacedAnimation replacedAnimation;
@@ -6044,7 +6044,7 @@ void CClientPed::ReplaceAnimation(CAnimBlendHierarchy* pInternalAnimHierarchy, c
     m_mapOfReplacedAnimations[pInternalAnimHierarchy->GetInterface()] = replacedAnimation;
 }
 
-void CClientPed::RestoreAnimation(CAnimBlendHierarchy* pInternalAnimHierarchy)
+void CClientPed::RestoreAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInternalAnimHierarchy)
 {
     m_mapOfReplacedAnimations.erase(pInternalAnimHierarchy->GetInterface());
 }

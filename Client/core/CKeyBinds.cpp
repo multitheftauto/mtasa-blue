@@ -776,9 +776,8 @@ bool CKeyBinds::SetCommandActive(const char* szKey, const char* szCommand, bool 
         if ((*iter)->GetType() == KEY_BIND_COMMAND)
         {
             CCommandBind* pBind = static_cast<CCommandBind*>(*iter);
-            if (!szKey 
-                || (stricmp(pBind->boundKey->szKey, szKey) == 0)
-                || (bConsiderDefaultKey && pBind->bIsReplacingScriptKey && stricmp(pBind->strOriginalScriptKey, szKey) == 0))
+            if (!szKey || (stricmp(pBind->boundKey->szKey, szKey) == 0) ||
+                (bConsiderDefaultKey && pBind->bIsReplacingScriptKey && stricmp(pBind->strOriginalScriptKey, szKey) == 0))
             {
                 if (pBind->szResource && (strcmp(pBind->szResource, szResource) == 0))
                 {
@@ -800,7 +799,8 @@ bool CKeyBinds::SetCommandActive(const char* szKey, const char* szCommand, bool 
     return false;
 }
 
-void CKeyBinds::SetAllCommandsActive(const char* szResource, bool bActive, const char* szCommand, bool bState, const char* szArguments, bool checkHitState, const char* szOnlyWithDefaultKey)
+void CKeyBinds::SetAllCommandsActive(const char* szResource, bool bActive, const char* szCommand, bool bState, const char* szArguments, bool checkHitState,
+                                     const char* szOnlyWithDefaultKey)
 {
     NullEmptyStrings(szCommand, szArguments);
 
@@ -818,9 +818,8 @@ void CKeyBinds::SetAllCommandsActive(const char* szResource, bool bActive, const
                     {
                         if (!szArguments || (pBind->szArguments && strcmp(pBind->szArguments, szArguments) == 0))
                         {
-                            if (!szOnlyWithDefaultKey 
-                                || (pBind->bIsReplacingScriptKey && stricmp(pBind->strOriginalScriptKey, szOnlyWithDefaultKey) == 0)
-                                || stricmp(pBind->boundKey->szKey, szOnlyWithDefaultKey) == 0)
+                            if (!szOnlyWithDefaultKey || (pBind->bIsReplacingScriptKey && stricmp(pBind->strOriginalScriptKey, szOnlyWithDefaultKey) == 0) ||
+                                stricmp(pBind->boundKey->szKey, szOnlyWithDefaultKey) == 0)
                             {
                                 pBind->bActive = bActive;
                             }

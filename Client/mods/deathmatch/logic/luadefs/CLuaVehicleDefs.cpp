@@ -138,6 +138,11 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
 {
     lua_newclass(luaVM);
 
+    lua_classfunction(luaVM, "getModelFromName", "getVehicleModelFromName");
+    lua_classfunction(luaVM, "getNameFromModel", "getVehicleNameFromModel");
+    lua_classfunction(luaVM, "getOriginalHandling", "getOriginalHandling");
+    lua_classfunction(luaVM, "getUpgradeSlotName", "getVehicleUpgradeSlotName");
+
     lua_classfunction(luaVM, "create", "createVehicle");
     lua_classfunction(luaVM, "blow", "blowVehicle");
     lua_classfunction(luaVM, "fix", "fixVehicle");
