@@ -1376,11 +1376,12 @@ void CSettings::UpdateAudioTab()
 
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
 
-    m_pAudioMasterVolume->SetScrollPosition(fMasterVolume);
     m_pAudioRadioVolume->SetScrollPosition(m_fRadioVolume);
     m_pAudioSFXVolume->SetScrollPosition(m_fSFXVolume);
     m_pAudioMTAVolume->SetScrollPosition(fMTAVolume);
     m_pAudioVoiceVolume->SetScrollPosition(fVoiceVolume);
+    // Lastly, set our master volume scroll position
+    m_pAudioMasterVolume->SetScrollPosition(fMasterVolume);
 
     m_pCheckBoxAudioEqualizer->SetSelected(gameSettings->IsRadioEqualizerEnabled());
     m_pCheckBoxAudioAutotune->SetSelected(gameSettings->IsRadioAutotuneEnabled());
