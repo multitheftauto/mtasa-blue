@@ -723,5 +723,5 @@ public:
     static const char*   GetOperatingSystemName();
     static const char*   GetVersionBuildTag();
     static SString       GetVersionSortable();
-    static void          SetColPolygonFloorAndCeil(CColShape* pPolygon, float fFloor, float fCeil);
+    static void          SetColPolygonHeight(CColShape* pPolygon, float fFloor, float fCeil);
 };

@@ -1030,7 +1030,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                                 BitStream.Write(&vertex);
                             }
                             float fFloor, fCeil;
-                            pPolygon->GetFloorAndCeil(fFloor, fCeil);
+                            pPolygon->GetHeight(fFloor, fCeil);
                             BitStream.Write(fFloor);
                             BitStream.Write(fCeil);
                             break;

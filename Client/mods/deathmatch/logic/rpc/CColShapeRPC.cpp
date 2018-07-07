@@ -26,6 +26,6 @@ void CColShapeRPCs::SetColShapePolygonHeight(CClientEntity* pSource, NetBitStrea
     bitStream.Read(fCeil);
     if (pSource)
     {
-        ((CClientColPolygon*)pSource)->SetFloorAndCeil(fFloor, fCeil);
+        static_cast<CClientColPolygon*>(pSource)->SetHeight(fFloor, fCeil);
     }
 }

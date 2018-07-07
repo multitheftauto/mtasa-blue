@@ -29,8 +29,8 @@ public:
 
     void AddPoint(CVector2D vecPoint);
 
-    void SetFloorAndCeil(float fFloor, float fCeil);
-    void GetFloorAndCeil(float &fFloor, float &fCeil) { fFloor = m_fFloor; fCeil = m_fCeil; };
+    void SetHeight(float fFloor, float fCeil);
+    void GetHeight(float &fFloor, float &fCeil) { fFloor = m_fFloor; fCeil = m_fCeil; };
 
     unsigned int                           CountPoints(void) const { return static_cast<unsigned int>(m_Points.size()); };
     std::vector<CVector2D>::const_iterator IterBegin(void) { return m_Points.begin(); };

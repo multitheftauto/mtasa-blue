@@ -3865,7 +3865,7 @@ retry:
                             float fFloor, fCeil;
                             bitStream.Read(fFloor);
                             bitStream.Read(fCeil);
-                            pPolygon->SetFloorAndCeil(fFloor, fCeil);
+                            pPolygon->SetHeight(fFloor, fCeil);
                             break;
                         }
                         default:

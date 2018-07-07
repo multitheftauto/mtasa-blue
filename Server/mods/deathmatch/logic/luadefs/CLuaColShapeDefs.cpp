@@ -370,9 +370,9 @@ int CLuaColShapeDefs::GetColPolygonHeight(lua_State* luaVM)
     {
         if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
         {
-            CColPolygon* pColPolygon = (CColPolygon*)pColShape;
+            CColPolygon* pColPolygon = static_cast<CColPolygon*>(pColShape);
             float fFloor, fCeil;
-            pColPolygon->GetFloorAndCeil(fFloor, fCeil);
+            pColPolygon->GetHeight(fFloor, fCeil);
             if (fFloor == std::numeric_limits<float>::min())
             {
                 lua_pushboolean(luaVM, false);
@@ -405,8 +405,7 @@ int CLuaColShapeDefs::SetColPolygonHeight(lua_State* luaVM)
 {
     //  bool SetColPolygonHeight ( colshape theColShape, float floor, float ceil )
     CColShape* pColShape;
-    float            fFloor;
-    float            fCeil;
+    float      fFloor, fCeil;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pColShape);
@@ -419,8 +418,8 @@ int CLuaColShapeDefs::SetColPolygonHeight(lua_State* luaVM)
         {
             if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
             {
-                CColPolygon* pColPolygon = (CColPolygon*)pColShape;
-                pColPolygon->SetFloorAndCeil(fFloor, fCeil);
+                CColPolygon* pColPolygon = static_cast<CColPolygon*>(pColShape);
+                pColPolygon->SetHeight(fFloor, fCeil);
                 lua_pushboolean(luaVM, true);
                 return 1;
             }
