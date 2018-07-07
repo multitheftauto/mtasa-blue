@@ -184,6 +184,9 @@ CCore::~CCore(void)
     // Destroy tray icon
     delete m_pTrayIcon;
 
+    // Reset GTA volume levels by ignoring master level
+    m_pLocalGUI->GetMainMenu()->GetSettingsWindow()->ResetGTAVolume();
+
     // Delete the mod manager
     delete m_pModManager;
     SAFE_DELETE(m_pMessageBox);
