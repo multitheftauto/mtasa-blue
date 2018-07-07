@@ -347,6 +347,11 @@ protected:
     bool OnSFXVolumeChanged(CGUIElement* pElement);
     bool OnMTAVolumeChanged(CGUIElement* pElement);
     bool OnVoiceVolumeChanged(CGUIElement* pElement);
+    bool OnMasterMuteMinimizedChanged(CGUIElement* pElement);
+    bool OnRadioMuteMinimizedChanged(CGUIElement* pElement);
+    bool OnSFXMuteMinimizedChanged(CGUIElement* pElement);
+    bool OnMTAMuteMinimizedChanged(CGUIElement* pElement);
+    bool OnVoiceMuteMinimizedChanged(CGUIElement* pElement);
     bool OnChatRedChanged(CGUIElement* pElement);
     bool OnChatGreenChanged(CGUIElement* pElement);
     bool OnChatBlueChanged(CGUIElement* pElement);

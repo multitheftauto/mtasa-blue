@@ -1187,6 +1187,11 @@ void CSettings::CreateGUI(void)
     m_pAudioSFXVolume->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnSFXVolumeChanged, this));
     m_pAudioMTAVolume->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnMTAVolumeChanged, this));
     m_pAudioVoiceVolume->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnVoiceVolumeChanged, this));
+    m_pCheckBoxMuteMaster->SetClickHandler(GUI_CALLBACK(&CSettings::OnMasterMuteMinimizedChanged, this));
+    m_pCheckBoxMuteRadio->SetClickHandler(GUI_CALLBACK(&CSettings::OnRadioMuteMinimizedChanged, this));
+    m_pCheckBoxMuteSFX->SetClickHandler(GUI_CALLBACK(&CSettings::OnSFXMuteMinimizedChanged, this));
+    m_pCheckBoxMuteMTA->SetClickHandler(GUI_CALLBACK(&CSettings::OnMTAMuteMinimizedChanged, this));
+    m_pCheckBoxMuteVoice->SetClickHandler(GUI_CALLBACK(&CSettings::OnVoiceMuteMinimizedChanged, this));
     m_pFieldOfView->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnFieldOfViewChanged, this));
     m_pDrawDistance->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnDrawDistanceChanged, this));
     m_pBrightness->SetOnScrollHandler(GUI_CALLBACK(&CSettings::OnBrightnessChanged, this));
@@ -1382,15 +1387,21 @@ void CSettings::UpdateAudioTab()
     m_pCheckBoxUserAutoscan->SetSelected(gameSettings->IsUsertrackAutoScan());
 
     CVARS_GET("mute_master_when_minimized", m_bMuteMaster);
-    CVARS_GET("mute_sfx_when_minimized", m_bMuteSFX);
     CVARS_GET("mute_radio_when_minimized", m_bMuteRadio);
+    CVARS_GET("mute_sfx_when_minimized", m_bMuteSFX);
     CVARS_GET("mute_mta_when_minimized", m_bMuteMTA);
     CVARS_GET("mute_voice_when_minimized", m_bMuteVoice);
+
     m_pCheckBoxMuteMaster->SetSelected(m_bMuteMaster);
-    m_pCheckBoxMuteSFX->SetSelected(m_bMuteSFX);
     m_pCheckBoxMuteRadio->SetSelected(m_bMuteRadio);
+    m_pCheckBoxMuteSFX->SetSelected(m_bMuteSFX);
     m_pCheckBoxMuteMTA->SetSelected(m_bMuteMTA);
     m_pCheckBoxMuteVoice->SetSelected(m_bMuteVoice);
+
+    m_pCheckBoxMuteRadio->SetEnabled(!m_bMuteMaster);
+    m_pCheckBoxMuteSFX->SetEnabled(!m_bMuteMaster);
+    m_pCheckBoxMuteMTA->SetEnabled(!m_bMuteMaster);
+    m_pCheckBoxMuteVoice->SetEnabled(!m_bMuteMaster);
 
     m_pComboUsertrackMode->SetSelectedItemByIndex(gameSettings->GetUsertrackMode());
 }
@@ -2843,6 +2854,17 @@ bool CSettings::OnCancelButtonClick(CGUIElement* pElement)
     CVARS_SET("mute_mta_when_minimized", m_bOldMuteMTA);
     CVARS_SET("mute_voice_when_minimized", m_bOldMuteVoice);
 
+    m_pCheckBoxMuteMaster->SetSelected(m_bOldMuteMaster);
+    m_pCheckBoxMuteRadio->SetSelected(m_bOldMuteRadio);
+    m_pCheckBoxMuteSFX->SetSelected(m_bOldMuteSFX);
+    m_pCheckBoxMuteMTA->SetSelected(m_bOldMuteMTA);
+    m_pCheckBoxMuteVoice->SetSelected(m_bOldMuteVoice);
+
+    m_pCheckBoxMuteRadio->SetEnabled(!m_bOldMuteMaster);
+    m_pCheckBoxMuteSFX->SetEnabled(!m_bOldMuteMaster);
+    m_pCheckBoxMuteMTA->SetEnabled(!m_bOldMuteMaster);
+    m_pCheckBoxMuteVoice->SetEnabled(!m_bOldMuteMaster);
+
     return true;
 }
 
@@ -2895,15 +2917,21 @@ void CSettings::LoadData(void)
     m_pCheckBoxUserAutoscan->SetSelected(gameSettings->IsUsertrackAutoScan());
 
     CVARS_GET("mute_master_when_minimized", m_bOldMuteMaster);
-    CVARS_GET("mute_sfx_when_minimized", m_bOldMuteSFX);
     CVARS_GET("mute_radio_when_minimized", m_bOldMuteRadio);
+    CVARS_GET("mute_sfx_when_minimized", m_bOldMuteSFX);
     CVARS_GET("mute_mta_when_minimized", m_bOldMuteMTA);
     CVARS_GET("mute_voice_when_minimized", m_bOldMuteVoice);
+
     m_pCheckBoxMuteMaster->SetSelected(m_bOldMuteMaster);
-    m_pCheckBoxMuteSFX->SetSelected(m_bOldMuteSFX);
     m_pCheckBoxMuteRadio->SetSelected(m_bOldMuteRadio);
+    m_pCheckBoxMuteSFX->SetSelected(m_bOldMuteSFX);
     m_pCheckBoxMuteMTA->SetSelected(m_bOldMuteMTA);
     m_pCheckBoxMuteVoice->SetSelected(m_bOldMuteVoice);
+
+    m_pCheckBoxMuteRadio->SetEnabled(!m_bOldMuteMaster);
+    m_pCheckBoxMuteSFX->SetEnabled(!m_bOldMuteMaster);
+    m_pCheckBoxMuteMTA->SetEnabled(!m_bOldMuteMaster);
+    m_pCheckBoxMuteVoice->SetEnabled(!m_bOldMuteMaster);
 
     unsigned int uiUsertrackMode = gameSettings->GetUsertrackMode();
     if (uiUsertrackMode == 0)
@@ -3298,17 +3326,6 @@ void CSettings::SaveData(void)
     gameSettings->SetRadioEqualizerEnabled(m_pCheckBoxAudioEqualizer->GetSelected());
     gameSettings->SetRadioAutotuneEnabled(m_pCheckBoxAudioAutotune->GetSelected());
     gameSettings->SetUsertrackAutoScan(m_pCheckBoxUserAutoscan->GetSelected());
-
-    m_bMuteMaster = m_pCheckBoxMuteMaster->GetSelected();
-    m_bMuteSFX = m_pCheckBoxMuteSFX->GetSelected();
-    m_bMuteRadio = m_pCheckBoxMuteRadio->GetSelected();
-    m_bMuteMTA = m_pCheckBoxMuteMTA->GetSelected();
-    m_bMuteVoice = m_pCheckBoxMuteVoice->GetSelected();
-    CVARS_SET("mute_master_when_minimized", m_bMuteMaster);
-    CVARS_SET("mute_sfx_when_minimized", m_bMuteSFX);
-    CVARS_SET("mute_radio_when_minimized", m_bMuteRadio);
-    CVARS_SET("mute_mta_when_minimized", m_bMuteMTA);
-    CVARS_SET("mute_voice_when_minimized", m_bMuteVoice);
 
     if (CGUIListItem* pSelected = m_pComboUsertrackMode->GetSelectedItem())
     {
@@ -4069,6 +4086,41 @@ bool CSettings::OnMTAVolumeChanged(CGUIElement* pElement)
 
     CVARS_SET("mtavolume", m_pAudioMTAVolume->GetScrollPosition());
 
+    return true;
+}
+
+bool CSettings::OnMasterMuteMinimizedChanged(CGUIElement* pElement)
+{
+    bool bSelected = m_pCheckBoxMuteMaster->GetSelected();
+    m_pCheckBoxMuteRadio->SetEnabled(!bSelected);
+    m_pCheckBoxMuteSFX->SetEnabled(!bSelected);
+    m_pCheckBoxMuteMTA->SetEnabled(!bSelected);
+    m_pCheckBoxMuteVoice->SetEnabled(!bSelected);
+    CVARS_SET("mute_master_when_minimized", bSelected);
+    return true;
+}
+
+bool CSettings::OnRadioMuteMinimizedChanged(CGUIElement* pElement)
+{
+    CVARS_SET("mute_radio_when_minimized", m_pCheckBoxMuteRadio->GetSelected());
+    return true;
+}
+
+bool CSettings::OnSFXMuteMinimizedChanged(CGUIElement* pElement)
+{
+    CVARS_SET("mute_sfx_when_minimized", m_pCheckBoxMuteSFX->GetSelected());
+    return true;
+}
+
+bool CSettings::OnMTAMuteMinimizedChanged(CGUIElement* pElement)
+{
+    CVARS_SET("mute_mta_when_minimized", m_pCheckBoxMuteMTA->GetSelected());
+    return true;
+}
+
+bool CSettings::OnVoiceMuteMinimizedChanged(CGUIElement* pElement)
+{
+    CVARS_SET("mute_voice_when_minimized", m_pCheckBoxMuteVoice->GetSelected());
     return true;
 }
 
