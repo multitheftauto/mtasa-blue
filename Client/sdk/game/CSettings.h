@@ -161,6 +161,10 @@ public:
     virtual void ResetVehiclesLODDistance(void) = 0;
     virtual void GetVehiclesLODDistance(float& fVehiclesLODDistance, float& fTrainsPlanesLODDistance) = 0;
 
+    virtual void SetPedsLODDistance(float fPedsLODDistance) = 0;
+    virtual void ResetPedsLODDistance(void) = 0;
+    virtual void GetPedsLODDistance(float& fPedsLODDistance) = 0;
+
     virtual void Save(void) = 0;
 };
 

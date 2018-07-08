@@ -1548,6 +1548,43 @@ int CLuaFunctionDefs::ResetVehiclesLODDistance(lua_State* luaVM)
     return 1;
 }
 
+int CLuaFunctionDefs::GetPedsLODDistance(lua_State* luaVM) 
+{ 
+    float fPedsDistance; 
+ 
+    g_pGame->GetSettings()->GetPedsLODDistance(fPedsDistance); 
+    lua_pushnumber(luaVM, fPedsDistance); 
+    return 1; 
+}
+ 
+int CLuaFunctionDefs::SetPedsLODDistance(lua_State* luaVM) 
+{ 
+    float fPedsDistance; 
+ 
+    CScriptArgReader argStream(luaVM); 
+    argStream.ReadNumber(fPedsDistance); 
+    fPedsDistance = Clamp(0.0f, fPedsDistance, 500.0f); 
+ 
+    if (!argStream.HasErrors()) 
+    { 
+        g_pGame->GetSettings()->SetPedsLODDistance(fPedsDistance); 
+        lua_pushnumber(luaVM, fPedsDistance); 
+        return 1; 
+    } 
+    else 
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage()); 
+ 
+    lua_pushboolean(luaVM, false); 
+    return 1; 
+}
+ 
+int CLuaFunctionDefs::ResetPedsLODDistance(lua_State* luaVM) 
+{ 
+    g_pGame->GetSettings()->ResetPedsLODDistance(); 
+    lua_pushboolean(luaVM, true); 
+    return 1; 
+}
+
 int CLuaFunctionDefs::GetFogDistance(lua_State* luaVM)
 {
     lua_pushnumber(luaVM, g_pMultiplayer->GetFogDistance());

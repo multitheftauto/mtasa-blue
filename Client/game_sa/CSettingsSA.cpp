@@ -35,7 +35,7 @@ void HOOK_GetFxQuality();
 DWORD RETURN_StoreShadowForVehicle = 0x70BDA9;
 void  HOOK_StoreShadowForVehicle();
 
-float ms_fVehicleLODDistance, ms_fTrainPlaneLODDistance;
+float ms_fVehicleLODDistance, ms_fTrainPlaneLODDistance, ms_fPedsLODDistance;
 
 CSettingsSA::CSettingsSA(void)
 {
@@ -52,6 +52,7 @@ CSettingsSA::CSettingsSA(void)
 
     MemPut(0x732926, &ms_fVehicleLODDistance);
     MemPut(0x732940, &ms_fTrainPlaneLODDistance);
+    MemPut(0x73295E, &ms_fPedsLODDistance);
 
     // Set "radar map and radar" as default radar mode
     SetRadarMode(RADAR_MODE_ALL);
@@ -588,6 +589,36 @@ void CSettingsSA::GetVehiclesLODDistance(float& fVehiclesLODDistance, float& fTr
 {
     fVehiclesLODDistance = ms_fVehicleLODDistance;
     fTrainsPlanesLODDistance = ms_fTrainPlaneLODDistance;
+}
+
+////////////////////////////////////////////////
+//
+// Peds LOD draw distance
+//
+////////////////////////////////////////////////
+ 
+void CSettingsSA::SetPedsLODDistance(float fPedsLODDistance)
+{
+    ms_fPedsLODDistance = fPedsLODDistance;
+}
+ 
+void CSettingsSA::GetPedsLODDistance(float& fPedsLODDistance)
+{
+    fPedsLODDistance = ms_fPedsLODDistance;
+}
+ 
+void CSettingsSA::ResetPedsLODDistance()
+{
+    bool bHighDetailPeds;
+    g_pCore->GetCVars()->Get("high_detail_vehicles", bHighDetailPeds);
+    if (bHighDetailPeds)
+    {
+        ms_fPedsLODDistance = MAX_PEDS_LOD_DISTANCE;
+    }
+    else
+    {
+        ms_fPedsLODDistance = DEFAULT_PEDS_LOD_DISTANCE;
+    }
 }
 
 ////////////////////////////////////////////////

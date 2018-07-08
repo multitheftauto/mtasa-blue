@@ -5567,6 +5567,9 @@ void CClientGame::ResetMapInfo(void)
     // Vehicles LOD distance
     g_pGame->GetSettings()->ResetVehiclesLODDistance();
 
+    // Peds LOD distance 
+    g_pGame->GetSettings()->ResetPedsLODDistance(); 
+    
     // Sun color
     g_pMultiplayer->ResetSunColor();
 
