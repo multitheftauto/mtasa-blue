@@ -1919,10 +1919,16 @@ void CClientPed::SetFrozen(bool bFrozen)
         {
             if (m_pTaskManager)
             {
-                m_pTaskManager->RemoveTask(TASK_PRIORITY_PRIMARY);
+                // Let them have a jetpack (#9522)
+                if (!HasJetPack())
+                    m_pTaskManager->RemoveTask(TASK_PRIORITY_PRIMARY);
+
                 m_pTaskManager->RemoveTask(TASK_PRIORITY_EVENT_RESPONSE_TEMP);
                 m_pTaskManager->RemoveTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
-                m_pTaskManager->RemoveTask(TASK_PRIORITY_PHYSICAL_RESPONSE);
+
+                // Let's let them choke too
+                if (!IsChoking())
+                    m_pTaskManager->RemoveTask(TASK_PRIORITY_PHYSICAL_RESPONSE);
             }
 
             if (m_pPlayerPed)
@@ -4310,6 +4316,10 @@ void CClientPed::SetChoking(bool bChoking)
             // His not choking. Make him choke if that's what we're supposed to do.
             if (bChoking)
             {
+                // Remove jetpack now so it doesn't stay on (#9522#c25612)
+                if (HasJetPack())
+                    SetHasJetPack(false);
+
                 // Create the choking task
                 CTaskSimpleChoking* pTask = g_pGame->GetTasks()->CreateTaskSimpleChoking(NULL, true);
                 if (pTask)
@@ -4517,6 +4527,13 @@ bool CClientPed::SetHasJetPack(bool bHasJetPack)
                     pTask->Destroy();
                     m_pTaskManager->RemoveTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
                 }
+
+                // Kill choking state now so it doesn't stay on (#9522#c26644)
+                if (IsChoking())
+                    SetChoking(false);
+
+                // Kill animation as well
+                KillAnimation();
 
                 CTaskSimpleJetPack* pJetPackTask = g_pGame->GetTasks()->CreateTaskSimpleJetpack();
                 if (pJetPackTask)
@@ -5634,6 +5651,14 @@ void CClientPed::RunAnimation(AssocGroupId animGroup, AnimationId animID)
 
     if (m_pPlayerPed)
     {
+        // Remove jetpack now so it doesn't stay on (#9522#c25612)
+        if (HasJetPack())
+            SetHasJetPack(false);
+
+        // Let's not choke them any longer
+        if (IsChoking())
+            SetChoking(false);
+
         CTask* pTask = g_pGame->GetTasks()->CreateTaskSimpleRunAnim(animGroup, animID, 4.0f, TASK_SIMPLE_ANIM, "TASK_SIMPLE_ANIM");
         if (pTask)
         {
@@ -5660,6 +5685,14 @@ void CClientPed::RunNamedAnimation(CAnimBlock* pBlock, const char* szAnimName, i
 
         if (pBlock->IsLoaded())
         {
+            // Remove jetpack now so it doesn't stay on (#9522#c25612)
+            if (HasJetPack())
+                SetHasJetPack(false);
+
+            // Let's not choke them any longer
+            if (IsChoking())
+                SetChoking(false);
+
             /*
              Saml1er: Setting flags to 0x10 will tell GTA:SA that animation needs to be decompressed.
                       If not, animation will either crash or do some weird things.
