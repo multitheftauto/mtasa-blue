@@ -206,6 +206,7 @@ int CLuaAccountDefs::GetAccount(lua_State* luaVM)
     SString strName;
     SString strPassword;
     bool    bUsePassword = false;
+    bool    bCaseSensitive;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strName);
@@ -215,10 +216,14 @@ int CLuaAccountDefs::GetAccount(lua_State* luaVM)
         argStream.ReadString(strPassword);
         bUsePassword = true;
     }
+    else
+        argStream.Skip(1);
+
+    argStream.ReadBool(bCaseSensitive, true);
 
     if (!argStream.HasErrors())
     {
-        CAccount* pAccount = CStaticFunctionDefinitions::GetAccount(strName, bUsePassword ? strPassword.c_str() : NULL);
+        CAccount* pAccount = CStaticFunctionDefinitions::GetAccount(strName, bUsePassword ? strPassword.c_str() : NULL, bCaseSensitive);
         if (pAccount)
         {
             lua_pushaccount(luaVM, pAccount);

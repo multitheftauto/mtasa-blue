@@ -126,7 +126,7 @@ public:
     bool SaveSettings(void);
     bool IntegrityCheck(void);
 
-    CAccount* Get(const char* szName);
+    CAccount* Get(const char* szName, bool caseSensitive = true);
     CAccount* GetAccountFromScriptID(uint uiScriptID);
     SString   GetActiveCaseVariation(const SString& strName);
 

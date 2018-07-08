@@ -387,12 +387,12 @@ bool CAccountManager::IntegrityCheck()
     return true;
 }
 
-CAccount* CAccountManager::Get(const char* szName)
+CAccount* CAccountManager::Get(const char* szName, bool bCaseSensitive)
 {
     if (szName && szName[0])
     {
         std::vector<CAccount*> results;
-        m_List.FindAccountMatches(&results, szName, true);
+        m_List.FindAccountMatches(&results, szName, bCaseSensitive);
         for (uint i = 0; i < results.size(); i++)
         {
             CAccount* pAccount = results[i];
