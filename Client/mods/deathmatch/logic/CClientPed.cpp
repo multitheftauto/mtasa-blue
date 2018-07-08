@@ -4320,6 +4320,9 @@ void CClientPed::SetChoking(bool bChoking)
                 if (HasJetPack())
                     SetHasJetPack(false);
 
+                // Let's kill any animation
+                KillAnimation();
+
                 // Create the choking task
                 CTaskSimpleChoking* pTask = g_pGame->GetTasks()->CreateTaskSimpleChoking(NULL, true);
                 if (pTask)
