@@ -62,8 +62,8 @@ int CLuaBlipDefs::CreateBlip(lua_State* luaVM)
     unsigned char    ucIcon = 0;
     unsigned char    ucSize = 2;
     SColorRGBA       color(255, 0, 0, 255);
-    short            sOrdering = 0;
-    unsigned short   usVisibleDistance = 16383;
+    int              iOrdering = 0;
+    int              iVisibleDistance = 16383;
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecPosition);
     argStream.ReadNumber(ucIcon, 0);
@@ -72,8 +72,8 @@ int CLuaBlipDefs::CreateBlip(lua_State* luaVM)
     argStream.ReadNumber(color.G, 0);
     argStream.ReadNumber(color.B, 0);
     argStream.ReadNumber(color.A, 255);
-    argStream.ReadNumber(sOrdering, 0);
-    argStream.ReadNumber(usVisibleDistance, 16383);
+    argStream.ReadNumber(iOrdering, 0);
+    argStream.ReadNumber(iVisibleDistance, 16383);
 
     if (!CClientRadarMarkerManager::IsValidIcon(ucIcon))
     {
@@ -88,6 +88,9 @@ int CLuaBlipDefs::CreateBlip(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (pResource)
             {
+                short          sOrdering = std::max(-32768, std::min(32767, iOrdering));
+                unsigned short usVisibleDistance = std::max(0, std::min(65535, iVisibleDistance));
+
                 // Create the blip
                 CClientRadarMarker* pMarker =
                     CStaticFunctionDefinitions::CreateBlip(*pResource, vecPosition, ucIcon, ucSize, color, sOrdering, usVisibleDistance);
@@ -119,8 +122,8 @@ int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
     unsigned char    ucIcon = 0;
     unsigned char    ucSize = 2;
     SColorRGBA       color(255, 0, 0, 255);
-    short            sOrdering = 0;
-    unsigned short   usVisibleDistance = 16383;
+    int              iOrdering = 0;
+    int              iVisibleDistance = 16383;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(ucIcon, 0);
@@ -129,8 +132,8 @@ int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
     argStream.ReadNumber(color.G, 0);
     argStream.ReadNumber(color.B, 0);
     argStream.ReadNumber(color.A, 255);
-    argStream.ReadNumber(sOrdering, 0);
-    argStream.ReadNumber(usVisibleDistance, 16383);
+    argStream.ReadNumber(iOrdering, 0);
+    argStream.ReadNumber(iVisibleDistance, 16383);
 
     if (!CClientRadarMarkerManager::IsValidIcon(ucIcon))
     {
@@ -145,6 +148,9 @@ int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (pResource)
             {
+                short          sOrdering = std::max(-32768, std::min(32767, iOrdering));
+                unsigned short usVisibleDistance = std::max(0, std::min(65535, iVisibleDistance));
+
                 // Create the blip
                 CClientRadarMarker* pMarker =
                     CStaticFunctionDefinitions::CreateBlipAttachedTo(*pResource, *pEntity, ucIcon, ucSize, color, sOrdering, usVisibleDistance);
@@ -346,13 +352,15 @@ int CLuaBlipDefs::SetBlipColor(lua_State* luaVM)
 int CLuaBlipDefs::SetBlipOrdering(lua_State* luaVM)
 {
     CClientEntity*   pEntity = NULL;
-    short            sOrdering;
+    int              iOrdering;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
-    argStream.ReadNumber(sOrdering);
+    argStream.ReadNumber(iOrdering);
 
     if (!argStream.HasErrors())
     {
+        short sOrdering = std::max(-32768, std::min(32767, iOrdering));
+
         if (CStaticFunctionDefinitions::SetBlipOrdering(*pEntity, sOrdering))
         {
             lua_pushboolean(luaVM, true);
@@ -369,13 +377,15 @@ int CLuaBlipDefs::SetBlipOrdering(lua_State* luaVM)
 int CLuaBlipDefs::SetBlipVisibleDistance(lua_State* luaVM)
 {
     CClientEntity*   pEntity = NULL;
-    unsigned short   usVisibleDistance;
+    int              iVisibleDistance;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
-    argStream.ReadNumber(usVisibleDistance);
+    argStream.ReadNumber(iVisibleDistance);
 
     if (!argStream.HasErrors())
     {
+        unsigned short usVisibleDistance = std::max(0, std::min(65535, iVisibleDistance));
+
         if (CStaticFunctionDefinitions::SetBlipVisibleDistance(*pEntity, usVisibleDistance))
         {
             lua_pushboolean(luaVM, true);
