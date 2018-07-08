@@ -99,14 +99,11 @@
       <right name="function.setBanNick" access="false" />
       <right name="function.removeBan" access="false" />
       <right name="function.removeAccount" access="false" />
+      <right name="function.setAccountName" access="false" />
       <right name="function.setAccountPassword" access="false" />
       <right name="function.kickPlayer" access="false" />
-      <right name="function.banIP" access="false" />
       <right name="function.banPlayer" access="false" />
-      <right name="function.banSerial" access="false" />
-      <right name="function.getBansXML" access="false" />
-      <right name="function.unbanIP" access="false" />
-      <right name="function.unbanSerial" access="false" />
+      <right name="function.getBans" access="false" />
       <right name="function.reloadBans" access="false" />
       <right name="function.setServerPassword" access="false" />
       <right name="function.getServerPassword" access="false" />
@@ -154,12 +151,9 @@
       <right name="command.whowas" access="true" />
       <right name="function.setPlayerMuted" access="true" />
       <right name="function.kickPlayer" access="true" />
-      <right name="function.banIP" access="true" />
       <right name="function.banPlayer" access="true" />
-      <right name="function.banSerial" access="true" />
-      <right name="function.getBansXML" access="true" />
-      <right name="function.unbanIP" access="true" />
-      <right name="function.unbanSerial" access="true" />
+      <right name="function.getBans" access="true" />
+      <right name="function.addBan" access="true" />
       <right name="function.startResource" access="true" />
       <right name="function.stopResource" access="true" />
       <right name="function.restartResource" access="true" />
@@ -185,6 +179,7 @@
       <right name="command.chgpass" access="true" />
       <right name="function.addAccount" access="true" />
       <right name="function.removeAccount" access="true" />
+      <right name="function.setAccountName" access="true" />
       <right name="function.setAccountPassword" access="true" />
    </acl>
    <acl name="Admin">
