@@ -10981,7 +10981,7 @@ CAccount* CStaticFunctionDefinitions::GetAccount(const char* szName, const char*
 {
     assert(szName);
 
-    CAccount* pCurrentAccount = m_pAccountManager->Get(szName, bCaseSensitive);
+    CAccount* pCurrentAccount = m_pAccountManager->Get(szName, szPassword, bCaseSensitive);
     if (pCurrentAccount && (!szPassword || pCurrentAccount->IsPassword(szPassword)))
         return pCurrentAccount;
     else

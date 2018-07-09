@@ -387,7 +387,7 @@ bool CAccountManager::IntegrityCheck()
     return true;
 }
 
-CAccount* CAccountManager::Get(const char* szName, bool bCaseSensitive)
+CAccount* CAccountManager::Get(const char* szName, const char* szPassword, bool bCaseSensitive)
 {
     if (szName && szName[0])
     {
@@ -399,7 +399,7 @@ CAccount* CAccountManager::Get(const char* szName, bool bCaseSensitive)
             for (uint i = 0; i < results.size(); i++)
             {
                 CAccount* pAccount = results[i];
-                if (pAccount->IsRegistered())
+                if (pAccount->IsRegistered() && (!szPassword || pAccount->IsPassword(szPassword)))
                 {
                     if (pAccount->GetName() == szName)
                     {
