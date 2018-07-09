@@ -393,6 +393,27 @@ CAccount* CAccountManager::Get(const char* szName, bool bCaseSensitive)
     {
         std::vector<CAccount*> results;
         m_List.FindAccountMatches(&results, szName, bCaseSensitive);
+        if (!bCaseSensitive)
+        {
+            CAccount* firstMatchAccount = nullptr;
+            for (uint i = 0; i < results.size(); i++)
+            {
+                CAccount* pAccount = results[i];
+                if (pAccount->IsRegistered())
+                {
+                    if (pAccount->GetName() == szName)
+                    {
+                        return pAccount;
+                    }
+                    else if (firstMatchAccount == nullptr)
+                    {
+                        firstMatchAccount = pAccount;
+                    }
+                }
+            }
+            return firstMatchAccount != nullptr ? firstMatchAccount : NULL;
+        }
+
         for (uint i = 0; i < results.size(); i++)
         {
             CAccount* pAccount = results[i];
