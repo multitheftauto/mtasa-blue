@@ -9,7 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-
+#include "game/CAnimBlendHierarchy.h"
 using std::list;
 using std::vector;
 
@@ -90,6 +90,12 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
 
     m_pRequester = pManager->GetModelRequestManager();
 
+    m_bisNextAnimationCustom = false;
+    m_bisCurrentAnimationCustom = false;
+    m_strCustomIFPBlockName = "Default";
+    m_strCustomIFPAnimationName = "Default";
+    m_u32CustomBlockNameHash = 0;
+    m_u32CustomAnimationNameHash = 0;
     m_iVehicleInOutState = VEHICLE_INOUT_NONE;
     m_pPlayerPed = NULL;
     m_pTaskManager = NULL;
@@ -233,10 +239,14 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
 
         SetArmor(0.0f);
     }
+
+    g_pClientGame->InsertPedPointerToSet(this);
 }
 
 CClientPed::~CClientPed(void)
 {
+    g_pClientGame->RemovePedPointerFromSet(this);
+
     // Remove from the ped manager
     m_pManager->GetPedManager()->RemoveFromList(this);
 
@@ -991,6 +1001,11 @@ bool CClientPed::SetModel(unsigned long ulModel, bool bTemp)
         // Different model from what we have now?
         if (m_ulModel != ulModel)
         {
+            if (m_bisCurrentAnimationCustom)
+            {
+                m_bisNextAnimationCustom = true;
+            }
+
             if (bTemp)
                 m_ulStoredModel = m_ulModel;
 
@@ -2774,6 +2789,11 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
             // Is it loaded now?
             if (m_pAnimationBlock->IsLoaded())
             {
+                if (m_bisCurrentAnimationCustom)
+                {
+                    m_bisNextAnimationCustom = true;
+                }
+
                 m_bRequestedAnimation = false;
 
                 // Copy our name incase it gets deleted
@@ -2862,7 +2882,7 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
     if (m_bStealthAiming)
     {
         // Grab our current anim
-        CAnimBlendAssociation* pAssoc = GetFirstAnimation();
+        std::unique_ptr<CAnimBlendAssociation> pAssoc = GetFirstAnimation();
         if (pAssoc)
         {
             // Check we're not doing any important animations
@@ -3621,6 +3641,10 @@ void CClientPed::_CreateModel(void)
         // Are we still playing a looped animation?
         if (m_bLoopAnimation && m_pAnimationBlock)
         {
+            if (m_bisCurrentAnimationCustom)
+            {
+                m_bisNextAnimationCustom = true;
+            }
             // Copy our anim name incase it gets deleted
             SString strAnimName = m_strAnimationName;
             // Run our animation
@@ -3914,6 +3938,11 @@ void CClientPed::_ChangeModel(void)
             // Are we still playing a looped animation?
             if (m_bLoopAnimation && m_pAnimationBlock)
             {
+                if (m_bisCurrentAnimationCustom)
+                {
+                    m_bisNextAnimationCustom = true;
+                }
+
                 // Copy our anim name incase it gets deleted
                 SString strAnimName = m_strAnimationName;
                 // Run our animation
@@ -5108,6 +5137,7 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
     // We must not call CPed::Respawn for remote players
     if (m_bIsLocalPlayer)
     {
+        SetNextAnimationNormal();
         SetFrozenWaitingForGroundToLoad(true);
         if (m_pPlayerPed)
         {
@@ -5630,7 +5660,11 @@ void CClientPed::RunNamedAnimation(CAnimBlock* pBlock, const char* szAnimName, i
 
         if (pBlock->IsLoaded())
         {
-            int flags = 0x10;            // // Stops jaw fucking up, some speaking flag maybe
+            /*
+             Saml1er: Setting flags to 0x10 will tell GTA:SA that animation needs to be decompressed.
+                      If not, animation will either crash or do some weird things.
+            */
+            int flags = 0x10;            // Stops jaw fucking up, some speaking flag maybe
             if (bLoop)
                 flags |= 0x2;            // flag that triggers the loop (Maccer)
             if (bUpdatePosition)
@@ -5699,6 +5733,7 @@ void CClientPed::KillAnimation(void)
     m_pAnimationBlock = NULL;
     m_strAnimationName = "";
     m_bRequestedAnimation = false;
+    SetNextAnimationNormal();
 }
 
 void CClientPed::PostWeaponFire(void)
@@ -5916,7 +5951,7 @@ bool CClientPed::ShouldBeStealthAiming(void)
                             if (DistanceBetweenPoints3D(vecPos, vecPos_2) <= STEALTH_KILL_RANGE)
                             {
                                 // Grab our current anim
-                                CAnimBlendAssociation* pAssoc = GetFirstAnimation();
+                                std::unique_ptr<CAnimBlendAssociation> pAssoc = GetFirstAnimation();
                                 if (pAssoc)
                                 {
                                     // Our game checks for stealth killing
@@ -5943,7 +5978,7 @@ void CClientPed::SetStealthAiming(bool bAiming)
         if (!bAiming)
         {
             // Do we have the aiming animation?
-            CAnimBlendAssociation* pAssoc = GetAnimation(ANIM_ID_STEALTH_AIM);
+            std::unique_ptr<CAnimBlendAssociation> pAssoc = GetAnimation(ANIM_ID_STEALTH_AIM);
             if (pAssoc)
             {
                 // Stop our animation
@@ -5954,40 +5989,101 @@ void CClientPed::SetStealthAiming(bool bAiming)
     }
 }
 
-CAnimBlendAssociation* CClientPed::AddAnimation(AssocGroupId group, AnimationId id)
+std::unique_ptr<CAnimBlendAssociation> CClientPed::AddAnimation(AssocGroupId group, AnimationId id)
 {
     if (m_pPlayerPed)
     {
         return g_pGame->GetAnimManager()->AddAnimation(m_pPlayerPed->GetRpClump(), group, id);
     }
-    return NULL;
+    return nullptr;
 }
 
-CAnimBlendAssociation* CClientPed::BlendAnimation(AssocGroupId group, AnimationId id, float fBlendDelta)
+std::unique_ptr<CAnimBlendAssociation> CClientPed::BlendAnimation(AssocGroupId group, AnimationId id, float fBlendDelta)
 {
     if (m_pPlayerPed)
     {
         return g_pGame->GetAnimManager()->BlendAnimation(m_pPlayerPed->GetRpClump(), group, id, fBlendDelta);
     }
-    return NULL;
+    return nullptr;
 }
 
-CAnimBlendAssociation* CClientPed::GetAnimation(AnimationId id)
+std::unique_ptr<CAnimBlendAssociation> CClientPed::GetAnimation(AnimationId id)
 {
     if (m_pPlayerPed)
     {
         return g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(m_pPlayerPed->GetRpClump(), id);
     }
-    return NULL;
+    return nullptr;
 }
 
-CAnimBlendAssociation* CClientPed::GetFirstAnimation(void)
+std::unique_ptr<CAnimBlendAssociation> CClientPed::GetFirstAnimation(void)
 {
     if (m_pPlayerPed)
     {
         return g_pGame->GetAnimManager()->RpAnimBlendClumpGetFirstAssociation(m_pPlayerPed->GetRpClump());
     }
-    return NULL;
+    return nullptr;
+}
+
+void CClientPed::SetNextAnimationCustom(const std::shared_ptr<CClientIFP>& pIFP, const SString& strAnimationName)
+{
+    m_bisNextAnimationCustom = true;
+    m_pCustomAnimationIFP = pIFP;
+    m_strCustomIFPBlockName = pIFP->GetBlockName();
+    m_strCustomIFPAnimationName = strAnimationName;
+    m_u32CustomBlockNameHash = pIFP->GetBlockNameHash();
+    m_u32CustomAnimationNameHash = HashString(strAnimationName.ToLower());
+}
+
+void CClientPed::ReplaceAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInternalAnimHierarchy, const std::shared_ptr<CClientIFP>& pIFP,
+                                  CAnimBlendHierarchySAInterface* pCustomAnimHierarchy)
+{
+    SReplacedAnimation replacedAnimation;
+    replacedAnimation.pIFP = pIFP;
+    replacedAnimation.pAnimationHierarchy = pCustomAnimHierarchy;
+    m_mapOfReplacedAnimations[pInternalAnimHierarchy->GetInterface()] = replacedAnimation;
+}
+
+void CClientPed::RestoreAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInternalAnimHierarchy)
+{
+    m_mapOfReplacedAnimations.erase(pInternalAnimHierarchy->GetInterface());
+}
+
+void CClientPed::RestoreAnimations(const std::shared_ptr<CClientIFP>& IFP)
+{
+    for (auto const& x : m_mapOfReplacedAnimations)
+    {
+        if (std::addressof(*IFP.get()) == std::addressof(*x.second.pIFP.get()))
+        {
+            m_mapOfReplacedAnimations.erase(x.first);
+        }
+    }
+}
+
+void CClientPed::RestoreAnimations(CAnimBlock& animationBlock)
+{
+    const size_t cAnimations = animationBlock.GetAnimationCount();
+    for (size_t i = 0; i < cAnimations; i++)
+    {
+        auto pAnimHierarchyInterface = animationBlock.GetAnimationHierarchyInterface(i);
+        m_mapOfReplacedAnimations.erase(pAnimHierarchyInterface);
+    }
+}
+
+void CClientPed::RestoreAllAnimations(void)
+{
+    m_mapOfReplacedAnimations.clear();
+}
+
+SReplacedAnimation* CClientPed::GetReplacedAnimation(CAnimBlendHierarchySAInterface* pInternalHierarchyInterface)
+{
+    CClientPed::ReplacedAnim_type::iterator it;
+    it = m_mapOfReplacedAnimations.find(pInternalHierarchyInterface);
+    if (it != m_mapOfReplacedAnimations.end())
+    {
+        return &it->second;
+    }
+    return nullptr;
 }
 
 CSphere CClientPed::GetWorldBoundingSphere(void)

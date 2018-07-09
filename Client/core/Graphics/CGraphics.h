@@ -130,7 +130,7 @@ public:
 
     void DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, CMaterialItem* pMaterial, float fU = 0,
                                   float fV = 0, float fSizeU = 1, float fSizeV = 1, bool bRelativeUV = true, bool bUseFaceToward = false,
-                                  const CVector& vecFaceToward = CVector());
+                                  const CVector& vecFaceToward = CVector(), bool bPostGUI = false);
 
     void DrawRectQueued(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bPostGUI, bool bSubPixelPositioning = false);
 
@@ -165,8 +165,8 @@ public:
     // To draw queued up drawings
     void DrawPreGUIQueue(void);
     void DrawPostGUIQueue(void);
-    void DrawMaterialLine3DQueue(void);
-    bool HasMaterialLine3DQueueItems(void);
+    void DrawLine3DPreGUIQueue(void);
+    bool HasLine3DPreGUIQueueItems(void);
 
     void DidRenderScene(void);
     void SetProgressMessage(const SString& strMessage);
@@ -202,7 +202,8 @@ private:
     CTileBatcher*            m_pTileBatcher;
     CLine3DBatcher*          m_pLine3DBatcherPreGUI;
     CLine3DBatcher*          m_pLine3DBatcherPostGUI;
-    CMaterialLine3DBatcher*  m_pMaterialLine3DBatcher;
+    CMaterialLine3DBatcher*  m_pMaterialLine3DBatcherPreGUI;
+    CMaterialLine3DBatcher*  m_pMaterialLine3DBatcherPostGUI;
     CAspectRatioConverter*   m_pAspectRatioConverter;
 
     // Fonts

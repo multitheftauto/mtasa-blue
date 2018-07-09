@@ -11,8 +11,7 @@
 
 class CMapManager;
 
-#ifndef __CMAPMANAGER_H
-#define __CMAPMANAGER_H
+#pragma once
 
 #include "CBlendedWeather.h"
 #include "CBlipManager.h"
@@ -104,5 +103,3 @@ private:
 
     CBlendedWeather* m_pBlendedWeather;
 };
-
-#endif

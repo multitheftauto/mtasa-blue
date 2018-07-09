@@ -1870,12 +1870,12 @@ void CCore::OnDeviceRestore(void)
 void CCore::OnPreFxRender(void)
 {
     // Don't do nothing if nothing won't be drawn
-    if (!CGraphics::GetSingleton().HasMaterialLine3DQueueItems())
+    if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems())
         return;
 
     CGraphics::GetSingleton().EnteringMTARenderZone();
 
-    CGraphics::GetSingleton().DrawMaterialLine3DQueue();
+    CGraphics::GetSingleton().DrawLine3DPreGUIQueue();
 
     CGraphics::GetSingleton().LeavingMTARenderZone();
 }
@@ -2242,4 +2242,10 @@ bool CCore::GetRightSizeTxdEnabled(void)
         return true;
 
     return false;
+}
+
+SString CCore::GetBlueCopyrightString(void)
+{
+    SString strCopyright = BLUE_COPYRIGHT_STRING;
+    return strCopyright.Replace("%BUILD_YEAR%", std::to_string(BUILD_YEAR).c_str());
 }

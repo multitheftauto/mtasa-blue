@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CWEAPONSTAT_H
-#define __CWEAPONSTAT_H
+#pragma once
 #include "CCommon.h"
 struct sWeaponStats
 {
@@ -335,4 +334,3 @@ private:
     bool         m_bChanged;
     static uint  ms_uiAllWeaponStatsRevision;
 };
-#endif

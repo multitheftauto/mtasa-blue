@@ -32,17 +32,6 @@ FILE* SharedUtil::File::Fopen(const char* szFilename, const char* szMode)
 {
     return fopen(szFilename, szMode);
 }
-bool SString::Contains(const SString& strOther) const
-{
-    return find(strOther) != std::string::npos;
-}
-SString SharedUtil::GetSystemCurrentDirectory(void)
-{
-    char szBuffer[MAX_PATH];
-    getcwd(szBuffer, MAX_PATH - 1);
-    return szBuffer;
-}
-void HandleLinuxLibs(const SString& strLaunchDirectory, int argc, char* argv[]);
 #endif
 
 using namespace std;
@@ -51,14 +40,6 @@ using namespace std;
     #define LIB_CORE SERVER_BIN_PATH "core" MTA_LIB_SUFFIX MTA_LIB_EXTENSION
 #else
     #define LIB_CORE "./" SERVER_BIN_PATH "core" MTA_LIB_SUFFIX MTA_LIB_EXTENSION
-#endif
-
-#ifndef WIN32
-    #ifdef ANY_x86
-        #define LINUX_LIBS_PATH     "x86/linux-libs"
-    #else
-        #define LINUX_LIBS_PATH     "x64/linux-libs"
-    #endif
 #endif
 
 int main(int argc, char* argv[])
@@ -102,7 +83,6 @@ int main(int argc, char* argv[])
             printf("  -u                   Disable output buffering and flush instantly (useful for screenlog)\n");
 #ifndef WIN32
             printf("  -x                   Disable simplified crash reports (To allow core dumps)\n");
-            printf("  -q                   Do not add " LINUX_LIBS_PATH " directory to library search path and relaunch\n");
 #endif
             printf("  -D [PATH]            Use as base directory\n");
             printf("  --config [FILE]      Alternate mtaserver.conf file\n");
@@ -125,8 +105,6 @@ int main(int argc, char* argv[])
         cin.get();
         return 1;
     }
-#else
-    HandleLinuxLibs(strLaunchDirectory, argc, argv);
 #endif
 
     // If we are unable to access the core module, try changing to the directory of the launched file
@@ -176,53 +154,3 @@ int main(int argc, char* argv[])
     cin.get();
     return 1;
 }
-
-#ifndef WIN32
-//
-// Add linux-libs to library search path if:
-//  1. Options don't forbid it (-q)
-//  2. linux-libs is not already in the library search path
-//
-void HandleLinuxLibs(const SString& strLaunchDirectory, int argc, char* argv[])
-{
-    // Check for linux-libs forbidden option
-    for (int i = 1; i < argc; i++)
-    {
-        if (strcmp(argv[i], "-q") == 0)
-            return;
-    }
-
-    // Calculate absolute path to MTA directory
-    SString strSavedDir = GetSystemCurrentDirectory();
-    chdir(strLaunchDirectory);
-    SString strAbsLaunchDirectory = GetSystemCurrentDirectory();
-    chdir(strSavedDir);
-
-    SString strLdLibraryPath = getenv("LD_LIBRARY_PATH");
-    SString strLinuxLibsPath = strAbsLaunchDirectory + "/" LINUX_LIBS_PATH;
-
-    // Check that linux-libs is not already in library path
-    if (!strLdLibraryPath.Contains(strLinuxLibsPath))
-    {
-        // Add linux-libs to search path
-        if (!strLdLibraryPath.empty())
-            strLdLibraryPath += ";";
-        strLdLibraryPath += strLinuxLibsPath;
-        SString strEnvString = SStringX("LD_LIBRARY_PATH=") + strLdLibraryPath;
-        putenv((char*)*strEnvString);
-
-        // Add -q to ensure linux-libs don't get added again
-        char** pArgArray = new char*[argc + 2];
-        for (int i = 0; i <= argc; i++)
-        {
-            pArgArray[i] = argv[i];
-        }
-        char newArg[] = "-q";
-        pArgArray[argc] = newArg;
-        pArgArray[argc + 1] = nullptr;
-
-        // Go for launch #2
-        execv(argv[0], pArgArray);
-    }
-}
-#endif

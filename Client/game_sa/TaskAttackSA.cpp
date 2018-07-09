@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CTaskSimpleGangDriveBySA::CTaskSimpleGangDriveBySA(CEntity *pTargetEntity, const CVector *pVecTarget, float fAbortRange, char FrequencyPercentage,
+CTaskSimpleGangDriveBySA::CTaskSimpleGangDriveBySA(CEntity* pTargetEntity, const CVector* pVecTarget, float fAbortRange, char FrequencyPercentage,
                                                    char nDrivebyStyle, bool bSeatRHS)
 {
     DEBUG_TRACE(
@@ -37,7 +37,7 @@ CTaskSimpleGangDriveBySA::CTaskSimpleGangDriveBySA(CEntity *pTargetEntity, const
     }
 }
 
-CTaskSimpleUseGunSA::CTaskSimpleUseGunSA(CEntity *pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength, unsigned char bAimImmediate)
+CTaskSimpleUseGunSA::CTaskSimpleUseGunSA(CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength, unsigned char bAimImmediate)
 {
     DEBUG_TRACE(
         "CTaskSimpleUseGunSA::CTaskSimpleUseGunSA ( CEntity *pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength, unsigned char bAimImmediate "
@@ -65,16 +65,16 @@ CTaskSimpleUseGunSA::CTaskSimpleUseGunSA(CEntity *pTargetEntity, CVector vecTarg
     }
 }
 
-bool CTaskSimpleUseGunSA::SetPedPosition(CPed *pPed)
+bool CTaskSimpleUseGunSA::SetPedPosition(CPed* pPed)
 {
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_SetPedPosition;
     DWORD dwThisInterface = (DWORD)this->GetInterface();
 
-    BYTE *ptr = (BYTE *)dwThisInterface;
+    BYTE* ptr = (BYTE*)dwThisInterface;
     ptr[0x0d] = 2;
 
-    CPedSAInterface *dwPedInterface = (CPedSAInterface *)pPed->GetInterface();
+    CPedSAInterface* dwPedInterface = (CPedSAInterface*)pPed->GetInterface();
 
     BYTE currentWeaponSlot = dwPedInterface->bCurrentWeaponSlot;
 
@@ -88,7 +88,7 @@ bool CTaskSimpleUseGunSA::SetPedPosition(CPed *pPed)
     return bReturn;
 }
 
-void CTaskSimpleUseGunSA::FireGun(CPed *pPed, bool bFlag)
+void CTaskSimpleUseGunSA::FireGun(CPed* pPed, bool bFlag)
 {
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_FireGun;
     DWORD dwThisInterface = (DWORD)this->GetInterface();
@@ -102,7 +102,7 @@ void CTaskSimpleUseGunSA::FireGun(CPed *pPed, bool bFlag)
     }
 }
 
-bool CTaskSimpleUseGunSA::ControlGun(CPed *pPed, CEntity *pTargetEntity, char nCommand)
+bool CTaskSimpleUseGunSA::ControlGun(CPed* pPed, CEntity* pTargetEntity, char nCommand)
 {
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_ControlGun;
@@ -121,7 +121,7 @@ bool CTaskSimpleUseGunSA::ControlGun(CPed *pPed, CEntity *pTargetEntity, char nC
     return bReturn;
 }
 
-bool CTaskSimpleUseGunSA::ControlGunMove(CVector2D *pMoveVec)
+bool CTaskSimpleUseGunSA::ControlGunMove(CVector2D* pMoveVec)
 {
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_ControlGunMove;
@@ -136,7 +136,7 @@ bool CTaskSimpleUseGunSA::ControlGunMove(CVector2D *pMoveVec)
     return bReturn;
 }
 
-void CTaskSimpleUseGunSA::Reset(CPed *pPed, CEntity *pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength)
+void CTaskSimpleUseGunSA::Reset(CPed* pPed, CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength)
 {
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_Reset;
     DWORD dwThisInterface = (DWORD)this->GetInterface();
@@ -174,7 +174,7 @@ int CTaskSimpleUseGunSA::GetTaskType(void)
 
 // If flag is 1 or 2 then do magic stop stuff else set m_nNextCommand to 6
 // (pEvent not used)
-bool CTaskSimpleUseGunSA::MakeAbortable(CPed *pPed, int iPriority, CEvent const *pEvent)
+bool CTaskSimpleUseGunSA::MakeAbortable(CPed* pPed, int iPriority, CEvent const* pEvent)
 {
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_MakeAbortable;
@@ -192,7 +192,7 @@ bool CTaskSimpleUseGunSA::MakeAbortable(CPed *pPed, int iPriority, CEvent const 
     return bReturn;
 }
 
-bool CTaskSimpleUseGunSA::ProcessPed(CPed *pPed)
+bool CTaskSimpleUseGunSA::ProcessPed(CPed* pPed)
 {
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_ProcessPed;
@@ -208,7 +208,7 @@ bool CTaskSimpleUseGunSA::ProcessPed(CPed *pPed)
     return bReturn;
 }
 
-void CTaskSimpleUseGunSA::AbortIK(CPed *pPed)
+void CTaskSimpleUseGunSA::AbortIK(CPed* pPed)
 {
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_AbortIK;
     DWORD dwThisInterface = (DWORD)this->GetInterface();
@@ -221,7 +221,7 @@ void CTaskSimpleUseGunSA::AbortIK(CPed *pPed)
     }
 }
 
-void CTaskSimpleUseGunSA::AimGun(CPed *pPed)
+void CTaskSimpleUseGunSA::AimGun(CPed* pPed)
 {
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_AimGun;
     DWORD dwThisInterface = (DWORD)this->GetInterface();
@@ -234,7 +234,7 @@ void CTaskSimpleUseGunSA::AimGun(CPed *pPed)
     }
 }
 
-void CTaskSimpleUseGunSA::ClearAnim(CPed *pPed)
+void CTaskSimpleUseGunSA::ClearAnim(CPed* pPed)
 {
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_ClearAnim;
     DWORD dwThisInterface = (DWORD)this->GetInterface();
@@ -359,7 +359,7 @@ bool CTaskSimpleUseGunSA::PlayerPassiveControlGun(void)
     return bReturn;
 }
 
-void CTaskSimpleUseGunSA::RemoveStanceAnims(CPed *pPed, float f)
+void CTaskSimpleUseGunSA::RemoveStanceAnims(CPed* pPed, float f)
 {
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_RemoveStanceAnims;
     DWORD dwThisInterface = (DWORD)this->GetInterface();
@@ -373,7 +373,7 @@ void CTaskSimpleUseGunSA::RemoveStanceAnims(CPed *pPed, float f)
     }
 }
 
-bool CTaskSimpleUseGunSA::RequirePistolWhip(CPed *pPed, CEntity *pTargetEntity)
+bool CTaskSimpleUseGunSA::RequirePistolWhip(CPed* pPed, CEntity* pTargetEntity)
 {
     bool  bReturn;
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_ControlGun;
@@ -401,7 +401,7 @@ void CTaskSimpleUseGunSA::SetBurstLength(short a)
     }
 }
 
-void CTaskSimpleUseGunSA::SetMoveAnim(CPed *pPed)
+void CTaskSimpleUseGunSA::SetMoveAnim(CPed* pPed)
 {
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_SetMoveAnim;
     DWORD dwThisInterface = (DWORD)this->GetInterface();
@@ -414,7 +414,7 @@ void CTaskSimpleUseGunSA::SetMoveAnim(CPed *pPed)
     }
 }
 
-void CTaskSimpleUseGunSA::StartAnim(class CPed *pPed)
+void CTaskSimpleUseGunSA::StartAnim(class CPed* pPed)
 {
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_StartAnim;
     DWORD dwThisInterface = (DWORD)this->GetInterface();
@@ -440,7 +440,7 @@ void CTaskSimpleUseGunSA::StartCountDown(unsigned char a, bool b)
     }
 }
 
-CTaskSimpleFightSA::CTaskSimpleFightSA(CEntity *pTargetEntity, int nCommand, unsigned int nIdlePeriod)
+CTaskSimpleFightSA::CTaskSimpleFightSA(CEntity* pTargetEntity, int nCommand, unsigned int nIdlePeriod)
 {
     DEBUG_TRACE("CTaskSimpleFightSA::CTaskSimpleFightSA ( CEntity *pTargetEntity, int nCommand, unsigned int nIdlePeriod )");
 

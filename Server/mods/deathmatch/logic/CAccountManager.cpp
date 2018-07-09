@@ -912,6 +912,21 @@ void CAccountManager::GetAccountsByIP(const SString& strIP, std::vector<CAccount
     }
 }
 
+CAccount* CAccountManager::GetAccountByID(int ID)
+{
+    CRegistryResult result;
+    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM accounts WHERE id = ?", SQLITE_INTEGER, ID);
+
+    for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+    {
+        const auto& row = *iter;
+
+        return Get(reinterpret_cast<const char*>(row[0].pVal));
+    }
+
+    return nullptr;
+}
+
 void CAccountManager::GetAccountsByData(const SString& dataName, const SString& value, std::vector<CAccount*>& outAccounts)
 {
     Save();

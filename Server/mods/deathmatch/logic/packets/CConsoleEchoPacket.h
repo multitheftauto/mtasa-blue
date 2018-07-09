@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CCONSOLEECHOPACKET_H
-#define __PACKETS_CCONSOLEECHOPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include "../../Config.h"
@@ -32,5 +31,3 @@ public:
 private:
     SString m_strMessage;
 };
-
-#endif

@@ -35,6 +35,9 @@ public:
     short                           sAnimID;                        // 44
     short                           sFlags;                         // or1 = started?, or64 = referenced?   // 46
     DWORD*                          pCallback;                      // 48
+    DWORD*                          pCallbackFunc;                  // 52
+    DWORD*                          pCallbackData;                  // 56
+                                                                    // Total: 60 bytes
 };
 
 class CAnimBlendAssociationSA : public CAnimBlendAssociation
@@ -42,15 +45,19 @@ class CAnimBlendAssociationSA : public CAnimBlendAssociation
 public:
     CAnimBlendAssociationSA(CAnimBlendAssociationSAInterface* pInterface) { m_pInterface = pInterface; }
 
-    CAnimBlendAssociationSAInterface* GetInterface(void) { return m_pInterface; }
-    AssocGroupId                      GetAnimGroup(void) { return (AssocGroupId)m_pInterface->sAnimGroup; }
-    AnimationId                       GetAnimID(void) { return (AnimationId)m_pInterface->sAnimID; }
-    CAnimBlendHierarchy*              GetAnimHierarchy(void);
+    CAnimBlendAssociationSAInterface*    Constructor(CAnimBlendStaticAssociationSAInterface& StaticAssociationByReference);
+    CAnimBlendAssociationSAInterface*    Constructor(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy);
+    CAnimBlendAssociationSAInterface*    GetInterface() { return m_pInterface; }
+    AssocGroupId                         GetAnimGroup() { return (AssocGroupId)m_pInterface->sAnimGroup; }
+    AnimationId                          GetAnimID() { return (AnimationId)m_pInterface->sAnimID; }
+    std::unique_ptr<CAnimBlendHierarchy> GetAnimHierarchy();
 
-    float GetBlendAmount(void) { return m_pInterface->fBlendAmount; }
+    float GetBlendAmount() { return m_pInterface->fBlendAmount; }
     void  SetBlendAmount(float fAmount) { m_pInterface->fBlendAmount = fAmount; }
-
-    void SetCurrentProgress(float fProgress);
+    void  SetCurrentProgress(float fProgress);
+    void  SetAnimID(short sAnimID) { m_pInterface->sAnimID = sAnimID; }
+    void  SetAnimGroup(short sAnimGroup) { m_pInterface->sAnimGroup = sAnimGroup; }
+    void  SetFlags(short sFlags) { m_pInterface->sFlags = sFlags; }
 
 protected:
     CAnimBlendAssociationSAInterface* m_pInterface;

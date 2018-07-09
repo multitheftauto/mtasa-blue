@@ -28,7 +28,7 @@ struct CFileObjectInstance
     long  flags;            // = -1
 };
 
-CObjectSA::CObjectSA(CObjectSAInterface *objectInterface)
+CObjectSA::CObjectSA(CObjectSAInterface* objectInterface)
 {
     DEBUG_TRACE("CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)");
     this->SetInterface(objectInterface);
@@ -50,7 +50,7 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
 {
     DEBUG_TRACE("CObjectSA::CObjectSA( DWORD dwModel )");
 
-    CWorldSA *world = (CWorldSA *)pGame->GetWorld();
+    CWorldSA* world = (CWorldSA*)pGame->GetWorld();
 
     DWORD dwThis = 0;
 
@@ -74,7 +74,7 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
         mov     dwThis, eax
     }
 
-    this->SetInterface((CEntitySAInterface *)dwThis);
+    this->SetInterface((CEntitySAInterface*)dwThis);
 
     MemPutFast<DWORD>(0xBCC0E0, dwThis);
     MemPutFast<DWORD>(0xBCC0D8, 1);
@@ -139,7 +139,7 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
     }
     if (dwObjectPtr)
     {
-        this->SetInterface((CEntitySAInterface *)dwObjectPtr);
+        this->SetInterface((CEntitySAInterface*)dwObjectPtr);
 
         world->Add(m_pInterface, CObject_Constructor);
 
@@ -151,7 +151,7 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
         {
             // Set our immunities
             // Sum of all flags checked @ CPhysical__CanPhysicalBeDamaged
-            CObjectSAInterface *pObjectSAInterface = GetObjectInterface();
+            CObjectSAInterface* pObjectSAInterface = GetObjectInterface();
             pObjectSAInterface->bBulletProof = true;
             pObjectSAInterface->bFireProof = true;
             pObjectSAInterface->bCollisionProof = true;
@@ -167,7 +167,7 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
     }
 #endif
 
-    this->internalID = pGame->GetPools()->GetObjectRef((DWORD *)this->GetInterface());
+    this->internalID = pGame->GetPools()->GetObjectRef((DWORD*)this->GetInterface());
 
     m_ucAlpha = 255;
 
@@ -189,7 +189,7 @@ CObjectSA::~CObjectSA()
         {
             if ((DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable)
             {
-                CWorldSA *world = (CWorldSA *)pGame->GetWorld();
+                CWorldSA* world = (CWorldSA*)pGame->GetWorld();
                 world->Remove(this->GetInterface(), CObject_Destructor);
 
                 DWORD dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR;            // we use the vtbl so we can be type independent
@@ -219,7 +219,7 @@ CObjectSA::~CObjectSA()
         }
 
         this->BeingDeleted = true;
-        ((CPoolsSA *)pGame->GetPools())->RemoveObject((CObject *)(CObjectSA *)this);
+        ((CPoolsSA*)pGame->GetPools())->RemoveObject((CObject*)(CObjectSA*)this);
 
         // OutputDebugString("Destroying Object\n");
     }
@@ -281,12 +281,12 @@ void CObjectSA::Break()
 
 void CObjectSA::SetHealth(float fHealth)
 {
-    static_cast<CObjectSAInterface *>(this->GetInterface())->fHealth = fHealth;
+    static_cast<CObjectSAInterface*>(this->GetInterface())->fHealth = fHealth;
 }
 
 float CObjectSA::GetHealth(void)
 {
-    return static_cast<CObjectSAInterface *>(this->GetInterface())->fHealth;
+    return static_cast<CObjectSAInterface*>(this->GetInterface())->fHealth;
 }
 
 void CObjectSA::SetModelIndex(unsigned long ulModel)
@@ -355,7 +355,7 @@ void CObjectSA::SetScale(float fX, float fY, float fZ)
     GetObjectInterface()->fScale = std::max(fX, std::max(fY, fZ));
 }
 
-CVector *CObjectSA::GetScale()
+CVector* CObjectSA::GetScale()
 {
     return &m_vecScale;
 }

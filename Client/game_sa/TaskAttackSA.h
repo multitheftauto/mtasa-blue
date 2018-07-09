@@ -83,10 +83,10 @@ public:
 
     AnimationId            m_nRequiredAnim;
     AssocGroupId           m_nRequiredAnimGroup;
-    CAnimBlendAssociation *m_pAnim;
-    CWeaponInfo *          m_pWeaponInfo;
+    CAnimBlendAssociation* m_pAnim;
+    CWeaponInfo*           m_pWeaponInfo;
 
-    CEntity *m_pTargetEntity;
+    CEntity* m_pTargetEntity;
     CVector  m_vecCoords;
 };
 
@@ -94,7 +94,7 @@ class CTaskSimpleGangDriveBySA : public virtual CTaskSimpleSA, public virtual CT
 {
 public:
     CTaskSimpleGangDriveBySA(void){};
-    CTaskSimpleGangDriveBySA(CEntity *pTargetEntity, const CVector *pVecTarget, float fAbortRange, char FrequencyPercentage, char nDrivebyStyle, bool bSeatRHS);
+    CTaskSimpleGangDriveBySA(CEntity* pTargetEntity, const CVector* pVecTarget, float fAbortRange, char FrequencyPercentage, char nDrivebyStyle, bool bSeatRHS);
 };
 
 class CTaskSimpleUseGunSAInterface : public CTaskSimpleSAInterface
@@ -112,12 +112,12 @@ public:
     char      m_nLastCommand;            // active command       (2 or 3) == is firing
     CVector2D m_vecMoveCommand;
 
-    CEntity *m_pTargetEntity;
+    CEntity* m_pTargetEntity;
     CVector  m_vecCoords;
 
-    CAnimBlendAssociation *m_pAnim;
+    CAnimBlendAssociation* m_pAnim;
 
-    CWeaponInfo *m_pWeaponInfo;             // 0x30
+    CWeaponInfo* m_pWeaponInfo;             // 0x30
     short        m_nBurstLength;            // 0x34
     short        m_nBurstShots;
 
@@ -132,20 +132,20 @@ class CTaskSimpleUseGunSA : public virtual CTaskSimpleSA, public virtual CTaskSi
 {
 public:
     CTaskSimpleUseGunSA(void){};
-    CTaskSimpleUseGunSA(CEntity *pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength = 1, unsigned char bAimImmediate = false);
+    CTaskSimpleUseGunSA(CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength = 1, unsigned char bAimImmediate = false);
 
-    bool ControlGun(CPed *pPed, CEntity *pTargetEntity, char nCommand);
-    bool ControlGunMove(CVector2D *pMoveVec);
-    void Reset(CPed *pPed, CEntity *pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength = 1);
+    bool ControlGun(CPed* pPed, CEntity* pTargetEntity, char nCommand);
+    bool ControlGunMove(CVector2D* pMoveVec);
+    void Reset(CPed* pPed, CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength = 1);
 
     int         GetTaskType(void);
-    bool        MakeAbortable(CPed *pPed, const int iPriority, const CEvent *pEvent);
-    bool        ProcessPed(CPed *pPed);
-    bool        SetPedPosition(CPed *pPed);
-    void        FireGun(CPed *pPed, bool bFlag);
-    void        AbortIK(CPed *pPed);
-    void        AimGun(CPed *pPed);
-    void        ClearAnim(CPed *pPed);
+    bool        MakeAbortable(CPed* pPed, const int iPriority, const CEvent* pEvent);
+    bool        ProcessPed(CPed* pPed);
+    bool        SetPedPosition(CPed* pPed);
+    void        FireGun(CPed* pPed, bool bFlag);
+    void        AbortIK(CPed* pPed);
+    void        AimGun(CPed* pPed);
+    void        ClearAnim(CPed* pPed);
     signed char GetCurrentCommand(void);
     bool        GetDoneFiring(void);
     bool        GetIsFinished(void);
@@ -154,11 +154,11 @@ public:
     bool        GetIsReloading(void);
     bool        GetSkipAim(void);
     bool        PlayerPassiveControlGun(void);
-    void        RemoveStanceAnims(CPed *pPed, float);
-    static bool RequirePistolWhip(CPed *pPed, CEntity *);
+    void        RemoveStanceAnims(CPed* pPed, float);
+    static bool RequirePistolWhip(CPed* pPed, CEntity*);
     void        SetBurstLength(short);
-    void        SetMoveAnim(CPed *pPed);
-    void        StartAnim(CPed *pPed);
+    void        SetMoveAnim(CPed* pPed);
+    void        StartAnim(CPed* pPed);
     void        StartCountDown(unsigned char, bool);
 };
 
@@ -176,9 +176,9 @@ public:
     char           m_nContinueStrike;
     char           m_nChainCounter;
 
-    CEntity *              m_pTargetEntity;
-    CAnimBlendAssociation *m_pAnim;
-    CAnimBlendAssociation *m_pIdleAnim;
+    CEntity*               m_pTargetEntity;
+    CAnimBlendAssociation* m_pAnim;
+    CAnimBlendAssociation* m_pIdleAnim;
 
     char m_nComboSet;
     char m_nCurrentMove;
@@ -190,7 +190,7 @@ class CTaskSimpleFightSA : public virtual CTaskSimpleSA, public virtual CTaskSim
 {
 public:
     CTaskSimpleFightSA(void){};
-    CTaskSimpleFightSA(CEntity *pTargetEntity, int nCommand, unsigned int nIdlePeriod = 10000);
+    CTaskSimpleFightSA(CEntity* pTargetEntity, int nCommand, unsigned int nIdlePeriod = 10000);
 };
 
 #endif

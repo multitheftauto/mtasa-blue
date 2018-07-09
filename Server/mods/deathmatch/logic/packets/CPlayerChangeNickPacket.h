@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CPLAYERCHANGENICKPACKET_H
-#define __PACKETS_CPLAYERCHANGENICKPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include "../../Config.h"
@@ -31,5 +30,3 @@ public:
 private:
     SString m_strNewNick;
 };
-
-#endif

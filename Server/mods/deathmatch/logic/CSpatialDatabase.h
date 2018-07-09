@@ -10,8 +10,7 @@
 
 class CElement;
 
-#ifndef __CSPATIALDATABASE_H
-#define __CSPATIALDATABASE_H
+#pragma once
 
 // Bounding sphere z position for 2d objects
 #define SPATIAL_2D_Z    0
@@ -38,5 +37,3 @@ public:
 };
 
 CSpatialDatabase* GetSpatialDatabase();
-
-#endif

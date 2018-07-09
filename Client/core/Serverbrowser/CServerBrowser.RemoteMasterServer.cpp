@@ -353,24 +353,22 @@ bool CRemoteMasterServer::ParseListVer2(CServerListItemList& itemList)
     uint uiFlags = 0;
     stream.Read(uiFlags);
 
-    // bool bHasAddress        = ( uiFlags & ASE_FLAG_ADDRESS ) != 0;
-    // bool bHasPort           = ( uiFlags & ASE_FLAG_PORT ) != 0;
-    bool bHasPlayerCount = (uiFlags & ASE_FLAG_PLAYER_COUNT) != 0;
-    bool bHasMaxPlayerCount = (uiFlags & ASE_FLAG_MAX_PLAYER_COUNT) != 0;
-    bool bHasGameName = (uiFlags & ASE_FLAG_GAME_NAME) != 0;
-    bool bHasName = (uiFlags & ASE_FLAG_NAME) != 0;
-    bool bHasGameMode = (uiFlags & ASE_FLAG_GAME_MODE) != 0;
-    bool bHasMap = (uiFlags & ASE_FLAG_MAP) != 0;
-    bool bHasVersion = (uiFlags & ASE_FLAG_VERSION) != 0;
-    bool bHasPassworded = (uiFlags & ASE_FLAG_PASSWORDED) != 0;
-    bool bHasSerials = (uiFlags & ASE_FLAG_SERIALS) != 0;
-    bool bHasPlayers = (uiFlags & ASE_FLAG_PLAYER_LIST) != 0;
-    bool bHasRespondingFlag = (uiFlags & ASE_FLAG_RESPONDING) != 0;
-    bool bHasRestrictionFlags = (uiFlags & ASE_FLAG_RESTRICTIONS) != 0;
-    bool bHasSearchIgnoreSections = (uiFlags & ASE_FLAG_SEARCH_IGNORE_SECTIONS) != 0;
-    bool bHasKeepFlag = (uiFlags & ASE_FLAG_KEEP) != 0;
-    bool bHasHttpPort = (uiFlags & ASE_FLAG_HTTP_PORT) != 0;
-    bool bHasSpecialFlags = (uiFlags & ASE_FLAG_SPECIAL_FLAGS) != 0;
+    bool bHasPlayerCount = (uiFlags & ASE_HAS_PLAYER_COUNT) != 0;
+    bool bHasMaxPlayerCount = (uiFlags & ASE_HAS_MAX_PLAYER_COUNT) != 0;
+    bool bHasGameName = (uiFlags & ASE_HAS_GAME_NAME) != 0;
+    bool bHasName = (uiFlags & ASE_HAS_SERVER_NAME) != 0;
+    bool bHasGameMode = (uiFlags & ASE_HAS_GAME_MODE) != 0;
+    bool bHasMap = (uiFlags & ASE_HAS_MAP_NAME) != 0;
+    bool bHasVersion = (uiFlags & ASE_HAS_SERVER_VERSION) != 0;
+    bool bHasPassworded = (uiFlags & ASE_HAS_PASSWORDED_FLAG) != 0;
+    bool bHasSerials = (uiFlags & ASE_HAS_SERIALS_FLAG) != 0;
+    bool bHasPlayers = (uiFlags & ASE_HAS_PLAYER_LIST) != 0;
+    bool bHasRespondingFlag = (uiFlags & ASE_HAS_RESPONDING_FLAG) != 0;
+    bool bHasRestrictionFlags = (uiFlags & ASE_HAS_RESTRICTION_FLAGS) != 0;
+    bool bHasSearchIgnoreSections = (uiFlags & ASE_HAS_SEARCH_IGNORE_SECTIONS) != 0;
+    bool bHasKeepFlag = (uiFlags & ASE_HAS_KEEP_FLAG) != 0;
+    bool bHasHttpPort = (uiFlags & ASE_HAS_HTTP_PORT) != 0;
+    bool bHasSpecialFlags = (uiFlags & ASE_HAS_SPECIAL_FLAGS) != 0;
 
     // Rate quality of data supplied here
     uint uiDataQuality = SERVER_INFO_ASE_2;

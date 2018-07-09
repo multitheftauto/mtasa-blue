@@ -537,38 +537,35 @@ bool CServerListItem::ParseQuery(const char* szBuffer, unsigned int nLength)
     // Game
     if (!ReadString(strTemp, szBuffer, i, nLength))
         return false;
-    if ((uiMasterServerSaysRestrictions & ASE_FLAG_GAME_NAME) == false)
+    if ((uiMasterServerSaysRestrictions & RESTRICTION_GAME_NAME) == false)
         strGameName = strTemp;
 
-    // Port
+    // Port (Ignore result as we must already have the correct value)
     if (!ReadString(strTemp, szBuffer, i, nLength))
         return false;
-    // Don't update port here. We must already have the correct value.
-    // if ( ( uiMasterServerSaysRestrictions & ASE_FLAG_PORT ) == false )
-    //    ChangeAddress( Address, atoi ( strTemp.c_str () ) );
 
     // Server name
     if (!ReadString(strTemp, szBuffer, i, nLength))
         return false;
-    if ((uiMasterServerSaysRestrictions & ASE_FLAG_NAME) == false)
+    if ((uiMasterServerSaysRestrictions & RESTRICTION_SERVER_NAME) == false)
         strName = strTemp;
 
     // Game type
     if (!ReadString(strTemp, szBuffer, i, nLength))
         return false;
-    if ((uiMasterServerSaysRestrictions & ASE_FLAG_GAME_MODE) == false)
+    if ((uiMasterServerSaysRestrictions & RESTRICTION_GAME_MODE) == false)
         strGameMode = strTemp;
 
     // Map name
     if (!ReadString(strMapTemp, szBuffer, i, nLength))
         return false;
-    if ((uiMasterServerSaysRestrictions & ASE_FLAG_MAP) == false)
+    if ((uiMasterServerSaysRestrictions & RESTRICTION_MAP_NAME) == false)
         strMap = strMapTemp;
 
     // Version
     if (!ReadString(strTemp, szBuffer, i, nLength))
         return false;
-    if ((uiMasterServerSaysRestrictions & ASE_FLAG_VERSION) == false)
+    if ((uiMasterServerSaysRestrictions & RESTRICTION_SERVER_VERSION) == false)
         strVersion = strTemp;
 
     // Got space for password, serial verification, player count, players max?
@@ -577,19 +574,19 @@ bool CServerListItem::ParseQuery(const char* szBuffer, unsigned int nLength)
         return false;
     }
 
-    if ((uiMasterServerSaysRestrictions & ASE_FLAG_PASSWORDED) == false)
+    if ((uiMasterServerSaysRestrictions & RESTRICTION_PASSWORDED_FLAG) == false)
         bPassworded = (szBuffer[i] == 1);
     i++;
 
-    if ((uiMasterServerSaysRestrictions & ASE_FLAG_SERIALS) == false)
+    if ((uiMasterServerSaysRestrictions & RESTRICTION_SERIALS_FLAG) == false)
         bSerials = (szBuffer[i] == 1);
     i++;
 
-    if ((uiMasterServerSaysRestrictions & ASE_FLAG_PLAYER_COUNT) == false)
+    if ((uiMasterServerSaysRestrictions & RESTRICTION_PLAYER_COUNT) == false)
         nPlayers = (unsigned char)szBuffer[i];
     i++;
 
-    if ((uiMasterServerSaysRestrictions & ASE_FLAG_MAX_PLAYER_COUNT) == false)
+    if ((uiMasterServerSaysRestrictions & RESTRICTION_MAX_PLAYER_COUNT) == false)
         nMaxPlayers = (unsigned char)szBuffer[i];
     i++;
 
@@ -600,9 +597,9 @@ bool CServerListItem::ParseQuery(const char* szBuffer, unsigned int nLength)
         SString strJoinedPlayers, strMaxPlayers;
         if (strPlayerCount.Split("/", &strJoinedPlayers, &strMaxPlayers))
         {
-            if ((uiMasterServerSaysRestrictions & ASE_FLAG_PLAYER_COUNT) == false)
+            if ((uiMasterServerSaysRestrictions & RESTRICTION_PLAYER_COUNT) == false)
                 nPlayers = atoi(strJoinedPlayers);
-            if ((uiMasterServerSaysRestrictions & ASE_FLAG_MAX_PLAYER_COUNT) == false)
+            if ((uiMasterServerSaysRestrictions & RESTRICTION_MAX_PLAYER_COUNT) == false)
                 nMaxPlayers = atoi(strMaxPlayers);
         }
     }
@@ -645,7 +642,7 @@ bool CServerListItem::ParseQuery(const char* szBuffer, unsigned int nLength)
                 SString strResult = RemoveColorCodes(strPlayer.c_str());
                 if (strResult.length() == 0)
                     strResult = strPlayer;
-                if ((uiMasterServerSaysRestrictions & ASE_FLAG_PLAYER_LIST) == false)
+                if ((uiMasterServerSaysRestrictions & RESTRICTION_PLAYER_LIST) == false)
                     vecPlayers.push_back(strResult);
             }
         }

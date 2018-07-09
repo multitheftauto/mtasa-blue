@@ -11,8 +11,7 @@
 
 class CBlipManager;
 
-#ifndef __CBLIPMANAGER_H
-#define __CBLIPMANAGER_H
+#pragma once
 
 #include "CBlip.h"
 #include <list>
@@ -40,5 +39,3 @@ public:
 private:
     list<CBlip*> m_List;
 };
-
-#endif
