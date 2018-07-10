@@ -2953,7 +2953,7 @@ int CLuaGUIDefs::GUIEditIsReadOnly(lua_State* luaVM)
     CClientGUIElement* editField;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData<CGUIEdit>(editField);
+    argStream.ReadUserData(editField);
 
     if (!argStream.HasErrors())
     {
@@ -2965,7 +2965,7 @@ int CLuaGUIDefs::GUIEditIsReadOnly(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // error: bad arguments
-    lua_pushboolean(luaVM, false);
+    lua_pushnil(luaVM);
     return 1;
 }
 
@@ -2989,7 +2989,7 @@ int CLuaGUIDefs::GUIMemoSetReadOnly(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // error: bad arguments
-    lua_pushboolean(luaVM, false);
+    lua_pushnil(luaVM);
     return 1;
 }
 
@@ -2999,7 +2999,7 @@ int CLuaGUIDefs::GUIMemoIsReadOnly(lua_State* luaVM)
     CClientGUIElement* theMemo;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData<CGUIMemo>(theMemo);
+    argStream.ReadUserData(theMemo);
 
     if (!argStream.HasErrors())
     {
