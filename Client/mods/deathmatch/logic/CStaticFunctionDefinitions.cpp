@@ -6431,28 +6431,32 @@ bool CStaticFunctionDefinitions::BindKey(const char* szKey, const char* szHitSta
     if (bKey)
     {
         bool bHitState = true;
-        // Activate all keys for this command
-        pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true, szKey);
         // Check if its binded already (dont rebind)
         if (pKeyBinds->CommandExists(szKey, szCommandName, true, bHitState, szArguments, szResource, true, true))
+        {
+            // Activate all keys for this command
+            pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true, szKey);
             return true;
+        }
 
         if ((!stricmp(szHitState, "down") || !stricmp(szHitState, "both")) &&
             pKeyBinds->AddCommand(szKey, szCommandName, szArguments, bHitState, szResource, true))
         {
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, szArguments, szResource, true, true);
+            pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true, szKey);
             bSuccess = true;
         }
 
         bHitState = false;
-        pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true, szKey);
         if (pKeyBinds->CommandExists(szKey, szCommandName, true, bHitState, szArguments, szResource, true, true))
+        {
+            pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true, szKey);
             return true;
+        }
 
         if ((!stricmp(szHitState, "up") || !stricmp(szHitState, "both")) &&
             pKeyBinds->AddCommand(szKey, szCommandName, szArguments, bHitState, szResource, true))
         {
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, szArguments, szResource, true, true);
+            pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true, szKey);
             bSuccess = true;
         }
     }
