@@ -843,7 +843,7 @@ void CheckDataFiles(void)
         const char* szFilename;
     } integrityCheckList[] = {
         {
-            "B4F19217C58F97E0564CF725B9B74E4E",
+            "A41F1DA321C250953C21624925AD0C56",
             "bass.dll",
         },
         {
