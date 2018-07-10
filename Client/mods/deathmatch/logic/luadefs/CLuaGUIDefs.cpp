@@ -278,7 +278,7 @@ void CLuaGUIDefs::AddGuiEditClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setMaxLength", "guiEditSetMaxLength");
 
     lua_classvariable(luaVM, "caretIndex", "guiEditSetCaretIndex", "guiEditGetCaretIndex");
-    lua_classvariable(luaVM, "readOnly", "guiEditSetReadOnly", NULL);
+    lua_classvariable(luaVM, "readOnly", "guiEditSetReadOnly", "guiEditIsReadOnly");
     lua_classvariable(luaVM, "masked", "guiEditSetMasked", NULL);
     lua_classvariable(luaVM, "maxLength", "guiEditSetMaxLength", NULL);
 
