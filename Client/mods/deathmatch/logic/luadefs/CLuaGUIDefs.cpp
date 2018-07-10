@@ -2989,7 +2989,7 @@ int CLuaGUIDefs::GUIMemoSetReadOnly(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // error: bad arguments
-    lua_pushnil(luaVM);
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
@@ -3011,7 +3011,7 @@ int CLuaGUIDefs::GUIMemoIsReadOnly(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // error: bad arguments
-    lua_pushboolean(luaVM, false);
+    lua_pushnil(luaVM);
     return 1;
 }
 
