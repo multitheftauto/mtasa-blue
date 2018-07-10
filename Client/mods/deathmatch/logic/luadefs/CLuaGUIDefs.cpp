@@ -128,10 +128,12 @@ void CLuaGUIDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("guiEditSetMasked", GUIEditSetMasked);
     CLuaCFunctions::AddFunction("guiEditSetMaxLength", GUIEditSetMaxLength);
     CLuaCFunctions::AddFunction("guiEditSetReadOnly", GUIEditSetReadOnly);
+    CLuaCFunctions::AddFunction("guiEditIsReadOnly", GUIEditIsReadOnly);
 
     CLuaCFunctions::AddFunction("guiMemoSetCaretIndex", GUIMemoSetCaretIndex);
     CLuaCFunctions::AddFunction("guiMemoGetCaretIndex", GUIMemoGetCaretIndex);
     CLuaCFunctions::AddFunction("guiMemoSetReadOnly", GUIMemoSetReadOnly);
+    CLuaCFunctions::AddFunction("guiMemoIsReadOnly", GUIMemoIsReadOnly);
 
     CLuaCFunctions::AddFunction("guiLabelSetColor", GUILabelSetColor);
     CLuaCFunctions::AddFunction("guiLabelGetColor", GUILabelGetColor);
@@ -319,7 +321,7 @@ void CLuaGUIDefs::AddGuiMemoClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setReadOnly", "guiMemoSetReadOnly");
 
     lua_classvariable(luaVM, "caretIndex", "guiMemoSetCaretIndex", "guiMemoGetCaretIndex");
-    lua_classvariable(luaVM, "readOnly", "guiMemoSetReadOnly", NULL);
+    lua_classvariable(luaVM, "readOnly", "guiMemoSetReadOnly", "guiMemoIsReadOnly");
 
     lua_registerclass(luaVM, "GuiMemo", "GuiElement");
 }
@@ -2945,6 +2947,28 @@ int CLuaGUIDefs::GUIEditSetReadOnly(lua_State* luaVM)
     return 1;
 }
 
+int CLuaGUIDefs::GUIEditIsReadOnly(lua_State* luaVM)
+{
+    // bool guiEditIsReadOnly( element editField )
+    CClientGUIElement* editField;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIEdit>(editField);
+
+    if (!argStream.HasErrors())
+    {
+        bool readOnly = static_cast<CGUIEdit*>(editField->GetCGUIElement())->IsReadOnly();
+        lua_pushboolean(luaVM, readOnly);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaGUIDefs::GUIMemoSetReadOnly(lua_State* luaVM)
 {
     //  bool guiMemoSetReadOnly ( gui-memo theMemo, bool status )
@@ -2959,6 +2983,28 @@ int CLuaGUIDefs::GUIMemoSetReadOnly(lua_State* luaVM)
     {
         CStaticFunctionDefinitions::GUIMemoSetReadOnly(*theMemo, status);
         lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIMemoIsReadOnly(lua_State* luaVM)
+{
+    // bool guiMemoIsReadOnly( gui-memo theMemo )
+    CClientGUIElement* theMemo;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIMemo>(theMemo);
+
+    if (!argStream.HasErrors())
+    {
+        bool readOnly = static_cast<CGUIMemo*>(theMemo->GetCGUIElement())->IsReadOnly();
+        lua_pushboolean(luaVM, readOnly);
         return 1;
     }
     else
