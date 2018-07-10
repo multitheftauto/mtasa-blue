@@ -1,6 +1,6 @@
 namespace EmbeddedLuaCode
 {
-    const SString exports = R"~LUA~(
+    const char* const exports = R"~LUA~(
 
 --[[
     SERVER AND CLIENT.

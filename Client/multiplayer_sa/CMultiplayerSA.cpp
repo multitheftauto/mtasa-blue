@@ -6571,7 +6571,7 @@ eRadioStationID dwStationID = UNKNOWN;
 BYTE            bTrackID = 0;
 DWORD           dwNumberOfTracks = 0;
 
-DWORD pTrackNumbers[] = {
+const DWORD pTrackNumbers[] = {
     0x2,             // radio off, somewhere 2 is subtracted from this so that's why it's 2
     0xB,             // playback fm
     0xF,             // k-rose

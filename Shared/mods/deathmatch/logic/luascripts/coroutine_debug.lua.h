@@ -1,6 +1,6 @@
 namespace EmbeddedLuaCode
 {
-    const SString coroutine_debug = R"~LUA~(
+    const char* const coroutine_debug = R"~LUA~(
 
 --[[
     SERVER AND CLIENT.

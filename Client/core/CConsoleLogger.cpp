@@ -23,7 +23,7 @@ struct
     uint        uiNumBlanks;
     const char* szDelim;
     const char* szText;
-} g_WordsToCheck[] = {
+} const g_WordsToCheck[] = {
     {2, "", "login "}, {2, "", "register "}, {2, "", "addaccount "}, {2, "", "chgpass "}, {2, "", "chgmypass "}, {1, "'", "password"},
 };
 
