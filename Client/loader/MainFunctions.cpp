@@ -785,12 +785,6 @@ void CheckDataFiles(void)
         }
     }
 
-    if (FileSize(PathJoin(strMTASAPath, "MTA", "bass.dll")) != 0x0001E69C)
-    {
-        DisplayErrorMessageBox(_("Load failed. Please ensure that the latest data files have been installed correctly."), _E("CL17"), "mta-datafiles-missing");
-        return ExitProcess(EXIT_ERROR);
-    }
-
     // Check for client file
     if (!FileExists(PathJoin(strMTASAPath, CHECK_DM_CLIENT_NAME)))
     {
