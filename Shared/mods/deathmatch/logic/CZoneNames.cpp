@@ -9,7 +9,7 @@
 
 #include "StdInc.h"
 
-static const char* szUnknownZone = "Unknown";
+static const char* const szUnknownZone = "Unknown";
 
 static const SFixedArray<const char*, 8> cityNameList = {{
     "Tierra Robada",

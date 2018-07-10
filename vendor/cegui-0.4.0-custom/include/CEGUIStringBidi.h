@@ -165,7 +165,7 @@ typedef struct{
 /* very bad Memory alignment for 32-bit machines
  * could split it to 2 arrays or promote type to 2 bytes type
  */
-shape_node shapetypes[] = {
+const shape_node shapetypes[] = {
 /* index, Typ, Iso */
 /* 621 */ {SU, 0xFE80},
 /* 622 */ {SR, 0xFE81},
