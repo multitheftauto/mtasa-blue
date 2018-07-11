@@ -373,22 +373,8 @@ int CLuaColShapeDefs::GetColPolygonHeight(lua_State* luaVM)
             CColPolygon* pColPolygon = static_cast<CColPolygon*>(pColShape);
             float fFloor, fCeil;
             pColPolygon->GetHeight(fFloor, fCeil);
-            if (fFloor == std::numeric_limits<float>::min())
-            {
-                lua_pushboolean(luaVM, false);
-            }
-            else
-            {
-                lua_pushnumber(luaVM, fFloor);
-            }
-            if (fCeil == std::numeric_limits<float>::max())
-            {
-                lua_pushboolean(luaVM, false);
-            }
-            else
-            {
-                lua_pushnumber(luaVM, fCeil);
-            }
+            lua_pushnumber(luaVM, fFloor);
+            lua_pushnumber(luaVM, fCeil);
             return 2;
         }
         else
