@@ -173,7 +173,6 @@ public:
     virtual void        SetFakeLagCommandEnabled(bool bEnabled) = 0;
     virtual SString     GetBlueCopyrightString(void) = 0;
     virtual bool ClearChat(void) = 0;
-    virtual bool ClearConsole(void) = 0;
 };
 
 class CClientTime

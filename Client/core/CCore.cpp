@@ -486,20 +486,6 @@ bool CCore::IsChatVisible(void)
     return false;
 }
 
-bool CCore::ClearConsole(void)
-{
-    if (m_pLocalGUI)
-    {
-        CConsole* pConsole = m_pLocalGUI->GetConsole();
-        if (pConsole)
-        {
-            pConsole->Clear();
-            return true;
-        }
-    }
-    return false;
-}
-
 bool CCore::ClearChat(void)
 {
     if (m_pLocalGUI)

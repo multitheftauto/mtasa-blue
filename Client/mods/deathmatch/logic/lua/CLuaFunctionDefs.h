@@ -54,7 +54,6 @@ public:
     LUA_DECLARE(GetClipboard);
     LUA_DECLARE(SetWindowFlashing);
     LUA_DECLARE(ClearChatBox);
-    LUA_DECLARE(ClearConsole);
 
     // Notification functions
     LUA_DECLARE(CreateTrayNotification);

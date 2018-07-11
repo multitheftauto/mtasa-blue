@@ -114,7 +114,6 @@ public:
     LUA_DECLARE(GetServerConfigSetting);
     LUA_DECLARE(SetServerConfigSetting);
     LUA_DECLARE(ClearChatBox);
-    LUA_DECLARE(ClearConsole);
 
     LUA_DECLARE(shutdown);
 

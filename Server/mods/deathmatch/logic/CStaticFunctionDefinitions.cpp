@@ -9864,21 +9864,6 @@ bool CStaticFunctionDefinitions::OutputConsole(const char* szText, CElement* pEl
     return false;
 }
 
-bool CStaticFunctionDefinitions::ClearConsole(CElement* pElement)
-{
-    assert(pElement);
-
-    RUN_CHILDREN(ClearConsole(*iter))
-
-    if (IS_PLAYER(pElement))
-    {
-        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
-        pPlayer->Send(CConsoleClear());
-        return true;
-    }
-    return false;
-}
-
 bool CStaticFunctionDefinitions::SetServerPassword(const SString& strPassword, bool bSave)
 {
     if (g_pGame->GetConfig()->SetPassword(strPassword, bSave))

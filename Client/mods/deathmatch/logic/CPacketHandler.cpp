@@ -77,10 +77,6 @@ bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfa
             Packet_ConsoleEcho(bitStream);
             return true;
 
-        case PACKET_ID_CONSOLE_CLEAR:
-            Packet_ConsoleClear(bitStream);
-            return true;
-
         case PACKET_ID_DEBUG_ECHO:
             Packet_DebugEcho(bitStream);
             return true;
@@ -1365,11 +1361,6 @@ void CPacketHandler::Packet_ConsoleEcho(NetBitStreamInterface& bitStream)
         // Echo it
         g_pCore->GetConsole()->Echo(szMessage);
     }
-}
-
-void CPacketHandler::Packet_ConsoleClear(NetBitStreamInterface& bitStream)
-{
-    CStaticFunctionDefinitions::ClearConsole();
 }
 
 void CPacketHandler::Packet_DebugEcho(NetBitStreamInterface& bitStream)

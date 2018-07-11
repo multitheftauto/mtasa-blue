@@ -230,7 +230,6 @@ void CLuaManager::LoadCFunctions(void)
     // CLuaCFunctions::AddFunction ( "getClipboard", CLuaFunctionDefs::GetClipboard );
     CLuaCFunctions::AddFunction("setWindowFlashing", CLuaFunctionDefs::SetWindowFlashing);
     CLuaCFunctions::AddFunction("clearChatBox", CLuaFunctionDefs::ClearChatBox);
-    CLuaCFunctions::AddFunction("clearConsole", CLuaFunctionDefs::ClearConsole);
 
     // Notification funcs
     CLuaCFunctions::AddFunction("createTrayNotification", CLuaFunctionDefs::CreateTrayNotification);

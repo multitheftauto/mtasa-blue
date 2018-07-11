@@ -174,29 +174,6 @@ int CLuaFunctionDefs::OutputConsole(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::ClearConsole(lua_State* luaVM)
-{
-    CElement* pElement;
-
-    CScriptArgReader argStream(luaVM);
-
-    argStream.ReadUserData(pElement, m_pRootElement);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::ClearConsole(pElement))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
 int CLuaFunctionDefs::OutputDebugString(lua_State* luaVM)
 {
     SString       strMessage;
