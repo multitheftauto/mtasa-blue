@@ -49,10 +49,10 @@ private:
     bool          m_bColorCoded;
 };
 
-class CChatClear : public CPacket
+class CChatClearPacket : public CPacket
 {
 public:
-    CChatClear() {};
+    CChatClearPacket() {};
 
     // Chat uses low priority channel to avoid getting queued behind large map downloads #6877
     ePacketID               GetPacketID(void) const { return PACKET_ID_CHAT_CLEAR; };
