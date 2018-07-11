@@ -9842,7 +9842,7 @@ bool CStaticFunctionDefinitions::ClearChatBox(CElement* pElement)
     if (IS_PLAYER(pElement))
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
-        pPlayer->Send(CChatClear());
+        pPlayer->Send(CChatClearPacket());
         return true;
     }
     return false;
