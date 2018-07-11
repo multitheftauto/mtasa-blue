@@ -1549,11 +1549,8 @@ int CLuaFunctionDefs::ResetVehiclesLODDistance(lua_State* luaVM)
 }
 
 int CLuaFunctionDefs::GetPedsLODDistance(lua_State* luaVM) 
-{ 
-    float fPedsDistance; 
- 
-    g_pGame->GetSettings()->GetPedsLODDistance(fPedsDistance); 
-    lua_pushnumber(luaVM, fPedsDistance); 
+{  
+    lua_pushnumber(luaVM, g_pGame->GetSettings()->GetPedsLODDistance());
     return 1; 
 }
  
@@ -1563,10 +1560,10 @@ int CLuaFunctionDefs::SetPedsLODDistance(lua_State* luaVM)
  
     CScriptArgReader argStream(luaVM); 
     argStream.ReadNumber(fPedsDistance); 
-    fPedsDistance = Clamp(0.0f, fPedsDistance, 500.0f); 
  
     if (!argStream.HasErrors()) 
-    { 
+    {
+        fPedsDistance = Clamp(0.0f, fPedsDistance, 500.0f);
         g_pGame->GetSettings()->SetPedsLODDistance(fPedsDistance); 
         lua_pushnumber(luaVM, fPedsDistance); 
         return 1; 

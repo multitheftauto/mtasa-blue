@@ -163,7 +163,7 @@ public:
 
     virtual void SetPedsLODDistance(float fPedsLODDistance) = 0;
     virtual void ResetPedsLODDistance(void) = 0;
-    virtual void GetPedsLODDistance(float& fPedsLODDistance) = 0;
+    virtual float GetPedsLODDistance(void) = 0;
 
     virtual void Save(void) = 0;
 };

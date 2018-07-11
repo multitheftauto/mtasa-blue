@@ -167,7 +167,7 @@ public:
 
     void SetPedsLODDistance(float fPedsLODDistance);
     void ResetPedsLODDistance(void);
-    void GetPedsLODDistance(float& fPedsLODDistance);
+    float GetPedsLODDistance(void);
 
     static void StaticSetHooks(void);
 

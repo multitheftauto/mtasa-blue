@@ -602,9 +602,9 @@ void CSettingsSA::SetPedsLODDistance(float fPedsLODDistance)
     ms_fPedsLODDistance = fPedsLODDistance;
 }
  
-void CSettingsSA::GetPedsLODDistance(float& fPedsLODDistance)
+float CSettingsSA::GetPedsLODDistance()
 {
-    fPedsLODDistance = ms_fPedsLODDistance;
+    return ms_fPedsLODDistance;
 }
  
 void CSettingsSA::ResetPedsLODDistance()
