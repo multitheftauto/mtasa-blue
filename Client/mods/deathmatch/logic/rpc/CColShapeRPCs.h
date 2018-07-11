@@ -9,6 +9,8 @@
 *
 *****************************************************************************/
 
+#pragma once
+
 #ifndef __CColShapeRPCs_H
 #define __CColShapeRPCs_H
 
