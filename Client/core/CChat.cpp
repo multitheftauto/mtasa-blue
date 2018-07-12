@@ -628,7 +628,7 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
                             }
 
                             // Check namepart
-                            if (!strPlayerName.BeginsWith(strPlayerNamePart))
+                            if (!RemoveColorCodes(strPlayerName).BeginsWith(strPlayerNamePart))
                                 continue;
                             else
                             {

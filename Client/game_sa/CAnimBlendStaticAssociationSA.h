@@ -36,7 +36,7 @@ public:
     int*                            pAnimBlendNodesSequenceArray;
     CAnimBlendHierarchySAInterface* pAnimHeirarchy;
 };
- 
+
 class CAnimBlendStaticAssociationSA : public CAnimBlendStaticAssociation
 {
 public:
@@ -52,7 +52,7 @@ public:
     short                                   GetAnimGroup() { return m_pInterface->sAnimGroup; }
     short                                   GetFlags() { return m_pInterface->sFlags; }
     CAnimBlendHierarchySAInterface*         GetAnimHierachyInterface() { return m_pInterface->pAnimHeirarchy; }
-    CAnimBlendStaticAssociationSAInterface* GetInterface() { return m_pInterface; } 
+    CAnimBlendStaticAssociationSAInterface* GetInterface() { return m_pInterface; }
 
 protected:
     CAnimBlendStaticAssociationSAInterface* m_pInterface;

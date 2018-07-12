@@ -14,7 +14,7 @@
 
 struct RpClump;
 class CAnimBlendHierarchySAInterface;
- 
+
 class CAnimBlendStaticAssociation
 {
 public:

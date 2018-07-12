@@ -3980,7 +3980,7 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
             // Play our custom animation instead of default
             auto pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pReplacedAnimation->pAnimationHierarchy);
             pAnimationManager->UncompressAnimation(pAnimHierarchy.get());
-            pAnimAssociation->Constructor(pClump, pAnimHierarchy->GetInterface());
+            pAnimAssociation->InitializeForCustomAnimation(pClump, pAnimHierarchy->GetInterface());
             pAnimAssociation->SetFlags(pOriginalAnimStaticAssoc->GetFlags());
             pAnimAssociation->SetAnimID(pOriginalAnimStaticAssoc->GetAnimID());
             pAnimAssociation->SetAnimGroup(pOriginalAnimStaticAssoc->GetAnimGroup());

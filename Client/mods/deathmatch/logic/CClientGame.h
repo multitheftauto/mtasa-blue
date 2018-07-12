@@ -69,7 +69,7 @@ struct SMiscGameSettings
     bool bAllowBadDrivebyHitboxFix;
     bool bAllowShotgunDamageFix;
 };
- 
+
 class CClientGame
 {
     friend class CPacketHandler;
