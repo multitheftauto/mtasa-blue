@@ -2953,7 +2953,7 @@ int CLuaGUIDefs::GUIEditIsReadOnly(lua_State* luaVM)
     CClientGUIElement* editField;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(editField);
+    argStream.ReadUserData<CGUIEdit>(editField);
 
     if (!argStream.HasErrors())
     {
@@ -2999,7 +2999,7 @@ int CLuaGUIDefs::GUIMemoIsReadOnly(lua_State* luaVM)
     CClientGUIElement* theMemo;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(theMemo);
+    argStream.ReadUserData<CGUIMemo>(theMemo);
 
     if (!argStream.HasErrors())
     {
