@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <ServerBrowser/CServerCache.h>
+#include "CServerCache.h"
 
 using namespace std;
 
