@@ -8,12 +8,13 @@ crash-reporting system.
 * [Bugs](https://bugs.chromium.org/p/google-breakpad/)
 * Discussion/Questions: [google-breakpad-discuss@googlegroups.com](https://groups.google.com/d/forum/google-breakpad-discuss)
 * Developer/Reviews: [google-breakpad-dev@googlegroups.com](https://groups.google.com/d/forum/google-breakpad-dev)
-* Tests: [![Build Status](https://travis-ci.org/google/breakpad.svg?branch=master)](https://travis-ci.org/google/breakpad)
+* Tests: [![Build Status](https://travis-ci.org/google/breakpad.svg?branch=master)](https://travis-ci.org/google/breakpad) [![Build status](https://ci.appveyor.com/api/projects/status/eguv4emv2rhq68u2?svg=true)](https://ci.appveyor.com/project/vapier/breakpad)
+* Coverage [![Coverity Status](https://scan.coverity.com/projects/9215/badge.svg)](https://scan.coverity.com/projects/google-breakpad)
 
 ## Getting started (from master)
 
 1.  First, [download depot_tools](http://dev.chromium.org/developers/how-tos/install-depot-tools)
-    and ensure that they're in your `PATH`.
+    and ensure that they’re in your `PATH`.
 
 2.  Create a new directory for checking out the source code (it must be named
     breakpad).
@@ -75,6 +76,7 @@ dependent repos are up-to-date.
     e.g. `git commit ... && git cl upload ...`
     You will be prompted for credential and a description.
 
-4.  At https://codereview.chromium.org/ you'll find your issue listed; click on
-    it, and select Publish+Mail, and enter in the code reviewer and CC
-    google-breakpad-dev@googlegroups.com
+4.  At https://chromium-review.googlesource.com/ you'll find your issue listed;
+    click on it, then “Add reviewer”, and enter in the code reviewer. Depending
+    on your settings, you may not see an email, but the reviewer has been
+    notified with google-breakpad-dev@googlegroups.com always CC’d.
