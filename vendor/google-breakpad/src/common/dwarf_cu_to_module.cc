@@ -39,9 +39,6 @@
 #include "common/dwarf_cu_to_module.h"
 
 #include <assert.h>
-#if !defined(__ANDROID__)
-#include <cxxabi.h>
-#endif
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -264,7 +261,7 @@ class DwarfCUToModule::GenericDIEHandler: public dwarf2reader::DIEHandler {
   uint64 offset_;
 
   // Place the name in the global set of strings. Even though this looks
-  // like a copy, all the major std::string implementations use reference
+  // like a copy, all the major string implementations use reference
   // counting internally, so the effect is to have all the data structures
   // share copies of strings whenever possible.
   // FIXME: Should this return something like a string_ref to avoid the
@@ -288,6 +285,10 @@ class DwarfCUToModule::GenericDIEHandler: public dwarf2reader::DIEHandler {
   // string if the DIE has no such attribute or its content could not be
   // demangled.
   string demangled_name_;
+
+  // The non-demangled value of the DW_AT_MIPS_linkage_name attribute,
+  // it its content count not be demangled.
+  string raw_name_;
 };
 
 void DwarfCUToModule::GenericDIEHandler::ProcessAttributeUnsigned(
@@ -350,20 +351,23 @@ void DwarfCUToModule::GenericDIEHandler::ProcessAttributeString(
     case dwarf2reader::DW_AT_name:
       name_attribute_ = AddStringToPool(data);
       break;
-    case dwarf2reader::DW_AT_MIPS_linkage_name: {
-      char* demangled = NULL;
-      int status = -1;
-#if !defined(__ANDROID__)  // Android NDK doesn't provide abi::__cxa_demangle.
-      demangled = abi::__cxa_demangle(data.c_str(), NULL, NULL, &status);
-#endif
-      if (status != 0) {
-        cu_context_->reporter->DemangleError(data, status);
-        demangled_name_ = "";
-        break;
-      }
-      if (demangled) {
-        demangled_name_ = AddStringToPool(demangled);
-        free(reinterpret_cast<void*>(demangled));
+    case dwarf2reader::DW_AT_MIPS_linkage_name:
+    case dwarf2reader::DW_AT_linkage_name: {
+      string demangled;
+      Language::DemangleResult result =
+          cu_context_->language->DemangleName(data, &demangled);
+      switch (result) {
+        case Language::kDemangleSuccess:
+          demangled_name_ = AddStringToPool(demangled);
+          break;
+
+        case Language::kDemangleFailure:
+          cu_context_->reporter->DemangleError(data);
+          // fallthrough
+        case Language::kDontDemangle:
+          demangled_name_.clear();
+          raw_name_ = AddStringToPool(data);
+          break;
       }
       break;
     }
@@ -393,6 +397,8 @@ string DwarfCUToModule::GenericDIEHandler::ComputeQualifiedName() {
       unqualified_name = &name_attribute_;
     else if (specification_)
       unqualified_name = &specification_->unqualified_name;
+    else if (!raw_name_.empty())
+      unqualified_name = &raw_name_;
 
     // Find the name of the enclosing context. If this DIE has a
     // specification, it's the specification's enclosing context that
@@ -676,11 +682,10 @@ void DwarfCUToModule::WarningReporter::UnnamedFunction(uint64 offset) {
           filename_.c_str(), offset);
 }
 
-void DwarfCUToModule::WarningReporter::DemangleError(
-    const string &input, int error) {
+void DwarfCUToModule::WarningReporter::DemangleError(const string &input) {
   CUHeading();
-  fprintf(stderr, "%s: warning: failed to demangle %s with error %d\n",
-          filename_.c_str(), input.c_str(), error);
+  fprintf(stderr, "%s: warning: failed to demangle %s\n",
+          filename_.c_str(), input.c_str());
 }
 
 void DwarfCUToModule::WarningReporter::UnhandledInterCUReference(
@@ -761,6 +766,7 @@ dwarf2reader::DIEHandler *DwarfCUToModule::FindChildHandler(
     case dwarf2reader::DW_TAG_class_type:
     case dwarf2reader::DW_TAG_structure_type:
     case dwarf2reader::DW_TAG_union_type:
+    case dwarf2reader::DW_TAG_module:
       return new NamedScopeHandler(cu_context_.get(), child_context_.get(),
                                    offset);
     default:
@@ -772,6 +778,14 @@ void DwarfCUToModule::SetLanguage(DwarfLanguage language) {
   switch (language) {
     case dwarf2reader::DW_LANG_Java:
       cu_context_->language = Language::Java;
+      break;
+
+    case dwarf2reader::DW_LANG_Swift:
+      cu_context_->language = Language::Swift;
+      break;
+
+    case dwarf2reader::DW_LANG_Rust:
+      cu_context_->language = Language::Rust;
       break;
 
     // DWARF has no generic language code for assembly language; this is

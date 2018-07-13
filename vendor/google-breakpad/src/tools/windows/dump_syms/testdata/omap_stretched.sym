@@ -2067,7 +2067,7 @@ FUNC 5263 84 0 _local_unwind2
 FUNC 52e7 23 0 _abnormal_termination
 FUNC 530a 9 0 _NLG_Notify1
 FUNC 5313 1f 0 _NLG_Notify
-PUBLIC 532a 0 _NLG_Dispatch2
+PUBLIC m 532a 0 _NLG_Dispatch
 FUNC 5332 3 0 _NLG_Call
 PUBLIC 5334 0 _NLG_Return2
 FUNC 5335 33 0 abort
