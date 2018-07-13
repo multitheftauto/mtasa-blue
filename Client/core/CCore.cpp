@@ -20,6 +20,7 @@
 #include "CTimingCheckpoints.hpp"
 #include "CModelCacheManager.h"
 #include "detours/include/detours.h"
+#include <ServerBrowser/CServerCache.h>
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;

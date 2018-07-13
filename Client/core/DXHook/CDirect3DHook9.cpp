@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "detours/include/detours.h"
+#include <ServerBrowser/CServerCache.h>
 
 template <>
 CDirect3DHook9* CSingleton<CDirect3DHook9>::m_pSingleton = NULL;

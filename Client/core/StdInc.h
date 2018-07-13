@@ -63,7 +63,6 @@
 #include "CExceptionInformation_Impl.h"
 #include "CJoystickManager.h"
 #include <Graphics/CVideoModeManager.h>
-#include <ServerBrowser/CServerCache.h>
 #include "CCrashDumpWriter.h"
 #include "CMemStats.h"
 #include "CGraphStats.h"
