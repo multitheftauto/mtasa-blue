@@ -11,8 +11,7 @@
 
 class CServerInfo;
 
-#ifndef __CServerInfo_H
-#define __CServerInfo_H
+#pragma once
 
 // Update interval for the full server (in milliseconds)
 #define SERVER_UPDATE_INTERVAL        2500
@@ -106,5 +105,3 @@ private:
     bool OnCloseClicked(CGUIElement* pElement);
     bool OnJoinGameClicked(CGUIElement* pElement);
 };
-
-#endif
