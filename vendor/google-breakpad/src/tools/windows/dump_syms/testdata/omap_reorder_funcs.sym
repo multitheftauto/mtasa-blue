@@ -1958,7 +1958,7 @@ FUNC 293c 84 0 _local_unwind2
 FUNC 29c0 23 0 _abnormal_termination
 FUNC 29e3 9 0 _NLG_Notify1
 FUNC 29ec 1f 0 _NLG_Notify
-PUBLIC 2a03 0 _NLG_Dispatch2
+PUBLIC m 2a03 0 _NLG_Dispatch
 FUNC 2a0b 3 0 _NLG_Call
 PUBLIC 2a0d 0 _NLG_Return2
 FUNC 2862 33 0 abort

@@ -1,23 +1,17 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CServerImpl.h
-*  PURPOSE:     Server class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*               Stanislav Bobrov <lil_toady@hotmail.com>
-*               Oli <>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CServerImpl.h
+ *  PURPOSE:     Server class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 class CServerImpl;
 
-#ifndef __CSERVERIMPL_H
-#define __CSERVERIMPL_H
+#pragma once
 
 #include "MTAPlatform.h"
 #include <string>
@@ -36,83 +30,83 @@ class CServerImpl;
 
 #define SERVER_RESET_RETURN 500
 
-typedef CXML* (*InitXMLInterface) ( const char* szSaveFlagDirectory );
-typedef CNetServer* (*InitNetServerInterface) ( void );
+typedef CXML* (*InitXMLInterface)(const char* szSaveFlagDirectory);
+typedef CNetServer* (*InitNetServerInterface)(void);
 
 #ifdef WIN32
-typedef void (FClientFeedback) ( const char* szText );
+typedef void(FClientFeedback)(const char* szText);
+constexpr SHORT SCREEN_BUFFER_SIZE = 256;
 #endif
 
 class CServerImpl : public CServerInterface
 {
 public:
     #ifdef WIN32
-                        CServerImpl         ( CThreadCommandQueue* pThreadCommandQueue );
+    CServerImpl(CThreadCommandQueue* pThreadCommandQueue);
     #else
-                        CServerImpl         ( void );
+    CServerImpl(void);
     #endif
 
-                        ~CServerImpl        ( void );
+    ~CServerImpl(void);
 
-    CNetServer*         GetNetwork          ( void );
-    CModManager*        GetModManager       ( void );
-    CXML*               GetXML              ( void );
+    CNetServer*  GetNetwork(void);
+    CModManager* GetModManager(void);
+    CXML*        GetXML(void);
 
-    const char*         GetServerModPath    ( void )                { return m_strServerModPath; };
-    SString             GetAbsolutePath     ( const char* szRelative );
+    const char* GetServerModPath(void) { return m_strServerModPath; };
+    SString     GetAbsolutePath(const char* szRelative);
 
-    void                Printf              ( const char* szText, ... );
-    bool                IsRequestingExit    ( void );
+    void Printf(const char* szText, ...);
+    bool IsRequestingExit(void);
 
-    int                 Run                 ( int iArgumentCount, char* szArguments [] );
+    int Run(int iArgumentCount, char* szArguments[]);
 #ifndef WIN32
-    void                Daemonize           () const;
+    void Daemonize() const;
 #else
-    bool                HasConsole          ( void )                { return m_hConsole != NULL; }
+    bool HasConsole();
 #endif
 
 private:
-    void                MainLoop            ( void );
+    void MainLoop(void);
 
-    bool                ParseArguments      ( int iArgumentCount, char* szArguments [] );
+    bool ParseArguments(int iArgumentCount, char* szArguments[]);
 
-    void                ShowInfoTag         ( char *szTag );
-    void                HandleInput         ( void );
-    void                HandlePulseSleep    ( void );
-    void                ApplyFrameRateLimit ( uint uiUseRate );
+    void ShowInfoTag(char* szTag);
+    void HandleInput(void);
+    void HandlePulseSleep(void);
+    void ApplyFrameRateLimit(uint uiUseRate);
 
-    void                DestroyWindow       ( void );
+    void DestroyWindow(void);
 
-    CDynamicLibrary     m_NetworkLibrary;
-    CDynamicLibrary     m_XMLLibrary;
-    CNetServer*         m_pNetwork;
-    CModManagerImpl*    m_pModManager;
-    CXML*               m_pXML;
+    CDynamicLibrary  m_NetworkLibrary;
+    CDynamicLibrary  m_XMLLibrary;
+    CNetServer*      m_pNetwork;
+    CModManagerImpl* m_pModManager;
+    CXML*            m_pXML;
 
 #ifdef WIN32
-    FClientFeedback*    m_fClientFeedback;
+    FClientFeedback* m_fClientFeedback;
 #endif
 
-    SString             m_strServerPath;
-    SString             m_strServerModPath;
+    SString m_strServerPath;
+    SString m_strServerModPath;
 
-    bool                m_bRequestedQuit;
-    bool                m_bRequestedReset;
+    bool m_bRequestedQuit;
+    bool m_bRequestedReset;
 
-    wchar_t             m_szInputBuffer[255];
-    unsigned int        m_uiInputCount;
-    
-    char                m_szTag[80];
+    wchar_t      m_szInputBuffer[255];
+    unsigned int m_uiInputCount;
 
-    double              m_dLastTimeMs;
-    double              m_dPrevOverrun;
+    char m_szTag[80];
+
+    double m_dLastTimeMs;
+    double m_dPrevOverrun;
 
 #ifdef WIN32
-    HANDLE              m_hConsole;
-    CHAR_INFO           m_ScrnBuffer[256];
+    HANDLE    m_hConsole;
+    HANDLE    m_hConsoleInput;
+    CHAR_INFO m_ScrnBuffer[SCREEN_BUFFER_SIZE];
 
-    CThreadCommandQueue*    m_pThreadCommandQueue;
+    CThreadCommandQueue* m_pThreadCommandQueue;
 #endif
 };
-
-#endif

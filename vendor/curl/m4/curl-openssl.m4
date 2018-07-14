@@ -9,7 +9,7 @@
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at http://curl.haxx.se/docs/copyright.html.
+# are also available at https://curl.haxx.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -29,7 +29,7 @@ dnl -------------------------------------------------
 dnl Find out OpenSSL headers API version, as reported
 dnl by OPENSSL_VERSION_NUMBER. No runtime checks
 dnl allowed here for cross-compilation support.
-dnl HAVE_OPENSSL_API_HEADERS is defined as apprpriate
+dnl HAVE_OPENSSL_API_HEADERS is defined as appropriate
 dnl only for systems which actually run the configure
 dnl script. Config files generated manually or in any
 dnl other way shall not define this.
@@ -66,7 +66,9 @@ AC_DEFUN([CURL_CHECK_OPENSSL_API_HEADERS], [
         ;;
     esac
     case $tst_api in
+      0x111) tst_show="1.1.1" ;;
       0x110) tst_show="1.1.0" ;;
+      0x102) tst_show="1.0.2" ;;
       0x101) tst_show="1.0.1" ;;
       0x100) tst_show="1.0.0" ;;
       0x099) tst_show="0.9.9" ;;
@@ -101,7 +103,7 @@ dnl Find out OpenSSL library API version, performing
 dnl only link tests in order to avoid getting fooled
 dnl by mismatched OpenSSL headers. No runtime checks
 dnl allowed here for cross-compilation support.
-dnl HAVE_OPENSSL_API_LIBRARY is defined as apprpriate
+dnl HAVE_OPENSSL_API_LIBRARY is defined as appropriate
 dnl only for systems which actually run the configure
 dnl script. Config files generated manually or in any
 dnl other way shall not define this.
@@ -121,6 +123,13 @@ AC_DEFUN([CURL_CHECK_OPENSSL_API_LIBRARY], [
   #
   AC_MSG_CHECKING([for OpenSSL library version])
   if test "$tst_api" = "unknown"; then
+    AC_LINK_IFELSE([
+      AC_LANG_FUNC_LINK_TRY([ERR_clear_last_mark])
+    ],[
+      tst_api="0x111"
+    ])
+  fi
+  if test "$tst_api" = "unknown"; then
     case $host in
       *-*-vms*)
         AC_LINK_IFELSE([
@@ -137,6 +146,13 @@ AC_DEFUN([CURL_CHECK_OPENSSL_API_LIBRARY], [
         ])
         ;;
     esac
+  fi
+  if test "$tst_api" = "unknown"; then
+    AC_LINK_IFELSE([
+      AC_LANG_FUNC_LINK_TRY([SSL_CONF_CTX_new])
+    ],[
+      tst_api="0x102"
+    ])
   fi
   if test "$tst_api" = "unknown"; then
     AC_LINK_IFELSE([
@@ -209,7 +225,9 @@ AC_DEFUN([CURL_CHECK_OPENSSL_API_LIBRARY], [
     ])
   fi
   case $tst_api in
+    0x111) tst_show="1.1.1" ;;
     0x110) tst_show="1.1.0" ;;
+    0x102) tst_show="1.0.2" ;;
     0x101) tst_show="1.0.1" ;;
     0x100) tst_show="1.0.0" ;;
     0x099) tst_show="0.9.9" ;;

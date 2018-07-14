@@ -16,22 +16,27 @@
 #ifndef _YATRL_H_W2348_H4232
 #define _YATRL_H_W2348_H4232
 
-// c guards (hmm... just in case)
+#include "bass.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 // Current version. Just increments each release.
-#define TAGS_VERSION 17
+#define TAGS_VERSION 18
 
-// returns description of the last error.
-const char*  _stdcall TAGS_GetLastErrorDesc();
+// get the loaded version
+DWORD WINAPI TAGS_GetVersion();
+
+// enable UTF-8 encoding
+BOOL WINAPI TAGS_SetUTF8( BOOL enable );
 
 // main purpose of this library
-const char*  _stdcall TAGS_Read( DWORD dwHandle, const char* fmt );
+const char* WINAPI TAGS_Read( DWORD dwHandle, const char* fmt );
+const char* WINAPI TAGS_ReadEx( DWORD dwHandle, const char* fmt, DWORD tagtype, int codepage );
 
-// retrieves the current version
-DWORD _stdcall TAGS_GetVersion();
+// returns description of the last error.
+const char* WINAPI TAGS_GetLastErrorDesc();
 
 #ifdef __cplusplus
 }

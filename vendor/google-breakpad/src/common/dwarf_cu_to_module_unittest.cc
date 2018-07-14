@@ -31,6 +31,8 @@
 
 // dwarf_cu_to_module.cc: Unit tests for google_breakpad::DwarfCUToModule.
 
+#include <stdint.h>
+
 #include <string>
 #include <utility>
 #include <vector>
@@ -65,7 +67,7 @@ using ::testing::ValuesIn;
 class MockLineToModuleHandler: public DwarfCUToModule::LineToModuleHandler {
  public:
   MOCK_METHOD1(StartCompilationUnit, void(const string& compilation_dir));
-  MOCK_METHOD4(ReadProgram, void(const char* program, uint64 length,
+  MOCK_METHOD4(ReadProgram, void(const uint8_t *program, uint64 length,
                                  Module *module, vector<Module::Line> *lines));
 };
 
@@ -81,7 +83,7 @@ class MockWarningReporter: public DwarfCUToModule::WarningReporter {
   MOCK_METHOD1(UncoveredFunction, void(const Module::Function &function));
   MOCK_METHOD1(UncoveredLine, void(const Module::Line &line));
   MOCK_METHOD1(UnnamedFunction, void(uint64 offset));
-  MOCK_METHOD2(DemangleError, void(const string &input, int error));
+  MOCK_METHOD1(DemangleError, void(const string &input));
   MOCK_METHOD2(UnhandledInterCUReference, void(uint64 offset, uint64 target));
 };
 
@@ -111,7 +113,7 @@ class CUFixtureBase {
    public:
     explicit AppendLinesFunctor(
         const vector<Module::Line> *lines) : lines_(lines) { }
-    void operator()(const char *program, uint64 length,
+    void operator()(const uint8_t *program, uint64 length,
                     Module *module, vector<Module::Line> *lines) {
       lines->insert(lines->end(), lines_->begin(), lines_->end());
     }
@@ -285,7 +287,7 @@ class CUFixtureBase {
   // Mock line program reader.
   MockLineToModuleHandler line_reader_;
   AppendLinesFunctor appender_;
-  static const char dummy_line_program_[];
+  static const uint8_t dummy_line_program_[];
   static const size_t dummy_line_size_;
 
   MockWarningReporter reporter_;
@@ -302,7 +304,7 @@ class CUFixtureBase {
   bool functions_filled_;
 };
 
-const char CUFixtureBase::dummy_line_program_[] = "lots of fun data";
+const uint8_t CUFixtureBase::dummy_line_program_[] = "lots of fun data";
 const size_t CUFixtureBase::dummy_line_size_ =
     sizeof(CUFixtureBase::dummy_line_program_);
 
@@ -375,7 +377,7 @@ void CUFixtureBase::ProcessStrangeAttributes(
   handler->ProcessAttributeReference((DwarfAttribute) 0xf7f7480f,
                                      (DwarfForm) 0x829e038a,
                                      0x50fddef44734fdecULL);
-  static const char buffer[10] = "frobynode";
+  static const uint8_t buffer[10] = "frobynode";
   handler->ProcessAttributeBuffer((DwarfAttribute) 0xa55ffb51,
                                   (DwarfForm) 0x2f43b041,
                                   buffer, sizeof(buffer));
@@ -1203,6 +1205,7 @@ TEST_F(Specifications, Function) {
 }
 
 TEST_F(Specifications, MangledName) {
+  // Language defaults to C++, so no need to set it here.
   PushLine(0x93cd3dfc1aa10097ULL, 0x0397d47a0b4ca0d4ULL, "line-file", 54883661);
 
   StartCU();
@@ -1216,6 +1219,53 @@ TEST_F(Specifications, MangledName) {
 
   TestFunctionCount(1);
   TestFunction(0, "C::f(int)",
+               0x93cd3dfc1aa10097ULL, 0x0397d47a0b4ca0d4ULL);
+}
+
+TEST_F(Specifications, MangledNameSwift) {
+  // Swift mangled names should pass through untouched.
+  SetLanguage(dwarf2reader::DW_LANG_Swift);
+  PushLine(0x93cd3dfc1aa10097ULL, 0x0397d47a0b4ca0d4ULL, "line-file", 54883661);
+  StartCU();
+  const string kName = "_TFC9swifttest5Shape17simpleDescriptionfS0_FT_Si";
+  DeclarationDIE(&root_handler_, 0xcd3c51b946fb1eeeLL,
+                 dwarf2reader::DW_TAG_subprogram, "declaration-name",
+                 kName);
+  DefinitionDIE(&root_handler_, dwarf2reader::DW_TAG_subprogram,
+                0xcd3c51b946fb1eeeLL, "",
+                0x93cd3dfc1aa10097ULL, 0x0397d47a0b4ca0d4ULL);
+  root_handler_.Finish();
+
+  TestFunctionCount(1);
+  TestFunction(0, kName,
+               0x93cd3dfc1aa10097ULL, 0x0397d47a0b4ca0d4ULL);
+}
+
+TEST_F(Specifications, MangledNameRust) {
+  SetLanguage(dwarf2reader::DW_LANG_Rust);
+  PushLine(0x93cd3dfc1aa10097ULL, 0x0397d47a0b4ca0d4ULL, "line-file", 54883661);
+
+  StartCU();
+  const string kName = "_ZN14rustc_demangle8demangle17h373defa94bffacdeE";
+  DeclarationDIE(&root_handler_, 0xcd3c51b946fb1eeeLL,
+                 dwarf2reader::DW_TAG_subprogram, "declaration-name",
+                 kName);
+  DefinitionDIE(&root_handler_, dwarf2reader::DW_TAG_subprogram,
+                0xcd3c51b946fb1eeeLL, "",
+                0x93cd3dfc1aa10097ULL, 0x0397d47a0b4ca0d4ULL);
+  root_handler_.Finish();
+
+  TestFunctionCount(1);
+  TestFunction(0,
+#ifndef HAVE_RUST_DEMANGLE
+               // Rust mangled names should pass through untouched if not
+               // using rust-demangle.
+               kName,
+#else
+               // If rust-demangle is available this should be properly
+               // demangled.
+               "rustc_demangle::demangle",
+#endif
                0x93cd3dfc1aa10097ULL, 0x0397d47a0b4ca0d4ULL);
 }
 
@@ -1318,6 +1368,29 @@ TEST_F(Specifications, InlineFunction) {
 
   TestFunctionCount(1);
   TestFunction(0, "inline-name",
+               0x1758a0f941b71efbULL, 0x1cf154f1f545e146ULL);
+}
+
+// An inline function in a namespace should correctly derive its
+// name from its abstract origin, and not just the namespace name.
+TEST_F(Specifications, InlineFunctionInNamespace) {
+  PushLine(0x1758a0f941b71efbULL, 0x1cf154f1f545e146ULL, "line-file", 75173118);
+
+  StartCU();
+  DIEHandler* space_handler
+      = StartNamedDIE(&root_handler_, dwarf2reader::DW_TAG_namespace,
+                      "Namespace");
+  ASSERT_TRUE(space_handler != NULL);
+  AbstractInstanceDIE(space_handler, 0x1e8dac5d507ed7abULL,
+                      dwarf2reader::DW_INL_inlined, 0LL, "func-name");
+  DefineInlineInstanceDIE(space_handler, "", 0x1e8dac5d507ed7abULL,
+                       0x1758a0f941b71efbULL, 0x1cf154f1f545e146ULL);
+  space_handler->Finish();
+  delete space_handler;
+  root_handler_.Finish();
+
+  TestFunctionCount(1);
+  TestFunction(0, "Namespace::func-name",
                0x1758a0f941b71efbULL, 0x1cf154f1f545e146ULL);
 }
 

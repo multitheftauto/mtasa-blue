@@ -1,12 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/logic/CClientCommon.h
-*  PURPOSE:     Common definitions
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/logic/CClientCommon.h
+ *  PURPOSE:     Common definitions
+ *
+ *****************************************************************************/
 
 #pragma once
 
@@ -25,7 +25,7 @@
 
 // Defines the min/max size for the player nametag (who the hell came up with 22?)
 #define MIN_PLAYER_NAMETAG_LENGTH       1
-#define MAX_PLAYER_NAMETAG_LENGTH       22
+#define MAX_PLAYER_NAMETAG_LENGTH       64
 
 #define MAX_TEAM_NAME_LENGTH            255
 
@@ -53,6 +53,6 @@ enum eHTTPDownloadType
 
 // Interfaces to Blue
 extern CCoreInterface* g_pCore;
-extern CGame* g_pGame;
-extern CMultiplayer* g_pMultiplayer;
-extern CNet* g_pNet;
+extern CGame*          g_pGame;
+extern CMultiplayer*   g_pMultiplayer;
+extern CNet*           g_pNet;

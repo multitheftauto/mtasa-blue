@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CCrashDumpWriter.cpp
-*  PURPOSE:
-*  DEVELOPERS:
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CCrashDumpWriter.cpp
+ *  PURPOSE:
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 #include <game/CGame.h>
@@ -17,7 +16,7 @@
 
 struct SLogEventInfo
 {
-    uint uiTickCount;
+    uint    uiTickCount;
     SString strType;
     SString strContext;
     SString strBody;
@@ -28,31 +27,28 @@ struct SLogEventLine
     SString strBody;
     SString strType;
     SString strContext;
-    operator SString&   ( void )                              { return strBody; }
-    bool operator ==    ( const SLogEventLine& other ) const  { return strBody == other.strBody && strType == other.strType && strContext == other.strContext; }
+            operator SString&(void) { return strBody; }
+    bool    operator==(const SLogEventLine& other) const { return strBody == other.strBody && strType == other.strType && strContext == other.strContext; }
 };
 
 struct SCrashAvertedInfo
 {
     uint uiTickCount;
-    int uiUsageCount;
+    int  uiUsageCount;
 };
 
-static std::list < SLogEventInfo >              ms_LogEventList;
-static CDuplicateLineFilter < SLogEventLine >   ms_LogEventFilter;
-static std::map < int, SCrashAvertedInfo >      ms_CrashAvertedMap;
-static uint                                     ms_uiTickCountBase = 0;
-static void*                                    ms_pReservedMemory = NULL;
-static uint                                     ms_uiInCrashZone = 0;
-static uint                                     ms_uiInvalidParameterCount = 0;
-static uint                                     ms_uiInvalidParameterCountLogged = 0;
+static std::list<SLogEventInfo>            ms_LogEventList;
+static CDuplicateLineFilter<SLogEventLine> ms_LogEventFilter;
+static std::map<int, SCrashAvertedInfo>    ms_CrashAvertedMap;
+static uint                                ms_uiTickCountBase = 0;
+static void*                               ms_pReservedMemory = NULL;
+static uint                                ms_uiInCrashZone = 0;
+static uint                                ms_uiInvalidParameterCount = 0;
+static uint                                ms_uiInvalidParameterCountLogged = 0;
 
-typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hFile, MINIDUMP_TYPE DumpType,
-                                    CONST PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
-                                    CONST PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
-                                    CONST PMINIDUMP_CALLBACK_INFORMATION CallbackParam
-                                    );
-
+typedef BOOL(WINAPI* MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hFile, MINIDUMP_TYPE DumpType,
+                                        CONST PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam, CONST PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
+                                        CONST PMINIDUMP_CALLBACK_INFORMATION CallbackParam);
 
 ///////////////////////////////////////////////////////////////
 //
@@ -61,19 +57,18 @@ typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hF
 // Static function. Called everytime a crash is averted
 //
 ///////////////////////////////////////////////////////////////
-void CCrashDumpWriter::OnCrashAverted ( uint uiId )
+void CCrashDumpWriter::OnCrashAverted(uint uiId)
 {
-    SCrashAvertedInfo* pInfo = MapFind ( ms_CrashAvertedMap, uiId );
-    if ( !pInfo )
+    SCrashAvertedInfo* pInfo = MapFind(ms_CrashAvertedMap, uiId);
+    if (!pInfo)
     {
-        MapSet ( ms_CrashAvertedMap, uiId, SCrashAvertedInfo () );
-        pInfo = MapFind ( ms_CrashAvertedMap, uiId );
+        MapSet(ms_CrashAvertedMap, uiId, SCrashAvertedInfo());
+        pInfo = MapFind(ms_CrashAvertedMap, uiId);
         pInfo->uiUsageCount = 0;
     }
-    pInfo->uiTickCount = GetTickCount32 ();
+    pInfo->uiTickCount = GetTickCount32();
     pInfo->uiUsageCount++;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -82,11 +77,10 @@ void CCrashDumpWriter::OnCrashAverted ( uint uiId )
 // Static function. Called when entering possible crash zone
 //
 ///////////////////////////////////////////////////////////////
-void CCrashDumpWriter::OnEnterCrashZone( uint uiId )
+void CCrashDumpWriter::OnEnterCrashZone(uint uiId)
 {
     ms_uiInCrashZone = uiId;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -95,25 +89,24 @@ void CCrashDumpWriter::OnEnterCrashZone( uint uiId )
 // Static function.
 //
 ///////////////////////////////////////////////////////////////
-void CCrashDumpWriter::LogEvent ( const char* szType, const char* szContext, const char* szBody )
+void CCrashDumpWriter::LogEvent(const char* szType, const char* szContext, const char* szBody)
 {
-    ms_LogEventFilter.AddLine( { szBody, szType, szContext } );
+    ms_LogEventFilter.AddLine({szBody, szType, szContext});
 
     SLogEventLine line;
-    while ( ms_LogEventFilter.PopOutputLine( line ) )
+    while (ms_LogEventFilter.PopOutputLine(line))
     {
         SLogEventInfo info;
-        info.uiTickCount = GetTickCount32 ();
+        info.uiTickCount = GetTickCount32();
         info.strType = line.strType;
         info.strContext = line.strContext;
         info.strBody = line.strBody;
-        ms_LogEventList.push_front ( info );
-    
-        while ( ms_LogEventList.size () > LOG_EVENT_SIZE )
-            ms_LogEventList.pop_back ();
+        ms_LogEventList.push_front(info);
+
+        while (ms_LogEventList.size() > LOG_EVENT_SIZE)
+            ms_LogEventList.pop_back();
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -122,15 +115,14 @@ void CCrashDumpWriter::LogEvent ( const char* szType, const char* szContext, con
 // Static function. Initialize handlers for crash situations
 //
 ///////////////////////////////////////////////////////////////
-void CCrashDumpWriter::SetHandlers( void )
+void CCrashDumpWriter::SetHandlers(void)
 {
 #ifndef MTA_DEBUG
-    _set_invalid_parameter_handler( CCrashDumpWriter::HandleInvalidParameter );
-    SetCrashHandlerFilter ( CCrashDumpWriter::HandleExceptionGlobal );
-    CCrashDumpWriter::ReserveMemoryKBForCrashDumpProcessing( 500 );
+    _set_invalid_parameter_handler(CCrashDumpWriter::HandleInvalidParameter);
+    SetCrashHandlerFilter(CCrashDumpWriter::HandleExceptionGlobal);
+    CCrashDumpWriter::ReserveMemoryKBForCrashDumpProcessing(500);
 #endif
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -139,15 +131,14 @@ void CCrashDumpWriter::SetHandlers( void )
 // Static function. Called every so often, you know
 //
 ///////////////////////////////////////////////////////////////
-void CCrashDumpWriter::UpdateCounters( void )
+void CCrashDumpWriter::UpdateCounters(void)
 {
-    if ( ms_uiInvalidParameterCount > ms_uiInvalidParameterCountLogged && ms_uiInvalidParameterCountLogged < 10 )
+    if (ms_uiInvalidParameterCount > ms_uiInvalidParameterCountLogged && ms_uiInvalidParameterCountLogged < 10)
     {
-        AddReportLog( 9206, SString( "InvalidParameterCount changed from %d to %d", ms_uiInvalidParameterCountLogged, ms_uiInvalidParameterCount ) );
+        AddReportLog(9206, SString("InvalidParameterCount changed from %d to %d", ms_uiInvalidParameterCountLogged, ms_uiInvalidParameterCount));
         ms_uiInvalidParameterCountLogged = ms_uiInvalidParameterCount;
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -157,11 +148,10 @@ void CCrashDumpWriter::UpdateCounters( void )
 // Can be caused by problems with localized strings.
 //
 ///////////////////////////////////////////////////////////////
-void CCrashDumpWriter::HandleInvalidParameter( const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved )
+void CCrashDumpWriter::HandleInvalidParameter(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved)
 {
     ms_uiInvalidParameterCount++;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -171,44 +161,43 @@ void CCrashDumpWriter::HandleInvalidParameter( const wchar_t* expression, const 
 // Static functions. Keep some RAM to help avoid mem problems during crash dump saving
 //
 ///////////////////////////////////////////////////////////////
-void CCrashDumpWriter::ReserveMemoryKBForCrashDumpProcessing( uint uiMemoryKB )
+void CCrashDumpWriter::ReserveMemoryKBForCrashDumpProcessing(uint uiMemoryKB)
 {
     FreeMemoryForCrashDumpProcessing();
-    ms_pReservedMemory = malloc( uiMemoryKB * 1024 );
+    ms_pReservedMemory = malloc(uiMemoryKB * 1024);
 }
 
-void CCrashDumpWriter::FreeMemoryForCrashDumpProcessing( void )
+void CCrashDumpWriter::FreeMemoryForCrashDumpProcessing(void)
 {
-    if ( ms_pReservedMemory )
+    if (ms_pReservedMemory)
     {
-        free( ms_pReservedMemory );
+        free(ms_pReservedMemory);
         ms_pReservedMemory = NULL;
     }
 }
 
-
-long WINAPI CCrashDumpWriter::HandleExceptionGlobal ( _EXCEPTION_POINTERS* pException )
+long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pException)
 {
     FreeMemoryForCrashDumpProcessing();
 
     // Create the exception information class
     CExceptionInformation_Impl* pExceptionInformation = new CExceptionInformation_Impl;
-    pExceptionInformation->Set ( pException->ExceptionRecord->ExceptionCode, pException );
+    pExceptionInformation->Set(pException->ExceptionRecord->ExceptionCode, pException);
 
-    WriteDebugEvent ( "CCrashDumpWriter::HandleExceptionGlobal" );
+    WriteDebugEvent("CCrashDumpWriter::HandleExceptionGlobal");
 
     // Grab the mod manager
-    CModManager* pModManager = CModManager::GetSingletonPtr ();
-    if ( pModManager )
+    CModManager* pModManager = CModManager::GetSingletonPtr();
+    if (pModManager)
     {
         // Got a client?
-        if ( pModManager->GetCurrentMod () )
+        if (pModManager->GetCurrentMod())
         {
             // Protect us from "double-faults"
             try
             {
                 // Let the client handle it. If it could, continue the execution
-                if ( pModManager->GetCurrentMod ()->HandleException ( pExceptionInformation ) )
+                if (pModManager->GetCurrentMod()->HandleException(pExceptionInformation))
                 {
                     // Delete the exception record and continue to search the exception stack
                     delete pExceptionInformation;
@@ -216,367 +205,324 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal ( _EXCEPTION_POINTERS* pExce
                 }
 
                 // Save tick count now
-                ms_uiTickCountBase = GetTickCount32 ();
+                ms_uiTickCountBase = GetTickCount32();
 
                 // The client wants us to terminate the process
-                DumpCoreLog ( pExceptionInformation );
-                DumpMiniDump ( pException, pExceptionInformation );
-                RunErrorTool ( pExceptionInformation );
-                TerminateProcess ( GetCurrentProcess (), 1 );
+                DumpCoreLog(pExceptionInformation);
+                DumpMiniDump(pException, pExceptionInformation);
+                RunErrorTool(pExceptionInformation);
+                TerminateProcess(GetCurrentProcess(), 1);
             }
-            catch ( ... )
+            catch (...)
             {
                 // Double-fault, terminate the process
-                DumpCoreLog ( pExceptionInformation );
-                DumpMiniDump ( pException, pExceptionInformation );
-                RunErrorTool ( pExceptionInformation );
-                TerminateProcess ( GetCurrentProcess (), 1 );
+                DumpCoreLog(pExceptionInformation);
+                DumpMiniDump(pException, pExceptionInformation);
+                RunErrorTool(pExceptionInformation);
+                TerminateProcess(GetCurrentProcess(), 1);
             }
         }
         else
         {
             // Continue if we're in debug mode, if not terminate
             #ifdef MTA_DEBUG
-                return EXCEPTION_CONTINUE_SEARCH;
+            return EXCEPTION_CONTINUE_SEARCH;
             #endif
         }
     }
 
     // Terminate the process
-    DumpCoreLog ( pExceptionInformation );
-    DumpMiniDump ( pException, pExceptionInformation );
-    RunErrorTool ( pExceptionInformation );
-    TerminateProcess ( GetCurrentProcess (), 1 );
+    DumpCoreLog(pExceptionInformation);
+    DumpMiniDump(pException, pExceptionInformation);
+    RunErrorTool(pExceptionInformation);
+    TerminateProcess(GetCurrentProcess(), 1);
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
-
-void CCrashDumpWriter::DumpCoreLog ( CExceptionInformation* pExceptionInformation )
+void CCrashDumpWriter::DumpCoreLog(CExceptionInformation* pExceptionInformation)
 {
     // Write crash flag for next launch (Simple flag in case of double faults later)
-    fclose( fopen ( CalcMTASAPath ( "mta\\core.log.flag" ), "w" ) );
+    fclose(File::Fopen(CalcMTASAPath("mta\\core.log.flag"), "w"));
 
     // Write a log with the generic exception information
-    FILE* pFile = fopen ( CalcMTASAPath ( "mta\\core.log" ), "a+" );
-    if ( pFile )
+    FILE* pFile = File::Fopen(CalcMTASAPath("mta\\core.log"), "a+");
+    if (pFile)
     {
         // Header
-        fprintf ( pFile, "%s", "** -- Unhandled exception -- **\n\n" );
+        fprintf(pFile, "%s", "** -- Unhandled exception -- **\n\n");
 
         // Write the time
         time_t timeTemp;
-        time ( &timeTemp );
+        time(&timeTemp);
 
-        SString strMTAVersionFull = SString ( "%s.%s", MTA_DM_BUILDTAG_LONG, *GetApplicationSetting ( "mta-version-ext" ).SplitRight ( ".", NULL, -2 ) );
+        SString strMTAVersionFull = SString("%s.%s", MTA_DM_BUILDTAG_LONG, *GetApplicationSetting("mta-version-ext").SplitRight(".", NULL, -2));
 
         SString strInfo;
-        strInfo += SString ( "Version = %s\n", strMTAVersionFull.c_str () );
-        strInfo += SString ( "Time = %s", ctime ( &timeTemp ) );
+        strInfo += SString("Version = %s\n", strMTAVersionFull.c_str());
+        strInfo += SString("Time = %s", ctime(&timeTemp));
 
-        strInfo += SString ( "Module = %s\n", pExceptionInformation->GetModulePathName () );
+        strInfo += SString("Module = %s\n", pExceptionInformation->GetModulePathName());
 
         // Write the basic exception information
-        strInfo += SString ( "Code = 0x%08X\n", pExceptionInformation->GetCode () );
-        strInfo += SString ( "Offset = 0x%08X\n\n", pExceptionInformation->GetAddressModuleOffset () );
+        strInfo += SString("Code = 0x%08X\n", pExceptionInformation->GetCode());
+        strInfo += SString("Offset = 0x%08X\n\n", pExceptionInformation->GetAddressModuleOffset());
 
         // Write the register info
-        strInfo += SString ( "EAX=%08X  EBX=%08X  ECX=%08X  EDX=%08X  ESI=%08X\n" \
-                         "EDI=%08X  EBP=%08X  ESP=%08X  EIP=%08X  FLG=%08X\n" \
-                         "CS=%04X   DS=%04X  SS=%04X  ES=%04X   " \
-                         "FS=%04X  GS=%04X\n\n",
-                         pExceptionInformation->GetEAX (),
-                         pExceptionInformation->GetEBX (),
-                         pExceptionInformation->GetECX (),
-                         pExceptionInformation->GetEDX (),
-                         pExceptionInformation->GetESI (),
-                         pExceptionInformation->GetEDI (),
-                         pExceptionInformation->GetEBP (),
-                         pExceptionInformation->GetESP (),
-                         pExceptionInformation->GetEIP (),
-                         pExceptionInformation->GetEFlags (),
-                         pExceptionInformation->GetCS (),
-                         pExceptionInformation->GetDS (),
-                         pExceptionInformation->GetSS (),
-                         pExceptionInformation->GetES (),
-                         pExceptionInformation->GetFS (),
-                         pExceptionInformation->GetGS () );
+        strInfo += SString(
+            "EAX=%08X  EBX=%08X  ECX=%08X  EDX=%08X  ESI=%08X\n"
+            "EDI=%08X  EBP=%08X  ESP=%08X  EIP=%08X  FLG=%08X\n"
+            "CS=%04X   DS=%04X  SS=%04X  ES=%04X   "
+            "FS=%04X  GS=%04X\n\n",
+            pExceptionInformation->GetEAX(), pExceptionInformation->GetEBX(), pExceptionInformation->GetECX(), pExceptionInformation->GetEDX(),
+            pExceptionInformation->GetESI(), pExceptionInformation->GetEDI(), pExceptionInformation->GetEBP(), pExceptionInformation->GetESP(),
+            pExceptionInformation->GetEIP(), pExceptionInformation->GetEFlags(), pExceptionInformation->GetCS(), pExceptionInformation->GetDS(),
+            pExceptionInformation->GetSS(), pExceptionInformation->GetES(), pExceptionInformation->GetFS(), pExceptionInformation->GetGS());
 
-
-        fprintf ( pFile, "%s", strInfo.c_str () );
+        fprintf(pFile, "%s", strInfo.c_str());
 
         // End of unhandled exception
-        fprintf ( pFile, "%s", "** -- End of unhandled exception -- **\n\n\n" );
-        
+        fprintf(pFile, "%s", "** -- End of unhandled exception -- **\n\n\n");
+
         // Close the file
-        fclose ( pFile );
+        fclose(pFile);
 
         // For the crash dialog
-        SetApplicationSetting ( "diagnostics", "last-crash-info", strInfo );
-        WriteDebugEvent ( strInfo.Replace( "\n", " " ) );
+        SetApplicationSetting("diagnostics", "last-crash-info", strInfo);
+        WriteDebugEvent(strInfo.Replace("\n", " "));
     }
 }
 
-
-void CCrashDumpWriter::DumpMiniDump ( _EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation )
+void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation)
 {
-    WriteDebugEvent ( "CCrashDumpWriter::DumpMiniDump" );
+    WriteDebugEvent("CCrashDumpWriter::DumpMiniDump");
 
     // Try to load the DLL in our directory
     HMODULE hDll = NULL;
-    char szDbgHelpPath [MAX_PATH];
-    if ( GetModuleFileNameA ( NULL, szDbgHelpPath, MAX_PATH ) )
+    char    szDbgHelpPath[MAX_PATH];
+    if (GetModuleFileNameA(NULL, szDbgHelpPath, MAX_PATH))
     {
-        char* pSlash = _tcsrchr ( szDbgHelpPath, '\\' );
-        if ( pSlash )
+        char* pSlash = _tcsrchr(szDbgHelpPath, '\\');
+        if (pSlash)
         {
-            _tcscpy ( pSlash + 1, "DBGHELP.DLL" );
-            hDll = LoadLibrary ( szDbgHelpPath );
+            _tcscpy(pSlash + 1, "DBGHELP.DLL");
+            hDll = LoadLibrary(szDbgHelpPath);
         }
     }
 
     // If we couldn't load the one in our dir, load any version available
-    if ( !hDll )
+    if (!hDll)
     {
-        hDll = LoadLibrary( "DBGHELP.DLL" );
+        hDll = LoadLibrary("DBGHELP.DLL");
     }
 
-    if ( !hDll )
-        AddReportLog( 9201, "CCrashDumpWriter::DumpMiniDump - Could not load DBGHELP.DLL" );
+    if (!hDll)
+        AddReportLog(9201, "CCrashDumpWriter::DumpMiniDump - Could not load DBGHELP.DLL");
 
     // We could load a dll?
-    if ( hDll )
+    if (hDll)
     {
         // Grab the MiniDumpWriteDump proc address
-        MINIDUMPWRITEDUMP pDump = reinterpret_cast < MINIDUMPWRITEDUMP > ( GetProcAddress( hDll, "MiniDumpWriteDump" ) );
-        if ( !pDump )
-            AddReportLog( 9202, "CCrashDumpWriter::DumpMiniDump - Could not find MiniDumpWriteDump" );
+        MINIDUMPWRITEDUMP pDump = reinterpret_cast<MINIDUMPWRITEDUMP>(GetProcAddress(hDll, "MiniDumpWriteDump"));
+        if (!pDump)
+            AddReportLog(9202, "CCrashDumpWriter::DumpMiniDump - Could not find MiniDumpWriteDump");
 
-        if ( pDump )
+        if (pDump)
         {
             // Create the file
-            HANDLE hFile = CreateFile ( CalcMTASAPath ( "mta\\core.dmp" ), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
-            if ( hFile == INVALID_HANDLE_VALUE )
-                AddReportLog( 9203, SString( "CCrashDumpWriter::DumpMiniDump - Could not create '%s'", *CalcMTASAPath ( "mta\\core.dmp" ) ) );
+            HANDLE hFile = CreateFile(CalcMTASAPath("mta\\core.dmp"), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+            if (hFile == INVALID_HANDLE_VALUE)
+                AddReportLog(9203, SString("CCrashDumpWriter::DumpMiniDump - Could not create '%s'", *CalcMTASAPath("mta\\core.dmp")));
 
-            if ( hFile != INVALID_HANDLE_VALUE )
+            if (hFile != INVALID_HANDLE_VALUE)
             {
                 // Create an exception information struct
                 _MINIDUMP_EXCEPTION_INFORMATION ExInfo;
-                ExInfo.ThreadId = GetCurrentThreadId ();
+                ExInfo.ThreadId = GetCurrentThreadId();
                 ExInfo.ExceptionPointers = pException;
                 ExInfo.ClientPointers = FALSE;
 
                 // Write the dump
-                BOOL bResult = pDump ( GetCurrentProcess(), GetCurrentProcessId(), hFile, (MINIDUMP_TYPE)( MiniDumpNormal | MiniDumpWithIndirectlyReferencedMemory ), &ExInfo, NULL, NULL );
+                BOOL bResult = pDump(GetCurrentProcess(), GetCurrentProcessId(), hFile,
+                                     (MINIDUMP_TYPE)(MiniDumpNormal | MiniDumpWithIndirectlyReferencedMemory), &ExInfo, NULL, NULL);
 
-                if ( !bResult )
-                    AddReportLog( 9204, SString( "CCrashDumpWriter::DumpMiniDump - MiniDumpWriteDump failed (%08x)", GetLastError() ) );
+                if (!bResult)
+                    AddReportLog(9204, SString("CCrashDumpWriter::DumpMiniDump - MiniDumpWriteDump failed (%08x)", GetLastError()));
                 else
-                    WriteDebugEvent ( "CCrashDumpWriter::DumpMiniDump - MiniDumpWriteDump succeeded" );
+                    WriteDebugEvent("CCrashDumpWriter::DumpMiniDump - MiniDumpWriteDump succeeded");
 
                 // Close the dumpfile
-                CloseHandle ( hFile );
+                CloseHandle(hFile);
 
                 // Grab the current time
                 // Ask windows for the system time.
                 SYSTEMTIME SystemTime;
-                GetLocalTime ( &SystemTime );
+                GetLocalTime(&SystemTime);
 
                 // Create the dump directory
-                CreateDirectory ( CalcMTASAPath ( "mta\\dumps" ), 0 );
-                CreateDirectory ( CalcMTASAPath ( "mta\\dumps\\private" ), 0 );
+                CreateDirectory(CalcMTASAPath("mta\\dumps"), 0);
+                CreateDirectory(CalcMTASAPath("mta\\dumps\\private"), 0);
 
-                SString strModuleName = pExceptionInformation->GetModuleBaseName ();
-                strModuleName = strModuleName.ReplaceI ( ".dll", "" ).Replace ( ".exe", "" ).Replace ( "_", "" ).Replace ( ".", "" ).Replace ( "-", "" );
-                if ( strModuleName.length () == 0 )
+                SString strModuleName = pExceptionInformation->GetModuleBaseName();
+                strModuleName = strModuleName.ReplaceI(".dll", "").Replace(".exe", "").Replace("_", "").Replace(".", "").Replace("-", "");
+                if (strModuleName.length() == 0)
                     strModuleName = "unknown";
 
-                SString strMTAVersionFull = SString ( "%s.%s", MTA_DM_BUILDTAG_LONG, *GetApplicationSetting ( "mta-version-ext" ).SplitRight ( ".", NULL, -2 ) );
-                SString strSerialPart = GetApplicationSetting ( "serial" ).substr ( 0, 5 );
-                uint uiServerIP = GetApplicationSettingInt ( "last-server-ip" );
-                uint uiServerPort = GetApplicationSettingInt ( "last-server-port" );
-                int uiServerTime = GetApplicationSettingInt ( "last-server-time" );
-                int uiServerDuration = _time32 ( NULL ) - uiServerTime;
-                uiServerDuration = Clamp ( 0, uiServerDuration + 1, 0xfff );
+                SString strMTAVersionFull = SString("%s.%s", MTA_DM_BUILDTAG_LONG, *GetApplicationSetting("mta-version-ext").SplitRight(".", NULL, -2));
+                SString strSerialPart = GetApplicationSetting("serial").substr(0, 5);
+                uint    uiServerIP = GetApplicationSettingInt("last-server-ip");
+                uint    uiServerPort = GetApplicationSettingInt("last-server-port");
+                int     uiServerTime = GetApplicationSettingInt("last-server-time");
+                int     uiServerDuration = _time32(NULL) - uiServerTime;
+                uiServerDuration = Clamp(0, uiServerDuration + 1, 0xfff);
 
                 // Get path to mta dir
                 SString strPathCode;
                 {
-                    std::vector < SString > parts;
-                    PathConform ( CalcMTASAPath ( "" ) ).Split ( PATH_SEPERATOR, parts );
-                    for ( uint i = 0 ; i < parts.size () ; i++ )
+                    std::vector<SString> parts;
+                    PathConform(CalcMTASAPath("")).Split(PATH_SEPERATOR, parts);
+                    for (uint i = 0; i < parts.size(); i++)
                     {
-                        if ( parts[i].CompareI ( "Program Files" ) )
+                        if (parts[i].CompareI("Program Files"))
                             strPathCode += "Pr";
-                        else
-                        if ( parts[i].CompareI ( "Program Files (x86)" ) )
+                        else if (parts[i].CompareI("Program Files (x86)"))
                             strPathCode += "Px";
-                        else
-                        if ( parts[i].CompareI ( "MTA San Andreas" ) )
+                        else if (parts[i].CompareI("MTA San Andreas"))
                             strPathCode += "Mt";
-                        else
-                        if ( parts[i].BeginsWithI ( "MTA San Andreas" ) )
+                        else if (parts[i].BeginsWithI("MTA San Andreas"))
                             strPathCode += "Mb";
                         else
-                            strPathCode += parts[i].Left ( 1 ).ToUpper ();
+                            strPathCode += parts[i].Left(1).ToUpper();
                     }
                 }
 
                 // Ensure filename parts match up with EDumpFileNameParts
-                SString strFilename ( "mta\\dumps\\private\\client_%s_%s_%08x_%x_%s_%08X_%04X_%03X_%s_%04d%02d%02d_%02d%02d.dmp",
-                                             strMTAVersionFull.c_str (),
-                                             strModuleName.c_str (),
-                                             pExceptionInformation->GetAddressModuleOffset (),
-                                             pExceptionInformation->GetCode () & 0xffff,
-                                             strPathCode.c_str (),
-                                             uiServerIP,
-                                             uiServerPort,
-                                             uiServerDuration,
-                                             strSerialPart.c_str (),
-                                             SystemTime.wYear,
-                                             SystemTime.wMonth,
-                                             SystemTime.wDay,
-                                             SystemTime.wHour,
-                                             SystemTime.wMinute
-                                           );
+                SString strFilename("mta\\dumps\\private\\client_%s_%s_%08x_%x_%s_%08X_%04X_%03X_%s_%04d%02d%02d_%02d%02d.dmp", strMTAVersionFull.c_str(),
+                                    strModuleName.c_str(), pExceptionInformation->GetAddressModuleOffset(), pExceptionInformation->GetCode() & 0xffff,
+                                    strPathCode.c_str(), uiServerIP, uiServerPort, uiServerDuration, strSerialPart.c_str(), SystemTime.wYear, SystemTime.wMonth,
+                                    SystemTime.wDay, SystemTime.wHour, SystemTime.wMinute);
 
-                SString strPathFilename = CalcMTASAPath ( strFilename );
+                SString strPathFilename = CalcMTASAPath(strFilename);
 
                 // Copy the file
-                CopyFile ( CalcMTASAPath ( "mta\\core.dmp" ), strPathFilename, false );
+                CopyFile(CalcMTASAPath("mta\\core.dmp"), strPathFilename, false);
 
                 // For the dump uploader
-                SetApplicationSetting ( "diagnostics", "last-dump-extra", "none" );
-                SetApplicationSetting ( "diagnostics", "last-dump-save", strPathFilename );
+                SetApplicationSetting("diagnostics", "last-dump-extra", "none");
+                SetApplicationSetting("diagnostics", "last-dump-save", strPathFilename);
 
                 // Try to append pool sizes info to dump file
-                SetApplicationSetting ( "diagnostics", "last-dump-extra", "try-pools" );
+                SetApplicationSetting("diagnostics", "last-dump-extra", "try-pools");
                 CBuffer poolInfo;
-                GetPoolInfo ( poolInfo );
-                AppendToDumpFile ( strPathFilename, poolInfo, 'POLs', 'POLe' );
-                SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-pools" );
+                GetPoolInfo(poolInfo);
+                AppendToDumpFile(strPathFilename, poolInfo, 'POLs', 'POLe');
+                SetApplicationSetting("diagnostics", "last-dump-extra", "added-pools");
 
                 // Try to append d3d state info to dump file
-                SetApplicationSetting ( "diagnostics", "last-dump-extra", "try-d3d" );
+                SetApplicationSetting("diagnostics", "last-dump-extra", "try-d3d");
                 CBuffer d3dInfo;
-                GetD3DInfo ( d3dInfo );
-                AppendToDumpFile ( strPathFilename, d3dInfo, 'D3Ds', 'D3De' );
-                SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-d3d" );
+                GetD3DInfo(d3dInfo);
+                AppendToDumpFile(strPathFilename, d3dInfo, 'D3Ds', 'D3De');
+                SetApplicationSetting("diagnostics", "last-dump-extra", "added-d3d");
 
                 // Try to append crash averted stats to dump file
-                SetApplicationSetting ( "diagnostics", "last-dump-extra", "try-crash-averted" );
+                SetApplicationSetting("diagnostics", "last-dump-extra", "try-crash-averted");
                 CBuffer crashAvertedStats;
-                GetCrashAvertedStats ( crashAvertedStats );
-                AppendToDumpFile ( strPathFilename, crashAvertedStats, 'CASs', 'CASe' );
-                SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-crash-averted" );
+                GetCrashAvertedStats(crashAvertedStats);
+                AppendToDumpFile(strPathFilename, crashAvertedStats, 'CASs', 'CASe');
+                SetApplicationSetting("diagnostics", "last-dump-extra", "added-crash-averted");
 
                 // Try to append log info to dump file
-                SetApplicationSetting ( "diagnostics", "last-dump-extra", "try-log" );
+                SetApplicationSetting("diagnostics", "last-dump-extra", "try-log");
                 CBuffer logInfo;
-                GetLogInfo ( logInfo );
-                AppendToDumpFile ( strPathFilename, logInfo, 'LOGs', 'LOGe' );
-                SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-log" );
+                GetLogInfo(logInfo);
+                AppendToDumpFile(strPathFilename, logInfo, 'LOGs', 'LOGe');
+                SetApplicationSetting("diagnostics", "last-dump-extra", "added-log");
 
                 // Try to append dx info to dump file
-                SetApplicationSetting ( "diagnostics", "last-dump-extra", "try-misc" );
+                SetApplicationSetting("diagnostics", "last-dump-extra", "try-misc");
                 CBuffer dxInfo;
-                GetDxInfo ( dxInfo );
-                AppendToDumpFile ( strPathFilename, dxInfo, 'DXIs', 'DXIe' );
-                SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-misc" );
+                GetDxInfo(dxInfo);
+                AppendToDumpFile(strPathFilename, dxInfo, 'DXIs', 'DXIe');
+                SetApplicationSetting("diagnostics", "last-dump-extra", "added-misc");
 
                 // Try to append misc info to dump file
-                SetApplicationSetting ( "diagnostics", "last-dump-extra", "try-misc" );
+                SetApplicationSetting("diagnostics", "last-dump-extra", "try-misc");
                 CBuffer miscInfo;
-                GetMiscInfo ( miscInfo );
-                AppendToDumpFile ( strPathFilename, miscInfo, 'MSCs', 'MSCe' );
-                SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-misc" );
+                GetMiscInfo(miscInfo);
+                AppendToDumpFile(strPathFilename, miscInfo, 'MSCs', 'MSCe');
+                SetApplicationSetting("diagnostics", "last-dump-extra", "added-misc");
 
                 // Try to append memory info to dump file
-                SetApplicationSetting ( "diagnostics", "last-dump-extra", "try-mem" );
+                SetApplicationSetting("diagnostics", "last-dump-extra", "try-mem");
                 CBuffer memInfo;
-                GetMemoryInfo ( memInfo );
-                AppendToDumpFile ( strPathFilename, memInfo, 'MEMs', 'MEMe' );
-                SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-mem" );
+                GetMemoryInfo(memInfo);
+                AppendToDumpFile(strPathFilename, memInfo, 'MEMs', 'MEMe');
+                SetApplicationSetting("diagnostics", "last-dump-extra", "added-mem");
 
                 // Try to logfile.txt to dump file
-                SetApplicationSetting ( "diagnostics", "last-dump-extra", "try-logfile" );
+                SetApplicationSetting("diagnostics", "last-dump-extra", "try-logfile");
                 CBuffer logfileContent;
-                logfileContent.LoadFromFile( CalcMTASAPath( PathJoin( "mta", "logs", "logfile.txt" ) ) );
-                AppendToDumpFile ( strPathFilename, logfileContent, 'LOGs', 'LOGe' );
-                SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-logfile" );
+                logfileContent.LoadFromFile(CalcMTASAPath(PathJoin("mta", "logs", "logfile.txt")));
+                AppendToDumpFile(strPathFilename, logfileContent, 'LOGs', 'LOGe');
+                SetApplicationSetting("diagnostics", "last-dump-extra", "added-logfile");
 
                 // Try to report.log to dump file
-                SetApplicationSetting ( "diagnostics", "last-dump-extra", "try-report" );
+                SetApplicationSetting("diagnostics", "last-dump-extra", "try-report");
                 CBuffer reportLogContent;
-                reportLogContent.LoadFromFile( PathJoin( GetMTADataPath(), "report.log" ) );
-                AppendToDumpFile ( strPathFilename, reportLogContent, 'REPs', 'REPe' );
-                SetApplicationSetting ( "diagnostics", "last-dump-extra", "added-report" );
+                reportLogContent.LoadFromFile(PathJoin(GetMTADataPath(), "report.log"));
+                AppendToDumpFile(strPathFilename, reportLogContent, 'REPs', 'REPe');
+                SetApplicationSetting("diagnostics", "last-dump-extra", "added-report");
             }
         }
 
         // Free the DLL again
-        FreeLibrary ( hDll );
+        FreeLibrary(hDll);
     }
 
     // Auto-fixes
 
     // Check if crash was in volumetric shadow code
-    if ( ms_uiInCrashZone == 1 || ms_uiInCrashZone == 2 )
+    if (ms_uiInCrashZone == 1 || ms_uiInCrashZone == 2)
     {
-        CVARS_SET( "volumetric_shadows", false );
+        CVARS_SET("volumetric_shadows", false);
         CCore::GetSingleton().SaveConfig();
-        AddReportLog( 9205, "Disabled volumetric shadows" );
+        AddReportLog(9205, "Disabled volumetric shadows");
     }
 
     CNet* pNet = CCore::GetSingleton().GetNetwork();
-    if ( pNet )
-        pNet->PostCrash();    
+    if (pNet)
+        pNet->PostCrash();
 }
 
-
-void CCrashDumpWriter::RunErrorTool ( CExceptionInformation* pExceptionInformation )
+void CCrashDumpWriter::RunErrorTool(CExceptionInformation* pExceptionInformation)
 {
-// MTA Error Reporter is now integrated into the launcher
+    // MTA Error Reporter is now integrated into the launcher
 
     // Only do once
     static bool bDoneReport = false;
-    if ( bDoneReport )
+    if (bDoneReport)
         return;
     bDoneReport = false;
 
     // Log the basic exception information
-    SString strMessage ( "Crash 0x%08X 0x%08X %s"
-                         " EAX=%08X EBX=%08X ECX=%08X EDX=%08X ESI=%08X"
-                         " EDI=%08X EBP=%08X ESP=%08X EIP=%08X FLG=%08X"
-                         " CS=%04X DS=%04X SS=%04X ES=%04X"
-                         " FS=%04X GS=%04X",
-                         pExceptionInformation->GetCode (),
-                         pExceptionInformation->GetAddressModuleOffset (),
-                         pExceptionInformation->GetModulePathName (),
-                         pExceptionInformation->GetEAX (),
-                         pExceptionInformation->GetEBX (),
-                         pExceptionInformation->GetECX (),
-                         pExceptionInformation->GetEDX (),
-                         pExceptionInformation->GetESI (),
-                         pExceptionInformation->GetEDI (),
-                         pExceptionInformation->GetEBP (),
-                         pExceptionInformation->GetESP (),
-                         pExceptionInformation->GetEIP (),
-                         pExceptionInformation->GetEFlags (),
-                         pExceptionInformation->GetCS (),
-                         pExceptionInformation->GetDS (),
-                         pExceptionInformation->GetSS (),
-                         pExceptionInformation->GetES (),
-                         pExceptionInformation->GetFS (),
-                         pExceptionInformation->GetGS ()
-                        );
+    SString strMessage(
+        "Crash 0x%08X 0x%08X %s"
+        " EAX=%08X EBX=%08X ECX=%08X EDX=%08X ESI=%08X"
+        " EDI=%08X EBP=%08X ESP=%08X EIP=%08X FLG=%08X"
+        " CS=%04X DS=%04X SS=%04X ES=%04X"
+        " FS=%04X GS=%04X",
+        pExceptionInformation->GetCode(), pExceptionInformation->GetAddressModuleOffset(), pExceptionInformation->GetModulePathName(),
+        pExceptionInformation->GetEAX(), pExceptionInformation->GetEBX(), pExceptionInformation->GetECX(), pExceptionInformation->GetEDX(),
+        pExceptionInformation->GetESI(), pExceptionInformation->GetEDI(), pExceptionInformation->GetEBP(), pExceptionInformation->GetESP(),
+        pExceptionInformation->GetEIP(), pExceptionInformation->GetEFlags(), pExceptionInformation->GetCS(), pExceptionInformation->GetDS(),
+        pExceptionInformation->GetSS(), pExceptionInformation->GetES(), pExceptionInformation->GetFS(), pExceptionInformation->GetGS());
 
-    AddReportLog ( 3120, strMessage );
+    AddReportLog(3120, strMessage);
 
     // Try relaunch with crashed flag
-    SString strMTASAPath = GetMTASABaseDir ();
-    SetCurrentDirectory ( strMTASAPath );
-    SetDllDirectory( strMTASAPath );
+    SString strMTASAPath = GetMTASABaseDir();
+    SetCurrentDirectory(strMTASAPath);
+    SetDllDirectory(strMTASAPath);
 
 #ifdef MTA_DEBUG
     #define MTA_EXE_NAME            "Multi Theft Auto_d.exe"
@@ -584,35 +530,32 @@ void CCrashDumpWriter::RunErrorTool ( CExceptionInformation* pExceptionInformati
     #define MTA_EXE_NAME            "Multi Theft Auto.exe"
 #endif
     SString strFile = strMTASAPath + "\\" + MTA_EXE_NAME;
-    ShellExecute( NULL, "open", strFile, "install_stage=crashed", NULL, SW_SHOWNORMAL );
+    ShellExecute(NULL, "open", strFile, "install_stage=crashed", NULL, SW_SHOWNORMAL);
 }
-
-
 
 //
 // Add extra data to the dump file and hope visual studio doesn't mind
 //
-void CCrashDumpWriter::AppendToDumpFile ( const SString& strPathFilename, const CBuffer& dataBuffer, DWORD dwMagicStart, DWORD dwMagicEnd )
+void CCrashDumpWriter::AppendToDumpFile(const SString& strPathFilename, const CBuffer& dataBuffer, DWORD dwMagicStart, DWORD dwMagicEnd)
 {
-    CBuffer output;
-    CBufferWriteStream stream ( output );
+    CBuffer            output;
+    CBufferWriteStream stream(output);
     // 4 bytes zero
-    stream.Write ( (DWORD)0 );
+    stream.Write((DWORD)0);
     // 4 bytes magic
-    stream.Write ( dwMagicStart );
+    stream.Write(dwMagicStart);
     // 4 bytes size of data
-    stream.Write ( dataBuffer.GetSize () );
+    stream.Write(dataBuffer.GetSize());
     // n bytes data
-    stream.WriteBytes ( dataBuffer.GetData (), dataBuffer.GetSize () );
+    stream.WriteBytes(dataBuffer.GetData(), dataBuffer.GetSize());
     // 4 bytes size of data
-    stream.Write ( dataBuffer.GetSize () );
+    stream.Write(dataBuffer.GetSize());
     // 4 bytes magic
-    stream.Write ( dwMagicEnd );
+    stream.Write(dwMagicEnd);
     // 4 bytes zero
-    stream.Write ( (DWORD)0 );
-    FileAppend ( strPathFilename, output.GetData (), output.GetSize () );
+    stream.Write((DWORD)0);
+    FileAppend(strPathFilename, output.GetData(), output.GetSize());
 }
-
 
 //
 // Helper crap for GetPoolInfo
@@ -655,70 +598,162 @@ namespace
     #define FUNC_CPtrNodeSingleLinkPool_GetNoOfUsedSpaces       0x550230
     #define FUNC_CPtrNodeDoubleLinkPool_GetNoOfUsedSpaces       0x550300
 
-    int GetPoolCapacity ( ePools pool )
+    int GetPoolCapacity(ePools pool)
     {
         DWORD iPtr = NULL;
         DWORD cPtr = NULL;
-        switch ( pool )
+        switch (pool)
         {
-            case BUILDING_POOL:             iPtr = 0x55105F; break;
-            case PED_POOL:                  iPtr = 0x550FF2; break;
-            case OBJECT_POOL:               iPtr = 0x551097; break;
-            case DUMMY_POOL:                iPtr = 0x5510CF; break;
-            case VEHICLE_POOL:              cPtr = 0x55102A; break;
-            case COL_MODEL_POOL:            iPtr = 0x551107; break;
-            case TASK_POOL:                 iPtr = 0x55113F; break;
-            case EVENT_POOL:                iPtr = 0x551177; break;
-            case TASK_ALLOCATOR_POOL:       cPtr = 0x55124E; break;
-            case PED_INTELLIGENCE_POOL:     iPtr = 0x551283; break;
-            case PED_ATTRACTOR_POOL:        cPtr = 0x5512BC; break;
-            case ENTRY_INFO_NODE_POOL:      iPtr = 0x550FBA; break;
-            case NODE_ROUTE_POOL:           cPtr = 0x551219; break;
-            case PATROL_ROUTE_POOL:         cPtr = 0x5511E4; break;
-            case POINT_ROUTE_POOL:          cPtr = 0x5511AF; break;
-            case POINTER_DOUBLE_LINK_POOL:  iPtr = 0x550F82; break;
-            case POINTER_SINGLE_LINK_POOL:  iPtr = 0x550F46; break;
-            case ENV_MAP_MATERIAL_POOL:     iPtr = 0x5DA08E; break;
-            case ENV_MAP_ATOMIC_POOL:       iPtr = 0x5DA0CA; break;
-            case SPEC_MAP_MATERIAL_POOL:    iPtr = 0x5DA106; break;
+            case BUILDING_POOL:
+                iPtr = 0x55105F;
+                break;
+            case PED_POOL:
+                iPtr = 0x550FF2;
+                break;
+            case OBJECT_POOL:
+                iPtr = 0x551097;
+                break;
+            case DUMMY_POOL:
+                iPtr = 0x5510CF;
+                break;
+            case VEHICLE_POOL:
+                cPtr = 0x55102A;
+                break;
+            case COL_MODEL_POOL:
+                iPtr = 0x551107;
+                break;
+            case TASK_POOL:
+                iPtr = 0x55113F;
+                break;
+            case EVENT_POOL:
+                iPtr = 0x551177;
+                break;
+            case TASK_ALLOCATOR_POOL:
+                cPtr = 0x55124E;
+                break;
+            case PED_INTELLIGENCE_POOL:
+                iPtr = 0x551283;
+                break;
+            case PED_ATTRACTOR_POOL:
+                cPtr = 0x5512BC;
+                break;
+            case ENTRY_INFO_NODE_POOL:
+                iPtr = 0x550FBA;
+                break;
+            case NODE_ROUTE_POOL:
+                cPtr = 0x551219;
+                break;
+            case PATROL_ROUTE_POOL:
+                cPtr = 0x5511E4;
+                break;
+            case POINT_ROUTE_POOL:
+                cPtr = 0x5511AF;
+                break;
+            case POINTER_DOUBLE_LINK_POOL:
+                iPtr = 0x550F82;
+                break;
+            case POINTER_SINGLE_LINK_POOL:
+                iPtr = 0x550F46;
+                break;
+            case ENV_MAP_MATERIAL_POOL:
+                iPtr = 0x5DA08E;
+                break;
+            case ENV_MAP_ATOMIC_POOL:
+                iPtr = 0x5DA0CA;
+                break;
+            case SPEC_MAP_MATERIAL_POOL:
+                iPtr = 0x5DA106;
+                break;
         }
-        if ( iPtr )
+        if (iPtr)
             return *(int*)iPtr;
 
-        if ( cPtr )
+        if (cPtr)
             return *(char*)cPtr;
 
         return 0;
     }
 
-    int GetNumberOfUsedSpaces ( ePools pool )
+    int GetNumberOfUsedSpaces(ePools pool)
     {
         DWORD dwFunc = NULL;
         DWORD dwThis = NULL;
-        switch ( pool )
+        switch (pool)
         {
-            case BUILDING_POOL: dwFunc = FUNC_CBuildingPool_GetNoOfUsedSpaces; dwThis = CLASS_CBuildingPool; break;
-            case PED_POOL: dwFunc = FUNC_CPedPool_GetNoOfUsedSpaces; dwThis = CLASS_CPedPool; break;
-            case OBJECT_POOL: dwFunc = FUNC_CObjectPool_GetNoOfUsedSpaces; dwThis = CLASS_CObjectPool; break;
-            case DUMMY_POOL: dwFunc = FUNC_CDummyPool_GetNoOfUsedSpaces; dwThis = CLASS_CDummyPool; break;
-            case VEHICLE_POOL: dwFunc = FUNC_CVehiclePool_GetNoOfUsedSpaces; dwThis = CLASS_CVehiclePool; break;
-            case COL_MODEL_POOL: dwFunc = FUNC_CColModelPool_GetNoOfUsedSpaces; dwThis = CLASS_CColModelPool; break;
-            case TASK_POOL: dwFunc = FUNC_CTaskPool_GetNoOfUsedSpaces; dwThis = CLASS_CTaskPool; break;
-            case EVENT_POOL: dwFunc = FUNC_CEventPool_GetNoOfUsedSpaces; dwThis = CLASS_CEventPool; break;
-            case TASK_ALLOCATOR_POOL: dwFunc = FUNC_CTaskAllocatorPool_GetNoOfUsedSpaces; dwThis = CLASS_CTaskAllocatorPool; break;
-            case PED_INTELLIGENCE_POOL: dwFunc = FUNC_CPedIntelligencePool_GetNoOfUsedSpaces; dwThis = CLASS_CPedIntelligencePool; break;
-            case PED_ATTRACTOR_POOL: dwFunc = FUNC_CPedAttractorPool_GetNoOfUsedSpaces; dwThis = CLASS_CPedAttractorPool; break;
-            case ENTRY_INFO_NODE_POOL: dwFunc = FUNC_CEntryInfoNodePool_GetNoOfUsedSpaces; dwThis = CLASS_CEntryInfoNodePool; break;
-            case NODE_ROUTE_POOL: dwFunc = FUNC_CNodeRoutePool_GetNoOfUsedSpaces; dwThis = CLASS_CNodeRoutePool; break;
-            case PATROL_ROUTE_POOL: dwFunc = FUNC_CPatrolRoutePool_GetNoOfUsedSpaces; dwThis = CLASS_CPatrolRoutePool; break;
-            case POINT_ROUTE_POOL: dwFunc = FUNC_CPointRoutePool_GetNoOfUsedSpaces; dwThis = CLASS_CPointRoutePool; break;
-            case POINTER_DOUBLE_LINK_POOL: dwFunc = FUNC_CPtrNodeDoubleLinkPool_GetNoOfUsedSpaces; dwThis = CLASS_CPtrNodeDoubleLinkPool; break;
-            case POINTER_SINGLE_LINK_POOL: dwFunc = FUNC_CPtrNodeSingleLinkPool_GetNoOfUsedSpaces; dwThis = CLASS_CPtrNodeSingleLinkPool; break;
-            default: return -1;
+            case BUILDING_POOL:
+                dwFunc = FUNC_CBuildingPool_GetNoOfUsedSpaces;
+                dwThis = CLASS_CBuildingPool;
+                break;
+            case PED_POOL:
+                dwFunc = FUNC_CPedPool_GetNoOfUsedSpaces;
+                dwThis = CLASS_CPedPool;
+                break;
+            case OBJECT_POOL:
+                dwFunc = FUNC_CObjectPool_GetNoOfUsedSpaces;
+                dwThis = CLASS_CObjectPool;
+                break;
+            case DUMMY_POOL:
+                dwFunc = FUNC_CDummyPool_GetNoOfUsedSpaces;
+                dwThis = CLASS_CDummyPool;
+                break;
+            case VEHICLE_POOL:
+                dwFunc = FUNC_CVehiclePool_GetNoOfUsedSpaces;
+                dwThis = CLASS_CVehiclePool;
+                break;
+            case COL_MODEL_POOL:
+                dwFunc = FUNC_CColModelPool_GetNoOfUsedSpaces;
+                dwThis = CLASS_CColModelPool;
+                break;
+            case TASK_POOL:
+                dwFunc = FUNC_CTaskPool_GetNoOfUsedSpaces;
+                dwThis = CLASS_CTaskPool;
+                break;
+            case EVENT_POOL:
+                dwFunc = FUNC_CEventPool_GetNoOfUsedSpaces;
+                dwThis = CLASS_CEventPool;
+                break;
+            case TASK_ALLOCATOR_POOL:
+                dwFunc = FUNC_CTaskAllocatorPool_GetNoOfUsedSpaces;
+                dwThis = CLASS_CTaskAllocatorPool;
+                break;
+            case PED_INTELLIGENCE_POOL:
+                dwFunc = FUNC_CPedIntelligencePool_GetNoOfUsedSpaces;
+                dwThis = CLASS_CPedIntelligencePool;
+                break;
+            case PED_ATTRACTOR_POOL:
+                dwFunc = FUNC_CPedAttractorPool_GetNoOfUsedSpaces;
+                dwThis = CLASS_CPedAttractorPool;
+                break;
+            case ENTRY_INFO_NODE_POOL:
+                dwFunc = FUNC_CEntryInfoNodePool_GetNoOfUsedSpaces;
+                dwThis = CLASS_CEntryInfoNodePool;
+                break;
+            case NODE_ROUTE_POOL:
+                dwFunc = FUNC_CNodeRoutePool_GetNoOfUsedSpaces;
+                dwThis = CLASS_CNodeRoutePool;
+                break;
+            case PATROL_ROUTE_POOL:
+                dwFunc = FUNC_CPatrolRoutePool_GetNoOfUsedSpaces;
+                dwThis = CLASS_CPatrolRoutePool;
+                break;
+            case POINT_ROUTE_POOL:
+                dwFunc = FUNC_CPointRoutePool_GetNoOfUsedSpaces;
+                dwThis = CLASS_CPointRoutePool;
+                break;
+            case POINTER_DOUBLE_LINK_POOL:
+                dwFunc = FUNC_CPtrNodeDoubleLinkPool_GetNoOfUsedSpaces;
+                dwThis = CLASS_CPtrNodeDoubleLinkPool;
+                break;
+            case POINTER_SINGLE_LINK_POOL:
+                dwFunc = FUNC_CPtrNodeSingleLinkPool_GetNoOfUsedSpaces;
+                dwThis = CLASS_CPtrNodeSingleLinkPool;
+                break;
+            default:
+                return -1;
         }
 
         int iOut = -2;
-        if ( *(DWORD *)dwThis != NULL )
+        if (*(DWORD*)dwThis != NULL)
         {
             _asm
             {
@@ -732,88 +767,85 @@ namespace
 
         return iOut;
     }
-}
-
+}            // namespace
 
 //
 // Grab the state of the memory pools
 //
-void CCrashDumpWriter::GetPoolInfo ( CBuffer& buffer )
+void CCrashDumpWriter::GetPoolInfo(CBuffer& buffer)
 {
-    CBufferWriteStream stream ( buffer );
+    CBufferWriteStream stream(buffer);
 
     // Write PoolInfo version
-    stream.Write ( 1 );
+    stream.Write(1);
 
     // Write number of pools we have info on
-    stream.Write ( MAX_POOLS );
+    stream.Write(MAX_POOLS);
 
     // For each pool
-    for ( int i = 0; i < MAX_POOLS ; i++ )
+    for (int i = 0; i < MAX_POOLS; i++)
     {
-        int iCapacity = GetPoolCapacity ( (ePools)i );
-        int iUsedSpaces = GetNumberOfUsedSpaces ( (ePools)i );
+        int iCapacity = GetPoolCapacity((ePools)i);
+        int iUsedSpaces = GetNumberOfUsedSpaces((ePools)i);
         // Write pool info
-        stream.Write ( i );
-        stream.Write ( iCapacity );
-        stream.Write ( iUsedSpaces );
+        stream.Write(i);
+        stream.Write(iCapacity);
+        stream.Write(iUsedSpaces);
     }
 
     // TODO - Get usage info for other arrays such as CMatrixLinkList
 }
 
-
 //
 // Grab the state of D3D
 //
-void CCrashDumpWriter::GetD3DInfo ( CBuffer& buffer )
+void CCrashDumpWriter::GetD3DInfo(CBuffer& buffer)
 {
-    CBufferWriteStream stream ( buffer );
+    CBufferWriteStream stream(buffer);
 
     // Write D3DInfo version
-    stream.Write ( 2 );
+    stream.Write(2);
 
     // Quit if device state pointer is not valid
-    if ( !g_pDeviceState )
+    if (!g_pDeviceState)
         return;
 
     // Write D3D call type
-    stream.Write ( g_pDeviceState->CallState.callType );
+    stream.Write(g_pDeviceState->CallState.callType);
 
     // Only record state if crash was inside D3D
-    if ( g_pDeviceState->CallState.callType == CProxyDirect3DDevice9::SCallState::NONE )
+    if (g_pDeviceState->CallState.callType == CProxyDirect3DDevice9::SCallState::NONE)
         return;
 
     // Write D3D call args
-    stream.Write ( g_pDeviceState->CallState.uiNumArgs );
-    for ( uint i = 0; i < g_pDeviceState->CallState.uiNumArgs ; i++ )
-        stream.Write ( g_pDeviceState->CallState.args[i] );
+    stream.Write(g_pDeviceState->CallState.uiNumArgs);
+    for (uint i = 0; i < g_pDeviceState->CallState.uiNumArgs; i++)
+        stream.Write(g_pDeviceState->CallState.args[i]);
 
     // Try to get CRenderWare pointer
-    CCore* pCore = CCore::GetSingletonPtr ();
-    CGame* pGame = pCore ? pCore->GetGame () : NULL;
-    CRenderWare* pRenderWare = pGame ? pGame->GetRenderWare () : NULL;
+    CCore*       pCore = CCore::GetSingletonPtr();
+    CGame*       pGame = pCore ? pCore->GetGame() : NULL;
+    CRenderWare* pRenderWare = pGame ? pGame->GetRenderWare() : NULL;
     // Write on how we got on with doing that
-    stream.Write ( (uchar)( pCore ? 1 : 0 ) );
-    stream.Write ( (uchar)( pGame ? 1 : 0 ) );
-    stream.Write ( (uchar)( pRenderWare ? 1 : 0 ) );
+    stream.Write((uchar)(pCore ? 1 : 0));
+    stream.Write((uchar)(pGame ? 1 : 0));
+    stream.Write((uchar)(pRenderWare ? 1 : 0));
 
     // Write last used texture D3D pointer
-    stream.Write ( (uint)g_pDeviceState->TextureState[0].Texture );
+    stream.Write((uint)g_pDeviceState->TextureState[0].Texture);
 
     // Write last used texture name
     SString strTextureName = "no name";
-    if ( pRenderWare )
-        strTextureName = pRenderWare->GetTextureName ( (CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture );
-    stream.WriteString ( strTextureName );
+    if (pRenderWare)
+        strTextureName = pRenderWare->GetTextureName((CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture);
+    stream.WriteString(strTextureName);
 
     // Write shader name if being used
-    stream.WriteString ( (const char*)g_pDeviceState->CallState.strShaderName );
-    stream.Write ( g_pDeviceState->CallState.bShaderRequiresNormals );
+    stream.WriteString("");
+    stream.Write(false);
 
     // TODO - Vertex state and vertex/index buffer if readable
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -823,25 +855,24 @@ void CCrashDumpWriter::GetD3DInfo ( CBuffer& buffer )
 // Grab the crash averted stats
 //
 ///////////////////////////////////////////////////////////////
-void CCrashDumpWriter::GetCrashAvertedStats ( CBuffer& buffer )
+void CCrashDumpWriter::GetCrashAvertedStats(CBuffer& buffer)
 {
-    CBufferWriteStream stream ( buffer );
+    CBufferWriteStream stream(buffer);
 
     // Write info version
-    stream.Write ( 2 );
+    stream.Write(2);
 
     // Write number of stats
-    stream.Write ( ms_CrashAvertedMap.size () );
+    stream.Write(ms_CrashAvertedMap.size());
 
     // Write stats
-    for ( std::map < int, SCrashAvertedInfo >::iterator iter = ms_CrashAvertedMap.begin () ; iter != ms_CrashAvertedMap.end () ; ++iter )
+    for (std::map<int, SCrashAvertedInfo>::iterator iter = ms_CrashAvertedMap.begin(); iter != ms_CrashAvertedMap.end(); ++iter)
     {
-        stream.Write ( ms_uiTickCountBase - iter->second.uiTickCount );
-        stream.Write ( iter->first );
-        stream.Write ( iter->second.uiUsageCount );
+        stream.Write(ms_uiTickCountBase - iter->second.uiTickCount);
+        stream.Write(iter->first);
+        stream.Write(iter->second.uiUsageCount);
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -851,26 +882,25 @@ void CCrashDumpWriter::GetCrashAvertedStats ( CBuffer& buffer )
 // Grab log info
 //
 ///////////////////////////////////////////////////////////////
-void CCrashDumpWriter::GetLogInfo ( CBuffer& buffer )
+void CCrashDumpWriter::GetLogInfo(CBuffer& buffer)
 {
-    CBufferWriteStream stream ( buffer );
+    CBufferWriteStream stream(buffer);
 
     // Write info version
-    stream.Write ( 1 );
+    stream.Write(1);
 
     // Write number of stats
-    stream.Write ( ms_LogEventList.size () );
+    stream.Write(ms_LogEventList.size());
 
     // Write stats
-    for ( std::list < SLogEventInfo >::iterator iter = ms_LogEventList.begin () ; iter != ms_LogEventList.end () ; ++iter )
+    for (std::list<SLogEventInfo>::iterator iter = ms_LogEventList.begin(); iter != ms_LogEventList.end(); ++iter)
     {
-        stream.Write ( ms_uiTickCountBase - iter->uiTickCount );
-        stream.WriteString ( iter->strType );
-        stream.WriteString ( iter->strContext );
-        stream.WriteString ( iter->strBody );
+        stream.Write(ms_uiTickCountBase - iter->uiTickCount);
+        stream.WriteString(iter->strType);
+        stream.WriteString(iter->strContext);
+        stream.WriteString(iter->strBody);
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -880,35 +910,34 @@ void CCrashDumpWriter::GetLogInfo ( CBuffer& buffer )
 // Grab our dx datum
 //
 ///////////////////////////////////////////////////////////////
-void CCrashDumpWriter::GetDxInfo ( CBuffer& buffer )
+void CCrashDumpWriter::GetDxInfo(CBuffer& buffer)
 {
-    CBufferWriteStream stream ( buffer );
+    CBufferWriteStream stream(buffer);
 
     // Write info version
-    stream.Write ( 2 );
+    stream.Write(2);
 
     // video card name etc..
     SDxStatus status;
-    CGraphics::GetSingleton ().GetRenderItemManager ()->GetDxStatus ( status );
+    CGraphics::GetSingleton().GetRenderItemManager()->GetDxStatus(status);
 
-    stream.Write ( status.testMode );
+    stream.Write(status.testMode);
 
-    stream.WriteString ( status.videoCard.strName );
-    stream.Write ( status.videoCard.iInstalledMemoryKB );
-    stream.WriteString ( status.videoCard.strPSVersion );
+    stream.WriteString(status.videoCard.strName);
+    stream.Write(status.videoCard.iInstalledMemoryKB);
+    stream.WriteString(status.videoCard.strPSVersion);
 
-    stream.Write ( status.videoMemoryKB.iFreeForMTA );
-    stream.Write ( status.videoMemoryKB.iUsedByFonts );
-    stream.Write ( status.videoMemoryKB.iUsedByTextures );
-    stream.Write ( status.videoMemoryKB.iUsedByRenderTargets );
+    stream.Write(status.videoMemoryKB.iFreeForMTA);
+    stream.Write(status.videoMemoryKB.iUsedByFonts);
+    stream.Write(status.videoMemoryKB.iUsedByTextures);
+    stream.Write(status.videoMemoryKB.iUsedByRenderTargets);
 
-    stream.Write ( status.settings.bWindowed );
-    stream.Write ( status.settings.iFXQuality );
-    stream.Write ( status.settings.iDrawDistance );
-    stream.Write ( status.settings.bVolumetricShadows );
-    stream.Write ( status.settings.iStreamingMemory );
+    stream.Write(status.settings.bWindowed);
+    stream.Write(status.settings.iFXQuality);
+    stream.Write(status.settings.iDrawDistance);
+    stream.Write(status.settings.bVolumetricShadows);
+    stream.Write(status.settings.iStreamingMemory);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -918,23 +947,22 @@ void CCrashDumpWriter::GetDxInfo ( CBuffer& buffer )
 // Grab various bits 'n' bobs
 //
 ///////////////////////////////////////////////////////////////
-void CCrashDumpWriter::GetMiscInfo ( CBuffer& buffer )
+void CCrashDumpWriter::GetMiscInfo(CBuffer& buffer)
 {
-    CBufferWriteStream stream ( buffer );
+    CBufferWriteStream stream(buffer);
 
     // Write info version
-    stream.Write ( 2 );
+    stream.Write(2);
 
     // US/Euro gta_sa.exe
-    unsigned char ucA = *reinterpret_cast < unsigned char* > ( 0x748ADD );
-    unsigned char ucB = *reinterpret_cast < unsigned char* > ( 0x748ADE );
-    stream.Write ( ucA );
-    stream.Write ( ucB );
+    unsigned char ucA = *reinterpret_cast<unsigned char*>(0x748ADD);
+    unsigned char ucB = *reinterpret_cast<unsigned char*>(0x748ADE);
+    stream.Write(ucA);
+    stream.Write(ucB);
 
     // Crash zone if any
-    stream.Write ( ms_uiInCrashZone );
+    stream.Write(ms_uiInCrashZone);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -944,46 +972,45 @@ void CCrashDumpWriter::GetMiscInfo ( CBuffer& buffer )
 // Same stuff as from showmemstat command
 //
 ///////////////////////////////////////////////////////////////
-void CCrashDumpWriter::GetMemoryInfo ( CBuffer& buffer )
+void CCrashDumpWriter::GetMemoryInfo(CBuffer& buffer)
 {
-    CBufferWriteStream stream ( buffer );
+    CBufferWriteStream stream(buffer);
 
     // Write info version
-    stream.Write ( 1 );
+    stream.Write(1);
 
     SMemStatsInfo memStatsNow;
-    GetMemStats ()->SampleState ( memStatsNow );
+    GetMemStats()->SampleState(memStatsNow);
 
     // GTA video memory
-    static const CProxyDirect3DDevice9::SResourceMemory* const nowList[] = {    &memStatsNow.d3dMemory.StaticVertexBuffer, &memStatsNow.d3dMemory.DynamicVertexBuffer,
-                                                                                &memStatsNow.d3dMemory.StaticIndexBuffer, &memStatsNow.d3dMemory.DynamicIndexBuffer,
-                                                                                &memStatsNow.d3dMemory.StaticTexture, &memStatsNow.d3dMemory.DynamicTexture };
-    int iNumLines = NUMELMS( nowList );
-    stream.Write ( iNumLines );
-    for ( int i = 0 ; i < iNumLines ; i++ )
+    static const CProxyDirect3DDevice9::SResourceMemory* const nowList[] = {
+        &memStatsNow.d3dMemory.StaticVertexBuffer, &memStatsNow.d3dMemory.DynamicVertexBuffer, &memStatsNow.d3dMemory.StaticIndexBuffer,
+        &memStatsNow.d3dMemory.DynamicIndexBuffer, &memStatsNow.d3dMemory.StaticTexture,       &memStatsNow.d3dMemory.DynamicTexture};
+    int iNumLines = NUMELMS(nowList);
+    stream.Write(iNumLines);
+    for (int i = 0; i < iNumLines; i++)
     {
-        stream.Write ( nowList[i]->iLockedCount );
-        stream.Write ( nowList[i]->iCreatedCount );
-        stream.Write ( nowList[i]->iDestroyedCount );
-        stream.Write ( nowList[i]->iCurrentCount );
-        stream.Write ( nowList[i]->iCurrentBytes );
+        stream.Write(nowList[i]->iLockedCount);
+        stream.Write(nowList[i]->iCreatedCount);
+        stream.Write(nowList[i]->iDestroyedCount);
+        stream.Write(nowList[i]->iCurrentCount);
+        stream.Write(nowList[i]->iCurrentBytes);
     }
 
     // Game memory
-    stream.Write ( 3 );
-    stream.Write ( memStatsNow.iProcessMemSizeKB );
-    stream.Write ( memStatsNow.iStreamingMemoryUsed );
-    stream.Write ( memStatsNow.iStreamingMemoryAvailable );
+    stream.Write(3);
+    stream.Write(memStatsNow.iProcessMemSizeKB);
+    stream.Write(memStatsNow.iStreamingMemoryUsed);
+    stream.Write(memStatsNow.iStreamingMemoryAvailable);
 
     // Model usage
-    iNumLines = sizeof ( memStatsNow.modelInfo ) / sizeof ( uint );
-    stream.Write ( iNumLines );
-    for ( int i = 0 ; i < iNumLines ; i++ )
+    iNumLines = sizeof(memStatsNow.modelInfo) / sizeof(uint);
+    stream.Write(iNumLines);
+    for (int i = 0; i < iNumLines; i++)
     {
-        stream.Write ( memStatsNow.modelInfo.uiArray[i] );
+        stream.Write(memStatsNow.modelInfo.uiArray[i]);
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -993,20 +1020,16 @@ void CCrashDumpWriter::GetMemoryInfo ( CBuffer& buffer )
 // Grab the crash averted stats
 //
 ///////////////////////////////////////////////////////////////
-SString CCrashDumpWriter::GetCrashAvertedStatsSoFar ()
+SString CCrashDumpWriter::GetCrashAvertedStatsSoFar()
 {
     SString strResult;
-    ms_uiTickCountBase = GetTickCount32 ();
+    ms_uiTickCountBase = GetTickCount32();
 
     int iIndex = 1;
-    for ( std::map < int, SCrashAvertedInfo >::iterator iter = ms_CrashAvertedMap.begin () ; iter != ms_CrashAvertedMap.end () ; ++iter )
+    for (std::map<int, SCrashAvertedInfo>::iterator iter = ms_CrashAvertedMap.begin(); iter != ms_CrashAvertedMap.end(); ++iter)
     {
-        strResult += SString ( "%d) Age:%5d Type:%2d Count:%d\n"
-                                            , iIndex++
-                                            , ms_uiTickCountBase - iter->second.uiTickCount
-                                            , iter->first
-                                            , iter->second.uiUsageCount
-                                            );
+        strResult +=
+            SString("%d) Age:%5d Type:%2d Count:%d\n", iIndex++, ms_uiTickCountBase - iter->second.uiTickCount, iter->first, iter->second.uiUsageCount);
     }
     return strResult;
 }

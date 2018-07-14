@@ -1,12 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CGraphStats.cpp
-*               
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CGraphStats.cpp
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include <StdInc.h>
 
@@ -16,12 +16,13 @@ namespace
 
     struct SGraphStatLine
     {
-        TIMEUS                          prevData;
-	    std::vector < TIMEUS >          dataHistory;
-	    int								iDataPos;
-	    SColor							color;
+        TIMEUS              prevData;
+        std::vector<TIMEUS> dataHistory;
+        int                 iDataPos;
+        SColor              color;
+        std::string         strName;
     };
-}
+}            // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -32,22 +33,20 @@ class CGraphStats : public CGraphStatsInterface
 {
 public:
     ZERO_ON_NEW
-                        CGraphStats               ( void );
-                        ~CGraphStats              ( void );
+    CGraphStats(void);
+    ~CGraphStats(void);
 
     // CGraphStatsInterface methods
-    virtual void        Draw                    ( void );
-    virtual void        SetEnabled              ( bool bEnabled );
-    virtual bool        IsEnabled               ( void );
-    virtual void        AddTimingPoint          ( const char* szName );
+    virtual void Draw(void);
+    virtual void SetEnabled(bool bEnabled);
+    virtual bool IsEnabled(void);
+    virtual void AddTimingPoint(const char* szName);
 
 protected:
-
-    bool                                    m_bEnabled;
-	std::map < SString, SGraphStatLine >    m_LineList;
-    TIMEUS                                  m_StartTime;
+    bool                              m_bEnabled;
+    std::map<SString, SGraphStatLine> m_LineList;
+    TIMEUS                            m_StartTime;
 };
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -56,27 +55,25 @@ protected:
 ///////////////////////////////////////////////////////////////
 CGraphStats* g_pGraphStats = NULL;
 
-CGraphStatsInterface* GetGraphStats ( void )
+CGraphStatsInterface* GetGraphStats(void)
 {
-    if ( !g_pGraphStats )
-        g_pGraphStats = new CGraphStats ();
+    if (!g_pGraphStats)
+        g_pGraphStats = new CGraphStats();
     return g_pGraphStats;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
 // CGraphStats implementation
 //
 ///////////////////////////////////////////////////////////////
-CGraphStats::CGraphStats ( void )
+CGraphStats::CGraphStats(void)
 {
 }
 
-CGraphStats::~CGraphStats ( void )
+CGraphStats::~CGraphStats(void)
 {
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -85,13 +82,12 @@ CGraphStats::~CGraphStats ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CGraphStats::SetEnabled ( bool bEnabled )
+void CGraphStats::SetEnabled(bool bEnabled)
 {
     m_bEnabled = bEnabled;
     m_LineList.clear();
     m_StartTime = 0;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -100,11 +96,10 @@ void CGraphStats::SetEnabled ( bool bEnabled )
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CGraphStats::IsEnabled (void )
+bool CGraphStats::IsEnabled(void)
 {
     return m_bEnabled;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -113,83 +108,83 @@ bool CGraphStats::IsEnabled (void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CGraphStats::AddTimingPoint( const char* szName )
+void CGraphStats::AddTimingPoint(const char* szName)
 {
-    if ( !IsEnabled() )
+    if (!IsEnabled())
         return;
 
     // Start of next frame?
-    if ( szName[0] == 0 )
+    if (szName[0] == 0)
     {
-        TIMEUS endTime = GetTimeUs(); 
-        TIMEUS frameTime = endTime - m_StartTime; 
+        TIMEUS endTime = GetTimeUs();
+        TIMEUS frameTime = endTime - m_StartTime;
         m_StartTime = endTime;
 
         // Duplicate data points to make up for missed time
         int Dups = frameTime / 33000;
-        if ( Dups > 0 )
+        if (Dups > 0)
         {
-            Dups = Min( 100, Dups );
-            for ( std::map < SString, SGraphStatLine >::iterator iter = m_LineList.begin() ; iter != m_LineList.end() ; ++iter )
-	        {
-	            SGraphStatLine* pLine = &iter->second;
+            Dups = std::min(100, Dups);
+            for (std::map<SString, SGraphStatLine>::iterator iter = m_LineList.begin(); iter != m_LineList.end(); ++iter)
+            {
+                SGraphStatLine* pLine = &iter->second;
 
-                float Data = pLine->dataHistory[ pLine->iDataPos ];
-                for ( int i = 0 ; i < Dups ; i++ )
+                float Data = pLine->dataHistory[pLine->iDataPos];
+                for (int i = 0; i < Dups; i++)
                 {
-	                pLine->iDataPos++;
-	                if ( pLine->iDataPos > GRAPHSTAT_HISTORY_SIZE - 1 )
-		                pLine->iDataPos = 0;
-	                pLine->dataHistory[ pLine->iDataPos ] = Data;
+                    pLine->iDataPos++;
+                    if (pLine->iDataPos > GRAPHSTAT_HISTORY_SIZE - 1)
+                        pLine->iDataPos = 0;
+                    pLine->dataHistory[pLine->iDataPos] = Data;
                 }
             }
         }
         return;
     }
 
-    if ( m_StartTime == 0 )
+    if (m_StartTime == 0)
         return;
 
     // Find existing line
-    SGraphStatLine* pLine = MapFind( m_LineList, szName );
+    SGraphStatLine* pLine = MapFind(m_LineList, szName);
 
-    if ( !pLine )
+    if (!pLine)
     {
         // Add new line
-        MapSet( m_LineList, szName, SGraphStatLine() );
-        pLine = MapFind( m_LineList, szName );
-	    pLine->dataHistory.resize( GRAPHSTAT_HISTORY_SIZE );
-        memset( &pLine->dataHistory[ 0 ], 0, pLine->dataHistory.size() );
-	    pLine->iDataPos = 0;
-	    pLine->prevData = 0;
+        MapSet(m_LineList, szName, SGraphStatLine());
+        pLine = MapFind(m_LineList, szName);
+        pLine->dataHistory.resize(GRAPHSTAT_HISTORY_SIZE);
+        memset(&pLine->dataHistory[0], 0, pLine->dataHistory.size());
+        pLine->iDataPos = 0;
+        pLine->prevData = 0;
+        pLine->strName = szName;
 
         // Random color based on line name
         MD5 md5;
-        CMD5Hasher().Calculate( szName, strlen( szName ), md5 );
+        CMD5Hasher().Calculate(szName, strlen(szName), md5);
         uchar* p = md5.data;
-        while ( p[0] + p[1] + p[2] < 128 )
+        while (p[0] + p[1] + p[2] < 128)
         {
-            int f = rand() % NUMELMS( md5.data );
+            int f = rand() % NUMELMS(md5.data);
             int t = rand() % 3;
-            p[t] = Min( 255, p[t] + p[f] + 1 );
-        } 
-	    pLine->color = SColorRGBA( p[0], p[1], p[2] ,255 );
+            p[t] = std::min(255, p[t] + p[f] + 1);
+        }
+        pLine->color = SColorRGBA(p[0], p[1], p[2], 255);
     }
 
     // Calc timing averaged with previous frame
     TIMEUS NewData = GetTimeUs() - m_StartTime;
-    TIMEUS AvgData = ( NewData + pLine->prevData ) / 2;
+    TIMEUS AvgData = (NewData + pLine->prevData) / 2;
     pLine->prevData = NewData;
 
     // Inc position
-	pLine->iDataPos++;
-	if(pLine->iDataPos > GRAPHSTAT_HISTORY_SIZE-1)
-		pLine->iDataPos = 0;
+    pLine->iDataPos++;
+    if (pLine->iDataPos > GRAPHSTAT_HISTORY_SIZE - 1)
+        pLine->iDataPos = 0;
 
     // Insert data point
-	pLine->dataHistory[ pLine->iDataPos ] = AvgData;
+    pLine->dataHistory[pLine->iDataPos] = AvgData;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -198,45 +193,47 @@ void CGraphStats::AddTimingPoint( const char* szName )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CGraphStats::Draw ( void )
+void CGraphStats::Draw(void)
 {
-    if ( !m_bEnabled )
+    if (!m_bEnabled)
         return;
 
     CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
 
-    uint uiViewportHeight = pGraphics->GetViewportHeight();
-    uint uiOriginX = 10;
-    uint uiOriginY = Min < int > ( 500, uiViewportHeight - 10 );
-    uint uiSizeX = GRAPHSTAT_HISTORY_SIZE;
-    uint uiSizeY = 150;
-    uint uiRangeY = 100;    // 100ms
-    float fLineScale = 1/1000.f / uiRangeY * uiSizeY;
+    uint  uiViewportHeight = pGraphics->GetViewportHeight();
+    uint  uiOriginX = 10;
+    uint  uiOriginY = std::min<int>(500, uiViewportHeight - 10);
+    uint  uiSizeX = GRAPHSTAT_HISTORY_SIZE;
+    uint  uiSizeY = 150;
+    uint  uiRangeY = 100;            // 100ms
+    float fLineScale = 1 / 1000.f / uiRangeY * uiSizeY;
+    float fHalfLineHeight = pGraphics->GetDXFontHeight() / 2;
 
-    // Backgrounf box
-	pGraphics->DrawRectQueued( uiOriginX,  uiOriginY - uiSizeY,  uiSizeX, uiSizeY, SColorRGBA( 0, 0, 0, 128 ), true );
+    // Backgroung box
+    pGraphics->DrawRectQueued(uiOriginX, uiOriginY - uiSizeY, uiSizeX, uiSizeY, SColorRGBA(0, 0, 0, 128), true);
 
-	// Draw data line.
-    for ( std::map < SString, SGraphStatLine >::iterator iter = m_LineList.begin() ; iter != m_LineList.end() ; ++iter )
-	{
-	    SGraphStatLine& line = iter->second;
+    // Draw data line.
+    for (const auto& dataLine : m_LineList)
+    {
+        const SGraphStatLine& line = dataLine.second;
+        int                   iDataPos = line.iDataPos;
+        int                   iDataPosPrev = iDataPos;
 
-		int iDataPos = line.iDataPos;
-		int iDataPosPrev = iDataPos;
-		if ( iDataPos == -1 )
-			iDataPos = GRAPHSTAT_HISTORY_SIZE - 1;
-
-        for ( int i = uiSizeX - 1 ; i > 0 ; i-- )
+        for (int i = uiSizeX - 1; i > 0; i--)
         {
-			float fY0 = line.dataHistory[ iDataPos ] * fLineScale;
-			float fY1 = line.dataHistory[ iDataPosPrev ] * fLineScale;
+            float fY0 = line.dataHistory[iDataPos] * fLineScale;
+            float fY1 = line.dataHistory[iDataPosPrev] * fLineScale;
 
-			iDataPosPrev = iDataPos;
-			iDataPos--;
-			if ( iDataPos == -1 )
-				iDataPos = GRAPHSTAT_HISTORY_SIZE - 1;
+            iDataPosPrev = iDataPos;
+            iDataPos--;
+            if (iDataPos == -1)
+                iDataPos = GRAPHSTAT_HISTORY_SIZE - 1;
 
-			pGraphics->DrawLineQueued( uiOriginX + i - 1,  uiOriginY - fY0,  uiOriginX + i,  uiOriginY - fY1, 1, line.color, true );
+            pGraphics->DrawLineQueued(uiOriginX + i - 1, uiOriginY - fY0, uiOriginX + i, uiOriginY - fY1, 1, line.color, true);
         }
-	}
+
+        float fX = uiOriginX + uiSizeX + 2;
+        float fY = uiOriginY - line.dataHistory[line.iDataPos] * fLineScale - fHalfLineHeight;
+        pGraphics->DrawStringQueued(fX, fY, fX, fY, line.color, line.strName.c_str(), 1.0f, 1.0f, DT_NOCLIP, nullptr, true);
+    }
 }

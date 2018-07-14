@@ -1,25 +1,24 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CPerfStat.EventPacketUsage.cpp
-*  PURPOSE:     Performance stats manager class
-*  DEVELOPERS:  Mr OCD
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CPerfStat.EventPacketUsage.cpp
+ *  PURPOSE:     Performance stats manager class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
 struct SEventUsage
 {
-    SEventUsage( void ) : iTotal( 0 ), iEventOut( 0 ), iElementDataOut( 0 ), iElementDataRelay( 0 ) {}
+    SEventUsage(void) : iTotal(0), iEventOut(0), iElementDataOut(0), iElementDataRelay(0) {}
     SString strName;
-    int iTotal;
-    int iEventOut;
-    int iElementDataOut;
-    int iElementDataRelay;
+    int     iTotal;
+    int     iEventOut;
+    int     iElementDataOut;
+    int     iElementDataRelay;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -34,30 +33,29 @@ class CPerfStatEventPacketUsageImpl : public CPerfStatEventPacketUsage
 public:
     ZERO_ON_NEW
 
-                                CPerfStatEventPacketUsageImpl  ( void );
-    virtual                     ~CPerfStatEventPacketUsageImpl ( void );
+    CPerfStatEventPacketUsageImpl(void);
+    virtual ~CPerfStatEventPacketUsageImpl(void);
 
     // CPerfStatModule
-    virtual const SString&      GetCategoryName         ( void );
-    virtual void                DoPulse                 ( void );
-    virtual void                GetStats                ( CPerfStatResult* pOutResult, const std::map < SString, int >& optionMap, const SString& strFilter );
+    virtual const SString& GetCategoryName(void);
+    virtual void           DoPulse(void);
+    virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CPerfStatEventPacketUsage
-    virtual void                UpdateElementDataUsageOut       ( const char* szName, uint uiNumPlayers, uint uiSize );
-    virtual void                UpdateElementDataUsageRelayed   ( const char* szName, uint uiNumPlayers, uint uiSize );
-    virtual void                UpdateEventUsageOut             ( const char* szName, uint uiNumPlayers );
+    virtual void UpdateElementDataUsageOut(const char* szName, uint uiNumPlayers, uint uiSize);
+    virtual void UpdateElementDataUsageRelayed(const char* szName, uint uiNumPlayers, uint uiSize);
+    virtual void UpdateEventUsageOut(const char* szName, uint uiNumPlayers);
 
     // CPerfStatEventPacketUsageImpl
-    void                        MaybeRecordStats        ( void );
+    void MaybeRecordStats(void);
 
-    bool                                m_bEnabled;
-    CElapsedTime                        m_TimeSinceGetStats;
-    long long                           m_llNextRecordTime;
-    SString                             m_strCategoryName;
-    std::map < SString, SEventUsage >   m_EventUsageLiveMap;
-    std::vector < SEventUsage >         m_EventUsageSortedList;
+    bool                           m_bEnabled;
+    CElapsedTime                   m_TimeSinceGetStats;
+    long long                      m_llNextRecordTime;
+    SString                        m_strCategoryName;
+    std::map<SString, SEventUsage> m_EventUsageLiveMap;
+    std::vector<SEventUsage>       m_EventUsageSortedList;
 };
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -68,13 +66,12 @@ public:
 ///////////////////////////////////////////////////////////////
 static std::unique_ptr<CPerfStatEventPacketUsageImpl> g_pPerfStatEventPacketUsageImp;
 
-CPerfStatEventPacketUsage* CPerfStatEventPacketUsage::GetSingleton ()
+CPerfStatEventPacketUsage* CPerfStatEventPacketUsage::GetSingleton()
 {
-    if ( !g_pPerfStatEventPacketUsageImp )
-        g_pPerfStatEventPacketUsageImp.reset(new CPerfStatEventPacketUsageImpl ());
+    if (!g_pPerfStatEventPacketUsageImp)
+        g_pPerfStatEventPacketUsageImp.reset(new CPerfStatEventPacketUsageImpl());
     return g_pPerfStatEventPacketUsageImp.get();
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -83,12 +80,11 @@ CPerfStatEventPacketUsage* CPerfStatEventPacketUsage::GetSingleton ()
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatEventPacketUsageImpl::CPerfStatEventPacketUsageImpl ( void )
+CPerfStatEventPacketUsageImpl::CPerfStatEventPacketUsageImpl(void)
 {
     m_strCategoryName = "Event Packet usage";
 }
 
-
 ///////////////////////////////////////////////////////////////
 //
 // CPerfStatEventPacketUsageImpl::CPerfStatEventPacketUsageImpl
@@ -96,7 +92,7 @@ CPerfStatEventPacketUsageImpl::CPerfStatEventPacketUsageImpl ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatEventPacketUsageImpl::~CPerfStatEventPacketUsageImpl ( void )
+CPerfStatEventPacketUsageImpl::~CPerfStatEventPacketUsageImpl(void)
 {
 }
 
@@ -107,11 +103,10 @@ CPerfStatEventPacketUsageImpl::~CPerfStatEventPacketUsageImpl ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CPerfStatEventPacketUsageImpl::GetCategoryName ( void )
+const SString& CPerfStatEventPacketUsageImpl::GetCategoryName(void)
 {
     return m_strCategoryName;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -120,7 +115,7 @@ const SString& CPerfStatEventPacketUsageImpl::GetCategoryName ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatEventPacketUsageImpl::DoPulse ( void )
+void CPerfStatEventPacketUsageImpl::DoPulse(void)
 {
     MaybeRecordStats();
 }
@@ -132,16 +127,15 @@ void CPerfStatEventPacketUsageImpl::DoPulse ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatEventPacketUsageImpl::UpdateElementDataUsageOut ( const char* szName, uint uiNumPlayers, uint uiSize )
+void CPerfStatEventPacketUsageImpl::UpdateElementDataUsageOut(const char* szName, uint uiNumPlayers, uint uiSize)
 {
-    if ( !m_bEnabled )
+    if (!m_bEnabled)
         return;
 
-    SEventUsage& usage = MapGet( m_EventUsageLiveMap, szName );
+    SEventUsage& usage = MapGet(m_EventUsageLiveMap, szName);
     usage.iTotal += uiNumPlayers;
     usage.iElementDataOut += uiNumPlayers;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -150,16 +144,15 @@ void CPerfStatEventPacketUsageImpl::UpdateElementDataUsageOut ( const char* szNa
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatEventPacketUsageImpl::UpdateElementDataUsageRelayed ( const char* szName, uint uiNumPlayers, uint uiSize )
+void CPerfStatEventPacketUsageImpl::UpdateElementDataUsageRelayed(const char* szName, uint uiNumPlayers, uint uiSize)
 {
-    if ( !m_bEnabled )
+    if (!m_bEnabled)
         return;
 
-    SEventUsage& usage = MapGet( m_EventUsageLiveMap, szName );
+    SEventUsage& usage = MapGet(m_EventUsageLiveMap, szName);
     usage.iTotal += uiNumPlayers;
     usage.iElementDataRelay += uiNumPlayers;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -168,16 +161,15 @@ void CPerfStatEventPacketUsageImpl::UpdateElementDataUsageRelayed ( const char* 
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatEventPacketUsageImpl::UpdateEventUsageOut ( const char* szName, uint uiNumPlayers )
+void CPerfStatEventPacketUsageImpl::UpdateEventUsageOut(const char* szName, uint uiNumPlayers)
 {
-    if ( !m_bEnabled )
+    if (!m_bEnabled)
         return;
 
-    SEventUsage& usage = MapGet( m_EventUsageLiveMap, szName );
+    SEventUsage& usage = MapGet(m_EventUsageLiveMap, szName);
     usage.iTotal += uiNumPlayers;
     usage.iEventOut += uiNumPlayers;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -186,25 +178,27 @@ void CPerfStatEventPacketUsageImpl::UpdateEventUsageOut ( const char* szName, ui
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatEventPacketUsageImpl::MaybeRecordStats ( void )
+void CPerfStatEventPacketUsageImpl::MaybeRecordStats(void)
 {
     // Someone watching?
-    if ( m_TimeSinceGetStats.Get () < 10000 )
+    if (m_TimeSinceGetStats.Get() < 10000)
     {
         // Time for record update?    // Copy and clear once every 5 seconds
-        long long llTime = GetTickCount64_ ();
-        if ( llTime >= m_llNextRecordTime )
+        long long llTime = GetTickCount64_();
+        if (llTime >= m_llNextRecordTime)
         {
-            m_llNextRecordTime = Max ( m_llNextRecordTime + 5000, llTime + 5000 / 10 * 9 );
+            m_llNextRecordTime = std::max(m_llNextRecordTime + 5000, llTime + 5000 / 10 * 9);
 
             // Copy into a list and sort
             m_EventUsageSortedList.clear();
-            for( std::map < SString, SEventUsage >::iterator iter = m_EventUsageLiveMap.begin() ; iter != m_EventUsageLiveMap.end() ; ++iter )
+            for (std::map<SString, SEventUsage>::iterator iter = m_EventUsageLiveMap.begin(); iter != m_EventUsageLiveMap.end(); ++iter)
             {
                 iter->second.strName = iter->first;
-                m_EventUsageSortedList.push_back( iter->second );
+                m_EventUsageSortedList.push_back(iter->second);
             }
-            sort_inline ( m_EventUsageSortedList.begin (), m_EventUsageSortedList.end (), ( const SEventUsage& a, const SEventUsage& b ) { return a.iTotal > b.iTotal; } );
+
+            std::sort(m_EventUsageSortedList.begin(), m_EventUsageSortedList.end(),
+                      [](const SEventUsage& a, const SEventUsage& b) { return a.iTotal > b.iTotal; });
 
             m_EventUsageLiveMap.clear();
         }
@@ -215,7 +209,6 @@ void CPerfStatEventPacketUsageImpl::MaybeRecordStats ( void )
     }
 }
 
-
 ///////////////////////////////////////////////////////////////
 //
 // CPerfStatEventPacketUsageImpl::GetStats
@@ -223,53 +216,53 @@ void CPerfStatEventPacketUsageImpl::MaybeRecordStats ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatEventPacketUsageImpl::GetStats ( CPerfStatResult* pResult, const std::map < SString, int >& strOptionMap, const SString& strFilter )
+void CPerfStatEventPacketUsageImpl::GetStats(CPerfStatResult* pResult, const std::map<SString, int>& strOptionMap, const SString& strFilter)
 {
-    m_TimeSinceGetStats.Reset ();
+    m_TimeSinceGetStats.Reset();
     m_bEnabled = true;
     MaybeRecordStats();
 
     //
     // Set option flags
     //
-    bool bHelp = MapContains ( strOptionMap, "h" );
+    bool bHelp = MapContains(strOptionMap, "h");
 
     //
     // Process help
     //
-    if ( bHelp )
+    if (bHelp)
     {
-        pResult->AddColumn ( "Event Packet usage help" );
-        pResult->AddRow ()[0] ="Option h - This help";
+        pResult->AddColumn("Event Packet usage help");
+        pResult->AddRow()[0] = "Option h - This help";
         return;
     }
 
     // Add columns
-    pResult->AddColumn ( "Type" );
-    pResult->AddColumn ( "Name" );
-    pResult->AddColumn ( "msgs/sec" );
-    pResult->AddColumn ( "5 sec.msgs" );
+    pResult->AddColumn("Type");
+    pResult->AddColumn("Name");
+    pResult->AddColumn("msgs/sec");
+    pResult->AddColumn("5 sec.msgs");
 
     // Fill rows
-    for ( uint i = 0 ; i < m_EventUsageSortedList.size() && i < 30 ; i++ )
+    for (uint i = 0; i < m_EventUsageSortedList.size() && i < 30; i++)
     {
         const SEventUsage& usage = m_EventUsageSortedList[i];
 
         // Add row
-        SString* row = pResult->AddRow ();
+        SString* row = pResult->AddRow();
 
         SString strType;
-        if ( usage.iEventOut )
+        if (usage.iEventOut)
             strType += "Event ";
-        if ( usage.iElementDataOut )
+        if (usage.iElementDataOut)
             strType += "ElementData ";
-        if ( usage.iElementDataRelay )
+        if (usage.iElementDataRelay)
             strType += "ElementData(Relay) ";
 
         int c = 0;
         row[c++] = strType;
         row[c++] = usage.strName;
-        row[c++] = SString ( "%d", ( usage.iTotal + 4 ) / 5 );
-        row[c++] = SString ( "%d", usage.iTotal );
+        row[c++] = SString("%d", (usage.iTotal + 4) / 5);
+        row[c++] = SString("%d", usage.iTotal);
     }
 }

@@ -55,7 +55,7 @@
       'target_name': 'dump_syms',
       'type': 'executable',
       'sources': [
-        'dump_syms/dump_syms_tool.mm',
+        'dump_syms/dump_syms_tool.cc',
       ],
       'link_settings': {
         'libraries': [

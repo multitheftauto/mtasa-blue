@@ -1,23 +1,19 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        loader/Main.cpp
-*  PURPOSE:     MTA loader
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Christian Myhre Lundheim <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        loader/Main.cpp
+ *  PURPOSE:     MTA loader
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 #include "SharedUtil.Win32Utf8FileHooks.hpp"
-#if defined(_DEBUG) 
+#if defined(MTA_DEBUG)
     #include "SharedUtil.Tests.hpp"
 #endif
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -30,13 +26,12 @@
 //      4. By 'MTA San Andreas.exe' during auto-update (in a temporary directory somewhere) (Which may then call it again as admin)
 //
 ///////////////////////////////////////////////////////////////
-extern "C" _declspec(dllexport)
-int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     AddUtf8FileHooks();
 
-#if defined(_DEBUG) 
-    SharedUtil_Tests ();
+#if defined(MTA_DEBUG)
+    SharedUtil_Tests();
 #endif
 
     //
@@ -44,13 +39,13 @@ int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCm
     //
 
     // Let install manager figure out what MTASA path to use
-    GetInstallManager()->SetMTASAPathSource( lpCmdLine );
+    GetInstallManager()->SetMTASAPathSource(lpCmdLine);
 
     // Start logging.....now
     BeginEventLog();
 
     // Start localization if possible
-    InitLocalization( false );
+    InitLocalization(false);
 
     // Handle commands from the installer
     HandleSpecialLaunchOptions();
@@ -59,11 +54,10 @@ int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCm
     HandleDuplicateLaunching();
 
     // Show logo
-    ShowSplash( g_hInstance );
+    ShowSplash(g_hInstance);
 
     // Other init stuff
     ClearPendingBrowseToSolution();
-
 
     //
     // Update
@@ -72,13 +66,12 @@ int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCm
     // Continue any update procedure
     SString strCmdLine = GetInstallManager()->Continue();
 
-
     //
     // Launch
     //
 
     // Ensure localization is started
-    InitLocalization( true );
+    InitLocalization(true);
 
     // Setup/test various counters and flags for monitoring problems
     PreLaunchWatchDogs();
@@ -88,7 +81,7 @@ int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCm
     ForbodenProgramsMessage();
     CycleEventLog();
     BsodDetectionPreLaunch();
-    MaybeShowCopySettingsDialog ();
+    MaybeShowCopySettingsDialog();
 
     // Make sure GTA is not running
     HandleIfGTAIsAlreadyRunning();
@@ -100,16 +93,16 @@ int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCm
     CheckAntiVirusStatus();
 
     // Ensure logo is showing
-    ShowSplash( g_hInstance );
+    ShowSplash(g_hInstance);
 
     // Check MTA files look good
     CheckDataFiles();
     CheckLibVersions();
 
     // Go for launch
-    int iReturnCode = LaunchGame( strCmdLine );
+    int iReturnCode = LaunchGame(strCmdLine);
 
-    PostRunWatchDogs( iReturnCode );
+    PostRunWatchDogs(iReturnCode);
 
     //
     // Quit
@@ -120,7 +113,7 @@ int DoWinMain ( HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LPSTR lpCm
     // Maybe show help if trouble was encountered
     ProcessPendingBrowseToSolution();
 
-    AddReportLog ( 1044, SString ( "* End (0x%X)* pid:%d", iReturnCode, GetCurrentProcessId() ) );
+    AddReportLog(1044, SString("* End (0x%X)* pid:%d", iReturnCode, GetCurrentProcessId()));
 
     RemoveUtf8FileHooks();
     return iReturnCode;

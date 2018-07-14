@@ -1,5 +1,4 @@
 MODULE windows x86 99302CF6F3C244F2B8E048BA0268A12F1 omap_reorder_bbs.pdb
-INFO CODE_ID 517C17D711000 omap_reorder_bbs.exe
 FILE 1 c:\src\breakpad\src\src\tools\windows\dump_syms\testdata\dump_syms_regtest.cc
 FILE 2 f:\dd\public\sdk\inc\internal\pebteb.h
 FILE 3 f:\dd\public\sdk\inc\internal\ntldr.h
@@ -2810,7 +2809,7 @@ FUNC 67c0 84 0 _local_unwind2
 FUNC 6844 23 0 _abnormal_termination
 FUNC 6867 9 0 _NLG_Notify1
 FUNC 6870 1f 0 _NLG_Notify
-PUBLIC 6887 0 _NLG_Dispatch2
+PUBLIC m 6887 0 _NLG_Dispatch
 FUNC 688f 3 0 _NLG_Call
 PUBLIC 6891 0 _NLG_Return2
 FUNC 4695 33 0 abort

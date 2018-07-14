@@ -31,7 +31,7 @@ unsigned long CRCGenerator::GetCRCFromFile ( const char* szFilename )
 unsigned long CRCGenerator::GetCRCFromFile ( const char* szFilename, unsigned long ucOldCRC )
 {
     // Open the file
-    FILE* pFile = fopen ( szFilename, "rb" );
+    FILE* pFile = File::Fopen ( szFilename, "rb" );
     if ( pFile )
     {
         // Start at the old CRC

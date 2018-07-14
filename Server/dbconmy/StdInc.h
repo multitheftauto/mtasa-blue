@@ -2,7 +2,6 @@
 #pragma message("Compiling precompiled header.\n")
 
 #include <windows.h>
-#include <winsock.h>
 #include <mmsystem.h>
 #endif
 

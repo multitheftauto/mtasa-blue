@@ -5,7 +5,6 @@ project "ehs"
 	includedirs { "../pcre", "../pme" }
 
 	defines { "WIN32_LEAN_AND_MEAN", "_LIB" }
-	disablewarnings { "4800" }
 	
 	vpaths { 
 		["Headers/*"] = "**.h",
@@ -26,3 +25,4 @@ project "ehs"
 	
 	filter "system:windows"
 		includedirs { "../pthreads/include" }
+		disablewarnings { "4800" }

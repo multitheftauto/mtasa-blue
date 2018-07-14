@@ -49,8 +49,9 @@ namespace google_breakpad {
 
 LinuxCoreDumper::LinuxCoreDumper(pid_t pid,
                                  const char* core_path,
-                                 const char* procfs_path)
-    : LinuxDumper(pid),
+                                 const char* procfs_path,
+                                 const char* root_prefix)
+    : LinuxDumper(pid, root_prefix),
       core_path_(core_path),
       procfs_path_(procfs_path),
       thread_infos_(&allocator_, 8) {
@@ -211,6 +212,7 @@ bool LinuxCoreDumper::EnumerateThreads() {
         if (first_thread) {
           crash_thread_ = pid;
           crash_signal_ = status->pr_info.si_signo;
+          crash_signal_code_ = status->pr_info.si_code;
         }
         first_thread = false;
         threads_.push_back(pid);

@@ -1,15 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        gui/CGUITab_Impl.h
-*  PURPOSE:     Tab widget class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        gui/CGUITab_Impl.h
+ *  PURPOSE:     Tab widget class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CGUITAB_IMPL_H
 #define __CGUITAB_IMPL_H
@@ -20,12 +18,12 @@
 class CGUITab_Impl : public CGUITab, public CGUIElement_Impl, public CGUITabList
 {
 public:
-                            CGUITab_Impl            ( class CGUI_Impl* pManager, CGUIElement_Impl* pParent, const char* szCaption );
-                            ~CGUITab_Impl           ( void );
+    CGUITab_Impl(class CGUI_Impl* pManager, CGUIElement_Impl* pParent, const char* szCaption);
+    ~CGUITab_Impl(void);
 
-    void                    SetCaption              ( const char* szCaption );
+    void SetCaption(const char* szCaption);
 
-    eCGUIType               GetType                 ( void ) { return CGUI_TAB; };
+    eCGUIType GetType(void) { return CGUI_TAB; };
 
 #define SETVISIBLE_HACK
 #define SETENABLED_HACK
@@ -33,10 +31,10 @@ public:
 #undef SETENABLED_HACK
 #undef SETVISIBLE_HACK
 
-    void                    SetVisible              ( bool bVisible );
-    bool                    IsVisible               ( void );
-    void                    SetEnabled              ( bool bEnabled );
-    bool                    IsEnabled               ( void );
+    void SetVisible(bool bVisible);
+    bool IsVisible(void);
+    void SetEnabled(bool bEnabled);
+    bool IsEnabled(void);
 };
 
 #endif

@@ -1,10 +1,8 @@
-#pragma once
-
 #ifdef WIN32
 #pragma message("Compiling precompiled header.\n")
 
+#include <winsock2.h>
 #include <windows.h>
-#include <winsock.h>
 #include <mmsystem.h>
 #endif
 
@@ -20,6 +18,7 @@
 #include <vector>
 #include <ctime>
 #include <sstream>
+#include <mutex>
 
 // Forward declarations
 class CAclRightName;
@@ -29,7 +28,6 @@ struct SAclRequest;
 #include "MTAPlatform.h"
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
 #include "SharedUtil.h"
-#include "gccHashSupport.h"
 #include <xml/CXML.h>
 #include <xml/CXMLNode.h>
 #include <xml/CXMLFile.h>
@@ -40,7 +38,6 @@ struct SAclRequest;
 #include "CSphere.h"
 #include "CBox.h"
 #include "CMatrix.h"
-#include "CQuat.h"
 #include "net/Packets.h"
 #include "Enums.h"
 #include <bochs_internal/crc32.h>
@@ -307,4 +304,4 @@ struct SAclRequest;
 #include "../../version.h"
 
 extern CNetServer* g_pRealNetServer;
-extern CGame* g_pGame;
+extern CGame*      g_pGame;

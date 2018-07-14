@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/Config.h
-*  PURPOSE:     Header for platform specific functions, types and defines
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/Config.h
+ *  PURPOSE:     Header for platform specific functions, types and defines
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 // Header file for platform specific functions, types and defines
 
@@ -17,21 +17,31 @@
 #include <Common.h>
 
 /*** va_pass() (passing of ... variable length arguments ***/
-template<unsigned char count>
-struct SVaPassNext{
-    SVaPassNext<count-1> big;
-    unsigned long dw;
+template <unsigned char count>
+struct SVaPassNext
+{
+    SVaPassNext<count - 1> big;
+    unsigned long          dw;
 };
-template<> struct SVaPassNext<0>{};
-//SVaPassNext - is generator of structure of any size at compile time.
+template <>
+struct SVaPassNext<0>
+{
+};
+// SVaPassNext - is generator of structure of any size at compile time.
 
-class CVaPassNext{
+class CVaPassNext
+{
 public:
     SVaPassNext<50> svapassnext;
-    CVaPassNext(va_list & args){
-        try{//to avoid access violation
+    CVaPassNext(va_list& args)
+    {
+        try
+        {            // to avoid access violation
             memcpy(&svapassnext, args, sizeof(svapassnext));
-        } catch (...) {}
+        }
+        catch (...)
+        {
+        }
     }
 };
 #define va_pass(valist) CVaPassNext(valist).svapassnext
@@ -43,13 +53,12 @@ public:
 
 // Min and max number of characters in player nametags (this must match the client's)
 #define MIN_PLAYER_NAMETAG_LENGTH 1
-#define MAX_PLAYER_NAMETAG_LENGTH 22
+#define MAX_PLAYER_NAMETAG_LENGTH 64
 
 #define MAX_TEAM_NAME_LENGTH 255
 
-// Min and max number of characters in passwords
+// Min number of characters in passwords
 #define MIN_PASSWORD_LENGTH 1
-#define MAX_PASSWORD_LENGTH 30
 
 // Min and max number of characters in chat messages
 #define MIN_CHAT_LENGTH 1

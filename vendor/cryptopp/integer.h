@@ -1,7 +1,16 @@
+// integer.h - written and placed in the public domain by Wei Dai
+
+//! \file integer.h
+//! \brief Multiple precision integer with arithmetic operations
+//! \details The Integer class can represent positive and negative integers
+//!   with absolute value less than (256**sizeof(word))<sup>(256**sizeof(int))</sup>.
+//! \details Internally, the library uses a sign magnitude representation, and the class
+//!   has two data members. The first is a IntegerSecBlock (a SecBlock<word>) and it is
+//!   used to hold the representation. The second is a Sign, and its is used to track
+//!   the sign of the Integer.
+
 #ifndef CRYPTOPP_INTEGER_H
 #define CRYPTOPP_INTEGER_H
-
-/** \file */
 
 #include "cryptlib.h"
 #include "secblock.h"
@@ -18,7 +27,12 @@ struct InitializeInteger
 	InitializeInteger();
 };
 
+// http://github.com/weidai11/cryptopp/issues/256
+#if defined(CRYPTOPP_WORD128_AVAILABLE)
+typedef SecBlock<word, AllocatorWithCleanup<word, true> > IntegerSecBlock;
+#else
 typedef SecBlock<word, AllocatorWithCleanup<word, CRYPTOPP_BOOL_X86> > IntegerSecBlock;
+#endif
 
 //! \brief Multiple precision integer with arithmetic operations
 //! \details The Integer class can represent positive and negative integers
@@ -107,7 +121,7 @@ public:
 		//! \details Byte order was added at Crypto++ 5.7 to allow use of little-endian
 		//!   integers with curve25519, Poly1305 and Microsoft CAPI.
 		explicit Integer(const char *str, ByteOrder order = BIG_ENDIAN_ORDER);
-		
+
 		//! \brief Convert from a wide C-string
 		//! \param str wide C-string value
 		//! \param order byte order
@@ -225,8 +239,8 @@ public:
 		//! \details OpenPGPEncode places result into a BufferedTransformation object and returns the
 		//!   number of bytes used for the encoding
 		size_t OpenPGPEncode(byte *output, size_t bufferSize) const;
-	
-		//! \brief Encode absolute value in OpenPGP format	
+
+		//! \brief Encode absolute value in OpenPGP format
 		//! \param bt BufferedTransformation object
 		//! \returns length of the output
 		//! \details OpenPGPEncode places result into a BufferedTransformation object and returns the
@@ -238,7 +252,7 @@ public:
 		//! \param inputLen length of the byte array
 		//! \param sign enumeration indicating Signedness
 		void Decode(const byte *input, size_t inputLen, Signedness sign=UNSIGNED);
-		
+
 		//! \brief Decode nonnegative value from big-endian byte array
 		//! \param bt BufferedTransformation object
 		//! \param inputLen length of the byte array
@@ -263,7 +277,7 @@ public:
 		//! \brief Exception thrown when an error is encountered decoding an OpenPGP integer
 		class OpenPGPDecodeErr : public Exception
 		{
-		public: 
+		public:
 			OpenPGPDecodeErr() : Exception(INVALID_DATA_FORMAT, "OpenPGP decode error") {}
 		};
 
@@ -409,10 +423,10 @@ public:
 
 		//! \brief Reverse the Sign of the Integer
 		void Negate();
-		
+
 		//! \brief Sets the Integer to positive
 		void SetPositive() {sign = POSITIVE;}
-		
+
 		//! \brief Sets the Integer to negative
 		void SetNegative() {if (!!(*this)) sign = NEGATIVE;}
 
@@ -528,7 +542,7 @@ public:
 		//! \sa IntToString<Integer>
 		friend CRYPTOPP_DLL std::ostream& CRYPTOPP_API operator<<(std::ostream& out, const Integer &a);
 	//@}
-		
+
 #ifndef CRYPTOPP_DOXYGEN_PROCESSING
 	//! modular multiplication
 	CRYPTOPP_DLL friend Integer CRYPTOPP_API a_times_b_mod_c(const Integer &x, const Integer& y, const Integer& m);
@@ -537,13 +551,13 @@ public:
 #endif
 
 private:
-	
+
 	Integer(word value, size_t length);
 	int PositiveCompare(const Integer &t) const;
-	
+
 	IntegerSecBlock reg;
 	Sign sign;
-	
+
 #ifndef CRYPTOPP_DOXYGEN_PROCESSING
 	friend class ModularArithmetic;
 	friend class MontgomeryRepresentation;

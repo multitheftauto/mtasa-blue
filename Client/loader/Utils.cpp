@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        loader/Utils.cpp
-*  PURPOSE:     Loading utilities
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        loader/Utils.cpp
+ *  PURPOSE:     Loading utilities
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 #include <tchar.h>
@@ -20,9 +19,9 @@
 
 static SString g_strMTASAPath;
 static SString g_strGTAPath;
-static HANDLE g_hMutex = NULL;
+static HANDLE  g_hMutex = NULL;
 static HMODULE hLibraryModule = NULL;
-HINSTANCE g_hInstance = NULL;
+HINSTANCE      g_hInstance = NULL;
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -31,31 +30,31 @@ HINSTANCE g_hInstance = NULL;
 // Call a Kernel32 function in a remote process
 //
 ///////////////////////////////////////////////////////////////////////////
-bool CallRemoteFunction( HANDLE hProcess, const SString& strFunctionName, const WString& strLibPath )
+bool CallRemoteFunction(HANDLE hProcess, const SString& strFunctionName, const WString& strLibPath)
 {
     const wchar_t* szLibPath = *strLibPath;
-    size_t uiLibPathLength = strLibPath.length();
+    size_t         uiLibPathLength = strLibPath.length();
 
     /* Allocate memory in the remote process for the library path */
-    HANDLE hThread = 0;
-    void* pLibPathRemote = NULL;
-    uint uiLibPathSize = ( uiLibPathLength + 1 ) * sizeof( wchar_t );
-    HMODULE hKernel32 = GetModuleHandle( "Kernel32" );
-    pLibPathRemote = _VirtualAllocEx( hProcess, NULL, uiLibPathSize, MEM_COMMIT, PAGE_READWRITE );
-    
-    if ( pLibPathRemote == NULL )
+    HANDLE  hThread = 0;
+    void*   pLibPathRemote = NULL;
+    uint    uiLibPathSize = (uiLibPathLength + 1) * sizeof(wchar_t);
+    HMODULE hKernel32 = GetModuleHandle("Kernel32");
+    pLibPathRemote = _VirtualAllocEx(hProcess, NULL, uiLibPathSize, MEM_COMMIT, PAGE_READWRITE);
+
+    if (pLibPathRemote == NULL)
     {
         return 0;
     }
 
     /* Make sure pLibPathRemote is always freed */
-    __try {
-
+    __try
+    {
         /* Write the DLL library path to the remote allocation */
         DWORD byteswritten = 0;
-        _WriteProcessMemory ( hProcess, pLibPathRemote, (void*)szLibPath, uiLibPathSize, &byteswritten );
+        _WriteProcessMemory(hProcess, pLibPathRemote, (void*)szLibPath, uiLibPathSize, &byteswritten);
 
-        if ( byteswritten != uiLibPathSize )
+        if (byteswritten != uiLibPathSize)
         {
             return 0;
         }
@@ -64,26 +63,20 @@ bool CallRemoteFunction( HANDLE hProcess, const SString& strFunctionName, const 
            remotly allocated path buffer as an argument to that thread (and also to LoadLibraryA)
            will make the remote process load the DLL into it's userspace (giving the DLL full
            access to the game executable).*/
-        LPTHREAD_START_ROUTINE pFunc = reinterpret_cast < LPTHREAD_START_ROUTINE > ( GetProcAddress ( hKernel32, strFunctionName ) );
-        if ( !pFunc )
+        LPTHREAD_START_ROUTINE pFunc = reinterpret_cast<LPTHREAD_START_ROUTINE>(GetProcAddress(hKernel32, strFunctionName));
+        if (!pFunc)
             return 0;
 
-        hThread = _CreateRemoteThread(   hProcess,
-                                        NULL,
-                                        0,
-                                        pFunc,
-                                        pLibPathRemote,
-                                        0,
-                                        NULL);
+        hThread = _CreateRemoteThread(hProcess, NULL, 0, pFunc, pLibPathRemote, 0, NULL);
 
-        if ( hThread == 0 )
+        if (hThread == 0)
         {
             return 0;
         }
-
-
-    } __finally {
-        _VirtualFreeEx( hProcess, pLibPathRemote, uiLibPathSize, MEM_RELEASE );
+    }
+    __finally
+    {
+        _VirtualFreeEx(hProcess, pLibPathRemote, uiLibPathSize, MEM_RELEASE);
     }
 
     /*  We wait for the created remote thread to finish executing. When it's done, the DLL
@@ -91,38 +84,34 @@ bool CallRemoteFunction( HANDLE hProcess, const SString& strFunctionName, const 
         5 seconds which is way longer than this should take to prevent this application
         from deadlocking if something goes really wrong allowing us to kill the injected
         game executable and avoid user inconvenience.*/
-    WaitForObject ( hProcess, hThread, INFINITE, NULL );
-
+    WaitForObject(hProcess, hThread, INFINITE, NULL);
 
     /* Get the handle of the remotely loaded DLL module */
     DWORD hLibModule = 0;
-    GetExitCodeThread ( hThread, &hLibModule );
-
+    GetExitCodeThread(hThread, &hLibModule);
 
     /* Clean up the resources we used to inject the DLL */
-    _VirtualFreeEx (hProcess, pLibPathRemote, uiLibPathSize, MEM_RELEASE );
+    _VirtualFreeEx(hProcess, pLibPathRemote, uiLibPathSize, MEM_RELEASE);
     return 1;
 }
-
 
 HMODULE RemoteLoadLibrary(HANDLE hProcess, const WString& strLibPath)
 {
     // Stop GTA from starting prematurely (Some driver dlls can inadvertently resume the thread before we are ready)
-    InsertWinMainBlock( hProcess );
-    ApplyLoadingCrashPatch( hProcess );
+    InsertWinMainBlock(hProcess);
+    ApplyLoadingCrashPatch(hProcess);
 
     // Ensure correct pthreadVC2.dll is gotted
-    CallRemoteFunction( hProcess, "SetDllDirectoryW", FromUTF8( ExtractPath( ToUTF8( strLibPath ) ) ) );
-    CallRemoteFunction( hProcess, "LoadLibraryW", strLibPath );
+    CallRemoteFunction(hProcess, "SetDllDirectoryW", FromUTF8(ExtractPath(ToUTF8(strLibPath))));
+    CallRemoteFunction(hProcess, "LoadLibraryW", strLibPath);
 
     // Allow GTA to continue
-    RemoveWinMainBlock( hProcess );
-    CheckService( CHECK_SERVICE_POST_CREATE );
+    RemoveWinMainBlock(hProcess);
+    CheckService(CHECK_SERVICE_POST_CREATE);
 
     /* Success */
-    return ( HINSTANCE )( 1 );
+    return (HINSTANCE)(1);
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -131,20 +120,19 @@ HMODULE RemoteLoadLibrary(HANDLE hProcess, const WString& strLibPath)
 // Return address of GTA WinMain function
 //
 ///////////////////////////////////////////////////////////////////////////
-uchar* GetWinMainAddress( HANDLE hProcess )
+uchar* GetWinMainAddress(HANDLE hProcess)
 {
     #define WINMAIN_US  0x0748710
     #define WINMAIN_EU  0x0748760
 
-    ushort buffer[1] = { 0 };
-    _ReadProcessMemory ( hProcess, (void*)(WINMAIN_EU + 0x24), &buffer, sizeof( buffer ), NULL );
-    if ( buffer[0] == 0x0F75 )     // jnz     short loc_748745
+    ushort buffer[1] = {0};
+    _ReadProcessMemory(hProcess, (void*)(WINMAIN_EU + 0x24), &buffer, sizeof(buffer), NULL);
+    if (buffer[0] == 0x0F75)            // jnz     short loc_748745
         return (uchar*)WINMAIN_EU;
-    if ( buffer[0] == 0xEF3B )     // cmp     ebp, edi
+    if (buffer[0] == 0xEF3B)            // cmp     ebp, edi
         return (uchar*)WINMAIN_US;
     return NULL;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -153,42 +141,41 @@ uchar* GetWinMainAddress( HANDLE hProcess )
 // Poke bytes and do some checks as well
 //
 ///////////////////////////////////////////////////////////////////////////
-void WriteProcessMemoryChecked( HANDLE hProcess, void* dest, const void* src, uint size, const void* oldvalues, bool bStopIfOldIncorrect )
+void WriteProcessMemoryChecked(HANDLE hProcess, void* dest, const void* src, uint size, const void* oldvalues, bool bStopIfOldIncorrect)
 {
     DWORD oldProt1;
-    _VirtualProtectEx ( hProcess, dest, size, PAGE_EXECUTE_READWRITE, &oldProt1 );
+    _VirtualProtectEx(hProcess, dest, size, PAGE_EXECUTE_READWRITE, &oldProt1);
 
     // Verify previous value was expected were written ok
-    if ( oldvalues )
+    if (oldvalues)
     {
-        char temp[30];
-        uint numBytesToCheck = Min( sizeof( temp ), size );
+        char   temp[30];
+        uint   numBytesToCheck = std::min(sizeof(temp), size);
         SIZE_T numBytesRead = 0;
-        _ReadProcessMemory ( hProcess, dest, temp, numBytesToCheck, &numBytesRead );
-        if ( memcmp( temp, oldvalues, numBytesToCheck ) )
+        _ReadProcessMemory(hProcess, dest, temp, numBytesToCheck, &numBytesRead);
+        if (memcmp(temp, oldvalues, numBytesToCheck))
         {
-            WriteDebugEvent( SString( "Failed to verify %d old bytes in process", size ) );
-            if ( bStopIfOldIncorrect )
+            WriteDebugEvent(SString("Failed to verify %d old bytes in process", size));
+            if (bStopIfOldIncorrect)
                 return;
         }
     }
 
-    _WriteProcessMemory ( hProcess, dest, src, size, NULL );
+    _WriteProcessMemory(hProcess, dest, src, size, NULL);
 
     // Verify bytes were written ok
     {
-        char temp[30];
-        uint numBytesToCheck = Min( sizeof( temp ), size );
+        char   temp[30];
+        uint   numBytesToCheck = std::min(sizeof(temp), size);
         SIZE_T numBytesRead = 0;
-        _ReadProcessMemory ( hProcess, dest, temp, numBytesToCheck, &numBytesRead );
-        if ( memcmp( temp, src, numBytesToCheck ) || numBytesRead != numBytesToCheck )
-            WriteDebugEvent( SString( "Failed to write %d bytes to process", size ) );
+        _ReadProcessMemory(hProcess, dest, temp, numBytesToCheck, &numBytesRead);
+        if (memcmp(temp, src, numBytesToCheck) || numBytesRead != numBytesToCheck)
+            WriteDebugEvent(SString("Failed to write %d bytes to process", size));
     }
 
     DWORD oldProt2;
-    _VirtualProtectEx ( hProcess, dest, size, oldProt1, &oldProt2 );
+    _VirtualProtectEx(hProcess, dest, size, oldProt1, &oldProt2);
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -197,50 +184,44 @@ void WriteProcessMemoryChecked( HANDLE hProcess, void* dest, const void* src, ui
 // Put an infinite loop at WinMain to stop GTA from running before we are ready
 //
 ///////////////////////////////////////////////////////////////////////////
-void InsertWinMainBlock( HANDLE hProcess )
+void InsertWinMainBlock(HANDLE hProcess)
 {
     // Get location of WinMain function
-    uchar* pWinMain = GetWinMainAddress( hProcess );
-    if ( !pWinMain )
+    uchar* pWinMain = GetWinMainAddress(hProcess);
+    if (!pWinMain)
         return;
 
-    WriteDebugEvent( "Loader - InsertWinMainBlock" );
+    WriteDebugEvent("Loader - InsertWinMainBlock");
 
     {
         const uchar oldCode[] = {
-                                    0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
-                                    0x90,
-                                    0x90, 0x90,
-                                    0x90, 0x90,
-                                    0x90, 0x90,
-                                    0x81, 0xEC, 0x84, 0x00, 0x00, 0x00, // WinMain  sub         esp,84h
-                                    0x53,                               //          push        ebx
-                                    0x6A, 0x02,                         //          push        2
-                                };
+            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
+            0x90, 0x90, 0x90, 0x81, 0xEC, 0x84, 0x00, 0x00, 0x00,            // WinMain  sub         esp,84h
+            0x53,                                                            //          push        ebx
+            0x6A, 0x02,                                                      //          push        2
+        };
 
         const uchar newCode[] = {
-                                    0x3E, 0xA1, 0x7C, 0x71, 0x74, 0x00, //      lp: mov         eax,dword ptr ds:[0074717Ch] 
-                                    0x48,                               //          dec         eax 
-                                    0x74, 0xF7,                         //          je          lp
-                                    0x6A, 0x02,                         //          push        2                           orig
-                                    0xEB, 0x09,                         //          jmp         cont
-                                    0x81, 0xEC, 0x84, 0x00, 0x00, 0x00, // WinMain  sub         esp,84h                     orig
-                                    0x53,                               //          push        ebx                         orig
-                                    0xEB, 0xEA,                         //          jmp         lp
-                                };                                      //    cont:
+            0x3E, 0xA1, 0x7C, 0x71, 0x74, 0x00,            //      lp: mov         eax,dword ptr ds:[0074717Ch]
+            0x48,                                          //          dec         eax
+            0x74, 0xF7,                                    //          je          lp
+            0x6A, 0x02,                                    //          push        2                           orig
+            0xEB, 0x09,                                    //          jmp         cont
+            0x81, 0xEC, 0x84, 0x00, 0x00, 0x00,            // WinMain  sub         esp,84h                     orig
+            0x53,                                          //          push        ebx                         orig
+            0xEB, 0xEA,                                    //          jmp         lp
+        };                                                 //    cont:
 
-
-        WriteProcessMemoryChecked( hProcess, pWinMain - sizeof( newCode ) + 9, newCode, sizeof( newCode ), oldCode, true );
+        WriteProcessMemoryChecked(hProcess, pWinMain - sizeof(newCode) + 9, newCode, sizeof(newCode), oldCode, true);
     }
 
     uchar* pFlag = (uchar*)0x74717C;
     {
-        const uchar oldCode[] = { 0x90, 0x90, 0x90, 0x90 };
-        const uchar newCode[] = { 1, 0, 0, 0 };
-        WriteProcessMemoryChecked( hProcess, pFlag, newCode, sizeof( newCode ), oldCode, false );
+        const uchar oldCode[] = {0x90, 0x90, 0x90, 0x90};
+        const uchar newCode[] = {1, 0, 0, 0};
+        WriteProcessMemoryChecked(hProcess, pFlag, newCode, sizeof(newCode), oldCode, false);
     }
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -249,23 +230,22 @@ void InsertWinMainBlock( HANDLE hProcess )
 // Remove infinite loop at WinMain which stopped GTA from running before we were ready
 //
 ///////////////////////////////////////////////////////////////////////////
-void RemoveWinMainBlock( HANDLE hProcess )
+void RemoveWinMainBlock(HANDLE hProcess)
 {
     // Get location of WinMain function
-    uchar* pWinMain = GetWinMainAddress( hProcess );
-    if ( !pWinMain )
+    uchar* pWinMain = GetWinMainAddress(hProcess);
+    if (!pWinMain)
         return;
 
-    WriteDebugEvent( "Loader - RemoveWinMainBlock" );
+    WriteDebugEvent("Loader - RemoveWinMainBlock");
 
     uchar* pFlag = (uchar*)0x74717C;
     {
-        const uchar oldCode[] = { 1, 0, 0, 0 };
-        const uchar newCode[] = { 0, 0, 0, 0 };
-        WriteProcessMemoryChecked( hProcess, pFlag, newCode, sizeof( newCode ), oldCode, false );
+        const uchar oldCode[] = {1, 0, 0, 0};
+        const uchar newCode[] = {0, 0, 0, 0};
+        WriteProcessMemoryChecked(hProcess, pFlag, newCode, sizeof(newCode), oldCode, false);
     }
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -274,22 +254,21 @@ void RemoveWinMainBlock( HANDLE hProcess )
 // Modify GTA function IsAppAlreadyRunning() to avoid startup crash
 //
 ///////////////////////////////////////////////////////////////////////////
-void ApplyLoadingCrashPatch( HANDLE hProcess )
+void ApplyLoadingCrashPatch(HANDLE hProcess)
 {
     // Get location of code to modify
-    uchar* pAddress = GetWinMainAddress( hProcess );
-    if ( !pAddress )
+    uchar* pAddress = GetWinMainAddress(hProcess);
+    if (!pAddress)
         return;
 
-    WriteDebugEvent( "Loader - ApplyLoadingCrashPatch" );
+    WriteDebugEvent("Loader - ApplyLoadingCrashPatch");
 
-    pAddress -= 0x1E17; // Offset from WinMain function
+    pAddress -= 0x1E17;            // Offset from WinMain function
 
-    const uchar oldCode[] = { 0xB7 };
-    const uchar newCode[] = { 0x37 };
-    WriteProcessMemoryChecked( hProcess, pAddress, newCode, sizeof( newCode ), oldCode, true );
+    const uchar oldCode[] = {0xB7};
+    const uchar newCode[] = {0x37};
+    WriteProcessMemoryChecked(hProcess, pAddress, newCode, sizeof(newCode), oldCode, true);
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -298,24 +277,24 @@ void ApplyLoadingCrashPatch( HANDLE hProcess )
 // Code from the merky depths of MSDN
 //
 ///////////////////////////////////////////////////////////////////////////
-WString devicePathToWin32Path ( const WString& strDevicePath ) 
+WString devicePathToWin32Path(const WString& strDevicePath)
 {
-    WCHAR pszFilename[MAX_PATH+2];
-    wcsncpy ( pszFilename, strDevicePath, MAX_PATH );
+    WCHAR pszFilename[MAX_PATH + 2];
+    wcsncpy(pszFilename, strDevicePath, MAX_PATH);
     pszFilename[MAX_PATH] = 0;
 
     // Translate path with device name to drive letters.
     WCHAR szTemp[1024];
     szTemp[0] = '\0';
 
-    if (GetLogicalDriveStringsW(NUMELMS(szTemp)-1, szTemp)) 
+    if (GetLogicalDriveStringsW(NUMELMS(szTemp) - 1, szTemp))
     {
-        WCHAR szName[MAX_PATH];
-        WCHAR szDrive[3] = L" :";
-        BOOL bFound = FALSE;
+        WCHAR  szName[MAX_PATH];
+        WCHAR  szDrive[3] = L" :";
+        BOOL   bFound = FALSE;
         WCHAR* p = szTemp;
 
-        do 
+        do
         {
             // Copy the drive letter to the template string
             *szDrive = *p;
@@ -325,31 +304,29 @@ WString devicePathToWin32Path ( const WString& strDevicePath )
             {
                 UINT uNameLen = wcslen(szName);
 
-                if (uNameLen < MAX_PATH) 
+                if (uNameLen < MAX_PATH)
                 {
                     bFound = wcsnicmp(pszFilename, szName, uNameLen) == 0;
 
-                    if (bFound && *(pszFilename + uNameLen) == L'\\') 
+                    if (bFound && *(pszFilename + uNameLen) == L'\\')
                     {
                         // Reconstruct pszFilename using szTempFile
                         // Replace device path with DOS path
-                        WCHAR szTempFile[MAX_PATH+2];
-                        StringCchPrintfW(szTempFile, MAX_PATH, L"%s%s", szDrive, pszFilename+uNameLen);
+                        WCHAR szTempFile[MAX_PATH + 2];
+                        StringCchPrintfW(szTempFile, MAX_PATH, L"%s%s", szDrive, pszFilename + uNameLen);
                         szTempFile[MAX_PATH] = 0;
-                        StringCchCopyNW(pszFilename, MAX_PATH+1, szTempFile, wcslen(szTempFile));
+                        StringCchCopyNW(pszFilename, MAX_PATH + 1, szTempFile, wcslen(szTempFile));
                     }
                 }
             }
             // Go to the next NULL character.
-            while (*p++);
+            while (*p++)
+                ;
 
-        } while (!bFound && *p); // end of string
+        } while (!bFound && *p);            // end of string
     }
     return pszFilename;
 }
-
-
-typedef WINBASEAPI BOOL (WINAPI *LPFN_QueryFullProcessImageNameW)(__in HANDLE hProcess, __in DWORD dwFlags, __out_ecount_part(*lpdwSize, *lpdwSize) LPWSTR lpExeName, __inout PDWORD lpdwSize);
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -358,35 +335,25 @@ typedef WINBASEAPI BOOL (WINAPI *LPFN_QueryFullProcessImageNameW)(__in HANDLE hP
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-SString GetProcessPathFilename ( DWORD processID )
+SString GetProcessPathFilename(DWORD processID)
 {
-    static LPFN_QueryFullProcessImageNameW fnQueryFullProcessImageNameW = NULL;
-    static bool bDoneGetProcAddress = false;
-    if ( !bDoneGetProcAddress )
+    if (_QueryFullProcessImageNameW)
     {
-        // Find 'QueryFullProcessImageNameA'
-        bDoneGetProcAddress = true;
-        HMODULE hModule = GetModuleHandle ( "Kernel32.dll" );
-        fnQueryFullProcessImageNameW = static_cast < LPFN_QueryFullProcessImageNameW > ( static_cast < PVOID > ( GetProcAddress( hModule, "QueryFullProcessImageNameW" ) ) );
-    }
-
-    if ( fnQueryFullProcessImageNameW )
-    {
-        for ( int i = 0 ; i < 2 ; i++ )
+        for (int i = 0; i < 2; i++)
         {
-            HANDLE hProcess = OpenProcess ( i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID );
-            if ( hProcess )
+            HANDLE hProcess = OpenProcess(i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID);
+            if (hProcess)
             {
                 WCHAR szProcessName[MAX_PATH] = L"";
                 DWORD dwSize = NUMELMS(szProcessName);
-                DWORD bOk = fnQueryFullProcessImageNameW ( hProcess, 0, szProcessName, &dwSize );
-                CloseHandle( hProcess );
-                if ( bOk )
+                DWORD bOk = _QueryFullProcessImageNameW(hProcess, 0, szProcessName, &dwSize);
+                CloseHandle(hProcess);
+                if (bOk)
                 {
                     wchar_t szBuffer[MAX_PATH * 2] = L"";
-                    if ( GetLongPathNameW( szProcessName, szBuffer, NUMELMS(szBuffer) - 1 ) )
+                    if (GetLongPathNameW(szProcessName, szBuffer, NUMELMS(szBuffer) - 1))
                     {
-                        return ToUTF8( szBuffer );
+                        return ToUTF8(szBuffer);
                     }
                 }
             }
@@ -395,46 +362,89 @@ SString GetProcessPathFilename ( DWORD processID )
 
     {
         {
-            HANDLE hProcess = OpenProcess( PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID );
-            if ( hProcess )
+            HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID);
+            if (hProcess)
             {
                 WCHAR szProcessName[MAX_PATH] = L"";
-                DWORD bOk = GetModuleFileNameExW( hProcess, NULL, szProcessName, NUMELMS(szProcessName) );
-                CloseHandle( hProcess );
-                if ( bOk )
+                DWORD bOk = GetModuleFileNameExW(hProcess, NULL, szProcessName, NUMELMS(szProcessName));
+                CloseHandle(hProcess);
+                if (bOk)
                 {
                     wchar_t szBuffer[MAX_PATH * 2] = L"";
-                    if ( GetLongPathNameW( szProcessName, szBuffer, NUMELMS(szBuffer) - 1 ) )
+                    if (GetLongPathNameW(szProcessName, szBuffer, NUMELMS(szBuffer) - 1))
                     {
-                        return ToUTF8( szBuffer );
+                        return ToUTF8(szBuffer);
                     }
                 }
             }
         }
 
-        for ( int i = 0 ; i < 2 ; i++ )
+        for (int i = 0; i < 2; i++)
         {
-            HANDLE hProcess = OpenProcess( i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID );
-            if ( hProcess )
+            HANDLE hProcess = OpenProcess(i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID);
+            if (hProcess)
             {
                 WCHAR szProcessName[MAX_PATH] = L"";
-                DWORD bOk = GetProcessImageFileNameW( hProcess, szProcessName, NUMELMS(szProcessName) );
-                CloseHandle( hProcess );
-                if ( bOk )
+                DWORD bOk = GetProcessImageFileNameW(hProcess, szProcessName, NUMELMS(szProcessName));
+                CloseHandle(hProcess);
+                if (bOk)
                 {
                     wchar_t szBuffer[MAX_PATH * 2] = L"";
-                    if ( GetLongPathNameW( devicePathToWin32Path( szProcessName ), szBuffer, NUMELMS(szBuffer) - 1 ) )
+                    if (GetLongPathNameW(devicePathToWin32Path(szProcessName), szBuffer, NUMELMS(szBuffer) - 1))
                     {
-                        return ToUTF8( szBuffer );
+                        return ToUTF8(szBuffer);
                     }
                 }
             }
+        }
+    }
+
+    if (_NtQuerySystemInformation)
+    {
+        SYSTEM_PROCESS_IMAGE_NAME_INFORMATION info;
+        WCHAR                                 szProcessName[MAX_PATH] = L"";
+        info.ProcessId = (HANDLE)processID;
+        info.ImageName.Length = 0;
+        info.ImageName.MaximumLength = sizeof(szProcessName);
+        info.ImageName.Buffer = szProcessName;
+
+        NTSTATUS status = _NtQuerySystemInformation(SystemProcessImageNameInformation, &info, sizeof(info), NULL);
+        if (NT_SUCCESS(status))
+        {
+            WString strProcessName = WStringX(info.ImageName.Buffer, info.ImageName.Length / 2);
+            return ToUTF8(devicePathToWin32Path(strProcessName));
         }
     }
 
     return "";
 }
 
+///////////////////////////////////////////////////////////////////////////
+//
+// GetProcessFilename
+//
+// More reliable than GetProcessPathFilename, but no path
+//
+///////////////////////////////////////////////////////////////////////////
+SString GetProcessFilename(DWORD processID)
+{
+    SString         strFilename;
+    HANDLE          hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    PROCESSENTRY32W pe = {sizeof(PROCESSENTRY32W)};
+    if (Process32FirstW(hSnapshot, &pe))
+    {
+        do
+        {
+            if (pe.th32ProcessID == processID)
+            {
+                strFilename = ToUTF8(pe.szExeFile);
+                break;
+            }
+        } while (Process32NextW(hSnapshot, &pe));
+    }
+    CloseHandle(hSnapshot);
+    return strFilename;
+}
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -443,24 +453,24 @@ SString GetProcessPathFilename ( DWORD processID )
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-std::vector < DWORD > MyEnumProcesses ( bool bInclude64bit, bool bIncludeCurrent )
+std::vector<DWORD> MyEnumProcesses(bool bInclude64bit, bool bIncludeCurrent)
 {
-    uint uiSize = 200;
-    std::vector < DWORD > processIdList;
-    while ( true )
+    uint               uiSize = 200;
+    std::vector<DWORD> processIdList;
+    while (true)
     {
-        processIdList.resize ( uiSize );
+        processIdList.resize(uiSize);
         DWORD pBytesReturned = 0;
-        if ( !EnumProcesses ( &processIdList[0], uiSize * sizeof(DWORD), &pBytesReturned ) )
+        if (!EnumProcesses(&processIdList[0], uiSize * sizeof(DWORD), &pBytesReturned))
         {
-            processIdList.clear ();
+            processIdList.clear();
             break;
         }
         uint uiNumProcessIds = pBytesReturned / sizeof(DWORD);
 
-        if ( uiNumProcessIds != uiSize )
+        if (uiNumProcessIds != uiSize)
         {
-            processIdList.resize ( uiNumProcessIds );
+            processIdList.resize(uiNumProcessIds);
             break;
         }
 
@@ -468,19 +478,18 @@ std::vector < DWORD > MyEnumProcesses ( bool bInclude64bit, bool bIncludeCurrent
     }
 
     // Filter list
-    std::vector < DWORD > filteredList;
-    for( auto processId : processIdList )
+    std::vector<DWORD> filteredList;
+    for (auto processId : processIdList)
     {
-        if ( !bInclude64bit && !Is32bitProcess ( processId ) )
+        if (!bInclude64bit && !Is32bitProcess(processId))
             continue;
-        if ( !bIncludeCurrent && processId == GetCurrentProcessId() )
+        if (!bIncludeCurrent && processId == GetCurrentProcessId())
             continue;
-        filteredList.push_back( processId );
+        filteredList.push_back(processId);
     }
 
     return filteredList;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -489,30 +498,28 @@ std::vector < DWORD > MyEnumProcesses ( bool bInclude64bit, bool bIncludeCurrent
 // Find a process id by process name
 //
 ///////////////////////////////////////////////////////////////////////////
-DWORD FindProcessId ( const SString& processName )
+DWORD FindProcessId(const SString& processName)
 {
     PROCESSENTRY32 processInfo;
-    processInfo.dwSize = sizeof ( processInfo );
+    processInfo.dwSize = sizeof(processInfo);
 
-    HANDLE processesSnapshot = CreateToolhelp32Snapshot ( TH32CS_SNAPPROCESS, NULL );
-    if ( processesSnapshot == INVALID_HANDLE_VALUE )
+    HANDLE processesSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
+    if (processesSnapshot == INVALID_HANDLE_VALUE)
         return 0;
 
-    Process32First ( processesSnapshot , &processInfo );
+    Process32First(processesSnapshot, &processInfo);
     do
     {
-        if ( processName.CompareI ( processInfo.szExeFile ) )
+        if (processName.CompareI(processInfo.szExeFile))
         {
-            CloseHandle ( processesSnapshot );
+            CloseHandle(processesSnapshot);
             return processInfo.th32ProcessID;
         }
-    }
-    while ( Process32Next ( processesSnapshot, &processInfo ) );
-    
-    CloseHandle ( processesSnapshot );
+    } while (Process32Next(processesSnapshot, &processInfo));
+
+    CloseHandle(processesSnapshot);
     return 0;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -521,26 +528,25 @@ DWORD FindProcessId ( const SString& processName )
 // Get list of process id's with the image name ending in "gta_sa.exe" or "proxy_sa.exe"
 //
 ///////////////////////////////////////////////////////////////////////////
-std::vector < DWORD > GetGTAProcessList ( void )
+std::vector<DWORD> GetGTAProcessList(void)
 {
-    std::vector < DWORD > result;
+    std::vector<DWORD> result;
 
-    for ( auto processId : MyEnumProcesses() )
+    for (auto processId : MyEnumProcesses())
     {
-        SString strPathFilename = GetProcessPathFilename ( processId );
-        if ( strPathFilename.EndsWith ( MTA_GTAEXE_NAME ) || strPathFilename.EndsWith ( MTA_HTAEXE_NAME ) )
-            ListAddUnique ( result, processId );
+        SString strPathFilename = GetProcessPathFilename(processId);
+        if (strPathFilename.EndsWith(MTA_GTAEXE_NAME) || strPathFilename.EndsWith(MTA_HTAEXE_NAME))
+            ListAddUnique(result, processId);
     }
 
-    if ( DWORD processId = FindProcessId ( MTA_GTAEXE_NAME ) )
-        ListAddUnique ( result, processId );
+    if (DWORD processId = FindProcessId(MTA_GTAEXE_NAME))
+        ListAddUnique(result, processId);
 
-    if ( DWORD processId = FindProcessId ( MTA_HTAEXE_NAME ) )
-        ListAddUnique ( result, processId );
+    if (DWORD processId = FindProcessId(MTA_HTAEXE_NAME))
+        ListAddUnique(result, processId);
 
     return result;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -549,11 +555,10 @@ std::vector < DWORD > GetGTAProcessList ( void )
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-bool IsGTARunning ( void )
+bool IsGTARunning(void)
 {
-    return !GetGTAProcessList ().empty ();
+    return !GetGTAProcessList().empty();
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -562,22 +567,21 @@ bool IsGTARunning ( void )
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-void TerminateGTAIfRunning ( void )
+void TerminateGTAIfRunning(void)
 {
-    std::vector < DWORD > processIdList = GetGTAProcessList ();
+    std::vector<DWORD> processIdList = GetGTAProcessList();
 
     // Try to stop all GTA process id's
-    for ( uint i = 0 ; i < 3 && processIdList.size () ; i++ )
+    for (uint i = 0; i < 3 && processIdList.size(); i++)
     {
-        for ( auto processId : processIdList )
+        for (auto processId : processIdList)
         {
-            TerminateProcess( processId );
+            TerminateProcess(processId);
         }
-        Sleep ( 1000 );
-        processIdList = GetGTAProcessList ();
+        Sleep(1000);
+        processIdList = GetGTAProcessList();
     }
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -586,26 +590,25 @@ void TerminateGTAIfRunning ( void )
 // Get list of process id's with the image name ending with the same name as this process
 //
 ///////////////////////////////////////////////////////////////////////////
-std::vector < DWORD > GetOtherMTAProcessList ( void )
+std::vector<DWORD> GetOtherMTAProcessList(void)
 {
-    std::vector < DWORD > result;
+    std::vector<DWORD> result;
 
-    for ( auto processId : MyEnumProcesses() )
+    for (auto processId : MyEnumProcesses())
     {
-        SString strPathFilename = GetProcessPathFilename ( processId );
-        if ( strPathFilename.EndsWith ( MTA_EXE_NAME ) )
-            ListAddUnique ( result, processId );
+        SString strPathFilename = GetProcessPathFilename(processId);
+        if (strPathFilename.EndsWith(MTA_EXE_NAME))
+            ListAddUnique(result, processId);
     }
 
-    if ( DWORD processId = FindProcessId ( MTA_EXE_NAME ) )
-        ListAddUnique ( result, processId );
+    if (DWORD processId = FindProcessId(MTA_EXE_NAME))
+        ListAddUnique(result, processId);
 
     // Ignore this process
-    ListRemove ( result, GetCurrentProcessId () );
+    ListRemove(result, GetCurrentProcessId());
 
     return result;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -614,11 +617,10 @@ std::vector < DWORD > GetOtherMTAProcessList ( void )
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-bool IsOtherMTARunning ( void )
+bool IsOtherMTARunning(void)
 {
-    return !GetOtherMTAProcessList ().empty ();
+    return !GetOtherMTAProcessList().empty();
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -627,53 +629,49 @@ bool IsOtherMTARunning ( void )
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-void TerminateOtherMTAIfRunning ( void )
+void TerminateOtherMTAIfRunning(void)
 {
-    std::vector < DWORD > processIdList = GetOtherMTAProcessList ();
+    std::vector<DWORD> processIdList = GetOtherMTAProcessList();
 
-    if ( processIdList.size () )
+    if (processIdList.size())
     {
         // Try to stop all other MTA process id's
-        for ( uint i = 0 ; i < 3 && processIdList.size () ; i++ )
+        for (uint i = 0; i < 3 && processIdList.size(); i++)
         {
-            for ( auto processId : processIdList )
+            for (auto processId : processIdList)
             {
-                TerminateProcess( processId );
+                TerminateProcess(processId);
             }
-            Sleep ( 1000 );
-            processIdList = GetOtherMTAProcessList ();
+            Sleep(1000);
+            processIdList = GetOtherMTAProcessList();
         }
     }
 }
 
-
-
 //
 // Return true if command line contains the string
 //
-bool CommandLineContains( const SString& strText )
+bool CommandLineContains(const SString& strText)
 {
-    return SStringX( GetCommandLine() ).Contains( strText );
+    return SStringX(GetCommandLine()).Contains(strText);
 }
-
 
 //
 // General error message box
 //
-void DisplayErrorMessageBox ( const SString& strMessage, const SString& strErrorCode, const SString& strTroubleType )
+void DisplayErrorMessageBox(const SString& strMessage, const SString& strErrorCode, const SString& strTroubleType)
 {
-    HideSplash ();
+    HideSplash();
 
-    if ( strTroubleType.empty() )
-        BrowseToSolution( strTroubleType, SHOW_MESSAGE_ONLY, strMessage, strErrorCode );
+    if (strTroubleType.empty())
+        BrowseToSolution(strTroubleType, SHOW_MESSAGE_ONLY, strMessage, strErrorCode);
     else
-        BrowseToSolution( strTroubleType, ASK_GO_ONLINE | TERMINATE_IF_YES, strMessage, strErrorCode );
+        BrowseToSolution(strTroubleType, ASK_GO_ONLINE | TERMINATE_IF_YES, strMessage, strErrorCode);
 }
 
-
-void SetMTASAPathSource ( bool bReadFromRegistry )
+void SetMTASAPathSource(bool bReadFromRegistry)
 {
-    if ( bReadFromRegistry )
+    if (bReadFromRegistry)
     {
         g_strMTASAPath = GetMTASABaseDir();
     }
@@ -684,43 +682,35 @@ void SetMTASAPathSource ( bool bReadFromRegistry )
 
         SString strHash = "-";
         {
-            MD5 md5;
+            MD5        md5;
             CMD5Hasher Hasher;
-            if ( Hasher.Calculate ( strLaunchPathFilename, md5 ) )
+            if (Hasher.Calculate(strLaunchPathFilename, md5))
             {
                 char szHashResult[33];
-                Hasher.ConvertToHex ( md5, szHashResult );
+                Hasher.ConvertToHex(md5, szHashResult);
                 strHash = szHashResult;
             }
         }
 
-        SetRegistryValue ( "", "Last Run Path", strLaunchPathFilename );
-        SetRegistryValue ( "", "Last Run Path Hash", strHash );
-        SetRegistryValue ( "", "Last Run Path Version", MTA_DM_ASE_VERSION );
-
-        // Also save for legacy 1.0 to see
-        SString strThisVersion = SStringX ( MTA_DM_ASE_VERSION ).TrimEnd ( "n" );
-        SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path", strLaunchPathFilename );
-        SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path Hash", strHash );
-        SetVersionRegistryValueLegacy ( strThisVersion, "", "Last Run Path Version", MTA_DM_ASE_VERSION );
+        SetRegistryValue("", "Last Run Path", strLaunchPathFilename);
+        SetRegistryValue("", "Last Run Path Hash", strHash);
+        SetRegistryValue("", "Last Run Path Version", MTA_DM_ASE_VERSION);
 
         // Strip the module name out of the path.
         SString strLaunchPath = GetLaunchPath();
 
         // Save to a temp registry key
-        SetRegistryValue ( "", "Last Run Location", strLaunchPath );
+        SetRegistryValue("", "Last Run Location", strLaunchPath);
         g_strMTASAPath = strLaunchPath;
     }
 }
 
-
-SString GetMTASAPath ( void )
+SString GetMTASAPath(void)
 {
-    if ( g_strMTASAPath == "" )
-        SetMTASAPathSource ( false );
+    if (g_strMTASAPath == "")
+        SetMTASAPathSource(false);
     return g_strMTASAPath;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -729,12 +719,12 @@ SString GetMTASAPath ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-bool LookForGtaProcess ( SString& strOutPathFilename )
+bool LookForGtaProcess(SString& strOutPathFilename)
 {
-    for ( auto processId : GetGTAProcessList() )
+    for (auto processId : GetGTAProcessList())
     {
-        SString strPathFilename = GetProcessPathFilename ( processId );
-        if ( FileExists ( strPathFilename ) )
+        SString strPathFilename = GetProcessPathFilename(processId);
+        if (FileExists(strPathFilename))
         {
             strOutPathFilename = strPathFilename;
             return true;
@@ -743,7 +733,6 @@ bool LookForGtaProcess ( SString& strOutPathFilename )
     return false;
 }
 
-
 ///////////////////////////////////////////////////////////////
 //
 // DoUserAssistedSearch
@@ -751,32 +740,31 @@ bool LookForGtaProcess ( SString& strOutPathFilename )
 //
 //
 ///////////////////////////////////////////////////////////////
-SString DoUserAssistedSearch ( void )
+SString DoUserAssistedSearch(void)
 {
     SString strResult;
 
-    ShowProgressDialog( g_hInstance, _("Searching for Grand Theft Auto San Andreas"), true );
+    ShowProgressDialog(g_hInstance, _("Searching for Grand Theft Auto San Andreas"), true);
 
-    while ( !UpdateProgress ( 0, 100, _("Please start Grand Theft Auto San Andreas") ) )
+    while (!UpdateProgress(0, 100, _("Please start Grand Theft Auto San Andreas")))
     {
         SString strPathFilename;
         // Check if user has started GTA
-        if ( LookForGtaProcess ( strPathFilename ) )
+        if (LookForGtaProcess(strPathFilename))
         {
             // If so, get the exe path
-            ExtractFilename ( strPathFilename, &strResult, NULL );
+            ExtractFilename(strPathFilename, &strResult, NULL);
             // And then stop it
-            TerminateGTAIfRunning ();
+            TerminateGTAIfRunning();
             break;
         }
 
-        Sleep ( 200 );
+        Sleep(200);
     }
 
-    HideProgressDialog ();
+    HideProgressDialog();
     return strResult;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -785,103 +773,96 @@ SString DoUserAssistedSearch ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-ePathResult GetGamePath ( SString& strOutResult, bool bFindIfMissing )
+ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
 {
     // Registry places to look
-    std::vector < SString > pathList;
+    std::vector<SString> pathList;
 
     // Try HKLM "SOFTWARE\\Multi Theft Auto: San Andreas All\\Common\\"
-    pathList.push_back ( GetCommonRegistryValue ( "", "GTA:SA Path" ) );
-    // Then HKCU "SOFTWARE\\Multi Theft Auto: San Andreas 1.0\\"
-    pathList.push_back ( GetVersionRegistryValueLegacy ( "1.0", "", "GTA:SA Path" ) );
-    // Then HKCU "SOFTWARE\\Multi Theft Auto: San Andreas 1.1\\"
-    pathList.push_back ( GetVersionRegistryValueLegacy ( "1.1", "", "GTA:SA Path Backup" ) );
-
+    pathList.push_back(GetCommonRegistryValue("", "GTA:SA Path"));
 
     // Unicode character check on first one
-    if ( strlen( pathList[0].c_str () ) )
+    if (strlen(pathList[0].c_str()))
     {
         // Check for replacement characters (?), to see if there are any (unsupported) unicode characters
-        if ( strchr ( pathList[0].c_str (), '?' ) > 0 )
+        if (strchr(pathList[0].c_str(), '?') > 0)
             return GAME_PATH_UNICODE_CHARS;
     }
 
-
     // Then step through looking for an existing file
-    bool bFoundSteamExe = false;
+    bool    bFoundSteamExe = false;
     SString strRegPath;
-    for ( uint i = 0 ; i < pathList.size (); i++ )
+    for (uint i = 0; i < pathList.size(); i++)
     {
-        if ( pathList[i].empty() )
+        if (pathList[i].empty())
             continue;
 
-        if ( FileExists( PathJoin ( pathList[i], MTA_GTAEXE_NAME ) ) )
+        if (FileExists(PathJoin(pathList[i], MTA_GTAEXE_NAME)))
         {
             strRegPath = pathList[i];
             break;
         }
-        if ( FileExists( PathJoin ( pathList[i], MTA_GTASTEAMEXE_NAME ) ) )
+        if (FileExists(PathJoin(pathList[i], MTA_GTASTEAMEXE_NAME)))
         {
             bFoundSteamExe = true;
         }
     }
 
     // Found an exe?
-    if ( !strRegPath.empty () )
+    if (!strRegPath.empty())
     {
         strOutResult = strRegPath;
         // Update registry.
-        SetCommonRegistryValue ( "", "GTA:SA Path", strOutResult );
+        SetCommonRegistryValue("", "GTA:SA Path", strOutResult);
         return GAME_PATH_OK;
     }
 
     // Found a steam exe?
-    if ( bFoundSteamExe )
+    if (bFoundSteamExe)
     {
         return GAME_PATH_STEAM;
     }
 
     // Try to find?
-    if ( !bFindIfMissing )
+    if (!bFindIfMissing)
         return GAME_PATH_MISSING;
 
-
     // Ask user to browse for GTA
-    BROWSEINFOW bi = { 0 };
-    WString strMessage = _("Select your Grand Theft Auto: San Andreas Installation Directory");
+    BROWSEINFOW bi = {0};
+    WString     strMessage = _("Select your Grand Theft Auto: San Andreas Installation Directory");
     bi.lpszTitle = strMessage;
-    LPITEMIDLIST pidl = SHBrowseForFolderW ( &bi );
+    LPITEMIDLIST pidl = SHBrowseForFolderW(&bi);
 
-    if ( pidl != 0 )
+    if (pidl != 0)
     {
         wchar_t szBuffer[MAX_PATH];
         // get the name of the  folder
-        if ( SHGetPathFromIDListW ( pidl, szBuffer ) )
+        if (SHGetPathFromIDListW(pidl, szBuffer))
         {
-            strOutResult = ToUTF8( szBuffer );
+            strOutResult = ToUTF8(szBuffer);
         }
 
         // free memory used
-        IMalloc * imalloc = 0;
-        if ( SUCCEEDED( SHGetMalloc ( &imalloc )) )
+        IMalloc* imalloc = 0;
+        if (SUCCEEDED(SHGetMalloc(&imalloc)))
         {
-            imalloc->Free ( pidl );
-            imalloc->Release ( );
+            imalloc->Free(pidl);
+            imalloc->Release();
         }
     }
 
     // Check browse result
-    if ( !FileExists( PathJoin ( strOutResult, MTA_GTAEXE_NAME ) ) )
+    if (!FileExists(PathJoin(strOutResult, MTA_GTAEXE_NAME)))
     {
-        if ( FileExists( PathJoin ( strOutResult, MTA_GTASTEAMEXE_NAME ) ) )
+        if (FileExists(PathJoin(strOutResult, MTA_GTASTEAMEXE_NAME)))
             return GAME_PATH_STEAM;
 
         // If browse didn't help, try another method
-        strOutResult = DoUserAssistedSearch ();
+        strOutResult = DoUserAssistedSearch();
 
-        if ( !FileExists( PathJoin ( strOutResult, MTA_GTAEXE_NAME ) ) )
+        if (!FileExists(PathJoin(strOutResult, MTA_GTAEXE_NAME)))
         {
-            if ( FileExists( PathJoin ( strOutResult, MTA_GTASTEAMEXE_NAME ) ) )
+            if (FileExists(PathJoin(strOutResult, MTA_GTASTEAMEXE_NAME)))
                 return GAME_PATH_STEAM;
 
             // If still not found, give up
@@ -890,10 +871,9 @@ ePathResult GetGamePath ( SString& strOutResult, bool bFindIfMissing )
     }
 
     // File found. Update registry.
-    SetCommonRegistryValue ( "", "GTA:SA Path", strOutResult );
+    SetCommonRegistryValue("", "GTA:SA Path", strOutResult);
     return GAME_PATH_OK;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -902,45 +882,96 @@ ePathResult GetGamePath ( SString& strOutResult, bool bFindIfMissing )
 // Find and cache GTA path
 //
 ///////////////////////////////////////////////////////////////
-ePathResult DiscoverGTAPath ( bool bFindIfMissing )
+ePathResult DiscoverGTAPath(bool bFindIfMissing)
 {
-    return GetGamePath ( g_strGTAPath, bFindIfMissing );
+    return GetGamePath(g_strGTAPath, bFindIfMissing);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
 // GetGTAPath
 //
-// 
+//
 //
 ///////////////////////////////////////////////////////////////
-SString GetGTAPath ( void )
+SString GetGTAPath(void)
 {
-    if ( g_strGTAPath == "" )
-        DiscoverGTAPath( false );
+    if (g_strGTAPath == "")
+        DiscoverGTAPath(false);
     return g_strGTAPath;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
 // HasGTAPath
 //
-// 
+//
 //
 ///////////////////////////////////////////////////////////////
-bool HasGTAPath ( void )
+bool HasGTAPath(void)
 {
     SString strGTAPath = GetGTAPath();
-    if ( !strGTAPath.empty() )
+    if (!strGTAPath.empty())
     {
-        SString strGTAEXEPath = PathJoin( strGTAPath, MTA_GTAEXE_NAME );
-        return FileExists( strGTAEXEPath );
+        SString strGTAEXEPath = PathJoin(strGTAPath, MTA_GTAEXE_NAME);
+        return FileExists(strGTAEXEPath);
     }
     return false;
 }
 
+///////////////////////////////////////////////////////////////
+//
+// GetPEFileOffsets
+//
+// Get some commonly used file offsets
+//
+///////////////////////////////////////////////////////////////
+void GetPEFileOffsets(SPEFileOffsets& outOffsets, const SString& strGTAEXEPath)
+{
+    outOffsets = {0};
+    long NtHeaders = 0;
+    ReadFileValue(strGTAEXEPath, NtHeaders, offsetof(IMAGE_DOS_HEADER, e_lfanew));
+    outOffsets.TimeDateStamp = NtHeaders + offsetof(IMAGE_NT_HEADERS, FileHeader.TimeDateStamp);
+    outOffsets.Characteristics = NtHeaders + offsetof(IMAGE_NT_HEADERS, FileHeader.Characteristics);
+    outOffsets.AddressOfEntryPoint = NtHeaders + offsetof(IMAGE_NT_HEADERS, OptionalHeader.AddressOfEntryPoint);
+    outOffsets.DllCharacteristics = NtHeaders + offsetof(IMAGE_NT_HEADERS, OptionalHeader.DllCharacteristics);
+
+    ushort usSizeOfOptionalHeader = 0;
+    ReadFileValue(strGTAEXEPath, usSizeOfOptionalHeader, NtHeaders + offsetof(IMAGE_NT_HEADERS, FileHeader.SizeOfOptionalHeader));
+    ReadFileValue(strGTAEXEPath, outOffsets.sections[0].PointerToRawData,
+                  NtHeaders + offsetof(IMAGE_NT_HEADERS, OptionalHeader) + usSizeOfOptionalHeader + offsetof(IMAGE_SECTION_HEADER, PointerToRawData));
+}
+
+///////////////////////////////////////////////////////////////
+//
+// GetGtaFileVersion
+//
+// Hardcoded numbers used:
+//  0x44 - File offset 0x44 is zero in legacy DOS stub. Encrypted exe does not have this.
+//  0x347ADD is the section offset equivalent of 0x748ADD as used in CGameSA::FindGameVersion
+//  0x53FF and 0x840F are also used in CGameSA::FindGameVersion
+//
+///////////////////////////////////////////////////////////////
+EGtaFileVersion GetGtaFileVersion(const SString& strGTAEXEPath)
+{
+    SPEFileOffsets fileOffsets;
+    GetPEFileOffsets(fileOffsets, strGTAEXEPath);
+
+    char   bIsEncypted = false;
+    ushort usIdBytes = 0;
+    ReadFileValue(strGTAEXEPath, bIsEncypted, 0x44);
+    ReadFileValue(strGTAEXEPath, usIdBytes, 0x347ADD + fileOffsets.sections[0].PointerToRawData);
+
+    EGtaFileVersion versionType = EGtaFileVersion::Unknown;
+    if (usIdBytes == 0x53FF)
+        versionType = EGtaFileVersion::US;
+    else if (usIdBytes == 0x840F)
+        versionType = EGtaFileVersion::EU;
+    else if (bIsEncypted)
+        versionType = EGtaFileVersion::Encrypted;
+
+    return versionType;
+}
 
 ///////////////////////////////////////////////////////////////
 //
@@ -949,34 +980,33 @@ bool HasGTAPath ( void )
 // Return a list of files inside strPath
 //
 ///////////////////////////////////////////////////////////////
-void FindFilesRecursive ( const SString& strPathMatch, std::vector < SString >& outFileList, uint uiMaxDepth )
+void FindFilesRecursive(const SString& strPathMatch, std::vector<SString>& outFileList, uint uiMaxDepth)
 {
     SString strPath, strMatch;
-    strPathMatch.Split ( "\\", &strPath, &strMatch, -1 );
+    strPathMatch.Split("\\", &strPath, &strMatch, -1);
 
-    std::list < SString > toDoList;
-    toDoList.push_back ( strPath );
-    while ( toDoList.size () )
+    std::list<SString> toDoList;
+    toDoList.push_back(strPath);
+    while (toDoList.size())
     {
-        SString strPathHere = toDoList.front ();
-        toDoList.pop_front ();
+        SString strPathHere = toDoList.front();
+        toDoList.pop_front();
 
-        std::vector < SString > fileListHere = FindFiles ( strPathHere + "\\" + strMatch, true, false );
-        std::vector < SString > dirListHere = FindFiles ( strPathHere + "\\" + strMatch, false, true );
+        std::vector<SString> fileListHere = FindFiles(strPathHere + "\\" + strMatch, true, false);
+        std::vector<SString> dirListHere = FindFiles(strPathHere + "\\" + strMatch, false, true);
 
-        for ( unsigned int i = 0 ; i < fileListHere.size (); i++ )
+        for (unsigned int i = 0; i < fileListHere.size(); i++)
         {
             SString filePathName = strPathHere + "\\" + fileListHere[i];
-            outFileList.push_back ( filePathName );
+            outFileList.push_back(filePathName);
         }
-        for ( unsigned int i = 0 ; i < dirListHere.size (); i++ )
+        for (unsigned int i = 0; i < dirListHere.size(); i++)
         {
             SString dirPathName = strPathHere + "\\" + dirListHere[i];
-            toDoList.push_back ( dirPathName );
+            toDoList.push_back(dirPathName);
         }
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -985,52 +1015,52 @@ void FindFilesRecursive ( const SString& strPathMatch, std::vector < SString >& 
 // Return a list of files and directories insode strPath, but not inside any dir in stopList
 //
 ///////////////////////////////////////////////////////////////
-void FindRelevantFiles ( const SString& strPath, std::vector < SString >& outFilePathList, std::vector < SString >& outDirPathList, const std::vector < SString >& stopList, unsigned int MaxFiles, unsigned int MaxDirs )
+void FindRelevantFiles(const SString& strPath, std::vector<SString>& outFilePathList, std::vector<SString>& outDirPathList,
+                       const std::vector<SString>& stopList, unsigned int MaxFiles, unsigned int MaxDirs)
 {
-    std::list < SString > toDoList;
-    toDoList.push_back ( strPath );
-    outDirPathList.push_back ( strPath );
-    while ( toDoList.size () )
+    std::list<SString> toDoList;
+    toDoList.push_back(strPath);
+    outDirPathList.push_back(strPath);
+    while (toDoList.size())
     {
         {
             // Update progress bar if visible
-            int NumItems = outFilePathList.size () + outDirPathList.size ();
-            int MaxItems = ( MaxFiles ? MaxFiles : 25000 ) + ( MaxDirs ? MaxDirs : 5000 );
-            if ( UpdateProgress ( Min ( NumItems, MaxItems ), MaxItems * 2, "Checking files..." ) )
+            int NumItems = outFilePathList.size() + outDirPathList.size();
+            int MaxItems = (MaxFiles ? MaxFiles : 25000) + (MaxDirs ? MaxDirs : 5000);
+            if (UpdateProgress(std::min(NumItems, MaxItems), MaxItems * 2, "Checking files..."))
                 return;
         }
 
-        SString strPathHere = toDoList.front ();
-        toDoList.pop_front ();
+        SString strPathHere = toDoList.front();
+        toDoList.pop_front();
 
-        std::vector < SString > fileListHere = FindFiles ( strPathHere + "\\*", true, false );
-        std::vector < SString > dirListHere = FindFiles ( strPathHere + "\\*", false, true );
+        std::vector<SString> fileListHere = FindFiles(strPathHere + "\\*", true, false);
+        std::vector<SString> dirListHere = FindFiles(strPathHere + "\\*", false, true);
 
-        for ( unsigned int i = 0 ; i < fileListHere.size (); i++ )
+        for (unsigned int i = 0; i < fileListHere.size(); i++)
         {
             SString filePathName = strPathHere + "\\" + fileListHere[i];
-            outFilePathList.push_back ( filePathName );
+            outFilePathList.push_back(filePathName);
         }
-        for ( unsigned int i = 0 ; i < dirListHere.size (); i++ )
+        for (unsigned int i = 0; i < dirListHere.size(); i++)
         {
             SString dirPathName = strPathHere + "\\" + dirListHere[i];
-            outDirPathList.push_back ( dirPathName );
+            outDirPathList.push_back(dirPathName);
 
             bool bTraverse = true;
-            for ( unsigned int k = 0 ; k < stopList.size (); k++ )
-                if ( dirListHere[i].length () >= stopList[k].length () )
-                    if ( dirListHere[i].ToLower ().substr ( 0, stopList[k].length () ) == stopList[k] )
+            for (unsigned int k = 0; k < stopList.size(); k++)
+                if (dirListHere[i].length() >= stopList[k].length())
+                    if (dirListHere[i].ToLower().substr(0, stopList[k].length()) == stopList[k])
                         bTraverse = false;
-            if ( bTraverse )
-                toDoList.push_back ( dirPathName );
+            if (bTraverse)
+                toDoList.push_back(dirPathName);
         }
 
-        if ( MaxFiles && outFilePathList.size () > MaxFiles )
-            if ( MaxDirs && outDirPathList.size () > MaxDirs )
+        if (MaxFiles && outFilePathList.size() > MaxFiles)
+            if (MaxDirs && outDirPathList.size() > MaxDirs)
                 break;
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -1039,12 +1069,12 @@ void FindRelevantFiles ( const SString& strPath, std::vector < SString >& outFil
 // Create a list of randomlu ordered indices from 0 to Size-1
 //
 ///////////////////////////////////////////////////////////////
-void MakeRandomIndexList ( int Size, std::vector < int >& outList )
+void MakeRandomIndexList(int Size, std::vector<int>& outList)
 {
-    for ( int i = 0 ; i < Size ; i ++ )
-        outList.push_back ( i );
+    for (int i = 0; i < Size; i++)
+        outList.push_back(i);
 
-    for ( int i = 0 ; i < Size ; i ++ )
+    for (int i = 0; i < Size; i++)
     {
         int otherIdx = rand() % Size;
         int Temp = outList[i];
@@ -1053,7 +1083,6 @@ void MakeRandomIndexList ( int Size, std::vector < int >& outList )
     }
 }
 
-
 ///////////////////////////////////////////////////////////////
 //
 // GetOSVersion
@@ -1061,15 +1090,14 @@ void MakeRandomIndexList ( int Size, std::vector < int >& outList )
 // Affected by compatibility mode
 //
 ///////////////////////////////////////////////////////////////
-SOSVersionInfo GetOSVersion ( void )
+SOSVersionInfo GetOSVersion(void)
 {
     OSVERSIONINFO versionInfo;
-    memset ( &versionInfo, 0, sizeof ( versionInfo ) );
-    versionInfo.dwOSVersionInfoSize = sizeof ( versionInfo );
-    GetVersionEx ( &versionInfo );
-    return { versionInfo.dwMajorVersion, versionInfo.dwMinorVersion, versionInfo.dwBuildNumber };
+    memset(&versionInfo, 0, sizeof(versionInfo));
+    versionInfo.dwOSVersionInfoSize = sizeof(versionInfo);
+    GetVersionEx(&versionInfo);
+    return {versionInfo.dwMajorVersion, versionInfo.dwMinorVersion, versionInfo.dwBuildNumber};
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -1078,39 +1106,38 @@ SOSVersionInfo GetOSVersion ( void )
 // Ignoring compatibility mode
 //
 ///////////////////////////////////////////////////////////////
-SOSVersionInfo GetRealOSVersion ( void )
+SOSVersionInfo GetRealOSVersion(void)
 {
-    static SOSVersionInfo versionInfo = { 0 };
+    static SOSVersionInfo versionInfo = {0};
 
     // Try WMI first
-    if ( versionInfo.dwMajor == 0 )
+    if (versionInfo.dwMajor == 0)
     {
-        SString strVersionAndBuild = GetWMIOSVersion ();
-        std::vector < SString > parts;
-        strVersionAndBuild.Split ( ".", parts );
-        if ( parts.size () == 3 )
+        SString              strVersionAndBuild = GetWMIOSVersion();
+        std::vector<SString> parts;
+        strVersionAndBuild.Split(".", parts);
+        if (parts.size() == 3)
         {
-            versionInfo.dwMajor = atoi ( parts[0] );
-            versionInfo.dwMinor = atoi ( parts[1] );
-            versionInfo.dwBuild = atoi ( parts[2] );
+            versionInfo.dwMajor = atoi(parts[0]);
+            versionInfo.dwMinor = atoi(parts[1]);
+            versionInfo.dwBuild = atoi(parts[2]);
         }
     }
 
     // Fallback to checking file version of kernel32.dll
-    if ( versionInfo.dwMajor == 0 )
+    if (versionInfo.dwMajor == 0)
     {
         SLibVersionInfo fileInfo;
-        if ( GetLibVersionInfo ( "kernel32.dll", &fileInfo ) )
+        if (GetLibVersionInfo("kernel32.dll", &fileInfo))
         {
-            versionInfo.dwMajor = HIWORD ( fileInfo.dwFileVersionMS );
-            versionInfo.dwMinor = LOWORD ( fileInfo.dwFileVersionMS );
-            versionInfo.dwBuild = HIWORD ( fileInfo.dwFileVersionLS );
+            versionInfo.dwMajor = HIWORD(fileInfo.dwFileVersionMS);
+            versionInfo.dwMinor = LOWORD(fileInfo.dwFileVersionMS);
+            versionInfo.dwBuild = HIWORD(fileInfo.dwFileVersionLS);
         }
     }
 
     return versionInfo;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -1119,32 +1146,17 @@ SOSVersionInfo GetRealOSVersion ( void )
 // Works around limit for applications not manifested for Windows 10
 //
 ///////////////////////////////////////////////////////////////
-bool IsWindows10OrGreater ( void )
+bool IsWindows10OrGreater(void)
 {
-    SOSVersionInfo info = GetRealOSVersion ();
+    SOSVersionInfo info = GetRealOSVersion();
     return info.dwMajor >= 10;
 }
 
-bool IsWindows10Threshold2OrGreater ( void )
+bool IsWindows10Threshold2OrGreater(void)
 {
-    SOSVersionInfo info = GetRealOSVersion ();
-    return info.dwMajor > 10 || ( info.dwMajor == 10 && info.dwBuild >= 10586 );
+    SOSVersionInfo info = GetRealOSVersion();
+    return info.dwMajor > 10 || (info.dwMajor == 10 && info.dwBuild >= 10586);
 }
-
-
-///////////////////////////////////////////////////////////////
-//
-// IsVS2013RuntimeInstalled
-//
-// Only checks registry settings, so install could still be invalid
-//
-///////////////////////////////////////////////////////////////
-bool IsVS2013RuntimeInstalled( void )
-{
-    SString strInstall = GetSystemRegistryValue( (uint)HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\DevDiv\\vc\\Servicing\\12.0\\RuntimeMinimum", "Install" );
-    return strInstall == "\x01";
-}
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -1154,53 +1166,49 @@ bool IsVS2013RuntimeInstalled( void )
 //
 ///////////////////////////////////////////////////////////////
 BOOL IsUserAdmin(VOID)
-/*++ 
+/*++
 Routine Description: This routine returns TRUE if the caller's
 process is a member of the Administrators local group. Caller is NOT
 expected to be impersonating anyone and is expected to be able to
-open its own process and process token. 
-Arguments: None. 
-Return Value: 
-   TRUE - Caller has Administrators local group. 
+open its own process and process token.
+Arguments: None.
+Return Value:
+   TRUE - Caller has Administrators local group.
    FALSE - Caller does not have Administrators local group. --
-*/ 
+*/
 {
-    BOOL b;
+    BOOL                     b;
     SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
-    PSID AdministratorsGroup; 
-    b = AllocateAndInitializeSid(
-        &NtAuthority,
-        2,
-        SECURITY_BUILTIN_DOMAIN_RID,
-        DOMAIN_ALIAS_RID_ADMINS,
-        0, 0, 0, 0, 0, 0,
-        &AdministratorsGroup); 
-    if(b) 
+    PSID                     AdministratorsGroup;
+    b = AllocateAndInitializeSid(&NtAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0, &AdministratorsGroup);
+    if (b)
     {
-        if (!CheckTokenMembership( NULL, AdministratorsGroup, &b)) 
+        if (!CheckTokenMembership(NULL, AdministratorsGroup, &b))
         {
-             b = FALSE;
-        } 
-        FreeSid(AdministratorsGroup); 
+            b = FALSE;
+        }
+        FreeSid(AdministratorsGroup);
     }
 
-    return(b);
+    return (b);
 }
 
-
-static SString HashBuffer ( char* pData, uint uiLength )
+//////////////////////////////////////////////////////////
+//
+// RelaunchAsAdmin
+//
+// Relaunch as admin if user agrees
+//
+//////////////////////////////////////////////////////////
+void RelaunchAsAdmin(const SString& strCmdLine, const SString& strReason)
 {
-    DWORD dwSum1 = 0;
-    DWORD dwSum2 = 0x1234;
-    for ( uint i = 0 ; i < uiLength ; i++ )
-    {
-        dwSum1 += pData[i];
-        dwSum2 += pData[i];
-        dwSum2 ^= ( dwSum2 << 2 ) + 0x93;
-    }
-    return SString ( "%08x%08x%08x", dwSum1, dwSum2, uiLength );
+    HideSplash();
+    AddReportLog(7115, SString("Loader - Request to elevate privileges (%s)", *strReason));
+    MessageBoxUTF8(NULL, SString(_("MTA:SA needs Administrator access for the following task:\n\n  '%s'\n\nPlease confirm in the next window."), *strReason),
+                   "Multi Theft Auto: San Andreas", MB_OK | MB_ICONINFORMATION | MB_TOPMOST);
+    ReleaseSingleInstanceMutex();
+    ShellExecuteNonBlocking("runas", PathJoin(GetMTASAPath(), MTA_EXE_NAME), strCmdLine);
 }
-
 
 /////////////////////////////////////////////////////////////////////
 //
@@ -1209,29 +1217,28 @@ static SString HashBuffer ( char* pData, uint uiLength )
 //
 //
 /////////////////////////////////////////////////////////////////////
-HMODULE GetLibraryHandle ( const SString& strFilename, DWORD* pdwOutLastError )
+HMODULE GetLibraryHandle(const SString& strFilename, DWORD* pdwOutLastError)
 {
-    if ( !hLibraryModule )
+    if (!hLibraryModule)
     {
         // Get path to the relevant file
-        SString strLibPath = PathJoin ( GetLaunchPath (), "mta" );
-        SString strLibPathFilename = PathJoin ( strLibPath, strFilename );
+        SString strLibPath = PathJoin(GetLaunchPath(), "mta");
+        SString strLibPathFilename = PathJoin(strLibPath, strFilename);
 
-        SString strPrevCurDir = GetSystemCurrentDirectory ();
-        SetCurrentDirectory ( strLibPath );
-        SetDllDirectory( strLibPath );
+        SString strPrevCurDir = GetSystemCurrentDirectory();
+        SetCurrentDirectory(strLibPath);
+        SetDllDirectory(strLibPath);
 
-        hLibraryModule = LoadLibrary ( strLibPathFilename );
-        if ( pdwOutLastError )
-            *pdwOutLastError = GetLastError ();
+        hLibraryModule = LoadLibrary(strLibPathFilename);
+        if (pdwOutLastError)
+            *pdwOutLastError = GetLastError();
 
-        SetCurrentDirectory ( strPrevCurDir );
-        SetDllDirectory( strPrevCurDir );
+        SetCurrentDirectory(strPrevCurDir);
+        SetDllDirectory(strPrevCurDir);
     }
 
     return hLibraryModule;
 }
-
 
 /////////////////////////////////////////////////////////////////////
 //
@@ -1240,15 +1247,14 @@ HMODULE GetLibraryHandle ( const SString& strFilename, DWORD* pdwOutLastError )
 //
 //
 /////////////////////////////////////////////////////////////////////
-void FreeLibraryHandle ( void )
+void FreeLibraryHandle(void)
 {
-    if ( hLibraryModule )
+    if (hLibraryModule)
     {
-        FreeLibrary ( hLibraryModule );
+        FreeLibrary(hLibraryModule);
         hLibraryModule = NULL;
     }
 }
-
 
 /////////////////////////////////////////////////////////////////////
 //
@@ -1257,7 +1263,7 @@ void FreeLibraryHandle ( void )
 // Make sure "mta-version-ext" is correct. eg "1.0.4-9.01234.2.000"
 //
 /////////////////////////////////////////////////////////////////////
-void UpdateMTAVersionApplicationSetting ( bool bQuiet )
+void UpdateMTAVersionApplicationSetting(bool bQuiet)
 {
 #ifdef MTA_DEBUG
     SString strFilename = "netc_d.dll";
@@ -1270,48 +1276,43 @@ void UpdateMTAVersionApplicationSetting ( bool bQuiet )
     //
 
     // Get saved status
-    unsigned short usNetRev = 65535;
-    unsigned short usNetRel = 0;
-    std::vector < SString > parts;
-    GetApplicationSetting ( "mta-version-ext" ).Split ( ".", parts );
-    if ( parts.size () == 6 )
+    unsigned short       usNetRev = 65535;
+    unsigned short       usNetRel = 0;
+    std::vector<SString> parts;
+    GetApplicationSetting("mta-version-ext").Split(".", parts);
+    if (parts.size() == 6)
     {
-        usNetRev = atoi ( parts[4] );
-        usNetRel = atoi ( parts[5] );
+        usNetRev = atoi(parts[4]);
+        usNetRel = atoi(parts[5]);
     }
 
-    DWORD dwLastError = 0;
-    HMODULE hModule = GetLibraryHandle ( strFilename, &dwLastError );
-    if ( hModule )
+    DWORD   dwLastError = 0;
+    HMODULE hModule = GetLibraryHandle(strFilename, &dwLastError);
+    if (hModule)
     {
-        typedef unsigned short (*PFNGETNETREV) ( void );
-        PFNGETNETREV pfnGetNetRev = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRev" ) ) );
-        if ( pfnGetNetRev )
-            usNetRev = pfnGetNetRev ();
-        PFNGETNETREV pfnGetNetRel = static_cast < PFNGETNETREV > ( static_cast < PVOID > ( GetProcAddress ( hModule, "GetNetRel" ) ) );
-        if ( pfnGetNetRel )
-            usNetRel = pfnGetNetRel ();
+        typedef void (*PFNINITNETREV)(const char*, const char*, const char*);
+        PFNINITNETREV pfnInitNetRev = static_cast<PFNINITNETREV>(static_cast<PVOID>(GetProcAddress(hModule, "InitNetRev")));
+        if (pfnInitNetRev)
+            pfnInitNetRev(GetProductRegistryPath(), GetProductCommonDataDir(), GetProductVersion());
+        typedef unsigned short (*PFNGETNETREV)(void);
+        PFNGETNETREV pfnGetNetRev = static_cast<PFNGETNETREV>(static_cast<PVOID>(GetProcAddress(hModule, "GetNetRev")));
+        if (pfnGetNetRev)
+            usNetRev = pfnGetNetRev();
+        PFNGETNETREV pfnGetNetRel = static_cast<PFNGETNETREV>(static_cast<PVOID>(GetProcAddress(hModule, "GetNetRel")));
+        if (pfnGetNetRel)
+            usNetRel = pfnGetNetRel();
     }
-    else
-    if ( !bQuiet )
+    else if (!bQuiet)
     {
-        SString strError = GetSystemErrorMessage ( dwLastError );            
-        SString strMessage( _("Error loading %s module! (%s)"), *strFilename.ToLower (), *strError );
-        DisplayErrorMessageBox ( strMessage, _E("CL38"), "module-not-loadable&name=" + ExtractBeforeExtension( strFilename ) );
+        SString strError = GetSystemErrorMessage(dwLastError);
+        SString strMessage(_("Error loading %s module! (%s)"), *strFilename.ToLower(), *strError);
+        DisplayErrorMessageBox(strMessage, _E("CL38"), "module-not-loadable&name=" + ExtractBeforeExtension(strFilename));
     }
 
-    if ( !bQuiet )
-        SetApplicationSetting ( "mta-version-ext", SString ( "%d.%d.%d-%d.%05d.%c.%03d"
-                                ,MTASA_VERSION_MAJOR
-                                ,MTASA_VERSION_MINOR
-                                ,MTASA_VERSION_MAINTENANCE
-                                ,MTASA_VERSION_TYPE
-                                ,MTASA_VERSION_BUILD
-                                ,usNetRev == 65535 ? '+' : usNetRev + '0'
-                                ,usNetRel
-                                ) );
+    if (!bQuiet)
+        SetApplicationSetting("mta-version-ext", SString("%d.%d.%d-%d.%05d.%c.%03d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE,
+                                                         MTASA_VERSION_TYPE, MTASA_VERSION_BUILD, usNetRev == 65535 ? '+' : usNetRev + '0', usNetRel));
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -1323,70 +1324,68 @@ void UpdateMTAVersionApplicationSetting ( bool bQuiet )
 // (Calling GetModuleFileNameEx or EnumProcessModules on a 64bit process from a 32bit process can cause problems)
 //
 ///////////////////////////////////////////////////////////////////////////
-bool Is32bitProcess ( DWORD processID )
+bool Is32bitProcess(DWORD processID)
 {
-    typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
+    typedef BOOL(WINAPI * LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
     static LPFN_ISWOW64PROCESS fnIsWow64Process = NULL;
-    static bool bDoneGetProcAddress = false;
-    static bool bDoneIs64BitOS = false;
-    static bool bIs64BitOS = false;
+    static bool                bDoneGetProcAddress = false;
+    static bool                bDoneIs64BitOS = false;
+    static bool                bIs64BitOS = false;
 
-    if ( !bDoneGetProcAddress )
+    if (!bDoneGetProcAddress)
     {
         // Find 'IsWow64Process'
         bDoneGetProcAddress = true;
-        HMODULE hModule = GetModuleHandle ( "Kernel32.dll" );
-        fnIsWow64Process = static_cast < LPFN_ISWOW64PROCESS > ( static_cast < PVOID > ( GetProcAddress( hModule, "IsWow64Process" ) ) );
+        HMODULE hModule = GetModuleHandle("Kernel32.dll");
+        fnIsWow64Process = static_cast<LPFN_ISWOW64PROCESS>(static_cast<PVOID>(GetProcAddress(hModule, "IsWow64Process")));
     }
 
     // Function not there? Must be 32bit everything
-    if ( !fnIsWow64Process )
+    if (!fnIsWow64Process)
         return true;
 
-
     // See if this is a 64 bit O/S
-    if ( !bDoneIs64BitOS )
+    if (!bDoneIs64BitOS)
     {
         bDoneIs64BitOS = true;
 
         // We know current process is 32 bit. See if it is running under WOW64
         BOOL bIsWow64 = FALSE;
-        BOOL bOk = fnIsWow64Process ( GetCurrentProcess (), &bIsWow64 );
-        if ( bOk )
+        BOOL bOk = fnIsWow64Process(GetCurrentProcess(), &bIsWow64);
+        if (bOk)
         {
             // Must be 64bit O/S if current (32 bit) process is running under WOW64
-            if ( bIsWow64 )
+            if (bIsWow64)
                 bIs64BitOS = true;
         }
     }
 
     // Not 64 bit O/S? Must be 32bit everything
-    if ( !bIs64BitOS )
+    if (!bIs64BitOS)
         return true;
 
     // Call 'IsWow64Process' on query process
-    for ( int i = 0 ; i < 2 ; i++ )
+    for (int i = 0; i < 2; i++)
     {
-        HANDLE hProcess = OpenProcess( i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID );
+        HANDLE hProcess = OpenProcess(i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID);
 
-        if ( hProcess )
+        if (hProcess)
         {
             BOOL bIsWow64 = FALSE;
-            BOOL bOk = fnIsWow64Process ( hProcess, &bIsWow64 );
-            CloseHandle( hProcess );
+            BOOL bOk = fnIsWow64Process(hProcess, &bIsWow64);
+            CloseHandle(hProcess);
 
-            if ( bOk )
+            if (bOk)
             {
-                if ( bIsWow64 == FALSE )
-                    return false;       // 64 bit O/S and process not running under WOW64, so it must be a 64 bit process
+                if (bIsWow64 == FALSE)
+                    return false;            // 64 bit O/S and process not running under WOW64, so it must be a 64 bit process
                 return true;
             }
         }
     }
 
-    return false;   // Can't determine. Guess it's 64 bit
+    return false;            // Can't determine. Guess it's 64 bit
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -1395,16 +1394,30 @@ bool Is32bitProcess ( DWORD processID )
 // Terminate process from pid
 //
 ///////////////////////////////////////////////////////////////////////////
-void TerminateProcess( DWORD dwProcessID, uint uiExitCode )
+void TerminateProcess(DWORD dwProcessID, uint uiExitCode)
 {
-    HANDLE hProcess = OpenProcess( PROCESS_TERMINATE, 0, dwProcessID );
-    if ( hProcess )
+    HMODULE hModule = GetLibraryHandle("kernel32.dll");
+    if (hModule)
     {
-        TerminateProcess( hProcess, uiExitCode );
-        CloseHandle( hProcess );
+        typedef bool (*PFNTerminateProcess)(uint, uint);
+        PFNTerminateProcess pfnTerminateProcess = static_cast<PFNTerminateProcess>(static_cast<PVOID>(GetProcAddress(hModule, "NtTerminateProcess")));
+
+        if (pfnTerminateProcess)
+        {
+            bool bResult = pfnTerminateProcess(dwProcessID, uiExitCode);
+            AddReportLog(8070, SString("TerminateProcess %d result: %d", dwProcessID, bResult));
+        }
+        else
+        {
+            HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, 0, dwProcessID);
+            if (hProcess)
+            {
+                TerminateProcess(hProcess, uiExitCode);
+                CloseHandle(hProcess);
+            }
+        }
     }
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -1413,21 +1426,20 @@ void TerminateProcess( DWORD dwProcessID, uint uiExitCode )
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-bool CreateSingleInstanceMutex ( void )
+bool CreateSingleInstanceMutex(void)
 {
-    HANDLE hMutex = CreateMutex ( NULL, FALSE, TEXT( MTA_GUID ) );
+    HANDLE hMutex = CreateMutex(NULL, FALSE, TEXT(MTA_GUID));
 
-    if ( GetLastError() == ERROR_ALREADY_EXISTS )
+    if (GetLastError() == ERROR_ALREADY_EXISTS)
     {
-        if ( hMutex )
-            CloseHandle ( hMutex );
+        if (hMutex)
+            CloseHandle(hMutex);
         return false;
     }
-    assert ( !g_hMutex );
+    assert(!g_hMutex);
     g_hMutex = hMutex;
     return true;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -1436,13 +1448,12 @@ bool CreateSingleInstanceMutex ( void )
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-void ReleaseSingleInstanceMutex ( void )
+void ReleaseSingleInstanceMutex(void)
 {
-    assert ( g_hMutex );
-    CloseHandle ( g_hMutex );
+    assert(g_hMutex);
+    CloseHandle(g_hMutex);
     g_hMutex = NULL;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -1452,24 +1463,23 @@ void ReleaseSingleInstanceMutex ( void )
 // Returns non-zero if wait failed.
 //
 ///////////////////////////////////////////////////////////////////////////
-uint WaitForObject ( HANDLE hProcess, HANDLE hThread, DWORD dwMilliseconds, HANDLE hMutex )
+uint WaitForObject(HANDLE hProcess, HANDLE hThread, DWORD dwMilliseconds, HANDLE hMutex)
 {
     uint uiResult = 0;
 
-    HMODULE hModule = GetLibraryHandle ( "kernel32.dll" );
+    HMODULE hModule = GetLibraryHandle("kernel32.dll");
 
-    if ( hModule )
+    if (hModule)
     {
-        typedef unsigned long (*PFNWaitForObject) ( HANDLE, ... );
-        PFNWaitForObject pfnWaitForObject = static_cast< PFNWaitForObject > ( static_cast < PVOID > ( GetProcAddress ( hModule, "WaitForObject" ) ) );
+        typedef unsigned long (*PFNWaitForObject)(HANDLE, ...);
+        PFNWaitForObject pfnWaitForObject = static_cast<PFNWaitForObject>(static_cast<PVOID>(GetProcAddress(hModule, "WaitForObject")));
 
-        if ( !pfnWaitForObject || pfnWaitForObject ( hProcess, hThread, dwMilliseconds, hMutex ) )
+        if (!pfnWaitForObject || pfnWaitForObject(hProcess, hThread, dwMilliseconds, hMutex))
             uiResult = 1;
     }
 
     return uiResult;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -1479,26 +1489,25 @@ uint WaitForObject ( HANDLE hProcess, HANDLE hThread, DWORD dwMilliseconds, HAND
 // Returns false on fail
 //
 ///////////////////////////////////////////////////////////////////////////
-bool CheckService ( uint uiStage )
+bool CheckService(uint uiStage)
 {
-    HMODULE hModule = GetLibraryHandle ( "kernel32.dll" );
+    HMODULE hModule = GetLibraryHandle("kernel32.dll");
 
-    if ( hModule )
+    if (hModule)
     {
-        typedef bool (*PFNCheckService) ( uint );
-        PFNCheckService pfnCheckService = static_cast< PFNCheckService > ( static_cast < PVOID > ( GetProcAddress ( hModule, "CheckService" ) ) );
+        typedef bool (*PFNCheckService)(uint);
+        PFNCheckService pfnCheckService = static_cast<PFNCheckService>(static_cast<PVOID>(GetProcAddress(hModule, "CheckService")));
 
-        if ( pfnCheckService )
+        if (pfnCheckService)
         {
-            bool bResult = pfnCheckService ( uiStage );
-            AddReportLog ( 8070, SString ( "CheckService %d result: %d", uiStage, bResult ) );
+            bool bResult = pfnCheckService(uiStage);
+            AddReportLog(8070, SString("CheckService %d result: %d", uiStage, bResult));
             return bResult;
         }
     }
 
     return false;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -1507,22 +1516,21 @@ bool CheckService ( uint uiStage )
 // Returns time in seconds since a file/directory was created
 //
 ///////////////////////////////////////////////////////////////////////////
-int GetFileAge ( const SString& strPathFilename )
+int GetFileAge(const SString& strPathFilename)
 {
     WIN32_FIND_DATAW findFileData;
-    HANDLE hFind = FindFirstFileW ( FromUTF8( strPathFilename ), &findFileData );
-    if ( hFind != INVALID_HANDLE_VALUE )
+    HANDLE           hFind = FindFirstFileW(FromUTF8(strPathFilename), &findFileData);
+    if (hFind != INVALID_HANDLE_VALUE)
     {
-        FindClose ( hFind );
+        FindClose(hFind);
         FILETIME ftNow;
-        GetSystemTimeAsFileTime ( &ftNow );
-        LARGE_INTEGER creationTime = { findFileData.ftCreationTime.dwLowDateTime, findFileData.ftCreationTime.dwHighDateTime };
-        LARGE_INTEGER timeNow = { ftNow.dwLowDateTime, ftNow.dwHighDateTime };
-        return static_cast < int > ( ( timeNow.QuadPart - creationTime.QuadPart ) / ( LONGLONG ) 10000000 );
+        GetSystemTimeAsFileTime(&ftNow);
+        LARGE_INTEGER creationTime = {findFileData.ftCreationTime.dwLowDateTime, findFileData.ftCreationTime.dwHighDateTime};
+        LARGE_INTEGER timeNow = {ftNow.dwLowDateTime, ftNow.dwHighDateTime};
+        return static_cast<int>((timeNow.QuadPart - creationTime.QuadPart) / (LONGLONG)10000000);
     }
     return 0;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -1531,45 +1539,44 @@ int GetFileAge ( const SString& strPathFilename )
 // Remove old files from the download cache
 //
 ///////////////////////////////////////////////////////////////////////////
-void CleanDownloadCache ( void )
+void CleanDownloadCache(void)
 {
-    const uint uiMaxCleanTime = 5;                      // Limit clean time (seconds)
-    const uint uiCleanFileAge = 60 * 60 * 24 * 7;       // Delete files older than this
+    const uint uiMaxCleanTime = 5;                           // Limit clean time (seconds)
+    const uint uiCleanFileAge = 60 * 60 * 24 * 7;            // Delete files older than this
 
-    const time_t tMaxEndTime = time ( NULL ) + uiMaxCleanTime;
+    const time_t tMaxEndTime = time(NULL) + uiMaxCleanTime;
 
     // Search possible cache locations
-    std::list < SString > cacheLocationList;
-    cacheLocationList.push_back ( PathJoin ( GetMTADataPath (), "upcache" ) );
-    cacheLocationList.push_back ( PathJoin ( GetMTATempPath (), "upcache" ) );
-    cacheLocationList.push_back ( GetMTATempPath () );
+    std::list<SString> cacheLocationList;
+    cacheLocationList.push_back(PathJoin(GetMTADataPath(), "upcache"));
+    cacheLocationList.push_back(PathJoin(GetMTATempPath(), "upcache"));
+    cacheLocationList.push_back(GetMTATempPath());
 
-    for ( ; !cacheLocationList.empty () ; cacheLocationList.pop_front () )
+    for (; !cacheLocationList.empty(); cacheLocationList.pop_front())
     {
         // Get list of files & directories in this cache location
-        const SString& strCacheLocation = cacheLocationList.front ();
-        const std::vector < SString > fileList = FindFiles ( PathJoin ( strCacheLocation, "\\*" ), true, true );
+        const SString&             strCacheLocation = cacheLocationList.front();
+        const std::vector<SString> fileList = FindFiles(PathJoin(strCacheLocation, "\\*"), true, true);
 
-        for ( uint i = 0 ; i < fileList.size () ; i++ )
+        for (uint i = 0; i < fileList.size(); i++)
         {
-            const SString strPathFilename = PathJoin ( strCacheLocation, fileList[i] );
+            const SString strPathFilename = PathJoin(strCacheLocation, fileList[i]);
             // Check if over 7 days old
-            if ( GetFileAge ( strPathFilename ) > uiCleanFileAge )
+            if (GetFileAge(strPathFilename) > uiCleanFileAge)
             {
                 // Delete as directory or file
-                if ( DirectoryExists ( strPathFilename ) )
-                    DelTree ( strPathFilename, strCacheLocation );
+                if (DirectoryExists(strPathFilename))
+                    DelTree(strPathFilename, strCacheLocation);
                 else
-                    FileDelete ( strPathFilename );
+                    FileDelete(strPathFilename);
 
                 // Check time spent
-                if ( time ( NULL ) > tMaxEndTime )
+                if (time(NULL) > tMaxEndTime)
                     break;
             }
         }
     }
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -1578,11 +1585,10 @@ void CleanDownloadCache ( void )
 // Returns true if directory does not exist, or it is empty
 //
 //////////////////////////////////////////////////////////
-bool IsDirectoryEmpty ( const SString& strSrcBase )
+bool IsDirectoryEmpty(const SString& strSrcBase)
 {
-    return FindFiles ( PathJoin ( strSrcBase, "*" ), true, true ).empty ();
+    return FindFiles(PathJoin(strSrcBase, "*"), true, true).empty();
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -1591,19 +1597,18 @@ bool IsDirectoryEmpty ( const SString& strSrcBase )
 // Get free disk space in bytes
 //
 //////////////////////////////////////////////////////////
-long long GetDiskFreeSpace ( SString strSrcBase )
+long long GetDiskFreeSpace(SString strSrcBase)
 {
-    for ( uint i = 0 ; i < 100 ; i++ )
+    for (uint i = 0; i < 100; i++)
     {
         ULARGE_INTEGER FreeBytesAvailable;
-        if ( GetDiskFreeSpaceEx ( strSrcBase, &FreeBytesAvailable, NULL, NULL ) )
+        if (GetDiskFreeSpaceEx(strSrcBase, &FreeBytesAvailable, NULL, NULL))
             return FreeBytesAvailable.QuadPart;
 
-        strSrcBase = ExtractPath( strSrcBase );
+        strSrcBase = ExtractPath(strSrcBase);
     }
     return 0;
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -1613,91 +1618,90 @@ long long GetDiskFreeSpace ( SString strSrcBase )
 //
 //
 //////////////////////////////////////////////////////////
-void DirectoryCopy ( SString strSrcBase, SString strDestBase, bool bShowProgressDialog = false, int iMinFreeSpaceMB = 1 )
+void DirectoryCopy(SString strSrcBase, SString strDestBase, bool bShowProgressDialog = false, int iMinFreeSpaceMB = 1)
 {
     // Setup diskspace checking
-    bool bCheckFreeSpace = false;
-    long long llFreeBytesAvailable = GetDiskFreeSpace ( strDestBase );
-    if ( llFreeBytesAvailable != 0 )
-        bCheckFreeSpace = ( llFreeBytesAvailable < ( iMinFreeSpaceMB + 10000 ) * 0x100000LL );    // Only check if initial freespace is less than 10GB
+    bool      bCheckFreeSpace = false;
+    long long llFreeBytesAvailable = GetDiskFreeSpace(strDestBase);
+    if (llFreeBytesAvailable != 0)
+        bCheckFreeSpace = (llFreeBytesAvailable < (iMinFreeSpaceMB + 10000) * 0x100000LL);            // Only check if initial freespace is less than 10GB
 
-    if ( bShowProgressDialog )
-        ShowProgressDialog( g_hInstance, _("Copying files..."), true );
+    if (bShowProgressDialog)
+        ShowProgressDialog(g_hInstance, _("Copying files..."), true);
 
-    strSrcBase = PathConform ( strSrcBase ).TrimEnd ( PATH_SEPERATOR );
-    strDestBase = PathConform ( strDestBase ).TrimEnd ( PATH_SEPERATOR );
+    strSrcBase = PathConform(strSrcBase).TrimEnd(PATH_SEPERATOR);
+    strDestBase = PathConform(strDestBase).TrimEnd(PATH_SEPERATOR);
 
-    float fProgress = 0;
-    float fUseProgress = 0;
-    std::list < SString > toDoList;
-    toDoList.push_back ( "" );
-    while ( toDoList.size () )
+    float              fProgress = 0;
+    float              fUseProgress = 0;
+    std::list<SString> toDoList;
+    toDoList.push_back("");
+    while (toDoList.size())
     {
         fProgress += 0.5f;
         fUseProgress = fProgress;
-        if ( fUseProgress > 50 )
-            fUseProgress = Min ( 100.f, pow ( fUseProgress - 50, 0.6f ) + 50 );
+        if (fUseProgress > 50)
+            fUseProgress = std::min(100.f, pow(fUseProgress - 50, 0.6f) + 50);
 
-        SString strPathHereBaseRel = toDoList.front ();
-        toDoList.pop_front ();
+        SString strPathHereBaseRel = toDoList.front();
+        toDoList.pop_front();
 
-        SString strPathHereSrc = PathJoin ( strSrcBase, strPathHereBaseRel );
-        SString strPathHereDest = PathJoin ( strDestBase, strPathHereBaseRel );
+        SString strPathHereSrc = PathJoin(strSrcBase, strPathHereBaseRel);
+        SString strPathHereDest = PathJoin(strDestBase, strPathHereBaseRel);
 
-        std::vector < SString > fileListHere = FindFiles ( PathJoin ( strPathHereSrc, "*" ), true, false );
-        std::vector < SString > dirListHere = FindFiles ( PathJoin ( strPathHereSrc, "*" ), false, true );
+        std::vector<SString> fileListHere = FindFiles(PathJoin(strPathHereSrc, "*"), true, false);
+        std::vector<SString> dirListHere = FindFiles(PathJoin(strPathHereSrc, "*"), false, true);
 
         // Copy the files at this level
-        for ( unsigned int i = 0 ; i < fileListHere.size (); i++ )
+        for (unsigned int i = 0; i < fileListHere.size(); i++)
         {
-            SString filePathNameSrc = PathJoin ( strPathHereSrc, fileListHere[i] );
-            SString filePathNameDest = PathJoin ( strPathHereDest, fileListHere[i] );
-            if ( bShowProgressDialog )
-                if ( UpdateProgress ( (int)fUseProgress, 100, SString ( "...%s", *PathJoin ( strPathHereBaseRel, fileListHere[i] ) ) ) )
+            SString filePathNameSrc = PathJoin(strPathHereSrc, fileListHere[i]);
+            SString filePathNameDest = PathJoin(strPathHereDest, fileListHere[i]);
+            if (bShowProgressDialog)
+                if (UpdateProgress((int)fUseProgress, 100, SString("...%s", *PathJoin(strPathHereBaseRel, fileListHere[i]))))
                     goto stop_copy;
 
             // Check enough disk space
-            if ( bCheckFreeSpace )
+            if (bCheckFreeSpace)
             {
-                llFreeBytesAvailable -= FileSize ( filePathNameSrc );
-                if ( llFreeBytesAvailable / 0x100000LL < iMinFreeSpaceMB )
+                llFreeBytesAvailable -= FileSize(filePathNameSrc);
+                if (llFreeBytesAvailable / 0x100000LL < iMinFreeSpaceMB)
                     goto stop_copy;
             }
 
-            FileCopy ( filePathNameSrc, filePathNameDest, true );
+            FileCopy(filePathNameSrc, filePathNameDest, true);
         }
 
         // Add the directories at this level
-        for ( unsigned int i = 0 ; i < dirListHere.size (); i++ )
+        for (unsigned int i = 0; i < dirListHere.size(); i++)
         {
-            SString dirPathNameBaseRel = PathJoin ( strPathHereBaseRel, dirListHere[i] );
-            toDoList.push_back ( dirPathNameBaseRel );
+            SString dirPathNameBaseRel = PathJoin(strPathHereBaseRel, dirListHere[i]);
+            toDoList.push_back(dirPathNameBaseRel);
         }
     }
 
 stop_copy:
-    if ( bShowProgressDialog )
+    if (bShowProgressDialog)
     {
         // Reassuring messages
-        if ( toDoList.size () )
+        if (toDoList.size())
         {
-            Sleep ( 1000 );
-            UpdateProgress ( (int)fUseProgress, 100, _("Copy finished early. Everything OK.") );
-            Sleep ( 2000 );
+            Sleep(1000);
+            UpdateProgress((int)fUseProgress, 100, _("Copy finished early. Everything OK."));
+            Sleep(2000);
         }
         else
         {
-            fUseProgress = Max ( 90.f, fUseProgress );
-            UpdateProgress ( (int)fUseProgress, 100, _("Finishing...") );
-            Sleep ( 1000 );
-            UpdateProgress ( 100, 100, _("Done!") );
-            Sleep ( 2000 );
+            fUseProgress = std::max(90.f, fUseProgress);
+            UpdateProgress((int)fUseProgress, 100, _("Finishing..."));
+            Sleep(1000);
+            UpdateProgress(100, 100, _("Done!"));
+            Sleep(2000);
         }
 
-        HideProgressDialog ();
+        HideProgressDialog();
     }
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -1707,56 +1711,54 @@ stop_copy:
 // settings from a previous version
 //
 //////////////////////////////////////////////////////////
-void MaybeShowCopySettingsDialog ( void )
+void MaybeShowCopySettingsDialog(void)
 {
     // Check if coreconfig.xml is present
-    const SString strMTASAPath = GetMTASAPath ();
-    SString strCurrentConfig = PathJoin ( GetMTASAPath (), "mta", "config", "coreconfig.xml" );
-    if ( FileExists ( strCurrentConfig ) )
+    const SString strMTASAPath = GetMTASAPath();
+    SString       strCurrentConfig = PathJoin(GetMTASAPath(), "mta", "config", "coreconfig.xml");
+    if (FileExists(strCurrentConfig))
         return;
 
     // Check if coreconfig.xml from previous version is present
-    SString strCurrentVersion = SString ( "%d.%d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR );
-    SString strPreviousVersion = SString ( "%d.%d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR - 1 );
-    SString strPreviousPath = GetVersionRegistryValue ( strPreviousVersion, "", "Last Run Location" );
-    if ( strPreviousPath.empty () )
+    SString strCurrentVersion = SString("%d.%d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR);
+    SString strPreviousVersion = SString("%d.%d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR - 1);
+    SString strPreviousPath = GetVersionRegistryValue(strPreviousVersion, "", "Last Run Location");
+    if (strPreviousPath.empty())
         return;
-    SString strPreviousConfig = PathJoin ( strPreviousPath, "mta", "config", "coreconfig.xml" );
-    if ( MTASA_VERSION_MAJOR == 1 && MTASA_VERSION_MINOR == 5 )
-        strPreviousConfig = PathJoin ( strPreviousPath, "mta", "coreconfig.xml" );
-    if ( !FileExists ( strPreviousConfig ) )
+    SString strPreviousConfig = PathJoin(strPreviousPath, "mta", "config", "coreconfig.xml");
+    if (MTASA_VERSION_MAJOR == 1 && MTASA_VERSION_MINOR == 5)
+        strPreviousConfig = PathJoin(strPreviousPath, "mta", "coreconfig.xml");
+    if (!FileExists(strPreviousConfig))
         return;
 
-    HideSplash ();  // Hide standard MTA splash
+    HideSplash();            // Hide standard MTA splash
 
     // Show dialog
     SString strMessage;
-    strMessage += SString( _( "New installation of %s detected.\n"
-                              "\n"
-                              "Do you want to copy your settings from %s ?" ),
-                                *strCurrentVersion,
-                                *strPreviousVersion  );
-    int iResponse = MessageBoxUTF8 ( NULL, strMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST );
-    if ( iResponse != IDYES )
+    strMessage += SString(_("New installation of %s detected.\n"
+                            "\n"
+                            "Do you want to copy your settings from %s ?"),
+                          *strCurrentVersion, *strPreviousVersion);
+    int iResponse = MessageBoxUTF8(NULL, strMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST);
+    if (iResponse != IDYES)
         return;
 
     // Copy settings from previous version
-    FileCopy ( strPreviousConfig, strCurrentConfig );
+    FileCopy(strPreviousConfig, strCurrentConfig);
 
     // Copy registry setting for aero-enabled
-    SString strAeroEnabled = GetVersionRegistryValue ( strPreviousVersion, PathJoin ( "Settings", "general" ) , "aero-enabled" );
-    SetApplicationSetting ( "aero-enabled", strAeroEnabled );
+    SString strAeroEnabled = GetVersionRegistryValue(strPreviousVersion, PathJoin("Settings", "general"), "aero-enabled");
+    SetApplicationSetting("aero-enabled", strAeroEnabled);
 
     // Copy some directories if empty
-    SString strCurrentNewsDir = PathJoin ( GetMTADataPath (), "news" );
+    SString strCurrentNewsDir = PathJoin(GetMTADataPath(), "news");
 
-    SString strPreviousDataPath = PathJoin ( GetSystemCommonAppDataPath(), "MTA San Andreas All", strPreviousVersion );
-    SString strPreviousNewsDir = PathJoin ( strPreviousDataPath, "news" );
+    SString strPreviousDataPath = PathJoin(GetSystemCommonAppDataPath(), GetProductCommonDataDir(), strPreviousVersion);
+    SString strPreviousNewsDir = PathJoin(strPreviousDataPath, "news");
 
-    if ( IsDirectoryEmpty( strCurrentNewsDir ) && DirectoryExists( strPreviousNewsDir ) )
-        DirectoryCopy ( strPreviousNewsDir, strCurrentNewsDir );
+    if (IsDirectoryEmpty(strCurrentNewsDir) && DirectoryExists(strPreviousNewsDir))
+        DirectoryCopy(strPreviousNewsDir, strCurrentNewsDir);
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -1765,19 +1767,19 @@ void MaybeShowCopySettingsDialog ( void )
 // Returns true if message was displayed
 //
 //////////////////////////////////////////////////////////
-bool CheckAndShowFileOpenFailureMessage ( void )
+bool CheckAndShowFileOpenFailureMessage(void)
 {
-    SString strFilename = GetApplicationSetting ( "diagnostics", "gta-fopen-fail" );
+    SString strFilename = GetApplicationSetting("diagnostics", "gta-fopen-fail");
 
-    if ( !strFilename.empty () )
+    if (!strFilename.empty())
     {
-        SString strMsg ( _("GTA:SA had trouble opening the file '%s'"), *strFilename );
-        DisplayErrorMessageBox ( strMsg, _E("CL31"), SString( "gta-fopen-fail&name=%s", *strFilename ) );
+        SetApplicationSetting("diagnostics", "gta-fopen-fail", "");
+        SString strMsg(_("GTA:SA had trouble opening the file '%s'"), *strFilename);
+        DisplayErrorMessageBox(strMsg, _E("CL31"), SString("gta-fopen-fail&name=%s", *strFilename));
         return true;
     }
     return false;
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -1786,19 +1788,18 @@ bool CheckAndShowFileOpenFailureMessage ( void )
 // Check for missing files that could cause a crash
 //
 //////////////////////////////////////////////////////////
-void CheckAndShowMissingFileMessage ( void )
+void CheckAndShowMissingFileMessage(void)
 {
-    SString strFilename = PathJoin( "text", "american.gxt" );
+    SString strFilename = PathJoin("text", "american.gxt");
 
-    const SString strGTAPathFilename = PathJoin( GetGTAPath(), strFilename );
+    const SString strGTAPathFilename = PathJoin(GetGTAPath(), strFilename);
 
-    if ( !FileExists( strGTAPathFilename ) )
+    if (!FileExists(strGTAPathFilename))
     {
-        SString strMsg ( _("GTA:SA is missing the file '%s'."), *strFilename );
-        DisplayErrorMessageBox ( strMsg, _E("CL36"), SString( "gta-file-missing&name=%s", *strFilename ) );
+        SString strMsg(_("GTA:SA is missing the file '%s'."), *strFilename);
+        DisplayErrorMessageBox(strMsg, _E("CL36"), SString("gta-file-missing&name=%s", *strFilename));
     }
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -1807,26 +1808,25 @@ void CheckAndShowMissingFileMessage ( void )
 // Check for flagged model problems
 //
 //////////////////////////////////////////////////////////
-void CheckAndShowModelProblems ( void )
+void CheckAndShowModelProblems(void)
 {
     SString strReason;
-    int iModelId = 0;
+    int     iModelId = 0;
     CArgMap argMap;
-    argMap.SetFromString( GetApplicationSetting ( "diagnostics", "gta-model-fail" ) );
-    argMap.Get( "reason", strReason );
-    argMap.Get( "id", iModelId );
-    SetApplicationSetting( "diagnostics", "gta-model-fail", "" );
+    argMap.SetFromString(GetApplicationSetting("diagnostics", "gta-model-fail"));
+    argMap.Get("reason", strReason);
+    argMap.Get("id", iModelId);
+    SetApplicationSetting("diagnostics", "gta-model-fail", "");
 
-    if ( iModelId )
+    if (iModelId)
     {
         SString strMsg;
         strMsg += _("GTA:SA had trouble loading a model.");
-        strMsg += SString( " (%d)\n\n", iModelId );
+        strMsg += SString(" (%d)\n\n", iModelId);
         strMsg += _("If you recently modified gta3.img, then try reinstalling GTA:SA.");
-        DisplayErrorMessageBox ( strMsg, _E("CL34"), SString( "gta-model-fail&id=%d&reason=%s", iModelId, *strReason ) );
+        DisplayErrorMessageBox(strMsg, _E("CL34"), SString("gta-model-fail&id=%d&reason=%s", iModelId, *strReason));
     }
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -1835,25 +1835,24 @@ void CheckAndShowModelProblems ( void )
 // Check for flagged upgrade problems
 //
 //////////////////////////////////////////////////////////
-void CheckAndShowUpgradeProblems ( void )
+void CheckAndShowUpgradeProblems(void)
 {
-    int iModelId = 0, iUpgradeId, iFrame;
+    int     iModelId = 0, iUpgradeId, iFrame;
     CArgMap argMap;
-    argMap.SetFromString( GetApplicationSetting ( "diagnostics", "gta-upgrade-fail" ) );
-    argMap.Get( "vehid", iModelId );
-    argMap.Get( "upgid", iUpgradeId );
-    argMap.Get( "frame", iFrame );
-    SetApplicationSetting( "diagnostics", "gta-upgrade-fail", "" );
+    argMap.SetFromString(GetApplicationSetting("diagnostics", "gta-upgrade-fail"));
+    argMap.Get("vehid", iModelId);
+    argMap.Get("upgid", iUpgradeId);
+    argMap.Get("frame", iFrame);
+    SetApplicationSetting("diagnostics", "gta-upgrade-fail", "");
 
-    if ( iModelId )
+    if (iModelId)
     {
         SString strMsg;
         strMsg += _("GTA:SA had trouble adding an upgrade to a vehicle.");
-        strMsg += SString( " (%d)", iModelId );
-        DisplayErrorMessageBox ( strMsg, _E("CL35"), SString( "gta-upgrade-fail&id=%d&upgid=%d&frame=%d", iModelId, iUpgradeId, iFrame ) );
+        strMsg += SString(" (%d)", iModelId);
+        DisplayErrorMessageBox(strMsg, _E("CL35"), SString("gta-upgrade-fail&id=%d&upgid=%d&frame=%d", iModelId, iUpgradeId, iFrame));
     }
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -1862,17 +1861,16 @@ void CheckAndShowUpgradeProblems ( void )
 // Check for flagged img problems
 //
 //////////////////////////////////////////////////////////
-void CheckAndShowImgProblems ( void )
+void CheckAndShowImgProblems(void)
 {
-    SString strFilename = GetApplicationSetting ( "diagnostics", "img-file-corrupt" );
-    SetApplicationSetting ( "diagnostics", "img-file-corrupt", "" );
-    if ( !strFilename.empty () )
+    SString strFilename = GetApplicationSetting("diagnostics", "img-file-corrupt");
+    SetApplicationSetting("diagnostics", "img-file-corrupt", "");
+    if (!strFilename.empty())
     {
-        SString strMsg ( _("GTA:SA found errors in the file '%s'"), *strFilename );
-        DisplayErrorMessageBox ( strMsg, _E("CL44"), SString( "img-file-corrupt&name=%s", *strFilename ) );
+        SString strMsg(_("GTA:SA found errors in the file '%s'"), *strFilename);
+        DisplayErrorMessageBox(strMsg, _E("CL44"), SString("img-file-corrupt&name=%s", *strFilename));
     }
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -1881,19 +1879,18 @@ void CheckAndShowImgProblems ( void )
 // Load a library function
 //
 //////////////////////////////////////////////////////////
-void* LoadFunction( const char* szLibName, const char* c, const char* a, const char* b )
+void* LoadFunction(const char* szLibName, const char* c, const char* a, const char* b)
 {
-    static std::map < SString, HMODULE > libMap;
-    HMODULE* phModule = MapFind( libMap, szLibName );
-    if ( !phModule )
+    static std::map<SString, HMODULE> libMap;
+    HMODULE*                          phModule = MapFind(libMap, szLibName);
+    if (!phModule)
     {
-        MapSet( libMap, szLibName, LoadLibrary( szLibName ) );
-        phModule = MapFind( libMap, szLibName );
+        MapSet(libMap, szLibName, LoadLibrary(szLibName));
+        phModule = MapFind(libMap, szLibName);
     }
-    SString strFunctionName( "%s%s%s", a, b, c );
-    return static_cast < PVOID >( GetProcAddress( *phModule, strFunctionName ) );
+    SString strFunctionName("%s%s%s", a, b, c);
+    return static_cast<PVOID>(GetProcAddress(*phModule, strFunctionName));
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -1902,65 +1899,64 @@ void* LoadFunction( const char* szLibName, const char* c, const char* a, const c
 // Possible BSOD situation if a new mini-dump file was created after the last game was started
 //
 //////////////////////////////////////////////////////////
-void BsodDetectionPreLaunch( void )
+void BsodDetectionPreLaunch(void)
 {
     // BSOD detection being handled elsewhere ?
-    int iBsodDetectSkip = GetApplicationSettingInt( DIAG_BSOD_DETECT_SKIP );
-    SetApplicationSettingInt( DIAG_BSOD_DETECT_SKIP, 0 );
+    int iBsodDetectSkip = GetApplicationSettingInt(DIAG_BSOD_DETECT_SKIP);
+    SetApplicationSettingInt(DIAG_BSOD_DETECT_SKIP, 0);
 
     // Find latest system minidump file
-    SString strMatch = PathJoin( GetSystemWindowsPath(), "MiniDump", "*" );
-    SString strMinidumpTime;
+    SString          strMatch = PathJoin(GetSystemWindowsPath(), "MiniDump", "*");
+    SString          strMinidumpTime;
     WIN32_FIND_DATAW findData;
-    HANDLE hFind = FindFirstFileW( FromUTF8( strMatch ), &findData );
-    if( hFind != INVALID_HANDLE_VALUE )
+    HANDLE           hFind = FindFirstFileW(FromUTF8(strMatch), &findData);
+    if (hFind != INVALID_HANDLE_VALUE)
     {
         do
         {
-            if ( ( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) == false )
-                if ( wcscmp( findData.cFileName, L"." ) && wcscmp( findData.cFileName, L".." ) )
+            if ((findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == false)
+                if (wcscmp(findData.cFileName, L".") && wcscmp(findData.cFileName, L".."))
                 {
                     SYSTEMTIME s;
-                    FileTimeToSystemTime( &findData.ftCreationTime, &s );
-                    SString strCreationTime( "%02d-%02d-%02d %02d:%02d:%02d", s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond );
-                    if ( strCreationTime > strMinidumpTime )
+                    FileTimeToSystemTime(&findData.ftCreationTime, &s);
+                    SString strCreationTime("%02d-%02d-%02d %02d:%02d:%02d", s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond);
+                    if (strCreationTime > strMinidumpTime)
                         strMinidumpTime = strCreationTime;
                 }
-        }
-        while( FindNextFileW( hFind, &findData ) );
-        FindClose( hFind );
+        } while (FindNextFileW(hFind, &findData));
+        FindClose(hFind);
     }
 
     // Is it a new file?
-    SString strLastMinidumpTime = GetApplicationSetting( "diagnostics", "last-minidump-time" );
-    if ( strMinidumpTime > strLastMinidumpTime )
+    SString strLastMinidumpTime = GetApplicationSetting("diagnostics", "last-minidump-time");
+    if (strMinidumpTime > strLastMinidumpTime)
     {
-        SetApplicationSetting( "diagnostics", "last-minidump-time", strMinidumpTime );
-        IncApplicationSettingInt( DIAG_MINIDUMP_DETECTED_COUNT );
+        SetApplicationSetting("diagnostics", "last-minidump-time", strMinidumpTime);
+        IncApplicationSettingInt(DIAG_MINIDUMP_DETECTED_COUNT);
 
         // Was it created during the game?
-        SString strGameBeginTime = GetApplicationSetting( "diagnostics", "game-begin-time" );
-        if ( strMinidumpTime > strGameBeginTime && !strGameBeginTime.empty() && iBsodDetectSkip == 0 )
+        SString strGameBeginTime = GetApplicationSetting("diagnostics", "game-begin-time");
+        if (strMinidumpTime > strGameBeginTime && !strGameBeginTime.empty() && iBsodDetectSkip == 0)
         {
             // Ask user to confirm
-            int iResponse = MessageBoxUTF8 ( NULL, _("Did your computer restart when playing MTA:SA?"), "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST );
-            if ( iResponse == IDYES )
+            int iResponse =
+                MessageBoxUTF8(NULL, _("Did your computer restart when playing MTA:SA?"), "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST);
+            if (iResponse == IDYES)
             {
-                SetApplicationSetting( "diagnostics", "user-confirmed-bsod-time", strMinidumpTime );
-                IncApplicationSettingInt( DIAG_MINIDUMP_CONFIRMED_COUNT );
- 
-               // BSOD might be caused by progress animation, so flag for it to be disabled
-                SetApplicationSettingInt( GENERAL_PROGRESS_ANIMATION_DISABLE, 1 );
+                SetApplicationSetting("diagnostics", "user-confirmed-bsod-time", strMinidumpTime);
+                IncApplicationSettingInt(DIAG_MINIDUMP_CONFIRMED_COUNT);
+
+                // BSOD might be caused by progress animation, so flag for it to be disabled
+                SetApplicationSettingInt(GENERAL_PROGRESS_ANIMATION_DISABLE, 1);
             }
         }
     }
 
     // Log BSOD status
-    SString strBsodTime = GetApplicationSetting( "diagnostics", "user-confirmed-bsod-time" );
-    if ( !strBsodTime.empty() )
-        WriteDebugEvent( SString( "User confirmed bsod time: %s", *strBsodTime ) );
+    SString strBsodTime = GetApplicationSetting("diagnostics", "user-confirmed-bsod-time");
+    if (!strBsodTime.empty())
+        WriteDebugEvent(SString("User confirmed bsod time: %s", *strBsodTime));
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -1969,11 +1965,10 @@ void BsodDetectionPreLaunch( void )
 // Record game start time
 //
 //////////////////////////////////////////////////////////
-void BsodDetectionOnGameBegin( void )
+void BsodDetectionOnGameBegin(void)
 {
-    SetApplicationSetting( "diagnostics", "game-begin-time", GetTimeString( true ) );
+    SetApplicationSetting("diagnostics", "game-begin-time", GetTimeString(true));
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -1982,11 +1977,10 @@ void BsodDetectionOnGameBegin( void )
 // Unrecord game start time
 //
 //////////////////////////////////////////////////////////
-void BsodDetectionOnGameEnd( void )
+void BsodDetectionOnGameEnd(void)
 {
-    SetApplicationSetting( "diagnostics", "game-begin-time", "" );
+    SetApplicationSetting("diagnostics", "game-begin-time", "");
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -1995,34 +1989,29 @@ void BsodDetectionOnGameEnd( void )
 // Message to advise against running certain other programs
 //
 //////////////////////////////////////////////////////////
-void ForbodenProgramsMessage ( void )
+void ForbodenProgramsMessage(void)
 {
-    std::vector < SString > forbodenList;
-    forbodenList.push_back( "ProcessHacker" );
-    forbodenList.push_back( "CheatEngine" );
-
-    SString strResult;
-    for ( auto processId : MyEnumProcesses( true ) )
+    std::vector<SString> forbodenList = {"ProcessHacker", "CheatEngine", "PCHunter"};
+    std::vector<SString> foundList;
+    for (auto processId : MyEnumProcesses(true))
     {
-        SString strPathFilename = GetProcessPathFilename ( processId );
-        SString strFilename = ExtractFilename( strPathFilename );
-        for ( auto forbodenName : forbodenList )
+        SString strFilename = ExtractFilename(GetProcessPathFilename(processId));
+        for (const auto& forbodenName : forbodenList)
         {
-            if ( strFilename.Replace( " ", "" ).BeginsWithI( forbodenName ) )
-                strResult += strFilename + "\n";
+            if (strFilename.Replace(" ", "").BeginsWithI(forbodenName))
+                foundList.push_back(strFilename);
         }
     }
 
-    if ( !strResult.empty() )
+    if (!foundList.empty())
     {
         SString strMessage = _("Please terminate the following programs before continuing:");
         strMessage += "\n\n";
-        strMessage += strResult;
-        DisplayErrorMessageBox ( strMessage, _E("CL39"), "forboden-programs" );
-        WriteDebugEventAndReport( 6550, SString( "Showed forboden programs list (%s)", *strResult.Replace( "\n", "" ) ) );
+        strMessage += SString::Join("\n", foundList);
+        DisplayErrorMessageBox(strMessage, _E("CL39"), "forboden-programs");
+        WriteDebugEventAndReport(6550, SString("Showed forboden programs list (%s)", *SString::Join(",", foundList)));
     }
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -2031,9 +2020,9 @@ void ForbodenProgramsMessage ( void )
 // Check a file has been signed proper
 //
 //////////////////////////////////////////////////////////
-bool VerifyEmbeddedSignature( const SString& strFilename )
+bool VerifyEmbeddedSignature(const SString& strFilename)
 {
-    WString wstrFilename = FromUTF8( strFilename );
+    WString            wstrFilename = FromUTF8(strFilename);
     WINTRUST_FILE_INFO FileData;
     memset(&FileData, 0, sizeof(FileData));
     FileData.cbStruct = sizeof(WINTRUST_FILE_INFO);
@@ -2043,15 +2032,14 @@ bool VerifyEmbeddedSignature( const SString& strFilename )
     memset(&WinTrustData, 0, sizeof(WinTrustData));
     WinTrustData.cbStruct = sizeof(WinTrustData);
     WinTrustData.dwUIChoice = WTD_UI_NONE;
-    WinTrustData.fdwRevocationChecks = WTD_REVOKE_NONE; 
+    WinTrustData.fdwRevocationChecks = WTD_REVOKE_NONE;
     WinTrustData.dwUnionChoice = WTD_CHOICE_FILE;
     WinTrustData.pFile = &FileData;
 
     GUID WVTPolicyGUID = WINTRUST_ACTION_GENERIC_VERIFY_V2;
-    LONG lStatus = WinVerifyTrust( NULL, &WVTPolicyGUID, &WinTrustData );
+    LONG lStatus = WinVerifyTrust(NULL, &WVTPolicyGUID, &WinTrustData);
     return lStatus == ERROR_SUCCESS;
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -2060,72 +2048,259 @@ bool VerifyEmbeddedSignature( const SString& strFilename )
 // Dump some settings to the log file to help debugging
 //
 //////////////////////////////////////////////////////////
-void LogSettings( void )
+void LogSettings(void)
 {
-    struct {
-        int bSkipIfZero;
+    struct
+    {
+        int         bSkipIfZero;
         const char* szPath;
         const char* szName;
         const char* szDesc;
     } const settings[] = {
-                            { false, "general", GENERAL_PROGRESS_ANIMATION_DISABLE, "", },
-                            { false, "general", "aero-enabled", "", },
-                            { false, "general", "aero-changeable", "", },
-                            { false, "general", "driver-overrides-disabled", "", },
-                            { false, "general", "device-selection-disabled", "", },
-                            { false, "general", "customized-sa-files-using", "", },
-                            { false, "general", "times-connected", "", },
-                            { false, "general", "times-connected-editor", "", },
-                            { false, "nvhacks", "nvidia", "", },
-                            { false, "nvhacks", "optimus-force-detection", "", },
-                            { false, "nvhacks", "optimus-export-enablement", "", },
-                            { false, "nvhacks", "optimus", "", },
-                            { false, "nvhacks", "optimus-rename-exe", "", },
-                            { false, "nvhacks", "optimus-alt-startup", "", },
-                            { false, "nvhacks", "optimus-force-windowed", "", },
-                            { false, "nvhacks", "optimus-dialog-skip", "", },
-                            { false, "nvhacks", "optimus-startup-option", "", },
-                            { true,  "watchdog", "CR1", "COUNTER_CRASH_CHAIN_BEFORE_ONLINE_GAME", },
-                            { true,  "watchdog", "CR2", "COUNTER_CRASH_CHAIN_BEFORE_LOADING_SCREEN", },
-                            { true,  "watchdog", "CR3", "COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU", },
-                            { true,  "watchdog", "L0", "SECTION_NOT_CLEAN_GTA_EXIT", },
-                            { true,  "watchdog", "L1", "SECTION_NOT_STARTED_ONLINE_GAME", },
-                            { true,  "watchdog", "L2", "SECTION_NOT_SHOWN_LOADING_SCREEN", },
-                            { true,  "watchdog", "L3", "SECTION_STARTUP_FREEZE", },
-                            { true,  "watchdog", "L4", "SECTION_NOT_USED_MAIN_MENU", },
-                            { true,  "watchdog", "L5", "SECTION_POST_INSTALL", },
-                            { true,  "watchdog", "lastruncrash", "", },
-                            { true,  "watchdog", "preload-upgrades", "", },
-                            { true,  "watchdog", "Q0", "SECTION_IS_QUITTING", },
-                            { true,  "watchdog", "uncleanstop", "", },
-                            { false, "diagnostics", "send-dumps", "", },
-                            { true,  "diagnostics", "last-minidump-time", "", },
-                            { true,  "diagnostics", "user-confirmed-bsod-time", "", },
-                            { true,  DIAG_MINIDUMP_DETECTED_COUNT, "", },
-                            { true,  DIAG_MINIDUMP_CONFIRMED_COUNT, "", },
-                            { true,  DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE, "", },
-                            { false, "general", "noav-user-says-skip", "", },
-                            { false, "general", "noav-last-asked-time", "", },
-                        };
-
-    for ( uint i = 0 ; i < NUMELMS( settings ) ; i++ )
-    {
-        SString strValue = GetApplicationSetting( settings[i].szPath, settings[i].szName );
-        if ( !settings[i].bSkipIfZero || atoi( strValue ) != 0 )
         {
-            WriteDebugEvent( SString( "%s.%s: %s %s", settings[i].szPath, settings[i].szName, *strValue, settings[i].szDesc ) );
+            false,
+            "general",
+            GENERAL_PROGRESS_ANIMATION_DISABLE,
+            "",
+        },
+        {
+            false,
+            "general",
+            "aero-enabled",
+            "",
+        },
+        {
+            false,
+            "general",
+            "aero-changeable",
+            "",
+        },
+        {
+            false,
+            "general",
+            "driver-overrides-disabled",
+            "",
+        },
+        {
+            false,
+            "general",
+            "device-selection-disabled",
+            "",
+        },
+        {
+            false,
+            "general",
+            "customized-sa-files-using",
+            "",
+        },
+        {
+            false,
+            "general",
+            "times-connected",
+            "",
+        },
+        {
+            false,
+            "general",
+            "times-connected-editor",
+            "",
+        },
+        {
+            false,
+            "nvhacks",
+            "nvidia",
+            "",
+        },
+        {
+            false,
+            "nvhacks",
+            "optimus-force-detection",
+            "",
+        },
+        {
+            false,
+            "nvhacks",
+            "optimus-export-enablement",
+            "",
+        },
+        {
+            false,
+            "nvhacks",
+            "optimus",
+            "",
+        },
+        {
+            false,
+            "nvhacks",
+            "optimus-rename-exe",
+            "",
+        },
+        {
+            false,
+            "nvhacks",
+            "optimus-alt-startup",
+            "",
+        },
+        {
+            false,
+            "nvhacks",
+            "optimus-force-windowed",
+            "",
+        },
+        {
+            false,
+            "nvhacks",
+            "optimus-dialog-skip",
+            "",
+        },
+        {
+            false,
+            "nvhacks",
+            "optimus-startup-option",
+            "",
+        },
+        {
+            true,
+            "watchdog",
+            "CR1",
+            "COUNTER_CRASH_CHAIN_BEFORE_ONLINE_GAME",
+        },
+        {
+            true,
+            "watchdog",
+            "CR2",
+            "COUNTER_CRASH_CHAIN_BEFORE_LOADING_SCREEN",
+        },
+        {
+            true,
+            "watchdog",
+            "CR3",
+            "COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU",
+        },
+        {
+            true,
+            "watchdog",
+            "L0",
+            "SECTION_NOT_CLEAN_GTA_EXIT",
+        },
+        {
+            true,
+            "watchdog",
+            "L1",
+            "SECTION_NOT_STARTED_ONLINE_GAME",
+        },
+        {
+            true,
+            "watchdog",
+            "L2",
+            "SECTION_NOT_SHOWN_LOADING_SCREEN",
+        },
+        {
+            true,
+            "watchdog",
+            "L3",
+            "SECTION_STARTUP_FREEZE",
+        },
+        {
+            true,
+            "watchdog",
+            "L4",
+            "SECTION_NOT_USED_MAIN_MENU",
+        },
+        {
+            true,
+            "watchdog",
+            "L5",
+            "SECTION_POST_INSTALL",
+        },
+        {
+            true,
+            "watchdog",
+            "lastruncrash",
+            "",
+        },
+        {
+            true,
+            "watchdog",
+            "preload-upgrades",
+            "",
+        },
+        {
+            true,
+            "watchdog",
+            "Q0",
+            "SECTION_IS_QUITTING",
+        },
+        {
+            true,
+            "watchdog",
+            "uncleanstop",
+            "",
+        },
+        {
+            false,
+            "diagnostics",
+            "send-dumps",
+            "",
+        },
+        {
+            true,
+            "diagnostics",
+            "last-minidump-time",
+            "",
+        },
+        {
+            true,
+            "diagnostics",
+            "user-confirmed-bsod-time",
+            "",
+        },
+        {
+            true,
+            DIAG_MINIDUMP_DETECTED_COUNT,
+            "",
+        },
+        {
+            true,
+            DIAG_MINIDUMP_CONFIRMED_COUNT,
+            "",
+        },
+        {
+            true,
+            DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE,
+            "",
+        },
+        {
+            false,
+            "general",
+            "noav-user-says-skip",
+            "",
+        },
+        {
+            false,
+            "general",
+            "noav-last-asked-time",
+            "",
+        },
+    };
+
+    for (uint i = 0; i < NUMELMS(settings); i++)
+    {
+        SString strValue = GetApplicationSetting(settings[i].szPath, settings[i].szName);
+        if (!settings[i].bSkipIfZero || atoi(strValue) != 0)
+        {
+            WriteDebugEvent(SString("%s.%s: %s %s", settings[i].szPath, settings[i].szName, *strValue, settings[i].szDesc));
         }
     }
 
-    uint uiTimeLastAsked = GetApplicationSettingInt( "noav-last-asked-time" );
-    if ( uiTimeLastAsked )
+    uint uiTimeLastAsked = GetApplicationSettingInt("noav-last-asked-time");
+    if (uiTimeLastAsked)
     {
-        uint uiTimeNow = static_cast < uint >( time( NULL ) / 3600LL );
+        uint uiTimeNow = static_cast<uint>(time(NULL) / 3600LL);
         uint uiHoursSinceLastAsked = uiTimeNow - uiTimeLastAsked;
-        WriteDebugEvent( SString( "noav-last-asked-time-hours-delta: %d", uiHoursSinceLastAsked ) );
+        WriteDebugEvent(SString("noav-last-asked-time-hours-delta: %d", uiHoursSinceLastAsked));
     }
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -2134,12 +2309,11 @@ void LogSettings( void )
 // Write to logile.txt and report.log
 //
 //////////////////////////////////////////////////////////
-void WriteDebugEventAndReport( uint uiId, const SString& strText )
+void WriteDebugEventAndReport(uint uiId, const SString& strText)
 {
-    WriteDebugEvent( strText );
-    AddReportLog( uiId, strText );
+    WriteDebugEvent(strText);
+    AddReportLog(uiId, strText);
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -2148,12 +2322,11 @@ void WriteDebugEventAndReport( uint uiId, const SString& strText )
 // Add some spaces to make it look nicer
 //
 //////////////////////////////////////////////////////////
-SString PadLeft( const SString& strText, uint uiNumSpaces, char cCharacter )
+SString PadLeft(const SString& strText, uint uiNumSpaces, char cCharacter)
 {
-    SString strPad = std::string( uiNumSpaces, cCharacter );
-    return strPad + strText.Replace( "\n", SStringX( "\n" ) + strPad );
+    SString strPad = std::string(uiNumSpaces, cCharacter);
+    return strPad + strText.Replace("\n", SStringX("\n") + strPad);
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -2162,25 +2335,24 @@ SString PadLeft( const SString& strText, uint uiNumSpaces, char cCharacter )
 // Check if device dialog is currently open in multi-monitor situation
 //
 //////////////////////////////////////////////////////////
-BOOL CALLBACK MyEnumThreadWndProc( HWND hwnd, LPARAM lParam )
+BOOL CALLBACK MyEnumThreadWndProc(HWND hwnd, LPARAM lParam)
 {
     WINDOWINFO windowInfo;
-    if ( GetWindowInfo( hwnd, &windowInfo ) )
+    if (GetWindowInfo(hwnd, &windowInfo))
     {
-        if ( windowInfo.atomWindowType == (WORD)WC_DIALOG )
+        if (windowInfo.atomWindowType == (WORD)WC_DIALOG)
         {
-            SetWindowPos ( hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
+            SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
             return false;
         }
     }
     return true;
 }
 
-bool IsDeviceSelectionDialogOpen( DWORD dwThreadId )
+bool IsDeviceSelectionDialogOpen(DWORD dwThreadId)
 {
-    return !EnumThreadWindows( dwThreadId, MyEnumThreadWndProc, 0 );
+    return !EnumThreadWindows(dwThreadId, MyEnumThreadWndProc, 0);
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -2188,32 +2360,31 @@ bool IsDeviceSelectionDialogOpen( DWORD dwThreadId )
 //
 //
 //////////////////////////////////////////////////////////
-LONG RegEnumValueString( HKEY hKey, DWORD dwIndex, WString& strOutName )
+LONG RegEnumValueString(HKEY hKey, DWORD dwIndex, WString& strOutName)
 {
     wchar_t buf[2048] = {0};
-    DWORD dwBufSizeChars = NUMELMS( buf );
-    long result = RegEnumValueW( hKey, dwIndex, buf, &dwBufSizeChars, 0, NULL, NULL, NULL );
+    DWORD   dwBufSizeChars = NUMELMS(buf);
+    long    result = RegEnumValueW(hKey, dwIndex, buf, &dwBufSizeChars, 0, NULL, NULL, NULL);
     strOutName = buf;
     return result;
 }
 
-LONG RegQueryValueString( HKEY hKey, LPCWSTR lpValueName, WString& strOutData )
+LONG RegQueryValueString(HKEY hKey, LPCWSTR lpValueName, WString& strOutData)
 {
     wchar_t buf[2048] = {0};
-    DWORD dwBufSizeBytes = sizeof( buf );
-    DWORD dwType = REG_SZ;
-    long result = RegQueryValueExW( hKey, lpValueName, NULL, &dwType, (BYTE*)buf, &dwBufSizeBytes );
+    DWORD   dwBufSizeBytes = sizeof(buf);
+    DWORD   dwType = REG_SZ;
+    long    result = RegQueryValueExW(hKey, lpValueName, NULL, &dwType, (BYTE*)buf, &dwBufSizeBytes);
     strOutData = buf;
     return result;
 }
 
-LONG RegSetValueString( HKEY hKey, LPCWSTR lpValueName, const WString& strData )
+LONG RegSetValueString(HKEY hKey, LPCWSTR lpValueName, const WString& strData)
 {
     DWORD dwSizeChars = strData.length() + 1;
-    DWORD dwSizeBytes = dwSizeChars * sizeof( WCHAR );
-    return RegSetValueExW( hKey, lpValueName, 0, REG_SZ, (const BYTE*)*strData, dwSizeBytes );
+    DWORD dwSizeBytes = dwSizeChars * sizeof(WCHAR);
+    return RegSetValueExW(hKey, lpValueName, 0, REG_SZ, (const BYTE*)*strData, dwSizeBytes);
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -2224,34 +2395,33 @@ LONG RegSetValueString( HKEY hKey, LPCWSTR lpValueName, const WString& strData )
 // Returns false if admin needed
 //
 //////////////////////////////////////////////////////////
-bool WriteCompatibilityEntries( const WString& strProgName, const WString& strSubKey, HKEY hKeyRoot, uint uiFlags, const WString& strNewData )
+bool WriteCompatibilityEntries(const WString& strProgName, const WString& strSubKey, HKEY hKeyRoot, uint uiFlags, const WString& strNewData)
 {
     bool bResult = false;
 
     // Try open/create key for wrting - Failure means admin is required
     HKEY hKey;
-    if ( RegCreateKeyExW( hKeyRoot, strSubKey, NULL, NULL, 0, KEY_READ | KEY_WRITE | uiFlags, NULL, &hKey, NULL ) == ERROR_SUCCESS )
+    if (RegCreateKeyExW(hKeyRoot, strSubKey, NULL, NULL, 0, KEY_READ | KEY_WRITE | uiFlags, NULL, &hKey, NULL) == ERROR_SUCCESS)
     {
         bResult = true;
-        if ( !strNewData.empty() )
+        if (!strNewData.empty())
         {
             // Write new setting
-            if ( RegSetValueString( hKey, strProgName, strNewData ) != ERROR_SUCCESS )
+            if (RegSetValueString(hKey, strProgName, strNewData) != ERROR_SUCCESS)
                 bResult = false;
         }
         else
         {
             // No setting, so delete the registry value
-            if ( RegDeleteValueW( hKey, strProgName ) != ERROR_SUCCESS )
+            if (RegDeleteValueW(hKey, strProgName) != ERROR_SUCCESS)
                 bResult = false;
         }
 
-        RegCloseKey( hKey );
+        RegCloseKey(hKey);
     }
 
     return bResult;
 }
-
 
 //////////////////////////////////////////////////////////
 //
@@ -2261,26 +2431,25 @@ bool WriteCompatibilityEntries( const WString& strProgName, const WString& strSu
 // Note: Windows 8 can have flag characters for the first field. (Have seen ~ $ and ~$)
 //
 //////////////////////////////////////////////////////////
-WString ReadCompatibilityEntries( const WString& strProgName, const WString& strSubKey, HKEY hKeyRoot, uint uiFlags )
+WString ReadCompatibilityEntries(const WString& strProgName, const WString& strSubKey, HKEY hKeyRoot, uint uiFlags)
 {
     WString strResult;
 
     // Try read only open - Failure probably means the key does not exist
     HKEY hKey;
-    if ( RegOpenKeyExW( hKeyRoot, strSubKey, NULL, KEY_READ | uiFlags, &hKey ) == ERROR_SUCCESS )
+    if (RegOpenKeyExW(hKeyRoot, strSubKey, NULL, KEY_READ | uiFlags, &hKey) == ERROR_SUCCESS)
     {
-        WString strData; 
-        if ( RegQueryValueString( hKey, strProgName, strData ) == ERROR_SUCCESS )
+        WString strData;
+        if (RegQueryValueString(hKey, strProgName, strData) == ERROR_SUCCESS)
         {
             strResult = strData;
         }
 
-        RegCloseKey ( hKey );
+        RegCloseKey(hKey);
     }
 
     return strResult;
 }
-
 
 //////////////////////////////////////////////////////////
 //

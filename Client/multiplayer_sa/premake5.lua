@@ -5,12 +5,12 @@ project "Multiplayer SA"
 	targetdir(buildpath("mta"))
 	
 	filter "system:windows"
-		includedirs { "../../vendor/sparsehash/current/src/windows" }
+		includedirs { "../../vendor/sparsehash/src/windows" }
 	
 	filter {}
 		includedirs { 
 			"../sdk",
-			"../../vendor/sparsehash/current/src/"
+			"../../vendor/sparsehash/src/"
 		}
 	
 	pchheader "StdInc.h"
@@ -33,3 +33,27 @@ project "Multiplayer SA"
 	
 	filter "system:not windows"
 		flags { "ExcludeFromBuild" } 
+
+	filter { "configurations:Release or configurations:Nightly",
+        "files:CMultiplayerSA.cpp" .. " or " ..
+        "files:CMultiplayerSA_1.3.cpp" .. " or " ..
+        "files:CMultiplayerSA_ClothesCache.cpp" .. " or " ..
+        "files:CMultiplayerSA_ClothesMemFix.cpp" .. " or " ..
+        "files:CMultiplayerSA_ClothesSpeedUp.cpp" .. " or " ..
+        "files:CMultiplayerSA_CrashFixHacks.cpp" .. " or " ..
+        "files:CMultiplayerSA_Direct3D.cpp" .. " or " ..
+        "files:CMultiplayerSA_Files.cpp" .. " or " ..
+        "files:CMultiplayerSA_FixBadAnimId.cpp" .. " or " ..
+        "files:CMultiplayerSA_FixLineOfSightArgs.cpp" .. " or " ..
+        "files:CMultiplayerSA_HookDestructors.cpp" .. " or " ..
+        "files:CMultiplayerSA_LicensePlate.cpp" .. " or " ..
+        "files:CMultiplayerSA_ObjectLODSystem.cpp" .. " or " ..
+        "files:CMultiplayerSA_Rendering.cpp" .. " or " ..
+        "files:CMultiplayerSA_RwResources.cpp" .. " or " ..
+        "files:CMultiplayerSA_VehicleDamage.cpp" .. " or " ..
+        "files:CMultiplayerSA_VehicleLights.cpp" .. " or " ..
+        "files:CMultiplayerSA_Weapons.cpp" .. " or " ..
+        "files:CPopulationSA.cpp" .. " or " ..
+        "files:multiplayer_keysync.cpp" .. " or " ..
+        "files:multiplayer_shotsync.cpp" }
+        buildoptions { "/Ob1" }   -- Expand only functions marked as inline

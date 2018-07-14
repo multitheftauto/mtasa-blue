@@ -1,22 +1,19 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        gui/CGUITabPanel_Impl.cpp
-*  PURPOSE:     Tab panel widget class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*               Chris McArthur <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        gui/CGUITabPanel_Impl.cpp
+ *  PURPOSE:     Tab panel widget class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
 #define CGUITABPANEL_NAME "CGUI/TabControl"
 
-CGUITabPanel_Impl::CGUITabPanel_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent )
+CGUITabPanel_Impl::CGUITabPanel_Impl(CGUI_Impl* pGUI, CGUIElement* pParent)
 {
     m_pManager = pGUI;
 
@@ -24,68 +21,65 @@ CGUITabPanel_Impl::CGUITabPanel_Impl ( CGUI_Impl* pGUI, CGUIElement* pParent )
     m_pGUI = pGUI;
 
     // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
-    char szUnique [CGUI_CHAR_SIZE];
-    pGUI->GetUniqueName ( szUnique );
+    char szUnique[CGUI_CHAR_SIZE];
+    pGUI->GetUniqueName(szUnique);
 
     // Create the window and set default settings
-    m_pWindow = pGUI->GetWindowManager ()->createWindow ( CGUITABPANEL_NAME, szUnique );
-    m_pWindow->setDestroyedByParent ( false );
-    m_pWindow->setRect ( CEGUI::Relative, CEGUI::Rect (0.9f, 0.9f, 0.9f, 0.9f) );
-    reinterpret_cast < CEGUI::TabControl* > ( m_pWindow ) -> setAbsoluteTabTextPadding ( 10.0f );
+    m_pWindow = pGUI->GetWindowManager()->createWindow(CGUITABPANEL_NAME, szUnique);
+    m_pWindow->setDestroyedByParent(false);
+    m_pWindow->setRect(CEGUI::Relative, CEGUI::Rect(0.9f, 0.9f, 0.9f, 0.9f));
+    reinterpret_cast<CEGUI::TabControl*>(m_pWindow)->setAbsoluteTabTextPadding(10.0f);
 
     // Store the pointer to this CGUI element in the CEGUI element
-    m_pWindow->setUserData ( reinterpret_cast < void* > ( this ) );
+    m_pWindow->setUserData(reinterpret_cast<void*>(this));
 
-    m_pWindow->subscribeEvent ( CEGUI::TabControl::EventSelectionChanged, CEGUI::Event::Subscriber ( &CGUITabPanel_Impl::Event_OnSelectionChanged, this ) );
-    AddEvents ();
+    m_pWindow->subscribeEvent(CEGUI::TabControl::EventSelectionChanged, CEGUI::Event::Subscriber(&CGUITabPanel_Impl::Event_OnSelectionChanged, this));
+    AddEvents();
 
     // If a parent is specified, add it to it's children list, if not, add it as a child to the m_pManager
-    if ( pParent )
+    if (pParent)
     {
-        SetParent ( pParent );
+        SetParent(pParent);
     }
     else
     {
-        pGUI->AddChild ( this );
-        SetParent ( NULL );
+        pGUI->AddChild(this);
+        SetParent(NULL);
     }
 }
 
-CGUITabPanel_Impl::~CGUITabPanel_Impl ( void )
+CGUITabPanel_Impl::~CGUITabPanel_Impl(void)
 {
-    DestroyElement ();
+    DestroyElement();
 }
 
-
-CGUITab* CGUITabPanel_Impl::CreateTab ( const char* szCaption )
+CGUITab* CGUITabPanel_Impl::CreateTab(const char* szCaption)
 {
-    return new CGUITab_Impl ( m_pGUI, this, szCaption );
+    return new CGUITab_Impl(m_pGUI, this, szCaption);
 }
 
-
-void CGUITabPanel_Impl::DeleteTab ( CGUITab* pTab )
+void CGUITabPanel_Impl::DeleteTab(CGUITab* pTab)
 {
-    CEGUI::TabControl* TabControl = reinterpret_cast < CEGUI::TabControl* > ( m_pWindow );
-    CGUITab_Impl* pTabImpl = reinterpret_cast < CGUITab_Impl* > ( pTab );
+    CEGUI::TabControl* TabControl = reinterpret_cast<CEGUI::TabControl*>(m_pWindow);
+    CGUITab_Impl*      pTabImpl = reinterpret_cast<CGUITab_Impl*>(pTab);
 
     TabControl->removeTab(pTabImpl->GetWindow()->getName());
     return;
 }
 
-
-CGUITab* CGUITabPanel_Impl::GetSelectedTab ( void )
+CGUITab* CGUITabPanel_Impl::GetSelectedTab(void)
 {
-    CEGUI::TabControl* pControl = reinterpret_cast < CEGUI::TabControl* > ( m_pWindow );
+    CEGUI::TabControl* pControl = reinterpret_cast<CEGUI::TabControl*>(m_pWindow);
 
-    if ( pControl->getTabCount() > 0 )
+    if (pControl->getTabCount() > 0)
     {
-        CEGUI::Window* pTab = pControl->getTabContentsAtIndex ( pControl->getSelectedTabIndex() );
+        CEGUI::Window* pTab = pControl->getTabContentsAtIndex(pControl->getSelectedTabIndex());
 
         try
         {
-            return reinterpret_cast < CGUITab* > ( pTab->getUserData() );
+            return reinterpret_cast<CGUITab*>(pTab->getUserData());
         }
-        catch ( CEGUI::Exception )
+        catch (CEGUI::Exception)
         {
             return NULL;
         }
@@ -93,65 +87,68 @@ CGUITab* CGUITabPanel_Impl::GetSelectedTab ( void )
     return NULL;
 }
 
-
-void CGUITabPanel_Impl::SetSelectedTab ( CGUITab* pTab )
+void CGUITabPanel_Impl::SetSelectedTab(CGUITab* pTab)
 {
-    CGUITab_Impl* pTabImpl = reinterpret_cast < CGUITab_Impl* > ( pTab );
+    CGUITab_Impl* pTabImpl = reinterpret_cast<CGUITab_Impl*>(pTab);
     try
     {
-        reinterpret_cast < CEGUI::TabControl* > ( m_pWindow )->setSelectedTab ( pTabImpl->GetWindow()->getName() );
+        reinterpret_cast<CEGUI::TabControl*>(m_pWindow)->setSelectedTab(pTabImpl->GetWindow()->getName());
     }
-    catch ( CEGUI::Exception ) {};
+    catch (CEGUI::Exception)
+    {
+    };
 }
 
-
-void CGUITabPanel_Impl::SetSelectedIndex ( unsigned int uiIndex )
+void CGUITabPanel_Impl::SetSelectedIndex(unsigned int uiIndex)
 {
     try
     {
-        reinterpret_cast < CEGUI::TabControl* > ( m_pWindow )->setSelectedTabAtIndex ( uiIndex );
+        reinterpret_cast<CEGUI::TabControl*>(m_pWindow)->setSelectedTabAtIndex(uiIndex);
     }
-    catch ( CEGUI::Exception ) {};
+    catch (CEGUI::Exception)
+    {
+    };
 }
 
-unsigned int CGUITabPanel_Impl::GetSelectedIndex ( void )
+unsigned int CGUITabPanel_Impl::GetSelectedIndex(void)
 {
     unsigned int uiIndex = 0;
     try
     {
-        uiIndex = reinterpret_cast < CEGUI::TabControl* > ( m_pWindow )->getSelectedTabIndex ( );
+        uiIndex = reinterpret_cast<CEGUI::TabControl*>(m_pWindow)->getSelectedTabIndex();
     }
-    catch ( CEGUI::Exception ) {};
+    catch (CEGUI::Exception)
+    {
+    };
     return uiIndex;
 }
 
-unsigned int CGUITabPanel_Impl::GetTabCount ( void )
+unsigned int CGUITabPanel_Impl::GetTabCount(void)
 {
     unsigned int uiIndex = 0;
     try
     {
-        uiIndex = reinterpret_cast < CEGUI::TabControl* > ( m_pWindow )->getTabCount ( );
+        uiIndex = reinterpret_cast<CEGUI::TabControl*>(m_pWindow)->getTabCount();
     }
-    catch ( CEGUI::Exception ) {};
+    catch (CEGUI::Exception)
+    {
+    };
     return uiIndex;
 }
 
-bool CGUITabPanel_Impl::IsTabSelected ( CGUITab* pTab )
+bool CGUITabPanel_Impl::IsTabSelected(CGUITab* pTab)
 {
-    return reinterpret_cast < CEGUI::TabControl* > ( m_pWindow )->isTabContentsSelected ( reinterpret_cast < CGUITab_Impl* > ( pTab )->GetWindow () );
+    return reinterpret_cast<CEGUI::TabControl*>(m_pWindow)->isTabContentsSelected(reinterpret_cast<CGUITab_Impl*>(pTab)->GetWindow());
 }
 
-
-void CGUITabPanel_Impl::SetSelectionHandler ( GUI_CALLBACK Callback )
+void CGUITabPanel_Impl::SetSelectionHandler(GUI_CALLBACK Callback)
 {
     m_OnSelectionChanged = Callback;
 }
 
-
-bool CGUITabPanel_Impl::Event_OnSelectionChanged ( const CEGUI::EventArgs& e )
+bool CGUITabPanel_Impl::Event_OnSelectionChanged(const CEGUI::EventArgs& e)
 {
-    if ( m_OnSelectionChanged )
-        m_OnSelectionChanged ( reinterpret_cast < CGUIElement* > ( GetSelectedTab() ) );
+    if (m_OnSelectionChanged)
+        m_OnSelectionChanged(reinterpret_cast<CGUIElement*>(GetSelectedTab()));
     return true;
 }
-

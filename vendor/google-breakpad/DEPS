@@ -33,34 +33,52 @@
 # 'gclient runhooks' rather than 'gclient sync'.
 
 deps = {
-  # Logging code.
-  "src/src/third_party/glog":
-    "http://google-glog.googlecode.com/svn/trunk@97",
-
   # Testing libraries and utilities.
-  "src/src/testing": "http://googlemock.googlecode.com/svn/trunk@408",
-  "src/src/testing/gtest": "http://googletest.googlecode.com/svn/trunk@615",
+  "src/src/testing":
+    "https://github.com/google/googletest.git" +
+      "@release-1.8.0",
 
   # Protobuf.
   "src/src/third_party/protobuf/protobuf":
-    "http://protobuf.googlecode.com/svn/trunk@407",
+    "https://github.com/google/protobuf.git" +
+      "@cb6dd4ef5f82e41e06179dcd57d3b1d9246ad6ac",
 
   # GYP project generator.
-  "src/src/tools/gyp": "http://gyp.googlecode.com/svn/trunk@1886",
+  "src/src/tools/gyp":
+    "https://chromium.googlesource.com/external/gyp/" +
+      "@324dd166b7c0b39d513026fa52d6280ac6d56770",
 
   # Linux syscall support.
   "src/src/third_party/lss":
-    "http://linux-syscall-support.googlecode.com/svn/trunk/lss@24",
+    "https://chromium.googlesource.com/linux-syscall-support/" +
+      "@a89bf7903f3169e6bc7b8efc10a73a7571de21cf",
 }
 
 hooks = [
   {
-    # TODO(chrisha): Fix the GYP files so that they work without
-    # --no-circular-check.
-    "pattern": ".",
-    "action": ["python",
-               "src/src/tools/gyp/gyp_main.py",
-               "--no-circular-check",
-               "src/src/client/windows/breakpad_client.gyp"],
+    # Keep the manifest up to date.
+    "action": ["python", "src/src/tools/python/deps-to-manifest.py",
+               "src/DEPS", "src/default.xml"],
   },
 ]
+
+hooks_os = {
+  'win': [
+    {
+      # TODO(chrisha): Fix the GYP files so that they work without
+      # --no-circular-check.
+      "pattern": ".",
+      "action": ["python",
+                 "src/src/tools/gyp/gyp_main.py",
+                 "--no-circular-check",
+                 "src/src/client/windows/breakpad_client.gyp"],
+    },
+    {
+      # XXX: this and above should all be wired into build/all.gyp ?
+      "action": ["python",
+                 "src/src/tools/gyp/gyp_main.py",
+                 "--no-circular-check",
+                 "src/src/tools/windows/tools_windows.gyp"],
+    },
+  ],
+}

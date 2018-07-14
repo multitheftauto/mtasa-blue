@@ -4,11 +4,10 @@ project "CEFLauncher DLL"
 	targetname "CEFLauncher_DLL"
 	targetdir(buildpath("mta/cef"))
 	
-	includedirs { 
-		"../../vendor/cef3" 
-	}
+	includedirs { "../../vendor/cef3" }
+	libdirs { "../../vendor/cef3/Release" }
 
-	defines { "UNICODE" }
+	defines { "UNICODE", "PSAPI_VERSION=1" }
 	
 	vpaths { 
 		["Headers/*"] = "**.h",
@@ -23,7 +22,7 @@ project "CEFLauncher DLL"
 		"*.cpp"
 	}
 	
-	links { "CEF",  "../../vendor/cef3/Release/libcef.lib" }
+	links { "CEF",  "libcef.lib", "Psapi.lib", "version.lib", "Winmm.lib", "Ws2_32.lib", "DbgHelp.lib" }
 
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 

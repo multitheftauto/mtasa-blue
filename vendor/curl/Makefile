@@ -5,11 +5,11 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 1998 - 2010, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
-# are also available at http://curl.haxx.se/docs/copyright.html.
+# are also available at https://curl.haxx.se/docs/copyright.html.
 #
 # You may opt to use, copy, modify, merge, publish, distribute and/or sell
 # copies of the Software, and permit persons to whom the Software is
@@ -19,8 +19,6 @@
 # KIND, either express or implied.
 #
 ###########################################################################
-
-VC=vc6
 
 all:
 	./configure
@@ -87,132 +85,13 @@ mingw32%:
 	$(MAKE) -C lib -f Makefile.m32 CFG=$@
 	$(MAKE) -C src -f Makefile.m32 CFG=$@
 
-vc-clean: $(VC)
-	cd lib
-	nmake -f Makefile.$(VC) clean
-	cd ..\src
-	nmake -f Makefile.$(VC) clean
+vc:
+	cd winbuild
+	nmake /f Makefile.vc MACHINE=x86
 
-vc-all: $(VC)
-	cd lib
-	nmake -f Makefile.$(VC) cfg=release
-	nmake -f Makefile.$(VC) cfg=release-ssl
-	nmake -f Makefile.$(VC) cfg=release-zlib
-	nmake -f Makefile.$(VC) cfg=release-ssl-zlib
-	nmake -f Makefile.$(VC) cfg=release-ssl-dll
-	nmake -f Makefile.$(VC) cfg=release-zlib-dll
-	nmake -f Makefile.$(VC) cfg=release-ssl-dll-zlib-dll
-	nmake -f Makefile.$(VC) cfg=release-dll
-	nmake -f Makefile.$(VC) cfg=release-dll-ssl-dll
-	nmake -f Makefile.$(VC) cfg=release-dll-zlib-dll
-	nmake -f Makefile.$(VC) cfg=release-dll-ssl-dll-zlib-dll
-	nmake -f Makefile.$(VC) cfg=debug
-	nmake -f Makefile.$(VC) cfg=debug-ssl
-	nmake -f Makefile.$(VC) cfg=debug-zlib
-	nmake -f Makefile.$(VC) cfg=debug-ssl-zlib
-	nmake -f Makefile.$(VC) cfg=debug-ssl-dll
-	nmake -f Makefile.$(VC) cfg=debug-zlib-dll
-	nmake -f Makefile.$(VC) cfg=debug-ssl-dll-zlib-dll
-	nmake -f Makefile.$(VC) cfg=debug-dll
-	nmake -f Makefile.$(VC) cfg=debug-dll-ssl-dll
-	nmake -f Makefile.$(VC) cfg=debug-dll-zlib-dll
-	nmake -f Makefile.$(VC) cfg=debug-dll-ssl-dll-zlib-dll
-
-vc: $(VC)
-	cd lib
-	nmake /f Makefile.$(VC) cfg=release
-	cd ..\src
-	nmake /f Makefile.$(VC)
-
-vc-x64: $(VC)
-	cd lib
-	nmake /f Makefile.$(VC) MACHINE=x64 cfg=release
-	cd ..\src
-	nmake /f Makefile.$(VC) MACHINE=x64 cfg=release
-
-vc-zlib: $(VC)
-	cd lib
-	nmake /f Makefile.$(VC) cfg=release-zlib
-	cd ..\src
-	nmake /f Makefile.$(VC) cfg=release-zlib
-
-vc-ssl: $(VC)
-	cd lib
-	nmake /f Makefile.$(VC) cfg=release-ssl
-	cd ..\src
-	nmake /f Makefile.$(VC) cfg=release-ssl
-
-vc-ssl-zlib: $(VC)
-	cd lib
-	nmake /f Makefile.$(VC) cfg=release-ssl-zlib
-	cd ..\src
-	nmake /f Makefile.$(VC) cfg=release-ssl-zlib
-
-vc-winssl-zlib: $(VC)
-	cd lib
-	nmake /f Makefile.$(VC) cfg=release-winssl-zlib
-	cd ..\src
-	nmake /f Makefile.$(VC) cfg=release-winssl-zlib
-
-vc-x64-ssl-zlib: $(VC)
-	cd lib
-	nmake /f Makefile.$(VC) MACHINE=x64 cfg=release-ssl-zlib
-	cd ..\src
-	nmake /f Makefile.$(VC) MACHINE=x64 cfg=release-ssl-zlib
-
-vc-x64-winssl-zlib: $(VC)
-	cd lib
-	nmake /f Makefile.$(VC) MACHINE=x64 cfg=release-winssl-zlib
-	cd ..\src
-	nmake /f Makefile.$(VC) MACHINE=x64 cfg=release-winssl-zlib
-
-vc-ssl-dll: $(VC)
-	cd lib
-	nmake /f Makefile.$(VC) cfg=release-ssl-dll
-	cd ..\src
-	nmake /f Makefile.$(VC) cfg=release-ssl-dll
-
-vc-dll-ssl-dll: $(VC)
-	cd lib
-	nmake /f Makefile.$(VC) cfg=release-dll-ssl-dll
-	cd ..\src
-	nmake /f Makefile.$(VC) cfg=release-dll-ssl-dll
-
-vc-dll: $(VC)
-	cd lib
-	nmake /f Makefile.$(VC) cfg=release-dll
-	cd ..\src
-	nmake /f Makefile.$(VC) cfg=release-dll
-
-vc-dll-zlib-dll: $(VC)
-	cd lib
-	nmake /f Makefile.$(VC) cfg=release-dll-zlib-dll
-	cd ..\src
-	nmake /f Makefile.$(VC) cfg=release-dll-zlib-dll
-
-vc-dll-ssl-dll-zlib-dll: $(VC)
-	cd lib
-	nmake /f Makefile.$(VC) cfg=release-dll-ssl-dll-zlib-dll
-	cd ..\src
-	nmake /f Makefile.$(VC) cfg=release-dll-ssl-dll-zlib-dll
-
-vc-ssl-dll-zlib-dll: $(VC)
-	cd lib
-	nmake /f Makefile.$(VC) cfg=release-ssl-dll-zlib-dll
-	cd ..\src
-	nmake /f Makefile.$(VC) cfg=release-ssl-dll-zlib-dll
-
-vc-zlib-dll: $(VC)
-	cd lib
-	nmake /f Makefile.$(VC) cfg=release-zlib-dll
-	cd ..\src
-	nmake /f Makefile.$(VC) cfg=release-zlib-dll
-
-vc-sspi: $(VC)
-	cd lib
-	nmake /f Makefile.$(VC) cfg=release WINDOWS_SSPI=1
-	cd ..\src
-	nmake /f Makefile.$(VC) cfg=release WINDOWS_SSPI=1
+vc-x64:
+	cd winbuild
+	nmake /f Makefile.vc MACHINE=x64
 
 djgpp:
 	$(MAKE) -C lib -f Makefile.dj
@@ -262,41 +141,6 @@ unix-ssl: ssl
 linux: all
 
 linux-ssl: ssl
-
-# We don't need to do anything for vc6.
-vc6:
-
-vc8: lib/Makefile.vc8 src/Makefile.vc8
-
-lib/Makefile.vc8: lib/Makefile.vc6
-	@echo "generate $@"
-	@sed -e "s#/GX /DWIN32 /YX#/EHsc /DWIN32#" -e "s#/GZ#/RTC1#" -e "s/ws2_32.lib/ws2_32.lib bufferoverflowu.lib/g" -e "s/VC6/VC8/g" lib/Makefile.vc6 > lib/Makefile.vc8
-
-src/Makefile.vc8: src/Makefile.vc6
-	@echo "generate $@"
-	@sed -e "s#/GX /DWIN32 /YX#/EHsc /DWIN32#" -e "s#/GZ#/RTC1#" -e "s/ws2_32.lib/ws2_32.lib bufferoverflowu.lib/g" -e "s/VC6/VC8/g" src/Makefile.vc6 > src/Makefile.vc8
-
-# VC9 makefiles are for use with VS2008
-vc9: lib/Makefile.vc9 src/Makefile.vc9
-
-lib/Makefile.vc9: lib/Makefile.vc6
-	@echo "generate $@"
-	@sed -e "s#/GX /DWIN32 /YX#/EHsc /DWIN32#" -e "s#/GZ#/RTC1#" -e "s/ws2_32.lib/ws2_32.lib/g" -e "s/vc6/vc9/g" -e "s/VC6/VC9/g" lib/Makefile.vc6 > lib/Makefile.vc9
-
-src/Makefile.vc9: src/Makefile.vc6
-	@echo "generate $@"
-	@sed -e "s#/GX /DWIN32 /YX#/EHsc /DWIN32#" -e "s#/GZ#/RTC1#" -e "s/ws2_32.lib/ws2_32.lib/g" -e "s/vc6/vc9/g" -e "s/VC6/VC9/g" src/Makefile.vc6 > src/Makefile.vc9
-
-# VC10 makefiles are for use with VS2010
-vc10: lib/Makefile.vc10 src/Makefile.vc10
-
-lib/Makefile.vc10: lib/Makefile.vc6
-	@echo "generate $@"
-	@sed -e "s#/GX /DWIN32 /YX#/EHsc /DWIN32#" -e "s#/GZ#/RTC1#" -e "s/ws2_32.lib/ws2_32.lib/g" -e "s/vc6/vc10/g" -e "s/VC6/VC10/g" lib/Makefile.vc6 > lib/Makefile.vc10
-
-src/Makefile.vc10: src/Makefile.vc6
-	@echo "generate $@"
-	@sed -e "s#/GX /DWIN32 /YX#/EHsc /DWIN32#" -e "s#/GZ#/RTC1#" -e "s/ws2_32.lib/ws2_32.lib/g" -e "s/vc6/vc10/g" -e "s/VC6/VC10/g" src/Makefile.vc6 > src/Makefile.vc10
 
 ca-bundle: lib/mk-ca-bundle.pl
 	@echo "generate a fresh ca-bundle.crt"

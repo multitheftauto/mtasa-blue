@@ -1,6 +1,6 @@
 namespace EmbeddedLuaCode
 {
-    const SString exports = R"~LUA~(
+    const char* const exports = R"~LUA~(
 
 --[[
     SERVER AND CLIENT.
@@ -38,7 +38,7 @@ function exportsMT:__index(k)
     elseif type(k) ~= 'string' then
         k = tostring(k)
     end
-    
+
     local res = getResourceFromName(k)
     if res and getResourceRootElement(res) then
         return setmetatable({ res = res }, rescallMT)

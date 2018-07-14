@@ -35,19 +35,15 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdio.h>
 #include <string.h>
 #include <time.h>
 
 #include <string>
 
+#include "common/stdio_wrapper.h"
 #include "common/using_std_string.h"
 #include "processor/logging.h"
 #include "processor/pathname_stripper.h"
-
-#ifdef _WIN32
-#define snprintf _snprintf
-#endif
 
 namespace google_breakpad {
 
@@ -72,6 +68,9 @@ LogStream::LogStream(std::ostream &stream, Severity severity,
       break;
     case SEVERITY_ERROR:
       severity_string = "ERROR";
+      break;
+    case SEVERITY_CRITICAL:
+      severity_string = "CRITICAL";
       break;
   }
 

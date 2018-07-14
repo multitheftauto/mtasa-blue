@@ -1,27 +1,26 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        loader/Dialogs.cpp
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        loader/Dialogs.cpp
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-static bool bCancelPressed = false;
-static bool bOkPressed = false;
-static bool bOtherPressed = false;
-static int iOtherCode = 0;
-static HWND hwndSplash = NULL;
-static HWND hwndProgressDialog = NULL;
+static bool          bCancelPressed = false;
+static bool          bOkPressed = false;
+static bool          bOtherPressed = false;
+static int           iOtherCode = 0;
+static HWND          hwndSplash = NULL;
+static HWND          hwndProgressDialog = NULL;
 static unsigned long ulProgressStartTime = 0;
-static HWND hwndCrashedDialog = NULL;
-static HWND hwndD3dDllDialog = NULL;
-static HWND hwndOptimusDialog = NULL;
-static HWND hwndNoAvDialog = NULL;
-
+static HWND          hwndCrashedDialog = NULL;
+static HWND          hwndD3dDllDialog = NULL;
+static HWND          hwndOptimusDialog = NULL;
+static HWND          hwndNoAvDialog = NULL;
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -29,80 +28,83 @@ static HWND hwndNoAvDialog = NULL;
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-const char* dialogStringsYes    = _td("Yes");
-const char* dialogStringsNo     = _td("No");
-const char* dialogStringsOk     = _td("OK");
-const char* dialogStringsQuit   = _td("Quit");
-const char* dialogStringsHelp   = _td("Help");
-const char* dialogStringsCancel = _td("Cancel");
+const char* const dialogStringsYes = _td("Yes");
+const char* const dialogStringsNo = _td("No");
+const char* const dialogStringsOk = _td("OK");
+const char* const dialogStringsQuit = _td("Quit");
+const char* const dialogStringsHelp = _td("Help");
+const char* const dialogStringsCancel = _td("Cancel");
 
-struct SDialogItemInfo {
-    int iItemId;
-    int iLeadingSpaces;
-    const char* szItemText;
+struct SDialogItemInfo
+{
+    int               iItemId;
+    int               iLeadingSpaces;
+    const char* const szItemText;
 };
 
-SDialogItemInfo g_ProgressDialogItems[] = {
-            { IDCANCEL,                     0, dialogStringsCancel },
-            { -1 },
-            };
+const SDialogItemInfo g_ProgressDialogItems[] = {
+    {IDCANCEL, 0, dialogStringsCancel},
+    {-1},
+};
 
-SDialogItemInfo g_CrashedDialogItems[] = {
-            { 0,                            0, _td("MTA: San Andreas has encountered a problem") },
-            { IDC_CRASH_HEAD,               0, _td("Crash information") },
-            { IDC_SEND_DUMP_CHECK,          0, _td("Tick the check box to send this crash info to MTA devs using the 'internet'") },
-            { IDC_SEND_DESC_STATIC,         0, _td("Doing so will increase the chance of this crash being fixed.") },
-            { IDC_RESTART_QUESTION_STATIC,  1, _td("Do you want to restart MTA: San Andreas ?") },
-            { IDCANCEL,                     0, dialogStringsNo },
-            { IDOK,                         0, dialogStringsYes },
-            { -1 },
-            };
+const SDialogItemInfo g_CrashedDialogItems[] = {
+    {0, 0, _td("MTA: San Andreas has encountered a problem")},
+    {IDC_CRASH_HEAD, 0, _td("Crash information")},
+    {IDC_SEND_DUMP_CHECK, 0, _td("Tick the check box to send this crash info to MTA devs using the 'internet'")},
+    {IDC_SEND_DESC_STATIC, 0, _td("Doing so will increase the chance of this crash being fixed.")},
+    {IDC_RESTART_QUESTION_STATIC, 1, _td("Do you want to restart MTA: San Andreas ?")},
+    {IDCANCEL, 0, dialogStringsNo},
+    {IDOK, 0, dialogStringsYes},
+    {-1},
+};
 
-SDialogItemInfo g_D3dDllDialogItems[] = {
-            { 0,                            0, _td("MTA: San Andreas - Warning") },
-            { IDC_D3DDLL_TEXT1,             0, _td("Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll file:") },
-            { IDC_D3DDLL_TEXT2,             0, _td("The file is not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
-                                                   "It is recommended that you remove or rename d3d9.dll") },
-            { IDC_CHECK_NOT_AGAIN,          1, _td("Do not tell me about this d3d9.dll again") },
-            { IDC_BUTTON_SHOW_DIR,          0, _td("Show me the file") },
-            { IDOK,                         0, _td("Play MTA:SA") },
-            { IDCANCEL,                     0, dialogStringsQuit },
-            { -1 },
-            };
+const SDialogItemInfo g_D3dDllDialogItems[] = {
+    {0, 0, _td("MTA: San Andreas - Warning")},
+    {IDC_D3DDLL_TEXT1, 0, _td("Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll file:")},
+    {IDC_D3DDLL_TEXT2, 0,
+     _td("The file is not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
+         "It is recommended that you remove or rename d3d9.dll")},
+    {IDC_CHECK_NOT_AGAIN, 1, _td("Do not tell me about this d3d9.dll again")},
+    {IDC_BUTTON_SHOW_DIR, 0, _td("Show me the file")},
+    {IDOK, 0, _td("Play MTA:SA")},
+    {IDCANCEL, 0, dialogStringsQuit},
+    {-1},
+};
 
+const SDialogItemInfo g_OptimusDialogItems[] = {
+    {0, 0, _td("MTA: San Andreas - Confusing options")},
+    {IDC_OPTIMUS_TEXT1, 0, _td("NVidia Optimus detected!")},
+    {IDC_OPTIMUS_TEXT2, 0, _td("Try each option and see what works:")},
+    {IDC_RADIO1, 1, _td("A - Standard NVidia")},
+    {IDC_RADIO2, 1, _td("B - Alternate NVidia")},
+    {IDC_RADIO3, 1, _td("C - Standard NVidia with exe rename")},
+    {IDC_RADIO4, 1, _td("D - Alternate NVidia with exe rename")},
+    {IDC_RADIO5, 1, _td("E - Standard Intel")},
+    {IDC_RADIO6, 1, _td("F - Alternate Intel")},
+    {IDC_RADIO7, 1, _td("G - Standard Intel with exe rename")},
+    {IDC_RADIO8, 1, _td("H - Alternate Intel with exe rename")},
+    {IDC_OPTIMUS_TEXT3, 0, _td("If you get desperate, this might help:")},
+    {IDC_CHECK_FORCE_WINDOWED, 1, _td("Force windowed mode")},
+    {IDC_BUTTON_HELP, 0, dialogStringsHelp},
+    {IDOK, 0, dialogStringsOk},
+    {-1},
+};
 
-SDialogItemInfo g_OptimusDialogItems[] = {
-            { 0,                            0, _td("MTA: San Andreas - Confusing options") },
-            { IDC_OPTIMUS_TEXT1,            0, _td("NVidia Optimus detected!") },
-            { IDC_OPTIMUS_TEXT2,            0, _td("Try each option and see what works:") },
-            { IDC_RADIO1,                   1, _td("A - Standard NVidia") },
-            { IDC_RADIO2,                   1, _td("B - Alternate NVidia") },
-            { IDC_RADIO3,                   1, _td("C - Standard NVidia with exe rename") },
-            { IDC_RADIO4,                   1, _td("D - Alternate NVidia with exe rename") },
-            { IDC_RADIO5,                   1, _td("E - Standard Intel") },
-            { IDC_RADIO6,                   1, _td("F - Alternate Intel") },
-            { IDC_RADIO7,                   1, _td("G - Standard Intel with exe rename") },
-            { IDC_RADIO8,                   1, _td("H - Alternate Intel with exe rename") },
-            { IDC_OPTIMUS_TEXT3,            0, _td("If you get desperate, this might help:") },
-            { IDC_CHECK_FORCE_WINDOWED,     1, _td("Force windowed mode") },
-            { IDC_BUTTON_HELP,              0, dialogStringsHelp },
-            { IDOK,                         0, dialogStringsOk },
-            { -1 },
-            };
-
-SDialogItemInfo g_NoAvDialogItems[] = {
-            { 0,                            0, _td("MTA: San Andreas") },
-            { IDC_NOAV_TEXT1,               0, _td("Warning: Could not detect anti-virus product") },
-            { IDC_NOAV_TEXT2,               0, _td("MTA could not detect an anti-virus on your PC.\n\n"
-                                                   "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
-                                                   "Press 'Help' for more information.") },
-            { IDC_NOAV_OPT_SKIP,            0, _td("I have already installed an anti-virus") },
-            { IDC_NOAV_OPT_BOTNET,          0, _td("I will not install an anti-virus.\n"
-                                                   "I want my PC to lag and be part of a botnet.") },
-            { IDC_BUTTON_HELP,              0, dialogStringsHelp },
-            { IDOK,                         0, dialogStringsOk },
-            { -1 },
-            };
+const SDialogItemInfo g_NoAvDialogItems[] = {
+    {0, 0, _td("MTA: San Andreas")},
+    {IDC_NOAV_TEXT1, 0, _td("Warning: Could not detect anti-virus product")},
+    {IDC_NOAV_TEXT2, 0,
+     _td("MTA could not detect an anti-virus on your PC.\n\n"
+         "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
+         "Press 'Help' for more information.")},
+    {IDC_NOAV_OPT_SKIP, 0, _td("I have already installed an anti-virus")},
+    {IDC_NOAV_OPT_BOTNET, 0,
+     _td("I will not install an anti-virus.\n"
+         "I want my PC to lag and be part of a botnet.")},
+    {IDC_BUTTON_HELP, 0, dialogStringsHelp},
+    {IDOK, 0, dialogStringsOk},
+    {-1},
+};
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -111,38 +113,38 @@ SDialogItemInfo g_NoAvDialogItems[] = {
 // Copy strings into dialog
 //
 ///////////////////////////////////////////////////////////////////////////
-void InitDialogStrings( HWND hwndDialog, const SDialogItemInfo* dialogItems )
+void InitDialogStrings(HWND hwndDialog, const SDialogItemInfo* dialogItems)
 {
-    for ( uint i = 0 ; true ; i++ )
+    for (uint i = 0; true; i++)
     {
         const SDialogItemInfo& item = dialogItems[i];
-        if ( item.iItemId == -1 )
+        if (item.iItemId == -1)
             return;
 
         HWND hwndItem;
-        if ( item.iItemId == 0 )
+        if (item.iItemId == 0)
             hwndItem = hwndDialog;
         else
-            hwndItem = GetDlgItem( hwndDialog, item.iItemId );
+            hwndItem = GetDlgItem(hwndDialog, item.iItemId);
 
-        if ( hwndItem )
+        if (hwndItem)
         {
-            SString strItemText = PadLeft( _(item.szItemText), item.iLeadingSpaces, ' ' );
+            SString strItemText = PadLeft(_(item.szItemText), item.iLeadingSpaces, ' ');
 #if MTA_DEBUG
             char szPrevText[200] = "";
-            GetWindowText( hwndItem, szPrevText, NUMELMS( szPrevText ) );
-            if ( !strItemText.EndsWith( szPrevText ) && !SStringX( szPrevText ).EndsWith( strItemText ) )
+            GetWindowText(hwndItem, szPrevText, NUMELMS(szPrevText));
+            if (!strItemText.EndsWith(szPrevText) && !SStringX(szPrevText).EndsWith(strItemText))
             {
-                OutputDebugLine( SString( "Possible text mismatch for dialog item (idx:%d id:%d) '%s' (orig:'%s')", i, item.iItemId, item.szItemText, szPrevText ) );
+                OutputDebugLine(
+                    SString("Possible text mismatch for dialog item (idx:%d id:%d) '%s' (orig:'%s')", i, item.iItemId, item.szItemText, szPrevText));
             }
 #endif
-            SetWindowTextW( hwndItem, FromUTF8( strItemText ) );
+            SetWindowTextW(hwndItem, FromUTF8(strItemText));
         }
         else
-            OutputDebugLine( SString( "No dialog item for (idx:%d id:%d) '%s' ", i, item.iItemId, item.szItemText ) );
+            OutputDebugLine(SString("No dialog item for (idx:%d id:%d) '%s' ", i, item.iItemId, item.szItemText));
     }
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -151,60 +153,59 @@ void InitDialogStrings( HWND hwndDialog, const SDialogItemInfo* dialogItems )
 // Generic callback for all our dialogs
 //
 ///////////////////////////////////////////////////////////////////////////
-int CALLBACK DialogProc ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
-{ 
-    switch (uMsg) 
-    { 
-        case WM_COMMAND: 
-            switch (LOWORD(wParam)) 
-            {  
+int CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+        case WM_COMMAND:
+            switch (LOWORD(wParam))
+            {
                 case IDCANCEL:
                     bCancelPressed = true;
-                    return TRUE; 
+                    return TRUE;
                 case IDOK:
                     bOkPressed = true;
-                    return TRUE; 
+                    return TRUE;
                 default:
-                    if ( iOtherCode && iOtherCode == LOWORD(wParam) )
+                    if (iOtherCode && iOtherCode == LOWORD(wParam))
                     {
                         bOtherPressed = true;
-                        return TRUE; 
+                        return TRUE;
                     }
-            } 
-    } 
-    return FALSE; 
-} 
-
+            }
+    }
+    return FALSE;
+}
 
 //
 // Show splash dialog
 //
-void ShowSplash ( HINSTANCE hInstance )
+void ShowSplash(HINSTANCE hInstance)
 {
 #ifndef MTA_DEBUG
-    if ( !hwndSplash )
+    if (!hwndSplash)
     {
-        hwndSplash = CreateDialog ( hInstance, MAKEINTRESOURCE(IDD_DIALOG1), 0, DialogProc );
+        hwndSplash = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), 0, DialogProc);
 
-        HWND hBitmap = GetDlgItem ( hwndSplash, IDC_SPLASHBITMAP );
+        HWND hBitmap = GetDlgItem(hwndSplash, IDC_SPLASHBITMAP);
         RECT splashRect;
-        GetWindowRect ( hBitmap, &splashRect );
-        int iScreenWidth = GetSystemMetrics ( SM_CXSCREEN );
-        int iScreenHeight = GetSystemMetrics ( SM_CYSCREEN );
+        GetWindowRect(hBitmap, &splashRect);
+        int iScreenWidth = GetSystemMetrics(SM_CXSCREEN);
+        int iScreenHeight = GetSystemMetrics(SM_CYSCREEN);
         int iWindowWidth = splashRect.right - splashRect.left;
         int iWindowHeight = splashRect.bottom - splashRect.top;
 
         // Adjust and center the window (to be DPI-aware)
-        SetWindowPos ( hwndSplash, NULL, (iScreenWidth-iWindowWidth)/2, (iScreenHeight-iWindowHeight)/2, iWindowWidth, iWindowHeight, 0 );
+        SetWindowPos(hwndSplash, NULL, (iScreenWidth - iWindowWidth) / 2, (iScreenHeight - iWindowHeight) / 2, iWindowWidth, iWindowHeight, 0);
     }
-    SetForegroundWindow ( hwndSplash );
-    SetWindowPos ( hwndSplash, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
+    SetForegroundWindow(hwndSplash);
+    SetWindowPos(hwndSplash, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 
     // Drain messages to allow for repaint in case picture bits were lost during previous operations
     MSG msg;
-    while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
+    while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
     {
-        if( GetMessage( &msg, NULL, 0, 0 ) )
+        if (GetMessage(&msg, NULL, 0, 0))
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
@@ -213,15 +214,14 @@ void ShowSplash ( HINSTANCE hInstance )
 #endif
 }
 
-
 //
 // Hide splash dialog
 //
-void HideSplash ( void )
+void HideSplash(void)
 {
-    if ( hwndSplash )
+    if (hwndSplash)
     {
-        DestroyWindow ( hwndSplash );
+        DestroyWindow(hwndSplash);
         hwndSplash = NULL;
     }
 }
@@ -229,26 +229,25 @@ void HideSplash ( void )
 //
 // Hide splash dialog temporarily
 //
-void SuspendSplash ( void )
+void SuspendSplash(void)
 {
-    if ( hwndSplash )
+    if (hwndSplash)
     {
-        ShowWindow( hwndSplash, SW_HIDE );
+        ShowWindow(hwndSplash, SW_HIDE);
     }
 }
 
 //
 // Show splash dialog if was previously suspended
 //
-void ResumeSplash ( void )
+void ResumeSplash(void)
 {
-    if ( hwndSplash )
+    if (hwndSplash)
     {
         HideSplash();
-        ShowSplash( g_hInstance );
+        ShowSplash(g_hInstance);
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -257,57 +256,56 @@ void ResumeSplash ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void ShowProgressDialog( HINSTANCE hInstance, const SString& strTitle, bool bAllowCancel )
+void ShowProgressDialog(HINSTANCE hInstance, const SString& strTitle, bool bAllowCancel)
 {
-    if ( !hwndProgressDialog )
+    if (!hwndProgressDialog)
     {
-        HideSplash ();
+        HideSplash();
         bCancelPressed = false;
-        hwndProgressDialog = CreateDialogW ( hInstance, MAKEINTRESOURCEW(IDD_PROGRESS_DIALOG), 0, DialogProc );
-        dassert( ( GetWindowLong( hwndProgressDialog, GWL_STYLE ) & WS_VISIBLE ) == 0 );    // Should be Visible: False
-        InitDialogStrings( hwndProgressDialog, g_ProgressDialogItems );
-        SetWindowTextW ( hwndProgressDialog, FromUTF8( strTitle ) );
-        ShowWindow( GetDlgItem( hwndProgressDialog, IDCANCEL ), bAllowCancel ? SW_SHOW : SW_HIDE );
-        ulProgressStartTime = GetTickCount32 ();
+        hwndProgressDialog = CreateDialogW(hInstance, MAKEINTRESOURCEW(IDD_PROGRESS_DIALOG), 0, DialogProc);
+        dassert((GetWindowLong(hwndProgressDialog, GWL_STYLE) & WS_VISIBLE) == 0);            // Should be Visible: False
+        InitDialogStrings(hwndProgressDialog, g_ProgressDialogItems);
+        SetWindowTextW(hwndProgressDialog, FromUTF8(strTitle));
+        ShowWindow(GetDlgItem(hwndProgressDialog, IDCANCEL), bAllowCancel ? SW_SHOW : SW_HIDE);
+        ulProgressStartTime = GetTickCount32();
     }
-    SetForegroundWindow ( hwndProgressDialog );
-    SetWindowPos ( hwndProgressDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
+    SetForegroundWindow(hwndProgressDialog);
+    SetWindowPos(hwndProgressDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 }
 
-void HideProgressDialog ( void )
+void HideProgressDialog(void)
 {
-    if ( hwndProgressDialog )
+    if (hwndProgressDialog)
     {
         // Show progress for at least two seconds
-        unsigned long ulTimeElapsed = GetTickCount32 () - ulProgressStartTime;
-        if ( ulTimeElapsed < 2000 )
+        unsigned long ulTimeElapsed = GetTickCount32() - ulProgressStartTime;
+        if (ulTimeElapsed < 2000)
         {
-            UpdateProgress( 100, 100 );
-            Sleep ( 2000 - ulTimeElapsed );
+            UpdateProgress(100, 100);
+            Sleep(2000 - ulTimeElapsed);
         }
 
-        DestroyWindow ( hwndProgressDialog );
+        DestroyWindow(hwndProgressDialog);
         hwndProgressDialog = NULL;
     }
 }
 
-
 // returns true if canceled
-bool UpdateProgress( int iPos, int iMax, const SString& strMsg )
+bool UpdateProgress(int iPos, int iMax, const SString& strMsg)
 {
-    if ( hwndProgressDialog)
+    if (hwndProgressDialog)
     {
-        HWND hwndText = GetDlgItem( hwndProgressDialog, IDC_PROGRESS_STATIC );
-        char buffer[ 1024 ] = "";
-        GetWindowText ( hwndText, buffer, NUMELMS(buffer) );
-        if ( strMsg.length () > 0 && strMsg != buffer )
-            SetWindowTextW ( hwndText, FromUTF8( strMsg ) );
-        HWND hwndBar = GetDlgItem( hwndProgressDialog, IDC_PROGRESS_BAR );
-        PostMessage(hwndBar, PBM_SETPOS, iPos * 100 / Max ( 1, iMax ), 0 );
+        HWND hwndText = GetDlgItem(hwndProgressDialog, IDC_PROGRESS_STATIC);
+        char buffer[1024] = "";
+        GetWindowText(hwndText, buffer, NUMELMS(buffer));
+        if (strMsg.length() > 0 && strMsg != buffer)
+            SetWindowTextW(hwndText, FromUTF8(strMsg));
+        HWND hwndBar = GetDlgItem(hwndProgressDialog, IDC_PROGRESS_BAR);
+        PostMessage(hwndBar, PBM_SETPOS, iPos * 100 / std::max(1, iMax), 0);
         MSG msg;
-        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
+        while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
         {
-            if( GetMessage( &msg, NULL, 0, 0 ) )
+            if (GetMessage(&msg, NULL, 0, 0))
             {
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
@@ -318,7 +316,6 @@ bool UpdateProgress( int iPos, int iMax, const SString& strMsg )
     return false;
 }
 
-
 ///////////////////////////////////////////////////////////////
 //
 // Progress
@@ -326,26 +323,25 @@ bool UpdateProgress( int iPos, int iMax, const SString& strMsg )
 //
 //
 ///////////////////////////////////////////////////////////////
-void StartPseudoProgress( HINSTANCE hInstance, const SString& strTitle, const SString& strMsg )
+void StartPseudoProgress(HINSTANCE hInstance, const SString& strTitle, const SString& strMsg)
 {
-    ShowProgressDialog ( hInstance, strTitle );
-    UpdateProgress( 10, 100, strMsg );
-    Sleep ( 100 );
-    UpdateProgress( 30, 100 );
+    ShowProgressDialog(hInstance, strTitle);
+    UpdateProgress(10, 100, strMsg);
+    Sleep(100);
+    UpdateProgress(30, 100);
 }
 
-void StopPseudoProgress( void )
+void StopPseudoProgress(void)
 {
-    if ( hwndProgressDialog )
+    if (hwndProgressDialog)
     {
-        UpdateProgress( 60, 100 );
-        Sleep ( 100 );
-        UpdateProgress( 90, 100 );
-        Sleep ( 100 );
-        HideProgressDialog ();
+        UpdateProgress(60, 100);
+        Sleep(100);
+        UpdateProgress(90, 100);
+        Sleep(100);
+        HideProgressDialog();
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -354,60 +350,59 @@ void StopPseudoProgress( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-SString ShowCrashedDialog( HINSTANCE hInstance, const SString& strMessage )
+SString ShowCrashedDialog(HINSTANCE hInstance, const SString& strMessage)
 {
-    if ( !hwndCrashedDialog )
+    if (!hwndCrashedDialog)
     {
-        SuspendSplash ();
+        SuspendSplash();
         bCancelPressed = false;
         bOkPressed = false;
         bOtherPressed = false;
         iOtherCode = 0;
-        hwndCrashedDialog = CreateDialogW ( hInstance, MAKEINTRESOURCEW(IDD_CRASHED_DIALOG), 0, DialogProc );
-        dassert( ( GetWindowLong( hwndCrashedDialog, GWL_STYLE ) & WS_VISIBLE ) == 0 );    // Should be Visible: False
-        InitDialogStrings( hwndCrashedDialog, g_CrashedDialogItems );
-        SetWindowTextW ( GetDlgItem( hwndCrashedDialog, IDC_CRASH_INFO_EDIT ), FromUTF8( strMessage ) );
-        SendDlgItemMessage( hwndCrashedDialog, IDC_SEND_DUMP_CHECK, BM_SETCHECK, GetApplicationSetting ( "diagnostics", "send-dumps" ) != "no" ? BST_CHECKED : BST_UNCHECKED, 0 );
+        hwndCrashedDialog = CreateDialogW(hInstance, MAKEINTRESOURCEW(IDD_CRASHED_DIALOG), 0, DialogProc);
+        dassert((GetWindowLong(hwndCrashedDialog, GWL_STYLE) & WS_VISIBLE) == 0);            // Should be Visible: False
+        InitDialogStrings(hwndCrashedDialog, g_CrashedDialogItems);
+        SetWindowTextW(GetDlgItem(hwndCrashedDialog, IDC_CRASH_INFO_EDIT), FromUTF8(strMessage));
+        SendDlgItemMessage(hwndCrashedDialog, IDC_SEND_DUMP_CHECK, BM_SETCHECK,
+                           GetApplicationSetting("diagnostics", "send-dumps") != "no" ? BST_CHECKED : BST_UNCHECKED, 0);
     }
-    SetForegroundWindow ( hwndCrashedDialog );
-    SetWindowPos ( hwndCrashedDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
+    SetForegroundWindow(hwndCrashedDialog);
+    SetWindowPos(hwndCrashedDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 
-    while ( !bCancelPressed && !bOkPressed )
+    while (!bCancelPressed && !bOkPressed)
     {
         MSG msg;
-        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
+        while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
         {
-            if( GetMessage( &msg, NULL, 0, 0 ) )
+            if (GetMessage(&msg, NULL, 0, 0))
             {
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
             }
         }
-        Sleep( 10 );
+        Sleep(10);
     }
 
-    LRESULT res = SendMessageA( GetDlgItem( hwndCrashedDialog, IDC_SEND_DUMP_CHECK ), BM_GETCHECK, 0, 0 );
-    SetApplicationSetting ( "diagnostics", "send-dumps", res ? "yes" : "no" );
+    LRESULT res = SendMessageA(GetDlgItem(hwndCrashedDialog, IDC_SEND_DUMP_CHECK), BM_GETCHECK, 0, 0);
+    SetApplicationSetting("diagnostics", "send-dumps", res ? "yes" : "no");
 
-    if ( bCancelPressed )
+    if (bCancelPressed)
         return "quit";
 
     ResumeSplash();
 
-    //if ( bOkPressed )
-        return "ok";
+    // if ( bOkPressed )
+    return "ok";
 }
 
-
-void HideCrashedDialog ( void )
+void HideCrashedDialog(void)
 {
-    if ( hwndCrashedDialog )
+    if (hwndCrashedDialog)
     {
-        DestroyWindow ( hwndCrashedDialog );
+        DestroyWindow(hwndCrashedDialog);
         hwndCrashedDialog = NULL;
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -416,91 +411,89 @@ void HideCrashedDialog ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void ShowD3dDllDialog( HINSTANCE hInstance, const SString& strPath )
+void ShowD3dDllDialog(HINSTANCE hInstance, const SString& strPath)
 {
     // Calc hash of target file
-    SString strFileHash;
-    MD5 md5;
+    SString    strFileHash;
+    MD5        md5;
     CMD5Hasher Hasher;
-    if ( Hasher.Calculate ( strPath, md5 ) )
+    if (Hasher.Calculate(strPath, md5))
     {
         char szHashResult[33];
-        Hasher.ConvertToHex ( md5, szHashResult );
+        Hasher.ConvertToHex(md5, szHashResult);
         strFileHash = szHashResult;
     }
 
-	// Maybe skip dialog
-    if ( GetApplicationSetting ( "diagnostics", "d3d9-dll-last-hash" ) == strFileHash )
+    // Maybe skip dialog
+    if (GetApplicationSetting("diagnostics", "d3d9-dll-last-hash") == strFileHash)
     {
-        if ( GetApplicationSetting ( "diagnostics", "d3d9-dll-not-again" ) == "yes" )
+        if (GetApplicationSetting("diagnostics", "d3d9-dll-not-again") == "yes")
             return;
     }
 
-	// Create and show dialog
-    if ( !hwndD3dDllDialog )
+    // Create and show dialog
+    if (!hwndD3dDllDialog)
     {
-        SuspendSplash ();
+        SuspendSplash();
         bCancelPressed = false;
         bOkPressed = false;
         bOtherPressed = false;
         iOtherCode = IDC_BUTTON_SHOW_DIR;
-        hwndD3dDllDialog = CreateDialogW ( hInstance, MAKEINTRESOURCEW(IDD_D3DDLL_DIALOG), 0, DialogProc );
-        dassert( ( GetWindowLong( hwndD3dDllDialog, GWL_STYLE ) & WS_VISIBLE ) == 0 );    // Should be Visible: False
-        InitDialogStrings( hwndD3dDllDialog, g_D3dDllDialogItems );
-        SetWindowTextW ( GetDlgItem( hwndD3dDllDialog, IDC_EDIT_D3DDLL_PATH ), FromUTF8( strPath ) );
+        hwndD3dDllDialog = CreateDialogW(hInstance, MAKEINTRESOURCEW(IDD_D3DDLL_DIALOG), 0, DialogProc);
+        dassert((GetWindowLong(hwndD3dDllDialog, GWL_STYLE) & WS_VISIBLE) == 0);            // Should be Visible: False
+        InitDialogStrings(hwndD3dDllDialog, g_D3dDllDialogItems);
+        SetWindowTextW(GetDlgItem(hwndD3dDllDialog, IDC_EDIT_D3DDLL_PATH), FromUTF8(strPath));
     }
-    SetForegroundWindow ( hwndD3dDllDialog );
-    SetWindowPos ( hwndD3dDllDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
+    SetForegroundWindow(hwndD3dDllDialog);
+    SetWindowPos(hwndD3dDllDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 
-	// Wait for input
-    while ( !bCancelPressed && !bOkPressed && !bOtherPressed )
+    // Wait for input
+    while (!bCancelPressed && !bOkPressed && !bOtherPressed)
     {
         MSG msg;
-        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
+        while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
         {
-            if( GetMessage( &msg, NULL, 0, 0 ) )
+            if (GetMessage(&msg, NULL, 0, 0))
             {
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
             }
         }
-        Sleep( 10 );
+        Sleep(10);
     }
 
-	// Process input
-    LRESULT res = SendMessageA( GetDlgItem( hwndD3dDllDialog, IDC_CHECK_NOT_AGAIN ), BM_GETCHECK, 0, 0 );
-    SetApplicationSetting ( "diagnostics", "d3d9-dll-last-hash", strFileHash );
-    SetApplicationSetting ( "diagnostics", "d3d9-dll-not-again", res ? "yes" : "no" );
+    // Process input
+    LRESULT res = SendMessageA(GetDlgItem(hwndD3dDllDialog, IDC_CHECK_NOT_AGAIN), BM_GETCHECK, 0, 0);
+    SetApplicationSetting("diagnostics", "d3d9-dll-last-hash", strFileHash);
+    SetApplicationSetting("diagnostics", "d3d9-dll-not-again", res ? "yes" : "no");
 
-    if ( bCancelPressed )
+    if (bCancelPressed)
     {
         ExitProcess(0);
     }
-    if ( bOtherPressed )
+    if (bOtherPressed)
     {
-        if ( ITEMIDLIST *pidl = ILCreateFromPathW ( FromUTF8( strPath ) ) )
+        if (ITEMIDLIST* pidl = ILCreateFromPathW(FromUTF8(strPath)))
         {
-            SHOpenFolderAndSelectItems ( pidl, 0, 0, 0 );
-            ILFree ( pidl );
+            SHOpenFolderAndSelectItems(pidl, 0, 0, 0);
+            ILFree(pidl);
         }
         else
-            ShellExecuteNonBlocking ( "open", ExtractPath ( strPath ) );
+            ShellExecuteNonBlocking("open", ExtractPath(strPath));
 
         ExitProcess(0);
     }
     ResumeSplash();
 }
 
-
-void HideD3dDllDialog ( void )
+void HideD3dDllDialog(void)
 {
-    if ( hwndD3dDllDialog )
+    if (hwndD3dDllDialog)
     {
-        DestroyWindow ( hwndD3dDllDialog );
+        DestroyWindow(hwndD3dDllDialog);
         hwndD3dDllDialog = NULL;
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -509,89 +502,87 @@ void HideD3dDllDialog ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void ShowOptimusDialog( HINSTANCE hInstance )
+void ShowOptimusDialog(HINSTANCE hInstance)
 {
-    if ( GetApplicationSettingInt( "nvhacks", "optimus-dialog-skip" ) )
+    if (GetApplicationSettingInt("nvhacks", "optimus-dialog-skip"))
     {
-        SetApplicationSettingInt( "nvhacks", "optimus-dialog-skip", 0 );
+        SetApplicationSettingInt("nvhacks", "optimus-dialog-skip", 0);
         return;
     }
 
-    uint RadioButtons[] = { IDC_RADIO1, IDC_RADIO2, IDC_RADIO3, IDC_RADIO4, IDC_RADIO5, IDC_RADIO6, IDC_RADIO7, IDC_RADIO8 };
-	// Create and show dialog
-    if ( !hwndOptimusDialog )
+    uint RadioButtons[] = {IDC_RADIO1, IDC_RADIO2, IDC_RADIO3, IDC_RADIO4, IDC_RADIO5, IDC_RADIO6, IDC_RADIO7, IDC_RADIO8};
+    // Create and show dialog
+    if (!hwndOptimusDialog)
     {
-        SuspendSplash ();
+        SuspendSplash();
         bCancelPressed = false;
         bOkPressed = false;
         bOtherPressed = false;
         iOtherCode = IDC_BUTTON_HELP;
-        hwndOptimusDialog = CreateDialogW ( hInstance, MAKEINTRESOURCEW(IDD_OPTIMUS_DIALOG), 0, DialogProc );
-        dassert( ( GetWindowLong( hwndOptimusDialog, GWL_STYLE ) & WS_VISIBLE ) == 0 );    // Should be Visible: False
-        InitDialogStrings( hwndOptimusDialog, g_OptimusDialogItems );
-        uint uiStartupOption = GetApplicationSettingInt( "nvhacks", "optimus-startup-option" ) % NUMELMS( RadioButtons );
-        uint uiForceWindowed = GetApplicationSettingInt( "nvhacks", "optimus-force-windowed" );
-        CheckRadioButton( hwndOptimusDialog, IDC_RADIO1, IDC_RADIO8, RadioButtons[ uiStartupOption ] );
-        CheckDlgButton( hwndOptimusDialog, IDC_CHECK_FORCE_WINDOWED, uiForceWindowed );
+        hwndOptimusDialog = CreateDialogW(hInstance, MAKEINTRESOURCEW(IDD_OPTIMUS_DIALOG), 0, DialogProc);
+        dassert((GetWindowLong(hwndOptimusDialog, GWL_STYLE) & WS_VISIBLE) == 0);            // Should be Visible: False
+        InitDialogStrings(hwndOptimusDialog, g_OptimusDialogItems);
+        uint uiStartupOption = GetApplicationSettingInt("nvhacks", "optimus-startup-option") % NUMELMS(RadioButtons);
+        uint uiForceWindowed = GetApplicationSettingInt("nvhacks", "optimus-force-windowed");
+        CheckRadioButton(hwndOptimusDialog, IDC_RADIO1, IDC_RADIO8, RadioButtons[uiStartupOption]);
+        CheckDlgButton(hwndOptimusDialog, IDC_CHECK_FORCE_WINDOWED, uiForceWindowed);
     }
-    SetForegroundWindow ( hwndOptimusDialog );
-    SetWindowPos ( hwndOptimusDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW );
+    SetForegroundWindow(hwndOptimusDialog);
+    SetWindowPos(hwndOptimusDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 
-	// Wait for input
-    while ( !bCancelPressed && !bOkPressed && !bOtherPressed )
+    // Wait for input
+    while (!bCancelPressed && !bOkPressed && !bOtherPressed)
     {
         MSG msg;
-        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
+        while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
         {
-            if( GetMessage( &msg, NULL, 0, 0 ) )
+            if (GetMessage(&msg, NULL, 0, 0))
             {
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
             }
         }
-        Sleep( 10 );
+        Sleep(10);
     }
 
-    if ( bOtherPressed )
+    if (bOtherPressed)
     {
-        BrowseToSolution ( "optimus-startup-option-help", TERMINATE_PROCESS );
+        BrowseToSolution("optimus-startup-option-help", TERMINATE_PROCESS);
     }
 
-	// Process input
+    // Process input
     uint uiStartupOption = 0;
-    for ( ; uiStartupOption < NUMELMS( RadioButtons ) - 1 ; uiStartupOption++ )
+    for (; uiStartupOption < NUMELMS(RadioButtons) - 1; uiStartupOption++)
     {
-        if ( IsDlgButtonChecked( hwndOptimusDialog, RadioButtons[ uiStartupOption ] ) == BST_CHECKED )
+        if (IsDlgButtonChecked(hwndOptimusDialog, RadioButtons[uiStartupOption]) == BST_CHECKED)
             break;
     }
-    uint uiForceWindowed = ( IsDlgButtonChecked( hwndOptimusDialog, IDC_CHECK_FORCE_WINDOWED ) == BST_CHECKED ) ? 1 : 0;
+    uint uiForceWindowed = (IsDlgButtonChecked(hwndOptimusDialog, IDC_CHECK_FORCE_WINDOWED) == BST_CHECKED) ? 1 : 0;
 
-    SetApplicationSettingInt( "nvhacks", "optimus-startup-option", uiStartupOption );
-    SetApplicationSettingInt( "nvhacks", "optimus-alt-startup", ( uiStartupOption & 1 ) ? 1 : 0 );
-    SetApplicationSettingInt( "nvhacks", "optimus-rename-exe", ( uiStartupOption & 2 ) ? 1 : 0 );
-    SetApplicationSettingInt( "nvhacks", "optimus-export-enablement", ( uiStartupOption & 4 ) ? 0 : 1 );
-    SetApplicationSettingInt( "nvhacks", "optimus-force-windowed", uiForceWindowed );
+    SetApplicationSettingInt("nvhacks", "optimus-startup-option", uiStartupOption);
+    SetApplicationSettingInt("nvhacks", "optimus-alt-startup", (uiStartupOption & 1) ? 1 : 0);
+    SetApplicationSettingInt("nvhacks", "optimus-rename-exe", (uiStartupOption & 2) ? 1 : 0);
+    SetApplicationSettingInt("nvhacks", "optimus-export-enablement", (uiStartupOption & 4) ? 0 : 1);
+    SetApplicationSettingInt("nvhacks", "optimus-force-windowed", uiForceWindowed);
 
-    if ( !GetInstallManager()->UpdateOptimusSymbolExport() )
+    if (!GetInstallManager()->UpdateOptimusSymbolExport())
     {
         // Restart required to apply change because of permissions
-        SetApplicationSettingInt( "nvhacks", "optimus-dialog-skip", 1 );
-        ShellExecuteNonBlocking( "open", PathJoin ( GetMTASAPath (), MTA_EXE_NAME ) );
-        TerminateProcess( GetCurrentProcess(), 0 );
+        SetApplicationSettingInt("nvhacks", "optimus-dialog-skip", 1);
+        ShellExecuteNonBlocking("open", PathJoin(GetMTASAPath(), MTA_EXE_NAME));
+        TerminateProcess(GetCurrentProcess(), 0);
     }
     ResumeSplash();
 }
 
-
-void HideOptimusDialog ( void )
+void HideOptimusDialog(void)
 {
-    if ( hwndOptimusDialog )
+    if (hwndOptimusDialog)
     {
-        DestroyWindow ( hwndOptimusDialog );
+        DestroyWindow(hwndOptimusDialog);
         hwndOptimusDialog = NULL;
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -600,92 +591,90 @@ void HideOptimusDialog ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void ShowNoAvDialog( HINSTANCE hInstance, bool bEnableScaremongering )
+void ShowNoAvDialog(HINSTANCE hInstance, bool bEnableScaremongering)
 {
-    uint uiTimeLastAsked = GetApplicationSettingInt( "noav-last-asked-time" );
-    bool bUserSaysNo = GetApplicationSettingInt( "noav-user-says-skip" ) != 0;
+    uint uiTimeLastAsked = GetApplicationSettingInt("noav-last-asked-time");
+    bool bUserSaysNo = GetApplicationSettingInt("noav-user-says-skip") != 0;
 
     // Don't display dialog on first run
-    if ( uiTimeLastAsked == 0 )
+    if (uiTimeLastAsked == 0)
     {
-        SetApplicationSettingInt( "noav-last-asked-time", 1 );
+        SetApplicationSettingInt("noav-last-asked-time", 1);
         return;
     }
 
     // Time to ask again?
     uint uiAskHoursInterval;
-    if ( !bUserSaysNo )
-        uiAskHoursInterval = 1;        // Once an hour if box not ticked
+    if (!bUserSaysNo)
+        uiAskHoursInterval = 1;            // Once an hour if box not ticked
     else
     {
-        if ( bEnableScaremongering )
+        if (bEnableScaremongering)
             uiAskHoursInterval = 24 * 7;            // Once a week if ticked
         else
-            uiAskHoursInterval = 24 * 365 * 1000;   // Once every 1000 years if ticked and WSC not monitoring
+            uiAskHoursInterval = 24 * 365 * 1000;            // Once every 1000 years if ticked and WSC not monitoring
     }
 
-    uint uiTimeNow = static_cast < uint >( time( NULL ) / 3600LL );
+    uint uiTimeNow = static_cast<uint>(time(NULL) / 3600LL);
     uint uiHoursSinceLastAsked = uiTimeNow - uiTimeLastAsked;
-    if ( uiHoursSinceLastAsked < uiAskHoursInterval )
+    if (uiHoursSinceLastAsked < uiAskHoursInterval)
         return;
 
-	// Create and show dialog
-    if ( !hwndNoAvDialog )
+    // Create and show dialog
+    if (!hwndNoAvDialog)
     {
-        SuspendSplash ();
+        SuspendSplash();
         bCancelPressed = false;
         bOkPressed = false;
         bOtherPressed = false;
         iOtherCode = IDC_BUTTON_HELP;
-        hwndNoAvDialog = CreateDialogW ( hInstance, MAKEINTRESOURCEW(IDD_NOAV_DIALOG), 0, DialogProc );
-        dassert( ( GetWindowLongW( hwndNoAvDialog, GWL_STYLE ) & WS_VISIBLE ) == 0 );    // Should be Visible: False
-        InitDialogStrings( hwndNoAvDialog, g_NoAvDialogItems );
-        ShowWindow( GetDlgItem( hwndNoAvDialog, IDC_NOAV_OPT_SKIP ), bEnableScaremongering ? SW_HIDE : SW_SHOW );
-        ShowWindow( GetDlgItem( hwndNoAvDialog, IDC_NOAV_OPT_BOTNET ), bEnableScaremongering ? SW_SHOW : SW_HIDE );
+        hwndNoAvDialog = CreateDialogW(hInstance, MAKEINTRESOURCEW(IDD_NOAV_DIALOG), 0, DialogProc);
+        dassert((GetWindowLongW(hwndNoAvDialog, GWL_STYLE) & WS_VISIBLE) == 0);            // Should be Visible: False
+        InitDialogStrings(hwndNoAvDialog, g_NoAvDialogItems);
+        ShowWindow(GetDlgItem(hwndNoAvDialog, IDC_NOAV_OPT_SKIP), bEnableScaremongering ? SW_HIDE : SW_SHOW);
+        ShowWindow(GetDlgItem(hwndNoAvDialog, IDC_NOAV_OPT_BOTNET), bEnableScaremongering ? SW_SHOW : SW_HIDE);
     }
-    ShowWindow( hwndNoAvDialog, SW_SHOW );  // Show after all changes are complete
-    SetForegroundWindow ( hwndNoAvDialog );
-    SetWindowPos ( hwndNoAvDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
+    ShowWindow(hwndNoAvDialog, SW_SHOW);            // Show after all changes are complete
+    SetForegroundWindow(hwndNoAvDialog);
+    SetWindowPos(hwndNoAvDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
-	// Wait for input
-    while ( !bCancelPressed && !bOkPressed && !bOtherPressed )
+    // Wait for input
+    while (!bCancelPressed && !bOkPressed && !bOtherPressed)
     {
         MSG msg;
-        while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
+        while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
         {
-            if( GetMessage( &msg, NULL, 0, 0 ) )
+            if (GetMessage(&msg, NULL, 0, 0))
             {
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
             }
         }
-        Sleep( 10 );
+        Sleep(10);
     }
 
-	// Process input
-    if ( bOtherPressed )
+    // Process input
+    if (bOtherPressed)
     {
-        ShowWindow( hwndNoAvDialog, SW_HIDE );
-        BrowseToSolution ( "no-anti-virus", TERMINATE_PROCESS );
+        ShowWindow(hwndNoAvDialog, SW_HIDE);
+        BrowseToSolution("no-anti-virus", TERMINATE_PROCESS);
     }
 
-    LRESULT res = SendMessageA( GetDlgItem( hwndNoAvDialog, IDC_CHECK_NOT_AGAIN ), BM_GETCHECK, 0, 0 );
-    SetApplicationSettingInt( "noav-last-asked-time", uiTimeNow );
-    SetApplicationSettingInt( "noav-user-says-skip", res ? 1 : 0 );
+    LRESULT res = SendMessageA(GetDlgItem(hwndNoAvDialog, IDC_CHECK_NOT_AGAIN), BM_GETCHECK, 0, 0);
+    SetApplicationSettingInt("noav-last-asked-time", uiTimeNow);
+    SetApplicationSettingInt("noav-user-says-skip", res ? 1 : 0);
 
     ResumeSplash();
 }
 
-
-void HideNoAvDialog ( void )
+void HideNoAvDialog(void)
 {
-    if ( hwndNoAvDialog )
+    if (hwndNoAvDialog)
     {
-        DestroyWindow ( hwndNoAvDialog );
+        DestroyWindow(hwndNoAvDialog);
         hwndNoAvDialog = NULL;
     }
 }
-
 
 #ifdef MTA_DEBUG
 ///////////////////////////////////////////////////////////////
@@ -695,7 +684,7 @@ void HideNoAvDialog ( void )
 // For checking string are correct
 //
 ///////////////////////////////////////////////////////////////
-void TestDialogs( void )
+void TestDialogs(void)
 {
 #if 0
 #if 1

@@ -1,0 +1,3419 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-02-03 05:11+0000\n"
+"PO-Revision-Date: 2018-02-23 21:08+0000\n"
+"Last-Translator: ccw <ccw808@googlemail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+"Translators: Mr.Pres[T]ege; iMr.Dawix; MSHOOSH; KING-ABADY; ALBANDER; SoRa; Alnassre; UAEpro; Majed-HQ; Tete; TAPL; 3BaDy; Ahmed Ly; Avenger; Tifa_1999; MR.NaiF-MTA D:\n"
+"X-Generator: Pootle 2.5.0-rc1\n"
+"X-POOTLE-MTIME: 1519420108.0\n"
+
+#: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
+msgid "Website requests"
+msgstr ""
+
+#: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:26
+msgid ""
+"The server requests the following websites in order to load them (later):"
+msgstr ""
+
+#: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:31
+msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
+msgstr ""
+
+#: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:43
+msgid "Remember decision"
+msgstr ""
+
+#: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:48
+#: C:\mtasa-blue\Client\core\CSettings.cpp:903
+msgid "Allow"
+msgstr ""
+
+#: C:\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:54
+msgid "Deny"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:36
+msgid "***[ COMMAND HELP ]***\n"
+msgstr ""
+"\n"
+"***[ مساعدة في الامور ]***"
+
+#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:189
+#, c-format
+msgid "* The time is %d:%02d:%02d"
+msgstr "* الوقت الآن %d:%02d:%02d"
+
+#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:279
+msgid "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"
+msgstr ""
+"تصحيح: بناء الجمله هو : '[<كلمة المرور> <الأسم>] <المنفذport> <الخادم> "
+"connect'"
+
+#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:287
+#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:338
+msgid "connect: Bad port number"
+msgstr "إتصال: خطأ في رقم ال port"
+
+#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:303
+#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:353
+#, c-format
+msgid "connect: Connecting to %s:%u..."
+msgstr "اتصال : الاتصال الى %s:%u..."
+
+#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:307
+#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:357
+#, c-format
+msgid "connect: could not connect to %s:%u!"
+msgstr "اتصال: تعذر الاتصال إلى %s:%u !"
+
+#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:312
+msgid "connect: Failed to unload current mod"
+msgstr "الاتصال: فشل في إلغاء تحميل mod الحالي"
+
+#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:391
+msgid "Bound all controls from GTA"
+msgstr "تم اعادة الاختصارات الافتراضية GTA"
+
+#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:405
+msgid "Saved configuration file"
+msgstr "تم حفظ ملف التكوين"
+
+#. Print it
+#: C:\mtasa-blue\Client\core\CCommandFuncs.cpp:468
+#, c-format
+msgid "* Your serial is: %s"
+msgstr "* الرقم التسلسلي (السيريال) الخاص بك هو : %s"
+
+#. Unknown command
+#: C:\mtasa-blue\Client\core\CCommands.cpp:213
+msgid "Unknown command or cvar: "
+msgstr "امر او فعل غير معروف:"
+
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:84
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "فشل الاتصال , الاسم المستعار غير صالح!"
+
+#. Show a message that the connection timed out and abort
+#. Show failed message and abort the attempt
+#. Show timeout message and disconnect
+#. Display an error, reset the error status and exit
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:85
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:116
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:132
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:271
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:321
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:412
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:419
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:429
+#: C:\mtasa-blue\Client\core\CCore.cpp:1287
+#: C:\mtasa-blue\Client\core\CCore.cpp:1300
+#: C:\mtasa-blue\Client\core\CGUI.cpp:85
+#: C:\mtasa-blue\Client\core\CQuickConnect.cpp:149
+#: C:\mtasa-blue\Client\core\CQuickConnect.cpp:158
+#: C:\mtasa-blue\Client\core\CQuickConnect.cpp:163
+#: C:\mtasa-blue\Client\core\CQuickConnect.cpp:172
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2812
+#: C:\mtasa-blue\Client\core\CSettings.cpp:3888
+#: C:\mtasa-blue\Client\core\CSettings.cpp:3917
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4315
+#: C:\mtasa-blue\Client\core\DXHook\CDirect3DHook9.cpp:126
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1224
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1246
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1303
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1353
+#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:532
+#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:541
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:239
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:252
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:255
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:813
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:565
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:639
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:664
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:686
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1021
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1101
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1111
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1180
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1214
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1254
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1266
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:138
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CServer.cpp:194
+#: C:\mtasa-blue\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp:374
+#: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:89
+msgid "Error"
+msgstr "خطأ"
+
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:115
+msgid "Connecting failed. Invalid host provided!"
+msgstr "فشل في الاتصال.المضيف المعطى غير صالح!"
+
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:131
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr "الاتصال بـ %s في المفذ %u فشل!"
+
+#. Display the status box
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:152
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr "يتصل بـ  %s:%u  ..."
+
+#. Display the status box
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:153
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:581
+msgid "CONNECTING"
+msgstr "جاري الإتصال"
+
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:271
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1180
+msgid "Connection timed out"
+msgstr "إنتهت مهلة الإتصال !"
+
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:285
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:288
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1225
+msgid "Disconnected: unknown protocol error"
+msgstr "قُطع الاتصال: خطأ بروتوكول غير معروف."
+
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:291
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1228
+msgid "Disconnected: disconnected remotely"
+msgstr "قُطع الإتصال: قُطع عن بعد !"
+
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:294
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1231
+msgid "Disconnected: connection lost remotely"
+msgstr "قُطع الإتصال: فُقد الإتصال عن بعد ."
+
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:297
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1234
+msgid "Disconnected: you are banned from this server"
+msgstr "قُطع الإتصال : أنت محظور من الدخول إلى هذا الخادم"
+
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:303
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1240
+msgid "Disconnected: disconnected from the server"
+msgstr "قُطع الإتصال: قُطع الإتصال من الخادم"
+
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:306
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1243
+msgid "Disconnected: connection to the server was lost"
+msgstr "قُطع الإتصال: تم فقد الاتصال بالخادم"
+
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:312
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1249
+msgid "Disconnected: connection was refused"
+msgstr "قُطع الإتصال: تم رفض الإتصال"
+
+#. Failed loading the mod
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:411
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "لا يوجد mod مشابه مثبت (%s)"
+
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:419
+msgid "Bad server response (2)"
+msgstr "إستجابة خادم سيئه (2)"
+
+#: C:\mtasa-blue\Client\core\CConnectManager.cpp:429
+msgid "Bad server response (1)"
+msgstr "إستجابة خادم سيئه (1)"
+
+#. Create window
+#: C:\mtasa-blue\Client\core\CConsole.cpp:445
+msgid "CONSOLE"
+msgstr "وحدة التحكم"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:709
+#: C:\mtasa-blue\Client\core\CQuestionBox.cpp:202
+#: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:641
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "هل تريد أن ترى بعض المساعدة على الأنترنت عن هذه المشكلة؟"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:714
+#: C:\mtasa-blue\Client\core\CMainMenu.cpp:1090
+#: C:\mtasa-blue\Client\core\CQuestionBox.cpp:204
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1318
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1344
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4162
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4210
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1582
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1601
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1886
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1906
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:482
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:33
+msgid "No"
+msgstr "لا"
+
+#. /////////////////////////////////////////////////////////////////////////
+#. Dialog strings
+#. /////////////////////////////////////////////////////////////////////////
+#: C:\mtasa-blue\Client\core\CCore.cpp:715
+#: C:\mtasa-blue\Client\core\CMainMenu.cpp:1091
+#: C:\mtasa-blue\Client\core\CQuestionBox.cpp:205
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1319
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1345
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4163
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4211
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1583
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1602
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1887
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1907
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:482
+#: C:\mtasa-blue\Client\gui\CGUIMessageBox_Impl.cpp:68
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:32
+msgid "Yes"
+msgstr "نعم"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:770
+#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:683
+#, c-format
+msgid "MTA:SA cannot continue because drive %s does not have enough space."
+msgstr " MTA:SA لا يمكن يستمر لأن القرص %s ليس لديه مساحة كافية"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:772
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:152
+msgid "Fatal error"
+msgstr "خطأ فادح"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:924
+msgid "TO FIX, REMOVE THIS FILE:"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:957
+#, c-format
+msgid "%s module is incorrect!"
+msgstr "الوحدة %s غير صحيحة!"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1287
+msgid "Error executing URL"
+msgstr "خطأ في تنفيذ الرابط "
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1299
+#, c-format
+msgid "Error running mod specified in command line ('%s')"
+msgstr "خطأ تشغيل المورد'mod' المحدد في سطر الأوامر ('%s')"
+
+#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
+#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+#: C:\mtasa-blue\Client\core\CCore.cpp:1386
+msgid "this help screen"
+msgstr "هذه شاشة المساعده"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1387
+#: C:\mtasa-blue\Client\core\CCore.cpp:1388
+msgid "exits the application"
+msgstr "يخرج من التطبيق"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1389
+msgid "shows the version"
+msgstr "يظهر الإصدار"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1390
+msgid "shows the time"
+msgstr "يظهر الوقت"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1391
+msgid "shows the hud"
+msgstr "يظهرالعرض العلوي"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1392
+msgid "shows all the binds"
+msgstr "يظهركل الأزرار المربوطه بـ الاوامر"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1393
+msgid "shows your serial"
+msgstr "يظهر سيريالك"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1402
+msgid "connects to a server (host port nick pass)"
+msgstr "الاتصال بـ خادم (المضيف المنفذ الاسم المستعار كلمة المرور)"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1403
+msgid "connects to a previous server"
+msgstr "يتصل بخادم سابق"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1404
+msgid "binds a key (key control)"
+msgstr "يربط بـ مفتاح (مفتاح التحكم)"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1405
+msgid "unbinds a key (key)"
+msgstr "يزيل الربط عن المفتاح (مفتاح)"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1406
+msgid "copies the default gta controls"
+msgstr "ينسخ ضوابط اللعبة الافتراضية"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1407
+msgid "outputs a screenshot"
+msgstr "يخرج لقطة"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1408
+msgid "immediately saves the config"
+msgstr "يحفظ التكوين على الفور ."
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1410
+msgid "clears the debug view"
+msgstr "ينظف عرض تصحيح الاخطاء"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1411
+msgid "scrolls the chatbox upwards"
+msgstr "مخطوطات صعودا مربع الشات "
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1412
+msgid "scrolls the chatbox downwards"
+msgstr "تمرير أسفل مربع الشات"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1413
+msgid "scrolls the debug view upwards"
+msgstr "مخطوطات صعودا عرض التصحيح"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1414
+msgid "scrolls the debug view downwards"
+msgstr "تمرير أسفل عرض التصحيح"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1417
+msgid "shows the memory statistics"
+msgstr "يبين إحصائيات الذاكرة"
+
+#: C:\mtasa-blue\Client\core\CCore.cpp:1418
+msgid "shows the frame timing graph"
+msgstr "يظهر الإطار توقيت الرسم البياني"
+
+#: C:\mtasa-blue\Client\core\CCore.h:55
+#, fuzzy
+msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
+msgstr "حقوق التأليف والنشر © 2003 - 2014 Multi Theft Auto"
+
+#: C:\mtasa-blue\Client\core\CCredits.cpp:32
+msgid "Programming"
+msgstr "البرمجة"
+
+#: C:\mtasa-blue\Client\core\CCredits.cpp:58
+msgid "Contributors"
+msgstr "المساهمون"
+
+#: C:\mtasa-blue\Client\core\CCredits.cpp:72
+msgid "Game Design / Scripting"
+msgstr "تصميم اللعبة / البرمجة"
+
+#: C:\mtasa-blue\Client\core\CCredits.cpp:88
+msgid "Patch contributors"
+msgstr "أقلمة اللغة"
+
+#: C:\mtasa-blue\Client\core\CCredits.cpp:146
+msgid "Language Localization"
+msgstr "أقلمة اللغة"
+
+#: C:\mtasa-blue\Client\core\CCredits.cpp:152
+msgid "Special Thanks"
+msgstr "شكر خاص"
+
+#: C:\mtasa-blue\Client\core\CCredits.cpp:177
+msgid "This software makes use of the following libraries and software:"
+msgstr "هذا البرنامج يجعل من استخدام المكتبات والبرامج التالية:"
+
+#. Even the default skin doesn't work, so give up
+#: C:\mtasa-blue\Client\core\CGUI.cpp:85
+msgid ""
+"The skin you selected could not be loaded, and the default skin also could "
+"not be loaded, please reinstall MTA."
+msgstr ""
+"الشخصية المختارة للايمكن تحميلها, و الشخصية الأصلية لايمكن استعادتها, الرجاء"
+" اعادة تثبيت Mta."
+
+#: C:\mtasa-blue\Client\core\CJoystickManager.cpp:1628
+msgid "Accelerate Axis"
+msgstr "تسريع المحور"
+
+#: C:\mtasa-blue\Client\core\CJoystickManager.cpp:1629
+msgid "Brake Axis"
+msgstr "مكابح المحور"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:187
+msgid "Fire"
+msgstr "حريق"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:188
+msgid "Next weapon"
+msgstr "السلاح التالي"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:189
+msgid "Previous weapon"
+msgstr "السلاح السابق"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:190
+msgid "Forwards"
+msgstr "الأمام"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:191
+msgid "Backwards"
+msgstr "الخلف"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:192
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2117
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2145
+msgid "Left"
+msgstr "يسار"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:193
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2119
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2146
+msgid "Right"
+msgstr "يمين"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:194
+msgid "Zoom in"
+msgstr "تكبير"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:195
+msgid "Zoom out"
+msgstr "تصغير"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:196
+msgid "Enter/Exit"
+msgstr "دخول/خروج"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:197
+msgid "Change camera"
+msgstr "تغيير الكاميرا"
+
+#. 10
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:198
+msgid "Jump"
+msgstr "قفز"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:199
+msgid "Sprint"
+msgstr "يسرع"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:200
+msgid "Look behind"
+msgstr "النظر للخلف"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:201
+msgid "Crouch"
+msgstr "إنحناء"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:202
+msgid "Action"
+msgstr "إجراء"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:203
+msgid "Walk"
+msgstr "مشي"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:204
+msgid "Vehicle fire"
+msgstr "حريق مركبه"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:205
+msgid "Vehicle secondary fire"
+msgstr "حريق مركبه ثانوي"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:206
+msgid "Vehicle left"
+msgstr "يسار المركبه"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:207
+msgid "Vehicle right"
+msgstr "يمين المركبه"
+
+#. 20
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:208
+msgid "Steer forwards/down"
+msgstr "توجيه إلى الأمام\\الأسفل"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:209
+msgid "Steer backwards/up"
+msgstr "توجيه إلى الخلف\\الأعلى"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:210
+msgid "Accelerate"
+msgstr "تسارع"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:211
+msgid "Brake/Reverse"
+msgstr "الفرامل\\عكس الإتجاه"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:212
+msgid "Radio next"
+msgstr "راديو التالي"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:213
+msgid "Radio previous"
+msgstr "راديو السابق"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:214
+msgid "Radio user track skip"
+msgstr "تخطي تتبع مستخدم الراديو"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:215
+msgid "Horn"
+msgstr "بوق السياره"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:216
+msgid "Sub-mission"
+msgstr "زر مهمة الغطس"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:217
+msgid "Handbrake"
+msgstr "فرامل يدويه"
+
+#. 30
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:218
+msgid "Vehicle look left"
+msgstr "النظر يسار المركبه"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:219
+msgid "Vehicle look right"
+msgstr "النظر يمين المركبه"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:220
+msgid "Vehicle look behind"
+msgstr "النظر خلف المركبه"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:221
+msgid "Vehicle mouse look"
+msgstr "النظر للمركبه بالماوس"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:222
+msgid "Special control left"
+msgstr "زر التحكم الخاص يسار"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:223
+msgid "Special control right"
+msgstr "زر التحكم الخاص يمين"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:224
+msgid "Special control down"
+msgstr "زر التحكم الخاص للأسفل"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:225
+msgid "Special control up"
+msgstr "زر التحكم الخاص للأعلى"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:226
+msgid "Aim weapon"
+msgstr "هدف السلاح"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:227
+msgid "Conversation yes"
+msgstr "المحادثه نعم"
+
+#. 40
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:228
+msgid "Conversation no"
+msgstr "المحادثه لا"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:229
+msgid "Group control forwards"
+msgstr "زر تحكم المجموعه الى الامام"
+
+#: C:\mtasa-blue\Client\core\CKeyBinds.cpp:230
+msgid "Group control backwards"
+msgstr "زر تحكم المجموعه للخلف"
+
+#: C:\mtasa-blue\Client\core\CMainMenu.cpp:317
+msgid ""
+"You are using a feature-branch build! This is a test build only which cannot"
+" be used to connect to public servers!"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CMainMenu.cpp:1084
+msgid ""
+"This will disconnect you from the current server.\n"
+"\n"
+"Are you sure you want to disconnect?"
+msgstr ""
+"هذا سيقوم بفصلك من الخادم الحالي\n"
+"\n"
+"هل انت متأكد من انك تريد الخروج؟"
+
+#: C:\mtasa-blue\Client\core\CMainMenu.cpp:1088
+msgid "DISCONNECT WARNING"
+msgstr "تحذير فصل"
+
+#: C:\mtasa-blue\Client\core\CQuickConnect.cpp:149
+msgid "No host specified!"
+msgstr "لا يوجد مضيف محدد"
+
+#: C:\mtasa-blue\Client\core\CQuickConnect.cpp:158
+msgid "No port specified!"
+msgstr "لم يتم تحديد بورت !"
+
+#: C:\mtasa-blue\Client\core\CQuickConnect.cpp:163
+msgid "Invalid port specified!"
+msgstr "البورت المدخل خاطئ غير صالح !"
+
+#: C:\mtasa-blue\Client\core\CQuickConnect.cpp:172
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1246
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1303
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:565
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:664
+msgid "Invalid nickname! Please go to Settings and set a new one!"
+msgstr "أسم غير صالح! الرجاء الذهاب الى الاعدادات و وضع اسم جديد !"
+
+#: C:\mtasa-blue\Client\core\CScreenShot.cpp:53
+#, c-format
+msgid "Screenshot taken: '%s'"
+msgstr "تم اخذ لقطة الشاشة : '%s'"
+
+#. Create window (with frame) if it will fit inside the screen resolution
+#: C:\mtasa-blue\Client\core\CSettings.cpp:88
+msgid "SETTINGS"
+msgstr "الاعدادات"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:120
+msgid "Multiplayer"
+msgstr "‪لعب متعدد"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:121
+msgid "Video"
+msgstr "فيديو"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:122
+msgid "Audio"
+msgstr "صوت"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:123
+msgid "Binds"
+msgstr "ازرار"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:124
+msgid "Controls"
+msgstr "الضوابط"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:125
+msgid "Interface"
+msgstr "الواجهة"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:126
+msgid "Web Browser"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:127
+msgid "Advanced"
+msgstr "متقدّم"
+
+#. Create buttons
+#. OK button
+#: C:\mtasa-blue\Client\core\CSettings.cpp:131
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4336
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1620
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1849
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1947
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1970
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1989
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2002
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2160
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2170
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2179
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2194
+#: C:\mtasa-blue\Client\gui\CGUIMessageBox_Impl.cpp:64
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:34
+msgid "OK"
+msgstr "موافق"
+
+#. Cancel button
+#: C:\mtasa-blue\Client\core\CSettings.cpp:136
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4335
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1814
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1831
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1868
+#: C:\mtasa-blue\Client\gui\CGUIMessageBox_Impl.cpp:66
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:37
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:125
+msgid "Cancel"
+msgstr "إلغاء"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:151
+#: C:\mtasa-blue\Client\core\CSettings.cpp:350
+#: C:\mtasa-blue\Client\core\CSettings.cpp:573
+#: C:\mtasa-blue\Client\core\CSettings.cpp:832
+msgid "Load defaults"
+msgstr "استعادة الأعدادات الأفتراضية"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:162
+#: C:\mtasa-blue\Client\core\CSettings.cpp:188
+msgid "Mouse sensitivity:"
+msgstr "حساسية الإلتقاط"
+
+#. VerticalAimSensitivity
+#: C:\mtasa-blue\Client\core\CSettings.cpp:163
+#: C:\mtasa-blue\Client\core\CSettings.cpp:206
+msgid "Vertical aim sensitivity:"
+msgstr "حساسية aim الرأسي:"
+
+#. Mouse Options
+#: C:\mtasa-blue\Client\core\CSettings.cpp:167
+msgid "Mouse options"
+msgstr "اعدادات الفأرة"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:174
+msgid "Invert mouse vertically"
+msgstr "عكس الفأره بشكل رأسي,عمودي "
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:178
+msgid "Steer with mouse"
+msgstr "توجيه مع الماوس"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:182
+msgid "Fly with mouse"
+msgstr "طيران مع الماوس"
+
+#. Joypad options
+#: C:\mtasa-blue\Client\core\CSettings.cpp:224
+msgid "Joypad options"
+msgstr "اعدادات اليد 'joypad'"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:237
+msgid "Standard controls (Mouse + Keyboard)"
+msgstr "اعدادات التحكم الافتراضية 'الماوس + لوحة المفاتيح'"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:244
+msgid "Classic controls (Joypad)"
+msgstr "التحكم الكلاسيكي اليد 'Joypad'"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:281
+msgid "Dead Zone"
+msgstr "منطقة الموت"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:286
+msgid "Saturation"
+msgstr "حدّة اللون"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:292
+msgid "Use the 'Binds' tab for joypad buttons."
+msgstr "استخدام ازرار'Binds' لأزرار التحكم الكلاسيكي اليد'joypad'"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:335
+msgid "Left Stick"
+msgstr "نقرة يسرى"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:341
+msgid "Right Stick"
+msgstr "أنقر اﻷيمن"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:357
+msgid "DESCRIPTION"
+msgstr "وصف"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:358
+msgid "KEY"
+msgstr "مفتاح"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:360
+msgid "ALT. KEY"
+msgstr "مفتاح ( ALT )"
+
+#. *
+#. *	Multiplayer tab
+#. *
+#: C:\mtasa-blue\Client\core\CSettings.cpp:365
+#: C:\mtasa-blue\Client\core\CSettings.cpp:368
+msgid "Nick:"
+msgstr "الاسم المستعار:"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:378
+msgid "Save server passwords"
+msgstr "حفظ  كلمات مرور السيرفر"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:383
+msgid "Auto-refresh server browser"
+msgstr "تحديث تلقائي لمتصفح السيرفرات"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:388
+msgid "Allow screen upload"
+msgstr "السماح بتحميل صورة من الشاشة"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:393
+msgid "Use customized GTA:SA files"
+msgstr "استخدام ملفات مخصصة لـ GTA:SA"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:398
+msgid "Map rendering options"
+msgstr "خيارات أداء الخريطة"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:404
+#: C:\mtasa-blue\Client\core\CSettings.cpp:592
+msgid "Opacity:"
+msgstr "الشفافية:"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:426
+#: C:\mtasa-blue\Client\core\CSettings.cpp:439
+msgid "Radio volume:"
+msgstr "شدة الصوت لـ الراديو :"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:427
+#: C:\mtasa-blue\Client\core\CSettings.cpp:458
+msgid "SFX volume:"
+msgstr "شدهـ الصوت لـ SFX :"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:428
+#: C:\mtasa-blue\Client\core\CSettings.cpp:477
+msgid "MTA volume:"
+msgstr "شدهـ الصوت لـ MTA :"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:429
+#: C:\mtasa-blue\Client\core\CSettings.cpp:496
+msgid "Voice volume:"
+msgstr "شدهـ صوت المايك :"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:430
+#: C:\mtasa-blue\Client\core\CSettings.cpp:554
+msgid "Play mode:"
+msgstr "وضع التشغيل:"
+
+#. *
+#. * Webbrowser tab
+#. *
+#: C:\mtasa-blue\Client\core\CSettings.cpp:433
+#: C:\mtasa-blue\Client\core\CSettings.cpp:595
+#: C:\mtasa-blue\Client\core\CSettings.cpp:847
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1883
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:53
+msgid "General"
+msgstr "عام"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:517
+msgid "Mute Radio sounds when minimized"
+msgstr "كتم الصوت الخاص بـ الراديو عند التصغير"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:522
+msgid "Mute SFX sounds when minimized"
+msgstr "كتم صوت الـ SFX عند التصغير"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:527
+msgid "Mute MTA sounds when minimized"
+msgstr "كتم صوت MTA عند التصغير"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:532
+msgid "Mute Voice sounds when minimized"
+msgstr "كتم صوت المايك عند التصغير "
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:539
+msgid "Radio Equalizer"
+msgstr "صوت الراديو "
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:543
+msgid "Radio Auto-tune"
+msgstr "راديو تلقائي"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:548
+msgid "Usertrack options"
+msgstr "خيارات واجهة المستخدم"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:562
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2901
+msgid "Radio"
+msgstr "راديو"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:563
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2902
+msgid "Random"
+msgstr "عشوائي"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:564
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2903
+msgid "Sequential"
+msgstr "تسلسلي"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:567
+msgid "Automatic Media Scan"
+msgstr "البحث التلقائي عن الملفات الاعلامية"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:584
+#: C:\mtasa-blue\Client\core\CSettings.cpp:601
+msgid "Resolution:"
+msgstr "التقرير :"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:585
+#: C:\mtasa-blue\Client\core\CSettings.cpp:642
+msgid "FOV:"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:586
+#: C:\mtasa-blue\Client\core\CSettings.cpp:658
+msgid "Draw Distance:"
+msgstr "رسم البعد :"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:587
+#: C:\mtasa-blue\Client\core\CSettings.cpp:676
+msgid "Brightness:"
+msgstr "شدة الإضاءة:"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:588
+#: C:\mtasa-blue\Client\core\CSettings.cpp:694
+msgid "FX Quality:"
+msgstr "الجودة:"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:589
+#: C:\mtasa-blue\Client\core\CSettings.cpp:708
+msgid "Anisotropic filtering:"
+msgstr "الترشيح متباين الخواص:"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:590
+#: C:\mtasa-blue\Client\core\CSettings.cpp:735
+msgid "Anti-aliasing:"
+msgstr "إزالة التسنن"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:591
+#: C:\mtasa-blue\Client\core\CSettings.cpp:750
+msgid "Aspect Ratio:"
+msgstr "نسبة الارتفاع إلى العرض:"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:613
+msgid "Windowed"
+msgstr "النوافذ"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:621
+#: C:\mtasa-blue\Client\core\CSettings.cpp:938
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:366
+msgid "Fullscreen mode:"
+msgstr "وضع ملء الشاشة:"
+
+#. Fullscreen style
+#: C:\mtasa-blue\Client\core\CSettings.cpp:628
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1506
+msgid "Standard"
+msgstr "قياسي"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:629
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1507
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:366
+msgid "Borderless window"
+msgstr "نافذة بلا حدود"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:630
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1508
+msgid "Borderless keep res"
+msgstr "بلا حدود للاحفاظ على الدقة"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:634
+msgid "Mip Mapping"
+msgstr "رسم الخرائط"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:702
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1436
+msgid "Low"
+msgstr "منحفض"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:703
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1437
+msgid "Medium"
+msgstr "متوسط"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:704
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1025
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1438
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2945
+msgid "High"
+msgstr "عالي"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:705
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1439
+msgid "Very high"
+msgstr "مرتفعة جدًا"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:720
+#: C:\mtasa-blue\Client\core\CSettings.cpp:743
+#: C:\mtasa-blue\Client\core\CSettings.cpp:956
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1010
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1141
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1442
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2951
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2973
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2991
+#: C:\mtasa-blue\Client\core\CSettings.cpp:3957
+msgid "Off"
+msgstr "مغلق"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:744
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1443
+msgid "1x"
+msgstr "1x"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:745
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1444
+msgid "2x"
+msgstr "2x"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:746
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1445
+msgid "3x"
+msgstr "3x"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:760
+#: C:\mtasa-blue\Client\core\CSettings.cpp:958
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1450
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2952
+msgid "Auto"
+msgstr "تلقائي"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:761
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1451
+msgid "4:3"
+msgstr "4:3"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:762
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1452
+msgid "16:10"
+msgstr "16:10"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:763
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1453
+msgid "16:9"
+msgstr "16:9"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:766
+msgid "HUD Match Aspect Ratio"
+msgstr "HUD يطابق نسبة العرض إلى الإرتفاع"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:772
+msgid "Volumetric Shadows"
+msgstr "أبعاد الظلال"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:776
+msgid "Grass effect"
+msgstr "تأثير العشب"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:780
+msgid "Heat haze"
+msgstr "توهج الظل'الضباب'"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:784
+msgid "Tyre Smoke etc"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:788
+msgid "Render vehicles always in high detail"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:793
+msgid "Full Screen Minimize"
+msgstr "تصغير ملئ الشاشة"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:805
+msgid "Enable Device Selection Dialog"
+msgstr "تمكين الجهاز من تحديد الحوار"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:817
+msgid "Show unsafe resolutions"
+msgstr "إظهار القرارات الغير آمنة"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:853
+msgid "Enable remote websites"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:858
+msgid "Enable Javascript on remote websites"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:863
+msgid "Custom blacklist"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:873
+#: C:\mtasa-blue\Client\core\CSettings.cpp:901
+msgid "Enter a domain e.g. google.com"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:875
+msgid "Block"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:883
+#: C:\mtasa-blue\Client\core\CSettings.cpp:911
+msgid "Domain"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:885
+#: C:\mtasa-blue\Client\core\CSettings.cpp:913
+msgid "Remove domain"
+msgstr ""
+
+#. Reset vecTemp
+#: C:\mtasa-blue\Client\core\CSettings.cpp:891
+msgid "Custom whitelist"
+msgstr ""
+
+#. Misc section label
+#: C:\mtasa-blue\Client\core\CSettings.cpp:926
+msgid "Misc"
+msgstr "متنوعات"
+
+#. Fast clothes loading
+#: C:\mtasa-blue\Client\core\CSettings.cpp:933
+#: C:\mtasa-blue\Client\core\CSettings.cpp:949
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4354
+msgid "Fast CJ clothes loading:"
+msgstr "تحميل ملابس CJ سريعاَ"
+
+#. Browser scan speed
+#: C:\mtasa-blue\Client\core\CSettings.cpp:934
+#: C:\mtasa-blue\Client\core\CSettings.cpp:963
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4356
+msgid "Browser speed:"
+msgstr "سرعة المتصفح:"
+
+#. Single download
+#: C:\mtasa-blue\Client\core\CSettings.cpp:935
+#: C:\mtasa-blue\Client\core\CSettings.cpp:977
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4358
+msgid "Single connection:"
+msgstr "اتصال واحد:"
+
+#. Packet tag
+#: C:\mtasa-blue\Client\core\CSettings.cpp:936
+#: C:\mtasa-blue\Client\core\CSettings.cpp:990
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4360
+msgid "Packet tag:"
+msgstr ""
+
+#. Progress animation
+#: C:\mtasa-blue\Client\core\CSettings.cpp:937
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1003
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4362
+msgid "Progress animation:"
+msgstr ""
+
+#. Process priority
+#: C:\mtasa-blue\Client\core\CSettings.cpp:939
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1016
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4352
+msgid "Process priority:"
+msgstr "أولوية العمل:"
+
+#. Debug setting
+#: C:\mtasa-blue\Client\core\CSettings.cpp:940
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1030
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4364
+msgid "Debug setting:"
+msgstr "تصحيح الإعداد:"
+
+#. Streaming memory
+#: C:\mtasa-blue\Client\core\CSettings.cpp:941
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1053
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4366
+msgid "Streaming memory:"
+msgstr "استخدام الذاكرة (الرام)"
+
+#. Update build type
+#: C:\mtasa-blue\Client\core\CSettings.cpp:942
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1155
+msgid "Update build type:"
+msgstr "تحديث لإنشاء نوع:"
+
+#. UpdateAutoInstall
+#: C:\mtasa-blue\Client\core\CSettings.cpp:943
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1134
+msgid "Install important updates:"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:957
+#: C:\mtasa-blue\Client\core\CSettings.cpp:985
+#: C:\mtasa-blue\Client\core\CSettings.cpp:998
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2953
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2964
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2969
+msgid "On"
+msgstr "على"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:970
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2957
+msgid "Very slow"
+msgstr "بطيء جدًا"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:971
+#: C:\mtasa-blue\Client\core\CSettings.cpp:984
+#: C:\mtasa-blue\Client\core\CSettings.cpp:997
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1011
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1037
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1049
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1142
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1162
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2958
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2963
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2968
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2974
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2986
+msgid "Default"
+msgstr "الإفتراضي"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:972
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2959
+msgid "Fast"
+msgstr "سريع"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1023
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2943
+msgid "Normal"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1024
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2944
+msgid "Above normal"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1060
+msgid "Min"
+msgstr "دقيقة او على الاقل .."
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1073
+msgid "Max"
+msgstr "اقصى"
+
+#. Windows 8 compatibility
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1080
+msgid "Windows 8 compatibility:"
+msgstr "التوافق مع ويندوز 8"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1085
+msgid "16-bit color"
+msgstr "لون 16-بت"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1090
+msgid "Mouse fix"
+msgstr "إصلاح الفأرة"
+
+#. Cache path info
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1108
+msgid "Client resource files:"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1112
+msgid "Show in Explorer"
+msgstr ""
+
+#. Auto updater section label
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1127
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1130
+msgid "Auto updater"
+msgstr "تحديث تلقائي"
+
+#. Check for updates
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1168
+msgid "Check for update now"
+msgstr "التحقق من التحديث الان"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1312
+msgid "Some settings will be changed when you next start MTA"
+msgstr " سيتم تفعيل الخاصية عند اعادة تشغيل MTA"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1313
+msgid ""
+"\n"
+"\n"
+"Do you want to restart now?"
+msgstr ""
+"\n"
+"\n"
+"هل تريد اعادة التشغيل الان ؟‫"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1316
+msgid "RESTART REQUIRED"
+msgstr "مطلوب اعادهـ التشغيل"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1338
+msgid "Some settings will be changed when you disconnect the current server"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1339
+#, fuzzy
+msgid ""
+"\n"
+"\n"
+"Do you want to disconnect now?"
+msgstr ""
+"\n"
+"\n"
+"هل تريد اعادة التشغيل الان ؟‫"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1342
+msgid "DISCONNECT REQUIRED"
+msgstr ""
+
+#. Update the joystick name
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1631
+msgid "Joypad not detected  -  Check connections and restart game"
+msgstr ""
+"لم يتم العثور على عصا التحكم - الرجاء التحقق من الاتصال وإعادة تشغيل اللعبة"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1793
+msgid "Binding axis"
+msgstr "محور ملزم"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1793
+msgid "Move an axis to bind, or escape to clear"
+msgstr "تحريك المحور او ازالتة"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1872
+msgid "Language:"
+msgstr "اللُّغة:"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1873
+msgid "Skin:"
+msgstr "المظهر"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1874
+msgid "Presets:"
+msgstr "التعيينات المسبقة:"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1925
+msgid "Chat"
+msgstr "محادثه"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1942
+msgid "Load"
+msgstr "تحميل"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1954
+msgid "Colors"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1955
+msgid "Layout"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1956
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2217
+msgid "Options"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1962
+msgid "Chat Background"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1963
+msgid "Chat Text"
+msgstr "نص المحادثة"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1964
+msgid "Input Background"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1965
+msgid "Input Text"
+msgstr "ادراج نص"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1988
+msgid "Lines:"
+msgstr "الأسطر:"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1989
+msgid "Scale:"
+msgstr "القياس:"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1990
+msgid "Width:"
+msgstr "العرض: "
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:1993
+msgid "Size"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2042
+msgid "after"
+msgstr "بعد"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2043
+msgid "for"
+msgstr "الى"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2044
+msgid "sec"
+msgstr "ثانية"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2047
+msgid "Fading"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2053
+msgid "Fade out old lines"
+msgstr "تلاشي الخطوط القديمة"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2093
+msgid "Horizontal:"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2094
+msgid "Vertical:"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2095
+msgid "Text-Align:"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2096
+msgid "X-Offset:"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2097
+msgid "Y-Offset:"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2103
+msgid "Position"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2118
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2132
+msgid "Center"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2131
+msgid "Top"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2133
+msgid "Bottom"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2181
+#, fuzzy
+msgid "Font"
+msgstr "الخط"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2223
+msgid "Hide background when not typing"
+msgstr "إخفاء الخلفية عند عدم الكتابة"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2228
+msgid "Nickname completion using the \"Tab\" key"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2233
+msgid "Allow server to flash the window"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2238
+msgid "Allow tray balloon notifications"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2243
+msgid "Chat text black/white outline"
+msgstr ""
+
+#. Create a messagebox to notify the user
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
+#. Create a messagebox to notify the user
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
+#. pItemBind->GetText ().c_str () );
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2494
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2501
+msgid "Press a key to bind, or escape to clear"
+msgstr "اضغط على مفتاح لـ ربطة ، أو مسحة"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2495
+msgid "Binding a primary key"
+msgstr "ربط مفتاح أساسي"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2502
+msgid "Binding a secondary key"
+msgstr "ربط مفتاح ثانوي ( غير اساسي )"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2579
+msgid "GTA GAME CONTROLS"
+msgstr "اعدادات GTA SA بـ التحكم"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2581
+msgid "MULTIPLAYER CONTROLS"
+msgstr "ضوابط متعددة اللاعبين "
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:2812
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4315
+msgid "Your nickname contains invalid characters!"
+msgstr "اسمك الامستعار يحتوي على حروف غير صالحة."
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:3496
+msgid "Red:"
+msgstr "أحمر:"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:3497
+msgid "Green:"
+msgstr "أخضر:"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:3498
+msgid "Blue:"
+msgstr "أزرق:"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:3499
+msgid "Transparency:"
+msgstr "الشفافية:"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:3502
+msgid "Color"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:3579
+msgid "Preview"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:3888
+#, fuzzy
+msgid "Please disconnect before changing language"
+msgstr "يرجى الفصل من الخادم قبل تغيير الشخصية!"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:3917
+msgid "Please disconnect before changing skin"
+msgstr "يرجى الفصل من الخادم قبل تغيير الشخصية!"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4156
+msgid ""
+"Volmetric shadows can cause some systems to slow down.\n"
+"\n"
+"Are you sure you want to enable them?"
+msgstr ""
+"الابعاء من الممكن ان تسبب بطئ للنظام !\n"
+"\n"
+"هل انت متأكد انك تريد تمكينهم ؟"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4160
+msgid "PERFORMANCE WARNING"
+msgstr "تحذير اداء"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4179
+msgid ""
+"Screen upload is required by some servers for anti-cheat purposes.\n"
+"\n"
+"(The chat box and GUI is excluded from the upload)\n"
+msgstr ""
+"شاشة التحميل مطلوبة من قبل بعض الملقمات لاسبباب مكافحة الغش. \n"
+"\n"
+"(يتم استبعاد مربع الدردشة واجهة المستخدم الرسومية من التحميل) \n"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4181
+msgid "SCREEN UPLOAD INFORMATION"
+msgstr "تحميل معلومات الشاشة"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4202
+msgid ""
+"Some files in your GTA:SA data directory are customized.\n"
+"MTA will only use these modified files if this check box is ticked.\n"
+"\n"
+"However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n"
+"\n"
+"Are you sure you want to use them?"
+msgstr ""
+"بعض الملفات في لعبتكـ GTA:SA مخصصة\n"
+" سيتم تعديلها من قبل MTA اذا قمت باختيار الخيار !.\n"
+"\n"
+"ولكن على اي حال بعض الملقات ترفض هذهـ الملفات\n"
+"\n"
+"هل انت متأكد انك تريد استخدامهم؟"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4208
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2120
+msgid "CUSTOMIZED GTA:SA FILES"
+msgstr "ملفات مخصصة GTA:SA"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4333
+msgid "Please enter a nickname"
+msgstr "رجاء أدخل اسمك المستعار!"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4334
+msgid ""
+"Please enter a nickname to be used ingame.  \n"
+"This will be your name when you connect to and play in a server"
+msgstr ""
+"الرجاء إدخال الإسم المستعار لاستخدامه في اللعبة.\n"
+"وسيكون هذا الاسم عند الاتصال و اللعب في السيرفر. "
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4352
+msgid "Very experimental feature."
+msgstr "خاصية تجريبية جدا ."
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4354
+msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
+msgstr "توقف الشك بوجود اختلافات CJ (يستخدم 65MB أكثر RAM)"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4356
+msgid "Older routers may require a slower scan speed."
+msgstr "المودم القديم ربما يجب تحديد السرعة البطيئة للبحث عن السيرفرات"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4358
+msgid "Switch on to use only one connection when downloading."
+msgstr "التحول إلى استخدام اتصال واحد فقط عند تنزيل."
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4360
+msgid "Tag network packets to help ISPs identify MTA traffic."
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4362
+msgid "Spinning circle animation at the bottom of the screen"
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4364
+msgid "Select default always. (This setting is not saved)"
+msgstr "حدد الافتراضي دائما. (لم يتم حفظ هذا الإعداد)"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4366
+msgid "Maximum is usually best"
+msgstr "الحد الأقصى هو الأفضل"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4368
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4370
+msgid "Auto updater:"
+msgstr "تحديث تلقائي"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4368
+msgid "Select default unless you like filling out bug reports."
+msgstr "تحديد الافتراضي إلا إذا كنت تفضل تعبئة تقاريرالخلل"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4370
+msgid "Select default to automatically install important updates."
+msgstr ""
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4372
+msgid "16-bit color:"
+msgstr "لون 16-بت"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4372
+msgid "Enable 16 bit color modes - Requires MTA restart"
+msgstr "تمكين شكل لون 16 بت - ستحتاج إلى إعادة تشغيل MTA"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4374
+msgid "Mouse fix:"
+msgstr "إصلاح الفأرة"
+
+#: C:\mtasa-blue\Client\core\CSettings.cpp:4374
+msgid "Mouse movement fix - May need PC restart"
+msgstr "ًإصلاح حركة الماوس - قد يتطلب إعادة تشغيل الجهاز"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:637
+msgid "Busy"
+msgstr "مشغول"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:637
+msgid "Can't check for updates right now"
+msgstr "لا يمكن التحقق من التحديثات الان ، تحقق من اتصالك بالانترنت"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1579
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1599
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1618
+#, c-format
+msgid "MTA:SA %s required"
+msgstr "MTA:SA %s مطلوبه"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1580
+#, c-format
+msgid ""
+"An updated version of MTA:SA %s is required to join the selected server.\n"
+"\n"
+"Do you want to download and install MTA:SA %s ?"
+msgstr ""
+"تحديث MTA:sA %s مطلوب للدخول للخادم المحدد.\n"
+"\n"
+"هل تود تحميل وتثبيت MTA:SA %s ؟"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1600
+#, c-format
+msgid "Do you want to launch MTA:SA %s and connect to this server ?"
+msgstr "هل تريد تشغيل Mta sa  %s والدخول إلى هذا الخادم؟"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1619
+msgid ""
+"It is not possible to connect at this time.\n"
+"\n"
+"Please try later."
+msgstr ""
+"لا يمكن  الدخول في هذا الوقت. \n"
+"\n"
+"الرجاء حاول لآحقاً."
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1812
+msgid "Connecting"
+msgstr "جاري الإتصال"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1813
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1830
+msgid "Please wait..."
+msgstr "الرجاء الانتظار..."
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1829
+msgid "CHECKING"
+msgstr "تحقق "
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1847
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1945
+msgid "UPDATE CHECK"
+msgstr "التحقق من التحديثات "
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1848
+msgid "No update needed"
+msgstr "لا يوجد تحديث مطلوب "
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1866
+msgid "DOWNLOADING"
+msgstr "يتم التحميل الان"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1867
+msgid "waiting..."
+msgstr "ينتظر..."
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1884
+msgid "MANDATORY UPDATE"
+msgstr "التحديثات الالزامية"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1885
+msgid ""
+"To join this server, you must update MTA.\n"
+"\n"
+" Do you want to update now ?"
+msgstr ""
+"للانضمام إلى هذا السيرفر، يجب عليك تحديث اللعبة.\n"
+"\n"
+"هل تريد التحديث الآن؟"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1904
+msgid "OPTIONAL UPDATE"
+msgstr "خيارات التحديث"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1905
+msgid ""
+"Server says an update is recommended, but not essential.\n"
+"\n"
+" Do you want to update now ?"
+msgstr ""
+"الخادم ينصحكـ بالتحديث ولكنة ليس اجباري !.\n"
+"\n"
+"هل تريد التحديث الان؟"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1946
+msgid ""
+"Update not currently avalable.\n"
+"\n"
+"Please check www.mtasa.com"
+msgstr ""
+" لا يتوفر اي تحديث  .\n"
+"\n"
+" يرجى التحقق في : www.mtasa.com "
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1968
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2158
+msgid "ERROR SAVING"
+msgstr "خطأ في الحفظ"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1969
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2159
+msgid "Unable to create the file."
+msgstr "تعذَر إنشاء الملف."
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1978
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1987
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2168
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2177
+msgid "ERROR DOWNLOADING"
+msgstr "خطا في التحميل"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1979
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2169
+msgid "The downloaded file appears to be incorrect."
+msgstr "الملف الذي تم تنزيله على ما يبدو غير صحيح ."
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:1988
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2178
+msgid "For some reason."
+msgstr "لسبب ما."
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2000
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2192
+msgid "DOWNLOAD COMPLETE"
+msgstr "تم الانتهاء من التحميل"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2025
+msgid " - Unknown problem in _DialogUpdateResult"
+msgstr "- مشكلة غير معروفة في _DialogUpdateResult"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2127
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2137
+msgid "Ok"
+msgstr "نعم"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2135
+msgid "ERROR"
+msgstr "خطأ"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2136
+msgid ""
+"Some MTA:SA data files are missing.\n"
+"\n"
+"\n"
+"Please reinstall MTA:SA"
+msgstr ""
+"بعض ملفات MTA:SA مفقودهـ !.\n"
+"\n"
+"\n"
+"رجاء قم باعادهـ التثبيت !"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2777
+#, c-format
+msgid "%3d %% completed"
+msgstr "%3d %% اكتمل"
+
+#: C:\mtasa-blue\Client\core\CVersionUpdater.cpp:2779
+#, c-format
+msgid ""
+"\n"
+"\n"
+"Waiting for response  -  %-3d"
+msgstr "انتظار الاستجابة %-3d"
+
+#: C:\mtasa-blue\Client\core\DXHook\CDirect3DEvents9.cpp:233
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "لقطة حصلت على %d بايت، لكنه من المتوقع %d"
+
+#: C:\mtasa-blue\Client\core\DXHook\CDirect3DEvents9.cpp:239
+msgid "Screenshot failed"
+msgstr "فشل تصوير الشاشة"
+
+#: C:\mtasa-blue\Client\core\DXHook\CDirect3DHook9.cpp:123
+msgid ""
+"Could not initialize Direct3D9.\n"
+"\n"
+"Please ensure the DirectX End-User Runtime and\n"
+"latest Windows Service Packs are installed correctly."
+msgstr ""
+"تعذر تهئية Direct3D9.\n"
+"\n"
+"  يرجى التأكد من DirectX وقت التشغيل المستخدم و \n"
+"  يتم تثبيت أحدث حزم الخدمة Windows بشكل صحيح."
+
+#. Create the window
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:91
+msgid "SERVER BROWSER"
+msgstr "مستعرض السيرفرات"
+
+#. Create the tabs
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:139
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:92
+msgid "Internet"
+msgstr "انترنت"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:140
+msgid "Local"
+msgstr "محلي"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:141
+msgid "Favourites"
+msgstr "المفضلة"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:142
+msgid "Recent"
+msgstr "الاخيره"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:197
+msgid ""
+"FOR QUICK CONNECT:\n"
+"\n"
+"Type the address and port into the address bar.\n"
+"Or select a server from the history list and press 'Connect'"
+msgstr ""
+"لأجل الأتصال السريع:\n"
+"اكتب العنوانip والمنفذport في شريط العنوان. \n"
+"أو حدد الخادم من قائمة التاريخ واضغط على 'اتصال'"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:210
+msgid "HELP"
+msgstr "مساعدة"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:220
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:266
+msgid "Refresh"
+msgstr "تحديث"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:221
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:267
+msgid "Add Favorite"
+msgstr "اضف الى المفضلة"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:222
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:268
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:317
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:376
+msgid "Connect"
+msgstr "أتصال"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:223
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:269
+msgid "Server information"
+msgstr "معلومات عن الخادم 'لسيرفر'"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:226
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:270
+msgid "Search servers"
+msgstr "البحث عن الخوادم 'السيرفرات'"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:227
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:271
+msgid "Search players"
+msgstr "البحث عن اللاعبين"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:228
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:272
+msgid "Start search"
+msgstr "أبحث"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:314
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1642
+msgid "Search players..."
+msgstr "بحث عن الاعبين ..."
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:315
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:426
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1640
+msgid "Search servers..."
+msgstr "بحث الخوادم ( السيرفرات )"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:457
+msgid "Name"
+msgstr "الاسم"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:458
+msgid "Players"
+msgstr "الاعبين"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:459
+msgid "Ping"
+msgstr "البنق "
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:460
+msgid "Gamemode"
+msgstr "نوع اللعب"
+
+#. Player List Columns
+#. Column for player names
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:482
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:145
+msgid "Player list"
+msgstr "قائمة الاعبين "
+
+#. Include label
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:490
+msgid "Include:"
+msgstr "يتضمن"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:496
+msgid "Empty"
+msgstr "فارغ"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:502
+msgid "Full"
+msgstr "ممتلئ"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:508
+msgid "Locked"
+msgstr "مقفل"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:520
+msgid "Offline"
+msgstr "غير متّصل"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:533
+msgid "Other Versions"
+msgstr "إصدارات أخرى"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:554
+msgid "Back"
+msgstr "الخلف"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:560
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:36
+msgid "Help"
+msgstr "مساعدة"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:743
+msgid "Loading..."
+msgstr "تحميل..."
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1193
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:2139
+msgid "  ..loading.."
+msgstr "..تحميل.."
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1224
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1353
+msgid "No address specified!"
+msgstr "لا يوجد عنوان محدد!"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1237
+msgid "Unknown protocol"
+msgstr "بروتوكول غير معروف"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1237
+msgid "Please use the mtasa:// protocol!"
+msgstr "الرجاء استخدام mtasa :/ / بروتوكول!"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1325
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:322
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:583
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:589
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1222
+msgid "Information"
+msgstr "معلومات"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerBrowser.cpp:1325
+msgid "You have to select a server to connect to."
+msgstr "يجب اختيار سيرفر للأتصال به."
+
+#. Create queue window
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:32
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:305
+msgid "SERVER IS FULL"
+msgstr "السيرفر ممتلئ"
+
+#. Start position
+#. Server Name
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:45
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:59
+msgid "Name:"
+msgstr "الأسم:"
+
+#. Server IP
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:46
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:71
+msgid "Server Address:"
+msgstr "عنوان السيرفر:"
+
+#. Gamemode
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:47
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:83
+msgid "Gamemode:"
+msgstr "نوع العب"
+
+#. Map
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:48
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:94
+msgid "Map:"
+msgstr "الخريطة"
+
+#. Players
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:49
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:105
+msgid "Players:"
+msgstr "الاعبين"
+
+#. Passworded
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:50
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:116
+msgid "Passworded:"
+msgstr "كلمة السر:"
+
+#. Latency
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:51
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:127
+msgid "Latency:"
+msgstr "زمن الوصول: "
+
+#. Close button
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:151
+msgid "Close"
+msgstr "اغلآق"
+
+#. Join Game button
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:158
+msgid "Join Game"
+msgstr "دخول اللعبه"
+
+#. Please enter password label
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:172
+msgid "Please enter the password to the server:"
+msgstr "يرجى إدخال كلمة المرور الخاصة بالخادم السيرفر: "
+
+#. Autojoin checkbox
+#. TRANSLATORS:  If you need more room, there is space for one extra line
+#. using a newline (\n).
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:182
+msgid "Join the server as soon as a player slot is available."
+msgstr "الدخول الى الخادم عند خروج احد اللاعبين."
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:313
+msgid "PLEASE ENTER SERVER PASSWORD"
+msgstr "الرجاء ادخل كلمة المرورالخاصه بالخادم"
+
+#. The server has timed out
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:405
+msgid "Timed Out"
+msgstr "انتهاء مهلة الاتصال"
+
+#. Set every GUI elements text to blank
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerInfo.cpp:434
+msgid "Querying..."
+msgstr "استفسار..."
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:26
+msgid "Idle"
+msgstr "عاطل عن العمل"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:154
+msgid "player"
+msgid_plural "players"
+msgstr[0] "لاعب"
+msgstr[1] "لاعب"
+msgstr[2] "لاعِبيّن"
+msgstr[3] "لاعِبون"
+msgstr[4] "لاعبون"
+msgstr[5] "لاعبون"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:155
+msgid "on"
+msgstr "يعمل"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:158
+msgid "server"
+msgid_plural "servers"
+msgstr[0] "خادم"
+msgstr[1] "خادم"
+msgstr[2] "خادمان"
+msgstr[3] "خوادم"
+msgstr[4] "خوادم"
+msgstr[5] "خوادم"
+
+#. We are polling for the master server list (first pass)
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:249
+#, c-format
+msgid "Requesting master server list (%lu ms elapsed)"
+msgstr "طلب قائمة الملقم الرئيسي (%lu لو انقضت MS)"
+
+#. Abort
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:263
+msgid "Master server list could not be parsed."
+msgstr "تعذر تحليل قائمة السيرفر الرئيسية"
+
+#. Abort
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:270
+msgid "Master server list could not be retrieved."
+msgstr "لا يمكن استرجاع قائمة السيرفر الرئيسية."
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:280
+msgid "(Backup server list)"
+msgstr "(قائمة ملقم النسخ الاحتياطي)"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:330
+msgid "Cannot bind LAN-broadcast socket"
+msgstr "لا يمكن ربط LAN-لبث مأخذ التوصيل"
+
+#: C:\mtasa-blue\Client\core\Serverbrowser\CServerList.cpp:350
+msgid "Attempting to discover LAN servers"
+msgstr "محاولة لاكتشاف ملقمات LAN"
+
+#: C:\mtasa-blue\Client\game_sa\CSettingsSA.cpp:701
+msgid "Can't find valid screen resolution."
+msgstr "لا يمكن العثور على دقة شاشة صالحة"
+
+#. Confirm that res should be used
+#: C:\mtasa-blue\Client\game_sa\CSettingsSA.cpp:778
+msgid "Are you sure you want to use this screen resolution?"
+msgstr "هل أنت متأكد بأن تريد استخدام دقة الشاشة هذه؟"
+
+#: C:\mtasa-blue\Client\game_sa\CSettingsSA.cpp:780
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:94
+msgid "MTA: San Andreas"
+msgstr "MTA : سان اندرس"
+
+#: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:158
+msgid "Update Aero setting"
+msgstr "اعدادات تحديث اريو"
+
+#: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:160
+msgid "Update Large Memory setting"
+msgstr "تحديث إعدادات الذاكرة كبيرة"
+
+#: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:162
+#, fuzzy
+msgid "Update DEP setting"
+msgstr "اعدادات تحديث اريو"
+
+#: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:164
+msgid "Update graphics driver compliance"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:166
+#: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:168
+msgid "Fix file issues"
+msgstr "إصلاح مشاكل المجلد"
+
+#: C:\mtasa-blue\Client\loader\CExePatchedStatus.cpp:169
+msgid "Copy main executable to avoid graphic driver issues"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:335
+#: C:\mtasa-blue\Client\loader\Utils.cpp:1268
+#, c-format
+msgid ""
+"MTA:SA needs Administrator access for the following task:\n"
+"\n"
+"  '%s'\n"
+"\n"
+"Please confirm in the next window."
+msgstr ""
+"MTA:SA تحتاج الى صلاحيات مسؤول للوظيفة التالية ال :\n"
+"\n"
+"'%s'\n"
+"\n"
+"الرجاء التأكيد في النافذهـ التالية ."
+
+#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:349
+#, c-format
+msgid ""
+"MTA:SA could not complete the following task:\n"
+"\n"
+"  '%s'\n"
+msgstr ""
+"MTA:SA لا يمكنها اكمال المهمه التالية \n"
+"\n"
+"'%s'\n"
+
+#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:400
+msgid ""
+"** The crash was caused by a graphics driver error **\n"
+"\n"
+"** Please update your graphics drivers **"
+msgstr ""
+"** ان الأنهيار حدث بسبب خطأ برنامج تشغيل الرسومات**\n"
+"\n"
+"** يرجى تحديث برنامج تشغيل الرسومات الخاصة بك **"
+
+#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:511
+msgid "Install updated MTA:SA files"
+msgstr "حمل ملفات MTA:SA محدثة"
+
+#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:532
+msgid ""
+"Could not update due to file conflicts. Please close other applications and "
+"retry"
+msgstr ""
+"تعذر تحديث بسبب خلافات الملف. الرجاء إغلاق تطبيقات أخرى وإعادة المحاولة"
+
+#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:541
+#, c-format
+msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
+msgstr "برنامج MTA SA لم يتم تثبيته بشكل صحيح ، يرجى اعادة التثبيت %s"
+
+#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:740
+msgid "Missing file:"
+msgstr "الملف مفقود:"
+
+#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:744
+msgid "If MTA fails to load, please re-install GTA:SA"
+msgstr "إذا فشل تشغيل MTA ، قم بإعادة تثبيت GTA:SA"
+
+#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:869
+msgid "Update install settings"
+msgstr "تحديث اعدادات التثبيت"
+
+#: C:\mtasa-blue\Client\loader\CInstallManager.cpp:981
+msgid "Update compatibility settings"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:35
+msgid "Quit"
+msgstr "خروج"
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:51
+msgid "MTA: San Andreas has encountered a problem"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:52
+msgid "Crash information"
+msgstr "معلومات الأنهيار"
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:53
+msgid ""
+"Tick the check box to send this crash info to MTA devs using the 'internet'"
+msgstr ""
+"ضع علامة في خانة الاختيار لإرسال معلومات الإنهيار لمطوري MTA باستخدام "
+"'الإنترنت'"
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:54
+msgid "Doing so will increase the chance of this crash being fixed."
+msgstr "وبذلك تزيد من فرصة تصليح سبب الإنهيار"
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:55
+msgid "Do you want to restart MTA: San Andreas ?"
+msgstr "هل تريد إعادة تشغيل MTA:سان اندرس ؟"
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:62
+msgid "MTA: San Andreas - Warning"
+msgstr "MTA:سان اندرس - تحذير"
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:63
+msgid ""
+"Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll "
+"file:"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:64
+msgid ""
+"The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
+"\n"
+"It is recommended that you remove or rename d3d9.dll"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:66
+msgid "Do not tell me about this d3d9.dll again"
+msgstr "لا تخبرني عن d3d9.dll مجدداً"
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:67
+msgid "Show me the file"
+msgstr "أرني الملف"
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:68
+msgid "Play MTA:SA"
+msgstr "ألعب MTA:SA"
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:75
+msgid "MTA: San Andreas - Confusing options"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:76
+msgid "NVidia Optimus detected!"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:77
+msgid "Try each option and see what works:"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:78
+msgid "A - Standard NVidia"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:79
+msgid "B - Alternate NVidia"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:80
+msgid "C - Standard NVidia with exe rename"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:81
+msgid "D - Alternate NVidia with exe rename"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:82
+msgid "E - Standard Intel"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:83
+msgid "F - Alternate Intel"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:84
+msgid "G - Standard Intel with exe rename"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:85
+msgid "H - Alternate Intel with exe rename"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:86
+msgid "If you get desperate, this might help:"
+msgstr "اذا تشتت،هذا قد يساعد:"
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:87
+msgid "Force windowed mode"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:95
+msgid "Warning: Could not detect anti-virus product"
+msgstr "تحذير: تعذر الكشف عن منتج لمكافحة الفيروسات"
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:96
+msgid ""
+"MTA could not detect an anti-virus on your PC.\n"
+"\n"
+"Viruses interfere with MTA and degrade your gameplay experience.\n"
+"\n"
+"Press 'Help' for more information."
+msgstr ""
+"MTA تعذرت الكشف عن مكافح فيروسات في هذا الجهاز.\n"
+"\n"
+"الفيروسات تتداخل مع MTA وتحط من تجربة اللعب الخاصة بك.\n"
+"\n"
+"أضغط 'مساعدة' للمزيد من المعلومات."
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:99
+msgid "I have already installed an anti-virus"
+msgstr "انا قد ثبت مكافح فيروسات مسبقاً"
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:100
+msgid ""
+"I will not install an anti-virus.\n"
+"I want my PC to lag and be part of a botnet."
+msgstr ""
+"لن اثبت مكافح للفيروسات.\n"
+"أريد ان يصاب جهازي باللاق."
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:702
+#: C:\mtasa-blue\Client\loader\Utils.cpp:786
+msgid "Searching for Grand Theft Auto San Andreas"
+msgstr "يتم البحث عن Grand Theft Auto San Andreas  .."
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:705
+#: C:\mtasa-blue\Client\loader\Utils.cpp:788
+msgid "Please start Grand Theft Auto San Andreas"
+msgstr "رجاءاً قم بتشغيل Grand Theft Auto San Andreas ."
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:713
+#: C:\mtasa-blue\Client\loader\Install.cpp:189
+msgid "Installing update..."
+msgstr "جاري تثبيت التحديث..."
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:721
+#: C:\mtasa-blue\Client\loader\Install.cpp:291
+msgid "Extracting files..."
+msgstr "جاري إستخراج الملفات..."
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:726
+#: C:\mtasa-blue\Client\loader\Utils.cpp:1713
+msgid "Copying files..."
+msgstr "يتم نسخ الملفات..."
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:731
+#: C:\mtasa-blue\Client\loader\Utils.cpp:1773
+msgid "Copy finished early. Everything OK."
+msgstr "الأنتهاء من النسخ في وقت مبكر. كل شي جاهز."
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:736
+#: C:\mtasa-blue\Client\loader\Utils.cpp:1779
+msgid "Finishing..."
+msgstr "يتم الآن الانهاء..."
+
+#: C:\mtasa-blue\Client\loader\Dialogs.cpp:740
+#: C:\mtasa-blue\Client\loader\Utils.cpp:1781
+msgid "Done!"
+msgstr "تم"
+
+#: C:\mtasa-blue\Client\loader\Install.cpp:95
+msgid "Do you want to terminate the MTA Server and continue updating?"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:235
+msgid ""
+"Trouble restarting MTA:SA\n"
+"\n"
+"If the problem persists, open Task Manager and\n"
+"stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n"
+"\n"
+"\n"
+"Try to launch MTA:SA again?"
+msgstr "هل تريد تشغيل MTA:SA مرة اخرى ؟"
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:252
+msgid ""
+"Another instance of MTA is already running.\n"
+"\n"
+"If this problem persists, please restart your computer"
+msgstr "برنامج MTA يعمل الان ، اذا المشكلة متكررة يرجى اعادة تشغيل الكمبيوتر"
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:255
+msgid ""
+"Another instance of MTA is already running.\n"
+"\n"
+"Do you want to terminate it?"
+msgstr ""
+"حالة أخرى من MTA قيد التشغيل.\n"
+"\n"
+"هل تريد ألغاء ذلك ؟"
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:279
+msgid ""
+"Are you having problems running MTA:SA?.\n"
+"\n"
+"Do you want to revert to an earlier version?"
+msgstr ""
+"هل تواجه مشاكل في تشغيل MTA؟ \n"
+"\n"
+"  هل تريد العودة إلى إصدار سابق؟"
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:307
+msgid ""
+"There seems to be a problem launching MTA:SA.\n"
+"Resetting GTA settings can sometimes fix this problem.\n"
+"\n"
+"Do you want to reset GTA settings now?"
+msgstr ""
+"هناك مشكلة يجب اعادهـ تعيين اعدادات GTA SA الان ربما يتم حل المشكلة؟ هل تريد"
+" ذلك الان؟"
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:316
+msgid ""
+"GTA settings have been reset.\n"
+"\n"
+"Press OK to continue."
+msgstr "اضغط زر ok"
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:321
+#, c-format
+msgid "File could not be deleted: '%s'"
+msgstr "لم يتم حذف الملف '%s' تعذر ذلك."
+
+#. No settings to delete, or can't find them
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:328
+msgid ""
+"Are you having problems running MTA:SA?.\n"
+"\n"
+"Do you want to see some online help?"
+msgstr "هل لديك مشاكل في تشغيل MTA:SA ?"
+
+#. Inform user
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:365
+msgid ""
+"Are you having problems running MTA:SA?.\n"
+"\n"
+"Do you want to change the following setting?"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:409
+msgid ""
+"Are you having problems running MTA:SA?.\n"
+"\n"
+"Try disabling the following products for GTA and MTA:"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:443
+msgid ""
+"WARNING\n"
+"\n"
+"MTA:SA has detected unusual activity.\n"
+"Please run a virus scan to ensure your system is secure.\n"
+"\n"
+msgstr ""
+"تحذير\n"
+"\n"
+"MTA:SA كشفت نشاطات غير إعتيادية.\n"
+"الرجاء تشغيل نظام فحص الفيروسات للتأكد من أمان جهازك.\n"
+"\n"
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:446
+#, c-format
+msgid "The detected file was:  %s\n"
+msgstr "الملف المكتشف هو: %s\n"
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:583
+msgid ""
+"An instance of GTA: San Andreas is already running. It needs to be "
+"terminated before MTA:SA can be started. Do you want to do that now?"
+msgstr "يوجد نسخة تعمل من قبل هل تريد انهائها و البدء من جديد"
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:589
+msgid ""
+"Unable to terminate GTA: San Andreas. If the problem persists, please "
+"restart your computer."
+msgstr "هناك مشكلة في البدء الرجاء اعادة تشغيل كمبيوتركـ"
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:611
+msgid ""
+"Registry entries are missing. Please reinstall Multi Theft Auto: San "
+"Andreas."
+msgstr "مدخلات الرجستري (محرر التسجيل) مفقودة. يرجى اعادة تثبيت MTA SA"
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:615
+msgid ""
+"The path to your installation of GTA: San Andreas contains unsupported "
+"(unicode) characters. Please move your Grand Theft Auto: San Andreas "
+"installation to a compatible path that contains only standard ASCII "
+"characters and reinstall Multi Theft Auto: San Andreas."
+msgstr ""
+"مسار لعبة Gta : sa الملف الموجود فية اسمة يحوي حروف  غير مسموح بها يجب تغيير"
+" المسار ."
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:619
+msgid ""
+"It appears you have a Steam version of GTA:SA, which is currently "
+"incompatible with MTASA.  You are now being redirected to a page where you "
+"can find information to resolve this issue."
+msgstr ""
+"هناك مشكلة غريبة نوعا ما جاري اعادهـ توجيهك الان الى مكان لحل المشكلة .."
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:632
+msgid ""
+"The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
+"contains a ';' (semicolon).\n"
+"\n"
+" If you experience problems when running MTA:SA,\n"
+" move your installation(s) to a path that does not contain a semicolon."
+msgstr ""
+"المسار الخاص بـ 'Mta sa' او 'Gta San Andreas' \n"
+" يحتوي على '؛' (الفاصلة المنقوطة). \n"
+"~اذا واجهت مشاكل عند تشغيل Mta sa \n"
+"~غير مسار التثبيت الى مسار تثبيت لآ يحتوي على فاصلة منقوطة"
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:773
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:780
+msgid ""
+"Load failed. Please ensure that the latest data files have been installed "
+"correctly."
+msgstr ""
+"فشل التحميل. يرجى التأكد من أنه تم تثبيت أحدث ملفات البيانات بشكل صحيح."
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:787
+#, c-format
+msgid "Load failed. Please ensure that %s is installed correctly."
+msgstr "فشل التحميل. الرجاء التأكد من أن يتم تثبيت %s بشكل صحيح."
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:794
+#, c-format
+msgid "Load failed. Could not find gta_sa.exe in %s."
+msgstr "فشل التحميل. لآ يستطيع إيجاد gta_sa.exe في %s  ."
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:804
+#, c-format
+msgid ""
+"Load failed. %s exists in the GTA directory. Please delete before "
+"continuing."
+msgstr "فشل تحميل.  %s موجود في ملف GTA . يرجى الحذف قبل المتابعة"
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:812
+#, c-format
+msgid "Main file has an incorrect name (%s)"
+msgstr "هذا الملف يحمل اسم خاطئ (%s)"
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:823
+msgid ""
+"Main file is unsigned. Possible virus activity.\n"
+"\n"
+"See online help if MTA does not work correctly."
+msgstr ""
+"هذا الملف غير مسجل. إحتمال نشاط فيروسي.\n"
+"\n"
+"انظر التعليمات الفورية إذا كانت MTA لا تعمل بشكل صحيح."
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:851
+msgid ""
+"Data files modified. Possible virus activity.\n"
+"\n"
+"See online help if MTA does not work correctly."
+msgstr ""
+"ملفات البيانات معدلة. إحتمال نشاط فيروسي.\n"
+"\n"
+"انظر التعليمات الفورية إذا كانت MTA لا تعمل بشكل صحيح."
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:862
+msgid ""
+".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
+"\n"
+"Remove these .asi files if you experience problems with MTA:SA."
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:926
+msgid ""
+"File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:935
+msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:947
+msgid ""
+"MTA:SA is not compatible with Windows 'Safe Mode'.\n"
+"\n"
+"Please restart your PC.\n"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1103
+msgid "Fix configuration issue"
+msgstr ""
+
+#. Try to relaunch as admin if not done so already
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1154
+msgid "Fix elevation required error"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1161
+#, c-format
+msgid ""
+"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
+"\n"
+"[%s]"
+msgstr ""
+"تعذر تشغيل Grand Theft Auto : San Andreas.  يرجى محاولة إعادة التشغيل، أو إذا استمرتالمشكلة , تواصل معنا MTA at www.multitheftauto.com. \n"
+"[%s]"
+
+#: C:\mtasa-blue\Client\loader\MainFunctions.cpp:1222
+msgid ""
+"GTA: San Andreas may not have launched correctly. Do you want to terminate "
+"it?"
+msgstr "قد لا تكون شغلت GTA: San Andreas بشكل صحيح. هل تريد أن تنهي ذلك ؟"
+
+#: C:\mtasa-blue\Client\loader\Utils.cpp:874
+msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
+msgstr "اختار دليل تثبيت Grand Theft Auto: San Andreas"
+
+#: C:\mtasa-blue\Client\loader\Utils.cpp:1372
+#, c-format
+msgid "Error loading %s module! (%s)"
+msgstr "خطأ في التحميل %s وحدة (%s)"
+
+#: C:\mtasa-blue\Client\loader\Utils.cpp:1822
+#, c-format
+msgid ""
+"New installation of %s detected.\n"
+"\n"
+"Do you want to copy your settings from %s ?"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Utils.cpp:1863
+#, c-format
+msgid "GTA:SA had trouble opening the file '%s'"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Utils.cpp:1886
+#, c-format
+msgid "GTA:SA is missing the file '%s'."
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Utils.cpp:1912
+msgid "GTA:SA had trouble loading a model."
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Utils.cpp:1914
+msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Utils.cpp:1940
+msgid "GTA:SA had trouble adding an upgrade to a vehicle."
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Utils.cpp:1960
+#, c-format
+msgid "GTA:SA found errors in the file '%s'"
+msgstr ""
+
+#. Ask user to confirm
+#: C:\mtasa-blue\Client\loader\Utils.cpp:2035
+msgid "Did your computer restart when playing MTA:SA?"
+msgstr ""
+
+#: C:\mtasa-blue\Client\loader\Utils.cpp:2103
+msgid "Please terminate the following programs before continuing:"
+msgstr ""
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:41
+msgid "This version has expired."
+msgstr "هذهـ النسخة منتهيه"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:62
+msgid "disconnect from the game"
+msgstr "انقطع الاتصال من اللعبة"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:63
+msgid "shows the nametags"
+msgstr "اظهار الالقاب"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:64
+msgid "shows the chatbox"
+msgstr "اظهار الشات / الدردشة"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:65
+msgid "shows the network statistics"
+msgstr "اظهار احصائيات الشبكة"
+
+#. Key commands (registered as 'mod commands', can be disabled)
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:69
+msgid "open the chat input"
+msgstr "فتح الإدخال للدردشة"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:70
+msgid "transmits voice to other players"
+msgstr "ننقل الصوت للاعبين اخرين"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:71
+msgid "enters a car as passenger"
+msgstr "الدخول لسيارهـ كـ رآكب."
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:72
+msgid "next radio channel"
+msgstr "القناهـ التالية للراديو"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:73
+msgid "previous radio channel"
+msgstr "القناهـ السابقة للراديو"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:74
+msgid "enables the radar view"
+msgstr "تمكين اظهار الرادار"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:75
+msgid "zooms the radar in"
+msgstr "تكبير الرادار"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:76
+msgid "zooms the radar out"
+msgstr "تصغير الرادار"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:77
+msgid "moves the radar north"
+msgstr "تحريك الرادار شمالا"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:78
+msgid "moves the radar south"
+msgstr "تحريك الرادار جنوبا"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:79
+msgid "moves the radar east"
+msgstr "تحريك الرادار شرقا"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:80
+msgid "moves the radar west"
+msgstr "تحريك الرادار غربا"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:81
+msgid "attaches the radar"
+msgstr "تعليق الرادار"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:82
+msgid "reduces radar opacity"
+msgstr "تقليل تعتيم الرادار"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:83
+msgid "increases radar opacity"
+msgstr "يزيد التعتيم للرادار"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:84
+msgid "toggles radar help text"
+msgstr "تبديل الرادار الى نص التعليمات"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:85
+msgid "sends a message to the targetted player"
+msgstr "ارسال رساله للاعب المحدد"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:86
+msgid "changes to the next weapon whilst in a vehicle"
+msgstr "تغير الى السلاح التالي في المركبة"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:87
+msgid "changes to the previous weapon whilst in a vehicle"
+msgstr "تغير السلاح السابق في المركبة"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:88
+msgid "outputs info about the current server"
+msgstr ""
+
+#. ACHTUNG" Should this be handled by the atomic cvar setter?
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:91
+msgid "defines the scale multiplier of all text-displays"
+msgstr "مقياس الكلام لـ جميع المقاسات"
+
+#. Development mode
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:98
+msgid "(Development mode) shows the colshapes"
+msgstr "(Development mode) وضع التطوير يظهر الكول شيب"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\CClient.cpp:99
+msgid "(Development mode) prints world sound ids into the debug window"
+msgstr "(وضع التطوير)يطبع ارقام اصوات العالم في إطار التصحيح"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:581
+msgid "Entering the game ..."
+msgstr "الدخول الى اللعبة ..."
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:639
+msgid ""
+"Not connected; please use Quick Connect or the 'connect' command to connect "
+"to a server."
+msgstr ""
+"لم يتم الاتصال ، رجاء استخدم الاتصال السريع او استخدم الامر connect للاتصال "
+"بالسيرفر"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:686
+msgid "The server is not installed"
+msgstr "لم يثبت السيرفر"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:696
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1090
+msgid "Local Server"
+msgstr "سيرفر محلي"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:696
+msgid "Starting local server ..."
+msgstr "تشغيل السيرفر المحلي"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1021
+#, c-format
+msgid "You were kicked from the game ( %s )"
+msgstr "تم طردك من اللعب ( %s )"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1090
+msgid "Connecting to local server..."
+msgstr "الاتصال الى الملقم المحلي ..."
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1101
+msgid "Error connecting to server."
+msgstr "خطأ في الاتصال الى السيرفر"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1111
+msgid "Connecting to local server timed out. See console for details."
+msgstr ""
+"انتهت مهلة الأتصال بالخادم المحلي . انظر إلى وحدة التحكم console للحصول على "
+"التفاصيل."
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1214
+msgid "Connection with the server was lost"
+msgstr "فقد الإتصال من الخادم"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1237
+msgid "Disconnected: the server is currently full"
+msgstr "قطع الإتصال: الخادم ممتلئ حالياً"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1246
+msgid "Disconnected: invalid password specified"
+msgstr "قطع الأتصال: كلمة المرور المدخله غير صحيحه"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1266
+msgid "MTA Client verification failed!"
+msgstr "فشل التحقق من العميل MTA !"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:39
+msgid "HOST GAME"
+msgstr "خادم اللعبه الخاص"
+
+#. m_pTabs->CreateTab ( "Gamemode" );
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:55
+msgid "Resources"
+msgstr "موارد 'mods'"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:57
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:59
+msgid "Server name:"
+msgstr "اسم الخادم: "
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:66
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:68
+msgid "Password:"
+msgstr "كلمة المرور:"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:75
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:77
+msgid "Max players:"
+msgstr "الحد الأقصى للاعبين: "
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:84
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:86
+msgid "Broadcast:"
+msgstr "إذاعه: "
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:88
+msgid "LAN"
+msgstr "الشبكة (LAN)"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:101
+msgid "Selected"
+msgstr "المحدد"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:118
+msgid "All"
+msgstr "الكل"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:120
+msgid "Start"
+msgstr "تشغيل"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:479
+msgid "Disconnected: Invalid nickname"
+msgstr "تم الفصل : اسم مستعار غير صالح!"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:482
+msgid "Disconnect from server"
+msgstr "تم الفصل من الخادم / الملقم"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:485
+#, c-format
+msgid ""
+"Disconnected: Serial is banned.\n"
+"Reason: %s"
+msgstr ""
+"تم الفصل: السريال محظور !.\n"
+" السبب: %s"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:490
+#, c-format
+msgid ""
+"Disconnected: You are banned.\n"
+"Reason: %s"
+msgstr ""
+"تم الفصل: انت محظور !.\n"
+" السبب: %s"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:495
+#, c-format
+msgid ""
+"Disconnected: Account is banned.\n"
+"Reason: %s"
+msgstr ""
+"تم الفصل:  الحساب محظور !.\n"
+" السبب: %s"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:499
+msgid "Disconnected: Version mismatch"
+msgstr "تم الفصل : عدم تطابق الإصدار"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:502
+msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
+msgstr "تم الفصل : مضاد التكرار الرجاء الانتظار دقيقة ثم الاتصال مرة اخرى !"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:505
+#, c-format
+msgid ""
+"Disconnected: Server from different branch.\n"
+"Information: %s"
+msgstr ""
+"تم الفصل: من الخادم افرع مختلفة .\n"
+" المعلومات: %s"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:509
+#, c-format
+msgid ""
+"Disconnected: Bad version.\n"
+"Information: %s"
+msgstr ""
+"تم الفصل: نسخة سيئة.\n"
+" معلومات: %s"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:513
+#, c-format
+msgid ""
+"Disconnected: Server is running a newer build.\n"
+"Information: %s"
+msgstr ""
+"تم الفصل:  الخادم يقوم بتشغيل بناء احدث !.\n"
+" معلومات: %s"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:517
+#, c-format
+msgid ""
+"Disconnected: Server is running an older build.\n"
+"Information: %s"
+msgstr ""
+"قطع الأتصال: السيرفر يقوم بتشغيل البنية القديمة \n"
+".المعلومات: %s"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:521
+msgid "Disconnected: Nick already in use"
+msgstr "قطع الأتصال: الاسم المستعار مستخدم"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:524
+msgid "Disconnected: Player Element Could not be created."
+msgstr "قطع الأتصال: تعذر إنشاء عنصر الاعب."
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:527
+#, c-format
+msgid "Disconnected: Server refused the connection: %s"
+msgstr "تم الفصل: الخادم رفض الاتصال: %s"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:531
+msgid "Disconnected: Serial verification failed"
+msgstr "قطع الاتصال: فشل التحقق من السيريال"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:534
+#, c-format
+msgid "Disconnected: Connection desync %s"
+msgstr "تم الفصل: اتصال desync %s "
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:542
+#, c-format
+msgid "Disconnected: You were kicked by %s"
+msgstr "تم قطع الاتصال: انت مطرود من %s"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:546
+#, c-format
+msgid "Disconnected: You were banned by %s"
+msgstr "قطع الاتصال: تم حظرك من قبل %s"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:555
+msgid "Disconnected: Server shutdown or restarting"
+msgstr ""
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:578
+msgid "Time Remaining: "
+msgstr "الوقت المتبقي:"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:588
+#, c-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "يوم %d"
+msgstr[1] "يوم %d"
+msgstr[2] "يومان %d"
+msgstr[3] "ايام %d"
+msgstr[4] "ايام %d"
+msgstr[5] "ايام %d"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:590
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "ساعه %d"
+msgstr[1] "ساعه %d"
+msgstr[2] "ساعتان %d"
+msgstr[3] "ساعات %d"
+msgstr[4] "ساعات %d"
+msgstr[5] "ساعات %d"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:592
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d دقيقه"
+msgstr[1] "%d دقيقه"
+msgstr[2] "%d دقيقه"
+msgstr[3] "%d دقيقه"
+msgstr[4] "%d دقيقه"
+msgstr[5] "%d دقيقه"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:594
+#, c-format
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
+
+#. Display the error
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:598
+msgid "Disconnected"
+msgstr "قطع الإتصال"
+
+#. Throw the error and disconnect
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:134
+#, c-format
+msgid "Download error: %s"
+msgstr "خطأ في التحميل:  %s"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CServer.cpp:194
+msgid "Could not start the local server. See console for details."
+msgstr ""
+"تعذر بدء تشغيل الخادم المحلي, افتح وحدة التحكم console للحصول على التفاصيل."
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CServer.cpp:195
+#, c-format
+msgid "Error: Could not start local server. [%s]"
+msgstr "خطأ: تعذر تشغيل الخادم المحلي. [%s]"
+
+#. Create our text for each transfer type
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:30
+msgid "Download Progress:"
+msgstr "تقدم التحميل :"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:31
+msgid "Map download progress:"
+msgstr "تقدم تحميل الخريطة  :"
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:36
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:122
+#, c-format
+msgid "%s of %s"
+msgstr "%s من %s ."
+
+#. stats label
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:37
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:63
+msgid "Disconnect to cancel download"
+msgstr "قطع الأتصال بسبب إلغاء التحميل"
+
+#. Populate the message and show the box
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:150
+#, c-format
+msgid ""
+"Fatal error (%u). If this problem persists, please check out mtasa.com for "
+"support."
+msgstr ""
+"خطأ فادح (%u). إذا استمرت هذه المشكلة، يرجى مراجعة mtasa.com للحصول على "
+"الدعم."
+
+#. #ifdef MTA_DEBUG
+#. assert ( 0 );
+#. #endif
+#. Populate the message and show the box
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:167
+#, c-format
+msgid ""
+"Protocol error (%u). If this problem persists, please check out mtasa.com "
+"for support."
+msgstr ""
+"خطأ بروتوكول  (%u). اذا استمرت هذه المشكلة، يرجى مراجعة mtasa.com للحصول على"
+" الدعم."
+
+#: C:\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:169
+msgid "Connection error"
+msgstr "خطأ في الاتصال."
+
+#. Couldn't create render target for CPostEffects
+#: C:\mtasa-blue\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1427
+msgid "Problem with graphics driver"
+msgstr ""
+
+#: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:89
+msgid "Multi Theft Auto has not been installed properly, please reinstall."
+msgstr "لم يتم تثبيت Multi Theft Auto بشكل صحيح, الرجاء إعادة التثبيت."
+
+#: C:\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:653
+msgid ""
+"Your browser will now display a web page with some help infomation.\n"
+"\n"
+"(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
+msgstr ""
+"سوف يعرض المتصفح الآن صفحة ويب مع بعض المعلومات للمساعدة.\n"
+"\n"
+"((Ctrl + V) اذا فشل تحميل الصفحة الصق عنوان الموقع في متصفح الويب الخاص بك)"
+
+#~ msgid "Services currently unavailable"
+#~ msgstr "الخدمات غير متوفرة حالياً"
+
+#~ msgid "Login Error"
+#~ msgstr "خطأ في تسجيل الدخول"
+
+#~ msgid "Invalid username/password"
+#~ msgstr "خطأ في اسم المستخدم/كلمة المرور"
+
+#~ msgid "Success"
+#~ msgstr "نجاح"
+
+#~ msgid "Successfully registered!"
+#~ msgstr "تم التسجيل بنجاح !"
+
+#~ msgid "Username missing"
+#~ msgstr "اسم المستخدم غير موجود"
+
+#~ msgid "Email missing"
+#~ msgstr "البريد الإلكتروني غير موجود"
+
+#~ msgid "Password missing"
+#~ msgstr "كلمة السر مفقودة ."
+
+#~ msgid "Passwords do not match"
+#~ msgstr "كلمات السر غير متطابقة"
+
+#~ msgid "Validation code missing"
+#~ msgstr "شفرة التحقق غير موجوده"
+
+#, fuzzy
+#~ msgid "Copyright (C) 2003 - 2015 Multi Theft Auto"
+#~ msgstr "حقوق التأليف والنشر © 2003 - 2014 Multi Theft Auto"
+
+#~ msgid "Community"
+#~ msgstr "مجتمع"
+
+#~ msgid "Username:"
+#~ msgstr "اسم المستخدم:"
+
+#~ msgid "Login"
+#~ msgstr "تسجيل الدخول"
+
+#~ msgid "Register"
+#~ msgstr "تسجيل"
+
+#~ msgid "Chat BG"
+#~ msgstr "خلفية المحادثة"
+
+#~ msgid "Input BG"
+#~ msgstr "خلفية الادخال"
+
+#~ msgid "Font:"
+#~ msgstr "الخط"
+
+#~ msgid "Logging in..."
+#~ msgstr "تسجيل الدخول ..."
+
+#~ msgid "Logout"
+#~ msgstr "تسجيل الخروج..."
+
+#~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
+#~ msgstr "حقوق التأليف والنشر © 2003 - 2014 Multi Theft Auto"
+
+#~ msgid "Disable Aero Desktop"
+#~ msgstr "تعطيل وضع الشفافية في سطح المكتب"
+
+#~ msgid "Disable Driver Overrides"
+#~ msgstr "تعطيل تجاوزات السائق"
+
+#~ msgid "Experimental feature."
+#~ msgstr "خاصية تجريب."
+
+#~ msgid "DATA FILES"
+#~ msgstr "بيانات الملفات"
+
+#~ msgid ""
+#~ "Data files not currently avalable.\n"
+#~ "\n"
+#~ "Please check www.mtasa.com"
+#~ msgstr ""
+#~ "ملفات البيانات غير متوفرة حاليا.\n"
+#~ "\n"
+#~ "تحقق هنا : www.mtasa.com"
+
+#~ msgid "Slow"
+#~ msgstr "بطيء"
+
+#~ msgid "General  "
+#~ msgstr "عام‏"
+
+#~ msgid "Copyright (C) 2003 - 2013 Multi Theft Auto"
+#~ msgstr "حقوق الطبع والنشر © 2003 - 2013 Multi Theft Auto"
+
+#~ msgid "Resolution"
+#~ msgstr "التصميم / الشاشة"
+
+#~ msgid " and "
+#~ msgstr "و"
+
+#~ msgid "Anti-aliasing"
+#~ msgstr "إزالة التسنن"
+
+#~ msgid "Aero setting"
+#~ msgstr "اعدادات الاريو"
+
+#, c-format
+#~ msgid "%s will be changed when you next start MTA"
+#~ msgstr "%s سيتم تفعيل الخاصية عند اعادة تشغيل MTA"
+
+#~ msgid "/Full Screen Minimize"
+#~ msgstr "/تصغير الشاشة الكامله"
+
+#~ msgid "Customized GTA:SA files setting"
+#~ msgstr "وضع ملفات Gta sa المخصصه"
+
+#~ msgid "Language setting"
+#~ msgstr "تحديد اللغة"
+
+#~ msgid "Some settings"
+#~ msgstr "بعض الاعدادت"
+
+#~ msgid "Error! (CTRL+C to copy)"
+#~ msgstr "خطأ !  (CTRL + C للنسخ)"
+
+#, c-format
+#~ msgid ""
+#~ "GTA:SA had trouble opening the file '%s'\n"
+#~ "\n"
+#~ "Try reinstalling GTA:SA to fix it"
+#~ msgstr "هناك مشكلة في ملفات GTA:SA ربما اعادهـ التثبيت يصلح المشكلة ."
+
+#~ msgid "A valid nickname isn't set. Please go to Settings and set a new."
+#~ msgstr ""
+#~ "الاسم المستعار  (النك nick) خطا. يرجى الذهاب الى الاعدادات وتحديد اسم مستعار"
+#~ " جديد"

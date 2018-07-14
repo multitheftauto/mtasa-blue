@@ -35,6 +35,7 @@
 
 #include <string>
 
+#include "client/linux/handler/microdump_extra_info.h"
 #include "common/using_std_string.h"
 
 // This class describes how a crash dump should be generated, either:
@@ -49,11 +50,12 @@ class MinidumpDescriptor {
   struct MicrodumpOnConsole {};
   static const MicrodumpOnConsole kMicrodumpOnConsole;
 
-  MinidumpDescriptor() : mode_(kUninitialized),
-                         fd_(-1),
-                         size_limit_(-1),
-                         microdump_build_fingerprint_(NULL),
-                         microdump_product_info_(NULL) {}
+  MinidumpDescriptor()
+      : mode_(kUninitialized),
+        fd_(-1),
+        size_limit_(-1),
+        address_within_principal_mapping_(0),
+        skip_dump_if_principal_mapping_not_referenced_(false) {}
 
   explicit MinidumpDescriptor(const string& directory)
       : mode_(kWriteMinidumpToFile),
@@ -61,8 +63,9 @@ class MinidumpDescriptor {
         directory_(directory),
         c_path_(NULL),
         size_limit_(-1),
-        microdump_build_fingerprint_(NULL),
-        microdump_product_info_(NULL) {
+        address_within_principal_mapping_(0),
+        skip_dump_if_principal_mapping_not_referenced_(false),
+        sanitize_stacks_(false) {
     assert(!directory.empty());
   }
 
@@ -71,8 +74,9 @@ class MinidumpDescriptor {
         fd_(fd),
         c_path_(NULL),
         size_limit_(-1),
-        microdump_build_fingerprint_(NULL),
-        microdump_product_info_(NULL) {
+        address_within_principal_mapping_(0),
+        skip_dump_if_principal_mapping_not_referenced_(false),
+        sanitize_stacks_(false) {
     assert(fd != -1);
   }
 
@@ -80,8 +84,9 @@ class MinidumpDescriptor {
       : mode_(kWriteMicrodumpToConsole),
         fd_(-1),
         size_limit_(-1),
-        microdump_build_fingerprint_(NULL),
-        microdump_product_info_(NULL) {}
+        address_within_principal_mapping_(0),
+        skip_dump_if_principal_mapping_not_referenced_(false),
+        sanitize_stacks_(false) {}
 
   explicit MinidumpDescriptor(const MinidumpDescriptor& descriptor);
   MinidumpDescriptor& operator=(const MinidumpDescriptor& descriptor);
@@ -107,17 +112,32 @@ class MinidumpDescriptor {
   off_t size_limit() const { return size_limit_; }
   void set_size_limit(off_t limit) { size_limit_ = limit; }
 
-  // TODO(primiano): make this and product info (below) just part of the
-  // microdump ctor once it is rolled stably into Chrome. ETA: June 2015.
-  void SetMicrodumpBuildFingerprint(const char* build_fingerprint);
-  const char* microdump_build_fingerprint() const {
-    return microdump_build_fingerprint_;
+  uintptr_t address_within_principal_mapping() const {
+    return address_within_principal_mapping_;
+  }
+  void set_address_within_principal_mapping(
+      uintptr_t address_within_principal_mapping) {
+    address_within_principal_mapping_ = address_within_principal_mapping;
   }
 
-  void SetMicrodumpProductInfo(const char* product_info);
-  const char* microdump_product_info() const {
-    return microdump_product_info_;
+  bool skip_dump_if_principal_mapping_not_referenced() {
+    return skip_dump_if_principal_mapping_not_referenced_;
   }
+  void set_skip_dump_if_principal_mapping_not_referenced(
+      bool skip_dump_if_principal_mapping_not_referenced) {
+    skip_dump_if_principal_mapping_not_referenced_ =
+        skip_dump_if_principal_mapping_not_referenced;
+  }
+
+  bool sanitize_stacks() const { return sanitize_stacks_; }
+  void set_sanitize_stacks(bool sanitize_stacks) {
+    sanitize_stacks_ = sanitize_stacks;
+  }
+
+  MicrodumpExtraInfo* microdump_extra_info() {
+    assert(IsMicrodumpOnConsole());
+    return &microdump_extra_info_;
+  };
 
  private:
   enum DumpMode {
@@ -145,15 +165,33 @@ class MinidumpDescriptor {
 
   off_t size_limit_;
 
-  // The product name/version and build fingerprint that should be appended to
-  // the dump (microdump only). Microdumps don't have the ability of appending
-  // extra metadata after the dump is generated (as opposite to minidumps
-  // MIME fields), therefore the product details must be provided upfront.
-  // The string pointers are supposed to be valid through all the lifetime of
-  // the process (read: the caller has to guarantee that they are stored in
-  // global static storage).
-  const char* microdump_build_fingerprint_;
-  const char* microdump_product_info_;
+  // This member points somewhere into the main module for this
+  // process (the module that is considerered interesting for the
+  // purposes of debugging crashes).
+  uintptr_t address_within_principal_mapping_;
+
+  // If set, threads that do not reference the address range
+  // associated with |address_within_principal_mapping_| will not have their
+  // stacks logged.
+  bool skip_dump_if_principal_mapping_not_referenced_;
+
+  // If set, stacks are sanitized to remove PII. This involves
+  // overwriting any pointer-aligned words that are not either
+  // pointers into a process mapping or small integers (+/-4096). This
+  // leaves enough information to unwind stacks, and preserve some
+  // register values, but elides strings and other program data.
+  bool sanitize_stacks_;
+
+  // The extra microdump data (e.g. product name/version, build
+  // fingerprint, gpu fingerprint) that should be appended to the dump
+  // (microdump only). Microdumps don't have the ability of appending
+  // extra metadata after the dump is generated (as opposite to
+  // minidumps MIME fields), therefore the extra data must be provided
+  // upfront. Any memory pointed to by members of the
+  // MicrodumpExtraInfo struct must be valid for the lifetime of the
+  // process (read: the caller has to guarantee that it is stored in
+  // global static storage.)
+  MicrodumpExtraInfo microdump_extra_info_;
 };
 
 }  // namespace google_breakpad

@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CPopulationSA.h
-*  PURPOSE:     Header file for ped entity population manager class
-*  DEVELOPERS:  
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CPopulationSA.h
+ *  PURPOSE:     Header file for ped entity population manager class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CGAMESA_POPULATION
 #define __CGAMESA_POPULATION
@@ -20,7 +19,6 @@
 
 class CPopulationSA : public CPopulation
 {
-
 };
 
 #endif

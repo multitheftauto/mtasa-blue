@@ -1,17 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/packets/CChatEchoPacket.h
-*  PURPOSE:     Chat message echo packet class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/packets/CChatEchoPacket.h
+ *  PURPOSE:     Chat message echo packet class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __PACKETS_CCHATECHOPACKET_H
-#define __PACKETS_CCHATECHOPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include "../../Config.h"
@@ -27,25 +25,26 @@
 class CChatEchoPacket : public CPacket
 {
 public:
-    inline                  CChatEchoPacket             ( SString strMessage,
-                                                          unsigned char ucRed,
-                                                          unsigned char ucGreen,
-                                                          unsigned char ucBlue,
-                                                          bool bColorCoded = false )    { m_strMessage = strMessage; m_ucRed = ucRed; m_ucGreen = ucGreen; m_ucBlue = ucBlue; m_bColorCoded = bColorCoded; };
+    CChatEchoPacket(SString strMessage, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded = false)
+    {
+        m_strMessage = strMessage;
+        m_ucRed = ucRed;
+        m_ucGreen = ucGreen;
+        m_ucBlue = ucBlue;
+        m_bColorCoded = bColorCoded;
+    };
 
-                                                                                            // Chat uses low priority channel to avoid getting queued behind large map downloads #6877
-    inline ePacketID                GetPacketID                 ( void ) const              { return PACKET_ID_CHAT_ECHO; };
-    inline unsigned long            GetFlags                    ( void ) const              { return PACKET_LOW_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
-    virtual ePacketOrdering         GetPacketOrdering           ( void ) const              { return PACKET_ORDERING_CHAT; }
+    // Chat uses low priority channel to avoid getting queued behind large map downloads #6877
+    ePacketID               GetPacketID(void) const { return PACKET_ID_CHAT_ECHO; };
+    unsigned long           GetFlags(void) const { return PACKET_LOW_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    virtual ePacketOrdering GetPacketOrdering(void) const { return PACKET_ORDERING_CHAT; }
 
-    bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
+    bool Write(NetBitStreamInterface& BitStream) const;
 
 private:
-    unsigned char           m_ucRed;
-    unsigned char           m_ucGreen;
-    unsigned char           m_ucBlue;
-    SString                 m_strMessage;
-    bool                    m_bColorCoded;
+    unsigned char m_ucRed;
+    unsigned char m_ucGreen;
+    unsigned char m_ucBlue;
+    SString       m_strMessage;
+    bool          m_bColorCoded;
 };
-
-#endif

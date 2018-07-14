@@ -1,5 +1,6 @@
 OS|Android|OS VERSION INFO
 CPU|arm||2
+GPU|OpenGL ES 3.0 V@104.0 AU@  (GIT@Id3510ff6dc)|Qualcomm|Adreno (TM) 330
 Crash||0x0|0
 Module|breakpad_unittests||breakpad_unittests|DA7778FB66018A4E9B4110ED06E730D00|0xaaacd000|0xaab48fff|0
 Module|libnetd_client.so||libnetd_client.so|56B149396A4DAF176E26B4A85DA87BF30|0xf6fca000|0xf6fcdfff|0

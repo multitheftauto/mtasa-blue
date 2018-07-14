@@ -55,7 +55,7 @@ protected:
 	virtual HANDLE GetHandle() const =0;
 	virtual void HandleError(const char *operation) const;
 	void CheckAndHandleError(const char *operation, BOOL result) const
-		{assert(result==TRUE || result==FALSE); if (!result) HandleError(operation);}
+		{if (!result) HandleError(operation);}
 };
 
 //! \brief Pipe-based implementation of NetworkReceiver
@@ -76,8 +76,8 @@ public:
 private:
 	WindowsHandle m_event;
 	OVERLAPPED m_overlapped;
-	bool m_resultPending;
 	DWORD m_lastResult;
+	bool m_resultPending;
 	bool m_eofReceived;
 };
 
@@ -100,8 +100,8 @@ public:
 private:
 	WindowsHandle m_event;
 	OVERLAPPED m_overlapped;
-	bool m_resultPending;
 	DWORD m_lastResult;
+	bool m_resultPending;
 };
 
 //! \brief Windows Pipe Source
