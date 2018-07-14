@@ -1404,7 +1404,11 @@ bool CStaticFunctionDefinitions::SetElementInterior(CElement* pElement, unsigned
 
     if (ucInterior != pElement->GetInterior())
     {
-        pElement->SetInterior(ucInterior);
+        CLuaArguments Arguments;
+        Arguments.PushNumber(pElement->GetInterior()); // get old interior
+        pElement->SetInterior(ucInterior); // set new interior
+        Arguments.PushNumber(ucInterior); // get new interior
+        pElement->CallEvent("onElementInteriorChange", Arguments); // call event
 
         // Tell everyone
         CBitStream BitStream;
@@ -1433,11 +1437,16 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
     {
         CTeam*                         pTeam = static_cast<CTeam*>(pElement);
         list<CPlayer*>::const_iterator iter = pTeam->PlayersBegin();
+
         for (; iter != pTeam->PlayersEnd(); iter++)
         {
             if ((*iter)->IsSpawned())
             {
-                (*iter)->SetDimension(usDimension);
+                CLuaArguments Arguments;
+                Arguments.PushNumber((*iter)->GetDimension()); // get old dimension
+                (*iter)->SetDimension(usDimension); // set new dimension
+                Arguments.PushNumber(usDimension); // get new dimension
+                (*iter)->CallEvent("onElementDimensionChange", Arguments); // call event
             }
         }
     }
@@ -1479,7 +1488,11 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
         case CElement::WORLD_MESH_UNUSED:
         case CElement::WATER:
         {
-            pElement->SetDimension(usDimension);
+            CLuaArguments Arguments;
+            Arguments.PushNumber(pElement->GetDimension()); // get old dimension
+            pElement->SetDimension(usDimension); // set new dimension
+            Arguments.PushNumber(usDimension); // get new dimension
+            pElement->CallEvent("onElementDimensionChange", Arguments); // call event
             CBitStream bitStream;
             bitStream.pBitStream->Write(usDimension);
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DIMENSION, *bitStream.pBitStream));
@@ -4903,7 +4916,7 @@ bool CStaticFunctionDefinitions::GetVehicleName(CVehicle* pVehicle, SString& str
 bool CStaticFunctionDefinitions::GetVehicleNameFromModel(unsigned short usModel, SString& strOutName)
 {
     strOutName = CVehicleNames::GetVehicleName(usModel);
-    return true;
+    return !strOutName.empty();
 }
 
 CPed* CStaticFunctionDefinitions::GetVehicleOccupant(CVehicle* pVehicle, unsigned int uiSeat)
@@ -9323,6 +9336,13 @@ CColTube* CStaticFunctionDefinitions::CreateColTube(CResource* pResource, const 
     return pColShape;
 }
 
+bool CStaticFunctionDefinitions::IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside)
+{
+    inside = pColShape->DoHitDetection(vecPosition);
+
+    return true;
+}
+
 // Make sure all colliders for a colshape are up to date
 void CStaticFunctionDefinitions::RefreshColShapeColliders(CColShape* pColShape)
 {
@@ -10904,6 +10924,21 @@ bool CStaticFunctionDefinitions::GetAccountSerial(CAccount* pAccount, SString& s
 bool CStaticFunctionDefinitions::GetAccountsBySerial(const SString& strSerial, std::vector<CAccount*>& outAccounts)
 {
     m_pAccountManager->GetAccountsBySerial(strSerial, outAccounts);
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetAccountID(CAccount* pAccount, int& ID)
+{
+    bool bRegistered = pAccount->IsRegistered();
+    if (bRegistered)
+        ID = pAccount->GetID();
+
+    return bRegistered;
+}
+
+bool CStaticFunctionDefinitions::GetAccountByID(int ID, CAccount*& outAccount)
+{
+    outAccount = m_pAccountManager->GetAccountByID(ID);
     return true;
 }
 
