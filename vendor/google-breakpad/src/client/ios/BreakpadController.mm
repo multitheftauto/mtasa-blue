@@ -93,12 +93,11 @@ NSString* GetPlatform() {
 @implementation BreakpadController
 
 + (BreakpadController*)sharedInstance {
-  static dispatch_once_t onceToken;
-  static BreakpadController* sharedInstance ;
-  dispatch_once(&onceToken, ^{
-      sharedInstance = [[BreakpadController alloc] initSingleton];
-  });
-  return sharedInstance;
+  @synchronized(self) {
+    static BreakpadController* sharedInstance_ =
+        [[BreakpadController alloc] initSingleton];
+    return sharedInstance_;
+  }
 }
 
 - (id)init {
@@ -180,9 +179,10 @@ NSString* GetPlatform() {
         enableUploads_ = YES;
         [self sendStoredCrashReports];
       } else {
-        // disable the enableUpload_ flag.
-        // sendDelay checks this flag and disables the upload of logs by sendStoredCrashReports
         enableUploads_ = NO;
+        [NSObject cancelPreviousPerformRequestsWithTarget:self
+            selector:@selector(sendStoredCrashReports)
+            object:nil];
       }
   });
 }
@@ -249,8 +249,10 @@ NSString* GetPlatform() {
 }
 
 - (void)withBreakpadRef:(void(^)(BreakpadRef))callback {
+  NSAssert(started_,
+      @"The controller must be started before withBreakpadRef is called");
   dispatch_async(queue_, ^{
-      callback(started_ ? breakpadRef_ : NULL);
+      callback(breakpadRef_);
   });
 }
 
@@ -315,35 +317,38 @@ NSString* GetPlatform() {
   [userDefaults synchronize];
 }
 
-// This method must be called from the breakpad queue.
 - (void)sendStoredCrashReports {
-  if (BreakpadGetCrashReportCount(breakpadRef_) == 0)
-    return;
+  dispatch_async(queue_, ^{
+      if (BreakpadGetCrashReportCount(breakpadRef_) == 0)
+        return;
 
-  int timeToWait = [self sendDelay];
+      int timeToWait = [self sendDelay];
 
-  // Unable to ever send report.
-  if (timeToWait == -1)
-    return;
+      // Unable to ever send report.
+      if (timeToWait == -1)
+        return;
 
-  // A report can be sent now.
-  if (timeToWait == 0) {
-    [self reportWillBeSent];
-    BreakpadUploadNextReportWithParameters(breakpadRef_,
-                                           uploadTimeParameters_);
+      // A report can be sent now.
+      if (timeToWait == 0) {
+        [self reportWillBeSent];
+        BreakpadUploadNextReportWithParameters(breakpadRef_,
+                                               uploadTimeParameters_);
 
-    // If more reports must be sent, make sure this method is called again.
-    if (BreakpadGetCrashReportCount(breakpadRef_) > 0)
-      timeToWait = uploadIntervalInSeconds_;
-  }
+        // If more reports must be sent, make sure this method is called again.
+        if (BreakpadGetCrashReportCount(breakpadRef_) > 0)
+          timeToWait = uploadIntervalInSeconds_;
+      }
 
-  // A report must be sent later.
-  if (timeToWait > 0) {
-    dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeToWait * NSEC_PER_SEC));
-    dispatch_after(delay, queue_, ^{
-        [self sendStoredCrashReports];
-    });
-  }
+      // A report must be sent later.
+      if (timeToWait > 0) {
+        // performSelector: doesn't work on queue_
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self performSelector:@selector(sendStoredCrashReports)
+                       withObject:nil
+                       afterDelay:timeToWait];
+        });
+     }
+  });
 }
 
 @end

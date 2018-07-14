@@ -53,11 +53,6 @@ void RangeMap<AddressType, EntryType>::SetEnableShrinkDown(
 }
 
 template<typename AddressType, typename EntryType>
-bool RangeMap<AddressType, EntryType>::IsShrinkDownEnabled() const {
-  return enable_shrink_down_;
-}
-
-template<typename AddressType, typename EntryType>
 bool RangeMap<AddressType, EntryType>::StoreRange(const AddressType &base,
                                                   const AddressType &size,
                                                   const EntryType &entry) {
@@ -256,7 +251,7 @@ bool RangeMap<AddressType, EntryType>::RetrieveRangeAtIndex(
 
 template<typename AddressType, typename EntryType>
 int RangeMap<AddressType, EntryType>::GetCount() const {
-  return static_cast<int>(map_.size());
+  return map_.size();
 }
 
 

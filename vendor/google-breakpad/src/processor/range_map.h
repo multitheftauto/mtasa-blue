@@ -60,7 +60,6 @@ class RangeMap {
   // will be shrunk down by moving its start position to a higher address so
   // that it does not overlap anymore.
   void SetEnableShrinkDown(bool enable_shrink_down);
-  bool IsShrinkDownEnabled() const;
 
   // Inserts a range into the map.  Returns false for a parameter error,
   // or if the location of the range would conflict with a range already
