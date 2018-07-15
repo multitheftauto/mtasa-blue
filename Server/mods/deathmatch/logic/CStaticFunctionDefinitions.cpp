@@ -1407,8 +1407,8 @@ bool CStaticFunctionDefinitions::SetElementInterior(CElement* pElement, unsigned
         CLuaArguments Arguments;
         Arguments.PushNumber(pElement->GetInterior()); // get old interior
         pElement->SetInterior(ucInterior); // set new interior
-        Arguments.PushNumber(ucInteroir); // get new interior
-        pElement->CallEvent("onElementInteriorChange", Arguments); // call event
+        Arguments.PushNumber(ucInterior); // get new interior
+        pElement->CallEvent("onElementInteriorChange", Arguments);
 
         // Tell everyone
         CBitStream BitStream;
