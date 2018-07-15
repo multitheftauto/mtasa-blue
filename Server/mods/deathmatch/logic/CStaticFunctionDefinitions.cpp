@@ -1404,7 +1404,11 @@ bool CStaticFunctionDefinitions::SetElementInterior(CElement* pElement, unsigned
 
     if (ucInterior != pElement->GetInterior())
     {
-        pElement->SetInterior(ucInterior);
+        CLuaArguments Arguments;
+        Arguments.PushNumber(pElement->GetInterior()); // get old interior
+        pElement->SetInterior(ucInterior); // set new interior
+        Arguments.PushNumber(ucInterior); // get new interior
+        pElement->CallEvent("onElementInteriorChange", Arguments);
 
         // Tell everyone
         CBitStream BitStream;
@@ -1437,7 +1441,11 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
         {
             if ((*iter)->IsSpawned())
             {
-                (*iter)->SetDimension(usDimension);
+                CLuaArguments Arguments;
+                Arguments.PushNumber((*iter)->GetDimension()); // get old dimension
+                (*iter)->SetDimension(usDimension); // set new dimension
+                Arguments.PushNumber(usDimension); // get new dimension
+                (*iter)->CallEvent("onElementDimensionChange", Arguments);
             }
         }
     }
@@ -1479,7 +1487,11 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
         case CElement::WORLD_MESH_UNUSED:
         case CElement::WATER:
         {
-            pElement->SetDimension(usDimension);
+            CLuaArguments Arguments;
+            Arguments.PushNumber(pElement->GetDimension()); // get old dimension
+            pElement->SetDimension(usDimension); // set new dimension
+            Arguments.PushNumber(usDimension); // get new dimension
+            pElement->CallEvent("onElementDimensionChange", Arguments);
             CBitStream bitStream;
             bitStream.pBitStream->Write(usDimension);
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DIMENSION, *bitStream.pBitStream));
