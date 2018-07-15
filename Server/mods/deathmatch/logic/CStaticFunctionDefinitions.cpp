@@ -1407,7 +1407,7 @@ bool CStaticFunctionDefinitions::SetElementInterior(CElement* pElement, unsigned
         CLuaArguments Arguments;
         Arguments.PushNumber(pElement->GetInterior()); // get old interior
         pElement->SetInterior(ucInterior); // set new interior
-        Arguments.PushNumber(ucInterior); // get new interior
+        Arguments.PushNumber(ucInteroir); // get new interior
         pElement->CallEvent("onElementInteriorChange", Arguments); // call event
 
         // Tell everyone
@@ -1437,7 +1437,6 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
     {
         CTeam*                         pTeam = static_cast<CTeam*>(pElement);
         list<CPlayer*>::const_iterator iter = pTeam->PlayersBegin();
-
         for (; iter != pTeam->PlayersEnd(); iter++)
         {
             if ((*iter)->IsSpawned())
@@ -1446,7 +1445,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
                 Arguments.PushNumber((*iter)->GetDimension()); // get old dimension
                 (*iter)->SetDimension(usDimension); // set new dimension
                 Arguments.PushNumber(usDimension); // get new dimension
-                (*iter)->CallEvent("onElementDimensionChange", Arguments); // call event
+                (*iter)->CallEvent("onElementDimensionChange", Arguments);
             }
         }
     }
@@ -1492,7 +1491,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
             Arguments.PushNumber(pElement->GetDimension()); // get old dimension
             pElement->SetDimension(usDimension); // set new dimension
             Arguments.PushNumber(usDimension); // get new dimension
-            pElement->CallEvent("onElementDimensionChange", Arguments); // call event
+            pElement->CallEvent("onElementDimensionChange", Arguments);
             CBitStream bitStream;
             bitStream.pBitStream->Write(usDimension);
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DIMENSION, *bitStream.pBitStream));
