@@ -88,8 +88,8 @@ int CLuaBlipDefs::CreateBlip(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (pResource)
             {
-                short          sOrdering = std::max(-32768, std::min(32767, iOrdering));
-                unsigned short usVisibleDistance = std::max(0, std::min(65535, iVisibleDistance));
+                short          sOrdering = Clamp(-32768, iOrdering, 32767);
+                unsigned short usVisibleDistance = Clamp(0, iVisibleDistance, 65535);
 
                 // Create the blip
                 CClientRadarMarker* pMarker =
@@ -148,8 +148,8 @@ int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (pResource)
             {
-                short          sOrdering = std::max(-32768, std::min(32767, iOrdering));
-                unsigned short usVisibleDistance = std::max(0, std::min(65535, iVisibleDistance));
+                short          sOrdering = Clamp(-32768, iOrdering, 32767);
+                unsigned short usVisibleDistance = Clamp(0, iVisibleDistance, 65535);
 
                 // Create the blip
                 CClientRadarMarker* pMarker =
@@ -359,7 +359,7 @@ int CLuaBlipDefs::SetBlipOrdering(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        short sOrdering = std::max(-32768, std::min(32767, iOrdering));
+        short sOrdering = Clamp(-32768, iOrdering, 32767);
 
         if (CStaticFunctionDefinitions::SetBlipOrdering(*pEntity, sOrdering))
         {
@@ -384,7 +384,7 @@ int CLuaBlipDefs::SetBlipVisibleDistance(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned short usVisibleDistance = std::max(0, std::min(65535, iVisibleDistance));
+        unsigned short usVisibleDistance = Clamp(0, iVisibleDistance, 65535);
 
         if (CStaticFunctionDefinitions::SetBlipVisibleDistance(*pEntity, usVisibleDistance))
         {
