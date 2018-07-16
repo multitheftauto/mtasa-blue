@@ -1762,7 +1762,8 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
 
 void CSettings::ResetGTAVolume()
 {
-    // This will reset and save GTA volume to given GTA volume levels and skip master volume level
+    // This will save GTA volume using the GTA volume level fader value set in settings
+    // and will not be "attenuated" by the master volume level setting.
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
     gameSettings->SetRadioVolume(m_fRadioVolume * 64.0f);
     gameSettings->SetSFXVolume(m_fSFXVolume * 64.0f);

@@ -184,7 +184,8 @@ CCore::~CCore(void)
     // Destroy tray icon
     delete m_pTrayIcon;
 
-    // Reset GTA volume levels by ignoring master level
+    // This will save GTA volume using the GTA volume level fader value set in settings
+    // and will not be "attenuated" by the master volume level setting.
     m_pLocalGUI->GetMainMenu()->GetSettingsWindow()->ResetGTAVolume();
 
     // Delete the mod manager
