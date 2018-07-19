@@ -367,10 +367,6 @@ namespace
         {false, "setPlayerStat", "setPedStat"},
         {false, "addPlayerClothes", "addPedClothes"},
         {false, "removePlayerClothes", "removePedClothes"},
-        {true, "givePlayerJetPack", "Please manually update this. Refer to the wiki for details"},
-        {true, "removePlayerJetPack", "Please manually update this. Refer to the wiki for details"},
-        {true, "givePedJetPack", "Please manually update this. Refer to the wiki for details"},
-        {true, "removePedJetPack", "Please manually update this. Refer to the wiki for details"},
         {false, "setPlayerFightingStyle", "setPedFightingStyle"},
         {false, "setPlayerGravity", "setPedGravity"},
         {false, "setPlayerChoking", "setPedChoking"},
@@ -379,6 +375,11 @@ namespace
         {false, "attachElementToElement", "attachElements"},
         {false, "detachElementFromElement", "detachElements"},
         {false, "showPlayerHudComponent", "setPlayerHudComponentVisible"},
+        // Server ped jetpack
+        {true, "givePlayerJetPack", "Please manually update this. Refer to the wiki for details"},
+        {true, "removePlayerJetPack", "Please manually update this. Refer to the wiki for details"},
+        {true, "givePedJetPack", "Please manually update this. Refer to the wiki for details"},
+        {true, "removePedJetPack", "Please manually update this. Refer to the wiki for details"},
         // XML
         {false, "xmlNodeGetSubNodes", "xmlNodeGetChildren"},
         {false, "xmlCreateSubNode", "xmlCreateChild"},
