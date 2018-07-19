@@ -186,6 +186,7 @@ public:
     static bool RemovePedClothes(CElement* pElement, unsigned char ucType, const char* szTexture = NULL, const char* szModel = NULL);
     static bool GivePedJetPack(CElement* pElement);
     static bool RemovePedJetPack(CElement* pElement);
+    static bool SetPedJetPack(CElement* pElement, bool bJetPack);
     static bool SetPedFightingStyle(CElement* pElement, unsigned char ucStyle);
     static bool SetPedMoveAnim(CElement* pElement, unsigned int iMoveAnim);
     static bool SetPedGravity(CElement* pElement, float fGravity);

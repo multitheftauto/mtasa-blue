@@ -23,6 +23,7 @@ public:
     DECLARE_ELEMENT_RPC(SetPedRotation);
     DECLARE_ELEMENT_RPC(GivePedJetPack);
     DECLARE_ELEMENT_RPC(RemovePedJetPack);
+    DECLARE_ELEMENT_RPC(SetPedJetPack);
     DECLARE_ELEMENT_RPC(RemovePedClothes);
     DECLARE_ELEMENT_RPC(SetPedGravity);
     DECLARE_ELEMENT_RPC(SetPedChoking);

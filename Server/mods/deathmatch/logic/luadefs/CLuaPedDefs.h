@@ -63,6 +63,7 @@ public:
     LUA_DECLARE(RemovePedClothes);
     LUA_DECLARE(GivePedJetPack);
     LUA_DECLARE(RemovePedJetPack);
+    LUA_DECLARE(SetPedJetPack);
     LUA_DECLARE(SetPedFightingStyle);
     LUA_DECLARE(SetPedMoveAnim);
     LUA_DECLARE(SetPedGravity);

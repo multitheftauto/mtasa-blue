@@ -54,6 +54,7 @@ void CLuaPedDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("removePedClothes", RemovePedClothes);
     CLuaCFunctions::AddFunction("givePedJetPack", GivePedJetPack);
     CLuaCFunctions::AddFunction("removePedJetPack", RemovePedJetPack);
+    CLuaCFunctions::AddFunction("setPedJetPack", SetPedJetPack);
     CLuaCFunctions::AddFunction("setPedFightingStyle", SetPedFightingStyle);
     CLuaCFunctions::AddFunction("setPedWalkingStyle", SetPedMoveAnim);
     CLuaCFunctions::AddFunction("setPedGravity", SetPedGravity);
@@ -96,6 +97,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "removeFromVehicle", "removePedFromVehicle");
     lua_classfunction(luaVM, "removeJetPack", "removePedJetPack");
     lua_classfunction(luaVM, "doesHaveJetpack", "doesPedHaveJetPack");
+    lua_classfunction(luaVM, "setJetPack", "setPedJetPack");
 
     lua_classfunction(luaVM, "isDead", "isPedDead");
     lua_classfunction(luaVM, "isDucked", "isPedDucked");
@@ -1226,6 +1228,32 @@ int CLuaPedDefs::RemovePedJetPack(lua_State* luaVM)
         LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
 
         if (CStaticFunctionDefinitions::RemovePedJetPack(pElement))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPedDefs::SetPedJetPack(lua_State* luaVM)
+{
+    CElement* pElement;
+    bool      bJetPack;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadBool(bJetPack);
+
+    if (!argStream.HasErrors())
+    {
+        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+
+        if (CStaticFunctionDefinitions::SetPedJetPack(pElement, bJetPack))
         {
             lua_pushboolean(luaVM, true);
             return 1;
