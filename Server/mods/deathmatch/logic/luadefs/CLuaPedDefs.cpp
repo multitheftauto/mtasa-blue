@@ -162,6 +162,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
                       GetPedOccupiedVehicle);                            // what about removePedFromVehicle?
     lua_classvariable(luaVM, "dead", "killPed", "isPedDead");            // Setting this to any value will still kill the ped. Should we special case this?
     lua_classvariable(luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle");
+    lua_classvariable(luaVM, "jetpack", "setPedJetPack", "doesPedHaveJetPack");
     // lua_classvariable ( luaVM, "stats", "setPedStat", "getPedStat", CLuaOOPDefs::SetPedStat, CLuaOOPDefs::GetPedStat ); // table
     // lua_classvariable ( luaVM, "controlState", "setPedControlState", "getPedControlState", CLuaOOPDefs::SetPedControlState, CLuaOOPDefs::GetPedControlState
     // ); // TODO: .controlState["control"] = value
