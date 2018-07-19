@@ -54,7 +54,7 @@ void CLuaPedDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("removePedClothes", RemovePedClothes);
     CLuaCFunctions::AddFunction("givePedJetPack", GivePedJetPack);
     CLuaCFunctions::AddFunction("removePedJetPack", RemovePedJetPack);
-    CLuaCFunctions::AddFunction("setPedJetPack", SetPedJetPack);
+    CLuaCFunctions::AddFunction("setPedWearingJetpack", SetPedWearingJetpack);
     CLuaCFunctions::AddFunction("setPedFightingStyle", SetPedFightingStyle);
     CLuaCFunctions::AddFunction("setPedWalkingStyle", SetPedMoveAnim);
     CLuaCFunctions::AddFunction("setPedGravity", SetPedGravity);
@@ -97,7 +97,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "removeFromVehicle", "removePedFromVehicle");
     lua_classfunction(luaVM, "removeJetPack", "removePedJetPack");
     lua_classfunction(luaVM, "doesHaveJetpack", "doesPedHaveJetPack");
-    lua_classfunction(luaVM, "setJetPack", "setPedJetPack");
+    lua_classfunction(luaVM, "setWearingJetpack", "setPedWearingJetpack");
 
     lua_classfunction(luaVM, "isDead", "isPedDead");
     lua_classfunction(luaVM, "isDucked", "isPedDucked");
@@ -162,7 +162,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
                       GetPedOccupiedVehicle);                            // what about removePedFromVehicle?
     lua_classvariable(luaVM, "dead", "killPed", "isPedDead");            // Setting this to any value will still kill the ped. Should we special case this?
     lua_classvariable(luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle");
-    lua_classvariable(luaVM, "jetpack", "setPedJetPack", "doesPedHaveJetPack");
+    lua_classvariable(luaVM, "jetpack", "setPedWearingJetpack", "doesPedHaveJetPack");
     // lua_classvariable ( luaVM, "stats", "setPedStat", "getPedStat", CLuaOOPDefs::SetPedStat, CLuaOOPDefs::GetPedStat ); // table
     // lua_classvariable ( luaVM, "controlState", "setPedControlState", "getPedControlState", CLuaOOPDefs::SetPedControlState, CLuaOOPDefs::GetPedControlState
     // ); // TODO: .controlState["control"] = value
@@ -1241,7 +1241,7 @@ int CLuaPedDefs::RemovePedJetPack(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::SetPedJetPack(lua_State* luaVM)
+int CLuaPedDefs::SetPedWearingJetpack(lua_State* luaVM)
 {
     CElement* pElement;
     bool      bJetPack;
@@ -1254,7 +1254,7 @@ int CLuaPedDefs::SetPedJetPack(lua_State* luaVM)
     {
         LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
 
-        if (CStaticFunctionDefinitions::SetPedJetPack(pElement, bJetPack))
+        if (CStaticFunctionDefinitions::SetPedWearingJetpack(pElement, bJetPack))
         {
             lua_pushboolean(luaVM, true);
             return 1;

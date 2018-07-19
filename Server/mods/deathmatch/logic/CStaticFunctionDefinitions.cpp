@@ -3898,10 +3898,10 @@ bool CStaticFunctionDefinitions::RemovePedJetPack(CElement* pElement)
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPedJetPack(CElement* pElement, bool bJetPack)
+bool CStaticFunctionDefinitions::SetPedWearingJetpack(CElement* pElement, bool bJetPack)
 {
     assert(pElement);
-    RUN_CHILDREN(SetPedJetPack(*iter, bJetPack))
+    RUN_CHILDREN(SetPedWearingJetpack(*iter, bJetPack))
 
     if (IS_PED(pElement))
     {
@@ -3911,8 +3911,7 @@ bool CStaticFunctionDefinitions::SetPedJetPack(CElement* pElement, bool bJetPack
             pPed->SetHasJetPack(bJetPack);
 
             CBitStream BitStream;
-            BitStream.pBitStream->WriteBit(bJetPack);
-            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_JETPACK, *BitStream.pBitStream));
+            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, bJetPack ? GIVE_PED_JETPACK : REMOVE_PED_JETPACK, *BitStream.pBitStream));
 
             return true;
         }
