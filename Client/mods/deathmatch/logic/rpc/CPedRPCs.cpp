@@ -21,7 +21,6 @@ void CPedRPCs::LoadFunctions(void)
     AddHandler(SET_PED_ROTATION, SetPedRotation, "SetPedRotation");
     AddHandler(GIVE_PED_JETPACK, GivePedJetPack, "GivePedJetPack");
     AddHandler(REMOVE_PED_JETPACK, RemovePedJetPack, "RemovePedJetPack");
-    AddHandler(SET_PED_JETPACK, SetPedJetPack, "SetPedJetPack");
     AddHandler(REMOVE_PED_CLOTHES, RemovePedClothes, "RemovePedClothes");
     AddHandler(SET_PED_GRAVITY, SetPedGravity, "SetPedGravity");
     AddHandler(SET_PED_CHOKING, SetPedChoking, "SetPedChoking");
@@ -98,19 +97,6 @@ void CPedRPCs::RemovePedJetPack(CClientEntity* pSource, NetBitStreamInterface& b
     if (pPed)
     {
         pPed->SetHasJetPack(false);
-    }
-}
-
-void CPedRPCs::SetPedJetPack(CClientEntity* pSource, NetBitStreamInterface& bitStream)
-{
-    bool bJetPack;
-    if (bitStream.ReadBit(bJetPack))
-    {
-        CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
-        if (pPed)
-        {
-            pPed->SetHasJetPack(bJetPack);
-        }
     }
 }
 
