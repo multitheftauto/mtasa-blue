@@ -244,6 +244,7 @@ namespace
         {"resendPlayerACInfo", "1.5.1-9.07633"},
         {"dbPrepareString", "1.5.2"},
         {"isPedWearingJetpack", "1.5.5-9.13176"},
+        {"setPedWearingJetpack", "1.5.5-9.13176"},
     };
 
     //
