@@ -30,7 +30,7 @@ void CLuaPedDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("getPedTotalAmmo", GetPedTotalAmmo);
     CLuaCFunctions::AddFunction("getPedWeapon", GetPedWeapon);
     CLuaCFunctions::AddFunction("getPedClothes", GetPedClothes);
-    CLuaCFunctions::AddFunction("doesPedHaveJetPack", DoesPedHaveJetPack);
+    CLuaCFunctions::AddFunction("doesPedHaveJetPack", DoesPedHaveJetPack); // deprecated since 1.5.5-9.13176
     CLuaCFunctions::AddFunction("isPedWearingJetpack", DoesPedHaveJetPack); // introduced in 1.5.5-9.13176
     CLuaCFunctions::AddFunction("isPedOnGround", IsPedOnGround);
     CLuaCFunctions::AddFunction("getPedFightingStyle", GetPedFightingStyle);
@@ -53,9 +53,9 @@ void CLuaPedDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("setPedStat", SetPedStat);
     CLuaCFunctions::AddFunction("addPedClothes", AddPedClothes);
     CLuaCFunctions::AddFunction("removePedClothes", RemovePedClothes);
-    CLuaCFunctions::AddFunction("givePedJetPack", GivePedJetPack);
-    CLuaCFunctions::AddFunction("removePedJetPack", RemovePedJetPack);
-    CLuaCFunctions::AddFunction("setPedWearingJetpack", SetPedWearingJetpack);
+    CLuaCFunctions::AddFunction("givePedJetPack", GivePedJetPack); // deprecated in 1.5.5-9.13176
+    CLuaCFunctions::AddFunction("removePedJetPack", RemovePedJetPack); // deprecated in 1.5.5-9.13176
+    CLuaCFunctions::AddFunction("setPedWearingJetpack", SetPedWearingJetpack); // introduced in 1.5.5-9.13176
     CLuaCFunctions::AddFunction("setPedFightingStyle", SetPedFightingStyle);
     CLuaCFunctions::AddFunction("setPedWalkingStyle", SetPedMoveAnim);
     CLuaCFunctions::AddFunction("setPedGravity", SetPedGravity);
@@ -97,8 +97,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "removeClothes", "removePedClothes");
     lua_classfunction(luaVM, "removeFromVehicle", "removePedFromVehicle");
     lua_classfunction(luaVM, "removeJetPack", "removePedJetPack");
-    lua_classfunction(luaVM, "doesHaveJetpack", "doesPedHaveJetPack");
-    lua_classfunction(luaVM, "setWearingJetpack", "setPedWearingJetpack");
+    lua_classfunction(luaVM, "doesHaveJetpack", "doesPedHaveJetPack"); // deprecated in 1.5.5-9.13176
 
     lua_classfunction(luaVM, "isDead", "isPedDead");
     lua_classfunction(luaVM, "isDucked", "isPedDucked");
@@ -138,9 +137,9 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setStat", "setPedStat");
     lua_classfunction(luaVM, "setWeaponSlot", "setPedWeaponSlot");
     lua_classfunction(luaVM, "setWalkingStyle", "setPedWalkingStyle");
-
     lua_classfunction(luaVM, "setAnimation", "setPedAnimation");
     lua_classfunction(luaVM, "setAnimationProgress", "setPedAnimationProgress");
+    lua_classfunction(luaVM, "setWearingJetpack", "setPedWearingJetpack");            // introduced in 1.5.5-9.13176
 
     lua_classvariable(luaVM, "inVehicle", NULL, "isPedInVehicle");
     lua_classvariable(luaVM, "ducked", NULL, "isPedDucked");

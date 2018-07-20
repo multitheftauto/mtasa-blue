@@ -327,6 +327,9 @@ namespace
 
         {false, "getComponentPosition", "will return 3 floats instead of a Vector3", "1.5.5-9.11710"},
         {false, "getComponentRotation", "will return 3 floats instead of a Vector3", "1.5.5-9.11710"},
+
+        // Ped jetpacks
+        {false, "doesPedHaveJetPack", "isPedWearingJetpack"},
     };
 
     SDeprecatedItem serverDeprecatedList[] = {
@@ -383,6 +386,7 @@ namespace
         {true, "removePlayerJetPack", "Please manually update this. Refer to the wiki for details"},
         {false, "givePedJetPack", "Please manually update this. Refer to the wiki for details"},
         {false, "removePedJetPack", "Please manually update this. Refer to the wiki for details"},
+        {false, "doesPedHaveJetPack", "isPedWearingJetpack"},
         // XML
         {false, "xmlNodeGetSubNodes", "xmlNodeGetChildren"},
         {false, "xmlCreateSubNode", "xmlCreateChild"},
