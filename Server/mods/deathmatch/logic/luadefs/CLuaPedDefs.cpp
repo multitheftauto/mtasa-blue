@@ -31,6 +31,7 @@ void CLuaPedDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("getPedWeapon", GetPedWeapon);
     CLuaCFunctions::AddFunction("getPedClothes", GetPedClothes);
     CLuaCFunctions::AddFunction("doesPedHaveJetPack", DoesPedHaveJetPack);
+    CLuaCFunctions::AddFunction("isPedWearingJetpack", DoesPedHaveJetPack); // introduced in 1.5.5-9.13176
     CLuaCFunctions::AddFunction("isPedOnGround", IsPedOnGround);
     CLuaCFunctions::AddFunction("getPedFightingStyle", GetPedFightingStyle);
     CLuaCFunctions::AddFunction("getPedWalkingStyle", GetPedMoveAnim);
@@ -104,12 +105,12 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isInWater", "isPedInWater");
     lua_classfunction(luaVM, "isOnGround", "isPedOnGround");
     lua_classfunction(luaVM, "isInVehicle", "isPedInVehicle");
-
     lua_classfunction(luaVM, "isOnFire", "isPedOnFire");
     lua_classfunction(luaVM, "isChoking", "isPedChoking");
     lua_classfunction(luaVM, "isDoingGangDriveby", "isPedDoingGangDriveby");
     lua_classfunction(luaVM, "isFrozen", "isPedFrozen");
     lua_classfunction(luaVM, "isHeadless", "isPedHeadless");
+    lua_classfunction(luaVM, "isWearingJetpack", "isPedWearingJetpack");            // introduced in 1.5.5-9.13176
 
     lua_classfunction(luaVM, "getArmor", "getPedArmor");
     lua_classfunction(luaVM, "getFightingStyle", "getPedFightingStyle");
@@ -117,7 +118,6 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getStat", "getPedStat");
     lua_classfunction(luaVM, "getWeaponSlot", "getPedWeaponSlot");
     lua_classfunction(luaVM, "getWalkingStyle", "getPedWalkingStyle");
-
     lua_classfunction(luaVM, "getAmmoInClip", "getPedAmmoInClip");
     lua_classfunction(luaVM, "getOccupiedVehicle", "getPedOccupiedVehicle");
     lua_classfunction(luaVM, "getWeapon", "getPedWeapon");
@@ -162,13 +162,10 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
                       GetPedOccupiedVehicle);                            // what about removePedFromVehicle?
     lua_classvariable(luaVM, "dead", "killPed", "isPedDead");            // Setting this to any value will still kill the ped. Should we special case this?
     lua_classvariable(luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle");
-    lua_classvariable(luaVM, "jetpack", "setPedWearingJetpack", "doesPedHaveJetPack");
+    lua_classvariable(luaVM, "jetpack", "setPedWearingJetpack", "isPedWearingJetpack");            // introduced in 1.5.5-9.13176
     // lua_classvariable ( luaVM, "stats", "setPedStat", "getPedStat", CLuaOOPDefs::SetPedStat, CLuaOOPDefs::GetPedStat ); // table
     // lua_classvariable ( luaVM, "controlState", "setPedControlState", "getPedControlState", CLuaOOPDefs::SetPedControlState, CLuaOOPDefs::GetPedControlState
     // ); // TODO: .controlState["control"] = value
-    // This commented code will syntax error, a new method has to be implemented to support this
-    // lua_classvariable ( luaVM, "jetpack", {"removePedJetPack","givePedJetPack}, "doesPedHaveJetPack", CLuaOOPDefs::SetJetpackActive, "doesPedHaveJetPack" );
-    // // very specialised!
 
     lua_registerclass(luaVM, "Ped", "Element");
 }
