@@ -381,8 +381,8 @@ namespace
         // Server ped jetpack
         {true, "givePlayerJetPack", "Please manually update this. Refer to the wiki for details"},
         {true, "removePlayerJetPack", "Please manually update this. Refer to the wiki for details"},
-        {true, "givePedJetPack", "Please manually update this. Refer to the wiki for details"},
-        {true, "removePedJetPack", "Please manually update this. Refer to the wiki for details"},
+        {false, "givePedJetPack", "Please manually update this. Refer to the wiki for details"},
+        {false, "removePedJetPack", "Please manually update this. Refer to the wiki for details"},
         // XML
         {false, "xmlNodeGetSubNodes", "xmlNodeGetChildren"},
         {false, "xmlCreateSubNode", "xmlCreateChild"},
