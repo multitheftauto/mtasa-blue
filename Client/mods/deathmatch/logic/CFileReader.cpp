@@ -59,3 +59,19 @@ bool CFileReader::LoadFileToMemory(const SString& strFilePath)
     }
     return false;
 }
+
+bool CFileReader::LoadDataBufferToMemory(const SString& buffer)
+{
+    std::streamsize m_BufferSize = buffer.size();
+    if (m_BufferSize == eIFSTREAM::SIZE_ERROR)
+    {
+        return false;
+    }
+
+    m_vecFileDataBuffer.reserve(static_cast<size_t>(m_BufferSize));
+    if (std::copy(buffer.begin(), buffer.end(), m_vecFileDataBuffer.data()))
+    {
+        return true;
+    }
+    return false;
+}
