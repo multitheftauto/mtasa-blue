@@ -3903,7 +3903,7 @@ retry:
                         vecVertices[i].fY = sY;
                     }
 
-                    bool bShallow;
+                    bool bShallow = false;
                     if (bitStream.Version() >= 0x06C)
                         bitStream.ReadBit(bShallow);
 
