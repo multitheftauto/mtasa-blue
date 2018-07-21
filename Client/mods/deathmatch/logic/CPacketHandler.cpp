@@ -3904,7 +3904,8 @@ retry:
                     }
 
                     bool bShallow;
-                    bitStream.ReadBit(bShallow);
+                    if (bitStream.Version() >= 0x06C)
+                        bitStream.ReadBit(bShallow);
 
                     CClientWater* pWater = NULL;
                     if (ucNumVertices == 3)
