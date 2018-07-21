@@ -258,12 +258,17 @@ int CClientSoundManager::GetFxEffectFromName(const std::string& strEffectName)
 
 void CClientSoundManager::UpdateVolume()
 {
-    // set our master sound volume if the cvar changed
+    // set our mta sound volume if mtavolume or mastervolume cvar changed
     float fValue = 0.0f;
+
     if (!m_bMinimizeMuted)
     {
+        float fMasterVolume = g_pCore->GetCVars()->GetValue<float>("mastervolume", 1.0f);
+
         if (g_pCore->GetCVars()->Get("mtavolume", fValue))
         {
+            fValue *= fMasterVolume;
+
             if (fValue * 10000 == BASS_GetConfig(BASS_CONFIG_GVOL_STREAM))
                 return;
 
@@ -271,7 +276,7 @@ void CClientSoundManager::UpdateVolume()
         }
         else
         {
-            fValue = 1.0f;
+            fValue = fMasterVolume;
         }
     }
 
