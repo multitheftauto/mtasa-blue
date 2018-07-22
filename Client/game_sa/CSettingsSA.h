@@ -35,9 +35,11 @@
 #define FUNC_SetAntiAliasing    0x7F8A90
 
 #define DEFAULT_VEHICLE_LOD_DISTANCE    ( 70.0f )
+#define DEFAULT_PEDS_LOD_DISTANCE       ( 60.0f )
 // Default train distance is 150, so make it relative to default vehicle distance
 #define TRAIN_LOD_DISTANCE_MULTIPLIER   ( 2.14f )
 #define MAX_VEHICLE_LOD_DISTANCE        ( 500.0f )
+#define MAX_PEDS_LOD_DISTANCE           ( 500.0f )
 
 struct CSettingsSAInterface            // see code around 0x57CE9A for where these are
 {
@@ -162,6 +164,10 @@ public:
     void GetVehiclesLODDistance(float& fVehiclesLODDistance, float& fTrainsPlanesLODDistance);
 
     void Save(void);
+
+    void SetPedsLODDistance(float fPedsLODDistance);
+    void ResetPedsLODDistance(void);
+    float GetPedsLODDistance(void);
 
     static void StaticSetHooks(void);
 
