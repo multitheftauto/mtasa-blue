@@ -123,6 +123,9 @@ public:
     LUA_DECLARE(GUIMemoIsReadOnly);
     LUA_DECLARE(GUIMemoSetCaretIndex);
     LUA_DECLARE(GUIMemoGetCaretIndex);
+    LUA_DECLARE(GUIMemoGetVerticalScrollPosition);
+    LUA_DECLARE(GUIMemoSetVerticalScrollPosition);
+    LUA_DECLARE(GUIMemoGetMaxVerticalScrollPosition);
     LUA_DECLARE(GUIWindowSetMovable);
     LUA_DECLARE(GUIWindowSetSizable);
     LUA_DECLARE(GUIWindowGetMovable);

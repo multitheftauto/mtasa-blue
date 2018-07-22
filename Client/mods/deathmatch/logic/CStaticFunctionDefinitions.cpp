@@ -5569,6 +5569,24 @@ void CStaticFunctionDefinitions::GUIMemoSetCaretIndex(CClientEntity& Entity, uns
     }
 }
 
+void CStaticFunctionDefinitions::GUIMemoSetVerticalScrollPosition(CClientEntity& Entity, float fPosition)
+{
+    RUN_CHILDREN(GUIMemoSetVerticalScrollPosition(**iter, fPosition))
+
+    // Are we a GUI element?
+    if (IS_GUI(&Entity))
+    {
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+
+        // Are we a gridlist?
+        if (IS_CGUIELEMENT_MEMO(&GUIElement))
+        {
+            CGUIMemo* guiMemo = static_cast<CGUIMemo*>(GUIElement.GetCGUIElement());
+            guiMemo->SetVerticalScrollPosition(fPosition / 100.0f * guiMemo->GetMaxVerticalScrollPosition());
+        }
+    }
+}
+
 void CStaticFunctionDefinitions::GUIGridListSetSortingEnabled(CClientEntity& Entity, bool bEnabled)
 {
     RUN_CHILDREN(GUIGridListSetSortingEnabled(**iter, bEnabled))
