@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPedRPCs_H
-#define __CPedRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
@@ -38,5 +37,3 @@ public:
     DECLARE_ELEMENT_RPC(SetPedFrozen);
     DECLARE_ELEMENT_RPC(ReloadPedWeapon);
 };
-
-#endif
