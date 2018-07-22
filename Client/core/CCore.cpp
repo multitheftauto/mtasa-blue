@@ -20,6 +20,7 @@
 #include "CTimingCheckpoints.hpp"
 #include "CModelCacheManager.h"
 #include "detours/include/detours.h"
+#include <ServerBrowser/CServerCache.h>
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -183,6 +184,10 @@ CCore::~CCore(void)
 
     // Destroy tray icon
     delete m_pTrayIcon;
+
+    // This will set the GTA volume to the GTA volume value in the settings,
+    // and is not affected by the master volume setting.
+    m_pLocalGUI->GetMainMenu()->GetSettingsWindow()->ResetGTAVolume();
 
     // Delete the mod manager
     delete m_pModManager;

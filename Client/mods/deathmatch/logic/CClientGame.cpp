@@ -3909,14 +3909,16 @@ void CClientGame::IdleHandler(void)
             CLuaArguments Arguments;
             m_pRootEntity->CallEvent("onClientMinimize", Arguments, false);
 
-            // Apply mute on minimize options
-            if (g_pCore->GetCVars()->GetValue<bool>("mute_sfx_when_minimized"))
-                g_pGame->GetAudio()->SetEffectsMasterVolume(0);
+            bool bMuteAll = g_pCore->GetCVars()->GetValue<bool>("mute_master_when_minimized");
 
-            if (g_pCore->GetCVars()->GetValue<bool>("mute_radio_when_minimized"))
+            // Apply mute on minimize options
+            if (bMuteAll || g_pCore->GetCVars()->GetValue<bool>("mute_radio_when_minimized"))
                 g_pGame->GetAudio()->SetMusicMasterVolume(0);
 
-            if (g_pCore->GetCVars()->GetValue<bool>("mute_mta_when_minimized"))
+            if (bMuteAll || g_pCore->GetCVars()->GetValue<bool>("mute_sfx_when_minimized"))
+                g_pGame->GetAudio()->SetEffectsMasterVolume(0);
+
+            if (bMuteAll || g_pCore->GetCVars()->GetValue<bool>("mute_mta_when_minimized"))
                 m_pManager->GetSoundManager()->SetMinimizeMuted(true);
         }
     }
@@ -3980,7 +3982,7 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
             // Play our custom animation instead of default
             auto pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pReplacedAnimation->pAnimationHierarchy);
             pAnimationManager->UncompressAnimation(pAnimHierarchy.get());
-            pAnimAssociation->Constructor(pClump, pAnimHierarchy->GetInterface());
+            pAnimAssociation->InitializeForCustomAnimation(pClump, pAnimHierarchy->GetInterface());
             pAnimAssociation->SetFlags(pOriginalAnimStaticAssoc->GetFlags());
             pAnimAssociation->SetAnimID(pOriginalAnimStaticAssoc->GetAnimID());
             pAnimAssociation->SetAnimGroup(pOriginalAnimStaticAssoc->GetAnimGroup());

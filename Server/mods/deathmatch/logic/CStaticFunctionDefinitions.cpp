@@ -3927,6 +3927,10 @@ bool CStaticFunctionDefinitions::GivePedJetPack(CElement* pElement)
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned() && !pPed->GetOccupiedVehicle() && !pPed->HasJetPack())
         {
+            // Remove choking state
+            if (pPed->IsChoking())
+                pPed->SetChoking(false);
+
             pPed->SetHasJetPack(true);
 
             CBitStream BitStream;
@@ -4056,6 +4060,10 @@ bool CStaticFunctionDefinitions::SetPedChoking(CElement* pElement, bool bChoking
                 // Not already (not) choking?
                 if (bChoking != pPed->IsChoking())
                 {
+                    // Remove jetpack now so it doesn't stay on (#9522#c25612)
+                    if (pPed->HasJetPack())
+                        pPed->SetHasJetPack(false);
+                    
                     pPed->SetChoking(bChoking);
 
                     CBitStream bitStream;
@@ -4267,6 +4275,14 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const char*
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned())
         {
+            // Remove jetpack now so it doesn't stay on (#9522#c25612)
+            if (pPed->HasJetPack())
+                pPed->SetHasJetPack(false);
+
+            // Remove choking state
+            if (pPed->IsChoking())
+                pPed->SetChoking(false);
+
             // TODO: save their animation?
 
             // Tell the players

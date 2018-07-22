@@ -11,8 +11,7 @@
 
 class CGraphics;
 
-#ifndef __CGRAPHICS_H
-#define __CGRAPHICS_H
+#pragma once
 
 #include <core/CGraphicsInterface.h>
 #include <gui/CGUI.h>
@@ -334,5 +333,3 @@ private:
     uint                                    m_uiProgressAnimFrame;
     std::map<SString, SCustomScaleFontInfo> m_CustomScaleFontMap;
 };
-
-#endif

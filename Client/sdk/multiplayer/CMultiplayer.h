@@ -8,7 +8,7 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
- 
+
 #ifndef __CMULTIPLAYER
 #define __CMULTIPLAYER
 
