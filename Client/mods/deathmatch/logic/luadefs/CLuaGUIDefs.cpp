@@ -318,18 +318,15 @@ void CLuaGUIDefs::AddGuiMemoClass(lua_State* luaVM)
     lua_classfunction(luaVM, "create", "guiCreateMemo");
 
     lua_classfunction(luaVM, "getCaretIndex", "guiMemoGetCaretIndex");
-
-    lua_classfunction(luaVM, "setCaretIndex", "guiMemoSetCaretIndex");
-    lua_classfunction(luaVM, "setReadOnly", "guiMemoSetReadOnly");
-
     lua_classfunction(luaVM, "getVerticalScrollPosition", "guiMemoGetVerticalScrollPosition");
 
+    lua_classfunction(luaVM, "setCaretIndex", "guiMemoSetCaretIndex");
     lua_classfunction(luaVM, "setVerticalScrollPosition", "guiMemoSetVerticalScrollPosition");
+    lua_classfunction(luaVM, "setReadOnly", "guiMemoSetReadOnly");
 
     lua_classvariable(luaVM, "caretIndex", "guiMemoSetCaretIndex", "guiMemoGetCaretIndex");
-    lua_classvariable(luaVM, "readOnly", "guiMemoSetReadOnly", "guiMemoIsReadOnly");
-
     lua_classvariable(luaVM, "verticalScrollPosition", "guiMemoSetVerticalScrollPosition", "guiMemoGetVerticalScrollPosition");
+    lua_classvariable(luaVM, "readOnly", "guiMemoSetReadOnly", "guiMemoIsReadOnly");
 
     lua_registerclass(luaVM, "GuiMemo", "GuiElement");
 }
