@@ -22,6 +22,7 @@ If applicable, add screenshots to help explain your problem.
 
 **MTA Client (please complete the following information):**
  - Version [e.g. 1.1, 1.5.4]
+ - Running in Wine? [e.g, No, Yes - Linux, Yes - macOS]
 
 **MTA Server (please complete the following information):**
  - OS: [e.g. Windows 7, Debian Stretch]
