@@ -4365,7 +4365,7 @@ void CPacketHandler::Packet_ExplosionSync(NetBitStreamInterface& bitStream)
                 pExplodingVehicle->SetWillExplode(true);
 
                 // Call onClientVehicleExplode
-                // Bonus: This way "onClientVehicleExplode will only get called for serversided vehicles.
+                // Bonus1702 says: This way "onClientVehicleExplode will only get called for serversided vehicles.
                 CLuaArguments Arguments;
                 pExplodingVehicle->CallEvent("onClientVehicleExplode", Arguments, true);
 
