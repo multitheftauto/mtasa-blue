@@ -610,7 +610,7 @@ float CSettingsSA::GetPedsLODDistance()
 void CSettingsSA::ResetPedsLODDistance()
 {
     bool bHighDetailPeds;
-    g_pCore->GetCVars()->Get("high_detail_vehicles", bHighDetailPeds);
+    g_pCore->GetCVars()->Get("high_detail_peds", bHighDetailPeds);
     if (bHighDetailPeds)
     {
         ms_fPedsLODDistance = MAX_PEDS_LOD_DISTANCE;
