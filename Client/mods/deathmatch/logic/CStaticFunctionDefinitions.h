@@ -218,6 +218,8 @@ public:
     static bool            GetVehicleNitroLevel(CClientVehicle& Vehicle, float& fLevel);
     static bool            GetHeliBladeCollisionsEnabled(CClientVehicle& Vehicle);
     static bool            IsVehicleWindowOpen(CClientVehicle& Vehicle, uchar ucWindow);
+    static bool            SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
+    static bool            GetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
 
     // Vehicle set functions
     static bool FixVehicle(CClientEntity& Entity);
@@ -460,6 +462,7 @@ public:
 
     static void GUIMemoSetReadOnly(CClientEntity& Element, bool bFlag);
     static void GUIMemoSetCaretIndex(CClientEntity& Element, unsigned int iCaret);
+    static void GUIMemoSetVerticalScrollPosition(CClientEntity& Element, float fPosition);
 
     static void                GUIGridListSetSortingEnabled(CClientEntity& Element, bool bEnabled);
     static inline unsigned int GUIGridListAddColumn(CClientGUIElement& GUIElement, const char* szTitle, float fWidth)

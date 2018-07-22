@@ -275,6 +275,15 @@ int CLuaColShapeDefs::CreateColPolygon(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(vecPosition);
 
+    // Get the points
+    std::vector<CVector2D> vecPointList;
+    for (uint i = 0; i < 3 || argStream.NextIsVector2D(); i++)
+    {
+        CVector2D vecPoint;
+        argStream.ReadVector2D(vecPoint);
+        vecPointList.push_back(vecPoint);
+    }
+
     if (!argStream.HasErrors())
     {
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
@@ -287,11 +296,10 @@ int CLuaColShapeDefs::CreateColPolygon(lua_State* luaVM)
                 CClientColPolygon* pShape = CStaticFunctionDefinitions::CreateColPolygon(*pResource, vecPosition);
                 if (pShape)
                 {
-                    // Get the points
-                    while (argStream.NextCouldBeNumber() && argStream.NextCouldBeNumber(1))
+                    // Add the points
+                    for (uint i = 0; i < vecPointList.size(); i++)
                     {
-                        argStream.ReadVector2D(vecPosition);
-                        pShape->AddPoint(vecPosition);
+                        pShape->AddPoint(vecPointList[i]);
                     }
 
                     CElementGroup* pGroup = pResource->GetElementGroup();

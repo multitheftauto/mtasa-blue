@@ -205,7 +205,7 @@ public:
     void MarkAsUnloading(void) { m_bUnloading = true; }
     bool IsUnloading(void) { return m_bUnloading; }
 
-    bool LoadIFP(const SString& strFilePath, const SString& strBlockName);
+    bool LoadIFP(const SString& strFile, const bool isRawData, const SString& strBlockName);
 
     const SString&      GetBlockName(void) { return m_strBlockName; }
     const unsigned int& GetBlockNameHash(void) { return m_u32Hashkey; }
@@ -219,7 +219,7 @@ public:
     void SetPosition(const CVector& vecPosition){};
 
 private:
-    bool LoadIFPFile(const SString& strFilePath);
+    bool LoadIFPFile(const SString& strFile, const bool isRawData);
     bool ReadIFPByVersion(void);
     void ReadIFPVersion1(void);
     void ReadIFPVersion2(bool bAnp3);

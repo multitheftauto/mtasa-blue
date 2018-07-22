@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CDIRECT3DHOOK9_H
-#define __CDIRECT3DHOOK9_H
+#pragma once
 
 typedef IDirect3D9*(__stdcall* pDirect3DCreate)(int SDKVersion);
 
@@ -29,5 +28,3 @@ public:
     pDirect3DCreate m_pfnDirect3DCreate9;
     bool            m_bDirect3DCreate9Suspended;
 };
-
-#endif

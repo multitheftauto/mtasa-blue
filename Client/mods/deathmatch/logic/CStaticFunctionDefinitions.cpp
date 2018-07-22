@@ -2098,11 +2098,10 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CClientEntity& Entity, 
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         if (!strAnimName.empty())
         {
-            CAnimBlendAssociation* pA = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(Ped.GetClump(), strAnimName);
-
-            if (pA)
+            auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(Ped.GetClump(), strAnimName);
+            if (pAnimAssociation)
             {
-                pA->SetCurrentProgress(fProgress);
+                pAnimAssociation->SetCurrentProgress(fProgress);
                 return true;
             }
         }
@@ -2475,7 +2474,7 @@ bool CStaticFunctionDefinitions::GetVehicleUpgradeSlotName(unsigned short usUpgr
 bool CStaticFunctionDefinitions::GetVehicleNameFromModel(unsigned short usModel, SString& strOutName)
 {
     strOutName = CVehicleNames::GetVehicleName(usModel);
-    return true;
+    return !strOutName.empty();
 }
 
 bool CStaticFunctionDefinitions::GetHelicopterRotorSpeed(CClientVehicle& Vehicle, float& fSpeed)
@@ -3418,6 +3417,34 @@ bool CStaticFunctionDefinitions::SetVehicleWindowOpen(CClientVehicle& Vehicle, u
 bool CStaticFunctionDefinitions::IsVehicleWindowOpen(CClientVehicle& Vehicle, uchar ucWindow)
 {
     return Vehicle.IsWindowOpen(ucWindow);
+}
+
+bool CStaticFunctionDefinitions::SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition)
+{
+    if (CClientVehicleManager::IsValidModel(usModel))
+    {
+        auto pModelInfo = g_pGame->GetModelInfo(usModel);
+        if (pModelInfo)
+        {
+            pModelInfo->SetVehicleExhaustFumesPosition(vecPosition);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition)
+{
+    if (CClientVehicleManager::IsValidModel(usModel))
+    {
+        auto pModelInfo = g_pGame->GetModelInfo(usModel);
+        if (pModelInfo)
+        {
+            vecPosition = pModelInfo->GetVehicleExhaustFumesPosition();
+            return true;
+        }
+    }
+    return false;
 }
 
 bool CStaticFunctionDefinitions::SetElementCollisionsEnabled(CClientEntity& Entity, bool bEnabled)
@@ -5587,6 +5614,24 @@ void CStaticFunctionDefinitions::GUIMemoSetCaretIndex(CClientEntity& Entity, uns
     }
 }
 
+void CStaticFunctionDefinitions::GUIMemoSetVerticalScrollPosition(CClientEntity& Entity, float fPosition)
+{
+    RUN_CHILDREN(GUIMemoSetVerticalScrollPosition(**iter, fPosition))
+
+    // Are we a GUI element?
+    if (IS_GUI(&Entity))
+    {
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+
+        // Are we a memo?
+        if (IS_CGUIELEMENT_MEMO(&GUIElement))
+        {
+            CGUIMemo* guiMemo = static_cast<CGUIMemo*>(GUIElement.GetCGUIElement());
+            guiMemo->SetVerticalScrollPosition(fPosition / 100.0f * guiMemo->GetMaxVerticalScrollPosition());
+        }
+    }
+}
+
 void CStaticFunctionDefinitions::GUIGridListSetSortingEnabled(CClientEntity& Entity, bool bEnabled)
 {
     RUN_CHILDREN(GUIGridListSetSortingEnabled(**iter, bEnabled))
@@ -6449,28 +6494,32 @@ bool CStaticFunctionDefinitions::BindKey(const char* szKey, const char* szHitSta
     if (bKey)
     {
         bool bHitState = true;
-        // Activate all keys for this command
-        pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true);
         // Check if its binded already (dont rebind)
         if (pKeyBinds->CommandExists(szKey, szCommandName, true, bHitState, szArguments, szResource, true, true))
+        {
+            // Activate all keys for this command
+            pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true, szKey);
             return true;
+        }
 
         if ((!stricmp(szHitState, "down") || !stricmp(szHitState, "both")) &&
             pKeyBinds->AddCommand(szKey, szCommandName, szArguments, bHitState, szResource, true))
         {
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, szArguments, szResource, true, true);
+            pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true, szKey);
             bSuccess = true;
         }
 
         bHitState = false;
-        pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true);
         if (pKeyBinds->CommandExists(szKey, szCommandName, true, bHitState, szArguments, szResource, true, true))
+        {
+            pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true, szKey);
             return true;
+        }
 
         if ((!stricmp(szHitState, "up") || !stricmp(szHitState, "both")) &&
             pKeyBinds->AddCommand(szKey, szCommandName, szArguments, bHitState, szResource, true))
         {
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, szArguments, szResource, true, true);
+            pKeyBinds->SetAllCommandsActive(szResource, true, szCommandName, bHitState, szArguments, true, szKey);
             bSuccess = true;
         }
     }
@@ -6540,16 +6589,16 @@ bool CStaticFunctionDefinitions::UnbindKey(const char* szKey, const char* szHitS
             }
         }
         if ((!stricmp(szHitState, "down") || !stricmp(szHitState, "both")) &&
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true))
+            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true, true))
         {
-            pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true);
+            pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true, szKey);
             bSuccess = true;
         }
         bHitState = false;
         if ((!stricmp(szHitState, "up") || !stricmp(szHitState, "both")) &&
-            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true))
+            pKeyBinds->SetCommandActive(szKey, szCommandName, bHitState, NULL, szResource, false, true, true))
         {
-            pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true);
+            pKeyBinds->SetAllCommandsActive(szResource, false, szCommandName, bHitState, NULL, true, szKey);
             bSuccess = true;
         }
     }

@@ -35,6 +35,7 @@ CClientPlayerVoice::CClientPlayerVoice(CClientPlayer* pPlayer, CVoiceRecorder* p
     // Get initial voice volume
     m_fVolume = 1.0f;
     g_pCore->GetCVars()->Get("voicevolume", m_fVolumeScale);
+    m_fVolumeScale *= g_pCore->GetCVars()->GetValue<float>("mastervolume", 1.0f);
 
     m_fVolume = m_fVolume * m_fVolumeScale;
 
@@ -114,6 +115,7 @@ void CClientPlayerVoice::DoPulse(void)
     m_CS.Lock();
     float fPreviousVolume = 0.0f;
     g_pCore->GetCVars()->Get("voicevolume", fPreviousVolume);
+    fPreviousVolume *= g_pCore->GetCVars()->GetValue<float>("mastervolume", 1.0f);
     m_CS.Unlock();
 
     if (fPreviousVolume != m_fVolumeScale && m_pPlayer->IsLocalPlayer() == false)

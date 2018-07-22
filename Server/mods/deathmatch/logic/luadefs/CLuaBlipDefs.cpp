@@ -62,12 +62,12 @@ void CLuaBlipDefs::AddClass(lua_State* luaVM)
 
 int CLuaBlipDefs::CreateBlip(lua_State* luaVM)
 {
-    CVector        vecPosition;
-    unsigned char  ucIcon, ucSize;
-    SColorRGBA     color(255, 0, 0, 255);
-    short          sOrdering;
-    unsigned short usVisibleDistance;
-    CElement*      pVisibleTo;
+    CVector       vecPosition;
+    unsigned char ucIcon, ucSize;
+    SColorRGBA    color(255, 0, 0, 255);
+    int           iOrdering;
+    int           iVisibleDistance;
+    CElement*     pVisibleTo;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecPosition);
@@ -77,8 +77,8 @@ int CLuaBlipDefs::CreateBlip(lua_State* luaVM)
     argStream.ReadNumber(color.G, color.G);
     argStream.ReadNumber(color.B, color.B);
     argStream.ReadNumber(color.A, color.A);
-    argStream.ReadNumber(sOrdering, 0);
-    argStream.ReadNumber(usVisibleDistance, 16383);
+    argStream.ReadNumber(iOrdering, 0);
+    argStream.ReadNumber(iVisibleDistance, 16383);
     if (argStream.NextIsBool() || argStream.NextIsNil())
         pVisibleTo = NULL;
     else
@@ -97,6 +97,9 @@ int CLuaBlipDefs::CreateBlip(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (pResource)
             {
+                short          sOrdering = Clamp(-32768, iOrdering, 32767);
+                unsigned short usVisibleDistance = Clamp(0, iVisibleDistance, 65535);
+
                 // Create the blip
                 CBlip* pBlip = CStaticFunctionDefinitions::CreateBlip(pResource, vecPosition, ucIcon, ucSize, color, sOrdering, usVisibleDistance, pVisibleTo);
                 if (pBlip)
@@ -121,12 +124,12 @@ int CLuaBlipDefs::CreateBlip(lua_State* luaVM)
 
 int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
 {
-    CElement*      pElement;
-    unsigned char  ucIcon, ucSize;
-    SColorRGBA     color(255, 0, 0, 255);
-    short          sOrdering;
-    unsigned short usVisibleDistance;
-    CElement*      pVisibleTo;
+    CElement*     pElement;
+    unsigned char ucIcon, ucSize;
+    SColorRGBA    color(255, 0, 0, 255);
+    int           iOrdering;
+    int           iVisibleDistance;
+    CElement*     pVisibleTo;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -136,8 +139,8 @@ int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
     argStream.ReadNumber(color.G, color.G);
     argStream.ReadNumber(color.B, color.B);
     argStream.ReadNumber(color.A, color.A);
-    argStream.ReadNumber(sOrdering, 0);
-    argStream.ReadNumber(usVisibleDistance, 16383);
+    argStream.ReadNumber(iOrdering, 0);
+    argStream.ReadNumber(iVisibleDistance, 16383);
     if (argStream.NextIsBool() || argStream.NextIsNil())
         pVisibleTo = NULL;
     else
@@ -153,6 +156,9 @@ int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
         CResource* resource = m_pLuaManager->GetVirtualMachineResource(luaVM);
         if (resource)
         {
+            short          sOrdering = Clamp(-32768, iOrdering, 32767);
+            unsigned short usVisibleDistance = Clamp(0, iVisibleDistance, 65535);
+
             // Create the blip
             CBlip* pBlip =
                 CStaticFunctionDefinitions::CreateBlipAttachedTo(resource, pElement, ucIcon, ucSize, color, sOrdering, usVisibleDistance, pVisibleTo);
@@ -375,14 +381,16 @@ int CLuaBlipDefs::SetBlipColor(lua_State* luaVM)
 int CLuaBlipDefs::SetBlipOrdering(lua_State* luaVM)
 {
     CElement* pElement;
-    short     sOrdering;
+    int       iOrdering;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
-    argStream.ReadNumber(sOrdering);
+    argStream.ReadNumber(iOrdering);
 
     if (!argStream.HasErrors())
     {
+        short sOrdering = Clamp(-32768, iOrdering, 32767);
+
         if (CStaticFunctionDefinitions::SetBlipOrdering(pElement, sOrdering))
         {
             lua_pushboolean(luaVM, true);
@@ -398,15 +406,17 @@ int CLuaBlipDefs::SetBlipOrdering(lua_State* luaVM)
 
 int CLuaBlipDefs::SetBlipVisibleDistance(lua_State* luaVM)
 {
-    CElement*      pElement;
-    unsigned short usVisibleDistance;
+    CElement* pElement;
+    int       iVisibleDistance;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
-    argStream.ReadNumber(usVisibleDistance);
+    argStream.ReadNumber(iVisibleDistance);
 
     if (!argStream.HasErrors())
     {
+        unsigned short usVisibleDistance = Clamp(0, iVisibleDistance, 65535);
+
         if (CStaticFunctionDefinitions::SetBlipVisibleDistance(pElement, usVisibleDistance))
         {
             lua_pushboolean(luaVM, true);
