@@ -923,14 +923,22 @@ CVector CModelInfoSA::GetVehicleExhaustFumesPosition()
     if (!IsVehicle())
         return CVector();
 
+    // Request model load right now if not loaded yet (#9897)
+    if (!IsLoaded())
+        Request(BLOCKING, "GetVehicleExhaustFumesPosition");
+
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
     return pVehicleModel->pVisualInfo->exhaustPosition;
 }
 
-void CModelInfoSA::SetVehicleExhaustFumesPosition(const CVector& position)
+void CModelInfoSA::SetVehicleExhaustFumesPosition(const CVector& vecPosition)
 {
     if (!IsVehicle())
         return;
+
+    // Request model load right now if not loaded yet (#9897)
+    if (!IsLoaded())
+        Request(BLOCKING, "SetVehicleExhaustFumesPosition");
 
     // Store default position in map
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
@@ -941,7 +949,7 @@ void CModelInfoSA::SetVehicleExhaustFumesPosition(const CVector& position)
     }
 
     // Set fumes position
-    pVehicleModel->pVisualInfo->exhaustPosition = position;
+    pVehicleModel->pVisualInfo->exhaustPosition = vecPosition;
 }
 
 void CModelInfoSA::ResetAllVehicleExhaustFumes()

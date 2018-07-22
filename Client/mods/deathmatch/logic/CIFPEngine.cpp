@@ -10,7 +10,7 @@
 
 #include <StdInc.h>
 
-std::shared_ptr<CClientIFP> CIFPEngine::EngineLoadIFP(CResource* pResource, CClientManager* pManager, const SString& strPath, const SString& strBlockName)
+std::shared_ptr<CClientIFP> CIFPEngine::EngineLoadIFP(CResource* pResource, CClientManager* pManager, const SString& strFile, bool bIsRawData, const SString& strBlockName)
 {
     // Grab the resource root entity
     CClientEntity*     pRoot = pResource->GetResourceIFPRoot();
@@ -23,7 +23,7 @@ std::shared_ptr<CClientIFP> CIFPEngine::EngineLoadIFP(CResource* pResource, CCli
         std::shared_ptr<CClientIFP> pIFP(new CClientIFP(pManager, INVALID_ELEMENT_ID));
 
         // Try to load the IFP file
-        if (pIFP->LoadIFP(strPath, strBlockName))
+        if (pIFP->LoadIFP(strFile, bIsRawData, strBlockName))
         {
             // We can use the map to retrieve correct IFP by block name later
             g_pClientGame->InsertIFPPointerToMap(u32BlockNameHash, pIFP);
@@ -51,7 +51,7 @@ bool CIFPEngine::EngineReplaceAnimation(CClientEntity* pEntity, const SString& s
             // Try to load the block, if it's not loaded already
             pInternalBlock->Request(BLOCKING, true);
 
-            CAnimBlendHierarchy*            pInternalAnimHierarchy = g_pGame->GetAnimManager()->GetAnimation(strInternalAnimName, pInternalBlock);
+            auto                            pInternalAnimHierarchy = g_pGame->GetAnimManager()->GetAnimation(strInternalAnimName, pInternalBlock);
             CAnimBlendHierarchySAInterface* pCustomAnimHierarchyInterface = pCustomIFP->GetAnimationHierarchy(strCustomAnimName);
             if (pInternalAnimHierarchy && pCustomAnimHierarchyInterface)
             {
@@ -87,7 +87,7 @@ bool CIFPEngine::EngineRestoreAnimation(CClientEntity* pEntity, const SString& s
                 }
                 else
                 {
-                    CAnimBlendHierarchy* pInternalAnimHierarchy = g_pGame->GetAnimManager()->GetAnimation(strInternalAnimName, pInternalBlock);
+                    auto pInternalAnimHierarchy = g_pGame->GetAnimManager()->GetAnimation(strInternalAnimName, pInternalBlock);
                     if (pInternalAnimHierarchy)
                     {
                         Ped.RestoreAnimation(pInternalAnimHierarchy);
@@ -98,4 +98,10 @@ bool CIFPEngine::EngineRestoreAnimation(CClientEntity* pEntity, const SString& s
         }
     }
     return false;
+}
+
+// Return true if data looks like IFP file contents
+bool CIFPEngine::IsIFPData(const SString& strData)
+{
+    return strData.length() > 32 && memcmp(strData, "\x41\x4E\x50", 3) == 0;
 }

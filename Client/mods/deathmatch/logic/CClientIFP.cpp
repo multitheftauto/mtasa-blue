@@ -24,12 +24,12 @@ CClientIFP::CClientIFP(class CClientManager* pManager, ElementID ID) : CClientEn
     m_u32Hashkey = 0;
 }
 
-bool CClientIFP::LoadIFP(const SString& strFilePath, const SString& strBlockName)
+bool CClientIFP::LoadIFP(const SString& strFile, const bool isRawData, const SString& strBlockName)
 {
     m_strBlockName = strBlockName;
     m_pVecAnimations = &m_pIFPAnimations->vecAnimations;
 
-    if (LoadIFPFile(strFilePath))
+    if (LoadIFPFile(strFile, isRawData))
     {
         m_u32Hashkey = HashString(strBlockName.ToLower());
         return true;
@@ -37,9 +37,9 @@ bool CClientIFP::LoadIFP(const SString& strFilePath, const SString& strBlockName
     return false;
 }
 
-bool CClientIFP::LoadIFPFile(const SString& strFilePath)
+bool CClientIFP::LoadIFPFile(const SString& strFile, const bool isRawData)
 {
-    if (LoadFileToMemory(strFilePath))
+    if (isRawData ? LoadDataBufferToMemory(strFile) : LoadFileToMemory(strFile))
     {
         if (ReadIFPByVersion())
         {

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CDIRECT3DEVENTS9_H
-#define __CDIRECT3DEVENTS9_H
+#pragma once
 
 #include <d3d9.h>
 
@@ -52,5 +51,3 @@ public:
     static IDirect3DIndexBuffer9*  GetRealIndexBuffer(IDirect3DIndexBuffer9* pIndexBuffer);
     static IDirect3DBaseTexture9*  GetRealTexture(IDirect3DBaseTexture9* pTexture);
 };
-
-#endif

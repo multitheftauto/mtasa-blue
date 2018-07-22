@@ -462,6 +462,7 @@ public:
 
     static void GUIMemoSetReadOnly(CClientEntity& Element, bool bFlag);
     static void GUIMemoSetCaretIndex(CClientEntity& Element, unsigned int iCaret);
+    static void GUIMemoSetVerticalScrollPosition(CClientEntity& Element, float fPosition);
 
     static void                GUIGridListSetSortingEnabled(CClientEntity& Element, bool bEnabled);
     static inline unsigned int GUIGridListAddColumn(CClientGUIElement& GUIElement, const char* szTitle, float fWidth)

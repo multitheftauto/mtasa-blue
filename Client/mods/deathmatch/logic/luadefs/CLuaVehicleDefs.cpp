@@ -41,7 +41,7 @@ void CLuaVehicleDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("getVehiclePaintjob", GetVehiclePaintjob);
     CLuaCFunctions::AddFunction("getVehiclePlateText", GetVehiclePlateText);
     CLuaCFunctions::AddFunction("getVehicleWheelStates", GetVehicleWheelStates);
-    CLuaCFunctions::AddFunction("isVehicleWheelCollided", IsVehicleWheelCollided);
+    CLuaCFunctions::AddFunction("isVehicleWheelOnGround", IsVehicleWheelCollided);
     CLuaCFunctions::AddFunction("isVehicleDamageProof", IsVehicleDamageProof);
     CLuaCFunctions::AddFunction("isVehicleFuelTankExplodable", IsVehicleFuelTankExplodable);
     CLuaCFunctions::AddFunction("isVehicleFrozen", IsVehicleFrozen);
@@ -178,7 +178,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getPaintjob", "getVehiclePaintjob");
     lua_classfunction(luaVM, "getTurretPosition", "getVehicleTurretPosition");
     lua_classfunction(luaVM, "getWheelStates", "getVehicleWheelStates");
-    lua_classfunction(luaVM, "isWheelCollided", "isVehicleWheelCollided");
+    lua_classfunction(luaVM, "isWheelOnGround", "isVehicleWheelOnGround");
     lua_classfunction(luaVM, "getDoorOpenRatio", "getVehicleDoorOpenRatio");
     lua_classfunction(luaVM, "getVariant", "getVehicleVariant");
     lua_classfunction(luaVM, "getHandling", "getVehicleHandling");

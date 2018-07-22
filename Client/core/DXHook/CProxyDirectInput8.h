@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPROXYDIRECTINPUT_H
-#define __CPROXYDIRECTINPUT_H
+#pragma once
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -40,5 +39,3 @@ public:
 private:
     IDirectInput8A* m_pDevice;
 };
-
-#endif
