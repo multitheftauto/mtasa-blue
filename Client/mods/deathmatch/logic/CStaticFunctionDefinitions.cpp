@@ -5578,7 +5578,7 @@ void CStaticFunctionDefinitions::GUIMemoSetVerticalScrollPosition(CClientEntity&
     {
         CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
 
-        // Are we a gridlist?
+        // Are we a memo?
         if (IS_CGUIELEMENT_MEMO(&GUIElement))
         {
             CGUIMemo* guiMemo = static_cast<CGUIMemo*>(GUIElement.GetCGUIElement());
