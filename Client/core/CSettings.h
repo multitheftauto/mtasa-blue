@@ -212,20 +212,26 @@ protected:
     CGUILabel*     m_pCachePathLabel;
     CGUILabel*     m_pCachePathValue;
     CGUIButton*    m_pCachePathShowButton;
+    CGUILabel*     m_pLabelMasterVolume;
     CGUILabel*     m_pLabelRadioVolume;
     CGUILabel*     m_pLabelSFXVolume;
     CGUILabel*     m_pLabelMTAVolume;
     CGUILabel*     m_pLabelVoiceVolume;
+    CGUILabel*     m_pLabelMasterVolumeValue;
     CGUILabel*     m_pLabelRadioVolumeValue;
     CGUILabel*     m_pLabelSFXVolumeValue;
     CGUILabel*     m_pLabelMTAVolumeValue;
     CGUILabel*     m_pLabelVoiceVolumeValue;
+    CGUIScrollBar* m_pAudioMasterVolume;
     CGUIScrollBar* m_pAudioRadioVolume;
     CGUIScrollBar* m_pAudioSFXVolume;
     CGUIScrollBar* m_pAudioMTAVolume;
     CGUIScrollBar* m_pAudioVoiceVolume;
+    CGUILabel*     m_pAudioRadioLabel;
     CGUICheckBox*  m_pCheckBoxAudioEqualizer;
     CGUICheckBox*  m_pCheckBoxAudioAutotune;
+    CGUILabel*     m_pAudioMuteLabel;
+    CGUICheckBox*  m_pCheckBoxMuteMaster;
     CGUICheckBox*  m_pCheckBoxMuteSFX;
     CGUICheckBox*  m_pCheckBoxMuteRadio;
     CGUICheckBox*  m_pCheckBoxMuteMTA;
@@ -336,10 +342,16 @@ protected:
     bool OnBrightnessChanged(CGUIElement* pElement);
     bool OnAnisotropicChanged(CGUIElement* pElement);
     bool OnMapAlphaChanged(CGUIElement* pElement);
+    bool OnMasterVolumeChanged(CGUIElement* pElement);
     bool OnRadioVolumeChanged(CGUIElement* pElement);
     bool OnSFXVolumeChanged(CGUIElement* pElement);
     bool OnMTAVolumeChanged(CGUIElement* pElement);
     bool OnVoiceVolumeChanged(CGUIElement* pElement);
+    bool OnMasterMuteMinimizedChanged(CGUIElement* pElement);
+    bool OnRadioMuteMinimizedChanged(CGUIElement* pElement);
+    bool OnSFXMuteMinimizedChanged(CGUIElement* pElement);
+    bool OnMTAMuteMinimizedChanged(CGUIElement* pElement);
+    bool OnVoiceMuteMinimizedChanged(CGUIElement* pElement);
     bool OnChatRedChanged(CGUIElement* pElement);
     bool OnChatGreenChanged(CGUIElement* pElement);
     bool OnChatBlueChanged(CGUIElement* pElement);
@@ -392,16 +404,36 @@ private:
     int    GetMilliseconds(CGUIEdit* pEdit);
     void   SetMilliseconds(CGUIEdit* pEdit, int milliseconds);
 
+    void ResetGTAVolume();
+    void SetRadioVolume(float fVolume);
+    void SetSFXVolume(float fVolume);
+
     unsigned int m_uiCaptureKey;
     bool         m_bCaptureKey;
     bool         m_bCaptureAxis;
 
     bool m_bIsModLoaded;
 
-    unsigned char m_ucOldRadioVolume;
-    unsigned char m_ucOldSFXVolume;
-    float         m_fOldMTAVolume;
-    float         m_fOldVoiceVolume;
+    float m_fRadioVolume;
+    float m_fSFXVolume;
+
+    float m_fOldMasterVolume;
+    float m_fOldRadioVolume;
+    float m_fOldSFXVolume;
+    float m_fOldMTAVolume;
+    float m_fOldVoiceVolume;
+
+    bool m_bOldMuteMaster;
+    bool m_bOldMuteSFX;
+    bool m_bOldMuteRadio;
+    bool m_bOldMuteMTA;
+    bool m_bOldMuteVoice;
+
+    bool m_bMuteMaster;
+    bool m_bMuteSFX;
+    bool m_bMuteRadio;
+    bool m_bMuteMTA;
+    bool m_bMuteVoice;
 
     CGUIListItem* m_pSelectedBind;
 
@@ -409,11 +441,6 @@ private:
     bool  m_bShownVolumetricShadowsWarning;
     bool  m_bShownAllowScreenUploadMessage;
     int   m_iMaxAnisotropic;
-
-    bool m_bMuteSFX;
-    bool m_bMuteRadio;
-    bool m_bMuteMTA;
-    bool m_bMuteVoice;
 
     std::list<SKeyBindSection*> m_pKeyBindSections;
 };
