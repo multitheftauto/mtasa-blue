@@ -1,22 +1,17 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CMapManager.h
-*  PURPOSE:     Map manager class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*               Kevin Whiteside <>
-*               lil_Toady <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CMapManager.h
+ *  PURPOSE:     Map manager class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 class CMapManager;
 
-#ifndef __CMAPMANAGER_H
-#define __CMAPMANAGER_H
+#pragma once
 
 #include "CBlendedWeather.h"
 #include "CBlipManager.h"
@@ -30,96 +25,81 @@ class CMapManager;
 #include "CTeamManager.h"
 #include "CGroups.h"
 
-
 #include "CResourceMapItem.h"
-
 
 class CMapManager
 {
 public:
-                                CMapManager                 ( CBlipManager* pBlipManager,
-                                                              CObjectManager* pObjectManager,
-                                                              CPickupManager* pPickupManager, 
-                                                              CPlayerManager* pPlayerManager, 
-                                                              CRadarAreaManager* pRadarAreaManager,
-                                                              CMarkerManager* pMarkerManager,
-                                                              CVehicleManager* pVehicleManager,
-                                                              CTeamManager* pTeamManager,
-                                                              CPedManager* pPedManager,
-                                                              CColManager* pColManager,
-                                                              CWaterManager* pWaterManager,
-                                                              CClock* pClock,
-                                                              class CLuaManager* pLuaManager,
-                                                              CGroups* pGroups,
-                                                              CEvents* pEvents,
-                                                              class CScriptDebugging* pScriptDebugging,
-                                                              CElementDeleter* pElementDeleter );
-                                ~CMapManager                ( void );
+    CMapManager(CBlipManager* pBlipManager, CObjectManager* pObjectManager, CPickupManager* pPickupManager, CPlayerManager* pPlayerManager,
+                CRadarAreaManager* pRadarAreaManager, CMarkerManager* pMarkerManager, CVehicleManager* pVehicleManager, CTeamManager* pTeamManager,
+                CPedManager* pPedManager, CColManager* pColManager, CWaterManager* pWaterManager, CClock* pClock, class CLuaManager* pLuaManager,
+                CGroups* pGroups, CEvents* pEvents, class CScriptDebugging* pScriptDebugging, CElementDeleter* pElementDeleter);
+    ~CMapManager(void);
 
-    CBlendedWeather*            GetWeather                  ( void )    { return m_pBlendedWeather; };
+    CBlendedWeather* GetWeather(void) { return m_pBlendedWeather; };
 
-    void                        DoPulse                     ( void );
+    void DoPulse(void);
 
-    CElement*                   LoadMapData                 ( CResource& Loader, CElement& Parent, CXMLNode& Node );
+    CElement* LoadMapData(CResource& Loader, CElement& Parent, CXMLNode& Node);
 
-    void                        BroadcastMapInformation     ( void );
-    void                        SendMapInformation          ( CPlayer& Player );
-    void                        SendBlips                   ( CPlayer& Player );
-    void                        SendPerPlayerEntities       ( CPlayer& Player );
+    void BroadcastMapInformation(void);
+    void SendMapInformation(CPlayer& Player);
+    void SendBlips(CPlayer& Player);
+    void SendPerPlayerEntities(CPlayer& Player);
 
-    void                        BroadcastResourceElements   ( CElement* pResourceElement, CElementGroup* pElementGroup );
-    void                        BroadcastElementChildren    ( CElement* pElement, class CEntityAddPacket &Packet, std::vector < CPerPlayerEntity* > &pPerPlayerList, std::set < CElement* >& outDoneElements );
-    void                        BroadcastElement            ( CElement* pElement, class CEntityAddPacket &Packet, std::vector < CPerPlayerEntity* > &pPerPlayerList );
+    void BroadcastResourceElements(CElement* pResourceElement, CElementGroup* pElementGroup);
+    void BroadcastElementChildren(CElement* pElement, class CEntityAddPacket& Packet, std::vector<CPerPlayerEntity*>& pPerPlayerList,
+                                  std::set<CElement*>& outDoneElements);
+    void BroadcastElement(CElement* pElement, class CEntityAddPacket& Packet, std::vector<CPerPlayerEntity*>& pPerPlayerList);
 
-    void                        OnPlayerJoin                ( CPlayer& Player );
-    void                        OnPlayerQuit                ( CPlayer& Player );
+    void OnPlayerJoin(CPlayer& Player);
+    void OnPlayerQuit(CPlayer& Player);
 
-    inline CDummy*              GetRootElement              ( void ) const              { return m_pRootElement; };
+    CDummy* GetRootElement(void) const { return m_pRootElement; };
 
-    inline CClock*              GetServerClock              ( void )                    { return m_pServerClock; }
+    CClock* GetServerClock(void) { return m_pServerClock; }
 
-    void                        SpawnPlayers                ( void );
-    void                        SpawnPlayer                 ( CPlayer& Player, const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior = 0, unsigned short usDimension = 0, CTeam* pTeam = NULL );
+    void SpawnPlayers(void);
+    void SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior = 0,
+                     unsigned short usDimension = 0, CTeam* pTeam = NULL);
 
-    void                        DoRespawning                ( void );
-    void                        DoPickupRespawning          ( void );
-    void                        DoPlayerRespawning          ( void );
-    void                        DoVehicleRespawning         ( void );
-    void                        RespawnAllVehicles          ( void );
+    void DoRespawning(void);
+    void DoPickupRespawning(void);
+    void DoPlayerRespawning(void);
+    void DoVehicleRespawning(void);
+    void RespawnAllVehicles(void);
 
 private:
-    void                        SetUpVisibleToReferences    ( CElement* pElement );
-    void                        ProcessVisibleToData        ( CPerPlayerEntity& Entity );
-    bool                        ParseVisibleToData          ( CPerPlayerEntity& Entity, char* szData );
+    void SetUpVisibleToReferences(CElement* pElement);
+    void ProcessVisibleToData(CPerPlayerEntity& Entity);
+    bool ParseVisibleToData(CPerPlayerEntity& Entity, char* szData);
 
-    CElement*                   LoadNode                    ( CResource& Loader, CXMLNode& Node, CElement* pParent, vector < CElement* >* pAdded, bool bIsDuringStart );
-    bool                        LoadSubNodes                ( CResource& Loader, CXMLNode& Node, CElement* pParent, vector < CElement* >* pAdded, bool bIsDuringStart );
-    bool                        HandleNode                  ( CResource& Loader, CXMLNode& Node, CElement* pParent, vector < CElement* >* pAdded, bool bIsDuringStart, CElement** pCreated );
-    void                        LinkupElements              ( void );
+    CElement* LoadNode(CResource& Loader, CXMLNode& Node, CElement* pParent, vector<CElement*>* pAdded, bool bIsDuringStart);
+    bool      LoadSubNodes(CResource& Loader, CXMLNode& Node, CElement* pParent, vector<CElement*>* pAdded, bool bIsDuringStart);
+    bool      HandleNode(CResource& Loader, CXMLNode& Node, CElement* pParent, vector<CElement*>* pAdded, bool bIsDuringStart, CElement** pCreated);
+    void      LinkupElements(void);
 
-    CBlipManager*               m_pBlipManager;
-    CObjectManager*             m_pObjectManager;
-    CPickupManager*             m_pPickupManager;
-    CPlayerManager*             m_pPlayerManager;
-    CRadarAreaManager*          m_pRadarAreaManager;
-    CMarkerManager*             m_pMarkerManager;
-    CVehicleManager*            m_pVehicleManager;
-    CTeamManager*               m_pTeamManager;
-    CPedManager*                m_pPedManager;
-    CColManager*                m_pColManager;
-    CWaterManager*              m_pWaterManager;
-    CClock*                     m_pServerClock;
-    class CLuaManager*          m_pLuaManager;
-    CGroups*                    m_pGroups;
-    CEvents*                    m_pEvents;
-    class CScriptDebugging*     m_pScriptDebugging;
-    CElementDeleter*            m_pElementDeleter;
+    CBlipManager*           m_pBlipManager;
+    CObjectManager*         m_pObjectManager;
+    CPickupManager*         m_pPickupManager;
+    CPlayerManager*         m_pPlayerManager;
+    CRadarAreaManager*      m_pRadarAreaManager;
+    CMarkerManager*         m_pMarkerManager;
+    CVehicleManager*        m_pVehicleManager;
+    CTeamManager*           m_pTeamManager;
+    CPedManager*            m_pPedManager;
+    CColManager*            m_pColManager;
+    CWaterManager*          m_pWaterManager;
+    CClock*                 m_pServerClock;
+    class CLuaManager*      m_pLuaManager;
+    CGroups*                m_pGroups;
+    CEvents*                m_pEvents;
+    class CScriptDebugging* m_pScriptDebugging;
+    CElementDeleter*        m_pElementDeleter;
 
-    CDummy*                     m_pRootElement;
+    CDummy* m_pRootElement;
 
-    long long                   m_llLastRespawnTime;
+    long long m_llLastRespawnTime;
 
-    CBlendedWeather*            m_pBlendedWeather;
+    CBlendedWeather* m_pBlendedWeather;
 };
-
-#endif

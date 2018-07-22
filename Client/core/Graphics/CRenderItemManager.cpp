@@ -1,12 +1,11 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CRenderItemManager.cpp
-*  PURPOSE:
-*  DEVELOPERS:  idiot
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CRenderItemManager.cpp
+ *  PURPOSE:
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 #include <game/CGame.h>
@@ -16,8 +15,8 @@
 struct SRTVertex
 {
     static const uint FVF = D3DFVF_XYZRHW | D3DFVF_TEX1;
-    float x,y,z,w;
-    float u,v;
+    float             x, y, z, w;
+    float             u, v;
 };
 
 ////////////////////////////////////////////////////////////////
@@ -27,11 +26,10 @@ struct SRTVertex
 //
 //
 ////////////////////////////////////////////////////////////////
-CRenderItemManager::CRenderItemManager ( void )
+CRenderItemManager::CRenderItemManager(void)
 {
-    m_pEffectCloner = NewEffectCloner ( this );
+    m_pEffectCloner = new CEffectCloner(this);
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -40,11 +38,10 @@ CRenderItemManager::CRenderItemManager ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-CRenderItemManager::~CRenderItemManager ( void )
+CRenderItemManager::~CRenderItemManager(void)
 {
-    SAFE_DELETE( m_pEffectCloner );
+    SAFE_DELETE(m_pEffectCloner);
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -53,36 +50,36 @@ CRenderItemManager::~CRenderItemManager ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::OnDeviceCreate ( IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY )
+void CRenderItemManager::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY)
 {
     m_pDevice = pDevice;
     m_uiDefaultViewportSizeX = fViewportSizeX;
     m_uiDefaultViewportSizeY = fViewportSizeY;
 
-    m_pRenderWare = CCore::GetSingleton ().GetGame ()->GetRenderWare ();
+    m_pRenderWare = CCore::GetSingleton().GetGame()->GetRenderWare();
 
     // Get some stats
     m_strVideoCardName = (const char*)g_pDeviceState->AdapterState.Name;
     m_iVideoCardMemoryKBTotal = g_pDeviceState->AdapterState.InstalledMemoryKB;
 
-    m_iVideoCardMemoryKBForMTATotal = ( m_iVideoCardMemoryKBTotal - ( 64 * 1024 ) ) * 4 / 5;
-    m_iVideoCardMemoryKBForMTATotal = std::max ( 0, m_iVideoCardMemoryKBForMTATotal );
+    m_iVideoCardMemoryKBForMTATotal = (m_iVideoCardMemoryKBTotal - (64 * 1024)) * 4 / 5;
+    m_iVideoCardMemoryKBForMTATotal = std::max(0, m_iVideoCardMemoryKBForMTATotal);
 
     D3DCAPS9 caps;
-    pDevice->GetDeviceCaps ( &caps );
+    pDevice->GetDeviceCaps(&caps);
     int iMinor = caps.PixelShaderVersion & 0xFF;
-    int iMajor = ( caps.PixelShaderVersion & 0xFF00 ) >> 8;
-    m_strVideoCardPSVersion = SString ( "%d", iMajor );
-    if ( iMinor )
-        m_strVideoCardPSVersion += SString ( ".%d", iMinor );
+    int iMajor = (caps.PixelShaderVersion & 0xFF00) >> 8;
+    m_strVideoCardPSVersion = SString("%d", iMajor);
+    if (iMinor)
+        m_strVideoCardPSVersion += SString(".%d", iMinor);
 
-    UpdateMemoryUsage ();
+    UpdateMemoryUsage();
 
     // Check if using SwiftShader dll
     SLibVersionInfo libVersionInfo;
-    if ( GetLibVersionInfo( "d3d9.dll", &libVersionInfo ) )
+    if (GetLibVersionInfo("d3d9.dll", &libVersionInfo))
     {
-        if ( libVersionInfo.strProductName.ContainsI( "Swift" ) )
+        if (libVersionInfo.strProductName.ContainsI("Swift"))
             m_bIsSwiftShader = true;
     }
 }
@@ -94,19 +91,18 @@ void CRenderItemManager::OnDeviceCreate ( IDirect3DDevice9* pDevice, float fView
 // Release device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::OnLostDevice ( void )
+void CRenderItemManager::OnLostDevice(void)
 {
-    for ( std::set < CRenderItem* >::iterator iter = m_CreatedItemList.begin () ; iter != m_CreatedItemList.end () ; iter++ )
-        (*iter)->OnLostDevice ();
+    for (std::set<CRenderItem*>::iterator iter = m_CreatedItemList.begin(); iter != m_CreatedItemList.end(); iter++)
+        (*iter)->OnLostDevice();
 
-    SAFE_RELEASE( m_pSavedSceneDepthSurface );
-    SAFE_RELEASE( m_pSavedSceneRenderTargetAA );
-    SAFE_RELEASE( g_pDeviceState->MainSceneState.DepthBuffer );
-    SAFE_RELEASE( m_pNonAARenderTargetTexture );
-    SAFE_RELEASE( m_pNonAARenderTarget );
-    SAFE_RELEASE( m_pNonAADepthSurface2 );
+    SAFE_RELEASE(m_pSavedSceneDepthSurface);
+    SAFE_RELEASE(m_pSavedSceneRenderTargetAA);
+    SAFE_RELEASE(g_pDeviceState->MainSceneState.DepthBuffer);
+    SAFE_RELEASE(m_pNonAARenderTargetTexture);
+    SAFE_RELEASE(m_pNonAARenderTarget);
+    SAFE_RELEASE(m_pNonAADepthSurface2);
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -115,14 +111,13 @@ void CRenderItemManager::OnLostDevice ( void )
 // Recreate device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::OnResetDevice ( void )
+void CRenderItemManager::OnResetDevice(void)
 {
-    for ( std::set < CRenderItem* >::iterator iter = m_CreatedItemList.begin () ; iter != m_CreatedItemList.end () ; iter++ )
-        (*iter)->OnResetDevice ();
+    for (std::set<CRenderItem*>::iterator iter = m_CreatedItemList.begin(); iter != m_CreatedItemList.end(); iter++)
+        (*iter)->OnResetDevice();
 
-    UpdateMemoryUsage ();
+    UpdateMemoryUsage();
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -131,22 +126,22 @@ void CRenderItemManager::OnResetDevice ( void )
 // TODO: Make underlying data for textures shared
 //
 ////////////////////////////////////////////////////////////////
-CTextureItem* CRenderItemManager::CreateTexture ( const SString& strFullFilePath, const CPixels* pPixels, bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format, ETextureAddress textureAddress, ETextureType textureType, uint uiVolumeDepth )
+CTextureItem* CRenderItemManager::CreateTexture(const SString& strFullFilePath, const CPixels* pPixels, bool bMipMaps, uint uiSizeX, uint uiSizeY,
+                                                ERenderFormat format, ETextureAddress textureAddress, ETextureType textureType, uint uiVolumeDepth)
 {
-    CFileTextureItem* pTextureItem = new CFileTextureItem ();
-    pTextureItem->PostConstruct ( this, strFullFilePath, pPixels, bMipMaps, uiSizeX, uiSizeY, format, textureAddress, textureType, uiVolumeDepth );
+    CFileTextureItem* pTextureItem = new CFileTextureItem();
+    pTextureItem->PostConstruct(this, strFullFilePath, pPixels, bMipMaps, uiSizeX, uiSizeY, format, textureAddress, textureType, uiVolumeDepth);
 
-    if ( !pTextureItem->IsValid () )
+    if (!pTextureItem->IsValid())
     {
-        SAFE_RELEASE ( pTextureItem );
+        SAFE_RELEASE(pTextureItem);
         return NULL;
     }
 
-    UpdateMemoryUsage ();
+    UpdateMemoryUsage();
 
     return pTextureItem;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -155,28 +150,27 @@ CTextureItem* CRenderItemManager::CreateTexture ( const SString& strFullFilePath
 //
 //
 ////////////////////////////////////////////////////////////////
-CRenderTargetItem* CRenderItemManager::CreateRenderTarget ( uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce )
+CRenderTargetItem* CRenderItemManager::CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce)
 {
-    if ( !bForce && !CanCreateRenderItem ( CRenderTargetItem::GetClassId () ) )
+    if (!bForce && !CanCreateRenderItem(CRenderTargetItem::GetClassId()))
         return NULL;
 
     // Include in memory stats only if render target is not for MTA internal use
     bool bIncludeInMemoryStats = (bForce == false);
 
-    CRenderTargetItem* pRenderTargetItem = new CRenderTargetItem ();
-    pRenderTargetItem->PostConstruct ( this, uiSizeX, uiSizeY, bWithAlphaChannel, bIncludeInMemoryStats );
+    CRenderTargetItem* pRenderTargetItem = new CRenderTargetItem();
+    pRenderTargetItem->PostConstruct(this, uiSizeX, uiSizeY, bWithAlphaChannel, bIncludeInMemoryStats);
 
-    if ( !pRenderTargetItem->IsValid () )
+    if (!pRenderTargetItem->IsValid())
     {
-        SAFE_RELEASE ( pRenderTargetItem );
+        SAFE_RELEASE(pRenderTargetItem);
         return NULL;
     }
 
-    UpdateMemoryUsage ();
+    UpdateMemoryUsage();
 
     return pRenderTargetItem;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -185,25 +179,24 @@ CRenderTargetItem* CRenderItemManager::CreateRenderTarget ( uint uiSizeX, uint u
 //
 //
 ////////////////////////////////////////////////////////////////
-CScreenSourceItem* CRenderItemManager::CreateScreenSource ( uint uiSizeX, uint uiSizeY )
+CScreenSourceItem* CRenderItemManager::CreateScreenSource(uint uiSizeX, uint uiSizeY)
 {
-    if ( !CanCreateRenderItem ( CScreenSourceItem::GetClassId () ) )
+    if (!CanCreateRenderItem(CScreenSourceItem::GetClassId()))
         return NULL;
 
-    CScreenSourceItem* pScreenSourceItem = new CScreenSourceItem ();
-    pScreenSourceItem->PostConstruct ( this, uiSizeX, uiSizeY );
+    CScreenSourceItem* pScreenSourceItem = new CScreenSourceItem();
+    pScreenSourceItem->PostConstruct(this, uiSizeX, uiSizeY);
 
-    if ( !pScreenSourceItem->IsValid () )
+    if (!pScreenSourceItem->IsValid())
     {
-        SAFE_RELEASE ( pScreenSourceItem );
+        SAFE_RELEASE(pScreenSourceItem);
         return NULL;
     }
 
-    UpdateMemoryUsage ();
+    UpdateMemoryUsage();
 
     return pScreenSourceItem;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -212,25 +205,24 @@ CScreenSourceItem* CRenderItemManager::CreateScreenSource ( uint uiSizeX, uint u
 //
 //
 ////////////////////////////////////////////////////////////////
-CWebBrowserItem* CRenderItemManager::CreateWebBrowser ( uint uiSizeX, uint uiSizeY )
+CWebBrowserItem* CRenderItemManager::CreateWebBrowser(uint uiSizeX, uint uiSizeY)
 {
-    if ( !CanCreateRenderItem ( CWebBrowserItem::GetClassId () ) )
+    if (!CanCreateRenderItem(CWebBrowserItem::GetClassId()))
         return NULL;
 
     CWebBrowserItem* pWebBrowserItem = new CWebBrowserItem;
-    pWebBrowserItem->PostConstruct ( this, uiSizeX, uiSizeY );
+    pWebBrowserItem->PostConstruct(this, uiSizeX, uiSizeY);
 
-    if ( !pWebBrowserItem->IsValid () )
+    if (!pWebBrowserItem->IsValid())
     {
-        SAFE_RELEASE ( pWebBrowserItem );
+        SAFE_RELEASE(pWebBrowserItem);
         return NULL;
     }
 
-    UpdateMemoryUsage ();
+    UpdateMemoryUsage();
 
     return pWebBrowserItem;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -239,25 +231,25 @@ CWebBrowserItem* CRenderItemManager::CreateWebBrowser ( uint uiSizeX, uint uiSiz
 // Create a D3DX effect from .fx file
 //
 ////////////////////////////////////////////////////////////////
-CShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask )
+CShaderItem* CRenderItemManager::CreateShader(const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority,
+                                              float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask)
 {
-    if ( !CanCreateRenderItem ( CShaderItem::GetClassId () ) )
+    if (!CanCreateRenderItem(CShaderItem::GetClassId()))
         return NULL;
 
     strOutStatus = "";
 
-    CShaderItem* pShaderItem = new CShaderItem ();
-    pShaderItem->PostConstruct ( this, strFullFilePath, strRootPath, strOutStatus, fPriority, fMaxDistance, bLayered, bDebug, iTypeMask );
+    CShaderItem* pShaderItem = new CShaderItem();
+    pShaderItem->PostConstruct(this, strFullFilePath, strRootPath, strOutStatus, fPriority, fMaxDistance, bLayered, bDebug, iTypeMask);
 
-    if ( !pShaderItem->IsValid () )
+    if (!pShaderItem->IsValid())
     {
-        SAFE_RELEASE ( pShaderItem );
+        SAFE_RELEASE(pShaderItem);
         return NULL;
     }
 
     return pShaderItem;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -266,25 +258,24 @@ CShaderItem* CRenderItemManager::CreateShader ( const SString& strFullFilePath, 
 // TODO: Make underlying data for fonts shared
 //
 ////////////////////////////////////////////////////////////////
-CDxFontItem* CRenderItemManager::CreateDxFont ( const SString& strFullFilePath, uint uiSize, bool bBold, DWORD ulQuality )
+CDxFontItem* CRenderItemManager::CreateDxFont(const SString& strFullFilePath, uint uiSize, bool bBold, DWORD ulQuality)
 {
-    if ( !CanCreateRenderItem ( CDxFontItem::GetClassId () ) )
+    if (!CanCreateRenderItem(CDxFontItem::GetClassId()))
         return NULL;
 
-    CDxFontItem* pDxFontItem = new CDxFontItem ();
-    pDxFontItem->PostConstruct ( this, strFullFilePath, uiSize, bBold, ulQuality );
+    CDxFontItem* pDxFontItem = new CDxFontItem();
+    pDxFontItem->PostConstruct(this, strFullFilePath, uiSize, bBold, ulQuality);
 
-    if ( !pDxFontItem->IsValid () )
+    if (!pDxFontItem->IsValid())
     {
-        SAFE_RELEASE ( pDxFontItem );
+        SAFE_RELEASE(pDxFontItem);
         return NULL;
     }
 
-    UpdateMemoryUsage ();
+    UpdateMemoryUsage();
 
     return pDxFontItem;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -293,25 +284,24 @@ CDxFontItem* CRenderItemManager::CreateDxFont ( const SString& strFullFilePath, 
 // TODO: Make underlying data for fonts shared
 //
 ////////////////////////////////////////////////////////////////
-CGuiFontItem* CRenderItemManager::CreateGuiFont ( const SString& strFullFilePath, const SString& strFontName, uint uiSize )
+CGuiFontItem* CRenderItemManager::CreateGuiFont(const SString& strFullFilePath, const SString& strFontName, uint uiSize)
 {
-    if ( !CanCreateRenderItem ( CGuiFontItem::GetClassId () ) )
+    if (!CanCreateRenderItem(CGuiFontItem::GetClassId()))
         return NULL;
 
-    CGuiFontItem* pGuiFontItem = new CGuiFontItem ();
-    pGuiFontItem->PostConstruct ( this, strFullFilePath, strFontName, uiSize );
+    CGuiFontItem* pGuiFontItem = new CGuiFontItem();
+    pGuiFontItem->PostConstruct(this, strFullFilePath, strFontName, uiSize);
 
-    if ( !pGuiFontItem->IsValid () )
+    if (!pGuiFontItem->IsValid())
     {
-        SAFE_RELEASE ( pGuiFontItem );
+        SAFE_RELEASE(pGuiFontItem);
         return NULL;
     }
 
-    UpdateMemoryUsage ();
+    UpdateMemoryUsage();
 
     return pGuiFontItem;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -320,15 +310,14 @@ CGuiFontItem* CRenderItemManager::CreateGuiFont ( const SString& strFullFilePath
 // Add to managers list
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::NotifyContructRenderItem ( CRenderItem* pItem )
+void CRenderItemManager::NotifyContructRenderItem(CRenderItem* pItem)
 {
-    assert ( !MapContains ( m_CreatedItemList, pItem ) );
-    MapInsert ( m_CreatedItemList, pItem );
+    assert(!MapContains(m_CreatedItemList, pItem));
+    MapInsert(m_CreatedItemList, pItem);
 
-    if ( CScreenSourceItem* pScreenSourceItem = DynamicCast < CScreenSourceItem > ( pItem ) )
+    if (CScreenSourceItem* pScreenSourceItem = DynamicCast<CScreenSourceItem>(pItem))
         m_bBackBufferCopyMaybeNeedsResize = true;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -337,20 +326,18 @@ void CRenderItemManager::NotifyContructRenderItem ( CRenderItem* pItem )
 // Remove from managers list
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::NotifyDestructRenderItem ( CRenderItem* pItem )
+void CRenderItemManager::NotifyDestructRenderItem(CRenderItem* pItem)
 {
-    assert ( MapContains ( m_CreatedItemList, pItem ) );
-    MapRemove ( m_CreatedItemList, pItem );
+    assert(MapContains(m_CreatedItemList, pItem));
+    MapRemove(m_CreatedItemList, pItem);
 
-    if ( CScreenSourceItem* pScreenSourceItem = DynamicCast < CScreenSourceItem > ( pItem ) )
+    if (CScreenSourceItem* pScreenSourceItem = DynamicCast<CScreenSourceItem>(pItem))
         m_bBackBufferCopyMaybeNeedsResize = true;
-    else
-    if ( CShaderItem* pShaderItem = DynamicCast < CShaderItem > ( pItem ) )
-        RemoveShaderItemFromWatchLists ( pShaderItem );
+    else if (CShaderItem* pShaderItem = DynamicCast<CShaderItem>(pItem))
+        RemoveShaderItemFromWatchLists(pShaderItem);
 
-    UpdateMemoryUsage ();
+    UpdateMemoryUsage();
 }
-
 
 //
 //
@@ -365,18 +352,17 @@ void CRenderItemManager::NotifyDestructRenderItem ( CRenderItem* pItem )
 // Update stuff
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::DoPulse ( void )
+void CRenderItemManager::DoPulse(void)
 {
-    m_pRenderWare->PulseWorldTextureWatch ();
+    m_pRenderWare->PulseWorldTextureWatch();
 
     m_PrevFrameTextureUsage = m_FrameTextureUsage;
-    m_FrameTextureUsage.clear ();
+    m_FrameTextureUsage.clear();
 
-    m_pEffectCloner->DoPulse ();
+    m_pEffectCloner->DoPulse();
 
-    UpdateBackBufferCopy ();
+    UpdateBackBufferCopy();
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -385,31 +371,30 @@ void CRenderItemManager::DoPulse ( void )
 // Save back buffer pixels in our special place
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::UpdateBackBufferCopy ( void )
+void CRenderItemManager::UpdateBackBufferCopy(void)
 {
-    if ( m_bBackBufferCopyMaybeNeedsResize )
-        UpdateBackBufferCopySize ();
+    if (m_bBackBufferCopyMaybeNeedsResize)
+        UpdateBackBufferCopySize();
 
     // Don't bother doing this unless at least one screen source in active
-    if ( !m_pBackBufferCopy )
+    if (!m_pBackBufferCopy)
         return;
 
     // Try to get the back buffer
-	IDirect3DSurface9* pD3DBackBufferSurface = NULL;
-    m_pDevice->GetRenderTarget( 0, &pD3DBackBufferSurface );
-    if ( !pD3DBackBufferSurface )
+    IDirect3DSurface9* pD3DBackBufferSurface = NULL;
+    m_pDevice->GetRenderTarget(0, &pD3DBackBufferSurface);
+    if (!pD3DBackBufferSurface)
         return;
 
     // Copy back buffer into our private render target
     D3DTEXTUREFILTERTYPE FilterType = D3DTEXF_LINEAR;
-    HRESULT hr = m_pDevice->StretchRect( pD3DBackBufferSurface, NULL, m_pBackBufferCopy->m_pD3DRenderTargetSurface, NULL, FilterType );
+    HRESULT              hr = m_pDevice->StretchRect(pD3DBackBufferSurface, NULL, m_pBackBufferCopy->m_pD3DRenderTargetSurface, NULL, FilterType);
 
     m_uiBackBufferCopyRevision++;
 
     // Clean up
-	SAFE_RELEASE( pD3DBackBufferSurface );
+    SAFE_RELEASE(pD3DBackBufferSurface);
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -419,42 +404,40 @@ void CRenderItemManager::UpdateBackBufferCopy ( void )
 // TODO - Optimize the case where the screen source is the same size as the back buffer copy (i.e. Use back buffer copy resources instead)
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::UpdateScreenSource ( CScreenSourceItem* pScreenSourceItem, bool bResampleNow )
+void CRenderItemManager::UpdateScreenSource(CScreenSourceItem* pScreenSourceItem, bool bResampleNow)
 {
-    if ( bResampleNow )
+    if (bResampleNow)
     {
         // Tell graphics things are about to change
-        CGraphics::GetSingleton().OnChangingRenderTarget ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY );
+        CGraphics::GetSingleton().OnChangingRenderTarget(m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY);
 
         // Try to get the back buffer
-	    IDirect3DSurface9* pD3DBackBufferSurface = NULL;
-        m_pDevice->GetRenderTarget( 0, &pD3DBackBufferSurface );
-        if ( !pD3DBackBufferSurface )
+        IDirect3DSurface9* pD3DBackBufferSurface = NULL;
+        m_pDevice->GetRenderTarget(0, &pD3DBackBufferSurface);
+        if (!pD3DBackBufferSurface)
             return;
 
         // Copy back buffer into our private render target
         D3DTEXTUREFILTERTYPE FilterType = D3DTEXF_LINEAR;
-        HRESULT hr = m_pDevice->StretchRect( pD3DBackBufferSurface, NULL, pScreenSourceItem->m_pD3DRenderTargetSurface, NULL, FilterType );
+        HRESULT              hr = m_pDevice->StretchRect(pD3DBackBufferSurface, NULL, pScreenSourceItem->m_pD3DRenderTargetSurface, NULL, FilterType);
 
         // Clean up
-	    SAFE_RELEASE( pD3DBackBufferSurface );
+        SAFE_RELEASE(pD3DBackBufferSurface);
         return;
     }
 
-
     // Only do update if back buffer copy has changed
-    if ( pScreenSourceItem->m_uiRevision == m_uiBackBufferCopyRevision )
+    if (pScreenSourceItem->m_uiRevision == m_uiBackBufferCopyRevision)
         return;
 
     pScreenSourceItem->m_uiRevision = m_uiBackBufferCopyRevision;
 
-    if ( m_pBackBufferCopy )
+    if (m_pBackBufferCopy)
     {
         D3DTEXTUREFILTERTYPE FilterType = D3DTEXF_LINEAR;
-        m_pDevice->StretchRect( m_pBackBufferCopy->m_pD3DRenderTargetSurface, NULL, pScreenSourceItem->m_pD3DRenderTargetSurface, NULL, FilterType );
+        m_pDevice->StretchRect(m_pBackBufferCopy->m_pD3DRenderTargetSurface, NULL, pScreenSourceItem->m_pD3DRenderTargetSurface, NULL, FilterType);
     }
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -463,34 +446,33 @@ void CRenderItemManager::UpdateScreenSource ( CScreenSourceItem* pScreenSourceIt
 // Create/resize/destroy back buffer copy depending on what is required
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::UpdateBackBufferCopySize ( void )
+void CRenderItemManager::UpdateBackBufferCopySize(void)
 {
     m_bBackBufferCopyMaybeNeedsResize = false;
 
     // Set what the max size requirement is for the back buffer copy
     uint uiSizeX = 0;
     uint uiSizeY = 0;
-    for ( std::set < CRenderItem* >::iterator iter = m_CreatedItemList.begin () ; iter != m_CreatedItemList.end () ; iter++ )
+    for (std::set<CRenderItem*>::iterator iter = m_CreatedItemList.begin(); iter != m_CreatedItemList.end(); iter++)
     {
-        if ( CScreenSourceItem* pScreenSourceItem = DynamicCast < CScreenSourceItem > ( *iter ) )
+        if (CScreenSourceItem* pScreenSourceItem = DynamicCast<CScreenSourceItem>(*iter))
         {
-            uiSizeX = std::max ( uiSizeX, pScreenSourceItem->m_uiSizeX );
-            uiSizeY = std::max ( uiSizeY, pScreenSourceItem->m_uiSizeY );
+            uiSizeX = std::max(uiSizeX, pScreenSourceItem->m_uiSizeX);
+            uiSizeY = std::max(uiSizeY, pScreenSourceItem->m_uiSizeY);
         }
     }
 
     // Update?
-    if ( !m_pBackBufferCopy || m_pBackBufferCopy->m_uiSizeX != uiSizeX || m_pBackBufferCopy->m_uiSizeY != uiSizeY )
+    if (!m_pBackBufferCopy || m_pBackBufferCopy->m_uiSizeX != uiSizeX || m_pBackBufferCopy->m_uiSizeY != uiSizeY)
     {
         // Delete old one if it exists
-        SAFE_RELEASE( m_pBackBufferCopy );
+        SAFE_RELEASE(m_pBackBufferCopy);
 
         // Try to create new one if needed
-        if ( uiSizeX > 0 )
-            m_pBackBufferCopy = CreateRenderTarget ( uiSizeX, uiSizeY, false, true );
+        if (uiSizeX > 0)
+            m_pBackBufferCopy = CreateRenderTarget(uiSizeX, uiSizeY, false, true);
     }
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -499,19 +481,18 @@ void CRenderItemManager::UpdateBackBufferCopySize ( void )
 // Set current render target to a custom one
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderItemManager::SetRenderTarget ( CRenderTargetItem* pItem, bool bClear )
+bool CRenderItemManager::SetRenderTarget(CRenderTargetItem* pItem, bool bClear)
 {
-    if ( !m_pDefaultD3DRenderTarget )
-        SaveDefaultRenderTarget ();
+    if (!m_pDefaultD3DRenderTarget)
+        SaveDefaultRenderTarget();
 
-    ChangeRenderTarget ( pItem->m_uiSizeX, pItem->m_uiSizeY, pItem->m_pD3DRenderTargetSurface, pItem->m_pD3DZStencilSurface );
+    ChangeRenderTarget(pItem->m_uiSizeX, pItem->m_uiSizeY, pItem->m_pD3DRenderTargetSurface, pItem->m_pD3DZStencilSurface);
 
-    if ( bClear )
-        m_pDevice->Clear ( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0,0,0,0), 1, 0 );
+    if (bClear)
+        m_pDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0, 0, 0, 0), 1, 0);
 
     return true;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -520,11 +501,10 @@ bool CRenderItemManager::SetRenderTarget ( CRenderTargetItem* pItem, bool bClear
 // See if in enabled zones for old versions
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderItemManager::IsSetRenderTargetEnabledOldVer ( void )
+bool CRenderItemManager::IsSetRenderTargetEnabledOldVer(void)
 {
     return m_bSetRenderTargetEnabledOldVer;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -533,11 +513,10 @@ bool CRenderItemManager::IsSetRenderTargetEnabledOldVer ( void )
 // Enabled zones for old versions
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::EnableSetRenderTargetOldVer ( bool bEnable )
+void CRenderItemManager::EnableSetRenderTargetOldVer(bool bEnable)
 {
     m_bSetRenderTargetEnabledOldVer = bEnable;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -546,29 +525,28 @@ void CRenderItemManager::EnableSetRenderTargetOldVer ( bool bEnable )
 // Save current render target as the default one
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderItemManager::SaveDefaultRenderTarget ( void )
+bool CRenderItemManager::SaveDefaultRenderTarget(void)
 {
     // Make sure any special depth buffer has been removed
-    SaveReadableDepthBuffer ();
+    SaveReadableDepthBuffer();
 
     // Update our info about what rendertarget is active
     IDirect3DSurface9* pActiveD3DRenderTarget;
     IDirect3DSurface9* pActiveD3DZStencilSurface;
-    m_pDevice->GetRenderTarget ( 0, &pActiveD3DRenderTarget );
-    m_pDevice->GetDepthStencilSurface ( &pActiveD3DZStencilSurface );
+    m_pDevice->GetRenderTarget(0, &pActiveD3DRenderTarget);
+    m_pDevice->GetDepthStencilSurface(&pActiveD3DZStencilSurface);
 
     m_pDefaultD3DRenderTarget = pActiveD3DRenderTarget;
     m_pDefaultD3DZStencilSurface = pActiveD3DZStencilSurface;
 
     // Don't hold any refs because it goes all funny during fullscreen minimize/maximize, even if they are released at onLostDevice
-    SAFE_RELEASE ( pActiveD3DRenderTarget )
-    SAFE_RELEASE ( pActiveD3DZStencilSurface )
+    SAFE_RELEASE(pActiveD3DRenderTarget)
+    SAFE_RELEASE(pActiveD3DZStencilSurface)
 
     // Do this in case dxSetRenderTarget is being called from some unexpected place
     CGraphics::GetSingleton().MaybeEnteringMTARenderZone();
     return true;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -577,12 +555,12 @@ bool CRenderItemManager::SaveDefaultRenderTarget ( void )
 // Set render target back to the default one
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderItemManager::RestoreDefaultRenderTarget ( void )
+bool CRenderItemManager::RestoreDefaultRenderTarget(void)
 {
     // Only need to change if we have info
-    if ( m_pDefaultD3DRenderTarget )
+    if (m_pDefaultD3DRenderTarget)
     {
-        ChangeRenderTarget ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, m_pDefaultD3DRenderTarget, m_pDefaultD3DZStencilSurface );
+        ChangeRenderTarget(m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, m_pDefaultD3DRenderTarget, m_pDefaultD3DZStencilSurface);
         m_pDefaultD3DRenderTarget = NULL;
 
         // Do this in case dxSetRenderTarget is being called from some unexpected place
@@ -592,7 +570,6 @@ bool CRenderItemManager::RestoreDefaultRenderTarget ( void )
     return true;
 }
 
-
 ////////////////////////////////////////////////////////////////
 //
 // CRenderItemManager::IsUsingDefaultRenderTarget
@@ -600,12 +577,11 @@ bool CRenderItemManager::RestoreDefaultRenderTarget ( void )
 // Check if currently drawing to the default render target
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderItemManager::IsUsingDefaultRenderTarget ( void )
+bool CRenderItemManager::IsUsingDefaultRenderTarget(void)
 {
     // If this is NULL, it means we haven't saved it, so aren't using another render target
     return m_pDefaultD3DRenderTarget == NULL;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -614,32 +590,32 @@ bool CRenderItemManager::IsUsingDefaultRenderTarget ( void )
 // Worker function to change the D3D render target
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::ChangeRenderTarget ( uint uiSizeX, uint uiSizeY, IDirect3DSurface9* pD3DRenderTarget, IDirect3DSurface9* pD3DZStencilSurface )
+void CRenderItemManager::ChangeRenderTarget(uint uiSizeX, uint uiSizeY, IDirect3DSurface9* pD3DRenderTarget, IDirect3DSurface9* pD3DZStencilSurface)
 {
     // Make sure any special depth buffer has been removed
-    SaveReadableDepthBuffer ();
+    SaveReadableDepthBuffer();
 
     // Check if we need to change
     IDirect3DSurface9* pCurrentRenderTarget;
     IDirect3DSurface9* pCurrentZStencilSurface;
-    m_pDevice->GetRenderTarget ( 0, &pCurrentRenderTarget );
-    m_pDevice->GetDepthStencilSurface ( &pCurrentZStencilSurface );
+    m_pDevice->GetRenderTarget(0, &pCurrentRenderTarget);
+    m_pDevice->GetDepthStencilSurface(&pCurrentZStencilSurface);
 
-    bool bAlreadySet = ( pD3DRenderTarget == pCurrentRenderTarget && pD3DZStencilSurface == pCurrentZStencilSurface );
+    bool bAlreadySet = (pD3DRenderTarget == pCurrentRenderTarget && pD3DZStencilSurface == pCurrentZStencilSurface);
 
-    SAFE_RELEASE ( pCurrentRenderTarget );
-    SAFE_RELEASE ( pCurrentZStencilSurface );
+    SAFE_RELEASE(pCurrentRenderTarget);
+    SAFE_RELEASE(pCurrentZStencilSurface);
 
     // Already set?
-    if ( bAlreadySet )
+    if (bAlreadySet)
         return;
 
     // Tell graphics things are about to change
-    CGraphics::GetSingleton().OnChangingRenderTarget ( uiSizeX, uiSizeY );
+    CGraphics::GetSingleton().OnChangingRenderTarget(uiSizeX, uiSizeY);
 
     // Do change
-    m_pDevice->SetRenderTarget ( 0, pD3DRenderTarget );
-    m_pDevice->SetDepthStencilSurface ( pD3DZStencilSurface );
+    m_pDevice->SetRenderTarget(0, pD3DRenderTarget);
+    m_pDevice->SetDepthStencilSurface(pD3DZStencilSurface);
 
     D3DVIEWPORT9 viewport;
     viewport.X = 0;
@@ -648,9 +624,8 @@ void CRenderItemManager::ChangeRenderTarget ( uint uiSizeX, uint uiSizeY, IDirec
     viewport.Height = uiSizeY;
     viewport.MinZ = 0.0f;
     viewport.MaxZ = 1.0f;
-    m_pDevice->SetViewport ( &viewport );
+    m_pDevice->SetViewport(&viewport);
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -659,36 +634,34 @@ void CRenderItemManager::ChangeRenderTarget ( uint uiSizeX, uint uiSizeY, IDirec
 //
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderItemManager::CanCreateRenderItem ( ClassId classId )
+bool CRenderItemManager::CanCreateRenderItem(ClassId classId)
 {
     // none:        Don't create font or rendertarget if no memory
     // no_mem:      Don't create font or rendertarget
     // low_mem:     Don't create font or rendertarget randomly
     // no_shader:   Don't validate any shaders
 
-    if ( classId == CRenderTargetItem::GetClassId () || classId == CGuiFontItem::GetClassId () || classId == CDxFontItem::GetClassId () )
+    if (classId == CRenderTargetItem::GetClassId() || classId == CGuiFontItem::GetClassId() || classId == CDxFontItem::GetClassId())
     {
-        if ( m_iMemoryKBFreeForMTA <= 0 )
+        if (m_iMemoryKBFreeForMTA <= 0)
             return false;
 
-        if ( m_TestMode == DX_TEST_MODE_NO_MEM )
+        if (m_TestMode == DX_TEST_MODE_NO_MEM)
             return false;
 
-        if ( m_TestMode == DX_TEST_MODE_LOW_MEM )
+        if (m_TestMode == DX_TEST_MODE_LOW_MEM)
         {
-            if ( ( rand () % 1000 ) > 750 )
+            if ((rand() % 1000) > 750)
                 return false;
         }
     }
-    else
-    if ( classId == CShaderItem::GetClassId ()  )
+    else if (classId == CShaderItem::GetClassId())
     {
-        if ( m_TestMode == DX_TEST_MODE_NO_SHADER )
+        if (m_TestMode == DX_TEST_MODE_NO_SHADER)
             return false;
     }
     return true;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -697,11 +670,10 @@ bool CRenderItemManager::CanCreateRenderItem ( ClassId classId )
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::SetTestMode ( eDxTestMode testMode )
+void CRenderItemManager::SetTestMode(eDxTestMode testMode)
 {
     m_TestMode = testMode;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -710,25 +682,23 @@ void CRenderItemManager::SetTestMode ( eDxTestMode testMode )
 // Should be called when a render item is created/destroyed or changes
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::UpdateMemoryUsage ( void )
+void CRenderItemManager::UpdateMemoryUsage(void)
 {
     m_iTextureMemoryKBUsed = 0;
     m_iRenderTargetMemoryKBUsed = 0;
     m_iFontMemoryKBUsed = 0;
-    for ( std::set < CRenderItem* >::iterator iter = m_CreatedItemList.begin () ; iter != m_CreatedItemList.end () ; iter++ )
+    for (std::set<CRenderItem*>::iterator iter = m_CreatedItemList.begin(); iter != m_CreatedItemList.end(); iter++)
     {
         CRenderItem* pRenderItem = *iter;
-        if ( !pRenderItem->GetIncludeInMemoryStats() )
+        if (!pRenderItem->GetIncludeInMemoryStats())
             continue;
-        int iMemoryKBUsed = pRenderItem->GetVideoMemoryKBUsed ();
+        int iMemoryKBUsed = pRenderItem->GetVideoMemoryKBUsed();
 
-        if ( pRenderItem->IsA ( CFileTextureItem::GetClassId () ) )
+        if (pRenderItem->IsA(CFileTextureItem::GetClassId()))
             m_iTextureMemoryKBUsed += iMemoryKBUsed;
-        else
-        if ( pRenderItem->IsA ( CRenderTargetItem::GetClassId () ) || pRenderItem->IsA ( CScreenSourceItem::GetClassId () ) )
+        else if (pRenderItem->IsA(CRenderTargetItem::GetClassId()) || pRenderItem->IsA(CScreenSourceItem::GetClassId()))
             m_iRenderTargetMemoryKBUsed += iMemoryKBUsed;
-        else
-        if ( pRenderItem->IsA ( CGuiFontItem::GetClassId () ) || pRenderItem->IsA ( CDxFontItem::GetClassId () ) )
+        else if (pRenderItem->IsA(CGuiFontItem::GetClassId()) || pRenderItem->IsA(CDxFontItem::GetClassId()))
             m_iFontMemoryKBUsed += iMemoryKBUsed;
     }
 
@@ -736,9 +706,8 @@ void CRenderItemManager::UpdateMemoryUsage ( void )
     m_iMemoryKBFreeForMTA -= m_iFontMemoryKBUsed / 2;
     m_iMemoryKBFreeForMTA -= m_iTextureMemoryKBUsed / 4;
     m_iMemoryKBFreeForMTA -= m_iRenderTargetMemoryKBUsed;
-    m_iMemoryKBFreeForMTA = std::max ( 0, m_iMemoryKBFreeForMTA );
+    m_iMemoryKBFreeForMTA = std::max(0, m_iMemoryKBFreeForMTA);
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -747,7 +716,7 @@ void CRenderItemManager::UpdateMemoryUsage ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
+void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
 {
     outStatus.testMode = m_TestMode;
 
@@ -769,10 +738,12 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
     outStatus.videoMemoryKB.iUsedByRenderTargets = m_iRenderTargetMemoryKBUsed;
 
     // Option settings
-    CGameSettings* gameSettings = CCore::GetSingleton ().GetGame ()->GetSettings ();
-    outStatus.settings.bWindowed = false;
-    outStatus.settings.iFXQuality = gameSettings->GetFXQuality(); ;
-    outStatus.settings.iDrawDistance = ( gameSettings->GetDrawDistance () - 0.925f ) / 0.8749f * 100;
+    CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+    outStatus.settings.bWindowed = GetVideoModeManager()->IsDisplayModeWindowed();
+    outStatus.settings.iFullScreenStyle = GetVideoModeManager()->GetFullScreenStyle();
+    outStatus.settings.iFXQuality = gameSettings->GetFXQuality();
+    ;
+    outStatus.settings.iDrawDistance = (gameSettings->GetDrawDistance() - 0.925f) / 0.8749f * 100;
     outStatus.settings.iAntiAliasing = gameSettings->GetAntiAliasing() - 1;
     outStatus.settings.bVolumetricShadows = false;
     outStatus.settings.bAllowScreenUpload = true;
@@ -780,21 +751,22 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
     outStatus.settings.bGrassEffect = false;
     outStatus.settings.bHeatHaze = false;
     outStatus.settings.iAnisotropicFiltering = 0;
-    outStatus.settings.aspectRatio = gameSettings->GetAspectRatio ();
+    outStatus.settings.aspectRatio = gameSettings->GetAspectRatio();
     outStatus.settings.bHUDMatchAspectRatio = true;
     outStatus.settings.fFieldOfView = 70;
+    outStatus.settings.bHighDetailVehicles = false;
 
-    CVARS_GET ( "streaming_memory",     outStatus.settings.iStreamingMemory );
-    CVARS_GET ( "display_windowed",     outStatus.settings.bWindowed );
-    CVARS_GET ( "volumetric_shadows",   outStatus.settings.bVolumetricShadows );
-    CVARS_GET ( "allow_screen_upload",  outStatus.settings.bAllowScreenUpload );
-    CVARS_GET ( "grass",                outStatus.settings.bGrassEffect );
-    CVARS_GET ( "heat_haze",            outStatus.settings.bHeatHaze );
-    CVARS_GET ( "anisotropic",          outStatus.settings.iAnisotropicFiltering );
-    CVARS_GET ( "hud_match_aspect_ratio", outStatus.settings.bHUDMatchAspectRatio );
-    CVARS_GET ( "fov",                  outStatus.settings.fFieldOfView );
+    CVARS_GET("streaming_memory", outStatus.settings.iStreamingMemory);
+    CVARS_GET("volumetric_shadows", outStatus.settings.bVolumetricShadows);
+    CVARS_GET("allow_screen_upload", outStatus.settings.bAllowScreenUpload);
+    CVARS_GET("grass", outStatus.settings.bGrassEffect);
+    CVARS_GET("heat_haze", outStatus.settings.bHeatHaze);
+    CVARS_GET("anisotropic", outStatus.settings.iAnisotropicFiltering);
+    CVARS_GET("hud_match_aspect_ratio", outStatus.settings.bHUDMatchAspectRatio);
+    CVARS_GET("fov", outStatus.settings.fFieldOfView);
+    CVARS_GET("high_detail_vehicles", outStatus.settings.bHighDetailVehicles);
 
-    if ( outStatus.settings.iFXQuality == 0 )
+    if (outStatus.settings.iFXQuality == 0)
     {
         // These are always off with low fx quality
         outStatus.settings.bVolumetricShadows = false;
@@ -803,22 +775,21 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
 
     // Display color depth
     D3DFORMAT BackBufferFormat = g_pDeviceState->CreationState.PresentationParameters.BackBufferFormat;
-    if ( BackBufferFormat >= D3DFMT_R5G6B5 && BackBufferFormat < D3DFMT_A8R3G3B2 )
+    if (BackBufferFormat >= D3DFMT_R5G6B5 && BackBufferFormat < D3DFMT_A8R3G3B2)
         outStatus.settings.b32BitColor = 0;
     else
         outStatus.settings.b32BitColor = 1;
 
     // Modify if using test mode
-    if ( m_TestMode == DX_TEST_MODE_NO_MEM )
+    if (m_TestMode == DX_TEST_MODE_NO_MEM)
         outStatus.videoMemoryKB.iFreeForMTA = 0;
 
-    if ( m_TestMode == DX_TEST_MODE_LOW_MEM )
+    if (m_TestMode == DX_TEST_MODE_LOW_MEM)
         outStatus.videoMemoryKB.iFreeForMTA = 1;
 
-    if ( m_TestMode == DX_TEST_MODE_NO_SHADER )
+    if (m_TestMode == DX_TEST_MODE_NO_SHADER)
         outStatus.videoCard.strPSVersion = "0";
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -827,60 +798,59 @@ void CRenderItemManager::GetDxStatus ( SDxStatus& outStatus )
 // Returns bits per pixel for a given D3D format
 //
 ////////////////////////////////////////////////////////////////
-int CRenderItemManager::GetBitsPerPixel ( D3DFORMAT Format )
+int CRenderItemManager::GetBitsPerPixel(D3DFORMAT Format)
 {
-	switch ( Format )
-	{
-	    case D3DFMT_A8R8G8B8:
-	    case D3DFMT_X8R8G8B8:
-	    case D3DFMT_Q8W8V8U8:
-	    case D3DFMT_X8L8V8U8:
-	    case D3DFMT_A2B10G10R10:
-	    case D3DFMT_V16U16:
-	    case D3DFMT_G16R16:
-	    case D3DFMT_D24X4S4:
-	    case D3DFMT_D32:
-	    case D3DFMT_D24X8:
-	    case D3DFMT_D24S8:
-		    return 32;
+    switch (Format)
+    {
+        case D3DFMT_A8R8G8B8:
+        case D3DFMT_X8R8G8B8:
+        case D3DFMT_Q8W8V8U8:
+        case D3DFMT_X8L8V8U8:
+        case D3DFMT_A2B10G10R10:
+        case D3DFMT_V16U16:
+        case D3DFMT_G16R16:
+        case D3DFMT_D24X4S4:
+        case D3DFMT_D32:
+        case D3DFMT_D24X8:
+        case D3DFMT_D24S8:
+            return 32;
 
-	    case D3DFMT_R8G8B8:
-		    return 24;
+        case D3DFMT_R8G8B8:
+            return 24;
 
-	    case D3DFMT_X1R5G5B5:
-	    case D3DFMT_R5G6B5:
-	    case D3DFMT_A1R5G5B5:
-	    case D3DFMT_D16:
-	    case D3DFMT_A8L8:
-	    case D3DFMT_V8U8:
-	    case D3DFMT_L6V5U5:
-	    case D3DFMT_D16_LOCKABLE:
-	    case D3DFMT_D15S1:
-	    case D3DFMT_A8P8:
-	    case D3DFMT_A8R3G3B2:	
-	    case D3DFMT_X4R4G4B4:
-	    case D3DFMT_A4R4G4B4:
-		    return 16;
+        case D3DFMT_X1R5G5B5:
+        case D3DFMT_R5G6B5:
+        case D3DFMT_A1R5G5B5:
+        case D3DFMT_D16:
+        case D3DFMT_A8L8:
+        case D3DFMT_V8U8:
+        case D3DFMT_L6V5U5:
+        case D3DFMT_D16_LOCKABLE:
+        case D3DFMT_D15S1:
+        case D3DFMT_A8P8:
+        case D3DFMT_A8R3G3B2:
+        case D3DFMT_X4R4G4B4:
+        case D3DFMT_A4R4G4B4:
+            return 16;
 
-	    case D3DFMT_R3G3B2:
-	    case D3DFMT_A4L4:
-	    case D3DFMT_P8:	
-	    case D3DFMT_A8:
-	    case D3DFMT_L8:	
-	    case D3DFMT_DXT2:
-	    case D3DFMT_DXT3:
-	    case D3DFMT_DXT4:
-	    case D3DFMT_DXT5:
-		    return 8;
+        case D3DFMT_R3G3B2:
+        case D3DFMT_A4L4:
+        case D3DFMT_P8:
+        case D3DFMT_A8:
+        case D3DFMT_L8:
+        case D3DFMT_DXT2:
+        case D3DFMT_DXT3:
+        case D3DFMT_DXT4:
+        case D3DFMT_DXT5:
+            return 8;
 
-	    case D3DFMT_DXT1:
-		    return 4;
+        case D3DFMT_DXT1:
+            return 4;
 
-	    default:
-		    return 32;  // unknown - guess at 32
-	}
+        default:
+            return 32;            // unknown - guess at 32
+    }
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -889,22 +859,21 @@ int CRenderItemManager::GetBitsPerPixel ( D3DFORMAT Format )
 // Returns block width for a given D3D format
 //
 ////////////////////////////////////////////////////////////////
-int CRenderItemManager::GetPitchDivisor ( D3DFORMAT Format )
+int CRenderItemManager::GetPitchDivisor(D3DFORMAT Format)
 {
-	switch ( Format )
-	{
-	    case D3DFMT_DXT1:
-	    case D3DFMT_DXT2:
-	    case D3DFMT_DXT3:
-	    case D3DFMT_DXT4:
-	    case D3DFMT_DXT5:
-		    return 4;
+    switch (Format)
+    {
+        case D3DFMT_DXT1:
+        case D3DFMT_DXT2:
+        case D3DFMT_DXT3:
+        case D3DFMT_DXT4:
+        case D3DFMT_DXT5:
+            return 4;
 
-	    default:
-		    return 1;
-	}
+        default:
+            return 1;
+    }
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -913,25 +882,24 @@ int CRenderItemManager::GetPitchDivisor ( D3DFORMAT Format )
 // Calculate how much video memory a D3D resource will take
 //
 ////////////////////////////////////////////////////////////////
-int CRenderItemManager::CalcD3DResourceMemoryKBUsage ( IDirect3DResource9* pD3DResource )
+int CRenderItemManager::CalcD3DResourceMemoryKBUsage(IDirect3DResource9* pD3DResource)
 {
-    D3DRESOURCETYPE type = pD3DResource->GetType ();
+    D3DRESOURCETYPE type = pD3DResource->GetType();
 
-    if ( type == D3DRTYPE_SURFACE )
-        return CalcD3DSurfaceMemoryKBUsage ( (IDirect3DSurface9*)pD3DResource );
+    if (type == D3DRTYPE_SURFACE)
+        return CalcD3DSurfaceMemoryKBUsage((IDirect3DSurface9*)pD3DResource);
 
-    if ( type == D3DRTYPE_TEXTURE )
-        return CalcD3DTextureMemoryKBUsage ( (IDirect3DTexture9*)pD3DResource );
+    if (type == D3DRTYPE_TEXTURE)
+        return CalcD3DTextureMemoryKBUsage((IDirect3DTexture9*)pD3DResource);
 
-    if ( type == D3DRTYPE_VOLUMETEXTURE )
-        return CalcD3DVolumeTextureMemoryKBUsage ( (IDirect3DVolumeTexture9*)pD3DResource );
+    if (type == D3DRTYPE_VOLUMETEXTURE)
+        return CalcD3DVolumeTextureMemoryKBUsage((IDirect3DVolumeTexture9*)pD3DResource);
 
-    if ( type == D3DRTYPE_CUBETEXTURE )
-        return CalcD3DCubeTextureMemoryKBUsage ( (IDirect3DCubeTexture9*)pD3DResource );
+    if (type == D3DRTYPE_CUBETEXTURE)
+        return CalcD3DCubeTextureMemoryKBUsage((IDirect3DCubeTexture9*)pD3DResource);
 
     return 0;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -940,17 +908,16 @@ int CRenderItemManager::CalcD3DResourceMemoryKBUsage ( IDirect3DResource9* pD3DR
 //
 //
 ////////////////////////////////////////////////////////////////
-int CRenderItemManager::CalcD3DSurfaceMemoryKBUsage ( IDirect3DSurface9* pD3DSurface )
+int CRenderItemManager::CalcD3DSurfaceMemoryKBUsage(IDirect3DSurface9* pD3DSurface)
 {
     D3DSURFACE_DESC surfaceDesc;
-    pD3DSurface->GetDesc ( &surfaceDesc );
+    pD3DSurface->GetDesc(&surfaceDesc);
 
-    int iBitsPerPixel = GetBitsPerPixel ( surfaceDesc.Format );
+    int iBitsPerPixel = GetBitsPerPixel(surfaceDesc.Format);
     int iMemoryUsed = surfaceDesc.Width * surfaceDesc.Height / 8 * iBitsPerPixel;
 
     return iMemoryUsed / 1024;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -959,24 +926,23 @@ int CRenderItemManager::CalcD3DSurfaceMemoryKBUsage ( IDirect3DSurface9* pD3DSur
 //
 //
 ////////////////////////////////////////////////////////////////
-int CRenderItemManager::CalcD3DTextureMemoryKBUsage ( IDirect3DTexture9* pD3DTexture )
+int CRenderItemManager::CalcD3DTextureMemoryKBUsage(IDirect3DTexture9* pD3DTexture)
 {
     int iMemoryUsed = 0;
 
     // Calc memory usage
-    int iLevelCount = pD3DTexture->GetLevelCount ();
-    for ( int i = 0 ; i < iLevelCount ; i++ )
+    int iLevelCount = pD3DTexture->GetLevelCount();
+    for (int i = 0; i < iLevelCount; i++)
     {
         D3DSURFACE_DESC surfaceDesc;
-        pD3DTexture->GetLevelDesc ( i, &surfaceDesc );
+        pD3DTexture->GetLevelDesc(i, &surfaceDesc);
 
-        int iBitsPerPixel = GetBitsPerPixel ( surfaceDesc.Format );
+        int iBitsPerPixel = GetBitsPerPixel(surfaceDesc.Format);
         iMemoryUsed += surfaceDesc.Width * surfaceDesc.Height / 8 * iBitsPerPixel;
     }
 
     return iMemoryUsed / 1024;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -985,24 +951,23 @@ int CRenderItemManager::CalcD3DTextureMemoryKBUsage ( IDirect3DTexture9* pD3DTex
 //
 //
 ////////////////////////////////////////////////////////////////
-int CRenderItemManager::CalcD3DVolumeTextureMemoryKBUsage ( IDirect3DVolumeTexture9* pD3DVolumeTexture )
+int CRenderItemManager::CalcD3DVolumeTextureMemoryKBUsage(IDirect3DVolumeTexture9* pD3DVolumeTexture)
 {
     int iMemoryUsed = 0;
 
     // Calc memory usage
-    int iLevelCount = pD3DVolumeTexture->GetLevelCount ();
-    for ( int i = 0 ; i < iLevelCount ; i++ )
+    int iLevelCount = pD3DVolumeTexture->GetLevelCount();
+    for (int i = 0; i < iLevelCount; i++)
     {
         D3DVOLUME_DESC volumeDesc;
-        pD3DVolumeTexture->GetLevelDesc ( i, &volumeDesc );
+        pD3DVolumeTexture->GetLevelDesc(i, &volumeDesc);
 
-        int iBitsPerPixel = GetBitsPerPixel ( volumeDesc.Format );
+        int iBitsPerPixel = GetBitsPerPixel(volumeDesc.Format);
         iMemoryUsed += volumeDesc.Width * volumeDesc.Height * volumeDesc.Depth / 8 * iBitsPerPixel;
     }
 
     return iMemoryUsed / 1024;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -1011,24 +976,23 @@ int CRenderItemManager::CalcD3DVolumeTextureMemoryKBUsage ( IDirect3DVolumeTextu
 //
 //
 ////////////////////////////////////////////////////////////////
-int CRenderItemManager::CalcD3DCubeTextureMemoryKBUsage ( IDirect3DCubeTexture9* pD3DCubeTexture )
+int CRenderItemManager::CalcD3DCubeTextureMemoryKBUsage(IDirect3DCubeTexture9* pD3DCubeTexture)
 {
     int iMemoryUsed = 0;
 
     // Calc memory usage
-    int iLevelCount = pD3DCubeTexture->GetLevelCount ();
-    for ( int i = 0 ; i < iLevelCount ; i++ )
+    int iLevelCount = pD3DCubeTexture->GetLevelCount();
+    for (int i = 0; i < iLevelCount; i++)
     {
         D3DSURFACE_DESC surfaceDesc;
-        pD3DCubeTexture->GetLevelDesc ( i, &surfaceDesc );
+        pD3DCubeTexture->GetLevelDesc(i, &surfaceDesc);
 
-        int iBitsPerPixel = GetBitsPerPixel ( surfaceDesc.Format );
+        int iBitsPerPixel = GetBitsPerPixel(surfaceDesc.Format);
         iMemoryUsed += surfaceDesc.Width * surfaceDesc.Height / 8 * iBitsPerPixel;
     }
 
     return iMemoryUsed * 6 / 1024;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -1037,14 +1001,13 @@ int CRenderItemManager::CalcD3DCubeTextureMemoryKBUsage ( IDirect3DCubeTexture9*
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::NotifyShaderItemUsesDepthBuffer ( CShaderItem* pShaderItem, bool bUsesDepthBuffer )
+void CRenderItemManager::NotifyShaderItemUsesDepthBuffer(CShaderItem* pShaderItem, bool bUsesDepthBuffer)
 {
-    if ( bUsesDepthBuffer )
-        MapInsert ( m_ShadersUsingDepthBuffer, pShaderItem );
+    if (bUsesDepthBuffer)
+        MapInsert(m_ShadersUsingDepthBuffer, pShaderItem);
     else
-        MapRemove ( m_ShadersUsingDepthBuffer, pShaderItem );
+        MapRemove(m_ShadersUsingDepthBuffer, pShaderItem);
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -1053,14 +1016,13 @@ void CRenderItemManager::NotifyShaderItemUsesDepthBuffer ( CShaderItem* pShaderI
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::NotifyShaderItemUsesMultipleRenderTargets ( CShaderItem* pShaderItem, bool bUsesMultipleRenderTargets )
+void CRenderItemManager::NotifyShaderItemUsesMultipleRenderTargets(CShaderItem* pShaderItem, bool bUsesMultipleRenderTargets)
 {
-    if ( bUsesMultipleRenderTargets )
-        MapInsert ( m_ShadersUsingMultipleRenderTargets, pShaderItem );
+    if (bUsesMultipleRenderTargets)
+        MapInsert(m_ShadersUsingMultipleRenderTargets, pShaderItem);
     else
-        MapRemove ( m_ShadersUsingMultipleRenderTargets, pShaderItem );
+        MapRemove(m_ShadersUsingMultipleRenderTargets, pShaderItem);
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -1069,7 +1031,7 @@ void CRenderItemManager::NotifyShaderItemUsesMultipleRenderTargets ( CShaderItem
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::PreDrawWorld ( void )
+void CRenderItemManager::PreDrawWorld(void)
 {
     // Save scene matrices
     g_pDeviceState->MainSceneState.TransformState = g_pDeviceState->TransformState;
@@ -1077,89 +1039,92 @@ void CRenderItemManager::PreDrawWorld ( void )
 
     // Determine what is needed
     bool bRequireDepthBuffer = false;
-    if ( !m_ShadersUsingDepthBuffer.empty () && m_depthBufferFormat != RFORMAT_UNKNOWN )
+    if (!m_ShadersUsingDepthBuffer.empty() && m_depthBufferFormat != RFORMAT_UNKNOWN)
         bRequireDepthBuffer = true;
 
     bool bRequireNonAADisplay = false;
-    if ( g_pDeviceState->CreationState.PresentationParameters.MultiSampleType != D3DMULTISAMPLE_NONE )
+    if (g_pDeviceState->CreationState.PresentationParameters.MultiSampleType != D3DMULTISAMPLE_NONE)
         bRequireNonAADisplay = bRequireDepthBuffer || !m_ShadersUsingMultipleRenderTargets.empty();
 
     // Readable depth buffer is not compatible with volumetric shadows
-    CCore::GetSingleton ().GetGame ()->GetSettings ()->SetVolumetricShadowsSuspended( bRequireDepthBuffer );
+    CCore::GetSingleton().GetGame()->GetSettings()->SetVolumetricShadowsSuspended(bRequireDepthBuffer);
 
     // Destroy old stuff that we don't need anymore
-    if ( !bRequireDepthBuffer )
+    if (!bRequireDepthBuffer)
     {
-        SAFE_RELEASE( pReadableDepthBuffer );
+        SAFE_RELEASE(pReadableDepthBuffer);
     }
-    if ( !bRequireNonAADisplay )
+    if (!bRequireNonAADisplay)
     {
-        SAFE_RELEASE( m_pNonAARenderTargetTexture );
-        SAFE_RELEASE( m_pNonAARenderTarget );
-        SAFE_RELEASE( m_pNonAADepthSurface2 );
+        SAFE_RELEASE(m_pNonAARenderTargetTexture);
+        SAFE_RELEASE(m_pNonAARenderTarget);
+        SAFE_RELEASE(m_pNonAADepthSurface2);
     }
 
     // Create new stuff that we need now
-    if ( bRequireDepthBuffer && !pReadableDepthBuffer )
+    if (bRequireDepthBuffer && !pReadableDepthBuffer)
     {
         // Create readable depth buffer
-        m_pDevice->CreateTexture ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, 1, D3DUSAGE_DEPTHSTENCIL, (D3DFORMAT)m_depthBufferFormat, D3DPOOL_DEFAULT, &pReadableDepthBuffer, NULL );
+        m_pDevice->CreateTexture(m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, 1, D3DUSAGE_DEPTHSTENCIL, (D3DFORMAT)m_depthBufferFormat, D3DPOOL_DEFAULT,
+                                 &pReadableDepthBuffer, NULL);
     }
-    if ( bRequireNonAADisplay && !m_pNonAARenderTarget )
+    if (bRequireNonAADisplay && !m_pNonAARenderTarget)
     {
         // Create a non-AA render target and depth buffer
-        assert( !m_pNonAARenderTargetTexture );
-        assert( !m_pNonAADepthSurface2 );
+        assert(!m_pNonAARenderTargetTexture);
+        assert(!m_pNonAADepthSurface2);
 
         const D3DPRESENT_PARAMETERS& pp = g_pDeviceState->CreationState.PresentationParameters;
-        if ( !m_bIsSwiftShader )
-            m_pDevice->CreateRenderTarget( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, pp.BackBufferFormat, D3DMULTISAMPLE_NONE, 0, false, &m_pNonAARenderTarget, NULL );
+        if (!m_bIsSwiftShader)
+            m_pDevice->CreateRenderTarget(m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, pp.BackBufferFormat, D3DMULTISAMPLE_NONE, 0, false,
+                                          &m_pNonAARenderTarget, NULL);
         else
         {
             // Render target texture is needed when emulating StretchRect
-            m_pDevice->CreateTexture ( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, 1, D3DUSAGE_RENDERTARGET, pp.BackBufferFormat, D3DPOOL_DEFAULT, &m_pNonAARenderTargetTexture, NULL );
-            if ( m_pNonAARenderTargetTexture )
-                m_pNonAARenderTargetTexture->GetSurfaceLevel ( 0, &m_pNonAARenderTarget );
+            m_pDevice->CreateTexture(m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, 1, D3DUSAGE_RENDERTARGET, pp.BackBufferFormat, D3DPOOL_DEFAULT,
+                                     &m_pNonAARenderTargetTexture, NULL);
+            if (m_pNonAARenderTargetTexture)
+                m_pNonAARenderTargetTexture->GetSurfaceLevel(0, &m_pNonAARenderTarget);
         }
 
-        m_pDevice->CreateDepthStencilSurface( m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, pp.AutoDepthStencilFormat, D3DMULTISAMPLE_NONE, 0, true, &m_pNonAADepthSurface2, NULL );
+        m_pDevice->CreateDepthStencilSurface(m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY, pp.AutoDepthStencilFormat, D3DMULTISAMPLE_NONE, 0, true,
+                                             &m_pNonAADepthSurface2, NULL);
     }
 
     // Set depth buffer and maybe render target
-    if ( ( pReadableDepthBuffer || m_pNonAADepthSurface2 ) && m_pSavedSceneDepthSurface == NULL )
+    if ((pReadableDepthBuffer || m_pNonAADepthSurface2) && m_pSavedSceneDepthSurface == NULL)
     {
-        if ( m_pDevice->GetDepthStencilSurface ( &m_pSavedSceneDepthSurface ) == D3D_OK )
+        if (m_pDevice->GetDepthStencilSurface(&m_pSavedSceneDepthSurface) == D3D_OK)
         {
-            if ( pReadableDepthBuffer )
+            if (pReadableDepthBuffer)
             {
                 // Set readable depth buffer
                 IDirect3DSurface9* pSurf = NULL;
-                if ( pReadableDepthBuffer->GetSurfaceLevel ( 0, &pSurf ) == D3D_OK )
+                if (pReadableDepthBuffer->GetSurfaceLevel(0, &pSurf) == D3D_OK)
                 {
-                    m_pDevice->SetDepthStencilSurface ( pSurf );
+                    m_pDevice->SetDepthStencilSurface(pSurf);
                     m_bUsingReadableDepthBuffer = true;
-                    pSurf->Release ();
+                    pSurf->Release();
                 }
             }
             else
             {
                 // Set non-AA depth buffer
-                m_pDevice->SetDepthStencilSurface ( m_pNonAADepthSurface2 );
+                m_pDevice->SetDepthStencilSurface(m_pNonAADepthSurface2);
             }
 
             // Also switch to non-AA render target if created
-            if ( m_pNonAARenderTarget )
+            if (m_pNonAARenderTarget)
             {
-                if ( m_pDevice->GetRenderTarget( 0, &m_pSavedSceneRenderTargetAA ) == D3D_OK )
+                if (m_pDevice->GetRenderTarget(0, &m_pSavedSceneRenderTargetAA) == D3D_OK)
                 {
-                    m_pDevice->SetRenderTarget( 0, m_pNonAARenderTarget );
+                    m_pDevice->SetRenderTarget(0, m_pNonAARenderTarget);
                 }
             }
-            m_pDevice->Clear ( 0, NULL, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, D3DCOLOR_ARGB(0,0,0,0), 1, 0 );
+            m_pDevice->Clear(0, NULL, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, D3DCOLOR_ARGB(0, 0, 0, 0), 1, 0);
         }
     }
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -1168,25 +1133,25 @@ void CRenderItemManager::PreDrawWorld ( void )
 // Ensure our readable depth buffer is no longer being used
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::SaveReadableDepthBuffer( void )
+void CRenderItemManager::SaveReadableDepthBuffer(void)
 {
-    if ( m_bUsingReadableDepthBuffer )
+    if (m_bUsingReadableDepthBuffer)
     {
         m_bUsingReadableDepthBuffer = false;
 
-        if ( m_pNonAADepthSurface2 )
+        if (m_pNonAADepthSurface2)
         {
             // If using AA hacks, change to the other depth buffer we created
-            m_pDevice->SetDepthStencilSurface ( m_pNonAADepthSurface2 );
-            m_pDevice->Clear ( 0, NULL, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, D3DCOLOR_ARGB(0,0,0,0), 1, 0 );
+            m_pDevice->SetDepthStencilSurface(m_pNonAADepthSurface2);
+            m_pDevice->Clear(0, NULL, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, D3DCOLOR_ARGB(0, 0, 0, 0), 1, 0);
         }
         else
         {
             // If not using AA hacks, just change back to the GTA depth buffer
-            if ( m_pSavedSceneDepthSurface )
+            if (m_pSavedSceneDepthSurface)
             {
-                m_pDevice->SetDepthStencilSurface ( m_pSavedSceneDepthSurface );
-                SAFE_RELEASE( m_pSavedSceneDepthSurface );
+                m_pDevice->SetDepthStencilSurface(m_pSavedSceneDepthSurface);
+                SAFE_RELEASE(m_pSavedSceneDepthSurface);
             }
         }
     }
@@ -1199,30 +1164,30 @@ void CRenderItemManager::SaveReadableDepthBuffer( void )
 // If using AA hacks, change everything back
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::FlushNonAARenderTarget( void )
+void CRenderItemManager::FlushNonAARenderTarget(void)
 {
-    if ( m_pSavedSceneDepthSurface )
+    if (m_pSavedSceneDepthSurface)
     {
-        m_pDevice->SetDepthStencilSurface ( m_pSavedSceneDepthSurface );
-        SAFE_RELEASE( m_pSavedSceneDepthSurface );
+        m_pDevice->SetDepthStencilSurface(m_pSavedSceneDepthSurface);
+        SAFE_RELEASE(m_pSavedSceneDepthSurface);
     }
 
-    if ( m_pSavedSceneRenderTargetAA )
+    if (m_pSavedSceneRenderTargetAA)
     {
         // Restore GTA AA render target, and copy our non-AA data to it
-        m_pDevice->SetRenderTarget( 0, m_pSavedSceneRenderTargetAA );
+        m_pDevice->SetRenderTarget(0, m_pSavedSceneRenderTargetAA);
 
-        if ( m_pNonAARenderTarget )
+        if (m_pNonAARenderTarget)
         {
-            if ( !m_bIsSwiftShader )
-                m_pDevice->StretchRect( m_pNonAARenderTarget, NULL, m_pSavedSceneRenderTargetAA, NULL, D3DTEXF_POINT );
+            if (!m_bIsSwiftShader)
+                m_pDevice->StretchRect(m_pNonAARenderTarget, NULL, m_pSavedSceneRenderTargetAA, NULL, D3DTEXF_POINT);
             else
             {
                 // Emulate StretchRect using DrawPrimitive
 
                 // Save render states
                 IDirect3DStateBlock9* pSavedStateBlock = NULL;
-                m_pDevice->CreateStateBlock( D3DSBT_ALL, &pSavedStateBlock );
+                m_pDevice->CreateStateBlock(D3DSBT_ALL, &pSavedStateBlock);
 
                 // Prepare vertex buffer
                 float fX1 = -0.5f;
@@ -1234,53 +1199,48 @@ void CRenderItemManager::FlushNonAARenderTarget( void )
                 float fU2 = 1;
                 float fV2 = 1;
 
-                const SRTVertex vertices[] = {  { fX1, fY1, 0, 1, fU1, fV1 }, 
-                                                { fX2, fY1, 0, 1, fU2, fV1 }, 
-                                                { fX1, fY2, 0, 1, fU1, fV2 }, 
+                const SRTVertex vertices[] = {{fX1, fY1, 0, 1, fU1, fV1}, {fX2, fY1, 0, 1, fU2, fV1}, {fX1, fY2, 0, 1, fU1, fV2},
 
-                                                { fX2, fY1, 0, 1, fU2, fV1 }, 
-                                                { fX2, fY2, 0, 1, fU2, fV2 }, 
-                                                { fX1, fY2, 0, 1, fU1, fV2 } };
+                                              {fX2, fY1, 0, 1, fU2, fV1}, {fX2, fY2, 0, 1, fU2, fV2}, {fX1, fY2, 0, 1, fU1, fV2}};
 
                 // Set vertex stream
-                uint PrimitiveCount                 = NUMELMS( vertices ) / 3;
-                const void* pVertexStreamZeroData   = &vertices[0];
-                uint VertexStreamZeroStride         = sizeof(SRTVertex);
-                m_pDevice->SetFVF( SRTVertex::FVF );
+                uint        PrimitiveCount = NUMELMS(vertices) / 3;
+                const void* pVertexStreamZeroData = &vertices[0];
+                uint        VertexStreamZeroStride = sizeof(SRTVertex);
+                m_pDevice->SetFVF(SRTVertex::FVF);
 
                 // Set render states
-                m_pDevice->SetRenderState( D3DRS_ZENABLE,          D3DZB_FALSE );
-                m_pDevice->SetRenderState( D3DRS_CULLMODE,         D3DCULL_NONE );
-                m_pDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, FALSE );
-                m_pDevice->SetRenderState( D3DRS_ALPHATESTENABLE,  FALSE );
-                m_pDevice->SetRenderState( D3DRS_LIGHTING,         FALSE);
-                m_pDevice->SetRenderState( D3DRS_ZWRITEENABLE,     FALSE );
-                m_pDevice->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_SELECTARG1 );
-                m_pDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
-                m_pDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_SELECTARG1 );
-                m_pDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
-                m_pDevice->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_DISABLE );
-                m_pDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP,   D3DTOP_DISABLE );
-                m_pDevice->SetSamplerState( 0, D3DSAMP_MAGFILTER, D3DTEXF_POINT );
-                m_pDevice->SetSamplerState( 0, D3DSAMP_MINFILTER, D3DTEXF_POINT );
-                m_pDevice->SetSamplerState( 0, D3DSAMP_MIPFILTER, D3DTEXF_POINT );
+                m_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
+                m_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+                m_pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+                m_pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+                m_pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+                m_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+                m_pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+                m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+                m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+                m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+                m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+                m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+                m_pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+                m_pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+                m_pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
 
                 // Draw using texture
-                m_pDevice->SetTexture( 0, m_pNonAARenderTargetTexture );
-                m_pDevice->DrawPrimitiveUP( D3DPT_TRIANGLELIST, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride );
+                m_pDevice->SetTexture(0, m_pNonAARenderTargetTexture);
+                m_pDevice->DrawPrimitiveUP(D3DPT_TRIANGLELIST, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride);
 
                 // Restore render states
-                if ( pSavedStateBlock )
+                if (pSavedStateBlock)
                 {
                     pSavedStateBlock->Apply();
-                    SAFE_RELEASE( pSavedStateBlock );
+                    SAFE_RELEASE(pSavedStateBlock);
                 }
             }
         }
-        SAFE_RELEASE( m_pSavedSceneRenderTargetAA );
+        SAFE_RELEASE(m_pSavedSceneRenderTargetAA);
     }
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -1289,19 +1249,20 @@ void CRenderItemManager::FlushNonAARenderTarget( void )
 // Maybe replace source surface with our non-AA rt, depending on things
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::HandleStretchRect( IDirect3DSurface9* pSourceSurface,CONST RECT* pSourceRect,IDirect3DSurface9* pDestSurface,CONST RECT* pDestRect,int Filter )
+void CRenderItemManager::HandleStretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface, CONST RECT* pDestRect,
+                                           int Filter)
 {
-    if ( pSourceSurface == m_pSavedSceneRenderTargetAA )
+    if (pSourceSurface == m_pSavedSceneRenderTargetAA)
     {
         // If trying to copy from the saved render target, use the active render target instead
-        if ( m_pDevice->GetRenderTarget( 0, &pSourceSurface ) == D3D_OK )
+        if (m_pDevice->GetRenderTarget(0, &pSourceSurface) == D3D_OK)
         {
-            m_pDevice->StretchRect( pSourceSurface, pSourceRect, pDestSurface, pDestRect, (D3DTEXTUREFILTERTYPE)Filter );
-            SAFE_RELEASE( pSourceSurface );
+            m_pDevice->StretchRect(pSourceSurface, pSourceRect, pDestSurface, pDestRect, (D3DTEXTUREFILTERTYPE)Filter);
+            SAFE_RELEASE(pSourceSurface);
         }
     }
     else
     {
-        m_pDevice->StretchRect( pSourceSurface, pSourceRect, pDestSurface, pDestRect, (D3DTEXTUREFILTERTYPE)Filter );  
+        m_pDevice->StretchRect(pSourceSurface, pSourceRect, pDestSurface, pDestRect, (D3DTEXTUREFILTERTYPE)Filter);
     }
 }

@@ -31,8 +31,9 @@ project "Deathmatch"
 			"../../../Shared/gta"
 		}
 	
+	defines { "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Server", "pthread", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib"
+		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib", "blowfish_bcrypt",
 	}
 	
 	vpaths {
@@ -49,8 +50,6 @@ project "Deathmatch"
 		"../../../Shared/mods/deathmatch/logic/**.h",
 		"../../../Shared/animation/CEasingCurve.cpp", 
 		"../../../Shared/animation/CPositionRotationAnimation.cpp",
-		"../../sdk/MTAPlatform.cpp",
-		"../../sdk/MTAPlatform.h",
 		"../../version.h",
 		-- Todo: Replace these two by using the CryptoPP functions instead
 		"../../../vendor/bochs/bochs_internal/crc32.cpp",
@@ -59,14 +58,13 @@ project "Deathmatch"
 	filter "system:windows"
 		includedirs { "../../../vendor/pthreads/include" }
 		buildoptions { "-Zm130" }
-		links { "ws2_32" }
-
-	filter {"system:windows", "toolset:*120*"}
-		links { "Psapi.lib" }
+		links { "ws2_32", "pthread" }
 		
 	filter "system:not windows"
 		buildoptions { "-Wno-narrowing" } -- We should fix the warnings at some point
 		links { "rt" }
+		buildoptions { "-pthread" }
+		linkoptions { "-pthread" }
 	
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))

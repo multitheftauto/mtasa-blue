@@ -1,36 +1,35 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CVehicle.cpp
-*  PURPOSE:     Vehicle entity class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*               Florian Busse <flobu@gmx.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CVehicle.cpp
+ *  PURPOSE:     Vehicle entity class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-extern CGame * g_pGame;
+extern CGame* g_pGame;
 
-CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2 ) : CElement ( pParent, pNode )
+CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel, unsigned char ucVariant,
+                   unsigned char ucVariant2)
+    : CElement(pParent, pNode)
 {
-    CElementRefManager::AddElementRefs ( ELEMENT_REF_DEBUG ( this, "CVehicle" ), &m_pTowedVehicle, &m_pTowedByVehicle, &m_pSyncer, &m_pJackingPlayer, NULL );
+    CElementRefManager::AddElementRefs(ELEMENT_REF_DEBUG(this, "CVehicle"), &m_pTowedVehicle, &m_pTowedByVehicle, &m_pSyncer, &m_pJackingPlayer, NULL);
 
     // Init
     m_pVehicleManager = pVehicleManager;
     m_usModel = usModel;
-    m_pUpgrades = new CVehicleUpgrades ( this );
+    m_pUpgrades = new CVehicleUpgrades(this);
 
     m_iType = CElement::VEHICLE;
-    SetTypeName ( "vehicle" );
-    m_eVehicleType = CVehicleManager::GetVehicleType ( m_usModel );
+    SetTypeName("vehicle");
+    m_eVehicleType = CVehicleManager::GetVehicleType(m_usModel);
     m_fHealth = DEFAULT_VEHICLE_HEALTH;
     m_fLastSyncedHealthHealth = DEFAULT_VEHICLE_HEALTH;
-    m_llIdleTime = CTickCount::Now ();
+    m_llIdleTime = CTickCount::Now();
     m_fTurretPositionX = 0;
     m_fTurretPositionY = 0;
     m_bSirenActive = false;
@@ -39,10 +38,10 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_bIsFrozen = false;
     m_bUnoccupiedSyncable = true;
     m_pSyncer = NULL;
-    GetInitialDoorStates ( m_ucDoorStates );
-    memset ( &m_ucWheelStates[0], 0, sizeof ( m_ucWheelStates ) );
-    memset ( &m_ucPanelStates[0], 0, sizeof ( m_ucPanelStates ) );
-    memset ( &m_ucLightStates[0], 0, sizeof ( m_ucLightStates ) );
+    GetInitialDoorStates(m_ucDoorStates);
+    memset(&m_ucWheelStates[0], 0, sizeof(m_ucWheelStates));
+    memset(&m_ucPanelStates[0], 0, sizeof(m_ucPanelStates));
+    memset(&m_ucLightStates[0], 0, sizeof(m_ucLightStates));
     m_ucOverrideLights = 0;
     m_pTowedVehicle = NULL;
     m_pTowedByVehicle = NULL;
@@ -56,8 +55,8 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_ulIdleRespawnInterval = 60000;
 
     m_bEngineOn = false;
-    for ( unsigned int i = 0; i < 6; ++i )
-        m_fDoorOpenRatio [ i ] = 0.0f;
+    for (unsigned int i = 0; i < 6; ++i)
+        m_fDoorOpenRatio[i] = 0.0f;
     m_bLocked = false;
     m_bDoorsUndamageable = false;
     m_bDamageProof = false;
@@ -74,7 +73,7 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_fTrainPosition = 0.0f;
     m_bTaxiLightState = false;
     m_bTrainDirection = false;
-    m_HeadLightColor = SColorRGBA ( 255, 255, 255, 255 );
+    m_HeadLightColor = SColorRGBA(255, 255, 255, 255);
     m_bHeliSearchLightVisible = false;
     m_bCollisionsEnabled = true;
     m_bHandlingChanged = false;
@@ -82,222 +81,219 @@ CVehicle::CVehicle ( CVehicleManager* pVehicleManager, CElement* pParent, CXMLNo
     m_ucVariant2 = ucVariant2;
 
     // Initialize the occupied Players
-    for ( int i = 0; i < MAX_VEHICLE_SEATS; i++ )
+    for (int i = 0; i < MAX_VEHICLE_SEATS; i++)
     {
-        m_pOccupants [i] = NULL;
+        m_pOccupants[i] = NULL;
     }
 
     // Add us to the vehicle manager
-    pVehicleManager->AddToList ( this );
+    pVehicleManager->AddToList(this);
 
     // Randomize our color
-    RandomizeColor ();
+    RandomizeColor();
 
     // Generate a random reg plate
-    GenerateRegPlate ();
+    GenerateRegPlate();
 
     // Generate the handling data
-    GenerateHandlingData ();
+    GenerateHandlingData();
 
     // Prepare the sirens
     RemoveVehicleSirens();
     m_tSirenBeaconInfo.m_bOverrideSirens = false;
 }
 
-
-CVehicle::~CVehicle ( void )
+CVehicle::~CVehicle(void)
 {
-    if ( m_pJackingPlayer && m_pJackingPlayer->GetJackingVehicle () == this )
+    if (m_pJackingPlayer && m_pJackingPlayer->GetJackingVehicle() == this)
     {
-        if ( m_pJackingPlayer->GetVehicleAction () == CPlayer::VEHICLEACTION_JACKING )
+        if (m_pJackingPlayer->GetVehicleAction() == CPlayer::VEHICLEACTION_JACKING)
         {
-            m_pJackingPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
+            m_pJackingPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
         }
-        m_pJackingPlayer->SetJackingVehicle ( NULL );
+        m_pJackingPlayer->SetJackingVehicle(NULL);
     }
 
     // loop through players and fix their in out state
-    
-    for ( int i = 0; i < MAX_VEHICLE_SEATS; i++ )
+
+    for (int i = 0; i < MAX_VEHICLE_SEATS; i++)
     {
-        CPed * pPed = m_pOccupants [i];
-        if ( pPed && pPed->IsPlayer ( ) )
+        CPed* pPed = m_pOccupants[i];
+        if (pPed && pPed->IsPlayer())
         {
-            CPlayer * pPlayer = static_cast < CPlayer * > ( pPed );
+            CPlayer* pPlayer = static_cast<CPlayer*>(pPed);
             // Is he already getting out?
-            if ( pPlayer->GetVehicleAction () == CPlayer::VEHICLEACTION_EXITING )
+            if (pPlayer->GetVehicleAction() == CPlayer::VEHICLEACTION_EXITING)
             {
                 // Does it have an occupant and is the occupant the requesting player?
-                unsigned char ucOccupiedSeat = pPlayer->GetOccupiedVehicleSeat ();
-                if ( pPlayer == GetOccupant ( ucOccupiedSeat ) )
+                unsigned char ucOccupiedSeat = pPlayer->GetOccupiedVehicleSeat();
+                if (pPlayer == GetOccupant(ucOccupiedSeat))
                 {
                     // Mark the player/vehicle as empty
-                    SetOccupant ( NULL, ucOccupiedSeat );
-                    pPlayer->SetOccupiedVehicle ( NULL, 0 );
-                    pPlayer->SetVehicleAction ( CPlayer::VEHICLEACTION_NONE );
+                    SetOccupant(NULL, ucOccupiedSeat);
+                    pPlayer->SetOccupiedVehicle(NULL, 0);
+                    pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
 
                     // Tell everyone he has exited the vehicle
-                    CVehicleInOutPacket Reply ( GetID ( ), ucOccupiedSeat, CGame::VEHICLE_NOTIFY_OUT_RETURN );
-                    Reply.SetSourceElement ( pPlayer );
-                    g_pGame->GetPlayerManager ( )->BroadcastOnlyJoined ( Reply );
+                    CVehicleInOutPacket Reply(GetID(), ucOccupiedSeat, CGame::VEHICLE_NOTIFY_OUT_RETURN);
+                    Reply.SetSourceElement(pPlayer);
+                    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(Reply);
                 }
             }
         }
     }
 
     // Unset any tow links
-    if ( m_pTowedVehicle )
-        m_pTowedVehicle->SetTowedByVehicle ( NULL );
+    if (m_pTowedVehicle)
+        m_pTowedVehicle->SetTowedByVehicle(NULL);
 
-    if ( m_pTowedByVehicle )
-        m_pTowedByVehicle->SetTowedVehicle ( NULL );
+    if (m_pTowedByVehicle)
+        m_pTowedByVehicle->SetTowedVehicle(NULL);
 
     // Make sure nobody's syncing us
-    SetSyncer ( NULL );
+    SetSyncer(NULL);
 
     // Unreference from our occupators
-    for ( unsigned int i = 0; i < MAX_VEHICLE_SEATS; i++ )
+    for (unsigned int i = 0; i < MAX_VEHICLE_SEATS; i++)
     {
-        if ( m_pOccupants [i] )
+        if (m_pOccupants[i])
         {
-            m_pOccupants [i]->SetOccupiedVehicle ( NULL, 0 );
-            m_pOccupants [i]->SetVehicleAction ( CPed::VEHICLEACTION_NONE );
+            m_pOccupants[i]->SetOccupiedVehicle(NULL, 0);
+            m_pOccupants[i]->SetVehicleAction(CPed::VEHICLEACTION_NONE);
         }
     }
     delete m_pUpgrades;
     delete m_pHandlingEntry;
 
-    CElementRefManager::RemoveElementRefs ( ELEMENT_REF_DEBUG ( this, "CVehicle" ), &m_pTowedVehicle, &m_pTowedByVehicle, &m_pSyncer, &m_pJackingPlayer, NULL );
+    CElementRefManager::RemoveElementRefs(ELEMENT_REF_DEBUG(this, "CVehicle"), &m_pTowedVehicle, &m_pTowedByVehicle, &m_pSyncer, &m_pJackingPlayer, NULL);
 
     // Notify the vehicle manager that we are not to be respawned anymore if neccessary
-    if ( m_bRespawnEnabled )
-        m_pVehicleManager->GetRespawnEnabledVehicles ( ).remove ( this );
+    if (m_bRespawnEnabled)
+        m_pVehicleManager->GetRespawnEnabledVehicles().remove(this);
 
     // Remove us from the vehicle manager
-    Unlink ();
+    Unlink();
 }
 
-
-void CVehicle::Unlink ( void )
+void CVehicle::Unlink(void)
 {
     // Remove us from the vehicle manager
-    m_pVehicleManager->RemoveFromList ( this );
+    m_pVehicleManager->RemoveFromList(this);
 }
 
-
-bool CVehicle::ReadSpecialData ( void )
+bool CVehicle::ReadSpecialData(void)
 {
     // Grab the "posX" data
-    if ( !GetCustomDataFloat ( "posX", m_vecPosition.fX, true ) )
+    if (!GetCustomDataFloat("posX", m_vecPosition.fX, true))
     {
-        CLogger::ErrorPrintf ( "Bad/missing 'posX' attribute in <vehicle> (line %u)\n", m_uiLine );
+        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <vehicle> (line %u)\n", m_uiLine);
         return false;
     }
 
     // Grab the "posY" data
-    if ( !GetCustomDataFloat ( "posY", m_vecPosition.fY, true ) )
+    if (!GetCustomDataFloat("posY", m_vecPosition.fY, true))
     {
-        CLogger::ErrorPrintf ( "Bad/missing 'posY' attribute in <vehicle> (line %u)\n", m_uiLine );
+        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <vehicle> (line %u)\n", m_uiLine);
         return false;
     }
 
     // Grab the "posZ" data
-    if ( !GetCustomDataFloat ( "posZ", m_vecPosition.fZ, true ) )
+    if (!GetCustomDataFloat("posZ", m_vecPosition.fZ, true))
     {
-        CLogger::ErrorPrintf ( "Bad/missing 'posZ' attribute in <vehicle> (line %u)\n", m_uiLine );
+        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <vehicle> (line %u)\n", m_uiLine);
         return false;
     }
 
     // Grab the "rotX", "rotY" and "rotZ" data
-    GetCustomDataFloat ( "rotX", m_vecRotationDegrees.fX, true );
-    GetCustomDataFloat ( "rotY", m_vecRotationDegrees.fY, true );
-    GetCustomDataFloat ( "rotZ", m_vecRotationDegrees.fZ, true );
+    GetCustomDataFloat("rotX", m_vecRotationDegrees.fX, true);
+    GetCustomDataFloat("rotY", m_vecRotationDegrees.fY, true);
+    GetCustomDataFloat("rotZ", m_vecRotationDegrees.fZ, true);
 
     // Wrap them around 360
-    m_vecRotationDegrees.fX = WrapAround ( m_vecRotationDegrees.fX, 360.0f );
-    m_vecRotationDegrees.fY = WrapAround ( m_vecRotationDegrees.fY, 360.0f );
-    m_vecRotationDegrees.fZ = WrapAround ( m_vecRotationDegrees.fZ, 360.0f );
+    m_vecRotationDegrees.fX = WrapAround(m_vecRotationDegrees.fX, 360.0f);
+    m_vecRotationDegrees.fY = WrapAround(m_vecRotationDegrees.fY, 360.0f);
+    m_vecRotationDegrees.fZ = WrapAround(m_vecRotationDegrees.fZ, 360.0f);
 
     // Set the respawn matrix
-    SetRespawnPosition ( m_vecPosition );
-    SetRespawnRotationDegrees ( m_vecRotationDegrees );
+    SetRespawnPosition(m_vecPosition);
+    SetRespawnRotationDegrees(m_vecRotationDegrees);
 
     // Grab the "model" data
     int iTemp;
-    if ( GetCustomDataInt ( "model", iTemp, true ) )
+    if (GetCustomDataInt("model", iTemp, true))
     {
         // Is it valid?
-        if ( CVehicleManager::IsValidModel ( iTemp ) )
+        if (CVehicleManager::IsValidModel(iTemp))
         {
             // Remember it and generate a new random color
-            SetModel ( static_cast < unsigned short > ( iTemp ) );
+            SetModel(static_cast<unsigned short>(iTemp));
 
             m_usAdjustableProperty = 0;
         }
         else
         {
-            CLogger::ErrorPrintf ( "Bad 'model'(%d) id specified in <vehicle> (line %u)\n", iTemp, m_uiLine );
+            CLogger::ErrorPrintf("Bad 'model'(%d) id specified in <vehicle> (line %u)\n", iTemp, m_uiLine);
             return false;
         }
     }
     else
     {
-        CLogger::ErrorPrintf ( "Bad/missing 'model' attribute in <vehicle> (line %u)\n", m_uiLine );
+        CLogger::ErrorPrintf("Bad/missing 'model' attribute in <vehicle> (line %u)\n", m_uiLine);
         return false;
     }
 
     // Grab the variant data
-    if ( GetCustomDataInt ( "variant1", iTemp, true ) )
+    if (GetCustomDataInt("variant1", iTemp, true))
     {
-        m_ucVariant = static_cast < unsigned char > ( iTemp );
+        m_ucVariant = static_cast<unsigned char>(iTemp);
     }
-    if ( GetCustomDataInt ( "variant2", iTemp, true ) )
+    if (GetCustomDataInt("variant2", iTemp, true))
     {
-        m_ucVariant2 = static_cast < unsigned char > ( iTemp );
+        m_ucVariant2 = static_cast<unsigned char>(iTemp);
     }
-    if ( m_ucVariant == 254 && m_ucVariant2 == 254 )
-        CVehicleManager::GetRandomVariation ( m_usModel, m_ucVariant, m_ucVariant2 );
+    if (m_ucVariant == 254 && m_ucVariant2 == 254)
+        CVehicleManager::GetRandomVariation(m_usModel, m_ucVariant, m_ucVariant2);
 
     // Grab the "turretX" data
-    if ( GetCustomDataFloat ( "turretX", m_fTurretPositionX, true ) )
+    if (GetCustomDataFloat("turretX", m_fTurretPositionX, true))
     {
-        m_fTurretPositionX = ConvertDegreesToRadians ( m_fTurretPositionX );
+        m_fTurretPositionX = ConvertDegreesToRadians(m_fTurretPositionX);
     }
 
     // Grab the "turretY" data
-    if ( GetCustomDataFloat ( "turretY", m_fTurretPositionY, true ) )
+    if (GetCustomDataFloat("turretY", m_fTurretPositionY, true))
     {
-        m_fTurretPositionY = ConvertDegreesToRadians ( m_fTurretPositionY );
+        m_fTurretPositionY = ConvertDegreesToRadians(m_fTurretPositionY);
     }
 
     // Grab the "health" data
-    if ( GetCustomDataFloat ( "health", m_fHealth, true ) )
+    if (GetCustomDataFloat("health", m_fHealth, true))
     {
-        if ( m_fHealth < 0.0f )
+        if (m_fHealth < 0.0f)
             m_fHealth = 0.0f;
     }
 
     // Grab the "Sirens" data
-    if ( !GetCustomDataBool ( "sirens", m_bSirenActive, true ) )
+    if (!GetCustomDataBool("sirens", m_bSirenActive, true))
     {
         m_bSirenActive = false;
     }
 
     // Grab the "landingGearDown" data
-    if ( !GetCustomDataBool ( "landingGearDown", m_bLandingGearDown, true ) )
+    if (!GetCustomDataBool("landingGearDown", m_bLandingGearDown, true))
     {
         m_bLandingGearDown = true;
     }
 
-    if ( !GetCustomDataBool ( "locked", m_bLocked, true ) )
+    if (!GetCustomDataBool("locked", m_bLocked, true))
     {
         m_bLocked = false;
     }
 
     // Grab the "specialState" data
-    if ( GetCustomDataInt ( "specialState", iTemp, true ) )
+    if (GetCustomDataInt("specialState", iTemp, true))
     {
-        m_usAdjustableProperty = static_cast < unsigned short > ( iTemp );
+        m_usAdjustableProperty = static_cast<unsigned short>(iTemp);
     }
     else
     {
@@ -305,237 +301,227 @@ bool CVehicle::ReadSpecialData ( void )
     }
 
     // Grab the "color" data
-    char szTemp [ 256 ];
-    if ( GetCustomDataString ( "color", szTemp, 256, true ) )
+    char szTemp[256];
+    if (GetCustomDataString("color", szTemp, 256, true))
     {
-        uchar ucValues[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-        char* sz1 = strtok ( szTemp, ", " );
-        if ( sz1 )
-            ucValues[0] = atoi ( sz1 );
+        uchar ucValues[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        char* sz1 = strtok(szTemp, ", ");
+        if (sz1)
+            ucValues[0] = atoi(sz1);
 
         int i;
-        for ( i = 1 ; i < 12 ; i++ )
+        for (i = 1; i < 12; i++)
         {
-            char* szn =  strtok ( NULL, ", " );
-            if ( !szn )
+            char* szn = strtok(NULL, ", ");
+            if (!szn)
                 break;
-            ucValues[i] = atoi ( szn );
+            ucValues[i] = atoi(szn);
         }
 
-        if ( i == 3 || i == 6 || i == 9 || i == 12 )
+        if (i == 3 || i == 6 || i == 9 || i == 12)
         {
-            m_Color.SetRGBColors (  SColorRGBA ( ucValues[0], ucValues[1], ucValues[2], 0 ),
-                                    SColorRGBA ( ucValues[3], ucValues[4], ucValues[5], 0 ),
-                                    SColorRGBA ( ucValues[6], ucValues[7], ucValues[8], 0 ),
-                                    SColorRGBA ( ucValues[9], ucValues[10], ucValues[11], 0 ) );
+            m_Color.SetRGBColors(SColorRGBA(ucValues[0], ucValues[1], ucValues[2], 0), SColorRGBA(ucValues[3], ucValues[4], ucValues[5], 0),
+                                 SColorRGBA(ucValues[6], ucValues[7], ucValues[8], 0), SColorRGBA(ucValues[9], ucValues[10], ucValues[11], 0));
         }
         else
         {
-            m_Color.SetPaletteColors ( ucValues[0], ucValues[1], ucValues[2], ucValues[3] );
+            m_Color.SetPaletteColors(ucValues[0], ucValues[1], ucValues[2], ucValues[3]);
         }
-    }            
+    }
 
-    if ( GetCustomDataInt ( "paintjob", iTemp, true ) )
-        m_ucPaintjob = static_cast < unsigned char > ( iTemp );
+    if (GetCustomDataInt("paintjob", iTemp, true))
+        m_ucPaintjob = static_cast<unsigned char>(iTemp);
 
-    if ( GetCustomDataString ( "upgrades", szTemp, 256, true ) )
+    if (GetCustomDataString("upgrades", szTemp, 256, true))
     {
-        if ( m_pUpgrades )
+        if (m_pUpgrades)
         {
-            if ( strcmp ( szTemp, "all" ) == 0 )
+            if (strcmp(szTemp, "all") == 0)
             {
-                m_pUpgrades->AddAllUpgrades ();
+                m_pUpgrades->AddAllUpgrades();
             }
             else
             {
                 bool bTemp = true;
-                while ( char* token = strtok ( ( bTemp ) ? szTemp : NULL, ", " ) )
+                while (char* token = strtok((bTemp) ? szTemp : NULL, ", "))
                 {
                     bTemp = false;
-                    unsigned short usUpgrade = static_cast < unsigned short > ( atoi ( token ) );
-                    if ( CVehicleUpgrades::IsValidUpgrade ( usUpgrade ) )
+                    unsigned short usUpgrade = static_cast<unsigned short>(atoi(token));
+                    if (CVehicleUpgrades::IsValidUpgrade(usUpgrade))
                     {
-                        m_pUpgrades->AddUpgrade ( usUpgrade );
+                        m_pUpgrades->AddUpgrade(usUpgrade);
                     }
                 }
             }
         }
     }
 
-    if ( GetCustomDataString ( "plate", szTemp, 9, true ) )
-        SetRegPlate ( szTemp );
+    if (GetCustomDataString("plate", szTemp, 9, true))
+        SetRegPlate(szTemp);
 
-    if ( GetCustomDataInt ( "interior", iTemp, true ) )
-        m_ucInterior = static_cast < unsigned char > ( iTemp );
+    if (GetCustomDataInt("interior", iTemp, true))
+        m_ucInterior = static_cast<unsigned char>(iTemp);
 
-    if ( GetCustomDataInt ( "dimension", iTemp, true ) )
-        m_usDimension = static_cast < unsigned short > ( iTemp );
+    if (GetCustomDataInt("dimension", iTemp, true))
+        m_usDimension = static_cast<unsigned short>(iTemp);
 
-    if ( !GetCustomDataBool ( "collisions", m_bCollisionsEnabled, true ) )
+    if (!GetCustomDataBool("collisions", m_bCollisionsEnabled, true))
         m_bCollisionsEnabled = true;
 
-    if ( GetCustomDataInt ( "alpha", iTemp, true ) )
-        m_ucAlpha = static_cast < unsigned char > ( iTemp );
+    if (GetCustomDataInt("alpha", iTemp, true))
+        m_ucAlpha = static_cast<unsigned char>(iTemp);
 
     bool bFrozen;
-    if ( GetCustomDataBool ( "frozen", bFrozen, true ) )
+    if (GetCustomDataBool("frozen", bFrozen, true))
         m_bIsFrozen = bFrozen;
 
     return true;
 }
 
-
-void CVehicle::GetMatrix( CMatrix& matrix )
+void CVehicle::GetMatrix(CMatrix& matrix)
 {
     CVector vecRotation;
-    GetRotation( vecRotation );
-    matrix.SetRotation( vecRotation );
+    GetRotation(vecRotation);
+    matrix.SetRotation(vecRotation);
     matrix.vPos = GetPosition();
 }
 
-
-void CVehicle::SetMatrix( const CMatrix& matrix )
+void CVehicle::SetMatrix(const CMatrix& matrix)
 {
     // Set position and rotation from matrix
-    SetPosition( matrix.vPos );
+    SetPosition(matrix.vPos);
     CVector vecRotation = matrix.GetRotation();
-    ConvertRadiansToDegreesNoWrap( vecRotation );
-    SetRotationDegrees( vecRotation );
+    ConvertRadiansToDegreesNoWrap(vecRotation);
+    SetRotationDegrees(vecRotation);
 }
 
-
-const CVector & CVehicle::GetPosition ( void )
+const CVector& CVehicle::GetPosition(void)
 {
     // Are we attached to something?
-    if ( m_pAttachedTo ) GetAttachedPosition ( m_vecPosition );
+    if (m_pAttachedTo)
+        GetAttachedPosition(m_vecPosition);
     return m_vecPosition;
 }
 
-
-void CVehicle::SetPosition ( const CVector & vecPosition )
+void CVehicle::SetPosition(const CVector& vecPosition)
 {
     // If we're attached to something, dont allow any change
-    if ( m_pAttachedTo ) return;
+    if (m_pAttachedTo)
+        return;
 
     // Different to where we are now?
-    if ( m_vecPosition != vecPosition )
+    if (m_vecPosition != vecPosition)
     {
         // Update our stored vectors
         m_vecPosition = vecPosition;
-        UpdateSpatialData ();
+        UpdateSpatialData();
     }
 }
 
-
-void CVehicle::GetRotation ( CVector & vecRotation )
+void CVehicle::GetRotation(CVector& vecRotation)
 {
-    if ( m_pAttachedTo ) GetAttachedRotation ( vecRotation );
+    if (m_pAttachedTo)
+        GetAttachedRotation(vecRotation);
     else
     {
-        GetRotationDegrees ( vecRotation );
-        ConvertDegreesToRadians ( vecRotation );
+        GetRotationDegrees(vecRotation);
+        ConvertDegreesToRadians(vecRotation);
     }
 }
 
-
-void CVehicle::GetRotationDegrees ( CVector & vecRotation )
+void CVehicle::GetRotationDegrees(CVector& vecRotation)
 {
-    if ( m_pAttachedTo )
+    if (m_pAttachedTo)
     {
-        GetAttachedRotation ( vecRotation );
-        ConvertRadiansToDegrees ( vecRotation );
+        GetAttachedRotation(vecRotation);
+        ConvertRadiansToDegrees(vecRotation);
     }
     else
         vecRotation = m_vecRotationDegrees;
 }
 
-
-void CVehicle::SetRotationDegrees ( const CVector & vecRotation )
+void CVehicle::SetRotationDegrees(const CVector& vecRotation)
 {
-    if ( m_pAttachedTo ) return;
+    if (m_pAttachedTo)
+        return;
     m_vecRotationDegrees = vecRotation;
 }
 
-
-void CVehicle::SetModel ( unsigned short usModel )
+void CVehicle::SetModel(unsigned short usModel)
 {
-    if ( usModel != m_usModel )
+    if (usModel != m_usModel)
     {
         m_usModel = usModel;
-        m_eVehicleType = CVehicleManager::GetVehicleType ( m_usModel );
-        RandomizeColor ();
-        ResetDoors ();
-        CVehicleManager::GetRandomVariation ( m_usModel, m_ucVariant, m_ucVariant2 );
+        m_eVehicleType = CVehicleManager::GetVehicleType(m_usModel);
+        RandomizeColor();
+        ResetDoors();
+        CVehicleManager::GetRandomVariation(m_usModel, m_ucVariant, m_ucVariant2);
 
         // Generate new handling data to fit the vehicle
-        GenerateHandlingData ();
+        GenerateHandlingData();
     }
 }
 
-
-bool CVehicle::HasValidModel ( void )
+bool CVehicle::HasValidModel(void)
 {
-    return CVehicleManager::IsValidModel ( m_usModel );
+    return CVehicleManager::IsValidModel(m_usModel);
 }
 
-void CVehicle::SetVariants ( unsigned char ucVariant, unsigned char ucVariant2 )
+void CVehicle::SetVariants(unsigned char ucVariant, unsigned char ucVariant2)
 {
     m_ucVariant = ucVariant;
     m_ucVariant2 = ucVariant2;
 }
 
-CVehicleColor& CVehicle::RandomizeColor ( void )
+CVehicleColor& CVehicle::RandomizeColor(void)
 {
-    // Grab a random color for this vehicle and return it 
-    m_Color = m_pVehicleManager->GetRandomColor ( m_usModel );
+    // Grab a random color for this vehicle and return it
+    m_Color = m_pVehicleManager->GetRandomColor(m_usModel);
     return m_Color;
 }
 
-void CVehicle::SetDoorOpenRatio ( unsigned char ucDoor, float fRatio )
+void CVehicle::SetDoorOpenRatio(unsigned char ucDoor, float fRatio)
 {
-    if ( ucDoor <= 5 )
-        m_fDoorOpenRatio [ ucDoor ] = SharedUtil::Clamp ( 0.0f, fRatio, 1.0f );
+    if (ucDoor <= 5)
+        m_fDoorOpenRatio[ucDoor] = SharedUtil::Clamp(0.0f, fRatio, 1.0f);
 }
 
-float CVehicle::GetDoorOpenRatio ( unsigned char ucDoor ) const
+float CVehicle::GetDoorOpenRatio(unsigned char ucDoor) const
 {
-    return (ucDoor <= 5) ? m_fDoorOpenRatio [ ucDoor ] : 0.0f;
+    return (ucDoor <= 5) ? m_fDoorOpenRatio[ucDoor] : 0.0f;
 }
 
-void CVehicle::GetTurretPosition ( float& fPositionX, float& fPositionY )
+void CVehicle::GetTurretPosition(float& fPositionX, float& fPositionY)
 {
     fPositionX = m_fTurretPositionX;
     fPositionY = m_fTurretPositionY;
 }
 
-
-void CVehicle::SetTurretPosition ( float fPositionX, float fPositionY )
+void CVehicle::SetTurretPosition(float fPositionX, float fPositionY)
 {
     m_fTurretPositionX = fPositionX;
     m_fTurretPositionY = fPositionY;
 }
 
-
-CPed* CVehicle::GetOccupant ( unsigned int uiSeat )
-{    
-    if ( uiSeat < MAX_VEHICLE_SEATS )
+CPed* CVehicle::GetOccupant(unsigned int uiSeat)
+{
+    if (uiSeat < MAX_VEHICLE_SEATS)
     {
-        return m_pOccupants [uiSeat];
+        return m_pOccupants[uiSeat];
     }
 
     return NULL;
 }
 
-
-CPed* CVehicle::GetFirstOccupant ( void )
+CPed* CVehicle::GetFirstOccupant(void)
 {
     // Try finding a seat with a Player in it
     unsigned int i = 0;
-    for ( ; i < MAX_VEHICLE_SEATS; i++ )
+    for (; i < MAX_VEHICLE_SEATS; i++)
     {
-        if ( m_pOccupants [i] )
+        if (m_pOccupants[i])
         {
-            return m_pOccupants [i];
+            return m_pOccupants[i];
         }
     }
 
@@ -543,22 +529,21 @@ CPed* CVehicle::GetFirstOccupant ( void )
     return NULL;
 }
 
-
-CPed* CVehicle::GetController ( void )
+CPed* CVehicle::GetController(void)
 {
-    CPed* pController = m_pOccupants [ 0 ];
+    CPed* pController = m_pOccupants[0];
 
-    if ( !pController )
+    if (!pController)
     {
         CVehicle* pCurrentVehicle = this;
         CVehicle* pTowedByVehicle = m_pTowedByVehicle;
-        pController = pCurrentVehicle->GetOccupant ( 0 );
-        while ( pTowedByVehicle )
+        pController = pCurrentVehicle->GetOccupant(0);
+        while (pTowedByVehicle)
         {
             pCurrentVehicle = pTowedByVehicle;
-            pTowedByVehicle = pCurrentVehicle->GetTowedByVehicle ();
-            CPed* pCurrentDriver = pCurrentVehicle->GetOccupant ( 0 );
-            if ( pCurrentDriver )
+            pTowedByVehicle = pCurrentVehicle->GetTowedByVehicle();
+            CPed* pCurrentDriver = pCurrentVehicle->GetOccupant(0);
+            if (pCurrentDriver)
                 pController = pCurrentDriver;
         }
     }
@@ -566,35 +551,34 @@ CPed* CVehicle::GetController ( void )
     return pController;
 }
 
-
-bool CVehicle::SetOccupant ( CPed* pPed, unsigned int uiSeat )
+bool CVehicle::SetOccupant(CPed* pPed, unsigned int uiSeat)
 {
     // CPlayer::SetOccupiedVehicle will also call this so we need to prevent an infinite recursive loop
     static bool bAlreadySetting = false;
-    if ( !bAlreadySetting )
+    if (!bAlreadySetting)
     {
         // Set the Player
-        if ( m_pOccupants [uiSeat] != pPed )
+        if (m_pOccupants[uiSeat] != pPed)
         {
-            if ( g_pBandwidthSettings->bLightSyncEnabled )
+            if (g_pBandwidthSettings->bLightSyncEnabled)
             {
-                if ( uiSeat == 0 && m_pOccupants[0] && IS_PLAYER(m_pOccupants[0]) )
-                    g_pGame->GetPlayerManager()->BroadcastOnlyJoined ( CVehicleResyncPacket(this) );
+                if (uiSeat == 0 && m_pOccupants[0] && IS_PLAYER(m_pOccupants[0]))
+                    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CVehicleResyncPacket(this));
             }
-            m_pOccupants [uiSeat] = pPed;
+            m_pOccupants[uiSeat] = pPed;
         }
 
         // Make sure the Player record is up to date
-        if ( pPed )
+        if (pPed)
         {
             bAlreadySetting = true;
-            pPed->SetOccupiedVehicle ( this, uiSeat );
+            pPed->SetOccupiedVehicle(this, uiSeat);
             bAlreadySetting = false;
         }
 
         // Ensure idle timer is stopped when the vehicle has any occupants
-        if ( GetFirstOccupant () )
-            StopIdleTimer ();
+        if (GetFirstOccupant())
+            StopIdleTimer();
 
         return true;
     }
@@ -602,24 +586,23 @@ bool CVehicle::SetOccupant ( CPed* pPed, unsigned int uiSeat )
     return true;
 }
 
-
-void CVehicle::SetSyncer ( CPlayer* pPlayer )
+void CVehicle::SetSyncer(CPlayer* pPlayer)
 {
     // Prevent a recursive call loop when setting vehicle's syncer
     static bool bAlreadyIn = false;
-    if ( !bAlreadyIn )
+    if (!bAlreadyIn)
     {
         // Update the last Player if any
         bAlreadyIn = true;
-        if ( m_pSyncer )
+        if (m_pSyncer)
         {
-            m_pSyncer->RemoveSyncingVehicle ( this );
+            m_pSyncer->RemoveSyncingVehicle(this);
         }
 
         // Update the vehicle
-        if ( pPlayer )
+        if (pPlayer)
         {
-            pPlayer->AddSyncingVehicle ( this );
+            pPlayer->AddSyncingVehicle(this);
         }
         bAlreadyIn = false;
 
@@ -628,25 +611,23 @@ void CVehicle::SetSyncer ( CPlayer* pPlayer )
     }
 }
 
-
-unsigned char CVehicle::GetMaxPassengers ( void )
+unsigned char CVehicle::GetMaxPassengers(void)
 {
-    return ( ( m_ucMaxPassengersOverride == VEHICLE_PASSENGERS_UNDEFINED ) ? CVehicleManager::GetMaxPassengers ( m_usModel ) : m_ucMaxPassengersOverride );
+    return ((m_ucMaxPassengersOverride == VEHICLE_PASSENGERS_UNDEFINED) ? CVehicleManager::GetMaxPassengers(m_usModel) : m_ucMaxPassengersOverride);
 }
 
-
-unsigned char CVehicle::GetFreePassengerSeat ( void )
+unsigned char CVehicle::GetFreePassengerSeat(void)
 {
     // Grab the max passengers this vehicle can have and check the rage
-    unsigned char ucMaxPassengers = GetMaxPassengers ();
-    if ( ucMaxPassengers < MAX_VEHICLE_SEATS )
+    unsigned char ucMaxPassengers = GetMaxPassengers();
+    if (ucMaxPassengers < MAX_VEHICLE_SEATS)
     {
         // Check for free slots
-        for ( int i = 1; i < ucMaxPassengers + 1; i++ )
+        for (int i = 1; i < ucMaxPassengers + 1; i++)
         {
-            if ( !m_pOccupants [i] )
+            if (!m_pOccupants[i])
             {
-                return static_cast < unsigned char > ( i );
+                return static_cast<unsigned char>(i);
             }
         }
     }
@@ -654,30 +635,28 @@ unsigned char CVehicle::GetFreePassengerSeat ( void )
     return 0xFF;
 }
 
-
-void CVehicle::SetUpgrades ( CVehicleUpgrades* pUpgrades )
+void CVehicle::SetUpgrades(CVehicleUpgrades* pUpgrades)
 {
     delete m_pUpgrades;
 
-    m_pUpgrades = new CVehicleUpgrades ( this, pUpgrades );
+    m_pUpgrades = new CVehicleUpgrades(this, pUpgrades);
 }
 
-
-bool CVehicle::SetTowedVehicle ( CVehicle* pVehicle )
+bool CVehicle::SetTowedVehicle(CVehicle* pVehicle)
 {
-    if ( m_pTowedVehicle )
+    if (m_pTowedVehicle)
     {
         m_pTowedVehicle->m_pTowedByVehicle = NULL;
         m_pTowedVehicle = NULL;
     }
 
-    if ( pVehicle )
+    if (pVehicle)
     {
         // Are we trying to establish a circular loop? (would freeze everything up)
         CVehicle* pCircTestVehicle = pVehicle;
-        while ( pCircTestVehicle )
+        while (pCircTestVehicle)
         {
-            if ( pCircTestVehicle == this )
+            if (pCircTestVehicle == this)
                 return false;
             pCircTestVehicle = pCircTestVehicle->m_pTowedVehicle;
         }
@@ -689,22 +668,21 @@ bool CVehicle::SetTowedVehicle ( CVehicle* pVehicle )
     return true;
 }
 
-
-bool CVehicle::SetTowedByVehicle ( CVehicle* pVehicle )
+bool CVehicle::SetTowedByVehicle(CVehicle* pVehicle)
 {
-    if ( m_pTowedByVehicle )
+    if (m_pTowedByVehicle)
     {
         m_pTowedByVehicle->m_pTowedVehicle = NULL;
         m_pTowedByVehicle = NULL;
     }
 
-    if ( pVehicle )
+    if (pVehicle)
     {
         // Are we trying to establish a circular loop? (would freeze everything up)
         CVehicle* pCircTestVehicle = pVehicle;
-        while ( pCircTestVehicle )
+        while (pCircTestVehicle)
         {
-            if ( pCircTestVehicle == this )
+            if (pCircTestVehicle == this)
                 return false;
             pCircTestVehicle = pCircTestVehicle->m_pTowedByVehicle;
         }
@@ -716,75 +694,69 @@ bool CVehicle::SetTowedByVehicle ( CVehicle* pVehicle )
     return true;
 }
 
-
-void CVehicle::SpawnAt ( const CVector& vecPosition, const CVector& vecRotation )
+void CVehicle::SpawnAt(const CVector& vecPosition, const CVector& vecRotation)
 {
-    SetHealth ( GetRespawnHealth () );
-    SetIsBlown ( false );
-    StopIdleTimer ();
-    ResetDoorsWheelsPanelsLights ();
-    SetLandingGearDown ( true );
-    SetAdjustableProperty ( 0 );
-    SetTowedByVehicle ( NULL );
-    AttachTo ( NULL );
-    
-    m_vecTurnSpeed = CVector ();
-    m_vecVelocity = CVector ();
+    SetHealth(GetRespawnHealth());
+    SetIsBlown(false);
+    StopIdleTimer();
+    ResetDoorsWheelsPanelsLights();
+    SetLandingGearDown(true);
+    SetAdjustableProperty(0);
+    SetTowedByVehicle(NULL);
+    AttachTo(NULL);
+
+    m_vecTurnSpeed = CVector();
+    m_vecVelocity = CVector();
     m_vecPosition = vecPosition;
     m_vecRotationDegrees = vecRotation;
-    UpdateSpatialData ();
+    UpdateSpatialData();
 }
 
-
-void CVehicle::Respawn ()
+void CVehicle::Respawn()
 {
-    SpawnAt ( m_vecRespawnPosition, m_vecRespawnRotationDegrees );
+    SpawnAt(m_vecRespawnPosition, m_vecRespawnRotationDegrees);
 }
 
-
-void CVehicle::SetRegPlate ( const char* szRegPlate )
+void CVehicle::SetRegPlate(const char* szRegPlate)
 {
     // Copy the text and make sure non-used chars are nulled.
-    memset ( m_szRegPlate, 0, 9 );
-    STRNCPY ( m_szRegPlate, szRegPlate, 9 );
+    memset(m_szRegPlate, 0, 9);
+    STRNCPY(m_szRegPlate, szRegPlate, 9);
 }
 
-
-void CVehicle::GenerateRegPlate ( void )
+void CVehicle::GenerateRegPlate(void)
 {
     // For all our 8 letters
-    for ( int i = 0; i < 8; i++ )
+    for (int i = 0; i < 8; i++)
     {
         // Put a space in letter 5
-        if ( i != 4 )
+        if (i != 4)
         {
             // Generate a random letter
-            int iChar = rand () % 36 + 'A';
-            if ( iChar > 'Z' )
+            int iChar = rand() % 36 + 'A';
+            if (iChar > 'Z')
             {
                 iChar = iChar - 43;
             }
 
             // Put it in the plate
-            m_szRegPlate [i] = iChar;
+            m_szRegPlate[i] = iChar;
         }
     }
 
     // Null terminator and space in number 5
-    m_szRegPlate [4] = ' ';
-    m_szRegPlate [8] = 0;
+    m_szRegPlate[4] = ' ';
+    m_szRegPlate[8] = 0;
 }
 
-
-void CVehicle::SetPaintjob ( unsigned char ucPaintjob )
+void CVehicle::SetPaintjob(unsigned char ucPaintjob)
 {
     m_ucPaintjob = ucPaintjob;
 }
 
-
-void CVehicle::GetInitialDoorStates ( SFixedArray < unsigned char, MAX_DOORS >& ucOutDoorStates )
+void CVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates)
 {
-    switch ( m_usModel )
+    switch (m_usModel)
     {
         case VT_BAGGAGE:
         case VT_BANDITO:
@@ -802,186 +774,173 @@ void CVehicle::GetInitialDoorStates ( SFixedArray < unsigned char, MAX_DOORS >& 
         case VT_RCTIGER:
         case VT_TRACTOR:
         case VT_VORTEX:
-            memset ( &ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS );
+            memset(&ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS);
 
             // Keep the bonet and boot intact
-            ucOutDoorStates [ 0 ] = ucOutDoorStates [ 1 ] = DT_DOOR_INTACT;
+            ucOutDoorStates[0] = ucOutDoorStates[1] = DT_DOOR_INTACT;
             break;
         default:
-            memset ( &ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS );
+            memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
     }
 }
 
-
-void CVehicle::GenerateHandlingData ( void )
+void CVehicle::GenerateHandlingData(void)
 {
     // Make a new CHandlingEntry
-    if( m_pHandlingEntry == NULL )
-        m_pHandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData ( );
+    if (m_pHandlingEntry == NULL)
+        m_pHandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData();
     // Apply the model handling info
-    m_pHandlingEntry->ApplyHandlingData( g_pGame->GetHandlingManager ()->GetModelHandlingData ( static_cast < eVehicleTypes > ( m_usModel ) ) );
+    m_pHandlingEntry->ApplyHandlingData(g_pGame->GetHandlingManager()->GetModelHandlingData(static_cast<eVehicleTypes>(m_usModel)));
 
     m_bHandlingChanged = false;
 }
 
-void CVehicle::SetVehicleSirenPosition ( unsigned char ucSirenID, CVector vecPos )
+void CVehicle::SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos)
 {
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions = vecPos;
 }
 
-void CVehicle::SetVehicleSirenMinimumAlpha( unsigned char ucSirenID, DWORD dwPercentage )
+void CVehicle::SetVehicleSirenMinimumAlpha(unsigned char ucSirenID, DWORD dwPercentage)
 {
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha = dwPercentage;
 }
 
-void CVehicle::SetVehicleSirenColour ( unsigned char ucSirenID, SColor tVehicleSirenColour )
+void CVehicle::SetVehicleSirenColour(unsigned char ucSirenID, SColor tVehicleSirenColour)
 {
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour;
 }
 
-void CVehicle::SetVehicleFlags ( bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent )
+void CVehicle::SetVehicleFlags(bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent)
 {
-    m_tSirenBeaconInfo.m_b360Flag = bEnable360; 
-    m_tSirenBeaconInfo.m_bDoLOSCheck = bEnableLOSCheck; 
+    m_tSirenBeaconInfo.m_b360Flag = bEnable360;
+    m_tSirenBeaconInfo.m_bDoLOSCheck = bEnableLOSCheck;
     m_tSirenBeaconInfo.m_bUseRandomiser = bEnableRandomiser;
     m_tSirenBeaconInfo.m_bSirenSilent = bEnableSilent;
 }
-void CVehicle::RemoveVehicleSirens ( void )
+void CVehicle::RemoveVehicleSirens(void)
 {
-    for ( int i = 0; i <= 7; i++ )
+    for (int i = 0; i <= 7; i++)
     {
-        m_tSirenBeaconInfo.m_tSirenInfo [ i ] = SSirenBeaconInfo ( );
-        SetVehicleSirenPosition( i, CVector ( 0, 0, 0 ) );
-        SetVehicleSirenMinimumAlpha( i, 0 );
-        SetVehicleSirenColour( i, SColor ( ) );
+        m_tSirenBeaconInfo.m_tSirenInfo[i] = SSirenBeaconInfo();
+        SetVehicleSirenPosition(i, CVector(0, 0, 0));
+        SetVehicleSirenMinimumAlpha(i, 0);
+        SetVehicleSirenColour(i, SColor());
     }
 
     m_tSirenBeaconInfo.m_ucSirenCount = 0;
 }
 
-
-void CVehicle::ResetDoors ( void )
+void CVehicle::ResetDoors(void)
 {
-    GetInitialDoorStates ( m_ucDoorStates );
-    for ( unsigned int i = 0; i < 6; ++i )
-        m_fDoorOpenRatio [ i ] = 0.0f;
+    GetInitialDoorStates(m_ucDoorStates);
+    for (unsigned int i = 0; i < 6; ++i)
+        m_fDoorOpenRatio[i] = 0.0f;
 }
 
-
-void CVehicle::ResetDoorsWheelsPanelsLights ( void )
+void CVehicle::ResetDoorsWheelsPanelsLights(void)
 {
-    ResetDoors ();
-    memset ( &m_ucWheelStates[0], 0, sizeof ( m_ucWheelStates ) );
-    memset ( &m_ucPanelStates[0], 0, sizeof ( m_ucPanelStates ) );
-    memset ( &m_ucLightStates[0], 0, sizeof ( m_ucLightStates ) );
+    ResetDoors();
+    memset(&m_ucWheelStates[0], 0, sizeof(m_ucWheelStates));
+    memset(&m_ucPanelStates[0], 0, sizeof(m_ucPanelStates));
+    memset(&m_ucLightStates[0], 0, sizeof(m_ucLightStates));
 }
 
 // For blow respawn timer
-void CVehicle::SetIsBlown ( bool bBlown )
+void CVehicle::SetIsBlown(bool bBlown)
 {
-    if ( !bBlown )
-        m_llBlowTime = CTickCount ( 0LL );
+    if (!bBlown)
+        m_llBlowTime = CTickCount(0LL);
     else
-        m_llBlowTime = CTickCount::Now ();
+        m_llBlowTime = CTickCount::Now();
 }
 
-
-bool CVehicle::GetIsBlown ( void )
+bool CVehicle::GetIsBlown(void)
 {
-    return m_llBlowTime.ToLongLong () != 0;
+    return m_llBlowTime.ToLongLong() != 0;
 }
 
-
-bool CVehicle::IsBlowTimerFinished ( void )
+bool CVehicle::IsBlowTimerFinished(void)
 {
-    return GetIsBlown () && CTickCount::Now () > m_llBlowTime + CTickCount ( (long long)m_ulBlowRespawnInterval );
+    return GetIsBlown() && CTickCount::Now() > m_llBlowTime + CTickCount((long long)m_ulBlowRespawnInterval);
 }
 
-
-void CVehicle::StopIdleTimer ( void )
+void CVehicle::StopIdleTimer(void)
 {
-    m_llIdleTime = CTickCount ( 0LL );
+    m_llIdleTime = CTickCount(0LL);
 }
 
-
-void CVehicle::RestartIdleTimer ( void )
+void CVehicle::RestartIdleTimer(void)
 {
-    m_llIdleTime = CTickCount::Now ();
+    m_llIdleTime = CTickCount::Now();
 }
 
-
-bool CVehicle::IsIdleTimerRunning ( void )
+bool CVehicle::IsIdleTimerRunning(void)
 {
-    return m_llIdleTime.ToLongLong () != 0;
+    return m_llIdleTime.ToLongLong() != 0;
 }
 
-
-bool CVehicle::IsIdleTimerFinished ( void )
+bool CVehicle::IsIdleTimerFinished(void)
 {
-    return IsIdleTimerRunning () && CTickCount::Now () > m_llIdleTime + CTickCount ( (long long)m_ulIdleRespawnInterval );
+    return IsIdleTimerRunning() && CTickCount::Now() > m_llIdleTime + CTickCount((long long)m_ulIdleRespawnInterval);
 }
-
 
 // Check if vehicle has not moved (much) since the last call
-bool CVehicle::IsStationary ( void )
+bool CVehicle::IsStationary(void)
 {
-    const CVector& vecPosition = GetPosition ();
-    if ( ( vecPosition - m_vecStationaryCheckPosition ).LengthSquared () < 0.1f * 0.1f )
+    const CVector& vecPosition = GetPosition();
+    if ((vecPosition - m_vecStationaryCheckPosition).LengthSquared() < 0.1f * 0.1f)
         return true;
 
     m_vecStationaryCheckPosition = vecPosition;
     return false;
 }
 
-
-void CVehicle::SetJackingPlayer ( CPlayer* pPlayer )
+void CVehicle::SetJackingPlayer(CPlayer* pPlayer)
 {
-    if ( pPlayer == m_pJackingPlayer )
+    if (pPlayer == m_pJackingPlayer)
         return;
 
     // Remove old
-    if ( m_pJackingPlayer )
+    if (m_pJackingPlayer)
     {
         CPlayer* pPrev = m_pJackingPlayer;
         m_pJackingPlayer = NULL;
-        pPrev->SetJackingVehicle ( NULL );
+        pPrev->SetJackingVehicle(NULL);
     }
 
     // Set new
     m_pJackingPlayer = pPlayer;
 
-    if ( m_pJackingPlayer )
-        m_pJackingPlayer->SetJackingVehicle ( this );
+    if (m_pJackingPlayer)
+        m_pJackingPlayer->SetJackingVehicle(this);
 }
 
-
-void CVehicle::OnRelayUnoccupiedSync ( void )
+void CVehicle::OnRelayUnoccupiedSync(void)
 {
     // Detect dimension change
-    m_bNeedsDimensionResync |= ( GetDimension() != m_usLastUnoccupiedSyncDimension );
+    m_bNeedsDimensionResync |= (GetDimension() != m_usLastUnoccupiedSyncDimension);
     m_usLastUnoccupiedSyncDimension = GetDimension();
 }
 
-
-void CVehicle::HandleDimensionResync ( void )
+void CVehicle::HandleDimensionResync(void)
 {
-    if ( m_bNeedsDimensionResync )
+    if (m_bNeedsDimensionResync)
     {
         // Unoccupied vehicle might be desynced because of dimension optimizations, so resync to players in new dimension
-        g_pGame->GetPlayerManager()->BroadcastDimensionOnlyJoined( CVehicleResyncPacket( this ), GetDimension() );
+        g_pGame->GetPlayerManager()->BroadcastDimensionOnlyJoined(CVehicleResyncPacket(this), GetDimension());
         m_bNeedsDimensionResync = false;
     }
 }
 
-void CVehicle::SetRespawnEnabled ( bool bEnabled )
-{ 
+void CVehicle::SetRespawnEnabled(bool bEnabled)
+{
     // If we changed the state, update the internal var and notify the vehicle manager
-    if ( bEnabled != m_bRespawnEnabled )
+    if (bEnabled != m_bRespawnEnabled)
     {
-        if ( bEnabled ) 
-            m_pVehicleManager->GetRespawnEnabledVehicles ( ).push_back ( this );
-        else 
-            m_pVehicleManager->GetRespawnEnabledVehicles ( ).remove ( this );
+        if (bEnabled)
+            m_pVehicleManager->GetRespawnEnabledVehicles().push_back(this);
+        else
+            m_pVehicleManager->GetRespawnEnabledVehicles().remove(this);
 
         m_bRespawnEnabled = bEnabled;
     }

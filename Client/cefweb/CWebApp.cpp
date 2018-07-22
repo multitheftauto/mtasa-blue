@@ -1,11 +1,11 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CWebApp.cpp
-*  PURPOSE:     Web app class
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CWebApp.cpp
+ *  PURPOSE:     Web app class
+ *
+ *****************************************************************************/
 #include "StdInc.h"
 #include "CWebApp.h"
 
@@ -16,26 +16,25 @@
 CefRefPtr<CefResourceHandler> CWebApp::HandleError(const SString& strError, unsigned int uiError)
 {
     auto stream = CefStreamReader::CreateForData((void*)strError.c_str(), strError.length());
-    return new CefStreamResourceHandler(
-        uiError, strError, "text/plain", CefResponse::HeaderMap(), stream);
+    return new CefStreamResourceHandler(uiError, strError, "text/plain", CefResponse::HeaderMap(), stream);
 }
 
-
-void CWebApp::OnRegisterCustomSchemes(CefRefPtr < CefSchemeRegistrar > registrar)
+void CWebApp::OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar)
 {
     // Register custom MTA scheme (has to be called in all proceseses)
-    registrar->AddCustomScheme("mtalocal", false, false, false);
+    registrar->AddCustomScheme("mtalocal", false, false, false, false, false, true);
 }
 
 void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line)
 {
     command_line->AppendSwitch("disable-gpu-compositing");
     command_line->AppendSwitch("disable-gpu");
-    //command_line->AppendSwitch("disable-d3d11");
+    // command_line->AppendSwitch("disable-d3d11");
     command_line->AppendSwitch("enable-begin-frame-scheduling");
 }
 
-CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& scheme_name, CefRefPtr<CefRequest> request)
+CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& scheme_name,
+                                              CefRefPtr<CefRequest> request)
 {
     // browser or frame are NULL if the request does not orginate from a browser window
     // This is for exmaple true for the application cache or CEFURLRequests
@@ -43,8 +42,8 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
     if (!browser || !frame)
         return nullptr;
 
-    CWebCore* pWebCore = static_cast<CWebCore*> (g_pCore->GetWebCore());
-    auto pWebView = pWebCore->FindWebView(browser);
+    CWebCore* pWebCore = static_cast<CWebCore*>(g_pCore->GetWebCore());
+    auto      pWebView = pWebCore->FindWebView(browser);
     if (!pWebView || !pWebView->IsLocal())
         return nullptr;
 
@@ -52,7 +51,7 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
     if (!CefParseURL(request->GetURL(), urlParts))
         return nullptr;
 
-    if (scheme_name == "mtalocal") // Backward compatibility
+    if (scheme_name == "mtalocal")            // Backward compatibility
     {
         // Get full path
         SString path = UTF16ToMbUTF8(urlParts.path.str).substr(2);
@@ -84,8 +83,8 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
         // Scheme format: http://mta/resourceName/file.html or http://mta/local/file.html for the current resource
 
         // Get resource name and path
-        SString path = UTF16ToMbUTF8(urlParts.path.str).substr(1); // Remove slash at the front
-        size_t slashPos = path.find('/');
+        SString path = UTF16ToMbUTF8(urlParts.path.str).substr(1);            // Remove slash at the front
+        size_t  slashPos = path.find('/');
         if (slashPos == std::string::npos)
             return HandleError("404 - Not found", 404);
 
@@ -97,11 +96,11 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
 
         // Get mime type from extension
         CefString mimeType;
-        size_t pos = resourcePath.find_last_of('.');
+        size_t    pos = resourcePath.find_last_of('.');
         if (pos != std::string::npos)
             mimeType = CefGetMimeType(resourcePath.substr(pos + 1));
 
-        // Make sure we provide a mime type, even 
+        // Make sure we provide a mime type, even
         // when we cannot deduct it from the file extension
         if (mimeType.empty())
             mimeType = "application/octet-stream";
@@ -113,11 +112,12 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
 
             if (urlParts.query.str != nullptr)
             {
-                SString strGet = UTF16ToMbUTF8(urlParts.query.str);
+                SString              strGet = UTF16ToMbUTF8(urlParts.query.str);
                 std::vector<SString> vecTmp;
                 strGet.Split("&", vecTmp);
 
-                SString key; SString value;
+                SString key;
+                SString value;
                 for (auto&& param : vecTmp)
                 {
                     param.Split("=", &key, &value);
@@ -127,12 +127,13 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
             }
 
             CefPostData::ElementVector vecPostElements;
-            auto postData = request->GetPostData();
+            auto                       postData = request->GetPostData();
             if (postData.get())
             {
                 request->GetPostData()->GetElements(vecPostElements);
 
-                SString key; SString value;
+                SString key;
+                SString value;
                 for (auto&& post : vecPostElements)
                 {
                     // Limit to 5MiB and allow byte data only
@@ -141,7 +142,7 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                         continue;
 
                     // Make string from buffer
-                    std::unique_ptr<char[]> buffer{ new char[bytesCount] };
+                    std::unique_ptr<char[]> buffer{new char[bytesCount]};
                     post->GetBytes(bytesCount, buffer.get());
                     SStringX param(buffer.get(), bytesCount);
 

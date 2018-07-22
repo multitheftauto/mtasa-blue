@@ -1,37 +1,31 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CElementDeleter.h
-*  PURPOSE:     Element lazy deletion manager class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Cecill Etheredge <>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CElementDeleter.h
+ *  PURPOSE:     Element lazy deletion manager class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CELEMENTDELETER_H
-#define __CELEMENTDELETER_H
+#pragma once
 
 #include <list>
 
 class CElementDeleter
 {
 public:
-    inline                          ~CElementDeleter        ( void )        { DoDeleteAll (); };
+    ~CElementDeleter(void) { DoDeleteAll(); };
 
-    void                            Delete                  ( class CElement* pElement, bool bUnlink = true, bool bUpdatePerPlayerEntities = true );
-    void                            DoDeleteAll             ( void );
+    void Delete(class CElement* pElement, bool bUnlink = true, bool bUpdatePerPlayerEntities = true);
+    void DoDeleteAll(void);
 
-    bool                            IsBeingDeleted          ( class CElement* pElement );
-    void                            Unreference             ( CElement* pElement );
+    bool IsBeingDeleted(class CElement* pElement);
+    void Unreference(CElement* pElement);
 
-    void                            CleanUpForVM            ( CLuaMain* pLuaMain );
+    void CleanUpForVM(CLuaMain* pLuaMain);
 
 private:
-    CElementListType                m_List;
+    CElementListType m_List;
 };
-
-#endif

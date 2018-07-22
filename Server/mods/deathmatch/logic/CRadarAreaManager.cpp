@@ -1,36 +1,33 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CRadarAreaManager.cpp
-*  PURPOSE:     Radar area entity manager class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CRadarAreaManager.cpp
+ *  PURPOSE:     Radar area entity manager class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-CRadarAreaManager::CRadarAreaManager ( void )
+CRadarAreaManager::CRadarAreaManager(void)
 {
 }
 
-
-CRadarAreaManager::~CRadarAreaManager ( void )
+CRadarAreaManager::~CRadarAreaManager(void)
 {
     // Delete all the radar areas
-    DeleteAll ();
+    DeleteAll();
 }
 
-
-CRadarArea* CRadarAreaManager::Create ( CElement* pParent, CXMLNode* pNode )
+CRadarArea* CRadarAreaManager::Create(CElement* pParent, CXMLNode* pNode)
 {
     // Create the radar area
-    CRadarArea* pArea = new CRadarArea ( this, pParent, pNode );
+    CRadarArea* pArea = new CRadarArea(this, pParent, pNode);
 
     // If the id was invalid, delete it and return NULL
-    if ( pArea->GetID () == INVALID_ELEMENT_ID )
+    if (pArea->GetID() == INVALID_ELEMENT_ID)
     {
         delete pArea;
         return NULL;
@@ -40,15 +37,13 @@ CRadarArea* CRadarAreaManager::Create ( CElement* pParent, CXMLNode* pNode )
     return pArea;
 }
 
-
-CRadarArea* CRadarAreaManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CEvents* pEvents )
+CRadarArea* CRadarAreaManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
 {
     // Create the radar area
-    CRadarArea* pArea = new CRadarArea ( this, pParent, &Node );
+    CRadarArea* pArea = new CRadarArea(this, pParent, &Node);
 
     // If the id was invalid, delete it and return NULL
-    if ( pArea->GetID () == INVALID_ELEMENT_ID ||
-         !pArea->LoadFromCustomData ( pEvents ) )
+    if (pArea->GetID() == INVALID_ELEMENT_ID || !pArea->LoadFromCustomData(pEvents))
     {
         delete pArea;
         return NULL;
@@ -58,21 +53,18 @@ CRadarArea* CRadarAreaManager::CreateFromXML ( CElement* pParent, CXMLNode& Node
     return pArea;
 }
 
-
-void CRadarAreaManager::DeleteAll ( void )
+void CRadarAreaManager::DeleteAll(void)
 {
     // Delete all the radar areas
-    DeletePointersAndClearList ( m_List );
+    DeletePointersAndClearList(m_List);
 }
 
-
-bool CRadarAreaManager::Exists ( CRadarArea* pArea )
+bool CRadarAreaManager::Exists(CRadarArea* pArea)
 {
-    return ListContains ( m_List, pArea );
+    return ListContains(m_List, pArea);
 }
 
-
-void CRadarAreaManager::RemoveFromList ( CRadarArea* pArea )
+void CRadarAreaManager::RemoveFromList(CRadarArea* pArea)
 {
-    m_List.remove ( pArea );
+    m_List.remove(pArea);
 }

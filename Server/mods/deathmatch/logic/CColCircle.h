@@ -1,39 +1,38 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CColCircle.h
-*  PURPOSE:     Circle-shaped collision entity class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CColCircle.h
+ *  PURPOSE:     Circle-shaped collision entity class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CCOLCIRCLE_H
-#define __CCOLCIRCLE_H
+#pragma once
 
 #include "CColShape.h"
 
 class CColCircle : public CColShape
 {
 public:
-                    CColCircle      ( CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, float fRadius, CXMLNode* pNode = NULL, bool bIsPartnered = false );
+    CColCircle(CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, float fRadius, CXMLNode* pNode = NULL, bool bIsPartnered = false);
 
-    virtual CSphere         GetWorldBoundingSphere  ( void );
+    virtual CSphere GetWorldBoundingSphere(void);
 
-    eColShapeType   GetShapeType    ( void )            { return COLSHAPE_CIRCLE; }
+    eColShapeType GetShapeType(void) { return COLSHAPE_CIRCLE; }
 
-    bool            DoHitDetection  ( const CVector& vecNowPosition );
+    bool DoHitDetection(const CVector& vecNowPosition);
 
-    float           GetRadius       ( void )            { return m_fRadius; };
-    void            SetRadius       ( float fRadius )   { m_fRadius = fRadius; SizeChanged (); };
+    float GetRadius(void) { return m_fRadius; };
+    void  SetRadius(float fRadius)
+    {
+        m_fRadius = fRadius;
+        SizeChanged();
+    };
 
 protected:
-    bool            ReadSpecialData ( void );
+    bool ReadSpecialData(void);
 
-    float           m_fRadius;
+    float m_fRadius;
 };
-
-#endif

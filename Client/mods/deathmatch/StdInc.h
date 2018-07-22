@@ -39,7 +39,6 @@
 #include <CVector.h>
 #include <CVector4D.h>
 #include <CMatrix4.h>
-#include <CQuat.h>
 #include <CSphere.h>
 #include <CBox.h>
 #include <ijsify.h>
@@ -78,6 +77,7 @@
 #include <CClientStreamSectorRow.h>
 #include <CClientTask.h>
 #include <CClientTXD.h>
+#include <CClientIFP.h>
 #include <CClientWater.h>
 #include <CClientWeapon.h>
 #include <CClientRenderElement.h>
@@ -95,6 +95,9 @@
 #include <CLogger.h>
 #include <CMapEventManager.h>
 #include <CModelNames.h>
+#include <CIFPEngine.h>
+#include <CFileReader.h>
+#include <CIFPAnimations.h>
 #include <CScriptFile.h>
 #include <CWeaponNames.h>
 #include <CVehicleNames.h>
@@ -157,5 +160,3 @@
 #include "logic/CStaticFunctionDefinitions.h"
 #include "logic/CResourceFileDownloadManager.h"
 #include "../../version.h"
-
-

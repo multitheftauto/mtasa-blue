@@ -1,16 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientObject.h
-*  PURPOSE:     Physical object entity class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Christian Myhre Lundheim <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*               Jax <>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientObject.h
+ *  PURPOSE:     Physical object entity class
+ *
+ *****************************************************************************/
 
 class CClientObject;
 
@@ -28,127 +24,130 @@ struct SLastSyncedObjectData
 
 class CClientObject : public CClientStreamElement
 {
-    DECLARE_CLASS( CClientObject, CClientStreamElement )
+    DECLARE_CLASS(CClientObject, CClientStreamElement)
     friend class CClientObjectManager;
     friend class CClientPed;
 
 public:
-                                    CClientObject           ( class CClientManager* pManager, ElementID ID, unsigned short usModel, bool bLowLod );
-                                    ~CClientObject          ( void );
+    CClientObject(class CClientManager* pManager, ElementID ID, unsigned short usModel, bool bLowLod);
+    ~CClientObject(void);
 
-    void                            Unlink                  ( void );
-    
-    inline eClientEntityType        GetType                 ( void ) const                      { return CCLIENTOBJECT; };
+    void Unlink(void);
 
-    inline CObject *                GetGameObject           ( void )                            { return m_pObject; }
-    inline CEntity *                GetGameEntity           ( void )                            { return m_pObject; }
-    inline const CEntity*           GetGameEntity           ( void ) const                      { return m_pObject; }
+    eClientEntityType GetType(void) const { return CCLIENTOBJECT; };
 
-    void                            GetPosition             ( CVector& vecPosition ) const;
-    void                            SetPosition             ( const CVector& vecPosition );
-    virtual CSphere                 GetWorldBoundingSphere  ( void );
+    CObject*       GetGameObject(void) { return m_pObject; }
+    CEntity*       GetGameEntity(void) { return m_pObject; }
+    const CEntity* GetGameEntity(void) const { return m_pObject; }
 
-    void                            GetRotationDegrees      ( CVector& vecRotation ) const;
-    void                            GetRotationRadians      ( CVector& vecRotation ) const;
-    void                            SetRotationDegrees      ( const CVector& vecRotation );
-    virtual void                    SetRotationRadians      ( const CVector& vecRotation );
+    void            GetPosition(CVector& vecPosition) const;
+    void            SetPosition(const CVector& vecPosition);
+    virtual CSphere GetWorldBoundingSphere(void);
 
-    void                            GetMoveSpeed            ( CVector& vecMoveSpeed ) const;
-    void                            SetMoveSpeed            ( const CVector& vecMoveSpeed );
+    void         GetRotationDegrees(CVector& vecRotation) const;
+    void         GetRotationRadians(CVector& vecRotation) const;
+    void         SetRotationDegrees(const CVector& vecRotation);
+    virtual void SetRotationRadians(const CVector& vecRotation);
 
-    void                            GetTurnSpeed            ( CVector& vecTurnSpeed ) const;
-    void                            SetTurnSpeed            ( const CVector& vecTurnSpeed );
+    void GetMoveSpeed(CVector& vecMoveSpeed) const;
+    void SetMoveSpeed(const CVector& vecMoveSpeed);
 
-    void                            GetOrientation          ( CVector& vecPosition, CVector& vecRotationRadians );
-    virtual void                    SetOrientation          ( const CVector& vecPosition, const CVector& vecRotationRadians );
+    void GetTurnSpeed(CVector& vecTurnSpeed) const;
+    void SetTurnSpeed(const CVector& vecTurnSpeed);
 
-    void                            ModelRequestCallback    ( CModelInfo* pModelInfo );
+    void         GetOrientation(CVector& vecPosition, CVector& vecRotationRadians);
+    virtual void SetOrientation(const CVector& vecPosition, const CVector& vecRotationRadians);
 
-    float                           GetDistanceFromCentreOfMassToBaseOfModel ( void );
+    void ModelRequestCallback(CModelInfo* pModelInfo);
 
-    inline bool                     IsVisible               ( void )                            { return m_bIsVisible; };
-    void                            SetVisible              ( bool bVisible );
+    float GetDistanceFromCentreOfMassToBaseOfModel(void);
 
-    inline unsigned short           GetModel                ( void ) const                      { return m_usModel; };
-    void                            SetModel                ( unsigned short usModel );
+    bool IsVisible(void) { return m_bIsVisible; };
+    void SetVisible(bool bVisible);
 
-    bool                            IsLowLod                ( void );
-    bool                            SetLowLodObject         ( CClientObject* pLowLodObject );
-    CClientObject*                  GetLowLodObject         ( void );
+    unsigned short GetModel(void) const { return m_usModel; };
+    void           SetModel(unsigned short usModel);
 
-    void                            Render                  ( void );
+    bool           IsLowLod(void);
+    bool           SetLowLodObject(CClientObject* pLowLodObject);
+    CClientObject* GetLowLodObject(void);
 
-    inline bool                     IsFrozen                ( void )                            { return m_bIsFrozen; }
-    void                            SetFrozen               ( bool bFrozen );
-    
-    inline unsigned char            GetAlpha                ( void )                            { return m_ucAlpha; }   
-    void                            SetAlpha                ( unsigned char ucAlpha );
-    void                            GetScale                ( CVector& vecScale ) const;
-    void                            SetScale                ( const CVector& vecScale );
+    void Render(void);
 
-    inline bool                     IsCollisionEnabled      ( void )                            { return m_bUsesCollision; };
-    void                            SetCollisionEnabled     ( bool bCollisionEnabled );
+    bool IsFrozen(void) { return m_bIsFrozen; }
+    void SetFrozen(bool bFrozen);
 
-    float                           GetHealth               ( void );
-    void                            SetHealth               ( float fHealth );
+    unsigned char GetAlpha(void) { return m_ucAlpha; }
+    void          SetAlpha(unsigned char ucAlpha);
+    void          GetScale(CVector& vecScale) const;
+    void          SetScale(const CVector& vecScale);
 
-    bool                            IsBreakable             ( bool bCheckModelList = true );
-    bool                            SetBreakable            ( bool bBreakable );
-    bool                            Break                   ( void );
-    inline bool                     IsRespawnEnabled        ( void )                            { return m_bRespawnEnabled; };
-    inline void                     SetRespawnEnabled       ( bool bRespawnEnabled )            { m_bRespawnEnabled = bRespawnEnabled; };
+    bool IsCollisionEnabled(void) { return m_bUsesCollision; };
+    void SetCollisionEnabled(bool bCollisionEnabled);
 
-    float                           GetMass                 ( void );
-    void                            SetMass                 ( float fMass );
+    float GetHealth(void);
+    void  SetHealth(float fHealth);
 
-    void                            ReCreate                ( void );
-    void                            UpdateVisibility        ( void );
+    bool IsBreakable(bool bCheckModelList = true);
+    bool SetBreakable(bool bBreakable);
+    bool Break(void);
+    bool IsRespawnEnabled(void) { return m_bRespawnEnabled; };
+    void SetRespawnEnabled(bool bRespawnEnabled) { m_bRespawnEnabled = bRespawnEnabled; };
 
-    inline bool                     IsBeingRespawned        ( void )                            { return m_bBeingRespawned; };
-    inline void                     SetBeingRespawned       ( bool bBeingRespawned )            { m_bBeingRespawned = bBeingRespawned; };
+    float GetMass(void);
+    void  SetMass(float fMass);
 
+    bool IsVisibleInAllDimensions(void) { return m_bVisibleInAllDimensions; };
+    void SetVisibleInAllDimensions(bool bVisible, unsigned short usNewDimension = 0);
+
+    void ReCreate(void);
+    void UpdateVisibility(void);
+
+    bool IsBeingRespawned(void) { return m_bBeingRespawned; };
+    void SetBeingRespawned(bool bBeingRespawned) { m_bBeingRespawned = bBeingRespawned; };
 
 protected:
-    void                            StreamIn                ( bool bInstantly );
-    void                            StreamOut               ( void );
+    void StreamIn(bool bInstantly);
+    void StreamOut(void);
 
-    void                            Create                  ( void );
-    void                            Destroy                 ( void );
+    void Create(void);
+    void Destroy(void);
 
-    void                            NotifyCreate            ( void );
-    void                            NotifyDestroy           ( void );
+    void NotifyCreate(void);
+    void NotifyDestroy(void);
 
-    void                            StreamedInPulse         ( void );
+    void StreamedInPulse(void);
 
-    class CClientObjectManager*         m_pObjectManager;
-    class CClientModelRequestManager*   m_pModelRequester;
+    class CClientObjectManager*       m_pObjectManager;
+    class CClientModelRequestManager* m_pModelRequester;
 
-    unsigned short                      m_usModel;
+    unsigned short m_usModel;
 
-    CVector                             m_vecPosition;
-    CVector                             m_vecRotation;
-    bool                                m_bIsVisible;
-    bool                                m_bIsFrozen;
-    bool                                m_bUsesCollision;
-    unsigned char                       m_ucAlpha;
-    CVector                             m_vecScale;
-    float                               m_fHealth;
-    bool                                m_bBreakingDisabled;
-    bool                                m_bBeingRespawned;
-    bool                                m_bRespawnEnabled;
-    float                               m_fMass;
+    CVector       m_vecPosition;
+    CVector       m_vecRotation;
+    bool          m_bIsVisible;
+    bool          m_bIsFrozen;
+    bool          m_bUsesCollision;
+    unsigned char m_ucAlpha;
+    CVector       m_vecScale;
+    float         m_fHealth;
+    bool          m_bBreakingDisabled;
+    bool          m_bBeingRespawned;
+    bool          m_bRespawnEnabled;
+    float         m_fMass;
+    bool          m_bVisibleInAllDimensions = false;
 
-    CVector                             m_vecMoveSpeed;
-    CVector                             m_vecTurnSpeed;
+    CVector m_vecMoveSpeed;
+    CVector m_vecTurnSpeed;
 
-    const bool                          m_bIsLowLod;            // true if this object is low LOD
-    CClientObject*                      m_pLowLodObject;        // Pointer to low LOD version of this object
-    std::vector < CClientObject* >      m_HighLodObjectList;    // List of objects that use this object as a low LOD version
-    bool                                m_IsHiddenLowLod;       // true if this object is low LOD and should not be drawn
+    const bool                  m_bIsLowLod;                    // true if this object is low LOD
+    CClientObject*              m_pLowLodObject;                // Pointer to low LOD version of this object
+    std::vector<CClientObject*> m_HighLodObjectList;            // List of objects that use this object as a low LOD version
+    bool                        m_IsHiddenLowLod;               // true if this object is low LOD and should not be drawn
 
 public:
-    CObject*                            m_pObject;
-    SLastSyncedObjectData               m_LastSyncedData;
+    CObject*              m_pObject;
+    SLastSyncedObjectData m_LastSyncedData;
 };
 
 #endif

@@ -1,8 +1,8 @@
 #ifdef WIN32
 #pragma message("Compiling precompiled header.\n")
 
+#include <winsock2.h>
 #include <windows.h>
-#include <winsock.h>
 #include <mmsystem.h>
 #endif
 
@@ -38,7 +38,6 @@ struct SAclRequest;
 #include "CSphere.h"
 #include "CBox.h"
 #include "CMatrix.h"
-#include "CQuat.h"
 #include "net/Packets.h"
 #include "Enums.h"
 #include <bochs_internal/crc32.h>
@@ -308,4 +307,4 @@ struct SAclRequest;
 #include "../../version.h"
 
 extern CNetServer* g_pRealNetServer;
-extern CGame* g_pGame;
+extern CGame*      g_pGame;

@@ -1,15 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        multiplayer_sa/CPopulationSA.h
-*  PURPOSE:     Ped world population class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        multiplayer_sa/CPopulationSA.h
+ *  PURPOSE:     Ped world population class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include <multiplayer/CPopulationMP.h>
 
@@ -30,20 +28,21 @@
 class CPopulationSA : public CPopulationMP
 {
 private:
-    std::list < CCivilianPedSA* >               peds;
-    std::list < CCivilianPedSA* > ::iterator    pedIter;
-    DWORD                                       dwPedCount;
+    std::list<CCivilianPedSA*>           peds;
+    std::list<CCivilianPedSA*>::iterator pedIter;
+    DWORD                                dwPedCount;
+
 public:
-                        CPopulationSA();
-    VOID                AddPed ( CCivilianPed * ped );
-    VOID                AddPed ( CPedSAInterface * ped );
-    VOID                RemovePed ( CCivilianPed * ped );
-    VOID                RemovePed ( CPedSAInterface * ped );
-    DWORD               GetPedCount ( );
-    CCivilianPed *      GetFirstPed ( );
-    CCivilianPed *      GetNextPed ( );
-    void                SetCivilianAddHandler ( CivilianAddHandler * pCivilianAddHandler );
-    void                SetCivilianRemoveHandler ( CivilianAddHandler * pCivilianAddHandler );
+    CPopulationSA();
+    VOID          AddPed(CCivilianPed* ped);
+    VOID          AddPed(CPedSAInterface* ped);
+    VOID          RemovePed(CCivilianPed* ped);
+    VOID          RemovePed(CPedSAInterface* ped);
+    DWORD         GetPedCount();
+    CCivilianPed* GetFirstPed();
+    CCivilianPed* GetNextPed();
+    void          SetCivilianAddHandler(CivilianAddHandler* pCivilianAddHandler);
+    void          SetCivilianRemoveHandler(CivilianAddHandler* pCivilianAddHandler);
 };
 
 #endif

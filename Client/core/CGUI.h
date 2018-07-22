@@ -1,15 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CGUI.h
-*  PURPOSE:     Header file for core graphical user interface class
-*  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
-*               Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CGUI.h
+ *  PURPOSE:     Header file for core graphical user interface class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 class CLocalGUI;
 
@@ -39,88 +37,87 @@ class CLocalGUI;
 class CChat;
 class CDebugView;
 
-class CLocalGUI : public CSingleton < CLocalGUI >
+class CLocalGUI : public CSingleton<CLocalGUI>
 {
 public:
-                        CLocalGUI                        ( void );
-                        ~CLocalGUI                       ( void );
+    CLocalGUI(void);
+    ~CLocalGUI(void);
 
-    void                SetSkin                     ( const char* szName );
-    void                ChangeLocale                ( const char* szName );
+    void SetSkin(const char* szName);
+    void ChangeLocale(const char* szName);
 
-    void                CreateWindows               ( bool bGameIsAlreadyLoaded );
-    void                DestroyWindows              ( void );
+    void CreateWindows(bool bGameIsAlreadyLoaded);
+    void DestroyWindows(void);
 
-    void                CreateObjects               ( IUnknown* pDevice );
-    void                DestroyObjects              ( void );
+    void CreateObjects(IUnknown* pDevice);
+    void DestroyObjects(void);
 
-    void                DoPulse                     ( void );
+    void DoPulse(void);
 
-    void                Draw                        ( void );
-    void                Invalidate                  ( void );
-    void                Restore                     ( void );
+    void Draw(void);
+    void Invalidate(void);
+    void Restore(void);
 
-    void                DrawMouseCursor             ( void );
-    void                SetCursorPos                ( int iX, int iY, bool bForce = false );
+    void DrawMouseCursor(void);
+    void SetCursorPos(int iX, int iY, bool bForce = false, bool overrideStored = true);
 
-    CConsole*           GetConsole                  ( void );
-    void                SetConsoleVisible           ( bool bVisible );
-    bool                IsConsoleVisible            ( void );
-    void                EchoConsole                 ( const char* szText );
+    CConsole* GetConsole(void);
+    void      SetConsoleVisible(bool bVisible);
+    bool      IsConsoleVisible(void);
+    void      EchoConsole(const char* szText);
 
-    CMainMenu*          GetMainMenu                 ( void );
-    void                SetMainMenuVisible          ( bool bVisible );
-    bool                IsMainMenuVisible           ( void );
+    CMainMenu* GetMainMenu(void);
+    void       SetMainMenuVisible(bool bVisible);
+    bool       IsMainMenuVisible(void);
 
-    CChat*              GetChat                     ( void );
-    void                SetChatBoxVisible           ( bool bVisible );
-    bool                IsChatBoxVisible            ( void );
-    void                SetChatBoxInputEnabled      ( bool bInputEnabled );
-    bool                IsChatBoxInputEnabled       ( void );
-    void                EchoChat                    ( const char* szText, bool bColorCoded );
+    CChat* GetChat(void);
+    void   SetChatBoxVisible(bool bVisible);
+    bool   IsChatBoxVisible(void);
+    void   SetChatBoxInputEnabled(bool bInputEnabled);
+    bool   IsChatBoxInputEnabled(void);
+    void   EchoChat(const char* szText, bool bColorCoded);
 
-    bool                IsWebRequestGUIVisible      ( void );
+    bool IsWebRequestGUIVisible(void);
 
-    CDebugView*         GetDebugView                ( void );
-    void                SetDebugViewVisible         ( bool bVisible );
-    bool                IsDebugViewVisible          ( void );
-    void                EchoDebug                   ( const char* szText );
+    CDebugView* GetDebugView(void);
+    void        SetDebugViewVisible(bool bVisible);
+    bool        IsDebugViewVisible(void);
+    void        EchoDebug(const char* szText);
 
-    bool                ProcessMessage              ( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-    bool                InputGoesToGUI              ( void );
-    inline bool         IsCursorForcedVisible       ( void )                { return m_bForceCursorVisible; }
-    void                ForceCursorVisible          ( bool bVisible );
+    bool ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    bool InputGoesToGUI(void);
+    bool IsCursorForcedVisible(void) { return m_bForceCursorVisible; }
+    void ForceCursorVisible(bool bVisible);
 
-    void                InitiateUpdate              ( const char* szType, const char* szData, const char* szHost )      { m_pVersionUpdater->InitiateUpdate ( szType, szData, szHost ); }
-    bool                IsOptionalUpdateInfoRequired( const char* szHost )                          { return m_pVersionUpdater->IsOptionalUpdateInfoRequired ( szHost ); }
-    void                InitiateDataFilesFix        ( void )                                        { m_pVersionUpdater->InitiateDataFilesFix (); }
+    void InitiateUpdate(const char* szType, const char* szData, const char* szHost) { m_pVersionUpdater->InitiateUpdate(szType, szData, szHost); }
+    bool IsOptionalUpdateInfoRequired(const char* szHost) { return m_pVersionUpdater->IsOptionalUpdateInfoRequired(szHost); }
+    void InitiateDataFilesFix(void) { m_pVersionUpdater->InitiateDataFilesFix(); }
 
 private:
-    void                    UpdateCursor                ( void );
+    void UpdateCursor(void);
 
-    DWORD                   TranslateScanCodeToGUIKey   ( DWORD dwCharacter );
+    DWORD TranslateScanCodeToGUIKey(DWORD dwCharacter);
 
-    CConsole*               m_pConsole;
-    CMainMenu*              m_pMainMenu;
-    CChat*                  m_pChat;
-    CDebugView*             m_pDebugView;
+    CConsole*   m_pConsole;
+    CMainMenu*  m_pMainMenu;
+    CChat*      m_pChat;
+    CDebugView* m_pDebugView;
 
     CVersionUpdaterInterface* m_pVersionUpdater;
 
+    CGUILabel* m_pLabelVersionTag;
 
-    CGUILabel*              m_pLabelVersionTag;
+    bool  m_bForceCursorVisible;
+    bool  m_bChatboxVisible;
+    bool  m_pDebugViewVisible;
+    bool  m_bGUIHasInput;
+    int   m_uiActiveCompositionSize;
+    POINT m_StoredMousePosition;
 
-    bool                    m_bForceCursorVisible;
-    bool                    m_bChatboxVisible;
-    bool                    m_pDebugViewVisible;
-    bool                    m_bGUIHasInput;
-    int                     m_uiActiveCompositionSize;
-    POINT                   m_StoredMousePosition;
-
-    int                     m_LastSettingsRevision; // the revision number the last time we saw the skin change
-    SString                 m_LastSkinName;
-    SString                 m_LastLocaleName;
-    uint                    m_LocaleChangeCounter;
+    int     m_LastSettingsRevision;            // the revision number the last time we saw the skin change
+    SString m_LastSkinName;
+    SString m_LastLocaleName;
+    uint    m_LocaleChangeCounter;
 };
 
 #endif

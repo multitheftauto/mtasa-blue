@@ -18,4 +18,5 @@ project "zlib"
 	excludes {
 		"example.c"
 	}
-	
+
+	defines { "verbose=-1" }    -- Stop "bit length overflow" warning

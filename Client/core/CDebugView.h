@@ -1,15 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CDebugView.h
-*  PURPOSE:     Header file for debug view class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CDebugView.h
+ *  PURPOSE:     Header file for debug view class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CDEBUGVIEW_H
 #define __CDEBUGVIEW_H
@@ -24,10 +22,14 @@
 class CDebugView : public CChat
 {
 public:
-                CDebugView              ( CGUI* pManager, const CVector2D & vecPosition );
+    CDebugView(CGUI* pManager, const CVector2D& vecPosition);
 
-    void        Draw                    ( bool bUseCacheTexture );
-    void        Output                  ( const char* szText, bool bColorCoded );
+    void Draw(bool bUseCacheTexture, bool bAllowOutline);
+    void Output(const char* szText, bool bColorCoded);
+
+protected:
+    // Debug view doesn't support position changes unlike chat box
+    void UpdatePosition(void){};
 };
 
 #endif

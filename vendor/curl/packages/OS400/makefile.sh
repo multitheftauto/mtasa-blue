@@ -21,7 +21,7 @@ fi
 #       Create the DOCS source file if it does not exist.
 
 if action_needed "${LIBIFSNAME}/DOCS.FILE"
-then    CMD="CRTSRCPF FILE(${TARGETLIB}/DOCS) RCDLEN(112)"
+then    CMD="CRTSRCPF FILE(${TARGETLIB}/DOCS) RCDLEN(240)"
         CMD="${CMD} CCSID(${TGTCCSID}) TEXT('Documentation texts')"
         system "${CMD}"
 fi
@@ -31,10 +31,11 @@ fi
 
 for TEXT in "${TOPDIR}/COPYING" "${SCRIPTDIR}/README.OS400"             \
     "${TOPDIR}/CHANGES" "${TOPDIR}/docs/THANKS" "${TOPDIR}/docs/FAQ"    \
-    "${TOPDIR}/docs/FEATURES" "${TOPDIR}/docs/SSLCERTS"                 \
+    "${TOPDIR}/docs/FEATURES" "${TOPDIR}/docs/SSLCERTS.md"              \
     "${TOPDIR}/docs/RESOURCES" "${TOPDIR}/docs/VERSIONS"                \
-    "${TOPDIR}/docs/HISTORY"
+    "${TOPDIR}/docs/HISTORY.md"
 do      MEMBER="`basename \"${TEXT}\" .OS400`"
+        MEMBER="`basename \"${MEMBER}\" .md`"
         MEMBER="${LIBIFSNAME}/DOCS.FILE/`db2_name \"${MEMBER}\"`.MBR"
 
         if action_needed "${MEMBER}" "${TEXT}"

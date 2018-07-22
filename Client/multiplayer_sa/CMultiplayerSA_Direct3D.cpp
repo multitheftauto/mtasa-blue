@@ -1,31 +1,30 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        multiplayer_sa/CMultiplayerSA_Direct3D.cpp
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        multiplayer_sa/CMultiplayerSA_Direct3D.cpp
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 extern CCoreInterface* g_pCore;
 
 namespace
 {
-    IDirect3D9* ms_pDirect3D    = NULL;
-    UINT ms_Adapter             = 0;
-    D3DDEVTYPE ms_DeviceType    = D3DDEVTYPE_HAL;
-    HWND ms_hFocusWindow        = NULL;
-    DWORD ms_BehaviorFlags      = 0;
-    D3DPRESENT_PARAMETERS* ms_pPresentationParameters   = NULL;
-    IDirect3DDevice9** ms_ppReturnedDeviceInterface     = NULL;
-}
-
+    IDirect3D9*            ms_pDirect3D = NULL;
+    UINT                   ms_Adapter = 0;
+    D3DDEVTYPE             ms_DeviceType = D3DDEVTYPE_HAL;
+    HWND                   ms_hFocusWindow = NULL;
+    DWORD                  ms_BehaviorFlags = 0;
+    D3DPRESENT_PARAMETERS* ms_pPresentationParameters = NULL;
+    IDirect3DDevice9**     ms_ppReturnedDeviceInterface = NULL;
+}            // namespace
 
 DWORD RESTORE_Addr_PreCreateDevice;
 DWORD RESTORE_Size_PreCreateDevice;
-BYTE RESTORE_Bytes_PreCreateDevice[6];
+BYTE  RESTORE_Bytes_PreCreateDevice[6];
 
 ////////////////////////////////////////////////////////////////
 //
@@ -34,18 +33,19 @@ BYTE RESTORE_Bytes_PreCreateDevice[6];
 // Called before GTA creates the D3D device
 //
 ////////////////////////////////////////////////////////////////
-void _cdecl OnPreCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD* BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface )
+void _cdecl OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD* BehaviorFlags,
+                              D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface)
 {
     // Unpatch
-    MemCpy( (PVOID)RESTORE_Addr_PreCreateDevice, RESTORE_Bytes_PreCreateDevice, RESTORE_Size_PreCreateDevice );
+    MemCpy((PVOID)RESTORE_Addr_PreCreateDevice, RESTORE_Bytes_PreCreateDevice, RESTORE_Size_PreCreateDevice);
 
-    //g_pCore->OnPreCreateDevice( pDirect3D, Adapter, DeviceType, hFocusWindow, *BehaviorFlags, pPresentationParameters );
-    ms_pDirect3D                 = pDirect3D;
-    ms_Adapter                   = Adapter;
-    ms_DeviceType                = DeviceType;
-    ms_hFocusWindow              = hFocusWindow;
-    ms_BehaviorFlags             = *BehaviorFlags;
-    ms_pPresentationParameters   = pPresentationParameters;
+    // g_pCore->OnPreCreateDevice( pDirect3D, Adapter, DeviceType, hFocusWindow, *BehaviorFlags, pPresentationParameters );
+    ms_pDirect3D = pDirect3D;
+    ms_Adapter = Adapter;
+    ms_DeviceType = DeviceType;
+    ms_hFocusWindow = hFocusWindow;
+    ms_BehaviorFlags = *BehaviorFlags;
+    ms_pPresentationParameters = pPresentationParameters;
     ms_ppReturnedDeviceInterface = ppReturnedDeviceInterface;
 }
 
@@ -54,23 +54,23 @@ void _cdecl OnPreCreateDevice( IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE D
 #define HOOKPOS_PreCreateDevice_EU          0x007F679B
 #define HOOKSIZE_PreCreateDevice_US         6
 #define HOOKSIZE_PreCreateDevice_EU         6
-DWORD RETURN_PreCreateDevice_US =           0x07F6781;
-DWORD RETURN_PreCreateDevice_EU =           0x07F67C1;
-DWORD RETURN_PreCreateDevice_BOTH =         0;
+DWORD RETURN_PreCreateDevice_US = 0x07F6781;
+DWORD RETURN_PreCreateDevice_EU = 0x07F67C1;
+DWORD RETURN_PreCreateDevice_BOTH = 0;
 void _declspec(naked) HOOK_PreCreateDevice()
 {
     _asm
     {
         // Run replaced code
-        mov     ecx,dword ptr ds:[0C97C20h] 
-        push    0C97C28h 
-        push    0C9C040h 
-        push    eax  
+        mov     ecx,dword ptr ds:[0C97C20h]
+        push    0C97C28h
+        push    0C9C040h
+        push    eax
         mov     eax,dword ptr ds:[00C97C1Ch]
-        mov     edx,  [ecx] 
-        push    eax  
+        mov     edx,  [ecx]
+        push    eax
         mov     eax,dword ptr ds:[008E2428h]
-        push    eax  
+        push    eax
 
         mov     eax, ds:0x0C97C24       // __RwD3DAdapterIndex
         push    eax
@@ -94,7 +94,6 @@ void _declspec(naked) HOOK_PreCreateDevice()
     }
 }
 
-
 ////////////////////////////////////////////////////////////////
 //
 // OnPostCreateDevice
@@ -102,9 +101,10 @@ void _declspec(naked) HOOK_PreCreateDevice()
 // Called after GTA creates the D3D device
 //
 ////////////////////////////////////////////////////////////////
-HRESULT _cdecl OnPostCreateDevice( HRESULT hResult )
+HRESULT _cdecl OnPostCreateDevice(HRESULT hResult)
 {
-    return g_pCore->OnPostCreateDevice( hResult, ms_pDirect3D, ms_Adapter, ms_DeviceType, ms_hFocusWindow, ms_BehaviorFlags, ms_pPresentationParameters, ms_ppReturnedDeviceInterface );
+    return g_pCore->OnPostCreateDevice(hResult, ms_pDirect3D, ms_Adapter, ms_DeviceType, ms_hFocusWindow, ms_BehaviorFlags, ms_pPresentationParameters,
+                                       ms_ppReturnedDeviceInterface);
 }
 
 // Hook info
@@ -112,12 +112,12 @@ HRESULT _cdecl OnPostCreateDevice( HRESULT hResult )
 #define HOOKPOS_PostCreateDevice_EU         0x07F67C4
 #define HOOKSIZE_PostCreateDevice_US        6
 #define HOOKSIZE_PostCreateDevice_EU        6
-DWORD RETURN_PostCreateDevice_US =          0x07F678A;
-DWORD RETURN_PostCreateDevice_EU =          0x07F67CA;
-DWORD RETURN_PostCreateDevice_BOTH =        0;
-DWORD RETURN_PostCreateDeviceB_US =         0x07F6799;
-DWORD RETURN_PostCreateDeviceB_EU =         0x07F67D9;
-DWORD RETURN_PostCreateDeviceB_BOTH =       0;
+DWORD RETURN_PostCreateDevice_US = 0x07F678A;
+DWORD RETURN_PostCreateDevice_EU = 0x07F67CA;
+DWORD RETURN_PostCreateDevice_BOTH = 0;
+DWORD RETURN_PostCreateDeviceB_US = 0x07F6799;
+DWORD RETURN_PostCreateDeviceB_EU = 0x07F67D9;
+DWORD RETURN_PostCreateDeviceB_BOTH = 0;
 void _declspec(naked) HOOK_PostCreateDevice()
 {
     _asm
@@ -142,7 +142,6 @@ ok:
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CMultiplayerSA::InitHooks_Direct3D
@@ -150,8 +149,8 @@ ok:
 // Setup hook
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_Direct3D ( void )
+void CMultiplayerSA::InitHooks_Direct3D(void)
 {
-    EZHookInstall ( PreCreateDevice );
-    EZHookInstall ( PostCreateDevice );
+    EZHookInstall(PreCreateDevice);
+    EZHookInstall(PostCreateDevice);
 }

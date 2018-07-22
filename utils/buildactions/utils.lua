@@ -84,7 +84,7 @@ function os.expanddir_wildcard(from, to)
 end
 
 function os.md5_file(path)
-	if os.get() == "windows" then
+	if os.host() == "windows" then
 		local s = os.outputof(string.format("CertUtil -hashfile \"%s\" MD5", path))
 		return (s:match("\n(.*)\n(.*)") or ""):gsub(" ", "")
 	else
@@ -95,9 +95,20 @@ end
 function os.extract_archive(archive_path, target_path, override)
 	local flags = override and "-aoa" or "-aos"
 
-	if os.get() == "windows" then
+	if os.host() == "windows" then
 		os.executef("call \"utils\\7z\\7za.exe\" x \"%s\" %s -o\"%s\"", archive_path, flags, target_path)
 	else
 		os.executef("7z x \"%s\" %s -o\"%s\"", archive_path, flags, target_path)
+	end
+end
+
+function http.download_print_errors(url, file, options)
+	local result_str, response_code = http.download(url, file, options)
+	if result_str ~= "OK" then
+		print( "\nERROR: Failed to download " .. url .. "\n" .. result_str )
+		if response_code == 0 then
+			-- No response code means server was unreachable
+			print( "Check premake5 is not blocked by firewall rules" )
+		end
 	end
 end

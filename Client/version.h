@@ -5,7 +5,7 @@
 //
 
 //
-// To compile a client: 
+// To compile a client:
 //      1. set MTASA_VERSION_TYPE to VERSION_TYPE_CUSTOM
 //      2. Use netc.dll from the latest unstable build (nightly.mtasa.com)
 //
@@ -13,7 +13,7 @@
 // New version info
 #define MTASA_VERSION_MAJOR         1
 #define MTASA_VERSION_MINOR         5
-#define MTASA_VERSION_MAINTENANCE   3
+#define MTASA_VERSION_MAINTENANCE   5
 #define MTASA_VERSION_TYPE          VERSION_TYPE_CUSTOM
 #define MTASA_VERSION_BUILD         0
 
@@ -28,14 +28,12 @@
 #endif
 #define MTA_DM_FULL_STRING          "MTA:SA Client"
 
-
 // Compile types
 #define VERSION_TYPE_CUSTOM         0x01
 #define VERSION_TYPE_EXPERIMENTAL   0x03
 #define VERSION_TYPE_UNSTABLE       0x05
 #define VERSION_TYPE_UNTESTED       0x07
 #define VERSION_TYPE_RELEASE        0x09
-
 
 #define QUOTE_DEFINE2(c) #c
 #define QUOTE_DEFINE(x) QUOTE_DEFINE2(x)
@@ -72,12 +70,11 @@
     #error "Incorrect MTASA_VERSION_TYPE"
 #endif
 
-
 #define _ASE_VERSION QUOTE_DEFINE(MTASA_VERSION_MAJOR) "." QUOTE_DEFINE(MTASA_VERSION_MINOR)
 #define _NETCODE_VERSION_BRANCH_ID      0x4         // Use 0x1 - 0xF to indicate an incompatible branch is being used (0x0 is reserved, 0x4 is trunk)
-#define _CLIENT_NET_MODULE_VERSION      0x0A1       // (0x000 - 0xfff) Lvl9 wizards only
+#define _CLIENT_NET_MODULE_VERSION      0x0A8       // (0x000 - 0xfff) Lvl9 wizards only
 #define _NETCODE_VERSION                0x1DA       // (0x000 - 0xfff) Increment when net messages change (pre-release)
-#define MTA_DM_BITSTREAM_VERSION        0x067       // (0x000 - 0xfff) Increment when net messages change (post-release). (Changing will also require additional backward compatibility code).
+#define MTA_DM_BITSTREAM_VERSION        0x06B       // (0x000 - 0xfff) Increment when net messages change (post-release). (Changing will also require additional backward compatibility code).
 
 // To avoid user confusion, make sure the ASE version matches only if communication is possible
 #if defined(MTA_DM_CONNECT_TO_PUBLIC)

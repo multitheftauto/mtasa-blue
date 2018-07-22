@@ -1,11 +1,11 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CRenderItem.WebBrowser.cpp
-*  PURPOSE:     Web browser texture item class
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CRenderItem.WebBrowser.cpp
+ *  PURPOSE:     Web browser texture item class
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
@@ -16,18 +16,17 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-void CWebBrowserItem::PostConstruct ( CRenderItemManager* pRenderItemManager, uint uiSizeX, uint uiSizeY )
+void CWebBrowserItem::PostConstruct(CRenderItemManager* pRenderItemManager, uint uiSizeX, uint uiSizeY)
 {
-    Super::PostConstruct ( pRenderItemManager );
+    Super::PostConstruct(pRenderItemManager);
     m_uiSizeX = uiSizeX;
     m_uiSizeY = uiSizeY;
     m_uiSurfaceSizeX = uiSizeX;
     m_uiSurfaceSizeY = uiSizeY;
 
     // Initial creation of d3d data
-    CreateUnderlyingData ();
+    CreateUnderlyingData();
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -36,12 +35,11 @@ void CWebBrowserItem::PostConstruct ( CRenderItemManager* pRenderItemManager, ui
 //
 //
 ////////////////////////////////////////////////////////////////
-void CWebBrowserItem::PreDestruct ( void )
+void CWebBrowserItem::PreDestruct(void)
 {
-    ReleaseUnderlyingData ();
-    Super::PreDestruct ();
+    ReleaseUnderlyingData();
+    Super::PreDestruct();
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -50,11 +48,10 @@ void CWebBrowserItem::PreDestruct ( void )
 // Check underlying data is present
 //
 ////////////////////////////////////////////////////////////////
-bool CWebBrowserItem::IsValid ( void )
+bool CWebBrowserItem::IsValid(void)
 {
     return m_pD3DTexture && m_pD3DRenderTargetSurface;
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -63,11 +60,9 @@ bool CWebBrowserItem::IsValid ( void )
 // Release device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CWebBrowserItem::OnLostDevice ( void )
+void CWebBrowserItem::OnLostDevice(void)
 {
-    
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -76,11 +71,9 @@ void CWebBrowserItem::OnLostDevice ( void )
 // Recreate device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CWebBrowserItem::OnResetDevice ( void )
+void CWebBrowserItem::OnResetDevice(void)
 {
-    
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -89,29 +82,28 @@ void CWebBrowserItem::OnResetDevice ( void )
 //
 //
 ////////////////////////////////////////////////////////////////
-void CWebBrowserItem::CreateUnderlyingData ()
+void CWebBrowserItem::CreateUnderlyingData()
 {
-    assert ( !m_pD3DRenderTargetSurface );
-    assert ( !m_pD3DTexture );
+    assert(!m_pD3DRenderTargetSurface);
+    assert(!m_pD3DTexture);
 
-    D3DXCreateTexture ( m_pDevice, m_uiSizeX, m_uiSizeY, 1, 0, D3DFMT_A8B8G8R8, D3DPOOL_MANAGED, (IDirect3DTexture9**)&m_pD3DTexture );
-    
+    D3DXCreateTexture(m_pDevice, m_uiSizeX, m_uiSizeY, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, (IDirect3DTexture9**)&m_pD3DTexture);
+
     // Check texture created
-    if ( !m_pD3DTexture )
+    if (!m_pD3DTexture)
         return;
 
     // Get the render target surface here for convenience
-    ((IDirect3DTexture9*)m_pD3DTexture)->GetSurfaceLevel ( 0, &m_pD3DRenderTargetSurface );
+    ((IDirect3DTexture9*)m_pD3DTexture)->GetSurfaceLevel(0, &m_pD3DRenderTargetSurface);
 
     // Update surface size, although it probably will be unchanged | Todo: Remove this
     D3DSURFACE_DESC desc;
-    m_pD3DRenderTargetSurface->GetDesc ( &desc );
+    m_pD3DRenderTargetSurface->GetDesc(&desc);
     m_uiSurfaceSizeX = desc.Width;
     m_uiSurfaceSizeY = desc.Height;
 
-    m_iMemoryKBUsed = CRenderItemManager::CalcD3DResourceMemoryKBUsage ( m_pD3DRenderTargetSurface );
+    m_iMemoryKBUsed = CRenderItemManager::CalcD3DResourceMemoryKBUsage(m_pD3DRenderTargetSurface);
 }
-
 
 ////////////////////////////////////////////////////////////////
 //
@@ -120,10 +112,10 @@ void CWebBrowserItem::CreateUnderlyingData ()
 //
 //
 ////////////////////////////////////////////////////////////////
-void CWebBrowserItem::ReleaseUnderlyingData ( void )
+void CWebBrowserItem::ReleaseUnderlyingData(void)
 {
-    SAFE_RELEASE( m_pD3DRenderTargetSurface )
-    SAFE_RELEASE( m_pD3DTexture )
+    SAFE_RELEASE(m_pD3DRenderTargetSurface)
+    SAFE_RELEASE(m_pD3DTexture)
 }
 
 void CWebBrowserItem::Resize(const CVector2D& size)

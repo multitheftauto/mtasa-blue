@@ -554,8 +554,10 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             StrCpy $0 $INSTDIR
             Call RemoveVirtualStore
 
-            IfFileExists $GTA_DIR\gta_sa.exe +1 0
-            IfFileExists $GTA_DIR\gta-sa.exe 0 PathBad
+            Push $GTA_DIR 
+            Call IsGtaDirectory
+            Pop $0
+            ${If} $0 == "gta"
                 # Fix permissions for GTA install directory
                 FastPerms::FullAccessPlox "$GTA_DIR"
 
@@ -564,70 +566,57 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
                 !insertmacro UAC_AsUser_Call Function RemoveVirtualStore ${UAC_SYNCREGISTERS}
                 StrCpy $0 $GTA_DIR
                 Call RemoveVirtualStore
-            PathBad:
+            ${EndIf}
         ${EndIf}
         #############################################################
-        
+
+        # Handle "Grand Theft Auto San Andreas.exe" being present instead of gta_sa.exe
+        IfFileExists "$GTA_DIR\gta_sa.exe" noCopyReq
+            IfFileExists "$GTA_DIR\Grand Theft Auto San Andreas.exe" 0 noCopyReq
+                CopyFiles "$GTA_DIR\Grand Theft Auto San Andreas.exe" "$GTA_DIR\gta_sa.exe"
+        noCopyReq:
+
         #############################################################
         # Patch our San Andreas .exe if it is required
-            
-        IfFileExists $GTA_DIR\gta_sa.exe 0 TrySteamExe
-            # Check gta_sa.exe is greater than 1MB (Previous Steam patching may have failed)
-            ${GetSize} "$GTA_DIR" "/M=gta_sa.exe /S=0M /G=0" $0 $1 $2
-            StrCmp "$0" "0" TrySteamExe
-            !insertmacro GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5
-            DetailPrint "gta_sa.exe successfully detected ($ExeMD5)"
-            ${LogText} "GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5"
-            ${Switch} $ExeMD5
-                ${Case} "bf25c28e9f6c13bd2d9e28f151899373" #US 2.00
-                ${Case} "7fd5f9436bd66af716ac584ff32eb483" #US 1.01
-                ${Case} "d84326ba0e0ace89f87288ffe7504da4" #EU 3.00 Steam Mac
-                ${Case} "4e99d762f44b1d5e7652dfa7e73d6b6f" #EU 2.00
-                ${Case} "2ac4b81b3e85c8d0f9846591df9597d3" #EU 1.01
-                ${Case} "d0ad36071f0e9bead7bddea4fbda583f" #EU 1.01 GamersGate
-                ${Case} "25405921d1c47747fd01fd0bfe0a05ae" #EU 1.01 DEViANCE
-                ${Case} "9effcaf66b59b9f8fb8dff920b3f6e63" #DE 2.00
-                ${Case} "fa490564cd9811978085a7a8f8ed7b2a" #DE 1.01
-                ${Case} "49dd417760484a18017805df46b308b8" #DE 1.00
-                ${Case} "185f0970f5913d0912a89789af175ffe" #?? ?.?? 4,496,063 bytes
-                    #Create a backup of the GTA exe before patching
-                    CopyFiles "$GTA_DIR\gta_sa.exe" "$GTA_DIR\gta_sa.exe.bak"
-                    Call InstallPatch
-                    ${If} $PatchInstalled == "1"
-                        Goto CompletePatchProc
-                    ${EndIf}
-                    Goto NoExeFound
-                    ${Break}
-                ${Default}
-                    Goto CompletePatchProc #This gta_sa.exe doesn't need patching, let's continue
-                    ${Break}
-            ${EndSwitch}
-        TrySteamExe:
-            # Try with gta-sa.exe, then testapp.exe
-            nsArray::SetList array "gta-sa.exe" "testapp.exe" /end
+            nsArray::SetList array "gta_sa.exe" "gta-sa.exe" "testapp.exe" /end
             ${ForEachIn} array $0 $1
-                IfFileExists $GTA_DIR\$1 0 TrySteamNext
+                IfFileExists $GTA_DIR\$1 0 TryNextExe
+                ${GetSize} "$GTA_DIR" "/M=$1 /S=0M /G=0" $0 $3 $4
+                StrCmp "$0" "0" TryNextExe
                 !insertmacro GetMD5 $GTA_DIR\$1 $ExeMD5
                 DetailPrint "$1 successfully detected ($ExeMD5)"
-                ${LogText} "GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5"
+                ${LogText} "GetMD5 $GTA_DIR\$1 $ExeMD5"
                 ${Switch} $ExeMD5
+                    ${Case} "bf25c28e9f6c13bd2d9e28f151899373" #US 2.00
+                    ${Case} "7fd5f9436bd66af716ac584ff32eb483" #US 1.01
+                    ${Case} "d84326ba0e0ace89f87288ffe7504da4" #EU 3.00 Steam Mac
+                    ${Case} "4e99d762f44b1d5e7652dfa7e73d6b6f" #EU 2.00
+                    ${Case} "2ac4b81b3e85c8d0f9846591df9597d3" #EU 1.01
+                    ${Case} "d0ad36071f0e9bead7bddea4fbda583f" #EU 1.01 GamersGate
+                    ${Case} "25405921d1c47747fd01fd0bfe0a05ae" #EU 1.01 DEViANCE
+                    ${Case} "9effcaf66b59b9f8fb8dff920b3f6e63" #DE 2.00
+                    ${Case} "fa490564cd9811978085a7a8f8ed7b2a" #DE 1.01
+                    ${Case} "49dd417760484a18017805df46b308b8" #DE 1.00
+                    ${Case} "185f0970f5913d0912a89789af175ffe" #?? ?.?? 4,496,063 bytes
                     ${Case} "0fd315d1af41e26e536a78b4d4556488" #EU 3.00 Steam                   2007-12-04 11:50:50     5697536
                     ${Case} "2ed36a3cee7b77da86a343838e3516b6" #EU 3.01 Steam (2014 Nov update) 2014-10-14 21:58:05     5971456
                     ${Case} "5bfd4dd83989a8264de4b8e771f237fd" #EU 3.02 Steam (2014 Dec update) 2014-12-01 20:43:21     5971456
                     ${Case} "d9cb35c898d3298ca904a63e10ee18d7" #DE 3.02 Steam (2014 Dec update) 2016-08-11 20:57:22     5971456
-                        #Copy gta-sa.exe to gta_sa.exe and commence patching process
+                        #Copy to gta_sa.exe and commence patching process
                         CopyFiles "$GTA_DIR\$1" "$GTA_DIR\gta_sa.exe.bak"
                         Call InstallPatch
                         ${If} $PatchInstalled == "1"
                             Goto CompletePatchProc
                         ${EndIf}
-                        Goto TrySteamNext
+                        Goto TryNextExe
                         ${Break}
                     ${Default}
-                        Goto TrySteamNext
+                        ${If} $1 == "gta_sa.exe"
+                            Goto CompletePatchProc #This gta_sa.exe doesn't need patching, let's continue
+                        ${EndIf}
                         ${Break}
                 ${EndSwitch}
-            TrySteamNext:
+                TryNextExe:
             ${Next}
 
         NoExeFound:
@@ -677,11 +666,23 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\game_sa.dll"
         File "${FILES_ROOT}\mta\multiplayer_sa.dll"
         File "${FILES_ROOT}\mta\netc.dll"
-        File "${FILES_ROOT}\mta\libcurl.dll"
         File "${FILES_ROOT}\mta\loader.dll"
         File "${FILES_ROOT}\mta\pthread.dll"
         File "${FILES_ROOT}\mta\cefweb.dll"
-        
+        File "${FILES_ROOT}\mta\libwow64.dll"
+        File "${FILES_ROOT}\mta\wow64_helper.exe"
+
+        File "${FILES_ROOT}\mta\bass.dll"
+        File "${FILES_ROOT}\mta\bass_aac.dll"
+        File "${FILES_ROOT}\mta\bass_ac3.dll"
+        File "${FILES_ROOT}\mta\bass_fx.dll"
+        File "${FILES_ROOT}\mta\bassflac.dll"
+        File "${FILES_ROOT}\mta\bassmidi.dll"
+        File "${FILES_ROOT}\mta\bassmix.dll"
+        File "${FILES_ROOT}\mta\bassopus.dll"
+        File "${FILES_ROOT}\mta\basswma.dll"
+        File "${FILES_ROOT}\mta\tags.dll"
+
         SetOutPath "$INSTDIR\MTA"
 		File "${FILES_ROOT}\mta\chrome_elf.dll"
         File "${FILES_ROOT}\mta\libcef.dll"
@@ -714,16 +715,6 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             SetOutPath "$INSTDIR\MTA"
             File "${FILES_ROOT}\mta\d3dx9_42.dll"
             File "${FILES_ROOT}\mta\D3DCompiler_42.dll"
-            File "${FILES_ROOT}\mta\bass.dll"
-            File "${FILES_ROOT}\mta\basswma.dll"
-            File "${FILES_ROOT}\mta\bassmidi.dll"
-            File "${FILES_ROOT}\mta\bassflac.dll"
-            File "${FILES_ROOT}\mta\bass_aac.dll"
-            File "${FILES_ROOT}\mta\bass_ac3.dll"
-            File "${FILES_ROOT}\mta\bassmix.dll"
-            File "${FILES_ROOT}\mta\bass_fx.dll"
-            File "${FILES_ROOT}\mta\bassopus.dll"
-            File "${FILES_ROOT}\mta\tags.dll"
             File "${FILES_ROOT}\mta\sa.dat"
             File "${FILES_ROOT}\mta\vea.dll"
             File "${FILES_ROOT}\mta\vog.dll"
@@ -828,7 +819,6 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         File "${FILES_ROOT}\mta\xmll.dll"
         File "${SERVER_FILES_ROOT}\MTA Server.exe"
         File "${SERVER_FILES_ROOT}\net.dll"
-        File "${FILES_ROOT}\mta\libcurl.dll"
         File "${FILES_ROOT}\mta\pthread.dll"
         ${LogText} "-Section end - SERVER CORE"
     SectionEnd
@@ -1110,10 +1100,14 @@ Section Uninstall
 
     RmDir /r "$INSTDIR\MTA\cgui"
     RmDir /r "$INSTDIR\MTA\data"
+    RmDir /r "$INSTDIR\MTA\CEF"
+    RmDir /r "$INSTDIR\MTA\locale"
     Delete "$INSTDIR\MTA\*.dll"
-    Delete "$INSTDIR\MTA\*.ax"
-    Delete "$INSTDIR\MTA\*.txt"
+    Delete "$INSTDIR\MTA\*.exe"
+    Delete "$INSTDIR\MTA\*.dmp"
+    Delete "$INSTDIR\MTA\*.log"
     Delete "$INSTDIR\MTA\*.dat"
+    Delete "$INSTDIR\MTA\*.bin"
 
     RmDir /r "$APPDATA\MTA San Andreas All\${0.0}"
     ; TODO if $APPDATA\MTA San Andreas All\Common is the only one left, delete it
@@ -1878,7 +1872,8 @@ Function IsGtaDirectory
     ; gta_sa.exe or gta-sa.exe should exist
     IfFileExists "$0\gta_sa.exe" cont1
         IfFileExists "$0\gta-sa.exe" cont1
-            StrCpy $1 ""
+            IfFileExists "$0\Grand Theft Auto San Andreas.exe" cont1
+                StrCpy $1 ""
     cont1:
 
     ; data subdirectory should exist

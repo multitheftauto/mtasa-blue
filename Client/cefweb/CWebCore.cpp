@@ -1,12 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CWebCore.cpp
-*  PURPOSE:     Webbrowser class
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CWebCore.cpp
+ *  PURPOSE:     Webbrowser class
+ *
+ *****************************************************************************/
 #include "StdInc.h"
 #include "CWebCore.h"
 #include "CWebView.h"
@@ -18,27 +18,30 @@
 #include "WebBrowserHelpers.h"
 #include "CWebApp.h"
 
-#define CEF_ENABLE_SANDBOX
+//#define CEF_ENABLE_SANDBOX
 #ifdef CEF_ENABLE_SANDBOX
     #pragma comment(lib, "cef_sandbox.lib")
 #endif
 
-CWebCore::CWebCore ()
+CWebCore::CWebCore()
 {
     m_pRequestsGUI = nullptr;
     m_bTestmodeEnabled = false;
     m_pXmlConfig = nullptr;
     m_pFocusedWebView = nullptr;
 
-    MakeSureXMLNodesExist ();
-    InitialiseWhiteAndBlacklist ();
+    MakeSureXMLNodesExist();
+    InitialiseWhiteAndBlacklist();
 
     // Update dynamic lists from QA server
-    UpdateListsFromMaster ();
+    UpdateListsFromMaster();
 }
 
-CWebCore::~CWebCore ()
+CWebCore::~CWebCore()
 {
+    // Unregister schema factories
+    CefClearSchemeHandlerFactories();
+
     // Shutdown CEF
     CefShutdown();
 
@@ -46,10 +49,10 @@ CWebCore::~CWebCore ()
     delete m_pXmlConfig;
 }
 
-bool CWebCore::Initialise ()
+bool CWebCore::Initialise()
 {
-    CefMainArgs mainArgs;
-    void* sandboxInfo = nullptr;
+    CefMainArgs        mainArgs;
+    void*              sandboxInfo = nullptr;
     CefRefPtr<CWebApp> app(new CWebApp);
 
 #ifdef CEF_ENABLE_SANDBOX
@@ -64,13 +67,13 @@ bool CWebCore::Initialise ()
 
     // Specifiy sub process executable path
 #ifndef MTA_DEBUG
-    CefString ( &settings.browser_subprocess_path ).FromWString( FromUTF8( CalcMTASAPath ( "MTA\\CEF\\CEFLauncher.exe" ) ) );
+    CefString(&settings.browser_subprocess_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\CEFLauncher.exe")));
 #else
-    CefString ( &settings.browser_subprocess_path ).FromWString( FromUTF8( CalcMTASAPath ( "MTA\\CEF\\CEFLauncher_d.exe" ) ) );
+    CefString(&settings.browser_subprocess_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\CEFLauncher_d.exe")));
 #endif
-    CefString ( &settings.resources_dir_path ).FromWString ( FromUTF8( CalcMTASAPath( "MTA\\CEF") ) );
-    CefString ( &settings.locales_dir_path ).FromWString( FromUTF8( CalcMTASAPath( "MTA\\CEF\\locales" ) ) );
-    CefString ( &settings.log_file ).FromWString ( FromUTF8( CalcMTASAPath ( "MTA\\CEF\\cefdebug.txt" ) ) );
+    CefString(&settings.resources_dir_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF")));
+    CefString(&settings.locales_dir_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\locales")));
+    CefString(&settings.log_file).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\cefdebug.txt")));
 #ifdef MTA_DEBUG
     settings.log_severity = cef_log_severity_t::LOGSEVERITY_INFO;
 #else
@@ -80,288 +83,290 @@ bool CWebCore::Initialise ()
     settings.multi_threaded_message_loop = true;
     settings.windowless_rendering_enabled = true;
 
-    bool state = CefInitialize ( mainArgs, settings, app, sandboxInfo );
-    
+    bool state = CefInitialize(mainArgs, settings, app, sandboxInfo);
+
     // Register custom scheme handler factory
-    CefRegisterSchemeHandlerFactory ( "mtalocal", "", app );
-    CefRegisterSchemeHandlerFactory ( "http", "mta", app );
+    CefRegisterSchemeHandlerFactory("mtalocal", "", app);
+    CefRegisterSchemeHandlerFactory("http", "mta", app);
 
     return state;
 }
 
-CWebViewInterface* CWebCore::CreateWebView ( unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent )
+CWebViewInterface* CWebCore::CreateWebView(unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem,
+                                           bool bTransparent)
 {
     // Create our webview implementation
     CefRefPtr<CWebView> pWebView = new CWebView(bIsLocal, pWebBrowserRenderItem, bTransparent);
-    m_WebViews.push_back ( pWebView );
+    m_WebViews.push_back(pWebView);
 
-    return static_cast < CWebViewInterface* > ( pWebView.get () );
+    return static_cast<CWebViewInterface*>(pWebView.get());
 }
 
-void CWebCore::DestroyWebView ( CWebViewInterface* pWebViewInterface )
+void CWebCore::DestroyWebView(CWebViewInterface* pWebViewInterface)
 {
-    CefRefPtr<CWebView> pWebView = dynamic_cast<CWebView*> ( pWebViewInterface );
-    if ( pWebView )
+    CefRefPtr<CWebView> pWebView = dynamic_cast<CWebView*>(pWebViewInterface);
+    if (pWebView)
     {
         // Ensure that no attached events are in the queue
-        RemoveWebViewEvents ( pWebView );
+        RemoveWebViewEvents(pWebView);
 
-        m_WebViews.remove ( pWebView );
-        //pWebView->Release(); // Do not release since other references get corrupted then
-        pWebView->CloseBrowser ();
+        m_WebViews.remove(pWebView);
+        // pWebView->Release(); // Do not release since other references get corrupted then
+        pWebView->CloseBrowser();
     }
 }
 
-void CWebCore::DoPulse ()
+void CWebCore::DoPulse()
 {
     // Check for queued whitelist/blacklist downloads
-    g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadModeType::WEBBROWSER_LISTS )->ProcessQueuedFiles ();
+    g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadModeType::WEBBROWSER_LISTS)->ProcessQueuedFiles();
 
     // Execute queued events on the main thread (Lua calls must be executed on the main thread)
-    DoEventQueuePulse ();
+    DoEventQueuePulse();
 }
 
-CWebView* CWebCore::FindWebView ( CefRefPtr<CefBrowser> browser )
+CWebView* CWebCore::FindWebView(CefRefPtr<CefBrowser> browser)
 {
-    for ( auto pWebView : m_WebViews )
+    for (auto pWebView : m_WebViews)
     {
         // CefBrowser objects are not unique
-        if ( pWebView->GetCefBrowser ()->GetIdentifier () == browser->GetIdentifier () )
-            return pWebView.get ();
+        if (pWebView->GetCefBrowser()->GetIdentifier() == browser->GetIdentifier())
+            return pWebView.get();
     }
     return nullptr;
 }
 
-void CWebCore::AddEventToEventQueue ( std::function<void(void)> event, CWebView* pWebView, const SString& name )
+void CWebCore::AddEventToEventQueue(std::function<void(void)> event, CWebView* pWebView, const SString& name)
 {
 #ifndef MTA_DEBUG
     UNREFERENCED_PARAMETER(name);
 #endif
-    if ( pWebView && pWebView->IsBeingDestroyed () )
+    if (pWebView && pWebView->IsBeingDestroyed())
         return;
 
-    std::lock_guard<std::mutex> lock ( m_EventQueueMutex );
-    
+    std::lock_guard<std::mutex> lock(m_EventQueueMutex);
+
 #ifndef MTA_DEBUG
-    m_EventQueue.push_back ( EventEntry ( event, pWebView ) );
+    m_EventQueue.push_back(EventEntry(event, pWebView));
 #else
-    m_EventQueue.push_back ( EventEntry ( event, pWebView, name ) );
+    m_EventQueue.push_back(EventEntry(event, pWebView, name));
 #endif
 }
 
-void CWebCore::RemoveWebViewEvents ( CWebView* pWebView )
+void CWebCore::RemoveWebViewEvents(CWebView* pWebView)
 {
-    std::lock_guard<std::mutex> lock ( m_EventQueueMutex );
+    std::lock_guard<std::mutex> lock(m_EventQueueMutex);
 
-    for ( auto iter = m_EventQueue.begin (); iter != m_EventQueue.end (); )
+    for (auto iter = m_EventQueue.begin(); iter != m_EventQueue.end();)
     {
         // Increment iterator before we remove the element from the list (to guarantee iterator validity)
         auto tempIterator = iter++;
-        if ( tempIterator->pWebView == pWebView )
-            m_EventQueue.erase ( tempIterator );
+        if (tempIterator->pWebView == pWebView)
+            m_EventQueue.erase(tempIterator);
     }
 }
 
-void CWebCore::DoEventQueuePulse ()
+void CWebCore::DoEventQueuePulse()
 {
-    std::lock_guard<std::mutex> lock ( m_EventQueueMutex );
+    std::lock_guard<std::mutex> lock(m_EventQueueMutex);
 
-    for ( auto& event : m_EventQueue )
+    for (auto& event : m_EventQueue)
     {
-        event.callback ();
+        event.callback();
     }
 
     // Clear message queue
-    m_EventQueue.clear ();
+    m_EventQueue.clear();
 
     // Invoke paint method if necessary on the main thread
-    for ( auto& view : m_WebViews )
+    for (auto& view : m_WebViews)
     {
         view->UpdateTexture();
     }
 }
 
-eURLState CWebCore::GetDomainState ( const SString& strURL, bool bOutputDebug )
+eURLState CWebCore::GetDomainState(const SString& strURL, bool bOutputDebug)
 {
-    std::lock_guard<std::recursive_mutex> lock ( m_FilterMutex );
-    
-    // Initialize wildcard whitelist (be careful with modifying) | Todo: Think about the following
-    static SString wildcardWhitelist[] = { "*.googlevideo.com", "*.google.com", "*.youtube.com", "*.ytimg.com", "*.vimeocdn.com" };
+    std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
 
-    for ( int i = 0; i < sizeof(wildcardWhitelist) / sizeof(SString); ++i )
+    // Initialize wildcard whitelist (be careful with modifying) | Todo: Think about the following
+    static SString wildcardWhitelist[] = {"*.googlevideo.com", "*.google.com", "*.youtube.com", "*.ytimg.com", "*.vimeocdn.com"};
+
+    for (int i = 0; i < sizeof(wildcardWhitelist) / sizeof(SString); ++i)
     {
-        if ( WildcardMatch ( wildcardWhitelist[i], strURL ) )
+        if (WildcardMatch(wildcardWhitelist[i], strURL))
             return eURLState::WEBPAGE_ALLOWED;
     }
 
-    google::dense_hash_map<SString, WebFilterPair>::iterator iter = m_Whitelist.find ( strURL );
-    if ( iter != m_Whitelist.end () )
+    google::dense_hash_map<SString, WebFilterPair>::iterator iter = m_Whitelist.find(strURL);
+    if (iter != m_Whitelist.end())
     {
-        if ( iter->second.first == true )
+        if (iter->second.first == true)
             return eURLState::WEBPAGE_ALLOWED;
         else
         {
-            if ( m_bTestmodeEnabled && bOutputDebug ) DebugOutputThreadsafe ( SString ( "[BROWSER] Blocked page: %s", strURL.c_str () ), 255, 0, 0 );
+            if (m_bTestmodeEnabled && bOutputDebug)
+                DebugOutputThreadsafe(SString("[BROWSER] Blocked page: %s", strURL.c_str()), 255, 0, 0);
             return eURLState::WEBPAGE_DISALLOWED;
         }
     }
 
-    if ( m_bTestmodeEnabled && bOutputDebug ) DebugOutputThreadsafe ( SString ( "[BROWSER] Blocked page: %s", strURL.c_str () ), 255, 0, 0 );
+    if (m_bTestmodeEnabled && bOutputDebug)
+        DebugOutputThreadsafe(SString("[BROWSER] Blocked page: %s", strURL.c_str()), 255, 0, 0);
     return eURLState::WEBPAGE_NOT_LISTED;
 }
 
-SString CWebCore::GetDomainFromURL ( const SString& strURL )
+SString CWebCore::GetDomainFromURL(const SString& strURL)
 {
     CefURLParts urlParts;
-    if ( !CefParseURL ( strURL, urlParts ) || !urlParts.host.str )
+    if (strURL.empty() || !CefParseURL(strURL, urlParts) || !urlParts.host.str)
         return "";
 
-    return UTF16ToMbUTF8 ( urlParts.host.str );
+    return UTF16ToMbUTF8(urlParts.host.str);
 }
 
-void CWebCore::ResetFilter ( bool bResetRequestsOnly )
+void CWebCore::ResetFilter(bool bResetRequestsOnly)
 {
-    std::lock_guard<std::recursive_mutex> lock ( m_FilterMutex );
+    std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
 
     // Clear old data
-    m_PendingRequests.clear ();
+    m_PendingRequests.clear();
 
-    if ( !bResetRequestsOnly )
+    if (!bResetRequestsOnly)
     {
-        m_Whitelist.clear ();
+        m_Whitelist.clear();
 
         // Re-add "default" entries
-        InitialiseWhiteAndBlacklist ();
+        InitialiseWhiteAndBlacklist();
     }
     else
     {
         // Close requests GUI
-        if ( m_pRequestsGUI )
+        if (m_pRequestsGUI)
         {
             delete m_pRequestsGUI;
             m_pRequestsGUI = nullptr;
         }
 
         // Erase all WEBFILTER_REQUEST entries
-        google::dense_hash_map<SString, WebFilterPair>::iterator iter = m_Whitelist.begin ();
-        for ( ; iter != m_Whitelist.end (); )
+        google::dense_hash_map<SString, WebFilterPair>::iterator iter = m_Whitelist.begin();
+        for (; iter != m_Whitelist.end();)
         {
-            if ( iter->second.second == eWebFilterType::WEBFILTER_REQUEST )
-                m_Whitelist.erase ( iter++ );
+            if (iter->second.second == eWebFilterType::WEBFILTER_REQUEST)
+                m_Whitelist.erase(iter++);
             else
                 ++iter;
         }
     }
 }
 
-void CWebCore::InitialiseWhiteAndBlacklist ( bool bAddHardcoded, bool bAddDynamic )
+void CWebCore::InitialiseWhiteAndBlacklist(bool bAddHardcoded, bool bAddDynamic)
 {
-    if ( bAddDynamic )
+    if (bAddDynamic)
     {
         // Hardcoded whitelist
-        static SString whitelist[] = { 
-            "google.com", "youtube.com", "www.youtube-nocookie.com", "vimeo.com", "player.vimeo.com", "code.jquery.com",
-            "myvideo.com", "mtasa.com", "multitheftauto.com", "mtavc.com", "www.googleapis.com", "ajax.googleapis.com",
-        };
+        static SString whitelist[] = {
+            "google.com",         "youtube.com", "www.youtube-nocookie.com", "vimeo.com",           "player.vimeo.com", "code.jquery.com", "mtasa.com",
+            "multitheftauto.com", "mtavc.com",   "www.googleapis.com",       "ajax.googleapis.com", "localhost",        "127.0.0.1"};
 
         // Hardcoded blacklist
-        static SString blacklist[] = { "nobrain.dk" };
+        static SString blacklist[] = {"nobrain.dk"};
 
         // Blacklist or whitelist URLs now
-        for ( unsigned int i = 0; i < sizeof(whitelist) / sizeof(SString); ++i )
+        for (unsigned int i = 0; i < sizeof(whitelist) / sizeof(SString); ++i)
         {
-            AddAllowedPage ( whitelist[i], eWebFilterType::WEBFILTER_HARDCODED );
+            AddAllowedPage(whitelist[i], eWebFilterType::WEBFILTER_HARDCODED);
         }
-        for ( unsigned int i = 0; i < sizeof(blacklist) / sizeof(SString); ++i )
+        for (unsigned int i = 0; i < sizeof(blacklist) / sizeof(SString); ++i)
         {
-            AddBlockedPage ( blacklist[i], eWebFilterType::WEBFILTER_HARDCODED );
+            AddBlockedPage(blacklist[i], eWebFilterType::WEBFILTER_HARDCODED);
         }
     }
 
     // Load dynamic and custom blacklist from XML config
-    if ( bAddDynamic )
-        LoadListsFromXML ( true, true, true );
+    if (bAddDynamic)
+        LoadListsFromXML(true, true, true);
 }
 
-void CWebCore::AddAllowedPage ( const SString& strURL, eWebFilterType filterType )
+void CWebCore::AddAllowedPage(const SString& strURL, eWebFilterType filterType)
 {
-    std::lock_guard<std::recursive_mutex> lock ( m_FilterMutex );
+    std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
 
-    m_Whitelist[strURL] = std::pair<bool, eWebFilterType> ( true, filterType );
+    m_Whitelist[strURL] = std::pair<bool, eWebFilterType>(true, filterType);
 }
 
-void CWebCore::AddBlockedPage ( const SString& strURL, eWebFilterType filterType )
+void CWebCore::AddBlockedPage(const SString& strURL, eWebFilterType filterType)
 {
-    std::lock_guard<std::recursive_mutex> lock ( m_FilterMutex );
+    std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
 
-    m_Whitelist[strURL] = std::pair<bool, eWebFilterType> ( false, filterType );
+    m_Whitelist[strURL] = std::pair<bool, eWebFilterType>(false, filterType);
 }
 
-void CWebCore::RequestPages ( const std::vector<SString>& pages, WebRequestCallback* pCallback )
+void CWebCore::RequestPages(const std::vector<SString>& pages, WebRequestCallback* pCallback)
 {
     // Add to pending pages queue
     bool bNewItem = false;
-    for ( const auto& page : pages )
+    for (const auto& page : pages)
     {
-        eURLState status = GetDomainState ( page );
-        if ( status == eURLState::WEBPAGE_ALLOWED || status == eURLState::WEBPAGE_DISALLOWED )
+        eURLState status = GetDomainState(page);
+        if (status == eURLState::WEBPAGE_ALLOWED || status == eURLState::WEBPAGE_DISALLOWED)
             continue;
 
-        m_PendingRequests.insert ( page );
+        m_PendingRequests.insert(page);
         bNewItem = true;
     }
 
-    if ( bNewItem )
+    if (bNewItem)
     {
         // Open CEGUI dialog
-        if ( !m_pRequestsGUI )
+        if (!m_pRequestsGUI)
             m_pRequestsGUI = new CWebsiteRequests;
 
         // Set pending requests memo content and show the window
-        m_pRequestsGUI->SetPendingRequests ( m_PendingRequests, pCallback );
-        m_pRequestsGUI->Show ();
+        m_pRequestsGUI->SetPendingRequests(m_PendingRequests, pCallback);
+        m_pRequestsGUI->Show();
     }
     else
     {
         // Call callback immediately if nothing has changed (all entries are most likely already on the whitelist)
         // There is still the possibility that all websites are blacklisted; this is not the usual case tho, so ignore for now (TODO)
-        if ( pCallback )
+        if (pCallback)
             (*pCallback)(true, std::unordered_set<SString>(pages.begin(), pages.end()));
     }
 }
 
-std::unordered_set<SString> CWebCore::AllowPendingPages ( bool bRemember )
+std::unordered_set<SString> CWebCore::AllowPendingPages(bool bRemember)
 {
-    for ( const auto& request : m_PendingRequests )
+    for (const auto& request : m_PendingRequests)
     {
-        AddAllowedPage ( request, !bRemember ? eWebFilterType::WEBFILTER_REQUEST : eWebFilterType::WEBFILTER_USER );
+        AddAllowedPage(request, !bRemember ? eWebFilterType::WEBFILTER_REQUEST : eWebFilterType::WEBFILTER_USER);
     }
 
     // Trigger an event now
-    auto pCurrentMod = g_pCore->GetModManager ()->GetCurrentMod ();
-    if ( !pCurrentMod )
+    auto pCurrentMod = g_pCore->GetModManager()->GetCurrentMod();
+    if (!pCurrentMod)
         return std::unordered_set<SString>();
 
-    pCurrentMod->WebsiteRequestResultHandler ( m_PendingRequests );
+    pCurrentMod->WebsiteRequestResultHandler(m_PendingRequests);
 
-    if ( bRemember )
+    if (bRemember)
     {
-        std::vector<std::pair<SString, bool>> result; // Contains only allowed entries
-        g_pCore->GetWebCore ()->GetFilterEntriesByType ( result, eWebFilterType::WEBFILTER_USER, eWebFilterState::WEBFILTER_ALLOWED );
+        std::vector<std::pair<SString, bool>> result;            // Contains only allowed entries
+        g_pCore->GetWebCore()->GetFilterEntriesByType(result, eWebFilterType::WEBFILTER_USER, eWebFilterState::WEBFILTER_ALLOWED);
         std::vector<SString> customWhitelist;
-        for ( std::vector<std::pair<SString, bool>>::iterator iter = result.begin (); iter != result.end (); ++iter )
-            customWhitelist.push_back ( iter->first );
+        for (std::vector<std::pair<SString, bool>>::iterator iter = result.begin(); iter != result.end(); ++iter)
+            customWhitelist.push_back(iter->first);
 
-        WriteCustomList ( "customwhitelist", customWhitelist, false );
+        WriteCustomList("customwhitelist", customWhitelist, false);
     }
 
     auto allowedRequests(std::move(m_PendingRequests));
-    m_PendingRequests.clear(); // MSVC's move constructor already clears the list which isn't specified by the C++ standard though
+    m_PendingRequests.clear();            // MSVC's move constructor already clears the list which isn't specified by the C++ standard though
 
     return allowedRequests;
 }
 
-std::unordered_set<SString> CWebCore::DenyPendingPages ()
+std::unordered_set<SString> CWebCore::DenyPendingPages()
 {
     auto deniedRequests(std::move(m_PendingRequests));
     m_PendingRequests.clear();
@@ -369,328 +374,332 @@ std::unordered_set<SString> CWebCore::DenyPendingPages ()
     return deniedRequests;
 }
 
-bool CWebCore::IsRequestsGUIVisible ()
+bool CWebCore::IsRequestsGUIVisible()
 {
-    return m_pRequestsGUI && m_pRequestsGUI->IsVisible ();
+    return m_pRequestsGUI && m_pRequestsGUI->IsVisible();
 }
 
-void CWebCore::DebugOutputThreadsafe ( const SString& message, unsigned char R, unsigned char G, unsigned char B )
+void CWebCore::DebugOutputThreadsafe(const SString& message, unsigned char R, unsigned char G, unsigned char B)
 {
-    AddEventToEventQueue( [message, R, G, B]() {
-        g_pCore->DebugEchoColor ( message, R, G, B );
-    }, nullptr, "DebugOutputThreadsafe" );
+    AddEventToEventQueue([message, R, G, B]() { g_pCore->DebugEchoColor(message, R, G, B); }, nullptr, "DebugOutputThreadsafe");
 }
 
-bool CWebCore::GetRemotePagesEnabled ()
+bool CWebCore::GetRemotePagesEnabled()
 {
     bool bCanLoadRemotePages;
-    g_pCore->GetCVars ()->Get ( "browser_remote_websites", bCanLoadRemotePages );
+    g_pCore->GetCVars()->Get("browser_remote_websites", bCanLoadRemotePages);
     return bCanLoadRemotePages;
 }
 
-bool CWebCore::GetRemoteJavascriptEnabled ()
+bool CWebCore::GetRemoteJavascriptEnabled()
 {
     bool bIsRemoteJavascriptEnabled;
-    g_pCore->GetCVars ()->Get ( "browser_remote_javascript", bIsRemoteJavascriptEnabled );
+    g_pCore->GetCVars()->Get("browser_remote_javascript", bIsRemoteJavascriptEnabled);
     return bIsRemoteJavascriptEnabled;
 }
 
-void CWebCore::OnPreScreenshot ()
+void CWebCore::OnPreScreenshot()
 {
     // Clear all textures
-    g_pCore->GetWebCore ()->ClearTextures ();
+    g_pCore->GetWebCore()->ClearTextures();
 }
 
-void CWebCore::OnPostScreenshot ()
+void CWebCore::OnPostScreenshot()
 {
     // Re-draw textures
-    for ( auto& pWebView : m_WebViews )
+    for (auto& pWebView : m_WebViews)
     {
-        pWebView->GetCefBrowser ()->GetHost ()->Invalidate ( CefBrowserHost::PaintElementType::PET_VIEW );
+        pWebView->GetCefBrowser()->GetHost()->Invalidate(CefBrowserHost::PaintElementType::PET_VIEW);
     }
 }
 
-void CWebCore::ProcessInputMessage ( UINT uMsg, WPARAM wParam, LPARAM lParam )
+void CWebCore::ProcessInputMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    if ( !m_pFocusedWebView || !( uMsg == WM_KEYDOWN || uMsg == WM_KEYUP || uMsg == WM_CHAR || uMsg == WM_SYSCHAR || uMsg == WM_SYSKEYDOWN || uMsg == WM_SYSKEYUP ) )
+    if (!m_pFocusedWebView ||
+        !(uMsg == WM_KEYDOWN || uMsg == WM_KEYUP || uMsg == WM_CHAR || uMsg == WM_SYSCHAR || uMsg == WM_SYSKEYDOWN || uMsg == WM_SYSKEYUP))
         return;
 
     CefKeyEvent keyEvent;
     keyEvent.windows_key_code = wParam;
     keyEvent.native_key_code = lParam;
-    keyEvent.modifiers = GetCefKeyboardModifiers ( wParam, lParam );
+    keyEvent.modifiers = GetCefKeyboardModifiers(wParam, lParam);
     keyEvent.is_system_key = uMsg == WM_SYSCHAR || uMsg == WM_SYSKEYDOWN || uMsg == WM_SYSKEYUP;
 
-    if ( uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN )
+    if (uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN)
         keyEvent.type = cef_key_event_type_t::KEYEVENT_RAWKEYDOWN;
-    else if ( uMsg == WM_KEYUP || uMsg == WM_SYSKEYUP )
+    else if (uMsg == WM_KEYUP || uMsg == WM_SYSKEYUP)
         keyEvent.type = cef_key_event_type_t::KEYEVENT_KEYUP;
-    else if ( uMsg == WM_CHAR || uMsg == WM_SYSCHAR )
+    else if (uMsg == WM_CHAR || uMsg == WM_SYSCHAR)
         keyEvent.type = cef_key_event_type_t::KEYEVENT_CHAR;
 
-    m_pFocusedWebView->InjectKeyboardEvent ( keyEvent );
+    m_pFocusedWebView->InjectKeyboardEvent(keyEvent);
 }
 
-void CWebCore::ClearTextures ()
+void CWebCore::ClearTextures()
 {
-    for ( auto& pWebBrowser : m_WebViews )
+    for (auto& pWebBrowser : m_WebViews)
     {
-        pWebBrowser->ClearTexture ();
+        pWebBrowser->ClearTexture();
     }
 }
 
-bool CWebCore::SetGlobalAudioVolume ( float fVolume )
+bool CWebCore::SetGlobalAudioVolume(float fVolume)
 {
-    if ( fVolume < 0.0f || fVolume > 1.0f )
+    if (fVolume < 0.0f || fVolume > 1.0f)
         return false;
 
-    for ( auto& pWebView : m_WebViews )
+    for (auto& pWebView : m_WebViews)
     {
-        pWebView->SetAudioVolume ( fVolume );
+        pWebView->SetAudioVolume(fVolume);
     }
     return true;
 }
 
-bool CWebCore::UpdateListsFromMaster ()
+bool CWebCore::UpdateListsFromMaster()
 {
-    if ( !m_pXmlConfig )
+    if (!m_pXmlConfig)
         return false;
 
-    CXMLNode* pRootNode = m_pXmlConfig->GetRootNode ();
-    if ( !pRootNode || !MakeSureXMLNodesExist () )
+    CXMLNode* pRootNode = m_pXmlConfig->GetRootNode();
+    if (!pRootNode || !MakeSureXMLNodesExist())
         return false;
 
     // Fetch white- and blacklist revision from config
-    CXMLNode* pWhiteRevNode = pRootNode->FindSubNode ( "whitelistrev" );
-    if ( !pWhiteRevNode || !pWhiteRevNode->GetTagContent ( m_iWhitelistRevision ) )
+    CXMLNode* pWhiteRevNode = pRootNode->FindSubNode("whitelistrev");
+    if (!pWhiteRevNode || !pWhiteRevNode->GetTagContent(m_iWhitelistRevision))
     {
-       m_iWhitelistRevision = 0;
+        m_iWhitelistRevision = 0;
     }
-    CXMLNode* pBlackRevNode = pRootNode->FindSubNode ( "blacklistrev" );
-    if ( !pBlackRevNode || !pBlackRevNode->GetTagContent ( m_iBlacklistRevision ) )
+    CXMLNode* pBlackRevNode = pRootNode->FindSubNode("blacklistrev");
+    if (!pBlackRevNode || !pBlackRevNode->GetTagContent(m_iBlacklistRevision))
     {
-       m_iBlacklistRevision = 0;
+        m_iBlacklistRevision = 0;
     }
 
     // Get last update timestamp and compare with current time
-    CXMLNode* pLastUpdateNode = pRootNode->FindSubNode ( "lastupdate" );
-    if ( pLastUpdateNode )
+    CXMLNode* pLastUpdateNode = pRootNode->FindSubNode("lastupdate");
+    if (pLastUpdateNode)
     {
-        SString lastUpdateTime = pLastUpdateNode->GetTagContent ();
+        SString lastUpdateTime = pLastUpdateNode->GetTagContent();
 
         time_t currentTime;
-        time ( &currentTime );
+        time(&currentTime);
 
-        if ( lastUpdateTime < SString ( "%d", (long long)currentTime - BROWSER_LIST_UPDATE_INTERVAL ) )
+        if (lastUpdateTime < SString("%d", (long long)currentTime - BROWSER_LIST_UPDATE_INTERVAL))
         {
         #ifdef MTA_DEBUG
-            OutputDebugLine ( "Updating white- and blacklist..." );
+            OutputDebugLine("Updating white- and blacklist...");
         #endif
-            g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadModeType::WEBBROWSER_LISTS )->QueueFile ( SString("%s?type=getrev", BROWSER_UPDATE_URL),
-                NULL, 0, NULL, 0, false, this, &CWebCore::StaticFetchRevisionFinished, false, 3 );
+            g_pCore->GetNetwork()
+                ->GetHTTPDownloadManager(EDownloadModeType::WEBBROWSER_LISTS)
+                ->QueueFile(SString("%s?type=getrev", BROWSER_UPDATE_URL), NULL, NULL, 0, false, this, &CWebCore::StaticFetchRevisionFinished, false, 3);
 
-            pLastUpdateNode->SetTagContent ( SString ( "%d", (long long)currentTime ) );
-            m_pXmlConfig->Write ();
+            pLastUpdateNode->SetTagContent(SString("%d", (long long)currentTime));
+            m_pXmlConfig->Write();
         }
     }
 
     return true;
 }
 
-bool CWebCore::MakeSureXMLNodesExist ()
+bool CWebCore::MakeSureXMLNodesExist()
 {
     // Check xml file
-    if ( !m_pXmlConfig )
+    if (!m_pXmlConfig)
     {
-        SString browserDataPath = CalcMTASAPath ( MTA_BROWSERDATA_PATH );
-        bool exists = FileExists ( browserDataPath );
+        SString browserDataPath = CalcMTASAPath(MTA_BROWSERDATA_PATH);
+        bool    exists = FileExists(browserDataPath);
 
-        m_pXmlConfig = g_pCore->GetXML ()->CreateXML ( browserDataPath );
+        m_pXmlConfig = g_pCore->GetXML()->CreateXML(browserDataPath);
 
-        if ( !m_pXmlConfig || ( exists && !m_pXmlConfig->Parse () ) )
+        if (!m_pXmlConfig || (exists && !m_pXmlConfig->Parse()))
             return false;
     }
 
-    CXMLNode* pRootNode = m_pXmlConfig->GetRootNode ();
-    if ( !pRootNode )
+    CXMLNode* pRootNode = m_pXmlConfig->GetRootNode();
+    if (!pRootNode)
     {
-        pRootNode = m_pXmlConfig->CreateRootNode ( "browserdata" );
-        if ( !pRootNode )
+        pRootNode = m_pXmlConfig->CreateRootNode("browserdata");
+        if (!pRootNode)
             return false;
     }
 
-    if ( !pRootNode->FindSubNode ( "lastupdate" ) )
+    if (!pRootNode->FindSubNode("lastupdate"))
     {
-        CXMLNode* pNode = pRootNode->CreateSubNode ( "lastupdate" );
-        if ( !pNode )
+        CXMLNode* pNode = pRootNode->CreateSubNode("lastupdate");
+        if (!pNode)
             return false;
 
-        pNode->SetTagContent ( 0 );
+        pNode->SetTagContent(0);
     }
 
-    if ( !pRootNode->FindSubNode ( "whitelistrev" ) )
+    if (!pRootNode->FindSubNode("whitelistrev"))
     {
-        if ( !pRootNode->CreateSubNode ( "whitelistrev" ) )
-            return false;
-    }
-
-    if ( !pRootNode->FindSubNode ( "blacklistrev" ) )
-    {
-        if ( !pRootNode->CreateSubNode ( "blacklistrev" ) )
+        if (!pRootNode->CreateSubNode("whitelistrev"))
             return false;
     }
 
-    if ( !pRootNode->FindSubNode ( "globalwhitelist" ) )
+    if (!pRootNode->FindSubNode("blacklistrev"))
     {
-        if ( !pRootNode->CreateSubNode ( "globalwhitelist" ) )
+        if (!pRootNode->CreateSubNode("blacklistrev"))
             return false;
     }
 
-    if ( !pRootNode->FindSubNode ( "globalblacklist" ) )
+    if (!pRootNode->FindSubNode("globalwhitelist"))
     {
-        if ( !pRootNode->CreateSubNode ( "globalblacklist" ) )
+        if (!pRootNode->CreateSubNode("globalwhitelist"))
             return false;
     }
 
-    if ( !pRootNode->FindSubNode ( "customblacklist" ) )
+    if (!pRootNode->FindSubNode("globalblacklist"))
     {
-        if ( !pRootNode->CreateSubNode ( "customblacklist" ) )
+        if (!pRootNode->CreateSubNode("globalblacklist"))
             return false;
     }
 
-    if ( !pRootNode->FindSubNode ( "customwhitelist" ) )
+    if (!pRootNode->FindSubNode("customblacklist"))
     {
-        if ( !pRootNode->CreateSubNode ( "customwhitelist" ) )
+        if (!pRootNode->CreateSubNode("customblacklist"))
+            return false;
+    }
+
+    if (!pRootNode->FindSubNode("customwhitelist"))
+    {
+        if (!pRootNode->CreateSubNode("customwhitelist"))
             return false;
     }
 
     return true;
 }
 
-void CWebCore::LoadListsFromXML ( bool bWhitelist, bool bBlacklist, bool bCustomLists )
+void CWebCore::LoadListsFromXML(bool bWhitelist, bool bBlacklist, bool bCustomLists)
 {
-    if ( !m_pXmlConfig )
+    if (!m_pXmlConfig)
         return;
 
-    CXMLNode* pRootNode = m_pXmlConfig->GetRootNode ();
-    if ( !pRootNode )
+    CXMLNode* pRootNode = m_pXmlConfig->GetRootNode();
+    if (!pRootNode)
         return;
 
-    if ( bWhitelist )
+    if (bWhitelist)
     {
-        CXMLNode* pWhiteSubNode = pRootNode->FindSubNode ( "globalwhitelist" );
-        if ( pWhiteSubNode )
+        CXMLNode* pWhiteSubNode = pRootNode->FindSubNode("globalwhitelist");
+        if (pWhiteSubNode)
         {
-            for ( std::list<CXMLNode*>::iterator iter = pWhiteSubNode->ChildrenBegin (); iter != pWhiteSubNode->ChildrenEnd (); ++iter )
+            for (std::list<CXMLNode*>::iterator iter = pWhiteSubNode->ChildrenBegin(); iter != pWhiteSubNode->ChildrenEnd(); ++iter)
             {
-                AddAllowedPage ( (*iter)->GetTagContent (), eWebFilterType::WEBFILTER_DYNAMIC );
-            }
-        }
-    }
-    
-    if ( bBlacklist )
-    {
-        CXMLNode* pBlackSubNode = pRootNode->FindSubNode ( "globalblacklist" );
-        if ( pBlackSubNode )
-        {
-            for ( std::list<CXMLNode*>::iterator iter = pBlackSubNode->ChildrenBegin (); iter != pBlackSubNode->ChildrenEnd (); ++iter )
-            {
-                AddBlockedPage ( (*iter)->GetTagContent (), eWebFilterType::WEBFILTER_DYNAMIC );
+                AddAllowedPage((*iter)->GetTagContent(), eWebFilterType::WEBFILTER_DYNAMIC);
             }
         }
     }
 
-    if ( bCustomLists )
+    if (bBlacklist)
     {
-        CXMLNode* pBlackSubNode = pRootNode->FindSubNode ( "customblacklist" );
-        if ( pBlackSubNode )
+        CXMLNode* pBlackSubNode = pRootNode->FindSubNode("globalblacklist");
+        if (pBlackSubNode)
         {
-            for ( std::list<CXMLNode*>::iterator iter = pBlackSubNode->ChildrenBegin (); iter != pBlackSubNode->ChildrenEnd (); ++iter )
+            for (std::list<CXMLNode*>::iterator iter = pBlackSubNode->ChildrenBegin(); iter != pBlackSubNode->ChildrenEnd(); ++iter)
             {
-                AddBlockedPage ( (*iter)->GetTagContent (), eWebFilterType::WEBFILTER_USER );
+                AddBlockedPage((*iter)->GetTagContent(), eWebFilterType::WEBFILTER_DYNAMIC);
             }
         }
-        CXMLNode* pWhiteSubNode = pRootNode->FindSubNode ( "customwhitelist" );
-        if ( pWhiteSubNode )
+    }
+
+    if (bCustomLists)
+    {
+        CXMLNode* pBlackSubNode = pRootNode->FindSubNode("customblacklist");
+        if (pBlackSubNode)
         {
-            for ( std::list<CXMLNode*>::iterator iter = pWhiteSubNode->ChildrenBegin (); iter != pWhiteSubNode->ChildrenEnd (); ++iter )
+            for (std::list<CXMLNode*>::iterator iter = pBlackSubNode->ChildrenBegin(); iter != pBlackSubNode->ChildrenEnd(); ++iter)
             {
-                AddAllowedPage ( (*iter)->GetTagContent (), eWebFilterType::WEBFILTER_USER );
+                AddBlockedPage((*iter)->GetTagContent(), eWebFilterType::WEBFILTER_USER);
+            }
+        }
+        CXMLNode* pWhiteSubNode = pRootNode->FindSubNode("customwhitelist");
+        if (pWhiteSubNode)
+        {
+            for (std::list<CXMLNode*>::iterator iter = pWhiteSubNode->ChildrenBegin(); iter != pWhiteSubNode->ChildrenEnd(); ++iter)
+            {
+                AddAllowedPage((*iter)->GetTagContent(), eWebFilterType::WEBFILTER_USER);
             }
         }
     }
 }
 
-void CWebCore::WriteCustomList ( const SString& strListName, const std::vector<SString>& customList, bool bReset )
+void CWebCore::WriteCustomList(const SString& strListName, const std::vector<SString>& customList, bool bReset)
 {
-    if ( !m_pXmlConfig || !MakeSureXMLNodesExist () )
+    if (!m_pXmlConfig || !MakeSureXMLNodesExist())
         return;
 
-    CXMLNode* pRootNode = m_pXmlConfig->GetRootNode ();
-    if ( !pRootNode )
+    CXMLNode* pRootNode = m_pXmlConfig->GetRootNode();
+    if (!pRootNode)
         return;
 
-    CXMLNode* pCustomListNode = pRootNode->FindSubNode ( strListName );
-    if ( !pCustomListNode )
+    CXMLNode* pCustomListNode = pRootNode->FindSubNode(strListName);
+    if (!pCustomListNode)
         return;
 
     pCustomListNode->DeleteAllSubNodes();
-    for ( std::vector<SString>::const_iterator iter = customList.begin (); iter != customList.end (); ++iter )
+    for (std::vector<SString>::const_iterator iter = customList.begin(); iter != customList.end(); ++iter)
     {
-        CXMLNode* pNode = pCustomListNode->CreateSubNode ( "url" );
-        if ( pNode )
-            pNode->SetTagContent ( *iter );
+        CXMLNode* pNode = pCustomListNode->CreateSubNode("url");
+        if (pNode)
+            pNode->SetTagContent(*iter);
     }
 
     // Write custom blacklist and reload from XML
-    m_pXmlConfig->Write ();
-    if ( bReset )
-        ResetFilter ( false );
+    m_pXmlConfig->Write();
+    if (bReset)
+        ResetFilter(false);
 }
 
-void CWebCore::GetFilterEntriesByType ( std::vector<std::pair<SString, bool>>& outEntries, eWebFilterType filterType, eWebFilterState state )
+void CWebCore::GetFilterEntriesByType(std::vector<std::pair<SString, bool>>& outEntries, eWebFilterType filterType, eWebFilterState state)
 {
-    std::lock_guard<std::recursive_mutex> lock ( m_FilterMutex );
+    std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
 
-    google::dense_hash_map<SString, WebFilterPair>::iterator iter = m_Whitelist.begin ();
-    for ( ; iter != m_Whitelist.end(); ++iter )
+    google::dense_hash_map<SString, WebFilterPair>::iterator iter = m_Whitelist.begin();
+    for (; iter != m_Whitelist.end(); ++iter)
     {
-        if ( iter->second.second == filterType )
+        if (iter->second.second == filterType)
         {
-            if ( state == eWebFilterState::WEBFILTER_ALL )
-                outEntries.push_back ( std::pair<SString, bool> ( iter->first, iter->second.first ) );
-            else if ( state == eWebFilterState::WEBFILTER_ALLOWED && iter->second.first == true )
-                outEntries.push_back ( std::pair<SString, bool> ( iter->first, iter->second.first ) );
+            if (state == eWebFilterState::WEBFILTER_ALL)
+                outEntries.push_back(std::pair<SString, bool>(iter->first, iter->second.first));
+            else if (state == eWebFilterState::WEBFILTER_ALLOWED && iter->second.first == true)
+                outEntries.push_back(std::pair<SString, bool>(iter->first, iter->second.first));
             else
-                outEntries.push_back ( std::pair<SString, bool> ( iter->first, iter->second.first ) );
+                outEntries.push_back(std::pair<SString, bool>(iter->first, iter->second.first));
         }
     }
 }
 
-void CWebCore::StaticFetchRevisionFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+void CWebCore::StaticFetchRevisionFinished(const SHttpDownloadResult& result)
 {
-    CWebCore* pWebCore = static_cast < CWebCore* > ( pObj );
-    if ( bSuccess )
+    CWebCore* pWebCore = static_cast<CWebCore*>(result.pObj);
+    if (result.bSuccess)
     {
-        SString strData = pCompletedData;
+        SString strData = result.pData;
         SString strWhiteRevision, strBlackRevision;
-        strData.Split ( ";", &strWhiteRevision, &strBlackRevision );
+        strData.Split(";", &strWhiteRevision, &strBlackRevision);
 
-        if ( !strWhiteRevision.empty () && !strBlackRevision.empty () )
+        if (!strWhiteRevision.empty() && !strBlackRevision.empty())
         {
-            int iWhiteListRevision = atoi ( strWhiteRevision );
-            if ( iWhiteListRevision > pWebCore->m_iWhitelistRevision )
+            int iWhiteListRevision = atoi(strWhiteRevision);
+            if (iWhiteListRevision > pWebCore->m_iWhitelistRevision)
             {
-                g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadModeType::WEBBROWSER_LISTS )->QueueFile ( SString("%s?type=fetchwhite", BROWSER_UPDATE_URL ),
-                    NULL, 0, NULL, 0, false, pWebCore, &CWebCore::StaticFetchWhitelistFinished, false, 3 );
+                g_pCore->GetNetwork()
+                    ->GetHTTPDownloadManager(EDownloadModeType::WEBBROWSER_LISTS)
+                    ->QueueFile(SString("%s?type=fetchwhite", BROWSER_UPDATE_URL), NULL, NULL, 0, false, pWebCore, &CWebCore::StaticFetchWhitelistFinished,
+                                false, 3);
 
                 pWebCore->m_iWhitelistRevision = iWhiteListRevision;
             }
-            int iBlackListRevision = atoi ( strBlackRevision );
-            if ( iBlackListRevision > pWebCore->m_iBlacklistRevision )
+            int iBlackListRevision = atoi(strBlackRevision);
+            if (iBlackListRevision > pWebCore->m_iBlacklistRevision)
             {
-                g_pCore->GetNetwork ()->GetHTTPDownloadManager ( EDownloadModeType::WEBBROWSER_LISTS )->QueueFile ( SString("%s?type=fetchblack", BROWSER_UPDATE_URL),
-                    NULL, 0, NULL, 0, false, pWebCore, &CWebCore::StaticFetchBlacklistFinished, false, 3 );
+                g_pCore->GetNetwork()
+                    ->GetHTTPDownloadManager(EDownloadModeType::WEBBROWSER_LISTS)
+                    ->QueueFile(SString("%s?type=fetchblack", BROWSER_UPDATE_URL), NULL, NULL, 0, false, pWebCore, &CWebCore::StaticFetchBlacklistFinished,
+                                false, 3);
 
                 pWebCore->m_iBlacklistRevision = iBlackListRevision;
             }
@@ -698,88 +707,88 @@ void CWebCore::StaticFetchRevisionFinished ( char* pCompletedData, size_t comple
     }
 }
 
-void CWebCore::StaticFetchWhitelistFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+void CWebCore::StaticFetchWhitelistFinished(const SHttpDownloadResult& result)
 {
-    if ( !bSuccess )
+    if (!result.bSuccess)
         return;
 
-    CWebCore* pWebCore = static_cast < CWebCore* > ( pObj );
-    if ( !pWebCore->m_pXmlConfig )
+    CWebCore* pWebCore = static_cast<CWebCore*>(result.pObj);
+    if (!pWebCore->m_pXmlConfig)
         return;
 
-    if ( !pWebCore->MakeSureXMLNodesExist () )
+    if (!pWebCore->MakeSureXMLNodesExist())
         return;
 
-    CXMLNode* pRootNode = pWebCore->m_pXmlConfig->GetRootNode ();
+    CXMLNode*            pRootNode = pWebCore->m_pXmlConfig->GetRootNode();
     std::vector<SString> whitelist;
-    SString strData = pCompletedData;
-    strData.Split ( ";", whitelist );
-    CXMLNode* pListNode = pRootNode->FindSubNode ( "globalwhitelist" );
-    if ( !pListNode )
+    SString              strData = result.pData;
+    strData.Split(";", whitelist);
+    CXMLNode* pListNode = pRootNode->FindSubNode("globalwhitelist");
+    if (!pListNode)
         return;
-    pListNode->DeleteAllSubNodes ();
+    pListNode->DeleteAllSubNodes();
 
-    for ( std::vector<SString>::const_iterator iter = whitelist.begin (); iter != whitelist.end (); ++iter )
+    for (std::vector<SString>::const_iterator iter = whitelist.begin(); iter != whitelist.end(); ++iter)
     {
-        CXMLNode* pNode = pListNode->CreateSubNode ( "url" );
-        pNode->SetTagContent ( *iter );
+        CXMLNode* pNode = pListNode->CreateSubNode("url");
+        pNode->SetTagContent(*iter);
     }
 
     // Set whitelist revision
-    CXMLNode* pNode = pRootNode->FindSubNode ( "whitelistrev" );
-    if ( !pNode )
+    CXMLNode* pNode = pRootNode->FindSubNode("whitelistrev");
+    if (!pNode)
         return;
-    pNode->SetTagContent ( pWebCore->m_iWhitelistRevision );
+    pNode->SetTagContent(pWebCore->m_iWhitelistRevision);
 
     // Write changes to the XML file
-    pWebCore->m_pXmlConfig->Write ();
+    pWebCore->m_pXmlConfig->Write();
 
-    pWebCore->LoadListsFromXML ( true, false, false );
+    pWebCore->LoadListsFromXML(true, false, false);
 
 #ifdef MTA_DEBUG
-    OutputDebugLine ( "Updated whitelist!" );
+    OutputDebugLine("Updated whitelist!");
 #endif
 }
 
-void CWebCore::StaticFetchBlacklistFinished ( char* pCompletedData, size_t completedLength, void *pObj, bool bSuccess, int iErrorCode )
+void CWebCore::StaticFetchBlacklistFinished(const SHttpDownloadResult& result)
 {
-    if ( !bSuccess )
+    if (!result.bSuccess)
         return;
 
-    CWebCore* pWebCore = static_cast < CWebCore* > ( pObj );
-    if ( !pWebCore->m_pXmlConfig )
+    CWebCore* pWebCore = static_cast<CWebCore*>(result.pObj);
+    if (!pWebCore->m_pXmlConfig)
         return;
 
-    if ( !pWebCore->MakeSureXMLNodesExist () )
+    if (!pWebCore->MakeSureXMLNodesExist())
         return;
 
-    CXMLNode* pRootNode = pWebCore->m_pXmlConfig->GetRootNode ();
+    CXMLNode*            pRootNode = pWebCore->m_pXmlConfig->GetRootNode();
     std::vector<SString> blacklist;
-    SString strData = pCompletedData;
-    strData.Split ( ";", blacklist );
-    CXMLNode* pListNode = pRootNode->FindSubNode ( "globalblacklist" );
-    if ( !pListNode )
+    SString              strData = result.pData;
+    strData.Split(";", blacklist);
+    CXMLNode* pListNode = pRootNode->FindSubNode("globalblacklist");
+    if (!pListNode)
         return;
-    pListNode->DeleteAllSubNodes ();
+    pListNode->DeleteAllSubNodes();
 
-    for ( std::vector<SString>::const_iterator iter = blacklist.begin (); iter != blacklist.end (); ++iter )
+    for (std::vector<SString>::const_iterator iter = blacklist.begin(); iter != blacklist.end(); ++iter)
     {
-        CXMLNode* pNode = pListNode->CreateSubNode ( "url" );
-        pNode->SetTagContent ( *iter );
+        CXMLNode* pNode = pListNode->CreateSubNode("url");
+        pNode->SetTagContent(*iter);
     }
 
     // Set blacklist revision
-    CXMLNode* pNode = pRootNode->FindSubNode ( "blacklistrev" );
-    if ( !pNode )
+    CXMLNode* pNode = pRootNode->FindSubNode("blacklistrev");
+    if (!pNode)
         return;
-    pNode->SetTagContent ( pWebCore->m_iBlacklistRevision );
+    pNode->SetTagContent(pWebCore->m_iBlacklistRevision);
 
     // Write changes to the XML file
-    pWebCore->m_pXmlConfig->Write ();
+    pWebCore->m_pXmlConfig->Write();
 
-    pWebCore->LoadListsFromXML ( false, true, false );
+    pWebCore->LoadListsFromXML(false, true, false);
 
 #ifdef MTA_DEBUG
-    OutputDebugLine ( "Updated browser blacklist!" );
+    OutputDebugLine("Updated browser blacklist!");
 #endif
 }

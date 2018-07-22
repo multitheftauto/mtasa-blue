@@ -1,24 +1,23 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CBikeSA.cpp
-*  PURPOSE:     Bike vehicle entity
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CBikeSA.cpp
+ *  PURPOSE:     Bike vehicle entity
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-CBikeSA::CBikeSA( CBikeSAInterface * bike )
+CBikeSA::CBikeSA(CBikeSAInterface* bike)
 {
     DEBUG_TRACE("CBikeSA::CBikeSA( CBikeSAInterface * bike )");
     this->m_pInterface = bike;
 }
 
-CBikeSA::CBikeSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2 ):CVehicleSA( dwModelID, ucVariation, ucVariation2 )
+CBikeSA::CBikeSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2) : CVehicleSA(dwModelID, ucVariation, ucVariation2)
 {
     DEBUG_TRACE("CBikeSA::CBikeSA( eVehicleTypes dwModelID ):CVehicleSA( dwModelID )");
     /*if(this->internalInterface)
@@ -39,4 +38,3 @@ CBikeSA::CBikeSA( eVehicleTypes dwModelID, unsigned char ucVariation, unsigned c
         pGame->GetWorld()->Add((CEntitySA *)this);
     }*/
 }
-

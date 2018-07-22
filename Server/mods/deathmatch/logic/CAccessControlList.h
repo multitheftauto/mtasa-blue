@@ -1,19 +1,17 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CAccessControlList.h
-*  PURPOSE:     Access control list class
-*  DEVELOPERS:  Oliver Brown <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CAccessControlList.h
+ *  PURPOSE:     Access control list class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 class CAccessControlList;
 
-#ifndef __CACCESSCONTROLLIST_H
-#define __CACCESSCONTROLLIST_H
+#pragma once
 
 #include <list>
 #include "CAccessControlListRight.h"
@@ -24,31 +22,29 @@ class CAccessControlList;
 class CAccessControlList
 {
 public:
-                                                CAccessControlList          ( const char* szACLName, class CAccessControlListManager* pACLManager );
-                                                ~CAccessControlList         ( void );
+    CAccessControlList(const char* szACLName, class CAccessControlListManager* pACLManager);
+    ~CAccessControlList(void);
 
-    inline const char*                          GetName                     ( void )        { return m_strACLName; };
+    const char* GetName(void) { return m_strACLName; };
 
-    CAccessControlListRight*                    AddRight                    ( const char* szRightName, CAccessControlListRight::ERightType eRightType, bool bAccess );
-    CAccessControlListRight*                    GetRight                    ( const char* szRightName, CAccessControlListRight::ERightType eRightType );
-    bool                                        RemoveRight                 ( const char* szRightName, CAccessControlListRight::ERightType eRightType );
+    CAccessControlListRight* AddRight(const char* szRightName, CAccessControlListRight::ERightType eRightType, bool bAccess);
+    CAccessControlListRight* GetRight(const char* szRightName, CAccessControlListRight::ERightType eRightType);
+    bool                     RemoveRight(const char* szRightName, CAccessControlListRight::ERightType eRightType);
 
-    void                                        WriteToXMLNode              ( CXMLNode* pNode );
+    void WriteToXMLNode(CXMLNode* pNode);
 
-    inline list < CAccessControlListRight* >  ::const_iterator  IterBegin   ( void ) { return m_Rights.begin (); };
-    inline list < CAccessControlListRight* >  ::const_iterator  IterEnd     ( void ) { return m_Rights.end (); };
+    list<CAccessControlListRight*>::const_iterator IterBegin(void) { return m_Rights.begin(); };
+    list<CAccessControlListRight*>::const_iterator IterEnd(void) { return m_Rights.end(); };
 
-    bool                                        CanBeModifiedByScript       ( void );
-    uint                                        GetScriptID                 ( void ) const  { return m_uiScriptID; }
+    bool CanBeModifiedByScript(void);
+    uint GetScriptID(void) const { return m_uiScriptID; }
 
 private:
-    void                                        OnChange                    ( void );
+    void OnChange(void);
 
-    SString                                     m_strACLName;
-    list < CAccessControlListRight* >           m_Rights;
+    SString                        m_strACLName;
+    list<CAccessControlListRight*> m_Rights;
 
-    class CAccessControlListManager*            m_pACLManager;
-    uint                                        m_uiScriptID;
+    class CAccessControlListManager* m_pACLManager;
+    uint                             m_uiScriptID;
 };
-
-#endif

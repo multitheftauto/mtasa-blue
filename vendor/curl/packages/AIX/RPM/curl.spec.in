@@ -16,7 +16,7 @@ License: MIT/X derivate
 Vendor: Daniel Stenberg <Daniel.Stenberg@haxx.se>
 Group: Applications/Internet
 Source: %{name}-%{version}.tar.bz2
-URL: http://curl.haxx.se/
+URL: https://curl.haxx.se/
 Provides: curl
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 Prefix: %{_prefix}
@@ -36,7 +36,7 @@ Note: this version is compiled without SSL support.
 %endif
 
 %package	devel
-Summary:	Development files for the curl libary
+Summary:	Development files for the curl library
 Group:		Development/Libraries
 %if %{SSL} == 1
 Requires: openssl >= 0.9.5

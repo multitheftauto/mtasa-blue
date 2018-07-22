@@ -1,16 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/Platform.cpp
-*  PURPOSE:     Platform-specific defines and methods
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/Platform.cpp
+ *  PURPOSE:     Platform-specific defines and methods
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __PLATFORM_H
-#define __PLATFORM_H
+#pragma once
 
 extern "C" bool g_bSilent;
 extern "C" bool g_bNoTopBar;
@@ -48,17 +47,17 @@ extern "C" bool g_bNoTopBar;
 
 /** Multi-platform defines **/
 #ifdef WIN32
-    /* Win32 */
+/* Win32 */
 
-    // Define includes
+// Define includes
     #include <conio.h>
     #include <direct.h>
     #include <windows.h>
 
-    // Define types
-    typedef int socklen_t;
+// Define types
+typedef int socklen_t;
 
-    // Define keys
+// Define keys
     #define KEY_BACKSPACE   0x08
     #define KEY_EXTENDED    0xE0
     #define KEY_LEFT    0x4B
@@ -66,9 +65,9 @@ extern "C" bool g_bNoTopBar;
     #define KEY_UP      0x48
     #define KEY_DOWN    0x50
 #else
-    /* POSIX */
+/* POSIX */
 
-    // Define includes
+// Define includes
     #include <stdio.h>
     #include <stdlib.h>
     #include <unistd.h>
@@ -79,7 +78,7 @@ extern "C" bool g_bNoTopBar;
     #include <dlfcn.h>
     #include <sys/time.h>
     #include <sys/times.h>
-    
+
     #define MAX_PATH 255
 
     #ifndef stricmp
@@ -90,20 +89,8 @@ extern "C" bool g_bNoTopBar;
     #define strnicmp strncasecmp
     #endif
 
-    #define _copysign copysign
-
     #ifndef Sleep
         #define Sleep(duration) usleep(duration * 1000)
     #endif
-
-    // Itoa replacement function
-    char* itoa ( int value, char* result, int base );
-
-    
-#endif
-
-// This function should be used instead of mkdir to preserve multiplatform
-// compatibility
-extern int mymkdir ( const char* dirname );
 
 #endif

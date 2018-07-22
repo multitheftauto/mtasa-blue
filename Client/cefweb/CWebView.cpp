@@ -1,12 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CWebView.cpp
-*  PURPOSE:     Web view class
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CWebView.cpp
+ *  PURPOSE:     Web view class
+ *
+ *****************************************************************************/
 #include "StdInc.h"
 #include "CWebView.h"
 #include "CAjaxResourceHandler.h"
@@ -22,18 +22,18 @@ CWebView::CWebView(bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool b
     m_pEventsInterface = nullptr;
     m_bBeingDestroyed = false;
     m_fVolume = 1.0f;
-    memset ( m_mouseButtonStates, 0, sizeof(m_mouseButtonStates) );
+    memset(m_mouseButtonStates, 0, sizeof(m_mouseButtonStates));
 
     // Initialise properties
     m_Properties["mobile"] = "0";
 }
 
-CWebView::~CWebView ()
+CWebView::~CWebView()
 {
-    if ( IsMainThread () )
+    if (IsMainThread())
     {
-        if ( g_pCore->GetWebCore ()->GetFocusedWebView () == this )
-            g_pCore->GetWebCore ()->SetFocusedWebView ( nullptr );
+        if (g_pCore->GetWebCore()->GetFocusedWebView() == this)
+            g_pCore->GetWebCore()->SetFocusedWebView(nullptr);
     }
 
     // Ensure that CefRefPtr::~CefRefPtr doesn't try to release it twice (it has already been released in CWebView::OnBeforeClose)
@@ -43,36 +43,40 @@ CWebView::~CWebView ()
     m_RenderData.cv.notify_all();
 
 #ifdef MTA_DEBUG
-    OutputDebugLine ( "CWebView::~CWebView" );
+    OutputDebugLine("CWebView::~CWebView");
 #endif
 }
 
-void CWebView::Initialise ()
+void CWebView::Initialise()
 {
     // Initialise the web session (which holds the actual settings) in in-memory mode
     CefBrowserSettings browserSettings;
-    browserSettings.windowless_frame_rate = g_pCore->GetFrameRateLimit ();
+    browserSettings.windowless_frame_rate = g_pCore->GetFrameRateLimit();
     browserSettings.javascript_access_clipboard = cef_state_t::STATE_DISABLED;
-    browserSettings.caret_browsing = cef_state_t::STATE_ENABLED;
-    browserSettings.universal_access_from_file_urls = cef_state_t::STATE_DISABLED; // Also filtered by resource interceptor, but set this nevertheless
+    browserSettings.javascript_dom_paste = cef_state_t::STATE_DISABLED;
+    browserSettings.universal_access_from_file_urls =
+        cef_state_t::STATE_DISABLED;            // Also filtered by resource interceptor, but set this nevertheless
     browserSettings.file_access_from_file_urls = cef_state_t::STATE_DISABLED;
     browserSettings.webgl = cef_state_t::STATE_ENABLED;
-    browserSettings.javascript_open_windows = cef_state_t::STATE_DISABLED;
 
     browserSettings.plugins = cef_state_t::STATE_DISABLED;
-    if ( !m_bIsLocal )
+    if (!m_bIsLocal)
     {
-        bool bEnabledJavascript = g_pCore->GetWebCore ()->GetRemoteJavascriptEnabled ();
+        bool bEnabledJavascript = g_pCore->GetWebCore()->GetRemoteJavascriptEnabled();
         browserSettings.javascript = bEnabledJavascript ? cef_state_t::STATE_ENABLED : cef_state_t::STATE_DISABLED;
     }
 
-    CefWindowInfo windowInfo;
-    windowInfo.SetAsWindowless ( g_pCore->GetHookedWindow (), m_bIsTransparent );
+    // Set background color to opaque white if transparency is disabled
+    if (!m_bIsTransparent)
+        browserSettings.background_color = 0xffffffff;
 
-    CefBrowserHost::CreateBrowser ( windowInfo, this, "", browserSettings, nullptr );
+    CefWindowInfo windowInfo;
+    windowInfo.SetAsWindowless(g_pCore->GetHookedWindow());
+
+    CefBrowserHost::CreateBrowser(windowInfo, this, "", browserSettings, nullptr);
 }
 
-void CWebView::CloseBrowser ()
+void CWebView::CloseBrowser()
 {
     // CefBrowserHost::CloseBrowser calls the destructor after the browser has been destroyed
     m_bBeingDestroyed = true;
@@ -80,113 +84,113 @@ void CWebView::CloseBrowser ()
     // Make sure we don't dead lock the CEF render thread
     m_RenderData.cv.notify_all();
 
-    if ( m_pWebView )
-        m_pWebView->GetHost ()->CloseBrowser ( true );
+    if (m_pWebView)
+        m_pWebView->GetHost()->CloseBrowser(true);
 }
 
-bool CWebView::LoadURL ( const SString& strURL, bool bFilterEnabled, const SString& strPostData, bool bURLEncoded )
+bool CWebView::LoadURL(const SString& strURL, bool bFilterEnabled, const SString& strPostData, bool bURLEncoded)
 {
-    if ( !m_pWebView )
+    if (!m_pWebView)
         return false;
 
     CefURLParts urlParts;
-    if ( !CefParseURL ( strURL, urlParts ) )
-        return false; // Invalid URL
+    if (strURL.empty() || !CefParseURL(strURL, urlParts))
+        return false;            // Invalid URL
 
     // Are we allowed to browse this website?
-    if ( bFilterEnabled && g_pCore->GetWebCore ()->GetDomainState ( UTF16ToMbUTF8 ( urlParts.host.str ), true ) != eURLState::WEBPAGE_ALLOWED )
+    if (bFilterEnabled && g_pCore->GetWebCore()->GetDomainState(UTF16ToMbUTF8(urlParts.host.str), true) != eURLState::WEBPAGE_ALLOWED)
         return false;
 
     // Load it!
-    auto pFrame = m_pWebView->GetMainFrame ();
-    if ( strPostData.empty () )
+    auto pFrame = m_pWebView->GetMainFrame();
+    if (strPostData.empty())
     {
-        pFrame->LoadURL ( strURL );
+        pFrame->LoadURL(strURL);
     }
     else
     {
         // Load URL first, see https://bitbucket.org/chromiumembedded/cef/issue/579
-        pFrame->LoadURL ( "about:blank" );
+        pFrame->LoadURL("about:blank");
 
         // Perform HTTP POST
-        auto request = CefRequest::Create ();
-        auto postData = CefPostData::Create ();
-        auto postDataElement = CefPostDataElement::Create ();
-        postDataElement->SetToBytes ( strPostData.size (), strPostData.c_str () );
-        postData->AddElement ( postDataElement );
+        auto request = CefRequest::Create();
+        auto postData = CefPostData::Create();
+        auto postDataElement = CefPostDataElement::Create();
+        postDataElement->SetToBytes(strPostData.size(), strPostData.c_str());
+        postData->AddElement(postDataElement);
 
-        if ( bURLEncoded )
+        if (bURLEncoded)
         {
             CefRequest::HeaderMap headerMap;
-            headerMap.insert ( std::make_pair ( "Content-Type", "application/x-www-form-urlencoded" ) );
-            headerMap.insert ( std::make_pair ( "Content-Length", std::to_string ( strPostData.size () ) ) );
-            //headerMap.insert ( std::make_pair ( "Connection", "close" ) );
-            request->SetHeaderMap ( headerMap );
+            headerMap.insert(std::make_pair("Content-Type", "application/x-www-form-urlencoded"));
+            headerMap.insert(std::make_pair("Content-Length", std::to_string(strPostData.size())));
+            // headerMap.insert ( std::make_pair ( "Connection", "close" ) );
+            request->SetHeaderMap(headerMap);
         }
 
-        request->SetURL ( strURL );
-        request->SetMethod ( "POST" );
-        request->SetPostData ( postData );
-        pFrame->LoadRequest ( request );
+        request->SetURL(strURL);
+        request->SetMethod("POST");
+        request->SetPostData(postData);
+        pFrame->LoadRequest(request);
     }
 
     return true;
 }
 
-bool CWebView::IsLoading ()
+bool CWebView::IsLoading()
 {
-    if ( !m_pWebView )
+    if (!m_pWebView)
         return false;
 
-    return m_pWebView->IsLoading ();
+    return m_pWebView->IsLoading();
 }
 
-SString CWebView::GetURL ()
+SString CWebView::GetURL()
 {
-    if ( !m_pWebView )
+    if (!m_pWebView)
         return "";
 
-    return UTF16ToMbUTF8 ( m_pWebView->GetMainFrame ()->GetURL () );
+    return UTF16ToMbUTF8(m_pWebView->GetMainFrame()->GetURL());
 }
 
-const SString& CWebView::GetTitle ()
+const SString& CWebView::GetTitle()
 {
     return m_CurrentTitle;
 }
 
-void CWebView::SetRenderingPaused ( bool bPaused )
+void CWebView::SetRenderingPaused(bool bPaused)
 {
-    if ( m_pWebView )
-        m_pWebView->GetHost ()->WasHidden ( bPaused );
+    if (m_pWebView)
+        m_pWebView->GetHost()->WasHidden(bPaused);
 }
 
-void CWebView::Focus ( bool state )
+void CWebView::Focus(bool state)
 {
-    if ( m_pWebView )
+    if (m_pWebView)
     {
-        m_pWebView->GetHost ()->SetFocus ( state );
-        m_pWebView->GetHost ()->SendFocusEvent ( state );
+        m_pWebView->GetHost()->SetFocus(state);
+        m_pWebView->GetHost()->SendFocusEvent(state);
     }
 
-    if ( state )
-        g_pCore->GetWebCore ()->SetFocusedWebView ( this );
-    else if ( g_pCore->GetWebCore ()->GetFocusedWebView () == this )
-        g_pCore->GetWebCore ()->SetFocusedWebView ( nullptr );
+    if (state)
+        g_pCore->GetWebCore()->SetFocusedWebView(this);
+    else if (g_pCore->GetWebCore()->GetFocusedWebView() == this)
+        g_pCore->GetWebCore()->SetFocusedWebView(nullptr);
 }
 
-void CWebView::ClearTexture ()
+void CWebView::ClearTexture()
 {
     IDirect3DSurface9* pD3DSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
-    if ( !pD3DSurface )
+    if (!pD3DSurface)
         return;
 
-    D3DLOCKED_RECT LockedRect;
+    D3DLOCKED_RECT  LockedRect;
     D3DSURFACE_DESC SurfaceDesc;
 
-    pD3DSurface->GetDesc ( &SurfaceDesc );
-    pD3DSurface->LockRect ( &LockedRect, NULL, 0 );
+    pD3DSurface->GetDesc(&SurfaceDesc);
+    pD3DSurface->LockRect(&LockedRect, NULL, 0);
 
-    memset ( LockedRect.pBits, 0xFF, SurfaceDesc.Width * SurfaceDesc.Height * 4 );
+    memset(LockedRect.pBits, 0xFF, SurfaceDesc.Width * SurfaceDesc.Height * 4);
     pD3DSurface->UnlockRect();
 }
 
@@ -220,7 +224,8 @@ void CWebView::UpdateTexture()
             // Update changed state
             m_RenderData.changed = false;
 
-            if (m_RenderData.dirtyRects.size() > 0 && m_RenderData.dirtyRects[0].width == m_RenderData.width && m_RenderData.dirtyRects[0].height == m_RenderData.height)
+            if (m_RenderData.dirtyRects.size() > 0 && m_RenderData.dirtyRects[0].width == m_RenderData.width &&
+                m_RenderData.dirtyRects[0].height == m_RenderData.height)
             {
                 // Update whole texture
                 memcpy(surfaceData, sourceData, m_RenderData.width * m_RenderData.height * 4);
@@ -240,8 +245,8 @@ void CWebView::UpdateTexture()
         }
 
         // Update popup area (override certain areas of the view texture)
-        bool popupSizeMismatches = m_RenderData.popupRect.x + m_RenderData.popupRect.width >= (int)m_pWebBrowserRenderItem->m_uiSizeX
-            || m_RenderData.popupRect.y + m_RenderData.popupRect.height >= (int)m_pWebBrowserRenderItem->m_uiSizeY;
+        bool popupSizeMismatches = m_RenderData.popupRect.x + m_RenderData.popupRect.width >= (int)m_pWebBrowserRenderItem->m_uiSizeX ||
+                                   m_RenderData.popupRect.y + m_RenderData.popupRect.height >= (int)m_pWebBrowserRenderItem->m_uiSizeY;
 
         if (m_RenderData.popupShown && !popupSizeMismatches)
         {
@@ -263,17 +268,16 @@ void CWebView::UpdateTexture()
     m_RenderData.cv.notify_all();
 }
 
-void CWebView::ExecuteJavascript ( const SString& strJavascriptCode )
+void CWebView::ExecuteJavascript(const SString& strJavascriptCode)
 {
-    if ( m_pWebView )
-        m_pWebView->GetMainFrame ()->ExecuteJavaScript ( strJavascriptCode, "", 0 );
+    if (m_pWebView)
+        m_pWebView->GetMainFrame()->ExecuteJavaScript(strJavascriptCode, "", 0);
 }
 
-bool CWebView::SetProperty ( const SString& strKey, const SString& strValue )
+bool CWebView::SetProperty(const SString& strKey, const SString& strValue)
 {
-    if ( strKey == "mobile" && ( strValue == "0" || strValue == "1" ) )
+    if (strKey == "mobile" && (strValue == "0" || strValue == "1"))
     {
-
     }
     else
         return false;
@@ -282,19 +286,19 @@ bool CWebView::SetProperty ( const SString& strKey, const SString& strValue )
     return true;
 }
 
-bool CWebView::GetProperty ( const SString& strKey, SString& outValue )
+bool CWebView::GetProperty(const SString& strKey, SString& outValue)
 {
-    auto iter = m_Properties.find ( strKey );
-    if ( iter == m_Properties.end () )
+    auto iter = m_Properties.find(strKey);
+    if (iter == m_Properties.end())
         return false;
 
     outValue = iter->second;
     return true;
 }
 
-void CWebView::InjectMouseMove ( int iPosX, int iPosY )
+void CWebView::InjectMouseMove(int iPosX, int iPosY)
 {
-    if ( !m_pWebView )
+    if (!m_pWebView)
         return;
 
     CefMouseEvent mouseEvent;
@@ -302,22 +306,22 @@ void CWebView::InjectMouseMove ( int iPosX, int iPosY )
     mouseEvent.y = iPosY;
 
     // Set modifiers from mouse states (yeah, using enum values as indices isn't best practise, but it's the easiest solution here)
-    if ( m_mouseButtonStates[BROWSER_MOUSEBUTTON_LEFT] )
+    if (m_mouseButtonStates[BROWSER_MOUSEBUTTON_LEFT])
         mouseEvent.modifiers |= EVENTFLAG_LEFT_MOUSE_BUTTON;
-    if ( m_mouseButtonStates[BROWSER_MOUSEBUTTON_MIDDLE] )
+    if (m_mouseButtonStates[BROWSER_MOUSEBUTTON_MIDDLE])
         mouseEvent.modifiers |= EVENTFLAG_MIDDLE_MOUSE_BUTTON;
-    if ( m_mouseButtonStates[BROWSER_MOUSEBUTTON_RIGHT] )
+    if (m_mouseButtonStates[BROWSER_MOUSEBUTTON_RIGHT])
         mouseEvent.modifiers |= EVENTFLAG_RIGHT_MOUSE_BUTTON;
 
-    m_pWebView->GetHost ()->SendMouseMoveEvent ( mouseEvent, false );
+    m_pWebView->GetHost()->SendMouseMoveEvent(mouseEvent, false);
 
     m_vecMousePosition.x = iPosX;
     m_vecMousePosition.y = iPosY;
 }
 
-void CWebView::InjectMouseDown ( eWebBrowserMouseButton mouseButton )
+void CWebView::InjectMouseDown(eWebBrowserMouseButton mouseButton)
 {
-    if ( !m_pWebView )
+    if (!m_pWebView)
         return;
 
     CefMouseEvent mouseEvent;
@@ -327,12 +331,12 @@ void CWebView::InjectMouseDown ( eWebBrowserMouseButton mouseButton )
     // Save mouse button states
     m_mouseButtonStates[static_cast<int>(mouseButton)] = true;
 
-    m_pWebView->GetHost ()->SendMouseClickEvent ( mouseEvent, static_cast < CefBrowserHost::MouseButtonType > ( mouseButton ), false, 1 );
+    m_pWebView->GetHost()->SendMouseClickEvent(mouseEvent, static_cast<CefBrowserHost::MouseButtonType>(mouseButton), false, 1);
 }
 
-void CWebView::InjectMouseUp ( eWebBrowserMouseButton mouseButton )
+void CWebView::InjectMouseUp(eWebBrowserMouseButton mouseButton)
 {
-    if ( !m_pWebView )
+    if (!m_pWebView)
         return;
 
     CefMouseEvent mouseEvent;
@@ -342,38 +346,40 @@ void CWebView::InjectMouseUp ( eWebBrowserMouseButton mouseButton )
     // Save mouse button states
     m_mouseButtonStates[static_cast<int>(mouseButton)] = false;
 
-    m_pWebView->GetHost ()->SendMouseClickEvent ( mouseEvent, static_cast < CefBrowserHost::MouseButtonType > ( mouseButton ), true, 1 );
+    m_pWebView->GetHost()->SendMouseClickEvent(mouseEvent, static_cast<CefBrowserHost::MouseButtonType>(mouseButton), true, 1);
 }
 
-void CWebView::InjectMouseWheel ( int iScrollVert, int iScrollHorz )
+void CWebView::InjectMouseWheel(int iScrollVert, int iScrollHorz)
 {
-    if ( !m_pWebView )
+    if (!m_pWebView)
         return;
 
     CefMouseEvent mouseEvent;
     mouseEvent.x = m_vecMousePosition.x;
     mouseEvent.y = m_vecMousePosition.y;
 
-    m_pWebView->GetHost ()->SendMouseWheelEvent ( mouseEvent, iScrollHorz, iScrollVert );
+    m_pWebView->GetHost()->SendMouseWheelEvent(mouseEvent, iScrollHorz, iScrollVert);
 }
 
-void CWebView::InjectKeyboardEvent ( const CefKeyEvent& keyEvent )
+void CWebView::InjectKeyboardEvent(const CefKeyEvent& keyEvent)
 {
-    if ( m_pWebView )
-        m_pWebView->GetHost ()->SendKeyEvent ( keyEvent );
+    if (m_pWebView)
+        m_pWebView->GetHost()->SendKeyEvent(keyEvent);
 }
 
-bool CWebView::SetAudioVolume ( float fVolume )
+bool CWebView::SetAudioVolume(float fVolume)
 {
     // NOTE: Keep this function thread-safe
-    if ( !m_pWebView || fVolume < 0.0f || fVolume > 1.0f )
+    if (!m_pWebView || fVolume < 0.0f || fVolume > 1.0f)
         return false;
 
     // Since the necessary interfaces of the core audio API were introduced in Win7, we've to fallback to HTML5 audio
-    SString strJSCode("function mta_adjustAudioVol(elem, vol) { elem.volume = vol; elem.onvolumechange = function() { if (Math.abs(elem.volume - vol) >= 0.001) elem.volume = vol; } }" \
-               "var tags = document.getElementsByTagName('audio'); for (var i = 0; i<tags.length; ++i) { mta_adjustAudioVol(tags[i], %f); }" \
-               "tags = document.getElementsByTagName('video'); for (var i = 0; i<tags.length; ++i) { mta_adjustAudioVol(tags[i], %f); }",
-            fVolume, fVolume );
+    SString strJSCode(
+        "function mta_adjustAudioVol(elem, vol) { elem.volume = vol; elem.onvolumechange = function() { if (Math.abs(elem.volume - vol) >= 0.001) elem.volume "
+        "= vol; } }"
+        "var tags = document.getElementsByTagName('audio'); for (var i = 0; i<tags.length; ++i) { mta_adjustAudioVol(tags[i], %f); }"
+        "tags = document.getElementsByTagName('video'); for (var i = 0; i<tags.length; ++i) { mta_adjustAudioVol(tags[i], %f); }",
+        fVolume, fVolume);
 
     std::vector<CefString> frameNames;
     m_pWebView->GetFrameNames(frameNames);
@@ -387,7 +393,7 @@ bool CWebView::SetAudioVolume ( float fVolume )
     return true;
 }
 
-void CWebView::GetSourceCode ( const std::function<void( const std::string& code )>& callback )
+void CWebView::GetSourceCode(const std::function<void(const std::string& code)>& callback)
 {
     if (!m_pWebView)
         return;
@@ -395,27 +401,27 @@ void CWebView::GetSourceCode ( const std::function<void( const std::string& code
     class MyStringVisitor : public CefStringVisitor
     {
     private:
-        CWebView* webView;
-        std::function<void( const std::string& )> callback;
+        CWebView*                               webView;
+        std::function<void(const std::string&)> callback;
 
     public:
-        MyStringVisitor ( CWebView* webView_, const std::function<void( const std::string& )>& callback_ ) : webView(webView_), callback(callback_) {}
+        MyStringVisitor(CWebView* webView_, const std::function<void(const std::string&)>& callback_) : webView(webView_), callback(callback_) {}
 
-        virtual void Visit ( const CefString& code ) override
+        virtual void Visit(const CefString& code) override
         {
             // Limit to 2MiB for now to prevent freezes (TODO: Optimize that and increase later)
-            if ( code.size () <= 2097152 )
+            if (code.size() <= 2097152)
             {
                 // Call callback on main thread
-                g_pCore->GetWebCore ()->AddEventToEventQueue ( std::bind ( callback, code ), webView, "GetSourceCode_Visit" );
+                g_pCore->GetWebCore()->AddEventToEventQueue(std::bind(callback, code), webView, "GetSourceCode_Visit");
             }
         }
 
         IMPLEMENT_REFCOUNTING(MyStringVisitor);
     };
 
-    CefRefPtr<CefStringVisitor> visitor { new MyStringVisitor ( this, callback ) };
-    m_pWebView->GetMainFrame ()->GetSource ( visitor );
+    CefRefPtr<CefStringVisitor> visitor{new MyStringVisitor(this, callback)};
+    m_pWebView->GetMainFrame()->GetSource(visitor);
 }
 
 void CWebView::Resize(const CVector2D& size)
@@ -424,7 +430,7 @@ void CWebView::Resize(const CVector2D& size)
     m_pWebBrowserRenderItem->Resize(size);
 
     // Send resize event to CEF
-    if ( m_pWebView )
+    if (m_pWebView)
         m_pWebView->GetHost()->WasResized();
 
     // Tell CEF to render a new frame
@@ -436,145 +442,145 @@ CVector2D CWebView::GetSize()
     return CVector2D(static_cast<float>(m_pWebBrowserRenderItem->m_uiSizeX), static_cast<float>(m_pWebBrowserRenderItem->m_uiSizeY));
 }
 
-bool CWebView::GetFullPathFromLocal ( SString& strPath )
+bool CWebView::GetFullPathFromLocal(SString& strPath)
 {
-     return m_pEventsInterface->Events_OnResourcePathCheck ( strPath );
+    return m_pEventsInterface->Events_OnResourcePathCheck(strPath);
 }
 
-bool CWebView::RegisterAjaxHandler ( const SString& strURL )
+bool CWebView::RegisterAjaxHandler(const SString& strURL)
 {
-    auto result = m_AjaxHandlers.insert ( strURL );
+    auto result = m_AjaxHandlers.insert(strURL);
     return result.second;
 }
 
-bool CWebView::UnregisterAjaxHandler ( const SString& strURL )
+bool CWebView::UnregisterAjaxHandler(const SString& strURL)
 {
-    return m_AjaxHandlers.erase ( strURL ) == 1;
+    return m_AjaxHandlers.erase(strURL) == 1;
 }
 
-
-bool CWebView::HasAjaxHandler ( const SString& strURL )
+bool CWebView::HasAjaxHandler(const SString& strURL)
 {
-    auto iterCB = m_AjaxHandlers.find ( strURL );
-    return iterCB != m_AjaxHandlers.end ();
+    auto iterCB = m_AjaxHandlers.find(strURL);
+    return iterCB != m_AjaxHandlers.end();
 }
 
-void CWebView::HandleAjaxRequest ( const SString& strURL, CAjaxResourceHandler * pHandler )
+void CWebView::HandleAjaxRequest(const SString& strURL, CAjaxResourceHandler* pHandler)
 {
-    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnAjaxRequest, m_pEventsInterface, pHandler, strURL );
-    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "AjaxResourceRequest" );
+    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnAjaxRequest, m_pEventsInterface, pHandler, strURL);
+    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "AjaxResourceRequest");
 }
 
-bool CWebView::ToggleDevTools ( bool visible )
+bool CWebView::ToggleDevTools(bool visible)
 {
-    if ( visible )
-        return CWebDevTools::Show ( this );
+    if (visible)
+        return CWebDevTools::Show(this);
 
-    return CWebDevTools::Close ( this );
+    return CWebDevTools::Close(this);
 }
 
-bool CWebView::VerifyFile ( const SString& strPath )
+bool CWebView::VerifyFile(const SString& strPath)
 {
-    return m_pEventsInterface->Events_OnResourceFileCheck ( strPath );
+    return m_pEventsInterface->Events_OnResourceFileCheck(strPath);
 }
 
-bool CWebView::CanGoBack ()
+bool CWebView::CanGoBack()
 {
-    if ( !m_pWebView )
+    if (!m_pWebView)
         return false;
 
-    return m_pWebView->CanGoBack ();
+    return m_pWebView->CanGoBack();
 }
 
-bool CWebView::CanGoForward ()
+bool CWebView::CanGoForward()
 {
-    if ( !m_pWebView )
+    if (!m_pWebView)
         return false;
 
-    return m_pWebView->CanGoForward ();
+    return m_pWebView->CanGoForward();
 }
 
-bool CWebView::GoBack ()
+bool CWebView::GoBack()
 {
-    if ( !m_pWebView )
+    if (!m_pWebView)
         return false;
 
-    if ( !m_pWebView->CanGoBack () )
+    if (!m_pWebView->CanGoBack())
         return false;
 
-    m_pWebView->GoBack ();
+    m_pWebView->GoBack();
     return true;
 }
 
-bool CWebView::GoForward ()
+bool CWebView::GoForward()
 {
-    if ( !m_pWebView )
+    if (!m_pWebView)
         return false;
 
-    if ( !m_pWebView->CanGoForward () )
+    if (!m_pWebView->CanGoForward())
         return false;
 
-    m_pWebView->GoForward ();
+    m_pWebView->GoForward();
     return true;
 }
 
-void CWebView::Refresh ( bool bIgnoreCache )
+void CWebView::Refresh(bool bIgnoreCache)
 {
-    if ( !m_pWebView )
+    if (!m_pWebView)
         return;
 
-    if ( bIgnoreCache )
+    if (bIgnoreCache)
     {
-        m_pWebView->ReloadIgnoreCache ();
+        m_pWebView->ReloadIgnoreCache();
     }
     else
     {
-        m_pWebView->Reload ();
+        m_pWebView->Reload();
     }
 }
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefClient::OnProcessMessageReceived            //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefClient.html#OnProcessMessageReceived(CefRefPtr%3CCefBrowser%3E,CefProcessId,CefRefPtr%3CCefProcessMessage%3E) //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefClient.html#OnProcessMessageReceived(CefRefPtr%3CCefBrowser%3E,CefProcessId,CefRefPtr%3CCefProcessMessage%3E)
+// //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnProcessMessageReceived ( CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message )
+bool CWebView::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message)
 {
-    CefRefPtr<CefListValue> argList = message->GetArgumentList ();
-    if ( message->GetName () == "TriggerLuaEvent" )
+    CefRefPtr<CefListValue> argList = message->GetArgumentList();
+    if (message->GetName() == "TriggerLuaEvent")
     {
-        if ( !m_bIsLocal )
+        if (!m_bIsLocal)
             return true;
 
         // Get event name
-        CefString eventName = argList->GetString ( 0 );
+        CefString eventName = argList->GetString(0);
 
         // Get number of arguments from IPC process message
-        int numArgs = argList->GetInt ( 1 );
+        int numArgs = argList->GetInt(1);
 
         // Get args
         std::vector<std::string> args;
-        for ( int i = 2; i < numArgs + 2; ++i )
+        for (int i = 2; i < numArgs + 2; ++i)
         {
-            args.push_back ( argList->GetString ( i ) );
+            args.push_back(argList->GetString(i));
         }
 
         // Queue event to run on the main thread
-        auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnTriggerEvent, m_pEventsInterface, SString ( eventName ), args );
-        g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnProcessMessageReceived1" );
+        auto func = std::bind(&CWebBrowserEventsInterface::Events_OnTriggerEvent, m_pEventsInterface, SString(eventName), args);
+        g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnProcessMessageReceived1");
 
         // The message was handled
         return true;
     }
-    if ( message->GetName () == "InputFocus" )
+    if (message->GetName() == "InputFocus")
     {
         // Retrieve arguments from process message
-        m_bHasInputFocus = argList->GetBool ( 0 );
+        m_bHasInputFocus = argList->GetBool(0);
 
         // Queue event to run on the main thread
-        auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnInputFocusChanged, m_pEventsInterface, m_bHasInputFocus );
-        g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnProcessMessageReceived2" );
+        auto func = std::bind(&CWebBrowserEventsInterface::Events_OnInputFocusChanged, m_pEventsInterface, m_bHasInputFocus);
+        g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnProcessMessageReceived2");
     }
 
     // The message wasn't handled
@@ -587,9 +593,9 @@ bool CWebView::OnProcessMessageReceived ( CefRefPtr<CefBrowser> browser, CefProc
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#GetViewRect(CefRefPtr%3CCefBrowser%3E,CefRect&) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::GetViewRect ( CefRefPtr<CefBrowser> browser, CefRect& rect )
+bool CWebView::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
 {
-    if ( m_bBeingDestroyed )
+    if (m_bBeingDestroyed)
         return false;
 
     rect.x = 0;
@@ -607,7 +613,7 @@ bool CWebView::GetViewRect ( CefRefPtr<CefBrowser> browser, CefRect& rect )
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnPopupShow(CefRefPtr<CefBrowser> browser, bool show)
 {
-    std::lock_guard<std::mutex>(m_RenderData.dataMutex);
+    std::lock_guard<std::mutex> lock{m_RenderData.dataMutex};
     m_RenderData.popupShown = show;
 
     // Free popup buffer memory if hidden
@@ -621,9 +627,9 @@ void CWebView::OnPopupShow(CefRefPtr<CefBrowser> browser, bool show)
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnPopupSize(CefRefPtr<CefBrowser>,constCefRect&) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-void CWebView::OnPopupSize ( CefRefPtr<CefBrowser> browser, const CefRect& rect )
+void CWebView::OnPopupSize(CefRefPtr<CefBrowser> browser, const CefRect& rect)
 {
-    std::lock_guard<std::mutex>(m_RenderData.dataMutex);
+    std::lock_guard<std::mutex> lock{m_RenderData.dataMutex};
 
     // Update rect
     m_RenderData.popupRect = rect;
@@ -635,12 +641,14 @@ void CWebView::OnPopupSize ( CefRefPtr<CefBrowser> browser, const CefRect& rect 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefRenderHandler::OnPaint                      //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnPaint(CefRefPtr%3CCefBrowser%3E,PaintElementType,constRectList&,constvoid*,int,int) //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnPaint(CefRefPtr%3CCefBrowser%3E,PaintElementType,constRectList&,constvoid*,int,int)
+// //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-void CWebView::OnPaint ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType paintType, const CefRenderHandler::RectList& dirtyRects, const void* buffer, int width, int height )
+void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType paintType, const CefRenderHandler::RectList& dirtyRects,
+                       const void* buffer, int width, int height)
 {
-    if ( m_bBeingDestroyed )
+    if (m_bBeingDestroyed)
         return;
 
     {
@@ -650,7 +658,7 @@ void CWebView::OnPaint ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintE
         if (paintType == PET_POPUP)
         {
             memcpy(m_RenderData.popupBuffer.get(), buffer, width * height * 4);
-            return; // We don't have to wait as we've copied the buffer already
+            return;            // We don't have to wait as we've copied the buffer already
         }
 
         // Store render data
@@ -672,14 +680,14 @@ void CWebView::OnPaint ( CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintE
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#OnCursorChange(CefRefPtr%3CCefBrowser%3E,CefCursorHandle) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-void CWebView::OnCursorChange ( CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, CursorType type, const CefCursorInfo& cursorInfo )
+void CWebView::OnCursorChange(CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, CursorType type, const CefCursorInfo& cursorInfo)
 {
     // Find the cursor index by the cursor handle
-    unsigned char cursorIndex = static_cast < unsigned char > ( type );
+    unsigned char cursorIndex = static_cast<unsigned char>(type);
 
     // Queue event to run on the main thread
-    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnChangeCursor, m_pEventsInterface, cursorIndex );
-    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnCursorChange" );
+    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnChangeCursor, m_pEventsInterface, cursorIndex);
+    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnCursorChange");
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -688,15 +696,15 @@ void CWebView::OnCursorChange ( CefRefPtr<CefBrowser> browser, CefCursorHandle c
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLoadHandler.html#OnLoadStart(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-void CWebView::OnLoadStart ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, TransitionType transitionType )
+void CWebView::OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, TransitionType transitionType)
 {
-    SString strURL = UTF16ToMbUTF8 ( frame->GetURL () );
-    if ( strURL == "blank" )
+    SString strURL = UTF16ToMbUTF8(frame->GetURL());
+    if (strURL == "blank")
         return;
 
     // Queue event to run on the main thread
-    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnLoadingStart, m_pEventsInterface, strURL, frame->IsMain () );
-    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnLoadStart" );
+    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnLoadingStart, m_pEventsInterface, strURL, frame->IsMain());
+    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnLoadStart");
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -705,81 +713,85 @@ void CWebView::OnLoadStart ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> 
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLoadHandler.html#OnLoadEnd(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,int) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-void CWebView::OnLoadEnd ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode )
+void CWebView::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode)
 {
     // Set browser volume once again
-    SetAudioVolume ( m_fVolume );
+    SetAudioVolume(m_fVolume);
 
-    if ( frame->IsMain () )
+    if (frame->IsMain())
     {
-	    SString strURL = UTF16ToMbUTF8 ( frame->GetURL () );
+        SString strURL = UTF16ToMbUTF8(frame->GetURL());
 
         // Queue event to run on the main thread
-        auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnDocumentReady, m_pEventsInterface, strURL );
-        g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnLoadEnd" );
+        auto func = std::bind(&CWebBrowserEventsInterface::Events_OnDocumentReady, m_pEventsInterface, strURL);
+        g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnLoadEnd");
     }
 }
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefLoadHandler::OnLoadError                    //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLoadHandler.html#OnLoadError(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,ErrorCode,constCefString&,constCefString&) //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLoadHandler.html#OnLoadError(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,ErrorCode,constCefString&,constCefString&)
+// //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-void CWebView::OnLoadError ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefLoadHandler::ErrorCode errorCode, const CefString& errorText, const CefString& failedURL )
+void CWebView::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefLoadHandler::ErrorCode errorCode, const CefString& errorText,
+                           const CefString& failedURL)
 {
-    SString strURL = UTF16ToMbUTF8 ( frame->GetURL () );
+    SString strURL = UTF16ToMbUTF8(frame->GetURL());
 
     // Queue event to run on the main thread
-    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnLoadingFailed, m_pEventsInterface, strURL, errorCode, SString ( errorText ) );
-    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnLoadError" );
+    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnLoadingFailed, m_pEventsInterface, strURL, errorCode, SString(errorText));
+    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnLoadError");
 }
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefRequestHandler::OnBeforeBrowe               //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRequestHandler.html#OnBeforeBrowse(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefRequest%3E,bool) //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRequestHandler.html#OnBeforeBrowse(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefRequest%3E,bool)
+// //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnBeforeBrowse ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool isRedirect )
+bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool isRedirect)
 {
     /*
         From documentation:
         The |request| object cannot be modified in this callback.
-        CefLoadHandler::OnLoadingStateChange will be called twice in all cases. If the navigation is allowed CefLoadHandler::OnLoadStart and CefLoadHandler::OnLoadEnd will be called.
-        If the navigation is canceled CefLoadHandler::OnLoadError will be called with an |errorCode| value of ERR_ABORTED.
+        CefLoadHandler::OnLoadingStateChange will be called twice in all cases. If the navigation is allowed CefLoadHandler::OnLoadStart and
+       CefLoadHandler::OnLoadEnd will be called. If the navigation is canceled CefLoadHandler::OnLoadError will be called with an |errorCode| value of
+       ERR_ABORTED.
     */
 
     CefURLParts urlParts;
-    if ( !CefParseURL ( request->GetURL(), urlParts ) )
-        return true; // Cancel if invalid URL (this line will normally not be executed)
+    if (!CefParseURL(request->GetURL(), urlParts))
+        return true;            // Cancel if invalid URL (this line will normally not be executed)
 
-    bool bResult;
+    bool    bResult;
     WString scheme = urlParts.scheme.str;
-    if ( scheme == L"http" || scheme == L"https" )
+    if (scheme == L"http" || scheme == L"https")
     {
-        SString host = UTF16ToMbUTF8 ( urlParts.host.str );
-        if ( host != "mta" )
+        SString host = UTF16ToMbUTF8(urlParts.host.str);
+        if (host != "mta")
         {
-            if ( IsLocal () || g_pCore->GetWebCore ()->GetDomainState ( host, true ) != eURLState::WEBPAGE_ALLOWED )
-                bResult = true; // Block remote here
+            if (IsLocal() || g_pCore->GetWebCore()->GetDomainState(host, true) != eURLState::WEBPAGE_ALLOWED)
+                bResult = true;            // Block remote here
             else
-                bResult = false; // Allow
+                bResult = false;            // Allow
         }
         else
             bResult = false;
     }
-    else if ( scheme == L"mtalocal" )
-        bResult = false; // Allow mtalocal:// URLs
+    else if (scheme == L"mtalocal")
+        bResult = false;            // Allow mtalocal:// URLs
     else
-        bResult = true; // Block other schemes
+        bResult = true;            // Block other schemes
 
     // Check if we're in the browser's main frame or only a frame element of the current page
-    bool bIsMainFrame = frame->IsMain ();
+    bool bIsMainFrame = frame->IsMain();
 
     // Queue event to run on the main thread
-    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnNavigate, m_pEventsInterface, SString ( request->GetURL () ), bResult, bIsMainFrame );
-    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnNavigate" );
+    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnNavigate, m_pEventsInterface, SString(request->GetURL()), bResult, bIsMainFrame);
+    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnNavigate");
 
     // Return execution to CEF
     return bResult;
@@ -788,54 +800,56 @@ bool CWebView::OnBeforeBrowse ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFram
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefRequestHandler::OnBeforeResourceLoad        //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRequestHandler.html#OnBeforeResourceLoad(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefRequest%3E) //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRequestHandler.html#OnBeforeResourceLoad(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefRequest%3E)
+// //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-CefRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefRequestCallback> callback )
+CefRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request,
+                                                              CefRefPtr<CefRequestCallback> callback)
 {
     // Mostly the same as CWebView::OnBeforeBrowse
     CefURLParts urlParts;
-    if ( !CefParseURL ( request->GetURL (), urlParts ) )
-        return RV_CANCEL; // Cancel if invalid URL (this line will normally not be executed)
+    if (!CefParseURL(request->GetURL(), urlParts))
+        return RV_CANCEL;            // Cancel if invalid URL (this line will normally not be executed)
 
     // Add some information to the HTTP header
     {
         CefRequest::HeaderMap headerMap;
-        request->GetHeaderMap ( headerMap );
-        auto iter = headerMap.find ( "User-Agent" );
+        request->GetHeaderMap(headerMap);
+        auto iter = headerMap.find("User-Agent");
 
-        if ( iter != headerMap.end () )
+        if (iter != headerMap.end())
         {
             // Add MTA:SA "watermark"
-            iter->second = iter->second.ToString () + "; " MTA_CEF_USERAGENT;
+            iter->second = iter->second.ToString() + "; " MTA_CEF_USERAGENT;
 
             // Add 'Android' to get the mobile version
             SString strPropertyValue;
-            if ( GetProperty ( "mobile", strPropertyValue ) && strPropertyValue == "1" )
-                iter->second = iter->second.ToString () + "; Mobile Android";
+            if (GetProperty("mobile", strPropertyValue) && strPropertyValue == "1")
+                iter->second = iter->second.ToString() + "; Mobile Android";
 
-            request->SetHeaderMap ( headerMap );
+            request->SetHeaderMap(headerMap);
         }
     }
 
     WString scheme = urlParts.scheme.str;
-    if ( scheme == L"http" || scheme == L"https" )
+    if (scheme == L"http" || scheme == L"https")
     {
-        SString domain = UTF16ToMbUTF8 ( urlParts.host.str );
-        if ( domain != "mta" )
+        SString domain = UTF16ToMbUTF8(urlParts.host.str);
+        if (domain != "mta")
         {
-            if ( IsLocal () )
-                return RV_CANCEL; // Block remote requests in local mode generally
+            if (IsLocal())
+                return RV_CANCEL;            // Block remote requests in local mode generally
 
-            eURLState urlState = g_pCore->GetWebCore ()->GetDomainState ( domain, true );
-            if ( urlState != eURLState::WEBPAGE_ALLOWED )
+            eURLState urlState = g_pCore->GetWebCore()->GetDomainState(domain, true);
+            if (urlState != eURLState::WEBPAGE_ALLOWED)
             {
                 // Trigger onClientBrowserResourceBlocked event
-                auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnResourceBlocked, m_pEventsInterface,
-                    SString ( request->GetURL () ), domain, urlState == eURLState::WEBPAGE_NOT_LISTED ? 0 : 1 );
-                g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnResourceBlocked" );
+                auto func = std::bind(&CWebBrowserEventsInterface::Events_OnResourceBlocked, m_pEventsInterface, SString(request->GetURL()), domain,
+                                      urlState == eURLState::WEBPAGE_NOT_LISTED ? 0 : 1);
+                g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnResourceBlocked");
 
-                return RV_CANCEL; // Block if explicitly forbidden
+                return RV_CANCEL;            // Block if explicitly forbidden
             }
 
             // Allow
@@ -844,14 +858,15 @@ CefRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBro
         else
             return RV_CONTINUE;
     }
-    else if ( scheme == L"mtalocal" ||  scheme == L"blob" )
+    else if (scheme == L"mtalocal" || scheme == L"blob")
     {
         return RV_CONTINUE;
     }
 
-     // Trigger onClientBrowserResourceBlocked event
-    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnResourceBlocked, m_pEventsInterface, SString ( request->GetURL () ), "", 2 ); // reason 1 := blocked protocol scheme
-    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnResourceBlocked" );
+    // Trigger onClientBrowserResourceBlocked event
+    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnResourceBlocked, m_pEventsInterface, SString(request->GetURL()), "",
+                          2);            // reason 1 := blocked protocol scheme
+    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnResourceBlocked");
 
     // Block everything else
     return RV_CANCEL;
@@ -863,35 +878,38 @@ CefRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad ( CefRefPtr<CefBro
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLifeSpanHandler.html#OnBeforeClose(CefRefPtr%3CCefBrowser%3E) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-void CWebView::OnBeforeClose ( CefRefPtr<CefBrowser> browser )
+void CWebView::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 {
     // Remove events owned by this webview and invoke left callbacks
-    g_pCore->GetWebCore ()->RemoveWebViewEvents ( this );
+    g_pCore->GetWebCore()->RemoveWebViewEvents(this);
 
     m_pWebView = nullptr;
 
     // Remove focused web view reference
-    if ( g_pCore->GetWebCore ()->GetFocusedWebView () == this )
-        g_pCore->GetWebCore ()->SetFocusedWebView ( nullptr );
+    if (g_pCore->GetWebCore()->GetFocusedWebView() == this)
+        g_pCore->GetWebCore()->SetFocusedWebView(nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefLifeSpanHandler::OnBeforePopup              //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLifeSpanHandler.html#OnBeforePopup(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,constCefString&,constCefString&,constCefPopupFeatures&,CefWindowInfo&,CefRefPtr%3CCefClient%3E&,CefBrowserSettings&,bool*) //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLifeSpanHandler.html#OnBeforePopup(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,constCefString&,constCefString&,constCefPopupFeatures&,CefWindowInfo&,CefRefPtr%3CCefClient%3E&,CefBrowserSettings&,bool*)
+// //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnBeforePopup ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access )
+bool CWebView::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name,
+                             CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures,
+                             CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access)
 {
     // ATTENTION: This method is called on the IO thread
 
     // Trigger the popup/new tab event
-    SString strTagetURL = UTF16ToMbUTF8 ( target_url );
-    SString strOpenerURL = UTF16ToMbUTF8 ( frame->GetURL () );
+    SString strTagetURL = UTF16ToMbUTF8(target_url);
+    SString strOpenerURL = UTF16ToMbUTF8(frame->GetURL());
 
     // Queue event to run on the main thread
-    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnPopup, m_pEventsInterface, strTagetURL, strOpenerURL );
-    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnBeforePopup" );
+    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnPopup, m_pEventsInterface, strTagetURL, strOpenerURL);
+    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnBeforePopup");
 
     // Block popups generally
     return true;
@@ -903,24 +921,25 @@ bool CWebView::OnBeforePopup ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefLifeSpanHandler.html#OnAfterCreated(CefRefPtr<CefBrowser>) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-void CWebView::OnAfterCreated ( CefRefPtr<CefBrowser> browser )
+void CWebView::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 {
     // Set web view reference
     m_pWebView = browser;
 
     // Call created event callback
-    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnCreated, m_pEventsInterface );
-    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnAfterCreated" );
+    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnCreated, m_pEventsInterface);
+    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnAfterCreated");
 }
-
 
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefJSDialogHandler::OnJSDialog                 //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefJSDialogHandler.html#OnJSDialog(CefRefPtr%3CCefBrowser%3E,constCefString&,constCefString&,JSDialogType,constCefString&,constCefString&,CefRefPtr%3CCefJSDialogCallback%3E,bool&) //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefJSDialogHandler.html#OnJSDialog(CefRefPtr%3CCefBrowser%3E,constCefString&,constCefString&,JSDialogType,constCefString&,constCefString&,CefRefPtr%3CCefJSDialogCallback%3E,bool&)
+// //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnJSDialog ( CefRefPtr<CefBrowser> browser, const CefString& origin_url, CefJSDialogHandler::JSDialogType dialog_type, const CefString& message_text, const CefString& default_prompt_text, CefRefPtr<CefJSDialogCallback> callback, bool& suppress_message )
+bool CWebView::OnJSDialog(CefRefPtr<CefBrowser> browser, const CefString& origin_url, CefJSDialogHandler::JSDialogType dialog_type,
+                          const CefString& message_text, const CefString& default_prompt_text, CefRefPtr<CefJSDialogCallback> callback, bool& suppress_message)
 {
     // TODO: Provide a way to influence Javascript dialogs via Lua
     // e.g. addEventHandler("onClientBrowserDialog", browser, function(message, defaultText) continueBrowserDialog("My input") end)
@@ -933,10 +952,12 @@ bool CWebView::OnJSDialog ( CefRefPtr<CefBrowser> browser, const CefString& orig
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefDialogHandler::OnFileDialog                 //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefDialogHandler.html#OnFileDialog(CefRefPtr%3CCefBrowser%3E,FileDialogMode,constCefString&,constCefString&,conststd::vector%3CCefString%3E&,CefRefPtr%3CCefFileDialogCallback%3E) //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefDialogHandler.html#OnFileDialog(CefRefPtr%3CCefBrowser%3E,FileDialogMode,constCefString&,constCefString&,conststd::vector%3CCefString%3E&,CefRefPtr%3CCefFileDialogCallback%3E)
+// //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnFileDialog ( CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_name, const std::vector< CefString >& accept_types, int selected_accept_filter, CefRefPtr< CefFileDialogCallback > callback )
+bool CWebView::OnFileDialog(CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_name,
+                            const std::vector<CefString>& accept_types, int selected_accept_filter, CefRefPtr<CefFileDialogCallback> callback)
 {
     // Don't show the dialog
     return true;
@@ -948,9 +969,9 @@ bool CWebView::OnFileDialog ( CefRefPtr<CefBrowser> browser, CefDialogHandler::F
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefDisplayHandler.html#OnTitleChange(CefRefPtr%3CCefBrowser%3E,constCefString&) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-void CWebView::OnTitleChange ( CefRefPtr<CefBrowser> browser, const CefString& title )
+void CWebView::OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title)
 {
-    m_CurrentTitle = UTF16ToMbUTF8 ( title );
+    m_CurrentTitle = UTF16ToMbUTF8(title);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -959,11 +980,11 @@ void CWebView::OnTitleChange ( CefRefPtr<CefBrowser> browser, const CefString& t
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefDisplayHandler.html#OnTooltip(CefRefPtr%3CCefBrowser%3E,CefString&) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnTooltip ( CefRefPtr<CefBrowser> browser, CefString& title )
+bool CWebView::OnTooltip(CefRefPtr<CefBrowser> browser, CefString& title)
 {
     // Queue event to run on the main thread
-    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnTooltip, m_pEventsInterface, UTF16ToMbUTF8 ( title ) );
-    g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnTooltip" );
+    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnTooltip, m_pEventsInterface, UTF16ToMbUTF8(title));
+    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnTooltip");
 
     return true;
 }
@@ -971,18 +992,20 @@ bool CWebView::OnTooltip ( CefRefPtr<CefBrowser> browser, CefString& title )
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefDisplayHandler::OnConsoleMessage            //
-// http://magpcss.org/ceforum/apidocs/projects/%28default%29/CefDisplayHandler.html#OnConsoleMessage%28CefRefPtr%3CCefBrowser%3E,constCefString&,constCefString&,int%29 //
+// http://magpcss.org/ceforum/apidocs/projects/%28default%29/CefDisplayHandler.html#OnConsoleMessage%28CefRefPtr%3CCefBrowser%3E,constCefString&,constCefString&,int%29
+// //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnConsoleMessage ( CefRefPtr<CefBrowser> browser, const CefString& message, const CefString& source, int line )
+bool CWebView::OnConsoleMessage(CefRefPtr<CefBrowser> browser, cef_log_severity_t level, const CefString& message, const CefString& source, int line)
 {
     // Redirect console message to debug window (if development mode is enabled)
-    if ( g_pCore->GetWebCore ()->IsTestModeEnabled () )
+    if (g_pCore->GetWebCore()->IsTestModeEnabled())
     {
-        g_pCore->GetWebCore ()->AddEventToEventQueue ( [message, source]() {
-            g_pCore->DebugPrintfColor ( "[BROWSER] Console: %s (%s)", 255, 0, 0, UTF16ToMbUTF8 ( message ).c_str (), UTF16ToMbUTF8 ( source ).c_str () );
-        }, this, "OnConsoleMessage" );
-
+        g_pCore->GetWebCore()->AddEventToEventQueue(
+            [message, source]() {
+                g_pCore->DebugPrintfColor("[BROWSER] Console: %s (%s)", 255, 0, 0, UTF16ToMbUTF8(message).c_str(), UTF16ToMbUTF8(source).c_str());
+            },
+            this, "OnConsoleMessage");
     }
 
     return true;
@@ -991,10 +1014,12 @@ bool CWebView::OnConsoleMessage ( CefRefPtr<CefBrowser> browser, const CefString
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefContextMenuHandler::OnBeforeContextMenu     //
-// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefContextMenuHandler.html#OnBeforeContextMenu(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefContextMenuParams%3E,CefRefPtr%3CCefMenuModel%3E) //
+// http://magpcss.org/ceforum/apidocs3/projects/(default)/CefContextMenuHandler.html#OnBeforeContextMenu(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefContextMenuParams%3E,CefRefPtr%3CCefMenuModel%3E)
+// //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-void CWebView::OnBeforeContextMenu(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefContextMenuParams> params, CefRefPtr<CefMenuModel> model)
+void CWebView::OnBeforeContextMenu(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefContextMenuParams> params,
+                                   CefRefPtr<CefMenuModel> model)
 {
     // Show no context menu
     model->Clear();

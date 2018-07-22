@@ -1,21 +1,20 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CKeyGenSA.cpp
-*  PURPOSE:     Game key generator
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CKeyGenSA.cpp
+ *  PURPOSE:     Game key generator
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-unsigned int CKeyGenSA::GetKey ( const char * szString, int iLength )
+unsigned int CKeyGenSA::GetKey(const char* szString, int iLength)
 {
     unsigned int uiReturn;
-    DWORD dwFunc = FUNC_CKeyGen_GetKey_len;
+    DWORD        dwFunc = FUNC_CKeyGen_GetKey_len;
     _asm
     {
         push    iLength
@@ -27,11 +26,10 @@ unsigned int CKeyGenSA::GetKey ( const char * szString, int iLength )
     return uiReturn;
 }
 
-
-unsigned int CKeyGenSA::GetKey ( const char * szString )
+unsigned int CKeyGenSA::GetKey(const char* szString)
 {
     unsigned int uiReturn;
-    DWORD dwFunc = FUNC_CKeyGen_GetKey;
+    DWORD        dwFunc = FUNC_CKeyGen_GetKey;
     _asm
     {
         push    szString
@@ -42,11 +40,10 @@ unsigned int CKeyGenSA::GetKey ( const char * szString )
     return uiReturn;
 }
 
-
-unsigned int CKeyGenSA::GetUppercaseKey ( const char * szString )
+unsigned int CKeyGenSA::GetUppercaseKey(const char* szString)
 {
     unsigned int uiReturn;
-    DWORD dwFunc = FUNC_CKeyGen_GetUppercaseKey;
+    DWORD        dwFunc = FUNC_CKeyGen_GetUppercaseKey;
     _asm
     {
         push    szString
@@ -57,11 +54,10 @@ unsigned int CKeyGenSA::GetUppercaseKey ( const char * szString )
     return uiReturn;
 }
 
-
-unsigned int CKeyGenSA::AppendStringToKey ( unsigned int uiKey, const char * szString )
+unsigned int CKeyGenSA::AppendStringToKey(unsigned int uiKey, const char* szString)
 {
     unsigned int uiReturn;
-    DWORD dwFunc = FUNC_CKeyGen_AppendStringToKey;
+    DWORD        dwFunc = FUNC_CKeyGen_AppendStringToKey;
     _asm
     {
         push    szString
