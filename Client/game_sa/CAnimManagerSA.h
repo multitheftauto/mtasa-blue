@@ -93,9 +93,9 @@ public:
     int GetNumAnimBlocks(void);
     int GetNumAnimAssocDefinitions(void);
 
-    CAnimBlendHierarchy* GetAnimation(int ID);
-    CAnimBlendHierarchy* GetAnimation(const char* szName, CAnimBlock* pBlock);
-    CAnimBlendHierarchy* GetAnimation(unsigned int uiIndex, CAnimBlock* pBlock);
+    std::unique_ptr<CAnimBlendHierarchy> GetAnimation(int ID);
+    std::unique_ptr<CAnimBlendHierarchy> GetAnimation(const char* szName, CAnimBlock* pBlock);
+    std::unique_ptr<CAnimBlendHierarchy> GetAnimation(unsigned int uiIndex, CAnimBlock* pBlock);
 
     CAnimBlock* GetAnimationBlock(int ID);
     CAnimBlock* GetAnimationBlock(const char* szName);
@@ -108,14 +108,15 @@ public:
     const char* GetAnimGroupName(AssocGroupId groupID);
     const char* GetAnimBlockName(AssocGroupId groupID);
 
-    CAnimBlendAssociation*  CreateAnimAssociation(AssocGroupId animGroup, AnimationId animID);
-    StaticAssocIntface_type GetAnimStaticAssociation(AssocGroupId animGroup, AnimationId animID);
-    CAnimBlendAssociation*  GetAnimAssociation(AssocGroupId animGroup, const char* szAnimName);
-    CAnimBlendAssociation*  AddAnimation(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
-    CAnimBlendAssociation*  AddAnimation(RpClump* pClump, CAnimBlendHierarchy*, int ID);
-    CAnimBlendAssociation*  AddAnimationAndSync(RpClump* pClump, CAnimBlendAssociation* pAssociation, AssocGroupId animGroup, AnimationId animID);
-    CAnimBlendAssociation*  BlendAnimation(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta);
-    CAnimBlendAssociation*  BlendAnimation(RpClump* pClump, CAnimBlendHierarchy* pHierarchy, int ID, float fBlendDelta);
+    std::unique_ptr<CAnimBlendAssociation> CreateAnimAssociation(AssocGroupId animGroup, AnimationId animID);
+    StaticAssocIntface_type                GetAnimStaticAssociation(AssocGroupId animGroup, AnimationId animID);
+    std::unique_ptr<CAnimBlendAssociation> GetAnimAssociation(AssocGroupId animGroup, const char* szAnimName);
+    std::unique_ptr<CAnimBlendAssociation> AddAnimation(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
+    std::unique_ptr<CAnimBlendAssociation> AddAnimation(RpClump* pClump, CAnimBlendHierarchy*, int ID);
+    std::unique_ptr<CAnimBlendAssociation> AddAnimationAndSync(RpClump* pClump, CAnimBlendAssociation* pAssociation, AssocGroupId animGroup,
+                                                               AnimationId animID);
+    std::unique_ptr<CAnimBlendAssociation> BlendAnimation(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta);
+    std::unique_ptr<CAnimBlendAssociation> BlendAnimation(RpClump* pClump, CAnimBlendHierarchy* pHierarchy, int ID, float fBlendDelta);
 
     void AddAnimBlockRef(int ID);
     void RemoveAnimBlockRef(int ID);
@@ -139,19 +140,19 @@ public:
     void  FreeKeyFramesMemory(void* pKeyFrames);
 
     // Non members
-    bool                   HasAnimGroupLoaded(AssocGroupId groupID);
-    CAnimBlendAssociation* RpAnimBlendClumpGetFirstAssociation(RpClump* pClump);
-    CAnimBlendAssociation* RpAnimBlendClumpGetAssociation(RpClump* pClump, const char* szAnimName);
-    CAnimBlendAssociation* RpAnimBlendClumpGetAssociation(RpClump* pClump, AnimationId animID);
-    CAnimBlendAssociation* RpAnimBlendGetNextAssociation(CAnimBlendAssociation* pAssociation);
-    int                    RpAnimBlendClumpGetNumAssociations(RpClump* pClump);
-    void                   RpAnimBlendClumpUpdateAnimations(RpClump* pClump, float f1, bool b1);
+    bool                                   HasAnimGroupLoaded(AssocGroupId groupID);
+    std::unique_ptr<CAnimBlendAssociation> RpAnimBlendClumpGetFirstAssociation(RpClump* pClump);
+    std::unique_ptr<CAnimBlendAssociation> RpAnimBlendClumpGetAssociation(RpClump* pClump, const char* szAnimName);
+    std::unique_ptr<CAnimBlendAssociation> RpAnimBlendClumpGetAssociation(RpClump* pClump, AnimationId animID);
+    std::unique_ptr<CAnimBlendAssociation> RpAnimBlendGetNextAssociation(CAnimBlendAssociation* pAssociation);
+    int                                    RpAnimBlendClumpGetNumAssociations(RpClump* pClump);
+    void                                   RpAnimBlendClumpUpdateAnimations(RpClump* pClump, float f1, bool b1);
 
     // MTA members
-    CAnimBlendAssociation* GetAnimBlendAssociation(CAnimBlendAssociationSAInterface* pInterface);
-    CAnimBlendAssocGroup*  GetAnimBlendAssocGroup(CAnimBlendAssocGroupSAInterface* pInterface);
-    CAnimBlock*            GetAnimBlock(CAnimBlockSAInterface* pInterface);
-    CAnimBlendHierarchy*   GetAnimBlendHierarchy(CAnimBlendHierarchySAInterface* pInterface);
+    std::unique_ptr<CAnimBlendAssociation> GetAnimBlendAssociation(CAnimBlendAssociationSAInterface* pInterface);
+    CAnimBlendAssocGroup*                  GetAnimBlendAssocGroup(CAnimBlendAssocGroupSAInterface* pInterface);
+    CAnimBlock*                            GetAnimBlock(CAnimBlockSAInterface* pInterface);
+    std::unique_ptr<CAnimBlendHierarchy>   GetAnimBlendHierarchy(CAnimBlendHierarchySAInterface* pInterface);
 
     StaticAssocIntface_type GetAnimStaticAssociation(CAnimBlendStaticAssociationSAInterface* pInterface);
 
@@ -171,10 +172,8 @@ public:
     const SString& GetGateWayAnimationName(void) { return m_kGateWayAnimationName; };
 
 private:
-    CAnimBlendAssocGroup*             m_pAnimAssocGroups[MAX_ANIM_GROUPS];
-    CAnimBlendHierarchy*              m_pAnimations[MAX_ANIMATIONS];
-    CAnimBlock*                       m_pAnimBlocks[MAX_ANIM_BLOCKS];
-    std::list<CAnimBlendAssociation*> m_Associations;
+    CAnimBlendAssocGroup* m_pAnimAssocGroups[MAX_ANIM_GROUPS];
+    CAnimBlock*           m_pAnimBlocks[MAX_ANIM_BLOCKS];
 
     // This "gateway" animation will allow us to play custom animations by simply playing this animation
     // and then in AddAnimation and AddAnimationAndSync hook, we can return our custom animation in the

@@ -9,12 +9,11 @@
  *
  *****************************************************************************/
 
-#ifndef __CCONNECTMANAGER_H
-#define __CCONNECTMANAGER_H
+#pragma once
 
 #include <ctime>
 #include <gui/CGUI.h>
-#include <Serverbrowser/CServerInfo.h>
+#include <ServerBrowser/CServerInfo.h>
 
 class CConnectManager
 {
@@ -61,5 +60,3 @@ private:
 
     bool CheckNickProvided(const char* szNick);
 };
-
-#endif

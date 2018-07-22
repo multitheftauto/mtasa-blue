@@ -301,10 +301,10 @@ void CPedRPCs::SetPedAnimationProgress(CClientEntity* pSource, NetBitStreamInter
                     szAnimName[ucAnimSize] = 0;
                     if (bitStream.Read(fProgress))
                     {
-                        CAnimBlendAssociation* pA = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pPed->GetClump(), szAnimName);
-                        if (pA)
+                        auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pPed->GetClump(), szAnimName);
+                        if (pAnimAssociation)
                         {
-                            pA->SetCurrentProgress(fProgress);
+                            pAnimAssociation->SetCurrentProgress(fProgress);
                         }
                     }
                 }

@@ -40,11 +40,7 @@ void CLuaFileDefs::AddClass(lua_State* luaVM)
 
     lua_classmetamethod(luaVM, "__gc", fileCloseGC);
 
-#ifdef MTA_CLIENT
-    lua_classfunction(luaVM, "create", CLuaFileDefs::File);
-#else
-    lua_classfunction(luaVM, "create", "fileCreate", CLuaFileDefs::File);
-#endif
+    lua_classfunction(luaVM, "create", "fileCreate");
 
     lua_classfunction(luaVM, "open", "fileOpen");
     lua_classfunction(luaVM, "new", "fileCreate");

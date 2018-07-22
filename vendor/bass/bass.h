@@ -141,6 +141,7 @@ typedef DWORD HPLUGIN;		// Plugin handle
 #define BASS_CONFIG_AM_DISABLE		58
 #define BASS_CONFIG_NET_PLAYLIST_DEPTH	59
 #define BASS_CONFIG_NET_PREBUF_WAIT	60
+#define BASS_CONFIG_LIBSSL			64
 
 // BASS_SetConfigPtr options
 #define BASS_CONFIG_NET_AGENT		16
@@ -561,6 +562,7 @@ user   : The 'user' parameter value given when calling BASS_StreamCreateURL */
 #define BASS_SYNC_MUSICINST		1
 #define BASS_SYNC_MUSICFX		3
 #define BASS_SYNC_OGG_CHANGE	12
+#define BASS_SYNC_DEV_FAIL		14
 #define BASS_SYNC_MIXTIME		0x40000000	// flag: sync at mixtime, else at playtime
 #define BASS_SYNC_ONETIME		0x80000000	// flag: sync only once, else continuously
 
@@ -593,10 +595,11 @@ user   : The 'user' parameter value given when calling BASS_RecordStart
 RETURN : TRUE = continue recording, FALSE = stop */
 
 // BASS_ChannelIsActive return values
-#define BASS_ACTIVE_STOPPED	0
-#define BASS_ACTIVE_PLAYING	1
-#define BASS_ACTIVE_STALLED	2
-#define BASS_ACTIVE_PAUSED	3
+#define BASS_ACTIVE_STOPPED			0
+#define BASS_ACTIVE_PLAYING			1
+#define BASS_ACTIVE_STALLED			2
+#define BASS_ACTIVE_PAUSED			3
+#define BASS_ACTIVE_PAUSED_DEVICE	4
 
 // Channel attributes
 #define BASS_ATTRIB_FREQ			1
@@ -1006,6 +1009,7 @@ float BASSDEF(BASS_GetCPU)();
 BOOL BASSDEF(BASS_Start)();
 BOOL BASSDEF(BASS_Stop)();
 BOOL BASSDEF(BASS_Pause)();
+BOOL BASSDEF(BASS_IsStarted)();
 BOOL BASSDEF(BASS_SetVolume)(float volume);
 float BASSDEF(BASS_GetVolume)();
 
