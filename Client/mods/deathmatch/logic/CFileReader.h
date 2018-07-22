@@ -24,6 +24,7 @@ public:
 
     CFileReader(void);
     bool LoadFileToMemory(const SString& strFilePath);
+    bool LoadDataBufferToMemory(const SString& buffer);
     // Do not call any file reader functions after calling this function
     void FreeFileReaderMemory(void);
 

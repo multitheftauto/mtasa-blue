@@ -14,10 +14,10 @@
 
 struct sTaskName
 {
-    const char* szName;
+    const char* const szName;
 };
 
-extern const char* sNoTaskName;
+extern const char* const sNoTaskName;
 
 extern const sTaskName TaskNames[1802];
 #endif

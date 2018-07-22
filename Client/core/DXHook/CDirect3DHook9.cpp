@@ -133,8 +133,6 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9(UINT SDKVersion)
 
     WriteDebugEvent("Direct3DCreate9 succeded");
 
-    GetServerCache();
-
     // Create a proxy device.
     CProxyDirect3D9* pProxyDirect3D9 = new CProxyDirect3D9(pDirect3D9);
 

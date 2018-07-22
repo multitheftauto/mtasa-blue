@@ -12,7 +12,7 @@
 
 using namespace std;
 
-const char* szWeaponNameEmpty = "";
+const char* const szWeaponNameEmpty = "";
 
 struct SWeaponName
 {

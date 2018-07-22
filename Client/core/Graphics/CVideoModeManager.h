@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CVIDEOMODEMANAGER_H
-#define __CVIDEOMODEMANAGER_H
+#pragma once
 
 enum
 {
@@ -41,5 +40,3 @@ public:
 };
 
 CVideoModeManagerInterface* GetVideoModeManager(void);
-
-#endif

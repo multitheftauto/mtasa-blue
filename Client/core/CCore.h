@@ -11,8 +11,7 @@
 
 class CCore;
 
-#ifndef __CCORE_H
-#define __CCORE_H
+#pragma once
 
 #include "../version.h"
 
@@ -368,5 +367,3 @@ private:
     std::map<std::string, std::string> m_CommandLineOptions;            // e.g. "-o option" -> {"o" = "option"}
     const char*                        m_szCommandLineArgs;             // Everything that comes after the options
 };
-
-#endif

@@ -334,7 +334,7 @@ public:
     void*        GetVehicleSuspensionData(void);
     void*        SetVehicleSuspensionData(void* pSuspensionLines);
     CVector      GetVehicleExhaustFumesPosition() override;
-    void         SetVehicleExhaustFumesPosition(const CVector& position) override;
+    void         SetVehicleExhaustFumesPosition(const CVector& vecPosition) override;
     static void  ResetAllVehicleExhaustFumes();
 
     // ONLY use for peds
