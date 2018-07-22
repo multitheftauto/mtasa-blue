@@ -136,7 +136,6 @@ void CLuaGUIDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("guiMemoIsReadOnly", GUIMemoIsReadOnly);
     CLuaCFunctions::AddFunction("guiMemoSetVerticalScrollPosition", GUIMemoSetVerticalScrollPosition);
     CLuaCFunctions::AddFunction("guiMemoGetVerticalScrollPosition", GUIMemoGetVerticalScrollPosition);
-    CLuaCFunctions::AddFunction("guiMemoGetMaxVerticalScrollPosition", GUIMemoGetMaxVerticalScrollPosition);
 
     CLuaCFunctions::AddFunction("guiLabelSetColor", GUILabelSetColor);
     CLuaCFunctions::AddFunction("guiLabelGetColor", GUILabelGetColor);
@@ -324,7 +323,6 @@ void CLuaGUIDefs::AddGuiMemoClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setReadOnly", "guiMemoSetReadOnly");
 
     lua_classfunction(luaVM, "getVerticalScrollPosition", "guiMemoGetVerticalScrollPosition");
-    lua_classfunction(luaVM, "getMaxVerticalScrollPosition", "guiMemoGetMaxVerticalScrollPosition");
 
     lua_classfunction(luaVM, "setVerticalScrollPosition", "guiMemoSetVerticalScrollPosition");
 
@@ -332,7 +330,6 @@ void CLuaGUIDefs::AddGuiMemoClass(lua_State* luaVM)
     lua_classvariable(luaVM, "readOnly", "guiMemoSetReadOnly", "guiMemoIsReadOnly");
 
     lua_classvariable(luaVM, "verticalScrollPosition", "guiMemoSetVerticalScrollPosition", "guiMemoGetVerticalScrollPosition");
-    lua_classvariable(luaVM, "maxVerticalScrollPosition", NULL, "guiMemoGetMaxVerticalScrollPosition");
 
     lua_registerclass(luaVM, "GuiMemo", "GuiElement");
 }
@@ -3177,28 +3174,6 @@ int CLuaGUIDefs::GUIMemoGetCaretIndex(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         lua_pushnumber(luaVM, static_cast<CGUIMemo*>(theMemo->GetCGUIElement())->GetCaretIndex());
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // error: bad arguments
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaGUIDefs::GUIMemoGetMaxVerticalScrollPosition(lua_State* luaVM)
-{
-    //  float guiMemoGetMaxVerticalScrollPosition ( gui-memo theMemo )
-    CClientGUIElement* theMemo;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData<CGUIMemo>(theMemo);
-
-    if (!argStream.HasErrors())
-    {
-        float fPos = static_cast<CGUIMemo*>(theMemo->GetCGUIElement())->GetMaxVerticalScrollPosition();
-        lua_pushnumber(luaVM, fPos);
         return 1;
     }
     else
