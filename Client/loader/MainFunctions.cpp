@@ -765,7 +765,6 @@ void CheckDataFiles(void)
     const char* dataFilesFiles[] = {"MTA\\cgui\\images\\background_logo.png",
                                     "MTA\\cgui\\images\\radarset\\up.png",
                                     "MTA\\cgui\\images\\busy_spinner.png",
-                                    "MTA\\cgui\\images\\rect_edge.png",
                                     "MTA\\D3DX9_42.dll",
                                     "MTA\\D3DCompiler_42.dll",
                                     "MTA\\bass.dll",
@@ -783,12 +782,6 @@ void CheckDataFiles(void)
                                    "mta-datafiles-missing");
             return ExitProcess(EXIT_ERROR);
         }
-    }
-
-    if (FileSize(PathJoin(strMTASAPath, "MTA", "bass.dll")) != 0x0001E69C)
-    {
-        DisplayErrorMessageBox(_("Load failed. Please ensure that the latest data files have been installed correctly."), _E("CL17"), "mta-datafiles-missing");
-        return ExitProcess(EXIT_ERROR);
     }
 
     // Check for client file
@@ -843,7 +836,7 @@ void CheckDataFiles(void)
         const char* szFilename;
     } integrityCheckList[] = {
         {
-            "B4F19217C58F97E0564CF725B9B74E4E",
+            "4783E7C0D0005B80673A972E4231A230",
             "bass.dll",
         },
         {
@@ -855,15 +848,15 @@ void CheckDataFiles(void)
             "bass_ac3.dll",
         },
         {
-            "C55E0F0FC9F2F4FF91AF7D24551CEBB0",
+            "E7F4494BDF7B1C49A303FE56C6B52DC9",
             "bass_fx.dll",
         },
         {
-            "437A8DBF495C0161CC889827AF8DBB0C",
+            "3CA82F8E39DE39A50C13474905EF2D65",
             "bassflac.dll",
         },
         {
-            "22D6CD2368A952509B503346F77D6E40",
+            "13A3F5637A93F0340161A40C6FBD3F1F",
             "bassmidi.dll",
         },
         {

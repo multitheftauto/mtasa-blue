@@ -11,8 +11,7 @@
 
 class CServerBrowser;
 
-#ifndef __CSERVERBROWSER_H
-#define __CSERVERBROWSER_H
+#pragma once
 
 // Amount of server lists/tabs (ServerBrowserType)
 #define SERVER_BROWSER_TYPE_COUNT           4
@@ -260,5 +259,3 @@ private:
     CGUIWindow*       m_pGeneralHelpWindow;
     long long         m_llLastGeneralHelpTime;
 };
-
-#endif

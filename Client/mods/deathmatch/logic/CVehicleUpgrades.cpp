@@ -14,7 +14,7 @@ char szUpgradeNameEmpty[] = "";
 
 struct SUpgradeName
 {
-    const char* szName;
+    const char* const szName;
 };
 
 static const SFixedArray<SUpgradeName, 17> UpgradeNames = {{{"Hood"},

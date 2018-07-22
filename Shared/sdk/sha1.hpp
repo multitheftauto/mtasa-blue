@@ -41,9 +41,9 @@
 #endif
 
 /* Implementation that should never be optimized out by the compiler */
-static void polarssl_zeroize(void *v, size_t n)
+static void polarssl_zeroize(void* v, size_t n)
 {
-    volatile unsigned char *p = (volatile unsigned char *)v;
+    volatile unsigned char* p = (volatile unsigned char*)v;
     while (n--)
         *p++ = 0;
 }
@@ -73,12 +73,12 @@ static void polarssl_zeroize(void *v, size_t n)
 }
 #endif
 
-void sha1_init(sha1_context *ctx)
+void sha1_init(sha1_context* ctx)
 {
     memset(ctx, 0, sizeof(sha1_context));
 }
 
-void sha1_free(sha1_context *ctx)
+void sha1_free(sha1_context* ctx)
 {
     if (ctx == NULL)
         return;
@@ -89,7 +89,7 @@ void sha1_free(sha1_context *ctx)
 /*
  * SHA-1 context setup
  */
-void sha1_starts(sha1_context *ctx)
+void sha1_starts(sha1_context* ctx)
 {
     ctx->total[0] = 0;
     ctx->total[1] = 0;
@@ -101,7 +101,7 @@ void sha1_starts(sha1_context *ctx)
     ctx->state[4] = 0xC3D2E1F0;
 }
 
-void sha1_process(sha1_context *ctx, const unsigned char data[64])
+void sha1_process(sha1_context* ctx, const unsigned char data[64])
 {
     uint32_t temp, W[16], A, B, C, D, E;
 
@@ -263,7 +263,7 @@ void sha1_process(sha1_context *ctx, const unsigned char data[64])
 /*
  * SHA-1 process buffer
  */
-void sha1_update(sha1_context *ctx, const unsigned char *input, size_t ilen)
+void sha1_update(sha1_context* ctx, const unsigned char* input, size_t ilen)
 {
     size_t   fill;
     uint32_t left;
@@ -282,7 +282,7 @@ void sha1_update(sha1_context *ctx, const unsigned char *input, size_t ilen)
 
     if (left && ilen >= fill)
     {
-        memcpy((void *)(ctx->buffer + left), input, fill);
+        memcpy((void*)(ctx->buffer + left), input, fill);
         sha1_process(ctx, ctx->buffer);
         input += fill;
         ilen -= fill;
@@ -297,7 +297,7 @@ void sha1_update(sha1_context *ctx, const unsigned char *input, size_t ilen)
     }
 
     if (ilen > 0)
-        memcpy((void *)(ctx->buffer + left), input, ilen);
+        memcpy((void*)(ctx->buffer + left), input, ilen);
 }
 
 static const unsigned char sha1_padding[64] = {0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -306,7 +306,7 @@ static const unsigned char sha1_padding[64] = {0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 /*
  * SHA-1 final digest
  */
-void sha1_finish(sha1_context *ctx, unsigned char output[20])
+void sha1_finish(sha1_context* ctx, unsigned char output[20])
 {
     uint32_t      last, padn;
     uint32_t      high, low;
@@ -336,7 +336,7 @@ void sha1_finish(sha1_context *ctx, unsigned char output[20])
 /*
  * output = SHA-1( input buffer )
  */
-void sha1(const unsigned char *input, size_t ilen, unsigned char output[20])
+void sha1(const unsigned char* input, size_t ilen, unsigned char output[20])
 {
     sha1_context ctx;
 
@@ -351,9 +351,9 @@ void sha1(const unsigned char *input, size_t ilen, unsigned char output[20])
 /*
  * output = SHA-1( file contents )
  */
-int sha1_file(const char *path, unsigned char output[20])
+int sha1_file(const char* path, unsigned char output[20])
 {
-    FILE *        f;
+    FILE*         f;
     size_t        n;
     sha1_context  ctx;
     unsigned char buf[1024];
@@ -384,7 +384,7 @@ int sha1_file(const char *path, unsigned char output[20])
 /*
  * SHA-1 HMAC context setup
  */
-void sha1_hmac_starts(sha1_context *ctx, const unsigned char *key, size_t keylen)
+void sha1_hmac_starts(sha1_context* ctx, const unsigned char* key, size_t keylen)
 {
     size_t        i;
     unsigned char sum[20];
@@ -414,7 +414,7 @@ void sha1_hmac_starts(sha1_context *ctx, const unsigned char *key, size_t keylen
 /*
  * SHA-1 HMAC process buffer
  */
-void sha1_hmac_update(sha1_context *ctx, const unsigned char *input, size_t ilen)
+void sha1_hmac_update(sha1_context* ctx, const unsigned char* input, size_t ilen)
 {
     sha1_update(ctx, input, ilen);
 }
@@ -422,7 +422,7 @@ void sha1_hmac_update(sha1_context *ctx, const unsigned char *input, size_t ilen
 /*
  * SHA-1 HMAC final digest
  */
-void sha1_hmac_finish(sha1_context *ctx, unsigned char output[20])
+void sha1_hmac_finish(sha1_context* ctx, unsigned char output[20])
 {
     unsigned char tmpbuf[20];
 
@@ -438,7 +438,7 @@ void sha1_hmac_finish(sha1_context *ctx, unsigned char output[20])
 /*
  * SHA1 HMAC context reset
  */
-void sha1_hmac_reset(sha1_context *ctx)
+void sha1_hmac_reset(sha1_context* ctx)
 {
     sha1_starts(ctx);
     sha1_update(ctx, ctx->ipad, 64);
@@ -447,7 +447,7 @@ void sha1_hmac_reset(sha1_context *ctx)
 /*
  * output = HMAC-SHA-1( hmac key, input buffer )
  */
-void sha1_hmac(const unsigned char *key, size_t keylen, const unsigned char *input, size_t ilen, unsigned char output[20])
+void sha1_hmac(const unsigned char* key, size_t keylen, const unsigned char* input, size_t ilen, unsigned char output[20])
 {
     sha1_context ctx;
 
