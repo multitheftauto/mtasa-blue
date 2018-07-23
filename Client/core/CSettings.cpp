@@ -1495,7 +1495,7 @@ void CSettings::UpdateVideoTab(void)
 
     // Allow screen upload
     bool bAllowServerTransferBoxControl;
-    CVARS_GET("allow_server_control_transfebox", bAllowServerTransferBoxControl);
+    CVARS_GET("allow_server_control_transferbox", bAllowServerTransferBoxControl);
     m_pCheckBoxAllowControlTransferBox->SetSelected(bAllowServerTransferBoxControl);
 
     // Customized sa files
@@ -3309,7 +3309,7 @@ void CSettings::SaveData(void)
 
     // Allow screen upload
     bool m_pCheckBoxAllowScreenUpload = m_pCheckBoxAllowControlTransferBox->GetSelected();
-    CVARS_SET("allow_server_control_transfebox", m_pCheckBoxAllowScreenUpload);
+    CVARS_SET("allow_server_control_transferbox", m_pCheckBoxAllowScreenUpload);
 
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();

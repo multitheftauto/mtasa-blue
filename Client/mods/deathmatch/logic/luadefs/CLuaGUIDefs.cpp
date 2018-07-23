@@ -7,7 +7,7 @@
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
-*****************************************************************************/
+ *****************************************************************************/
 
 #include "StdInc.h"
 
@@ -662,7 +662,7 @@ int CLuaGUIDefs::GUISetTransferBoxEnabled(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         bool bAllowed = false;
-        g_pCore->GetCVars()->Get("allow_server_control_transfebox", bAllowed);
+        g_pCore->GetCVars()->Get("allow_server_control_transferbox", bAllowed);
         if (bAllowed)
         {
             g_pClientGame->GetTransferBox()->SetEnabled(bEnabled);

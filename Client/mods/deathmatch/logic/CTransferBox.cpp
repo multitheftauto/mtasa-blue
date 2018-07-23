@@ -109,6 +109,7 @@ void CTransferBox::Hide(void)
 {
     m_pWindow->SetVisible(false);
     g_pCore->GetGUI()->SetTransferBoxVisible(false);
+
     m_dTotalSize = 0;
 }
 
