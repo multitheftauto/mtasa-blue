@@ -3004,12 +3004,12 @@ int CLuaGUIDefs::GUIEditIsReadOnly(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        bool readOnly = static_cast<CGUIEdit*>(editField>GetCGUIElement())>IsReadOnly();
+        bool readOnly = static_cast<CGUIEdit*>(editField->GetCGUIElement())->IsReadOnly();
         lua_pushboolean(luaVM, readOnly);
         return 1;
     }
     else
-        m_pScriptDebugging>LogCustom(luaVM, argStream.GetFullErrorMessage());
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // error: bad arguments
     lua_pushnil(luaVM);
@@ -3050,12 +3050,12 @@ int CLuaGUIDefs::GUIMemoIsReadOnly(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        bool readOnly = static_cast<CGUIMemo*>(theMemo>GetCGUIElement())>IsReadOnly();
+        bool readOnly = static_cast<CGUIMemo*>(theMemo->GetCGUIElement())->IsReadOnly();
         lua_pushboolean(luaVM, readOnly);
         return 1;
     }
     else
-        m_pScriptDebugging>LogCustom(luaVM, argStream.GetFullErrorMessage());
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // error: bad arguments
     lua_pushnil(luaVM);
