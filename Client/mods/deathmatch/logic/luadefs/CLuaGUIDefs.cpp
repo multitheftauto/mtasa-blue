@@ -656,9 +656,19 @@ int CLuaGUIDefs::GUISetTransferBoxEnabled(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        g_pClientGame->GetTransferBox()->SetEnabled(bEnabled);
-        lua_pushboolean(luaVM, true);
-        return 1;
+        bool bAllowed = false;
+        g_pCore->GetCVars()->Get("allow_server_control_transfebox", bAllowed);
+        if (bAllowed)
+        {
+            g_pClientGame->GetTransferBox()->SetEnabled(bEnabled);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        else
+        {
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
