@@ -116,13 +116,17 @@ public:
     LUA_DECLARE(GUIProgressBarSetProgress);
     LUA_DECLARE(GUIProgressBarGetProgress);
     LUA_DECLARE(GUIEditSetReadOnly);
+    LUA_DECLARE(GUIEditIsReadOnly);
     LUA_DECLARE(GUIEditSetMasked);
     LUA_DECLARE(GUIEditSetMaxLength);
     LUA_DECLARE(GUIEditSetCaretIndex);
     LUA_DECLARE(GUIEditGetCaretIndex);
     LUA_DECLARE(GUIMemoSetReadOnly);
+    LUA_DECLARE(GUIMemoIsReadOnly);
     LUA_DECLARE(GUIMemoSetCaretIndex);
     LUA_DECLARE(GUIMemoGetCaretIndex);
+    LUA_DECLARE(GUIMemoGetVerticalScrollPosition);
+    LUA_DECLARE(GUIMemoSetVerticalScrollPosition);
     LUA_DECLARE(GUIWindowSetMovable);
     LUA_DECLARE(GUIWindowSetSizable);
     LUA_DECLARE(GUIWindowGetMovable);

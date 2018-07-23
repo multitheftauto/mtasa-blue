@@ -1919,10 +1919,16 @@ void CClientPed::SetFrozen(bool bFrozen)
         {
             if (m_pTaskManager)
             {
-                m_pTaskManager->RemoveTask(TASK_PRIORITY_PRIMARY);
+                // Let them have a jetpack (#9522)
+                if (!HasJetPack())
+                    m_pTaskManager->RemoveTask(TASK_PRIORITY_PRIMARY);
+
                 m_pTaskManager->RemoveTask(TASK_PRIORITY_EVENT_RESPONSE_TEMP);
                 m_pTaskManager->RemoveTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
-                m_pTaskManager->RemoveTask(TASK_PRIORITY_PHYSICAL_RESPONSE);
+
+                // Let's let them choke too
+                if (!IsChoking())
+                    m_pTaskManager->RemoveTask(TASK_PRIORITY_PHYSICAL_RESPONSE);
             }
 
             if (m_pPlayerPed)
@@ -2882,7 +2888,7 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
     if (m_bStealthAiming)
     {
         // Grab our current anim
-        CAnimBlendAssociation* pAssoc = GetFirstAnimation();
+        std::unique_ptr<CAnimBlendAssociation> pAssoc = GetFirstAnimation();
         if (pAssoc)
         {
             // Check we're not doing any important animations
@@ -4310,6 +4316,13 @@ void CClientPed::SetChoking(bool bChoking)
             // His not choking. Make him choke if that's what we're supposed to do.
             if (bChoking)
             {
+                // Remove jetpack now so it doesn't stay on (#9522#c25612)
+                if (HasJetPack())
+                    SetHasJetPack(false);
+
+                // Let's kill any animation
+                KillAnimation();
+
                 // Create the choking task
                 CTaskSimpleChoking* pTask = g_pGame->GetTasks()->CreateTaskSimpleChoking(NULL, true);
                 if (pTask)
@@ -4517,6 +4530,13 @@ bool CClientPed::SetHasJetPack(bool bHasJetPack)
                     pTask->Destroy();
                     m_pTaskManager->RemoveTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
                 }
+
+                // Kill choking state now so it doesn't stay on (#9522#c26644)
+                if (IsChoking())
+                    SetChoking(false);
+
+                // Kill animation as well
+                KillAnimation();
 
                 CTaskSimpleJetPack* pJetPackTask = g_pGame->GetTasks()->CreateTaskSimpleJetpack();
                 if (pJetPackTask)
@@ -5634,6 +5654,14 @@ void CClientPed::RunAnimation(AssocGroupId animGroup, AnimationId animID)
 
     if (m_pPlayerPed)
     {
+        // Remove jetpack now so it doesn't stay on (#9522#c25612)
+        if (HasJetPack())
+            SetHasJetPack(false);
+
+        // Let's not choke them any longer
+        if (IsChoking())
+            SetChoking(false);
+
         CTask* pTask = g_pGame->GetTasks()->CreateTaskSimpleRunAnim(animGroup, animID, 4.0f, TASK_SIMPLE_ANIM, "TASK_SIMPLE_ANIM");
         if (pTask)
         {
@@ -5660,6 +5688,14 @@ void CClientPed::RunNamedAnimation(CAnimBlock* pBlock, const char* szAnimName, i
 
         if (pBlock->IsLoaded())
         {
+            // Remove jetpack now so it doesn't stay on (#9522#c25612)
+            if (HasJetPack())
+                SetHasJetPack(false);
+
+            // Let's not choke them any longer
+            if (IsChoking())
+                SetChoking(false);
+
             /*
              Saml1er: Setting flags to 0x10 will tell GTA:SA that animation needs to be decompressed.
                       If not, animation will either crash or do some weird things.
@@ -5951,7 +5987,7 @@ bool CClientPed::ShouldBeStealthAiming(void)
                             if (DistanceBetweenPoints3D(vecPos, vecPos_2) <= STEALTH_KILL_RANGE)
                             {
                                 // Grab our current anim
-                                CAnimBlendAssociation* pAssoc = GetFirstAnimation();
+                                std::unique_ptr<CAnimBlendAssociation> pAssoc = GetFirstAnimation();
                                 if (pAssoc)
                                 {
                                     // Our game checks for stealth killing
@@ -5978,7 +6014,7 @@ void CClientPed::SetStealthAiming(bool bAiming)
         if (!bAiming)
         {
             // Do we have the aiming animation?
-            CAnimBlendAssociation* pAssoc = GetAnimation(ANIM_ID_STEALTH_AIM);
+            std::unique_ptr<CAnimBlendAssociation> pAssoc = GetAnimation(ANIM_ID_STEALTH_AIM);
             if (pAssoc)
             {
                 // Stop our animation
@@ -5989,40 +6025,40 @@ void CClientPed::SetStealthAiming(bool bAiming)
     }
 }
 
-CAnimBlendAssociation* CClientPed::AddAnimation(AssocGroupId group, AnimationId id)
+std::unique_ptr<CAnimBlendAssociation> CClientPed::AddAnimation(AssocGroupId group, AnimationId id)
 {
     if (m_pPlayerPed)
     {
         return g_pGame->GetAnimManager()->AddAnimation(m_pPlayerPed->GetRpClump(), group, id);
     }
-    return NULL;
+    return nullptr;
 }
 
-CAnimBlendAssociation* CClientPed::BlendAnimation(AssocGroupId group, AnimationId id, float fBlendDelta)
+std::unique_ptr<CAnimBlendAssociation> CClientPed::BlendAnimation(AssocGroupId group, AnimationId id, float fBlendDelta)
 {
     if (m_pPlayerPed)
     {
         return g_pGame->GetAnimManager()->BlendAnimation(m_pPlayerPed->GetRpClump(), group, id, fBlendDelta);
     }
-    return NULL;
+    return nullptr;
 }
 
-CAnimBlendAssociation* CClientPed::GetAnimation(AnimationId id)
+std::unique_ptr<CAnimBlendAssociation> CClientPed::GetAnimation(AnimationId id)
 {
     if (m_pPlayerPed)
     {
         return g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(m_pPlayerPed->GetRpClump(), id);
     }
-    return NULL;
+    return nullptr;
 }
 
-CAnimBlendAssociation* CClientPed::GetFirstAnimation(void)
+std::unique_ptr<CAnimBlendAssociation> CClientPed::GetFirstAnimation(void)
 {
     if (m_pPlayerPed)
     {
         return g_pGame->GetAnimManager()->RpAnimBlendClumpGetFirstAssociation(m_pPlayerPed->GetRpClump());
     }
-    return NULL;
+    return nullptr;
 }
 
 void CClientPed::SetNextAnimationCustom(const std::shared_ptr<CClientIFP>& pIFP, const SString& strAnimationName)
@@ -6035,7 +6071,7 @@ void CClientPed::SetNextAnimationCustom(const std::shared_ptr<CClientIFP>& pIFP,
     m_u32CustomAnimationNameHash = HashString(strAnimationName.ToLower());
 }
 
-void CClientPed::ReplaceAnimation(CAnimBlendHierarchy* pInternalAnimHierarchy, const std::shared_ptr<CClientIFP>& pIFP,
+void CClientPed::ReplaceAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInternalAnimHierarchy, const std::shared_ptr<CClientIFP>& pIFP,
                                   CAnimBlendHierarchySAInterface* pCustomAnimHierarchy)
 {
     SReplacedAnimation replacedAnimation;
@@ -6044,7 +6080,7 @@ void CClientPed::ReplaceAnimation(CAnimBlendHierarchy* pInternalAnimHierarchy, c
     m_mapOfReplacedAnimations[pInternalAnimHierarchy->GetInterface()] = replacedAnimation;
 }
 
-void CClientPed::RestoreAnimation(CAnimBlendHierarchy* pInternalAnimHierarchy)
+void CClientPed::RestoreAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInternalAnimHierarchy)
 {
     m_mapOfReplacedAnimations.erase(pInternalAnimHierarchy->GetInterface());
 }

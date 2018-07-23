@@ -17,6 +17,5 @@ public:
     static void LoadFunctions(void);
 
     LUA_DECLARE(CreateFire);
-    LUA_DECLARE(ExtinguishFireInRadius);
-    LUA_DECLARE(ExtinguishAllFires);
+    LUA_DECLARE(ExtinguishFire);
 };

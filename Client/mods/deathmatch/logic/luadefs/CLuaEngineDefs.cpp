@@ -297,11 +297,12 @@ int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (pResource)
             {
+                bool bIsRawData = CIFPEngine::IsIFPData(strFile);
                 SString strPath;
                 // Is this a legal filepath?
-                if (CResourceManager::ParseResourcePathInput(strFile, pResource, &strPath))
+                if (bIsRawData || CResourceManager::ParseResourcePathInput(strFile, pResource, &strPath))
                 {
-                    std::shared_ptr<CClientIFP> pIFP = CIFPEngine::EngineLoadIFP(pResource, m_pManager, strPath, strBlockName);
+                    std::shared_ptr<CClientIFP> pIFP = CIFPEngine::EngineLoadIFP(pResource, m_pManager, bIsRawData ? strFile : strPath, bIsRawData, strBlockName);
                     if (pIFP != nullptr)
                     {
                         // Return the IFP element
@@ -309,10 +310,10 @@ int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
                         return 1;
                     }
                     else
-                        argStream.SetCustomError(strFile, "Error loading IFP");
+                        argStream.SetCustomError(bIsRawData ? "raw data" : strFile, "Error loading IFP");
                 }
                 else
-                    argStream.SetCustomError(strFile, "Bad file path");
+                    argStream.SetCustomError(bIsRawData ? "raw data" : strFile, "Bad file path");
             }
         }
     }

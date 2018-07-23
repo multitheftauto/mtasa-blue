@@ -14,8 +14,7 @@ class CServerListItem;
 class CServerListItemList;
 class CMasterServerManagerInterface;
 
-#ifndef __CSERVERLIST_H
-#define __CSERVERLIST_H
+#pragma once
 
 #include <windows.h>
 #include <string>
@@ -429,5 +428,3 @@ private:
     sockaddr_in   m_Remote;
     unsigned long m_ulStartTime;
 };
-
-#endif
