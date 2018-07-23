@@ -46,29 +46,29 @@ int CLuaFireDefs::ExtinguishFire(lua_State* luaVM)
     // bool extinguishFire ( [ float x, float y, float z [, float radius = 1.0 ] ] )
     CScriptArgReader argStream(luaVM);
 
-    if (argStream.NextIsVector3D())
+    if (argStream.NextIsNone())
     {
-        CVector vecPosition;
-        float   fRadius;
-
-        argStream.ReadVector3D(vecPosition);
-        argStream.ReadNumber(fRadius, 1.0f);
-
-        if (!argStream.HasErrors())
-        {
-            if (CStaticFunctionDefinitions::ExtinguishFireInRadius(vecPosition, fRadius))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-        lua_pushboolean(luaVM, false);
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::ExtinguishAllFires());
         return 1;
     }
 
-    lua_pushboolean(luaVM, CStaticFunctionDefinitions::ExtinguishAllFires());
+    CVector vecPosition;
+    float   fRadius;
+
+    argStream.ReadVector3D(vecPosition);
+    argStream.ReadNumber(fRadius, 1.0f);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::ExtinguishFireInRadius(vecPosition, fRadius))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
     return 1;
 }
