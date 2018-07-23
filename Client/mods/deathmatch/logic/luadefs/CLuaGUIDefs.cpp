@@ -3450,7 +3450,7 @@ int CLuaGUIDefs::GUIGetChatboxLayout(lua_State* luaVM)
     CScriptArgReader  argStream(luaVM);
     CCVarsInterface*  pCVars = g_pCore->GetCVars();
     float             fNumber;
-    std::string       strCVarValue;
+    SString           strCVarValue;
     std::stringstream ss;
     int               iR, iG, iB, iA;
     SString           strCVarArg;
