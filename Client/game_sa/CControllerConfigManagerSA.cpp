@@ -27,7 +27,7 @@ CControllerConfigManagerSA::CControllerConfigManagerSA()
     // Get initial settings
     m_bSteerWithMouse = *VAR_FlyWithMouse != 0;
     m_bFlyWithMouse = *VAR_SteerWithMouse != 0;
-    MemSet((void *)0x5BC7B4, 0x90, 10);            // Stop vertical aim sensitivity value reset
+    MemSet((void*)0x5BC7B4, 0x90, 10);            // Stop vertical aim sensitivity value reset
 }
 
 void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction(eControllerAction action, int iKey, eControllerType controllerType)
@@ -141,7 +141,7 @@ void CControllerConfigManagerSA::SetVerticalAimSensitivity(float fSensitivity)
 // Raw value used for saving so range can be changed without affecting user setting
 float CControllerConfigManagerSA::GetVerticalAimSensitivityRawValue()
 {
-    return *(FLOAT *)VAR_VerticalAimSensitivity;
+    return *(FLOAT*)VAR_VerticalAimSensitivity;
 }
 
 void CControllerConfigManagerSA::SetVerticalAimSensitivityRawValue(float fRawValue)

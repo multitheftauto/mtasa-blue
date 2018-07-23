@@ -11,8 +11,7 @@
 
 class CVehicle;
 
-#ifndef __CVEHICLE_H
-#define __CVEHICLE_H
+#pragma once
 
 #include "CCommon.h"
 #include "packets/CPacket.h"
@@ -443,5 +442,3 @@ public:            // 'Safe' variables (that have no need for accessors)
     SSirenInfo                             m_tSirenBeaconInfo;
     bool                                   m_bOccupantChanged;
 };
-
-#endif

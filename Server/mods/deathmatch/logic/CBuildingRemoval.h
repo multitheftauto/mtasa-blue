@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CBUILDINGREMOVAL_H
-#define __CBUILDINGREMOVAL_H
+#pragma once
 
 class CBuildingRemoval
 {
@@ -28,4 +27,3 @@ private:
     float          m_fRadius;
     char           m_cInterior;
 };
-#endif

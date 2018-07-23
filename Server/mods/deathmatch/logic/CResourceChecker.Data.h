@@ -397,11 +397,11 @@ namespace
         {false, "getClientName", "getPlayerName"},
         {false, "getClientIP", "getPlayerIP"},
         {false, "getClientAccount", "getPlayerAccount"},
-        {false, "getAccountClient", "getAccountPlayer"},
+        {true, "getAccountClient", "getAccountPlayer"},
         {false, "setClientName", "setPlayerName"},
         // Utility
-        {false, "randFloat", "math.random"},
-        {false, "randInt", "math.random"},
+        {true, "randFloat", "math.random"},
+        {true, "randInt", "math.random"},
         // Weapon
         {false, "giveWeaponAmmo", "giveWeapon"},
         {false, "takeWeaponAmmo", "takeWeapon"},

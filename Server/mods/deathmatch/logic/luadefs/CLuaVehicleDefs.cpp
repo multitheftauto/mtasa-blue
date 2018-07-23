@@ -165,7 +165,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getEngineState", "getVehicleEngineState");
     lua_classfunction(luaVM, "getLandingGearDown", "getVehicleLandingGearDown");
     lua_classfunction(luaVM, "getLightState", "getVehicleLightState");
-    lua_classfunction(luaVM, "getMaxPassenger", "getVehicleMaxPassengers");
+    lua_classfunction(luaVM, "getMaxPassengers", "getVehicleMaxPassengers");
     lua_classfunction(luaVM, "getName", "getVehicleName");
     lua_classfunction(luaVM, "getOccupant", "getVehicleOccupant");
     lua_classfunction(luaVM, "getOccupants", "getVehicleOccupants");
@@ -348,11 +348,8 @@ int CLuaVehicleDefs::GetVehicleType(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (ulModel >= 400 && ulModel < 610)
-        {
-            lua_pushstring(luaVM, CVehicleNames::GetVehicleTypeName(ulModel));
-            return 1;
-        }
+        lua_pushstring(luaVM, CVehicleNames::GetVehicleTypeName(ulModel));
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

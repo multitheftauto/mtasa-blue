@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef CRESOURCECLIENTSCRIPTITEM_H
-#define CRESOURCECLIENTSCRIPTITEM_H
+#pragma once
 
 #include "CResourceFile.h"
 
@@ -32,5 +31,3 @@ private:
     bool    m_bIsNoClientCache;
     SString m_sourceCode;
 };
-
-#endif

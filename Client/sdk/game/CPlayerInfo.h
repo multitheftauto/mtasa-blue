@@ -28,15 +28,15 @@ public:
     virtual short GetLastTimeEaten(void) = 0;
     virtual void  SetLastTimeEaten(short sTime) = 0;
 
-    virtual CWanted *GetWanted(void) = 0;
+    virtual CWanted* GetWanted(void) = 0;
     virtual float    GetFPSMoveHeading(void) = 0;
 
-    virtual void GetCrossHair(bool &bActivated, float &fTargetX, float &fTargetY) = 0;
+    virtual void GetCrossHair(bool& bActivated, float& fTargetX, float& fTargetY) = 0;
 
     virtual bool GetDoesNotGetTired(void) = 0;
     virtual void SetDoesNotGetTired(bool bDoesNotGetTired) = 0;
 
-    virtual CVehicle *GivePlayerRemoteControlledCar(eVehicleTypes vehicletype) = 0;
+    virtual CVehicle* GivePlayerRemoteControlledCar(eVehicleTypes vehicletype) = 0;
 
     virtual DWORD GetLastTimeBigGunFired(void) = 0;
     virtual void  SetLastTimeBigGunFired(DWORD dwTime) = 0;

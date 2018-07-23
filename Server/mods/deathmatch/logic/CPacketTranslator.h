@@ -11,8 +11,7 @@
 
 class CPacketTranslator;
 
-#ifndef __CPACKETTRANSLATOR_H
-#define __CPACKETTRANSLATOR_H
+#pragma once
 
 #include "CCommon.h"
 #include "CPlayerManager.h"
@@ -32,5 +31,3 @@ public:
 private:
     CPlayerManager* m_pPlayerManager;
 };
-
-#endif

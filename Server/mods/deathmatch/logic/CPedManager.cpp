@@ -48,10 +48,12 @@ CPed* CPedManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEv
         return NULL;
     }
 
-    // Make sure hes alive (leave to scripts?)
-    pPed->SetIsDead(false);
     pPed->SetSpawned(true);
-    pPed->SetHealth(100.0f);
+
+    if (pPed->GetHealth() > 0)
+    {
+        pPed->SetIsDead(false);
+    }
 
     // Return the created Ped
     return pPed;

@@ -207,7 +207,7 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
 
     // Unknown command
     val = _("Unknown command or cvar: ") + szCommand;
-    if (!bIsScriptedBind && !bIsNickCommand)
+    if (!bIsScriptedBind && !bIsNickCommand && pEntry == nullptr)
         CCore::GetSingleton().GetConsole()->Print(val.c_str());
     return false;
 }

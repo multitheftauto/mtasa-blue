@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CENTITYREMOVEPACKET_H
-#define __PACKETS_CENTITYREMOVEPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include <vector>
@@ -29,5 +28,3 @@ public:
 private:
     std::vector<class CElement*> m_List;
 };
-
-#endif

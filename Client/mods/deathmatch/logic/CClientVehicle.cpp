@@ -941,6 +941,7 @@ CVehicleColor& CClientVehicle::GetColor(void)
 void CClientVehicle::SetColor(const CVehicleColor& color)
 {
     m_Color = color;
+    m_bColorSaved = true;
     if (m_pVehicle)
     {
         m_pVehicle->SetColor(m_Color.GetRGBColor(0), m_Color.GetRGBColor(1), m_Color.GetRGBColor(2), m_Color.GetRGBColor(3), 0);
@@ -3062,7 +3063,7 @@ bool CClientVehicle::SetTowedVehicle(CClientVehicle* pVehicle, const CVector* ve
             pVehicle->SetTrainTrack(pChainEngine->GetTrainTrack());
             pVehicle->SetTrainPosition(pChainEngine->GetTrainPosition());
             pVehicle->SetTrainDirection(pChainEngine->GetTrainDirection());
-    
+
             CVector vecPosition;
             pChainEngine->GetPosition(vecPosition);
             pVehicle->SetPosition(vecPosition);
@@ -3739,8 +3740,8 @@ void CClientVehicle::UpdateTargetPosition(void)
 #endif
 
         // Update our contact players
-        CVector                     vecPlayerPosition;
-        CVector                     vecOffset;
+        CVector vecPlayerPosition;
+        CVector vecOffset;
         for (uint i = 0; i < m_Contacts.size(); i++)
         {
             CClientPed* pModel = m_Contacts[i];
@@ -4721,22 +4722,6 @@ bool CClientVehicle::DoesSupportUpgrade(const SString& strFrameName)
         return m_pVehicle->DoesSupportUpgrade(strFrameName);
     }
     return true;
-}
-
-void CClientVehicle::SetModelExhaustFumesPosition(unsigned short modelID, const CVector& position)
-{
-    auto pModelInfo = g_pGame->GetModelInfo(modelID);
-    if (pModelInfo)
-        pModelInfo->SetVehicleExhaustFumesPosition(position);
-}
-
-CVector CClientVehicle::GetModelExhaustFumesPosition(unsigned short modelID)
-{
-    auto pModelInfo = g_pGame->GetModelInfo(modelID);
-    if (pModelInfo)
-        return pModelInfo->GetVehicleExhaustFumesPosition();
-
-    return CVector();
 }
 
 bool CClientVehicle::OnVehicleFallThroughMap()

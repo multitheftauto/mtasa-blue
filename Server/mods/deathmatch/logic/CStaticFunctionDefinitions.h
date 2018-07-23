@@ -442,6 +442,7 @@ public:
     static CColRectangle* CreateColRectangle(CResource* pResource, const CVector2D& vecPosition, const CVector2D& vecSize);
     static CColPolygon*   CreateColPolygon(CResource* pResource, const std::vector<CVector2D>& vecPointList);
     static CColTube*      CreateColTube(CResource* pResource, const CVector& vecPosition, float fRadius, float fHeight);
+    static bool           IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside);
     static void           RefreshColShapeColliders(CColShape* pColShape);
 
     // Weapon funcs
@@ -651,6 +652,8 @@ public:
     static bool                          GetAccountsByData(const SString& dataName, const SString& value, std::vector<CAccount*>& outAccounts);
     static bool                          GetAccountSerial(CAccount* pAccount, SString& strSerial);
     static bool                          GetAccountsBySerial(const SString& strSerial, std::vector<CAccount*>& outAccounts);
+    static bool                          GetAccountID(CAccount* pAccount, int& ID);
+    static bool                          GetAccountByID(int ID, CAccount*& outAccount);
     static bool                          GetAccountIP(CAccount* pAccount, SString& strIP);
     static bool                          GetAccountsByIP(const SString& strIP, std::vector<CAccount*>& outAccounts);
 

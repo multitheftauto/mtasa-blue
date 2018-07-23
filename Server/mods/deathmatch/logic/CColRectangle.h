@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOLRECTANGLE_H
-#define __CCOLRECTANGLE_H
+#pragma once
 
 #include "CColShape.h"
 #include <CVector2D.h>
@@ -38,5 +37,3 @@ protected:
 
     CVector2D m_vecSize;
 };
-
-#endif

@@ -3863,6 +3863,10 @@ bool CStaticFunctionDefinitions::GivePedJetPack(CElement* pElement)
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned() && !pPed->GetOccupiedVehicle() && !pPed->HasJetPack())
         {
+            // Remove choking state
+            if (pPed->IsChoking())
+                pPed->SetChoking(false);
+
             pPed->SetHasJetPack(true);
 
             CBitStream BitStream;
@@ -3992,6 +3996,10 @@ bool CStaticFunctionDefinitions::SetPedChoking(CElement* pElement, bool bChoking
                 // Not already (not) choking?
                 if (bChoking != pPed->IsChoking())
                 {
+                    // Remove jetpack now so it doesn't stay on (#9522#c25612)
+                    if (pPed->HasJetPack())
+                        pPed->SetHasJetPack(false);
+                    
                     pPed->SetChoking(bChoking);
 
                     CBitStream bitStream;
@@ -4203,6 +4211,14 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const char*
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned())
         {
+            // Remove jetpack now so it doesn't stay on (#9522#c25612)
+            if (pPed->HasJetPack())
+                pPed->SetHasJetPack(false);
+
+            // Remove choking state
+            if (pPed->IsChoking())
+                pPed->SetChoking(false);
+
             // TODO: save their animation?
 
             // Tell the players
@@ -4903,7 +4919,7 @@ bool CStaticFunctionDefinitions::GetVehicleName(CVehicle* pVehicle, SString& str
 bool CStaticFunctionDefinitions::GetVehicleNameFromModel(unsigned short usModel, SString& strOutName)
 {
     strOutName = CVehicleNames::GetVehicleName(usModel);
-    return true;
+    return !strOutName.empty();
 }
 
 CPed* CStaticFunctionDefinitions::GetVehicleOccupant(CVehicle* pVehicle, unsigned int uiSeat)
@@ -9323,6 +9339,13 @@ CColTube* CStaticFunctionDefinitions::CreateColTube(CResource* pResource, const 
     return pColShape;
 }
 
+bool CStaticFunctionDefinitions::IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside)
+{
+    inside = pColShape->DoHitDetection(vecPosition);
+
+    return true;
+}
+
 // Make sure all colliders for a colshape are up to date
 void CStaticFunctionDefinitions::RefreshColShapeColliders(CColShape* pColShape)
 {
@@ -10904,6 +10927,21 @@ bool CStaticFunctionDefinitions::GetAccountSerial(CAccount* pAccount, SString& s
 bool CStaticFunctionDefinitions::GetAccountsBySerial(const SString& strSerial, std::vector<CAccount*>& outAccounts)
 {
     m_pAccountManager->GetAccountsBySerial(strSerial, outAccounts);
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetAccountID(CAccount* pAccount, int& ID)
+{
+    bool bRegistered = pAccount->IsRegistered();
+    if (bRegistered)
+        ID = pAccount->GetID();
+
+    return bRegistered;
+}
+
+bool CStaticFunctionDefinitions::GetAccountByID(int ID, CAccount*& outAccount)
+{
+    outAccount = m_pAccountManager->GetAccountByID(ID);
     return true;
 }
 

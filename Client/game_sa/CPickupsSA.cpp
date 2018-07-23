@@ -15,7 +15,7 @@ CPickupsSA::CPickupsSA()
 {
     DEBUG_TRACE("CPickupsSA::CPickupsSA()");
     for (int i = 0; i < MAX_PICKUPS; i++)
-        Pickups[i] = new CPickupSA((CPickupSAInterface *)(ARRAY_PICKUPS + i * sizeof(CPickupSAInterface)));
+        Pickups[i] = new CPickupSA((CPickupSAInterface*)(ARRAY_PICKUPS + i * sizeof(CPickupSAInterface)));
 }
 
 CPickupsSA::~CPickupsSA(void)
@@ -26,20 +26,20 @@ CPickupsSA::~CPickupsSA(void)
     }
 }
 
-CPickup *CPickupsSA::GetPickup(DWORD ID)
+CPickup* CPickupsSA::GetPickup(DWORD ID)
 {
     DEBUG_TRACE("CPickup * CPickupsSA::GetPickup(DWORD ID)");
-    return (CPickup *)Pickups[ID];
+    return (CPickup*)Pickups[ID];
 }
 
-CPickup *CPickupsSA::CreatePickup(CVector *position, DWORD ModelIndex, ePickupType Type, DWORD dwMonetaryValue, DWORD dwMoneyPerDay, BYTE bPingOutOfPlayer)
+CPickup* CPickupsSA::CreatePickup(CVector* position, DWORD ModelIndex, ePickupType Type, DWORD dwMonetaryValue, DWORD dwMoneyPerDay, BYTE bPingOutOfPlayer)
 {
     DEBUG_TRACE(
         "CPickup * CPickupsSA::CreatePickup(CVector * position, DWORD ModelIndex, ePickupType Type, DWORD dwMonetaryValue, DWORD dwMoneyPerDay, BYTE "
         "bPingOutOfPlayer)");
     DWORD      FreeSlot = 0;
     bool       bFoundFreeSlot = false;
-    CPickupSA *pickup;
+    CPickupSA* pickup;
 
     /*if (Type == PICKUP_FLOATINGPACKAGE || Type == PICKUP_NAUTICAL_MINE_INACTIVE || bPingOutOfPlayer)
     {
@@ -86,7 +86,7 @@ CPickup *CPickupsSA::CreatePickup(CVector *position, DWORD ModelIndex, ePickupTy
         if (FreeSlot >= MAX_PICKUPS)
         {            // Couldn't find one. Let's just hope we don't break anything in the scripts.
                      // ASSERTMSG(0, "Ran out of pickups");
-            return (CPickup *)NULL;
+            return (CPickup*)NULL;
         }
         else
         {
@@ -95,7 +95,7 @@ CPickup *CPickupsSA::CreatePickup(CVector *position, DWORD ModelIndex, ePickupTy
     }
 
     if (FreeSlot >= MAX_PICKUPS + MAX_PICKUPS_ALWAYS_UPDATED)
-        return (CPickup *)NULL;
+        return (CPickup*)NULL;
     pickup = Pickups[FreeSlot];
     // Generate an object in the world for us.
     // Set the values for this pickup
@@ -140,7 +140,7 @@ CPickup *CPickupsSA::CreatePickup(CVector *position, DWORD ModelIndex, ePickupTy
     pickup->GiveUsAPickUpObject();
 
     if (pickup->GetInterface()->pObject)
-        ((CWorldSA *)pGame->GetWorld())->Add(pickup->GetInterface()->pObject, CPickup_Constructor);
+        ((CWorldSA*)pGame->GetWorld())->Add(pickup->GetInterface()->pObject, CPickup_Constructor);
 
     return pickup;
 }
@@ -150,7 +150,7 @@ void CPickupsSA::DisablePickupProcessing(bool bDisabled)
     static BYTE byteOriginal = 0;
     if (bDisabled && !byteOriginal)
     {
-        byteOriginal = *(BYTE *)FUNC_CPickups__Update;
+        byteOriginal = *(BYTE*)FUNC_CPickups__Update;
         MemPut<BYTE>(FUNC_CPickups__Update, 0xC3);
     }
     else if (!bDisabled && byteOriginal)

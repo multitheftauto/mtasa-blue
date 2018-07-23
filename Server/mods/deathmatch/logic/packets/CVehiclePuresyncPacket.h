@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CVEHICLEPURESYNCPACKET_H
-#define __PACKETS_CVEHICLEPURESYNCPACKET_H
+#pragma once
 
 #include "CCommon.h"
 #include "CPacket.h"
@@ -35,5 +34,3 @@ private:
     void ReadVehicleSpecific(class CVehicle* pVehicle, NetBitStreamInterface& BitStream, int iRemoteModel);
     void WriteVehicleSpecific(class CVehicle* pVehicle, NetBitStreamInterface& BitStream) const;
 };
-
-#endif

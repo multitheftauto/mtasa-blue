@@ -11,8 +11,7 @@
 
 class CPickupManager;
 
-#ifndef __CPICKUPMANAGER_H
-#define __CPICKUPMANAGER_H
+#pragma once
 
 #include "CColManager.h"
 #include "CPickup.h"
@@ -48,5 +47,3 @@ private:
     CColManager*   m_pColManager;
     list<CPickup*> m_List;
 };
-
-#endif

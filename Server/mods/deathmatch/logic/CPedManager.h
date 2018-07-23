@@ -11,8 +11,7 @@
 
 class CPedManager;
 
-#ifndef __CPedManager_H
-#define __CPedManager_H
+#pragma once
 
 class CPedManager
 {
@@ -40,5 +39,3 @@ protected:
 
     list<class CPed*> m_List;
 };
-
-#endif

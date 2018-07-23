@@ -16,7 +16,7 @@ C3DMarkersSA::C3DMarkersSA()
     DEBUG_TRACE("C3DMarkersSA::C3DMarkersSA()");
     for (int i = 0; i < MAX_3D_MARKERS; i++)
     {
-        this->Markers[i] = new C3DMarkerSA((C3DMarkerSAInterface *)(ARRAY_3D_MARKERS + i * sizeof(C3DMarkerSAInterface)));
+        this->Markers[i] = new C3DMarkerSA((C3DMarkerSAInterface*)(ARRAY_3D_MARKERS + i * sizeof(C3DMarkerSAInterface)));
     }
 }
 
@@ -28,7 +28,7 @@ C3DMarkersSA::~C3DMarkersSA()
     }
 }
 
-C3DMarker *C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CVector *vecPosition, FLOAT fSize, FLOAT fPulseFraction, BYTE r, BYTE g, BYTE b,
+C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CVector* vecPosition, FLOAT fSize, FLOAT fPulseFraction, BYTE r, BYTE g, BYTE b,
                                       BYTE a)
 {
     DEBUG_TRACE("C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CVector * vecPosition, FLOAT fSize, FLOAT fPulseFraction)");
@@ -90,7 +90,7 @@ C3DMarker *C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CV
     {
         for (int i = 0; i < MAX_3D_MARKERS; i++)
         {
-            if (Markers[i]->GetInterface() == (C3DMarkerSAInterface *)dwReturn)
+            if (Markers[i]->GetInterface() == (C3DMarkerSAInterface*)dwReturn)
             {
                 // Markers[i]->Reset(); // debug stuff
                 return Markers[i];
@@ -101,7 +101,7 @@ C3DMarker *C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CV
     return NULL;
 }
 
-C3DMarker *C3DMarkersSA::FindFreeMarker()
+C3DMarker* C3DMarkersSA::FindFreeMarker()
 {
     DEBUG_TRACE("C3DMarker * C3DMarkersSA::FindFreeMarker()");
     for (int i = 0; i < MAX_3D_MARKERS; i++)
@@ -112,7 +112,7 @@ C3DMarker *C3DMarkersSA::FindFreeMarker()
     return NULL;
 }
 
-C3DMarker *C3DMarkersSA::FindMarker(DWORD Identifier)
+C3DMarker* C3DMarkersSA::FindMarker(DWORD Identifier)
 {
     DEBUG_TRACE("C3DMarker * C3DMarkersSA::FindMarker( DWORD Identifier )");
     for (int i = 0; i < MAX_3D_MARKERS; i++)

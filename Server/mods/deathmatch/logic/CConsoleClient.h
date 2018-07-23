@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCONSOLECLIENT_H
-#define __CCONSOLECLIENT_H
+#pragma once
 
 #include "CClient.h"
 #include "CElement.h"
@@ -36,5 +35,3 @@ protected:
     SString   m_strNick;
     CConsole* m_pConsole;
 };
-
-#endif

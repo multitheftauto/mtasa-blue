@@ -11,8 +11,7 @@
 
 class CLuaCFunctions;
 
-#ifndef __CLUACFUNCTIONS_H
-#define __CLUACFUNCTIONS_H
+#pragma once
 
 #include "LuaCommon.h"
 
@@ -56,5 +55,3 @@ private:
     static void*                                       ms_pFunctionPtrLow;
     static void*                                       ms_pFunctionPtrHigh;
 };
-
-#endif

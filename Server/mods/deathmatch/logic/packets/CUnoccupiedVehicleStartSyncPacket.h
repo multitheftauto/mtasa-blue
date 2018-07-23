@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CUNOCCUPIEDVEHICLESTARTSYNCPACKET_H
-#define __CUNOCCUPIEDVEHICLESTARTSYNCPACKET_H
+#pragma once
 
 #include "CPacket.h"
 class CVehicle;
@@ -28,5 +27,3 @@ public:
 private:
     CVehicle* m_pVehicle;
 };
-
-#endif

@@ -11,8 +11,7 @@
 
 class CModManagerImpl;
 
-#ifndef __CMODMANAGERIMPL_H
-#define __CMODMANAGERIMPL_H
+#pragma once
 
 #include <core/CModManager.h>
 #include <core/CServerBase.h>
@@ -61,5 +60,3 @@ private:
     SString         m_strServerPath;            // Root path
     SString         m_strModPath;               // root/mods/deathmatch
 };
-
-#endif

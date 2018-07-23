@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOLCUBOID_H
-#define __CCOLCUBOID_H
+#pragma once
 
 #include "CColShape.h"
 
@@ -37,5 +36,3 @@ protected:
 
     CVector m_vecSize;
 };
-
-#endif

@@ -201,6 +201,7 @@ int CLuaCameraDefs::SetCameraMatrix(lua_State* luaVM)
     float            fRoll = 0.0f;
     float            fFOV = 70.0f;
     CScriptArgReader argStream(luaVM);
+    bool             bLookAtValid;
 
     if (argStream.NextIsUserDataOfType<CLuaMatrix>())
     {
@@ -209,10 +210,12 @@ int CLuaCameraDefs::SetCameraMatrix(lua_State* luaVM)
 
         vecPosition = pMatrix->GetPosition();
         vecLookAt = pMatrix->GetRotation();
+        bLookAtValid = true;
     }
     else
     {
         argStream.ReadVector3D(vecPosition);
+        bLookAtValid = argStream.NextIsVector3D();
         argStream.ReadVector3D(vecLookAt, CVector());
     }
 
@@ -223,7 +226,7 @@ int CLuaCameraDefs::SetCameraMatrix(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetCameraMatrix(vecPosition, &vecLookAt, fRoll, fFOV))
+        if (CStaticFunctionDefinitions::SetCameraMatrix(vecPosition, bLookAtValid ? &vecLookAt : nullptr, fRoll, fFOV))
         {
             lua_pushboolean(luaVM, true);
             return 1;

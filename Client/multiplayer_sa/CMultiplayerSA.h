@@ -20,6 +20,7 @@
 #include "CLimitsSA.h"
 
 #include "CRemoteDataSA.h"
+
 class CRemoteDataSA;
 #define DEFAULT_NEAR_CLIP_DISTANCE  ( 0.3f )
 
@@ -38,6 +39,8 @@ enum eRadioStationID
     Master_Sounds,
     WCTR,
 };
+
+typedef void*(__cdecl* hCAnimBlendAssociation_NewOperator)(size_t iSizeInBytes);
 
 class CMultiplayerSA : public CMultiplayer
 {
@@ -106,8 +109,11 @@ public:
     void SetIdleHandler(IdleHandler* pHandler);
     void SetPreFxRenderHandler(PreFxRenderHandler* pHandler);
     void SetPreHudRenderHandler(PreHudRenderHandler* pHandler);
+    void SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler);
     void SetAddAnimationHandler(AddAnimationHandler* pHandler);
-    void SetBlendAnimationHandler(BlendAnimationHandler* pHandler);
+    void SetAddAnimationAndSyncHandler(AddAnimationAndSyncHandler* pHandler);
+    void SetAssocGroupCopyAnimationHandler(AssocGroupCopyAnimationHandler* pHandler);
+    void SetBlendAnimationHierarchyHandler(BlendAnimationHierarchyHandler* pHandler);
     void SetProcessCollisionHandler(ProcessCollisionHandler* pHandler);
     void SetVehicleCollisionHandler(VehicleCollisionHandler* pHandler);
     void SetVehicleDamageHandler(VehicleDamageHandler* pHandler);

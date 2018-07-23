@@ -55,6 +55,7 @@ class CWorldSA : public CWorld
 {
 public:
     CWorldSA();
+    void InstallHooks(void);
     void Add(CEntity* entity, eDebugCaller CallerId);
     void Add(CEntitySAInterface* entityInterface, eDebugCaller CallerId);
     void Remove(CEntity* entity, eDebugCaller CallerId);

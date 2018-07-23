@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CServerCache.h"
 
 using namespace std;
 
@@ -1046,7 +1047,7 @@ void CServerBrowser::AddServerToList(const CServerListItem* pServer, const Serve
     bool bIsFull = (pServer->nPlayers >= pServer->nMaxPlayers) && (pServer->nMaxPlayers != 0);
     bool bIsLocked = pServer->bPassworded;
     bool bIsBlockedVersion = bIsOtherVersion && !CanBrowseVersion(pServer->strVersion);
-    bool bIsBlockedServer = (pServer->uiMasterServerSaysRestrictions & ASE_FLAG_RESTRICTIONS) != false;
+    bool bIsBlockedServer = (pServer->uiMasterServerSaysRestrictions & RESTRICTION_BLOCK_SERVER) != false;
 
     if ((!pServer->strVersion.empty() || bIsOffline) && (!bLowQuality || bIsOffline) && (!bIsEmpty || bIncludeEmpty) && (!bIsFull || bIncludeFull) &&
         (!bIsLocked || bIncludeLocked) && (!bIsOffline || bIncludeOffline || bWasGoodNowFailing) && (!bIsOtherVersion || bIncludeOtherVersions) &&

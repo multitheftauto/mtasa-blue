@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CTHREADCOMMANDQUEUE_H
-#define __CTHREADCOMMANDQUEUE_H
+#pragma once
 
 #ifdef WIN32
 
@@ -27,7 +26,5 @@ private:
     std::list<std::string> m_Commands;
     CCriticalSection       m_Critical;
 };
-
-#endif
 
 #endif

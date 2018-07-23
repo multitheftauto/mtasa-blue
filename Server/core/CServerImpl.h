@@ -11,8 +11,7 @@
 
 class CServerImpl;
 
-#ifndef __CSERVERIMPL_H
-#define __CSERVERIMPL_H
+#pragma once
 
 #include "MTAPlatform.h"
 #include <string>
@@ -111,5 +110,3 @@ private:
     CThreadCommandQueue* m_pThreadCommandQueue;
 #endif
 };
-
-#endif

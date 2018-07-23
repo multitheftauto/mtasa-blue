@@ -11,8 +11,7 @@
 
 class CMainConfig;
 
-#ifndef __CMAINCONFIG_H
-#define __CMAINCONFIG_H
+#pragma once
 
 #include "CCommon.h"
 #include "CLogger.h"
@@ -221,5 +220,3 @@ private:
     int                        m_bDatabaseCredentialsProtectionEnabled;
     int                        m_bFakeLagCommandEnabled;
 };
-
-#endif

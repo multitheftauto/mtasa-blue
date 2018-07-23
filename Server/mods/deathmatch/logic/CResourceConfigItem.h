@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef CRESOURCECONFIGITEM_H
-#define CRESOURCECONFIGITEM_H
+#pragma once
 
 #include "CResourceFile.h"
 #include <list>
@@ -36,5 +35,3 @@ private:
 
     bool m_bInvalid;
 };
-
-#endif

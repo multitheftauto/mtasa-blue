@@ -15,7 +15,7 @@ CExplosionManagerSA::CExplosionManagerSA()
 {
     DEBUG_TRACE("CExplosionManagerSA::CExplosionManagerSA()");
     for (int i = 0; i < MAX_EXPLOSIONS; i++)
-        Explosions[i] = new CExplosionSA((CExplosionSAInterface *)(ARRAY_Explosions + i * sizeof(CExplosionSAInterface)));
+        Explosions[i] = new CExplosionSA((CExplosionSAInterface*)(ARRAY_Explosions + i * sizeof(CExplosionSAInterface)));
 }
 
 CExplosionManagerSA::~CExplosionManagerSA()
@@ -29,14 +29,14 @@ CExplosionManagerSA::~CExplosionManagerSA()
 /**
  * \todo Test this, replace with CExplosion::AddExplosion code if possible in order to ensure correct pointer
  */
-CExplosion *CExplosionManagerSA::AddExplosion(CEntity *pExplodingEntity, CEntity *pOwner, eExplosionType explosionType, CVector &vecPosition,
+CExplosion* CExplosionManagerSA::AddExplosion(CEntity* pExplodingEntity, CEntity* pOwner, eExplosionType explosionType, CVector& vecPosition,
                                               unsigned int uiActivationDelay, bool bMakeSound, float fCamShake, bool bNoDamage)
 {
     DEBUG_TRACE("CExplosion * CExplosionManagerSA::AddExplosion ( eExplosionType explosiontype, CVector * vecPosition, CEntity * creator = NULL)");
     DWORD       dwExplodingEntityInterface = (pExplodingEntity) ? (DWORD)pExplodingEntity->GetInterface() : 0;
     DWORD       dwOwnerInterface = (pOwner) ? (DWORD)pOwner->GetInterface() : 0;
     float       fX = vecPosition.fX, fY = vecPosition.fY, fZ = vecPosition.fZ;
-    CExplosion *explosion = CExplosionManagerSA::FindFreeExplosion();
+    CExplosion* explosion = CExplosionManagerSA::FindFreeExplosion();
     bool        bReturn;
     DWORD       dwFunc = FUNC_CExplosion_AddExplosion;
     _asm
@@ -75,7 +75,7 @@ returnhere:
 /**
  * \todo Need to simulate this manually (loop and IsNear...)
  */
-VOID CExplosionManagerSA::RemoveAllExplosionsInArea(CVector *vecPosition, FLOAT fRadius)
+VOID CExplosionManagerSA::RemoveAllExplosionsInArea(CVector* vecPosition, FLOAT fRadius)
 {
     DEBUG_TRACE("VOID CExplosionManagerSA::RemoveAllExplosionsInArea ( CVector * vecPosition, FLOAT fRadius )");
 
@@ -104,13 +104,13 @@ VOID CExplosionManagerSA::RemoveAllExplosions()
             Explosions[i]->Remove();
 }
 
-CExplosion *CExplosionManagerSA::GetExplosion(DWORD ID)
+CExplosion* CExplosionManagerSA::GetExplosion(DWORD ID)
 {
     DEBUG_TRACE("CExplosion * CExplosionManagerSA::GetExplosion ( DWORD ID )");
     return Explosions[ID];
 }
 
-CExplosion *CExplosionManagerSA::FindFreeExplosion()
+CExplosion* CExplosionManagerSA::FindFreeExplosion()
 {
     DEBUG_TRACE("CExplosion * CExplosionManagerSA::FindFreeExplosion (  )");
     for (int i = 0; i < MAX_EXPLOSIONS; i++)

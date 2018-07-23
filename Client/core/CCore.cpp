@@ -20,6 +20,7 @@
 #include "CTimingCheckpoints.hpp"
 #include "CModelCacheManager.h"
 #include "detours/include/detours.h"
+#include <ServerBrowser/CServerCache.h>
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -183,6 +184,10 @@ CCore::~CCore(void)
 
     // Destroy tray icon
     delete m_pTrayIcon;
+
+    // This will set the GTA volume to the GTA volume value in the settings,
+    // and is not affected by the master volume setting.
+    m_pLocalGUI->GetMainMenu()->GetSettingsWindow()->ResetGTAVolume();
 
     // Delete the mod manager
     delete m_pModManager;
@@ -1870,12 +1875,12 @@ void CCore::OnDeviceRestore(void)
 void CCore::OnPreFxRender(void)
 {
     // Don't do nothing if nothing won't be drawn
-    if (!CGraphics::GetSingleton().HasMaterialLine3DQueueItems())
+    if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems())
         return;
 
     CGraphics::GetSingleton().EnteringMTARenderZone();
 
-    CGraphics::GetSingleton().DrawMaterialLine3DQueue();
+    CGraphics::GetSingleton().DrawLine3DPreGUIQueue();
 
     CGraphics::GetSingleton().LeavingMTARenderZone();
 }
@@ -2242,4 +2247,10 @@ bool CCore::GetRightSizeTxdEnabled(void)
         return true;
 
     return false;
+}
+
+SString CCore::GetBlueCopyrightString(void)
+{
+    SString strCopyright = BLUE_COPYRIGHT_STRING;
+    return strCopyright.Replace("%BUILD_YEAR%", std::to_string(BUILD_YEAR).c_str());
 }

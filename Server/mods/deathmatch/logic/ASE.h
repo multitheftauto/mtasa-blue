@@ -11,8 +11,7 @@
 
 class ASE;
 
-#ifndef __ASE_H__
-#define __ASE_H__
+#pragma once
 
 #ifdef WIN32
     #include <conio.h>
@@ -154,5 +153,3 @@ private:
     std::string m_strKey;
     std::string m_strValue;
 };
-
-#endif

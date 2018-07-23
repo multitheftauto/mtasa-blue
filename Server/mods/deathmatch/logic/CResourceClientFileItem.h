@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef CRESOURCECLIENTFILEITEM_H
-#define CRESOURCECLIENTFILEITEM_H
+#pragma once
 
 #include "CResourceFile.h"
 
@@ -29,5 +28,3 @@ public:
 private:
     bool m_bClientAutoDownload;
 };
-
-#endif

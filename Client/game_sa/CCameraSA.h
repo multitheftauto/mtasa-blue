@@ -58,7 +58,7 @@ public:
     {
         MAXPATHLENGTH = 800
     };
-    FLOAT *m_arr_PathData;            //    FLOAT m_arr_PathData[MAXPATHLENGTH];
+    FLOAT* m_arr_PathData;            //    FLOAT m_arr_PathData[MAXPATHLENGTH];
 };
 
 class CQueuedMode
@@ -280,8 +280,8 @@ public:
     // DATA NOT UPDATED FOR SA  BELOW HERE!!!!! //
     // #########################################//
 
-    CGarageSAInterface *pToGarageWeAreIn;
-    CGarageSAInterface *pToGarageWeAreInForHackAvoidFirstPerson;
+    CGarageSAInterface* pToGarageWeAreIn;
+    CGarageSAInterface* pToGarageWeAreInForHackAvoidFirstPerson;
     CQueuedMode         m_PlayerMode;
     // The higher priority player camera mode. This one is used
     // for the sniper mode and rocket launcher mode.
@@ -316,10 +316,10 @@ public:
     FLOAT   m_fAttachedCamAngle;            // for giving the attached camera a tilt.
 
     // RenderWare camera pointer
-    DWORD *m_pRwCamera;            // was RwCamera *
+    DWORD* m_pRwCamera;            // was RwCamera *
     /// stuff for cut scenes
-    CEntitySAInterface *pTargetEntity;
-    CEntitySAInterface *pAttachedEntity;
+    CEntitySAInterface* pTargetEntity;
+    CEntitySAInterface* pAttachedEntity;
     // CVector CutScene;
     CCamPathSplines m_arrPathArray[MAX_NUM_OF_SPLINETYPES];            // These only get created when the script calls the load splines function
     // maybe this shouldn't be here depends if GTA_TRAIN is defined (its not)
@@ -395,45 +395,45 @@ class CCameraSA : public CCamera
     friend class COffsets;
 
 private:
-    CCameraSAInterface *internalInterface;
-    CCamSA *            Cams[MAX_CAMS];
+    CCameraSAInterface* internalInterface;
+    CCamSA*             Cams[MAX_CAMS];
 
 public:
-    CCameraSA(CCameraSAInterface *cameraInterface);
+    CCameraSA(CCameraSAInterface* cameraInterface);
     ~CCameraSA(void);
 
-    CCameraSAInterface *GetInterface() { return internalInterface; };
-    VOID                TakeControl(CEntity *entity, eCamMode CamMode, int CamSwitchStyle);
-    VOID                TakeControl(CVector *position, int CamSwitchStyle);
-    VOID     TakeControlAttachToEntity(CEntity *TargetEntity, CEntity *AttachEntity, CVector *vecOffset, CVector *vecLookAt, float fTilt, int CamSwitchStyle);
+    CCameraSAInterface* GetInterface() { return internalInterface; };
+    VOID                TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle);
+    VOID                TakeControl(CVector* position, int CamSwitchStyle);
+    VOID     TakeControlAttachToEntity(CEntity* TargetEntity, CEntity* AttachEntity, CVector* vecOffset, CVector* vecLookAt, float fTilt, int CamSwitchStyle);
     VOID     Restore();
     VOID     RestoreWithJumpCut();
-    CMatrix *GetMatrix(CMatrix *matrix);
-    VOID     SetMatrix(CMatrix *matrix);
-    VOID     SetCamPositionForFixedMode(CVector *vecPosition, CVector *vecUpOffset);
-    VOID     Find3rdPersonCamTargetVector(FLOAT fDistance, CVector *vecGunMuzzle, CVector *vecSource, CVector *vecTarget);
+    CMatrix* GetMatrix(CMatrix* matrix);
+    VOID     SetMatrix(CMatrix* matrix);
+    VOID     SetCamPositionForFixedMode(CVector* vecPosition, CVector* vecUpOffset);
+    VOID     Find3rdPersonCamTargetVector(FLOAT fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget);
     float    Find3rdPersonQuickAimPitch(void);
     BYTE     GetActiveCam();
 
-    CCam *        GetCam(BYTE bCameraID);
-    virtual CCam *GetCam(CCamSAInterface *camInterface);
+    CCam*         GetCam(BYTE bCameraID);
+    virtual CCam* GetCam(CCamSAInterface* camInterface);
 
     VOID      SetWidescreen(BOOL bWidescreen);
     BOOL      GetWidescreen();
     FLOAT     GetCarZoom();
     VOID      SetCarZoom(FLOAT fCarZoom);
     bool      TryToStartNewCamMode(DWORD dwCamMode);
-    bool      ConeCastCollisionResolve(CVector *pPos, CVector *pLookAt, CVector *pDest, float rad, float minDist, float *pDist);
-    void      VectorTrackLinear(CVector *pTo, CVector *pFrom, float time, bool bSmoothEnds);
+    bool      ConeCastCollisionResolve(CVector* pPos, CVector* pLookAt, CVector* pDest, float rad, float minDist, float* pDist);
+    void      VectorTrackLinear(CVector* pTo, CVector* pFrom, float time, bool bSmoothEnds);
     bool      IsFading(void);
     int       GetFadingDirection(void);
     void      Fade(float fFadeOutTime, int iOutOrIn);
     void      SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
     float     GetCameraRotation(void);
-    RwMatrix *GetLTM(void);
-    CEntity * GetTargetEntity(void);
+    RwMatrix* GetLTM(void);
+    CEntity*  GetTargetEntity(void);
     void      SetCameraClip(bool bObjects, bool bVehicles);
-    void      GetCameraClip(bool &bObjects, bool &bVehicles);
+    void      GetCameraClip(bool& bObjects, bool& bVehicles);
     BYTE      GetCameraViewMode(void);
     VOID      SetCameraViewMode(BYTE dwCamMode);
     void      RestoreLastGoodState(void);

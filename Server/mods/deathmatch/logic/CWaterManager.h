@@ -11,8 +11,7 @@
 
 class CWaterManager;
 
-#ifndef __CWaterManager_H
-#define __CWaterManager_H
+#pragma once
 
 class CWaterManager
 {
@@ -50,5 +49,3 @@ protected:
     SWorldWaterLevelInfo m_WorldWaterLevelInfo;
     float                m_fGlobalWaveHeight;
 };
-
-#endif

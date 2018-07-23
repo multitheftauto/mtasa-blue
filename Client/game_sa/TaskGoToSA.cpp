@@ -20,8 +20,8 @@
 int CTaskComplexWanderSA::GetWanderType()
 {
     DEBUG_TRACE("int CTaskComplexWander::GetWanderType()");
-    CTaskSAInterface *pTaskInterface = this->GetInterface();
-    DWORD             dwFunc = ((TaskComplexWanderVTBL *)pTaskInterface->VTBL)->GetWanderType;
+    CTaskSAInterface* pTaskInterface = this->GetInterface();
+    DWORD             dwFunc = ((TaskComplexWanderVTBL*)pTaskInterface->VTBL)->GetWanderType;
     int               iReturn = NO_WANDER_TYPE;
 
     if (dwFunc && dwFunc != 0x82263A)            // some tasks have no wander type 0x82263A is purecal (assert?)
@@ -36,14 +36,14 @@ int CTaskComplexWanderSA::GetWanderType()
     return iReturn;
 }
 
-CNodeAddress *CTaskComplexWanderSA::GetNextNode()
+CNodeAddress* CTaskComplexWanderSA::GetNextNode()
 {
-    return &((CTaskComplexWanderSAInterface *)this->GetInterface())->m_NextNode;
+    return &((CTaskComplexWanderSAInterface*)this->GetInterface())->m_NextNode;
 }
 
-CNodeAddress *CTaskComplexWanderSA::GetLastNode()
+CNodeAddress* CTaskComplexWanderSA::GetLastNode()
 {
-    return &((CTaskComplexWanderSAInterface *)this->GetInterface())->m_LastNode;
+    return &((CTaskComplexWanderSAInterface*)this->GetInterface())->m_LastNode;
 }
 
 // ##############################################################################

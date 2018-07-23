@@ -41,7 +41,7 @@ void CLuaVehicleDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("getVehiclePaintjob", GetVehiclePaintjob);
     CLuaCFunctions::AddFunction("getVehiclePlateText", GetVehiclePlateText);
     CLuaCFunctions::AddFunction("getVehicleWheelStates", GetVehicleWheelStates);
-    CLuaCFunctions::AddFunction("isVehicleWheelCollided", IsVehicleWheelCollided);
+    CLuaCFunctions::AddFunction("isVehicleWheelOnGround", IsVehicleWheelCollided);
     CLuaCFunctions::AddFunction("isVehicleDamageProof", IsVehicleDamageProof);
     CLuaCFunctions::AddFunction("isVehicleFuelTankExplodable", IsVehicleFuelTankExplodable);
     CLuaCFunctions::AddFunction("isVehicleFrozen", IsVehicleFrozen);
@@ -113,6 +113,7 @@ void CLuaVehicleDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("setVehicleHeadLightColor", SetVehicleHeadLightColor);
     CLuaCFunctions::AddFunction("setVehicleTurretPosition", SetVehicleTurretPosition);
     CLuaCFunctions::AddFunction("setVehicleDoorOpenRatio", SetVehicleDoorOpenRatio);
+    CLuaCFunctions::AddFunction("setVehicleHandling", SetVehicleHandling);
     CLuaCFunctions::AddFunction("setVehicleSirens", SetVehicleSirens);
     CLuaCFunctions::AddFunction("setVehicleComponentPosition", SetVehicleComponentPosition);
     CLuaCFunctions::AddFunction("getVehicleComponentPosition", GetVehicleComponentPosition);
@@ -136,6 +137,11 @@ void CLuaVehicleDefs::LoadFunctions(void)
 void CLuaVehicleDefs::AddClass(lua_State* luaVM)
 {
     lua_newclass(luaVM);
+
+    lua_classfunction(luaVM, "getModelFromName", "getVehicleModelFromName");
+    lua_classfunction(luaVM, "getNameFromModel", "getVehicleNameFromModel");
+    lua_classfunction(luaVM, "getOriginalHandling", "getOriginalHandling");
+    lua_classfunction(luaVM, "getUpgradeSlotName", "getVehicleUpgradeSlotName");
 
     lua_classfunction(luaVM, "create", "createVehicle");
     lua_classfunction(luaVM, "blow", "blowVehicle");
@@ -172,7 +178,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getPaintjob", "getVehiclePaintjob");
     lua_classfunction(luaVM, "getTurretPosition", "getVehicleTurretPosition");
     lua_classfunction(luaVM, "getWheelStates", "getVehicleWheelStates");
-    lua_classfunction(luaVM, "isWheelCollided", "isVehicleWheelCollided");
+    lua_classfunction(luaVM, "isWheelOnGround", "isVehicleWheelOnGround");
     lua_classfunction(luaVM, "getDoorOpenRatio", "getVehicleDoorOpenRatio");
     lua_classfunction(luaVM, "getVariant", "getVehicleVariant");
     lua_classfunction(luaVM, "getHandling", "getVehicleHandling");
@@ -199,6 +205,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getUpgradeSlotName", "getVehicleUpgradeSlotName");
     lua_classfunction(luaVM, "getCompatibleUpgrades", "getVehicleCompatibleUpgrades");
     lua_classfunction(luaVM, "getUpgradeOnSlot", "getVehicleUpgradeOnSlot");
+    lua_classfunction(luaVM, "getModelExhaustFumesPosition", OOP_GetVehicleModelExhaustFumesPosition);
 
     lua_classfunction(luaVM, "setComponentVisible", "setVehicleComponentVisible");
     lua_classfunction(luaVM, "setSirensOn", "setVehicleSirensOn");
@@ -214,6 +221,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setWheelStates", "setVehicleWheelStates");
     lua_classfunction(luaVM, "setDoorOpenRatio", "setVehicleDoorOpenRatio");
     lua_classfunction(luaVM, "setDoorsUndamageable", "setVehicleDoorsUndamageable");
+    lua_classfunction(luaVM, "setHandling", "setVehicleHandling");
     lua_classfunction(luaVM, "setDoorState", "setVehicleDoorState");
     lua_classfunction(luaVM, "setLandingGearDown", "setVehicleLandingGearDown");
     lua_classfunction(luaVM, "setEngineState", "setVehicleEngineState");
@@ -238,6 +246,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setColor", "setVehicleColor");
     lua_classfunction(luaVM, "setPlateText", "setVehiclePlateText");
     lua_classfunction(luaVM, "setGravity", "setVehicleGravity");
+    lua_classfunction(luaVM, "setModelExhaustFumesPosition", "setVehicleModelExhaustFumesPosition");
 
     lua_classfunction(luaVM, "resetComponentPosition", "resetVehicleComponentPosition");
     lua_classfunction(luaVM, "resetComponentRotation", "resetVehicleComponentRotation");
@@ -2457,6 +2466,175 @@ int CLuaVehicleDefs::SetVehicleTurretPosition(lua_State* luaVM)
     return 1;
 }
 
+int CLuaVehicleDefs::SetVehicleHandling(lua_State* luaVM)
+{
+    //  bool setVehicleHandling ( element theVehicle, string property, var value )
+    CClientVehicle* pVehicle;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+
+    if (!argStream.HasErrors())
+    {
+        if (argStream.NextIsString())
+        {
+            SString strProperty;
+            argStream.ReadString(strProperty);
+
+            eHandlingProperty eProperty = g_pGame->GetHandlingManager()->GetPropertyEnumFromName(strProperty);
+            if (eProperty)
+            {
+                if (argStream.NextIsNil())
+                {
+                    if (CStaticFunctionDefinitions::ResetVehicleHandlingProperty(pVehicle, eProperty))
+                    {
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                }
+                else
+                {
+                    switch (eProperty)
+                    {
+                        case HANDLING_MASS:
+                        case HANDLING_TURNMASS:
+                        case HANDLING_DRAGCOEFF:
+                        case HANDLING_TRACTIONMULTIPLIER:
+                        case HANDLING_ENGINEACCELERATION:
+                        case HANDLING_ENGINEINERTIA:
+                        case HANDLING_MAXVELOCITY:
+                        case HANDLING_BRAKEDECELERATION:
+                        case HANDLING_BRAKEBIAS:
+                        case HANDLING_STEERINGLOCK:
+                        case HANDLING_TRACTIONLOSS:
+                        case HANDLING_TRACTIONBIAS:
+                        case HANDLING_SUSPENSION_FORCELEVEL:
+                        case HANDLING_SUSPENSION_DAMPING:
+                        case HANDLING_SUSPENSION_HIGHSPEEDDAMPING:
+                        case HANDLING_SUSPENSION_UPPER_LIMIT:
+                        case HANDLING_SUSPENSION_LOWER_LIMIT:
+                        case HANDLING_SUSPENSION_FRONTREARBIAS:
+                        case HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER:
+                        case HANDLING_COLLISIONDAMAGEMULTIPLIER:
+                        case HANDLING_SEATOFFSETDISTANCE:
+                        {
+                            float fValue;
+                            argStream.ReadNumber(fValue);
+                            if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, fValue))
+                            {
+                                lua_pushboolean(luaVM, true);
+                                return 1;
+                            }
+                            break;
+                        }
+                        case HANDLING_PERCENTSUBMERGED:            // unsigned int
+                                                                   // case HANDLING_MONETARY:
+                        case HANDLING_HANDLINGFLAGS:
+                        case HANDLING_MODELFLAGS:
+                        {
+                            unsigned int uiValue;
+                            argStream.ReadNumber(uiValue);
+                            if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, uiValue))
+                            {
+                                lua_pushboolean(luaVM, true);
+                                return 1;
+                            }
+                            break;
+                        }
+                        case HANDLING_NUMOFGEARS:
+                        case HANDLING_ANIMGROUP:
+                        {
+                            unsigned char ucValue;
+                            argStream.ReadNumber(ucValue);
+                            if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, ucValue))
+                            {
+                                lua_pushboolean(luaVM, true);
+                                return 1;
+                            }
+                            break;
+                        }
+                        case HANDLING_CENTEROFMASS:
+                        {
+                            if (argStream.NextIsTable())
+                            {
+                                lua_pushnumber(luaVM, 1);
+                                lua_gettable(luaVM, 3);
+                                float fX = static_cast<float>(lua_tonumber(luaVM, -1));
+                                lua_pop(luaVM, 1);
+
+                                lua_pushnumber(luaVM, 2);
+                                lua_gettable(luaVM, 3);
+                                float fY = static_cast<float>(lua_tonumber(luaVM, -1));
+                                lua_pop(luaVM, 1);
+
+                                lua_pushnumber(luaVM, 3);
+                                lua_gettable(luaVM, 3);
+                                float fZ = static_cast<float>(lua_tonumber(luaVM, -1));
+                                lua_pop(luaVM, 1);
+
+                                CVector vecCenterOfMass(fX, fY, fZ);
+
+                                if (CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, vecCenterOfMass))
+                                {
+                                    lua_pushboolean(luaVM, true);
+                                    return 1;
+                                }
+                            }
+                            argStream.SetTypeError("table");
+                            break;
+                        }
+                        case HANDLING_DRIVETYPE:
+                        case HANDLING_ENGINETYPE:
+                            // case HANDLING_HEADLIGHT:
+                            // case HANDLING_TAILLIGHT:
+                            {
+                                SString strValue;
+                                argStream.ReadString(strValue);
+                                if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, strValue))
+                                {
+                                    lua_pushboolean(luaVM, true);
+                                    return 1;
+                                }
+                                break;
+                            }
+                        case HANDLING_ABS:
+                        {
+                            bool bValue;
+                            argStream.ReadBool(bValue);
+                            if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, bValue ? 1.0f : 0.0f))
+                            {
+                                lua_pushboolean(luaVM, true);
+                                return 1;
+                            }
+                            break;
+                        }
+                        case HANDLING_MAX:
+                        {
+                            argStream.SetCustomError("Invalid property");
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+        else if (argStream.NextIsNil())
+        {
+            if (CStaticFunctionDefinitions::ResetVehicleHandling(pVehicle))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaVehicleDefs::GetVehicleHandling(lua_State* luaVM)
 {
     CClientVehicle*  pVehicle = NULL;
@@ -3575,20 +3753,21 @@ int CLuaVehicleDefs::IsVehicleWindowOpen(lua_State* luaVM)
 
 int CLuaVehicleDefs::SetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 {
-    // bool setVehicleModelExhaustPosition(int modelID, float x, float y, float z)
-    unsigned short modelID;
-    CVector        position;
+    // bool setVehicleModelExhaustPosition ( int modelID, float x, float y, float z )
+    unsigned short usModel;
+    CVector        vecPosition;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(modelID);
-    argStream.ReadVector3D(position);
+    argStream.ReadNumber(usModel);
+    argStream.ReadVector3D(vecPosition);
 
     if (!argStream.HasErrors())
     {
-        CClientVehicle::SetModelExhaustFumesPosition(modelID, position);
-
-        lua_pushboolean(luaVM, true);
-        return 1;
+        if (CStaticFunctionDefinitions::SetVehicleModelExhaustFumesPosition(usModel, vecPosition))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -3599,20 +3778,48 @@ int CLuaVehicleDefs::SetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 
 int CLuaVehicleDefs::GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 {
-    // bool getVehicleModelExhaustPosition(int modelID)
-    unsigned short modelID;
+    // float, float, float getVehicleModelExhaustPosition ( int modelID )
+    unsigned short usModel;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(modelID);
+    argStream.ReadNumber(usModel);
 
     if (!argStream.HasErrors())
     {
-        CVector position = CClientVehicle::GetModelExhaustFumesPosition(modelID);
+        CVector vecPosition;
+        
+        if (CStaticFunctionDefinitions::GetVehicleModelExhaustFumesPosition(usModel, vecPosition))
+        {
+            lua_pushnumber(luaVM, vecPosition.fX);
+            lua_pushnumber(luaVM, vecPosition.fY);
+            lua_pushnumber(luaVM, vecPosition.fZ);
+            return 3;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-        lua_pushnumber(luaVM, position.fX);
-        lua_pushnumber(luaVM, position.fY);
-        lua_pushnumber(luaVM, position.fZ);
-        return 3;
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::OOP_GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
+{
+    // float, float, float getVehicleModelExhaustPosition ( int modelID )
+    unsigned short usModel;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(usModel);
+
+    if (!argStream.HasErrors())
+    {
+        CVector vecPosition;
+        
+        if (CStaticFunctionDefinitions::GetVehicleModelExhaustFumesPosition(usModel, vecPosition))
+        {
+            lua_pushvector(luaVM, vecPosition);
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
