@@ -4135,7 +4135,7 @@ CClientFire* CStaticFunctionDefinitions::CreateFire(CResource& Resource, CVector
         pFire->SetParent(Resource.GetResourceDynamicEntity());
         return pFire;
     }
-    return NULL;
+    return nullptr;
 }
 
 bool CStaticFunctionDefinitions::ExtinguishFireInRadius(CVector& vecPosition, float fRadius)

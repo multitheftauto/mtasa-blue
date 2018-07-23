@@ -16,6 +16,15 @@ void CLuaFireDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("extinguishFire", CLuaFireDefs::ExtinguishFire);
 }
 
+void CLuaFireDefs::AddClass(lua_State* luaVM)
+{
+    lua_newclass(luaVM);
+
+    lua_classfunction(luaVM, "create", "createFire");
+
+    lua_registerclass(luaVM, "Fire", "Element");
+}
+
 int CLuaFireDefs::CreateFire(lua_State* luaVM)
 {
     // bool createFire ( float x, float y, float z [, float size = 1.8, bool bSilent = false ] )
@@ -31,10 +40,22 @@ int CLuaFireDefs::CreateFire(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        CResource* pResource = pLuaMain->GetResource();
-    
-        lua_pushelement(luaVM, CStaticFunctionDefinitions::CreateFire(*pResource, vecPosition, fSize, bSilent));
-        return 1;
+        CResource* pResource = pLuaMain ? pLuaMain->GetResource() : nullptr;
+        if (pResource)
+        {
+            auto pFire = CStaticFunctionDefinitions::CreateFire(*pResource, vecPosition, fSize, bSilent);
+            if (pFire)
+            {
+                CElementGroup* pGroup = pResource->GetElementGroup();
+                if (pGroup)
+                {
+                    pGroup->Add((CClientEntity*)pFire);
+                }
+
+                lua_pushelement(luaVM, pFire);
+                return 1;
+            }
+        }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

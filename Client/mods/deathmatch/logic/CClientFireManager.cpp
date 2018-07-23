@@ -32,7 +32,7 @@ CClientFire* CClientFireManager::Get(ElementID ID)
         return static_cast<CClientFire*>(pEntity);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void CClientFireManager::DeleteAll(void)

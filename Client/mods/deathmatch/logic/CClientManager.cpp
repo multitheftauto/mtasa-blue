@@ -176,7 +176,7 @@ CClientManager::~CClientManager(void)
     m_pPointLightsManager = NULL;
 
     delete m_pFireManager;
-    m_pFireManager = NULL;
+    m_pFireManager = nullptr;
 }
 
 //
