@@ -330,7 +330,6 @@ void CClientVariables::LoadDefaults(void)
     DEFAULT("high_detail_vehicles", 0);                                               // Disable rendering high detail vehicles all the time
     DEFAULT("fast_clothes_loading", 1);                                               // 0-off 1-auto 2-on
     DEFAULT("allow_screen_upload", 1);                                                // 0-off 1-on
-    DEFAULT("allow_server_control_transfebox", 1);                                    // 0-off 1-on
     DEFAULT("max_clientscript_log_kb", 5000);                                         // Max size in KB (0-No limit)
     DEFAULT("display_fullscreen_style", 0);                                           // 0-standard 1-borderless 2-borderless keep res 3-borderless stretch
     DEFAULT("display_windowed", 0);                                                   // 0-off 1-on
