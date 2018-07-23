@@ -376,6 +376,11 @@ void CSettings::CreateGUI(void)
     m_pCheckBoxAllowScreenUpload->GetPosition(vecTemp, false);
     m_pCheckBoxAllowScreenUpload->AutoSize(NULL, 20.0f);
 
+    m_pCheckBoxAllowControlTransferBox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow server to control transfer box"), true));
+    m_pCheckBoxAllowControlTransferBox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAllowControlTransferBox->GetPosition(vecTemp, false);
+    m_pCheckBoxAllowControlTransferBox->AutoSize(NULL, 20.0f);
+
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxCustomizedSAFiles->GetPosition(vecTemp, false);
@@ -1487,6 +1492,11 @@ void CSettings::UpdateVideoTab(void)
     bool bAllowScreenUploadEnabled;
     CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
     m_pCheckBoxAllowScreenUpload->SetSelected(bAllowScreenUploadEnabled);
+
+    // Allow screen upload
+    bool bAllowServerTransferBoxControl;
+    CVARS_GET("allow_server_control_transfebox", bAllowServerTransferBoxControl);
+    m_pCheckBoxAllowControlTransferBox->SetSelected(bAllowServerTransferBoxControl);
 
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
@@ -3294,8 +3304,12 @@ void CSettings::SaveData(void)
     CVARS_SET("show_unsafe_resolutions", bShowUnsafeResolutions);
 
     // Allow screen upload
-    bool bAllowScreenUploadEnabled = m_pCheckBoxAllowScreenUpload->GetSelected();
+    bAllowScreenUploadEnabled = m_pCheckBoxAllowScreenUpload->GetSelected();
     CVARS_SET("allow_screen_upload", bAllowScreenUploadEnabled);
+
+    // Allow screen upload
+    bool m_pCheckBoxAllowScreenUpload = m_pCheckBoxAllowControlTransferBox->GetSelected();
+    CVARS_SET("allow_server_control_transfebox", m_pCheckBoxAllowScreenUpload);
 
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();
@@ -4533,4 +4547,9 @@ void CSettings::TabSkip(bool bBackwards)
 bool CSettings::IsActive(void)
 {
     return m_pWindow->IsActive();
+}
+
+bool CSettings::IsTransferBoxControlEnabled(void)
+{
+    return bAllowScreenUploadEnabled;
 }

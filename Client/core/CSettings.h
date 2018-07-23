@@ -117,6 +117,7 @@ public:
     void TabSkip(bool bBackwards);
 
     bool IsActive(void);
+    bool IsTransferBoxControlEnabled(void);
 
     void SetSelectedIndex(unsigned int uiIndex);
 
@@ -151,6 +152,7 @@ protected:
     CGUICheckBox*  m_pCheckBoxDeviceSelectionDialog;
     CGUICheckBox*  m_pCheckBoxShowUnsafeResolutions;
     CGUICheckBox*  m_pCheckBoxAllowScreenUpload;
+    CGUICheckBox*  m_pCheckBoxAllowControlTransferBox;
     CGUICheckBox*  m_pCheckBoxCustomizedSAFiles;
     CGUICheckBox*  m_pCheckBoxGrass;
     CGUICheckBox*  m_pCheckBoxHeatHaze;
@@ -443,4 +445,6 @@ private:
     int   m_iMaxAnisotropic;
 
     std::list<SKeyBindSection*> m_pKeyBindSections;
+
+    bool bAllowScreenUploadEnabled;
 };
