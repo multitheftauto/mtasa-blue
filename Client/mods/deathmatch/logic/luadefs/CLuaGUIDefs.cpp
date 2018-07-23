@@ -1,12 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/luadefs/CLuaGUIDefs.cpp
-*  PURPOSE:     Lua definitions class
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/luadefs/CLuaGUIDefs.cpp
+ *  PURPOSE:     Lua definitions class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
 *****************************************************************************/
 
 #include "StdInc.h"
@@ -130,10 +130,14 @@ void CLuaGUIDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("guiEditSetMasked", GUIEditSetMasked);
     CLuaCFunctions::AddFunction("guiEditSetMaxLength", GUIEditSetMaxLength);
     CLuaCFunctions::AddFunction("guiEditSetReadOnly", GUIEditSetReadOnly);
+    CLuaCFunctions::AddFunction("guiEditIsReadOnly", GUIEditIsReadOnly);
 
     CLuaCFunctions::AddFunction("guiMemoSetCaretIndex", GUIMemoSetCaretIndex);
     CLuaCFunctions::AddFunction("guiMemoGetCaretIndex", GUIMemoGetCaretIndex);
     CLuaCFunctions::AddFunction("guiMemoSetReadOnly", GUIMemoSetReadOnly);
+    CLuaCFunctions::AddFunction("guiMemoIsReadOnly", GUIMemoIsReadOnly);
+    CLuaCFunctions::AddFunction("guiMemoSetVerticalScrollPosition", GUIMemoSetVerticalScrollPosition);
+    CLuaCFunctions::AddFunction("guiMemoGetVerticalScrollPosition", GUIMemoGetVerticalScrollPosition);
 
     CLuaCFunctions::AddFunction("guiLabelSetColor", GUILabelSetColor);
     CLuaCFunctions::AddFunction("guiLabelGetColor", GUILabelGetColor);
@@ -278,7 +282,7 @@ void CLuaGUIDefs::AddGuiEditClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setMaxLength", "guiEditSetMaxLength");
 
     lua_classvariable(luaVM, "caretIndex", "guiEditSetCaretIndex", "guiEditGetCaretIndex");
-    lua_classvariable(luaVM, "readOnly", "guiEditSetReadOnly", NULL);
+    lua_classvariable(luaVM, "readOnly", "guiEditSetReadOnly", "guiEditIsReadOnly");
     lua_classvariable(luaVM, "masked", "guiEditSetMasked", NULL);
     lua_classvariable(luaVM, "maxLength", "guiEditSetMaxLength", NULL);
 
@@ -316,12 +320,15 @@ void CLuaGUIDefs::AddGuiMemoClass(lua_State* luaVM)
     lua_classfunction(luaVM, "create", "guiCreateMemo");
 
     lua_classfunction(luaVM, "getCaretIndex", "guiMemoGetCaretIndex");
+    lua_classfunction(luaVM, "getVerticalScrollPosition", "guiMemoGetVerticalScrollPosition");
 
     lua_classfunction(luaVM, "setCaretIndex", "guiMemoSetCaretIndex");
+    lua_classfunction(luaVM, "setVerticalScrollPosition", "guiMemoSetVerticalScrollPosition");
     lua_classfunction(luaVM, "setReadOnly", "guiMemoSetReadOnly");
 
     lua_classvariable(luaVM, "caretIndex", "guiMemoSetCaretIndex", "guiMemoGetCaretIndex");
-    lua_classvariable(luaVM, "readOnly", "guiMemoSetReadOnly", NULL);
+    lua_classvariable(luaVM, "verticalScrollPosition", "guiMemoSetVerticalScrollPosition", "guiMemoGetVerticalScrollPosition");
+    lua_classvariable(luaVM, "readOnly", "guiMemoSetReadOnly", "guiMemoIsReadOnly");
 
     lua_registerclass(luaVM, "GuiMemo", "GuiElement");
 }
@@ -2987,6 +2994,28 @@ int CLuaGUIDefs::GUIEditSetReadOnly(lua_State* luaVM)
     return 1;
 }
 
+int CLuaGUIDefs::GUIEditIsReadOnly(lua_State* luaVM)
+{
+    // bool guiEditIsReadOnly( element editField )
+    CClientGUIElement* editField;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIEdit>(editField);
+
+    if (!argStream.HasErrors())
+    {
+        bool readOnly = static_cast<CGUIEdit*>(editField>GetCGUIElement())>IsReadOnly();
+        lua_pushboolean(luaVM, readOnly);
+        return 1;
+    }
+    else
+        m_pScriptDebugging>LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushnil(luaVM);
+    return 1;
+}
+
 int CLuaGUIDefs::GUIMemoSetReadOnly(lua_State* luaVM)
 {
     //  bool guiMemoSetReadOnly ( gui-memo theMemo, bool status )
@@ -3008,6 +3037,28 @@ int CLuaGUIDefs::GUIMemoSetReadOnly(lua_State* luaVM)
 
     // error: bad arguments
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIMemoIsReadOnly(lua_State* luaVM)
+{
+    // bool guiMemoIsReadOnly( guimemo theMemo )
+    CClientGUIElement* theMemo;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIMemo>(theMemo);
+
+    if (!argStream.HasErrors())
+    {
+        bool readOnly = static_cast<CGUIMemo*>(theMemo>GetCGUIElement())>IsReadOnly();
+        lua_pushboolean(luaVM, readOnly);
+        return 1;
+    }
+    else
+        m_pScriptDebugging>LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushnil(luaVM);
     return 1;
 }
 
@@ -3083,6 +3134,29 @@ int CLuaGUIDefs::GUIEditSetCaretIndex(lua_State* luaVM)
     return 1;
 }
 
+int CLuaGUIDefs::GUIMemoSetVerticalScrollPosition(lua_State* luaVM)
+{
+    //  bool guiMemoSetVerticalScrollPosition ( guimemo theMemo, float fPosition )
+    CClientGUIElement* theMemo;
+    float              fPosition;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIMemo>(theMemo);
+    argStream.ReadNumber(fPosition);
+
+    if (!argStream.HasErrors())
+    {
+        CStaticFunctionDefinitions::GUIMemoSetVerticalScrollPosition(*theMemo, fPosition);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging>LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaGUIDefs::GUIEditGetCaretIndex(lua_State* luaVM)
 {
     //  int guiEditGetCaretIndex ( element theElement )
@@ -3098,6 +3172,29 @@ int CLuaGUIDefs::GUIEditGetCaretIndex(lua_State* luaVM)
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIMemoGetVerticalScrollPosition(lua_State* luaVM)
+{
+    //  float guiMemoGetVerticalScrollPosition ( guimemo theMemo )
+    CClientGUIElement* theMemo;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIMemo>(theMemo);
+
+    if (!argStream.HasErrors())
+    {
+        CGUIMemo* guiMemo = static_cast<CGUIMemo*>(theMemo>GetCGUIElement());
+        float     fPos = guiMemo>GetVerticalScrollPosition() / guiMemo>GetMaxVerticalScrollPosition() * 100.0f;
+        lua_pushnumber(luaVM, fPos);
+        return 1;
+    }
+    else
+        m_pScriptDebugging>LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // error: bad arguments
     lua_pushboolean(luaVM, false);
