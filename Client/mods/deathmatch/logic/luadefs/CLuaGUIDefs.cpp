@@ -3094,7 +3094,7 @@ int CLuaGUIDefs::GUIEditSetMaxLength(lua_State* luaVM)
 
 int CLuaGUIDefs::GUIEditGetMaxLength(lua_State* luaVM)
 {
-    // int guiEditGetMaxLength( element theElement)
+    // int guiEditGetMaxLength(element theElement)
     CClientGUIElement* theElement;
 
     CScriptArgReader argStream(luaVM);
