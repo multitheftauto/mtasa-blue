@@ -11,6 +11,7 @@
 
 #include <StdInc.h>
 #include "CVehicleRPCs.h"
+#include "CElementRPCs.h"
 
 void CVehicleRPCs::LoadFunctions(void)
 {
@@ -18,7 +19,7 @@ void CVehicleRPCs::LoadFunctions(void)
     AddHandler(FIX_VEHICLE, FixVehicle, "FixVehicle");
     AddHandler(BLOW_VEHICLE, BlowVehicle, "BlowVehicle");
     AddHandler(SET_VEHICLE_ROTATION, SetVehicleRotation, "SetVehicleRotation");
-    AddHandler(SET_VEHICLE_TURNSPEED, SetVehicleTurnSpeed, "SetVehicleTurnSpeed");
+    AddHandler(SET_VEHICLE_TURNSPEED, CElementRPCs::SetElementTurnVelocity, "SetVehicleTurnSpeed");
     AddHandler(SET_VEHICLE_COLOR, SetVehicleColor, "SetVehicleColor");
     AddHandler(SET_VEHICLE_LOCKED, SetVehicleLocked, "SetVehicleLocked");
     AddHandler(SET_VEHICLE_DOORS_UNDAMAGEABLE, SetVehicleDoorsUndamageable, "");
@@ -107,22 +108,6 @@ void CVehicleRPCs::SetVehicleRotation(CClientEntity* pSource, NetBitStreamInterf
             // Set the new rotation
             pVehicle->SetRotationDegrees(vecRotation);
             pVehicle->SetSyncTimeContext(ucTimeContext);
-        }
-    }
-}
-
-void CVehicleRPCs::SetVehicleTurnSpeed(CClientEntity* pSource, NetBitStreamInterface& bitStream)
-{
-    // Grab the vehicle
-    CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
-    if (pVehicle)
-    {
-        // Read out the turn speed
-        CVector vecTurnSpeed;
-        if (bitStream.Read(vecTurnSpeed.fX) && bitStream.Read(vecTurnSpeed.fY) && bitStream.Read(vecTurnSpeed.fZ))
-        {
-            // Set the new movespeed
-            pVehicle->SetTurnSpeed(vecTurnSpeed);
         }
     }
 }

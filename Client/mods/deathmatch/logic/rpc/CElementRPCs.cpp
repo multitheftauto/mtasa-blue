@@ -22,7 +22,7 @@ void CElementRPCs::LoadFunctions(void)
     AddHandler(REMOVE_ELEMENT_DATA, RemoveElementData, "RemoveElementData");
     AddHandler(SET_ELEMENT_POSITION, SetElementPosition, "SetElementPosition");
     AddHandler(SET_ELEMENT_VELOCITY, SetElementVelocity, "SetElementVelocity");
-    AddHandler(SET_ELEMENT_TURNSPEED, SetElementTurnVelocity, "SetElementTurnVelocity");
+    AddHandler(SET_ELEMENT_ANGULAR_VELOCITY, SetElementTurnVelocity, "SetElementAngularVelocity");
     AddHandler(SET_ELEMENT_INTERIOR, SetElementInterior, "SetElementInterior");
     AddHandler(SET_ELEMENT_DIMENSION, SetElementDimension, "SetElementDimension");
     AddHandler(ATTACH_ELEMENTS, AttachElements, "AttachElements");
