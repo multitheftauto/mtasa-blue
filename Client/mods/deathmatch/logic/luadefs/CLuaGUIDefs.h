@@ -116,7 +116,9 @@ public:
     LUA_DECLARE(GUIEditSetReadOnly);
     LUA_DECLARE(GUIEditIsReadOnly);
     LUA_DECLARE(GUIEditSetMasked);
+    LUA_DECLARE(GUIEditIsMasked);
     LUA_DECLARE(GUIEditSetMaxLength);
+    LUA_DECLARE(GUIEditGetMaxLength);
     LUA_DECLARE(GUIEditSetCaretIndex);
     LUA_DECLARE(GUIEditGetCaretIndex);
     LUA_DECLARE(GUIMemoSetReadOnly);
