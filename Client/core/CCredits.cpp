@@ -142,6 +142,8 @@ CCredits::CCredits(void)
         "JR10\n"
         "PhrozenByte\n"
         "AboShanab\n"
+        "GTX / Timic3\n"
+        "Patrik \"myonlake\" Juvonen\n"
         "\n";
     "\n";
 
