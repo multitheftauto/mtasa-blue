@@ -25,6 +25,8 @@ void CLuaVector4Defs::AddClass(lua_State* luaVM)
     lua_classmetamethod(luaVM, "__pow", Pow);
     lua_classmetamethod(luaVM, "__unm", Unm);
     lua_classmetamethod(luaVM, "__eq", Eq);
+    lua_classmetamethod(luaVM, "__lt", Lt);
+    lua_classmetamethod(luaVM, "__le", Le);
     lua_classmetamethod(luaVM, "__len", GetLength);
 
 #ifdef MTA_CLIENT
@@ -748,3 +750,50 @@ int CLuaVector4Defs::Eq(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
+
+int CLuaVector4Defs::Lt(lua_State* luaVM)
+{
+    CLuaVector4D* pVector1 = NULL;
+    CLuaVector4D* pVector2 = NULL;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVector1);
+    argStream.ReadUserData(pVector2);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, pVector1.fX < pVector2.fX || pVector1.fY < pVector2.fY || pVector1.fZ < pVector2.fZ || pVector1.fW < pVector2.fW);
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVector4Defs::Le(lua_State* luaVM)
+{
+    CLuaVector4D* pVector1 = NULL;
+    CLuaVector4D* pVector2 = NULL;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVector1);
+    argStream.ReadUserData(pVector2);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, pVector1.fX <= pVector2.fX || pVector1.fY <= pVector2.fY || pVector1.fZ <= pVector2.fZ || pVector1.fW <= pVector2.fW);
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
