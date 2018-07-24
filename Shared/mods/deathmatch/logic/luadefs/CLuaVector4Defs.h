@@ -50,6 +50,4 @@ public:
     LUA_DECLARE(Pow);
     LUA_DECLARE(Unm);
     LUA_DECLARE(Eq);
-    LUA_DECLARE(Lt);
-    LUA_DECLARE(Le);
 };
