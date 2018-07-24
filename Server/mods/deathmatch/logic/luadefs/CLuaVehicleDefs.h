@@ -35,8 +35,6 @@ public:
     LUA_DECLARE(GetVehicleController);
     LUA_DECLARE(GetVehicleRotation);
     LUA_DECLARE(GetVehicleSirensOn);
-    LUA_DECLARE(GetVehicleTurnVelocity);
-    LUA_DECLARE(OOP_GetVehicleTurnVelocity);
     LUA_DECLARE(GetVehicleTurretPosition);
     LUA_DECLARE(IsVehicleLocked);
     LUA_DECLARE(GetVehiclesOfType);
@@ -72,7 +70,6 @@ public:
     LUA_DECLARE(FixVehicle);
     LUA_DECLARE(BlowVehicle);
     LUA_DECLARE(SetVehicleRotation);
-    LUA_DECLARE(SetVehicleTurnVelocity);
     LUA_DECLARE(SetVehicleColor);
     LUA_DECLARE(SetVehicleLandingGearDown);
     LUA_DECLARE(SetVehicleLocked);

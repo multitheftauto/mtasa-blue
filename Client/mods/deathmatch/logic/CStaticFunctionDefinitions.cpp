@@ -2815,20 +2815,6 @@ bool CStaticFunctionDefinitions::SetVehicleSirensOn(CClientEntity& Entity, bool 
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleTurnVelocity(CClientEntity& Entity, const CVector& vecTurnVelocity)
-{
-    RUN_CHILDREN(SetVehicleTurnVelocity(**iter, vecTurnVelocity))
-
-    if (IS_VEHICLE(&Entity))
-    {
-        CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
-        Vehicle.SetTurnSpeed(vecTurnVelocity);
-        return true;
-    }
-
-    return false;
-}
-
 bool CStaticFunctionDefinitions::AddVehicleUpgrade(CClientEntity& Entity, unsigned short usUpgrade)
 {
     RUN_CHILDREN(AddVehicleUpgrade(**iter, usUpgrade))

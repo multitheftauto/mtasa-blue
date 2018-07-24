@@ -5002,14 +5002,6 @@ bool CStaticFunctionDefinitions::GetVehicleRotation(CVehicle* pVehicle, CVector&
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleTurnVelocity(CVehicle* pVehicle, CVector& vecTurnVelocity)
-{
-    assert(pVehicle);
-
-    vecTurnVelocity = pVehicle->GetTurnSpeed();
-    return true;
-}
-
 bool CStaticFunctionDefinitions::GetVehicleTurretPosition(CVehicle* pVehicle, CVector2D& vecPosition)
 {
     assert(pVehicle);
@@ -6424,27 +6416,6 @@ bool CStaticFunctionDefinitions::SetVehicleTaxiLightOn(CElement* pElement, bool 
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_TAXI_LIGHT_ON, *BitStream.pBitStream));
             return true;
         }
-    }
-
-    return false;
-}
-
-bool CStaticFunctionDefinitions::SetVehicleTurnVelocity(CElement* pElement, const CVector& vecTurnVelocity)
-{
-    assert(pElement);
-    RUN_CHILDREN(SetVehicleTurnVelocity(*iter, vecTurnVelocity))
-
-    if (IS_VEHICLE(pElement))
-    {
-        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
-        pVehicle->SetTurnSpeed(vecTurnVelocity);
-
-        CBitStream BitStream;
-        BitStream.pBitStream->Write(vecTurnVelocity.fX);
-        BitStream.pBitStream->Write(vecTurnVelocity.fY);
-        BitStream.pBitStream->Write(vecTurnVelocity.fZ);
-        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_TURNSPEED, *BitStream.pBitStream));
-        return true;
     }
 
     return false;
