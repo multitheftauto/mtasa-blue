@@ -50,13 +50,13 @@ void CElementRPCs::LoadFunctions(void)
     AddHandler(SET_PROPAGATE_CALLS_ENABLED, SetCallPropagationEnabled, "setCallPropagationEnabled");
 }
 
-#define RUN_CHILDREN_SERVER( func ) \
-    if ( pSource->CountChildren () && pSource->IsCallPropagationEnabled() ) \
+#define RUN_CHILDREN_SERVER(func) \
+    if (pSource->CountChildren() && pSource->IsCallPropagationEnabled()) \
     { \
         CElementListSnapshot* pList = pSource->GetChildrenListSnapshot(); \
-        pList->AddRef();    /* Keep list alive during use */ \
-        for ( CElementListSnapshot::const_iterator iter = pList->begin() ; iter != pList->end() ; iter++ ) \
-            if ( !(*iter)->IsBeingDeleted() && !(*iter)->IsLocalEntity() ) \
+        pList->AddRef(); /* Keep list alive during use */ \
+        for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++) \
+            if (!(*iter)->IsBeingDeleted() && !(*iter)->IsLocalEntity()) \
                 func; \
         pList->Release(); \
     }
@@ -211,7 +211,6 @@ void CElementRPCs::SetElementVelocity(CClientEntity* pSource, NetBitStreamInterf
     }
 }
 
-
 void CElementRPCs::SetElementTurnVelocity(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the entity id and the turn speed
@@ -231,7 +230,7 @@ void CElementRPCs::SetElementTurnVelocity(CClientEntity* pSource, NetBitStreamIn
             }
             case CCLIENTVEHICLE:
             {
-                CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);                    
+                CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);
                 pVehicle->SetTurnSpeed(vecTurnVelocity);
 
                 break;
@@ -241,13 +240,12 @@ void CElementRPCs::SetElementTurnVelocity(CClientEntity* pSource, NetBitStreamIn
             {
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
                 pObject->SetTurnSpeed(vecTurnVelocity);
-                
+
                 break;
             }
         }
     }
 }
-
 
 void CElementRPCs::SetElementInterior(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {

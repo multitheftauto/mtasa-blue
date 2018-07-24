@@ -39,13 +39,13 @@ static CClientProjectileManager* m_pProjectileManager;
 static CClientSoundManager*      m_pSoundManager;
 
 // Used to run a function on all the children of the elements too
-#define RUN_CHILDREN( func ) \
-    if ( Entity.CountChildren () && Entity.IsCallPropagationEnabled() ) \
+#define RUN_CHILDREN(func) \
+    if (Entity.CountChildren() && Entity.IsCallPropagationEnabled()) \
     { \
         CElementListSnapshot* pList = Entity.GetChildrenListSnapshot(); \
-        pList->AddRef();    /* Keep list alive during use */ \
-        for ( CElementListSnapshot::const_iterator iter = pList->begin() ; iter != pList->end() ; iter++ ) \
-            if ( !(*iter)->IsBeingDeleted() ) \
+        pList->AddRef(); /* Keep list alive during use */ \
+        for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++) \
+            if (!(*iter)->IsBeingDeleted()) \
                 func; \
         pList->Release(); \
     }
@@ -491,7 +491,6 @@ bool CStaticFunctionDefinitions::GetElementVelocity(CClientEntity& Entity, CVect
     return true;
 }
 
-
 bool CStaticFunctionDefinitions::GetElementTurnVelocity(CClientEntity& Entity, CVector& vecTurnVelocity)
 {
     int iType = Entity.GetType();
@@ -517,12 +516,12 @@ bool CStaticFunctionDefinitions::GetElementTurnVelocity(CClientEntity& Entity, C
             Object.GetTurnSpeed(vecTurnVelocity);
             break;
         }
-        default: return false;
+        default:
+            return false;
     }
 
     return true;
 }
-
 
 bool CStaticFunctionDefinitions::GetElementInterior(CClientEntity& Entity, unsigned char& ucInterior)
 {
@@ -1161,7 +1160,6 @@ bool CStaticFunctionDefinitions::SetElementVelocity(CClientEntity& Entity, const
     return true;
 }
 
-
 bool CStaticFunctionDefinitions::SetElementTurnVelocity(CClientEntity& Entity, const CVector& vecTurnVelocity)
 {
     RUN_CHILDREN(SetElementTurnVelocity(**iter, vecTurnVelocity))
@@ -1189,12 +1187,12 @@ bool CStaticFunctionDefinitions::SetElementTurnVelocity(CClientEntity& Entity, c
             Object.SetTurnSpeed(vecTurnVelocity);
             break;
         }
-        default: return false;
+        default:
+            return false;
     }
 
     return true;
 }
-
 
 bool CStaticFunctionDefinitions::SetElementParent(CClientEntity& Entity, CClientEntity& Parent, CLuaMain* pLuaMain)
 {

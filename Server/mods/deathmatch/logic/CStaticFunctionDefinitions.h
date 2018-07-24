@@ -44,7 +44,7 @@ public:
     static CElement*      GetElementChild(CElement* pElement, unsigned int uiIndex);
     static bool           GetElementChildrenCount(CElement* pElement, unsigned int& uiCount);
     static CLuaArgument*  GetElementData(CElement* pElement, const char* szName, bool bInherit);
-    static CLuaArguments* GetAllElementData(CElement* pElement, CLuaArguments * table);
+    static CLuaArguments* GetAllElementData(CElement* pElement, CLuaArguments* table);
     static CElement*      GetElementParent(CElement* pElement);
     static bool           GetElementMatrix(CElement* pElement, CMatrix& matrix);
     static bool           GetElementPosition(CElement* pElement, CVector& vecPosition);
@@ -62,9 +62,9 @@ public:
     static bool           GetElementAlpha(CElement* pElement, unsigned char& ucAlpha);
     static bool           IsElementDoubleSided(CElement* pElement, bool& bDoubleSided);
     static bool           GetElementHealth(CElement* pElement, float& fHealth);
-    static bool           GetElementModel(CElement* pElement, unsigned short & usModel);
+    static bool           GetElementModel(CElement* pElement, unsigned short& usModel);
     static bool           IsElementInWater(CElement* pElement, bool& bInWater);
-    static bool           GetElementAttachedOffsets(CElement* pElement, CVector & vecPosition, CVector & vecRotation);
+    static bool           GetElementAttachedOffsets(CElement* pElement, CVector& vecPosition, CVector& vecRotation);
     static CElement*      GetElementSyncer(CElement* pElement);
     static bool           GetElementCollisionsEnabled(CElement* pElement);
     static bool           IsElementFrozen(CElement* pElement, bool& bFrozen);
@@ -92,7 +92,7 @@ public:
     static bool SetElementDoubleSided(CElement* pElement, bool bDoubleSided);
     static bool SetElementHealth(CElement* pElement, float fHealth);
     static bool SetElementModel(CElement* pElement, unsigned short usModel);
-    static bool SetElementAttachedOffsets(CElement* pElement, CVector & vecPosition, CVector & vecRotation);
+    static bool SetElementAttachedOffsets(CElement* pElement, CVector& vecPosition, CVector& vecRotation);
     static bool SetElementSyncer(CElement* pElement, CPlayer* pPlayer, bool bEnable = true);
     static bool SetElementCollisionsEnabled(CElement* pElement, bool bEnable);
     static bool SetElementFrozen(CElement* pElement, bool bFrozen);

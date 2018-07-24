@@ -36,13 +36,13 @@ static CWaterManager*        m_pWaterManager;
 static CCustomWeaponManager* m_pCustomWeaponManager;
 
 // Used to run a function on all the children of the elements too
-#define RUN_CHILDREN( func ) \
-    if ( pElement->CountChildren () && pElement->IsCallPropagationEnabled() ) \
+#define RUN_CHILDREN(func) \
+    if (pElement->CountChildren() && pElement->IsCallPropagationEnabled()) \
     { \
         CElementListSnapshot* pList = pElement->GetChildrenListSnapshot(); \
-        pList->AddRef();    /* Keep list alive during use */ \
-        for ( CElementListSnapshot::const_iterator iter = pList->begin() ; iter != pList->end() ; iter++ ) \
-            if ( !(*iter)->IsBeingDeleted() ) \
+        pList->AddRef(); /* Keep list alive during use */ \
+        for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++) \
+            if (!(*iter)->IsBeingDeleted()) \
                 func; \
         pList->Release(); \
     }
@@ -1225,7 +1225,6 @@ bool CStaticFunctionDefinitions::GetElementVelocity(CElement* pElement, CVector&
     return true;
 }
 
-
 bool CStaticFunctionDefinitions::GetElementTurnVelocity(CElement* pElement, CVector& vecTurnVelocity)
 {
     assert(pElement);
@@ -1245,7 +1244,6 @@ bool CStaticFunctionDefinitions::GetElementTurnVelocity(CElement* pElement, CVec
     }
     return true;
 }
-
 
 bool CStaticFunctionDefinitions::SetElementMatrix(CElement* pElement, const CMatrix& matrix)
 {
@@ -1403,7 +1401,6 @@ bool CStaticFunctionDefinitions::SetElementVelocity(CElement* pElement, const CV
     return true;
 }
 
-
 bool CStaticFunctionDefinitions::SetElementTurnVelocity(CElement* pElement, const CVector& vecTurnVelocity)
 {
     assert(pElement);
@@ -1443,7 +1440,6 @@ bool CStaticFunctionDefinitions::SetElementTurnVelocity(CElement* pElement, cons
 
     return true;
 }
-
 
 bool CStaticFunctionDefinitions::SetElementVisibleTo(CElement* pElement, CElement* pReference, bool bVisible)
 {
@@ -4063,7 +4059,7 @@ bool CStaticFunctionDefinitions::SetPedChoking(CElement* pElement, bool bChoking
                     // Remove jetpack now so it doesn't stay on (#9522#c25612)
                     if (pPed->HasJetPack())
                         pPed->SetHasJetPack(false);
-                    
+
                     pPed->SetChoking(bChoking);
 
                     CBitStream bitStream;

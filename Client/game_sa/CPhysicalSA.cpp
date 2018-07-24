@@ -106,7 +106,7 @@ VOID CPhysicalSA::SetTurnSpeed(CVector* vecTurnSpeed)
 {
     DEBUG_TRACE("VOID CPhysicalSA::SetTurnSpeed(CVector * vecTurnSpeed)");
 
-    ((CPhysicalSAInterface *)this->GetInterface())->m_vecAngularVelocity = *vecTurnSpeed;
+    ((CPhysicalSAInterface*)this->GetInterface())->m_vecAngularVelocity = *vecTurnSpeed;
 
     if (GetInterface()->nType == ENTITY_TYPE_OBJECT)
     {

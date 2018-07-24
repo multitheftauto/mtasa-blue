@@ -70,7 +70,7 @@ void CLuaElementDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("setElementID", SetElementID);
     CLuaCFunctions::AddFunction("setElementParent", SetElementParent);
     CLuaCFunctions::AddFunction("setElementData", SetElementData);
-    //CLuaCFunctions::AddFunction("removeElementData", RemoveElementData); TODO Clientside
+    // CLuaCFunctions::AddFunction("removeElementData", RemoveElementData); TODO Clientside
     CLuaCFunctions::AddFunction("setElementMatrix", SetElementMatrix);
     CLuaCFunctions::AddFunction("setElementPosition", SetElementPosition);
     CLuaCFunctions::AddFunction("setElementRotation", SetElementRotation);
@@ -618,7 +618,7 @@ int CLuaElementDefs::OOP_GetElementVelocity(lua_State* luaVM)
 int CLuaElementDefs::GetElementTurnVelocity(lua_State* luaVM)
 {
     // Verify the argument
-    CClientEntity* pEntity = NULL;
+    CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
 
@@ -636,7 +636,7 @@ int CLuaElementDefs::GetElementTurnVelocity(lua_State* luaVM)
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage ());
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
     lua_pushboolean(luaVM, false);
@@ -659,7 +659,7 @@ int CLuaElementDefs::OOP_GetElementTurnVelocity(lua_State* luaVM)
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage ());
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -1918,7 +1918,7 @@ int CLuaElementDefs::SetElementVelocity(lua_State* luaVM)
 int CLuaElementDefs::SetElementTurnVelocity(lua_State* luaVM)
 {
     CClientEntity* pEntity;
-    CVector vecTurnVelocity;
+    CVector        vecTurnVelocity;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
@@ -1935,13 +1935,12 @@ int CLuaElementDefs::SetElementTurnVelocity(lua_State* luaVM)
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage ());
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
     lua_pushboolean(luaVM, false);
     return 1;
 }
-
 
 int CLuaElementDefs::SetElementParent(lua_State* luaVM)
 {
