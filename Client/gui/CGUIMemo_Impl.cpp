@@ -111,6 +111,11 @@ void CGUIMemo_Impl::SetVerticalScrollPosition(float fPosition)
     }
 }
 
+float CGUIMemo_Impl::GetMaxVerticalScrollPosition(void)
+{
+    return GetScrollbarDocumentSize() - GetScrollbarPageSize();
+}
+
 float CGUIMemo_Impl::GetScrollbarDocumentSize(void)
 {
     CEGUI::Scrollbar* pScrollbar = reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->d_vertScrollbar;

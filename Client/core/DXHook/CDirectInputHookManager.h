@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CDIRECTINPUTHOOKMANAGER_H
-#define __CDIRECTINPUTHOOKMANAGER_H
+#pragma once
 
 #include "CDirectInputHook8.h"
 
@@ -26,5 +25,3 @@ public:
 private:
     CDirectInputHook8* m_pDirectInputHook8;
 };
-
-#endif

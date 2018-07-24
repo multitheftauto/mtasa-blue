@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPROXYDIRECT3DDEVICE9_H
-#define __CPROXYDIRECT3DDEVICE9_H
+#pragma once
 
 #include <d3d9.h>
 #include "CDirect3DData.h"
@@ -553,5 +552,3 @@ public:
 
 extern CProxyDirect3DDevice9*                  g_pProxyDevice;
 extern CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState;
-
-#endif

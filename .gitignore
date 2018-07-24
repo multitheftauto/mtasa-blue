@@ -410,9 +410,9 @@ __pycache__/
 Bin/
 Build/
 InstallFiles/
-utils/vswhere.exe
 utils/DXFiles.zip
 utils/DXFiles/
 !*.so
 !*.dll
 !*.exe
+utils/vswhere.exe

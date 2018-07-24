@@ -1,14 +1,14 @@
 /*===========================================================================
- BASS_FX 2.4 - Copyright (c) 2002-2013 (: JOBnik! :) [Arthur Aminov, ISRAEL]
+ BASS_FX 2.4 - Copyright (c) 2002-2018 (: JOBnik! :) [Arthur Aminov, ISRAEL]
                                                      [http://www.jobnik.org]
 
       bugs/suggestions/questions:
         forum  : http://www.un4seen.com/forum/?board=1
-                 http://www.jobnik.org/smforum
+                 http://www.jobnik.org/forums
         e-mail : bass_fx@jobnik.org
      --------------------------------------------------
 
- NOTE: This header will work only with BASS_FX version 2.4.10
+ NOTE: This header will work only with BASS_FX version 2.4.12
        Check www.un4seen.com or www.jobnik.org for any later versions.
 
  * Requires BASS 2.4 (available at http://www.un4seen.com)
@@ -24,6 +24,10 @@
 #ifndef BASS_FXDEF
 	#define BASS_FXDEF(f) WINAPI f
 #endif
+
+// BASS_CHANNELINFO types
+#define BASS_CTYPE_STREAM_TEMPO		0x1f200
+#define BASS_CTYPE_STREAM_REVERSE	0x1f201
 
 // Tempo / Reverse / BPM / Beat flag
 #define BASS_FX_FREESOURCE			0x10000	// Free the source handle as well?
@@ -81,7 +85,9 @@ enum {
 	BASS_FX_BFX_COMPRESSOR2,				// Compressor 2					/ multi channel
 	BASS_FX_BFX_VOLUME_ENV,					// Volume envelope				/ multi channel
 	BASS_FX_BFX_BQF,						// BiQuad filters				/ multi channel
-	BASS_FX_BFX_ECHO4						// Echo/Reverb					/ multi channel
+	BASS_FX_BFX_ECHO4,						// Echo	4						/ multi channel
+	BASS_FX_BFX_PITCHSHIFT,					// Pitch shift using FFT		/ multi channel		(not available on mobile)
+	BASS_FX_BFX_FREEVERB					// Reverb using "Freeverb" algo	/ multi channel
 };
 
 /*
@@ -90,7 +96,7 @@ enum {
 	BASS_FX_BFX_ECHO		-> use BASS_FX_BFX_ECHO4
 	BASS_FX_BFX_ECHO2		-> use BASS_FX_BFX_ECHO4
 	BASS_FX_BFX_ECHO3		-> use BASS_FX_BFX_ECHO4
-	BASS_FX_BFX_REVERB		-> use BASS_FX_BFX_ECHO4 with fFeedback enabled
+	BASS_FX_BFX_REVERB		-> use BASS_FX_BFX_FREEVERB
 	BASS_FX_BFX_FLANGER		-> use BASS_FX_BFX_CHORUS
 	BASS_FX_BFX_COMPRESSOR	-> use BASS_FX_BFX_COMPRESSOR2
 	BASS_FX_BFX_APF			-> use BASS_FX_BFX_BQF with BASS_BFX_BQF_ALLPASS filter
@@ -287,7 +293,7 @@ typedef struct {
 	int   lChannel;							// BASS_BFX_CHANxxx flag/s
 } BASS_BFX_BQF;
 
-// Echo/Reverb
+// Echo 4
 typedef struct {
 	float fDryMix;							// dry (unaffected) signal mix				[-2.......2]
 	float fWetMix;							// wet (affected) signal mix				[-2.......2]
@@ -296,6 +302,31 @@ typedef struct {
 	BOOL  bStereo;							// echo adjoining channels to each other	[TRUE/FALSE]
 	int   lChannel;							// BASS_BFX_CHANxxx flag/s
 } BASS_BFX_ECHO4;
+
+// Pitch shift (not available on mobile)
+typedef struct {
+	float fPitchShift;						// A factor value which is between 0.5 (one octave down) and 2 (one octave up) (1 won't change the pitch) [1 default]
+											// (fSemitones is not in use, fPitchShift has a priority over fSemitones)
+	float fSemitones;						// Semitones (0 won't change the pitch) [0 default]
+	long  lFFTsize;							// Defines the FFT frame size used for the processing. Typical values are 1024, 2048 and 4096 [2048 default]
+											// It may be any value <= 8192 but it MUST be a power of 2
+	long  lOsamp;							// Is the STFT oversampling factor which also determines the overlap between adjacent STFT frames [8 default]
+											// It should at least be 4 for moderate scaling ratios. A value of 32 is recommended for best quality (better quality = higher CPU usage)
+	int   lChannel;							// BASS_BFX_CHANxxx flag/s
+} BASS_BFX_PITCHSHIFT;
+
+// Freeverb
+#define BASS_BFX_FREEVERB_MODE_FREEZE	1
+
+typedef struct {
+	float fDryMix;							// dry (unaffected) signal mix				[0........1], def. 0
+	float fWetMix;							// wet (affected) signal mix				[0........3], def. 1.0f
+	float fRoomSize;						// room size								[0........1], def. 0.5f
+	float fDamp;							// damping									[0........1], def. 0.5f
+	float fWidth;							// stereo width								[0........1], def. 1
+	DWORD lMode;							// 0 or BASS_BFX_FREEVERB_MODE_FREEZE, def. 0 (no freeze)
+	int   lChannel;							// BASS_BFX_CHANxxx flag/s
+} BASS_BFX_FREEVERB;
 
 /*===========================================================================
 	set dsp fx			- BASS_ChannelSetFX
@@ -322,12 +353,17 @@ enum {
 enum {
 	BASS_ATTRIB_TEMPO_OPTION_USE_AA_FILTER = 0x10010,	// TRUE (default) / FALSE (default for multi-channel on mobile devices for lower CPU usage)
 	BASS_ATTRIB_TEMPO_OPTION_AA_FILTER_LENGTH,			// 32 default (8 .. 128 taps)
-	BASS_ATTRIB_TEMPO_OPTION_USE_QUICKALGO,				// TRUE (default on mobile devices for loswer CPU usage) / FALSE (default)
+	BASS_ATTRIB_TEMPO_OPTION_USE_QUICKALGO,				// TRUE (default on mobile devices for lower CPU usage) / FALSE (default)
 	BASS_ATTRIB_TEMPO_OPTION_SEQUENCE_MS,				// 82 default, 0 = automatic
 	BASS_ATTRIB_TEMPO_OPTION_SEEKWINDOW_MS,				// 28 default, 0 = automatic
 	BASS_ATTRIB_TEMPO_OPTION_OVERLAP_MS,				// 8  default
 	BASS_ATTRIB_TEMPO_OPTION_PREVENT_CLICK				// TRUE / FALSE (default)
 };
+
+// tempo algorithm flags
+#define BASS_FX_TEMPO_ALGO_LINEAR		0x200
+#define BASS_FX_TEMPO_ALGO_CUBIC		0x400			// default
+#define BASS_FX_TEMPO_ALGO_SHANNON		0x800
 
 HSTREAM BASS_FXDEF(BASS_FX_TempoCreate)(DWORD chan, DWORD flags);
 DWORD   BASS_FXDEF(BASS_FX_TempoGetSource)(HSTREAM chan);

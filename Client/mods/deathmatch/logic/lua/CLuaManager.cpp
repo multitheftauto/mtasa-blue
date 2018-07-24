@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "../luadefs/CLuaFireDefs.h"
 
 using std::list;
 
@@ -242,9 +243,6 @@ void CLuaManager::LoadCFunctions(void)
     // Explosion funcs
     CLuaCFunctions::AddFunction("createExplosion", CLuaFunctionDefs::CreateExplosion);
 
-    // Fire funcs
-    CLuaCFunctions::AddFunction("createFire", CLuaFunctionDefs::CreateFire);
-
     // Cursor funcs
     CLuaCFunctions::AddFunction("getCursorPosition", CLuaFunctionDefs::GetCursorPosition);
     CLuaCFunctions::AddFunction("setCursorPosition", CLuaFunctionDefs::SetCursorPosition);
@@ -289,6 +287,7 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("getFarClipDistance", CLuaFunctionDefs::GetFarClipDistance);
     CLuaCFunctions::AddFunction("getNearClipDistance", CLuaFunctionDefs::GetNearClipDistance);
     CLuaCFunctions::AddFunction("getVehiclesLODDistance", CLuaFunctionDefs::GetVehiclesLODDistance);
+    CLuaCFunctions::AddFunction("getPedsLODDistance", CLuaFunctionDefs::GetPedsLODDistance); 
     CLuaCFunctions::AddFunction("getFogDistance", CLuaFunctionDefs::GetFogDistance);
     CLuaCFunctions::AddFunction("getSunColor", CLuaFunctionDefs::GetSunColor);
     CLuaCFunctions::AddFunction("getSunSize", CLuaFunctionDefs::GetSunSize);
@@ -335,6 +334,8 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("resetNearClipDistance", CLuaFunctionDefs::ResetNearClipDistance);
     CLuaCFunctions::AddFunction("setVehiclesLODDistance", CLuaFunctionDefs::SetVehiclesLODDistance);
     CLuaCFunctions::AddFunction("resetVehiclesLODDistance", CLuaFunctionDefs::ResetVehiclesLODDistance);
+    CLuaCFunctions::AddFunction("setPedsLODDistance", CLuaFunctionDefs::SetPedsLODDistance);
+    CLuaCFunctions::AddFunction("resetPedsLODDistance", CLuaFunctionDefs::ResetPedsLODDistance);
     CLuaCFunctions::AddFunction("setFogDistance", CLuaFunctionDefs::SetFogDistance);
     CLuaCFunctions::AddFunction("resetFogDistance", CLuaFunctionDefs::ResetFogDistance);
     CLuaCFunctions::AddFunction("setSunColor", CLuaFunctionDefs::SetSunColor);
@@ -402,6 +403,7 @@ void CLuaManager::LoadCFunctions(void)
     CLuaEffectDefs::LoadFunctions();
     CLuaElementDefs::LoadFunctions();
     CLuaEngineDefs::LoadFunctions();
+    CLuaFireDefs::LoadFunctions();
     CLuaGUIDefs::LoadFunctions();
     CLuaMarkerDefs::LoadFunctions();
     CLuaObjectDefs::LoadFunctions();

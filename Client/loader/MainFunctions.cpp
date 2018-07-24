@@ -765,7 +765,6 @@ void CheckDataFiles(void)
     const char* dataFilesFiles[] = {"MTA\\cgui\\images\\background_logo.png",
                                     "MTA\\cgui\\images\\radarset\\up.png",
                                     "MTA\\cgui\\images\\busy_spinner.png",
-                                    "MTA\\cgui\\images\\rect_edge.png",
                                     "MTA\\D3DX9_42.dll",
                                     "MTA\\D3DCompiler_42.dll",
                                     "MTA\\bass.dll",
@@ -783,12 +782,6 @@ void CheckDataFiles(void)
                                    "mta-datafiles-missing");
             return ExitProcess(EXIT_ERROR);
         }
-    }
-
-    if (FileSize(PathJoin(strMTASAPath, "MTA", "bass.dll")) != 0x0001A440)
-    {
-        DisplayErrorMessageBox(_("Load failed. Please ensure that the latest data files have been installed correctly."), _E("CL17"), "mta-datafiles-missing");
-        return ExitProcess(EXIT_ERROR);
     }
 
     // Check for client file
@@ -843,39 +836,39 @@ void CheckDataFiles(void)
         const char* szFilename;
     } integrityCheckList[] = {
         {
-            "9586E7BE6AE8016932038932D1417241",
+            "4783E7C0D0005B80673A972E4231A230",
             "bass.dll",
         },
         {
-            "B2E49F0C22C8B7D92D615F942BA19353",
+            "526E02E9EB8953655EB293D8BAC59C8F",
             "bass_aac.dll",
         },
         {
-            "569C60F8397C34034E685A303B7404C0",
+            "3935396799611AD3FDE5A66832D69DD6",
             "bass_ac3.dll",
         },
         {
-            "0E44BCAC0E940DB2BFB13448E96E4B29",
+            "E7F4494BDF7B1C49A303FE56C6B52DC9",
             "bass_fx.dll",
         },
         {
-            "50AF8A7D49E83A723ED0F70FB682DCFB",
+            "3CA82F8E39DE39A50C13474905EF2D65",
             "bassflac.dll",
         },
         {
-            "BEBA64522AA8265751187E38D1FC0653",
+            "13A3F5637A93F0340161A40C6FBD3F1F",
             "bassmidi.dll",
         },
         {
-            "99F4F38007D347CEED482B7C04FDD122",
+            "BCB4A47D5CBF53515AAE135AAA9C1C52",
             "bassmix.dll",
         },
         {
-            "7B52BE6D702AA590DB57A0E135F81C45",
+            "02C9E8F0288D15FF290DD31EB1C7BFBC",
             "basswma.dll",
         },
         {
-            "38D7679D3B8B6D7F16A0AA9BF2A60043",
+            "6F26A1A5D165272BA48F45BC0B79750E",
             "tags.dll",
         },
         {

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPROXYDIRECT3D9_H
-#define __CPROXYDIRECT3D9_H
+#pragma once
 
 #include <d3d9.h>
 #include "CProxyDirect3DDevice9.h"
@@ -51,5 +50,3 @@ public:
 private:
     IDirect3D9* m_pDevice;
 };
-
-#endif

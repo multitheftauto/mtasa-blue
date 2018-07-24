@@ -15,6 +15,62 @@ CWorldSA::CWorldSA()
     m_pBuildingRemovals = new std::multimap<unsigned short, SBuildingRemoval*>;
     m_pDataBuildings = new std::multimap<unsigned short, sDataBuildingRemovalItem*>;
     m_pBinaryBuildings = new std::multimap<unsigned short, sBuildingRemovalItem*>;
+
+    InstallHooks();
+}
+
+void HOOK_FallenPeds();
+void HOOK_FallenCars();
+
+void CWorldSA::InstallHooks(void)
+{
+    HookInstall(0x565CB0, (DWORD)HOOK_FallenPeds, 5);
+    HookInstall(0x565E80, (DWORD)HOOK_FallenCars, 5);
+}
+
+DWORD CONTINUE_CWorld_FallenPeds = 0x00565CBA;
+DWORD CONTINUE_CWorld_FallenCars = 0x00565E8A;
+
+void _declspec(naked) HOOK_FallenPeds()
+{
+    if (pGame && pGame->IsUnderWorldWarpEnabled())
+    {
+        _asm
+        {
+            sub esp, 2Ch
+            push ebx
+            mov ebx, ds:0B74490h
+            jmp CONTINUE_CWorld_FallenPeds
+        }
+    }
+    else
+    {
+        _asm
+        {
+            ret
+        }
+    }
+}
+
+void _declspec(naked) HOOK_FallenCars()
+{
+    if (pGame && pGame->IsUnderWorldWarpEnabled())
+    {
+        _asm
+        {
+            sub esp, 2Ch
+            push ebx
+            mov ebx, ds:0B74494h
+            jmp CONTINUE_CWorld_FallenCars
+        }
+    }
+    else
+    {
+        _asm
+        {
+            ret
+        }
+    }
 }
 
 void CWorldSA::Add(CEntity* pEntity, eDebugCaller CallerId)

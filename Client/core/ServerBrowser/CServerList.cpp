@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CServerBrowser.MasterServerManager.h"
+#include "CServerCache.h"
 
 using namespace std;
 

@@ -67,9 +67,6 @@ public:
     // Explosion functions
     LUA_DECLARE(CreateExplosion);
 
-    // Fire functions
-    LUA_DECLARE(CreateFire);
-
     // Cursor funcs
     LUA_DECLARE(GetCursorPosition);
     LUA_DECLARE(SetCursorPosition);
@@ -153,6 +150,9 @@ public:
     LUA_DECLARE(GetVehiclesLODDistance);
     LUA_DECLARE(SetVehiclesLODDistance);
     LUA_DECLARE(ResetVehiclesLODDistance);
+    LUA_DECLARE(GetPedsLODDistance); 
+    LUA_DECLARE(SetPedsLODDistance); 
+    LUA_DECLARE(ResetPedsLODDistance); 
     LUA_DECLARE(GetFogDistance);
     LUA_DECLARE(SetFogDistance);
     LUA_DECLARE(ResetFogDistance);

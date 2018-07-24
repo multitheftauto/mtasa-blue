@@ -218,6 +218,8 @@ public:
     static bool            GetVehicleNitroLevel(CClientVehicle& Vehicle, float& fLevel);
     static bool            GetHeliBladeCollisionsEnabled(CClientVehicle& Vehicle);
     static bool            IsVehicleWindowOpen(CClientVehicle& Vehicle, uchar ucWindow);
+    static bool            SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
+    static bool            GetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
 
     // Vehicle set functions
     static bool FixVehicle(CClientEntity& Entity);
@@ -307,6 +309,8 @@ public:
 
     // Fire funcs
     static bool CreateFire(CVector& vecPosition, float fSize);
+    static bool ExtinguishFireInRadius(CVector& vecPosition, float fRadius);
+    static bool ExtinguishAllFires();
 
     // Light funcs
     static CClientPointLights* CreateLight(CResource& Resource, int iMode, const CVector& vecPosition, float fRadius, SColor color, CVector& vecDirection);
@@ -458,6 +462,7 @@ public:
 
     static void GUIMemoSetReadOnly(CClientEntity& Element, bool bFlag);
     static void GUIMemoSetCaretIndex(CClientEntity& Element, unsigned int iCaret);
+    static void GUIMemoSetVerticalScrollPosition(CClientEntity& Element, float fPosition);
 
     static void                GUIGridListSetSortingEnabled(CClientEntity& Element, bool bEnabled);
     static inline unsigned int GUIGridListAddColumn(CClientGUIElement& GUIElement, const char* szTitle, float fWidth)
@@ -631,6 +636,7 @@ public:
     static CClientColPolygon*   CreateColPolygon(CResource& Resource, const CVector2D& vecPosition);
     static CClientColTube*      CreateColTube(CResource& Resource, const CVector& vecPosition, float fRadius, float fHeight);
     static CClientColShape*     GetElementColShape(CClientEntity* pEntity);
+    static bool                 IsInsideColShape(CClientColShape* pColShape, const CVector& vecPosition, bool& inside);
     static void                 RefreshColShapeColliders(CClientColShape* pColShape);
 
     // Weapon funcs
