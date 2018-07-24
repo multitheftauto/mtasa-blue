@@ -267,14 +267,14 @@ void CCommandFuncs::Connect(const char* szParameters)
             strNick = szNick;
 
         // Got all required arguments?
-        if (!szHost || !szPort || strNick.empty())
+        if (!szHost || strNick.empty())
         {
-            CCore::GetSingleton().GetConsole()->Print(_("connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"));
+            CCore::GetSingleton().GetConsole()->Print(_("connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"));
             return;
         }
 
         // Verify and convert the port number
-        int iPort = atoi(szPort);
+        int iPort = szPort ? atoi(szPort) : 22003;
         if (iPort <= 0 || iPort > 0xFFFF)
         {
             CCore::GetSingleton().GetConsole()->Print(_("connect: Bad port number"));

@@ -2,6 +2,9 @@ language: cpp
 sudo: false
 dist: trusty
 
+git:
+  depth: 1
+
 matrix:
   include:
     - compiler: gcc
