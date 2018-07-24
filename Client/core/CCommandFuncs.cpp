@@ -234,62 +234,63 @@ void CCommandFuncs::Unload(const char* szParameters)
 
 void CCommandFuncs::Connect(const char* szParameters)
 {
+    // Parse the arguments (host port nick pass)
+    char szBuffer[256] = "";
+    if (szParameters)
+        STRNCPY(szBuffer, szParameters, NUMELMS(szBuffer));
+
+    if (!strncmp(szBuffer, "mtasa://", 8))
+    {
+        // Using a mtasa:// URI to connect
+        SString strArguments = g_pCore->GetConnectCommandFromURI(szBuffer);
+
+        if (strArguments.length() > 0 && g_pCore->GetCommands()->Execute(strArguments))
+        {
+            return;
+        }
+    }
+
+    char* szHost = strtok(szBuffer, " ");
+    char* szPort = strtok(NULL, " ");
+    char* szNick = strtok(NULL, " ");
+    char* szPass = strtok(NULL, " ");
+
+    std::string strNick;
+    if (!szNick)
+        CVARS_GET("nick", strNick);
+    else
+        strNick = szNick;
+
+    // Got all required arguments?
+    if (!szHost || strNick.empty())
+    {
+        CCore::GetSingleton().GetConsole()->Print(_("connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"));
+        return;
+    }
+
+    // Verify and convert the port number
+    int iPort = szPort ? atoi(szPort) : 22003;
+    if (iPort <= 0 || iPort > 0xFFFF)
+    {
+        CCore::GetSingleton().GetConsole()->Print(_("connect: Bad port number"));
+        return;
+    }
+
+    unsigned short usPort = static_cast<unsigned short>(iPort);
+
+    // Got a password?
+    char emptyPass = 0;
+    if (!szPass)
+    {
+        szPass = &emptyPass;
+    }
+
+    // Unload any mod before connecting to a server
     CModManager::GetSingleton().Unload();
 
-    // Any mod loaded?
+    // Only connect if there is no mod loaded
     if (!CModManager::GetSingleton().GetCurrentMod())
     {
-        // Parse the arguments (host port nick pass)
-        char szBuffer[256] = "";
-        if (szParameters)
-            STRNCPY(szBuffer, szParameters, NUMELMS(szBuffer));
-
-        if (!strncmp(szBuffer, "mtasa://", 8))
-        {
-            // Using a mtasa:// URI to connect
-            SString strArguments = g_pCore->GetConnectCommandFromURI(szBuffer);
-
-            if (strArguments.length() > 0 && g_pCore->GetCommands()->Execute(strArguments))
-            {
-                return;
-            }
-        }
-
-        char* szHost = strtok(szBuffer, " ");
-        char* szPort = strtok(NULL, " ");
-        char* szNick = strtok(NULL, " ");
-        char* szPass = strtok(NULL, " ");
-
-        std::string strNick;
-        if (!szNick)
-            CVARS_GET("nick", strNick);
-        else
-            strNick = szNick;
-
-        // Got all required arguments?
-        if (!szHost || strNick.empty())
-        {
-            CCore::GetSingleton().GetConsole()->Print(_("connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"));
-            return;
-        }
-
-        // Verify and convert the port number
-        int iPort = szPort ? atoi(szPort) : 22003;
-        if (iPort <= 0 || iPort > 0xFFFF)
-        {
-            CCore::GetSingleton().GetConsole()->Print(_("connect: Bad port number"));
-            return;
-        }
-
-        unsigned short usPort = static_cast<unsigned short>(iPort);
-
-        // Got a password?
-        char emptyPass = 0;
-        if (!szPass)
-        {
-            szPass = &emptyPass;
-        }
-
         // Start the connect
         if (CCore::GetSingleton().GetConnectManager()->Connect(szHost, usPort, strNick.c_str(), szPass))
         {
