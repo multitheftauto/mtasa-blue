@@ -2645,28 +2645,30 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
         case WM_MOUSEMOVE:
         {
             CVector2D  vecResolution = g_pCore->GetGUI()->GetResolution();
-            int        iX = Clamp(0, (int)LOWORD(lParam), (int)vecResolution.fX);
-            int        iY = Clamp(0, (int)HIWORD(lParam), (int)vecResolution.fY);
-            static int iPreviousX = 0, iPreviousY = 0;
-            if (iX != iPreviousX || iY != iPreviousY)
+            int        iX = (int)LOWORD(lParam), iY = (int)HIWORD(lParam);
+            if (iX >= 0 && iX <= vecResolution.fX && iY >= 0 && iY <= vecResolution.fY)
             {
-                iPreviousX = iX, iPreviousY = iY;
+                static int iPreviousX = 0, iPreviousY = 0;
+                if (iX != iPreviousX || iY != iPreviousY)
+                {
+                    iPreviousX = iX, iPreviousY = iY;
 
-                CVector2D vecCursorPosition(((float)iX) / vecResolution.fX, ((float)iY) / vecResolution.fY);
+                    CVector2D vecCursorPosition(((float)iX) / vecResolution.fX, ((float)iY) / vecResolution.fY);
 
-                CVector vecTarget, vecScreen((float)iX, (float)iY, 300.0f);
-                g_pCore->GetGraphics()->CalcWorldCoors(&vecScreen, &vecTarget);
+                    CVector vecTarget, vecScreen((float)iX, (float)iY, 300.0f);
+                    g_pCore->GetGraphics()->CalcWorldCoors(&vecScreen, &vecTarget);
 
-                // Call the onClientCursorMove event
-                CLuaArguments Arguments;
-                Arguments.PushNumber((double)vecCursorPosition.fX);
-                Arguments.PushNumber((double)vecCursorPosition.fY);
-                Arguments.PushNumber((double)iX);
-                Arguments.PushNumber((double)iY);
-                Arguments.PushNumber((double)vecTarget.fX);
-                Arguments.PushNumber((double)vecTarget.fY);
-                Arguments.PushNumber((double)vecTarget.fZ);
-                m_pRootEntity->CallEvent("onClientCursorMove", Arguments, false);
+                    // Call the onClientCursorMove event
+                    CLuaArguments Arguments;
+                    Arguments.PushNumber((double)vecCursorPosition.fX);
+                    Arguments.PushNumber((double)vecCursorPosition.fY);
+                    Arguments.PushNumber((double)iX);
+                    Arguments.PushNumber((double)iY);
+                    Arguments.PushNumber((double)vecTarget.fX);
+                    Arguments.PushNumber((double)vecTarget.fY);
+                    Arguments.PushNumber((double)vecTarget.fZ);
+                    m_pRootEntity->CallEvent("onClientCursorMove", Arguments, false);
+                }
             }
             break;
         }
