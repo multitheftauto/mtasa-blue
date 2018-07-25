@@ -762,7 +762,7 @@ int CLuaVector4Defs::Lt(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushboolean(luaVM, pVector1.fX < pVector2.fX || pVector1.fY < pVector2.fY || pVector1.fZ < pVector2.fZ || pVector1.fW < pVector2.fW);
+        lua_pushboolean(luaVM, (pVector1.fX < pVector2.fX) && (pVector1.fY < pVector2.fY) && (pVector1.fZ < pVector2.fZ) && (pVector1.fW < pVector2.fW));
         return 1;
     }
     else
@@ -785,7 +785,7 @@ int CLuaVector4Defs::Le(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushboolean(luaVM, pVector1.fX <= pVector2.fX || pVector1.fY <= pVector2.fY || pVector1.fZ <= pVector2.fZ || pVector1.fW <= pVector2.fW);
+        lua_pushboolean(luaVM, (pVector1.fX <= pVector2.fX) && (pVector1.fY <= pVector2.fY) && (pVector1.fZ <= pVector2.fZ) && (pVector1.fW <= pVector2.fW));
         return 1;
     }
     else
