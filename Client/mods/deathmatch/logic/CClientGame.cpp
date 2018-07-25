@@ -14,6 +14,7 @@
 #include "game/CAnimBlendAssocGroup.h"
 #include "game/CAnimBlendAssociation.h"
 #include "game/CAnimBlendHierarchy.h"
+#include <windowsx.h>
 
 SString StringZeroPadout(const SString& strInput, uint uiPadoutSize)
 {
