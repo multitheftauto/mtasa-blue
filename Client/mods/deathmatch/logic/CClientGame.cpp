@@ -2476,166 +2476,162 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                 }
                 if (ucButtonHit != 0xFF)
                 {
-                    int iX = GET_X_LPARAM(lParam);
-                    int iY = GET_Y_LPARAM(lParam);
-
-                    CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
-
-                    /*
-                    // (IJs) why are these relative? it doesn't make sense
-                    CVector2D vecCursorPosition ( ( ( float ) iX ) / vecResolution.fX,
-                                                  ( ( float ) iY ) / vecResolution.fY );
-                    */
-
-                    CVector2D vecCursorPosition((float)iX, (float)iY);
-
-                    CVector vecOrigin, vecTarget, vecScreen((float)iX, (float)iY, 300.0f);
-                    g_pCore->GetGraphics()->CalcWorldCoors(&vecScreen, &vecTarget);
-
-                    // Grab the camera position
-                    CCamera* pCamera = g_pGame->GetCamera();
-                    CCam*    pCam = pCamera->GetCam(pCamera->GetActiveCam());
-                    CMatrix  matCamera;
-                    pCamera->GetMatrix(&matCamera);
-                    vecOrigin = matCamera.vPos;
-
-                    CColPoint* pColPoint = NULL;
-                    CEntity*   pGameEntity = NULL;
-
-                    // Grab the collision point/entity
-                    bool bCollision = g_pGame->GetWorld()->ProcessLineOfSight(&vecOrigin, &vecTarget, &pColPoint, &pGameEntity);
-
-                    CVector        vecCollision;
-                    ElementID      CollisionEntityID = INVALID_ELEMENT_ID;
-                    CClientEntity* pCollisionEntity = NULL;
-                    if (bCollision && pColPoint)
+                    CVector2D  vecResolution = g_pCore->GetGUI()->GetResolution();
+                    int        iX = GET_X_LPARAM(lParam), iY = GET_Y_LPARAM(lParam);
+                    if (iX >= 0 && iX <= vecResolution.fX && iY >= 0 && iY <= vecResolution.fY)
                     {
-                        vecCollision = pColPoint->GetPosition();
-                        if (pGameEntity)
+                        /*
+                        // (IJs) why are these relative? it doesn't make sense
+                        CVector2D vecCursorPosition ( ( ( float ) iX ) / vecResolution.fX,
+                        ( ( float ) iY ) / vecResolution.fY );
+                        */
+
+                        CVector2D vecCursorPosition((float)iX, (float)iY);
+
+                        CVector vecOrigin, vecTarget, vecScreen((float)iX, (float)iY, 300.0f);
+                        g_pCore->GetGraphics()->CalcWorldCoors(&vecScreen, &vecTarget);
+
+                        // Grab the camera position
+                        CCamera* pCamera = g_pGame->GetCamera();
+                        CCam*    pCam = pCamera->GetCam(pCamera->GetActiveCam());
+                        CMatrix  matCamera;
+                        pCamera->GetMatrix(&matCamera);
+                        vecOrigin = matCamera.vPos;
+
+                        CColPoint* pColPoint = NULL;
+                        CEntity*   pGameEntity = NULL;
+
+                        // Grab the collision point/entity
+                        bool bCollision = g_pGame->GetWorld()->ProcessLineOfSight(&vecOrigin, &vecTarget, &pColPoint, &pGameEntity);
+
+                        CVector        vecCollision;
+                        ElementID      CollisionEntityID = INVALID_ELEMENT_ID;
+                        CClientEntity* pCollisionEntity = NULL;
+                        if (bCollision && pColPoint)
                         {
-                            CClientEntity* pEntity = m_pManager->FindEntity(pGameEntity);
-                            if (pEntity)
+                            vecCollision = pColPoint->GetPosition();
+                            if (pGameEntity)
                             {
-                                pCollisionEntity = pEntity;
-                                if (!pEntity->IsLocalEntity())
-                                    CollisionEntityID = pEntity->GetID();
+                                CClientEntity* pEntity = m_pManager->FindEntity(pGameEntity);
+                                if (pEntity)
+                                {
+                                    pCollisionEntity = pEntity;
+                                    if (!pEntity->IsLocalEntity())
+                                        CollisionEntityID = pEntity->GetID();
+                                }
                             }
                         }
-                    }
-                    else
-                    {
-                        vecCollision = vecTarget;
-                    }
-
-                    // Destroy the colpoint so we don't get a leak
-                    if (pColPoint)
-                    {
-                        pColPoint->Destroy();
-                    }
-
-                    const char* szButton = NULL;
-                    const char* szState = NULL;
-                    switch (ucButtonHit)
-                    {
-                        case 0:
-                            szButton = "left";
-                            szState = "down";
-                            break;
-                        case 1:
-                            szButton = "left";
-                            szState = "up";
-                            break;
-                        case 2:
-                            szButton = "middle";
-                            szState = "down";
-                            break;
-                        case 3:
-                            szButton = "middle";
-                            szState = "up";
-                            break;
-                        case 4:
-                            szButton = "right";
-                            szState = "down";
-                            break;
-                        case 5:
-                            szButton = "right";
-                            szState = "up";
-                            break;
-                    }
-                    if (szButton && szState)
-                    {
-                        if (std::isnan(vecCollision.fX))
-                            vecCollision.fX = 0;
-                        if (std::isnan(vecCollision.fY))
-                            vecCollision.fY = 0;
-                        if (std::isnan(vecCollision.fZ))
-                            vecCollision.fZ = 0;
-
-                        // Call the event for the client
-                        CLuaArguments Arguments;
-                        Arguments.PushString(szButton);
-                        Arguments.PushString(szState);
-                        Arguments.PushNumber(vecCursorPosition.fX);
-                        Arguments.PushNumber(vecCursorPosition.fY);
-                        Arguments.PushNumber(vecCollision.fX);
-                        Arguments.PushNumber(vecCollision.fY);
-                        Arguments.PushNumber(vecCollision.fZ);
-                        if (pCollisionEntity)
-                            Arguments.PushElement(pCollisionEntity);
                         else
-                            Arguments.PushBoolean(false);
-                        m_pRootEntity->CallEvent("onClientClick", Arguments, false);
+                            vecCollision = vecTarget;
 
-                        // Send the button, cursor position, 3d position and the entity collided with
-                        CBitStream bitStream;
+                        // Destroy the colpoint so we don't get a leak
+                        if (pColPoint)
+                            pColPoint->Destroy();
 
-                        SMouseButtonSync button;
-                        button.data.ucButton = ucButtonHit;
-                        bitStream.pBitStream->Write(&button);
-
-                        bitStream.pBitStream->WriteCompressed(static_cast<unsigned short>(vecCursorPosition.fX));
-                        bitStream.pBitStream->WriteCompressed(static_cast<unsigned short>(vecCursorPosition.fY));
-
-                        SPositionSync position(false);
-                        position.data.vecPosition = vecCollision;
-                        bitStream.pBitStream->Write(&position);
-
-                        if (CollisionEntityID != INVALID_ELEMENT_ID)
+                        const char* szButton = NULL;
+                        const char* szState = NULL;
+                        switch (ucButtonHit)
                         {
-                            bitStream.pBitStream->WriteBit(true);
-                            bitStream.pBitStream->Write(CollisionEntityID);
+                            case 0:
+                                szButton = "left";
+                                szState = "down";
+                                break;
+                            case 1:
+                                szButton = "left";
+                                szState = "up";
+                                break;
+                            case 2:
+                                szButton = "middle";
+                                szState = "down";
+                                break;
+                            case 3:
+                                szButton = "middle";
+                                szState = "up";
+                                break;
+                            case 4:
+                                szButton = "right";
+                                szState = "down";
+                                break;
+                            case 5:
+                                szButton = "right";
+                                szState = "up";
+                                break;
                         }
-                        else
-                            bitStream.pBitStream->WriteBit(false);
-
-                        m_pNetAPI->RPC(CURSOR_EVENT, bitStream.pBitStream);
-
-                        if (strcmp(szState, "down") == 0)
+                        if (szButton && szState)
                         {
-                            CVector2D vecDelta = m_vecLastCursorPosition - vecCursorPosition;
+                            if (std::isnan(vecCollision.fX))
+                                vecCollision.fX = 0;
+                            if (std::isnan(vecCollision.fY))
+                                vecCollision.fY = 0;
+                            if (std::isnan(vecCollision.fZ))
+                                vecCollision.fZ = 0;
 
-                            if ((GetTickCount32() - m_ulLastClickTick) < DOUBLECLICK_TIMEOUT && vecDelta.Length() <= DOUBLECLICK_MOVE_THRESHOLD)
+                            // Call the event for the client
+                            CLuaArguments Arguments;
+                            Arguments.PushString(szButton);
+                            Arguments.PushString(szState);
+                            Arguments.PushNumber(vecCursorPosition.fX);
+                            Arguments.PushNumber(vecCursorPosition.fY);
+                            Arguments.PushNumber(vecCollision.fX);
+                            Arguments.PushNumber(vecCollision.fY);
+                            Arguments.PushNumber(vecCollision.fZ);
+                            if (pCollisionEntity)
+                                Arguments.PushElement(pCollisionEntity);
+                            else
+                                Arguments.PushBoolean(false);
+                            m_pRootEntity->CallEvent("onClientClick", Arguments, false);
+
+                            // Send the button, cursor position, 3d position and the entity collided with
+                            CBitStream bitStream;
+
+                            SMouseButtonSync button;
+                            button.data.ucButton = ucButtonHit;
+                            bitStream.pBitStream->Write(&button);
+
+                            bitStream.pBitStream->WriteCompressed(static_cast<unsigned short>(vecCursorPosition.fX));
+                            bitStream.pBitStream->WriteCompressed(static_cast<unsigned short>(vecCursorPosition.fY));
+
+                            SPositionSync position(false);
+                            position.data.vecPosition = vecCollision;
+                            bitStream.pBitStream->Write(&position);
+
+                            if (CollisionEntityID != INVALID_ELEMENT_ID)
                             {
-                                // Call the event for the client
-                                CLuaArguments DoubleClickArguments;
-                                DoubleClickArguments.PushString(szButton);
-                                DoubleClickArguments.PushNumber(vecCursorPosition.fX);
-                                DoubleClickArguments.PushNumber(vecCursorPosition.fY);
-                                DoubleClickArguments.PushNumber(vecCollision.fX);
-                                DoubleClickArguments.PushNumber(vecCollision.fY);
-                                DoubleClickArguments.PushNumber(vecCollision.fZ);
-                                if (pCollisionEntity)
-                                    DoubleClickArguments.PushElement(pCollisionEntity);
-                                else
-                                    DoubleClickArguments.PushBoolean(false);
-                                m_pRootEntity->CallEvent("onClientDoubleClick", DoubleClickArguments, false);
+                                bitStream.pBitStream->WriteBit(true);
+                                bitStream.pBitStream->Write(CollisionEntityID);
+                            }
+                            else
+                                bitStream.pBitStream->WriteBit(false);
+
+                            m_pNetAPI->RPC(CURSOR_EVENT, bitStream.pBitStream);
+
+                            if (strcmp(szState, "down") == 0)
+                            {
+                                CVector2D vecDelta = m_vecLastCursorPosition - vecCursorPosition;
+
+                                if ((GetTickCount32() - m_ulLastClickTick) < DOUBLECLICK_TIMEOUT && vecDelta.Length() <= DOUBLECLICK_MOVE_THRESHOLD)
+                                {
+                                    // Call the event for the client
+                                    CLuaArguments DoubleClickArguments;
+                                    DoubleClickArguments.PushString(szButton);
+                                    DoubleClickArguments.PushNumber(vecCursorPosition.fX);
+                                    DoubleClickArguments.PushNumber(vecCursorPosition.fY);
+                                    DoubleClickArguments.PushNumber(vecCollision.fX);
+                                    DoubleClickArguments.PushNumber(vecCollision.fY);
+                                    DoubleClickArguments.PushNumber(vecCollision.fZ);
+                                    if (pCollisionEntity)
+                                        DoubleClickArguments.PushElement(pCollisionEntity);
+                                    else
+                                        DoubleClickArguments.PushBoolean(false);
+                                    m_pRootEntity->CallEvent("onClientDoubleClick", DoubleClickArguments, false);
+                                }
+
+                                m_ulLastClickTick = GetTickCount32();
+                                m_vecLastCursorPosition = vecCursorPosition;
                             }
 
-                            m_ulLastClickTick = GetTickCount32();
-                            m_vecLastCursorPosition = vecCursorPosition;
+                            return true;
                         }
-
-                        return true;
                     }
                 }
             }
@@ -2645,28 +2641,31 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
     {
         case WM_MOUSEMOVE:
         {
+            CVector2D  vecResolution = g_pCore->GetGUI()->GetResolution();
             int        iX = GET_X_LPARAM(lParam), iY = GET_Y_LPARAM(lParam);
-            static int iPreviousX = 0, iPreviousY = 0;
-            if (iX != iPreviousX || iY != iPreviousY)
+            if (iX >= 0 && iX <= vecResolution.fX && iY >= 0 && iY <= vecResolution.fY)
             {
-                iPreviousX = iX, iPreviousY = iY;
+                static int iPreviousX = 0, iPreviousY = 0;
+                if (iX != iPreviousX || iY != iPreviousY)
+                {
+                    iPreviousX = iX, iPreviousY = iY;
 
-                CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
-                CVector2D vecCursorPosition(((float)iX) / vecResolution.fX, ((float)iY) / vecResolution.fY);
+                    CVector2D vecCursorPosition(((float)iX) / vecResolution.fX, ((float)iY) / vecResolution.fY);
 
-                CVector vecTarget, vecScreen((float)iX, (float)iY, 300.0f);
-                g_pCore->GetGraphics()->CalcWorldCoors(&vecScreen, &vecTarget);
+                    CVector vecTarget, vecScreen((float)iX, (float)iY, 300.0f);
+                    g_pCore->GetGraphics()->CalcWorldCoors(&vecScreen, &vecTarget);
 
-                // Call the onClientCursorMove event
-                CLuaArguments Arguments;
-                Arguments.PushNumber((double)vecCursorPosition.fX);
-                Arguments.PushNumber((double)vecCursorPosition.fY);
-                Arguments.PushNumber((double)iX);
-                Arguments.PushNumber((double)iY);
-                Arguments.PushNumber((double)vecTarget.fX);
-                Arguments.PushNumber((double)vecTarget.fY);
-                Arguments.PushNumber((double)vecTarget.fZ);
-                m_pRootEntity->CallEvent("onClientCursorMove", Arguments, false);
+                    // Call the onClientCursorMove event
+                    CLuaArguments Arguments;
+                    Arguments.PushNumber((double)vecCursorPosition.fX);
+                    Arguments.PushNumber((double)vecCursorPosition.fY);
+                    Arguments.PushNumber((double)iX);
+                    Arguments.PushNumber((double)iY);
+                    Arguments.PushNumber((double)vecTarget.fX);
+                    Arguments.PushNumber((double)vecTarget.fY);
+                    Arguments.PushNumber((double)vecTarget.fZ);
+                    m_pRootEntity->CallEvent("onClientCursorMove", Arguments, false);
+                }
             }
             break;
         }
