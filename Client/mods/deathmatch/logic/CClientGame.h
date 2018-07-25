@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "Windowsx.h"
 #include "CPacketHandler.h"
 #include <CClientCommon.h>
 #include <CClientManager.h>

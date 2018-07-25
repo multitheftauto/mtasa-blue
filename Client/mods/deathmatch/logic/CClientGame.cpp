@@ -2645,7 +2645,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
         case WM_MOUSEMOVE:
         {
             CVector2D  vecResolution = g_pCore->GetGUI()->GetResolution();
-            int        iX = (int)LOWORD(lParam), iY = (int)HIWORD(lParam);
+            int        iX = GET_X_LPARAM(lParam), iY = GET_Y_LPARAM(lParam);
             if (iX >= 0 && iX <= vecResolution.fX && iY >= 0 && iY <= vecResolution.fY)
             {
                 static int iPreviousX = 0, iPreviousY = 0;
