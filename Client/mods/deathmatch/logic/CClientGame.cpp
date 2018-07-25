@@ -2644,13 +2644,14 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
     {
         case WM_MOUSEMOVE:
         {
-            int        iX = LOWORD(lParam), iY = HIWORD(lParam);
+            CVector2D  vecResolution = g_pCore->GetGUI()->GetResolution();
+            int        iX = Clamp(0, (int)LOWORD(lParam), (int)vecResolution.fX);
+            int        iY = Clamp(0, (int)HIWORD(lParam), (int)vecResolution.fY);
             static int iPreviousX = 0, iPreviousY = 0;
             if (iX != iPreviousX || iY != iPreviousY)
             {
                 iPreviousX = iX, iPreviousY = iY;
 
-                CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
                 CVector2D vecCursorPosition(((float)iX) / vecResolution.fX, ((float)iY) / vecResolution.fY);
 
                 CVector vecTarget, vecScreen((float)iX, (float)iY, 300.0f);
