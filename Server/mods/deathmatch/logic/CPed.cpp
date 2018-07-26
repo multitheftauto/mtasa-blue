@@ -154,6 +154,7 @@ bool CPed::ReadSpecialData(void)
         return false;
     }
 
+    // Grab the "rotZ" data
     float fRotation = 0.0f;
     GetCustomDataFloat("rotZ", fRotation, true);
     m_fRotation = ConvertDegreesToRadians(fRotation);
@@ -171,7 +172,7 @@ bool CPed::ReadSpecialData(void)
         }
         else
         {
-            CLogger::ErrorPrintf("Bad 'model' id specified in <ped> (line %u)\n", m_uiLine);
+            CLogger::ErrorPrintf("Bad 'model'(%d) id specified in <ped> (line %u)\n", iTemp, m_uiLine);
             return false;
         }
     }
@@ -181,6 +182,7 @@ bool CPed::ReadSpecialData(void)
         return false;
     }
 
+    // Grab the "health" data
     if (GetCustomDataFloat("health", m_fHealth, true))
     {
         // Limit it to 0-100 (we can assume max health is 100 because they can't change stats here)
@@ -190,28 +192,36 @@ bool CPed::ReadSpecialData(void)
             m_fHealth = 0;
     }
     else
-    {
         // Set health to 100 if not defined
         m_fHealth = 100.0f;
-    }
 
+    // Grab the "armor" data
     GetCustomDataFloat("armor", m_fArmor, true);
 
+    // Grab the "interior" data
     if (GetCustomDataInt("interior", iTemp, true))
         m_ucInterior = static_cast<unsigned char>(iTemp);
 
+    // Grab the "dimension" data
     if (GetCustomDataInt("dimension", iTemp, true))
         m_usDimension = static_cast<unsigned short>(iTemp);
 
+    // Grab the "collisions" data
     if (!GetCustomDataBool("collisions", m_bCollisionsEnabled, true))
         m_bCollisionsEnabled = true;
 
+    // Grab the "alpha" data
     if (GetCustomDataInt("alpha", iTemp, true))
         m_ucAlpha = static_cast<unsigned char>(iTemp);
 
-    bool bFrozen;
-    if (GetCustomDataBool("frozen", bFrozen, true))
-        m_bFrozen = bFrozen;
+    // Grab the "frozen" data
+    GetCustomDataBool("frozen", m_bFrozen, true);
+
+    // Grab the "headless" data
+    GetCustomDataBool("headless", m_bHeadless, true);
+
+    // Grab the "walkingStyle" data
+    GetCustomDataInt("walkingStyle", m_iMoveAnim, true);
 
     return true;
 }
