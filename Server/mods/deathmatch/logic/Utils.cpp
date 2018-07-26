@@ -548,7 +548,7 @@ bool ColorStringToRGBA(const char* szColor, SColorRGBA defaultColor, std::vector
     std::stringstream ss(szColor);
     SColorRGBA        color = defaultColor;
     bool              bPreviousWasHex = false;
-    int               i = 0;
+    int               iRGBAIndex = 0;
     unsigned long     ulColor;
     unsigned char     ucValue;
     unsigned char     ucLength = bIgnoreAlpha ? 3 : 4;
@@ -568,7 +568,7 @@ bool ColorStringToRGBA(const char* szColor, SColorRGBA defaultColor, std::vector
             if (XMLColorToInt(strValue.c_str(), ulColor))
             {
                 // If a previous RGBA wasn't finished, let's finish it now
-                if (!bPreviousWasHex && i != 0)
+                if (!bPreviousWasHex && iRGBAIndex != 0)
                 {
                     vecColors.push_back(color);
                     color = defaultColor;
@@ -591,21 +591,21 @@ bool ColorStringToRGBA(const char* szColor, SColorRGBA defaultColor, std::vector
         else if (strValue.find_first_not_of("0123456789") == std::string::npos)
         {
             ucValue = atoi(strValue.c_str());
-            if (bPreviousWasHex || i % ucLength == 0)
+            if (bPreviousWasHex || iRGBAIndex % ucLength == 0)
             {
                 color.R = ucValue;
                 bPreviousWasHex = false;
-                i = 0;
+                iRGBAIndex = 0;
             }
-            else if (i % ucLength == 1)
+            else if (iRGBAIndex % ucLength == 1)
                 color.G = ucValue;
-            else if (i % ucLength == 2)
+            else if (iRGBAIndex % ucLength == 2)
                 color.B = ucValue;
-            else if (i % ucLength == 3)
+            else if (iRGBAIndex % ucLength == 3)
                 color.A = ucValue;
-            i++;
+            iRGBAIndex++;
             ucCount++;
-            if (i % ucLength != 0 && ss.good())
+            if (iRGBAIndex % ucLength != 0 && ss.good())
                 continue;
         }
         else
@@ -614,7 +614,7 @@ bool ColorStringToRGBA(const char* szColor, SColorRGBA defaultColor, std::vector
         // We have a color, so let's push it
         vecColors.push_back(color);
         color = defaultColor;
-        i = 0;
+        iRGBAIndex = 0;
     }
 
     return true;
