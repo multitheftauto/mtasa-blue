@@ -858,8 +858,8 @@ void CGraphics::DrawCircleInternal(float fX, float fY, float fRadius, float star
     
     // first
     stVertex vertFirst;
-    vertFirst.x = fX + fRadius * cos(startAngle);
-    vertFirst.y = fY + fRadius * sin(startAngle);
+    vertFirst.x = fX + fRadius * cos(startAngle) * fRatio;
+    vertFirst.y = fY + fRadius * sin(startAngle) / fRatio;
     vertFirst.z = 0;
     vertFirst.color = color;
     Points.push_back(vertFirst);
@@ -871,8 +871,8 @@ void CGraphics::DrawCircleInternal(float fX, float fY, float fRadius, float star
     for (float angle = startAngle; angle <= stopAngle;)
     {
         stVertex vertex;
-        vertex.x = fX + fRadius * cos(angle);
-        vertex.y = fY + fRadius * sin(angle);
+        vertex.x = fX + fRadius * cos(angle) * fRatio;
+        vertex.y = fY + fRadius * sin(angle) / fRatio;
         vertex.z = 0;
         vertex.color = color;
         Points.push_back(vertex);
@@ -881,8 +881,8 @@ void CGraphics::DrawCircleInternal(float fX, float fY, float fRadius, float star
 
     // last
     stVertex vertLast;
-    vertLast.x = fX + fRadius * cos(stopAngle);
-    vertLast.y = fY + fRadius * sin(stopAngle);
+    vertLast.x = fX + fRadius * cos(stopAngle) * fRatio;
+    vertLast.y = fY + fRadius * sin(stopAngle) / fRatio;
     vertLast.z = 0;
     vertLast.color = color;
     Points.push_back(vertLast);
