@@ -34,8 +34,8 @@ namespace SharedUtil
     public:
         CVehicleColor(void);
 
-        void SetRGBColors(SColor color1, SColor color2, SColor color3, SColor color4);
-        void SetPaletteColors(uchar ucColor1, uchar ucColor2, uchar ucColor3, uchar ucColor4);
+        void SetRGBColors(SColor color1, SColor color2, SColor color3, SColor color4, bool bForced = false);
+        void SetPaletteColors(uchar ucColor1, uchar ucColor2, uchar ucColor3, uchar ucColor4, bool bForced = false);
 
         void SetRGBColor(uint uiSlot, SColor color);
         void SetPaletteColor(uint uiSlot, uchar ucColor);

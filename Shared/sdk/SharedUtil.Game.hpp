@@ -88,9 +88,9 @@ namespace SharedUtil
     }
 
     // Use black for colours that are not used (bandwidth saving)
-    void CVehicleColor::SetRGBColors(SColor color1, SColor color2, SColor color3, SColor color4)
+    void CVehicleColor::SetRGBColors(SColor color1, SColor color2, SColor color3, SColor color4, bool bForced)
     {
-        if (m_RGBColors[0] != color1 || m_RGBColors[1] != color2 || m_RGBColors[2] != color3 || m_RGBColors[3] != color4)
+        if (bForced || m_RGBColors[0] != color1 || m_RGBColors[1] != color2 || m_RGBColors[2] != color3 || m_RGBColors[3] != color4)
         {
             m_RGBColors[0] = color1;
             m_RGBColors[1] = color2;
@@ -100,9 +100,9 @@ namespace SharedUtil
         }
     }
 
-    void CVehicleColor::SetPaletteColors(unsigned char ucColor1, unsigned char ucColor2, unsigned char ucColor3, unsigned char ucColor4)
+    void CVehicleColor::SetPaletteColors(unsigned char ucColor1, unsigned char ucColor2, unsigned char ucColor3, unsigned char ucColor4, bool bForced)
     {
-        if (m_ucPaletteColors[0] != ucColor1 || m_ucPaletteColors[1] != ucColor2 || m_ucPaletteColors[2] != ucColor3 || m_ucPaletteColors[3] != ucColor4)
+        if (bForced || m_ucPaletteColors[0] != ucColor1 || m_ucPaletteColors[1] != ucColor2 || m_ucPaletteColors[2] != ucColor3 || m_ucPaletteColors[3] != ucColor4)
         {
             m_ucPaletteColors[0] = ucColor1;
             m_ucPaletteColors[1] = ucColor2;
