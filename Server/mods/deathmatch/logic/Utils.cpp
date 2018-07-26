@@ -530,44 +530,17 @@ bool XMLColorToInt(const char* szColor, unsigned char& ucRed, unsigned char& ucG
     if (!szColor || strlen(szColor) == 0)
         return false;
 
-    // Convert it to an integer first
-    unsigned long ulColor;
-    if (!XMLColorToInt(szColor, ulColor))
+    std::vector<SColorRGBA> vecColors;
+    unsigned char           ucCount;
+    if (ColorStringToRGBA(szColor, SColorRGBA(ucRed, ucGreen, ucBlue, ucAlpha), vecColors, ucCount))
     {
-        // We were dealing with some hexadecimal value
-        if (szColor[0] == '#')
-            return false;
-
-        std::string strColor(szColor);
-        // Let's try to parse it as a comma-separated RGBA next
-        // Check if our color string contains only numbers, commas and spaces
-        if (strColor.find_first_not_of("0123456789, ") == std::string::npos)
-        {
-            uchar ucValues[4] = { ucRed, ucGreen, ucBlue, ucAlpha };
-            for (int i = 0; i < 4; i++)
-            {
-                char* szn = strtok(i == 0 ? (char*)szColor : NULL, ", ");
-                if (!szn)
-                    break;
-                else if (strlen(szn) > 0)
-                    ucValues[i] = atoi(szn);
-                else
-                    return false;
-            }
-            ucRed = ucValues[0];
-            ucGreen = ucValues[1];
-            ucBlue = ucValues[2];
-            ucAlpha = ucValues[3];
-            return true;
-        }
+        ucRed = vecColors[0].R;
+        ucGreen = vecColors[0].G;
+        ucBlue = vecColors[0].B;
+        ucAlpha = vecColors[0].A;
+        return true;
     }
-
-    // Convert it to red, green, blue and alpha
-    ucRed = static_cast<unsigned char>(ulColor);
-    ucGreen = static_cast<unsigned char>(ulColor >> 8);
-    ucBlue = static_cast<unsigned char>(ulColor >> 16);
-    ucAlpha = static_cast<unsigned char>(ulColor >> 24);
-    return true;
+    return false;
 }
 
 bool ColorStringToRGBA(const char* szColor, SColorRGBA defaultColor, std::vector<SColorRGBA>& vecColors, unsigned char& ucCount, bool bIgnoreAlpha)
