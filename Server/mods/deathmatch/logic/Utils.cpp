@@ -544,19 +544,9 @@ bool XMLColorToInt(const char* szColor, unsigned char& ucRed, unsigned char& ucG
         if (szColorStr.find_first_not_of("0123456789, ") == std::string::npos)
         {
             uchar ucValues[4] = { ucRed, ucGreen, ucBlue, ucAlpha };
-
-            // Get our red value
-            char* sz1 = strtok((char*)szColor, ", ");
-            if (sz1 && strlen(sz1) > 0)
-                ucValues[0] = atoi(sz1);
-            else
-                return false;
-
-            // Get our green, blue, alpha values
-            int i;
-            for (i = 1; i < 4; i++)
+            for (int i = 0; i < 4; i++)
             {
-                char* szn = strtok(NULL, ", ");
+                char* szn = strtok(i == 0 ? (char*)szColor : NULL, ", ");
                 if (!szn)
                     break;
                 else if (strlen(szn) > 0)
@@ -564,8 +554,6 @@ bool XMLColorToInt(const char* szColor, unsigned char& ucRed, unsigned char& ucG
                 else
                     return false;
             }
-
-            // Let's set them now
             ucRed = ucValues[0];
             ucGreen = ucValues[1];
             ucBlue = ucValues[2];
