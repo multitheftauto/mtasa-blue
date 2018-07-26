@@ -405,8 +405,6 @@ int CLuaDrawingDefs::DxDrawRectangle(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
 {
-    //  bool dxDrawRectangle ( float startX, float startY, float width, float height [, int color = white, bool postGUI = false, bool subPixelPositioning=false]
-    //  )
     CVector2D vecPosition;
     float     radius;
     float     startAngle;
