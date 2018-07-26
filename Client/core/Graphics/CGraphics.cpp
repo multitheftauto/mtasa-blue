@@ -795,7 +795,7 @@ void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, 
     AddQueueItem(Item, bPostGUI);
 }
 
-void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float startAngle, float stopAngle, unsigned long color, unsigned long colorCenter, ushort fResolution, float fRatio, bool bPostGUI, bool bSubPixelPositioning)
+void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float startAngle, float stopAngle, unsigned long color, unsigned long colorCenter, ushort fSegments, float fRatio, bool bPostGUI, bool bSubPixelPositioning)
 {
     if (g_pCore->IsWindowMinimized())
         return;
@@ -813,7 +813,7 @@ void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float startA
     Item.Circle.startAngle = startAngle;
     Item.Circle.stopAngle = stopAngle;
     Item.Circle.bPostGUI = bPostGUI;
-    Item.Circle.fResolution = fResolution;
+    Item.Circle.fSegments = fSegments;
     Item.Circle.fRatio = fRatio;
     Item.Circle.ulColor = color;
     Item.Circle.ulColorCenter = colorCenter;
@@ -821,7 +821,7 @@ void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float startA
     // Add it to the queue
     AddQueueItem(Item, bPostGUI);
 
-    DrawCircleInternal(fX, fY, fRadius, startAngle, stopAngle, color, colorCenter, fResolution, fRatio, bPostGUI, bSubPixelPositioning);
+    DrawCircleInternal(fX, fY, fRadius, startAngle, stopAngle, color, colorCenter, fSegments, fRatio, bPostGUI, bSubPixelPositioning);
 
     EndDrawBatch();
 }
@@ -833,7 +833,7 @@ struct stVertex
     D3DCOLOR color;
 };
 
-void CGraphics::DrawCircleInternal(float fX, float fY, float fRadius, float startAngle, float stopAngle, unsigned long color, unsigned long colorCenter, ushort fResolution, float fRatio, bool bPostGUI, bool bSubPixelPositioning)
+void CGraphics::DrawCircleInternal(float fX, float fY, float fRadius, float startAngle, float stopAngle, unsigned long color, unsigned long colorCenter, ushort fSegments, float fRatio, bool bPostGUI, bool bSubPixelPositioning)
 {
 
     // Adjust size to account for sub pixel borders
@@ -865,8 +865,8 @@ void CGraphics::DrawCircleInternal(float fX, float fY, float fRadius, float star
     Points.push_back(vertFirst);
 
     bool out = false;
-    float fResolutionn = (float)fResolution + 1;
-    float segmentAngle = ((stopAngle - startAngle) / fResolutionn);
+    float fSegments2 = (float)fSegments + 1;
+    float segmentAngle = ((stopAngle - startAngle) / fSegments2);
 
     for (float angle = startAngle; angle <= stopAngle;)
     {
@@ -1535,7 +1535,7 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
         case QUEUE_CIRCLE:
         {
             CheckModes(EDrawMode::DX_SPRITE, Item.blendMode);
-            DrawCircleInternal(Item.Circle.fX, Item.Circle.fY, Item.Circle.fRadius, Item.Circle.startAngle, Item.Circle.stopAngle, Item.Circle.ulColor, Item.Circle.ulColorCenter, Item.Circle.fResolution, Item.Circle.fRatio, Item.Circle.bPostGUI, Item.Circle.bSubPixelPositioning);
+            DrawCircleInternal(Item.Circle.fX, Item.Circle.fY, Item.Circle.fRadius, Item.Circle.startAngle, Item.Circle.stopAngle, Item.Circle.ulColor, Item.Circle.ulColorCenter, Item.Circle.fSegments, Item.Circle.fRatio, Item.Circle.bPostGUI, Item.Circle.bSubPixelPositioning);
             break;
         }
 
