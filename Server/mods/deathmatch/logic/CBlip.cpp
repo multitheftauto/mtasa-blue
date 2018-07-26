@@ -77,6 +77,10 @@ bool CBlip::ReadSpecialData(void)
     else
         m_ucIcon = 0;
 
+    // Grab the "size" data
+    if (GetCustomDataInt("size", iTemp, true))
+        m_ucSize = static_cast<unsigned char>(Clamp(0, iTemp, 25));
+
     // Grab the "color" data
     char szColor[64];
     if (GetCustomDataString("color", szColor, 64, true))
