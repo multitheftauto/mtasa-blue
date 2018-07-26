@@ -284,25 +284,51 @@ bool CVehicle::ReadSpecialData(void)
     char szTemp[256];
     if (GetCustomDataString("color", szTemp, 256, true))
     {
-        uchar ucValues[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-        char* sz1 = strtok(szTemp, ", ");
-        if (sz1)
-            ucValues[0] = atoi(sz1);
+        bool       bHexadecimal = szTemp[0] == '#';
+        SColorRGBA ucValues[4] = { SColorRGBA(0, 0, 0, 0), SColorRGBA(0, 0, 0, 0), SColorRGBA(0, 0, 0, 0), SColorRGBA(0, 0, 0, 0) };
+        char*      szn;
 
-        int i;
-        for (i = 1; i < 12; i++)
+        // If we're looking at hexadecimal colors
+        if (bHexadecimal)
         {
-            char* szn = strtok(NULL, ", ");
-            if (!szn)
-                break;
-            ucValues[i] = atoi(szn);
-        }
+            for (int i = 0; i < 4; i++)
+            {
+                szn = strtok(i == 0 ? szTemp : NULL, ", ");
+                if (!szn)
+                    break;
 
-        if (i == 3 || i == 6 || i == 9 || i == 12)
-            m_Color.SetRGBColors(SColorRGBA(ucValues[0], ucValues[1], ucValues[2], 0), SColorRGBA(ucValues[3], ucValues[4], ucValues[5], 0),
-                SColorRGBA(ucValues[6], ucValues[7], ucValues[8], 0), SColorRGBA(ucValues[9], ucValues[10], ucValues[11], 0), true);
+                XMLColorToInt(szn, ucValues[i].R, ucValues[i].G, ucValues[i].B, ucValues[i].A);
+            }
+
+            m_Color.SetRGBColors(ucValues[0], ucValues[1], ucValues[2], ucValues[3], true);
+        }
+        // We're looking for RGB or palette values
         else
-            m_Color.SetPaletteColors(ucValues[0], ucValues[1], ucValues[2], ucValues[3], true);
+        {
+            int iLastColor = 0;
+            int i;
+            for (i = 0; i < 12; i++)
+            {
+                szn = strtok(i == 0 ? szTemp : NULL, ", ");
+                if (!szn)
+                    break;
+                
+                if (i % 3 == 0)
+                    ucValues[iLastColor].R = atoi(szn);
+                else if (i % 3 == 1)
+                    ucValues[iLastColor].G = atoi(szn);
+                else if (i % 3 == 2)
+                    ucValues[iLastColor].B = atoi(szn);
+
+                if ((i + 1) % 3 == 0)
+                    iLastColor++;
+            }
+
+            if (i == 3 || i == 6 || i == 9 || i == 12)
+                m_Color.SetRGBColors(ucValues[0], ucValues[1], ucValues[2], ucValues[3], true);
+            else
+                m_Color.SetPaletteColors(ucValues[0].R, ucValues[0].G, ucValues[0].B, ucValues[1].R, true);
+        }
     }
 
     // Grab the "headLightColor" data
@@ -378,8 +404,8 @@ bool CVehicle::ReadSpecialData(void)
     // Grab the "damageProof" data
     GetCustomDataBool("damageProof", m_bDamageProof, true);
 
-    // Grab the "fuelTankExplodable" data
-    GetCustomDataBool("fuelTankExplodable", m_bFuelTankExplodable, true);
+    // Grab the "explodableFuelTank" data
+    GetCustomDataBool("explodableFuelTank", m_bFuelTankExplodable, true);
 
     // Grab the "respawnOn" data
     bool bRespawnOn;
