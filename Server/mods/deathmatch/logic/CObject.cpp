@@ -125,7 +125,7 @@ bool CObject::ReadSpecialData(void)
         }
         else
         {
-            CLogger::ErrorPrintf("Bad 'model' id specified in <object> (line %u)\n", m_uiLine);
+            CLogger::ErrorPrintf("Bad 'model'(%d) id specified in <object> (line %u)\n", iTemp, m_uiLine);
             return false;
         }
     }
@@ -144,8 +144,7 @@ bool CObject::ReadSpecialData(void)
         else
             m_usDimension = static_cast<unsigned short>(iTemp);
 
-    if (!GetCustomDataBool("doublesided", m_bDoubleSided, true))
-        m_bDoubleSided = false;
+    GetCustomDataBool("doublesided", m_bDoubleSided, true);
 
     if (!GetCustomDataFloat("scale", m_vecScale.fX, true))
         m_vecScale.fX = 1.0f;
@@ -161,11 +160,8 @@ bool CObject::ReadSpecialData(void)
     if (GetCustomDataInt("alpha", iTemp, true))
         m_ucAlpha = static_cast<unsigned char>(iTemp);
 
-    bool bFrozen;
-    if (GetCustomDataBool("frozen", bFrozen, true))
-        m_bIsFrozen = bFrozen;
+    GetCustomDataBool("frozen", m_bIsFrozen, true);
 
-    // Success
     return true;
 }
 
