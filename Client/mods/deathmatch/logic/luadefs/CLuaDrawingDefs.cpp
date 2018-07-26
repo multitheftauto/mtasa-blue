@@ -432,12 +432,20 @@ int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
     {
         if (fResolution >= 3 && fResolution <= 1024)
         {
-            if (stopAngle < startAngle)
-                std::swap(stopAngle, startAngle);
+            if (fRatio > 0 && fRatio <= 100)
+            {
+                if (stopAngle < startAngle)
+                    std::swap(stopAngle, startAngle);
 
-            g_pCore->GetGraphics()->DrawCircleQueued(vecPosition.fX, vecPosition.fY, radius, startAngle, stopAngle, color, colorCenter, fResolution, fRatio, bPostGUI, bSubPixelPositioning);
-            lua_pushboolean(luaVM, true);
-            return 1;
+                g_pCore->GetGraphics()->DrawCircleQueued(vecPosition.fX, vecPosition.fY, radius, startAngle, stopAngle, color, colorCenter, fResolution, fRatio, bPostGUI, bSubPixelPositioning);
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+            else
+            {
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
         }
         else
         {
