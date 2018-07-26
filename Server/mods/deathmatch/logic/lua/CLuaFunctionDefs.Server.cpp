@@ -31,8 +31,17 @@ int CLuaFunctionDefs::SetMaxPlayers(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        lua_pushboolean(luaVM, CStaticFunctionDefinitions::SetMaxPlayers(uiMaxPlayers));
-        return 1;
+        // Maybe add a custom debug message that 1 < can't be passed anymore?
+        if (uiMaxPlayers < 1)
+        {
+            lua_pushboolean(luaVM, false);
+            m_pScriptDebugging->LogCustom(luaVM, "No, don't try to set max players to a number under 1.");
+        }
+        else
+        {
+            lua_pushboolean(luaVM, CStaticFunctionDefinitions::SetMaxPlayers(uiMaxPlayers));
+            return 1;
+        }       
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

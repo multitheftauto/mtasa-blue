@@ -9814,7 +9814,7 @@ unsigned int CStaticFunctionDefinitions::GetMaxPlayers(void)
 
 bool CStaticFunctionDefinitions::SetMaxPlayers(unsigned int uiMax)
 {
-    if (uiMax > m_pMainConfig->GetHardMaxPlayers())
+    if (uiMax > m_pMainConfig->GetHardMaxPlayers() || uiMax < 1)
         return false;
     m_pMainConfig->SetSoftMaxPlayers(uiMax);
     g_pNetServer->SetMaximumIncomingConnections(uiMax);
