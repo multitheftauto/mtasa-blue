@@ -81,7 +81,7 @@ public:
     void DrawLine3D(const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f);
     void DrawRectangle(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning = false);
     void DrawStringOutline(const RECT& rect, unsigned long ulColor, const wchar_t* szText, unsigned long ulFormat, LPD3DXFONT pDXFont);
-    void DrawCircleQueued(float fX, float fY, float fRadiusMin, float fRadiusMax, ushort startAngle, ushort stopAngle, bool bPostGUI, bool bSubPixelPositioning);
+    void DrawCircleInternal(float fX, float fY, float fRadius, float startAngle, float stopAngle, unsigned long color, unsigned long colorCenter, ushort fResolution, float fRatio, bool bPostGUI, bool bSubPixelPositioning);
 
     void           SetBlendMode(EBlendModeType blendMode);
     EBlendModeType GetBlendMode(void);
@@ -141,6 +141,8 @@ public:
     void DrawStringQueued(float iLeft, float iTop, float iRight, float iBottom, unsigned long dwColor, const char* wszText, float fScaleX, float fScaleY,
                           unsigned long ulFormat, ID3DXFont* pDXFont = NULL, bool bPostGUI = false, bool bColorCoded = false, bool bSubPixelPositioning = false,
                           float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0);
+
+    void DrawCircleQueued(float fX, float fY, float fRadius, float startAngle, float stopAngle, unsigned long color, unsigned long colorCenter, ushort fResolution, float fRatio, bool bPostGUI, bool bSubPixelPositioning = false);
 
     void OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
 
@@ -267,10 +269,15 @@ private:
     {
         float         fX;
         float         fY;
-        float         fRadiusMin;
-        float         fRadiusMax;
-        ushort        startAngle;
-        ushort        stopAngle;
+        float         fRadius;
+        short         startAngle;
+        short         stopAngle;
+        float         fResolution;
+        float         fRatio;
+        float         bPostGUI;
+        unsigned long ulColor;
+        unsigned long ulColorCenter;
+        bool          bSubPixelPositioning;
     };
 
     struct sDrawQueueTexture

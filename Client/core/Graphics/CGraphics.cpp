@@ -795,8 +795,13 @@ void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, 
     AddQueueItem(Item, bPostGUI);
 }
 
-void CGraphics::DrawCircleQueued(float fX, float fY, float fRadiusMin, float fRadiusMax, ushort startAngle, ushort stopAngle, bool bPostGUI, bool bSubPixelPositioning)
+void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float startAngle, float stopAngle, unsigned long color, unsigned long colorCenter, ushort fResolution, float fRatio, bool bPostGUI, bool bSubPixelPositioning)
 {
+    if (g_pCore->IsWindowMinimized())
+        return;
+
+    BeginDrawBatch();
+    CheckModes(EDrawMode::DX_SPRITE, m_ActiveBlendMode);
 
     // Set up a queue item
     sDrawQueueItem Item;
@@ -804,12 +809,89 @@ void CGraphics::DrawCircleQueued(float fX, float fY, float fRadiusMin, float fRa
     Item.blendMode = m_ActiveBlendMode;
     Item.Circle.fX = fX;
     Item.Circle.fY = fY;
-    Item.Circle.fRadiusMin = fRadiusMin;
-    Item.Circle.fRadiusMax = fRadiusMax;
+    Item.Circle.fRadius = fRadius;
     Item.Circle.startAngle = startAngle;
     Item.Circle.stopAngle = stopAngle;
+    Item.Circle.bPostGUI = bPostGUI;
+    Item.Circle.fResolution = fResolution;
+    Item.Circle.fRatio = fRatio;
+    Item.Circle.ulColor = color;
+    Item.Circle.ulColorCenter = colorCenter;
+    Item.Circle.bSubPixelPositioning = bSubPixelPositioning;
     // Add it to the queue
     AddQueueItem(Item, bPostGUI);
+
+    DrawCircleInternal(fX, fY, fRadius, startAngle, stopAngle, color, colorCenter, fResolution, fRatio, bPostGUI, bSubPixelPositioning);
+
+    EndDrawBatch();
+}
+
+
+struct stVertex
+{
+    float x, y, z;
+    D3DCOLOR color;
+};
+
+void CGraphics::DrawCircleInternal(float fX, float fY, float fRadius, float startAngle, float stopAngle, unsigned long color, unsigned long colorCenter, ushort fResolution, float fRatio, bool bPostGUI, bool bSubPixelPositioning)
+{
+
+    // Adjust size to account for sub pixel borders
+    if (bSubPixelPositioning)
+    {
+        fX += 0.5f;
+        fY += 0.5f;
+    }
+
+    startAngle = D3DXToRadian(startAngle);
+    stopAngle = D3DXToRadian(stopAngle);
+
+    std::vector<stVertex> Points;
+
+    // center
+    stVertex vertCenter;
+    vertCenter.x = fX;
+    vertCenter.y = fY;
+    vertCenter.z = 0;
+    vertCenter.color = colorCenter;
+    Points.push_back(vertCenter);
+    
+    // first
+    stVertex vertFirst;
+    vertFirst.x = fX + fRadius * cos(startAngle);
+    vertFirst.y = fY + fRadius * sin(startAngle);
+    vertFirst.z = 0;
+    vertFirst.color = color;
+    Points.push_back(vertFirst);
+
+    bool out = false;
+    float fResolutionn = (float)fResolution + 1;
+    float segmentAngle = ((stopAngle - startAngle) / fResolutionn);
+
+    for (float angle = startAngle; angle <= stopAngle;)
+    {
+        stVertex vertex;
+        vertex.x = fX + fRadius * cos(angle);
+        vertex.y = fY + fRadius * sin(angle);
+        vertex.z = 0;
+        vertex.color = color;
+        Points.push_back(vertex);
+        angle = angle + segmentAngle;
+    }
+
+    // last
+    stVertex vertLast;
+    vertLast.x = fX + fRadius * cos(stopAngle);
+    vertLast.y = fY + fRadius * sin(stopAngle);
+    vertLast.z = 0;
+    vertLast.color = color;
+    Points.push_back(vertLast);
+
+    if (Points.size() >= 3)
+    {
+        m_pDevice->SetTexture(0, 0);
+        m_pDevice->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, Points.size() - 2, &Points[0], sizeof(stVertex));
+    }
 }
 
 void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeight, float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV,
@@ -1453,7 +1535,7 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
         case QUEUE_CIRCLE:
         {
             CheckModes(EDrawMode::DX_SPRITE, Item.blendMode);
-            DrawRectangleInternal(Item.Rect.fX, Item.Rect.fY, Item.Rect.fWidth, Item.Rect.fHeight, Item.Rect.ulColor, Item.Rect.bSubPixelPositioning);
+            DrawCircleInternal(Item.Circle.fX, Item.Circle.fY, Item.Circle.fRadius, Item.Circle.startAngle, Item.Circle.stopAngle, Item.Circle.ulColor, Item.Circle.ulColorCenter, Item.Circle.fResolution, Item.Circle.fRatio, Item.Circle.bPostGUI, Item.Circle.bSubPixelPositioning);
             break;
         }
 

@@ -408,23 +408,44 @@ int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
     //  bool dxDrawRectangle ( float startX, float startY, float width, float height [, int color = white, bool postGUI = false, bool subPixelPositioning=false]
     //  )
     CVector2D vecPosition;
-    CVector2D vecSize;
+    float     radius;
+    float     startAngle;
+    float     stopAngle;
     SColor    color;
+    SColor    colorCenter;
+    short     fResolution;
+    float     fRatio;
     bool      bPostGUI;
     bool      bSubPixelPositioning;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(vecPosition);
-    argStream.ReadVector2D(vecSize);
+    argStream.ReadNumber(radius);
+    argStream.ReadNumber(startAngle, 0);
+    argStream.ReadNumber(stopAngle, 360);
     argStream.ReadColor(color, 0xFFFFFFFF);
+    argStream.ReadColor(colorCenter, color);
+    argStream.ReadNumber(fResolution, 32);
+    argStream.ReadNumber(fRatio, 1);
     argStream.ReadBool(bPostGUI, false);
     argStream.ReadBool(bSubPixelPositioning, false);
 
     if (!argStream.HasErrors())
     {
-        g_pCore->GetGraphics()->DrawRectQueued(vecPosition.fX, vecPosition.fY, vecSize.fX, vecSize.fY, color, bPostGUI, bSubPixelPositioning);
-        lua_pushboolean(luaVM, true);
-        return 1;
+        if (fResolution >= 3 && fResolution <= 1024)
+        {
+            if (stopAngle < startAngle)
+                std::swap(stopAngle, startAngle);
+
+            g_pCore->GetGraphics()->DrawCircleQueued(vecPosition.fX, vecPosition.fY, radius, startAngle, stopAngle, color, colorCenter, fResolution, fRatio, bPostGUI, bSubPixelPositioning);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        else
+        {
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
