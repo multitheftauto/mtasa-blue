@@ -570,6 +570,88 @@ bool XMLColorToInt(const char* szColor, unsigned char& ucRed, unsigned char& ucG
     return true;
 }
 
+bool ColorStringToRGBA(const char* szColor, SColorRGBA defaultColor, std::vector<SColorRGBA>& vecColors, unsigned char& ucCount, bool bIgnoreAlpha)
+{
+    std::stringstream ss(szColor);
+    SColorRGBA        color = defaultColor;
+    bool              bPreviousWasHex = false;
+    int               i = 0;
+    unsigned long     ulColor;
+    unsigned char     ucValue;
+    unsigned char     ucLength = bIgnoreAlpha ? 3 : 4;
+    while (ss.good())
+    {
+        // Ambiguous value before a comma
+        SString strValue;
+        getline(ss, strValue, ',');
+
+        // Remove spaces
+        ReplaceOccurrencesInString(strValue, " ", "");
+        
+        // Is the value looking like a hexadecimal?
+        if (strValue[0] == '#')
+        {
+            // Try converting it to an integer
+            if (XMLColorToInt(strValue.c_str(), ulColor))
+            {
+                // If a previous RGBA wasn't finished, let's finish it now
+                if (!bPreviousWasHex && i != 0)
+                {
+                    vecColors.push_back(color);
+                    color = defaultColor;
+                }
+
+                color.R = static_cast<unsigned char>(ulColor);
+                color.G = static_cast<unsigned char>(ulColor >> 8);
+                color.B = static_cast<unsigned char>(ulColor >> 16);
+
+                if (!bIgnoreAlpha)
+                    color.A = static_cast<unsigned char>(ulColor >> 24);
+                
+                bPreviousWasHex = true;
+                ucCount += ucLength;
+            }
+            else
+                return false;
+        }
+        // It looks like a plain number so let's treat it as a RGBA value
+        else if (strValue.find_first_not_of("0123456789") == std::string::npos)
+        {
+            ucValue = atoi(strValue.c_str());
+            if (bPreviousWasHex || i % ucLength == 0)
+            {
+                color.R = ucValue;
+                bPreviousWasHex = false;
+                i = 0;
+            }
+            else if (i % ucLength == 1)
+                color.G = ucValue;
+            else if (i % ucLength == 2)
+                color.B = ucValue;
+            else if (i % ucLength == 3)
+                color.A = ucValue;
+            i++;
+            ucCount++;
+            if (i % ucLength != 0 && ss.good())
+                continue;
+        }
+        else
+            return false;
+
+        // We have a color, so let's push it
+        vecColors.push_back(color);
+        color = defaultColor;
+        i = 0;
+    }
+
+    return true;
+}
+
+bool ColorStringToRGB(const char* szColor, SColorRGBA defaultColor, std::vector<SColorRGBA>& vecColors, unsigned char& ucCount)
+{
+    return ColorStringToRGBA(szColor, defaultColor, vecColors, ucCount, true);
+}
+
 bool ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamInterface& BitStream)
 {
     SSmallKeysyncSync keys;

@@ -284,50 +284,20 @@ bool CVehicle::ReadSpecialData(void)
     char szTemp[256];
     if (GetCustomDataString("color", szTemp, 256, true))
     {
-        bool       bHexadecimal = szTemp[0] == '#';
-        SColorRGBA ucValues[4] = { SColorRGBA(0, 0, 0, 0), SColorRGBA(0, 0, 0, 0), SColorRGBA(0, 0, 0, 0), SColorRGBA(0, 0, 0, 0) };
-        char*      szn;
+        std::vector<SColorRGBA> vecColors;
+        unsigned char           ucCount;
 
-        // If we're looking at hexadecimal colors
-        if (bHexadecimal)
+        if (ColorStringToRGB(szTemp, SColorRGBA(0, 0, 0, 0), vecColors, ucCount))
         {
-            for (int i = 0; i < 4; i++)
-            {
-                szn = strtok(i == 0 ? szTemp : NULL, ", ");
-                if (!szn)
-                    break;
-
-                XMLColorToInt(szn, ucValues[i].R, ucValues[i].G, ucValues[i].B, ucValues[i].A);
-            }
-
-            m_Color.SetRGBColors(ucValues[0], ucValues[1], ucValues[2], ucValues[3], true);
+            if (ucCount % 3 == 0)
+                m_Color.SetRGBColors(vecColors[0], vecColors[1], vecColors[2], vecColors[3], true);
+            else
+                m_Color.SetPaletteColors(vecColors[0].R, vecColors[0].G, vecColors[0].B, vecColors[1].R, true);
         }
-        // We're looking for RGB or palette values
         else
         {
-            int iLastColor = 0;
-            int i;
-            for (i = 0; i < 12; i++)
-            {
-                szn = strtok(i == 0 ? szTemp : NULL, ", ");
-                if (!szn)
-                    break;
-                
-                if (i % 3 == 0)
-                    ucValues[iLastColor].R = atoi(szn);
-                else if (i % 3 == 1)
-                    ucValues[iLastColor].G = atoi(szn);
-                else if (i % 3 == 2)
-                    ucValues[iLastColor].B = atoi(szn);
-
-                if ((i + 1) % 3 == 0)
-                    iLastColor++;
-            }
-
-            if (i == 3 || i == 6 || i == 9 || i == 12)
-                m_Color.SetRGBColors(ucValues[0], ucValues[1], ucValues[2], ucValues[3], true);
-            else
-                m_Color.SetPaletteColors(ucValues[0].R, ucValues[0].G, ucValues[0].B, ucValues[1].R, true);
+            CLogger::ErrorPrintf("Bad 'color' value specified in <vehicle> (line %u)\n", m_uiLine);
+            return false;
         }
     }
 
