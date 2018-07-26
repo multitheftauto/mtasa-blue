@@ -526,11 +526,52 @@ bool XMLColorToInt(const char* szColor, unsigned long& ulColor)
 
 bool XMLColorToInt(const char* szColor, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha)
 {
+    // If we're empty, let's just stop right away
+    if (!szColor || strlen(szColor) == 0)
+        return false;
+
     // Convert it to an integer first
     unsigned long ulColor;
     if (!XMLColorToInt(szColor, ulColor))
     {
-        return false;
+        // We were dealing with some hexadecimal value
+        if (szColor[0] == '#')
+            return false;
+
+        std::string szColorStr(szColor);
+        // Let's try to parse it as a comma-separated RGBA next
+        // Check if our color string contains only numbers, commas and spaces
+        if (szColorStr.find_first_not_of("0123456789, ") == std::string::npos)
+        {
+            uchar ucValues[4] = { ucRed, ucGreen, ucBlue, ucAlpha };
+
+            // Get our red value
+            char* sz1 = strtok((char*)szColor, ", ");
+            if (sz1 && strlen(sz1) > 0)
+                ucValues[0] = atoi(sz1);
+            else
+                return false;
+
+            // Get our green, blue, alpha values
+            int i;
+            for (i = 1; i < 4; i++)
+            {
+                char* szn = strtok(NULL, ", ");
+                if (!szn)
+                    break;
+                else if (strlen(szn) > 0)
+                    ucValues[i] = atoi(szn);
+                else
+                    return false;
+            }
+
+            // Let's set them now
+            ucRed = ucValues[0];
+            ucGreen = ucValues[1];
+            ucBlue = ucValues[2];
+            ucAlpha = ucValues[3];
+            return true;
+        }
     }
 
     // Convert it to red, green, blue and alpha
