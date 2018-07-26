@@ -647,11 +647,6 @@ bool ColorStringToRGBA(const char* szColor, SColorRGBA defaultColor, std::vector
     return true;
 }
 
-bool ColorStringToRGB(const char* szColor, SColorRGBA defaultColor, std::vector<SColorRGBA>& vecColors, unsigned char& ucCount)
-{
-    return ColorStringToRGBA(szColor, defaultColor, vecColors, ucCount, true);
-}
-
 bool ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamInterface& BitStream)
 {
     SSmallKeysyncSync keys;
