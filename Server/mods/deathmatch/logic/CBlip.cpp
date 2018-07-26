@@ -21,6 +21,7 @@ CBlip::CBlip(CElement* pParent, CXMLNode* pNode, CBlipManager* pBlipManager) : C
     m_ucIcon = 0;
     m_sOrdering = 0;
     m_usVisibleDistance = 16383;
+    m_Color = SColorRGBA(0, 0, 255, 255);
 
     // Add us to manager's list
     m_pBlipManager->m_List.push_back(this);
@@ -66,19 +67,15 @@ bool CBlip::ReadSpecialData(void)
     if (GetCustomDataInt("icon", iTemp, true))
     {
         if (CBlipManager::IsValidIcon(iTemp))
-        {
             m_ucIcon = static_cast<unsigned char>(iTemp);
-        }
         else
         {
-            CLogger::ErrorPrintf("Bad 'icon' id specified in <blip> (line %u)\n", m_uiLine);
+            CLogger::ErrorPrintf("Bad 'icon'(%d) id specified in <blip> (line %u)\n", iTemp, m_uiLine);
             return false;
         }
     }
     else
-    {
         m_ucIcon = 0;
-    }
 
     // Grab the "color" data
     char szColor[64];
@@ -91,31 +88,18 @@ bool CBlip::ReadSpecialData(void)
             return false;
         }
     }
-    else
-    {
-        m_Color = SColorRGBA(0, 0, 255, 255);
-    }
 
+    // Grab the "dimension" data
     if (GetCustomDataInt("dimension", iTemp, true))
         m_usDimension = static_cast<unsigned short>(iTemp);
 
     // Grab the "ordering" data
     if (GetCustomDataInt("ordering", iTemp, true))
-    {
-        if (iTemp >= -32768 && iTemp <= 32767)
-        {
-            m_sOrdering = static_cast<short>(iTemp);
-        }
-        else
-        {
-            CLogger::ErrorPrintf("Bad 'ordering' id specified in <blip> (line %u)\n", m_uiLine);
-            return false;
-        }
-    }
-    else
-    {
-        m_sOrdering = 0;
-    }
+        m_sOrdering = static_cast<short>(Clamp(-32768, iTemp, 32767));
+
+    // Grab the "visibleDistance" data
+    if (GetCustomDataInt("visibleDistance", iTemp, true))
+        m_usVisibleDistance = static_cast<unsigned short>(Clamp(0, iTemp, 65535));
 
     return true;
 }
