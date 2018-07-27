@@ -1,8 +1,11 @@
 /* lib/curl_config.h.  Generated from curl_config.h.in by configure.  */
 /* lib/curl_config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* to enable curl debug memory tracking */
+/* #undef CURLDEBUG */
+
 /* Location of default ca bundle */
-#define CURL_CA_BUNDLE "/etc/ssl/certs/ca-certificates.crt"
+/* #define CURL_CA_BUNDLE "/etc/ssl/certs/ca-certificates.crt" */
 
 /* define "1" to use built in CA store of SSL library */
 /* #undef CURL_CA_FALLBACK */
@@ -76,8 +79,14 @@
 /* Definition to make a library symbol externally visible. */
 #define CURL_EXTERN_SYMBOL __attribute__ ((__visibility__ ("default")))
 
+/* IP address type in sockaddr */
+/* #undef CURL_SA_FAMILY_T */
+
 /* built with multiple SSL backends */
 /* #undef CURL_WITH_MULTI_SSL */
+
+/* enable debug build options */
+/* #undef DEBUGBUILD */
 
 /* your Entropy Gathering Daemon socket pathname */
 /* #undef EGD_SOCKET */
@@ -87,21 +96,6 @@
 
 /* Define to the type of arg 2 for gethostname. */
 #define GETHOSTNAME_TYPE_ARG2 size_t
-
-/* Define to the type qualifier of arg 1 for getnameinfo. */
-#define GETNAMEINFO_QUAL_ARG1 const
-
-/* Define to the type of arg 1 for getnameinfo. */
-#define GETNAMEINFO_TYPE_ARG1 struct sockaddr *
-
-/* Define to the type of arg 2 for getnameinfo. */
-#define GETNAMEINFO_TYPE_ARG2 socklen_t
-
-/* Define to the type of args 4 and 6 for getnameinfo. */
-#define GETNAMEINFO_TYPE_ARG46 socklen_t
-
-/* Define to the type of arg 7 for getnameinfo. */
-#define GETNAMEINFO_TYPE_ARG7 int
 
 /* Specifies the number of arguments to getservbyport_r */
 #define GETSERVBYPORT_R_ARGS 6
@@ -169,14 +163,18 @@
 /* Define to 1 if you have the <cyassl/options.h> header file. */
 /* #undef HAVE_CYASSL_OPTIONS_H */
 
+/* Define to 1 if you have the declaration of `getpwuid_r', and to 0 if you
+   don't. */
+/* #undef HAVE_DECL_GETPWUID_R */
+
+/* "Set if getpwuid_r() declaration is missing" */
+/* #undef HAVE_DECL_GETPWUID_R_MISSING */
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
 
 /* Define to 1 if you have the `ENGINE_cleanup' function. */
 /* #undef HAVE_ENGINE_CLEANUP */
-
-/* Define to 1 if you have the `ENGINE_load_builtin_engines' function. */
-/* #undef HAVE_ENGINE_LOAD_BUILTIN_ENGINES */
 
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
@@ -195,6 +193,9 @@
 
 /* Define to 1 if you have the fdopen function. */
 #define HAVE_FDOPEN 1
+
+/* Define to 1 if you have the `fnmatch' function. */
+/* #undef HAVE_FNMATCH */
 
 /* Define to 1 if you have the freeaddrinfo function. */
 #define HAVE_FREEADDRINFO 1
@@ -261,9 +262,6 @@
 
 /* Define to 1 if you have a working getifaddrs function. */
 #define HAVE_GETIFADDRS 1
-
-/* Define to 1 if you have the getnameinfo function. */
-#define HAVE_GETNAMEINFO 1
 
 /* Define to 1 if you have the `getpass_r' function. */
 /* #undef HAVE_GETPASS_R */
@@ -480,18 +478,12 @@
 /* Define to 1 if you have the <nghttp2/nghttp2.h> header file. */
 /* #undef HAVE_NGHTTP2_NGHTTP2_H */
 
-/* Define to 1 if NI_WITHSCOPEID exists and works. */
-/* #undef HAVE_NI_WITHSCOPEID */
-
 /* if you have an old MIT Kerberos version, lacking GSS_C_NT_HOSTBASED_SERVICE
    */
 /* #undef HAVE_OLD_GSSMIT */
 
 /* Define to 1 if you have the <openssl/crypto.h> header file. */
 /* #undef HAVE_OPENSSL_CRYPTO_H */
-
-/* Define to 1 if you have the <openssl/engine.h> header file. */
-/* #undef HAVE_OPENSSL_ENGINE_H */
 
 /* Define to 1 if you have the <openssl/err.h> header file. */
 /* #undef HAVE_OPENSSL_ERR_H */
@@ -898,28 +890,28 @@
 /* Define to the function return type for send. */
 #define SEND_TYPE_RETV ssize_t
 
-/* The size of `curl_off_t', as computed by sizeof. */
+/* The number of bytes in type curl_off_t */
 #define SIZEOF_CURL_OFF_T 8
 
-/* The size of `int', as computed by sizeof. */
+/* The number of bytes in type int */
 #define SIZEOF_INT 4
 
-/* The size of `long', as computed by sizeof. */
+/* The number of bytes in type long */
 #define SIZEOF_LONG 8
 
-/* The size of `long long', as computed by sizeof. */
+/* The number of bytes in type long long */
 /* #undef SIZEOF_LONG_LONG */
 
-/* The size of `off_t', as computed by sizeof. */
+/* The number of bytes in type off_t */
 #define SIZEOF_OFF_T 8
 
-/* The size of `short', as computed by sizeof. */
+/* The number of bytes in type short */
 #define SIZEOF_SHORT 2
 
-/* The size of `size_t', as computed by sizeof. */
+/* The number of bytes in type size_t */
 #define SIZEOF_SIZE_T 8
 
-/* The size of `time_t', as computed by sizeof. */
+/* The number of bytes in type time_t */
 #define SIZEOF_TIME_T 8
 
 /* Define to 1 if you have the ANSI C header files. */
