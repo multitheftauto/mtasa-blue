@@ -141,6 +141,9 @@ public:
                           unsigned long ulFormat, ID3DXFont* pDXFont = NULL, bool bPostGUI = false, bool bColorCoded = false, bool bSubPixelPositioning = false,
                           float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0);
 
+    void DrawPrimitivesQueued(D3DPRIMITIVETYPE primitiveType, std::vector<sPrimitiveVertex> vecPrimitives, CMaterialItem* pMaterial, bool bPostGUI = false);
+    void DrawPrimitives3DQueued(D3DPRIMITIVETYPE primitiveType, std::vector<sPrimitiveVertex> vecPrimitives, CMaterialItem* pTexture, bool bPostGUI);
+
     void OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
 
     // Subsystems
@@ -172,6 +175,10 @@ public:
     void SetProgressMessage(const SString& strMessage);
     void DrawProgressMessage(bool bPreserveBackbuffer = true);
     void DrawRectangleInternal(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning);
+    void DrawPrimitivesInternal(D3DPRIMITIVETYPE primitiveType, int primitivesCount, sPrimitiveVertex* vecPrimitives, CMaterialItem* pMaterial);
+    void DrawPrimitives(D3DPRIMITIVETYPE primitiveType, std::vector<sPrimitiveVertex> vecPrimitives, CMaterialItem* pMaterial );
+    void DrawPrimitives3DInternal(D3DPRIMITIVETYPE primitiveType, int primitivesCount, sPrimitiveVertex* vecPrimitives, CMaterialItem* pMaterial);
+    void DrawPrimitives3D(D3DPRIMITIVETYPE primitiveType, std::vector<sPrimitiveVertex> vecPrimitives, CMaterialItem* pMaterial );
 
 private:
     void       OnDeviceCreate(IDirect3DDevice9* pDevice);
@@ -223,6 +230,8 @@ private:
         QUEUE_RECT,
         QUEUE_TEXTURE,
         QUEUE_SHADER,
+        QUEUE_PRIMITIVES,
+        QUEUE_PRIMITIVES3D,
     };
 
     struct sDrawQueueLine
@@ -279,6 +288,14 @@ private:
         bool           bRelativeUV;
     };
 
+    struct sDrawQueuePrimitives
+    {
+        int primitiveType;
+        int primitivesCount;
+        sPrimitiveVertex *vecPrimitives;
+        CMaterialItem* pMaterial;
+    };
+
     struct sDrawQueueItem
     {
         eDrawQueueType eType;
@@ -287,10 +304,12 @@ private:
 
         // Queue item data based on the eType.
         union {
-            sDrawQueueLine    Line;
-            sDrawQueueText    Text;
-            sDrawQueueRect    Rect;
-            sDrawQueueTexture Texture;
+            sDrawQueueLine       Line;
+            sDrawQueueText       Text;
+            sDrawQueueRect       Rect;
+            sDrawQueueTexture    Texture;
+            sDrawQueuePrimitives Primitives;
+            sDrawQueuePrimitives Primitives3D;
         };
     };
 

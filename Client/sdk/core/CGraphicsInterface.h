@@ -13,6 +13,15 @@
 #define __CGRAPHICSINTERFACE_H
 
 #include "CVector.h"
+#include <d3d9.h>
+#include <d3dx9.h>
+
+struct sPrimitiveVertex
+{
+    float             x, y, z;
+    D3DCOLOR          color;
+    float             u, v;
+};
 
 struct ID3DXFont;
 struct IDirect3DDevice9;
@@ -126,6 +135,9 @@ public:
     virtual void DrawStringQueued(float fLeft, float fTop, float fRight, float fBottom, unsigned long dwColor, const char* wszText, float fScaleX,
                                   float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bColorCoded = false,
                                   bool bSubPixelPositioning = false, float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0) = 0;
+
+    virtual void DrawPrimitivesQueued(D3DPRIMITIVETYPE primitiveType, std::vector<sPrimitiveVertex> vecPrimitives, CMaterialItem* pMaterial, bool bPostGUI) = 0;
+    virtual void DrawPrimitives3DQueued(D3DPRIMITIVETYPE primitiveType, std::vector<sPrimitiveVertex> vecPrimitives, CMaterialItem* pMaterial, bool bPostGUI) = 0;
 
     // Subsystems
     virtual CRenderItemManagerInterface* GetRenderItemManager(void) = 0;

@@ -46,9 +46,10 @@ DECLARE_ENUM(eAspectRatio);
 DECLARE_ENUM(eRadioStreamIndex);
 DECLARE_ENUM(EComponentBase::EComponentBaseType);
 DECLARE_ENUM(eWebBrowserMouseButton);
-DECLARE_ENUM(eTrayIconType)
-DECLARE_ENUM(eCursorType)
-DECLARE_ENUM(eWheelPosition)
+DECLARE_ENUM(eTrayIconType);
+DECLARE_ENUM(eCursorType);
+DECLARE_ENUM(eWheelPosition);
+DECLARE_ENUM(D3DPRIMITIVETYPE);
 
 enum eDXHorizontalAlign
 {
@@ -367,6 +368,10 @@ inline SString GetClassTypeName(CLuaVector4D*)
 inline SString GetClassTypeName(CLuaMatrix*)
 {
     return "matrix";
+}
+inline SString GetClassTypeName(D3DPRIMITIVETYPE*)
+{
+    return "primitive-type";
 }
 
 //

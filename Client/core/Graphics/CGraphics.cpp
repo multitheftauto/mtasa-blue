@@ -249,6 +249,113 @@ void CGraphics::DrawRectangleInternal(float fX, float fY, float fWidth, float fH
     }
 }
 
+void CGraphics::DrawPrimitives(D3DPRIMITIVETYPE primitiveType, std::vector<sPrimitiveVertex> vecPrimitives, CMaterialItem* pMaterial)
+{
+    if (g_pCore->IsWindowMinimized())
+        return;
+
+    BeginDrawBatch();
+    CheckModes(EDrawMode::DX_SPRITE, m_ActiveBlendMode);
+    DrawPrimitivesInternal(primitiveType, vecPrimitives.size(), &vecPrimitives.at(0), pMaterial);
+    EndDrawBatch();
+}
+
+void CGraphics::DrawPrimitivesInternal(D3DPRIMITIVETYPE primitiveType, int primitivesCount, sPrimitiveVertex* vecPrimitives, CMaterialItem* pMaterial)
+{
+
+    if (CTextureItem* pTexture = DynamicCast<CTextureItem>(pMaterial))
+    {
+        m_pDevice->SetTexture(0, (IDirect3DTexture9*)pTexture->m_pD3DTexture);
+    }
+    else
+    {
+        m_pDevice->SetTexture(0, NULL);
+    }
+    switch (primitiveType)
+    {
+        case D3DPT_TRIANGLEFAN:
+        case D3DPT_TRIANGLESTRIP:
+            primitivesCount = primitivesCount - 2;
+            break;
+        case D3DPT_TRIANGLELIST:
+            primitivesCount = primitivesCount/3;
+            break;
+    }
+    m_pDevice->DrawPrimitiveUP(primitiveType, primitivesCount, vecPrimitives, sizeof(sPrimitiveVertex));
+}
+
+void CGraphics::DrawPrimitives3DInternal(D3DPRIMITIVETYPE primitiveType, int primitivesCount, sPrimitiveVertex* vecPrimitives, CMaterialItem* pMaterial)
+{
+
+    // Get scene matrices
+    D3DXMATRIX matWorld;
+    D3DXMatrixIdentity(&matWorld);
+    const D3DXMATRIX& matView = g_pDeviceState->TransformState.VIEW;
+    const D3DXMATRIX& matProjection = g_pDeviceState->TransformState.PROJECTION;
+
+    D3DXMATRIX m_MatProjection, m_MatView;
+    D3DXMatrixIdentity(&m_MatProjection);
+    D3DXMatrixIdentity(&m_MatView);
+
+
+
+    // Set states
+    if (g_pDeviceState->AdapterState.bRequiresClipping)
+        m_pDevice->SetRenderState(D3DRS_CLIPPING, TRUE);
+    m_pDevice->SetRenderState(D3DRS_ZENABLE, false ? D3DZB_TRUE : D3DZB_FALSE);
+    m_pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+    m_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+    m_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+    m_pDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
+    m_pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+    m_pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+    m_pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+    m_pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+    m_pDevice->SetRenderState(D3DRS_ALPHAREF, 0x01);
+    m_pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
+    m_pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+    m_pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG2);
+    m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+    m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG2);
+    m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+    m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+
+    // Set transforms
+    m_pDevice->SetTransform(D3DTS_WORLD, &matWorld);
+    m_pDevice->SetTransform(D3DTS_VIEW, &matView);
+    m_pDevice->SetTransform(D3DTS_PROJECTION, &matProjection);
+
+    // Set vertex stream
+    m_pDevice->SetFVF(SPDVertex::FVF);
+
+    // Draw
+    if (CTextureItem* pTexture = DynamicCast<CTextureItem>(pMaterial))
+    {
+        m_pDevice->SetTexture(0, (IDirect3DTexture9*)pTexture->m_pD3DTexture);
+    }
+    else
+    {
+        m_pDevice->SetTexture(0, NULL);
+    }
+    switch (primitiveType)
+    {
+    case D3DPT_TRIANGLEFAN:
+    case D3DPT_TRIANGLESTRIP:
+        primitivesCount = primitivesCount - 2;
+        break;
+    case D3DPT_TRIANGLELIST:
+        primitivesCount = primitivesCount / 3;
+        break;
+    }
+    m_pDevice->DrawPrimitiveUP(primitiveType, primitivesCount, vecPrimitives, sizeof(sPrimitiveVertex));
+
+    // Clean up
+
+    if (g_pDeviceState->AdapterState.bRequiresClipping)
+        m_pDevice->SetRenderState(D3DRS_CLIPPING, FALSE);
+}
+
 void CGraphics::DrawRectangle(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning)
 {
     if (g_pCore->IsWindowMinimized())
@@ -792,6 +899,38 @@ void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, 
     Item.Rect.bSubPixelPositioning = bSubPixelPositioning;
 
     // Add it to the queue
+    AddQueueItem(Item, bPostGUI);
+}
+
+void CGraphics::DrawPrimitivesQueued(D3DPRIMITIVETYPE primitiveType, std::vector<sPrimitiveVertex> vecPrimitives, CMaterialItem* pTexture, bool bPostGUI)
+{
+    // Set up a queue item
+    sDrawQueueItem Item;
+    Item.eType = QUEUE_PRIMITIVES;
+    Item.blendMode = m_ActiveBlendMode;
+    Item.Primitives.primitiveType = primitiveType;
+    Item.Primitives.primitivesCount = vecPrimitives.size();
+    Item.Primitives.vecPrimitives = &(vecPrimitives.at(0));
+    Item.Primitives.pMaterial = pTexture;
+
+    // Add it to the queue
+
+    AddQueueItem(Item, bPostGUI);
+}
+
+void CGraphics::DrawPrimitives3DQueued(D3DPRIMITIVETYPE primitiveType, std::vector<sPrimitiveVertex> vecPrimitives, CMaterialItem* pTexture, bool bPostGUI)
+{
+    // Set up a queue item
+    sDrawQueueItem Item;
+    Item.eType = QUEUE_PRIMITIVES3D;
+    Item.blendMode = m_ActiveBlendMode;
+    Item.Primitives3D.primitiveType = primitiveType;
+    Item.Primitives3D.primitivesCount = vecPrimitives.size();
+    Item.Primitives3D.vecPrimitives = &(vecPrimitives.at(0));
+    Item.Primitives3D.pMaterial = pTexture;
+
+    // Add it to the queue
+
     AddQueueItem(Item, bPostGUI);
 }
 
@@ -1433,6 +1572,19 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
             DrawRectangleInternal(Item.Rect.fX, Item.Rect.fY, Item.Rect.fWidth, Item.Rect.fHeight, Item.Rect.ulColor, Item.Rect.bSubPixelPositioning);
             break;
         }
+        case QUEUE_PRIMITIVES:
+        {
+            CheckModes(EDrawMode::DX_SPRITE, Item.blendMode);
+            DrawPrimitivesInternal((D3DPRIMITIVETYPE)Item.Primitives.primitiveType, Item.Primitives.primitivesCount, Item.Primitives.vecPrimitives, Item.Primitives.pMaterial );
+            break;
+        }
+        case QUEUE_PRIMITIVES3D:
+        {
+            CheckModes(EDrawMode::DX_SPRITE, Item.blendMode);
+            DrawPrimitives3DInternal((D3DPRIMITIVETYPE)Item.Primitives.primitiveType, Item.Primitives.primitivesCount, Item.Primitives.vecPrimitives, Item.Primitives.pMaterial );
+            break;
+        }
+
         case QUEUE_TEXT:
         {
             RECT rect;

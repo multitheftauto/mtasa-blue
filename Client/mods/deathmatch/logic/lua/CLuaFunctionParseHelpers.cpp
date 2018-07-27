@@ -488,6 +488,15 @@ ADD_ENUM(FRONT_RIGHT_WHEEL, "front_right")
 ADD_ENUM(REAR_RIGHT_WHEEL, "rear_right")
 IMPLEMENT_ENUM_END("wheel-position")
 
+IMPLEMENT_ENUM_BEGIN(D3DPRIMITIVETYPE)
+ADD_ENUM(D3DPT_POINTLIST, "pointlist")
+ADD_ENUM(D3DPT_LINELIST, "linelist")
+ADD_ENUM(D3DPT_LINESTRIP, "linestrip")
+ADD_ENUM(D3DPT_TRIANGLELIST, "trianglelist")
+ADD_ENUM(D3DPT_TRIANGLESTRIP, "trianglestrip")
+ADD_ENUM(D3DPT_TRIANGLEFAN, "trianglefan")
+IMPLEMENT_ENUM_END("primitive-type")
+
 //
 // Get best guess at name of userdata type
 //
