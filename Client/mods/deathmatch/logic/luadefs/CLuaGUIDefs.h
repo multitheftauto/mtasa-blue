@@ -127,8 +127,8 @@ public:
     LUA_DECLARE(GUIMemoSetVerticalScrollPosition);
     LUA_DECLARE(GUIWindowSetMovable);
     LUA_DECLARE(GUIWindowSetSizable);
-    LUA_DECLARE(GUIWindowGetMovable);
-    LUA_DECLARE(GUIWindowGetSizable);
+    LUA_DECLARE(GUIWindowIsMovable);
+    LUA_DECLARE(GUIWindowIsSizable);
     LUA_DECLARE(GUIWindowGetCloseButtonEnabled);
     LUA_DECLARE(GUIWindowGetTitleBarEnabled);
     LUA_DECLARE(GUILabelSetColor);
