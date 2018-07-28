@@ -578,6 +578,9 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
     if (!strcmp(szCheatName, PROP_UNDERWORLD_WARP))
         return IsUnderWorldWarpEnabled();
 
+    if (!strcmp(szCheatName, PROP_WATER_CREATURES))
+        return IsWaterCreaturesEnabled();
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -610,6 +613,12 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
         return true;
     }
 
+    if (!strcmp(szCheatName, PROP_WATER_CREATURES))
+    {
+        SetWaterCreaturesEnabled(bEnable);
+        return true;
+    }
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -626,6 +635,7 @@ void CGameSA::ResetCheats()
     SetMoonEasterEggEnabled(false);
     SetExtraAirResistanceEnabled(true);
     SetUnderWorldWarpEnabled(true);
+    SetWaterCreaturesEnabled(true);
 
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
@@ -680,6 +690,37 @@ void CGameSA::SetUnderWorldWarpEnabled(bool bEnable)
 bool CGameSA::IsUnderWorldWarpEnabled()
 {
     return !m_bUnderworldWarp;
+}
+
+bool CGameSA::IsWaterCreaturesEnabled()
+{
+    return m_bWaterCreatures;
+}
+
+void CGameSA::SetWaterCreaturesEnabled(bool bEnabled)
+{
+    DWORD g_waterCreatureMan = 0xC1DF30;
+    if (bEnabled && !m_bWaterCreatures)
+    {
+        // initialise dynamic water creatures generation
+        DWORD CALL_WaterCreatureManager_Init = 0x6E3F90;
+        _asm
+        {
+            mov     ecx, g_waterCreatureMan
+            call    CALL_WaterCreatureManager_Init
+        }
+    }
+    else if (!bEnabled && m_bWaterCreatures)
+    {
+        // shutdown dynamic water creatures generation
+        DWORD CALL_WaterCreatureManager_Exit = 0x6E3FD0;
+        _asm
+        {
+            mov     ecx, g_waterCreatureMan
+            call    CALL_WaterCreatureManager_Exit
+        }
+    }
+    m_bWaterCreatures = bEnabled;
 }
 
 bool CGameSA::GetJetpackWeaponEnabled(eWeaponType weaponType)

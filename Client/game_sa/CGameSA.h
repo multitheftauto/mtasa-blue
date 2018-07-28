@@ -84,6 +84,7 @@
 #define PROP_SNIPER_MOON            "snipermoon"
 #define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
 #define PROP_UNDERWORLD_WARP        "underworldwarp"
+#define PROP_WATER_CREATURES        "watercreatures"
 
 struct SCheatSA
 {
@@ -403,6 +404,9 @@ public:
     bool IsUnderWorldWarpEnabled();
     void SetUnderWorldWarpEnabled(bool bEnable);
 
+    bool IsWaterCreaturesEnabled();
+    void SetWaterCreaturesEnabled(bool bEnable);
+
     bool VerifySADataFileNames();
     bool PerformChecks();
     int& GetCheckStatus(void) { return m_iCheckStatus; }
@@ -494,6 +498,7 @@ private:
     bool         m_bASyncLoadingSuspended;
     int          m_iCheckStatus;
     bool         m_bUnderworldWarp;
+    bool         m_bWaterCreatures;
 
     static unsigned long* VAR_SystemTime;
     static unsigned long* VAR_IsAtMenu;

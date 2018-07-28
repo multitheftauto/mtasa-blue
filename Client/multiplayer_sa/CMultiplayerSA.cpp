@@ -311,8 +311,6 @@ unsigned char ucTrafficLightState = 0;
 bool          bTrafficLightsBlocked = false;
 bool          bInteriorSoundsEnabled = true;
 bool          bInteriorFurnitureStates[5] = {true, true, true, true, true};
-bool          bPlantsEnabled = true;
-bool          bWaterCreaturesEnabled = true;
 
 bool  bUsingCustomSkyGradient = false;
 BYTE  ucSkyGradientTopR = 0;
@@ -1762,80 +1760,6 @@ void CMultiplayerSA::SetInteriorFurnitureEnabled(char cRoomId, bool bEnabled)
     }
 
     bInteriorFurnitureStates[cRoomId] = bEnabled;
-}
-
-bool CMultiplayerSA::GetPlantsEnabled()
-{
-    return bPlantsEnabled;
-}
-
-DWORD CALL_CPlantMgr_Shutdown = 0x5DB940;
-DWORD CALL_CPlantMgr_Initialise = 0x5DD910;
-void CMultiplayerSA::SetPlantsEnabled(bool bEnabled)
-{
-    if (bEnabled && !bPlantsEnabled)
-    {
-        // enable dynamic plants
-        MemPut<BYTE>(0x0053C159, 0xE8);
-        MemPut<BYTE>(0x0053C15A, 0x42);
-        MemPut<BYTE>(0x0053C15B, 0x0E);
-        MemPut<BYTE>(0x0053C15C, 0x0A);
-        MemPut<BYTE>(0x0053C15D, 0x00);
-
-        // initialise dynamic plants generation
-        _asm
-        {
-            call    CALL_CPlantMgr_Initialise
-        }
-    }
-    else if(!bEnabled && bPlantsEnabled)
-    {
-        // disable dynamic plants
-        // prevents crash after plants generation shutdown
-        MemSet((PVOID)0x0053C159, 0x90, 5);
-
-        // shutdown dynamic plants generation
-        // it also removes already created plants
-        _asm
-        {
-            call    CALL_CPlantMgr_Shutdown
-        }
-    }
-
-    bPlantsEnabled = bEnabled;
-}
-
-bool CMultiplayerSA::GetWaterCreaturesEnabled()
-{
-    return bWaterCreaturesEnabled;
-}
-
-DWORD g_waterCreatureMan = 0xC1DF30;
-DWORD CALL_WaterCreatureManager_Exit = 0x6E3FD0;
-DWORD CALL_WaterCreatureManager_Init = 0x6E3F90;
-void CMultiplayerSA::SetWaterCreaturesEnabled(bool bEnabled)
-{
-    if (bEnabled && !bWaterCreaturesEnabled)
-    {
-        // initialise dynamic water creatures generation
-        _asm
-        {
-            mov     ecx, g_waterCreatureMan
-            call    CALL_WaterCreatureManager_Init
-        }
-    }
-    else if (!bEnabled && bWaterCreaturesEnabled)
-    {
-        // shutdown dynamic water creatures generation
-        // it also removes already created creatures
-        _asm
-        {
-            mov     ecx, g_waterCreatureMan
-            call    CALL_WaterCreatureManager_Exit
-        }
-    }
-
-    bWaterCreaturesEnabled = bEnabled;
 }
 
 void CMultiplayerSA::SetWindVelocity(float fX, float fY, float fZ)

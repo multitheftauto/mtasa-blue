@@ -1365,62 +1365,6 @@ int CLuaFunctionDefs::SetInteriorFurnitureEnabled(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetPlantsEnabled(lua_State* luaVM)
-{
-    lua_pushboolean(luaVM, g_pMultiplayer->GetPlantsEnabled());
-    return 1;
-}
-
-int CLuaFunctionDefs::SetPlantsEnabled(lua_State* luaVM)
-{
-    //  bool setPlantsEnabled ( bool enabled )
-    bool bEnabled;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadBool(bEnabled);
-
-    if (!argStream.HasErrors())
-    {
-        g_pMultiplayer->SetPlantsEnabled(bEnabled);
-
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaFunctionDefs::GetWaterCreaturesEnabled(lua_State* luaVM)
-{
-    lua_pushboolean(luaVM, g_pMultiplayer->GetWaterCreaturesEnabled());
-    return 1;
-}
-
-int CLuaFunctionDefs::SetWaterCreaturesEnabled(lua_State* luaVM)
-{
-    //  bool setWaterCreaturesEnabled ( bool enabled )
-    bool bEnabled;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadBool(bEnabled);
-
-    if (!argStream.HasErrors())
-    {
-        g_pMultiplayer->SetWaterCreaturesEnabled(bEnabled);
-
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
 int CLuaFunctionDefs::GetRainLevel(lua_State* luaVM)
 {
     lua_pushnumber(luaVM, g_pGame->GetWeather()->GetAmountOfRain());

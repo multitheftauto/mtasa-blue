@@ -282,8 +282,6 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("getWindVelocity", CLuaFunctionDefs::GetWindVelocity);
     CLuaCFunctions::AddFunction("getInteriorSoundsEnabled", CLuaFunctionDefs::GetInteriorSoundsEnabled);
     CLuaCFunctions::AddFunction("getInteriorFurnitureEnabled", CLuaFunctionDefs::GetInteriorFurnitureEnabled);
-    CLuaCFunctions::AddFunction("getPlantsEnabled", CLuaFunctionDefs::GetPlantsEnabled);
-    CLuaCFunctions::AddFunction("getWaterCreaturesEnabled", CLuaFunctionDefs::GetWaterCreaturesEnabled);
     CLuaCFunctions::AddFunction("getFarClipDistance", CLuaFunctionDefs::GetFarClipDistance);
     CLuaCFunctions::AddFunction("getNearClipDistance", CLuaFunctionDefs::GetNearClipDistance);
     CLuaCFunctions::AddFunction("getVehiclesLODDistance", CLuaFunctionDefs::GetVehiclesLODDistance);
@@ -326,8 +324,6 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("resetWindVelocity", CLuaFunctionDefs::ResetWindVelocity);
     CLuaCFunctions::AddFunction("setInteriorSoundsEnabled", CLuaFunctionDefs::SetInteriorSoundsEnabled);
     CLuaCFunctions::AddFunction("setInteriorFurnitureEnabled", CLuaFunctionDefs::SetInteriorFurnitureEnabled);
-    CLuaCFunctions::AddFunction("setPlantsEnabled", CLuaFunctionDefs::SetPlantsEnabled);
-    CLuaCFunctions::AddFunction("setWaterCreaturesEnabled", CLuaFunctionDefs::SetWaterCreaturesEnabled);
     CLuaCFunctions::AddFunction("setRainLevel", CLuaFunctionDefs::SetRainLevel);
     CLuaCFunctions::AddFunction("resetRainLevel", CLuaFunctionDefs::ResetRainLevel);
     CLuaCFunctions::AddFunction("setFarClipDistance", CLuaFunctionDefs::SetFarClipDistance);

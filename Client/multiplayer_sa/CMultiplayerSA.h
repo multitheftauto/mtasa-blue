@@ -154,10 +154,6 @@ public:
     void  SetInteriorSoundsEnabled(bool bEnabled);
     bool  GetInteriorFurnitureEnabled(char cRoomId);
     void  SetInteriorFurnitureEnabled(char cRoomId, bool bEnabled);
-    bool  GetPlantsEnabled();
-    void  SetPlantsEnabled(bool bEnabled);
-    bool  GetWaterCreaturesEnabled();
-    void  SetWaterCreaturesEnabled(bool bEnabled);
     void  SetWindVelocity(float fX, float fY, float fZ);
     void  GetWindVelocity(float& fX, float& fY, float& fZ);
     void  RestoreWindVelocity(void);
