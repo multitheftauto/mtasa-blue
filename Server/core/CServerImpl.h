@@ -102,6 +102,9 @@ private:
     double m_dLastTimeMs;
     double m_dPrevOverrun;
 
+    std::vector<SString> m_szCmdHistory;
+    int                  m_uiSelectedHistoryCmd = -1;
+
 #ifdef WIN32
     HANDLE    m_hConsole;
     HANDLE    m_hConsoleInput;

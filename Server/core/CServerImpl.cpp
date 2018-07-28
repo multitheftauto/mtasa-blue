@@ -798,13 +798,18 @@ void CServerImpl::HandleInput(void)
                 }
                 else
                 {
+                    SString szCommand = UTF16ToMbUTF8(m_szInputBuffer).c_str();
                     // Otherwise, pass the command to the mod's input handler
-                    m_pModManager->HandleInput(UTF16ToMbUTF8(m_szInputBuffer).c_str());
+                    m_pModManager->HandleInput(szCommand);
+
+                    if (szCommand.length() > 0 && (m_szCmdHistory.empty() || m_szCmdHistory.back() != szCommand))
+                        m_szCmdHistory.push_back(szCommand);
                 }
             }
 
             memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
             m_uiInputCount = 0;
+            m_uiSelectedHistoryCmd = -1;
             break;
 
         case KEY_BACKSPACE:            // Backspace
@@ -884,11 +889,108 @@ void CServerImpl::HandleInput(void)
                 }
 
                 case KEY_UP:            // Up-arrow cursor
-                    break;
+                {
+                    // If there's nothing to select, break here
+                    if (m_szCmdHistory.empty() || m_uiSelectedHistoryCmd - 1 == -1)
+                        break;
 
+                    // Select the previous command
+                    if (m_uiSelectedHistoryCmd == -1)
+                        m_uiSelectedHistoryCmd = m_szCmdHistory.size() - 1;
+                    else
+                        m_uiSelectedHistoryCmd--;
+
+                    // Clear out old buffer
+                    memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
+
+                    // Couldn't get anything else working, so this is a way to clear the line
+                    for (uint i = 0; i < 68; i++)
+                    {
+#ifdef WIN32
+                        Printf("%c %c", 0x08, 0x08);
+#else
+                        if (!g_bSilent && !g_bNoCurses)
+                        {
+                            wprintw(m_wndInput, "%c %c", 0x08, 0x08);
+                        }
+#endif
+                    }
+#ifndef WIN32
+                    wmove(m_wndInput, 0, 0);
+#endif
+                    
+                    // Select our command and fill the input buffer
+                    SString szCommand = m_szCmdHistory[m_uiSelectedHistoryCmd];
+                    m_uiInputCount = szCommand.length();
+                    for (uint i = 0; i < szCommand.length(); i++)
+                        m_szInputBuffer[i] = szCommand[i];
+
+                    // Let's print it out
+                    wchar_t szBuffer[255];
+                    memset(szBuffer, 0, sizeof(szBuffer));
+                    wcsncpy(&szBuffer[0], &m_szInputBuffer[0], m_uiInputCount);
+#ifdef WIN32
+                    Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
+#else
+                    if (!g_bSilent && !g_bNoCurses)
+                        wprintw(m_wndInput, "%s", UTF16ToMbUTF8(szBuffer).c_str());
+#endif
+
+                    break;
+                }
                 case KEY_DOWN:            // Down-arrow cursor
-                    break;
+                {
+                    // If there's nothing to select, break here
+                    if (m_szCmdHistory.empty() || m_uiSelectedHistoryCmd == -1)
+                        break;
 
+                    // Select the next command
+                    if (m_uiSelectedHistoryCmd == m_szCmdHistory.size() - 1)
+                        m_uiSelectedHistoryCmd = -1;
+                    else
+                        m_uiSelectedHistoryCmd++;
+
+                    // Clear out old buffer
+                    memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
+
+                    // Couldn't get anything else working, so this is a way to clear the line
+                    for (uint i = 0; i < 68; i++)
+                    {
+#ifdef WIN32
+                        Printf("%c %c", 0x08, 0x08);
+#else
+                        if (!g_bSilent && !g_bNoCurses)
+                        {
+                            wprintw(m_wndInput, "%c %c", 0x08, 0x08);
+                        }
+#endif
+                    }
+#ifndef WIN32
+                    wmove(m_wndInput, 0, 0);
+#endif
+
+                    if (m_uiSelectedHistoryCmd == -1)
+                        break;
+
+                    // Select our command and fill the input buffer
+                    SString szCommand = m_szCmdHistory[m_uiSelectedHistoryCmd];
+                    m_uiInputCount = szCommand.length();
+                    for (uint i = 0; i < szCommand.length(); i++)
+                        m_szInputBuffer[i] = szCommand[i];
+
+                    // Let's print it out
+                    wchar_t szBuffer[255];
+                    memset(szBuffer, 0, sizeof(szBuffer));
+                    wcsncpy(&szBuffer[0], &m_szInputBuffer[0], m_uiInputCount);
+#ifdef WIN32
+                    Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
+#else
+                    if (!g_bSilent && !g_bNoCurses)
+                        wprintw(m_wndInput, "%s", UTF16ToMbUTF8(szBuffer).c_str());
+#endif
+
+                    break;
+                }
 #ifdef WIN32    // WIN32: Close the switch again
             }
             // Restore the color
