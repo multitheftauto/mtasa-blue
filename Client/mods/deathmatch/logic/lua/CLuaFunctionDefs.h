@@ -136,6 +136,10 @@ public:
     LUA_DECLARE(SetInteriorSoundsEnabled);
     LUA_DECLARE(GetInteriorFurnitureEnabled);
     LUA_DECLARE(SetInteriorFurnitureEnabled);
+    LUA_DECLARE(GetPlantsEnabled);
+    LUA_DECLARE(SetPlantsEnabled);
+    LUA_DECLARE(GetWaterCreaturesEnabled);
+    LUA_DECLARE(SetWaterCreaturesEnabled);
     LUA_DECLARE(GetRainLevel);
     LUA_DECLARE(SetRainLevel);
     LUA_DECLARE(ResetRainLevel);
