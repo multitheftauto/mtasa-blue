@@ -25,7 +25,6 @@ void CLuaDrawingDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("dxDrawImage", DxDrawImage);
     CLuaCFunctions::AddFunction("dxDrawImageSection", DxDrawImageSection);
     CLuaCFunctions::AddFunction("dxDrawPrimitives", DxDrawPrimitives);
-    CLuaCFunctions::AddFunction("dxDrawPrimitives3D", DxDrawPrimitives3D);
     CLuaCFunctions::AddFunction("dxGetTextWidth", DxGetTextWidth);
     CLuaCFunctions::AddFunction("dxGetFontHeight", DxGetFontHeight);
     CLuaCFunctions::AddFunction("dxCreateFont", DxCreateFont);
@@ -1666,70 +1665,6 @@ int CLuaDrawingDefs::DxDrawPrimitives(lua_State* luaVM)
                 g_pCore->GetGraphics()->DrawPrimitivesQueued(primitiveType, vecPrimitives, pTexture->GetMaterialItem(), bPostGUI);
             else
                 g_pCore->GetGraphics()->DrawPrimitivesQueued(primitiveType, vecPrimitives, NULL, bPostGUI);
-
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-        else
-        {
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaDrawingDefs::DxDrawPrimitives3D(lua_State* luaVM)
-{
-    D3DPRIMITIVETYPE              primitiveType;
-    std::vector<sPrimitiveVertex> vecPrimitives;
-    CClientTexture*               pTexture;
-
-    SColor    color;
-    bool      bPostGUI;
-
-    CStringMap primiteVertex;
-
-    CScriptArgReader argStream(luaVM);
-
-    argStream.ReadEnumString(primitiveType);
-
-    argStream.ReadUserData(pTexture, NULL);
-
-    while (argStream.NextIsTable())
-    {
-        lua_pushnil(luaVM);
-
-        std::vector<float> vecTableContent;
-        argStream.ReadNumberTable(vecTableContent);
-        if (vecTableContent.size() == 3)
-        {
-            vecPrimitives.push_back(sPrimitiveVertex{ vecTableContent.at(0), vecTableContent.at(1), vecTableContent.at(2), 0, 0, 0 });
-        }
-        else if (vecTableContent.size() == 4)
-        {
-            vecPrimitives.push_back(sPrimitiveVertex{ vecTableContent.at(0), vecTableContent.at(1), vecTableContent.at(2), (DWORD)vecTableContent.at(3), 0, 0 });
-        }
-        else if (vecTableContent.size() == 6)
-        {
-            vecPrimitives.push_back(sPrimitiveVertex{ vecTableContent.at(0), vecTableContent.at(1), vecTableContent.at(2), (DWORD)vecTableContent.at(3), vecTableContent.at(4), vecTableContent.at(5) });
-        }
-    }
-    argStream.ReadBool(bPostGUI, false);
-
-    if (!argStream.HasErrors())
-    {
-        if (vecPrimitives.size() > 2)
-        {
-            if(pTexture != NULL)
-                g_pCore->GetGraphics()->DrawPrimitives3DQueued(primitiveType, vecPrimitives, pTexture->GetMaterialItem(), bPostGUI);
-            else
-                g_pCore->GetGraphics()->DrawPrimitives3DQueued(primitiveType, vecPrimitives, NULL, bPostGUI);
 
             lua_pushboolean(luaVM, true);
             return 1;

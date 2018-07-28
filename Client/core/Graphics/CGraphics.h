@@ -142,7 +142,6 @@ public:
                           float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0);
 
     void DrawPrimitivesQueued(D3DPRIMITIVETYPE primitiveType, std::vector<sPrimitiveVertex> vecPrimitives, CMaterialItem* pMaterial, bool bPostGUI = false);
-    void DrawPrimitives3DQueued(D3DPRIMITIVETYPE primitiveType, std::vector<sPrimitiveVertex> vecPrimitives, CMaterialItem* pTexture, bool bPostGUI);
 
     void OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
 
@@ -177,8 +176,6 @@ public:
     void DrawRectangleInternal(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning);
     void DrawPrimitivesInternal(D3DPRIMITIVETYPE primitiveType, int primitivesCount, sPrimitiveVertex* vecPrimitives, CMaterialItem* pMaterial);
     void DrawPrimitives(D3DPRIMITIVETYPE primitiveType, std::vector<sPrimitiveVertex> vecPrimitives, CMaterialItem* pMaterial );
-    void DrawPrimitives3DInternal(D3DPRIMITIVETYPE primitiveType, int primitivesCount, sPrimitiveVertex* vecPrimitives, CMaterialItem* pMaterial);
-    void DrawPrimitives3D(D3DPRIMITIVETYPE primitiveType, std::vector<sPrimitiveVertex> vecPrimitives, CMaterialItem* pMaterial );
 
 private:
     void       OnDeviceCreate(IDirect3DDevice9* pDevice);
@@ -231,7 +228,6 @@ private:
         QUEUE_TEXTURE,
         QUEUE_SHADER,
         QUEUE_PRIMITIVES,
-        QUEUE_PRIMITIVES3D,
     };
 
     struct sDrawQueueLine
@@ -309,7 +305,6 @@ private:
             sDrawQueueRect       Rect;
             sDrawQueueTexture    Texture;
             sDrawQueuePrimitives Primitives;
-            sDrawQueuePrimitives Primitives3D;
         };
     };
 
