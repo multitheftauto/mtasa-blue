@@ -1624,17 +1624,17 @@ int CLuaDrawingDefs::DxDrawPrimitives(lua_State* luaVM)
     D3DPRIMITIVETYPE              primitiveType;
     std::vector<sPrimitiveVertex> vecPrimitives;
     CClientTexture*               pTexture;
-
-    SColor    color;
-    bool      bPostGUI;
-
-    CStringMap primiteVertex;
+    SColor                        color;
+    bool                          bPostGUI = false;
 
     CScriptArgReader argStream(luaVM);
 
     argStream.ReadEnumString(primitiveType);
 
-    argStream.ReadUserData(pTexture, NULL);
+    if(argStream.NextIsUserData())
+        argStream.ReadUserData(pTexture, NULL);
+    if(argStream.NextIsBool())
+        argStream.ReadBool(bPostGUI, false);
 
     while (argStream.NextIsTable())
     {
@@ -1642,24 +1642,26 @@ int CLuaDrawingDefs::DxDrawPrimitives(lua_State* luaVM)
 
         std::vector<float> vecTableContent;
         argStream.ReadNumberTable(vecTableContent);
-        if (vecTableContent.size() == 2)
+        switch (vecTableContent.size())
         {
-            vecPrimitives.push_back(sPrimitiveVertex{ vecTableContent.at(0), vecTableContent.at(1), 0, 0, 0, 0 });
-        }
-        else if (vecTableContent.size() == 3)
-        {
+        case 2: // read x,y
+            vecPrimitives.push_back(sPrimitiveVertex{ vecTableContent.at(0), vecTableContent.at(1), 0, (DWORD)-1, 0, 0 });
+            break;
+        case 3: // read x,y,color
             vecPrimitives.push_back(sPrimitiveVertex{ vecTableContent.at(0), vecTableContent.at(1), 0, (DWORD)vecTableContent.at(2), 0, 0 });
-        }
-        else if (vecTableContent.size() == 5)
-        {
+            break;
+        case 4: // read x,y,u,v
+            vecPrimitives.push_back(sPrimitiveVertex{ vecTableContent.at(0), vecTableContent.at(1), 0, (DWORD)-1, vecTableContent.at(2), vecTableContent.at(3) });
+            break;
+        case 5: // read x,y,color,u,v
             vecPrimitives.push_back(sPrimitiveVertex{ vecTableContent.at(0), vecTableContent.at(1), 0, (DWORD)vecTableContent.at(2), vecTableContent.at(3), vecTableContent.at(4) });
+            break;
         }
     }
-    argStream.ReadBool(bPostGUI, false);
 
     if (!argStream.HasErrors())
     {
-        if (vecPrimitives.size() > 2)
+        if (vecPrimitives.size() > 2 && vecPrimitives.size() <= 1024)
         {
             if(pTexture != NULL)
                 g_pCore->GetGraphics()->DrawPrimitivesQueued(primitiveType, vecPrimitives, pTexture->GetMaterialItem(), bPostGUI);
