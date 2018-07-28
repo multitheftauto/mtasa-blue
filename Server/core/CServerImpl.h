@@ -73,7 +73,7 @@ private:
 
     void ShowInfoTag(char* szTag);
     void HandleInput(void);
-	void SelectCommandHistoryEntry(int iEntry);
+    void SelectCommandHistoryEntry(int iEntry);
     void HandlePulseSleep(void);
     void ApplyFrameRateLimit(uint uiUseRate);
 
