@@ -149,6 +149,8 @@ void CLuaGUIDefs::LoadFunctions(void)
 
     CLuaCFunctions::AddFunction("guiWindowSetMovable", GUIWindowSetMovable);
     CLuaCFunctions::AddFunction("guiWindowSetSizable", GUIWindowSetSizable);
+    CLuaCFunctions::AddFunction("guiWindowIsMovable", GUIWindowIsMovable);
+    CLuaCFunctions::AddFunction("guiWindowIsSizable", GUIWindowIsSizable);
 
     CLuaCFunctions::AddFunction("getChatboxLayout", GUIGetChatboxLayout);
 
@@ -252,11 +254,15 @@ void CLuaGUIDefs::AddGuiWindowClass(lua_State* luaVM)
     lua_newclass(luaVM);
 
     lua_classfunction(luaVM, "create", "guiCreateWindow");
+
     lua_classfunction(luaVM, "setMovable", "guiWindowSetMovable");
     lua_classfunction(luaVM, "setSizable", "guiWindowSetSizable");
 
-    lua_classvariable(luaVM, "movable", "guiWindowSetMovable", NULL);
-    lua_classvariable(luaVM, "sizable", "guiWindowSetSizable", NULL);
+    lua_classfunction(luaVM, "isMovable", "guiWindowIsMovable");
+    lua_classfunction(luaVM, "isSizable", "guiWindowIsSizable");
+
+    lua_classvariable(luaVM, "movable", "guiWindowSetMovable", "guiWindowIsMovable");
+    lua_classvariable(luaVM, "sizable", "guiWindowSetSizable", "guiWindowIsSizable");
 
     lua_registerclass(luaVM, "GuiWindow", "GuiElement");
 }
@@ -3273,6 +3279,28 @@ int CLuaGUIDefs::GUIWindowSetMovable(lua_State* luaVM)
     return 1;
 }
 
+int CLuaGUIDefs::GUIWindowIsMovable(lua_State* luaVM)
+{
+    // bool guiWindowIsMovable( element theElement )
+    CClientGUIElement* theElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIWindow>(theElement);
+
+    if (!argStream.HasErrors())
+    {
+        bool movable = static_cast<CGUIWindow*>(theElement->GetCGUIElement())->IsMovable();
+        lua_pushboolean(luaVM, movable);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushnil(luaVM);
+    return 1;
+}
+
 int CLuaGUIDefs::GUIWindowSetSizable(lua_State* luaVM)
 {
     //  bool guiWindowSetSizable ( element theElement, bool status )
@@ -3294,6 +3322,28 @@ int CLuaGUIDefs::GUIWindowSetSizable(lua_State* luaVM)
 
     // error: bad arguments
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIWindowIsSizable(lua_State* luaVM)
+{
+    // bool guiWindowIsSizable( elemen theElement )
+    CClientGUIElement* theElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIWindow>(theElement);
+
+    if (!argStream.HasErrors())
+    {
+        bool sizable = static_cast<CGUIWindow*>(theElement->GetCGUIElement())->IsSizingEnabled();
+        lua_pushboolean(luaVM, sizable);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    
+    // error: bad arguments
+    lua_pushnil(luaVM);
     return 1;
 }
 
