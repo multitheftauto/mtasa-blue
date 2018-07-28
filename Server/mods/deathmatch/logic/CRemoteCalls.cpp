@@ -241,8 +241,8 @@ void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
                 arguments.PushString(std::string(result.pData, result.dataSize));
                 arguments.PushNumber(0);
             }
-            else
-                arguments.ReadFromJSONString(result.pData);
+            else if (arguments.ReadFromJSONString(result.pData))
+                arguments.PushNumber(0);
         }
         else
         {
