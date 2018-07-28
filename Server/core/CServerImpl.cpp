@@ -802,14 +802,14 @@ void CServerImpl::HandleInput(void)
                     // Otherwise, pass the command to the mod's input handler
                     m_pModManager->HandleInput(szCommand);
 
-                    if (szCommand.length() > 0 && (m_szCmdHistory.empty() || m_szCmdHistory.back() != szCommand))
-                        m_szCmdHistory.push_back(szCommand);
+                    if (!szCommand.empty() && (m_vecCommandHistory.empty() || m_vecCommandHistory.back() != szCommand))
+                        m_vecCommandHistory.push_back(szCommand);
                 }
             }
 
             memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
             m_uiInputCount = 0;
-            m_uiSelectedHistoryCmd = -1;
+            m_iSelectedCommandHistoryEntry = -1;
             break;
 
         case KEY_BACKSPACE:            // Backspace
@@ -891,103 +891,25 @@ void CServerImpl::HandleInput(void)
                 case KEY_UP:            // Up-arrow cursor
                 {
                     // If there's nothing to select, break here
-                    if (m_szCmdHistory.empty() || m_uiSelectedHistoryCmd - 1 == -1)
+                    if (m_vecCommandHistory.empty())
                         break;
 
                     // Select the previous command
-                    if (m_uiSelectedHistoryCmd == -1)
-                        m_uiSelectedHistoryCmd = m_szCmdHistory.size() - 1;
+                    int iEntry = m_iSelectedCommandHistoryEntry;
+                    if (iEntry == -1)
+                        iEntry = m_vecCommandHistory.size() - 1;
                     else
-                        m_uiSelectedHistoryCmd--;
+                        iEntry--;
 
-                    // Clear out old buffer
-                    memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
-
-                    // Couldn't get anything else working, so this is a way to clear the line
-                    for (uint i = 0; i < 68; i++)
-                    {
-#ifdef WIN32
-                        Printf("%c %c", 0x08, 0x08);
-#else
-                        if (!g_bSilent && !g_bNoCurses)
-                        {
-                            wprintw(m_wndInput, "%c %c", 0x08, 0x08);
-                        }
-#endif
-                    }
-#ifndef WIN32
-                    wmove(m_wndInput, 0, 0);
-#endif
-                    
-                    // Select our command and fill the input buffer
-                    SString szCommand = m_szCmdHistory[m_uiSelectedHistoryCmd];
-                    m_uiInputCount = szCommand.length();
-                    for (uint i = 0; i < szCommand.length(); i++)
-                        m_szInputBuffer[i] = szCommand[i];
-
-                    // Let's print it out
-                    wchar_t szBuffer[255];
-                    memset(szBuffer, 0, sizeof(szBuffer));
-                    wcsncpy(&szBuffer[0], &m_szInputBuffer[0], m_uiInputCount);
-#ifdef WIN32
-                    Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
-#else
-                    if (!g_bSilent && !g_bNoCurses)
-                        wprintw(m_wndInput, "%s", UTF16ToMbUTF8(szBuffer).c_str());
-#endif
+                    // Select the previous command
+                    SelectCommandHistoryEntry(iEntry);
 
                     break;
                 }
                 case KEY_DOWN:            // Down-arrow cursor
                 {
-                    // If there's nothing to select, break here
-                    if (m_szCmdHistory.empty() || m_uiSelectedHistoryCmd == -1)
-                        break;
-
                     // Select the next command
-                    if (m_uiSelectedHistoryCmd == m_szCmdHistory.size() - 1)
-                        m_uiSelectedHistoryCmd = -1;
-                    else
-                        m_uiSelectedHistoryCmd++;
-
-                    // Clear out old buffer
-                    memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
-
-                    // Couldn't get anything else working, so this is a way to clear the line
-                    for (uint i = 0; i < 68; i++)
-                    {
-#ifdef WIN32
-                        Printf("%c %c", 0x08, 0x08);
-#else
-                        if (!g_bSilent && !g_bNoCurses)
-                        {
-                            wprintw(m_wndInput, "%c %c", 0x08, 0x08);
-                        }
-#endif
-                    }
-#ifndef WIN32
-                    wmove(m_wndInput, 0, 0);
-#endif
-
-                    if (m_uiSelectedHistoryCmd == -1)
-                        break;
-
-                    // Select our command and fill the input buffer
-                    SString szCommand = m_szCmdHistory[m_uiSelectedHistoryCmd];
-                    m_uiInputCount = szCommand.length();
-                    for (uint i = 0; i < szCommand.length(); i++)
-                        m_szInputBuffer[i] = szCommand[i];
-
-                    // Let's print it out
-                    wchar_t szBuffer[255];
-                    memset(szBuffer, 0, sizeof(szBuffer));
-                    wcsncpy(&szBuffer[0], &m_szInputBuffer[0], m_uiInputCount);
-#ifdef WIN32
-                    Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
-#else
-                    if (!g_bSilent && !g_bNoCurses)
-                        wprintw(m_wndInput, "%s", UTF16ToMbUTF8(szBuffer).c_str());
-#endif
+                    SelectCommandHistoryEntry(m_iSelectedCommandHistoryEntry + 1);
 
                     break;
                 }
@@ -1030,6 +952,50 @@ void CServerImpl::HandleInput(void)
 #endif
             break;
     }
+}
+
+void CServerImpl::SelectCommandHistoryEntry(int iEntry)
+{
+    // Check if we're in bounds, otherwise clear selection
+    if (!m_vecCommandHistory.empty() && iEntry >= 0 && iEntry < m_vecCommandHistory.size())
+        m_iSelectedCommandHistoryEntry = iEntry;
+    else
+        m_iSelectedCommandHistoryEntry = -1;
+
+    // Clear out old buffer
+    memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
+
+    // Couldn't get anything else working, so this is a way to clear the line
+#ifdef WIN32
+    for (uint i = 0; i < 80; i++)
+        Printf("%c %c", 0x08, 0x08);
+#else
+    for (uint i = 0; i < COLS; i++)
+        if (!g_bSilent && !g_bNoCurses)
+            wprintw(m_wndInput, "%c %c", 0x08, 0x08);
+    wmove(m_wndInput, 0, 0);
+#endif
+
+    // If we wanted to clear selection, break here
+    if (m_iSelectedCommandHistoryEntry == -1)
+        return;
+
+    // Select our command and fill the input buffer
+    SString szCommand = m_vecCommandHistory[m_iSelectedCommandHistoryEntry];
+    m_uiInputCount = szCommand.length();
+    for (uint i = 0; i < szCommand.length(); i++)
+        m_szInputBuffer[i] = szCommand[i];
+
+    // Let's print it out
+    wchar_t szBuffer[255];
+    memset(szBuffer, 0, sizeof(szBuffer));
+    wcsncpy(&szBuffer[0], &m_szInputBuffer[0], m_uiInputCount);
+#ifdef WIN32
+    Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
+#else
+    if (!g_bSilent && !g_bNoCurses)
+        wprintw(m_wndInput, "%s", UTF16ToMbUTF8(szBuffer).c_str());
+#endif
 }
 
 bool CServerImpl::ParseArguments(int iArgumentCount, char* szArguments[])

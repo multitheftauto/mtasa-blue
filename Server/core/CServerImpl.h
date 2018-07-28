@@ -73,6 +73,7 @@ private:
 
     void ShowInfoTag(char* szTag);
     void HandleInput(void);
+	void SelectCommandHistoryEntry(int iEntry);
     void HandlePulseSleep(void);
     void ApplyFrameRateLimit(uint uiUseRate);
 
@@ -102,8 +103,8 @@ private:
     double m_dLastTimeMs;
     double m_dPrevOverrun;
 
-    std::vector<SString> m_szCmdHistory;
-    int                  m_uiSelectedHistoryCmd = -1;
+    std::vector<SString> m_vecCommandHistory;
+    int                  m_iSelectedCommandHistoryEntry = -1;
 
 #ifdef WIN32
     HANDLE    m_hConsole;
