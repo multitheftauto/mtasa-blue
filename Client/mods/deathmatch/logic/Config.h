@@ -98,9 +98,6 @@ public:
     #error MAX_CHAT_LENGTH "macro can't exceed 255"
 #endif
 
-// Defines how long the whowas list can be
-#define MAX_WHOWAS_LENGTH 1024
-
 // Max valid weather id
 #define MAX_VALID_WEATHER 255
 
