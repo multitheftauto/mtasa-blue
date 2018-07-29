@@ -1681,17 +1681,19 @@ int CMultiplayerSA::AddBirds(CVector& vecStartPosition, CVector& vecDestPosition
 {
     DWORD FUNC_CBirds_Add           = 0x711EF0;
     DWORD VAR_CBirds_nBirdsCreated  = 0xC6A8A4;
+    DWORD dwCheckObstacles          = bCheckObstacles;
 
     float fStartX = vecStartPosition.fX;
     float fStartY = vecStartPosition.fY;
     float fStartZ = vecStartPosition.fZ;
-    float fDestX = vecDestPosition.fX;
-    float fDestY = vecDestPosition.fY;
-    float fDestZ = vecDestPosition.fZ;
+    float fDestX  = vecDestPosition.fX;
+    float fDestY  = vecDestPosition.fY;
+    float fDestZ  = vecDestPosition.fZ;
 
     int iBirdsCreated_before = *(int*)VAR_CBirds_nBirdsCreated;
-    _asm {
-        push    bCheckObstacles
+    _asm
+    {
+        push    dwCheckObstacles
         push    iBirdType
         push    iNumBirds
         push    fDestZ

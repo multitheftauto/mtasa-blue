@@ -1767,11 +1767,9 @@ int CLuaFunctionDefs::GetBirdsEnabled(lua_State* luaVM)
 
 int CLuaFunctionDefs::AddBirds(lua_State* luaVM)
 {
-    CVector          vecStartPosition;
-    CVector          vecDestPosition;
-    int              iNumBirds = 1;
-    int              iBirdType = 0;
-    bool             bCheckObstacles = false;
+    CVector          vecStartPosition, vecDestPosition;
+    int              iNumBirds, iBirdType;
+    bool             bCheckObstacles;
     CScriptArgReader argStream(luaVM);
 
     argStream.ReadVector3D(vecStartPosition);
