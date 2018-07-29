@@ -80,6 +80,9 @@ int CLuaBlipDefs::CreateBlip(lua_State* luaVM)
         argStream.SetCustomError("Invalid icon");
     }
 
+    if (iSize < 0 || iSize > 25)
+        argStream.SetCustomWarning(SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", iSize));
+
     if (!argStream.HasErrors())
     {
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
@@ -140,6 +143,9 @@ int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
     {
         argStream.SetCustomError("Invalid icon");
     }
+
+    if (iSize < 0 || iSize > 25)
+        argStream.SetCustomWarning(SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", iSize));
 
     if (!argStream.HasErrors())
     {
@@ -309,6 +315,9 @@ int CLuaBlipDefs::SetBlipSize(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(iSize);
+
+    if (iSize < 0 || iSize > 25)
+        argStream.SetCustomWarning(SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", iSize));
 
     if (!argStream.HasErrors())
     {
