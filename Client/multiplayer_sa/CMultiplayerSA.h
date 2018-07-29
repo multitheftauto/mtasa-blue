@@ -177,6 +177,7 @@ public:
     void  SetMoonSize(int iSize);
     int   GetMoonSize();
     void  ResetMoonSize();
+    int   AddBirds(CVector& vecStartPosition, CVector& vecDestPosition, int iNumBirds, int iBirdType, bool bCheckObstacles);
 
     void SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled);
     void SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled);

@@ -1764,6 +1764,38 @@ int CLuaFunctionDefs::GetBirdsEnabled(lua_State* luaVM)
     return 1;
 }
 
+
+int CLuaFunctionDefs::AddBirds(lua_State* luaVM)
+{
+    CVector          vecStartPosition;
+    CVector          vecDestPosition;
+    int              iNumBirds = 1;
+    int              iBirdType = 0;
+    bool             bCheckObstacles = false;
+    CScriptArgReader argStream(luaVM);
+
+    argStream.ReadVector3D(vecStartPosition);
+    argStream.ReadVector3D(vecDestPosition);
+    argStream.ReadNumber(iNumBirds, 1);
+    argStream.ReadNumber(iBirdType, 0);
+    argStream.ReadBool(bCheckObstacles, false);
+
+    if (!argStream.HasErrors())
+    {
+        int iBirdsCreated = CStaticFunctionDefinitions::AddBirds(vecStartPosition, vecDestPosition, iNumBirds, iBirdType, bCheckObstacles);
+        if (iBirdsCreated != 0)
+        {
+            lua_pushnumber(luaVM, iBirdsCreated);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaFunctionDefs::SetMoonSize(lua_State* luaVM)
 {
     int iSize;

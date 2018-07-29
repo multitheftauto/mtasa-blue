@@ -349,6 +349,7 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("createSWATRope", CLuaFunctionDefs::CreateSWATRope);
     CLuaCFunctions::AddFunction("setBirdsEnabled", CLuaFunctionDefs::SetBirdsEnabled);
     CLuaCFunctions::AddFunction("getBirdsEnabled", CLuaFunctionDefs::GetBirdsEnabled);
+    CLuaCFunctions::AddFunction("addBirds", CLuaFunctionDefs::AddBirds);
     CLuaCFunctions::AddFunction("setPedTargetingMarkerEnabled", CLuaFunctionDefs::SetPedTargetingMarkerEnabled);
     CLuaCFunctions::AddFunction("isPedTargetingMarkerEnabled", CLuaFunctionDefs::IsPedTargetingMarkerEnabled);
 

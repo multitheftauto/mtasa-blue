@@ -609,6 +609,7 @@ public:
     static bool SetMoonSize(int iSize);
     static bool SetFPSLimit(int iLimit);
     static bool GetFPSLimit(int& iLimit);
+    static int  AddBirds(CVector vecStartPosition, CVector vecDestPosition, int iNumBirds, int iBirdType, bool bCheckObstacles);
 
     // Input functions
     static bool BindKey(const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments);

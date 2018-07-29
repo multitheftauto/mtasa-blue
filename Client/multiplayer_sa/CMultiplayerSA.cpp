@@ -1677,6 +1677,37 @@ void CMultiplayerSA::DisableBirds(bool bDisabled)
     }
 }
 
+int CMultiplayerSA::AddBirds(CVector& vecStartPosition, CVector& vecDestPosition, int iNumBirds, int iBirdType, bool bCheckObstacles)
+{
+    DWORD FUNC_CBirds_Add           = 0x711EF0;
+    DWORD VAR_CBirds_nBirdsCreated  = 0xC6A8A4;
+
+    float fStartX = vecStartPosition.fX;
+    float fStartY = vecStartPosition.fY;
+    float fStartZ = vecStartPosition.fZ;
+    float fDestX = vecDestPosition.fX;
+    float fDestY = vecDestPosition.fY;
+    float fDestZ = vecDestPosition.fZ;
+
+    int iBirdsCreated_before = *(int*)VAR_CBirds_nBirdsCreated;
+    _asm {
+        push    bCheckObstacles
+        push    iBirdType
+        push    iNumBirds
+        push    fDestZ
+        push    fDestY
+        push    fDestX
+        push    fStartZ
+        push    fStartY
+        push    fStartX
+        call    FUNC_CBirds_Add
+        add     esp, 0x24
+    }
+    int iBirdsCreated_after = *(int*)VAR_CBirds_nBirdsCreated;
+
+    return iBirdsCreated_after - iBirdsCreated_before;
+}
+
 void CMultiplayerSA::DisableQuickReload(bool bDisabled)
 {
     if (bDisabled)

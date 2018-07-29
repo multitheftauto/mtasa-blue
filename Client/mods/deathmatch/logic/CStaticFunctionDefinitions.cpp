@@ -6404,6 +6404,11 @@ bool CStaticFunctionDefinitions::SetBirdsEnabled(bool bEnabled)
     return true;
 }
 
+int CStaticFunctionDefinitions::AddBirds(CVector vecStartPosition, CVector vecDestPosition, int iNumBirds, int iBirdType, bool bCheckObstacles)
+{
+    return g_pMultiplayer->AddBirds(vecStartPosition, vecDestPosition, iNumBirds, iBirdType, bCheckObstacles);
+}
+
 bool CStaticFunctionDefinitions::GetBirdsEnabled(void)
 {
     return g_pClientGame->GetBirdsEnabled();
