@@ -532,6 +532,9 @@ public:
     static bool        GUIComboBoxSetSelected(CClientEntity& Entity, int index);
     static std::string GUIComboBoxGetItemText(CClientEntity& Entity, int index);
     static bool        GUIComboBoxSetItemText(CClientEntity& Entity, int index, const char* szText);
+    static int         GUIComboBoxGetItemCount(CClientEntity& Entity);
+    static bool        GUIComboBoxSetState(CClientEntity& Entity, int state);
+    static int         GUIComboBoxGetState(CClientEntity& Entity);
 
     // World functions
     static bool GetTime(unsigned char& ucHour, unsigned char& ucMin);

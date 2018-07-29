@@ -159,6 +159,9 @@ void CLuaGUIDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("guiComboBoxSetSelected", GUIComboBoxSetSelected);
     CLuaCFunctions::AddFunction("guiComboBoxGetItemText", GUIComboBoxGetItemText);
     CLuaCFunctions::AddFunction("guiComboBoxSetItemText", GUIComboBoxSetItemText);
+    CLuaCFunctions::AddFunction("guiComboBoxGetItemCount", GUIComboBoxGetItemCount);
+    CLuaCFunctions::AddFunction("guiComboBoxSetState", GUIComboBoxSetState);
+    CLuaCFunctions::AddFunction("guiComboBoxGetState", GUIComboBoxGetState);
 }
 
 void CLuaGUIDefs::AddClass(lua_State* luaVM)
@@ -361,6 +364,9 @@ void CLuaGUIDefs::AddGuiComboBoxClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "setItemText", "guiComboBoxSetItemText");
     lua_classfunction(luaVM, "setSelected", "guiComboBoxSetSelected");
+    lua_classfunction(luaVM, "getItemCount", "guiComboBoxGetItemCount");
+    lua_classfunction(luaVM, "setState", "guiComboBoxSetState");
+    lua_classfunction(luaVM, "getState", "guiComboBoxGetState");
 
     lua_classvariable(luaVM, "selected", "guiComboBoxSetSelected", "guiComboBoxGetSelected");
 
@@ -3836,6 +3842,71 @@ int CLuaGUIDefs::GUIComboBoxSetItemText(lua_State* luaVM)
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIComboBoxGetItemCount(lua_State* luaVM)
+{
+    // int guiComboBoxGetItemCount( element comboBox )
+    CClientGUIElement* comboBox;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIComboBox>(comboBox);
+
+    if (!argStream.HasErrors())
+    {
+        int items = CStaticFunctionDefinitions::GUIComboBoxGetItemCount(*comboBox);
+        lua_pushnumber(luaVM, items);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIComboBoxSetState(lua_State* luaVM)
+{
+    // int guiComboBoxSetState( element comboBox, int state)
+    CClientGUIElement* comboBox;
+    int state;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIComboBox>(comboBox);
+    argStream.ReadNumber(state);
+
+    if (!argStream.HasErrors())
+    {
+        bool stateb = CStaticFunctionDefinitions::GUIComboBoxSetState(*comboBox, state);
+        lua_pushboolean(luaVM, stateb);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIComboBoxGetState(lua_State* luaVM)
+{
+    // int guiComboBoxGetState( element comboBox )
+    CClientGUIElement* comboBox;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIComboBox>(comboBox);
+
+    if (!argStream.HasErrors())
+    {
+        int statei = CStaticFunctionDefinitions::GUIComboBoxGetState(*comboBox);
+        lua_pushnumber(luaVM, statei);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
     lua_pushboolean(luaVM, false);
     return 1;
 }
