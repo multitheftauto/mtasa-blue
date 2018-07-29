@@ -934,10 +934,12 @@ int CLuaElementDefs::GetElementsWithinRange(lua_State* luaVM)
 {
     CVector position;
     float   radius;
+    SString elementType;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(position);
     argStream.ReadNumber(radius);
+    argStream.ReadString(elementType, "");
 
     if (!argStream.HasErrors())
     {
@@ -950,9 +952,12 @@ int CLuaElementDefs::GetElementsWithinRange(lua_State* luaVM)
 
         for (CClientEntity* entity : result)
         {
-            lua_pushnumber(luaVM, ++index);
-            lua_pushelement(luaVM, entity);
-            lua_settable(luaVM, -3);
+            if (elementType.empty() || elementType == entity->GetTypeName())
+            {
+                lua_pushnumber(luaVM, ++index);
+                lua_pushelement(luaVM, entity);
+                lua_settable(luaVM, -3);
+            }
         }
 
         return 1;
