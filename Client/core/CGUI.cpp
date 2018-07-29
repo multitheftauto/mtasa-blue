@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include <windowsx.h>
 
 using std::string;
 
@@ -541,7 +542,7 @@ bool CLocalGUI::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 return true;
 
             case WM_MOUSEMOVE:
-                pGUI->ProcessMouseInput(CGUI_MI_MOUSEPOS, LOWORD(lParam), HIWORD(lParam));
+                pGUI->ProcessMouseInput(CGUI_MI_MOUSEPOS, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
                 return true;
 
             case WM_LBUTTONDOWN:

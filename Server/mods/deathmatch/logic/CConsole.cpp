@@ -12,7 +12,7 @@
 #include "StdInc.h"
 
 CConsole::CConsole(CBlipManager* pBlipManager, CMapManager* pMapManager, CPlayerManager* pPlayerManager, CRegisteredCommands* pRegisteredCommands,
-                   CVehicleManager* pVehicleManager, CLuaManager* pLuaManager, CWhoWas* pWhoWas, CBanManager* pBanManager,
+                   CVehicleManager* pVehicleManager, CLuaManager* pLuaManager, CBanManager* pBanManager,
                    CAccessControlListManager* pACLManager)
 {
     // Init
@@ -22,7 +22,6 @@ CConsole::CConsole(CBlipManager* pBlipManager, CMapManager* pMapManager, CPlayer
     m_pRegisteredCommands = pRegisteredCommands;
     m_pVehicleManager = pVehicleManager;
     m_pLuaManager = pLuaManager;
-    m_pWhoWas = pWhoWas;
     m_pBanManager = pBanManager;
     m_pACLManager = pACLManager;
 }
