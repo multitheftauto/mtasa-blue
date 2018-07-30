@@ -1,66 +1,61 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CElementGroup.cpp
-*  PURPOSE:     Static element array management class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CElementGroup.cpp
+ *  PURPOSE:     Static element array management class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
 using namespace std;
 
-CStack <ElementID, MAX_SERVER_ELEMENTS - 2 > CElementIDs::m_UniqueIDs;
-SFixedArray < CElement*, MAX_SERVER_ELEMENTS > CElementIDs::m_Elements;
+CStack<ElementID, MAX_SERVER_ELEMENTS - 2>  CElementIDs::m_UniqueIDs;
+SFixedArray<CElement*, MAX_SERVER_ELEMENTS> CElementIDs::m_Elements;
 
-void CElementIDs::Initialize ( void )
+void CElementIDs::Initialize(void)
 {
-    memset ( &m_Elements[0], 0, sizeof ( m_Elements ) );
+    memset(&m_Elements[0], 0, sizeof(m_Elements));
 }
 
-
-ElementID CElementIDs::PopUniqueID ( CElement* pElement )
+ElementID CElementIDs::PopUniqueID(CElement* pElement)
 {
     // Grab the ID and check that we had more left
     ElementID ID;
-    if ( m_UniqueIDs.Pop (ID) && ID != INVALID_ELEMENT_ID )
+    if (m_UniqueIDs.Pop(ID) && ID != INVALID_ELEMENT_ID)
     {
-        assert( ID < MAX_SERVER_ELEMENTS );
-        m_Elements [ID.Value()] = pElement;
+        assert(ID < MAX_SERVER_ELEMENTS);
+        m_Elements[ID.Value()] = pElement;
     }
 
     return ID;
 }
 
-
-void CElementIDs::PushUniqueID ( ElementID ID )
+void CElementIDs::PushUniqueID(ElementID ID)
 {
     // Push the ID back and NULL the entity there
-    if ( ID != INVALID_ELEMENT_ID && ID < MAX_SERVER_ELEMENTS )
+    if (ID != INVALID_ELEMENT_ID && ID < MAX_SERVER_ELEMENTS)
     {
-        m_UniqueIDs.Push ( ID );
-        m_Elements [ID.Value()] = NULL;
+        m_UniqueIDs.Push(ID);
+        m_Elements[ID.Value()] = NULL;
     }
 }
 
-
-void CElementIDs::PushUniqueID ( CElement* pElement )
+void CElementIDs::PushUniqueID(CElement* pElement)
 {
-    PushUniqueID ( pElement->GetID () );
+    PushUniqueID(pElement->GetID());
 }
 
-
-CElement* CElementIDs::GetElement ( ElementID ID )
+CElement* CElementIDs::GetElement(ElementID ID)
 {
     // Return the element with the given ID
-    if ( ID != INVALID_ELEMENT_ID && ID < MAX_SERVER_ELEMENTS )
+    if (ID != INVALID_ELEMENT_ID && ID < MAX_SERVER_ELEMENTS)
     {
-        CElement* pElement = m_Elements [ID.Value()];
-        if ( pElement && !pElement->IsBeingDeleted () )
+        CElement* pElement = m_Elements[ID.Value()];
+        if (pElement && !pElement->IsBeingDeleted())
             return pElement;
     }
 

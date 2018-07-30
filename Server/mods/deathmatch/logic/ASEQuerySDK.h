@@ -107,8 +107,9 @@ under the "SDK test" filter.
 
 actual .h stuff follows
 */
-extern "C" {
-    extern int ASEQuery_initialize(int hostport, int internet, char *address);
+extern "C"
+{
+    extern int ASEQuery_initialize(int hostport, int internet, char* address);
 
     extern void ASEQuery_shutdown(void);
 
@@ -118,9 +119,10 @@ extern "C" {
     void ASEQuery_wantrules(void);
     void ASEQuery_wantplayers(void);
 
-    extern void ASEQuery_status(const char *hostname, const char *gametype, const char *mapname, const char *gamever, int password, int numplayers, int maxplayers);
-    extern void ASEQuery_addrule(const char *key, const char *value);
-    extern void ASEQuery_addplayer(const char *name, const char *team, const char *skin, const char *score, const char *ping, const char *time);
+    extern void ASEQuery_status(const char* hostname, const char* gametype, const char* mapname, const char* gamever, int password, int numplayers,
+                                int maxplayers);
+    extern void ASEQuery_addrule(const char* key, const char* value);
+    extern void ASEQuery_addplayer(const char* name, const char* team, const char* skin, const char* score, const char* ping, const char* time);
 
-    extern char *ASEQuery_error;
+    extern char* ASEQuery_error;
 }

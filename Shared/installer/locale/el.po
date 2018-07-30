@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -12,8 +12,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Translators: Alex Georgiou; ccw\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: Alex \"Dredd\" Georgiou; ccw\n"
 "X-POOTLE-MTIME: 1517636800.0\n"
 
 #. GET_XPVISTA_PLEASE
@@ -45,11 +45,9 @@ msgid ""
 "\n"
 "Click Next to continue."
 msgstr ""
-"Αυτός ο οδηγός θα σας καθοδηγήσει μέσα από την εγκατάσταση ή την ενημέρωση "
-"των $(^Name) ${REVISION_TAG}\n"
+"Αυτός ο οδηγός θα σας καθοδηγήσει μέσα από την εγκατάσταση ή την ενημέρωση των $(^Name) ${REVISION_TAG}\n"
 "\n"
-"Συνιστάται να κλείσετε όλες τις άλλες εφαρμογές πριν ξεκινήσετε την "
-"εγκατάσταση.\n"
+"Συνιστάται να κλείσετε όλες τις άλλες εφαρμογές πριν ξεκινήσετε την εγκατάσταση.\n"
 "\n"
 "[Η άδεια διαχειριστή μπορεί να ζητηθεί για τις εκδόσεις Vista και πάνω]\n"
 "\n"
@@ -76,8 +74,7 @@ msgid ""
 msgstr ""
 "Παρακαλώ επιλέξτε τον φάκελο του Grand Theft Auto: San Andreas.$\n"
 "$\n"
-"ΠΡΕΠΕΙ να έχετε το Grand Theft Auto: San Andreas 1.0 εγκαταστημένο για να "
-"χρησιμοποιήσετε το MTA:SA, δεν υποστηρίζει άλλες εκδόσεις.$\n"
+"ΠΡΕΠΕΙ να έχετε το Grand Theft Auto: San Andreas 1.0 εγκαταστημένο για να χρησιμοποιήσετε το MTA:SA, δεν υποστηρίζει άλλες εκδόσεις.$\n"
 "$\n"
 "Πατήστε Εγκατάσταση για να αρχίσετε την εγκατάσταση."
 
@@ -90,8 +87,8 @@ msgstr "Δημιουργήστε μια ομάδα στο μενού έναρξ�
 #: ../Shared/installer/nightly.nsi:195
 msgid "Create a Desktop Shortcut for the MTA:SA Client."
 msgstr ""
-"Δημιουργήστε μια συντόμευση στην επιφάνεια εργασίας για το MTA:SA "
-"πρόγραμμα-πελάτης."
+"Δημιουργήστε μια συντόμευση στην επιφάνεια εργασίας για το MTA:SA πρόγραμμα-"
+"πελάτης."
 
 #. DESC_Section12
 #: ../Shared/installer/nightly.nsi:196
@@ -131,7 +128,8 @@ msgstr ""
 #. DESC_Section4
 #: ../Shared/installer/nightly.nsi:204
 msgid "The Multi Theft Auto server. This is a required component."
-msgstr "Ο διακομιστής του Multi Theft Auto. Αυτό είναι ένα απαραίτητο στοιχείο."
+msgstr ""
+"Ο διακομιστής του Multi Theft Auto. Αυτό είναι ένα απαραίτητο στοιχείο."
 
 #. DESC_Section5
 #: ../Shared/installer/nightly.nsi:205
@@ -175,8 +173,8 @@ msgid ""
 "Development code and tools that aid in the creation of mods for Multi Theft "
 "Auto"
 msgstr ""
-"Ο κώδικας και τα εργαλεία ανάπτυξης που σε βοηθούν στη δημιουργία μετατροπών "
-"για το Multi Theft Auto"
+"Ο κώδικας και τα εργαλεία ανάπτυξης που σε βοηθούν στη δημιουργία μετατροπών"
+" για το Multi Theft Auto"
 
 #. DESC_SectionGroupClient
 #: ../Shared/installer/nightly.nsi:212
@@ -259,8 +257,10 @@ msgid ""
 "$\n"
 "Please reinstall if there are problems later."
 msgstr ""
-"Δεν βρέθηκε έγκυρη έκδοση των Windows του Grand Theft Auto: San Andreas.$\r$\n"
-"Ωστόσο η εγκατάσταση θα συνεχίσει.$\r$\n"
+"Δεν βρέθηκε έγκυρη έκδοση των Windows του Grand Theft Auto: San Andreas.$\r"
+"$\n"
+"Ωστόσο η εγκατάσταση θα συνεχίσει.$\r"
+"$\n"
 "Παρακαλώ επανεγκαταστήστε αν υπάρξουν προβλήματα αργότερα."
 
 #. INST_SEC_CORE_RESOURCES
@@ -311,11 +311,11 @@ msgid ""
 "$\n"
 "Run the new installer to upgrade and preserve your settings."
 msgstr ""
-"Απεγκατάσταση πριν την ενημέρωση;$\r$\n"
-"Δεν είναι απαραίτητη η απεγκατάσταση πριν την εγκατάσταση μιας νεότερης "
-"έκδοσης του MTA:SA$\r$\n"
-"Τρέξτε το νέο πρόγραμμα εγκατάστασης για την αναβάθμιση και την διατήρηση "
-"των ρυθμίσεων σας."
+"Απεγκατάσταση πριν την ενημέρωση;$\r"
+"$\n"
+"Δεν είναι απαραίτητη η απεγκατάσταση πριν την εγκατάσταση μιας νεότερης έκδοσης του MTA:SA$\r"
+"$\n"
+"Τρέξτε το νέο πρόγραμμα εγκατάστασης για την αναβάθμιση και την διατήρηση των ρυθμίσεων σας."
 
 #. UNINST_DATA_REQUEST
 #: ../Shared/installer/nightly.nsi:1044
@@ -377,11 +377,9 @@ msgid ""
 "MTA is designed for major versions to be installed in different paths.$\n"
 " Are you sure you want to overwrite MTA $1 at $INSTDIR ?"
 msgstr ""
-"Μια διαφορετική σημαντική έκδοση του MTA ($1) υπάρχει ήδη σε αυτόν τον "
-"προορισμό.$\n"
+"Μια διαφορετική σημαντική έκδοση του MTA ($1) υπάρχει ήδη σε αυτόν τον προορισμό.$\n"
 "$\n"
-"Το MTA έχει σχεδιαστεί ώστε οι σημαντικές εκδόσεις να είναι εγκατεστημένες "
-"σε διαφορετικούς προορισμούς.$\n"
+"Το MTA έχει σχεδιαστεί ώστε οι σημαντικές εκδόσεις να είναι εγκατεστημένες σε διαφορετικούς προορισμούς.$\n"
 "Είσαι σίγουρος ότι θες να αντικαταστήσεις MTA $1 στο $INSTDIR ;"
 
 #. INST_GTA_CONFLICT
@@ -441,10 +439,8 @@ msgid ""
 "$\n"
 " Click Next to continue."
 msgstr ""
-"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} θα εγκατασταθεί στο ακόλουθο "
-"φάκελο.$\n"
-"Για να εγκαταστήσετε σε έναν διαφορετικό φάκελο, πατήστε Περιήγηση και "
-"επιλέξτε άλλον φάκελο.$\n"
+"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} θα εγκατασταθεί στο ακόλουθο φάκελο.$\n"
+"Για να εγκαταστήσετε σε έναν διαφορετικό φάκελο, πατήστε Περιήγηση και επιλέξτε άλλον φάκελο.$\n"
 "$\n"
 " Πατήστε Επόμενο για να συνεχίσετε."
 
@@ -530,6 +526,8 @@ msgstr "Παρακαλώ εξασφαλίστε ότι το πρόγραμμα �
 #~ "$\n"
 #~ "Please reinstall if there are problems later."
 #~ msgstr ""
-#~ "Δεν είναι δυνατή η λήψη του Microsoft Visual Studio 2013 redistributable.$\r$\n"
-#~ "Ωστόσο η εγκατάσταση θα συνεχίσει.$\r$\n"
+#~ "Δεν είναι δυνατή η λήψη του Microsoft Visual Studio 2013 redistributable.$\r"
+#~ "$\n"
+#~ "Ωστόσο η εγκατάσταση θα συνεχίσει.$\r"
+#~ "$\n"
 #~ "Παρακαλώ επανεγκαταστήστε αν προκύψουν προβλήματα αργότερα."

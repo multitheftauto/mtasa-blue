@@ -1,20 +1,18 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CMapEvent.cpp
-*  PURPOSE:     Map event class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*               Chris McArthur <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CMapEvent.cpp
+ *  PURPOSE:     Map event class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-CMapEvent::CMapEvent ( CLuaMain* pMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod )
+CMapEvent::CMapEvent(CLuaMain* pMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority,
+                     float fPriorityMod)
 {
     // Init
     m_pMain = pMain;
@@ -24,27 +22,23 @@ CMapEvent::CMapEvent ( CLuaMain* pMain, const char* szName, const CLuaFunctionRe
     m_bBeingDestroyed = false;
     m_eventPriority = eventPriority;
     m_fPriorityMod = fPriorityMod;
-    m_strName.AssignLeft ( szName, MAPEVENT_MAX_LENGTH_NAME );
+    m_strName.AssignLeft(szName, MAPEVENT_MAX_LENGTH_NAME);
 }
 
-
-CMapEvent::~CMapEvent ( void )
+CMapEvent::~CMapEvent(void)
 {
 }
 
-
-void CMapEvent::Call ( const CLuaArguments& Arguments )
+void CMapEvent::Call(const CLuaArguments& Arguments)
 {
-    if ( m_pMain )
+    if (m_pMain)
     {
         // Call our function with the given arguments
-        Arguments.Call ( m_pMain, m_iLuaFunction );
+        Arguments.Call(m_pMain, m_iLuaFunction);
     }
 }
 
-bool CMapEvent::IsHigherPriorityThan ( const CMapEvent* pOther )
+bool CMapEvent::IsHigherPriorityThan(const CMapEvent* pOther)
 {
-    return m_eventPriority > pOther->m_eventPriority ||
-         ( m_eventPriority == pOther->m_eventPriority &&
-           m_fPriorityMod > pOther->m_fPriorityMod );
+    return m_eventPriority > pOther->m_eventPriority || (m_eventPriority == pOther->m_eventPriority && m_fPriorityMod > pOther->m_fPriorityMod);
 }

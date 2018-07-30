@@ -1,18 +1,17 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CConnectHistory.cpp
-*  PURPOSE:     Client connection history class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CConnectHistory.cpp
+ *  PURPOSE:     Client connection history class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-CConnectHistory::CConnectHistory ( unsigned long ulMaxConnections, unsigned long ulSamplePeriod, unsigned long ulBanLength )
+CConnectHistory::CConnectHistory(unsigned long ulMaxConnections, unsigned long ulSamplePeriod, unsigned long ulBanLength)
 {
     m_ulMaxConnections = ulMaxConnections;
     m_ulSamplePeriod = ulSamplePeriod;
@@ -22,56 +21,54 @@ CConnectHistory::CConnectHistory ( unsigned long ulMaxConnections, unsigned long
 }
 
 // Add flood candidate connection attempt and return true if flooding is occurring
-bool CConnectHistory::AddConnect ( const string& strIP )
+bool CConnectHistory::AddConnect(const string& strIP)
 {
     // See if banned first
-    if ( IsFlooding ( strIP ) )
+    if (IsFlooding(strIP))
         return true;
 
     // Get history for this IP
-    CConnectHistoryItem& historyItem = GetHistoryItem ( strIP );
+    CConnectHistoryItem& historyItem = GetHistoryItem(strIP);
 
     // Add time of this allowed connection
-    historyItem.joinTimes.push_back ( GetModuleTickCount64 () );
+    historyItem.joinTimes.push_back(GetModuleTickCount64());
     return false;
 }
 
-
 // Check if IP is currently flooding
-bool CConnectHistory::IsFlooding ( const string& strIP )
+bool CConnectHistory::IsFlooding(const string& strIP)
 {
     // Delete the expired entries
-    RemoveExpired ();
+    RemoveExpired();
 
     // Get history for this IP
-    CConnectHistoryItem& historyItem = GetHistoryItem ( strIP );
+    CConnectHistoryItem& historyItem = GetHistoryItem(strIP);
 
     // Check if inside ban time
-    if ( GetModuleTickCount64 () < historyItem.llBanEndTime )
+    if (GetModuleTickCount64() < historyItem.llBanEndTime)
         return true;
 
     // Check if too many connections
-    if ( historyItem.joinTimes.size () > m_ulMaxConnections )
+    if (historyItem.joinTimes.size() > m_ulMaxConnections)
     {
         // Begin timed ban
-        historyItem.llBanEndTime = GetModuleTickCount64 () + m_ulBanLength;
+        historyItem.llBanEndTime = GetModuleTickCount64() + m_ulBanLength;
         return true;
     }
 
     return false;
 }
 
-
-CConnectHistoryItem& CConnectHistory::GetHistoryItem ( const string& strIP )
+CConnectHistoryItem& CConnectHistory::GetHistoryItem(const string& strIP)
 {
     // Find existing
-    HistoryItemMap::iterator iter = m_HistoryItemMap.find ( strIP );
+    HistoryItemMap::iterator iter = m_HistoryItemMap.find(strIP);
 
-    if ( iter == m_HistoryItemMap.end () )
+    if (iter == m_HistoryItemMap.end())
     {
         // Add if not found
         m_HistoryItemMap[strIP] = CConnectHistoryItem();
-        iter = m_HistoryItemMap.find ( strIP );
+        iter = m_HistoryItemMap.find(strIP);
     }
 
 #if MTA_DEBUG
@@ -94,102 +91,99 @@ CConnectHistoryItem& CConnectHistory::GetHistoryItem ( const string& strIP )
     return iter->second;
 }
 
-
-void CConnectHistory::RemoveExpired ( void )
+void CConnectHistory::RemoveExpired(void)
 {
-    long long llCurrentTime = GetModuleTickCount64 ();
+    long long llCurrentTime = GetModuleTickCount64();
 
-    if ( llCurrentTime - m_llTimeLastRemoveExpired < 1000LL )
+    if (llCurrentTime - m_llTimeLastRemoveExpired < 1000LL)
         return;
 
     m_llTimeLastRemoveExpired = llCurrentTime;
 
     // Step through each IP's connect history
-    HistoryItemMap ::iterator mapIt = m_HistoryItemMap.begin ();
-    while ( mapIt != m_HistoryItemMap.end () )
+    HistoryItemMap ::iterator mapIt = m_HistoryItemMap.begin();
+    while (mapIt != m_HistoryItemMap.end())
     {
         CConnectHistoryItem& historyItem = mapIt->second;
 
         // Don't expire until any ban is finished
-        if ( llCurrentTime < historyItem.llBanEndTime )
+        if (llCurrentTime < historyItem.llBanEndTime)
         {
             ++mapIt;
             continue;
         }
 
         // Find point in the joinTimes list where the time is too old
-        JoinTimesMap ::iterator timesIt = historyItem.joinTimes.begin ();
-        for ( ; timesIt < historyItem.joinTimes.end () ; ++timesIt )
+        JoinTimesMap ::iterator timesIt = historyItem.joinTimes.begin();
+        for (; timesIt < historyItem.joinTimes.end(); ++timesIt)
         {
-            if ( *timesIt > llCurrentTime - (long long)m_ulSamplePeriod )
+            if (*timesIt > llCurrentTime - (long long)m_ulSamplePeriod)
                 break;
         }
 
-        if ( timesIt == historyItem.joinTimes.end () )
+        if (timesIt == historyItem.joinTimes.end())
         {
             // All times are too old
-            historyItem.joinTimes.clear ();
+            historyItem.joinTimes.clear();
         }
-        else
-        if ( timesIt != historyItem.joinTimes.begin () )
+        else if (timesIt != historyItem.joinTimes.begin())
         {
             // Some times are too old
-            historyItem.joinTimes.erase ( historyItem.joinTimes.begin (), timesIt );
+            historyItem.joinTimes.erase(historyItem.joinTimes.begin(), timesIt);
         }
 
-        // Remove history item for this IP if there are no join times left (postfix ++ here ensures that a copy of the current pointer is used to call erase, hence causing no invalidation)
-        if ( historyItem.joinTimes.empty () )
-            m_HistoryItemMap.erase ( mapIt++ );
+        // Remove history item for this IP if there are no join times left (postfix ++ here ensures that a copy of the current pointer is used to call erase,
+        // hence causing no invalidation)
+        if (historyItem.joinTimes.empty())
+            m_HistoryItemMap.erase(mapIt++);
         else
             ++mapIt;
     }
 }
 
-
-uint CConnectHistory::GetTotalFloodingCount ( void )
+uint CConnectHistory::GetTotalFloodingCount(void)
 {
     // Delete the expired entries
-    RemoveExpired ();
+    RemoveExpired();
 
-    return m_HistoryItemMap.size ();
+    return m_HistoryItemMap.size();
 }
 
 // Internal function for debugging
-long long CConnectHistory::GetModuleTickCount64 ( void )
+long long CConnectHistory::GetModuleTickCount64(void)
 {
     long long llValue = ::GetModuleTickCount64();
     llValue += m_llDebugTickCountOffset;
     return llValue;
 }
 
-
-SString CConnectHistory::DebugDump ( long long llTickCountAdd )
+SString CConnectHistory::DebugDump(long long llTickCountAdd)
 {
     m_llDebugTickCountOffset += llTickCountAdd;
 
     // Dump info
     std::stringstream strOutput;
 
-    long long llCurrentTime = GetModuleTickCount64 ();
-    strOutput << SString( "CurrentTime: 0x%llx\n", llCurrentTime );
-    strOutput << SString( "TimeLastRemoveExpired: 0x%llx\n", m_llTimeLastRemoveExpired );
-    strOutput << SString( "HistoryItems: %d\n", m_HistoryItemMap.size() );
-    strOutput << SString( "TickCountAdd: 0x%llx\n", llTickCountAdd );
-    strOutput << SString( "DebugTickCountOffset: 0x%llx\n", m_llDebugTickCountOffset );
+    long long llCurrentTime = GetModuleTickCount64();
+    strOutput << SString("CurrentTime: 0x%llx\n", llCurrentTime);
+    strOutput << SString("TimeLastRemoveExpired: 0x%llx\n", m_llTimeLastRemoveExpired);
+    strOutput << SString("HistoryItems: %d\n", m_HistoryItemMap.size());
+    strOutput << SString("TickCountAdd: 0x%llx\n", llTickCountAdd);
+    strOutput << SString("DebugTickCountOffset: 0x%llx\n", m_llDebugTickCountOffset);
 
     // Step through each IP's connect history
-    for ( HistoryItemMap::iterator mapIt = m_HistoryItemMap.begin () ; mapIt != m_HistoryItemMap.end (); ++mapIt )
+    for (HistoryItemMap::iterator mapIt = m_HistoryItemMap.begin(); mapIt != m_HistoryItemMap.end(); ++mapIt)
     {
-        const SString& strIP = mapIt->first;
+        const SString&             strIP = mapIt->first;
         const CConnectHistoryItem& historyItem = mapIt->second;
-        if ( !historyItem.joinTimes.empty () )
+        if (!historyItem.joinTimes.empty())
         {
-            SString strInfo ( "IP:%s  ", strIP.c_str () );
-            for ( unsigned int i = 0 ; i < historyItem.joinTimes.size () ; i++ )
+            SString strInfo("IP:%s  ", strIP.c_str());
+            for (unsigned int i = 0; i < historyItem.joinTimes.size(); i++)
             {
                 long long llTime = historyItem.joinTimes[i];
                 long long llAge = llCurrentTime - historyItem.joinTimes[i];
-                strInfo += SString ( "%lld(0x%llx)  ", llAge, llTime );
+                strInfo += SString("%lld(0x%llx)  ", llAge, llTime);
             }
             strInfo += "\n";
             strOutput << strInfo;

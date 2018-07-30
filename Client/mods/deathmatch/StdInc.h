@@ -77,6 +77,7 @@
 #include <CClientStreamSectorRow.h>
 #include <CClientTask.h>
 #include <CClientTXD.h>
+#include <CClientIFP.h>
 #include <CClientWater.h>
 #include <CClientWeapon.h>
 #include <CClientRenderElement.h>
@@ -94,6 +95,9 @@
 #include <CMapEventManager.h>
 #include <CClientModelManager.h>
 #include <CModelNames.h>
+#include <CIFPEngine.h>
+#include <CFileReader.h>
+#include <CIFPAnimations.h>
 #include <CScriptFile.h>
 #include <CWeaponNames.h>
 #include <CVehicleNames.h>
@@ -155,5 +159,3 @@
 #include "logic/CStaticFunctionDefinitions.h"
 #include "logic/CResourceFileDownloadManager.h"
 #include "../../version.h"
-
-

@@ -1,20 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        Shared/sdk/net/Packets.h
-*  PURPOSE:     Packet enumeration
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Oliver Brown <>
-*               Kent Simon <>
-*               Jax <>
-*               Kevin Whiteside <kevuwk@gmail.com>
-*               Stanislav Bobrov <lil_toady@hotmail.com>
-*               Alberto Alonso <rydencillo@gmail.com>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Shared/sdk/net/Packets.h
+ *  PURPOSE:     Packet enumeration
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #pragma once
 

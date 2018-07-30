@@ -1,19 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CCustomData.h
-*  PURPOSE:     Custom entity data class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Ed Lyons <>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CCustomData.h
+ *  PURPOSE:     Custom entity data class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CCUSTOMDATA_H
-#define __CCUSTOMDATA_H
+#pragma once
 
 #include <core/CServerInterface.h>
 #include "lua/CLuaArgument.h"
@@ -24,39 +20,35 @@
 
 struct SCustomData
 {
-    CLuaArgument        Variable;
-    bool                bSynchronized;
+    CLuaArgument Variable;
+    bool         bSynchronized;
 };
 
 class CCustomData
 {
 public:
+    void Copy(CCustomData* pCustomData);
 
-    void                    Copy                    ( CCustomData* pCustomData );
+    SCustomData* Get(const char* szName);
+    SCustomData* GetSynced(const char* szName);
+    void         Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true);
 
-    SCustomData*            Get                     ( const char* szName );
-    SCustomData*            GetSynced               ( const char* szName );
-    void                    Set                     ( const char* szName, const CLuaArgument& Variable, bool bSynchronized = true );
+    bool Delete(const char* szName);
 
-    bool                    Delete                  ( const char* szName );
+    unsigned short CountOnlySynchronized(void);
 
-    unsigned short          CountOnlySynchronized   ( void );
+    CXMLNode* OutputToXML(CXMLNode* pNode);
 
-    CXMLNode *              OutputToXML             ( CXMLNode * pNode );
+    std::map<std::string, SCustomData>::const_iterator IterBegin(void) { return m_Data.begin(); }
+    std::map<std::string, SCustomData>::const_iterator IterEnd(void) { return m_Data.end(); }
 
-    std::map < std::string, SCustomData > :: const_iterator IterBegin   ( void )   { return m_Data.begin (); }
-    std::map < std::string, SCustomData > :: const_iterator IterEnd     ( void )   { return m_Data.end (); }
-
-    std::map < std::string, SCustomData > :: const_iterator SyncedIterBegin   ( void )   { return m_SyncedData.begin (); }
-    std::map < std::string, SCustomData > :: const_iterator SyncedIterEnd     ( void )   { return m_SyncedData.end (); }
+    std::map<std::string, SCustomData>::const_iterator SyncedIterBegin(void) { return m_SyncedData.begin(); }
+    std::map<std::string, SCustomData>::const_iterator SyncedIterEnd(void) { return m_SyncedData.end(); }
 
 private:
-    bool                    DeleteSynced            ( const char* szName );
-    void                    UpdateSynced            ( const char* szName, const CLuaArgument& Variable, bool bSynchronized );
+    bool DeleteSynced(const char* szName);
+    void UpdateSynced(const char* szName, const CLuaArgument& Variable, bool bSynchronized);
 
-
-    std::map < std::string, SCustomData >       m_Data;
-    std::map < std::string, SCustomData >       m_SyncedData;
+    std::map<std::string, SCustomData> m_Data;
+    std::map<std::string, SCustomData> m_SyncedData;
 };
-
-#endif

@@ -1,94 +1,87 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CAccessControlListGroup.cpp
-*  PURPOSE:     Access control list group definition class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Oliver Brown <>
-*               aru <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CAccessControlListGroup.cpp
+ *  PURPOSE:     Access control list group definition class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-
-CAccessControlListGroup::CAccessControlListGroup ( const char* szGroupName )
+CAccessControlListGroup::CAccessControlListGroup(const char* szGroupName)
 {
-    m_uiScriptID = CIdArray::PopUniqueId ( this, EIdClass::ACL_GROUP );
+    m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::ACL_GROUP);
     m_strGroupName = szGroupName;
 }
 
-
-CAccessControlListGroup::~CAccessControlListGroup ( void )
+CAccessControlListGroup::~CAccessControlListGroup(void)
 {
-    CIdArray::PushUniqueId ( this, EIdClass::ACL_GROUP, m_uiScriptID );
-    ObjectList::iterator iter = m_Objects.begin ();
-    for ( ; iter != m_Objects.end (); iter++ )
+    CIdArray::PushUniqueId(this, EIdClass::ACL_GROUP, m_uiScriptID);
+    ObjectList::iterator iter = m_Objects.begin();
+    for (; iter != m_Objects.end(); iter++)
     {
         delete *iter;
     }
 
-    m_Objects.clear ();
-    m_ObjectsById.clear ();
-    OnChange ();
+    m_Objects.clear();
+    m_ObjectsById.clear();
+    OnChange();
 }
 
-
-CAccessControlListGroupObject* CAccessControlListGroup::AddObject ( const char* szObjectName, CAccessControlListGroupObject::EObjectType eObjectType )
+CAccessControlListGroupObject* CAccessControlListGroup::AddObject(const char* szObjectName, CAccessControlListGroupObject::EObjectType eObjectType)
 {
-    const SString strKey = CAccessControlListGroupObject::GenerateKey ( szObjectName, eObjectType );
-    ObjectMap::const_iterator iter = m_ObjectsById.find ( strKey );
+    const SString             strKey = CAccessControlListGroupObject::GenerateKey(szObjectName, eObjectType);
+    ObjectMap::const_iterator iter = m_ObjectsById.find(strKey);
 
-    if ( iter != m_ObjectsById.end() )
+    if (iter != m_ObjectsById.end())
     {
         return iter->second;
     }
 
-    CAccessControlListGroupObject* pObject = new CAccessControlListGroupObject ( szObjectName, eObjectType );
-    m_Objects.push_back ( pObject );
-    m_ObjectsById.insert ( ObjectMap::value_type ( pObject->GetObjectKey(), pObject ) );
+    CAccessControlListGroupObject* pObject = new CAccessControlListGroupObject(szObjectName, eObjectType);
+    m_Objects.push_back(pObject);
+    m_ObjectsById.insert(ObjectMap::value_type(pObject->GetObjectKey(), pObject));
 
-    OnChange ();
+    OnChange();
     return pObject;
 }
 
-
-bool CAccessControlListGroup::FindObjectMatch ( const char* szObjectName, CAccessControlListGroupObject::EObjectType eObjectType )
+bool CAccessControlListGroup::FindObjectMatch(const char* szObjectName, CAccessControlListGroupObject::EObjectType eObjectType)
 {
-    const SString strKey = CAccessControlListGroupObject::GenerateKey ( szObjectName, eObjectType );
+    const SString strKey = CAccessControlListGroupObject::GenerateKey(szObjectName, eObjectType);
 
     // Look through the list for a matching name. If we find one, return true.
-    ObjectMap::const_iterator iterFind = m_ObjectsById.find ( strKey );
-    if ( iterFind != m_ObjectsById.end() )
+    ObjectMap::const_iterator iterFind = m_ObjectsById.find(strKey);
+    if (iterFind != m_ObjectsById.end())
     {
         return true;
     }
 
     // Loop through our list again for wildchar finding
-    char strName [256];
+    char strName[256];
     strName[255] = '\0';
-    ObjectList::iterator iter = m_Objects.begin ();
-    for ( ; iter != m_Objects.end (); iter++ )
+    ObjectList::iterator iter = m_Objects.begin();
+    for (; iter != m_Objects.end(); iter++)
     {
         // Matching type (resource/user)
-        if ( eObjectType == (*iter)->GetObjectType () )
+        if (eObjectType == (*iter)->GetObjectType())
         {
             // Grab object name and string length
-            const char* szName = (*iter)->GetObjectName ();
-            int iLen = strlen ( szName );
+            const char* szName = (*iter)->GetObjectName();
+            int         iLen = strlen(szName);
 
             // Long enough string and this is a wildchar entry?
-            if ( iLen > 0 && szName [iLen - 1] == '*' )
+            if (iLen > 0 && szName[iLen - 1] == '*')
             {
                 // Copy the namestring and remove it's wildchar character
-                strncpy ( strName, szName, 255 );
-                strName [iLen - 1] = '\0';
+                strncpy(strName, szName, 255);
+                strName[iLen - 1] = '\0';
 
                 // Does the st
-                if ( StringBeginsWith ( szObjectName, strName ) )
+                if (StringBeginsWith(szObjectName, strName))
                 {
                     return true;
                 }
@@ -99,47 +92,44 @@ bool CAccessControlListGroup::FindObjectMatch ( const char* szObjectName, CAcces
     return false;
 }
 
-
-bool CAccessControlListGroup::RemoveObject ( const char* szObjectName, CAccessControlListGroupObject::EObjectType eObjectType )
+bool CAccessControlListGroup::RemoveObject(const char* szObjectName, CAccessControlListGroupObject::EObjectType eObjectType)
 {
-    const SString strKey = CAccessControlListGroupObject::GenerateKey ( szObjectName, eObjectType );
+    const SString strKey = CAccessControlListGroupObject::GenerateKey(szObjectName, eObjectType);
 
     // Try to find a match and delete it
-    ObjectMap::iterator iter = m_ObjectsById.find ( strKey );
-    if ( iter != m_ObjectsById.end() )
+    ObjectMap::iterator iter = m_ObjectsById.find(strKey);
+    if (iter != m_ObjectsById.end())
     {
         // Delete, remove from list and return true
-        delete ( iter->second );
-        m_Objects.remove ( iter->second );
-        m_ObjectsById.erase( iter );
+        delete (iter->second);
+        m_Objects.remove(iter->second);
+        m_ObjectsById.erase(iter);
 
-        OnChange ();
+        OnChange();
         return true;
     }
 
     return false;
 }
 
-
-bool CAccessControlListGroup::AddACL ( CAccessControlList* pACL )
+bool CAccessControlListGroup::AddACL(CAccessControlList* pACL)
 {
-    if ( !IsACLPresent ( pACL ) )
+    if (!IsACLPresent(pACL))
     {
-        m_ACLs.push_back ( pACL );
-        OnChange ();
+        m_ACLs.push_back(pACL);
+        OnChange();
         return true;
     }
 
     return false;
 }
 
-
-bool CAccessControlListGroup::IsACLPresent ( CAccessControlList* pACL )
+bool CAccessControlListGroup::IsACLPresent(CAccessControlList* pACL)
 {
-    ACLsList::iterator iter = m_ACLs.begin ();
-    for ( ; iter != m_ACLs.end (); iter++ )
+    ACLsList::iterator iter = m_ACLs.begin();
+    for (; iter != m_ACLs.end(); iter++)
     {
-        if ( *iter == pACL )
+        if (*iter == pACL)
         {
             return true;
         }
@@ -148,13 +138,12 @@ bool CAccessControlListGroup::IsACLPresent ( CAccessControlList* pACL )
     return false;
 }
 
-
-CAccessControlList* CAccessControlListGroup::GetACL ( const char* szACLName )
+CAccessControlList* CAccessControlListGroup::GetACL(const char* szACLName)
 {
-    ACLsList::iterator iter = m_ACLs.begin ();
-    for ( ; iter != m_ACLs.end (); iter++ )
+    ACLsList::iterator iter = m_ACLs.begin();
+    for (; iter != m_ACLs.end(); iter++)
     {
-        if ( strcmp ( szACLName, (*iter)->GetName () ) == 0 )
+        if (strcmp(szACLName, (*iter)->GetName()) == 0)
         {
             return *iter;
         }
@@ -163,78 +152,76 @@ CAccessControlList* CAccessControlListGroup::GetACL ( const char* szACLName )
     return NULL;
 }
 
-
-void CAccessControlListGroup::RemoveACL ( class CAccessControlList* pACL )
+void CAccessControlListGroup::RemoveACL(class CAccessControlList* pACL)
 {
-    m_ACLs.remove ( pACL );
-    OnChange ();
+    m_ACLs.remove(pACL);
+    OnChange();
 }
 
-
-void CAccessControlListGroup::WriteToXMLNode ( CXMLNode* pNode )
+void CAccessControlListGroup::WriteToXMLNode(CXMLNode* pNode)
 {
-    assert ( pNode );
+    assert(pNode);
 
     // Create the subnode for this
-    CXMLNode* pSubNode = pNode->CreateSubNode ( "group" );
-    assert ( pSubNode );
+    CXMLNode* pSubNode = pNode->CreateSubNode("group");
+    assert(pSubNode);
 
     // Create attribute for the name and set it
-    CXMLAttribute* pAttribute = pSubNode->GetAttributes ().Create ( "name" );
-    pAttribute->SetValue ( m_strGroupName );
+    CXMLAttribute* pAttribute = pSubNode->GetAttributes().Create("name");
+    pAttribute->SetValue(m_strGroupName);
 
     // Write the ACL's this group use
-    ACLsList::iterator iterACL = m_ACLs.begin ();
-    for ( ; iterACL != m_ACLs.end (); iterACL++ )
+    ACLsList::iterator iterACL = m_ACLs.begin();
+    for (; iterACL != m_ACLs.end(); iterACL++)
     {
         CAccessControlList* pACL = *iterACL;
 
         // Create the subnode for this object and write the name attribute we generated
-        CXMLNode* pObjectNode = pSubNode->CreateSubNode ( "acl" );
-        pAttribute = pObjectNode->GetAttributes ().Create ( "name" );
-        pAttribute->SetValue ( pACL->GetName () );
+        CXMLNode* pObjectNode = pSubNode->CreateSubNode("acl");
+        pAttribute = pObjectNode->GetAttributes().Create("name");
+        pAttribute->SetValue(pACL->GetName());
     }
 
     // Write every object
-    ObjectList::iterator iter = m_Objects.begin ();
-    for ( ; iter != m_Objects.end (); iter++ )
+    ObjectList::iterator iter = m_Objects.begin();
+    for (; iter != m_Objects.end(); iter++)
     {
         CAccessControlListGroupObject* pObject = *iter;
 
         // Find out the object type string
-        char szObjectType [255];
-        switch ( pObject->GetObjectType () )
+        char szObjectType[255];
+        switch (pObject->GetObjectType())
         {
             case CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE:
-                strcpy ( szObjectType, "resource" );
+                strcpy(szObjectType, "resource");
                 break;
 
             case CAccessControlListGroupObject::OBJECT_TYPE_USER:
-                strcpy ( szObjectType, "user" );
+                strcpy(szObjectType, "user");
                 break;
 
             default:
-                strcpy ( szObjectType, "error" );
+                strcpy(szObjectType, "error");
                 break;
         }
 
         // Append a dot append the name of the node
-        strcat ( szObjectType, "." );
-        strncat ( szObjectType, pObject->GetObjectName (), NUMELMS( szObjectType ) - 1 );
+        strcat(szObjectType, ".");
+        strncat(szObjectType, pObject->GetObjectName(), NUMELMS(szObjectType) - 1);
 
         // Create the subnode for this object and write the name attribute we generated
-        CXMLNode* pObjectNode = pSubNode->CreateSubNode ( "object" );
-        pAttribute = pObjectNode->GetAttributes ().Create ( "name" );
-        pAttribute->SetValue ( szObjectType );
+        CXMLNode* pObjectNode = pSubNode->CreateSubNode("object");
+        pAttribute = pObjectNode->GetAttributes().Create("name");
+        pAttribute->SetValue(szObjectType);
     }
 }
 
-void CAccessControlListGroup::OnChange ( void )
+void CAccessControlListGroup::OnChange(void)
 {
-    g_pGame->GetACLManager ()->OnChange ();
+    g_pGame->GetACLManager()->OnChange();
 }
 
-void CAccessControlListRight::OnChange ( void )
+void CAccessControlListRight::OnChange(void)
 {
-    g_pGame->GetACLManager ()->OnChange ();
+    g_pGame->GetACLManager()->OnChange();
 }

@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/rpc/CPickupRPCs.h
-*  PURPOSE:     Header for pickups RPC class
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/rpc/CPickupRPCs.h
+ *  PURPOSE:     Header for pickups RPC class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CPickupRPCs_H
 #define __CPickupRPCs_H
@@ -18,11 +17,11 @@
 class CPickupRPCs : public CRPCFunctions
 {
 public:
-    static void                 LoadFunctions           ( void );
+    static void LoadFunctions(void);
 
-    DECLARE_RPC ( DestroyAllPickups );
-    DECLARE_ELEMENT_RPC ( SetPickupType );
-    DECLARE_ELEMENT_RPC ( SetPickupVisible );
+    DECLARE_RPC(DestroyAllPickups);
+    DECLARE_ELEMENT_RPC(SetPickupType);
+    DECLARE_ELEMENT_RPC(SetPickupVisible);
 };
 
 #endif

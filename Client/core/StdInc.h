@@ -34,7 +34,6 @@
 #include <iomanip>
 #include <functional>
 
-
 // Localization
 #include "../../vendor/tinygettext/tinygettext.hpp"
 #include "CLocalization.h"
@@ -64,7 +63,6 @@
 #include "CExceptionInformation_Impl.h"
 #include "CJoystickManager.h"
 #include <Graphics/CVideoModeManager.h>
-#include <Serverbrowser/CServerCache.h>
 #include "CCrashDumpWriter.h"
 #include "CMemStats.h"
 #include "CGraphStats.h"

@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/Common.h
-*  PURPOSE:     Header for common definitions
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/Common.h
+ *  PURPOSE:     Header for common definitions
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #pragma once
 
@@ -31,29 +31,50 @@
 #define MAX_CLIENT_ELEMENTS 131072
 
 // Make sure MAX_SERVER_ELEMENTS are a power of two
-static_assert( ( MAX_SERVER_ELEMENTS&( MAX_SERVER_ELEMENTS - 1 ) ) == 0, "MAX_SERVER_ELEMENTS must be a power of 2" );
-
+static_assert((MAX_SERVER_ELEMENTS & (MAX_SERVER_ELEMENTS - 1)) == 0, "MAX_SERVER_ELEMENTS must be a power of 2");
 
 // ElementID structure
 struct ElementID
 {
 public:
-    ElementID ( const unsigned int& value = INVALID_ELEMENT_ID ) : m_value(value) {}
-    ElementID& operator= ( const unsigned int& value ) { m_value = value; return *this; }
-    bool operator== ( const ElementID& ID ) const { return m_value == ID.m_value; }
-    bool operator!= ( const ElementID& ID ) const { return m_value != ID.m_value; }
-    bool operator> ( const ElementID& ID ) const { return m_value > ID.m_value; }
-    bool operator>= ( const ElementID& ID ) const { return m_value >= ID.m_value; }
-    bool operator< ( const ElementID& ID ) const { return m_value < ID.m_value; }
-    bool operator<= ( const ElementID& ID ) const { return m_value <= ID.m_value; }
-    ElementID& operator+= ( const ElementID& ID ) { m_value += ID.m_value; return *this; }
-    ElementID& operator-= ( const ElementID& ID ) { m_value += ID.m_value; return *this; }
-    ElementID operator+ ( const ElementID& ID ) const { return m_value + ID.m_value; }
-    ElementID operator- ( const ElementID& ID ) const { return m_value - ID.m_value; }
-    ElementID operator++ ( int ) { ElementID ret ( m_value ); ++m_value; return ret; }
-    ElementID& operator++ () { ++m_value; return *this; }
-    unsigned int& Value () { return m_value; }
-    const unsigned int& Value () const { return m_value; }
+    ElementID(const unsigned int& value = INVALID_ELEMENT_ID) : m_value(value) {}
+    ElementID& operator=(const unsigned int& value)
+    {
+        m_value = value;
+        return *this;
+    }
+    bool       operator==(const ElementID& ID) const { return m_value == ID.m_value; }
+    bool       operator!=(const ElementID& ID) const { return m_value != ID.m_value; }
+    bool       operator>(const ElementID& ID) const { return m_value > ID.m_value; }
+    bool       operator>=(const ElementID& ID) const { return m_value >= ID.m_value; }
+    bool       operator<(const ElementID& ID) const { return m_value < ID.m_value; }
+    bool       operator<=(const ElementID& ID) const { return m_value <= ID.m_value; }
+    ElementID& operator+=(const ElementID& ID)
+    {
+        m_value += ID.m_value;
+        return *this;
+    }
+    ElementID& operator-=(const ElementID& ID)
+    {
+        m_value += ID.m_value;
+        return *this;
+    }
+    ElementID operator+(const ElementID& ID) const { return m_value + ID.m_value; }
+    ElementID operator-(const ElementID& ID) const { return m_value - ID.m_value; }
+    ElementID operator++(int)
+    {
+        ElementID ret(m_value);
+        ++m_value;
+        return ret;
+    }
+    ElementID& operator++()
+    {
+        ++m_value;
+        return *this;
+    }
+    unsigned int&       Value() { return m_value; }
+    const unsigned int& Value() const { return m_value; }
+
 private:
     unsigned int m_value;
 };

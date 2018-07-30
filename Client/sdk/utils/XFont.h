@@ -2,12 +2,12 @@
 //
 // Copyright (C) 2003 Hans Dietrich
 //
-// This software is released into the public domain.  
+// This software is released into the public domain.
 // You are free to use it in any way you like.
 //
-// This software is provided "as is" with no expressed 
-// or implied warranty.  I accept no liability for any 
-// damage or loss of business that this software may cause. 
+// This software is provided "as is" with no expressed
+// or implied warranty.  I accept no liability for any
+// damage or loss of business that this software may cause.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -36,10 +36,10 @@
 
 typedef struct _tagFONT_PROPERTIES
 {
-	TCHAR csName[1024];
-	TCHAR csCopyright[1024];
-	TCHAR csTrademark[1024];
-	TCHAR csFamily[1024];
+    TCHAR csName[1024];
+    TCHAR csCopyright[1024];
+    TCHAR csTrademark[1024];
+    TCHAR csFamily[1024];
 } FONT_PROPERTIES, *LPFONT_PROPERTIES;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -48,295 +48,276 @@ typedef struct _tagFONT_PROPERTIES
 //
 typedef struct _tagFONT_PROPERTIES_ANSI
 {
-	char csName[1024];
-	char csCopyright[1024];
-	char csTrademark[1024];
-	char csFamily[1024];
+    char csName[1024];
+    char csCopyright[1024];
+    char csTrademark[1024];
+    char csFamily[1024];
 } FONT_PROPERTIES_ANSI;
 
 typedef struct _tagTT_OFFSET_TABLE
 {
     union {
-        struct {
-	        USHORT	uMajorVersion;
-	        USHORT	uMinorVersion;
+        struct
+        {
+            USHORT uMajorVersion;
+            USHORT uMinorVersion;
         };
         ULONG uTag;
     };
-	USHORT	uNumOfTables;
-	USHORT	uSearchRange;
-	USHORT	uEntrySelector;
-	USHORT	uRangeShift;
+    USHORT uNumOfTables;
+    USHORT uSearchRange;
+    USHORT uEntrySelector;
+    USHORT uRangeShift;
 } TT_OFFSET_TABLE;
 
 typedef struct _tagTT_TABLE_DIRECTORY
 {
-	char	szTag[4];			//table name
-	ULONG	uCheckSum;			//Check sum
-	ULONG	uOffset;			//Offset from beginning of file
-	ULONG	uLength;			//length of the table in bytes
+    char  szTag[4];             // table name
+    ULONG uCheckSum;            // Check sum
+    ULONG uOffset;              // Offset from beginning of file
+    ULONG uLength;              // length of the table in bytes
 } TT_TABLE_DIRECTORY;
 
 typedef struct _tagTT_NAME_TABLE_HEADER
 {
-	USHORT	uFSelector;			//format selector. Always 0
-	USHORT	uNRCount;			//Name Records count
-	USHORT	uStorageOffset;		//Offset for strings storage, from start of the table
+    USHORT uFSelector;                // format selector. Always 0
+    USHORT uNRCount;                  // Name Records count
+    USHORT uStorageOffset;            // Offset for strings storage, from start of the table
 } TT_NAME_TABLE_HEADER;
 
 typedef struct _tagTT_NAME_RECORD
 {
-	USHORT	uPlatformID;
-	USHORT	uEncodingID;
-	USHORT	uLanguageID;
-	USHORT	uNameID;
-	USHORT	uStringLength;
-	USHORT	uStringOffset;	//from start of storage area
+    USHORT uPlatformID;
+    USHORT uEncodingID;
+    USHORT uLanguageID;
+    USHORT uNameID;
+    USHORT uStringLength;
+    USHORT uStringOffset;            // from start of storage area
 } TT_NAME_RECORD;
 
-#define SWAPWORD(x)		MAKEWORD(HIBYTE(x), LOBYTE(x))
-#define SWAPLONG(x)		MAKELONG(SWAPWORD(HIWORD(x)), SWAPWORD(LOWORD(x)))
+#define SWAPWORD(x)        MAKEWORD(HIBYTE(x), LOBYTE(x))
+#define SWAPLONG(x)        MAKELONG(SWAPWORD(HIWORD(x)), SWAPWORD(LOWORD(x)))
 
-
-BOOL GetFontProperties(LPCTSTR lpszFilePath, FONT_PROPERTIES * lpFontPropsX)
+BOOL GetFontProperties(LPCTSTR lpszFilePath, FONT_PROPERTIES* lpFontPropsX)
 {
-	FONT_PROPERTIES_ANSI fp;
-	FONT_PROPERTIES_ANSI * lpFontProps = &fp;
+    FONT_PROPERTIES_ANSI  fp;
+    FONT_PROPERTIES_ANSI* lpFontProps = &fp;
 
-	memset(lpFontProps, 0, sizeof(FONT_PROPERTIES_ANSI));
+    memset(lpFontProps, 0, sizeof(FONT_PROPERTIES_ANSI));
 
-	HANDLE hFile = INVALID_HANDLE_VALUE;
-	hFile = ::CreateFile(lpszFilePath,
-						 GENERIC_READ,// | GENERIC_WRITE,
-						 0,
-						 NULL,
-						 OPEN_ALWAYS,
-						 FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN,
-						 NULL);
+    HANDLE hFile = INVALID_HANDLE_VALUE;
+    hFile = ::CreateFile(lpszFilePath,
+                         GENERIC_READ,            // | GENERIC_WRITE,
+                         0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 
-	if (hFile == INVALID_HANDLE_VALUE)
+    if (hFile == INVALID_HANDLE_VALUE)
     {
         // Windows 8 fix
-	    hFile = ::CreateFile(lpszFilePath,
-						     GENERIC_READ,// | GENERIC_WRITE,
-						     FILE_SHARE_READ,
-						     NULL,
-						     OPEN_ALWAYS,
-						     FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN,
-						     NULL);
+        hFile = ::CreateFile(lpszFilePath,
+                             GENERIC_READ,            // | GENERIC_WRITE,
+                             FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
     }
 
-	if (hFile == INVALID_HANDLE_VALUE)
-	{
-		//TRACE(_T("ERROR:  failed to open '%s'\n"), lpszFilePath);
-		//TRACE(_T("ERROR: %s failed\n"), _T("CreateFile"));
-		return FALSE;
-	}
-
-	// get the file size
-	DWORD dwFileSize = ::GetFileSize(hFile, NULL);
-
-	if (dwFileSize == INVALID_FILE_SIZE)
-	{
-		//TRACE(_T("ERROR: %s failed\n"), _T("GetFileSize"));
-		::CloseHandle(hFile);
-		return FALSE;
-	}
-
-	//TRACE(_T("dwFileSize = %d\n"), dwFileSize);
-
-	// Create a file mapping object that is the current size of the file
-	HANDLE hMappedFile = NULL;
-	hMappedFile = ::CreateFileMapping(hFile,
-									  NULL,
-									  PAGE_READONLY, //PAGE_READWRITE,
-									  0,
-									  dwFileSize,
-									  NULL);
-
-	if (hMappedFile == NULL)
-	{
-		//TRACE(_T("ERROR: %s failed\n"), _T("CreateFileMapping"));
-		::CloseHandle(hFile);
-		return FALSE;
-	}
-
-	LPBYTE lpMapAddress = (LPBYTE) ::MapViewOfFile(hMappedFile,		// handle to file-mapping object
-											FILE_MAP_READ,//FILE_MAP_WRITE,			// access mode
-											0,						// high-order DWORD of offset
-											0,						// low-order DWORD of offset
-											0);						// number of bytes to map
-
-	if (lpMapAddress == NULL)
-	{
-		//TRACE(_T("ERROR: %s failed\n"), _T("MapViewOfFile"));
-		::CloseHandle(hMappedFile);
-		::CloseHandle(hFile);
-		return FALSE;
-	}
-
-	BOOL bRetVal = FALSE;
-	int index = 0;
-
-	TT_OFFSET_TABLE ttOffsetTable;
-	memcpy(&ttOffsetTable, &lpMapAddress[index], sizeof(TT_OFFSET_TABLE));
-	index += sizeof(TT_OFFSET_TABLE);
-
-	USHORT uNumOfTables = SWAPWORD(ttOffsetTable.uNumOfTables);
-	USHORT uMajorVersion = SWAPWORD(ttOffsetTable.uMajorVersion);
-	USHORT uMinorVersion = SWAPWORD(ttOffsetTable.uMinorVersion);
-	ULONG uTag = SWAPLONG(ttOffsetTable.uTag);
-
-	//check is this is a true type font and the version is 1.0
-    // or is CFF OpenType font
-	if ( ( uMajorVersion != 1 || uMinorVersion != 0 ) && uTag != 'OTTO' )
+    if (hFile == INVALID_HANDLE_VALUE)
     {
-	    ::UnmapViewOfFile(lpMapAddress);
-	    ::CloseHandle(hMappedFile);
-	    ::CloseHandle(hFile);
-		return bRetVal;
+        // TRACE(_T("ERROR:  failed to open '%s'\n"), lpszFilePath);
+        // TRACE(_T("ERROR: %s failed\n"), _T("CreateFile"));
+        return FALSE;
     }
 
-	TT_TABLE_DIRECTORY tblDir;
-	memset(&tblDir, 0, sizeof(TT_TABLE_DIRECTORY));
-	BOOL bFound = FALSE;
-	char szTemp[4096];
-	memset(szTemp, 0, sizeof(szTemp));
+    // get the file size
+    DWORD dwFileSize = ::GetFileSize(hFile, NULL);
 
-	for (int i = 0; i< uNumOfTables; i++)
-	{
-		//f.Read(&tblDir, sizeof(TT_TABLE_DIRECTORY));
-		memcpy(&tblDir, &lpMapAddress[index], sizeof(TT_TABLE_DIRECTORY));
-		index += sizeof(TT_TABLE_DIRECTORY);
+    if (dwFileSize == INVALID_FILE_SIZE)
+    {
+        // TRACE(_T("ERROR: %s failed\n"), _T("GetFileSize"));
+        ::CloseHandle(hFile);
+        return FALSE;
+    }
 
-		strncpy(szTemp, tblDir.szTag, 4);
-		if (stricmp(szTemp, "name") == 0)
-		{
-			bFound = TRUE;
-			tblDir.uLength = SWAPLONG(tblDir.uLength);
-			tblDir.uOffset = SWAPLONG(tblDir.uOffset);
-			break;
-		}
-		else if (szTemp[0] == 0)
-		{
-			break;
-		}
-	}
+    // TRACE(_T("dwFileSize = %d\n"), dwFileSize);
 
-	if (bFound)
-	{
-		index = tblDir.uOffset;
+    // Create a file mapping object that is the current size of the file
+    HANDLE hMappedFile = NULL;
+    hMappedFile = ::CreateFileMapping(hFile, NULL,
+                                      PAGE_READONLY,            // PAGE_READWRITE,
+                                      0, dwFileSize, NULL);
 
-		TT_NAME_TABLE_HEADER ttNTHeader;
-		memcpy(&ttNTHeader, &lpMapAddress[index], sizeof(TT_NAME_TABLE_HEADER));
-		index += sizeof(TT_NAME_TABLE_HEADER);
+    if (hMappedFile == NULL)
+    {
+        // TRACE(_T("ERROR: %s failed\n"), _T("CreateFileMapping"));
+        ::CloseHandle(hFile);
+        return FALSE;
+    }
 
-		ttNTHeader.uNRCount = SWAPWORD(ttNTHeader.uNRCount);
-		ttNTHeader.uStorageOffset = SWAPWORD(ttNTHeader.uStorageOffset);
-		TT_NAME_RECORD ttRecord;
-		bFound = FALSE;
+    LPBYTE lpMapAddress = (LPBYTE)::MapViewOfFile(hMappedFile,              // handle to file-mapping object
+                                                  FILE_MAP_READ,            // FILE_MAP_WRITE,            // access mode
+                                                  0,                        // high-order DWORD of offset
+                                                  0,                        // low-order DWORD of offset
+                                                  0);                       // number of bytes to map
 
-		for (int i = 0;
-			 i < ttNTHeader.uNRCount &&
-			 (lpFontProps->csCopyright[0] == 0 ||
-			  lpFontProps->csName[0] == 0      ||
-			  lpFontProps->csTrademark[0] == 0 ||
-			  lpFontProps->csFamily[0] == 0);
-			 i++)
-		{
-			memcpy(&ttRecord, &lpMapAddress[index], sizeof(TT_NAME_RECORD));
-			index += sizeof(TT_NAME_RECORD);
+    if (lpMapAddress == NULL)
+    {
+        // TRACE(_T("ERROR: %s failed\n"), _T("MapViewOfFile"));
+        ::CloseHandle(hMappedFile);
+        ::CloseHandle(hFile);
+        return FALSE;
+    }
 
-			ttRecord.uNameID = SWAPWORD(ttRecord.uNameID);
-			ttRecord.uStringLength = SWAPWORD(ttRecord.uStringLength);
-			ttRecord.uStringOffset = SWAPWORD(ttRecord.uStringOffset);
+    BOOL bRetVal = FALSE;
+    int  index = 0;
 
-			if (ttRecord.uNameID == 1 || ttRecord.uNameID == 0 || ttRecord.uNameID == 4 || ttRecord.uNameID == 7)
-			{
-				int nPos = index; //f.GetPosition();
+    TT_OFFSET_TABLE ttOffsetTable;
+    memcpy(&ttOffsetTable, &lpMapAddress[index], sizeof(TT_OFFSET_TABLE));
+    index += sizeof(TT_OFFSET_TABLE);
 
-				index = tblDir.uOffset + ttRecord.uStringOffset + ttNTHeader.uStorageOffset;
+    USHORT uNumOfTables = SWAPWORD(ttOffsetTable.uNumOfTables);
+    USHORT uMajorVersion = SWAPWORD(ttOffsetTable.uMajorVersion);
+    USHORT uMinorVersion = SWAPWORD(ttOffsetTable.uMinorVersion);
+    ULONG  uTag = SWAPLONG(ttOffsetTable.uTag);
 
-				memset(szTemp, 0, sizeof(szTemp));
+    // check is this is a true type font and the version is 1.0
+    // or is CFF OpenType font
+    if ((uMajorVersion != 1 || uMinorVersion != 0) && uTag != 'OTTO')
+    {
+        ::UnmapViewOfFile(lpMapAddress);
+        ::CloseHandle(hMappedFile);
+        ::CloseHandle(hFile);
+        return bRetVal;
+    }
 
-				memcpy(szTemp, &lpMapAddress[index], ttRecord.uStringLength);
-				index += ttRecord.uStringLength;
+    TT_TABLE_DIRECTORY tblDir;
+    memset(&tblDir, 0, sizeof(TT_TABLE_DIRECTORY));
+    BOOL bFound = FALSE;
+    char szTemp[4096];
+    memset(szTemp, 0, sizeof(szTemp));
+
+    for (int i = 0; i < uNumOfTables; i++)
+    {
+        // f.Read(&tblDir, sizeof(TT_TABLE_DIRECTORY));
+        memcpy(&tblDir, &lpMapAddress[index], sizeof(TT_TABLE_DIRECTORY));
+        index += sizeof(TT_TABLE_DIRECTORY);
+
+        strncpy(szTemp, tblDir.szTag, 4);
+        if (stricmp(szTemp, "name") == 0)
+        {
+            bFound = TRUE;
+            tblDir.uLength = SWAPLONG(tblDir.uLength);
+            tblDir.uOffset = SWAPLONG(tblDir.uOffset);
+            break;
+        }
+        else if (szTemp[0] == 0)
+        {
+            break;
+        }
+    }
+
+    if (bFound)
+    {
+        index = tblDir.uOffset;
+
+        TT_NAME_TABLE_HEADER ttNTHeader;
+        memcpy(&ttNTHeader, &lpMapAddress[index], sizeof(TT_NAME_TABLE_HEADER));
+        index += sizeof(TT_NAME_TABLE_HEADER);
+
+        ttNTHeader.uNRCount = SWAPWORD(ttNTHeader.uNRCount);
+        ttNTHeader.uStorageOffset = SWAPWORD(ttNTHeader.uStorageOffset);
+        TT_NAME_RECORD ttRecord;
+        bFound = FALSE;
+
+        for (int i = 0; i < ttNTHeader.uNRCount &&
+                        (lpFontProps->csCopyright[0] == 0 || lpFontProps->csName[0] == 0 || lpFontProps->csTrademark[0] == 0 || lpFontProps->csFamily[0] == 0);
+             i++)
+        {
+            memcpy(&ttRecord, &lpMapAddress[index], sizeof(TT_NAME_RECORD));
+            index += sizeof(TT_NAME_RECORD);
+
+            ttRecord.uNameID = SWAPWORD(ttRecord.uNameID);
+            ttRecord.uStringLength = SWAPWORD(ttRecord.uStringLength);
+            ttRecord.uStringOffset = SWAPWORD(ttRecord.uStringOffset);
+
+            if (ttRecord.uNameID == 1 || ttRecord.uNameID == 0 || ttRecord.uNameID == 4 || ttRecord.uNameID == 7)
+            {
+                int nPos = index;            // f.GetPosition();
+
+                index = tblDir.uOffset + ttRecord.uStringOffset + ttNTHeader.uStorageOffset;
+
+                memset(szTemp, 0, sizeof(szTemp));
+
+                memcpy(szTemp, &lpMapAddress[index], ttRecord.uStringLength);
+                index += ttRecord.uStringLength;
 
                 // Sometimes neeeds a unitext to sortofansitext hack
                 std::string strTemp = szTemp;
-                if ( strTemp.length () == 0 && ttRecord.uStringLength > 2 )
+                if (strTemp.length() == 0 && ttRecord.uStringLength > 2)
                 {
-                    std::wstring strTempE = (const wchar_t*)(szTemp+1);
-                    strTemp = UTF16ToMbUTF8 ( strTempE );
+                    std::wstring strTempE = (const wchar_t*)(szTemp + 1);
+                    strTemp = UTF16ToMbUTF8(strTempE);
                 }
-                const char* szTempAnsi = strTemp.c_str ();
+                const char* szTempAnsi = strTemp.c_str();
 
-				if (szTempAnsi[0] != 0)
-				{
-					//_ASSERTE(strlen(szTempAnsi) < sizeof(lpFontProps->csName));
+                if (szTempAnsi[0] != 0)
+                {
+                    //_ASSERTE(strlen(szTempAnsi) < sizeof(lpFontProps->csName));
 
-					switch (ttRecord.uNameID)
-					{
-						case 0:
-							if (lpFontProps->csCopyright[0] == 0)
-								STRNCPY(lpFontProps->csCopyright, szTempAnsi,
-									sizeof(lpFontProps->csCopyright));
-							break;
+                    switch (ttRecord.uNameID)
+                    {
+                        case 0:
+                            if (lpFontProps->csCopyright[0] == 0)
+                                STRNCPY(lpFontProps->csCopyright, szTempAnsi, sizeof(lpFontProps->csCopyright));
+                            break;
 
-						case 1:
-							if (lpFontProps->csFamily[0] == 0)
-								STRNCPY(lpFontProps->csFamily, szTempAnsi,
-									sizeof(lpFontProps->csFamily));
-							bRetVal = TRUE;
-							break;
+                        case 1:
+                            if (lpFontProps->csFamily[0] == 0)
+                                STRNCPY(lpFontProps->csFamily, szTempAnsi, sizeof(lpFontProps->csFamily));
+                            bRetVal = TRUE;
+                            break;
 
-						case 4:
-							if (lpFontProps->csName[0] == 0)
-								STRNCPY(lpFontProps->csName, szTempAnsi,
-									sizeof(lpFontProps->csName));
-							break;
+                        case 4:
+                            if (lpFontProps->csName[0] == 0)
+                                STRNCPY(lpFontProps->csName, szTempAnsi, sizeof(lpFontProps->csName));
+                            break;
 
-						case 7:
-							if (lpFontProps->csTrademark[0] == 0)
-								STRNCPY(lpFontProps->csTrademark, szTempAnsi,
-									sizeof(lpFontProps->csTrademark));
-							break;
+                        case 7:
+                            if (lpFontProps->csTrademark[0] == 0)
+                                STRNCPY(lpFontProps->csTrademark, szTempAnsi, sizeof(lpFontProps->csTrademark));
+                            break;
 
-						default:
-							break;
-					}
-				}
-				index = nPos;
-			}
-		}
-	}
+                        default:
+                            break;
+                    }
+                }
+                index = nPos;
+            }
+        }
+    }
 
-	::UnmapViewOfFile(lpMapAddress);
-	::CloseHandle(hMappedFile);
-	::CloseHandle(hFile);
+    ::UnmapViewOfFile(lpMapAddress);
+    ::CloseHandle(hMappedFile);
+    ::CloseHandle(hFile);
 
-	if (lpFontProps->csName[0] == 0)
-		STRNCPY(lpFontProps->csName, lpFontProps->csFamily, sizeof( lpFontProps->csName ));
+    if (lpFontProps->csName[0] == 0)
+        STRNCPY(lpFontProps->csName, lpFontProps->csFamily, sizeof(lpFontProps->csName));
 
-	memset(lpFontPropsX, 0, sizeof(FONT_PROPERTIES));
+    memset(lpFontPropsX, 0, sizeof(FONT_PROPERTIES));
 
     /*
-	::MultiByteToWideChar(CP_ACP, 0, lpFontProps->csName, -1, lpFontPropsX->csName,
-		sizeof(lpFontPropsX->csName)/sizeof(TCHAR)-1);
-	::MultiByteToWideChar(CP_ACP, 0, lpFontProps->csCopyright, -1, lpFontPropsX->csCopyright,
-		sizeof(lpFontPropsX->csCopyright)/sizeof(TCHAR)-1);
-	::MultiByteToWideChar(CP_ACP, 0, lpFontProps->csTrademark, -1, lpFontPropsX->csTrademark,
-		sizeof(lpFontPropsX->csTrademark)/sizeof(TCHAR)-1);
-	::MultiByteToWideChar(CP_ACP, 0, lpFontProps->csFamily, -1, lpFontPropsX->csFamily,
-		sizeof(lpFontPropsX->csFamily)/sizeof(TCHAR)-1);
+    ::MultiByteToWideChar(CP_ACP, 0, lpFontProps->csName, -1, lpFontPropsX->csName,
+        sizeof(lpFontPropsX->csName)/sizeof(TCHAR)-1);
+    ::MultiByteToWideChar(CP_ACP, 0, lpFontProps->csCopyright, -1, lpFontPropsX->csCopyright,
+        sizeof(lpFontPropsX->csCopyright)/sizeof(TCHAR)-1);
+    ::MultiByteToWideChar(CP_ACP, 0, lpFontProps->csTrademark, -1, lpFontPropsX->csTrademark,
+        sizeof(lpFontPropsX->csTrademark)/sizeof(TCHAR)-1);
+    ::MultiByteToWideChar(CP_ACP, 0, lpFontProps->csFamily, -1, lpFontPropsX->csFamily,
+        sizeof(lpFontPropsX->csFamily)/sizeof(TCHAR)-1);
     */
 
-    STRNCPY(lpFontPropsX->csName, lpFontProps->csName, sizeof( lpFontPropsX->csName ));
-	STRNCPY(lpFontPropsX->csCopyright, lpFontProps->csCopyright, sizeof( lpFontPropsX->csCopyright ));
-	STRNCPY(lpFontPropsX->csTrademark, lpFontProps->csTrademark, sizeof( lpFontPropsX->csTrademark ));
-	STRNCPY(lpFontPropsX->csFamily, lpFontProps->csFamily, sizeof( lpFontPropsX->csFamily ));
+    STRNCPY(lpFontPropsX->csName, lpFontProps->csName, sizeof(lpFontPropsX->csName));
+    STRNCPY(lpFontPropsX->csCopyright, lpFontProps->csCopyright, sizeof(lpFontPropsX->csCopyright));
+    STRNCPY(lpFontPropsX->csTrademark, lpFontProps->csTrademark, sizeof(lpFontPropsX->csTrademark));
+    STRNCPY(lpFontPropsX->csFamily, lpFontProps->csFamily, sizeof(lpFontPropsX->csFamily));
 
-	return bRetVal;
+    return bRetVal;
 }
 
 #endif //XFONT_H

@@ -1,36 +1,36 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.x
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientSearchLight.cpp
-*  PURPOSE:     HeliLight entity class source
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.x
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientSearchLight.cpp
+ *  PURPOSE:     HeliLight entity class source
+ *
+ *****************************************************************************/
 #include <StdInc.h>
 
-CClientSearchLight::CClientSearchLight ( CClientManager* pManager, ElementID ID ) : ClassInit ( this ), CClientStreamElement ( pManager->GetLightStreamer (), ID )
+CClientSearchLight::CClientSearchLight(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientStreamElement(pManager->GetLightStreamer(), ID)
 {
     m_pManager = pManager;
-    pManager->GetPointLightsManager ()->AddToSearchLightList ( this );
+    pManager->GetPointLightsManager()->AddToSearchLightList(this);
 
-    SetTypeName ( "searchlight" );
+    SetTypeName("searchlight");
 }
 
-CClientSearchLight::~CClientSearchLight ()
+CClientSearchLight::~CClientSearchLight()
 {
-    Unlink ();
+    Unlink();
 }
 
-void CClientSearchLight::Unlink ()
+void CClientSearchLight::Unlink()
 {
-    g_pClientGame->GetManager ()->GetPointLightsManager ()->RemoveSearchLightFromList ( this );
+    g_pClientGame->GetManager()->GetPointLightsManager()->RemoveSearchLightFromList(this);
 }
 
-void CClientSearchLight::Render ()
+void CClientSearchLight::Render()
 {
-    DoAttaching ();
+    DoAttaching();
 
-    if ( IsStreamedIn () )
-        g_pGame->GetPointLights ()->RenderHeliLight ( m_StartPosition, m_EndPosition, m_StartRadius, m_EndRadius, m_bRenderSpot );
+    if (IsStreamedIn())
+        g_pGame->GetPointLights()->RenderHeliLight(m_StartPosition, m_EndPosition, m_StartRadius, m_EndRadius, m_bRenderSpot);
 }

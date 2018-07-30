@@ -5,7 +5,7 @@
 //
 
 //
-// To compile a client: 
+// To compile a client:
 //      1. set MTASA_VERSION_TYPE to VERSION_TYPE_CUSTOM
 //      2. Use netc.dll from the latest unstable build (nightly.mtasa.com)
 //
@@ -28,14 +28,12 @@
 #endif
 #define MTA_DM_FULL_STRING          "MTA:SA Client"
 
-
 // Compile types
 #define VERSION_TYPE_CUSTOM         0x01
 #define VERSION_TYPE_EXPERIMENTAL   0x03
 #define VERSION_TYPE_UNSTABLE       0x05
 #define VERSION_TYPE_UNTESTED       0x07
 #define VERSION_TYPE_RELEASE        0x09
-
 
 #define QUOTE_DEFINE2(c) #c
 #define QUOTE_DEFINE(x) QUOTE_DEFINE2(x)
@@ -71,7 +69,6 @@
 #else
     #error "Incorrect MTASA_VERSION_TYPE"
 #endif
-
 
 #define _ASE_VERSION QUOTE_DEFINE(MTASA_VERSION_MAJOR) "." QUOTE_DEFINE(MTASA_VERSION_MINOR)
 #define _NETCODE_VERSION_BRANCH_ID      0x4         // Use 0x1 - 0xF to indicate an incompatible branch is being used (0x0 is reserved, 0x4 is trunk)

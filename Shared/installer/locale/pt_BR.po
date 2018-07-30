@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -12,9 +12,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Translators: RaceXtreme; LooooP; DNL291; Zezin; Cadu12; Cristiano Teixeira; ccw; neves768; Davidhm; gustavorn; Talidan\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: RaceXtreme; LooooP; DNL291; Zezin; Cadu12; Cristiano \"Banex\" "
-"Teixeira; ccw; neves768; gustavorn; Davidhm; Talidan\n"
 "X-POOTLE-MTIME: 1502171474.0\n"
 
 #. GET_XPVISTA_PLEASE
@@ -42,13 +41,11 @@ msgid ""
 "\n"
 "Click Next to continue."
 msgstr ""
-"Este assistente irá lhe guiar durante a instalação ou atualização do "
-"$(^Name) ${REVISION_TAG}\n"
+"Este assistente irá lhe guiar durante a instalação ou atualização do $(^Name) ${REVISION_TAG}\n"
 "\n"
 "É recomendado fechar todos os programas abertos antes de prosseguir.\n"
 "\n"
-"Lembrando que o acesso de administrador poderá ser necessário no Windows "
-"Vista ou superior.\n"
+"Lembrando que o acesso de administrador poderá ser necessário no Windows Vista ou superior.\n"
 "\n"
 "Clique em Próximo para continuar."
 
@@ -73,8 +70,7 @@ msgid ""
 msgstr ""
 "Selecione a pasta onde Grand Theft Auto: San Andreas foi instalado.$\n"
 " $\n"
-"Você DEVE ter a versão 1.0 do Grand Theft Auto: San Andreas para usar o "
-"MTA:SA, outras versões não são suportadas.$\n"
+"Você DEVE ter a versão 1.0 do Grand Theft Auto: San Andreas para usar o MTA:SA, outras versões não são suportadas.$\n"
 " $\n"
 "Clique em Instalar para iniciar a instalação."
 
@@ -92,8 +88,8 @@ msgstr "Criar um atalho do MTA:SA na Área de Trabalho."
 #: ../Shared/installer/nightly.nsi:196
 msgid "Register mtasa:// protocol for browser clickable-ness."
 msgstr ""
-"Registrar o protocolo mtasa:// para os navegadores redirecionarem algum link "
-"contendo este prefixo."
+"Registrar o protocolo mtasa:// para os navegadores redirecionarem algum link"
+" contendo este prefixo."
 
 #. DESC_Section13
 #: ../Shared/installer/nightly.nsi:197
@@ -121,8 +117,8 @@ msgid ""
 "The Multi Theft Auto Server. This allows you to host games from your "
 "computer. This requires a fast internet connection."
 msgstr ""
-"O Servidor do Multi Theft Auto. Ele permite hospedar um jogo a partir do seu "
-"computador. É necessário ter uma boa conexão com a internet."
+"O Servidor do Multi Theft Auto. Ele permite hospedar um jogo a partir do seu"
+" computador. É necessário ter uma boa conexão com a internet."
 
 #. DESC_Section4
 #: ../Shared/installer/nightly.nsi:204
@@ -250,13 +246,14 @@ msgid ""
 "$\n"
 "Please reinstall if there are problems later."
 msgstr ""
-"Uma versão válida do Grand Theft Auto: San Andreas para Windows não foi "
-"encontrada.$\r$\n"
-"Porém, a instalação continuará mesmo assim.$\r$\n"
+"Uma versão válida do Grand Theft Auto: San Andreas para Windows não foi encontrada.$\r"
+"$\n"
+"Porém, a instalação continuará mesmo assim.$\r"
+"$\n"
 "Por favor, reinstale caso houver problemas após a instalação."
 
-# 'Resources' são os Recursos que rodam no servidor.
 #. INST_SEC_CORE_RESOURCES
+# 'Resources' são os Recursos que rodam no servidor.
 #: ../Shared/installer/nightly.nsi:472
 msgid "Core Resources"
 msgstr "Recursos Principais"
@@ -292,8 +289,8 @@ msgid ""
 "Are you sure you want to completely remove $(^Name) and all of its "
 "components?"
 msgstr ""
-"Você tem certeza que deseja remover completamente o $(^Name) e todos os seus "
-"componentes?"
+"Você tem certeza que deseja remover completamente o $(^Name) e todos os seus"
+" componentes?"
 
 #. UNINST_REQUEST_NOTE
 #: ../Shared/installer/nightly.nsi:1033
@@ -304,9 +301,10 @@ msgid ""
 "$\n"
 "Run the new installer to upgrade and preserve your settings."
 msgstr ""
-"Desinstalar antes de atualizar?$\r$\n"
-"Não é necessário desinstalar a versão anterior antes de instalar uma nova "
-"versão do MTA:SA$\r$\n"
+"Desinstalar antes de atualizar?$\r"
+"$\n"
+"Não é necessário desinstalar a versão anterior antes de instalar uma nova versão do MTA:SA$\r"
+"$\n"
 "Execute o novo instalador para atualizar e preservar as suas configurações."
 
 #. UNINST_DATA_REQUEST
@@ -341,7 +339,8 @@ msgstr ""
 #. UAC_RIGHTS1
 #: ../Shared/installer/nightly.nsi:1181
 msgid "This installer requires admin access, try again"
-msgstr "Este instalador necessita de acesso do administrador, tente novamente."
+msgstr ""
+"Este instalador necessita de acesso do administrador, tente novamente."
 
 #. UAC_RIGHTS_UN
 #: ../Shared/installer/nightly.nsi:1182
@@ -369,8 +368,7 @@ msgid ""
 msgstr ""
 "A versão $1 do MTA já existe neste diretório.$\n"
 "$\n"
-"O MTA foi projetado para que versões diferentes sejam instaladas em "
-"diretórios separados.$\n"
+"O MTA foi projetado para que versões diferentes sejam instaladas em diretórios separados.$\n"
 "Você tem certeza que deseja substituir o MTA $1 em $INSTDIR ?"
 
 #. INST_GTA_CONFLICT
@@ -430,10 +428,8 @@ msgid ""
 "$\n"
 " Click Next to continue."
 msgstr ""
-"O ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} será instalado na pasta "
-"selecionada.$\n"
-"Para instalá-lo em uma outra pasta, vá em Procurar e selecione uma outra "
-"pasta.$\n"
+"O ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} será instalado na pasta selecionada.$\n"
+"Para instalá-lo em uma outra pasta, vá em Procurar e selecione uma outra pasta.$\n"
 "$\n"
 "Clique em Seguinte para continuar."
 
@@ -518,13 +514,15 @@ msgstr "Certifique-se que o seu firewall não esteja bloqueando este processo"
 #~ "$\n"
 #~ "Please reinstall if there are problems later."
 #~ msgstr ""
-#~ "Não foi possível realizar o download de Microsoft Visual Studio 2008 SP1 "
-#~ "redistributable.$\r$\n"
-#~ "Mas a instalação continuará normalmente.$\r$\n"
+#~ "Não foi possível realizar o download de Microsoft Visual Studio 2008 SP1 redistributable.$\r"
+#~ "$\n"
+#~ "Mas a instalação continuará normalmente.$\r"
+#~ "$\n"
 #~ "Por favor, reinstale o MTA:SA se houver problemas adiante."
 
 #~ msgid "Unable to download Microsoft Visual Studio 2013 redistributable"
-#~ msgstr "Não foi possível baixar o Microsoft Visual Studio 2013 redistributable"
+#~ msgstr ""
+#~ "Não foi possível baixar o Microsoft Visual Studio 2013 redistributable"
 
 #~ msgid "Unable to install Microsoft Visual Studio 2013 redistributable"
 #~ msgstr ""
@@ -537,6 +535,8 @@ msgstr "Certifique-se que o seu firewall não esteja bloqueando este processo"
 #~ "$\n"
 #~ "Please reinstall if there are problems later."
 #~ msgstr ""
-#~ "Não foi possível baixar o Microsoft Visual Studio 2013 redistributable.$\r$\n"
-#~ "A instalação irá prosseguir.$\r$\n"
+#~ "Não foi possível baixar o Microsoft Visual Studio 2013 redistributable.$\r"
+#~ "$\n"
+#~ "A instalação irá prosseguir.$\r"
+#~ "$\n"
 #~ "Por favor, reinstale caso houver problemas depois."

@@ -1,12 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/core/CTrayIconInterface.h
-*  PURPOSE:     Tray icon interface class
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/core/CTrayIconInterface.h
+ *  PURPOSE:     Tray icon interface class
+ *
+ *****************************************************************************/
 
 #pragma once
 
@@ -21,8 +21,8 @@ enum eTrayIconType
 class CTrayIconInterface
 {
 public:
-    virtual bool        DoesTrayIconExist       ( void ) = 0;
-    virtual bool        CreateTrayIcon          ( void ) = 0;
-    virtual void        DestroyTrayIcon         ( void ) = 0;
-    virtual bool        CreateTrayBallon        ( SString strText, eTrayIconType trayIconType, bool useSound ) = 0;
+    virtual bool DoesTrayIconExist(void) = 0;
+    virtual bool CreateTrayIcon(void) = 0;
+    virtual void DestroyTrayIcon(void) = 0;
+    virtual bool CreateTrayBallon(SString strText, eTrayIconType trayIconType, bool useSound) = 0;
 };

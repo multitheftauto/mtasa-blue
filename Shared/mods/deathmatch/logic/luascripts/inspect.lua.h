@@ -1,6 +1,6 @@
 namespace EmbeddedLuaCode
 {
-    const SString inspect = R"~LUA~(
+    const char* const inspect = R"~LUA~(
 
 --[[
     SERVER AND CLIENT.
@@ -8,7 +8,7 @@ namespace EmbeddedLuaCode
     Provide extra utility scripting functions:
         string inspect ( arg )  --Provides a human description of any argument, i.e. string,bool,table,element,xml etc
         string iprint ( ... ) --Prints any number of arguments in human readable format
-        
+
     Table output adapted from inspect.lua provided by Kikito with minor modifiactions (License below)
 --]]
 inspect ={
@@ -314,7 +314,7 @@ function Inspector:putValue(v)
   elseif tv == 'table' then
     self:putTable(v)
   elseif tv == 'userdata' then
-	self:putUserdata(v)
+    self:putUserdata(v)
   else
     self:puts('<',tv,' ',self:getId(v),'>')
   end
@@ -341,74 +341,74 @@ local aclGroupGetName = aclGroupGetName
 local outputDebugString = outputDebugString
 
 function mta_type (v)
-	local tv = type(v)
-	if tv == 'userdata' then
-		if isElement(v) then
-			return "elem:"..getElementType(v) --
-		else
-			return getUserdataType(v)
-		end
-	end
-	return tv
+    local tv = type(v)
+    if tv == 'userdata' then
+        if isElement(v) then
+            return "elem:"..getElementType(v) --
+        else
+            return getUserdataType(v)
+        end
+    end
+    return tv
 end
 
 function Inspector:putUserdata(v)
-	local human = mta_type (v)
-	local ptr = tostring(v):sub(11,-1)
-	local o = ""
-	if isElement(v) then
-		etype = getElementType(v)
-		if etype == "player" then
-			o = "elem:"..etype.."["..getPlayerName(v).."]"
-		elseif etype == "vehicle" then
-			o = "elem:"..etype.."["..getVehicleName(v).."]"..ptr
-		elseif etype == "object" then
-			o = "elem:"..etype.."["..getElementModel(v).."]"..ptr
-		elseif etype == "ped" then
-			o = "elem:"..etype.."["..getElementModel(v).."]"..ptr
-		elseif etype == "pickup" then
-			local pType
-			if getPickupType(v) == 0 then pType = "health"
-			elseif getPickupType(v) == 1 then pType = "armor"
-			elseif getPickupType(v) == 2 then pType = "weapon["..getWeaponNameFromID(getPickupWeapon(v)).."]" 
-			else pType = "custom["..getElementModel(v).."]"	end
-			o = "elem:"..etype.."["..pType.."]"..ptr
-		elseif etype == "marker" then
-			o = "elem:"..etype.."["..getMarkerType (v).."]"..ptr
-		elseif etype == "team" then
-			o = "elem:"..etype.."["..getTeamName (v).."]"..ptr
-		else
-			o = "elem:"..etype..ptr
-		end
-	elseif human == "xml-node" then
-		o = "xml-node["..xmlNodeGetName(v).."]"..ptr
-	elseif human == "resource-data" then
-		o = "resource["..getResourceName(v).."]"
-	elseif human == "account" then
-		o = "account["..getAccountName(v).."]"
-	elseif human == "acl" then
-		o = "acl["..aclGetName(v).."]"
-	elseif human == "acl-group" then
-		o = "acl-group["..aclGroupGetName(v).."]"
-	elseif human == "vector4" or human == "vector3" or human == "vector2" or human == "matrix" then
-		o = tostring(v)
-	else
+    local human = mta_type (v)
+    local ptr = tostring(v):sub(11,-1)
+    local o = ""
+    if isElement(v) then
+        etype = getElementType(v)
+        if etype == "player" then
+            o = "elem:"..etype.."["..getPlayerName(v).."]"
+        elseif etype == "vehicle" then
+            o = "elem:"..etype.."["..getVehicleName(v).."]"..ptr
+        elseif etype == "object" then
+            o = "elem:"..etype.."["..getElementModel(v).."]"..ptr
+        elseif etype == "ped" then
+            o = "elem:"..etype.."["..getElementModel(v).."]"..ptr
+        elseif etype == "pickup" then
+            local pType
+            if getPickupType(v) == 0 then pType = "health"
+            elseif getPickupType(v) == 1 then pType = "armor"
+            elseif getPickupType(v) == 2 then pType = "weapon["..getWeaponNameFromID(getPickupWeapon(v)).."]"
+            else pType = "custom["..getElementModel(v).."]"    end
+            o = "elem:"..etype.."["..pType.."]"..ptr
+        elseif etype == "marker" then
+            o = "elem:"..etype.."["..getMarkerType (v).."]"..ptr
+        elseif etype == "team" then
+            o = "elem:"..etype.."["..getTeamName (v).."]"..ptr
+        else
+            o = "elem:"..etype..ptr
+        end
+    elseif human == "xml-node" then
+        o = "xml-node["..xmlNodeGetName(v).."]"..ptr
+    elseif human == "resource-data" then
+        o = "resource["..getResourceName(v).."]"
+    elseif human == "account" then
+        o = "account["..getAccountName(v).."]"
+    elseif human == "acl" then
+        o = "acl["..aclGetName(v).."]"
+    elseif human == "acl-group" then
+        o = "acl-group["..aclGroupGetName(v).."]"
+    elseif human == "vector4" or human == "vector3" or human == "vector2" or human == "matrix" then
+        o = tostring(v)
+    else
         o = human..ptr
     end
-	
-	self:puts(o) 
+
+    self:puts(o)
 end
 
 function iprint(...)
-	local arg = {...}
-	local s = ""
-	for i,arg in ipairs(arg) do
-		if i > 1 then
-			s = s .. "    "
-		end
-		s = s .. inspect(arg)
-	end
-	outputDebugString(s,3,180,180,180)
+    local arg = {...}
+    local s = ""
+    for i,arg in ipairs(arg) do
+        if i > 1 then
+            s = s .. "    "
+        end
+        s = s .. inspect(arg)
+    end
+    outputDebugString(s,3,180,180,180)
 end
 
 -------------------------------------------------------------------

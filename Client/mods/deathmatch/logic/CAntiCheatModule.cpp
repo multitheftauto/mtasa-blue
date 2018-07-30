@@ -1,23 +1,21 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CAntiCheatModule.cpp
-*  PURPOSE:     Anti-cheat module class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CAntiCheatModule.cpp
+ *  PURPOSE:     Anti-cheat module class
+ *
+ *****************************************************************************/
 
 #include <StdInc.h>
 
-CAntiCheatModule::CAntiCheatModule ( CAntiCheat& AntiCheat ) : m_AntiCheat ( AntiCheat )
+CAntiCheatModule::CAntiCheatModule(CAntiCheat& AntiCheat) : m_AntiCheat(AntiCheat)
 {
-    AntiCheat.AddModule ( *this );
+    AntiCheat.AddModule(*this);
 }
 
-
-CAntiCheatModule::~CAntiCheatModule ( void )
+CAntiCheatModule::~CAntiCheatModule(void)
 {
-    m_AntiCheat.RemoveModule ( *this );
+    m_AntiCheat.RemoveModule(*this);
 }

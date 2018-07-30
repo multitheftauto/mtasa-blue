@@ -1,17 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/packets/CPlayerDisconnectedPacket.h
-*  PURPOSE:     Player disconnected packet class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/packets/CPlayerDisconnectedPacket.h
+ *  PURPOSE:     Player disconnected packet class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __PACKETS_CPLAYERDISCONNECTEDPACKET_H
-#define __PACKETS_CPLAYERDISCONNECTEDPACKET_H
+#pragma once
 
 #include "../packets/CPacket.h"
 
@@ -44,22 +42,20 @@ public:
         SHUTDOWN
     };
 
-                            CPlayerDisconnectedPacket   ( const char* szReason );
-                            CPlayerDisconnectedPacket   ( CPlayerDisconnectedPacket::ePlayerDisconnectType eType, const char* szReason = "" );
-                            CPlayerDisconnectedPacket   ( CPlayerDisconnectedPacket::ePlayerDisconnectType eType, time_t BanDuration = 0, const char* szReason = "" );
+    CPlayerDisconnectedPacket(const char* szReason);
+    CPlayerDisconnectedPacket(CPlayerDisconnectedPacket::ePlayerDisconnectType eType, const char* szReason = "");
+    CPlayerDisconnectedPacket(CPlayerDisconnectedPacket::ePlayerDisconnectType eType, time_t BanDuration = 0, const char* szReason = "");
 
-    inline ePacketID        GetPacketID                 ( void ) const              { return PACKET_ID_SERVER_DISCONNECTED; };
-    inline unsigned long    GetFlags                    ( void ) const              { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID(void) const { return PACKET_ID_SERVER_DISCONNECTED; };
+    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    bool                    Write                       ( NetBitStreamInterface& BitStream ) const;
+    bool Write(NetBitStreamInterface& BitStream) const;
 
-    inline const char*      GetReason                   ( void )                    { return m_strReason; }
-    inline void             SetReason                   ( const char* szReason )    { m_strReason = szReason; }
+    const char* GetReason(void) { return m_strReason; }
+    void        SetReason(const char* szReason) { m_strReason = szReason; }
 
 private:
-    SString                 m_strReason;
-    ePlayerDisconnectType   m_eType;
-    time_t                  m_Duration;
+    SString               m_strReason;
+    ePlayerDisconnectType m_eType;
+    time_t                m_Duration;
 };
-
-#endif

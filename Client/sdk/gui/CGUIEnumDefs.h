@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/gui/CGUIEnumDefs.h
-*  PURPOSE:     Graphical User Interface module interface
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/gui/CGUIEnumDefs.h
+ *  PURPOSE:     Graphical User Interface module interface
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #pragma once
 
@@ -25,15 +25,13 @@ enum CMessageBoxFlag
     MB_ICON_ERROR = 128,
 };
 
-
 // Input handler switcher
 enum eInputChannel
-{ 
+{
     INPUT_CORE,
     INPUT_MOD,
     INPUT_CHANNEL_COUNT,
 };
-
 
 enum eInputMode
 {
@@ -41,7 +39,6 @@ enum eInputMode
     INPUTMODE_NO_BINDS,
     INPUTMODE_NO_BINDS_ON_EDIT,
 };
-
 
 enum eCursorType
 {

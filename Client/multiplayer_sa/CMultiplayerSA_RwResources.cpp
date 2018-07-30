@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        multiplayer_sa/CMultiplayerSA_RwResources.cpp
-*  PORPOISE:    Record usage of certain Renderware resources
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        multiplayer_sa/CMultiplayerSA_RwResources.cpp
+ *  PORPOISE:    Record usage of certain Renderware resources
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
@@ -16,17 +16,16 @@ namespace
     SRwResourceStats ms_Stats;
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // RwTextureCreate
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_RwTextureCreate_Pre( DWORD calledFrom )
+void OnMY_RwTextureCreate_Pre(DWORD calledFrom)
 {
 }
 
-void OnMY_RwTextureCreate_Post( RwTexture* pTexture, DWORD calledFrom )
+void OnMY_RwTextureCreate_Post(RwTexture* pTexture, DWORD calledFrom)
 {
     ms_Stats.uiTextures++;
 }
@@ -36,9 +35,9 @@ void OnMY_RwTextureCreate_Post( RwTexture* pTexture, DWORD calledFrom )
 #define HOOKPOS_RwTextureCreate_EU                         0x7F3800
 #define HOOKSIZE_RwTextureCreate_US                        5
 #define HOOKSIZE_RwTextureCreate_EU                        5
-DWORD RETURN_RwTextureCreate_US =                          0x7F37C5;
-DWORD RETURN_RwTextureCreate_EU =                          0x7F3805;
-DWORD RETURN_RwTextureCreate_BOTH =                        0;
+DWORD RETURN_RwTextureCreate_US = 0x7F37C5;
+DWORD RETURN_RwTextureCreate_EU = 0x7F3805;
+DWORD RETURN_RwTextureCreate_BOTH = 0;
 void _declspec(naked) HOOK_RwTextureCreate()
 {
     _asm
@@ -68,15 +67,14 @@ inner:
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // RwTextureDestroy
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_RwTextureDestroy( RwTexture* pTexture, DWORD calledFrom )
+void OnMY_RwTextureDestroy(RwTexture* pTexture, DWORD calledFrom)
 {
-    if ( pTexture->refs == 1 )
+    if (pTexture->refs == 1)
         ms_Stats.uiTextures--;
 }
 
@@ -85,10 +83,10 @@ void OnMY_RwTextureDestroy( RwTexture* pTexture, DWORD calledFrom )
 #define HOOKPOS_RwTextureDestroy_EU                         0x7F3860
 #define HOOKSIZE_RwTextureDestroy_EU                        5
 #define HOOKSIZE_RwTextureDestroy_US                        5
-DWORD RETURN_RwTextureDestroy_US =                          0x7F3825;
-DWORD RETURN_RwTextureDestroy_EU =                          0x7F3865;
-DWORD RETURN_RwTextureDestroy_BOTH =                        0;
-void _declspec(naked) HOOK_RwTextureDestroy ()
+DWORD RETURN_RwTextureDestroy_US = 0x7F3825;
+DWORD RETURN_RwTextureDestroy_EU = 0x7F3865;
+DWORD RETURN_RwTextureDestroy_BOTH = 0;
+void _declspec(naked) HOOK_RwTextureDestroy()
 {
     _asm
     {
@@ -105,13 +103,12 @@ void _declspec(naked) HOOK_RwTextureDestroy ()
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // RwRasterCreate
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_RwRasterCreate( DWORD calledFrom )
+void OnMY_RwRasterCreate(DWORD calledFrom)
 {
     ms_Stats.uiRasters++;
 }
@@ -121,10 +118,10 @@ void OnMY_RwRasterCreate( DWORD calledFrom )
 #define HOOKPOS_RwRasterCreate_EU                         0x7FB270
 #define HOOKSIZE_RwRasterCreate_US                        5
 #define HOOKSIZE_RwRasterCreate_EU                        5
-DWORD RETURN_RwRasterCreate_US =                          0x7FB235;
-DWORD RETURN_RwRasterCreate_EU =                          0x7FB275;
-DWORD RETURN_RwRasterCreate_BOTH =                        0;
-void _declspec(naked) HOOK_RwRasterCreate ()
+DWORD RETURN_RwRasterCreate_US = 0x7FB235;
+DWORD RETURN_RwRasterCreate_EU = 0x7FB275;
+DWORD RETURN_RwRasterCreate_BOTH = 0;
+void _declspec(naked) HOOK_RwRasterCreate()
 {
     _asm
     {
@@ -140,13 +137,12 @@ void _declspec(naked) HOOK_RwRasterCreate ()
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // RwRasterDestroy
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_RwRasterDestroy( DWORD calledFrom )
+void OnMY_RwRasterDestroy(DWORD calledFrom)
 {
     ms_Stats.uiRasters--;
 }
@@ -156,10 +152,10 @@ void OnMY_RwRasterDestroy( DWORD calledFrom )
 #define HOOKPOS_RwRasterDestroy_EU                         0x7FB060
 #define HOOKSIZE_RwRasterDestroy_US                        5
 #define HOOKSIZE_RwRasterDestroy_EU                        5
-DWORD RETURN_RwRasterDestroy_US =                          0x7FB025;
-DWORD RETURN_RwRasterDestroy_EU =                          0x7FB065;
-DWORD RETURN_RwRasterDestroy_BOTH =                        0;
-void _declspec(naked) HOOK_RwRasterDestroy ()
+DWORD RETURN_RwRasterDestroy_US = 0x7FB025;
+DWORD RETURN_RwRasterDestroy_EU = 0x7FB065;
+DWORD RETURN_RwRasterDestroy_BOTH = 0;
+void _declspec(naked) HOOK_RwRasterDestroy()
 {
     _asm
     {
@@ -175,17 +171,16 @@ void _declspec(naked) HOOK_RwRasterDestroy ()
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // RwGeometryCreate
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_RwGeometryCreate_Pre( DWORD calledFrom )
+void OnMY_RwGeometryCreate_Pre(DWORD calledFrom)
 {
 }
 
-void OnMY_RwGeometryCreate_Post( RwGeometry* pGeometry, DWORD calledFrom )
+void OnMY_RwGeometryCreate_Post(RwGeometry* pGeometry, DWORD calledFrom)
 {
     ms_Stats.uiGeometries++;
 }
@@ -195,9 +190,9 @@ void OnMY_RwGeometryCreate_Post( RwGeometry* pGeometry, DWORD calledFrom )
 #define HOOKPOS_RwGeometryCreate_EU                         0x74CAE0
 #define HOOKSIZE_RwGeometryCreate_US                        7
 #define HOOKSIZE_RwGeometryCreate_EU                        7
-DWORD RETURN_RwGeometryCreate_US =                          0x74CA97;
-DWORD RETURN_RwGeometryCreate_EU =                          0x74CAE7;
-DWORD RETURN_RwGeometryCreate_BOTH =                        0;
+DWORD RETURN_RwGeometryCreate_US = 0x74CA97;
+DWORD RETURN_RwGeometryCreate_EU = 0x74CAE7;
+DWORD RETURN_RwGeometryCreate_BOTH = 0;
 void _declspec(naked) HOOK_RwGeometryCreate()
 {
     _asm
@@ -230,15 +225,14 @@ inner:
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // RwGeometryDestroy
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_RwGeometryDestroy( DWORD calledFrom, RwGeometry* pGeometry )
+void OnMY_RwGeometryDestroy(DWORD calledFrom, RwGeometry* pGeometry)
 {
-    if ( pGeometry->refs == 1 )
+    if (pGeometry->refs == 1)
         ms_Stats.uiGeometries--;
 }
 
@@ -247,10 +241,10 @@ void OnMY_RwGeometryDestroy( DWORD calledFrom, RwGeometry* pGeometry )
 #define HOOKPOS_RwGeometryDestroy_EU                         0x74CD10
 #define HOOKSIZE_RwGeometryDestroy_US                        5
 #define HOOKSIZE_RwGeometryDestroy_EU                        5
-DWORD RETURN_RwGeometryDestroy_US =                          0x74CCC5;
-DWORD RETURN_RwGeometryDestroy_EU =                          0x74CD15;
-DWORD RETURN_RwGeometryDestroy_BOTH =                        0;
-void _declspec(naked) HOOK_RwGeometryDestroy ()
+DWORD RETURN_RwGeometryDestroy_US = 0x74CCC5;
+DWORD RETURN_RwGeometryDestroy_EU = 0x74CD15;
+DWORD RETURN_RwGeometryDestroy_BOTH = 0;
+void _declspec(naked) HOOK_RwGeometryDestroy()
 {
     _asm
     {
@@ -267,18 +261,16 @@ void _declspec(naked) HOOK_RwGeometryDestroy ()
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CMultiplayerSA::GetRwResourceStats
 //
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::GetRwResourceStats ( SRwResourceStats& outStats )
+void CMultiplayerSA::GetRwResourceStats(SRwResourceStats& outStats)
 {
     outStats = ms_Stats;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -287,14 +279,14 @@ void CMultiplayerSA::GetRwResourceStats ( SRwResourceStats& outStats )
 // Setup hooks for RwResources
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_RwResources ( void )
+void CMultiplayerSA::InitHooks_RwResources(void)
 {
-    memset ( &ms_Stats, 0, sizeof ( ms_Stats ) );
+    memset(&ms_Stats, 0, sizeof(ms_Stats));
 
-    EZHookInstall ( RwTextureCreate );
-    EZHookInstall ( RwTextureDestroy );
-    EZHookInstall ( RwRasterCreate );
-    EZHookInstall ( RwRasterDestroy );
-    EZHookInstall ( RwGeometryCreate );
-    EZHookInstall ( RwGeometryDestroy );
+    EZHookInstall(RwTextureCreate);
+    EZHookInstall(RwTextureDestroy);
+    EZHookInstall(RwRasterCreate);
+    EZHookInstall(RwRasterDestroy);
+    EZHookInstall(RwGeometryCreate);
+    EZHookInstall(RwGeometryDestroy);
 }
