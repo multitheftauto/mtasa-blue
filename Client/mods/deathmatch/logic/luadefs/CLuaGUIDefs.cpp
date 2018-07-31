@@ -3915,7 +3915,7 @@ int CLuaGUIDefs::GUIComboBoxGetItemCount(lua_State* luaVM)
 
 int CLuaGUIDefs::GUIComboBoxSetOpen(lua_State* luaVM)
 {
-    // int guiComboBoxSetOpen( element comboBox, bool state)
+    // bool guiComboBoxSetOpen( element comboBox, bool state)
     CClientGUIElement* comboBox;
     bool state;
     CScriptArgReader argStream(luaVM);
@@ -3937,7 +3937,7 @@ int CLuaGUIDefs::GUIComboBoxSetOpen(lua_State* luaVM)
 
 int CLuaGUIDefs::GUIComboBoxIsOpen(lua_State* luaVM)
 {
-    // int guiComboBoxIsOpen( element comboBox )
+    // bool guiComboBoxIsOpen( element comboBox )
     CClientGUIElement* comboBox;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData<CGUIComboBox>(comboBox);
