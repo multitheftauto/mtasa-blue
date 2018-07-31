@@ -5209,23 +5209,23 @@ int CStaticFunctionDefinitions::GUIComboBoxGetItemCount(CClientEntity& Entity)
     return 0;
 }
 
-bool CStaticFunctionDefinitions::GUIComboBoxSetState(CClientEntity& Entity, int state)
+bool CStaticFunctionDefinitions::GUIComboBoxSetOpen(CClientEntity& Entity, bool state)
 {
-    RUN_CHILDREN(GUIComboBoxSetState(**iter, state))
+    RUN_CHILDREN(GUIComboBoxSetOpen(**iter, state))
 
     // Are we a CGUI Element?
     if (IS_GUI(&Entity))
     {
         CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
 
-        // Are we a combobox? and state > 0 and state < 3
-        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement) && state > 0 && state < 3)
+        // Are we a combobox?
+        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
         {
-            if (state == 1)
+            if (state)
             {
                 static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->ShowDropList();
             }
-            else if (state == 2)
+            else if (!state)
             {
                 static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->HideDropList();
             }
@@ -5236,9 +5236,9 @@ bool CStaticFunctionDefinitions::GUIComboBoxSetState(CClientEntity& Entity, int 
     return false;
 }
 
-int CStaticFunctionDefinitions::GUIComboBoxGetState(CClientEntity& Entity)
+bool CStaticFunctionDefinitions::GUIComboBoxIsOpen(CClientEntity& Entity)
 {
-    RUN_CHILDREN(GUIComboBoxGetState(**iter))
+    RUN_CHILDREN(GUIComboBoxIsOpen(**iter))
 
     // Are we a CGUI Element?
     if (IS_GUI(&Entity))
@@ -5248,21 +5248,11 @@ int CStaticFunctionDefinitions::GUIComboBoxGetState(CClientEntity& Entity)
         // Are we a combobox?
         if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
         {
-            bool vs = static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetState();
-            int comboState;
-            if (!vs)
-            {
-                comboState = 2;
-            }
-            else if (vs)
-            {
-                comboState = 1;
-            }
-            return comboState;
+            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetState();
         }
     }
     
-    return 0;
+    return false;
 }
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateBrowser(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bIsLocal,
