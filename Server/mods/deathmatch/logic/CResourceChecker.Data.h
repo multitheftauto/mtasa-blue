@@ -253,7 +253,12 @@ namespace
 
     struct SDeprecatedItem
     {
+        // bRemoved does not mean:
+        //     "has this function been removed yet?"
+        // bRemoved actually means:
+        //     "is not rename?" (you can't rename removed functions)
         bool    bRemoved;
+
         SString strOldName;
         SString strNewName;
         SString strVersion;
