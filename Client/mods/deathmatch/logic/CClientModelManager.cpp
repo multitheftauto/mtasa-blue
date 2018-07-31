@@ -74,3 +74,17 @@ CClientModel * CClientModelManager::FindModelByID ( int iModelID )
     }
     return NULL;
 }
+
+void CClientModelManager::DeallocateModelsAllocatedByResource(CResource* pResource)
+{
+    for (ushort i = 0; i <= MAX_MODEL_ID; i++)
+    {
+        if (m_Models[i] != NULL)
+        {
+            if (m_Models[i]->GetResourceThatAllocatedIt() == pResource)
+            {
+                m_Models[i]->Deallocate();
+            }
+        }
+    }
+}

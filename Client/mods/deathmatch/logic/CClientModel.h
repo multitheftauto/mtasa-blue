@@ -34,6 +34,8 @@ public:
     eClientModelType                GetModelType ( void ) { return m_eModelType; };
     bool                            Allocate ( void );
     bool                            Deallocate ( void );
+    void                            SetResourceThatAllocatedIt(CResource* pResource) { m_pOwnedByResource = pResource; }
+    CResource*                      GetResourceThatAllocatedIt(void) { return m_pOwnedByResource; }
 
 protected:
     CClientManager*                 m_pManager;
@@ -42,6 +44,8 @@ protected:
     int                             m_iModelID;
     eClientModelType                m_eModelType;
     bool                            m_bAllocatedByUs;
+
+    CResource*                      m_pOwnedByResource;
 };
 
 #endif

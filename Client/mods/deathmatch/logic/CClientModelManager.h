@@ -36,6 +36,8 @@ public:
 
     CClientModel *                  FindModelByID ( int iModelID );
 
+    void                            DeallocateModelsAllocatedByResource(CResource* pResource);
+
 private:
     CClientModel *                  m_Models[ MAX_MODEL_ID + 1 ];
 };

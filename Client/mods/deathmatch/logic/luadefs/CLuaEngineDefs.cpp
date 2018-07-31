@@ -486,30 +486,38 @@ int CLuaEngineDefs::EngineRequestModel ( lua_State* luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadString ( strModelType );
 
-    if ( !argStream.HasErrors () )
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (pLuaMain)
     {
-        eClientModelType eModelType;
-        if ( strModelType == "ped" )
+        CResource* pResource = pLuaMain->GetResource();
+        if (pResource)
         {
-            eModelType = CCLIENTMODELPED;
+            if (!argStream.HasErrors())
+            {
+                eClientModelType eModelType;
+                if (strModelType == "ped")
+                {
+                    eModelType = CCLIENTMODELPED;
+                }
+                else
+                {
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+
+                int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
+
+                CClientModel * pModel = new CClientModel(m_pManager, iModelID, eModelType);
+                pModel->Allocate();
+                pModel->SetResourceThatAllocatedIt(pResource);
+
+                lua_pushinteger(luaVM, iModelID);
+                return 1;
+            }
+            else
+                m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
         }
-        else
-        {
-            lua_pushboolean ( luaVM, false );
-            return 1;
-        }
-
-        int iModelID = m_pManager->GetModelManager ()->GetFirstFreeModelID ();
-
-        CClientModel * pModel = new CClientModel( m_pManager, iModelID, eModelType );
-        pModel->Allocate ();
-
-        lua_pushinteger ( luaVM, iModelID );
-        return 1;
     }
-    else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
-
     lua_pushboolean( luaVM, false );
     return 1;
 }

@@ -83,6 +83,8 @@ bool CClientModel::Deallocate ( void )
         }
 
         pModelInfo->DeallocateModel ();
+
+        this->SetResourceThatAllocatedIt(NULL);
         return true;
     }
     return false;
