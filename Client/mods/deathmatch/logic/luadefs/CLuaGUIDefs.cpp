@@ -3920,7 +3920,7 @@ int CLuaGUIDefs::GUIComboBoxSetOpen(lua_State* luaVM)
     bool state;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData<CGUIComboBox>(comboBox);
-    argStream.ReadNumber(state);
+    argStream.ReadBool(state);
 
     if (!argStream.HasErrors())
     {
