@@ -149,8 +149,8 @@ public:
     LUA_DECLARE(GUIComboBoxGetItemText);
     LUA_DECLARE(GUIComboBoxSetItemText);
     LUA_DECLARE(GUIComboBoxGetItemCount);
-    LUA_DECLARE(GUIComboBoxSetState);
-    LUA_DECLARE(GUIComboBoxGetState);
+    LUA_DECLARE(GUIComboBoxSetOpen);
+    LUA_DECLARE(GUIComboBoxIsOpen);
     LUA_DECLARE(GUIGetCursorType);
 
 private:
