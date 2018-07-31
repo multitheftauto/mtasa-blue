@@ -3902,6 +3902,28 @@ bool CStaticFunctionDefinitions::RemovePedJetPack(CElement* pElement)
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetPedWearingJetpack(CElement* pElement, bool bJetPack)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetPedWearingJetpack(*iter, bJetPack))
+
+    if (IS_PED(pElement))
+    {
+        CPed* pPed = static_cast<CPed*>(pElement);
+        if (pPed->IsSpawned() && bJetPack != pPed->HasJetPack())
+        {
+            pPed->SetHasJetPack(bJetPack);
+
+            CBitStream BitStream;
+            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, bJetPack ? GIVE_PED_JETPACK : REMOVE_PED_JETPACK, *BitStream.pBitStream));
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetPedFightingStyle(CElement* pElement, unsigned char ucStyle)
 {
     assert(pElement);
