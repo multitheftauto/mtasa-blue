@@ -5244,12 +5244,12 @@ int CStaticFunctionDefinitions::GUIComboBoxGetState(CClientEntity& Entity)
     if (IS_GUI(&Entity))
     {
         CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-        int comboState;
-
+        
         // Are we a combobox?
         if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
         {
             bool vs = static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetState();
+            int comboState;
             if (!vs)
             {
                 comboState = 2;
@@ -5258,7 +5258,7 @@ int CStaticFunctionDefinitions::GUIComboBoxGetState(CClientEntity& Entity)
             {
                 comboState = 1;
             }
-                return comboState;
+            return comboState;
         }
     }
     
