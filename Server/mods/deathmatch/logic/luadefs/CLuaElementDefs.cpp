@@ -44,6 +44,7 @@ void CLuaElementDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("getElementType", getElementType);
     CLuaCFunctions::AddFunction("getElementInterior", getElementInterior);
     CLuaCFunctions::AddFunction("getElementsWithinColShape", getElementsWithinColShape);
+    CLuaCFunctions::AddFunction("getElementsWithinRange", getElementsWithinRange);
     CLuaCFunctions::AddFunction("getElementDimension", getElementDimension);
     CLuaCFunctions::AddFunction("getElementZoneName", getElementZoneName);
     CLuaCFunctions::AddFunction("getElementColShape", getElementColShape);
@@ -99,6 +100,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getByID", "getElementByID");
     lua_classfunction(luaVM, "getAllByType", "getElementsByType");
     lua_classfunction(luaVM, "getByIndex", "getElementByIndex");
+    lua_classfunction(luaVM, "getWithinRange", "getElementsWithinRange");
 
     lua_classfunction(luaVM, "create", "createElement");
     lua_classfunction(luaVM, "clone", "cloneElement");
@@ -977,6 +979,45 @@ int CLuaElementDefs::getElementsWithinColShape(lua_State* luaVM)
                 lua_settable(luaVM, -3);
             }
         }
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::getElementsWithinRange(lua_State* luaVM)
+{
+    CVector position;
+    float   radius;
+    SString elementType;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadVector3D(position);
+    argStream.ReadNumber(radius);
+    argStream.ReadString(elementType, "");
+
+    if (!argStream.HasErrors())
+    {
+        // Query the spatial database
+        CElementResult result;
+        GetSpatialDatabase()->SphereQuery(result, CSphere{ position, radius });
+
+        lua_newtable(luaVM);
+        unsigned int index = 0;
+
+        for (CElement* entity : result)
+        {
+            if (elementType.empty() || elementType == entity->GetTypeName())
+            {
+                lua_pushnumber(luaVM, ++index);
+                lua_pushelement(luaVM, entity);
+                lua_settable(luaVM, -3);
+            }
+        }
+
         return 1;
     }
     else

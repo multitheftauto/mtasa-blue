@@ -289,7 +289,6 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction ( "banPlayer", CLuaFunctionDefinitions::BanPlayer );
     CLuaCFunctions::AddFunction ( "banPlayerIP", CLuaFunctionDefinitions::BanPlayerIP );
     CLuaCFunctions::AddFunction ( "setPlayerMuted", CLuaFunctionDefinitions::SetPlayerMuted );
-    CLuaCFunctions::AddFunction ( "whoWas", CLuaFunctionDefinitions::WhoWas );
 
     CLuaCFunctions::AddFunction ( "addAccount", CLuaFunctionDefinitions::AddAccount );
     CLuaCFunctions::AddFunction ( "delAccount", CLuaFunctionDefinitions::DelAccount );
