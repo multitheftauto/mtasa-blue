@@ -30,7 +30,6 @@ void CLuaPedDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("getPedTotalAmmo", GetPedTotalAmmo);
     CLuaCFunctions::AddFunction("getPedWeapon", GetPedWeapon);
     CLuaCFunctions::AddFunction("getPedClothes", GetPedClothes);
-    CLuaCFunctions::AddFunction("doesPedHaveJetPack", DoesPedHaveJetPack); // deprecated since 1.5.5-9.13176
     CLuaCFunctions::AddFunction("isPedWearingJetpack", DoesPedHaveJetPack); // introduced in 1.5.5-9.13176
     CLuaCFunctions::AddFunction("isPedOnGround", IsPedOnGround);
     CLuaCFunctions::AddFunction("getPedFightingStyle", GetPedFightingStyle);
@@ -53,8 +52,6 @@ void CLuaPedDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("setPedStat", SetPedStat);
     CLuaCFunctions::AddFunction("addPedClothes", AddPedClothes);
     CLuaCFunctions::AddFunction("removePedClothes", RemovePedClothes);
-    CLuaCFunctions::AddFunction("givePedJetPack", GivePedJetPack); // deprecated in 1.5.5-9.13176
-    CLuaCFunctions::AddFunction("removePedJetPack", RemovePedJetPack); // deprecated in 1.5.5-9.13176
     CLuaCFunctions::AddFunction("setPedWearingJetpack", SetPedWearingJetpack); // introduced in 1.5.5-9.13176
     CLuaCFunctions::AddFunction("setPedFightingStyle", SetPedFightingStyle);
     CLuaCFunctions::AddFunction("setPedWalkingStyle", SetPedMoveAnim);
