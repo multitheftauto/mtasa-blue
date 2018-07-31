@@ -382,10 +382,10 @@ namespace
         {false, "detachElementFromElement", "detachElements"},
         {false, "showPlayerHudComponent", "setPlayerHudComponentVisible"},
         // Server ped jetpack
-        {true, "givePlayerJetPack", "setPedWearingJetpack. Refer to the wiki for details"},
-        {true, "removePlayerJetPack", "setPedWearingJetpack. Refer to the wiki for details"},
-        {false, "givePedJetPack", "setPedWearingJetpack. Refer to the wiki for details"},
-        {false, "removePedJetPack", "setPedWearingJetpack. Refer to the wiki for details"},
+        {true, "givePlayerJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
+        {true, "removePlayerJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
+        {false, "givePedJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
+        {false, "removePedJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
         {false, "doesPedHaveJetPack", "isPedWearingJetpack"},
         // XML
         {false, "xmlNodeGetSubNodes", "xmlNodeGetChildren"},
