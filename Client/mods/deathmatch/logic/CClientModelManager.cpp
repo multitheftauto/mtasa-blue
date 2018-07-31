@@ -81,7 +81,7 @@ void CClientModelManager::DeallocateModelsAllocatedByResource(CResource* pResour
     {
         if (m_Models[i] != NULL)
         {
-            if (m_Models[i]->GetResourceThatAllocatedIt() == pResource)
+            if (m_Models[i]->GetParentResource() == pResource)
             {
                 m_Models[i]->Deallocate();
             }

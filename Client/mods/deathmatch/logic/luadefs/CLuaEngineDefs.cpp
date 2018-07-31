@@ -509,7 +509,7 @@ int CLuaEngineDefs::EngineRequestModel ( lua_State* luaVM )
 
                 CClientModel * pModel = new CClientModel(m_pManager, iModelID, eModelType);
                 pModel->Allocate();
-                pModel->SetResourceThatAllocatedIt(pResource);
+                pModel->SetParentResource(pResource);
 
                 lua_pushinteger(luaVM, iModelID);
                 return 1;
