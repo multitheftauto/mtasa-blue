@@ -162,8 +162,8 @@ void CLuaGUIDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("guiComboBoxGetItemText", GUIComboBoxGetItemText);
     CLuaCFunctions::AddFunction("guiComboBoxSetItemText", GUIComboBoxSetItemText);
     CLuaCFunctions::AddFunction("guiComboBoxGetItemCount", GUIComboBoxGetItemCount);
-    CLuaCFunctions::AddFunction("guiComboBoxSetState", GUIComboBoxSetState);
-    CLuaCFunctions::AddFunction("guiComboBoxGetState", GUIComboBoxGetState);
+    CLuaCFunctions::AddFunction("guiComboBoxSetOpen", GUIComboBoxSetOpen);
+    CLuaCFunctions::AddFunction("guiComboBoxIsOpen", GUIComboBoxIsOpen);
 }
 
 void CLuaGUIDefs::AddClass(lua_State* luaVM)
@@ -368,8 +368,8 @@ void CLuaGUIDefs::AddGuiComboBoxClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setItemText", "guiComboBoxSetItemText");
     lua_classfunction(luaVM, "setSelected", "guiComboBoxSetSelected");
     lua_classfunction(luaVM, "getItemCount", "guiComboBoxGetItemCount");
-    lua_classfunction(luaVM, "setState", "guiComboBoxSetState");
-    lua_classfunction(luaVM, "getState", "guiComboBoxGetState");
+    lua_classfunction(luaVM, "setOpen", "guiComboBoxSetOpen");
+    lua_classfunction(luaVM, "isOpen", "guiComboBoxIsOpen");
 
     lua_classvariable(luaVM, "selected", "guiComboBoxSetSelected", "guiComboBoxGetSelected");
 
@@ -3913,19 +3913,18 @@ int CLuaGUIDefs::GUIComboBoxGetItemCount(lua_State* luaVM)
     return 1;
 }
 
-int CLuaGUIDefs::GUIComboBoxSetState(lua_State* luaVM)
+int CLuaGUIDefs::GUIComboBoxSetOpen(lua_State* luaVM)
 {
-    // int guiComboBoxSetState( element comboBox, int state)
+    // int guiComboBoxSetOpen( element comboBox, bool state)
     CClientGUIElement* comboBox;
-    int state;
+    bool state;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData<CGUIComboBox>(comboBox);
     argStream.ReadNumber(state);
 
     if (!argStream.HasErrors())
     {
-        bool stateb = CStaticFunctionDefinitions::GUIComboBoxSetState(*comboBox, state);
-        lua_pushboolean(luaVM, stateb);
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::GUIComboBoxSetOpen(*comboBox, state));
         return 1;
     }
     else
@@ -3936,17 +3935,16 @@ int CLuaGUIDefs::GUIComboBoxSetState(lua_State* luaVM)
     return 1;
 }
 
-int CLuaGUIDefs::GUIComboBoxGetState(lua_State* luaVM)
+int CLuaGUIDefs::GUIComboBoxIsOpen(lua_State* luaVM)
 {
-    // int guiComboBoxGetState( element comboBox )
+    // int guiComboBoxIsOpen( element comboBox )
     CClientGUIElement* comboBox;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData<CGUIComboBox>(comboBox);
 
     if (!argStream.HasErrors())
     {
-        int statei = CStaticFunctionDefinitions::GUIComboBoxGetState(*comboBox);
-        lua_pushnumber(luaVM, statei);
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::GUIComboBoxIsOpen(*comboBox));
         return 1;
     }
     else
