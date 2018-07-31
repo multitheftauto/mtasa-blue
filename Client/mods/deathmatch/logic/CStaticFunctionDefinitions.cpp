@@ -5194,17 +5194,18 @@ int CStaticFunctionDefinitions::GUIComboBoxGetItemCount(CClientEntity& Entity)
     RUN_CHILDREN(GUIComboBoxGetItemCount(**iter))
 
     // Are we a CGUI Element?
-        if (IS_GUI(&Entity))
-        {
-            CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+    if (IS_GUI(&Entity))
+    {
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
 
-            // Are we a combobox?
-            if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
-            {
-                // Call getItemCount
-                return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetItemCount();
+        // Are we a combobox?
+        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
+        {
+            // Call getItemCount
+            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetItemCount();
         }
     }
+    
     return 0;
 }
 
@@ -5213,25 +5214,25 @@ bool CStaticFunctionDefinitions::GUIComboBoxSetState(CClientEntity& Entity, int 
     RUN_CHILDREN(GUIComboBoxSetState(**iter, state))
 
     // Are we a CGUI Element?
-        if (IS_GUI(&Entity))
-        {
-            CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+    if (IS_GUI(&Entity))
+    {
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
 
-            // Are we a combobox? and state > 0 and state < 3
-            if (IS_CGUIELEMENT_COMBOBOX(&GUIElement) && state > 0 && state < 3)
+        // Are we a combobox? and state > 0 and state < 3
+        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement) && state > 0 && state < 3)
+        {
+            if (state == 1)
             {
-                if (state == 1)
-                {
-                    static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->ShowDropList();
-                    return true;
-                }
-                else if (state == 2)
-                {
-                    static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->HideDropList();
-                    return true;
-                }
+                static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->ShowDropList();
             }
+            else if (state == 2)
+            {
+                static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->HideDropList();
+            }
+            return true;
         }
+    }
+    
     return false;
 }
 
@@ -5239,27 +5240,28 @@ int CStaticFunctionDefinitions::GUIComboBoxGetState(CClientEntity& Entity)
 {
     RUN_CHILDREN(GUIComboBoxGetState(**iter))
 
-        // Are we a CGUI Element?
-        if (IS_GUI(&Entity))
-        {
-            CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-            int comboState;
+    // Are we a CGUI Element?
+    if (IS_GUI(&Entity))
+    {
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+        int comboState;
 
-            // Are we a combobox?
-            if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
+        // Are we a combobox?
+        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
+        {
+            bool vs = static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetState();
+            if (!vs)
             {
-                bool vs = static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetState();
-                if (!vs)
-                {
-                    comboState = 2;
-                }
-                else if (vs)
-                {
-                    comboState = 1;
-                }
-                return comboState;
+                comboState = 2;
             }
+            else if (vs)
+            {
+                comboState = 1;
+            }
+                return comboState;
         }
+    }
+    
     return 0;
 }
 
