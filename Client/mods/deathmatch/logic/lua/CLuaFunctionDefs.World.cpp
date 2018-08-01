@@ -1764,6 +1764,16 @@ int CLuaFunctionDefs::GetBirdsEnabled(lua_State* luaVM)
     return 1;
 }
 
+int CLuaFunctionDefs::RemoveBirds(lua_State* luaVM)
+{
+    if (CStaticFunctionDefinitions::RemoveBirds())
+    {
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
 
 int CLuaFunctionDefs::AddBirds(lua_State* luaVM)
 {

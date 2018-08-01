@@ -169,6 +169,7 @@ public:
     LUA_DECLARE(CreateSWATRope);
     LUA_DECLARE(SetBirdsEnabled);
     LUA_DECLARE(GetBirdsEnabled);
+    LUA_DECLARE(RemoveBirds);
     LUA_DECLARE(AddBirds);
     LUA_DECLARE(SetPedTargetingMarkerEnabled);
     LUA_DECLARE(IsPedTargetingMarkerEnabled);

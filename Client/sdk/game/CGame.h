@@ -225,6 +225,9 @@ public:
     virtual bool IsWaterCreaturesEnabled() = 0;
     virtual void SetWaterCreaturesEnabled(bool bEnable) = 0;
 
+    virtual bool IsRandomBirdsEnabled() = 0;
+    virtual void SetRandomBirdsEnabled(bool bEnable) = 0;
+
     virtual CWeapon*     CreateWeapon(void) = 0;
     virtual CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill) = 0;
 

@@ -259,6 +259,7 @@ public:
     virtual void  SetMoonSize(int iSize) = 0;
     virtual int   GetMoonSize() = 0;
     virtual void  ResetMoonSize() = 0;
+    virtual bool  RemoveBirds() = 0;
     virtual int   AddBirds(CVector& vecStartPosition, CVector& vecDestPosition, int iNumBirds, int iBirdType, bool bCheckObstacles) = 0;
 
     virtual void DisableEnterExitVehicleKey(bool bDisabled) = 0;

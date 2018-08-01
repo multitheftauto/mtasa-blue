@@ -1677,18 +1677,25 @@ void CMultiplayerSA::DisableBirds(bool bDisabled)
     }
 }
 
+DWORD VAR_CBirds_nBirdsCreated = 0xC6A8A4;
+bool CMultiplayerSA::RemoveBirds()
+{
+    if (*(int*)VAR_CBirds_nBirdsCreated == 0) return true; // there is nothing to remove
+    DWORD FUNC_CBirds_Shutdown = 0x712300;
+    _asm
+    {
+        call FUNC_CBirds_Shutdown
+    }
+    return true;
+}
+
 int CMultiplayerSA::AddBirds(CVector& vecStartPosition, CVector& vecDestPosition, int iNumBirds, int iBirdType, bool bCheckObstacles)
 {
-    DWORD FUNC_CBirds_Add           = 0x711EF0;
-    DWORD VAR_CBirds_nBirdsCreated  = 0xC6A8A4;
-    DWORD dwCheckObstacles          = bCheckObstacles;
+    DWORD FUNC_CBirds_Add  = 0x711EF0;
+    DWORD dwCheckObstacles = bCheckObstacles;
 
-    float fStartX = vecStartPosition.fX;
-    float fStartY = vecStartPosition.fY;
-    float fStartZ = vecStartPosition.fZ;
-    float fDestX  = vecDestPosition.fX;
-    float fDestY  = vecDestPosition.fY;
-    float fDestZ  = vecDestPosition.fZ;
+    float fStartX   = vecStartPosition.fX,  fStartY = vecStartPosition.fY,  fStartZ = vecStartPosition.fZ;
+    float fDestX    = vecDestPosition.fX,   fDestY = vecDestPosition.fY,    fDestZ = vecDestPosition.fZ;
 
     int iBirdsCreated_before = *(int*)VAR_CBirds_nBirdsCreated;
     _asm
