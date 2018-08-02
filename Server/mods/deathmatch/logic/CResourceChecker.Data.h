@@ -166,7 +166,7 @@ namespace
         {"setElementCallPropagationEnabled", "1.3.5-9.06118"},
         {"isElementCallPropagationEnabled", "1.3.5-9.06118"},
         {"getResourceState", "1.3.5-9.06194"},
-        {"isPedWearingJetpack", "1.5.5-9.13176"},
+        {"isPedWearingJetpack", "1.5.5-9.13846"},
     };
 
     SVersionItem serverFunctionInitList[] = {
@@ -243,8 +243,8 @@ namespace
         {"isElementCallPropagationEnabled", "1.3.5-9.06118"},
         {"resendPlayerACInfo", "1.5.1-9.07633"},
         {"dbPrepareString", "1.5.2"},
-        {"isPedWearingJetpack", "1.5.5-9.13176"},
-        {"setPedWearingJetpack", "1.5.5-9.13176"},
+        {"isPedWearingJetpack", "1.5.5-9.13846"},
+        {"setPedWearingJetpack", "1.5.5-9.13846"},
     };
 
     //
