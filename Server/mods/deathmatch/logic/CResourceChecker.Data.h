@@ -389,8 +389,8 @@ namespace
         // Server ped jetpack
         {true, "givePlayerJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
         {true, "removePlayerJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
-        {true, "givePedJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
-        {true, "removePedJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
+        //{true, "givePedJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
+        //{true, "removePedJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
         {false, "doesPedHaveJetPack", "isPedWearingJetpack"},
         // XML
         {false, "xmlNodeGetSubNodes", "xmlNodeGetChildren"},
