@@ -690,6 +690,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\libGLESv2.dll"
         File "${FILES_ROOT}\mta\natives_blob.bin"
         File "${FILES_ROOT}\mta\snapshot_blob.bin"
+        File "${FILES_ROOT}\mta\v8_context_snapshot.bin"
         
         SetOutPath "$INSTDIR\MTA\CEF"
         File "${FILES_ROOT}\mta\CEF\CEFLauncher.exe"

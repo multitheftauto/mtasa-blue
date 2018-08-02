@@ -36,6 +36,7 @@ void CLuaElementDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("isElementWithinColShape", IsElementWithinColShape);
     CLuaCFunctions::AddFunction("isElementWithinMarker", IsElementWithinMarker);
     CLuaCFunctions::AddFunction("getElementsWithinColShape", GetElementsWithinColShape);
+    CLuaCFunctions::AddFunction("getElementsWithinRange", GetElementsWithinRange);
     CLuaCFunctions::AddFunction("getElementDimension", GetElementDimension);
     CLuaCFunctions::AddFunction("getElementBoundingBox", GetElementBoundingBox);
     CLuaCFunctions::AddFunction("getElementRadius", GetElementRadius);
@@ -139,6 +140,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getType", "getElementType");
     lua_classfunction(luaVM, "getInterior", "getElementInterior");
     lua_classfunction(luaVM, "getWithinColShape", "getElementsWithinColShape");
+    lua_classfunction(luaVM, "getWithinRange", "getElementsWithinRange");
     lua_classfunction(luaVM, "getDimension", "getElementDimension");
     lua_classfunction(luaVM, "getColShape", "getElementColShape");
     lua_classfunction(luaVM, "getAlpha", "getElementAlpha");
@@ -924,6 +926,45 @@ int CLuaElementDefs::GetElementsWithinColShape(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::GetElementsWithinRange(lua_State* luaVM)
+{
+    CVector position;
+    float   radius;
+    SString elementType;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadVector3D(position);
+    argStream.ReadNumber(radius);
+    argStream.ReadString(elementType, "");
+
+    if (!argStream.HasErrors())
+    {
+        // Query the spatial database
+        CClientEntityResult result;
+        GetClientSpatialDatabase()->SphereQuery(result, CSphere{ position, radius });
+
+        lua_newtable(luaVM);
+        unsigned int index = 0;
+
+        for (CClientEntity* entity : result)
+        {
+            if (elementType.empty() || elementType == entity->GetTypeName())
+            {
+                lua_pushnumber(luaVM, ++index);
+                lua_pushelement(luaVM, entity);
+                lua_settable(luaVM, -3);
+            }
+        }
+
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
     lua_pushboolean(luaVM, false);
     return 1;
 }

@@ -765,7 +765,6 @@ void CheckDataFiles(void)
     const char* dataFilesFiles[] = {"MTA\\cgui\\images\\background_logo.png",
                                     "MTA\\cgui\\images\\radarset\\up.png",
                                     "MTA\\cgui\\images\\busy_spinner.png",
-                                    "MTA\\cgui\\images\\rect_edge.png",
                                     "MTA\\D3DX9_42.dll",
                                     "MTA\\D3DCompiler_42.dll",
                                     "MTA\\bass.dll",

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPROXYDIRECTINPUTDEVICE_H
-#define __CPROXYDIRECTINPUTDEVICE_H
+#pragma once
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -59,5 +58,3 @@ public:
     IDirectInputDevice8A* m_pDevice;
     bool                  m_bDropDataIfInputGoesToGUI;
 };
-
-#endif

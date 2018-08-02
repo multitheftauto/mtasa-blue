@@ -14,6 +14,7 @@
 #include "game/CAnimBlendAssocGroup.h"
 #include "game/CAnimBlendAssociation.h"
 #include "game/CAnimBlendHierarchy.h"
+#include <windowsx.h>
 
 SString StringZeroPadout(const SString& strInput, uint uiPadoutSize)
 {
@@ -2475,8 +2476,8 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                 }
                 if (ucButtonHit != 0xFF)
                 {
-                    int iX = LOWORD(lParam);
-                    int iY = HIWORD(lParam);
+                    int iX = GET_X_LPARAM(lParam);
+                    int iY = GET_Y_LPARAM(lParam);
 
                     CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
 
@@ -2644,7 +2645,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
     {
         case WM_MOUSEMOVE:
         {
-            int        iX = LOWORD(lParam), iY = HIWORD(lParam);
+            int        iX = GET_X_LPARAM(lParam), iY = GET_Y_LPARAM(lParam);
             static int iPreviousX = 0, iPreviousY = 0;
             if (iX != iPreviousX || iY != iPreviousY)
             {
@@ -3909,14 +3910,16 @@ void CClientGame::IdleHandler(void)
             CLuaArguments Arguments;
             m_pRootEntity->CallEvent("onClientMinimize", Arguments, false);
 
-            // Apply mute on minimize options
-            if (g_pCore->GetCVars()->GetValue<bool>("mute_sfx_when_minimized"))
-                g_pGame->GetAudio()->SetEffectsMasterVolume(0);
+            bool bMuteAll = g_pCore->GetCVars()->GetValue<bool>("mute_master_when_minimized");
 
-            if (g_pCore->GetCVars()->GetValue<bool>("mute_radio_when_minimized"))
+            // Apply mute on minimize options
+            if (bMuteAll || g_pCore->GetCVars()->GetValue<bool>("mute_radio_when_minimized"))
                 g_pGame->GetAudio()->SetMusicMasterVolume(0);
 
-            if (g_pCore->GetCVars()->GetValue<bool>("mute_mta_when_minimized"))
+            if (bMuteAll || g_pCore->GetCVars()->GetValue<bool>("mute_sfx_when_minimized"))
+                g_pGame->GetAudio()->SetEffectsMasterVolume(0);
+
+            if (bMuteAll || g_pCore->GetCVars()->GetValue<bool>("mute_mta_when_minimized"))
                 m_pManager->GetSoundManager()->SetMinimizeMuted(true);
         }
     }
@@ -5572,6 +5575,9 @@ void CClientGame::ResetMapInfo(void)
     // Vehicles LOD distance
     g_pGame->GetSettings()->ResetVehiclesLODDistance();
 
+    // Peds LOD distance 
+    g_pGame->GetSettings()->ResetPedsLODDistance(); 
+    
     // Sun color
     g_pMultiplayer->ResetSunColor();
 

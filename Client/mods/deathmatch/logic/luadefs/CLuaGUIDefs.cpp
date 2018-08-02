@@ -126,12 +126,18 @@ void CLuaGUIDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("guiEditSetCaretIndex", GUIEditSetCaretIndex);
     CLuaCFunctions::AddFunction("guiEditGetCaretIndex", GUIEditGetCaretIndex);
     CLuaCFunctions::AddFunction("guiEditSetMasked", GUIEditSetMasked);
+    CLuaCFunctions::AddFunction("guiEditIsMasked", GUIEditIsMasked);
     CLuaCFunctions::AddFunction("guiEditSetMaxLength", GUIEditSetMaxLength);
+    CLuaCFunctions::AddFunction("guiEditGetMaxLength", GUIEditGetMaxLength);
     CLuaCFunctions::AddFunction("guiEditSetReadOnly", GUIEditSetReadOnly);
+    CLuaCFunctions::AddFunction("guiEditIsReadOnly", GUIEditIsReadOnly);
 
     CLuaCFunctions::AddFunction("guiMemoSetCaretIndex", GUIMemoSetCaretIndex);
     CLuaCFunctions::AddFunction("guiMemoGetCaretIndex", GUIMemoGetCaretIndex);
     CLuaCFunctions::AddFunction("guiMemoSetReadOnly", GUIMemoSetReadOnly);
+    CLuaCFunctions::AddFunction("guiMemoIsReadOnly", GUIMemoIsReadOnly);
+    CLuaCFunctions::AddFunction("guiMemoSetVerticalScrollPosition", GUIMemoSetVerticalScrollPosition);
+    CLuaCFunctions::AddFunction("guiMemoGetVerticalScrollPosition", GUIMemoGetVerticalScrollPosition);
 
     CLuaCFunctions::AddFunction("guiLabelSetColor", GUILabelSetColor);
     CLuaCFunctions::AddFunction("guiLabelGetColor", GUILabelGetColor);
@@ -143,6 +149,8 @@ void CLuaGUIDefs::LoadFunctions(void)
 
     CLuaCFunctions::AddFunction("guiWindowSetMovable", GUIWindowSetMovable);
     CLuaCFunctions::AddFunction("guiWindowSetSizable", GUIWindowSetSizable);
+    CLuaCFunctions::AddFunction("guiWindowIsMovable", GUIWindowIsMovable);
+    CLuaCFunctions::AddFunction("guiWindowIsSizable", GUIWindowIsSizable);
 
     CLuaCFunctions::AddFunction("getChatboxLayout", GUIGetChatboxLayout);
 
@@ -246,11 +254,15 @@ void CLuaGUIDefs::AddGuiWindowClass(lua_State* luaVM)
     lua_newclass(luaVM);
 
     lua_classfunction(luaVM, "create", "guiCreateWindow");
+
     lua_classfunction(luaVM, "setMovable", "guiWindowSetMovable");
     lua_classfunction(luaVM, "setSizable", "guiWindowSetSizable");
 
-    lua_classvariable(luaVM, "movable", "guiWindowSetMovable", NULL);
-    lua_classvariable(luaVM, "sizable", "guiWindowSetSizable", NULL);
+    lua_classfunction(luaVM, "isMovable", "guiWindowIsMovable");
+    lua_classfunction(luaVM, "isSizable", "guiWindowIsSizable");
+
+    lua_classvariable(luaVM, "movable", "guiWindowSetMovable", "guiWindowIsMovable");
+    lua_classvariable(luaVM, "sizable", "guiWindowSetSizable", "guiWindowIsSizable");
 
     lua_registerclass(luaVM, "GuiWindow", "GuiElement");
 }
@@ -276,9 +288,9 @@ void CLuaGUIDefs::AddGuiEditClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setMaxLength", "guiEditSetMaxLength");
 
     lua_classvariable(luaVM, "caretIndex", "guiEditSetCaretIndex", "guiEditGetCaretIndex");
-    lua_classvariable(luaVM, "readOnly", "guiEditSetReadOnly", NULL);
-    lua_classvariable(luaVM, "masked", "guiEditSetMasked", NULL);
-    lua_classvariable(luaVM, "maxLength", "guiEditSetMaxLength", NULL);
+    lua_classvariable(luaVM, "readOnly", "guiEditSetReadOnly", "guiEditIsReadOnly");
+    lua_classvariable(luaVM, "masked", "guiEditSetMasked", "guiEditIsMasked");
+    lua_classvariable(luaVM, "maxLength", "guiEditSetMaxLength", "guiEditGetMaxLength");
 
     lua_registerclass(luaVM, "GuiEdit", "GuiElement");
 }
@@ -314,12 +326,15 @@ void CLuaGUIDefs::AddGuiMemoClass(lua_State* luaVM)
     lua_classfunction(luaVM, "create", "guiCreateMemo");
 
     lua_classfunction(luaVM, "getCaretIndex", "guiMemoGetCaretIndex");
+    lua_classfunction(luaVM, "getVerticalScrollPosition", "guiMemoGetVerticalScrollPosition");
 
     lua_classfunction(luaVM, "setCaretIndex", "guiMemoSetCaretIndex");
+    lua_classfunction(luaVM, "setVerticalScrollPosition", "guiMemoSetVerticalScrollPosition");
     lua_classfunction(luaVM, "setReadOnly", "guiMemoSetReadOnly");
 
     lua_classvariable(luaVM, "caretIndex", "guiMemoSetCaretIndex", "guiMemoGetCaretIndex");
-    lua_classvariable(luaVM, "readOnly", "guiMemoSetReadOnly", NULL);
+    lua_classvariable(luaVM, "verticalScrollPosition", "guiMemoSetVerticalScrollPosition", "guiMemoGetVerticalScrollPosition");
+    lua_classvariable(luaVM, "readOnly", "guiMemoSetReadOnly", "guiMemoIsReadOnly");
 
     lua_registerclass(luaVM, "GuiMemo", "GuiElement");
 }
@@ -2945,6 +2960,28 @@ int CLuaGUIDefs::GUIEditSetReadOnly(lua_State* luaVM)
     return 1;
 }
 
+int CLuaGUIDefs::GUIEditIsReadOnly(lua_State* luaVM)
+{
+    // bool guiEditIsReadOnly( element editField )
+    CClientGUIElement* editField;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIEdit>(editField);
+
+    if (!argStream.HasErrors())
+    {
+        bool readOnly = static_cast<CGUIEdit*>(editField->GetCGUIElement())->IsReadOnly();
+        lua_pushboolean(luaVM, readOnly);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushnil(luaVM);
+    return 1;
+}
+
 int CLuaGUIDefs::GUIMemoSetReadOnly(lua_State* luaVM)
 {
     //  bool guiMemoSetReadOnly ( gui-memo theMemo, bool status )
@@ -2966,6 +3003,28 @@ int CLuaGUIDefs::GUIMemoSetReadOnly(lua_State* luaVM)
 
     // error: bad arguments
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIMemoIsReadOnly(lua_State* luaVM)
+{
+    // bool guiMemoIsReadOnly( gui-memo theMemo )
+    CClientGUIElement* theMemo;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIMemo>(theMemo);
+
+    if (!argStream.HasErrors())
+    {
+        bool readOnly = static_cast<CGUIMemo*>(theMemo->GetCGUIElement())->IsReadOnly();
+        lua_pushboolean(luaVM, readOnly);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushnil(luaVM);
     return 1;
 }
 
@@ -2993,6 +3052,28 @@ int CLuaGUIDefs::GUIEditSetMasked(lua_State* luaVM)
     return 1;
 }
 
+int CLuaGUIDefs::GUIEditIsMasked(lua_State* luaVM)
+{
+    //bool guiEditIsMasked(element theElement)
+    CClientGUIElement* theElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIEdit>(theElement);
+    
+    if (!argStream.HasErrors())
+    {
+        bool masked = static_cast<CGUIEdit*>(theElement->GetCGUIElement())->IsMasked();
+        lua_pushboolean(luaVM, masked);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushnil(luaVM);
+    return 1;
+}
+
 int CLuaGUIDefs::GUIEditSetMaxLength(lua_State* luaVM)
 {
     //  bool guiEditSetMaxLength ( element theElement, int length )
@@ -3007,6 +3088,27 @@ int CLuaGUIDefs::GUIEditSetMaxLength(lua_State* luaVM)
     {
         CStaticFunctionDefinitions::GUIEditSetMaxLength(*theElement, length);
         lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIEditGetMaxLength(lua_State* luaVM)
+{
+    // int guiEditGetMaxLength(element theElement)
+    CClientGUIElement* theElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIEdit>(theElement);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushnumber(luaVM, static_cast<CGUIEdit*>(theElement->GetCGUIElement())->GetMaxLength());
         return 1;
     }
     else
@@ -3086,6 +3188,29 @@ int CLuaGUIDefs::GUIMemoSetCaretIndex(lua_State* luaVM)
     return 1;
 }
 
+int CLuaGUIDefs::GUIMemoSetVerticalScrollPosition(lua_State* luaVM)
+{
+    //  bool guiMemoSetVerticalScrollPosition ( gui-memo theMemo, float fPosition )
+    CClientGUIElement* theMemo;
+    float              fPosition;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIMemo>(theMemo);
+    argStream.ReadNumber(fPosition);
+
+    if (!argStream.HasErrors())
+    {
+        CStaticFunctionDefinitions::GUIMemoSetVerticalScrollPosition(*theMemo, fPosition);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaGUIDefs::GUIMemoGetCaretIndex(lua_State* luaVM)
 {
     //  bool guiMemoGetCaretIndex ( gui-memo theMemo )
@@ -3097,6 +3222,29 @@ int CLuaGUIDefs::GUIMemoGetCaretIndex(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         lua_pushnumber(luaVM, static_cast<CGUIMemo*>(theMemo->GetCGUIElement())->GetCaretIndex());
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIMemoGetVerticalScrollPosition(lua_State* luaVM)
+{
+    //  float guiMemoGetVerticalScrollPosition ( gui-memo theMemo )
+    CClientGUIElement* theMemo;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIMemo>(theMemo);
+
+    if (!argStream.HasErrors())
+    {
+        CGUIMemo* guiMemo = static_cast<CGUIMemo*>(theMemo->GetCGUIElement());
+        float     fPos = guiMemo->GetVerticalScrollPosition() / guiMemo->GetMaxVerticalScrollPosition() * 100.0f;
+        lua_pushnumber(luaVM, fPos);
         return 1;
     }
     else
@@ -3131,6 +3279,28 @@ int CLuaGUIDefs::GUIWindowSetMovable(lua_State* luaVM)
     return 1;
 }
 
+int CLuaGUIDefs::GUIWindowIsMovable(lua_State* luaVM)
+{
+    // bool guiWindowIsMovable( element theElement )
+    CClientGUIElement* theElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIWindow>(theElement);
+
+    if (!argStream.HasErrors())
+    {
+        bool movable = static_cast<CGUIWindow*>(theElement->GetCGUIElement())->IsMovable();
+        lua_pushboolean(luaVM, movable);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushnil(luaVM);
+    return 1;
+}
+
 int CLuaGUIDefs::GUIWindowSetSizable(lua_State* luaVM)
 {
     //  bool guiWindowSetSizable ( element theElement, bool status )
@@ -3152,6 +3322,28 @@ int CLuaGUIDefs::GUIWindowSetSizable(lua_State* luaVM)
 
     // error: bad arguments
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIWindowIsSizable(lua_State* luaVM)
+{
+    // bool guiWindowIsSizable( elemen theElement )
+    CClientGUIElement* theElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIWindow>(theElement);
+
+    if (!argStream.HasErrors())
+    {
+        bool sizable = static_cast<CGUIWindow*>(theElement->GetCGUIElement())->IsSizingEnabled();
+        lua_pushboolean(luaVM, sizable);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    
+    // error: bad arguments
+    lua_pushnil(luaVM);
     return 1;
 }
 

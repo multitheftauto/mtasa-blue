@@ -3414,6 +3414,34 @@ bool CStaticFunctionDefinitions::IsVehicleWindowOpen(CClientVehicle& Vehicle, uc
     return Vehicle.IsWindowOpen(ucWindow);
 }
 
+bool CStaticFunctionDefinitions::SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition)
+{
+    if (CClientVehicleManager::IsValidModel(usModel))
+    {
+        auto pModelInfo = g_pGame->GetModelInfo(usModel);
+        if (pModelInfo)
+        {
+            pModelInfo->SetVehicleExhaustFumesPosition(vecPosition);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition)
+{
+    if (CClientVehicleManager::IsValidModel(usModel))
+    {
+        auto pModelInfo = g_pGame->GetModelInfo(usModel);
+        if (pModelInfo)
+        {
+            vecPosition = pModelInfo->GetVehicleExhaustFumesPosition();
+            return true;
+        }
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetElementCollisionsEnabled(CClientEntity& Entity, bool bEnabled)
 {
     switch (Entity.GetType())
@@ -4196,43 +4224,59 @@ bool CStaticFunctionDefinitions::GetSFXStatus(eAudioLookupIndex containerIndex, 
 CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip(CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize,
                                                            const SColor color, short sOrdering, unsigned short usVisibleDistance)
 {
-    CClientRadarMarker* pBlip = new CClientRadarMarker(m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance);
-    if (pBlip)
+    // Valid icon and size?
+    if (CClientRadarMarkerManager::IsValidIcon(ucIcon) && ucSize <= 25)
     {
-        pBlip->SetParent(Resource.GetResourceDynamicEntity());
-        pBlip->SetPosition(vecPosition);
-        pBlip->SetSprite(ucIcon);
-        pBlip->SetScale(ucSize);
-        pBlip->SetColor(color);
+        CClientRadarMarker* pBlip = new CClientRadarMarker(m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance);
+        if (pBlip)
+        {
+            pBlip->SetParent(Resource.GetResourceDynamicEntity());
+            pBlip->SetPosition(vecPosition);
+            pBlip->SetSprite(ucIcon);
+            pBlip->SetScale(ucSize);
+            pBlip->SetColor(color);
+        }
+        return pBlip;
     }
-    return pBlip;
+
+    return nullptr;
 }
 
 CClientRadarMarker* CStaticFunctionDefinitions::CreateBlipAttachedTo(CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize,
                                                                      const SColor color, short sOrdering, unsigned short usVisibleDistance)
 {
-    CClientRadarMarker* pBlip = new CClientRadarMarker(m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance);
-    if (pBlip)
+    assert(&Entity);
+    // Valid icon and size?
+    if (CClientRadarMarkerManager::IsValidIcon(ucIcon) && ucSize <= 25)
     {
-        pBlip->SetParent(Resource.GetResourceDynamicEntity());
-        pBlip->AttachTo(&Entity);
-        pBlip->SetSprite(ucIcon);
-        pBlip->SetScale(ucSize);
-        pBlip->SetColor(color);
+        CClientRadarMarker* pBlip = new CClientRadarMarker(m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance);
+        if (pBlip)
+        {
+            pBlip->SetParent(Resource.GetResourceDynamicEntity());
+            pBlip->AttachTo(&Entity);
+            pBlip->SetSprite(ucIcon);
+            pBlip->SetScale(ucSize);
+            pBlip->SetColor(color);
+        }
+        return pBlip;
     }
-    return pBlip;
+
+    return nullptr;
 }
 
 bool CStaticFunctionDefinitions::SetBlipIcon(CClientEntity& Entity, unsigned char ucIcon)
 {
-    RUN_CHILDREN(SetBlipIcon(**iter, ucIcon))
-
-    if (IS_RADARMARKER(&Entity))
+    if (CClientRadarMarkerManager::IsValidIcon(ucIcon))
     {
-        CClientRadarMarker& Marker = static_cast<CClientRadarMarker&>(Entity);
+        RUN_CHILDREN(SetBlipIcon(**iter, ucIcon))
 
-        Marker.SetSprite(ucIcon);
-        return true;
+        if (IS_RADARMARKER(&Entity))
+        {
+            CClientRadarMarker& Marker = static_cast<CClientRadarMarker&>(Entity);
+
+            Marker.SetSprite(ucIcon);
+            return true;
+        }
     }
 
     return false;
@@ -4240,14 +4284,17 @@ bool CStaticFunctionDefinitions::SetBlipIcon(CClientEntity& Entity, unsigned cha
 
 bool CStaticFunctionDefinitions::SetBlipSize(CClientEntity& Entity, unsigned char ucSize)
 {
-    RUN_CHILDREN(SetBlipSize(**iter, ucSize))
-
-    if (IS_RADARMARKER(&Entity))
+    if (ucSize <= 25)
     {
-        CClientRadarMarker& Marker = static_cast<CClientRadarMarker&>(Entity);
+        RUN_CHILDREN(SetBlipSize(**iter, ucSize))
 
-        Marker.SetScale(ucSize);
-        return true;
+        if (IS_RADARMARKER(&Entity))
+        {
+            CClientRadarMarker& Marker = static_cast<CClientRadarMarker&>(Entity);
+
+            Marker.SetScale(ucSize);
+            return true;
+        }
     }
 
     return false;
@@ -5565,6 +5612,24 @@ void CStaticFunctionDefinitions::GUIMemoSetCaretIndex(CClientEntity& Entity, uns
         {
             // Set its carat index
             static_cast<CGUIMemo*>(GUIElement.GetCGUIElement())->SetCaretIndex(iCaret);
+        }
+    }
+}
+
+void CStaticFunctionDefinitions::GUIMemoSetVerticalScrollPosition(CClientEntity& Entity, float fPosition)
+{
+    RUN_CHILDREN(GUIMemoSetVerticalScrollPosition(**iter, fPosition))
+
+    // Are we a GUI element?
+    if (IS_GUI(&Entity))
+    {
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+
+        // Are we a memo?
+        if (IS_CGUIELEMENT_MEMO(&GUIElement))
+        {
+            CGUIMemo* guiMemo = static_cast<CGUIMemo*>(GUIElement.GetCGUIElement());
+            guiMemo->SetVerticalScrollPosition(fPosition / 100.0f * guiMemo->GetMaxVerticalScrollPosition());
         }
     }
 }
