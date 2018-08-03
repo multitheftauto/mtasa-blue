@@ -59,6 +59,11 @@ public:
     void Printf(const char* szText, ...);
     bool IsRequestingExit(void);
 
+    // Clears input buffer
+    bool ClearInput(void);
+    // Prints current input buffer on a new line, clears the input buffer and resets history selection
+    bool ResetInput(void);
+
     int Run(int iArgumentCount, char* szArguments[]);
 #ifndef WIN32
     void Daemonize() const;

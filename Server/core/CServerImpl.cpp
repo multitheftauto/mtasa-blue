@@ -765,7 +765,7 @@ void CServerImpl::HandleInput(void)
             // Echo a newline
             Printf("\n");
 #else
-            // set string termination (required for compare/string functions
+            // Set string termination (required for compare/string functions)
             m_szInputBuffer[m_uiInputCount] = 0;
 
             if (!g_bSilent && !g_bNoCurses)
@@ -962,19 +962,8 @@ void CServerImpl::SelectCommandHistoryEntry(int iEntry)
     else
         m_iSelectedCommandHistoryEntry = -1;
 
-    // Clear out old buffer
-    memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
-
-    // Couldn't get anything else working, so this is a way to clear the line
-#ifdef WIN32
-    for (uint i = 0; i < 80; i++)
-        Printf("%c %c", 0x08, 0x08);
-#else
-    for (uint i = 0; i < COLS; i++)
-        if (!g_bSilent && !g_bNoCurses)
-            wprintw(m_wndInput, "%c %c", 0x08, 0x08);
-    wmove(m_wndInput, 0, 0);
-#endif
+    // Clear out input
+    ClearInput();
 
     // If we wanted to clear selection, break here
     if (m_iSelectedCommandHistoryEntry == -1)
@@ -996,6 +985,61 @@ void CServerImpl::SelectCommandHistoryEntry(int iEntry)
     if (!g_bSilent && !g_bNoCurses)
         wprintw(m_wndInput, "%s", UTF16ToMbUTF8(szBuffer).c_str());
 #endif
+}
+
+bool CServerImpl::ClearInput(void)
+{
+    if (m_uiInputCount > 0)
+    {
+        // Clear out old buffer
+        memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
+
+        // Couldn't get anything else working, so this is a way to clear the line
+#ifdef WIN32
+        for (uint i = 0; i < 80; i++)
+            Printf("%c %c", 0x08, 0x08);
+#else
+        for (uint i = 0; i < COLS; i++)
+            if (!g_bSilent && !g_bNoCurses)
+                wprintw(m_wndInput, "%c %c", 0x08, 0x08);
+#endif
+        // Reset our input count
+        m_uiInputCount = 0;
+
+        return true;
+    }
+    return false;
+}
+
+bool CServerImpl::ResetInput(void)
+{
+    if (m_uiInputCount > 0)
+    {
+        // Let's print our current input buffer
+#ifdef WIN32
+        // Echo a newline
+        Printf("\n");
+#else
+        // Set string termination (required for compare/string functions)
+        m_szInputBuffer[m_uiInputCount] = 0;
+
+        if (!g_bSilent && !g_bNoCurses)
+        {
+            // Clear the input window
+            wclear(m_wndInput);
+            printw("%s\n", UTF16ToMbUTF8(m_szInputBuffer).c_str());
+        }
+#endif
+
+        // Clear our input buffer
+        ClearInput();
+
+        // Reset our command history entry
+        m_iSelectedCommandHistoryEntry = -1;
+
+        return true;
+    }
+    return false;
 }
 
 bool CServerImpl::ParseArguments(int iArgumentCount, char* szArguments[])
