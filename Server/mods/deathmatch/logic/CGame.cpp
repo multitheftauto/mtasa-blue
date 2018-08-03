@@ -79,7 +79,7 @@ void sighandler(int sig)
     if (sig == SIGTERM || sig == SIGINT)
     {
         // If we received a Ctrl-C, let's try resetting input buffer first, otherwise close the server
-        if (g_pGame && (sig == SIGINT && !g_pServerInterface->ResetInput()))
+        if (g_pGame && (sig != SIGINT || (sig == SIGINT && !g_pServerInterface->ResetInput())))
         {
             // Graceful close on Ctrl-C or 'kill'
             g_pGame->SetIsFinished(true);
