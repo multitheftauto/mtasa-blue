@@ -78,7 +78,7 @@ private:
 
     void ShowInfoTag(char* szTag);
     void HandleInput(void);
-    void SelectCommandHistoryEntry(int iEntry);
+    void SelectCommandHistoryEntry(uint uiEntry);
     void HandlePulseSleep(void);
     void ApplyFrameRateLimit(uint uiUseRate);
 
@@ -100,16 +100,16 @@ private:
     bool m_bRequestedQuit;
     bool m_bRequestedReset;
 
-    wchar_t      m_szInputBuffer[255];
-    unsigned int m_uiInputCount;
+    wchar_t m_szInputBuffer[255];
+    uint    m_uiInputCount;
 
     char m_szTag[80];
 
     double m_dLastTimeMs;
     double m_dPrevOverrun;
 
-    std::vector<SString> m_vecCommandHistory;
-    int                  m_iSelectedCommandHistoryEntry = -1;
+    std::vector<SString> m_vecCommandHistory = { "" };
+    uint                 m_uiSelectedCommandHistoryEntry = 0;
 
 #ifdef WIN32
     HANDLE    m_hConsole;

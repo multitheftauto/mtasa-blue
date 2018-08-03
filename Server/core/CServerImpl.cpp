@@ -809,7 +809,7 @@ void CServerImpl::HandleInput(void)
 
             memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
             m_uiInputCount = 0;
-            m_iSelectedCommandHistoryEntry = -1;
+            m_uiSelectedCommandHistoryEntry = 0;
             break;
 
         case KEY_BACKSPACE:            // Backspace
@@ -891,12 +891,12 @@ void CServerImpl::HandleInput(void)
                 case KEY_UP:            // Up-arrow cursor
                 {
                     // If there's nothing to select, break here
-                    if (m_vecCommandHistory.empty())
+                    if (m_vecCommandHistory.size() <= 1 || m_uiSelectedCommandHistoryEntry == 1)
                         break;
 
                     // Select the previous command
-                    int iEntry = m_iSelectedCommandHistoryEntry;
-                    if (iEntry == -1)
+                    int iEntry = m_uiSelectedCommandHistoryEntry;
+                    if (iEntry == 0)
                         iEntry = m_vecCommandHistory.size() - 1;
                     else
                         iEntry--;
@@ -908,8 +908,12 @@ void CServerImpl::HandleInput(void)
                 }
                 case KEY_DOWN:            // Down-arrow cursor
                 {
+                    // If there's nothing to select, break here
+                    if (m_vecCommandHistory.size() <= 1 || m_uiSelectedCommandHistoryEntry == 0)
+                        break;
+
                     // Select the next command
-                    SelectCommandHistoryEntry(m_iSelectedCommandHistoryEntry + 1);
+                    SelectCommandHistoryEntry(m_uiSelectedCommandHistoryEntry + 1);
 
                     break;
                 }
@@ -954,26 +958,31 @@ void CServerImpl::HandleInput(void)
     }
 }
 
-void CServerImpl::SelectCommandHistoryEntry(int iEntry)
+void CServerImpl::SelectCommandHistoryEntry(uint uiEntry)
 {
+    uint uiPreviouslySelectedCommandHistoryEntry = m_uiSelectedCommandHistoryEntry;
+
     // Check if we're in bounds, otherwise clear selection
-    if (!m_vecCommandHistory.empty() && iEntry >= 0 && iEntry < m_vecCommandHistory.size())
-        m_iSelectedCommandHistoryEntry = iEntry;
+    if (!m_vecCommandHistory.empty() && uiEntry > 0 && uiEntry < m_vecCommandHistory.size())
+        m_uiSelectedCommandHistoryEntry = uiEntry;
     else
-        m_iSelectedCommandHistoryEntry = -1;
+        m_uiSelectedCommandHistoryEntry = 0;
+
+    // Save current input buffer to the command history entry
+    m_vecCommandHistory[uiPreviouslySelectedCommandHistoryEntry] = UTF16ToMbUTF8(m_szInputBuffer).c_str();
 
     // Clear out input
     ClearInput();
 
-    // If we wanted to clear selection, break here
-    if (m_iSelectedCommandHistoryEntry == -1)
+    // If the input is empty, let's just stop here
+    SString szInput = m_vecCommandHistory[m_uiSelectedCommandHistoryEntry];
+    if (szInput.empty())
         return;
 
-    // Select our command and fill the input buffer
-    SString szCommand = m_vecCommandHistory[m_iSelectedCommandHistoryEntry];
-    m_uiInputCount = szCommand.length();
-    for (uint i = 0; i < szCommand.length(); i++)
-        m_szInputBuffer[i] = szCommand[i];
+    // Fill the input buffer
+    m_uiInputCount = szInput.length();
+    for (uint i = 0; i < szInput.length(); i++)
+        m_szInputBuffer[i] = szInput[i];
 
     // Let's print it out
     wchar_t szBuffer[255];
@@ -1035,7 +1044,7 @@ bool CServerImpl::ResetInput(void)
         ClearInput();
 
         // Reset our command history entry
-        m_iSelectedCommandHistoryEntry = -1;
+        m_uiSelectedCommandHistoryEntry = 0;
 
         return true;
     }
