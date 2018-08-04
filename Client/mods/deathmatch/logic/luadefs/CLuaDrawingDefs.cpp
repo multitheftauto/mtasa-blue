@@ -406,9 +406,9 @@ int CLuaDrawingDefs::DxDrawRectangle(lua_State* luaVM)
 int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
 {
     CVector2D vecPosition;
-    float     radius;
-    float     startAngle;
-    float     stopAngle;
+    float     fRadius;
+    float     fStartAngle;
+    float     fStopAngle;
     SColor    color;
     SColor    colorCenter;
     short     fSegments;
@@ -418,9 +418,9 @@ int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(vecPosition);
-    argStream.ReadNumber(radius);
-    argStream.ReadNumber(startAngle, 0);
-    argStream.ReadNumber(stopAngle, 360);
+    argStream.ReadNumber(fRadius);
+    argStream.ReadNumber(fStartAngle, 0);
+    argStream.ReadNumber(fStopAngle, 360);
     argStream.ReadColor(color, 0xFFFFFFFF);
     argStream.ReadColor(colorCenter, color);
     argStream.ReadNumber(fSegments, 32);
@@ -434,12 +434,12 @@ int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
         {
             if (fRatio > 0 && fRatio <= 100)
             {
-                if (radius > 0)
+                if (fRadius > 0)
                 {
-                    if (stopAngle < startAngle)
-                        std::swap(stopAngle, startAngle);
+                    if (fStopAngle < fStartAngle)
+                        std::swap(fStopAngle, fStartAngle);
 
-                    g_pCore->GetGraphics()->DrawCircleQueued(vecPosition.fX, vecPosition.fY, radius, startAngle, stopAngle, color, colorCenter, fSegments, fRatio, bPostGUI, bSubPixelPositioning);
+                    g_pCore->GetGraphics()->DrawCircleQueued(vecPosition.fX, vecPosition.fY, fRadius, fStartAngle, fStopAngle, color, colorCenter, fSegments, fRatio, bPostGUI, bSubPixelPositioning);
                     lua_pushboolean(luaVM, true);
                     return 1;
                 }
