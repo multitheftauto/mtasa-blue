@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CMouseControl.h"
+#include <windowsx.h>
 #include <game/CGame.h>
 
 #define MOUSE_CONTROL_MULTIPLIER    35
@@ -78,7 +79,7 @@ bool CMouseControl::ProcessMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     // Let's calculate our mouse movement directions
     CVector2D resolution = g_pCore->GetGUI()->GetResolution();
-    int       iX = LOWORD(lParam), iY = HIWORD(lParam);
+    int       iX = GET_X_LPARAM(lParam), iY = GET_Y_LPARAM(lParam);
     float     fX = (iX - resolution.fX * 0.5f) / resolution.fX;
 
     fX *= MOUSE_CONTROL_MULTIPLIER;
