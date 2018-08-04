@@ -79,7 +79,6 @@ public:
 
     virtual void DrawLine3D(const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f) = 0;
     virtual void DrawRectangle(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning = false) = 0;
-    virtual void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI, bool bSubPixelPositioning) = 0;
 
     virtual void           SetBlendMode(EBlendModeType blendMode) = 0;
     virtual EBlendModeType GetBlendMode(void) = 0;
@@ -127,6 +126,8 @@ public:
     virtual void DrawStringQueued(float fLeft, float fTop, float fRight, float fBottom, unsigned long dwColor, const char* wszText, float fScaleX,
                                   float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bColorCoded = false,
                                   bool bSubPixelPositioning = false, float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0) = 0;
+
+    virtual void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI) = 0;
 
     // Subsystems
     virtual CRenderItemManagerInterface* GetRenderItemManager(void) = 0;

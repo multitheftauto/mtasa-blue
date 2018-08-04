@@ -795,7 +795,7 @@ void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, 
     AddQueueItem(Item, bPostGUI);
 }
 
-void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI, bool bSubPixelPositioning)
+void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI)
 {
     if (g_pCore->IsWindowMinimized())
         return;
@@ -817,11 +817,10 @@ void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStart
     Item.Circle.fRatio = fRatio;
     Item.Circle.ulColor = ulColor;
     Item.Circle.ulColorCenter = ulColorCenter;
-    Item.Circle.bSubPixelPositioning = bSubPixelPositioning;
     // Add it to the queue
     AddQueueItem(Item, bPostGUI);
 
-    DrawCircleInternal(fX, fY, fRadius, fStartAngle, fStopAngle, ulColor, ulColorCenter, fSegments, fRatio, bPostGUI, bSubPixelPositioning);
+    DrawCircleInternal(fX, fY, fRadius, fStartAngle, fStopAngle, ulColor, ulColorCenter, fSegments, fRatio, bPostGUI);
 
     EndDrawBatch();
 }
@@ -832,16 +831,8 @@ struct stVertex
     D3DCOLOR color;
 };
 
-void CGraphics::DrawCircleInternal(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI, bool bSubPixelPositioning)
+void CGraphics::DrawCircleInternal(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI)
 {
-
-    // Adjust size to account for sub pixel borders
-    if (bSubPixelPositioning)
-    {
-        fX += 0.5f;
-        fY += 0.5f;
-    }
-
     fStartAngle = D3DXToRadian(fStartAngle);
     fStopAngle = D3DXToRadian(fStopAngle);
 
@@ -1533,7 +1524,7 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
         case QUEUE_CIRCLE:
         {
             CheckModes(EDrawMode::DX_SPRITE, Item.blendMode);
-            DrawCircleInternal(Item.Circle.fX, Item.Circle.fY, Item.Circle.fRadius, Item.Circle.fStartAngle, Item.Circle.fStopAngle, Item.Circle.ulColor, Item.Circle.ulColorCenter, Item.Circle.fSegments, Item.Circle.fRatio, Item.Circle.bPostGUI, Item.Circle.bSubPixelPositioning);
+            DrawCircleInternal(Item.Circle.fX, Item.Circle.fY, Item.Circle.fRadius, Item.Circle.fStartAngle, Item.Circle.fStopAngle, Item.Circle.ulColor, Item.Circle.ulColorCenter, Item.Circle.fSegments, Item.Circle.fRatio, Item.Circle.bPostGUI);
             break;
         }
 

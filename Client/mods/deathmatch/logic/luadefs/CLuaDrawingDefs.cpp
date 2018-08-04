@@ -414,7 +414,6 @@ int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
     short     fSegments;
     float     fRatio;
     bool      bPostGUI;
-    bool      bSubPixelPositioning;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(vecPosition);
@@ -426,7 +425,6 @@ int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
     argStream.ReadNumber(fSegments, 32);
     argStream.ReadNumber(fRatio, 1);
     argStream.ReadBool(bPostGUI, false);
-    argStream.ReadBool(bSubPixelPositioning, false);
 
     if (!argStream.HasErrors())
     {
@@ -439,7 +437,7 @@ int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
                     if (fStopAngle < fStartAngle)
                         std::swap(fStopAngle, fStartAngle);
 
-                    g_pCore->GetGraphics()->DrawCircleQueued(vecPosition.fX, vecPosition.fY, fRadius, fStartAngle, fStopAngle, color, colorCenter, fSegments, fRatio, bPostGUI, bSubPixelPositioning);
+                    g_pCore->GetGraphics()->DrawCircleQueued(vecPosition.fX, vecPosition.fY, fRadius, fStartAngle, fStopAngle, color, colorCenter, fSegments, fRatio, bPostGUI);
                     lua_pushboolean(luaVM, true);
                     return 1;
                 }

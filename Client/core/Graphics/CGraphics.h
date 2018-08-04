@@ -81,7 +81,7 @@ public:
     void DrawLine3D(const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f);
     void DrawRectangle(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning = false);
     void DrawStringOutline(const RECT& rect, unsigned long ulColor, const wchar_t* szText, unsigned long ulFormat, LPD3DXFONT pDXFont);
-    void DrawCircleInternal(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI, bool bSubPixelPositioning);
+    void DrawCircleInternal(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI);
 
     void           SetBlendMode(EBlendModeType blendMode);
     EBlendModeType GetBlendMode(void);
@@ -142,7 +142,7 @@ public:
                           unsigned long ulFormat, ID3DXFont* pDXFont = NULL, bool bPostGUI = false, bool bColorCoded = false, bool bSubPixelPositioning = false,
                           float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0);
 
-    void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI, bool bSubPixelPositioning = false);
+    void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI);
 
     void OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
 
@@ -277,7 +277,6 @@ private:
         float         bPostGUI;
         unsigned long ulColor;
         unsigned long ulColorCenter;
-        bool          bSubPixelPositioning;
     };
 
     struct sDrawQueueTexture
