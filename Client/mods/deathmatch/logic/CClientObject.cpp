@@ -729,7 +729,6 @@ bool CClientObject::Break(void)
     return false;
 }
 
-
 float CClientObject::GetMass(void)
 {
     if (m_pObject)
@@ -737,7 +736,6 @@ float CClientObject::GetMass(void)
 
     return m_fMass;
 }
-
 
 void CClientObject::SetMass(float fMass)
 {
@@ -747,7 +745,6 @@ void CClientObject::SetMass(float fMass)
     m_fMass = fMass;
 }
 
-
 float CClientObject::GetTurnMass(void)
 {
     if (m_pObject)
@@ -755,7 +752,6 @@ float CClientObject::GetTurnMass(void)
 
     return m_fTurnMass;
 }
-
 
 void CClientObject::SetTurnMass(float fTurnMass)
 {
@@ -765,7 +761,6 @@ void CClientObject::SetTurnMass(float fTurnMass)
     m_fTurnMass = fTurnMass;
 }
 
-
 float CClientObject::GetAirResistance(void)
 {
     if (m_pObject)
@@ -773,7 +768,6 @@ float CClientObject::GetAirResistance(void)
 
     return m_fAirResistance;
 }
-
 
 void CClientObject::SetAirResistance(float fAirResistance)
 {
@@ -783,7 +777,6 @@ void CClientObject::SetAirResistance(float fAirResistance)
     m_fAirResistance = fAirResistance;
 }
 
-
 float CClientObject::GetElasticity(void)
 {
     if (m_pObject)
@@ -791,7 +784,6 @@ float CClientObject::GetElasticity(void)
 
     return m_fElasticity;
 }
-
 
 void CClientObject::SetElasticity(float fElasticity)
 {
@@ -801,7 +793,6 @@ void CClientObject::SetElasticity(float fElasticity)
     m_fElasticity = fElasticity;
 }
 
-
 float CClientObject::GetBuoyancyConstant(void)
 {
     if (m_pObject)
@@ -809,7 +800,6 @@ float CClientObject::GetBuoyancyConstant(void)
 
     return m_fBuoyancyConstant;
 }
-
 
 void CClientObject::SetBuoyancyConstant(float fBuoyancyConstant)
 {
@@ -819,7 +809,6 @@ void CClientObject::SetBuoyancyConstant(float fBuoyancyConstant)
     m_fBuoyancyConstant = fBuoyancyConstant;
 }
 
-
 void CClientObject::GetCenterOfMass(CVector& vecCenterOfMass) const
 {
     if (m_pObject)
@@ -828,7 +817,6 @@ void CClientObject::GetCenterOfMass(CVector& vecCenterOfMass) const
         vecCenterOfMass = m_vecCenterOfMass;
 }
 
-
 void CClientObject::SetCenterOfMass(const CVector& vecCenterOfMass)
 {
     if (m_pObject)
@@ -836,7 +824,6 @@ void CClientObject::SetCenterOfMass(const CVector& vecCenterOfMass)
 
     m_vecCenterOfMass = vecCenterOfMass;
 }
-
 
 void CClientObject::SetVisibleInAllDimensions(bool bVisible, unsigned short usNewDimension)
 {
