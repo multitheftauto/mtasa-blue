@@ -252,7 +252,6 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("setCursorAlpha", CLuaFunctionDefs::SetCursorAlpha);
 
     // Util functions
-    CLuaCFunctions::AddFunction("gettok", CLuaFunctionDefs::GetTok);
     CLuaCFunctions::AddFunction("getValidPedModels", CLuaFunctionDefs::GetValidPedModels);
     CLuaCFunctions::AddFunction("downloadFile", CLuaFunctionDefs::DownloadFile);
 

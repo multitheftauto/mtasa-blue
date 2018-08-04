@@ -50,5 +50,6 @@ public:
     LUA_DECLARE(DebugSleep);
 
     // Utility functions
+    LUA_DECLARE(GetTok);
     LUA_DECLARE(tocolor);
 };
