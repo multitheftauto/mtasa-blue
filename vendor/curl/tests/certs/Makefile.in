@@ -90,6 +90,7 @@ host_triplet = @host@
 subdir = tests/certs
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_code_coverage.m4 \
+	$(top_srcdir)/m4/ax_compile_check_sizeof.m4 \
 	$(top_srcdir)/m4/curl-compilers.m4 \
 	$(top_srcdir)/m4/curl-confopts.m4 \
 	$(top_srcdir)/m4/curl-functions.m4 \
@@ -200,6 +201,7 @@ ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
+AR_FLAGS = @AR_FLAGS@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
@@ -463,7 +465,25 @@ GENERATEDCERTS = \
   Server-localhost0h-sv.key \
   Server-localhost0h-sv.pem \
   Server-localhost0h-sv.pub.der \
-  Server-localhost0h-sv.pub.pem
+  Server-localhost0h-sv.pub.pem \
+  Server-localhost-firstSAN-sv.crl \
+  Server-localhost-firstSAN-sv.crt \
+  Server-localhost-firstSAN-sv.csr \
+  Server-localhost-firstSAN-sv.der \
+  Server-localhost-firstSAN-sv.dhp \
+  Server-localhost-firstSAN-sv.key \
+  Server-localhost-firstSAN-sv.pem \
+  Server-localhost-firstSAN-sv.pub.der \
+  Server-localhost-firstSAN-sv.pub.pem \
+  Server-localhost-lastSAN-sv.crl \
+  Server-localhost-lastSAN-sv.crt \
+  Server-localhost-lastSAN-sv.csr \
+  Server-localhost-lastSAN-sv.der \
+  Server-localhost-lastSAN-sv.dhp \
+  Server-localhost-lastSAN-sv.key \
+  Server-localhost-lastSAN-sv.pem \
+  Server-localhost-lastSAN-sv.pub.der \
+  Server-localhost-lastSAN-sv.pub.pem
 
 SRPFILES = \
   srp-verifier-conf \
@@ -788,7 +808,8 @@ clean-certs:
 	cd $(srcdir); rm -f $(GENERATEDCERTS)
 
 build-certs: $(srcdir)/EdelCurlRoot-ca.cacert $(srcdir)/Server-localhost-sv.pem \
-	$(srcdir)/Server-localhost.nn-sv.pem $(srcdir)/Server-localhost0h-sv.pem
+	$(srcdir)/Server-localhost.nn-sv.pem $(srcdir)/Server-localhost0h-sv.pem \
+	$(srcdir)/Server-localhost-firstSAN-sv.pem $(srcdir)/Server-localhost-lastSAN-sv.pem
 
 $(srcdir)/EdelCurlRoot-ca.cacert:
 	cd $(srcdir); scripts/genroot.sh EdelCurlRoot
@@ -801,6 +822,12 @@ $(srcdir)/Server-localhost.nn-sv.pem: $(srcdir)/EdelCurlRoot-ca.cacert
 
 $(srcdir)/Server-localhost0h-sv.pem: $(srcdir)/EdelCurlRoot-ca.cacert
 	cd $(srcdir); scripts/genserv.sh Server-localhost0h EdelCurlRoot
+
+$(srcdir)/Server-localhost-firstSAN-sv.pem: $(srcdir)/EdelCurlRoot-ca.cacert
+	cd $(srcdir); scripts/genserv.sh Server-localhost-firstSAN EdelCurlRoot
+
+$(srcdir)/Server-localhost-lastSAN-sv.pem: $(srcdir)/EdelCurlRoot-ca.cacert
+	cd $(srcdir); scripts/genserv.sh Server-localhost-firstSAN EdelCurlRoot
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
