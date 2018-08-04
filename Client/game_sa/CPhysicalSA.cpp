@@ -128,18 +128,15 @@ void CPhysicalSA::SetTurnMass(float fTurnMass)
     ((CPhysicalSAInterface*)this->GetInterface())->m_fTurnMass = fTurnMass;
 }
 
-
 float CPhysicalSA::GetAirResistance(void)
 {
     return ((CPhysicalSAInterface *)this->GetInterface())->m_fAirResistance;
 }
 
-
 void CPhysicalSA::SetAirResistance(float fAirResistance)
 {
     ((CPhysicalSAInterface *)this->GetInterface())->m_fAirResistance = fAirResistance;
 }
-
 
 float CPhysicalSA::GetElasticity(void)
 {
@@ -171,7 +168,6 @@ void CPhysicalSA::SetCenterOfMass(CVector & vecCenterOfMass)
 {
     ((CPhysicalSAInterface *)this->GetInterface())->m_vecCenterOfMass = vecCenterOfMass;
 }
-
 
 VOID CPhysicalSA::ProcessCollision()
 {
