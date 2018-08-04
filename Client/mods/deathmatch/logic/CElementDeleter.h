@@ -16,7 +16,7 @@
 
 class CElementDeleter
 {
-public: 
+public:
     CElementDeleter();
     ~CElementDeleter() { DoDeleteAll(); };
 
