@@ -559,12 +559,16 @@ int CLuaEngineDefs::EngineGetModelLODDistance(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         ushort      usModelID = CModelNames::ResolveModelID(strModelId);
-        CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
-        if (pModelInfo)
+        // Ensure we have a good model (#9139)
+        if (CClientObjectManager::IsValidModel(usModelID))
         {
-            float fDistance = pModelInfo->GetLODDistance();
-            lua_pushnumber(luaVM, fDistance);
-            return 1;
+            CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
+            if (pModelInfo)
+            {
+                float fDistance = pModelInfo->GetLODDistance();
+                lua_pushnumber(luaVM, fDistance);
+                return 1;
+            }
         }
     }
     else
@@ -586,12 +590,16 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         unsigned short usModelID = CModelNames::ResolveModelID(strModel);
-        CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
-        if (pModelInfo && fDistance > 0.0f)
+        // Ensure we have a good model (#9139)
+        if (CClientObjectManager::IsValidModel(usModelID))
         {
-            pModelInfo->SetLODDistance(fDistance);
-            lua_pushboolean(luaVM, true);
-            return 1;
+            CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
+            if (pModelInfo && fDistance > 0.0f)
+            {
+                pModelInfo->SetLODDistance(fDistance);
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
         }
     }
     else
