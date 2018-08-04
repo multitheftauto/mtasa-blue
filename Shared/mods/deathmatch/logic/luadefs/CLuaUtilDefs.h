@@ -48,4 +48,7 @@ public:
 
     // Debug functions
     LUA_DECLARE(DebugSleep);
+
+    // Utility functions
+    LUA_DECLARE(tocolor);
 };

@@ -41,6 +41,9 @@ void CLuaUtilDefs::LoadFunctions(void)
 
     // Debug functions
     CLuaCFunctions::AddFunction("debugSleep", DebugSleep);
+
+    // Utility functions
+    CLuaCFunctions::AddFunction("tocolor", tocolor);
 }
 
 int CLuaUtilDefs::DisabledFunction(lua_State* luaVM)
@@ -611,5 +614,33 @@ int CLuaUtilDefs::DebugSleep(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaUtilDefs::tocolor(lua_State* luaVM)
+{
+    //  int tocolor ( int red, int green, int blue [, int alpha = 255 ] )
+    int iRed;
+    int iGreen;
+    int iBlue;
+    int iAlpha;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(iRed);
+    argStream.ReadNumber(iGreen);
+    argStream.ReadNumber(iBlue);
+    argStream.ReadNumber(iAlpha, 255);
+
+    if (!argStream.HasErrors())
+    {
+        // Make it into an unsigned long
+        unsigned long ulColor = COLOR_RGBA(iRed, iGreen, iBlue, iAlpha);
+        lua_pushinteger(luaVM, static_cast<lua_Integer>(ulColor));
+        return 1;
+    }
+
+    // Make it black so funcs dont break
+    unsigned long ulColor = COLOR_RGBA(0, 0, 0, 255);
+    lua_pushnumber(luaVM, static_cast<lua_Number>(ulColor));
     return 1;
 }

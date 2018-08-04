@@ -253,7 +253,6 @@ void CLuaManager::LoadCFunctions(void)
 
     // Util functions
     CLuaCFunctions::AddFunction("gettok", CLuaFunctionDefs::GetTok);
-    CLuaCFunctions::AddFunction("tocolor", CLuaFunctionDefs::tocolor);
     CLuaCFunctions::AddFunction("getValidPedModels", CLuaFunctionDefs::GetValidPedModels);
     CLuaCFunctions::AddFunction("downloadFile", CLuaFunctionDefs::DownloadFile);
 
