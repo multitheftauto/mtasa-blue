@@ -79,7 +79,7 @@ public:
 
     virtual void DrawLine3D(const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f) = 0;
     virtual void DrawRectangle(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning = false) = 0;
-    virtual void DrawCircleQueued(float fX, float fY, float fRadius, float startAngle, float stopAngle, unsigned long color, unsigned long colorCenter, ushort fSegments, float fRatio, bool bPostGUI, bool bSubPixelPositioning) = 0;
+    virtual void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI, bool bSubPixelPositioning) = 0;
 
     virtual void           SetBlendMode(EBlendModeType blendMode) = 0;
     virtual EBlendModeType GetBlendMode(void) = 0;

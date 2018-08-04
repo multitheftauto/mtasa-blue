@@ -795,7 +795,7 @@ void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, 
     AddQueueItem(Item, bPostGUI);
 }
 
-void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float startAngle, float stopAngle, unsigned long color, unsigned long colorCenter, ushort fSegments, float fRatio, bool bPostGUI, bool bSubPixelPositioning)
+void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI, bool bSubPixelPositioning)
 {
     if (g_pCore->IsWindowMinimized())
         return;
@@ -810,22 +810,21 @@ void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float startA
     Item.Circle.fX = fX;
     Item.Circle.fY = fY;
     Item.Circle.fRadius = fRadius;
-    Item.Circle.startAngle = startAngle;
-    Item.Circle.stopAngle = stopAngle;
+    Item.Circle.fStartAngle = fStartAngle;
+    Item.Circle.fStopAngle = fStopAngle;
     Item.Circle.bPostGUI = bPostGUI;
     Item.Circle.fSegments = fSegments;
     Item.Circle.fRatio = fRatio;
-    Item.Circle.ulColor = color;
-    Item.Circle.ulColorCenter = colorCenter;
+    Item.Circle.ulColor = ulColor;
+    Item.Circle.ulColorCenter = ulColorCenter;
     Item.Circle.bSubPixelPositioning = bSubPixelPositioning;
     // Add it to the queue
     AddQueueItem(Item, bPostGUI);
 
-    DrawCircleInternal(fX, fY, fRadius, startAngle, stopAngle, color, colorCenter, fSegments, fRatio, bPostGUI, bSubPixelPositioning);
+    DrawCircleInternal(fX, fY, fRadius, fStartAngle, fStopAngle, ulColor, ulColorCenter, fSegments, fRatio, bPostGUI, bSubPixelPositioning);
 
     EndDrawBatch();
 }
-
 
 struct stVertex
 {
@@ -833,7 +832,7 @@ struct stVertex
     D3DCOLOR color;
 };
 
-void CGraphics::DrawCircleInternal(float fX, float fY, float fRadius, float startAngle, float stopAngle, unsigned long color, unsigned long colorCenter, ushort fSegments, float fRatio, bool bPostGUI, bool bSubPixelPositioning)
+void CGraphics::DrawCircleInternal(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI, bool bSubPixelPositioning)
 {
 
     // Adjust size to account for sub pixel borders
@@ -843,54 +842,53 @@ void CGraphics::DrawCircleInternal(float fX, float fY, float fRadius, float star
         fY += 0.5f;
     }
 
-    startAngle = D3DXToRadian(startAngle);
-    stopAngle = D3DXToRadian(stopAngle);
+    fStartAngle = D3DXToRadian(fStartAngle);
+    fStopAngle = D3DXToRadian(fStopAngle);
 
-    std::vector<stVertex> Points;
+    std::vector<stVertex> vecPoints;
 
     // center
     stVertex vertCenter;
     vertCenter.x = fX;
     vertCenter.y = fY;
     vertCenter.z = 0;
-    vertCenter.color = colorCenter;
-    Points.push_back(vertCenter);
+    vertCenter.color = ulColorCenter;
+    vecPoints.push_back(vertCenter);
     
     // first
     stVertex vertFirst;
-    vertFirst.x = fX + fRadius * cos(startAngle) * fRatio;
-    vertFirst.y = fY + fRadius * sin(startAngle) / fRatio;
+    vertFirst.x = fX + fRadius * cos(fStartAngle) * fRatio;
+    vertFirst.y = fY + fRadius * sin(fStartAngle) / fRatio;
     vertFirst.z = 0;
-    vertFirst.color = color;
-    Points.push_back(vertFirst);
+    vertFirst.color = ulColor;
+    vecPoints.push_back(vertFirst);
 
-    bool out = false;
     float fSegments2 = (float)fSegments + 1;
-    float segmentAngle = ((stopAngle - startAngle) / fSegments2);
+    float segmentAngle = ((fStopAngle - fStartAngle) / fSegments2);
 
-    for (float angle = startAngle; angle <= stopAngle;)
+    for (float fAngle = fStartAngle; fAngle <= fStopAngle;)
     {
         stVertex vertex;
-        vertex.x = fX + fRadius * cos(angle) * fRatio;
-        vertex.y = fY + fRadius * sin(angle) / fRatio;
+        vertex.x = fX + fRadius * cos(fAngle) * fRatio;
+        vertex.y = fY + fRadius * sin(fAngle) / fRatio;
         vertex.z = 0;
-        vertex.color = color;
-        Points.push_back(vertex);
-        angle = angle + segmentAngle;
+        vertex.color = ulColor;
+        vecPoints.push_back(vertex);
+        fAngle = fAngle + segmentAngle;
     }
 
     // last
     stVertex vertLast;
-    vertLast.x = fX + fRadius * cos(stopAngle) * fRatio;
-    vertLast.y = fY + fRadius * sin(stopAngle) / fRatio;
+    vertLast.x = fX + fRadius * cos(fStopAngle) * fRatio;
+    vertLast.y = fY + fRadius * sin(fStopAngle) / fRatio;
     vertLast.z = 0;
-    vertLast.color = color;
-    Points.push_back(vertLast);
+    vertLast.color = ulColor;
+    vecPoints.push_back(vertLast);
 
-    if (Points.size() >= 3)
+    if (vecPoints.size() >= 3)
     {
         m_pDevice->SetTexture(0, 0);
-        m_pDevice->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, Points.size() - 2, &Points[0], sizeof(stVertex));
+        m_pDevice->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, vecPoints.size() - 2, &vecPoints[0], sizeof(stVertex));
     }
 }
 
@@ -1535,7 +1533,7 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
         case QUEUE_CIRCLE:
         {
             CheckModes(EDrawMode::DX_SPRITE, Item.blendMode);
-            DrawCircleInternal(Item.Circle.fX, Item.Circle.fY, Item.Circle.fRadius, Item.Circle.startAngle, Item.Circle.stopAngle, Item.Circle.ulColor, Item.Circle.ulColorCenter, Item.Circle.fSegments, Item.Circle.fRatio, Item.Circle.bPostGUI, Item.Circle.bSubPixelPositioning);
+            DrawCircleInternal(Item.Circle.fX, Item.Circle.fY, Item.Circle.fRadius, Item.Circle.fStartAngle, Item.Circle.fStopAngle, Item.Circle.ulColor, Item.Circle.ulColorCenter, Item.Circle.fSegments, Item.Circle.fRatio, Item.Circle.bPostGUI, Item.Circle.bSubPixelPositioning);
             break;
         }
 
