@@ -273,12 +273,18 @@ void CGraphics::DrawPrimitivesInternal(D3DPRIMITIVETYPE primitiveType, int primi
     }
     switch (primitiveType)
     {
+        case D3DPT_LINELIST:
+            primitivesCount /= 2;
+            break;
+        case D3DPT_LINESTRIP:
+            primitivesCount -= 1;
+            break;
         case D3DPT_TRIANGLEFAN:
         case D3DPT_TRIANGLESTRIP:
             primitivesCount = primitivesCount - 2;
             break;
         case D3DPT_TRIANGLELIST:
-            primitivesCount = primitivesCount/3;
+            primitivesCount = primitivesCount / 3;
             break;
     }
     m_pDevice->DrawPrimitiveUP(primitiveType, primitivesCount, vecPrimitives, sizeof(sPrimitiveVertex));
@@ -844,6 +850,10 @@ void CGraphics::DrawPrimitivesQueued(D3DPRIMITIVETYPE primitiveType, std::vector
     // Add it to the queue
 
     AddQueueItem(Item, bPostGUI);
+    
+    DrawPrimitivesInternal(primitiveType, vecPrimitives.size(), &vecPrimitives.at(0), pTexture);
+
+    EndDrawBatch();
 }
 
 void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeight, float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV,

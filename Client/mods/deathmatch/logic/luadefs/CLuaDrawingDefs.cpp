@@ -1631,8 +1631,11 @@ int CLuaDrawingDefs::DxDrawPrimitives(lua_State* luaVM)
 
     argStream.ReadEnumString(primitiveType);
 
-    if(argStream.NextIsUserData())
+    if (argStream.NextIsUserData())
         argStream.ReadUserData(pTexture, NULL);
+    else
+        pTexture = NULL;
+
     if(argStream.NextIsBool())
         argStream.ReadBool(bPostGUI, false);
 
@@ -1663,6 +1666,14 @@ int CLuaDrawingDefs::DxDrawPrimitives(lua_State* luaVM)
     {
         if (vecPrimitives.size() > 2 && vecPrimitives.size() <= 1024)
         {
+            if (primitiveType == D3DPT_TRIANGLELIST)
+            {
+                if (vecPrimitives.size() % 3 != 0)
+                {
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+            }
             if(pTexture != NULL)
                 g_pCore->GetGraphics()->DrawPrimitivesQueued(primitiveType, vecPrimitives, pTexture->GetMaterialItem(), bPostGUI);
             else
