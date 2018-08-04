@@ -428,9 +428,13 @@ int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (fSegments >= 3 && fSegments <= 1024)
+        const float fMinimumSegments = 3;
+        const float fMaximumSegments = 1024;
+        if (fSegments >= fMinimumSegments && fSegments <= fMaximumSegments )
         {
-            if (fRatio > 0 && fRatio <= 100)
+            const float fMinimumRatio = 0;
+            const float fMaximumRatio = 100;
+            if (fRatio > fMinimumRatio && fRatio <= fMaximumRatio)
             {
                 if (fRadius > 0)
                 {
