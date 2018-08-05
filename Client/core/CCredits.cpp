@@ -45,6 +45,7 @@ CCredits::CCredits(void)
         L"Raphael \"Mr.Hankey\" Leiteritz\n"
         L"Ed \"eAi\" Lyons\n"
         L"Christian \"ChrML\" Myhre Lundheim\n"
+        L"Qais \"qaisjp\" Patankar\n"
         L"Arushan \"aru\" Raj\n"
         L"Frank \"Aim\" Spijkerman\n"
         L"Pascal \"sbx320\" Stücker\n"
@@ -52,7 +53,6 @@ CCredits::CCredits(void)
         L"Richard \"Cazomino05\" Whitlock\n"
         L"Gamesnert\n"
         L"Jusonex\n"
-        L"Qais \"qaisjp\" Patankar\n"
         L"\n"
         L"\n");
 
@@ -61,14 +61,15 @@ CCredits::CCredits(void)
         "\n\n"
 
         "Arran\n"
-        "Remp\n"
-        "MX_Master\n"
+        "Dutchman101\n"
         "Iztas\n"
         "impulze\n"
         "JoeBullet\n"
         "lopezloo\n"
+        "MX_Master\n"
         "Marek \"Necktrox\" Kulik\n"
-        "Dutchman101\n"
+        "Remp\n"
+        "Danish \"Saml1er\" Khan\n"
         "\n";
 
     m_strCredits += _("Game Design / Scripting");
@@ -94,10 +95,12 @@ CCredits::CCredits(void)
 
         "Lukasz \"W\" Biegaj\n"
         "Florian \"Flobu\" Busse\n"
+        "Callum \"Callum\" Dawson\n"
         "Philip \"Fenix\" Farquharson\n"
         "Robin \"robhol\" Holm\n"
+        "Patrik \"myonlake\" Juvonen\n"
+        "Gabrielius \"Dezash\" Laurinavicius\n"
         "Adam \"50p\" Telega\n"
-        "Callum \"Callum\" Dawson\n"
         "Ilya \"Kenix\" Volkov\n"
         "Gothem\n"
         "rafalh\n"
@@ -143,7 +146,8 @@ CCredits::CCredits(void)
         "PhrozenByte\n"
         "AboShanab\n"
         "GTX / Timic3\n"
-        "Patrik \"myonlake\" Juvonen\n"
+        "FileEX\n"
+        "Pirulax\n"
         "\n";
     "\n";
 
@@ -164,6 +168,7 @@ CCredits::CCredits(void)
         "Oliver \"Oli\" Brown\n"
         "Wojciech \"Wojjie\" Hlibowicki\n"
         "Chris \"Cray\" McArthur\n"
+        "Rob 'Sugar Daddy' Pooley\n"
         "Hans \"Blokker\" Roes\n"
         "Kent \"Kent747\" Simon\n"
         "Matthew \"Towncivilian\" Wolfe\n"
@@ -174,7 +179,6 @@ CCredits::CCredits(void)
         "Phatlooser\n"
         "Dwayne 'The 'Woovie' Rock' Johnson\n"
         "max 'Hobo Pie' Power\n"
-        "Rob 'Sugar Daddy' Pooley\n"
         "diegofkda\n"
         "Ren712\n"
         "\n"

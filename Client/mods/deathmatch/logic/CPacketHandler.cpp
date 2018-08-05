@@ -3902,14 +3902,19 @@ retry:
                         vecVertices[i].fX = sX;
                         vecVertices[i].fY = sY;
                     }
+
+                    bool bShallow = false;
+                    if (bitStream.Version() >= 0x06C)
+                        bitStream.ReadBit(bShallow);
+
                     CClientWater* pWater = NULL;
                     if (ucNumVertices == 3)
                     {
-                        pWater = new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2]);
+                        pWater = new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], bShallow);
                     }
                     else
                     {
-                        pWater = new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3]);
+                        pWater = new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3], bShallow);
                     }
                     if (!pWater->Exists())
                     {
