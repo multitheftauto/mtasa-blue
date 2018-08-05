@@ -952,7 +952,7 @@ int CLuaElementDefs::GetElementsWithinRange(lua_State* luaVM)
 
         for (CClientEntity* entity : result)
         {
-            if (elementType.empty() || elementType == entity->GetTypeName())
+            if ((elementType.empty() || elementType == entity->GetTypeName()) && !entity->IsBeingDeleted())
             {
                 lua_pushnumber(luaVM, ++index);
                 lua_pushelement(luaVM, entity);
