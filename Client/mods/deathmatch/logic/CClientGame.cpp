@@ -14,6 +14,7 @@
 #include "game/CAnimBlendAssocGroup.h"
 #include "game/CAnimBlendAssociation.h"
 #include "game/CAnimBlendHierarchy.h"
+#include <windowsx.h>
 
 SString StringZeroPadout(const SString& strInput, uint uiPadoutSize)
 {
@@ -2475,8 +2476,8 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                 }
                 if (ucButtonHit != 0xFF)
                 {
-                    int iX = LOWORD(lParam);
-                    int iY = HIWORD(lParam);
+                    int iX = GET_X_LPARAM(lParam);
+                    int iY = GET_Y_LPARAM(lParam);
 
                     CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
 
@@ -2644,7 +2645,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
     {
         case WM_MOUSEMOVE:
         {
-            int        iX = LOWORD(lParam), iY = HIWORD(lParam);
+            int        iX = GET_X_LPARAM(lParam), iY = GET_Y_LPARAM(lParam);
             static int iPreviousX = 0, iPreviousY = 0;
             if (iX != iPreviousX || iY != iPreviousY)
             {
