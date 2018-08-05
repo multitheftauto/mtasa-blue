@@ -722,7 +722,7 @@ void CClientPed::Spawn(const CVector& vecPosition, float fRotation, unsigned sho
     // Set some states
     SetFrozen(false);
     Teleport(vecPosition);
-    SetCurrentRotation(fRotation);
+    SetCurrentRotationNew(fRotation);
     SetHealth(GetMaxHealth());
     RemoveAllWeapons();
     SetArmor(0);
