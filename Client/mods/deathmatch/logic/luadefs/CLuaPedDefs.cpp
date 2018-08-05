@@ -26,6 +26,7 @@ void CLuaPedDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("getPedContactElement", GetPedContactElement);
     CLuaCFunctions::AddFunction("isPedInVehicle", IsPedInVehicle);
     CLuaCFunctions::AddFunction("doesPedHaveJetPack", DoesPedHaveJetPack);
+    CLuaCFunctions::AddFunction("isPedWearingJetpack", DoesPedHaveJetPack);            // introduced in 1.5.5-9.13846
     CLuaCFunctions::AddFunction("isPedOnGround", IsPedOnGround);
     CLuaCFunctions::AddFunction("getPedTask", GetPedTask);
     CLuaCFunctions::AddFunction("getPedSimplestTask", GetPedSimplestTask);
@@ -104,6 +105,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "canBeKnockedOffBike", "canPedBeKnockedOffBike");
     lua_classfunction(luaVM, "doesHaveJetPack", "doesPedHaveJetPack");
+    lua_classfunction(luaVM, "isWearingJetpack", "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
     lua_classfunction(luaVM, "getAmmoInClip", "getPedAmmoInClip");
     lua_classfunction(luaVM, "getAnalogControlState", "getPedAnalogControlState");
     lua_classfunction(luaVM, "getAnimation", "getPedAnimation");
@@ -170,6 +172,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat");
     lua_classvariable(luaVM, "canBeKnockedOffBike", "setPedCanBeKnockedOffBike", "canPedBeKnockedOffBike");
     lua_classvariable(luaVM, "hasJetPack", NULL, "doesPedHaveJetPack");
+    lua_classvariable(luaVM, "jetpack", NULL, "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
     lua_classvariable(luaVM, "armor", NULL, "getPedArmor");
     lua_classvariable(luaVM, "cameraRotation", "setPedCameraRotation", "getPedCameraRotation");
     lua_classvariable(luaVM, "contactElement", NULL, "getPedContactElement");
