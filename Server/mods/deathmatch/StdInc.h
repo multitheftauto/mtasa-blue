@@ -280,7 +280,6 @@ struct SAclRequest;
 #include "CWater.h"
 #include "CWaterManager.h"
 #include "CWeaponNames.h"
-#include "CWhoWas.h"
 #include "CXMLConfig.h"
 #include "CZoneNames.h"
 #include "TaskNames.h"

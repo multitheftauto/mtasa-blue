@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CWater::CWater(CWaterManager* pWaterManager, CElement* pParent, CXMLNode* pNode, EWaterType waterType) : CElement(pParent, pNode)
+CWater::CWater(CWaterManager* pWaterManager, CElement* pParent, CXMLNode* pNode, EWaterType waterType, bool bShallow) : CElement(pParent, pNode)
 {
     m_pWaterManager = pWaterManager;
 
@@ -24,6 +24,8 @@ CWater::CWater(CWaterManager* pWaterManager, CElement* pParent, CXMLNode* pNode,
     m_Vertices[2] = CVector(-10.0f, 10.0f, 0.0f);
     if (m_WaterType == QUAD)
         m_Vertices[3] = CVector(10.0f, 10.0f, 0.0f);
+
+    m_bShallow = bShallow;
 
     if (m_pWaterManager)
         m_pWaterManager->AddToList(this);
@@ -128,6 +130,9 @@ bool CWater::ReadSpecialData()
             }
         }
     }
+
+    if (!GetCustomDataBool("shallow", m_bShallow, true))
+        m_bShallow = false;
 
     RoundVertices();
     if (!Valid())

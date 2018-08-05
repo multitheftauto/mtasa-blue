@@ -568,10 +568,6 @@ bool CAccountManager::LogIn(CClient* pClient, CClient* pEchoClient, const char* 
         pEchoClient->SendEcho("login: You successfully logged in");
     }
 
-    // Update who was info
-    if (pClient->GetClientType() == CClient::CLIENT_PLAYER)
-        g_pGame->GetConsole()->GetWhoWas()->OnPlayerLogin(static_cast<CPlayer*>(pClient));
-
     // Delete the old account if it was a guest account
     if (!pCurrentAccount->IsRegistered())
         delete pCurrentAccount;

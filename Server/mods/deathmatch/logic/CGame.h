@@ -20,7 +20,6 @@ class CGame;
 #include "CCommandLineParser.h"
 #include "CConnectHistory.h"
 #include "CElementDeleter.h"
-#include "CWhoWas.h"
 
 #include "packets/CCommandPacket.h"
 #include "packets/CExplosionSyncPacket.h"
@@ -530,7 +529,6 @@ private:
     CClock*                    m_pClock;
     CBanManager*               m_pBanManager;
     CTeamManager*              m_pTeamManager;
-    CWhoWas                    m_WhoWas;
     CCommandLineParser         m_CommandLineParser;
     CRegisteredCommands*       m_pRegisteredCommands;
     CDatabaseManager*          m_pDatabaseManager;
