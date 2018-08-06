@@ -42,6 +42,7 @@ public:
     LUA_DECLARE(GetElementDimension);
     LUA_DECLARE(GetElementZoneName);
     LUA_DECLARE(GetElementBoundingBox);
+    LUA_DECLARE_OOP(GetElementBoundingBox);// Probably wrong, tell me how to declare the OOP version of this.
     LUA_DECLARE(GetElementRadius);
     LUA_DECLARE(IsElementAttached);
     LUA_DECLARE(GetElementAttachedTo);
