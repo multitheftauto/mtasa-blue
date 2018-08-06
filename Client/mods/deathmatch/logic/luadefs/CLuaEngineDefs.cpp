@@ -560,7 +560,7 @@ int CLuaEngineDefs::EngineGetModelLODDistance(lua_State* luaVM)
     {
         ushort      usModelID = CModelNames::ResolveModelID(strModelId);
         // Ensure we have a good model (#9139)
-        if (CClientObjectManager::IsValidModel(usModelID))
+        if (CClientObjectManager::IsValidModel(usModelID) || CClientVehicleManager::IsValidModel(usModelID) || CClientPlayerManager::IsValidModel(usModelID))
         {
             CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
             if (pModelInfo)
@@ -591,7 +591,7 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
     {
         unsigned short usModelID = CModelNames::ResolveModelID(strModel);
         // Ensure we have a good model (#9139)
-        if (CClientObjectManager::IsValidModel(usModelID))
+        if (CClientObjectManager::IsValidModel(usModelID) || CClientVehicleManager::IsValidModel(usModelID) || CClientPlayerManager::IsValidModel(usModelID))
         {
             CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
             if (pModelInfo && fDistance > 0.0f)
