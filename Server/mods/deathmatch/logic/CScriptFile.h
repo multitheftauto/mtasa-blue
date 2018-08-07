@@ -64,5 +64,5 @@ private:
     uint          m_uiScriptId;
     SString       m_strFilename;
     unsigned long m_ulMaxSize;
-    SLuaDebugInfo         m_LuaDebugInfo;
+    SLuaDebugInfo m_LuaDebugInfo;
 };
