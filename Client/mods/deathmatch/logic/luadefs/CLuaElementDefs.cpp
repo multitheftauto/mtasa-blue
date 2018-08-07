@@ -12,6 +12,7 @@
 
 #include "StdInc.h"
 using std::list;
+#define MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP      "1.5.5-9.13987" // Update this to the version number when merged
 
 void CLuaElementDefs::LoadFunctions(void)
 {
@@ -1003,12 +1004,9 @@ int CLuaElementDefs::GetElementDimension(lua_State* luaVM)
 
 int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
 {
-    // Verify the argument
     CClientEntity*   pEntity;
-    bool             bLegacy;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
-    argStream.ReadBool(bLegacy, true);
 
     if (!argStream.HasErrors())
     {
@@ -1016,10 +1014,10 @@ int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
         CVector vecMin, vecMax;
         if (CStaticFunctionDefinitions::GetElementBoundingBox(*pEntity, vecMin, vecMax))
         {
-            if (!bLegacy)
+            if (!MinClientReqCheck(argStream, MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP))
             {
-                lua_pushvector(luaVM, vecMin)
-                lua_pushvector(luaVM, vecMax)
+                lua_pushvector(luaVM, vecMin);
+                lua_pushvector(luaVM, vecMax);
             }
             else
             {
