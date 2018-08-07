@@ -112,6 +112,7 @@ CGameSA::CGameSA()
     this->m_pWaterManager = new CWaterManagerSA();
     this->m_pWeaponStatsManager = new CWeaponStatManagerSA();
     this->m_pPointLights = new CPointLightsSA();
+    this->m_pTimeCycle = new CTimeCycleSA();
 
     // Normal weapon types (WEAPONSKILL_STD)
     for (int i = 0; i < NUM_WeaponInfosStdSkill; i++)
@@ -246,6 +247,7 @@ CGameSA::~CGameSA(void)
     delete reinterpret_cast<CAEAudioHardwareSA*>(m_pAEAudioHardware);
     delete reinterpret_cast<CAudioContainerSA*>(m_pAudioContainer);
     delete reinterpret_cast<CPointLightsSA*>(m_pPointLights);
+    delete reinterpret_cast<CTimeCycleSA*>(m_pTimeCycle);
 }
 
 CWeaponInfo* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)

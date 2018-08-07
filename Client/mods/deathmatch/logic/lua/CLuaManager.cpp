@@ -300,6 +300,8 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("setFPSLimit", CLuaFunctionDefs::SetFPSLimit);
     CLuaCFunctions::AddFunction("getFPSLimit", CLuaFunctionDefs::GetFPSLimit);
     CLuaCFunctions::AddFunction("fetchRemote", CLuaFunctionDefs::FetchRemote);
+    CLuaCFunctions::AddFunction("getTimeCycle", CLuaFunctionDefs::GetTimeCycle);
+    CLuaCFunctions::AddFunction("getOriginalTimeCycle", CLuaFunctionDefs::GetOriginalTimeCycle);
 
     // World set funcs
     CLuaCFunctions::AddFunction("setTime", CLuaFunctionDefs::SetTime);
@@ -353,6 +355,8 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("addBirds", CLuaFunctionDefs::AddBirds);
     CLuaCFunctions::AddFunction("setPedTargetingMarkerEnabled", CLuaFunctionDefs::SetPedTargetingMarkerEnabled);
     CLuaCFunctions::AddFunction("isPedTargetingMarkerEnabled", CLuaFunctionDefs::IsPedTargetingMarkerEnabled);
+    CLuaCFunctions::AddFunction("resetTimeCycle", CLuaFunctionDefs::ResetTimeCycle);
+    CLuaCFunctions::AddFunction("setTimeCycle", CLuaFunctionDefs::SetTimeCycle);
 
     // Input functions
     CLuaCFunctions::AddFunction("bindKey", CLuaFunctionDefs::BindKey);

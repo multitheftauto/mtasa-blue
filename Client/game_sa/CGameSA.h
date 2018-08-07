@@ -312,6 +312,7 @@ public:
     CPointLights*       GetPointLights() { return m_pPointLights; }
     CRenderWareSA*      GetRenderWareSA() { return m_pRenderWare; }
     CFxManagerSA*       GetFxManagerSA() { return m_pFxManager; }
+    CTimeCycle*         GetTimeCycle() { return m_pTimeCycle; }
 
     CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
@@ -476,6 +477,7 @@ private:
     CWaterManager*      m_pWaterManager;
     CWeaponStatManager* m_pWeaponStatsManager;
     CPointLights*       m_pPointLights;
+    CTimeCycle*         m_pTimeCycle;
 
     CPad*                     m_pPad;
     CTheCarGenerators*        m_pTheCarGenerators;

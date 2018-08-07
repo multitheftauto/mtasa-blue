@@ -73,6 +73,7 @@ typedef void(InRenderer)(void);
 #include "CTasks.h"
 #include "CText.h"
 #include "CTheCarGenerators.h"
+#include "CTimeCycle.h"
 #include "CVisibilityPlugins.h"
 #include "CWaterManager.h"
 #include "CWeaponStatManager.h"
@@ -166,6 +167,7 @@ public:
     virtual CWaterManager*            GetWaterManager() = 0;
     virtual CWeaponStatManager*       GetWeaponStatManager() = 0;
     virtual CPointLights*             GetPointLights() = 0;
+    virtual CTimeCycle*               GetTimeCycle() = 0;
 
     virtual CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
     virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;

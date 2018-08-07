@@ -117,3 +117,4 @@
 #include "CShadowDataSA.h"
 #include "CBuoyancySA.h"
 #include "CEventGroupSA.h"
+#include "CTimeCycleSA.h"
