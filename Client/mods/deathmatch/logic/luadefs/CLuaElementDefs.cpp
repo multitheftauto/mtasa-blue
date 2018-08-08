@@ -1018,6 +1018,7 @@ int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
             {
                 lua_pushvector(luaVM, vecMin);
                 lua_pushvector(luaVM, vecMax);
+                return 2;
             }
             else
             {
@@ -1027,9 +1028,8 @@ int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
                 lua_pushnumber(luaVM, vecMax.fX);
                 lua_pushnumber(luaVM, vecMax.fY);
                 lua_pushnumber(luaVM, vecMax.fZ);
-            }
-            
-            return 6;
+                return 6;
+            }           
         }
     }
     else
@@ -1037,7 +1037,7 @@ int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
 
     // Failed
     lua_pushboolean(luaVM, false);
-  
+}
 
 int CLuaElementDefs::GetElementBoundingBox(lua_State* luaVM)
 {
