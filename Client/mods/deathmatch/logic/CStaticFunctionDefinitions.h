@@ -58,6 +58,7 @@ public:
     static bool           GetElementPosition(CClientEntity& Entity, CVector& vecPosition);
     static bool           GetElementRotation(CClientEntity& Entity, CVector& vecRotation, eEulerRotationOrder rotationOrder);
     static bool           GetElementVelocity(CClientEntity& Entity, CVector& vecVelocity);
+    static bool           GetElementSpeed(CClientEntity& Entity, unsigned char ucUnit, float& fSpeed);
     static bool           GetElementInterior(CClientEntity& Entity, unsigned char& ucInterior);
     static bool           GetElementBoundingBox(CClientEntity& Entity, CVector& vecMin, CVector& vecMax);
     static bool           GetElementRadius(CClientEntity& Entity, float& fRadius);
