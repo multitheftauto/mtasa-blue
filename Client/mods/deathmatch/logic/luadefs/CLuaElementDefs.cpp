@@ -200,7 +200,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "distanceFromCentreOfMassToBaseOfModel", NULL, "getElementDistanceFromCentreOfMassToBaseOfModel");
     lua_classvariable(luaVM, "radius", NULL, "getElementRadius");
     lua_classvariable(luaVM, "childrenCount", NULL, "getElementChildrenCount");
-    lua_classfunction(luaVM, "boundingBox", NULL, OOP_GetElementBoundingBox);
+    lua_classvariable(luaVM, "boundingBox", NULL, OOP_GetElementBoundingBox);
     lua_classvariable(luaVM, "position", SetElementPosition, OOP_GetElementPosition);
     lua_classvariable(luaVM, "rotation", OOP_SetElementRotation, OOP_GetElementRotation);
     lua_classvariable(luaVM, "matrix", SetElementMatrix, OOP_GetElementMatrix);
