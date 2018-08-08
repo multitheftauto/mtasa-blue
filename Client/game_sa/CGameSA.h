@@ -85,7 +85,6 @@
 #define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
 #define PROP_UNDERWORLD_WARP        "underworldwarp"
 #define PROP_WATER_CREATURES        "watercreatures"
-#define PROP_RANDOM_BIRDS           "randombirds"
 
 struct SCheatSA
 {
@@ -409,9 +408,6 @@ public:
     bool IsWaterCreaturesEnabled();
     void SetWaterCreaturesEnabled(bool bEnable);
 
-    bool IsRandomBirdsEnabled();
-    void SetRandomBirdsEnabled(bool bEnable);
-
     bool VerifySADataFileNames();
     bool PerformChecks();
     int& GetCheckStatus(void) { return m_iCheckStatus; }
@@ -505,7 +501,6 @@ private:
     int          m_iCheckStatus;
     bool         m_bUnderworldWarp;
     bool         m_bWaterCreatures;
-    bool         m_bRandomBirds;
 
     static unsigned long* VAR_SystemTime;
     static unsigned long* VAR_IsAtMenu;

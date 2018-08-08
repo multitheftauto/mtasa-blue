@@ -6416,7 +6416,6 @@ bool CStaticFunctionDefinitions::RemoveBirds()
 
 int CStaticFunctionDefinitions::AddBirds(CVector vecStartPosition, CVector vecDestPosition, int iNumBirds, int iBirdType, bool bCheckObstacles)
 {
-    if (!g_pClientGame->GetBirdsEnabled()) return 0; // there is no point in trying to create a new birds if birds render is disabled
     return g_pMultiplayer->AddBirds(vecStartPosition, vecDestPosition, iNumBirds, iBirdType, bCheckObstacles);
 }
 

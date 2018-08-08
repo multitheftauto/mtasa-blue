@@ -1664,16 +1664,16 @@ void CMultiplayerSA::DisableBirds(bool bDisabled)
 {
     if (bDisabled)
     {
-        // return out of render and update to make sure birds already created aren't rendered at least.. also no point in calling render if there is nothing to
-        // render I guess
-        MemPut<BYTE>(0x712810, 0xC3);
-        MemPut<BYTE>(0x712330, 0xC3);
+        MemSet((PINT)0x71262A, 0x90, 5);
+        RemoveBirds();
     }
     else
     {
-        // restore previous first bytes render and update to normal
-        MemPut<BYTE>(0x712810, 0x64);
-        MemPut<BYTE>(0x712330, 0xA1);
+        MemPut<BYTE>(0x71262A, 0xE8);
+        MemPut<BYTE>(0x71262B, 0xC1);
+        MemPut<BYTE>(0x71262C, 0xF8);
+        MemPut<BYTE>(0x71262D, 0xFF);
+        MemPut<BYTE>(0x71262E, 0xFF);
     }
 }
 

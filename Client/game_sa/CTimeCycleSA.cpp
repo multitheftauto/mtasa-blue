@@ -185,6 +185,7 @@ bool CTimeCycleSA::SetTimeCycle(const char* szPropertyName, float fValue, int iW
     }
     else if (iWeatherID == -1) // set for all weathers
     {
+        assert(iCycleNum >= 0 && iCycleNum <= 7);
         for (iWeatherID = 0; iWeatherID < 24; iWeatherID++)
         {
             if (bResetValue)
@@ -195,6 +196,7 @@ bool CTimeCycleSA::SetTimeCycle(const char* szPropertyName, float fValue, int iW
     }
     else if (iCycleNum == -1) // set for all cycles of the weather
     {
+        assert(iWeatherID >= 0 && iWeatherID <= 23);
         for (iCycleNum = 0; iCycleNum < 8; iCycleNum++)
         {
             if (bResetValue)
@@ -205,6 +207,8 @@ bool CTimeCycleSA::SetTimeCycle(const char* szPropertyName, float fValue, int iW
     }
     else // set for the cycle of the weather
     {
+        assert(iWeatherID >= 0 && iWeatherID <= 23);
+        assert(iCycleNum >= 0 && iCycleNum <= 7);
         if (bResetValue)
             m_TimeCycleProps[szPropertyName]->ResetValue(iWeatherID, iCycleNum);
         else

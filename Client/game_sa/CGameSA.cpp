@@ -583,9 +583,6 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
     if (!strcmp(szCheatName, PROP_WATER_CREATURES))
         return IsWaterCreaturesEnabled();
 
-    if (!strcmp(szCheatName, PROP_RANDOM_BIRDS))
-        return IsRandomBirdsEnabled();
-
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -624,12 +621,6 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
         return true;
     }
 
-    if (!strcmp(szCheatName, PROP_RANDOM_BIRDS))
-    {
-        SetRandomBirdsEnabled(bEnable);
-        return true;
-    }
-
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -647,7 +638,6 @@ void CGameSA::ResetCheats()
     SetExtraAirResistanceEnabled(true);
     SetUnderWorldWarpEnabled(true);
     SetWaterCreaturesEnabled(true);
-    SetRandomBirdsEnabled(true);
 
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
@@ -733,27 +723,6 @@ void CGameSA::SetWaterCreaturesEnabled(bool bEnabled)
         }
     }
     m_bWaterCreatures = bEnabled;
-}
-
-bool CGameSA::IsRandomBirdsEnabled()
-{
-    return m_bRandomBirds;
-}
-
-void CGameSA::SetRandomBirdsEnabled(bool bEnabled)
-{
-    if (bEnabled)
-    {
-        MemPut<BYTE>(0x71262A, 0xE8);
-        MemPut<BYTE>(0x71262B, 0xC1);
-        MemPut<BYTE>(0x71262C, 0xF8);
-        MemPut<BYTE>(0x71262D, 0xFF);
-        MemPut<BYTE>(0x71262E, 0xFF);
-    }
-     else
-        MemSet((PINT)0x71262A, 0x90, 5);
-
-    m_bRandomBirds = bEnabled;
 }
 
 bool CGameSA::GetJetpackWeaponEnabled(eWeaponType weaponType)
