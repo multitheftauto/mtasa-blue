@@ -108,6 +108,22 @@ void CLuaMain::ResetInstructionCount(void)
 
 void CLuaMain::InitSecurity(void)
 {
+    // Disable dangerous Lua Os library functions
+    lua_getglobal(m_luaVM, "os");
+    lua_pushnil(m_luaVM);
+    lua_setfield(m_luaVM, -2, "execute");
+    lua_pushnil(m_luaVM);
+    lua_setfield(m_luaVM, -2, "rename");
+    lua_pushnil(m_luaVM);
+    lua_setfield(m_luaVM, -2, "remove");
+    lua_pushnil(m_luaVM);
+    lua_setfield(m_luaVM, -2, "exit");
+    lua_pushnil(m_luaVM);
+    lua_setfield(m_luaVM, -2, "getenv");
+    lua_pushnil(m_luaVM);
+    lua_setfield(m_luaVM, -2, "tmpname");
+    lua_pop(m_luaVM, 1);
+
     lua_register(m_luaVM, "dofile", CLuaUtilDefs::DisabledFunction);
     lua_register(m_luaVM, "loadfile", CLuaUtilDefs::DisabledFunction);
     lua_register(m_luaVM, "require", CLuaUtilDefs::DisabledFunction);
@@ -173,22 +189,6 @@ void CLuaMain::InitVM(void)
     luaopen_debug(m_luaVM);
     luaopen_utf8(m_luaVM);
     luaopen_os(m_luaVM);
-
-    // Disable dangerous Lua Os library functions
-    lua_getglobal(m_luaVM, "os");
-    lua_pushnil(m_luaVM);
-    lua_setfield(m_luaVM, -2, "execute");
-    lua_pushnil(m_luaVM);
-    lua_setfield(m_luaVM, -2, "rename");
-    lua_pushnil(m_luaVM);
-    lua_setfield(m_luaVM, -2, "remove");
-    lua_pushnil(m_luaVM);
-    lua_setfield(m_luaVM, -2, "exit");
-    lua_pushnil(m_luaVM);
-    lua_setfield(m_luaVM, -2, "getenv");
-    lua_pushnil(m_luaVM);
-    lua_setfield(m_luaVM, -2, "tmpname");
-    lua_pop(m_luaVM, 1);
 
     // Initialize security restrictions. Very important to prevent lua trojans and viruses!
     InitSecurity();
