@@ -33,7 +33,7 @@ extern "C" bool g_bNoTopBar;
     #define MTA_OS_STRING       "BSD"
     #define MTA_LIB_EXTENSION   ".so"
 #elif defined(__APPLE__) && defined(__MACH__)
-    #define MTA_OS_STRING       "Mac OS X"
+    #define MTA_OS_STRING       "macOS"
     #define MTA_LIB_EXTENSION   ".so"
 #else
     #error "Unsupported operating system"
