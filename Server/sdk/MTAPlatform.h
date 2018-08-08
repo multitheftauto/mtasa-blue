@@ -32,7 +32,7 @@ extern "C" bool g_bNoTopBar;
 #elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     #define MTA_OS_STRING       "BSD"
     #define MTA_LIB_EXTENSION   ".so"
-#elif defined(__APPLE__) && defined(__MACH__)
+#elif defined(__APPLE__)
     #define MTA_OS_STRING       "macOS"
     #define MTA_LIB_EXTENSION   ".so"
 #else
