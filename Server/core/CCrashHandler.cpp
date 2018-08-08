@@ -17,7 +17,11 @@
 #endif
 
 #ifndef WIN32
-    #include <ncursesw/curses.h>
+    #ifdef __APPLE__
+        #include <curses.h>
+    #else
+        #include <ncursesw/curses.h>
+    #endif
 extern "C" WINDOW* m_wndMenu;
 extern "C" WINDOW* m_wndInput;
 extern "C" bool    g_bNoCurses;

@@ -74,10 +74,15 @@ typedef int socklen_t;
     #include <string.h>
     #include <string>
     #include <fcntl.h>
-    #include <ncursesw/curses.h>
     #include <dlfcn.h>
     #include <sys/time.h>
     #include <sys/times.h>
+
+    #if defined(__APPLE__)
+        #include <curses.h>
+    #else
+        #include <ncursesw/curses.h>
+    #endif
 
     #define MAX_PATH 255
 
