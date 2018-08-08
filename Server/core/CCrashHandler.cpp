@@ -16,19 +16,25 @@
     #include <execinfo.h>
 #endif
 
+// clang-format off
 #ifndef WIN32
     #ifdef __APPLE__
         #include <curses.h>
     #else
         #include <ncursesw/curses.h>
     #endif
-extern "C" WINDOW* m_wndMenu;
-extern "C" WINDOW* m_wndInput;
-extern "C" bool    g_bNoCurses;
+
+    extern "C" WINDOW* m_wndMenu;
+    extern "C" WINDOW* m_wndInput;
+    extern "C" bool    g_bNoCurses;
+
     #include <client/linux/handler/exception_handler.h>
-bool           DumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void* context, bool succeeded);
-static SString ms_strDumpPathFilename;
+    bool           DumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void* context, bool succeeded);
+
+    static SString ms_strDumpPathFilename;
 #endif
+// clang-format on
+
 static SString ms_strDumpPath;
 
 #ifdef WIN32
@@ -53,6 +59,7 @@ void CCrashHandler::Init(const SString& strInServerPath)
     #ifdef WIN32
     SetCrashHandlerFilter(HandleExceptionGlobal);
     #else
+
     // Prepare initial dumpfile name
     time_t     pTime = time(NULL);
     struct tm* tm = localtime(&pTime);
