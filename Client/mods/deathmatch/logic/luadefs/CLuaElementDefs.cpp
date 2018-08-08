@@ -25,6 +25,7 @@ void CLuaElementDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("getElementPosition", GetElementPosition);
     CLuaCFunctions::AddFunction("getElementRotation", GetElementRotation);
     CLuaCFunctions::AddFunction("getElementVelocity", GetElementVelocity);
+    CLuaCFunctions::AddFunction("getElementSpeed", GetElementSpeed);
     CLuaCFunctions::AddFunction("getElementType", GetElementType);
     CLuaCFunctions::AddFunction("getElementChildren", GetElementChildren);
     CLuaCFunctions::AddFunction("getElementChild", GetElementChild);
@@ -75,6 +76,7 @@ void CLuaElementDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("setElementPosition", SetElementPosition);
     CLuaCFunctions::AddFunction("setElementRotation", SetElementRotation);
     CLuaCFunctions::AddFunction("setElementVelocity", SetElementVelocity);
+    //CLuaCFunctions::AddFunction("setElementSpeed", SetElementSpeed); TODO
     CLuaCFunctions::AddFunction("setElementInterior", SetElementInterior);
     CLuaCFunctions::AddFunction("setElementDimension", SetElementDimension);
     CLuaCFunctions::AddFunction("attachElements", AttachElements);
@@ -134,6 +136,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getRotation", OOP_GetElementRotation);
     lua_classfunction(luaVM, "getMatrix", OOP_GetElementMatrix);
     lua_classfunction(luaVM, "getVelocity", OOP_GetElementVelocity);
+    lua_classfunction(luaVM, "getSpeed", "GetElementSpeed");
     lua_classfunction(luaVM, "getByType", "getElementsByType");
     lua_classfunction(luaVM, "getDistanceFromCentreOfMassToBaseOfModel", "getElementDistanceFromCentreOfMassToBaseOfModel");
     lua_classfunction(luaVM, "getRadius", "getElementRadius");
@@ -160,6 +163,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setRotation", OOP_SetElementRotation);
     lua_classfunction(luaVM, "setMatrix", "setElementMatrix");
     lua_classfunction(luaVM, "setVelocity", "setElementVelocity");
+    // ua_classfunction(luaVM, "setSpeed", "setElementSpeed"); TODO
     lua_classfunction(luaVM, "setInterior", "setElementInterior");
     lua_classfunction(luaVM, "setDimension", "setElementDimension");
     lua_classfunction(luaVM, "setAlpha", "setElementAlpha");
@@ -203,6 +207,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "rotation", OOP_SetElementRotation, OOP_GetElementRotation);
     lua_classvariable(luaVM, "matrix", SetElementMatrix, OOP_GetElementMatrix);
     lua_classvariable(luaVM, "velocity", SetElementVelocity, OOP_GetElementVelocity);
+    // lua_classvariable(luaVM, "speed", SetElementSpeed, GetElementSpeed); TODO
     lua_classvariable(luaVM, "isElement", NULL, "isElement");
     // TODO: Support element data: player.data["age"] = 1337; <=> setElementData(player, "age", 1337)
 
@@ -604,6 +609,65 @@ int CLuaElementDefs::OOP_GetElementVelocity(lua_State* luaVM)
 
         lua_pushvector(luaVM, vecVelocity);
         return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::GetElementSpeed(lua_State* luaVM)
+{
+    CClientEntity* pEntity = NULL;
+    unsigned char  ucUnit  = 0;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+    if (argStream.NextIsNumber())
+        argStream.ReadNumber(usUnit, 0);
+    else if (argStream.NextIsString()) // Unit can be a string too, so lets decide which string is it.
+    {
+        SString strUnit = "";
+        argStream.ReadString(SString, "km/h");
+        switch (strUnit)
+        {
+            case "m/s":
+            case "ms":
+            {
+                ucUnit = 0;
+                break;
+            }
+            case "km/h":
+            case "kmh":
+            {
+                ucUnit = 1;
+                break;
+            }
+            case "mp/h":
+            case "mph":
+            {
+                ucUnit = 2;
+                break;
+            }
+            default:
+            {
+                m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ getElementSpeed[Expected a valid unit name, got %s]", strUnit));
+                return 1;
+            }                
+        }      
+    }
+
+    if (!argStream.HasErrors())
+    {
+        float fSpeed = 0;
+        if (CStaticFunctionDefinitions::GetElementSpeed(*pEntity, ucUnit, iSpeed))
+        {
+            lua_pushnumber(luaVM, fSpeed);
+            return 1;  
+        }  
+        else
+            m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ getElementSpeed[Expected a valid unit type, got %i]", (int)ucUnit));
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
