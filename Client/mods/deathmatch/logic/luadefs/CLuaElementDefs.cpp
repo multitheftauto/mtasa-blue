@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 using std::list;
-#define MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP      "1.5.5-9.13987" // Update this to the version number when merged
+#define MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP      "1.5.5-9.13999"
 
 void CLuaElementDefs::LoadFunctions(void)
 {
