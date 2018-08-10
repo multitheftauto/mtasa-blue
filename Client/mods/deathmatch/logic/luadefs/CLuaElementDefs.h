@@ -41,7 +41,6 @@ public:
     LUA_DECLARE(GetElementsWithinRange);
     LUA_DECLARE(GetElementDimension);
     LUA_DECLARE(GetElementZoneName);
-    // DECLARE_OOP Declares both the normal and a OOP_ version of a given funciton, just for furtherer reference.
     LUA_DECLARE_OOP(GetElementBoundingBox);
     LUA_DECLARE(GetElementRadius);
     LUA_DECLARE(IsElementAttached);
