@@ -12,6 +12,7 @@
 
 #include "StdInc.h"
 using std::list;
+#define MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP      "1.5.5-9.13999"
 
 void CLuaElementDefs::LoadFunctions(void)
 {
@@ -129,7 +130,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getChildrenCount", "getElementChildrenCount");
     lua_classfunction(luaVM, "getID", "getElementID");
     lua_classfunction(luaVM, "getParent", "getElementParent");
-    lua_classfunction(luaVM, "getBoundingBox", "getElementBoundingBox");
+    lua_classfunction(luaVM, "getBoundingBox", OOP_GetElementBoundingBox);
     lua_classfunction(luaVM, "getPosition", OOP_GetElementPosition);
     lua_classfunction(luaVM, "getRotation", OOP_GetElementRotation);
     lua_classfunction(luaVM, "getMatrix", OOP_GetElementMatrix);
@@ -199,6 +200,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "distanceFromCentreOfMassToBaseOfModel", NULL, "getElementDistanceFromCentreOfMassToBaseOfModel");
     lua_classvariable(luaVM, "radius", NULL, "getElementRadius");
     lua_classvariable(luaVM, "childrenCount", NULL, "getElementChildrenCount");
+    lua_classvariable(luaVM, "boundingBox", NULL, OOP_GetElementBoundingBox);
     lua_classvariable(luaVM, "position", SetElementPosition, OOP_GetElementPosition);
     lua_classvariable(luaVM, "rotation", OOP_SetElementRotation, OOP_GetElementRotation);
     lua_classvariable(luaVM, "matrix", SetElementMatrix, OOP_GetElementMatrix);
@@ -998,6 +1000,43 @@ int CLuaElementDefs::GetElementDimension(lua_State* luaVM)
     // Failed
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
+{
+    CClientEntity*   pEntity;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+
+    if (!argStream.HasErrors())
+    {
+        // Grab the bounding box and return it
+        CVector vecMin, vecMax;
+        if (CStaticFunctionDefinitions::GetElementBoundingBox(*pEntity, vecMin, vecMax))
+        {
+            if (!MinClientReqCheck(argStream, MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP))
+            {
+                lua_pushvector(luaVM, vecMin);
+                lua_pushvector(luaVM, vecMax);
+                return 2;
+            }
+            else
+            {
+                lua_pushnumber(luaVM, vecMin.fX);
+                lua_pushnumber(luaVM, vecMin.fY);
+                lua_pushnumber(luaVM, vecMin.fZ);
+                lua_pushnumber(luaVM, vecMax.fX);
+                lua_pushnumber(luaVM, vecMax.fY);
+                lua_pushnumber(luaVM, vecMax.fZ);
+                return 6;
+            }           
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
 }
 
 int CLuaElementDefs::GetElementBoundingBox(lua_State* luaVM)
