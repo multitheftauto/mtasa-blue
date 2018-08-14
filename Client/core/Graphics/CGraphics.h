@@ -227,7 +227,6 @@ private:
         QUEUE_RECT,
         QUEUE_TEXTURE,
         QUEUE_SHADER,
-        QUEUE_PRIMITIVES,
     };
 
     struct sDrawQueueLine
@@ -284,14 +283,6 @@ private:
         bool           bRelativeUV;
     };
 
-    struct sDrawQueuePrimitives
-    {
-        int primitiveType;
-        int primitivesCount;
-        sPrimitiveVertex *vecPrimitives;
-        CMaterialItem* pMaterial;
-    };
-
     struct sDrawQueueItem
     {
         eDrawQueueType eType;
@@ -304,7 +295,6 @@ private:
             sDrawQueueText       Text;
             sDrawQueueRect       Rect;
             sDrawQueueTexture    Texture;
-            sDrawQueuePrimitives Primitives;
         };
     };
 

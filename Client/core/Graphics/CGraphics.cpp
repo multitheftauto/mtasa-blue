@@ -262,7 +262,6 @@ void CGraphics::DrawPrimitives(D3DPRIMITIVETYPE primitiveType, std::vector<sPrim
 
 void CGraphics::DrawPrimitivesInternal(D3DPRIMITIVETYPE primitiveType, int primitivesCount, sPrimitiveVertex* vecPrimitives, CMaterialItem* pMaterial)
 {
-
     if (CTextureItem* pTexture = DynamicCast<CTextureItem>(pMaterial))
     {
         m_pDevice->SetTexture(0, (IDirect3DTexture9*)pTexture->m_pD3DTexture);
@@ -836,22 +835,9 @@ void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, 
     AddQueueItem(Item, bPostGUI);
 }
 
-void CGraphics::DrawPrimitivesQueued(D3DPRIMITIVETYPE primitiveType, std::vector<sPrimitiveVertex> vecPrimitives, CMaterialItem* pTexture, bool bPostGUI)
+void CGraphics::DrawPrimitivesQueued(D3DPRIMITIVETYPE primitiveType, std::vector<sPrimitiveVertex> vecPrimitives, CMaterialItem* pMaterial, bool bPostGUI)
 {
-    // Set up a queue item
-    sDrawQueueItem Item;
-    Item.eType = QUEUE_PRIMITIVES;
-    Item.blendMode = m_ActiveBlendMode;
-    Item.Primitives.primitiveType = primitiveType;
-    Item.Primitives.primitivesCount = vecPrimitives.size();
-    Item.Primitives.vecPrimitives = &(vecPrimitives.at(0));
-    Item.Primitives.pMaterial = pTexture;
-
-    // Add it to the queue
-
-    AddQueueItem(Item, bPostGUI);
-    
-    DrawPrimitivesInternal(primitiveType, vecPrimitives.size(), &vecPrimitives.at(0), pTexture);
+    DrawPrimitivesInternal(primitiveType, vecPrimitives.size(), &vecPrimitives[0], pMaterial);
 
     EndDrawBatch();
 }
@@ -1492,12 +1478,6 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
         {
             CheckModes(EDrawMode::DX_SPRITE, Item.blendMode);
             DrawRectangleInternal(Item.Rect.fX, Item.Rect.fY, Item.Rect.fWidth, Item.Rect.fHeight, Item.Rect.ulColor, Item.Rect.bSubPixelPositioning);
-            break;
-        }
-        case QUEUE_PRIMITIVES:
-        {
-            CheckModes(EDrawMode::DX_SPRITE, Item.blendMode);
-            DrawPrimitivesInternal((D3DPRIMITIVETYPE)Item.Primitives.primitiveType, Item.Primitives.primitivesCount, Item.Primitives.vecPrimitives, Item.Primitives.pMaterial );
             break;
         }
         case QUEUE_TEXT:

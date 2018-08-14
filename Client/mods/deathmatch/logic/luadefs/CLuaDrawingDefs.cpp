@@ -1625,7 +1625,6 @@ int CLuaDrawingDefs::DxDrawPrimitives(lua_State* luaVM)
     std::vector<sPrimitiveVertex> vecPrimitives;
     CClientTexture*               pTexture;
     SColor                        color;
-    bool                          bPostGUI = false;
 
     CScriptArgReader argStream(luaVM);
 
@@ -1636,13 +1635,8 @@ int CLuaDrawingDefs::DxDrawPrimitives(lua_State* luaVM)
     else
         pTexture = NULL;
 
-    if(argStream.NextIsBool())
-        argStream.ReadBool(bPostGUI, false);
-
     while (argStream.NextIsTable())
     {
-        lua_pushnil(luaVM);
-
         std::vector<float> vecTableContent;
         argStream.ReadNumberTable(vecTableContent);
         switch (vecTableContent.size())
@@ -1664,20 +1658,20 @@ int CLuaDrawingDefs::DxDrawPrimitives(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (vecPrimitives.size() > 2 && vecPrimitives.size() <= 1024)
+        if (vecPrimitives.size() > 2 && vecPrimitives.size() <= 4096)
         {
-            if (primitiveType == D3DPT_TRIANGLELIST)
-            {
+            switch(primitiveType)
+            case D3DPT_TRIANGLELIST:
                 if (vecPrimitives.size() % 3 != 0)
                 {
                     lua_pushboolean(luaVM, false);
                     return 1;
                 }
-            }
-            if(pTexture != NULL)
-                g_pCore->GetGraphics()->DrawPrimitivesQueued(primitiveType, vecPrimitives, pTexture->GetMaterialItem(), bPostGUI);
+
+            if(pTexture != NULL && pTexture->GetMaterialItem())
+                g_pCore->GetGraphics()->DrawPrimitivesInternal(primitiveType, vecPrimitives.size(), &vecPrimitives[0], pTexture->GetMaterialItem());
             else
-                g_pCore->GetGraphics()->DrawPrimitivesQueued(primitiveType, vecPrimitives, NULL, bPostGUI);
+                g_pCore->GetGraphics()->DrawPrimitivesInternal(primitiveType, vecPrimitives.size(), &vecPrimitives[0], NULL);
 
             lua_pushboolean(luaVM, true);
             return 1;

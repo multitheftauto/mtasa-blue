@@ -136,7 +136,7 @@ public:
                                   float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bColorCoded = false,
                                   bool bSubPixelPositioning = false, float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0) = 0;
 
-    virtual void DrawPrimitivesQueued(D3DPRIMITIVETYPE primitiveType, std::vector<sPrimitiveVertex> vecPrimitives, CMaterialItem* pMaterial, bool bPostGUI) = 0;
+    virtual void DrawPrimitivesInternal(D3DPRIMITIVETYPE primitiveType, int primitivesCount, sPrimitiveVertex* vecPrimitives, CMaterialItem* pMaterial) = 0;
 
     // Subsystems
     virtual CRenderItemManagerInterface* GetRenderItemManager(void) = 0;
