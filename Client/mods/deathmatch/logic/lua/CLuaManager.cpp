@@ -252,8 +252,6 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("setCursorAlpha", CLuaFunctionDefs::SetCursorAlpha);
 
     // Util functions
-    CLuaCFunctions::AddFunction("gettok", CLuaFunctionDefs::GetTok);
-    CLuaCFunctions::AddFunction("tocolor", CLuaFunctionDefs::tocolor);
     CLuaCFunctions::AddFunction("getValidPedModels", CLuaFunctionDefs::GetValidPedModels);
     CLuaCFunctions::AddFunction("downloadFile", CLuaFunctionDefs::DownloadFile);
 
@@ -287,6 +285,7 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("getFarClipDistance", CLuaFunctionDefs::GetFarClipDistance);
     CLuaCFunctions::AddFunction("getNearClipDistance", CLuaFunctionDefs::GetNearClipDistance);
     CLuaCFunctions::AddFunction("getVehiclesLODDistance", CLuaFunctionDefs::GetVehiclesLODDistance);
+    CLuaCFunctions::AddFunction("getPedsLODDistance", CLuaFunctionDefs::GetPedsLODDistance); 
     CLuaCFunctions::AddFunction("getFogDistance", CLuaFunctionDefs::GetFogDistance);
     CLuaCFunctions::AddFunction("getSunColor", CLuaFunctionDefs::GetSunColor);
     CLuaCFunctions::AddFunction("getSunSize", CLuaFunctionDefs::GetSunSize);
@@ -333,6 +332,8 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("resetNearClipDistance", CLuaFunctionDefs::ResetNearClipDistance);
     CLuaCFunctions::AddFunction("setVehiclesLODDistance", CLuaFunctionDefs::SetVehiclesLODDistance);
     CLuaCFunctions::AddFunction("resetVehiclesLODDistance", CLuaFunctionDefs::ResetVehiclesLODDistance);
+    CLuaCFunctions::AddFunction("setPedsLODDistance", CLuaFunctionDefs::SetPedsLODDistance);
+    CLuaCFunctions::AddFunction("resetPedsLODDistance", CLuaFunctionDefs::ResetPedsLODDistance);
     CLuaCFunctions::AddFunction("setFogDistance", CLuaFunctionDefs::SetFogDistance);
     CLuaCFunctions::AddFunction("resetFogDistance", CLuaFunctionDefs::ResetFogDistance);
     CLuaCFunctions::AddFunction("setSunColor", CLuaFunctionDefs::SetSunColor);

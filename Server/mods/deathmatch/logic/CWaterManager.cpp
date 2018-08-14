@@ -24,9 +24,9 @@ CWaterManager::~CWaterManager()
     DeleteAll();
 }
 
-CWater* CWaterManager::Create(CWater::EWaterType waterType, CElement* pParent, CXMLNode* pNode)
+CWater* CWaterManager::Create(CWater::EWaterType waterType, CElement* pParent, CXMLNode* pNode, bool bShallow)
 {
-    CWater* pWater = new CWater(this, pParent, pNode, waterType);
+    CWater* pWater = new CWater(this, pParent, pNode, waterType, bShallow);
     if (pWater->GetID() == INVALID_ELEMENT_ID)
     {
         delete pWater;

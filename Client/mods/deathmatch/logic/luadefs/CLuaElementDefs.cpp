@@ -12,6 +12,7 @@
 
 #include "StdInc.h"
 using std::list;
+#define MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP      "1.5.5-9.13999"
 
 void CLuaElementDefs::LoadFunctions(void)
 {
@@ -36,6 +37,7 @@ void CLuaElementDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("isElementWithinColShape", IsElementWithinColShape);
     CLuaCFunctions::AddFunction("isElementWithinMarker", IsElementWithinMarker);
     CLuaCFunctions::AddFunction("getElementsWithinColShape", GetElementsWithinColShape);
+    CLuaCFunctions::AddFunction("getElementsWithinRange", GetElementsWithinRange);
     CLuaCFunctions::AddFunction("getElementDimension", GetElementDimension);
     CLuaCFunctions::AddFunction("getElementBoundingBox", GetElementBoundingBox);
     CLuaCFunctions::AddFunction("getElementRadius", GetElementRadius);
@@ -128,7 +130,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getChildrenCount", "getElementChildrenCount");
     lua_classfunction(luaVM, "getID", "getElementID");
     lua_classfunction(luaVM, "getParent", "getElementParent");
-    lua_classfunction(luaVM, "getBoundingBox", "getElementBoundingBox");
+    lua_classfunction(luaVM, "getBoundingBox", OOP_GetElementBoundingBox);
     lua_classfunction(luaVM, "getPosition", OOP_GetElementPosition);
     lua_classfunction(luaVM, "getRotation", OOP_GetElementRotation);
     lua_classfunction(luaVM, "getMatrix", OOP_GetElementMatrix);
@@ -139,6 +141,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getType", "getElementType");
     lua_classfunction(luaVM, "getInterior", "getElementInterior");
     lua_classfunction(luaVM, "getWithinColShape", "getElementsWithinColShape");
+    lua_classfunction(luaVM, "getWithinRange", "getElementsWithinRange");
     lua_classfunction(luaVM, "getDimension", "getElementDimension");
     lua_classfunction(luaVM, "getColShape", "getElementColShape");
     lua_classfunction(luaVM, "getAlpha", "getElementAlpha");
@@ -197,6 +200,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "distanceFromCentreOfMassToBaseOfModel", NULL, "getElementDistanceFromCentreOfMassToBaseOfModel");
     lua_classvariable(luaVM, "radius", NULL, "getElementRadius");
     lua_classvariable(luaVM, "childrenCount", NULL, "getElementChildrenCount");
+    lua_classvariable(luaVM, "boundingBox", NULL, OOP_GetElementBoundingBox);
     lua_classvariable(luaVM, "position", SetElementPosition, OOP_GetElementPosition);
     lua_classvariable(luaVM, "rotation", OOP_SetElementRotation, OOP_GetElementRotation);
     lua_classvariable(luaVM, "matrix", SetElementMatrix, OOP_GetElementMatrix);
@@ -928,6 +932,45 @@ int CLuaElementDefs::GetElementsWithinColShape(lua_State* luaVM)
     return 1;
 }
 
+int CLuaElementDefs::GetElementsWithinRange(lua_State* luaVM)
+{
+    CVector position;
+    float   radius;
+    SString elementType;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadVector3D(position);
+    argStream.ReadNumber(radius);
+    argStream.ReadString(elementType, "");
+
+    if (!argStream.HasErrors())
+    {
+        // Query the spatial database
+        CClientEntityResult result;
+        GetClientSpatialDatabase()->SphereQuery(result, CSphere{ position, radius });
+
+        lua_newtable(luaVM);
+        unsigned int index = 0;
+
+        for (CClientEntity* entity : result)
+        {
+            if ((elementType.empty() || elementType == entity->GetTypeName()) && !entity->IsBeingDeleted())
+            {
+                lua_pushnumber(luaVM, ++index);
+                lua_pushelement(luaVM, entity);
+                lua_settable(luaVM, -3);
+            }
+        }
+
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaElementDefs::GetElementDimension(lua_State* luaVM)
 {
     // Verify the argument
@@ -957,6 +1000,43 @@ int CLuaElementDefs::GetElementDimension(lua_State* luaVM)
     // Failed
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
+{
+    CClientEntity*   pEntity;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+
+    if (!argStream.HasErrors())
+    {
+        // Grab the bounding box and return it
+        CVector vecMin, vecMax;
+        if (CStaticFunctionDefinitions::GetElementBoundingBox(*pEntity, vecMin, vecMax))
+        {
+            if (!MinClientReqCheck(argStream, MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP))
+            {
+                lua_pushvector(luaVM, vecMin);
+                lua_pushvector(luaVM, vecMax);
+                return 2;
+            }
+            else
+            {
+                lua_pushnumber(luaVM, vecMin.fX);
+                lua_pushnumber(luaVM, vecMin.fY);
+                lua_pushnumber(luaVM, vecMin.fZ);
+                lua_pushnumber(luaVM, vecMax.fX);
+                lua_pushnumber(luaVM, vecMax.fY);
+                lua_pushnumber(luaVM, vecMax.fZ);
+                return 6;
+            }           
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
 }
 
 int CLuaElementDefs::GetElementBoundingBox(lua_State* luaVM)

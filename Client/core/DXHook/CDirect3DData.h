@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CDIRECT3DDATA_H
-#define __CDIRECT3DDATA_H
+#pragma once
 
 #include <d3d9.h>
 #include "CSingleton.h"
@@ -46,5 +45,3 @@ private:
     DWORD m_dwViewportWidth;
     DWORD m_dwViewportHeight;
 };
-
-#endif

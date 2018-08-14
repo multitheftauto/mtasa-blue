@@ -26,10 +26,6 @@ DWORD RETURN_CAnimManager_AddAnimation = 0x4D3AB1;
 DWORD RETURN_CAnimManager_AddAnimationAndSync = 0x4D3B41;
 DWORD RETURN_CAnimManager_BlendAnimation_Hierarchy = 0x4D4577;
 
-auto CAnimBlendStaticAssociation_FreeSequenceArray = (hCAnimBlendStaticAssociation_FreeSequenceArray)0x4ce9a0;
-auto UncompressAnimation = (hUncompressAnimation)0x4d41c0;
-auto CAnimBlendAssociation_Constructor_staticAssocByReference = (hCAnimBlendAssociation_Constructor_staticAssocByReference)0x4CF080;
-
 auto CAnimBlendAssociation_NewOperator_US = (hCAnimBlendAssociation_NewOperator)0x82119A;
 auto CAnimBlendAssociation_NewOperator_EU = (hCAnimBlendAssociation_NewOperator)0x8211DA;
 
@@ -70,15 +66,7 @@ CAnimBlendAssociationSAInterface* __cdecl CAnimBlendAssocGroup_CopyAnimation(RpC
 
     if (pAnimAssociationInterface)
     {
-        CAnimBlendStaticAssociationSAInterface staticAnimAssociationInterface;
-
-        m_pAssocGroupCopyAnimationHandler(&staticAnimAssociationInterface, pAnimAssociationInterface, pClump, pAnimAssocGroupInterface, animID);
-
-        UncompressAnimation(staticAnimAssociationInterface.pAnimHeirarchy);
-
-        CAnimBlendAssociation_Constructor_staticAssocByReference(pAnimAssociationInterface, staticAnimAssociationInterface);
-
-        CAnimBlendStaticAssociation_FreeSequenceArray(&staticAnimAssociationInterface);
+        m_pAssocGroupCopyAnimationHandler(pAnimAssociationInterface, pClump, pAnimAssocGroupInterface, animID);
     }
     return pAnimAssociationInterface;
 }

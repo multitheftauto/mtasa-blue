@@ -24,6 +24,7 @@ public:
     LUA_DECLARE(DxDrawMaterialSectionLine3D);
     LUA_DECLARE(DxDrawText);
     LUA_DECLARE(DxDrawRectangle);
+    LUA_DECLARE(DxDrawCircle);
     LUA_DECLARE(DxDrawImage);
     LUA_DECLARE(DxDrawImageSection);
     LUA_DECLARE(DxDrawPrimitives);

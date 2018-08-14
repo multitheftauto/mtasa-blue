@@ -23,6 +23,18 @@ using namespace std;
 template <>
 CGraphics* CSingleton<CGraphics>::m_pSingleton = NULL;
 
+const SColor g_rectEdgePixelsData[] = {
+    0x00FFFF00, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF,            //
+    0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,            //
+    0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,            //
+    0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,            //
+    0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,            //
+    0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,            //
+    0x00FFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF,            //
+    0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF, 0x00FFFFFF,            //
+    0x00080008                                                                                                 // Plain pixels size info
+};
+
 CGraphics::CGraphics(CLocalGUI* pGUI)
 {
     m_pGUI = pGUI;
@@ -835,6 +847,94 @@ void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, 
     AddQueueItem(Item, bPostGUI);
 }
 
+void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI)
+{
+    if (g_pCore->IsWindowMinimized())
+        return;
+
+    BeginDrawBatch();
+    CheckModes(EDrawMode::DX_SPRITE, m_ActiveBlendMode);
+
+    // Set up a queue item
+    sDrawQueueItem Item;
+    Item.eType = QUEUE_CIRCLE;
+    Item.blendMode = m_ActiveBlendMode;
+    Item.Circle.fX = fX;
+    Item.Circle.fY = fY;
+    Item.Circle.fRadius = fRadius;
+    Item.Circle.fStartAngle = fStartAngle;
+    Item.Circle.fStopAngle = fStopAngle;
+    Item.Circle.bPostGUI = bPostGUI;
+    Item.Circle.fSegments = fSegments;
+    Item.Circle.fRatio = fRatio;
+    Item.Circle.ulColor = ulColor;
+    Item.Circle.ulColorCenter = ulColorCenter;
+    // Add it to the queue
+    AddQueueItem(Item, bPostGUI);
+
+    DrawCircleInternal(fX, fY, fRadius, fStartAngle, fStopAngle, ulColor, ulColorCenter, fSegments, fRatio, bPostGUI);
+
+    EndDrawBatch();
+}
+
+struct stVertex
+{
+    float x, y, z;
+    D3DCOLOR color;
+};
+
+void CGraphics::DrawCircleInternal(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI)
+{
+    fStartAngle = D3DXToRadian(fStartAngle);
+    fStopAngle = D3DXToRadian(fStopAngle);
+
+    std::vector<stVertex> vecPoints;
+
+    // center
+    stVertex vertCenter;
+    vertCenter.x = fX;
+    vertCenter.y = fY;
+    vertCenter.z = 0;
+    vertCenter.color = ulColorCenter;
+    vecPoints.push_back(vertCenter);
+    
+    // first
+    stVertex vertFirst;
+    vertFirst.x = fX + fRadius * cos(fStartAngle) * fRatio;
+    vertFirst.y = fY + fRadius * sin(fStartAngle) / fRatio;
+    vertFirst.z = 0;
+    vertFirst.color = ulColor;
+    vecPoints.push_back(vertFirst);
+
+    float fSegments2 = (float)fSegments + 1;
+    float segmentAngle = ((fStopAngle - fStartAngle) / fSegments2);
+
+    for (float fAngle = fStartAngle; fAngle <= fStopAngle;)
+    {
+        stVertex vertex;
+        vertex.x = fX + fRadius * cos(fAngle) * fRatio;
+        vertex.y = fY + fRadius * sin(fAngle) / fRatio;
+        vertex.z = 0;
+        vertex.color = ulColor;
+        vecPoints.push_back(vertex);
+        fAngle = fAngle + segmentAngle;
+    }
+
+    // last
+    stVertex vertLast;
+    vertLast.x = fX + fRadius * cos(fStopAngle) * fRatio;
+    vertLast.y = fY + fRadius * sin(fStopAngle) / fRatio;
+    vertLast.z = 0;
+    vertLast.color = ulColor;
+    vecPoints.push_back(vertLast);
+
+    if (vecPoints.size() >= 3)
+    {
+        m_pDevice->SetTexture(0, 0);
+        m_pDevice->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, vecPoints.size() - 2, &vecPoints[0], sizeof(stVertex));
+    }
+}
+
 void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeight, float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV,
                                   CMaterialItem* pMaterial, float fRotation, float fRotCenOffX, float fRotCenOffY, unsigned long ulColor, bool bPostGUI)
 {
@@ -1307,8 +1407,8 @@ void CGraphics::OnDeviceCreate(IDirect3DDevice9* pDevice)
     m_pPixelsManager->OnDeviceCreate(pDevice);
     m_ProgressSpinnerTexture =
         GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\busy_spinner.png"), NULL, false, -1, -1, RFORMAT_DXT3, TADDRESS_CLAMP);
-    m_RectangleEdgeTexture =
-        GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\rect_edge.png"), NULL, false, 8, 8, RFORMAT_ARGB, TADDRESS_CLAMP);
+    CPixels rectEdge = {CBuffer(g_rectEdgePixelsData, sizeof(g_rectEdgePixelsData))};
+    m_RectangleEdgeTexture = GetRenderItemManager()->CreateTexture(nullptr, &rectEdge, false, 8, 8, RFORMAT_ARGB, TADDRESS_CLAMP);
     m_pAspectRatioConverter->Init(GetViewportHeight());
 }
 
@@ -1473,6 +1573,13 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
             DrawRectangleInternal(Item.Rect.fX, Item.Rect.fY, Item.Rect.fWidth, Item.Rect.fHeight, Item.Rect.ulColor, Item.Rect.bSubPixelPositioning);
             break;
         }
+        case QUEUE_CIRCLE:
+        {
+            CheckModes(EDrawMode::DX_SPRITE, Item.blendMode);
+            DrawCircleInternal(Item.Circle.fX, Item.Circle.fY, Item.Circle.fRadius, Item.Circle.fStartAngle, Item.Circle.fStopAngle, Item.Circle.ulColor, Item.Circle.ulColorCenter, Item.Circle.fSegments, Item.Circle.fRatio, Item.Circle.bPostGUI);
+            break;
+        }
+
         case QUEUE_TEXT:
         {
             RECT rect;

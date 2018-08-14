@@ -78,8 +78,6 @@ public:
 
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
-    LUA_DECLARE(GetTok);
-    LUA_DECLARE(tocolor);
     LUA_DECLARE(GetValidPedModels);
     LUA_DECLARE(SetDevelopmentMode);
     LUA_DECLARE(GetDevelopmentMode);
@@ -150,6 +148,9 @@ public:
     LUA_DECLARE(GetVehiclesLODDistance);
     LUA_DECLARE(SetVehiclesLODDistance);
     LUA_DECLARE(ResetVehiclesLODDistance);
+    LUA_DECLARE(GetPedsLODDistance); 
+    LUA_DECLARE(SetPedsLODDistance); 
+    LUA_DECLARE(ResetPedsLODDistance); 
     LUA_DECLARE(GetFogDistance);
     LUA_DECLARE(SetFogDistance);
     LUA_DECLARE(ResetFogDistance);
