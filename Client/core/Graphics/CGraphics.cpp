@@ -835,13 +835,6 @@ void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, 
     AddQueueItem(Item, bPostGUI);
 }
 
-void CGraphics::DrawPrimitivesQueued(D3DPRIMITIVETYPE primitiveType, std::vector<sPrimitiveVertex> vecPrimitives, CMaterialItem* pMaterial, bool bPostGUI)
-{
-    DrawPrimitivesInternal(primitiveType, vecPrimitives.size(), &vecPrimitives[0], pMaterial);
-
-    EndDrawBatch();
-}
-
 void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeight, float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV,
                                   CMaterialItem* pMaterial, float fRotation, float fRotCenOffX, float fRotCenOffY, unsigned long ulColor, bool bPostGUI)
 {
