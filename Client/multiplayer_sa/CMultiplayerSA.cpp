@@ -3842,7 +3842,7 @@ void CMultiplayerSA::RebuildMultiplayerPlayer(CPed* player)
     TIMING_CHECKPOINT("-RebuldMulplrPlr");
 }
 
-void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled)
+void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled)
 {
     if (bEnabled)
     {
@@ -3852,9 +3852,18 @@ void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled)
     {
         MemPutFast<BYTE>(0xC402B8, 0);
     }
+    if (bNoiseEnabled)
+    {
+        BYTE originalCodes[5] = { 0xE8, 0xD3, 0xE8, 0xFF, 0xFF };
+        MemCpy((void*)0x704EE8, &originalCodes, 5);
+    }
+    else
+    {
+        MemSet((void*)0x704EE8, 0x90, 5);
+    }
 }
 
-void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled)
+void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled)
 {
     if (bEnabled)
     {
@@ -3863,6 +3872,15 @@ void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled)
     else
     {
         MemPutFast<BYTE>(0xC402B9, 0);
+    }
+    if (bNoiseEnabled)
+    {
+        BYTE originalCodes[5] = { 0xE8, 0x62, 0xE8, 0xFF, 0xFF };
+        MemCpy((void*)0x704F59, &originalCodes, 5);
+    }
+    else
+    {
+        MemSet((void*)0x704F59, 0x90, 5);
     }
 }
 

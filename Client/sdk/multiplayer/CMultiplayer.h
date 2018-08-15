@@ -262,8 +262,8 @@ public:
 
     virtual void DisableEnterExitVehicleKey(bool bDisabled) = 0;
 
-    virtual void SetNightVisionEnabled(bool bEnabled) = 0;
-    virtual void SetThermalVisionEnabled(bool bEnabled) = 0;
+    virtual void SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled) = 0;
+    virtual void SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled) = 0;
     virtual bool IsNightVisionEnabled() = 0;
     virtual bool IsThermalVisionEnabled() = 0;
 
