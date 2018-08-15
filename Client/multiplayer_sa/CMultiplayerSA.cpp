@@ -1669,11 +1669,8 @@ void CMultiplayerSA::DisableBirds(bool bDisabled)
     }
     else
     {
-        MemPut<BYTE>(0x71262A, 0xE8);
-        MemPut<BYTE>(0x71262B, 0xC1);
-        MemPut<BYTE>(0x71262C, 0xF8);
-        MemPut<BYTE>(0x71262D, 0xFF);
-        MemPut<BYTE>(0x71262E, 0xFF);
+        BYTE originalCodes[5] = { 0xE8, 0xC1, 0xF8, 0xFF, 0xFF };
+        MemCpy((PINT)0x71262A, &originalCodes, 5);
     }
 }
 
