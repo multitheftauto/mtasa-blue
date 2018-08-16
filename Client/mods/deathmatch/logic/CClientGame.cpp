@@ -123,8 +123,8 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->DisableBadDrivebyHitboxes(true);
 
     // Remove Night & Thermal vision view (if enabled).
-    g_pMultiplayer->SetNightVisionEnabled(false);
-    g_pMultiplayer->SetThermalVisionEnabled(false);
+    g_pMultiplayer->SetNightVisionEnabled(false, true);
+    g_pMultiplayer->SetThermalVisionEnabled(false, true);
 
     m_bCloudsEnabled = true;
 
