@@ -74,20 +74,17 @@ void CLuaMain::ResetInstructionCount(void)
 void CLuaMain::InitSecurity(void)
 {
     // Disable dangerous Lua Os library functions
-    lua_getglobal(m_luaVM, "os");
-    lua_pushnil(m_luaVM);
-    lua_setfield(m_luaVM, -2, "execute");
-    lua_pushnil(m_luaVM);
-    lua_setfield(m_luaVM, -2, "rename");
-    lua_pushnil(m_luaVM);
-    lua_setfield(m_luaVM, -2, "remove");
-    lua_pushnil(m_luaVM);
-    lua_setfield(m_luaVM, -2, "exit");
-    lua_pushnil(m_luaVM);
-    lua_setfield(m_luaVM, -2, "getenv");
-    lua_pushnil(m_luaVM);
-    lua_setfield(m_luaVM, -2, "tmpname");
-    lua_pop(m_luaVM, 1);
+    static const luaL_reg osfuncs[] =
+    {
+        { "execute", CLuaUtilDefs::DisabledFunction },
+        { "rename", CLuaUtilDefs::DisabledFunction },
+        { "remove", CLuaUtilDefs::DisabledFunction },
+        { "exit", CLuaUtilDefs::DisabledFunction },
+        { "getenv", CLuaUtilDefs::DisabledFunction },
+        { "tmpname", CLuaUtilDefs::DisabledFunction },
+        { NULL, NULL }
+    };
+    luaL_register(m_luaVM, "os", osfuncs);
 
     lua_register(m_luaVM, "dofile", CLuaUtilDefs::DisabledFunction);
     lua_register(m_luaVM, "loadfile", CLuaUtilDefs::DisabledFunction);
