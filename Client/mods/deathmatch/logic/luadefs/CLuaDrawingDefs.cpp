@@ -430,13 +430,13 @@ int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
     {
         const float fMinimumSegments = 3;
         const float fMaximumSegments = 1024;
-        if (fSegments >= fMinimumSegments && fSegments <= fMaximumSegments )
+        if (fSegments >= fMinimumSegments && fSegments <= fMaximumSegments)
         {
             const float fMinimumRatio = 0;
             const float fMaximumRatio = 100;
             if (fRatio > fMinimumRatio && fRatio <= fMaximumRatio)
             {
-                if (fRadius > 0)
+                if (fRadius > 0 && fStartAngle != fStopAngle)
                 {
                     if (fStopAngle < fStartAngle)
                         std::swap(fStopAngle, fStartAngle);
