@@ -24,10 +24,12 @@ class CServerImpl;
 #include <xml/CXML.h>
 #include "CThreadCommandQueue.h"
 
-#if defined(__APPLE__)
-    #include <curses.h>
-#elif !defined(WIN32)
-    #include <ncursesw/curses.h>
+#ifndef WIN32
+    #ifdef __APPLE__
+        #include <ncurses.h>
+    #else
+        #include <ncursesw/curses.h>
+    #endif
 #endif
 
 #define SERVER_RESET_RETURN 500
