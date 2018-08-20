@@ -1037,6 +1037,7 @@ int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
 
     // Failed
     lua_pushboolean(luaVM, false);
+    return 1;
 }
 
 int CLuaElementDefs::GetElementBoundingBox(lua_State* luaVM)
