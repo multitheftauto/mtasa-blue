@@ -19,7 +19,7 @@
 // clang-format off
 #ifndef WIN32
     #ifdef __APPLE__
-        #include <curses.h>
+        #include <ncurses.h>
     #else
         #include <ncursesw/curses.h>
     #endif
