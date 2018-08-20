@@ -1016,12 +1016,6 @@ int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
         {
             if (!MinClientReqCheck(argStream, MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP))
             {
-                lua_pushvector(luaVM, vecMin);
-                lua_pushvector(luaVM, vecMax);
-                return 2;
-            }
-            else
-            {
                 lua_pushnumber(luaVM, vecMin.fX);
                 lua_pushnumber(luaVM, vecMin.fY);
                 lua_pushnumber(luaVM, vecMin.fZ);
@@ -1029,6 +1023,12 @@ int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
                 lua_pushnumber(luaVM, vecMax.fY);
                 lua_pushnumber(luaVM, vecMax.fZ);
                 return 6;
+            }
+            else
+            {
+                lua_pushvector(luaVM, vecMin);
+                lua_pushvector(luaVM, vecMax);
+                return 2;
             }           
         }
     }
