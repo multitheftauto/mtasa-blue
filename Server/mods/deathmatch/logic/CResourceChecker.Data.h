@@ -333,6 +333,8 @@ namespace
         {false, "getComponentPosition", "will return 3 floats instead of a Vector3", "1.5.5-9.11710"},
         {false, "getComponentRotation", "will return 3 floats instead of a Vector3", "1.5.5-9.11710"},
 
+        {false, "getBoundingBox", "will return 6 floats instead of 2 Vector3", "1.5.5-9.13999"},
+
         // Ped jetpacks
         {false, "doesPedHaveJetPack", "isPedWearingJetpack"},
     };
