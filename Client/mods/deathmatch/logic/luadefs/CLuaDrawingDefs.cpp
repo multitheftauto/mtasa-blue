@@ -21,6 +21,7 @@ void CLuaDrawingDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("dxDrawLine3D", DxDrawLine3D);
     CLuaCFunctions::AddFunction("dxDrawText", DxDrawText);
     CLuaCFunctions::AddFunction("dxDrawRectangle", DxDrawRectangle);
+    CLuaCFunctions::AddFunction("dxDrawCircle", DxDrawCircle);
     CLuaCFunctions::AddFunction("dxDrawImage", DxDrawImage);
     CLuaCFunctions::AddFunction("dxDrawImageSection", DxDrawImageSection);
     CLuaCFunctions::AddFunction("dxGetTextWidth", DxGetTextWidth);
@@ -393,6 +394,69 @@ int CLuaDrawingDefs::DxDrawRectangle(lua_State* luaVM)
         g_pCore->GetGraphics()->DrawRectQueued(vecPosition.fX, vecPosition.fY, vecSize.fX, vecSize.fY, color, bPostGUI, bSubPixelPositioning);
         lua_pushboolean(luaVM, true);
         return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
+{
+    CVector2D vecPosition;
+    float     fRadius;
+    float     fStartAngle;
+    float     fStopAngle;
+    SColor    color;
+    SColor    colorCenter;
+    short     fSegments;
+    float     fRatio;
+    bool      bPostGUI;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadVector2D(vecPosition);
+    argStream.ReadNumber(fRadius);
+    argStream.ReadNumber(fStartAngle, 0);
+    argStream.ReadNumber(fStopAngle, 360);
+    argStream.ReadColor(color, 0xFFFFFFFF);
+    argStream.ReadColor(colorCenter, color);
+    argStream.ReadNumber(fSegments, 32);
+    argStream.ReadNumber(fRatio, 1);
+    argStream.ReadBool(bPostGUI, false);
+
+    if (!argStream.HasErrors())
+    {
+        const float fMinimumSegments = 3;
+        const float fMaximumSegments = 1024;
+        if (fSegments >= fMinimumSegments && fSegments <= fMaximumSegments)
+        {
+            const float fMinimumRatio = 0;
+            const float fMaximumRatio = 100;
+            if (fRatio > fMinimumRatio && fRatio <= fMaximumRatio)
+            {
+                if (fRadius > 0 && fStartAngle != fStopAngle)
+                {
+                    if (fStopAngle < fStartAngle)
+                        std::swap(fStopAngle, fStartAngle);
+
+                    g_pCore->GetGraphics()->DrawCircleQueued(vecPosition.fX, vecPosition.fY, fRadius, fStartAngle, fStopAngle, color, colorCenter, fSegments, fRatio, bPostGUI);
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+            }
+            else
+            {
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+        }
+        else
+        {
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

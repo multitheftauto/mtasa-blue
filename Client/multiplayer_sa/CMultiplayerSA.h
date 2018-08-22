@@ -178,8 +178,8 @@ public:
     int   GetMoonSize();
     void  ResetMoonSize();
 
-    void SetNightVisionEnabled(bool bEnabled);
-    void SetThermalVisionEnabled(bool bEnabled);
+    void SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled);
+    void SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled);
     bool IsNightVisionEnabled();
     bool IsThermalVisionEnabled();
 

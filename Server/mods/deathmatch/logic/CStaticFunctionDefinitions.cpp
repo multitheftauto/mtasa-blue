@@ -9093,12 +9093,12 @@ bool CStaticFunctionDefinitions::SetTeamFriendlyFire(CTeam* pTeam, bool bFriendl
     return false;
 }
 
-CWater* CStaticFunctionDefinitions::CreateWater(CResource* pResource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4)
+CWater* CStaticFunctionDefinitions::CreateWater(CResource* pResource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow)
 {
     if (!pV1 || !pV2 || !pV3)
         return NULL;
 
-    CWater* pWater = m_pWaterManager->Create(pV4 ? CWater::QUAD : CWater::TRIANGLE, pResource->GetDynamicElementRoot());
+    CWater* pWater = m_pWaterManager->Create(pV4 ? CWater::QUAD : CWater::TRIANGLE, pResource->GetDynamicElementRoot(), NULL, bShallow);
 
     if (pWater)
     {
@@ -11065,9 +11065,8 @@ bool CStaticFunctionDefinitions::RemoveAccount(CAccount* pAccount)
 bool CStaticFunctionDefinitions::SetAccountName(CAccount* pAccount, SString strNewName, bool bAllowCaseVariations, SString& strOutError)
 {
     assert(pAccount);
-    assert(!strNewName.empty());
 
-    if (pAccount->IsRegistered())
+    if (!strNewName.empty() && pAccount->IsRegistered())
     {
         // Check for case variations if not allowed
         if (!bAllowCaseVariations)
@@ -11100,9 +11099,8 @@ bool CStaticFunctionDefinitions::SetAccountName(CAccount* pAccount, SString strN
 bool CStaticFunctionDefinitions::SetAccountPassword(CAccount* pAccount, SString strPassword, CAccountPassword::EAccountPasswordType ePasswordType)
 {
     assert(pAccount);
-    assert(!strPassword.empty());
 
-    if (pAccount->IsRegistered())
+    if (!strPassword.empty() && pAccount->IsRegistered())
     {
         if ((ePasswordType == CAccountPassword::PLAINTEXT && CAccountManager::IsValidNewPassword(strPassword)) ||
             (ePasswordType == CAccountPassword::MD5 && strPassword.length() == 32) ||
