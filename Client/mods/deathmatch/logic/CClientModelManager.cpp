@@ -60,7 +60,7 @@ int CClientModelManager::GetFirstFreeModelID(void)
             return i;
         }
     }
-    return nullptr;
+    return INVALID_MODEL_ID;
 }
 
 CClientModel* CClientModelManager::FindModelByID(int iModelID)

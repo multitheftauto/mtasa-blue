@@ -506,13 +506,14 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                 }
 
                 int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
+                if (iModelID != INVALID_MODEL_ID) {
+                    CClientModel* pModel = new CClientModel(m_pManager, iModelID, eModelType);
+                    pModel->Allocate();
+                    pModel->SetParentResource(pResource);
 
-                CClientModel* pModel = new CClientModel(m_pManager, iModelID, eModelType);
-                pModel->Allocate();
-                pModel->SetParentResource(pResource);
-
-                lua_pushinteger(luaVM, iModelID);
-                return 1;
+                    lua_pushinteger(luaVM, iModelID);
+                    return 1;
+                }
             }
             else
                 m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
