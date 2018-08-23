@@ -20,7 +20,7 @@
 .\" *
 .\" **************************************************************************
 .\"
-.TH CURLOPT_SSL_CTX_FUNCTION 3 "December 19, 2017" "libcurl 7.59.0" "curl_easy_setopt options"
+.TH CURLOPT_SSL_CTX_FUNCTION 3 "April 17, 2018" "libcurl 7.61.0" "curl_easy_setopt options"
 
 .SH NAME
 CURLOPT_SSL_CTX_FUNCTION \- SSL context callback for OpenSSL, wolfSSL/CyaSSL or mbedTLS
@@ -57,7 +57,7 @@ each time, but note the pointer may be the same as from a prior call.
 To use this properly, a non-trivial amount of knowledge of your SSL library is
 necessary. For example, you can use this function to call library-specific
 callbacks to add additional validation code for certificates, and even to
-change the actual URI of a HTTPS request.
+change the actual URI of an HTTPS request.
 .SH DEFAULT
 NULL
 .SH PROTOCOLS

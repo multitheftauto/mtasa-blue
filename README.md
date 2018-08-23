@@ -26,7 +26,6 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 
 * [Coding guidelines](https://wiki.mtasa.com/index.php?title=Coding_guidelines)
 * [Nightly Builds](https://nightly.mtasa.com/)
-* [Bugtracker Roadmap](https://bugs.mtasa.com/roadmap_page.php)
 * [Wiki Roadmap](https://wiki.mtasa.com/wiki/Roadmap)
 
 ### IDE Setup

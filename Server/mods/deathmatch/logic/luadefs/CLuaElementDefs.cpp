@@ -1010,7 +1010,7 @@ int CLuaElementDefs::getElementsWithinRange(lua_State* luaVM)
 
         for (CElement* entity : result)
         {
-            if (elementType.empty() || elementType == entity->GetTypeName())
+            if ((elementType.empty() || elementType == entity->GetTypeName()) && !entity->IsBeingDeleted())
             {
                 lua_pushnumber(luaVM, ++index);
                 lua_pushelement(luaVM, entity);

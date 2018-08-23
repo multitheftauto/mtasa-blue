@@ -235,9 +235,6 @@ void CLuaManager::LoadCFunctions(void)
 
     CLuaCFunctions::AddFunction("shutdown", CLuaFunctionDefs::shutdown, true);
 
-    // Util funcs
-    CLuaCFunctions::AddFunction("gettok", CLuaFunctionDefs::GetTok);
-
     // Loaded map funcs
     CLuaCFunctions::AddFunction("getRootElement", CLuaFunctionDefs::GetRootElement);
     CLuaCFunctions::AddFunction("loadMapData", CLuaFunctionDefs::LoadMapData);
@@ -375,5 +372,9 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("xmlFindSubNode", CLuaXMLDefs::xmlNodeFindChild);
     CLuaCFunctions::AddFunction("attachElementToElement", CLuaElementDefs::attachElements);
     CLuaCFunctions::AddFunction("detachElementFromElement", CLuaElementDefs::detachElements);
+    // Deprecated since 1.5.5-9.13846
+    CLuaCFunctions::AddFunction("doesPedHaveJetPack", CLuaPedDefs::DoesPedHaveJetPack);
+    CLuaCFunctions::AddFunction("givePedJetPack", CLuaPedDefs::GivePedJetPack);
+    CLuaCFunctions::AddFunction("removePedJetPack", CLuaPedDefs::RemovePedJetPack);
     // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
 }
