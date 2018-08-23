@@ -12,7 +12,7 @@
 
 CClientModelManager::CClientModelManager(CClientManager* pManager)
 {
-    for (ushort i = 0; i <= MAX_MODEL_ID; i++)
+    for (ushort i = 0; i < MAX_MODEL_ID; i++)
     {
         m_Models[i] = nullptr;
     }
@@ -26,7 +26,7 @@ CClientModelManager::~CClientModelManager(void)
 
 void CClientModelManager::RemoveAll(void)
 {
-    for (int i = 0; i <= MAX_MODEL_ID; i++)
+    for (int i = 0; i < MAX_MODEL_ID; i++)
     {
         Remove(m_Models[i]);
     }
@@ -52,7 +52,7 @@ bool CClientModelManager::Remove(CClientModel* pModel)
 
 int CClientModelManager::GetFirstFreeModelID(void)
 {
-    for (int i = 0; i <= MAX_MODEL_ID; i++)
+    for (int i = 0; i < MAX_MODEL_ID; i++)
     {
         CModelInfo* pModelInfo = g_pGame->GetModelInfo(i, true);
         if (!pModelInfo->IsValid())
@@ -65,7 +65,7 @@ int CClientModelManager::GetFirstFreeModelID(void)
 
 CClientModel* CClientModelManager::FindModelByID(int iModelID)
 {
-    if (iModelID <= MAX_MODEL_ID)
+    if (iModelID < MAX_MODEL_ID)
     {
         return m_Models[iModelID];
     }
@@ -74,7 +74,7 @@ CClientModel* CClientModelManager::FindModelByID(int iModelID)
 
 void CClientModelManager::DeallocateModelsAllocatedByResource(CResource* pResource)
 {
-    for (ushort i = 0; i <= MAX_MODEL_ID; i++)
+    for (ushort i = 0; i < MAX_MODEL_ID; i++)
     {
         if (m_Models[i] != nullptr)
         {
