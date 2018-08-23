@@ -6711,6 +6711,7 @@ bool CStaticFunctionDefinitions::GetVehicleRespawnRotation(CElement* pElement, C
     }
     return false;
 }
+
 bool CStaticFunctionDefinitions::GetVehicleRespawnPosition(CElement* pElement, CVector& vecPosition)
 {
     assert(pElement);
