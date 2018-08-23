@@ -301,6 +301,8 @@ public:
     static bool SetVehiclePanelState(CElement* pElement, unsigned char ucPanel, unsigned char ucState);
     static bool SetVehicleIdleRespawnDelay(CElement* pElement, unsigned long ulTime);
     static bool SetVehicleRespawnDelay(CElement* pElement, unsigned long ulTime);
+    static bool GetVehicleRespawnPosition(CElement* pElement, CVector& vecPosition);
+    static bool GetVehicleRespawnRotation(CElement* pElement, CVector& vecRotation);
     static bool SetVehicleRespawnPosition(CElement* pElement, const CVector& vecPosition, const CVector& vecRotation);
     static bool ToggleVehicleRespawn(CElement* pElement, bool bRespawn);
     static bool ResetVehicleExplosionTime(CElement* pElement);
