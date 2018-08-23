@@ -4,10 +4,13 @@
 #cmakedefine BUILDING_LIBCURL 1
 
 /* Location of default ca bundle */
-#cmakedefine CURL_CA_BUNDLE ${CURL_CA_BUNDLE}
+#cmakedefine CURL_CA_BUNDLE "${CURL_CA_BUNDLE}"
+
+/* define "1" to use built-in ca store of TLS backend */
+#cmakedefine CURL_CA_FALLBACK 1
 
 /* Location of default ca path */
-#cmakedefine CURL_CA_PATH ${CURL_CA_PATH}
+#cmakedefine CURL_CA_PATH "${CURL_CA_PATH}"
 
 /* to disable cookies support */
 #cmakedefine CURL_DISABLE_COOKIES 1
@@ -48,9 +51,6 @@
 /* to disable RTSP */
 #cmakedefine CURL_DISABLE_RTSP 1
 
-/* to disable RTMP */
-#cmakedefine CURL_DISABLE_RTMP 1
-
 /* to disable SMB */
 #cmakedefine CURL_DISABLE_SMB 1
 
@@ -78,9 +78,6 @@
 
 /* when not building a shared library */
 #cmakedefine CURL_STATICLIB 1
-
-/* Set to explicitly specify we don't want to use thread-safe functions */
-#cmakedefine DISABLED_THREADSAFE 1
 
 /* your Entropy Gathering Daemon socket pathname */
 #cmakedefine EGD_SOCKET ${EGD_SOCKET}
@@ -237,6 +234,9 @@
 
 /* Define to 1 if you have the `getpwuid' function. */
 #cmakedefine HAVE_GETPWUID 1
+
+/* Define to 1 if you have the `getpwuid_r' function. */
+#cmakedefine HAVE_GETPWUID_R 1
 
 /* Define to 1 if you have the `getrlimit' function. */
 #cmakedefine HAVE_GETRLIMIT 1
@@ -401,8 +401,8 @@
 /* if zlib is available */
 #cmakedefine HAVE_LIBZ 1
 
-/* Define to 1 if you have the <limits.h> header file. */
-#cmakedefine HAVE_LIMITS_H 1
+/* if brotli is available */
+#cmakedefine HAVE_BROTLI 1
 
 /* if your compiler supports LL */
 #cmakedefine HAVE_LL 1
@@ -891,6 +891,9 @@
 /* The size of `off_t', as computed by sizeof. */
 #cmakedefine SIZEOF_OFF_T ${SIZEOF_OFF_T}
 
+/* The size of `curl_off_t', as computed by sizeof. */
+#cmakedefine SIZEOF_CURL_OFF_T ${SIZEOF_CURL_OFF_T}
+
 /* The size of `size_t', as computed by sizeof. */
 #cmakedefine SIZEOF_SIZE_T ${SIZEOF_SIZE_T}
 
@@ -963,14 +966,14 @@
 /* to enable Windows SSL  */
 #cmakedefine USE_SCHANNEL 1
 
+/* enable multiple SSL backends */
+#cmakedefine CURL_WITH_MULTI_SSL 1
+
 /* Define to 1 if using yaSSL in OpenSSL compatibility mode. */
 #cmakedefine USE_YASSLEMUL 1
 
 /* Version number of package */
 #cmakedefine VERSION ${VERSION}
-
-/* Define to avoid automatic inclusion of winsock.h */
-#cmakedefine WIN32_LEAN_AND_MEAN 1
 
 /* Define to 1 if OS is AIX. */
 #ifndef _ALL_SOURCE
@@ -1003,3 +1006,6 @@
 
 /* the signed version of size_t */
 #cmakedefine ssize_t ${ssize_t}
+
+/* Define to 1 if you have the mach_absolute_time function. */
+#cmakedefine HAVE_MACH_ABSOLUTE_TIME 1

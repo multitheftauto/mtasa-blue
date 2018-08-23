@@ -1,68 +1,62 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CTeamManager.cpp
-*  PURPOSE:     Team element manager class
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CTeamManager.cpp
+ *  PURPOSE:     Team element manager class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-CTeamManager::CTeamManager ( void )
+CTeamManager::CTeamManager(void)
 {
 }
 
-
-CTeamManager::~CTeamManager ( void )
+CTeamManager::~CTeamManager(void)
 {
-    RemoveAll ();
+    RemoveAll();
 }
 
-
-void CTeamManager::RemoveFromList ( CTeam* pTeam )
+void CTeamManager::RemoveFromList(CTeam* pTeam)
 {
-    m_List.remove ( pTeam );
+    m_List.remove(pTeam);
 }
 
-
-void CTeamManager::RemoveAll ( void )
+void CTeamManager::RemoveAll(void)
 {
-    DeletePointersAndClearList ( m_List );
+    DeletePointersAndClearList(m_List);
 }
 
-
-CTeam* CTeamManager::GetTeam ( const char* szName )
+CTeam* CTeamManager::GetTeam(const char* szName)
 {
-    if ( szName == NULL ) return NULL;
+    if (szName == NULL)
+        return NULL;
 
-    list < CTeam* > ::const_iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end (); iter++ )
+    list<CTeam*>::const_iterator iter = m_List.begin();
+    for (; iter != m_List.end(); iter++)
     {
-        if ( strcmp ( (*iter)->GetTeamName (), szName ) == 0 )
+        if (strcmp((*iter)->GetTeamName(), szName) == 0)
             return *iter;
     }
-    
+
     return NULL;
 }
 
-
-bool CTeamManager::Exists ( CTeam* pTeam )
+bool CTeamManager::Exists(CTeam* pTeam)
 {
-    return ListContains ( m_List, pTeam );
+    return ListContains(m_List, pTeam);
 }
 
-
-CTeam* CTeamManager::Create ( CElement* pParent, CXMLNode* pNode, char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue )
+CTeam* CTeamManager::Create(CElement* pParent, CXMLNode* pNode, char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
 {
     // Create the team
-    CTeam* pTeam = new CTeam ( this, pParent, pNode, szName, ucRed, ucGreen, ucBlue );
+    CTeam* pTeam = new CTeam(this, pParent, pNode, szName, ucRed, ucGreen, ucBlue);
 
     // Invalid Team id?
-    if ( pTeam->GetID () == INVALID_ELEMENT_ID )
+    if (pTeam->GetID() == INVALID_ELEMENT_ID)
     {
         delete pTeam;
         return NULL;
@@ -72,15 +66,13 @@ CTeam* CTeamManager::Create ( CElement* pParent, CXMLNode* pNode, char* szName, 
     return pTeam;
 }
 
-
-CTeam* CTeamManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CEvents* pEvents )
+CTeam* CTeamManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
 {
     // Create the Team
-    CTeam* pTeam = new CTeam ( this, pParent, &Node );
+    CTeam* pTeam = new CTeam(this, pParent, &Node);
 
     // Verify the Team id and load the data from xml
-    if ( pTeam->GetID () == INVALID_ELEMENT_ID ||
-         !pTeam->LoadFromCustomData ( pEvents ) )
+    if (pTeam->GetID() == INVALID_ELEMENT_ID || !pTeam->LoadFromCustomData(pEvents))
     {
         delete pTeam;
         return NULL;

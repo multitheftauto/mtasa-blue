@@ -71,7 +71,6 @@ int test(char *URL)
       "Host: ninja\r\n\r\n";
 #endif
     size_t iolen;
-    char buf[1024];
 
     res = curl_easy_send(curl, request, strlen(request), &iolen);
 
@@ -79,6 +78,7 @@ int test(char *URL)
       /* we assume that sending always work */
 
       do {
+        char buf[1024];
         /* busy-read like crazy */
         res = curl_easy_recv(curl, buf, sizeof(buf), &iolen);
 
@@ -95,8 +95,8 @@ int test(char *URL)
       } while((res == CURLE_OK && iolen != 0) || (res == CURLE_AGAIN));
     }
 
-    if(res != CURLE_OK || iolen != 0)
-      return TEST_ERR_FAILURE;
+    if(iolen != 0)
+      res = TEST_ERR_FAILURE;
   }
 
 test_cleanup:

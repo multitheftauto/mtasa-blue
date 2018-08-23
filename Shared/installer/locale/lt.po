@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -11,12 +11,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%"
-"100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Translators: Kristupas Skabeikis; Rytis Jankauskas; Gabrielius  Laurinavičius; Tadas Lapė; ccw; Karolis Vaikutis; Dzinas\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"Translators: Kristupas \"Buffalo\" Skabeikis; Rytis \"-TmS\" Jankauskas; "
-"Gabrielius  \"Drakath\" Laurinavičius; Tadas \"Grafu\" Lapė; ccw; Karolis "
-"\"Blantas\" Vaikutis; Dzinas\n"
 "X-POOTLE-MTIME: 1451914164.0\n"
 
 #. GET_XPVISTA_PLEASE
@@ -48,8 +45,7 @@ msgstr ""
 "\n"
 "Rekomenduojame išjungti visas kitas programas prieš pradedant Įdiegimą.\n"
 "\n"
-"[Administratoriaus teisės gali būti pareikalautos naudojantis Vista ir "
-"vėlesnėmis operacinėmis sistemomis]\n"
+"[Administratoriaus teisės gali būti pareikalautos naudojantis Vista ir vėlesnėmis operacinėmis sistemomis]\n"
 "\n"
 "Norėdami tęsti, spauskite Toliau."
 
@@ -74,8 +70,7 @@ msgid ""
 msgstr ""
 "Pasirinkite Grand Theft Auto: San Andreas aplanką.$\n"
 "$\n"
-"Jūs PRIVALOTE turėti Grand Theft Auto: Sand Andreas 1.0 įdiegtą, norėdami "
-"naudoti MTA:SA, kitos versijos nepalaikomos.$\n"
+"Jūs PRIVALOTE turėti Grand Theft Auto: Sand Andreas 1.0 įdiegtą, norėdami naudoti MTA:SA, kitos versijos nepalaikomos.$\n"
 "$\n"
 "Spauskite Įdiegti norėdami pradėti įdiegimą."
 
@@ -251,8 +246,10 @@ msgid ""
 "$\n"
 "Please reinstall if there are problems later."
 msgstr ""
-"Galiojanti Grand Theft Auto: San Andreas versija nerasta.$\r$\n"
-"Tačiau diegimas tęsis.$\rJei kils problemų, prašome įdiegti iš naujo."
+"Galiojanti Grand Theft Auto: San Andreas versija nerasta.$\r"
+"$\n"
+"Tačiau diegimas tęsis.$\r"
+"Jei kils problemų, prašome įdiegti iš naujo."
 
 #. INST_SEC_CORE_RESOURCES
 #: ../Shared/installer/nightly.nsi:472
@@ -300,8 +297,10 @@ msgid ""
 "$\n"
 "Run the new installer to upgrade and preserve your settings."
 msgstr ""
-"Pašalinama prieš atnaujinimą?$\r$\n"
-"Nėra būtina pašalinti šios versijos prieš diegiant naują MTA:SA versiją$\r$\n"
+"Pašalinama prieš atnaujinimą?$\r"
+"$\n"
+"Nėra būtina pašalinti šios versijos prieš diegiant naują MTA:SA versiją$\r"
+"$\n"
 "Paleiskite atnaujinimo diegimą ir išsaugosite savo nustatymus."
 
 #. UNINST_DATA_REQUEST
@@ -311,8 +310,8 @@ msgid ""
 "server configuration)? If you click no, any resources, configurations or "
 "screenshots you have created will be lost."
 msgstr ""
-"Ar norėtumėte palikti savo duomenų bylas (pavyzdžiui resursus, nuotraukas ir "
-"serverio konfigūraciją)? Jei paspausite ne, tai visi resursai, "
+"Ar norėtumėte palikti savo duomenų bylas (pavyzdžiui resursus, nuotraukas ir"
+" serverio konfigūraciją)? Jei paspausite ne, tai visi resursai, "
 "konfigūracijos ar nuotraukos kurias padarėte, bus pašalinti."
 
 #. MSGBOX_PATCH_FAIL1
@@ -321,8 +320,8 @@ msgid ""
 "Unable to download the patch file for your version of Grand Theft Auto: San "
 "Andreas"
 msgstr ""
-"Nepavyko atsisiųsti papildomų klaidų ištaisymo paketo jūsų Grand Theft Auto: "
-"San Andreas versijai"
+"Nepavyko atsisiųsti papildomų klaidų ištaisymo paketo jūsų Grand Theft Auto:"
+" San Andreas versijai"
 
 #. MSGBOX_PATCH_FAIL2
 #: ../Shared/installer/nightly.nsi:1145
@@ -351,8 +350,8 @@ msgstr ""
 msgid "Logon service not running, aborting!"
 msgstr "Prisijungimo paslauga neveikia, nutraukiama!"
 
-# Elevate what ? More specific ?
 #. UAC_RIGHTS4
+# Elevate what ? More specific ?
 #: ../Shared/installer/nightly.nsi:1184
 msgid "Unable to elevate"
 msgstr "Nepavyko iškelti"
@@ -428,8 +427,7 @@ msgid ""
 " Click Next to continue."
 msgstr ""
 "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} bus įdiegta šiame aplanke.$\n"
-"Norėdami įdiegti į kitą aplanką, paspauskite Naršyti ir pasirinkite kitą "
-"aplanką.$\n"
+"Norėdami įdiegti į kitą aplanką, paspauskite Naršyti ir pasirinkite kitą aplanką.$\n"
 "$\n"
 "Norėdami tęsti, spauskite Toliau."
 
@@ -462,7 +460,8 @@ msgstr "Pasirinktinis"
 #: ../Shared/installer/nightly.nsi:2091
 msgid ""
 "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
-msgstr "Pasirinkite aplanką įdiegti ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}:"
+msgstr ""
+"Pasirinkite aplanką įdiegti ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}:"
 
 #. INST_LOC_OW
 #: ../Shared/installer/nightly.nsi:2109
@@ -510,8 +509,10 @@ msgstr "Prašome įsitinkinti ar ugniasienė neblokuoja"
 #~ "$\n"
 #~ "Please reinstall if there are problems later."
 #~ msgstr ""
-#~ "Nepavyko atsisiųsti Microsoft Visual Studio 2008 SP1 redistributable.$\r$\n"
-#~ "Tačiau instaliacija tęsis.$\r$\n"
+#~ "Nepavyko atsisiųsti Microsoft Visual Studio 2008 SP1 redistributable.$\r"
+#~ "$\n"
+#~ "Tačiau instaliacija tęsis.$\r"
+#~ "$\n"
 #~ "Jei kils problemų, įdiekite iš naujo."
 
 #~ msgid "Unable to download Microsoft Visual Studio 2013 redistributable"
@@ -527,6 +528,8 @@ msgstr "Prašome įsitinkinti ar ugniasienė neblokuoja"
 #~ "$\n"
 #~ "Please reinstall if there are problems later."
 #~ msgstr ""
-#~ "Nepavyko atsisiųsti Microsoft Visual Studio 2013 redistributable.$\r$\n"
-#~ "Nepaisant to, diegimas tęsiasi.$\r$\n"
+#~ "Nepavyko atsisiųsti Microsoft Visual Studio 2013 redistributable.$\r"
+#~ "$\n"
+#~ "Nepaisant to, diegimas tęsiasi.$\r"
+#~ "$\n"
 #~ "Prašome įdiegti iš naujo jei kils problemų."

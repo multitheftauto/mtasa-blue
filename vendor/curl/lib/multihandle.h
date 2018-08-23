@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -23,8 +23,10 @@
  ***************************************************************************/
 
 #include "conncache.h"
+#include "psl.h"
 
 struct Curl_message {
+  struct curl_llist_element list;
   /* the 'CURLMsg' is the part that is visible to the external user */
   struct CURLMsg extmsg;
 };
@@ -96,6 +98,11 @@ struct Curl_multi {
   /* Hostname cache */
   struct curl_hash hostcache;
 
+#ifdef USE_LIBPSL
+  /* PSL cache. */
+  struct PslCache psl;
+#endif
+
   /* timetree points to the splay-tree of time nodes to figure out expire
      times of all currently set timers */
   struct Curl_tree *timetree;
@@ -112,10 +119,6 @@ struct Curl_multi {
 
   /* Shared connection cache (bundles)*/
   struct conncache conn_cache;
-
-  /* This handle will be used for closing the cached connections in
-     curl_multi_cleanup() */
-  struct Curl_easy *closure_handle;
 
   long maxconnects; /* if >0, a fixed limit of the maximum number of entries
                        we're allowed to grow the connection cache to */
@@ -147,8 +150,9 @@ struct Curl_multi {
   /* timer callback and user data pointer for the *socket() API */
   curl_multi_timer_callback timer_cb;
   void *timer_userp;
-  struct timeval timer_lastcall; /* the fixed time for the timeout for the
+  struct curltime timer_lastcall; /* the fixed time for the timeout for the
                                     previous callback */
+  bool in_callback;            /* true while executing a callback */
 };
 
 #endif /* HEADER_CURL_MULTIHANDLE_H */

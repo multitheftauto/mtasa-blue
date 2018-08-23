@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -466,6 +466,7 @@ static const char *GTime2str(const char *beg, const char *end)
     break;
   case 2:
     sec1 = fracp[-2];
+    /* FALLTHROUGH */
   case 1:
     sec2 = fracp[-1];
     break;
@@ -711,7 +712,7 @@ int Curl_parseX509(curl_X509certificate *cert,
   /* Get optional version, get serialNumber. */
   cert->version.header = NULL;
   cert->version.beg = &defaultVersion;
-  cert->version.end = &defaultVersion + sizeof defaultVersion;;
+  cert->version.end = &defaultVersion + sizeof(defaultVersion);
   beg = Curl_getASN1Element(&elem, beg, end);
   if(elem.tag == 0) {
     Curl_getASN1Element(&cert->version, elem.beg, elem.end);

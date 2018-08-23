@@ -1,14 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientModelRequestManager.h
-*  PURPOSE:     Entity model streaming manager class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientModelRequestManager.h
+ *  PURPOSE:     Entity model streaming manager class
+ *
+ *****************************************************************************/
 
 class CClientModelRequestManager;
 
@@ -21,9 +19,9 @@ class CClientModelRequestManager;
 
 struct SClientModelRequest
 {
-    CModelInfo*         pModel;
-    CClientEntity*      pEntity;
-    CElapsedTime        requestTimer;
+    CModelInfo*    pModel;
+    CClientEntity* pEntity;
+    CElapsedTime   requestTimer;
 };
 
 class CClientModelRequestManager
@@ -31,26 +29,26 @@ class CClientModelRequestManager
     friend class CClientManager;
 
 public:
-                                    CClientModelRequestManager      ( void );
-                                    ~CClientModelRequestManager     ( void );
+    CClientModelRequestManager(void);
+    ~CClientModelRequestManager(void);
 
-    bool                            IsLoaded                        ( unsigned short usModelID );
-    bool                            IsRequested                     ( CModelInfo* pModelInfo );
-    bool                            HasRequested                    ( CClientEntity* pRequester );
-    CModelInfo*                     GetRequestedModelInfo           ( CClientEntity* pRequester );
+    bool        IsLoaded(unsigned short usModelID);
+    bool        IsRequested(CModelInfo* pModelInfo);
+    bool        HasRequested(CClientEntity* pRequester);
+    CModelInfo* GetRequestedModelInfo(CClientEntity* pRequester);
 
-    bool                            RequestBlocking                 ( unsigned short usModelID, const char* szTag );
+    bool RequestBlocking(unsigned short usModelID, const char* szTag);
 
-    bool                            Request                         ( unsigned short usModelID, CClientEntity* pRequester );
-    void                            Cancel                          ( CClientEntity* pRequester, bool bAllowQueue );
+    bool Request(unsigned short usModelID, CClientEntity* pRequester);
+    void Cancel(CClientEntity* pRequester, bool bAllowQueue);
 
 private:
-    void                                DoPulse                     ( void );
-    bool                                GetRequestEntry             ( CClientEntity* pRequester, std::list < SClientModelRequest* > ::iterator& iter );
+    void DoPulse(void);
+    bool GetRequestEntry(CClientEntity* pRequester, std::list<SClientModelRequest*>::iterator& iter);
 
-    bool                                m_bDoingPulse;
-    std::list < SClientModelRequest* >  m_Requests;
-    std::list < CClientEntity* >        m_CancelQueue;
+    bool                            m_bDoingPulse;
+    std::list<SClientModelRequest*> m_Requests;
+    std::list<CClientEntity*>       m_CancelQueue;
 };
 
 #endif

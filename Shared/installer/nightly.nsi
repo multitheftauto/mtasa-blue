@@ -554,8 +554,10 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             StrCpy $0 $INSTDIR
             Call RemoveVirtualStore
 
-            IfFileExists $GTA_DIR\gta_sa.exe +1 0
-            IfFileExists $GTA_DIR\gta-sa.exe 0 PathBad
+            Push $GTA_DIR 
+            Call IsGtaDirectory
+            Pop $0
+            ${If} $0 == "gta"
                 # Fix permissions for GTA install directory
                 FastPerms::FullAccessPlox "$GTA_DIR"
 
@@ -564,10 +566,16 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
                 !insertmacro UAC_AsUser_Call Function RemoveVirtualStore ${UAC_SYNCREGISTERS}
                 StrCpy $0 $GTA_DIR
                 Call RemoveVirtualStore
-            PathBad:
+            ${EndIf}
         ${EndIf}
         #############################################################
-        
+
+        # Handle "Grand Theft Auto San Andreas.exe" being present instead of gta_sa.exe
+        IfFileExists "$GTA_DIR\gta_sa.exe" noCopyReq
+            IfFileExists "$GTA_DIR\Grand Theft Auto San Andreas.exe" 0 noCopyReq
+                CopyFiles "$GTA_DIR\Grand Theft Auto San Andreas.exe" "$GTA_DIR\gta_sa.exe"
+        noCopyReq:
+
         #############################################################
         # Patch our San Andreas .exe if it is required
             nsArray::SetList array "gta_sa.exe" "gta-sa.exe" "testapp.exe" /end
@@ -577,7 +585,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
                 StrCmp "$0" "0" TryNextExe
                 !insertmacro GetMD5 $GTA_DIR\$1 $ExeMD5
                 DetailPrint "$1 successfully detected ($ExeMD5)"
-                ${LogText} "GetMD5 $GTA_DIR\gta_sa.exe $ExeMD5"
+                ${LogText} "GetMD5 $GTA_DIR\$1 $ExeMD5"
                 ${Switch} $ExeMD5
                     ${Case} "bf25c28e9f6c13bd2d9e28f151899373" #US 2.00
                     ${Case} "7fd5f9436bd66af716ac584ff32eb483" #US 1.01
@@ -663,7 +671,18 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\cefweb.dll"
         File "${FILES_ROOT}\mta\libwow64.dll"
         File "${FILES_ROOT}\mta\wow64_helper.exe"
-        
+
+        File "${FILES_ROOT}\mta\bass.dll"
+        File "${FILES_ROOT}\mta\bass_aac.dll"
+        File "${FILES_ROOT}\mta\bass_ac3.dll"
+        File "${FILES_ROOT}\mta\bass_fx.dll"
+        File "${FILES_ROOT}\mta\bassflac.dll"
+        File "${FILES_ROOT}\mta\bassmidi.dll"
+        File "${FILES_ROOT}\mta\bassmix.dll"
+        File "${FILES_ROOT}\mta\bassopus.dll"
+        File "${FILES_ROOT}\mta\basswma.dll"
+        File "${FILES_ROOT}\mta\tags.dll"
+
         SetOutPath "$INSTDIR\MTA"
 		File "${FILES_ROOT}\mta\chrome_elf.dll"
         File "${FILES_ROOT}\mta\libcef.dll"
@@ -672,6 +691,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\libGLESv2.dll"
         File "${FILES_ROOT}\mta\natives_blob.bin"
         File "${FILES_ROOT}\mta\snapshot_blob.bin"
+        File "${FILES_ROOT}\mta\v8_context_snapshot.bin"
         
         SetOutPath "$INSTDIR\MTA\CEF"
         File "${FILES_ROOT}\mta\CEF\CEFLauncher.exe"
@@ -696,16 +716,6 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             SetOutPath "$INSTDIR\MTA"
             File "${FILES_ROOT}\mta\d3dx9_42.dll"
             File "${FILES_ROOT}\mta\D3DCompiler_42.dll"
-            File "${FILES_ROOT}\mta\bass.dll"
-            File "${FILES_ROOT}\mta\basswma.dll"
-            File "${FILES_ROOT}\mta\bassmidi.dll"
-            File "${FILES_ROOT}\mta\bassflac.dll"
-            File "${FILES_ROOT}\mta\bass_aac.dll"
-            File "${FILES_ROOT}\mta\bass_ac3.dll"
-            File "${FILES_ROOT}\mta\bassmix.dll"
-            File "${FILES_ROOT}\mta\bass_fx.dll"
-            File "${FILES_ROOT}\mta\bassopus.dll"
-            File "${FILES_ROOT}\mta\tags.dll"
             File "${FILES_ROOT}\mta\sa.dat"
             File "${FILES_ROOT}\mta\vea.dll"
             File "${FILES_ROOT}\mta\vog.dll"
@@ -1863,7 +1873,8 @@ Function IsGtaDirectory
     ; gta_sa.exe or gta-sa.exe should exist
     IfFileExists "$0\gta_sa.exe" cont1
         IfFileExists "$0\gta-sa.exe" cont1
-            StrCpy $1 ""
+            IfFileExists "$0\Grand Theft Auto San Andreas.exe" cont1
+                StrCpy $1 ""
     cont1:
 
     ; data subdirectory should exist

@@ -199,8 +199,8 @@ static curl_socklen_t fromlen;
 
 static curl_socket_t peer = CURL_SOCKET_BAD;
 
-static int timeout;
-static int maxtimeout = 5 * TIMEOUT;
+static unsigned int timeout;
+static unsigned int maxtimeout = 5 * TIMEOUT;
 
 #ifdef ENABLE_IPV6
 static bool use_ipv6 = FALSE;
@@ -208,7 +208,7 @@ static bool use_ipv6 = FALSE;
 static const char *ipv_inuse = "IPv4";
 
 const  char *serverlogfile = DEFAULT_LOGFILE;
-static char *pidname= (char *)".tftpd.pid";
+static const char *pidname = ".tftpd.pid";
 static int serverlogslocked = 0;
 static int wrotepidfile = 0;
 
@@ -217,7 +217,7 @@ static sigjmp_buf timeoutbuf;
 #endif
 
 #if defined(HAVE_ALARM) && defined(SIGALRM)
-static int rexmtval = TIMEOUT;
+static const unsigned int rexmtval = TIMEOUT;
 #endif
 
 /* do-nothing macro replacement for systems which lack siginterrupt() */
@@ -515,7 +515,7 @@ static void read_ahead(struct testcase *test,
     }
     else {
       if(test->rcount) {
-        c=test->rptr[0];
+        c = test->rptr[0];
         test->rptr++;
         test->rcount--;
       }
@@ -571,9 +571,9 @@ static ssize_t write_behind(struct testcase *test, int convert)
     char outfile[256];
     snprintf(outfile, sizeof(outfile), "log/upload.%ld", test->testno);
 #ifdef WIN32
-    test->ofile=open(outfile, O_CREAT|O_RDWR|O_BINARY, 0777);
+    test->ofile = open(outfile, O_CREAT|O_RDWR|O_BINARY, 0777);
 #else
-    test->ofile=open(outfile, O_CREAT|O_RDWR, 0777);
+    test->ofile = open(outfile, O_CREAT|O_RDWR, 0777);
 #endif
     if(test->ofile == -1) {
       logmsg("Couldn't create and/or open file %s for upload!", outfile);
@@ -955,18 +955,16 @@ static int do_tftp(struct testcase *test, struct tftphdr *tp, ssize_t size)
   int first = 1, ecode;
   struct formats *pf;
   char *filename, *mode = NULL;
-  int error;
-  FILE *server;
 #ifdef USE_WINSOCK
   DWORD recvtimeout, recvtimeoutbak;
 #endif
-  char *option = (char *)"mode"; /* mode is implicit */
+  const char *option = "mode"; /* mode is implicit */
   int toggle = 1;
 
   /* Open request dump file. */
-  server = fopen(REQUEST_DUMP, "ab");
+  FILE *server = fopen(REQUEST_DUMP, "ab");
   if(!server) {
-    error = errno;
+    int error = errno;
     logmsg("fopen() failed with error: %d %s", error, strerror(error));
     logmsg("Error opening file: %s", REQUEST_DUMP);
     return -1;
@@ -992,7 +990,7 @@ static int do_tftp(struct testcase *test, struct tftphdr *tp, ssize_t size)
 
     /* before increasing pointer, make sure it is still within the legal
        space */
-    if((cp+1) < &buf.storage[size]) {
+    if((cp + 1) < &buf.storage[size]) {
       ++cp;
       if(first) {
         /* store the mode since we need it later */
@@ -1074,7 +1072,7 @@ static int parse_servercmd(struct testcase *req)
 
   filename = test2file(req->testno);
 
-  stream=fopen(filename, "rb");
+  stream = fopen(filename, "rb");
   if(!stream) {
     error = errno;
     logmsg("fopen() failed with error: %d %s", error, strerror(error));
@@ -1086,7 +1084,7 @@ static int parse_servercmd(struct testcase *req)
     char *orgcmd = NULL;
     char *cmd = NULL;
     size_t cmdsize = 0;
-    int num=0;
+    int num = 0;
 
     /* get the custom server control "commands" */
     error = getpart(&orgcmd, &cmdsize, "reply", "servercmd", stream);
@@ -1138,9 +1136,6 @@ static int validate_access(struct testcase *test,
                            const char *filename, int mode)
 {
   char *ptr;
-  long testno, partno;
-  int error;
-  char partbuf[80]="data";
 
   logmsg("trying to get file: %s mode %x", filename, mode);
 
@@ -1161,6 +1156,9 @@ static int validate_access(struct testcase *test,
   ptr = strrchr(filename, '/');
 
   if(ptr) {
+    char partbuf[80]="data";
+    long partno;
+    long testno;
     char *file;
 
     ptr++; /* skip the slash */
@@ -1192,9 +1190,9 @@ static int validate_access(struct testcase *test,
       snprintf(partbuf, sizeof(partbuf), "data%ld", partno);
 
     if(file) {
-      FILE *stream=fopen(file, "rb");
+      FILE *stream = fopen(file, "rb");
       if(!stream) {
-        error = errno;
+        int error = errno;
         logmsg("fopen() failed with error: %d %s", error, strerror(error));
         logmsg("Error opening file: %s", file);
         logmsg("Couldn't open test file: %s", file);
@@ -1202,7 +1200,7 @@ static int validate_access(struct testcase *test,
       }
       else {
         size_t count;
-        error = getpart(&test->buffer, &count, "reply", partbuf, stream);
+        int error = getpart(&test->buffer, &count, "reply", partbuf, stream);
         fclose(stream);
         if(error) {
           logmsg("getpart() failed with error: %d", error);

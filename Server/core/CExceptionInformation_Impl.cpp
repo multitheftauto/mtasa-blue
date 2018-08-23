@@ -1,21 +1,19 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CExceptionInformation_Impl.cpp
-*  PURPOSE:     Exception information parser
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Derek Abdine <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CExceptionInformation_Impl.cpp
+ *  PURPOSE:     Exception information parser
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
 #define MAX_MODULE_PATH 512
 
-CExceptionInformation_Impl::CExceptionInformation_Impl ( void )
+CExceptionInformation_Impl::CExceptionInformation_Impl(void)
 {
     m_uiCode = 0;
     m_pAddress = NULL;
@@ -40,14 +38,13 @@ CExceptionInformation_Impl::CExceptionInformation_Impl ( void )
     m_ulEFlags = 0;
 }
 
-CExceptionInformation_Impl::~CExceptionInformation_Impl ( void )
+CExceptionInformation_Impl::~CExceptionInformation_Impl(void)
 {
-    if ( m_szModulePathName )
+    if (m_szModulePathName)
         delete m_szModulePathName;
 }
 
-
-void CExceptionInformation_Impl::Set ( unsigned int iCode, _EXCEPTION_POINTERS* pException )
+void CExceptionInformation_Impl::Set(unsigned int iCode, _EXCEPTION_POINTERS* pException)
 {
     m_uiCode = iCode;
     m_pAddress = pException->ExceptionRecord->ExceptionAddress;
@@ -70,14 +67,12 @@ void CExceptionInformation_Impl::Set ( unsigned int iCode, _EXCEPTION_POINTERS* 
     m_ulEFlags = pException->ContextRecord->EFlags;
 #endif
 
-
     void* pModuleBaseAddress = NULL;
     m_szModulePathName = new char[MAX_MODULE_PATH];
-    GetModule ( m_szModulePathName, MAX_MODULE_PATH, &pModuleBaseAddress );
-    m_szModuleBaseName = strrchr ( m_szModulePathName , '\\' );
+    GetModule(m_szModulePathName, MAX_MODULE_PATH, &pModuleBaseAddress);
+    m_szModuleBaseName = strrchr(m_szModulePathName, '\\');
     m_szModuleBaseName = m_szModuleBaseName ? m_szModuleBaseName + 1 : m_szModulePathName;
-    m_uiAddressModuleOffset = static_cast < BYTE* > ( GetAddress () ) - static_cast < BYTE* > ( pModuleBaseAddress );
-
+    m_uiAddressModuleOffset = static_cast<BYTE*>(GetAddress()) - static_cast<BYTE*>(pModuleBaseAddress);
 }
 
 /**
@@ -86,78 +81,71 @@ void CExceptionInformation_Impl::Set ( unsigned int iCode, _EXCEPTION_POINTERS* 
  *
  * @return <code>true</code> if successful, <code>false</code> otherwise.
  */
-bool CExceptionInformation_Impl::GetModule ( char * szOutputBuffer, int nOutputNameLength, void** ppModuleBaseAddress )
+bool CExceptionInformation_Impl::GetModule(char* szOutputBuffer, int nOutputNameLength, void** ppModuleBaseAddress)
 {
-   HMODULE hModule;
+    HMODULE hModule;
 
-   if (szOutputBuffer == NULL)
-      return false;
+    if (szOutputBuffer == NULL)
+        return false;
 
-   /*
-    * NUL out the first char in the output buffer.
-    */
-   szOutputBuffer[0] = 0;
+    /*
+     * NUL out the first char in the output buffer.
+     */
+    szOutputBuffer[0] = 0;
 
-   if ( nOutputNameLength == 0 )
-      return false;
+    if (nOutputNameLength == 0)
+        return false;
 
-   /*
-    * GetModuleHandleExA isn't supported under Windows 2000.
-    */
-   typedef BOOL (WINAPI * _pfnGetModuleHandleExA) ( DWORD, LPCSTR, HMODULE * );
+    /*
+     * GetModuleHandleExA isn't supported under Windows 2000.
+     */
+    typedef BOOL(WINAPI * _pfnGetModuleHandleExA)(DWORD, LPCSTR, HMODULE*);
 
-   /*
-    * Get kernel32.dll's HMODULE.
-    */
-   HMODULE hKern32 = GetModuleHandle("kernel32.dll");
-   if ( NULL == hKern32 )  
-      return false;
+    /*
+     * Get kernel32.dll's HMODULE.
+     */
+    HMODULE hKern32 = GetModuleHandle("kernel32.dll");
+    if (NULL == hKern32)
+        return false;
 
-   /*
-    * See if we're able to use GetModuleHandleExA.  According to Microsoft,
-    * this API is only available on Windows XP and Vista.
-    */
-   _pfnGetModuleHandleExA pfnGetModuleHandleExA = 
-      (_pfnGetModuleHandleExA)GetProcAddress(hKern32, "GetModuleHandleExA");
+    /*
+     * See if we're able to use GetModuleHandleExA.  According to Microsoft,
+     * this API is only available on Windows XP and Vista.
+     */
+    _pfnGetModuleHandleExA pfnGetModuleHandleExA = (_pfnGetModuleHandleExA)GetProcAddress(hKern32, "GetModuleHandleExA");
 
-   /*
-    * TODO:  Possibly use our own code to do this for other systems.
-    * It is possible to enumerate all modules and get their starting/ending
-    * offsets, so it would just be a simple comparison of addresses to
-    * do this...
-    */
-   if (NULL == pfnGetModuleHandleExA)
-      return false;
-   
-   if ( 0 == pfnGetModuleHandleExA ( 
-               0x00000004 /*GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS*/, 
-               (LPCSTR)m_pAddress,
-               &hModule ) )
-   {
-      return false;
-   }
+    /*
+     * TODO:  Possibly use our own code to do this for other systems.
+     * It is possible to enumerate all modules and get their starting/ending
+     * offsets, so it would just be a simple comparison of addresses to
+     * do this...
+     */
+    if (NULL == pfnGetModuleHandleExA)
+        return false;
 
-   *ppModuleBaseAddress = hModule;
+    if (0 == pfnGetModuleHandleExA(0x00000004 /*GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS*/, (LPCSTR)m_pAddress, &hModule))
+    {
+        return false;
+    }
 
-   if ( 0 != GetModuleFileNameA ( 
-                hModule, 
-                szOutputBuffer,
-                nOutputNameLength ) )
-   {
-      /*
-       * GetModuleFileNameA will return nOutputNameLength to us
-       * if the buffer is too small.  NUL term the buffer.
-       *
-       * TODO:  Check GetLastError() and actually grow the buffer
-       * and retry if it is too small.
-       */ 
-      if (nOutputNameLength)
-         szOutputBuffer[nOutputNameLength-1] = 0;
+    *ppModuleBaseAddress = hModule;
 
-      return true;
-   }
+    if (0 != GetModuleFileNameA(hModule, szOutputBuffer, nOutputNameLength))
+    {
+        /*
+         * GetModuleFileNameA will return nOutputNameLength to us
+         * if the buffer is too small.  NUL term the buffer.
+         *
+         * TODO:  Check GetLastError() and actually grow the buffer
+         * and retry if it is too small.
+         */
+        if (nOutputNameLength)
+            szOutputBuffer[nOutputNameLength - 1] = 0;
 
-   szOutputBuffer[0] = 0;
+        return true;
+    }
 
-   return false;
+    szOutputBuffer[0] = 0;
+
+    return false;
 }

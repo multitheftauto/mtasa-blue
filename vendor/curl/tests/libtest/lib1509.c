@@ -28,7 +28,7 @@
 size_t WriteOutput(void *ptr, size_t size, size_t nmemb, void *stream);
 size_t WriteHeader(void *ptr, size_t size, size_t nmemb, void *stream);
 
-unsigned long realHeaderSize = 0;
+static unsigned long realHeaderSize = 0;
 
 int test(char *URL)
 {
@@ -69,7 +69,7 @@ int test(char *URL)
     goto test_cleanup;
   }
 
-  printf("header length is ........: %lu\n", headerSize);
+  printf("header length is ........: %ld\n", headerSize);
   printf("header length should be..: %lu\n", realHeaderSize);
 
 test_cleanup:

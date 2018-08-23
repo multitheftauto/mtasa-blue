@@ -1,17 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CTaskManagementSystemSA.h
-*  PURPOSE:     Header file for task management system class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Christian Myhre Lundheim <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CTaskManagementSystemSA.h
+ *  PURPOSE:     Header file for task management system class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 class CTaskManagementSystemSA;
 
@@ -29,22 +25,22 @@ class CTaskManagementSystemSA;
 class CTaskManagementSystemSA : public CTaskManagementSystem
 {
 public:
-                                CTaskManagementSystemSA             ( void );
-                                ~CTaskManagementSystemSA            ( void );
+    CTaskManagementSystemSA(void);
+    ~CTaskManagementSystemSA(void);
 
-    CTask *                     AddTask                             ( CTaskSA * pTask );
-    void                        RemoveTask                          ( CTaskSAInterface * pTaskInterface );
-    CTask *                     GetTask                             ( CTaskSAInterface * pTaskInterface );
-    CTask *                     CreateAppropriateTask               ( CTaskSAInterface * pTaskInterface, int iTaskType );
+    CTask* AddTask(CTaskSA* pTask);
+    void   RemoveTask(CTaskSAInterface* pTaskInterface);
+    CTask* GetTask(CTaskSAInterface* pTaskInterface);
+    CTask* CreateAppropriateTask(CTaskSAInterface* pTaskInterface, int iTaskType);
 
 private:
     struct STaskListItem
     {
-        CTaskSAInterface*   taskInterface;
-        CTaskSA*            pTaskSA;
+        CTaskSAInterface* taskInterface;
+        CTaskSA*          pTaskSA;
     };
 
-    std::list < STaskListItem* >     m_TaskList;
+    std::list<STaskListItem*> m_TaskList;
 };
 
 #endif

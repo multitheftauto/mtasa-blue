@@ -1,19 +1,17 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CPlayerClothes.h
-*  PURPOSE:     Player clothes class
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CPlayerClothes.h
+ *  PURPOSE:     Player clothes class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 class CPlayerClothes;
 
-#ifndef __PLAYERCLOTHES_H
-#define __PLAYERCLOTHES_H
+#pragma once
 
 #include "CCommon.h"
 
@@ -53,26 +51,24 @@ struct SPlayerClothing
 class CPlayerClothes
 {
 public:
-                                CPlayerClothes              ( void );
+    CPlayerClothes(void);
 
-    const SPlayerClothing*      GetClothing                 ( unsigned char ucType );
-    void                        AddClothes                  ( const char* szTexture, const char* szModel, unsigned char ucType );
-    bool                        RemoveClothes               ( unsigned char ucType );
+    const SPlayerClothing* GetClothing(unsigned char ucType);
+    void                   AddClothes(const char* szTexture, const char* szModel, unsigned char ucType);
+    bool                   RemoveClothes(unsigned char ucType);
 
-    void                        RemoveAll                   ( void );
+    void RemoveAll(void);
 
-    void                        DefaultClothes              ( void );
+    void DefaultClothes(void);
 
-    static bool                 HasEmptyClothing            ( unsigned char ucType );
-    static bool                 IsEmptyClothing             ( const SPlayerClothing * pClothing, unsigned char ucType );
-    static const  char*         GetClothingName             ( unsigned char ucType );
+    static bool        HasEmptyClothing(unsigned char ucType);
+    static bool        IsEmptyClothing(const SPlayerClothing* pClothing, unsigned char ucType);
+    static const char* GetClothingName(unsigned char ucType);
 
-    static const SPlayerClothing*     GetClothingGroup      ( unsigned char ucType );
-    static const SPlayerClothing*     GetClothing           ( const char * szTexture, const char * szModel, unsigned char ucType );
-    static const int            GetClothingGroupMax         ( unsigned char ucType );
-    static bool                 IsValidClothing             ( const char * szTexture, const char * szModel, unsigned char ucType );
+    static const SPlayerClothing* GetClothingGroup(unsigned char ucType);
+    static const SPlayerClothing* GetClothing(const char* szTexture, const char* szModel, unsigned char ucType);
+    static const int              GetClothingGroupMax(unsigned char ucType);
+    static bool                   IsValidClothing(const char* szTexture, const char* szModel, unsigned char ucType);
 
-    SFixedArray < const SPlayerClothing*, PLAYER_CLOTHING_SLOTS >   m_Clothes;
+    SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS> m_Clothes;
 };
-
-#endif

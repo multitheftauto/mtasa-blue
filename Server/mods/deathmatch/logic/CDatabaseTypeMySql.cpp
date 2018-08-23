@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CDatabaseTypeMySql.cpp
-*  PURPOSE:     MySql connection maker
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CDatabaseTypeMySql.cpp
+ *  PURPOSE:     MySql connection maker
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 #include "CDatabaseType.h"
@@ -25,35 +25,34 @@ class CDatabaseTypeMySql : public CDatabaseType
 {
 public:
     ZERO_ON_NEW
-                                    CDatabaseTypeMySql         ( void );
-    virtual                         ~CDatabaseTypeMySql        ( void );
+    CDatabaseTypeMySql(void);
+    virtual ~CDatabaseTypeMySql(void);
 
     // CDatabaseType
-    virtual SString                 GetDataSourceTag            ( void );
-    virtual CDatabaseConnection*    Connect                     ( const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strDriverOptions );
-    virtual void                    NotifyConnectionDeleted     ( CDatabaseConnection* pConnection );
-    virtual void                    NotifyConnectionChanged     ( CDatabaseConnection* pConnection );
+    virtual SString              GetDataSourceTag(void);
+    virtual CDatabaseConnection* Connect(const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strDriverOptions);
+    virtual void                 NotifyConnectionDeleted(CDatabaseConnection* pConnection);
+    virtual void                 NotifyConnectionChanged(CDatabaseConnection* pConnection);
 
     // CDatabaseTypeMySql
-    CDatabaseConnection*            CallNewDatabaseConnectionMySql ( CDatabaseType* pManager, const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions );
-    void                            UpdateStats                 ( void );
+    CDatabaseConnection* CallNewDatabaseConnectionMySql(CDatabaseType* pManager, const SString& strHost, const SString& strUsername, const SString& strPassword,
+                                                        const SString& strOptions);
+    void                 UpdateStats(void);
 
-    CDynamicLibrary                                 m_DbconmyLib;
-    NewDatabaseConnectionMySql_t*                   m_pfnNewDatabaseConnection;
-    std::map < SString, CDatabaseConnection* >      m_SharedConnectionMap;
-    std::set < CDatabaseConnection* >               m_AllConnectionMap;
-    SString                                         m_strStatsKeyHead;
+    CDynamicLibrary                         m_DbconmyLib;
+    NewDatabaseConnectionMySql_t*           m_pfnNewDatabaseConnection;
+    std::map<SString, CDatabaseConnection*> m_SharedConnectionMap;
+    std::set<CDatabaseConnection*>          m_AllConnectionMap;
+    SString                                 m_strStatsKeyHead;
 };
-
 
 ///////////////////////////////////////////////////////////////
 // Object creation
 ///////////////////////////////////////////////////////////////
-CDatabaseType* NewDatabaseTypeMySql ( void )
+CDatabaseType* NewDatabaseTypeMySql(void)
 {
-    return new CDatabaseTypeMySql ();
+    return new CDatabaseTypeMySql();
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -62,10 +61,9 @@ CDatabaseType* NewDatabaseTypeMySql ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseTypeMySql::CDatabaseTypeMySql ( void )
+CDatabaseTypeMySql::CDatabaseTypeMySql(void)
 {
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -74,12 +72,11 @@ CDatabaseTypeMySql::CDatabaseTypeMySql ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseTypeMySql::~CDatabaseTypeMySql ( void )
+CDatabaseTypeMySql::~CDatabaseTypeMySql(void)
 {
-    assert ( m_SharedConnectionMap.empty () );
-    assert ( m_AllConnectionMap.empty () );
+    assert(m_SharedConnectionMap.empty());
+    assert(m_AllConnectionMap.empty());
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -88,11 +85,10 @@ CDatabaseTypeMySql::~CDatabaseTypeMySql ( void )
 // Return database type as a string
 //
 ///////////////////////////////////////////////////////////////
-SString CDatabaseTypeMySql::GetDataSourceTag ( void )
+SString CDatabaseTypeMySql::GetDataSourceTag(void)
 {
     return "mysql";
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -101,16 +97,15 @@ SString CDatabaseTypeMySql::GetDataSourceTag ( void )
 // Remove connection from internal lists
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseTypeMySql::NotifyConnectionDeleted ( CDatabaseConnection* pConnection )
+void CDatabaseTypeMySql::NotifyConnectionDeleted(CDatabaseConnection* pConnection)
 {
     g_pStats->iDbConnectionCount--;
-    assert ( MapContains ( m_AllConnectionMap, pConnection ) );
-    MapRemove ( m_AllConnectionMap, pConnection );
-    MapRemoveByValue ( m_SharedConnectionMap, pConnection );
+    assert(MapContains(m_AllConnectionMap, pConnection));
+    MapRemove(m_AllConnectionMap, pConnection);
+    MapRemoveByValue(m_SharedConnectionMap, pConnection);
 
-    UpdateStats ();
+    UpdateStats();
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -119,11 +114,10 @@ void CDatabaseTypeMySql::NotifyConnectionDeleted ( CDatabaseConnection* pConnect
 // Update things that need to know
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseTypeMySql::NotifyConnectionChanged ( CDatabaseConnection* pConnection )
+void CDatabaseTypeMySql::NotifyConnectionChanged(CDatabaseConnection* pConnection)
 {
-    UpdateStats ();
+    UpdateStats();
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -138,20 +132,20 @@ void CDatabaseTypeMySql::NotifyConnectionChanged ( CDatabaseConnection* pConnect
 //          share=1     // Share this connection with anything else (defaults to share=1)
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseConnection* CDatabaseTypeMySql::Connect ( const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions )
+CDatabaseConnection* CDatabaseTypeMySql::Connect(const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions)
 {
     // Parse options
     bool bShareConnection = false;
-    GetOption < CDbOptionsMap > ( strOptions, "share", bShareConnection, false );
+    GetOption<CDbOptionsMap>(strOptions, "share", bShareConnection, false);
 
     CDatabaseConnection* pConnection = NULL;
 
     // Can we share a connection?
-    if ( !bShareConnection )
+    if (!bShareConnection)
     {
         // No sharing so create a new connection
-        pConnection = CallNewDatabaseConnectionMySql ( this, strHost, strUsername, strPassword, strOptions );
-        if ( pConnection )
+        pConnection = CallNewDatabaseConnectionMySql(this, strHost, strUsername, strPassword, strOptions);
+        if (pConnection)
             pConnection->m_strOtherTag = strHost + "%" + strUsername + "%" + strOptions;
     }
     else
@@ -160,33 +154,32 @@ CDatabaseConnection* CDatabaseTypeMySql::Connect ( const SString& strHost, const
         SString strShareKey = strHost + "%" + strUsername + "%" + strOptions;
 
         // Look for a match
-        pConnection = MapFindRef ( m_SharedConnectionMap, strShareKey );
-        if ( !pConnection )
+        pConnection = MapFindRef(m_SharedConnectionMap, strShareKey);
+        if (!pConnection)
         {
             // No match, so create a new connection
-            pConnection = CallNewDatabaseConnectionMySql ( this, strHost, strUsername, strPassword, strOptions );
-            if ( pConnection )
-                MapSet ( m_SharedConnectionMap, strShareKey, pConnection );
+            pConnection = CallNewDatabaseConnectionMySql(this, strHost, strUsername, strPassword, strOptions);
+            if (pConnection)
+                MapSet(m_SharedConnectionMap, strShareKey, pConnection);
         }
         else
         {
             // Yes match, so add a ref to existing connection
-            pConnection->AddRef ();
+            pConnection->AddRef();
         }
     }
 
-    if ( pConnection )
-        MapInsert ( m_AllConnectionMap, pConnection );
+    if (pConnection)
+        MapInsert(m_AllConnectionMap, pConnection);
 
     // For stats
     SString strQueueName;
-    GetOption<CDbOptionsMap>( strOptions, "queue", strQueueName );
-    m_strStatsKeyHead = SString( "dbcon mysql [%s] ", *strQueueName );
-    UpdateStats ();
+    GetOption<CDbOptionsMap>(strOptions, "queue", strQueueName);
+    m_strStatsKeyHead = SString("dbcon mysql [%s] ", *strQueueName);
+    UpdateStats();
 
     return pConnection;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -195,26 +188,27 @@ CDatabaseConnection* CDatabaseTypeMySql::Connect ( const SString& strHost, const
 // Load, find and call NewDatabaseConnectionMySql
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseConnection* CDatabaseTypeMySql::CallNewDatabaseConnectionMySql ( CDatabaseType* pManager, const SString& strHost, const SString& strUsername, const SString& strPassword, const SString& strOptions )
+CDatabaseConnection* CDatabaseTypeMySql::CallNewDatabaseConnectionMySql(CDatabaseType* pManager, const SString& strHost, const SString& strUsername,
+                                                                        const SString& strPassword, const SString& strOptions)
 {
-    if ( !m_DbconmyLib.IsLoaded () )
+    if (!m_DbconmyLib.IsLoaded())
     {
-        SString strServerPath = g_pServerInterface->GetModManager ()->GetServerPath ();
-        m_DbconmyLib.Load ( PathJoin ( strServerPath, SERVER_BIN_PATH_MOD, LIB_DBCONMY ) );
-        m_pfnNewDatabaseConnection = reinterpret_cast < NewDatabaseConnectionMySql_t* > ( (long long)(m_DbconmyLib.GetProcedureAddress ( "NewDatabaseConnectionMySql" )) );      
+        SString strServerPath = g_pServerInterface->GetModManager()->GetServerPath();
+        m_DbconmyLib.Load(PathJoin(strServerPath, SERVER_BIN_PATH_MOD, LIB_DBCONMY));
+        m_pfnNewDatabaseConnection =
+            reinterpret_cast<NewDatabaseConnectionMySql_t*>((long long)(m_DbconmyLib.GetProcedureAddress("NewDatabaseConnectionMySql")));
     }
 
-    if ( !m_pfnNewDatabaseConnection )
+    if (!m_pfnNewDatabaseConnection)
         return NULL;
 
-    CDatabaseConnection* pConnection = m_pfnNewDatabaseConnection ( pManager, strHost, strUsername, strPassword, strOptions );
+    CDatabaseConnection* pConnection = m_pfnNewDatabaseConnection(pManager, strHost, strUsername, strPassword, strOptions);
 
-    if ( pConnection )
+    if (pConnection)
         g_pStats->iDbConnectionCount++;
 
     return pConnection;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -223,45 +217,38 @@ CDatabaseConnection* CDatabaseTypeMySql::CallNewDatabaseConnectionMySql ( CDatab
 // Tracking connections
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseTypeMySql::UpdateStats ( void )
+void CDatabaseTypeMySql::UpdateStats(void)
 {
     // Remove all lines with this key
-    CPerfStatDebugTable::GetSingleton ()->RemoveLines ( m_strStatsKeyHead + "*" );
+    CPerfStatDebugTable::GetSingleton()->RemoveLines(m_strStatsKeyHead + "*");
 
-    int iIndex = 0;
-    std::set < CDatabaseConnection* > unsharedConnectionMap = m_AllConnectionMap;
+    int                            iIndex = 0;
+    std::set<CDatabaseConnection*> unsharedConnectionMap = m_AllConnectionMap;
 
     // Add shared info
-    for ( std::map < SString, CDatabaseConnection* >::iterator iter = m_SharedConnectionMap.begin () ; iter != m_SharedConnectionMap.end () ; ++iter )
+    for (std::map<SString, CDatabaseConnection*>::iterator iter = m_SharedConnectionMap.begin(); iter != m_SharedConnectionMap.end(); ++iter)
     {
-        const SString& strShareKey = iter->first;
+        const SString&       strShareKey = iter->first;
         CDatabaseConnection* pConnection = iter->second;
 
         // Add new line with this key
-        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( m_strStatsKeyHead + SString( "%d", iIndex++ ), 0
-                                                          ,"Database connection: mysql (shared)"
-                                                          ,*strShareKey
-                                                          ,*SString ( "Share count: %d", pConnection->GetShareCount () )
-                                                          , NULL );
+        CPerfStatDebugTable::GetSingleton()->UpdateLine(m_strStatsKeyHead + SString("%d", iIndex++), 0, "Database connection: mysql (shared)", *strShareKey,
+                                                        *SString("Share count: %d", pConnection->GetShareCount()), NULL);
 
         // Update unshared map for the second part
-        MapRemove ( unsharedConnectionMap, pConnection );
+        MapRemove(unsharedConnectionMap, pConnection);
     }
 
     // Add unshared info
-    for ( std::set < CDatabaseConnection* >::iterator iter = unsharedConnectionMap.begin () ; iter != unsharedConnectionMap.end () ; ++iter )
+    for (std::set<CDatabaseConnection*>::iterator iter = unsharedConnectionMap.begin(); iter != unsharedConnectionMap.end(); ++iter)
     {
         CDatabaseConnection* pConnection = *iter;
 
         // Add new line with this key
-        CPerfStatDebugTable::GetSingleton ()->UpdateLine ( m_strStatsKeyHead + SString( "%d", iIndex++ ), 0
-                                                          ,"Database connection: mysql (unshared)"
-                                                          ,*pConnection->m_strOtherTag
-                                                          ,*SString ( "Refs: %d", pConnection->GetShareCount () )
-                                                          , NULL );
+        CPerfStatDebugTable::GetSingleton()->UpdateLine(m_strStatsKeyHead + SString("%d", iIndex++), 0, "Database connection: mysql (unshared)",
+                                                        *pConnection->m_strOtherTag, *SString("Refs: %d", pConnection->GetShareCount()), NULL);
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -270,17 +257,16 @@ void CDatabaseTypeMySql::UpdateStats ( void )
 // Apply MySql escapement to a string
 //
 ///////////////////////////////////////////////////////////////
-static void MySqlEscape ( SString& strOutput, const char* szContent, uint uiLength )
+static void MySqlEscape(SString& strOutput, const char* szContent, uint uiLength)
 {
-    for ( uint i = 0 ; i < uiLength ; i++ )
+    for (uint i = 0; i < uiLength; i++)
     {
         const char c = szContent[i];
-        if ( c == '\x00' || c == '\n' || c == '\r' || c == '\\' || c == '\'' || c == '\"' || c == '\x1a' )
+        if (c == '\x00' || c == '\n' || c == '\r' || c == '\\' || c == '\'' || c == '\"' || c == '\x1a')
             strOutput += '\\';
         strOutput += c;
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -289,16 +275,16 @@ static void MySqlEscape ( SString& strOutput, const char* szContent, uint uiLeng
 // Insert arguments and apply MySql escapement
 //
 ///////////////////////////////////////////////////////////////
-SString InsertQueryArgumentsMySql ( const SString& strQuery, CLuaArguments* pArgs )
+SString InsertQueryArgumentsMySql(const SString& strQuery, CLuaArguments* pArgs)
 {
     SString strParsedQuery;
 
     // Walk through the query and replace the variable placeholders with the actual variables
-    unsigned int uiLen = strQuery.length ();
+    unsigned int uiLen = strQuery.length();
     unsigned int a = 0;
-    for ( unsigned int i = 0 ; i < uiLen ; i++ )
+    for (unsigned int i = 0; i < uiLen; i++)
     {
-        if ( strQuery[i] != SQL_VARIABLE_PLACEHOLDER )
+        if (strQuery[i] != SQL_VARIABLE_PLACEHOLDER)
         {
             // If we found a normal character, copy it into the destination buffer
             strParsedQuery += strQuery[i];
@@ -306,38 +292,37 @@ SString InsertQueryArgumentsMySql ( const SString& strQuery, CLuaArguments* pArg
         else
         {
             // Use ?? for unquoted strings
-            bool bUnquotedStrings = strQuery[i+1] == SQL_VARIABLE_PLACEHOLDER;
-            if ( bUnquotedStrings )
+            bool bUnquotedStrings = strQuery[i + 1] == SQL_VARIABLE_PLACEHOLDER;
+            if (bUnquotedStrings)
                 i++;
 
             // If the placeholder is found, replace it with the variable
             CLuaArgument* pArgument = (*pArgs)[a++];
 
             // Check the type of the argument and convert it to a string we can process
-            uint type = pArgument ? pArgument->GetType () : LUA_TNONE;
-            if ( type == LUA_TBOOLEAN )
+            uint type = pArgument ? pArgument->GetType() : LUA_TNONE;
+            if (type == LUA_TBOOLEAN)
             {
-                strParsedQuery += ( pArgument->GetBoolean() ) ? "1" : "0";
+                strParsedQuery += (pArgument->GetBoolean()) ? "1" : "0";
             }
-            else
-            if ( type == LUA_TNUMBER )
+            else if (type == LUA_TNUMBER)
             {
-                double dNumber = pArgument->GetNumber ();
-                if ( dNumber == floor ( dNumber ) )
-                    strParsedQuery += SString ( "%lld", (long long)dNumber );
+                double dNumber = pArgument->GetNumber();
+                if (dNumber == floor(dNumber))
+                    strParsedQuery += SString("%lld", (long long)dNumber);
                 else
-                    strParsedQuery += SString ( "%f", dNumber );
+                    strParsedQuery += SString("%f", dNumber);
             }
-            else
-            if ( type == LUA_TSTRING )
+            else if (type == LUA_TSTRING)
             {
                 // Copy the string into the query, and escape \x00, \n, \r, \, ', " and \x1a
-                if ( !bUnquotedStrings ) strParsedQuery += '\'';
-                MySqlEscape ( strParsedQuery, pArgument->GetString ().c_str (), pArgument->GetString ().length () );
-                if ( !bUnquotedStrings ) strParsedQuery += '\'';
+                if (!bUnquotedStrings)
+                    strParsedQuery += '\'';
+                MySqlEscape(strParsedQuery, pArgument->GetString().c_str(), pArgument->GetString().length());
+                if (!bUnquotedStrings)
+                    strParsedQuery += '\'';
             }
-            else
-            if ( type == LUA_TNIL )
+            else if (type == LUA_TNIL)
             {
                 // Nil becomes NULL
                 strParsedQuery += "NULL";
@@ -353,7 +338,6 @@ SString InsertQueryArgumentsMySql ( const SString& strQuery, CLuaArguments* pArg
     return strParsedQuery;
 }
 
-
 ///////////////////////////////////////////////////////////////
 //
 // InsertQueryArgumentsMySql
@@ -361,52 +345,54 @@ SString InsertQueryArgumentsMySql ( const SString& strQuery, CLuaArguments* pArg
 // Insert arguments and apply MySql escapement
 //
 ///////////////////////////////////////////////////////////////
-SString InsertQueryArgumentsMySql ( const char* szQuery, va_list vl )
+SString InsertQueryArgumentsMySql(const char* szQuery, va_list vl)
 {
     SString strParsedQuery;
-    for ( unsigned int i = 0; szQuery[i] != '\0'; i++ )
+    for (unsigned int i = 0; szQuery[i] != '\0'; i++)
     {
-        if ( szQuery[i] != SQL_VARIABLE_PLACEHOLDER )
+        if (szQuery[i] != SQL_VARIABLE_PLACEHOLDER)
         {
             strParsedQuery += szQuery[i];
         }
         else
         {
             // Use ?? for unquoted strings
-            bool bUnquotedStrings = szQuery[i+1] == SQL_VARIABLE_PLACEHOLDER;
-            if ( bUnquotedStrings )
+            bool bUnquotedStrings = szQuery[i + 1] == SQL_VARIABLE_PLACEHOLDER;
+            if (bUnquotedStrings)
                 i++;
 
-            switch ( va_arg( vl, int ) )
+            switch (va_arg(vl, int))
             {
                 case SQLITE_INTEGER:
                 {
-                    int iValue = va_arg( vl, int );
-                    strParsedQuery += SString ( "%d", iValue );
+                    int iValue = va_arg(vl, int);
+                    strParsedQuery += SString("%d", iValue);
                 }
                 break;
 
                 case SQLITE_INTEGER64:
                 {
-                    long long int llValue = va_arg( vl, long long int );
-                    strParsedQuery += SString( "%lld", llValue );
+                    long long int llValue = va_arg(vl, long long int);
+                    strParsedQuery += SString("%lld", llValue);
                 }
                 break;
 
                 case SQLITE_FLOAT:
                 {
-                    double fValue = va_arg( vl, double );
-                    strParsedQuery += SString ( "%f", fValue );
+                    double fValue = va_arg(vl, double);
+                    strParsedQuery += SString("%f", fValue);
                 }
                 break;
 
                 case SQLITE_TEXT:
                 {
-                    const char* szValue = va_arg( vl, const char* );
-                    assert ( szValue );
-                    if ( !bUnquotedStrings ) strParsedQuery += '\'';
-                    MySqlEscape ( strParsedQuery, szValue, strlen ( szValue ) );
-                    if ( !bUnquotedStrings ) strParsedQuery += '\'';
+                    const char* szValue = va_arg(vl, const char*);
+                    assert(szValue);
+                    if (!bUnquotedStrings)
+                        strParsedQuery += '\'';
+                    MySqlEscape(strParsedQuery, szValue, strlen(szValue));
+                    if (!bUnquotedStrings)
+                        strParsedQuery += '\'';
                 }
                 break;
 
@@ -424,11 +410,11 @@ SString InsertQueryArgumentsMySql ( const char* szQuery, va_list vl )
 
                 default:
                     // someone passed a value without specifying its type
-                    assert ( 0 );
+                    assert(0);
                     break;
             }
         }
     }
-    va_end ( vl );
+    va_end(vl);
     return strParsedQuery;
 }

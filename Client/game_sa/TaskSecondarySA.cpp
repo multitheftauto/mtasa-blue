@@ -1,28 +1,27 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/TaskSecondarySA.cpp
-*  PURPOSE:     Secondary game tasks
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/TaskSecondarySA.cpp
+ *  PURPOSE:     Secondary game tasks
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
 // ##############################################################################
-// ## Name:    CTaskSimpleDuck                                    
+// ## Name:    CTaskSimpleDuck
 // ## Purpose: Make the ped duck
 // ##############################################################################
 
-CTaskSimpleDuckSA::CTaskSimpleDuckSA ( eDuckControlTypes nDuckControl, unsigned short nLengthOfDuck, short nUseShotsWhizzingEvents )
+CTaskSimpleDuckSA::CTaskSimpleDuckSA(eDuckControlTypes nDuckControl, unsigned short nLengthOfDuck, short nUseShotsWhizzingEvents)
 {
     DWORD dwFunc = FUNC_CTaskSimpleDuck__Constructor;
     this->CreateTaskInterface(sizeof(CTaskSimpleDuckSAInterface));
-    if ( !IsValid () ) return;
+    if (!IsValid())
+        return;
     DWORD dwThisInterface = (DWORD)this->GetInterface();
     _asm
     {

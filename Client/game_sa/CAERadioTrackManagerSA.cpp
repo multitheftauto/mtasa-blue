@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CAERadioTrackManagerSA.cpp
-*  PURPOSE:     Audio entity radio track manager
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CAERadioTrackManagerSA.cpp
+ *  PURPOSE:     Audio entity radio track manager
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
@@ -16,7 +15,7 @@ BYTE CAERadioTrackManagerSA::GetCurrentRadioStationID()
 {
     DEBUG_TRACE("BYTE CAERadioTrackManagerSA::GetCurrentRadioStationID()");
     DWORD dwFunc = FUNC_GetCurrentRadioStationID;
-    BYTE bReturn = 0;
+    BYTE  bReturn = 0;
     _asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
@@ -31,7 +30,7 @@ BYTE CAERadioTrackManagerSA::IsVehicleRadioActive()
 {
     DEBUG_TRACE("BYTE CAERadioTrackManagerSA::IsVehicleRadioActive()");
     DWORD dwFunc = FUNC_IsVehicleRadioActive;
-    BYTE bReturn = 0;
+    BYTE  bReturn = 0;
     _asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
@@ -42,11 +41,11 @@ BYTE CAERadioTrackManagerSA::IsVehicleRadioActive()
     return bReturn;
 }
 
-char * CAERadioTrackManagerSA::GetRadioStationName(BYTE bStationID)
+char* CAERadioTrackManagerSA::GetRadioStationName(BYTE bStationID)
 {
     DEBUG_TRACE("char * CAERadioTrackManagerSA::GetRadioStationName(BYTE bStationID)");
     DWORD dwFunc = FUNC_GetRadioStationName;
-    char * cReturn = 0;
+    char* cReturn = 0;
     DWORD dwStationID = bStationID;
     _asm
     {
@@ -63,7 +62,7 @@ BOOL CAERadioTrackManagerSA::IsRadioOn()
 {
     DEBUG_TRACE("BOOL CAERadioTrackManagerSA::IsRadioOn()");
     DWORD dwFunc = FUNC_IsRadioOn;
-    BYTE bReturn = 0;
+    BYTE  bReturn = 0;
     _asm
     {
         mov     ecx, CLASS_CAERadioTrackManager

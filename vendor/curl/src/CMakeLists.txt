@@ -40,7 +40,7 @@ transform_makefile_inc("Makefile.inc" "${CMAKE_CURRENT_BINARY_DIR}/Makefile.inc.
 include(${CMAKE_CURRENT_BINARY_DIR}/Makefile.inc.cmake)
 
 if(MSVC)
-  list(APPEND CURL_SOURCE curl.rc)
+  list(APPEND CURL_FILES curl.rc)
 endif()
 
 # CURL_FILES comes from Makefile.inc
@@ -56,7 +56,7 @@ source_group("curl header files" FILES ${CURL_HFILES})
 include_directories(
   ${CURL_SOURCE_DIR}/lib        # To be able to reach "curl_setup_once.h"
   ${CURL_BINARY_DIR}/lib        # To be able to reach "curl_config.h"
-  ${CURL_BINARY_DIR}/include    # To be able to reach "curl/curlbuild.h"
+  ${CURL_BINARY_DIR}/include    # To be able to reach "curl/curl.h"
   # This is needed as tool_hugehelp.c is generated in the binary dir
   ${CURL_SOURCE_DIR}/src        # To be able to reach "tool_hugehelp.h"
   )
@@ -70,10 +70,17 @@ target_link_libraries( ${EXE_NAME} libcurl ${CURL_LIBS})
 #SET_TARGET_PROPERTIES(${EXE_NAME} RUNTIME_OUTPUT_DIRECTORY "blah blah blah")
 #SET_TARGET_PROPERTIES(${EXE_NAME} LIBRARY_OUTPUT_DIRECTORY "blah blah blah")
 
-# Add the postfix to the executable since it is not added automatically as for modules and shared libraries
-set_target_properties(${EXE_NAME} PROPERTIES
-  DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}")
-
 #INCLUDE(ModuleInstall OPTIONAL)
 
-install(TARGETS ${EXE_NAME} DESTINATION bin)
+install(TARGETS ${EXE_NAME} EXPORT curl-target DESTINATION bin)
+export(TARGETS ${EXE_NAME}
+       APPEND FILE ${PROJECT_BINARY_DIR}/curl-target.cmake
+       NAMESPACE CURL::
+)
+
+install(EXPORT curl-target
+        FILE curl-target.cmake
+        NAMESPACE CURL::
+        DESTINATION ${CURL_INSTALL_CMAKE_DIR}
+)
+

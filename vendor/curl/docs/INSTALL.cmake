@@ -34,19 +34,8 @@ Current flaws in the curl CMake build
    - Doesn't allow you to disable specific protocols from the build
    - Doesn't find or use krb4 or GSS
    - Rebuilds test files too eagerly, but still can't run the tests
-   - Does't detect the correct strerror_r flavor when cross-compiling (issue #1123)
+   - Doesn't detect the correct strerror_r flavor when cross-compiling (issue #1123)
 
-
-Important notice
-==================
-   If you got your curl sources from a distribution tarball, make sure to
-   delete the generic 'include/curl/curlbuild.h' file that comes with it:
-       rm -f curl/include/curl/curlbuild.h
-
-   The purpose of this file is to provide reasonable definitions for systems
-   where autoconfiguration is not available. CMake will create its own
-   version of this file in its build directory. If the "generic" version
-   is not deleted, weird build errors may occur on some systems.
 
 Command Line CMake
 ==================

@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/core/CLocalizationInterface.h
-*  PURPOSE:     Localization/translation interface
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/core/CLocalizationInterface.h
+ *  PURPOSE:     Localization/translation interface
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #ifndef __CLOCALIZATIONINTERFACE_H
 #define __CLOCALIZATIONINTERFACE_H
@@ -25,16 +25,16 @@
 class CLocalizationInterface
 {
 public:
-    virtual SString             Translate                   ( const SString& strMessage ) = 0;
-    virtual SString             TranslateWithContext        ( const SString& strContext, const SString& strMessage ) = 0;
-    virtual SString             TranslatePlural             ( const SString& strSingular, const SString& strPlural, int iNum ) = 0;
-    virtual SString             TranslatePluralWithContext  ( const SString& strContext, const SString& strSingular, const SString& strPlural, int iNum ) = 0;
+    virtual SString Translate(const SString& strMessage) = 0;
+    virtual SString TranslateWithContext(const SString& strContext, const SString& strMessage) = 0;
+    virtual SString TranslatePlural(const SString& strSingular, const SString& strPlural, int iNum) = 0;
+    virtual SString TranslatePluralWithContext(const SString& strContext, const SString& strSingular, const SString& strPlural, int iNum) = 0;
 
-    virtual std::map<SString,SString>   GetAvailableLanguages       ( void ) = 0;
-    virtual bool                        IsLocalized                 ( void ) = 0;
-    virtual SString                     GetLanguageDirectory        ( void ) = 0;
-    virtual SString                     GetLanguageCode             ( void ) = 0;
-    virtual SString                     GetLanguageName             ( void ) = 0;
+    virtual std::map<SString, SString> GetAvailableLanguages(void) = 0;
+    virtual bool                       IsLocalized(void) = 0;
+    virtual SString                    GetLanguageDirectory(void) = 0;
+    virtual SString                    GetLanguageCode(void) = 0;
+    virtual SString                    GetLanguageName(void) = 0;
 };
 
 #endif

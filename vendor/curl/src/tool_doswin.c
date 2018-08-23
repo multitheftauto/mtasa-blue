@@ -638,32 +638,33 @@ char **__crt0_glob_function(char *arg)
  */
 
 CURLcode FindWin32CACert(struct OperationConfig *config,
+                         curl_sslbackend backend,
                          const char *bundle_file)
 {
   CURLcode result = CURLE_OK;
 
-  /* search and set cert file only if libcurl supports SSL */
-  if(curlinfo->features & CURL_VERSION_SSL) {
+  /* Search and set cert file only if libcurl supports SSL.
+   *
+   * If Schannel (WinSSL) is the selected SSL backend then these locations
+   * are ignored. We allow setting CA location for schannel only when
+   * explicitly specified by the user via CURLOPT_CAINFO / --cacert.
+   */
+  if((curlinfo->features & CURL_VERSION_SSL) &&
+     backend != CURLSSLBACKEND_SCHANNEL) {
 
     DWORD res_len;
-    DWORD buf_tchar_size = PATH_MAX + 1;
-    DWORD buf_bytes_size = sizeof(TCHAR) * buf_tchar_size;
+    char buf[PATH_MAX];
     char *ptr = NULL;
 
-    char *buf = malloc(buf_bytes_size);
-    if(!buf)
-      return CURLE_OUT_OF_MEMORY;
     buf[0] = '\0';
 
-    res_len = SearchPathA(NULL, bundle_file, NULL, buf_tchar_size, buf, &ptr);
+    res_len = SearchPathA(NULL, bundle_file, NULL, PATH_MAX, buf, &ptr);
     if(res_len > 0) {
       Curl_safefree(config->cacert);
       config->cacert = strdup(buf);
       if(!config->cacert)
         result = CURLE_OUT_OF_MEMORY;
     }
-
-    Curl_safefree(buf);
   }
 
   return result;

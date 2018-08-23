@@ -1,21 +1,18 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientRadarMarkerManager.cpp
-*  PURPOSE:     Radar marker entity manager class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Oliver Brown <>
-*               Jax <>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientRadarMarkerManager.cpp
+ *  PURPOSE:     Radar marker entity manager class
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
 using std::list;
 
-CClientRadarMarkerManager::CClientRadarMarkerManager ( CClientManager* pManager )
+CClientRadarMarkerManager::CClientRadarMarkerManager(CClientManager* pManager)
 {
     m_pManager = pManager;
     m_bCanRemoveFromList = true;
@@ -23,82 +20,76 @@ CClientRadarMarkerManager::CClientRadarMarkerManager ( CClientManager* pManager 
     m_bOrderOnPulse = false;
 }
 
-
-CClientRadarMarkerManager::~CClientRadarMarkerManager ( void )
+CClientRadarMarkerManager::~CClientRadarMarkerManager(void)
 {
     // Remove all markers from the list
-    DeleteAll ();
+    DeleteAll();
 }
 
-
-void CClientRadarMarkerManager::DoPulse ( void )
-{   
+void CClientRadarMarkerManager::DoPulse(void)
+{
     // Grab the camera position here (so it isn't done for every marker)
-    m_pManager->GetCamera ()->GetPosition ( m_vecCameraPosition );
-    list < CClientRadarMarker* > ::iterator iter = m_Markers.begin ();
-    for ( ; iter != m_Markers.end (); ++iter )
+    m_pManager->GetCamera()->GetPosition(m_vecCameraPosition);
+    list<CClientRadarMarker*>::iterator iter = m_Markers.begin();
+    for (; iter != m_Markers.end(); ++iter)
     {
-        (*iter)->DoPulse ();
+        (*iter)->DoPulse();
     }
-    if ( m_bOrderOnPulse )
+    if (m_bOrderOnPulse)
     {
-        OrderMarkers ();
+        OrderMarkers();
         m_bOrderOnPulse = false;
     }
 }
 
-
-void CClientRadarMarkerManager::DeleteAll ( void )
+void CClientRadarMarkerManager::DeleteAll(void)
 {
     // Delete all the markers in our list
     m_bCanRemoveFromList = false;
-    list < CClientRadarMarker* > ::const_iterator iter = m_Markers.begin ();
-    for ( ; iter != m_Markers.end (); iter++ )
+    list<CClientRadarMarker*>::const_iterator iter = m_Markers.begin();
+    for (; iter != m_Markers.end(); iter++)
     {
         delete *iter;
     }
 
     // Clear the list
-    m_Markers.clear ();
+    m_Markers.clear();
     m_bCanRemoveFromList = true;
 }
 
-
-CClientRadarMarker* CClientRadarMarkerManager::Get ( ElementID ID )
+CClientRadarMarker* CClientRadarMarkerManager::Get(ElementID ID)
 {
     // Grab the element with the given id. Check its type.
-    CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-    if ( pEntity && pEntity->GetType () == CCLIENTRADARMARKER )
+    CClientEntity* pEntity = CElementIDs::GetElement(ID);
+    if (pEntity && pEntity->GetType() == CCLIENTRADARMARKER)
     {
-        return static_cast < CClientRadarMarker* > ( pEntity );
+        return static_cast<CClientRadarMarker*>(pEntity);
     }
 
     return NULL;
 }
 
-
-void CClientRadarMarkerManager::RemoveFromList ( CClientRadarMarker* pMarker )
+void CClientRadarMarkerManager::RemoveFromList(CClientRadarMarker* pMarker)
 {
-    if ( m_bCanRemoveFromList )
+    if (m_bCanRemoveFromList)
     {
-        if ( !m_Markers.empty() ) m_Markers.remove ( pMarker );
+        if (!m_Markers.empty())
+            m_Markers.remove(pMarker);
     }
 }
 
-
-void CClientRadarMarkerManager::SetDimension ( unsigned short usDimension )
+void CClientRadarMarkerManager::SetDimension(unsigned short usDimension)
 {
     m_usDimension = usDimension;
     m_bOrderOnPulse = true;
 }
 
-
-bool CClientRadarMarkerManager::Exists ( CClientRadarMarker* pRadarMarker )
+bool CClientRadarMarkerManager::Exists(CClientRadarMarker* pRadarMarker)
 {
-    list < CClientRadarMarker* > ::const_iterator iter = m_Markers.begin ();
-    for ( ; iter != m_Markers.end () ; iter++ )
+    list<CClientRadarMarker*>::const_iterator iter = m_Markers.begin();
+    for (; iter != m_Markers.end(); iter++)
     {
-        if ( *iter == pRadarMarker )
+        if (*iter == pRadarMarker)
         {
             return true;
         }
@@ -107,28 +98,26 @@ bool CClientRadarMarkerManager::Exists ( CClientRadarMarker* pRadarMarker )
     return false;
 }
 
-
-void CClientRadarMarkerManager::OrderMarkers ( void )
+void CClientRadarMarkerManager::OrderMarkers(void)
 {
-    m_Markers.sort ( CompareOrderingIndex );
+    m_Markers.sort(CompareOrderingIndex);
 
-    list < CClientRadarMarker * > ::iterator iter = m_Markers.begin ();
-    for ( ; iter != m_Markers.end () ; iter++ )
+    list<CClientRadarMarker*>::iterator iter = m_Markers.begin();
+    for (; iter != m_Markers.end(); iter++)
     {
-        (*iter)->DestroyMarker ();
+        (*iter)->DestroyMarker();
     }
-    iter = m_Markers.begin ();
-    for ( ; iter != m_Markers.end () ; iter++ )
+    iter = m_Markers.begin();
+    for (; iter != m_Markers.end(); iter++)
     {
-        if ( (*iter)->GetDimension() == m_usDimension )
+        if ((*iter)->GetDimension() == m_usDimension)
         {
-            (*iter)->CreateMarker ();
+            (*iter)->CreateMarker();
         }
     }
 }
 
-
-bool CClientRadarMarkerManager::CompareOrderingIndex ( CClientRadarMarker * p1, CClientRadarMarker * p2 )
+bool CClientRadarMarkerManager::CompareOrderingIndex(CClientRadarMarker* p1, CClientRadarMarker* p2)
 {
-    return p1->GetOrdering () < p2->GetOrdering ();
+    return p1->GetOrdering() < p2->GetOrdering();
 }

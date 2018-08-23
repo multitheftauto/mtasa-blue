@@ -72,10 +72,9 @@ work:
 
 If you have shared SSL libs installed in a directory where your run-time
 linker doesn't find them (which usually causes configure failures), you can
-provide the -R option to ld on some operating systems to set a hard-coded
-path to the run-time linker:
+provide this option to gcc to set a hard-coded path to the run-time linker:
 
-    LDFLAGS=-R/usr/local/ssl/lib ./configure --with-ssl
+    LDFLAGS=-Wl,-R/usr/local/ssl/lib ./configure --with-ssl
 
 ## More Options
 
@@ -178,50 +177,6 @@ executable in /bin/ or you'll see the configure fail toward the end.
 
 Run `make`
 
-## Borland C++ compiler
-
-Ensure that your build environment is properly set up to use the compiler and
-associated tools. PATH environment variable must include the path to bin
-subdirectory of your compiler installation, eg: `c:\Borland\BCC55\bin`
-
-It is advisable to set environment variable BCCDIR to the base path of the
-compiler installation.
-
-    set BCCDIR=c:\Borland\BCC55
-
-In order to build a plain vanilla version of curl and libcurl run the
-following command from curl's root directory:
-
-    make borland
-
-To build curl and libcurl with zlib and OpenSSL support set environment
-variables `ZLIB_PATH` and `OPENSSL_PATH` to the base subdirectories of the
-already built zlib and OpenSSL libraries and from curl's root directory run
-command:
-
-    make borland-ssl-zlib
-
-libcurl library will be built in 'lib' subdirectory while curl tool is built
-in 'src' subdirectory. In order to use libcurl library it is advisable to
-modify compiler's configuration file bcc32.cfg located in
-`c:\Borland\BCC55\bin` to reflect the location of libraries include paths for
-example the '-I' line could result in something like:
-
-    -I"c:\Borland\BCC55\include;c:\curl\include;c:\openssl\inc32"
-
-bcc3.cfg `-L` line could also be modified to reflect the location of of
-libcurl library resulting for example:
-
-    -L"c:\Borland\BCC55\lib;c:\curl\lib;c:\openssl\out32"
-
-In order to build sample program `simple.c` from the docs\examples
-subdirectory run following command from mentioned subdirectory:
-
-    bcc32 simple.c libcurl.lib cw32mt.lib
-
-In order to build sample program simplessl.c an SSL enabled libcurl is
-required, as well as the OpenSSL libeay32.lib and ssleay32.lib libraries.
-
 ## Disabling Specific Protocols in Windows builds
 
 The configure utility, unfortunately, is not available for the Windows
@@ -278,8 +233,8 @@ before including any libcurl header. Your program does not need the
 `USE_LWIPSOCK` preprocessor definition which is for libcurl internals only.
 
 Compilation has been verified with [lwIP
-1.4.0](http://download.savannah.gnu.org/releases/lwip/lwip-1.4.0.zip) and
-[contrib-1.4.0](http://download.savannah.gnu.org/releases/lwip/contrib-1.4.0.zip).
+1.4.0](https://download.savannah.gnu.org/releases/lwip/lwip-1.4.0.zip) and
+[contrib-1.4.0](https://download.savannah.gnu.org/releases/lwip/contrib-1.4.0.zip).
 
 This BSD-style lwIP TCP/IP stack support must be considered experimental given
 that it has been verified that lwIP 1.4.0 still needs some polish, and libcurl

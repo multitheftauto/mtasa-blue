@@ -1,14 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/gamesa_init.h
-*  PURPOSE:     Global game module header
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/gamesa_init.h
+ *  PURPOSE:     Global game module header
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "CGameSA.h"
 #include <multiplayer/CMultiplayer.h>
@@ -17,32 +16,31 @@
 #ifndef __CGAMESA_INIT
 #define __CGAMESA_INIT
 
-extern CGameSA * pGame;
-extern CCoreInterface * g_pCore;
+extern CGameSA*        pGame;
+extern CCoreInterface* g_pCore;
 
 //
 // Use MemSet/Cpy/Put for non Mem*Fast memory regions
 //
 
-void MemSet ( void* dwDest, int cValue, uint uiAmount );
-void MemCpy ( void* dwDest, const void* dwSrc, uint uiAmount );
+void MemSet(void* dwDest, int cValue, uint uiAmount);
+void MemCpy(void* dwDest, const void* dwSrc, uint uiAmount);
 
-template < class T, class U >
-void MemPut ( U ptr, const T value )
+template <class T, class U>
+void MemPut(U ptr, const T value)
 {
-    if ( *(T*)ptr != value )
-        MemCpy ( (void*)ptr, &value, sizeof ( T ) );
+    if (*(T*)ptr != value)
+        MemCpy((void*)ptr, &value, sizeof(T));
 }
 
-template < class T, class U >
-void MemAdd ( U ptr, const T value )
+template <class T, class U>
+void MemAdd(U ptr, const T value)
 {
     T current;
-    memcpy ( &current, (void*)ptr, sizeof ( T ) );
+    memcpy(&current, (void*)ptr, sizeof(T));
     current += value;
-    MemCpy ( (void*)ptr, &current, sizeof ( T ) );
+    MemCpy((void*)ptr, &current, sizeof(T));
 }
-
 
 //
 // Use Mem*Fast for the following memory regions:
@@ -65,54 +63,54 @@ void MemAdd ( U ptr, const T value )
 // 0x729B00 - 0x729BFF
 // 0x742B00 - 0x742BFF
 //
-inline void MemCpyFast ( void* dwDest, const void* dwSrc, uint uiAmount )
+inline void MemCpyFast(void* dwDest, const void* dwSrc, uint uiAmount)
 {
-    DEBUG_CHECK_IS_FAST_MEM( dwDest, uiAmount );
-    memcpy ( dwDest, dwSrc, uiAmount );
+    DEBUG_CHECK_IS_FAST_MEM(dwDest, uiAmount);
+    memcpy(dwDest, dwSrc, uiAmount);
 }
 
-inline void MemSetFast ( void* dwDest, int cValue, uint uiAmount )
+inline void MemSetFast(void* dwDest, int cValue, uint uiAmount)
 {
-    DEBUG_CHECK_IS_FAST_MEM( dwDest, uiAmount );
-    memset ( dwDest, cValue, uiAmount );
+    DEBUG_CHECK_IS_FAST_MEM(dwDest, uiAmount);
+    memset(dwDest, cValue, uiAmount);
 }
 
-template < class T, class U >
-void MemPutFast ( U ptr, const T value )
+template <class T, class U>
+void MemPutFast(U ptr, const T value)
 {
-    DEBUG_CHECK_IS_FAST_MEM( ptr, sizeof( T ) );
+    DEBUG_CHECK_IS_FAST_MEM(ptr, sizeof(T));
     *(T*)ptr = value;
 }
 
-template < class T, class U >
-void MemAddFast ( U ptr, const T value )
+template <class T, class U>
+void MemAddFast(U ptr, const T value)
 {
-    DEBUG_CHECK_IS_FAST_MEM( ptr, sizeof( T ) );
+    DEBUG_CHECK_IS_FAST_MEM(ptr, sizeof(T));
     *(T*)ptr += value;
 }
 
-template < class T, class U >
-void MemSubFast ( U ptr, const T value )
+template <class T, class U>
+void MemSubFast(U ptr, const T value)
 {
-    DEBUG_CHECK_IS_FAST_MEM( ptr, sizeof( T ) );
+    DEBUG_CHECK_IS_FAST_MEM(ptr, sizeof(T));
     *(T*)ptr -= value;
 }
 
-template < class T, class U >
-void MemAndFast ( U ptr, const T value )
+template <class T, class U>
+void MemAndFast(U ptr, const T value)
 {
-    DEBUG_CHECK_IS_FAST_MEM( ptr, sizeof( T ) );
+    DEBUG_CHECK_IS_FAST_MEM(ptr, sizeof(T));
     *(T*)ptr &= value;
 }
 
-template < class T, class U >
-void MemOrFast ( U ptr, const T value )
+template <class T, class U>
+void MemOrFast(U ptr, const T value)
 {
-    DEBUG_CHECK_IS_FAST_MEM( ptr, sizeof( T ) );
+    DEBUG_CHECK_IS_FAST_MEM(ptr, sizeof(T));
     *(T*)ptr |= value;
 }
 
-bool GetDebugIdEnabled ( uint uiDebugId );
-void LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId = 0 );
+bool GetDebugIdEnabled(uint uiDebugId);
+void LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId = 0);
 
 #endif

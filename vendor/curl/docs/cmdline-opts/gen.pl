@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 =begin comment
 
@@ -202,6 +202,9 @@ sub single {
         my @m=split(/ /, $seealso);
         my $mstr;
         for my $k (@m) {
+            if(!$helplong{$k}) {
+                print STDERR "WARN: $f see-alsos a non-existing option: $k\n";
+            }
             my $l = manpageify($k);
             $mstr .= sprintf "%s$l", $mstr?" and ":"";
         }
@@ -216,6 +219,9 @@ sub single {
         my @m=split(/ /, $mutexed);
         my $mstr;
         for my $k (@m) {
+            if(!$helplong{$k}) {
+                print STDERR "WARN: $f mutexes a non-existing option: $k\n";
+            }
             my $l = manpageify($k);
             $mstr .= sprintf "%s$l", $mstr?" and ":"";
         }
@@ -307,10 +313,12 @@ sub listhelp {
         if($arg) {
             $opt .= " $arg";
         }
+        my $desc = $helplong{$f};
+        $desc =~ s/\"/\\\"/g; # escape double quotes
 
-        my $line = sprintf " %-19s %s\n", $opt, $helplong{$f};
+        my $line = sprintf "  {\"%s\",\n   \"%s\"},\n", $opt, $desc;
 
-        if(length($line) > 79) {
+        if(length($opt) + length($desc) > 78) {
             print STDERR "WARN: the --$long line is too long\n";
         }
         print $line;

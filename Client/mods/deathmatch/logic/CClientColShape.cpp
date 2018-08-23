@@ -1,23 +1,20 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientColShape.cpp
-*  PURPOSE:     Shaped collision entity base class
-*  DEVELOPERS:  Jax <>
-*               Kevin Whiteside <kevuwk@gmail.com>
-*               Stanislav Bobrov <lil_toady@hotmail.com>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientColShape.cpp
+ *  PURPOSE:     Shaped collision entity base class
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
 using std::list;
 
-CClientColShape::CClientColShape ( CClientManager* pManager, ElementID ID ) : ClassInit ( this ), CClientEntity ( ID )
+CClientColShape::CClientColShape(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
-    CClientEntityRefManager::AddEntityRefs ( ENTITY_REF_DEBUG ( this, "CClientColShape" ), &m_pOwningMarker, &m_pOwningPickup, NULL );
+    CClientEntityRefManager::AddEntityRefs(ENTITY_REF_DEBUG(this, "CClientColShape"), &m_pOwningMarker, &m_pOwningPickup, NULL);
 
     // Init
     m_pManager = pManager;
@@ -27,96 +24,86 @@ CClientColShape::CClientColShape ( CClientManager* pManager, ElementID ID ) : Cl
     m_pOwningMarker = NULL;
     m_pOwningPickup = NULL;
 
-    SetTypeName ( "colshape" );
+    SetTypeName("colshape");
 
     // Add it to our manager's list
-    m_pColManager = pManager->GetColManager ();
-    m_pColManager->AddToList ( this );
+    m_pColManager = pManager->GetColManager();
+    m_pColManager->AddToList(this);
 }
 
-
-
-CClientColShape::~CClientColShape ( void )
+CClientColShape::~CClientColShape(void)
 {
-    if ( m_pOwningMarker && m_pOwningMarker->m_pCollision == this )
+    if (m_pOwningMarker && m_pOwningMarker->m_pCollision == this)
         m_pOwningMarker->m_pCollision = NULL;
-    else if ( m_pOwningPickup && m_pOwningPickup->m_pCollision == this )
+    else if (m_pOwningPickup && m_pOwningPickup->m_pCollision == this)
         m_pOwningPickup->m_pCollision = NULL;
 
-    RemoveAllColliders ();
-    Unlink ();
-    CClientEntityRefManager::RemoveEntityRefs ( 0, &m_pOwningMarker, &m_pOwningPickup, NULL );
+    RemoveAllColliders();
+    Unlink();
+    CClientEntityRefManager::RemoveEntityRefs(0, &m_pOwningMarker, &m_pOwningPickup, NULL);
 }
 
-
-void CClientColShape::Unlink ( void )
+void CClientColShape::Unlink(void)
 {
-    m_pColManager->RemoveFromList ( this );
+    m_pColManager->RemoveFromList(this);
 }
 
-
-void CClientColShape::SizeChanged ( void )
+void CClientColShape::SizeChanged(void)
 {
-    UpdateSpatialData ();
+    UpdateSpatialData();
     // Maybe queue RefreshColliders for v1.1
 }
 
-void CClientColShape::DoPulse ( void )
+void CClientColShape::DoPulse(void)
 {
     // Update our position/rotation if we're attached
-    DoAttaching ();
+    DoAttaching();
 }
 
-
-bool CClientColShape::IsAttachable ( void )
+bool CClientColShape::IsAttachable(void)
 {
-    return ( !m_pOwningPickup && !m_pOwningMarker );
+    return (!m_pOwningPickup && !m_pOwningMarker);
 }
 
-
-void CClientColShape::SetPosition ( const CVector& vecPosition )
+void CClientColShape::SetPosition(const CVector& vecPosition)
 {
-    if ( vecPosition != m_vecPosition )
+    if (vecPosition != m_vecPosition)
     {
         m_vecPosition = vecPosition;
-        UpdateSpatialData ();
-        CStaticFunctionDefinitions::RefreshColShapeColliders ( this );
+        UpdateSpatialData();
+        CStaticFunctionDefinitions::RefreshColShapeColliders(this);
     }
 };
 
-
-void CClientColShape::CallHitCallback ( CClientEntity& Entity )
+void CClientColShape::CallHitCallback(CClientEntity& Entity)
 {
     // Call the callback with us as the shape if it exists
-    if ( m_pCallback )
+    if (m_pCallback)
     {
-        m_pCallback->Callback_OnCollision ( *this, Entity );
+        m_pCallback->Callback_OnCollision(*this, Entity);
     }
 }
 
-
-void CClientColShape::CallLeaveCallback ( CClientEntity& Entity )
+void CClientColShape::CallLeaveCallback(CClientEntity& Entity)
 {
     // Call the callback with us as the shape if it exists
-    if ( m_pCallback )
+    if (m_pCallback)
     {
-        m_pCallback->Callback_OnLeave ( *this, Entity );
+        m_pCallback->Callback_OnLeave(*this, Entity);
     }
 }
 
-
-bool CClientColShape::ColliderExists ( CClientEntity* pEntity )
+bool CClientColShape::ColliderExists(CClientEntity* pEntity)
 {
-    return m_Colliders.contains ( pEntity );
+    return m_Colliders.contains(pEntity);
 }
 
-
-void CClientColShape::RemoveAllColliders ( void )
+void CClientColShape::RemoveAllColliders(void)
 {
-    CFastList < CClientEntity* > ::iterator iter = m_Colliders.begin ();
-    for ( ; iter != m_Colliders.end () ; iter++ )
+    CFastList<CClientEntity*>::iterator iter = m_Colliders.begin();
+    for (; iter != m_Colliders.end(); iter++)
     {
-        (*iter)->RemoveCollision ( this );
+        (*iter)->RemoveCollision(this);
     }
-    m_Colliders.clear ();
+    m_Colliders.clear();
 }

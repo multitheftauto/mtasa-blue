@@ -1,17 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CPlayerCamera.h
-*  PURPOSE:     Player camera entity class
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CPlayerCamera.h
+ *  PURPOSE:     Player camera entity class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CPlayerCamera_H
-#define __CPlayerCamera_H
+#pragma once
 
 #include <CVector.h>
 
@@ -26,52 +24,50 @@ enum eCameraMode
 };
 
 class CPlayerCamera
-{    
+{
 public:
-                            CPlayerCamera           ( CPlayer * pPlayer );
-                            ~CPlayerCamera          ( void );
+    CPlayerCamera(CPlayer* pPlayer);
+    ~CPlayerCamera(void);
 
-    eCameraMode             GetMode                 ( void ) const                  { return m_Mode; }
-    void                    SetMode                 ( eCameraMode Mode );
+    eCameraMode GetMode(void) const { return m_Mode; }
+    void        SetMode(eCameraMode Mode);
 
-    const CVector&          GetPosition             ( void ) const;
-    void                    GetPosition             ( CVector& vecPosition ) const;
-    void                    SetPosition             ( const CVector& vecPosition );
-    
-    void                    GetLookAt               ( CVector& vecLookAt ) const;
-    void                    SetLookAt               ( const CVector& vecLookAt );
+    const CVector& GetPosition(void) const;
+    void           GetPosition(CVector& vecPosition) const;
+    void           SetPosition(const CVector& vecPosition);
 
-    void                    SetMatrix               ( const CVector& vecPosition, const CVector& vecLookAt );
+    void GetLookAt(CVector& vecLookAt) const;
+    void SetLookAt(const CVector& vecLookAt);
 
-    CElement *              GetTarget               ( void ) const                  { return m_pTarget; }
-    void                    SetTarget               ( CElement* pElement );
+    void SetMatrix(const CVector& vecPosition, const CVector& vecLookAt);
 
-    float                   GetRoll                 ( void ) const                  { return m_fRoll; }
-    void                    SetRoll                 ( float fRoll )                 { m_fRoll = fRoll; }
-    float                   GetFOV                  ( void ) const                  { return m_fFOV; }
-    void                    SetFOV                  ( float fFOV )                  { m_fFOV = fFOV; }
+    CElement* GetTarget(void) const { return m_pTarget; }
+    void      SetTarget(CElement* pElement);
 
-    void                    SetRotation             ( CVector & vecRotation );
+    float GetRoll(void) const { return m_fRoll; }
+    void  SetRoll(float fRoll) { m_fRoll = fRoll; }
+    float GetFOV(void) const { return m_fFOV; }
+    void  SetFOV(float fFOV) { m_fFOV = fFOV; }
 
-    unsigned char           GetInterior             ( void ) const                  { return m_ucInterior; }
-    void                    SetInterior             ( unsigned char ucInterior )    { m_ucInterior = ucInterior; }
+    void SetRotation(CVector& vecRotation);
 
-    CPlayer*                GetPlayer               ( void ) const                  { return m_pPlayer; }
+    unsigned char GetInterior(void) const { return m_ucInterior; }
+    void          SetInterior(unsigned char ucInterior) { m_ucInterior = ucInterior; }
 
-    uchar                   GenerateSyncTimeContext ( void );
-    bool                    CanUpdateSync           ( uchar ucRemote );
+    CPlayer* GetPlayer(void) const { return m_pPlayer; }
+
+    uchar GenerateSyncTimeContext(void);
+    bool  CanUpdateSync(uchar ucRemote);
 
 private:
-    CPlayer *               m_pPlayer;
-    eCameraMode             m_Mode;
-    float                   m_fRotation;
-    unsigned char           m_ucInterior;
-    CVector                 m_vecPosition;
-    CVector                 m_vecLookAt;
-    CElement *              m_pTarget;
-    float                   m_fRoll;
-    float                   m_fFOV;
-    uchar                   m_ucSyncTimeContext;
+    CPlayer*      m_pPlayer;
+    eCameraMode   m_Mode;
+    float         m_fRotation;
+    unsigned char m_ucInterior;
+    CVector       m_vecPosition;
+    CVector       m_vecLookAt;
+    CElement*     m_pTarget;
+    float         m_fRoll;
+    float         m_fFOV;
+    uchar         m_ucSyncTimeContext;
 };
-
-#endif

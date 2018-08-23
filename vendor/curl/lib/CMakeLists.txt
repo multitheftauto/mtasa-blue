@@ -1,7 +1,5 @@
 set(LIB_NAME libcurl)
 
-configure_file(${CURL_SOURCE_DIR}/include/curl/curlbuild.h.cmake
-  ${CURL_BINARY_DIR}/include/curl/curlbuild.h)
 configure_file(curl_config.h.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/curl_config.h)
 
@@ -10,11 +8,11 @@ include(${CMAKE_CURRENT_BINARY_DIR}/Makefile.inc.cmake)
 
 list(APPEND HHEADERS
   ${CMAKE_CURRENT_BINARY_DIR}/curl_config.h
-  ${CURL_BINARY_DIR}/include/curl/curlbuild.h
   )
 
 if(MSVC)
   list(APPEND CSOURCES libcurl.rc)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4127")
 endif()
 
 # SET(CSOURCES
@@ -103,7 +101,24 @@ if(WIN32)
   endif()
 endif()
 
+target_include_directories(${LIB_NAME} INTERFACE
+	$<INSTALL_INTERFACE:include>)
+
 install(TARGETS ${LIB_NAME}
+  EXPORT libcurl-target
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
+  RUNTIME DESTINATION bin
+)
+
+export(TARGETS ${LIB_NAME}
+       APPEND FILE ${PROJECT_BINARY_DIR}/libcurl-target.cmake
+       NAMESPACE CURL::
+)
+
+install(EXPORT libcurl-target
+        FILE libcurl-target.cmake
+        NAMESPACE CURL::
+        DESTINATION ${CURL_INSTALL_CMAKE_DIR}
+)
+

@@ -23,23 +23,22 @@
 
 #include "getpart.h"
 
-#define _MPRINTF_REPLACE /* use our functions only */
-#include <curl/mprintf.h>
+#include "curl_printf.h"
 
 /* include memdebug.h last */
 #include "memdebug.h"
 
 int main(int argc, char **argv)
 {
-  int rc;
   char  *part;
-  size_t partlen, i;
+  size_t partlen;
 
   if(argc< 3) {
     printf("./testpart main sub\n");
   }
   else {
-    rc = getpart(&part, &partlen, argv[1], argv[2], stdin);
+    int rc = getpart(&part, &partlen, argv[1], argv[2], stdin);
+    size_t i;
     if(rc)
       return rc;
     for(i = 0; i < partlen; i++)

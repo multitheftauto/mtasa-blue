@@ -1,23 +1,21 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CBlip.cpp
-*  PURPOSE:     Blip entity class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CBlip.cpp
+ *  PURPOSE:     Blip entity class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-CBlip::CBlip ( CElement* pParent, CXMLNode* pNode, CBlipManager* pBlipManager ) : CPerPlayerEntity ( pParent, pNode )
+CBlip::CBlip(CElement* pParent, CXMLNode* pNode, CBlipManager* pBlipManager) : CPerPlayerEntity(pParent, pNode)
 {
     // Init
     m_iType = CElement::BLIP;
-    SetTypeName ( "blip" );
+    SetTypeName("blip");
     m_pBlipManager = pBlipManager;
     m_ucSize = 2;
     m_ucIcon = 0;
@@ -25,58 +23,55 @@ CBlip::CBlip ( CElement* pParent, CXMLNode* pNode, CBlipManager* pBlipManager ) 
     m_usVisibleDistance = 16383;
 
     // Add us to manager's list
-    m_pBlipManager->m_List.push_back ( this );
+    m_pBlipManager->m_List.push_back(this);
 }
 
-
-CBlip::~CBlip ( void )
+CBlip::~CBlip(void)
 {
     // Remove us from the manager's list
-    Unlink ();
+    Unlink();
 }
 
-
-void CBlip::Unlink ( void )
+void CBlip::Unlink(void)
 {
     // Remove us from the manager's list
-    m_pBlipManager->m_List.remove ( this );
+    m_pBlipManager->m_List.remove(this);
 }
 
-
-bool CBlip::ReadSpecialData ( void )
+bool CBlip::ReadSpecialData(void)
 {
     // Grab the "posX" data
-    if ( !GetCustomDataFloat ( "posX", m_vecPosition.fX, true ) )
+    if (!GetCustomDataFloat("posX", m_vecPosition.fX, true))
     {
-        CLogger::ErrorPrintf ( "Bad/missing 'posX' attribute in <blip> (line %u)\n", m_uiLine );
+        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <blip> (line %u)\n", m_uiLine);
         return false;
     }
 
     // Grab the "posY" data
-    if ( !GetCustomDataFloat ( "posY", m_vecPosition.fY, true ) )
+    if (!GetCustomDataFloat("posY", m_vecPosition.fY, true))
     {
-        CLogger::ErrorPrintf ( "Bad/missing 'posY' attribute in <blip> (line %u)\n", m_uiLine );
+        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <blip> (line %u)\n", m_uiLine);
         return false;
     }
 
     // Grab the "posZ" data
-    if ( !GetCustomDataFloat ( "posZ", m_vecPosition.fZ, true ) )
+    if (!GetCustomDataFloat("posZ", m_vecPosition.fZ, true))
     {
-        CLogger::ErrorPrintf ( "Bad/missing 'posZ' attribute in <blip> (line %u)\n", m_uiLine );
+        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <blip> (line %u)\n", m_uiLine);
         return false;
     }
 
     // Grab the "icon" data
     int iTemp;
-    if ( GetCustomDataInt ( "icon", iTemp, true ) )
+    if (GetCustomDataInt("icon", iTemp, true))
     {
-        if ( CBlipManager::IsValidIcon ( iTemp ) )
+        if (CBlipManager::IsValidIcon(iTemp))
         {
-            m_ucIcon = static_cast < unsigned char > ( iTemp );
+            m_ucIcon = static_cast<unsigned char>(iTemp);
         }
         else
         {
-            CLogger::ErrorPrintf ( "Bad 'icon' id specified in <blip> (line %u)\n", m_uiLine );
+            CLogger::ErrorPrintf("Bad 'icon' id specified in <blip> (line %u)\n", m_uiLine);
             return false;
         }
     }
@@ -86,34 +81,34 @@ bool CBlip::ReadSpecialData ( void )
     }
 
     // Grab the "color" data
-    char szColor [64];
-    if ( GetCustomDataString ( "color", szColor, 64, true ) )
+    char szColor[64];
+    if (GetCustomDataString("color", szColor, 64, true))
     {
         // Convert it to RGBA
-        if ( !XMLColorToInt ( szColor, m_Color.R, m_Color.G, m_Color.B, m_Color.A ) )
+        if (!XMLColorToInt(szColor, m_Color.R, m_Color.G, m_Color.B, m_Color.A))
         {
-            CLogger::ErrorPrintf ( "Bad 'color' value specified in <blip> (line %u)\n", m_uiLine );
+            CLogger::ErrorPrintf("Bad 'color' value specified in <blip> (line %u)\n", m_uiLine);
             return false;
         }
     }
     else
     {
-        m_Color = SColorRGBA ( 0, 0, 255, 255 );
+        m_Color = SColorRGBA(0, 0, 255, 255);
     }
 
-    if ( GetCustomDataInt ( "dimension", iTemp, true ) )
-        m_usDimension = static_cast < unsigned short > ( iTemp );
+    if (GetCustomDataInt("dimension", iTemp, true))
+        m_usDimension = static_cast<unsigned short>(iTemp);
 
     // Grab the "ordering" data
-    if ( GetCustomDataInt ( "ordering", iTemp, true ) )
+    if (GetCustomDataInt("ordering", iTemp, true))
     {
-        if ( iTemp >= -32768 && iTemp <= 32767 )
+        if (iTemp >= -32768 && iTemp <= 32767)
         {
-            m_sOrdering = static_cast < short > ( iTemp );
+            m_sOrdering = static_cast<short>(iTemp);
         }
         else
         {
-            CLogger::ErrorPrintf ( "Bad 'ordering' id specified in <blip> (line %u)\n", m_uiLine );
+            CLogger::ErrorPrintf("Bad 'ordering' id specified in <blip> (line %u)\n", m_uiLine);
             return false;
         }
     }
@@ -125,36 +120,35 @@ bool CBlip::ReadSpecialData ( void )
     return true;
 }
 
-
-const CVector & CBlip::GetPosition ( void )
+const CVector& CBlip::GetPosition(void)
 {
     // Are we attached to something?
-    if ( m_pAttachedTo ) GetAttachedPosition ( m_vecPosition );
+    if (m_pAttachedTo)
+        GetAttachedPosition(m_vecPosition);
     return m_vecPosition;
 }
 
-
-void CBlip::SetPosition ( const CVector& vecPosition )
+void CBlip::SetPosition(const CVector& vecPosition)
 {
     // Don't allow a change if we're attached to something
-    if ( m_pAttachedTo ) return;
-    
+    if (m_pAttachedTo)
+        return;
+
     // Is it any different to where we are now?
-    if ( m_vecPosition != vecPosition )
+    if (m_vecPosition != vecPosition)
     {
         // Remember our position vectors
         m_vecPosition = vecPosition;
     }
 }
 
-
-void CBlip::AttachTo ( CElement* pElement )
+void CBlip::AttachTo(CElement* pElement)
 {
-    CElement::AttachTo ( pElement );
+    CElement::AttachTo(pElement);
 
     // If we have a new element, change our dimension to match it's
-    if ( m_pAttachedTo )
+    if (m_pAttachedTo)
     {
-        SetDimension ( m_pAttachedTo->GetDimension () );
+        SetDimension(m_pAttachedTo->GetDimension());
     }
 }
