@@ -10,8 +10,7 @@
 
 class CClientModel;
 
-#ifndef __CCLIENTMODEL_H
-#define __CCLIENTMODEL_H
+#pragma once
 
 #include <list>
 #include "CClientModelManager.h"
@@ -46,5 +45,3 @@ protected:
 
     CResource*                      m_pParentResource; // Resource that allocated model
 };
-
-#endif

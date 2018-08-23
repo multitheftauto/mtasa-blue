@@ -1,18 +1,16 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
+*  PROJECT:     Multi Theft Auto
 *               (Shared logic for modifications)
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientModelManager.h
+*  FILE:        mods/deathmatch/logic/CClientModelManager.h
 *  PURPOSE:     Model manager class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
 *
 *****************************************************************************/
 
 class CClientModelManager;
 
-#ifndef __CCLIENTMODELMANAGER_H
-#define __CCLIENTMODELMANAGER_H
+#pragma once
 
 #include <list>
 #include "CClientModel.h"
@@ -41,5 +39,3 @@ public:
 private:
     CClientModel *                  m_Models[ MAX_MODEL_ID + 1 ];
 };
-
-#endif
