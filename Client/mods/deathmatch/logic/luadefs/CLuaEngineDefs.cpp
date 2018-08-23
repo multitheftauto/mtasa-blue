@@ -479,12 +479,12 @@ int CLuaEngineDefs::EngineRestoreModel(lua_State* luaVM)
     return 1;
 }
 
-int CLuaEngineDefs::EngineRequestModel ( lua_State* luaVM )
+int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
 {
     SString strModelType;
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadString ( strModelType );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strModelType);
 
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (pLuaMain)
@@ -507,7 +507,7 @@ int CLuaEngineDefs::EngineRequestModel ( lua_State* luaVM )
 
                 int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
 
-                CClientModel * pModel = new CClientModel(m_pManager, iModelID, eModelType);
+                CClientModel* pModel = new CClientModel(m_pManager, iModelID, eModelType);
                 pModel->Allocate();
                 pModel->SetParentResource(pResource);
 
@@ -518,30 +518,30 @@ int CLuaEngineDefs::EngineRequestModel ( lua_State* luaVM )
                 m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
         }
     }
-    lua_pushboolean( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
-int CLuaEngineDefs::EngineFreeModel ( lua_State* luaVM )
+int CLuaEngineDefs::EngineFreeModel(lua_State* luaVM)
 {
     int iModelID;
 
-    CScriptArgReader argStream ( luaVM );
-    argStream.ReadNumber ( iModelID );
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(iModelID);
 
-    if ( !argStream.HasErrors () )
+    if (!argStream.HasErrors())
     {
-        CClientModel * pModel = m_pManager->GetModelManager ()->FindModelByID ( iModelID );
+        CClientModel* pModel = m_pManager->GetModelManager()->FindModelByID(iModelID);
 
-        if ( pModel && pModel->Deallocate () )
-            lua_pushboolean ( luaVM, true );
+        if (pModel && pModel->Deallocate())
+            lua_pushboolean(luaVM, true);
 
         return 1;
     }
     else
-        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage () );
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean ( luaVM, false );
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 

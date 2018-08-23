@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_MODELINFO
-#define __CGAME_MODELINFO
+#pragma once
 
 #include "Common.h"
 #include "RenderWare.h"
@@ -175,5 +174,3 @@ public:
     virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades(void) = 0;
     virtual void                      ResetSupportedUpgrades(void) = 0;
 };
-
-#endif

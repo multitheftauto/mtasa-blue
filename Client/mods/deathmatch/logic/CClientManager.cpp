@@ -176,7 +176,7 @@ CClientManager::~CClientManager(void)
     m_pPointLightsManager = NULL;
 
     delete m_pModelManager;
-    m_pModelManager = NULL;
+    m_pModelManager = nullptr;
 }
 
 //

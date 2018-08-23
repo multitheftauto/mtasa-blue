@@ -1,13 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientModel.h
-*  PURPOSE:     Model handling class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CClientModel.h
+ *  PURPOSE:     Model handling class
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
@@ -21,7 +20,6 @@ CClientModel::CClientModel(CClientManager* pManager, int iModelID, eClientModelT
 
     m_pModelManager->Add(this);
 }
-
 
 CClientModel::~CClientModel(void)
 {
@@ -58,8 +56,8 @@ bool CClientModel::Deallocate(void)
         if (m_eModelType == CCLIENTMODELPED)
         {
             // If some ped is using this ID, change him to CJ
-            CClientPedManager * pPedManager = g_pClientGame->GetManager()->GetPedManager();
-            std::vector < CClientPed* > ::const_iterator iter = pPedManager->IterBegin();
+            CClientPedManager*                       pPedManager = g_pClientGame->GetManager()->GetPedManager();
+            std::vector<CClientPed*>::const_iterator iter = pPedManager->IterBegin();
             for (; iter != pPedManager->IterEnd(); iter++)
             {
                 if ((*iter)->GetModel() == m_iModelID)

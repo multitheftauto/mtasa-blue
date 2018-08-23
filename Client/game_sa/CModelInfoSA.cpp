@@ -250,7 +250,7 @@ BOOL CModelInfoSA::IsVehicle()
 
 bool CModelInfoSA::IsPlayerModel()
 {
-    return ( GetInterface() && GetInterface()->pColModel && GetInterface()->pColModel == ( CColModelSAInterface * ) VAR_CTempColModels_ModelPed1 );
+    return (GetInterface() && GetInterface()->pColModel && GetInterface()->pColModel == (CColModelSAInterface*)VAR_CTempColModels_ModelPed1);
 }
 
 BOOL CModelInfoSA::IsUpgrade(void)
@@ -1187,10 +1187,10 @@ void CModelInfoSA::MakePedModel(char* szTexture)
     pGame->GetStreaming()->RequestSpecialModel(m_dwModelID, szTexture, 0);
 }
 
-void CModelInfoSA::DeallocateModel ( void )
+void CModelInfoSA::DeallocateModel(void)
 {
-    Remove ();
-    ppModelInfo [ m_dwModelID ] = NULL;
+    Remove();
+    ppModelInfo[m_dwModelID] = nullptr;
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 //

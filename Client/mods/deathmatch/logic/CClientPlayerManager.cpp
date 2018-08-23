@@ -180,7 +180,7 @@ bool CClientPlayerManager::IsValidModel(unsigned long ulModel)
 {
     if (ulModel <= MAX_MODEL_ID)
     {
-        CModelInfo * pModelInfo = g_pGame->GetModelInfo(ulModel);
+        CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulModel);
         return pModelInfo && pModelInfo->IsPlayerModel();
     }
     return false;
