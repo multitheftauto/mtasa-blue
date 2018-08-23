@@ -14,7 +14,7 @@ CClientModelManager::CClientModelManager(CClientManager* pManager)
 {
     for (ushort i = 0; i <= MAX_MODEL_ID; i++)
     {
-        m_Models[i] = NULL;
+        m_Models[i] = nullptr;
     }
 }
 
@@ -34,7 +34,7 @@ void CClientModelManager::RemoveAll(void)
 
 void CClientModelManager::Add(CClientModel* pModel)
 {
-    if (m_Models[pModel->GetModelID()] == NULL)
+    if (m_Models[pModel->GetModelID()] == nullptr)
     {
         m_Models[pModel->GetModelID()] = pModel;
     }
@@ -42,9 +42,9 @@ void CClientModelManager::Add(CClientModel* pModel)
 
 bool CClientModelManager::Remove(CClientModel* pModel)
 {
-    if (pModel && m_Models[pModel->GetModelID()] != NULL)
+    if (pModel && m_Models[pModel->GetModelID()] != nullptr)
     {
-        m_Models[pModel->GetModelID()] = NULL;
+        m_Models[pModel->GetModelID()] = nullptr;
         return true;
     }
     return false;
@@ -60,7 +60,7 @@ int CClientModelManager::GetFirstFreeModelID(void)
             return i;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 CClientModel* CClientModelManager::FindModelByID(int iModelID)
@@ -69,14 +69,14 @@ CClientModel* CClientModelManager::FindModelByID(int iModelID)
     {
         return m_Models[iModelID];
     }
-    return NULL;
+    return nullptr;
 }
 
 void CClientModelManager::DeallocateModelsAllocatedByResource(CResource* pResource)
 {
     for (ushort i = 0; i <= MAX_MODEL_ID; i++)
     {
-        if (m_Models[i] != NULL)
+        if (m_Models[i] != nullptr)
         {
             if (m_Models[i]->GetParentResource() == pResource)
             {
