@@ -6726,17 +6726,31 @@ bool CStaticFunctionDefinitions::GetVehicleRespawnPosition(CElement* pElement, C
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleRespawnPosition(CElement* pElement, const CVector& vecPosition, const CVector& vecRotation)
+bool CStaticFunctionDefinitions::SetVehicleRespawnRotation(CElement* pElement, const CVector& vecRotation)
 {
     assert(pElement);
-    RUN_CHILDREN(SetVehicleRespawnPosition(*iter, vecPosition, vecRotation))
+    RUN_CHILDREN(SetVehicleRespawnRotation(*iter, vecRotation))
 
     if (IS_VEHICLE(pElement))
     {
         CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
-
-        pVehicle->SetRespawnPosition(vecPosition);
         pVehicle->SetRespawnRotationDegrees(vecRotation);
+
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleRespawnPosition(CElement* pElement, const CVector& vecPosition)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetVehicleRespawnPosition(*iter, vecPosition))
+
+    if (IS_VEHICLE(pElement))
+    {
+        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+        pVehicle->SetRespawnPosition(vecPosition);
 
         return true;
     }
