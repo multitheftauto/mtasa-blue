@@ -825,7 +825,7 @@ void CClientVehicle::Fix(void)
 
     SetHealth(DEFAULT_VEHICLE_HEALTH);
 
-    SFixedArray<unsigned char, MAX_DOOR > ucDoorStates;
+    SFixedArray<unsigned char, MAX_DOORS> ucDoorStates;
     GetInitialDoorStates(ucDoorStates);
     for (int i = 0; i < MAX_DOORS; i++)
     {
