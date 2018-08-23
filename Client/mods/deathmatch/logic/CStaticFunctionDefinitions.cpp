@@ -491,6 +491,46 @@ bool CStaticFunctionDefinitions::GetElementVelocity(CClientEntity& Entity, CVect
     return true;
 }
 
+int CStaticFunctionDefinitions::GetElementSpeed(CClientEntity& Entity, unsigned char ucUnit, float& fSpeed)
+{
+    // Is in in the range of [0, 2]?
+    if (ucUnit<=2) 
+    {
+        // Figure out the multiplier
+        float fMultiplier;
+        switch (ucUnit)
+        {
+            case 0: // m/s
+            {
+                fMultiplier = 50.0f;
+                break
+            }
+            case 1: // km/h
+            {
+                fMultiplier = 180.0f;
+                break;
+            }
+            case 2; // mph
+            {
+                fMultiplier = 111.84681456f;
+                break
+            }
+            default:
+                return false;
+        }
+        // Grab it's velocity
+        CVector* vecVelocity;
+        if (GetElementVelocity(Entity, vecVelocity))
+        {
+            // Get the actual speed
+            fSpeed = (*pVector1 * fValue)->Length();
+            return true
+        }
+    }
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::GetElementInterior(CClientEntity& Entity, unsigned char& ucInterior)
 {
     ucInterior = Entity.GetInterior();

@@ -32,6 +32,7 @@ public:
     LUA_DECLARE_OOP(GetElementPosition);
     LUA_DECLARE_OOP(GetElementRotation);
     LUA_DECLARE_OOP(GetElementVelocity);
+    LUA_DECLARE(GetElementSpeed);
     LUA_DECLARE(GetElementType);
     LUA_DECLARE(GetElementsByType);
     LUA_DECLARE(GetElementInterior);
