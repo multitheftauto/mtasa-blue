@@ -371,7 +371,7 @@ inline SString GetClassTypeName(CLuaMatrix*)
 }
 inline SString GetClassTypeName(D3DPRIMITIVETYPE*)
 {
-	return "primitive-type";
+    return "primitive-type";
 }
 
 //
