@@ -172,7 +172,6 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
         {
             popad
             mov     ecx, [esp+4]  // animationClump
-            mov     ebx, [esp+8]  // pAnimAssociationToSyncWith
             mov     edx, [esp+12] // animationGroup
             mov     eax, [esp+16] // animationID
             push    eax
@@ -183,8 +182,9 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
 
             // call our handler function
             push    eax
+            mov     eax, [esp+12] // pAnimAssociationToSyncWith
             push    edx
-            push    ebx
+            push    eax
             mov     ecx, [esp+16] // animationClump
             push    ecx
             call    m_pAddAnimationAndSyncHandler
