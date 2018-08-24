@@ -141,6 +141,9 @@ void CPrimitiveMaterialBatcher::Flush (void)
 
 	// Draw
 	m_pDevice->SetTexture (0, NULL);
+	// Cache last used material, so we don't set directx parameters needlessly
+	CMaterialItem* lastMaterial = nullptr;
+
 	for (int i = 0; i < m_primitiveList.size (); i++) {
 		sDrawQueuePrimitiveMaterial primitive = m_primitiveList[i];
 		//uint PrimitiveCount = m_triangleList.size () / 3;
@@ -148,17 +151,25 @@ void CPrimitiveMaterialBatcher::Flush (void)
 		uint VertexStreamZeroStride = sizeof (PrimitiveMaterialVertice);
 
 		CMaterialItem* material = primitive.material;
-		// Set texture addressing mode
-		m_pDevice->SetSamplerState (0, D3DSAMP_ADDRESSU, material->m_TextureAddress);
-		m_pDevice->SetSamplerState (0, D3DSAMP_ADDRESSV, material->m_TextureAddress);
+		if (material != lastMaterial)
+		{
+			// Set texture addressing mode
+			m_pDevice->SetSamplerState (0, D3DSAMP_ADDRESSU, material->m_TextureAddress);
+			m_pDevice->SetSamplerState (0, D3DSAMP_ADDRESSV, material->m_TextureAddress);
 
-		if (material->m_TextureAddress == TADDRESS_BORDER)
-			m_pDevice->SetSamplerState (0, D3DSAMP_BORDERCOLOR, material->m_uiBorderColor);
+			if (material->m_TextureAddress == TADDRESS_BORDER)
+				m_pDevice->SetSamplerState (0, D3DSAMP_BORDERCOLOR, material->m_uiBorderColor);
+		}
+		
 
 		if (CTextureItem* pTextureItem = DynamicCast<CTextureItem> (material))
 		{
 			// Draw using texture
-			m_pDevice->SetTexture (0, pTextureItem->m_pD3DTexture);
+			if (material != lastMaterial)
+			{
+				m_pDevice->SetTexture (0, pTextureItem->m_pD3DTexture);
+			}
+			
 			DrawPrimitive (primitive.type, primitive.vertices.size (), pVertexStreamZeroData, VertexStreamZeroStride);
 		}
 		else if (CShaderInstance* pShaderInstance = DynamicCast<CShaderInstance> (material))
@@ -166,12 +177,16 @@ void CPrimitiveMaterialBatcher::Flush (void)
 			// Draw using shader
 			ID3DXEffect* pD3DEffect = pShaderInstance->m_pEffectWrap->m_pD3DEffect;
 
-			// Apply custom parameters
-			pShaderInstance->ApplyShaderParameters ();
-			// Apply common parameters
-			pShaderInstance->m_pEffectWrap->ApplyCommonHandles ();
-			// Apply mapped parameters
-			pShaderInstance->m_pEffectWrap->ApplyMappedHandles ();
+			if (material != lastMaterial)
+			{
+				// Apply custom parameters
+				pShaderInstance->ApplyShaderParameters ();
+				// Apply common parameters
+				pShaderInstance->m_pEffectWrap->ApplyCommonHandles ();
+				// Apply mapped parameters
+				pShaderInstance->m_pEffectWrap->ApplyMappedHandles ();
+			}
+			
 
 			// Do shader passes
 			DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;
@@ -193,6 +208,7 @@ void CPrimitiveMaterialBatcher::Flush (void)
 				m_pDevice->SetPixelShader (NULL);
 			}
 		}
+		lastMaterial = material;
 		m_pGraphics->RemoveQueueRef (material);
 	}
 	
