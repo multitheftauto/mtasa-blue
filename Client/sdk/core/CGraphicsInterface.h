@@ -13,6 +13,15 @@
 #define __CGRAPHICSINTERFACE_H
 
 #include "CVector.h"
+#include <d3d9.h>
+#include <d3dx9.h>
+
+struct sPrimitiveVertex
+{
+    float             x, y, z;
+    D3DCOLOR          color;
+    float             u, v;
+};
 
 struct ID3DXFont;
 struct IDirect3DDevice9;
@@ -127,6 +136,7 @@ public:
                                   float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bColorCoded = false,
                                   bool bSubPixelPositioning = false, float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0) = 0;
 
+    virtual void DrawPrimitivesInternal(D3DPRIMITIVETYPE primitiveType, int primitivesCount, sPrimitiveVertex* vecPrimitives, CMaterialItem* pMaterial) = 0;
     virtual void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI) = 0;
 
     // Subsystems

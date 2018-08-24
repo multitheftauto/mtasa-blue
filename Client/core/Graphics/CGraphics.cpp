@@ -261,6 +261,46 @@ void CGraphics::DrawRectangleInternal(float fX, float fY, float fWidth, float fH
     }
 }
 
+void CGraphics::DrawPrimitives(D3DPRIMITIVETYPE primitiveType, std::vector<sPrimitiveVertex> vecPrimitives, CMaterialItem* pMaterial)
+{
+    if (g_pCore->IsWindowMinimized())
+        return;
+
+    BeginDrawBatch();
+    CheckModes(EDrawMode::DX_SPRITE, m_ActiveBlendMode);
+    DrawPrimitivesInternal(primitiveType, vecPrimitives.size(), &vecPrimitives.at(0), pMaterial);
+    EndDrawBatch();
+}
+
+void CGraphics::DrawPrimitivesInternal(D3DPRIMITIVETYPE primitiveType, int primitivesCount, sPrimitiveVertex* vecPrimitives, CMaterialItem* pMaterial)
+{
+    if (CTextureItem* pTexture = DynamicCast<CTextureItem>(pMaterial))
+    {
+        m_pDevice->SetTexture(0, (IDirect3DTexture9*)pTexture->m_pD3DTexture);
+    }
+    else
+    {
+        m_pDevice->SetTexture(0, NULL);
+    }
+    switch (primitiveType)
+    {
+        case D3DPT_LINELIST:
+            primitivesCount /= 2;
+            break;
+        case D3DPT_LINESTRIP:
+            primitivesCount -= 1;
+            break;
+        case D3DPT_TRIANGLEFAN:
+        case D3DPT_TRIANGLESTRIP:
+            primitivesCount = primitivesCount - 2;
+            break;
+        case D3DPT_TRIANGLELIST:
+            primitivesCount = primitivesCount / 3;
+            break;
+    }
+    m_pDevice->DrawPrimitiveUP(primitiveType, primitivesCount, vecPrimitives, sizeof(sPrimitiveVertex));
+}
+
 void CGraphics::DrawRectangle(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning)
 {
     if (g_pCore->IsWindowMinimized())

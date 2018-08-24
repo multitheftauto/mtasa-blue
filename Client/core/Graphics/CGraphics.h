@@ -141,6 +141,7 @@ public:
                           unsigned long ulFormat, ID3DXFont* pDXFont = NULL, bool bPostGUI = false, bool bColorCoded = false, bool bSubPixelPositioning = false,
                           float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0);
 
+
     void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI);
 
     void OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
@@ -174,6 +175,8 @@ public:
     void SetProgressMessage(const SString& strMessage);
     void DrawProgressMessage(bool bPreserveBackbuffer = true);
     void DrawRectangleInternal(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning);
+    void DrawPrimitivesInternal(D3DPRIMITIVETYPE primitiveType, int primitivesCount, sPrimitiveVertex* vecPrimitives, CMaterialItem* pMaterial);
+    void DrawPrimitives(D3DPRIMITIVETYPE primitiveType, std::vector<sPrimitiveVertex> vecPrimitives, CMaterialItem* pMaterial );
 
 private:
     void       OnDeviceCreate(IDirect3DDevice9* pDevice);

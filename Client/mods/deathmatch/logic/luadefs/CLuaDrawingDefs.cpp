@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+
 #define MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS  "1.3.0-9.04431"
 extern bool g_bAllowAspectRatioAdjustment;
 
@@ -24,6 +25,7 @@ void CLuaDrawingDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("dxDrawCircle", DxDrawCircle);
     CLuaCFunctions::AddFunction("dxDrawImage", DxDrawImage);
     CLuaCFunctions::AddFunction("dxDrawImageSection", DxDrawImageSection);
+    CLuaCFunctions::AddFunction("dxDrawPrimitives", DxDrawPrimitives);
     CLuaCFunctions::AddFunction("dxGetTextWidth", DxGetTextWidth);
     CLuaCFunctions::AddFunction("dxGetFontHeight", DxGetFontHeight);
     CLuaCFunctions::AddFunction("dxCreateFont", DxCreateFont);
@@ -1677,6 +1679,77 @@ int CLuaDrawingDefs::DxSetTextureEdge(lua_State* luaVM)
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaDrawingDefs::DxDrawPrimitives(lua_State* luaVM)
+{
+    D3DPRIMITIVETYPE              primitiveType;
+    std::vector<sPrimitiveVertex> vecPrimitives;
+    CClientTexture*               pTexture;
+    SColor                        color;
+
+    CScriptArgReader argStream(luaVM);
+
+    argStream.ReadEnumString(primitiveType);
+
+    if (argStream.NextIsUserData())
+        argStream.ReadUserData(pTexture, NULL);
+    else
+        pTexture = NULL;
+
+    while (argStream.NextIsTable())
+    {
+        std::vector<float> vecTableContent;
+        argStream.ReadNumberTable(vecTableContent);
+        switch (vecTableContent.size())
+        {
+        case 2: // read x,y
+            vecPrimitives.push_back(sPrimitiveVertex{ vecTableContent.at(0), vecTableContent.at(1), 0, (DWORD)-1, 0, 0 });
+            break;
+        case 3: // read x,y,color
+            vecPrimitives.push_back(sPrimitiveVertex{ vecTableContent.at(0), vecTableContent.at(1), 0, (DWORD)vecTableContent.at(2), 0, 0 });
+            break;
+        case 4: // read x,y,u,v
+            vecPrimitives.push_back(sPrimitiveVertex{ vecTableContent.at(0), vecTableContent.at(1), 0, (DWORD)-1, vecTableContent.at(2), vecTableContent.at(3) });
+            break;
+        case 5: // read x,y,color,u,v
+            vecPrimitives.push_back(sPrimitiveVertex{ vecTableContent.at(0), vecTableContent.at(1), 0, (DWORD)vecTableContent.at(2), vecTableContent.at(3), vecTableContent.at(4) });
+            break;
+        }
+    }
+
+    if (!argStream.HasErrors())
+    {
+        if (vecPrimitives.size() > 2 && vecPrimitives.size() <= 4096)
+        {
+            switch(primitiveType)
+            case D3DPT_TRIANGLELIST:
+                if (vecPrimitives.size() % 3 != 0)
+                {
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+
+            if(pTexture != NULL && pTexture->GetMaterialItem())
+                g_pCore->GetGraphics()->DrawPrimitivesInternal(primitiveType, vecPrimitives.size(), &vecPrimitives[0], pTexture->GetMaterialItem());
+            else
+                g_pCore->GetGraphics()->DrawPrimitivesInternal(primitiveType, vecPrimitives.size(), &vecPrimitives[0], NULL);
+
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        else
+        {
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
     lua_pushboolean(luaVM, false);
     return 1;
 }
