@@ -13,6 +13,8 @@
 #include "CTileBatcher.h"
 #include "CLine3DBatcher.h"
 #include "CMaterialLine3DBatcher.h"
+#include "CPrimitiveBatcher.h"
+#include "CPrimitiveMaterialBatcher.h"
 #include "CAspectRatioConverter.h"
 extern CCore* g_pCore;
 extern bool   g_bInGTAScene;
@@ -56,6 +58,10 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_pLine3DBatcherPostGUI = new CLine3DBatcher(false);
     m_pMaterialLine3DBatcherPreGUI = new CMaterialLine3DBatcher(true);
     m_pMaterialLine3DBatcherPostGUI = new CMaterialLine3DBatcher(false);
+	m_pPrimitiveBatcherPreGUI = new CPrimitiveBatcher (true);
+	m_pPrimitiveBatcherPostGUI = new CPrimitiveBatcher (false);
+    m_pPrimitiveMaterialBatcherPreGUI = new CPrimitiveMaterialBatcher (true, this);
+    m_pPrimitiveMaterialBatcherPostGUI = new CPrimitiveMaterialBatcher (false, this);
 
     m_pScreenGrabber = NewScreenGrabber();
     m_pPixelsManager = NewPixelsManager();
@@ -78,6 +84,10 @@ CGraphics::~CGraphics(void)
     SAFE_DELETE(m_pLine3DBatcherPostGUI);
     SAFE_DELETE(m_pMaterialLine3DBatcherPreGUI);
     SAFE_DELETE(m_pMaterialLine3DBatcherPostGUI);
+	SAFE_DELETE(m_pPrimitiveBatcherPreGUI);
+	SAFE_DELETE(m_pPrimitiveBatcherPostGUI);
+    SAFE_DELETE(m_pPrimitiveMaterialBatcherPreGUI);
+    SAFE_DELETE(m_pPrimitiveMaterialBatcherPostGUI);
     SAFE_DELETE(m_pScreenGrabber);
     SAFE_DELETE(m_pPixelsManager);
     SAFE_DELETE(m_pAspectRatioConverter);
@@ -837,6 +847,57 @@ void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStart
     EndDrawBatch();
 }
 
+void CGraphics::DrawPrimitiveQueued (const std::vector<PrimitiveVertice>& vecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI)
+{
+	// Prevent queuing when minimized
+	if (g_pCore->IsWindowMinimized ())
+	{
+		m_pPrimitiveBatcherPreGUI->ClearQueue ();
+		m_pPrimitiveBatcherPostGUI->ClearQueue ();
+		return;
+	}
+
+	for (PrimitiveVertice vert : vecVertices) {
+		vert.fY = m_pAspectRatioConverter->ConvertPositionForAspectRatio (vert.fY);
+	}
+
+	sDrawQueuePrimitive primitive;
+	primitive.vertices = vecVertices;
+	primitive.type = eType;
+	// Add it to the queue
+	if (bPostGUI && !CCore::GetSingleton ().IsMenuVisible ())
+		m_pPrimitiveBatcherPostGUI->AddPrimitive (primitive);
+	else
+		m_pPrimitiveBatcherPreGUI->AddPrimitive (primitive);
+}
+
+void CGraphics::DrawMaterialPrimitiveQueued (const std::vector<PrimitiveMaterialVertice>& vecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, bool bPostGUI)
+{
+    // Prevent queuing when minimized
+    if (g_pCore->IsWindowMinimized ())
+    {
+        m_pPrimitiveBatcherPreGUI->ClearQueue ();
+        m_pPrimitiveBatcherPostGUI->ClearQueue ();
+        return;
+    }
+
+    for (PrimitiveMaterialVertice vert : vecVertices) {
+        vert.fY = m_pAspectRatioConverter->ConvertPositionForAspectRatio (vert.fY);
+    }
+
+    sDrawQueuePrimitiveMaterial primitive;
+    primitive.vertices = vecVertices;
+    primitive.material = pMaterial;
+    primitive.type = eType;
+
+	AddQueueRef (primitive.material);
+    // Add it to the queue
+    if (bPostGUI && !CCore::GetSingleton ().IsMenuVisible ())
+        m_pPrimitiveMaterialBatcherPostGUI->AddPrimitive (primitive);
+    else
+        m_pPrimitiveMaterialBatcherPreGUI->AddPrimitive (primitive);
+}
+
 struct stVertex
 {
     float x, y, z;
@@ -1362,6 +1423,10 @@ void CGraphics::OnDeviceCreate(IDirect3DDevice9* pDevice)
     m_pLine3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialLine3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialLine3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+	m_pPrimitiveBatcherPreGUI->OnDeviceCreate (pDevice, GetViewportWidth (), GetViewportHeight ());
+	m_pPrimitiveBatcherPostGUI->OnDeviceCreate (pDevice, GetViewportWidth (), GetViewportHeight ());
+    m_pPrimitiveMaterialBatcherPreGUI->OnDeviceCreate (pDevice, GetViewportWidth (), GetViewportHeight ());
+    m_pPrimitiveMaterialBatcherPostGUI->OnDeviceCreate (pDevice, GetViewportWidth (), GetViewportHeight ());
     m_pRenderItemManager->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pScreenGrabber->OnDeviceCreate(pDevice);
     m_pPixelsManager->OnDeviceCreate(pDevice);
@@ -1430,11 +1495,15 @@ void CGraphics::OnZBufferModified(void)
 void CGraphics::DrawPreGUIQueue(void)
 {
     DrawQueue(m_PreGUIQueue);
+	m_pPrimitiveBatcherPreGUI->Flush ();
+    m_pPrimitiveMaterialBatcherPreGUI->Flush ();
 }
 
 void CGraphics::DrawPostGUIQueue(void)
 {
     DrawQueue(m_PostGUIQueue);
+	m_pPrimitiveBatcherPostGUI->Flush ();
+    m_pPrimitiveMaterialBatcherPostGUI->Flush ();
     m_pLine3DBatcherPostGUI->Flush();
     m_pMaterialLine3DBatcherPostGUI->Flush();
 
@@ -1685,8 +1754,12 @@ void CGraphics::OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewpo
 {
     // Flush dx draws
     DrawPreGUIQueue();
-    // Inform tile batcher
+    // Inform batchers
     m_pTileBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
+    m_pPrimitiveBatcherPreGUI->OnChangingRenderTarget (uiNewViewportSizeX, uiNewViewportSizeY);
+    m_pPrimitiveBatcherPostGUI->OnChangingRenderTarget (uiNewViewportSizeX, uiNewViewportSizeY);
+    m_pPrimitiveMaterialBatcherPreGUI->OnChangingRenderTarget (uiNewViewportSizeX, uiNewViewportSizeY);
+    m_pPrimitiveMaterialBatcherPostGUI->OnChangingRenderTarget (uiNewViewportSizeX, uiNewViewportSizeY);
 }
 
 ////////////////////////////////////////////////////////////////

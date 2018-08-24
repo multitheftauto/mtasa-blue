@@ -13,6 +13,22 @@
 #define __CGRAPHICSINTERFACE_H
 
 #include "CVector.h"
+#include <d3d9.h>
+
+ // Vertex type used by the primitives batchers
+struct PrimitiveVertice
+{
+    static const uint FNV = D3DFVF_XYZ | D3DFVF_DIFFUSE;
+	float    fX, fY, fZ;
+	D3DCOLOR Color;
+};
+struct PrimitiveMaterialVertice
+{
+    static const uint FNV = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1;
+    float    fX, fY, fZ;
+    D3DCOLOR Color;
+    float    u, v;
+};
 
 struct ID3DXFont;
 struct IDirect3DDevice9;
@@ -128,6 +144,8 @@ public:
                                   bool bSubPixelPositioning = false, float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0) = 0;
 
     virtual void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI) = 0;
+	virtual void DrawPrimitiveQueued (const std::vector<PrimitiveVertice>& vertices, D3DPRIMITIVETYPE type, bool bPostGUI) = 0;
+    virtual void DrawMaterialPrimitiveQueued (const std::vector<PrimitiveMaterialVertice>& vertices, D3DPRIMITIVETYPE type, CMaterialItem* pMaterial, bool bPostGUI) = 0;
 
     // Subsystems
     virtual CRenderItemManagerInterface* GetRenderItemManager(void) = 0;
