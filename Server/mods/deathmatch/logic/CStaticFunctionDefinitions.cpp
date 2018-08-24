@@ -6698,6 +6698,34 @@ bool CStaticFunctionDefinitions::SetVehicleIdleRespawnDelay(CElement* pElement, 
     return false;
 }
 
+bool CStaticFunctionDefinitions::GetVehicleRespawnRotation(CElement* pElement, CVector& vecRotation)
+{
+    assert(pElement);
+
+    if (IS_VEHICLE(pElement))
+    {
+        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+        vecRotation = pVehicle->GetRespawnRotationDegrees();
+
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetVehicleRespawnPosition(CElement* pElement, CVector& vecPosition)
+{
+    assert(pElement);
+
+    if (IS_VEHICLE(pElement))
+    {
+        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+        vecPosition = pVehicle->GetRespawnPosition();
+
+        return true;
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetVehicleRespawnPosition(CElement* pElement, const CVector& vecPosition, const CVector& vecRotation)
 {
     assert(pElement);
