@@ -237,7 +237,6 @@ private:
         QUEUE_TEXTURE,
         QUEUE_SHADER,
         QUEUE_CIRCLE,
-		QUEUE_PRIMITIVE,
     };
 
     struct sDrawQueueLine
