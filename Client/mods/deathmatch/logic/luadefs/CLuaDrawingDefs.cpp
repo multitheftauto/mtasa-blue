@@ -590,6 +590,13 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
 
         switch (primitiveType)
         {
+            case D3DPT_LINESTRIP:
+                if (vecVertices.size() < 2)
+                {
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+                break;
             case D3DPT_LINELIST:
                 if (vecVertices.size() % 2 != 0)
                 {
@@ -669,6 +676,13 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
 
             switch (primitiveType)
             {
+                case D3DPT_LINESTRIP:
+                    if (vecVertices.size() < 2)
+                    {
+                        lua_pushboolean(luaVM, false);
+                        return 1;
+                    }
+                    break;
                 case D3DPT_LINELIST:
                     if (vecVertices.size() % 2 != 0)
                     {
