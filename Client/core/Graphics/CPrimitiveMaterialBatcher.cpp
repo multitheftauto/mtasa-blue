@@ -104,7 +104,7 @@ void CPrimitiveMaterialBatcher::Flush(void)
         return;
 
     // Save render states
-    IDirect3DStateBlock9* pSavedStateBlock = NULL;
+    IDirect3DStateBlock9* pSavedStateBlock = nullptr;
     m_pDevice->CreateStateBlock(D3DSBT_ALL, &pSavedStateBlock);
     // Set transformations
     D3DXMATRIX matWorld;
@@ -139,7 +139,7 @@ void CPrimitiveMaterialBatcher::Flush(void)
     m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
     // Draw
-    m_pDevice->SetTexture(0, NULL);
+    m_pDevice->SetTexture(0, nullptr);
     // Cache last used material, so we don't set directx parameters needlessly
     CMaterialItem* pLastMaterial = nullptr;
 
@@ -219,12 +219,21 @@ void CPrimitiveMaterialBatcher::Flush(void)
         SAFE_RELEASE(pSavedStateBlock);
     }
 }
-
+////////////////////////////////////////////////////////////////
+//
+// CPrimitiveMaterialBatcher::DrawPrimitive
+//
+// Draws the primitives on render target
+//
+////////////////////////////////////////////////////////////////
 void CPrimitiveMaterialBatcher::DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iCollectionSize, const void* pDataAddr, size_t uiVertexStride)
 {
     int iSize = 1;
     switch (eType)
     {
+        case D3DPT_POINTLIST:
+            iSize = iCollectionSize;
+            break;
         case D3DPT_LINELIST:
             iSize = iCollectionSize / 2;
             break;

@@ -26,6 +26,7 @@ public:
     void OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
     void UpdateMatrices(float fViewportSizeX, float fViewportSizeY);
     void Flush(void);
+    void DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iSize, const void* pDataAddr, size_t iVertexStride);
     void ClearQueue(void);
     void AddPrimitive(sDrawQueuePrimitive primitive);
 

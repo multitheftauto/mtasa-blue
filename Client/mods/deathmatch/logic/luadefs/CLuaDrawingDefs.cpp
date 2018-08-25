@@ -582,7 +582,7 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if ((vecVertices.size()) < 2)
+        if ((vecVertices.size() < 2  && primitiveType != D3DPT_POINTLIST) )
         {
             lua_pushboolean(luaVM, false);
             return 1;
@@ -661,7 +661,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
     {
         if (pMaterialElement)
         {
-            if ((vecVertices.size()) < 2)
+            if ((vecVertices.size() < 2 && primitiveType != D3DPT_POINTLIST))
             {
                 lua_pushboolean(luaVM, false);
                 return 1;

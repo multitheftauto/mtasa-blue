@@ -103,7 +103,7 @@ void CPrimitiveBatcher::Flush(void)
         return;
 
     // Save render states
-    IDirect3DStateBlock9* pSavedStateBlock = NULL;
+    IDirect3DStateBlock9* pSavedStateBlock = nullptr;
     m_pDevice->CreateStateBlock(D3DSBT_ALL, &pSavedStateBlock);
     // Set transformations
     D3DXMATRIX matWorld;
@@ -136,32 +136,15 @@ void CPrimitiveBatcher::Flush(void)
     m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
     // Draw
-    m_pDevice->SetTexture(0, NULL);
+    m_pDevice->SetTexture(0, nullptr);
     for (int i = 0; i < m_primitiveList.size(); i++)
     {
         sDrawQueuePrimitive primitive = m_primitiveList[i];
-        // uint PrimitiveCount = m_triangleList.size () / 3;
+
         const void* pVertexStreamZeroData = &primitive.vertices[0];
         uint        uiVertexStreamZeroStride = sizeof(PrimitiveVertice);
 
-        switch (primitive.type)
-        {
-            case D3DPT_LINELIST:
-                m_pDevice->DrawPrimitiveUP(D3DPT_LINELIST, primitive.vertices.size() / 2, pVertexStreamZeroData, uiVertexStreamZeroStride);
-                break;
-            case D3DPT_LINESTRIP:
-                m_pDevice->DrawPrimitiveUP(D3DPT_LINESTRIP, primitive.vertices.size() - 1, pVertexStreamZeroData, uiVertexStreamZeroStride);
-                break;
-            case D3DPT_TRIANGLEFAN:
-                m_pDevice->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, primitive.vertices.size() - 2, pVertexStreamZeroData, uiVertexStreamZeroStride);
-                break;
-            case D3DPT_TRIANGLESTRIP:
-                m_pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, primitive.vertices.size() - 2, pVertexStreamZeroData, uiVertexStreamZeroStride);
-                break;
-            case D3DPT_TRIANGLELIST:
-                m_pDevice->DrawPrimitiveUP(D3DPT_TRIANGLELIST, primitive.vertices.size() / 3, pVertexStreamZeroData, uiVertexStreamZeroStride);
-                break;
-        }
+        DrawPrimitive(primitive.type, primitive.vertices.size(), pVertexStreamZeroData, uiVertexStreamZeroStride);
     }
 
     // Clean up
@@ -172,6 +155,37 @@ void CPrimitiveBatcher::Flush(void)
         pSavedStateBlock->Apply();
         SAFE_RELEASE(pSavedStateBlock);
     }
+}
+////////////////////////////////////////////////////////////////
+//
+// CPrimitiveBatcher::DrawPrimitive
+//
+// Draws the primitives on render target
+//
+////////////////////////////////////////////////////////////////
+void CPrimitiveBatcher::DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iCollectionSize, const void* pDataAddr, size_t uiVertexStride)
+{
+    int iSize = 1;
+    switch (eType)
+    {
+    case D3DPT_POINTLIST:
+        iSize = iCollectionSize;
+        break;
+    case D3DPT_LINELIST:
+        iSize = iCollectionSize / 2;
+        break;
+    case D3DPT_LINESTRIP:
+        iSize = iCollectionSize - 1;
+        break;
+    case D3DPT_TRIANGLEFAN:
+    case D3DPT_TRIANGLESTRIP:
+        iSize = iCollectionSize - 2;
+        break;
+    case D3DPT_TRIANGLELIST:
+        iSize = iCollectionSize / 3;
+        break;
+    }
+    m_pDevice->DrawPrimitiveUP(eType, iSize, pDataAddr, uiVertexStride);
 }
 ////////////////////////////////////////////////////////////////
 //
