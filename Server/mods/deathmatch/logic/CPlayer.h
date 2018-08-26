@@ -267,6 +267,7 @@ public:
     CVehicle* GetJackingVehicle(void) { return m_pJackingVehicle; }
     void      SetJackingVehicle(CVehicle* pVehicle);
     bool      IsLeavingServer(void) { return m_bIsLeavingServer; }
+
 public:
     //
     // Light Sync
@@ -342,6 +343,7 @@ public:
     SString                m_strD3d9Md5;
     SString                m_strD3d9Sha256;
     bool                   m_bIsLeavingServer;
+
 private:
     SLightweightSyncData m_lightweightSyncData;
 
