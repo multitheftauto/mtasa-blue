@@ -3389,6 +3389,7 @@ bool CStaticFunctionDefinitions::RedirectPlayer(CElement* pElement, const char* 
         if (pPlayer->IsLeavingServer()) {
             return false;
         }
+
         unsigned char ucHostLength = static_cast<unsigned char>(strlen(szHost));
 
         CBitStream BitStream;
@@ -11098,9 +11099,11 @@ bool CStaticFunctionDefinitions::KickPlayer(CPlayer* pPlayer, SString strRespons
 {
     // Make sure we have a player
     assert (pPlayer);
+
     if (pPlayer->IsLeavingServer()) {
         return false;
     }
+
     // If our responsible string is too long, crop it to size and display ... in the end so it's obvious it's cropped
     if (strResponsible.length() > MAX_KICK_RESPONSIBLE_LENGTH)
         strResponsible = strResponsible.substr(0, MAX_KICK_RESPONSIBLE_LENGTH - 3) + "...";
@@ -11145,11 +11148,12 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pPlayer, bool bIP, bool bUs
                                             SString strReason, time_t tUnban)
 {
     // Make sure we have a player
-
     assert (pPlayer);
+
     if (pPlayer->IsLeavingServer()) {
         return nullptr;
     }
+
     // Initialize variables
     CBan* pBan = NULL;
 
