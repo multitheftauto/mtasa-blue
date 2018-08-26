@@ -144,7 +144,7 @@ public:
     std::unique_ptr<CAnimBlendAssociation> RpAnimBlendClumpGetFirstAssociation(RpClump* pClump);
     std::unique_ptr<CAnimBlendAssociation> RpAnimBlendClumpGetAssociation(RpClump* pClump, const char* szAnimName);
     std::unique_ptr<CAnimBlendAssociation> RpAnimBlendClumpGetAssociation(RpClump* pClump, AnimationId animID);
-    std::unique_ptr<CAnimBlendAssociation> RpAnimBlendGetNextAssociation(CAnimBlendAssociation* pAssociation);
+    std::unique_ptr<CAnimBlendAssociation> RpAnimBlendGetNextAssociation(std::unique_ptr<CAnimBlendAssociation>& pAssociation);
     int                                    RpAnimBlendClumpGetNumAssociations(RpClump* pClump);
     void                                   RpAnimBlendClumpUpdateAnimations(RpClump* pClump, float f1, bool b1);
 
