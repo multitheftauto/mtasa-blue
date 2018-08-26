@@ -266,7 +266,7 @@ public:
 
     CVehicle* GetJackingVehicle(void) { return m_pJackingVehicle; }
     void      SetJackingVehicle(CVehicle* pVehicle);
-    bool      IsLeavingServer( void ){ return m_bIsLeavingServer; }
+    bool      IsLeavingServer(void) { return m_bIsLeavingServer; }
 public:
     //
     // Light Sync
