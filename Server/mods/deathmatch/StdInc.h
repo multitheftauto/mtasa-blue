@@ -19,6 +19,7 @@
 #include <ctime>
 #include <sstream>
 #include <mutex>
+#include <unordered_set>
 
 // Forward declarations
 class CAclRightName;
