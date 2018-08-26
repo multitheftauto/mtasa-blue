@@ -1401,7 +1401,7 @@ void CGame::QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason, bool bSayI
             Arguments.PushBoolean(false);
             Arguments.PushBoolean(false);
         }
-      
+
         Player.m_bIsLeavingServer = true;
         Player.CallEvent("onPlayerQuit", Arguments);
         // Tell the map manager
