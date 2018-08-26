@@ -11098,7 +11098,7 @@ bool CStaticFunctionDefinitions::LogOut(CPlayer* pPlayer)
 bool CStaticFunctionDefinitions::KickPlayer(CPlayer* pPlayer, SString strResponsible, SString strReason)
 {
     // Make sure we have a player
-    assert (pPlayer);
+    assert(pPlayer);
 
     if (pPlayer->IsLeavingServer()) {
         return false;
@@ -11148,7 +11148,7 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pPlayer, bool bIP, bool bUs
                                             SString strReason, time_t tUnban)
 {
     // Make sure we have a player
-    assert (pPlayer);
+    assert(pPlayer);
 
     if (pPlayer->IsLeavingServer()) {
         return nullptr;
