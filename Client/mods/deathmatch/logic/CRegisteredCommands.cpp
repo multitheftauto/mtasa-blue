@@ -22,6 +22,49 @@ CRegisteredCommands::~CRegisteredCommands(void)
     ClearCommands();
 }
 
+bool CRegisteredCommands::AddAlias(CLuaMain* pLuaMain, const char* szKey, const char* szCommand)
+{
+    assert(pLuaMain);
+    assert(szKey);
+    assert(szCommand);
+
+    // Check if we already have this key and handler
+    SCommand* pCommand = GetCommand(szCommand, pLuaMain);
+
+    if (!pCommand)
+        return false;
+
+    bool isCreated = AddCommand(pLuaMain, szKey, pCommand->iLuaFunction, pCommand->bCaseSensitive);
+    if (isCreated)
+    {
+        SCommand* tpCommand = GetCommand(szKey, pLuaMain);
+        tpCommand->sParent = pCommand->strKey;
+    }
+    else
+        return false;
+
+    return true;
+}
+
+bool CRegisteredCommands::RemoveAlias(CLuaMain* pLuaMain, const char* szKey, const char* szCommand)
+{
+    assert(pLuaMain);
+    assert(szKey);
+    assert(szCommand);
+
+    // Check if we already have this key and handler
+    SCommand* pCommand = GetCommand(szKey, pLuaMain);
+
+    if (!pCommand || !GetCommand(szCommand, pLuaMain))
+        return false;
+
+    if (pCommand->sParent == szCommand)
+    {
+        RemoveCommand(pLuaMain, szKey);
+    }
+    return true;
+}
+
 bool CRegisteredCommands::AddCommand(CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction, bool bCaseSensitive)
 {
     assert(pLuaMain);
@@ -41,6 +84,7 @@ bool CRegisteredCommands::AddCommand(CLuaMain* pLuaMain, const char* szKey, cons
     pCommand->strKey.AssignLeft(szKey, MAX_REGISTERED_COMMAND_LENGTH);
     pCommand->iLuaFunction = iLuaFunction;
     pCommand->bCaseSensitive = bCaseSensitive;
+    pCommand->sParent = "";
 
     // Add it to our list
     m_Commands.push_back(pCommand);
@@ -57,6 +101,7 @@ bool CRegisteredCommands::RemoveCommand(CLuaMain* pLuaMain, const char* szKey)
     list<SCommand*>::iterator iter = m_Commands.begin();
     int                       iCompareResult;
 
+    ClearAliases(pLuaMain, szKey);
     while (iter != m_Commands.end())
     {
         if ((*iter)->bCaseSensitive)
@@ -85,6 +130,23 @@ bool CRegisteredCommands::RemoveCommand(CLuaMain* pLuaMain, const char* szKey)
     }
 
     return bFound;
+}
+
+void CRegisteredCommands::ClearAliases(CLuaMain* pLuaMain, const char* szCommand)
+{
+    list<SCommand*>::const_iterator iter = m_Commands.begin();
+
+    while (iter != m_Commands.end())
+    {
+        if ((*iter)->pLuaMain == pLuaMain && (*iter)->sParent == szCommand)
+        {
+            // Delete the entry and remove it from the list
+            delete *iter;
+            iter = m_Commands.erase(iter);
+        }
+        else
+            ++iter;
+    }
 }
 
 void CRegisteredCommands::ClearCommands(void)

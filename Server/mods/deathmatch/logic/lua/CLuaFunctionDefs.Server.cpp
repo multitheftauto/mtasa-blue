@@ -204,6 +204,68 @@ int CLuaFunctionDefs::OutputDebugString(lua_State* luaVM)
     return 1;
 }
 
+int CLuaFunctionDefs::AddCommandAlias(lua_State* luaVM)
+{
+    // bool addCommandAlias( string commandAlias, string commandName )
+    SString strKey, strCommand;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strKey);
+    argStream.ReadString(strCommand);
+
+    if (strKey != strCommand)
+    {
+        if (!argStream.HasErrors())
+        {
+            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+            if (pLuaMain)
+            {
+                if (m_pRegisteredCommands->CommandExists(strCommand, pLuaMain))
+                {
+                    if (m_pRegisteredCommands->AddAlias(pLuaMain, strKey, strCommand))
+                    {
+                        lua_pushboolean(luaVM, true);
+                        return 1;
+                    }
+                }
+            }
+        }
+        else
+            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFunctionDefs::RemoveCommandAlias(lua_State* luaVM)
+{
+    // bool removeCommandAlias( string commandAlias, string command )
+    SString strKey, strCommand;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strKey);
+    argStream.ReadString(strCommand);
+
+    if (!argStream.HasErrors())
+    {
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
+        {
+            if (m_pRegisteredCommands->RemoveAlias(pLuaMain, strKey, strCommand))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaFunctionDefs::AddCommandHandler(lua_State* luaVM)
 {
     //  bool addCommandHandler ( string commandName, function handlerFunction, [bool restricted = false, bool caseSensitive = true] )
