@@ -28,7 +28,6 @@ bool CRegisteredCommands::AddAlias(CLuaMain* pLuaMain, const char* szKey, const 
     assert(szKey);
     assert(szCommand);
 
-    // Check if we already have this key and handler
     SCommand* pCommand = GetCommand(szCommand, pLuaMain);
 
     if (!pCommand)
@@ -37,6 +36,7 @@ bool CRegisteredCommands::AddAlias(CLuaMain* pLuaMain, const char* szKey, const 
     bool isCreated = AddCommand(pLuaMain, szKey, pCommand->iLuaFunction, pCommand->bRestricted, pCommand->bCaseSensitive);
     if (isCreated)
     {
+        // fast trick to set parent
         SCommand* tpCommand = GetCommand(szKey, pLuaMain);
         tpCommand->sParent = pCommand->strKey;
     }
@@ -52,7 +52,6 @@ bool CRegisteredCommands::RemoveAlias(CLuaMain* pLuaMain, const char* szKey, con
     assert(szKey);
     assert(szCommand);
 
-    // Check if we already have this key and handler
     SCommand* pCommand = GetCommand(szKey, pLuaMain);
 
     if (!pCommand || !GetCommand(szCommand, pLuaMain))
