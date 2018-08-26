@@ -245,6 +245,12 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
 
 CClientPed::~CClientPed(void)
 {
+    // A hack to destroy custom animation by playing a default internal animation.
+    // When IFP is unloaded by leaving the server, the pointer to its animations might
+    // still be somewhere in use, and a crash can occur by calling its members.
+    // So we switch to internal GTA animation to avoid the crash.
+    CStaticFunctionDefinitions::SetPedAnimation(*this, "ped", "idle_stance", -1, 250, true, false, false, false);
+
     g_pClientGame->RemovePedPointerFromSet(this);
 
     // Remove from the ped manager
