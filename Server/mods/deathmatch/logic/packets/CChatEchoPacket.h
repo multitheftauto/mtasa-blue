@@ -12,7 +12,6 @@
 #pragma once
 
 #include "CPacket.h"
-#include "../../Config.h"
 
 #define CHATCOLOR_SAY           235, 221, 178
 #define CHATCOLOR_TEAMSAY       235, 221, 178
@@ -47,15 +46,4 @@ private:
     unsigned char m_ucBlue;
     SString       m_strMessage;
     bool          m_bColorCoded;
-};
-
-class CChatClearPacket : public CPacket
-{
-public:
-    CChatClearPacket() {};
-
-    // Chat uses low priority channel to avoid getting queued behind large map downloads #6877
-    ePacketID               GetPacketID() const { return PACKET_ID_CHAT_CLEAR; };
-    unsigned long           GetFlags() const { return PACKET_LOW_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
-    virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_CHAT; }
 };
