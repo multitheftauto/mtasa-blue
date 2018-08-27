@@ -29,7 +29,7 @@ void CLuaVehicleDefs::LoadFunctions()
     CLuaCFunctions::AddFunction("getVehicleController", GetVehicleController);
     CLuaCFunctions::AddFunction("getVehicleRotation", GetVehicleRotation);
     CLuaCFunctions::AddFunction("getVehicleSirensOn", GetVehicleSirensOn);
-    CLuaCFunctions::AddFunction("getVehicleTurnVelocity", CLuaElementDefs::getElementTurnVelocity);
+    CLuaCFunctions::AddFunction("getVehicleTurnVelocity", GetVehicleTurnVelocity);
     CLuaCFunctions::AddFunction("getVehicleTurretPosition", GetVehicleTurretPosition);
     CLuaCFunctions::AddFunction("getVehicleMaxPassengers", GetVehicleMaxPassengers);
     CLuaCFunctions::AddFunction("isVehicleLocked", IsVehicleLocked);
@@ -66,7 +66,7 @@ void CLuaVehicleDefs::LoadFunctions()
     CLuaCFunctions::AddFunction("fixVehicle", FixVehicle);
     CLuaCFunctions::AddFunction("blowVehicle", BlowVehicle);
     CLuaCFunctions::AddFunction("setVehicleRotation", SetVehicleRotation);
-    CLuaCFunctions::AddFunction("setVehicleTurnVelocity", CLuaElementDefs::setElementTurnVelocity);
+    CLuaCFunctions::AddFunction("setVehicleTurnVelocity", SetVehicleTurnVelocity);
     CLuaCFunctions::AddFunction("setVehicleColor", SetVehicleColor);
     CLuaCFunctions::AddFunction("setVehicleLandingGearDown", SetVehicleLandingGearDown);
     CLuaCFunctions::AddFunction("setVehicleLocked", SetVehicleLocked);
@@ -178,7 +178,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "areSirensOn", "getVehicleSirensOn");
     lua_classfunction(luaVM, "getTowedByVehicle", "getVehicleTowedByVehicle");
     lua_classfunction(luaVM, "getTowingVehicle", "getVehicleTowingVehicle");
-    lua_classfunction(luaVM, "getTurnVelocity", "getVehicleTurnVelocity", CLuaElementDefs::OOP_getElementTurnVelocity);
+    lua_classfunction(luaVM, "getTurnVelocity", "getVehicleTurnVelocity", CLuaVehicleDefs::OOP_GetVehicleTurnVelocity);
     lua_classfunction(luaVM, "getTurretPosition", "getVehicleTurretPosition");
     lua_classfunction(luaVM, "getVehicleType", "getVehicleType");            // This isn't "getType" because it would overwrite Element.getType
     lua_classfunction(luaVM, "getUpgradeOnSlot", "getVehicleUpgradeOnSlot");
@@ -246,7 +246,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "maxPassengers", NULL, "getVehicleMaxPassengers");
     lua_classvariable(luaVM, "upgrades", NULL, "getVehicleUpgrades");
     lua_classvariable(luaVM, "turretPosition", "setVehicleTurretPosition", "getVehicleTurretPosition");
-    lua_classvariable(luaVM, "turnVelocity", "setVehicleTurnVelocity", "getVehicleTurnVelocity", CLuaElementDefs::setElementTurnVelocity, CLuaElementDefs::OOP_getElementTurnVelocity);
+    lua_classvariable(luaVM, "turnVelocity", "setVehicleTurnVelocity", "getVehicleTurnVelocity", SetVehicleTurnVelocity, OOP_GetVehicleTurnVelocity);
     lua_classvariable(luaVM, "overrideLights", "setVehicleOverrideLights", "getVehicleOverrideLights");
     lua_classvariable(luaVM, "idleRespawnDelay", "setVehicleIdleRespawnDelay", NULL);
     lua_classvariable(luaVM, "respawnDelay", "setVehicleRespawnDelay", NULL);
@@ -971,6 +971,54 @@ int CLuaVehicleDefs::GetVehicleSirensOn(lua_State* luaVM)
         if (CVehicleManager::HasSirens(pVehicle->GetModel()) || pVehicle->DoesVehicleHaveSirens())
         {
             lua_pushboolean(luaVM, pVehicle->IsSirenActive());
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::GetVehicleTurnVelocity(lua_State* luaVM)
+{
+    CVehicle* pVehicle;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+
+    if (!argStream.HasErrors())
+    {
+        CVector vecTurnVelocity;
+        if (CStaticFunctionDefinitions::GetVehicleTurnVelocity(pVehicle, vecTurnVelocity))
+        {
+            lua_pushnumber(luaVM, vecTurnVelocity.fX);
+            lua_pushnumber(luaVM, vecTurnVelocity.fY);
+            lua_pushnumber(luaVM, vecTurnVelocity.fZ);
+            return 3;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::OOP_GetVehicleTurnVelocity(lua_State* luaVM)
+{
+    CVehicle* pVehicle;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+
+    if (!argStream.HasErrors())
+    {
+        CVector vecTurnVelocity;
+        if (CStaticFunctionDefinitions::GetVehicleTurnVelocity(pVehicle, vecTurnVelocity))
+        {
+            lua_pushvector(luaVM, vecTurnVelocity);
             return 1;
         }
     }
@@ -1773,6 +1821,30 @@ int CLuaVehicleDefs::SetVehicleRotation(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         if (CStaticFunctionDefinitions::SetVehicleRotation(pElement, vecRotation))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::SetVehicleTurnVelocity(lua_State* luaVM)
+{
+    CElement* pElement;
+    CVector   vecTurnVelocity;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadVector3D(vecTurnVelocity);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetVehicleTurnVelocity(pElement, vecTurnVelocity))
         {
             lua_pushboolean(luaVM, true);
             return 1;

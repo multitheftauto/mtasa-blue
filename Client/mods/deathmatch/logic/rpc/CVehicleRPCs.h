@@ -23,6 +23,7 @@ public:
     DECLARE_ELEMENT_RPC(FixVehicle);
     DECLARE_ELEMENT_RPC(BlowVehicle);
     DECLARE_ELEMENT_RPC(SetVehicleRotation);
+    DECLARE_ELEMENT_RPC(SetVehicleTurnSpeed);
     DECLARE_ELEMENT_RPC(SetVehicleColor);
     DECLARE_ELEMENT_RPC(SetVehicleModel);
     DECLARE_ELEMENT_RPC(SetVehicleLocked);

@@ -232,6 +232,7 @@ public:
     static bool SetVehicleDoorsUndamageable(CClientEntity& Entity, bool bDoorsUndamageable);
     static bool SetVehicleRotation(CClientEntity& Entity, const CVector& vecRotation);
     static bool SetVehicleSirensOn(CClientEntity& Entity, bool bSirensOn);
+    static bool SetVehicleTurnVelocity(CClientEntity& Entity, const CVector& vecTurnVelocity);
     static bool AddVehicleUpgrade(CClientEntity& Entity, unsigned short usUpgrade);
     static bool AddAllVehicleUpgrades(CClientEntity& Entity);
     static bool RemoveVehicleUpgrade(CClientEntity& Entity, unsigned short usUpgrade);

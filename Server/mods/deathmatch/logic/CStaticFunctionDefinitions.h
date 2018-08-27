@@ -239,6 +239,7 @@ public:
     static CPed* GetVehicleOccupant(CVehicle* pVehicle, unsigned int uiSeat);
     static CPed* GetVehicleController(CVehicle* pVehicle);
     static bool  GetVehicleRotation(CVehicle* pVehicle, CVector& vecRotation);
+    static bool  GetVehicleTurnVelocity(CVehicle* pVehicle, CVector& vecTurnVelocity);
     static bool  GetVehicleTurretPosition(CVehicle* pVehicle, CVector2D& vecPosition);
     static bool  IsVehicleLocked(CVehicle* pVehicle, bool& bLocked);
     static bool  GetVehicleUpgradeOnSlot(CVehicle* pVehicle, unsigned char ucSlot, unsigned short& usUpgrade);
@@ -292,6 +293,7 @@ public:
     static bool SetVehicleRotation(CElement* pElement, const CVector& vecRotation);
     static bool SetVehicleSirensOn(CElement* pElement, bool bSirensOn);
     static bool SetVehicleTaxiLightOn(CElement* pElement, bool bTaxiLightState);
+    static bool SetVehicleTurnVelocity(CElement* pElement, const CVector& vecTurnVelocity);
     static bool AddVehicleUpgrade(CElement* pElement, unsigned short usUpgrade);
     static bool AddAllVehicleUpgrades(CElement* pElement);
     static bool RemoveVehicleUpgrade(CElement* pElement, unsigned short usUpgrade);
