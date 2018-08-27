@@ -82,7 +82,7 @@ public:
     static bool SetElementPosition(CElement* pElement, const CVector& vecPosition, bool bWarp = true);
     static bool SetElementRotation(CElement* pElement, const CVector& vecRotation, eEulerRotationOrder rotationOrder, bool bNewWay);
     static bool SetElementVelocity(CElement* pElement, const CVector& vecVelocity);
-    static bool SetElementTurnVelocity(CElement* pElement, const CVector& vecTurnVelocity);
+    static bool SetElementAngularVelocity(CElement* pElement, const CVector& vecTurnVelocity);
     static bool SetElementVisibleTo(CElement* pElement, CElement* pReference, bool bVisible);
     static bool SetElementInterior(CElement* pElement, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition);
     static bool SetElementDimension(CElement* pElement, unsigned short usDimension);

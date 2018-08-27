@@ -1401,10 +1401,10 @@ bool CStaticFunctionDefinitions::SetElementVelocity(CElement* pElement, const CV
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetElementTurnVelocity(CElement* pElement, const CVector& vecTurnVelocity)
+bool CStaticFunctionDefinitions::SetElementAngularVelocity(CElement* pElement, const CVector& vecTurnVelocity)
 {
     assert(pElement);
-    RUN_CHILDREN(SetElementTurnVelocity(*iter, vecTurnVelocity))
+    RUN_CHILDREN(SetElementAngularVelocity(*iter, vecTurnVelocity))
 
     int iType = pElement->GetType();
     switch (iType)
@@ -1436,7 +1436,7 @@ bool CStaticFunctionDefinitions::SetElementTurnVelocity(CElement* pElement, cons
     BitStream.pBitStream->Write(vecTurnVelocity.fX);
     BitStream.pBitStream->Write(vecTurnVelocity.fY);
     BitStream.pBitStream->Write(vecTurnVelocity.fZ);
-    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_TURNSPEED, *BitStream.pBitStream));
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_ANGULAR_VELOCITY, *BitStream.pBitStream));
 
     return true;
 }

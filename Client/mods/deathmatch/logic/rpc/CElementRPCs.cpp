@@ -22,7 +22,7 @@ void CElementRPCs::LoadFunctions(void)
     AddHandler(REMOVE_ELEMENT_DATA, RemoveElementData, "RemoveElementData");
     AddHandler(SET_ELEMENT_POSITION, SetElementPosition, "SetElementPosition");
     AddHandler(SET_ELEMENT_VELOCITY, SetElementVelocity, "SetElementVelocity");
-    AddHandler(SET_ELEMENT_TURNSPEED, SetElementTurnVelocity, "SetElementTurnVelocity");
+    AddHandler(SET_ELEMENT_ANGULAR_VELOCITY, SetElementAngularVelocity, "SetElementAngularVelocity");
     AddHandler(SET_ELEMENT_INTERIOR, SetElementInterior, "SetElementInterior");
     AddHandler(SET_ELEMENT_DIMENSION, SetElementDimension, "SetElementDimension");
     AddHandler(ATTACH_ELEMENTS, AttachElements, "AttachElements");
@@ -211,7 +211,7 @@ void CElementRPCs::SetElementVelocity(CClientEntity* pSource, NetBitStreamInterf
     }
 }
 
-void CElementRPCs::SetElementTurnVelocity(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+void CElementRPCs::SetElementAngularVelocity(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the entity id and the turn speed
     CVector vecTurnVelocity;

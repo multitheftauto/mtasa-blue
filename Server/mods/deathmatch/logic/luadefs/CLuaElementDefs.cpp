@@ -1899,7 +1899,7 @@ int CLuaElementDefs::setElementTurnVelocity(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Set the turn velocity
-        if (CStaticFunctionDefinitions::SetElementTurnVelocity(pElement, vecTurnVelocity))
+        if (CStaticFunctionDefinitions::SetElementAngularVelocity(pElement, vecTurnVelocity))
         {
             lua_pushboolean(luaVM, true);
             return 1;

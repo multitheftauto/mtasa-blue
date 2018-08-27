@@ -78,7 +78,7 @@ public:
     LUA_DECLARE(SetElementPosition);
     LUA_DECLARE_OOP(SetElementRotation);
     LUA_DECLARE(SetElementVelocity);
-    LUA_DECLARE(SetElementTurnVelocity);
+    LUA_DECLARE(SetElementAngularVelocity);
     LUA_DECLARE(SetElementParent);
     LUA_DECLARE(SetElementInterior);
     LUA_DECLARE(SetElementDimension);

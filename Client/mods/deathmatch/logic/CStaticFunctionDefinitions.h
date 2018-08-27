@@ -88,7 +88,7 @@ public:
     static bool          SetElementPosition(CClientEntity& Entity, const CVector& vecPosition, bool bWarp = true);
     static bool          SetElementRotation(CClientEntity& Entity, const CVector& vecRotation, eEulerRotationOrder rotationOrder, bool bNewWay);
     static bool          SetElementVelocity(CClientEntity& Element, const CVector& vecVelocity);
-    static bool          SetElementTurnVelocity(CClientEntity& Element, const CVector& vecTurnVelocity);
+    static bool          SetElementAngularVelocity(CClientEntity& Element, const CVector& vecTurnVelocity);
     static bool          SetElementParent(CClientEntity& Element, CClientEntity& Parent, CLuaMain* pLuaMain);
     static bool          SetElementInterior(CClientEntity& Entity, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition);
     static bool          SetElementDimension(CClientEntity& Entity, unsigned short usDimension);

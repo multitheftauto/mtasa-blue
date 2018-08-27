@@ -1160,9 +1160,9 @@ bool CStaticFunctionDefinitions::SetElementVelocity(CClientEntity& Entity, const
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetElementTurnVelocity(CClientEntity& Entity, const CVector& vecTurnVelocity)
+bool CStaticFunctionDefinitions::SetElementAngularVelocity(CClientEntity& Entity, const CVector& vecTurnVelocity)
 {
-    RUN_CHILDREN(SetElementTurnVelocity(**iter, vecTurnVelocity))
+    RUN_CHILDREN(SetElementAngularVelocity(**iter, vecTurnVelocity))
 
     int iType = Entity.GetType();
     switch (iType)

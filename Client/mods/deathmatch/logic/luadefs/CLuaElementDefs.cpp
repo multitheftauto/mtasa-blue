@@ -77,7 +77,7 @@ void CLuaElementDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("setElementPosition", SetElementPosition);
     CLuaCFunctions::AddFunction("setElementRotation", SetElementRotation);
     CLuaCFunctions::AddFunction("setElementVelocity", SetElementVelocity);
-    CLuaCFunctions::AddFunction("setElementAngularVelocity", SetElementTurnVelocity);
+    CLuaCFunctions::AddFunction("setElementAngularVelocity", SetElementAngularVelocity);
     CLuaCFunctions::AddFunction("setElementInterior", SetElementInterior);
     CLuaCFunctions::AddFunction("setElementDimension", SetElementDimension);
     CLuaCFunctions::AddFunction("attachElements", AttachElements);
@@ -209,7 +209,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "rotation", OOP_SetElementRotation, OOP_GetElementRotation);
     lua_classvariable(luaVM, "matrix", SetElementMatrix, OOP_GetElementMatrix);
     lua_classvariable(luaVM, "velocity", SetElementVelocity, OOP_GetElementVelocity);
-    lua_classvariable(luaVM, "angularVelocity", SetElementTurnVelocity, OOP_GetElementTurnVelocity);
+    lua_classvariable(luaVM, "angularVelocity", SetElementAngularVelocity, OOP_GetElementTurnVelocity);
     lua_classvariable(luaVM, "isElement", NULL, "isElement");
     // TODO: Support element data: player.data["age"] = 1337; <=> setElementData(player, "age", 1337)
 
@@ -1996,7 +1996,7 @@ int CLuaElementDefs::SetElementVelocity(lua_State* luaVM)
     return 1;
 }
 
-int CLuaElementDefs::SetElementTurnVelocity(lua_State* luaVM)
+int CLuaElementDefs::SetElementAngularVelocity(lua_State* luaVM)
 {
     CClientEntity* pEntity;
     CVector        vecTurnVelocity;
@@ -2009,7 +2009,7 @@ int CLuaElementDefs::SetElementTurnVelocity(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Set the turn velocity
-        if (CStaticFunctionDefinitions::SetElementTurnVelocity(*pEntity, vecTurnVelocity))
+        if (CStaticFunctionDefinitions::SetElementAngularVelocity(*pEntity, vecTurnVelocity))
         {
             lua_pushboolean(luaVM, true);
             return 1;
