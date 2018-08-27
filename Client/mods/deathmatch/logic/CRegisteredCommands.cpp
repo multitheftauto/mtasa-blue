@@ -151,7 +151,7 @@ void CRegisteredCommands::ClearAliases(CLuaMain* pLuaMain, const char* szCommand
 void CRegisteredCommands::ClearCommands(void)
 {
     // Delete all the commands
-    list<SCommand*>::iterator iter = m_Commands.begin();
+    list<SCommand*>::const_iterator iter = m_Commands.begin();
     for (; iter != m_Commands.end(); iter++)
     {
         delete *iter;
