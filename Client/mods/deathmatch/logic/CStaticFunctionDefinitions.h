@@ -44,6 +44,7 @@ public:
     static bool SetClipboard(SString& strText);
     static bool GetClipboard(SString& strText);
     static bool SetWindowFlashing(bool flash, uint count);
+    static bool ClearChatBox(void);
 
     // Notification funcs
     static bool CreateTrayNotification(SString strText, eTrayIconType eType, bool useSound);

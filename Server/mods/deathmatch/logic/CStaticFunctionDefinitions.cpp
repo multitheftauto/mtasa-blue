@@ -9899,6 +9899,21 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
     return false;
 }
 
+bool CStaticFunctionDefinitions::ClearChatBox(CElement* pElement)
+{
+    assert(pElement);
+
+    RUN_CHILDREN(ClearChatBox(*iter))
+
+    if (IS_PLAYER(pElement))
+    {
+        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
+        pPlayer->Send(CChatClearPacket());
+        return true;
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::OutputConsole(const char* szText, CElement* pElement)
 {
     assert(pElement);

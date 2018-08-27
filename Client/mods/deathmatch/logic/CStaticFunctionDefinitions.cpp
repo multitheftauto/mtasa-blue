@@ -233,6 +233,12 @@ bool CStaticFunctionDefinitions::OutputConsole(const char* szText)
     return true;
 }
 
+bool CStaticFunctionDefinitions::ClearChatBox()
+{
+    m_pCore->ClearChat();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded)
 {
     if (strlen(szText) <= MAX_OUTPUTCHATBOX_LENGTH)
