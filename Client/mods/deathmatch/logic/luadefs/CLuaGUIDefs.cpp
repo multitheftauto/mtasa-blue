@@ -262,7 +262,7 @@ void CLuaGUIDefs::AddGuiWindowClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setSizable", "guiWindowSetSizable");
     lua_classfunction(luaVM, "isMovable", "guiWindowIsMovable");
     lua_classfunction(luaVM, "isSizable", "guiWindowIsSizable");
-  
+
     lua_classvariable(luaVM, "movable", "guiWindowSetMovable", "guiWindowIsMovable");
     lua_classvariable(luaVM, "sizable", "guiWindowSetSizable", "guiWindowIsSizable");
 
