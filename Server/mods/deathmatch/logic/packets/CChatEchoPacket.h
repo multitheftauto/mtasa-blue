@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CPacket.h"
+#include "../../Config.h"
 
 #define CHATCOLOR_SAY           235, 221, 178
 #define CHATCOLOR_TEAMSAY       235, 221, 178
