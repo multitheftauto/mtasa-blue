@@ -45,6 +45,7 @@ public:
     LUA_DECLARE(getElementsByType);
     LUA_DECLARE(getElementInterior);
     LUA_DECLARE(getElementsWithinColShape);
+    LUA_DECLARE(getElementsWithinRange);
     LUA_DECLARE(getElementDimension);
     LUA_DECLARE(getElementZoneName);
     LUA_DECLARE(getElementColShape);

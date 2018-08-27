@@ -166,6 +166,7 @@ namespace
         {"setElementCallPropagationEnabled", "1.3.5-9.06118"},
         {"isElementCallPropagationEnabled", "1.3.5-9.06118"},
         {"getResourceState", "1.3.5-9.06194"},
+        {"isPedWearingJetpack", "1.5.5-9.13846"},
     };
 
     SVersionItem serverFunctionInitList[] = {
@@ -242,6 +243,8 @@ namespace
         {"isElementCallPropagationEnabled", "1.3.5-9.06118"},
         {"resendPlayerACInfo", "1.5.1-9.07633"},
         {"dbPrepareString", "1.5.2"},
+        {"isPedWearingJetpack", "1.5.5-9.13846"},
+        {"setPedWearingJetpack", "1.5.5-9.13846"},
     };
 
     //
@@ -250,7 +253,12 @@ namespace
 
     struct SDeprecatedItem
     {
+        // bRemoved does not mean:
+        //     "has this function been removed yet?"
+        // bRemoved actually means:
+        //     "is not rename?" (you can't rename removed functions)
         bool    bRemoved;
+
         SString strOldName;
         SString strNewName;
         SString strVersion;
@@ -326,6 +334,11 @@ namespace
 
         {false, "getComponentPosition", "will return 3 floats instead of a Vector3", "1.5.5-9.11710"},
         {false, "getComponentRotation", "will return 3 floats instead of a Vector3", "1.5.5-9.11710"},
+
+        {false, "getBoundingBox", "will return 6 floats instead of 2 Vector3", "1.5.5-9.13999"},
+
+        // Ped jetpacks
+        {false, "doesPedHaveJetPack", "isPedWearingJetpack"},
     };
 
     SDeprecatedItem serverDeprecatedList[] = {
@@ -369,8 +382,6 @@ namespace
         {false, "setPlayerStat", "setPedStat"},
         {false, "addPlayerClothes", "addPedClothes"},
         {false, "removePlayerClothes", "removePedClothes"},
-        {false, "givePlayerJetPack", "givePedJetPack"},
-        {false, "removePlayerJetPack", "removePedJetPack"},
         {false, "setPlayerFightingStyle", "setPedFightingStyle"},
         {false, "setPlayerGravity", "setPedGravity"},
         {false, "setPlayerChoking", "setPedChoking"},
@@ -381,6 +392,14 @@ namespace
         {false, "showPlayerHudComponent", "setPlayerHudComponentVisible"},
         {false, "getVehicleTurnVelocity", "getElementAngularVelocity"},
         {false, "setVehicleTurnVelocity", "setElementAngularVelocity"},
+
+        // Server ped jetpack
+        {true, "givePlayerJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
+        {true, "removePlayerJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
+        //{true, "givePedJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
+        //{true, "removePedJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
+        {false, "doesPedHaveJetPack", "isPedWearingJetpack"},
+
         // XML
         {false, "xmlNodeGetSubNodes", "xmlNodeGetChildren"},
         {false, "xmlCreateSubNode", "xmlCreateChild"},

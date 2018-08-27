@@ -54,6 +54,7 @@ public:
     CAnimBlendAssociationSAInterface*    InitializeForCustomAnimation(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy);
     void                                 InitializeWithHierarchy(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy);
     void                                 AllocateAnimBlendNodeArray(int count);
+    void                                 FreeAnimBlendNodeArray();
     CAnimBlendAssociationSAInterface*    GetInterface() { return m_pInterface; }
     AssocGroupId                         GetAnimGroup() { return (AssocGroupId)m_pInterface->sAnimGroup; }
     AnimationId                          GetAnimID() { return (AnimationId)m_pInterface->sAnimID; }

@@ -4276,43 +4276,59 @@ bool CStaticFunctionDefinitions::GetSFXStatus(eAudioLookupIndex containerIndex, 
 CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip(CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize,
                                                            const SColor color, short sOrdering, unsigned short usVisibleDistance)
 {
-    CClientRadarMarker* pBlip = new CClientRadarMarker(m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance);
-    if (pBlip)
+    // Valid icon and size?
+    if (CClientRadarMarkerManager::IsValidIcon(ucIcon) && ucSize <= 25)
     {
-        pBlip->SetParent(Resource.GetResourceDynamicEntity());
-        pBlip->SetPosition(vecPosition);
-        pBlip->SetSprite(ucIcon);
-        pBlip->SetScale(ucSize);
-        pBlip->SetColor(color);
+        CClientRadarMarker* pBlip = new CClientRadarMarker(m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance);
+        if (pBlip)
+        {
+            pBlip->SetParent(Resource.GetResourceDynamicEntity());
+            pBlip->SetPosition(vecPosition);
+            pBlip->SetSprite(ucIcon);
+            pBlip->SetScale(ucSize);
+            pBlip->SetColor(color);
+        }
+        return pBlip;
     }
-    return pBlip;
+
+    return nullptr;
 }
 
 CClientRadarMarker* CStaticFunctionDefinitions::CreateBlipAttachedTo(CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize,
                                                                      const SColor color, short sOrdering, unsigned short usVisibleDistance)
 {
-    CClientRadarMarker* pBlip = new CClientRadarMarker(m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance);
-    if (pBlip)
+    assert(&Entity);
+    // Valid icon and size?
+    if (CClientRadarMarkerManager::IsValidIcon(ucIcon) && ucSize <= 25)
     {
-        pBlip->SetParent(Resource.GetResourceDynamicEntity());
-        pBlip->AttachTo(&Entity);
-        pBlip->SetSprite(ucIcon);
-        pBlip->SetScale(ucSize);
-        pBlip->SetColor(color);
+        CClientRadarMarker* pBlip = new CClientRadarMarker(m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance);
+        if (pBlip)
+        {
+            pBlip->SetParent(Resource.GetResourceDynamicEntity());
+            pBlip->AttachTo(&Entity);
+            pBlip->SetSprite(ucIcon);
+            pBlip->SetScale(ucSize);
+            pBlip->SetColor(color);
+        }
+        return pBlip;
     }
-    return pBlip;
+
+    return nullptr;
 }
 
 bool CStaticFunctionDefinitions::SetBlipIcon(CClientEntity& Entity, unsigned char ucIcon)
 {
-    RUN_CHILDREN(SetBlipIcon(**iter, ucIcon))
-
-    if (IS_RADARMARKER(&Entity))
+    if (CClientRadarMarkerManager::IsValidIcon(ucIcon))
     {
-        CClientRadarMarker& Marker = static_cast<CClientRadarMarker&>(Entity);
+        RUN_CHILDREN(SetBlipIcon(**iter, ucIcon))
 
-        Marker.SetSprite(ucIcon);
-        return true;
+        if (IS_RADARMARKER(&Entity))
+        {
+            CClientRadarMarker& Marker = static_cast<CClientRadarMarker&>(Entity);
+
+            Marker.SetSprite(ucIcon);
+            return true;
+        }
     }
 
     return false;
@@ -4320,14 +4336,17 @@ bool CStaticFunctionDefinitions::SetBlipIcon(CClientEntity& Entity, unsigned cha
 
 bool CStaticFunctionDefinitions::SetBlipSize(CClientEntity& Entity, unsigned char ucSize)
 {
-    RUN_CHILDREN(SetBlipSize(**iter, ucSize))
-
-    if (IS_RADARMARKER(&Entity))
+    if (ucSize <= 25)
     {
-        CClientRadarMarker& Marker = static_cast<CClientRadarMarker&>(Entity);
+        RUN_CHILDREN(SetBlipSize(**iter, ucSize))
 
-        Marker.SetScale(ucSize);
-        return true;
+        if (IS_RADARMARKER(&Entity))
+        {
+            CClientRadarMarker& Marker = static_cast<CClientRadarMarker&>(Entity);
+
+            Marker.SetScale(ucSize);
+            return true;
+        }
     }
 
     return false;

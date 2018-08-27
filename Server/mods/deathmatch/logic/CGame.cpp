@@ -514,7 +514,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pRegisteredCommands = new CRegisteredCommands(m_pACLManager);
     m_pLuaManager = new CLuaManager(m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pRegisteredCommands,
                                     m_pMapManager, &m_Events);
-    m_pConsole = new CConsole(m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager, m_pLuaManager, &m_WhoWas,
+    m_pConsole = new CConsole(m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager, m_pLuaManager,
                               m_pBanManager, m_pACLManager);
     m_pMainConfig = new CMainConfig(m_pConsole, m_pLuaManager);
     m_pRPCFunctions = new CRPCFunctions;
@@ -1786,9 +1786,6 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                     return;
                                 }
                             #endif
-
-                                // Add him to the whowas list
-                                m_WhoWas.Add(szNick, Packet.GetSourceIP(), pPlayer->GetSerial(), pPlayer->GetPlayerVersion(), pPlayer->GetAccount()->GetName());
 
                                 PlayerCompleteConnect(pPlayer);
                             }

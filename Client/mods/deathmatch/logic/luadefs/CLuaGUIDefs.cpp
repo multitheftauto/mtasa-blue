@@ -11,6 +11,29 @@
 
 #include "StdInc.h"
 
+static const SFixedArray<const char*, MAX_CHATBOX_LAYOUT_CVARS> g_chatboxLayoutCVars = {{
+    "chat_font",
+    "chat_lines",
+    "chat_color",
+    "chat_text_color",
+    "chat_input_color",
+    "chat_input_prefix_color",
+    "chat_input_text_color",
+    "chat_scale",
+    "chat_position_offset_x",
+    "chat_position_offset_y",
+    "chat_position_horizontal",
+    "chat_position_vertical",
+    "chat_text_alignment",
+    "chat_width",
+    "chat_css_style_text",
+    "chat_css_style_background",
+    "chat_line_life",
+    "chat_line_fade_out",
+    "chat_use_cegui",
+    "text_scale"
+}};
+
 void CLuaGUIDefs::LoadFunctions(void)
 {
     CLuaCFunctions::AddFunction("guiGetInputEnabled", GUIGetInputEnabled);
@@ -126,7 +149,9 @@ void CLuaGUIDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("guiEditSetCaretIndex", GUIEditSetCaretIndex);
     CLuaCFunctions::AddFunction("guiEditGetCaretIndex", GUIEditGetCaretIndex);
     CLuaCFunctions::AddFunction("guiEditSetMasked", GUIEditSetMasked);
+    CLuaCFunctions::AddFunction("guiEditIsMasked", GUIEditIsMasked);
     CLuaCFunctions::AddFunction("guiEditSetMaxLength", GUIEditSetMaxLength);
+    CLuaCFunctions::AddFunction("guiEditGetMaxLength", GUIEditGetMaxLength);
     CLuaCFunctions::AddFunction("guiEditSetReadOnly", GUIEditSetReadOnly);
     CLuaCFunctions::AddFunction("guiEditIsReadOnly", GUIEditIsReadOnly);
 
@@ -147,6 +172,8 @@ void CLuaGUIDefs::LoadFunctions(void)
 
     CLuaCFunctions::AddFunction("guiWindowSetMovable", GUIWindowSetMovable);
     CLuaCFunctions::AddFunction("guiWindowSetSizable", GUIWindowSetSizable);
+    CLuaCFunctions::AddFunction("guiWindowIsMovable", GUIWindowIsMovable);
+    CLuaCFunctions::AddFunction("guiWindowIsSizable", GUIWindowIsSizable);
 
     CLuaCFunctions::AddFunction("getChatboxLayout", GUIGetChatboxLayout);
 
@@ -250,11 +277,15 @@ void CLuaGUIDefs::AddGuiWindowClass(lua_State* luaVM)
     lua_newclass(luaVM);
 
     lua_classfunction(luaVM, "create", "guiCreateWindow");
+
     lua_classfunction(luaVM, "setMovable", "guiWindowSetMovable");
     lua_classfunction(luaVM, "setSizable", "guiWindowSetSizable");
 
-    lua_classvariable(luaVM, "movable", "guiWindowSetMovable", NULL);
-    lua_classvariable(luaVM, "sizable", "guiWindowSetSizable", NULL);
+    lua_classfunction(luaVM, "isMovable", "guiWindowIsMovable");
+    lua_classfunction(luaVM, "isSizable", "guiWindowIsSizable");
+
+    lua_classvariable(luaVM, "movable", "guiWindowSetMovable", "guiWindowIsMovable");
+    lua_classvariable(luaVM, "sizable", "guiWindowSetSizable", "guiWindowIsSizable");
 
     lua_registerclass(luaVM, "GuiWindow", "GuiElement");
 }
@@ -281,8 +312,8 @@ void CLuaGUIDefs::AddGuiEditClass(lua_State* luaVM)
 
     lua_classvariable(luaVM, "caretIndex", "guiEditSetCaretIndex", "guiEditGetCaretIndex");
     lua_classvariable(luaVM, "readOnly", "guiEditSetReadOnly", "guiEditIsReadOnly");
-    lua_classvariable(luaVM, "masked", "guiEditSetMasked", NULL);
-    lua_classvariable(luaVM, "maxLength", "guiEditSetMaxLength", NULL);
+    lua_classvariable(luaVM, "masked", "guiEditSetMasked", "guiEditIsMasked");
+    lua_classvariable(luaVM, "maxLength", "guiEditSetMaxLength", "guiEditGetMaxLength");
 
     lua_registerclass(luaVM, "GuiEdit", "GuiElement");
 }
@@ -3044,6 +3075,28 @@ int CLuaGUIDefs::GUIEditSetMasked(lua_State* luaVM)
     return 1;
 }
 
+int CLuaGUIDefs::GUIEditIsMasked(lua_State* luaVM)
+{
+    //bool guiEditIsMasked(element theElement)
+    CClientGUIElement* theElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIEdit>(theElement);
+    
+    if (!argStream.HasErrors())
+    {
+        bool masked = static_cast<CGUIEdit*>(theElement->GetCGUIElement())->IsMasked();
+        lua_pushboolean(luaVM, masked);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushnil(luaVM);
+    return 1;
+}
+
 int CLuaGUIDefs::GUIEditSetMaxLength(lua_State* luaVM)
 {
     //  bool guiEditSetMaxLength ( element theElement, int length )
@@ -3058,6 +3111,27 @@ int CLuaGUIDefs::GUIEditSetMaxLength(lua_State* luaVM)
     {
         CStaticFunctionDefinitions::GUIEditSetMaxLength(*theElement, length);
         lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIEditGetMaxLength(lua_State* luaVM)
+{
+    // int guiEditGetMaxLength(element theElement)
+    CClientGUIElement* theElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIEdit>(theElement);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushnumber(luaVM, static_cast<CGUIEdit*>(theElement->GetCGUIElement())->GetMaxLength());
         return 1;
     }
     else
@@ -3228,6 +3302,28 @@ int CLuaGUIDefs::GUIWindowSetMovable(lua_State* luaVM)
     return 1;
 }
 
+int CLuaGUIDefs::GUIWindowIsMovable(lua_State* luaVM)
+{
+    // bool guiWindowIsMovable( element theElement )
+    CClientGUIElement* theElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIWindow>(theElement);
+
+    if (!argStream.HasErrors())
+    {
+        bool movable = static_cast<CGUIWindow*>(theElement->GetCGUIElement())->IsMovable();
+        lua_pushboolean(luaVM, movable);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushnil(luaVM);
+    return 1;
+}
+
 int CLuaGUIDefs::GUIWindowSetSizable(lua_State* luaVM)
 {
     //  bool guiWindowSetSizable ( element theElement, bool status )
@@ -3249,6 +3345,28 @@ int CLuaGUIDefs::GUIWindowSetSizable(lua_State* luaVM)
 
     // error: bad arguments
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIWindowIsSizable(lua_State* luaVM)
+{
+    // bool guiWindowIsSizable( elemen theElement )
+    CClientGUIElement* theElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIWindow>(theElement);
+
+    if (!argStream.HasErrors())
+    {
+        bool sizable = static_cast<CGUIWindow*>(theElement->GetCGUIElement())->IsSizingEnabled();
+        lua_pushboolean(luaVM, sizable);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    
+    // error: bad arguments
+    lua_pushnil(luaVM);
     return 1;
 }
 
@@ -3424,176 +3542,102 @@ int CLuaGUIDefs::GUIGetChatboxLayout(lua_State* luaVM)
     //* chat_use_cegui - Returns whether CEGUI is used to render the chatbox
     //* text_scale - Returns text scale
 
-    CCVarsInterface* pCVars = g_pCore->GetCVars();
-    int              iNumber;
-    float            fNumber;
-    pCVars->Get("chat_font", fNumber);
-    lua_newtable(luaVM);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "chat_font");
-    pCVars->Get("chat_lines", fNumber);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "chat_lines");
-    pCVars->Get("chat_width", fNumber);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "chat_width");
-    pCVars->Get("chat_position_offset_x", fNumber);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "chat_position_offset_x");
-    pCVars->Get("chat_position_offset_y", fNumber);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "chat_position_offset_y");
-    pCVars->Get("chat_position_horizontal", iNumber);
-    lua_pushnumber(luaVM, iNumber);
-    lua_setfield(luaVM, -2, "chat_position_horizontal");
-    pCVars->Get("chat_position_vertical", iNumber);
-    lua_pushnumber(luaVM, iNumber);
-    lua_setfield(luaVM, -2, "chat_position_vertical");
-    pCVars->Get("chat_text_alignment", iNumber);
-    lua_pushnumber(luaVM, iNumber);
-    lua_setfield(luaVM, -2, "chat_text_alignment");
-    pCVars->Get("chat_css_style_text", fNumber);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "chat_css_style_text");
-    pCVars->Get("chat_css_style_background", fNumber);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "chat_css_style_background");
-    pCVars->Get("chat_line_life", fNumber);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "chat_line_life");
-    pCVars->Get("chat_line_fade_out", fNumber);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "chat_line_fade_out");
-    pCVars->Get("text_scale", fNumber);
-    lua_pushnumber(luaVM, fNumber);
-    lua_setfield(luaVM, -2, "text_scale");
-    pCVars->Get("chat_use_cegui", fNumber);
-    lua_pushboolean(luaVM, fNumber ? true : false);
-    lua_setfield(luaVM, -2, "chat_use_cegui");
-    std::string       strCVar;
+    CScriptArgReader  argStream(luaVM);
+    CCVarsInterface*  pCVars = g_pCore->GetCVars();
+    float             fNumber;
+    SString           strCVarValue;
     std::stringstream ss;
     int               iR, iG, iB, iA;
-    pCVars->Get("chat_color", strCVar);
-    if (!strCVar.empty())
-    {
-        ss.str(strCVar);
-        ss >> iR >> iG >> iB >> iA;
-        lua_newtable(luaVM);
-        lua_pushnumber(luaVM, 1);
-        lua_pushnumber(luaVM, iR);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 2);
-        lua_pushnumber(luaVM, iG);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 3);
-        lua_pushnumber(luaVM, iB);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 4);
-        lua_pushnumber(luaVM, iA);
-        lua_settable(luaVM, -3);
-        lua_setfield(luaVM, -2, "chat_color");
-    }
-    pCVars->Get("chat_text_color", strCVar);
-    if (!strCVar.empty())
-    {
-        ss.clear();
-        ss.str(strCVar);
-        ss >> iR >> iG >> iB >> iA;
-        lua_newtable(luaVM);
-        lua_pushnumber(luaVM, 1);
-        lua_pushnumber(luaVM, iR);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 2);
-        lua_pushnumber(luaVM, iG);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 3);
-        lua_pushnumber(luaVM, iB);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 4);
-        lua_pushnumber(luaVM, iA);
-        lua_settable(luaVM, -3);
-        lua_setfield(luaVM, -2, "chat_text_color");
-    }
-    pCVars->Get("chat_input_color", strCVar);
-    if (!strCVar.empty())
-    {
-        ss.clear();
-        ss.str(strCVar);
-        ss >> iR >> iG >> iB >> iA;
-        lua_newtable(luaVM);
-        lua_pushnumber(luaVM, 1);
-        lua_pushnumber(luaVM, iR);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 2);
-        lua_pushnumber(luaVM, iG);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 3);
-        lua_pushnumber(luaVM, iB);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 4);
-        lua_pushnumber(luaVM, iA);
-        lua_settable(luaVM, -3);
-        lua_setfield(luaVM, -2, "chat_input_color");
-    }
-    pCVars->Get("chat_input_prefix_color", strCVar);
-    if (!strCVar.empty())
-    {
-        ss.clear();
-        ss.str(strCVar);
-        ss >> iR >> iG >> iB >> iA;
-        lua_newtable(luaVM);
-        lua_pushnumber(luaVM, 1);
-        lua_pushnumber(luaVM, iR);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 2);
-        lua_pushnumber(luaVM, iG);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 3);
-        lua_pushnumber(luaVM, iB);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 4);
-        lua_pushnumber(luaVM, iA);
-        lua_settable(luaVM, -3);
-        lua_setfield(luaVM, -2, "chat_input_prefix_color");
-    }
-    pCVars->Get("chat_input_text_color", strCVar);
-    if (!strCVar.empty())
-    {
-        ss.clear();
-        ss.str(strCVar);
-        ss >> iR >> iG >> iB >> iA;
-        lua_newtable(luaVM);
-        lua_pushnumber(luaVM, 1);
-        lua_pushnumber(luaVM, iR);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 2);
-        lua_pushnumber(luaVM, iG);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 3);
-        lua_pushnumber(luaVM, iB);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 4);
-        lua_pushnumber(luaVM, iA);
-        lua_settable(luaVM, -3);
-        lua_setfield(luaVM, -2, "chat_input_text_color");
-    }
-    pCVars->Get("chat_scale", strCVar);
-    if (!strCVar.empty())
-    {
-        float fX, fY;
-        ss.clear();
-        ss.str(strCVar);
-        ss >> fX >> fY;
-        lua_newtable(luaVM);
-        lua_pushnumber(luaVM, 1);
-        lua_pushnumber(luaVM, fX);
-        lua_settable(luaVM, -3);
-        lua_pushnumber(luaVM, 2);
-        lua_pushnumber(luaVM, fY);
-        lua_settable(luaVM, -3);
-        lua_setfield(luaVM, -2, "chat_scale");
-    }
+    SString           strCVarArg;
+    bool              bAll = argStream.NextIsNone();
 
+    // If we are asking for all CVars, prepare a new table
+    if (bAll)
+        lua_newtable(luaVM);
+    else
+        argStream.ReadString(strCVarArg);
+
+    if (!argStream.HasErrors())
+    {
+        // Loop through all CVars
+        for (unsigned int i = 0; i < MAX_CHATBOX_LAYOUT_CVARS; i++)
+        {
+            // If we are asking for all CVars, or we can match the requested CVar with this CVar
+            if (bAll || !stricmp(g_chatboxLayoutCVars[i], strCVarArg))
+            {
+                // Push color values into a table
+                if (g_chatboxLayoutCVars[i] == "chat_color" ||
+                    g_chatboxLayoutCVars[i] == "chat_text_color" ||
+                    g_chatboxLayoutCVars[i] == "chat_input_color" ||
+                    g_chatboxLayoutCVars[i] == "chat_input_prefix_color" ||
+                    g_chatboxLayoutCVars[i] == "chat_input_text_color")
+                {
+                    pCVars->Get(g_chatboxLayoutCVars[i], strCVarValue);
+                    if (!strCVarValue.empty())
+                    {
+                        ss.clear();
+                        ss.str(strCVarValue);
+                        ss >> iR >> iG >> iB >> iA;
+                        lua_newtable(luaVM);
+                        lua_pushnumber(luaVM, 1);
+                        lua_pushnumber(luaVM, iR);
+                        lua_settable(luaVM, -3);
+                        lua_pushnumber(luaVM, 2);
+                        lua_pushnumber(luaVM, iG);
+                        lua_settable(luaVM, -3);
+                        lua_pushnumber(luaVM, 3);
+                        lua_pushnumber(luaVM, iB);
+                        lua_settable(luaVM, -3);
+                        lua_pushnumber(luaVM, 4);
+                        lua_pushnumber(luaVM, iA);
+                        lua_settable(luaVM, -3);
+                    }
+                }
+                // Push chat scale into a table
+                else if (g_chatboxLayoutCVars[i] == "chat_scale")
+                {
+                    pCVars->Get(g_chatboxLayoutCVars[i], strCVarValue);
+                    if (!strCVarValue.empty())
+                    {
+                        float fX, fY;
+                        ss.clear();
+                        ss.str(strCVarValue);
+                        ss >> fX >> fY;
+                        lua_newtable(luaVM);
+                        lua_pushnumber(luaVM, 1);
+                        lua_pushnumber(luaVM, fX);
+                        lua_settable(luaVM, -3);
+                        lua_pushnumber(luaVM, 2);
+                        lua_pushnumber(luaVM, fY);
+                        lua_settable(luaVM, -3);
+                    }
+                }
+                else
+                {
+                    pCVars->Get(g_chatboxLayoutCVars[i], fNumber);
+                    if (g_chatboxLayoutCVars[i] == "chat_use_cegui")
+                        lua_pushboolean(luaVM, fNumber ? true : false);
+                    else
+                        lua_pushnumber(luaVM, fNumber);
+                }
+                
+                // If we are asking for all CVars, push this into the table with its CVar name, otherwise just stop here
+                if (bAll)
+                    lua_setfield(luaVM, -2, g_chatboxLayoutCVars[i]);
+                else
+                    return 1;
+            }
+        }
+
+        // We wanted all CVars and that's done so let's stop now
+        if (bAll)
+            return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
