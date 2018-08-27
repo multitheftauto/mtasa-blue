@@ -140,7 +140,7 @@ bool CRegisteredCommands::RemoveCommand(CLuaMain* pLuaMain, const char* szKey, c
 
 void CRegisteredCommands::ClearAliases(CLuaMain* pLuaMain, const char* szCommand)
 {
-    list<SCommand*>::const_iterator iter = m_Commands.begin();
+    list<SCommand*>::iterator iter = m_Commands.begin();
 
     while (iter != m_Commands.end())
     {
@@ -158,7 +158,7 @@ void CRegisteredCommands::ClearAliases(CLuaMain* pLuaMain, const char* szCommand
 void CRegisteredCommands::ClearCommands(void)
 {
     // Delete all the commands
-    list<SCommand*>::const_iterator iter = m_Commands.begin();
+    list<SCommand*>::iterator iter = m_Commands.begin();
 
     for (; iter != m_Commands.end(); iter++)
         delete *iter;
