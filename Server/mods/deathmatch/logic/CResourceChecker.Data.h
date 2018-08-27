@@ -167,6 +167,8 @@ namespace
         {"isElementCallPropagationEnabled", "1.3.5-9.06118"},
         {"getResourceState", "1.3.5-9.06194"},
         {"isPedWearingJetpack", "1.5.5-9.13846"},
+        {"setElementAngularVelocity", "1.5.5-9.14060"},
+        {"getElementAngularVelocity", "1.5.5-9.14060"},
     };
 
     SVersionItem serverFunctionInitList[] = {
@@ -245,6 +247,8 @@ namespace
         {"dbPrepareString", "1.5.2"},
         {"isPedWearingJetpack", "1.5.5-9.13846"},
         {"setPedWearingJetpack", "1.5.5-9.13846"},
+        {"setElementAngularVelocity", "1.5.5-9.14060"},
+        {"getElementAngularVelocity", "1.5.5-9.14060"},
     };
 
     //
