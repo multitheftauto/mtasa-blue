@@ -39,13 +39,13 @@ static CClientProjectileManager* m_pProjectileManager;
 static CClientSoundManager*      m_pSoundManager;
 
 // Used to run a function on all the children of the elements too
-#define RUN_CHILDREN( func ) \
-    if ( Entity.CountChildren () && Entity.IsCallPropagationEnabled() ) \
+#define RUN_CHILDREN(func) \
+    if (Entity.CountChildren() && Entity.IsCallPropagationEnabled()) \
     { \
         CElementListSnapshot* pList = Entity.GetChildrenListSnapshot(); \
-        pList->AddRef();    /* Keep list alive during use */ \
-        for ( CElementListSnapshot::const_iterator iter = pList->begin() ; iter != pList->end() ; iter++ ) \
-            if ( !(*iter)->IsBeingDeleted() ) \
+        pList->AddRef(); /* Keep list alive during use */ \
+        for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++) \
+            if (!(*iter)->IsBeingDeleted()) \
                 func; \
         pList->Release(); \
     }
@@ -488,6 +488,38 @@ bool CStaticFunctionDefinitions::GetElementVelocity(CClientEntity& Entity, CVect
         {
             CClientSound& Sound = static_cast<CClientSound&>(Entity);
             Sound.GetVelocity(vecVelocity);
+            break;
+        }
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetElementTurnVelocity(CClientEntity& Entity, CVector& vecTurnVelocity)
+{
+    int iType = Entity.GetType();
+    switch (iType)
+    {
+        case CCLIENTPED:
+        case CCLIENTPLAYER:
+        {
+            CClientPed& Ped = static_cast<CClientPed&>(Entity);
+            Ped.GetTurnSpeed(vecTurnVelocity);
+            break;
+        }
+        case CCLIENTVEHICLE:
+        {
+            CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
+            Vehicle.GetTurnSpeed(vecTurnVelocity);
+            break;
+        }
+        case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
+        {
+            CClientObject& Object = static_cast<CClientObject&>(Entity);
+            Object.GetTurnSpeed(vecTurnVelocity);
             break;
         }
         default:
@@ -1127,6 +1159,40 @@ bool CStaticFunctionDefinitions::SetElementVelocity(CClientEntity& Entity, const
             break;
         }
 
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetElementAngularVelocity(CClientEntity& Entity, const CVector& vecTurnVelocity)
+{
+    RUN_CHILDREN(SetElementAngularVelocity(**iter, vecTurnVelocity))
+
+    int iType = Entity.GetType();
+    switch (iType)
+    {
+        case CCLIENTPED:
+        case CCLIENTPLAYER:
+        {
+            CClientPed& Ped = static_cast<CClientPed&>(Entity);
+            Ped.SetTurnSpeed(vecTurnVelocity);
+            break;
+        }
+        case CCLIENTVEHICLE:
+        {
+            CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
+            Vehicle.SetTurnSpeed(vecTurnVelocity);
+            break;
+        }
+        case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
+        {
+            CClientObject& Object = static_cast<CClientObject&>(Entity);
+            Object.SetTurnSpeed(vecTurnVelocity);
+            break;
+        }
         default:
             return false;
     }
