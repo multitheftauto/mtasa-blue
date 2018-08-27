@@ -365,14 +365,16 @@ void CLuaGUIDefs::AddGuiComboBoxClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "getSelected", "guiComboBoxGetSelected");
     lua_classfunction(luaVM, "getItemText", "guiComboBoxGetItemText");
+    lua_classfunction(luaVM, "isOpen", "guiComboBoxIsOpen");
+    lua_classfunction(luaVM, "getItemCount", "guiComboBoxGetItemCount");
 
     lua_classfunction(luaVM, "setItemText", "guiComboBoxSetItemText");
     lua_classfunction(luaVM, "setSelected", "guiComboBoxSetSelected");
-    lua_classfunction(luaVM, "getItemCount", "guiComboBoxGetItemCount");
     lua_classfunction(luaVM, "setOpen", "guiComboBoxSetOpen");
-    lua_classfunction(luaVM, "isOpen", "guiComboBoxIsOpen");
 
     lua_classvariable(luaVM, "selected", "guiComboBoxSetSelected", "guiComboBoxGetSelected");
+    lua_classvariable(luaVM, "itemCount", nullptr, "guiComboBoxGetItemCount");
+    lua_classvariable(luaVM, "open", "guiComboBoxSetOpen", "guiComboBoxIsOpen");
 
     lua_registerclass(luaVM, "GuiComboBox", "GuiElement");
 }
