@@ -177,9 +177,9 @@ public:
     const SString& GetName(void) const { return m_strName; }
     void           SetName(const char* szName) { m_strName.AssignLeft(szName, MAX_ELEMENT_NAME_LENGTH); }
 
-    const char*  GetTypeName(void) { return m_strTypeName; };
-    unsigned int GetTypeHash(void) { return m_uiTypeHash; };
-    void         SetTypeName(const char* szName);
+    const SString& GetTypeName() { return m_strTypeName; }
+    unsigned int   GetTypeHash() { return m_uiTypeHash; }
+    void           SetTypeName(const SString& name);
 
     CClientEntity* GetParent(void) { return m_pParent; };
     CClientEntity* SetParent(CClientEntity* pParent);

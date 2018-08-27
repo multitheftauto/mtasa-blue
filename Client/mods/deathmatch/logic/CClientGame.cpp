@@ -14,6 +14,7 @@
 #include "game/CAnimBlendAssocGroup.h"
 #include "game/CAnimBlendAssociation.h"
 #include "game/CAnimBlendHierarchy.h"
+#include <windowsx.h>
 
 SString StringZeroPadout(const SString& strInput, uint uiPadoutSize)
 {
@@ -122,8 +123,8 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->DisableBadDrivebyHitboxes(true);
 
     // Remove Night & Thermal vision view (if enabled).
-    g_pMultiplayer->SetNightVisionEnabled(false);
-    g_pMultiplayer->SetThermalVisionEnabled(false);
+    g_pMultiplayer->SetNightVisionEnabled(false, true);
+    g_pMultiplayer->SetThermalVisionEnabled(false, true);
 
     m_bCloudsEnabled = true;
 
@@ -257,6 +258,7 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->SetPostWorldProcessHandler(CClientGame::StaticPostWorldProcessHandler);
     g_pMultiplayer->SetPreFxRenderHandler(CClientGame::StaticPreFxRenderHandler);
     g_pMultiplayer->SetPreHudRenderHandler(CClientGame::StaticPreHudRenderHandler);
+    g_pMultiplayer->DisableCallsToCAnimBlendNode(false);
     g_pMultiplayer->SetCAnimBlendAssocDestructorHandler(CClientGame::StaticCAnimBlendAssocDestructorHandler);
     g_pMultiplayer->SetAddAnimationHandler(CClientGame::StaticAddAnimationHandler);
     g_pMultiplayer->SetAddAnimationAndSyncHandler(CClientGame::StaticAddAnimationAndSyncHandler);
@@ -417,6 +419,7 @@ CClientGame::~CClientGame(void)
     g_pMultiplayer->SetPostWorldProcessHandler(NULL);
     g_pMultiplayer->SetPreFxRenderHandler(NULL);
     g_pMultiplayer->SetPreHudRenderHandler(NULL);
+    g_pMultiplayer->DisableCallsToCAnimBlendNode(true);
     g_pMultiplayer->SetCAnimBlendAssocDestructorHandler(NULL);
     g_pMultiplayer->SetAddAnimationHandler(NULL);
     g_pMultiplayer->SetAddAnimationAndSyncHandler(NULL);
@@ -2475,8 +2478,8 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                 }
                 if (ucButtonHit != 0xFF)
                 {
-                    int iX = LOWORD(lParam);
-                    int iY = HIWORD(lParam);
+                    int iX = GET_X_LPARAM(lParam);
+                    int iY = GET_Y_LPARAM(lParam);
 
                     CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
 
@@ -2644,7 +2647,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
     {
         case WM_MOUSEMOVE:
         {
-            int        iX = LOWORD(lParam), iY = HIWORD(lParam);
+            int        iX = GET_X_LPARAM(lParam), iY = GET_Y_LPARAM(lParam);
             static int iPreviousX = 0, iPreviousY = 0;
             if (iX != iPreviousX || iY != iPreviousY)
             {
@@ -3541,6 +3544,9 @@ void CClientGame::Event_OnIngame(void)
     g_pGame->GetWaterManager()->Reset();            // Deletes all custom water elements, ResetMapInfo only reverts changes to water level
     g_pGame->GetWaterManager()->SetWaterDrawnLast(true);
     m_pCamera->SetCameraClip(true, true);
+
+    // Deallocate all custom models
+    m_pManager->GetModelManager()->RemoveAll();
 
     // Create a local player for us
     m_pLocalPlayer = new CClientPlayer(m_pManager, m_LocalID, true);
@@ -5577,9 +5583,9 @@ void CClientGame::ResetMapInfo(void)
     // Vehicles LOD distance
     g_pGame->GetSettings()->ResetVehiclesLODDistance();
 
-    // Peds LOD distance 
-    g_pGame->GetSettings()->ResetPedsLODDistance(); 
-    
+    // Peds LOD distance
+    g_pGame->GetSettings()->ResetPedsLODDistance();
+
     // Sun color
     g_pMultiplayer->ResetSunColor();
 

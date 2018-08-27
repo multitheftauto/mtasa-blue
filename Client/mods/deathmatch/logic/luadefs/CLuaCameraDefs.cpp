@@ -455,9 +455,11 @@ int CLuaCameraDefs::SetCameraViewMode(lua_State* luaVM)
 
 int CLuaCameraDefs::SetCameraGoggleEffect(lua_State* luaVM)
 {
-    SString          strMode = "";
+    SString          strMode;
+    bool             bNoiseEnabled;
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strMode);
+    argStream.ReadBool(bNoiseEnabled, true);
 
     if (!argStream.HasErrors())
     {
@@ -465,22 +467,22 @@ int CLuaCameraDefs::SetCameraGoggleEffect(lua_State* luaVM)
 
         if (strMode.compare("nightvision") == 0)
         {
-            g_pMultiplayer->SetNightVisionEnabled(true);
-            g_pMultiplayer->SetThermalVisionEnabled(false);
+            g_pMultiplayer->SetNightVisionEnabled(true, bNoiseEnabled);
+            g_pMultiplayer->SetThermalVisionEnabled(false, true);
 
             bSuccess = true;
         }
         else if (strMode.compare("thermalvision") == 0)
         {
-            g_pMultiplayer->SetNightVisionEnabled(false);
-            g_pMultiplayer->SetThermalVisionEnabled(true);
+            g_pMultiplayer->SetNightVisionEnabled(false, true);
+            g_pMultiplayer->SetThermalVisionEnabled(true, bNoiseEnabled);
 
             bSuccess = true;
         }
         else if (strMode.compare("normal") == 0)
         {
-            g_pMultiplayer->SetNightVisionEnabled(false);
-            g_pMultiplayer->SetThermalVisionEnabled(false);
+            g_pMultiplayer->SetNightVisionEnabled(false, true);
+            g_pMultiplayer->SetThermalVisionEnabled(false, true);
 
             bSuccess = true;
         }

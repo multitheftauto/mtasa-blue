@@ -12,6 +12,8 @@
 #pragma once
 #include "CLuaDefs.h"
 
+#define MAX_CHATBOX_LAYOUT_CVARS 20
+
 class CLuaGUIDefs : public CLuaDefs
 {
 public:
@@ -116,7 +118,9 @@ public:
     LUA_DECLARE(GUIEditSetReadOnly);
     LUA_DECLARE(GUIEditIsReadOnly);
     LUA_DECLARE(GUIEditSetMasked);
+    LUA_DECLARE(GUIEditIsMasked);
     LUA_DECLARE(GUIEditSetMaxLength);
+    LUA_DECLARE(GUIEditGetMaxLength);
     LUA_DECLARE(GUIEditSetCaretIndex);
     LUA_DECLARE(GUIEditGetCaretIndex);
     LUA_DECLARE(GUIMemoSetReadOnly);
@@ -127,8 +131,8 @@ public:
     LUA_DECLARE(GUIMemoSetVerticalScrollPosition);
     LUA_DECLARE(GUIWindowSetMovable);
     LUA_DECLARE(GUIWindowSetSizable);
-    LUA_DECLARE(GUIWindowGetMovable);
-    LUA_DECLARE(GUIWindowGetSizable);
+    LUA_DECLARE(GUIWindowIsMovable);
+    LUA_DECLARE(GUIWindowIsSizable);
     LUA_DECLARE(GUIWindowGetCloseButtonEnabled);
     LUA_DECLARE(GUIWindowGetTitleBarEnabled);
     LUA_DECLARE(GUILabelSetColor);

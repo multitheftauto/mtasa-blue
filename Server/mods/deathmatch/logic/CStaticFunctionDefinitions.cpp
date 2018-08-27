@@ -3904,6 +3904,28 @@ bool CStaticFunctionDefinitions::RemovePedJetPack(CElement* pElement)
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetPedWearingJetpack(CElement* pElement, bool bJetPack)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetPedWearingJetpack(*iter, bJetPack))
+
+    if (IS_PED(pElement))
+    {
+        CPed* pPed = static_cast<CPed*>(pElement);
+        if (pPed->IsSpawned() && bJetPack != pPed->HasJetPack())
+        {
+            pPed->SetHasJetPack(bJetPack);
+
+            CBitStream BitStream;
+            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, bJetPack ? GIVE_PED_JETPACK : REMOVE_PED_JETPACK, *BitStream.pBitStream));
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetPedFightingStyle(CElement* pElement, unsigned char ucStyle)
 {
     assert(pElement);
@@ -6678,6 +6700,34 @@ bool CStaticFunctionDefinitions::SetVehicleIdleRespawnDelay(CElement* pElement, 
     return false;
 }
 
+bool CStaticFunctionDefinitions::GetVehicleRespawnRotation(CElement* pElement, CVector& vecRotation)
+{
+    assert(pElement);
+
+    if (IS_VEHICLE(pElement))
+    {
+        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+        vecRotation = pVehicle->GetRespawnRotationDegrees();
+
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetVehicleRespawnPosition(CElement* pElement, CVector& vecPosition)
+{
+    assert(pElement);
+
+    if (IS_VEHICLE(pElement))
+    {
+        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+        vecPosition = pVehicle->GetRespawnPosition();
+
+        return true;
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetVehicleRespawnPosition(CElement* pElement, const CVector& vecPosition, const CVector& vecRotation)
 {
     assert(pElement);
@@ -9072,12 +9122,12 @@ bool CStaticFunctionDefinitions::SetTeamFriendlyFire(CTeam* pTeam, bool bFriendl
     return false;
 }
 
-CWater* CStaticFunctionDefinitions::CreateWater(CResource* pResource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4)
+CWater* CStaticFunctionDefinitions::CreateWater(CResource* pResource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow)
 {
     if (!pV1 || !pV2 || !pV3)
         return NULL;
 
-    CWater* pWater = m_pWaterManager->Create(pV4 ? CWater::QUAD : CWater::TRIANGLE, pResource->GetDynamicElementRoot());
+    CWater* pWater = m_pWaterManager->Create(pV4 ? CWater::QUAD : CWater::TRIANGLE, pResource->GetDynamicElementRoot(), NULL, bShallow);
 
     if (pWater)
     {
@@ -11044,9 +11094,8 @@ bool CStaticFunctionDefinitions::RemoveAccount(CAccount* pAccount)
 bool CStaticFunctionDefinitions::SetAccountName(CAccount* pAccount, SString strNewName, bool bAllowCaseVariations, SString& strOutError)
 {
     assert(pAccount);
-    assert(!strNewName.empty());
 
-    if (pAccount->IsRegistered())
+    if (!strNewName.empty() && pAccount->IsRegistered())
     {
         // Check for case variations if not allowed
         if (!bAllowCaseVariations)
@@ -11079,9 +11128,8 @@ bool CStaticFunctionDefinitions::SetAccountName(CAccount* pAccount, SString strN
 bool CStaticFunctionDefinitions::SetAccountPassword(CAccount* pAccount, SString strPassword, CAccountPassword::EAccountPasswordType ePasswordType)
 {
     assert(pAccount);
-    assert(!strPassword.empty());
 
-    if (pAccount->IsRegistered())
+    if (!strPassword.empty() && pAccount->IsRegistered())
     {
         if ((ePasswordType == CAccountPassword::PLAINTEXT && CAccountManager::IsValidNewPassword(strPassword)) ||
             (ePasswordType == CAccountPassword::MD5 && strPassword.length() == 32) ||

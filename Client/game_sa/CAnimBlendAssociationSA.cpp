@@ -86,6 +86,17 @@ void CAnimBlendAssociationSA::AllocateAnimBlendNodeArray(int iCount)
     };
 }
 
+void CAnimBlendAssociationSA::FreeAnimBlendNodeArray()
+{
+    DWORD DwFunc = 0x4CEA40;
+    DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
+    _asm
+    {
+        mov     ecx, DwThisInterface
+        call    DwFunc
+    };
+}
+
 std::unique_ptr<CAnimBlendHierarchy> CAnimBlendAssociationSA::GetAnimHierarchy(void)
 {
     return pGame->GetAnimManager()->GetAnimBlendHierarchy(m_pInterface->pAnimHierarchy);

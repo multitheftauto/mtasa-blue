@@ -223,21 +223,26 @@ int CLuaPlayerDefs::CanPlayerUseFunction(lua_State* luaVM)
 int CLuaPlayerDefs::GetPlayerName(lua_State* luaVM)
 {
     //  string getPlayerName ( player thePlayer )
-    CElement* pElement;
+    CElement* pElement; // player or console
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
 
     if (!argStream.HasErrors())
     {
-        SString strNick;
-        if (CStaticFunctionDefinitions::GetPlayerName(pElement, strNick))
+        if (IS_PLAYER(pElement) || IS_CONSOLE(pElement))
         {
-            lua_pushstring(luaVM, strNick);
-            return 1;
+            SString strNick;
+            if (CStaticFunctionDefinitions::GetPlayerName(pElement, strNick))
+            {
+                lua_pushstring(luaVM, strNick);
+                return 1;
+            }
         }
+        else
+            argStream.SetTypeError("player or console", 1);
     }
-    else
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
@@ -247,21 +252,26 @@ int CLuaPlayerDefs::GetPlayerName(lua_State* luaVM)
 int CLuaPlayerDefs::GetPlayerIP(lua_State* luaVM)
 {
     //  string getPlayerIP ( player thePlayer )
-    CElement* pElement;
+    CElement* pElement; // player or console
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
 
     if (!argStream.HasErrors())
     {
-        SString strIP;
-        if (CStaticFunctionDefinitions::GetPlayerIP(pElement, strIP))
+        if (IS_PLAYER(pElement) || IS_CONSOLE(pElement))
         {
-            lua_pushstring(luaVM, strIP);
-            return 1;
+            SString strIP;
+            if (CStaticFunctionDefinitions::GetPlayerIP(pElement, strIP))
+            {
+                lua_pushstring(luaVM, strIP);
+                return 1;
+            }
         }
+        else
+            argStream.SetTypeError("player or console", 1);
     }
-    else
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
@@ -292,21 +302,26 @@ int CLuaPlayerDefs::GetPlayerVersion(lua_State* luaVM)
 int CLuaPlayerDefs::GetPlayerAccount(lua_State* luaVM)
 {
     //  account getPlayerAccount ( player thePlayer )
-    CElement* pElement;
+    CElement* pElement; // player or console
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
 
     if (!argStream.HasErrors())
     {
-        CAccount* pAccount = CStaticFunctionDefinitions::GetPlayerAccount(pElement);
-        if (pAccount)
+        if (IS_PLAYER(pElement) || IS_CONSOLE(pElement))
         {
-            lua_pushaccount(luaVM, pAccount);
-            return 1;
+            CAccount* pAccount = CStaticFunctionDefinitions::GetPlayerAccount(pElement);
+            if (pAccount)
+            {
+                lua_pushaccount(luaVM, pAccount);
+                return 1;
+            }
         }
+        else
+            argStream.SetTypeError("player or console", 1);
     }
-    else
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
@@ -316,8 +331,8 @@ int CLuaPlayerDefs::GetPlayerAccount(lua_State* luaVM)
 int CLuaPlayerDefs::SetPlayerName(lua_State* luaVM)
 {
     //  bool setPlayerName ( player thePlayer, string newName )
-    CElement* pElement;
-    SString   strName;
+    CPlayer* pElement;
+    SString  strName;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -1118,7 +1133,7 @@ int CLuaPlayerDefs::SetPlayerBlurLevel(lua_State* luaVM)
 
 int CLuaPlayerDefs::RedirectPlayer(lua_State* luaVM)
 {
-    CElement*      pElement;
+    CPlayer*       pElement;
     SString        strHost;
     unsigned short usPort;
     SString        strPassword;
