@@ -246,7 +246,6 @@ bool CGUIComboBox_Impl::GetState(void)
     return reinterpret_cast<CEGUI::Combobox*>(m_pWindow)->isDropDownListVisible();
 }
 
-
 void CGUIComboBox_Impl::SetReadOnly(bool bReadonly)
 {
     reinterpret_cast<CEGUI::Combobox*>(m_pWindow)->setReadOnly(bReadonly);
