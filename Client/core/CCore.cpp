@@ -486,7 +486,7 @@ bool CCore::IsChatVisible(void)
     return false;
 }
 
-bool CCore::ClearChat(void)
+bool CCore::ClearChat()
 {
     if (m_pLocalGUI)
     {

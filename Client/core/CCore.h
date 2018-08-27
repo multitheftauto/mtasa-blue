@@ -124,7 +124,7 @@ public:
     bool IsChatVisible(void);
     void EnableChatInput(char* szCommand, DWORD dwColor);
     bool IsChatInputEnabled(void);
-    bool ClearChat(void);
+    bool ClearChat();
 
     // Screenshots
     void TakeScreenShot(void);
