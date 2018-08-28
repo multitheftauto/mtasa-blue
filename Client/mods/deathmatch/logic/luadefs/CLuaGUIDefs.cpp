@@ -647,12 +647,6 @@ int CLuaGUIDefs::GUIIsTransferBoxActive(lua_State* luaVM)
     return 1;
 }
 
-int CLuaGUIDefs::GUIIsTransferBoxActive(lua_State* luaVM)
-{
-    lua_pushboolean(luaVM, g_pClientGame->GetTransferBox()->IsVisible());
-    return 1;
-}
-
 int CLuaGUIDefs::GUISetTransferBoxEnabled(lua_State* luaVM)
 {
     bool bEnabled;
@@ -3151,7 +3145,7 @@ int CLuaGUIDefs::GUIMemoSetVerticalScrollPosition(lua_State* luaVM)
         return 1;
     }
     else
-        m_pScriptDebugging>LogCustom(luaVM, argStream.GetFullErrorMessage());
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -3188,13 +3182,13 @@ int CLuaGUIDefs::GUIMemoGetVerticalScrollPosition(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CGUIMemo* guiMemo = static_cast<CGUIMemo*>(theMemo>GetCGUIElement());
-        float     fPos = guiMemo>GetVerticalScrollPosition() / guiMemo>GetMaxVerticalScrollPosition() * 100.0f;
+        CGUIMemo* guiMemo = static_cast<CGUIMemo*>(theMemo->GetCGUIElement());
+        float     fPos = guiMemo->GetVerticalScrollPosition() / guiMemo->GetMaxVerticalScrollPosition() * 100.0f;
         lua_pushnumber(luaVM, fPos);
         return 1;
     }
     else
-        m_pScriptDebugging>LogCustom(luaVM, argStream.GetFullErrorMessage());
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // error: bad arguments
     lua_pushboolean(luaVM, false);
