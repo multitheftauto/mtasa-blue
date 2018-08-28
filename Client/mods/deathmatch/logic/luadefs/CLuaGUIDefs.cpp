@@ -2990,7 +2990,7 @@ int CLuaGUIDefs::GUIEditSetReadOnly(lua_State* luaVM)
 
 int CLuaGUIDefs::GUIEditIsReadOnly(lua_State* luaVM)
 {
-    // bool guiEditIsReadOnly( element editField )
+    // bool guiMemoIsReadOnly( gui-memo theMemo )
     CClientGUIElement* editField;
 
     CScriptArgReader argStream(luaVM);
