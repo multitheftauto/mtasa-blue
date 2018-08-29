@@ -28,6 +28,7 @@ CClientEntity::CClientEntity(ElementID ID) : ClassInit(this)
     m_bDoubleSided = false;
     m_bDoubleSidedInit = false;
     m_bCallPropagationEnabled = true;
+    m_bSmartPointer = false;
 
     // Need to generate a clientside ID?
     if (ID == INVALID_ELEMENT_ID)

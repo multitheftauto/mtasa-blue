@@ -25,7 +25,11 @@ class CServerImpl;
 #include "CThreadCommandQueue.h"
 
 #ifndef WIN32
-#include <ncursesw/curses.h>
+    #ifdef __APPLE__
+        #include <ncurses.h>
+    #else
+        #include <ncursesw/curses.h>
+    #endif
 #endif
 
 #define SERVER_RESET_RETURN 500

@@ -411,7 +411,7 @@ int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
     float     fStopAngle;
     SColor    color;
     SColor    colorCenter;
-    short     fSegments;
+    short     siSegments;
     float     fRatio;
     bool      bPostGUI;
 
@@ -422,26 +422,26 @@ int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
     argStream.ReadNumber(fStopAngle, 360);
     argStream.ReadColor(color, 0xFFFFFFFF);
     argStream.ReadColor(colorCenter, color);
-    argStream.ReadNumber(fSegments, 32);
+    argStream.ReadNumber(siSegments, 32);
     argStream.ReadNumber(fRatio, 1);
     argStream.ReadBool(bPostGUI, false);
 
     if (!argStream.HasErrors())
     {
-        const float fMinimumSegments = 3;
-        const float fMaximumSegments = 1024;
-        if (fSegments >= fMinimumSegments && fSegments <= fMaximumSegments )
+        const short siMinimumSegments = 3;
+        const short siMaximumSegments = 1024;
+        if (siSegments >= siMinimumSegments && siSegments <= siMaximumSegments)
         {
             const float fMinimumRatio = 0;
             const float fMaximumRatio = 100;
             if (fRatio > fMinimumRatio && fRatio <= fMaximumRatio)
             {
-                if (fRadius > 0)
+                if (fRadius > 0 && fStartAngle != fStopAngle)
                 {
                     if (fStopAngle < fStartAngle)
                         std::swap(fStopAngle, fStartAngle);
 
-                    g_pCore->GetGraphics()->DrawCircleQueued(vecPosition.fX, vecPosition.fY, fRadius, fStartAngle, fStopAngle, color, colorCenter, fSegments, fRatio, bPostGUI);
+                    g_pCore->GetGraphics()->DrawCircleQueued(vecPosition.fX, vecPosition.fY, fRadius, fStartAngle, fStopAngle, color, colorCenter, siSegments, fRatio, bPostGUI);
                     lua_pushboolean(luaVM, true);
                     return 1;
                 }
