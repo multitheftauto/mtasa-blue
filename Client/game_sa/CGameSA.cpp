@@ -294,18 +294,24 @@ bool CGameSA::IsInForeground()
     return *VAR_IsForegroundWindow;
 }
 
-CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
+CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID)
 {
-    DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)");
+    DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID )");
     if (dwModelID < MODELINFO_MAX)
     {
-        if (ModelInfo[dwModelID].IsValid() || bCanBeInvalid)
+        if (ModelInfo[dwModelID].IsValid())
         {
             return &ModelInfo[dwModelID];
         }
-        return nullptr;
+        else
+        {
+            return NULL;
+        }
     }
-    return nullptr;
+    else
+    {
+        return NULL;
+    }
 }
 
 /**

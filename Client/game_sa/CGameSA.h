@@ -312,7 +312,7 @@ public:
     CFxManagerSA*       GetFxManagerSA() { return m_pFxManager; }
 
     CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
-    CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
+    CModelInfo*  GetModelInfo(DWORD dwModelID);
 
     DWORD GetSystemTime()
     {
