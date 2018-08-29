@@ -241,7 +241,7 @@ void CGUIComboBox_Impl::Clear(void)
     m_pWindow->setText(storedCaption);
 }
 
-bool CGUIComboBox_Impl::GetState(void)
+bool CGUIComboBox_Impl::IsOpen(void)
 {
     return reinterpret_cast<CEGUI::Combobox*>(m_pWindow)->isDropDownListVisible();
 }
