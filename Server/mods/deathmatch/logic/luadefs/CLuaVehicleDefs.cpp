@@ -2303,6 +2303,47 @@ int CLuaVehicleDefs::GetVehicleRespawnRotation(lua_State* luaVM)
     return 1;
 }
 
+int CLuaVehicleDefs::SetVehicleRespawnPosition(lua_State* luaVM)
+{
+    CElement* pElement;
+    CVector   vecPosition;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadVector3D(vecPosition);
+
+    if (argStream.NextIsVector3D())
+    {
+        CVector vecRotation;
+        argStream.ReadVector3D(vecRotation);
+
+        if (!argStream.HasErrors())
+        {
+            if (CStaticFunctionDefinitions::SetVehicleRespawnPosition(pElement, vecPosition) &&
+                CStaticFunctionDefinitions::SetVehicleRespawnRotation(pElement, vecRotation))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
+        else
+            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+    else if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetVehicleRespawnPosition(pElement, vecPosition))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaVehicleDefs::GetVehicleRespawnPosition(lua_State* luaVM)
 {
     // float, float, float getVehicleRespawnPosition( vehicle theVehicle )
@@ -2342,47 +2383,6 @@ int CLuaVehicleDefs::SetVehicleRespawnRotation(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         if (CStaticFunctionDefinitions::SetVehicleRespawnRotation(pElement, vecRotation))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaVehicleDefs::SetVehicleRespawnPosition(lua_State* luaVM)
-{
-    CElement* pElement;
-    CVector   vecPosition;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    argStream.ReadVector3D(vecPosition);
-
-    if (argStream.NextIsVector3D())
-    {
-        CVector vecRotation;
-        argStream.ReadVector3D(vecRotation);
-
-        if (!argStream.HasErrors())
-        {
-            if (CStaticFunctionDefinitions::SetVehicleRespawnPosition(pElement, vecPosition) &&
-                CStaticFunctionDefinitions::SetVehicleRespawnRotation(pElement, vecRotation))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    }
-    else if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetVehicleRespawnPosition(pElement, vecPosition))
         {
             lua_pushboolean(luaVM, true);
             return 1;
