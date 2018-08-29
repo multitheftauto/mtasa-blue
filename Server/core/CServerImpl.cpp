@@ -985,8 +985,7 @@ void CServerImpl::SelectCommandHistoryEntry(uint uiEntry)
         m_szInputBuffer[i] = szInput[i];
 
     // Let's print it out
-    wchar_t szBuffer[255];
-    memset(szBuffer, 0, sizeof(szBuffer));
+    wchar_t szBuffer[255] = {};
     wcsncpy(&szBuffer[0], &m_szInputBuffer[0], m_uiInputCount);
 #ifdef WIN32
     Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
