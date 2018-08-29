@@ -22,6 +22,7 @@ void CElementRPCs::LoadFunctions(void)
     AddHandler(REMOVE_ELEMENT_DATA, RemoveElementData, "RemoveElementData");
     AddHandler(SET_ELEMENT_POSITION, SetElementPosition, "SetElementPosition");
     AddHandler(SET_ELEMENT_VELOCITY, SetElementVelocity, "SetElementVelocity");
+    AddHandler(SET_ELEMENT_ANGULAR_VELOCITY, SetElementAngularVelocity, "SetElementAngularVelocity");
     AddHandler(SET_ELEMENT_INTERIOR, SetElementInterior, "SetElementInterior");
     AddHandler(SET_ELEMENT_DIMENSION, SetElementDimension, "SetElementDimension");
     AddHandler(ATTACH_ELEMENTS, AttachElements, "AttachElements");
@@ -49,13 +50,13 @@ void CElementRPCs::LoadFunctions(void)
     AddHandler(SET_PROPAGATE_CALLS_ENABLED, SetCallPropagationEnabled, "setCallPropagationEnabled");
 }
 
-#define RUN_CHILDREN_SERVER( func ) \
-    if ( pSource->CountChildren () && pSource->IsCallPropagationEnabled() ) \
+#define RUN_CHILDREN_SERVER(func) \
+    if (pSource->CountChildren() && pSource->IsCallPropagationEnabled()) \
     { \
         CElementListSnapshot* pList = pSource->GetChildrenListSnapshot(); \
-        pList->AddRef();    /* Keep list alive during use */ \
-        for ( CElementListSnapshot::const_iterator iter = pList->begin() ; iter != pList->end() ; iter++ ) \
-            if ( !(*iter)->IsBeingDeleted() && !(*iter)->IsLocalEntity() ) \
+        pList->AddRef(); /* Keep list alive during use */ \
+        for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++) \
+            if (!(*iter)->IsBeingDeleted() && !(*iter)->IsLocalEntity()) \
                 func; \
         pList->Release(); \
     }
@@ -203,6 +204,42 @@ void CElementRPCs::SetElementVelocity(CClientEntity* pSource, NetBitStreamInterf
             {
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
                 pObject->SetMoveSpeed(vecVelocity);
+
+                break;
+            }
+        }
+    }
+}
+
+void CElementRPCs::SetElementAngularVelocity(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    // Read out the entity id and the turn speed
+    CVector vecTurnVelocity;
+    if (bitStream.Read(vecTurnVelocity.fX) && bitStream.Read(vecTurnVelocity.fY) && bitStream.Read(vecTurnVelocity.fZ))
+    {
+        switch (pSource->GetType())
+        {
+            case CCLIENTPED:
+            case CCLIENTPLAYER:
+            {
+                CClientPed* pPed = static_cast<CClientPed*>(pSource);
+
+                pPed->SetTurnSpeed(vecTurnVelocity);
+
+                break;
+            }
+            case CCLIENTVEHICLE:
+            {
+                CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);
+                pVehicle->SetTurnSpeed(vecTurnVelocity);
+
+                break;
+            }
+            case CCLIENTOBJECT:
+            case CCLIENTWEAPON:
+            {
+                CClientObject* pObject = static_cast<CClientObject*>(pSource);
+                pObject->SetTurnSpeed(vecTurnVelocity);
 
                 break;
             }

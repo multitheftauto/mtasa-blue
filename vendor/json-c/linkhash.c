@@ -10,6 +10,8 @@
  *
  */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -21,8 +23,34 @@
 # include <endian.h>    /* attempt to define endianness */
 #endif
 
+#if defined(_MSC_VER) || defined(__MINGW32__)
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>   /* Get InterlockedCompareExchange */
+#endif
+
 #include "random_seed.h"
 #include "linkhash.h"
+
+/* hash functions */
+static unsigned long lh_char_hash(const void *k);
+static unsigned long lh_perllike_str_hash(const void *k);
+static lh_hash_fn *char_hash_fn = lh_char_hash;
+
+int
+json_global_set_string_hash(const int h)
+{
+	switch(h) {
+	case JSON_C_STR_HASH_DFLT:
+		char_hash_fn = lh_char_hash;
+		break;
+	case JSON_C_STR_HASH_PERLLIKE:
+		char_hash_fn = lh_perllike_str_hash;
+		break;
+	default:
+		return -1;
+	}
+	return 0;
+}
 
 void lh_abort(const char *msg, ...)
 {
@@ -33,7 +61,7 @@ void lh_abort(const char *msg, ...)
 	exit(1);
 }
 
-unsigned long lh_ptr_hash(const void *k)
+static unsigned long lh_ptr_hash(const void *k)
 {
 	/* CAW: refactored to be 64bit nice */
 	return (unsigned long)((((ptrdiff_t)k * LH_PRIME) >> 4) & ULONG_MAX);
@@ -44,7 +72,7 @@ int lh_ptr_equal(const void *k1, const void *k2)
 	return (k1 == k2);
 }
 
-/* 
+/*
  * hashlittle from lookup3.c, by Bob Jenkins, May 2006, Public Domain.
  * http://burtleburtle.net/bob/c/lookup3.c
  * minor modifications to make functions static so no symbols are exported
@@ -56,8 +84,8 @@ int lh_ptr_equal(const void *k1, const void *k2)
 lookup3.c, by Bob Jenkins, May 2006, Public Domain.
 
 These are functions for producing 32-bit hashes for hash table lookup.
-hashword(), hashlittle(), hashlittle2(), hashbig(), mix(), and final() 
-are externally useful functions.  Routines to test the hash are included 
+hashword(), hashlittle(), hashlittle2(), hashbig(), mix(), and final()
+are externally useful functions.  Routines to test the hash are included
 if SELF_TEST is defined.  You can use this free for any purpose.  It's in
 the public domain.  It has no warranty.
 
@@ -65,7 +93,7 @@ You probably want to use hashlittle().  hashlittle() and hashbig()
 hash byte arrays.  hashlittle() is is faster than hashbig() on
 little-endian machines.  Intel and AMD are little-endian machines.
 On second thought, you probably want hashlittle2(), which is identical to
-hashlittle() except it returns two 32-bit hashes for the price of one.  
+hashlittle() except it returns two 32-bit hashes for the price of one.
 You could implement hashbig2() if you wanted but I haven't bothered here.
 
 If you want to find a hash of, say, exactly 7 integers, do
@@ -78,9 +106,9 @@ If you want to find a hash of, say, exactly 7 integers, do
 then use c as the hash value.  If you have a variable length array of
 4-byte integers to hash, use hashword().  If you have a byte array (like
 a character string), use hashlittle().  If you have several byte arrays, or
-a mix of things, see the comments above hashlittle().  
+a mix of things, see the comments above hashlittle().
 
-Why is this so big?  I read 12 bytes at a time into 3 4-byte integers, 
+Why is this so big?  I read 12 bytes at a time into 3 4-byte integers,
 then mix those integers.  This is fast (you can do a lot more thorough
 mixing with 12*3 instructions on 3 integers than you can with 3 instructions
 on 1 byte), but shoehorning those bytes into integers efficiently is messy.
@@ -129,7 +157,7 @@ This was tested for:
   the output delta to a Gray code (a^(a>>1)) so a string of 1's (as
   is commonly produced by subtraction) look like a single 1-bit
   difference.
-* the base values were pseudorandom, all zero but one bit set, or 
+* the base values were pseudorandom, all zero but one bit set, or
   all zero plus a counter that starts at zero.
 
 Some k values for my "a-=c; a^=rot(c,k); c+=b;" arrangement that
@@ -139,7 +167,7 @@ satisfy this are
    14  9  3  7 17  3
 Well, "9 15 3 18 27 15" didn't quite get 32 bits diffing
 for "differ" defined as + with a one-bit base and a two-bit delta.  I
-used http://burtleburtle.net/bob/hash/avalanche.html to choose 
+used http://burtleburtle.net/bob/hash/avalanche.html to choose
 the operations, constants, and arrangements of the variables.
 
 This does not achieve avalanche.  There are input bits of (a,b,c)
@@ -178,7 +206,7 @@ produce values of c that look totally different.  This was tested for
   the output delta to a Gray code (a^(a>>1)) so a string of 1's (as
   is commonly produced by subtraction) look like a single 1-bit
   difference.
-* the base values were pseudorandom, all zero but one bit set, or 
+* the base values were pseudorandom, all zero but one bit set, or
   all zero plus a counter that starts at zero.
 
 These constants passed:
@@ -253,7 +281,7 @@ static uint32_t hashlittle( const void *key, size_t length, uint32_t initval)
     }
 
     /*----------------------------- handle the last (probably partial) block */
-    /* 
+    /*
      * "k[2]&0xffffff" actually reads beyond the end of the string, but
      * then masks off the part it's not allowed to read.  Because the
      * string is aligned, the masked-off tail is in the same word as the
@@ -261,8 +289,19 @@ static uint32_t hashlittle( const void *key, size_t length, uint32_t initval)
      * does it on word boundaries, so is OK with this.  But VALGRIND will
      * still catch it and complain.  The masking trick does make the hash
      * noticably faster for short strings (like English words).
+     * AddressSanitizer is similarly picky about overrunning
+	 * the buffer. (http://clang.llvm.org/docs/AddressSanitizer.html
      */
-#ifndef VALGRIND
+#ifdef VALGRIND
+#    define PRECISE_MEMORY_ACCESS 1
+#elif defined(__SANITIZE_ADDRESS__) /* GCC's ASAN */
+#    define PRECISE_MEMORY_ACCESS 1
+#elif defined(__has_feature)
+#  if __has_feature(address_sanitizer) /* Clang's ASAN */
+#    define PRECISE_MEMORY_ACCESS 1
+#  endif
+#endif
+#ifndef PRECISE_MEMORY_ACCESS
 
     switch(length)
     {
@@ -376,17 +415,17 @@ static uint32_t hashlittle( const void *key, size_t length, uint32_t initval)
     /*-------------------------------- last block: affect all 32 bits of (c) */
     switch(length)                   /* all the case statements fall through */
     {
-    case 12: c+=((uint32_t)k[11])<<24;
-    case 11: c+=((uint32_t)k[10])<<16;
-    case 10: c+=((uint32_t)k[9])<<8;
-    case 9 : c+=k[8];
-    case 8 : b+=((uint32_t)k[7])<<24;
-    case 7 : b+=((uint32_t)k[6])<<16;
-    case 6 : b+=((uint32_t)k[5])<<8;
-    case 5 : b+=k[4];
-    case 4 : a+=((uint32_t)k[3])<<24;
-    case 3 : a+=((uint32_t)k[2])<<16;
-    case 2 : a+=((uint32_t)k[1])<<8;
+    case 12: c+=((uint32_t)k[11])<<24; /* FALLTHRU */
+    case 11: c+=((uint32_t)k[10])<<16; /* FALLTHRU */
+    case 10: c+=((uint32_t)k[9])<<8; /* FALLTHRU */
+    case 9 : c+=k[8]; /* FALLTHRU */
+    case 8 : b+=((uint32_t)k[7])<<24; /* FALLTHRU */
+    case 7 : b+=((uint32_t)k[6])<<16; /* FALLTHRU */
+    case 6 : b+=((uint32_t)k[5])<<8; /* FALLTHRU */
+    case 5 : b+=k[4]; /* FALLTHRU */
+    case 4 : a+=((uint32_t)k[3])<<24; /* FALLTHRU */
+    case 3 : a+=((uint32_t)k[2])<<16; /* FALLTHRU */
+    case 2 : a+=((uint32_t)k[1])<<8; /* FALLTHRU */
     case 1 : a+=k[0];
              break;
     case 0 : return c;
@@ -397,25 +436,53 @@ static uint32_t hashlittle( const void *key, size_t length, uint32_t initval)
   return c;
 }
 
-unsigned long lh_char_hash(const void *k)
+/* a simple hash function similiar to what perl does for strings.
+ * for good results, the string should not be excessivly large.
+ */
+static unsigned long lh_perllike_str_hash(const void *k) 
 {
-	static volatile int random_seed = -1;
+    const char *rkey = (const char *)k;
+    unsigned hashval = 1;
+
+    while (*rkey)
+        hashval = hashval * 33 + *rkey++;
+
+    return hashval;
+}
+
+static unsigned long lh_char_hash(const void *k)
+{
+#if defined _MSC_VER || defined __MINGW32__
+#define RANDOM_SEED_TYPE LONG
+#else
+#define RANDOM_SEED_TYPE int
+#endif
+	static volatile RANDOM_SEED_TYPE random_seed = -1;
 
 	if (random_seed == -1) {
-		int seed;
+		RANDOM_SEED_TYPE seed;
 		/* we can't use -1 as it is the unitialized sentinel */
 		while ((seed = json_c_get_random_seed()) == -1);
-#if defined __GNUC__
-		__sync_val_compare_and_swap(&random_seed, -1, seed);
-#elif defined _MSC_VER
-		_InterlockedCompareExchange(&random_seed, seed, -1);
+#if SIZEOF_INT == 8 && defined __GCC_HAVE_SYNC_COMPARE_AND_SWAP_8
+#define USE_SYNC_COMPARE_AND_SWAP 1
+#endif
+#if SIZEOF_INT == 4 && defined __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+#define USE_SYNC_COMPARE_AND_SWAP 1
+#endif
+#if SIZEOF_INT == 2 && defined __GCC_HAVE_SYNC_COMPARE_AND_SWAP_2
+#define USE_SYNC_COMPARE_AND_SWAP 1
+#endif
+#if defined USE_SYNC_COMPARE_AND_SWAP
+		(void)__sync_val_compare_and_swap(&random_seed, -1, seed);
+#elif defined _MSC_VER || defined __MINGW32__
+		InterlockedCompareExchange(&random_seed, seed, -1);
 #else
-#warning "racy random seed initializtion if used by multiple threads"
+//#warning "racy random seed initializtion if used by multiple threads"
 		random_seed = seed; /* potentially racy */
 #endif
 	}
 
-	return hashlittle((const char*)k, strlen((const char*)k), random_seed); 
+	return hashlittle((const char*)k, strlen((const char*)k), random_seed);
 }
 
 int lh_char_equal(const void *k1, const void *k2)
@@ -423,7 +490,7 @@ int lh_char_equal(const void *k1, const void *k2)
 	return (strcmp((const char*)k1, (const char*)k2) == 0);
 }
 
-struct lh_table* lh_table_new(int size, const char *name,
+struct lh_table* lh_table_new(int size,
 			      lh_entry_free_fn *free_fn,
 			      lh_hash_fn *hash_fn,
 			      lh_equal_fn *equal_fn)
@@ -432,12 +499,17 @@ struct lh_table* lh_table_new(int size, const char *name,
 	struct lh_table *t;
 
 	t = (struct lh_table*)calloc(1, sizeof(struct lh_table));
-	if(!t) lh_abort("lh_table_new: calloc failed\n");
+	if (!t)
+		return NULL;
+
 	t->count = 0;
 	t->size = size;
-	t->name = name;
 	t->table = (struct lh_entry*)calloc(size, sizeof(struct lh_entry));
-	if(!t->table) lh_abort("lh_table_new: calloc failed\n");
+	if (!t->table)
+	{
+		free(t);
+		return NULL;
+	}
 	t->free_fn = free_fn;
 	t->hash_fn = hash_fn;
 	t->equal_fn = equal_fn;
@@ -445,68 +517,78 @@ struct lh_table* lh_table_new(int size, const char *name,
 	return t;
 }
 
-struct lh_table* lh_kchar_table_new(int size, const char *name,
+struct lh_table* lh_kchar_table_new(int size,
 				    lh_entry_free_fn *free_fn)
 {
-	return lh_table_new(size, name, free_fn, lh_char_hash, lh_char_equal);
+	return lh_table_new(size, free_fn, char_hash_fn, lh_char_equal);
 }
 
-struct lh_table* lh_kptr_table_new(int size, const char *name,
+struct lh_table* lh_kptr_table_new(int size,
 				   lh_entry_free_fn *free_fn)
 {
-	return lh_table_new(size, name, free_fn, lh_ptr_hash, lh_ptr_equal);
+	return lh_table_new(size, free_fn, lh_ptr_hash, lh_ptr_equal);
 }
 
-void lh_table_resize(struct lh_table *t, int new_size)
+int lh_table_resize(struct lh_table *t, int new_size)
 {
 	struct lh_table *new_t;
 	struct lh_entry *ent;
 
-	new_t = lh_table_new(new_size, t->name, NULL, t->hash_fn, t->equal_fn);
-	ent = t->head;
-	while(ent) {
-		lh_table_insert(new_t, ent->k, ent->v);
-		ent = ent->next;
+	new_t = lh_table_new(new_size, NULL, t->hash_fn, t->equal_fn);
+	if (new_t == NULL)
+		return -1;
+
+	for (ent = t->head; ent != NULL; ent = ent->next)
+	{
+		unsigned long h = lh_get_hash(new_t, ent->k);
+		unsigned int opts = 0;
+		if (ent->k_is_constant)
+			opts = JSON_C_OBJECT_KEY_IS_CONSTANT;
+		if (lh_table_insert_w_hash(new_t, ent->k, ent->v, h, opts) != 0)
+		{
+			lh_table_free(new_t);
+			return -1;
+		}
 	}
 	free(t->table);
 	t->table = new_t->table;
 	t->size = new_size;
 	t->head = new_t->head;
 	t->tail = new_t->tail;
-	t->resizes++;
 	free(new_t);
+
+	return 0;
 }
 
 void lh_table_free(struct lh_table *t)
 {
 	struct lh_entry *c;
-	for(c = t->head; c != NULL; c = c->next) {
-		if(t->free_fn) {
+	if(t->free_fn) {
+		for(c = t->head; c != NULL; c = c->next)
 			t->free_fn(c);
-		}
 	}
 	free(t->table);
 	free(t);
 }
 
 
-int lh_table_insert(struct lh_table *t, void *k, const void *v)
+int lh_table_insert_w_hash(struct lh_table *t, const void *k, const void *v, const unsigned long h, const unsigned opts)
 {
-	unsigned long h, n;
+	unsigned long n;
 
-	t->inserts++;
-	if(t->count >= t->size * LH_LOAD_FACTOR) lh_table_resize(t, t->size * 2);
+	if (t->count >= t->size * LH_LOAD_FACTOR)
+		if (lh_table_resize(t, t->size * 2) != 0)
+			return -1;
 
-	h = t->hash_fn(k);
 	n = h % t->size;
 
 	while( 1 ) {
 		if(t->table[n].k == LH_EMPTY || t->table[n].k == LH_FREED) break;
-		t->collisions++;
 		if ((int)++n == t->size) n = 0;
 	}
 
 	t->table[n].k = k;
+	t->table[n].k_is_constant = (opts & JSON_C_OBJECT_KEY_IS_CONSTANT);
 	t->table[n].v = v;
 	t->count++;
 
@@ -522,15 +604,17 @@ int lh_table_insert(struct lh_table *t, void *k, const void *v)
 
 	return 0;
 }
-
-
-struct lh_entry* lh_table_lookup_entry(struct lh_table *t, const void *k)
+int lh_table_insert(struct lh_table *t, const void *k, const void *v)
 {
-	unsigned long h = t->hash_fn(k);
+	return lh_table_insert_w_hash(t, k, v, lh_get_hash(t, k), 0);
+}
+
+
+struct lh_entry* lh_table_lookup_entry_w_hash(struct lh_table *t, const void *k, const unsigned long h)
+{
 	unsigned long n = h % t->size;
 	int count = 0;
 
-	t->lookups++;
 	while( count < t->size ) {
 		if(t->table[n].k == LH_EMPTY) return NULL;
 		if(t->table[n].k != LH_FREED &&
@@ -541,6 +625,10 @@ struct lh_entry* lh_table_lookup_entry(struct lh_table *t, const void *k)
 	return NULL;
 }
 
+struct lh_entry* lh_table_lookup_entry(struct lh_table *t, const void *k)
+{
+	return lh_table_lookup_entry_w_hash(t, k, lh_get_hash(t, k));
+}
 
 const void* lh_table_lookup(struct lh_table *t, const void *k)
 {
@@ -553,11 +641,11 @@ json_bool lh_table_lookup_ex(struct lh_table* t, const void* k, void **v)
 {
 	struct lh_entry *e = lh_table_lookup_entry(t, k);
 	if (e != NULL) {
-		if (v != NULL) *v = (void *)e->v;
+		if (v != NULL) *v = lh_entry_v(e);
 		return TRUE; /* key found */
 	}
 	if (v != NULL) *v = NULL;
-	return FALSE; /* key not found */
+		return FALSE; /* key not found */
 }
 
 int lh_table_delete_entry(struct lh_table *t, struct lh_entry *e)
