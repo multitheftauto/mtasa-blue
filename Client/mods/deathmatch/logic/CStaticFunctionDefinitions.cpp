@@ -5191,7 +5191,6 @@ bool CStaticFunctionDefinitions::GUIComboBoxSetItemText(CClientEntity& Entity, i
 
 int CStaticFunctionDefinitions::GUIComboBoxGetItemCount(CClientEntity& Entity)
 {
-    RUN_CHILDREN(GUIComboBoxGetItemCount(**iter))
 
     // Are we a CGUI Element?
     if (IS_GUI(&Entity))
@@ -5238,8 +5237,7 @@ bool CStaticFunctionDefinitions::GUIComboBoxSetOpen(CClientEntity& Entity, bool 
 
 bool CStaticFunctionDefinitions::GUIComboBoxIsOpen(CClientEntity& Entity)
 {
-    RUN_CHILDREN(GUIComboBoxIsOpen(**iter))
-
+    
     // Are we a CGUI Element?
     if (IS_GUI(&Entity))
     {
