@@ -284,7 +284,7 @@ bool CVehicle::ReadSpecialData(void)
     char szTemp[256];
     if (GetCustomDataString("color", szTemp, 256, true))
     {
-        uchar ucValues[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        uchar ucValues[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         char* sz1 = strtok(szTemp, ", ");
         if (sz1)
             ucValues[0] = atoi(sz1);
