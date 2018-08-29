@@ -74,6 +74,11 @@ void CLuaVehicleDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("getVehicleNitroLevel", GetVehicleNitroLevel);
     CLuaCFunctions::AddFunction("getHeliBladeCollisionsEnabled", GetHeliBladeCollisionsEnabled);
     CLuaCFunctions::AddFunction("isVehicleWindowOpen", IsVehicleWindowOpen);
+    CLuaCFunctions::AddFunction("getVehicleComponentPosition", GetVehicleComponentPosition);
+    CLuaCFunctions::AddFunction("getVehicleComponentRotation", GetVehicleComponentRotation);
+    CLuaCFunctions::AddFunction("getVehicleComponentVisible", GetVehicleComponentVisible);
+    CLuaCFunctions::AddFunction("getVehicleComponents", GetVehicleComponents);
+    CLuaCFunctions::AddFunction("getVehicleModelExhaustFumesPosition", GetVehicleModelExhaustFumesPosition);
 
     // Vehicle set funcs
     CLuaCFunctions::AddFunction("createVehicle", CreateVehicle);
@@ -116,14 +121,10 @@ void CLuaVehicleDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("setVehicleHandling", SetVehicleHandling);
     CLuaCFunctions::AddFunction("setVehicleSirens", SetVehicleSirens);
     CLuaCFunctions::AddFunction("setVehicleComponentPosition", SetVehicleComponentPosition);
-    CLuaCFunctions::AddFunction("getVehicleComponentPosition", GetVehicleComponentPosition);
     CLuaCFunctions::AddFunction("setVehicleComponentRotation", SetVehicleComponentRotation);
-    CLuaCFunctions::AddFunction("getVehicleComponentRotation", GetVehicleComponentRotation);
     CLuaCFunctions::AddFunction("resetVehicleComponentPosition", ResetVehicleComponentPosition);
     CLuaCFunctions::AddFunction("resetVehicleComponentRotation", ResetVehicleComponentRotation);
     CLuaCFunctions::AddFunction("setVehicleComponentVisible", SetVehicleComponentVisible);
-    CLuaCFunctions::AddFunction("getVehicleComponentVisible", GetVehicleComponentVisible);
-    CLuaCFunctions::AddFunction("getVehicleComponents", GetVehicleComponents);
     CLuaCFunctions::AddFunction("setVehicleNitroActivated", SetVehicleNitroActivated);
     CLuaCFunctions::AddFunction("setVehicleNitroCount", SetVehicleNitroCount);
     CLuaCFunctions::AddFunction("setVehicleNitroLevel", SetVehicleNitroLevel);
@@ -131,7 +132,6 @@ void CLuaVehicleDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("setHeliBladeCollisionsEnabled", SetHeliBladeCollisionsEnabled);
     CLuaCFunctions::AddFunction("setVehicleWindowOpen", SetVehicleWindowOpen);
     CLuaCFunctions::AddFunction("setVehicleModelExhaustFumesPosition", SetVehicleModelExhaustFumesPosition);
-    CLuaCFunctions::AddFunction("getVehicleModelExhaustFumesPosition", GetVehicleModelExhaustFumesPosition);
 }
 
 void CLuaVehicleDefs::AddClass(lua_State* luaVM)
