@@ -15,6 +15,7 @@
 CClientIFP::CClientIFP(class CClientManager* pManager, ElementID ID) : CClientEntity(ID)
 {
     // Init
+    SetSmartPointer(true);
     m_pManager = pManager;
     SetTypeName("IFP");
     m_pIFPAnimations = std::make_shared<CIFPAnimations>();
@@ -22,6 +23,19 @@ CClientIFP::CClientIFP(class CClientManager* pManager, ElementID ID) : CClientEn
     m_bVersion1 = false;
     m_bUnloading = false;
     m_u32Hashkey = 0;
+}
+
+void CClientIFP::Unlink()
+{
+    std::shared_ptr<CClientIFP> pIFP = g_pClientGame->GetIFPPointerFromMap(m_u32Hashkey);
+    if (pIFP)
+    {
+        // Remove IFP from map, so we can indicate that it does not exist
+        g_pClientGame->RemoveIFPPointerFromMap(m_u32Hashkey);
+
+        // Remove IFP animations from replaced animations of peds/players
+        g_pClientGame->OnClientIFPUnload(pIFP);
+    }
 }
 
 bool CClientIFP::LoadIFP(const SString& strFile, const bool isRawData, const SString& strBlockName)
@@ -52,7 +66,7 @@ bool CClientIFP::LoadIFPFile(const SString& strFile, const bool isRawData)
     return false;
 }
 
-bool CClientIFP::ReadIFPByVersion(void)
+bool CClientIFP::ReadIFPByVersion()
 {
     char Version[4];
     ReadBytes(Version, sizeof(Version));
@@ -75,7 +89,7 @@ bool CClientIFP::ReadIFPByVersion(void)
     return false;
 }
 
-void CClientIFP::ReadIFPVersion1(void)
+void CClientIFP::ReadIFPVersion1()
 {
     SInfo Info;
     ReadHeaderVersion1(Info);
@@ -301,7 +315,7 @@ void CClientIFP::ReadDgan(SDgan& Dgan)
     ReadBytes(&Dgan.Info.Entries, Dgan.Info.Base.Size);
 }
 
-CClientIFP::eFrameType CClientIFP::ReadKfrm(void)
+CClientIFP::eFrameType CClientIFP::ReadKfrm()
 {
     SKfrm Kfrm;
     ReadBuffer<SKfrm>(&Kfrm);

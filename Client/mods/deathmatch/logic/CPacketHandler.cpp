@@ -69,6 +69,10 @@ bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfa
             Packet_ChatEcho(bitStream);
             return true;
 
+        case PACKET_ID_CHAT_CLEAR:
+            Packet_ChatClear(bitStream);
+            return true;
+
         case PACKET_ID_CONSOLE_ECHO:
             Packet_ConsoleEcho(bitStream);
             return true;
@@ -1331,6 +1335,11 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
             delete[] szMessage;
         }
     }
+}
+
+void CPacketHandler::Packet_ChatClear(NetBitStreamInterface& bitStream)
+{
+    CStaticFunctionDefinitions::ClearChatBox();
 }
 
 void CPacketHandler::Packet_ConsoleEcho(NetBitStreamInterface& bitStream)

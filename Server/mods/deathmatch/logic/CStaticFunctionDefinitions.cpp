@@ -36,13 +36,13 @@ static CWaterManager*        m_pWaterManager;
 static CCustomWeaponManager* m_pCustomWeaponManager;
 
 // Used to run a function on all the children of the elements too
-#define RUN_CHILDREN( func ) \
-    if ( pElement->CountChildren () && pElement->IsCallPropagationEnabled() ) \
+#define RUN_CHILDREN(func) \
+    if (pElement->CountChildren() && pElement->IsCallPropagationEnabled()) \
     { \
         CElementListSnapshot* pList = pElement->GetChildrenListSnapshot(); \
-        pList->AddRef();    /* Keep list alive during use */ \
-        for ( CElementListSnapshot::const_iterator iter = pList->begin() ; iter != pList->end() ; iter++ ) \
-            if ( !(*iter)->IsBeingDeleted() ) \
+        pList->AddRef(); /* Keep list alive during use */ \
+        for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++) \
+            if (!(*iter)->IsBeingDeleted()) \
                 func; \
         pList->Release(); \
     }
@@ -1225,6 +1225,26 @@ bool CStaticFunctionDefinitions::GetElementVelocity(CElement* pElement, CVector&
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetElementTurnVelocity(CElement* pElement, CVector& vecTurnVelocity)
+{
+    assert(pElement);
+
+    int iType = pElement->GetType();
+    switch (iType)
+    {
+        case CElement::VEHICLE:
+        {
+            CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+            vecTurnVelocity = pVehicle->GetTurnSpeed();
+
+            break;
+        }
+        default:
+            return false;
+    }
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetElementMatrix(CElement* pElement, const CMatrix& matrix)
 {
     RUN_CHILDREN(SetElementMatrix(*iter, matrix))
@@ -1377,6 +1397,46 @@ bool CStaticFunctionDefinitions::SetElementVelocity(CElement* pElement, const CV
     BitStream.pBitStream->Write(vecVelocity.fY);
     BitStream.pBitStream->Write(vecVelocity.fZ);
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_VELOCITY, *BitStream.pBitStream));
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetElementAngularVelocity(CElement* pElement, const CVector& vecTurnVelocity)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetElementAngularVelocity(*iter, vecTurnVelocity))
+
+    int iType = pElement->GetType();
+    switch (iType)
+    {
+        case CElement::PED:
+        case CElement::PLAYER:
+        {
+            // TODO
+            break;
+        }
+        case CElement::VEHICLE:
+        {
+            CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+            pVehicle->SetTurnSpeed(vecTurnVelocity);
+
+            break;
+        }
+        case CElement::OBJECT:
+        case CElement::WEAPON:
+        {
+            // Don't store velocity serverside (requires potentially needless additional sizeof(CVector) bytes per object)
+            break;
+        }
+        default:
+            return false;
+    }
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(vecTurnVelocity.fX);
+    BitStream.pBitStream->Write(vecTurnVelocity.fY);
+    BitStream.pBitStream->Write(vecTurnVelocity.fZ);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_ANGULAR_VELOCITY, *BitStream.pBitStream));
 
     return true;
 }
@@ -4021,7 +4081,7 @@ bool CStaticFunctionDefinitions::SetPedChoking(CElement* pElement, bool bChoking
                     // Remove jetpack now so it doesn't stay on (#9522#c25612)
                     if (pPed->HasJetPack())
                         pPed->SetHasJetPack(false);
-                    
+
                     pPed->SetChoking(bChoking);
 
                     CBitStream bitStream;
@@ -6695,6 +6755,34 @@ bool CStaticFunctionDefinitions::SetVehicleIdleRespawnDelay(CElement* pElement, 
         return true;
     }
 
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetVehicleRespawnRotation(CElement* pElement, CVector& vecRotation)
+{
+    assert(pElement);
+
+    if (IS_VEHICLE(pElement))
+    {
+        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+        vecRotation = pVehicle->GetRespawnRotationDegrees();
+
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetVehicleRespawnPosition(CElement* pElement, CVector& vecPosition)
+{
+    assert(pElement);
+
+    if (IS_VEHICLE(pElement))
+    {
+        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+        vecPosition = pVehicle->GetRespawnPosition();
+
+        return true;
+    }
     return false;
 }
 
@@ -9871,6 +9959,21 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
     return false;
 }
 
+bool CStaticFunctionDefinitions::ClearChatBox(CElement* pElement)
+{
+    assert(pElement);
+
+    RUN_CHILDREN(ClearChatBox(*iter))
+
+    if (IS_PLAYER(pElement))
+    {
+        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
+        pPlayer->Send(CChatClearPacket());
+        return true;
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::OutputConsole(const char* szText, CElement* pElement)
 {
     assert(pElement);
@@ -11065,9 +11168,8 @@ bool CStaticFunctionDefinitions::RemoveAccount(CAccount* pAccount)
 bool CStaticFunctionDefinitions::SetAccountName(CAccount* pAccount, SString strNewName, bool bAllowCaseVariations, SString& strOutError)
 {
     assert(pAccount);
-    assert(!strNewName.empty());
 
-    if (pAccount->IsRegistered())
+    if (!strNewName.empty() && pAccount->IsRegistered())
     {
         // Check for case variations if not allowed
         if (!bAllowCaseVariations)
@@ -11100,9 +11202,8 @@ bool CStaticFunctionDefinitions::SetAccountName(CAccount* pAccount, SString strN
 bool CStaticFunctionDefinitions::SetAccountPassword(CAccount* pAccount, SString strPassword, CAccountPassword::EAccountPasswordType ePasswordType)
 {
     assert(pAccount);
-    assert(!strPassword.empty());
 
-    if (pAccount->IsRegistered())
+    if (!strPassword.empty() && pAccount->IsRegistered())
     {
         if ((ePasswordType == CAccountPassword::PLAINTEXT && CAccountManager::IsValidNewPassword(strPassword)) ||
             (ePasswordType == CAccountPassword::MD5 && strPassword.length() == 32) ||
