@@ -526,97 +526,18 @@ bool XMLColorToInt(const char* szColor, unsigned long& ulColor)
 
 bool XMLColorToInt(const char* szColor, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha)
 {
-    // If we're empty, let's just stop right away
-    if (!szColor || strlen(szColor) == 0)
+    // Convert it to an integer first
+    unsigned long ulColor;
+    if (!XMLColorToInt(szColor, ulColor))
+    {
         return false;
-
-    std::vector<SColorRGBA> vecColors;
-    unsigned char           ucCount;
-    if (ColorStringToRGBA(szColor, SColorRGBA(ucRed, ucGreen, ucBlue, ucAlpha), vecColors, ucCount))
-    {
-        ucRed = vecColors[0].R;
-        ucGreen = vecColors[0].G;
-        ucBlue = vecColors[0].B;
-        ucAlpha = vecColors[0].A;
-        return true;
-    }
-    return false;
-}
-
-bool ColorStringToRGBA(const char* szColor, SColorRGBA defaultColor, std::vector<SColorRGBA>& vecColors, unsigned char& ucCount, bool bIgnoreAlpha)
-{
-    std::stringstream ss(szColor);
-    SColorRGBA        color = defaultColor;
-    bool              bPreviousWasHex = false;
-    int               iRGBAIndex = 0;
-    unsigned long     ulColor;
-    unsigned char     ucValue;
-    unsigned char     ucLength = bIgnoreAlpha ? 3 : 4;
-    while (ss.good())
-    {
-        // Ambiguous value before a comma
-        SString strValue;
-        getline(ss, strValue, ',');
-
-        // Remove spaces
-        ReplaceOccurrencesInString(strValue, " ", "");
-        
-        // Is the value looking like a hexadecimal?
-        if (strValue[0] == '#')
-        {
-            // Try converting it to an integer
-            if (XMLColorToInt(strValue.c_str(), ulColor))
-            {
-                // If a previous RGBA wasn't finished, let's finish it now
-                if (!bPreviousWasHex && iRGBAIndex != 0)
-                {
-                    vecColors.push_back(color);
-                    color = defaultColor;
-                }
-
-                color.R = static_cast<unsigned char>(ulColor);
-                color.G = static_cast<unsigned char>(ulColor >> 8);
-                color.B = static_cast<unsigned char>(ulColor >> 16);
-
-                if (!bIgnoreAlpha)
-                    color.A = static_cast<unsigned char>(ulColor >> 24);
-                
-                bPreviousWasHex = true;
-                ucCount += ucLength;
-            }
-            else
-                return false;
-        }
-        // It looks like a plain number so let's treat it as a RGBA value
-        else if (strValue.find_first_not_of("0123456789") == std::string::npos)
-        {
-            ucValue = atoi(strValue.c_str());
-            if (bPreviousWasHex || iRGBAIndex % ucLength == 0)
-            {
-                color.R = ucValue;
-                bPreviousWasHex = false;
-                iRGBAIndex = 0;
-            }
-            else if (iRGBAIndex % ucLength == 1)
-                color.G = ucValue;
-            else if (iRGBAIndex % ucLength == 2)
-                color.B = ucValue;
-            else if (iRGBAIndex % ucLength == 3)
-                color.A = ucValue;
-            iRGBAIndex++;
-            ucCount++;
-            if (iRGBAIndex % ucLength != 0 && ss.good())
-                continue;
-        }
-        else
-            return false;
-
-        // We have a color, so let's push it
-        vecColors.push_back(color);
-        color = defaultColor;
-        iRGBAIndex = 0;
     }
 
+    // Convert it to red, green, blue and alpha
+    ucRed = static_cast<unsigned char>(ulColor);
+    ucGreen = static_cast<unsigned char>(ulColor >> 8);
+    ucBlue = static_cast<unsigned char>(ulColor >> 16);
+    ucAlpha = static_cast<unsigned char>(ulColor >> 24);
     return true;
 }
 
