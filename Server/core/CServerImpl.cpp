@@ -170,9 +170,7 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
 {
     // Parse our arguments
     if (!ParseArguments(iArgumentCount, szArguments))
-    {
         return 1;
-    }
 
 #ifdef WIN32
     if (!m_fClientFeedback)
@@ -307,9 +305,7 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
 
     // Did we find the path? If not, assume our current
     if (m_strServerPath == "")
-    {
         m_strServerPath = GetSystemCurrentDirectory();
-    }
 
     // Convert all backslashes to forward slashes
     m_strServerPath = m_strServerPath.Replace("\\", "/");
@@ -479,9 +475,7 @@ void CServerImpl::MainLoop(void)
         m_pModManager->DoPulse();
 
         if (m_pModManager->IsFinished())
-        {
             m_bRequestedQuit = true;
-        }
 
         HandlePulseSleep();
     }
@@ -736,9 +730,7 @@ void CServerImpl::HandleInput(void)
             iStdIn = 0;
     }
     else if (kbhit())
-    {
         iStdIn = _getwch();
-    }
 #else
     if (!g_bNoCurses)
     {
@@ -748,7 +740,6 @@ void CServerImpl::HandleInput(void)
     else
     {
         iStdIn = getwchar();
-
         if (iStdIn == WEOF)
             iStdIn = 0;
     }
@@ -821,9 +812,7 @@ void CServerImpl::HandleInput(void)
         case KEY_BACKSPACE:            // Backspace
         case 0x7F:
             if (m_uiInputCount == 0)
-            {
                 break;
-            }
 
             // Insert a blank space + backspace
 #ifdef WIN32
@@ -847,13 +836,10 @@ void CServerImpl::HandleInput(void)
             switch (iStdIn)
             {
 #endif
-
                 case KEY_LEFT:
                 {
                     if (m_uiInputCount <= 0)
-                    {
                         break;
-                    }
 
 #ifdef WIN32
                     wchar_t szBuffer[255];
@@ -865,8 +851,8 @@ void CServerImpl::HandleInput(void)
 
                     Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
 #else
-            if (!g_bSilent && !g_bNoCurses)
-                wmove(m_wndInput, 0, --m_uiInputCount);
+                    if (!g_bSilent && !g_bNoCurses)
+                        wmove(m_wndInput, 0, --m_uiInputCount);
 #endif
                     break;
                 }
@@ -874,9 +860,7 @@ void CServerImpl::HandleInput(void)
                 case KEY_RIGHT:
                 {
                     if (m_uiInputCount == wcslen(m_szInputBuffer))
-                    {
                         break;
-                    }
 
 #ifdef WIN32
                     wchar_t szBuffer[255];
@@ -888,8 +872,8 @@ void CServerImpl::HandleInput(void)
 
                     Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
 #else
-            if (!g_bSilent && !g_bNoCurses)
-                wmove(m_wndInput, 0, ++m_uiInputCount);
+                    if (!g_bSilent && !g_bNoCurses)
+                        wmove(m_wndInput, 0, ++m_uiInputCount);
 #endif
                     break;
                 }
@@ -934,10 +918,8 @@ void CServerImpl::HandleInput(void)
 
         default:
             if (m_uiInputCount == sizeof(m_szInputBuffer) / sizeof(wchar_t) - 1)
-            {
                 // entered 254 characters, wait for user to confirm/remove
                 break;
-            }
 
 #ifdef WIN32
             // Color the text
@@ -1153,9 +1135,7 @@ bool IsKeyPressed(int iKey)
     // Is the key pressed?
 #ifdef WIN32
     if (kbhit())
-    {
         return getch() == iKey;
-    }
 #else
     refresh();
     return getchar() == iKey;
@@ -1190,9 +1170,7 @@ void WaitForKey(int iKey)
         {
             // Is the key pressed?
             if (IsKeyPressed(iKey))
-            {
                 return;
-            }
 
             // Limit the looping a little to prevent heavy CPU usage
             Sleep(10);
