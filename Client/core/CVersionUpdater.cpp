@@ -3094,7 +3094,8 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer(void)
     SLibVersionInfo verInfoKernel32 = {}, verInfoNcrypt = {};
     GetLibVersionInfo("kernel32.dll", &verInfoKernel32);
     GetLibVersionInfo("ncrypt.dll", &verInfoNcrypt);
-    if (Is64BitOS() && verInfoNcrypt.GetFileVersionString() > "6.1.7601" && verInfoNcrypt.GetFileVersionString() < "6.1.7601.18741")
+    if (Is64BitOS() && GetApplicationSetting("real-os-version") == "6.1" && GetApplicationSetting("real-os-build") == "7601" &&
+        verInfoNcrypt.GetFileVersionString() < "6.1.7601.18741")
     {
         iReqKB3033929 = IsHotFixInstalled("KB3033929") ? 0 : 1;
         iReqKB3035131 = IsHotFixInstalled("KB3035131") ? 0 : 1;
