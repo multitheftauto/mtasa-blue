@@ -112,8 +112,8 @@ private:
     double m_dLastTimeMs;
     double m_dPrevOverrun;
 
-    std::vector<SString> m_vecCommandHistory = {""};
-    uint                 m_uiSelectedCommandHistoryEntry = 0;
+    std::vector<std::vector<SString>> m_vecCommandHistory = {{"", ""}};
+    uint                              m_uiSelectedCommandHistoryEntry = 0;
 
 #ifdef WIN32
     HANDLE    m_hConsole;

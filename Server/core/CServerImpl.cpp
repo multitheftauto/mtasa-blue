@@ -802,10 +802,16 @@ void CServerImpl::HandleInput(void)
                     // Otherwise, pass the command to the mod's input handler
                     m_pModManager->HandleInput(szCommand);
 
-                    if (!szCommand.empty() && (m_vecCommandHistory.empty() || m_vecCommandHistory.back() != szCommand))
-                        m_vecCommandHistory.push_back(szCommand);
+                    // If the command is not empty and it isn't identical to the previous entry in history, add it to the history
+                    // The first string is the original command, the second string is for storing the edited command
+                    if (!szCommand.empty() && (m_vecCommandHistory.empty() || m_vecCommandHistory.back()[0] != szCommand))
+                        m_vecCommandHistory.push_back({szCommand, szCommand});
                 }
             }
+
+            // Reset command history edits to their original commands
+            for (auto& i : m_vecCommandHistory)
+                i[1] = i[0];
 
             memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
             m_uiInputCount = 0;
@@ -968,14 +974,14 @@ void CServerImpl::SelectCommandHistoryEntry(uint uiEntry)
     else
         m_uiSelectedCommandHistoryEntry = 0;
 
-    // Save current input buffer to the command history entry
-    m_vecCommandHistory[uiPreviouslySelectedCommandHistoryEntry] = UTF16ToMbUTF8(m_szInputBuffer).c_str();
+    // Save current input buffer to the command history entry as the second element
+    m_vecCommandHistory[uiPreviouslySelectedCommandHistoryEntry][1] = UTF16ToMbUTF8(m_szInputBuffer).c_str();
 
-    // Clear out input
+    // Clear input
     ClearInput();
 
-    // If the input is empty, let's just stop here
-    SString szInput = m_vecCommandHistory[m_uiSelectedCommandHistoryEntry];
+    // If the selected command is empty, let's just stop here
+    SString szInput = m_vecCommandHistory[m_uiSelectedCommandHistoryEntry][1];
     if (szInput.empty())
         return;
 
