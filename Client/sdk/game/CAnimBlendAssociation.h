@@ -28,6 +28,7 @@ public:
     virtual CAnimBlendAssociationSAInterface*    Constructor(CAnimBlendStaticAssociationSAInterface& StaticAssociationByReference) = 0;
     virtual CAnimBlendAssociationSAInterface*    Constructor(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy) = 0;
     virtual CAnimBlendAssociationSAInterface*    InitializeForCustomAnimation(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy) = 0;
+    virtual void                                 FreeAnimBlendNodeArray() = 0;
     virtual CAnimBlendAssociationSAInterface*    GetInterface() = 0;
     virtual AssocGroupId                         GetAnimGroup() = 0;
     virtual AnimationId                          GetAnimID() = 0;
