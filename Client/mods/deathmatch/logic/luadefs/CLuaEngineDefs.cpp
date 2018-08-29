@@ -22,6 +22,8 @@ void CLuaEngineDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("engineRestoreCOL", EngineRestoreCOL);
     CLuaCFunctions::AddFunction("engineReplaceModel", EngineReplaceModel);
     CLuaCFunctions::AddFunction("engineRestoreModel", EngineRestoreModel);
+    CLuaCFunctions::AddFunction("engineRequestModel", EngineRequestModel);
+    CLuaCFunctions::AddFunction("engineFreeModel", EngineFreeModel);
     CLuaCFunctions::AddFunction("engineReplaceAnimation", EngineReplaceAnimation);
     CLuaCFunctions::AddFunction("engineRestoreAnimation", EngineRestoreAnimation);
     CLuaCFunctions::AddFunction("engineGetModelLODDistance", EngineGetModelLODDistance);
@@ -473,6 +475,73 @@ int CLuaEngineDefs::EngineRestoreModel(lua_State* luaVM)
     }
 
     // Failure
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
+{
+    SString strModelType;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strModelType);
+
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (pLuaMain)
+    {
+        CResource* pResource = pLuaMain->GetResource();
+        if (pResource)
+        {
+            if (!argStream.HasErrors())
+            {
+                eClientModelType eModelType;
+                if (strModelType == "ped")
+                {
+                    eModelType = CCLIENTMODELPED;
+                }
+                else
+                {
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+
+                int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
+                if (iModelID != INVALID_MODEL_ID) {
+                    CClientModel* pModel = new CClientModel(m_pManager, iModelID, eModelType);
+                    pModel->Allocate();
+                    pModel->SetParentResource(pResource);
+
+                    lua_pushinteger(luaVM, iModelID);
+                    return 1;
+                }
+            }
+            else
+                m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        }
+    }
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineFreeModel(lua_State* luaVM)
+{
+    int iModelID;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(iModelID);
+
+    if (!argStream.HasErrors())
+    {
+        CClientModel* pModel = m_pManager->GetModelManager()->FindModelByID(iModelID);
+
+        if (pModel && pModel->Deallocate())
+            lua_pushboolean(luaVM, true);
+
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
     lua_pushboolean(luaVM, false);
     return 1;
 }
