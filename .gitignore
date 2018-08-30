@@ -416,7 +416,3 @@ utils/DXFiles/
 !*.dll
 !*.exe
 utils/vswhere.exe
-
-utils/clang-format-r325576\.exe
-
-utils/fnr\.exe
