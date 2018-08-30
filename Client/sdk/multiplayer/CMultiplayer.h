@@ -193,6 +193,7 @@ public:
     virtual void SetIdleHandler(IdleHandler* pHandler) = 0;
     virtual void SetPreFxRenderHandler(PreFxRenderHandler* pHandler) = 0;
     virtual void SetPreHudRenderHandler(PreHudRenderHandler* pHandler) = 0;
+    virtual void DisableCallsToCAnimBlendNode(bool bDisableCalls) = 0;
     virtual void SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler) = 0;
     virtual void SetAddAnimationHandler(AddAnimationHandler* pHandler) = 0;
     virtual void SetAddAnimationAndSyncHandler(AddAnimationAndSyncHandler* pHandler) = 0;

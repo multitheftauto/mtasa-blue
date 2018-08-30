@@ -19,6 +19,9 @@ DWORD FUNC_CAnimBlendAssociation__ReferenceAnimBlock = 0x4CEA50;
 DWORD FUNC_UncompressAnimation = 0x4D41C0;
 DWORD FUNC_CAnimBlendAssociation__CAnimBlendAssociation_hierarchy = 0x4CEFC0;
 
+DWORD RETURN_CAnimBlendNode_GetCurrentTranslation_NORMALFLOW = 0x4CFC55;
+DWORD RETURN_CAnimBlendAssociation_SetCurrentTime_NORMALFLOW = 0x4CEA88;
+DWORD RETURN_RpAnimBlendClumpUpdateAnimations_NORMALFLOW = 0x4D34F8;
 DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation_NORMALFLOW = 0x4CE151;
 DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation = 0x4CE187;
 DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation_ERROR = 0x4CE199;
@@ -33,6 +36,8 @@ AddAnimationHandler*            m_pAddAnimationHandler = nullptr;
 AddAnimationAndSyncHandler*     m_pAddAnimationAndSyncHandler = nullptr;
 AssocGroupCopyAnimationHandler* m_pAssocGroupCopyAnimationHandler = nullptr;
 BlendAnimationHierarchyHandler* m_pBlendAnimationHierarchyHandler = nullptr;
+
+static bool bDisableCallsToCAnimBlendNode = true;
 
 int _cdecl OnCAnimBlendAssocGroupCopyAnimation(AssocGroupId animGroup, int iAnimId);
 
@@ -54,6 +59,86 @@ void CMultiplayerSA::SetAssocGroupCopyAnimationHandler(AssocGroupCopyAnimationHa
 void CMultiplayerSA::SetBlendAnimationHierarchyHandler(BlendAnimationHierarchyHandler* pHandler)
 {
     m_pBlendAnimationHierarchyHandler = pHandler;
+}
+
+void CMultiplayerSA::DisableCallsToCAnimBlendNode(bool bDisableCalls)
+{
+    bDisableCallsToCAnimBlendNode = bDisableCalls;
+}
+
+void _declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
+{
+    _asm
+    {
+        pushad
+    }
+
+    if (bDisableCallsToCAnimBlendNode)
+    {
+        _asm
+        {
+            popad
+            retn 8
+        }
+    }
+
+    _asm
+    {
+        popad
+        sub     esp, 18h
+        xor     eax, eax
+        jmp     RETURN_CAnimBlendNode_GetCurrentTranslation_NORMALFLOW
+    }
+}
+
+void _declspec(naked) HOOK_CAnimBlendAssociation_SetCurrentTime()
+{
+    _asm
+    {
+        pushad
+    }
+
+    if (bDisableCallsToCAnimBlendNode)
+    {
+        _asm
+        {
+            popad
+            retn 4
+        }
+    }
+
+    _asm
+    {
+        popad
+        mov     eax, [esp+4]
+        fld     [esp+4]
+        jmp     RETURN_CAnimBlendAssociation_SetCurrentTime_NORMALFLOW
+    }
+}
+
+void _declspec(naked) HOOK_RpAnimBlendClumpUpdateAnimations()
+{
+    _asm
+    {
+        pushad
+    }
+
+    if (bDisableCallsToCAnimBlendNode)
+    {
+        _asm
+        {
+            popad
+            retn
+        }
+    }
+
+    _asm
+    {
+        popad
+        sub     esp, 3Ch
+        mov     eax, ds:[0B5F878h]
+        jmp     RETURN_RpAnimBlendClumpUpdateAnimations_NORMALFLOW
+    }
 }
 
 CAnimBlendAssociationSAInterface* __cdecl CAnimBlendAssocGroup_CopyAnimation(RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroupInterface,

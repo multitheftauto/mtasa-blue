@@ -752,7 +752,15 @@ uint GetWeaponPropertyFlagBit(eWeaponProperty weaponProperty)
 //
 // Set error if pThisResource does not have permission to modify pOtherResource
 //
-void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, CResource* pOtherResource2)
+void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource)
+{
+    // No operation on the client
+}
+
+//
+// Set error if pThisResource does not have permission to modify every resource in resourceList
+//
+void CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisResource, std::initializer_list<CResource*> resourceList)
 {
     // No operation on the client
 }

@@ -258,6 +258,7 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->SetPostWorldProcessHandler(CClientGame::StaticPostWorldProcessHandler);
     g_pMultiplayer->SetPreFxRenderHandler(CClientGame::StaticPreFxRenderHandler);
     g_pMultiplayer->SetPreHudRenderHandler(CClientGame::StaticPreHudRenderHandler);
+    g_pMultiplayer->DisableCallsToCAnimBlendNode(false);
     g_pMultiplayer->SetCAnimBlendAssocDestructorHandler(CClientGame::StaticCAnimBlendAssocDestructorHandler);
     g_pMultiplayer->SetAddAnimationHandler(CClientGame::StaticAddAnimationHandler);
     g_pMultiplayer->SetAddAnimationAndSyncHandler(CClientGame::StaticAddAnimationAndSyncHandler);
@@ -418,6 +419,7 @@ CClientGame::~CClientGame(void)
     g_pMultiplayer->SetPostWorldProcessHandler(NULL);
     g_pMultiplayer->SetPreFxRenderHandler(NULL);
     g_pMultiplayer->SetPreHudRenderHandler(NULL);
+    g_pMultiplayer->DisableCallsToCAnimBlendNode(true);
     g_pMultiplayer->SetCAnimBlendAssocDestructorHandler(NULL);
     g_pMultiplayer->SetAddAnimationHandler(NULL);
     g_pMultiplayer->SetAddAnimationAndSyncHandler(NULL);
@@ -3543,9 +3545,6 @@ void CClientGame::Event_OnIngame(void)
     g_pGame->GetWaterManager()->SetWaterDrawnLast(true);
     m_pCamera->SetCameraClip(true, true);
 
-    // Deallocate all custom models
-    m_pManager->GetModelManager()->RemoveAll();
-
     // Create a local player for us
     m_pLocalPlayer = new CClientPlayer(m_pManager, m_LocalID, true);
     if (m_pLocalPlayer)
@@ -5578,9 +5577,9 @@ void CClientGame::ResetMapInfo(void)
     // Vehicles LOD distance
     g_pGame->GetSettings()->ResetVehiclesLODDistance();
 
-    // Peds LOD distance 
-    g_pGame->GetSettings()->ResetPedsLODDistance(); 
-    
+    // Peds LOD distance
+    g_pGame->GetSettings()->ResetPedsLODDistance();
+
     // Sun color
     g_pMultiplayer->ResetSunColor();
 

@@ -40,7 +40,11 @@ void CLuaFileDefs::AddClass(lua_State* luaVM)
 
     lua_classmetamethod(luaVM, "__gc", fileCloseGC);
 
-    lua_classfunction(luaVM, "create", "fileCreate");
+#ifdef MTA_CLIENT
+    lua_classfunction(luaVM, "create", CLuaFileDefs::File);
+#else
+    lua_classfunction(luaVM, "create", "fileCreate", CLuaFileDefs::File);
+#endif
 
     lua_classfunction(luaVM, "open", "fileOpen");
     lua_classfunction(luaVM, "new", "fileCreate");
@@ -430,7 +434,7 @@ int CLuaFileDefs::fileCopy(lua_State* luaVM)
         if (CResourceManager::ParseResourcePathInput(strInputSrcPath, pSrcResource, &strSrcAbsPath) &&
             CResourceManager::ParseResourcePathInput(strInputDestPath, pDestResource, &strDestAbsPath))
         {
-            CheckCanModifyOtherResource(argStream, pThisResource, pSrcResource, pDestResource);
+            CheckCanModifyOtherResources(argStream, pThisResource, { pSrcResource, pDestResource });
             CheckCanAccessOtherResourceFile(argStream, pThisResource, pSrcResource, strSrcAbsPath);
             CheckCanAccessOtherResourceFile(argStream, pThisResource, pDestResource, strDestAbsPath);
             if (!argStream.HasErrors())
@@ -521,7 +525,7 @@ int CLuaFileDefs::fileRename(lua_State* luaVM)
         if (CResourceManager::ParseResourcePathInput(strInputSrcPath, pSrcResource, &strSrcAbsPath) &&
             CResourceManager::ParseResourcePathInput(strInputDestPath, pDestResource, &strDestAbsPath))
         {
-            CheckCanModifyOtherResource(argStream, pThisResource, pSrcResource, pDestResource);
+            CheckCanModifyOtherResources(argStream, pThisResource, { pSrcResource, pDestResource });
             CheckCanAccessOtherResourceFile(argStream, pThisResource, pSrcResource, strSrcAbsPath);
             CheckCanAccessOtherResourceFile(argStream, pThisResource, pDestResource, strDestAbsPath);
             if (!argStream.HasErrors())
