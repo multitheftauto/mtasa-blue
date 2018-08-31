@@ -40,12 +40,7 @@ enum eRadioStationID
     WCTR,
 };
 
-typedef void(__thiscall* hCAnimBlendStaticAssociation_FreeSequenceArray)(CAnimBlendStaticAssociationSAInterface* pThis);
-typedef void(__cdecl* hUncompressAnimation)(CAnimBlendHierarchySAInterface* pAnimBlendHierarchyInterface);
 typedef void*(__cdecl* hCAnimBlendAssociation_NewOperator)(size_t iSizeInBytes);
-
-typedef CAnimBlendAssociationSAInterface*(__thiscall* hCAnimBlendAssociation_Constructor_staticAssocByReference)(
-    CAnimBlendAssociationSAInterface* pThis, CAnimBlendStaticAssociationSAInterface& StaticAssociationByReference);
 
 class CMultiplayerSA : public CMultiplayer
 {
@@ -114,6 +109,7 @@ public:
     void SetIdleHandler(IdleHandler* pHandler);
     void SetPreFxRenderHandler(PreFxRenderHandler* pHandler);
     void SetPreHudRenderHandler(PreHudRenderHandler* pHandler);
+    void DisableCallsToCAnimBlendNode(bool bDisableCalls);
     void SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler);
     void SetAddAnimationHandler(AddAnimationHandler* pHandler);
     void SetAddAnimationAndSyncHandler(AddAnimationAndSyncHandler* pHandler);
@@ -183,8 +179,8 @@ public:
     int   GetMoonSize();
     void  ResetMoonSize();
 
-    void SetNightVisionEnabled(bool bEnabled);
-    void SetThermalVisionEnabled(bool bEnabled);
+    void SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled);
+    void SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled);
     bool IsNightVisionEnabled();
     bool IsThermalVisionEnabled();
 

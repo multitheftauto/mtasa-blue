@@ -3084,6 +3084,23 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer(void)
         }
     }
 
+    // Mem stats
+    MEMORYSTATUSEX memoryStatus = {sizeof(memoryStatus)};
+    GlobalMemoryStatusEx(&memoryStatus);
+
+    // Info required for hotfix update
+    int             iReqKB3033929 = -1;
+    int             iReqKB3035131 = -1;
+    SLibVersionInfo verInfoKernel32 = {}, verInfoNcrypt = {};
+    GetLibVersionInfo("kernel32.dll", &verInfoKernel32);
+    GetLibVersionInfo("ncrypt.dll", &verInfoNcrypt);
+    if (Is64BitOS() && GetApplicationSetting("real-os-version") == "6.1" && GetApplicationSetting("real-os-build") == "7601" &&
+        verInfoNcrypt.GetFileVersionString() < "6.1.7601.18741")
+    {
+        iReqKB3033929 = IsHotFixInstalled("KB3033929") ? 0 : 1;
+        iReqKB3035131 = IsHotFixInstalled("KB3035131") ? 0 : 1;
+    }
+
     bool bSecureBootEnabled =
         (GetSystemRegistryValue((uint)HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\SecureBoot\\State", "UEFISecureBootEnabled") == "\x01");
     // Compile some system stats
@@ -3096,38 +3113,57 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer(void)
         "1_%d_%d_%d_%d_%d"
         "_%d%d%d%d"
         "_%s",
-        static_cast<int>(GetWMITotalPhysicalMemory() / 1024LL / 1024LL), g_pDeviceState->AdapterState.InstalledMemoryKB / 1024,
-        gameSettings->GetCurrentVideoMode(), gameSettings->GetFXQuality(), dxStatus.settings.iDrawDistance
+        static_cast<int>(GetWMITotalPhysicalMemory() / 1024LL / 1024LL),            //
+        g_pDeviceState->AdapterState.InstalledMemoryKB / 1024,                      //
+        gameSettings->GetCurrentVideoMode(),                                        //
+        gameSettings->GetFXQuality(),                                               //
+        dxStatus.settings.iDrawDistance,                                            //
 
-        ,
-        GetVideoModeManager()->IsWindowed(), GetVideoModeManager()->IsMultiMonitor(), dxStatus.settings.bVolumetricShadows, dxStatus.settings.bAllowScreenUpload
+        GetVideoModeManager()->IsWindowed(),                //
+        GetVideoModeManager()->IsMultiMonitor(),            //
+        dxStatus.settings.bVolumetricShadows,               //
+        dxStatus.settings.bAllowScreenUpload,               //
 
-        ,
-        *GetApplicationSetting("real-os-version"));
+        *GetApplicationSetting("real-os-version")            //
+    );
 
     SString strSystemStats2(
         "2_%d_%d_%d"
         "_%d_%d_%d"
         "_%d_%d_%d_%d_%d_%x",
-        g_pGraphics->GetViewportWidth(), g_pGraphics->GetViewportHeight(), dxStatus.settings.b32BitColor
+        g_pGraphics->GetViewportWidth(),             //
+        g_pGraphics->GetViewportHeight(),            //
+        dxStatus.settings.b32BitColor,               //
 
-        ,
-        GetApplicationSettingInt(DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE), GetApplicationSettingInt(DIAG_MINIDUMP_DETECTED_COUNT),
-        GetApplicationSettingInt(DIAG_MINIDUMP_CONFIRMED_COUNT)
+        GetApplicationSettingInt(DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE),            //
+        GetApplicationSettingInt(DIAG_MINIDUMP_DETECTED_COUNT),                   //
+        GetApplicationSettingInt(DIAG_MINIDUMP_CONFIRMED_COUNT),                  //
 
-            ,
-        atoi(dxStatus.videoCard.strPSVersion), dxStatus.videoCard.iNumSimultaneousRTs, dxStatus.settings.iAntiAliasing, dxStatus.settings.iAnisotropicFiltering,
-        (int)dxStatus.settings.fFieldOfView, dxStatus.videoCard.depthBufferFormat);
+        atoi(dxStatus.videoCard.strPSVersion),              //
+        dxStatus.videoCard.iNumSimultaneousRTs,             //
+        dxStatus.settings.iAntiAliasing,                    //
+        dxStatus.settings.iAnisotropicFiltering,            //
+        (int)dxStatus.settings.fFieldOfView,                //
+        dxStatus.videoCard.depthBufferFormat                //
+    );
 
     SString strSystemStats3(
         "3_0"            // Was VS2013 runtime installed
-        "_%s"
-        "_%s"
-        "_%d"
+        "_%s_%s_%d"
         "_0"            // Was VS2015 runtime version
-        "_%d",
-        *GetApplicationSetting("real-os-build"), *GetApplicationSetting("locale").Replace("_", "-"),
-        (uint)FileSize(PathJoin(GetSystemSystemPath(), "normaliz.dll")), bSecureBootEnabled);
+        "_%d_%d_%d_%d_%d_%s_%s",
+        *GetApplicationSetting("real-os-build"),                                    //
+        *GetApplicationSetting("locale").Replace("_", "-"),                         //
+        (uint)FileSize(PathJoin(GetSystemSystemPath(), "normaliz.dll")),            //
+
+        bSecureBootEnabled,                                               //
+        static_cast<int>(memoryStatus.ullTotalVirtual / 1024),            //
+        Is64BitOS(),                                                      //
+        iReqKB3033929,                                                    //
+        iReqKB3035131,                                                    //
+        *verInfoKernel32.GetFileVersionString(),                          //
+        *verInfoNcrypt.GetFileVersionString()                             //
+    );
 
     SString strConnectUsage = SString("%i_%i", GetApplicationSettingInt("times-connected-editor"), GetApplicationSettingInt("times-connected"));
     SString strOptimusInfo = SString("%i_%i_%i", GetApplicationSettingInt("nvhacks", "optimus"), GetApplicationSettingInt("nvhacks", "optimus-startup-option"),

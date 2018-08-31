@@ -52,10 +52,9 @@ void _declspec(naked) HOOK_FallenPeds()
     }
 }
 
-
 void _declspec(naked) HOOK_FallenCars()
 {
-    if (pGame && !pGame->IsUnderWorldWarpEnabled())
+    if (pGame && pGame->IsUnderWorldWarpEnabled())
     {
         _asm
         {

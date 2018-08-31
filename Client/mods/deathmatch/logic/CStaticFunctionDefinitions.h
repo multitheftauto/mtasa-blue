@@ -44,6 +44,7 @@ public:
     static bool SetClipboard(SString& strText);
     static bool GetClipboard(SString& strText);
     static bool SetWindowFlashing(bool flash, uint count);
+    static bool ClearChatBox(void);
 
     // Notification funcs
     static bool CreateTrayNotification(SString strText, eTrayIconType eType, bool useSound);
@@ -58,6 +59,7 @@ public:
     static bool           GetElementPosition(CClientEntity& Entity, CVector& vecPosition);
     static bool           GetElementRotation(CClientEntity& Entity, CVector& vecRotation, eEulerRotationOrder rotationOrder);
     static bool           GetElementVelocity(CClientEntity& Entity, CVector& vecVelocity);
+    static bool           GetElementTurnVelocity(CClientEntity& Entity, CVector& vecTurnVelocity);
     static bool           GetElementInterior(CClientEntity& Entity, unsigned char& ucInterior);
     static bool           GetElementBoundingBox(CClientEntity& Entity, CVector& vecMin, CVector& vecMax);
     static bool           GetElementRadius(CClientEntity& Entity, float& fRadius);
@@ -87,6 +89,7 @@ public:
     static bool          SetElementPosition(CClientEntity& Entity, const CVector& vecPosition, bool bWarp = true);
     static bool          SetElementRotation(CClientEntity& Entity, const CVector& vecRotation, eEulerRotationOrder rotationOrder, bool bNewWay);
     static bool          SetElementVelocity(CClientEntity& Element, const CVector& vecVelocity);
+    static bool          SetElementAngularVelocity(CClientEntity& Element, const CVector& vecTurnVelocity);
     static bool          SetElementParent(CClientEntity& Element, CClientEntity& Parent, CLuaMain* pLuaMain);
     static bool          SetElementInterior(CClientEntity& Entity, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition);
     static bool          SetElementDimension(CClientEntity& Entity, unsigned short usDimension);
@@ -218,6 +221,8 @@ public:
     static bool            GetVehicleNitroLevel(CClientVehicle& Vehicle, float& fLevel);
     static bool            GetHeliBladeCollisionsEnabled(CClientVehicle& Vehicle);
     static bool            IsVehicleWindowOpen(CClientVehicle& Vehicle, uchar ucWindow);
+    static bool            SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
+    static bool            GetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
 
     // Vehicle set functions
     static bool FixVehicle(CClientEntity& Entity);
@@ -460,6 +465,7 @@ public:
 
     static void GUIMemoSetReadOnly(CClientEntity& Element, bool bFlag);
     static void GUIMemoSetCaretIndex(CClientEntity& Element, unsigned int iCaret);
+    static void GUIMemoSetVerticalScrollPosition(CClientEntity& Element, float fPosition);
 
     static void                GUIGridListSetSortingEnabled(CClientEntity& Element, bool bEnabled);
     static inline unsigned int GUIGridListAddColumn(CClientGUIElement& GUIElement, const char* szTitle, float fWidth)

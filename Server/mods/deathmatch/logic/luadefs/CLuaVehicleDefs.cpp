@@ -84,6 +84,8 @@ void CLuaVehicleDefs::LoadFunctions()
     CLuaCFunctions::AddFunction("setVehicleRespawnDelay", SetVehicleRespawnDelay);
     CLuaCFunctions::AddFunction("setVehicleIdleRespawnDelay", SetVehicleIdleRespawnDelay);
     CLuaCFunctions::AddFunction("setVehicleRespawnPosition", SetVehicleRespawnPosition);
+    CLuaCFunctions::AddFunction("getVehicleRespawnPosition", GetVehicleRespawnPosition);
+    CLuaCFunctions::AddFunction("getVehicleRespawnRotation", GetVehicleRespawnRotation);
     CLuaCFunctions::AddFunction("respawnVehicle", RespawnVehicle);
     CLuaCFunctions::AddFunction("resetVehicleExplosionTime", ResetVehicleExplosionTime);
     CLuaCFunctions::AddFunction("resetVehicleIdleTime", ResetVehicleIdleTime);
@@ -248,7 +250,8 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "overrideLights", "setVehicleOverrideLights", "getVehicleOverrideLights");
     lua_classvariable(luaVM, "idleRespawnDelay", "setVehicleIdleRespawnDelay", NULL);
     lua_classvariable(luaVM, "respawnDelay", "setVehicleRespawnDelay", NULL);
-    lua_classvariable(luaVM, "respawnPosition", "setVehicleRespawnPosition", NULL);
+    lua_classvariable(luaVM, "respawnPosition", "setVehicleRespawnPosition", "getVehicleRespawnPosition", SetVehicleRespawnPosition, OOP_GetVehicleRespawnPosition);
+    lua_classvariable(luaVM, "respawnRotation", NULL, "getVehicleRespawnRotation", NULL, OOP_GetVehicleRespawnRotation);
     lua_classvariable(luaVM, "onGround", NULL, "isVehicleOnGround");
     lua_classvariable(luaVM, "name", NULL, "getVehicleName");
     lua_classvariable(luaVM, "vehicleType", NULL, "getVehicleType");
@@ -348,11 +351,8 @@ int CLuaVehicleDefs::GetVehicleType(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (ulModel >= 400 && ulModel < 610)
-        {
-            lua_pushstring(luaVM, CVehicleNames::GetVehicleTypeName(ulModel));
-            return 1;
-        }
+        lua_pushstring(luaVM, CVehicleNames::GetVehicleTypeName(ulModel));
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -2215,6 +2215,108 @@ int CLuaVehicleDefs::SetVehicleRespawnDelay(lua_State* luaVM)
         {
             lua_pushboolean(luaVM, true);
             return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::OOP_GetVehicleRespawnRotation(lua_State* luaVM)
+{
+    CElement* pElement = NULL;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+
+    if (!argStream.HasErrors())
+    {
+        CVector vecRotationDegress;
+        if (CStaticFunctionDefinitions::GetVehicleRespawnRotation(pElement, vecRotationDegress))
+        {
+            lua_pushvector(luaVM, vecRotationDegress);
+
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::OOP_GetVehicleRespawnPosition(lua_State* luaVM)
+{
+    CElement* pElement = NULL;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+
+    if (!argStream.HasErrors())
+    {
+        CVector vecPosition;
+        if (CStaticFunctionDefinitions::GetVehicleRespawnPosition(pElement, vecPosition))
+        {
+            lua_pushvector(luaVM, vecPosition);
+
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::GetVehicleRespawnRotation(lua_State* luaVM)
+{
+    // float, float, float getVehicleRespawnRotation( vehicle theVehicle )
+    CElement* pElement = NULL;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+
+    if (!argStream.HasErrors())
+    {
+        CVector vecRotationDegress;
+        if (CStaticFunctionDefinitions::GetVehicleRespawnRotation(pElement, vecRotationDegress))
+        {
+            lua_pushnumber(luaVM, vecRotationDegress.fX);
+            lua_pushnumber(luaVM, vecRotationDegress.fY);
+            lua_pushnumber(luaVM, vecRotationDegress.fZ);
+
+            return 3;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::GetVehicleRespawnPosition(lua_State* luaVM)
+{
+    // float, float, float getVehicleRespawnPosition( vehicle theVehicle )
+    CElement* pElement = NULL;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+
+    if (!argStream.HasErrors())
+    {
+        CVector vecPosition;
+        if (CStaticFunctionDefinitions::GetVehicleRespawnPosition(pElement, vecPosition))
+        {
+            lua_pushnumber(luaVM, vecPosition.fX);
+            lua_pushnumber(luaVM, vecPosition.fY);
+            lua_pushnumber(luaVM, vecPosition.fZ);
+
+            return 3;
         }
     }
     else

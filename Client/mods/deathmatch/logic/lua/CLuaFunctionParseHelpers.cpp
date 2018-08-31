@@ -488,6 +488,15 @@ ADD_ENUM(FRONT_RIGHT_WHEEL, "front_right")
 ADD_ENUM(REAR_RIGHT_WHEEL, "rear_right")
 IMPLEMENT_ENUM_END("wheel-position")
 
+IMPLEMENT_ENUM_BEGIN(D3DPRIMITIVETYPE)
+ADD_ENUM(D3DPT_POINTLIST, "pointlist")
+ADD_ENUM(D3DPT_LINELIST, "linelist")
+ADD_ENUM(D3DPT_LINESTRIP, "linestrip")
+ADD_ENUM(D3DPT_TRIANGLELIST, "trianglelist")
+ADD_ENUM(D3DPT_TRIANGLESTRIP, "trianglestrip")
+ADD_ENUM(D3DPT_TRIANGLEFAN, "trianglefan")
+IMPLEMENT_ENUM_END("primitive-type")
+
 //
 // Get best guess at name of userdata type
 //
@@ -743,7 +752,15 @@ uint GetWeaponPropertyFlagBit(eWeaponProperty weaponProperty)
 //
 // Set error if pThisResource does not have permission to modify pOtherResource
 //
-void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, CResource* pOtherResource2)
+void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource)
+{
+    // No operation on the client
+}
+
+//
+// Set error if pThisResource does not have permission to modify every resource in resourceList
+//
+void CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisResource, std::initializer_list<CResource*> resourceList)
 {
     // No operation on the client
 }

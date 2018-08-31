@@ -154,6 +154,8 @@ public:
 
     virtual eClientEntityType GetType(void) const = 0;
     bool                      IsLocalEntity(void) { return m_ID >= MAX_SERVER_ELEMENTS; };
+    bool                      IsSmartPointer() { return m_bSmartPointer; }
+    void                      SetSmartPointer(bool bSmartPointer) { m_bSmartPointer = bSmartPointer; }
 
     // System entity? A system entity means it can't be removed by the server
     // or the client scripts.
@@ -175,9 +177,9 @@ public:
     const SString& GetName(void) const { return m_strName; }
     void           SetName(const char* szName) { m_strName.AssignLeft(szName, MAX_ELEMENT_NAME_LENGTH); }
 
-    const char*  GetTypeName(void) { return m_strTypeName; };
-    unsigned int GetTypeHash(void) { return m_uiTypeHash; };
-    void         SetTypeName(const char* szName);
+    const SString& GetTypeName() { return m_strTypeName; }
+    unsigned int   GetTypeHash() { return m_uiTypeHash; }
+    void           SetTypeName(const SString& name);
 
     CClientEntity* GetParent(void) { return m_pParent; };
     CClientEntity* SetParent(CClientEntity* pParent);
@@ -341,6 +343,7 @@ private:
     unsigned int m_uiTypeHash;
     SString      m_strTypeName;
     SString      m_strName;
+    bool         m_bSmartPointer;
 
 protected:
     unsigned char m_ucSyncTimeContext;

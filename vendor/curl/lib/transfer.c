@@ -444,7 +444,6 @@ static CURLcode readwrite_data(struct Curl_easy *data,
   CURLcode result = CURLE_OK;
   ssize_t nread; /* number of bytes read */
   size_t excess = 0; /* excess bytes read */
-  bool is_empty_data = FALSE;
   bool readmore = FALSE; /* used by RTP to signal for more data */
   int maxloops = 100;
 
@@ -454,6 +453,7 @@ static CURLcode readwrite_data(struct Curl_easy *data,
   /* This is where we loop until we have read everything there is to
      read or we get a CURLE_AGAIN */
   do {
+    bool is_empty_data = FALSE;
     size_t buffersize = data->set.buffer_size;
     size_t bytestoread = buffersize;
 
@@ -660,14 +660,14 @@ static CURLcode readwrite_data(struct Curl_easy *data,
       if(data->set.verbose) {
         if(k->badheader) {
           Curl_debug(data, CURLINFO_DATA_IN, data->state.headerbuff,
-                     (size_t)k->hbuflen, conn);
+                     (size_t)k->hbuflen);
           if(k->badheader == HEADER_PARTHEADER)
             Curl_debug(data, CURLINFO_DATA_IN,
-                       k->str, (size_t)nread, conn);
+                       k->str, (size_t)nread);
         }
         else
           Curl_debug(data, CURLINFO_DATA_IN,
-                     k->str, (size_t)nread, conn);
+                     k->str, (size_t)nread);
       }
 
 #ifndef CURL_DISABLE_HTTP
@@ -717,7 +717,7 @@ static CURLcode readwrite_data(struct Curl_easy *data,
 #endif   /* CURL_DISABLE_HTTP */
 
       /* Account for body content stored in the header buffer */
-      if(k->badheader && !k->ignorebody) {
+      if((k->badheader == HEADER_PARTHEADER) && !k->ignorebody) {
         DEBUGF(infof(data, "Increasing bytecount by %zu from hbuflen\n",
                      k->hbuflen));
         k->bytecount += k->hbuflen;
@@ -1027,7 +1027,7 @@ static CURLcode readwrite_upload(struct Curl_easy *data,
     if(data->set.verbose)
       /* show the data before we change the pointer upload_fromhere */
       Curl_debug(data, CURLINFO_DATA_OUT, k->upload_fromhere,
-                 (size_t)bytes_written, conn);
+                 (size_t)bytes_written);
 
     k->writebytecount += bytes_written;
 
@@ -1447,6 +1447,16 @@ static const char *find_host_sep(const char *url)
 }
 
 /*
+ * Decide in an encoding-independent manner whether a character in an
+ * URL must be escaped. The same criterion must be used in strlen_url()
+ * and strcpy_url().
+ */
+static bool urlchar_needs_escaping(int c)
+{
+    return !(ISCNTRL(c) || ISSPACE(c) || ISGRAPH(c));
+}
+
+/*
  * strlen_url() returns the length of the given URL if the spaces within the
  * URL were properly URL encoded.
  * URL encoding should be skipped for host names, otherwise IDN resolution
@@ -1474,7 +1484,7 @@ static size_t strlen_url(const char *url, bool relative)
       left = FALSE;
       /* fall through */
     default:
-      if(*ptr >= 0x80)
+      if(urlchar_needs_escaping(*ptr))
         newlen += 2;
       newlen++;
       break;
@@ -1519,7 +1529,7 @@ static void strcpy_url(char *output, const char *url, bool relative)
       left = FALSE;
       /* fall through */
     default:
-      if(*iptr >= 0x80) {
+      if(urlchar_needs_escaping(*iptr)) {
         snprintf(optr, 4, "%%%02x", *iptr);
         optr += 3;
       }
@@ -1926,7 +1936,7 @@ CURLcode Curl_retry_request(struct connectdata *conn,
                             char **url)
 {
   struct Curl_easy *data = conn->data;
-
+  bool retry = FALSE;
   *url = NULL;
 
   /* if we're talking upload, we can't do the checks below, unless the protocol
@@ -1939,7 +1949,7 @@ CURLcode Curl_retry_request(struct connectdata *conn,
       conn->bits.reuse &&
       (!data->set.opt_no_body
         || (conn->handler->protocol & PROTO_FAMILY_HTTP)) &&
-      (data->set.rtspreq != RTSPREQ_RECEIVE)) {
+      (data->set.rtspreq != RTSPREQ_RECEIVE))
     /* We got no data, we attempted to re-use a connection. For HTTP this
        can be a retry so we try again regardless if we expected a body.
        For other protocols we only try again only if we expected a body.
@@ -1947,6 +1957,19 @@ CURLcode Curl_retry_request(struct connectdata *conn,
        This might happen if the connection was left alive when we were
        done using it before, but that was closed when we wanted to read from
        it again. Bad luck. Retry the same request on a fresh connect! */
+    retry = TRUE;
+  else if(data->state.refused_stream &&
+          (data->req.bytecount + data->req.headerbytecount == 0) ) {
+    /* This was sent on a refused stream, safe to rerun. A refused stream
+       error can typically only happen on HTTP/2 level if the stream is safe
+       to issue again, but the nghttp2 API can deliver the message to other
+       streams as well, which is why this adds the check the data counters
+       too. */
+    infof(conn->data, "REFUSED_STREAM, retrying a fresh connect\n");
+    data->state.refused_stream = FALSE; /* clear again */
+    retry = TRUE;
+  }
+  if(retry) {
     infof(conn->data, "Connection died, retrying a fresh connect\n");
     *url = strdup(conn->data->change.url);
     if(!*url)
@@ -1995,11 +2018,19 @@ Curl_setup_transfer(
 
   DEBUGASSERT((sockindex <= 1) && (sockindex >= -1));
 
-  /* now copy all input parameters */
-  conn->sockfd = sockindex == -1 ?
+  if(conn->bits.multiplex || conn->httpversion == 20) {
+    /* when multiplexing, the read/write sockets need to be the same! */
+    conn->sockfd = sockindex == -1 ?
+      ((writesockindex == -1 ? CURL_SOCKET_BAD : conn->sock[writesockindex])) :
+      conn->sock[sockindex];
+    conn->writesockfd = conn->sockfd;
+  }
+  else {
+    conn->sockfd = sockindex == -1 ?
       CURL_SOCKET_BAD : conn->sock[sockindex];
-  conn->writesockfd = writesockindex == -1 ?
+    conn->writesockfd = writesockindex == -1 ?
       CURL_SOCKET_BAD:conn->sock[writesockindex];
+  }
   k->getheader = getheader;
 
   k->size = size;
@@ -2018,10 +2049,10 @@ Curl_setup_transfer(
   /* we want header and/or body, if neither then don't do this! */
   if(k->getheader || !data->set.opt_no_body) {
 
-    if(conn->sockfd != CURL_SOCKET_BAD)
+    if(sockindex != -1)
       k->keepon |= KEEP_RECV;
 
-    if(conn->writesockfd != CURL_SOCKET_BAD) {
+    if(writesockindex != -1) {
       struct HTTP *http = data->req.protop;
       /* HTTP 1.1 magic:
 
@@ -2052,7 +2083,7 @@ Curl_setup_transfer(
         /* enable the write bit when we're not waiting for continue */
         k->keepon |= KEEP_SEND;
       }
-    } /* if(conn->writesockfd != CURL_SOCKET_BAD) */
+    } /* if(writesockindex != -1) */
   } /* if(k->getheader || !data->set.opt_no_body) */
 
 }

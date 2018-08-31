@@ -202,12 +202,6 @@ void CPlayer::DoPulse(void)
 
 void CPlayer::SetNick(const char* szNick)
 {
-    if (!m_strNick.empty() && m_strNick != szNick)
-    {
-        // If changing, add the new name to the whowas list
-        g_pGame->GetConsole()->GetWhoWas()->Add(szNick, inet_addr(GetSourceIP()), GetSerial(), GetPlayerVersion(), GetAccount()->GetName());
-    }
-
     m_strNick.AssignLeft(szNick, MAX_PLAYER_NICK_LENGTH);
 }
 
