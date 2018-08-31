@@ -79,7 +79,7 @@ typedef int socklen_t;
     #include <sys/times.h>
 
     #if defined(__APPLE__)
-        #include <curses.h>
+        #include <ncurses.h>
     #else
         #include <ncursesw/curses.h>
     #endif

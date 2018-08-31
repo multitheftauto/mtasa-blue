@@ -49,6 +49,7 @@ DECLARE_ENUM(eWebBrowserMouseButton);
 DECLARE_ENUM(eTrayIconType)
 DECLARE_ENUM(eCursorType)
 DECLARE_ENUM(eWheelPosition)
+DECLARE_ENUM(D3DPRIMITIVETYPE);
 
 enum eDXHorizontalAlign
 {
@@ -368,6 +369,10 @@ inline SString GetClassTypeName(CLuaMatrix*)
 {
     return "matrix";
 }
+inline SString GetClassTypeName(D3DPRIMITIVETYPE*)
+{
+    return "primitive-type";
+}
 
 //
 // CResource from userdata
@@ -475,7 +480,12 @@ void MixedReadMaterialString(CScriptArgReader& argStream, CClientMaterial*& pMat
 bool ReadMatrix(lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix);
 bool MinClientReqCheck(CScriptArgReader& argStream, const char* szVersionReq, const char* szReason = nullptr);
 void ReadPregFlags(CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions);
-void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, CResource* pOtherResource2 = nullptr);
+
+//
+// Resource access helpers
+//
+void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource);
+void CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisResource, std::initializer_list<CResource*> resourceList);
 void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath,
                                      bool* pbReadOnly = nullptr);
 

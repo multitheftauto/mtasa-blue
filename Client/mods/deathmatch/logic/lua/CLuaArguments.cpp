@@ -656,7 +656,7 @@ bool CLuaArguments::ReadFromJSONString(const char* szJSON)
     }
 
     json_object* object = json_tokener_parse(szJSON);
-    if (!is_error(object))
+    if (object)
     {
         if (json_object_get_type(object) == json_type_array)
         {
@@ -664,7 +664,7 @@ bool CLuaArguments::ReadFromJSONString(const char* szJSON)
 
             std::vector<CLuaArguments*> knownTables;
 
-            for (int i = 0; i < json_object_array_length(object); i++)
+            for (uint i = 0; i < json_object_array_length(object); i++)
             {
                 json_object*  arrayObject = json_object_array_get_idx(object, i);
                 CLuaArgument* pArgument = new CLuaArgument();
@@ -697,7 +697,7 @@ bool CLuaArguments::ReadFromJSONString(const char* szJSON)
 
 bool CLuaArguments::ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables)
 {
-    if (!is_error(object))
+    if (object)
     {
         if (json_object_get_type(object) == json_type_object)
         {
@@ -735,7 +735,7 @@ bool CLuaArguments::ReadFromJSONObject(json_object* object, std::vector<CLuaArgu
 
 bool CLuaArguments::ReadFromJSONArray(json_object* object, std::vector<CLuaArguments*>* pKnownTables)
 {
-    if (!is_error(object))
+    if (object)
     {
         if (json_object_get_type(object) == json_type_array)
         {
@@ -749,7 +749,7 @@ bool CLuaArguments::ReadFromJSONArray(json_object* object, std::vector<CLuaArgum
             pKnownTables->push_back(this);
 
             bool bSuccess = true;
-            for (int i = 0; i < json_object_array_length(object); i++)
+            for (uint i = 0; i < json_object_array_length(object); i++)
             {
                 json_object*  arrayObject = json_object_array_get_idx(object, i);
                 CLuaArgument* pArgument = new CLuaArgument();

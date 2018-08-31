@@ -148,6 +148,9 @@ DWORD RETURN_CPlantMgr_Render_fail = 0x5DBDAA;
 #define HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse   0x4BA06F
 DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse = 0x4BA076;
 
+#define HOOKPOS_CAnimBlendNode_GetCurrentTranslation        0x4CFC50
+#define HOOKPOS_CAnimBlendAssociation_SetCurrentTime        0x4CEA80
+#define HOOKPOS_RpAnimBlendClumpUpdateAnimations            0x4D34F0
 #define HOOKPOS_CAnimBlendAssoc_destructor                  0x4CECF0
 #define HOOKPOS_CAnimBlendAssocGroup_CopyAnimation          0x4CE14C
 #define HOOKPOS_CAnimManager_AddAnimation                   0x4d3aa0
@@ -412,7 +415,9 @@ void HOOK_RenderScene_Plants();
 void HOOK_RenderScene_end();
 void HOOK_CPlantMgr_Render();
 void HOOK_CEventHandler_ComputeKnockOffBikeResponse();
-void HOOK_CAnimBlendAssoc_Hierarchy_Constructor();
+void HOOK_CAnimBlendNode_GetCurrentTranslation();
+void HOOK_CAnimBlendAssociation_SetCurrentTime();
+void HOOK_RpAnimBlendClumpUpdateAnimations();
 void HOOK_CAnimBlendAssoc_destructor();
 void HOOK_CAnimManager_AddAnimation();
 void HOOK_CAnimManager_AddAnimationAndSync();
@@ -631,6 +636,9 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CGame_Process, (DWORD)HOOK_CGame_Process, 10);
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10);
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7);
+    HookInstall(HOOKPOS_CAnimBlendNode_GetCurrentTranslation, (DWORD)HOOK_CAnimBlendNode_GetCurrentTranslation, 5);
+    HookInstall(HOOKPOS_CAnimBlendAssociation_SetCurrentTime, (DWORD)HOOK_CAnimBlendAssociation_SetCurrentTime, 8);
+    HookInstall(HOOKPOS_RpAnimBlendClumpUpdateAnimations, (DWORD)HOOK_RpAnimBlendClumpUpdateAnimations, 8);
     HookInstall(HOOKPOS_CAnimBlendAssoc_destructor, (DWORD)HOOK_CAnimBlendAssoc_destructor, 6);
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
     HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
@@ -3854,7 +3862,7 @@ void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled)
     }
     if (bNoiseEnabled)
     {
-        BYTE originalCodes[5] = { 0xE8, 0xD3, 0xE8, 0xFF, 0xFF };
+        BYTE originalCodes[5] = {0xE8, 0xD3, 0xE8, 0xFF, 0xFF};
         MemCpy((void*)0x704EE8, &originalCodes, 5);
     }
     else
@@ -3875,7 +3883,7 @@ void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled)
     }
     if (bNoiseEnabled)
     {
-        BYTE originalCodes[5] = { 0xE8, 0x62, 0xE8, 0xFF, 0xFF };
+        BYTE originalCodes[5] = {0xE8, 0x62, 0xE8, 0xFF, 0xFF};
         MemCpy((void*)0x704F59, &originalCodes, 5);
     }
     else
