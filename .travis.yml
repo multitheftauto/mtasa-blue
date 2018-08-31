@@ -1,16 +1,6 @@
 language: cpp
 sudo: false
 
-os:
-  - linux
-  - osx
-
-matrix:
-  include:
-    - os: linux
-      dist: trusty
-    - os: osx
-
 matrix:
   allow_failures:
     - os: osx
