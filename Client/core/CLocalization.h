@@ -20,7 +20,7 @@ using namespace tinygettext;
 class CLocalization : public CLocalizationInterface
 {
 public:
-    CLocalization(SString strLocale = "", SString strLocalePath = "");
+    CLocalization(const SString& strLocale = "", const SString& strLocalePath = "");
     ~CLocalization(void);
 
     SString Translate(const SString& strMessage);
@@ -34,14 +34,17 @@ public:
     SString                    GetLanguageDirectory(void);
     SString                    GetLanguageCode(void);
     SString                    GetLanguageName(void);
+    SString                    ValidateLocale(SString strLocale);
+    void                       SetCurrentLanguage(SString strLocale = "");
+    CLanguage*                 GetLanguage(SString strLocale);
+    SString                    GetLanguageNativeName(const SString& strLocale);
 
     static void LogCallback(const std::string& str);
 
 private:
-    Dictionary        m_CurrentDict;
-    DictionaryManager m_DictManager;
-
-    CLanguage* m_pCurrentLang;
+    DictionaryManager             m_DictManager;
+    std::map<SString, CLanguage*> m_LanguageMap;
+    CLanguage*                    m_pCurrentLang;
 };
 
 #endif

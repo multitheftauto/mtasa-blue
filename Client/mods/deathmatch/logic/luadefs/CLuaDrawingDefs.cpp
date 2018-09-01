@@ -24,8 +24,8 @@ void CLuaDrawingDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("dxDrawCircle", DxDrawCircle);
     CLuaCFunctions::AddFunction("dxDrawImage", DxDrawImage);
     CLuaCFunctions::AddFunction("dxDrawImageSection", DxDrawImageSection);
-    CLuaCFunctions::AddFunction("dxDrawPrimitive", DxDrawPrimitive);
-    CLuaCFunctions::AddFunction("dxDrawMaterialPrimitive", DxDrawMaterialPrimitive);
+    //CLuaCFunctions::AddFunction("dxDrawPrimitive", DxDrawPrimitive);
+    //CLuaCFunctions::AddFunction("dxDrawMaterialPrimitive", DxDrawMaterialPrimitive);
     CLuaCFunctions::AddFunction("dxGetTextWidth", DxGetTextWidth);
     CLuaCFunctions::AddFunction("dxGetFontHeight", DxGetFontHeight);
     CLuaCFunctions::AddFunction("dxCreateFont", DxCreateFont);
