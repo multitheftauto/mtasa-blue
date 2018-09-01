@@ -6,18 +6,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-23 23:03+0100\n"
-"PO-Revision-Date: 2018-07-23 22:18+0000\n"
-"Last-Translator: qaisjp <me@qaisjp.com>\n"
+"POT-Creation-Date: 2018-09-01 13:55+0100\n"
+"PO-Revision-Date: 2018-09-01 13:09+0000\n"
+"Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"Translators: Jin Yin; mk124; ChineseGTA Li; hcyxsq; LilDollaTechZone; qaisjp\n"
+"Translators: Jin Yin; mk124; ChineseGTA Li; hcyxsq; qaisjp; LilDollaTechZone\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1532384334.0\n"
+"X-POOTLE-MTIME: 1535807378.0\n"
 
 #: E:\Documents\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -37,7 +37,7 @@ msgid "Remember decision"
 msgstr "记住选项"
 
 #: E:\Documents\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:49
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:906
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:907
 msgid "Allow"
 msgstr "允许"
 
@@ -49,28 +49,28 @@ msgstr "拒绝"
 msgid "***[ COMMAND HELP ]***\n"
 msgstr "***[ 指令帮助 ]***\n"
 
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:183
+#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:182
 #, c-format, c-format
 msgid "* The time is %d:%02d:%02d"
 msgstr "* 当前时间为 %d:%02d:%02d"
 
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:272
+#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:266
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
 msgstr "连接: 指令为 'connect <服务器地址> [<端口> <昵称> <密码>]'"
 
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:280
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:330
+#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:274
+#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:342
 msgid "connect: Bad port number"
 msgstr "连接: 无效的端口号"
 
 #: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:296
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:345
+#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:357
 #, c-format, c-format
 msgid "connect: Connecting to %s:%u..."
 msgstr "连接: 正在连接到 %s:%u..."
 
 #: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:300
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:349
+#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:361
 #, c-format, c-format
 msgid "connect: could not connect to %s:%u!"
 msgstr "连接: 无法连接到 %s:%u!"
@@ -79,16 +79,16 @@ msgstr "连接: 无法连接到 %s:%u!"
 msgid "connect: Failed to unload current mod"
 msgstr "连接: 卸载当前 mod 失败"
 
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:383
+#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:395
 msgid "Bound all controls from GTA"
 msgstr "绑定 GTA 所有的控制设置"
 
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:397
+#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:409
 msgid "Saved configuration file"
 msgstr "已保存的配置文件"
 
 #. Print it
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:463
+#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:475
 #, c-format, c-format
 msgid "* Your serial is: %s"
 msgstr "* 您的序列号为 : %s"
@@ -114,17 +114,17 @@ msgstr "连接失败。使用了不可用的昵称!"
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:410
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:417
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:427
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1221
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1234
-#: E:\Documents\mtasa-blue\Client\core\CGUI.cpp:84
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1235
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1248
+#: E:\Documents\mtasa-blue\Client\core\CGUI.cpp:85
 #: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:142
 #: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:151
 #: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:156
 #: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:165
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2824
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3952
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3980
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4425
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2826
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3954
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3982
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4427
 #: E:\Documents\mtasa-blue\Client\core\DXHook\CDirect3DHook9.cpp:128
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1244
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1266
@@ -136,17 +136,17 @@ msgstr "连接失败。使用了不可用的昵称!"
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:254
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:256
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:817
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:560
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:628
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:652
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:674
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:990
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1070
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1080
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1149
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1183
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1232
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1244
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:563
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:631
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:655
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:677
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:993
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1073
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1083
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1152
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1186
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1235
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1247
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:134
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CServer.cpp:181
 #: E:\Documents\mtasa-blue\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp:354
@@ -171,48 +171,48 @@ msgstr "正在连接到 %s:%u ..."
 
 #. Display the status box
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:148
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:576
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:579
 msgid "CONNECTING"
 msgstr "连接中"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:263
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1149
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1152
 msgid "Connection timed out"
 msgstr "连接已超时"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:277
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:281
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1194
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1197
 msgid "Disconnected: unknown protocol error"
 msgstr "已断开连接: 未知协议错误"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:285
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1198
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1201
 msgid "Disconnected: disconnected remotely"
 msgstr "已断开连接: 服务器主动断开连接"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:289
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1202
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1205
 msgid "Disconnected: connection lost remotely"
 msgstr "已断开连接: 与服务器连接中断"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:293
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1206
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1209
 msgid "Disconnected: you are banned from this server"
 msgstr "已断开连接: 你已被该服务器封禁 (Banned)"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:300
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1214
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1217
 msgid "Disconnected: disconnected from the server"
 msgstr "已断开连接: 从服务器断开连接"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:304
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1218
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1221
 msgid "Disconnected: connection to the server was lost"
 msgstr "已断开连接: 与服务器的连接已中断"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:311
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1226
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1229
 msgid "Disconnected: connection was refused"
 msgstr "已断开连接: 服务器拒绝连接"
 
@@ -235,19 +235,19 @@ msgstr "意外的服务器响应 (1)"
 msgid "CONSOLE"
 msgstr "控制台"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:674
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:688
 #: E:\Documents\mtasa-blue\Client\core\CQuestionBox.cpp:192
 #: E:\Documents\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:621
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "你希望查看一些与此问题相关的在线帮助吗?"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:679
-#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1104
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:693
+#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1112
 #: E:\Documents\mtasa-blue\Client\core\CQuestionBox.cpp:194
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1314
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1338
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4272
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4321
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1315
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1339
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4274
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4323
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1568
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1586
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1855
@@ -260,13 +260,13 @@ msgstr "否"
 #. /////////////////////////////////////////////////////////////////////////
 #. Dialog strings
 #. /////////////////////////////////////////////////////////////////////////
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:680
-#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1105
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:694
+#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1113
 #: E:\Documents\mtasa-blue\Client\core\CQuestionBox.cpp:195
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1315
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1339
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4273
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4322
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1316
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1340
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4275
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4324
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1569
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1587
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1856
@@ -277,119 +277,119 @@ msgstr "否"
 msgid "Yes"
 msgstr "是"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:733
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:747
 #: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:612
 #, c-format, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "由于驱动器 %s 没有足够的空间,MTA:SA 无法继续运行."
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:735
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:749
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:144
 msgid "Fatal error"
 msgstr "致命错误"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:883
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:897
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "请移除该文件修复问题："
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:915
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:929
 #, c-format, c-format
 msgid "%s module is incorrect!"
 msgstr "模块 %s 不适用!"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1221
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1235
 msgid "Error executing URL"
 msgstr "执行 URL 时出错"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1233
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1247
 #, c-format, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "执行命令行 ('%s') 对应的 Mod 时出错"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1318
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1332
 msgid "this help screen"
 msgstr "此帮助画面"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1319
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1320
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1333
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1334
 msgid "exits the application"
 msgstr "退出程序"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1321
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1335
 msgid "shows the version"
 msgstr "显示版本号"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1322
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1336
 msgid "shows the time"
 msgstr "显示时间"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1323
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1337
 msgid "shows the hud"
 msgstr "显示 HUD 界面"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1324
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1338
 msgid "shows all the binds"
 msgstr "显示所有绑定设置"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1325
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1339
 msgid "shows your serial"
 msgstr "显示你的序列号"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1334
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1348
 msgid "connects to a server (host port nick pass)"
 msgstr "连接到一个服务器 (服务器 端口 昵称 密码)"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1335
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1349
 msgid "connects to a previous server"
 msgstr "连接到之前登陆过的服务器"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1336
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1350
 msgid "binds a key (key control)"
 msgstr "绑定一个按键 (控制键)"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1337
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1351
 msgid "unbinds a key (key)"
 msgstr "取消绑定按键 (key)"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1338
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1352
 msgid "copies the default gta controls"
 msgstr "复制默认的 GTA 控制按键设置"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1339
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1353
 msgid "outputs a screenshot"
 msgstr "输出截图"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1340
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1354
 msgid "immediately saves the config"
 msgstr "立刻保存设置"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1342
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1356
 msgid "clears the debug view"
 msgstr "清空调试视图"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1343
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1357
 msgid "scrolls the chatbox upwards"
 msgstr "向上滚动聊天框"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1344
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1358
 msgid "scrolls the chatbox downwards"
 msgstr "向下滚动聊天框"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1345
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1359
 msgid "scrolls the debug view upwards"
 msgstr "向上滚动调试视图"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1346
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1360
 msgid "scrolls the debug view downwards"
 msgstr "向下滚动调试视图"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1349
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1363
 msgid "shows the memory statistics"
 msgstr "显示内存统计信息"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1350
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1364
 msgid "shows the frame timing graph"
 msgstr "显示帧数图表"
 
@@ -401,28 +401,28 @@ msgstr "程序开发"
 msgid "Contributors"
 msgstr "贡献者"
 
-#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:74
+#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:75
 msgid "Game Design / Scripting"
 msgstr "游戏设计 / 脚本编写员"
 
-#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:91
+#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:92
 msgid "Patch contributors"
 msgstr "补丁贡献者"
 
-#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:150
+#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:156
 msgid "Language Localization"
 msgstr "本地化翻译"
 
-#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:156
+#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:162
 msgid "Special Thanks"
 msgstr "特别鸣谢"
 
-#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:182
+#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:188
 msgid "This software makes use of the following libraries and software:"
 msgstr "本软件利用以下程序库和软件:"
 
 #. Even the default skin doesn't work, so give up
-#: E:\Documents\mtasa-blue\Client\core\CGUI.cpp:83
+#: E:\Documents\mtasa-blue\Client\core\CGUI.cpp:84
 msgid ""
 "The skin you selected could not be loaded, and the default skin also could "
 "not be loaded, please reinstall MTA."
@@ -457,14 +457,14 @@ msgid "Backwards"
 msgstr "后退"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:185
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2142
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2170
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2144
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2172
 msgid "Left"
 msgstr "左移"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:186
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2144
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2171
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2146
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2173
 msgid "Right"
 msgstr "右移"
 
@@ -620,13 +620,18 @@ msgstr "小组控制 前进"
 msgid "Group control backwards"
 msgstr "小组控制 后退"
 
+#. TRANSLATORS: Replace with your language native name
+#: E:\Documents\mtasa-blue\Client\core\CLocalization.cpp:17
+msgid "English"
+msgstr "中文 (简体)"
+
 #: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:314
 msgid ""
 "You are using a feature-branch build! This is a test build only which cannot"
 " be used to connect to public servers!"
 msgstr "您当前正在使用一个分支版本的客户端！测试版本的客户端不能被用来连接公共服务器！"
 
-#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1098
+#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1106
 msgid ""
 "This will disconnect you from the current server.\n"
 "\n"
@@ -636,7 +641,7 @@ msgstr ""
 "\n"
 "你确定要断开连接吗?"
 
-#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1102
+#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1110
 msgid "DISCONNECT WARNING"
 msgstr "断开连接警告"
 
@@ -655,8 +660,8 @@ msgstr "指定了无效的端口号!"
 #: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:165
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1266
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1323
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:560
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:652
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:563
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:655
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "无效的昵称! 请去设置画面那里设定一个新昵称!"
 
@@ -705,7 +710,7 @@ msgstr "高级"
 #. Create buttons
 #. OK button
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:125
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4446
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4448
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1604
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1820
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1913
@@ -723,7 +728,7 @@ msgstr "确定"
 
 #. Cancel button
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:130
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4445
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4447
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1787
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1803
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1838
@@ -735,8 +740,8 @@ msgstr "取消"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:145
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:336
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:586
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:835
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:587
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:836
 msgid "Load defaults"
 msgstr "读取默认值"
 
@@ -845,7 +850,7 @@ msgid "Map rendering options"
 msgstr "地图渲染选项"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:390
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:598
 msgid "Opacity:"
 msgstr "不透明度:"
 
@@ -886,9 +891,9 @@ msgstr "游戏模式:"
 #. * Webbrowser tab
 #. *
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:412
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:599
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:850
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1918
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:600
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:851
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1919
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:51
 msgid "General"
 msgstr "常规"
@@ -910,17 +915,17 @@ msgid "Usertrack options"
 msgstr "用户本地电台选项"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:543
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2940
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2942
 msgid "Radio"
 msgstr "收音机"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:544
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2942
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2944
 msgid "Random"
 msgstr "随机"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:545
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2944
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2946
 msgid "Sequential"
 msgstr "顺序"
 
@@ -928,413 +933,413 @@ msgstr "顺序"
 msgid "Automatic Media Scan"
 msgstr "自动扫描媒体文件"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:554
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:555
 #, fuzzy
 msgid "Mute options"
 msgstr "鼠标选项"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:560
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:561
 #, fuzzy
 msgid "Mute All sounds when minimized"
 msgstr "当窗口最小化时屏蔽游戏音效"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:565
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:566
 msgid "Mute Radio sounds when minimized"
 msgstr "当窗口最小化时屏蔽电台音乐"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:570
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:571
 msgid "Mute SFX sounds when minimized"
 msgstr "当窗口最小化时屏蔽游戏音效"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:575
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:576
 msgid "Mute MTA sounds when minimized"
 msgstr "当窗口最小化时屏蔽 MTA 音效"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:580
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:581
 msgid "Mute Voice sounds when minimized"
 msgstr "当窗口最小化时屏蔽语音"
 
 #. *
 #. *  Video tab
 #. *
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:596
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:605
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:606
 msgid "Resolution:"
 msgstr "分辨率:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:596
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:646
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:647
 msgid "FOV:"
 msgstr "FOV："
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:596
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:662
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:663
 msgid "Draw Distance:"
 msgstr "显示距离:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:596
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:680
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:681
 msgid "Brightness:"
 msgstr "亮度:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:596
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:698
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:699
 msgid "FX Quality:"
 msgstr "效果质量:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:712
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:598
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:713
 msgid "Anisotropic filtering:"
 msgstr "各向异性过滤:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:739
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:598
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:740
 msgid "Anti-aliasing:"
 msgstr "抗锯齿:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:753
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:598
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:754
 msgid "Aspect Ratio:"
 msgstr "纵横比:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:617
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:618
 msgid "Windowed"
 msgstr "窗口模式"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:625
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:626
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:370
 msgid "Fullscreen mode:"
 msgstr "全屏模式:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:632
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1520
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:633
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1521
 msgid "Standard"
 msgstr "标准"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:633
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1522
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:634
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1523
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:370
 msgid "Borderless window"
 msgstr "无边框窗口"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:634
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1524
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:635
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1525
 msgid "Borderless keep res"
 msgstr "保持无边框窗口"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:638
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:639
 msgid "Mip Mapping"
 msgstr "多重细节层纹理 (Mip Mapping)"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:706
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1438
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:707
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1439
 msgid "Low"
 msgstr "低"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:707
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1440
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:708
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1441
 msgid "Medium"
 msgstr "中"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:708
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1018
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1442
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2995
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:709
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1019
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1443
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2997
 msgid "High"
 msgstr "高"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:709
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1444
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:710
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1445
 msgid "Very high"
 msgstr "非常高"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:724
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:747
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:949
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1003
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1134
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1448
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3002
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3034
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3056
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4020
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:725
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:748
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:950
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1004
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1135
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1449
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3004
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3036
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3058
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4022
 msgid "Off"
 msgstr "关"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:748
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1450
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:749
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1451
 msgid "1x"
 msgstr "1x"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:749
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1452
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:750
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1453
 msgid "2x"
 msgstr "2x"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:750
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1454
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:751
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1455
 msgid "3x"
 msgstr "3x"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:763
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:951
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1460
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3004
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:764
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:952
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1461
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3006
 msgid "Auto"
 msgstr "自动"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:764
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1462
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:765
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1463
 msgid "4:3"
 msgstr "4:3"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:765
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1464
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:766
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1465
 msgid "16:10"
 msgstr "16:10"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:766
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1466
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:767
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1467
 msgid "16:9"
 msgstr "16:9"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:769
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:770
 msgid "HUD Match Aspect Ratio"
 msgstr "HUD与显示纵横比相匹配"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:775
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:776
 msgid "Volumetric Shadows"
 msgstr "体积阴影"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:779
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:780
 msgid "Grass effect"
 msgstr "草地效果"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:783
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:784
 msgid "Heat haze"
 msgstr "热浪"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:787
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:788
 msgid "Tyre Smoke etc"
 msgstr "轮胎烟雾等"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:791
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:792
 msgid "Render vehicles always in high detail"
 msgstr "总是以高细节渲染载具"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:796
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:797
 msgid "Full Screen Minimize"
 msgstr "全屏幕最小化"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:808
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:809
 msgid "Enable Device Selection Dialog"
 msgstr "启用设备选择对话框"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:820
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:821
 msgid "Show unsafe resolutions"
 msgstr "显示不安全的分辨率"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:856
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:857
 msgid "Enable remote websites"
 msgstr "启用远程网站"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:861
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:862
 msgid "Enable Javascript on remote websites"
 msgstr "在远程网站启用Javascript"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:866
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:867
 msgid "Custom blacklist"
 msgstr "自定义黑名单"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:876
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:904
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:877
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:905
 msgid "Enter a domain e.g. google.com"
 msgstr "请输入域名 例：google.com"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:878
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:879
 msgid "Block"
 msgstr "阻止"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:886
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:914
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:887
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:915
 msgid "Domain"
 msgstr "域名"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:888
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:916
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:889
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:917
 msgid "Remove domain"
 msgstr "移除域名"
 
 #. Reset vecTemp
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:894
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:895
 msgid "Custom whitelist"
 msgstr "自定义白名单"
 
 #. Misc section label
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:929
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:930
 msgid "Misc"
 msgstr "其它"
 
 #. Fast clothes loading
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:935
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:942
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4464
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:943
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4466
 msgid "Fast CJ clothes loading:"
 msgstr "快速载入CJ服装:"
 
 #. Browser scan speed
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:935
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:956
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4466
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:957
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4468
 msgid "Browser speed:"
 msgstr "浏览器速度:"
 
 #. Single download
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:935
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:970
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4468
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:971
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4470
 msgid "Single connection:"
 msgstr "单程连接:"
 
 #. Packet tag
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:935
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:983
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4470
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:984
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4472
 msgid "Packet tag:"
 msgstr "数据包标签："
 
 #. Progress animation
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:996
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4472
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:997
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4474
 msgid "Progress animation:"
 msgstr "进度动画："
 
 #. Process priority
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1009
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4462
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1010
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4464
 msgid "Process priority:"
 msgstr "进程优先级:"
 
 #. Debug setting
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1023
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4474
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1024
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4476
 msgid "Debug setting:"
 msgstr "Debug 设置:"
 
 #. Streaming memory
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1046
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4476
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:938
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1047
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4478
 msgid "Streaming memory:"
 msgstr "流媒体缓存:"
 
 #. Update build type
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1148
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:938
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1149
 msgid "Update build type:"
 msgstr "更新构建类型:"
 
 #. UpdateAutoInstall
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1127
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:938
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1128
 msgid "Install important updates:"
 msgstr "安装重要更新："
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:950
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:978
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:991
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3006
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3022
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3029
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:951
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:979
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:992
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3008
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3024
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3031
 msgid "On"
 msgstr "开"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:963
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3011
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:964
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3013
 msgid "Very slow"
 msgstr "非常慢"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:964
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:977
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:990
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1004
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1030
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1042
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1135
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1155
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3013
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3020
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3027
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3036
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3049
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:965
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:978
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:991
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1005
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1031
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1043
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1136
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1156
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3015
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3022
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3029
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3038
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3051
 msgid "Default"
 msgstr "默认"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:965
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3015
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:966
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3017
 msgid "Fast"
 msgstr "快"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1016
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2991
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1017
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2993
 msgid "Normal"
 msgstr "正常"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1017
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2993
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1018
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2995
 msgid "Above normal"
 msgstr "高于正常"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1053
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1054
 msgid "Min"
 msgstr "最低"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1066
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1067
 msgid "Max"
 msgstr "最高"
 
 #. Windows 8 compatibility
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1073
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1074
 msgid "Windows 8 compatibility:"
 msgstr "Windows 8 兼容模式:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1078
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1079
 msgid "16-bit color"
 msgstr "16位色"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1083
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1084
 msgid "Mouse fix"
 msgstr "鼠标修正"
 
 #. Cache path info
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1101
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1102
 msgid "Client resource files:"
 msgstr "客户端资源文件："
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1105
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1106
 msgid "Show in Explorer"
 msgstr "在系统资源管理器中显示"
 
 #. Auto updater section label
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1120
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1123
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1121
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1124
 msgid "Auto updater"
 msgstr "自动更新"
 
 #. Check for updates
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1161
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1162
 msgid "Check for update now"
 msgstr "立即检查更新"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1308
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1309
 msgid "Some settings will be changed when you next start MTA"
 msgstr "一些设置将会在您下次启动MTA时生效"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1309
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1310
 msgid ""
 "\n"
 "\n"
@@ -1344,15 +1349,15 @@ msgstr ""
 "\n"
 "你想现在重启吗?"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1312
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1313
 msgid "RESTART REQUIRED"
 msgstr "需要重新启动"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1332
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1333
 msgid "Some settings will be changed when you disconnect the current server"
 msgstr "当你退出本服务器时有些设置将会改变"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1333
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1334
 #, fuzzy
 msgid ""
 "\n"
@@ -1363,167 +1368,167 @@ msgstr ""
 "\n"
 "你想现在断开连接吗?"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1336
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1337
 msgid "DISCONNECT REQUIRED"
 msgstr "需要断开服务器连接"
 
 #. Update the joystick name
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1644
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1645
 msgid "Joypad not detected  -  Check connections and restart game"
 msgstr "未能检测到游戏手柄       -      请检查手柄连接以及重启游戏"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1832
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1833
 msgid "Binding axis"
 msgstr "绑定坐标轴"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1832
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1833
 msgid "Move an axis to bind, or escape to clear"
 msgstr "移动一个轴来绑定,或者离开以清除绑定"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1909
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1910
 msgid "Language:"
 msgstr "语言:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1909
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1910
 msgid "Skin:"
 msgstr "皮肤:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1909
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1910
 msgid "Presets:"
 msgstr "预设:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1960
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1962
 msgid "Chat"
 msgstr "聊天"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1977
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1979
 msgid "Load"
 msgstr "载入"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1989
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1991
 msgid "Colors"
 msgstr "颜色"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1990
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1992
 msgid "Layout"
 msgstr "布局"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1991
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2237
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1993
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2239
 msgid "Options"
 msgstr "选项"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1997
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1999
 msgid "Chat Background"
 msgstr "聊天背景"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1997
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1999
 msgid "Chat Text"
 msgstr "聊天文字"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1997
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1999
 msgid "Input Background"
 msgstr "输入背景"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1997
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1999
 msgid "Input Text"
 msgstr "输入文本"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2020
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2022
 msgid "Lines:"
 msgstr "行:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2020
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2022
 msgid "Scale:"
 msgstr "比例:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2020
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2022
 msgid "Width:"
 msgstr "宽度:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2023
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2025
 msgid "Size"
 msgstr "大小"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2072
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2074
 msgid "after"
 msgstr "后"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2072
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2074
 msgid "for"
 msgstr "于"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2072
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2074
 msgid "sec"
 msgstr "秒"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2075
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2077
 msgid "Fading"
 msgstr "淡化"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2081
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2083
 msgid "Fade out old lines"
 msgstr "淡出旧行数"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2121
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2123
 msgid "Horizontal:"
 msgstr "水平："
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2121
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2123
 msgid "Vertical:"
 msgstr "垂直："
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2121
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2123
 msgid "Text-Align:"
 msgstr "水平对齐："
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2121
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2123
 msgid "X-Offset:"
 msgstr "X轴偏移："
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2122
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2124
 msgid "Y-Offset:"
 msgstr "Y轴偏移："
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2128
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2130
 msgid "Position"
 msgstr "位置"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2143
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2157
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2145
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2159
 msgid "Center"
 msgstr "中心"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2156
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2158
 msgid "Top"
 msgstr "顶部"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2158
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2160
 msgid "Bottom"
 msgstr "底部"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2206
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2208
 #, fuzzy
 msgid "Font"
 msgstr "字体"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2243
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2245
 msgid "Hide background when not typing"
 msgstr "不输入文字时隐藏背景"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2248
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2250
 msgid "Nickname completion using the \"Tab\" key"
 msgstr "请按下 “Tab”完成昵称输入"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2253
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2255
 msgid "Allow server to flash the window"
 msgstr "允许服务器刷新窗口"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2258
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2260
 msgid "Allow tray balloon notifications"
 msgstr "允许气泡显示通知"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2263
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2265
 msgid "Chat text black/white outline"
 msgstr "聊天文本黑白描边"
 
@@ -1533,65 +1538,65 @@ msgstr "聊天文本黑白描边"
 #. Create a messagebox to notify the user
 #. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
 #. pItemBind->GetText ().c_str () );
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2511
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2518
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2513
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2520
 msgid "Press a key to bind, or escape to clear"
 msgstr "输入你要绑定的按键, 或离开以清除绑定"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2512
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2514
 msgid "Binding a primary key"
 msgstr "绑定一个主键"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2519
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2521
 msgid "Binding a secondary key"
 msgstr "绑定一个次要按键"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2593
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2595
 msgid "GTA GAME CONTROLS"
 msgstr "GTA 内置游戏控制"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2595
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2597
 msgid "MULTIPLAYER CONTROLS"
 msgstr "多人游戏控制"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2824
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4425
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2826
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4427
 msgid "Your nickname contains invalid characters!"
 msgstr "你的昵称包含非法字符!"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3564
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3566
 msgid "Red:"
 msgstr "红:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3564
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3566
 msgid "Green:"
 msgstr "绿:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3564
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3566
 msgid "Blue:"
 msgstr "蓝:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3564
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3566
 msgid "Transparency:"
 msgstr "透明度:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3567
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3569
 msgid "Color"
 msgstr "颜色"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3644
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3646
 msgid "Preview"
 msgstr "预览"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3952
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3954
 msgid "Please disconnect before changing language"
 msgstr "请在更换皮肤前断开服务器的连接"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3980
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3982
 msgid "Please disconnect before changing skin"
 msgstr "请在更换皮肤前断开服务器的连接"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4266
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4268
 msgid ""
 "Volmetric shadows can cause some systems to slow down.\n"
 "\n"
@@ -1601,11 +1606,11 @@ msgstr ""
 "\n"
 "你确定要启用这个功能吗?"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4270
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4272
 msgid "PERFORMANCE WARNING"
 msgstr "性能警告"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4290
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4292
 msgid ""
 "Screen upload is required by some servers for anti-cheat purposes.\n"
 "\n"
@@ -1615,11 +1620,11 @@ msgstr ""
 "\n"
 "(聊天框和GUI界面将不会被上传)\n"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4292
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4294
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "屏幕上传信息"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4313
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4315
 msgid ""
 "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n"
@@ -1635,16 +1640,16 @@ msgstr ""
 "\n"
 "你确定你想使用它们吗?"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4319
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4321
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2078
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "定制的 GTA:SA 文件"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4443
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4445
 msgid "Please enter a nickname"
 msgstr "请输入一个昵称"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4444
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4446
 msgid ""
 "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
@@ -1652,64 +1657,64 @@ msgstr ""
 "请输入一个在游戏里面使用的昵称      \n"
 " 这将会在你登陆服务器时显示"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4462
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4464
 msgid "Very experimental feature."
 msgstr "大量实验性功能."
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4464
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4466
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr "停止CJ的跳舞命令 (将会增加65MB内存占用)"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4466
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4468
 msgid "Older routers may require a slower scan speed."
 msgstr "比较老的路由会降慢扫描的速度"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4468
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4470
 msgid "Switch on to use only one connection when downloading."
 msgstr "打开将会启用单线程下载"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4470
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4472
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr "标记网络包以帮助ISP识别MTA流量"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4472
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4474
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr "在屏幕底部显示旋转圈圈动画"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4474
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4476
 msgid "Select default always. (This setting is not saved)"
 msgstr "总是设为默认值. (不保存设置)"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4476
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4478
 msgid "Maximum is usually best"
 msgstr "数值最大通常是最好的"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4478
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4480
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4482
 msgid "Auto updater:"
 msgstr "自动更新:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4478
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4480
 msgid "Select default unless you like filling out bug reports."
 msgstr "如果你喜欢发送错误报告就可以不选择默认."
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4480
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4482
 msgid "Select default to automatically install important updates."
 msgstr "选项默认安装重要更新"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4482
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4484
 msgid "16-bit color:"
 msgstr "16位色"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4482
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4484
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr "启动16位色模式 -需要重启MTA"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4484
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4486
 msgid "Mouse fix:"
 msgstr "鼠标修正:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4484
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4486
 msgid "Mouse movement fix - May need PC restart"
 msgstr "鼠标移动修正 - 可能需要重启计算机"
 
@@ -2961,59 +2966,59 @@ msgstr "(开发模式) shows the colshapes"
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(开发模式) prints world sound ids into the debug window"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:576
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:579
 msgid "Entering the game ..."
 msgstr "进入游戏中 ..."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:628
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:631
 msgid ""
 "Not connected; please use Quick Connect or the 'connect' command to connect "
 "to a server."
 msgstr "未连接; 请使用快速连接或者 'connect' 命令来连接服务器."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:674
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:677
 msgid "The server is not installed"
 msgstr "服务器未被安装"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:684
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1059
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:687
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1062
 msgid "Local Server"
 msgstr "本地服务器"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:684
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:687
 msgid "Starting local server ..."
 msgstr "正在启用本地服务器 ..."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:990
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:993
 #, c-format, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "您已经被踢出游戏 ( %s )"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1059
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1062
 msgid "Connecting to local server..."
 msgstr "正在连接到本地服务器..."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1070
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1073
 msgid "Error connecting to server."
 msgstr "连接到服务器时发生错误."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1080
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1083
 msgid "Connecting to local server timed out. See console for details."
 msgstr "连接本地服务器超时.请在console中查看详细内容"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1183
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1186
 msgid "Connection with the server was lost"
 msgstr "与服务器丢失连接"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1210
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1213
 msgid "Disconnected: the server is currently full"
 msgstr "断开连接:服务器满载"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1222
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1225
 msgid "Disconnected: invalid password specified"
 msgstr "断开连接: 无效的密码"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1244
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1247
 msgid "MTA Client verification failed!"
 msgstr "MTA客户端验证失败!"
 
@@ -3062,15 +3067,15 @@ msgstr "所有"
 msgid "Start"
 msgstr "开启"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:471
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:475
 msgid "Disconnected: Invalid nickname"
 msgstr "断开连接: 无效的昵称"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:475
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:479
 msgid "Disconnect from server"
 msgstr "与服务器断开连接"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:479
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:483
 #, c-format, c-format
 msgid ""
 "Disconnected: Serial is banned.\n"
@@ -3079,7 +3084,7 @@ msgstr ""
 "断开连接: 序列号被封禁.\n"
 "原因: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:485
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:489
 #, c-format, c-format
 msgid ""
 "Disconnected: You are banned.\n"
@@ -3088,7 +3093,7 @@ msgstr ""
 "断开连接: 您被封禁.\n"
 "原因: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:491
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:495
 #, c-format, c-format
 msgid ""
 "Disconnected: Account is banned.\n"
@@ -3097,15 +3102,15 @@ msgstr ""
 "断开连接: 账号被封禁.\n"
 "原因: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:496
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:500
 msgid "Disconnected: Version mismatch"
 msgstr "断开连接: 游戏版本不对应"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:500
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:504
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
 msgstr "断开连接: 过多玩家同时进入服务器,请等候几分钟后再进入."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:504
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:508
 #, c-format, c-format
 msgid ""
 "Disconnected: Server from different branch.\n"
@@ -3114,7 +3119,7 @@ msgstr ""
 "断开连接: 服务器来自不同的分支.\n"
 "相关信息: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:509
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:513
 #, c-format, c-format
 msgid ""
 "Disconnected: Bad version.\n"
@@ -3123,7 +3128,7 @@ msgstr ""
 "断开连接: 版本已损坏.\n"
 "相关信息: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:514
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:518
 #, c-format, c-format
 msgid ""
 "Disconnected: Server is running a newer build.\n"
@@ -3132,7 +3137,7 @@ msgstr ""
 "断开连接: 用户版本比服务器版本旧.\n"
 "相关信息: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:519
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:523
 #, c-format, c-format
 msgid ""
 "Disconnected: Server is running an older build.\n"
@@ -3141,72 +3146,72 @@ msgstr ""
 "断开连接: 用户版本比服务器版本新.\n"
 "相关信息: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:524
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:528
 msgid "Disconnected: Nick already in use"
 msgstr "断开连接: 昵称已有人使用"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:528
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:532
 msgid "Disconnected: Player Element Could not be created."
 msgstr "断开连接: 无法创建玩家元素"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:532
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:536
 #, c-format, c-format
 msgid "Disconnected: Server refused the connection: %s"
 msgstr "断开连接: 服务器拒绝连接: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:537
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:541
 msgid "Disconnected: Serial verification failed"
 msgstr "断开连接: 序列验证失败"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:541
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:545
 #, c-format, c-format
 msgid "Disconnected: Connection desync %s"
 msgstr "断开连接: 数据不同步 %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:550
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:554
 #, c-format, c-format
 msgid "Disconnected: You were kicked by %s"
 msgstr "断开连接: 您已经被 %s 踢出服务器(KICKED)"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:555
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:559
 #, c-format, c-format
 msgid "Disconnected: You were banned by %s"
 msgstr "断开连接: 您已经被 %s 禁止进入服务器"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:566
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:570
 msgid "Disconnected: Server shutdown or restarting"
 msgstr "断开连接：服务器已关闭或重启"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:591
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:595
 msgid "Time Remaining: "
 msgstr "剩余时间"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:601
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:605
 #, c-format, c-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d 天"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:603
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:607
 #, c-format, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d 时"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:605
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:609
 #, c-format, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d 分"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:607
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:611
 #, c-format, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] "%d 秒%d 秒"
 
 #. Display the error
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:611
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:615
 msgid "Disconnected"
 msgstr "断开连接"
 

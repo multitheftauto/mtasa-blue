@@ -27,7 +27,7 @@ CLocalization::CLocalization(const SString& strLocale, const SString& strLocaleP
     m_DictManager.add_directory(strLocalePath.empty() ? CalcMTASAPath(MTA_LOCALE_DIR) : strLocalePath);
 
     // Initialize our language
-    SetCurrentLanguageFromLocale(strLocale);
+    SetCurrentLanguage(strLocale);
 }
 
 CLocalization::~CLocalization(void)
