@@ -1939,7 +1939,8 @@ void CSettings::CreateInterfaceTabGUI(void)
 
         for (const auto& language : availableLanguagesMap)
         {
-            m_pInterfaceLanguageSelector->AddItem(language.first)->SetData(language.second);
+            SString strLanguageName = g_pLocalization->GetLanguageNativeName(language.second);
+            m_pInterfaceLanguageSelector->AddItem(strLanguageName)->SetData(language.second);
         }
 
         // Skin
@@ -4051,7 +4052,7 @@ bool CSettings::OnMasterVolumeChanged(CGUIElement* pElement)
 {
     int iVolume = m_pAudioMasterVolume->GetScrollPosition() * 100.0f;
     m_pLabelMasterVolumeValue->SetText(SString("%i%%", iVolume).c_str());
-    
+
     CVARS_SET("mastervolume", m_pAudioMasterVolume->GetScrollPosition());
 
     OnRadioVolumeChanged(nullptr);
