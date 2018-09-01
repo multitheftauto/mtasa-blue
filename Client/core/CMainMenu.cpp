@@ -1090,6 +1090,7 @@ void CMainMenu::ReloadNews()
     delete m_pNewsBrowser;
     m_pNewsBrowser = new CNewsBrowser();
     m_pNewsBrowser->CreateHeadlines();
+    m_pNewsBrowser->SetVisible(true);
 }
 
 /////////////////////////////////////////////////////////////
