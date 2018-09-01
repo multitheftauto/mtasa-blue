@@ -308,6 +308,12 @@ void CCommandFuncs::Connect(const char* szParameters)
 
 void CCommandFuncs::ReloadNews(const char* szParameters)
 {
+    if (CModManager::GetSingleton().GetCurrentMod())
+    {
+        CCore::GetSingleton().GetConsole()->Print("reloadnews: can't do this whilst connected to server");
+        return;
+    }
+
     CCore::GetSingleton().GetConsole()->Print("reloadnews: reloading");
     g_pCore->GetLocalGUI()->GetMainMenu()->ReloadNews();
 }
