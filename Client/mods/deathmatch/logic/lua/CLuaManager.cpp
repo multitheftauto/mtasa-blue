@@ -370,6 +370,8 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("toggleAllControls", CLuaFunctionDefs::ToggleAllControls);
 
     // Command funcs
+    CLuaCFunctions::AddFunction("addCommandAlias", CLuaFunctionDefs::AddCommandAlias);
+    CLuaCFunctions::AddFunction("removeCommandAlias", CLuaFunctionDefs::RemoveCommandAlias);
     CLuaCFunctions::AddFunction("addCommandHandler", CLuaFunctionDefs::AddCommandHandler);
     CLuaCFunctions::AddFunction("removeCommandHandler", CLuaFunctionDefs::RemoveCommandHandler);
     CLuaCFunctions::AddFunction("executeCommandHandler", CLuaFunctionDefs::ExecuteCommandHandler);

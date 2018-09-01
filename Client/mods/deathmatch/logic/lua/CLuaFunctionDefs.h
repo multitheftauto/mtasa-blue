@@ -198,6 +198,8 @@ public:
     LUA_DECLARE(ToggleAllControls);
 
     // Command funcs
+    LUA_DECLARE(AddCommandAlias);
+    LUA_DECLARE(RemoveCommandAlias);
     LUA_DECLARE(AddCommandHandler);
     LUA_DECLARE(RemoveCommandHandler);
     LUA_DECLARE(ExecuteCommandHandler);

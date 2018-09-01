@@ -24,15 +24,20 @@ class CRegisteredCommands
         SString         strKey;
         CLuaFunctionRef iLuaFunction;
         bool            bCaseSensitive;
+        SString         sParent;
     };
 
 public:
     CRegisteredCommands(void);
     ~CRegisteredCommands(void);
 
+    bool AddAlias(class CLuaMain* pLuaMain, const char* szKey, const char* szCommand);
+    bool RemoveAlias(class CLuaMain* pLuaMain, const char* szKey, const char* szCommand);
     bool AddCommand(class CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction, bool bCaseSensitive);
     bool RemoveCommand(class CLuaMain* pLuaMain, const char* szKey);
+    
     void ClearCommands(void);
+    void ClearAliases(class CLuaMain* pLuaMain, const char* szCommand);
     void CleanUpForVM(class CLuaMain* pLuaMain);
 
     bool CommandExists(const char* szKey, class CLuaMain* pLuaMain = NULL);
