@@ -307,6 +307,12 @@ void CCommandFuncs::Connect(const char* szParameters)
     }
 }
 
+void CCommandFuncs::ReloadNews(const char* szParameters)
+{
+    CCore::GetSingleton().GetConsole()->Print("reloadnews: reloading");
+    g_pCore->GetLocalGUI()->GetMainMenu()->ReloadNews();
+}
+
 void CCommandFuncs::Reconnect(const char* szParameters)
 {
     CModManager::GetSingleton().Unload();

@@ -1085,6 +1085,13 @@ void CMainMenu::SetNewsHeadline(int iIndex, const SString& strHeadline, const SS
     pNewLabel->SetPosition(CVector2D(pItem->GetPosition().fX + 4, pItem->GetPosition().fY - 4));
 }
 
+void CMainMenu::ReloadNews()
+{
+    delete m_pNewsBrowser;
+    m_pNewsBrowser = new CNewsBrowser();
+    m_pNewsBrowser->CreateHeadlines();
+}
+
 /////////////////////////////////////////////////////////////
 //
 // CMainMenu::AskUserIfHeWantsToDisconnect
