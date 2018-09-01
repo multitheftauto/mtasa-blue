@@ -54,7 +54,6 @@ void CCommandFuncs::Help(const char* szParameters)
     pConsole->Printf("***[--------------]***\n");
 }
 
-void dumpbasj();
 void CCommandFuncs::Exit(const char* szParameters)
 {
     g_pCore->Quit();
