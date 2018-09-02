@@ -33,6 +33,8 @@ void CLuaEngineDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("engineGetModelIDFromName", EngineGetModelIDFromName);
     CLuaCFunctions::AddFunction("engineGetModelTextureNames", EngineGetModelTextureNames);
     CLuaCFunctions::AddFunction("engineGetVisibleTextureNames", EngineGetVisibleTextureNames);
+    CLuaCFunctions::AddFunction("engineGetSurfaceProperties", EngineGetSurfaceProperties);
+    CLuaCFunctions::AddFunction("engineSetSurfaceProperties", EngineSetSurfaceProperties);
 
     // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
     // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -598,6 +600,234 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+class SurfaceInfo_c
+{
+public:
+    uint8_t m_tyreGrip;
+    uint8_t m_wetGrip; // 2
+    uint16_t pad; // 4
+    // ^ size 4
+    union
+    {
+        struct // size 8
+        {
+            uint32_t flags1;
+            uint32_t flags2;
+        };
+        struct // size = 51
+        {
+            uint32_t m_adhesionGroup : 3;
+            uint32_t m_skidmarkType : 2;
+            uint32_t m_frictionEffect : 3; // 8
+            uint32_t m_bulletFx : 3;
+            uint32_t m_softLanding : 1;
+            uint32_t m_seeThrough : 1;
+            uint32_t m_shootThrough : 1;
+            uint32_t m_sand : 1;
+            uint32_t m_water : 1; // 16
+            uint32_t m_shallowWater : 1;
+            uint32_t m_beach : 1;
+            uint32_t m_steepSlope : 1;
+            uint32_t m_glass : 1;
+            uint32_t m_stairs : 1;
+            uint32_t m_skateable : 1;
+            uint32_t m_pavement : 1;
+            uint32_t m_roughness : 2; //23
+            uint32_t m_flammability : 2;//25
+            uint32_t m_createsSparks : 1; //27
+            uint32_t m_cantSprintOn : 1;
+            uint32_t m_leavesFootsteps : 1;
+            uint32_t m_producesFootDust : 1;
+            uint32_t m_makesCarDirty : 1; // 31
+                                          // flags2
+            uint32_t m_makesCarClean : 1;
+            uint32_t m_createsWheelGrass : 1;
+            uint32_t m_createsWheelGravel : 1;
+            uint32_t m_createsWheelMud : 1;
+            uint32_t m_createsWheelDust : 1;
+            uint32_t m_createsWheelSand : 1;
+            uint32_t m_createsWheelSpray : 1;
+            uint32_t m_createsPlants : 1;
+            uint32_t m_createsObjects : 1;
+            uint32_t m_canClimb : 1;
+            uint32_t m_audioConcrete : 1;
+            uint32_t m_audioGrass : 1;
+            uint32_t m_audioSand : 1;
+            uint32_t m_audioGravel : 1;
+            uint32_t m_audioWood : 1;
+            uint32_t m_audioWater : 1;
+            uint32_t m_audioMetal : 1;
+            uint32_t m_audioLongGrass : 1;
+            uint32_t m_audioTile : 1;
+        };
+    };
+};
+
+struct CSurfaceType {
+    uint32_t m_adhesiveLimits[6][6];
+    SurfaceInfo_c surfType[179];
+};
+
+/*
+12031288 - start
+
+12033580 - end
+
+2292 - total size
+2148 + 144
+size block: 12
+*/
+
+// surface->flags2 = surface->flags2 |= 1UL << 10;
+
+int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
+{
+    int                 iSurfaceID;
+    eSurfaceProperties  eType;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(iSurfaceID);
+    argStream.ReadEnumString(eType);
+
+    if (!argStream.HasErrors())
+    {
+        if (iSurfaceID > 0 && iSurfaceID < 180)
+        {
+            //iSurfaceID--; // i don't know why but working
+            CSurfaceType* ptr;
+            ptr = reinterpret_cast<CSurfaceType*>(0xB79538);
+            SurfaceInfo_c* surface = &ptr->surfType[iSurfaceID];
+            switch (eType)
+            {
+            case SURFACE_PROPERTY_AUDIO:
+                eSurfaceAudio eAudio;
+                argStream.ReadEnumString(eAudio);
+                if (!argStream.HasErrors())
+                {
+                    // Disable others audios
+                    for (char i = SURFACE_AUDIO_CONCRETE; i != eSurfaceAudio::LAST; i++)
+                    {
+                        surface->flags2 = surface->flags2 &= ~(1UL << i);
+                    }
+
+                    // Set audio which user selected
+                    surface->flags2 = surface->flags2 |= 1UL << eAudio;
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+                break;
+            case SURFACE_PROPERTY_CLIMBING:
+                bool bCanClimb;
+                argStream.ReadBool(bCanClimb);
+                if (!argStream.HasErrors())
+                {
+                    if (bCanClimb)
+                        surface->flags2 = surface->flags2 |= 1UL << 9;
+                    else
+                        surface->flags2 = surface->flags2 &= ~(1UL << 9);
+
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+                break;
+            }
+
+        }
+        else
+            argStream.SetCustomError("Expected valid surface ID ( 1 - 179 ) at argument 1");
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, true);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineGetSurfaceProperties(lua_State* luaVM)
+{
+    int                 iSurfaceID;
+    eSurfaceProperties  eType;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(iSurfaceID);
+    argStream.ReadEnumString(eType);
+
+    if (!argStream.HasErrors())
+    {
+        if (iSurfaceID > 0 && iSurfaceID < 180)
+        {
+            //iSurfaceID--;
+            CSurfaceType* ptr;
+            ptr = reinterpret_cast<CSurfaceType*>(0xB79538);
+            SurfaceInfo_c* surface = &ptr->surfType[iSurfaceID];
+            switch (eType)
+            {
+                case SURFACE_PROPERTY_CLIMBING:
+                    lua_pushboolean(luaVM, surface->m_canClimb == 1);
+                    return 1;
+                case SURFACE_PROPERTY_AUDIO:
+                    if (surface->m_audioConcrete == 1)
+                    {
+                        lua_pushstring(luaVM, "concrete");
+                        return 1;
+                    }
+                    else if (surface->m_audioGrass == 1)
+                    {
+                        lua_pushstring(luaVM, "grass");
+                        return 1;
+                    }
+                    else if (surface->m_audioSand == 1)
+                    {
+                        lua_pushstring(luaVM, "sand");
+                        return 1;
+                    }
+                    else if (surface->m_audioGravel == 1)
+                    {
+                        lua_pushstring(luaVM, "gravel");
+                        return 1;
+                    }
+                    else if (surface->m_audioWood == 1)
+                    {
+                        lua_pushstring(luaVM, "wood");
+                        return 1;
+                    }
+                    else if (surface->m_audioWater == 1)
+                    {
+                        lua_pushstring(luaVM, "water");
+                        return 1;
+                    }
+                    else if (surface->m_audioMetal == 1)
+                    {
+                        lua_pushstring(luaVM, "metal");
+                        return 1;
+                    }
+                    else if (surface->m_audioLongGrass == 1)
+                    {
+                        lua_pushstring(luaVM, "longGrass");
+                        return 1;
+                    }
+                    else if (surface->m_audioTile == 1)
+                    {
+                        lua_pushstring(luaVM, "audioTile");
+                        return 1;
+                    }
+                    else
+                    {
+                        lua_pushboolean(luaVM, false);
+                        return 1;
+                    }
+                break;
+            }
+
+        }
+        else
+            argStream.SetCustomError("Expected valid surface ID ( 1 - 179 ) at argument 1");
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    
+    lua_pushboolean(luaVM, true);
     return 1;
 }
 

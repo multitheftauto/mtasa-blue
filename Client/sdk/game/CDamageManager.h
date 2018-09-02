@@ -95,6 +95,26 @@ enum eWheelPosition
 
 };
 
+enum eSurfaceProperties
+{
+    SURFACE_PROPERTY_AUDIO,
+    SURFACE_PROPERTY_CLIMBING,
+};
+
+enum eSurfaceAudio
+{
+    SURFACE_AUDIO_CONCRETE = 10, // concrete starting from 10 bit
+    SURFACE_AUDIO_GRASS,
+    SURFACE_AUDIO_SAND,
+    SURFACE_AUDIO_GRAVEL,
+    SURFACE_AUDIO_WOOD,
+    SURFACE_AUDIO_WATER,
+    SURFACE_AUDIO_METAL,
+    SURFACE_AUDIO_LONGGRASS,
+    LAST,
+};
+
+
 enum ePanels
 {
     FRONT_LEFT_PANEL = 0,
