@@ -123,6 +123,8 @@ void CLuaGUIDefs::LoadFunctions(void)
 
     CLuaCFunctions::AddFunction("guiBringToFront", GUIBringToFront);
     CLuaCFunctions::AddFunction("guiMoveToBack", GUIMoveToBack);
+    CLuaCFunctions::AddFunction("guiBlur", GUIBlur);
+    CLuaCFunctions::AddFunction("guiFocus", GUIFocus);
 
     CLuaCFunctions::AddFunction("guiCheckBoxSetSelected", GUICheckBoxSetSelected);
     CLuaCFunctions::AddFunction("guiRadioButtonSetSelected", GUIRadioButtonSetSelected);
@@ -1867,6 +1869,66 @@ int CLuaGUIDefs::GUISetEnabled(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         CStaticFunctionDefinitions::GUISetEnabled(*guiElement, enabled);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIBlur(lua_State* luaVM)
+{
+    //  bool guiBlur ( element guiElement )
+    CClientGUIElement* guiElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(guiElement);
+
+    if (!argStream.HasErrors())
+    {
+        CStaticFunctionDefinitions::GUIBlur(*guiElement);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIFocus(lua_State* luaVM)
+{
+    //  bool guiFocus ( element guiElement [, bool bMoveCaretToEnd = true ] )
+    CClientGUIElement* guiElement;
+    bool               bMoveCaretToEnd;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(guiElement);
+    argStream.ReadBool(bMoveCaretToEnd, true);
+
+    if (!argStream.HasErrors())
+    {
+        CStaticFunctionDefinitions::GUIFocus(*guiElement);
+
+        if (bMoveCaretToEnd) {
+            CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(*guiElement);
+
+            if (IS_CGUIELEMENT_EDIT(&GUIElement))
+            {
+                CGUIEdit* GUIEdit = static_cast<CGUIEdit*>(GUIElement.GetCGUIElement());
+                GUIEdit->SetCaretIndex(GUIEdit->GetText().length());
+            }
+            else if (IS_CGUIELEMENT_MEMO(&GUIElement))
+            {
+                CGUIMemo* GUIMemo = static_cast<CGUIMemo*>(GUIElement.GetCGUIElement());
+                GUIMemo->SetCaretIndex(GUIMemo->GetText().length());
+            }
+        }
+        
         lua_pushboolean(luaVM, true);
         return 1;
     }

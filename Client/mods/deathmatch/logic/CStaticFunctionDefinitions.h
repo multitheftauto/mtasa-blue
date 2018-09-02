@@ -443,6 +443,8 @@ public:
     static void GUISetAlpha(CClientEntity& Element, float fAlpha);
     static bool GUIBringToFront(CClientEntity& Element);
     static void GUIMoveToBack(CClientEntity& Element);
+    static bool GUIBlur(CClientEntity& Element);
+    static bool GUIFocus(CClientEntity& Element);
 
     static void GUICheckBoxSetSelected(CClientEntity& Element, bool bFlag);
     static void GUIRadioButtonSetSelected(CClientEntity& Element, bool bFlag);

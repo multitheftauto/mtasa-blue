@@ -99,6 +99,8 @@ public:
     LUA_DECLARE(GUISetProperty);
     LUA_DECLARE(GUIBringToFront);
     LUA_DECLARE(GUIMoveToBack);
+    LUA_DECLARE(GUIBlur);
+    LUA_DECLARE(GUIFocus);
     LUA_DECLARE(GUICheckBoxSetSelected);
     LUA_DECLARE(GUIRadioButtonSetSelected);
     LUA_DECLARE(GUIGetEnabled);
