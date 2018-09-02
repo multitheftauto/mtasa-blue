@@ -7,17 +7,17 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-01 13:55+0100\n"
-"PO-Revision-Date: 2018-09-02 02:22+0000\n"
+"PO-Revision-Date: 2018-09-02 02:20+0000\n"
 "Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: et\n"
+"Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Translators: SpunkyMe; LilDollaTechZone\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Translators: gfpts; bank; tim_pang; aa7867; jery0987; SKYGF; Ying; Tim885885; Jass; johncs61503; qaisjp; HKG_NewsJai; Milk_Shake\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1535854945.0\n"
+"X-POOTLE-MTIME: 1535854840.0\n"
 
 #: E:\Documents\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -47,61 +47,60 @@ msgstr ""
 
 #: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:31
 msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ KÄSK ABI ]***\n"
+msgstr "***[ 指令幫助 ]***\n"
 
 #: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:182
 #, c-format, c-format
 msgid "* The time is %d:%02d:%02d"
-msgstr "* Aeg on %d:%02d:%02d"
+msgstr "* 現在時間是 %d:%02d:%02d"
 
 #: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:266
-#, fuzzy
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "ühenda: Käsk on 'ühenda <server> <port> [<nimi> <salasõna>]'"
+msgstr "連線: 指令為 'connect <伺服器> [<連接埠> <暱稱> <密碼>]'"
 
 #: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:274
 #: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:342
 msgid "connect: Bad port number"
-msgstr "ühenda: Port number ei sobi"
+msgstr "連線: 無效的連接埠號碼"
 
 #: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:296
 #: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:357
 #, c-format, c-format
 msgid "connect: Connecting to %s:%u..."
-msgstr "ühenda: Loon ühendust serveriga %s:%u ..."
+msgstr "連線: 正在連線到 %s:%u..."
 
 #: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:300
 #: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:361
 #, c-format, c-format
 msgid "connect: could not connect to %s:%u!"
-msgstr "ühenda: Ei suutnud luua ühendust serveriga %s:%u!"
+msgstr "連線: 無法連線到 %s:%u!"
 
 #: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:305
 msgid "connect: Failed to unload current mod"
-msgstr "ühenda: Ei suutnud eemaldada modifikatsiooni"
+msgstr "連線: 移除指定 mod 失敗"
 
 #: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:395
 msgid "Bound all controls from GTA"
-msgstr "Seo kõik nupud GTA-ga"
+msgstr "綁定GTA 所有的控制設定"
 
 #: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:409
 msgid "Saved configuration file"
-msgstr "Seadistusfail on salvestatud"
+msgstr "儲存配置檔案"
 
 #. Print it
 #: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:475
 #, c-format, c-format
 msgid "* Your serial is: %s"
-msgstr "* Sinu serial on: %s"
+msgstr "* 您的序列號為: %s"
 
 #. Unknown command
 #: E:\Documents\mtasa-blue\Client\core\CCommands.cpp:209
 msgid "Unknown command or cvar: "
-msgstr "Tundmatu käsk või sõna:"
+msgstr "不明的命令或指令:"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:79
 msgid "Connecting failed. Invalid nick provided!"
-msgstr "Ühendamine ebaõnnestus. Teie mängunimi ei sobi!"
+msgstr "連線失敗。無效的匿名ID!"
 
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
@@ -153,94 +152,94 @@ msgstr "Ühendamine ebaõnnestus. Teie mängunimi ei sobi!"
 #: E:\Documents\mtasa-blue\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp:354
 #: E:\Documents\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:85
 msgid "Error"
-msgstr "Viga"
+msgstr "錯誤"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:110
 msgid "Connecting failed. Invalid host provided!"
-msgstr "Ühendamine ebaõnnestus. Vale serveri IP!"
+msgstr "連線失敗。提供無效的主機"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:126
 #, c-format, c-format
 msgid "Connecting to %s at port %u failed!"
-msgstr "Ühendumine serveriga %s pordiga %u ebaõnnstus!"
+msgstr "連接到 %s 於埠口 %u 失敗"
 
 #. Display the status box
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:147
 #, c-format, c-format
 msgid "Connecting to %s:%u ..."
-msgstr "Loon ühendust serveriga %s:%u ..."
+msgstr "正在連線至 %s:%u ..."
 
 #. Display the status box
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:148
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:579
 msgid "CONNECTING"
-msgstr "Ühendan"
+msgstr "連接中"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:263
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1152
 msgid "Connection timed out"
-msgstr "Ühendus aegus"
+msgstr "連線已逾時"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:277
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:281
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1197
 msgid "Disconnected: unknown protocol error"
-msgstr "Ühendus katkestati: teadmata protokolli viga"
+msgstr "連線中斷: 未知的協定錯誤"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:285
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1201
 msgid "Disconnected: disconnected remotely"
-msgstr "Ühendus katkestati: katkestati kuskilt mujalt"
+msgstr "連線中斷: 遠程連線中斷"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:289
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1205
 msgid "Disconnected: connection lost remotely"
-msgstr "Ühendus katkestati: ühendus kadus"
+msgstr "連線中斷: 伺服器連線中斷"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:293
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1209
 msgid "Disconnected: you are banned from this server"
-msgstr "Ühendus katkestati: sa oled bannitud selles serverist"
+msgstr "連線中斷: 你已經被封鎖禁止進入該伺服器"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:300
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1217
 msgid "Disconnected: disconnected from the server"
-msgstr "Ühendus katkestati: lahkusid serverist"
+msgstr "連線中斷: 伺服器連線中斷"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:304
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1221
 msgid "Disconnected: connection to the server was lost"
-msgstr "Ühendus katkestati: ühendus serveriga katkes"
+msgstr "連線中斷: 與伺服器的連線已遺失"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:311
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1229
 msgid "Disconnected: connection was refused"
-msgstr "Ühendus katkestati: server ei soovi ühendada"
+msgstr "連線中斷: 連線已被拒絕"
 
 #. Failed loading the mod
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:409
 #, c-format, c-format
 msgid "No such mod installed (%s)"
-msgstr "Pole sellist modifikatsiooni installeeritud (%s)"
+msgstr "未發現指定的 Mod (%s)"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:417
 msgid "Bad server response (2)"
-msgstr "Server ei vasta (2)"
+msgstr "不當的伺服器回應 (2)"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:427
 msgid "Bad server response (1)"
-msgstr "Server ei vasta (1)"
+msgstr "不當的伺服器回應 (1)"
 
 #. Create window
 #: E:\Documents\mtasa-blue\Client\core\CConsole.cpp:427
 msgid "CONSOLE"
-msgstr "KONSOOL"
+msgstr "控制臺"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:688
 #: E:\Documents\mtasa-blue\Client\core\CQuestionBox.cpp:192
 #: E:\Documents\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:621
 msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Kas soovid näha onlain abi selle probleemi kohta ?"
+msgstr "你希望在線上看看關於此問題的幫助嗎?"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:693
 #: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1112
@@ -256,7 +255,7 @@ msgstr "Kas soovid näha onlain abi selle probleemi kohta ?"
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:479
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:32
 msgid "No"
-msgstr "Ei"
+msgstr "否"
 
 #. /////////////////////////////////////////////////////////////////////////
 #. Dialog strings
@@ -276,18 +275,18 @@ msgstr "Ei"
 #: E:\Documents\mtasa-blue\Client\gui\CGUIMessageBox_Impl.cpp:72
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:31
 msgid "Yes"
-msgstr "Jah"
+msgstr "是"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:747
 #: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:612
-#, c-format
+#, c-format, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr ""
+msgstr "MTASA不能繼續,因為磁碟機 %s 空間不足"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:749
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:144
 msgid "Fatal error"
-msgstr "Tõsine viga"
+msgstr "嚴重的錯誤"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:897
 msgid "TO FIX, REMOVE THIS FILE:"
@@ -296,337 +295,335 @@ msgstr ""
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:929
 #, c-format, c-format
 msgid "%s module is incorrect!"
-msgstr "%s moodul on ebasobiv!"
+msgstr "%s 模組不正確！"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1235
 msgid "Error executing URL"
-msgstr "Viga URL-i avamisel"
+msgstr "執行網址時發生錯誤"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1247
 #, c-format, c-format
 msgid "Error running mod specified in command line ('%s')"
-msgstr "Viga modifikatsiooni jooksutamises, mis oli edastatud käsus ('%s')"
+msgstr "於運行模組發生錯誤，命令列 ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1332
 msgid "this help screen"
-msgstr "see abi leht"
+msgstr "這個說明畫面"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1333
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1334
 msgid "exits the application"
-msgstr "sulgeb rakenduse"
+msgstr "退出應用程式"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1335
 msgid "shows the version"
-msgstr "näitab versiooni"
+msgstr "顯示版本"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1336
 msgid "shows the time"
-msgstr "näitab aega"
+msgstr "顯示時間"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1337
 msgid "shows the hud"
-msgstr "näitab displeid"
+msgstr "顯示 Hud"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1338
 msgid "shows all the binds"
-msgstr "näitab kõiki binde"
+msgstr "顯示所有綁定設置"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1339
 msgid "shows your serial"
-msgstr "näitab sinu seriali"
+msgstr "顯示你的序列"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1348
 msgid "connects to a server (host port nick pass)"
-msgstr "ühendab serveriga (ip port mängunimi salasõna)"
+msgstr "連線到一個伺服器 (伺服器 埠口 暱稱 密碼)"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1349
 msgid "connects to a previous server"
-msgstr "ühendab eelmise serveriga"
+msgstr "連線到前一次登入過的伺服器"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1350
 msgid "binds a key (key control)"
-msgstr "bindib nupu (nupp)"
+msgstr "綁定一個按鍵 (控制鍵)"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1351
 msgid "unbinds a key (key)"
-msgstr "vabastab nupu bindist (nupp)"
+msgstr "解除綁定按鍵 (按鍵)"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1352
 msgid "copies the default gta controls"
-msgstr "kopeerib tavalise GTA nupud"
+msgstr "複製預設的GTA控制"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1353
 msgid "outputs a screenshot"
-msgstr "väljastab pildi mängust"
+msgstr "輸出截圖"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1354
 msgid "immediately saves the config"
-msgstr "salvestab seaded koheselt"
+msgstr "立刻地儲存配置"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1356
 msgid "clears the debug view"
-msgstr "puhastab debug akna"
+msgstr "清除除錯視圖"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1357
 msgid "scrolls the chatbox upwards"
-msgstr "kerib chati üles"
+msgstr "把對話框向上移"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1358
 msgid "scrolls the chatbox downwards"
-msgstr "kerib chati alla"
+msgstr "把對話框向下移"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1359
 msgid "scrolls the debug view upwards"
-msgstr "kerib debug akent üles"
+msgstr "把除錯視圖向上移"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1360
 msgid "scrolls the debug view downwards"
-msgstr "kerib debug akent alla"
+msgstr "把除錯視圖向下移"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1363
 msgid "shows the memory statistics"
-msgstr "näitab mälu(RAM) statistikat"
+msgstr "顯示記憶體狀態"
 
 #: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1364
 msgid "shows the frame timing graph"
-msgstr "näitab kaadrite kohta graafikut"
+msgstr "顯示每秒幀數時間圖"
 
 #: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:32
 msgid "Programming"
-msgstr "Programmeerimine"
+msgstr "程式開發"
 
 #: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:59
 msgid "Contributors"
-msgstr "Panustajad"
+msgstr "協助開發者:"
 
 #: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:75
 msgid "Game Design / Scripting"
-msgstr "Mängu disain / Koodimine"
+msgstr "遊戲設計/腳本師"
 
 #: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:92
 msgid "Patch contributors"
-msgstr "Patchi koostajad"
+msgstr "補丁協助開發員"
 
 #: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:156
 msgid "Language Localization"
-msgstr "Keel lokaliseerimine"
+msgstr "語言本地化"
 
 #: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:162
 msgid "Special Thanks"
-msgstr "Eriline tänu"
+msgstr "特別感謝"
 
 #: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:188
 msgid "This software makes use of the following libraries and software:"
-msgstr "See tarkvara kasutab järgmisi kogusi ja tarkvarasi:"
+msgstr "這個軟體曾使用到以下函式和軟體來協助："
 
 #. Even the default skin doesn't work, so give up
 #: E:\Documents\mtasa-blue\Client\core\CGUI.cpp:84
 msgid ""
 "The skin you selected could not be loaded, and the default skin also could "
 "not be loaded, please reinstall MTA."
-msgstr ""
-"Valitud välimust pole võimalik laadida, ka tavalist välimust ei suudetud "
-"laadida. Palun installi MTA uuesti."
+msgstr "你選擇的皮膚無法被讀取，默認的皮膚也無法被讀取，請重新安裝MTA。"
 
 #: E:\Documents\mtasa-blue\Client\core\CJoystickManager.cpp:1582
 msgid "Accelerate Axis"
-msgstr "Kiirenduse kang"
+msgstr "加速軸"
 
 #: E:\Documents\mtasa-blue\Client\core\CJoystickManager.cpp:1584
 msgid "Brake Axis"
-msgstr "Pidurdamise kang"
+msgstr "制動軸"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:180
 msgid "Fire"
-msgstr "Tulistamine"
+msgstr "攻擊"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:181
 msgid "Next weapon"
-msgstr "Järgmine relv"
+msgstr "下一項武器"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:182
 msgid "Previous weapon"
-msgstr "Eelmine relv"
+msgstr "上一項武器"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:183
 msgid "Forwards"
-msgstr "Edasi suunas"
+msgstr "向前"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:184
 msgid "Backwards"
-msgstr "Tagasi suunas"
+msgstr "向後"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:185
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2144
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2172
 msgid "Left"
-msgstr "Vasakule"
+msgstr "向左"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:186
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2146
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2173
 msgid "Right"
-msgstr "Paremale"
+msgstr "向右"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:187
 msgid "Zoom in"
-msgstr "Zoomi sisse"
+msgstr "放大"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:188
 msgid "Zoom out"
-msgstr "Zoomi välja"
+msgstr "縮小"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:189
 msgid "Enter/Exit"
-msgstr "Sisene/Välju"
+msgstr "進入/離開"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:190
 msgid "Change camera"
-msgstr "Vaheta kaamerat"
+msgstr "更改視角"
 
 #. 10
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:191
 msgid "Jump"
-msgstr "Hüppamine"
+msgstr "跳躍"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:192
 msgid "Sprint"
-msgstr "Sprintimine"
+msgstr "短跑"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:193
 msgid "Look behind"
-msgstr "Taha vaatamine"
+msgstr "向後看"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:194
 msgid "Crouch"
-msgstr "Kükitama"
+msgstr "蹲下"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:195
 msgid "Action"
-msgstr "Tegutsema"
+msgstr "行動"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:196
 msgid "Walk"
-msgstr "Kõndima"
+msgstr "行走"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:197
 msgid "Vehicle fire"
-msgstr "Autoga tulistamine"
+msgstr "車內攻擊"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:198
 msgid "Vehicle secondary fire"
-msgstr "Autoga tulistamine teisest relvast"
+msgstr "車內副攻擊"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:199
 msgid "Vehicle left"
-msgstr "Autoga vasakule"
+msgstr "車輛左邊"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:200
 msgid "Vehicle right"
-msgstr "Sõidukiga paremale"
+msgstr "車輛右邊"
 
 #. 20
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:201
 msgid "Steer forwards/down"
-msgstr "Juhtima edasi/alla"
+msgstr "向前走/向下轉向"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:202
 msgid "Steer backwards/up"
-msgstr "Juhtima tagasi/üles"
+msgstr "向前/向下轉向"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:203
 msgid "Accelerate"
-msgstr "Kiirendamine"
+msgstr "加速"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:204
 msgid "Brake/Reverse"
-msgstr "Pidurdamine/Tagurdamine"
+msgstr "煞車/倒車"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:205
 msgid "Radio next"
-msgstr "Järgmine raadiojaam"
+msgstr "下一個廣播電台"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:206
 msgid "Radio previous"
-msgstr "Eelmine raadiojaam"
+msgstr "上一個廣播電台"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:207
 msgid "Radio user track skip"
-msgstr "Raadio kasutaja lugude vahele jätmine"
+msgstr "跳過用戶自訂電台"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:208
 msgid "Horn"
-msgstr "Signaal"
+msgstr "汽車喇叭"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:209
 msgid "Sub-mission"
-msgstr "Kõrval missioon"
+msgstr "副任務"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:210
 msgid "Handbrake"
-msgstr "Käsipidur"
+msgstr "手動剎車"
 
 #. 30
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:211
 msgid "Vehicle look left"
-msgstr "Sõidukis vasakule vaatamine"
+msgstr "車內向左看"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:212
 msgid "Vehicle look right"
-msgstr "Sõidukis paremale vaatamine"
+msgstr "車內向右看"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:213
 msgid "Vehicle look behind"
-msgstr "Sõidukis taha vaatamine"
+msgstr "車內往後看"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:214
 msgid "Vehicle mouse look"
-msgstr "Sõidukiga hiirega vaatamine"
+msgstr "車內使用滑鼠看"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:215
 msgid "Special control left"
-msgstr "Eriline käsk vasakule"
+msgstr "特別控制左"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:216
 msgid "Special control right"
-msgstr "Eriline käsk paremale"
+msgstr "特別控制右"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:217
 msgid "Special control down"
-msgstr "Eriline käsk alla"
+msgstr "特別控制下"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:218
 msgid "Special control up"
-msgstr "Eriline käsk üles"
+msgstr "特別控制上"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:219
 msgid "Aim weapon"
-msgstr "Sihi relvaga"
+msgstr "武器瞄準"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:220
 msgid "Conversation yes"
-msgstr "Vestlus jaatav"
+msgstr "談話是"
 
 #. 40
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:221
 msgid "Conversation no"
-msgstr "Vestlus eitav"
+msgstr "對話「否」/負面"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:222
 msgid "Group control forwards"
-msgstr "Grupi käsk edasi"
+msgstr "團體控制往前"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:223
 msgid "Group control backwards"
-msgstr "Grupi käsk tagasi"
+msgstr "團體控制往後"
 
 #. TRANSLATORS: Replace with your language native name
 #: E:\Documents\mtasa-blue\Client\core\CLocalization.cpp:17
 msgid "English"
-msgstr "Eesti"
+msgstr "繁體中文"
 
 #: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:314
 msgid ""
@@ -640,25 +637,25 @@ msgid ""
 "\n"
 "Are you sure you want to disconnect?"
 msgstr ""
-"See toiming katkestab ühenduse praeguse serveriga.\n"
+"這將會使你從目前伺服器結束連線。\n"
 "\n"
-"Oled sa kindel, et tahad ühendust katkestada?"
+"你確定要結束連線嗎?"
 
 #: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1110
 msgid "DISCONNECT WARNING"
-msgstr "ÜHENDUSE KATKEMISE HOIATUS"
+msgstr "斷線警告"
 
 #: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:142
 msgid "No host specified!"
-msgstr "Unustasite lisada serveri ip!"
+msgstr "沒有指定的主機！"
 
 #: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:151
 msgid "No port specified!"
-msgstr "Unustasite lisada serveri pordi!"
+msgstr "沒有指定的連接埠!"
 
 #: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:156
 msgid "Invalid port specified!"
-msgstr "See port ei sobi!"
+msgstr "指定的連接埠無效!"
 
 #: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:165
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1266
@@ -666,41 +663,41 @@ msgstr "See port ei sobi!"
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:563
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:655
 msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Vale mängunimi! Palun mine seadetesse ja vali uus!"
+msgstr "無效的暱稱! 請去設置那裏設定新的暱稱!"
 
 #: E:\Documents\mtasa-blue\Client\core\CScreenShot.cpp:51
 #, c-format, c-format
 msgid "Screenshot taken: '%s'"
-msgstr "Pilt on tehtud: '%s'"
+msgstr "螢幕截圖已拍攝: '%s'"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:82
 msgid "SETTINGS"
-msgstr "SEADED"
+msgstr "設定"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:114
 msgid "Multiplayer"
-msgstr "Mitmikmäng"
+msgstr "多人"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:115
 msgid "Video"
-msgstr "Video"
+msgstr "視訊"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:116
 msgid "Audio"
-msgstr "Heli"
+msgstr "音效"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:117
 msgid "Binds"
-msgstr "Bindid"
+msgstr "綁定"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:118
 msgid "Controls"
-msgstr "Nupud"
+msgstr "控制"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:119
 msgid "Interface"
-msgstr "Kasutajaliides"
+msgstr "界面"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:120
 msgid "Web Browser"
@@ -708,7 +705,7 @@ msgstr ""
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:121
 msgid "Advanced"
-msgstr "Täpsemalt"
+msgstr "進階"
 
 #. Create buttons
 #. OK button
@@ -727,7 +724,7 @@ msgstr "Täpsemalt"
 #: E:\Documents\mtasa-blue\Client\gui\CGUIMessageBox_Impl.cpp:64
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:33
 msgid "OK"
-msgstr "Sobib"
+msgstr "確定"
 
 #. Cancel button
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:130
@@ -739,14 +736,14 @@ msgstr "Sobib"
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:36
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:123
 msgid "Cancel"
-msgstr "Loobu"
+msgstr "取消"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:145
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:336
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:587
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:836
 msgid "Load defaults"
-msgstr "Laadi tavalised"
+msgstr "載入預設值"
 
 #. *
 #. *  Controls tab
@@ -754,75 +751,75 @@ msgstr "Laadi tavalised"
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:155
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:179
 msgid "Mouse sensitivity:"
-msgstr "Hiire tundlikus:"
+msgstr "滑鼠靈敏度:"
 
 #. VerticalAimSensitivity
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:155
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:197
 msgid "Vertical aim sensitivity:"
-msgstr "Vertikaalse shitimise tundlikus:"
+msgstr "垂直瞄准靈敏度:"
 
 #. Mouse Options
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:158
 msgid "Mouse options"
-msgstr "Hiire seaded"
+msgstr "滑鼠選項"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:165
 msgid "Invert mouse vertically"
-msgstr "Pööra hiirt vertikaalselt"
+msgstr "反轉滑鼠垂直方向"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:169
 msgid "Steer with mouse"
-msgstr "Juhi hiirega"
+msgstr "使用滑鼠轉向"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:173
 msgid "Fly with mouse"
-msgstr "Lenda hiirega"
+msgstr "使用滑鼠飛行"
 
 #. Joypad options
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:215
 msgid "Joypad options"
-msgstr "Joypad valikud"
+msgstr "手把選項"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:228
 msgid "Standard controls (Mouse + Keyboard)"
-msgstr "Tavalised nupud (Hiirt + Klaviatuur)"
+msgstr "標準控制(滑鼠+鍵盤)"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:235
 msgid "Classic controls (Joypad)"
-msgstr "Klassikalised nupud (Joypad)"
+msgstr "經典控制(手把)"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:272
 msgid "Dead Zone"
-msgstr "Surnud tsoon"
+msgstr "死亡區域"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:277
 msgid "Saturation"
-msgstr "Värvilisus"
+msgstr "飽和度"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:283
 msgid "Use the 'Binds' tab for joypad buttons."
-msgstr "Kasuta \"Binds\" vahetahvlit joypadi nuppude joaks."
+msgstr "使用“綁定”鍵作為手把按鈕."
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:322
 msgid "Left Stick"
-msgstr "Vasakule kang"
+msgstr "左搖桿"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:328
 msgid "Right Stick"
-msgstr "Paremale kang"
+msgstr "右搖桿"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:343
 msgid "DESCRIPTION"
-msgstr "KIRJELDUS"
+msgstr "描述"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:344
 msgid "KEY"
-msgstr "NUPP"
+msgstr "按鍵"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:346
 msgid "ALT. KEY"
-msgstr "ALT. NUPP"
+msgstr "ALT. 快鍵鍵"
 
 #. *
 #. *    Multiplayer tab
@@ -830,32 +827,32 @@ msgstr "ALT. NUPP"
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:351
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:354
 msgid "Nick:"
-msgstr "Mängunimi:"
+msgstr "暱稱:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:364
 msgid "Save server passwords"
-msgstr "Salvesta serverite salasõnad"
+msgstr "儲存伺服器密碼"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:369
 msgid "Auto-refresh server browser"
-msgstr "Automaatselt värskenda serverite listi"
+msgstr "自動重整伺服器瀏覽器"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:374
 msgid "Allow screen upload"
-msgstr "Luba ekraani üleslaadmist"
+msgstr "允許畫面上傳"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:379
 msgid "Use customized GTA:SA files"
-msgstr "Kasuta muudetud GTA:SA faile"
+msgstr "使用自訂的俠盜獵車手:聖安地列斯文件"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:384
 msgid "Map rendering options"
-msgstr "Kaardi laadimise valikud"
+msgstr "地圖渲染選項"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:390
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:598
 msgid "Opacity:"
-msgstr "Katvus:"
+msgstr "不透明度:"
 
 #. *
 #. *  Audio tab
@@ -868,27 +865,27 @@ msgstr ""
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:410
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:437
 msgid "Radio volume:"
-msgstr "Raadio helitugevus:"
+msgstr "電台音量:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:410
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:456
 msgid "SFX volume:"
-msgstr "Mängu helitugevus:"
+msgstr "SFX音量:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:410
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:475
 msgid "MTA volume:"
-msgstr "MTA helitugevus:"
+msgstr "MTA音量："
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:410
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:494
 msgid "Voice volume:"
-msgstr "Hääle helitugevus:"
+msgstr "語音音量:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:410
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:535
 msgid "Play mode:"
-msgstr "Mängu tüüp:"
+msgstr "遊戲模式:"
 
 #. *
 #. * Webbrowser tab
@@ -899,7 +896,7 @@ msgstr "Mängu tüüp:"
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1919
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:51
 msgid "General"
-msgstr "Üldine"
+msgstr "一般"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:513
 msgid "Radio options"
@@ -907,60 +904,60 @@ msgstr ""
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:519
 msgid "Radio Equalizer"
-msgstr "Raadio ekvalaiser"
+msgstr "電台均衡器"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:524
 msgid "Radio Auto-tune"
-msgstr "Raadio auto-tune"
+msgstr "自動調整電台"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:529
 msgid "Usertrack options"
-msgstr "Kasutaja lugude valikud"
+msgstr "使用者自訂音訊選項"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:543
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2942
 msgid "Radio"
-msgstr "Raadio"
+msgstr "電台"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:544
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2944
 msgid "Random"
-msgstr "Juhuslik"
+msgstr "隨機"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:545
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2946
 msgid "Sequential"
-msgstr "Järjestikune"
+msgstr "順序"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:548
 msgid "Automatic Media Scan"
-msgstr "Automaatne meedia skäneerimine"
+msgstr "自動掃描媒體"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:555
 #, fuzzy
 msgid "Mute options"
-msgstr "Hiire seaded"
+msgstr "滑鼠選項"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:561
 #, fuzzy
 msgid "Mute All sounds when minimized"
-msgstr "Vaigista mängu helid kui mäng on all"
+msgstr "聲音最小化時把SFX聲音調至靜音"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:566
 msgid "Mute Radio sounds when minimized"
-msgstr "Vaigista raadio heli kui mäng on all"
+msgstr "聲音最小化時收音機調至靜音"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:571
 msgid "Mute SFX sounds when minimized"
-msgstr "Vaigista mängu helid kui mäng on all"
+msgstr "聲音最小化時把SFX聲音調至靜音"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:576
 msgid "Mute MTA sounds when minimized"
-msgstr "Vaigista MTA helid kui mäng on all"
+msgstr "聲音最小化時把MTA聲音調至靜音"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:581
 msgid "Mute Voice sounds when minimized"
-msgstr "Vaigista mängijate mikrofoni helid kui mäng on all"
+msgstr "聲音最小化時靜音語音"
 
 #. *
 #. *  Video tab
@@ -968,7 +965,7 @@ msgstr "Vaigista mängijate mikrofoni helid kui mäng on all"
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:606
 msgid "Resolution:"
-msgstr "Resolutsioon:"
+msgstr "解析度:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:647
@@ -978,84 +975,84 @@ msgstr ""
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:663
 msgid "Draw Distance:"
-msgstr "Vaatekaugus:"
+msgstr "顯示距離:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:681
 msgid "Brightness:"
-msgstr "Heledus:"
+msgstr "亮度:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:699
 msgid "FX Quality:"
-msgstr "FX kvaliteet:"
+msgstr "FX 畫質:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:598
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:713
 msgid "Anisotropic filtering:"
-msgstr "Anisotroopne filtreering:"
+msgstr "非等向過濾:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:598
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:740
 msgid "Anti-aliasing:"
-msgstr "Antialias:"
+msgstr "反鋸齒:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:598
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:754
 msgid "Aspect Ratio:"
-msgstr "Kuvasuhe:"
+msgstr "畫面比例:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:618
 msgid "Windowed"
-msgstr "Windowed"
+msgstr "視窗化"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:626
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:370
 msgid "Fullscreen mode:"
-msgstr "Täisekraanirežiim:"
+msgstr "全螢幕模式:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:633
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1521
 msgid "Standard"
-msgstr "Standard"
+msgstr "標準"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:634
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1523
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:370
 msgid "Borderless window"
-msgstr "Ilma raamita aken"
+msgstr "無邊框視窗化"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:635
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1525
 msgid "Borderless keep res"
-msgstr "Hoia äärteta resolutsiooni"
+msgstr "保持解析度的無邊框"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:639
 msgid "Mip Mapping"
-msgstr "Mip kaardistamine"
+msgstr "多重材質貼圖"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:707
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1439
 msgid "Low"
-msgstr "Madal"
+msgstr "低"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:708
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1441
 msgid "Medium"
-msgstr "Keskmine"
+msgstr "中等"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:709
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1019
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1443
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2997
 msgid "High"
-msgstr "Kõrge"
+msgstr "高"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:710
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1445
 msgid "Very high"
-msgstr "Väga kõrge"
+msgstr "非常高"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:725
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:748
@@ -1068,7 +1065,7 @@ msgstr "Väga kõrge"
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3058
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4022
 msgid "Off"
-msgstr "Väljas"
+msgstr "關閉"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:749
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1451
@@ -1090,7 +1087,7 @@ msgstr "3x"
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1461
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3006
 msgid "Auto"
-msgstr "Automaatne"
+msgstr "自動"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:765
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1463
@@ -1109,23 +1106,23 @@ msgstr "16:9"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:770
 msgid "HUD Match Aspect Ratio"
-msgstr ""
+msgstr "HUD的比例"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:776
 msgid "Volumetric Shadows"
-msgstr "Volumeetrilised varjud"
+msgstr "陰影品質"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:780
 msgid "Grass effect"
-msgstr "Muru efekt"
+msgstr "雜草效果"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:784
 msgid "Heat haze"
-msgstr "Soojus laine"
+msgstr "熱煙霧"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:788
 msgid "Tyre Smoke etc"
-msgstr ""
+msgstr "輪胎煙霧等"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:792
 msgid "Render vehicles always in high detail"
@@ -1133,15 +1130,15 @@ msgstr ""
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:797
 msgid "Full Screen Minimize"
-msgstr "Täisekraanirežiimi allapanek"
+msgstr "全螢幕最小化"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:809
 msgid "Enable Device Selection Dialog"
-msgstr "Võimalda seadme valiku dialoog"
+msgstr "啟用裝置使用對話框式選擇"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:821
 msgid "Show unsafe resolutions"
-msgstr ""
+msgstr "展示不安全的模式"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:857
 msgid "Enable remote websites"
@@ -1182,28 +1179,28 @@ msgstr ""
 #. Misc section label
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:930
 msgid "Misc"
-msgstr "Muu"
+msgstr "其它"
 
 #. Fast clothes loading
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:943
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4466
 msgid "Fast CJ clothes loading:"
-msgstr "Kiire CJ riiete laadimine:"
+msgstr "快速載入CJ服裝:"
 
 #. Browser scan speed
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:957
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4468
 msgid "Browser speed:"
-msgstr "Brauseri kiirus:"
+msgstr "瀏覧器速度:"
 
 #. Single download
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:971
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4470
 msgid "Single connection:"
-msgstr "Üksik ühendus:"
+msgstr "單一連線:"
 
 #. Packet tag
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
@@ -1224,27 +1221,27 @@ msgstr ""
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1010
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4464
 msgid "Process priority:"
-msgstr "Protsessi prioteet:"
+msgstr "優先處理權:"
 
 #. Debug setting
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1024
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4476
 msgid "Debug setting:"
-msgstr "Debug seaded:"
+msgstr "除錯設定:"
 
 #. Streaming memory
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:938
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1047
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4478
 msgid "Streaming memory:"
-msgstr "Striiming mälu:"
+msgstr "串流記憶體:"
 
 #. Update build type
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:938
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1149
 msgid "Update build type:"
-msgstr "Uuenduse tüüp:"
+msgstr "更新組建類型:"
 
 #. UpdateAutoInstall
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:938
@@ -1259,12 +1256,12 @@ msgstr ""
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3024
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3031
 msgid "On"
-msgstr "Peal"
+msgstr "開啟"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:964
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3013
 msgid "Very slow"
-msgstr "Väga aeglane"
+msgstr "非常慢"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:965
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:978
@@ -1280,12 +1277,12 @@ msgstr "Väga aeglane"
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3038
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3051
 msgid "Default"
-msgstr "Tavaline"
+msgstr "預設"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:966
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3017
 msgid "Fast"
-msgstr "Ilma ääreta aken"
+msgstr "快"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1017
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2993
@@ -1299,24 +1296,24 @@ msgstr ""
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1054
 msgid "Min"
-msgstr "Miinimum"
+msgstr "最低"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1067
 msgid "Max"
-msgstr "Maksimum"
+msgstr "最大"
 
 #. Windows 8 compatibility
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1074
 msgid "Windows 8 compatibility:"
-msgstr ""
+msgstr "Windows 8 相容性:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1079
 msgid "16-bit color"
-msgstr ""
+msgstr "16位元顏色"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1084
 msgid "Mouse fix"
-msgstr ""
+msgstr "修正滑鼠"
 
 #. Cache path info
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1102
@@ -1331,17 +1328,16 @@ msgstr ""
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1121
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1124
 msgid "Auto updater"
-msgstr "Automaatne uuendaja"
+msgstr "自動更新"
 
 #. Check for updates
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1162
 msgid "Check for update now"
-msgstr "Kontrolli uuendusi"
+msgstr "立刻檢查更新"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1309
-#, fuzzy
 msgid "Some settings will be changed when you next start MTA"
-msgstr "Some settings muudetakse kui avate uuesti MTA"
+msgstr "有些設定必須在你重啟MTA之後才會生效"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1310
 msgid ""
@@ -1351,11 +1347,11 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Kas soovite taaskäivitada kohe?"
+"你想要馬上重啟嗎?"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1313
 msgid "RESTART REQUIRED"
-msgstr "TAASKÄIVITUS NÕUTUD"
+msgstr "需要重新啟動"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1333
 msgid "Some settings will be changed when you disconnect the current server"
@@ -1370,7 +1366,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Kas soovite taaskäivitada kohe?"
+"你想要馬上重啟嗎?"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1337
 msgid "DISCONNECT REQUIRED"
@@ -1379,35 +1375,35 @@ msgstr ""
 #. Update the joystick name
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1645
 msgid "Joypad not detected  -  Check connections and restart game"
-msgstr "Joypadi ei avastatud - Kontrolli ühendusi ja taaskäivita mäng"
+msgstr "未檢測到手把  -  撿查手把與電腦的連接並重啟遊戲"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1833
 msgid "Binding axis"
-msgstr "Siduv telg"
+msgstr "綁定中的軸"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1833
 msgid "Move an axis to bind, or escape to clear"
-msgstr "Liiguta telge, et bindida või ärge liigutage midagi, et puhastada"
+msgstr "請移動一個軸以綁定，或按下ESC鍵取消"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1910
 msgid "Language:"
-msgstr "Keel:"
+msgstr "語言:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1910
 msgid "Skin:"
-msgstr "Välimus:"
+msgstr "外觀:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1910
 msgid "Presets:"
-msgstr "Valmisseadistus:"
+msgstr "預置:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1962
 msgid "Chat"
-msgstr "Vestlus"
+msgstr "聊天"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1979
 msgid "Load"
-msgstr "Lae"
+msgstr "讀取"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1991
 msgid "Colors"
@@ -1428,7 +1424,7 @@ msgstr ""
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1999
 msgid "Chat Text"
-msgstr "Chati tekst"
+msgstr "聊天文字"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1999
 msgid "Input Background"
@@ -1436,19 +1432,19 @@ msgstr ""
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1999
 msgid "Input Text"
-msgstr "Sisestuskasti tekst"
+msgstr "輸入文字"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2022
 msgid "Lines:"
-msgstr "Ridu:"
+msgstr "行數:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2022
 msgid "Scale:"
-msgstr "Suurus:"
+msgstr "比例:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2022
 msgid "Width:"
-msgstr "Laius:"
+msgstr "寬度:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2025
 msgid "Size"
@@ -1456,15 +1452,15 @@ msgstr ""
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2074
 msgid "after"
-msgstr "pärast"
+msgstr "之後"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2074
 msgid "for"
-msgstr "jaoks"
+msgstr "為"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2074
 msgid "sec"
-msgstr "sek"
+msgstr "秒"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2077
 msgid "Fading"
@@ -1472,7 +1468,7 @@ msgstr ""
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2083
 msgid "Fade out old lines"
-msgstr "Eemalda vanad read"
+msgstr "灰色化舊行數"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2123
 msgid "Horizontal:"
@@ -1514,11 +1510,11 @@ msgstr ""
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2208
 #, fuzzy
 msgid "Font"
-msgstr "Kirjatüüp:"
+msgstr "字型:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2245
 msgid "Hide background when not typing"
-msgstr "Peida taust kui ei kirjuta"
+msgstr "當不在輸入文字時隱藏背景"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2250
 msgid "Nickname completion using the \"Tab\" key"
@@ -1545,44 +1541,44 @@ msgstr ""
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2513
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2520
 msgid "Press a key to bind, or escape to clear"
-msgstr "Vajutage nuppu, et bindida, või ärge tehke midagi, et puhastada"
+msgstr "請按下一個按鍵以綁定，或按下ESC鍵取消"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2514
 msgid "Binding a primary key"
-msgstr "Bindin põhilise nupu"
+msgstr "綁定一個主按鍵"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2521
 msgid "Binding a secondary key"
-msgstr "Bindin sekundaarse nupu"
+msgstr "綁定一個副按鍵"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2595
 msgid "GTA GAME CONTROLS"
-msgstr "GTA MÄNGU NUPUD"
+msgstr "GTA遊戲控制"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2597
 msgid "MULTIPLAYER CONTROLS"
-msgstr "MITMIKMÄNGU NUPUD"
+msgstr "多人遊戲控制"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2826
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4427
 msgid "Your nickname contains invalid characters!"
-msgstr "Teie mängunimi sisaldab ebasobivaid märke!"
+msgstr "你的暱稱中含有不正當的字元!"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3566
 msgid "Red:"
-msgstr "Punane:"
+msgstr "紅:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3566
 msgid "Green:"
-msgstr "Roheline:"
+msgstr "綠:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3566
 msgid "Blue:"
-msgstr "Sinine:"
+msgstr "藍色:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3566
 msgid "Transparency:"
-msgstr "Läbipaistvus:"
+msgstr "透明度:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3569
 msgid "Color"
@@ -1595,11 +1591,11 @@ msgstr ""
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3954
 #, fuzzy
 msgid "Please disconnect before changing language"
-msgstr "Palun katkestage ühendus enne välimuse muutmist"
+msgstr "在更換皮膚前請先斷線"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3982
 msgid "Please disconnect before changing skin"
-msgstr "Palun katkestage ühendus enne välimuse muutmist"
+msgstr "在更換皮膚前請先斷線"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4268
 msgid ""
@@ -1607,13 +1603,13 @@ msgid ""
 "\n"
 "Are you sure you want to enable them?"
 msgstr ""
-"Volumeetrilised varjud võivad teie süsteemi aeglustada.\n"
+"陰影體積化有可能會導致系統速度變慢\n"
 "\n"
-"Oled kindel, et soovid neid lubada?"
+"你確定要啟用陰影體積化?"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4272
 msgid "PERFORMANCE WARNING"
-msgstr "JÕUDLUSE HOIATUS"
+msgstr "效能警告"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4292
 msgid ""
@@ -1621,13 +1617,13 @@ msgid ""
 "\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr ""
-"Pildi üleslaadimine on nõutud osade serverite poolt anti-cheat eesmärgil.\n"
+"為達防止外掛發生目的，在某些伺服器中你需要上傳螢幕截圖來證明。\n"
 "\n"
-"(Chat ja lahtiolevad aknad ei kuulu üleslaadimisele)\n"
+"(對話框及其圖像將不會連同螢幕截圖一併上傳)\n"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4294
 msgid "SCREEN UPLOAD INFORMATION"
-msgstr "PILDI ÜLESLAADIMISE INFORMATSIOON"
+msgstr "截圖上傳資訊"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4315
 msgid ""
@@ -1638,45 +1634,45 @@ msgid ""
 "\n"
 "Are you sure you want to use them?"
 msgstr ""
-"Mõned failid sinu GTA:SA kaustas on muudetud.\n"
-"MTA kasutab neid faile kui see kast on valitud.\n"
+"在你的GTA:SA目錄有些東西是有經過自行更改的.\n"
+"如果你勾選MTA將會只用這些模組檔案.\n"
 "\n"
-"Kuid, MUUDETUD FAILID ON KEELATUD PALJUDES SERVERITES\n"
+"然而,更改過的GTA SA將會備很多伺服器禁止\n"
 "\n"
-"Old kindel, et soovid neid kasutada?"
+"你確定你要使用他們嗎?"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4321
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2078
 msgid "CUSTOMIZED GTA:SA FILES"
-msgstr "MUUDETUD GTA:SA FAILID"
+msgstr "已修改俠盜獵車手:聖安地列斯的文件檔"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4445
 msgid "Please enter a nickname"
-msgstr "Palun sisesta mängunimi"
+msgstr "請輸入一個暱稱"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4446
 msgid ""
 "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
 msgstr ""
-"Palun sisesta mängunimi, et liituda serveritega. \n"
-"Seda kasutatakse sinu äratundmiseks mängus"
+"請輸入暱稱以用於遊戲內。  \n"
+"當你進入伺服器後這將會成為你的名稱"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4464
 msgid "Very experimental feature."
-msgstr "Väga eksperimentaalne funktsioon."
+msgstr "非常實驗性的功能。"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4466
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
-msgstr "Peatab kioskid CJ variatsioonidega (Kasutab 65MB rohkem RAMi)"
+msgstr "請停止使用CJ變數暫存檔(使用超過65MB記憶體)"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4468
 msgid "Older routers may require a slower scan speed."
-msgstr "Vanemad ruuterid võivad nõuda aeglasemat skäneerimise kiirust."
+msgstr "較舊的路由器掃描速度可能較慢。"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4470
 msgid "Switch on to use only one connection when downloading."
-msgstr "Lülita sisse, et kasutaks ainult ühte ühendust kui laeb faile alla."
+msgstr "當下載時，開啟以只使用單一連線。"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4472
 msgid "Tag network packets to help ISPs identify MTA traffic."
@@ -1688,20 +1684,20 @@ msgstr ""
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4476
 msgid "Select default always. (This setting is not saved)"
-msgstr "Vali alati tavaline. (See säte ei ole salvestatud)"
+msgstr "經常選擇預設。(此項設定並不會儲存)"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4478
 msgid "Maximum is usually best"
-msgstr "Maksimaalne on tavaliselt parim"
+msgstr "最大通常是最好"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4480
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4482
 msgid "Auto updater:"
-msgstr "Automaatne uuendamine:"
+msgstr "自動更新:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4480
 msgid "Select default unless you like filling out bug reports."
-msgstr "Vali tavaline kui sulle ei meelde täita bug reporte."
+msgstr "請選擇預設，有意願要填寫漏洞報告。"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4482
 msgid "Select default to automatically install important updates."
@@ -1709,34 +1705,34 @@ msgstr ""
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4484
 msgid "16-bit color:"
-msgstr ""
+msgstr "16位元的顏色:"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4484
 msgid "Enable 16 bit color modes - Requires MTA restart"
-msgstr ""
+msgstr "啟動 16位元顏色 並將MTA重啟"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4486
 msgid "Mouse fix:"
-msgstr ""
+msgstr "修正滑鼠"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4486
 msgid "Mouse movement fix - May need PC restart"
-msgstr ""
+msgstr "滑鼠移動修正 - 可能需要重啟電腦"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:623
 msgid "Busy"
-msgstr "Hõivatud"
+msgstr "忙碌"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:623
 msgid "Can't check for updates right now"
-msgstr "Hetkel pole võimalik uuendusi kontrollida"
+msgstr "目前無法檢查更新"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1564
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1584
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1602
 #, c-format, c-format
 msgid "MTA:SA %s required"
-msgstr "MTA:SA %s on nõutud"
+msgstr "需要 MTA:SA %s"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1565
 #, c-format, c-format
@@ -1745,14 +1741,14 @@ msgid ""
 "\n"
 "Do you want to download and install MTA:SA %s ?"
 msgstr ""
-"Uuem versioon MTA:SA-st (%s) on vajalik, et serveriga ühenduda.\n"
+"若想加入目前的伺服器，需要安裝更新版本的MTA:SA %s。\n"
 "\n"
-"Kas te tahate MTA:SA %s alla laadida ja installida?"
+"你想要現在下載及安裝 MTA:SA %s 嗎?"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1585
 #, c-format, c-format
 msgid "Do you want to launch MTA:SA %s and connect to this server ?"
-msgstr "Kas soovid käivitada MTA:SA %s ja liituda selle serveriga ?"
+msgstr "你想要啟動 MTA:SA %s 並連線到該伺服器嗎?"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1603
 msgid ""
@@ -1760,43 +1756,43 @@ msgid ""
 "\n"
 "Please try later."
 msgstr ""
-"Pole võimalik ühendust luua sellel korral.\n"
+"現在不可能連線。\n"
 "\n"
-"Palun proovige hiljem uuesti."
+"請稍後再試。"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1785
 msgid "Connecting"
-msgstr "Ühendamine"
+msgstr "連線中"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1786
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1802
 msgid "Please wait..."
-msgstr "Palun oodake..."
+msgstr "請稍等..."
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1801
 msgid "CHECKING"
-msgstr "UURIN"
+msgstr "檢查中"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1818
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1911
 msgid "UPDATE CHECK"
-msgstr "UUENDUSTE KONTROLLIMINE"
+msgstr "更新檢查"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1819
 msgid "No update needed"
-msgstr "Uuendada pole vaja"
+msgstr "不需要更新"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1836
 msgid "DOWNLOADING"
-msgstr "LAEN ALLA"
+msgstr "下載中"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1837
 msgid "waiting..."
-msgstr "ootan..."
+msgstr "等待..."
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1853
 msgid "MANDATORY UPDATE"
-msgstr "KOHUSTUSLIK UUENDUS"
+msgstr "強制性更新"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1854
 msgid ""
@@ -1804,13 +1800,13 @@ msgid ""
 "\n"
 " Do you want to update now ?"
 msgstr ""
-"Et liituda selle serveriga pead uuendama oma MTA.\n"
+"要加入這伺服器，你必須更新 MTA。\n"
 "\n"
-"Kas soovid uuendada kohe ?"
+"你希望現在更新嗎?"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1872
 msgid "OPTIONAL UPDATE"
-msgstr "VALIKULINE UUENDUS"
+msgstr "可選擇性更新"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1873
 msgid ""
@@ -1818,9 +1814,9 @@ msgid ""
 "\n"
 " Do you want to update now ?"
 msgstr ""
-"Server ütleb, et uuendus on soovituslik, aga mitte vajalik.\n"
+"伺服器表示建議你進行更新，但並非一定要。\n"
 "\n"
-"Kas soovid uuendada kohe ?"
+"你想要現在更新嗎?"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1912
 msgid ""
@@ -1828,54 +1824,54 @@ msgid ""
 "\n"
 "Please check www.mtasa.com"
 msgstr ""
-"Uuendust pole hetkel saadaval.\n"
+"目前無法取得更新。\n"
 "\n"
-"Palun külastage www.mtasa.com"
+"請到 www.mtasa.com 查看"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1933
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2115
 msgid "ERROR SAVING"
-msgstr "VIGADE SALVESTAMINE"
+msgstr "錯誤保存"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1934
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2116
 msgid "Unable to create the file."
-msgstr "Ei suutnud luua uut faili."
+msgstr "無法建立檔案"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1942
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1951
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2124
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2133
 msgid "ERROR DOWNLOADING"
-msgstr "VIGA ALLA LAADIMISEL"
+msgstr "下載錯誤"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1943
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2125
 msgid "The downloaded file appears to be incorrect."
-msgstr "Alla laetud failid tunduvad olevat ebasobivad."
+msgstr "下載的文件不正確"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1952
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2134
 msgid "For some reason."
-msgstr "Mingil põhjusel"
+msgstr "因為某些原因。"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1963
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2147
 msgid "DOWNLOAD COMPLETE"
-msgstr "ALLA LAADIMINE LÕPETATUD"
+msgstr "下載完成"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1987
 msgid " - Unknown problem in _DialogUpdateResult"
-msgstr "- Teadmata probleem _DialogUpdateResult -ga"
+msgstr "- 未知的問題發生在 _DialogUpdateResult"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2085
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2095
 msgid "Ok"
-msgstr "Sobib"
+msgstr "確定"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2093
 msgid "ERROR"
-msgstr "VIGA"
+msgstr "錯誤"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2094
 msgid ""
@@ -1884,15 +1880,15 @@ msgid ""
 "\n"
 "Please reinstall MTA:SA"
 msgstr ""
-"Mõned tähtsad MTA:SA failid on puudu.\n"
+"某些 MTA:SA資料遺失\n"
 "\n"
 "\n"
-"Palun paigaldage MTA:SA uuesti"
+"請重新安裝 MTA:SA"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2721
 #, c-format, c-format
 msgid "%3d %% completed"
-msgstr "%3d %% valmis"
+msgstr "%3d %% 已完成"
 
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2723
 #, c-format, c-format
@@ -1903,16 +1899,16 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Ootan vastust - %-3d"
+"等待回應中  -  %-3d"
 
 #: E:\Documents\mtasa-blue\Client\core\DXHook\CDirect3DEvents9.cpp:230
 #, c-format, c-format
 msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Pilt tuli %d baiti, aga eeldati %d"
+msgstr "截圖包含%d 個字節，但預期為 %d 字節"
 
 #: E:\Documents\mtasa-blue\Client\core\DXHook\CDirect3DEvents9.cpp:236
 msgid "Screenshot failed"
-msgstr "Pildi tegemine ebaõnnestus"
+msgstr "截圖失敗"
 
 #: E:\Documents\mtasa-blue\Client\core\DXHook\CDirect3DHook9.cpp:125
 msgid ""
@@ -1921,33 +1917,33 @@ msgid ""
 "Please ensure the DirectX End-User Runtime and\n"
 "latest Windows Service Packs are installed correctly."
 msgstr ""
-"Ei suudetud käivitada Direct3D9.\n"
+"無法初始化 Direct3D9。\n"
 "\n"
-"Palun tehtke kindlaks, et DirectX End-User Runtime ja\n"
-"viimane Windows Service Pack on paigaldatud korrektselt."
+"請確保DirectX End-User Runtime 及\n"
+"最新的Windows 安全性更新是否已正確安裝。"
 
 #. Create the window
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:85
 msgid "SERVER BROWSER"
-msgstr "SERVERI LIST"
+msgstr "伺服器瀏覽器"
 
 #. Create the tabs
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:133
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:90
 msgid "Internet"
-msgstr "Internet"
+msgstr "網際網路"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:134
 msgid "Local"
-msgstr "Kohalik"
+msgstr "區域"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:135
 msgid "Favourites"
-msgstr "Lemmikud"
+msgstr "我的最愛"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:136
 msgid "Recent"
-msgstr "Hiljutine"
+msgstr "最近"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:191
 msgid ""
@@ -1956,70 +1952,70 @@ msgid ""
 "Type the address and port into the address bar.\n"
 "Or select a server from the history list and press 'Connect'"
 msgstr ""
-"KIIRE ÜHENDUSE LOOMISEKS:\n"
+"快速連線：\n"
 "\n"
-"Kirjuta serveri IP ja port aadressi ribale.\n"
-"Või vali server ajaloo listist ja vajuta 'Ühenda'"
+"輸入到地址欄的地址和端口。\n"
+"或從歷史列表中選擇一個伺服器，並按下「連接」"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:203
 msgid "HELP"
-msgstr "ABI"
+msgstr "幫助"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:212
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:294
 msgid "Refresh"
-msgstr "Värskenda"
+msgstr "重新整理"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:212
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:295
 msgid "Add Favorite"
-msgstr "Lisa lemmik"
+msgstr "新增收藏"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:212
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:296
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:344
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:404
 msgid "Connect"
-msgstr "Ühenda"
+msgstr "連線"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:212
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:297
 msgid "Server information"
-msgstr "Serveri informatsioon"
+msgstr "伺服器資訊"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:213
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:298
 msgid "Search servers"
-msgstr "Otsi servereid"
+msgstr "搜尋伺服器"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:213
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:299
 msgid "Search players"
-msgstr "Otsi mängijaid"
+msgstr "搜尋玩家"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:213
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:300
 msgid "Start search"
-msgstr "Alusta otsingut"
+msgstr "開始搜尋"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:341
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1658
 msgid "Search players..."
-msgstr "Otsi mängijaid..."
+msgstr "搜尋玩家..."
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:342
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:454
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1656
 msgid "Search servers..."
-msgstr "Otsi servereid..."
+msgstr "搜尋伺服器..."
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:485
 msgid "Name"
-msgstr "Nimi"
+msgstr "名稱"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:486
 msgid "Players"
-msgstr "Mängijad"
+msgstr "玩家數"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:487
 msgid "Ping"
@@ -2027,70 +2023,70 @@ msgstr "Ping"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:488
 msgid "Gamemode"
-msgstr "Mängutüüp"
+msgstr "遊戲模式"
 
 #. Player List Columns
 #. Column for player names
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:510
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:138
 msgid "Player list"
-msgstr "Mängijate list"
+msgstr "玩家清單"
 
 #. Include label
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:518
 msgid "Include:"
-msgstr "Kaasa:"
+msgstr "包括:"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:524
 msgid "Empty"
-msgstr "Tühi"
+msgstr "空白"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:530
 msgid "Full"
-msgstr "Täis"
+msgstr "滿人"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:536
 msgid "Locked"
-msgstr "Lukus"
+msgstr "鎖定"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:548
 msgid "Offline"
-msgstr "Offlain"
+msgstr "離線"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:561
 msgid "Other Versions"
-msgstr "Muud versioonid"
+msgstr "其他版本"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:582
 msgid "Back"
-msgstr "Tagasi"
+msgstr "返回"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:588
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:35
 msgid "Help"
-msgstr "Abi"
+msgstr "說明"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:771
 msgid "Loading..."
-msgstr "Laadimine..."
+msgstr "載入中..."
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1214
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:2145
 msgid "  ..loading.."
-msgstr " ..laadimine.."
+msgstr "..載入中.."
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1244
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1372
 msgid "No address specified!"
-msgstr "Aadressi pole määratud!"
+msgstr "尚未指定位址!"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1257
 msgid "Unknown protocol"
-msgstr "Tundmatu protokoll"
+msgstr "未知的協議"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1257
 msgid "Please use the mtasa:// protocol!"
-msgstr "Palun kasuta mtasa:// protokolli!"
+msgstr "請使用 mtasa:// protocol!"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1346
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:319
@@ -2098,17 +2094,17 @@ msgstr "Palun kasuta mtasa:// protokolli!"
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:591
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:1243
 msgid "Information"
-msgstr "Informatsioon"
+msgstr "資訊"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1346
 msgid "You have to select a server to connect to."
-msgstr "Sa pead valima serveri millega ühenduda."
+msgstr "你需要選擇一個伺服器來連接。"
 
 #. Create queue window
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:32
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:302
 msgid "SERVER IS FULL"
-msgstr "SERVER ON TÄIS"
+msgstr "伺服器已滿"
 
 #. Determine our label draw position for L10n
 #. Start position
@@ -2116,164 +2112,161 @@ msgstr "SERVER ON TÄIS"
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:44
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:53
 msgid "Name:"
-msgstr "Nimi:"
+msgstr "名稱:"
 
 #. Server IP
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:44
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:64
 msgid "Server Address:"
-msgstr "Serveri aadress:"
+msgstr "伺服器位址:"
 
 #. Gamemode
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:44
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:75
 msgid "Gamemode:"
-msgstr "Mängutüüp:"
+msgstr "遊戲模式:"
 
 #. Map
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:44
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:86
 msgid "Map:"
-msgstr "Kaart:"
+msgstr "地圖:"
 
 #. Players
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:45
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:97
 msgid "Players:"
-msgstr "Mängijaid:"
+msgstr "玩家數:"
 
 #. Passworded
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:45
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:108
 msgid "Passworded:"
-msgstr "Lukustatud:"
+msgstr "已被密碼保護:"
 
 #. Latency
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:45
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:119
 msgid "Latency:"
-msgstr "Latents:"
+msgstr "延遲:"
 
 #. Close button
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:144
 msgid "Close"
-msgstr "Sulge"
+msgstr "關閉"
 
 #. Join Game button
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:152
 msgid "Join Game"
-msgstr "Liitu mänguga"
+msgstr "加入遊戲"
 
 #. Please enter password label
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:166
 msgid "Please enter the password to the server:"
-msgstr "Palun sisestage serveri salasõna:"
+msgstr "請輸入密碼來進入伺服器："
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:177
 msgid "Join the server as soon as a player slot is available."
-msgstr "Liitu serveriga esimesel võimalusel kui koht vabaneb."
+msgstr "伺服器人數有空缺時會自動進入"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:310
 msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "PALUN SISESTA SERVERI SALASÕNA"
+msgstr "請輸入伺服器密碼"
 
 #. The server has timed out
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:402
 msgid "Timed Out"
-msgstr "Ühendus aegus"
+msgstr "已逾時"
 
 #. Set every GUI elements text to blank
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:431
 msgid "Querying..."
-msgstr "Päring..."
+msgstr "正在查詢..."
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:25
 msgid "Idle"
-msgstr "Tegevuseta"
+msgstr "閒置"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:152
 msgid "player"
 msgid_plural "players"
-msgstr[0] "mängija"
-msgstr[1] "mängijad"
+msgstr[0] "玩家玩家數"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:153
 msgid "on"
-msgstr "peal"
+msgstr "於"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:156
 msgid "server"
 msgid_plural "servers"
-msgstr[0] "server"
-msgstr[1] "serverid"
+msgstr[0] "伺服器伺服器數"
 
 #. We are polling for the master server list (first pass)
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:240
 #, c-format, c-format
 msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "Nõuan peaserveri listi (%lu ms läbitud)"
+msgstr "請求主伺服器列表（已過 %lu 毫秒）"
 
 #. Abort
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:256
 msgid "Master server list could not be parsed."
-msgstr "Peaserveri listi pole võimalik lugeda."
+msgstr "主伺服器列表無法解析。"
 
 #. Abort
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:266
 msgid "Master server list could not be retrieved."
-msgstr "Peaserveri listi pole võimalik laadida."
+msgstr "主伺服器列表無法檢索。"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:276
 msgid "(Backup server list)"
-msgstr "(Tagavara serveri list)"
+msgstr "(備分伺服器列表)"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:328
 msgid "Cannot bind LAN-broadcast socket"
-msgstr "Ei suuda siduda LAN-braodcast pesa"
+msgstr "不能綁定局域網廣播插座"
 
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:347
 msgid "Attempting to discover LAN servers"
-msgstr "Proovin avastada LAN servereid"
+msgstr "正在嘗試尋找區域網路中的伺服器"
 
 #: E:\Documents\mtasa-blue\Client\game_sa\CSettingsSA.cpp:723
 msgid "Can't find valid screen resolution."
-msgstr ""
+msgstr "無法找到有效的螢幕分辨率。"
 
 #. Confirm that res should be used
 #: E:\Documents\mtasa-blue\Client\game_sa\CSettingsSA.cpp:799
 msgid "Are you sure you want to use this screen resolution?"
-msgstr ""
+msgstr "你確定你想要使用此螢幕分辨率?"
 
 #: E:\Documents\mtasa-blue\Client\game_sa\CSettingsSA.cpp:801
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:94
 msgid "MTA: San Andreas"
-msgstr ""
+msgstr "MTA: San Andreas"
 
 #: E:\Documents\mtasa-blue\Client\loader\CExePatchedStatus.cpp:153
 msgid "Update Aero setting"
-msgstr "Uuenda Aero seadeid"
+msgstr "更新透明效果的設定"
 
 #: E:\Documents\mtasa-blue\Client\loader\CExePatchedStatus.cpp:155
 msgid "Update Large Memory setting"
-msgstr "Uuenda koguka mälu seadeid"
+msgstr "更新大記憶體的設定"
 
 #: E:\Documents\mtasa-blue\Client\loader\CExePatchedStatus.cpp:157
-#, fuzzy
 msgid "Update DEP setting"
-msgstr "Uuenda Aero seadeid"
+msgstr "更新DEP設置"
 
 #: E:\Documents\mtasa-blue\Client\loader\CExePatchedStatus.cpp:159
 msgid "Update graphics driver compliance"
-msgstr ""
+msgstr "更新顯示卡驅動程序合規"
 
 #: E:\Documents\mtasa-blue\Client\loader\CExePatchedStatus.cpp:161
 #: E:\Documents\mtasa-blue\Client\loader\CExePatchedStatus.cpp:163
 msgid "Fix file issues"
-msgstr ""
+msgstr "修復文件問題"
 
 #: E:\Documents\mtasa-blue\Client\loader\CExePatchedStatus.cpp:164
 msgid "Copy main executable to avoid graphic driver issues"
-msgstr ""
+msgstr "複製主可執行檔，以避免圖形驅動程式問題"
 
 #: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:269
 #: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1207
@@ -2285,11 +2278,11 @@ msgid ""
 "\n"
 "Please confirm in the next window."
 msgstr ""
-"MTA:SA vajab administraatori õiguseid järgnevaks tegevuseks:\n"
+"MTA:SA 需要為以下的任務提供管理員權限:\n"
 "\n"
-"'%s'\n"
+" '%s'\n"
 "\n"
-"Palun nõustuge järgnevas aknas."
+"請在下一個窗口進行確定。"
 
 #: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:284
 #, c-format, c-format
@@ -2298,9 +2291,9 @@ msgid ""
 "\n"
 "  '%s'\n"
 msgstr ""
-"MTA:SA ei suutnud täita järgnevat käsku:\n"
+"MTA:SA 無法完成下列的任務:\n"
 "\n"
-"'%s'\n"
+" '%s'\n"
 
 #: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:334
 msgid ""
@@ -2308,78 +2301,75 @@ msgid ""
 "\n"
 "** Please update your graphics drivers **"
 msgstr ""
-"** Kokkujooksu põhjustas graafika draiverite viga **\n"
+"** 造成崩潰的原因是一個來自於圖形驅動程式的錯誤 **\n"
 "\n"
-"** Palun uuenda oma graafika draivereid **"
+"** 請更新你的顯示卡圖形驅動程式 **"
 
 #: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:440
 msgid "Install updated MTA:SA files"
-msgstr "Paigalda uuendatud MTA:SA failid"
+msgstr "安裝已更新的 MTA:SA 文件"
 
 #: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:460
 msgid ""
 "Could not update due to file conflicts. Please close other applications and "
 "retry"
-msgstr ""
-"Ei suuda uuendada faili konflikti pärast. Palun sulgege teised rakendused ja"
-" proovige uuesti"
+msgstr "由於文件衝突導致無法更新，請關閉其他軟體並重試"
 
 #: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:469
 #, c-format, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr ""
-"Multi Theft Auto ei ole paigaldatud korrektselt, palun paigaldage uuesti. %s"
+msgstr "MTA 並沒有被正確安裝，請重新安裝。%s"
 
 #: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:668
 msgid "Missing file:"
-msgstr ""
+msgstr "遺失檔案:"
 
 #: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:672
 msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr ""
+msgstr "如果MTA載入失敗，請重新安裝 GTA:SA"
 
 #: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:793
 msgid "Update install settings"
-msgstr "Uuenda paigaldamise seadeid"
+msgstr "更新安裝設定"
 
 #: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:904
 msgid "Update compatibility settings"
-msgstr ""
+msgstr "更新相容性設置"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:34
 msgid "Quit"
-msgstr ""
+msgstr "離開"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:51
 msgid "MTA: San Andreas has encountered a problem"
-msgstr ""
+msgstr "MTA: San Andreas 發生問題"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:52
 msgid "Crash information"
-msgstr ""
+msgstr "當機資訊"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:53
 msgid ""
 "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr ""
+msgstr "勾選該核取方塊以將此當機資訊發送到 MTA 開發者使用互聯網"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:54
 msgid "Doing so will increase the chance of this crash being fixed."
-msgstr ""
+msgstr "這樣做會增加這個崩潰被固定的機會."
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:55
 msgid "Do you want to restart MTA: San Andreas ?"
-msgstr ""
+msgstr "你想重新啟動MTA: San Andreas ?"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:62
 msgid "MTA: San Andreas - Warning"
-msgstr ""
+msgstr "MTA: San Andreas-警告"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:63
 msgid ""
 "Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll "
 "file:"
-msgstr ""
+msgstr "您的Grand Theft Auto： San Andreas 安裝目錄中包含的 d3d9.DLL 檔案："
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:65
 msgid ""
@@ -2387,74 +2377,77 @@ msgid ""
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
+"該檔不是必需的而且可能會干擾此版本的 MTA:SA.中的圖形功能\n"
+" \n"
+"建議您刪除或重命名 d3d9.dll"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:67
 msgid "Do not tell me about this d3d9.dll again"
-msgstr ""
+msgstr "不要告訴我關於d3d9.dll的問題"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:68
 msgid "Show me the file"
-msgstr ""
+msgstr "讓我看看該檔"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:69
 msgid "Play MTA:SA"
-msgstr ""
+msgstr "玩 MTA:SA"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:75
 msgid "MTA: San Andreas - Confusing options"
-msgstr ""
+msgstr "MTA: San Andreas-迷惑選項"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:76
 msgid "NVidia Optimus detected!"
-msgstr ""
+msgstr "NVidia Optimus 檢測到 ！"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:77
 msgid "Try each option and see what works:"
-msgstr ""
+msgstr "嘗試使用每個選項，看看什麼效果："
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:78
 msgid "A - Standard NVidia"
-msgstr ""
+msgstr "A - NVIDIA標準"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:79
 msgid "B - Alternate NVidia"
-msgstr ""
+msgstr "B - 備用NVIDIA"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:80
 msgid "C - Standard NVidia with exe rename"
-msgstr ""
+msgstr "C - 標準NVIDIA與EXE重命名"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:81
 msgid "D - Alternate NVidia with exe rename"
-msgstr ""
+msgstr "D - 備用NVIDIA與exe文件重命名"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:82
 msgid "E - Standard Intel"
-msgstr ""
+msgstr "E - 標準的英特爾"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:83
 msgid "F - Alternate Intel"
-msgstr ""
+msgstr "F - 備用英特爾"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:84
 msgid "G - Standard Intel with exe rename"
-msgstr ""
+msgstr "G - 標準的英特爾與exe文件重命名"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:85
 msgid "H - Alternate Intel with exe rename"
-msgstr ""
+msgstr "H - 備用英特爾與exe文件重命名"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:86
 msgid "If you get desperate, this might help:"
-msgstr ""
+msgstr "如果你找不到，這可能會説明:"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:87
 msgid "Force windowed mode"
-msgstr ""
+msgstr "強制窗口模式"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:95
 msgid "Warning: Could not detect anti-virus product"
-msgstr ""
+msgstr "警告：無法檢測到的防病毒軟體"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:97
 msgid ""
@@ -2464,56 +2457,63 @@ msgid ""
 "\n"
 "Press 'Help' for more information."
 msgstr ""
+"MTA無法檢測到您的PC上的防病毒軟件。\n"
+"\n"
+"病毒干擾MTA並降低你的遊戲體驗。\n"
+"\n"
+"按下“幫助”以獲取更多信息。"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:100
 msgid "I have already installed an anti-virus"
-msgstr ""
+msgstr "我已經安裝了防病毒軟體"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:102
 msgid ""
 "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr ""
+"我將不安裝防病毒。\n"
+"我希望我的PC 變lag，並成為殭屍網絡的一部分。"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:691
 #: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:747
 msgid "Searching for Grand Theft Auto San Andreas"
-msgstr "Otsin Grand Theft Auto San Andreast"
+msgstr "搜尋 Grand Theft Auto San Andreas 中"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:694
 #: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:749
 msgid "Please start Grand Theft Auto San Andreas"
-msgstr "Palun käivitage Grand Theft Auto San Andreas"
+msgstr "請啟動 GTA SA"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:702
 #: E:\Documents\mtasa-blue\Client\loader\Install.cpp:187
 msgid "Installing update..."
-msgstr ""
+msgstr "安装更新..."
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:710
 #: E:\Documents\mtasa-blue\Client\loader\Install.cpp:287
 msgid "Extracting files..."
-msgstr ""
+msgstr "解開檔案中..."
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:715
 #: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1630
 msgid "Copying files..."
-msgstr "Kopeerin faile..."
+msgstr "複製文件中..."
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:720
 #: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1690
 msgid "Copy finished early. Everything OK."
-msgstr "Kopeerimine lõpetatud varakult. Kõik on korras."
+msgstr "早就完成複製，一切准備就緒。"
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:725
 #: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1696
 msgid "Finishing..."
-msgstr "Lõpetamine..."
+msgstr "正在完成..."
 
 #: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:729
 #: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1698
 msgid "Done!"
-msgstr "Valmis!"
+msgstr "完成!"
 
 #: E:\Documents\mtasa-blue\Client\loader\Install.cpp:92
 msgid "Do you want to terminate the MTA Server and continue updating?"
@@ -2529,13 +2529,13 @@ msgid ""
 "\n"
 "Try to launch MTA:SA again?"
 msgstr ""
-"Probleem MTA:SA taaskäivitamisel\n"
+"重啟MTA:SA時有故障\n"
 "\n"
-"Kui probleem jätkub siis avage Task Manager ja\n"
-"lõpetage 'gta_sa.exe' ning 'Multi Theft Auto.exe' protsessid\n"
+"若問題依然存在，開啟工作管理員(Ctrl+Alt+Del)並\n"
+"停止「gta_sa.exe」及「Multi Theft Auto.exe」的處理程序\n"
 "\n"
 "\n"
-"Kas avan MTA:SA uuesti?"
+"再嘗試啟動 MTA:SA嗎?"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:253
 msgid ""
@@ -2543,9 +2543,9 @@ msgid ""
 "\n"
 "If this problem persists, please restart your computer"
 msgstr ""
-"Üks MTA klient juba käib.\n"
+"另一個MTA正在運行。\n"
 "\n"
-"Kui probleem jätkub siis palun taaskäivitage oma arvuti"
+"若這問題仍然存在，請重新啟動你的電腦"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:256
 msgid ""
@@ -2553,9 +2553,9 @@ msgid ""
 "\n"
 "Do you want to terminate it?"
 msgstr ""
-"Üks MTA klient juba käib.\n"
+"另一個MTA正在運行。\n"
 "\n"
-"Kas soovite selle sulgeda?"
+"你想要終止它嗎?"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:280
 msgid ""
@@ -2563,9 +2563,9 @@ msgid ""
 "\n"
 "Do you want to revert to an earlier version?"
 msgstr ""
-"Kas on probleeme MTA:SA käivitamisega?.\n"
+"你運行MTA:SA時有任何問題?\n"
 "\n"
-"Kas soovid proovida vanemat versiooni?"
+"你想要回溯至較早的版本嗎?"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:309
 msgid ""
@@ -2574,10 +2574,10 @@ msgid ""
 "\n"
 "Do you want to reset GTA settings now?"
 msgstr ""
-"Tundub, et on probleeme MTA:SA käivitamisel.\n"
-"GTA seadete taastamine suudab mõnikord selle probleemi kõrvaldada.\n"
+"啟動 MTA:SA時似乎有些問題，\n"
+"重設GTA的設定有時有助於修復這些問題.\n"
 "\n"
-"Kas soovid GTA seadeid taastada?"
+"你想要現在重設GTA的設定嗎?"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:320
 msgid ""
@@ -2585,14 +2585,14 @@ msgid ""
 "\n"
 "Press OK to continue."
 msgstr ""
-"GTA seaded on taastatud.\n"
+"GTA的設定已被重設.\n"
 "\n"
-"Vajuta OK et jätkata."
+"請按「確定」以繼續。"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:325
 #, c-format, c-format
 msgid "File could not be deleted: '%s'"
-msgstr "Ei suutnud faili kustutada: '%s'"
+msgstr "無法刪除文件: '%s'"
 
 #. No settings to delete, or can't find them
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:333
@@ -2601,9 +2601,9 @@ msgid ""
 "\n"
 "Do you want to see some online help?"
 msgstr ""
-"Kas esineb probleeme MTA:SA käivitamisel?.\n"
+"你運行MTA:SA時遇到任何問題?\n"
 "\n"
-"Kas soovid näha onlain abi?"
+"你希望看看線上的幫助嗎?"
 
 #. Inform user
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:369
@@ -2628,34 +2628,34 @@ msgid ""
 "Please run a virus scan to ensure your system is secure.\n"
 "\n"
 msgstr ""
+"警告\n"
+"\n"
+"MTA:SA 已檢測到不尋常的活動\n"
+"請運行病毒掃描，以確保您的系統是安全的\n"
+"\n"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:449
-#, c-format
+#, c-format, c-format
 msgid "The detected file was:  %s\n"
-msgstr ""
+msgstr "檢測到的檔是: %s\n"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:583
 msgid ""
 "An instance of GTA: San Andreas is already running. It needs to be "
 "terminated before MTA:SA can be started. Do you want to do that now?"
-msgstr ""
-"Üks GTA: San Andreas juba käib. See peab olema suletud enne kui soovite "
-"MTA:SA käivitada. Kas soovid seda kohe teha?"
+msgstr "另一個GTA:SA正在運行，啟動MTA:SA前需要先終止它。你想要現在這麼做嗎?"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:590
 msgid ""
 "Unable to terminate GTA: San Andreas. If the problem persists, please "
 "restart your computer."
-msgstr ""
-"Ei suutnud GTA: San Andreas sulgeda. Kui probleem jätkub siis palun "
-"taaskäivitage oma arvuti."
+msgstr "無法終止GTA:SA，若這問題仍然存在，請重新啟動你的電腦。"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:613
 msgid ""
 "Registry entries are missing. Please reinstall Multi Theft Auto: San "
 "Andreas."
-msgstr ""
-"Registrikanne puudub. Palun paigaldage Multi Theft Auto: San Andreas uuesti."
+msgstr "註冊表項遺失，請重新安裝MTA:SA。"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:619
 msgid ""
@@ -2664,10 +2664,7 @@ msgid ""
 "installation to a compatible path that contains only standard ASCII "
 "characters and reinstall Multi Theft Auto: San Andreas."
 msgstr ""
-"GTA: San Andrease paigalduse kaust sisaldab toetamatuid tähti. Palun "
-"liigutage oma Grand Theft Auto: San Andreas kuhugi mujale, mis koosneks "
-"ainult tavalistest ASCII tähtedest ja paigaldage Multi Theft Auto: San "
-"Andreas uuesti."
+"該安裝GTA:SA的路徑包含不受支持的(Unicode)字符，請移動你安裝的GTA:SA到一個兼容並只包含標準的ASCII字符的路徑，以及重新安裝MTA:SA。"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:626
 msgid ""
@@ -2675,9 +2672,7 @@ msgid ""
 "incompatible with MTASA.  You are now being redirected to a page where you "
 "can find information to resolve this issue."
 msgstr ""
-"Tundub, et jooksutate Stiimi versiooni GTA:SA-st, mis hetkel ei sobi kokku "
-"MTA:SA-ga. Teid suunatakse edasi leheküljele, kust leiate informatsiooni "
-"selle probleemi kohta."
+"你似乎擁有Steam版本的GTA:SA，該版本的GTA:SA並不兼容於MTA:SA，你現在正被重新導向至一個可以找到幫助你解決此問題的頁面。"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:641
 msgid ""
@@ -2687,45 +2682,39 @@ msgid ""
 " If you experience problems when running MTA:SA,\n"
 " move your installation(s) to a path that does not contain a semicolon."
 msgstr ""
-"Asukoht 'MTA:SA' või 'GTA: San Andrease' jaoks\n"
-"sisaldab ';' (semikoolonit).\n"
+"你安裝「GTA:SA」或「MTA:SA」的路徑\n"
+"包含「;」(分號)，\n"
 "\n"
-"Kui sul tekib probleeme MTA:SA käivitamisega siis\n"
-"paigaldage need sinna, kus pole semikooloneid."
+"若你運行MTA:SA時遇到問題發生，\n"
+"移動你安裝的「GTA:SA」或「MTA:SA」至不包含分號的路徑。"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:781
 msgid ""
 "Load failed. Please ensure that the latest data files have been installed "
 "correctly."
-msgstr ""
-"Laadimine ebaõnnestus: Palun tehke kindlaks, et viimased andmefailid on "
-"paigaldatud korrektselt."
+msgstr "載入失敗，請確保最新的數據文件已被正確安裝。"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:790
 #, c-format, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
-msgstr ""
-"Laadimine ebaõnnestus. Palun tehke kindlaks, kas %s on paigaldatud "
-"korrektselt."
+msgstr "載入失敗，請確保 %s 已被正確安裝。"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:797
 #, c-format, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
-msgstr "Laadimine ebaõnnestus. Ei suutnud leida gta_sa.exe kohast %s."
+msgstr "載入失敗，無法找到 gta_sa.exe 在 %s 裏。"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:807
 #, c-format, c-format
 msgid ""
 "Load failed. %s exists in the GTA directory. Please delete before "
 "continuing."
-msgstr ""
-"Laadimine ebaõnnestus. %s eksisteerib GTA kaustas. Palun kustutage ennem "
-"jätkamist."
+msgstr "載入失敗，%s 存在於GTA目錄，請先刪除再繼續。"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:816
-#, c-format
+#, c-format, c-format
 msgid "Main file has an incorrect name (%s)"
-msgstr ""
+msgstr "主文件有一個不正確的名稱 (%s)"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:827
 msgid ""
@@ -2733,6 +2722,9 @@ msgid ""
 "\n"
 "See online help if MTA does not work correctly."
 msgstr ""
+"主要文件是無符號。可能的病毒活動.\n"
+"\n"
+"請查看線上幫助，如果MTA不能正常工作。"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:900
 msgid ""
@@ -2740,6 +2732,9 @@ msgid ""
 "\n"
 "See online help if MTA does not work correctly."
 msgstr ""
+"數據文件的修改。可能的病毒活動。\n"
+"\n"
+"請查看線上幫助，如果MTA不能正常工作。"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:912
 msgid ""
@@ -2747,15 +2742,18 @@ msgid ""
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
+".asi 檔是在 'MTA:SA' 或 ' GTA: San Andreas 安裝目錄。\n"
+"\n"
+"如果使用 MTA:SA 遇到了問題，請刪除這些.asi 檔。"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:974
 msgid ""
 "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr ""
+msgstr "檔版本不匹配錯誤。如果您遇到問題，請重新安裝 MTA:SA。\n"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:983
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr ""
+msgstr "某些檔是缺掉的。如果您遇到問題，請重新安裝 MTA:SA。\n"
 
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:995
 msgid ""
@@ -2780,7 +2778,7 @@ msgid ""
 "\n"
 "[%s]"
 msgstr ""
-"Ei suuda käivitada Grand Theft Auto: San Andreast. Proovige taaskäivitada ning kui probleem jätkub siis kontakteeruge MTA tiimiga veebilehelt www.multitheftauto.com\n"
+"無法啟動 GTA:SA，請嘗試重新啟動。若問題依然存在，請聯絡MTA網址 www.multitheftauto.com。\n"
 "\n"
 "[%s]"
 
@@ -2788,39 +2786,41 @@ msgstr ""
 msgid ""
 "GTA: San Andreas may not have launched correctly. Do you want to terminate "
 "it?"
-msgstr ""
-"GTA: San Andreas ei käivitunud korrektselt. Kas soovite selle sulgeda?"
+msgstr "GTA: San Andreas 可能沒有正確地啟動。你想要現在終止它嗎?"
 
 #: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:832
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "Vali oma Grand Theft Auto: San Andrease kaust"
+msgstr "選擇你Grand Theft Auto: San Andreas的安裝目錄"
 
 #: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1308
 #, c-format, c-format
 msgid "Error loading %s module! (%s)"
-msgstr "Viga mooduli %s laadimises! (%s)"
+msgstr "錯誤載入 %s 模組!(%s)"
 
 #: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1738
-#, c-format
+#, c-format, c-format
 msgid ""
 "New installation of %s detected.\n"
 "\n"
 "Do you want to copy your settings from %s ?"
 msgstr ""
+"檢測到新安裝的%s\n"
+"\n"
+"您想去複製您的設定從%s ?"
 
 #: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1777
-#, c-format
+#, c-format, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
-msgstr ""
+msgstr "GTA：SA 遇到問題在打開文件 '%s'時"
 
 #: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1799
-#, c-format
+#, c-format, c-format
 msgid "GTA:SA is missing the file '%s'."
-msgstr ""
+msgstr "GTA:SA 遺失這個 '%s' 檔案"
 
 #: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1824
 msgid "GTA:SA had trouble loading a model."
-msgstr ""
+msgstr "GTA:SA 在載入模組時遇到問題."
 
 #: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1826
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
@@ -2828,7 +2828,7 @@ msgstr ""
 
 #: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1851
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr ""
+msgstr "GTA:SA 發生問題在新增升級車輛時"
 
 #: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1870
 #, c-format
@@ -2837,239 +2837,235 @@ msgstr ""
 
 #: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1943
 msgid "Did your computer restart when playing MTA:SA?"
-msgstr ""
+msgstr "在玩 MTA:SA時，您的電腦重起嗎?"
 
 #: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:2008
 msgid "Please terminate the following programs before continuing:"
-msgstr ""
+msgstr "請在繼續之前終止下列程式:"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:35
 msgid "This version has expired."
-msgstr "See versioon on aegunud."
+msgstr "這個版本已經逾期。"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:55
 msgid "disconnect from the game"
-msgstr "katkestab serveriga ühenduse"
+msgstr "從遊戲中斷連線"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:56
 msgid "shows the nametags"
-msgstr "näitab nimesilte"
+msgstr "顯示名稱標籤"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:57
 msgid "shows the chatbox"
-msgstr "näitab chatti"
+msgstr "顯示對話框"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:58
 msgid "shows the network statistics"
-msgstr "näitab võrgu statistikat"
+msgstr "顯示網路狀態"
 
 #. Key commands (registered as 'mod commands', can be disabled)
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:62
 msgid "open the chat input"
-msgstr "ava chati sisestuskast"
+msgstr "開啟對話框輸入"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:63
 msgid "transmits voice to other players"
-msgstr "edastab hääle teistele mängijatele"
+msgstr "傳輸語音給其他玩家"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:64
 msgid "enters a car as passenger"
-msgstr "siseneb autosse kaasreisijana"
+msgstr "進入一輛車並作為乘客"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:65
 msgid "next radio channel"
-msgstr "järgmine raadiojaam"
+msgstr "下一個電台頻道"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:66
 msgid "previous radio channel"
-msgstr "eelmine raadiojaam"
+msgstr "前一個電台頻道"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:67
 msgid "enables the radar view"
-msgstr "lubab kasutada radari vaadet"
+msgstr "開啟雷達視角"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:68
 msgid "zooms the radar in"
-msgstr "zoomib radarit sisse"
+msgstr "拉近並放大雷達"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:69
 msgid "zooms the radar out"
-msgstr "zoomib radari välja"
+msgstr "拉遠並縮小雷達"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:70
 msgid "moves the radar north"
-msgstr "liigutab radari põhja"
+msgstr "將雷達向北面移動"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:71
 msgid "moves the radar south"
-msgstr "liigutab radarit lõunasse"
+msgstr "將雷達向南面移動"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:72
 msgid "moves the radar east"
-msgstr "liigutab radarit itta"
+msgstr "將雷達向東面移動"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:73
 msgid "moves the radar west"
-msgstr "liigutab radarit läände"
+msgstr "將雷達向西面移動"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:74
 msgid "attaches the radar"
-msgstr "kinnitab radari"
+msgstr "貼上雷達"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:75
 msgid "reduces radar opacity"
-msgstr "vähendab radari läbipaistvust"
+msgstr "減少雷達的不透明度"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:76
 msgid "increases radar opacity"
-msgstr "suurendab radari läbipaistvust"
+msgstr "增加雷達的不透明度"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:77
 msgid "toggles radar help text"
-msgstr "lülitab radari abistava teksti"
+msgstr "開啟雷達幫助說明"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:78
 msgid "sends a message to the targetted player"
-msgstr "saadab sõnumi märgistatud mängijale"
+msgstr "傳送了一則訊息給他的目標玩家"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:79
 msgid "changes to the next weapon whilst in a vehicle"
-msgstr "võtab järgmise relva autos olles"
+msgstr "在車內轉換了下一種武器"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:80
 msgid "changes to the previous weapon whilst in a vehicle"
-msgstr "võtab eelmise relva autos olles"
+msgstr "在車內轉換了前一種武器"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:81
 msgid "outputs info about the current server"
-msgstr ""
+msgstr "輸出當前伺服器的資訊"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:84
 msgid "defines the scale multiplier of all text-displays"
-msgstr "defineerib suuruse korrutise tekstidele"
+msgstr "定義了所有文字顯示的倍數規模"
 
 #. Development mode
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:91
 msgid "(Development mode) shows the colshapes"
-msgstr "(Arendus mood) näitab jooniseid"
+msgstr "(開發模式)顯示山坳形物件"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:92
 msgid "(Development mode) prints world sound ids into the debug window"
-msgstr "(Arendus mood) näitab maailma helide id-si debug aknas"
+msgstr "(開發模式)列出所有聲音id到除錯窗口"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:579
 msgid "Entering the game ..."
-msgstr "Sisenen mängu ..."
+msgstr "進入遊戲中..."
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:631
 msgid ""
 "Not connected; please use Quick Connect or the 'connect' command to connect "
 "to a server."
-msgstr ""
-"Pole ühendatud: palun kasutage Loo Ühendus või \"Ühenda\" käsku, et liituda "
-"serveriga."
+msgstr "未連線；請使用'快速連線'或'連線'指令去連線到伺服器。"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:677
 msgid "The server is not installed"
-msgstr "Server ei ole installeeritud"
+msgstr "此伺服器並未安裝完成"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:687
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1062
 msgid "Local Server"
-msgstr "Kohalik server"
+msgstr "本地伺服器"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:687
 msgid "Starting local server ..."
-msgstr "Käivitan kohalikku serverit ..."
+msgstr "啟動本地伺服器中..."
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:993
 #, c-format, c-format
 msgid "You were kicked from the game ( %s )"
-msgstr "Teid visati mängust välja ( %s )"
+msgstr "你從遊戲中被剔除了 ( %s )"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1062
 msgid "Connecting to local server..."
-msgstr "Ühendan kohaliku serveriga..."
+msgstr "正在連線至本地伺服器..."
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1073
 msgid "Error connecting to server."
-msgstr "Viga serveriga ühendusmisel."
+msgstr "連線到伺服器時發生錯誤。"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1083
 msgid "Connecting to local server timed out. See console for details."
-msgstr ""
-"Ühendamine lokaalse serveriga aegus. Vaata konsooli, et näha rohkem "
-"informatsiooni."
+msgstr "連線到本地伺服器逾時，請查看控制台以詳細了解。"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1186
 msgid "Connection with the server was lost"
-msgstr "Ühendus serveriga katkes"
+msgstr "與伺服器的連線已遺失"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1213
 msgid "Disconnected: the server is currently full"
-msgstr "Ühendus katkestati: server on täis"
+msgstr "連線中斷: 該伺服器目前滿人"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1225
 msgid "Disconnected: invalid password specified"
-msgstr "Ühendus katkestatud: vale salasõna"
+msgstr "連線中斷: 指定的密碼無效"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1247
 msgid "MTA Client verification failed!"
-msgstr "MTA Kliendi auditeerimine ebaõnnestus!"
+msgstr "MTA 客戶端驗證失敗"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:37
 msgid "HOST GAME"
-msgstr "LOO MÄNG"
+msgstr "主辦遊戲"
 
 #. m_pTabs->CreateTab ( "Gamemode" );
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:53
 msgid "Resources"
-msgstr "Ressursid"
+msgstr "資源"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:55
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:57
 msgid "Server name:"
-msgstr "Serveri nimi:"
+msgstr "伺服器名稱："
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:64
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:66
 msgid "Password:"
-msgstr "Salasõna:"
+msgstr "密碼:"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:73
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:75
 msgid "Max players:"
-msgstr "Maks mängijaid:"
+msgstr "最大玩家數:"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:82
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:84
 msgid "Broadcast:"
-msgstr "Ülekanne:"
+msgstr "廣播:"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:86
 msgid "LAN"
-msgstr "LAN"
+msgstr "區域網路"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:99
 msgid "Selected"
-msgstr "Valitud"
+msgstr "已選取"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:116
 msgid "All"
-msgstr "Kõik"
+msgstr "全部"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:118
 msgid "Start"
-msgstr "Alusta"
+msgstr "啟動"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:475
 msgid "Disconnected: Invalid nickname"
-msgstr "Ühendus katkestatud: Ebasobiv mängunimi"
+msgstr "連線中斷: 無效的暱稱"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:479
 msgid "Disconnect from server"
-msgstr "Katkesta ühendus"
+msgstr "從伺服中斷連線"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:483
 #, c-format, c-format
@@ -3077,8 +3073,8 @@ msgid ""
 "Disconnected: Serial is banned.\n"
 "Reason: %s"
 msgstr ""
-"Ühendus katkestatud: Serial on bannitud.\n"
-"Põhjus: %s"
+"連線中斷: 序列被禁止。\n"
+"原因: %s"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:489
 #, c-format, c-format
@@ -3086,8 +3082,8 @@ msgid ""
 "Disconnected: You are banned.\n"
 "Reason: %s"
 msgstr ""
-"Ühendus katkestatud: Oled bannitud.\n"
-"Põhjus: %s"
+"連線中斷: 你已被禁止。\n"
+"原因: %s"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:495
 #, c-format, c-format
@@ -3095,18 +3091,16 @@ msgid ""
 "Disconnected: Account is banned.\n"
 "Reason: %s"
 msgstr ""
-"Ühendus katkestatud: Kasutaja on bannitud.\n"
-"Põhjus: %s"
+"連線中斷: 帳號已被禁止。\n"
+"原因: %s"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:500
 msgid "Disconnected: Version mismatch"
-msgstr "Ühendus katkestatud: Versioonid ei kattu"
+msgstr "連線中斷: 版本不相符"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:504
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr ""
-"Ühendus katkestatud: Proovid liituda liiga kiiresti. Palun oota minut ja "
-"siis proovi uuesti."
+msgstr "連線中斷: 加入流量過大，請稍等再重新連線。"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:508
 #, c-format, c-format
@@ -3114,8 +3108,8 @@ msgid ""
 "Disconnected: Server from different branch.\n"
 "Information: %s"
 msgstr ""
-"Ühendus katkestatud: Server asub teises alas.\n"
-"Informatsioon: %s"
+"連線中斷: 不同分支的伺服器。\n"
+"資訊: %s"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:513
 #, c-format, c-format
@@ -3123,8 +3117,8 @@ msgid ""
 "Disconnected: Bad version.\n"
 "Information: %s"
 msgstr ""
-"Ühendus katkes: Ebasobiv versioon.\n"
-"Informatsioon: %s"
+"連線中斷: 錯誤版本。\n"
+"資訊: %s"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:518
 #, c-format, c-format
@@ -3132,8 +3126,8 @@ msgid ""
 "Disconnected: Server is running a newer build.\n"
 "Information: %s"
 msgstr ""
-"Ühendus katkes: Server jooksutab uuemat versiooni.\n"
-"Informatsioon: %s"
+"連線中斷: 伺服器正在運行一個更新版本的組建。\n"
+"資訊: %s"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:523
 #, c-format, c-format
@@ -3141,40 +3135,40 @@ msgid ""
 "Disconnected: Server is running an older build.\n"
 "Information: %s"
 msgstr ""
-"Ühendus katkes: Server jooksutab vanemat versiooni.\n"
-"Informatsioon: %s"
+"連線中斷: 伺服器正在運行一個較舊版本的組建。\n"
+"資訊: %s"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:528
 msgid "Disconnected: Nick already in use"
-msgstr "Ühendus katkestati: Mängunimi on juba kasutusel"
+msgstr "連線中斷: 暱稱已被使用"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:532
 msgid "Disconnected: Player Element Could not be created."
-msgstr "Ühendus katkestati: Mängija elementi ei suudetud luua."
+msgstr "連線中斷: 玩家元素無法被建立"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:536
 #, c-format, c-format
 msgid "Disconnected: Server refused the connection: %s"
-msgstr "Ühendus katkestati: Serveri ei soovi ühendust luua %s"
+msgstr "連線中斷: 伺服器已拒絕連線: %s"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:541
 msgid "Disconnected: Serial verification failed"
-msgstr "Ühendus katkestatud: Seriali auditeerimine ebaõnnestus"
+msgstr "連線中斷: 序列驗證失敗"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:545
 #, c-format, c-format
 msgid "Disconnected: Connection desync %s"
-msgstr "Ühendus katkestatud: Ühendus pole sünkroonitud %s"
+msgstr "連線中斷: 連線不同步 %s"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:554
 #, c-format, c-format
 msgid "Disconnected: You were kicked by %s"
-msgstr "Ühendus katkestatud: Said kicki %s poolt"
+msgstr "連線中斷: 你己被 %s 剔除"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:559
 #, c-format, c-format
 msgid "Disconnected: You were banned by %s"
-msgstr "Ühendus katkestatud: Said banni %s poolt"
+msgstr "連線中斷: 你已被 %s 禁止"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:570
 msgid "Disconnected: Server shutdown or restarting"
@@ -3182,77 +3176,72 @@ msgstr ""
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:595
 msgid "Time Remaining: "
-msgstr "Aega jäänud: "
+msgstr "剩餘時間："
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:605
 #, c-format, c-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] "%d päev"
-msgstr[1] "%d päeva"
+msgstr[0] "%d 天"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:607
 #, c-format, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] "%d tund"
-msgstr[1] "%d tundi"
+msgstr[0] "%d 小時"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:609
 #, c-format, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] "%d minut"
-msgstr[1] "%d minutit"
+msgstr[0] "%d 分鐘"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:611
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] ""
-msgstr[1] ""
 
 #. Display the error
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:615
 msgid "Disconnected"
-msgstr "Ühendus katkestatud"
+msgstr "已中斷連線"
 
 #. Throw the error and disconnect
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:130
 #, c-format, c-format
 msgid "Download error: %s"
-msgstr "Alla laadimise viga: %s"
+msgstr "下載錯誤: %s"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CServer.cpp:181
 msgid "Could not start the local server. See console for details."
-msgstr ""
-"Ei suuda kohalikku serverit käivitada. Rohkem informatsiooni konsoolis."
+msgstr "無法啟動本地伺服器.查看控制台以了解詳情."
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CServer.cpp:182
 #, c-format, c-format
 msgid "Error: Could not start local server. [%s]"
-msgstr "Viga: Ei suuda käivitada kohalikku serverit. [%s]"
+msgstr "錯誤: 無法啟動本地伺服器。[%s]"
 
 #. Create our text for each transfer type
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:24
 msgid "Download Progress:"
-msgstr "Allalaadimise protsess:"
+msgstr "下載進度:"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:25
 msgid "Map download progress:"
-msgstr "Kaardi allalaadimise protsess:"
+msgstr "地圖下載進度:"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:31
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:119
 #, c-format, c-format
 msgid "%s of %s"
-msgstr "%s / %s"
+msgstr "%s 的 %s"
 
 #. stats label
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:32
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:58
 msgid "Disconnect to cancel download"
-msgstr "Katkesta ühendus, et loobuda allalaadimisest"
+msgstr "中斷連線以取消下載"
 
 #. Populate the message and show the box
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:142
@@ -3260,9 +3249,7 @@ msgstr "Katkesta ühendus, et loobuda allalaadimisest"
 msgid ""
 "Fatal error (%u). If this problem persists, please check out mtasa.com for "
 "support."
-msgstr ""
-"Tõsine viga (%u). Kui probleem jätkub siis palun külastage mtasa.com abi "
-"saamiseks."
+msgstr "致命的錯誤(%u)，若這問題仍然存在，請參閱mtasa.com 取得技術支援。"
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3273,13 +3260,11 @@ msgstr ""
 msgid ""
 "Protocol error (%u). If this problem persists, please check out mtasa.com "
 "for support."
-msgstr ""
-"Protokolli viga (%u). Kui probleem jätkub siis palun külastage mtasa.com abi"
-" saamiseks."
+msgstr "協議錯誤(%u)，若這問題仍然存在，請參閱mtasa.com 取得技術支援。"
 
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:160
 msgid "Connection error"
-msgstr "Ühenduse viga"
+msgstr "連線錯誤"
 
 #. Couldn't create render target for CPostEffects
 #: E:\Documents\mtasa-blue\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1377
@@ -3288,8 +3273,7 @@ msgstr ""
 
 #: E:\Documents\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:85
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
-msgstr ""
-"Multi Theft Auto pole paigaldatud korrektselt, palun paigaldage uuesti."
+msgstr "MTA 並沒有被正確安裝，請重新安裝。"
 
 #: E:\Documents\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:635
 msgid ""
@@ -3297,138 +3281,96 @@ msgid ""
 "\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr ""
-"Sinu brauser näitab veebilehte koos abistava tekstiga.\n"
+"你的瀏覧器現在會顯示出幫助資訊的頁面。\n"
 "\n"
-"(Kui lehekülg ei lae ära siis kleebi (CTRL-V) aadress oma veebilehitseja aknasse)"
+"(如果該頁面顯示失敗，使用(CTRL+V)鍵貼上連結到你的網際網路瀏覧器)"
 
 #~ msgid "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"
-#~ msgstr "ühenda: Käsk on 'ühenda <server> <port> [<nimi> <salasõna>]'"
+#~ msgstr "連線: 指令為 'connect <伺服器> <連接埠> [<暱稱> <密碼>]'"
 
 #~ msgid "Services currently unavailable"
-#~ msgstr "Teenus pole praegu kättesaadav"
+#~ msgstr "目前無法使用服務"
 
 #~ msgid "Login Error"
-#~ msgstr "Viga sisenemisel"
+#~ msgstr "登入錯誤"
 
 #~ msgid "Invalid username/password"
-#~ msgstr "Vale kasutajanimi/salasõna"
+#~ msgstr "不正確的使用者名稱或密碼"
 
 #~ msgid "Success"
-#~ msgstr "Õnnestus"
+#~ msgstr "成功"
 
 #~ msgid "Successfully registered!"
-#~ msgstr "Registreerimine õnnestus!"
+#~ msgstr "註冊成功!"
 
 #~ msgid "Username missing"
-#~ msgstr "Kasutajanimi on puudu"
+#~ msgstr "請輸入用戶名"
 
 #~ msgid "Email missing"
-#~ msgstr "E-posti aadress on puudu"
+#~ msgstr "信箱遺失"
 
 #~ msgid "Password missing"
-#~ msgstr "Salasõna on puudu"
+#~ msgstr "密碼遺失"
 
 #~ msgid "Passwords do not match"
-#~ msgstr "Salasõnad ei kattu"
+#~ msgstr "密碼並不相符"
 
 #~ msgid "Validation code missing"
-#~ msgstr "Valideerimis kood on puudu"
+#~ msgstr "遺失驗證碼"
 
 #~ msgid "Community"
-#~ msgstr "Kommuun"
+#~ msgstr "社群"
 
 #~ msgid "Username:"
-#~ msgstr "Kasutajanimi:"
+#~ msgstr "使用者名稱:"
 
 #~ msgid "Login"
-#~ msgstr "Sisene"
+#~ msgstr "登入"
 
 #~ msgid "Register"
-#~ msgstr "Registreeri"
+#~ msgstr "註冊"
 
 #~ msgid "Chat BG"
-#~ msgstr "Chati taust"
+#~ msgstr "聊天背景"
 
 #~ msgid "Input BG"
-#~ msgstr "Sisestuskasti taust"
+#~ msgstr "輸入背景"
 
 #~ msgid "Font:"
-#~ msgstr "Kirjatüüp:"
+#~ msgstr "字型:"
 
 #~ msgid "Logging in..."
-#~ msgstr "Sisselogimine..."
+#~ msgstr "登入中..."
 
 #~ msgid "Logout"
-#~ msgstr "Logi välja"
+#~ msgstr "登出"
 
-#, fuzzy
 #~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
-#~ msgstr "Õigused on kaitstud (C) 2003 - 2013 Multi Theft Auto"
+#~ msgstr "版權所有(C) 2003 - 2013 Multi Theft Auto"
 
 #~ msgid "Disable Aero Desktop"
-#~ msgstr "Keela Aero Desktop"
+#~ msgstr "禁止桌面透明效果"
+
+#~ msgid "Disable Driver Overrides"
+#~ msgstr "禁用驅動程序覆蓋"
 
 #~ msgid "Experimental feature."
-#~ msgstr "Katseline funktsioon."
+#~ msgstr "實驗性的功能"
 
 #~ msgid "DATA FILES"
-#~ msgstr "ANDMETE FAILID"
+#~ msgstr "數據文件"
 
 #~ msgid ""
 #~ "Data files not currently avalable.\n"
 #~ "\n"
 #~ "Please check www.mtasa.com"
 #~ msgstr ""
-#~ "Andmete faile pole hetkel saadaval.\n"
+#~ "數據文件目前不可用。\n"
 #~ "\n"
-#~ "Palun külastage www.mtasa.com"
+#~ "請至 www.mtasa.com 查看"
 
 #~ msgid "Slow"
-#~ msgstr "Aeglane"
-
-#~ msgid "General  "
-#~ msgstr "Üldine"
+#~ msgstr "慢"
 
 #~ msgid "Copyright (C) 2003 - 2013 Multi Theft Auto"
-#~ msgstr "Õigused on kaitstud (C) 2003 - 2013 Multi Theft Auto"
-
-#~ msgid "Resolution"
-#~ msgstr "Resolutsioon"
-
-#~ msgid " and "
-#~ msgstr "ja"
-
-#~ msgid "Anti-aliasing"
-#~ msgstr "Antialias"
-
-#~ msgid "Aero setting"
-#~ msgstr "Aero seaded"
-
-#, c-format
-#~ msgid "%s will be changed when you next start MTA"
-#~ msgstr "%s muudetakse kui avate uuesti MTA"
-
-#~ msgid "/Full Screen Minimize"
-#~ msgstr "/Täisekraan alla"
-
-#~ msgid "Customized GTA:SA files setting"
-#~ msgstr "Muudetud GTA:SA failide seaded"
-
-#~ msgid "Language setting"
-#~ msgstr "Keele seaded"
-
-#~ msgid "Some settings"
-#~ msgstr "Mõned sätted"
-
-#~ msgid "Error! (CTRL+C to copy)"
-#~ msgstr "Viga! (CTRL+C kopeerimiseks)"
-
-#, c-format
-#~ msgid ""
-#~ "GTA:SA had trouble opening the file '%s'\n"
-#~ "\n"
-#~ "Try reinstalling GTA:SA to fix it"
-#~ msgstr ""
-#~ "GTA:SA ei suutnud avada faili '%s'\n"
-#~ "\n"
-#~ "Proovi paigalda GTA:SA uuesti"
+#~ msgstr "版權所有（C）2003 - 2013 Multi Theft Auto"

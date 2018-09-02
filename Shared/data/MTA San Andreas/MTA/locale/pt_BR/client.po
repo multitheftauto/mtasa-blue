@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-01 13:55+0100\n"
-"PO-Revision-Date: 2018-09-01 13:20+0000\n"
+"PO-Revision-Date: 2018-09-02 02:26+0000\n"
 "Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: pt_BR\n"
@@ -15,9 +15,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"Translators: RaceXtreme; LooooP; DNL291; Zezin; Cadu12; Francisco \"Vampire\"; Cristiano Teixeira; neves768; Davidhm; qaisjp; gustavorn\n"
+"Translators: RaceXtreme; LooooP; DNL291; Zezin; Cadu12; Francisco \"Vampire\"; Cristiano Teixeira; neves768; qaisjp; Davidhm; gustavorn\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1535808029.0\n"
+"X-POOTLE-MTIME: 1535855203.0\n"
 
 #: E:\Documents\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -633,7 +633,7 @@ msgstr "Ordenar ao grupo para recuar"
 #. TRANSLATORS: Replace with your language native name
 #: E:\Documents\mtasa-blue\Client\core\CLocalization.cpp:17
 msgid "English"
-msgstr "Português do Brasil"
+msgstr "Português (BR)"
 
 #: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:314
 msgid ""
