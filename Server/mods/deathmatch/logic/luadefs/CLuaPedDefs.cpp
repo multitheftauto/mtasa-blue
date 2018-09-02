@@ -62,6 +62,7 @@ void CLuaPedDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("setPedDoingGangDriveby", SetPedDoingGangDriveby);
     CLuaCFunctions::AddFunction("setPedAnimation", SetPedAnimation);
     CLuaCFunctions::AddFunction("setPedAnimationProgress", SetPedAnimationProgress);
+    CLuaCFunctions::AddFunction("setPedAnimationSpeed", SetPedAnimationSpeed);
     CLuaCFunctions::AddFunction("setPedOnFire", SetPedOnFire);
     CLuaCFunctions::AddFunction("setPedHeadless", SetPedHeadless);
     CLuaCFunctions::AddFunction("setPedFrozen", SetPedFrozen);
@@ -136,6 +137,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setWalkingStyle", "setPedWalkingStyle");
     lua_classfunction(luaVM, "setAnimation", "setPedAnimation");
     lua_classfunction(luaVM, "setAnimationProgress", "setPedAnimationProgress");
+    lua_classfunction(luaVM, "setAnimationSpeed", "setPedAnimationSpeed");
     lua_classfunction(luaVM, "setWearingJetpack", "setPedWearingJetpack");            // introduced in 1.5.5-9.13846
 
     lua_classvariable(luaVM, "inVehicle", NULL, "isPedInVehicle");
@@ -464,6 +466,35 @@ int CLuaPedDefs::SetPedAnimationProgress(lua_State* luaVM)
         {
             lua_pushboolean(luaVM, true);
             return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPedDefs::SetPedAnimationSpeed(lua_State* luaVM)
+{
+    CElement* pElement;
+    SString   strAnimName;
+    float     fSpeed;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadString(strAnimName, "");
+    argStream.ReadNumber(fSpeed, 1.0f);
+
+    if (!argStream.HasErrors())
+    {
+        if (!strAnimName.empty() && fSpeed >= 0.0f && fSpeed <= 1.0f)
+        {
+            if (CStaticFunctionDefinitions::SetPedAnimationSpeed(pElement, strAnimName, fSpeed))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
         }
     }
     else

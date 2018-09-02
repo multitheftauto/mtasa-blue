@@ -4366,6 +4366,33 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, con
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CElement* pElement, const char* szAnimName, float fSpeed)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetPedAnimationSpeed(*iter, szAnimName, fSpeed))
+
+        if (IS_PED(pElement))
+        {
+            CPed* pPed = static_cast<CPed*>(pElement);
+            if (pPed->IsSpawned() && szAnimName)
+            {
+                CBitStream BitStream;
+                if (szAnimName)
+                {
+                    unsigned char ucAnimSize = (unsigned char)strlen(szAnimName);
+
+                    BitStream.pBitStream->Write(ucAnimSize);
+                    BitStream.pBitStream->Write(szAnimName, ucAnimSize);
+                    BitStream.pBitStream->Write(fSpeed);
+                }
+                m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION_SPEED, *BitStream.pBitStream));
+
+                return true;
+            }
+        }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetPedOnFire(CElement* pElement, bool bIsOnFire)
 {
     assert(pElement);
