@@ -1286,7 +1286,7 @@ void _declspec(naked) HOOK_NodeNameStreamRead()
 //////////////////////////////////////////////////////////////////////////////////////////
 void CModelInfoSA::StaticSetHooks(void)
 {
-    HookInstall(HOOKPOS_CFileLoader_LoadCollisionFile_Mid, (DWORD)HOOK_CFileLoader_LoadCollisionFile_Mid, HOOKSIZE_CFileLoader_LoadCollisionFile_Mid);
+    //HookInstall(HOOKPOS_CFileLoader_LoadCollisionFile_Mid, (DWORD)HOOK_CFileLoader_LoadCollisionFile_Mid, HOOKSIZE_CFileLoader_LoadCollisionFile_Mid);
     EZHookInstall(NodeNameStreamRead);
 }
 
