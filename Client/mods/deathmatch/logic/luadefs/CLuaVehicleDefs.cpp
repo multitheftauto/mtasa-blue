@@ -204,6 +204,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getComponentPosition", OOP_GetVehicleComponentPosition);
     lua_classfunction(luaVM, "getComponentVisible", "getVehicleComponentVisible");
     lua_classfunction(luaVM, "getComponentRotation", OOP_GetVehicleComponentRotation);
+    lua_classfunction(luaVM, "getComponentScale", OOP_GetVehicleComponentScale);
     lua_classfunction(luaVM, "getUpgrades", "getVehicleUpgrades");
     lua_classfunction(luaVM, "getUpgradeSlotName", "getVehicleUpgradeSlotName");
     lua_classfunction(luaVM, "getCompatibleUpgrades", "getVehicleCompatibleUpgrades");
@@ -215,6 +216,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setSirens", "setVehicleSirens");
     lua_classfunction(luaVM, "setComponentPosition", "setVehicleComponentPosition");
     lua_classfunction(luaVM, "setComponentRotation", "setVehicleComponentRotation");
+    lua_classfunction(luaVM, "setComponentScale", "setVehicleComponentScale");
     lua_classfunction(luaVM, "setLocked", "setVehicleLocked");
     lua_classfunction(luaVM, "setDamageProof", "setVehicleDamageProof");
     lua_classfunction(luaVM, "setHelicopterRotorSpeed", "setHelicopterRotorSpeed");
@@ -253,6 +255,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "resetComponentPosition", "resetVehicleComponentPosition");
     lua_classfunction(luaVM, "resetComponentRotation", "resetVehicleComponentRotation");
+    lua_classfunction(luaVM, "resetComponentScale", "resetVehicleComponentScale");
 
     lua_classfunction(luaVM, "attachTrailer", "attachTrailerToVehicle");
     lua_classfunction(luaVM, "detachTrailer", "detachTrailerFromVehicle");
