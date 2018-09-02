@@ -295,12 +295,10 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("getOcclusionsEnabled", CLuaFunctionDefs::GetOcclusionsEnabled);
     CLuaCFunctions::AddFunction("getCloudsEnabled", CLuaFunctionDefs::GetCloudsEnabled);
     CLuaCFunctions::AddFunction("getRainLevel", CLuaFunctionDefs::GetRainLevel);
-    CLuaCFunctions::AddFunction("setMoonSize", CLuaFunctionDefs::SetMoonSize);
     CLuaCFunctions::AddFunction("getMoonSize", CLuaFunctionDefs::GetMoonSize);
-    CLuaCFunctions::AddFunction("resetMoonSize", CLuaFunctionDefs::ResetMoonSize);
-    CLuaCFunctions::AddFunction("setFPSLimit", CLuaFunctionDefs::SetFPSLimit);
     CLuaCFunctions::AddFunction("getFPSLimit", CLuaFunctionDefs::GetFPSLimit);
-    CLuaCFunctions::AddFunction("fetchRemote", CLuaFunctionDefs::FetchRemote);
+    CLuaCFunctions::AddFunction("getBirdsEnabled", CLuaFunctionDefs::GetBirdsEnabled);
+    CLuaCFunctions::AddFunction("isPedTargetingMarkerEnabled", CLuaFunctionDefs::IsPedTargetingMarkerEnabled);
 
     // World set funcs
     CLuaCFunctions::AddFunction("setTime", CLuaFunctionDefs::SetTime);
@@ -349,9 +347,10 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("setOcclusionsEnabled", CLuaFunctionDefs::SetOcclusionsEnabled);
     CLuaCFunctions::AddFunction("createSWATRope", CLuaFunctionDefs::CreateSWATRope);
     CLuaCFunctions::AddFunction("setBirdsEnabled", CLuaFunctionDefs::SetBirdsEnabled);
-    CLuaCFunctions::AddFunction("getBirdsEnabled", CLuaFunctionDefs::GetBirdsEnabled);
     CLuaCFunctions::AddFunction("setPedTargetingMarkerEnabled", CLuaFunctionDefs::SetPedTargetingMarkerEnabled);
-    CLuaCFunctions::AddFunction("isPedTargetingMarkerEnabled", CLuaFunctionDefs::IsPedTargetingMarkerEnabled);
+    CLuaCFunctions::AddFunction("setMoonSize", CLuaFunctionDefs::SetMoonSize);
+    CLuaCFunctions::AddFunction("resetMoonSize", CLuaFunctionDefs::ResetMoonSize);
+    CLuaCFunctions::AddFunction("setFPSLimit", CLuaFunctionDefs::SetFPSLimit);
 
     // Input functions
     CLuaCFunctions::AddFunction("bindKey", CLuaFunctionDefs::BindKey);
@@ -382,6 +381,7 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("getDevelopmentMode", CLuaFunctionDefs::GetDevelopmentMode);
     CLuaCFunctions::AddFunction("addDebugHook", CLuaFunctionDefs::AddDebugHook);
     CLuaCFunctions::AddFunction("removeDebugHook", CLuaFunctionDefs::RemoveDebugHook);
+    CLuaCFunctions::AddFunction("fetchRemote", CLuaFunctionDefs::FetchRemote);
 
     // Version functions
     CLuaCFunctions::AddFunction("getVersion", CLuaFunctionDefs::GetVersion);
