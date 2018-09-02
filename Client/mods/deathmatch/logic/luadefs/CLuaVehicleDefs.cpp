@@ -76,6 +76,7 @@ void CLuaVehicleDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("isVehicleWindowOpen", IsVehicleWindowOpen);
     CLuaCFunctions::AddFunction("getVehicleComponentPosition", GetVehicleComponentPosition);
     CLuaCFunctions::AddFunction("getVehicleComponentRotation", GetVehicleComponentRotation);
+    CLuaCFunctions::AddFunction("getVehicleComponentScale", GetVehicleComponentScale);
     CLuaCFunctions::AddFunction("getVehicleComponentVisible", GetVehicleComponentVisible);
     CLuaCFunctions::AddFunction("getVehicleComponents", GetVehicleComponents);
     CLuaCFunctions::AddFunction("getVehicleModelExhaustFumesPosition", GetVehicleModelExhaustFumesPosition);
@@ -122,8 +123,10 @@ void CLuaVehicleDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("setVehicleSirens", SetVehicleSirens);
     CLuaCFunctions::AddFunction("setVehicleComponentPosition", SetVehicleComponentPosition);
     CLuaCFunctions::AddFunction("setVehicleComponentRotation", SetVehicleComponentRotation);
+    CLuaCFunctions::AddFunction("setVehicleComponentScale", SetVehicleComponentScale);
     CLuaCFunctions::AddFunction("resetVehicleComponentPosition", ResetVehicleComponentPosition);
     CLuaCFunctions::AddFunction("resetVehicleComponentRotation", ResetVehicleComponentRotation);
+    CLuaCFunctions::AddFunction("resetVehicleComponentScale", ResetVehicleComponentScale);
     CLuaCFunctions::AddFunction("setVehicleComponentVisible", SetVehicleComponentVisible);
     CLuaCFunctions::AddFunction("setVehicleNitroActivated", SetVehicleNitroActivated);
     CLuaCFunctions::AddFunction("setVehicleNitroCount", SetVehicleNitroCount);
@@ -3329,6 +3332,91 @@ int CLuaVehicleDefs::OOP_GetVehicleComponentRotation(lua_State* luaVM)
     return 1;
 }
 
+int CLuaVehicleDefs::SetVehicleComponentScale(lua_State* luaVM)
+{
+    //  bool setVehicleComponentScale ( vehicle theVehicle, string theComponent, float rotX, float rotY, float rotZ [, string base = "parent"] )
+    SString            strComponent;
+    CClientVehicle*    pVehicle = NULL;
+    CVector            vecScale;
+    EComponentBaseType inputBase;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+    argStream.ReadString(strComponent);
+    argStream.ReadVector3D(vecScale);
+    argStream.ReadEnumString(inputBase, EComponentBase::PARENT);
+
+    if(!argStream.HasErrors())
+    {
+        pVehicle->SetComponentScale(strComponent, vecScale, inputBase);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::GetVehicleComponentScale(lua_State* luaVM)
+{
+    // float, float, float getVehicleComponentScale ( vehicle theVehicle, string theComponent [, string base = "parent"]  )
+    SString            strComponent;
+    CClientVehicle*    pVehicle = NULL;
+    EComponentBaseType outputBase;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+    argStream.ReadString(strComponent);
+    argStream.ReadEnumString(outputBase, EComponentBase::PARENT);
+
+    if(!argStream.HasErrors())
+    {
+        CVector vecScale;
+        if(pVehicle->GetComponentScale(strComponent, vecScale, outputBase))
+        {
+            lua_pushnumber(luaVM, vecScale.fX);
+            lua_pushnumber(luaVM, vecScale.fY);
+            lua_pushnumber(luaVM, vecScale.fZ);
+            return 3;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::OOP_GetVehicleComponentScale(lua_State* luaVM)
+{
+    // float, float, float getVehicleComponentScale ( vehicle theVehicle, string theComponent [, string base = "parent"]  )
+    SString            strComponent;
+    CClientVehicle*    pVehicle = NULL;
+    EComponentBaseType outputBase;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+    argStream.ReadString(strComponent);
+    argStream.ReadEnumString(outputBase, EComponentBase::PARENT);
+
+    if(!argStream.HasErrors())
+    {
+        CVector vecScale;
+        if(pVehicle->GetComponentScale(strComponent, vecScale, outputBase))
+        {
+            lua_pushvector(luaVM, vecScale);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaVehicleDefs::ResetVehicleComponentPosition(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
@@ -3363,6 +3451,29 @@ int CLuaVehicleDefs::ResetVehicleComponentRotation(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         if (pVehicle->ResetComponentRotation(strComponent))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::ResetVehicleComponentScale(lua_State* luaVM)
+{
+    CScriptArgReader argStream(luaVM);
+    SString          strComponent;
+    CClientVehicle*  pVehicle = NULL;
+    argStream.ReadUserData(pVehicle);
+    argStream.ReadString(strComponent);
+
+    if(!argStream.HasErrors())
+    {
+        if(pVehicle->ResetComponentScale(strComponent))
         {
             lua_pushboolean(luaVM, true);
             return 1;
