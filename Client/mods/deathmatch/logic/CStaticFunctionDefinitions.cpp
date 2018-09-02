@@ -2187,6 +2187,27 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CClientEntity& Entity, 
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CClientEntity& Entity, const SString& strAnimName, float fSpeed)
+{
+    RUN_CHILDREN(SetPedAnimationSpeed(**iter, strAnimName, fSpeed))
+
+        if (IS_PED(&Entity))
+        {
+            CClientPed& Ped = static_cast<CClientPed&>(Entity);
+            if (!strAnimName.empty())
+            {
+                auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(Ped.GetClump(), strAnimName);
+                if (pAnimAssociation)
+                {
+                    pAnimAssociation->SetCurrentSpeed(fSpeed);
+                    return true;
+                }
+            }
+        }
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetPedMoveAnim(CClientEntity& Entity, unsigned int iMoveAnim)
 {
     RUN_CHILDREN(SetPedMoveAnim(**iter, iMoveAnim))
