@@ -3547,27 +3547,21 @@ void CClientGame::Event_OnIngame(void)
 
     // Create a local player for us
     m_pLocalPlayer = new CClientPlayer(m_pManager, m_LocalID, true);
-    if (m_pLocalPlayer)
-    {
-        // Set our parent the root entity
-        m_pLocalPlayer->SetParent(m_pRootEntity);
 
-        // Give the local player our nickname
-        m_pLocalPlayer->SetNick(m_strLocalNick);
+    // Set our parent the root entity
+    m_pLocalPlayer->SetParent(m_pRootEntity);
 
-        // Freeze the player at some location we won't see
-        m_pLocalPlayer->SetHealth(100);
-        m_pLocalPlayer->SetPosition(CVector(0, 0, 0));
-        m_pLocalPlayer->SetFrozen(true);
-        m_pLocalPlayer->ResetInterpolation();
+    // Give the local player our nickname
+    m_pLocalPlayer->SetNick(m_strLocalNick);
 
-        // Reset him
-        m_pLocalPlayer->ResetStats();
-    }
-    else
-    {
-        RaiseFatalError(2);
-    }
+    // Freeze the player at some location we won't see
+    m_pLocalPlayer->SetHealth(100);
+    m_pLocalPlayer->SetPosition(CVector(0, 0, 0));
+    m_pLocalPlayer->SetFrozen(true);
+    m_pLocalPlayer->ResetInterpolation();
+
+    // Reset him
+    m_pLocalPlayer->ResetStats();
 
     // Make sure we never get tired
     g_pGame->GetPlayerInfo()->SetDoesNotGetTired(true);
