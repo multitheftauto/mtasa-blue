@@ -2187,6 +2187,27 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CClientEntity& Entity, 
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CClientEntity& Entity, const SString& strAnimName, float fSpeed)
+{
+    RUN_CHILDREN(SetPedAnimationSpeed(**iter, strAnimName, fSpeed))
+
+        if (IS_PED(&Entity))
+        {
+            CClientPed& Ped = static_cast<CClientPed&>(Entity);
+            if (!strAnimName.empty())
+            {
+                auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(Ped.GetClump(), strAnimName);
+                if (pAnimAssociation)
+                {
+                    pAnimAssociation->SetCurrentSpeed(fSpeed);
+                    return true;
+                }
+            }
+        }
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetPedMoveAnim(CClientEntity& Entity, unsigned int iMoveAnim)
 {
     RUN_CHILDREN(SetPedMoveAnim(**iter, iMoveAnim))
@@ -4271,19 +4292,19 @@ bool CStaticFunctionDefinitions::ResetAmbientSounds(void)
 
 bool CStaticFunctionDefinitions::SetWorldSoundEnabled(uint uiGroup, uint uiIndex, bool bMute, bool bImmediate)
 {
-    g_pGame->GetAudio()->SetWorldSoundEnabled(uiGroup, uiIndex, bMute, bImmediate);
+    g_pGame->GetAudioEngine()->SetWorldSoundEnabled(uiGroup, uiIndex, bMute, bImmediate);
     return true;
 }
 
 bool CStaticFunctionDefinitions::IsWorldSoundEnabled(uint uiGroup, uint uiIndex, bool& bOutMute)
 {
-    bOutMute = g_pGame->GetAudio()->IsWorldSoundEnabled(uiGroup, uiIndex);
+    bOutMute = g_pGame->GetAudioEngine()->IsWorldSoundEnabled(uiGroup, uiIndex);
     return true;
 }
 
 bool CStaticFunctionDefinitions::ResetWorldSounds(void)
 {
-    g_pGame->GetAudio()->ResetWorldSounds();
+    g_pGame->GetAudioEngine()->ResetWorldSounds();
     return true;
 }
 

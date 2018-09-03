@@ -360,8 +360,8 @@ CClientGame::~CClientGame(void)
     // playing these special IDS.
     if (m_bGameLoaded)
     {
-        g_pGame->GetAudio()->PlayFrontEndSound(35);
-        g_pGame->GetAudio()->PlayFrontEndSound(48);
+        g_pGame->GetAudioEngine()->PlayFrontEndSound(35);
+        g_pGame->GetAudioEngine()->PlayFrontEndSound(48);
     }
 
     // Reset the GUI input mode
@@ -442,7 +442,7 @@ CClientGame::~CClientGame(void)
     g_pGame->SetPreWeaponFireHandler(NULL);
     g_pGame->SetPostWeaponFireHandler(NULL);
     g_pGame->SetTaskSimpleBeHitHandler(NULL);
-    g_pGame->GetAudio()->SetWorldSoundHandler(NULL);
+    g_pGame->GetAudioEngine()->SetWorldSoundHandler(NULL);
     g_pCore->SetMessageProcessor(NULL);
     g_pCore->GetKeyBinds()->SetKeyStrokeHandler(NULL);
     g_pCore->GetKeyBinds()->SetCharacterKeyHandler(NULL);
@@ -733,8 +733,8 @@ void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRend
         m_bWasMinimized = false;
 
         // Reverse any mute on minimize effects
-        g_pGame->GetAudio()->SetEffectsMasterVolume(g_pGame->GetSettings()->GetSFXVolume());
-        g_pGame->GetAudio()->SetMusicMasterVolume(g_pGame->GetSettings()->GetRadioVolume());
+        g_pGame->GetAudioEngine()->SetEffectsMasterVolume(g_pGame->GetSettings()->GetSFXVolume());
+        g_pGame->GetAudioEngine()->SetMusicMasterVolume(g_pGame->GetSettings()->GetRadioVolume());
         m_pManager->GetSoundManager()->SetMinimizeMuted(false);
     }
 
@@ -3916,10 +3916,10 @@ void CClientGame::IdleHandler(void)
 
             // Apply mute on minimize options
             if (bMuteAll || g_pCore->GetCVars()->GetValue<bool>("mute_radio_when_minimized"))
-                g_pGame->GetAudio()->SetMusicMasterVolume(0);
+                g_pGame->GetAudioEngine()->SetMusicMasterVolume(0);
 
             if (bMuteAll || g_pCore->GetCVars()->GetValue<bool>("mute_sfx_when_minimized"))
-                g_pGame->GetAudio()->SetEffectsMasterVolume(0);
+                g_pGame->GetAudioEngine()->SetEffectsMasterVolume(0);
 
             if (bMuteAll || g_pCore->GetCVars()->GetValue<bool>("mute_mta_when_minimized"))
                 m_pManager->GetSoundManager()->SetMinimizeMuted(true);
@@ -5612,10 +5612,10 @@ void CClientGame::ResetMapInfo(void)
     g_pClientGame->SetBirdsEnabled(true);
 
     // Ambient sounds
-    g_pGame->GetAudio()->ResetAmbientSounds();
+    g_pGame->GetAudioEngine()->ResetAmbientSounds();
 
     // World sounds
-    g_pGame->GetAudio()->ResetWorldSounds();
+    g_pGame->GetAudioEngine()->ResetWorldSounds();
 
     // Cheats
     g_pGame->ResetCheats();
@@ -6454,9 +6454,9 @@ void CClientGame::SetDevelopmentMode(bool bEnable, bool bEnableWeb)
     m_bDevelopmentMode = bEnable;
 
     if (m_bDevelopmentMode)
-        g_pGame->GetAudio()->SetWorldSoundHandler(CClientGame::StaticWorldSoundHandler);
+        g_pGame->GetAudioEngine()->SetWorldSoundHandler(CClientGame::StaticWorldSoundHandler);
     else
-        g_pGame->GetAudio()->SetWorldSoundHandler(NULL);
+        g_pGame->GetAudioEngine()->SetWorldSoundHandler(NULL);
 
     if (g_pCore->IsWebCoreLoaded())
         g_pCore->GetWebCore()->SetTestModeEnabled(bEnableWeb);

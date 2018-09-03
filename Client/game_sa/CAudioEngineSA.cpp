@@ -430,7 +430,7 @@ __declspec(noinline) bool _cdecl IsAmbientSoundGeneralEnabled(void)
 {
     if (pGame)
     {
-        return pGame->GetAudio()->IsAmbientSoundEnabled(AMBIENT_SOUND_GENERAL);
+        return pGame->GetAudioEngine()->IsAmbientSoundEnabled(AMBIENT_SOUND_GENERAL);
     }
     return false;
 }
