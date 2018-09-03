@@ -6838,73 +6838,35 @@ void _declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyProp()
     }
 }
 
-bool bFixSwimmingSpeed = true;
 const float kfTimeStepOriginal = 1.66f;
 void _declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
 {
     _asm
     {
-        pushfd
-        pushad
-    }
+        fsub    st, st(1)
 
-    if (bFixSwimmingSpeed)
-    {
-        _asm
-        {
-            popad
-            popfd
+        fld     dword ptr[esp + 16]
+        lea     eax, [esi + 44h]
+        mov     ecx, eax
+        fmul    st, st(1)
 
-            fsub    st, st(1)
+        fdiv    ds : 0xB7CB5C
+        fmul    kfTimeStepOriginal
 
-            fld     dword ptr[esp + 16]
-            lea     eax, [esi + 44h]
-            mov     ecx, eax
-            fmul    st, st(1)
+        fstp    dword ptr[esp + 28]
 
-            fdiv    ds : 0xB7CB5C
-            fmul    kfTimeStepOriginal
+        fld     dword ptr[esp + 20]
+        fmul    st, st(1)
 
-            fstp    dword ptr[esp + 28]
+        fdiv    ds : 0xB7CB5C
+        fmul    kfTimeStepOriginal
 
-            fld     dword ptr[esp + 20]
-            fmul    st, st(1)
+        fstp    dword ptr[esp + 32]
+        fmul    dword ptr[esp + 24]
 
-            fdiv    ds : 0xB7CB5C
-            fmul    kfTimeStepOriginal
+        fdiv    ds : 0xB7CB5C
+        fmul    kfTimeStepOriginal
 
-            fstp    dword ptr[esp + 32]
-            fmul    dword ptr[esp + 24]
-
-            fdiv    ds : 0xB7CB5C
-            fmul    kfTimeStepOriginal
-
-            jmp     RETURN_CTaskSimpleSwim_ProcessSwimmingResistance
-        }
-    }
-    else
-    {
-        _asm
-        {
-            popad
-            popfd
-
-            fsub    st, st(1)
-
-            fld     dword ptr[esp + 16]
-            lea     eax, [esi + 44h]
-            mov     ecx, eax
-            fmul    st, st(1)
-
-            fstp    dword ptr[esp + 28]
-
-            fld     dword ptr[esp + 20]
-            fmul    st, st(1)
-
-            fstp    dword ptr[esp + 32]
-            fmul    dword ptr[esp + 24]
-
-            jmp     RETURN_CTaskSimpleSwim_ProcessSwimmingResistance
-        }
+        jmp     RETURN_CTaskSimpleSwim_ProcessSwimmingResistance
     }
 }
