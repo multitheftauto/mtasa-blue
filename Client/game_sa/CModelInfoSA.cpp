@@ -16,10 +16,10 @@ extern CGameSA* pGame;
 
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
-std::map<unsigned short, int>                              CModelInfoSA::ms_RestreamTxdIDMap;
-std::map<DWORD, float>                                     CModelInfoSA::ms_ModelDefaultLodDistanceMap;
-std::set<uint>                                             CModelInfoSA::ms_ReplacedColModels;
-std::map<DWORD, BYTE>                                      CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
+std::map<unsigned short, int>                                                         CModelInfoSA::ms_RestreamTxdIDMap;
+std::map<DWORD, float>                                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
+std::set<uint>                                                                        CModelInfoSA::ms_ReplacedColModels;
+std::map<DWORD, BYTE>                                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<CVehicleModelInfoSAInterface*, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
 
 CModelInfoSA::CModelInfoSA(void)
@@ -930,11 +930,11 @@ void CModelInfoSA::SetVehicleExhaustFumesPosition(const CVector& vecPosition)
 
 CVector CModelInfoSA::GetVehicleDummyPosition(eVehicleDummies eDummy)
 {
-    if(!IsVehicle())
+    if (!IsVehicle())
         return CVector();
 
     // Request model load right now if not loaded yet (#9897)
-    if(!IsLoaded())
+    if (!IsLoaded())
         Request(BLOCKING, "GetVehicleDummyPosition");
 
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
@@ -943,22 +943,22 @@ CVector CModelInfoSA::GetVehicleDummyPosition(eVehicleDummies eDummy)
 
 void CModelInfoSA::SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition)
 {
-    if(!IsVehicle())
+    if (!IsVehicle())
         return;
 
     // Request model load right now if not loaded yet (#9897)
-    if(!IsLoaded())
+    if (!IsLoaded())
         Request(BLOCKING, "SetVehicleDummyPosition");
 
     // Store default position in map
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
     auto iter = ms_ModelDefaultDummiesPosition.find(pVehicleModel);
-    if(iter == ms_ModelDefaultDummiesPosition.end())
+    if (iter == ms_ModelDefaultDummiesPosition.end())
     {
-        ms_ModelDefaultDummiesPosition.insert({ pVehicleModel, std::map<eVehicleDummies,CVector>() });
+        ms_ModelDefaultDummiesPosition.insert({pVehicleModel, std::map<eVehicleDummies, CVector>()});
     }
-    
-    if(ms_ModelDefaultDummiesPosition[pVehicleModel].find(eDummy) == ms_ModelDefaultDummiesPosition[pVehicleModel].end())
+
+    if (ms_ModelDefaultDummiesPosition[pVehicleModel].find(eDummy) == ms_ModelDefaultDummiesPosition[pVehicleModel].end())
     {
         ms_ModelDefaultDummiesPosition[pVehicleModel][eDummy] = pVehicleModel->pVisualInfo->vecDummies[eDummy];
     }
@@ -972,7 +972,7 @@ void CModelInfoSA::ResetAllVehicleDummies()
     for (auto& info : ms_ModelDefaultDummiesPosition)
     {
         CVehicleModelInfoSAInterface* pVehicleModel = info.first;
-        for(auto& dummy : ms_ModelDefaultDummiesPosition[pVehicleModel])
+        for (auto& dummy : ms_ModelDefaultDummiesPosition[pVehicleModel])
         {
             pVehicleModel->pVisualInfo->vecDummies[dummy.first] = dummy.second;
         }

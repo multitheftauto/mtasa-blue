@@ -1511,7 +1511,8 @@ enum eVehicleComponent
     VEHICLE_COMPONENT_MAX,
 };
 
-enum eVehicleDummies{
+enum eVehicleDummies
+{
     LIGHT_FRONT_MAIN = 0,
     LIGHT_REAR_MAIN,
     LIGHT_FRONT_SECONDARY,

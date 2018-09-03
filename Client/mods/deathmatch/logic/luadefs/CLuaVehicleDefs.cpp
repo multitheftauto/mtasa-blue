@@ -3758,18 +3758,18 @@ int CLuaVehicleDefs::IsVehicleWindowOpen(lua_State* luaVM)
 int CLuaVehicleDefs::SetVehicleModelDummyPosition(lua_State* luaVM)
 {
     // bool setVehicleModelDummyPosition ( int modelID, vehicle-dummy dummy, float x, float y, float z )
-    unsigned short usModel;
+    unsigned short  usModel;
     eVehicleDummies eDummy;
-    CVector        vecPosition;
+    CVector         vecPosition;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
     argStream.ReadEnumString(eDummy);
     argStream.ReadVector3D(vecPosition);
 
-    if(!argStream.HasErrors())
+    if (!argStream.HasErrors())
     {
-        if(CStaticFunctionDefinitions::SetVehicleModelDummyPosition(usModel, eDummy, vecPosition))
+        if (CStaticFunctionDefinitions::SetVehicleModelDummyPosition(usModel, eDummy, vecPosition))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -3785,18 +3785,18 @@ int CLuaVehicleDefs::SetVehicleModelDummyPosition(lua_State* luaVM)
 int CLuaVehicleDefs::GetVehicleModelDummyPosition(lua_State* luaVM)
 {
     // float, float, float getVehicleModelDummyPosition ( int modelID, vehicle-dummy dummy )
-    unsigned short usModel;
+    unsigned short  usModel;
     eVehicleDummies eDummy;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
     argStream.ReadEnumString(eDummy);
 
-    if(!argStream.HasErrors())
+    if (!argStream.HasErrors())
     {
         CVector vecPosition;
 
-        if(CStaticFunctionDefinitions::GetVehicleModelDummyPosition(usModel, eDummy, vecPosition))
+        if (CStaticFunctionDefinitions::GetVehicleModelDummyPosition(usModel, eDummy, vecPosition))
         {
             lua_pushnumber(luaVM, vecPosition.fX);
             lua_pushnumber(luaVM, vecPosition.fY);
@@ -3814,18 +3814,18 @@ int CLuaVehicleDefs::GetVehicleModelDummyPosition(lua_State* luaVM)
 int CLuaVehicleDefs::OOP_GetVehicleModelDummyPosition(lua_State* luaVM)
 {
     // float, float, float getVehicleModelDummyPosition ( int modelID, vehicle-dummy dummy )
-    unsigned short usModel;
+    unsigned short  usModel;
     eVehicleDummies eDummy;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
     argStream.ReadEnumString(eDummy);
 
-    if(!argStream.HasErrors())
+    if (!argStream.HasErrors())
     {
         CVector vecPosition;
 
-        if(CStaticFunctionDefinitions::GetVehicleModelDummyPosition(usModel, eDummy, vecPosition))
+        if (CStaticFunctionDefinitions::GetVehicleModelDummyPosition(usModel, eDummy, vecPosition))
         {
             lua_pushvector(luaVM, vecPosition);
             return 3;
@@ -3863,32 +3863,32 @@ int CLuaVehicleDefs::SetVehicleModelExhaustFumesPosition(lua_State* luaVM)
     return 1;
 }
 
-    int CLuaVehicleDefs::GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
+int CLuaVehicleDefs::GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
+{
+    // float, float, float getVehicleModelExhaustPosition ( int modelID )
+    unsigned short usModel;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(usModel);
+
+    if (!argStream.HasErrors())
     {
-        // float, float, float getVehicleModelExhaustPosition ( int modelID )
-        unsigned short usModel;
+        CVector vecPosition;
 
-        CScriptArgReader argStream(luaVM);
-        argStream.ReadNumber(usModel);
-
-        if (!argStream.HasErrors())
+        if (CStaticFunctionDefinitions::GetVehicleModelExhaustFumesPosition(usModel, vecPosition))
         {
-            CVector vecPosition;
-        
-            if (CStaticFunctionDefinitions::GetVehicleModelExhaustFumesPosition(usModel, vecPosition))
-            {
-                lua_pushnumber(luaVM, vecPosition.fX);
-                lua_pushnumber(luaVM, vecPosition.fY);
-                lua_pushnumber(luaVM, vecPosition.fZ);
-                return 3;
-            }
+            lua_pushnumber(luaVM, vecPosition.fX);
+            lua_pushnumber(luaVM, vecPosition.fY);
+            lua_pushnumber(luaVM, vecPosition.fZ);
+            return 3;
         }
-        else
-            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-        lua_pushboolean(luaVM, false);
-        return 1;
     }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
 
 int CLuaVehicleDefs::OOP_GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 {
@@ -3901,7 +3901,7 @@ int CLuaVehicleDefs::OOP_GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         CVector vecPosition;
-        
+
         if (CStaticFunctionDefinitions::GetVehicleModelExhaustFumesPosition(usModel, vecPosition))
         {
             lua_pushvector(luaVM, vecPosition);
