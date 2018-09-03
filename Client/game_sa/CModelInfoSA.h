@@ -268,8 +268,6 @@ protected:
     SVehicleSupportedUpgrades                                         m_ModelSupportedUpgrades;
 
 public:
-    static std::set<uint> ms_ReplacedColModels;
-
     CModelInfoSA(void);
     CModelInfoSA(DWORD dwModelID);
 
