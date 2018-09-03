@@ -3486,6 +3486,34 @@ bool CStaticFunctionDefinitions::IsVehicleWindowOpen(CClientVehicle& Vehicle, uc
     return Vehicle.IsWindowOpen(ucWindow);
 }
 
+bool CStaticFunctionDefinitions::SetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummies, CVector& vecPosition)
+{
+    if(CClientVehicleManager::IsValidModel(usModel))
+    {
+        auto pModelInfo = g_pGame->GetModelInfo(usModel);
+        if(pModelInfo)
+        {
+            pModelInfo->SetVehicleDummyPosition(eDummies, vecPosition);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummies, CVector& vecPosition)
+{
+    if(CClientVehicleManager::IsValidModel(usModel))
+    {
+        auto pModelInfo = g_pGame->GetModelInfo(usModel);
+        if(pModelInfo)
+        {
+            vecPosition = pModelInfo->GetVehicleDummyPosition(eDummies);
+            return true;
+        }
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition)
 {
     if (CClientVehicleManager::IsValidModel(usModel))

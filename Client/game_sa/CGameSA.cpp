@@ -470,7 +470,7 @@ void CGameSA::Reset(void)
         m_pHud->SetComponentVisible(HUD_ALL, true);
 
         // Restore model exhaust fumes positions
-        CModelInfoSA::ResetAllVehicleExhaustFumes();
+        CModelInfoSA::ResetAllVehicleDummies();
     }
 }
 

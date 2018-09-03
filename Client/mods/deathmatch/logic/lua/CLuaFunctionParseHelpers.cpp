@@ -497,6 +497,23 @@ ADD_ENUM(D3DPT_TRIANGLESTRIP, "trianglestrip")
 ADD_ENUM(D3DPT_TRIANGLEFAN, "trianglefan")
 IMPLEMENT_ENUM_END("primitive-type")
 
+IMPLEMENT_ENUM_BEGIN(eVehicleDummies)
+ADD_ENUM(LIGHT_FRONT_MAIN, "light_front_main")
+ADD_ENUM(LIGHT_REAR_MAIN, "light_rear_main")
+ADD_ENUM(LIGHT_FRONT_SECONDARY, "light_front_second")
+ADD_ENUM(LIGHT_REAR_SECONDARY, "light_rear_second")
+ADD_ENUM(SEAT_FRONT, "seat_front")
+ADD_ENUM(SEAT_REAR, "seat_rear")
+ADD_ENUM(EXHAUST, "exhaust")
+ADD_ENUM(ENGINE, "engine")
+ADD_ENUM(GAS_CAP, "gas_cap")
+ADD_ENUM(TRAILER_ATTACH, "trailer_attach")
+ADD_ENUM(HAND_REST, "hand_rest")
+ADD_ENUM(EXHAUST_SECONDARY, "exhaust_second")
+ADD_ENUM(WING_AIRTRAIL, "wing_airtrail")
+ADD_ENUM(VEH_GUN, "veh_gun")
+IMPLEMENT_ENUM_END("vehicle-dummy")
+
 //
 // Get best guess at name of userdata type
 //
