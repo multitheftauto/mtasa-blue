@@ -35,7 +35,7 @@ void HOOK_GetFxQuality();
 DWORD RETURN_StoreShadowForVehicle = 0x70BDA9;
 void  HOOK_StoreShadowForVehicle();
 
-float ms_fVehicleLODDistance, ms_fTrainPlaneLODDistance;
+float ms_fVehicleLODDistance, ms_fTrainPlaneLODDistance, ms_fPedsLODDistance;
 
 CSettingsSA::CSettingsSA(void)
 {
@@ -52,6 +52,7 @@ CSettingsSA::CSettingsSA(void)
 
     MemPut(0x732926, &ms_fVehicleLODDistance);
     MemPut(0x732940, &ms_fTrainPlaneLODDistance);
+    MemPut(0x73295E, &ms_fPedsLODDistance);
 
     // Set "radar map and radar" as default radar mode
     SetRadarMode(RADAR_MODE_ALL);
@@ -332,8 +333,7 @@ void CSettingsSA::SetVolumetricShadowsSuspended(bool bSuspended)
 DWORD dwFxQualityValue = 0;
 WORD  usCallingForVehicleModel = 0;
 
-__declspec(noinline)
-void _cdecl MaybeAlterFxQualityValue(DWORD dwAddrCalledFrom)
+__declspec(noinline) void _cdecl MaybeAlterFxQualityValue(DWORD dwAddrCalledFrom)
 {
     // Handle all calls from CVolumetricShadowMgr
     if (dwAddrCalledFrom > 0x70F990 && dwAddrCalledFrom < 0x711EB0)
@@ -593,6 +593,36 @@ void CSettingsSA::GetVehiclesLODDistance(float& fVehiclesLODDistance, float& fTr
 
 ////////////////////////////////////////////////
 //
+// Peds LOD draw distance
+//
+////////////////////////////////////////////////
+ 
+void CSettingsSA::SetPedsLODDistance(float fPedsLODDistance)
+{
+    ms_fPedsLODDistance = fPedsLODDistance;
+}
+ 
+float CSettingsSA::GetPedsLODDistance()
+{
+    return ms_fPedsLODDistance;
+}
+ 
+void CSettingsSA::ResetPedsLODDistance()
+{
+    bool bHighDetailPeds;
+    g_pCore->GetCVars()->Get("high_detail_peds", bHighDetailPeds);
+    if (bHighDetailPeds)
+    {
+        ms_fPedsLODDistance = MAX_PEDS_LOD_DISTANCE;
+    }
+    else
+    {
+        ms_fPedsLODDistance = DEFAULT_PEDS_LOD_DISTANCE;
+    }
+}
+
+////////////////////////////////////////////////
+//
 // CSettingsSA::HasUnsafeResolutions
 //
 // Return true if DirectX says we have resolutions available that are higher that the desktop
@@ -830,8 +860,7 @@ int CSettingsSA::OnSelectDevice(void)
 //   * Choose whether to show the device selection dialog box
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-__declspec(noinline)
-int OnMY_SelectDevice(void)
+__declspec(noinline) int OnMY_SelectDevice(void)
 {
     CSettingsSA* gameSettings = (CSettingsSA*)pGame->GetSettings();
     return gameSettings->OnSelectDevice();

@@ -11,8 +11,7 @@
 
 class CVehicle;
 
-#ifndef __CVEHICLE_H
-#define __CVEHICLE_H
+#pragma once
 
 #include "CCommon.h"
 #include "packets/CPacket.h"
@@ -309,8 +308,8 @@ public:
 
     // Functions used to remember where this vehicle spawns
     const CVector& GetRespawnPosition(void) { return m_vecRespawnPosition; };
+    const CVector& GetRespawnRotationDegrees(void) { return m_vecRespawnRotationDegrees; };
     void           SetRespawnPosition(const CVector& vecPosition) { m_vecRespawnPosition = vecPosition; };
-    void           GetRespawnRotationDegrees(CVector& vecRotation) { vecRotation = m_vecRespawnRotationDegrees; };
     void           SetRespawnRotationDegrees(const CVector& vecRotation) { m_vecRespawnRotationDegrees = vecRotation; };
     float          GetRespawnHealth(void) { return m_fRespawnHealth; };
     void           SetRespawnHealth(float fHealth) { m_fRespawnHealth = fHealth; };
@@ -443,5 +442,3 @@ public:            // 'Safe' variables (that have no need for accessors)
     SSirenInfo                             m_tSirenBeaconInfo;
     bool                                   m_bOccupantChanged;
 };
-
-#endif

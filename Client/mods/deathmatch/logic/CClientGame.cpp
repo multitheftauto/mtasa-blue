@@ -11,6 +11,10 @@
 
 #include "StdInc.h"
 #include <net/SyncStructures.h>
+#include "game/CAnimBlendAssocGroup.h"
+#include "game/CAnimBlendAssociation.h"
+#include "game/CAnimBlendHierarchy.h"
+#include <windowsx.h>
 
 SString StringZeroPadout(const SString& strInput, uint uiPadoutSize)
 {
@@ -119,8 +123,8 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->DisableBadDrivebyHitboxes(true);
 
     // Remove Night & Thermal vision view (if enabled).
-    g_pMultiplayer->SetNightVisionEnabled(false);
-    g_pMultiplayer->SetThermalVisionEnabled(false);
+    g_pMultiplayer->SetNightVisionEnabled(false, true);
+    g_pMultiplayer->SetThermalVisionEnabled(false, true);
 
     m_bCloudsEnabled = true;
 
@@ -254,8 +258,12 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->SetPostWorldProcessHandler(CClientGame::StaticPostWorldProcessHandler);
     g_pMultiplayer->SetPreFxRenderHandler(CClientGame::StaticPreFxRenderHandler);
     g_pMultiplayer->SetPreHudRenderHandler(CClientGame::StaticPreHudRenderHandler);
+    g_pMultiplayer->DisableCallsToCAnimBlendNode(false);
+    g_pMultiplayer->SetCAnimBlendAssocDestructorHandler(CClientGame::StaticCAnimBlendAssocDestructorHandler);
     g_pMultiplayer->SetAddAnimationHandler(CClientGame::StaticAddAnimationHandler);
-    g_pMultiplayer->SetBlendAnimationHandler(CClientGame::StaticBlendAnimationHandler);
+    g_pMultiplayer->SetAddAnimationAndSyncHandler(CClientGame::StaticAddAnimationAndSyncHandler);
+    g_pMultiplayer->SetAssocGroupCopyAnimationHandler(CClientGame::StaticAssocGroupCopyAnimationHandler);
+    g_pMultiplayer->SetBlendAnimationHierarchyHandler(CClientGame::StaticBlendAnimationHierarchyHandler);
     g_pMultiplayer->SetProcessCollisionHandler(CClientGame::StaticProcessCollisionHandler);
     g_pMultiplayer->SetVehicleCollisionHandler(CClientGame::StaticVehicleCollisionHandler);
     g_pMultiplayer->SetVehicleDamageHandler(CClientGame::StaticVehicleDamageHandler);
@@ -352,8 +360,8 @@ CClientGame::~CClientGame(void)
     // playing these special IDS.
     if (m_bGameLoaded)
     {
-        g_pGame->GetAudio()->PlayFrontEndSound(35);
-        g_pGame->GetAudio()->PlayFrontEndSound(48);
+        g_pGame->GetAudioEngine()->PlayFrontEndSound(35);
+        g_pGame->GetAudioEngine()->PlayFrontEndSound(48);
     }
 
     // Reset the GUI input mode
@@ -411,8 +419,12 @@ CClientGame::~CClientGame(void)
     g_pMultiplayer->SetPostWorldProcessHandler(NULL);
     g_pMultiplayer->SetPreFxRenderHandler(NULL);
     g_pMultiplayer->SetPreHudRenderHandler(NULL);
+    g_pMultiplayer->DisableCallsToCAnimBlendNode(true);
+    g_pMultiplayer->SetCAnimBlendAssocDestructorHandler(NULL);
     g_pMultiplayer->SetAddAnimationHandler(NULL);
-    g_pMultiplayer->SetBlendAnimationHandler(NULL);
+    g_pMultiplayer->SetAddAnimationAndSyncHandler(NULL);
+    g_pMultiplayer->SetAssocGroupCopyAnimationHandler(NULL);
+    g_pMultiplayer->SetBlendAnimationHierarchyHandler(NULL);
     g_pMultiplayer->SetProcessCollisionHandler(NULL);
     g_pMultiplayer->SetVehicleCollisionHandler(NULL);
     g_pMultiplayer->SetVehicleDamageHandler(NULL);
@@ -430,7 +442,7 @@ CClientGame::~CClientGame(void)
     g_pGame->SetPreWeaponFireHandler(NULL);
     g_pGame->SetPostWeaponFireHandler(NULL);
     g_pGame->SetTaskSimpleBeHitHandler(NULL);
-    g_pGame->GetAudio()->SetWorldSoundHandler(NULL);
+    g_pGame->GetAudioEngine()->SetWorldSoundHandler(NULL);
     g_pCore->SetMessageProcessor(NULL);
     g_pCore->GetKeyBinds()->SetKeyStrokeHandler(NULL);
     g_pCore->GetKeyBinds()->SetCharacterKeyHandler(NULL);
@@ -721,8 +733,8 @@ void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRend
         m_bWasMinimized = false;
 
         // Reverse any mute on minimize effects
-        g_pGame->GetAudio()->SetEffectsMasterVolume(g_pGame->GetSettings()->GetSFXVolume());
-        g_pGame->GetAudio()->SetMusicMasterVolume(g_pGame->GetSettings()->GetRadioVolume());
+        g_pGame->GetAudioEngine()->SetEffectsMasterVolume(g_pGame->GetSettings()->GetSFXVolume());
+        g_pGame->GetAudioEngine()->SetMusicMasterVolume(g_pGame->GetSettings()->GetRadioVolume());
         m_pManager->GetSoundManager()->SetMinimizeMuted(false);
     }
 
@@ -2466,8 +2478,8 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                 }
                 if (ucButtonHit != 0xFF)
                 {
-                    int iX = LOWORD(lParam);
-                    int iY = HIWORD(lParam);
+                    int iX = GET_X_LPARAM(lParam);
+                    int iY = GET_Y_LPARAM(lParam);
 
                     CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
 
@@ -2635,7 +2647,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
     {
         case WM_MOUSEMOVE:
         {
-            int        iX = LOWORD(lParam), iY = HIWORD(lParam);
+            int        iX = GET_X_LPARAM(lParam), iY = GET_Y_LPARAM(lParam);
             static int iPreviousX = 0, iPreviousY = 0;
             if (iX != iPreviousX || iY != iPreviousY)
             {
@@ -3535,27 +3547,21 @@ void CClientGame::Event_OnIngame(void)
 
     // Create a local player for us
     m_pLocalPlayer = new CClientPlayer(m_pManager, m_LocalID, true);
-    if (m_pLocalPlayer)
-    {
-        // Set our parent the root entity
-        m_pLocalPlayer->SetParent(m_pRootEntity);
 
-        // Give the local player our nickname
-        m_pLocalPlayer->SetNick(m_strLocalNick);
+    // Set our parent the root entity
+    m_pLocalPlayer->SetParent(m_pRootEntity);
 
-        // Freeze the player at some location we won't see
-        m_pLocalPlayer->SetHealth(100);
-        m_pLocalPlayer->SetPosition(CVector(0, 0, 0));
-        m_pLocalPlayer->SetFrozen(true);
-        m_pLocalPlayer->ResetInterpolation();
+    // Give the local player our nickname
+    m_pLocalPlayer->SetNick(m_strLocalNick);
 
-        // Reset him
-        m_pLocalPlayer->ResetStats();
-    }
-    else
-    {
-        RaiseFatalError(2);
-    }
+    // Freeze the player at some location we won't see
+    m_pLocalPlayer->SetHealth(100);
+    m_pLocalPlayer->SetPosition(CVector(0, 0, 0));
+    m_pLocalPlayer->SetFrozen(true);
+    m_pLocalPlayer->ResetInterpolation();
+
+    // Reset him
+    m_pLocalPlayer->ResetStats();
 
     // Make sure we never get tired
     g_pGame->GetPlayerInfo()->SetDoesNotGetTired(true);
@@ -3622,14 +3628,32 @@ bool CClientGame::StaticChokingHandler(unsigned char ucWeaponType)
     return g_pClientGame->ChokingHandler(ucWeaponType);
 }
 
-void CClientGame::StaticAddAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID)
+void CClientGame::StaticCAnimBlendAssocDestructorHandler(CAnimBlendAssociationSAInterface* pThis)
 {
-    g_pClientGame->AddAnimationHandler(pClump, animGroup, animID);
+    g_pClientGame->CAnimBlendAssocDestructorHandler(pThis);
 }
 
-void CClientGame::StaticBlendAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta)
+CAnimBlendAssociationSAInterface* CClientGame::StaticAddAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID)
 {
-    g_pClientGame->BlendAnimationHandler(pClump, animGroup, animID, fBlendDelta);
+    return g_pClientGame->AddAnimationHandler(pClump, animGroup, animID);
+}
+
+CAnimBlendAssociationSAInterface* CClientGame::StaticAddAnimationAndSyncHandler(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
+                                                                                AssocGroupId animGroup, AnimationId animID)
+{
+    return g_pClientGame->AddAnimationAndSyncHandler(pClump, pAnimAssocToSyncWith, animGroup, animID);
+}
+
+bool CClientGame::StaticAssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump,
+                                                       CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, AnimationId animID)
+{
+    return g_pClientGame->AssocGroupCopyAnimationHandler(pAnimAssoc, pClump, pAnimAssocGroup, animID);
+}
+
+bool CClientGame::StaticBlendAnimationHierarchyHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy,
+                                                       int* pFlags, RpClump* pClump)
+{
+    return g_pClientGame->BlendAnimationHierarchyHandler(pAnimAssoc, pOutAnimHierarchy, pFlags, pClump);
 }
 
 void CClientGame::StaticPreWorldProcessHandler(void)
@@ -3882,14 +3906,16 @@ void CClientGame::IdleHandler(void)
             CLuaArguments Arguments;
             m_pRootEntity->CallEvent("onClientMinimize", Arguments, false);
 
+            bool bMuteAll = g_pCore->GetCVars()->GetValue<bool>("mute_master_when_minimized");
+
             // Apply mute on minimize options
-            if (g_pCore->GetCVars()->GetValue<bool>("mute_sfx_when_minimized"))
-                g_pGame->GetAudio()->SetEffectsMasterVolume(0);
+            if (bMuteAll || g_pCore->GetCVars()->GetValue<bool>("mute_radio_when_minimized"))
+                g_pGame->GetAudioEngine()->SetMusicMasterVolume(0);
 
-            if (g_pCore->GetCVars()->GetValue<bool>("mute_radio_when_minimized"))
-                g_pGame->GetAudio()->SetMusicMasterVolume(0);
+            if (bMuteAll || g_pCore->GetCVars()->GetValue<bool>("mute_sfx_when_minimized"))
+                g_pGame->GetAudioEngine()->SetEffectsMasterVolume(0);
 
-            if (g_pCore->GetCVars()->GetValue<bool>("mute_mta_when_minimized"))
+            if (bMuteAll || g_pCore->GetCVars()->GetValue<bool>("mute_mta_when_minimized"))
                 m_pManager->GetSoundManager()->SetMinimizeMuted(true);
         }
     }
@@ -3912,14 +3938,104 @@ bool CClientGame::ChokingHandler(unsigned char ucWeaponType)
     return m_pLocalPlayer->CallEvent("onClientPlayerChoke", Arguments, true);
 }
 
-void CClientGame::AddAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID)
+void CClientGame::CAnimBlendAssocDestructorHandler(CAnimBlendAssociationSAInterface* pThis)
 {
-    // CClientPed * pPed = m_pPedManager->Get ( pClump, true );
+    // printf("CClientGame::CAnimBlendAssocDestructorHandler called! sAnimID: %d\n", pThis->sAnimID);
+    RemoveAnimationAssociationFromMap(pThis);
 }
 
-void CClientGame::BlendAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta)
+CAnimBlendAssociationSAInterface* CClientGame::AddAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID)
 {
-    // CClientPed * pPed = m_pPedManager->Get ( pClump, true );
+    // printf ( "AddAnimationHandler called! pClump, GroupID, AnimID: %p, %d, %d\n", (void*)pClump, animGroup, animID );
+    return nullptr;
+}
+
+CAnimBlendAssociationSAInterface* CClientGame::AddAnimationAndSyncHandler(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
+                                                                          AssocGroupId animGroup, AnimationId animID)
+{
+    // printf ( "AddAnimationAndSyncHandler called! pClump, GroupID, AnimID: %p, %d, %d\n", (void*)pClump, animGroup, animID );
+    return nullptr;
+}
+
+bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterface* pAnimAssocInterface, RpClump* pClump,
+                                                 CAnimBlendAssocGroupSAInterface* pAnimAssocGroupInterface, AnimationId animID)
+{
+    bool          isCustomAnimationToPlay = false;
+    CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
+    auto          pAnimAssocGroup = pAnimationManager->GetAnimBlendAssocGroup(pAnimAssocGroupInterface);
+    auto          pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(pAnimAssocGroup->GetGroupID(), animID);
+    auto          pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierachyInterface();
+    auto          pAnimAssociation = pAnimationManager->GetAnimBlendAssociation(pAnimAssocInterface);
+
+    CClientPed* pClientPed = GetClientPedByClump(*pClump);
+    if (pClientPed != nullptr)
+    {
+        auto pReplacedAnimation = pClientPed->GetReplacedAnimation(pOriginalAnimHierarchyInterface);
+        if (pReplacedAnimation != nullptr)
+        {
+            std::shared_ptr<CIFPAnimations> pIFPAnimations = pReplacedAnimation->pIFP->GetIFPAnimationsPointer();
+            InsertAnimationAssociationToMap(pAnimAssocInterface, pIFPAnimations);
+
+            // Play our custom animation instead of default
+            auto pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pReplacedAnimation->pAnimationHierarchy);
+            pAnimationManager->UncompressAnimation(pAnimHierarchy.get());
+            pAnimAssociation->InitializeForCustomAnimation(pClump, pAnimHierarchy->GetInterface());
+            pAnimAssociation->SetFlags(pOriginalAnimStaticAssoc->GetFlags());
+            pAnimAssociation->SetAnimID(pOriginalAnimStaticAssoc->GetAnimID());
+            pAnimAssociation->SetAnimGroup(pOriginalAnimStaticAssoc->GetAnimGroup());
+            isCustomAnimationToPlay = true;
+        }
+    }
+
+    if (!isCustomAnimationToPlay)
+    {
+        auto pAnimHierarchy = pAnimationManager->GetAnimBlendHierarchy(pOriginalAnimHierarchyInterface);
+
+        // Play default internal animation
+        pAnimationManager->UncompressAnimation(pAnimHierarchy.get());
+        pAnimAssociation->Constructor(*pOriginalAnimStaticAssoc->GetInterface());
+    }
+    return isCustomAnimationToPlay;
+}
+
+bool CClientGame::BlendAnimationHierarchyHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy, int* pFlags,
+                                                 RpClump* pClump)
+{
+    bool          isCustomAnimationToPlay = false;
+    CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
+    CClientPed*   pClientPed = GetClientPedByClump(*pClump);
+    if (pClientPed != nullptr)
+    {
+        if (pClientPed->IsNextAnimationCustom())
+        {
+            std::shared_ptr<CClientIFP> pIFP = pClientPed->GetCustomAnimationIFP();
+            if (pIFP)
+            {
+                const SString& strAnimationName = pClientPed->GetNextAnimationCustomName();
+                auto           pCustomAnimBlendHierarchy = pIFP->GetAnimationHierarchy(strAnimationName);
+                if (pCustomAnimBlendHierarchy != nullptr)
+                {
+                    std::shared_ptr<CIFPAnimations> pIFPAnimations = pIFP->GetIFPAnimationsPointer();
+                    InsertAnimationAssociationToMap(pAnimAssoc, pIFPAnimations);
+
+                    pClientPed->SetCurrentAnimationCustom(true);
+                    pClientPed->SetNextAnimationNormal();
+
+                    if (pIFP->IsUnloading())
+                    {
+                        pClientPed->DereferenceCustomAnimationBlock();
+                    }
+                    *pOutAnimHierarchy = pCustomAnimBlendHierarchy;
+                    isCustomAnimationToPlay = true;
+                    return isCustomAnimationToPlay;
+                }
+            }
+        }
+
+        pClientPed->SetCurrentAnimationCustom(false);
+        pClientPed->SetNextAnimationNormal();
+    }
+    return isCustomAnimationToPlay;
 }
 
 bool CClientGame::ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface)
@@ -5455,6 +5571,9 @@ void CClientGame::ResetMapInfo(void)
     // Vehicles LOD distance
     g_pGame->GetSettings()->ResetVehiclesLODDistance();
 
+    // Peds LOD distance
+    g_pGame->GetSettings()->ResetPedsLODDistance();
+
     // Sun color
     g_pMultiplayer->ResetSunColor();
 
@@ -5487,10 +5606,10 @@ void CClientGame::ResetMapInfo(void)
     g_pClientGame->SetBirdsEnabled(true);
 
     // Ambient sounds
-    g_pGame->GetAudio()->ResetAmbientSounds();
+    g_pGame->GetAudioEngine()->ResetAmbientSounds();
 
     // World sounds
-    g_pGame->GetAudio()->ResetWorldSounds();
+    g_pGame->GetAudioEngine()->ResetWorldSounds();
 
     // Cheats
     g_pGame->ResetCheats();
@@ -6329,9 +6448,9 @@ void CClientGame::SetDevelopmentMode(bool bEnable, bool bEnableWeb)
     m_bDevelopmentMode = bEnable;
 
     if (m_bDevelopmentMode)
-        g_pGame->GetAudio()->SetWorldSoundHandler(CClientGame::StaticWorldSoundHandler);
+        g_pGame->GetAudioEngine()->SetWorldSoundHandler(CClientGame::StaticWorldSoundHandler);
     else
-        g_pGame->GetAudio()->SetWorldSoundHandler(NULL);
+        g_pGame->GetAudioEngine()->SetWorldSoundHandler(NULL);
 
     if (g_pCore->IsWebCoreLoaded())
         g_pCore->GetWebCore()->SetTestModeEnabled(bEnableWeb);
@@ -6658,4 +6777,92 @@ void CClientGame::RestreamModel(unsigned short usModel)
         // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
         if (CClientObjectManager::IsValidModel(usModel) && CVehicleUpgrades::IsUpgrade(usModel))
         m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
+}
+
+void CClientGame::InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP)
+{
+    m_mapOfIfpPointers[u32BlockNameHash] = pIFP;
+}
+
+std::shared_ptr<CClientIFP> CClientGame::GetIFPPointerFromMap(const unsigned int u32BlockNameHash)
+{
+    auto it = m_mapOfIfpPointers.find(u32BlockNameHash);
+    if (it != m_mapOfIfpPointers.end())
+    {
+        return it->second;
+    }
+    return nullptr;
+}
+
+void CClientGame::RemoveIFPPointerFromMap(const unsigned int u32BlockNameHash)
+{
+    m_mapOfIfpPointers.erase(u32BlockNameHash);
+}
+
+void CClientGame::InsertPedPointerToSet(CClientPed* pPed)
+{
+    m_setOfPedPointers.insert(pPed);
+}
+
+void CClientGame::RemovePedPointerFromSet(CClientPed* pPed)
+{
+    m_setOfPedPointers.erase(pPed);
+}
+
+CClientPed* CClientGame::GetClientPedByClump(const RpClump& Clump)
+{
+    for (auto& pPed : m_setOfPedPointers)
+    {
+        CEntity* pEntity = pPed->GetGameEntity();
+        if (pEntity != nullptr)
+        {
+            if (pEntity->GetRpClump() != nullptr)
+            {
+                const RpClump& entityClump = *pEntity->GetRpClump();
+                if (std::addressof(entityClump) == std::addressof(Clump))
+                {
+                    return pPed;
+                }
+            }
+        }
+    }
+    return nullptr;
+}
+
+void CClientGame::OnClientIFPUnload(const std::shared_ptr<CClientIFP>& IFP)
+{
+    IFP->MarkAsUnloading();
+    for (auto& pPed : m_setOfPedPointers)
+    {
+        // Remove IFP animations from replaced animations of peds/players
+        pPed->RestoreAnimations(IFP);
+
+        // Make sure that streamed in pulses or changing model does not accidently
+        // play our custom animation. We can do that by making the custom animation
+        // untriggerable
+        if (pPed->GetCustomAnimationBlockNameHash() == IFP->GetBlockNameHash())
+        {
+            if (pPed->IsCustomAnimationPlaying())
+            {
+                pPed->SetCustomAnimationUntriggerable();
+            }
+
+            // Important! As we are using a shared_ptr, we need to decrement the reference counter
+            // by setting the shared_ptr to nullptr, this will avoid memory leak
+            if (!pPed->IsNextAnimationCustom() && pPed->IsCurrentAnimationCustom())
+            {
+                pPed->DereferenceCustomAnimationBlock();
+            }
+        }
+    }
+}
+
+void CClientGame::InsertAnimationAssociationToMap(CAnimBlendAssociationSAInterface* pAnimAssociation, const std::shared_ptr<CIFPAnimations>& pIFPAnimations)
+{
+    m_mapOfCustomAnimationAssociations[pAnimAssociation] = pIFPAnimations;
+}
+
+void CClientGame::RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation)
+{
+    m_mapOfCustomAnimationAssociations.erase(pAnimAssociation);
 }

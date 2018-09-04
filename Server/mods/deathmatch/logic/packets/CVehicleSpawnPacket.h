@@ -11,8 +11,7 @@
 
 class CVehicleSpawnPacket;
 
-#ifndef __CVEHICLESPAWNPACKET_H
-#define __CVEHICLESPAWNPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include <vector>
@@ -33,5 +32,3 @@ public:
 private:
     std::vector<CVehicle*> m_List;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CXMLConfig_H
-#define __CXMLConfig_H
+#pragma once
 
 #include "CCommon.h"
 #include <string>
@@ -50,5 +49,3 @@ protected:
     std::string m_strFileName;
     CXMLFile*   m_pFile;
 };
-
-#endif

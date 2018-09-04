@@ -11,8 +11,7 @@
 
 class CCore;
 
-#ifndef __CCORE_H
-#define __CCORE_H
+#pragma once
 
 #include "../version.h"
 
@@ -46,7 +45,7 @@ class CCore;
 #include <dinput.h>
 
 #define BLUE_VERSION_STRING     "Multi Theft Auto v" MTA_DM_BUILDTAG_LONG
-#define BLUE_COPYRIGHT_STRING    _td("Copyright (C) 2003 - 2018 Multi Theft Auto")
+#define BLUE_COPYRIGHT_STRING   "Copyright (C) 2003 - %BUILD_YEAR% Multi Theft Auto"
 
 // Configuration file path (relative to MTA install directory)
 #define MTA_CONFIG_PATH             "mta/config/coreconfig.xml"
@@ -124,6 +123,7 @@ public:
     bool IsChatVisible(void);
     void EnableChatInput(char* szCommand, DWORD dwColor);
     bool IsChatInputEnabled(void);
+    bool ClearChat();
 
     // Screenshots
     void TakeScreenShot(void);
@@ -272,6 +272,7 @@ public:
     const char* GetProductVersion(void) { return SharedUtil::GetProductVersion(); }
     void        SetFakeLagCommandEnabled(bool bEnabled) { m_bFakeLagCommandEnabled = bEnabled; }
     bool        IsFakeLagCommandEnabled(void) { return m_bFakeLagCommandEnabled; }
+    SString     GetBlueCopyrightString(void);
 
 private:
     // Core devices.
@@ -367,5 +368,3 @@ private:
     std::map<std::string, std::string> m_CommandLineOptions;            // e.g. "-o option" -> {"o" = "option"}
     const char*                        m_szCommandLineArgs;             // Everything that comes after the options
 };
-
-#endif

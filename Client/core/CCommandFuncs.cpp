@@ -54,7 +54,6 @@ void CCommandFuncs::Help(const char* szParameters)
     pConsole->Printf("***[--------------]***\n");
 }
 
-void dumpbasj();
 void CCommandFuncs::Exit(const char* szParameters)
 {
     g_pCore->Quit();
@@ -75,7 +74,7 @@ void CCommandFuncs::Ver(const char* szParameters)
     if (usNetRel > 0)
         strVersion += SString(".%03d", usNetRel);
     strVersion += "\n";
-    strVersion += _(BLUE_COPYRIGHT_STRING);
+    strVersion += g_pCore->GetBlueCopyrightString();
     CLocalGUI::GetSingleton().EchoConsole(strVersion);
 }
 
@@ -234,62 +233,63 @@ void CCommandFuncs::Unload(const char* szParameters)
 
 void CCommandFuncs::Connect(const char* szParameters)
 {
+    // Parse the arguments (host port nick pass)
+    char szBuffer[256] = "";
+    if (szParameters)
+        STRNCPY(szBuffer, szParameters, NUMELMS(szBuffer));
+
+    if (!strncmp(szBuffer, "mtasa://", 8))
+    {
+        // Using a mtasa:// URI to connect
+        SString strArguments = g_pCore->GetConnectCommandFromURI(szBuffer);
+
+        if (strArguments.length() > 0 && g_pCore->GetCommands()->Execute(strArguments))
+        {
+            return;
+        }
+    }
+
+    char* szHost = strtok(szBuffer, " ");
+    char* szPort = strtok(NULL, " ");
+    char* szNick = strtok(NULL, " ");
+    char* szPass = strtok(NULL, " ");
+
+    std::string strNick;
+    if (!szNick)
+        CVARS_GET("nick", strNick);
+    else
+        strNick = szNick;
+
+    // Got all required arguments?
+    if (!szHost || strNick.empty())
+    {
+        CCore::GetSingleton().GetConsole()->Print(_("connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"));
+        return;
+    }
+
+    // Verify and convert the port number
+    int iPort = szPort ? atoi(szPort) : 22003;
+    if (iPort <= 0 || iPort > 0xFFFF)
+    {
+        CCore::GetSingleton().GetConsole()->Print(_("connect: Bad port number"));
+        return;
+    }
+
+    unsigned short usPort = static_cast<unsigned short>(iPort);
+
+    // Got a password?
+    char emptyPass = 0;
+    if (!szPass)
+    {
+        szPass = &emptyPass;
+    }
+
+    // Unload any mod before connecting to a server
     CModManager::GetSingleton().Unload();
 
-    // Any mod loaded?
+    // Only connect if there is no mod loaded
     if (!CModManager::GetSingleton().GetCurrentMod())
     {
-        // Parse the arguments (host port nick pass)
-        char szBuffer[256] = "";
-        if (szParameters)
-            STRNCPY(szBuffer, szParameters, NUMELMS(szBuffer));
-
-        if (!strncmp(szBuffer, "mtasa://", 8))
-        {
-            // Using a mtasa:// URI to connect
-            SString strArguments = g_pCore->GetConnectCommandFromURI(szBuffer);
-
-            if (strArguments.length() > 0 && g_pCore->GetCommands()->Execute(strArguments))
-            {
-                return;
-            }
-        }
-
-        char* szHost = strtok(szBuffer, " ");
-        char* szPort = strtok(NULL, " ");
-        char* szNick = strtok(NULL, " ");
-        char* szPass = strtok(NULL, " ");
-
-        std::string strNick;
-        if (!szNick)
-            CVARS_GET("nick", strNick);
-        else
-            strNick = szNick;
-
-        // Got all required arguments?
-        if (!szHost || !szPort || strNick.empty())
-        {
-            CCore::GetSingleton().GetConsole()->Print(_("connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"));
-            return;
-        }
-
-        // Verify and convert the port number
-        int iPort = atoi(szPort);
-        if (iPort <= 0 || iPort > 0xFFFF)
-        {
-            CCore::GetSingleton().GetConsole()->Print(_("connect: Bad port number"));
-            return;
-        }
-
-        unsigned short usPort = static_cast<unsigned short>(iPort);
-
-        // Got a password?
-        char emptyPass = 0;
-        if (!szPass)
-        {
-            szPass = &emptyPass;
-        }
-
         // Start the connect
         if (CCore::GetSingleton().GetConnectManager()->Connect(szHost, usPort, strNick.c_str(), szPass))
         {
@@ -304,6 +304,18 @@ void CCommandFuncs::Connect(const char* szParameters)
     {
         CCore::GetSingleton().GetConsole()->Print(_("connect: Failed to unload current mod"));
     }
+}
+
+void CCommandFuncs::ReloadNews(const char* szParameters)
+{
+    if (CModManager::GetSingleton().GetCurrentMod())
+    {
+        CCore::GetSingleton().GetConsole()->Print("reloadnews: can't do this whilst connected to server");
+        return;
+    }
+
+    CCore::GetSingleton().GetConsole()->Print("reloadnews: reloading");
+    g_pCore->GetLocalGUI()->GetMainMenu()->ReloadNews();
 }
 
 void CCommandFuncs::Reconnect(const char* szParameters)

@@ -113,12 +113,9 @@ public:
     LUA_DECLARE(SetServerPassword);
     LUA_DECLARE(GetServerConfigSetting);
     LUA_DECLARE(SetServerConfigSetting);
+    LUA_DECLARE(ClearChatBox);
 
     LUA_DECLARE(shutdown);
-
-    // Util functions to make scripting easier for the end user
-    // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
-    LUA_DECLARE(GetTok);
 
     // Loaded Map Functions
     LUA_DECLARE(GetRootElement);

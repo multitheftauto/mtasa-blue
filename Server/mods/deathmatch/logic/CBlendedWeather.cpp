@@ -25,6 +25,11 @@ CBlendedWeather::CBlendedWeather(CClock* pClock)
     m_pClock = pClock;
 }
 
+void CBlendedWeather::DoPulse(void)
+{
+    Update();
+}
+
 void CBlendedWeather::SetWeather(unsigned char ucWeather)
 {
     // Set the primary and secondary weather instantly and stop any blending we might've been doing
@@ -36,9 +41,6 @@ void CBlendedWeather::SetWeather(unsigned char ucWeather)
 
 void CBlendedWeather::SetWeatherBlended(unsigned char ucWeather, unsigned char ucHour)
 {
-    // TODO: Should write it to not require this
-    Update();
-
     // Store the weather we blend to for the timing
     m_ucPrimaryBlendedWeather = m_ucSecondaryWeather;
     m_ucSecondaryBlendedWeather = ucWeather;
@@ -54,9 +56,6 @@ void CBlendedWeather::SetWeatherBlended(unsigned char ucWeather, unsigned char u
 
 unsigned char CBlendedWeather::GetWeather(void)
 {
-    // TODO: Should write it to not require this
-    Update();
-
     // If we're blending the weather, return the weather we started blending from
     if (m_ucBlendStopHour != 0xFF)
     {

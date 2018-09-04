@@ -11,8 +11,7 @@
 
 class CBlip;
 
-#ifndef __CBLIP_H
-#define __CBLIP_H
+#pragma once
 
 #include "CPerPlayerEntity.h"
 
@@ -44,5 +43,3 @@ public:
     short          m_sOrdering;
     unsigned short m_usVisibleDistance;
 };
-
-#endif

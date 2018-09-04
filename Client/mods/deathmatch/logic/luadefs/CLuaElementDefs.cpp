@@ -12,6 +12,7 @@
 
 #include "StdInc.h"
 using std::list;
+#define MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP      "1.5.5-9.13999"
 
 void CLuaElementDefs::LoadFunctions(void)
 {
@@ -25,6 +26,7 @@ void CLuaElementDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("getElementPosition", GetElementPosition);
     CLuaCFunctions::AddFunction("getElementRotation", GetElementRotation);
     CLuaCFunctions::AddFunction("getElementVelocity", GetElementVelocity);
+    CLuaCFunctions::AddFunction("getElementAngularVelocity", GetElementTurnVelocity);
     CLuaCFunctions::AddFunction("getElementType", GetElementType);
     CLuaCFunctions::AddFunction("getElementChildren", GetElementChildren);
     CLuaCFunctions::AddFunction("getElementChild", GetElementChild);
@@ -36,6 +38,7 @@ void CLuaElementDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("isElementWithinColShape", IsElementWithinColShape);
     CLuaCFunctions::AddFunction("isElementWithinMarker", IsElementWithinMarker);
     CLuaCFunctions::AddFunction("getElementsWithinColShape", GetElementsWithinColShape);
+    CLuaCFunctions::AddFunction("getElementsWithinRange", GetElementsWithinRange);
     CLuaCFunctions::AddFunction("getElementDimension", GetElementDimension);
     CLuaCFunctions::AddFunction("getElementBoundingBox", GetElementBoundingBox);
     CLuaCFunctions::AddFunction("getElementRadius", GetElementRadius);
@@ -69,11 +72,12 @@ void CLuaElementDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("setElementID", SetElementID);
     CLuaCFunctions::AddFunction("setElementParent", SetElementParent);
     CLuaCFunctions::AddFunction("setElementData", SetElementData);
-    // CLuaCFunctions::AddFunction ( "removeElementData", RemoveElementData ); TODO Clientside
+    // CLuaCFunctions::AddFunction("removeElementData", RemoveElementData); TODO Clientside
     CLuaCFunctions::AddFunction("setElementMatrix", SetElementMatrix);
     CLuaCFunctions::AddFunction("setElementPosition", SetElementPosition);
     CLuaCFunctions::AddFunction("setElementRotation", SetElementRotation);
     CLuaCFunctions::AddFunction("setElementVelocity", SetElementVelocity);
+    CLuaCFunctions::AddFunction("setElementAngularVelocity", SetElementAngularVelocity);
     CLuaCFunctions::AddFunction("setElementInterior", SetElementInterior);
     CLuaCFunctions::AddFunction("setElementDimension", SetElementDimension);
     CLuaCFunctions::AddFunction("attachElements", AttachElements);
@@ -128,17 +132,19 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getChildrenCount", "getElementChildrenCount");
     lua_classfunction(luaVM, "getID", "getElementID");
     lua_classfunction(luaVM, "getParent", "getElementParent");
-    lua_classfunction(luaVM, "getBoundingBox", "getElementBoundingBox");
+    lua_classfunction(luaVM, "getBoundingBox", OOP_GetElementBoundingBox);
     lua_classfunction(luaVM, "getPosition", OOP_GetElementPosition);
     lua_classfunction(luaVM, "getRotation", OOP_GetElementRotation);
     lua_classfunction(luaVM, "getMatrix", OOP_GetElementMatrix);
     lua_classfunction(luaVM, "getVelocity", OOP_GetElementVelocity);
+    lua_classfunction(luaVM, "getAngularVelocity", OOP_GetElementTurnVelocity);
     lua_classfunction(luaVM, "getByType", "getElementsByType");
     lua_classfunction(luaVM, "getDistanceFromCentreOfMassToBaseOfModel", "getElementDistanceFromCentreOfMassToBaseOfModel");
     lua_classfunction(luaVM, "getRadius", "getElementRadius");
     lua_classfunction(luaVM, "getType", "getElementType");
     lua_classfunction(luaVM, "getInterior", "getElementInterior");
     lua_classfunction(luaVM, "getWithinColShape", "getElementsWithinColShape");
+    lua_classfunction(luaVM, "getWithinRange", "getElementsWithinRange");
     lua_classfunction(luaVM, "getDimension", "getElementDimension");
     lua_classfunction(luaVM, "getColShape", "getElementColShape");
     lua_classfunction(luaVM, "getAlpha", "getElementAlpha");
@@ -158,6 +164,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setRotation", OOP_SetElementRotation);
     lua_classfunction(luaVM, "setMatrix", "setElementMatrix");
     lua_classfunction(luaVM, "setVelocity", "setElementVelocity");
+    lua_classfunction(luaVM, "setAngularVelocity", "setElementAngularVelocity");
     lua_classfunction(luaVM, "setInterior", "setElementInterior");
     lua_classfunction(luaVM, "setDimension", "setElementDimension");
     lua_classfunction(luaVM, "setAlpha", "setElementAlpha");
@@ -197,10 +204,12 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "distanceFromCentreOfMassToBaseOfModel", NULL, "getElementDistanceFromCentreOfMassToBaseOfModel");
     lua_classvariable(luaVM, "radius", NULL, "getElementRadius");
     lua_classvariable(luaVM, "childrenCount", NULL, "getElementChildrenCount");
+    lua_classvariable(luaVM, "boundingBox", NULL, OOP_GetElementBoundingBox);
     lua_classvariable(luaVM, "position", SetElementPosition, OOP_GetElementPosition);
     lua_classvariable(luaVM, "rotation", OOP_SetElementRotation, OOP_GetElementRotation);
     lua_classvariable(luaVM, "matrix", SetElementMatrix, OOP_GetElementMatrix);
     lua_classvariable(luaVM, "velocity", SetElementVelocity, OOP_GetElementVelocity);
+    lua_classvariable(luaVM, "angularVelocity", SetElementAngularVelocity, OOP_GetElementTurnVelocity);
     lua_classvariable(luaVM, "isElement", NULL, "isElement");
     // TODO: Support element data: player.data["age"] = 1337; <=> setElementData(player, "age", 1337)
 
@@ -610,6 +619,56 @@ int CLuaElementDefs::OOP_GetElementVelocity(lua_State* luaVM)
     return 1;
 }
 
+int CLuaElementDefs::GetElementTurnVelocity(lua_State* luaVM)
+{
+    // Verify the argument
+    CClientEntity*   pEntity = NULL;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+
+    if (!argStream.HasErrors())
+    {
+        // Grab the turn velocity
+        CVector vecTurnVelocity;
+        if (CStaticFunctionDefinitions::GetElementTurnVelocity(*pEntity, vecTurnVelocity))
+        {
+            // Return it
+            lua_pushnumber(luaVM, vecTurnVelocity.fX);
+            lua_pushnumber(luaVM, vecTurnVelocity.fY);
+            lua_pushnumber(luaVM, vecTurnVelocity.fZ);
+            return 3;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::OOP_GetElementTurnVelocity(lua_State* luaVM)
+{
+    CClientEntity* pEntity = NULL;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+
+    if (!argStream.HasErrors())
+    {
+        CVector vecTurnVelocity;
+        CStaticFunctionDefinitions::GetElementTurnVelocity(*pEntity, vecTurnVelocity);
+
+        lua_pushvector(luaVM, vecTurnVelocity);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaElementDefs::GetElementType(lua_State* luaVM)
 {
     // Check the arg type
@@ -928,6 +987,45 @@ int CLuaElementDefs::GetElementsWithinColShape(lua_State* luaVM)
     return 1;
 }
 
+int CLuaElementDefs::GetElementsWithinRange(lua_State* luaVM)
+{
+    CVector position;
+    float   radius;
+    SString elementType;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadVector3D(position);
+    argStream.ReadNumber(radius);
+    argStream.ReadString(elementType, "");
+
+    if (!argStream.HasErrors())
+    {
+        // Query the spatial database
+        CClientEntityResult result;
+        GetClientSpatialDatabase()->SphereQuery(result, CSphere{ position, radius });
+
+        lua_newtable(luaVM);
+        unsigned int index = 0;
+
+        for (CClientEntity* entity : result)
+        {
+            if ((elementType.empty() || elementType == entity->GetTypeName()) && !entity->IsBeingDeleted())
+            {
+                lua_pushnumber(luaVM, ++index);
+                lua_pushelement(luaVM, entity);
+                lua_settable(luaVM, -3);
+            }
+        }
+
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaElementDefs::GetElementDimension(lua_State* luaVM)
 {
     // Verify the argument
@@ -949,6 +1047,44 @@ int CLuaElementDefs::GetElementDimension(lua_State* luaVM)
             unsigned short usDimension = pEntity->GetDimension();
             lua_pushnumber(luaVM, usDimension);
             return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
+{
+    CClientEntity*   pEntity;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+
+    if (!argStream.HasErrors())
+    {
+        // Grab the bounding box and return it
+        CVector vecMin, vecMax;
+        if (CStaticFunctionDefinitions::GetElementBoundingBox(*pEntity, vecMin, vecMax))
+        {
+            if (!MinClientReqCheck(argStream, MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP))
+            {
+                lua_pushnumber(luaVM, vecMin.fX);
+                lua_pushnumber(luaVM, vecMin.fY);
+                lua_pushnumber(luaVM, vecMin.fZ);
+                lua_pushnumber(luaVM, vecMax.fX);
+                lua_pushnumber(luaVM, vecMax.fY);
+                lua_pushnumber(luaVM, vecMax.fZ);
+                return 6;
+            }
+            else
+            {
+                lua_pushvector(luaVM, vecMin);
+                lua_pushvector(luaVM, vecMax);
+                return 2;
+            }           
         }
     }
     else
@@ -1847,6 +1983,33 @@ int CLuaElementDefs::SetElementVelocity(lua_State* luaVM)
     {
         // Set the velocity
         if (CStaticFunctionDefinitions::SetElementVelocity(*pEntity, vecVelocity))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::SetElementAngularVelocity(lua_State* luaVM)
+{
+    CClientEntity* pEntity;
+    CVector        vecTurnVelocity;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+    argStream.ReadVector3D(vecTurnVelocity);
+
+    // Verify the arguments
+    if (!argStream.HasErrors())
+    {
+        // Set the turn velocity
+        if (CStaticFunctionDefinitions::SetElementAngularVelocity(*pEntity, vecTurnVelocity))
         {
             lua_pushboolean(luaVM, true);
             return 1;

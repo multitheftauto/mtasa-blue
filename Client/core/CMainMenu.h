@@ -11,14 +11,13 @@
 
 class CMainMenu;
 
-#ifndef __CMAINMENU_H
-#define __CMAINMENU_H
+#pragma once
 
 #include "CCore.h"
 #include "CQuickConnect.h"
 #include "CQuestionBox.h"
-#include <Serverbrowser/CServerBrowser.h>
-#include <Serverbrowser/CServerInfo.h>
+#include <ServerBrowser/CServerBrowser.h>
+#include <ServerBrowser/CServerInfo.h>
 #include "CSettings.h"
 #include "CCredits.h"
 #include <Graphics/CGraphics.h>
@@ -71,6 +70,7 @@ public:
     bool HasStarted(void) { return m_bStarted; };
 
     void SetNewsHeadline(int iIndex, const SString& strHeadline, const SString& strDate, bool bIsNew);
+    void ReloadNews();
     void OnEscapePressedOffLine(void);
 
     static void StaticWantsToDisconnectCallBack(void* pData, uint uiButton);
@@ -192,5 +192,3 @@ private:
         MENU_ITEM_QUIT,
     };
 };
-
-#endif

@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CBuildingSA::CBuildingSA(CBuildingSAInterface *objectInterface)
+CBuildingSA::CBuildingSA(CBuildingSAInterface* objectInterface)
 {
     DEBUG_TRACE("CBuildingSA::CBuildingSA(CBuildingSAInterface * objectInterface)");
     this->SetInterface(objectInterface);
@@ -67,7 +67,7 @@ CBuildingSA::CBuildingSA(DWORD dwModel)
         call    dwFunc
     }*/
 
-    CWorldSA *world = (CWorldSA *)pGame->GetWorld();
+    CWorldSA* world = (CWorldSA*)pGame->GetWorld();
     // world->Add(this->GetInterface());
     // this->GetInterface()->bIsStatic = true;
 
@@ -107,7 +107,7 @@ CBuildingSA::CBuildingSA(DWORD dwModel)
         mov     dwThis, eax
     }
 
-    this->SetInterface((CEntitySAInterface *)dwThis);
+    this->SetInterface((CEntitySAInterface*)dwThis);
 
     // DWORD * Index = (DWORD *)0xBCC0D8;
     MemPutFast<DWORD>(0xBCC0E0, dwThis);
@@ -160,7 +160,7 @@ CBuildingSA::~CBuildingSA()
     {
         DWORD dwInterface = (DWORD)this->GetInterface();
 
-        CWorldSA *world = (CWorldSA *)pGame->GetWorld();
+        CWorldSA* world = (CWorldSA*)pGame->GetWorld();
         world->Remove(this->GetInterface(), CBuilding_Destructor);
 
         DWORD dwThis = (DWORD)this->GetInterface();

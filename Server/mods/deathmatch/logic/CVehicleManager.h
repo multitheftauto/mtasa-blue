@@ -11,8 +11,7 @@
 
 class CVehicleManager;
 
-#ifndef __CVEHICLEMANAGER_H
-#define __CVEHICLEMANAGER_H
+#pragma once
 
 #include "CVehicle.h"
 #include "CVehicleColorManager.h"
@@ -72,5 +71,3 @@ private:
     list<CVehicle*> m_List;
     list<CVehicle*> m_RespawnEnabledVehicles;
 };
-
-#endif

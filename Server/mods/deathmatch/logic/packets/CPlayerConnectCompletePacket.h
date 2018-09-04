@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CPLAYERCONNECTCOMPLETEPACKET_H
-#define __PACKETS_CPLAYERCONNECTCOMPLETEPACKET_H
+#pragma once
 
 #include "CPacket.h"
 
@@ -22,5 +21,3 @@ public:
 
     bool Write(NetBitStreamInterface& BitStream) const;
 };
-
-#endif

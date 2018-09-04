@@ -11,8 +11,7 @@
 
 class CHandlingManager;
 
-#ifndef __CHANDLINGMANAGER_H
-#define __CHANDLINGMANAGER_H
+#pragma once
 
 #include "CHandlingEntry.h"
 
@@ -52,5 +51,3 @@ private:
 
     SFixedArray<bool, HT_MAX> m_bModelHandlingChanged;
 };
-
-#endif

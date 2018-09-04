@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CVEHICLEDAMAGESYNCPACKET_H
-#define __PACKETS_CVEHICLEDAMAGESYNCPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include "../CVehicle.h"
@@ -32,5 +31,3 @@ public:
     ElementID          m_Vehicle;
     SVehicleDamageSync m_damage;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CProjectileSYNCPACKET_H
-#define __CProjectileSYNCPACKET_H
+#pragma once
 
 #include "CPacket.h"
 #include <CVector.h>
@@ -37,5 +36,3 @@ public:
     CVector        m_vecMoveSpeed;
     unsigned short m_usModel;
 };
-
-#endif

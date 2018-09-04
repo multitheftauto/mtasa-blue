@@ -21,9 +21,9 @@ class CObject;
 class CPickup
 {
 public:
-    virtual CObject *GetObject() = 0;
-    virtual VOID     SetPosition(CVector *vecPosition) = 0;
-    virtual CVector *GetPosition(CVector *vecPosition) = 0;
+    virtual CObject* GetObject() = 0;
+    virtual VOID     SetPosition(CVector* vecPosition) = 0;
+    virtual CVector* GetPosition(CVector* vecPosition) = 0;
 
     virtual ePickupType  GetType() = 0;
     virtual VOID         SetType(ePickupType type) = 0;
@@ -47,6 +47,6 @@ public:
 };
 
 // not used
-typedef BOOL (*CBPickup)(CPickup *);
+typedef BOOL (*CBPickup)(CPickup*);
 
 #endif

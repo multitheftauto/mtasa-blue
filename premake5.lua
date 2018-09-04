@@ -16,9 +16,14 @@ GLIBC_COMPAT = os.getenv("GLIBC_COMPAT") == "true"
 
 workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
+
 	platforms { "x86", "x64"}
-	targetprefix ("")
-	
+	if os.host() == "macosx" then
+		removeplatforms { "x86" }
+	end
+
+	targetprefix ""
+
 	location "Build"
 	startproject "Client Launcher"
 	

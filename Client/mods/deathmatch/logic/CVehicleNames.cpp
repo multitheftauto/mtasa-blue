@@ -12,7 +12,7 @@
 
 using namespace std;
 
-const char* szVehicleNameEmpty = "";
+const char* const szVehicleNameEmpty = "";
 
 struct SVehicleName
 {

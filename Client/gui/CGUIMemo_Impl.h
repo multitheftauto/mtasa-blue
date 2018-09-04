@@ -29,6 +29,7 @@ public:
 
     float GetVerticalScrollPosition(void);
     void  SetVerticalScrollPosition(float fPosition);
+    float GetMaxVerticalScrollPosition(void);
     float GetScrollbarDocumentSize(void);
     float GetScrollbarPageSize(void);
 

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __PACKETS_CCAMERASYNCPACKET_H
-#define __PACKETS_CCAMERASYNCPACKET_H
+#pragma once
 
 #include "../CCommon.h"
 #include "CPacket.h"
@@ -28,5 +27,3 @@ public:
     CVector   m_vecPosition, m_vecLookAt;
     ElementID m_TargetID;
 };
-
-#endif

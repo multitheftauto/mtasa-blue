@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CVEHICLECOLORMANAGER_H
-#define __CVEHICLECOLORMANAGER_H
+#pragma once
 
 #include <list>
 
@@ -40,5 +39,3 @@ public:
 private:
     SFixedArray<CVehicleColors, 212> m_Colors;
 };
-
-#endif

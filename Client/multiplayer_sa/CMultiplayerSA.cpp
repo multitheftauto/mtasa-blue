@@ -17,6 +17,7 @@
 #include "..\game_sa\CBuildingSA.h"
 #include "..\game_sa\CPedSA.h"
 #include "..\game_sa\common.h"
+
 extern CCoreInterface* g_pCore;
 extern CMultiplayerSA* pMultiplayer;
 
@@ -147,10 +148,14 @@ DWORD RETURN_CPlantMgr_Render_fail = 0x5DBDAA;
 #define HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse   0x4BA06F
 DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse = 0x4BA076;
 
+#define HOOKPOS_CAnimBlendNode_GetCurrentTranslation        0x4CFC50
+#define HOOKPOS_CAnimBlendAssociation_SetCurrentTime        0x4CEA80
+#define HOOKPOS_RpAnimBlendClumpUpdateAnimations            0x4D34F0
+#define HOOKPOS_CAnimBlendAssoc_destructor                  0x4CECF0
+#define HOOKPOS_CAnimBlendAssocGroup_CopyAnimation          0x4CE14C
 #define HOOKPOS_CAnimManager_AddAnimation                   0x4d3aa0
-DWORD RETURN_CAnimManager_AddAnimation = 0x4D3AAA;
-#define HOOKPOS_CAnimManager_BlendAnimation                 0x4D4610
-DWORD RETURN_CAnimManager_BlendAnimation = 0x4D4617;
+#define HOOKPOS_CAnimManager_AddAnimationAndSync            0x4D3B30
+#define HOOKPOS_CAnimManager_BlendAnimation_Hierarchy       0x4D453E
 
 #define HOOKPOS_CPed_GetWeaponSkill                         0x5e3b60
 DWORD RETURN_CPed_GetWeaponSkill = 0x5E3B68;
@@ -349,8 +354,6 @@ PostWorldProcessHandler*    m_pPostWorldProcessHandler = NULL;
 IdleHandler*                m_pIdleHandler = NULL;
 PreFxRenderHandler*         m_pPreFxRenderHandler = NULL;
 PreHudRenderHandler*        m_pPreHudRenderHandler = NULL;
-AddAnimationHandler*        m_pAddAnimationHandler = NULL;
-BlendAnimationHandler*      m_pBlendAnimationHandler = NULL;
 ProcessCollisionHandler*    m_pProcessCollisionHandler = NULL;
 VehicleCollisionHandler*    m_pVehicleCollisionHandler = NULL;
 HeliKillHandler*            m_pHeliKillHandler = NULL;
@@ -412,8 +415,14 @@ void HOOK_RenderScene_Plants();
 void HOOK_RenderScene_end();
 void HOOK_CPlantMgr_Render();
 void HOOK_CEventHandler_ComputeKnockOffBikeResponse();
+void HOOK_CAnimBlendNode_GetCurrentTranslation();
+void HOOK_CAnimBlendAssociation_SetCurrentTime();
+void HOOK_RpAnimBlendClumpUpdateAnimations();
+void HOOK_CAnimBlendAssoc_destructor();
 void HOOK_CAnimManager_AddAnimation();
-void HOOK_CAnimManager_BlendAnimation();
+void HOOK_CAnimManager_AddAnimationAndSync();
+void HOOK_CAnimBlendAssocGroup_CopyAnimation();
+void HOOK_CAnimManager_BlendAnimation_Hierarchy();
 void HOOK_CPed_GetWeaponSkill();
 void HOOK_CPed_AddGogglesModel();
 void HOOK_CPhysical_ProcessCollisionSectorList();
@@ -627,8 +636,14 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CGame_Process, (DWORD)HOOK_CGame_Process, 10);
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10);
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7);
+    HookInstall(HOOKPOS_CAnimBlendNode_GetCurrentTranslation, (DWORD)HOOK_CAnimBlendNode_GetCurrentTranslation, 5);
+    HookInstall(HOOKPOS_CAnimBlendAssociation_SetCurrentTime, (DWORD)HOOK_CAnimBlendAssociation_SetCurrentTime, 8);
+    HookInstall(HOOKPOS_RpAnimBlendClumpUpdateAnimations, (DWORD)HOOK_RpAnimBlendClumpUpdateAnimations, 8);
+    HookInstall(HOOKPOS_CAnimBlendAssoc_destructor, (DWORD)HOOK_CAnimBlendAssoc_destructor, 6);
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
-    HookInstall(HOOKPOS_CAnimManager_BlendAnimation, (DWORD)HOOK_CAnimManager_BlendAnimation, 7);
+    HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
+    HookInstall(HOOKPOS_CAnimBlendAssocGroup_CopyAnimation, (DWORD)HOOK_CAnimBlendAssocGroup_CopyAnimation, 5);
+    HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8);
     HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
     HookInstall(HOOKPOS_CPhysical_ProcessCollisionSectorList, (DWORD)HOOK_CPhysical_ProcessCollisionSectorList, 7);
@@ -2184,16 +2199,6 @@ void CMultiplayerSA::SetPreHudRenderHandler(PreHudRenderHandler* pHandler)
     m_pPreHudRenderHandler = pHandler;
 }
 
-void CMultiplayerSA::SetAddAnimationHandler(AddAnimationHandler* pHandler)
-{
-    m_pAddAnimationHandler = pHandler;
-}
-
-void CMultiplayerSA::SetBlendAnimationHandler(BlendAnimationHandler* pHandler)
-{
-    m_pBlendAnimationHandler = pHandler;
-}
-
 void CMultiplayerSA::SetProcessCollisionHandler(ProcessCollisionHandler* pHandler)
 {
     m_pProcessCollisionHandler = pHandler;
@@ -2881,11 +2886,11 @@ void _declspec(naked) HOOK_FxManager_CreateFxSystem()
         // Restore the registers
         popad
 
-            // Put the new vector back onto the stack
+        // Put the new vector back onto the stack
         mov         eax, pNewCreateFxSystem_Matrix
         mov         [esp+12], eax
 
-            // The original code we replaced
+        // The original code we replaced
         mov         eax, [esp+16]
         mov         edx, [esp+8]
 
@@ -2920,7 +2925,7 @@ void _declspec(naked) HOOK_FxManager_DestroyFxSystem()
         // Restore the registers
         popad
 
-            // The original code we replaced
+        // The original code we replaced
         push        ecx
         push        ebx
         push        edi
@@ -3845,7 +3850,7 @@ void CMultiplayerSA::RebuildMultiplayerPlayer(CPed* player)
     TIMING_CHECKPOINT("-RebuldMulplrPlr");
 }
 
-void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled)
+void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled)
 {
     if (bEnabled)
     {
@@ -3855,9 +3860,18 @@ void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled)
     {
         MemPutFast<BYTE>(0xC402B8, 0);
     }
+    if (bNoiseEnabled)
+    {
+        BYTE originalCodes[5] = {0xE8, 0xD3, 0xE8, 0xFF, 0xFF};
+        MemCpy((void*)0x704EE8, &originalCodes, 5);
+    }
+    else
+    {
+        MemSet((void*)0x704EE8, 0x90, 5);
+    }
 }
 
-void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled)
+void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled)
 {
     if (bEnabled)
     {
@@ -3866,6 +3880,15 @@ void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled)
     else
     {
         MemPutFast<BYTE>(0xC402B9, 0);
+    }
+    if (bNoiseEnabled)
+    {
+        BYTE originalCodes[5] = {0xE8, 0x62, 0xE8, 0xFF, 0xFF};
+        MemCpy((void*)0x704F59, &originalCodes, 5);
+    }
+    else
+    {
+        MemSet((void*)0x704F59, 0x90, 5);
     }
 }
 
@@ -5238,66 +5261,6 @@ void _declspec(naked) HOOK_CEventHandler_ComputeKnockOffBikeResponse()
     }
 }
 
-RpClump*     animationClump = NULL;
-AssocGroupId animationGroup = 0;
-AnimationId  animationID = 0;
-void _declspec(naked) HOOK_CAnimManager_AddAnimation()
-{
-    _asm
-    {
-        mov     eax, [esp+4]
-        mov     animationClump, eax
-        mov     eax, [esp+8]
-        mov     animationGroup, eax
-        mov     eax, [esp+12]
-        mov     animationID, eax
-        pushad
-    }
-
-    if (m_pAddAnimationHandler)
-    {
-        m_pAddAnimationHandler(animationClump, animationGroup, animationID);
-    }
-
-    _asm
-    {
-        popad
-        mov     eax,dword ptr [esp+0Ch]
-        mov     edx,dword ptr ds:[0B4EA34h]
-        jmp     RETURN_CAnimManager_AddAnimation
-    }
-}
-
-float animationBlendDelta;
-void _declspec(naked) HOOK_CAnimManager_BlendAnimation()
-{
-    _asm
-    {
-        mov     eax, [esp+4]
-        mov     animationClump, eax
-        mov     eax, [esp+8]
-        mov     animationGroup, eax
-        mov     eax, [esp+12]
-        mov     animationID, eax
-        mov     eax, [esp+16]
-        mov     animationBlendDelta, eax
-        pushad
-    }
-
-    if (m_pBlendAnimationHandler)
-    {
-        m_pBlendAnimationHandler(animationClump, animationGroup, animationID, animationBlendDelta);
-    }
-
-    _asm
-    {
-        popad
-        sub     esp,14h
-        mov     ecx,dword ptr [esp+18h]
-        jmp     RETURN_CAnimManager_BlendAnimation
-    }
-}
-
 CPedSAInterface* weaponSkillPed;
 eWeaponType      weaponSkillWeapon;
 BYTE             weaponSkill;
@@ -6634,7 +6597,7 @@ eRadioStationID dwStationID = UNKNOWN;
 BYTE            bTrackID = 0;
 DWORD           dwNumberOfTracks = 0;
 
-DWORD pTrackNumbers[] = {
+const DWORD pTrackNumbers[] = {
     0x2,             // radio off, somewhere 2 is subtracted from this so that's why it's 2
     0xB,             // playback fm
     0xF,             // k-rose

@@ -116,6 +116,8 @@ struct SShaderReplacementStats
 
 class __declspec(novtable) CGame
 {
+    typedef std::unique_ptr<CAnimBlendAssocGroup> AssocGroup_type;
+
 public:
     virtual CPools*                   GetPools() = 0;
     virtual CPlayerInfo*              GetPlayerInfo() = 0;
@@ -140,7 +142,6 @@ public:
     virtual CAudioEngine*             GetAudioEngine() = 0;
     virtual CAEAudioHardware*         GetAEAudioHardware() = 0;
     virtual CAESoundManager*          GetAESoundManager() = 0;
-    virtual CAudioEngine*             GetAudio() = 0;
     virtual CAudioContainer*          GetAudioContainer() = 0;
     virtual CMenuManager*             GetMenuManager() = 0;
     virtual CText*                    GetText() = 0;

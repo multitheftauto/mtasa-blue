@@ -33,10 +33,9 @@ CPlayer::CPlayer(CPlayerManager* pPlayerManager, class CScriptDebugging* pScript
     m_usMTAVersion = 0;
     m_usBitStreamVersion = 0;
     m_bIsMuted = false;
+    m_bIsJoined = false;
     m_lMoney = 0;
     m_bNametagColorOverridden = false;
-
-    m_iStatus = STATUS_CONNECTED;
 
     m_fRotation = 0.0f;
     m_fAimDirection = 0.0f;
@@ -183,7 +182,7 @@ void CPlayer::Unlink(void)
 
 void CPlayer::DoPulse(void)
 {
-    if (GetStatus() == STATUS_JOINED)
+    if (IsJoined())
     {
         if (m_pPlayerTextManager != NULL)
             m_pPlayerTextManager->Process();
@@ -203,12 +202,6 @@ void CPlayer::DoPulse(void)
 
 void CPlayer::SetNick(const char* szNick)
 {
-    if (!m_strNick.empty() && m_strNick != szNick)
-    {
-        // If changing, add the new name to the whowas list
-        g_pGame->GetConsole()->GetWhoWas()->Add(szNick, inet_addr(GetSourceIP()), GetSerial(), GetPlayerVersion(), GetAccount()->GetName());
-    }
-
     m_strNick.AssignLeft(szNick, MAX_PLAYER_NICK_LENGTH);
 }
 

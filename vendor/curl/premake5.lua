@@ -17,13 +17,16 @@ project "curl"
 		"lib/amigaos.c",
 		"lib/amigaos.h",
 		"lib/config-amigaos.h",
+		"lib/config-dos.h",
 		"lib/config-mac.h",
 		"lib/config-os400.h",
 		"lib/config-riscos.h",
 		"lib/config-symbian.h",
 		"lib/config-tpf.h",
 		"lib/config-win32ce.h",
-		"lib/setup-os400.h"
+		"lib/config-vxworks.h",
+		"lib/setup-os400.h",
+		"lib/setup-vms.h"
 	}
 
 	filter { "system:windows" }

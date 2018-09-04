@@ -44,6 +44,7 @@ public:
     static bool SetClipboard(SString& strText);
     static bool GetClipboard(SString& strText);
     static bool SetWindowFlashing(bool flash, uint count);
+    static bool ClearChatBox(void);
 
     // Notification funcs
     static bool CreateTrayNotification(SString strText, eTrayIconType eType, bool useSound);
@@ -58,6 +59,7 @@ public:
     static bool           GetElementPosition(CClientEntity& Entity, CVector& vecPosition);
     static bool           GetElementRotation(CClientEntity& Entity, CVector& vecRotation, eEulerRotationOrder rotationOrder);
     static bool           GetElementVelocity(CClientEntity& Entity, CVector& vecVelocity);
+    static bool           GetElementTurnVelocity(CClientEntity& Entity, CVector& vecTurnVelocity);
     static bool           GetElementInterior(CClientEntity& Entity, unsigned char& ucInterior);
     static bool           GetElementBoundingBox(CClientEntity& Entity, CVector& vecMin, CVector& vecMax);
     static bool           GetElementRadius(CClientEntity& Entity, float& fRadius);
@@ -87,6 +89,7 @@ public:
     static bool          SetElementPosition(CClientEntity& Entity, const CVector& vecPosition, bool bWarp = true);
     static bool          SetElementRotation(CClientEntity& Entity, const CVector& vecRotation, eEulerRotationOrder rotationOrder, bool bNewWay);
     static bool          SetElementVelocity(CClientEntity& Element, const CVector& vecVelocity);
+    static bool          SetElementAngularVelocity(CClientEntity& Element, const CVector& vecTurnVelocity);
     static bool          SetElementParent(CClientEntity& Element, CClientEntity& Parent, CLuaMain* pLuaMain);
     static bool          SetElementInterior(CClientEntity& Entity, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition);
     static bool          SetElementDimension(CClientEntity& Entity, unsigned short usDimension);
@@ -164,9 +167,10 @@ public:
     static bool GivePedWeapon(CClientEntity& Entity, uchar ucWeaponID, ushort usWeaponAmmo, bool bSetAsCurrent);
     static bool SetPedRotation(CClientEntity& Entity, float fRotation, bool bNewWay);
     static bool SetPedCanBeKnockedOffBike(CClientEntity& Entity, bool bCanBeKnockedOffBike);
-    static bool SetPedAnimation(CClientEntity& Entity, const char* szBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
-                                bool bInterruptable, bool bFreezeLastFrame);
+    static bool SetPedAnimation(CClientEntity& Entity, const SString& strBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop,
+                                bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame);
     static bool SetPedAnimationProgress(CClientEntity& Entity, const SString& strAnimName, float fProgress);
+    static bool SetPedAnimationSpeed(CClientEntity& Entity, const SString& strAnimName, float fSpeed);
     static bool SetPedMoveAnim(CClientEntity& Entity, unsigned int iMoveAnim);
     static bool AddPedClothes(CClientEntity& Entity, const char* szTexture, const char* szModel, unsigned char ucType);
     static bool RemovePedClothes(CClientEntity& Entity, unsigned char ucType);
@@ -218,6 +222,8 @@ public:
     static bool            GetVehicleNitroLevel(CClientVehicle& Vehicle, float& fLevel);
     static bool            GetHeliBladeCollisionsEnabled(CClientVehicle& Vehicle);
     static bool            IsVehicleWindowOpen(CClientVehicle& Vehicle, uchar ucWindow);
+    static bool            SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
+    static bool            GetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
 
     // Vehicle set functions
     static bool FixVehicle(CClientEntity& Entity);
@@ -307,6 +313,8 @@ public:
 
     // Fire funcs
     static bool CreateFire(CVector& vecPosition, float fSize);
+    static bool ExtinguishFireInRadius(CVector& vecPosition, float fRadius);
+    static bool ExtinguishAllFires();
 
     // Light funcs
     static CClientPointLights* CreateLight(CResource& Resource, int iMode, const CVector& vecPosition, float fRadius, SColor color, CVector& vecDirection);
@@ -458,6 +466,7 @@ public:
 
     static void GUIMemoSetReadOnly(CClientEntity& Element, bool bFlag);
     static void GUIMemoSetCaretIndex(CClientEntity& Element, unsigned int iCaret);
+    static void GUIMemoSetVerticalScrollPosition(CClientEntity& Element, float fPosition);
 
     static void                GUIGridListSetSortingEnabled(CClientEntity& Element, bool bEnabled);
     static inline unsigned int GUIGridListAddColumn(CClientGUIElement& GUIElement, const char* szTitle, float fWidth)
@@ -743,9 +752,22 @@ public:
     static bool              GetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned int& uiValue);
     static bool              GetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned char& ucValue);
     static bool              GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, float& fValue);
+    static bool              GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, CVector& vecValue);
     static bool              GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string& strValue);
     static bool              GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int& uiValue);
     static bool              GetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char& ucValue);
+    static bool              ResetVehicleHandling(CClientVehicle* pVehicle);
+    static bool              ResetVehicleHandlingProperty(CClientVehicle* pVehicle, eHandlingProperty eProperty);
+    static bool              SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, float fValue);
+    static bool              SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, CVector vecValue);
+    static bool              SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, std::string strValue);
+    static bool              SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned int uiValue);
+    static bool              SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned char ucValue);
+    static bool              SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, float fValue);
+    static bool              SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, CVector vecValue);
+    static bool              SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, std::string strValue);
+    static bool              SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int uiValue);
+    static bool              SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char ucValue);
 
     // Version funcs
     static unsigned long GetVersion();

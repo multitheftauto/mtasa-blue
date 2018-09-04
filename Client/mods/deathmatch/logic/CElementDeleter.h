@@ -9,31 +9,28 @@
  *
  *****************************************************************************/
 
-#ifndef __CELEMENTDELETER_H
-#define __CELEMENTDELETER_H
+#pragma once
 
+#include <memory>
 #include <list>
 
 class CElementDeleter
 {
 public:
-    CElementDeleter(void);
-    ~CElementDeleter(void) { DoDeleteAll(); };
+    CElementDeleter();
+    ~CElementDeleter() { DoDeleteAll(); };
 
     void Delete(class CClientEntity* pElement);
     void DeleteRecursive(class CClientEntity* pElement);
-
-    void DoDeleteAll(void);
-
+    void DoDeleteAll();
     bool IsBeingDeleted(class CClientEntity* pElement);
-
     void Unreference(class CClientEntity* pElement);
-
     void CleanUpForVM(CLuaMain* pLuaMain);
 
 private:
+    void DoDeleteAllSmartPointers();
+
     CMappedList<class CClientEntity*> m_List;
     bool                              m_bAllowUnreference;
+    CMappedList<class CClientEntity*> m_ListRawSmartPointer;
 };
-
-#endif

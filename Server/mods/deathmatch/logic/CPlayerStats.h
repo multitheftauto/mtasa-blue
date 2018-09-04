@@ -11,8 +11,7 @@
 
 class CPlayerStats;
 
-#ifndef __CPLAYERSTATS_H
-#define __CPLAYERSTATS_H
+#pragma once
 
 #include <vector>
 using namespace std;
@@ -37,5 +36,3 @@ public:
 private:
     vector<sStat*> m_List;
 };
-
-#endif

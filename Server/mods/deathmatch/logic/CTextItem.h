@@ -11,8 +11,7 @@
 
 class CTextItem;
 
-#ifndef __CTEXTITEM_H
-#define __CTEXTITEM_H
+#pragma once
 
 #include <CVector2D.h>
 #include "CTextDisplay.h"
@@ -78,5 +77,3 @@ private:
     void RemoveObserver(CTextDisplay* pObserver) { m_Observers.remove(pObserver); };
     void NotifyObservers(void);
 };
-
-#endif

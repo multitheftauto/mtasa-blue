@@ -36,13 +36,13 @@ static CWaterManager*        m_pWaterManager;
 static CCustomWeaponManager* m_pCustomWeaponManager;
 
 // Used to run a function on all the children of the elements too
-#define RUN_CHILDREN( func ) \
-    if ( pElement->CountChildren () && pElement->IsCallPropagationEnabled() ) \
+#define RUN_CHILDREN(func) \
+    if (pElement->CountChildren() && pElement->IsCallPropagationEnabled()) \
     { \
         CElementListSnapshot* pList = pElement->GetChildrenListSnapshot(); \
-        pList->AddRef();    /* Keep list alive during use */ \
-        for ( CElementListSnapshot::const_iterator iter = pList->begin() ; iter != pList->end() ; iter++ ) \
-            if ( !(*iter)->IsBeingDeleted() ) \
+        pList->AddRef(); /* Keep list alive during use */ \
+        for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++) \
+            if (!(*iter)->IsBeingDeleted()) \
                 func; \
         pList->Release(); \
     }
@@ -1225,6 +1225,26 @@ bool CStaticFunctionDefinitions::GetElementVelocity(CElement* pElement, CVector&
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetElementTurnVelocity(CElement* pElement, CVector& vecTurnVelocity)
+{
+    assert(pElement);
+
+    int iType = pElement->GetType();
+    switch (iType)
+    {
+        case CElement::VEHICLE:
+        {
+            CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+            vecTurnVelocity = pVehicle->GetTurnSpeed();
+
+            break;
+        }
+        default:
+            return false;
+    }
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetElementMatrix(CElement* pElement, const CMatrix& matrix)
 {
     RUN_CHILDREN(SetElementMatrix(*iter, matrix))
@@ -1377,6 +1397,46 @@ bool CStaticFunctionDefinitions::SetElementVelocity(CElement* pElement, const CV
     BitStream.pBitStream->Write(vecVelocity.fY);
     BitStream.pBitStream->Write(vecVelocity.fZ);
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_VELOCITY, *BitStream.pBitStream));
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetElementAngularVelocity(CElement* pElement, const CVector& vecTurnVelocity)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetElementAngularVelocity(*iter, vecTurnVelocity))
+
+    int iType = pElement->GetType();
+    switch (iType)
+    {
+        case CElement::PED:
+        case CElement::PLAYER:
+        {
+            // TODO
+            break;
+        }
+        case CElement::VEHICLE:
+        {
+            CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+            pVehicle->SetTurnSpeed(vecTurnVelocity);
+
+            break;
+        }
+        case CElement::OBJECT:
+        case CElement::WEAPON:
+        {
+            // Don't store velocity serverside (requires potentially needless additional sizeof(CVector) bytes per object)
+            break;
+        }
+        default:
+            return false;
+    }
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(vecTurnVelocity.fX);
+    BitStream.pBitStream->Write(vecTurnVelocity.fY);
+    BitStream.pBitStream->Write(vecTurnVelocity.fZ);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_ANGULAR_VELOCITY, *BitStream.pBitStream));
 
     return true;
 }
@@ -3863,6 +3923,10 @@ bool CStaticFunctionDefinitions::GivePedJetPack(CElement* pElement)
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned() && !pPed->GetOccupiedVehicle() && !pPed->HasJetPack())
         {
+            // Remove choking state
+            if (pPed->IsChoking())
+                pPed->SetChoking(false);
+
             pPed->SetHasJetPack(true);
 
             CBitStream BitStream;
@@ -3890,6 +3954,28 @@ bool CStaticFunctionDefinitions::RemovePedJetPack(CElement* pElement)
 
             CBitStream BitStream;
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, REMOVE_PED_JETPACK, *BitStream.pBitStream));
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetPedWearingJetpack(CElement* pElement, bool bJetPack)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetPedWearingJetpack(*iter, bJetPack))
+
+    if (IS_PED(pElement))
+    {
+        CPed* pPed = static_cast<CPed*>(pElement);
+        if (pPed->IsSpawned() && bJetPack != pPed->HasJetPack())
+        {
+            pPed->SetHasJetPack(bJetPack);
+
+            CBitStream BitStream;
+            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, bJetPack ? GIVE_PED_JETPACK : REMOVE_PED_JETPACK, *BitStream.pBitStream));
 
             return true;
         }
@@ -3992,6 +4078,10 @@ bool CStaticFunctionDefinitions::SetPedChoking(CElement* pElement, bool bChoking
                 // Not already (not) choking?
                 if (bChoking != pPed->IsChoking())
                 {
+                    // Remove jetpack now so it doesn't stay on (#9522#c25612)
+                    if (pPed->HasJetPack())
+                        pPed->SetHasJetPack(false);
+
                     pPed->SetChoking(bChoking);
 
                     CBitStream bitStream;
@@ -4203,6 +4293,14 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const char*
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned())
         {
+            // Remove jetpack now so it doesn't stay on (#9522#c25612)
+            if (pPed->HasJetPack())
+                pPed->SetHasJetPack(false);
+
+            // Remove choking state
+            if (pPed->IsChoking())
+                pPed->SetChoking(false);
+
             // TODO: save their animation?
 
             // Tell the players
@@ -4265,6 +4363,33 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, con
             return true;
         }
     }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CElement* pElement, const char* szAnimName, float fSpeed)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetPedAnimationSpeed(*iter, szAnimName, fSpeed))
+
+        if (IS_PED(pElement))
+        {
+            CPed* pPed = static_cast<CPed*>(pElement);
+            if (pPed->IsSpawned() && szAnimName)
+            {
+                CBitStream BitStream;
+                if (szAnimName)
+                {
+                    unsigned char ucAnimSize = (unsigned char)strlen(szAnimName);
+
+                    BitStream.pBitStream->Write(ucAnimSize);
+                    BitStream.pBitStream->Write(szAnimName, ucAnimSize);
+                    BitStream.pBitStream->Write(fSpeed);
+                }
+                m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION_SPEED, *BitStream.pBitStream));
+
+                return true;
+            }
+        }
     return false;
 }
 
@@ -4903,7 +5028,7 @@ bool CStaticFunctionDefinitions::GetVehicleName(CVehicle* pVehicle, SString& str
 bool CStaticFunctionDefinitions::GetVehicleNameFromModel(unsigned short usModel, SString& strOutName)
 {
     strOutName = CVehicleNames::GetVehicleName(usModel);
-    return true;
+    return !strOutName.empty();
 }
 
 CPed* CStaticFunctionDefinitions::GetVehicleOccupant(CVehicle* pVehicle, unsigned int uiSeat)
@@ -6657,6 +6782,34 @@ bool CStaticFunctionDefinitions::SetVehicleIdleRespawnDelay(CElement* pElement, 
         return true;
     }
 
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetVehicleRespawnRotation(CElement* pElement, CVector& vecRotation)
+{
+    assert(pElement);
+
+    if (IS_VEHICLE(pElement))
+    {
+        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+        vecRotation = pVehicle->GetRespawnRotationDegrees();
+
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetVehicleRespawnPosition(CElement* pElement, CVector& vecPosition)
+{
+    assert(pElement);
+
+    if (IS_VEHICLE(pElement))
+    {
+        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+        vecPosition = pVehicle->GetRespawnPosition();
+
+        return true;
+    }
     return false;
 }
 
@@ -9055,12 +9208,12 @@ bool CStaticFunctionDefinitions::SetTeamFriendlyFire(CTeam* pTeam, bool bFriendl
     return false;
 }
 
-CWater* CStaticFunctionDefinitions::CreateWater(CResource* pResource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4)
+CWater* CStaticFunctionDefinitions::CreateWater(CResource* pResource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow)
 {
     if (!pV1 || !pV2 || !pV3)
         return NULL;
 
-    CWater* pWater = m_pWaterManager->Create(pV4 ? CWater::QUAD : CWater::TRIANGLE, pResource->GetDynamicElementRoot());
+    CWater* pWater = m_pWaterManager->Create(pV4 ? CWater::QUAD : CWater::TRIANGLE, pResource->GetDynamicElementRoot(), NULL, bShallow);
 
     if (pWater)
     {
@@ -9830,6 +9983,21 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
         m_pMapManager->GetRootElement()->CallEvent("onChatMessage", Arguments);
     }
 
+    return false;
+}
+
+bool CStaticFunctionDefinitions::ClearChatBox(CElement* pElement)
+{
+    assert(pElement);
+
+    RUN_CHILDREN(ClearChatBox(*iter))
+
+    if (IS_PLAYER(pElement))
+    {
+        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
+        pPlayer->Send(CChatClearPacket());
+        return true;
+    }
     return false;
 }
 
@@ -10914,6 +11082,21 @@ bool CStaticFunctionDefinitions::GetAccountsBySerial(const SString& strSerial, s
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetAccountID(CAccount* pAccount, int& ID)
+{
+    bool bRegistered = pAccount->IsRegistered();
+    if (bRegistered)
+        ID = pAccount->GetID();
+
+    return bRegistered;
+}
+
+bool CStaticFunctionDefinitions::GetAccountByID(int ID, CAccount*& outAccount)
+{
+    outAccount = m_pAccountManager->GetAccountByID(ID);
+    return true;
+}
+
 bool CStaticFunctionDefinitions::GetAccountIP(CAccount* pAccount, SString& strIP)
 {
     bool bRegistered = pAccount->IsRegistered();
@@ -11012,9 +11195,8 @@ bool CStaticFunctionDefinitions::RemoveAccount(CAccount* pAccount)
 bool CStaticFunctionDefinitions::SetAccountName(CAccount* pAccount, SString strNewName, bool bAllowCaseVariations, SString& strOutError)
 {
     assert(pAccount);
-    assert(!strNewName.empty());
 
-    if (pAccount->IsRegistered())
+    if (!strNewName.empty() && pAccount->IsRegistered())
     {
         // Check for case variations if not allowed
         if (!bAllowCaseVariations)
@@ -11047,9 +11229,8 @@ bool CStaticFunctionDefinitions::SetAccountName(CAccount* pAccount, SString strN
 bool CStaticFunctionDefinitions::SetAccountPassword(CAccount* pAccount, SString strPassword, CAccountPassword::EAccountPasswordType ePasswordType)
 {
     assert(pAccount);
-    assert(!strPassword.empty());
 
-    if (pAccount->IsRegistered())
+    if (!strPassword.empty() && pAccount->IsRegistered())
     {
         if ((ePasswordType == CAccountPassword::PLAINTEXT && CAccountManager::IsValidNewPassword(strPassword)) ||
             (ePasswordType == CAccountPassword::MD5 && strPassword.length() == 32) ||

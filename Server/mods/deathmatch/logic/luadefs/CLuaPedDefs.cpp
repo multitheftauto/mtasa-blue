@@ -30,7 +30,7 @@ void CLuaPedDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("getPedTotalAmmo", GetPedTotalAmmo);
     CLuaCFunctions::AddFunction("getPedWeapon", GetPedWeapon);
     CLuaCFunctions::AddFunction("getPedClothes", GetPedClothes);
-    CLuaCFunctions::AddFunction("doesPedHaveJetPack", DoesPedHaveJetPack);
+    CLuaCFunctions::AddFunction("isPedWearingJetpack", DoesPedHaveJetPack); // introduced in 1.5.5-9.13846
     CLuaCFunctions::AddFunction("isPedOnGround", IsPedOnGround);
     CLuaCFunctions::AddFunction("getPedFightingStyle", GetPedFightingStyle);
     CLuaCFunctions::AddFunction("getPedWalkingStyle", GetPedMoveAnim);
@@ -52,8 +52,7 @@ void CLuaPedDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("setPedStat", SetPedStat);
     CLuaCFunctions::AddFunction("addPedClothes", AddPedClothes);
     CLuaCFunctions::AddFunction("removePedClothes", RemovePedClothes);
-    CLuaCFunctions::AddFunction("givePedJetPack", GivePedJetPack);
-    CLuaCFunctions::AddFunction("removePedJetPack", RemovePedJetPack);
+    CLuaCFunctions::AddFunction("setPedWearingJetpack", SetPedWearingJetpack); // introduced in 1.5.5-9.13846
     CLuaCFunctions::AddFunction("setPedFightingStyle", SetPedFightingStyle);
     CLuaCFunctions::AddFunction("setPedWalkingStyle", SetPedMoveAnim);
     CLuaCFunctions::AddFunction("setPedGravity", SetPedGravity);
@@ -63,6 +62,7 @@ void CLuaPedDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("setPedDoingGangDriveby", SetPedDoingGangDriveby);
     CLuaCFunctions::AddFunction("setPedAnimation", SetPedAnimation);
     CLuaCFunctions::AddFunction("setPedAnimationProgress", SetPedAnimationProgress);
+    CLuaCFunctions::AddFunction("setPedAnimationSpeed", SetPedAnimationSpeed);
     CLuaCFunctions::AddFunction("setPedOnFire", SetPedOnFire);
     CLuaCFunctions::AddFunction("setPedHeadless", SetPedHeadless);
     CLuaCFunctions::AddFunction("setPedFrozen", SetPedFrozen);
@@ -95,19 +95,19 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "removeClothes", "removePedClothes");
     lua_classfunction(luaVM, "removeFromVehicle", "removePedFromVehicle");
     lua_classfunction(luaVM, "removeJetPack", "removePedJetPack");
-    lua_classfunction(luaVM, "doesHaveJetpack", "doesPedHaveJetPack");
+    lua_classfunction(luaVM, "doesHaveJetpack", "doesPedHaveJetPack"); // deprecated in 1.5.5-9.13846
 
     lua_classfunction(luaVM, "isDead", "isPedDead");
     lua_classfunction(luaVM, "isDucked", "isPedDucked");
     lua_classfunction(luaVM, "isInWater", "isPedInWater");
     lua_classfunction(luaVM, "isOnGround", "isPedOnGround");
     lua_classfunction(luaVM, "isInVehicle", "isPedInVehicle");
-
     lua_classfunction(luaVM, "isOnFire", "isPedOnFire");
     lua_classfunction(luaVM, "isChoking", "isPedChoking");
     lua_classfunction(luaVM, "isDoingGangDriveby", "isPedDoingGangDriveby");
     lua_classfunction(luaVM, "isFrozen", "isPedFrozen");
     lua_classfunction(luaVM, "isHeadless", "isPedHeadless");
+    lua_classfunction(luaVM, "isWearingJetpack", "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
 
     lua_classfunction(luaVM, "getArmor", "getPedArmor");
     lua_classfunction(luaVM, "getFightingStyle", "getPedFightingStyle");
@@ -115,7 +115,6 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getStat", "getPedStat");
     lua_classfunction(luaVM, "getWeaponSlot", "getPedWeaponSlot");
     lua_classfunction(luaVM, "getWalkingStyle", "getPedWalkingStyle");
-
     lua_classfunction(luaVM, "getAmmoInClip", "getPedAmmoInClip");
     lua_classfunction(luaVM, "getOccupiedVehicle", "getPedOccupiedVehicle");
     lua_classfunction(luaVM, "getWeapon", "getPedWeapon");
@@ -136,9 +135,10 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setStat", "setPedStat");
     lua_classfunction(luaVM, "setWeaponSlot", "setPedWeaponSlot");
     lua_classfunction(luaVM, "setWalkingStyle", "setPedWalkingStyle");
-
     lua_classfunction(luaVM, "setAnimation", "setPedAnimation");
     lua_classfunction(luaVM, "setAnimationProgress", "setPedAnimationProgress");
+    lua_classfunction(luaVM, "setAnimationSpeed", "setPedAnimationSpeed");
+    lua_classfunction(luaVM, "setWearingJetpack", "setPedWearingJetpack");            // introduced in 1.5.5-9.13846
 
     lua_classvariable(luaVM, "inVehicle", NULL, "isPedInVehicle");
     lua_classvariable(luaVM, "ducked", NULL, "isPedDucked");
@@ -160,12 +160,10 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
                       GetPedOccupiedVehicle);                            // what about removePedFromVehicle?
     lua_classvariable(luaVM, "dead", "killPed", "isPedDead");            // Setting this to any value will still kill the ped. Should we special case this?
     lua_classvariable(luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle");
+    lua_classvariable(luaVM, "jetpack", "setPedWearingJetpack", "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
     // lua_classvariable ( luaVM, "stats", "setPedStat", "getPedStat", CLuaOOPDefs::SetPedStat, CLuaOOPDefs::GetPedStat ); // table
     // lua_classvariable ( luaVM, "controlState", "setPedControlState", "getPedControlState", CLuaOOPDefs::SetPedControlState, CLuaOOPDefs::GetPedControlState
     // ); // TODO: .controlState["control"] = value
-    // This commented code will syntax error, a new method has to be implemented to support this
-    // lua_classvariable ( luaVM, "jetpack", {"removePedJetPack","givePedJetPack}, "doesPedHaveJetPack", CLuaOOPDefs::SetJetpackActive, "doesPedHaveJetPack" );
-    // // very specialised!
 
     lua_registerclass(luaVM, "Ped", "Element");
 }
@@ -468,6 +466,35 @@ int CLuaPedDefs::SetPedAnimationProgress(lua_State* luaVM)
         {
             lua_pushboolean(luaVM, true);
             return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPedDefs::SetPedAnimationSpeed(lua_State* luaVM)
+{
+    CElement* pElement;
+    SString   strAnimName;
+    float     fSpeed;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadString(strAnimName, "");
+    argStream.ReadNumber(fSpeed, 1.0f);
+
+    if (!argStream.HasErrors())
+    {
+        if (!strAnimName.empty() && fSpeed >= 0.0f && fSpeed <= 1.0f)
+        {
+            if (CStaticFunctionDefinitions::SetPedAnimationSpeed(pElement, strAnimName, fSpeed))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
         }
     }
     else
@@ -1226,6 +1253,32 @@ int CLuaPedDefs::RemovePedJetPack(lua_State* luaVM)
         LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
 
         if (CStaticFunctionDefinitions::RemovePedJetPack(pElement))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPedDefs::SetPedWearingJetpack(lua_State* luaVM)
+{
+    CElement* pElement;
+    bool      bJetPack;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadBool(bJetPack);
+
+    if (!argStream.HasErrors())
+    {
+        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+
+        if (CStaticFunctionDefinitions::SetPedWearingJetpack(pElement, bJetPack))
         {
             lua_pushboolean(luaVM, true);
             return 1;

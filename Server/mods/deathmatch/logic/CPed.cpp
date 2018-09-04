@@ -181,7 +181,20 @@ bool CPed::ReadSpecialData(void)
         return false;
     }
 
-    GetCustomDataFloat("health", m_fHealth, true);
+    if (GetCustomDataFloat("health", m_fHealth, true))
+    {
+        // Limit it to 0-100 (we can assume max health is 100 because they can't change stats here)
+        if (m_fHealth > 100)
+            m_fHealth = 100;
+        else if (m_fHealth < 0)
+            m_fHealth = 0;
+    }
+    else
+    {
+        // Set health to 100 if not defined
+        m_fHealth = 100.0f;
+    }
+
     GetCustomDataFloat("armor", m_fArmor, true);
 
     if (GetCustomDataInt("interior", iTemp, true))

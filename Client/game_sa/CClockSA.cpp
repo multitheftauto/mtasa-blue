@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-extern CGameSA *pGame;
+extern CGameSA* pGame;
 
 VOID CClockSA::Set(BYTE bHour, BYTE bMinute)
 {
@@ -24,9 +24,9 @@ VOID CClockSA::Set(BYTE bHour, BYTE bMinute)
     }
 }
 
-VOID CClockSA::Get(BYTE *bHour, BYTE *bMinute)
+VOID CClockSA::Get(BYTE* bHour, BYTE* bMinute)
 {
     DEBUG_TRACE("VOID CClockSA::Get ( BYTE * bHour, BYTE * bMinute )");
-    *bMinute = *(BYTE *)VAR_TimeMinutes;
-    *bHour = *(BYTE *)VAR_TimeHours;
+    *bMinute = *(BYTE*)VAR_TimeMinutes;
+    *bHour = *(BYTE*)VAR_TimeHours;
 }

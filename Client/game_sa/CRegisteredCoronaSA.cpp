@@ -11,19 +11,19 @@
 
 #include "StdInc.h"
 
-CRegisteredCoronaSA::CRegisteredCoronaSA(CRegisteredCoronaSAInterface *coronaInterface)
+CRegisteredCoronaSA::CRegisteredCoronaSA(CRegisteredCoronaSAInterface* coronaInterface)
 {
     DEBUG_TRACE("CRegisteredCoronaSA::CRegisteredCoronaSA(CRegisteredCoronaSAInterface * coronaInterface)");
     internalInterface = coronaInterface;
 }
 
-CVector *CRegisteredCoronaSA::GetPosition()
+CVector* CRegisteredCoronaSA::GetPosition()
 {
     DEBUG_TRACE("CVector * CRegisteredCoronaSA::GetPosition()");
     return &internalInterface->Coordinates;
 }
 
-VOID CRegisteredCoronaSA::SetPosition(CVector *vector)
+VOID CRegisteredCoronaSA::SetPosition(CVector* vector)
 {
     DEBUG_TRACE("VOID CRegisteredCoronaSA::SetPosition(CVector * vector)");
     MemCpyFast(&internalInterface->Coordinates, vector, sizeof(CVector));
@@ -75,7 +75,7 @@ VOID CRegisteredCoronaSA::SetColor(BYTE Red, BYTE Green, BYTE Blue, BYTE Alpha)
     internalInterface->FadedIntensity = Alpha;
 }
 
-VOID CRegisteredCoronaSA::SetTexture(RwTexture *texture)
+VOID CRegisteredCoronaSA::SetTexture(RwTexture* texture)
 {
     DEBUG_TRACE("VOID CRegisteredCoronaSA::SetTexture(RwTexture * texture)");
     internalInterface->pTex = texture;
@@ -84,8 +84,8 @@ VOID CRegisteredCoronaSA::SetTexture(RwTexture *texture)
 VOID CRegisteredCoronaSA::SetTexture(eCoronaType texture)
 {
     DEBUG_TRACE("VOID CRegisteredCoronaSA::SetTexture(eCoronaType texture)");
-    CCoronasSA *coronas = ((CCoronasSA *)pGame->GetCoronas());
-    RwTexture * tex = coronas->GetTexture(texture);
+    CCoronasSA* coronas = ((CCoronasSA*)pGame->GetCoronas());
+    RwTexture*  tex = coronas->GetTexture(texture);
     if (tex)
         internalInterface->pTex = tex;
 }

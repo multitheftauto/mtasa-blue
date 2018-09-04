@@ -13,8 +13,7 @@
 
 class CLuaModuleManager;
 
-#ifndef __CLUAMODULEMANAGER_H
-#define __CLUAMODULEMANAGER_H
+#pragma once
 
 #include "CLuaMain.h"
 #include "ILuaModuleManager.h"
@@ -49,5 +48,3 @@ private:
     CLuaManager*      m_pLuaManager;
     list<CLuaModule*> m_Modules;
 };
-
-#endif

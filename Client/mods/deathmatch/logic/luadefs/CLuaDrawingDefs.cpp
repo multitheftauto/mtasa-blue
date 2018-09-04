@@ -21,8 +21,11 @@ void CLuaDrawingDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("dxDrawLine3D", DxDrawLine3D);
     CLuaCFunctions::AddFunction("dxDrawText", DxDrawText);
     CLuaCFunctions::AddFunction("dxDrawRectangle", DxDrawRectangle);
+    CLuaCFunctions::AddFunction("dxDrawCircle", DxDrawCircle);
     CLuaCFunctions::AddFunction("dxDrawImage", DxDrawImage);
     CLuaCFunctions::AddFunction("dxDrawImageSection", DxDrawImageSection);
+    //CLuaCFunctions::AddFunction("dxDrawPrimitive", DxDrawPrimitive);
+    //CLuaCFunctions::AddFunction("dxDrawMaterialPrimitive", DxDrawMaterialPrimitive);
     CLuaCFunctions::AddFunction("dxGetTextWidth", DxGetTextWidth);
     CLuaCFunctions::AddFunction("dxGetFontHeight", DxGetFontHeight);
     CLuaCFunctions::AddFunction("dxCreateFont", DxCreateFont);
@@ -206,6 +209,7 @@ int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
     CClientMaterial* pMaterial;
     float            fWidth;
     SColor           color;
+    bool             bPostGUI;
     CVector          vecFaceToward;
     bool             bUseFaceToward = false;
 
@@ -215,6 +219,7 @@ int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
     argStream.ReadUserData(pMaterial);
     argStream.ReadNumber(fWidth);
     argStream.ReadColor(color, 0xFFFFFFFF);
+    argStream.ReadIfNextIsBool(bPostGUI, false);
     if (argStream.NextIsVector3D())
     {
         argStream.ReadVector3D(vecFaceToward);
@@ -224,7 +229,7 @@ int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         g_pCore->GetGraphics()->DrawMaterialLine3DQueued(vecBegin, vecEnd, fWidth, color, pMaterial->GetMaterialItem(), 0, 0, 1, 1, true, bUseFaceToward,
-                                                         vecFaceToward);
+                                                         vecFaceToward, bPostGUI);
         lua_pushboolean(luaVM, true);
         return 1;
     }
@@ -248,6 +253,7 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
     CClientMaterial* pMaterial;
     float            fWidth;
     SColor           color;
+    bool             bPostGUI;
     CVector          vecFaceToward;
     bool             bUseFaceToward = false;
 
@@ -259,6 +265,7 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
     argStream.ReadUserData(pMaterial);
     argStream.ReadNumber(fWidth);
     argStream.ReadColor(color, 0xFFFFFFFF);
+    argStream.ReadIfNextIsBool(bPostGUI, false);
     if (argStream.NextIsVector3D())
     {
         argStream.ReadVector3D(vecFaceToward);
@@ -268,7 +275,7 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         g_pCore->GetGraphics()->DrawMaterialLine3DQueued(vecBegin, vecEnd, fWidth, color, pMaterial->GetMaterialItem(), vecSectionPos.fX, vecSectionPos.fY,
-                                                         vecSectionSize.fX, vecSectionSize.fY, false, bUseFaceToward, vecFaceToward);
+                                                         vecSectionSize.fX, vecSectionSize.fY, false, bUseFaceToward, vecFaceToward, bPostGUI);
         lua_pushboolean(luaVM, true);
         return 1;
     }
@@ -398,6 +405,70 @@ int CLuaDrawingDefs::DxDrawRectangle(lua_State* luaVM)
     return 1;
 }
 
+int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
+{
+    CVector2D vecPosition;
+    float     fRadius;
+    float     fStartAngle;
+    float     fStopAngle;
+    SColor    color;
+    SColor    colorCenter;
+    short     siSegments;
+    float     fRatio;
+    bool      bPostGUI;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadVector2D(vecPosition);
+    argStream.ReadNumber(fRadius);
+    argStream.ReadNumber(fStartAngle, 0);
+    argStream.ReadNumber(fStopAngle, 360);
+    argStream.ReadColor(color, 0xFFFFFFFF);
+    argStream.ReadColor(colorCenter, color);
+    argStream.ReadNumber(siSegments, 32);
+    argStream.ReadNumber(fRatio, 1);
+    argStream.ReadBool(bPostGUI, false);
+
+    if (!argStream.HasErrors())
+    {
+        const short siMinimumSegments = 3;
+        const short siMaximumSegments = 1024;
+        if (siSegments >= siMinimumSegments && siSegments <= siMaximumSegments)
+        {
+            const float fMinimumRatio = 0;
+            const float fMaximumRatio = 100;
+            if (fRatio > fMinimumRatio && fRatio <= fMaximumRatio)
+            {
+                if (fRadius > 0 && fStartAngle != fStopAngle)
+                {
+                    if (fStopAngle < fStartAngle)
+                        std::swap(fStopAngle, fStartAngle);
+
+                    g_pCore->GetGraphics()->DrawCircleQueued(vecPosition.fX, vecPosition.fY, fRadius, fStartAngle, fStopAngle, color, colorCenter, siSegments,
+                                                             fRatio, bPostGUI);
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+            }
+            else
+            {
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+        }
+        else
+        {
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaDrawingDefs::DxDrawImage(lua_State* luaVM)
 {
     //  bool dxDrawImage ( float posX, float posY, float width, float height, string filepath [, float rotation = 0, float rotationCenterOffsetX = 0,
@@ -477,6 +548,173 @@ int CLuaDrawingDefs::DxDrawImageSection(lua_State* luaVM)
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
+{
+    // bool dxDrawPrimitive (string primitiveType, bool postGUI, table vertice1, ...)
+    D3DPRIMITIVETYPE              primitiveType;
+    std::vector<PrimitiveVertice> vecVertices;
+    bool                          bPostGUI;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadEnumString(primitiveType);
+    argStream.ReadBool(bPostGUI);
+
+    while (argStream.NextIsTable())
+    {
+        std::vector<float> vecTableContent;
+        argStream.ReadNumberTable(vecTableContent);
+        switch (vecTableContent.size())
+        {
+            case 2:
+                vecVertices.push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], 0, (DWORD)0xFFFFFFFF});
+                break;
+            case 3:
+                vecVertices.push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(vecTableContent[2])});
+                break;
+        }
+    }
+
+    if (!argStream.HasErrors())
+    {
+        if (vecVertices.size() < 1)
+        {
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
+        switch (primitiveType)
+        {
+            case D3DPT_LINESTRIP:
+                if (vecVertices.size() < 2)
+                {
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+                break;
+            case D3DPT_LINELIST:
+                if (vecVertices.size() % 2 != 0)
+                {
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+                break;
+            case D3DPT_TRIANGLELIST:
+                if (vecVertices.size() % 3 != 0)
+                {
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+            case D3DPT_TRIANGLEFAN:
+            case D3DPT_TRIANGLESTRIP:
+                if (vecVertices.size() < 3)
+                {
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+                break;
+        }
+
+        g_pCore->GetGraphics()->DrawPrimitiveQueued(vecVertices, primitiveType, bPostGUI);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
+{
+    // bool dxDrawPrimitive (string primitiveType, dxMaterial material, bool postGUI, table vertice1, ...)
+    D3DPRIMITIVETYPE                      primitiveType;
+    std::vector<PrimitiveMaterialVertice> vecVertices;
+    CClientMaterial*                      pMaterialElement;
+    bool                                  bPostGUI;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadEnumString(primitiveType);
+    MixedReadMaterialString(argStream, pMaterialElement);
+    argStream.ReadBool(bPostGUI);
+
+    while (argStream.NextIsTable())
+    {
+        std::vector<float> vecTableContent;
+        argStream.ReadNumberTable(vecTableContent);
+        switch (vecTableContent.size())
+        {
+            case 4:
+                vecVertices.push_back(
+                    PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], 0, (DWORD)0xFFFFFFFF, vecTableContent[2], vecTableContent[3]});
+                break;
+            case 5:
+                vecVertices.push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(vecTableContent[2]),
+                                                               vecTableContent[3], vecTableContent[4]});
+                break;
+        }
+    }
+
+    if (!argStream.HasErrors())
+    {
+        if (pMaterialElement)
+        {
+            if (vecVertices.size() < 1)
+            {
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+
+            switch (primitiveType)
+            {
+                case D3DPT_LINESTRIP:
+                    if (vecVertices.size() < 2)
+                    {
+                        lua_pushboolean(luaVM, false);
+                        return 1;
+                    }
+                    break;
+                case D3DPT_LINELIST:
+                    if (vecVertices.size() % 2 != 0)
+                    {
+                        lua_pushboolean(luaVM, false);
+                        return 1;
+                    }
+                    break;
+                case D3DPT_TRIANGLELIST:
+                    if (vecVertices.size() % 3 != 0)
+                    {
+                        lua_pushboolean(luaVM, false);
+                        return 1;
+                    }
+                case D3DPT_TRIANGLEFAN:
+                case D3DPT_TRIANGLESTRIP:
+                    if (vecVertices.size() < 3)
+                    {
+                        lua_pushboolean(luaVM, false);
+                        return 1;
+                    }
+                    break;
+            }
+
+            g_pCore->GetGraphics()->DrawMaterialPrimitiveQueued(vecVertices, primitiveType, pMaterialElement->GetMaterialItem(), bPostGUI);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
 
     // Failed
     lua_pushboolean(luaVM, false);
