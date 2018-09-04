@@ -2378,7 +2378,7 @@ int CLuaVehicleDefs::SetVehicleRespawnRotation(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
-    argStream.ReadVector3D(vecRotation, CVector());
+    argStream.ReadVector3D(vecRotation);
 
     if (!argStream.HasErrors())
     {
