@@ -1159,7 +1159,45 @@ int CLuaDrawingDefs::DxSetShaderValue(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Try each mixed type in turn
-        if (argStream.NextIsUserData())
+        if (argStream.NextIsUserDataOfType<CLuaVector2D>())
+        {
+            CVector2D vecValue;
+            argStream.ReadVector2D(vecValue);
+
+            bool bResult = pShader->GetShaderItem()->SetValue(strName, &vecValue.fX, 2);
+            lua_pushboolean(luaVM, bResult);
+            return 1;
+        }
+        else if (argStream.NextIsUserDataOfType<CLuaVector3D>())
+        {
+            CVector vecValue;
+            argStream.ReadVector3D(vecValue);
+
+            bool bResult = pShader->GetShaderItem()->SetValue(strName, &vecValue.fX, 3);
+            lua_pushboolean(luaVM, bResult);
+            return 1;
+        }
+        else if (argStream.NextIsUserDataOfType<CLuaVector4D>())
+        {
+            CVector4D vecValue;
+            argStream.ReadVector4D(vecValue);
+
+            bool bResult = pShader->GetShaderItem()->SetValue(strName, &vecValue.fX, 4);
+            lua_pushboolean(luaVM, bResult);
+            return 1;
+        }
+        else if (argStream.NextIsUserDataOfType<CLuaMatrix>())
+        {
+            CMatrix matrix;
+            argStream.ReadMatrix(matrix);
+            float fBuffer[16];
+            matrix.GetBuffer(fBuffer);
+
+            bool bResult = pShader->GetShaderItem()->SetValue(strName, fBuffer, 16);
+            lua_pushboolean(luaVM, bResult);
+            return 1;
+        }
+        else if (argStream.NextIsUserData())
         {
             // Texture
             CClientTexture* pTexture;
