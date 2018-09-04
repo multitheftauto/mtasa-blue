@@ -236,14 +236,8 @@ std::int32_t CClientIFP::ReadSequenceVersion1(SAnim& Anim)
     RoundSize(Anim.Base.Size);
     ReadBytes(&Anim.Name, Anim.Base.Size);
 
-    std::int32_t iBoneID = eBoneType::UNKNOWN;
-    if (Anim.Base.Size == 0x2C)
-    {
-        iBoneID = Anim.Next;
-    }
-
     SString strBoneName = ConvertStringToKey(Anim.Name);
-    iBoneID = GetBoneIDFromName(strBoneName);
+    std::int32_t iBoneID = GetBoneIDFromName(strBoneName);
 
     SString strCorrectBoneName = GetCorrectBoneNameFromName(strBoneName);
     strncpy(Anim.Name, strCorrectBoneName, strCorrectBoneName.size() + 1);

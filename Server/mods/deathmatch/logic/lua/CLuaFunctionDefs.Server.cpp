@@ -136,9 +136,8 @@ int CLuaFunctionDefs::ClearChatBox(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (pElement)
+        if (CStaticFunctionDefinitions::ClearChatBox(pElement))
         {
-            CStaticFunctionDefinitions::ClearChatBox(pElement);
             lua_pushboolean(luaVM, true);
             return 1;
         }

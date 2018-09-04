@@ -4,10 +4,11 @@
 
 ;----------------------------------------
 ; In: ID = KB number
+;     BASENAME = KB filename without path or extention
 ;     URL = Download URL
-;     TEMPFILE = Temp filename to use
+;     TEMPFILE = Download filename to use
 ;----------------------------------------
-!macro __InstallKB ID URL TEMPFILE
+!macro __InstallKB ID BASENAME URL TEMPFILE
     Push $0
     ${IsKBInstalled} ${ID} $0
     ${If} $0 == 0
@@ -19,7 +20,7 @@
             DetailPrint "* $0"
             DetailPrint "* Installation continuing anyway"
         ${Else}
-            ${ExecInstallKB} ${ID} ${TEMPFILE}
+            ${ExecInstallKB} ${ID} ${BASENAME} ${TEMPFILE}
             ${IsKBInstalled} ${ID} $0
             ${If} $0 == 0
                 DetailPrint "* Some error occured installing ${ID}"
@@ -30,38 +31,37 @@
     ${EndIf}
     Pop $0
 !macroend
-!macro _InstallKB ID URL
-    !insertmacro __InstallKB ${ID} ${URL} "$TEMP\${ID}.msu"
+!macro _InstallKB ID BASENAME URL
+    !insertmacro __InstallKB ${ID} ${BASENAME} ${URL} "$TEMP\${BASENAME}.msu"
 !macroend
 !define InstallKB `!insertmacro _InstallKB`
 
 
 ;----------------------------------------
 ; Run KB installer
+; Uses technique described at http://dennisspan.com/slow-installation-of-msu-files-using-the-wusa-exe/
 ; In: ID = KB number
-;     FILENAME = KB file
+;     BASENAME = KB filename without path or extention
+;     MSUFILE = Full .msu filename
+;     BATFILE = Filename to use for temp .bat file
 ;----------------------------------------
-!macro _ExecInstallKB ID FILENAME
+!macro __ExecInstallKB ID BASENAME MSUFILE BATFILE
     Push $0
-    Push $1
     Push $R1
-    StrCpy $1 "$TEMP\RunMSU.bat"
-    FileOpen $0 $1 w
-    FileWrite $0 "@echo off$\r$\n"
-    FileWrite $0 "start $\"$\" wusa /quiet /norestart $\"${FILENAME}$\""
-    FileClose $0
-    ExecWait $1
-
-    ; Wait for wusa.exe to start
-    ${ProcessWait} wusa.exe 5000 $0
-
-    ; Wait for slui.exe (license warning) to start and terminate it
-    ${ProcessWait} slui.exe 4000 $0
-    ${TerminateProcess} slui.exe $0
+    Delete "$TEMP\${BASENAME}.cab"
+    ExecWait 'expand -f:* "${MSUFILE}" "$TEMP"'
     Sleep 500
-    ${TerminateProcess} slui.exe $0
 
-    ; Show progress while wusa.exe is running
+    FileOpen $0 ${BATFILE} w
+    FileWrite $0 "@echo off$\r$\n"
+    FileWrite $0 'start "" /WAIT /B "$WINDIR\system32\dism.exe" /online /norestart /add-package /packagepath:"$TEMP\${BASENAME}.cab"'
+    FileClose $0
+    ${DisableX64FSRedirection}
+    Exec ${BATFILE}
+    ${ProcessWait} dism.exe 5000 $0         ; Wait for dism.exe to start (5 sec timout)
+    BringToFront
+
+    ; Show progress while dism.exe is running
     DetailPrint ""
     StrCpy $R1 0
     ${Do}
@@ -71,15 +71,19 @@
             ${DetailUpdate} "Please wait..."
             DetailPrint "Working..."
         ${EndIf}
-        ${ProcessWaitClose} wusa.exe 1000 $0
+        ${ProcessWaitClose} dism.exe 1500 $0
         ${If} $0 > 0
             StrCpy $R1 100
         ${EndIf}
         ${DetailUpdate} "Installing ${ID}: $R1% done..."
-    ${LoopUntil} $0 > 0
+    ${LoopUntil} $R1 == 100
+
+    ${EnableX64FSRedirection}
     Pop $R1
-    Pop $1
     Pop $0
+!macroend
+!macro _ExecInstallKB ID BASENAME MSUFILE
+    !insertmacro __ExecInstallKB ${ID} ${BASENAME} ${MSUFILE} "$TEMP\RunMSU.bat"
 !macroend
 !define ExecInstallKB `!insertmacro _ExecInstallKB`
 

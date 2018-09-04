@@ -96,22 +96,13 @@
 // Handy self compile message
 #ifndef MTA_DM_CONNECT_FROM_PUBLIC
     #if defined(SHOW_SELF_COMPILE_WARNING) && !defined(CI_BUILD)
-        #ifdef WIN32
-            #pragma message("-------------------------------------------------------------------------")
-            #pragma message("MTASA_VERSION_TYPE is not set to VERSION_TYPE_RELEASE")
-            #pragma message("Server will not work with release clients")
-            #pragma message("-------------------------------------------------------------------------")
-            #pragma message("If you want the server to work with release clients,")
-            #pragma message("set MTASA_VERSION_TYPE to VERSION_TYPE_RELEASE in MTA10_Server/version.h")
-            #pragma message("-------------------------------------------------------------------------")
-        #else
-            #pragma message ("-------------------------------------------------------------------------")
-            #warning "MTASA_VERSION_TYPE is not set to VERSION_TYPE_RELEASE"
-            #warning "Server will not work with release clients"
-            #warning "-------------------------------------------------------------------------"
-            #warning "If you want the server to work with release clients,"
-            #warning "set MTASA_VERSION_TYPE to VERSION_TYPE_RELEASE in MTA10_Server/version.h"
-            #warning "-------------------------------------------------------------------------"
-        #endif
+        #pragma message("\n\
+----------------------------------------------------------------------\n\
+MTASA_VERSION_TYPE is not set to VERSION_TYPE_RELEASE\n\
+Server will not work with release clients\n\
+-------------------------------------------------------------------------\n\
+If you want the server to work with release clients\n\
+set MTASA_VERSION_TYPE to VERSION_TYPE_RELEASE in MTA10_Server/version.h\n\
+-------------------------------------------------------------------------")
     #endif
 #endif

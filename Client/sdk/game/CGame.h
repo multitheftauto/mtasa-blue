@@ -142,7 +142,6 @@ public:
     virtual CAudioEngine*             GetAudioEngine() = 0;
     virtual CAEAudioHardware*         GetAEAudioHardware() = 0;
     virtual CAESoundManager*          GetAESoundManager() = 0;
-    virtual CAudioEngine*             GetAudio() = 0;
     virtual CAudioContainer*          GetAudioContainer() = 0;
     virtual CMenuManager*             GetMenuManager() = 0;
     virtual CText*                    GetText() = 0;
@@ -168,7 +167,7 @@ public:
     virtual CPointLights*             GetPointLights() = 0;
 
     virtual CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
-    virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;
+    virtual CModelInfo*  GetModelInfo(DWORD dwModelID) = 0;
 
     virtual DWORD        GetSystemTime() = 0;
     virtual BOOL         IsAtMenu() = 0;

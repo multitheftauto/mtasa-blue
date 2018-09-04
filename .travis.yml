@@ -1,11 +1,10 @@
 language: cpp
 sudo: false
-dist: trusty
-
-git:
-  depth: 1
 
 matrix:
+  allow_failures:
+    - os: osx
+
   include:
     - compiler: gcc
       addons:

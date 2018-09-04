@@ -121,9 +121,6 @@ CResource::~CResource(void)
     g_pClientGame->GetElementDeleter()->DeleteRecursive(m_pResourceGUIEntity);
     m_pResourceGUIEntity = NULL;
 
-    // Deallocate all models that this resource allocated earlier
-    g_pClientGame->GetManager()->GetModelManager()->DeallocateModelsAllocatedByResource(this);
-
     // Undo all changes to water
     g_pGame->GetWaterManager()->UndoChanges(this);
 

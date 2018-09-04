@@ -2187,6 +2187,27 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CClientEntity& Entity, 
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CClientEntity& Entity, const SString& strAnimName, float fSpeed)
+{
+    RUN_CHILDREN(SetPedAnimationSpeed(**iter, strAnimName, fSpeed))
+
+        if (IS_PED(&Entity))
+        {
+            CClientPed& Ped = static_cast<CClientPed&>(Entity);
+            if (!strAnimName.empty())
+            {
+                auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(Ped.GetClump(), strAnimName);
+                if (pAnimAssociation)
+                {
+                    pAnimAssociation->SetCurrentSpeed(fSpeed);
+                    return true;
+                }
+            }
+        }
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetPedMoveAnim(CClientEntity& Entity, unsigned int iMoveAnim)
 {
     RUN_CHILDREN(SetPedMoveAnim(**iter, iMoveAnim))
@@ -2640,20 +2661,18 @@ CClientVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource& Resource, u
             CClientVehicleManager::GetRandomVariation(usModel, ucVariation, ucVariation2);
 
         CClientVehicle* pVehicle = new CDeathmatchVehicle(m_pManager, NULL, INVALID_ELEMENT_ID, usModel, ucVariation, ucVariation2);
-        if (pVehicle)
-        {
-            pVehicle->SetParent(Resource.GetResourceDynamicEntity());
-            pVehicle->SetPosition(vecPosition);
 
-            pVehicle->SetRotationDegrees(vecRotation);
-            if (szRegPlate)
-                pVehicle->SetRegPlate(szRegPlate);
+        pVehicle->SetParent(Resource.GetResourceDynamicEntity());
+        pVehicle->SetPosition(vecPosition);
 
-            return pVehicle;
-        }
+        pVehicle->SetRotationDegrees(vecRotation);
+        if (szRegPlate)
+            pVehicle->SetRegPlate(szRegPlate);
+
+        return pVehicle;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool CStaticFunctionDefinitions::FixVehicle(CClientEntity& Entity)
@@ -3717,17 +3736,15 @@ CClientObject* CStaticFunctionDefinitions::CreateObject(CResource& Resource, uns
 #else
         CClientObject* pObject = new CDeathmatchObject(m_pManager, m_pMovingObjectsManager, INVALID_ELEMENT_ID, usModelID, bLowLod);
 #endif
-        if (pObject)
-        {
-            pObject->SetParent(Resource.GetResourceDynamicEntity());
-            pObject->SetPosition(vecPosition);
-            pObject->SetRotationDegrees(vecRotation);
 
-            return pObject;
-        }
+        pObject->SetParent(Resource.GetResourceDynamicEntity());
+        pObject->SetPosition(vecPosition);
+        pObject->SetRotationDegrees(vecRotation);
+
+        return pObject;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool CStaticFunctionDefinitions::GetObjectScale(CClientObject& Object, CVector& vecScale)
@@ -3948,17 +3965,13 @@ CClientRadarArea* CStaticFunctionDefinitions::CreateRadarArea(CResource& Resourc
 {
     // Create it
     CClientRadarArea* pRadarArea = new CClientRadarArea(m_pManager, INVALID_ELEMENT_ID);
-    if (pRadarArea)
-    {
-        pRadarArea->SetParent(Resource.GetResourceDynamicEntity());
-        pRadarArea->SetPosition(vecPosition2D);
-        pRadarArea->SetSize(vecSize);
-        pRadarArea->SetColor(color);
 
-        return pRadarArea;
-    }
+    pRadarArea->SetParent(Resource.GetResourceDynamicEntity());
+    pRadarArea->SetPosition(vecPosition2D);
+    pRadarArea->SetSize(vecSize);
+    pRadarArea->SetColor(color);
 
-    return NULL;
+    return pRadarArea;
 }
 
 bool CStaticFunctionDefinitions::GetRadarAreaColor(CClientRadarArea* RadarArea, SColor& outColor)
@@ -4243,19 +4256,19 @@ bool CStaticFunctionDefinitions::ResetAmbientSounds(void)
 
 bool CStaticFunctionDefinitions::SetWorldSoundEnabled(uint uiGroup, uint uiIndex, bool bMute, bool bImmediate)
 {
-    g_pGame->GetAudio()->SetWorldSoundEnabled(uiGroup, uiIndex, bMute, bImmediate);
+    g_pGame->GetAudioEngine()->SetWorldSoundEnabled(uiGroup, uiIndex, bMute, bImmediate);
     return true;
 }
 
 bool CStaticFunctionDefinitions::IsWorldSoundEnabled(uint uiGroup, uint uiIndex, bool& bOutMute)
 {
-    bOutMute = g_pGame->GetAudio()->IsWorldSoundEnabled(uiGroup, uiIndex);
+    bOutMute = g_pGame->GetAudioEngine()->IsWorldSoundEnabled(uiGroup, uiIndex);
     return true;
 }
 
 bool CStaticFunctionDefinitions::ResetWorldSounds(void)
 {
-    g_pGame->GetAudio()->ResetWorldSounds();
+    g_pGame->GetAudioEngine()->ResetWorldSounds();
     return true;
 }
 
@@ -4300,14 +4313,13 @@ CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip(CResource& Resource, 
     if (CClientRadarMarkerManager::IsValidIcon(ucIcon) && ucSize <= 25)
     {
         CClientRadarMarker* pBlip = new CClientRadarMarker(m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance);
-        if (pBlip)
-        {
-            pBlip->SetParent(Resource.GetResourceDynamicEntity());
-            pBlip->SetPosition(vecPosition);
-            pBlip->SetSprite(ucIcon);
-            pBlip->SetScale(ucSize);
-            pBlip->SetColor(color);
-        }
+
+        pBlip->SetParent(Resource.GetResourceDynamicEntity());
+        pBlip->SetPosition(vecPosition);
+        pBlip->SetSprite(ucIcon);
+        pBlip->SetScale(ucSize);
+        pBlip->SetColor(color);
+
         return pBlip;
     }
 
@@ -4322,14 +4334,13 @@ CClientRadarMarker* CStaticFunctionDefinitions::CreateBlipAttachedTo(CResource& 
     if (CClientRadarMarkerManager::IsValidIcon(ucIcon) && ucSize <= 25)
     {
         CClientRadarMarker* pBlip = new CClientRadarMarker(m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance);
-        if (pBlip)
-        {
-            pBlip->SetParent(Resource.GetResourceDynamicEntity());
-            pBlip->AttachTo(&Entity);
-            pBlip->SetSprite(ucIcon);
-            pBlip->SetScale(ucSize);
-            pBlip->SetColor(color);
-        }
+
+        pBlip->SetParent(Resource.GetResourceDynamicEntity());
+        pBlip->AttachTo(&Entity);
+        pBlip->SetSprite(ucIcon);
+        pBlip->SetScale(ucSize);
+        pBlip->SetColor(color);
+
         return pBlip;
     }
 
@@ -9374,19 +9385,15 @@ CClientPointLights* CStaticFunctionDefinitions::CreateLight(CResource& Resource,
 {
     // Create it
     CClientPointLights* pLight = new CClientPointLights(m_pManager, INVALID_ELEMENT_ID);
-    if (pLight)
-    {
-        pLight->SetParent(Resource.GetResourceDynamicEntity());
-        pLight->SetMode(iMode);
-        pLight->SetPosition(vecPosition);
-        pLight->SetRadius(fRadius);
-        pLight->SetColor(color);
-        pLight->SetDirection(vecDirection);
 
-        return pLight;
-    }
+    pLight->SetParent(Resource.GetResourceDynamicEntity());
+    pLight->SetMode(iMode);
+    pLight->SetPosition(vecPosition);
+    pLight->SetRadius(fRadius);
+    pLight->SetColor(color);
+    pLight->SetDirection(vecDirection);
 
-    return NULL;
+    return pLight;
 }
 
 bool CStaticFunctionDefinitions::GetLightType(CClientPointLights* pLight, int& iMode)

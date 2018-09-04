@@ -227,11 +227,6 @@ public:
         return m_pAEAudioHardware;
     };
     CAESoundManager* GetAESoundManager() override { return m_pAESoundManager; }
-    CAudioEngine*    GetAudio()
-    {
-        DEBUG_TRACE("CAudio     * GetAudioEngine()");
-        return m_pAudioEngine;
-    };
     CAudioContainer* GetAudioContainer()
     {
         DEBUG_TRACE("CAudio     * GetAudioContainer()");
@@ -312,7 +307,7 @@ public:
     CFxManagerSA*       GetFxManagerSA() { return m_pFxManager; }
 
     CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
-    CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
+    CModelInfo*  GetModelInfo(DWORD dwModelID);
 
     DWORD GetSystemTime()
     {

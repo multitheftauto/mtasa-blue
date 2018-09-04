@@ -270,14 +270,20 @@ int CLuaCryptDefs::PasswordHash(lua_State* luaVM)
 
 int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
 {
-    //  bool passwordVerify(string password, string hash [, function callback])
+    //  bool passwordVerify(string password, string hash [, table options, function callback])
     SString         password;
     SString         hash;
+    CStringMap      options;
     CLuaFunctionRef luaFunctionRef;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(password);
     argStream.ReadString(hash);
+
+    if (argStream.NextIsTable())
+    {
+        argStream.ReadStringMap(options);
+    }
 
     if (argStream.NextIsFunction())
     {
@@ -287,8 +293,19 @@ int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (hash.BeginsWith("$2y$"))
+        // Is it bcrypt?
+        if (hash.BeginsWith("$2y$") || hash.BeginsWith("$2a$"))
         {
+            bool insecureBcrypt;
+            options.ReadBool("insecureBcrypt", insecureBcrypt, false);
+
+            if (hash.BeginsWith("$2a$") && !insecureBcrypt)
+            {
+                m_pScriptDebugging->LogWarning(luaVM, "Bcrypt 2a prefix is only supported if the 'insecureBcrypt' option is enabled. Consider upgrading to 2y");
+                lua_pushnil(luaVM);
+                return 1;
+            }
+
             // Sync
             if (luaFunctionRef == CLuaFunctionRef())
             {
@@ -327,7 +344,7 @@ int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
+    lua_pushnil(luaVM);
     return 1;
 }
 
