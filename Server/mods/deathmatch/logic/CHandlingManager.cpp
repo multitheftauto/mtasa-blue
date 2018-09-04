@@ -274,7 +274,7 @@ eHandlingTypes CHandlingManager::GetHandlingID(eVehicleTypes eModel)
         case VT_SEASPAR:
             return HT_SEASPAR;
         case VT_PIZZABOY:
-            return HT_MOPED;
+            return HT_PIZZABOY;
         case VT_TRAM:
             return HT_TRAM;
         case VT_ARTICT2:
@@ -302,7 +302,7 @@ eHandlingTypes CHandlingManager::GetHandlingID(eVehicleTypes eModel)
         case VT_PCJ600:
             return HT_BIKE;
         case VT_FAGGIO:
-            return HT_MOPED;
+            return HT_FAGGIO;
         case VT_FREEWAY:
             return HT_FREEWAY;
         case VT_RCBARON:
@@ -382,13 +382,13 @@ eHandlingTypes CHandlingManager::GetHandlingID(eVehicleTypes eModel)
         case VT_RCGOBLIN:
             return HT_RCGOBLIN;
         case VT_HOTRINA:
-            return HT_HOTRING;
+            return HT_HOTRINA;
         case VT_HOTRINB:
-            return HT_HOTRING;
+            return HT_HOTRINB;
         case VT_BLOODRA:
             return HT_BLOODRA;
         case VT_RNCHLURE:
-            return HT_RANCHER;
+            return HT_RNCHLURE;
         case VT_SUPERGT:
             return HT_SUPERGT;
         case VT_ELEGANT:
@@ -466,7 +466,7 @@ eHandlingTypes CHandlingManager::GetHandlingID(eVehicleTypes eModel)
         case VT_SADLER:
             return HT_SADLER;
         case VT_FIRELA:
-            return HT_FIRETRUK;
+            return HT_FIRELA;
         case VT_HUSTLER:
             return HT_HUSTLER;
         case VT_INTRUDER:
@@ -558,7 +558,7 @@ eHandlingTypes CHandlingManager::GetHandlingID(eVehicleTypes eModel)
         case VT_CLUB:
             return HT_CLUB;
         case VT_FREIBOX:
-            return HT_FREIFLAT;
+            return HT_FREIBOX;
         case VT_ARTICT3:
             return HT_ARTICT3;
         case VT_ANDROM:
@@ -586,9 +586,9 @@ eHandlingTypes CHandlingManager::GetHandlingID(eVehicleTypes eModel)
         case VT_PHOENIX:
             return HT_PHOENIX;
         case VT_GLENSHIT:
-            return HT_GLENDALE;
+            return HT_GLENSHIT;
         case VT_SADLSHIT:
-            return HT_SADLER;
+            return HT_SADLSHIT;
         case VT_BAGBOXA:
             return HT_BAGBOXA;
         case VT_BAGBOXB:
@@ -8173,4 +8173,292 @@ void CHandlingManager::InitializeDefaultHandlings(void)
     m_OriginalHandlingData[209].ucHeadLight = 0;
     m_OriginalHandlingData[209].ucTailLight = 1;
     m_OriginalHandlingData[209].ucAnimGroup = 0;
+
+    m_OriginalHandlingData[210].iVehicleID = 210;
+    m_OriginalHandlingData[210].fMass = 1600.000000f;
+    m_OriginalHandlingData[210].fTurnMass = 4500.000000f;
+    m_OriginalHandlingData[210].fDragCoeff = 1.400000f;
+    m_OriginalHandlingData[210].vecCenterOfMass = CVector(0.000000f, 0.200000f, -0.400000f);
+    m_OriginalHandlingData[210].uiPercentSubmerged = 70;
+    m_OriginalHandlingData[210].fTractionMultiplier = 0.850000f;
+    m_OriginalHandlingData[210].Transmission.ucDriveType = 'R';
+    m_OriginalHandlingData[210].Transmission.ucEngineType = 'P';
+    m_OriginalHandlingData[210].Transmission.ucNumberOfGears = 5;
+    m_OriginalHandlingData[210].Transmission.uiHandlingFlags = 12582912;
+    m_OriginalHandlingData[210].Transmission.fEngineAcceleration = 10.400000f;
+    m_OriginalHandlingData[210].Transmission.fEngineInertia = 5.000000f;
+    m_OriginalHandlingData[210].Transmission.fMaxVelocity = 220.000000f;
+    m_OriginalHandlingData[210].fBrakeDeceleration = 10.000000f;
+    m_OriginalHandlingData[210].fBrakeBias = 0.520000f;
+    m_OriginalHandlingData[210].bABS = false;
+    m_OriginalHandlingData[210].fSteeringLock = 30.000000f;
+    m_OriginalHandlingData[210].fTractionLoss = 0.800000f;
+    m_OriginalHandlingData[210].fTractionBias = 0.480000f;
+    m_OriginalHandlingData[210].fSuspensionForceLevel = 1.500000f;
+    m_OriginalHandlingData[210].fSuspensionDamping = 0.100000f;
+    m_OriginalHandlingData[210].fSuspensionHighSpdDamping = 10.000000f;
+    m_OriginalHandlingData[210].fSuspensionUpperLimit = 0.290000f;
+    m_OriginalHandlingData[210].fSuspensionLowerLimit = -0.160000f;
+    m_OriginalHandlingData[210].fSuspensionFrontRearBias = 0.600000f;
+    m_OriginalHandlingData[210].fSuspensionAntiDiveMultiplier = 0.400000f;
+    m_OriginalHandlingData[210].fCollisionDamageMultiplier = 0.560000f;
+    m_OriginalHandlingData[210].uiModelFlags = 0x40002004;
+    m_OriginalHandlingData[210].uiHandlingFlags = 0xC00000;
+    m_OriginalHandlingData[210].fSeatOffsetDistance = 0.200000f;
+    m_OriginalHandlingData[210].uiMonetary = 45000;
+    m_OriginalHandlingData[210].ucHeadLight = 1;
+    m_OriginalHandlingData[210].ucTailLight = 1;
+    m_OriginalHandlingData[210].ucAnimGroup = 0;
+
+    m_OriginalHandlingData[211].iVehicleID = 211;
+    m_OriginalHandlingData[211].fMass = 1600.000000f;
+    m_OriginalHandlingData[211].fTurnMass = 4500.000000f;
+    m_OriginalHandlingData[211].fDragCoeff = 1.400000f;
+    m_OriginalHandlingData[211].vecCenterOfMass = CVector(0.000000f, 0.200000f, -0.400000f);
+    m_OriginalHandlingData[211].uiPercentSubmerged = 70;
+    m_OriginalHandlingData[211].fTractionMultiplier = 0.850000f;
+    m_OriginalHandlingData[211].Transmission.ucDriveType = 'R';
+    m_OriginalHandlingData[211].Transmission.ucEngineType = 'P';
+    m_OriginalHandlingData[211].Transmission.ucNumberOfGears = 5;
+    m_OriginalHandlingData[211].Transmission.uiHandlingFlags = 12582912;
+    m_OriginalHandlingData[211].Transmission.fEngineAcceleration = 10.400000f;
+    m_OriginalHandlingData[211].Transmission.fEngineInertia = 5.000000f;
+    m_OriginalHandlingData[211].Transmission.fMaxVelocity = 220.000000f;
+    m_OriginalHandlingData[211].fBrakeDeceleration = 10.000000f;
+    m_OriginalHandlingData[211].fBrakeBias = 0.520000f;
+    m_OriginalHandlingData[211].bABS = false;
+    m_OriginalHandlingData[211].fSteeringLock = 30.000000f;
+    m_OriginalHandlingData[211].fTractionLoss = 0.800000f;
+    m_OriginalHandlingData[211].fTractionBias = 0.480000f;
+    m_OriginalHandlingData[211].fSuspensionForceLevel = 1.500000f;
+    m_OriginalHandlingData[211].fSuspensionDamping = 0.100000f;
+    m_OriginalHandlingData[211].fSuspensionHighSpdDamping = 10.000000f;
+    m_OriginalHandlingData[211].fSuspensionUpperLimit = 0.290000f;
+    m_OriginalHandlingData[211].fSuspensionLowerLimit = -0.160000f;
+    m_OriginalHandlingData[211].fSuspensionFrontRearBias = 0.600000f;
+    m_OriginalHandlingData[211].fSuspensionAntiDiveMultiplier = 0.400000f;
+    m_OriginalHandlingData[211].fCollisionDamageMultiplier = 0.560000f;
+    m_OriginalHandlingData[211].uiModelFlags = 0x40002004;
+    m_OriginalHandlingData[211].uiHandlingFlags = 0xC00000;
+    m_OriginalHandlingData[211].fSeatOffsetDistance = 0.200000f;
+    m_OriginalHandlingData[211].uiMonetary = 45000;
+    m_OriginalHandlingData[211].ucHeadLight = 1;
+    m_OriginalHandlingData[211].ucTailLight = 1;
+    m_OriginalHandlingData[211].ucAnimGroup = 0;
+
+    m_OriginalHandlingData[212].iVehicleID = 212;
+    m_OriginalHandlingData[212].fMass = 1700.000000f;
+    m_OriginalHandlingData[212].fTurnMass = 4500.000000f;
+    m_OriginalHandlingData[212].fDragCoeff = 2.700000f;
+    m_OriginalHandlingData[212].vecCenterOfMass = CVector(0.000000f, 0.000000f, -0.050000f);
+    m_OriginalHandlingData[212].uiPercentSubmerged = 75;
+    m_OriginalHandlingData[212].fTractionMultiplier = 0.650000f;
+    m_OriginalHandlingData[212].Transmission.ucDriveType = '4';
+    m_OriginalHandlingData[212].Transmission.ucEngineType = 'D';
+    m_OriginalHandlingData[212].Transmission.ucNumberOfGears = 5;
+    m_OriginalHandlingData[212].Transmission.uiHandlingFlags = 1064964;
+    m_OriginalHandlingData[212].Transmission.fEngineAcceleration = 10.000000f;
+    m_OriginalHandlingData[212].Transmission.fEngineInertia = 20.000000f;
+    m_OriginalHandlingData[212].Transmission.fMaxVelocity = 165.000000f;
+    m_OriginalHandlingData[212].fBrakeDeceleration = 8.500000f;
+    m_OriginalHandlingData[212].fBrakeBias = 0.500000f;
+    m_OriginalHandlingData[212].bABS = false;
+    m_OriginalHandlingData[212].fSteeringLock = 35.000000f;
+    m_OriginalHandlingData[212].fTractionLoss = 0.700000f;
+    m_OriginalHandlingData[212].fTractionBias = 0.500000f;
+    m_OriginalHandlingData[212].fSuspensionForceLevel = 0.800000f;
+    m_OriginalHandlingData[212].fSuspensionDamping = 0.080000f;
+    m_OriginalHandlingData[212].fSuspensionHighSpdDamping = 3.000000f;
+    m_OriginalHandlingData[212].fSuspensionUpperLimit = 0.250000f;
+    m_OriginalHandlingData[212].fSuspensionLowerLimit = -0.150000f;
+    m_OriginalHandlingData[212].fSuspensionFrontRearBias = 0.400000f;
+    m_OriginalHandlingData[212].fSuspensionAntiDiveMultiplier = 0.400000f;
+    m_OriginalHandlingData[212].fCollisionDamageMultiplier = 0.200000f;
+    m_OriginalHandlingData[212].uiModelFlags = 0x200040;
+    m_OriginalHandlingData[212].uiHandlingFlags = 0x104004;
+    m_OriginalHandlingData[212].fSeatOffsetDistance = 0.260000f;
+    m_OriginalHandlingData[212].uiMonetary = 26000;
+    m_OriginalHandlingData[212].ucHeadLight = 0;
+    m_OriginalHandlingData[212].ucTailLight = 1;
+    m_OriginalHandlingData[212].ucAnimGroup = 0;
+
+    m_OriginalHandlingData[213].iVehicleID = 213;
+    m_OriginalHandlingData[213].fMass = 1600.000000f;
+    m_OriginalHandlingData[213].fTurnMass = 4000.000000f;
+    m_OriginalHandlingData[213].fDragCoeff = 2.500000f;
+    m_OriginalHandlingData[213].vecCenterOfMass = CVector(0.000000f, 0.000000f, 0.050000f);
+    m_OriginalHandlingData[213].uiPercentSubmerged = 75;
+    m_OriginalHandlingData[213].fTractionMultiplier = 0.600000f;
+    m_OriginalHandlingData[213].Transmission.ucDriveType = 'R';
+    m_OriginalHandlingData[213].Transmission.ucEngineType = 'P';
+    m_OriginalHandlingData[213].Transmission.ucNumberOfGears = 5;
+    m_OriginalHandlingData[213].Transmission.uiHandlingFlags = 276824066;
+    m_OriginalHandlingData[213].Transmission.fEngineAcceleration = 8.800000f;
+    m_OriginalHandlingData[213].Transmission.fEngineInertia = 15.000000f;
+    m_OriginalHandlingData[213].Transmission.fMaxVelocity = 160.000000f;
+    m_OriginalHandlingData[213].fBrakeDeceleration = 6.200000f;
+    m_OriginalHandlingData[213].fBrakeBias = 0.550000f;
+    m_OriginalHandlingData[213].bABS = false;
+    m_OriginalHandlingData[213].fSteeringLock = 30.000000f;
+    m_OriginalHandlingData[213].fTractionLoss = 0.840000f;
+    m_OriginalHandlingData[213].fTractionBias = 0.520000f;
+    m_OriginalHandlingData[213].fSuspensionForceLevel = 0.800000f;
+    m_OriginalHandlingData[213].fSuspensionDamping = 0.070000f;
+    m_OriginalHandlingData[213].fSuspensionHighSpdDamping = 0.000000f;
+    m_OriginalHandlingData[213].fSuspensionUpperLimit = 0.350000f;
+    m_OriginalHandlingData[213].fSuspensionLowerLimit = -0.220000f;
+    m_OriginalHandlingData[213].fSuspensionFrontRearBias = 0.500000f;
+    m_OriginalHandlingData[213].fSuspensionAntiDiveMultiplier = 0.500000f;
+    m_OriginalHandlingData[213].fCollisionDamageMultiplier = 0.400000f;
+    m_OriginalHandlingData[213].uiModelFlags = 0x0;
+    m_OriginalHandlingData[213].uiHandlingFlags = 0x10800002;
+    m_OriginalHandlingData[213].fSeatOffsetDistance = 0.230000f;
+    m_OriginalHandlingData[213].uiMonetary = 20000;
+    m_OriginalHandlingData[213].ucHeadLight = 1;
+    m_OriginalHandlingData[213].ucTailLight = 1;
+    m_OriginalHandlingData[213].ucAnimGroup = 0;
+
+    m_OriginalHandlingData[214].iVehicleID = 214;
+    m_OriginalHandlingData[214].fMass = 350.000000f;
+    m_OriginalHandlingData[214].fTurnMass = 119.599998f;
+    m_OriginalHandlingData[214].fDragCoeff = 5.000000f;
+    m_OriginalHandlingData[214].vecCenterOfMass = CVector(0.000000f, 0.050000f, -0.100000f);
+    m_OriginalHandlingData[214].uiPercentSubmerged = 103;
+    m_OriginalHandlingData[214].fTractionMultiplier = 1.800000f;
+    m_OriginalHandlingData[214].Transmission.ucDriveType = 'R';
+    m_OriginalHandlingData[214].Transmission.ucEngineType = 'P';
+    m_OriginalHandlingData[214].Transmission.ucNumberOfGears = 3;
+    m_OriginalHandlingData[214].Transmission.uiHandlingFlags = 0;
+    m_OriginalHandlingData[214].Transmission.fEngineAcceleration = 12.000000f;
+    m_OriginalHandlingData[214].Transmission.fEngineInertia = 5.000000f;
+    m_OriginalHandlingData[214].Transmission.fMaxVelocity = 190.000000f;
+    m_OriginalHandlingData[214].fBrakeDeceleration = 14.000000f;
+    m_OriginalHandlingData[214].fBrakeBias = 0.500000f;
+    m_OriginalHandlingData[214].bABS = false;
+    m_OriginalHandlingData[214].fSteeringLock = 35.000000f;
+    m_OriginalHandlingData[214].fTractionLoss = 0.900000f;
+    m_OriginalHandlingData[214].fTractionBias = 0.480000f;
+    m_OriginalHandlingData[214].fSuspensionForceLevel = 1.000000f;
+    m_OriginalHandlingData[214].fSuspensionDamping = 0.150000f;
+    m_OriginalHandlingData[214].fSuspensionHighSpdDamping = 0.000000f;
+    m_OriginalHandlingData[214].fSuspensionUpperLimit = 0.120000f;
+    m_OriginalHandlingData[214].fSuspensionLowerLimit = -0.170000f;
+    m_OriginalHandlingData[214].fSuspensionFrontRearBias = 0.500000f;
+    m_OriginalHandlingData[214].fSuspensionAntiDiveMultiplier = 0.000000f;
+    m_OriginalHandlingData[214].fCollisionDamageMultiplier = 0.110000f;
+    m_OriginalHandlingData[214].uiModelFlags = 0x1000000;
+    m_OriginalHandlingData[214].uiHandlingFlags = 0x0;
+    m_OriginalHandlingData[214].fSeatOffsetDistance = 0.000000f;
+    m_OriginalHandlingData[214].uiMonetary = 10000;
+    m_OriginalHandlingData[214].ucHeadLight = 1;
+    m_OriginalHandlingData[214].ucTailLight = 1;
+    m_OriginalHandlingData[214].ucAnimGroup = 5;
+
+    m_OriginalHandlingData[215].iVehicleID = 215;
+    m_OriginalHandlingData[215].fMass = 6500.000000f;
+    m_OriginalHandlingData[215].fTurnMass = 36670.800781f;
+    m_OriginalHandlingData[215].fDragCoeff = 3.000000f;
+    m_OriginalHandlingData[215].vecCenterOfMass = CVector(0.000000f, 0.000000f, 0.000000f);
+    m_OriginalHandlingData[215].uiPercentSubmerged = 90;
+    m_OriginalHandlingData[215].fTractionMultiplier = 0.550000f;
+    m_OriginalHandlingData[215].Transmission.ucDriveType = 'R';
+    m_OriginalHandlingData[215].Transmission.ucEngineType = 'D';
+    m_OriginalHandlingData[215].Transmission.ucNumberOfGears = 5;
+    m_OriginalHandlingData[215].Transmission.uiHandlingFlags = 0;
+    m_OriginalHandlingData[215].Transmission.fEngineAcceleration = 10.800000f;
+    m_OriginalHandlingData[215].Transmission.fEngineInertia = 10.000000f;
+    m_OriginalHandlingData[215].Transmission.fMaxVelocity = 170.000000f;
+    m_OriginalHandlingData[215].fBrakeDeceleration = 10.000000f;
+    m_OriginalHandlingData[215].fBrakeBias = 0.450000f;
+    m_OriginalHandlingData[215].bABS = false;
+    m_OriginalHandlingData[215].fSteeringLock = 27.000000f;
+    m_OriginalHandlingData[215].fTractionLoss = 0.800000f;
+    m_OriginalHandlingData[215].fTractionBias = 0.500000f;
+    m_OriginalHandlingData[215].fSuspensionForceLevel = 1.200000f;
+    m_OriginalHandlingData[215].fSuspensionDamping = 0.080000f;
+    m_OriginalHandlingData[215].fSuspensionHighSpdDamping = 0.000000f;
+    m_OriginalHandlingData[215].fSuspensionUpperLimit = 0.470000f;
+    m_OriginalHandlingData[215].fSuspensionLowerLimit = -0.170000f;
+    m_OriginalHandlingData[215].fSuspensionFrontRearBias = 0.500000f;
+    m_OriginalHandlingData[215].fSuspensionAntiDiveMultiplier = 0.000000f;
+    m_OriginalHandlingData[215].fCollisionDamageMultiplier = 0.260000f;
+    m_OriginalHandlingData[215].uiModelFlags = 0x4098;
+    m_OriginalHandlingData[215].uiHandlingFlags = 0x0;
+    m_OriginalHandlingData[215].fSeatOffsetDistance = 0.200000f;
+    m_OriginalHandlingData[215].uiMonetary = 15000;
+    m_OriginalHandlingData[215].ucHeadLight = 0;
+    m_OriginalHandlingData[215].ucTailLight = 1;
+    m_OriginalHandlingData[215].ucAnimGroup = 2;
+
+    m_OriginalHandlingData[216].iVehicleID = 216;
+    m_OriginalHandlingData[216].fMass = 2500.000000f;
+    m_OriginalHandlingData[216].fTurnMass = 7604.200195f;
+    m_OriginalHandlingData[216].fDragCoeff = 2.500000f;
+    m_OriginalHandlingData[216].vecCenterOfMass = CVector(0.000000f, 0.000000f, -0.350000f);
+    m_OriginalHandlingData[216].uiPercentSubmerged = 80;
+    m_OriginalHandlingData[216].fTractionMultiplier = 0.700000f;
+    m_OriginalHandlingData[216].Transmission.ucDriveType = '4';
+    m_OriginalHandlingData[216].Transmission.ucEngineType = 'P';
+    m_OriginalHandlingData[216].Transmission.ucNumberOfGears = 5;
+    m_OriginalHandlingData[216].Transmission.uiHandlingFlags = 1048580;
+    m_OriginalHandlingData[216].Transmission.fEngineAcceleration = 8.000000f;
+    m_OriginalHandlingData[216].Transmission.fEngineInertia = 5.000000f;
+    m_OriginalHandlingData[216].Transmission.fMaxVelocity = 170.000000f;
+    m_OriginalHandlingData[216].fBrakeDeceleration = 7.000000f;
+    m_OriginalHandlingData[216].fBrakeBias = 0.450000f;
+    m_OriginalHandlingData[216].bABS = false;
+    m_OriginalHandlingData[216].fSteeringLock = 35.000000f;
+    m_OriginalHandlingData[216].fTractionLoss = 0.850000f;
+    m_OriginalHandlingData[216].fTractionBias = 0.540000f;
+    m_OriginalHandlingData[216].fSuspensionForceLevel = 0.800000f;
+    m_OriginalHandlingData[216].fSuspensionDamping = 0.080000f;
+    m_OriginalHandlingData[216].fSuspensionHighSpdDamping = 0.000000f;
+    m_OriginalHandlingData[216].fSuspensionUpperLimit = 0.450000f;
+    m_OriginalHandlingData[216].fSuspensionLowerLimit = -0.250000f;
+    m_OriginalHandlingData[216].fSuspensionFrontRearBias = 0.450000f;
+    m_OriginalHandlingData[216].fSuspensionAntiDiveMultiplier = 0.300000f;
+    m_OriginalHandlingData[216].fCollisionDamageMultiplier = 0.350000f;
+    m_OriginalHandlingData[216].uiModelFlags = 0x4020;
+    m_OriginalHandlingData[216].uiHandlingFlags = 0x100004;
+    m_OriginalHandlingData[216].fSeatOffsetDistance = 0.440000f;
+    m_OriginalHandlingData[216].uiMonetary = 40000;
+    m_OriginalHandlingData[216].ucHeadLight = 0;
+    m_OriginalHandlingData[216].ucTailLight = 1;
+    m_OriginalHandlingData[216].ucAnimGroup = 0;
+
+    m_OriginalHandlingData[217].iVehicleID = 217;
+    m_OriginalHandlingData[217].fMass = 5500.000000f;
+    m_OriginalHandlingData[217].fTurnMass = 33187.898438f;
+    m_OriginalHandlingData[217].fDragCoeff = 1.000000f;
+    m_OriginalHandlingData[217].vecCenterOfMass = CVector(0.000000f, 0.000000f, 0.000000f);
+    m_OriginalHandlingData[217].uiPercentSubmerged = 90;
+    m_OriginalHandlingData[217].fTractionMultiplier = 0.580000f;
+    m_OriginalHandlingData[217].Transmission.ucDriveType = 'R';
+    m_OriginalHandlingData[217].Transmission.ucEngineType = 'D';
+    m_OriginalHandlingData[217].Transmission.ucNumberOfGears = 4;
+    m_OriginalHandlingData[217].Transmission.uiHandlingFlags = 512;
+    m_OriginalHandlingData[217].Transmission.fEngineAcceleration = 8.000000f;
+    m_OriginalHandlingData[217].Transmission.fEngineInertia = 20.000000f;
+    m_OriginalHandlingData[217].Transmission.fMaxVelocity = 110.000000f;
+    m_OriginalHandlingData[217].fBrakeDeceleration = 3.170000f;
+    m_OriginalHandlingData[217].fBrakeBias = 0.400000f;
+    m_OriginalHandlingData[217].bABS = false;
+    m_OriginalHandlingData[217].fSteeringLock = 30.000000f;
+    m_OriginalHandlingData[217].fTractionLoss = 0.800000f;
+    m_OriginalHandlingData[217].fTractionBias = 0.500000f;
+    m_OriginalHandlingData[217].fSuspensionForceLevel = 1.400000f;
+    m_OriginalHandlingData[217].fSuspensionDamping = 0.060000f;
+    m_OriginalHandlingData[217].fSuspensionHighSpdDamping = 0.000000f;
+    m_OriginalHandlingData[217].fSuspensionUpperLimit = 0.450000f;
+    m_OriginalHandlingData[217].fSuspensionLowerLimit = 0.000000f;
+    m_OriginalHandlingData[217].fSuspensionFrontRearBias = 0.550000f;
+    m_OriginalHandlingData[217].fSuspensionAntiDiveMultiplier = 0.000000f;
+    m_OriginalHandlingData[217].fCollisionDamageMultiplier = 0.200000f;
+    m_OriginalHandlingData[217].uiModelFlags = 0x8;
+    m_OriginalHandlingData[217].uiHandlingFlags = 0x200;
+    m_OriginalHandlingData[217].fSeatOffsetDistance = 0.450000f;
+    m_OriginalHandlingData[217].uiMonetary = 5000;
+    m_OriginalHandlingData[217].ucHeadLight = 0;
+    m_OriginalHandlingData[217].ucTailLight = 1;
+    m_OriginalHandlingData[217].ucAnimGroup = 0;
 }
