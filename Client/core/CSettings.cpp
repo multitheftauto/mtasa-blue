@@ -538,7 +538,7 @@ void CSettings::CreateGUI(void)
     m_pLabelUserTrackMode->AutoSize();
 
     m_pComboUsertrackMode = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabAudio, ""));
-    m_pComboUsertrackMode->SetPosition(CVector2D(vecTemp.fX + fIndentX + 5.0f, vecTemp.fY));
+    m_pComboUsertrackMode->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pComboUsertrackMode->SetSize(CVector2D(160.0f, 80.0f));
     m_pComboUsertrackMode->AddItem(_("Radio"))->SetData((void*)0);
     m_pComboUsertrackMode->AddItem(_("Random"))->SetData((void*)1);
@@ -546,13 +546,14 @@ void CSettings::CreateGUI(void)
     m_pComboUsertrackMode->SetReadOnly(true);
 
     m_pCheckBoxUserAutoscan = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAudio, _("Automatic Media Scan"), true));
-    m_pCheckBoxUserAutoscan->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 32.0f));
+    m_pCheckBoxUserAutoscan->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 52.0f));
     m_pCheckBoxUserAutoscan->AutoSize(NULL, 20.0f);
     m_pCheckBoxUserAutoscan->GetPosition(vecTemp, false);
 
-    vecTemp.fX = fIndentX + 260;
+    m_pAudioRadioLabel->GetPosition(vecTemp, false);
+    vecTemp.fX = fIndentX + 173;
     m_pAudioMuteLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Mute options")));
-    m_pAudioMuteLabel->SetPosition(CVector2D(vecTemp.fX, 13.0f));
+    m_pAudioMuteLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 52.0f));
     m_pAudioMuteLabel->GetPosition(vecTemp, false);
     m_pAudioMuteLabel->AutoSize(NULL, 5.0f);
     m_pAudioMuteLabel->SetFont("default-bold-small");
@@ -1938,7 +1939,8 @@ void CSettings::CreateInterfaceTabGUI(void)
 
         for (const auto& language : availableLanguagesMap)
         {
-            m_pInterfaceLanguageSelector->AddItem(language.first)->SetData(language.second);
+            SString strLanguageName = g_pLocalization->GetLanguageNativeName(language.second);
+            m_pInterfaceLanguageSelector->AddItem(strLanguageName)->SetData(language.second);
         }
 
         // Skin
@@ -4050,7 +4052,7 @@ bool CSettings::OnMasterVolumeChanged(CGUIElement* pElement)
 {
     int iVolume = m_pAudioMasterVolume->GetScrollPosition() * 100.0f;
     m_pLabelMasterVolumeValue->SetText(SString("%i%%", iVolume).c_str());
-    
+
     CVARS_SET("mastervolume", m_pAudioMasterVolume->GetScrollPosition());
 
     OnRadioVolumeChanged(nullptr);

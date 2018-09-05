@@ -227,11 +227,6 @@ public:
         return m_pAEAudioHardware;
     };
     CAESoundManager* GetAESoundManager() override { return m_pAESoundManager; }
-    CAudioEngine*    GetAudio()
-    {
-        DEBUG_TRACE("CAudio     * GetAudioEngine()");
-        return m_pAudioEngine;
-    };
     CAudioContainer* GetAudioContainer()
     {
         DEBUG_TRACE("CAudio     * GetAudioContainer()");

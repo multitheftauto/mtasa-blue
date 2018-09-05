@@ -32,6 +32,7 @@ public:
     LUA_DECLARE_OOP(GetElementPosition);
     LUA_DECLARE_OOP(GetElementRotation);
     LUA_DECLARE_OOP(GetElementVelocity);
+    LUA_DECLARE_OOP(GetElementTurnVelocity);
     LUA_DECLARE(GetElementType);
     LUA_DECLARE(GetElementsByType);
     LUA_DECLARE(GetElementInterior);
@@ -41,7 +42,7 @@ public:
     LUA_DECLARE(GetElementsWithinRange);
     LUA_DECLARE(GetElementDimension);
     LUA_DECLARE(GetElementZoneName);
-    LUA_DECLARE(GetElementBoundingBox);
+    LUA_DECLARE_OOP(GetElementBoundingBox);
     LUA_DECLARE(GetElementRadius);
     LUA_DECLARE(IsElementAttached);
     LUA_DECLARE(GetElementAttachedTo);
@@ -77,6 +78,7 @@ public:
     LUA_DECLARE(SetElementPosition);
     LUA_DECLARE_OOP(SetElementRotation);
     LUA_DECLARE(SetElementVelocity);
+    LUA_DECLARE(SetElementAngularVelocity);
     LUA_DECLARE(SetElementParent);
     LUA_DECLARE(SetElementInterior);
     LUA_DECLARE(SetElementDimension);

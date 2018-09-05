@@ -68,14 +68,15 @@ bool CLuaManager::RemoveVirtualMachine(CLuaMain* pLuaMain)
         m_pEvents->RemoveAllEvents(pLuaMain);
         m_pRegisteredCommands->CleanUpForVM(pLuaMain);
 
+        // Remove it from our list
+        m_virtualMachines.remove(pLuaMain);
+
         // Delete it unless it is already
         if (!pLuaMain->BeingDeleted())
         {
             delete pLuaMain;
         }
 
-        // Remove it from our list
-        m_virtualMachines.remove(pLuaMain);
         return true;
     }
 
@@ -229,6 +230,7 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("setClipboard", CLuaFunctionDefs::SetClipboard);
     // CLuaCFunctions::AddFunction ( "getClipboard", CLuaFunctionDefs::GetClipboard );
     CLuaCFunctions::AddFunction("setWindowFlashing", CLuaFunctionDefs::SetWindowFlashing);
+    CLuaCFunctions::AddFunction("clearChatBox", CLuaFunctionDefs::ClearChatBox);
 
     // Notification funcs
     CLuaCFunctions::AddFunction("createTrayNotification", CLuaFunctionDefs::CreateTrayNotification);

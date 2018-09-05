@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-23 23:03+0100\n"
-"PO-Revision-Date: 2018-07-23 22:21+0000\n"
-"Last-Translator: qaisjp <me@qaisjp.com>\n"
+"POT-Creation-Date: 2018-09-01 13:55+0100\n"
+"PO-Revision-Date: 2018-09-01 13:16+0000\n"
+"Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Translators: Alex Georgiou; qaisjp\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1532384475.0\n"
+"X-POOTLE-MTIME: 1535807766.0\n"
 
 #: E:\Documents\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -39,7 +39,7 @@ msgid "Remember decision"
 msgstr "Θυμήσου την απόφαση"
 
 #: E:\Documents\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:49
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:906
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:907
 msgid "Allow"
 msgstr "Επέτρεψε"
 
@@ -51,28 +51,28 @@ msgstr "Αρνούμαι"
 msgid "***[ COMMAND HELP ]***\n"
 msgstr "***[ ΕΝΤΟΛH ΒΟHΘΕΙΑ ]***\n"
 
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:183
+#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:182
 #, c-format, c-format
 msgid "* The time is %d:%02d:%02d"
 msgstr "* Η ώρα είναι %d:%02d:%02d"
 
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:272
+#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:266
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
 msgstr "Σύνδεση: Η σύνταξη είναι 'connect <host> [<port> <nick> <pass>]'"
 
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:280
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:330
+#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:274
+#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:342
 msgid "connect: Bad port number"
 msgstr "Σύνδεση: Κακός αριθμός θύρας"
 
 #: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:296
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:345
+#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:357
 #, c-format, c-format
 msgid "connect: Connecting to %s:%u..."
 msgstr "Σύνδεση: Συνδέεται στο %s:%u..."
 
 #: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:300
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:349
+#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:361
 #, c-format, c-format
 msgid "connect: could not connect to %s:%u!"
 msgstr "Σύνδεση: δεν μπόρεσε να συνδεθεί στο %s:%u!"
@@ -81,16 +81,16 @@ msgstr "Σύνδεση: δεν μπόρεσε να συνδεθεί στο %s:%u
 msgid "connect: Failed to unload current mod"
 msgstr "Σύνδεση: H αποφόρτωση της τροποποίησης ήταν ανεπιτυχής"
 
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:383
+#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:395
 msgid "Bound all controls from GTA"
 msgstr "Δεσμεύτηκαν όλα τα κουμπιά από το GTA"
 
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:397
+#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:409
 msgid "Saved configuration file"
 msgstr "To αρχείο ρυθμίσεων αποθηκεύτηκε"
 
 #. Print it
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:463
+#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:475
 #, c-format, c-format
 msgid "* Your serial is: %s"
 msgstr "* Ο σειριακός αριθμός σου είναι: %s"
@@ -116,17 +116,17 @@ msgstr "Η σύνδεση απέτυχε: Δόθηκε άτοπο ψευδώνυ
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:410
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:417
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:427
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1221
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1234
-#: E:\Documents\mtasa-blue\Client\core\CGUI.cpp:84
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1235
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1248
+#: E:\Documents\mtasa-blue\Client\core\CGUI.cpp:85
 #: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:142
 #: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:151
 #: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:156
 #: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:165
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2824
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3952
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3980
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4425
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2826
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3954
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3982
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4427
 #: E:\Documents\mtasa-blue\Client\core\DXHook\CDirect3DHook9.cpp:128
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1244
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1266
@@ -138,17 +138,17 @@ msgstr "Η σύνδεση απέτυχε: Δόθηκε άτοπο ψευδώνυ
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:254
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:256
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:817
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:560
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:628
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:652
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:674
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:990
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1070
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1080
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1149
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1183
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1232
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1244
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:563
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:631
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:655
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:677
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:993
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1073
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1083
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1152
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1186
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1235
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1247
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:134
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CServer.cpp:181
 #: E:\Documents\mtasa-blue\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp:354
@@ -173,48 +173,48 @@ msgstr "Σύνδεση στο %s:%u... "
 
 #. Display the status box
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:148
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:576
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:579
 msgid "CONNECTING"
 msgstr "ΣΥΝΔΕΕΤΕ"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:263
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1149
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1152
 msgid "Connection timed out"
 msgstr "Λήξη χρόνου σύνδεσης"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:277
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:281
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1194
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1197
 msgid "Disconnected: unknown protocol error"
 msgstr "Αποσυνδέθηκες: άγνωστο σφάλμα πρωτοκόλλου"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:285
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1198
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1201
 msgid "Disconnected: disconnected remotely"
 msgstr "Αποσυνδέθηκες: αποσυνδέθηκες απομακρυσμένα"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:289
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1202
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1205
 msgid "Disconnected: connection lost remotely"
 msgstr "Αποσυνδέθηκες: χάθηκε η απομακρυσμένη σύνδεση"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:293
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1206
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1209
 msgid "Disconnected: you are banned from this server"
 msgstr "Αποσυνδέθηκες: Έχεις αποκλειστεί από αυτό τον διακομιστή"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:300
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1214
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1217
 msgid "Disconnected: disconnected from the server"
 msgstr "Αποσυνδέθηκες: αποσυνδέθηκες από τον διακομιστή"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:304
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1218
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1221
 msgid "Disconnected: connection to the server was lost"
 msgstr "Αποσυνδέθηκες: χάθηκε η σύνδεση με τον διακομιστή"
 
 #: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:311
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1226
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1229
 msgid "Disconnected: connection was refused"
 msgstr "Αποσυνδέθηκες: η σύνδεση απορρίφθηκε"
 
@@ -237,19 +237,19 @@ msgstr "Κακή ανταπόκριση διακομιστή (1)"
 msgid "CONSOLE"
 msgstr "Κονσόλα"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:674
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:688
 #: E:\Documents\mtasa-blue\Client\core\CQuestionBox.cpp:192
 #: E:\Documents\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:621
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "Θέλεις να δεις κάποια βοήθεια στο διαδίκτυο για αυτό το πρόβλημα ;"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:679
-#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1104
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:693
+#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1112
 #: E:\Documents\mtasa-blue\Client\core\CQuestionBox.cpp:194
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1314
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1338
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4272
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4321
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1315
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1339
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4274
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4323
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1568
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1586
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1855
@@ -262,13 +262,13 @@ msgstr "Όχι"
 #. /////////////////////////////////////////////////////////////////////////
 #. Dialog strings
 #. /////////////////////////////////////////////////////////////////////////
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:680
-#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1105
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:694
+#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1113
 #: E:\Documents\mtasa-blue\Client\core\CQuestionBox.cpp:195
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1315
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1339
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4273
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4322
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1316
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1340
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4275
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4324
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1569
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1587
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1856
@@ -279,7 +279,7 @@ msgstr "Όχι"
 msgid "Yes"
 msgstr "Ναι"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:733
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:747
 #: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:612
 #, c-format, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
@@ -287,113 +287,113 @@ msgstr ""
 "Το MTA:SA δεν είναι δυνατό να συνεχίσει διότι ο οδηγός %s δεν έχει αρκετό "
 "χώρο."
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:735
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:749
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:144
 msgid "Fatal error"
 msgstr "Κρίσιμο σφάλμα"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:883
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:897
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "ΓΙΑ ΔΙΟΡΘΩΣΗ, ΑΦΑΙΡΕΣΤΕ ΑΥΤΟ ΤΟ ΑΡΧΕΙΟ:"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:915
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:929
 #, c-format, c-format
 msgid "%s module is incorrect!"
 msgstr "%s δομοστοιχείο είναι εσφαλμένο!"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1221
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1235
 msgid "Error executing URL"
 msgstr "Σφάλμα κατά την εκτέλεση του URL"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1233
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1247
 #, c-format, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "Σφάλμα κατά την εκτέλεση της τροποποίησης στη γραμμή εκτέλεσης ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1318
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1332
 msgid "this help screen"
 msgstr "αυτή η οθόνη βοήθειας"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1319
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1320
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1333
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1334
 msgid "exits the application"
 msgstr "έξοδος από την εφαρμογή"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1321
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1335
 msgid "shows the version"
 msgstr "εμφάνιση της έκδοσης"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1322
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1336
 msgid "shows the time"
 msgstr "εμφάνιση της ώρας"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1323
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1337
 msgid "shows the hud"
 msgstr "εμφάνιση του hud"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1324
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1338
 msgid "shows all the binds"
 msgstr "εμφάνιση όλων των δεσμευμένων κουμπιών"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1325
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1339
 msgid "shows your serial"
 msgstr "εμφάνιση του σειριακού αριθμού"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1334
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1348
 msgid "connects to a server (host port nick pass)"
 msgstr "σύνδεση με τον διακομιστή (διοργανωτής θύρα όνομα κωδικός)"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1335
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1349
 msgid "connects to a previous server"
 msgstr "συνδέετε σε έναν προηγούμενο διακομιστή"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1336
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1350
 msgid "binds a key (key control)"
 msgstr "δέσμευση ενός πλήκτρου (πλήκτρο έλεγχος)"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1337
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1351
 msgid "unbinds a key (key)"
 msgstr "Αποδέσμευση ενός πλήκτρου (πλήκτρο)"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1338
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1352
 msgid "copies the default gta controls"
 msgstr "αντιγραφή των προεπιλεγμένων gta πλήκτρων "
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1339
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1353
 msgid "outputs a screenshot"
 msgstr "απόδοση στιγμιότυπου οθόνης"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1340
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1354
 msgid "immediately saves the config"
 msgstr "άμεση αποθήκευση του config"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1342
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1356
 msgid "clears the debug view"
 msgstr "εκκαθάριση της απασφαλματωμένης όψης"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1343
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1357
 msgid "scrolls the chatbox upwards"
 msgstr "κύλιση του πλαισίου συνομιλίας προς τα επάνω"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1344
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1358
 msgid "scrolls the chatbox downwards"
 msgstr "κύλιση του πλαισίου συνομιλίας προς τα κάτω"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1345
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1359
 msgid "scrolls the debug view upwards"
 msgstr "κύλιση της απασφαλματωμένης όψης προς τα πάνω"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1346
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1360
 msgid "scrolls the debug view downwards"
 msgstr "κύλιση της απασφαλματωμένης όψης προς τα κάτω"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1349
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1363
 msgid "shows the memory statistics"
 msgstr "προβολή στατιστικών στοιχείων μνήμης"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1350
+#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1364
 msgid "shows the frame timing graph"
 msgstr "προβολή γραφήματος συγχρονισμού εικόνας"
 
@@ -405,29 +405,29 @@ msgstr "Προγραμματισμός"
 msgid "Contributors"
 msgstr "Συνεργάτες"
 
-#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:74
+#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:75
 msgid "Game Design / Scripting"
 msgstr "Σχεδίαση / Scripting Παιχνιδιού"
 
-#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:91
+#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:92
 msgid "Patch contributors"
 msgstr "Συνεργάτες λογισμικού ενημέρωσης"
 
-#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:150
+#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:156
 msgid "Language Localization"
 msgstr "Γλωσσική τοπικοποίηση"
 
-#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:156
+#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:162
 msgid "Special Thanks"
 msgstr "Ιδιαίτερες Ευχαριστίες!"
 
-#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:182
+#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:188
 msgid "This software makes use of the following libraries and software:"
 msgstr ""
 "Αυτό το λογισμικό κάνει χρήση των ακολούθων βιβλιοθηκών και προγραμμάτων:"
 
 #. Even the default skin doesn't work, so give up
-#: E:\Documents\mtasa-blue\Client\core\CGUI.cpp:83
+#: E:\Documents\mtasa-blue\Client\core\CGUI.cpp:84
 msgid ""
 "The skin you selected could not be loaded, and the default skin also could "
 "not be loaded, please reinstall MTA."
@@ -464,14 +464,14 @@ msgid "Backwards"
 msgstr "Πίσω"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:185
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2142
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2170
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2144
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2172
 msgid "Left"
 msgstr "Αριστερά"
 
 #: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:186
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2144
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2171
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2146
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2173
 msgid "Right"
 msgstr "Δεξιά"
 
@@ -627,6 +627,11 @@ msgstr "Πλήκτρο ομάδας μπροστά"
 msgid "Group control backwards"
 msgstr "Πλήκτρο ομάδας πίσω"
 
+#. TRANSLATORS: Replace with your language native name
+#: E:\Documents\mtasa-blue\Client\core\CLocalization.cpp:17
+msgid "English"
+msgstr "Ελληνικά"
+
 #: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:314
 msgid ""
 "You are using a feature-branch build! This is a test build only which cannot"
@@ -635,7 +640,7 @@ msgstr ""
 "Χρησιμοποιείται ένα χαρακτηριστικό τμήμα έκδοσης! Αυτή είναι μια δοκιμαστική"
 " έκδοση μόνο για όσους δεν μπορούν να συνδεθούν στους ανοιχτούς διακοσμητές!"
 
-#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1098
+#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1106
 msgid ""
 "This will disconnect you from the current server.\n"
 "\n"
@@ -645,7 +650,7 @@ msgstr ""
 "\n"
 "Είστε σίγουρος ότι θέλετε να αποσυνδεθείτε;"
 
-#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1102
+#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1110
 msgid "DISCONNECT WARNING"
 msgstr "ΠΡΟΕΙΔΟΠΟΙΗΣΗ ΑΠΟΣΥΝΔΕΣΗΣ"
 
@@ -664,8 +669,8 @@ msgstr "Ορίστηκε μη έγκυρη θύρα!"
 #: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:165
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1266
 #: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1323
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:560
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:652
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:563
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:655
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr ""
 "Άτοπο ψευδώνυμο! Παρακαλώ πηγαίνετε στις ρυθμίσεις και αναθέστε ένα νέο!"
@@ -715,7 +720,7 @@ msgstr "Προχωρημένα"
 #. Create buttons
 #. OK button
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:125
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4446
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4448
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1604
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1820
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1913
@@ -733,7 +738,7 @@ msgstr "Εντάξει"
 
 #. Cancel button
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:130
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4445
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4447
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1787
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1803
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1838
@@ -745,8 +750,8 @@ msgstr "Ακύρωση"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:145
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:336
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:586
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:835
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:587
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:836
 msgid "Load defaults"
 msgstr "Φόρτωση προεπιλεγμένων"
 
@@ -855,7 +860,7 @@ msgid "Map rendering options"
 msgstr "Ρυθμίσεις απόδοσης χάρτη"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:390
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:598
 msgid "Opacity:"
 msgstr "Αδιαφάνεια:"
 
@@ -896,9 +901,9 @@ msgstr "Λειτουργία παιχνιδιού:"
 #. * Webbrowser tab
 #. *
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:412
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:599
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:850
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1918
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:600
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:851
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1919
 #: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:51
 msgid "General"
 msgstr "Γενικά"
@@ -920,17 +925,17 @@ msgid "Usertrack options"
 msgstr "Ρυθμίσεις κομματιών χρήστη"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:543
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2940
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2942
 msgid "Radio"
 msgstr "Ραδιόφωνο"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:544
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2942
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2944
 msgid "Random"
 msgstr "Τυχαίος"
 
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:545
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2944
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2946
 msgid "Sequential"
 msgstr "Διαδοχικός"
 
@@ -938,413 +943,413 @@ msgstr "Διαδοχικός"
 msgid "Automatic Media Scan"
 msgstr "Αυτόματη σάρωση Media"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:554
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:555
 #, fuzzy
 msgid "Mute options"
 msgstr "Ρυθμίσεις ποντικιού"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:560
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:561
 #, fuzzy
 msgid "Mute All sounds when minimized"
 msgstr "Απενεργοποίηση ήχων SFX κατά την ελαχιστοποίηση"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:565
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:566
 msgid "Mute Radio sounds when minimized"
 msgstr "Απενεργοποίηση ήχων ραδιοφώνου κατά την ελαχιστοποίηση"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:570
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:571
 msgid "Mute SFX sounds when minimized"
 msgstr "Απενεργοποίηση ήχων SFX κατά την ελαχιστοποίηση"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:575
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:576
 msgid "Mute MTA sounds when minimized"
 msgstr "Απενεργοποίηση ήχων MTA κατά την ελαχιστοποίηση"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:580
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:581
 msgid "Mute Voice sounds when minimized"
 msgstr "Απενεργοποίηση ήχων ομιλιών κατά την ελαχιστοποίηση"
 
 #. *
 #. *  Video tab
 #. *
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:596
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:605
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:606
 msgid "Resolution:"
 msgstr "Ανάλυση:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:596
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:646
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:647
 msgid "FOV:"
 msgstr "Οπτικό Πεδίο (FOV):"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:596
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:662
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:663
 msgid "Draw Distance:"
 msgstr "Σχεδίαση απόστασης:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:596
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:680
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:681
 msgid "Brightness:"
 msgstr "Φωτεινότητα:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:596
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:698
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:699
 msgid "FX Quality:"
 msgstr "FX Ποιότητα:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:712
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:598
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:713
 msgid "Anisotropic filtering:"
 msgstr "Φίλτρο ανισοτροπίας:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:739
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:598
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:740
 msgid "Anti-aliasing:"
 msgstr "Ευκρίνεια Κυρτών Γραμμών (Anti-aliasing):"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:753
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:598
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:754
 msgid "Aspect Ratio:"
 msgstr "Αναλογία Πλευρών:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:617
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:618
 msgid "Windowed"
 msgstr "Λειτουργία παραθύρου"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:625
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:626
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:370
 msgid "Fullscreen mode:"
 msgstr "Πλήρης οθόνη:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:632
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1520
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:633
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1521
 msgid "Standard"
 msgstr "Κανονικό"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:633
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1522
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:634
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1523
 #: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:370
 msgid "Borderless window"
 msgstr "Παράθυρο χωρίς περιθώρια"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:634
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1524
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:635
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1525
 msgid "Borderless keep res"
 msgstr "Χωρίς περιθώρια με διατηρημένη ανάλυση"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:638
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:639
 msgid "Mip Mapping"
 msgstr "Mip Χαρτογράφηση"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:706
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1438
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:707
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1439
 msgid "Low"
 msgstr "Χαμηλά"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:707
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1440
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:708
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1441
 msgid "Medium"
 msgstr "Μέτρια"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:708
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1018
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1442
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2995
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:709
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1019
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1443
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2997
 msgid "High"
 msgstr "Υψηλά"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:709
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1444
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:710
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1445
 msgid "Very high"
 msgstr "Πολύ υψηλά"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:724
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:747
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:949
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1003
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1134
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1448
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3002
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3034
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3056
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4020
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:725
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:748
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:950
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1004
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1135
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1449
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3004
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3036
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3058
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4022
 msgid "Off"
 msgstr "Απενεργοποιήση"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:748
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1450
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:749
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1451
 msgid "1x"
 msgstr "1x"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:749
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1452
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:750
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1453
 msgid "2x"
 msgstr "2x"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:750
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1454
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:751
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1455
 msgid "3x"
 msgstr "3x"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:763
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:951
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1460
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3004
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:764
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:952
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1461
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3006
 msgid "Auto"
 msgstr "Αυτόματο"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:764
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1462
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:765
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1463
 msgid "4:3"
 msgstr "4:3"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:765
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1464
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:766
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1465
 msgid "16:10"
 msgstr "16:10"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:766
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1466
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:767
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1467
 msgid "16:9"
 msgstr "16:9"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:769
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:770
 msgid "HUD Match Aspect Ratio"
 msgstr "HUD Αντιστοίχηση συντελεστή αναλογίας"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:775
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:776
 msgid "Volumetric Shadows"
 msgstr "Ογκομετρικές σκιές"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:779
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:780
 msgid "Grass effect"
 msgstr "Εφέ χόρτου"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:783
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:784
 msgid "Heat haze"
 msgstr "Θολούρα ζέστης"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:787
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:788
 msgid "Tyre Smoke etc"
 msgstr "Καπνός λάστιχων κτλ"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:791
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:792
 msgid "Render vehicles always in high detail"
 msgstr "Αποδίδετε τα οχήματα πάντα με μεγάλη λεπτομέρεια"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:796
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:797
 msgid "Full Screen Minimize"
 msgstr "Πλήρης οθόνη Ελαχιστοποίηση"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:808
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:809
 msgid "Enable Device Selection Dialog"
 msgstr "Ενεργοποίηση συσκευής επιλογής Dialog"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:820
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:821
 msgid "Show unsafe resolutions"
 msgstr "Εμφάνιση επικίνδυνων αναλύσεων"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:856
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:857
 msgid "Enable remote websites"
 msgstr "Ενεργοποίηση απομακρυσμένων ιστότοπων"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:861
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:862
 msgid "Enable Javascript on remote websites"
 msgstr "Ενεργοποιήση Javascript σε απομακρυσμένους ιστότοπους"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:866
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:867
 msgid "Custom blacklist"
 msgstr "Προσαρμοσμένη μαύρη λίστα"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:876
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:904
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:877
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:905
 msgid "Enter a domain e.g. google.com"
 msgstr "Εισαγάγετε έναν τομέα, π.χ. google.com"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:878
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:879
 msgid "Block"
 msgstr "Μπλόκαρε"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:886
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:914
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:887
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:915
 msgid "Domain"
 msgstr "Τομέας"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:888
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:916
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:889
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:917
 msgid "Remove domain"
 msgstr "Αφαίρεση τομέα"
 
 #. Reset vecTemp
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:894
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:895
 msgid "Custom whitelist"
 msgstr "Προεπιλεγμένη άσπρη λίστα (whitelist)"
 
 #. Misc section label
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:929
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:930
 msgid "Misc"
 msgstr "Λοιπά"
 
 #. Fast clothes loading
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:935
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:942
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4464
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:943
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4466
 msgid "Fast CJ clothes loading:"
 msgstr "Γρήγορα CJ ρούχα φορτώνονται:"
 
 #. Browser scan speed
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:935
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:956
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4466
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:957
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4468
 msgid "Browser speed:"
 msgstr "Ταχύτητα περιήγησης:"
 
 #. Single download
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:935
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:970
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4468
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:971
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4470
 msgid "Single connection:"
 msgstr "Μοναδική σύνδεση:"
 
 #. Packet tag
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:935
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:983
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4470
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:984
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4472
 msgid "Packet tag:"
 msgstr "Πακέτο ετικετών:"
 
 #. Progress animation
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:996
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4472
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:997
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4474
 msgid "Progress animation:"
 msgstr "Πρόοδος animation:"
 
 #. Process priority
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1009
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4462
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1010
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4464
 msgid "Process priority:"
 msgstr "Διαδικασία προτεραιότητας:"
 
 #. Debug setting
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1023
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4474
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1024
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4476
 msgid "Debug setting:"
 msgstr "Ρύθμιση απασφαλμάτωσης:"
 
 #. Streaming memory
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1046
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4476
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:938
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1047
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4478
 msgid "Streaming memory:"
 msgstr "Ροή μνήμης:"
 
 #. Update build type
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1148
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:938
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1149
 msgid "Update build type:"
 msgstr "Ενημέρωση τύπου αναπτύγματος:"
 
 #. UpdateAutoInstall
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1127
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:938
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1128
 msgid "Install important updates:"
 msgstr "Εγκατάσταση σημαντικών ενημερώσεων:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:950
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:978
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:991
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3006
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3022
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3029
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:951
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:979
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:992
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3008
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3024
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3031
 msgid "On"
 msgstr "Ενεργοποίηση"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:963
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3011
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:964
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3013
 msgid "Very slow"
 msgstr "Πολύ αργό"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:964
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:977
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:990
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1004
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1030
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1042
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1135
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1155
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3013
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3020
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3027
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3036
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3049
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:965
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:978
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:991
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1005
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1031
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1043
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1136
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1156
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3015
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3022
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3029
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3038
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3051
 msgid "Default"
 msgstr "Προεπιλογμένο"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:965
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3015
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:966
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3017
 msgid "Fast"
 msgstr "Γρήγορο"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1016
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2991
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1017
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2993
 msgid "Normal"
 msgstr "Κανονικό"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1017
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2993
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1018
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2995
 msgid "Above normal"
 msgstr "Παραπάνω από το κανονικό"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1053
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1054
 msgid "Min"
 msgstr "Ελάσσων"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1066
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1067
 msgid "Max"
 msgstr "Μέγιστο"
 
 #. Windows 8 compatibility
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1073
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1074
 msgid "Windows 8 compatibility:"
 msgstr "Windows 8 συμβατότητα:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1078
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1079
 msgid "16-bit color"
 msgstr "16-bit χρώμα"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1083
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1084
 msgid "Mouse fix"
 msgstr "Σταθεροποιήση ποντικιού"
 
 #. Cache path info
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1101
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1102
 msgid "Client resource files:"
 msgstr "Βοηθήματα αρχείων πρόγραμμα-πελάτη:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1105
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1106
 msgid "Show in Explorer"
 msgstr "Προβολή στον εξερευνητή"
 
 #. Auto updater section label
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1120
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1123
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1121
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1124
 msgid "Auto updater"
 msgstr "Αυτόματος ενημερωτής"
 
 #. Check for updates
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1161
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1162
 msgid "Check for update now"
 msgstr "Έλεγχος για ενημέρωση τώρα"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1308
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1309
 msgid "Some settings will be changed when you next start MTA"
 msgstr "Κάποιες ρυθμίσεις θα αλλάξουν στην επόμενη εκκίνηση του MTA"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1309
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1310
 msgid ""
 "\n"
 "\n"
@@ -1354,16 +1359,16 @@ msgstr ""
 "\n"
 "Θέλετε να πραγματοποιηθεί επανεκκίνηση τώρα;"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1312
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1313
 msgid "RESTART REQUIRED"
 msgstr "ΑΠΑΙΤΕΙΤΕ ΕΠΑΝΕΚΚΙΝΗΣΗ"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1332
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1333
 msgid "Some settings will be changed when you disconnect the current server"
 msgstr ""
 "Κάποιες ρυθμίσεις θα αλλάξουν όταν αποσυνδεθείτε από τον τρέχων διακομιστή"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1333
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1334
 msgid ""
 "\n"
 "\n"
@@ -1373,167 +1378,167 @@ msgstr ""
 "\n"
 "Θέλετε να αποσυνδεθείτε τώρα;"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1336
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1337
 msgid "DISCONNECT REQUIRED"
 msgstr "ΑΠΑΙΤΕΙΤΑΙ ΑΠΟΣΥΝΔΕΣΗ"
 
 #. Update the joystick name
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1644
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1645
 msgid "Joypad not detected  -  Check connections and restart game"
 msgstr ""
 "Δεν βρέθηκε Joypad - Ελέγξτε τις συνδέσεις και επανεκκινήστε το παιχνίδι"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1832
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1833
 msgid "Binding axis"
 msgstr "Δεσμεύοντας άξονες"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1832
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1833
 msgid "Move an axis to bind, or escape to clear"
 msgstr "Κουνήστε έναν άξονα για δέσμευση, ή escape για εκκαθάριση"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1909
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1910
 msgid "Language:"
 msgstr "Γλώσσα:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1909
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1910
 msgid "Skin:"
 msgstr "Σώμα:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1909
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1910
 msgid "Presets:"
 msgstr "Προρυθμίσεις:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1960
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1962
 msgid "Chat"
 msgstr "Συνομιλία"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1977
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1979
 msgid "Load"
 msgstr "Φόρτωση"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1989
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1991
 msgid "Colors"
 msgstr "Χρώματα"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1990
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1992
 msgid "Layout"
 msgstr "Διάταξη"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1991
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2237
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1993
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2239
 msgid "Options"
 msgstr "Ρυθμίσεις"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1997
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1999
 msgid "Chat Background"
 msgstr "Φόντο Συνομιλίας"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1997
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1999
 msgid "Chat Text"
 msgstr "Κείμενο συνομιλίας"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1997
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1999
 msgid "Input Background"
 msgstr "Είσοδος Συνομιλίας"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1997
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1999
 msgid "Input Text"
 msgstr "Εισαγωγή Κειμένου"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2020
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2022
 msgid "Lines:"
 msgstr "Γραμμές:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2020
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2022
 msgid "Scale:"
 msgstr "Κλίμακα:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2020
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2022
 msgid "Width:"
 msgstr "Πλάτος:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2023
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2025
 msgid "Size"
 msgstr "Μέγεθος"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2072
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2074
 msgid "after"
 msgstr "μετά"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2072
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2074
 msgid "for"
 msgstr "για"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2072
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2074
 msgid "sec"
 msgstr "δευτερ"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2075
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2077
 msgid "Fading"
 msgstr "Eξασθένηση"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2081
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2083
 msgid "Fade out old lines"
 msgstr "Εξασθενημένες παλιές γραμμές"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2121
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2123
 msgid "Horizontal:"
 msgstr "Οριζόντιος:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2121
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2123
 msgid "Vertical:"
 msgstr "Κατακόρυφος:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2121
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2123
 msgid "Text-Align:"
 msgstr "Ευθυγράμμιση Κειμένου:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2121
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2123
 msgid "X-Offset:"
 msgstr "Αντιστάθμισμα Χ:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2122
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2124
 msgid "Y-Offset:"
 msgstr "Αντιστάθμισμα Ψ:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2128
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2130
 msgid "Position"
 msgstr "Θέση"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2143
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2157
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2145
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2159
 msgid "Center"
 msgstr "Κέντρο"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2156
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2158
 msgid "Top"
 msgstr "Κορυφή"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2158
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2160
 msgid "Bottom"
 msgstr "Κάτω μέρος"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2206
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2208
 msgid "Font"
 msgstr "Γραμματοσειρά"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2243
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2245
 msgid "Hide background when not typing"
 msgstr "Απόκρυψη φόντου όταν δεν πληκτρολογείτε"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2248
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2250
 msgid "Nickname completion using the \"Tab\" key"
 msgstr "Ολοκλήρωση ψευδωνύμου χρησιμοποιώντας το πλήκτρο \"Tab\""
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2253
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2255
 msgid "Allow server to flash the window"
 msgstr "Επιτρέπω τον διακομιστή να δείχνει στιγμιαία ένα παράθυρο"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2258
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2260
 msgid "Allow tray balloon notifications"
 msgstr "Επιτρέπω tray balloon ειδοποιήσεις"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2263
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2265
 msgid "Chat text black/white outline"
 msgstr "Άσπρο/μαύρο περίγραμμα κειμένου συνομιλίας"
 
@@ -1543,65 +1548,65 @@ msgstr "Άσπρο/μαύρο περίγραμμα κειμένου συνομι
 #. Create a messagebox to notify the user
 #. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
 #. pItemBind->GetText ().c_str () );
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2511
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2518
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2513
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2520
 msgid "Press a key to bind, or escape to clear"
 msgstr "Πατήστε ένα πλήκτρο για να το δεσμεύσετε, ή escape για εκκαθάριση"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2512
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2514
 msgid "Binding a primary key"
 msgstr "Δεσμεύοντας ένα πρωταρχικό πλήκτρο"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2519
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2521
 msgid "Binding a secondary key"
 msgstr "Δεσμεύοντας ένα δευτερεύων πλήκτρο"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2593
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2595
 msgid "GTA GAME CONTROLS"
 msgstr "GTA ΠΛΗΚΤΡΑ ΠΑΙΧΝΙΔΙΟΥ"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2595
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2597
 msgid "MULTIPLAYER CONTROLS"
 msgstr "MULTIPLAYER ΠΛΗΚΤΡΑ"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2824
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4425
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2826
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4427
 msgid "Your nickname contains invalid characters!"
 msgstr "Το ψευδώνυμο σας περιέχει άκυρους χαρακτήρες!"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3564
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3566
 msgid "Red:"
 msgstr "Κόκκινο:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3564
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3566
 msgid "Green:"
 msgstr "Πράσινο:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3564
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3566
 msgid "Blue:"
 msgstr "Μπλε:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3564
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3566
 msgid "Transparency:"
 msgstr "Διαφάνεια:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3567
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3569
 msgid "Color"
 msgstr "Χρώμα"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3644
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3646
 msgid "Preview"
 msgstr "Προεπισκόπηση"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3952
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3954
 msgid "Please disconnect before changing language"
 msgstr "Παρακαλώ αποσυνδεθείτε πριν αλλάξετε γλώσσα"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3980
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3982
 msgid "Please disconnect before changing skin"
 msgstr "Παρακαλώ αποσυνδεθείτε πριν αλλάξετε σώμα"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4266
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4268
 msgid ""
 "Volmetric shadows can cause some systems to slow down.\n"
 "\n"
@@ -1611,11 +1616,11 @@ msgstr ""
 "\n"
 "Είστε σίγουρος ότι θέλετε να τις ενεργοποιήσετε;"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4270
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4272
 msgid "PERFORMANCE WARNING"
 msgstr "ΠΡΟΕΙΔΟΠΟΙΗΣΗ ΑΠΟΔΟΣΗΣ"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4290
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4292
 msgid ""
 "Screen upload is required by some servers for anti-cheat purposes.\n"
 "\n"
@@ -1625,11 +1630,11 @@ msgstr ""
 "\n"
 "(Το πλαίσιο συνομιλίας και το Γραφικό περιβάλλον διεπαφής χρήστη (GUI) δεν συμπεριλαμβάνονται στην αναφόρτωση)\n"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4292
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4294
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "ΠΛΗΡΟΦΟΡΙΕΣ ΑΝΑΦΟΡΤΩΣΗΣ ΟΘΟΝΗΣ"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4313
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4315
 msgid ""
 "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n"
@@ -1645,16 +1650,16 @@ msgstr ""
 "\n"
 "Είστε σίγουρος ότι θέλετε να τα χρησιμοποιήσετε;"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4319
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4321
 #: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2078
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "ΕΞΑΤΟΜΙΚΕΥΜΕΝΑ GTA:SA ΑΡΧΕΙΑ"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4443
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4445
 msgid "Please enter a nickname"
 msgstr "Παρακαλώ εισάγετε το ψευδώνυμο"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4444
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4446
 msgid ""
 "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
@@ -1662,73 +1667,73 @@ msgstr ""
 "Παρακαλώ εισάγετε το ψευδώνυμο που θα χρησιμοποιείτε στο παιχνίδι.  \n"
 "Αυτό θα είναι το όνομα σας όταν συνδέεστε και παίζετε σε ένα διακομιστή"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4462
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4464
 msgid "Very experimental feature."
 msgstr "Πολύ πειραματικό χαρακτηριστικό."
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4464
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4466
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr ""
 "Εμποδίζει τις παραλλαγές του CJ (Χρησιμοποιεί 65MB περισσότερη μνήμη RAM)"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4466
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4468
 msgid "Older routers may require a slower scan speed."
 msgstr ""
 "Οι παλαιότεροι δρομολογητές (router) μπορεί να χρειάζονται βραδύτερη "
 "ταχύτητα σάρωσης."
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4468
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4470
 msgid "Switch on to use only one connection when downloading."
 msgstr "Ενεργοποίηση χρήσης μόνο μιας σύνδεσης όταν γίνεται λήψη."
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4470
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4472
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr ""
 "Πακέτα ετικετών δικτύου για βοήθεια των ISPs στην αναγνώριση της MTA κίνησης"
 " δεδομένων. "
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4472
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4474
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr "Animation περιστρεφόμενου κύκλου στο κάτω μέρος της οθόνης"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4474
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4476
 msgid "Select default always. (This setting is not saved)"
 msgstr "Επιλογή προεπιλογής πάντα. (Αυτή η ρύθμιση δεν είναι αποθηκευμένη)"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4476
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4478
 msgid "Maximum is usually best"
 msgstr "Το μέγιστο είναι συνήθως το καλύτερο"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4478
 #: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4480
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4482
 msgid "Auto updater:"
 msgstr "Αυτόματος ενημερωτής:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4478
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4480
 msgid "Select default unless you like filling out bug reports."
 msgstr ""
 "Επιλέξτε τα προεπιλεγμένα εκτός αν θέλετε να συμπληρώνετε αναφορές "
 "σφαλμάτων."
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4480
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4482
 msgid "Select default to automatically install important updates."
 msgstr ""
 "Επιλέξτε τα προεπιλεγμένα για να εγκαθίστανται αυτόματα οι σημαντικές "
 "ενημερώσεις."
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4482
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4484
 msgid "16-bit color:"
 msgstr "16-bit χρώμα:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4482
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4484
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr "Ενεργοποίηση 16 bit χρώματος - Απαιτείται επανεκκίνηση του MTA"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4484
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4486
 msgid "Mouse fix:"
 msgstr "Σταθεροποιήση ποντικιού:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4484
+#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4486
 msgid "Mouse movement fix - May need PC restart"
 msgstr ""
 "Σταθεροποιήση κίνησης ποντικιού - Μπορεί να χρειαστεί επανεκκίνηση του "
@@ -3023,11 +3028,11 @@ msgstr ""
 "(Λειτουργία ανάπτυξης) εκτυπώνει τα παγκόσμια ids ήχου στο παράθυρο "
 "απασφαλμάτωσης"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:576
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:579
 msgid "Entering the game ..."
 msgstr "Είσοδος στο παιχνίδι ..."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:628
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:631
 msgid ""
 "Not connected; please use Quick Connect or the 'connect' command to connect "
 "to a server."
@@ -3035,51 +3040,51 @@ msgstr ""
 "Δεν είστε συνδεδεμένος, χρησιμοποιήστε την Γρήγορη Σύνδεση ή την εντολή "
 "'σύνδεση' για να συνδεθείτε σε ένα διακομιστή."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:674
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:677
 msgid "The server is not installed"
 msgstr "Ο διακομιστής δεν είναι εγκατεστημένος"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:684
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1059
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:687
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1062
 msgid "Local Server"
 msgstr "Τοπικός Διακομιστής"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:684
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:687
 msgid "Starting local server ..."
 msgstr "Ξεκινώντας τοπικό διακομιστή ..."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:990
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:993
 #, c-format, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "Διωχθήκατε από το παιχνίδι ( %s )"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1059
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1062
 msgid "Connecting to local server..."
 msgstr "Σύνδεση με τοπικό διακομιστή..."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1070
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1073
 msgid "Error connecting to server."
 msgstr "Σφάλμα σύνδεσης με τον διακομιστή."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1080
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1083
 msgid "Connecting to local server timed out. See console for details."
 msgstr ""
 "Η σύνδεση σας με τον τοπικό διακομιστή έχει λήξει. Ανατρέξτε στην κονσόλα "
 "για λεπτομέρειες."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1183
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1186
 msgid "Connection with the server was lost"
 msgstr "Η σύνδεση με τον διακομιστή χάθηκε."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1210
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1213
 msgid "Disconnected: the server is currently full"
 msgstr "Αποσύνδεση: ο διακομιστής είναι πλήρης"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1222
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1225
 msgid "Disconnected: invalid password specified"
 msgstr "Αποσύνδεση: καθορίστηκε μη έγκυρος κωδικός πρόσβασης"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1244
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1247
 msgid "MTA Client verification failed!"
 msgstr "Η επαλήθευση του πρόγραμμα-πελάτη του MTA απέτυχε!"
 
@@ -3129,15 +3134,15 @@ msgstr "Όλα"
 msgid "Start"
 msgstr "Έναρξη"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:471
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:475
 msgid "Disconnected: Invalid nickname"
 msgstr "Αποσύνδεση: Μη έγκυρο ψευδώνυμο"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:475
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:479
 msgid "Disconnect from server"
 msgstr "Αποσύνδεση από το διακομιστή"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:479
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:483
 #, c-format, c-format
 msgid ""
 "Disconnected: Serial is banned.\n"
@@ -3146,7 +3151,7 @@ msgstr ""
 "Αποσύνδεση: Ο σειριακός αριθμός έχει αποκλειστεί.\n"
 "Λόγος: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:485
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:489
 #, c-format, c-format
 msgid ""
 "Disconnected: You are banned.\n"
@@ -3155,7 +3160,7 @@ msgstr ""
 "Αποσύνδεση: Είστε αποκλεισμένοι.\n"
 "Λόγος: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:491
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:495
 #, c-format, c-format
 msgid ""
 "Disconnected: Account is banned.\n"
@@ -3164,17 +3169,17 @@ msgstr ""
 "Αποσύνδεση: Ο λογαριασμός είναι αποκλεισμένος.\n"
 "Λόγος: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:496
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:500
 msgid "Disconnected: Version mismatch"
 msgstr "Αποσύνδεση: Αναντιστοιχία έκδοσης"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:500
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:504
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
 msgstr ""
 "Αποσύνδεση: Υπερχείλιση συνδέσεων. Παρακαλώ περιμένετε ένα λεπτό και στη "
 "συνέχεια επανασυνδεθείτε."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:504
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:508
 #, c-format, c-format
 msgid ""
 "Disconnected: Server from different branch.\n"
@@ -3183,7 +3188,7 @@ msgstr ""
 "Αποσύνδεση: Ο διακομιστής είναι από διαφορετικό τομέα (branch).\n"
 "Πληροφορίες: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:509
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:513
 #, c-format, c-format
 msgid ""
 "Disconnected: Bad version.\n"
@@ -3192,7 +3197,7 @@ msgstr ""
 "Αποσύνδεση: Κακή έκδοση.\n"
 "Πληροφορίες: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:514
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:518
 #, c-format, c-format
 msgid ""
 "Disconnected: Server is running a newer build.\n"
@@ -3201,7 +3206,7 @@ msgstr ""
 "Αποσύνδεση: Ο διακομιστής εκτελεί νεότερο ανάπτυγμα (build).\n"
 "Πληροφορίες: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:519
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:523
 #, c-format, c-format
 msgid ""
 "Disconnected: Server is running an older build.\n"
@@ -3210,68 +3215,68 @@ msgstr ""
 "Αποσύνδεση: Ο διακομιστής εκτελεί παλαιότερο ανάπτυγμα (build).\n"
 "Πληροφορίες: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:524
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:528
 msgid "Disconnected: Nick already in use"
 msgstr "Αποσύνδεση: Το ψευδώνυμο χρησιμοποιείτε ήδη"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:528
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:532
 msgid "Disconnected: Player Element Could not be created."
 msgstr "Αποσύνδεση: Το στοιχείο το παίχτη δεν μπόρεσε να δημιουργηθεί"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:532
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:536
 #, c-format, c-format
 msgid "Disconnected: Server refused the connection: %s"
 msgstr "Αποσύνδεση: Ο διακομιστής απέρριψε την σύνδεση: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:537
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:541
 msgid "Disconnected: Serial verification failed"
 msgstr "Αποσύνδεση: Η επαλήθευση του σειριακού αριθμού απέτυχε"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:541
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:545
 #, c-format, c-format
 msgid "Disconnected: Connection desync %s"
 msgstr "Αποσύνδεση: Η σύνδεση αποσυγχρονίστηκε %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:550
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:554
 #, c-format, c-format
 msgid "Disconnected: You were kicked by %s"
 msgstr "Αποσύνδεση: Έχετε εκδιωχθεί από %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:555
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:559
 #, c-format, c-format
 msgid "Disconnected: You were banned by %s"
 msgstr "Αποσύνδεση: Έχετε αποκλειστεί από %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:566
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:570
 msgid "Disconnected: Server shutdown or restarting"
 msgstr "Αποσύνδεση: Ο διακομιστής έκλεισε ή κάνει επανεκκίνηση"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:591
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:595
 msgid "Time Remaining: "
 msgstr "Εναπομείνοντας χρόνος: "
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:601
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:605
 #, c-format, c-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d ημέρα"
 msgstr[1] "%d ημέρες"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:603
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:607
 #, c-format, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d ώρα"
 msgstr[1] "%d ώρες"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:605
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:609
 #, c-format, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d λεπτό"
 msgstr[1] "%d λεπτά"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:607
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:611
 #, c-format, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
@@ -3279,7 +3284,7 @@ msgstr[0] "δευτερόλεπτο"
 msgstr[1] "δευτερόλεπτα"
 
 #. Display the error
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:611
+#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:615
 msgid "Disconnected"
 msgstr "Αποσύνδεση"
 

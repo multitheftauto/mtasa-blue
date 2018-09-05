@@ -26,6 +26,8 @@ class CGraphics;
 class CTileBatcher;
 class CLine3DBatcher;
 class CMaterialLine3DBatcher;
+class CPrimitiveBatcher;
+class CPrimitiveMaterialBatcher;
 class CAspectRatioConverter;
 struct IDirect3DDevice9;
 struct IDirect3DSurface9;
@@ -60,6 +62,7 @@ struct sFontInfo
 class CGraphics : public CGraphicsInterface, public CSingleton<CGraphics>
 {
     friend class CDirect3DEvents9;
+    friend CPrimitiveMaterialBatcher;
 
 public:
     ZERO_ON_NEW
@@ -80,7 +83,8 @@ public:
     void DrawLine3D(const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f);
     void DrawRectangle(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning = false);
     void DrawStringOutline(const RECT& rect, unsigned long ulColor, const wchar_t* szText, unsigned long ulFormat, LPD3DXFONT pDXFont);
-    void DrawCircleInternal(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI);
+    void DrawCircleInternal(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
+                            short siSegments, float fRatio, bool bPostGUI);
 
     void           SetBlendMode(EBlendModeType blendMode);
     EBlendModeType GetBlendMode(void);
@@ -141,7 +145,10 @@ public:
                           unsigned long ulFormat, ID3DXFont* pDXFont = NULL, bool bPostGUI = false, bool bColorCoded = false, bool bSubPixelPositioning = false,
                           float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0);
 
-    void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter, ushort fSegments, float fRatio, bool bPostGUI);
+    void DrawPrimitiveQueued(const std::vector<PrimitiveVertice>& vecVertices, D3DPRIMITIVETYPE type, bool bPostGUI = false);
+    void DrawMaterialPrimitiveQueued(const std::vector<PrimitiveMaterialVertice>& vertices, D3DPRIMITIVETYPE type, CMaterialItem* pMaterial, bool bPostGUI);
+    void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
+                          short siSegments, float fRatio, bool bPostGUI);
 
     void OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
 
@@ -198,15 +205,19 @@ private:
 
     IDirect3DDevice9* m_pDevice;
 
-    CRenderItemManager*      m_pRenderItemManager;
-    CScreenGrabberInterface* m_pScreenGrabber;
-    CPixelsManagerInterface* m_pPixelsManager;
-    CTileBatcher*            m_pTileBatcher;
-    CLine3DBatcher*          m_pLine3DBatcherPreGUI;
-    CLine3DBatcher*          m_pLine3DBatcherPostGUI;
-    CMaterialLine3DBatcher*  m_pMaterialLine3DBatcherPreGUI;
-    CMaterialLine3DBatcher*  m_pMaterialLine3DBatcherPostGUI;
-    CAspectRatioConverter*   m_pAspectRatioConverter;
+    CRenderItemManager*        m_pRenderItemManager;
+    CScreenGrabberInterface*   m_pScreenGrabber;
+    CPixelsManagerInterface*   m_pPixelsManager;
+    CTileBatcher*              m_pTileBatcher;
+    CLine3DBatcher*            m_pLine3DBatcherPreGUI;
+    CLine3DBatcher*            m_pLine3DBatcherPostGUI;
+    CMaterialLine3DBatcher*    m_pMaterialLine3DBatcherPreGUI;
+    CMaterialLine3DBatcher*    m_pMaterialLine3DBatcherPostGUI;
+    CPrimitiveBatcher*         m_pPrimitiveBatcherPreGUI;
+    CPrimitiveBatcher*         m_pPrimitiveBatcherPostGUI;
+    CPrimitiveMaterialBatcher* m_pPrimitiveMaterialBatcherPreGUI;
+    CPrimitiveMaterialBatcher* m_pPrimitiveMaterialBatcherPostGUI;
+    CAspectRatioConverter*     m_pAspectRatioConverter;
 
     // Fonts
     ID3DXFont* m_pDXFonts[NUM_FONTS];

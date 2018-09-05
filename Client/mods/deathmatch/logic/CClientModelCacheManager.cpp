@@ -104,8 +104,7 @@ void CClientModelCacheManagerImpl::DoPulse(void)
     m_TickCountNow = CTickCount::Now();
     ClearStats();
 
-    CClientPlayer* m_pLocalPlayer = g_pClientGame->GetLocalPlayer();
-    if (!m_pLocalPlayer)
+    if (!g_pClientGame->GetLocalPlayer())
         return;
 
     m_fGameFps = g_pGame->GetFPS();

@@ -54,6 +54,7 @@ public:
     CAnimBlendAssociationSAInterface*    InitializeForCustomAnimation(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy);
     void                                 InitializeWithHierarchy(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy);
     void                                 AllocateAnimBlendNodeArray(int count);
+    void                                 FreeAnimBlendNodeArray();
     CAnimBlendAssociationSAInterface*    GetInterface() { return m_pInterface; }
     AssocGroupId                         GetAnimGroup() { return (AssocGroupId)m_pInterface->sAnimGroup; }
     AnimationId                          GetAnimID() { return (AnimationId)m_pInterface->sAnimID; }
@@ -62,6 +63,7 @@ public:
     float GetBlendAmount() { return m_pInterface->fBlendAmount; }
     void  SetBlendAmount(float fAmount) { m_pInterface->fBlendAmount = fAmount; }
     void  SetCurrentProgress(float fProgress);
+    void  SetCurrentSpeed(float fSpeed) { m_pInterface->fSpeed = fSpeed; }
     void  SetAnimID(short sAnimID) { m_pInterface->sAnimID = sAnimID; }
     void  SetAnimGroup(short sAnimGroup) { m_pInterface->sAnimGroup = sAnimGroup; }
     void  SetFlags(short sFlags) { m_pInterface->sFlags = sFlags; }

@@ -70,6 +70,7 @@ public:
     bool HasStarted(void) { return m_bStarted; };
 
     void SetNewsHeadline(int iIndex, const SString& strHeadline, const SString& strDate, bool bIsNew);
+    void ReloadNews();
     void OnEscapePressedOffLine(void);
 
     static void StaticWantsToDisconnectCallBack(void* pData, uint uiButton);

@@ -451,9 +451,22 @@ bool    StringToBool(const SString& strText);
 void    MinServerReqCheck(CScriptArgReader& argStream, const char* szVersionReq, const char* szReason);
 void    ReadPregFlags(CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions);
 bool    ReadMatrix(lua_State* luaVM, uint uiArgIndex, CMatrix& outMatrix);
-void    CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, CResource* pOtherResource2 = nullptr);
-void    CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath,
-                                        bool* pbReadOnly = nullptr);
+
+//
+// Resource access helpers
+//
+enum class eResourceModifyScope
+{
+    NONE,
+    SINGLE_RESOURCE,
+    EVERY_RESOURCE,
+};
+
+eResourceModifyScope GetResourceModifyScope(CResource* pThisResource, CResource* pOtherResource);
+void                 CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource);
+void                 CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisResource, std::initializer_list<CResource*> resourceList);
+void                 CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath,
+                                                     bool* pbReadOnly = nullptr);
 
 //
 // Other misc helpers

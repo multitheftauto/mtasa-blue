@@ -25,7 +25,11 @@ class CServerImpl;
 #include "CThreadCommandQueue.h"
 
 #ifndef WIN32
-#include <ncursesw/curses.h>
+    #ifdef __APPLE__
+        #include <ncurses.h>
+    #else
+        #include <ncursesw/curses.h>
+    #endif
 #endif
 
 #define SERVER_RESET_RETURN 500
@@ -59,6 +63,11 @@ public:
     void Printf(const char* szText, ...);
     bool IsRequestingExit(void);
 
+    // Clears input buffer
+    bool ClearInput(void);
+    // Prints current input buffer on a new line, clears the input buffer and resets history selection
+    bool ResetInput(void);
+
     int Run(int iArgumentCount, char* szArguments[]);
 #ifndef WIN32
     void Daemonize() const;
@@ -73,6 +82,7 @@ private:
 
     void ShowInfoTag(char* szTag);
     void HandleInput(void);
+    void SelectCommandHistoryEntry(uint uiEntry);
     void HandlePulseSleep(void);
     void ApplyFrameRateLimit(uint uiUseRate);
 
@@ -94,13 +104,16 @@ private:
     bool m_bRequestedQuit;
     bool m_bRequestedReset;
 
-    wchar_t      m_szInputBuffer[255];
-    unsigned int m_uiInputCount;
+    wchar_t m_szInputBuffer[255];
+    uint    m_uiInputCount;
 
     char m_szTag[80];
 
     double m_dLastTimeMs;
     double m_dPrevOverrun;
+
+    std::vector<std::vector<SString>> m_vecCommandHistory = {{"", ""}};
+    uint                              m_uiSelectedCommandHistoryEntry = 0;
 
 #ifdef WIN32
     HANDLE    m_hConsole;
