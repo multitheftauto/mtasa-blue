@@ -1764,6 +1764,12 @@ int CLuaFunctionDefs::GetBirdsEnabled(lua_State* luaVM)
     return 1;
 }
 
+int CLuaFunctionDefs::GetCurrentFPS(lua_State* luaVM)
+{
+    lua_pushnumber(luaVM, g_pGame->GetFPS());
+    return 1;
+}
+
 int CLuaFunctionDefs::SetMoonSize(lua_State* luaVM)
 {
     int iSize;
