@@ -33,7 +33,7 @@ matrix:
         NIGHTLY_UPLOAD=0
     
 before_script:
-  - wget https://mirror.mtasa.com/bdata/premake5-travis -v -O ./premake5 &&
+  - wget https://mirror.mtasa.com/bdata/premake5-travis -4 -O ./premake5 &&
     chmod +x ./premake5 &&
     ./premake5 gmake && 
     cd Build
@@ -47,7 +47,7 @@ after_success:
     ./premake5 install_data && 
     ./premake5 compose_files && 
     zip -r Artifact.zip InstallFiles/ &&
-    curl -i -F \"branch_name=$TRAVIS_BRANCH\" -F \"commit_hash=$TRAVIS_COMMIT\" -F \"commit_title=$(git log -1 --pretty=%B)\" -F build_type=linux64 -F \"secret=$UPLOAD_SECRET\" -F build_upload=@Artifact.zip https://nightlytest.mtasa.com/api/upload"
+    curl -i -4 -F \"branch_name=$TRAVIS_BRANCH\" -F \"commit_hash=$TRAVIS_COMMIT\" -F \"commit_title=$(git log -1 --pretty=%B)\" -F build_type=linux64 -F \"secret=$UPLOAD_SECRET\" -F build_upload=@Artifact.zip https://nightlytest.mtasa.com/api/upload"
 
 notifications:
   irc:
