@@ -181,6 +181,7 @@ CCredits::CCredits(void)
         "max 'Hobo Pie' Power\n"
         "diegofkda\n"
         "Ren712\n"
+        "StifflersMom\n"
         "\n"
         "\n"
 
