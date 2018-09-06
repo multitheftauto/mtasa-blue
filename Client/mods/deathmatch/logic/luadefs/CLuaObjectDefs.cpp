@@ -55,7 +55,7 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
 
     lua_classvariable(luaVM, "scale", "setObjectScale", "getObjectScale");
     lua_classvariable(luaVM, "breakable", "setObjectBreakable", "isObjectBreakable");
-    lua_classvariable(luaVM, "properties", nullptr, "getObjectProperties");
+    lua_classvariable(luaVM, "properties", nullptr, GetObjectProperties);
 
     // Add deprecated methods for backwards compatibility
     lua_classfunction(luaVM, "toggleObjectRespawn", "toggleObjectRespawn");
