@@ -283,7 +283,8 @@ public:
 
     // Object set funcs
     static bool SetObjectRotation(CClientEntity& Entity, const CVector& vecRotation);
-    static bool MoveObject(CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation, CEasingCurve::eType a_eEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot);
+    static bool MoveObject(CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation,
+                           CEasingCurve::eType a_eEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot);
     static bool StopObject(CClientEntity& Entity);
     static bool SetObjectScale(CClientEntity& Entity, const CVector& vecScale);
     static bool SetObjectStatic(CClientEntity& Entity, bool bStatic);

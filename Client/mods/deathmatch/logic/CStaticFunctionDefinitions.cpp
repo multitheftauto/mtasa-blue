@@ -3788,7 +3788,7 @@ bool CStaticFunctionDefinitions::GetObjectBuoyancyConstant(CClientObject& Object
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetObjectCenterOfMass(CClientObject & Object, CVector& vecCenterOfMass)
+bool CStaticFunctionDefinitions::GetObjectCenterOfMass(CClientObject& Object, CVector& vecCenterOfMass)
 {
     Object.GetCenterOfMass(vecCenterOfMass);
     return true;

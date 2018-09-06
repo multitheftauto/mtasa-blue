@@ -196,11 +196,10 @@ int CLuaObjectDefs::IsObjectBreakable(lua_State* luaVM)
     return 1;
 }
 
-
 int CLuaObjectDefs::GetObjectProperty(lua_State* luaVM)
 {
     //  float, float, float getObjectProperty ( object theObject, string property )
-    CClientObject* pObject;
+    CClientObject*  pObject;
     eObjectProperty eProp;
 
     CScriptArgReader argStream(luaVM);
@@ -282,11 +281,10 @@ int CLuaObjectDefs::GetObjectProperty(lua_State* luaVM)
     return 1;
 }
 
-
 int CLuaObjectDefs::GetObjectProperties(lua_State* luaVM)
 {
     //  table getObjectProperties ( object theObject )
-    CClientObject* pObject;
+    CClientObject*   pObject;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pObject);
 
@@ -330,7 +328,6 @@ int CLuaObjectDefs::GetObjectProperties(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
-
 
 int CLuaObjectDefs::MoveObject(lua_State* luaVM)
 {
@@ -554,11 +551,10 @@ int CLuaObjectDefs::ToggleObjectRespawn(lua_State* luaVM)
     return 1;
 }
 
-
 int CLuaObjectDefs::SetObjectProperty(lua_State* luaVM)
 {
     //  bool setObjectProperty ( object theObject, string property, ... )
-    CClientEntity* pEntity;
+    CClientEntity*  pEntity;
     eObjectProperty eProp;
 
     CScriptArgReader argStream(luaVM);

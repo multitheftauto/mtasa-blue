@@ -34,8 +34,8 @@ public:
     virtual void  SetElasticity(float fElasticity) = 0;
     virtual float GetBuoyancyConstant(void) = 0;
     virtual void  SetBuoyancyConstant(float fBuoyancyConstant) = 0;
-    virtual void  GetCenterOfMass(CVector & vecCenterOfMass) = 0;
-    virtual void  SetCenterOfMass(CVector & vecCenterOfMass) = 0;
+    virtual void  GetCenterOfMass(CVector& vecCenterOfMass) = 0;
+    virtual void  SetCenterOfMass(CVector& vecCenterOfMass) = 0;
 
     virtual void ProcessCollision(void) = 0;
     virtual void AddToMovingList(void) = 0;
