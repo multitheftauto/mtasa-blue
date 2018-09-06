@@ -39,6 +39,9 @@ CObject::CObject(CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectMana
 CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent, Copy.m_pXMLNode), m_bIsLowLod(Copy.m_bIsLowLod), m_pLowLodObject(Copy.m_pLowLodObject)
 {
     // Init
+    m_iType = CElement::OBJECT;
+    SetTypeName("object");
+
     m_pObjectManager = Copy.m_pObjectManager;
     m_usModel = Copy.m_usModel;
     m_vecPosition = Copy.m_vecPosition;
