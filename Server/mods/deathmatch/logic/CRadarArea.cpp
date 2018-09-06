@@ -39,7 +39,7 @@ CElement* CRadarArea::Clone(bool* bAddEntity, CResource* pResource)
         pTemp->SetColor(GetColor());
         if (pResource->HasStarted())
             pTemp->Sync(true);
-        bAddEntity = false;
+        *bAddEntity = false;
     }
     return pTemp;
 }

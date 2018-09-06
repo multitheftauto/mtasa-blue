@@ -54,7 +54,7 @@ CElement* CMarker::Clone(bool* bAddEntity, CResource* pResource)
         pTemp->SetSize(GetSize());
         if (pResource->HasStarted())
             pTemp->Sync(true);
-        bAddEntity = false;
+        *bAddEntity = false;
     }
     return pTemp;
 }
