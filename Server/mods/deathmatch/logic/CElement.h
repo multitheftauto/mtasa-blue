@@ -87,7 +87,7 @@ public:
     virtual ~CElement(void);
 
     virtual CElement* Clone(bool* bAddEntity, CResource* pResource) { return nullptr; }
-    constexpr bool    IsCloneable(void);
+    bool              IsCloneable(void);
 
     bool         IsBeingDeleted(void) { return m_bIsBeingDeleted; };
     void         SetIsBeingDeleted(bool bBeingDeleted) { m_bIsBeingDeleted = bBeingDeleted; };

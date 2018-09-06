@@ -136,7 +136,7 @@ CElement::~CElement(void)
     SAFE_RELEASE(m_pChildrenListSnapshot);
 }
 
-constexpr bool CElement::IsCloneable(void)
+bool CElement::IsCloneable(void)
 {
     auto iType = GetType();
     switch (iType)
