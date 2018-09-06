@@ -136,6 +136,25 @@ CElement::~CElement(void)
     SAFE_RELEASE(m_pChildrenListSnapshot);
 }
 
+constexpr bool CElement::IsCloneable(void)
+{
+    auto iType = GetType();
+    switch (iType)
+    {
+        case CElement::DUMMY:
+        case CElement::VEHICLE:
+        case CElement::OBJECT:
+        case CElement::MARKER:
+        case CElement::BLIP:
+        case CElement::PICKUP:
+        case CElement::RADAR_AREA:
+        case CElement::PATH_NODE_UNUSED:
+            return true;
+        default:
+            return false;
+    }
+}
+
 const CVector& CElement::GetPosition(void)
 {
     if (m_pAttachedTo)
