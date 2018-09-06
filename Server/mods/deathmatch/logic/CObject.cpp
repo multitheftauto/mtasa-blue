@@ -72,6 +72,11 @@ CObject::~CObject(void)
     Unlink();
 }
 
+CElement* CObject::Clone(bool* bAddEntity, CResource* pResource)
+{
+    return new CObject(*this);
+}
+
 void CObject::Unlink(void)
 {
     // Remove us from the manager's list

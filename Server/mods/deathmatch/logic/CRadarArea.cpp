@@ -30,6 +30,20 @@ CRadarArea::~CRadarArea(void)
     Unlink();
 }
 
+CElement* CRadarArea::Clone(bool* bAddEntity, CResource* pResource)
+{
+    CRadarArea* pTemp = m_pRadarAreaManager->Create(GetParentEntity(), NULL);
+    if (pTemp)
+    {
+        pTemp->SetSize(GetSize());
+        pTemp->SetColor(GetColor());
+        if (pResource->HasStarted())
+            pTemp->Sync(true);
+        bAddEntity = false;
+    }
+    return pTemp;
+}
+
 void CRadarArea::Unlink(void)
 {
     // Remove us from the manager's list
