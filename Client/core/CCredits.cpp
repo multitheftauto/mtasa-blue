@@ -60,16 +60,15 @@ CCredits::CCredits(void)
     m_strCredits +=
         "\n\n"
 
+        "Danish \"Saml1er\" Khan\n"
+        "Marek \"botder\" Kulik\n"
         "Arran\n"
-        "Dutchman101\n"
         "Iztas\n"
         "impulze\n"
         "JoeBullet\n"
         "lopezloo\n"
         "MX_Master\n"
-        "Marek \"Necktrox\" Kulik\n"
         "Remp\n"
-        "Danish \"Saml1er\" Khan\n"
         "\n";
 
     m_strCredits += _("Game Design / Scripting");
@@ -86,6 +85,7 @@ CCredits::CCredits(void)
         "Dustin \"Ransom\" Morren\n"
         "erorr404\n"
         "Synecy\n"
+        "Dutchman101\n"
         "\n"
         "\n";
 
