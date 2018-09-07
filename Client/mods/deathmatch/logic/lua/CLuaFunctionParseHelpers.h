@@ -54,6 +54,7 @@ DECLARE_ENUM(eSurfaceProperties);
 DECLARE_ENUM(eSurfaceAudio);
 DECLARE_ENUM(eSurfaceStepEffect);
 DECLARE_ENUM(eSurfaceBulletEffect);
+DECLARE_ENUM(eSurfaceWheelEffect);
 
 enum eDXHorizontalAlign
 {
@@ -392,6 +393,10 @@ inline SString GetClassTypeName(eSurfaceStepEffect*)
 inline SString GetClassTypeName(eSurfaceBulletEffect*)
 {
     return "surface-bullet-effect";
+}
+inline SString GetClassTypeName(eSurfaceWheelEffect*)
+{
+    return "surface-wheel-effect";
 }
 
 //

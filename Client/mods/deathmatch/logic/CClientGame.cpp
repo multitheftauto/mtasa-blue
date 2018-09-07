@@ -343,6 +343,11 @@ CClientGame::CClientGame(bool bLocalPlay)
 
     // Reset test mode script settings to default
     g_pCore->GetGraphics()->GetRenderItemManager()->SetTestMode(DX_TEST_MODE_NONE);
+
+    // Store default sutface properties
+    m_pSurfaceInfo = reinterpret_cast<CSurfaceType*>(0xB79538);
+    memcpy(m_pOriginalSurfaceInfo, m_pSurfaceInfo, sizeof(CSurfaceType));
+
 }
 
 CClientGame::~CClientGame(void)
@@ -504,6 +509,8 @@ CClientGame::~CClientGame(void)
     // NULL the global CClientGame var
     g_pClientGame = NULL;
     m_bBeingDeleted = false;
+
+    memcpy(m_pSurfaceInfo, m_pOriginalSurfaceInfo, sizeof(CSurfaceType));
 }
 
 /*

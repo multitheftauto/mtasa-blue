@@ -801,6 +801,9 @@ private:
     bool m_bShowCollision;
     bool m_bShowSound;
 
+    CSurfaceType* m_pSurfaceInfo;
+    CSurfaceType* m_pOriginalSurfaceInfo;
+
     // Debug class. Empty in release.
 public:
     CFoo m_Foo;
