@@ -143,7 +143,7 @@ void CPrimitiveMaterialBatcher::Flush(void)
     // Cache last used material, so we don't set directx parameters needlessly
     CMaterialItem* pLastMaterial = nullptr;
 
-    for (int i = 0; i < m_primitiveList.size(); i++)
+    for (uint i = 0; i < m_primitiveList.size(); i++)
     {
         sDrawQueuePrimitiveMaterial primitive = m_primitiveList[i];
         // uint PrimitiveCount = m_triangleList.size () / 3;

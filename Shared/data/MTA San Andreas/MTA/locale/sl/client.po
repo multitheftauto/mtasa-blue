@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-01 13:55+0100\n"
-"PO-Revision-Date: 2018-09-01 13:22+0000\n"
+"PO-Revision-Date: 2018-09-02 02:28+0000\n"
 "Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: sl\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
 "Translators: PrimoXD; Boštjan Kozar; Bine; qaisjp\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1535808140.0\n"
+"X-POOTLE-MTIME: 1535855284.0\n"
 
 #: E:\Documents\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -627,7 +627,7 @@ msgstr "Nadzor skupine nazaj"
 #. TRANSLATORS: Replace with your language native name
 #: E:\Documents\mtasa-blue\Client\core\CLocalization.cpp:17
 msgid "English"
-msgstr "slovensko"
+msgstr "Slovenščina"
 
 #: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:314
 msgid ""

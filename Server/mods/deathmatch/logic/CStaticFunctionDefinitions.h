@@ -200,6 +200,7 @@ public:
     static bool SetPedAnimation(CElement* pElement, const char* szBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
                                 bool bInterruptable, bool bFreezeLastFrame);
     static bool SetPedAnimationProgress(CElement* pElement, const char* szAnimName, float fProgress);
+    static bool SetPedAnimationSpeed(CElement* pElement, const char* szAnimName, float fSpeed);
     static bool SetPedOnFire(CElement* pElement, bool bIsOnFire);
     static bool SetPedHeadless(CElement* pElement, bool bIsHeadless);
     static bool SetPedFrozen(CElement* pElement, bool bIsFrozen);
@@ -305,7 +306,8 @@ public:
     static bool SetVehicleRespawnDelay(CElement* pElement, unsigned long ulTime);
     static bool GetVehicleRespawnPosition(CElement* pElement, CVector& vecPosition);
     static bool GetVehicleRespawnRotation(CElement* pElement, CVector& vecRotation);
-    static bool SetVehicleRespawnPosition(CElement* pElement, const CVector& vecPosition, const CVector& vecRotation);
+    static bool SetVehicleRespawnRotation(CElement* pElement, const CVector& vecRotation);
+    static bool SetVehicleRespawnPosition(CElement* pElement, const CVector& vecPosition);
     static bool ToggleVehicleRespawn(CElement* pElement, bool bRespawn);
     static bool ResetVehicleExplosionTime(CElement* pElement);
     static bool ResetVehicleIdleTime(CElement* pElement);

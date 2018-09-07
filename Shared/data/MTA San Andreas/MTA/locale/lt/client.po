@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-01 13:55+0100\n"
-"PO-Revision-Date: 2018-09-01 13:19+0000\n"
+"PO-Revision-Date: 2018-09-02 02:25+0000\n"
 "Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: lt\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "Translators: Kristupas Skabeikis; Rytis Jankauskas; Gabrielius  Laurinavičius; Tadas Lapė; qaisjp; Karolis Vaikutis; Dzinas\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1535807960.0\n"
+"X-POOTLE-MTIME: 1535855105.0\n"
 
 #: E:\Documents\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -628,7 +628,7 @@ msgstr "Gaujos nurodymas atsitraukti"
 #. TRANSLATORS: Replace with your language native name
 #: E:\Documents\mtasa-blue\Client\core\CLocalization.cpp:17
 msgid "English"
-msgstr "lietuvių kalba"
+msgstr "Lietuvių"
 
 #: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:314
 msgid ""

@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-01 13:55+0100\n"
-"PO-Revision-Date: 2018-09-01 13:22+0000\n"
+"PO-Revision-Date: 2018-09-02 02:27+0000\n"
 "Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: sk\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "Translators: Nidecker; Waileer; tinostar91; qaisjp\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1535808127.0\n"
+"X-POOTLE-MTIME: 1535855259.0\n"
 
 #: E:\Documents\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -628,7 +628,7 @@ msgstr "Skupinové ovládanie dozadu"
 #. TRANSLATORS: Replace with your language native name
 #: E:\Documents\mtasa-blue\Client\core\CLocalization.cpp:17
 msgid "English"
-msgstr "slovenčina"
+msgstr "Slovenčina"
 
 #: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:314
 msgid ""

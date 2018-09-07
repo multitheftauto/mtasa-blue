@@ -37,7 +37,7 @@ class CClientManager;
 #define IS_PROJECTILE(entity) ((entity)->GetType()==CCLIENTPROJECTILE)
 #define IS_GUI(entity) ((entity)->GetType()==CCLIENTGUI)
 #define IS_IFP(entity) ((entity)->GetType()==CCLIENTIFP)
-#define CHECK_CGUI(entity,type) (((CClientGUIElement*)entity)->GetCGUIElement()->GetType()==type)
+#define CHECK_CGUI(entity,type) (((CClientGUIElement*)entity)->GetCGUIElement()->GetType()==(type))
 
 enum eClientEntityType
 {

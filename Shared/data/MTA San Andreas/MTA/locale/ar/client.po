@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-01 13:55+0100\n"
-"PO-Revision-Date: 2018-09-01 13:08+0000\n"
+"PO-Revision-Date: 2018-09-02 02:18+0000\n"
 "Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: ar\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
 "Translators: Mr.Pres[T]ege; iMr.Dawix; MSHOOSH; KING-ABADY; ALBANDER; SoRa; Alnassre; UAEpro; Majed-HQ; Tete; TAPL; Ahmed Ly; 3BaDy; Avenger; Live; Tifa_1999; MR.NaiF-MTA D:\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1535807290.0\n"
+"X-POOTLE-MTIME: 1535854695.0\n"
 
 #: E:\Documents\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -630,7 +630,7 @@ msgstr "زر تحكم المجموعه للخلف"
 #. TRANSLATORS: Replace with your language native name
 #: E:\Documents\mtasa-blue\Client\core\CLocalization.cpp:17
 msgid "English"
-msgstr "عربي"
+msgstr "العربية"
 
 #: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:314
 msgid ""
