@@ -82,6 +82,7 @@ void CLuaMain::InitSecurity(void)
         { "exit", CLuaUtilDefs::DisabledFunction },
         { "getenv", CLuaUtilDefs::DisabledFunction },
         { "tmpname", CLuaUtilDefs::DisabledFunction },
+        { "setlocale", CLuaUtilDefs::DisabledFunction },
         { NULL, NULL }
     };
     luaL_register(m_luaVM, "os", osfuncs);
