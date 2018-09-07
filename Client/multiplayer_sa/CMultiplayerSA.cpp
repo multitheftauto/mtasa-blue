@@ -294,6 +294,9 @@ DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIHeli = FUNC_CAEVehicleAudioEntity__
 DWORD RETURN_CAEVEhicleAudioEntity__ProcessDummyProp = 0x4FDFAB;
 DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIProp = FUNC_CAEVehicleAudioEntity__ProcessAIProp;
 
+#define HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance   0x68A4EF
+DWORD RETURN_CTaskSimpleSwim_ProcessSwimmingResistance = 0x68A50E;
+
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
 FLOAT         fFalseHeading;
@@ -514,6 +517,8 @@ void HOOK_CAERadioTrackManager__ChooseMusicTrackIndex();
 
 void HOOK_CAEVehicleAudioEntity__ProcessDummyHeli();
 void HOOK_CAEVehicleAudioEntity__ProcessDummyProp();
+
+void HOOK_CTaskSimpleSwim_ProcessSwimmingResistance();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -743,6 +748,9 @@ void CMultiplayerSA::InitHooks()
 
     HookInstall(HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyHeli, (DWORD)HOOK_CAEVehicleAudioEntity__ProcessDummyHeli, 5);
     HookInstall(HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyProp, (DWORD)HOOK_CAEVehicleAudioEntity__ProcessDummyProp, 5);
+
+    // Fix GTA:SA swimming speed problem on higher fps
+    HookInstall(HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance, (DWORD)HOOK_CTaskSimpleSwim_ProcessSwimmingResistance, 6);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -6827,5 +6835,38 @@ void _declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyProp()
         call    dwFUNC_CAEVehicleAudioEntity__ProcessAIProp
         // go back
         jmp     RETURN_CAEVEhicleAudioEntity__ProcessDummyProp
+    }
+}
+
+const float kfTimeStepOriginal = 1.66f;
+void _declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
+{
+    _asm
+    {
+        fsub    st, st(1)
+
+        fld     dword ptr[esp + 16]
+        lea     eax, [esi + 44h]
+        mov     ecx, eax
+        fmul    st, st(1)
+
+        fdiv    ds : 0xB7CB5C
+        fmul    kfTimeStepOriginal
+
+        fstp    dword ptr[esp + 28]
+
+        fld     dword ptr[esp + 20]
+        fmul    st, st(1)
+
+        fdiv    ds : 0xB7CB5C
+        fmul    kfTimeStepOriginal
+
+        fstp    dword ptr[esp + 32]
+        fmul    dword ptr[esp + 24]
+
+        fdiv    ds : 0xB7CB5C
+        fmul    kfTimeStepOriginal
+
+        jmp     RETURN_CTaskSimpleSwim_ProcessSwimmingResistance
     }
 }

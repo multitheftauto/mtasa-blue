@@ -91,6 +91,7 @@ public:
 
     CPickup(CElement* pParent, CXMLNode* pNode, class CPickupManager* pPickupManager, CColManager* pColManager);
     ~CPickup(void);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
     bool IsEntity(void) { return true; }
 

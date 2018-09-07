@@ -18,7 +18,6 @@ CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_Mod
 
 std::map<unsigned short, int>                              CModelInfoSA::ms_RestreamTxdIDMap;
 std::map<DWORD, float>                                     CModelInfoSA::ms_ModelDefaultLodDistanceMap;
-std::set<uint>                                             CModelInfoSA::ms_ReplacedColModels;
 std::map<DWORD, BYTE>                                      CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<CVehicleModelInfoSAInterface*, CVector> CModelInfoSA::ms_ModelDefaultVehicleFumesPosition;
 
@@ -1020,9 +1019,6 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
     if (m_pCustomColModel == pColModel)
         return;
 
-    // Remember model so we can skip GTA trying to reload the original
-    MapInsert(ms_ReplacedColModels, m_dwModelID);
-
     // Store the col model we set
     m_pCustomColModel = pColModel;
 
@@ -1082,8 +1078,6 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
 
 void CModelInfoSA::RestoreColModel(void)
 {
-    MapRemove(ms_ReplacedColModels, m_dwModelID);
-
     // Are we loaded?
     m_pInterface = ppModelInfo[m_dwModelID];
     if (m_pInterface)
@@ -1192,52 +1186,6 @@ void CModelInfoSA::MakePedModel(char* szTexture)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
-// Hook for CFileLoader_LoadCollisionFile_Mid
-//
-// Skip loading GTA collision model if we have replaced it
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-__declspec(noinline) bool OnMY_CFileLoader_LoadCollisionFile_Mid(int iModelId)
-{
-    if (MapContains(CModelInfoSA::ms_ReplacedColModels, iModelId))
-        return false;
-
-    return true;
-}
-
-// Hook info
-#define HOOKPOS_CFileLoader_LoadCollisionFile_Mid                         0x5384EE
-#define HOOKSIZE_CFileLoader_LoadCollisionFile_Mid                        6
-DWORD RETURN_CFileLoader_LoadCollisionFile_Mid = 0x5384F4;
-DWORD RETURN_CFileLoader_LoadCollisionFile_Mid_Skip = 0x53863B;
-void _declspec(naked) HOOK_CFileLoader_LoadCollisionFile_Mid()
-{
-    _asm
-    {
-        pushad
-        push    eax
-        call    OnMY_CFileLoader_LoadCollisionFile_Mid
-        add     esp, 4*1
-
-        cmp     al,0
-        jz      skip
-
-        popad
-        sub     edx,18h
-        add     ebp,2
-        jmp     RETURN_CFileLoader_LoadCollisionFile_Mid
-
-skip:
-        popad
-        sub     edx,18h
-        add     ebp,2
-        mov     dword ptr [esp+4Ch],edx
-        jmp     RETURN_CFileLoader_LoadCollisionFile_Mid_Skip
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//
 // Hook for NodeNameStreamRead
 //
 // Ignore extra characters in dff frame name
@@ -1286,7 +1234,6 @@ void _declspec(naked) HOOK_NodeNameStreamRead()
 //////////////////////////////////////////////////////////////////////////////////////////
 void CModelInfoSA::StaticSetHooks(void)
 {
-    HookInstall(HOOKPOS_CFileLoader_LoadCollisionFile_Mid, (DWORD)HOOK_CFileLoader_LoadCollisionFile_Mid, HOOKSIZE_CFileLoader_LoadCollisionFile_Mid);
     EZHookInstall(NodeNameStreamRead);
 }
 
