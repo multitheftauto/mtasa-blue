@@ -223,7 +223,7 @@ public:
 
 public:
     ZERO_ON_NEW
-    CClientGame(bool bLocalPlay = false);
+        CClientGame(bool bLocalPlay = false);
     ~CClientGame(void);
 
     bool StartGame(const char* szNick, const char* szPassword, eServerType Type = SERVER_TYPE_NORMAL);
@@ -309,15 +309,15 @@ public:
     void ShowEaeg(bool bShow);
     void ShowFPS(bool bShow) { m_bShowFPS = bShow; };
 
-    #if defined (MTA_DEBUG) || defined (MTA_BETA)
+#if defined (MTA_DEBUG) || defined (MTA_BETA)
     void ShowSyncingInfo(bool bShow) { m_bShowSyncingInfo = bShow; };
-    #endif
+#endif
 
 #ifdef MTA_WEPSYNCDBG
     void ShowWepdata(const char* szNick);
 #endif
 
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
     void ShowWepdata(const char* szNick);
     void ShowTasks(const char* szNick);
     void ShowPlayer(const char* szNick);
@@ -326,7 +326,7 @@ public:
     void SetDoPaintballs(bool bDoPaintballs) { m_bDoPaintballs = bDoPaintballs; }
     void ShowInterpolation(bool bShow) { m_bShowInterpolation = bShow; }
     bool IsShowingInterpolation() const { return m_bShowInterpolation; }
-    #endif
+#endif
 
     CEntity*       GetTargetedGameEntity(void) { return m_pTargetedGameEntity; }
     CClientEntity* GetTargetedEntity(void) { return m_pTargetedEntity; }
@@ -382,9 +382,9 @@ public:
     void ResetMapInfo(void);
 
     void DoWastedCheck(ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF, AssocGroupId animGroup = 0,
-                       AnimationId animId = 15);
+        AnimationId animId = 15);
     void SendPedWastedPacket(CClientPed* Ped, ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF,
-                             AssocGroupId animGroup = 0, AnimationId animID = 15);
+        AssocGroupId animGroup = 0, AnimationId animID = 15);
 
     CClientGUIElement* GetClickedGUIElement(void) { return m_pClickedGUIElement; }
     void               SetClickedGUIElement(CClientGUIElement* pElement) { m_pClickedGUIElement = NULL; }
@@ -418,7 +418,7 @@ public:
     bool GetShowSound(void) { return m_bShowSound; }
 
     void        TakePlayerScreenShot(uint uiSizeX, uint uiSizeY, const SString& strTag, uint uiQuality, uint uiMaxBandwidth, uint uiMaxPacketSize,
-                                     CResource* pResource, uint uiServerSentTime);
+        CResource* pResource, uint uiServerSentTime);
     static void StaticGottenPlayerScreenShot(const CBuffer* pBuffer, uint uiTimeSpentInQueue, const SString& strError);
     void        GottenPlayerScreenShot(const CBuffer* pBuffer, uint uiTimeSpentInQueue, const SString& strError);
     void        ProcessDelayedSendList(void);
@@ -467,17 +467,17 @@ private:
 
     void DrawFPS(void);
 
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
     void DrawTasks(CClientPlayer* pPlayer);
     void DrawPlayerDetails(CClientPlayer* pPlayer);
     void UpdateMimics(void);
     void DoPaintballs(void);
     void DrawWeaponsyncData(CClientPlayer* pPlayer);
-    #endif
+#endif
 
-    #ifdef MTA_WEPSYNCDBG
+#ifdef MTA_WEPSYNCDBG
     void DrawWeaponsyncData(CClientPlayer* pPlayer);
-    #endif
+#endif
 
     void DownloadSingularResourceFiles(void);
 
@@ -502,17 +502,17 @@ private:
     static void                              StaticCAnimBlendAssocDestructorHandler(CAnimBlendAssociationSAInterface* pThis);
     static CAnimBlendAssociationSAInterface* StaticAddAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
     static CAnimBlendAssociationSAInterface* StaticAddAnimationAndSyncHandler(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
-                                                                              AssocGroupId animGroup, AnimationId animID);
+        AssocGroupId animGroup, AnimationId animID);
     static bool                              StaticAssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump,
-                                                                                  CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, AnimationId animID);
+        CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, AnimationId animID);
     static bool StaticBlendAnimationHierarchyHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy,
-                                                     int* pFlags, RpClump* pClump);
+        int* pFlags, RpClump* pClump);
     static bool StaticProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface);
     static bool StaticVehicleCollisionHandler(CVehicleSAInterface* pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex,
-                                              float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos,
-                                              CVector vecCollisionVelocity);
+        float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos,
+        CVector vecCollisionVelocity);
     static bool StaticVehicleDamageHandler(CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType,
-                                           const CVector& vecDamagePos, uchar ucTyre);
+        const CVector& vecDamagePos, uchar ucTyre);
     static bool StaticHeliKillHandler(CVehicleSAInterface* pHeli, CEntitySAInterface* pHitInterface);
     static bool StaticObjectDamageHandler(CObjectSAInterface* pObjectInterface, float fLoss, CEntitySAInterface* pAttackerInterface);
     static bool StaticObjectBreakHandler(CObjectSAInterface* pObjectInterface, CEntitySAInterface* pAttackerInterface);
@@ -542,16 +542,16 @@ private:
     void                              CAnimBlendAssocDestructorHandler(CAnimBlendAssociationSAInterface* pThis);
     CAnimBlendAssociationSAInterface* AddAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
     CAnimBlendAssociationSAInterface* AddAnimationAndSyncHandler(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
-                                                                 AssocGroupId animGroup, AnimationId animID);
+        AssocGroupId animGroup, AnimationId animID);
     bool        AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroup,
-                                               AnimationId animID);
+        AnimationId animID);
     bool        BlendAnimationHierarchyHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy, int* pFlags,
-                                               RpClump* pClump);
+        RpClump* pClump);
     bool        ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface);
     bool        VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag,
-                                        float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity);
+        float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity);
     bool        VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType,
-                                     const CVector& vecDamagePos, uchar ucTyre);
+        const CVector& vecDamagePos, uchar ucTyre);
     bool        HeliKillHandler(CVehicleSAInterface* pHeli, CEntitySAInterface* pHitInterface);
     bool        ObjectDamageHandler(CObjectSAInterface* pObjectInterface, float fLoss, CEntitySAInterface* pAttackerInterface);
     bool        ObjectBreakHandler(CObjectSAInterface* pObjectInterface, CEntitySAInterface* pAttackerInterface);
@@ -578,7 +578,7 @@ public:
     static bool StaticProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream);
 
     bool ApplyPedDamageFromGame(eWeaponType weaponType, float fDamage, uchar ucHitZone, CClientPed* pDamagedPed, CClientEntity* pInflictingEntity,
-                                CEventDamage* pEvent);
+        CEventDamage* pEvent);
 
     bool VerifySADataFiles(int iEnableClientChecks = 0);
     void DebugElementRender(void);
@@ -602,7 +602,7 @@ public:
     const char*                    GetFileCacheRoot(void) { return m_strFileCacheRoot; }
 
     void                        CopyStaticAssociationProperties(std::unique_ptr<CAnimBlendStaticAssociation>& pOutAnimStaticAssoc,
-                                                                std::unique_ptr<CAnimBlendStaticAssociation>& pOriginalAnimStaticAssoc);
+        std::unique_ptr<CAnimBlendStaticAssociation>& pOriginalAnimStaticAssoc);
     void                        InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP);
     void                        RemoveIFPPointerFromMap(const unsigned int u32BlockNameHash);
     std::shared_ptr<CClientIFP> GetIFPPointerFromMap(const unsigned int u32BlockNameHash);
@@ -616,6 +616,8 @@ public:
     void InsertAnimationAssociationToMap(CAnimBlendAssociationSAInterface* pAnimAssociation, const std::shared_ptr<CIFPAnimations>& pIFPAnimations);
     void RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation);
 
+
+    CSurfaceType* GetSurfaceInfo(){ return m_pSurfaceInfo; }
 private:
     eStatus       m_Status;
     eServerType   m_ServerType;

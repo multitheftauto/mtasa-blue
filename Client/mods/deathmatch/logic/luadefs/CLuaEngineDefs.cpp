@@ -615,9 +615,8 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
     {
         if (iSurfaceID >= 0 && iSurfaceID <= 179)
         {
-            CSurfaceType* ptr;
-            ptr = reinterpret_cast<CSurfaceType*>(0xB79538);
-            SurfaceInfo_c* surface = &ptr->surfType[iSurfaceID];
+            CSurfaceType* pSurfaceInfo = m_pClientGame->GetSurfaceInfo();
+            SurfaceInfo_c* pSurface = &pSurfaceInfo->surfType[iSurfaceID];
             
             bool bEnabled;
             switch (eType)
@@ -627,16 +626,10 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                 argStream.ReadEnumString(eAudio);
                 if (!argStream.HasErrors())
                 {
-                    // Disable others audios
-                    for (char i = SURFACE_AUDIO_CONCRETE; i != SURFACE_AUDIO_DISABLED; i++)
-                    {
-                        surface->flags2 = surface->flags2 &= ~(1UL << i);
-                    }
+                    pSurface->setFlagEnabled(SURFACE_AUDIO_CONCRETE, false, 8);
                     if (eAudio != SURFACE_AUDIO_DISABLED)
-                    {
-                        // Set audio which user selected
-                        surface->flags2 = surface->flags2 |= 1UL << eAudio;
-                    }
+                        pSurface->setFlagEnabled(eAudio, true);
+
                     lua_pushboolean(luaVM, true);
                     return 1;
                 }
@@ -646,17 +639,11 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                 argStream.ReadEnumString(eStepEffect);
                 if (!argStream.HasErrors())
                 {
-                    surface->setFlag1Enabled(15, false);
-                    surface->setFlag1Enabled(16, false);
-                    switch (eStepEffect)
-                    {
-                    case SURFACE_STEP_EFFECT_SAND:
-                        surface->setFlag1Enabled(15, true);
-                        break;
-                    case SURFACE_STEP_EFFECT_WATER:
-                        surface->setFlag1Enabled(16, true);
-                        break;
-                    }
+                    pSurface->setFlagEnabled(15, false, 2);
+
+                    if (eStepEffect != SURFACE_STEP_EFFECT_DISABLED)
+                        pSurface->setFlagEnabled(eStepEffect, true);
+
                     lua_pushboolean(luaVM, true);
                     return 1;
                 }
@@ -666,11 +653,9 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                 argStream.ReadEnumString(eBulletEffect);
                 if (!argStream.HasErrors())
                 {
-                    surface->setFlag1Enabled(8, false);
-                    surface->setFlag1Enabled(9, false);
-                    surface->setFlag1Enabled(10, false);
+                    pSurface->setFlagEnabled(8, false, 3);
                     if( eBulletEffect != SURFACE_BULLET_EFFECT_DISABLED)
-                        surface->setFlag1Enabled(eBulletEffect, true);
+                        pSurface->setFlagEnabled(eBulletEffect, true);
 
                     lua_pushboolean(luaVM, true);
                     return 1;
@@ -680,7 +665,7 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                 argStream.ReadBool(bEnabled);
                 if (!argStream.HasErrors())
                 {
-                    surface->setFlag1Enabled(14, bEnabled);
+                    pSurface->setFlagEnabled(14, bEnabled);
                     lua_pushboolean(luaVM, true);
                     return 1;
                 }
@@ -689,7 +674,7 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                 argStream.ReadBool(bEnabled);
                 if (!argStream.HasErrors())
                 {
-                    surface->setFlag1Enabled(13, bEnabled);
+                    pSurface->setFlagEnabled(13, bEnabled);
                     lua_pushboolean(luaVM, true);
                     return 1;
                 }
@@ -700,7 +685,7 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                 argStream.ReadNumber(sSkidMarkType);
                 if (!argStream.HasErrors() && sSkidMarkType >= 0 && sSkidMarkType < 4)
                 {
-                    surface->m_skidmarkType = sSkidMarkType;
+                    pSurface->m_skidmarkType = sSkidMarkType;
                     lua_pushboolean(luaVM, true);
                     return 1;
                 }
@@ -710,7 +695,7 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                 argStream.ReadNumber(sFractionEffect);
                 if (!argStream.HasErrors() && sFractionEffect > 0 && sFractionEffect < 8)
                 {
-                    surface->m_frictionEffect = sFractionEffect;
+                    pSurface->m_frictionEffect = sFractionEffect;
                     lua_pushboolean(luaVM, true);
                     return 1;
                 }
@@ -721,17 +706,17 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                 argStream.ReadNumber(uiTyreGrip);
                 if (!argStream.HasErrors() && uiTyreGrip >= 0 && uiTyreGrip < 10000)
                 {
-                    surface->m_tyreGrip = uiTyreGrip;
+                    pSurface->m_tyreGrip = uiTyreGrip;
                     lua_pushboolean(luaVM, true);
                     return 1;
                 }
                 break;
-            case SURFACE_PROPERTY_WETMULTIPLIER:
-                uint uiWetMultiplier;
-                argStream.ReadNumber(uiWetMultiplier);
-                if (!argStream.HasErrors() && uiWetMultiplier >= 0 && uiWetMultiplier < 10000)
+            case SURFACE_PROPERTY_WETGRIP:
+                uint uiWetGrip;
+                argStream.ReadNumber(uiWetGrip);
+                if (!argStream.HasErrors() && uiWetGrip >= 0 && uiWetGrip < 10000)
                 {
-                    surface->m_wetGrip = uiWetMultiplier;
+                    pSurface->m_wetGrip = uiWetGrip;
                     lua_pushboolean(luaVM, true);
                     return 1;
                 }
@@ -741,7 +726,7 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                 argStream.ReadNumber(fAdhesionGroup);
                 if (!argStream.HasErrors() && fAdhesionGroup > 0 && fAdhesionGroup < 9)
                 {
-                    surface->m_adhesionGroup = fAdhesionGroup;
+                    pSurface->m_adhesionGroup = fAdhesionGroup;
                     lua_pushboolean(luaVM, true);
                     return 1;
                 }
@@ -750,7 +735,7 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                 argStream.ReadBool(bEnabled);
                 if (!argStream.HasErrors())
                 {
-                    surface->setFlag2Enabled(9, bEnabled);
+                    pSurface->setFlagEnabled(9, bEnabled);
                     lua_pushboolean(luaVM, true);
                     return 1;
                 }
@@ -760,14 +745,11 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                 argStream.ReadEnumString(eWheelEffect);
                 if (!argStream.HasErrors())
                 {
-                    surface->setFlag2Enabled(2, false);
-                    surface->setFlag2Enabled(3, false);
-                    surface->setFlag2Enabled(4, false);
-                    surface->setFlag2Enabled(5, false);
+                    pSurface->setFlagEnabled(2, false, 4);
                     //surface->setFlag2Enabled(6, false); -- sand
                     //surface->setFlag2Enabled(7, false); -- spray
                     if (eWheelEffect != SURFACE_WHEEL_EFFECT_DISABLED)
-                        surface->setFlag2Enabled(eWheelEffect, true);
+                        pSurface->setFlagEnabled(eWheelEffect, true);
 
                     lua_pushboolean(luaVM, true);
                     return 1;
@@ -778,7 +760,7 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
 
         }
         else
-            argStream.SetCustomError("Expected valid surface ID ( 1 - 179 ) at argument 1");
+            argStream.SetCustomError("Expected valid surface ID ( 0 - 179 ) at argument 1");
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -786,6 +768,23 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
     lua_pushboolean(luaVM, true);
     return 1;
 }
+
+/*
+enum eSurfaceAudio
+{
+SURFACE_AUDIO_CONCRETE = 10, // concrete starting from 10 bit
+SURFACE_AUDIO_GRASS,
+SURFACE_AUDIO_SAND,
+SURFACE_AUDIO_GRAVEL,
+SURFACE_AUDIO_WOOD,
+SURFACE_AUDIO_WATER,
+SURFACE_AUDIO_METAL,
+SURFACE_AUDIO_LONGGRASS,
+SURFACE_AUDIO_DISABLED,
+};
+*/
+
+const char* cSurfaceAudio[9] = { "concrete", "grass", "sand", "gravel", "wood", "water", "metal", "longGrass", "audioTile" };
 
 int CLuaEngineDefs::EngineGetSurfaceProperties(lua_State* luaVM)
 {
@@ -797,74 +796,73 @@ int CLuaEngineDefs::EngineGetSurfaceProperties(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (iSurfaceID > 0 && iSurfaceID < 180)
+        if (iSurfaceID >= 0 && iSurfaceID <= 179)
         {
-            //iSurfaceID--;
-            CSurfaceType* ptr;
-            ptr = reinterpret_cast<CSurfaceType*>(0xB79538);
-            SurfaceInfo_c* surface = &ptr->surfType[iSurfaceID];
+            CSurfaceType* pSurfaceInfo = m_pClientGame->GetSurfaceInfo();
+            SurfaceInfo_c* pSurface = &pSurfaceInfo->surfType[iSurfaceID];
             switch (eType)
             {
-                case SURFACE_PROPERTY_CLIMBING:
-                    lua_pushboolean(luaVM, surface->m_canClimb == 1);
-                    return 1;
-                case SURFACE_PROPERTY_AUDIO:
-                    if (surface->m_audioConcrete == 1)
+            case SURFACE_PROPERTY_AUDIO:
+                for (char cFlag = SURFACE_AUDIO_CONCRETE; cFlag < SURFACE_AUDIO_DISABLED; cFlag++)
+                {
+                    if (pSurface->getFlagEnabled(1, cFlag))
                     {
-                        lua_pushstring(luaVM, "concrete");
+                        lua_pushstring(luaVM, cSurfaceAudio[cFlag - SURFACE_AUDIO_CONCRETE]);
                         return 1;
                     }
-                    else if (surface->m_audioGrass == 1)
-                    {
-                        lua_pushstring(luaVM, "grass");
-                        return 1;
-                    }
-                    else if (surface->m_audioSand == 1)
-                    {
-                        lua_pushstring(luaVM, "sand");
-                        return 1;
-                    }
-                    else if (surface->m_audioGravel == 1)
-                    {
-                        lua_pushstring(luaVM, "gravel");
-                        return 1;
-                    }
-                    else if (surface->m_audioWood == 1)
-                    {
-                        lua_pushstring(luaVM, "wood");
-                        return 1;
-                    }
-                    else if (surface->m_audioWater == 1)
-                    {
-                        lua_pushstring(luaVM, "water");
-                        return 1;
-                    }
-                    else if (surface->m_audioMetal == 1)
-                    {
-                        lua_pushstring(luaVM, "metal");
-                        return 1;
-                    }
-                    else if (surface->m_audioLongGrass == 1)
-                    {
-                        lua_pushstring(luaVM, "longGrass");
-                        return 1;
-                    }
-                    else if (surface->m_audioTile == 1)
-                    {
-                        lua_pushstring(luaVM, "audioTile");
-                        return 1;
-                    }
-                    else
-                    {
-                        lua_pushboolean(luaVM, false);
-                        return 1;
-                    }
+                }
+                lua_pushboolean(luaVM, false);
+                return 1;
+                break;
+            case SURFACE_PROPERTY_STEPEFFECT:
+                lua_pushnumber(luaVM, 99999);
+                return 1;
+                break;
+            case SURFACE_PROPERTY_BULLETEFFECT:
+                lua_pushnumber(luaVM, 99999);
+                return 1;
+                break;
+            case SURFACE_PROPERTY_SHOOTTHROUGH:
+                lua_pushboolean(luaVM, pSurface->getFlagEnabled(0, 14));
+                return 1;
+                break;
+            case SURFACE_PROPERTY_SEETHROUGH:
+                lua_pushboolean(luaVM, pSurface->getFlagEnabled(0, 13));
+                return 1;
+                break;
+            case SURFACE_PROPERTY_SKIDMARKTYPE:
+                lua_pushnumber(luaVM, 99999);
+                return 1;
+                break;
+            case SURFACE_PROPERTY_FRACTIONEFFECT:
+                lua_pushnumber(luaVM, 99999);
+                return 1;
+                break;
+            case SURFACE_PROPERTY_TYREGRIP:
+                lua_pushnumber(luaVM, pSurface->m_tyreGrip);
+                return 1;
+                break;
+            case SURFACE_PROPERTY_WETGRIP:
+                lua_pushnumber(luaVM, pSurface->m_wetGrip);
+                return 1;
+                break;
+            case SURFACE_PROPERTY_ADHESIONGROUP:
+                lua_pushnumber(luaVM, pSurface->m_adhesionGroup);
+                return 1;
+                break;
+            case SURFACE_PROPERTY_CLIMBING:
+                lua_pushboolean(luaVM, pSurface->getFlagEnabled(1, 10));
+                return 1;
+                break;
+            case SURFACE_PROPERTY_WHEELEFFECT:
+                lua_pushnumber(luaVM, 99999);
+                return 1;
                 break;
             }
 
         }
         else
-            argStream.SetCustomError("Expected valid surface ID ( 1 - 179 ) at argument 1");
+            argStream.SetCustomError("Expected valid surface ID ( 0 - 179 ) at argument 1");
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
