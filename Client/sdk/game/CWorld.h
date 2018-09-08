@@ -254,14 +254,8 @@ public:
         };
     };
 
-    void setFlagEnabled(short sFlagID, bool bEnabled, short usForNext = 1)
+    void setFlagEnabled(short flagsGroup, short sFlagID, bool bEnabled, short usForNext = 1)
     {
-        char flagsGroup = 0;
-        if (sFlagID > 31)
-        {
-            flagsGroup = 1;
-            sFlagID -= 32;
-        }
         for (usForNext--; usForNext >= 0; usForNext--)
         {
             if (bEnabled)

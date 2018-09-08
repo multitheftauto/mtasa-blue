@@ -628,7 +628,7 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                 {
                     pSurface->setFlagEnabled(SURFACE_AUDIO_CONCRETE, false, 8);
                     if (eAudio != SURFACE_AUDIO_DISABLED)
-                        pSurface->setFlagEnabled(eAudio, true);
+                        pSurface->setFlagEnabled(1, eAudio, true);
 
                     lua_pushboolean(luaVM, true);
                     return 1;
@@ -639,10 +639,10 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                 argStream.ReadEnumString(eStepEffect);
                 if (!argStream.HasErrors())
                 {
-                    pSurface->setFlagEnabled(15, false, 2);
+                    pSurface->setFlagEnabled(0, SURFACE_STEP_EFFECT_SAND, false, 2);
 
                     if (eStepEffect != SURFACE_STEP_EFFECT_DISABLED)
-                        pSurface->setFlagEnabled(eStepEffect, true);
+                        pSurface->setFlagEnabled(0, eStepEffect, true);
 
                     lua_pushboolean(luaVM, true);
                     return 1;
@@ -653,9 +653,11 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                 argStream.ReadEnumString(eBulletEffect);
                 if (!argStream.HasErrors())
                 {
-                    pSurface->setFlagEnabled(8, false, 3);
-                    if( eBulletEffect != SURFACE_BULLET_EFFECT_DISABLED)
-                        pSurface->setFlagEnabled(eBulletEffect, true);
+
+                    if (eBulletEffect == SURFACE_BULLET_EFFECT_DISABLED)
+                        pSurface->m_bulletFx = 0;
+                    else
+                        pSurface->m_bulletFx = eBulletEffect;
 
                     lua_pushboolean(luaVM, true);
                     return 1;
@@ -665,7 +667,7 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                 argStream.ReadBool(bEnabled);
                 if (!argStream.HasErrors())
                 {
-                    pSurface->setFlagEnabled(14, bEnabled);
+                    pSurface->setFlagEnabled(0, 14, bEnabled);
                     lua_pushboolean(luaVM, true);
                     return 1;
                 }
@@ -674,7 +676,7 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                 argStream.ReadBool(bEnabled);
                 if (!argStream.HasErrors())
                 {
-                    pSurface->setFlagEnabled(13, bEnabled);
+                    pSurface->setFlagEnabled(0, 13, bEnabled);
                     lua_pushboolean(luaVM, true);
                     return 1;
                 }
@@ -724,7 +726,7 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
             case SURFACE_PROPERTY_ADHESIONGROUP:
                 int fAdhesionGroup;
                 argStream.ReadNumber(fAdhesionGroup);
-                if (!argStream.HasErrors() && fAdhesionGroup > 0 && fAdhesionGroup < 9)
+                if (!argStream.HasErrors() && fAdhesionGroup >= 0 && fAdhesionGroup < 8)
                 {
                     pSurface->m_adhesionGroup = fAdhesionGroup;
                     lua_pushboolean(luaVM, true);
@@ -735,7 +737,7 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                 argStream.ReadBool(bEnabled);
                 if (!argStream.HasErrors())
                 {
-                    pSurface->setFlagEnabled(9, bEnabled);
+                    pSurface->setFlagEnabled(0, 9, bEnabled);
                     lua_pushboolean(luaVM, true);
                     return 1;
                 }
@@ -745,11 +747,11 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                 argStream.ReadEnumString(eWheelEffect);
                 if (!argStream.HasErrors())
                 {
-                    pSurface->setFlagEnabled(2, false, 4);
+                    pSurface->setFlagEnabled(1, 1, false, 4);
                     //surface->setFlag2Enabled(6, false); -- sand
                     //surface->setFlag2Enabled(7, false); -- spray
                     if (eWheelEffect != SURFACE_WHEEL_EFFECT_DISABLED)
-                        pSurface->setFlagEnabled(eWheelEffect, true);
+                        pSurface->setFlagEnabled(1, 1, eWheelEffect, true);
 
                     lua_pushboolean(luaVM, true);
                     return 1;
@@ -769,22 +771,9 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
     return 1;
 }
 
-/*
-enum eSurfaceAudio
-{
-SURFACE_AUDIO_CONCRETE = 10, // concrete starting from 10 bit
-SURFACE_AUDIO_GRASS,
-SURFACE_AUDIO_SAND,
-SURFACE_AUDIO_GRAVEL,
-SURFACE_AUDIO_WOOD,
-SURFACE_AUDIO_WATER,
-SURFACE_AUDIO_METAL,
-SURFACE_AUDIO_LONGGRASS,
-SURFACE_AUDIO_DISABLED,
-};
-*/
-
-const char* cSurfaceAudio[9] = { "concrete", "grass", "sand", "gravel", "wood", "water", "metal", "longGrass", "audioTile" };
+const char* cSurfaceAudio[8] = { "concrete", "grass", "sand", "gravel", "wood", "water", "metal", "longGrass" };
+const char* cSurfaceStepEffect[2] = { "sand", "water" };
+const char* cSurfaceBulletEffect[4] = { "metal", "concrete", "sand", "wood" };
 
 int CLuaEngineDefs::EngineGetSurfaceProperties(lua_State* luaVM)
 {
@@ -811,16 +800,32 @@ int CLuaEngineDefs::EngineGetSurfaceProperties(lua_State* luaVM)
                         return 1;
                     }
                 }
-                lua_pushboolean(luaVM, false);
+                lua_pushstring(luaVM, "disabled");
                 return 1;
                 break;
             case SURFACE_PROPERTY_STEPEFFECT:
-                lua_pushnumber(luaVM, 99999);
+                for (char cFlag = SURFACE_STEP_EFFECT_SAND; cFlag < SURFACE_STEP_EFFECT_DISABLED; cFlag++)
+                {
+                    if (pSurface->getFlagEnabled(0, cFlag))
+                    {
+                        lua_pushstring(luaVM, cSurfaceStepEffect[cFlag - SURFACE_STEP_EFFECT_SAND]);
+                        return 1;
+                    }
+                }
+                lua_pushstring(luaVM, "disabled");
                 return 1;
                 break;
             case SURFACE_PROPERTY_BULLETEFFECT:
-                lua_pushnumber(luaVM, 99999);
-                return 1;
+                if (pSurface->m_bulletFx == 0)
+                {
+                    lua_pushstring(luaVM, "disabled");
+                    return 1;
+                }
+                else
+                {
+                    lua_pushstring(luaVM, cSurfaceBulletEffect[pSurface->m_bulletFx]);
+                    return 1;
+                }
                 break;
             case SURFACE_PROPERTY_SHOOTTHROUGH:
                 lua_pushboolean(luaVM, pSurface->getFlagEnabled(0, 14));
