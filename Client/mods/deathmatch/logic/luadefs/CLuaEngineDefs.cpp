@@ -681,13 +681,12 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                     return 1;
                 }
                 break;
-
             case SURFACE_PROPERTY_SKIDMARKTYPE:
-                short sSkidMarkType;
-                argStream.ReadNumber(sSkidMarkType);
-                if (!argStream.HasErrors() && sSkidMarkType >= 0 && sSkidMarkType < 4)
+                eSurfaceSkidMarkType eSkidMarkType;
+                argStream.ReadEnumString(eSkidMarkType);
+                if (!argStream.HasErrors())
                 {
-                    pSurface->m_skidmarkType = sSkidMarkType;
+                    pSurface->m_skidmarkType = eSkidMarkType;
                     lua_pushboolean(luaVM, true);
                     return 1;
                 }
@@ -702,7 +701,6 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                     return 1;
                 }
                 break;
-
             case SURFACE_PROPERTY_TYREGRIP:
                 uint uiTyreGrip;
                 argStream.ReadNumber(uiTyreGrip);
@@ -747,16 +745,36 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
                 argStream.ReadEnumString(eWheelEffect);
                 if (!argStream.HasErrors())
                 {
-                    pSurface->setFlagEnabled(1, 1, false, 4);
+                    pSurface->setFlagEnabled(1, SURFACE_WHEEL_EFFECT_GRASS, false, 4);
                     //surface->setFlag2Enabled(6, false); -- sand
                     //surface->setFlag2Enabled(7, false); -- spray
                     if (eWheelEffect != SURFACE_WHEEL_EFFECT_DISABLED)
-                        pSurface->setFlagEnabled(1, 1, eWheelEffect, true);
+                        pSurface->setFlagEnabled(1, eWheelEffect, true);
 
                     lua_pushboolean(luaVM, true);
                     return 1;
                 }
                 break;
+            case SURFACE_PROPERTY_STAIRS:
+                argStream.ReadBool(bEnabled);
+                if (!argStream.HasErrors())
+                {
+                    pSurface->setFlagEnabled(0, 20, bEnabled);
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+                break;
+            case SURFACE_PROPERTY_ROUGHNESS:
+                char cRoughness;
+                argStream.ReadNumber(cRoughness);
+                if (!argStream.HasErrors() && cRoughness >= 0 && cRoughness <= 3)
+                {
+                    pSurface->m_roughness = cRoughness;
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+                break;
+
             }
 
 
@@ -774,6 +792,8 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
 const char* cSurfaceAudio[8] = { "concrete", "grass", "sand", "gravel", "wood", "water", "metal", "longGrass" };
 const char* cSurfaceStepEffect[2] = { "sand", "water" };
 const char* cSurfaceBulletEffect[4] = { "metal", "concrete", "sand", "wood" };
+const char* cSurfaceWheelEffect[6] = { "grass", "gravel", "mud", "dust", "sand", "spray" };
+const char* cSurfaceSkidMark[3] = { "asphalt", "dirt", "dust" };
 
 int CLuaEngineDefs::EngineGetSurfaceProperties(lua_State* luaVM)
 {
@@ -836,11 +856,16 @@ int CLuaEngineDefs::EngineGetSurfaceProperties(lua_State* luaVM)
                 return 1;
                 break;
             case SURFACE_PROPERTY_SKIDMARKTYPE:
-                lua_pushnumber(luaVM, 99999);
+                if (pSurface->m_skidmarkType == SURFACE_SKID_MARK_DISABLED)
+                {
+                    lua_pushstring(luaVM, "disabled");
+                    return 1;
+                }
+                lua_pushstring(luaVM, cSurfaceSkidMark[pSurface->m_skidmarkType]);
                 return 1;
                 break;
             case SURFACE_PROPERTY_FRACTIONEFFECT:
-                lua_pushnumber(luaVM, 99999);
+                lua_pushnumber(luaVM, pSurface->m_frictionEffect);
                 return 1;
                 break;
             case SURFACE_PROPERTY_TYREGRIP:
@@ -860,9 +885,26 @@ int CLuaEngineDefs::EngineGetSurfaceProperties(lua_State* luaVM)
                 return 1;
                 break;
             case SURFACE_PROPERTY_WHEELEFFECT:
-                lua_pushnumber(luaVM, 99999);
+                for (char cFlag = SURFACE_WHEEL_EFFECT_GRASS; cFlag < SURFACE_WHEEL_EFFECT_DISABLED; cFlag++)
+                {
+                    if (pSurface->getFlagEnabled(1, cFlag))
+                    {
+                        lua_pushstring(luaVM, cSurfaceWheelEffect[cFlag - SURFACE_WHEEL_EFFECT_GRASS]);
+                        return 1;
+                    }
+                }
+                lua_pushstring(luaVM, "disabled");
                 return 1;
                 break;
+            case SURFACE_PROPERTY_STAIRS:
+                lua_pushboolean(luaVM, pSurface->getFlagEnabled(0, 20));
+                return 1;
+                break;
+            case SURFACE_PROPERTY_ROUGHNESS:
+                lua_pushnumber(luaVM, pSurface->m_roughness);
+                return 1;
+                break;
+
             }
 
         }
