@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-01 13:55+0100\n"
+"POT-Creation-Date: 2018-09-10 02:54+0100\n"
 "PO-Revision-Date: 2018-09-01 13:19+0000\n"
 "Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,92 +15,88 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n==1 || n%10==1 ? 0 : 1;\n"
-"Translators: Mercy; qaisjp; Rilind\n"
+"Translators: Mercy; Rilind\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
 "X-POOTLE-MTIME: 1535807973.0\n"
 
-#: E:\Documents\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:19
+#: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
 msgstr "Барање на вебсајт"
 
-#: E:\Documents\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:27
+#: ..\Client\cefweb\CWebsiteRequests.cpp:27
 msgid ""
 "The server requests the following websites in order to load them (later):"
 msgstr ""
 "Серверот ги бара следниве вебсајтови за да може да ги лоадира (подоцна)"
 
-#: E:\Documents\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:32
+#: ..\Client\cefweb\CWebsiteRequests.cpp:32
 msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
 msgstr "НИКОГАШ НЕ ВНЕСУВАЈТЕ ВАЖНИ ИНФОРМАЦИИ ЗА ДА НЕ БИДАТ УКРАДЕНИ"
 
-#: E:\Documents\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:44
+#: ..\Client\cefweb\CWebsiteRequests.cpp:44
 msgid "Remember decision"
 msgstr "Запамти ја одлуката"
 
-#: E:\Documents\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:49
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:907
+#: ..\Client\cefweb\CWebsiteRequests.cpp:49 ..\Client\core\CSettings.cpp:907
 msgid "Allow"
 msgstr "Одобри"
 
-#: E:\Documents\mtasa-blue\Client\cefweb\CWebsiteRequests.cpp:55
+#: ..\Client\cefweb\CWebsiteRequests.cpp:55
 msgid "Deny"
 msgstr "Одбиј"
 
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:31
+#: ..\Client\core\CCommandFuncs.cpp:31
 msgid "***[ COMMAND HELP ]***\n"
 msgstr "***[ КОМАНДА ПОМОШ ] ***\n"
 
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:182
+#: ..\Client\core\CCommandFuncs.cpp:182
 #, c-format, c-format
 msgid "* The time is %d:%02d:%02d"
 msgstr "* Часот е  %d:%02d:%02d"
 
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:266
+#: ..\Client\core\CCommandFuncs.cpp:266
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
 msgstr ""
 "конекција: Синтаксата е конектирана на <хост> [<порта> <име> <пасворд>]'"
 
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:274
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:342
+#: ..\Client\core\CCommandFuncs.cpp:274 ..\Client\core\CCommandFuncs.cpp:342
 msgid "connect: Bad port number"
 msgstr "конекција: Погрешна бројка на портата"
 
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:296
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:357
+#: ..\Client\core\CCommandFuncs.cpp:296 ..\Client\core\CCommandFuncs.cpp:357
 #, c-format, c-format
 msgid "connect: Connecting to %s:%u..."
 msgstr "Конекција: Се конектира %s:%u..."
 
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:300
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:361
+#: ..\Client\core\CCommandFuncs.cpp:300 ..\Client\core\CCommandFuncs.cpp:361
 #, c-format, c-format
 msgid "connect: could not connect to %s:%u!"
 msgstr "Конекција: Конекцијата е неуспешна %s.%u! "
 
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:305
+#: ..\Client\core\CCommandFuncs.cpp:305
 msgid "connect: Failed to unload current mod"
 msgstr "Конекција: Неуспешно отпакување на модот"
 
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:395
+#: ..\Client\core\CCommandFuncs.cpp:395
 msgid "Bound all controls from GTA"
 msgstr "Сврзи ги сите контроли од ГТА"
 
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:409
+#: ..\Client\core\CCommandFuncs.cpp:409
 msgid "Saved configuration file"
 msgstr "Фајлот за конфигурација е зачуван"
 
 #. Print it
-#: E:\Documents\mtasa-blue\Client\core\CCommandFuncs.cpp:475
+#: ..\Client\core\CCommandFuncs.cpp:475
 #, c-format, c-format
 msgid "* Your serial is: %s"
 msgstr "*Твојот сериски број е: %s "
 
 #. Unknown command
-#: E:\Documents\mtasa-blue\Client\core\CCommands.cpp:209
+#: ..\Client\core\CCommands.cpp:209
 msgid "Unknown command or cvar: "
 msgstr "Непозната команда"
 
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:79
+#: ..\Client\core\CConnectManager.cpp:79
 msgid "Connecting failed. Invalid nick provided!"
 msgstr "Конекцијата е неуспешна: Приложеното име е невалидно"
 
@@ -108,323 +104,304 @@ msgstr "Конекцијата е неуспешна: Приложеното и�
 #. Show failed message and abort the attempt
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:80
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:111
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:127
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:263
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:321
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:410
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:417
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:427
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1235
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1248
-#: E:\Documents\mtasa-blue\Client\core\CGUI.cpp:85
-#: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:142
-#: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:151
-#: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:156
-#: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:165
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2826
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3954
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3982
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4427
-#: E:\Documents\mtasa-blue\Client\core\DXHook\CDirect3DHook9.cpp:128
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1244
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1266
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1323
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1372
-#: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:460
-#: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:469
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:239
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:254
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:256
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:817
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:563
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:631
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:655
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:677
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:993
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1073
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1083
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1152
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1186
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1235
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1247
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:134
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CServer.cpp:181
-#: E:\Documents\mtasa-blue\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp:354
-#: E:\Documents\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:85
+#: ..\Client\core\CConnectManager.cpp:80
+#: ..\Client\core\CConnectManager.cpp:111
+#: ..\Client\core\CConnectManager.cpp:127
+#: ..\Client\core\CConnectManager.cpp:263
+#: ..\Client\core\CConnectManager.cpp:321
+#: ..\Client\core\CConnectManager.cpp:410
+#: ..\Client\core\CConnectManager.cpp:417
+#: ..\Client\core\CConnectManager.cpp:427 ..\Client\core\CCore.cpp:1235
+#: ..\Client\core\CCore.cpp:1248 ..\Client\core\CGUI.cpp:85
+#: ..\Client\core\CQuickConnect.cpp:142 ..\Client\core\CQuickConnect.cpp:151
+#: ..\Client\core\CQuickConnect.cpp:156 ..\Client\core\CQuickConnect.cpp:165
+#: ..\Client\core\CSettings.cpp:2823 ..\Client\core\CSettings.cpp:3951
+#: ..\Client\core\CSettings.cpp:3979 ..\Client\core\CSettings.cpp:4424
+#: ..\Client\core\DXHook\CDirect3DHook9.cpp:128
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1244
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1266
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1323
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1372
+#: ..\Client\loader\CInstallManager.cpp:506
+#: ..\Client\loader\CInstallManager.cpp:515
+#: ..\Client\loader\MainFunctions.cpp:239
+#: ..\Client\loader\MainFunctions.cpp:254
+#: ..\Client\loader\MainFunctions.cpp:256
+#: ..\Client\loader\MainFunctions.cpp:817
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:563
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:631
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:655
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:677
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:993
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1073
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1083
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1152
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1186
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1235
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1247
+#: ..\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:134
+#: ..\Client\mods\deathmatch\logic\CServer.cpp:181
+#: ..\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp:354
+#: ..\Shared\sdk\SharedUtil.Misc.hpp:85
 msgid "Error"
 msgstr "Грешка"
 
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:110
+#: ..\Client\core\CConnectManager.cpp:110
 msgid "Connecting failed. Invalid host provided!"
 msgstr "Конекцијата е неуспешна: Приложениот хост е невалиден"
 
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:126
+#: ..\Client\core\CConnectManager.cpp:126
 #, c-format, c-format
 msgid "Connecting to %s at port %u failed!"
 msgstr "Конектирањето до %s портата %u е неуспешно!"
 
 #. Display the status box
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:147
+#: ..\Client\core\CConnectManager.cpp:147
 #, c-format, c-format
 msgid "Connecting to %s:%u ..."
 msgstr "Се конектира на %s:%u ..."
 
 #. Display the status box
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:148
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:579
+#: ..\Client\core\CConnectManager.cpp:148
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:579
 msgid "CONNECTING"
 msgstr "Поврзување"
 
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:263
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1152
+#: ..\Client\core\CConnectManager.cpp:263
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1152
 msgid "Connection timed out"
 msgstr "Конекцијата е прекината "
 
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:277
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:281
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1197
+#: ..\Client\core\CConnectManager.cpp:277
+#: ..\Client\core\CConnectManager.cpp:281
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1197
 msgid "Disconnected: unknown protocol error"
 msgstr "Дисконектиран: непозната грешка на протоколот"
 
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:285
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1201
+#: ..\Client\core\CConnectManager.cpp:285
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1201
 msgid "Disconnected: disconnected remotely"
 msgstr "Дисконектиран: дисконектиран рачно"
 
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:289
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1205
+#: ..\Client\core\CConnectManager.cpp:289
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1205
 msgid "Disconnected: connection lost remotely"
 msgstr "Дисконектиран: конекцијата е изгубена рачно"
 
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:293
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1209
+#: ..\Client\core\CConnectManager.cpp:293
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1209
 msgid "Disconnected: you are banned from this server"
 msgstr "Дисконектиран: Вие сте баниран од серверот"
 
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:300
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1217
+#: ..\Client\core\CConnectManager.cpp:300
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1217
 msgid "Disconnected: disconnected from the server"
 msgstr "Дисконектиран: Дисконектиран од серверот"
 
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:304
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1221
+#: ..\Client\core\CConnectManager.cpp:304
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1221
 msgid "Disconnected: connection to the server was lost"
 msgstr "Врската со серверот беше прекината."
 
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:311
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1229
+#: ..\Client\core\CConnectManager.cpp:311
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1229
 msgid "Disconnected: connection was refused"
 msgstr "Дисконектиран: конекцијата e oдбиена"
 
 #. Failed loading the mod
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:409
+#: ..\Client\core\CConnectManager.cpp:409
 #, c-format, c-format
 msgid "No such mod installed (%s)"
 msgstr "Непостоечки мод (%s)"
 
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:417
+#: ..\Client\core\CConnectManager.cpp:417
 msgid "Bad server response (2)"
 msgstr "Погрешен одговор од серверот (2)"
 
-#: E:\Documents\mtasa-blue\Client\core\CConnectManager.cpp:427
+#: ..\Client\core\CConnectManager.cpp:427
 msgid "Bad server response (1)"
 msgstr "Погрешен одговор од серверот (1)"
 
 #. Create window
-#: E:\Documents\mtasa-blue\Client\core\CConsole.cpp:427
+#: ..\Client\core\CConsole.cpp:427
 msgid "CONSOLE"
 msgstr "Конзола"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:688
-#: E:\Documents\mtasa-blue\Client\core\CQuestionBox.cpp:192
-#: E:\Documents\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:621
+#: ..\Client\core\CCore.cpp:688 ..\Client\core\CQuestionBox.cpp:192
+#: ..\Shared\sdk\SharedUtil.Misc.hpp:621
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "Дали сакате да побарате онлајн помош во врска со овој проблем ?"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:693
-#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1112
-#: E:\Documents\mtasa-blue\Client\core\CQuestionBox.cpp:194
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1315
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1339
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4274
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4323
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1568
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1586
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1855
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1874
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:479
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:32
+#: ..\Client\core\CCore.cpp:693 ..\Client\core\CMainMenu.cpp:1135
+#: ..\Client\core\CQuestionBox.cpp:194 ..\Client\core\CSettings.cpp:1315
+#: ..\Client\core\CSettings.cpp:1339 ..\Client\core\CSettings.cpp:4271
+#: ..\Client\core\CSettings.cpp:4320 ..\Client\core\CVersionUpdater.cpp:1569
+#: ..\Client\core\CVersionUpdater.cpp:1587
+#: ..\Client\core\CVersionUpdater.cpp:1856
+#: ..\Client\core\CVersionUpdater.cpp:1875
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:479
+#: ..\Client\loader\Dialogs.cpp:32
 msgid "No"
 msgstr "Не"
 
 #. /////////////////////////////////////////////////////////////////////////
 #. Dialog strings
 #. /////////////////////////////////////////////////////////////////////////
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:694
-#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1113
-#: E:\Documents\mtasa-blue\Client\core\CQuestionBox.cpp:195
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1316
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1340
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4275
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4324
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1569
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1587
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1856
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1875
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:479
-#: E:\Documents\mtasa-blue\Client\gui\CGUIMessageBox_Impl.cpp:72
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:31
+#: ..\Client\core\CCore.cpp:694 ..\Client\core\CMainMenu.cpp:1136
+#: ..\Client\core\CQuestionBox.cpp:195 ..\Client\core\CSettings.cpp:1316
+#: ..\Client\core\CSettings.cpp:1340 ..\Client\core\CSettings.cpp:4272
+#: ..\Client\core\CSettings.cpp:4321 ..\Client\core\CVersionUpdater.cpp:1570
+#: ..\Client\core\CVersionUpdater.cpp:1588
+#: ..\Client\core\CVersionUpdater.cpp:1857
+#: ..\Client\core\CVersionUpdater.cpp:1876
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:479
+#: ..\Client\gui\CGUIMessageBox_Impl.cpp:72 ..\Client\loader\Dialogs.cpp:31
 msgid "Yes"
 msgstr "Да"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:747
-#: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:612
+#: ..\Client\core\CCore.cpp:747 ..\Client\loader\CInstallManager.cpp:658
 #, c-format, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA неможе да продолжи бидејќи драјверот %s нема доволно место."
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:749
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:144
+#: ..\Client\core\CCore.cpp:749 ..\Client\mods\deathmatch\logic\Utils.cpp:144
 msgid "Fatal error"
 msgstr "Опасна грешка"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:897
+#: ..\Client\core\CCore.cpp:897
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "ЗА ДА СЕ ПОПРАВИ, ИЗБРИШЕТЕ ГО ОВОЈ ФАЈЛ:"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:929
+#: ..\Client\core\CCore.cpp:929
 #, c-format, c-format
 msgid "%s module is incorrect!"
 msgstr "%s моделот е неточен!"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1235
+#: ..\Client\core\CCore.cpp:1235
 msgid "Error executing URL"
 msgstr "Грешно извршување URL"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1247
+#: ..\Client\core\CCore.cpp:1247
 #, c-format, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "Погрешен мод наведен во комадната линија ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1332
+#: ..\Client\core\CCore.cpp:1332
 msgid "this help screen"
 msgstr "ова помошно прозорче"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1333
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1334
+#: ..\Client\core\CCore.cpp:1333 ..\Client\core\CCore.cpp:1334
 msgid "exits the application"
 msgstr "напуштање на апликацијата"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1335
+#: ..\Client\core\CCore.cpp:1335
 msgid "shows the version"
 msgstr "прикажување на верзијата"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1336
+#: ..\Client\core\CCore.cpp:1336
 msgid "shows the time"
 msgstr "прикажување на времето"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1337
+#: ..\Client\core\CCore.cpp:1337
 msgid "shows the hud"
 msgstr "прикажување на HUD"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1338
+#: ..\Client\core\CCore.cpp:1338
 msgid "shows all the binds"
 msgstr "прикажување на сите сврзувања"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1339
+#: ..\Client\core\CCore.cpp:1339
 msgid "shows your serial"
 msgstr "го покажува твојот сериски број"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1348
+#: ..\Client\core\CCore.cpp:1348
 msgid "connects to a server (host port nick pass)"
 msgstr "се конектира на серверот (хост порта ник пасворд)"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1349
+#: ..\Client\core\CCore.cpp:1349
 msgid "connects to a previous server"
 msgstr "се конектира на минатион сервер"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1350
+#: ..\Client\core\CCore.cpp:1350
 msgid "binds a key (key control)"
 msgstr "сврзување на контрола (контрола)"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1351
+#: ..\Client\core\CCore.cpp:1351
 msgid "unbinds a key (key)"
 msgstr "одврзување на контрола"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1352
+#: ..\Client\core\CCore.cpp:1352
 msgid "copies the default gta controls"
 msgstr "се копираат стандарните гта контроли"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1353
+#: ..\Client\core\CCore.cpp:1353
 msgid "outputs a screenshot"
 msgstr "произлегува слика "
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1354
+#: ..\Client\core\CCore.cpp:1354
 msgid "immediately saves the config"
 msgstr "конфигурацијата ќе се зачува веднаш"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1356
+#: ..\Client\core\CCore.cpp:1356
 msgid "clears the debug view"
 msgstr "чист дебаг преглед"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1357
+#: ..\Client\core\CCore.cpp:1357
 msgid "scrolls the chatbox upwards"
 msgstr "скролниго чатот нагоре"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1358
+#: ..\Client\core\CCore.cpp:1358
 msgid "scrolls the chatbox downwards"
 msgstr "скролниго чатот надоле"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1359
+#: ..\Client\core\CCore.cpp:1359
 msgid "scrolls the debug view upwards"
 msgstr "скролниго дебаг прегледот нагоре"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1360
+#: ..\Client\core\CCore.cpp:1360
 msgid "scrolls the debug view downwards"
 msgstr "скролниго дебаг прегледот надоле"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1363
+#: ..\Client\core\CCore.cpp:1363
 msgid "shows the memory statistics"
 msgstr "прикажување на мемориската статистика"
 
-#: E:\Documents\mtasa-blue\Client\core\CCore.cpp:1364
+#: ..\Client\core\CCore.cpp:1364
 msgid "shows the frame timing graph"
 msgstr "прикажување на временската графа"
 
-#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:32
+#: ..\Client\core\CCredits.cpp:32
 msgid "Programming"
 msgstr "Програмирање"
 
-#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:59
+#: ..\Client\core\CCredits.cpp:59
 msgid "Contributors"
 msgstr "Соработници"
 
-#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:75
+#: ..\Client\core\CCredits.cpp:74
 msgid "Game Design / Scripting"
 msgstr "Дизајн на Играта / Скрипти"
 
-#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:92
+#: ..\Client\core\CCredits.cpp:92
 msgid "Patch contributors"
 msgstr "Поврзани соработници"
 
-#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:156
+#: ..\Client\core\CCredits.cpp:156
 msgid "Language Localization"
 msgstr "Локација на Јазикот"
 
-#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:162
+#: ..\Client\core\CCredits.cpp:162
 msgid "Special Thanks"
 msgstr "Специјално Заблагодарување"
 
-#: E:\Documents\mtasa-blue\Client\core\CCredits.cpp:188
+#: ..\Client\core\CCredits.cpp:189
 msgid "This software makes use of the following libraries and software:"
 msgstr "Овој софтвер се употребува од следните софтвери:"
 
 #. Even the default skin doesn't work, so give up
-#: E:\Documents\mtasa-blue\Client\core\CGUI.cpp:84
+#: ..\Client\core\CGUI.cpp:84
 msgid ""
 "The skin you selected could not be loaded, and the default skin also could "
 "not be loaded, please reinstall MTA."
@@ -432,204 +409,202 @@ msgstr ""
 "Скинот што го одбравте неможе се да се прикаже, исто така и стандарниот "
 "неможе се да прикаже, ве молиме ре-инсталирајте ја MTA."
 
-#: E:\Documents\mtasa-blue\Client\core\CJoystickManager.cpp:1582
+#: ..\Client\core\CJoystickManager.cpp:1582
 msgid "Accelerate Axis"
 msgstr "Забрзана оска"
 
-#: E:\Documents\mtasa-blue\Client\core\CJoystickManager.cpp:1584
+#: ..\Client\core\CJoystickManager.cpp:1584
 msgid "Brake Axis"
 msgstr "Запирачка оска"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:180
+#: ..\Client\core\CKeyBinds.cpp:180
 msgid "Fire"
 msgstr "Пукај"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:181
+#: ..\Client\core\CKeyBinds.cpp:181
 msgid "Next weapon"
 msgstr "Следно оружје"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:182
+#: ..\Client\core\CKeyBinds.cpp:182
 msgid "Previous weapon"
 msgstr "Претходно оружје"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:183
+#: ..\Client\core\CKeyBinds.cpp:183
 msgid "Forwards"
 msgstr "Нанапред"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:184
+#: ..\Client\core\CKeyBinds.cpp:184
 msgid "Backwards"
 msgstr "Наназад"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:185
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2144
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2172
+#: ..\Client\core\CKeyBinds.cpp:185 ..\Client\core\CSettings.cpp:2141
+#: ..\Client\core\CSettings.cpp:2169
 msgid "Left"
 msgstr "Лево"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:186
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2146
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2173
+#: ..\Client\core\CKeyBinds.cpp:186 ..\Client\core\CSettings.cpp:2143
+#: ..\Client\core\CSettings.cpp:2170
 msgid "Right"
 msgstr "Десно"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:187
+#: ..\Client\core\CKeyBinds.cpp:187
 msgid "Zoom in"
 msgstr "Зумирај"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:188
+#: ..\Client\core\CKeyBinds.cpp:188
 msgid "Zoom out"
 msgstr "Одзумирај"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:189
+#: ..\Client\core\CKeyBinds.cpp:189
 msgid "Enter/Exit"
 msgstr "Излези/Влези"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:190
+#: ..\Client\core\CKeyBinds.cpp:190
 msgid "Change camera"
 msgstr "Смени ја камерата"
 
 #. 10
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:191
+#: ..\Client\core\CKeyBinds.cpp:191
 msgid "Jump"
 msgstr "Скокни"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:192
+#: ..\Client\core\CKeyBinds.cpp:192
 msgid "Sprint"
 msgstr "Спринтај"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:193
+#: ..\Client\core\CKeyBinds.cpp:193
 msgid "Look behind"
 msgstr "Погледни наназад"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:194
+#: ..\Client\core\CKeyBinds.cpp:194
 msgid "Crouch"
 msgstr "Ползи"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:195
+#: ..\Client\core\CKeyBinds.cpp:195
 msgid "Action"
 msgstr "Акција"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:196
+#: ..\Client\core\CKeyBinds.cpp:196
 msgid "Walk"
 msgstr "Оди"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:197
+#: ..\Client\core\CKeyBinds.cpp:197
 msgid "Vehicle fire"
 msgstr "Автомобилско пукање"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:198
+#: ..\Client\core\CKeyBinds.cpp:198
 msgid "Vehicle secondary fire"
 msgstr "Секундарно оружје"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:199
+#: ..\Client\core\CKeyBinds.cpp:199
 msgid "Vehicle left"
 msgstr "Десно возило"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:200
+#: ..\Client\core\CKeyBinds.cpp:200
 msgid "Vehicle right"
 msgstr "Лево возило"
 
 #. 20
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:201
+#: ..\Client\core\CKeyBinds.cpp:201
 msgid "Steer forwards/down"
 msgstr "Управувај нанпред/надоле"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:202
+#: ..\Client\core\CKeyBinds.cpp:202
 msgid "Steer backwards/up"
 msgstr "Управувај наназад/нагоре"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:203
+#: ..\Client\core\CKeyBinds.cpp:203
 msgid "Accelerate"
 msgstr "Забрзај"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:204
+#: ..\Client\core\CKeyBinds.cpp:204
 msgid "Brake/Reverse"
 msgstr "Закочи/Наназад"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:205
+#: ..\Client\core\CKeyBinds.cpp:205
 msgid "Radio next"
 msgstr "Следно радио"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:206
+#: ..\Client\core\CKeyBinds.cpp:206
 msgid "Radio previous"
 msgstr "Претходно радио"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:207
+#: ..\Client\core\CKeyBinds.cpp:207
 msgid "Radio user track skip"
 msgstr "Корисничко радио"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:208
+#: ..\Client\core\CKeyBinds.cpp:208
 msgid "Horn"
 msgstr "Свири"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:209
+#: ..\Client\core\CKeyBinds.cpp:209
 msgid "Sub-mission"
 msgstr "Секундарна мисија"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:210
+#: ..\Client\core\CKeyBinds.cpp:210
 msgid "Handbrake"
 msgstr "Рачна кочница"
 
 #. 30
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:211
+#: ..\Client\core\CKeyBinds.cpp:211
 msgid "Vehicle look left"
 msgstr "Поглед налево од возилото"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:212
+#: ..\Client\core\CKeyBinds.cpp:212
 msgid "Vehicle look right"
 msgstr "Поглед надесно од возилото"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:213
+#: ..\Client\core\CKeyBinds.cpp:213
 msgid "Vehicle look behind"
 msgstr "Поглед наназад од возилото"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:214
+#: ..\Client\core\CKeyBinds.cpp:214
 msgid "Vehicle mouse look"
 msgstr "Поглед со маусот од возилото"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:215
+#: ..\Client\core\CKeyBinds.cpp:215
 msgid "Special control left"
 msgstr "Специјална контрола лево"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:216
+#: ..\Client\core\CKeyBinds.cpp:216
 msgid "Special control right"
 msgstr "Специјална контрола лево"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:217
+#: ..\Client\core\CKeyBinds.cpp:217
 msgid "Special control down"
 msgstr "Специјална контрола надолу"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:218
+#: ..\Client\core\CKeyBinds.cpp:218
 msgid "Special control up"
 msgstr "Специјална контрола нагоре"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:219
+#: ..\Client\core\CKeyBinds.cpp:219
 msgid "Aim weapon"
 msgstr "Нишани со оружјето"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:220
+#: ..\Client\core\CKeyBinds.cpp:220
 msgid "Conversation yes"
 msgstr "Конверзација да"
 
 #. 40
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:221
+#: ..\Client\core\CKeyBinds.cpp:221
 msgid "Conversation no"
 msgstr "Конверзација не"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:222
+#: ..\Client\core\CKeyBinds.cpp:222
 msgid "Group control forwards"
 msgstr "Групна контрола нанапред"
 
-#: E:\Documents\mtasa-blue\Client\core\CKeyBinds.cpp:223
+#: ..\Client\core\CKeyBinds.cpp:223
 msgid "Group control backwards"
 msgstr "Групна контрола наназад"
 
 #. TRANSLATORS: Replace with your language native name
-#: E:\Documents\mtasa-blue\Client\core\CLocalization.cpp:17
+#: ..\Client\core\CLocalization.cpp:17
 msgid "English"
 msgstr "Македонски"
 
-#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:314
+#: ..\Client\core\CMainMenu.cpp:320
 msgid ""
 "You are using a feature-branch build! This is a test build only which cannot"
 " be used to connect to public servers!"
@@ -637,7 +612,7 @@ msgstr ""
 "Вие користите нова верзија, и истата не може да се конектира на јавни "
 "сервери!"
 
-#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1106
+#: ..\Client\core\CMainMenu.cpp:1129
 msgid ""
 "This will disconnect you from the current server.\n"
 "\n"
@@ -647,705 +622,627 @@ msgstr ""
 "\n"
 "Дали сте сигурни дека сакате да се дисконектирате?"
 
-#: E:\Documents\mtasa-blue\Client\core\CMainMenu.cpp:1110
+#: ..\Client\core\CMainMenu.cpp:1133
 msgid "DISCONNECT WARNING"
 msgstr "ДИСКОНЕКЦИЈА ПРЕДУПРЕДУВАЊЕ"
 
-#: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:142
+#: ..\Client\core\CQuickConnect.cpp:142
 msgid "No host specified!"
 msgstr "Хостот не е специфициран!"
 
-#: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:151
+#: ..\Client\core\CQuickConnect.cpp:151
 msgid "No port specified!"
 msgstr "Портот не е специфициран!"
 
-#: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:156
+#: ..\Client\core\CQuickConnect.cpp:156
 msgid "Invalid port specified!"
 msgstr "Портот што е специфициран е неважечки!"
 
-#: E:\Documents\mtasa-blue\Client\core\CQuickConnect.cpp:165
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1266
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1323
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:563
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:655
+#: ..\Client\core\CQuickConnect.cpp:165
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1266
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1323
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:563
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:655
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "Неважечко име! Ве молиме одете во Опции и впишете ново име!"
 
-#: E:\Documents\mtasa-blue\Client\core\CScreenShot.cpp:51
+#: ..\Client\core\CScreenShot.cpp:51
 #, c-format, c-format
 msgid "Screenshot taken: '%s'"
 msgstr "Сликата е спремна: '%s'"
 
 #. Create window (with frame) if it will fit inside the screen resolution
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:82
+#: ..\Client\core\CSettings.cpp:82
 msgid "SETTINGS"
 msgstr "ПОСТАВКИ"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:114
+#: ..\Client\core\CSettings.cpp:114
 msgid "Multiplayer"
 msgstr "Мултиплеер"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:115
+#: ..\Client\core\CSettings.cpp:115
 msgid "Video"
 msgstr "Видео"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:116
+#: ..\Client\core\CSettings.cpp:116
 msgid "Audio"
 msgstr "Аудио"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:117
+#: ..\Client\core\CSettings.cpp:117
 msgid "Binds"
 msgstr "Сврзувања"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:118
+#: ..\Client\core\CSettings.cpp:118
 msgid "Controls"
 msgstr "Контроли"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:119
+#: ..\Client\core\CSettings.cpp:119
 msgid "Interface"
 msgstr "Интерфејс"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:120
+#: ..\Client\core\CSettings.cpp:120
 msgid "Web Browser"
 msgstr "Веб пребарувач"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:121
+#: ..\Client\core\CSettings.cpp:121
 msgid "Advanced"
 msgstr "Напредно"
 
 #. Create buttons
 #. OK button
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:125
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4448
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1604
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1820
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1913
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1935
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1953
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1965
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2117
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2126
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2135
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2149
-#: E:\Documents\mtasa-blue\Client\gui\CGUIMessageBox_Impl.cpp:64
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:33
+#: ..\Client\core\CSettings.cpp:125 ..\Client\core\CSettings.cpp:4445
+#: ..\Client\core\CVersionUpdater.cpp:1605
+#: ..\Client\core\CVersionUpdater.cpp:1821
+#: ..\Client\core\CVersionUpdater.cpp:1914
+#: ..\Client\core\CVersionUpdater.cpp:1936
+#: ..\Client\core\CVersionUpdater.cpp:1954
+#: ..\Client\core\CVersionUpdater.cpp:1966
+#: ..\Client\core\CVersionUpdater.cpp:2118
+#: ..\Client\core\CVersionUpdater.cpp:2127
+#: ..\Client\core\CVersionUpdater.cpp:2136
+#: ..\Client\core\CVersionUpdater.cpp:2150
+#: ..\Client\gui\CGUIMessageBox_Impl.cpp:64 ..\Client\loader\Dialogs.cpp:33
 msgid "OK"
 msgstr "Ок"
 
 #. Cancel button
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:130
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4447
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1787
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1803
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1838
-#: E:\Documents\mtasa-blue\Client\gui\CGUIMessageBox_Impl.cpp:68
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:36
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:123
+#: ..\Client\core\CSettings.cpp:130 ..\Client\core\CSettings.cpp:4444
+#: ..\Client\core\CVersionUpdater.cpp:1788
+#: ..\Client\core\CVersionUpdater.cpp:1804
+#: ..\Client\core\CVersionUpdater.cpp:1839
+#: ..\Client\gui\CGUIMessageBox_Impl.cpp:68 ..\Client\loader\Dialogs.cpp:36
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:123
 msgid "Cancel"
 msgstr "Откажи"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:145
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:336
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:587
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:836
+#: ..\Client\core\CSettings.cpp:145 ..\Client\core\CSettings.cpp:336
+#: ..\Client\core\CSettings.cpp:587 ..\Client\core\CSettings.cpp:836
 msgid "Load defaults"
 msgstr "Стандарно вчитување"
 
 #. *
 #. *  Controls tab
 #. *
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:155
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:179
+#: ..\Client\core\CSettings.cpp:155 ..\Client\core\CSettings.cpp:179
 msgid "Mouse sensitivity:"
 msgstr "Сензитивност на маусот:"
 
 #. VerticalAimSensitivity
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:155
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:197
+#: ..\Client\core\CSettings.cpp:155 ..\Client\core\CSettings.cpp:197
 msgid "Vertical aim sensitivity:"
 msgstr "Вертикална сензитивност на аимот:"
 
 #. Mouse Options
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:158
+#: ..\Client\core\CSettings.cpp:158
 msgid "Mouse options"
 msgstr "Маус опции"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:165
+#: ..\Client\core\CSettings.cpp:165
 msgid "Invert mouse vertically"
 msgstr "Инвертна вертикалност на маусот"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:169
+#: ..\Client\core\CSettings.cpp:169
 msgid "Steer with mouse"
 msgstr "Мрдај со маусот"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:173
+#: ..\Client\core\CSettings.cpp:173
 msgid "Fly with mouse"
 msgstr "Летај со маусот"
 
 #. Joypad options
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:215
+#: ..\Client\core\CSettings.cpp:215
 msgid "Joypad options"
 msgstr "Joypad опции"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:228
+#: ..\Client\core\CSettings.cpp:228
 msgid "Standard controls (Mouse + Keyboard)"
 msgstr "Стандарни контроли ( Маус + Тастатура)"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:235
+#: ..\Client\core\CSettings.cpp:235
 msgid "Classic controls (Joypad)"
 msgstr "Класични контроли (Joypad)"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:272
+#: ..\Client\core\CSettings.cpp:272
 msgid "Dead Zone"
 msgstr "Мртва Зона"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:277
+#: ..\Client\core\CSettings.cpp:277
 msgid "Saturation"
 msgstr "Сатурација"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:283
+#: ..\Client\core\CSettings.cpp:283
 msgid "Use the 'Binds' tab for joypad buttons."
 msgstr "Употребете го 'Сврзување' табот за joypad копчиња."
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:322
+#: ..\Client\core\CSettings.cpp:322
 msgid "Left Stick"
 msgstr "Лев стик"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:328
+#: ..\Client\core\CSettings.cpp:328
 msgid "Right Stick"
 msgstr "Десен стик"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:343
+#: ..\Client\core\CSettings.cpp:343
 msgid "DESCRIPTION"
 msgstr "ОПИС"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:344
+#: ..\Client\core\CSettings.cpp:344
 msgid "KEY"
 msgstr "КЛУЧ"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:346
+#: ..\Client\core\CSettings.cpp:346
 msgid "ALT. KEY"
 msgstr "ALT. Копче"
 
 #. *
 #. *    Multiplayer tab
 #. *
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:351
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:354
+#: ..\Client\core\CSettings.cpp:351 ..\Client\core\CSettings.cpp:354
 msgid "Nick:"
 msgstr "Име:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:364
+#: ..\Client\core\CSettings.cpp:364
 msgid "Save server passwords"
 msgstr "Зачувај го пасвордот на серверот"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:369
+#: ..\Client\core\CSettings.cpp:369
 msgid "Auto-refresh server browser"
 msgstr "Автоматско-освежување на пребарувачот на сервери"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:374
+#: ..\Client\core\CSettings.cpp:374
 msgid "Allow screen upload"
 msgstr "Дозволи аплоадирање на слика"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:379
+#: ..\Client\core\CSettings.cpp:379
 msgid "Use customized GTA:SA files"
 msgstr "Употреби модифицирани GTA:SA фајлови"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:384
+#: ..\Client\core\CSettings.cpp:384
 msgid "Map rendering options"
 msgstr "Опции за нацрт на мапа"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:390
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:598
+#: ..\Client\core\CSettings.cpp:390 ..\Client\core\CSettings.cpp:598
 msgid "Opacity:"
 msgstr "Непроѕирност:"
 
 #. *
 #. *  Audio tab
 #. *
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:410
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:418
+#: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:418
 msgid "Master volume:"
 msgstr ""
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:410
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:437
+#: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:437
 msgid "Radio volume:"
 msgstr "Глас на радиото:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:410
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:456
+#: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:456
 msgid "SFX volume:"
 msgstr "SFX јачина:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:410
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:475
+#: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:475
 msgid "MTA volume:"
 msgstr "MTA јачина:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:410
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:494
+#: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:494
 msgid "Voice volume:"
 msgstr "Јачина на гласот:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:410
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:535
+#: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:535
 msgid "Play mode:"
 msgstr "Вид на игра:"
 
 #. *
 #. * Webbrowser tab
 #. *
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:412
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:600
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:851
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1919
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:51
+#: ..\Client\core\CSettings.cpp:412 ..\Client\core\CSettings.cpp:600
+#: ..\Client\core\CSettings.cpp:851 ..\Client\core\CSettings.cpp:1919
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:51
 msgid "General"
 msgstr "Општо"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:513
+#: ..\Client\core\CSettings.cpp:513
 msgid "Radio options"
 msgstr ""
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:519
+#: ..\Client\core\CSettings.cpp:519
 msgid "Radio Equalizer"
 msgstr "Изедначување на радио"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:524
+#: ..\Client\core\CSettings.cpp:524
 msgid "Radio Auto-tune"
 msgstr "Автоматско нагодување на радиото"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:529
+#: ..\Client\core\CSettings.cpp:529
 msgid "Usertrack options"
 msgstr "Кориснички опции"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:543
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2942
+#: ..\Client\core\CSettings.cpp:543 ..\Client\core\CSettings.cpp:2939
 msgid "Radio"
 msgstr "Радио"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:544
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2944
+#: ..\Client\core\CSettings.cpp:544 ..\Client\core\CSettings.cpp:2941
 msgid "Random"
 msgstr "Случајно"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:545
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2946
+#: ..\Client\core\CSettings.cpp:545 ..\Client\core\CSettings.cpp:2943
 msgid "Sequential"
 msgstr "Секвенцијален"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:548
+#: ..\Client\core\CSettings.cpp:548
 msgid "Automatic Media Scan"
 msgstr "Автоматски медија скенер"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:555
+#: ..\Client\core\CSettings.cpp:555
 #, fuzzy
 msgid "Mute options"
 msgstr "Маус опции"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:561
+#: ..\Client\core\CSettings.cpp:561
 #, fuzzy
 msgid "Mute All sounds when minimized"
 msgstr "Мутирај SFX звук кога е минимизирано"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:566
+#: ..\Client\core\CSettings.cpp:566
 msgid "Mute Radio sounds when minimized"
 msgstr "Мутирај го звукот на радиото кога е минимизирано"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:571
+#: ..\Client\core\CSettings.cpp:571
 msgid "Mute SFX sounds when minimized"
 msgstr "Мутирај SFX звук кога е минимизирано"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:576
+#: ..\Client\core\CSettings.cpp:576
 msgid "Mute MTA sounds when minimized"
 msgstr "Мутирај MTA звук кога е минимизирано"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:581
+#: ..\Client\core\CSettings.cpp:581
 msgid "Mute Voice sounds when minimized"
 msgstr "Мутирај гласовен звук кога е минимизирано"
 
 #. *
 #. *  Video tab
 #. *
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:606
+#: ..\Client\core\CSettings.cpp:597 ..\Client\core\CSettings.cpp:606
 msgid "Resolution:"
 msgstr "Резолуција:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:647
+#: ..\Client\core\CSettings.cpp:597 ..\Client\core\CSettings.cpp:647
 msgid "FOV:"
 msgstr "FOV:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:663
+#: ..\Client\core\CSettings.cpp:597 ..\Client\core\CSettings.cpp:663
 msgid "Draw Distance:"
 msgstr "Составна Дистанца:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:681
+#: ..\Client\core\CSettings.cpp:597 ..\Client\core\CSettings.cpp:681
 msgid "Brightness:"
 msgstr "Светлина:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:597
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:699
+#: ..\Client\core\CSettings.cpp:597 ..\Client\core\CSettings.cpp:699
 msgid "FX Quality:"
 msgstr "FX квалитет:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:598
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:713
+#: ..\Client\core\CSettings.cpp:598 ..\Client\core\CSettings.cpp:713
 msgid "Anisotropic filtering:"
 msgstr "Анизотропски филтер:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:598
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:740
+#: ..\Client\core\CSettings.cpp:598 ..\Client\core\CSettings.cpp:740
 msgid "Anti-aliasing:"
 msgstr "Анти-лаг:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:598
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:754
+#: ..\Client\core\CSettings.cpp:598 ..\Client\core\CSettings.cpp:754
 msgid "Aspect Ratio:"
 msgstr "Аспект Рејтио:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:618
+#: ..\Client\core\CSettings.cpp:618
 msgid "Windowed"
 msgstr "Без рамки"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:626
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:370
+#: ..\Client\core\CSettings.cpp:626 ..\Client\core\CSettings.cpp:937
+#: ..\Client\loader\MainFunctions.cpp:370
 msgid "Fullscreen mode:"
 msgstr "Режим на цел екран:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:633
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1521
+#: ..\Client\core\CSettings.cpp:633 ..\Client\core\CSettings.cpp:1521
 msgid "Standard"
 msgstr "Стандардно"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:634
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1523
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:370
+#: ..\Client\core\CSettings.cpp:634 ..\Client\core\CSettings.cpp:1523
+#: ..\Client\loader\MainFunctions.cpp:370
 msgid "Borderless window"
 msgstr "Прозорец без рамки"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:635
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1525
+#: ..\Client\core\CSettings.cpp:635 ..\Client\core\CSettings.cpp:1525
 msgid "Borderless keep res"
 msgstr "Резолуција без рамка"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:639
+#: ..\Client\core\CSettings.cpp:639
 msgid "Mip Mapping"
 msgstr "Мапирање"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:707
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1439
+#: ..\Client\core\CSettings.cpp:707 ..\Client\core\CSettings.cpp:1439
 msgid "Low"
 msgstr "Слабо"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:708
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1441
+#: ..\Client\core\CSettings.cpp:708 ..\Client\core\CSettings.cpp:1441
 msgid "Medium"
 msgstr "Средно"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:709
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1019
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1443
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2997
+#: ..\Client\core\CSettings.cpp:709 ..\Client\core\CSettings.cpp:1019
+#: ..\Client\core\CSettings.cpp:1443 ..\Client\core\CSettings.cpp:2994
 msgid "High"
 msgstr "Високо"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:710
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1445
+#: ..\Client\core\CSettings.cpp:710 ..\Client\core\CSettings.cpp:1445
 msgid "Very high"
 msgstr "Многу високо"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:725
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:748
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:950
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1004
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1135
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1449
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3004
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3036
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3058
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4022
+#: ..\Client\core\CSettings.cpp:725 ..\Client\core\CSettings.cpp:748
+#: ..\Client\core\CSettings.cpp:950 ..\Client\core\CSettings.cpp:1004
+#: ..\Client\core\CSettings.cpp:1135 ..\Client\core\CSettings.cpp:1449
+#: ..\Client\core\CSettings.cpp:3001 ..\Client\core\CSettings.cpp:3033
+#: ..\Client\core\CSettings.cpp:3055 ..\Client\core\CSettings.cpp:4019
 msgid "Off"
 msgstr "Исклучување"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:749
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1451
+#: ..\Client\core\CSettings.cpp:749 ..\Client\core\CSettings.cpp:1451
 msgid "1x"
 msgstr "1x"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:750
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1453
+#: ..\Client\core\CSettings.cpp:750 ..\Client\core\CSettings.cpp:1453
 msgid "2x"
 msgstr "2x"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:751
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1455
+#: ..\Client\core\CSettings.cpp:751 ..\Client\core\CSettings.cpp:1455
 msgid "3x"
 msgstr "3x"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:764
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:952
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1461
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3006
+#: ..\Client\core\CSettings.cpp:764 ..\Client\core\CSettings.cpp:952
+#: ..\Client\core\CSettings.cpp:1461 ..\Client\core\CSettings.cpp:3003
 msgid "Auto"
 msgstr "Автоматски"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:765
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1463
+#: ..\Client\core\CSettings.cpp:765 ..\Client\core\CSettings.cpp:1463
 msgid "4:3"
 msgstr "4:3"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:766
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1465
+#: ..\Client\core\CSettings.cpp:766 ..\Client\core\CSettings.cpp:1465
 msgid "16:10"
 msgstr "16:10"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:767
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1467
+#: ..\Client\core\CSettings.cpp:767 ..\Client\core\CSettings.cpp:1467
 msgid "16:9"
 msgstr "16:9"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:770
+#: ..\Client\core\CSettings.cpp:770
 msgid "HUD Match Aspect Ratio"
 msgstr "HUD-от се вклопува "
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:776
+#: ..\Client\core\CSettings.cpp:776
 msgid "Volumetric Shadows"
 msgstr "Волуметриски Сенки"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:780
+#: ..\Client\core\CSettings.cpp:780
 msgid "Grass effect"
 msgstr "Ефект на трева"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:784
+#: ..\Client\core\CSettings.cpp:784
 msgid "Heat haze"
 msgstr "Магловита топлина"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:788
+#: ..\Client\core\CSettings.cpp:788
 msgid "Tyre Smoke etc"
 msgstr "Гумо Чад итн"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:792
+#: ..\Client\core\CSettings.cpp:792
 msgid "Render vehicles always in high detail"
 msgstr "Рендирање на возилата секогаш детални"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:797
+#: ..\Client\core\CSettings.cpp:797
 msgid "Full Screen Minimize"
 msgstr "Целосно Минимизирање"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:809
+#: ..\Client\core\CSettings.cpp:809
 msgid "Enable Device Selection Dialog"
 msgstr "Дозволи уред за селекција на диалог"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:821
+#: ..\Client\core\CSettings.cpp:821
 msgid "Show unsafe resolutions"
 msgstr "Прикажи ги небезбедните резолуции"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:857
+#: ..\Client\core\CSettings.cpp:857
 msgid "Enable remote websites"
 msgstr "Вклучете вебсајти"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:862
+#: ..\Client\core\CSettings.cpp:862
 msgid "Enable Javascript on remote websites"
 msgstr "Вклучете јава скрипти на далечински вебсајти"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:867
+#: ..\Client\core\CSettings.cpp:867
 msgid "Custom blacklist"
 msgstr "Црна листа"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:877
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:905
+#: ..\Client\core\CSettings.cpp:877 ..\Client\core\CSettings.cpp:905
 msgid "Enter a domain e.g. google.com"
 msgstr "Внесете домејн како на пример google.com"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:879
+#: ..\Client\core\CSettings.cpp:879
 msgid "Block"
 msgstr "Блок"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:887
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:915
+#: ..\Client\core\CSettings.cpp:887 ..\Client\core\CSettings.cpp:915
 msgid "Domain"
 msgstr "Домен"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:889
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:917
+#: ..\Client\core\CSettings.cpp:889 ..\Client\core\CSettings.cpp:917
 msgid "Remove domain"
 msgstr "Отстрани домен"
 
 #. Reset vecTemp
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:895
+#: ..\Client\core\CSettings.cpp:895
 msgid "Custom whitelist"
 msgstr "Бела листа"
 
 #. Misc section label
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:930
+#: ..\Client\core\CSettings.cpp:930
 msgid "Misc"
 msgstr "Разно"
 
 #. Fast clothes loading
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:943
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4466
+#: ..\Client\core\CSettings.cpp:936 ..\Client\core\CSettings.cpp:943
+#: ..\Client\core\CSettings.cpp:4463
 msgid "Fast CJ clothes loading:"
 msgstr "Брзи СЈ облеки се вчитува:"
 
 #. Browser scan speed
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:957
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4468
+#: ..\Client\core\CSettings.cpp:936 ..\Client\core\CSettings.cpp:957
+#: ..\Client\core\CSettings.cpp:4465
 msgid "Browser speed:"
 msgstr "Брзина на прелистувачот:"
 
 #. Single download
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:971
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4470
+#: ..\Client\core\CSettings.cpp:936 ..\Client\core\CSettings.cpp:971
+#: ..\Client\core\CSettings.cpp:4467
 msgid "Single connection:"
 msgstr "Единечна конекција:"
 
 #. Packet tag
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:936
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:984
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4472
+#: ..\Client\core\CSettings.cpp:936 ..\Client\core\CSettings.cpp:984
+#: ..\Client\core\CSettings.cpp:4469
 msgid "Packet tag:"
 msgstr "Таг на пакет:"
 
 #. Progress animation
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:997
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4474
+#: ..\Client\core\CSettings.cpp:937 ..\Client\core\CSettings.cpp:997
+#: ..\Client\core\CSettings.cpp:4471
 msgid "Progress animation:"
 msgstr "Анимација на прогрес:"
 
 #. Process priority
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1010
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4464
+#: ..\Client\core\CSettings.cpp:937 ..\Client\core\CSettings.cpp:1010
+#: ..\Client\core\CSettings.cpp:4461
 msgid "Process priority:"
 msgstr "Процес на приоритет:"
 
 #. Debug setting
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:937
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1024
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4476
+#: ..\Client\core\CSettings.cpp:937 ..\Client\core\CSettings.cpp:1024
+#: ..\Client\core\CSettings.cpp:4473
 msgid "Debug setting:"
 msgstr "Дебаг опции:"
 
 #. Streaming memory
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:938
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1047
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4478
+#: ..\Client\core\CSettings.cpp:938 ..\Client\core\CSettings.cpp:1047
+#: ..\Client\core\CSettings.cpp:4475
 msgid "Streaming memory:"
 msgstr "Стриминг меморија:"
 
 #. Update build type
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:938
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1149
+#: ..\Client\core\CSettings.cpp:938 ..\Client\core\CSettings.cpp:1149
 msgid "Update build type:"
 msgstr "Надградете го типот: "
 
 #. UpdateAutoInstall
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:938
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1128
+#: ..\Client\core\CSettings.cpp:938 ..\Client\core\CSettings.cpp:1128
 msgid "Install important updates:"
 msgstr "Инсталирај важни надградби:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:951
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:979
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:992
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3008
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3024
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3031
+#: ..\Client\core\CSettings.cpp:951 ..\Client\core\CSettings.cpp:979
+#: ..\Client\core\CSettings.cpp:992 ..\Client\core\CSettings.cpp:3005
+#: ..\Client\core\CSettings.cpp:3021 ..\Client\core\CSettings.cpp:3028
 msgid "On"
 msgstr "Вклучување"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:964
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3013
+#: ..\Client\core\CSettings.cpp:964 ..\Client\core\CSettings.cpp:3010
 msgid "Very slow"
 msgstr "Многу бавно"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:965
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:978
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:991
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1005
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1031
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1043
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1136
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1156
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3015
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3022
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3029
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3038
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3051
+#: ..\Client\core\CSettings.cpp:965 ..\Client\core\CSettings.cpp:978
+#: ..\Client\core\CSettings.cpp:991 ..\Client\core\CSettings.cpp:1005
+#: ..\Client\core\CSettings.cpp:1031 ..\Client\core\CSettings.cpp:1043
+#: ..\Client\core\CSettings.cpp:1136 ..\Client\core\CSettings.cpp:1156
+#: ..\Client\core\CSettings.cpp:3012 ..\Client\core\CSettings.cpp:3019
+#: ..\Client\core\CSettings.cpp:3026 ..\Client\core\CSettings.cpp:3035
+#: ..\Client\core\CSettings.cpp:3048
 msgid "Default"
 msgstr "Стандарно"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:966
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3017
+#: ..\Client\core\CSettings.cpp:966 ..\Client\core\CSettings.cpp:3014
 msgid "Fast"
 msgstr "Брзи"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1017
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2993
+#: ..\Client\core\CSettings.cpp:1017 ..\Client\core\CSettings.cpp:2990
 msgid "Normal"
 msgstr "Нормално"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1018
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2995
+#: ..\Client\core\CSettings.cpp:1018 ..\Client\core\CSettings.cpp:2992
 msgid "Above normal"
 msgstr "Нормално"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1054
+#: ..\Client\core\CSettings.cpp:1054
 msgid "Min"
 msgstr "Минимум"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1067
+#: ..\Client\core\CSettings.cpp:1067
 msgid "Max"
 msgstr "Махимим"
 
 #. Windows 8 compatibility
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1074
+#: ..\Client\core\CSettings.cpp:1074
 msgid "Windows 8 compatibility:"
 msgstr "Виндоус 8 компатибилност: "
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1079
+#: ..\Client\core\CSettings.cpp:1079
 msgid "16-bit color"
 msgstr "16-битна боја "
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1084
+#: ..\Client\core\CSettings.cpp:1084
 msgid "Mouse fix"
 msgstr "Поправка на маус"
 
 #. Cache path info
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1102
+#: ..\Client\core\CSettings.cpp:1102
 msgid "Client resource files:"
 msgstr "Фајлови и ресурси на клиентот:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1106
+#: ..\Client\core\CSettings.cpp:1106
 msgid "Show in Explorer"
 msgstr "Прикажи во Explorer"
 
 #. Auto updater section label
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1121
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1124
+#: ..\Client\core\CSettings.cpp:1121 ..\Client\core\CSettings.cpp:1124
 msgid "Auto updater"
 msgstr "Автоматско ажурирање"
 
 #. Check for updates
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1162
+#: ..\Client\core\CSettings.cpp:1162
 msgid "Check for update now"
 msgstr "Провери ги ажурирањата сега"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1309
+#: ..\Client\core\CSettings.cpp:1309
 msgid "Some settings will be changed when you next start MTA"
 msgstr "Некои опции ќе бидат промените следниот пат кога ќе ја вклучите MTA"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1310
+#: ..\Client\core\CSettings.cpp:1310
 msgid ""
 "\n"
 "\n"
@@ -1355,15 +1252,15 @@ msgstr ""
 "\n"
 "Дали сакате сега да рестартирате?"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1313
+#: ..\Client\core\CSettings.cpp:1313
 msgid "RESTART REQUIRED"
 msgstr "РЕСТАРТИРАЊЕ Е ЗАДОЛЖИТЕЛНО"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1333
+#: ..\Client\core\CSettings.cpp:1333
 msgid "Some settings will be changed when you disconnect the current server"
 msgstr "Некои поставки ќе бидат сменети кога ќе се дисконектирате од серверот"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1334
+#: ..\Client\core\CSettings.cpp:1334
 msgid ""
 "\n"
 "\n"
@@ -1373,168 +1270,166 @@ msgstr ""
 "\n"
 "Дали сакате да се дисконектирате сега?"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1337
+#: ..\Client\core\CSettings.cpp:1337
 msgid "DISCONNECT REQUIRED"
 msgstr "ДИСКОНЕКТИРАЊЕ Е ЗАДОЛЖИТЕЛНО"
 
 #. Update the joystick name
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1645
+#: ..\Client\core\CSettings.cpp:1645
 msgid "Joypad not detected  -  Check connections and restart game"
 msgstr ""
 "Joypad не е детектиран ~ ~-~ ~Проверете ја конекцијата и рестартирајте ја "
 "играта"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1833
+#: ..\Client\core\CSettings.cpp:1833
 msgid "Binding axis"
 msgstr "Сврзувачки оски"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1833
+#: ..\Client\core\CSettings.cpp:1833
 msgid "Move an axis to bind, or escape to clear"
 msgstr "Премести оска до сврзување, или притисни ескејп за да исклучиш"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1910
+#: ..\Client\core\CSettings.cpp:1910
 msgid "Language:"
 msgstr "Јазик:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1910
+#: ..\Client\core\CSettings.cpp:1910
 msgid "Skin:"
 msgstr "Скин:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1910
+#: ..\Client\core\CSettings.cpp:1910
 msgid "Presets:"
 msgstr "Стабилизатор:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1962
+#: ..\Client\core\CSettings.cpp:1959
 msgid "Chat"
 msgstr "Чат"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1979
+#: ..\Client\core\CSettings.cpp:1976
 msgid "Load"
 msgstr "Вчитај"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1991
+#: ..\Client\core\CSettings.cpp:1988
 msgid "Colors"
 msgstr "Бои"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1992
+#: ..\Client\core\CSettings.cpp:1989
 msgid "Layout"
 msgstr "Распоред"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1993
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2239
+#: ..\Client\core\CSettings.cpp:1990 ..\Client\core\CSettings.cpp:2236
 msgid "Options"
 msgstr "Опции"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1999
+#: ..\Client\core\CSettings.cpp:1996
 msgid "Chat Background"
 msgstr "Позадина на чатот"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1999
+#: ..\Client\core\CSettings.cpp:1996
 msgid "Chat Text"
 msgstr "Чат текст"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1999
+#: ..\Client\core\CSettings.cpp:1996
 msgid "Input Background"
 msgstr "Внесување на позадина"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:1999
+#: ..\Client\core\CSettings.cpp:1996
 msgid "Input Text"
 msgstr "Влезен Текст "
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2022
+#: ..\Client\core\CSettings.cpp:2019
 msgid "Lines:"
 msgstr "Линии: "
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2022
+#: ..\Client\core\CSettings.cpp:2019
 msgid "Scale:"
 msgstr "Скала:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2022
+#: ..\Client\core\CSettings.cpp:2019
 msgid "Width:"
 msgstr "Ширина:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2025
+#: ..\Client\core\CSettings.cpp:2022
 msgid "Size"
 msgstr "Големина"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2074
+#: ..\Client\core\CSettings.cpp:2071
 msgid "after"
 msgstr "после"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2074
+#: ..\Client\core\CSettings.cpp:2071
 msgid "for"
 msgstr "за"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2074
+#: ..\Client\core\CSettings.cpp:2071
 msgid "sec"
 msgstr "секунда"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2077
+#: ..\Client\core\CSettings.cpp:2074
 msgid "Fading"
 msgstr "Избледнување"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2083
+#: ..\Client\core\CSettings.cpp:2080
 msgid "Fade out old lines"
 msgstr "Да исчезнат старите линии"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2123
+#: ..\Client\core\CSettings.cpp:2120
 msgid "Horizontal:"
 msgstr "Хоризонтално:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2123
+#: ..\Client\core\CSettings.cpp:2120
 msgid "Vertical:"
 msgstr "Вертикално:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2123
+#: ..\Client\core\CSettings.cpp:2120
 msgid "Text-Align:"
 msgstr "Текст-Порамнување:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2123
+#: ..\Client\core\CSettings.cpp:2120
 msgid "X-Offset:"
 msgstr "X-офсет:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2124
+#: ..\Client\core\CSettings.cpp:2121
 msgid "Y-Offset:"
 msgstr "Y-офсет:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2130
+#: ..\Client\core\CSettings.cpp:2127
 msgid "Position"
 msgstr "Позиција"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2145
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2159
+#: ..\Client\core\CSettings.cpp:2142 ..\Client\core\CSettings.cpp:2156
 msgid "Center"
 msgstr "Центар"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2158
+#: ..\Client\core\CSettings.cpp:2155
 msgid "Top"
 msgstr "Врв"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2160
+#: ..\Client\core\CSettings.cpp:2157
 msgid "Bottom"
 msgstr "Дно"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2208
+#: ..\Client\core\CSettings.cpp:2205
 msgid "Font"
 msgstr "Фонт"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2245
+#: ..\Client\core\CSettings.cpp:2242
 msgid "Hide background when not typing"
 msgstr "Сокриј во позадина кога не пишуваш"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2250
+#: ..\Client\core\CSettings.cpp:2247
 msgid "Nickname completion using the \"Tab\" key"
 msgstr "Завршување на името притиснувајќи го копчето \"Tab\""
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2255
+#: ..\Client\core\CSettings.cpp:2252
 msgid "Allow server to flash the window"
 msgstr "Дозволи серверот да го осветли прозорот"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2260
+#: ..\Client\core\CSettings.cpp:2257
 msgid "Allow tray balloon notifications"
 msgstr "Дозволи нотификации во вид на балон"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2265
+#: ..\Client\core\CSettings.cpp:2262
 msgid "Chat text black/white outline"
 msgstr "Чат текст црно/бел надворешен"
 
@@ -1544,65 +1439,63 @@ msgstr "Чат текст црно/бел надворешен"
 #. Create a messagebox to notify the user
 #. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
 #. pItemBind->GetText ().c_str () );
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2513
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2520
+#: ..\Client\core\CSettings.cpp:2510 ..\Client\core\CSettings.cpp:2517
 msgid "Press a key to bind, or escape to clear"
 msgstr "Притиснете на копче за да сврзете, или ескејп за да излезете"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2514
+#: ..\Client\core\CSettings.cpp:2511
 msgid "Binding a primary key"
 msgstr "Сврзување на основен клуч"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2521
+#: ..\Client\core\CSettings.cpp:2518
 msgid "Binding a secondary key"
 msgstr "Сврзување на секундарен клуч"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2595
+#: ..\Client\core\CSettings.cpp:2592
 msgid "GTA GAME CONTROLS"
 msgstr "GTA ИГРАЧКИ КОНТРОЛИ"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2597
+#: ..\Client\core\CSettings.cpp:2594
 msgid "MULTIPLAYER CONTROLS"
 msgstr "МУЛТИПЛЕЕР КОНТРОЛИ"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:2826
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4427
+#: ..\Client\core\CSettings.cpp:2823 ..\Client\core\CSettings.cpp:4424
 msgid "Your nickname contains invalid characters!"
 msgstr "Вашето име содржи забранети знаци!"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3566
+#: ..\Client\core\CSettings.cpp:3563
 msgid "Red:"
 msgstr "Црвена:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3566
+#: ..\Client\core\CSettings.cpp:3563
 msgid "Green:"
 msgstr "Зелена:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3566
+#: ..\Client\core\CSettings.cpp:3563
 msgid "Blue:"
 msgstr "Плава:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3566
+#: ..\Client\core\CSettings.cpp:3563
 msgid "Transparency:"
 msgstr "Транспарентност:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3569
+#: ..\Client\core\CSettings.cpp:3566
 msgid "Color"
 msgstr "Боја"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3646
+#: ..\Client\core\CSettings.cpp:3643
 msgid "Preview"
 msgstr "Преглед"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3954
+#: ..\Client\core\CSettings.cpp:3951
 msgid "Please disconnect before changing language"
 msgstr "Ве молиме дисконектирајте се пред да го смените јазикот"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:3982
+#: ..\Client\core\CSettings.cpp:3979
 msgid "Please disconnect before changing skin"
 msgstr "Ве молиме дисконектирајте се пред да го смените скинот"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4268
+#: ..\Client\core\CSettings.cpp:4265
 msgid ""
 "Volmetric shadows can cause some systems to slow down.\n"
 "\n"
@@ -1612,11 +1505,11 @@ msgstr ""
 "\n"
 "Дали сте сигурни дека сакате да ги вклучите?"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4272
+#: ..\Client\core\CSettings.cpp:4269
 msgid "PERFORMANCE WARNING"
 msgstr "ПРЕДУПРЕДУВАЊЕ ЗА ПЕРФОМАНСА"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4292
+#: ..\Client\core\CSettings.cpp:4289
 msgid ""
 "Screen upload is required by some servers for anti-cheat purposes.\n"
 "\n"
@@ -1626,11 +1519,11 @@ msgstr ""
 "\n"
 "(Чат прозорчето и GUI е исклучено од аплоадирањето)\n"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4294
+#: ..\Client\core\CSettings.cpp:4291
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "Информации за аплоадирањето на слика"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4315
+#: ..\Client\core\CSettings.cpp:4312
 msgid ""
 "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n"
@@ -1646,16 +1539,15 @@ msgstr ""
 "\n"
 "Дали сте сигурни дека сакате да ги употребите?"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4321
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2078
+#: ..\Client\core\CSettings.cpp:4318 ..\Client\core\CVersionUpdater.cpp:2079
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "МОДИФИЦИРАНИ GTA:SA ФАЈЛОВИ"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4445
+#: ..\Client\core\CSettings.cpp:4442
 msgid "Please enter a nickname"
 msgstr "Ве молиме внесете име"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4446
+#: ..\Client\core\CSettings.cpp:4443
 msgid ""
 "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
@@ -1663,86 +1555,85 @@ msgstr ""
 "Ве молиме внесете име што ќе биде употребувано во играта.~ ~\n"
 "Ова ќе виде вашето име кога ќе се конектирате и играте на серверот"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4464
+#: ..\Client\core\CSettings.cpp:4461
 msgid "Very experimental feature."
 msgstr "Експериментална функција"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4466
+#: ..\Client\core\CSettings.cpp:4463
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr "Престанување на СЈ варијации (Употребува 65MB повеќе RAM)"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4468
+#: ..\Client\core\CSettings.cpp:4465
 msgid "Older routers may require a slower scan speed."
 msgstr "Постарите рутери може да бараат поспора брзина на скенерот."
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4470
+#: ..\Client\core\CSettings.cpp:4467
 msgid "Switch on to use only one connection when downloading."
 msgstr "Додека симнувате притиснете на \"On\" за да користите една конекција."
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4472
+#: ..\Client\core\CSettings.cpp:4469
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr ""
 "Тагирајте мрежни пакети за ISPs да може да го препознае MTA сообраќајот."
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4474
+#: ..\Client\core\CSettings.cpp:4471
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr "Круг на дното од екранот"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4476
+#: ..\Client\core\CSettings.cpp:4473
 msgid "Select default always. (This setting is not saved)"
 msgstr "Селектирајте секогаш стандарно. (Оваа опција не е зачувана)"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4478
+#: ..\Client\core\CSettings.cpp:4475
 msgid "Maximum is usually best"
 msgstr "Максимум е обично најдобро"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4480
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4482
+#: ..\Client\core\CSettings.cpp:4477 ..\Client\core\CSettings.cpp:4479
 msgid "Auto updater:"
 msgstr "Автоматско надоградување:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4480
+#: ..\Client\core\CSettings.cpp:4477
 msgid "Select default unless you like filling out bug reports."
 msgstr "Селектирај стандарно доколку не сакаш да добиваш багови."
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4482
+#: ..\Client\core\CSettings.cpp:4479
 msgid "Select default to automatically install important updates."
 msgstr ""
 "Селектирајте стандарно за автоматски да се инсталираат важни ажурирања."
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4484
+#: ..\Client\core\CSettings.cpp:4481
 msgid "16-bit color:"
 msgstr "16-битна боја: "
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4484
+#: ..\Client\core\CSettings.cpp:4481
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr ""
 "Овозможете 16 битна боја на модот - Рестартирање на MTA е задолжително"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4486
+#: ..\Client\core\CSettings.cpp:4483
 msgid "Mouse fix:"
 msgstr "Поправка на маус:"
 
-#: E:\Documents\mtasa-blue\Client\core\CSettings.cpp:4486
+#: ..\Client\core\CSettings.cpp:4483
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Поправка на движењето на маусот - Можно е рестартирање на копмјутерот"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:623
+#: ..\Client\core\CVersionUpdater.cpp:624
 msgid "Busy"
 msgstr "Зафатен"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:623
+#: ..\Client\core\CVersionUpdater.cpp:624
 msgid "Can't check for updates right now"
 msgstr "Не е возможно да се прегледат ажурирањата во моментот"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1564
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1584
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1602
+#: ..\Client\core\CVersionUpdater.cpp:1565
+#: ..\Client\core\CVersionUpdater.cpp:1585
+#: ..\Client\core\CVersionUpdater.cpp:1603
 #, c-format, c-format
 msgid "MTA:SA %s required"
 msgstr "MTA:SA %s е потребна"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1565
+#: ..\Client\core\CVersionUpdater.cpp:1566
 #, c-format, c-format
 msgid ""
 "An updated version of MTA:SA %s is required to join the selected server.\n"
@@ -1753,12 +1644,12 @@ msgstr ""
 "\n"
 "Дали сакате да ја симнете и инсталирате MTA:SA %s?"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1585
+#: ..\Client\core\CVersionUpdater.cpp:1586
 #, c-format, c-format
 msgid "Do you want to launch MTA:SA %s and connect to this server ?"
 msgstr "Дали сакате да ја започнете MTA:SA %s и конектирате на овој сервер ?"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1603
+#: ..\Client\core\CVersionUpdater.cpp:1604
 msgid ""
 "It is not possible to connect at this time.\n"
 "\n"
@@ -1768,41 +1659,41 @@ msgstr ""
 "\n"
 "Ве молиме пробајте подоцна."
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1785
+#: ..\Client\core\CVersionUpdater.cpp:1786
 msgid "Connecting"
 msgstr "Се конектира"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1786
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1802
+#: ..\Client\core\CVersionUpdater.cpp:1787
+#: ..\Client\core\CVersionUpdater.cpp:1803
 msgid "Please wait..."
 msgstr "Ве молиме почекајте..."
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1801
+#: ..\Client\core\CVersionUpdater.cpp:1802
 msgid "CHECKING"
 msgstr "Се проверува"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1818
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1911
+#: ..\Client\core\CVersionUpdater.cpp:1819
+#: ..\Client\core\CVersionUpdater.cpp:1912
 msgid "UPDATE CHECK"
 msgstr "Ажурирањето се проверува"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1819
+#: ..\Client\core\CVersionUpdater.cpp:1820
 msgid "No update needed"
 msgstr "Не се потребни ажурирања"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1836
+#: ..\Client\core\CVersionUpdater.cpp:1837
 msgid "DOWNLOADING"
 msgstr "СИМНУВАЊЕ"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1837
+#: ..\Client\core\CVersionUpdater.cpp:1838
 msgid "waiting..."
 msgstr "почекајте..."
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1853
+#: ..\Client\core\CVersionUpdater.cpp:1854
 msgid "MANDATORY UPDATE"
 msgstr "ЗАДОЛЖИТЕЛНА НАДГРАДБА"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1854
+#: ..\Client\core\CVersionUpdater.cpp:1855
 msgid ""
 "To join this server, you must update MTA.\n"
 "\n"
@@ -1812,11 +1703,11 @@ msgstr ""
 "\n"
 "~ Сакате ли да ја ажурирате сега?"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1872
+#: ..\Client\core\CVersionUpdater.cpp:1873
 msgid "OPTIONAL UPDATE"
 msgstr "ОПТИОНАЛНО АЖУРИРАЊЕ"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1873
+#: ..\Client\core\CVersionUpdater.cpp:1874
 msgid ""
 "Server says an update is recommended, but not essential.\n"
 "\n"
@@ -1826,7 +1717,7 @@ msgstr ""
 "\n"
 "~ Дали сакате да надградите сега ?"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1912
+#: ..\Client\core\CVersionUpdater.cpp:1913
 msgid ""
 "Update not currently avalable.\n"
 "\n"
@@ -1836,52 +1727,52 @@ msgstr ""
 "\n"
 "Ве молиме посетете ја www.mtasa.com"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1933
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2115
+#: ..\Client\core\CVersionUpdater.cpp:1934
+#: ..\Client\core\CVersionUpdater.cpp:2116
 msgid "ERROR SAVING"
 msgstr "Грешка Зачувување"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1934
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2116
+#: ..\Client\core\CVersionUpdater.cpp:1935
+#: ..\Client\core\CVersionUpdater.cpp:2117
 msgid "Unable to create the file."
 msgstr "Фајлот не беше во можност да се креира."
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1942
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1951
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2124
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2133
+#: ..\Client\core\CVersionUpdater.cpp:1943
+#: ..\Client\core\CVersionUpdater.cpp:1952
+#: ..\Client\core\CVersionUpdater.cpp:2125
+#: ..\Client\core\CVersionUpdater.cpp:2134
 msgid "ERROR DOWNLOADING"
 msgstr "Грешка Симнување"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1943
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2125
+#: ..\Client\core\CVersionUpdater.cpp:1944
+#: ..\Client\core\CVersionUpdater.cpp:2126
 msgid "The downloaded file appears to be incorrect."
 msgstr "Симнатиот фајл изгледа е неточен."
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1952
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2134
+#: ..\Client\core\CVersionUpdater.cpp:1953
+#: ..\Client\core\CVersionUpdater.cpp:2135
 msgid "For some reason."
 msgstr "Поради некои причини."
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1963
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2147
+#: ..\Client\core\CVersionUpdater.cpp:1964
+#: ..\Client\core\CVersionUpdater.cpp:2148
 msgid "DOWNLOAD COMPLETE"
 msgstr "Симнувањето е Успешно"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:1987
+#: ..\Client\core\CVersionUpdater.cpp:1988
 msgid " - Unknown problem in _DialogUpdateResult"
 msgstr "~ - Непознат проблем во _DialogUpdateResult"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2085
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2095
+#: ..\Client\core\CVersionUpdater.cpp:2086
+#: ..\Client\core\CVersionUpdater.cpp:2096
 msgid "Ok"
 msgstr "Ok"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2093
+#: ..\Client\core\CVersionUpdater.cpp:2094
 msgid "ERROR"
 msgstr "ГРЕШКА"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2094
+#: ..\Client\core\CVersionUpdater.cpp:2095
 msgid ""
 "Some MTA:SA data files are missing.\n"
 "\n"
@@ -1891,12 +1782,12 @@ msgstr ""
 "Некои MTA:SA дата фајлови недостасуваат.\n"
 "/n/nВе молиме ре-инсталирајте ја MTA:SA"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2721
+#: ..\Client\core\CVersionUpdater.cpp:2722
 #, c-format, c-format
 msgid "%3d %% completed"
 msgstr "%3d %% комплетирарно"
 
-#: E:\Documents\mtasa-blue\Client\core\CVersionUpdater.cpp:2723
+#: ..\Client\core\CVersionUpdater.cpp:2724
 #, c-format, c-format
 msgid ""
 "\n"
@@ -1907,16 +1798,16 @@ msgstr ""
 "\n"
 "Се чека одговор ~ ~ - ~ ~ %-3d"
 
-#: E:\Documents\mtasa-blue\Client\core\DXHook\CDirect3DEvents9.cpp:230
+#: ..\Client\core\DXHook\CDirect3DEvents9.cpp:230
 #, c-format, c-format
 msgid "Screenshot got %d bytes, but expected %d"
 msgstr "Сликата има %d бајти, но очекувано е %d"
 
-#: E:\Documents\mtasa-blue\Client\core\DXHook\CDirect3DEvents9.cpp:236
+#: ..\Client\core\DXHook\CDirect3DEvents9.cpp:236
 msgid "Screenshot failed"
 msgstr "Сликата се изгуби"
 
-#: E:\Documents\mtasa-blue\Client\core\DXHook\CDirect3DHook9.cpp:125
+#: ..\Client\core\DXHook\CDirect3DHook9.cpp:125
 msgid ""
 "Could not initialize Direct3D9.\n"
 "\n"
@@ -1929,29 +1820,29 @@ msgstr ""
 "најновиот сервисен пакет на Windows е инсталиран правилно."
 
 #. Create the window
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:85
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:85
 msgid "SERVER BROWSER"
 msgstr "ПРЕБАРУВАЧ НА СЕРВЕРОТ"
 
 #. Create the tabs
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:133
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:90
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:133
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:90
 msgid "Internet"
 msgstr "Интернет"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:134
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:134
 msgid "Local"
 msgstr "Локал"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:135
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:135
 msgid "Favourites"
 msgstr "Омилени"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:136
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:136
 msgid "Recent"
 msgstr "Неодамна"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:191
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:191
 msgid ""
 "FOR QUICK CONNECT:\n"
 "\n"
@@ -1963,324 +1854,322 @@ msgstr ""
 "Пишете ја адресата и портата во празното место за адреса.\n"
 "Или селектирајте сервер од листата на неодмна посетени сервери и притиснете 'Kонектирај'"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:203
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:203
 msgid "HELP"
 msgstr "ПОМОШ"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:212
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:294
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:212
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:294
 msgid "Refresh"
 msgstr "Освежи"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:212
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:295
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:212
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:295
 msgid "Add Favorite"
 msgstr "Додај во Омилени"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:212
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:296
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:344
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:404
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:212
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:296
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:344
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:404
 msgid "Connect"
 msgstr "Конектирај"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:212
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:297
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:212
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:297
 msgid "Server information"
 msgstr "Информации за Серверот"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:213
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:298
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:213
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:298
 msgid "Search servers"
 msgstr "Пребарување на сервери"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:213
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:299
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:213
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:299
 msgid "Search players"
 msgstr "Пребарај играчи"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:213
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:300
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:213
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:300
 msgid "Start search"
 msgstr "Почни со пребарување"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:341
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1658
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:341
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1658
 msgid "Search players..."
 msgstr "Пребарување на играчи..."
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:342
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:454
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1656
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:342
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:454
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1656
 msgid "Search servers..."
 msgstr "Пребарување на сервери..."
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:485
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:485
 msgid "Name"
 msgstr "Име"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:486
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:486
 msgid "Players"
 msgstr "Играчи"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:487
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:487
 msgid "Ping"
 msgstr "Пинг"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:488
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:488
 msgid "Gamemode"
 msgstr "Мод на Игра"
 
 #. Player List Columns
 #. Column for player names
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:510
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:138
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:510
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:138
 msgid "Player list"
 msgstr "Листа на Играчи"
 
 #. Include label
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:518
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:518
 msgid "Include:"
 msgstr "Вклучи:"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:524
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:524
 msgid "Empty"
 msgstr "Празно"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:530
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:530
 msgid "Full"
 msgstr "Полн"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:536
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:536
 msgid "Locked"
 msgstr "Заклучен"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:548
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:548
 msgid "Offline"
 msgstr "Офлајн"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:561
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:561
 msgid "Other Versions"
 msgstr "Други Верзии"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:582
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:582
 msgid "Back"
 msgstr "Назад"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:588
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:35
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:588
+#: ..\Client\loader\Dialogs.cpp:35
 msgid "Help"
 msgstr "Помош"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:771
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:771
 msgid "Loading..."
 msgstr "Се вчитува..."
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1214
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:2145
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1214
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:2145
 msgid "  ..loading.."
 msgstr "~ ~ ..се вчитува..."
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1244
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1372
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1244
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1372
 msgid "No address specified!"
 msgstr "Ниедна адреса не беше спицифицирана!"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1257
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1257
 msgid "Unknown protocol"
 msgstr "Непознат протокол"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1257
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1257
 msgid "Please use the mtasa:// protocol!"
 msgstr "Ве молиме употребете го mtasa:// протоколот!"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1346
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:319
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:584
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:591
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:1243
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1346
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:319
+#: ..\Client\loader\MainFunctions.cpp:584
+#: ..\Client\loader\MainFunctions.cpp:591
+#: ..\Client\loader\MainFunctions.cpp:1243
 msgid "Information"
 msgstr "Информации"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerBrowser.cpp:1346
+#: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1346
 msgid "You have to select a server to connect to."
 msgstr "Вие мора да селектирате сервер за да се конектирате на него."
 
 #. Create queue window
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:32
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:302
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:32
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:302
 msgid "SERVER IS FULL"
 msgstr "СЕРВЕРОТ Е ПОЛН"
 
 #. Determine our label draw position for L10n
 #. Start position
 #. Server Name
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:44
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:53
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:44
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:53
 msgid "Name:"
 msgstr "Име: "
 
 #. Server IP
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:44
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:64
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:44
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:64
 msgid "Server Address:"
 msgstr "Адреса на Серверот:"
 
 #. Gamemode
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:44
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:75
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:44
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:75
 msgid "Gamemode:"
 msgstr "Мод на играта: "
 
 #. Map
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:44
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:86
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:44
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:86
 msgid "Map:"
 msgstr "Мапа:"
 
 #. Players
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:45
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:97
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:45
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:97
 msgid "Players:"
 msgstr "Играчи:"
 
 #. Passworded
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:45
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:108
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:45
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:108
 msgid "Passworded:"
 msgstr "Заштитено со пасворд:"
 
 #. Latency
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:45
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:119
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:45
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:119
 msgid "Latency:"
 msgstr "Пинг:"
 
 #. Close button
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:144
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:144
 msgid "Close"
 msgstr "Затвори"
 
 #. Join Game button
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:152
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:152
 msgid "Join Game"
 msgstr "Приклучете се на играта"
 
 #. Please enter password label
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:166
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:166
 msgid "Please enter the password to the server:"
 msgstr "Ве молиме внесете го пасвордот на серверот:"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:177
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:177
 msgid "Join the server as soon as a player slot is available."
 msgstr "Приклучете се на серверот кога слободен слот ќе биде достапен."
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:310
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:310
 msgid "PLEASE ENTER SERVER PASSWORD"
 msgstr "ВЕ МОЛИМЕ ВНЕСЕТЕ ГО ПАСВОРДОТ НА СЕРВЕРОТ"
 
 #. The server has timed out
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:402
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:402
 msgid "Timed Out"
 msgstr "Времето ви Истече"
 
 #. Set every GUI elements text to blank
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerInfo.cpp:431
+#: ..\Client\core\ServerBrowser\CServerInfo.cpp:431
 msgid "Querying..."
 msgstr "Се бара..."
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:25
+#: ..\Client\core\ServerBrowser\CServerList.cpp:25
 msgid "Idle"
 msgstr "Неактивен"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:152
+#: ..\Client\core\ServerBrowser\CServerList.cpp:152
 msgid "player"
 msgid_plural "players"
 msgstr[0] "играч"
 msgstr[1] "играчи"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:153
+#: ..\Client\core\ServerBrowser\CServerList.cpp:153
 msgid "on"
 msgstr "на"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:156
+#: ..\Client\core\ServerBrowser\CServerList.cpp:156
 msgid "server"
 msgid_plural "servers"
 msgstr[0] "сервер"
 msgstr[1] "сервери"
 
 #. We are polling for the master server list (first pass)
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:240
+#: ..\Client\core\ServerBrowser\CServerList.cpp:240
 #, c-format, c-format
 msgid "Requesting master server list (%lu ms elapsed)"
 msgstr "Се бара мастер листа (%lu ms изминал)"
 
 #. Abort
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:256
+#: ..\Client\core\ServerBrowser\CServerList.cpp:256
 msgid "Master server list could not be parsed."
 msgstr "Главниот лист на сервер неможе да биде разложен."
 
 #. Abort
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:266
+#: ..\Client\core\ServerBrowser\CServerList.cpp:266
 msgid "Master server list could not be retrieved."
 msgstr "Главната листа на сервери неможе се да биде извадена."
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:276
+#: ..\Client\core\ServerBrowser\CServerList.cpp:276
 msgid "(Backup server list)"
 msgstr "(Резерва листа на сервери)"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:328
+#: ..\Client\core\ServerBrowser\CServerList.cpp:328
 msgid "Cannot bind LAN-broadcast socket"
 msgstr "Не може се да се сврзе LAN приклучокот"
 
-#: E:\Documents\mtasa-blue\Client\core\ServerBrowser\CServerList.cpp:347
+#: ..\Client\core\ServerBrowser\CServerList.cpp:347
 msgid "Attempting to discover LAN servers"
 msgstr "Се обидува да истражи LAN сервери."
 
-#: E:\Documents\mtasa-blue\Client\game_sa\CSettingsSA.cpp:723
+#: ..\Client\game_sa\CSettingsSA.cpp:723
 msgid "Can't find valid screen resolution."
 msgstr "Не можам да најдам валидна резолуција за екранот>"
 
 #. Confirm that res should be used
-#: E:\Documents\mtasa-blue\Client\game_sa\CSettingsSA.cpp:799
+#: ..\Client\game_sa\CSettingsSA.cpp:799
 msgid "Are you sure you want to use this screen resolution?"
 msgstr ""
 "Дали сте сигурни дека сакате да ја употребувате оваа резолуција на екранот?"
 
-#: E:\Documents\mtasa-blue\Client\game_sa\CSettingsSA.cpp:801
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:94
+#: ..\Client\game_sa\CSettingsSA.cpp:801 ..\Client\loader\Dialogs.cpp:94
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
-#: E:\Documents\mtasa-blue\Client\loader\CExePatchedStatus.cpp:153
+#: ..\Client\loader\CExePatchedStatus.cpp:153
 msgid "Update Aero setting"
 msgstr "Ажурирање на Аеро опции"
 
-#: E:\Documents\mtasa-blue\Client\loader\CExePatchedStatus.cpp:155
+#: ..\Client\loader\CExePatchedStatus.cpp:155
 msgid "Update Large Memory setting"
 msgstr "Ажурирај опции за големи меморија"
 
-#: E:\Documents\mtasa-blue\Client\loader\CExePatchedStatus.cpp:157
+#: ..\Client\loader\CExePatchedStatus.cpp:157
 msgid "Update DEP setting"
 msgstr "Ажурирање на DEP опции"
 
-#: E:\Documents\mtasa-blue\Client\loader\CExePatchedStatus.cpp:159
+#: ..\Client\loader\CExePatchedStatus.cpp:159
 msgid "Update graphics driver compliance"
 msgstr "Ажурирање на графички драјвер"
 
-#: E:\Documents\mtasa-blue\Client\loader\CExePatchedStatus.cpp:161
-#: E:\Documents\mtasa-blue\Client\loader\CExePatchedStatus.cpp:163
+#: ..\Client\loader\CExePatchedStatus.cpp:161
+#: ..\Client\loader\CExePatchedStatus.cpp:163
 msgid "Fix file issues"
 msgstr "Поправка на проблем во фајлот"
 
-#: E:\Documents\mtasa-blue\Client\loader\CExePatchedStatus.cpp:164
+#: ..\Client\loader\CExePatchedStatus.cpp:164
 msgid "Copy main executable to avoid graphic driver issues"
 msgstr ""
 "Копирање на главниот извршен за да се избегнат проблеми со графичките "
 "драјвери"
 
-#: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:269
-#: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1207
+#: ..\Client\loader\CInstallManager.cpp:315 ..\Client\loader\Utils.cpp:1207
 #, c-format, c-format
 msgid ""
 "MTA:SA needs Administrator access for the following task:\n"
@@ -2295,7 +2184,7 @@ msgstr ""
 "\n"
 "Ве молиме потврдете во следниов прозор."
 
-#: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:284
+#: ..\Client\loader\CInstallManager.cpp:330
 #, c-format, c-format
 msgid ""
 "MTA:SA could not complete the following task:\n"
@@ -2306,7 +2195,7 @@ msgstr ""
 "\n"
 "~ ~ '%s'\n"
 
-#: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:334
+#: ..\Client\loader\CInstallManager.cpp:380
 msgid ""
 "** The crash was caused by a graphics driver error **\n"
 "\n"
@@ -2316,11 +2205,11 @@ msgstr ""
 "\n"
 "** Ве молиме апдејтирајте ги графичките драјвери **"
 
-#: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:440
+#: ..\Client\loader\CInstallManager.cpp:486
 msgid "Install updated MTA:SA files"
 msgstr "Инсталирај ажурирани MTA:SA фајлови"
 
-#: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:460
+#: ..\Client\loader\CInstallManager.cpp:506
 msgid ""
 "Could not update due to file conflicts. Please close other applications and "
 "retry"
@@ -2328,59 +2217,59 @@ msgstr ""
 "Не може се да се ажурира поради конфликт со фајловите. Ве молиме затворете "
 "ги другите апликации и пробајте одново"
 
-#: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:469
+#: ..\Client\loader\CInstallManager.cpp:515
 #, c-format, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr ""
 "Multi Theft Auto не е инсталирана правилно, ве молиме ре-инсталирајте ја. %s"
 
-#: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:668
+#: ..\Client\loader\CInstallManager.cpp:714
 msgid "Missing file:"
 msgstr "Фајл што недостасува:"
 
-#: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:672
+#: ..\Client\loader\CInstallManager.cpp:718
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr "Ако MTA не успее да вчита, ве молиме ре-инсталирајте ја GTA:SA"
 
-#: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:793
+#: ..\Client\loader\CInstallManager.cpp:839
 msgid "Update install settings"
 msgstr "Ажурирање на опции за инсталирање"
 
-#: E:\Documents\mtasa-blue\Client\loader\CInstallManager.cpp:904
+#: ..\Client\loader\CInstallManager.cpp:950
 msgid "Update compatibility settings"
 msgstr "Ажурирање на опции за компатибилност "
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:34
+#: ..\Client\loader\Dialogs.cpp:34
 msgid "Quit"
 msgstr "Исклучи"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:51
+#: ..\Client\loader\Dialogs.cpp:51
 msgid "MTA: San Andreas has encountered a problem"
 msgstr "MTA: San Andreas наиде на проблем"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:52
+#: ..\Client\loader\Dialogs.cpp:52
 msgid "Crash information"
 msgstr "Информации за исклучувањето"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:53
+#: ..\Client\loader\Dialogs.cpp:53
 msgid ""
 "Tick the check box to send this crash info to MTA devs using the 'internet'"
 msgstr ""
 "Штиклирајте за да пратите репорт до MTA девелоперите употребувајќи интернет"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:54
+#: ..\Client\loader\Dialogs.cpp:54
 msgid "Doing so will increase the chance of this crash being fixed."
 msgstr "Правејќи го ова ќе се зголеми шансата од проблемot да биде решен."
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:55
+#: ..\Client\loader\Dialogs.cpp:55
 msgid "Do you want to restart MTA: San Andreas ?"
 msgstr "Дали сакате да ја рестартирате MTA: San Andreas ?"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:62
+#: ..\Client\loader\Dialogs.cpp:62
 msgid "MTA: San Andreas - Warning"
 msgstr "MTA: San Andreas - Предупредување"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:63
+#: ..\Client\loader\Dialogs.cpp:63
 msgid ""
 "Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll "
 "file:"
@@ -2388,7 +2277,7 @@ msgstr ""
 "Вашата Grand Theft Auto: San Andreas инсталира дирекција што содржи d3d9.dll"
 " фајл:"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:65
+#: ..\Client\loader\Dialogs.cpp:65
 msgid ""
 "The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
 "\n"
@@ -2398,75 +2287,75 @@ msgstr ""
 "\n"
 "Препорачливо е да се преименува или избрише d3d9.dll"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:67
+#: ..\Client\loader\Dialogs.cpp:67
 msgid "Do not tell me about this d3d9.dll again"
 msgstr "Не го прикажувајте овој проблем за d3d9.dll повторно"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:68
+#: ..\Client\loader\Dialogs.cpp:68
 msgid "Show me the file"
 msgstr "Покажи го фајлот"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:69
+#: ..\Client\loader\Dialogs.cpp:69
 msgid "Play MTA:SA"
 msgstr "Играј MTA:SA"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:75
+#: ..\Client\loader\Dialogs.cpp:75
 msgid "MTA: San Andreas - Confusing options"
 msgstr "MTA: San Andreas - Збунувачки опции"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:76
+#: ..\Client\loader\Dialogs.cpp:76
 msgid "NVidia Optimus detected!"
 msgstr "NVidia Optimus детектиран!"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:77
+#: ..\Client\loader\Dialogs.cpp:77
 msgid "Try each option and see what works:"
 msgstr "Пробајте ја секоја опција и проверете која работи:"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:78
+#: ..\Client\loader\Dialogs.cpp:78
 msgid "A - Standard NVidia"
 msgstr "A - Стандарна NVidia"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:79
+#: ..\Client\loader\Dialogs.cpp:79
 msgid "B - Alternate NVidia"
 msgstr "B - Алтернативна NVidia"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:80
+#: ..\Client\loader\Dialogs.cpp:80
 msgid "C - Standard NVidia with exe rename"
 msgstr "C- Стандарна NVidia со преименување на exe"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:81
+#: ..\Client\loader\Dialogs.cpp:81
 msgid "D - Alternate NVidia with exe rename"
 msgstr "D - Алтернативна NVidia со преименување на exe"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:82
+#: ..\Client\loader\Dialogs.cpp:82
 msgid "E - Standard Intel"
 msgstr "E - Стандарен Intel"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:83
+#: ..\Client\loader\Dialogs.cpp:83
 msgid "F - Alternate Intel"
 msgstr "F - Алтернативен Intel"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:84
+#: ..\Client\loader\Dialogs.cpp:84
 msgid "G - Standard Intel with exe rename"
 msgstr "G - Стандарен Intel со преименуван еxe"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:85
+#: ..\Client\loader\Dialogs.cpp:85
 msgid "H - Alternate Intel with exe rename"
 msgstr "H - Алтернативен Intel со преименување на exe"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:86
+#: ..\Client\loader\Dialogs.cpp:86
 msgid "If you get desperate, this might help:"
 msgstr "Доколку сте очајни, ова може да ви помогне:"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:87
+#: ..\Client\loader\Dialogs.cpp:87
 msgid "Force windowed mode"
 msgstr "Присилен \"Windowed\" мод"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:95
+#: ..\Client\loader\Dialogs.cpp:95
 msgid "Warning: Could not detect anti-virus product"
 msgstr "Предупредување: Не е во можност да се детектира анти вирус"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:97
+#: ..\Client\loader\Dialogs.cpp:97
 msgid ""
 "MTA could not detect an anti-virus on your PC.\n"
 "\n"
@@ -2480,11 +2369,11 @@ msgstr ""
 "\n"
 "Притиснете на \"Помош\" за повеќе информации."
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:100
+#: ..\Client\loader\Dialogs.cpp:100
 msgid "I have already installed an anti-virus"
 msgstr "Јас веќе имам инсталирано анти вирус"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:102
+#: ..\Client\loader\Dialogs.cpp:102
 msgid ""
 "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
@@ -2492,52 +2381,44 @@ msgstr ""
 "Јас нема да инсталирам анти вирус.\n"
 "Јас сакам мојот РС да лагира и да бидам дел од бот мрежата."
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:691
-#: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:747
+#: ..\Client\loader\Dialogs.cpp:691 ..\Client\loader\Utils.cpp:747
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Пребарување на Grand Theft Auto San Andreas"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:694
-#: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:749
+#: ..\Client\loader\Dialogs.cpp:694 ..\Client\loader\Utils.cpp:749
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Ве молиме стартувајте ја Grand Theft Auto San Andreas"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:702
-#: E:\Documents\mtasa-blue\Client\loader\Install.cpp:187
+#: ..\Client\loader\Dialogs.cpp:702 ..\Client\loader\Install.cpp:187
 msgid "Installing update..."
 msgstr "Инсталирање на ажурирање"
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:710
-#: E:\Documents\mtasa-blue\Client\loader\Install.cpp:287
+#: ..\Client\loader\Dialogs.cpp:710 ..\Client\loader\Install.cpp:288
 msgid "Extracting files..."
 msgstr "Извлекување на фајлови..."
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:715
-#: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1630
+#: ..\Client\loader\Dialogs.cpp:715 ..\Client\loader\Utils.cpp:1630
 msgid "Copying files..."
 msgstr "Копирање на фајлови..."
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:720
-#: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1690
+#: ..\Client\loader\Dialogs.cpp:720 ..\Client\loader\Utils.cpp:1690
 msgid "Copy finished early. Everything OK."
 msgstr "Копирањето заврши порано. Се е во ред."
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:725
-#: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1696
+#: ..\Client\loader\Dialogs.cpp:725 ..\Client\loader\Utils.cpp:1696
 msgid "Finishing..."
 msgstr "Завршува..."
 
-#: E:\Documents\mtasa-blue\Client\loader\Dialogs.cpp:729
-#: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1698
+#: ..\Client\loader\Dialogs.cpp:729 ..\Client\loader\Utils.cpp:1698
 msgid "Done!"
 msgstr "Готово!"
 
-#: E:\Documents\mtasa-blue\Client\loader\Install.cpp:92
+#: ..\Client\loader\Install.cpp:92
 msgid "Do you want to terminate the MTA Server and continue updating?"
 msgstr ""
 "Дали сакате да го прекинете MTA серверот и да продолжите со ажурирање?"
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:235
+#: ..\Client\loader\MainFunctions.cpp:235
 msgid ""
 "Trouble restarting MTA:SA\n"
 "\n"
@@ -2555,7 +2436,7 @@ msgstr ""
 "\n"
 "Пробајте да ја вклучите MTA:SA повторно?"
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:253
+#: ..\Client\loader\MainFunctions.cpp:253
 msgid ""
 "Another instance of MTA is already running.\n"
 "\n"
@@ -2565,7 +2446,7 @@ msgstr ""
 "\n"
 "Доколку проблемот продолжи, рестартирајте го компјутерот"
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:256
+#: ..\Client\loader\MainFunctions.cpp:256
 msgid ""
 "Another instance of MTA is already running.\n"
 "\n"
@@ -2575,7 +2456,7 @@ msgstr ""
 "\n"
 "Дали сакате да ја исклучите?"
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:280
+#: ..\Client\loader\MainFunctions.cpp:280
 msgid ""
 "Are you having problems running MTA:SA?.\n"
 "\n"
@@ -2585,7 +2466,7 @@ msgstr ""
 "\n"
 "Дали сакате да ја вратите во постара верзија?"
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:309
+#: ..\Client\loader\MainFunctions.cpp:309
 msgid ""
 "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n"
@@ -2597,7 +2478,7 @@ msgstr ""
 "\n"
 "Дали сакате да ги рестартирате GTA опциите сега?"
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:320
+#: ..\Client\loader\MainFunctions.cpp:320
 msgid ""
 "GTA settings have been reset.\n"
 "\n"
@@ -2607,13 +2488,13 @@ msgstr ""
 "\n"
 "Притиснете OK за да продолжите."
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:325
+#: ..\Client\loader\MainFunctions.cpp:325
 #, c-format, c-format
 msgid "File could not be deleted: '%s'"
 msgstr "Фајлот не може да се избрише: '%s'"
 
 #. No settings to delete, or can't find them
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:333
+#: ..\Client\loader\MainFunctions.cpp:333
 msgid ""
 "Are you having problems running MTA:SA?.\n"
 "\n"
@@ -2624,7 +2505,7 @@ msgstr ""
 "Дали сакате да побарате помош онлајн?"
 
 #. Inform user
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:369
+#: ..\Client\loader\MainFunctions.cpp:369
 msgid ""
 "Are you having problems running MTA:SA?.\n"
 "\n"
@@ -2634,7 +2515,7 @@ msgstr ""
 "\n"
 "Дали сакате да ги промените следните опции?"
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:412
+#: ..\Client\loader\MainFunctions.cpp:412
 msgid ""
 "Are you having problems running MTA:SA?.\n"
 "\n"
@@ -2644,7 +2525,7 @@ msgstr ""
 "\n"
 "Пробајте со деактивирање на следните продукти за GTA и MTA:"
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:446
+#: ..\Client\loader\MainFunctions.cpp:446
 msgid ""
 "WARNING\n"
 "\n"
@@ -2658,12 +2539,12 @@ msgstr ""
 "Ве молиме направете вирус скенирање за да се осигурате дека вашиот систем е безбеден.\n"
 "\n"
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:449
+#: ..\Client\loader\MainFunctions.cpp:449
 #, c-format, c-format
 msgid "The detected file was:  %s\n"
 msgstr "Детектираниот фајл е: ~ ~%s\n"
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:583
+#: ..\Client\loader\MainFunctions.cpp:583
 msgid ""
 "An instance of GTA: San Andreas is already running. It needs to be "
 "terminated before MTA:SA can be started. Do you want to do that now?"
@@ -2671,7 +2552,7 @@ msgstr ""
 "Уште една копија од GTA: San Andreas е веќе вклучена и треба да се исклучи "
 "пред MTA:SA да биде стартувана.Дали сакате тоа да го направите сега?"
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:590
+#: ..\Client\loader\MainFunctions.cpp:590
 msgid ""
 "Unable to terminate GTA: San Andreas. If the problem persists, please "
 "restart your computer."
@@ -2679,7 +2560,7 @@ msgstr ""
 "Исклучување на GTA: San Andreas беше невозможно.Доколку проблемот продолжи, "
 "рестартирајте го вашиот компјутер."
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:613
+#: ..\Client\loader\MainFunctions.cpp:613
 msgid ""
 "Registry entries are missing. Please reinstall Multi Theft Auto: San "
 "Andreas."
@@ -2687,7 +2568,7 @@ msgstr ""
 "Регистарските влеза недостигаат.Ве молиме реинсталирајте ја Multi Theft "
 "Auto: San Andreas."
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:619
+#: ..\Client\loader\MainFunctions.cpp:619
 msgid ""
 "The path to your installation of GTA: San Andreas contains unsupported "
 "(unicode) characters. Please move your Grand Theft Auto: San Andreas "
@@ -2699,7 +2580,7 @@ msgstr ""
 "преместете ја на компатибилен линк што содржи само стандарни ASCII карактери"
 " и реинсталирајте ја Multi Theft Auto: San Andreas."
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:626
+#: ..\Client\loader\MainFunctions.cpp:626
 msgid ""
 "It appears you have a Steam version of GTA:SA, which is currently "
 "incompatible with MTASA.  You are now being redirected to a page where you "
@@ -2709,7 +2590,7 @@ msgstr ""
 "MTASA. ~ ~ Сега ќе бидете пренасочени до страница каде што може да го решите"
 " овој проблем."
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:641
+#: ..\Client\loader\MainFunctions.cpp:641
 msgid ""
 "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n"
@@ -2723,7 +2604,7 @@ msgstr ""
 "~Доколку имате проблеми со MTA:SA,\n"
 "~преместете ја инсталацијата во друг линк што не содржи точказапирка."
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:781
+#: ..\Client\loader\MainFunctions.cpp:781
 msgid ""
 "Load failed. Please ensure that the latest data files have been installed "
 "correctly."
@@ -2731,18 +2612,18 @@ msgstr ""
 "Вчитувањето е неуспешно. Ве молиме проверете дали најновите фајлови ви се "
 "инсталирани."
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:790
+#: ..\Client\loader\MainFunctions.cpp:790
 #, c-format, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr ""
 "Вчитувањето е неуспешно. Ве молиме проверете дали %s е инсталиран правилно."
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:797
+#: ..\Client\loader\MainFunctions.cpp:797
 #, c-format, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "Вчитувањето е неуспешно. gta_sa.exe во %s не може да се пронајде."
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:807
+#: ..\Client\loader\MainFunctions.cpp:807
 #, c-format, c-format
 msgid ""
 "Load failed. %s exists in the GTA directory. Please delete before "
@@ -2751,12 +2632,12 @@ msgstr ""
 "Вчитувањето е неуспешно. %s постои во GTA дирекцијата. Ве молиме тргнете го "
 "пред да продолжите."
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:816
+#: ..\Client\loader\MainFunctions.cpp:816
 #, c-format, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "Главниот фајл има погрешно име (%s)"
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:827
+#: ..\Client\loader\MainFunctions.cpp:827
 msgid ""
 "Main file is unsigned. Possible virus activity.\n"
 "\n"
@@ -2766,7 +2647,7 @@ msgstr ""
 "\n"
 "Побарајте онлјан помош доколку MTA не работи како што треба."
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:900
+#: ..\Client\loader\MainFunctions.cpp:900
 msgid ""
 "Data files modified. Possible virus activity.\n"
 "\n"
@@ -2776,7 +2657,7 @@ msgstr ""
 "\n"
 "Побарајте онлјан помош доколку MTA не работи како што треба."
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:912
+#: ..\Client\loader\MainFunctions.cpp:912
 msgid ""
 ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
 "\n"
@@ -2786,20 +2667,20 @@ msgstr ""
 "\n"
 "Избришете ги тие фајлови ако имате проблеми со MTA:SA"
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:974
+#: ..\Client\loader\MainFunctions.cpp:974
 msgid ""
 "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr ""
 "Грешка во фајловите на верзијата. Реинсталирајте ја MTA:SA доколку имате "
 "проблеми.\n"
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:983
+#: ..\Client\loader\MainFunctions.cpp:983
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr ""
 "Некои фајлови се недостапни.Преинсталирајте ја MTA:SA доколку имате некој "
 "проблем.\n"
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:995
+#: ..\Client\loader\MainFunctions.cpp:995
 msgid ""
 "MTA:SA is not compatible with Windows 'Safe Mode'.\n"
 "\n"
@@ -2810,16 +2691,16 @@ msgstr ""
 "Ве молиме рестартирајте го компјутерот.\n"
 " "
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:1131
+#: ..\Client\loader\MainFunctions.cpp:1131
 msgid "Fix configuration issue"
 msgstr "Поправете го проблемот со конфигурацијата"
 
 #. Try to relaunch as admin if not done so already
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:1173
+#: ..\Client\loader\MainFunctions.cpp:1173
 msgid "Fix elevation required error"
 msgstr "Поправете ја грешката"
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:1180
+#: ..\Client\loader\MainFunctions.cpp:1180
 #, c-format, c-format
 msgid ""
 "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
@@ -2830,23 +2711,23 @@ msgstr ""
 "\n"
 "[%s]"
 
-#: E:\Documents\mtasa-blue\Client\loader\MainFunctions.cpp:1243
+#: ..\Client\loader\MainFunctions.cpp:1243
 msgid ""
 "GTA: San Andreas may not have launched correctly. Do you want to terminate "
 "it?"
 msgstr "GTA: San Andreas не е вклучена коректно. Дали сакате да ја исклучите?"
 
-#: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:832
+#: ..\Client\loader\Utils.cpp:832
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr ""
 "Селектирајте ја дирекцијата за инсталирање на Grand Theft Auto: San Andreas"
 
-#: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1308
+#: ..\Client\loader\Utils.cpp:1308
 #, c-format, c-format
 msgid "Error loading %s module! (%s)"
 msgstr "Погрешно вчитување %s модел! (%s)"
 
-#: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1738
+#: ..\Client\loader\Utils.cpp:1738
 #, c-format, c-format
 msgid ""
 "New installation of %s detected.\n"
@@ -2857,163 +2738,163 @@ msgstr ""
 "\n"
 "Дали сакате да ги копирате вашите опции од %s ?"
 
-#: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1777
+#: ..\Client\loader\Utils.cpp:1777
 #, c-format, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
 msgstr "GTA:SA имаше проблеми да го отвори овој фајл '%s'"
 
-#: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1799
+#: ..\Client\loader\Utils.cpp:1799
 #, c-format, c-format
 msgid "GTA:SA is missing the file '%s'."
 msgstr "GTA:SA и недостасува фајлот '%s'."
 
-#: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1824
+#: ..\Client\loader\Utils.cpp:1824
 msgid "GTA:SA had trouble loading a model."
 msgstr "GTA:SA имаше проблеми да го вчита овој модел."
 
-#: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1826
+#: ..\Client\loader\Utils.cpp:1826
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr ""
 "Ако неодамна сте го модифицирале gta3.img, тогаш пробајте со ре-инсталирање "
 "на GTA:SA."
 
-#: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1851
+#: ..\Client\loader\Utils.cpp:1851
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
 msgstr "GTA:SA имаше проблем со додавање на надградба на ова возило."
 
-#: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1870
+#: ..\Client\loader\Utils.cpp:1870
 #, c-format, c-format
 msgid "GTA:SA found errors in the file '%s'"
 msgstr "GTA:SA пронајде грешки во фајлот '%s'"
 
-#: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:1943
+#: ..\Client\loader\Utils.cpp:1943
 msgid "Did your computer restart when playing MTA:SA?"
 msgstr "Дали твојот компјутер се рестартил кога MTA:SA билa вклучена?"
 
-#: E:\Documents\mtasa-blue\Client\loader\Utils.cpp:2008
+#: ..\Client\loader\Utils.cpp:2008
 msgid "Please terminate the following programs before continuing:"
 msgstr "Ве молиме следниве програми исклучете ги пред да продолжите:"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:35
+#: ..\Client\mods\deathmatch\CClient.cpp:35
 msgid "This version has expired."
 msgstr "Оваа верзија е остарена."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:55
+#: ..\Client\mods\deathmatch\CClient.cpp:55
 msgid "disconnect from the game"
 msgstr "дисконекција од играта"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:56
+#: ..\Client\mods\deathmatch\CClient.cpp:56
 msgid "shows the nametags"
 msgstr "прикажување на таговите на имињата"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:57
+#: ..\Client\mods\deathmatch\CClient.cpp:57
 msgid "shows the chatbox"
 msgstr "покажува чатбокс"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:58
+#: ..\Client\mods\deathmatch\CClient.cpp:58
 msgid "shows the network statistics"
 msgstr "прикажување на мемориската статистика"
 
 #. Key commands (registered as 'mod commands', can be disabled)
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:62
+#: ..\Client\mods\deathmatch\CClient.cpp:62
 msgid "open the chat input"
 msgstr "отвори го внатрешниот чат"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:63
+#: ..\Client\mods\deathmatch\CClient.cpp:63
 msgid "transmits voice to other players"
 msgstr "пренеси глас до друг играч"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:64
+#: ..\Client\mods\deathmatch\CClient.cpp:64
 msgid "enters a car as passenger"
 msgstr "влези во колата како совозач"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:65
+#: ..\Client\mods\deathmatch\CClient.cpp:65
 msgid "next radio channel"
 msgstr "следниот радио канал"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:66
+#: ..\Client\mods\deathmatch\CClient.cpp:66
 msgid "previous radio channel"
 msgstr "минатиот радио канал"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:67
+#: ..\Client\mods\deathmatch\CClient.cpp:67
 msgid "enables the radar view"
 msgstr "вклучување на поглед на радар"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:68
+#: ..\Client\mods\deathmatch\CClient.cpp:68
 msgid "zooms the radar in"
 msgstr "зумирајте го радарот"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:69
+#: ..\Client\mods\deathmatch\CClient.cpp:69
 msgid "zooms the radar out"
 msgstr "одзумирајте го радарот"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:70
+#: ..\Client\mods\deathmatch\CClient.cpp:70
 msgid "moves the radar north"
 msgstr "преместете го радарот на север"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:71
+#: ..\Client\mods\deathmatch\CClient.cpp:71
 msgid "moves the radar south"
 msgstr "преместете го радарот на југ"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:72
+#: ..\Client\mods\deathmatch\CClient.cpp:72
 msgid "moves the radar east"
 msgstr "преместете го радарот на исток"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:73
+#: ..\Client\mods\deathmatch\CClient.cpp:73
 msgid "moves the radar west"
 msgstr "преместете го радарот на запад"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:74
+#: ..\Client\mods\deathmatch\CClient.cpp:74
 msgid "attaches the radar"
 msgstr "поставување на радар"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:75
+#: ..\Client\mods\deathmatch\CClient.cpp:75
 msgid "reduces radar opacity"
 msgstr "намалување на прозирноста на радарот"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:76
+#: ..\Client\mods\deathmatch\CClient.cpp:76
 msgid "increases radar opacity"
 msgstr "зголемување на прозирноста на радарот"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:77
+#: ..\Client\mods\deathmatch\CClient.cpp:77
 msgid "toggles radar help text"
 msgstr "менување на помошниот текст на радарот"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:78
+#: ..\Client\mods\deathmatch\CClient.cpp:78
 msgid "sends a message to the targetted player"
 msgstr "праќање на порака до насочениот играч"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:79
+#: ..\Client\mods\deathmatch\CClient.cpp:79
 msgid "changes to the next weapon whilst in a vehicle"
 msgstr "промена на следното оружје додека сте во возило"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:80
+#: ..\Client\mods\deathmatch\CClient.cpp:80
 msgid "changes to the previous weapon whilst in a vehicle"
 msgstr "промена на минатото оружје додека сте во возило"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:81
+#: ..\Client\mods\deathmatch\CClient.cpp:81
 msgid "outputs info about the current server"
 msgstr "надворешна информација за моменталниот сервер"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:84
+#: ..\Client\mods\deathmatch\CClient.cpp:84
 msgid "defines the scale multiplier of all text-displays"
 msgstr "дефинициски мултипликатор на скала на сите текстуални прилози"
 
 #. Development mode
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:91
+#: ..\Client\mods\deathmatch\CClient.cpp:91
 msgid "(Development mode) shows the colshapes"
 msgstr "(Девелоперски мод) прикажување на фигури"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\CClient.cpp:92
+#: ..\Client\mods\deathmatch\CClient.cpp:92
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(Девелоперски мод) светски отпечатоци за музика во дебугиран прозорец"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:579
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:579
 msgid "Entering the game ..."
 msgstr "Влегување во игра ..."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:631
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:631
 msgid ""
 "Not connected; please use Quick Connect or the 'connect' command to connect "
 "to a server."
@@ -3021,107 +2902,107 @@ msgstr ""
 "Не сте конектирани; ве молиме употребете ја Брзо Вклучување или 'вклучување'"
 " командата за да се вклучите во серверот."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:677
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:677
 msgid "The server is not installed"
 msgstr "Серверот не е инсталиран"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:687
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1062
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:687
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1062
 msgid "Local Server"
 msgstr "Локален Сервер"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:687
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:687
 msgid "Starting local server ..."
 msgstr "Започнување на локален сервер ..."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:993
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:993
 #, c-format, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "Вие сте кикнати од играта ( %s)"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1062
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1062
 msgid "Connecting to local server..."
 msgstr "Конектирање на локален сервер..."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1073
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1073
 msgid "Error connecting to server."
 msgstr "Погрешно конектирање на серверот."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1083
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1083
 msgid "Connecting to local server timed out. See console for details."
 msgstr ""
 "Конектирањето на локален сервер е прекинат.Проверете ја конзолата за детали."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1186
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1186
 msgid "Connection with the server was lost"
 msgstr "Конекцијата со серверот е прекината"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1213
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1213
 msgid "Disconnected: the server is currently full"
 msgstr "Дисконектиран: серверот моментално е полн"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1225
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1225
 msgid "Disconnected: invalid password specified"
 msgstr "Дисконектиран: пасвордот е погрешен"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CClientGame.cpp:1247
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1247
 msgid "MTA Client verification failed!"
 msgstr "MTA Клиент верификацијата е неуспешна!"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:37
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:37
 msgid "HOST GAME"
 msgstr "ХОСТИРАЊЕ ИГРА"
 
 #. m_pTabs->CreateTab ( "Gamemode" );
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:53
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:53
 msgid "Resources"
 msgstr "Ресурси"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:55
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:57
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:55
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:57
 msgid "Server name:"
 msgstr "Име на сервер:"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:64
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:66
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:64
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:66
 msgid "Password:"
 msgstr "Пасворд:"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:73
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:75
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:73
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:75
 msgid "Max players:"
 msgstr "Максимум играчи:"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:82
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:84
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:82
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:84
 msgid "Broadcast:"
 msgstr "Емитување:"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:86
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:86
 msgid "LAN"
 msgstr "Мрежно"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:99
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:99
 msgid "Selected"
 msgstr "Селектиран"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:116
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:116
 msgid "All"
 msgstr "Се"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CLocalServer.cpp:118
+#: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:118
 msgid "Start"
 msgstr "Старт"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:475
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:475
 msgid "Disconnected: Invalid nickname"
 msgstr "Дисконектиран: Никот е погрешен"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:479
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:479
 msgid "Disconnect from server"
 msgstr "Дисконектирање од серверот"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:483
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:483
 #, c-format, c-format
 msgid ""
 "Disconnected: Serial is banned.\n"
@@ -3130,7 +3011,7 @@ msgstr ""
 "Дисконектиран: Серискиот број е баниран.\n"
 "Причина %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:489
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:489
 #, c-format, c-format
 msgid ""
 "Disconnected: You are banned.\n"
@@ -3139,7 +3020,7 @@ msgstr ""
 "Дисконектиран: Вие сте банирани.\n"
 "Причина: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:495
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:495
 #, c-format, c-format
 msgid ""
 "Disconnected: Account is banned.\n"
@@ -3148,16 +3029,16 @@ msgstr ""
 "Дисконектиран: Акаунтот е баниран.\n"
 "Причина: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:500
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:500
 msgid "Disconnected: Version mismatch"
 msgstr "Дисконектиран: Погрешна верзија"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:504
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:504
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
 msgstr ""
 "Дисконектиран: Ве молиме почекајте минута и после тоа реконектирајте се."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:508
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:508
 #, c-format, c-format
 msgid ""
 "Disconnected: Server from different branch.\n"
@@ -3166,7 +3047,7 @@ msgstr ""
 "Дисконектиран: Сервер од различна верзија.\n"
 "Информации: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:513
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:513
 #, c-format, c-format
 msgid ""
 "Disconnected: Bad version.\n"
@@ -3175,7 +3056,7 @@ msgstr ""
 "Дисконектиран: Лоша верзија.\n"
 "Информации: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:518
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:518
 #, c-format, c-format
 msgid ""
 "Disconnected: Server is running a newer build.\n"
@@ -3184,7 +3065,7 @@ msgstr ""
 "Дисконектиран: Серверот работи на поново верзија.\n"
 "Информации: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:523
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:523
 #, c-format, c-format
 msgid ""
 "Disconnected: Server is running an older build.\n"
@@ -3193,68 +3074,68 @@ msgstr ""
 "Дисконектиран: Серверот работи на постара верзија.\n"
 "Информации: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:528
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:528
 msgid "Disconnected: Nick already in use"
 msgstr "Дисконектиран: Името е веќе во употреба"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:532
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:532
 msgid "Disconnected: Player Element Could not be created."
 msgstr "Дисконектиран: Играч Елемент не може да се креира."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:536
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:536
 #, c-format, c-format
 msgid "Disconnected: Server refused the connection: %s"
 msgstr "Дисконектиран: Серверот ја одби конекцијата: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:541
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:541
 msgid "Disconnected: Serial verification failed"
 msgstr "Дисконектиран: Верификацијата на серискиот број е неуспешен"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:545
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:545
 #, c-format, c-format
 msgid "Disconnected: Connection desync %s"
 msgstr "Дисконектиран: Десинк на конекцијата %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:554
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:554
 #, c-format, c-format
 msgid "Disconnected: You were kicked by %s"
 msgstr "Дисконектиран: Вие сте кикнати од %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:559
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:559
 #, c-format, c-format
 msgid "Disconnected: You were banned by %s"
 msgstr "Дисконектиран: Вие бевте банирани од %s "
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:570
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:570
 msgid "Disconnected: Server shutdown or restarting"
 msgstr "Дисконектиран: Серверот е исклучен или се рестартира"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:595
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:595
 msgid "Time Remaining: "
 msgstr "Преостанато време:~"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:605
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:605
 #, c-format, c-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%д ден"
 msgstr[1] "%д денови"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:607
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:607
 #, c-format, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%д час"
 msgstr[1] "%д часови"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:609
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:609
 #, c-format, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%д минута"
 msgstr[1] "%д минути"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:611
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:611
 #, c-format, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
@@ -3262,50 +3143,50 @@ msgstr[0] "%д секунда"
 msgstr[1] "%д секунди"
 
 #. Display the error
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CPacketHandler.cpp:615
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:615
 msgid "Disconnected"
 msgstr "Дисконектиран"
 
 #. Throw the error and disconnect
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:130
+#: ..\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:130
 #, c-format, c-format
 msgid "Download error: %s"
 msgstr "Грешка во симnувањето: %s"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CServer.cpp:181
+#: ..\Client\mods\deathmatch\logic\CServer.cpp:181
 msgid "Could not start the local server. See console for details."
 msgstr ""
 "Стартување на локален сервер е невозможно. Види ја конзолата за повеќе "
 "детали."
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CServer.cpp:182
+#: ..\Client\mods\deathmatch\logic\CServer.cpp:182
 #, c-format, c-format
 msgid "Error: Could not start local server. [%s]"
 msgstr "Грешка: Не е возможно да се стартува локален сервер. [%s]"
 
 #. Create our text for each transfer type
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:24
+#: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:24
 msgid "Download Progress:"
 msgstr "Прогрес на симување:"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:25
+#: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:25
 msgid "Map download progress:"
 msgstr "Прогрес на симнување на мапата:"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:31
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:119
+#: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:31
+#: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:119
 #, c-format, c-format
 msgid "%s of %s"
 msgstr "%s од %s"
 
 #. stats label
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:32
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\CTransferBox.cpp:58
+#: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:32
+#: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:58
 msgid "Disconnect to cancel download"
 msgstr "Дисконектирај се за да го прекинеш симнувањето"
 
 #. Populate the message and show the box
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:142
+#: ..\Client\mods\deathmatch\logic\Utils.cpp:142
 #, c-format, c-format
 msgid ""
 "Fatal error (%u). If this problem persists, please check out mtasa.com for "
@@ -3318,7 +3199,7 @@ msgstr ""
 #. assert ( 0 );
 #. #endif
 #. Populate the message and show the box
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:158
+#: ..\Client\mods\deathmatch\logic\Utils.cpp:158
 #, c-format, c-format
 msgid ""
 "Protocol error (%u). If this problem persists, please check out mtasa.com "
@@ -3327,21 +3208,21 @@ msgstr ""
 "Грешка во протоколот (%u). Доколку проблемот продолжи, побарајте помош на "
 "mtasa.com"
 
-#: E:\Documents\mtasa-blue\Client\mods\deathmatch\logic\Utils.cpp:160
+#: ..\Client\mods\deathmatch\logic\Utils.cpp:160
 msgid "Connection error"
 msgstr "Погрешна конекција"
 
 #. Couldn't create render target for CPostEffects
-#: E:\Documents\mtasa-blue\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1377
+#: ..\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1377
 msgid "Problem with graphics driver"
 msgstr "Проблеми со графичките драјвери"
 
-#: E:\Documents\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:85
+#: ..\Shared\sdk\SharedUtil.Misc.hpp:85
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr ""
 "Multi Theft Auto не е инсталирана правилно, ве молиме ре-инсталирајте ја. "
 
-#: E:\Documents\mtasa-blue\Shared\sdk\SharedUtil.Misc.hpp:635
+#: ..\Shared\sdk\SharedUtil.Misc.hpp:635
 msgid ""
 "Your browser will now display a web page with some help infomation.\n"
 "\n"
