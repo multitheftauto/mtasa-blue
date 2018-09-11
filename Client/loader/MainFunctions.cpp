@@ -26,11 +26,11 @@ public:
     virtual SString TranslatePlural(const SString& strSingular, const SString& strPlural, int iNum) { return strPlural; }
     virtual SString TranslatePluralWithContext(const SString& strContext, const SString& strSingular, const SString& strPlural, int iNum) { return strPlural; }
 
-    virtual std::map<SString, SString> GetAvailableLanguages(void) { return std::map<SString, SString>(); }
-    virtual bool                       IsLocalized(void) { return false; }
-    virtual SString                    GetLanguageDirectory(void) { return ""; }
-    virtual SString                    GetLanguageCode(void) { return "en_US"; }
-    virtual SString                    GetLanguageName(void) { return "English"; }
+    virtual std::vector<SString> GetAvailableLocales(void) { return std::vector<SString>(); }
+    virtual bool                 IsLocalized(void) { return false; }
+    virtual SString              GetLanguageDirectory(void) { return ""; }
+    virtual SString              GetLanguageCode(void) { return "en_US"; }
+    virtual SString              GetLanguageName(void) { return "English"; }
 };
 
 CLocalizationInterface* g_pLocalization = new CLocalizationDummy();
