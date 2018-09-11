@@ -593,6 +593,9 @@ public:
     void SetTransferringSingularFiles(bool bTransfer) { m_bTransferringSingularFiles = bTransfer; }
     bool IsTransferringSingularFiles(void) { return m_bTransferringSingularFiles; }
 
+    CSurfaceType* GetOriginalSurfaceInfo() { return m_pOriginalSurfaceInfo; }
+    CSurfaceType* GetSurfaceInfo() { return m_pSurfaceInfo; }
+
     void                           SetVehExtrapolateSettings(const SVehExtrapolateSettings& settings) { m_VehExtrapolateSettings = settings; }
     const SVehExtrapolateSettings& GetVehExtrapolateSettings(void) { return m_VehExtrapolateSettings; }
     void                           SetMiscGameSettings(const SMiscGameSettings& settings) { m_MiscGameSettings = settings; }
@@ -616,8 +619,6 @@ public:
     void InsertAnimationAssociationToMap(CAnimBlendAssociationSAInterface* pAnimAssociation, const std::shared_ptr<CIFPAnimations>& pIFPAnimations);
     void RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation);
 
-
-    CSurfaceType* GetSurfaceInfo(){ return m_pSurfaceInfo; }
 private:
     eStatus       m_Status;
     eServerType   m_ServerType;
@@ -733,6 +734,9 @@ private:
     eWeaponSlot                            m_lastWeaponSlot;
     SFixedArray<DWORD, WEAPONSLOT_MAX + 1> m_wasWeaponAmmoInClip;
 
+    CSurfaceType* m_pSurfaceInfo;
+    CSurfaceType* m_pOriginalSurfaceInfo;
+
     bool m_bCursorEventsEnabled;
     bool m_bLocalPlay;
 
@@ -802,9 +806,6 @@ private:
     bool m_bDevelopmentMode;
     bool m_bShowCollision;
     bool m_bShowSound;
-
-    CSurfaceType* m_pSurfaceInfo;
-    CSurfaceType* m_pOriginalSurfaceInfo;
 
     // Debug class. Empty in release.
 public:

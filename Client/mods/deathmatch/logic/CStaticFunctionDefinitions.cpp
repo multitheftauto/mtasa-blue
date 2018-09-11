@@ -9476,3 +9476,24 @@ CClientSearchLight* CStaticFunctionDefinitions::CreateSearchLight(CResource& Res
 
     return nullptr;
 }
+
+bool CStaticFunctionDefinitions::ResetSurfaceInfo(short sSurfaceID)
+{
+    CSurfaceType* pOriginalSurfaceInfo = m_pClientGame->GetOriginalSurfaceInfo();
+    CSurfaceType* pSurfaceInfo = m_pClientGame->GetSurfaceInfo();
+    DWORD dwSurfaceInfo = (DWORD)pSurfaceInfo;
+    DWORD dwOriginalSurfaceInfo = (DWORD)pOriginalSurfaceInfo;
+    short sOffset, sSize;
+    if (sSurfaceID >= 0 && sSurfaceID <= 179)
+    {
+        sOffset = 144 + sizeof(SurfaceInfo_c) * sSurfaceID;
+        sSize = sizeof(SurfaceInfo_c);
+    }
+    else // reset all
+    {
+        sOffset = 144;
+        sSize = sizeof(SurfaceInfo_c) * 179;
+    }
+    memcpy((void*)(dwSurfaceInfo + sOffset), (void*)(dwOriginalSurfaceInfo + sOffset), sSize);
+    return true;
+}

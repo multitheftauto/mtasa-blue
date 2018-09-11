@@ -99,6 +99,12 @@ CClientGame::CClientGame(bool bLocalPlay)
     m_lastWeaponSlot = WEAPONSLOT_MAX;            // last stored weapon slot, for weapon slot syncing to server (sets to invalid value)
     ResetAmmoInClip();
 
+
+    m_pSurfaceInfo = reinterpret_cast<CSurfaceType*>(0xB79538);
+    // Store default surface properties
+    m_pOriginalSurfaceInfo = new CSurfaceType;
+    memcpy(m_pOriginalSurfaceInfo, (void *)0xB79538, sizeof(CSurfaceType));
+
     m_bNoNewVehicleTask = false;
     m_NoNewVehicleTaskReasonID = INVALID_ELEMENT_ID;
 
@@ -343,11 +349,6 @@ CClientGame::CClientGame(bool bLocalPlay)
 
     // Reset test mode script settings to default
     g_pCore->GetGraphics()->GetRenderItemManager()->SetTestMode(DX_TEST_MODE_NONE);
-
-    // Store default surface properties
-    m_pSurfaceInfo = reinterpret_cast<CSurfaceType*>(0xB79538);
-    //memcpy(&m_pOriginalSurfaceInfo, m_pSurfaceInfo, sizeof(CSurfaceType));
-
 }
 
 CClientGame::~CClientGame(void)

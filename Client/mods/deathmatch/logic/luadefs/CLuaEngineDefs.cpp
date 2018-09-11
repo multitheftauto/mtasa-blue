@@ -35,6 +35,7 @@ void CLuaEngineDefs::LoadFunctions(void)
     CLuaCFunctions::AddFunction("engineGetVisibleTextureNames", EngineGetVisibleTextureNames);
     CLuaCFunctions::AddFunction("engineGetSurfaceProperties", EngineGetSurfaceProperties);
     CLuaCFunctions::AddFunction("engineSetSurfaceProperties", EngineSetSurfaceProperties);
+    CLuaCFunctions::AddFunction("engineResetSurfaceProperties", EngineResetSurfaceProperties);
 
     // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
     // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -920,6 +921,29 @@ int CLuaEngineDefs::EngineGetSurfaceProperties(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineResetSurfaceProperties(lua_State* luaVM)
 {
+    CScriptArgReader argStream(luaVM);
+
+    if (argStream.NextIsNumber())
+    {
+        short            sSurfaceID;
+        argStream.ReadNumber(sSurfaceID);
+        if (!argStream.HasErrors())
+        {
+            if (sSurfaceID >= 0 && sSurfaceID <= 179)
+            {
+                lua_pushboolean(luaVM, CStaticFunctionDefinitions::ResetSurfaceInfo(sSurfaceID));
+                return 1;
+            }
+        }
+    }
+    else
+    {
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::ResetSurfaceInfo());
+        return 1;
+    }
+
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
