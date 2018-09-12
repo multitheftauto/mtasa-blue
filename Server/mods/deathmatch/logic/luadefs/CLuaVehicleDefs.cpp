@@ -13,109 +13,117 @@
 
 void CLuaVehicleDefs::LoadFunctions()
 {
-    // Vehicle create/destroy funcs
-    CLuaCFunctions::AddFunction("createVehicle", CreateVehicle);
+    std::map<const char*, lua_CFunction> functions{
+        // Vehicle create/destroy funcs
+        {"createVehicle", CreateVehicle},
 
-    // Vehicle get funcs
-    CLuaCFunctions::AddFunction("getVehicleType", GetVehicleType);
-    CLuaCFunctions::AddFunction("getVehicleVariant", GetVehicleVariant);
-    CLuaCFunctions::AddFunction("getVehicleColor", GetVehicleColor);
-    CLuaCFunctions::AddFunction("getVehicleModelFromName", GetVehicleModelFromName);
-    CLuaCFunctions::AddFunction("getVehicleLandingGearDown", GetVehicleLandingGearDown);
-    CLuaCFunctions::AddFunction("getVehicleName", GetVehicleName);
-    CLuaCFunctions::AddFunction("getVehicleNameFromModel", GetVehicleNameFromModel);
-    CLuaCFunctions::AddFunction("getVehicleOccupant", GetVehicleOccupant);
-    CLuaCFunctions::AddFunction("getVehicleOccupants", GetVehicleOccupants);
-    CLuaCFunctions::AddFunction("getVehicleController", GetVehicleController);
-    CLuaCFunctions::AddFunction("getVehicleRotation", GetVehicleRotation);
-    CLuaCFunctions::AddFunction("getVehicleSirensOn", GetVehicleSirensOn);
-    CLuaCFunctions::AddFunction("getVehicleTurnVelocity", GetVehicleTurnVelocity);
-    CLuaCFunctions::AddFunction("getVehicleTurretPosition", GetVehicleTurretPosition);
-    CLuaCFunctions::AddFunction("getVehicleMaxPassengers", GetVehicleMaxPassengers);
-    CLuaCFunctions::AddFunction("isVehicleLocked", IsVehicleLocked);
-    CLuaCFunctions::AddFunction("getVehiclesOfType", GetVehiclesOfType);
-    CLuaCFunctions::AddFunction("getVehicleUpgradeOnSlot", GetVehicleUpgradeOnSlot);
-    CLuaCFunctions::AddFunction("getVehicleUpgrades", GetVehicleUpgrades);
-    CLuaCFunctions::AddFunction("getVehicleUpgradeSlotName", GetVehicleUpgradeSlotName);
-    CLuaCFunctions::AddFunction("getVehicleCompatibleUpgrades", GetVehicleCompatibleUpgrades);
-    CLuaCFunctions::AddFunction("getVehicleDoorState", GetVehicleDoorState);
-    CLuaCFunctions::AddFunction("getVehicleWheelStates", GetVehicleWheelStates);
-    CLuaCFunctions::AddFunction("getVehicleLightState", GetVehicleLightState);
-    CLuaCFunctions::AddFunction("getVehiclePanelState", GetVehiclePanelState);
-    CLuaCFunctions::AddFunction("getVehicleOverrideLights", GetVehicleOverrideLights);
-    CLuaCFunctions::AddFunction("getVehicleTowedByVehicle", GetVehicleTowedByVehicle);
-    CLuaCFunctions::AddFunction("getVehicleTowingVehicle", GetVehicleTowingVehicle);
-    CLuaCFunctions::AddFunction("getVehiclePaintjob", GetVehiclePaintjob);
-    CLuaCFunctions::AddFunction("getVehiclePlateText", GetVehiclePlateText);
-    CLuaCFunctions::AddFunction("isVehicleDamageProof", IsVehicleDamageProof);
-    CLuaCFunctions::AddFunction("isVehicleFuelTankExplodable", IsVehicleFuelTankExplodable);
-    CLuaCFunctions::AddFunction("isVehicleFrozen", IsVehicleFrozen);
-    CLuaCFunctions::AddFunction("isVehicleOnGround", IsVehicleOnGround);
-    CLuaCFunctions::AddFunction("getVehicleEngineState", GetVehicleEngineState);
-    CLuaCFunctions::AddFunction("isTrainDerailed", IsTrainDerailed);
-    CLuaCFunctions::AddFunction("isTrainDerailable", IsTrainDerailable);
-    CLuaCFunctions::AddFunction("getTrainDirection", GetTrainDirection);
-    CLuaCFunctions::AddFunction("getTrainSpeed", GetTrainSpeed);
-    // CLuaCFunctions::AddFunction ( "getTrainTrack", GetTrainTrack );
-    CLuaCFunctions::AddFunction("getTrainPosition", GetTrainPosition);
-    CLuaCFunctions::AddFunction("isVehicleBlown", IsVehicleBlown);
-    CLuaCFunctions::AddFunction("getVehicleHeadLightColor", GetVehicleHeadLightColor);
-    CLuaCFunctions::AddFunction("getVehicleDoorOpenRatio", GetVehicleDoorOpenRatio);
+        // Vehicle get funcs
+        {"getVehicleType", GetVehicleType},
+        {"getVehicleVariant", GetVehicleVariant},
+        {"getVehicleColor", GetVehicleColor},
+        {"getVehicleModelFromName", GetVehicleModelFromName},
+        {"getVehicleLandingGearDown", GetVehicleLandingGearDown},
+        {"getVehicleName", GetVehicleName},
+        {"getVehicleNameFromModel", GetVehicleNameFromModel},
+        {"getVehicleOccupant", GetVehicleOccupant},
+        {"getVehicleOccupants", GetVehicleOccupants},
+        {"getVehicleController", GetVehicleController},
+        {"getVehicleRotation", GetVehicleRotation},
+        {"getVehicleSirensOn", GetVehicleSirensOn},
+        {"getVehicleTurnVelocity", GetVehicleTurnVelocity},
+        {"getVehicleTurretPosition", GetVehicleTurretPosition},
+        {"getVehicleMaxPassengers", GetVehicleMaxPassengers},
+        {"isVehicleLocked", IsVehicleLocked},
+        {"getVehiclesOfType", GetVehiclesOfType},
+        {"getVehicleUpgradeOnSlot", GetVehicleUpgradeOnSlot},
+        {"getVehicleUpgrades", GetVehicleUpgrades},
+        {"getVehicleUpgradeSlotName", GetVehicleUpgradeSlotName},
+        {"getVehicleCompatibleUpgrades", GetVehicleCompatibleUpgrades},
+        {"getVehicleDoorState", GetVehicleDoorState},
+        {"getVehicleWheelStates", GetVehicleWheelStates},
+        {"getVehicleLightState", GetVehicleLightState},
+        {"getVehiclePanelState", GetVehiclePanelState},
+        {"getVehicleOverrideLights", GetVehicleOverrideLights},
+        {"getVehicleTowedByVehicle", GetVehicleTowedByVehicle},
+        {"getVehicleTowingVehicle", GetVehicleTowingVehicle},
+        {"getVehiclePaintjob", GetVehiclePaintjob},
+        {"getVehiclePlateText", GetVehiclePlateText},
+        {"isVehicleDamageProof", IsVehicleDamageProof},
+        {"isVehicleFuelTankExplodable", IsVehicleFuelTankExplodable},
+        {"isVehicleFrozen", IsVehicleFrozen},
+        {"isVehicleOnGround", IsVehicleOnGround},
+        {"getVehicleEngineState", GetVehicleEngineState},
+        {"isTrainDerailed", IsTrainDerailed},
+        {"isTrainDerailable", IsTrainDerailable},
+        {"getTrainDirection", GetTrainDirection},
+        {"getTrainSpeed", GetTrainSpeed},
+        // {"getTrainTrack", GetTrainTrack},
+        {"getTrainPosition", GetTrainPosition},
+        {"isVehicleBlown", IsVehicleBlown},
+        {"getVehicleHeadLightColor", GetVehicleHeadLightColor},
+        {"getVehicleDoorOpenRatio", GetVehicleDoorOpenRatio},
 
-    // Vehicle set funcs
-    CLuaCFunctions::AddFunction("fixVehicle", FixVehicle);
-    CLuaCFunctions::AddFunction("blowVehicle", BlowVehicle);
-    CLuaCFunctions::AddFunction("setVehicleRotation", SetVehicleRotation);
-    CLuaCFunctions::AddFunction("setVehicleTurnVelocity", SetVehicleTurnVelocity);
-    CLuaCFunctions::AddFunction("setVehicleColor", SetVehicleColor);
-    CLuaCFunctions::AddFunction("setVehicleLandingGearDown", SetVehicleLandingGearDown);
-    CLuaCFunctions::AddFunction("setVehicleLocked", SetVehicleLocked);
-    CLuaCFunctions::AddFunction("setVehicleDoorsUndamageable", SetVehicleDoorsUndamageable);
-    CLuaCFunctions::AddFunction("setVehicleSirensOn", SetVehicleSirensOn);
-    CLuaCFunctions::AddFunction("setVehicleTaxiLightOn", SetVehicleTaxiLightOn);
-    CLuaCFunctions::AddFunction("isVehicleTaxiLightOn", IsVehicleTaxiLightOn);
-    CLuaCFunctions::AddFunction("addVehicleUpgrade", AddVehicleUpgrade);
-    CLuaCFunctions::AddFunction("removeVehicleUpgrade", RemoveVehicleUpgrade);
-    CLuaCFunctions::AddFunction("setVehicleDoorState", SetVehicleDoorState);
-    CLuaCFunctions::AddFunction("setVehicleWheelStates", SetVehicleWheelStates);
-    CLuaCFunctions::AddFunction("setVehicleLightState", SetVehicleLightState);
-    CLuaCFunctions::AddFunction("setVehiclePanelState", SetVehiclePanelState);
-    CLuaCFunctions::AddFunction("toggleVehicleRespawn", ToggleVehicleRespawn);
-    CLuaCFunctions::AddFunction("setVehicleRespawnDelay", SetVehicleRespawnDelay);
-    CLuaCFunctions::AddFunction("setVehicleIdleRespawnDelay", SetVehicleIdleRespawnDelay);
-    CLuaCFunctions::AddFunction("setVehicleRespawnPosition", SetVehicleRespawnPosition);
-    CLuaCFunctions::AddFunction("setVehicleRespawnRotation", SetVehicleRespawnRotation);
-    CLuaCFunctions::AddFunction("getVehicleRespawnPosition", GetVehicleRespawnPosition);
-    CLuaCFunctions::AddFunction("getVehicleRespawnRotation", GetVehicleRespawnRotation);
-    CLuaCFunctions::AddFunction("respawnVehicle", RespawnVehicle);
-    CLuaCFunctions::AddFunction("resetVehicleExplosionTime", ResetVehicleExplosionTime);
-    CLuaCFunctions::AddFunction("resetVehicleIdleTime", ResetVehicleIdleTime);
-    CLuaCFunctions::AddFunction("spawnVehicle", SpawnVehicle);
-    CLuaCFunctions::AddFunction("setVehicleOverrideLights", SetVehicleOverrideLights);
-    CLuaCFunctions::AddFunction("attachTrailerToVehicle", AttachTrailerToVehicle);
-    CLuaCFunctions::AddFunction("detachTrailerFromVehicle", DetachTrailerFromVehicle);
-    CLuaCFunctions::AddFunction("setVehicleEngineState", SetVehicleEngineState);
-    CLuaCFunctions::AddFunction("setVehicleDirtLevel", SetVehicleDirtLevel);
-    CLuaCFunctions::AddFunction("setVehicleDamageProof", SetVehicleDamageProof);
-    CLuaCFunctions::AddFunction("setVehiclePaintjob", SetVehiclePaintjob);
-    CLuaCFunctions::AddFunction("setVehicleFuelTankExplodable", SetVehicleFuelTankExplodable);
-    CLuaCFunctions::AddFunction("setVehicleFrozen", SetVehicleFrozen);
-    CLuaCFunctions::AddFunction("setTrainDerailed", SetTrainDerailed);
-    CLuaCFunctions::AddFunction("setTrainDerailable", SetTrainDerailable);
-    CLuaCFunctions::AddFunction("setTrainDirection", SetTrainDirection);
-    CLuaCFunctions::AddFunction("setTrainSpeed", SetTrainSpeed);
-    // CLuaCFunctions::AddFunction ( "setTrainTrack", SetTrainTrack );
-    CLuaCFunctions::AddFunction("setTrainPosition", SetTrainPosition);
-    CLuaCFunctions::AddFunction("setVehicleHeadLightColor", SetVehicleHeadLightColor);
-    CLuaCFunctions::AddFunction("setVehicleTurretPosition", SetVehicleTurretPosition);
-    CLuaCFunctions::AddFunction("setVehicleDoorOpenRatio", SetVehicleDoorOpenRatio);
-    CLuaCFunctions::AddFunction("setVehicleVariant", SetVehicleVariant);
-    CLuaCFunctions::AddFunction("addVehicleSirens", GiveVehicleSirens);
-    CLuaCFunctions::AddFunction("removeVehicleSirens", RemoveVehicleSirens);
-    CLuaCFunctions::AddFunction("setVehicleSirens", SetVehicleSirens);
-    CLuaCFunctions::AddFunction("getVehicleSirens", GetVehicleSirens);
-    CLuaCFunctions::AddFunction("getVehicleSirenParams", GetVehicleSirenParams);
-    CLuaCFunctions::AddFunction("setVehiclePlateText", SetVehiclePlateText);
+        // Vehicle set funcs
+        {"fixVehicle", FixVehicle},
+        {"blowVehicle", BlowVehicle},
+        {"setVehicleRotation", SetVehicleRotation},
+        {"setVehicleTurnVelocity", SetVehicleTurnVelocity},
+        {"setVehicleColor", SetVehicleColor},
+        {"setVehicleLandingGearDown", SetVehicleLandingGearDown},
+        {"setVehicleLocked", SetVehicleLocked},
+        {"setVehicleDoorsUndamageable", SetVehicleDoorsUndamageable},
+        {"setVehicleSirensOn", SetVehicleSirensOn},
+        {"setVehicleTaxiLightOn", SetVehicleTaxiLightOn},
+        {"isVehicleTaxiLightOn", IsVehicleTaxiLightOn},
+        {"addVehicleUpgrade", AddVehicleUpgrade},
+        {"removeVehicleUpgrade", RemoveVehicleUpgrade},
+        {"setVehicleDoorState", SetVehicleDoorState},
+        {"setVehicleWheelStates", SetVehicleWheelStates},
+        {"setVehicleLightState", SetVehicleLightState},
+        {"setVehiclePanelState", SetVehiclePanelState},
+        {"toggleVehicleRespawn", ToggleVehicleRespawn},
+        {"setVehicleRespawnDelay", SetVehicleRespawnDelay},
+        {"setVehicleIdleRespawnDelay", SetVehicleIdleRespawnDelay},
+        {"setVehicleRespawnPosition", SetVehicleRespawnPosition},
+        {"setVehicleRespawnRotation", SetVehicleRespawnRotation},
+        {"getVehicleRespawnPosition", GetVehicleRespawnPosition},
+        {"getVehicleRespawnRotation", GetVehicleRespawnRotation},
+        {"respawnVehicle", RespawnVehicle},
+        {"resetVehicleExplosionTime", ResetVehicleExplosionTime},
+        {"resetVehicleIdleTime", ResetVehicleIdleTime},
+        {"spawnVehicle", SpawnVehicle},
+        {"setVehicleOverrideLights", SetVehicleOverrideLights},
+        {"attachTrailerToVehicle", AttachTrailerToVehicle},
+        {"detachTrailerFromVehicle", DetachTrailerFromVehicle},
+        {"setVehicleEngineState", SetVehicleEngineState},
+        {"setVehicleDirtLevel", SetVehicleDirtLevel},
+        {"setVehicleDamageProof", SetVehicleDamageProof},
+        {"setVehiclePaintjob", SetVehiclePaintjob},
+        {"setVehicleFuelTankExplodable", SetVehicleFuelTankExplodable},
+        {"setVehicleFrozen", SetVehicleFrozen},
+        {"setTrainDerailed", SetTrainDerailed},
+        {"setTrainDerailable", SetTrainDerailable},
+        {"setTrainDirection", SetTrainDirection},
+        {"setTrainSpeed", SetTrainSpeed},
+        // {"setTrainTrack", SetTrainTrack},
+        {"setTrainPosition", SetTrainPosition},
+        {"setVehicleHeadLightColor", SetVehicleHeadLightColor},
+        {"setVehicleTurretPosition", SetVehicleTurretPosition},
+        {"setVehicleDoorOpenRatio", SetVehicleDoorOpenRatio},
+        {"setVehicleVariant", SetVehicleVariant},
+        {"addVehicleSirens", GiveVehicleSirens},
+        {"removeVehicleSirens", RemoveVehicleSirens},
+        {"setVehicleSirens", SetVehicleSirens},
+        {"getVehicleSirens", GetVehicleSirens},
+        {"getVehicleSirenParams", GetVehicleSirenParams},
+        {"setVehiclePlateText", SetVehiclePlateText},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaVehicleDefs::AddClass(lua_State* luaVM)

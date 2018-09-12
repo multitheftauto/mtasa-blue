@@ -14,18 +14,26 @@ using std::list;
 
 void CLuaResourceDefs::LoadFunctions(void)
 {
-    CLuaCFunctions::AddFunction("call", Call);
-    CLuaCFunctions::AddFunction("getThisResource", GetThisResource);
-    CLuaCFunctions::AddFunction("getResourceConfig", GetResourceConfig);
-    CLuaCFunctions::AddFunction("getResourceName", GetResourceName);
-    CLuaCFunctions::AddFunction("getResourceFromName", GetResourceFromName);
-    CLuaCFunctions::AddFunction("getResourceRootElement", GetResourceRootElement);
-    CLuaCFunctions::AddFunction("getResourceGUIElement", GetResourceGUIElement);
-    CLuaCFunctions::AddFunction("getResourceDynamicElementRoot", GetResourceDynamicElementRoot);
-    CLuaCFunctions::AddFunction("getResourceExportedFunctions", GetResourceExportedFunctions);
-    CLuaCFunctions::AddFunction("getResourceState", GetResourceState);
-    CLuaCFunctions::AddFunction("loadstring", LoadString);
-    CLuaCFunctions::AddFunction("load", Load);
+    std::map<const char*, lua_CFunction> functions{
+        {"call", Call},
+        {"getThisResource", GetThisResource},
+        {"getResourceConfig", GetResourceConfig},
+        {"getResourceName", GetResourceName},
+        {"getResourceFromName", GetResourceFromName},
+        {"getResourceRootElement", GetResourceRootElement},
+        {"getResourceGUIElement", GetResourceGUIElement},
+        {"getResourceDynamicElementRoot", GetResourceDynamicElementRoot},
+        {"getResourceExportedFunctions", GetResourceExportedFunctions},
+        {"getResourceState", GetResourceState},
+        {"loadstring", LoadString},
+        {"load", Load},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaResourceDefs::AddClass(lua_State* luaVM)

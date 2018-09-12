@@ -14,24 +14,32 @@
 
 void CLuaFileDefs::LoadFunctions(void)
 {
-    CLuaCFunctions::AddFunction("fileOpen", fileOpen);
-    CLuaCFunctions::AddFunction("fileCreate", fileCreate);
-    CLuaCFunctions::AddFunction("fileExists", fileExists);
-    CLuaCFunctions::AddFunction("fileCopy", fileCopy);
-    CLuaCFunctions::AddFunction("fileRename", fileRename);
-    CLuaCFunctions::AddFunction("fileDelete", fileDelete);
+    std::map<const char*, lua_CFunction> functions{
+        {"fileOpen", fileOpen},
+        {"fileCreate", fileCreate},
+        {"fileExists", fileExists},
+        {"fileCopy", fileCopy},
+        {"fileRename", fileRename},
+        {"fileDelete", fileDelete},
 
-    CLuaCFunctions::AddFunction("fileClose", fileClose);
-    CLuaCFunctions::AddFunction("fileFlush", fileFlush);
-    CLuaCFunctions::AddFunction("fileRead", fileRead);
-    CLuaCFunctions::AddFunction("fileWrite", fileWrite);
+        {"fileClose", fileClose},
+        {"fileFlush", fileFlush},
+        {"fileRead", fileRead},
+        {"fileWrite", fileWrite},
 
-    CLuaCFunctions::AddFunction("fileGetPos", fileGetPos);
-    CLuaCFunctions::AddFunction("fileGetSize", fileGetSize);
-    CLuaCFunctions::AddFunction("fileGetPath", fileGetPath);
-    CLuaCFunctions::AddFunction("fileIsEOF", fileIsEOF);
+        {"fileGetPos", fileGetPos},
+        {"fileGetSize", fileGetSize},
+        {"fileGetPath", fileGetPath},
+        {"fileIsEOF", fileIsEOF},
 
-    CLuaCFunctions::AddFunction("fileSetPos", fileSetPos);
+        {"fileSetPos", fileSetPos},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaFileDefs::AddClass(lua_State* luaVM)

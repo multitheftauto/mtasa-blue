@@ -13,19 +13,27 @@
 
 void CLuaBlipDefs::LoadFunctions(void)
 {
-    CLuaCFunctions::AddFunction("createBlip", CreateBlip);
-    CLuaCFunctions::AddFunction("createBlipAttachedTo", CreateBlipAttachedTo);
-    CLuaCFunctions::AddFunction("getBlipIcon", GetBlipIcon);
-    CLuaCFunctions::AddFunction("getBlipSize", GetBlipSize);
-    CLuaCFunctions::AddFunction("getBlipColor", GetBlipColor);
-    CLuaCFunctions::AddFunction("getBlipOrdering", GetBlipOrdering);
-    CLuaCFunctions::AddFunction("getBlipVisibleDistance", GetBlipVisibleDistance);
+    std::map<const char*, lua_CFunction> functions{
+        {"createBlip", CreateBlip},
+        {"createBlipAttachedTo", CreateBlipAttachedTo},
+        {"getBlipIcon", GetBlipIcon},
+        {"getBlipSize", GetBlipSize},
+        {"getBlipColor", GetBlipColor},
+        {"getBlipOrdering", GetBlipOrdering},
+        {"getBlipVisibleDistance", GetBlipVisibleDistance},
 
-    CLuaCFunctions::AddFunction("setBlipIcon", SetBlipIcon);
-    CLuaCFunctions::AddFunction("setBlipSize", SetBlipSize);
-    CLuaCFunctions::AddFunction("setBlipColor", SetBlipColor);
-    CLuaCFunctions::AddFunction("setBlipOrdering", SetBlipOrdering);
-    CLuaCFunctions::AddFunction("setBlipVisibleDistance", SetBlipVisibleDistance);
+        {"setBlipIcon", SetBlipIcon},
+        {"setBlipSize", SetBlipSize},
+        {"setBlipColor", SetBlipColor},
+        {"setBlipOrdering", SetBlipOrdering},
+        {"setBlipVisibleDistance", SetBlipVisibleDistance},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaBlipDefs::AddClass(lua_State* luaVM)

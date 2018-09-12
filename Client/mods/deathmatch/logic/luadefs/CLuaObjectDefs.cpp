@@ -13,25 +13,33 @@
 
 void CLuaObjectDefs::LoadFunctions(void)
 {
-    // Object create/destroy funcs
-    CLuaCFunctions::AddFunction("createObject", CreateObject);
+    std::map<const char*, lua_CFunction> functions{
+        // Object create/destroy funcs
+        {"createObject", CreateObject},
 
-    // Object get funcs
-    CLuaCFunctions::AddFunction("isObjectStatic", IsObjectStatic);
-    CLuaCFunctions::AddFunction("getObjectScale", GetObjectScale);
-    CLuaCFunctions::AddFunction("isObjectBreakable", IsObjectBreakable);
-    CLuaCFunctions::AddFunction("getObjectProperty", GetObjectProperty);
+        // Object get funcs
+        {"isObjectStatic", IsObjectStatic},
+        {"getObjectScale", GetObjectScale},
+        {"isObjectBreakable", IsObjectBreakable},
+        {"getObjectProperty", GetObjectProperty},
 
-    // Object set funcs
-    CLuaCFunctions::AddFunction("moveObject", MoveObject);
-    CLuaCFunctions::AddFunction("stopObject", StopObject);
-    CLuaCFunctions::AddFunction("setObjectScale", SetObjectScale);
-    CLuaCFunctions::AddFunction("setObjectStatic", SetObjectStatic);
-    CLuaCFunctions::AddFunction("setObjectBreakable", SetObjectBreakable);
-    CLuaCFunctions::AddFunction("breakObject", BreakObject);
-    CLuaCFunctions::AddFunction("respawnObject", RespawnObject);
-    CLuaCFunctions::AddFunction("toggleObjectRespawn", ToggleObjectRespawn);
-    CLuaCFunctions::AddFunction("setObjectProperty", SetObjectProperty);
+        // Object set funcs
+        {"moveObject", MoveObject},
+        {"stopObject", StopObject},
+        {"setObjectScale", SetObjectScale},
+        {"setObjectStatic", SetObjectStatic},
+        {"setObjectBreakable", SetObjectBreakable},
+        {"breakObject", BreakObject},
+        {"respawnObject", RespawnObject},
+        {"toggleObjectRespawn", ToggleObjectRespawn},
+        {"setObjectProperty", SetObjectProperty},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaObjectDefs::AddClass(lua_State* luaVM)
