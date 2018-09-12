@@ -66,8 +66,8 @@ bool CIFPEngine::EngineReplaceAnimation(CClientEntity* pEntity, const SString& s
                     {
                         auto pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pCustomAnimHierarchyInterface);
                         pAnimationManager->UncompressAnimation(pAnimHierarchy.get());
+                        pCurrentAnimAssociation->FreeAnimBlendNodeArray();
                         pCurrentAnimAssociation->InitializeWithHierarchy(pClump, pCustomAnimHierarchyInterface);
-                        auto pOriginalAnimAssocInterface = pCurrentAnimAssociation->GetInterface();
                         pCurrentAnimAssociation->SetCurrentProgress(0.0);
                     }
                 }
