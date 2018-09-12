@@ -56,6 +56,21 @@ bool CIFPEngine::EngineReplaceAnimation(CClientEntity* pEntity, const SString& s
             if (pInternalAnimHierarchy && pCustomAnimHierarchyInterface)
             {
                 Ped.ReplaceAnimation(pInternalAnimHierarchy, pCustomIFP, pCustomAnimHierarchyInterface);
+
+                CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
+                RpClump* pClump = Ped.GetClump();
+                if (pClump)
+                {
+                    auto pCurrentAnimAssociation = pAnimationManager->RpAnimBlendClumpGetAssociation(pClump, strInternalAnimName);
+                    if (pCurrentAnimAssociation)
+                    {
+                        auto pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pCustomAnimHierarchyInterface);
+                        pAnimationManager->UncompressAnimation(pAnimHierarchy.get());
+                        pCurrentAnimAssociation->InitializeWithHierarchy(pClump, pCustomAnimHierarchyInterface);
+                        auto pOriginalAnimAssocInterface = pCurrentAnimAssociation->GetInterface();
+                        pCurrentAnimAssociation->SetCurrentProgress(0.0);
+                    }
+                }
                 return true;
             }
         }

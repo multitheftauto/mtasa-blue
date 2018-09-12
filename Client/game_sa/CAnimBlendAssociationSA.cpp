@@ -46,7 +46,7 @@ CAnimBlendAssociationSAInterface* CAnimBlendAssociationSA::InitializeForCustomAn
     m_pInterface->fBlendDelta = 0.0;
     m_pInterface->fCurrentTime = 0.0;
     m_pInterface->fTimeStep = 0.0;
-    m_pInterface->sFlags = 0;
+    m_pInterface->m_nFlags = 0;
     m_pInterface->uiCallbackType = 0;
     m_pInterface->vTable = reinterpret_cast<DWORD*>(0x85C6D0);
     m_pInterface->sAnimGroup = -1;
