@@ -157,6 +157,7 @@ CCredits::CCredits(void)
         "GTX / Timic3\n"
         "FileEX\n"
         "Pirulax\n"
+        "SDraw\n"
         "\n"
         "\n";
 
