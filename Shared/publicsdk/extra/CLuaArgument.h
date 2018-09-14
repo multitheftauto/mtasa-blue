@@ -16,8 +16,7 @@
  *
  *********************************************************/
 
-#ifndef __CLUAARGUMENT_H
-#define __CLUAARGUMENT_H
+#pragma once
 
 extern "C"
 {
@@ -57,5 +56,3 @@ private:
     char*      m_szString;
     void*      m_pLightUserData;
 };
-
-#endif

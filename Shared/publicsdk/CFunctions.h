@@ -18,8 +18,7 @@
 
 class CFunctions;
 
-#ifndef __CFUNCTIONS_H
-#define __CFUNCTIONS_H
+#pragma once
 
 #include <stdio.h>
 
@@ -31,4 +30,3 @@ class CFunctions
 public:
     static int HelloWorld(lua_State* luaVM);
 };
-#endif

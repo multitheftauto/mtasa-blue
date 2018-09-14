@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMatrix_H
-#define __CMatrix_H
+#pragma once
 
 #include "CVector.h"
 
@@ -255,5 +254,3 @@ public:
     CVector vUp;
     CVector vPos;
 };
-
-#endif

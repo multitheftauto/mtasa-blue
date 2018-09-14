@@ -18,8 +18,7 @@
 
 class CThreadData;
 
-#ifndef __CTHREADDATA_H
-#define __CTHREADDATA_H
+#pragma once
 
 #include "CThread.h"
 
@@ -33,5 +32,3 @@ public:
     ThreadMutex MutexPrimary;            // primary mutex for suspend/resume operations
     ThreadMutex MutexLogical;            // logical mutex for proper CThreadData sync
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CXMLNODEIMPL_H
-#define __CXMLNODEIMPL_H
+#pragma once
 
 #include "CXMLAttributesImpl.h"
 #include <tinyxml.h>
@@ -97,5 +96,3 @@ private:
 
     CXMLAttributesImpl m_Attributes;
 };
-
-#endif

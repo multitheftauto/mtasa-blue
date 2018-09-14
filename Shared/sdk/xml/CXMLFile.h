@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CXMLFILE_H
-#define __CXMLFILE_H
+#pragma once
 
 #include "CXMLCommon.h"
 #include "CXMLErrorCodes.h"
@@ -40,5 +39,3 @@ public:
 
     virtual bool IsValid(void) = 0;
 };
-
-#endif
