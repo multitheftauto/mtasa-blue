@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CLOCALSERVER_H
-#define __CLOCALSERVER_H
+#pragma once
 
 #include <CClientGUIManager.h>
 #include <string>
@@ -75,5 +74,3 @@ private:
     CGUIButton* m_pButtonStart;
     CGUIButton* m_pButtonCancel;
 };
-
-#endif

@@ -11,8 +11,7 @@
 
 class CConsole;
 
-#ifndef __CCONSOLE_H
-#define __CCONSOLE_H
+#pragma once
 
 #include <core/CConsoleInterface.h>
 #include "CCore.h"
@@ -90,5 +89,3 @@ private:
     float   m_fInputHeight;
     SString m_strPendingAdd;
 };
-
-#endif

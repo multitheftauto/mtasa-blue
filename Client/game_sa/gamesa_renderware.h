@@ -10,8 +10,7 @@
  *
  *****************************************************************************/
 
-#ifndef __GAMESA_RENDERWARE
-#define __GAMESA_RENDERWARE
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 
@@ -253,5 +252,3 @@ inline RwFrame* RwFrameFindFrame(RwFrame* parent, const char* name)
     }
     return NULL;
 }
-
-#endif

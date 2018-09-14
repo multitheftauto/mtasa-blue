@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CEventDamageSA_H
-#define __CEventDamageSA_H
+#pragma once
 
 #include <windows.h>
 #include <game/CEventDamage.h>
@@ -103,5 +102,3 @@ public:
     void              SetDamageReason(EDamageReasonType damageReason) { m_DamageReason = damageReason; }
     EDamageReasonType GetDamageReason(void) { return m_DamageReason; }
 };
-
-#endif

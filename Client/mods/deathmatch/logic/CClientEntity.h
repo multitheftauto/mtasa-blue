@@ -10,8 +10,7 @@
 
 class CClientEntity;
 
-#ifndef __CCLIENTENTITY_H
-#define __CCLIENTENTITY_H
+#pragma once
 
 #include "CElementArray.h"
 #include "CClientCommon.h"
@@ -386,5 +385,3 @@ private:
     static void _GetEntitiesFromRoot(unsigned int uiTypeHash, std::map<CClientEntity*, int>& mapResults);
 #endif
 };
-
-#endif

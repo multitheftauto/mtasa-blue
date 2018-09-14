@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_MODELINFO
-#define __CGAMESA_MODELINFO
+#pragma once
 
 #include <game/CModelInfo.h>
 #include <game/Common.h>
@@ -363,5 +362,3 @@ public:
 private:
     void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);
 };
-
-#endif

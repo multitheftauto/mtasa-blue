@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CSETCURSORPOSHOOKINTERFACE_H
-#define __CSETCURSORPOSHOOKINTERFACE_H
+#pragma once
 
 class CSetCursorPosHookInterface
 {
@@ -24,5 +23,3 @@ public:
 
     virtual BOOL CallSetCursorPos(int X, int Y) = 0;
 };
-
-#endif

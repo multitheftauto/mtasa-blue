@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTMARKERMANAGER_H
-#define __CCLIENTMARKERMANAGER_H
+#pragma once
 
 #include "CClientMarker.h"
 #include <list>
@@ -40,5 +39,3 @@ private:
     CFastList<CClientMarker*> m_Markers;
     bool                      m_bCanRemoveFromList;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOREINTERFACE_H
-#define __CCOREINTERFACE_H
+#pragma once
 
 #include "CConsoleInterface.h"
 #include "CCommandsInterface.h"
@@ -180,5 +179,3 @@ class CClientTime
 public:
     static unsigned long GetTime(void) { return GetTickCount32(); }
 };
-
-#endif

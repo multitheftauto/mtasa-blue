@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUICHECKBOX_IMPL_H
-#define __CGUICHECKBOX_IMPL_H
+#pragma once
 
 #include <gui/CGUICheckBox.h>
 #include "CGUIElement_Impl.h"
@@ -28,5 +27,3 @@ public:
 
     #include "CGUIElement_Inc.h"
 };
-
-#endif

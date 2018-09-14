@@ -11,8 +11,7 @@
  *
  *****************************************************************************/
 
-#ifndef __RENDERWARE_COMPAT
-#define __RENDERWARE_COMPAT
+#pragma once
 
 /*****************************************************************************/
 /** RenderWare rendering types                                              **/
@@ -425,5 +424,3 @@ struct RwError
 {
     int err1, err2;
 };
-
-#endif

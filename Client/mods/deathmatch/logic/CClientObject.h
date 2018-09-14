@@ -10,8 +10,7 @@
 
 class CClientObject;
 
-#ifndef __CCLIENTOBJECT_H
-#define __CCLIENTOBJECT_H
+#pragma once
 
 #include "CClientStreamElement.h"
 
@@ -164,5 +163,3 @@ public:
     CObject*              m_pObject;
     SLastSyncedObjectData m_LastSyncedData;
 };
-
-#endif

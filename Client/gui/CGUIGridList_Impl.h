@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIGRIDLIST_IMPL_H
-#define __CGUIGRIDLIST_IMPL_H
+#pragma once
 
 #include <gui/CGUIGridList.h>
 #include "CGUIElement_Impl.h"
@@ -100,5 +99,3 @@ private:
 
     bool m_bIgnoreTextSpacer;
 };
-
-#endif

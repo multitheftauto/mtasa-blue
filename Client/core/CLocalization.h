@@ -15,8 +15,7 @@ using namespace tinygettext;
 #include "CLanguage.h"
 #define MTA_LOCALE_DIR  "MTA/locale/"
 
-#ifndef __CLOCALIZATION_H
-#define __CLOCALIZATION_H
+#pragma once
 
 class CLocalization : public CLocalizationInterface
 {
@@ -47,5 +46,3 @@ private:
     std::map<SString, CLanguage*> m_LanguageMap;
     CLanguage*                    m_pCurrentLang;
 };
-
-#endif

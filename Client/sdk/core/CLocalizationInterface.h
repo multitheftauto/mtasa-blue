@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CLOCALIZATIONINTERFACE_H
-#define __CLOCALIZATIONINTERFACE_H
+#pragma once
 
 #ifdef _
 #undef _
@@ -36,5 +35,3 @@ public:
     virtual SString              GetLanguageCode(void) = 0;
     virtual SString              GetLanguageName(void) = 0;
 };
-
-#endif

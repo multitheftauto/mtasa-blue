@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TEXT
-#define __CGAMESA_TEXT
+#pragma once
 
 #include <game/CText.h>
 
@@ -32,5 +31,3 @@ public:
     void  SetText(char* szKey, char* szValue);
     // char  * GetReplacementText ( char * szKey );
 };
-
-#endif

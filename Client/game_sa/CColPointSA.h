@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_COLPOINT
-#define __CGAMESA_COLPOINT
+#pragma once
 
 #include <game/CColPoint.h>
 #include <CVector.h>
@@ -79,5 +78,3 @@ public:
     }
     virtual float GetLightingForTimeOfDay(void);
 };
-
-#endif

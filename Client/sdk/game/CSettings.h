@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_SETTINGS
-#define __CGAME_SETTINGS
+#pragma once
 
 #if (!defined(RWFORCEENUMSIZEINT))
 #define RWFORCEENUMSIZEINT ((int)((~((unsigned int)0))>>1))
@@ -167,5 +166,3 @@ public:
 
     virtual void Save(void) = 0;
 };
-
-#endif

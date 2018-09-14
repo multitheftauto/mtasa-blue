@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __GAME_COMMON
-#define __GAME_COMMON
+#pragma once
 
 #include <windows.h>
 
@@ -1522,5 +1521,3 @@ enum eObjectProperty
     OBJECT_PROPERTY_BUOYANCY,
     OBJECT_PROPERTY_MAX,
 };
-
-#endif

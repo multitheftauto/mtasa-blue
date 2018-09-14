@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimManager_H
-#define __CAnimManager_H
+#pragma once
 
 #include <memory>
 
@@ -132,5 +131,3 @@ public:
     virtual const SString& GetGateWayBlockName(void) = 0;
     virtual const SString& GetGateWayAnimationName(void) = 0;
 };
-
-#endif

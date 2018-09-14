@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CWEAPONSTAT_H
-#define __CWEAPONSTAT_H
+#pragma once
 
 class CWeaponStat
 {
@@ -131,5 +130,3 @@ public:
     virtual BYTE GetCombosAvailable(void) = 0;
     virtual void SetCombosAvailable(BYTE nCombosAvailable) = 0;
 };
-
-#endif

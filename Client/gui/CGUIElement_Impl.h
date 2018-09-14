@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIELEMENT_IMPL_H
-#define __CGUIELEMENT_IMPL_H
+#pragma once
 
 #include <gui/CGUIElement.h>
 
@@ -157,5 +156,3 @@ protected:
     GUI_CALLBACK     m_OnEnter;
     GUI_CALLBACK_KEY m_OnKeyDownWithArgs;
 };
-
-#endif

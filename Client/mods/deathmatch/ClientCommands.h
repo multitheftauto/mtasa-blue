@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CLIENTCOMMANDS_H
-#define __CLIENTCOMMANDS_H
+#pragma once
 
 bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled, bool bIsScriptedBind);
 
@@ -86,5 +85,3 @@ void COMMAND_Debug4(const char* szCmdLine);
 // Commands enabled when development mode in on
 void COMMAND_ShowCollision(const char* szCmdLine);
 void COMMAND_ShowSound(const char* szCmdLine);
-
-#endif

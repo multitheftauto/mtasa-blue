@@ -10,8 +10,7 @@
 
 class CClientTextDisplay;
 
-#ifndef __CCLIENTTEXTDISPLAY_H
-#define __CCLIENTTEXTDISPLAY_H
+#pragma once
 
 #include "CClientDisplay.h"
 #include "CClientDisplayManager.h"
@@ -56,5 +55,3 @@ private:
 
     static float m_fGlobalScale;
 };
-
-#endif

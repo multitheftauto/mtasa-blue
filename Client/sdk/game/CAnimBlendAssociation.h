@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimBlendAssociation_H
-#define __CAnimBlendAssociation_H
+#pragma once
 
 #include <memory>
 
@@ -43,5 +42,3 @@ public:
     virtual void  SetAnimGroup(short sAnimGroup) = 0;
     virtual void  SetFlags(short sFlags) = 0;
 };
-
-#endif

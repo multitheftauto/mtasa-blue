@@ -11,8 +11,7 @@
 
 /*CAnimBlendAssociation: 1 per running animation?*/
 
-#ifndef __CAnimBlendAssociationSA_H
-#define __CAnimBlendAssociationSA_H
+#pragma once
 
 #include <game/CAnimBlendAssociation.h>
 #include "CAnimBlendNodeSA.h"
@@ -112,5 +111,3 @@ public:
 protected:
     CAnimBlendAssociationSAInterface* m_pInterface;
 };
-
-#endif

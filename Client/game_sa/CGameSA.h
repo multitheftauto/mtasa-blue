@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA
-#define __CGAMESA
+#pragma once
 
 #include "CModelInfoSA.h"
 #include "CFxManagerSA.h"
@@ -512,5 +511,3 @@ private:
     CPed*      m_pPedContext;
     CTickCount m_llASyncLoadingAutoUnsuspendTime;
 };
-
-#endif

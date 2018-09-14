@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUILABEL_H
-#define __CGUILABEL_H
+#pragma once
 
 #include "CGUIElement.h"
 
@@ -38,5 +37,3 @@ public:
     virtual float GetFontHeight(void) = 0;
     virtual float GetTextExtent(void) = 0;
 };
-
-#endif
