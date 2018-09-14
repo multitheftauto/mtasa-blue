@@ -18,7 +18,6 @@ CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_Mod
 
 std::map<unsigned short, int>                                                         CModelInfoSA::ms_RestreamTxdIDMap;
 std::map<DWORD, float>                                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
-std::set<uint>                                                                        CModelInfoSA::ms_ReplacedColModels;
 std::map<DWORD, BYTE>                                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<CVehicleModelInfoSAInterface*, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
 

@@ -80,6 +80,7 @@ void CLuaVehicleDefs::LoadFunctions(void)
         {"getVehicleComponentVisible", GetVehicleComponentVisible},
         {"getVehicleComponents", GetVehicleComponents},
         {"getVehicleModelExhaustFumesPosition", GetVehicleModelExhaustFumesPosition},
+        {"getVehicleModelDummyPosition", GetVehicleModelDummyPosition},
 
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
@@ -133,6 +134,7 @@ void CLuaVehicleDefs::LoadFunctions(void)
         {"setHeliBladeCollisionsEnabled", SetHeliBladeCollisionsEnabled},
         {"setVehicleWindowOpen", SetVehicleWindowOpen},
         {"setVehicleModelExhaustFumesPosition", SetVehicleModelExhaustFumesPosition},
+        {"setVehicleModelDummyPosition", SetVehicleModelDummyPosition },
     };
 
     // Add functions
