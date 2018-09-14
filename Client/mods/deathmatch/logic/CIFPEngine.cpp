@@ -115,7 +115,7 @@ bool CIFPEngine::EngineRestoreAnimation(CClientEntity* pEntity, const SString& s
     return false;
 }
 
-// Return true if data looks like IFP file contents
+// IsIFPData returns true if the provided data looks like an IFP file
 bool CIFPEngine::IsIFPData(const SString& strData)
 {
     return strData.length() > 32 && memcmp(strData, "\x41\x4E\x50", 3) == 0;
