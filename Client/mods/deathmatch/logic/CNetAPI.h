@@ -11,8 +11,7 @@
 
 class CNetAPI;
 
-#ifndef __CNETAPI__
-#define __CNETAPI__
+#pragma once
 
 #include "CClientCommon.h"
 #include "CClientManager.h"
@@ -127,5 +126,3 @@ private:
     uchar            m_ucBulletSyncOrderCounter;
     uchar            m_ucCustomWeaponBulletSyncOrderCounter;
 };
-
-#endif

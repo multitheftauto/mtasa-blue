@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __COutputRPCs_H
-#define __COutputRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
@@ -21,5 +20,3 @@ public:
 
     DECLARE_RPC(ToggleDebugger);
 };
-
-#endif

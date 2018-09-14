@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PEDSOUND
-#define __CGAMESA_PEDSOUND
+#pragma once
 
 #include <game/CPedSound.h>
 
@@ -90,5 +89,3 @@ public:
     static const char* GetVoiceTypeNameFromID(short sVoiceTypeID);
     static const char* GetVoiceNameFromID(short sVoiceTypeID, short sVoiceID);
 };
-
-#endif

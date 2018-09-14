@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CClientStreamSector_H
-#define __CClientStreamSector_H
+#pragma once
 
 #include <list>
 #include "CClientCommon.h"
@@ -67,5 +66,3 @@ private:
 
     class CClientRadarArea* m_pArea;
 };
-
-#endif

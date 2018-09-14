@@ -276,6 +276,11 @@ public:
     static bool           GetObjectScale(CClientObject& Object, CVector& vecScale);
     static bool           IsObjectBreakable(CClientObject& Object, bool& bBreakable);
     static bool           GetObjectMass(CClientObject& Object, float& fMass);
+    static bool           GetObjectTurnMass(CClientObject& Object, float& fTurnMass);
+    static bool           GetObjectAirResistance(CClientObject& Object, float& fAirResistance);
+    static bool           GetObjectElasticity(CClientObject& Object, float& fElasticity);
+    static bool           GetObjectBuoyancyConstant(CClientObject& Object, float& fBuoyancyConstant);
+    static bool           GetObjectCenterOfMass(CClientObject& Object, CVector& vecCenterOfMass);
     static bool           IsObjectVisibleInAllDimensions(CClientEntity& Entity);
 
     // Object set funcs
@@ -290,6 +295,11 @@ public:
     static bool RespawnObject(CClientEntity& Entity);
     static bool ToggleObjectRespawn(CClientEntity& Entity, bool bRespawn);
     static bool SetObjectMass(CClientEntity& Entity, float fMass);
+    static bool SetObjectTurnMass(CClientEntity& Entity, float fTurnMass);
+    static bool SetObjectAirResistance(CClientEntity& Entity, float fAirResistance);
+    static bool SetObjectElasticity(CClientEntity& Entity, float fElasticity);
+    static bool SetObjectBuoyancyConstant(CClientEntity& Entity, float fBuoyancyConstant);
+    static bool SetObjectCenterOfMass(CClientEntity& Entity, const CVector& vecCenterOfMass);
     static bool SetObjectVisibleInAllDimensions(CClientEntity& Entity, bool bVisible, unsigned short usNewDimension = 0);
 
     // Radar-area get funcs

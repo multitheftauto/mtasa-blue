@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimBlendAssociation_H
-#define __CAnimBlendAssociation_H
+#pragma once
 
 #include <memory>
 
@@ -27,6 +26,7 @@ class CAnimBlendAssociation
 public:
     virtual CAnimBlendAssociationSAInterface*    Constructor(CAnimBlendStaticAssociationSAInterface& StaticAssociationByReference) = 0;
     virtual CAnimBlendAssociationSAInterface*    Constructor(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy) = 0;
+    virtual void                                 InitializeWithHierarchy(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy) = 0;
     virtual CAnimBlendAssociationSAInterface*    InitializeForCustomAnimation(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy) = 0;
     virtual void                                 FreeAnimBlendNodeArray() = 0;
     virtual CAnimBlendAssociationSAInterface*    GetInterface() = 0;
@@ -42,5 +42,3 @@ public:
     virtual void  SetAnimGroup(short sAnimGroup) = 0;
     virtual void  SetFlags(short sFlags) = 0;
 };
-
-#endif

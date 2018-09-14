@@ -11,8 +11,7 @@
 
 /* CAnimBlendHierarchy: data tree on animation blending?*/
 
-#ifndef __CAnimBlendHierarchySA_H
-#define __CAnimBlendHierarchySA_H
+#pragma once
 
 #include <game/CAnimBlendHierarchy.h>
 #include "Common.h"
@@ -68,5 +67,3 @@ public:
 protected:
     CAnimBlendHierarchySAInterface* m_pInterface;
 };
-
-#endif

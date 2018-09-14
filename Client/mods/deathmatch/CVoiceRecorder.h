@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CVOICE_H
-#define __CVOICE_H
+#pragma once
 
 #define VOICE_BUFFER_LENGTH             200000
 #define VOICE_FREQUENCY                 44100
@@ -98,4 +97,3 @@ private:
     std::list<SString> m_EventQueue;
     CCriticalSection   m_CS;
 };
-#endif

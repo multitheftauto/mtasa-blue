@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTWEAPONMANAGER_H
-#define __CCLIENTWEAPONMANAGER_H
+#pragma once
 
 #include <list>
 class CClientWeapon;
@@ -32,5 +31,3 @@ private:
     std::list<CClientWeapon*> m_Weapons;
     bool                      m_bDeleteAll;
 };
-
-#endif

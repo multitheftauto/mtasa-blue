@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMODULELOADER_H
-#define __CMODULELOADER_H
+#pragma once
 
 #include <windows.h>
 #include <string>
@@ -35,5 +34,3 @@ private:
     bool    m_bStatus;
     SString m_strLastError;
 };
-
-#endif

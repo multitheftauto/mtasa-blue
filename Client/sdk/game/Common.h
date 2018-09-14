@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __GAME_COMMON
-#define __GAME_COMMON
+#pragma once
 
 #include <windows.h>
 
@@ -1529,4 +1528,14 @@ enum eVehicleDummies
     VEH_GUN,
 };
 
-#endif
+enum eObjectProperty
+{
+    OBJECT_PROPERTY_ALL,
+    OBJECT_PROPERTY_MASS,
+    OBJECT_PROPERTY_TURNMASS,
+    OBJECT_PROPERTY_AIRRESISTANCE,
+    OBJECT_PROPERTY_ELASTICITY,
+    OBJECT_PROPERTY_CENTEROFMASS,
+    OBJECT_PROPERTY_BUOYANCY,
+    OBJECT_PROPERTY_MAX,
+};

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_DAMAGEMANAGER
-#define __CGAMESA_DAMAGEMANAGER
+#pragma once
 
 #include <game/CDamageManager.h>
 #include "Common.h"
@@ -77,5 +76,3 @@ public:
         internalInterface = intInterface;
     };
 };
-
-#endif

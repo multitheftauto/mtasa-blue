@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUILISTITEM_IMPL_H
-#define __CGUILISTITEM_IMPL_H
+#pragma once
 
 #include <gui/CGUIListItem.h>
 #include <CEGUI.h>
@@ -62,5 +61,3 @@ private:
     std::string               m_strData;
     CGUICallback<void, void*> m_deleteDataCallback;
 };
-
-#endif

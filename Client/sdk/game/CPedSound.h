@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPedSound_H
-#define __CPedSound_H
+#pragma once
 
 class CPedSoundSAInterface;
 
@@ -28,5 +27,3 @@ public:
     virtual void EnablePedSpeech(void) = 0;
     virtual void DisablePedSpeech(bool bStopCurrent) = 0;
 };
-
-#endif

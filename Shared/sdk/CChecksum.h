@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CChecksum_H
-#define __CChecksum_H
+#pragma once
 
 // Depends on CMD5Hasher and CRCGenerator
 
@@ -49,5 +48,3 @@ public:
     unsigned long ulCRC;
     MD5           md5;
 };
-
-#endif

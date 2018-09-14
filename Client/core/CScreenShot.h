@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCORESCREENSHOT_H
-#define __CCORESCREENSHOT_H
+#pragma once
 
 #include "CCore.h"
 #include <time.h>
@@ -30,5 +29,3 @@ public:
     static bool  IsSaving(void);
     static DWORD ThreadProc(LPVOID lpdwThreadParam);
 };
-
-#endif

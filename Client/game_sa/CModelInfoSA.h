@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_MODELINFO
-#define __CGAMESA_MODELINFO
+#pragma once
 
 #include <game/CModelInfo.h>
 #include <game/Common.h>
@@ -282,8 +281,6 @@ protected:
     SVehicleSupportedUpgrades                                                                    m_ModelSupportedUpgrades;
 
 public:
-    static std::set<uint> ms_ReplacedColModels;
-
     CModelInfoSA(void);
     CModelInfoSA(DWORD dwModelID);
 
@@ -381,5 +378,3 @@ public:
 private:
     void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);
 };
-
-#endif

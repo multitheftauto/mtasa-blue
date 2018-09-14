@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTGROUPS_H
-#define __CCLIENTGROUPS_H
+#pragma once
 
 #include "CClientDummy.h"
 #include "CClientEntity.h"
@@ -32,5 +31,3 @@ private:
     std::list<CClientDummy*> m_List;
     bool                     m_bDontRemoveFromList;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TRAILER
-#define __CGAME_TRAILER
+#pragma once
 
 #include "CVehicle.h"
 
@@ -19,5 +18,3 @@ class CTrailer : public virtual CVehicle
 public:
     virtual ~CTrailer(void){};
 };
-
-#endif

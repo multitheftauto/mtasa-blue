@@ -8,8 +8,6 @@
  *
  *****************************************************************************/
 
-#ifndef __CIFPENGINE_H
-#define __CIFPENGINE_H
 #pragma once
 
 #include "game/CAnimBlendHierarchy.h"
@@ -32,5 +30,3 @@ public:
                                                               const eRestoreAnimation& eRestoreType);
     static bool                        IsIFPData(const SString& strData);
 };
-
-#endif

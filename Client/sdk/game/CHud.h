@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_HUD
-#define __CGAME_HUD
+#pragma once
 
 #include <windows.h>
 #include <CVector.h>
@@ -55,5 +54,3 @@ public:
     virtual void AdjustComponents(float fAspectRatio) = 0;
     virtual void ResetComponentAdjustment(void) = 0;
 };
-
-#endif

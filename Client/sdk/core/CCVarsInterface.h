@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCVARSINTERFACE_H
-#define __CCVARSINTERFACE_H
+#pragma once
 
 #include <string>
 
@@ -43,5 +42,3 @@ public:
         return value;
     }
 };
-
-#endif

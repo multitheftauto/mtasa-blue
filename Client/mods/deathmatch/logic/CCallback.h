@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCALLCALLBACK_H
-#define __CCALLCALLBACK_H
+#pragma once
 
 // Represents any callback
 template <typename Ret, typename Arguments>
@@ -81,5 +80,3 @@ public:
 protected:
     CCallbackInterface<Ret, Arguments>* m_pCallback;
 };
-
-#endif

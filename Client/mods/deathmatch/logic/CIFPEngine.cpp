@@ -56,6 +56,21 @@ bool CIFPEngine::EngineReplaceAnimation(CClientEntity* pEntity, const SString& s
             if (pInternalAnimHierarchy && pCustomAnimHierarchyInterface)
             {
                 Ped.ReplaceAnimation(pInternalAnimHierarchy, pCustomIFP, pCustomAnimHierarchyInterface);
+
+                CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
+                RpClump* pClump = Ped.GetClump();
+                if (pClump)
+                {
+                    auto pCurrentAnimAssociation = pAnimationManager->RpAnimBlendClumpGetAssociation(pClump, strInternalAnimName);
+                    if (pCurrentAnimAssociation)
+                    {
+                        auto pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pCustomAnimHierarchyInterface);
+                        pAnimationManager->UncompressAnimation(pAnimHierarchy.get());
+                        pCurrentAnimAssociation->FreeAnimBlendNodeArray();
+                        pCurrentAnimAssociation->InitializeWithHierarchy(pClump, pCustomAnimHierarchyInterface);
+                        pCurrentAnimAssociation->SetCurrentProgress(0.0);
+                    }
+                }
                 return true;
             }
         }
@@ -100,7 +115,7 @@ bool CIFPEngine::EngineRestoreAnimation(CClientEntity* pEntity, const SString& s
     return false;
 }
 
-// Return true if data looks like IFP file contents
+// IsIFPData returns true if the provided data looks like an IFP file
 bool CIFPEngine::IsIFPData(const SString& strData)
 {
     return strData.length() > 32 && memcmp(strData, "\x41\x4E\x50", 3) == 0;

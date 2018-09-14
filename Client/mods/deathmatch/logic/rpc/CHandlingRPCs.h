@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CHandlingRPCs_H
-#define __CHandlingRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
@@ -24,5 +23,3 @@ public:
     DECLARE_ELEMENT_RPC(RestoreVehicleHandlingProperty);
     DECLARE_ELEMENT_RPC(RestoreVehicleHandling);
 };
-
-#endif

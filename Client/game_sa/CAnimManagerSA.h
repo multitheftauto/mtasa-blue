@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimManagerSA_H
-#define __CAnimManagerSA_H
+#pragma once
 
 #include <game/CAnimManager.h>
 #include <game/CAnimBlendAssociation.h>
@@ -184,5 +183,3 @@ private:
     const SString m_kGateWayBlockName = "ped";
     const SString m_kGateWayAnimationName = "run_wuzi";
 };
-
-#endif

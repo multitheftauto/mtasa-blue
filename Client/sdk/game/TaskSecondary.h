@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TASKSECONDARY
-#define __CGAME_TASKSECONDARY
+#pragma once
 
 #include "Task.h"
 
@@ -28,5 +27,3 @@ class CTaskSimpleDuck : public virtual CTaskSimple
 public:
     virtual ~CTaskSimpleDuck(void){};
 };
-
-#endif

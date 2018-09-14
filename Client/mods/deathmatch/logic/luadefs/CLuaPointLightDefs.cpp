@@ -13,14 +13,22 @@
 
 void CLuaPointLightDefs::LoadFunctions(void)
 {
-    CLuaCFunctions::AddFunction("createLight", CreateLight);
-    CLuaCFunctions::AddFunction("getLightType", GetLightType);
-    CLuaCFunctions::AddFunction("getLightRadius", GetLightRadius);
-    CLuaCFunctions::AddFunction("setLightRadius", SetLightRadius);
-    CLuaCFunctions::AddFunction("getLightColor", GetLightColor);
-    CLuaCFunctions::AddFunction("setLightColor", SetLightColor);
-    CLuaCFunctions::AddFunction("getLightDirection", GetLightDirection);
-    CLuaCFunctions::AddFunction("setLightDirection", SetLightDirection);
+    std::map<const char*, lua_CFunction> functions{
+        {"createLight", CreateLight},
+        {"getLightType", GetLightType},
+        {"getLightRadius", GetLightRadius},
+        {"setLightRadius", SetLightRadius},
+        {"getLightColor", GetLightColor},
+        {"setLightColor", SetLightColor},
+        {"getLightDirection", GetLightDirection},
+        {"setLightDirection", SetLightDirection},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaPointLightDefs::AddClass(lua_State* luaVM)

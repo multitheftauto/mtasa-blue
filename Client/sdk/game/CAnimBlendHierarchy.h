@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimBlendHierarchy_H
-#define __CAnimBlendHierarchy_H
+#pragma once
 
 class CAnimBlendHierarchySAInterface;
 
@@ -34,5 +33,3 @@ public:
     virtual int                             GetAnimBlockID(void) = 0;
     virtual CAnimBlendHierarchySAInterface* GetInterface(void) = 0;
 };
-
-#endif

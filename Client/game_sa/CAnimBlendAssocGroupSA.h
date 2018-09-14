@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimBlendAssocGroupSA_H
-#define __CAnimBlendAssocGroupSA_H
+#pragma once
 
 #include <game/CAnimBlendAssocGroup.h>
 #include "CAnimBlendStaticAssociationSA.h"
@@ -63,5 +62,3 @@ protected:
     CAnimBlendAssocGroupSAInterface* m_pInterface;
     CAnimBlockSA*                    m_pAnimBlock;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimBlockSA_H
-#define __CAnimBlockSA_H
+#pragma once
 
 #include <game/CAnimBlock.h>
 #include "Common.h"
@@ -52,5 +51,3 @@ public:
 protected:
     CAnimBlockSAInterface* m_pInterface;
 };
-
-#endif

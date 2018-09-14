@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIPROGRESSBAR_IMPL_H
-#define __CGUIPROGRESSBAR_IMPL_H
+#pragma once
 
 #include <gui/CGUIProgressBar.h>
 #include "CGUIElement_Impl.h"
@@ -30,5 +29,3 @@ public:
 
 private:
 };
-
-#endif

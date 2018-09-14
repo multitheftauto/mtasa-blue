@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_CONROLLER_CONFIG_MANAGER
-#define __CGAMESA_CONROLLER_CONFIG_MANAGER
+#pragma once
 
 #include <game/CControllerConfigManager.h>
 
@@ -48,5 +47,3 @@ protected:
     bool m_bFlyWithMouse;
     bool m_bSuspendSteerAndFlyWithMouse;
 };
-
-#endif

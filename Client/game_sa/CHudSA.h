@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_HUD
-#define __CGAMESA_HUD
+#pragma once
 
 #include <game/CHud.h>
 #include <CVector.h>
@@ -91,5 +90,3 @@ protected:
     float* m_pfCameraCrosshairScale;
     float  m_fSniperCrosshairScale;
 };
-
-#endif

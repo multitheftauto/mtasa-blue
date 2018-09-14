@@ -15,44 +15,52 @@ extern bool g_bAllowAspectRatioAdjustment;
 
 void CLuaDrawingDefs::LoadFunctions(void)
 {
-    CLuaCFunctions::AddFunction("dxDrawLine", DxDrawLine);
-    CLuaCFunctions::AddFunction("dxDrawMaterialLine3D", DxDrawMaterialLine3D);
-    CLuaCFunctions::AddFunction("dxDrawMaterialSectionLine3D", DxDrawMaterialSectionLine3D);
-    CLuaCFunctions::AddFunction("dxDrawLine3D", DxDrawLine3D);
-    CLuaCFunctions::AddFunction("dxDrawText", DxDrawText);
-    CLuaCFunctions::AddFunction("dxDrawRectangle", DxDrawRectangle);
-    CLuaCFunctions::AddFunction("dxDrawCircle", DxDrawCircle);
-    CLuaCFunctions::AddFunction("dxDrawImage", DxDrawImage);
-    CLuaCFunctions::AddFunction("dxDrawImageSection", DxDrawImageSection);
-    //CLuaCFunctions::AddFunction("dxDrawPrimitive", DxDrawPrimitive);
-    //CLuaCFunctions::AddFunction("dxDrawMaterialPrimitive", DxDrawMaterialPrimitive);
-    CLuaCFunctions::AddFunction("dxGetTextWidth", DxGetTextWidth);
-    CLuaCFunctions::AddFunction("dxGetFontHeight", DxGetFontHeight);
-    CLuaCFunctions::AddFunction("dxCreateFont", DxCreateFont);
-    CLuaCFunctions::AddFunction("dxCreateTexture", DxCreateTexture);
-    CLuaCFunctions::AddFunction("dxCreateShader", DxCreateShader);
-    CLuaCFunctions::AddFunction("dxCreateRenderTarget", DxCreateRenderTarget);
-    CLuaCFunctions::AddFunction("dxCreateScreenSource", DxCreateScreenSource);
-    CLuaCFunctions::AddFunction("dxGetMaterialSize", DxGetMaterialSize);
-    CLuaCFunctions::AddFunction("dxSetShaderValue", DxSetShaderValue);
-    CLuaCFunctions::AddFunction("dxSetShaderTessellation", DxSetShaderTessellation);
-    CLuaCFunctions::AddFunction("dxSetShaderTransform", DxSetShaderTransform);
-    CLuaCFunctions::AddFunction("dxSetRenderTarget", DxSetRenderTarget);
-    CLuaCFunctions::AddFunction("dxUpdateScreenSource", DxUpdateScreenSource);
-    CLuaCFunctions::AddFunction("dxGetStatus", DxGetStatus);
-    CLuaCFunctions::AddFunction("dxSetTestMode", DxSetTestMode);
-    CLuaCFunctions::AddFunction("dxGetTexturePixels", DxGetTexturePixels);
-    CLuaCFunctions::AddFunction("dxSetTexturePixels", DxSetTexturePixels);
-    CLuaCFunctions::AddFunction("dxGetPixelsSize", DxGetPixelsSize);
-    CLuaCFunctions::AddFunction("dxGetPixelsFormat", DxGetPixelsFormat);
-    CLuaCFunctions::AddFunction("dxConvertPixels", DxConvertPixels);
-    CLuaCFunctions::AddFunction("dxGetPixelColor", DxGetPixelColor);
-    CLuaCFunctions::AddFunction("dxSetPixelColor", DxSetPixelColor);
-    CLuaCFunctions::AddFunction("dxSetBlendMode", DxSetBlendMode);
-    CLuaCFunctions::AddFunction("dxGetBlendMode", DxGetBlendMode);
-    CLuaCFunctions::AddFunction("dxSetAspectRatioAdjustmentEnabled", DxSetAspectRatioAdjustmentEnabled);
-    CLuaCFunctions::AddFunction("dxIsAspectRatioAdjustmentEnabled", DxIsAspectRatioAdjustmentEnabled);
-    CLuaCFunctions::AddFunction("dxSetTextureEdge", DxSetTextureEdge);
+    std::map<const char*, lua_CFunction> functions{
+        {"dxDrawLine", DxDrawLine},
+        {"dxDrawMaterialLine3D", DxDrawMaterialLine3D},
+        {"dxDrawMaterialSectionLine3D", DxDrawMaterialSectionLine3D},
+        {"dxDrawLine3D", DxDrawLine3D},
+        {"dxDrawText", DxDrawText},
+        {"dxDrawRectangle", DxDrawRectangle},
+        {"dxDrawCircle", DxDrawCircle},
+        {"dxDrawImage", DxDrawImage},
+        {"dxDrawImageSection", DxDrawImageSection},
+        {"dxDrawPrimitive", DxDrawPrimitive},
+        {"dxDrawMaterialPrimitive", DxDrawMaterialPrimitive},
+        {"dxGetTextWidth", DxGetTextWidth},
+        {"dxGetFontHeight", DxGetFontHeight},
+        {"dxCreateFont", DxCreateFont},
+        {"dxCreateTexture", DxCreateTexture},
+        {"dxCreateShader", DxCreateShader},
+        {"dxCreateRenderTarget", DxCreateRenderTarget},
+        {"dxCreateScreenSource", DxCreateScreenSource},
+        {"dxGetMaterialSize", DxGetMaterialSize},
+        {"dxSetShaderValue", DxSetShaderValue},
+        {"dxSetShaderTessellation", DxSetShaderTessellation},
+        {"dxSetShaderTransform", DxSetShaderTransform},
+        {"dxSetRenderTarget", DxSetRenderTarget},
+        {"dxUpdateScreenSource", DxUpdateScreenSource},
+        {"dxGetStatus", DxGetStatus},
+        {"dxSetTestMode", DxSetTestMode},
+        {"dxGetTexturePixels", DxGetTexturePixels},
+        {"dxSetTexturePixels", DxSetTexturePixels},
+        {"dxGetPixelsSize", DxGetPixelsSize},
+        {"dxGetPixelsFormat", DxGetPixelsFormat},
+        {"dxConvertPixels", DxConvertPixels},
+        {"dxGetPixelColor", DxGetPixelColor},
+        {"dxSetPixelColor", DxSetPixelColor},
+        {"dxSetBlendMode", DxSetBlendMode},
+        {"dxGetBlendMode", DxGetBlendMode},
+        {"dxSetAspectRatioAdjustmentEnabled", DxSetAspectRatioAdjustmentEnabled},
+        {"dxIsAspectRatioAdjustmentEnabled", DxIsAspectRatioAdjustmentEnabled},
+        {"dxSetTextureEdge", DxSetTextureEdge},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaDrawingDefs::AddClass(lua_State* luaVM)

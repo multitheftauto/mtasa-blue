@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CFILE_H
-#define __CFILE_H
+#pragma once
 
 #include "CClientEntity.h"
 #include <stdio.h>
@@ -77,5 +76,3 @@ private:
     eAccessType           m_accessType;
     SLuaDebugInfo         m_LuaDebugInfo;
 };
-
-#endif

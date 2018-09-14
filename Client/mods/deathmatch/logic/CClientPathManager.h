@@ -10,8 +10,7 @@
 
 class CClientPathManager;
 
-#ifndef __CCLIENTPATHMANAGER_H
-#define __CCLIENTPATHMANAGER_H
+#pragma once
 
 #include "CClientPathNode.h"
 #include "CClientManager.h"
@@ -47,5 +46,3 @@ private:
     std::list<CClientPathNode*> m_PathNodeList;
     bool                        m_bRemoveFromList;
 };
-
-#endif
