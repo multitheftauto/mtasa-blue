@@ -8,8 +8,6 @@
  *
  *****************************************************************************/
 
-#ifndef __CIFPANIMATIONS_H
-#define __CIFPANIMATIONS_H
 #pragma once
 
 #include "CClientIFP.h"
@@ -31,4 +29,3 @@ public:
     ~CIFPAnimations(void);
     void DeleteAnimations(void);
 };
-#endif
