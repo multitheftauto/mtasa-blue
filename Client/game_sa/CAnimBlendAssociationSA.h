@@ -92,7 +92,7 @@ public:
     CAnimBlendAssociationSAInterface*    Constructor(CAnimBlendStaticAssociationSAInterface& StaticAssociationByReference);
     CAnimBlendAssociationSAInterface*    Constructor(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy);
     CAnimBlendAssociationSAInterface*    InitializeForCustomAnimation(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy);
-    void                                 InitializeWithHierarchy(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy);
+    void                                 Init(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy);
     void                                 AllocateAnimBlendNodeArray(int count);
     void                                 FreeAnimBlendNodeArray();
     CAnimBlendAssociationSAInterface*    GetInterface() { return m_pInterface; }

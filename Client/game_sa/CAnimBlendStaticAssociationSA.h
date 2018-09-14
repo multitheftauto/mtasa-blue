@@ -9,8 +9,6 @@
  *
  *****************************************************************************/
 
-/* CAnimBlendStaticAssociation: 1 per uncompressed animation?*/
-
 #pragma once
 
 #include <game/CAnimBlendStaticAssociation.h>
