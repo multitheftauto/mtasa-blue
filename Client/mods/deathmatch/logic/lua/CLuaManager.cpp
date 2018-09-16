@@ -301,6 +301,7 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("resetMoonSize", CLuaFunctionDefs::ResetMoonSize);
     CLuaCFunctions::AddFunction("setFPSLimit", CLuaFunctionDefs::SetFPSLimit);
     CLuaCFunctions::AddFunction("getFPSLimit", CLuaFunctionDefs::GetFPSLimit);
+    CLuaCFunctions::AddFunction("getCurrentFPS", CLuaFunctionDefs::GetCurrentFPS);
     CLuaCFunctions::AddFunction("fetchRemote", CLuaFunctionDefs::FetchRemote);
 
     // World set funcs

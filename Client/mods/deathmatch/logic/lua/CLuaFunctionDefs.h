@@ -177,6 +177,7 @@ public:
     LUA_DECLARE(ResetMoonSize);
     LUA_DECLARE(SetFPSLimit);
     LUA_DECLARE(GetFPSLimit);
+    LUA_DECLARE(GetCurrentFPS);
     LUA_DECLARE(FetchRemote);
 
     // Input functions
