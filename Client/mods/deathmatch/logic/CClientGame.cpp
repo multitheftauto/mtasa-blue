@@ -2890,7 +2890,7 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientFileDownloadComplete", "fileName, success", NULL, false);
 
     m_Events.AddEvent("onClientWeaponFire", "ped, x, y, z", NULL, false);
-    m_Events.AddEvent("onWaterCannonWorldHit", "test", NULL, false);
+    m_Events.AddEvent("onWaterCannonWorldHit", "x, y, z, normalx, normaly, normalz, materialid", NULL, false);
 }
 
 void CClientGame::DrawFPS(void)
