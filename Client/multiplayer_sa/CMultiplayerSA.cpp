@@ -361,6 +361,7 @@ ObjectDamageHandler*        m_pObjectDamageHandler = NULL;
 ObjectBreakHandler*         m_pObjectBreakHandler = NULL;
 FxSystemDestructionHandler* m_pFxSystemDestructionHandler = NULL;
 DrivebyAnimationHandler*    m_pDrivebyAnimationHandler = NULL;
+WaterCannonHitWorldHandler* m_pWaterCannonHitWorldHandler = nullptr;
 
 CEntitySAInterface* dwSavedPlayerPointer = 0;
 CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active
@@ -514,6 +515,8 @@ void HOOK_CAERadioTrackManager__ChooseMusicTrackIndex();
 
 void HOOK_CAEVehicleAudioEntity__ProcessDummyHeli();
 void HOOK_CAEVehicleAudioEntity__ProcessDummyProp();
+
+void HOOK_WaterCannonHitWorld();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -743,6 +746,8 @@ void CMultiplayerSA::InitHooks()
 
     HookInstall(HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyHeli, (DWORD)HOOK_CAEVehicleAudioEntity__ProcessDummyHeli, 5);
     HookInstall(HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyProp, (DWORD)HOOK_CAEVehicleAudioEntity__ProcessDummyProp, 5);
+
+    HookInstall(0x72932A, (DWORD)HOOK_WaterCannonHitWorld, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -1474,6 +1479,9 @@ void CMultiplayerSA::InitHooks()
     // Disable call to CAEVehicleAudioEntity::JustGotOutOfVehicleAsDriver
     MemSetFast((void*)0x502341, 0x90, 5);
 
+    // Allow water cannon to hit objects created by createObject
+    MemSet((void*)0x72925D, 1, 1);
+
     InitHooks_CrashFixHacks();
 
     // Init our 1.3 hooks.
@@ -1486,6 +1494,8 @@ void CMultiplayerSA::InitHooks()
 }
 
 // Used to store copied pointers for explosions in the FxSystem
+
+DWORD CONTINUE_WaterCannonHit = 0x0072932F;
 
 std::list<DWORD*> Pointers_FxSystem;
 
@@ -2232,6 +2242,11 @@ void CMultiplayerSA::SetFxSystemDestructionHandler(FxSystemDestructionHandler* p
 void CMultiplayerSA::SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler)
 {
     m_pDrivebyAnimationHandler = pHandler;
+}
+
+void CMultiplayerSA::SetWaterCannonHitWorldHandler(WaterCannonHitWorldHandler* pHandler)
+{
+    m_pWaterCannonHitWorldHandler = pHandler;
 }
 
 // What we do here is check if the idle handler has been set
@@ -6827,5 +6842,35 @@ void _declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyProp()
         call    dwFUNC_CAEVehicleAudioEntity__ProcessAIProp
         // go back
         jmp     RETURN_CAEVEhicleAudioEntity__ProcessDummyProp
+    }
+}
+
+static void __cdecl Hook_CannonHitWorld(CColPointSAInterface& pColPoint, CEntitySAInterface& pEntity)
+{
+    if (m_pWaterCannonHitWorldHandler)
+    {
+        m_pWaterCannonHitWorldHandler(pColPoint, pEntity);
+    }
+}
+
+static void _declspec(naked) HOOK_WaterCannonHitWorld()
+{
+    _asm
+    {
+        pushad
+        lea eax, [esp + 100h - 58h]
+        push eax
+        lea eax, [esp + 104h - 54h]
+        push eax
+        call Hook_CannonHitWorld
+        add     esp, 8
+        popad
+    }
+
+    _asm
+    {
+        push 3E4CCCCDh
+        mov eax, CONTINUE_WaterCannonHit
+        jmp eax
     }
 }
