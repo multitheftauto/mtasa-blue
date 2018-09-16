@@ -505,49 +505,11 @@ const SString& CLuaMain::GetFunctionTag(int iLuaFunction)
 int CLuaMain::PCall(lua_State* L, int nargs, int nresults, int errfunc)
 {
     TIMING_CHECKPOINT("+pcall");
-    std::exception_ptr pException{};
-
     g_pClientGame->ChangeFloatPrecision(true);
     g_pClientGame->GetScriptDebugging()->PushLuaMain(this);
-    int iret = 0;
-
-    try
-    {
-        iret = lua_pcall(L, nargs, nresults, errfunc);
-    }
-    catch (std::bad_alloc& e)
-    {
-        AddExceptionReportLog(7550, "std::bad_alloc", e.what());
-        pException = std::current_exception();
-    }
-    catch (std::runtime_error& e)
-    {
-        AddExceptionReportLog(7551, "std::runtime_error", e.what());
-        pException = std::current_exception();
-    }
-    catch (std::exception& e)
-    {
-        AddExceptionReportLog(7552, "std::exception", e.what());
-        pException = std::current_exception();
-    }
-    catch (std::string& e)
-    {
-        AddExceptionReportLog(7553, "std::string", e.c_str());
-        pException = std::current_exception();
-    }
-    catch (...)
-    {
-        AddReportLog(7554, "CLuaMain::PCall - Unexpected exception thrown");
-    }
-
-    if (pException)
-    {
-        std::rethrow_exception(pException);
-    }
-
+    const int iret = lua_pcall(L, nargs, nresults, errfunc);
     g_pClientGame->GetScriptDebugging()->PopLuaMain(this);
     g_pClientGame->ChangeFloatPrecision(false);
-
     TIMING_CHECKPOINT("-pcall");
     return iret;
 }
