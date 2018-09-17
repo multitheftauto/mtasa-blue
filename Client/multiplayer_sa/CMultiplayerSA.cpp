@@ -6845,11 +6845,11 @@ void _declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyProp()
     }
 }
 
-static void __cdecl Hook_CannonHitWorld(CColPointSAInterface& pColPoint, CEntitySAInterface& pEntity)
+static void __cdecl Hook_CannonHitWorld(CColPointSAInterface& pColPoint)
 {
     if (m_pWaterCannonHitWorldHandler)
     {
-        m_pWaterCannonHitWorldHandler(pColPoint, pEntity);
+        m_pWaterCannonHitWorldHandler(pColPoint);
     }
 }
 
@@ -6860,15 +6860,10 @@ static void _declspec(naked) HOOK_WaterCannonHitWorld()
         pushad
         lea eax, [esp + 100h - 58h]
         push eax
-        lea eax, [esp + 104h - 54h]
-        push eax
         call Hook_CannonHitWorld
-        add     esp, 8
+        add     esp, 4
         popad
-    }
 
-    _asm
-    {
         push 3E4CCCCDh
         mov eax, CONTINUE_WaterCannonHit
         jmp eax

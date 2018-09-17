@@ -99,7 +99,7 @@ typedef void(GameModelRemoveHandler)(ushort usModelId);
 typedef void(GameEntityRenderHandler)(CEntitySAInterface* pEntity);
 typedef void(FxSystemDestructionHandler)(void* pFxSA);
 typedef AnimationId(DrivebyAnimationHandler)(AnimationId animGroup, AssocGroupId animId);
-typedef void(WaterCannonHitWorldHandler)(CColPointSAInterface& pColPoint, CEntitySAInterface& pEntity);
+typedef void(WaterCannonHitWorldHandler)(CColPointSAInterface& pColPoint);
 
 /**
  * This class contains information used for shot syncing, one exists per player.

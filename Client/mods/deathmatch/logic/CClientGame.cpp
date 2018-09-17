@@ -3804,9 +3804,9 @@ AnimationId CClientGame::StaticDrivebyAnimationHandler(AnimationId animGroup, As
     return g_pClientGame->DrivebyAnimationHandler(animGroup, animId);
 }
 
-void CClientGame::StaticWaterCannonHitWorldHandler(CColPointSAInterface& pColPoint, CEntitySAInterface& pEntity)
+void CClientGame::StaticWaterCannonHitWorldHandler(CColPointSAInterface& pColPoint)
 {
-    return g_pClientGame->WaterCannonHitWorldHandler(pColPoint, pEntity);
+    return g_pClientGame->WaterCannonHitWorldHandler(pColPoint);
 }
 
 void CClientGame::DrawRadarAreasHandler(void)
@@ -6881,7 +6881,7 @@ void CClientGame::RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInter
     m_mapOfCustomAnimationAssociations.erase(pAnimAssociation);
 }
 
-void CClientGame::WaterCannonHitWorldHandler(CColPointSAInterface& pColPoint, CEntitySAInterface& pEntity)
+void CClientGame::WaterCannonHitWorldHandler(CColPointSAInterface& pColPoint)
 {
     CLuaArguments Arguments;
     Arguments.PushNumber(pColPoint.Position.fX);
@@ -6891,13 +6891,5 @@ void CClientGame::WaterCannonHitWorldHandler(CColPointSAInterface& pColPoint, CE
     Arguments.PushNumber(pColPoint.Normal.fY);
     Arguments.PushNumber(pColPoint.Normal.fZ);
     Arguments.PushNumber(pColPoint.ucSurfaceTypeB);
-    /*if (&pEntity != nullptr) // seems to not work
-    {
-        CClientEntity* pClientEntity = g_pClientGame->GetGameEntityXRefManager()->FindClientEntity(&pEntity);
-        Arguments.PushElement(pClientEntity);
-    }
-    else
-        Arguments.PushBoolean(false);*/
-
     GetRootEntity()->CallEvent("onWaterCannonWorldHit", Arguments, true);
 }
