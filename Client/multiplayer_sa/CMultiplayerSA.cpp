@@ -294,6 +294,12 @@ DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIHeli = FUNC_CAEVehicleAudioEntity__
 DWORD RETURN_CAEVEhicleAudioEntity__ProcessDummyProp = 0x4FDFAB;
 DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIProp = FUNC_CAEVehicleAudioEntity__ProcessAIProp;
 
+#define HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance   0x68A4EF
+DWORD RETURN_CTaskSimpleSwim_ProcessSwimmingResistance = 0x68A50E;
+
+#define HOOKPOS_WatterCannonHitWorld   0x72932A
+DWORD CONTINUE_WaterCannonHit = 0x72932F;
+
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
 FLOAT         fFalseHeading;
@@ -515,6 +521,8 @@ void HOOK_CAERadioTrackManager__ChooseMusicTrackIndex();
 
 void HOOK_CAEVehicleAudioEntity__ProcessDummyHeli();
 void HOOK_CAEVehicleAudioEntity__ProcessDummyProp();
+
+void HOOK_CTaskSimpleSwim_ProcessSwimmingResistance();
 
 void HOOK_WaterCannonHitWorld();
 
@@ -747,7 +755,10 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyHeli, (DWORD)HOOK_CAEVehicleAudioEntity__ProcessDummyHeli, 5);
     HookInstall(HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyProp, (DWORD)HOOK_CAEVehicleAudioEntity__ProcessDummyProp, 5);
 
-    HookInstall(0x72932A, (DWORD)HOOK_WaterCannonHitWorld, 5);
+    // Fix GTA:SA swimming speed problem on higher fps
+    HookInstall(HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance, (DWORD)HOOK_CTaskSimpleSwim_ProcessSwimmingResistance, 6);
+
+    HookInstall(HOOKPOS_WatterCannonHitWorld, (DWORD)HOOK_WaterCannonHitWorld, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -1479,8 +1490,8 @@ void CMultiplayerSA::InitHooks()
     // Disable call to CAEVehicleAudioEntity::JustGotOutOfVehicleAsDriver
     MemSetFast((void*)0x502341, 0x90, 5);
 
-    // Allow water cannon to hit objects created by createObject
-    MemSet((void*)0x72925D, 1, 1);
+    // Allow water cannon hit objects created by CreateObject
+    MemSetFast((void*)0x72925D, 0x1, 1);
 
     InitHooks_CrashFixHacks();
 
@@ -1494,8 +1505,6 @@ void CMultiplayerSA::InitHooks()
 }
 
 // Used to store copied pointers for explosions in the FxSystem
-
-DWORD CONTINUE_WaterCannonHit = 0x0072932F;
 
 std::list<DWORD*> Pointers_FxSystem;
 
@@ -6842,6 +6851,39 @@ void _declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyProp()
         call    dwFUNC_CAEVehicleAudioEntity__ProcessAIProp
         // go back
         jmp     RETURN_CAEVEhicleAudioEntity__ProcessDummyProp
+    }
+}
+
+const float kfTimeStepOriginal = 1.66f;
+void _declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
+{
+    _asm
+    {
+        fsub    st, st(1)
+
+        fld     dword ptr[esp + 16]
+        lea     eax, [esi + 44h]
+        mov     ecx, eax
+        fmul    st, st(1)
+
+        fdiv    ds : 0xB7CB5C
+        fmul    kfTimeStepOriginal
+
+        fstp    dword ptr[esp + 28]
+
+        fld     dword ptr[esp + 20]
+        fmul    st, st(1)
+
+        fdiv    ds : 0xB7CB5C
+        fmul    kfTimeStepOriginal
+
+        fstp    dword ptr[esp + 32]
+        fmul    dword ptr[esp + 24]
+
+        fdiv    ds : 0xB7CB5C
+        fmul    kfTimeStepOriginal
+
+        jmp     RETURN_CTaskSimpleSwim_ProcessSwimmingResistance
     }
 }
 
