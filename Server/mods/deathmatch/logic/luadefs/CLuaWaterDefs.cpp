@@ -13,14 +13,22 @@
 
 void CLuaWaterDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("createWater", CreateWater);
-    CLuaCFunctions::AddFunction("setWaterLevel", SetWaterLevel);
-    CLuaCFunctions::AddFunction("resetWaterLevel", ResetWaterLevel);
-    CLuaCFunctions::AddFunction("getWaterVertexPosition", GetWaterVertexPosition);
-    CLuaCFunctions::AddFunction("setWaterVertexPosition", SetWaterVertexPosition);
-    CLuaCFunctions::AddFunction("getWaterColor", GetWaterColor);
-    CLuaCFunctions::AddFunction("setWaterColor", SetWaterColor);
-    CLuaCFunctions::AddFunction("resetWaterColor", ResetWaterColor);
+    std::map<const char*, lua_CFunction> functions{
+        {"createWater", CreateWater},
+        {"setWaterLevel", SetWaterLevel},
+        {"resetWaterLevel", ResetWaterLevel},
+        {"getWaterVertexPosition", GetWaterVertexPosition},
+        {"setWaterVertexPosition", SetWaterVertexPosition},
+        {"getWaterColor", GetWaterColor},
+        {"setWaterColor", SetWaterColor},
+        {"resetWaterColor", ResetWaterColor},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaWaterDefs::AddClass(lua_State* luaVM)

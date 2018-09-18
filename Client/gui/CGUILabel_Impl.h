@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUILABEL_IMPL_H
-#define __CGUILABEL_IMPL_H
+#pragma once
 
 #include <gui/CGUILabel.h>
 #include "CGUIElement_Impl.h"
@@ -48,5 +47,3 @@ public:
     #include "CGUIElement_Inc.h"
     #undef EXCLUDE_SET_TEXT
 };
-
-#endif

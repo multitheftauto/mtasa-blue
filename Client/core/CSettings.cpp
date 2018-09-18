@@ -407,7 +407,8 @@ void CSettings::CreateGUI(void)
     /**
      *  Audio tab
      **/
-    fIndentX = pManager->CGUI_GetMaxTextExtent("default-normal", _("Master volume:"), _("Radio volume:"), _("SFX volume:"), _("MTA volume:"), _("Voice volume:"), _("Play mode:"));
+    fIndentX = pManager->CGUI_GetMaxTextExtent("default-normal", _("Master volume:"), _("Radio volume:"), _("SFX volume:"), _("MTA volume:"),
+                                               _("Voice volume:"), _("Play mode:"));
 
     m_pAudioGeneralLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("General")));
     m_pAudioGeneralLabel->SetPosition(CVector2D(11, 13));
@@ -1934,12 +1935,10 @@ void CSettings::CreateInterfaceTabGUI(void)
         m_pInterfaceLanguageSelector->SetReadOnly(true);
 
         // Grab languages and populate
-        std::map<SString, SString> availableLanguagesMap = g_pCore->GetLocalization()->GetAvailableLanguages();
-        availableLanguagesMap["English"] = "en_US";
-
-        for (const auto& language : availableLanguagesMap)
+        for (const auto& strLocale : g_pCore->GetLocalization()->GetAvailableLocales())
         {
-            m_pInterfaceLanguageSelector->AddItem(language.first)->SetData(language.second);
+            SString strLanguageName = g_pLocalization->GetLanguageNativeName(strLocale);
+            m_pInterfaceLanguageSelector->AddItem(strLanguageName)->SetData(strLocale);
         }
 
         // Skin
@@ -4051,7 +4050,7 @@ bool CSettings::OnMasterVolumeChanged(CGUIElement* pElement)
 {
     int iVolume = m_pAudioMasterVolume->GetScrollPosition() * 100.0f;
     m_pLabelMasterVolumeValue->SetText(SString("%i%%", iVolume).c_str());
-    
+
     CVARS_SET("mastervolume", m_pAudioMasterVolume->GetScrollPosition());
 
     OnRadioVolumeChanged(nullptr);

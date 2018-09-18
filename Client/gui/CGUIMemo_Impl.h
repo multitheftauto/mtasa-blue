@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIMEMO_IMPL_H
-#define __CGUIMEMO_IMPL_H
+#pragma once
 
 #include <gui/CGUIMemo.h>
 #include "CGUIElement_Impl.h"
@@ -54,5 +53,3 @@ private:
 
     GUI_CALLBACK m_TextChanged;
 };
-
-#endif

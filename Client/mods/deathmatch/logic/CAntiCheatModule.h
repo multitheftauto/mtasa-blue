@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CANTICHEATMODULE_H
-#define __CANTICHEATMODULE_H
+#pragma once
 
 class CAntiCheatModule
 {
@@ -25,5 +24,3 @@ public:
 private:
     class CAntiCheat& m_AntiCheat;
 };
-
-#endif

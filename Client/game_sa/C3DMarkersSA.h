@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_MARKERS
-#define __CGAMESA_MARKERS
+#pragma once
 
 #ifdef GTASA_30
 
@@ -45,5 +44,3 @@ public:
     C3DMarker* FindFreeMarker();
     C3DMarker* FindMarker(DWORD Identifier);
 };
-
-#endif

@@ -10,8 +10,7 @@
 
 class CClientPickupManager;
 
-#ifndef __CCLIENTPICKUPMANAGER_H
-#define __CCLIENTPICKUPMANAGER_H
+#pragma once
 
 #include "CClientManager.h"
 #include "CClientPickup.h"
@@ -59,5 +58,3 @@ private:
     bool                m_bPickupProcessingDisabled;
     static unsigned int m_uiPickupCount;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMULTIPLAYER
-#define __CMULTIPLAYER
+#pragma once
 
 #include <CMatrix.h>
 #include <CVector.h>
@@ -356,5 +355,3 @@ public:
     virtual void SetBoatWaterSplashEnabled(bool bEnabled) = 0;
     virtual void SetTyreSmokeEnabled(bool bEnabled) = 0;
 };
-
-#endif

@@ -11,8 +11,7 @@
 
 class CCredits;
 
-#ifndef __CCREDITS_H
-#define __CCREDITS_H
+#pragma once
 
 #include "CMainMenu.h"
 #include <ctime>
@@ -38,5 +37,3 @@ private:
 
     clock_t m_clkStart;
 };
-
-#endif

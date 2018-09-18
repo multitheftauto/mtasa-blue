@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TASKBASIC
-#define __CGAME_TASKBASIC
+#pragma once
 
 #include "Task.h"
 
@@ -95,5 +94,3 @@ class CTaskComplexFacial : public virtual CTaskComplex
 public:
     virtual ~CTaskComplexFacial(void){};
 };
-
-#endif

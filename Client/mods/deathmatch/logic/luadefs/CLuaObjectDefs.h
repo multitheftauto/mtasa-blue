@@ -25,7 +25,8 @@ public:
     LUA_DECLARE(IsObjectStatic);
     LUA_DECLARE(GetObjectScale);
     LUA_DECLARE(IsObjectBreakable);
-    LUA_DECLARE(GetObjectMass);
+    LUA_DECLARE(GetObjectProperty);
+    LUA_DECLARE(GetObjectProperties);
 
     // Object set funcs
     LUA_DECLARE(SetObjectRotation);
@@ -37,5 +38,5 @@ public:
     LUA_DECLARE(BreakObject);
     LUA_DECLARE(RespawnObject);
     LUA_DECLARE(ToggleObjectRespawn);
-    LUA_DECLARE(SetObjectMass);
+    LUA_DECLARE(SetObjectProperty);
 };

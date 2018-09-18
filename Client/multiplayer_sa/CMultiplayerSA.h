@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMULTIPLAYERSA
-#define __CMULTIPLAYERSA
+#pragma once
 
 #include <game/CGame.h>
 #include <multiplayer/CMultiplayer.h>
@@ -337,5 +336,3 @@ private:
 
     static unsigned long FUNC_CPlayerInfoBase;
 };
-
-#endif

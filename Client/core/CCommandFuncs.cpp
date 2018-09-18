@@ -54,7 +54,6 @@ void CCommandFuncs::Help(const char* szParameters)
     pConsole->Printf("***[--------------]***\n");
 }
 
-void dumpbasj();
 void CCommandFuncs::Exit(const char* szParameters)
 {
     g_pCore->Quit();
@@ -305,6 +304,18 @@ void CCommandFuncs::Connect(const char* szParameters)
     {
         CCore::GetSingleton().GetConsole()->Print(_("connect: Failed to unload current mod"));
     }
+}
+
+void CCommandFuncs::ReloadNews(const char* szParameters)
+{
+    if (CModManager::GetSingleton().GetCurrentMod())
+    {
+        CCore::GetSingleton().GetConsole()->Print("reloadnews: can't do this whilst connected to server");
+        return;
+    }
+
+    CCore::GetSingleton().GetConsole()->Print("reloadnews: reloading");
+    g_pCore->GetLocalGUI()->GetMainMenu()->ReloadNews();
 }
 
 void CCommandFuncs::Reconnect(const char* szParameters)

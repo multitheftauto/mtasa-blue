@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCOLCIRCLE_H
-#define __CCLIENTCOLCIRCLE_H
+#pragma once
 
 class CClientColCircle : public CClientColShape
 {
@@ -34,5 +33,3 @@ public:
 protected:
     float m_fRadius;
 };
-
-#endif

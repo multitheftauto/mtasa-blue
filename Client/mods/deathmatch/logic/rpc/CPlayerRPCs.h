@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPlayerRPCs_H
-#define __CPlayerRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
@@ -29,5 +28,3 @@ public:
     DECLARE_ELEMENT_RPC(SetPlayerTeam);
     DECLARE_RPC(TakePlayerScreenShot);
 };
-
-#endif

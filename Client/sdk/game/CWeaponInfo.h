@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CWEAPONINFO
-#define __CGAME_CWEAPONINFO
+#pragma once
 
 #include "Common.h"
 #include <CVector.h>
@@ -277,5 +276,3 @@ public:
     virtual BYTE  GetDefaultCombo(void) = 0;
     virtual BYTE  GetCombosAvailable(void) = 0;
 };
-
-#endif

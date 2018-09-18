@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PEDIK
-#define __CGAMESA_PEDIK
+#pragma once
 
 #include <game/CPedIK.h>
 #include "Common.h"
@@ -80,5 +79,3 @@ public:
     void ClearFlag(DWORD flag) { this->internalInterface->m_flags &= ~flag; }
     bool IsFlagSet(DWORD flag) { return ((this->internalInterface->m_flags & flag) > 0 ? 1 : 0); }
 };
-
-#endif

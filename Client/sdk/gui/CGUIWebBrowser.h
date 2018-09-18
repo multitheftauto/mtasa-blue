@@ -8,8 +8,7 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-#ifndef __CGUIWEBBROWSER_H
-#define __CGUIWEBBROWSER_H
+#pragma once
 
 #include "CGUIElement.h"
 #include "CGUITexture.h"
@@ -26,5 +25,3 @@ public:
 
     virtual void Render() = 0;
 };
-
-#endif

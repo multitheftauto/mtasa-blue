@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGRAPHICSINTERFACE_H
-#define __CGRAPHICSINTERFACE_H
+#pragma once
 
 #include "CVector.h"
 #include <d3d9.h>
@@ -164,5 +163,3 @@ public:
     virtual bool ResizeTextureData(const void* pData, uint uiDataPitch, uint uiWidth, uint uiHeight, uint d3dFormat, uint uiNewWidth, uint uiNewHeight,
                                    CBuffer& outBuffer) = 0;
 };
-
-#endif

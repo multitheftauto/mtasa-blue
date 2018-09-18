@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIGRIDLIST_H
-#define __CGUIGRIDLIST_H
+#pragma once
 
 #include "CGUIElement.h"
 #include "CGUIStaticImage.h"
@@ -112,5 +111,3 @@ public:
 
     virtual void SetIgnoreTextSpacer(bool bIgnoreTextSpacer) = 0;
 };
-
-#endif

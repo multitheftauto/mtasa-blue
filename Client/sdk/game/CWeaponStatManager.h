@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CWEAPONSTATMANAGER_H
-#define __CWEAPONSTATMANAGER_H
+#pragma once
 #include "CWeaponStat.h"
 
 class CWeaponStatManager
@@ -26,5 +25,3 @@ public:
     virtual CWeaponStat* CreateWeaponStatUnlisted(eWeaponType weaponType, eWeaponSkill weaponSkill) = 0;
     virtual eWeaponSkill GetWeaponSkillFromSkillLevel(eWeaponType type, float fSkillLevel) = 0;
 };
-
-#endif

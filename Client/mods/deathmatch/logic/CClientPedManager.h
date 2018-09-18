@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CClientPedManager_H
-#define __CClientPedManager_H
+#pragma once
 
 #include <list>
 
@@ -59,5 +58,3 @@ protected:
     std::vector<CClientPed*> m_StreamedIn;
     bool                     m_bRemoveFromList;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PLAYERPED
-#define __CGAMESA_PLAYERPED
+#pragma once
 
 #include <game/CPlayerPed.h>
 #include "CPedSA.h"
@@ -66,5 +65,3 @@ public:
 
     static void StaticSetHooks(void);
 };
-
-#endif
