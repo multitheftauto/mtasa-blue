@@ -91,12 +91,12 @@ public:
     virtual unsigned long GetObjectCount() = 0;
 
     // Peds pool
-    virtual CPed*         AddPed(ePedModel ePedType) = 0;
-    virtual CPed*         AddPed(DWORD* pGameInterface) = 0;
+    virtual CPed*         AddPed(class CClientPed* pClientPed, ePedModel ePedType) = 0;
+    virtual CPed*         AddPed(class CClientPed* pClientPed, DWORD* pGameInterface) = 0;
     virtual CPed*         AddCivilianPed(DWORD* pGameInterface) = 0;
     virtual void          RemovePed(CPed* pPed, bool bDelete = true) = 0;
-    virtual void          RemovePed(unsigned long ulID, bool bDelete = true) = 0;
-    virtual CPed*         GetPed(unsigned long ulID) = 0;
+    //virtual void          RemovePed(unsigned long ulID, bool bDelete = true) = 0;
+    //virtual CPed*         GetPed(unsigned long ulID) = 0;
     virtual CPed*         GetPed(DWORD* pGameInterface) = 0;            // not sure we really want this here
     virtual DWORD         GetPedRef(CPed* pPed) = 0;
     virtual DWORD         GetPedRef(DWORD* pGameInterface) = 0;

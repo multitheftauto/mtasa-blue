@@ -191,7 +191,7 @@ public:
     virtual void Reset(void) = 0;
     virtual void Terminate(void) = 0;
 
-    virtual BOOL InitLocalPlayer() = 0;
+    virtual BOOL InitLocalPlayer(class CClientPed* pClientPed) = 0;
 
     virtual float GetGravity(void) = 0;
     virtual void  SetGravity(float fGravity) = 0;

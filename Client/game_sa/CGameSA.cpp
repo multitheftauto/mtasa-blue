@@ -348,7 +348,7 @@ eSystemState CGameSA::GetSystemState()
  * This adds the local player to the ped pool, nothing else
  * @return BOOL TRUE if success, FALSE otherwise
  */
-BOOL CGameSA::InitLocalPlayer()
+BOOL CGameSA::InitLocalPlayer(CClientPed* pClientPed)
 {
     DEBUG_TRACE("BOOL CGameSA::InitLocalPlayer(  )");
 
@@ -368,7 +368,7 @@ BOOL CGameSA::InitLocalPlayer()
 
         if (pInterface)
         {
-            pools->AddPed((DWORD*)pInterface);
+            pools->AddPed(pClientPed, (DWORD*)pInterface);
             return TRUE;
         }
 

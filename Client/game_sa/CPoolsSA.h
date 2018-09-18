@@ -15,7 +15,10 @@
 #include "CVehicleSA.h"
 #include "CObjectSA.h"
 #include "CBuildingSA.h"
+#include <array>
 #define INVALID_POOL_ARRAY_ID    0xFFFFFFFF
+
+class CClientEntity;
 
 class CEntryInfoNodePoolSA : public CEntryInfoNodePool
 {
@@ -35,9 +38,17 @@ public:
     int GetNumberOfUsedSpaces();
 };
 
+template <class T>
+struct SClientEntity
+{
+    T* pEntity;
+    CClientEntity* pClientEntity;
+};
+
 class CPoolsSA : public CPools
 {
 public:
+
     CPoolsSA();
     ~CPoolsSA();
 
@@ -81,17 +92,16 @@ public:
     void          DeleteAllObjects();
 
     // Peds pool
-    CPed* AddPed(ePedModel ePedType);
-    CPed* AddPed(DWORD* pGameInterface);
+    CPed* AddPed(CClientPed * pClientPed, ePedModel ePedType);
+    CPed* AddPed(CClientPed * pClientPed, DWORD* pGameInterface);
     CPed* AddCivilianPed(DWORD* pGameInterface);
 
 private:
-    bool AddPedToPool(CPedSA* pPed);
+    bool AddPedToPool(CClientPed * pClientPed, CPedSA* pPed);
 
 public:
     void             RemovePed(CPed* ped, bool bDelete = true);
-    void             RemovePed(unsigned long ulID, bool bDelete = true);
-    CPed*            GetPed(unsigned long ulID);
+    //CPed*            GetPed(unsigned long ulID);
     CPed*            GetPed(DWORD* pGameInterface);
     DWORD            GetPedRef(CPed* pPed);
     DWORD            GetPedRef(DWORD* pGameInterface);
@@ -120,10 +130,16 @@ public:
 
 private:
     // Generic container for pools
-    template <class T, class I, unsigned long MAX>
+    template <class T, class I,unsigned long MAX>
     struct SPoolData
     {
+        std::array <SClientEntity<T>, MAX> arrayOfClientEntities;
+
         typedef CFastHashMap<I*, T*> mapType;
+
+        // we are not using array and map members for ped pool.
+        // These two members can be removed after we've done the same
+        // for other pools in CPoolsSA.cpp
         mapType                      map;
         T*                           array[MAX];
         unsigned long                ulCount;
@@ -133,6 +149,12 @@ private:
 
         SPoolData() : map(MAX), ulCount(0UL)
         {
+            std::printf("max for CPoolSA: %u\n", MAX);
+            for (unsigned int i = 0; i < MAX; ++i)
+            {
+                arrayOfClientEntities[i] = { nullptr, nullptr };
+            }
+
             for (unsigned int i = 0; i < MAX; ++i)
             {
                 array[i] = NULL;
