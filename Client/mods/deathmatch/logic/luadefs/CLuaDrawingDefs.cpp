@@ -988,16 +988,16 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
 {
-    //  element dxCreateShader( string filepath [, float priority = 0, float maxdistance = 0, bool layered = false, string elementTypes =
+    //  element dxCreateShader( string filepath / string raw_data [, float priority = 0, float maxdistance = 0, bool layered = false, string elementTypes =
     //  "world,vehicle,object,other" ] )
-    SString                      strFilePath;
+    SString                      strFile;
     float                        fPriority;
     float                        fMaxDistance;
     bool                         bLayered;
     std::vector<EEntityTypeMask> elementTypeList;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strFilePath);
+    argStream.ReadString(strFile);
     argStream.ReadNumber(fPriority, 0.0f);
     argStream.ReadNumber(fMaxDistance, 0.0f);
     argStream.ReadBool(bLayered, false);
@@ -1014,37 +1014,36 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
         {
             CResource* pParentResource = pLuaMain->GetResource();
             CResource* pFileResource = pParentResource;
-            SString    strPath, strMetaPath;
-            if (CResourceManager::ParseResourcePathInput(strFilePath, pFileResource, &strPath, &strMetaPath))
+            SString    strPath, strMetaPath, strRootPath, strStatus;
+
+            // If we can't parse path input or file doesn't exists then consider strFile as a raw data
+            bool bIsRawData = !CResourceManager::ParseResourcePathInput(strFile, pFileResource, &strPath, &strMetaPath) || !FileExists(strPath);
+            if (bIsRawData)
             {
-                if (FileExists(strPath))
-                {
-                    SString        strRootPath = strPath.Left(strPath.length() - strMetaPath.length());
-                    SString        strStatus;
-                    CClientShader* pShader = g_pClientGame->GetManager()->GetRenderElementManager()->CreateShader(
-                        strPath, strRootPath, strStatus, fPriority, fMaxDistance, bLayered, false, iEntityTypeMaskResult);
-                    if (pShader)
-                    {
-                        // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's
-                        // ElementGroup? **
-                        pShader->SetParent(pParentResource->GetResourceDynamicEntity());
-                        lua_pushelement(luaVM, pShader);
-                        lua_pushstring(luaVM, strStatus);            // String containing name of technique being used.
-                        return 2;
-                    }
-                    else
-                    {
-                        // Replace any path in the error message with our own one
-                        SString strRootPathWithoutResource = strRootPath.Left(strRootPath.TrimEnd("\\").length() - SStringX(pFileResource->GetName()).length());
-                        strStatus = strStatus.ReplaceI(strRootPathWithoutResource, "");
-                        argStream.SetCustomError(strFilePath, strStatus);
-                    }
-                }
-                else
-                    argStream.SetCustomError(strFilePath, "File not found");
+                strPath = strFile;
+                strRootPath = pFileResource->GetResourceDirectoryPath(ACCESS_PUBLIC, NULL);
             }
             else
-                argStream.SetCustomError(strFilePath, "Bad file path");
+                strRootPath = strPath.Left(strPath.length() - strMetaPath.length());
+
+            CClientShader* pShader = g_pClientGame->GetManager()->GetRenderElementManager()->CreateShader(
+                strPath, strRootPath, bIsRawData, strStatus, fPriority, fMaxDistance, bLayered, false, iEntityTypeMaskResult);
+            if (pShader)
+            {
+                // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's
+                // ElementGroup? **
+                pShader->SetParent(pParentResource->GetResourceDynamicEntity());
+                lua_pushelement(luaVM, pShader);
+                lua_pushstring(luaVM, strStatus);            // String containing name of technique being used.
+                return 2;
+            }
+            else
+            {
+                // Replace any path in the error message with our own one
+                SString strRootPathWithoutResource = strRootPath.Left(strRootPath.TrimEnd("\\").length() - SStringX(pFileResource->GetName()).length());
+                strStatus = strStatus.ReplaceI(strRootPathWithoutResource, "");
+                argStream.SetCustomError(bIsRawData ? "raw data" : strFile, strStatus);
+            }
         }
     }
     if (argStream.HasErrors())
