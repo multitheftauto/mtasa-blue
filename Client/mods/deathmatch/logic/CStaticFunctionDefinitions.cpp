@@ -2190,19 +2190,19 @@ bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CClientEntity& Entity, con
 {
     RUN_CHILDREN(SetPedAnimationSpeed(**iter, strAnimName, fSpeed))
 
-        if (IS_PED(&Entity))
+    if (IS_PED(&Entity))
+    {
+        CClientPed& Ped = static_cast<CClientPed&>(Entity);
+        if (!strAnimName.empty())
         {
-            CClientPed& Ped = static_cast<CClientPed&>(Entity);
-            if (!strAnimName.empty())
+            auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(Ped.GetClump(), strAnimName);
+            if (pAnimAssociation)
             {
-                auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(Ped.GetClump(), strAnimName);
-                if (pAnimAssociation)
-                {
-                    pAnimAssociation->SetCurrentSpeed(fSpeed);
-                    return true;
-                }
+                pAnimAssociation->SetCurrentSpeed(fSpeed);
+                return true;
             }
         }
+    }
 
     return false;
 }
@@ -3502,6 +3502,34 @@ bool CStaticFunctionDefinitions::SetVehicleWindowOpen(CClientVehicle& Vehicle, u
 bool CStaticFunctionDefinitions::IsVehicleWindowOpen(CClientVehicle& Vehicle, uchar ucWindow)
 {
     return Vehicle.IsWindowOpen(ucWindow);
+}
+
+bool CStaticFunctionDefinitions::SetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummies, CVector& vecPosition)
+{
+    if (CClientVehicleManager::IsValidModel(usModel))
+    {
+        auto pModelInfo = g_pGame->GetModelInfo(usModel);
+        if (pModelInfo)
+        {
+            pModelInfo->SetVehicleDummyPosition(eDummies, vecPosition);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummies, CVector& vecPosition)
+{
+    if (CClientVehicleManager::IsValidModel(usModel))
+    {
+        auto pModelInfo = g_pGame->GetModelInfo(usModel);
+        if (pModelInfo)
+        {
+            vecPosition = pModelInfo->GetVehicleDummyPosition(eDummies);
+            return true;
+        }
+    }
+    return false;
 }
 
 bool CStaticFunctionDefinitions::SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition)
