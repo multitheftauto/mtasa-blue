@@ -1188,10 +1188,10 @@ int CLuaDrawingDefs::DxSetShaderValue(lua_State* luaVM)
         }
         else if (argStream.NextIsUserDataOfType<CLuaMatrix>())
         {
-            CMatrix matrix;
-            argStream.ReadMatrix(matrix);
+            CMatrix matValue;
+            argStream.ReadMatrix(matValue);
             float fBuffer[16];
-            matrix.GetBuffer(fBuffer);
+            matValue.GetBuffer(fBuffer);
 
             bool bResult = pShader->GetShaderItem()->SetValue(strName, fBuffer, 16);
             lua_pushboolean(luaVM, bResult);
