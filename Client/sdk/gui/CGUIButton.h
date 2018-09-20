@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIBUTTON_H
-#define __CGUIBUTTON_H
+#pragma once
 
 #include "CGUIElement.h"
 #include "CGUICallback.h"
@@ -20,5 +19,3 @@ class CGUIButton : public CGUIElement
 public:
     virtual ~CGUIButton(void){};
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_PROJECTILE
-#define __CGAME_PROJECTILE
+#pragma once
 
 #include "CObject.h"
 
@@ -23,5 +22,3 @@ public:
     virtual void SetProjectileInfo(class CProjectileInfo* pProjectileInfo) = 0;
     virtual bool CorrectPhysics() = 0;
 };
-
-#endif

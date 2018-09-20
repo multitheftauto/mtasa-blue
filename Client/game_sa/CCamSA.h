@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_CAM
-#define __CGAMESA_CAM
+#pragma once
 
 #include <game/CCam.h>
 #include "CEntitySA.h"
@@ -181,5 +180,3 @@ public:
 
     CEntity* GetTargetEntity() const;
 };
-
-#endif

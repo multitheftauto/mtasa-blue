@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUICOMBOBOX_H
-#define __CGUICOMBOBOX_H
+#pragma once
 
 #include "CGUIElement.h"
 #include "CGUICallback.h"
@@ -39,5 +38,3 @@ public:
     virtual void          HideDropList(void) = 0;
     virtual bool          GetState(void) = 0;
 };
-
-#endif

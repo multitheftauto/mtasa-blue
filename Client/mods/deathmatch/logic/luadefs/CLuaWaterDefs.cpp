@@ -13,20 +13,28 @@
 
 void CLuaWaterDefs::LoadFunctions(void)
 {
-    CLuaCFunctions::AddFunction("createWater", CreateWater);
-    CLuaCFunctions::AddFunction("testLineAgainstWater", TestLineAgainstWater);
-    CLuaCFunctions::AddFunction("resetWaterColor", ResetWaterColor);
-    CLuaCFunctions::AddFunction("resetWaterLevel", ResetWaterLevel);
+    std::map<const char*, lua_CFunction> functions{
+        {"createWater", CreateWater},
+        {"testLineAgainstWater", TestLineAgainstWater},
+        {"resetWaterColor", ResetWaterColor},
+        {"resetWaterLevel", ResetWaterLevel},
 
-    CLuaCFunctions::AddFunction("setWaterColor", SetWaterColor);
-    CLuaCFunctions::AddFunction("setWaterLevel", SetWaterLevel);
-    CLuaCFunctions::AddFunction("setWaterVertexPosition", SetWaterVertexPosition);
-    CLuaCFunctions::AddFunction("setWaterDrawnLast", SetWaterDrawnLast);
+        {"setWaterColor", SetWaterColor},
+        {"setWaterLevel", SetWaterLevel},
+        {"setWaterVertexPosition", SetWaterVertexPosition},
+        {"setWaterDrawnLast", SetWaterDrawnLast},
 
-    CLuaCFunctions::AddFunction("getWaterColor", GetWaterColor);
-    CLuaCFunctions::AddFunction("getWaterLevel", GetWaterLevel);
-    CLuaCFunctions::AddFunction("getWaterVertexPosition", GetWaterVertexPosition);
-    CLuaCFunctions::AddFunction("isWaterDrawnLast", IsWaterDrawnLast);
+        {"getWaterColor", GetWaterColor},
+        {"getWaterLevel", GetWaterLevel},
+        {"getWaterVertexPosition", GetWaterVertexPosition},
+        {"isWaterDrawnLast", IsWaterDrawnLast},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaWaterDefs::AddClass(lua_State* luaVM)
@@ -63,7 +71,7 @@ void CLuaWaterDefs::AddClass(lua_State* luaVM)
 
 int CLuaWaterDefs::CreateWater(lua_State* luaVM)
 {
-    //  water createWater ( float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3 [, float x4, float y4, float z4 ] )
+    //  water createWater ( float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3 [, float x4, float y4, float z4 ] [, bool bShallow = false ] )
     CVector v1;
     CVector v2;
     CVector v3;

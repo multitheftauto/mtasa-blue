@@ -68,14 +68,15 @@ bool CLuaManager::RemoveVirtualMachine(CLuaMain* pLuaMain)
         m_pEvents->RemoveAllEvents(pLuaMain);
         m_pRegisteredCommands->CleanUpForVM(pLuaMain);
 
+        // Remove it from our list
+        m_virtualMachines.remove(pLuaMain);
+
         // Delete it unless it is already
         if (!pLuaMain->BeingDeleted())
         {
             delete pLuaMain;
         }
 
-        // Remove it from our list
-        m_virtualMachines.remove(pLuaMain);
         return true;
     }
 
@@ -229,6 +230,7 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("setClipboard", CLuaFunctionDefs::SetClipboard);
     // CLuaCFunctions::AddFunction ( "getClipboard", CLuaFunctionDefs::GetClipboard );
     CLuaCFunctions::AddFunction("setWindowFlashing", CLuaFunctionDefs::SetWindowFlashing);
+    CLuaCFunctions::AddFunction("clearChatBox", CLuaFunctionDefs::ClearChatBox);
 
     // Notification funcs
     CLuaCFunctions::AddFunction("createTrayNotification", CLuaFunctionDefs::CreateTrayNotification);
@@ -252,8 +254,6 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("setCursorAlpha", CLuaFunctionDefs::SetCursorAlpha);
 
     // Util functions
-    CLuaCFunctions::AddFunction("gettok", CLuaFunctionDefs::GetTok);
-    CLuaCFunctions::AddFunction("tocolor", CLuaFunctionDefs::tocolor);
     CLuaCFunctions::AddFunction("getValidPedModels", CLuaFunctionDefs::GetValidPedModels);
     CLuaCFunctions::AddFunction("downloadFile", CLuaFunctionDefs::DownloadFile);
 
@@ -261,7 +261,6 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("getTime", CLuaFunctionDefs::GetTime_);
     CLuaCFunctions::AddFunction("getGroundPosition", CLuaFunctionDefs::GetGroundPosition);
     CLuaCFunctions::AddFunction("processLineOfSight", CLuaFunctionDefs::ProcessLineOfSight);
-    CLuaCFunctions::AddFunction("isLineOfSightClear", CLuaFunctionDefs::IsLineOfSightClear);
     CLuaCFunctions::AddFunction("getWorldFromScreenPosition", CLuaFunctionDefs::GetWorldFromScreenPosition);
     CLuaCFunctions::AddFunction("getScreenFromWorldPosition", CLuaFunctionDefs::GetScreenFromWorldPosition);
     CLuaCFunctions::AddFunction("getWeather", CLuaFunctionDefs::GetWeather);
@@ -270,11 +269,9 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("getGameSpeed", CLuaFunctionDefs::GetGameSpeed);
     CLuaCFunctions::AddFunction("getMinuteDuration", CLuaFunctionDefs::GetMinuteDuration);
     CLuaCFunctions::AddFunction("getWaveHeight", CLuaFunctionDefs::GetWaveHeight);
-    CLuaCFunctions::AddFunction("isGarageOpen", CLuaFunctionDefs::IsGarageOpen);
     CLuaCFunctions::AddFunction("getGaragePosition", CLuaFunctionDefs::GetGaragePosition);
     CLuaCFunctions::AddFunction("getGarageSize", CLuaFunctionDefs::GetGarageSize);
     CLuaCFunctions::AddFunction("getGarageBoundingBox", CLuaFunctionDefs::GetGarageBoundingBox);
-    CLuaCFunctions::AddFunction("isWorldSpecialPropertyEnabled", CLuaFunctionDefs::IsWorldSpecialPropertyEnabled);
     CLuaCFunctions::AddFunction("getBlurLevel", CLuaFunctionDefs::GetBlurLevel);
     CLuaCFunctions::AddFunction("getTrafficLightState", CLuaFunctionDefs::GetTrafficLightState);
     CLuaCFunctions::AddFunction("areTrafficLightsLocked", CLuaFunctionDefs::AreTrafficLightsLocked);
@@ -296,19 +293,18 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("getOcclusionsEnabled", CLuaFunctionDefs::GetOcclusionsEnabled);
     CLuaCFunctions::AddFunction("getCloudsEnabled", CLuaFunctionDefs::GetCloudsEnabled);
     CLuaCFunctions::AddFunction("getRainLevel", CLuaFunctionDefs::GetRainLevel);
-    CLuaCFunctions::AddFunction("setMoonSize", CLuaFunctionDefs::SetMoonSize);
     CLuaCFunctions::AddFunction("getMoonSize", CLuaFunctionDefs::GetMoonSize);
-    CLuaCFunctions::AddFunction("resetMoonSize", CLuaFunctionDefs::ResetMoonSize);
-    CLuaCFunctions::AddFunction("setFPSLimit", CLuaFunctionDefs::SetFPSLimit);
     CLuaCFunctions::AddFunction("getFPSLimit", CLuaFunctionDefs::GetFPSLimit);
-    CLuaCFunctions::AddFunction("fetchRemote", CLuaFunctionDefs::FetchRemote);
+    CLuaCFunctions::AddFunction("getBirdsEnabled", CLuaFunctionDefs::GetBirdsEnabled);
+    CLuaCFunctions::AddFunction("isPedTargetingMarkerEnabled", CLuaFunctionDefs::IsPedTargetingMarkerEnabled);
+    CLuaCFunctions::AddFunction("isLineOfSightClear", CLuaFunctionDefs::IsLineOfSightClear);
+    CLuaCFunctions::AddFunction("isWorldSpecialPropertyEnabled", CLuaFunctionDefs::IsWorldSpecialPropertyEnabled);
+    CLuaCFunctions::AddFunction("isGarageOpen", CLuaFunctionDefs::IsGarageOpen);
 
     // World set funcs
     CLuaCFunctions::AddFunction("setTime", CLuaFunctionDefs::SetTime);
     CLuaCFunctions::AddFunction("setSkyGradient", CLuaFunctionDefs::SetSkyGradient);
-    CLuaCFunctions::AddFunction("resetSkyGradient", CLuaFunctionDefs::ResetSkyGradient);
     CLuaCFunctions::AddFunction("setHeatHaze", CLuaFunctionDefs::SetHeatHaze);
-    CLuaCFunctions::AddFunction("resetHeatHaze", CLuaFunctionDefs::ResetHeatHaze);
     CLuaCFunctions::AddFunction("setWeather", CLuaFunctionDefs::SetWeather);
     CLuaCFunctions::AddFunction("setWeatherBlended", CLuaFunctionDefs::SetWeatherBlended);
     CLuaCFunctions::AddFunction("setGravity", CLuaFunctionDefs::SetGravity);
@@ -323,36 +319,41 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("setTrafficLightState", CLuaFunctionDefs::SetTrafficLightState);
     CLuaCFunctions::AddFunction("setTrafficLightsLocked", CLuaFunctionDefs::SetTrafficLightsLocked);
     CLuaCFunctions::AddFunction("setWindVelocity", CLuaFunctionDefs::SetWindVelocity);
-    CLuaCFunctions::AddFunction("resetWindVelocity", CLuaFunctionDefs::ResetWindVelocity);
     CLuaCFunctions::AddFunction("setInteriorSoundsEnabled", CLuaFunctionDefs::SetInteriorSoundsEnabled);
     CLuaCFunctions::AddFunction("setInteriorFurnitureEnabled", CLuaFunctionDefs::SetInteriorFurnitureEnabled);
     CLuaCFunctions::AddFunction("setRainLevel", CLuaFunctionDefs::SetRainLevel);
-    CLuaCFunctions::AddFunction("resetRainLevel", CLuaFunctionDefs::ResetRainLevel);
     CLuaCFunctions::AddFunction("setFarClipDistance", CLuaFunctionDefs::SetFarClipDistance);
-    CLuaCFunctions::AddFunction("resetFarClipDistance", CLuaFunctionDefs::ResetFarClipDistance);
     CLuaCFunctions::AddFunction("setNearClipDistance", CLuaFunctionDefs::SetNearClipDistance);
-    CLuaCFunctions::AddFunction("resetNearClipDistance", CLuaFunctionDefs::ResetNearClipDistance);
     CLuaCFunctions::AddFunction("setVehiclesLODDistance", CLuaFunctionDefs::SetVehiclesLODDistance);
-    CLuaCFunctions::AddFunction("resetVehiclesLODDistance", CLuaFunctionDefs::ResetVehiclesLODDistance);
     CLuaCFunctions::AddFunction("setPedsLODDistance", CLuaFunctionDefs::SetPedsLODDistance);
-    CLuaCFunctions::AddFunction("resetPedsLODDistance", CLuaFunctionDefs::ResetPedsLODDistance);
     CLuaCFunctions::AddFunction("setFogDistance", CLuaFunctionDefs::SetFogDistance);
-    CLuaCFunctions::AddFunction("resetFogDistance", CLuaFunctionDefs::ResetFogDistance);
     CLuaCFunctions::AddFunction("setSunColor", CLuaFunctionDefs::SetSunColor);
-    CLuaCFunctions::AddFunction("resetSunColor", CLuaFunctionDefs::ResetSunColor);
     CLuaCFunctions::AddFunction("setSunSize", CLuaFunctionDefs::SetSunSize);
-    CLuaCFunctions::AddFunction("resetSunSize", CLuaFunctionDefs::ResetSunSize);
-    CLuaCFunctions::AddFunction("removeWorldModel", CLuaFunctionDefs::RemoveWorldBuilding);
-    CLuaCFunctions::AddFunction("restoreAllWorldModels", CLuaFunctionDefs::RestoreWorldBuildings);
-    CLuaCFunctions::AddFunction("restoreWorldModel", CLuaFunctionDefs::RestoreWorldBuilding);
     CLuaCFunctions::AddFunction("setAircraftMaxHeight", CLuaFunctionDefs::SetAircraftMaxHeight);
     CLuaCFunctions::AddFunction("setAircraftMaxVelocity", CLuaFunctionDefs::SetAircraftMaxVelocity);
     CLuaCFunctions::AddFunction("setOcclusionsEnabled", CLuaFunctionDefs::SetOcclusionsEnabled);
-    CLuaCFunctions::AddFunction("createSWATRope", CLuaFunctionDefs::CreateSWATRope);
     CLuaCFunctions::AddFunction("setBirdsEnabled", CLuaFunctionDefs::SetBirdsEnabled);
-    CLuaCFunctions::AddFunction("getBirdsEnabled", CLuaFunctionDefs::GetBirdsEnabled);
     CLuaCFunctions::AddFunction("setPedTargetingMarkerEnabled", CLuaFunctionDefs::SetPedTargetingMarkerEnabled);
-    CLuaCFunctions::AddFunction("isPedTargetingMarkerEnabled", CLuaFunctionDefs::IsPedTargetingMarkerEnabled);
+    CLuaCFunctions::AddFunction("setMoonSize", CLuaFunctionDefs::SetMoonSize);
+    CLuaCFunctions::AddFunction("setFPSLimit", CLuaFunctionDefs::SetFPSLimit);
+    CLuaCFunctions::AddFunction("removeWorldModel", CLuaFunctionDefs::RemoveWorldBuilding);
+    CLuaCFunctions::AddFunction("restoreAllWorldModels", CLuaFunctionDefs::RestoreWorldBuildings);
+    CLuaCFunctions::AddFunction("restoreWorldModel", CLuaFunctionDefs::RestoreWorldBuilding);
+    CLuaCFunctions::AddFunction("createSWATRope", CLuaFunctionDefs::CreateSWATRope);
+
+    // World reset funcs
+    CLuaCFunctions::AddFunction("resetSkyGradient", CLuaFunctionDefs::ResetSkyGradient);
+    CLuaCFunctions::AddFunction("resetHeatHaze", CLuaFunctionDefs::ResetHeatHaze);
+    CLuaCFunctions::AddFunction("resetWindVelocity", CLuaFunctionDefs::ResetWindVelocity);
+    CLuaCFunctions::AddFunction("resetRainLevel", CLuaFunctionDefs::ResetRainLevel);
+    CLuaCFunctions::AddFunction("resetFarClipDistance", CLuaFunctionDefs::ResetFarClipDistance);
+    CLuaCFunctions::AddFunction("resetNearClipDistance", CLuaFunctionDefs::ResetNearClipDistance);
+    CLuaCFunctions::AddFunction("resetVehiclesLODDistance", CLuaFunctionDefs::ResetVehiclesLODDistance);
+    CLuaCFunctions::AddFunction("resetPedsLODDistance", CLuaFunctionDefs::ResetPedsLODDistance);
+    CLuaCFunctions::AddFunction("resetFogDistance", CLuaFunctionDefs::ResetFogDistance);
+    CLuaCFunctions::AddFunction("resetSunColor", CLuaFunctionDefs::ResetSunColor);
+    CLuaCFunctions::AddFunction("resetSunSize", CLuaFunctionDefs::ResetSunSize);
+    CLuaCFunctions::AddFunction("resetMoonSize", CLuaFunctionDefs::ResetMoonSize);
 
     // Input functions
     CLuaCFunctions::AddFunction("bindKey", CLuaFunctionDefs::BindKey);
@@ -383,6 +384,7 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("getDevelopmentMode", CLuaFunctionDefs::GetDevelopmentMode);
     CLuaCFunctions::AddFunction("addDebugHook", CLuaFunctionDefs::AddDebugHook);
     CLuaCFunctions::AddFunction("removeDebugHook", CLuaFunctionDefs::RemoveDebugHook);
+    CLuaCFunctions::AddFunction("fetchRemote", CLuaFunctionDefs::FetchRemote);
 
     // Version functions
     CLuaCFunctions::AddFunction("getVersion", CLuaFunctionDefs::GetVersion);

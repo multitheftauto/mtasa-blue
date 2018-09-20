@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CNAMETAGS_H
-#define __CNAMETAGS_H
+#pragma once
 
 class CHud;
 class CClientManager;
@@ -53,5 +52,3 @@ private:
     bool                  m_bVisible;
     CTextureItem*         m_pConnectionTroubleIcon;
 };
-
-#endif

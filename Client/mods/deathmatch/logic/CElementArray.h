@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CELEMENTARRAY_H
-#define __CELEMENTARRAY_H
+#pragma once
 
 #include "Common.h"
 
@@ -30,5 +29,3 @@ private:
     static SFixedArray<CClientEntity*, MAX_SERVER_ELEMENTS + MAX_CLIENT_ELEMENTS> m_Elements;
     static CStack<ElementID, MAX_CLIENT_ELEMENTS - 2>                             m_ClientStack;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __MAIN_H
-#define __MAIN_H
+#pragma once
 
 #define MTA_GTAEXE_NAME "gta_sa.exe"
 #define MTA_HTAEXE_NAME "proxy_sa.exe"
@@ -29,6 +28,4 @@
     #define MTA_DLL_NAME            "core.dll"
     #define CHECK_DM_LUA_NAME       "mods\\deathmatch\\lua5.1c.dll"
     #define CHECK_DM_CLIENT_NAME    "mods\\deathmatch\\Client.dll"
-#endif
-
 #endif

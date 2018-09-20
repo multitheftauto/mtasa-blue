@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMULTIPLAYER
-#define __CMULTIPLAYER
+#pragma once
 
 #include <CMatrix.h>
 #include <CVector.h>
@@ -193,6 +192,7 @@ public:
     virtual void SetIdleHandler(IdleHandler* pHandler) = 0;
     virtual void SetPreFxRenderHandler(PreFxRenderHandler* pHandler) = 0;
     virtual void SetPreHudRenderHandler(PreHudRenderHandler* pHandler) = 0;
+    virtual void DisableCallsToCAnimBlendNode(bool bDisableCalls) = 0;
     virtual void SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler) = 0;
     virtual void SetAddAnimationHandler(AddAnimationHandler* pHandler) = 0;
     virtual void SetAddAnimationAndSyncHandler(AddAnimationAndSyncHandler* pHandler) = 0;
@@ -262,8 +262,8 @@ public:
 
     virtual void DisableEnterExitVehicleKey(bool bDisabled) = 0;
 
-    virtual void SetNightVisionEnabled(bool bEnabled) = 0;
-    virtual void SetThermalVisionEnabled(bool bEnabled) = 0;
+    virtual void SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled) = 0;
+    virtual void SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled) = 0;
     virtual bool IsNightVisionEnabled() = 0;
     virtual bool IsThermalVisionEnabled() = 0;
 
@@ -352,5 +352,3 @@ public:
     virtual void SetBoatWaterSplashEnabled(bool bEnabled) = 0;
     virtual void SetTyreSmokeEnabled(bool bEnabled) = 0;
 };
-
-#endif

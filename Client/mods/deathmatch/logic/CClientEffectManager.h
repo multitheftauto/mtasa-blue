@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTEFFECTMANAGER_H
-#define __CCLIENTEFFECTMANAGER_H
+#pragma once
 
 #include "CClientEffect.h"
 
@@ -39,5 +38,3 @@ private:
     bool                      m_bCanRemoveFromList;
     std::list<CClientEffect*> m_Effects;
 };
-
-#endif

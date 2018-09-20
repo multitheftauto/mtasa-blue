@@ -4,9 +4,9 @@
  *
  *  ml_base, External lua add-on module
  *
- *  Copyright © 2003-2008 MTA.  All Rights Reserved.
+ *  Copyright Â© 2003-2018 MTA.  All Rights Reserved.
  *
- *  Grand Theft Auto is © 2002-2003 Rockstar North
+ *  Grand Theft Auto is Â© 2002-2018 Rockstar North
  *
  *  THE FOLLOWING SOURCES ARE PART OF THE MULTI THEFT
  *  AUTO SOFTWARE DEVELOPMENT KIT AND ARE RELEASED AS
@@ -18,8 +18,7 @@
 
 /** And remember.. threads on Win32 and POSIX are not similar at all. **/
 
-#ifndef __CTHREAD_H
-#define __CTHREAD_H
+#pragma once
 
 #ifdef WIN32            // Win32 threads
     #define _WIN32_WINNT 0x400
@@ -71,5 +70,3 @@ private:
     CThreadData* m_pThreadData;
     ThreadHandle m_hThread;
 };
-
-#endif

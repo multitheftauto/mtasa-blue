@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMULTIPLAYERSA
-#define __CMULTIPLAYERSA
+#pragma once
 
 #include <game/CGame.h>
 #include <multiplayer/CMultiplayer.h>
@@ -109,6 +108,7 @@ public:
     void SetIdleHandler(IdleHandler* pHandler);
     void SetPreFxRenderHandler(PreFxRenderHandler* pHandler);
     void SetPreHudRenderHandler(PreHudRenderHandler* pHandler);
+    void DisableCallsToCAnimBlendNode(bool bDisableCalls);
     void SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler);
     void SetAddAnimationHandler(AddAnimationHandler* pHandler);
     void SetAddAnimationAndSyncHandler(AddAnimationAndSyncHandler* pHandler);
@@ -178,8 +178,8 @@ public:
     int   GetMoonSize();
     void  ResetMoonSize();
 
-    void SetNightVisionEnabled(bool bEnabled);
-    void SetThermalVisionEnabled(bool bEnabled);
+    void SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled);
+    void SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled);
     bool IsNightVisionEnabled();
     bool IsThermalVisionEnabled();
 
@@ -335,5 +335,3 @@ private:
 
     static unsigned long FUNC_CPlayerInfoBase;
 };
-
-#endif

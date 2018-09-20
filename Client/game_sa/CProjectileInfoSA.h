@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PROJECTILEINFO
-#define __CGAMESA_PROJECTILEINFO
+#pragma once
 
 #include <game/CProjectileInfo.h>
 #include "CProjectileSA.h"
@@ -80,5 +79,3 @@ public:
     void  SetCounter(DWORD dwCounter) { internalInterface->dwCounter = dwCounter + pGame->GetSystemTime(); }
     DWORD GetCounter(void) { return internalInterface->dwCounter - pGame->GetSystemTime(); }
 };
-
-#endif

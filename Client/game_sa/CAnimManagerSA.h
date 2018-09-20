@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimManagerSA_H
-#define __CAnimManagerSA_H
+#pragma once
 
 #include <game/CAnimManager.h>
 #include <game/CAnimBlendAssociation.h>
@@ -144,7 +143,8 @@ public:
     std::unique_ptr<CAnimBlendAssociation> RpAnimBlendClumpGetFirstAssociation(RpClump* pClump);
     std::unique_ptr<CAnimBlendAssociation> RpAnimBlendClumpGetAssociation(RpClump* pClump, const char* szAnimName);
     std::unique_ptr<CAnimBlendAssociation> RpAnimBlendClumpGetAssociation(RpClump* pClump, AnimationId animID);
-    std::unique_ptr<CAnimBlendAssociation> RpAnimBlendGetNextAssociation(CAnimBlendAssociation* pAssociation);
+    std::unique_ptr<CAnimBlendAssociation> RpAnimBlendClumpGetAssociationHashKey(RpClump* pClump, const unsigned int& uiAnimNameHashKey);
+    std::unique_ptr<CAnimBlendAssociation> RpAnimBlendGetNextAssociation(std::unique_ptr<CAnimBlendAssociation>& pAssociation);
     int                                    RpAnimBlendClumpGetNumAssociations(RpClump* pClump);
     void                                   RpAnimBlendClumpUpdateAnimations(RpClump* pClump, float f1, bool b1);
 
@@ -184,5 +184,3 @@ private:
     const SString m_kGateWayBlockName = "ped";
     const SString m_kGateWayAnimationName = "run_wuzi";
 };
-
-#endif

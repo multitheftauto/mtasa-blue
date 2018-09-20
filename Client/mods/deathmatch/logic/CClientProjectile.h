@@ -10,8 +10,7 @@
 
 class CClientProjectile;
 
-#ifndef __CCLIENTPROJECTILE_H
-#define __CCLIENTPROJECTILE_H
+#pragma once
 
 #include "CClientEntity.h"
 #include "CClientCommon.h"
@@ -115,5 +114,3 @@ protected:
     CProjectileInitiateData* m_pInitiateData;
     bool                     m_bCorrected;
 };
-
-#endif

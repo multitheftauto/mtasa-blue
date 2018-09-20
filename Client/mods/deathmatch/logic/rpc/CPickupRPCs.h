@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPickupRPCs_H
-#define __CPickupRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
@@ -23,5 +22,3 @@ public:
     DECLARE_ELEMENT_RPC(SetPickupType);
     DECLARE_ELEMENT_RPC(SetPickupVisible);
 };
-
-#endif

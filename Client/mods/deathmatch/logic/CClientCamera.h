@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCAMERA_H
-#define __CCLIENTCAMERA_H
+#pragma once
 
 #include "CClientCommon.h"
 #include "CClientEntity.h"
@@ -106,5 +105,3 @@ private:
 
     CCamera* m_pCamera;
 };
-
-#endif

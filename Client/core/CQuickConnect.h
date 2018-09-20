@@ -11,8 +11,7 @@
 
 class CQuickConnect;
 
-#ifndef __CQUICKCONNECT_H
-#define __CQUICKCONNECT_H
+#pragma once
 
 #include "CMainMenu.h"
 
@@ -43,5 +42,3 @@ private:
     CGUIButton* m_pButtonConnect;
     CGUIButton* m_pButtonBack;
 };
-
-#endif

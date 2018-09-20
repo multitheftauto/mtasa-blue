@@ -13,19 +13,27 @@
 
 void CLuaRadarAreaDefs::LoadFunctions()
 {
-    // Radar area create/destroy funcs
-    CLuaCFunctions::AddFunction("createRadarArea", CreateRadarArea);
+    std::map<const char*, lua_CFunction> functions{
+        // Radar area create/destroy funcs
+        {"createRadarArea", CreateRadarArea},
 
-    // Radar area get funcs
-    CLuaCFunctions::AddFunction("getRadarAreaSize", GetRadarAreaSize);
-    CLuaCFunctions::AddFunction("getRadarAreaColor", GetRadarAreaColor);
-    CLuaCFunctions::AddFunction("isRadarAreaFlashing", IsRadarAreaFlashing);
-    CLuaCFunctions::AddFunction("isInsideRadarArea", IsInsideRadarArea);
+        // Radar area get funcs
+        {"getRadarAreaSize", GetRadarAreaSize},
+        {"getRadarAreaColor", GetRadarAreaColor},
+        {"isRadarAreaFlashing", IsRadarAreaFlashing},
+        {"isInsideRadarArea", IsInsideRadarArea},
 
-    // Radar area set funcs
-    CLuaCFunctions::AddFunction("setRadarAreaSize", SetRadarAreaSize);
-    CLuaCFunctions::AddFunction("setRadarAreaColor", SetRadarAreaColor);
-    CLuaCFunctions::AddFunction("setRadarAreaFlashing", SetRadarAreaFlashing);
+        // Radar area set funcs
+        {"setRadarAreaSize", SetRadarAreaSize},
+        {"setRadarAreaColor", SetRadarAreaColor},
+        {"setRadarAreaFlashing", SetRadarAreaFlashing},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaRadarAreaDefs::AddClass(lua_State* luaVM)

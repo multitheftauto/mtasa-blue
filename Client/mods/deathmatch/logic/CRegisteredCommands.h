@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CREGISTEREDCOMMANDS_H
-#define __CREGISTEREDCOMMANDS_H
+#pragma once
 
 #include <list>
 
@@ -49,5 +48,3 @@ private:
     std::list<SCommand*> m_TrashCan;
     bool                 m_bIteratingList;
 };
-
-#endif

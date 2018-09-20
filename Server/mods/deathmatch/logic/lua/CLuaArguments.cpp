@@ -21,10 +21,6 @@ extern CGame* g_pGame;
 #define VERIFY_ELEMENT(element) (g_pGame->GetMapManager()->GetRootElement ()->IsMyChild(element,true)&&!element->IsBeingDeleted())
 #endif
 
-CLuaArguments::CLuaArguments(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables)
-{
-    ReadFromBitStream(bitStream, pKnownTables);
-}
 
 CLuaArguments::CLuaArguments(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables)
 {
@@ -508,7 +504,13 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
         pKnownTables->push_back(this);
         for (unsigned int ui = 0; ui < uiNumArgs; ++ui)
         {
-            CLuaArgument* pArgument = new CLuaArgument(bitStream, pKnownTables);
+            CLuaArgument* pArgument = new CLuaArgument();
+            if (!pArgument->ReadFromBitStream(bitStream, pKnownTables))
+            {
+                if (bKnownTablesCreated)
+                    delete pKnownTables;
+                return false;
+            }
             m_Arguments.push_back(pArgument);
         }
     }
@@ -702,7 +704,7 @@ bool CLuaArguments::ReadFromJSONString(const char* szJSON)
     }
 
     json_object* object = json_tokener_parse(szJSON);
-    if (!is_error(object))
+    if (object)
     {
         if (json_object_get_type(object) == json_type_array)
         {
@@ -710,7 +712,7 @@ bool CLuaArguments::ReadFromJSONString(const char* szJSON)
 
             std::vector<CLuaArguments*> knownTables;
 
-            for (int i = 0; i < json_object_array_length(object); i++)
+            for (uint i = 0; i < json_object_array_length(object); i++)
             {
                 json_object*  arrayObject = json_object_array_get_idx(object, i);
                 CLuaArgument* pArgument = new CLuaArgument();
@@ -743,7 +745,7 @@ bool CLuaArguments::ReadFromJSONString(const char* szJSON)
 
 bool CLuaArguments::ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables)
 {
-    if (!is_error(object))
+    if (object)
     {
         if (json_object_get_type(object) == json_type_object)
         {
@@ -781,7 +783,7 @@ bool CLuaArguments::ReadFromJSONObject(json_object* object, std::vector<CLuaArgu
 
 bool CLuaArguments::ReadFromJSONArray(json_object* object, std::vector<CLuaArguments*>* pKnownTables)
 {
-    if (!is_error(object))
+    if (object)
     {
         if (json_object_get_type(object) == json_type_array)
         {
@@ -795,7 +797,7 @@ bool CLuaArguments::ReadFromJSONArray(json_object* object, std::vector<CLuaArgum
             pKnownTables->push_back(this);
 
             bool bSuccess = true;
-            for (int i = 0; i < json_object_array_length(object); i++)
+            for (uint i = 0; i < json_object_array_length(object); i++)
             {
                 json_object*  arrayObject = json_object_array_get_idx(object, i);
                 CLuaArgument* pArgument = new CLuaArgument();

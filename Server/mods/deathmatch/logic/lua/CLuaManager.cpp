@@ -232,11 +232,9 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("setServerPassword", CLuaFunctionDefs::SetServerPassword);
     CLuaCFunctions::AddFunction("getServerConfigSetting", CLuaFunctionDefs::GetServerConfigSetting);
     CLuaCFunctions::AddFunction("setServerConfigSetting", CLuaFunctionDefs::SetServerConfigSetting, true);
+    CLuaCFunctions::AddFunction("clearChatBox", CLuaFunctionDefs::ClearChatBox);
 
     CLuaCFunctions::AddFunction("shutdown", CLuaFunctionDefs::shutdown, true);
-
-    // Util funcs
-    CLuaCFunctions::AddFunction("gettok", CLuaFunctionDefs::GetTok);
 
     // Loaded map funcs
     CLuaCFunctions::AddFunction("getRootElement", CLuaFunctionDefs::GetRootElement);
@@ -375,7 +373,7 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("xmlFindSubNode", CLuaXMLDefs::xmlNodeFindChild);
     CLuaCFunctions::AddFunction("attachElementToElement", CLuaElementDefs::attachElements);
     CLuaCFunctions::AddFunction("detachElementFromElement", CLuaElementDefs::detachElements);
-    // Deprecated since 1.5.5-9.13176
+    // Deprecated since 1.5.5-9.13846
     CLuaCFunctions::AddFunction("doesPedHaveJetPack", CLuaPedDefs::DoesPedHaveJetPack);
     CLuaCFunctions::AddFunction("givePedJetPack", CLuaPedDefs::GivePedJetPack);
     CLuaCFunctions::AddFunction("removePedJetPack", CLuaPedDefs::RemovePedJetPack);

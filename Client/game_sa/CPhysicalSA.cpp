@@ -105,7 +105,14 @@ VOID CPhysicalSA::SetMoveSpeed(CVector* vecMoveSpeed)
 VOID CPhysicalSA::SetTurnSpeed(CVector* vecTurnSpeed)
 {
     DEBUG_TRACE("VOID CPhysicalSA::SetTurnSpeed(CVector * vecTurnSpeed)");
+
     ((CPhysicalSAInterface*)this->GetInterface())->m_vecAngularVelocity = *vecTurnSpeed;
+
+    if (GetInterface()->nType == ENTITY_TYPE_OBJECT)
+    {
+        AddToMovingList();
+        SetStatic(false);
+    }
 }
 
 float CPhysicalSA::GetMass(void)
@@ -128,6 +135,16 @@ void CPhysicalSA::SetTurnMass(float fTurnMass)
     ((CPhysicalSAInterface*)this->GetInterface())->m_fTurnMass = fTurnMass;
 }
 
+float CPhysicalSA::GetAirResistance(void)
+{
+    return ((CPhysicalSAInterface*)this->GetInterface())->m_fAirResistance;
+}
+
+void CPhysicalSA::SetAirResistance(float fAirResistance)
+{
+    ((CPhysicalSAInterface*)this->GetInterface())->m_fAirResistance = fAirResistance;
+}
+
 float CPhysicalSA::GetElasticity(void)
 {
     return ((CPhysicalSAInterface*)this->GetInterface())->m_fElasticity;
@@ -146,6 +163,17 @@ float CPhysicalSA::GetBuoyancyConstant(void)
 void CPhysicalSA::SetBuoyancyConstant(float fBuoyancyConstant)
 {
     ((CPhysicalSAInterface*)this->GetInterface())->m_fBuoyancyConstant = fBuoyancyConstant;
+}
+
+void CPhysicalSA::GetCenterOfMass(CVector & vecCenterOfMass)
+{
+    vecCenterOfMass = ((CPhysicalSAInterface*)this->GetInterface())->m_vecCenterOfMass;
+}
+
+
+void CPhysicalSA::SetCenterOfMass(CVector & vecCenterOfMass)
+{
+    ((CPhysicalSAInterface*)this->GetInterface())->m_vecCenterOfMass = vecCenterOfMass;
 }
 
 VOID CPhysicalSA::ProcessCollision()

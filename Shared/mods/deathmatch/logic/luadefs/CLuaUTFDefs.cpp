@@ -12,11 +12,19 @@
 
 void CLuaUTFDefs::LoadFunctions(void)
 {
-    CLuaCFunctions::AddFunction("utfLen", UtfLen);
-    CLuaCFunctions::AddFunction("utfSeek", UtfSeek);
-    CLuaCFunctions::AddFunction("utfSub", UtfSub);
-    CLuaCFunctions::AddFunction("utfChar", UtfChar);
-    CLuaCFunctions::AddFunction("utfCode", UtfCode);
+    std::map<const char*, lua_CFunction> functions{
+        {"utfLen", UtfLen},
+        {"utfSeek", UtfSeek},
+        {"utfSub", UtfSub},
+        {"utfChar", UtfChar},
+        {"utfCode", UtfCode},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 int CLuaUTFDefs::UtfLen(lua_State* luaVM)

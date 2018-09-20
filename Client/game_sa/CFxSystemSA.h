@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CFxSystemSA
-#define __CFxSystemSA
+#pragma once
 
 #include <game/CFxSystem.h>
 
@@ -134,5 +133,3 @@ public:
     CFxSystemSAInterface*    pOwner;                // 0x08
     // TODO the rest
 };
-
-#endif

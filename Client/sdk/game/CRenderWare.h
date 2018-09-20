@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CRENDERWARE
-#define __CRENDERWARE
+#pragma once
 
 #include "RenderWare.h"
 #include <list>
@@ -102,5 +101,3 @@ public:
     virtual bool     RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit) = 0;
     virtual void     TxdForceUnload(ushort usTxdId, bool bDestroyTextures) = 0;
 };
-
-#endif

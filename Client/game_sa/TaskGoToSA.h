@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TASKGOTO
-#define __CGAMESA_TASKGOTO
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -94,5 +93,3 @@ public:
     CTaskComplexWanderStandardSA(void){};
     CTaskComplexWanderStandardSA(const int iMoveState, const unsigned char iDir, const bool bWanderSensibly = true);
 };
-
-#endif

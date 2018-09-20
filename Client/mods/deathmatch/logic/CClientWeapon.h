@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTWEAPON_H
-#define __CCLIENTWEAPON_H
+#pragma once
 
 #include <game/CWeaponInfo.h>
 #include "CClientObject.h"
@@ -134,5 +133,3 @@ private:
     int                  m_iWeaponFireRate;
     CVector              m_vecFireRotationNoTarget;            // Rotation adjustment when firing directly forward
 };
-
-#endif

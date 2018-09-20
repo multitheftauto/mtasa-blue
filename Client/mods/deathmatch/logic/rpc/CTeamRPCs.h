@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CTeamRPCs_H
-#define __CTeamRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
@@ -24,5 +23,3 @@ public:
     DECLARE_ELEMENT_RPC(SetTeamColor);
     DECLARE_ELEMENT_RPC(SetTeamFriendlyFire);
 };
-
-#endif

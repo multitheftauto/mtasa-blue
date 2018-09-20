@@ -53,6 +53,7 @@ public:
     LUA_DECLARE(SetClipboard);
     LUA_DECLARE(GetClipboard);
     LUA_DECLARE(SetWindowFlashing);
+    LUA_DECLARE(ClearChatBox);
 
     // Notification functions
     LUA_DECLARE(CreateTrayNotification);
@@ -78,8 +79,6 @@ public:
 
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
-    LUA_DECLARE(GetTok);
-    LUA_DECLARE(tocolor);
     LUA_DECLARE(GetValidPedModels);
     LUA_DECLARE(SetDevelopmentMode);
     LUA_DECLARE(GetDevelopmentMode);

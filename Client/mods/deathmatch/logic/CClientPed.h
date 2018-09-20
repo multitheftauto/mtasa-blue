@@ -10,8 +10,7 @@
 
 class CClientPed;
 
-#ifndef __CCLIENTPED_H
-#define __CCLIENTPED_H
+#pragma once
 
 #include "CAntiCheatModule.h"
 #include "CClientCommon.h"
@@ -709,5 +708,3 @@ public:
     // Key: Internal GTA animation, Value: Custom Animation
     ReplacedAnim_type m_mapOfReplacedAnimations;
 };
-
-#endif

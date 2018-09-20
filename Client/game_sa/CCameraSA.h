@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_CAMERA
-#define __CGAMESA_CAMERA
+#pragma once
 
 #include <game/CCamera.h>
 #include "CCamSA.h"
@@ -443,5 +442,3 @@ public:
 private:
     static unsigned long FUNC_RwFrameGetLTM;
 };
-
-#endif

@@ -11,8 +11,7 @@
 
 class CVehicleSA;
 
-#ifndef __CGAMESA_VEHICLE
-#define __CGAMESA_VEHICLE
+#pragma once
 
 #include <game/CVehicle.h>
 
@@ -805,5 +804,3 @@ private:
     SVehicleFrame* GetVehicleComponent(const SString& vehicleComponent);
     void           FinalizeFramesList(void);
 };
-
-#endif

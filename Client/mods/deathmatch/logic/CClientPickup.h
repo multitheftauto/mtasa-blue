@@ -10,8 +10,7 @@
 
 class CClientPickup;
 
-#ifndef __CCLIENTPICKUP_H
-#define __CCLIENTPICKUP_H
+#pragma once
 
 #include "CClientPickupManager.h"
 #include "CClientEntity.h"
@@ -141,5 +140,3 @@ public:
     float          m_fAmount;
     unsigned short m_usAmmo;
 };
-
-#endif

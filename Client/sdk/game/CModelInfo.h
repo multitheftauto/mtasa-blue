@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_MODELINFO
-#define __CGAME_MODELINFO
+#pragma once
 
 #include "Common.h"
 #include "RenderWare.h"
@@ -149,6 +148,8 @@ public:
     virtual void*        SetVehicleSuspensionData(void* pSuspensionLines) = 0;
     virtual CVector      GetVehicleExhaustFumesPosition() = 0;
     virtual void         SetVehicleExhaustFumesPosition(const CVector& position) = 0;
+    virtual CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) = 0;
+    virtual void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) = 0;
 
     // Init the supported upgrades structure
     virtual void InitialiseSupportedUpgrades(RpClump* pClump) = 0;
@@ -172,5 +173,3 @@ public:
     virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades(void) = 0;
     virtual void                      ResetSupportedUpgrades(void) = 0;
 };
-
-#endif

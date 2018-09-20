@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimManager_H
-#define __CAnimManager_H
+#pragma once
 
 #include <memory>
 
@@ -108,7 +107,8 @@ public:
     virtual AnimBlendAssoc_type RpAnimBlendClumpGetFirstAssociation(RpClump* pClump) = 0;
     virtual AnimBlendAssoc_type RpAnimBlendClumpGetAssociation(RpClump* pClump, const char* szAnimName) = 0;
     virtual AnimBlendAssoc_type RpAnimBlendClumpGetAssociation(RpClump* pClump, AnimationId animID) = 0;
-    virtual AnimBlendAssoc_type RpAnimBlendGetNextAssociation(CAnimBlendAssociation* pAssociation) = 0;
+    virtual AnimBlendAssoc_type RpAnimBlendClumpGetAssociationHashKey(RpClump* pClump, const unsigned int& uiAnimNameHashKey) = 0;
+    virtual AnimBlendAssoc_type RpAnimBlendGetNextAssociation(std::unique_ptr<CAnimBlendAssociation>& pAssociation) = 0;
     virtual int                 RpAnimBlendClumpGetNumAssociations(RpClump* pClump) = 0;
     virtual void                RpAnimBlendClumpUpdateAnimations(RpClump* pClump, float f1, bool b1) = 0;
 
@@ -132,5 +132,3 @@ public:
     virtual const SString& GetGateWayBlockName(void) = 0;
     virtual const SString& GetGateWayAnimationName(void) = 0;
 };
-
-#endif

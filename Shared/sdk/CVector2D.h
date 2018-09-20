@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CVector2D_H
-#define __CVector2D_H
+#pragma once
 
 #include <cmath>
 #include "CVector.h"
@@ -140,5 +139,3 @@ public:
     float fX;
     float fY;
 };
-
-#endif

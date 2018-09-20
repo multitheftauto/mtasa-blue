@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CXMLIMPL_H
-#define __CXMLIMPL_H
+#pragma once
 
 #include <xml/CXML.h>
 
@@ -29,5 +28,3 @@ public:
     CXMLFile*      GetFileFromID(unsigned long ulID);
     CXMLNode*      GetNodeFromID(unsigned long ulID);
 };
-
-#endif
