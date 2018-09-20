@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_ENTITY
-#define __CGAME_ENTITY
+#pragma once
 
 #include "Common.h"
 #include <CMatrix.h>
@@ -106,5 +105,3 @@ public:
 
     virtual unsigned long GetArrayID(void) = 0;
 };
-
-#endif

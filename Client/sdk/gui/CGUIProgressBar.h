@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIPROGRESSBAR_H
-#define __CGUIPROGRESSBAR_H
+#pragma once
 
 #include "CGUIElement.h"
 #include <string>
@@ -23,5 +22,3 @@ public:
     virtual void  SetProgress(float fProgress) = 0;
     virtual float GetProgress(void) = 0;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_VEHICLE
-#define __CGAME_VEHICLE
+#pragma once
 
 #include "Common.h"
 #include "CColPoint.h"
@@ -318,5 +317,3 @@ public:
     virtual bool                              SetWindowOpenFlagState(unsigned char ucWindow, bool bState) = 0;
     virtual CAEVehicleAudioEntity*            GetVehicleAudioEntity(void) = 0;
 };
-
-#endif

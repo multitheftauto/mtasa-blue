@@ -10,8 +10,7 @@
 
 class CClientDFF;
 
-#ifndef __CCLIENTDFF_H
-#define __CCLIENTDFF_H
+#pragma once
 
 #include <list>
 #include "CClientEntity.h"
@@ -71,5 +70,3 @@ protected:
 
     std::list<unsigned short> m_Replaced;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMarkerRPCs_H
-#define __CMarkerRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
@@ -25,5 +24,3 @@ public:
     DECLARE_ELEMENT_RPC(SetMarkerTarget);
     DECLARE_ELEMENT_RPC(SetMarkerIcon);
 };
-
-#endif

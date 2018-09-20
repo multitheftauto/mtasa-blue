@@ -11,7 +11,6 @@
 
 #include "StdInc.h"
 #include "../../vendor/tinygettext/log.hpp"
-#define MTA_LOCALE_DIR              "MTA/locale/"
 #define MTA_LOCALE_TEXTDOMAIN       "client"
 // TRANSLATORS: Replace with your language native name
 #define NATIVE_LANGUAGE_NAME _td("English")
@@ -32,7 +31,7 @@ CLocalization::CLocalization(const SString& strLocale, const SString& strLocaleP
 
 CLocalization::~CLocalization(void)
 {
-    for(auto iter : m_LanguageMap)
+    for (auto iter : m_LanguageMap)
     {
         delete iter.second;
     }
@@ -82,10 +81,11 @@ CLanguage* CLocalization::GetLanguage(SString strLocale)
 //
 // Get translated language name
 //
-SString CLocalization::GetLanguageNativeName(const SString& strLocale)
+SString CLocalization::GetLanguageNativeName(SString strLocale)
 {
+    strLocale = ValidateLocale(strLocale);
     SString strNativeName = GetLanguage(strLocale)->Translate(NATIVE_LANGUAGE_NAME);
-    if (strNativeName == "English")
+    if (strNativeName == "English" && strLocale != "en_US")
     {
         // If native name not available, use English version
         strNativeName = GetLanguage(strLocale)->GetName();
@@ -124,15 +124,14 @@ SString CLocalization::GetTranslators()
     return "";
 }
 
-std::map<SString, SString> CLocalization::GetAvailableLanguages(void)
+std::vector<SString> CLocalization::GetAvailableLocales(void)
 {
-    std::map<SString, SString> m_LanguageMap;
-    const std::set<Language>&  languages = m_DictManager.get_languages(MTA_LOCALE_TEXTDOMAIN);
-
-    for (std::set<Language>::const_iterator i = languages.begin(); i != languages.end(); ++i)
-        m_LanguageMap[i->get_name()] = i->str();
-
-    return m_LanguageMap;
+    std::vector<SString> localeList = {"en_US"};
+    for (const auto& language : m_DictManager.get_languages(MTA_LOCALE_TEXTDOMAIN))
+        localeList.push_back(language.str());
+    // Alpha sort
+    std::sort(localeList.begin(), localeList.end());
+    return localeList;
 }
 
 // Tell whether the client is translated

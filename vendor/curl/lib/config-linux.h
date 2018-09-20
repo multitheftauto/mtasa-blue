@@ -5,7 +5,7 @@
 /* #undef CURLDEBUG */
 
 /* Location of default ca bundle */
-/* #define CURL_CA_BUNDLE "/etc/ssl/certs/ca-certificates.crt" */
+/* #undef CURL_CA_BUNDLE */
 
 /* define "1" to use built in CA store of SSL library */
 /* #undef CURL_CA_FALLBACK */
@@ -80,7 +80,7 @@
 #define CURL_EXTERN_SYMBOL __attribute__ ((__visibility__ ("default")))
 
 /* IP address type in sockaddr */
-/* #undef CURL_SA_FAMILY_T */
+#define CURL_SA_FAMILY_T sa_family_t
 
 /* built with multiple SSL backends */
 /* #undef CURL_WITH_MULTI_SSL */
@@ -92,7 +92,7 @@
 /* #undef EGD_SOCKET */
 
 /* Define if you want to enable IPv6 support */
-/* #define ENABLE_IPV6 1 */
+/* #undef ENABLE_IPV6 */
 
 /* Define to the type of arg 2 for gethostname. */
 #define GETHOSTNAME_TYPE_ARG2 size_t
@@ -165,7 +165,7 @@
 
 /* Define to 1 if you have the declaration of `getpwuid_r', and to 0 if you
    don't. */
-/* #undef HAVE_DECL_GETPWUID_R */
+#define HAVE_DECL_GETPWUID_R 1
 
 /* "Set if getpwuid_r() declaration is missing" */
 /* #undef HAVE_DECL_GETPWUID_R_MISSING */
@@ -195,7 +195,7 @@
 #define HAVE_FDOPEN 1
 
 /* Define to 1 if you have the `fnmatch' function. */
-/* #undef HAVE_FNMATCH */
+#define HAVE_FNMATCH 1
 
 /* Define to 1 if you have the freeaddrinfo function. */
 #define HAVE_FREEADDRINFO 1
@@ -588,7 +588,7 @@
 /* #undef HAVE_SIG_ATOMIC_T_VOLATILE */
 
 /* Define to 1 if struct sockaddr_in6 has the sin6_scope_id member */
-#define HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID 1
+/* #undef HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID */
 
 /* Define to 1 if you have the socket function. */
 #define HAVE_SOCKET 1
@@ -774,7 +774,7 @@
 /* #undef HAVE_WOLFSSL_USEALPN */
 
 /* Define this symbol if your OS supports changing the contents of argv */
-#define HAVE_WRITABLE_ARGV 1
+/* #undef HAVE_WRITABLE_ARGV */
 
 /* Define to 1 if you have the writev function. */
 #define HAVE_WRITEV 1

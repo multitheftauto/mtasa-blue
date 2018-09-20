@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CANTICHEAT_H
-#define __CANTICHEAT_H
+#pragma once
 
 #include "CAntiCheatModule.h"
 #include <list>
@@ -30,5 +29,3 @@ private:
     std::list<CAntiCheatModule*>           m_Entries;
     std::list<CAntiCheatModule*>::iterator m_LastEntry;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CWeaponRPCs_H
-#define __CWeaponRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
@@ -27,5 +26,3 @@ public:
     DECLARE_ELEMENT_RPC(SetWeaponAmmo);
     DECLARE_ELEMENT_RPC(SetWeaponSlot);
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUITABPANEL_IMPL_H
-#define __CGUITABPANEL_IMPL_H
+#pragma once
 
 #include <gui/CGUITabPanel.h>
 #include "CGUIElement_Impl.h"
@@ -52,5 +51,3 @@ private:
 
     bool Event_OnSelectionChanged(const CEGUI::EventArgs& e);
 };
-
-#endif

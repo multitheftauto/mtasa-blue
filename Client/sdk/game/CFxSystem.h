@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CFxSystem
-#define __CFxSystem
+#pragma once
 
 #include "RenderWare.h"
 class CFxSystem
@@ -34,5 +33,3 @@ public:
 
     virtual void* GetInterface(void) = 0;
 };
-
-#endif

@@ -8,8 +8,6 @@
  *
  *****************************************************************************/
 
-#ifndef CFILEREADER_H
-#define CFILEREADER_H
 #pragma once
 
 #include <cstdint>
@@ -44,5 +42,3 @@ private:
     std::vector<char> m_vecFileDataBuffer;
     std::uint32_t     m_u32BytesReadFromBuffer;
 };
-
-#endif

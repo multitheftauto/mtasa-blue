@@ -11,8 +11,7 @@
 struct CClientVehicleProperties;
 class CClientVehicle;
 
-#ifndef __CCLIENTVEHICLE_H
-#define __CCLIENTVEHICLE_H
+#pragma once
 
 #include <game/CPlane.h>
 #include <game/CVehicle.h>
@@ -683,5 +682,3 @@ public:
     std::map<SString, SVehicleComponentData> m_ComponentData;
     bool                                     m_bAsyncLoadingDisabled;
 };
-
-#endif

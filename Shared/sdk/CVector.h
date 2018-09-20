@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CVector_H
-#define __CVector_H
+#pragma once
 
 #ifdef WIN32
 #include <windows.h>
@@ -197,5 +196,3 @@ public:
         return *this;
     }
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_CHANDLINGENTRY
-#define __CGAMESA_CHANDLINGENTRY
+#pragma once
 
 #include <game/CHandlingEntry.h>
 #include "Common.h"
@@ -228,5 +227,3 @@ struct tFlyingHandlingDataSA
     CVector TurnResistance;
     CVector SpeedResistance;
 };
-
-#endif

@@ -11,8 +11,7 @@
 
 class CLuaTimerManager;
 
-#ifndef __CLUATIMERMANAGER_H
-#define __CLUATIMERMANAGER_H
+#pragma once
 
 #include "LuaCommon.h"
 #include "CLuaTimer.h"
@@ -48,5 +47,3 @@ private:
     CLuaTimer*             m_pPendingDelete;
     CLuaTimer*             m_pProcessingTimer;
 };
-
-#endif

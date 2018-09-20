@@ -11,8 +11,7 @@
 
 class CGUI_Impl;
 
-#ifndef __CGUI_IMPL_H
-#define __CGUI_IMPL_H
+#pragma once
 
 #include <gui/CGUI.h>
 #include <list>
@@ -356,5 +355,3 @@ private:
     SString      m_CurrentSchemeName;
     CElapsedTime m_RenderOkTimer;
 };
-
-#endif

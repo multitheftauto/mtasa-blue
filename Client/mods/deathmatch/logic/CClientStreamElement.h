@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CClientStreamElement_H
-#define __CClientStreamElement_H
+#pragma once
 
 #include "CClientEntity.h"
 class CClientStreamer;
@@ -72,5 +71,3 @@ public:
     SFixedArray<CVector, 2> m_vecCachedBoundingBox;
     int                     m_iCachedBoundingBoxCounter;
 };
-
-#endif

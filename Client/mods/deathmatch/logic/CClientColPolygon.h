@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCOLPOLYGON_H
-#define __CCLIENTCOLPOLYGON_H
+#pragma once
 
 class CClientColPolygon : public CClientColShape
 {
@@ -42,5 +41,3 @@ protected:
 
     float m_fRadius;
 };
-
-#endif

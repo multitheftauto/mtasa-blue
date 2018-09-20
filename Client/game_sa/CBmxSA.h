@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_BMX
-#define __CGAMESA_BMX
+#pragma once
 
 #include <game/CBmx.h>
 #include "CBikeSA.h"
@@ -29,5 +28,3 @@ public:
 
     virtual ~CBmxSA(void){};
 };
-
-#endif

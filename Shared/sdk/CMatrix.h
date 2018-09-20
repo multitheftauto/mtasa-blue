@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMatrix_H
-#define __CMatrix_H
+#pragma once
 
 #include "CVector.h"
 
@@ -301,6 +300,29 @@ public:
         return vRight;
     }
 
+    void GetBuffer(float* array)
+    {
+        array[0] = vRight.fX;
+        array[1] = vRight.fY;
+        array[2] = vRight.fZ;
+        array[3] = 0.0f;
+
+        array[4] = vFront.fX;
+        array[5] = vFront.fY;
+        array[6] = vFront.fZ;
+        array[7] = 0.0f;
+
+        array[8] = vUp.fX;
+        array[9] = vUp.fY;
+        array[10] = vUp.fZ;
+        array[11] = 0.0f;
+
+        array[12] = vPos.fX;
+        array[13] = vPos.fY;
+        array[14] = vPos.fZ;
+        array[15] = 1.0f;
+    }
+
     enum EMatrixAxes
     {
         AXIS_RIGHT,
@@ -313,5 +335,3 @@ public:
     CVector vUp;
     CVector vPos;
 };
-
-#endif

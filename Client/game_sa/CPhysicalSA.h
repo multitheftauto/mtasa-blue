@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PHYSICAL
-#define __CGAMESA_PHYSICAL
+#pragma once
 
 #include <game/CPhysical.h>
 #include "CEntitySA.h"
@@ -125,10 +124,14 @@ public:
     void  SetMass(float fMass);
     float GetTurnMass(void);
     void  SetTurnMass(float fTurnMass);
+    float GetAirResistance(void);
+    void  SetAirResistance(float fAirResistance);
     float GetElasticity(void);
     void  SetElasticity(float fElasticity);
     float GetBuoyancyConstant(void);
     void  SetBuoyancyConstant(float fBuoyancyConstant);
+    void  GetCenterOfMass(CVector& vecCenterOfMass);
+    void  SetCenterOfMass(CVector& vecCenterOfMass);
 
     void ProcessCollision(void);
     void AddToMovingList(void);
@@ -155,10 +158,6 @@ public:
     /*
     VOID        SetMassMultiplier(FLOAT fMassMultiplier);
     FLOAT       GetMassMultiplier();
-    VOID        SetAirResistance(FLOAT fAirResistance);
-    FLOAT       GetAirResistance();
-    VOID        SetCenterOfMass(CVector * vecCenterOfMass);
-    CVector * GetCenterOfMass();
 
     BOOL        GetExtraHeavy();
     VOID        SetExtraHeavy(BOOL bExtraHeavy);
@@ -173,5 +172,3 @@ public:
     BYTE        GetLevel();
     VOID        SetLevel(BYTE LivesInThisLevel);*/
 };
-
-#endif

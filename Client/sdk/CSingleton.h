@@ -20,8 +20,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CSINGLETON_H
-#define __CSINGLETON_H
+#pragma once
 
 template <typename T>
 class CSingleton
@@ -46,5 +45,3 @@ public:
 
     static T* GetSingletonPtr(void) { return m_pSingleton; }
 };
-
-#endif

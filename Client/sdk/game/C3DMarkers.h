@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_3DMARKERS
-#define __CGAME_3DMARKERS
+#pragma once
 
 #include <CVector.h>
 #include "C3DMarker.h"
@@ -22,5 +21,3 @@ public:
                                     BYTE a) = 0;
     virtual C3DMarker* FindFreeMarker() = 0;
 };
-
-#endif

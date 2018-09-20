@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUICALLBACK_H
-#define __CGUICALLBACK_H
+#pragma once
 
 class CGUIElement;
 
@@ -101,5 +100,3 @@ public:
 protected:
     char m_Callback[4 + 4 + 20];            // vtable + pObj + pMemFn
 };
-
-#endif

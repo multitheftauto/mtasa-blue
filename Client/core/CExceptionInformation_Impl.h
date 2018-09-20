@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CEXCEPTIONINFORMATION_IMPL_H
-#define __CEXCEPTIONINFORMATION_IMPL_H
+#pragma once
 
 #include <core/CExceptionInformation.h>
 #include <windows.h>
@@ -70,5 +69,3 @@ private:
     unsigned long m_ulSS;
     unsigned long m_ulEFlags;
 };
-
-#endif

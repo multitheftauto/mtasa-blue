@@ -14,7 +14,7 @@
 extern CGame* g_pGame;
 
 #ifndef VERIFY_ELEMENT
-#define VERIFY_ELEMENT(element) (g_pGame->GetMapManager()->GetRootElement ()->IsMyChild(element,true)&&!element->IsBeingDeleted())
+#define VERIFY_ELEMENT(element) (g_pGame->GetMapManager()->GetRootElement()->IsMyChild(element, true) && !element->IsBeingDeleted())
 #endif
 
 using namespace std;
@@ -31,12 +31,6 @@ CLuaArgument::CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArgume
     // Initialize and call our = on the argument
     m_pTableData = NULL;
     CopyRecursive(Argument, pKnownTables);
-}
-
-CLuaArgument::CLuaArgument(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables)
-{
-    m_pTableData = NULL;
-    ReadFromBitStream(bitStream, pKnownTables);
 }
 
 CLuaArgument::CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables)
@@ -464,144 +458,158 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
     SLuaTypeSync type;
 
     // Read out the type
-    if (bitStream.Read(&type))
+    if (!bitStream.Read(&type))
+        return false;
+
+    // Depending on what type...
+    switch (type.data.ucType)
     {
-        // Depending on what type...
-        switch (type.data.ucType)
-        {
             // Nil type
-            case LUA_TNIL:
-            {
-                m_iType = LUA_TNIL;
-                break;
-            }
+        case LUA_TNIL:
+        {
+            m_iType = LUA_TNIL;
+            return true;
+            ;
+        }
 
-            // Boolean type
-            case LUA_TBOOLEAN:
-            {
-                bool bValue;
-                if (bitStream.ReadBit(bValue))
-                    ReadBool(bValue);
-                break;
-            }
+        // Boolean type
+        case LUA_TBOOLEAN:
+        {
+            bool bValue;
+            if (!bitStream.ReadBit(bValue))
+                return false;
 
-            // Number type
-            case LUA_TNUMBER:
+            ReadBool(bValue);
+            return true;
+        }
+
+        // Number type
+        case LUA_TNUMBER:
+        {
+            if (bitStream.ReadBit())
             {
                 if (bitStream.ReadBit())
                 {
-                    if (bitStream.ReadBit())
-                    {
-                        double dNum;
-                        if (bitStream.Read(dNum))
-                            ReadNumber(dNum);
-                    }
+                    double dNum;
+                    if (bitStream.Read(dNum))
+                        ReadNumber(dNum);
                     else
-                    {
-                        float fNum;
-                        if (bitStream.Read(fNum))
-                            ReadNumber(RoundFromFloatSource(fNum));
-                    }
+                        return false;
                 }
                 else
                 {
-                    int iNum;
-                    if (bitStream.ReadCompressed(iNum))
-                        ReadNumber(iNum);
+                    float fNum;
+                    if (bitStream.Read(fNum))
+                        ReadNumber(RoundFromFloatSource(fNum));
+                    else
+                        return false;
                 }
-                break;
             }
 
-            // Table type
-            case LUA_TTABLE:
+            int iNum;
+            if (bitStream.ReadCompressed(iNum))
+                ReadNumber(iNum);
+            else
+                return false;
+        }
+
+        // Table type
+        case LUA_TTABLE:
+        {
+            m_pTableData = new CLuaArguments();
+            if (!m_pTableData->ReadFromBitStream(bitStream, pKnownTables))
+                return false;
+            m_bWeakTableRef = false;
+            m_iType = LUA_TTABLE;
+            m_pTableData->ValidateTableKeys();
+            return true;
+        }
+
+        // Table reference
+        case LUA_TTABLEREF:
+        {
+            unsigned long ulTableRef;
+            if (!bitStream.ReadCompressed(ulTableRef))
+                return false;
+
+            if (pKnownTables && ulTableRef < pKnownTables->size())
             {
-                m_pTableData = new CLuaArguments(bitStream, pKnownTables);
-                m_bWeakTableRef = false;
+                m_pTableData = pKnownTables->at(ulTableRef);
+                m_bWeakTableRef = true;
                 m_iType = LUA_TTABLE;
-                m_pTableData->ValidateTableKeys();
-                break;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // String type
+        case LUA_TSTRING:
+        {
+            // Read out the string length
+            unsigned short usLength;
+            if (bitStream.ReadCompressed(usLength) && usLength > 0)
+            {
+                if (!bitStream.CanReadNumberOfBytes(usLength))
+                    return false;
+                // Allocate a buffer and read the string into it
+                std::string strValue(usLength, '\0');
+                if (bitStream.Read(&strValue[0], usLength))
+                {
+                    // Put it into us
+                    ReadString(strValue);
+                    return true;
+                }
+                return false;
             }
 
-            // Table reference
-            case LUA_TTABLEREF:
+            return true;
+        }
+
+        // Long string type
+        case LUA_TSTRING_LONG:
+        {
+            // Read out the string length
+            uint uiLength;
+            if (bitStream.ReadCompressed(uiLength) && uiLength > 0)
             {
-                unsigned long ulTableRef;
-                if (bitStream.ReadCompressed(ulTableRef))
+                if (!bitStream.CanReadNumberOfBytes(uiLength))
+                    return false;
+
+                bitStream.AlignReadToByteBoundary();
+                // Allocate a buffer and read the string into it
+                std::string strValue(uiLength, '\0');
+                if (bitStream.Read(&strValue[0], uiLength))
                 {
-                    if (pKnownTables && ulTableRef < pKnownTables->size())
-                    {
-                        m_pTableData = pKnownTables->at(ulTableRef);
-                        m_bWeakTableRef = true;
-                        m_iType = LUA_TTABLE;
-                    }
+                    // Put it into us
+                    ReadString(strValue);
+                    return true;
                 }
-                break;
+                return false;
             }
 
-            // String type
-            case LUA_TSTRING:
+            return true;
+        }
+
+        // Element type?
+        case LUA_TLIGHTUSERDATA:
+        case LUA_TUSERDATA:
+        {
+            ElementID ElementID;
+            if (bitStream.Read(ElementID))
             {
-                // Read out the string length
-                unsigned short usLength;
-                if (bitStream.ReadCompressed(usLength) && usLength)
-                {
-                    // Allocate a buffer and read the string into it
-                    char* szValue = new char[usLength + 1];
-                    if (bitStream.Read(szValue, usLength))
-                    {
-                        // Put it into us
-                        ReadString(std::string(szValue, usLength));
-                    }
-
-                    // Delete the buffer
-                    delete[] szValue;
-                }
-                else
-                    ReadString("");
-
-                break;
+                ReadElementID(ElementID);
+                return true;
             }
-
-            // Long string type
-            case LUA_TSTRING_LONG:
+            else
             {
-                // Read out the string length
-                uint uiLength;
-                if (bitStream.ReadCompressed(uiLength) && uiLength)
-                {
-                    bitStream.AlignReadToByteBoundary();
-
-                    // Allocate a buffer and read the string into it
-                    char* szValue = new char[uiLength + 1];
-                    assert(szValue);
-                    if (bitStream.Read(szValue, uiLength))
-                    {
-                        // Put it into us
-                        ReadString(std::string(szValue, uiLength));
-                    }
-
-                    // Delete the buffer
-                    delete[] szValue;
-                }
-                else
-                    ReadString("");
-
-                break;
-            }
-
-            // Element type?
-            case LUA_TLIGHTUSERDATA:
-            case LUA_TUSERDATA:
-            {
-                ElementID ElementID;
-                if (bitStream.Read(ElementID))
-                {
-                    ReadElementID(ElementID);
-                }
-                break;
+                return false;
             }
         }
     }
+
     return true;
 }
 

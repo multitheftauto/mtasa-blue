@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include <game/CGame.h>
 #include "CNewsBrowser.h"
+#include "CLanguageSelector.h"
 
 #define NATIVE_RES_X    1280.0f
 #define NATIVE_RES_Y    1024.0f
@@ -281,6 +282,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_Settings.SetVisible(false);
     m_Credits.SetVisible(false);
     m_pNewsBrowser->SetVisible(false);
+    m_pLanguageSelector = new CLanguageSelector(m_pCanvas);
 
     // We're not ingame
     SetIsIngame(false);
@@ -348,6 +350,7 @@ CMainMenu::~CMainMenu(void)
 
     delete m_pDisconnect->image;
     delete m_pDisconnect;
+    delete m_pLanguageSelector;
 }
 
 void CMainMenu::SetMenuVerticalPosition(int iPosY)
@@ -652,6 +655,7 @@ void CMainMenu::Update(void)
     // Call subdialog pulses
     m_ServerBrowser.Update();
     m_ServerInfo.DoPulse();
+    m_pLanguageSelector->DoPulse();
 }
 
 void CMainMenu::Show(bool bOverlay)
