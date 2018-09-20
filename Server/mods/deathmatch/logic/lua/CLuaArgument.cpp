@@ -543,8 +543,10 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
             {
                 // Read out the string length
                 unsigned short usLength;
-                if (bitStream.ReadCompressed(usLength) && usLength)
+                if (bitStream.ReadCompressed(usLength) && usLength > 0)
                 {
+                    if (!bitStream.CanReadNumberOfBytes(usLength))
+                        return false;
                     // Allocate a buffer and read the string into it
                     char* szValue = new char[usLength + 1];
                     if (bitStream.Read(szValue, usLength))
@@ -567,8 +569,11 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
             {
                 // Read out the string length
                 uint uiLength;
-                if (bitStream.ReadCompressed(uiLength) && uiLength)
+                if (bitStream.ReadCompressed(uiLength) && uiLength > 0)
                 {
+                    if(!bitStream.CanReadNumberOfBytes(uiLength))
+                        return false;
+                        
                     bitStream.AlignReadToByteBoundary();
 
                     // Allocate a buffer and read the string into it
