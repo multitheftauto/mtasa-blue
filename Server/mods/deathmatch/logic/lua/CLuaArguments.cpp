@@ -21,10 +21,6 @@ extern CGame* g_pGame;
 #define VERIFY_ELEMENT(element) (g_pGame->GetMapManager()->GetRootElement ()->IsMyChild(element,true)&&!element->IsBeingDeleted())
 #endif
 
-CLuaArguments::CLuaArguments(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables)
-{
-    ReadFromBitStream(bitStream, pKnownTables);
-}
 
 CLuaArguments::CLuaArguments(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables)
 {
@@ -508,7 +504,13 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
         pKnownTables->push_back(this);
         for (unsigned int ui = 0; ui < uiNumArgs; ++ui)
         {
-            CLuaArgument* pArgument = new CLuaArgument(bitStream, pKnownTables);
+            CLuaArgument* pArgument = new CLuaArgument();
+            if (!ReadFromBitStream(bitStream, pKnownTables))
+            {
+                if (bKnownTablesCreated)
+                    delete pKnownTables;
+                return false;
+            }
             m_Arguments.push_back(pArgument);
         }
     }
