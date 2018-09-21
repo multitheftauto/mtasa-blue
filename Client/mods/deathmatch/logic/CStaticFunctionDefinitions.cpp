@@ -5474,7 +5474,7 @@ bool CStaticFunctionDefinitions::GUIComboBoxIsOpen(CClientEntity& Entity)
         // Are we a combobox?
         if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
         {
-            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetState();
+            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->IsOpen();
         }
     }
     
