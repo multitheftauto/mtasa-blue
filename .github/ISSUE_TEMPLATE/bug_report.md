@@ -22,7 +22,7 @@ Steps to reproduce the behaviour:
 **Screenshots**
 <!-- If applicable, add screenshots to help explain your problem. -->
 
-**Version:**
+**Version**
 <!--
 Please provide the following information:
 - server/client version (e.g, 1.1, 1.5.4)
