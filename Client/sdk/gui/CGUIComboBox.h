@@ -36,5 +36,5 @@ public:
     virtual void          SetDropListRemoveHandler(GUI_CALLBACK Callback) = 0;
     virtual void          ShowDropList(void) = 0;
     virtual void          HideDropList(void) = 0;
-    virtual bool          GetState(void) = 0;
+    virtual bool          IsOpen(void) = 0;
 };
