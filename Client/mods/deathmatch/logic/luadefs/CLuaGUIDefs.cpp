@@ -35,7 +35,7 @@ static const SFixedArray<const char*, MAX_CHATBOX_LAYOUT_CVARS> g_chatboxLayoutC
 }};
 
 void CLuaGUIDefs::LoadFunctions(void)
-{ 
+{
     std::map<const char*, lua_CFunction> functions{
         {"guiGetInputEnabled", GUIGetInputEnabled},
         {"guiSetInputEnabled", GUISetInputEnabled},
