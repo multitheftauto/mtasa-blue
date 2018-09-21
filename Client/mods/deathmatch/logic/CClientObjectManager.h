@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTOBJECTMANAGER_H
-#define __CCLIENTOBJECTMANAGER_H
+#pragma once
 
 class CClientManager;
 class CClientObject;
@@ -68,5 +67,3 @@ protected:
     CMappedArray<CClientObject*> m_Objects;
     CMappedArray<CClientObject*> m_StreamedIn;
 };
-
-#endif

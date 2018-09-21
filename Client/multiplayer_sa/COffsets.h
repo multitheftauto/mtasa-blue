@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __MULTIPLAYERSA_OFFSETS_H
-#define __MULTIPLAYERSA_OFFSETS_H
+#pragma once
 
 class COffsetsMP
 {
@@ -23,5 +22,3 @@ public:
 private:
     static void InitializeCommon10(void);
 };
-
-#endif

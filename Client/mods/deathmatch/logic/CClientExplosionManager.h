@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CClientExplosionManager_H
-#define __CClientExplosionManager_H
+#pragma once
 
 #include "CClientCommon.h"
 
@@ -37,5 +36,3 @@ public:
 private:
     CClientManager* m_pManager;
 };
-
-#endif

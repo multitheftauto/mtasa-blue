@@ -11,8 +11,7 @@
 
 using namespace tinygettext;
 
-#ifndef __CLANGUAGE_H
-#define __CLANGUAGE_H
+#pragma once
 
 class CLanguage
 {
@@ -35,5 +34,3 @@ private:
     SString    m_strCode;            // Language code
     SString    m_strName;            // Human readable name
 };
-
-#endif

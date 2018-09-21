@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCONSOLELOGGER_H
-#define __CCONSOLELOGGER_H
+#pragma once
 
 #include "CSingleton.h"
 #include <fstream>
@@ -32,5 +31,3 @@ private:
     FILE*        m_pFile;
     std::fstream File;
 };
-
-#endif

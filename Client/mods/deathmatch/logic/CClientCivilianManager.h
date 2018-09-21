@@ -10,8 +10,7 @@
 
 class CClientCivilianManager;
 
-#ifndef __CCLIENTCIVILIANMANAGER_H
-#define __CCLIENTCIVILIANMANAGER_H
+#pragma once
 
 #include "CClientCivilian.h"
 
@@ -53,5 +52,3 @@ private:
     bool                        m_bCanRemoveFromList;
     std::list<CClientCivilian*> m_Civilians;
 };
-
-#endif

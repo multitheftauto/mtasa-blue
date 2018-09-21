@@ -16,7 +16,7 @@ project "CEF"
 	
 	files {
 		"premake5.lua",
-		"**.cc",
+		"libcef_dll/**.cc",
 		"**.h",
 	}
 

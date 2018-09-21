@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAUDIOCONTAINERSA_H
-#define __CAUDIOCONTAINERSA_H
+#pragma once
 
 #include <game/CAudioContainer.h>
 #include "CAudioContainerLookupTableSA.h"
@@ -124,5 +123,3 @@ protected:
         }
     }
 };
-
-#endif

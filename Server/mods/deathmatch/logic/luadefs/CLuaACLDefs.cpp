@@ -20,38 +20,46 @@ static const char* GetResourceName(lua_State* luaVM)
 
 void CLuaACLDefs::LoadFunctions(void)
 {
-    CLuaCFunctions::AddFunction("aclReload", aclReload);
-    CLuaCFunctions::AddFunction("aclSave", aclSave);
+    std::map<const char*, lua_CFunction> functions{
+        {"aclReload", aclReload},
+        {"aclSave", aclSave},
 
-    CLuaCFunctions::AddFunction("aclCreate", aclCreate);
-    CLuaCFunctions::AddFunction("aclDestroy", aclDestroy);
+        {"aclCreate", aclCreate},
+        {"aclDestroy", aclDestroy},
 
-    CLuaCFunctions::AddFunction("aclGet", aclGet);
+        {"aclGet", aclGet},
 
-    CLuaCFunctions::AddFunction("aclList", aclList);
-    CLuaCFunctions::AddFunction("aclGetName", aclGetName);
+        {"aclList", aclList},
+        {"aclGetName", aclGetName},
 
-    CLuaCFunctions::AddFunction("aclGetRight", aclGetRight);
-    CLuaCFunctions::AddFunction("aclSetRight", aclSetRight);
-    CLuaCFunctions::AddFunction("aclListRights", aclListRights);
-    CLuaCFunctions::AddFunction("aclRemoveRight", aclRemoveRight);
+        {"aclGetRight", aclGetRight},
+        {"aclSetRight", aclSetRight},
+        {"aclListRights", aclListRights},
+        {"aclRemoveRight", aclRemoveRight},
 
-    CLuaCFunctions::AddFunction("aclCreateGroup", aclCreateGroup);
-    CLuaCFunctions::AddFunction("aclDestroyGroup", aclDestroyGroup);
+        {"aclCreateGroup", aclCreateGroup},
+        {"aclDestroyGroup", aclDestroyGroup},
 
-    CLuaCFunctions::AddFunction("aclGetGroup", aclGetGroup);
-    CLuaCFunctions::AddFunction("aclGroupList", aclGroupList);
+        {"aclGetGroup", aclGetGroup},
+        {"aclGroupList", aclGroupList},
 
-    CLuaCFunctions::AddFunction("aclGroupGetName", aclGroupGetName);
-    CLuaCFunctions::AddFunction("aclGroupAddACL", aclGroupAddACL);
-    CLuaCFunctions::AddFunction("aclGroupListACL", aclGroupListACL);
-    CLuaCFunctions::AddFunction("aclGroupRemoveACL", aclGroupRemoveACL);
-    CLuaCFunctions::AddFunction("aclGroupAddObject", aclGroupAddObject);
-    CLuaCFunctions::AddFunction("aclGroupListObjects", aclGroupListObjects);
-    CLuaCFunctions::AddFunction("aclGroupRemoveObject", aclGroupRemoveObject);
+        {"aclGroupGetName", aclGroupGetName},
+        {"aclGroupAddACL", aclGroupAddACL},
+        {"aclGroupListACL", aclGroupListACL},
+        {"aclGroupRemoveACL", aclGroupRemoveACL},
+        {"aclGroupAddObject", aclGroupAddObject},
+        {"aclGroupListObjects", aclGroupListObjects},
+        {"aclGroupRemoveObject", aclGroupRemoveObject},
 
-    CLuaCFunctions::AddFunction("isObjectInACLGroup", isObjectInACLGroup);
-    CLuaCFunctions::AddFunction("hasObjectPermissionTo", hasObjectPermissionTo);
+        {"isObjectInACLGroup", isObjectInACLGroup},
+        {"hasObjectPermissionTo", hasObjectPermissionTo},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaACLDefs::AddClass(lua_State* luaVM)

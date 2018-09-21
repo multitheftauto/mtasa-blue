@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_EXPLOSIONMANAGER
-#define __CGAMESA_EXPLOSIONMANAGER
+#pragma once
 
 #include <game/CExplosionManager.h>
 #include "CExplosionSA.h"
@@ -37,5 +36,3 @@ public:
 private:
     CExplosionSA* Explosions[MAX_EXPLOSIONS];
 };
-
-#endif

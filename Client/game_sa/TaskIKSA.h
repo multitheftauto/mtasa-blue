@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TASKIK
-#define __CGAMESA_TASKIK
+#pragma once
 
 #include <game/TaskIK.h>
 
@@ -159,5 +158,3 @@ public:
     CTaskSimpleTriggerLookAtSA(CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, unsigned char useTorso = false, float speed = 0.25f,
                                int blendTime = 1000, int priority = 3);
 };
-
-#endif

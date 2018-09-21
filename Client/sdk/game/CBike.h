@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_BIKE
-#define __CGAME_BIKE
+#pragma once
 
 #include "CVehicle.h"
 
@@ -21,5 +20,3 @@ public:
 
     // virtual void PlaceOnRoadProperly ( void )=0;
 };
-
-#endif

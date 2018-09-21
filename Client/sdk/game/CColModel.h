@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_COLMODEL
-#define __CGAME_COLMODEL
+#pragma once
 
 class CColModelSAInterface;
 
@@ -20,5 +19,3 @@ public:
     virtual CColModelSAInterface* GetInterface(void) = 0;
     virtual void                  Destroy(void) = 0;
 };
-
-#endif

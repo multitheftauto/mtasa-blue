@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_CARGENERATOR
-#define __CGAMESA_CARGENERATOR
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 
@@ -78,5 +77,3 @@ public:
     DWORD    GetNextGenTime();
     VOID     SetNextGenTime(DWORD dwNextGenTime);
 };
-
-#endif

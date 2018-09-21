@@ -1081,7 +1081,6 @@ bool CStaticFunctionDefinitions::SetElementRotation(CClientEntity& Entity, const
             {
                 Vehicle.SetRotationDegrees(ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZYX));
             }
-
             break;
         }
         case CCLIENTOBJECT:
@@ -2191,19 +2190,19 @@ bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CClientEntity& Entity, con
 {
     RUN_CHILDREN(SetPedAnimationSpeed(**iter, strAnimName, fSpeed))
 
-        if (IS_PED(&Entity))
+    if (IS_PED(&Entity))
+    {
+        CClientPed& Ped = static_cast<CClientPed&>(Entity);
+        if (!strAnimName.empty())
         {
-            CClientPed& Ped = static_cast<CClientPed&>(Entity);
-            if (!strAnimName.empty())
+            auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(Ped.GetClump(), strAnimName);
+            if (pAnimAssociation)
             {
-                auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(Ped.GetClump(), strAnimName);
-                if (pAnimAssociation)
-                {
-                    pAnimAssociation->SetCurrentSpeed(fSpeed);
-                    return true;
-                }
+                pAnimAssociation->SetCurrentSpeed(fSpeed);
+                return true;
             }
         }
+    }
 
     return false;
 }
@@ -3505,6 +3504,34 @@ bool CStaticFunctionDefinitions::IsVehicleWindowOpen(CClientVehicle& Vehicle, uc
     return Vehicle.IsWindowOpen(ucWindow);
 }
 
+bool CStaticFunctionDefinitions::SetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummies, CVector& vecPosition)
+{
+    if (CClientVehicleManager::IsValidModel(usModel))
+    {
+        auto pModelInfo = g_pGame->GetModelInfo(usModel);
+        if (pModelInfo)
+        {
+            pModelInfo->SetVehicleDummyPosition(eDummies, vecPosition);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummies, CVector& vecPosition)
+{
+    if (CClientVehicleManager::IsValidModel(usModel))
+    {
+        auto pModelInfo = g_pGame->GetModelInfo(usModel);
+        if (pModelInfo)
+        {
+            vecPosition = pModelInfo->GetVehicleDummyPosition(eDummies);
+            return true;
+        }
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition)
 {
     if (CClientVehicleManager::IsValidModel(usModel))
@@ -3765,6 +3792,36 @@ bool CStaticFunctionDefinitions::GetObjectMass(CClientObject& Object, float& fMa
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetObjectTurnMass(CClientObject& Object, float& fTurnMass)
+{
+    fTurnMass = Object.GetTurnMass();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetObjectAirResistance(CClientObject& Object, float& fAirResistance)
+{
+    fAirResistance = Object.GetAirResistance();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetObjectElasticity(CClientObject& Object, float& fElasticity)
+{
+    fElasticity = Object.GetElasticity();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetObjectBuoyancyConstant(CClientObject& Object, float& fBuoyancyConstant)
+{
+    fBuoyancyConstant = Object.GetBuoyancyConstant();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetObjectCenterOfMass(CClientObject& Object, CVector& vecCenterOfMass)
+{
+    Object.GetCenterOfMass(vecCenterOfMass);
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetObjectRotation(CClientEntity& Entity, const CVector& vecRotation)
 {
     RUN_CHILDREN(SetObjectRotation(**iter, vecRotation))
@@ -3932,6 +3989,75 @@ bool CStaticFunctionDefinitions::SetObjectMass(CClientEntity& Entity, float fMas
             return true;
         }
     }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetObjectTurnMass(CClientEntity& Entity, float fTurnMass)
+{
+    if (fTurnMass >= 0.0f)
+    {
+        RUN_CHILDREN(SetObjectTurnMass(**iter, fTurnMass))
+
+        if (IS_OBJECT(&Entity))
+        {
+            CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
+            Object.SetTurnMass(fTurnMass);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetObjectAirResistance(CClientEntity& Entity, float fAirResistance)
+{
+    RUN_CHILDREN(SetObjectAirResistance(**iter, fAirResistance))
+
+    if (IS_OBJECT(&Entity))
+    {
+        CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
+        Object.SetAirResistance(fAirResistance);
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetObjectElasticity(CClientEntity& Entity, float fElasticity)
+{
+    RUN_CHILDREN(SetObjectElasticity(**iter, fElasticity))
+
+    if (IS_OBJECT(&Entity))
+    {
+        CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
+        Object.SetElasticity(fElasticity);
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetObjectBuoyancyConstant(CClientEntity& Entity, float fBuoyancyConstant)
+{
+    RUN_CHILDREN(SetObjectBuoyancyConstant(**iter, fBuoyancyConstant))
+
+    if (IS_OBJECT(&Entity))
+    {
+        CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
+        Object.SetBuoyancyConstant(fBuoyancyConstant);
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetObjectCenterOfMass(CClientEntity& Entity, const CVector& vecCenterOfMass)
+{
+    RUN_CHILDREN(SetObjectCenterOfMass(**iter, vecCenterOfMass))
+
+    if (IS_OBJECT(&Entity))
+    {
+        CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
+        Object.SetCenterOfMass(vecCenterOfMass);
+        return true;
+    }
+
     return false;
 }
 

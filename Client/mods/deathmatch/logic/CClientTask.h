@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTTASK_H
-#define __CCLIENTTASK_H
+#pragma once
 
 #include <list>
 #include "lua/LuaCommon.h"
@@ -79,5 +78,3 @@ private:
 
     static unsigned long m_ulLastUniqueIdentifier;
 };
-
-#endif

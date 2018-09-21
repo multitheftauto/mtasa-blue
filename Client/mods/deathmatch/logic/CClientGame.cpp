@@ -3940,7 +3940,7 @@ bool CClientGame::ChokingHandler(unsigned char ucWeaponType)
 
 void CClientGame::CAnimBlendAssocDestructorHandler(CAnimBlendAssociationSAInterface* pThis)
 {
-    // printf("CClientGame::CAnimBlendAssocDestructorHandler called! sAnimID: %d\n", pThis->sAnimID);
+    // printf("CClientGame::CAnimBlendAssocDestructorHandler called! sAnimGroupID: %d | sAnimID: %d\n", pThis->sAnimGroup, pThis->sAnimID);
     RemoveAnimationAssociationFromMap(pThis);
 }
 

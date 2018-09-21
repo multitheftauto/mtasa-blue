@@ -10,8 +10,7 @@
 
 class CClientTeamManager;
 
-#ifndef __CCLIENTTEAMMANAGER_H
-#define __CCLIENTTEAMMANAGER_H
+#pragma once
 
 #include <list>
 #include "CClientTeam.h"
@@ -37,5 +36,3 @@ private:
     std::list<CClientTeam*> m_List;
     bool                    m_bRemoveFromList;
 };
-
-#endif

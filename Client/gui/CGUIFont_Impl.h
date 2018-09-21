@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIFONT_IMPL_H
-#define __CGUIFONT_IMPL_H
+#pragma once
 
 #include <gui/CGUIFont.h>
 #include <CEGUI.h>
@@ -42,5 +41,3 @@ private:
     CEGUI::Font*        m_pFont;
     CEGUI::FontManager* m_pFontManager;
 };
-
-#endif

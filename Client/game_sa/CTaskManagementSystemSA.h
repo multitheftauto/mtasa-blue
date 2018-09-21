@@ -11,8 +11,7 @@
 
 class CTaskManagementSystemSA;
 
-#ifndef __CGAMESA_TASKSYSTEM
-#define __CGAMESA_TASKSYSTEM
+#pragma once
 
 #include "TaskSA.h"
 #include "TaskCarAccessoriesSA.h"
@@ -42,5 +41,3 @@ private:
 
     std::list<STaskListItem*> m_TaskList;
 };
-
-#endif

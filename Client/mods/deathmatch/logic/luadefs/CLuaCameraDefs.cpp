@@ -14,27 +14,35 @@
 
 void CLuaCameraDefs::LoadFunctions(void)
 {
-    // Cam get funcs
-    CLuaCFunctions::AddFunction("getCamera", GetCamera);
-    CLuaCFunctions::AddFunction("getCameraViewMode", GetCameraViewMode);
-    CLuaCFunctions::AddFunction("getCameraMatrix", GetCameraMatrix);
-    CLuaCFunctions::AddFunction("getCameraTarget", GetCameraTarget);
-    CLuaCFunctions::AddFunction("getCameraInterior", GetCameraInterior);
-    CLuaCFunctions::AddFunction("getCameraGoggleEffect", GetCameraGoggleEffect);
-    CLuaCFunctions::AddFunction("getCameraShakeLevel", GetCameraShakeLevel);
-    CLuaCFunctions::AddFunction("getCameraFieldOfView", GetCameraFieldOfView);
+    std::map<const char*, lua_CFunction> functions{
+        // Cam get funcs
+        {"getCamera", GetCamera},
+        {"getCameraViewMode", GetCameraViewMode},
+        {"getCameraMatrix", GetCameraMatrix},
+        {"getCameraTarget", GetCameraTarget},
+        {"getCameraInterior", GetCameraInterior},
+        {"getCameraGoggleEffect", GetCameraGoggleEffect},
+        {"getCameraShakeLevel", GetCameraShakeLevel},
+        {"getCameraFieldOfView", GetCameraFieldOfView},
 
-    // Cam set funcs
-    CLuaCFunctions::AddFunction("setCameraMatrix", SetCameraMatrix);
-    CLuaCFunctions::AddFunction("setCameraFieldOfView", SetCameraFieldOfView);
-    CLuaCFunctions::AddFunction("setCameraTarget", SetCameraTarget);
-    CLuaCFunctions::AddFunction("setCameraInterior", SetCameraInterior);
-    CLuaCFunctions::AddFunction("fadeCamera", FadeCamera);
-    CLuaCFunctions::AddFunction("setCameraClip", SetCameraClip);
-    CLuaCFunctions::AddFunction("getCameraClip", GetCameraClip);
-    CLuaCFunctions::AddFunction("setCameraViewMode", SetCameraViewMode);
-    CLuaCFunctions::AddFunction("setCameraGoggleEffect", SetCameraGoggleEffect);
-    CLuaCFunctions::AddFunction("setCameraShakeLevel", SetCameraShakeLevel);
+        // Cam set funcs
+        {"setCameraMatrix", SetCameraMatrix},
+        {"setCameraFieldOfView", SetCameraFieldOfView},
+        {"setCameraTarget", SetCameraTarget},
+        {"setCameraInterior", SetCameraInterior},
+        {"fadeCamera", FadeCamera},
+        {"setCameraClip", SetCameraClip},
+        {"getCameraClip", GetCameraClip},
+        {"setCameraViewMode", SetCameraViewMode},
+        {"setCameraGoggleEffect", SetCameraGoggleEffect},
+        {"setCameraShakeLevel", SetCameraShakeLevel},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaCameraDefs::AddClass(lua_State* luaVM)

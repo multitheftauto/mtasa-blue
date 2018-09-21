@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimBlendSequenceSA_H
-#define __CAnimBlendSequenceSA_H
+#pragma once
 
 #include <game/CAnimBlendSequence.h>
 
@@ -50,5 +49,3 @@ public:
 protected:
     CAnimBlendSequenceSAInterface* m_pInterface;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_PAD
-#define __CGAME_PAD
+#pragma once
 
 #include <windows.h>
 
@@ -70,5 +69,3 @@ public:
     virtual uint              GetDrunkInputDelay() = 0;
     virtual void              SetDrunkInputDelay(uint inputDelay) = 0;
 };
-
-#endif

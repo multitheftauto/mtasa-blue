@@ -10,8 +10,7 @@
 
 class CClientEntity;
 
-#ifndef __CCLIENTSPATIALDATABASE_H
-#define __CCLIENTSPATIALDATABASE_H
+#pragma once
 
 // Bounding sphere z position for 2d objects
 #define SPATIAL_2D_Z    0
@@ -36,5 +35,3 @@ public:
 };
 
 CClientSpatialDatabase* GetClientSpatialDatabase();
-
-#endif

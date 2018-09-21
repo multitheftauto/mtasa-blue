@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CVERSIONUPDATER_H
-#define __CVERSIONUPDATER_H
+#pragma once
 
 class CVersionUpdaterInterface
 {
@@ -32,5 +31,3 @@ public:
 };
 
 CVersionUpdaterInterface* GetVersionUpdater();
-
-#endif

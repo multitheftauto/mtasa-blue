@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_PATHFIND
-#define __CGAME_PATHFIND
+#pragma once
 
 #include <CVector.h>
 
@@ -43,5 +42,3 @@ public:
     virtual void SetMaxVehicles(int iMaxVehicles) = 0;
     virtual void SetAllRandomPedsThisType(int iType) = 0;
 };
-
-#endif

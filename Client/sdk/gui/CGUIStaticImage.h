@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUISTATICIMAGE_H
-#define __CGUISTATICIMAGE_H
+#pragma once
 
 #include "CGUIElement.h"
 #include "CGUITexture.h"
@@ -30,5 +29,3 @@ public:
 
     virtual void Render(void) = 0;
 };
-
-#endif
