@@ -603,6 +603,8 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
             }
         }
     }
+    else
+        return false;
     return true;
 }
 
