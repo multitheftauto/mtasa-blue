@@ -14,13 +14,18 @@ Steps to reproduce the behaviour:
 2. Click on '....'
 3. Scroll down to '....'
 4. See error
+
+Please paste reproduction resources (zip files) directly into this section.
 -->
 
 **Expected behaviour**
 <!-- A clear and concise description of what you expected to happen. -->
 
 **Screenshots**
-<!-- If applicable, add screenshots to help explain your problem. -->
+<!--
+If applicable, add screenshots to help explain your problem.
+Please paste screenshots directly into this section. Do not provide imgur/tinypic/photobucket links.
+-->
 
 **Version**
 <!--
