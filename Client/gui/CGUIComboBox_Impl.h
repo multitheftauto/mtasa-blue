@@ -34,7 +34,7 @@ public:
     bool          SetItemText(int index, const char* szText);
     bool          SetSelectedItemByIndex(int index);
     void          Clear(void);
-    bool          GetState(void);
+    bool          IsOpen(void);
 
     void SetReadOnly(bool bReadonly);
 
