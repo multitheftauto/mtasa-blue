@@ -1481,6 +1481,7 @@ void CMultiplayerSA::InitHooks()
     MemSetFast((void*)0x5023E1, 0x90, 5);
     // Disable call to CAEVehicleAudioEntity::JustGotOutOfVehicleAsDriver
     MemSetFast((void*)0x502341, 0x90, 5);
+
     // Allow to switch weapons while glued
     MemSetFast((void*)0x60D861, 0x90, 14);
 
