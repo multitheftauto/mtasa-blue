@@ -11,14 +11,15 @@
 
 #include "StdInc.h"
 
-auto        pPedPool = (CPoolSAInterface<CPedSAInterface>**)0xB74490;
-auto        pObjectPool = (CPoolSAInterface<CObjectSAInterface>**)0xB7449C;
-auto        pVehiclePool = (CPoolSAInterface<CVehicleSAInterface>**)0xB74494;
 extern bool g_bVehiclePointerInvalid;
 
 CPoolsSA::CPoolsSA()
 {
     DEBUG_TRACE("CPoolsSA::CPoolsSA()");
+    m_ppPedPoolInterface = (CPoolSAInterface<CPedSAInterface>**)0xB74490;
+    m_ppObjectPoolInterface = (CPoolSAInterface<CObjectSAInterface>**)0xB7449C;
+    m_ppVehiclePoolInterface = (CPoolSAInterface<CVehicleSAInterface>**)0xB74494;
+
     m_bGetVehicleEnabled = true;
     m_ulBuildingCount = 0;
 
@@ -76,11 +77,11 @@ inline bool CPoolsSA::AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleS
     }
     else
     {
-        DWORD dwPoolIndex = GetVehiclePoolIndex((std::uint8_t*)pInterface);
+        DWORD dwElementIndexInPool = GetVehiclePoolIndex((std::uint8_t*)pInterface);
 
-        m_vehiclePool.arrayOfClientEntities[dwPoolIndex] = {pVehicle, (CClientEntity*)pClientVehicle};
+        m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool] = {pVehicle, (CClientEntity*)pClientVehicle};
 
-        std::printf("ADD: vehicle ref: %u | pInterface = %p | pool capacity: %u\n", dwPoolIndex, pInterface, GetPoolCapacity(VEHICLE_POOL));
+        std::printf("ADD: vehicle ref: %u | pInterface = %p | pool capacity: %u\n", dwElementIndexInPool, pInterface, GetPoolCapacity(VEHICLE_POOL));
 
         ++m_vehiclePool.ulCount;
     }
@@ -117,8 +118,8 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, DWORD* pGameInter
 
         if (pInterface)
         {
-            DWORD dwPoolIndex = GetVehiclePoolIndex((std::uint8_t*)pInterface);
-            pVehicle = m_vehiclePool.arrayOfClientEntities[dwPoolIndex].pEntity;
+            DWORD dwElementIndexInPool = GetVehiclePoolIndex((std::uint8_t*)pInterface);
+            pVehicle = m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
 
             if (pVehicle)
             {
@@ -154,12 +155,12 @@ void CPoolsSA::RemoveVehicle(CVehicle* pVehicle, bool bDelete)
 
         CVehicleSAInterface* pInterface = pVehicle->GetVehicleInterface();
 
-        DWORD       dwPoolIndex = GetVehiclePoolIndex((std::uint8_t*)pInterface);
-        CVehicleSA* pVehicleSA = m_vehiclePool.arrayOfClientEntities[dwPoolIndex].pEntity;
+        DWORD       dwElementIndexInPool = GetVehiclePoolIndex((std::uint8_t*)pInterface);
+        CVehicleSA* pVehicleSA = m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
 
-        std::printf("REMOVE vehicle: dwPoolIndex: %u | pInterface = %p | UsedSpaces: %d\n", dwPoolIndex, pInterface, GetNumberOfUsedSpaces(VEHICLE_POOL));
+        std::printf("REMOVE vehicle: dwElementIndexInPool: %u | pInterface = %p | UsedSpaces: %d\n", dwElementIndexInPool, pInterface, GetNumberOfUsedSpaces(VEHICLE_POOL));
 
-        m_vehiclePool.arrayOfClientEntities[dwPoolIndex] = {nullptr, nullptr};
+        m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool] = {nullptr, nullptr};
 
         // Delete it from memory
         delete pVehicleSA;
@@ -183,8 +184,8 @@ CVehicle* CPoolsSA::GetVehicle(DWORD* pGameInterface)
 
         if (pInterface)
         {
-            DWORD       dwPoolIndex = GetVehiclePoolIndex((std::uint8_t*)pInterface);
-            CVehicleSA* pVehicle = m_vehiclePool.arrayOfClientEntities[dwPoolIndex].pEntity;
+            DWORD       dwElementIndexInPool = GetVehiclePoolIndex((std::uint8_t*)pInterface);
+            CVehicleSA* pVehicle = m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
 
             if (pVehicle)
             {
@@ -257,8 +258,8 @@ CVehicle* CPoolsSA::GetVehicleFromRef(DWORD dwGameRef)
     CVehicleSAInterface* pInterface = (CVehicleSAInterface*)dwReturn;
     if (pInterface)
     {
-        DWORD       dwPoolIndex = dwGameRef >> 8;
-        CVehicleSA* pVehicle = m_vehiclePool.arrayOfClientEntities[dwPoolIndex].pEntity;
+        DWORD       dwElementIndexInPool = dwGameRef >> 8;
+        CVehicleSA* pVehicle = m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
 
         if (pVehicle)
         {
@@ -299,10 +300,10 @@ inline bool CPoolsSA::AddObjectToPool(CClientObject* pClientObject, CObjectSA* p
     }
     else
     {
-        DWORD dwPoolIndex = GetObjectPoolIndex((std::uint8_t*)pInterface);
+        DWORD dwElementIndexInPool = GetObjectPoolIndex((std::uint8_t*)pInterface);
 
-        m_objectPool.arrayOfClientEntities[dwPoolIndex] = {pObject, (CClientEntity*)pClientObject};
-        std::printf("ADD: object index: %u | pInterface = %p | pool capacity: %u\n", dwPoolIndex, pInterface, GetPoolCapacity(OBJECT_POOL));
+        m_objectPool.arrayOfClientEntities[dwElementIndexInPool] = {pObject, (CClientEntity*)pClientObject};
+        std::printf("ADD: object index: %u | pInterface = %p | pool capacity: %u\n", dwElementIndexInPool, pInterface, GetPoolCapacity(OBJECT_POOL));
 
         // Increase the count of objects
         ++m_objectPool.ulCount;
@@ -357,13 +358,13 @@ void CPoolsSA::RemoveObject(CObject* pObject, bool bDelete)
 
         CObjectSAInterface* pInterface = pObject->GetObjectInterface();
 
-        DWORD dwPoolIndex = GetObjectPoolIndex((std::uint8_t*)pInterface);
+        DWORD dwElementIndexInPool = GetObjectPoolIndex((std::uint8_t*)pInterface);
 
-        CObjectSA* pObjectSA = m_objectPool.arrayOfClientEntities[dwPoolIndex].pEntity;
+        CObjectSA* pObjectSA = m_objectPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
 
-        std::printf("REMOVE object: dwPoolIndex: %u | pInterface = %p | UsedSpaces = %d \n", dwPoolIndex, pInterface, GetNumberOfUsedSpaces(OBJECT_POOL));
+        std::printf("REMOVE object: dwElementIndexInPool: %u | pInterface = %p | UsedSpaces = %d \n", dwElementIndexInPool, pInterface, GetNumberOfUsedSpaces(OBJECT_POOL));
 
-        m_objectPool.arrayOfClientEntities[dwPoolIndex] = {nullptr, nullptr};
+        m_objectPool.arrayOfClientEntities[dwElementIndexInPool] = {nullptr, nullptr};
 
         // Delete it from memory
         delete pObjectSA;
@@ -383,8 +384,8 @@ CObject* CPoolsSA::GetObject(DWORD* pGameInterface)
 
     if (pInterface)
     {
-        DWORD      dwPoolIndex = GetObjectPoolIndex((std::uint8_t*)pInterface);
-        CObjectSA* pObject = m_objectPool.arrayOfClientEntities[dwPoolIndex].pEntity;
+        DWORD      dwElementIndexInPool = GetObjectPoolIndex((std::uint8_t*)pInterface);
+        CObjectSA* pObject = m_objectPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
 
         if (pObject)
         {
@@ -457,8 +458,8 @@ CObject* CPoolsSA::GetObjectFromRef(DWORD dwGameRef)
 
     if (pInterface)
     {
-        DWORD      dwPoolIndex = dwGameRef >> 8;
-        CObjectSA* pObject = m_objectPool.arrayOfClientEntities[dwPoolIndex].pEntity;
+        DWORD      dwElementIndexInPool = dwGameRef >> 8;
+        CObjectSA* pObject = m_objectPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
 
         if (pObject)
         {
@@ -929,19 +930,19 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPositio
 DWORD CPoolsSA::GetPedPoolIndex(std::uint8_t* pInterface)
 {
     DWORD dwAlignedSize = 1988;
-    return ((pInterface - (std::uint8_t*)(*pPedPool)->m_pObjects) / dwAlignedSize);
+    return ((pInterface - (std::uint8_t*)(*m_ppPedPoolInterface)->m_pObjects) / dwAlignedSize);
 }
 
 DWORD CPoolsSA::GetVehiclePoolIndex(std::uint8_t* pInterface)
 {
     DWORD dwAlignedSize = 2584;
-    return ((pInterface - (std::uint8_t*)(*pVehiclePool)->m_pObjects) / dwAlignedSize);
+    return ((pInterface - (std::uint8_t*)(*m_ppVehiclePoolInterface)->m_pObjects) / dwAlignedSize);
 }
 
 DWORD CPoolsSA::GetObjectPoolIndex(std::uint8_t* pInterface)
 {
     DWORD dwAlignedSize = 412;
-    return ((pInterface - (std::uint8_t*)(*pObjectPool)->m_pObjects) / dwAlignedSize);
+    return ((pInterface - (std::uint8_t*)(*m_ppObjectPoolInterface)->m_pObjects) / dwAlignedSize);
 }
 
 uint CPoolsSA::GetModelIdFromClump(RpClump* pRpClump)

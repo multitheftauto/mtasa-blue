@@ -197,6 +197,9 @@ private:
     vehiclePool_t                                                    m_vehiclePool;
     pedPool_t                                                        m_pedPool;
     objectPool_t                                                     m_objectPool;
+    CPoolSAInterface<CPedSAInterface>**                              m_ppPedPoolInterface;
+    CPoolSAInterface<CObjectSAInterface>**                           m_ppObjectPoolInterface;
+    CPoolSAInterface<CVehicleSAInterface>**                          m_ppVehiclePoolInterface;
 
     CBuildingSA*  Buildings[MAX_BUILDINGS];
     unsigned long m_ulBuildingCount;
