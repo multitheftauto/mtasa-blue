@@ -681,7 +681,11 @@ SClientEntity<CPedSA>* CPoolsSA::GetPed(DWORD* pGameInterface)
         DWORD dwElementIndexInPool = GetPedPoolIndex((std::uint8_t*)pInterface);
 
         SClientEntity<CPedSA>* pEntity = &m_pedPool.arrayOfClientEntities[dwElementIndexInPool];
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> f4c20840591dab8c91d81575c8db2b503c6995ee
         if (pEntity)
         {
             return pEntity;
