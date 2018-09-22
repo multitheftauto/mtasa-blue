@@ -106,7 +106,7 @@ public:
     virtual CPed* AddCivilianPed(DWORD* pGameInterface) = 0;
     virtual void  RemovePed(CPed* pPed, bool bDelete = true) = 0;
 
-    virtual SClientEntity<CEntity>* GetPed(DWORD* pGameInterface) = 0;            // not sure we really want this here
+    virtual SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface) = 0;            // not sure we really want this here
     
     virtual DWORD         GetPedRef(CPed* pPed) = 0;
     virtual DWORD         GetPedRef(DWORD* pGameInterface) = 0;
