@@ -666,9 +666,9 @@ void CPoolsSA::RemovePed(CPed* pPed, bool bDelete)
     }
 }
 
-CPed* CPoolsSA::GetPed(DWORD* pGameInterface)
+SClientEntity<CEntity>* CPoolsSA::GetPed(DWORD* pGameInterface)
 {
-    DEBUG_TRACE("CPed* CPoolsSA::GetPed ( DWORD* pGameInterface )");
+    DEBUG_TRACE("SClientEntity<T>* CPoolsSA::GetPed ( DWORD* pGameInterface )");
 
     CPedSAInterface* pInterface = reinterpret_cast<CPedSAInterface*>(pGameInterface);
 
@@ -678,10 +678,10 @@ CPed* CPoolsSA::GetPed(DWORD* pGameInterface)
         // Extract the element index from the handle
         DWORD dwElementIndexInPool = GetPedPoolIndex((std::uint8_t*)pInterface);
 
-        CPedSA* pPed = m_pedPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
-        if (pPed)
+        SClientEntity<CEntity>* pEntity = dynamic_cast<SClientEntity<CEntity>*>(m_pedPool.arrayOfClientEntities[dwElementIndexInPool]);
+        if (pEntity)
         {
-            return pPed;
+            return pEntity;
         }
     }
 

@@ -1361,7 +1361,8 @@ void _declspec(naked) HOOK_CObject_PreRender()
 CPedSAInterface* pFallingPedInterface;
 bool             CWorld_Remove_FallenPedsCheck()
 {
-    CPed* pPed = pGameInterface->GetPools()->GetPed((DWORD*)pFallingPedInterface);
+    CPed* pPed = dynamic_cast<CPed*>(pGameInterface->GetPools()->GetPed((DWORD*)pFallingPedInterface)->pEntity);
+
     if (pPed && pPed->GetVehicle() != NULL)
     {
         // Disallow
@@ -1575,7 +1576,8 @@ CPedSAInterface* pTyreSmokePed = NULL;
 
 bool IsPlayerPedLocal()
 {
-    CPed* pPed = pGameInterface->GetPools()->GetPed((DWORD*)pTyreSmokePed);
+    CPed* pPed = dynamic_cast<CPed*>(pGameInterface->GetPools()->GetPed((DWORD*)pTyreSmokePed)->pEntity);
+
     if (pPed)
     {
         CPed* pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);

@@ -433,7 +433,7 @@ void SwitchContext(CPed* thePed)
 
 void SwitchContext(CPedSAInterface* ped)
 {
-    CPed* thePed = pGameInterface->GetPools()->GetPed((DWORD*)ped);
+    CPed* thePed = dynamic_cast<CPed*>(pGameInterface->GetPools()->GetPed((DWORD*)ped)->pEntity);
     if (thePed)
     {
         SwitchContext(thePed);

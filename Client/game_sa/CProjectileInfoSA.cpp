@@ -179,7 +179,7 @@ CEntity* CProjectileInfoSA::GetTarget(void)
         {
             case ENTITY_TYPE_PED:
             {
-                pTarget = pGame->GetPools()->GetPed((DWORD*)pTargetInterface);
+                pTarget = dynamic_cast<CPed*>(pGame->GetPools()->GetPed((DWORD*)pTargetInterface)->pEntity);
                 break;
             }
 

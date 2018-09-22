@@ -22,7 +22,7 @@ CEntity* CCamSA::GetTargetEntity(void) const
         switch (pInterface->nType)
         {
             case ENTITY_TYPE_PED:
-                pReturn = (CEntity*)(pPools->GetPed((DWORD*)pInterface));
+                pReturn = dynamic_cast<CPed*>(pPools->GetPed((DWORD*)pInterface)->pEntity);
                 break;
             case ENTITY_TYPE_VEHICLE:
                 pReturn = (CEntity*)(pPools->GetVehicle((DWORD*)pInterface));

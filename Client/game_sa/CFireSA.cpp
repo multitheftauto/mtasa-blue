@@ -76,7 +76,7 @@ CEntity* CFireSA::GetCreator()
         switch (createEntitySA->nType)
         {
             case ENTITY_TYPE_PED:
-                creatorEntity = pPools->GetPed((DWORD*)createEntitySA);
+                creatorEntity = dynamic_cast<CPed*>(pPools->GetPed((DWORD*)createEntitySA)->pEntity);
                 break;
             case ENTITY_TYPE_VEHICLE:
                 creatorEntity = pPools->GetVehicle((DWORD*)createEntitySA);
@@ -99,7 +99,7 @@ CEntity* CFireSA::GetEntityOnFire()
         switch (TargetEntitySA->nType)
         {
             case ENTITY_TYPE_PED:
-                TargetEntity = pPools->GetPed((DWORD*)TargetEntitySA);
+                TargetEntity = dynamic_cast<CPed*>(pPools->GetPed((DWORD*)TargetEntitySA)->pEntity);
                 break;
             case ENTITY_TYPE_VEHICLE:
                 TargetEntity = pPools->GetVehicle((DWORD*)TargetEntitySA);

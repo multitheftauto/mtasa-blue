@@ -125,8 +125,9 @@ private:
 
 public:
     void RemovePed(CPed* ped, bool bDelete = true);
-    // CPed*            GetPed(unsigned long ulID);
-    CPed*            GetPed(DWORD* pGameInterface);
+    
+    SClientEntity<CEntity>* GetPed(DWORD* pGameInterface);
+
     DWORD            GetPedRef(CPed* pPed);
     DWORD            GetPedRef(DWORD* pGameInterface);
     CPed*            GetPedFromRef(DWORD dwGameRef);

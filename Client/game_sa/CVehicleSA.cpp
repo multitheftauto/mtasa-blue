@@ -1156,7 +1156,7 @@ CPed* CVehicleSA::GetDriver(void)
 
     CPedSAInterface* pDriver = GetVehicleInterface()->pDriver;
     if (pDriver)
-        return pPools->GetPed((DWORD*)pDriver);
+        return dynamic_cast<CPed*>(pPools->GetPed((DWORD*)pDriver)->pEntity);
     else
         return NULL;
 }
@@ -1170,7 +1170,7 @@ CPed* CVehicleSA::GetPassenger(unsigned char ucSlot)
     {
         CPedSAInterface* pPassenger = GetVehicleInterface()->pPassengers[ucSlot];
         if (pPassenger)
-            return pPools->GetPed((DWORD*)pPassenger);
+            return dynamic_cast<CPed*>(pPools->GetPed((DWORD*)pPassenger)->pEntity);
     }
 
     return NULL;

@@ -2651,7 +2651,7 @@ bool CallExplosionHandler(void)
         {
             case ENTITY_TYPE_PED:
             {
-                pExplosionCreator = pGameInterface->GetPools()->GetPed((DWORD*)pInterface);
+                pExplosionCreator = dynamic_cast<CPed*>(pGameInterface->GetPools()->GetPed((DWORD*)pInterface)->pEntity);
                 break;
             }
 
@@ -2676,7 +2676,7 @@ bool CallExplosionHandler(void)
         {
             case ENTITY_TYPE_PED:
             {
-                pExplodingEntity = dynamic_cast<CEntity*>(pGameInterface->GetPools()->GetPed((DWORD*)pExplodingEntityInterface));
+                pExplodingEntity = pGameInterface->GetPools()->GetPed((DWORD*)pExplodingEntityInterface)->pEntity;
                 break;
             }
 
@@ -3006,7 +3006,7 @@ bool             ProcessPlayerWeapon()
     if (IsLocalPlayer(pProcessPlayerWeaponPed))
         return true;
 
-    CPlayerPed* pPed = dynamic_cast<CPlayerPed*>(pGameInterface->GetPools()->GetPed((DWORD*)pProcessPlayerWeaponPed));
+    CPlayerPed* pPed = dynamic_cast<CPlayerPed*>(pGameInterface->GetPools()->GetPed((DWORD*)pProcessPlayerWeaponPed)->pEntity);
     if (pPed)
     {
         CRemoteDataStorageSA* pData = CRemoteDataSA::GetRemoteDataStorage(pPed);
@@ -5234,7 +5234,8 @@ float                    fBikeDamage;
 void                     CEventHandler_ComputeKnockOffBikeResponse()
 {
     CEventDamage* pEvent = pGameInterface->GetEventList()->GetEventDamage(pBikeDamageInterface);
-    CPed*         pPed = pGameInterface->GetPools()->GetPed((DWORD*)pBikePedInterface);
+    CPed* pPed           = dynamic_cast<CPed*>(pGameInterface->GetPools()->GetPed((DWORD*)pBikePedInterface)->pEntity);
+
     if (pEvent && pPed)
     {
         CPedDamageResponse* pResponse = pEvent->GetDamageResponse();
@@ -5274,7 +5275,8 @@ eWeaponType      weaponSkillWeapon;
 BYTE             weaponSkill;
 bool             CPed_GetWeaponSkill()
 {
-    CPed* pPed = pGameInterface->GetPools()->GetPed((DWORD*)weaponSkillPed);
+    CPed* pPed = dynamic_cast<CPed*>(pGameInterface->GetPools()->GetPed((DWORD*)weaponSkillPed)->pEntity);
+    
     if (pPed)
     {
         CPed* pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);
@@ -5342,7 +5344,7 @@ void _declspec(naked) HOOK_CPed_GetWeaponSkill()
 // applying the visual effect
 bool _cdecl CPed_AddGogglesModelCheck(void* pPedInterface)
 {
-    return pGameInterface->GetPools()->GetPed((DWORD*)pPedInterface) == pGameInterface->GetPools()->GetPedFromRef(1);
+    return pGameInterface->GetPools()->GetPed((DWORD*)pPedInterface)->pEntity == pGameInterface->GetPools()->GetPedFromRef(1);
 }
 
 void _declspec(naked) HOOK_CPed_AddGogglesModel()

@@ -46,7 +46,7 @@ CTaskSimpleChokingSA::CTaskSimpleChokingSA(CPed* pAttacker, bool bIsTearGas)
 CPed* CTaskSimpleChokingSA::GetAttacker(void)
 {
     CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
-    return pGame->GetPools()->GetPed((DWORD*)internalInterface->m_pAttacker);
+    return dynamic_cast<CPed*>(pGame->GetPools()->GetPed((DWORD*)internalInterface->m_pAttacker)->pEntity);
 }
 
 unsigned int CTaskSimpleChokingSA::GetTimeRemaining(void)

@@ -47,6 +47,7 @@ enum ePools
 };
 
 class CClientEntity;
+class CPedSA;
 
 template <class T>
 struct SClientEntity
@@ -54,6 +55,8 @@ struct SClientEntity
     T*             pEntity;
     CClientEntity* pClientEntity;
 };
+
+
 
 class CEntryInfoNodePool
 {
@@ -103,7 +106,8 @@ public:
     virtual CPed* AddCivilianPed(DWORD* pGameInterface) = 0;
     virtual void  RemovePed(CPed* pPed, bool bDelete = true) = 0;
 
-    virtual CPed*         GetPed(DWORD* pGameInterface) = 0;            // not sure we really want this here
+    virtual SClientEntity<CEntity>* GetPed(DWORD* pGameInterface) = 0;            // not sure we really want this here
+    
     virtual DWORD         GetPedRef(CPed* pPed) = 0;
     virtual DWORD         GetPedRef(DWORD* pGameInterface) = 0;
     virtual CPed*         GetPedFromRef(DWORD dwGameRef) = 0;
