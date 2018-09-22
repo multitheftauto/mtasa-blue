@@ -16,7 +16,8 @@
 #include "CObjectSA.h"
 #include "CBuildingSA.h"
 #include <array>
-#define INVALID_POOL_ARRAY_ID    0xFFFFFFFF
+
+#define INVALID_POOL_ARRAY_ID 0xFFFFFFFF
 
 class CClientEntity;
 
@@ -38,31 +39,56 @@ public:
     int GetNumberOfUsedSpaces();
 };
 
-template <class T>
-struct SClientEntity
+// size of tPoolObjectFlags is 1 byte only
+union tPoolObjectFlags {
+    struct
+    {
+        unsigned char nId : 7;
+        bool          bEmpty : 1;
+    };
+
+private:
+    unsigned char nValue;
+};
+
+template <class A, class B = A>
+class CPoolSAInterface
 {
-    T* pEntity;
-    CClientEntity* pClientEntity;
+public:
+    // m_pObjects contains all interfaces. 140 maximum for ped objects.
+    B*                m_pObjects;
+    tPoolObjectFlags* m_byteMap;
+    int               m_nSize;
+    int               m_nFirstFree;
+    bool              m_bOwnsAllocations;
+    bool              field_11;
+
+    // Default constructor for statically allocated pools
+    CPoolSAInterface()
+    {
+        // Remember to call CPool::Init to fill in the fields!
+        m_pObjects = nullptr;
+        m_byteMap = nullptr;
+        m_nSize = 0;
+        m_bOwnsAllocations = false;
+    }
 };
 
 class CPoolsSA : public CPools
 {
 public:
-
     CPoolsSA();
     ~CPoolsSA();
 
     // Vehicles pool
-    CVehicle* AddVehicle(eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2);
-    CVehicle* AddVehicle(DWORD* pGameInterface);
+    CVehicle* AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2);
+    CVehicle* AddVehicle(CClientVehicle* pClientVehicle, DWORD* pGameInterface);
 
 private:
-    bool AddVehicleToPool(CVehicleSA* pVehicle);
+    bool AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleSA* pVehicle);
 
 public:
     void          RemoveVehicle(CVehicle* pVehicle, bool bDelete = true);
-    void          RemoveVehicle(unsigned long ulID, bool bDelete = true);
-    CVehicle*     GetVehicle(unsigned long ulID);
     CVehicle*     GetVehicle(DWORD* pGameInterface);
     DWORD         GetVehicleRef(CVehicle* pVehicle);
     DWORD         GetVehicleRef(DWORD* pGameInterface);
@@ -75,15 +101,13 @@ public:
     void DeleteAllVehicles();
 
     // Objects pool
-    CObject* AddObject(DWORD dwModelID, bool bLowLod, bool bBreakingDisabled);
+    CObject* AddObject(CClientObject* pClientObject, DWORD dwModelID, bool bLowLod, bool bBreakingDisabled);
 
 private:
-    bool AddObjectToPool(CObjectSA* pObject);
+    bool AddObjectToPool(CClientObject* pClientObject, CObjectSA* pObject);
 
 public:
     void          RemoveObject(CObject* pObject, bool bDelete = true);
-    void          RemoveObject(unsigned long ulID, bool bDelete = true);
-    CObject*      GetObject(unsigned long ulID);
     CObject*      GetObject(DWORD* pGameInterface);
     DWORD         GetObjectRef(CObject* pObject);
     DWORD         GetObjectRef(DWORD* pGameInterface);
@@ -92,16 +116,16 @@ public:
     void          DeleteAllObjects();
 
     // Peds pool
-    CPed* AddPed(CClientPed * pClientPed, ePedModel ePedType);
-    CPed* AddPed(CClientPed * pClientPed, DWORD* pGameInterface);
+    CPed* AddPed(CClientPed* pClientPed, ePedModel ePedType);
+    CPed* AddPed(CClientPed* pClientPed, DWORD* pGameInterface);
     CPed* AddCivilianPed(DWORD* pGameInterface);
 
 private:
-    bool AddPedToPool(CClientPed * pClientPed, CPedSA* pPed);
+    bool AddPedToPool(CClientPed* pClientPed, CPedSA* pPed);
 
 public:
-    void             RemovePed(CPed* ped, bool bDelete = true);
-    //CPed*            GetPed(unsigned long ulID);
+    void RemovePed(CPed* ped, bool bDelete = true);
+    // CPed*            GetPed(unsigned long ulID);
     CPed*            GetPed(DWORD* pGameInterface);
     DWORD            GetPedRef(CPed* pPed);
     DWORD            GetPedRef(DWORD* pGameInterface);
@@ -116,7 +140,11 @@ public:
     // Others
     CBuilding* AddBuilding(DWORD dwModelID);
     void       DeleteAllBuildings();
-    CVehicle*  AddTrain(CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId = 0xFF);
+    CVehicle*  AddTrain(CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId = 0xFF);
+
+    DWORD GetPedPoolIndex(std::uint8_t* pInterface);
+    DWORD GetVehiclePoolIndex(std::uint8_t* pInterfacee);
+    DWORD GetObjectPoolIndex(std::uint8_t* pInterface);
 
     int  GetNumberOfUsedSpaces(ePools pools);
     int  GetPoolDefaultCapacity(ePools pool);
@@ -130,19 +158,19 @@ public:
 
 private:
     // Generic container for pools
-    template <class T, class I,unsigned long MAX>
+    template <class T, class I, unsigned long MAX>
     struct SPoolData
     {
-        std::array <SClientEntity<T>, MAX> arrayOfClientEntities;
+        std::array<SClientEntity<T>, MAX> arrayOfClientEntities;
 
         typedef CFastHashMap<I*, T*> mapType;
 
         // we are not using array and map members for ped pool.
         // These two members can be removed after we've done the same
         // for other pools in CPoolsSA.cpp
-        mapType                      map;
-        T*                           array[MAX];
-        unsigned long                ulCount;
+        mapType       map;
+        T*            array[MAX];
+        unsigned long ulCount;
 
     private:
         friend class CPoolsSA;
@@ -152,7 +180,7 @@ private:
             std::printf("max for CPoolSA: %u\n", MAX);
             for (unsigned int i = 0; i < MAX; ++i)
             {
-                arrayOfClientEntities[i] = { nullptr, nullptr };
+                arrayOfClientEntities[i] = {nullptr, nullptr};
             }
 
             for (unsigned int i = 0; i < MAX; ++i)
@@ -180,55 +208,55 @@ private:
     CPointerNodeSingleLinkPool* PointerNodeSingleLinkPool;
 };
 
-#define FUNC_GetVehicle                     0x54fff0
-#define FUNC_GetVehicleRef                  0x54ffc0
+#define FUNC_GetVehicle 0x54fff0
+#define FUNC_GetVehicleRef 0x54ffc0
 //#define FUNC_GetVehicleCount              0x429510
-#define FUNC_GetPed                         0x54ff90
-#define FUNC_GetPedRef                      0x54ff60
+#define FUNC_GetPed 0x54ff90
+#define FUNC_GetPedRef 0x54ff60
 //#define FUNC_GetPedCount                  0x4A7440
-#define FUNC_GetObject                      0x550050
-#define FUNC_GetObjectRef                   0x550020
+#define FUNC_GetObject 0x550050
+#define FUNC_GetObjectRef 0x550020
 //#define FUNC_GetObjectCount                   0x4A74D0
 
-#define CLASS_CPool_Vehicle                 0xB74494
-#define CLASS_CPool_Ped                     0xB74490
-#define CLASS_CPool_Object                  0xB7449C
+#define CLASS_CPool_Vehicle 0xB74494
+#define CLASS_CPool_Ped 0xB74490
+#define CLASS_CPool_Object 0xB7449C
 
-#define CLASS_CBuildingPool                 0xb74498
-#define CLASS_CPedPool                      0xb74490
-#define CLASS_CObjectPool                   0xb7449c
-#define CLASS_CDummyPool                    0xb744a0
-#define CLASS_CVehiclePool                  0xb74494
-#define CLASS_CColModelPool                 0xb744a4
-#define CLASS_CTaskPool                     0xb744a8
-#define CLASS_CEventPool                    0xb744ac
-#define CLASS_CTaskAllocatorPool            0xb744bc
-#define CLASS_CPedIntelligencePool          0xb744c0
-#define CLASS_CPedAttractorPool             0xb744c4
-#define CLASS_CEntryInfoNodePool            0xb7448c
-#define CLASS_CNodeRoutePool                0xb744b8
-#define CLASS_CPatrolRoutePool              0xb744b4
-#define CLASS_CPointRoutePool               0xb744b0
-#define CLASS_CPtrNodeDoubleLinkPool        0xB74488
-#define CLASS_CPtrNodeSingleLinkPool        0xB74484
+#define CLASS_CBuildingPool 0xb74498
+#define CLASS_CPedPool 0xb74490
+#define CLASS_CObjectPool 0xb7449c
+#define CLASS_CDummyPool 0xb744a0
+#define CLASS_CVehiclePool 0xb74494
+#define CLASS_CColModelPool 0xb744a4
+#define CLASS_CTaskPool 0xb744a8
+#define CLASS_CEventPool 0xb744ac
+#define CLASS_CTaskAllocatorPool 0xb744bc
+#define CLASS_CPedIntelligencePool 0xb744c0
+#define CLASS_CPedAttractorPool 0xb744c4
+#define CLASS_CEntryInfoNodePool 0xb7448c
+#define CLASS_CNodeRoutePool 0xb744b8
+#define CLASS_CPatrolRoutePool 0xb744b4
+#define CLASS_CPointRoutePool 0xb744b0
+#define CLASS_CPtrNodeDoubleLinkPool 0xB74488
+#define CLASS_CPtrNodeSingleLinkPool 0xB74484
 
-#define FUNC_CBuildingPool_GetNoOfUsedSpaces                0x550620
-#define FUNC_CPedPool_GetNoOfUsedSpaces                     0x5504A0
-#define FUNC_CObjectPool_GetNoOfUsedSpaces                  0x54F6B0
-#define FUNC_CDummyPool_GetNoOfUsedSpaces                   0x5507A0
-#define FUNC_CVehiclePool_GetNoOfUsedSpaces                 0x42CCF0
-#define FUNC_CColModelPool_GetNoOfUsedSpaces                0x550870
-#define FUNC_CTaskPool_GetNoOfUsedSpaces                    0x550940
-#define FUNC_CEventPool_GetNoOfUsedSpaces                   0x550A10
-#define FUNC_CTaskAllocatorPool_GetNoOfUsedSpaces           0x550d50
-#define FUNC_CPedIntelligencePool_GetNoOfUsedSpaces         0x550E20
-#define FUNC_CPedAttractorPool_GetNoOfUsedSpaces            0x550ef0
-#define FUNC_CEntryInfoNodePool_GetNoOfUsedSpaces           0x5503d0
-#define FUNC_CNodeRoutePool_GetNoOfUsedSpaces               0x550c80
-#define FUNC_CPatrolRoutePool_GetNoOfUsedSpaces             0x550bb0
-#define FUNC_CPointRoutePool_GetNoOfUsedSpaces              0x550ae0
-#define FUNC_CPtrNodeSingleLinkPool_GetNoOfUsedSpaces       0x550230
-#define FUNC_CPtrNodeDoubleLinkPool_GetNoOfUsedSpaces       0x550300
+#define FUNC_CBuildingPool_GetNoOfUsedSpaces 0x550620
+#define FUNC_CPedPool_GetNoOfUsedSpaces 0x5504A0
+#define FUNC_CObjectPool_GetNoOfUsedSpaces 0x54F6B0
+#define FUNC_CDummyPool_GetNoOfUsedSpaces 0x5507A0
+#define FUNC_CVehiclePool_GetNoOfUsedSpaces 0x42CCF0
+#define FUNC_CColModelPool_GetNoOfUsedSpaces 0x550870
+#define FUNC_CTaskPool_GetNoOfUsedSpaces 0x550940
+#define FUNC_CEventPool_GetNoOfUsedSpaces 0x550A10
+#define FUNC_CTaskAllocatorPool_GetNoOfUsedSpaces 0x550d50
+#define FUNC_CPedIntelligencePool_GetNoOfUsedSpaces 0x550E20
+#define FUNC_CPedAttractorPool_GetNoOfUsedSpaces 0x550ef0
+#define FUNC_CEntryInfoNodePool_GetNoOfUsedSpaces 0x5503d0
+#define FUNC_CNodeRoutePool_GetNoOfUsedSpaces 0x550c80
+#define FUNC_CPatrolRoutePool_GetNoOfUsedSpaces 0x550bb0
+#define FUNC_CPointRoutePool_GetNoOfUsedSpaces 0x550ae0
+#define FUNC_CPtrNodeSingleLinkPool_GetNoOfUsedSpaces 0x550230
+#define FUNC_CPtrNodeDoubleLinkPool_GetNoOfUsedSpaces 0x550300
 
-#define FUNC_CTrain_CreateMissionTrain                      0x6F7550
-#define VAR_TrainModelArray                                 0x8D44F8
+#define FUNC_CTrain_CreateMissionTrain 0x6F7550
+#define VAR_TrainModelArray 0x8D44F8

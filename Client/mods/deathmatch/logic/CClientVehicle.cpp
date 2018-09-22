@@ -2514,11 +2514,11 @@ void CClientVehicle::Create(void)
         {
             DWORD dwModels[1];
             dwModels[0] = m_usModel;
-            m_pVehicle = g_pGame->GetPools()->AddTrain(&m_Matrix.vPos, dwModels, 1, m_bTrainDirection, m_ucTrackID);
+            m_pVehicle = g_pGame->GetPools()->AddTrain(this, &m_Matrix.vPos, dwModels, 1, m_bTrainDirection, m_ucTrackID);
         }
         else
         {
-            m_pVehicle = g_pGame->GetPools()->AddVehicle(static_cast<eVehicleTypes>(m_usModel), m_ucVariation, m_ucVariation2);
+            m_pVehicle = g_pGame->GetPools()->AddVehicle(this, static_cast<eVehicleTypes>(m_usModel), m_ucVariation, m_ucVariation2);
         }
 
         // Failed. Remove our reference to the vehicle model and return
