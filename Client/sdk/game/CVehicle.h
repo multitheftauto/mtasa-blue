@@ -303,6 +303,8 @@ public:
     virtual bool                              GetComponentRotation(const SString& vehicleComponent, CVector& vecRotation) = 0;
     virtual bool                              SetComponentPosition(const SString& vehicleComponent, const CVector& vecPosition) = 0;
     virtual bool                              GetComponentPosition(const SString& vehicleComponent, CVector& vecPositionModelling) = 0;
+    virtual bool                              SetComponentScale(const SString& vehicleComponent, const CVector& vecScale) = 0;
+    virtual bool                              GetComponentScale(const SString& vehicleComponent, CVector& vecScaleModelling) = 0;
     virtual bool                              IsComponentPresent(const SString& vehicleComponent) = 0;
     virtual bool                              SetComponentMatrix(const SString& vehicleComponent, const CMatrix& matOrientation) = 0;
     virtual bool                              GetComponentMatrix(const SString& vehicleComponent, CMatrix& matOutOrientation) = 0;

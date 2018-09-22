@@ -38,6 +38,20 @@ public:
 
     CMatrix(const CVector& vecPosition, const CVector& vecRotation)
     {
+        // Initialize as identity, so rotation isn't broken by no scale set.
+        vRight = CVector(1.0f, 0.0f, 0.0f);
+        vFront = CVector(0.0f, 1.0f, 0.0f);
+        vUp = CVector(0.0f, 0.0f, 1.0f);
+        SetRotation(vecRotation);
+        SetPosition(vecPosition);
+    }
+
+    CMatrix(const CVector& vecPosition, const CVector& vecRotation, const CVector& vecScale)
+    {
+        // Initialize with scale set
+        vRight = CVector(vecScale.fX, 0.0f, 0.0f);
+        vFront = CVector(0.0f, vecScale.fY, 0.0f);
+        vUp = CVector(0.0f, 0.0f, vecScale.fZ);
         SetRotation(vecRotation);
         SetPosition(vecPosition);
     }
@@ -130,6 +144,17 @@ public:
         return matResult;
     }
 
+    CMatrix Clone(void) const
+    {
+        CMatrix matResult;
+        matResult.vRight = vRight.Clone();
+        matResult.vFront = vFront.Clone();
+        matResult.vUp = vUp.Clone();
+        matResult.vPos = vPos.Clone();
+        
+        return matResult;
+    }
+
     void Invert()
     {
         // Transpose the rotation matrix and negate the position
@@ -184,17 +209,32 @@ public:
         }
     }
 
+    CMatrix GetRotationMatrix() const
+    {
+        // Operate only on rotation, ignore scale.
+        CMatrix matClone = Clone();
+        CVector vecScale = GetScale();
+        matClone.vRight /= vecScale.fX;
+        matClone.vFront /= vecScale.fY;
+        matClone.vUp /= vecScale.fZ;
+        matClone.vPos = CVector(0, 0, 0);
+        return matClone;
+    }
+
     // Get matrix rotation as angles
     // Inverted to match MTAized rotations for vehicles and players (and objects on the server)
     // Should produce the same results as ( CVector(0,0,0) - ConvertToEulerAngles() )
     CVector GetRotation(void) const
     {
-        float fRotY = atan2(vRight.fZ, sqrtf(Square(vRight.fX) + Square(vRight.fY)));
-        float fRotZ = atan2(vRight.fY, vRight.fX);
+        // Operate only on rotation, ignore scale.
+        CMatrix matRot = GetRotationMatrix();
+
+        float fRotY = atan2(matRot.vRight.fZ, sqrtf(Square(matRot.vRight.fX) + Square(matRot.vRight.fY)));
+        float fRotZ = atan2(matRot.vRight.fY, matRot.vRight.fX);
 
         float fSinZ = -sin(fRotZ);
         float fCosZ = cos(fRotZ);
-        float fRotX = atan2(vUp.fX * fSinZ + vUp.fY * fCosZ, vFront.fX * fSinZ + vFront.fY * fCosZ);
+        float fRotX = atan2(matRot.vUp.fX * fSinZ + matRot.vUp.fY * fCosZ, matRot.vFront.fX * fSinZ + matRot.vFront.fY * fCosZ);
         return CVector(-fRotX, -fRotY, fRotZ);
     }
 
@@ -210,17 +250,23 @@ public:
         float fSinY = sin(-vecRotation.fY);
         float fSinZ = sin(vecRotation.fZ);
 
+        // Keep current scale even after rotation.
+        CVector vecScale = GetScale();
+
         vRight.fX = fCosY * fCosZ;
         vRight.fY = fCosY * fSinZ;
         vRight.fZ = fSinY;
+        vRight *= vecScale.fX;
 
         vFront.fX = fSinX * fSinY * fCosZ - fCosX * fSinZ;
         vFront.fY = fSinX * fSinY * fSinZ + fCosX * fCosZ;
         vFront.fZ = -fSinX * fCosY;
+        vFront *= vecScale.fY;
 
         vUp.fX = -(fCosX * fSinY * fCosZ + fSinX * fSinZ);
         vUp.fY = fCosZ * fSinX - fCosX * fSinY * fSinZ;
         vUp.fZ = fCosX * fCosY;
+        vUp *= vecScale.fZ;
     }
 
     // Get matrix translational part
@@ -229,6 +275,18 @@ public:
     // Set matrix translational part
     void SetPosition(const CVector& vecPosition) { vPos = vecPosition; }
 
+    const CVector& GetScale() const
+    {
+        return CVector(vRight.Length(), vFront.Length(), vUp.Length());
+    }
+
+    void SetScale(const CVector& vecScale) 
+    {
+        CMatrix matRot = GetRotationMatrix();
+        vRight = matRot.vRight * vecScale.fX;
+        vFront = matRot.vFront * vecScale.fY;
+        vUp = matRot.vUp * vecScale.fZ;
+    }
     //
     // Get reference to component axis by index
     //
