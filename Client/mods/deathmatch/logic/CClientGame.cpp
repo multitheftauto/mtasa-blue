@@ -9,6 +9,7 @@
  *
  *****************************************************************************/
 
+ 
 #include "StdInc.h"
 #include <net/SyncStructures.h>
 #include "game/CAnimBlendAssocGroup.h"
@@ -4543,14 +4544,7 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle
 
                     if (pCollidedPedEntity->pClientEntity)
                     {
-<<<<<<< HEAD
                         pCollidedWithClientEntity = static_cast<CClientEntity*>(pCollidedPedEntity->pClientEntity);
-=======
-                        CClientPed* pCollidedWithClientPed = static_cast<CClientPed*>(pCollidedPedEntity->pClientEntity);
-                        CPed*       pCollidedWithPed = reinterpret_cast<CPed*>(pCollidedWithClientPed);
-
-                        pCollidedWithClientEntity = m_pManager->FindEntity(pCollidedWithPed, true);
->>>>>>> f4c20840591dab8c91d81575c8db2b503c6995ee
                     }
                 }
             }
@@ -4818,14 +4812,7 @@ bool CClientGame::ObjectBreakHandler(CObjectSAInterface* pObjectInterface, CEnti
 
                     if (pAttackerEntity->pClientEntity)
                     {
-<<<<<<< HEAD
                         pClientAttacker = pAttackerEntity->pClientEntity;
-=======
-                        CClientPed* pAttackerClient = static_cast<CClientPed*>(g_pGame->GetPools()->GetPed((DWORD*)pAttackerInterface)->pClientEntity);
-                        CPed*       pAttackerPed = reinterpret_cast<CPed*>(pAttackerClient);
-
-                        pClientAttacker = m_pManager->FindEntity(pAttackerPed);
->>>>>>> f4c20840591dab8c91d81575c8db2b503c6995ee
                     }
                 }
             }
@@ -4854,18 +4841,8 @@ bool CClientGame::WaterCannonHitHandler(CVehicleSAInterface* pCannonVehicle, CPe
         if (pCannonClientVehicle)
         {
             // Get our ped and client ped
-<<<<<<< HEAD
             auto pTheEntity = g_pGame->GetPools()->GetPed((DWORD*)pHitPed);
             CClientPed* pClientPed = nullptr;
-=======
-            auto pPedEntity = g_pGame->GetPools()->GetPed((DWORD*)pHitPed);
-            CClientPed* pClientPed;
-
-            if (pPedEntity->pClientEntity)
-            {
-                pClientPed = static_cast<CClientPed*>(pPedEntity->pClientEntity);
-            }
->>>>>>> f4c20840591dab8c91d81575c8db2b503c6995ee
 
             CLuaArguments Arguments;
 
