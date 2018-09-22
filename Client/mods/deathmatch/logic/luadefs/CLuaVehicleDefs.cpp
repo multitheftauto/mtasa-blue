@@ -128,6 +128,7 @@ void CLuaVehicleDefs::LoadFunctions(void)
         {"setVehicleComponentScale", SetVehicleComponentScale},
         {"resetVehicleComponentPosition", ResetVehicleComponentPosition},
         {"resetVehicleComponentRotation", ResetVehicleComponentRotation},
+        {"resetVehicleComponentScale", ResetVehicleComponentScale },
         {"setVehicleComponentVisible", SetVehicleComponentVisible},
         {"setVehicleNitroActivated", SetVehicleNitroActivated},
         {"setVehicleNitroCount", SetVehicleNitroCount},
