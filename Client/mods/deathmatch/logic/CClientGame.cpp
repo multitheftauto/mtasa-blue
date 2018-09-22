@@ -2890,7 +2890,7 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientFileDownloadComplete", "fileName, success", NULL, false);
 
     m_Events.AddEvent("onClientWeaponFire", "ped, x, y, z", NULL, false);
-    m_Events.AddEvent("onWaterCannonWorldHit", "x, y, z, normalx, normaly, normalz, materialid", NULL, false);
+    m_Events.AddEvent("onClientWaterCannonHit", "x, y, z, normalx, normaly, normalz, materialid", NULL, false);
 }
 
 void CClientGame::DrawFPS(void)
@@ -6885,5 +6885,5 @@ void CClientGame::WaterCannonHitWorldHandler(CColPointSAInterface& pColPoint)
     Arguments.PushNumber(pColPoint.Normal.fY);
     Arguments.PushNumber(pColPoint.Normal.fZ);
     Arguments.PushNumber(pColPoint.ucSurfaceTypeB);
-    GetRootEntity()->CallEvent("onWaterCannonWorldHit", Arguments, true);
+    GetRootEntity()->CallEvent("onClientWaterCannonHit", Arguments, true);
 }
