@@ -8,11 +8,11 @@
  *
  *****************************************************************************/
 // Vertex type used by the primitives batcher
-struct sDrawQueuePrimitiveMaterial
+struct sPrimitiveMaterial
 {
-    D3DPRIMITIVETYPE                      type;
-    CMaterialItem*                        material;
-    std::vector<PrimitiveMaterialVertice> vertices;
+    D3DPRIMITIVETYPE                        eType;
+    CMaterialItem*                          pMaterial;
+    std::vector<PrimitiveMaterialVertice>*  pVecVertices;
 };
 //
 // Batches primitives drawing
@@ -23,23 +23,24 @@ class CPrimitiveMaterialBatcher
 
 public:
     ZERO_ON_NEW
-    CPrimitiveMaterialBatcher(bool m_bZTest, CGraphics* graphics);
+    CPrimitiveMaterialBatcher(CGraphics* graphics);
     ~CPrimitiveMaterialBatcher(void);
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
     void OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
     void UpdateMatrices(float fViewportSizeX, float fViewportSizeY);
+    void SetDeviceStates();
     void Flush(void);
     void DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iSize, const void* pDataAddr, size_t iVertexStride);
     void ClearQueue(void);
-    void AddPrimitive(sDrawQueuePrimitiveMaterial primitive);
+    void AddPrimitive(D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, std::vector<PrimitiveMaterialVertice>* pVecVertices);
 
 protected:
-    bool                                     m_bZTest;
-    IDirect3DDevice9*                        m_pDevice;
-    CGraphics*                               m_pGraphics;
-    std::vector<sDrawQueuePrimitiveMaterial> m_primitiveList;
-    float                                    m_fViewportSizeX;
-    float                                    m_fViewportSizeY;
-    D3DXMATRIX                               m_MatView;
-    D3DXMATRIX                               m_MatProjection;
+    IDirect3DDevice9*               m_pDevice;
+    CGraphics*                      m_pGraphics;
+    std::vector<sPrimitiveMaterial> m_primitiveList;
+    float                           m_fViewportSizeX;
+    float                           m_fViewportSizeY;
+    D3DXMATRIX                      m_MatWorld;
+    D3DXMATRIX                      m_MatView;
+    D3DXMATRIX                      m_MatProjection;
 };

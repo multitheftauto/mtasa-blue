@@ -40,6 +40,8 @@ namespace EDrawMode
         DX_LINE,
         DX_SPRITE,
         TILE_BATCHER,
+        PRIMITIVE,
+        PRIMITIVE_MATERIAL
     };
 }
 using EDrawMode::EDrawModeType;
@@ -145,10 +147,12 @@ public:
                           unsigned long ulFormat, ID3DXFont* pDXFont = NULL, bool bPostGUI = false, bool bColorCoded = false, bool bSubPixelPositioning = false,
                           float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0);
 
-    void DrawPrimitiveQueued(const std::vector<PrimitiveVertice>& vecVertices, D3DPRIMITIVETYPE type, bool bPostGUI = false);
-    void DrawMaterialPrimitiveQueued(const std::vector<PrimitiveMaterialVertice>& vertices, D3DPRIMITIVETYPE type, CMaterialItem* pMaterial, bool bPostGUI);
+    void DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI = false);
+    void DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* vertices, D3DPRIMITIVETYPE type, CMaterialItem* pMaterial, bool bPostGUI);
     void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
                           short siSegments, float fRatio, bool bPostGUI);
+
+    bool IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType);
 
     void OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
 
@@ -213,10 +217,8 @@ private:
     CLine3DBatcher*            m_pLine3DBatcherPostGUI;
     CMaterialLine3DBatcher*    m_pMaterialLine3DBatcherPreGUI;
     CMaterialLine3DBatcher*    m_pMaterialLine3DBatcherPostGUI;
-    CPrimitiveBatcher*         m_pPrimitiveBatcherPreGUI;
-    CPrimitiveBatcher*         m_pPrimitiveBatcherPostGUI;
-    CPrimitiveMaterialBatcher* m_pPrimitiveMaterialBatcherPreGUI;
-    CPrimitiveMaterialBatcher* m_pPrimitiveMaterialBatcherPostGUI;
+    CPrimitiveBatcher*         m_pPrimitiveBatcher;
+    CPrimitiveMaterialBatcher* m_pPrimitiveMaterialBatcher;
     CAspectRatioConverter*     m_pAspectRatioConverter;
 
     // Fonts
@@ -237,6 +239,8 @@ private:
         QUEUE_TEXTURE,
         QUEUE_SHADER,
         QUEUE_CIRCLE,
+        QUEUE_PRIMITIVE,
+        QUEUE_PRIMITIVEMATERIAL,
     };
 
     struct sDrawQueueLine
@@ -307,6 +311,19 @@ private:
         bool           bRelativeUV;
     };
 
+    struct sDrawQueuePrimitive
+    {
+        D3DPRIMITIVETYPE                eType;
+        std::vector<PrimitiveVertice>*  pVecVertices;
+    };
+
+    struct sDrawQueuePrimitiveMaterial
+    {
+        D3DPRIMITIVETYPE                        eType;
+        CMaterialItem*                          pMaterial;
+        std::vector<PrimitiveMaterialVertice>*  pVecVertices;
+    };
+
     struct sDrawQueueItem
     {
         eDrawQueueType eType;
@@ -315,11 +332,13 @@ private:
 
         // Queue item data based on the eType.
         union {
-            sDrawQueueLine    Line;
-            sDrawQueueText    Text;
-            sDrawQueueRect    Rect;
-            sDrawQueueTexture Texture;
-            sDrawQueueCircle  Circle;
+            sDrawQueueLine              Line;
+            sDrawQueueText              Text;
+            sDrawQueueRect              Rect;
+            sDrawQueueTexture           Texture;
+            sDrawQueueCircle            Circle;
+            sDrawQueuePrimitive         Primitive;
+            sDrawQueuePrimitiveMaterial PrimitiveMaterial;
         };
     };
 
