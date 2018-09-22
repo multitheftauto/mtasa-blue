@@ -19,7 +19,7 @@ static CCoreInterface*           m_pCore;
 static CGame*                    m_pGame;
 static CClientGame*              m_pClientGame;
 static CClientManager*           m_pManager;
-static CClientEntity*            m_pRootEntity;
+static CClientEntity*            m_pRooGtEntity;
 static CClientPlayerManager*     m_pPlayerManager;
 static CClientVehicleManager*    m_pVehicleManager;
 static CClientObjectManager*     m_pObjectManager;
@@ -5414,6 +5414,68 @@ bool CStaticFunctionDefinitions::GUIComboBoxSetItemText(CClientEntity& Entity, i
         }
     }
 
+    return false;
+}
+
+int CStaticFunctionDefinitions::GUIComboBoxGetItemCount(CClientEntity& Entity)
+{
+    // Are we a CGUI Element?
+    if (IS_GUI(&Entity))
+    {
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+
+        // Are we a combobox?
+        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
+        {
+            // Call getItemCount
+            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetItemCount();
+        }
+    }
+    
+    return 0;
+}
+
+bool CStaticFunctionDefinitions::GUIComboBoxSetOpen(CClientEntity& Entity, bool state)
+{
+    RUN_CHILDREN(GUIComboBoxSetOpen(**iter, state))
+
+    // Are we a CGUI Element?
+    if (IS_GUI(&Entity))
+    {
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+
+        // Are we a combobox?
+        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
+        {
+            if (state)
+            {
+                static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->ShowDropList();
+            }
+            else if (!state)
+            {
+                static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->HideDropList();
+            }
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GUIComboBoxIsOpen(CClientEntity& Entity)
+{
+    // Are we a CGUI Element?
+    if (IS_GUI(&Entity))
+    {
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+        
+        // Are we a combobox?
+        if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
+        {
+            return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->IsOpen();
+        }
+    }
+    
     return false;
 }
 
