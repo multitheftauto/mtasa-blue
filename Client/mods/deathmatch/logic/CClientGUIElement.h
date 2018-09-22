@@ -10,8 +10,7 @@
 
 class CClientGUIElement;
 
-#ifndef __CCLIENTGUIELEMENT_H
-#define __CCLIENTGUIELEMENT_H
+#pragma once
 
 #include "CClientGUIManager.h"
 #include "CClientEntity.h"
@@ -92,5 +91,3 @@ private:
     CClientGuiFont*    m_pFontElement;
     CLuaMain*          m_pLuaMain;
 };
-
-#endif

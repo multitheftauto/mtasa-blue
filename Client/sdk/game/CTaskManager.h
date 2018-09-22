@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TASK_MANAGER
-#define __CGAME_TASK_MANAGER
+#pragma once
 
 class CPed;
 class CVehicle;
@@ -113,5 +112,3 @@ public:
     virtual void   ClearTaskEventResponse() = 0;
     virtual void   Flush(const int iPriority) = 0;
 };
-
-#endif

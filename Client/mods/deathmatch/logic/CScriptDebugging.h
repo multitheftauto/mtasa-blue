@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CSCRIPTDEBUGGING_H
-#define __CSCRIPTDEBUGGING_H
+#pragma once
 
 #include <cstdio>
 #include <list>
@@ -81,5 +80,3 @@ private:
     HANDLE                         m_flushTimerHandle;
     CDuplicateLineFilter<SLogLine> m_DuplicateLineFilter;
 };
-
-#endif

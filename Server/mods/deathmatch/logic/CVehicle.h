@@ -145,6 +145,7 @@ public:
     CVehicle(class CVehicleManager* pVehicleManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel, unsigned char ucVariant,
              unsigned char ucVariant2);
     ~CVehicle(void);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
     bool IsEntity(void) { return true; }
 
@@ -308,8 +309,8 @@ public:
 
     // Functions used to remember where this vehicle spawns
     const CVector& GetRespawnPosition(void) { return m_vecRespawnPosition; };
+    const CVector& GetRespawnRotationDegrees(void) { return m_vecRespawnRotationDegrees; };
     void           SetRespawnPosition(const CVector& vecPosition) { m_vecRespawnPosition = vecPosition; };
-    void           GetRespawnRotationDegrees(CVector& vecRotation) { vecRotation = m_vecRespawnRotationDegrees; };
     void           SetRespawnRotationDegrees(const CVector& vecRotation) { m_vecRespawnRotationDegrees = vecRotation; };
     float          GetRespawnHealth(void) { return m_fRespawnHealth; };
     void           SetRespawnHealth(float fHealth) { m_fRespawnHealth = fHealth; };

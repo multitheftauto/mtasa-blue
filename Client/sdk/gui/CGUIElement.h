@@ -11,8 +11,7 @@
 
 class CGUIElement;
 
-#ifndef __CGUIELEMENT_H
-#define __CGUIELEMENT_H
+#pragma once
 
 #include "CGUIEvent.h"
 #include "CGUICallback.h"
@@ -136,5 +135,3 @@ public:
     virtual bool Event_OnMouseLeave(void) = 0;
     virtual bool Event_OnMouseButtonDown(void) = 0;
 };
-
-#endif

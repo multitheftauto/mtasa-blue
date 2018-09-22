@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_AERADIOTRACKMANAGER
-#define __CGAMESA_AERADIOTRACKMANAGER
+#pragma once
 
 #include "Common.h"
 #include <game/CAERadioTrackManager.h>
@@ -52,5 +51,3 @@ public:
     VOID  Reset();
     VOID  StartRadio(BYTE bStationID, BYTE bUnknown);
 };
-
-#endif

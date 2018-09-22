@@ -13,15 +13,23 @@
 
 void CLuaColShapeDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("createColCircle", CreateColCircle);
-    CLuaCFunctions::AddFunction("createColCuboid", CreateColCuboid);
-    CLuaCFunctions::AddFunction("createColSphere", CreateColSphere);
-    CLuaCFunctions::AddFunction("createColRectangle", CreateColRectangle);
-    CLuaCFunctions::AddFunction("createColPolygon", CreateColPolygon);
-    CLuaCFunctions::AddFunction("createColTube", CreateColTube);
+    std::map<const char*, lua_CFunction> functions{
+        {"createColCircle", CreateColCircle},
+        {"createColCuboid", CreateColCuboid},
+        {"createColSphere", CreateColSphere},
+        {"createColRectangle", CreateColRectangle},
+        {"createColPolygon", CreateColPolygon},
+        {"createColTube", CreateColTube},
 
-    CLuaCFunctions::AddFunction("isInsideColShape", IsInsideColShape);
-    CLuaCFunctions::AddFunction("getColShapeType", GetColShapeType);
+        {"isInsideColShape", IsInsideColShape},
+        {"getColShapeType", GetColShapeType},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaColShapeDefs::AddClass(lua_State* luaVM)
@@ -249,7 +257,7 @@ int CLuaColShapeDefs::CreateColPolygon(lua_State* luaVM)
     std::vector<CVector2D> vecPointList;
 
     CScriptArgReader argStream(luaVM);
-    for (uint i = 0; i < 4 || argStream.NextCouldBeNumber(); i++)
+    for (uint i = 0; i < 4 || argStream.NextIsVector2D(); i++)
     {
         CVector2D vecPoint;
         argStream.ReadVector2D(vecPoint);

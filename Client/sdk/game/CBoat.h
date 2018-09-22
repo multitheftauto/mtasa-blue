@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_BOAT
-#define __CGAME_BOAT
+#pragma once
 
 #include "CVehicle.h"
 
@@ -19,5 +18,3 @@ class CBoat : public virtual CVehicle
 public:
     virtual ~CBoat(void){};
 };
-
-#endif

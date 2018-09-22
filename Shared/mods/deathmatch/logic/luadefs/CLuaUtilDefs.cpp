@@ -12,35 +12,47 @@
 
 void CLuaUtilDefs::LoadFunctions(void)
 {
-    // Util functions to make scripting easier for the end user
-    // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
-    CLuaCFunctions::AddFunction("deref", Dereference);
-    CLuaCFunctions::AddFunction("ref", Reference);
-    CLuaCFunctions::AddFunction("getTickCount", GetTickCount_);
-    CLuaCFunctions::AddFunction("getRealTime", GetCTime);
-    CLuaCFunctions::AddFunction("split", Split);
-    CLuaCFunctions::AddFunction("isOOPEnabled", IsOOPEnabled);
-    CLuaCFunctions::AddFunction("getUserdataType", GetUserdataType);
-    CLuaCFunctions::AddFunction("print", luaB_print);
-    CLuaCFunctions::AddFunction("getColorFromString", GetColorFromString);
+    std::map<const char*, lua_CFunction> functions{
+        // Util functions to make scripting easier for the end user
+        // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
+        {"deref", Dereference},
+        {"ref", Reference},
+        {"getTickCount", GetTickCount_},
+        {"getRealTime", GetCTime},
+        {"split", Split},
+        {"isOOPEnabled", IsOOPEnabled},
+        {"getUserdataType", GetUserdataType},
+        {"print", luaB_print},
+        {"getColorFromString", GetColorFromString},
 
-    // Utility vector math functions
-    CLuaCFunctions::AddFunction("getDistanceBetweenPoints2D", GetDistanceBetweenPoints2D);
-    CLuaCFunctions::AddFunction("getDistanceBetweenPoints3D", GetDistanceBetweenPoints3D);
-    CLuaCFunctions::AddFunction("getEasingValue", GetEasingValue);
-    CLuaCFunctions::AddFunction("interpolateBetween", InterpolateBetween);
+        // Utility vector math functions
+        {"getDistanceBetweenPoints2D", GetDistanceBetweenPoints2D},
+        {"getDistanceBetweenPoints3D", GetDistanceBetweenPoints3D},
+        {"getEasingValue", GetEasingValue},
+        {"interpolateBetween", InterpolateBetween},
 
-    // JSON funcs
-    CLuaCFunctions::AddFunction("toJSON", toJSON);
-    CLuaCFunctions::AddFunction("fromJSON", fromJSON);
+        // JSON funcs
+        {"toJSON", toJSON},
+        {"fromJSON", fromJSON},
 
-    // PCRE functions
-    CLuaCFunctions::AddFunction("pregFind", PregFind);
-    CLuaCFunctions::AddFunction("pregReplace", PregReplace);
-    CLuaCFunctions::AddFunction("pregMatch", PregMatch);
+        // PCRE functions
+        {"pregFind", PregFind},
+        {"pregReplace", PregReplace},
+        {"pregMatch", PregMatch},
 
-    // Debug functions
-    CLuaCFunctions::AddFunction("debugSleep", DebugSleep);
+        // Debug functions
+        {"debugSleep", DebugSleep},
+
+        // Utility functions
+        {"gettok", GetTok},
+        {"tocolor", tocolor},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 int CLuaUtilDefs::DisabledFunction(lua_State* luaVM)
@@ -611,5 +623,96 @@ int CLuaUtilDefs::DebugSleep(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaUtilDefs::GetTok(lua_State* luaVM)
+{
+    SString          strInput = "";
+    unsigned int     uiToken = 0;
+    unsigned int     uiDelimiter = 0;
+    SString          strDelimiter;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strInput);
+    argStream.ReadNumber(uiToken);
+
+    if (argStream.NextIsNumber())
+    {
+        argStream.ReadNumber(uiDelimiter);
+        wchar_t wUNICODE[2] = { uiDelimiter, '\0' };
+        strDelimiter = UTF16ToMbUTF8(wUNICODE);
+    }
+    else            // It's already a string
+        argStream.ReadString(strDelimiter);
+
+    if (!argStream.HasErrors())
+    {
+        unsigned int uiCount = 0;
+
+        if (uiToken > 0 && uiToken < 1024)
+        {
+            unsigned int uiCount = 1;
+            char*        szText = new char[strInput.length() + 1];
+            strcpy(szText, strInput);
+            char* szToken = strtok(szText, strDelimiter);
+
+            // We're looking for the first part?
+            if (uiToken != 1)
+            {
+                // strtok count number of times
+                do
+                {
+                    uiCount++;
+                    szToken = strtok(NULL, strDelimiter);
+                } while (uiCount != uiToken);
+            }
+
+            // Found it?
+            if (szToken)
+            {
+                // Return it
+                lua_pushstring(luaVM, szToken);
+                delete[] szText;
+                return 1;
+            }
+
+            // Delete the text
+            delete[] szText;
+        }
+        else
+            m_pScriptDebugging->LogWarning(luaVM, "Token parameter sent to split must be greater than 0 and smaller than 1024");
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaUtilDefs::tocolor(lua_State* luaVM)
+{
+    //  int tocolor ( int red, int green, int blue [, int alpha = 255 ] )
+    int iRed;
+    int iGreen;
+    int iBlue;
+    int iAlpha;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(iRed);
+    argStream.ReadNumber(iGreen);
+    argStream.ReadNumber(iBlue);
+    argStream.ReadNumber(iAlpha, 255);
+
+    if (!argStream.HasErrors())
+    {
+        // Make it into an unsigned long
+        unsigned long ulColor = COLOR_RGBA(iRed, iGreen, iBlue, iAlpha);
+        lua_pushinteger(luaVM, static_cast<lua_Integer>(ulColor));
+        return 1;
+    }
+
+    // Make it black so funcs dont break
+    unsigned long ulColor = COLOR_RGBA(0, 0, 0, 255);
+    lua_pushnumber(luaVM, static_cast<lua_Number>(ulColor));
     return 1;
 }

@@ -16,8 +16,9 @@
 class CDummy : public CElement
 {
 public:
-    CDummy(class CGroups* pGroups, CElement* pParent, CXMLNode* pNode = NULL);
+    CDummy(class CGroups* pGroups, CElement* pParent, CXMLNode* pNode = nullptr);
     ~CDummy(void);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
     bool IsEntity(void) { return true; }
 

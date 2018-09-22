@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPACKETHANDLER_H
-#define __CPACKETHANDLER_H
+#pragma once
 
 #include <CClientCommon.h>
 
@@ -98,6 +97,7 @@ public:
     void Packet_LatentTransfer(NetBitStreamInterface& bitStream);
     void Packet_SyncSettings(NetBitStreamInterface& bitStream);
     void Packet_PedTask(NetBitStreamInterface& bitStream);
+    void Packet_ChatClear(NetBitStreamInterface& bitStream);
 
     // For debugging protocol errors during ENTITY_ADD packet
     void    EntityAddDebugBegin(uint uiNumEntities, NetBitStreamInterface* pBitStream);
@@ -109,5 +109,3 @@ public:
     NetBitStreamInterface* m_pEntityAddBitStream;
     uint                   m_uiEntityAddNumEntities;
 };
-
-#endif

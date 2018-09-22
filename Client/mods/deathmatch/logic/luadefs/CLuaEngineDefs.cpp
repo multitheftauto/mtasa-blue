@@ -13,33 +13,41 @@
 
 void CLuaEngineDefs::LoadFunctions(void)
 {
-    CLuaCFunctions::AddFunction("engineLoadTXD", EngineLoadTXD);
-    CLuaCFunctions::AddFunction("engineLoadCOL", EngineLoadCOL);
-    CLuaCFunctions::AddFunction("engineLoadDFF", EngineLoadDFF);
-    CLuaCFunctions::AddFunction("engineLoadIFP", EngineLoadIFP);
-    CLuaCFunctions::AddFunction("engineImportTXD", EngineImportTXD);
-    CLuaCFunctions::AddFunction("engineReplaceCOL", EngineReplaceCOL);
-    CLuaCFunctions::AddFunction("engineRestoreCOL", EngineRestoreCOL);
-    CLuaCFunctions::AddFunction("engineReplaceModel", EngineReplaceModel);
-    CLuaCFunctions::AddFunction("engineRestoreModel", EngineRestoreModel);
-    CLuaCFunctions::AddFunction("engineReplaceAnimation", EngineReplaceAnimation);
-    CLuaCFunctions::AddFunction("engineRestoreAnimation", EngineRestoreAnimation);
-    CLuaCFunctions::AddFunction("engineGetModelLODDistance", EngineGetModelLODDistance);
-    CLuaCFunctions::AddFunction("engineSetModelLODDistance", EngineSetModelLODDistance);
-    CLuaCFunctions::AddFunction("engineSetAsynchronousLoading", EngineSetAsynchronousLoading);
-    CLuaCFunctions::AddFunction("engineApplyShaderToWorldTexture", EngineApplyShaderToWorldTexture);
-    CLuaCFunctions::AddFunction("engineRemoveShaderFromWorldTexture", EngineRemoveShaderFromWorldTexture);
-    CLuaCFunctions::AddFunction("engineGetModelNameFromID", EngineGetModelNameFromID);
-    CLuaCFunctions::AddFunction("engineGetModelIDFromName", EngineGetModelIDFromName);
-    CLuaCFunctions::AddFunction("engineGetModelTextureNames", EngineGetModelTextureNames);
-    CLuaCFunctions::AddFunction("engineGetVisibleTextureNames", EngineGetVisibleTextureNames);
+    std::map<const char*, lua_CFunction> functions{
+        {"engineLoadTXD", EngineLoadTXD},
+        {"engineLoadCOL", EngineLoadCOL},
+        {"engineLoadDFF", EngineLoadDFF},
+        {"engineLoadIFP", EngineLoadIFP},
+        {"engineImportTXD", EngineImportTXD},
+        {"engineReplaceCOL", EngineReplaceCOL},
+        {"engineRestoreCOL", EngineRestoreCOL},
+        {"engineReplaceModel", EngineReplaceModel},
+        {"engineRestoreModel", EngineRestoreModel},
+        {"engineReplaceAnimation", EngineReplaceAnimation},
+        {"engineRestoreAnimation", EngineRestoreAnimation},
+        {"engineGetModelLODDistance", EngineGetModelLODDistance},
+        {"engineSetModelLODDistance", EngineSetModelLODDistance},
+        {"engineSetAsynchronousLoading", EngineSetAsynchronousLoading},
+        {"engineApplyShaderToWorldTexture", EngineApplyShaderToWorldTexture},
+        {"engineRemoveShaderFromWorldTexture", EngineRemoveShaderFromWorldTexture},
+        {"engineGetModelNameFromID", EngineGetModelNameFromID},
+        {"engineGetModelIDFromName", EngineGetModelIDFromName},
+        {"engineGetModelTextureNames", EngineGetModelTextureNames},
+        {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
 
-    // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
-    // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
-    // CLuaCFunctions::AddFunction ( "enginePositionAtomic", EnginePositionAtomic );
-    // CLuaCFunctions::AddFunction ( "enginePositionSeats", EnginePositionSeats );
-    // CLuaCFunctions::AddFunction ( "engineAddAllAtomics", EngineAddAllAtomics );
-    // CLuaCFunctions::AddFunction ( "engineReplaceVehiclePart", EngineReplaceVehiclePart );
+        // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
+        // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
+        // CLuaCFunctions::AddFunction ( "enginePositionAtomic", EnginePositionAtomic );
+        // CLuaCFunctions::AddFunction ( "enginePositionSeats", EnginePositionSeats );
+        // CLuaCFunctions::AddFunction ( "engineAddAllAtomics", EngineAddAllAtomics );
+        // CLuaCFunctions::AddFunction ( "engineReplaceVehiclePart", EngineReplaceVehiclePart );
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaEngineDefs::AddClass(lua_State* luaVM)
@@ -297,11 +305,12 @@ int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (pResource)
             {
+                bool bIsRawData = CIFPEngine::IsIFPData(strFile);
                 SString strPath;
                 // Is this a legal filepath?
-                if (CResourceManager::ParseResourcePathInput(strFile, pResource, &strPath))
+                if (bIsRawData || CResourceManager::ParseResourcePathInput(strFile, pResource, &strPath))
                 {
-                    std::shared_ptr<CClientIFP> pIFP = CIFPEngine::EngineLoadIFP(pResource, m_pManager, strPath, strBlockName);
+                    std::shared_ptr<CClientIFP> pIFP = CIFPEngine::EngineLoadIFP(pResource, m_pManager, bIsRawData ? strFile : strPath, bIsRawData, strBlockName);
                     if (pIFP != nullptr)
                     {
                         // Return the IFP element
@@ -309,10 +318,10 @@ int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
                         return 1;
                     }
                     else
-                        argStream.SetCustomError(strFile, "Error loading IFP");
+                        argStream.SetCustomError(bIsRawData ? "raw data" : strFile, "Error loading IFP");
                 }
                 else
-                    argStream.SetCustomError(strFile, "Bad file path");
+                    argStream.SetCustomError(bIsRawData ? "raw data" : strFile, "Bad file path");
             }
         }
     }

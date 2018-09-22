@@ -10,8 +10,7 @@
 
 class CClientRadarMarkerManager;
 
-#ifndef __CCLIENTRADARMARKERMANAGER_H
-#define __CCLIENTRADARMARKERMANAGER_H
+#pragma once
 
 #include "CClientRadarMarker.h"
 #include <list>
@@ -54,5 +53,3 @@ private:
     bool           m_bOrderOnPulse;
     CVector        m_vecCameraPosition;
 };
-
-#endif

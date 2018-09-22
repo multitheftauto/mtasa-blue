@@ -12,25 +12,33 @@
 
 void CLuaXMLDefs::LoadFunctions(void)
 {
-    CLuaCFunctions::AddFunction("xmlCreateFile", xmlCreateFile);
-    CLuaCFunctions::AddFunction("xmlLoadFile", xmlLoadFile);
-    CLuaCFunctions::AddFunction("xmlCopyFile", xmlCopyFile);
-    CLuaCFunctions::AddFunction("xmlSaveFile", xmlSaveFile);
-    CLuaCFunctions::AddFunction("xmlUnloadFile", xmlUnloadFile);
-    CLuaCFunctions::AddFunction("xmlCreateChild", xmlCreateChild);
-    CLuaCFunctions::AddFunction("xmlDestroyNode", xmlDestroyNode);
-    CLuaCFunctions::AddFunction("xmlFindChild", xmlNodeFindChild);
+    std::map<const char*, lua_CFunction> functions{
+        {"xmlCreateFile", xmlCreateFile},
+        {"xmlLoadFile", xmlLoadFile},
+        {"xmlCopyFile", xmlCopyFile},
+        {"xmlSaveFile", xmlSaveFile},
+        {"xmlUnloadFile", xmlUnloadFile},
+        {"xmlCreateChild", xmlCreateChild},
+        {"xmlDestroyNode", xmlDestroyNode},
+        {"xmlFindChild", xmlNodeFindChild},
 
-    CLuaCFunctions::AddFunction("xmlNodeGetChildren", xmlNodeGetChildren);
-    CLuaCFunctions::AddFunction("xmlNodeGetParent", xmlNodeGetParent);
-    CLuaCFunctions::AddFunction("xmlNodeGetValue", xmlNodeGetValue);
-    CLuaCFunctions::AddFunction("xmlNodeGetAttributes", xmlNodeGetAttributes);
-    CLuaCFunctions::AddFunction("xmlNodeGetAttribute", xmlNodeGetAttribute);
-    CLuaCFunctions::AddFunction("xmlNodeGetName", xmlNodeGetName);
+        {"xmlNodeGetChildren", xmlNodeGetChildren},
+        {"xmlNodeGetParent", xmlNodeGetParent},
+        {"xmlNodeGetValue", xmlNodeGetValue},
+        {"xmlNodeGetAttributes", xmlNodeGetAttributes},
+        {"xmlNodeGetAttribute", xmlNodeGetAttribute},
+        {"xmlNodeGetName", xmlNodeGetName},
 
-    CLuaCFunctions::AddFunction("xmlNodeSetValue", xmlNodeSetValue);
-    CLuaCFunctions::AddFunction("xmlNodeSetAttribute", xmlNodeSetAttribute);
-    CLuaCFunctions::AddFunction("xmlNodeSetName", xmlNodeSetName);
+        {"xmlNodeSetValue", xmlNodeSetValue},
+        {"xmlNodeSetAttribute", xmlNodeSetAttribute},
+        {"xmlNodeSetName", xmlNodeSetName},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaXMLDefs::AddClass(lua_State* luaVM)

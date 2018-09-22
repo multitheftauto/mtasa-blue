@@ -133,6 +133,7 @@ public:
 
     CPed(class CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel);
     ~CPed(void);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
     bool IsEntity(void) { return true; }
 

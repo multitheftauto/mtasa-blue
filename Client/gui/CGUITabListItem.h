@@ -8,8 +8,7 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-#ifndef __CGUITABLISTITEM_H
-#define __CGUITABLISTITEM_H
+#pragma once
 
 #include <gui/CGUI.h>
 
@@ -18,5 +17,3 @@ class CGUITabListItem : public CGUIElement
 public:
     virtual bool ActivateOnTab(void) = 0;
 };
-
-#endif

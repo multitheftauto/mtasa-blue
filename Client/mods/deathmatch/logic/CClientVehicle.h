@@ -11,8 +11,7 @@
 struct CClientVehicleProperties;
 class CClientVehicle;
 
-#ifndef __CCLIENTVEHICLE_H
-#define __CCLIENTVEHICLE_H
+#pragma once
 
 #include <game/CPlane.h>
 #include <game/CVehicle.h>
@@ -484,9 +483,6 @@ public:
 
     void SetHeliBladeCollisionsEnabled(bool bEnable) { m_bEnableHeliBladeCollisions = bEnable; }
 
-    static void    SetModelExhaustFumesPosition(unsigned short modelID, const CVector& position);
-    static CVector GetModelExhaustFumesPosition(unsigned short modelID);
-
     bool OnVehicleFallThroughMap();
 
 protected:
@@ -677,5 +673,3 @@ public:
     std::map<SString, SVehicleComponentData> m_ComponentData;
     bool                                     m_bAsyncLoadingDisabled;
 };
-
-#endif

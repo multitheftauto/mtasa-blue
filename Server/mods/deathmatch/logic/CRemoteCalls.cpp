@@ -154,6 +154,7 @@ CRemoteCall::CRemoteCall(const char* szServerHost, const char* szResourceName, c
     arguments->WriteToJSONString(m_options.strPostData, true);
     m_options.bPostBinary = false;
     m_options.bIsLegacy = true;
+    m_options.requestHeaders["Content-Type"] = "application/json";
     m_bIsFetch = false;
 
     m_strURL = SString("http://%s/%s/call/%s", szServerHost, szResourceName, szFunctionName);
@@ -172,6 +173,7 @@ CRemoteCall::CRemoteCall(const char* szURL, CLuaArguments* arguments, CLuaMain* 
     arguments->WriteToJSONString(m_options.strPostData, true);
     m_options.bPostBinary = false;
     m_options.bIsLegacy = true;
+    m_options.requestHeaders["Content-Type"] = "application/json";
     m_bIsFetch = false;
 
     m_strURL = szURL;

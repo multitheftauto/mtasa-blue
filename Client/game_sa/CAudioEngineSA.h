@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_AUDIOENGINE
-#define __CGAMESA_AUDIOENGINE
+#pragma once
 
 #include "Common.h"
 #include <game/CAudioEngine.h>
@@ -158,5 +157,3 @@ private:
 
     CAudioEngineSAInterface* m_pInterface;
 };
-
-#endif

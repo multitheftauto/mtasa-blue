@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimBlock_H
-#define __CAnimBlock_H
+#pragma once
 
 enum EModelRequestType
 {
@@ -35,5 +34,3 @@ public:
     virtual void                            Request(EModelRequestType requestType, bool bAllowBlockingFail = false) = 0;
     virtual CAnimBlendHierarchySAInterface* GetAnimationHierarchyInterface(size_t iAnimation) = 0;
 };
-
-#endif

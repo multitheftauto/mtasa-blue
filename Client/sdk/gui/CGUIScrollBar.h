@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUISCROLLBAR_H
-#define __CGUISCROLLBAR_H
+#pragma once
 
 #include "CGUIElement.h"
 #include "CGUICallback.h"
@@ -25,5 +24,3 @@ public:
     virtual void  SetScrollPosition(float fPosition) = 0;
     virtual float GetScrollPosition(void) = 0;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIWINDOW_H
-#define __CGUIWINDOW_H
+#pragma once
 
 #include "CGUIElement.h"
 
@@ -32,5 +31,3 @@ public:
 
     virtual void SetCloseClickHandler(GUI_CALLBACK Callback) = 0;
 };
-
-#endif

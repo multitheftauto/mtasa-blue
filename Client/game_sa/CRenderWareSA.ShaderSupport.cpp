@@ -6,7 +6,7 @@
  *  PURPOSE:
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
- *  RenderWare is © Criterion Software
+ *  RenderWare is Â© Criterion Software
  *
  *****************************************************************************/
 

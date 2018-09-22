@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CKEYBINDSINTERFACE_H
-#define __CKEYBINDSINTERFACE_H
+#pragma once
 
 // Beware: this class is poorly written and depends on game while it shouldn't
 #include <game/CControllerConfigManager.h>
@@ -164,9 +163,9 @@ public:
     virtual bool CommandExists(const char* szKey, const char* szCommand, bool bCheckState = false, bool bState = true, const char* szArguments = NULL,
                                const char* szResource = NULL, bool bCheckScriptCreated = false, bool bScriptCreated = false) = 0;
     virtual bool SetCommandActive(const char* szKey, const char* szCommand, bool bState, const char* szArguments, const char* szResource, bool bActive,
-                                  bool checkHitState) = 0;
+                                  bool checkHitState, bool bConsiderDefaultKey = false) = 0;
     virtual void SetAllCommandsActive(const char* szResource, bool bActive, const char* szCommand = NULL, bool bState = true, const char* szArguments = NULL,
-                                      bool checkHitState = false) = 0;
+                                      bool checkHitState = false, const char* szOnlyWithDefaultKey = NULL) = 0;
     virtual CCommandBind* GetBindFromCommand(const char* szCommand, const char* szArguments = NULL, bool bMatchCase = true, const char* szKey = NULL,
                                              bool bCheckHitState = false, bool bState = NULL) = 0;
     virtual bool          GetBoundCommands(const char* szCommand, std::list<CCommandBind*>& commandsList) = 0;
@@ -245,5 +244,3 @@ public:
     virtual void PrintBindsCommand(const char* szCmdLine) = 0;
     virtual bool TriggerKeyStrokeHandler(const SString& strKey, bool bActive, bool bIsConsoleInputKey) = 0;
 };
-
-#endif

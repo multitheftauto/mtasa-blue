@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_EXPLOSIONMANAGER
-#define __CGAME_EXPLOSIONMANAGER
+#pragma once
 
 #include <CVector.h>
 #include "CExplosion.h"
@@ -27,5 +26,3 @@ public:
     virtual CExplosion* GetExplosion(DWORD ID) = 0;
     virtual CExplosion* FindFreeExplosion(void) = 0;
 };
-
-#endif

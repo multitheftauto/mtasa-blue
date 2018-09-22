@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTBASE_H
-#define __CCLIENTBASE_H
+#pragma once
 
 #include "CCoreInterface.h"
 #include "CExceptionInformation.h"
@@ -35,5 +34,3 @@ public:
     virtual bool HandleException(CExceptionInformation* pExceptionInformation) = 0;
     virtual void GetPlayerNames(std::vector<SString>& vPlayerNames) = 0;
 };
-
-#endif

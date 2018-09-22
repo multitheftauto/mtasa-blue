@@ -18,13 +18,8 @@
 extern CGame* g_pGame;
 
 #ifndef VERIFY_ELEMENT
-#define VERIFY_ELEMENT(element) (g_pGame->GetMapManager()->GetRootElement ()->IsMyChild(element,true)&&!element->IsBeingDeleted())
+#define VERIFY_ELEMENT(element) (g_pGame->GetMapManager()->GetRootElement()->IsMyChild(element, true) && !element->IsBeingDeleted())
 #endif
-
-CLuaArguments::CLuaArguments(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables)
-{
-    ReadFromBitStream(bitStream, pKnownTables);
-}
 
 CLuaArguments::CLuaArguments(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables)
 {
@@ -265,12 +260,23 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
     lua_pushstring(luaVM, szFunction);
     lua_gettable(luaVM, LUA_GLOBALSINDEX);
 
+    // If that function doesn't exist, return false
+    if (lua_isnil(luaVM, -1))
+    {
+        // cleanup the stack
+        while (lua_gettop(luaVM) - luaStackPointer > 0)
+            lua_pop(luaVM, 1);
+
+        return false;
+    }
+
     // Push our arguments onto the stack
     PushArguments(luaVM);
 
-    // Call the function with our arguments
+    // Reset function call timer (checks long-running functions)
     pLuaMain->ResetInstructionCount();
 
+    // Call the function with our arguments
     int iret = pLuaMain->PCall(luaVM, m_Arguments.size(), LUA_MULTRET, 0);
     if (iret == LUA_ERRRUN || iret == LUA_ERRMEM)
     {
@@ -508,7 +514,14 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
         pKnownTables->push_back(this);
         for (unsigned int ui = 0; ui < uiNumArgs; ++ui)
         {
-            CLuaArgument* pArgument = new CLuaArgument(bitStream, pKnownTables);
+            CLuaArgument* pArgument = new CLuaArgument();
+            if (!pArgument->ReadFromBitStream(bitStream, pKnownTables))
+            {
+                delete pArgument;
+                if (bKnownTablesCreated)
+                    delete pKnownTables;
+                return false;
+            }
             m_Arguments.push_back(pArgument);
         }
     }
@@ -702,7 +715,7 @@ bool CLuaArguments::ReadFromJSONString(const char* szJSON)
     }
 
     json_object* object = json_tokener_parse(szJSON);
-    if (!is_error(object))
+    if (object)
     {
         if (json_object_get_type(object) == json_type_array)
         {
@@ -710,7 +723,7 @@ bool CLuaArguments::ReadFromJSONString(const char* szJSON)
 
             std::vector<CLuaArguments*> knownTables;
 
-            for (int i = 0; i < json_object_array_length(object); i++)
+            for (uint i = 0; i < json_object_array_length(object); i++)
             {
                 json_object*  arrayObject = json_object_array_get_idx(object, i);
                 CLuaArgument* pArgument = new CLuaArgument();
@@ -743,7 +756,7 @@ bool CLuaArguments::ReadFromJSONString(const char* szJSON)
 
 bool CLuaArguments::ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables)
 {
-    if (!is_error(object))
+    if (object)
     {
         if (json_object_get_type(object) == json_type_object)
         {
@@ -781,7 +794,7 @@ bool CLuaArguments::ReadFromJSONObject(json_object* object, std::vector<CLuaArgu
 
 bool CLuaArguments::ReadFromJSONArray(json_object* object, std::vector<CLuaArguments*>* pKnownTables)
 {
-    if (!is_error(object))
+    if (object)
     {
         if (json_object_get_type(object) == json_type_array)
         {
@@ -795,7 +808,7 @@ bool CLuaArguments::ReadFromJSONArray(json_object* object, std::vector<CLuaArgum
             pKnownTables->push_back(this);
 
             bool bSuccess = true;
-            for (int i = 0; i < json_object_array_length(object); i++)
+            for (uint i = 0; i < json_object_array_length(object); i++)
             {
                 json_object*  arrayObject = json_object_array_get_idx(object, i);
                 CLuaArgument* pArgument = new CLuaArgument();

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIFONT_H
-#define __CGUIFONT_H
+#pragma once
 
 #include "CRect2D.h"
 
@@ -33,5 +32,3 @@ public:
     virtual void DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX,
                                 float fScaleY) = 0;
 };
-
-#endif

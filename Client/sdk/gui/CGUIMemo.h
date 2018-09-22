@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIMEMO_H
-#define __CGUIMEMO_H
+#pragma once
 
 #include "CGUIElement.h"
 #include "CGUICallback.h"
@@ -28,6 +27,7 @@ public:
 
     virtual float GetVerticalScrollPosition(void) = 0;
     virtual void  SetVerticalScrollPosition(float fPosition) = 0;
+    virtual float GetMaxVerticalScrollPosition(void) = 0;
     virtual float GetScrollbarDocumentSize(void) = 0;
     virtual float GetScrollbarPageSize(void) = 0;
 
@@ -40,5 +40,3 @@ public:
 
     virtual void SetTextChangedHandler(const GUI_CALLBACK& Callback) = 0;
 };
-
-#endif

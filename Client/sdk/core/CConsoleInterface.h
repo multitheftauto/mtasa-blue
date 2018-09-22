@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCONSOLEINTERFACE_H
-#define __CCONSOLEINTERFACE_H
+#pragma once
 
 class CConsoleInterface
 {
@@ -31,5 +30,3 @@ public:
     virtual bool IsInputActive(void) = 0;
     virtual void ActivateInput(void) = 0;
 };
-
-#endif

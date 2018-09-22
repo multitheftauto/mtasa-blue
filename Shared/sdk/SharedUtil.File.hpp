@@ -186,6 +186,8 @@ uint64 SharedUtil::FileSize(const SString& strFilename)
     fseek(fh, 0, SEEK_END);
 #ifdef WIN32
     uint64 size = _ftelli64(fh);
+#elif defined(__APPLE__)
+    uint64 size = ftello(fh);
 #else
     uint64 size = ftello64(fh);
 #endif

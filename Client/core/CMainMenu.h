@@ -11,18 +11,18 @@
 
 class CMainMenu;
 
-#ifndef __CMAINMENU_H
-#define __CMAINMENU_H
+#pragma once
 
 #include "CCore.h"
 #include "CQuickConnect.h"
 #include "CQuestionBox.h"
-#include <Serverbrowser/CServerBrowser.h>
-#include <Serverbrowser/CServerInfo.h>
+#include <ServerBrowser/CServerBrowser.h>
+#include <ServerBrowser/CServerInfo.h>
 #include "CSettings.h"
 #include "CCredits.h"
 #include <Graphics/CGraphics.h>
 class CNewsBrowser;
+class CLanguageSelector;
 
 #define CORE_MTA_NEWS_ITEMS         3
 
@@ -71,6 +71,7 @@ public:
     bool HasStarted(void) { return m_bStarted; };
 
     void SetNewsHeadline(int iIndex, const SString& strHeadline, const SString& strDate, bool bIsNew);
+    void ReloadNews();
     void OnEscapePressedOffLine(void);
 
     static void StaticWantsToDisconnectCallBack(void* pData, uint uiButton);
@@ -117,13 +118,14 @@ private:
     bool                   m_bMouseOverMenu;
 
     // Submenu classes
-    CQuestionBox   m_QuestionBox;
-    CQuickConnect  m_QuickConnect;
-    CSettings      m_Settings;
-    CNewsBrowser*  m_pNewsBrowser;
-    CCredits       m_Credits;
-    CServerBrowser m_ServerBrowser;
-    CServerInfo    m_ServerInfo;
+    CQuestionBox       m_QuestionBox;
+    CQuickConnect      m_QuickConnect;
+    CSettings          m_Settings;
+    CNewsBrowser*      m_pNewsBrowser;
+    CCredits           m_Credits;
+    CServerBrowser     m_ServerBrowser;
+    CServerInfo        m_ServerInfo;
+    CLanguageSelector* m_pLanguageSelector;
 
     // Properties
     bool m_bIsIngame;
@@ -192,5 +194,3 @@ private:
         MENU_ITEM_QUIT,
     };
 };
-
-#endif

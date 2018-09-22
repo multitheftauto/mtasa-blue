@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_OFFSETS_H
-#define __CGAMESA_OFFSETS_H
+#pragma once
 
 class COffsets
 {
@@ -23,5 +22,3 @@ public:
 private:
     static void InitializeCommon10(void);
 };
-
-#endif

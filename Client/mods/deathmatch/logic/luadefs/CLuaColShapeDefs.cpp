@@ -13,15 +13,23 @@
 
 void CLuaColShapeDefs::LoadFunctions(void)
 {
-    CLuaCFunctions::AddFunction("createColCircle", CreateColCircle);
-    CLuaCFunctions::AddFunction("createColCuboid", CreateColCuboid);
-    CLuaCFunctions::AddFunction("createColSphere", CreateColSphere);
-    CLuaCFunctions::AddFunction("createColRectangle", CreateColRectangle);
-    CLuaCFunctions::AddFunction("createColPolygon", CreateColPolygon);
-    CLuaCFunctions::AddFunction("createColTube", CreateColTube);
+    std::map<const char*, lua_CFunction> functions{
+        {"createColCircle", CreateColCircle},
+        {"createColCuboid", CreateColCuboid},
+        {"createColSphere", CreateColSphere},
+        {"createColRectangle", CreateColRectangle},
+        {"createColPolygon", CreateColPolygon},
+        {"createColTube", CreateColTube},
 
-    CLuaCFunctions::AddFunction("isInsideColShape", IsInsideColShape);
-    CLuaCFunctions::AddFunction("getColShapeType", GetColShapeType);
+        {"isInsideColShape", IsInsideColShape},
+        {"getColShapeType", GetColShapeType},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaColShapeDefs::AddClass(lua_State* luaVM)
@@ -255,6 +263,15 @@ int CLuaColShapeDefs::CreateColPolygon(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(vecPosition);
 
+    // Get the points
+    std::vector<CVector2D> vecPointList;
+    for (uint i = 0; i < 3 || argStream.NextIsVector2D(); i++)
+    {
+        CVector2D vecPoint;
+        argStream.ReadVector2D(vecPoint);
+        vecPointList.push_back(vecPoint);
+    }
+
     if (!argStream.HasErrors())
     {
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
@@ -267,11 +284,10 @@ int CLuaColShapeDefs::CreateColPolygon(lua_State* luaVM)
                 CClientColPolygon* pShape = CStaticFunctionDefinitions::CreateColPolygon(*pResource, vecPosition);
                 if (pShape)
                 {
-                    // Get the points
-                    while (argStream.NextCouldBeNumber() && argStream.NextCouldBeNumber(1))
+                    // Add the points
+                    for (uint i = 0; i < vecPointList.size(); i++)
                     {
-                        argStream.ReadVector2D(vecPosition);
-                        pShape->AddPoint(vecPosition);
+                        pShape->AddPoint(vecPointList[i]);
                     }
 
                     CElementGroup* pGroup = pResource->GetElementGroup();

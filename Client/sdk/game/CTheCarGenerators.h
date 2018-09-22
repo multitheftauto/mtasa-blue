@@ -9,11 +9,8 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_THECARGENERATORS
-#define __CGAME_THECARGENERATORS
+#pragma once
 
 class CTheCarGenerators
 {
 };
-
-#endif

@@ -15,6 +15,7 @@
 CClientIFP::CClientIFP(class CClientManager* pManager, ElementID ID) : CClientEntity(ID)
 {
     // Init
+    SetSmartPointer(true);
     m_pManager = pManager;
     SetTypeName("IFP");
     m_pIFPAnimations = std::make_shared<CIFPAnimations>();
@@ -24,12 +25,25 @@ CClientIFP::CClientIFP(class CClientManager* pManager, ElementID ID) : CClientEn
     m_u32Hashkey = 0;
 }
 
-bool CClientIFP::LoadIFP(const SString& strFilePath, const SString& strBlockName)
+void CClientIFP::Unlink()
+{
+    std::shared_ptr<CClientIFP> pIFP = g_pClientGame->GetIFPPointerFromMap(m_u32Hashkey);
+    if (pIFP)
+    {
+        // Remove IFP from map, so we can indicate that it does not exist
+        g_pClientGame->RemoveIFPPointerFromMap(m_u32Hashkey);
+
+        // Remove IFP animations from replaced animations of peds/players
+        g_pClientGame->OnClientIFPUnload(pIFP);
+    }
+}
+
+bool CClientIFP::LoadIFP(const SString& strFile, const bool isRawData, const SString& strBlockName)
 {
     m_strBlockName = strBlockName;
     m_pVecAnimations = &m_pIFPAnimations->vecAnimations;
 
-    if (LoadIFPFile(strFilePath))
+    if (LoadIFPFile(strFile, isRawData))
     {
         m_u32Hashkey = HashString(strBlockName.ToLower());
         return true;
@@ -37,9 +51,9 @@ bool CClientIFP::LoadIFP(const SString& strFilePath, const SString& strBlockName
     return false;
 }
 
-bool CClientIFP::LoadIFPFile(const SString& strFilePath)
+bool CClientIFP::LoadIFPFile(const SString& strFile, const bool isRawData)
 {
-    if (LoadFileToMemory(strFilePath))
+    if (isRawData ? LoadDataBufferToMemory(strFile) : LoadFileToMemory(strFile))
     {
         if (ReadIFPByVersion())
         {
@@ -52,7 +66,7 @@ bool CClientIFP::LoadIFPFile(const SString& strFilePath)
     return false;
 }
 
-bool CClientIFP::ReadIFPByVersion(void)
+bool CClientIFP::ReadIFPByVersion()
 {
     char Version[4];
     ReadBytes(Version, sizeof(Version));
@@ -75,7 +89,7 @@ bool CClientIFP::ReadIFPByVersion(void)
     return false;
 }
 
-void CClientIFP::ReadIFPVersion1(void)
+void CClientIFP::ReadIFPVersion1()
 {
     SInfo Info;
     ReadHeaderVersion1(Info);
@@ -222,14 +236,8 @@ std::int32_t CClientIFP::ReadSequenceVersion1(SAnim& Anim)
     RoundSize(Anim.Base.Size);
     ReadBytes(&Anim.Name, Anim.Base.Size);
 
-    std::int32_t iBoneID = eBoneType::UNKNOWN;
-    if (Anim.Base.Size == 0x2C)
-    {
-        iBoneID = Anim.Next;
-    }
-
-    SString strBoneName = ConvertStringToKey(Anim.Name);
-    iBoneID = GetBoneIDFromName(strBoneName);
+    SString      strBoneName = ConvertStringToKey(Anim.Name);
+    std::int32_t iBoneID = GetBoneIDFromName(strBoneName);
 
     SString strCorrectBoneName = GetCorrectBoneNameFromName(strBoneName);
     strncpy(Anim.Name, strCorrectBoneName, strCorrectBoneName.size() + 1);
@@ -301,7 +309,7 @@ void CClientIFP::ReadDgan(SDgan& Dgan)
     ReadBytes(&Dgan.Info.Entries, Dgan.Info.Base.Size);
 }
 
-CClientIFP::eFrameType CClientIFP::ReadKfrm(void)
+CClientIFP::eFrameType CClientIFP::ReadKfrm()
 {
     SKfrm Kfrm;
     ReadBuffer<SKfrm>(&Kfrm);
@@ -439,7 +447,7 @@ void CClientIFP::InitializeAnimationHierarchy(std::unique_ptr<CAnimBlendHierarch
     pAnimationHierarchy->Initialize();
     pAnimationHierarchy->SetName(strAnimationName);
     pAnimationHierarchy->SetNumSequences(iSequences);
-    pAnimationHierarchy->SetAnimationBlockID(0);
+    pAnimationHierarchy->SetAnimationBlockID(-1);
     pAnimationHierarchy->SetRunningCompressed(m_kbAllKeyFramesCompressed);
 }
 
@@ -452,7 +460,7 @@ void CClientIFP::InitializeAnimationSequence(std::unique_ptr<CAnimBlendSequence>
 
 void CClientIFP::PreProcessAnimationHierarchy(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy)
 {
-    if (!pAnimationHierarchy->isRunningCompressed())
+    if (!pAnimationHierarchy->IsRunningCompressed())
     {
         pAnimationHierarchy->RemoveQuaternionFlips();
         pAnimationHierarchy->CalculateTotalTime();
