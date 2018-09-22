@@ -507,6 +507,7 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
             CLuaArgument* pArgument = new CLuaArgument();
             if (!pArgument->ReadFromBitStream(bitStream, pKnownTables))
             {
+                delete pArgument;
                 if (bKnownTablesCreated)
                     delete pKnownTables;
                 return false;
