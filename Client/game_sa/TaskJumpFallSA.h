@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TASKJUMPFALL
-#define __CGAMESA_TASKJUMPFALL
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 
@@ -109,5 +108,3 @@ public:
     CTaskSimpleJetPackSA(void){};
     CTaskSimpleJetPackSA(const CVector* pVecTargetPos, float fCruiseHeight = 10.0f, int nHoverTime = 0);
 };
-
-#endif

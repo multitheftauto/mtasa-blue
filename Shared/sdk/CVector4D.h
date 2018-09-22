@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CVector4D_H
-#define __CVector4D_H
+#pragma once
 
 #include <cmath>
 #include "CVector.h"
@@ -169,5 +168,3 @@ public:
     float fZ;
     float fW;
 };
-
-#endif

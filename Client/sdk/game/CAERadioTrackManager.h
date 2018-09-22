@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CAERADIOTRACKMANAGER
-#define __CGAME_CAERADIOTRACKMANAGER
+#pragma once
 
 #include <windows.h>
 
@@ -25,5 +24,3 @@ public:
     virtual VOID  Reset(void) = 0;
     virtual VOID  StartRadio(BYTE bStationID, BYTE bUnknown) = 0;
 };
-
-#endif

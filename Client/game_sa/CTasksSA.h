@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TASKS
-#define __CGAMESA_TASKS
+#pragma once
 
 #include <game/CTasks.h>
 #include "Common.h"
@@ -93,5 +92,3 @@ public:
 
     static void StaticSetHooks(void);
 };
-
-#endif

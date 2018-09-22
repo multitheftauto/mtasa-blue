@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME
-#define __CGAME
+#pragma once
 
 // use this to check if you're using SA or VC headers
 #define GTA_SA
@@ -247,5 +246,3 @@ public:
     virtual void SetPostWeaponFireHandler(PostWeaponFireHandler* pPostWeaponFireHandler) = 0;
     virtual void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) = 0;
 };
-
-#endif

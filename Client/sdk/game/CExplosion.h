@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_EXPLOSION
-#define __CGAME_EXPLOSION
+#pragma once
 
 #include <CVector.h>
 #include "CEntity.h"
@@ -50,5 +49,3 @@ public:
     virtual float          GetExplosionRadius(void) = 0;
     virtual void           SetExplosionRadius(float fRadius) = 0;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef CSINGULARFILEDOWNLOAD_H
-#define CSINGULARFILEDOWNLOAD_H
+#pragma once
 
 #ifndef _WINDOWS_
 
@@ -57,5 +56,3 @@ protected:
     CChecksum m_LastClientChecksum;
     CChecksum m_ServerChecksum;
 };
-
-#endif

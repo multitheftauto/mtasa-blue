@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CXMLATTRIBUTES_H
-#define __CXMLATTRIBUTES_H
+#pragma once
 
 #include <list>
 
@@ -31,5 +30,3 @@ public:
     virtual std::list<CXMLAttribute*>::iterator ListBegin(void) = 0;
     virtual std::list<CXMLAttribute*>::iterator ListEnd(void) = 0;
 };
-
-#endif

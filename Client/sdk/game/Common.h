@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __GAME_COMMON
-#define __GAME_COMMON
+#pragma once
 
 #include <windows.h>
 
@@ -567,7 +566,7 @@ enum eHandlingTypes
     HT_UTIL_TR1,
     HT_ROLLER,
     HT_BIKE,
-    HT_MOPED,
+    HT_PIZZABOY,
     HT_DIRTBIKE,
     HT_FCR900,
     HT_NRG500,
@@ -614,6 +613,14 @@ enum eHandlingTypes
     HT_RCBARON,
     HT_RCGOBLIN,
     HT_RCRAIDER,
+    HT_HOTRINA,
+    HT_HOTRINB,
+    HT_SADLSHIT,
+    HT_GLENSHIT,
+    HT_FAGGIO,
+    HT_FIRELA,
+    HT_RNCHLURE,
+    HT_FREIBOX,
     HT_MAX
 };
 
@@ -1511,6 +1518,24 @@ enum eVehicleComponent
     VEHICLE_COMPONENT_MAX,
 };
 
+enum eVehicleDummies
+{
+    LIGHT_FRONT_MAIN = 0,
+    LIGHT_REAR_MAIN,
+    LIGHT_FRONT_SECONDARY,
+    LIGHT_REAR_SECONDARY,
+    SEAT_FRONT,
+    SEAT_REAR,
+    EXHAUST,
+    ENGINE,
+    GAS_CAP,
+    TRAILER_ATTACH,
+    HAND_REST,
+    EXHAUST_SECONDARY,
+    WING_AIRTRAIL,
+    VEH_GUN,
+};
+
 enum eObjectProperty
 {
     OBJECT_PROPERTY_ALL,
@@ -1522,5 +1547,3 @@ enum eObjectProperty
     OBJECT_PROPERTY_BUOYANCY,
     OBJECT_PROPERTY_MAX,
 };
-
-#endif

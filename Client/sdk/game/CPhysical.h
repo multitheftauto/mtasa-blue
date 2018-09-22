@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_PHYSICAL
-#define __CGAME_PHYSICAL
+#pragma once
 
 #include "CEntity.h"
 
@@ -81,5 +80,3 @@ public:
         virtual VOID        SetPositionFrozen(BOOL bPositionFrozen)=0;
         virtual BYTE        GetLastMaterialToHaveBeenStandingOn()=0;*/
 };
-
-#endif

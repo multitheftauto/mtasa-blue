@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __COBJECTSYNC_H
-#define __COBJECTSYNC_H
+#pragma once
 
 #include <CClientCommon.h>
 #include "CDeathmatchObject.h"
@@ -46,7 +45,5 @@ private:
     CMappedList<CDeathmatchObject*> m_List;
     unsigned long                   m_ulLastSyncTime;
 };
-
-#endif
 
 #endif

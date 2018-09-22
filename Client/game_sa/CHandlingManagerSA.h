@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CHANDLINGMANAGER
-#define __CGAME_CHANDLINGMANAGER
+#pragma once
 
 #include <game/CHandlingManager.h>
 #include "CHandlingEntrySA.h"
@@ -44,5 +43,3 @@ private:
     std::map<std::string, eHandlingProperty> m_HandlingNames;
     int                                      iChangedVehicles;
 };
-
-#endif

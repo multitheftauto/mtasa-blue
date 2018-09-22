@@ -11,69 +11,77 @@
 
 #include "StdInc.h"
 
-void CLuaPedDefs::LoadFunctions(void)
+void CLuaPedDefs::LoadFunctions()
 {
-    // Ped funcs
-    CLuaCFunctions::AddFunction("createPed", CreatePed);
-    CLuaCFunctions::AddFunction("getValidPedModels", GetValidPedModels);
+    std::map<const char*, lua_CFunction> functions{
+        // Ped funcs
+        {"createPed", CreatePed},
+        {"getValidPedModels", GetValidPedModels},
 
-    // Ped get functions
-    CLuaCFunctions::AddFunction("getPedWeaponSlot", GetPedWeaponSlot);
-    CLuaCFunctions::AddFunction("getPedArmor", GetPedArmor);
-    CLuaCFunctions::AddFunction("getPedRotation", GetPedRotation);
-    CLuaCFunctions::AddFunction("isPedChoking", IsPedChoking);
-    CLuaCFunctions::AddFunction("isPedDead", IsPedDead);
-    CLuaCFunctions::AddFunction("isPedDucked", IsPedDucked);
-    CLuaCFunctions::AddFunction("getPedAmmoInClip", GetPedAmmoInClip);
-    CLuaCFunctions::AddFunction("getPedStat", GetPedStat);
-    CLuaCFunctions::AddFunction("getPedTarget", GetPedTarget);
-    CLuaCFunctions::AddFunction("getPedTotalAmmo", GetPedTotalAmmo);
-    CLuaCFunctions::AddFunction("getPedWeapon", GetPedWeapon);
-    CLuaCFunctions::AddFunction("getPedClothes", GetPedClothes);
-    CLuaCFunctions::AddFunction("isPedWearingJetpack", DoesPedHaveJetPack); // introduced in 1.5.5-9.13846
-    CLuaCFunctions::AddFunction("isPedOnGround", IsPedOnGround);
-    CLuaCFunctions::AddFunction("getPedFightingStyle", GetPedFightingStyle);
-    CLuaCFunctions::AddFunction("getPedWalkingStyle", GetPedMoveAnim);
-    CLuaCFunctions::AddFunction("getPedGravity", GetPedGravity);
-    CLuaCFunctions::AddFunction("getPedContactElement", GetPedContactElement);
-    CLuaCFunctions::AddFunction("isPedDoingGangDriveby", IsPedDoingGangDriveby);
-    CLuaCFunctions::AddFunction("isPedOnFire", IsPedOnFire);
-    CLuaCFunctions::AddFunction("isPedHeadless", IsPedHeadless);
-    CLuaCFunctions::AddFunction("isPedFrozen", IsPedFrozen);
-    CLuaCFunctions::AddFunction("getPedOccupiedVehicle", GetPedOccupiedVehicle);
-    CLuaCFunctions::AddFunction("getPedOccupiedVehicleSeat", GetPedOccupiedVehicleSeat);
-    CLuaCFunctions::AddFunction("isPedInVehicle", IsPedInVehicle);
+        // Ped get functions
+        {"getPedWeaponSlot", GetPedWeaponSlot},
+        {"getPedArmor", GetPedArmor},
+        {"getPedRotation", GetPedRotation},
+        {"isPedChoking", IsPedChoking},
+        {"isPedDead", IsPedDead},
+        {"isPedDucked", IsPedDucked},
+        {"getPedAmmoInClip", GetPedAmmoInClip},
+        {"getPedStat", GetPedStat},
+        {"getPedTarget", GetPedTarget},
+        {"getPedTotalAmmo", GetPedTotalAmmo},
+        {"getPedWeapon", GetPedWeapon},
+        {"getPedClothes", GetPedClothes},
+        {"isPedWearingJetpack", DoesPedHaveJetPack}, // introduced in 1.5.5-9.13846
+        {"isPedOnGround", IsPedOnGround},
+        {"getPedFightingStyle", GetPedFightingStyle},
+        {"getPedWalkingStyle", GetPedMoveAnim},
+        {"getPedGravity", GetPedGravity},
+        {"getPedContactElement", GetPedContactElement},
+        {"isPedDoingGangDriveby", IsPedDoingGangDriveby},
+        {"isPedOnFire", IsPedOnFire},
+        {"isPedHeadless", IsPedHeadless},
+        {"isPedFrozen", IsPedFrozen},
+        {"getPedOccupiedVehicle", GetPedOccupiedVehicle},
+        {"getPedOccupiedVehicleSeat", GetPedOccupiedVehicleSeat},
+        {"isPedInVehicle", IsPedInVehicle},
 
-    // Ped set functions
-    CLuaCFunctions::AddFunction("setPedArmor", SetPedArmor);
-    CLuaCFunctions::AddFunction("setPedWeaponSlot", SetPedWeaponSlot);
-    CLuaCFunctions::AddFunction("killPed", KillPed);
-    CLuaCFunctions::AddFunction("setPedRotation", SetPedRotation);
-    CLuaCFunctions::AddFunction("setPedStat", SetPedStat);
-    CLuaCFunctions::AddFunction("addPedClothes", AddPedClothes);
-    CLuaCFunctions::AddFunction("removePedClothes", RemovePedClothes);
-    CLuaCFunctions::AddFunction("setPedWearingJetpack", SetPedWearingJetpack); // introduced in 1.5.5-9.13846
-    CLuaCFunctions::AddFunction("setPedFightingStyle", SetPedFightingStyle);
-    CLuaCFunctions::AddFunction("setPedWalkingStyle", SetPedMoveAnim);
-    CLuaCFunctions::AddFunction("setPedGravity", SetPedGravity);
-    CLuaCFunctions::AddFunction("setPedChoking", SetPedChoking);
-    CLuaCFunctions::AddFunction("warpPedIntoVehicle", WarpPedIntoVehicle);
-    CLuaCFunctions::AddFunction("removePedFromVehicle", RemovePedFromVehicle);
-    CLuaCFunctions::AddFunction("setPedDoingGangDriveby", SetPedDoingGangDriveby);
-    CLuaCFunctions::AddFunction("setPedAnimation", SetPedAnimation);
-    CLuaCFunctions::AddFunction("setPedAnimationProgress", SetPedAnimationProgress);
-    CLuaCFunctions::AddFunction("setPedAnimationSpeed", SetPedAnimationSpeed);
-    CLuaCFunctions::AddFunction("setPedOnFire", SetPedOnFire);
-    CLuaCFunctions::AddFunction("setPedHeadless", SetPedHeadless);
-    CLuaCFunctions::AddFunction("setPedFrozen", SetPedFrozen);
-    CLuaCFunctions::AddFunction("reloadPedWeapon", reloadPedWeapon);
+        // Ped set functions
+        {"setPedArmor", SetPedArmor},
+        {"setPedWeaponSlot", SetPedWeaponSlot},
+        {"killPed", KillPed},
+        {"setPedRotation", SetPedRotation},
+        {"setPedStat", SetPedStat},
+        {"addPedClothes", AddPedClothes},
+        {"removePedClothes", RemovePedClothes},
+        {"setPedWearingJetpack", SetPedWearingJetpack}, // introduced in 1.5.5-9.13846
+        {"setPedFightingStyle", SetPedFightingStyle},
+        {"setPedWalkingStyle", SetPedMoveAnim},
+        {"setPedGravity", SetPedGravity},
+        {"setPedChoking", SetPedChoking},
+        {"warpPedIntoVehicle", WarpPedIntoVehicle},
+        {"removePedFromVehicle", RemovePedFromVehicle},
+        {"setPedDoingGangDriveby", SetPedDoingGangDriveby},
+        {"setPedAnimation", SetPedAnimation},
+        {"setPedAnimationProgress", SetPedAnimationProgress},
+        {"setPedAnimationSpeed", SetPedAnimationSpeed},
+        {"setPedOnFire", SetPedOnFire},
+        {"setPedHeadless", SetPedHeadless},
+        {"setPedFrozen", SetPedFrozen},
+        {"reloadPedWeapon", reloadPedWeapon},
 
-    // Weapon give/take functions
-    CLuaCFunctions::AddFunction("giveWeapon", GiveWeapon);
-    CLuaCFunctions::AddFunction("takeWeapon", TakeWeapon);
-    CLuaCFunctions::AddFunction("takeAllWeapons", TakeAllWeapons);
-    CLuaCFunctions::AddFunction("giveWeaponAmmo", GiveWeapon);
-    CLuaCFunctions::AddFunction("takeWeaponAmmo", TakeWeapon);
+        // Weapon give/take functions
+        {"giveWeapon", GiveWeapon},
+        {"takeWeapon", TakeWeapon},
+        {"takeAllWeapons", TakeAllWeapons},
+        {"giveWeaponAmmo", GiveWeapon},
+        {"takeWeaponAmmo", TakeWeapon},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 // TODO: specials

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_FIREMANAGER
-#define __CGAMESA_FIREMANAGER
+#pragma once
 
 #include <game/CFireManager.h>
 #include "Common.h"
@@ -48,5 +47,3 @@ public:
     CFire* FindFreeFire();
     CFire* GetFire(CFireSAInterface* fire);
 };
-
-#endif

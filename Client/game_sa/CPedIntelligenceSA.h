@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PEDINTELLIGENCE
-#define __CGAMESA_PEDINTELLIGENCE
+#pragma once
 
 #include <game/CPedIntelligence.h>
 #include "CEventSA.h"
@@ -71,5 +70,3 @@ public:
     bool                          TestForStealthKill(CPed* pPed, bool bUnk);
     CTaskSimpleUseGunSAInterface* GetTaskUseGun(void);
 };
-
-#endif

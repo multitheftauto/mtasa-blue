@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TASKIK
-#define __CGAME_TASKIK
+#pragma once
 
 #include "Task.h"
 
@@ -45,5 +44,3 @@ class CTaskSimpleTriggerLookAt : public virtual CTaskSimple
 public:
     virtual ~CTaskSimpleTriggerLookAt(void){};
 };
-
-#endif

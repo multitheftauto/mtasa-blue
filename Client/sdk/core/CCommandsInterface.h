@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOMMANDSINTERFACE_H
-#define __CCOMMANDSINTERFACE_H
+#pragma once
 
 #include <list>
 
@@ -54,5 +53,3 @@ public:
     virtual std::list<COMMANDENTRY*>::iterator IterBegin(void) = 0;
     virtual std::list<COMMANDENTRY*>::iterator IterEnd(void) = 0;
 };
-
-#endif

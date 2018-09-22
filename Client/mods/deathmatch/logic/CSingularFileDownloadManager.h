@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef CSINGULARFILEDOWNLOADMANAGER_H
-#define CSINGULARFILEDOWNLOADMANAGER_H
+#pragma once
 
 #ifndef _WINDOWS_
 
@@ -39,5 +38,3 @@ public:
 protected:
     std::list<CSingularFileDownload*> m_Downloads;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CONTROLLER_CONFIG_MANAGER
-#define __CGAME_CONTROLLER_CONFIG_MANAGER
+#pragma once
 
 // FROM VC, unlikely that they were changed though
 #define GTA_KEY_NO_MOUSE_BUTTON 0
@@ -208,4 +207,3 @@ public:
     virtual float GetVerticalAimSensitivityRawValue(void) = 0;
     virtual void  SetVerticalAimSensitivityRawValue(float fRawValue) = 0;
 };
-#endif

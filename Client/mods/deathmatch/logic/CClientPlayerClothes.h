@@ -10,8 +10,7 @@
 
 class CClientPlayerClothes;
 
-#ifndef __CLIENTPLAYERCLOTHES_H
-#define __CLIENTPLAYERCLOTHES_H
+#pragma once
 
 #define PLAYER_CLOTHING_SLOTS 18
 #define TORSO_CLOTHING_MAX 68
@@ -78,5 +77,3 @@ private:
     static SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS> m_GlobalClothes;
     static bool                                                       m_bStaticInit;
 };
-
-#endif

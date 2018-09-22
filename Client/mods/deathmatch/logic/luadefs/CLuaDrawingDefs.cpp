@@ -15,44 +15,52 @@ extern bool g_bAllowAspectRatioAdjustment;
 
 void CLuaDrawingDefs::LoadFunctions(void)
 {
-    CLuaCFunctions::AddFunction("dxDrawLine", DxDrawLine);
-    CLuaCFunctions::AddFunction("dxDrawMaterialLine3D", DxDrawMaterialLine3D);
-    CLuaCFunctions::AddFunction("dxDrawMaterialSectionLine3D", DxDrawMaterialSectionLine3D);
-    CLuaCFunctions::AddFunction("dxDrawLine3D", DxDrawLine3D);
-    CLuaCFunctions::AddFunction("dxDrawText", DxDrawText);
-    CLuaCFunctions::AddFunction("dxDrawRectangle", DxDrawRectangle);
-    CLuaCFunctions::AddFunction("dxDrawCircle", DxDrawCircle);
-    CLuaCFunctions::AddFunction("dxDrawImage", DxDrawImage);
-    CLuaCFunctions::AddFunction("dxDrawImageSection", DxDrawImageSection);
-    CLuaCFunctions::AddFunction("dxDrawPrimitive", DxDrawPrimitive);
-    CLuaCFunctions::AddFunction("dxDrawMaterialPrimitive", DxDrawMaterialPrimitive);
-    CLuaCFunctions::AddFunction("dxGetTextWidth", DxGetTextWidth);
-    CLuaCFunctions::AddFunction("dxGetFontHeight", DxGetFontHeight);
-    CLuaCFunctions::AddFunction("dxCreateFont", DxCreateFont);
-    CLuaCFunctions::AddFunction("dxCreateTexture", DxCreateTexture);
-    CLuaCFunctions::AddFunction("dxCreateShader", DxCreateShader);
-    CLuaCFunctions::AddFunction("dxCreateRenderTarget", DxCreateRenderTarget);
-    CLuaCFunctions::AddFunction("dxCreateScreenSource", DxCreateScreenSource);
-    CLuaCFunctions::AddFunction("dxGetMaterialSize", DxGetMaterialSize);
-    CLuaCFunctions::AddFunction("dxSetShaderValue", DxSetShaderValue);
-    CLuaCFunctions::AddFunction("dxSetShaderTessellation", DxSetShaderTessellation);
-    CLuaCFunctions::AddFunction("dxSetShaderTransform", DxSetShaderTransform);
-    CLuaCFunctions::AddFunction("dxSetRenderTarget", DxSetRenderTarget);
-    CLuaCFunctions::AddFunction("dxUpdateScreenSource", DxUpdateScreenSource);
-    CLuaCFunctions::AddFunction("dxGetStatus", DxGetStatus);
-    CLuaCFunctions::AddFunction("dxSetTestMode", DxSetTestMode);
-    CLuaCFunctions::AddFunction("dxGetTexturePixels", DxGetTexturePixels);
-    CLuaCFunctions::AddFunction("dxSetTexturePixels", DxSetTexturePixels);
-    CLuaCFunctions::AddFunction("dxGetPixelsSize", DxGetPixelsSize);
-    CLuaCFunctions::AddFunction("dxGetPixelsFormat", DxGetPixelsFormat);
-    CLuaCFunctions::AddFunction("dxConvertPixels", DxConvertPixels);
-    CLuaCFunctions::AddFunction("dxGetPixelColor", DxGetPixelColor);
-    CLuaCFunctions::AddFunction("dxSetPixelColor", DxSetPixelColor);
-    CLuaCFunctions::AddFunction("dxSetBlendMode", DxSetBlendMode);
-    CLuaCFunctions::AddFunction("dxGetBlendMode", DxGetBlendMode);
-    CLuaCFunctions::AddFunction("dxSetAspectRatioAdjustmentEnabled", DxSetAspectRatioAdjustmentEnabled);
-    CLuaCFunctions::AddFunction("dxIsAspectRatioAdjustmentEnabled", DxIsAspectRatioAdjustmentEnabled);
-    CLuaCFunctions::AddFunction("dxSetTextureEdge", DxSetTextureEdge);
+    std::map<const char*, lua_CFunction> functions{
+        {"dxDrawLine", DxDrawLine},
+        {"dxDrawMaterialLine3D", DxDrawMaterialLine3D},
+        {"dxDrawMaterialSectionLine3D", DxDrawMaterialSectionLine3D},
+        {"dxDrawLine3D", DxDrawLine3D},
+        {"dxDrawText", DxDrawText},
+        {"dxDrawRectangle", DxDrawRectangle},
+        {"dxDrawCircle", DxDrawCircle},
+        {"dxDrawImage", DxDrawImage},
+        {"dxDrawImageSection", DxDrawImageSection},
+        {"dxDrawPrimitive", DxDrawPrimitive},
+        {"dxDrawMaterialPrimitive", DxDrawMaterialPrimitive},
+        {"dxGetTextWidth", DxGetTextWidth},
+        {"dxGetFontHeight", DxGetFontHeight},
+        {"dxCreateFont", DxCreateFont},
+        {"dxCreateTexture", DxCreateTexture},
+        {"dxCreateShader", DxCreateShader},
+        {"dxCreateRenderTarget", DxCreateRenderTarget},
+        {"dxCreateScreenSource", DxCreateScreenSource},
+        {"dxGetMaterialSize", DxGetMaterialSize},
+        {"dxSetShaderValue", DxSetShaderValue},
+        {"dxSetShaderTessellation", DxSetShaderTessellation},
+        {"dxSetShaderTransform", DxSetShaderTransform},
+        {"dxSetRenderTarget", DxSetRenderTarget},
+        {"dxUpdateScreenSource", DxUpdateScreenSource},
+        {"dxGetStatus", DxGetStatus},
+        {"dxSetTestMode", DxSetTestMode},
+        {"dxGetTexturePixels", DxGetTexturePixels},
+        {"dxSetTexturePixels", DxSetTexturePixels},
+        {"dxGetPixelsSize", DxGetPixelsSize},
+        {"dxGetPixelsFormat", DxGetPixelsFormat},
+        {"dxConvertPixels", DxConvertPixels},
+        {"dxGetPixelColor", DxGetPixelColor},
+        {"dxSetPixelColor", DxSetPixelColor},
+        {"dxSetBlendMode", DxSetBlendMode},
+        {"dxGetBlendMode", DxGetBlendMode},
+        {"dxSetAspectRatioAdjustmentEnabled", DxSetAspectRatioAdjustmentEnabled},
+        {"dxIsAspectRatioAdjustmentEnabled", DxIsAspectRatioAdjustmentEnabled},
+        {"dxSetTextureEdge", DxSetTextureEdge},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaDrawingDefs::AddClass(lua_State* luaVM)
@@ -980,16 +988,16 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
 {
-    //  element dxCreateShader( string filepath [, float priority = 0, float maxdistance = 0, bool layered = false, string elementTypes =
+    //  element dxCreateShader( string filepath / string raw_data [, float priority = 0, float maxdistance = 0, bool layered = false, string elementTypes =
     //  "world,vehicle,object,other" ] )
-    SString                      strFilePath;
+    SString                      strFile;
     float                        fPriority;
     float                        fMaxDistance;
     bool                         bLayered;
     std::vector<EEntityTypeMask> elementTypeList;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strFilePath);
+    argStream.ReadString(strFile);
     argStream.ReadNumber(fPriority, 0.0f);
     argStream.ReadNumber(fMaxDistance, 0.0f);
     argStream.ReadBool(bLayered, false);
@@ -1006,37 +1014,36 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
         {
             CResource* pParentResource = pLuaMain->GetResource();
             CResource* pFileResource = pParentResource;
-            SString    strPath, strMetaPath;
-            if (CResourceManager::ParseResourcePathInput(strFilePath, pFileResource, &strPath, &strMetaPath))
+            SString    strPath, strMetaPath, strRootPath, strStatus;
+
+            // If we can't parse path input or file doesn't exists then consider strFile as a raw data
+            bool bIsRawData = !CResourceManager::ParseResourcePathInput(strFile, pFileResource, &strPath, &strMetaPath) || !FileExists(strPath);
+            if (bIsRawData)
             {
-                if (FileExists(strPath))
-                {
-                    SString        strRootPath = strPath.Left(strPath.length() - strMetaPath.length());
-                    SString        strStatus;
-                    CClientShader* pShader = g_pClientGame->GetManager()->GetRenderElementManager()->CreateShader(
-                        strPath, strRootPath, strStatus, fPriority, fMaxDistance, bLayered, false, iEntityTypeMaskResult);
-                    if (pShader)
-                    {
-                        // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's
-                        // ElementGroup? **
-                        pShader->SetParent(pParentResource->GetResourceDynamicEntity());
-                        lua_pushelement(luaVM, pShader);
-                        lua_pushstring(luaVM, strStatus);            // String containing name of technique being used.
-                        return 2;
-                    }
-                    else
-                    {
-                        // Replace any path in the error message with our own one
-                        SString strRootPathWithoutResource = strRootPath.Left(strRootPath.TrimEnd("\\").length() - SStringX(pFileResource->GetName()).length());
-                        strStatus = strStatus.ReplaceI(strRootPathWithoutResource, "");
-                        argStream.SetCustomError(strFilePath, strStatus);
-                    }
-                }
-                else
-                    argStream.SetCustomError(strFilePath, "File not found");
+                strPath = strFile;
+                strRootPath = pFileResource->GetResourceDirectoryPath(ACCESS_PUBLIC, NULL);
             }
             else
-                argStream.SetCustomError(strFilePath, "Bad file path");
+                strRootPath = strPath.Left(strPath.length() - strMetaPath.length());
+
+            CClientShader* pShader = g_pClientGame->GetManager()->GetRenderElementManager()->CreateShader(
+                strPath, strRootPath, bIsRawData, strStatus, fPriority, fMaxDistance, bLayered, false, iEntityTypeMaskResult);
+            if (pShader)
+            {
+                // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's
+                // ElementGroup? **
+                pShader->SetParent(pParentResource->GetResourceDynamicEntity());
+                lua_pushelement(luaVM, pShader);
+                lua_pushstring(luaVM, strStatus);            // String containing name of technique being used.
+                return 2;
+            }
+            else
+            {
+                // Replace any path in the error message with our own one
+                SString strRootPathWithoutResource = strRootPath.Left(strRootPath.TrimEnd("\\").length() - SStringX(pFileResource->GetName()).length());
+                strStatus = strStatus.ReplaceI(strRootPathWithoutResource, "");
+                argStream.SetCustomError(bIsRawData ? "raw data" : strFile, strStatus);
+            }
         }
     }
     if (argStream.HasErrors())
@@ -1159,7 +1166,45 @@ int CLuaDrawingDefs::DxSetShaderValue(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Try each mixed type in turn
-        if (argStream.NextIsUserData())
+        if (argStream.NextIsUserDataOfType<CLuaVector2D>())
+        {
+            CVector2D vecValue;
+            argStream.ReadVector2D(vecValue);
+
+            bool bResult = pShader->GetShaderItem()->SetValue(strName, &vecValue.fX, 2);
+            lua_pushboolean(luaVM, bResult);
+            return 1;
+        }
+        else if (argStream.NextIsUserDataOfType<CLuaVector3D>())
+        {
+            CVector vecValue;
+            argStream.ReadVector3D(vecValue);
+
+            bool bResult = pShader->GetShaderItem()->SetValue(strName, &vecValue.fX, 3);
+            lua_pushboolean(luaVM, bResult);
+            return 1;
+        }
+        else if (argStream.NextIsUserDataOfType<CLuaVector4D>())
+        {
+            CVector4D vecValue;
+            argStream.ReadVector4D(vecValue);
+
+            bool bResult = pShader->GetShaderItem()->SetValue(strName, &vecValue.fX, 4);
+            lua_pushboolean(luaVM, bResult);
+            return 1;
+        }
+        else if (argStream.NextIsUserDataOfType<CLuaMatrix>())
+        {
+            CMatrix matValue;
+            argStream.ReadMatrix(matValue);
+            float fBuffer[16];
+            matValue.GetBuffer(fBuffer);
+
+            bool bResult = pShader->GetShaderItem()->SetValue(strName, fBuffer, 16);
+            lua_pushboolean(luaVM, bResult);
+            return 1;
+        }
+        else if (argStream.NextIsUserData())
         {
             // Texture
             CClientTexture* pTexture;

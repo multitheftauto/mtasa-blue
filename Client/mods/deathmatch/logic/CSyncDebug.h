@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CSYNCDEBUG_H
-#define __CSYNCDEBUG_H
+#pragma once
 
 class CClientManager;
 class CClientPlayer;
@@ -68,5 +67,3 @@ private:
 
 #endif
 };
-
-#endif

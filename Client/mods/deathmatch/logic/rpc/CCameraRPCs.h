@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCameraRPCs_H
-#define __CCameraRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
@@ -24,5 +23,3 @@ public:
     DECLARE_RPC(SetCameraInterior);
     DECLARE_RPC(FadeCamera);
 };
-
-#endif
