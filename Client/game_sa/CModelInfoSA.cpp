@@ -16,10 +16,10 @@ extern CGameSA* pGame;
 
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
-std::map<unsigned short, int>                              CModelInfoSA::ms_RestreamTxdIDMap;
-std::map<DWORD, float>                                     CModelInfoSA::ms_ModelDefaultLodDistanceMap;
-std::map<DWORD, BYTE>                                      CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
-std::unordered_map<CVehicleModelInfoSAInterface*, CVector> CModelInfoSA::ms_ModelDefaultVehicleFumesPosition;
+std::map<unsigned short, int>                                                         CModelInfoSA::ms_RestreamTxdIDMap;
+std::map<DWORD, float>                                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
+std::map<DWORD, BYTE>                                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
+std::unordered_map<CVehicleModelInfoSAInterface*, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
 
 CModelInfoSA::CModelInfoSA(void)
 {
@@ -919,46 +919,65 @@ void* CModelInfoSA::SetVehicleSuspensionData(void* pSuspensionLines)
 
 CVector CModelInfoSA::GetVehicleExhaustFumesPosition()
 {
+    return GetVehicleDummyPosition(eVehicleDummies::EXHAUST);
+}
+
+void CModelInfoSA::SetVehicleExhaustFumesPosition(const CVector& vecPosition)
+{
+    return SetVehicleDummyPosition(eVehicleDummies::EXHAUST, vecPosition);
+}
+
+CVector CModelInfoSA::GetVehicleDummyPosition(eVehicleDummies eDummy)
+{
     if (!IsVehicle())
         return CVector();
 
     // Request model load right now if not loaded yet (#9897)
     if (!IsLoaded())
-        Request(BLOCKING, "GetVehicleExhaustFumesPosition");
+        Request(BLOCKING, "GetVehicleDummyPosition");
 
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
-    return pVehicleModel->pVisualInfo->exhaustPosition;
+    return pVehicleModel->pVisualInfo->vecDummies[eDummy];
 }
 
-void CModelInfoSA::SetVehicleExhaustFumesPosition(const CVector& vecPosition)
+void CModelInfoSA::SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition)
 {
     if (!IsVehicle())
         return;
 
     // Request model load right now if not loaded yet (#9897)
     if (!IsLoaded())
-        Request(BLOCKING, "SetVehicleExhaustFumesPosition");
+        Request(BLOCKING, "SetVehicleDummyPosition");
 
     // Store default position in map
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
-    auto iter = ms_ModelDefaultVehicleFumesPosition.find(pVehicleModel);
-    if (iter == ms_ModelDefaultVehicleFumesPosition.end())
+    auto iter = ms_ModelDefaultDummiesPosition.find(pVehicleModel);
+    if (iter == ms_ModelDefaultDummiesPosition.end())
     {
-        ms_ModelDefaultVehicleFumesPosition.insert({pVehicleModel, pVehicleModel->pVisualInfo->exhaustPosition});
+        ms_ModelDefaultDummiesPosition.insert({pVehicleModel, std::map<eVehicleDummies, CVector>()});
     }
 
-    // Set fumes position
-    pVehicleModel->pVisualInfo->exhaustPosition = vecPosition;
+    if (ms_ModelDefaultDummiesPosition[pVehicleModel].find(eDummy) == ms_ModelDefaultDummiesPosition[pVehicleModel].end())
+    {
+        ms_ModelDefaultDummiesPosition[pVehicleModel][eDummy] = pVehicleModel->pVisualInfo->vecDummies[eDummy];
+    }
+
+    // Set dummy position
+    pVehicleModel->pVisualInfo->vecDummies[eDummy] = vecPosition;
 }
 
-void CModelInfoSA::ResetAllVehicleExhaustFumes()
+void CModelInfoSA::ResetAllVehicleDummies()
 {
-    for (auto& info : ms_ModelDefaultVehicleFumesPosition)
+    for (auto& info : ms_ModelDefaultDummiesPosition)
     {
         CVehicleModelInfoSAInterface* pVehicleModel = info.first;
-        pVehicleModel->pVisualInfo->exhaustPosition = info.second;
+        for (auto& dummy : ms_ModelDefaultDummiesPosition[pVehicleModel])
+        {
+            pVehicleModel->pVisualInfo->vecDummies[dummy.first] = dummy.second;
+        }
+        ms_ModelDefaultDummiesPosition[pVehicleModel].clear();
     }
-    ms_ModelDefaultVehicleFumesPosition.clear();
+    ms_ModelDefaultDummiesPosition.clear();
 }
 
 void CModelInfoSA::SetCustomModel(RpClump* pClump)

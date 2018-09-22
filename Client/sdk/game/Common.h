@@ -1518,6 +1518,24 @@ enum eVehicleComponent
     VEHICLE_COMPONENT_MAX,
 };
 
+enum eVehicleDummies
+{
+    LIGHT_FRONT_MAIN = 0,
+    LIGHT_REAR_MAIN,
+    LIGHT_FRONT_SECONDARY,
+    LIGHT_REAR_SECONDARY,
+    SEAT_FRONT,
+    SEAT_REAR,
+    EXHAUST,
+    ENGINE,
+    GAS_CAP,
+    TRAILER_ATTACH,
+    HAND_REST,
+    EXHAUST_SECONDARY,
+    WING_AIRTRAIL,
+    VEH_GUN,
+};
+
 enum eObjectProperty
 {
     OBJECT_PROPERTY_ALL,

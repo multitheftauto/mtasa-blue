@@ -25,7 +25,7 @@ CCustomDataPacket::~CCustomDataPacket(void)
 bool CCustomDataPacket::Read(NetBitStreamInterface& BitStream)
 {
     unsigned short usNameLength;
-    if (BitStream.Read(m_ElementID) && BitStream.ReadCompressed(usNameLength) && usNameLength > 0)
+    if (BitStream.Read(m_ElementID) && BitStream.ReadCompressed(usNameLength) && usNameLength > 0 && usNameLength <= MAX_CUSTOMDATA_NAME_LENGTH)
     {
         m_szName = new char[usNameLength + 1];
         if (BitStream.Read(m_szName, usNameLength))
