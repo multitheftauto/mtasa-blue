@@ -125,6 +125,9 @@ DWORD RETURN_UnoccupiedVehicleBurnCheck = 0x6A76E4;
 #define HOOKPOS_ApplyCarBlowHop                             0x6B3816
 DWORD RETURN_ApplyCarBlowHop = 0x6B3831;
 
+#define HOOKPOS_CVehicle_ApplyBoatWaterResistance           0x6D2771
+DWORD RETURN_CVehicle_ApplyBoatWaterResistance = 0x6D2777;
+
 #define HOOKPOS_CPhysical_ApplyGravity                      0x543081
 DWORD RETURN_CPhysical_ApplyGravity = 0x543093;
 
@@ -398,6 +401,7 @@ void HOOK_EndWorldColors();
 void HOOK_CWorld_ProcessVerticalLineSectorList();
 void HOOK_ComputeDamageResponse_StartChoking();
 void HOOK_CollisionStreamRead();
+void HOOK_CVehicle_ApplyBoatWaterResistance();
 void HOOK_CPhysical_ApplyGravity();
 void HOOK_VehicleCamStart();
 void HOOK_VehicleCamTargetZTweak();
@@ -1489,6 +1493,8 @@ void CMultiplayerSA::InitHooks()
     MemSetFast((void*)0x5023E1, 0x90, 5);
     // Disable call to CAEVehicleAudioEntity::JustGotOutOfVehicleAsDriver
     MemSetFast((void*)0x502341, 0x90, 5);
+    // Allow to switch weapons while glued
+    MemSetFast((void*)0x60D861, 0x90, 14);
 
     // Allow water cannon hit objects created by CreateObject
     MemSetFast((void*)0x72925D, 0x1, 1);
@@ -4213,6 +4219,18 @@ void _cdecl CPhysical_ApplyGravity(DWORD dwThis)
     {
         // It's something else, apply regular downward gravity (+0x4C == m_vecMoveSpeed.fZ)
         MemSubFast<float>(dwThis + 0x4C, fTimeStep * fGravity);
+    }
+}
+
+const float kfTimeStepOrg = 5.0f / 3.0f;
+void _declspec(naked) HOOK_CVehicle_ApplyBoatWaterResistance()
+{
+    _asm
+    {
+        fmul    ds : 0x871DDC   // Original constant used in code
+        fmul    ds : 0xB7CB5C   // Multiply by current timestep
+        fdiv    kfTimeStepOrg   // Divide by desired timestep, used at 30fps
+        jmp     RETURN_CVehicle_ApplyBoatWaterResistance
     }
 }
 
