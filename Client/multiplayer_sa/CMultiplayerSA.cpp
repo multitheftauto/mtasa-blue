@@ -6920,7 +6920,7 @@ static void _declspec(naked) HOOK_WaterCannonHitWorld()
     _asm
     {
         pushad
-        lea eax, [esp + 100h - 58h]
+        lea eax, [esp + 100h - 54h]
         push eax
         call Hook_CannonHitWorld
         add     esp, 4
