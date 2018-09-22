@@ -19,7 +19,7 @@ static CCoreInterface*           m_pCore;
 static CGame*                    m_pGame;
 static CClientGame*              m_pClientGame;
 static CClientManager*           m_pManager;
-static CClientEntity*            m_pRootEntity;
+static CClientEntity*            m_pRooGtEntity;
 static CClientPlayerManager*     m_pPlayerManager;
 static CClientVehicleManager*    m_pVehicleManager;
 static CClientObjectManager*     m_pObjectManager;
@@ -5419,7 +5419,6 @@ bool CStaticFunctionDefinitions::GUIComboBoxSetItemText(CClientEntity& Entity, i
 
 int CStaticFunctionDefinitions::GUIComboBoxGetItemCount(CClientEntity& Entity)
 {
-
     // Are we a CGUI Element?
     if (IS_GUI(&Entity))
     {
@@ -5465,7 +5464,6 @@ bool CStaticFunctionDefinitions::GUIComboBoxSetOpen(CClientEntity& Entity, bool 
 
 bool CStaticFunctionDefinitions::GUIComboBoxIsOpen(CClientEntity& Entity)
 {
-    
     // Are we a CGUI Element?
     if (IS_GUI(&Entity))
     {
