@@ -158,7 +158,8 @@ void CPoolsSA::RemoveVehicle(CVehicle* pVehicle, bool bDelete)
         DWORD       dwElementIndexInPool = GetVehiclePoolIndex((std::uint8_t*)pInterface);
         CVehicleSA* pVehicleSA = m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
 
-        std::printf("REMOVE vehicle: dwElementIndexInPool: %u | pInterface = %p | UsedSpaces: %d\n", dwElementIndexInPool, pInterface, GetNumberOfUsedSpaces(VEHICLE_POOL));
+        std::printf("REMOVE vehicle: dwElementIndexInPool: %u | pInterface = %p | UsedSpaces: %d\n", dwElementIndexInPool, pInterface,
+                    GetNumberOfUsedSpaces(VEHICLE_POOL));
 
         m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool] = {nullptr, nullptr};
 
@@ -362,7 +363,8 @@ void CPoolsSA::RemoveObject(CObject* pObject, bool bDelete)
 
         CObjectSA* pObjectSA = m_objectPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
 
-        std::printf("REMOVE object: dwElementIndexInPool: %u | pInterface = %p | UsedSpaces = %d \n", dwElementIndexInPool, pInterface, GetNumberOfUsedSpaces(OBJECT_POOL));
+        std::printf("REMOVE object: dwElementIndexInPool: %u | pInterface = %p | UsedSpaces = %d \n", dwElementIndexInPool, pInterface,
+                    GetNumberOfUsedSpaces(OBJECT_POOL));
 
         m_objectPool.arrayOfClientEntities[dwElementIndexInPool] = {nullptr, nullptr};
 
@@ -666,7 +668,7 @@ void CPoolsSA::RemovePed(CPed* pPed, bool bDelete)
     }
 }
 
-SClientEntity<CEntity>* CPoolsSA::GetPed(DWORD* pGameInterface)
+SClientEntity<CPedSA>* CPoolsSA::GetPed(DWORD* pGameInterface)
 {
     DEBUG_TRACE("SClientEntity<T>* CPoolsSA::GetPed ( DWORD* pGameInterface )");
 
@@ -678,7 +680,8 @@ SClientEntity<CEntity>* CPoolsSA::GetPed(DWORD* pGameInterface)
         // Extract the element index from the handle
         DWORD dwElementIndexInPool = GetPedPoolIndex((std::uint8_t*)pInterface);
 
-        SClientEntity<CEntity>* pEntity = dynamic_cast<SClientEntity<CEntity>*>(m_pedPool.arrayOfClientEntities[dwElementIndexInPool]);
+        SClientEntity<CPedSA>* pEntity = &m_pedPool.arrayOfClientEntities[dwElementIndexInPool];
+
         if (pEntity)
         {
             return pEntity;
@@ -787,8 +790,15 @@ CEntity* CPoolsSA::GetEntity(DWORD* pGameInterface)
         switch (pEntityInterface->nType)
         {
             case ENTITY_TYPE_PED:
-                return (CEntity*)GetPed(pGameInterface);
+            {
+                auto pTheEntity = GetPed(pGameInterface);
+                
+                if (pTheEntity->pEntity)
+                {
+                    return pTheEntity->pEntity;
+                }
                 break;
+            }
             case ENTITY_TYPE_VEHICLE:
                 return (CEntity*)GetVehicle(pGameInterface);
                 break;
@@ -857,9 +867,9 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPositio
 
     DWORD dwFunc = FUNC_CTrain_CreateMissionTrain;
     _asm
-    {
+        {
         push    0            // place as close to point as possible (rather than at node)? (maybe) (actually seems to have an effect on the speed, so changed from
-                             // 1 to 0)
+                           // 1 to 0)
                              push    iDesiredTrackId            // track ID
                              push    iNodeId            // node to start at (-1 for closest node)
                              lea     ecx, pTrainEnd
@@ -873,7 +883,7 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPositio
                              push    fX            // x
                              call    dwFunc
                              add     esp, 0x28
-    }
+        }
 
     // Enable GetVehicle
     m_bGetVehicleEnabled = true;

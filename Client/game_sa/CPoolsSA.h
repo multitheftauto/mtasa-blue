@@ -126,7 +126,7 @@ private:
 public:
     void RemovePed(CPed* ped, bool bDelete = true);
     
-    SClientEntity<CEntity>* GetPed(DWORD* pGameInterface);
+    SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface);
 
     DWORD            GetPedRef(CPed* pPed);
     DWORD            GetPedRef(DWORD* pGameInterface);
