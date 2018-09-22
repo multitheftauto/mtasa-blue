@@ -639,6 +639,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_VehicleCamEnd, (DWORD)HOOK_VehicleCamEnd, 6);
     HookInstall(HOOKPOS_VehicleLookBehind, (DWORD)HOOK_VehicleLookBehind, 6);
     HookInstall(HOOKPOS_VehicleLookAside, (DWORD)HOOK_VehicleLookAside, 6);
+    HookInstall(HOOKPOS_CVehicle_ApplyBoatWaterResistance, (DWORD)HOOK_CVehicle_ApplyBoatWaterResistance, 6);
     HookInstall(HOOKPOS_CPhysical_ApplyGravity, (DWORD)HOOK_CPhysical_ApplyGravity, 6);
     HookInstall(HOOKPOS_OccupiedVehicleBurnCheck, (DWORD)HOOK_OccupiedVehicleBurnCheck, 6);
     HookInstall(HOOKPOS_UnoccupiedVehicleBurnCheck, (DWORD)HOOK_UnoccupiedVehicleBurnCheck, 5);
@@ -1493,6 +1494,7 @@ void CMultiplayerSA::InitHooks()
     MemSetFast((void*)0x5023E1, 0x90, 5);
     // Disable call to CAEVehicleAudioEntity::JustGotOutOfVehicleAsDriver
     MemSetFast((void*)0x502341, 0x90, 5);
+
     // Allow to switch weapons while glued
     MemSetFast((void*)0x60D861, 0x90, 14);
 
@@ -4222,7 +4224,7 @@ void _cdecl CPhysical_ApplyGravity(DWORD dwThis)
     }
 }
 
-const float kfTimeStepOrg = 5.0f / 3.0f;
+const float kfTimeStepOrg = 5.0f/3.0f;
 void _declspec(naked) HOOK_CVehicle_ApplyBoatWaterResistance()
 {
     _asm
