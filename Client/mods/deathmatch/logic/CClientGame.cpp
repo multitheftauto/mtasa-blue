@@ -4543,7 +4543,14 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle
 
                     if (pCollidedPedEntity->pClientEntity)
                     {
+<<<<<<< HEAD
                         pCollidedWithClientEntity = static_cast<CClientEntity*>(pCollidedPedEntity->pClientEntity);
+=======
+                        CClientPed* pCollidedWithClientPed = static_cast<CClientPed*>(pCollidedPedEntity->pClientEntity);
+                        CPed*       pCollidedWithPed = reinterpret_cast<CPed*>(pCollidedWithClientPed);
+
+                        pCollidedWithClientEntity = m_pManager->FindEntity(pCollidedWithPed, true);
+>>>>>>> f4c20840591dab8c91d81575c8db2b503c6995ee
                     }
                 }
             }
@@ -4629,49 +4636,63 @@ bool CClientGame::HeliKillHandler(CVehicleSAInterface* pHeliInterface, CEntitySA
 
             // Was our client ped valid
             if (pClientPed)
+            auto pHittedPedEntity = g_pGame->GetPools()->GetPed((DWORD*)pHitInterface);
+
+            if (pHittedPedEntity->pClientEntity)
             {
-                // Get our heli and client heli
-                CVehicle*       pHeli = g_pGame->GetPools()->GetVehicle((DWORD*)pHeliInterface);
-                CClientVehicle* pClientHeli = m_pManager->GetVehicleManager()->GetSafe(pHeli);
+                CClientPed* pClientPed = static_cast<CClientPed*>(pHittedPedEntity->pClientEntity);
+                CPed*       pPed = reinterpret_cast<CPed*>(pClientPed);
 
-                // Iterate our "stored" cancel state and find the heli in question
-                std::pair<std::multimap<CClientVehicle*, CClientPed*>::iterator, std::multimap<CClientVehicle*, CClientPed*>::iterator> iterators =
-                    m_HeliCollisionsMap.equal_range(pClientHeli);
-                std::multimap<CClientVehicle*, CClientPed*>::const_iterator iter = iterators.first;
-                for (; iter != iterators.second; ++iter)
+                // Was our client ped valid
+                if (pClientPed)
                 {
-                    // If the Heli and ped collided within the clear rate return false
-                    if ((*iter).first == pClientHeli && (*iter).second == pClientPed)
-                        return false;
-                }
+                    // Get our heli and client heli
+                    CVehicle*       pHeli = g_pGame->GetPools()->GetVehicle((DWORD*)pHeliInterface);
+                    CClientVehicle* pClientHeli = m_pManager->GetVehicleManager()->GetSafe(pHeli);
 
-                CLuaArguments Arguments;
-                if (pClientHeli)
-                {
-                    // Push our heli
-                    Arguments.PushElement(pClientHeli);
-                }
-                else
-                {
-                    Arguments.PushNil();
-                }
+                    // Iterate our "stored" cancel state and find the heli in question
+                    std::pair<std::multimap<CClientVehicle*, CClientPed*>::iterator, std::multimap<CClientVehicle*, CClientPed*>::iterator> iterators =
+                        m_HeliCollisionsMap.equal_range(pClientHeli);
+                    std::multimap<CClientVehicle*, CClientPed*>::const_iterator iter = iterators.first;
+                    for (; iter != iterators.second; ++iter)
+                    {
+                        // If the Heli and ped collided within the clear rate return false
+                        if ((*iter).first == pClientHeli && (*iter).second == pClientPed)
+                            return false;
+                    }
 
-                // Trigger our event
-                bool bContinue;
-                if (IS_PLAYER(pClientPed))
-                    bContinue = pClientPed->CallEvent("onClientPlayerHeliKilled", Arguments, true);
-                else
-                    bContinue = pClientPed->CallEvent("onClientPedHeliKilled", Arguments, true);
+                    CLuaArguments Arguments;
+                    if (pClientHeli)
+                    {
+                        // Push our heli
+                        Arguments.PushElement(pClientHeli);
+                    }
+                    else
+                    {
+                        Arguments.PushNil();
+                    }
 
-                // Was our event cancelled
-                if (!bContinue)
-                {
-                    // Add our heli and ped pair to the list
-                    std::pair<CClientVehicle*, CClientPed*> pair = std::pair<CClientVehicle*, CClientPed*>(pClientHeli, pClientPed);
-                    m_HeliCollisionsMap.insert(pair);
+                    // Trigger our event
+                    bool bContinue;
+                    if (IS_PLAYER(pClientPed))
+                        bContinue = pClientPed->CallEvent("onClientPlayerHeliKilled", Arguments, true);
+                    else
+                        bContinue = pClientPed->CallEvent("onClientPedHeliKilled", Arguments, true);
+
+                    // Was our event cancelled
+                    if (!bContinue)
+                    {
+                        // Add our heli and ped pair to the list
+                        std::pair<CClientVehicle*, CClientPed*> pair = std::pair<CClientVehicle*, CClientPed*>(pClientHeli, pClientPed);
+                        m_HeliCollisionsMap.insert(pair);
+                    }
+                    // Return if it was cancelled
+                    return bContinue;
                 }
-                // Return if it was cancelled
-                return bContinue;
+            }
+            else
+            {
+                return false;
             }
         }
         else
@@ -4797,7 +4818,14 @@ bool CClientGame::ObjectBreakHandler(CObjectSAInterface* pObjectInterface, CEnti
 
                     if (pAttackerEntity->pClientEntity)
                     {
+<<<<<<< HEAD
                         pClientAttacker = pAttackerEntity->pClientEntity;
+=======
+                        CClientPed* pAttackerClient = static_cast<CClientPed*>(g_pGame->GetPools()->GetPed((DWORD*)pAttackerInterface)->pClientEntity);
+                        CPed*       pAttackerPed = reinterpret_cast<CPed*>(pAttackerClient);
+
+                        pClientAttacker = m_pManager->FindEntity(pAttackerPed);
+>>>>>>> f4c20840591dab8c91d81575c8db2b503c6995ee
                     }
                 }
             }
@@ -4826,8 +4854,18 @@ bool CClientGame::WaterCannonHitHandler(CVehicleSAInterface* pCannonVehicle, CPe
         if (pCannonClientVehicle)
         {
             // Get our ped and client ped
+<<<<<<< HEAD
             auto pTheEntity = g_pGame->GetPools()->GetPed((DWORD*)pHitPed);
             CClientPed* pClientPed = nullptr;
+=======
+            auto pPedEntity = g_pGame->GetPools()->GetPed((DWORD*)pHitPed);
+            CClientPed* pClientPed;
+
+            if (pPedEntity->pClientEntity)
+            {
+                pClientPed = static_cast<CClientPed*>(pPedEntity->pClientEntity);
+            }
+>>>>>>> f4c20840591dab8c91d81575c8db2b503c6995ee
 
             CLuaArguments Arguments;
 
