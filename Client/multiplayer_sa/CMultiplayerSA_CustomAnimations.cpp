@@ -39,7 +39,7 @@ BlendAnimationHierarchyHandler* m_pBlendAnimationHierarchyHandler = nullptr;
 
 static bool bDisableCallsToCAnimBlendNode = true;
 
-int _cdecl OnCAnimBlendAssocGroupCopyAnimation(AssocGroupId animGroup, int iAnimId);
+int _cdecl OnCAnimBlendAssocGroupCopyAnimation(AssocGroupId* pAnimGroup, int* pAnimId);
 
 void CMultiplayerSA::SetAddAnimationHandler(AddAnimationHandler* pHandler)
 {
@@ -209,13 +209,12 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation()
         {
             popad
             mov     ecx, [esp+4]  // animationClump
-            mov     edx, [esp+8]  // animationGroup
-            mov     eax, [esp+12] // animationID
+            lea     edx, [esp+8]  // animationGroup address
+            lea     eax, [esp+12] // animationID address
             push    eax
             push    edx
             call    OnCAnimBlendAssocGroupCopyAnimation
             add     esp, 8
-            mov     [esp+12], eax // replace animationID
 
             // call our handler function
             push    eax
@@ -257,13 +256,12 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
         {
             popad
             mov     ecx, [esp+4]  // animationClump
-            mov     edx, [esp+12] // animationGroup
-            mov     eax, [esp+16] // animationID
+            lea     edx, [esp+12] // animationGroup address
+            lea     eax, [esp+16] // animationID address
             push    eax
             push    edx
             call    OnCAnimBlendAssocGroupCopyAnimation
             add     esp, 8
-            mov     [esp+16], eax // replace animationID
 
             // call our handler function
             push    eax
