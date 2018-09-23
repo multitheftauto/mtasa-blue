@@ -13,6 +13,9 @@
 
 extern bool g_bVehiclePointerInvalid;
 
+template <class T>
+SClientEntity<T> pEmptyEntity = { nullptr, nullptr };
+
 CPoolsSA::CPoolsSA()
 {
     DEBUG_TRACE("CPoolsSA::CPoolsSA()");
@@ -185,17 +188,21 @@ SClientEntity<CVehicleSA>* CPoolsSA::GetVehicle(DWORD* pGameInterface)
 
         if (pInterface)
         {
-            DWORD                      dwElementIndexInPool = GetVehiclePoolIndex((std::uint8_t*)pInterface);
-            SClientEntity<CVehicleSA>* pEntity = &m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool];
+            DWORD dwElementIndexInPool = GetVehiclePoolIndex((std::uint8_t*)pInterface);
 
-            if (pEntity)
+            if (dwElementIndexInPool < MAX_VEHICLES)
             {
-                return pEntity;
+                SClientEntity<CVehicleSA>* pEntity = &m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool];
+
+                if (pEntity)
+                {
+                    return pEntity;
+                }
             }
         }
     }
 
-    return NULL;
+    return &pEmptyEntity<CVehicleSA>;
 }
 
 DWORD CPoolsSA::GetVehicleRef(CVehicle* pVehicle)
@@ -386,16 +393,20 @@ SClientEntity<CObjectSA>* CPoolsSA::GetObject(DWORD* pGameInterface)
 
     if (pInterface)
     {
-        DWORD                     dwElementIndexInPool = GetObjectPoolIndex((std::uint8_t*)pInterface);
-        SClientEntity<CObjectSA>* pEntity = &m_objectPool.arrayOfClientEntities[dwElementIndexInPool];
+        DWORD dwElementIndexInPool = GetObjectPoolIndex((std::uint8_t*)pInterface);
 
-        if (pEntity)
+        if (dwElementIndexInPool < MAX_OBJECTS)
         {
-            return pEntity;
+            SClientEntity<CObjectSA>* pEntity = &m_objectPool.arrayOfClientEntities[dwElementIndexInPool];
+
+            if (pEntity)
+            {
+                return pEntity;
+            }
         }
     }
 
-    return NULL;
+    return &pEmptyEntity<CObjectSA>;
 }
 
 DWORD CPoolsSA::GetObjectRef(CObject* pObject)
@@ -680,15 +691,18 @@ SClientEntity<CPedSA>* CPoolsSA::GetPed(DWORD* pGameInterface)
         // Extract the element index from the handle
         DWORD dwElementIndexInPool = GetPedPoolIndex((std::uint8_t*)pInterface);
 
-        SClientEntity<CPedSA>* pEntity = &m_pedPool.arrayOfClientEntities[dwElementIndexInPool];
-        
-        if (pEntity)
+        if (dwElementIndexInPool < MAX_PEDS)
         {
-            return pEntity;
+            SClientEntity<CPedSA>* pEntity = &m_pedPool.arrayOfClientEntities[dwElementIndexInPool];
+        
+            if (pEntity)
+            {
+                return pEntity;
+            }
         }
     }
 
-    return NULL;
+    return &pEmptyEntity<CPedSA>;
 }
 
 DWORD CPoolsSA::GetPedRef(CPed* pPed)
