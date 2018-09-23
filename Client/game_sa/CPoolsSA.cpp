@@ -378,7 +378,7 @@ void CPoolsSA::RemoveObject(CObject* pObject, bool bDelete)
     }
 }
 
-CObject* CPoolsSA::GetObject(DWORD* pGameInterface)
+SClientEntity<CObjectSA>* CPoolsSA::GetObject(DWORD* pGameInterface)
 {
     DEBUG_TRACE("CObject* CPoolsSA::GetObject( DWORD* pGameInterface )");
 
@@ -386,12 +386,12 @@ CObject* CPoolsSA::GetObject(DWORD* pGameInterface)
 
     if (pInterface)
     {
-        DWORD      dwElementIndexInPool = GetObjectPoolIndex((std::uint8_t*)pInterface);
-        CObjectSA* pObject = m_objectPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
+        DWORD                     dwElementIndexInPool = GetObjectPoolIndex((std::uint8_t*)pInterface);
+        SClientEntity<CObjectSA>* pEntity = &m_objectPool.arrayOfClientEntities[dwElementIndexInPool];
 
-        if (pObject)
+        if (pEntity)
         {
-            return pObject;
+            return pEntity;
         }
     }
 
@@ -810,8 +810,15 @@ CEntity* CPoolsSA::GetEntity(DWORD* pGameInterface)
                 break;
             }
             case ENTITY_TYPE_OBJECT:
-                return (CEntity*)GetObject(pGameInterface);
+            {
+                auto pTheEntity = GetObject(pGameInterface);
+
+                if (pTheEntity->pEntity)
+                {
+                    return pTheEntity->pEntity;
+                }
                 break;
+            }
             default:
                 break;
         }

@@ -107,13 +107,13 @@ private:
     bool AddObjectToPool(CClientObject* pClientObject, CObjectSA* pObject);
 
 public:
-    void          RemoveObject(CObject* pObject, bool bDelete = true);
-    CObject*      GetObject(DWORD* pGameInterface);
-    DWORD         GetObjectRef(CObject* pObject);
-    DWORD         GetObjectRef(DWORD* pGameInterface);
-    CObject*      GetObjectFromRef(DWORD dwGameRef);
-    unsigned long GetObjectCount() { return m_objectPool.ulCount; }
-    void          DeleteAllObjects();
+    void                      RemoveObject(CObject* pObject, bool bDelete = true);
+    SClientEntity<CObjectSA>* GetObject(DWORD* pGameInterface);
+    DWORD                     GetObjectRef(CObject* pObject);
+    DWORD                     GetObjectRef(DWORD* pGameInterface);
+    CObject*                  GetObjectFromRef(DWORD dwGameRef);
+    unsigned long             GetObjectCount() { return m_objectPool.ulCount; }
+    void                      DeleteAllObjects();
 
     // Peds pool
     CPed* AddPed(CClientPed* pClientPed, ePedModel ePedType);

@@ -289,12 +289,14 @@ static void Event_BulletImpact(void)
     }
 }
 
-CPedSAInterface*      pAPed = NULL;
-float                 fTempPosX = 0, fTempPosY = 0, fTempPosZ = 0;
-CPed*                 pATargetingPed = NULL;
-CVector*              pTempVec;
-bool*                 pSkipAim;
-CRemoteDataStorageSA* pTempRemote;
+CPedSAInterface*       pAPed = NULL;
+float                  fTempPosX = 0, fTempPosY = 0, fTempPosZ = 0;
+CPed*                  pATargetingPed = NULL;
+SClientEntity<CPedSA>* pTargetEntity = nullptr;
+CClientPed*            pTargetClientPed = nullptr;
+CVector*               pTempVec;
+bool*                  pSkipAim;
+CRemoteDataStorageSA*  pTempRemote;
 
 VOID _declspec(naked) HOOK_CTaskSimpleUsegun_ProcessPed()
 {
@@ -332,8 +334,13 @@ VOID _declspec(naked) HOOK_SkipAim()
         pushad
     }
 
-    // Grab the player for this interface
-    pATargetingPed = dynamic_cast<CPed*>(m_pools->GetPed((DWORD*)pAPed)->pEntity);
+    // Grab the player for this interface    
+    pTargetEntity = m_pools->GetPed((DWORD*)pAPed);
+
+    if (pTargetEntity->pClientEntity)
+    {
+        pATargetingPed = reinterpret_cast<CPed*>((CClientPed*)pTargetClientPed);
+    }
 
     if (pATargetingPed)
     {

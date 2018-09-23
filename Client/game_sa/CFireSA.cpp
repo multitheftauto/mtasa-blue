@@ -76,10 +76,10 @@ CEntity* CFireSA::GetCreator()
         switch (createEntitySA->nType)
         {
             case ENTITY_TYPE_PED:
-                creatorEntity = dynamic_cast<CPed*>(pPools->GetPed((DWORD*)createEntitySA)->pEntity);
+                creatorEntity = (CEntity*)pPools->GetPed((DWORD*)createEntitySA)->pEntity;
                 break;
             case ENTITY_TYPE_VEHICLE:
-                creatorEntity = dynamic_cast<CVehicle*>(pPools->GetVehicle((DWORD*)createEntitySA)->pEntity);
+                creatorEntity = (CEntity*)pPools->GetVehicle((DWORD*)createEntitySA)->pEntity;
                 break;
             default:
                 creatorEntity = NULL;

@@ -4540,8 +4540,12 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle
                 }
                 else if (pCollidedWithEntity->GetEntityType() == ENTITY_TYPE_OBJECT)
                 {
-                    CObject* pCollidedWithObject = g_pGame->GetPools()->GetObject((DWORD*)pCollidedWith);
-                    pCollidedWithClientEntity = m_pManager->FindEntity(pCollidedWithObject, true);
+                    auto pObjectEntity = g_pGame->GetPools()->GetObjectA((DWORD*)pCollidedWith);
+
+                    if (pObjectEntity->pClientEntity)
+                    {
+                        pCollidedWithClientEntity = pObjectEntity->pClientEntity;
+                    }
                 }
                 else if (pCollidedWithEntity->GetEntityType() == ENTITY_TYPE_PED)
                 {
@@ -4779,8 +4783,16 @@ bool CClientGame::ObjectDamageHandler(CObjectSAInterface* pObjectInterface, floa
     if (pObjectInterface)
     {
         // Get our object and client object
-        CObject*       pObject = g_pGame->GetPools()->GetObjectA((DWORD*)pObjectInterface);
-        CClientObject* pClientObject = m_pManager->GetObjectManager()->GetSafe(pObject);
+        CObject*       pObject = nullptr;
+        CClientObject* pClientObject = nullptr;
+
+        auto pObjectEntity = g_pGame->GetPools()->GetObjectA((DWORD*)pObjectInterface);
+
+        if (pObjectEntity->pClientEntity)
+        {
+            pClientObject = static_cast<CClientObject*>(pObjectEntity->pClientEntity);
+            pObject = reinterpret_cast<CObject*>(pObjectEntity->pEntity);
+        }
 
         // Is our client vehicle valid?
         if (pClientObject)
@@ -4828,8 +4840,16 @@ bool CClientGame::ObjectBreakHandler(CObjectSAInterface* pObjectInterface, CEnti
     if (pObjectInterface)
     {
         // Get our object and client object
-        CObject*       pObject = g_pGame->GetPools()->GetObjectA((DWORD*)pObjectInterface);
-        CClientObject* pClientObject = m_pManager->GetObjectManager()->GetSafe(pObject);
+        CObject*       pObject = nullptr;
+        CClientObject* pClientObject = nullptr;
+
+        auto pObjectEntity = g_pGame->GetPools()->GetObjectA((DWORD*)pObjectInterface);
+
+        if (pObjectEntity->pClientEntity)
+        {
+            pClientObject = static_cast<CClientObject*>(pObjectEntity->pClientEntity);
+            pObject = reinterpret_cast<CObject*>(pObjectEntity->pEntity);
+        }
 
         // Is our client vehicle valid?
         if (pClientObject)

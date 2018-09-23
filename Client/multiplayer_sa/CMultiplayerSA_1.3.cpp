@@ -1316,7 +1316,8 @@ CVector             vecObjectScale;
 CObjectSAInterface* pCurrentObject;
 bool                CObject_GetScale()
 {
-    CObject* pObject = pGameInterface->GetPools()->GetObjectA((DWORD*)pCurrentObject);
+    CObject* pObject = pGameInterface->GetPools()->GetObjectA((DWORD*)pCurrentObject)->pEntity;
+
     if (pObject)
     {
         vecObjectScale = *pObject->GetScale();

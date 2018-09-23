@@ -2084,7 +2084,7 @@ CObject* CVehicleSA::SpawnFlyingComponent(int i_1, unsigned int ui_2)
 
     CObject* pObject = NULL;
     if (dwReturn)
-        pObject = pGame->GetPools()->GetObject((DWORD*)dwReturn);
+        pObject = pGame->GetPools()->GetObject((DWORD*)dwReturn)->pEntity;
     return pObject;
 }
 

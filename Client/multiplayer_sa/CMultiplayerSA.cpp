@@ -2664,7 +2664,7 @@ bool CallExplosionHandler(void)
 
             case ENTITY_TYPE_OBJECT:
             {
-                pExplosionCreator = pGameInterface->GetPools()->GetObject((DWORD*)pInterface);
+                pExplosionCreator = pGameInterface->GetPools()->GetObject((DWORD*)pInterface)->pEntity;
                 break;
             }
         }
@@ -2683,13 +2683,13 @@ bool CallExplosionHandler(void)
 
             case ENTITY_TYPE_VEHICLE:
             {
-                pExplodingEntity = dynamic_cast<CEntity*>(pGameInterface->GetPools()->GetVehicle((DWORD*)pExplodingEntityInterface)->pEntity);
+                pExplodingEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pExplodingEntityInterface)->pEntity;
                 break;
             }
 
             case ENTITY_TYPE_OBJECT:
             {
-                pExplodingEntity = pGameInterface->GetPools()->GetObject((DWORD*)pExplodingEntityInterface);
+                pExplodingEntity = pGameInterface->GetPools()->GetObject((DWORD*)pExplodingEntityInterface)->pEntity;
                 break;
             }
         }
@@ -3429,7 +3429,8 @@ static void SetObjectAlpha()
 
     if (dwAlphaEntity)
     {
-        CObject* pObject = pGameInterface->GetPools()->GetObject((DWORD*)dwAlphaEntity);
+        CObject* pObject = pGameInterface->GetPools()->GetObject((DWORD*)dwAlphaEntity)->pEntity;
+
         if (pObject)
         {
             if (pObject->IsAGangTag())
