@@ -572,7 +572,7 @@ bool IsTaskSimpleCarFallOutValid(CAnimBlendAssociationSAInterface* pAnimBlendAss
 
     if (pTask->pVehicle)
     {
-        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pTask->pVehicle);
+        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pTask->pVehicle)->pEntity;
         if (!pVehicle)
         {
             // Task looks valid, but vehicle is not recognised by MTA

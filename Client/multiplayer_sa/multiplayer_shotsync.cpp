@@ -916,7 +916,7 @@ bool ProcessProjectileAdd()
             switch (pProjectileOwner->nType)
             {
                 case ENTITY_TYPE_VEHICLE:
-                    pOwner = pPools->GetVehicle((DWORD*)pProjectileOwner);
+                    pOwner = dynamic_cast<CVehicle*>(pPools->GetVehicle((DWORD*)pProjectileOwner)->pEntity);
                     break;
                 case ENTITY_TYPE_PED:
                     pOwner = dynamic_cast<CPed*>(pPools->GetPed((DWORD*)pProjectileOwner)->pEntity);
@@ -933,7 +933,7 @@ bool ProcessProjectileAdd()
             switch (projectileTargetEntityInterface->nType)
             {
                 case ENTITY_TYPE_VEHICLE:
-                    projectileTargetEntity = pPools->GetVehicle((DWORD*)projectileTargetEntityInterface);
+                    projectileTargetEntity = dynamic_cast<CVehicle*>(pPools->GetVehicle((DWORD*)projectileTargetEntityInterface)->pEntity);
                     break;
                 case ENTITY_TYPE_PED:
                     projectileTargetEntity = dynamic_cast<CPed*>(pPools->GetPed((DWORD*)projectileTargetEntityInterface)->pEntity);
@@ -960,7 +960,7 @@ void ProcessProjectile()
             switch (pProjectileOwner->nType)
             {
                 case ENTITY_TYPE_VEHICLE:
-                    pOwner = pPools->GetVehicle((DWORD*)pProjectileOwner);
+                    pOwner = dynamic_cast<CVehicle*>(pPools->GetVehicle((DWORD*)pProjectileOwner)->pEntity);
                     break;
                 case ENTITY_TYPE_PED:
                     pOwner = dynamic_cast<CPed*>(pPools->GetPed((DWORD*)pProjectileOwner)->pEntity);

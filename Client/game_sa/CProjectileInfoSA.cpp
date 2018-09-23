@@ -185,7 +185,7 @@ CEntity* CProjectileInfoSA::GetTarget(void)
 
             case ENTITY_TYPE_VEHICLE:
             {
-                pTarget = pGame->GetPools()->GetVehicle((DWORD*)pTargetInterface);
+                pTarget = dynamic_cast<CVehicle*>(pGame->GetPools()->GetVehicle((DWORD*)pTargetInterface)->pEntity);
                 break;
             }
 

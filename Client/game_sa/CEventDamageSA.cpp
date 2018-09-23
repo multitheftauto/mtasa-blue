@@ -73,7 +73,7 @@ CEntity* CEventDamageSA::GetInflictingEntity(void)
                 pReturn = dynamic_cast<CPed*>(pPools->GetPed((DWORD*)pInterface)->pEntity);
                 break;
             case ENTITY_TYPE_VEHICLE:
-                pReturn = pPools->GetVehicle((DWORD*)pInterface);
+                pReturn = dynamic_cast<CVehicle*>(pPools->GetVehicle((DWORD*)pInterface)->pEntity);
                 break;
             case ENTITY_TYPE_OBJECT:
                 pReturn = pPools->GetObject((DWORD*)pInterface);

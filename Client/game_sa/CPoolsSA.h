@@ -88,12 +88,12 @@ private:
     bool AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleSA* pVehicle);
 
 public:
-    void          RemoveVehicle(CVehicle* pVehicle, bool bDelete = true);
-    CVehicle*     GetVehicle(DWORD* pGameInterface);
-    DWORD         GetVehicleRef(CVehicle* pVehicle);
-    DWORD         GetVehicleRef(DWORD* pGameInterface);
-    CVehicle*     GetVehicleFromRef(DWORD dwGameRef);
-    unsigned long GetVehicleCount()
+    void                       RemoveVehicle(CVehicle* pVehicle, bool bDelete = true);
+    SClientEntity<CVehicleSA>* GetVehicle(DWORD* pGameInterface);
+    DWORD                      GetVehicleRef(CVehicle* pVehicle);
+    DWORD                      GetVehicleRef(DWORD* pGameInterface);
+    CVehicle*                  GetVehicleFromRef(DWORD dwGameRef);
+    unsigned long              GetVehicleCount()
     {
         return m_vehiclePool.ulCount;
         ;

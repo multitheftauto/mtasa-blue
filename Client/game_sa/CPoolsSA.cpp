@@ -173,9 +173,9 @@ void CPoolsSA::RemoveVehicle(CVehicle* pVehicle, bool bDelete)
     }
 }
 
-CVehicle* CPoolsSA::GetVehicle(DWORD* pGameInterface)
+SClientEntity<CVehicleSA>* CPoolsSA::GetVehicle(DWORD* pGameInterface)
 {
-    DEBUG_TRACE("CVehicle* CPoolsSA::GetVehicle ( DWORD* pGameInterface )");
+    DEBUG_TRACE("SClientEntity<CVehicleSA>* CPoolsSA::GetVehicle ( DWORD* pGameInterface )");
 
     assert(pGameInterface);
 
@@ -185,12 +185,12 @@ CVehicle* CPoolsSA::GetVehicle(DWORD* pGameInterface)
 
         if (pInterface)
         {
-            DWORD       dwElementIndexInPool = GetVehiclePoolIndex((std::uint8_t*)pInterface);
-            CVehicleSA* pVehicle = m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
+            DWORD                      dwElementIndexInPool = GetVehiclePoolIndex((std::uint8_t*)pInterface);
+            SClientEntity<CVehicleSA>* pEntity = &m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool];
 
-            if (pVehicle)
+            if (pEntity)
             {
-                return pVehicle;
+                return pEntity;
             }
         }
     }
@@ -800,8 +800,15 @@ CEntity* CPoolsSA::GetEntity(DWORD* pGameInterface)
                 break;
             }
             case ENTITY_TYPE_VEHICLE:
-                return (CEntity*)GetVehicle(pGameInterface);
+            {
+                auto pTheEntity = GetVehicle(pGameInterface);
+
+                if (pTheEntity->pEntity)
+                {
+                    return pTheEntity->pEntity;
+                }
                 break;
+            }
             case ENTITY_TYPE_OBJECT:
                 return (CEntity*)GetObject(pGameInterface);
                 break;

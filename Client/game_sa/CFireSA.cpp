@@ -79,7 +79,7 @@ CEntity* CFireSA::GetCreator()
                 creatorEntity = dynamic_cast<CPed*>(pPools->GetPed((DWORD*)createEntitySA)->pEntity);
                 break;
             case ENTITY_TYPE_VEHICLE:
-                creatorEntity = pPools->GetVehicle((DWORD*)createEntitySA);
+                creatorEntity = dynamic_cast<CVehicle*>(pPools->GetVehicle((DWORD*)createEntitySA)->pEntity);
                 break;
             default:
                 creatorEntity = NULL;
@@ -102,7 +102,7 @@ CEntity* CFireSA::GetEntityOnFire()
                 TargetEntity = dynamic_cast<CPed*>(pPools->GetPed((DWORD*)TargetEntitySA)->pEntity);
                 break;
             case ENTITY_TYPE_VEHICLE:
-                TargetEntity = pPools->GetVehicle((DWORD*)TargetEntitySA);
+                TargetEntity = dynamic_cast<CVehicle*>(pPools->GetVehicle((DWORD*)TargetEntitySA)->pEntity);
                 break;
             default:
                 TargetEntity = NULL;

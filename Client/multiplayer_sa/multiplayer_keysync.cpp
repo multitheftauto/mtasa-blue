@@ -503,7 +503,7 @@ void SwitchContext(CVehicleSAInterface* pVehicleInterface)
 {
     // Grab the CVehicle for the given vehicle interface
     CPoolsSA* pool = (CPoolsSA*)pGameInterface->GetPools();
-    CVehicle* pVehicle = pool->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle* pVehicle = pool->GetVehicle((DWORD*)pVehicleInterface)->pEntity;
     if (pVehicle)
     {
         SwitchContext(pVehicle);

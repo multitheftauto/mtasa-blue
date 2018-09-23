@@ -323,7 +323,7 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
                         *CollisionEntity = pPools->GetObject((DWORD*)targetEntity);
                         break;
                     case ENTITY_TYPE_VEHICLE:
-                        *CollisionEntity = pPools->GetVehicle((DWORD*)targetEntity);
+                        *CollisionEntity = dynamic_cast<CVehicle*>(pPools->GetVehicle((DWORD*)targetEntity)->pEntity);
                         break;
                 }
 

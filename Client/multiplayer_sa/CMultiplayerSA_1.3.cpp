@@ -290,7 +290,7 @@ void GetVehicleSirenType()
     if (pVehicleWithTheSiren)
     {
         // Grab the CVehicle
-        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
+        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren)->pEntity;
         // Valid ? I see a pattern here!
         if (pVehicle)
         {
@@ -395,7 +395,7 @@ bool ProcessVehicleSirenPosition()
     if (pVehicleWithTheSiren)
     {
         // Grab our vehicle from the interface
-        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
+        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren)->pEntity;
         // Valid - Wait this seems familiar
         if (pVehicle)
         {
@@ -769,7 +769,7 @@ bool TestVehicleForSiren()
     if (pVehicleWithTheSiren)
     {
         // Grab our vehicle
-        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
+        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren)->pEntity;
         // Is it valid and it doesn't have a siren by default
         if (pVehicle)
         {
@@ -818,7 +818,7 @@ bool SirenCheckCameraPosition()
     // Default SA sirens we don't bother processing
     // if ( DoesVehicleHaveSiren ( ) == false )
     {
-        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
+        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren)->pEntity;
         // Do we have sirens given by us and is the 360 flag set?
         if (pVehicle->DoesVehicleHaveSirens() && pVehicle->IsSiren360EffectEnabled())
         {
@@ -866,7 +866,7 @@ bool DisableVehicleSiren()
 {
     if (pVehicleWithTheSiren && pVehicleWithTheSiren->vtbl != NULL)
     {
-        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
+        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren)->pEntity;
         if (pVehicle && (pVehicle->IsSirenSilentEffectEnabled() || pVehicle->GetModelIndex() == 420 || pVehicle->GetModelIndex() == 438))
         {
             return true;
@@ -1407,7 +1407,7 @@ void CMultiplayerSA::SetVehicleFellThroughMapHandler(VehicleFellThroughMapHandle
 CVehicleSAInterface* pFallingVehicleInterface;
 bool                 CWorld_Remove_FallenVehiclesCheck()
 {
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pFallingVehicleInterface);
+    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pFallingVehicleInterface)->pEntity;
     if (pVehicle && m_pVehicleFellThroughMapHandler(pFallingVehicleInterface))
     {
         // Disallow

@@ -48,6 +48,7 @@ enum ePools
 
 class CClientEntity;
 class CPedSA;
+class CVehicleSA;
 
 template <class T>
 struct SClientEntity
@@ -84,11 +85,11 @@ public:
     virtual CVehicle* AddVehicle(class CClientVehicle* pClientVehicle, DWORD* pGameInterface) = 0;
     virtual void      RemoveVehicle(CVehicle* pVehicle, bool bDelete = true) = 0;
 
-    virtual CVehicle*     GetVehicle(DWORD* pGameInterface) = 0;
-    virtual DWORD         GetVehicleRef(CVehicle* pVehicle) = 0;
-    virtual DWORD         GetVehicleRef(DWORD* pGameInterface) = 0;
-    virtual CVehicle*     GetVehicleFromRef(DWORD dwGameRef) = 0;
-    virtual unsigned long GetVehicleCount() = 0;
+    virtual SClientEntity<CVehicleSA>* GetVehicle(DWORD* pGameInterface) = 0;
+    virtual DWORD                      GetVehicleRef(CVehicle* pVehicle) = 0;
+    virtual DWORD                      GetVehicleRef(DWORD* pGameInterface) = 0;
+    virtual CVehicle*                  GetVehicleFromRef(DWORD dwGameRef) = 0;
+    virtual unsigned long              GetVehicleCount() = 0;
 
     // Objects pool
     virtual CObject* AddObject(class CClientObject* pClientObject, DWORD dwModelID, bool bLowLod, bool bBreakingDisabled) = 0;

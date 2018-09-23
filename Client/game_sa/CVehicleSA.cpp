@@ -424,7 +424,7 @@ CVehicle* CVehicleSA::GetNextTrainCarriage(void)
 {
     CVehicleSAInterface* pVehicle = GetNextCarriageInTrain();
     if (pVehicle)
-        return pGame->GetPools()->GetVehicle((DWORD*)pVehicle);
+        return pGame->GetPools()->GetVehicle((DWORD*)pVehicle)->pEntity;
     else
         return NULL;
 }
@@ -479,7 +479,7 @@ CVehicle* CVehicleSA::GetPreviousTrainCarriage(void)
 {
     CVehicleSAInterface* pVehicle = GetPreviousCarriageInTrain();
     if (pVehicle)
-        return pGame->GetPools()->GetVehicle((DWORD*)pVehicle);
+        return pGame->GetPools()->GetVehicle((DWORD*)pVehicle)->pEntity;
     else
         return NULL;
 }
@@ -1718,7 +1718,7 @@ CVehicle* CVehicleSA::GetTowedVehicle(void)
     DEBUG_TRACE("CVehicle * CVehicleSA::GetTowedVehicle ( void )");
     CVehicleSAInterface* pTowedVehicle = (CVehicleSAInterface*)*(DWORD*)((DWORD)this->GetInterface() + 1224);
     if (pTowedVehicle)
-        return pGame->GetPools()->GetVehicle((DWORD*)pTowedVehicle);
+        return pGame->GetPools()->GetVehicle((DWORD*)pTowedVehicle)->pEntity;
     return NULL;
 }
 
@@ -1727,7 +1727,7 @@ CVehicle* CVehicleSA::GetTowedByVehicle(void)
     DEBUG_TRACE("CVehicle * CVehicleSA::GetTowedVehicle ( void )");
     CVehicleSAInterface* pTowedVehicle = (CVehicleSAInterface*)*(DWORD*)((DWORD)this->GetInterface() + 1220);
     if (pTowedVehicle)
-        return pGame->GetPools()->GetVehicle((DWORD*)pTowedVehicle);
+        return pGame->GetPools()->GetVehicle((DWORD*)pTowedVehicle)->pEntity;
     return NULL;
 }
 

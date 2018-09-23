@@ -2573,10 +2573,11 @@ no_render:
 
 bool CallBreakTowLinkHandler(CVehicleSAInterface* vehicle)
 {
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)vehicle);
-    if (pVehicle && m_pBreakTowLinkHandler)
+    auto pVehicleEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)vehicle);
+
+    if (pVehicleEntity->pEntity && m_pBreakTowLinkHandler)
     {
-        return m_pBreakTowLinkHandler(pVehicle);
+        return m_pBreakTowLinkHandler(pVehicleEntity->pEntity);
     }
     return true;
 }
@@ -2657,7 +2658,7 @@ bool CallExplosionHandler(void)
 
             case ENTITY_TYPE_VEHICLE:
             {
-                pExplosionCreator = pGameInterface->GetPools()->GetVehicle((DWORD*)pInterface);
+                pExplosionCreator = pGameInterface->GetPools()->GetVehicle((DWORD*)pInterface)->pEntity;
                 break;
             }
 
@@ -2682,7 +2683,7 @@ bool CallExplosionHandler(void)
 
             case ENTITY_TYPE_VEHICLE:
             {
-                pExplodingEntity = dynamic_cast<CEntity*>(pGameInterface->GetPools()->GetVehicle((DWORD*)pExplodingEntityInterface));
+                pExplodingEntity = dynamic_cast<CEntity*>(pGameInterface->GetPools()->GetVehicle((DWORD*)pExplodingEntityInterface)->pEntity);
                 break;
             }
 
@@ -4183,7 +4184,7 @@ void _cdecl CPhysical_ApplyGravity(DWORD dwThis)
     if (dwType == 2)
     {
         // It's a vehicle, use the gravity vector
-        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)dwThis);
+        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)dwThis)->pEntity;
         if (!pVehicle)
             return;
 
@@ -4257,7 +4258,7 @@ bool _cdecl VehicleCamStart(DWORD dwCam, DWORD pVehicleInterface)
     // This way SA's gravity-goes-downward assumptive code can calculate the camera
     // spherical coords correctly. Of course we restore these after the camera function
     // completes.
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface)->pEntity;
     if (!pVehicle)
         return false;
 
@@ -4465,7 +4466,7 @@ docustom:
 void _cdecl VehicleCamEnd(DWORD pVehicleInterface)
 {
     // Restore the things that we inverse transformed in VehicleCamStart
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface)->pEntity;
     if (!pVehicle)
         return;
 
@@ -4556,7 +4557,7 @@ float _cdecl VehicleBurnCheck(DWORD pVehicleInterface)
     // To check if a vehicle is lying upside down on its roof, SA checks if the z coordinate
     // of the vehicle's up vector is negative. We replace this z by the dot product of the up vector
     // and the negated gravity vector.
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface)->pEntity;
     if (!pVehicle)
         return 1.0f;
 
@@ -4598,7 +4599,7 @@ void _cdecl ApplyVehicleBlowHop(DWORD pVehicleInterface)
 {
     // Custom application of the little jump that vehicles make when they blow up,
     // taking into account custom gravity
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface)->pEntity;
     if (!pVehicle)
         return;
 
@@ -4797,7 +4798,7 @@ unsigned long ulHeadLightR = 0, ulHeadLightG = 0, ulHeadLightB = 0;
 void          CVehicle_GetHeadLightColor(CVehicleSAInterface* pInterface, float fR, float fG, float fB)
 {
     SColor    color = SColorRGBA(255, 255, 255, 255);
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pInterface);
+    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pInterface)->pEntity;
     if (pVehicle)
     {
         color = pVehicle->GetHeadLightColor();
@@ -5549,7 +5550,7 @@ static SColor vehColors[4];
 
 void _cdecl SaveVehColors(DWORD dwThis)
 {
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)dwThis);
+    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)dwThis)->pEntity;
     if (pVehicle)
     {
         pVehicle->GetColor(&vehColors[0], &vehColors[1], &vehColors[2], &vehColors[3], true);
@@ -5606,7 +5607,7 @@ static const DWORD dwSwingingRet1 = 0x6A9DB6;
 static const DWORD dwSwingingRet2 = 0x6AA1DA;
 static bool        AllowSwingingDoors()
 {
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)dwSwingingDoorAutomobile);
+    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)dwSwingingDoorAutomobile)->pEntity;
     if (pVehicle == 0 || pVehicle->AreSwingingDoorsAllowed())
         return true;
     else
