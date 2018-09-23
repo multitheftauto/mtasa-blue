@@ -1803,13 +1803,13 @@ CPhysical* CVehicleSA::QueryPickedUpEntityWithWinch()
         switch (phys->nType)
         {
             case ENTITY_TYPE_PED:
-                physRet = (CPhysical*)pPools->GetPed((DWORD*)phys);
+                physRet = (CPhysical*)pPools->GetPed((DWORD*)phys)->pEntity;
                 break;
             case ENTITY_TYPE_VEHICLE:
-                physRet = (CPhysical*)pGame->GetPools()->GetVehicle((DWORD*)phys);
+                physRet = (CPhysical*)pGame->GetPools()->GetVehicle((DWORD*)phys)->pEntity;
                 break;
             case ENTITY_TYPE_OBJECT:
-                physRet = (CPhysical*)pPools->GetObject((DWORD*)phys);
+                physRet = (CPhysical*)pPools->GetObject((DWORD*)phys)->pEntity;
                 break;
             default:
                 physRet = NULL;

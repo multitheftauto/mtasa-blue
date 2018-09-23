@@ -48,7 +48,7 @@ CEntity* CExplosionSA::GetExplosionCreator(void)
             return (CEntity*)(pools->GetPed((DWORD*)this->GetInterface()->m_pEntExplosionOwner));
             break;
         case ENTITY_TYPE_VEHICLE:
-            return (CEntity*)(pools->GetVehicle((DWORD*)this->GetInterface()->m_pEntExplosionOwner));
+            return (CEntity*)(pools->GetVehicle((DWORD*)this->GetInterface()->m_pEntExplosionOwner)->pEntity);
             break;
         case ENTITY_TYPE_OBJECT:
             break;
