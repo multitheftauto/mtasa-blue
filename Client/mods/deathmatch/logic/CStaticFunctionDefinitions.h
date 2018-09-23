@@ -559,7 +559,7 @@ public:
                                    SLineOfSightBuildingResult* pBuildingResult = NULL);
     static bool IsLineOfSightClear(const CVector& vecStart, const CVector& vecEnd, bool& bIsClear, const SLineOfSightFlags& flags = SLineOfSightFlags(),
                                    CEntity* pIgnoredEntity = NULL);
-    static bool TestLineAgainstWater(CVector& vecStart, CVector& vecEnd, CVector& vecCollision);
+    static bool TestLineAgainstWater(CVector& vecStart, CVector& vecEnd, CVector& vecCollision, bool bUseLegacy);
     static CClientWater* CreateWater(CResource& resource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow);
     static bool          GetWaterLevel(CVector& vecPosition, float& fLevel, bool bCheckWaves, CVector& vecUnknown);
     static bool          GetWaterLevel(CClientWater* pWater, float& fLevel);

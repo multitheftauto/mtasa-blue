@@ -31,7 +31,7 @@ public:
     virtual void  SetWaterDrawnLast(bool bEnable) = 0;
     virtual bool  IsWaterDrawnLast(void) = 0;
 
-    virtual bool TestLineAgainstWater(const CVector& vecStart, const CVector& vecEnd, CVector* vecCollision) = 0;
+    virtual bool TestLineAgainstWater(const CVector& vecStart, const CVector& vecEnd, CVector* vecCollision, bool bUseLegacy) = 0;
 
     virtual void UndoChanges(void* pChangeSource = NULL) = 0;
     virtual void RebuildIndex() = 0;            // Call this after moving a polygon's vertices
