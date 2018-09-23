@@ -224,6 +224,8 @@ public:
     static bool            IsVehicleWindowOpen(CClientVehicle& Vehicle, uchar ucWindow);
     static bool            SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
     static bool            GetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
+    static bool            SetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition);
+    static bool            GetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition);
 
     // Vehicle set functions
     static bool FixVehicle(CClientEntity& Entity);
@@ -546,6 +548,9 @@ public:
     static bool        GUIComboBoxSetSelected(CClientEntity& Entity, int index);
     static std::string GUIComboBoxGetItemText(CClientEntity& Entity, int index);
     static bool        GUIComboBoxSetItemText(CClientEntity& Entity, int index, const char* szText);
+    static int         GUIComboBoxGetItemCount(CClientEntity& Entity);
+    static bool        GUIComboBoxSetOpen(CClientEntity& Entity, bool state);
+    static bool        GUIComboBoxIsOpen(CClientEntity& Entity);
 
     // World functions
     static bool GetTime(unsigned char& ucHour, unsigned char& ucMin);

@@ -51,6 +51,7 @@ DECLARE_ENUM(eTrayIconType)
 DECLARE_ENUM(eCursorType)
 DECLARE_ENUM(eWheelPosition)
 DECLARE_ENUM(D3DPRIMITIVETYPE);
+DECLARE_ENUM(eVehicleDummies);
 
 enum eDXHorizontalAlign
 {
@@ -373,6 +374,10 @@ inline SString GetClassTypeName(CLuaMatrix*)
 inline SString GetClassTypeName(D3DPRIMITIVETYPE*)
 {
     return "primitive-type";
+}
+inline SString GetClassTypeName(eVehicleDummies*)
+{
+    return "vehicle-dummy";
 }
 
 //
