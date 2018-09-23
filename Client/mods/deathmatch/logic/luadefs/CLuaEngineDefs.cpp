@@ -39,6 +39,8 @@ void CLuaEngineDefs::LoadFunctions(void)
         {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
         {"engineGetModelCollisionProperties", EngineGetModelCollisionProperties },
         {"engineGetModelCollisionData", EngineGetModelCollisionData},
+        {"engineSetModelCollisionData", EngineSetModelCollisionData},
+        {"engineModelCollisionCreateShape", EngineModelCollisionCreateShape },
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -1006,7 +1008,6 @@ int CLuaEngineDefs::EngineGetModelCollisionProperties(lua_State* luaVM)
     return 1;
 }
 
-
 int CLuaEngineDefs::EngineGetModelCollisionData(lua_State* luaVM)
 {
     ushort usModel;
@@ -1082,20 +1083,20 @@ int CLuaEngineDefs::EngineGetModelCollisionData(lua_State* luaVM)
                                 lua_settable(luaVM, -3);
                             }
                         break;
-                        case COLLISION_VERTEX:
+                        case COLLISION_TRIANGLE:
                             for (uint i = 0; pColData->numColTriangles > i; i++)
                             {
                                 lua_pushnumber(luaVM, i + 1);
                                 CColTriangleSA pTriangle = pColData->pColTriangles[i];
                                 lua_newtable(luaVM);
                                 lua_pushnumber(luaVM, 1);
-                                lua_pushnumber(luaVM, pTriangle.v1);
+                                lua_pushnumber(luaVM, pTriangle.vertex[0]);
                                 lua_settable(luaVM, -3);
                                 lua_pushnumber(luaVM, 2);
-                                lua_pushnumber(luaVM, pTriangle.v2);
+                                lua_pushnumber(luaVM, pTriangle.vertex[1]);
                                 lua_settable(luaVM, -3);
                                 lua_pushnumber(luaVM, 3);
-                                lua_pushnumber(luaVM, pTriangle.v3);
+                                lua_pushnumber(luaVM, pTriangle.vertex[2]);
                                 lua_settable(luaVM, -3);
                                 lua_pushnumber(luaVM, 4);
                                 lua_pushnumber(luaVM, pTriangle.material);
@@ -1108,6 +1109,287 @@ int CLuaEngineDefs::EngineGetModelCollisionData(lua_State* luaVM)
                                 lua_settable(luaVM, -3);
                                 lua_settable(luaVM, -3);
                             }
+                        break;
+                        case COLLISION_VERTEX:
+                            std::map<ushort, CompressedVector> vecVertices = pColData->getAllVertices();
+                            lua_newtable(luaVM);
+
+                            std::map<ushort, CompressedVector>::iterator it;
+                            for (it = vecVertices.begin(); it != vecVertices.end(); it++)
+                            {
+                                lua_pushnumber(luaVM, it->first);
+                                CVector vec = it->second.getVector();
+                                lua_newtable(luaVM);
+                                lua_pushnumber(luaVM, 1);
+                                lua_pushnumber(luaVM, vec.fX);
+                                lua_settable(luaVM, -3);
+                                lua_pushnumber(luaVM, 2);
+                                lua_pushnumber(luaVM, vec.fY);
+                                lua_settable(luaVM, -3);
+                                lua_pushnumber(luaVM, 3);
+                                lua_pushnumber(luaVM, vec.fZ);
+                                lua_settable(luaVM, -3);
+                                lua_settable(luaVM, -3);
+                            }
+                            break;
+                    }
+                    return 1;
+                }
+            }
+        }
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineSetModelCollisionData(lua_State* luaVM)
+{
+    ushort usModel;
+    ushort usShapeId;
+    eCollisionShapes eCollisionShape;
+    eCollisionKey eCollisionKey;
+    CVector vec1, vec2;
+    uchar cSurface;
+    float fNumber;
+    uchar cDay,cNight;
+    ushort sVertex[3];
+    float fPosition[3];
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(usModel);
+    argStream.ReadEnumString(eCollisionShape);
+    argStream.ReadNumber(usShapeId);
+    argStream.ReadEnumString(eCollisionKey);
+    if (!argStream.HasErrors())
+    {
+        if (CClientObjectManager::IsValidModel(usModel))
+        {
+            CBaseModelInfoSAInterface* pModelInfo = ppModelInfo[usModel];
+            if (pModelInfo != nullptr)
+            {
+                CColModelSAInterface* pCol = pModelInfo->pColModel;
+                if (pCol)
+                {
+                    CColDataSA* pColData = pCol->pColData;
+                    switch (eCollisionShape)
+                    {
+                        case COLLISION_BOX:
+                            if (usShapeId >= 0 && usShapeId < pColData->numColBoxes)
+                            {
+                                CColBoxSA* pBox = &pColData->pColBoxes[usShapeId];
+                                switch (eCollisionKey)
+                                {
+                                    case COLLISION_KEY_MATERIAL:
+                                        argStream.ReadNumber(cSurface);
+                                        if (!argStream.HasErrors())
+                                        {
+                                            if (cSurface >= EColSurfaceValue::DEFAULT && cSurface <= EColSurfaceValue::RAILTRACK)
+                                            {
+                                                pBox->material = cSurface;
+                                                lua_pushboolean(luaVM, true);
+                                                return 1;
+                                            }
+                                        }
+                                    case COLLISION_KEY_SIZE:
+                                        argStream.ReadVector3D(vec1);
+                                        argStream.ReadVector3D(vec2);
+                                        if (!argStream.HasErrors())
+                                        {
+                                            pBox->min = vec1;
+                                            pBox->max = vec2;
+                                            lua_pushboolean(luaVM, true);
+                                            return 1;
+                                        }
+
+                                    break;
+                                }
+                            }
+                        break;
+                        case COLLISION_SPHERE:
+                            if (usShapeId >= 0 && usShapeId < pColData->numColBoxes)
+                            {
+                                CColSphereSA* pSphere = &pColData->pColSpheres[usShapeId];
+                                switch (eCollisionKey)
+                                {
+                                case COLLISION_KEY_POSITION:
+                                    argStream.ReadVector3D(vec1);
+                                    if (!argStream.HasErrors())
+                                    {
+                                        pSphere->vecCenter = vec1;
+                                        lua_pushboolean(luaVM, true);
+                                        return 1;
+                                    }
+                                case COLLISION_KEY_RADIUS:
+                                    argStream.ReadNumber(fNumber);
+                                    if (!argStream.HasErrors())
+                                    {
+                                        pSphere->fRadius = fNumber;
+                                        lua_pushboolean(luaVM, true);
+                                        return 1;
+                                    }
+
+                                    break;
+                                case COLLISION_KEY_MATERIAL:
+                                    argStream.ReadNumber(cSurface);
+                                    if (!argStream.HasErrors())
+                                    {
+                                        if (cSurface >= EColSurfaceValue::DEFAULT && cSurface <= EColSurfaceValue::RAILTRACK)
+                                        {
+                                            pSphere->material = cSurface;
+                                            lua_pushboolean(luaVM, true);
+                                            return 1;
+                                        }
+                                    }
+                                }
+                            }
+                        break;
+                        case COLLISION_TRIANGLE:
+                            if (usShapeId >= 0 && usShapeId < pColData->numColTriangles)
+                            {
+                                CColTriangleSA* pTriangle = &pColData->pColTriangles[usShapeId];
+                                switch (eCollisionKey)
+                                {
+                                case COLLISION_KEY_MATERIAL:
+                                    argStream.ReadNumber(cSurface);
+                                    if (!argStream.HasErrors())
+                                    {
+                                        if (cSurface >= EColSurfaceValue::DEFAULT && cSurface <= EColSurfaceValue::RAILTRACK)
+                                        {
+                                            pTriangle->material = cSurface;
+                                            lua_pushboolean(luaVM, true);
+                                            return 1;
+                                        }
+                                    }
+                                case COLLISION_KEY_LIGHTING:
+                                    argStream.ReadNumber(cDay);
+                                    argStream.ReadNumber(cNight);
+                                    if (!argStream.HasErrors())
+                                    {
+                                        if (cDay >= 0 && cDay <= 15 && cNight >= 0 && cNight <= 15)
+                                        {
+                                            pTriangle->lighting.day = cDay;
+                                            pTriangle->lighting.night = cNight;
+                                            lua_pushboolean(luaVM, true);
+                                            return 1;
+                                        }
+                                    }
+
+                                    break;
+                                case COLLISION_KEY_VERTICES:
+                                    argStream.ReadNumber(sVertex[0]);
+                                    argStream.ReadNumber(sVertex[1]);
+                                    if (argStream.NextIsNumber())
+                                    {
+                                        argStream.ReadNumber(sVertex[2]);
+                                        if (!argStream.HasErrors())
+                                        {
+                                            pTriangle->vertex[0] = sVertex[0];
+                                            pTriangle->vertex[1] = sVertex[1];
+                                            pTriangle->vertex[2] = sVertex[2];
+                                            lua_pushboolean(luaVM, true);
+                                            return 1;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (!argStream.HasErrors())
+                                        {
+                                            pTriangle->vertex[sVertex[0]] = sVertex[1];
+                                            lua_pushboolean(luaVM, true);
+                                            return 1;
+                                        }
+                                    }
+                                }
+                            }
+                        break;
+                        case COLLISION_VERTEX:
+                            if (true)
+                            {
+                                CompressedVector* pVector = &pColData->pVertices[usShapeId];
+                                switch (eCollisionKey)
+                                {
+                                case COLLISION_KEY_POSITION:
+                                    argStream.ReadNumber(fPosition[0]);
+                                    argStream.ReadNumber(fPosition[1]);
+                                    argStream.ReadNumber(fPosition[2]);
+                                    if (!argStream.HasErrors())
+                                    {
+                                        pVector->x = (signed __int16)(fPosition[0] * 128.0f);
+                                        pVector->y = (signed __int16)(fPosition[1] * 128.0f);
+                                        pVector->z = (signed __int16)(fPosition[2] * 128.0f);
+                                        lua_pushboolean(luaVM, true);
+                                        return 1;
+                                    }
+                                }
+                            }
+                        break;
+                    }
+                    return 1;
+                }
+            }
+        }
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineModelCollisionCreateShape(lua_State* luaVM)
+{
+    ushort usModel;
+    eCollisionShapes eCollisionShape;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(usModel);
+    argStream.ReadEnumString(eCollisionShape);
+    if (!argStream.HasErrors())
+    {
+        if (CClientObjectManager::IsValidModel(usModel))
+        {
+            CBaseModelInfoSAInterface* pModelInfo = ppModelInfo[usModel];
+            if (pModelInfo != nullptr)
+            {
+                CColModelSAInterface* pCol = pModelInfo->pColModel;
+                if (pCol)
+                {
+                    CColDataSA* pColData = pCol->pColData;
+
+                    CVector vecMin, vecMax;
+                    uchar cMaterial;
+                    switch (eCollisionShape)
+                    {
+                        case COLLISION_BOX:
+                            argStream.ReadVector3D(vecMin);
+                            argStream.ReadVector3D(vecMax);
+                            argStream.ReadNumber(cMaterial);
+                            if (!argStream.HasErrors())
+                            {
+                                CColBoxSA* more_boxes = (CColBoxSA*)malloc(sizeof(CColBoxSA) * pColData->numColBoxes + sizeof(CColBoxSA));
+                                memcpy(more_boxes, pColData->pColBoxes, sizeof(CColBoxSA) * pColData->numColBoxes);
+
+                                pColData->numColBoxes++;
+
+                                CColBoxSA newBox;
+                                newBox.min = vecMin;
+                                newBox.min = vecMax;
+                                newBox.material = cMaterial;
+
+                                memcpy(more_boxes + sizeof(CColBoxSA) * pColData->numColBoxes, &newBox, sizeof(CColBoxSA));
+                                //more_boxes[pColData->numColBoxes] = newBox;
+
+                                pColData->pColBoxes = more_boxes;
+                                lua_pushboolean(luaVM, true);
+                                return 1;
+                            }
+                        break;
+                        case COLLISION_SPHERE:
+                        break;
+                        case COLLISION_TRIANGLE:
+                        break;
+                        case COLLISION_VERTEX:
                         break;
                     }
                     return 1;

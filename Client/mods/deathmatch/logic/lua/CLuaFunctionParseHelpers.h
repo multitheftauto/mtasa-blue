@@ -99,6 +99,18 @@ enum eCollisionShapes
 };
 DECLARE_ENUM(eCollisionShapes);
 
+enum eCollisionKey
+{
+    COLLISION_KEY_SIZE,
+    COLLISION_KEY_MATERIAL,
+    COLLISION_KEY_POSITION,
+    COLLISION_KEY_RADIUS,
+    COLLISION_KEY_LIGHTING,
+    COLLISION_KEY_VERTICES,
+
+};
+DECLARE_ENUM(eCollisionKey);
+
 
 // class -> class type
 inline eCGUIType GetClassType(CGUIButton*)
@@ -392,6 +404,10 @@ inline SString GetClassTypeName(eVehicleDummies*)
 inline SString GetClassTypeName(eCollisionShapes*)
 {
     return "collision-shape";
+}
+inline SString GetClassTypeName(eCollisionKey*)
+{
+    return "collision-key";
 }
 
 //

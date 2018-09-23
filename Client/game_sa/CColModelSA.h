@@ -29,22 +29,20 @@ typedef struct
 {
     CVector        vecCenter;
     float          fRadius;
-    EColSurface    material;
+    uchar          material;
 } CColSphereSA;
 
 typedef struct
 {
     CVector        min;
     CVector        max;
-    EColSurface    material;
+    uchar          material;
 } CColBoxSA;
 
 typedef struct
 {
-    unsigned short v1;
-    unsigned short v2;
-    unsigned short v3;
-    EColSurface    material;
+    unsigned short vertex[3];
+    uchar          material;
     CColLighting   lighting;
 } CColTriangleSA;
 
@@ -65,6 +63,10 @@ typedef struct
     signed __int16 x;
     signed __int16 y;
     signed __int16 z;
+    CVector getVector()
+    {
+        return CVector(x * 0.0078125f, y * 0.0078125f, z * 0.0078125f);
+    }
 } CompressedVector;
 
 typedef struct
@@ -84,6 +86,17 @@ typedef struct
     unsigned int         m_nNumShadowVertices;
     CompressedVector*    m_pShadowVertices;
     CColTriangleSA*      m_pShadowTriangles;
+    std::map<ushort, CompressedVector> getAllVertices()
+    {
+        std::map<ushort, CompressedVector> vertices;
+        for (uint i = 0; numColTriangles > i; i++)
+        {
+            vertices[pColTriangles[i].vertex[0]] = pVertices[pColTriangles[i].vertex[0]];
+            vertices[pColTriangles[i].vertex[1]] = pVertices[pColTriangles[i].vertex[1]];
+            vertices[pColTriangles[i].vertex[2]] = pVertices[pColTriangles[i].vertex[2]];
+        }
+        return vertices;
+    }
 } CColDataSA;
 
 class CColModelSAInterface
