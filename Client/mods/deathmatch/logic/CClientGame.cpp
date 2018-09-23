@@ -4521,8 +4521,7 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle
 
         if (pColliderVehicleEntity->pEntity)
         {
-            CClientEntity*  pVehicleClientEntity = pColliderVehicleEntity->pClientEntity;
-            CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(pVehicleClientEntity);
+            CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(pColliderVehicleEntity->pClientEntity);
             CVehicle*       pColliderVehicle = reinterpret_cast<CVehicle*>(pClientVehicle);
 
             CEntity*       pCollidedWithEntity = g_pGame->GetPools()->GetEntity((DWORD*)pCollidedWith);
@@ -4574,7 +4573,7 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle
             Arguments.PushNumber(fCollidingDamageImpulseMag);
             Arguments.PushNumber(iModelIndex);
 
-            pVehicleClientEntity->CallEvent("onClientVehicleCollision", Arguments, true);
+            pColliderVehicleEntity->pClientEntity->CallEvent("onClientVehicleCollision", Arguments, true);
             // Alocate a BitStream
             NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
             // Make sure it created
@@ -4584,7 +4583,7 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle
                 {
                     // Sync Stuff
                     // if it's not a local vehicle + it collided with the local player
-                    if (pVehicleClientEntity->IsLocalEntity() == false && pCollidedWithClientEntity == g_pClientGame->GetLocalPlayer())
+                    if (pColliderVehicleEntity->pClientEntity->IsLocalEntity() == false && pCollidedWithClientEntity == g_pClientGame->GetLocalPlayer())
                     {
                         // is it below the anti spam threshold?
                         if (pClientVehicle->GetTimeSinceLastPush() >= MIN_PUSH_ANTISPAM_RATE)
@@ -4592,12 +4591,12 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle
                             // if there is no controlling player
                             if (!pClientVehicle->GetControllingPlayer())
                             {
-                                CDeathmatchVehicle* Vehicle = static_cast<CDeathmatchVehicle*>(pVehicleClientEntity);
+                                CDeathmatchVehicle* Vehicle = static_cast<CDeathmatchVehicle*>(pColliderVehicleEntity->pClientEntity);
                                 // if We aren't already syncing the vehicle
                                 if (GetUnoccupiedVehicleSync()->Exists(Vehicle) == false)
                                 {
                                     // Write the vehicle ID
-                                    pBitStream->Write(pVehicleClientEntity->GetID());
+                                    pBitStream->Write(pColliderVehicleEntity->pClientEntity->GetID());
                                     // Send!
                                     g_pNet->SendPacket(PACKET_ID_VEHICLE_PUSH_SYNC, pBitStream, PACKET_PRIORITY_MEDIUM,
                                                        PACKET_RELIABILITY_UNRELIABLE_SEQUENCED);
