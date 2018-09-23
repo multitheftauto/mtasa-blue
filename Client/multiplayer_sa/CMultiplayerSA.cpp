@@ -2652,7 +2652,7 @@ bool CallExplosionHandler(void)
         {
             case ENTITY_TYPE_PED:
             {
-                pExplosionCreator = dynamic_cast<CPed*>(pGameInterface->GetPools()->GetPed((DWORD*)pInterface)->pEntity);
+                pExplosionCreator = pGameInterface->GetPools()->GetPed((DWORD*)pInterface)->pEntity;
                 break;
             }
 

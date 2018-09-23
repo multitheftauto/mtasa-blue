@@ -293,7 +293,6 @@ CPedSAInterface*       pAPed = NULL;
 float                  fTempPosX = 0, fTempPosY = 0, fTempPosZ = 0;
 CPed*                  pATargetingPed = NULL;
 SClientEntity<CPedSA>* pTargetEntity = nullptr;
-CClientPed*            pTargetClientPed = nullptr;
 CVector*               pTempVec;
 bool*                  pSkipAim;
 CRemoteDataStorageSA*  pTempRemote;
@@ -339,7 +338,7 @@ VOID _declspec(naked) HOOK_SkipAim()
 
     if (pTargetEntity->pClientEntity)
     {
-        pATargetingPed = reinterpret_cast<CPed*>((CClientPed*)pTargetClientPed);
+        pATargetingPed = reinterpret_cast<CPed*>(pTargetEntity->pClientEntity);
     }
 
     if (pATargetingPed)
