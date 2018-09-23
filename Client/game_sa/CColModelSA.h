@@ -27,14 +27,16 @@ typedef struct
 
 typedef struct
 {
-    CVector vecCenter;
-    float   fRadius;
+    CVector        vecCenter;
+    float          fRadius;
+    EColSurface    material;
 } CColSphereSA;
 
 typedef struct
 {
-    CVector min;
-    CVector max;
+    CVector        min;
+    CVector        max;
+    EColSurface    material;
 } CColBoxSA;
 
 typedef struct
@@ -60,6 +62,13 @@ typedef struct
 
 typedef struct
 {
+    signed __int16 x;
+    signed __int16 y;
+    signed __int16 z;
+} CompressedVector;
+
+typedef struct
+{
     WORD                 numColSpheres;
     WORD                 numColBoxes;
     WORD                 numColTriangles;
@@ -68,9 +77,13 @@ typedef struct
     CColSphereSA*        pColSpheres;
     CColBoxSA*           pColBoxes;
     void*                pSuspensionLines;
-    void*                pUnknown;
+    CompressedVector*    pVertices;
     CColTriangleSA*      pColTriangles;
     CColTrianglePlaneSA* pColTrianglePlanes;
+    unsigned int         m_nNumShadowTriangles;
+    unsigned int         m_nNumShadowVertices;
+    CompressedVector*    m_pShadowVertices;
+    CColTriangleSA*      m_pShadowTriangles;
 } CColDataSA;
 
 class CColModelSAInterface

@@ -90,6 +90,16 @@ enum eJSONPrettyType
 };
 DECLARE_ENUM(eJSONPrettyType);
 
+enum eCollisionShapes
+{
+    COLLISION_BOX,
+    COLLISION_SPHERE,
+    COLLISION_TRIANGLE,
+    COLLISION_VERTEX,
+};
+DECLARE_ENUM(eCollisionShapes);
+
+
 // class -> class type
 inline eCGUIType GetClassType(CGUIButton*)
 {
@@ -378,6 +388,10 @@ inline SString GetClassTypeName(D3DPRIMITIVETYPE*)
 inline SString GetClassTypeName(eVehicleDummies*)
 {
     return "vehicle-dummy";
+}
+inline SString GetClassTypeName(eCollisionShapes*)
+{
+    return "collision-shape";
 }
 
 //

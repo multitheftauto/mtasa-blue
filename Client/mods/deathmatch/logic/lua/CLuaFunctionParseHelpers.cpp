@@ -524,6 +524,12 @@ ADD_ENUM(WING_AIRTRAIL, "wing_airtrail")
 ADD_ENUM(VEH_GUN, "veh_gun")
 IMPLEMENT_ENUM_END("vehicle-dummy")
 
+IMPLEMENT_ENUM_BEGIN(eCollisionShapes)
+ADD_ENUM(COLLISION_BOX, "box")
+ADD_ENUM(COLLISION_SPHERE, "sphere")
+ADD_ENUM(COLLISION_TRIANGLE, "triangle")
+IMPLEMENT_ENUM_END("collision-shape")
+
 //
 // Get best guess at name of userdata type
 //

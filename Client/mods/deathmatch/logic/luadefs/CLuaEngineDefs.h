@@ -44,6 +44,8 @@ public:
     LUA_DECLARE(EngineGetModelIDFromName);
     LUA_DECLARE(EngineGetModelTextureNames);
     LUA_DECLARE(EngineGetVisibleTextureNames);
+    LUA_DECLARE(EngineGetModelCollisionProperties);
+    LUA_DECLARE(EngineGetModelCollisionData);
 
 private:
     static void AddEngineColClass(lua_State* luaVM);
