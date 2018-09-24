@@ -801,6 +801,7 @@ CEntity* CPoolsSA::GetEntity(DWORD* pGameInterface)
     if (pGameInterface)
     {
         CEntitySAInterface* pEntityInterface = (CEntitySAInterface*)(pGameInterface);
+        
         switch (pEntityInterface->nType)
         {
             case ENTITY_TYPE_PED:
@@ -830,6 +831,51 @@ CEntity* CPoolsSA::GetEntity(DWORD* pGameInterface)
                 if (pTheEntity->pEntity)
                 {
                     return pTheEntity->pEntity;
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    return NULL;
+}
+
+CClientEntity* CPoolsSA::GetClientEntity(DWORD* pGameInterface)
+{
+    if (pGameInterface)
+    {
+        CEntitySAInterface* pEntityInterface = (CEntitySAInterface*)(pGameInterface);
+        
+        switch (pEntityInterface->nType)
+        {
+            case ENTITY_TYPE_PED:
+            {
+                auto pTheEntity = GetPed(pGameInterface);
+                
+                if (pTheEntity->pClientEntity)
+                {
+                    return pTheEntity->pClientEntity;
+                }
+                break;
+            }
+            case ENTITY_TYPE_VEHICLE:
+            {
+                auto pTheEntity = GetVehicle(pGameInterface);
+
+                if (pTheEntity->pClientEntity)
+                {
+                    return pTheEntity->pClientEntity;
+                }
+                break;
+            }
+            case ENTITY_TYPE_OBJECT:
+            {
+                auto pTheEntity = GetObject(pGameInterface);
+
+                if (pTheEntity->pClientEntity)
+                {
+                    return pTheEntity->pClientEntity;
                 }
                 break;
             }

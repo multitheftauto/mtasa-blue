@@ -119,8 +119,10 @@ public:
     virtual CBuilding* AddBuilding(DWORD dwModelID) = 0;
     virtual CVehicle*  AddTrain(class CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool iDirection,
                                 uchar ucTrackId = 0xFF) = 0;
-    virtual CEntity*   GetEntity(DWORD* pGameInterface) = 0;
-    virtual uint       GetModelIdFromClump(RpClump* pRpClump) = 0;
+    
+    virtual CEntity*       GetEntity(DWORD* pGameInterface) = 0;
+    virtual CClientEntity* GetClientEntity(DWORD* pGameInterface) = 0;
+    virtual uint           GetModelIdFromClump(RpClump* pRpClump) = 0;
 
     virtual int  GetNumberOfUsedSpaces(ePools pool) = 0;
     virtual int  GetPoolDefaultCapacity(ePools pool) = 0;

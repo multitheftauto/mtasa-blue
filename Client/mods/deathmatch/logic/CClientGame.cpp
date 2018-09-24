@@ -4074,8 +4074,8 @@ bool CClientGame::ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CE
 
             if (pGameEntity && pGameColEntity)
             {
-                CClientEntity* pEntity = m_pManager->FindEntity(pGameEntity, true);
-                CClientEntity* pColEntity = m_pManager->FindEntity(pGameColEntity, true);
+                CClientEntity* pEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pGameEntity);
+                CClientEntity* pColEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pGameColEntity);
 
                 if (pEntity && pColEntity)
                 {
@@ -4525,38 +4525,8 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle
             CVehicle*       pColliderVehicle = reinterpret_cast<CVehicle*>(pClientVehicle);
 
             CEntity*       pCollidedWithEntity = g_pGame->GetPools()->GetEntity((DWORD*)pCollidedWith);
-            CClientEntity* pCollidedWithClientEntity = NULL;
-
-            if (pCollidedWithEntity)
-            {
-                if (pCollidedWithEntity->GetEntityType() == ENTITY_TYPE_VEHICLE)
-                {
-                    auto pVehicleEntity = g_pGame->GetPools()->GetVehicle((DWORD*)pCollidedWith);
-
-                    if (pVehicleEntity->pClientEntity)
-                    {
-                        pCollidedWithClientEntity = pVehicleEntity->pClientEntity;
-                    }
-                }
-                else if (pCollidedWithEntity->GetEntityType() == ENTITY_TYPE_OBJECT)
-                {
-                    auto pObjectEntity = g_pGame->GetPools()->GetObjectA((DWORD*)pCollidedWith);
-
-                    if (pObjectEntity->pClientEntity)
-                    {
-                        pCollidedWithClientEntity = pObjectEntity->pClientEntity;
-                    }
-                }
-                else if (pCollidedWithEntity->GetEntityType() == ENTITY_TYPE_PED)
-                {
-                    auto pCollidedPedEntity = g_pGame->GetPools()->GetPed((DWORD*)pCollidedWith);
-
-                    if (pCollidedPedEntity->pClientEntity)
-                    {
-                        pCollidedWithClientEntity = pCollidedPedEntity->pClientEntity;
-                    }
-                }
-            }
+            CClientEntity* pCollidedWithClientEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pCollidedWith);
+            
             CLuaArguments Arguments;
             if (pCollidedWithClientEntity)
             {
@@ -4738,14 +4708,8 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
 
     if (pClientVehicle)
     {
-        CClientEntity* pClientAttacker = nullptr;
-        CEntity*       pAttackerEntity = g_pGame->GetPools()->GetEntity((DWORD*)pAttackerInterface);
-
-        if (pAttackerEntity)
-        {
-            pClientAttacker = reinterpret_cast<CClientEntity*>(pAttackerEntity);
-        }
-
+        CClientEntity* pClientAttacker = g_pGame->GetPools()->GetClientEntity((DWORD*)pAttackerInterface);
+        
         // Compose arguments
         // attacker, weapon, loss, damagepos, tyreIdx
         CLuaArguments Arguments;
@@ -4798,29 +4762,8 @@ bool CClientGame::ObjectDamageHandler(CObjectSAInterface* pObjectInterface, floa
         if (pClientObject)
         {
             CEntity*       pAttacker = g_pGame->GetPools()->GetEntity((DWORD*)pAttackerInterface);
-            CClientEntity* pClientAttacker = NULL;
-            if (pAttacker)
-            {
-                if (pAttacker->GetEntityType() == ENTITY_TYPE_VEHICLE)
-                {
-                    auto pAttackerEntity = g_pGame->GetPools()->GetVehicle((DWORD*)pAttackerInterface);
-
-                    if (pAttackerEntity->pClientEntity)
-                    {
-                        pClientAttacker = pAttackerEntity->pClientEntity;
-                    }
-                }
-                else if (pAttacker->GetEntityType() == ENTITY_TYPE_PED)
-                {
-                    auto pAttackerEntity = g_pGame->GetPools()->GetPed((DWORD*)pAttackerInterface);
-
-                    if (pAttackerEntity->pClientEntity)
-                    {
-                        pClientAttacker = pAttackerEntity->pClientEntity;
-                    }
-                }
-            }
-
+            CClientEntity* pClientAttacker = g_pGame->GetPools()->GetClientEntity((DWORD*)pAttackerInterface);
+            
             CLuaArguments Arguments;
             Arguments.PushNumber(fLoss);
 
@@ -4861,29 +4804,8 @@ bool CClientGame::ObjectBreakHandler(CObjectSAInterface* pObjectInterface, CEnti
             pClientObject->SetHealth(0.0f);
 
             CEntity*       pAttacker = g_pGame->GetPools()->GetEntity((DWORD*)pAttackerInterface);
-            CClientEntity* pClientAttacker = NULL;
-            if (pAttacker)
-            {
-                if (pAttacker->GetEntityType() == ENTITY_TYPE_VEHICLE)
-                {
-                    auto pAttackerEntity = g_pGame->GetPools()->GetVehicle((DWORD*)pAttackerInterface);
-
-                    if (pAttackerEntity->pClientEntity)
-                    {
-                        pClientAttacker = pAttackerEntity->pClientEntity;
-                    }
-                }
-                else if (pAttacker->GetEntityType() == ENTITY_TYPE_PED)
-                {
-                    auto pAttackerEntity = g_pGame->GetPools()->GetPed((DWORD*)pAttackerInterface);
-
-                    if (pAttackerEntity->pClientEntity)
-                    {
-                        pClientAttacker = pAttackerEntity->pClientEntity;
-                    }
-                }
-            }
-
+            CClientEntity* pClientAttacker = g_pGame->GetPools()->GetClientEntity((DWORD*)pAttackerInterface);;
+            
             CLuaArguments Arguments;
 
             if (pClientAttacker)

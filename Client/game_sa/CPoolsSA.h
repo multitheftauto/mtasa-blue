@@ -135,8 +135,9 @@ public:
     unsigned long    GetPedCount() { return m_pedPool.ulCount; }
     void             DeleteAllPeds();
 
-    CEntity* GetEntity(DWORD* pGameInterface);
-    uint     GetModelIdFromClump(RpClump* pRpClump);
+    CEntity*       GetEntity(DWORD* pGameInterface);
+    CClientEntity* GetClientEntity(DWORD* pGameInterface);
+    uint           GetModelIdFromClump(RpClump* pRpClump);
 
     // Others
     CBuilding* AddBuilding(DWORD dwModelID);
