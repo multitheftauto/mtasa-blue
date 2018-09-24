@@ -48,6 +48,7 @@ public:
     LUA_DECLARE(EngineGetModelCollisionData);
     LUA_DECLARE(EngineSetModelCollisionData);
     LUA_DECLARE(EngineModelCollisionCreateShape);
+    LUA_DECLARE(EngineUpdateModelCollisionBoundingBox);
 
 private:
     static void AddEngineColClass(lua_State* luaVM);

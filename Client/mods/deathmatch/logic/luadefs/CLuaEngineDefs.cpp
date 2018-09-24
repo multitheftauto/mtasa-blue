@@ -40,6 +40,7 @@ void CLuaEngineDefs::LoadFunctions(void)
         {"engineGetModelCollisionProperties", EngineGetModelCollisionProperties },
         {"engineGetModelCollisionData", EngineGetModelCollisionData},
         {"engineSetModelCollisionData", EngineSetModelCollisionData},
+        {"engineUpdateModelCollisionBoundingBox", EngineUpdateModelCollisionBoundingBox },
         {"engineModelCollisionCreateShape", EngineModelCollisionCreateShape },
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
@@ -982,19 +983,28 @@ int CLuaEngineDefs::EngineGetModelCollisionProperties(lua_State* luaVM)
                     lua_settable(luaVM, -3);
 
                     CColDataSA* pColData = pCol->pColData;
-                    lua_settable(luaVM, -3);
-                    lua_pushstring(luaVM, "colBoxes");
-                    lua_pushnumber(luaVM, pColData->numColBoxes);
-                    lua_settable(luaVM, -3);
-                    lua_pushstring(luaVM, "colSpheres");
-                    lua_pushnumber(luaVM, pColData->numColSpheres);
-                    lua_settable(luaVM, -3);
-                    lua_pushstring(luaVM, "colTriangles");
-                    lua_pushnumber(luaVM, pColData->numColTriangles);
-                    lua_settable(luaVM, -3);
-                    lua_pushstring(luaVM, "colVertices");
-                    lua_pushnumber(luaVM, 0);
-                    lua_settable(luaVM, -3);
+                    if (pColData != nullptr)
+                    {
+                        lua_settable(luaVM, -3);
+                        lua_pushstring(luaVM, "colBoxes");
+                        lua_pushnumber(luaVM, pColData->numColBoxes);
+                        lua_settable(luaVM, -3);
+                        lua_pushstring(luaVM, "colSpheres");
+                        lua_pushnumber(luaVM, pColData->numColSpheres);
+                        lua_settable(luaVM, -3);
+                        lua_pushstring(luaVM, "colTriangles");
+                        lua_pushnumber(luaVM, pColData->numColTriangles);
+                        lua_settable(luaVM, -3);
+                        lua_pushstring(luaVM, "colVertices");
+                        lua_pushnumber(luaVM, 0);
+                        lua_settable(luaVM, -3);
+                        lua_pushstring(luaVM, "shadowTriangles");
+                        lua_pushnumber(luaVM, pColData->m_nNumShadowTriangles);
+                        lua_settable(luaVM, -3);
+                        lua_pushstring(luaVM, "shadowVertices");
+                        lua_pushnumber(luaVM, pColData->m_nNumShadowVertices);
+                        lua_settable(luaVM, -3);
+                    }
 
                     return 1;
                 }
@@ -1026,9 +1036,11 @@ int CLuaEngineDefs::EngineGetModelCollisionData(lua_State* luaVM)
                 if (pCol)
                 {
                     CColDataSA* pColData = pCol->pColData;
-                    lua_newtable(luaVM);
-                    switch (eCollisionShape)
+                    if (pColData)
                     {
+                        lua_newtable(luaVM);
+                        switch (eCollisionShape)
+                        {
                         case COLLISION_BOX:
                             for (uint i = 0; pColData->numColBoxes > i; i++)
                             {
@@ -1058,7 +1070,7 @@ int CLuaEngineDefs::EngineGetModelCollisionData(lua_State* luaVM)
                                 lua_settable(luaVM, -3);
                                 lua_settable(luaVM, -3);
                             }
-                        break;
+                            break;
                         case COLLISION_SPHERE:
                             for (uint i = 0; pColData->numColSpheres > i; i++)
                             {
@@ -1082,7 +1094,7 @@ int CLuaEngineDefs::EngineGetModelCollisionData(lua_State* luaVM)
                                 lua_settable(luaVM, -3);
                                 lua_settable(luaVM, -3);
                             }
-                        break;
+                            break;
                         case COLLISION_TRIANGLE:
                             for (uint i = 0; pColData->numColTriangles > i; i++)
                             {
@@ -1109,7 +1121,7 @@ int CLuaEngineDefs::EngineGetModelCollisionData(lua_State* luaVM)
                                 lua_settable(luaVM, -3);
                                 lua_settable(luaVM, -3);
                             }
-                        break;
+                            break;
                         case COLLISION_VERTEX:
                             std::map<ushort, CompressedVector> vecVertices = pColData->getAllVertices();
                             lua_newtable(luaVM);
@@ -1132,8 +1144,9 @@ int CLuaEngineDefs::EngineGetModelCollisionData(lua_State* luaVM)
                                 lua_settable(luaVM, -3);
                             }
                             break;
+                        }
+                        return 1;
                     }
-                    return 1;
                 }
             }
         }
@@ -1145,6 +1158,78 @@ int CLuaEngineDefs::EngineGetModelCollisionData(lua_State* luaVM)
     return 1;
 }
 
+int CLuaEngineDefs::EngineUpdateModelCollisionBoundingBox(lua_State* luaVM)
+{
+    ushort usModel;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(usModel);
+    if (!argStream.HasErrors())
+    {
+        if (CClientObjectManager::IsValidModel(usModel))
+        {
+            CBaseModelInfoSAInterface* pModelInfo = ppModelInfo[usModel];
+            if (pModelInfo != nullptr)
+            {
+                CColModelSAInterface* pCol = pModelInfo->pColModel;
+                if (pCol)
+                {
+                    CColDataSA* pColData = pCol->pColData;
+                    CBoundingBoxSA* pBoundingBox = &pCol->boundingBox;
+                    float fRadius = 0;
+                    CVector minVec(0, 0, 0);
+                    CVector maxVec(0, 0, 0);
+                    CVector center(0, 0, 0);
+                    CVector pBoxMinVec, pBoxMaxVec;
+                    for (uint i = 0; pColData->numColBoxes > i; i++)
+                    {
+                        CColBoxSA pBox = pColData->pColBoxes[i];
+                        pBoxMaxVec = pBox.max;
+                        pBoxMinVec = pBox.min;
+                        float fDis = DistanceBetweenPoints3D(pBoxMaxVec, center);
+                        if (fDis > fRadius)
+                        {
+                            fRadius = fDis;
+                        }
+                        
+                        if (minVec.fX > pBoxMinVec.fX)
+                        {
+                            minVec.fX = pBoxMinVec.fX;
+                        }
+                        if (minVec.fY > pBoxMinVec.fY)
+                        {
+                            minVec.fY = pBoxMinVec.fY;
+                        }
+                        if (minVec.fZ > pBoxMinVec.fZ)
+                        {
+                            minVec.fZ = pBoxMinVec.fZ;
+                        }
+
+                        if (maxVec.fX < pBoxMaxVec.fX)
+                        {
+                            maxVec.fX = pBoxMaxVec.fX;
+                        }
+                        if (maxVec.fY < pBoxMaxVec.fY)
+                        {
+                            maxVec.fY = pBoxMaxVec.fY;
+                        }
+                        if (maxVec.fZ < pBoxMaxVec.fZ)
+                        {
+                            maxVec.fZ = pBoxMaxVec.fZ;
+                        }
+                    }
+                    pBoundingBox->fRadius = fRadius;
+                    pBoundingBox->vecOffset = center;
+                    pBoundingBox->vecMax = maxVec;
+                    pBoundingBox->vecMin = minVec;
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+            }
+        }
+    }
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
 int CLuaEngineDefs::EngineSetModelCollisionData(lua_State* luaVM)
 {
     ushort usModel;
@@ -1367,21 +1452,19 @@ int CLuaEngineDefs::EngineModelCollisionCreateShape(lua_State* luaVM)
                             argStream.ReadNumber(cMaterial);
                             if (!argStream.HasErrors())
                             {
-                                CColBoxSA* more_boxes = (CColBoxSA*)malloc(sizeof(CColBoxSA) * pColData->numColBoxes + sizeof(CColBoxSA));
-                                memcpy(more_boxes, pColData->pColBoxes, sizeof(CColBoxSA) * pColData->numColBoxes);
+                                CColBoxSA* newArr = new CColBoxSA[pColData->numColBoxes + 1];
+                                memcpy(newArr, pColData->pColBoxes, sizeof(CColBoxSA) * pColData->numColBoxes);
 
+                                CColBoxSA* newBox = new CColBoxSA;
+                                newBox->min = vecMin;
+                                newBox->min = vecMax;
+                                newBox->material = cMaterial;
+
+                                //memcpy(newArr + sizeof(CColBoxSA) * pColData->numColBoxes, &newBox, sizeof(CColBoxSA));
+                                newArr[pColData->numColBoxes] = *newBox;
                                 pColData->numColBoxes++;
-
-                                CColBoxSA newBox;
-                                newBox.min = vecMin;
-                                newBox.min = vecMax;
-                                newBox.material = cMaterial;
-
-                                memcpy(more_boxes + sizeof(CColBoxSA) * pColData->numColBoxes, &newBox, sizeof(CColBoxSA));
-                                //more_boxes[pColData->numColBoxes] = newBox;
-
-                                pColData->pColBoxes = more_boxes;
-                                lua_pushboolean(luaVM, true);
+                                pColData->pColBoxes = newArr;
+                                lua_pushnumber(luaVM, pColData->numColBoxes);
                                 return 1;
                             }
                         break;
