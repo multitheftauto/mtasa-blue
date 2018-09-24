@@ -29,7 +29,7 @@ using std::list;
 using std::vector;
 
 // Hide the "conversion from 'unsigned long' to 'DWORD*' of greater size" warning
-#pragma warning(disable:4312)
+#pragma warning(disable : 4312)
 
 // Used within this file by the packet handler to grab the this pointer of CClientGame
 extern CClientGame* g_pClientGame;
@@ -41,15 +41,15 @@ bool                g_bBulletFireVectorsValid;
 CVector             g_vecBulletFireStartPosition;
 CVector             g_vecBulletFireEndPosition;
 
-#define DEFAULT_GRAVITY              0.008f
-#define DEFAULT_GAME_SPEED           1.0f
-#define DEFAULT_BLUR_LEVEL           36
-#define DEFAULT_JETPACK_MAXHEIGHT    100
-#define DEFAULT_AIRCRAFT_MAXHEIGHT   800
+#define DEFAULT_GRAVITY 0.008f
+#define DEFAULT_GAME_SPEED 1.0f
+#define DEFAULT_BLUR_LEVEL 36
+#define DEFAULT_JETPACK_MAXHEIGHT 100
+#define DEFAULT_AIRCRAFT_MAXHEIGHT 800
 #define DEFAULT_AIRCRAFT_MAXVELOCITY 1.5f
-#define DEFAULT_MINUTE_DURATION      1000
-#define DOUBLECLICK_TIMEOUT          330
-#define DOUBLECLICK_MOVE_THRESHOLD   10.0f
+#define DEFAULT_MINUTE_DURATION 1000
+#define DOUBLECLICK_TIMEOUT 330
+#define DOUBLECLICK_MOVE_THRESHOLD 10.0f
 
 CClientGame::CClientGame(bool bLocalPlay)
 {
@@ -158,7 +158,7 @@ CClientGame::CClientGame(bool bLocalPlay)
     CClientEntity::StartupEntitiesFromRoot();
 
     // Startup game entity tracking manager
-    m_pGameEntityXRefManager = NewGameEntityXRefManager();
+    // m_pGameEntityXRefManager = NewGameEntityXRefManager();
     m_pModelCacheManager = NewClientModelCacheManager();
 
     // Initialize our root entity with an invalid id, we dont know the true id until map-start
@@ -315,17 +315,17 @@ CClientGame::CClientGame(bool bLocalPlay)
 
     m_bBeingDeleted = false;
 
-    #if defined (MTA_DEBUG) || defined (MTA_BETA)
+#if defined(MTA_DEBUG) || defined(MTA_BETA)
     m_bShowSyncingInfo = false;
-    #endif
+#endif
 
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
     m_pShowPlayer = m_pShowPlayerTasks = NULL;
     m_bMimicLag = false;
     m_ulLastMimicLag = 0;
     m_bDoPaintballs = false;
     m_bShowInterpolation = false;
-    #endif
+#endif
 
     // Add our lua events
     AddBuiltInEvents();
@@ -370,8 +370,8 @@ CClientGame::~CClientGame(void)
     // Reset CGUI's global events
     g_pCore->GetGUI()->ClearInputHandlers(INPUT_MOD);
 
-    // Destroy mimics
-    #ifdef MTA_DEBUG
+// Destroy mimics
+#ifdef MTA_DEBUG
     list<CClientPlayer*>::const_iterator iterMimics = m_Mimics.begin();
     for (; iterMimics != m_Mimics.end(); iterMimics++)
     {
@@ -382,7 +382,7 @@ CClientGame::~CClientGame(void)
 
         delete pPlayer;
     }
-    #endif
+#endif
 
     // Hide the transfer box incase it is showing
     m_pTransferBox->Hide();
@@ -481,7 +481,7 @@ CClientGame::~CClientGame(void)
     SAFE_DELETE(m_pRootEntity);
 
     SAFE_DELETE(m_pModelCacheManager);
-    SAFE_DELETE(m_pGameEntityXRefManager);
+    // SAFE_DELETE(m_pGameEntityXRefManager);
     SAFE_DELETE(m_pZoneNames);
     SAFE_DELETE(m_pScriptKeyBinds);
 
@@ -754,7 +754,7 @@ void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRend
 void CClientGame::DoPulsePostFrame(void)
 {
     TIMING_CHECKPOINT("+CClientGame::DoPulsePostFrame");
-    #ifdef DEBUG_KEYSTATES
+#ifdef DEBUG_KEYSTATES
     // Get the controller state
     CControllerState cs;
     g_pGame->GetPad()->GetCurrentControllerState(&cs);
@@ -792,7 +792,7 @@ void CClientGame::DoPulsePostFrame(void)
         cs.m_bVehicleMouseLook, cs.LeftStickX, cs.LeftStickY, cs.RightStickX, cs.RightStickY);
 
     g_pCore->GetGraphics()->DrawTextTTF(300, 320, 1280, 800, 0xFFFFFFFF, strBuffer, 1.0f, 0);
-    #endif
+#endif
 
     UpdateModuleTickCount64();
 
@@ -861,7 +861,7 @@ void CClientGame::DoPulsePostFrame(void)
             g_pMultiplayer->GetLimits()->SetStreamingMemory(iStreamingMemoryBytes);
 
             // If we're in debug mode and are supposed to show task data, do it
-        #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
         if (m_pShowPlayerTasks)
         {
             DrawTasks(m_pShowPlayerTasks);
@@ -879,9 +879,9 @@ void CClientGame::DoPulsePostFrame(void)
             if (pPlayer->IsStreamedIn() && pPlayer->IsShowingWepdata())
                 DrawWeaponsyncData(pPlayer);
         }
-        #endif
+#endif
 
-        #if defined (MTA_DEBUG) || defined (MTA_BETA)
+#if defined(MTA_DEBUG) || defined(MTA_BETA)
         if (m_bShowSyncingInfo)
         {
             // Draw the header boxz
@@ -901,7 +901,7 @@ void CClientGame::DoPulsePostFrame(void)
                 m_pDisplayManager->DrawText2D(strBuffer, vecPosition, 1.0f, 0xFFFFFFFF);
             }
         }
-        #endif
+#endif
         // Heli Clear time
         if (m_LastClearTime.Get() > HeliKill_List_Clear_Rate)
         {
@@ -1031,9 +1031,9 @@ void CClientGame::DoPulses(void)
 
     GetModelCacheManager()->DoPulse();
 
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
     UpdateMimics();
-    #endif
+#endif
 
     // Grab the current time
     unsigned long ulCurrentTime = CClientTime::GetTime();
@@ -1855,7 +1855,7 @@ void CClientGame::UpdatePlayerTarget(void)
 
         if (pColEntity)
         {
-            m_pTargetedEntity = m_pManager->FindEntity(pColEntity);
+            m_pTargetedEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pColEntity);
         }
         else
             m_pTargetedEntity = NULL;
@@ -2515,7 +2515,8 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                         vecCollision = pColPoint->GetPosition();
                         if (pGameEntity)
                         {
-                            CClientEntity* pEntity = m_pManager->FindEntity(pGameEntity);
+                            CClientEntity* pEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pGameEntity);
+
                             if (pEntity)
                             {
                                 pCollisionEntity = pEntity;
@@ -3750,7 +3751,10 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
     if (pGameEntity)
     {
         // Map to client entity and pass to the texture replacer
-        CClientEntity* pClientEntity = g_pClientGame->GetGameEntityXRefManager()->FindClientEntity(pGameEntity);
+        // CClientEntity* pClientEntity = g_pClientGame->GetGameEntityXRefManager()->FindClientEntity(pGameEntity);
+
+        CClientEntity* pClientEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pGameEntity);
+
         if (pClientEntity)
         {
             int    iTypeMask;
@@ -3802,7 +3806,8 @@ void CClientGame::DrawRadarAreasHandler(void)
 
 bool CClientGame::BreakTowLinkHandler(CVehicle* pTowedVehicle)
 {
-    CClientVehicle* pVehicle = m_pVehicleManager->Get(pTowedVehicle, false);
+    CClientVehicle* pVehicle = (CClientVehicle*)g_pGame->GetPools()->GetVehicle((DWORD*)pTowedVehicle)->pClientEntity;
+
     if (pVehicle)
     {
         // Check if this is a legal break
@@ -4074,18 +4079,18 @@ bool CClientGame::ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CE
 
             if (pGameEntity && pGameColEntity)
             {
-                CClientEntity* pEntity = m_pManager->FindEntity(pGameEntity, true);
-                CClientEntity* pColEntity = m_pManager->FindEntity(pGameColEntity, true);
+                CClientEntity* pEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pGameEntity);
+                CClientEntity* pColEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pGameColEntity);
 
                 if (pEntity && pColEntity)
                 {
-                    #if MTA_DEBUG
+#if MTA_DEBUG
                     CClientEntity* ppThisEntity2 = iter1->second;
                     CClientEntity* ppOtherEntity2 = iter2->second;
                     // These should match, but its not essential.
                     assert(ppThisEntity2 == pEntity);
                     assert(ppOtherEntity2 == pColEntity);
-                    #endif
+#endif
                     if (!pEntity->IsCollidableWith(pColEntity))
                         return false;
                 }
@@ -4180,12 +4185,14 @@ bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
     // Grab the damaged ped
     CClientPed* pDamagedPed = NULL;
     if (pDamagePed)
-        pDamagedPed = m_pPedManager->Get(dynamic_cast<CPlayerPed*>(pDamagePed), true, true);
+    {
+        pDamagedPed = (CClientPed*)g_pGame->GetPools()->GetPed((DWORD*)pDamagePed->GetPedInterface())->pClientEntity;
+    }
 
     // Grab the inflictor
     CClientEntity* pInflictingEntity = NULL;
     if (pInflictor)
-        pInflictingEntity = m_pManager->FindEntity(pInflictor, true);
+        pInflictingEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pInflictor->GetInterface());
 
     // If the damage was caused by an explosion
     if (weaponUsed == WEAPONTYPE_EXPLOSION)
@@ -4488,7 +4495,7 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
 
 void CClientGame::DeathHandler(CPed* pKilledPedSA, unsigned char ucDeathReason, unsigned char ucBodyPart)
 {
-    CClientPed* pKilledPed = m_pPedManager->Get(dynamic_cast<CPlayerPed*>(pKilledPedSA), true, true);
+    CClientPed* pKilledPed = (CClientPed*)g_pGame->GetPools()->GetPed((DWORD*)pKilledPedSA)->pClientEntity;
 
     if (!pKilledPed)
         return;
@@ -4517,32 +4524,16 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle
 {
     if (pCollidingVehicle && pCollidedWith)
     {
-        CVehicle*      pColliderVehicle = g_pGame->GetPools()->GetVehicle((DWORD*)pCollidingVehicle);
-        CClientEntity* pVehicleClientEntity = m_pManager->FindEntity(pColliderVehicle, true);
-        if (pVehicleClientEntity)
+        auto pColliderVehicleEntity = g_pGame->GetPools()->GetVehicle((DWORD*)pCollidingVehicle);
+
+        if (pColliderVehicleEntity->pEntity)
         {
-            CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(pVehicleClientEntity);
+            CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(pColliderVehicleEntity->pClientEntity);
+            CVehicle*       pColliderVehicle = reinterpret_cast<CVehicle*>(pClientVehicle);
 
             CEntity*       pCollidedWithEntity = g_pGame->GetPools()->GetEntity((DWORD*)pCollidedWith);
-            CClientEntity* pCollidedWithClientEntity = NULL;
-            if (pCollidedWithEntity)
-            {
-                if (pCollidedWithEntity->GetEntityType() == ENTITY_TYPE_VEHICLE)
-                {
-                    CVehicle* pCollidedWithVehicle = g_pGame->GetPools()->GetVehicle((DWORD*)pCollidedWith);
-                    pCollidedWithClientEntity = m_pManager->FindEntity(pCollidedWithVehicle, true);
-                }
-                else if (pCollidedWithEntity->GetEntityType() == ENTITY_TYPE_OBJECT)
-                {
-                    CObject* pCollidedWithObject = g_pGame->GetPools()->GetObject((DWORD*)pCollidedWith);
-                    pCollidedWithClientEntity = m_pManager->FindEntity(pCollidedWithObject, true);
-                }
-                else if (pCollidedWithEntity->GetEntityType() == ENTITY_TYPE_PED)
-                {
-                    CPed* pCollidedWithPed = g_pGame->GetPools()->GetPed((DWORD*)pCollidedWith);
-                    pCollidedWithClientEntity = m_pManager->FindEntity(pCollidedWithPed, true);
-                }
-            }
+            CClientEntity* pCollidedWithClientEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pCollidedWith);
+
             CLuaArguments Arguments;
             if (pCollidedWithClientEntity)
             {
@@ -4563,7 +4554,7 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle
             Arguments.PushNumber(fCollidingDamageImpulseMag);
             Arguments.PushNumber(iModelIndex);
 
-            pVehicleClientEntity->CallEvent("onClientVehicleCollision", Arguments, true);
+            pColliderVehicleEntity->pClientEntity->CallEvent("onClientVehicleCollision", Arguments, true);
             // Alocate a BitStream
             NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
             // Make sure it created
@@ -4573,7 +4564,7 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle
                 {
                     // Sync Stuff
                     // if it's not a local vehicle + it collided with the local player
-                    if (pVehicleClientEntity->IsLocalEntity() == false && pCollidedWithClientEntity == g_pClientGame->GetLocalPlayer())
+                    if (pColliderVehicleEntity->pClientEntity->IsLocalEntity() == false && pCollidedWithClientEntity == g_pClientGame->GetLocalPlayer())
                     {
                         // is it below the anti spam threshold?
                         if (pClientVehicle->GetTimeSinceLastPush() >= MIN_PUSH_ANTISPAM_RATE)
@@ -4581,12 +4572,12 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle
                             // if there is no controlling player
                             if (!pClientVehicle->GetControllingPlayer())
                             {
-                                CDeathmatchVehicle* Vehicle = static_cast<CDeathmatchVehicle*>(pVehicleClientEntity);
+                                CDeathmatchVehicle* Vehicle = static_cast<CDeathmatchVehicle*>(pColliderVehicleEntity->pClientEntity);
                                 // if We aren't already syncing the vehicle
                                 if (GetUnoccupiedVehicleSync()->Exists(Vehicle) == false)
                                 {
                                     // Write the vehicle ID
-                                    pBitStream->Write(pVehicleClientEntity->GetID());
+                                    pBitStream->Write(pColliderVehicleEntity->pClientEntity->GetID());
                                     // Send!
                                     g_pNet->SendPacket(PACKET_ID_VEHICLE_PUSH_SYNC, pBitStream, PACKET_PRIORITY_MEDIUM,
                                                        PACKET_RELIABILITY_UNRELIABLE_SEQUENCED);
@@ -4610,58 +4601,94 @@ bool CClientGame::HeliKillHandler(CVehicleSAInterface* pHeliInterface, CEntitySA
     if (pHeliInterface && pHitInterface)
     {
         // Get our heli and client heli
-        CVehicle*       pHeli = g_pGame->GetPools()->GetVehicle((DWORD*)pHeliInterface);
-        CClientVehicle* pClientHeli = m_pManager->GetVehicleManager()->GetSafe(pHeli);
+        CVehicle*       pHeli = nullptr;
+        CClientVehicle* pClientHeli = nullptr;
+
+        auto pHeliEntity = g_pGame->GetPools()->GetVehicle((DWORD*)pHeliInterface);
+
+        if (pHeliEntity->pClientEntity)
+        {
+            pClientHeli = static_cast<CClientVehicle*>(pHeliEntity->pClientEntity);
+            pHeli = reinterpret_cast<CVehicle*>(pClientHeli);
+        }
+
         if (pHeli && pClientHeli && pClientHeli->AreHeliBladeCollisionsEnabled())
         {
             // Get our ped and client ped
-            CPed*       pPed = g_pGame->GetPools()->GetPed((DWORD*)pHitInterface);
-            CClientPed* pClientPed = m_pManager->GetPedManager()->GetSafe(pPed, true);
+            auto        pHittedPedEntity = g_pGame->GetPools()->GetPed((DWORD*)pHitInterface);
+            CClientPed* pClientPed = nullptr;
+
+            if (pHittedPedEntity->pEntity)
+            {
+                pClientPed = static_cast<CClientPed*>(pHittedPedEntity->pClientEntity);
+            }
+
             // Was our client ped valid
             if (pClientPed)
+                auto pHittedPedEntity = g_pGame->GetPools()->GetPed((DWORD*)pHitInterface);
+
+            if (pHittedPedEntity->pClientEntity)
             {
-                // Get our heli and client heli
-                CVehicle*       pHeli = g_pGame->GetPools()->GetVehicle((DWORD*)pHeliInterface);
-                CClientVehicle* pClientHeli = m_pManager->GetVehicleManager()->GetSafe(pHeli);
+                CClientPed* pClientPed = static_cast<CClientPed*>(pHittedPedEntity->pClientEntity);
+                CPed*       pPed = reinterpret_cast<CPed*>(pClientPed);
 
-                // Iterate our "stored" cancel state and find the heli in question
-                std::pair<std::multimap<CClientVehicle*, CClientPed*>::iterator, std::multimap<CClientVehicle*, CClientPed*>::iterator> iterators =
-                    m_HeliCollisionsMap.equal_range(pClientHeli);
-                std::multimap<CClientVehicle*, CClientPed*>::const_iterator iter = iterators.first;
-                for (; iter != iterators.second; ++iter)
+                // Was our client ped valid
+                if (pClientPed)
                 {
-                    // If the Heli and ped collided within the clear rate return false
-                    if ((*iter).first == pClientHeli && (*iter).second == pClientPed)
-                        return false;
-                }
+                    // Get our heli and client heli
+                    CVehicle*       pHeli = nullptr;
+                    CClientVehicle* pClientHeli = nullptr;
+                    auto            pHeliEntity = g_pGame->GetPools()->GetVehicle((DWORD*)pHeliInterface);
 
-                CLuaArguments Arguments;
-                if (pClientHeli)
-                {
-                    // Push our heli
-                    Arguments.PushElement(pClientHeli);
-                }
-                else
-                {
-                    Arguments.PushNil();
-                }
+                    if (pHeliEntity->pClientEntity)
+                    {
+                        pClientHeli = static_cast<CClientVehicle*>(pHeliEntity->pClientEntity);
+                        pHeli = reinterpret_cast<CVehicle*>(pClientHeli);
+                    }
 
-                // Trigger our event
-                bool bContinue;
-                if (IS_PLAYER(pClientPed))
-                    bContinue = pClientPed->CallEvent("onClientPlayerHeliKilled", Arguments, true);
-                else
-                    bContinue = pClientPed->CallEvent("onClientPedHeliKilled", Arguments, true);
+                    // Iterate our "stored" cancel state and find the heli in question
+                    std::pair<std::multimap<CClientVehicle*, CClientPed*>::iterator, std::multimap<CClientVehicle*, CClientPed*>::iterator> iterators =
+                        m_HeliCollisionsMap.equal_range(pClientHeli);
+                    std::multimap<CClientVehicle*, CClientPed*>::const_iterator iter = iterators.first;
+                    for (; iter != iterators.second; ++iter)
+                    {
+                        // If the Heli and ped collided within the clear rate return false
+                        if ((*iter).first == pClientHeli && (*iter).second == pClientPed)
+                            return false;
+                    }
 
-                // Was our event cancelled
-                if (!bContinue)
-                {
-                    // Add our heli and ped pair to the list
-                    std::pair<CClientVehicle*, CClientPed*> pair = std::pair<CClientVehicle*, CClientPed*>(pClientHeli, pClientPed);
-                    m_HeliCollisionsMap.insert(pair);
+                    CLuaArguments Arguments;
+                    if (pClientHeli)
+                    {
+                        // Push our heli
+                        Arguments.PushElement(pClientHeli);
+                    }
+                    else
+                    {
+                        Arguments.PushNil();
+                    }
+
+                    // Trigger our event
+                    bool bContinue;
+                    if (IS_PLAYER(pClientPed))
+                        bContinue = pClientPed->CallEvent("onClientPlayerHeliKilled", Arguments, true);
+                    else
+                        bContinue = pClientPed->CallEvent("onClientPedHeliKilled", Arguments, true);
+
+                    // Was our event cancelled
+                    if (!bContinue)
+                    {
+                        // Add our heli and ped pair to the list
+                        std::pair<CClientVehicle*, CClientPed*> pair = std::pair<CClientVehicle*, CClientPed*>(pClientHeli, pClientPed);
+                        m_HeliCollisionsMap.insert(pair);
+                    }
+                    // Return if it was cancelled
+                    return bContinue;
                 }
-                // Return if it was cancelled
-                return bContinue;
+            }
+            else
+            {
+                return false;
             }
         }
         else
@@ -4675,15 +4702,25 @@ bool CClientGame::HeliKillHandler(CVehicleSAInterface* pHeliInterface, CEntitySA
 bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType,
                                        const CVector& vecDamagePos, uchar ucTyre)
 {
-    bool            bAllowDamage = true;
-    CClientVehicle* pClientVehicle = GetGameEntityXRefManager()->FindClientVehicle(pVehicleInterface);
+    bool bAllowDamage = true;
+    // CClientVehicle* pClientVehicle = GetGameEntityXRefManager()->FindClientVehicle(pVehicleInterface);
+    CClientVehicle* pClientVehicle = nullptr;
+
+    auto pVehicleEntity = g_pGame->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+
+    if (pVehicleEntity->pClientEntity)
+    {
+        pClientVehicle = static_cast<CClientVehicle*>(pVehicleEntity->pClientEntity);
+    }
+
     if (pClientVehicle)
     {
-        CClientEntity* pClientAttacker = GetGameEntityXRefManager()->FindClientEntity(pAttackerInterface);
+        CClientEntity* pClientAttacker = g_pGame->GetPools()->GetClientEntity((DWORD*)pAttackerInterface);
 
         // Compose arguments
         // attacker, weapon, loss, damagepos, tyreIdx
         CLuaArguments Arguments;
+
         if (pClientAttacker)
             Arguments.PushElement(pClientAttacker);
         else
@@ -4692,10 +4729,12 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
             Arguments.PushNumber(weaponType);
         else
             Arguments.PushNil();
+
         Arguments.PushNumber(fLoss);
         Arguments.PushNumber(vecDamagePos.fX);
         Arguments.PushNumber(vecDamagePos.fY);
         Arguments.PushNumber(vecDamagePos.fZ);
+
         if (ucTyre != UCHAR_INVALID_INDEX)
             Arguments.PushNumber(ucTyre);
         else
@@ -4715,27 +4754,22 @@ bool CClientGame::ObjectDamageHandler(CObjectSAInterface* pObjectInterface, floa
     if (pObjectInterface)
     {
         // Get our object and client object
-        CObject*       pObject = g_pGame->GetPools()->GetObjectA((DWORD*)pObjectInterface);
-        CClientObject* pClientObject = m_pManager->GetObjectManager()->GetSafe(pObject);
+        CObject*       pObject = nullptr;
+        CClientObject* pClientObject = nullptr;
+
+        auto pObjectEntity = g_pGame->GetPools()->GetObjectA((DWORD*)pObjectInterface);
+
+        if (pObjectEntity->pClientEntity)
+        {
+            pClientObject = static_cast<CClientObject*>(pObjectEntity->pClientEntity);
+            pObject = reinterpret_cast<CObject*>(pObjectEntity->pEntity);
+        }
 
         // Is our client vehicle valid?
         if (pClientObject)
         {
             CEntity*       pAttacker = g_pGame->GetPools()->GetEntity((DWORD*)pAttackerInterface);
-            CClientEntity* pClientAttacker = NULL;
-            if (pAttacker)
-            {
-                if (pAttacker->GetEntityType() == ENTITY_TYPE_VEHICLE)
-                {
-                    CVehicle* pAttackerVehicle = g_pGame->GetPools()->GetVehicle((DWORD*)pAttackerInterface);
-                    pClientAttacker = m_pManager->FindEntity(pAttackerVehicle);
-                }
-                else if (pAttacker->GetEntityType() == ENTITY_TYPE_PED)
-                {
-                    CPed* pAttackerPed = g_pGame->GetPools()->GetPed((DWORD*)pAttackerInterface);
-                    pClientAttacker = m_pManager->FindEntity(pAttackerPed);
-                }
-            }
+            CClientEntity* pClientAttacker = g_pGame->GetPools()->GetClientEntity((DWORD*)pAttackerInterface);
 
             CLuaArguments Arguments;
             Arguments.PushNumber(fLoss);
@@ -4756,8 +4790,16 @@ bool CClientGame::ObjectBreakHandler(CObjectSAInterface* pObjectInterface, CEnti
     if (pObjectInterface)
     {
         // Get our object and client object
-        CObject*       pObject = g_pGame->GetPools()->GetObjectA((DWORD*)pObjectInterface);
-        CClientObject* pClientObject = m_pManager->GetObjectManager()->GetSafe(pObject);
+        CObject*       pObject = nullptr;
+        CClientObject* pClientObject = nullptr;
+
+        auto pObjectEntity = g_pGame->GetPools()->GetObjectA((DWORD*)pObjectInterface);
+
+        if (pObjectEntity->pClientEntity)
+        {
+            pClientObject = static_cast<CClientObject*>(pObjectEntity->pClientEntity);
+            pObject = reinterpret_cast<CObject*>(pObjectEntity->pEntity);
+        }
 
         // Is our client vehicle valid?
         if (pClientObject)
@@ -4769,20 +4811,8 @@ bool CClientGame::ObjectBreakHandler(CObjectSAInterface* pObjectInterface, CEnti
             pClientObject->SetHealth(0.0f);
 
             CEntity*       pAttacker = g_pGame->GetPools()->GetEntity((DWORD*)pAttackerInterface);
-            CClientEntity* pClientAttacker = NULL;
-            if (pAttacker)
-            {
-                if (pAttacker->GetEntityType() == ENTITY_TYPE_VEHICLE)
-                {
-                    CVehicle* pAttackerVehicle = g_pGame->GetPools()->GetVehicle((DWORD*)pAttackerInterface);
-                    pClientAttacker = m_pManager->FindEntity(pAttackerVehicle);
-                }
-                else if (pAttacker->GetEntityType() == ENTITY_TYPE_PED)
-                {
-                    CPed* pAttackerPed = g_pGame->GetPools()->GetPed((DWORD*)pAttackerInterface);
-                    pClientAttacker = m_pManager->FindEntity(pAttackerPed);
-                }
-            }
+            CClientEntity* pClientAttacker = g_pGame->GetPools()->GetClientEntity((DWORD*)pAttackerInterface);
+            ;
 
             CLuaArguments Arguments;
 
@@ -4802,19 +4832,30 @@ bool CClientGame::WaterCannonHitHandler(CVehicleSAInterface* pCannonVehicle, CPe
     if (pCannonVehicle && pHitPed)
     {
         // Get our vehicle and client vehicle
-        CVehicle*       pVehicle = g_pGame->GetPools()->GetVehicle((DWORD*)pCannonVehicle);
-        CClientVehicle* pCannonClientVehicle = m_pManager->GetVehicleManager()->GetSafe(pVehicle);
+        CVehicle*       pVehicle = nullptr;
+        CClientVehicle* pCannonClientVehicle = nullptr;
+
+        auto pVehicleEntity = g_pGame->GetPools()->GetVehicle((DWORD*)pCannonVehicle);
+
+        if (pVehicleEntity->pClientEntity)
+        {
+            pCannonClientVehicle = static_cast<CClientVehicle*>(pVehicleEntity->pClientEntity);
+            pVehicle = reinterpret_cast<CVehicle*>(pCannonClientVehicle);
+        }
+
         // Was our client vehicle valid
         if (pCannonClientVehicle)
         {
             // Get our ped and client ped
-            CPed*       pPed = g_pGame->GetPools()->GetPed((DWORD*)pHitPed);
-            CClientPed* pClientPed = m_pManager->GetPedManager()->GetSafe(pPed, true);
+            auto        pTheEntity = g_pGame->GetPools()->GetPed((DWORD*)pHitPed);
+            CClientPed* pClientPed = nullptr;
 
             CLuaArguments Arguments;
-            if (pClientPed)
+
+            if (pTheEntity->pEntity)
             {
-                // Push our ped
+                pClientPed = reinterpret_cast<CClientPed*>(pTheEntity->pClientEntity);
+
                 Arguments.PushElement(pClientPed);
             }
             else
@@ -4840,13 +4881,12 @@ bool CClientGame::VehicleFellThroughMapHandler(CVehicleSAInterface* pVehicleInte
 {
     if (pVehicleInterface)
     {
-        // Get our vehicle and client vehicle
-        CVehicle*       pVehicle = g_pGame->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
-        CClientVehicle* pClientVehicle = m_pManager->GetVehicleManager()->GetSafe(pVehicle);
-        if (pClientVehicle)
+        auto pVehicleEntity = g_pGame->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+
+        if (pVehicleEntity->pClientEntity)
         {
             // handle or don't
-            return pClientVehicle->OnVehicleFallThroughMap();
+            return static_cast<CClientVehicle*>(pVehicleEntity->pClientEntity)->OnVehicleFallThroughMap();
         }
     }
     // unhandled
@@ -4856,17 +4896,96 @@ bool CClientGame::VehicleFellThroughMapHandler(CVehicleSAInterface* pVehicleInte
 // Validate known objects
 void CClientGame::GameObjectDestructHandler(CEntitySAInterface* pObject)
 {
-    m_pGameEntityXRefManager->OnGameEntityDestruct(pObject);
+    // m_pGameEntityXRefManager->OnGameEntityDestruct(pObject);
+
+    CClientEntity* pClientEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pObject);
+
+    if (pClientEntity)
+    {
+        BYTE*  pInterface = (BYTE*)pObject;
+        DWORD  InterfaceVtbl = *(DWORD*)pInterface;
+        ushort InterfaceModelId = *(ushort*)(pInterface + 34);
+
+        SString  strClientEntityInfo;
+        CEntity* pGameEntity = NULL;
+
+        if (CClientPed* pPed = DynamicCast<CClientPed>(pClientEntity))
+            pGameEntity = pPed->GetGameEntity();
+
+        if (CClientVehicle* pVehicle = DynamicCast<CClientVehicle>(pClientEntity))
+            pGameEntity = pVehicle->GetGameEntity();
+
+        if (CClientObject* pObject = DynamicCast<CClientObject>(pClientEntity))
+            pGameEntity = pObject->GetGameEntity();
+
+        if (CClientProjectile* pProjectile = DynamicCast<CClientProjectile>(pClientEntity))
+            pGameEntity = pProjectile->GetGameEntity();
+
+        if (CClientPickup* pPickup = DynamicCast<CClientPickup>(pClientEntity))
+            pGameEntity = pPickup->GetGameObject();
+
+        CEntity*       pMappedGameEntity = g_pGame->GetPools()->GetEntity((DWORD*)pClientEntity);
+        CClientEntity* pMappedClientEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pGameEntity);
+
+        strClientEntityInfo = SString("%s Id:%x GameEntity:%08x MappedGameEntity:%08x MappedClientEntity:%08x", pClientEntity->GetClassName(),
+                                      pClientEntity->GetID(), (int)pGameEntity, (int)pMappedGameEntity, (int)pMappedClientEntity);
+
+        SString strMessage("EntitySAInterface:%08x  Vtbl:%08x  ModelId:%d   ClientEntity:%08x  [%s]", (int)pObject, InterfaceVtbl, InterfaceModelId,
+                           (int)pClientEntity, *strClientEntityInfo);
+
+        g_pCore->LogEvent(8542, "XRefManager", "GameEntity Mismatch", strMessage);
+        AddReportLog(8542, strMessage);
+    }
 }
 
 void CClientGame::GameVehicleDestructHandler(CEntitySAInterface* pVehicle)
 {
-    m_pGameEntityXRefManager->OnGameEntityDestruct(pVehicle);
+    // m_pGameEntityXRefManager->OnGameEntityDestruct(pVehicle);
 }
 
 void CClientGame::GamePlayerDestructHandler(CEntitySAInterface* pPlayer)
 {
-    m_pGameEntityXRefManager->OnGameEntityDestruct(pPlayer);
+    // m_pGameEntityXRefManager->OnGameEntityDestruct(pPlayer);
+
+    CClientEntity* pClientEntity = g_pCore->GetGame()->GetPools()->GetClientEntity((DWORD*)pPlayer);
+
+    if (pClientEntity)
+    {
+        BYTE*  pInterface = (BYTE*)pPlayer;
+        DWORD  InterfaceVtbl = *(DWORD*)pInterface;
+        ushort InterfaceModelId = *(ushort*)(pInterface + 34);
+
+        SString strClientEntityInfo;
+
+        CEntity* pGameEntity = NULL;
+
+        if (CClientPed* pPed = DynamicCast<CClientPed>(pClientEntity))
+            pGameEntity = pPed->GetGameEntity();
+
+        if (CClientVehicle* pVehicle = DynamicCast<CClientVehicle>(pClientEntity))
+            pGameEntity = pVehicle->GetGameEntity();
+
+        if (CClientObject* pObject = DynamicCast<CClientObject>(pClientEntity))
+            pGameEntity = pObject->GetGameEntity();
+
+        if (CClientProjectile* pProjectile = DynamicCast<CClientProjectile>(pClientEntity))
+            pGameEntity = pProjectile->GetGameEntity();
+
+        if (CClientPickup* pPickup = DynamicCast<CClientPickup>(pClientEntity))
+            pGameEntity = pPickup->GetGameObject();
+
+        CEntity*       pMappedGameEntity = g_pGame->GetPools()->GetEntity((DWORD*)pClientEntity);
+        CClientEntity* pMappedClientEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pGameEntity);
+
+        strClientEntityInfo = SString("%s Id:%x GameEntity:%08x MappedGameEntity:%08x MappedClientEntity:%08x", pClientEntity->GetClassName(),
+                                      pClientEntity->GetID(), (int)pGameEntity, (int)pMappedGameEntity, (int)pMappedClientEntity);
+
+        SString strMessage("EntitySAInterface:%08x  Vtbl:%08x  ModelId:%d   ClientEntity:%08x  [%s]", (int)pPlayer, InterfaceVtbl, InterfaceModelId,
+                           (int)pClientEntity, *strClientEntityInfo);
+
+        g_pCore->LogEvent(8542, "XRefManager", "GameEntity Mismatch", strMessage);
+        AddReportLog(8542, strMessage);
+    }
 }
 
 void CClientGame::GameProjectileDestructHandler(CEntitySAInterface* pProjectile)
@@ -4882,7 +5001,7 @@ void CClientGame::GameProjectileDestructHandler(CEntitySAInterface* pProjectile)
 
 void CClientGame::GameModelRemoveHandler(ushort usModelId)
 {
-    m_pGameEntityXRefManager->OnGameModelRemove(usModelId);
+    // m_pGameEntityXRefManager->OnGameModelRemove(usModelId);
 }
 
 void CClientGame::TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId)
@@ -4891,7 +5010,7 @@ void CClientGame::TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPiec
     if (bOldBehaviour)
         return;
 
-    CClientPed* pClientPedAttacker = DynamicCast<CClientPed>(GetGameEntityXRefManager()->FindClientEntity((CEntitySAInterface*)pPedAttacker));
+    CClientPed* pClientPedAttacker = (CClientPed*)g_pGame->GetPools()->GetPed((DWORD*)pPedAttacker)->pClientEntity;
 
     // Make sure cause was networked ped
     if (pClientPedAttacker && !pClientPedAttacker->IsLocalEntity())
@@ -5197,7 +5316,8 @@ void CClientGame::PostWeaponFire(void)
     CClientPed* pLocalPlayer = g_pClientGame->m_pLocalPlayer;
     if (pLocalPlayer && pWeaponFirePed)
     {
-        CClientPed* pPed = g_pClientGame->GetPedManager()->Get(pWeaponFirePed, true, true);
+        CClientPed* pPed = (CClientPed*)g_pGame->GetPools()->GetPed((DWORD*)pWeaponFirePed)->pClientEntity;
+
         if (pPed)
         {
             if (pPed->GetType() == CCLIENTPLAYER)
@@ -5247,7 +5367,7 @@ void CClientGame::PostWeaponFire(void)
                     }
 
                     if (pCollisionGameEntity)
-                        pCollisionEntity = g_pClientGame->m_pManager->FindEntity(pCollisionGameEntity);
+                        pCollisionEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pCollisionGameEntity);
                 }
                 else
                 {
@@ -5298,7 +5418,7 @@ void CClientGame::BulletImpact(CPed* pInitiator, CEntity* pVictim, const CVector
     if (pLocalPlayer && pInitiator)
     {
         // Find the client ped that initiated the bullet impact
-        CClientPed* pInitiatorPed = g_pClientGame->GetPedManager()->Get(dynamic_cast<CPlayerPed*>(pInitiator), true, true);
+        CClientPed* pInitiatorPed = (CClientPed*)g_pGame->GetPools()->GetPed((DWORD*)pInitiator)->pClientEntity;
 
         if (pInitiatorPed)
         {
@@ -5324,9 +5444,10 @@ void CClientGame::BulletImpact(CPed* pInitiator, CEntity* pVictim, const CVector
 
             // Find the client entity for the victim.
             CClientEntity* pClientVictim = NULL;
+
             if (pVictim)
             {
-                pClientVictim = g_pClientGame->m_pManager->FindEntity(pVictim);
+                pClientVictim = g_pGame->GetPools()->GetClientEntity((DWORD*)pVictim);
             }
 
             // Store the data in the bullet fire initiator.

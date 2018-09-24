@@ -494,7 +494,7 @@ int GetAnimPose(int iAnim)
 ////////////////////////////////////////////////////////////////
 __declspec(noinline) int _cdecl OnCPlayerPed_ProcessAnimGroups_Mid(CPlayerPedSAInterface* pPlayerPedSAInterface, int iReqMoveAnim)
 {
-    CPed* pPed = pGame->GetPools()->GetPed((DWORD*)pPlayerPedSAInterface);
+    CPed* pPed = dynamic_cast<CPed*>(pGame->GetPools()->GetPed((DWORD*)pPlayerPedSAInterface)->pEntity);
 
     if (pPed)
     {

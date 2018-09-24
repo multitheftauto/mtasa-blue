@@ -238,12 +238,22 @@ bool CPedSA::CanSeeEntity(CEntity* entity, FLOAT fDistance)
 CVehicle* CPedSA::GetVehicle()
 {
     DEBUG_TRACE("CVehicle * CPedSA::GetVehicle()");
+    
     if (((CPedSAInterface*)this->GetInterface())->pedFlags.bInVehicle)
     {
-        CVehicleSAInterface* vehicle = (CVehicleSAInterface*)(((CPedSAInterface*)this->GetInterface())->CurrentObjective);
-        if (vehicle)
-            return ((CPoolsSA*)pGame->GetPools())->GetVehicle((DWORD*)vehicle);
+        CVehicleSAInterface* pVehicle = (CVehicleSAInterface*)(((CPedSAInterface*)this->GetInterface())->CurrentObjective);
+        
+        if (pVehicle)
+        {
+            auto pVehicleEntity = pGame->GetPools()->GetVehicle((DWORD*)pVehicle);
+
+            if (pVehicleEntity->pEntity)
+            {
+                return pVehicleEntity->pEntity;
+            }
+        }
     }
+
     return NULL;
 }
 
@@ -772,10 +782,10 @@ CEntity* CPedSA::GetContactEntity(void)
         switch (pInterface->nType)
         {
             case ENTITY_TYPE_VEHICLE:
-                pReturn = (CEntity*)(pPools->GetVehicle((DWORD*)pInterface));
+                pReturn = (CEntity*)(pPools->GetVehicle((DWORD*)pInterface)->pEntity);
                 break;
             case ENTITY_TYPE_OBJECT:
-                pReturn = (CEntity*)(pPools->GetObject((DWORD*)pInterface));
+                pReturn = (CEntity*)(pPools->GetObject((DWORD*)pInterface)->pEntity);
                 break;
             default:
                 break;
@@ -800,13 +810,13 @@ CEntity* CPedSA::GetTargetedEntity(void)
         switch (pInterface->nType)
         {
             case ENTITY_TYPE_PED:
-                pReturn = (CEntity*)(pPools->GetPed((DWORD*)pInterface));
+                pReturn = (CEntity*)(pPools->GetPed((DWORD*)pInterface)->pEntity);
                 break;
             case ENTITY_TYPE_VEHICLE:
-                pReturn = (CEntity*)(pPools->GetVehicle((DWORD*)pInterface));
+                pReturn = (CEntity*)(pPools->GetVehicle((DWORD*)pInterface)->pEntity);
                 break;
             case ENTITY_TYPE_OBJECT:
-                pReturn = (CEntity*)(pPools->GetObject((DWORD*)pInterface));
+                pReturn = (CEntity*)(pPools->GetObject((DWORD*)pInterface)->pEntity);
                 break;
             default:
                 break;

@@ -63,16 +63,6 @@ CClientPed* CClientPedManager::Get(ElementID ID, bool bCheckPlayers)
     return NULL;
 }
 
-CClientPed* CClientPedManager::Get(CPlayerPed* pPlayer, bool bValidatePointer, bool bCheckPlayers)
-{
-    return g_pClientGame->GetGameEntityXRefManager()->FindClientPed(pPlayer);
-}
-
-CClientPed* CClientPedManager::GetSafe(CEntity* pEntity, bool bCheckPlayers)
-{
-    return g_pClientGame->GetGameEntityXRefManager()->FindClientPed(pEntity);
-}
-
 bool CClientPedManager::Exists(CClientPed* pPed)
 {
     // Is it in our list?

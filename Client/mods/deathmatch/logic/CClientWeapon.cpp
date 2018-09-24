@@ -407,12 +407,14 @@ void CClientWeapon::FireInstantHit(CVector vecOrigin, CVector vecTarget, bool bS
             return;
         }
         // Execute our weapon fire event
-        CClientEntity* pClientEntity = m_pManager->FindEntitySafe(pColEntity);
+        CClientEntity* pClientEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pColEntity);
         CLuaArguments  Arguments;
+        
         if (pClientEntity)
             Arguments.PushElement(pClientEntity);            // entity that got hit
         else
             Arguments.PushNil();                                               // Probably a building.
+        
         Arguments.PushNumber(pColPoint->GetPosition().fX);                     // pos x
         Arguments.PushNumber(pColPoint->GetPosition().fY);                     // pos y
         Arguments.PushNumber(pColPoint->GetPosition().fZ);                     // pos z

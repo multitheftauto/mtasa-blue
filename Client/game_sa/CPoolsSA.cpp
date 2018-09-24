@@ -13,9 +13,15 @@
 
 extern bool g_bVehiclePointerInvalid;
 
+template <class T>
+SClientEntity<T> pEmptyEntity = { nullptr, nullptr };
+
 CPoolsSA::CPoolsSA()
 {
     DEBUG_TRACE("CPoolsSA::CPoolsSA()");
+    m_ppPedPoolInterface = (CPoolSAInterface<CPedSAInterface>**)0xB74490;
+    m_ppObjectPoolInterface = (CPoolSAInterface<CObjectSAInterface>**)0xB7449C;
+    m_ppVehiclePoolInterface = (CPoolSAInterface<CVehicleSAInterface>**)0xB74494;
 
     m_bGetVehicleEnabled = true;
     m_ulBuildingCount = 0;
@@ -50,10 +56,10 @@ void CPoolsSA::DeleteAllBuildings(void)
     /*
     for ( int i = 0; i < MAX_BUILDINGS; i++ )
     {
-        if ( Buildings [i] )
-        {
-            RemoveBuilding ( Buildings [i] );
-        }
+    if ( Buildings [i] )
+    {
+    RemoveBuilding ( Buildings [i] );
+    }
     }
     */
 }
@@ -61,14 +67,9 @@ void CPoolsSA::DeleteAllBuildings(void)
 //////////////////////////////////////////////////////////////////////////////////////////
 //                                    VEHICLES POOL                                     //
 //////////////////////////////////////////////////////////////////////////////////////////
-inline bool CPoolsSA::AddVehicleToPool(CVehicleSA* pVehicle)
+inline bool CPoolsSA::AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleSA* pVehicle)
 {
-    DEBUG_TRACE("inline bool CPoolsSA::AddVehicleToPool ( CVehicleSA* pVehicle )");
-
-    // We always add to the end of the pool array because
-    // it's ensured that there won't be empty spaces in the
-    // middle of the array.
-    unsigned long ulNewPos = m_vehiclePool.ulCount;
+    DEBUG_TRACE("inline bool CPoolsSA::AddVehicleToPool ( CClientVehicle* pClientVehicle, CVehicleSA* pVehicle )");
 
     // Grab the interface
     CVehicleSAInterface* pInterface = pVehicle->GetVehicleInterface();
@@ -79,29 +80,27 @@ inline bool CPoolsSA::AddVehicleToPool(CVehicleSA* pVehicle)
     }
     else
     {
-        // Add it to the pool array
-        m_vehiclePool.array[ulNewPos] = pVehicle;
-        pVehicle->SetArrayID(ulNewPos);
+        DWORD dwElementIndexInPool = GetVehiclePoolIndex((std::uint8_t*)pInterface);
 
-        // Add it to the pool map
-        m_vehiclePool.map.insert(vehiclePool_t::mapType::value_type(pInterface, pVehicle));
+        m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool] = {pVehicle, (CClientEntity*)pClientVehicle};
 
-        // Increase the count of vehicles
+        std::printf("ADD: vehicle ref: %u | pInterface = %p | pool capacity: %u\n", dwElementIndexInPool, pInterface, GetPoolCapacity(VEHICLE_POOL));
+
         ++m_vehiclePool.ulCount;
     }
 
     return true;
 }
 
-CVehicle* CPoolsSA::AddVehicle(eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2)
+CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2)
 {
-    DEBUG_TRACE("CVehicle* CPoolsSA::AddVehicle ( eVehicleTypes eVehicleType )");
+    DEBUG_TRACE("CVehicle* CPoolsSA::AddVehicle ( CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType )");
     CVehicleSA* pVehicle = NULL;
 
     if (m_vehiclePool.ulCount < MAX_VEHICLES)
     {
         pVehicle = new CVehicleSA(eVehicleType, ucVariation, ucVariation2);
-        if (!AddVehicleToPool(pVehicle))
+        if (!AddVehicleToPool(pClientVehicle, pVehicle))
         {
             delete pVehicle;
             pVehicle = NULL;
@@ -111,27 +110,29 @@ CVehicle* CPoolsSA::AddVehicle(eVehicleTypes eVehicleType, unsigned char ucVaria
     return pVehicle;
 }
 
-CVehicle* CPoolsSA::AddVehicle(DWORD* pGameInterface)
+CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, DWORD* pGameInterface)
 {
-    DEBUG_TRACE("CVehicle* CPoolsSA::AddVehicle ( DWORD* pGameInterface )");
+    DEBUG_TRACE("CVehicle* CPoolsSA::AddVehicle ( CClientVehicle* pClientVehicle, DWORD* pGameInterface )");
     CVehicleSA* pVehicle = NULL;
 
     if (m_vehiclePool.ulCount < MAX_VEHICLES)
     {
         CVehicleSAInterface* pInterface = reinterpret_cast<CVehicleSAInterface*>(pGameInterface);
+
         if (pInterface)
         {
-            // Make sure that it's not already in the pool
-            vehiclePool_t::mapType::iterator iter = m_vehiclePool.map.find(pInterface);
-            if (iter != m_vehiclePool.map.end())
+            DWORD dwElementIndexInPool = GetVehiclePoolIndex((std::uint8_t*)pInterface);
+            pVehicle = m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
+
+            if (pVehicle)
             {
-                pVehicle = (*iter).second;
+                return pVehicle;
             }
             else
             {
                 // Create it
                 pVehicle = new CVehicleSA(pInterface);
-                if (!AddVehicleToPool(pVehicle))
+                if (!AddVehicleToPool(pClientVehicle, pVehicle))
                 {
                     delete pVehicle;
                     pVehicle = NULL;
@@ -143,36 +144,27 @@ CVehicle* CPoolsSA::AddVehicle(DWORD* pGameInterface)
     return pVehicle;
 }
 
-void CPoolsSA::RemoveVehicle(unsigned long ulID, bool)
+void CPoolsSA::RemoveVehicle(CVehicle* pVehicle, bool bDelete)
 {
-    DEBUG_TRACE("void CPoolsSA::RemoveVehicle ( unsigned long ulID, bool )");
+    DEBUG_TRACE("void CPoolsSA::RemoveVehicle ( CVehicle * pVehicle, bool bDelete )");
 
-    static bool bIsDeletingVehicleAlready = false;            // to prevent delete being called twice
+    static bool bIsDeletingVehicleAlready = false;
+
     if (!bIsDeletingVehicleAlready)
     {
+        assert(NULL != pVehicle);
+
         bIsDeletingVehicleAlready = true;
 
-        CVehicleSA* pVehicleSA = m_vehiclePool.array[ulID];
-        assert(NULL != pVehicleSA);
+        CVehicleSAInterface* pInterface = pVehicle->GetVehicleInterface();
 
-        // Pop the element to remove from the pool array
-        if (ulID != m_vehiclePool.ulCount - 1)
-        {
-            // We are removing an intermediate position of
-            // the array. Move the last element to the just
-            // deleted element position to not allow empty
-            // spaces on it.
-            m_vehiclePool.array[ulID] = m_vehiclePool.array[m_vehiclePool.ulCount - 1];
-            m_vehiclePool.array[ulID]->SetArrayID(ulID);
-        }
-        m_vehiclePool.array[m_vehiclePool.ulCount - 1] = NULL;
+        DWORD       dwElementIndexInPool = GetVehiclePoolIndex((std::uint8_t*)pInterface);
+        CVehicleSA* pVehicleSA = m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
 
-        // Unlink the element to remove from the pool map
-        vehiclePool_t::mapType::iterator iter = m_vehiclePool.map.find(pVehicleSA->GetVehicleInterface());
-        if (iter != m_vehiclePool.map.end())
-        {
-            m_vehiclePool.map.erase(iter);
-        }
+        std::printf("REMOVE vehicle: dwElementIndexInPool: %u | pInterface = %p | UsedSpaces: %d\n", dwElementIndexInPool, pInterface,
+                    GetNumberOfUsedSpaces(VEHICLE_POOL));
+
+        m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool] = {nullptr, nullptr};
 
         // Delete it from memory
         delete pVehicleSA;
@@ -184,31 +176,9 @@ void CPoolsSA::RemoveVehicle(unsigned long ulID, bool)
     }
 }
 
-void CPoolsSA::RemoveVehicle(CVehicle* pVehicle, bool bDelete)
+SClientEntity<CVehicleSA>* CPoolsSA::GetVehicle(DWORD* pGameInterface)
 {
-    DEBUG_TRACE("void CPoolsSA::RemoveVehicle ( CVehicle * pVehicle, bool bDelete )");
-
-    assert(NULL != pVehicle);
-
-    CVehicleSA* pVehicleSA = dynamic_cast<CVehicleSA*>(pVehicle);
-    if (pVehicleSA)
-    {
-        RemoveVehicle(pVehicleSA->GetArrayID(), bDelete);
-    }
-}
-
-CVehicle* CPoolsSA::GetVehicle(unsigned long ulID)
-{
-    DEBUG_TRACE("CVehicle* CPoolsSA::GetVehicle ( unsigned long ulID )");
-
-    assert(ulID < MAX_VEHICLES);
-
-    return m_vehiclePool.array[ulID];
-}
-
-CVehicle* CPoolsSA::GetVehicle(DWORD* pGameInterface)
-{
-    DEBUG_TRACE("CVehicle* CPoolsSA::GetVehicle ( DWORD* pGameInterface )");
+    DEBUG_TRACE("SClientEntity<CVehicleSA>* CPoolsSA::GetVehicle ( DWORD* pGameInterface )");
 
     assert(pGameInterface);
 
@@ -216,14 +186,23 @@ CVehicle* CPoolsSA::GetVehicle(DWORD* pGameInterface)
     {
         CVehicleSAInterface* pInterface = reinterpret_cast<CVehicleSAInterface*>(pGameInterface);
 
-        if (!g_bVehiclePointerInvalid)
-            return pInterface->m_pVehicle;
-        vehiclePool_t::mapType::iterator iter = m_vehiclePool.map.find(pInterface);
-        if (iter != m_vehiclePool.map.end())
-            return (*iter).second;
+        if (pInterface)
+        {
+            DWORD dwElementIndexInPool = GetVehiclePoolIndex((std::uint8_t*)pInterface);
+
+            if (dwElementIndexInPool < MAX_VEHICLES)
+            {
+                SClientEntity<CVehicleSA>* pEntity = &m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool];
+
+                if (pEntity)
+                {
+                    return pEntity;
+                }
+            }
+        }
     }
 
-    return NULL;
+    return &pEmptyEntity<CVehicleSA>;
 }
 
 DWORD CPoolsSA::GetVehicleRef(CVehicle* pVehicle)
@@ -276,9 +255,8 @@ CVehicle* CPoolsSA::GetVehicleFromRef(DWORD dwGameRef)
     DWORD dwReturn;
     DWORD dwFunction = FUNC_GetVehicle;
 
-    _asm
-    {
-        mov     ecx, dword ptr ds:[CLASS_CPool_Vehicle]
+    _asm {
+        mov     ecx, dword ptr ds : [CLASS_CPool_Vehicle]
         push    dwGameRef
         call    dwFunction
         add     esp, 0x4
@@ -288,14 +266,13 @@ CVehicle* CPoolsSA::GetVehicleFromRef(DWORD dwGameRef)
     CVehicleSAInterface* pInterface = (CVehicleSAInterface*)dwReturn;
     if (pInterface)
     {
-        // We have a special slot in vehicles GTA interface pointing to
-        // our game_sa instance for it.
-        if (!g_bVehiclePointerInvalid)
-            return pInterface->m_pVehicle;
+        DWORD       dwElementIndexInPool = dwGameRef >> 8;
+        CVehicleSA* pVehicle = m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
 
-        vehiclePool_t::mapType::iterator iter = m_vehiclePool.map.find(pInterface);
-        if (iter != m_vehiclePool.map.end())
-            return (*iter).second;
+        if (pVehicle)
+        {
+            return pVehicle;
+        }
     }
 
     return NULL;
@@ -306,21 +283,21 @@ void CPoolsSA::DeleteAllVehicles()
     DEBUG_TRACE("void CPoolsSA::DeleteAllVehicles ( )");
 
     while (m_vehiclePool.ulCount > 0)
-        RemoveVehicle(m_vehiclePool.ulCount - 1);
+    {
+        CVehicleSA* pVehicle = m_vehiclePool.arrayOfClientEntities[m_vehiclePool.ulCount - 1].pEntity;
+
+        RemoveVehicle(pVehicle);
+    }
+
     m_vehiclePool.map.clear();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //                                     OBJECTS POOL                                     //
 //////////////////////////////////////////////////////////////////////////////////////////
-inline bool CPoolsSA::AddObjectToPool(CObjectSA* pObject)
+inline bool CPoolsSA::AddObjectToPool(CClientObject* pClientObject, CObjectSA* pObject)
 {
-    DEBUG_TRACE("inline bool CPoolsSA::AddObjectToPool ( CObjectSA* pObject )");
-
-    // We always add to the end of the pool array because
-    // it's ensured that there won't be empty spaces in the
-    // middle of the array.
-    unsigned long ulNewPos = m_objectPool.ulCount;
+    DEBUG_TRACE("inline bool CPoolsSA::AddObjectToPool ( CClientObject* pClientObject, CObjectSA* pObject )");
 
     // Grab the new object interface
     CObjectSAInterface* pInterface = pObject->GetObjectInterface();
@@ -331,12 +308,10 @@ inline bool CPoolsSA::AddObjectToPool(CObjectSA* pObject)
     }
     else
     {
-        // Add it to the pool array
-        m_objectPool.array[ulNewPos] = pObject;
-        pObject->SetArrayID(ulNewPos);
+        DWORD dwElementIndexInPool = GetObjectPoolIndex((std::uint8_t*)pInterface);
 
-        // Add it to the pool map
-        m_objectPool.map.insert(objectPool_t::mapType::value_type(pInterface, pObject));
+        m_objectPool.arrayOfClientEntities[dwElementIndexInPool] = {pObject, (CClientEntity*)pClientObject};
+        std::printf("ADD: object index: %u | pInterface = %p | pool capacity: %u\n", dwElementIndexInPool, pInterface, GetPoolCapacity(OBJECT_POOL));
 
         // Increase the count of objects
         ++m_objectPool.ulCount;
@@ -345,9 +320,9 @@ inline bool CPoolsSA::AddObjectToPool(CObjectSA* pObject)
     return true;
 }
 
-CObject* CPoolsSA::AddObject(DWORD dwModelID, bool bLowLod, bool bBreakingDisabled)
+CObject* CPoolsSA::AddObject(CClientObject* pClientObject, DWORD dwModelID, bool bLowLod, bool bBreakingDisabled)
 {
-    DEBUG_TRACE("CObject * CPoolsSA::AddObject ( DWORD dwModelID )");
+    DEBUG_TRACE("CObject * CPoolsSA::AddObject ( CClientObject* pClientObject, DWORD dwModelID, bool bLowLod, bool bBreakingDisabled )");
 
     CObjectSA* pObject = NULL;
 
@@ -355,7 +330,7 @@ CObject* CPoolsSA::AddObject(DWORD dwModelID, bool bLowLod, bool bBreakingDisabl
     {
         pObject = new CObjectSA(dwModelID, bBreakingDisabled);
 
-        if (AddObjectToPool(pObject))
+        if (pObject && AddObjectToPool(pClientObject, pObject))
         {
             if (bLowLod)
             {
@@ -377,36 +352,28 @@ CObject* CPoolsSA::AddObject(DWORD dwModelID, bool bLowLod, bool bBreakingDisabl
     return pObject;
 }
 
-void CPoolsSA::RemoveObject(unsigned long ulID, bool)
+void CPoolsSA::RemoveObject(CObject* pObject, bool bDelete)
 {
-    DEBUG_TRACE("void CPoolsSA::RemoveObject ( unsigned long ulID, bool )");
+    DEBUG_TRACE("void CPoolsSA::RemoveObject ( CObject* pObject, bool bDelete )");
 
-    static bool bIsDeletingObjectAlready = false;            // to prevent delete being called twice
-    if (!bIsDeletingObjectAlready && ulID != INVALID_POOL_ARRAY_ID)
+    static bool bIsDeletingObjectAlready = false;
+
+    if (!bIsDeletingObjectAlready)
     {
+        assert(NULL != pObject);
+
         bIsDeletingObjectAlready = true;
 
-        CObjectSA* pObjectSA = m_objectPool.array[ulID];
-        assert(NULL != pObjectSA);
+        CObjectSAInterface* pInterface = pObject->GetObjectInterface();
 
-        // Pop the element to remove from the pool array
-        if (ulID != m_objectPool.ulCount - 1)
-        {
-            // We are removing an intermediate position of
-            // the array. Move the last element to the just
-            // deleted element position to not allow empty
-            // spaces on it.
-            m_objectPool.array[ulID] = m_objectPool.array[m_objectPool.ulCount - 1];
-            m_objectPool.array[ulID]->SetArrayID(ulID);
-        }
-        m_objectPool.array[m_objectPool.ulCount - 1] = NULL;
+        DWORD dwElementIndexInPool = GetObjectPoolIndex((std::uint8_t*)pInterface);
 
-        // Unlink the element to remove from the pool map
-        objectPool_t::mapType::iterator iter = m_objectPool.map.find(pObjectSA->GetObjectInterface());
-        if (iter != m_objectPool.map.end())
-        {
-            m_objectPool.map.erase(iter);
-        }
+        CObjectSA* pObjectSA = m_objectPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
+
+        std::printf("REMOVE object: dwElementIndexInPool: %u | pInterface = %p | UsedSpaces = %d \n", dwElementIndexInPool, pInterface,
+                    GetNumberOfUsedSpaces(OBJECT_POOL));
+
+        m_objectPool.arrayOfClientEntities[dwElementIndexInPool] = {nullptr, nullptr};
 
         // Delete it from memory
         delete pObjectSA;
@@ -418,45 +385,28 @@ void CPoolsSA::RemoveObject(unsigned long ulID, bool)
     }
 }
 
-void CPoolsSA::RemoveObject(CObject* pObject, bool bDelete)
+SClientEntity<CObjectSA>* CPoolsSA::GetObject(DWORD* pGameInterface)
 {
-    DEBUG_TRACE("void CPoolsSA::RemoveObject ( CObject* pObject, bool bDelete )");
-
-    assert(NULL != pObject);
-
-    CObjectSA* pObjectSA = dynamic_cast<CObjectSA*>(pObject);
-    if (pObjectSA)
-    {
-        RemoveObject(pObjectSA->GetArrayID(), bDelete);
-    }
-}
-
-CObject* CPoolsSA::GetObject(unsigned long ulID)
-{
-    DEBUG_TRACE("CObject* CPoolsSA::GetObject ( unsigned long ulID )");
-
-    assert(ulID < MAX_OBJECTS);
-
-    return m_objectPool.array[ulID];
-}
-
-CObject* CPoolsSA::GetObject(DWORD* pGameInterface)
-{
-    DEBUG_TRACE("CObject* CPoolsSA::GetObject ( DWORD* pGameInterface )");
+    DEBUG_TRACE("CObject* CPoolsSA::GetObject( DWORD* pGameInterface )");
 
     CObjectSAInterface* pInterface = reinterpret_cast<CObjectSAInterface*>(pGameInterface);
 
     if (pInterface)
     {
-        // Lookup in the pool map for the object related to this interface.
-        objectPool_t::mapType::iterator iter = m_objectPool.map.find(pInterface);
-        if (iter != m_objectPool.map.end())
+        DWORD dwElementIndexInPool = GetObjectPoolIndex((std::uint8_t*)pInterface);
+
+        if (dwElementIndexInPool < MAX_OBJECTS)
         {
-            return (*iter).second;
+            SClientEntity<CObjectSA>* pEntity = &m_objectPool.arrayOfClientEntities[dwElementIndexInPool];
+
+            if (pEntity)
+            {
+                return pEntity;
+            }
         }
     }
 
-    return NULL;
+    return &pEmptyEntity<CObjectSA>;
 }
 
 DWORD CPoolsSA::GetObjectRef(CObject* pObject)
@@ -509,9 +459,8 @@ CObject* CPoolsSA::GetObjectFromRef(DWORD dwGameRef)
     DWORD dwReturn;
     DWORD dwFunction = FUNC_GetObject;
 
-    _asm
-    {
-        mov     ecx, dword ptr ds:[CLASS_CPool_Object]
+    _asm {
+        mov     ecx, dword ptr ds : [CLASS_CPool_Object]
         push    dwGameRef
         call    dwFunction
         add     esp, 0x4
@@ -519,13 +468,15 @@ CObject* CPoolsSA::GetObjectFromRef(DWORD dwGameRef)
     }
 
     CObjectSAInterface* pInterface = (CObjectSAInterface*)dwReturn;
+
     if (pInterface)
     {
-        // Lookup in the pool map for this GTA interface.
-        objectPool_t::mapType::iterator iter = m_objectPool.map.find(pInterface);
-        if (iter != m_objectPool.map.end())
+        DWORD      dwElementIndexInPool = dwGameRef >> 8;
+        CObjectSA* pObject = m_objectPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
+
+        if (pObject)
         {
-            return (*iter).second;
+            return pObject;
         }
     }
 
@@ -537,16 +488,21 @@ void CPoolsSA::DeleteAllObjects()
     DEBUG_TRACE("void CPoolsSA::DeleteAllObjects ( )");
 
     while (m_objectPool.ulCount > 0)
-        RemoveObject(m_objectPool.ulCount - 1);
+    {
+        CObjectSA* pObject = m_objectPool.arrayOfClientEntities[m_objectPool.ulCount - 1].pEntity;
+
+        RemoveObject(pObject);
+    }
+
     m_objectPool.map.clear();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //                                       PEDS POOL                                      //
 //////////////////////////////////////////////////////////////////////////////////////////
-inline bool CPoolsSA::AddPedToPool(CClientPed * pClientPed, CPedSA* pPed)
+inline bool CPoolsSA::AddPedToPool(CClientPed* pClientPed, CPedSA* pPed)
 {
-    DEBUG_TRACE("inline bool CPoolsSA::AddPedToPool ( CPedSA* pPed )");
+    DEBUG_TRACE("inline bool CPoolsSA::AddPedToPool ( CClientPed* pClientPed, CPedSA* pPed )");
 
     // Grab the ped interface
     CPedSAInterface* pInterface = pPed->GetPedInterface();
@@ -557,16 +513,14 @@ inline bool CPoolsSA::AddPedToPool(CClientPed * pClientPed, CPedSA* pPed)
     }
     else
     {
+        // Extract the element index from the handle
+        DWORD dwElementIndexInPool = GetPedPoolIndex((std::uint8_t*)pInterface);
 
-        DWORD dwPedRef = GetPedRef((DWORD*)pInterface);
+        m_pedPool.arrayOfClientEntities[dwElementIndexInPool] = {pPed, (CClientEntity*)pClientPed};
 
-        // Extract the element index from the handle  
-        DWORD dwElementIndexInPool = dwPedRef >> 8;    
+        std::printf("ADD: ped ref: %u | pInterface = %p | GetPedPoolIndex:: %d | pool capacity: %u\n", dwElementIndexInPool, pInterface,
+                    GetPedPoolIndex((std::uint8_t*)pInterface), GetPoolCapacity(PED_POOL));
 
-        m_pedPool.arrayOfClientEntities[dwElementIndexInPool] = { pPed, (CClientEntity*)pClientPed };
- 
-        std::printf("ADD: ped ref: %u | pInterface = %p | inteface via GetPedFromRef: %p | pool capacity: %u\n", dwElementIndexInPool, pInterface, GetPedFromRef(dwPedRef)->GetPedInterface() , GetPoolCapacity(PED_POOL));
-  
         // Increase the count of peds
         ++m_pedPool.ulCount;
     }
@@ -574,9 +528,9 @@ inline bool CPoolsSA::AddPedToPool(CClientPed * pClientPed, CPedSA* pPed)
     return true;
 }
 
-CPed* CPoolsSA::AddPed(CClientPed * pClientPed, ePedModel ePedType)
+CPed* CPoolsSA::AddPed(CClientPed* pClientPed, ePedModel ePedType)
 {
-    DEBUG_TRACE("CPed* CPoolsSA::AddPed ( ePedModel ePedType )");
+    DEBUG_TRACE("CPed* CPoolsSA::AddPed ( CClientPed* pClientPed, ePedModel ePedType )");
 
     CPedSA* pPed = NULL;
 
@@ -593,9 +547,9 @@ CPed* CPoolsSA::AddPed(CClientPed * pClientPed, ePedModel ePedType)
     return pPed;
 }
 
-CPed* CPoolsSA::AddPed(CClientPed * pClientPed, DWORD* pGameInterface)
+CPed* CPoolsSA::AddPed(CClientPed* pClientPed, DWORD* pGameInterface)
 {
-    DEBUG_TRACE("CPed* CPoolsSA::AddPed ( DWORD* pGameInterface )");
+    DEBUG_TRACE("CPed* CPoolsSA::AddPed ( CClientPed* pClientPed, DWORD* pGameInterface )");
 
     CPedSA* pPed = NULL;
 
@@ -604,8 +558,9 @@ CPed* CPoolsSA::AddPed(CClientPed * pClientPed, DWORD* pGameInterface)
         CPlayerPedSAInterface* pInterface = reinterpret_cast<CPlayerPedSAInterface*>(pGameInterface);
         if (pInterface)
         {
-            // Extract the element index from the handle  
-            DWORD dwElementIndexInPool = GetPedRef((DWORD*)pInterface) >> 8;
+            // Extract the element index from the handle
+            DWORD dwElementIndexInPool = GetPedPoolIndex((std::uint8_t*)pInterface);
+
             pPed = m_pedPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
             if (pPed)
             {
@@ -638,9 +593,10 @@ CPed* CPoolsSA::AddCivilianPed(DWORD* pGameInterface)
         CPedSAInterface* pInterface = reinterpret_cast<CPedSAInterface*>(pGameInterface);
         if (pInterface)
         {
-            // Extract the element index from the handle  
-            DWORD dwElementIndexInPool = GetPedRef((DWORD*)pInterface) >> 8;
-            CPedSA * pPed = m_pedPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
+            // Extract the element index from the handle
+            DWORD dwElementIndexInPool = GetPedPoolIndex((std::uint8_t*)pInterface);
+
+            CPedSA* pPed = m_pedPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
             if (pPed)
             {
                 return pPed;
@@ -652,8 +608,8 @@ CPed* CPoolsSA::AddCivilianPed(DWORD* pGameInterface)
                 pPed = new CCivilianPedSA(pInterface);
                 if (!AddPedToPool(pClientPed, pPed))
                 {
-                    delete pPed;
-                    pPed = NULL;
+                delete pPed;
+                pPed = NULL;
                 }*/
             }
         }
@@ -664,29 +620,27 @@ CPed* CPoolsSA::AddCivilianPed(DWORD* pGameInterface)
 
 void CPoolsSA::RemovePed(CPed* pPed, bool bDelete)
 {
-    DEBUG_TRACE("void CPoolsSA::RemovePed ( unsigned long ulID, bool bDelete )");
+    DEBUG_TRACE("void CPoolsSA::RemovePed( CPed* pPed, bool bDelete )");
 
     static bool bIsDeletingPedAlready = false;            // to prevent delete being called twice
+
     if (!bIsDeletingPedAlready)
     {
-        bIsDeletingPedAlready = true;
-
-        CPedSAInterface * pInterface = pPed->GetPedInterface();
-
-        DWORD dwPedRef = GetPedRef((DWORD*)pInterface);
-
-        // Extract the element index from the handle  
-        DWORD dwElementIndexInPool = dwPedRef >> 8;
-
-        CPedSA* pPed = m_pedPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
         assert(nullptr != pPed);
 
-        if (pPed)
-        {
-            std::printf("REMOVE: dwElementIndexInPool: %u | pInterface = %p | inteface via GetPedFromRef: %p\n", dwElementIndexInPool, pInterface, GetPedFromRef(dwPedRef)->GetInterface());
-            m_pedPool.arrayOfClientEntities[dwElementIndexInPool] = { nullptr, nullptr };
-        
-        }
+        bIsDeletingPedAlready = true;
+
+        CPedSAInterface* pInterface = pPed->GetPedInterface();
+
+        // Extract the element index from the handle
+        DWORD dwElementIndexInPool = GetPedPoolIndex((std::uint8_t*)pInterface);
+
+        CPedSA* pPed = m_pedPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
+
+        std::printf("REMOVE ped: dwElementIndexInPool: %u | pInterface = %p | UsedSpaces: %d\n", dwElementIndexInPool, pInterface,
+                    GetNumberOfUsedSpaces(PED_POOL));
+
+        m_pedPool.arrayOfClientEntities[dwElementIndexInPool] = {nullptr, nullptr};
 
         // Delete the element from memory
         switch (pPed->GetType())
@@ -725,50 +679,30 @@ void CPoolsSA::RemovePed(CPed* pPed, bool bDelete)
     }
 }
 
-/*
-// We simply don't need this anymore
-void CPoolsSA::RemovePed(CPed* pPed, bool bDelete)
+SClientEntity<CPedSA>* CPoolsSA::GetPed(DWORD* pGameInterface)
 {
-    DEBUG_TRACE("void CPoolsSA::RemovePed ( CPed* pPed, bool bDelete )");
-
-    assert(NULL != pPed);
-
-    CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
-    if (pPedSA)
-    {
-        RemovePed(pPed, bDelete);
-    }
-}
-
-// NEVER USED
-CPed* CPoolsSA::GetPed(unsigned long ulID)
-{
-    DEBUG_TRACE("CPed* CPoolsSA::GetPed ( unsigned long ulID )");
-
-    assert(ulID < MAX_PEDS);
-
-    return m_pedPool.array[ulID];
-}*/
-
-CPed* CPoolsSA::GetPed(DWORD* pGameInterface)
-{
-    DEBUG_TRACE("CPed* CPoolsSA::GetPed ( DWORD* pGameInterface )");
+    DEBUG_TRACE("SClientEntity<T>* CPoolsSA::GetPed ( DWORD* pGameInterface )");
 
     CPedSAInterface* pInterface = reinterpret_cast<CPedSAInterface*>(pGameInterface);
 
     // 0x00400000 is used for bad player pointers some places in GTA
     if (pInterface && pGameInterface != (DWORD*)0x00400000)
     {
-        // Extract the element index from the handle  
-        DWORD dwElementIndexInPool = GetPedRef((DWORD*)pInterface) >> 8;
-        CPedSA* pPed = m_pedPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
-        if (pPed)
+        // Extract the element index from the handle
+        DWORD dwElementIndexInPool = GetPedPoolIndex((std::uint8_t*)pInterface);
+
+        if (dwElementIndexInPool < MAX_PEDS)
         {
-            return pPed;
+            SClientEntity<CPedSA>* pEntity = &m_pedPool.arrayOfClientEntities[dwElementIndexInPool];
+        
+            if (pEntity)
+            {
+                return pEntity;
+            }
         }
     }
 
-    return NULL;
+    return &pEmptyEntity<CPedSA>;
 }
 
 DWORD CPoolsSA::GetPedRef(CPed* pPed)
@@ -820,12 +754,12 @@ CPed* CPoolsSA::GetPedFromRef(DWORD dwGameRef)
     CPedSAInterface* pInterface = this->GetPedInterface(dwGameRef);
     if (pInterface)
     {
-        // Extract the element index from the handle  
-        DWORD dwElementIndexInPool = dwGameRef >> 8;
-        CPedSA * pPed = m_pedPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
+        // Extract the element index from the handle
+        DWORD   dwElementIndexInPool = dwGameRef >> 8;
+        CPedSA* pPed = m_pedPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
         if (pPed)
         {
-           return pPed;
+            return pPed;
         }
     }
     return NULL;
@@ -838,9 +772,8 @@ CPedSAInterface* CPoolsSA::GetPedInterface(DWORD dwGameRef)
     DWORD dwReturn;
     DWORD dwFunction = FUNC_GetPed;
 
-    _asm
-    {
-        mov     ecx, dword ptr ds:[CLASS_CPool_Ped]
+    _asm {
+        mov     ecx, dword ptr ds : [CLASS_CPool_Ped]
         push    dwGameRef
         call    dwFunction
         add     esp, 0x4
@@ -868,17 +801,84 @@ CEntity* CPoolsSA::GetEntity(DWORD* pGameInterface)
     if (pGameInterface)
     {
         CEntitySAInterface* pEntityInterface = (CEntitySAInterface*)(pGameInterface);
+        
         switch (pEntityInterface->nType)
         {
             case ENTITY_TYPE_PED:
-                return (CEntity*)GetPed(pGameInterface);
+            {
+                auto pTheEntity = GetPed(pGameInterface);
+                
+                if (pTheEntity->pEntity)
+                {
+                    return pTheEntity->pEntity;
+                }
                 break;
+            }
             case ENTITY_TYPE_VEHICLE:
-                return (CEntity*)GetVehicle(pGameInterface);
+            {
+                auto pTheEntity = GetVehicle(pGameInterface);
+
+                if (pTheEntity->pEntity)
+                {
+                    return pTheEntity->pEntity;
+                }
                 break;
+            }
             case ENTITY_TYPE_OBJECT:
-                return (CEntity*)GetObject(pGameInterface);
+            {
+                auto pTheEntity = GetObject(pGameInterface);
+
+                if (pTheEntity->pEntity)
+                {
+                    return pTheEntity->pEntity;
+                }
                 break;
+            }
+            default:
+                break;
+        }
+    }
+    return NULL;
+}
+
+CClientEntity* CPoolsSA::GetClientEntity(DWORD* pGameInterface)
+{
+    if (pGameInterface)
+    {
+        CEntitySAInterface* pEntityInterface = (CEntitySAInterface*)(pGameInterface);
+        
+        switch (pEntityInterface->nType)
+        {
+            case ENTITY_TYPE_PED:
+            {
+                auto pTheEntity = GetPed(pGameInterface);
+                
+                if (pTheEntity->pClientEntity)
+                {
+                    return pTheEntity->pClientEntity;
+                }
+                break;
+            }
+            case ENTITY_TYPE_VEHICLE:
+            {
+                auto pTheEntity = GetVehicle(pGameInterface);
+
+                if (pTheEntity->pClientEntity)
+                {
+                    return pTheEntity->pClientEntity;
+                }
+                break;
+            }
+            case ENTITY_TYPE_OBJECT:
+            {
+                auto pTheEntity = GetObject(pGameInterface);
+
+                if (pTheEntity->pClientEntity)
+                {
+                    return pTheEntity->pClientEntity;
+                }
+                break;
+            }
             default:
                 break;
         }
@@ -889,6 +889,7 @@ CEntity* CPoolsSA::GetEntity(DWORD* pGameInterface)
 CBuilding* CPoolsSA::AddBuilding(DWORD dwModelID)
 {
     DEBUG_TRACE("CBuilding * CPoolsSA::AddBuilding ( DWORD dwModelID )");
+
     if (m_ulBuildingCount <= MAX_BUILDINGS)
     {
         for (int i = 0; i < MAX_BUILDINGS; i++)
@@ -907,9 +908,9 @@ CBuilding* CPoolsSA::AddBuilding(DWORD dwModelID)
     return NULL;
 }
 
-CVehicle* CPoolsSA::AddTrain(CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId)
+CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId)
 {
-    DEBUG_TRACE("CVehicle* CPoolsSA::AddTrain ( CVector * vecPosition, DWORD dwModels[], int iSize, bool bDirection )");
+    DEBUG_TRACE("CVehicle* CPoolsSA::AddTrain ( CClientVehicle* pClientVehicle, CVector * vecPosition, DWORD dwModels[], int iSize, bool bDirection )");
 
     // clean the existing array
     MemSetFast((void*)VAR_TrainModelArray, 0, 32 * sizeof(DWORD));
@@ -940,22 +941,23 @@ CVehicle* CPoolsSA::AddTrain(CVector* vecPosition, DWORD dwModels[], int iSize, 
 
     DWORD dwFunc = FUNC_CTrain_CreateMissionTrain;
     _asm
-    {
-        push    0 // place as close to point as possible (rather than at node)? (maybe) (actually seems to have an effect on the speed, so changed from 1 to 0)
-        push    iDesiredTrackId // track ID
-        push    iNodeId // node to start at (-1 for closest node)
-        lea     ecx, pTrainEnd
-        push    ecx // end of train
-        lea     ecx, pTrainBeginning
-        push    ecx // begining of train
-        push    0 // train type (always use 0 as thats where we're writing to)
-        push    bDirection // direction
-        push    fZ // z
-        push    fY // y
-        push    fX // x
-        call    dwFunc
-        add     esp, 0x28
-    }
+        {
+        push    0            // place as close to point as possible (rather than at node)? (maybe) (actually seems to have an effect on the speed, so changed from
+                           // 1 to 0)
+                             push    iDesiredTrackId            // track ID
+                             push    iNodeId            // node to start at (-1 for closest node)
+                             lea     ecx, pTrainEnd
+                             push    ecx            // end of train
+                             lea     ecx, pTrainBeginning
+                             push    ecx            // begining of train
+                             push    0            // train type (always use 0 as thats where we're writing to)
+                             push    bDirection            // direction
+                             push    fZ            // z
+                             push    fY            // y
+                             push    fX            // x
+                             call    dwFunc
+                             add     esp, 0x28
+        }
 
     // Enable GetVehicle
     m_bGetVehicleEnabled = true;
@@ -968,7 +970,7 @@ CVehicle* CPoolsSA::AddTrain(CVector* vecPosition, DWORD dwModels[], int iSize, 
         if (m_vehiclePool.ulCount < MAX_VEHICLES)
         {
             trainHead = new CVehicleSA(pTrainBeginning);
-            if (!AddVehicleToPool(trainHead))
+            if (!AddVehicleToPool(pClientVehicle, trainHead))
             {
                 delete trainHead;
                 trainHead = NULL;
@@ -987,7 +989,7 @@ CVehicle* CPoolsSA::AddTrain(CVector* vecPosition, DWORD dwModels[], int iSize, 
                 if (vehCarriage)
                 {
                     carriage = new CVehicleSA(vehCarriage);
-                    if (!AddVehicleToPool(carriage))
+                    if (!AddVehicleToPool(pClientVehicle, carriage))
                     {
                         delete carriage;
                         carriage = NULL;
@@ -1009,15 +1011,32 @@ CVehicle* CPoolsSA::AddTrain(CVector* vecPosition, DWORD dwModels[], int iSize, 
     return trainHead;
 }
 
+DWORD CPoolsSA::GetPedPoolIndex(std::uint8_t* pInterface)
+{
+    DWORD dwAlignedSize = 1988;
+    return ((pInterface - (std::uint8_t*)(*m_ppPedPoolInterface)->m_pObjects) / dwAlignedSize);
+}
+
+DWORD CPoolsSA::GetVehiclePoolIndex(std::uint8_t* pInterface)
+{
+    DWORD dwAlignedSize = 2584;
+    return ((pInterface - (std::uint8_t*)(*m_ppVehiclePoolInterface)->m_pObjects) / dwAlignedSize);
+}
+
+DWORD CPoolsSA::GetObjectPoolIndex(std::uint8_t* pInterface)
+{
+    DWORD dwAlignedSize = 412;
+    return ((pInterface - (std::uint8_t*)(*m_ppObjectPoolInterface)->m_pObjects) / dwAlignedSize);
+}
+
 uint CPoolsSA::GetModelIdFromClump(RpClump* pRpClump)
 {
     // Search our pools for a match
     for (uint i = 0; i < m_pedPool.ulCount; i++)
     {
-        CClientPed * pClientPed = (CClientPed *) (m_pedPool.arrayOfClientEntities[i].pClientEntity);
-        if (pClientPed)
+        CEntitySA* pEntitySA = m_pedPool.arrayOfClientEntities[i].pEntity;
+        if (pEntitySA)
         {
-            CEntitySA* pEntitySA = m_pedPool.arrayOfClientEntities[i].pEntity; //m_pedPool.array[i];
             if (pEntitySA->GetRpClump() == pRpClump)
             {
                 return pEntitySA->GetModelIndex();
@@ -1027,19 +1046,25 @@ uint CPoolsSA::GetModelIdFromClump(RpClump* pRpClump)
 
     for (uint i = 0; i < m_vehiclePool.ulCount; i++)
     {
-        CEntitySA* pEntitySA = m_vehiclePool.array[i];
-        if (pEntitySA->GetRpClump() == pRpClump)
+        CEntitySA* pEntitySA = m_vehiclePool.arrayOfClientEntities[i].pEntity;
+        if (pEntitySA)
         {
-            return pEntitySA->GetModelIndex();
+            if (pEntitySA->GetRpClump() == pRpClump)
+            {
+                return pEntitySA->GetModelIndex();
+            }
         }
     }
 
     for (uint i = 0; i < m_objectPool.ulCount; i++)
     {
-        CEntitySA* pEntitySA = m_objectPool.array[i];
-        if (pEntitySA->GetRpClump() == pRpClump)
+        CEntitySA* pEntitySA = m_objectPool.arrayOfClientEntities[i].pEntity;
+        if (pEntitySA)
         {
-            return pEntitySA->GetModelIndex();
+            if (pEntitySA->GetRpClump() == pRpClump)
+            {
+                return pEntitySA->GetModelIndex();
+            }
         }
     }
 
