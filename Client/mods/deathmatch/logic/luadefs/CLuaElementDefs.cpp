@@ -1179,7 +1179,7 @@ int CLuaElementDefs::IsElementAttached(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
-    lua_pushnil(luaVM);
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
