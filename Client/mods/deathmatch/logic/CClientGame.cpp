@@ -158,7 +158,7 @@ CClientGame::CClientGame(bool bLocalPlay)
     CClientEntity::StartupEntitiesFromRoot();
 
     // Startup game entity tracking manager
-    m_pGameEntityXRefManager = NewGameEntityXRefManager();
+    // m_pGameEntityXRefManager = NewGameEntityXRefManager();
     m_pModelCacheManager = NewClientModelCacheManager();
 
     // Initialize our root entity with an invalid id, we dont know the true id until map-start
@@ -481,7 +481,7 @@ CClientGame::~CClientGame(void)
     SAFE_DELETE(m_pRootEntity);
 
     SAFE_DELETE(m_pModelCacheManager);
-    SAFE_DELETE(m_pGameEntityXRefManager);
+    // SAFE_DELETE(m_pGameEntityXRefManager);
     SAFE_DELETE(m_pZoneNames);
     SAFE_DELETE(m_pScriptKeyBinds);
 
@@ -1855,7 +1855,7 @@ void CClientGame::UpdatePlayerTarget(void)
 
         if (pColEntity)
         {
-            m_pTargetedEntity = m_pManager->FindEntity(pColEntity);
+            m_pTargetedEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pColEntity);
         }
         else
             m_pTargetedEntity = NULL;
@@ -2515,7 +2515,8 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                         vecCollision = pColPoint->GetPosition();
                         if (pGameEntity)
                         {
-                            CClientEntity* pEntity = m_pManager->FindEntity(pGameEntity);
+                            CClientEntity* pEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pGameEntity);
+
                             if (pEntity)
                             {
                                 pCollisionEntity = pEntity;
@@ -3750,7 +3751,10 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
     if (pGameEntity)
     {
         // Map to client entity and pass to the texture replacer
-        CClientEntity* pClientEntity = g_pClientGame->GetGameEntityXRefManager()->FindClientEntity(pGameEntity);
+        // CClientEntity* pClientEntity = g_pClientGame->GetGameEntityXRefManager()->FindClientEntity(pGameEntity);
+
+        CClientEntity* pClientEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pGameEntity);
+
         if (pClientEntity)
         {
             int    iTypeMask;
@@ -3802,7 +3806,8 @@ void CClientGame::DrawRadarAreasHandler(void)
 
 bool CClientGame::BreakTowLinkHandler(CVehicle* pTowedVehicle)
 {
-    CClientVehicle* pVehicle = m_pVehicleManager->Get(pTowedVehicle, false);
+    CClientVehicle* pVehicle = (CClientVehicle*)g_pGame->GetPools()->GetVehicle((DWORD*)pTowedVehicle)->pClientEntity;
+
     if (pVehicle)
     {
         // Check if this is a legal break
@@ -4180,12 +4185,14 @@ bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
     // Grab the damaged ped
     CClientPed* pDamagedPed = NULL;
     if (pDamagePed)
-        pDamagedPed = m_pPedManager->Get(dynamic_cast<CPlayerPed*>(pDamagePed), true, true);
+    {
+        pDamagedPed = (CClientPed*)g_pGame->GetPools()->GetPed((DWORD*)pDamagePed->GetPedInterface())->pClientEntity;
+    }
 
     // Grab the inflictor
     CClientEntity* pInflictingEntity = NULL;
     if (pInflictor)
-        pInflictingEntity = m_pManager->FindEntity(pInflictor, true);
+        pInflictingEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pInflictor->GetInterface());
 
     // If the damage was caused by an explosion
     if (weaponUsed == WEAPONTYPE_EXPLOSION)
@@ -4488,7 +4495,7 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
 
 void CClientGame::DeathHandler(CPed* pKilledPedSA, unsigned char ucDeathReason, unsigned char ucBodyPart)
 {
-    CClientPed* pKilledPed = m_pPedManager->Get(dynamic_cast<CPlayerPed*>(pKilledPedSA), true, true);
+    CClientPed* pKilledPed = (CClientPed*)g_pGame->GetPools()->GetPed((DWORD*)pKilledPedSA)->pClientEntity;
 
     if (!pKilledPed)
         return;
@@ -4526,7 +4533,7 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle
 
             CEntity*       pCollidedWithEntity = g_pGame->GetPools()->GetEntity((DWORD*)pCollidedWith);
             CClientEntity* pCollidedWithClientEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pCollidedWith);
-            
+
             CLuaArguments Arguments;
             if (pCollidedWithClientEntity)
             {
@@ -4709,7 +4716,7 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
     if (pClientVehicle)
     {
         CClientEntity* pClientAttacker = g_pGame->GetPools()->GetClientEntity((DWORD*)pAttackerInterface);
-        
+
         // Compose arguments
         // attacker, weapon, loss, damagepos, tyreIdx
         CLuaArguments Arguments;
@@ -4763,7 +4770,7 @@ bool CClientGame::ObjectDamageHandler(CObjectSAInterface* pObjectInterface, floa
         {
             CEntity*       pAttacker = g_pGame->GetPools()->GetEntity((DWORD*)pAttackerInterface);
             CClientEntity* pClientAttacker = g_pGame->GetPools()->GetClientEntity((DWORD*)pAttackerInterface);
-            
+
             CLuaArguments Arguments;
             Arguments.PushNumber(fLoss);
 
@@ -4804,8 +4811,9 @@ bool CClientGame::ObjectBreakHandler(CObjectSAInterface* pObjectInterface, CEnti
             pClientObject->SetHealth(0.0f);
 
             CEntity*       pAttacker = g_pGame->GetPools()->GetEntity((DWORD*)pAttackerInterface);
-            CClientEntity* pClientAttacker = g_pGame->GetPools()->GetClientEntity((DWORD*)pAttackerInterface);;
-            
+            CClientEntity* pClientAttacker = g_pGame->GetPools()->GetClientEntity((DWORD*)pAttackerInterface);
+            ;
+
             CLuaArguments Arguments;
 
             if (pClientAttacker)
@@ -4888,17 +4896,96 @@ bool CClientGame::VehicleFellThroughMapHandler(CVehicleSAInterface* pVehicleInte
 // Validate known objects
 void CClientGame::GameObjectDestructHandler(CEntitySAInterface* pObject)
 {
-    m_pGameEntityXRefManager->OnGameEntityDestruct(pObject);
+    // m_pGameEntityXRefManager->OnGameEntityDestruct(pObject);
+
+    CClientEntity* pClientEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pObject);
+
+    if (pClientEntity)
+    {
+        BYTE*  pInterface = (BYTE*)pObject;
+        DWORD  InterfaceVtbl = *(DWORD*)pInterface;
+        ushort InterfaceModelId = *(ushort*)(pInterface + 34);
+
+        SString  strClientEntityInfo;
+        CEntity* pGameEntity = NULL;
+
+        if (CClientPed* pPed = DynamicCast<CClientPed>(pClientEntity))
+            pGameEntity = pPed->GetGameEntity();
+
+        if (CClientVehicle* pVehicle = DynamicCast<CClientVehicle>(pClientEntity))
+            pGameEntity = pVehicle->GetGameEntity();
+
+        if (CClientObject* pObject = DynamicCast<CClientObject>(pClientEntity))
+            pGameEntity = pObject->GetGameEntity();
+
+        if (CClientProjectile* pProjectile = DynamicCast<CClientProjectile>(pClientEntity))
+            pGameEntity = pProjectile->GetGameEntity();
+
+        if (CClientPickup* pPickup = DynamicCast<CClientPickup>(pClientEntity))
+            pGameEntity = pPickup->GetGameObject();
+
+        CEntity*       pMappedGameEntity = g_pGame->GetPools()->GetEntity((DWORD*)pClientEntity);
+        CClientEntity* pMappedClientEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pGameEntity);
+
+        strClientEntityInfo = SString("%s Id:%x GameEntity:%08x MappedGameEntity:%08x MappedClientEntity:%08x", pClientEntity->GetClassName(),
+                                      pClientEntity->GetID(), (int)pGameEntity, (int)pMappedGameEntity, (int)pMappedClientEntity);
+
+        SString strMessage("EntitySAInterface:%08x  Vtbl:%08x  ModelId:%d   ClientEntity:%08x  [%s]", (int)pObject, InterfaceVtbl, InterfaceModelId,
+                           (int)pClientEntity, *strClientEntityInfo);
+
+        g_pCore->LogEvent(8542, "XRefManager", "GameEntity Mismatch", strMessage);
+        AddReportLog(8542, strMessage);
+    }
 }
 
 void CClientGame::GameVehicleDestructHandler(CEntitySAInterface* pVehicle)
 {
-    m_pGameEntityXRefManager->OnGameEntityDestruct(pVehicle);
+    // m_pGameEntityXRefManager->OnGameEntityDestruct(pVehicle);
 }
 
 void CClientGame::GamePlayerDestructHandler(CEntitySAInterface* pPlayer)
 {
-    m_pGameEntityXRefManager->OnGameEntityDestruct(pPlayer);
+    // m_pGameEntityXRefManager->OnGameEntityDestruct(pPlayer);
+
+    CClientEntity* pClientEntity = g_pCore->GetGame()->GetPools()->GetClientEntity((DWORD*)pPlayer);
+
+    if (pClientEntity)
+    {
+        BYTE*  pInterface = (BYTE*)pPlayer;
+        DWORD  InterfaceVtbl = *(DWORD*)pInterface;
+        ushort InterfaceModelId = *(ushort*)(pInterface + 34);
+
+        SString strClientEntityInfo;
+
+        CEntity* pGameEntity = NULL;
+
+        if (CClientPed* pPed = DynamicCast<CClientPed>(pClientEntity))
+            pGameEntity = pPed->GetGameEntity();
+
+        if (CClientVehicle* pVehicle = DynamicCast<CClientVehicle>(pClientEntity))
+            pGameEntity = pVehicle->GetGameEntity();
+
+        if (CClientObject* pObject = DynamicCast<CClientObject>(pClientEntity))
+            pGameEntity = pObject->GetGameEntity();
+
+        if (CClientProjectile* pProjectile = DynamicCast<CClientProjectile>(pClientEntity))
+            pGameEntity = pProjectile->GetGameEntity();
+
+        if (CClientPickup* pPickup = DynamicCast<CClientPickup>(pClientEntity))
+            pGameEntity = pPickup->GetGameObject();
+
+        CEntity*       pMappedGameEntity = g_pGame->GetPools()->GetEntity((DWORD*)pClientEntity);
+        CClientEntity* pMappedClientEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pGameEntity);
+
+        strClientEntityInfo = SString("%s Id:%x GameEntity:%08x MappedGameEntity:%08x MappedClientEntity:%08x", pClientEntity->GetClassName(),
+                                      pClientEntity->GetID(), (int)pGameEntity, (int)pMappedGameEntity, (int)pMappedClientEntity);
+
+        SString strMessage("EntitySAInterface:%08x  Vtbl:%08x  ModelId:%d   ClientEntity:%08x  [%s]", (int)pPlayer, InterfaceVtbl, InterfaceModelId,
+                           (int)pClientEntity, *strClientEntityInfo);
+
+        g_pCore->LogEvent(8542, "XRefManager", "GameEntity Mismatch", strMessage);
+        AddReportLog(8542, strMessage);
+    }
 }
 
 void CClientGame::GameProjectileDestructHandler(CEntitySAInterface* pProjectile)
@@ -4914,7 +5001,7 @@ void CClientGame::GameProjectileDestructHandler(CEntitySAInterface* pProjectile)
 
 void CClientGame::GameModelRemoveHandler(ushort usModelId)
 {
-    m_pGameEntityXRefManager->OnGameModelRemove(usModelId);
+    // m_pGameEntityXRefManager->OnGameModelRemove(usModelId);
 }
 
 void CClientGame::TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId)
@@ -4923,7 +5010,7 @@ void CClientGame::TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPiec
     if (bOldBehaviour)
         return;
 
-    CClientPed* pClientPedAttacker = DynamicCast<CClientPed>(GetGameEntityXRefManager()->FindClientEntity((CEntitySAInterface*)pPedAttacker));
+    CClientPed* pClientPedAttacker = (CClientPed*)g_pGame->GetPools()->GetPed((DWORD*)pPedAttacker)->pClientEntity;
 
     // Make sure cause was networked ped
     if (pClientPedAttacker && !pClientPedAttacker->IsLocalEntity())
@@ -5229,7 +5316,8 @@ void CClientGame::PostWeaponFire(void)
     CClientPed* pLocalPlayer = g_pClientGame->m_pLocalPlayer;
     if (pLocalPlayer && pWeaponFirePed)
     {
-        CClientPed* pPed = g_pClientGame->GetPedManager()->Get(pWeaponFirePed, true, true);
+        CClientPed* pPed = (CClientPed*)g_pGame->GetPools()->GetPed((DWORD*)pWeaponFirePed)->pClientEntity;
+
         if (pPed)
         {
             if (pPed->GetType() == CCLIENTPLAYER)
@@ -5279,7 +5367,7 @@ void CClientGame::PostWeaponFire(void)
                     }
 
                     if (pCollisionGameEntity)
-                        pCollisionEntity = g_pClientGame->m_pManager->FindEntity(pCollisionGameEntity);
+                        pCollisionEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pCollisionGameEntity);
                 }
                 else
                 {
@@ -5330,7 +5418,7 @@ void CClientGame::BulletImpact(CPed* pInitiator, CEntity* pVictim, const CVector
     if (pLocalPlayer && pInitiator)
     {
         // Find the client ped that initiated the bullet impact
-        CClientPed* pInitiatorPed = g_pClientGame->GetPedManager()->Get(dynamic_cast<CPlayerPed*>(pInitiator), true, true);
+        CClientPed* pInitiatorPed = (CClientPed*)g_pGame->GetPools()->GetPed((DWORD*)pInitiator)->pClientEntity;
 
         if (pInitiatorPed)
         {
@@ -5356,9 +5444,10 @@ void CClientGame::BulletImpact(CPed* pInitiator, CEntity* pVictim, const CVector
 
             // Find the client entity for the victim.
             CClientEntity* pClientVictim = NULL;
+
             if (pVictim)
             {
-                pClientVictim = g_pClientGame->m_pManager->FindEntity(pVictim);
+                pClientVictim = g_pGame->GetPools()->GetClientEntity((DWORD*)pVictim);
             }
 
             // Store the data in the bullet fire initiator.

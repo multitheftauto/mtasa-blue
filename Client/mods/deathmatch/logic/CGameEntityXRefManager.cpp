@@ -9,6 +9,8 @@
 
 #include "StdInc.h"
 
+#if defined(USE_ENTITYXREFMANAGER)
+
 ///////////////////////////////////////////////////////////////
 //
 //
@@ -265,3 +267,5 @@ void CGameEntityXRefManagerImpl::OnGameModelRemove(ushort usModelId)
 {
     // TODO - Something clever
 }
+
+#endif // !USE_ENTITYXREFMANAGER

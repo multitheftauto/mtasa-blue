@@ -1913,7 +1913,7 @@ CClientVehicle* CClientVehicle::GetPreviousTrainCarriage(void)
 
     if (m_pVehicle && m_pVehicle->GetPreviousTrainCarriage())
     {
-        return m_pVehicleManager->Get(m_pVehicle->GetPreviousTrainCarriage(), false);
+        return (CClientVehicle*)g_pGame->GetPools()->GetVehicle((DWORD*)m_pVehicle->GetPreviousTrainCarriage())->pClientEntity;
     }
     return m_pPreviousLink;
 }
@@ -1925,7 +1925,7 @@ CClientVehicle* CClientVehicle::GetNextTrainCarriage(void)
 
     if (m_pVehicle && m_pVehicle->GetNextTrainCarriage())
     {
-        return m_pVehicleManager->Get(m_pVehicle->GetNextTrainCarriage(), false);
+        return (CClientVehicle*)g_pGame->GetPools()->GetVehicle((DWORD*)m_pVehicle->GetNextTrainCarriage())->pClientEntity;
     }
     return m_pNextLink;
 }
@@ -2535,7 +2535,7 @@ void CClientVehicle::Create(void)
         m_pVehicle->SetStoredPointer(this);
 
         // Add XRef
-        g_pClientGame->GetGameEntityXRefManager()->AddEntityXRef(this, m_pVehicle);
+        //g_pClientGame->GetGameEntityXRefManager()->AddEntityXRef(this, m_pVehicle);
 
         /*if ( DoesNeedToWaitForGroundToLoad() )
         {
@@ -2963,7 +2963,7 @@ void CClientVehicle::Destroy(void)
         }
 
         // Remove XRef
-        g_pClientGame->GetGameEntityXRefManager()->RemoveEntityXRef(this, m_pVehicle);
+        //g_pClientGame->GetGameEntityXRefManager()->RemoveEntityXRef(this, m_pVehicle);
 
         // Destroy the vehicle
         g_pGame->GetPools()->RemoveVehicle(m_pVehicle);
@@ -3012,7 +3012,7 @@ CClientVehicle* CClientVehicle::GetTowedVehicle(void)
     {
         CVehicle* pGameVehicle = m_pVehicle->GetTowedVehicle();
         if (pGameVehicle)
-            return m_pVehicleManager->Get(pGameVehicle, false);
+            return (CClientVehicle*)g_pGame->GetPools()->GetVehicle((DWORD*)pGameVehicle)->pClientEntity;
     }
 
     return m_pTowedVehicle;
@@ -3024,7 +3024,7 @@ CClientVehicle* CClientVehicle::GetRealTowedVehicle(void)
     {
         CVehicle* pGameVehicle = m_pVehicle->GetTowedVehicle();
         if (pGameVehicle)
-            return m_pVehicleManager->Get(pGameVehicle, false);
+            return (CClientVehicle*)g_pGame->GetPools()->GetVehicle((DWORD*)pGameVehicle)->pClientEntity;
 
         // This is the only difference from ::GetTowedVehicle
         return NULL;
@@ -3293,7 +3293,8 @@ CClientEntity* CClientVehicle::GetPickedUpEntityWithWinch(void)
                 case ENTITY_TYPE_VEHICLE:
                 {
                     CVehicle*       pGameVehicle = dynamic_cast<CVehicle*>(pPhysical);
-                    CClientVehicle* pVehicle = m_pVehicleManager->Get(pGameVehicle, false);
+                    CClientVehicle* pVehicle = (CClientVehicle*)g_pGame->GetPools()->GetVehicle((DWORD*)pGameVehicle)->pClientEntity;
+
                     if (pVehicle)
                         pEntity = static_cast<CClientEntity*>(pVehicle);
                     break;
@@ -3301,7 +3302,8 @@ CClientEntity* CClientVehicle::GetPickedUpEntityWithWinch(void)
                 case ENTITY_TYPE_PED:
                 {
                     CPlayerPed* pPlayerPed = dynamic_cast<CPlayerPed*>(pPhysical);
-                    CClientPed* pModel = m_pManager->GetPedManager()->Get(pPlayerPed, false, false);
+                    CClientPed* pModel = (CClientPed*)g_pGame->GetPools()->GetPed((DWORD*)pPlayerPed)->pClientEntity;
+
                     if (pModel)
                         pEntity = static_cast<CClientEntity*>(pModel);
                     break;
@@ -3309,7 +3311,8 @@ CClientEntity* CClientVehicle::GetPickedUpEntityWithWinch(void)
                 case ENTITY_TYPE_OBJECT:
                 {
                     CObject*       pGameObject = dynamic_cast<CObject*>(pPhysical);
-                    CClientObject* pObject = m_pManager->GetObjectManager()->Get(pGameObject, false);
+                    CClientObject* pObject = (CClientObject*)g_pGame->GetPools()->GetObjectA((DWORD*)pGameObject)->pClientEntity;
+
                     if (pObject)
                         pEntity = static_cast<CClientEntity*>(pObject);
                     break;

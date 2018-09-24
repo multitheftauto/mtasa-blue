@@ -496,7 +496,7 @@ void CClientObject::Create(void)
                 m_pObject->SetStoredPointer(this);
 
                 // Add XRef
-                g_pClientGame->GetGameEntityXRefManager()->AddEntityXRef(this, m_pObject);
+                //g_pClientGame->GetGameEntityXRefManager()->AddEntityXRef(this, m_pObject);
 
                 // Apply our data to the object
                 m_pObject->Teleport(m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ);
@@ -563,7 +563,7 @@ void CClientObject::Destroy(void)
         m_pManager->InvalidateEntity(this);
 
         // Remove XRef
-        g_pClientGame->GetGameEntityXRefManager()->RemoveEntityXRef(this, m_pObject);
+        //g_pClientGame->GetGameEntityXRefManager()->RemoveEntityXRef(this, m_pObject);
 
         // Destroy the object
         g_pGame->GetPools()->RemoveObject(m_pObject);

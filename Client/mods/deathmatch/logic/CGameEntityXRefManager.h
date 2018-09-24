@@ -7,6 +7,8 @@
  *
  *****************************************************************************/
 
+#if defined(USE_ENTITYXREFMANAGER)
+
 class CGameEntityXRefManager
 {
 public:
@@ -29,3 +31,5 @@ public:
 };
 
 CGameEntityXRefManager* NewGameEntityXRefManager(void);
+
+#endif // !USE_ENTITYXREFMANAGER

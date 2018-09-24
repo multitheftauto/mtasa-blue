@@ -1541,7 +1541,7 @@ CClientEntity* CStaticFunctionDefinitions::GetPedTarget(CClientPed& Ped)
     CClientEntity* pCollisionEntity = NULL;
     if (pCollisionGameEntity)
     {
-        pCollisionEntity = m_pManager->FindEntity(pCollisionGameEntity);
+        pCollisionEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pCollisionGameEntity);
 
         return pCollisionEntity;
     }
@@ -2190,19 +2190,19 @@ bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CClientEntity& Entity, con
 {
     RUN_CHILDREN(SetPedAnimationSpeed(**iter, strAnimName, fSpeed))
 
-        if (IS_PED(&Entity))
+    if (IS_PED(&Entity))
+    {
+        CClientPed& Ped = static_cast<CClientPed&>(Entity);
+        if (!strAnimName.empty())
         {
-            CClientPed& Ped = static_cast<CClientPed&>(Entity);
-            if (!strAnimName.empty())
+            auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(Ped.GetClump(), strAnimName);
+            if (pAnimAssociation)
             {
-                auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(Ped.GetClump(), strAnimName);
-                if (pAnimAssociation)
-                {
-                    pAnimAssociation->SetCurrentSpeed(fSpeed);
-                    return true;
-                }
+                pAnimAssociation->SetCurrentSpeed(fSpeed);
+                return true;
             }
         }
+    }
 
     return false;
 }
@@ -6058,8 +6058,7 @@ bool CStaticFunctionDefinitions::ProcessLineOfSight(const CVector& vecStart, con
     if (pIgnoredEntity)
         g_pGame->GetWorld()->IgnoreEntity(NULL);
 
-    *pColEntity = m_pManager->FindEntity(pColGameEntity);
-
+    *pColEntity = m_pGame->GetPools()->GetClientEntity((DWORD*)pColGameEntity);
     return true;
 }
 
