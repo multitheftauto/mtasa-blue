@@ -11,6 +11,9 @@
 
 #include "StdInc.h"
 
+// Disables pay and sprays (making sounds when closing) / https://wiki.multitheftauto.com/wiki/Garage
+static const int iDisabledGarages[] = {1, 8, 11, 12, 19, 23, 26, 27, 29, 32, 36, 40, 41, 47};
+
 CGaragesSA::CGaragesSA(CGaragesSAInterface* pInterface)
 {
     this->internalInterface = pInterface;
@@ -32,19 +35,30 @@ CGaragesSA::~CGaragesSA()
 
 void CGaragesSA::Initialize()
 {
-    // Disable pay and sprays and mod shops
-    static const int iPayAndSprays[] = {7, 8, 10, 11, 12, 15, 18, 19, 24, 27, 32, 33, 36, 40, 41, 47};
-    for (unsigned int i = 0; i < sizeof(iPayAndSprays) / sizeof(int); ++i)
+    for (unsigned int i = 0; i < sizeof(iDisabledGarages) / sizeof(int); ++i)
     {
-        this->Garages[iPayAndSprays[i]]->SetType(1);
+        this->Garages[iDisabledGarages[i]]->SetType(1);
     }
 }
 
 CGarageSA* CGaragesSA::GetGarage(DWORD dwID)
 {
-    if (dwID >= 0 && dwID < MAX_GARAGES)
+    bool bIsDisabled = false;
+
+    // Check if garage has been disabled
+    for (unsigned int i = 0; i < sizeof(iDisabledGarages) / sizeof(int); ++i)
+    {
+        if (dwID == iDisabledGarages[i])
+        {
+            bIsDisabled = true;
+            break;
+        }
+    }
+
+    if (!bIsDisabled && dwID >= 0 && dwID < MAX_GARAGES)
     {
         return this->Garages[dwID];
     }
+
     return NULL;
 }
