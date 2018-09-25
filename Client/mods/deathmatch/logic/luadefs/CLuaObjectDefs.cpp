@@ -21,6 +21,7 @@ void CLuaObjectDefs::LoadFunctions(void)
         {"isObjectStatic", IsObjectStatic},
         {"getObjectScale", GetObjectScale},
         {"isObjectBreakable", IsObjectBreakable},
+        {"getObjectMass", GetObjectMass},
         {"getObjectProperty", GetObjectProperty},
 
         // Object set funcs
@@ -55,6 +56,7 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "getScale", "getObjectScale");
     lua_classfunction(luaVM, "isBreakable", "isObjectBreakable");
+    lua_classfunction(luaVM, "getMass", "getObjectMass");
     lua_classfunction(luaVM, "getProperties", GetObjectProperties);
     lua_classfunction(luaVM, "getProperty", "getObjectProperty");
 
@@ -195,6 +197,29 @@ int CLuaObjectDefs::IsObjectBreakable(lua_State* luaVM)
         if (CStaticFunctionDefinitions::IsObjectBreakable(*pObject, bBreakable))
         {
             lua_pushboolean(luaVM, bBreakable);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaObjectDefs::GetObjectMass(lua_State* luaVM)
+{
+    //  float getObjectMass ( object theObject )
+    CClientObject* pObject;
+    float          fMass;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pObject);
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::GetObjectMass(*pObject, fMass))
+        {
+            lua_pushnumber(luaVM, fMass);
             return 1;
         }
     }

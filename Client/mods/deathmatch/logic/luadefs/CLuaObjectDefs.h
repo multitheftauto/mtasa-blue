@@ -25,6 +25,7 @@ public:
     LUA_DECLARE(IsObjectStatic);
     LUA_DECLARE(GetObjectScale);
     LUA_DECLARE(IsObjectBreakable);
+    LUA_DECLARE(GetObjectMass);
     LUA_DECLARE(GetObjectProperty);
     LUA_DECLARE(GetObjectProperties);
 
