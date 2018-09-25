@@ -19,7 +19,7 @@ static CCoreInterface*           m_pCore;
 static CGame*                    m_pGame;
 static CClientGame*              m_pClientGame;
 static CClientManager*           m_pManager;
-static CClientEntity*            m_pRootEntity;
+static CClientEntity*            m_pRooGtEntity;
 static CClientPlayerManager*     m_pPlayerManager;
 static CClientVehicleManager*    m_pVehicleManager;
 static CClientObjectManager*     m_pObjectManager;

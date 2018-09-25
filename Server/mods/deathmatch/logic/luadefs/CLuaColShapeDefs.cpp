@@ -14,15 +14,10 @@
 void CLuaColShapeDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
-        {"createColCircle", CreateColCircle},
-        {"createColCuboid", CreateColCuboid},
-        {"createColSphere", CreateColSphere},
-        {"createColRectangle", CreateColRectangle},
-        {"createColPolygon", CreateColPolygon},
-        {"createColTube", CreateColTube},
+        {"createColCircle", CreateColCircle},       {"createColCuboid", CreateColCuboid},   {"createColSphere", CreateColSphere},
+        {"createColRectangle", CreateColRectangle}, {"createColPolygon", CreateColPolygon}, {"createColTube", CreateColTube},
 
-        {"isInsideColShape", IsInsideColShape},
-        {"getColShapeType", GetColShapeType},
+        {"isInsideColShape", IsInsideColShape},     {"getColShapeType", GetColShapeType},   {"getColShapeCount", GetColShapeCount},
     };
 
     // Add functions
@@ -334,6 +329,21 @@ int CLuaColShapeDefs::CreateColTube(lua_State* luaVM)
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaColShapeDefs::GetColShapeCount(lua_State* luaVM)
+{
+    // int getColShapeCount()
+    unsigned int uiCount = 0;
+    if (CStaticFunctionDefinitions::GetColShapeCount(uiCount))
+    {
+        lua_pushnumber(luaVM, static_cast<lua_Number>(uiCount));
+        return 1;
+    }
+
+    // Failed
     lua_pushboolean(luaVM, false);
     return 1;
 }

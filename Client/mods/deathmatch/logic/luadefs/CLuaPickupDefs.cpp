@@ -16,8 +16,11 @@ void CLuaPickupDefs::LoadFunctions(void)
     std::map<const char*, lua_CFunction> functions{
         {"createPickup", CreatePickup},
 
-        {"getPickupType", GetPickupType}, {"getPickupWeapon", GetPickupWeapon}, {"getPickupAmount", GetPickupAmount},
-        {"getPickupAmmo", GetPickupAmmo}, {"getPickupCount", GetPickupCount},
+        {"getPickupType", GetPickupType},
+        {"getPickupWeapon", GetPickupWeapon},
+        {"getPickupAmount", GetPickupAmount},
+        {"getPickupAmmo", GetPickupAmmo},
+        {"getPickupCount", GetPickupCount},
 
         {"setPickupType", SetPickupType},
     };

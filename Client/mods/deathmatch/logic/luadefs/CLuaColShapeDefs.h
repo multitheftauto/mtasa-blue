@@ -27,4 +27,5 @@ public:
 
     LUA_DECLARE(IsInsideColShape);
     LUA_DECLARE(GetColShapeType);
+    LUA_DECLARE(GetColShapeCount);
 };
