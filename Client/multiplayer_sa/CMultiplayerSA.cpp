@@ -300,7 +300,7 @@ DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIProp = FUNC_CAEVehicleAudioEntity__
 #define HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance   0x68A4EF
 DWORD RETURN_CTaskSimpleSwim_ProcessSwimmingResistance = 0x68A50E;
 
-#define HOOKPOS_WatterCannonHitWorld   0x72932A
+#define HOOKPOS_CWaterCannon_Render   0x72932A
 DWORD CONTINUE_WaterCannonHit = 0x72932F;
 
 CPed*         pContextSwitchedPed = 0;
@@ -763,7 +763,7 @@ void CMultiplayerSA::InitHooks()
     // Fix GTA:SA swimming speed problem on higher fps
     HookInstall(HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance, (DWORD)HOOK_CTaskSimpleSwim_ProcessSwimmingResistance, 6);
 
-    HookInstall(HOOKPOS_WatterCannonHitWorld, (DWORD)HOOK_WaterCannonHitWorld, 5);
+    HookInstall(HOOKPOS_CWaterCannon_Render, (DWORD)HOOK_WaterCannonHitWorld, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -6907,7 +6907,7 @@ void _declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
     }
 }
 
-static void __cdecl Hook_CannonHitWorld(CColPointSAInterface& pColPoint)
+static void __cdecl WaterCannonHitWorld(CColPointSAInterface& pColPoint)
 {
     if (m_pWaterCannonHitWorldHandler)
     {
@@ -6922,7 +6922,7 @@ static void _declspec(naked) HOOK_WaterCannonHitWorld()
         pushad
         lea eax, [esp + 100h - 54h]
         push eax
-        call Hook_CannonHitWorld
+        call WaterCannonHitWorld
         add     esp, 4
         popad
 
