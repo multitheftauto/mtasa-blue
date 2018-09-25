@@ -319,7 +319,7 @@ CElement* CStaticFunctionDefinitions::CloneElement(CResource* pResource, CElemen
         return nullptr;
     }
 
-    bool      bAddEntity = true;
+    bool bAddEntity = true;
     CElement* pNewElement = pElement->Clone(&bAddEntity, pResource);
 
     if (pNewElement)
