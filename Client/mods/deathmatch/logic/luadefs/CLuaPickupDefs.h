@@ -20,6 +20,7 @@ public:
 
     LUA_DECLARE(CreatePickup);
 
+    LUA_DECLARE(GetPickupCount);
     LUA_DECLARE(GetPickupType);
     LUA_DECLARE(GetPickupWeapon);
     LUA_DECLARE(GetPickupAmount);

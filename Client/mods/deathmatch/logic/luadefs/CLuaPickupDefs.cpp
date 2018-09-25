@@ -16,10 +16,8 @@ void CLuaPickupDefs::LoadFunctions(void)
     std::map<const char*, lua_CFunction> functions{
         {"createPickup", CreatePickup},
 
-        {"getPickupType", GetPickupType},
-        {"getPickupWeapon", GetPickupWeapon},
-        {"getPickupAmount", GetPickupAmount},
-        {"getPickupAmmo", GetPickupAmmo},
+        {"getPickupType", GetPickupType}, {"getPickupWeapon", GetPickupWeapon}, {"getPickupAmount", GetPickupAmount},
+        {"getPickupAmmo", GetPickupAmmo}, {"getPickupCount", GetPickupCount},
 
         {"setPickupType", SetPickupType},
     };
@@ -173,6 +171,13 @@ int CLuaPickupDefs::GetPickupAmmo(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPickupDefs::GetPickupCount(lua_State* luaVM)
+{
+    unsigned int uiCount = m_pPickupManager->Count();
+    lua_pushnumber(luaVM, static_cast<lua_Number>(uiCount));
     return 1;
 }
 

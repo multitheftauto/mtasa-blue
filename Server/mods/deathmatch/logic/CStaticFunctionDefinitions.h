@@ -436,6 +436,8 @@ public:
     static bool GetPickupAmmo(CPickup* pPickup, unsigned short& ucAmmo);
     static bool GetPickupRespawnInterval(CPickup* pPickup, unsigned long& ulInterval);
     static bool IsPickupSpawned(CPickup* pPickup, bool& bSpawned);
+    static bool GetPickupCount(unsigned int& uiCount);
+    static bool GetColShapeCount(unsigned int& uiCount);
 
     // Pickup set funcs
     static bool SetPickupType(CElement* pElement, unsigned char ucType, double dThree, double dFour);

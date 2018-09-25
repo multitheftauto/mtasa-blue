@@ -319,7 +319,7 @@ CElement* CStaticFunctionDefinitions::CloneElement(CResource* pResource, CElemen
         return nullptr;
     }
 
-    bool bAddEntity = true;
+    bool      bAddEntity = true;
     CElement* pNewElement = pElement->Clone(&bAddEntity, pResource);
 
     if (pNewElement)
@@ -8367,6 +8367,13 @@ bool CStaticFunctionDefinitions::IsPickupSpawned(CPickup* pPickup, bool& bSpawne
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetPickupCount(unsigned int& uiCount)
+{
+    uiCount = m_pPickupManager->Count();
+
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetPickupType(CElement* pElement, unsigned char ucType, double dThree, double dFour)
 {
     assert(pElement);
@@ -9325,6 +9332,13 @@ CColTube* CStaticFunctionDefinitions::CreateColTube(CResource* pResource, const 
 bool CStaticFunctionDefinitions::IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside)
 {
     inside = pColShape->DoHitDetection(vecPosition);
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetColShapeCount(unsigned int& uiCount)
+{   
+    uiCount = m_pColManager->Count();
 
     return true;
 }
