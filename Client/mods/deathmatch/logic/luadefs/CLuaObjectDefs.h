@@ -39,5 +39,6 @@ public:
     LUA_DECLARE(BreakObject);
     LUA_DECLARE(RespawnObject);
     LUA_DECLARE(ToggleObjectRespawn);
+    LUA_DECLARE(SetObjectMass);
     LUA_DECLARE(SetObjectProperty);
 };
