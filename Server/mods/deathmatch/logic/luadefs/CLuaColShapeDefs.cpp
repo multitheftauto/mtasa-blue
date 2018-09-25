@@ -22,7 +22,8 @@ void CLuaColShapeDefs::LoadFunctions()
         {"createColTube", CreateColTube},
 
         {"isInsideColShape", IsInsideColShape},
-        {"getColShapeType", GetColShapeType},
+        {"getColShapeType", GetColShapeType}, 
+        {"getColShapeCount", GetColShapeCount},
     };
 
     // Add functions
@@ -334,6 +335,21 @@ int CLuaColShapeDefs::CreateColTube(lua_State* luaVM)
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaColShapeDefs::GetColShapeCount(lua_State* luaVM)
+{
+    // int getColShapeCount()
+    unsigned int uiCount = 0;
+    if (CStaticFunctionDefinitions::GetColShapeCount(uiCount))
+    {
+        lua_pushnumber(luaVM, static_cast<lua_Number>(uiCount));
+        return 1;
+    }
+
+    // Failed
     lua_pushboolean(luaVM, false);
     return 1;
 }

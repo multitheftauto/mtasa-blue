@@ -23,6 +23,7 @@ void CLuaColShapeDefs::LoadFunctions(void)
 
         {"isInsideColShape", IsInsideColShape},
         {"getColShapeType", GetColShapeType},
+        {"getColShapeCount", GetColShapeCount},
     };
 
     // Add functions
@@ -354,6 +355,13 @@ int CLuaColShapeDefs::CreateColTube(lua_State* luaVM)
         m_pScriptDebugging->LogBadType(luaVM);
 
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaColShapeDefs::GetColShapeCount(lua_State* luaVM)
+{
+    unsigned int uiCount = m_pColManager->Count();
+    lua_pushnumber(luaVM, static_cast<lua_Number>(uiCount));
     return 1;
 }
 

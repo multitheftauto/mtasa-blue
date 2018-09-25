@@ -28,6 +28,7 @@ public:
     LUA_DECLARE(getPickupAmmo);
     LUA_DECLARE(getPickupRespawnInterval);
     LUA_DECLARE(isPickupSpawned);
+    LUA_DECLARE(GetPickupCount);
 
     // Set
     LUA_DECLARE(setPickupType);

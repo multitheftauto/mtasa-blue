@@ -20,6 +20,7 @@ void CLuaPickupDefs::LoadFunctions(void)
         {"getPickupWeapon", GetPickupWeapon},
         {"getPickupAmount", GetPickupAmount},
         {"getPickupAmmo", GetPickupAmmo},
+        {"getPickupCount", GetPickupCount},
 
         {"setPickupType", SetPickupType},
     };
@@ -173,6 +174,13 @@ int CLuaPickupDefs::GetPickupAmmo(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPickupDefs::GetPickupCount(lua_State* luaVM)
+{
+    unsigned int uiCount = m_pPickupManager->Count();
+    lua_pushnumber(luaVM, static_cast<lua_Number>(uiCount));
     return 1;
 }
 

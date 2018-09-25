@@ -24,6 +24,7 @@ void CLuaPickupDefs::LoadFunctions()
         {"getPickupAmmo", getPickupAmmo},
         {"getPickupRespawnInterval", getPickupRespawnInterval},
         {"isPickupSpawned", isPickupSpawned},
+        {"getPickupCount", GetPickupCount},
 
         // Set
         {"setPickupType", setPickupType},
@@ -249,6 +250,21 @@ int CLuaPickupDefs::isPickupSpawned(lua_State* luaVM)
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPickupDefs::GetPickupCount(lua_State* luaVM)
+{
+    // int getPickupCount()
+    unsigned int uiCount = 0;
+    if (CStaticFunctionDefinitions::GetPickupCount(uiCount))
+    {
+        lua_pushnumber(luaVM, static_cast<lua_Number>(uiCount));
+        return 1;
+    }
+
+    // Failed
     lua_pushboolean(luaVM, false);
     return 1;
 }

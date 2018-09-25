@@ -26,6 +26,7 @@ public:
 
     bool Exists(CColShape* pShape);
     void DeleteAll(void);
+    unsigned int Count(void) { return static_cast<unsigned int>(m_List.size()); }
 
     std::vector<CColShape*>::const_iterator IterBegin(void) { return m_List.begin(); }
     std::vector<CColShape*>::const_iterator IterEnd(void) { return m_List.end(); }
