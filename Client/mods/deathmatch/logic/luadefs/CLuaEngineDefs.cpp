@@ -1129,7 +1129,7 @@ int CLuaEngineDefs::EngineGetModelCollisionData(lua_State* luaVM)
                             std::map<ushort, CompressedVector>::iterator it;
                             for (it = vecVertices.begin(); it != vecVertices.end(); it++)
                             {
-                                lua_pushnumber(luaVM, it->first);
+                                lua_pushnumber(luaVM, it->first + 1);
                                 CVector vec = it->second.getVector();
                                 lua_newtable(luaVM);
                                 lua_pushnumber(luaVM, 1);
@@ -1158,6 +1158,22 @@ int CLuaEngineDefs::EngineGetModelCollisionData(lua_State* luaVM)
     return 1;
 }
 
+void VectorAlign(CVector& destMin, CVector& destMax, CVector& src)
+{
+    if (src.fX < destMax.fX)
+        destMax.fX = src.fX;
+    if (src.fY < destMax.fY)
+        destMax.fY = src.fY;
+    if (src.fZ < destMax.fZ)
+        destMax.fZ = src.fZ;
+
+    if (src.fX > destMin.fX)
+        destMin.fX = src.fX;
+    if (src.fY > destMin.fY)
+        destMin.fY = src.fY;
+    if (src.fZ > destMin.fZ)
+        destMin.fZ = src.fZ;
+}
 int CLuaEngineDefs::EngineUpdateModelCollisionBoundingBox(lua_State* luaVM)
 {
     ushort usModel;
@@ -1180,41 +1196,46 @@ int CLuaEngineDefs::EngineUpdateModelCollisionBoundingBox(lua_State* luaVM)
                     CVector maxVec(0, 0, 0);
                     CVector center(0, 0, 0);
                     CVector pBoxMinVec, pBoxMaxVec;
+
+                    CColSphereSA pSphere;
+                    CColBoxSA pBox;
+                    float fDis;
                     for (uint i = 0; pColData->numColBoxes > i; i++)
                     {
-                        CColBoxSA pBox = pColData->pColBoxes[i];
+                        pBox = pColData->pColBoxes[i];
                         pBoxMaxVec = pBox.max;
                         pBoxMinVec = pBox.min;
-                        float fDis = DistanceBetweenPoints3D(pBoxMaxVec, center);
+                        fDis = DistanceBetweenPoints3D(pBoxMaxVec, center);
                         if (fDis > fRadius)
                         {
                             fRadius = fDis;
                         }
-                        
-                        if (minVec.fX > pBoxMinVec.fX)
-                        {
-                            minVec.fX = pBoxMinVec.fX;
-                        }
-                        if (minVec.fY > pBoxMinVec.fY)
-                        {
-                            minVec.fY = pBoxMinVec.fY;
-                        }
-                        if (minVec.fZ > pBoxMinVec.fZ)
-                        {
-                            minVec.fZ = pBoxMinVec.fZ;
-                        }
+                        VectorAlign(maxVec, minVec, pBoxMinVec);
+                        VectorAlign(maxVec, minVec, pBoxMaxVec);
+                    }
 
-                        if (maxVec.fX < pBoxMaxVec.fX)
+                    for (uint i = 0; pColData->numColSpheres > i; i++)
+                    {
+                        pSphere = pColData->pColSpheres[i];
+                        pBoxMaxVec = pSphere.vecCenter;
+                        VectorAlign(maxVec, minVec, pBoxMaxVec);
+                        pBoxMaxVec.fX += pSphere.fRadius;
+                        pBoxMaxVec.fY += pSphere.fRadius;
+                        pBoxMaxVec.fZ += pSphere.fRadius;
+                        VectorAlign(maxVec, minVec, pBoxMaxVec);
+                        fDis = DistanceBetweenPoints3D(pBoxMaxVec, center);
+                        if (fDis > fRadius)
                         {
-                            maxVec.fX = pBoxMaxVec.fX;
+                            fRadius = fDis;
                         }
-                        if (maxVec.fY < pBoxMaxVec.fY)
+                        pBoxMaxVec.fX -= pSphere.fRadius * 2;
+                        pBoxMaxVec.fY -= pSphere.fRadius * 2;
+                        pBoxMaxVec.fZ -= pSphere.fRadius * 2;
+                        VectorAlign(maxVec, minVec, pBoxMaxVec);
+                        fDis = DistanceBetweenPoints3D(pBoxMaxVec, center);
+                        if (fDis > fRadius)
                         {
-                            maxVec.fY = pBoxMaxVec.fY;
-                        }
-                        if (maxVec.fZ < pBoxMaxVec.fZ)
-                        {
-                            maxVec.fZ = pBoxMaxVec.fZ;
+                            fRadius = fDis;
                         }
                     }
                     pBoundingBox->fRadius = fRadius;
@@ -1260,6 +1281,7 @@ int CLuaEngineDefs::EngineSetModelCollisionData(lua_State* luaVM)
                     CColDataSA* pColData = pCol->pColData;
                     switch (eCollisionShape)
                     {
+                        usShapeId--;
                         case COLLISION_BOX:
                             if (usShapeId >= 0 && usShapeId < pColData->numColBoxes)
                             {
@@ -1287,13 +1309,31 @@ int CLuaEngineDefs::EngineSetModelCollisionData(lua_State* luaVM)
                                             lua_pushboolean(luaVM, true);
                                             return 1;
                                         }
+                                    case COLLISION_KEY_POSITION:
+                                        argStream.ReadVector3D(vec1);
+                                        if (!argStream.HasErrors())
+                                        {
+                                            vec2 = CVector(pBox->min.fX + pBox->max.fX, pBox->min.fY + pBox->max.fY, pBox->min.fZ + pBox->max.fZ);
+                                            vec2.fX = sqrt(vec2.fX);
+                                            vec2.fY = sqrt(vec2.fY);
+                                            vec2.fZ = sqrt(vec2.fZ);
+                                            pBox->min -= vec1 + vec2;
+                                            vec2 = CVector(pBox->max.fX * pBox->max.fX, pBox->max.fY * pBox->max.fY, pBox->max.fZ * pBox->max.fZ);
+                                            vec2.fX = sqrt(vec2.fX);
+                                            vec2.fY = sqrt(vec2.fY);
+                                            vec2.fZ = sqrt(vec2.fZ);
+                                            pBox->max -= vec1 + vec2;
+
+                                            lua_pushboolean(luaVM, true);
+                                            return 1;
+                                        }
 
                                     break;
                                 }
                             }
                         break;
                         case COLLISION_SPHERE:
-                            if (usShapeId >= 0 && usShapeId < pColData->numColBoxes)
+                            if (usShapeId >= 0 && usShapeId < pColData->numColSpheres)
                             {
                                 CColSphereSA* pSphere = &pColData->pColSpheres[usShapeId];
                                 switch (eCollisionKey)
@@ -1390,7 +1430,7 @@ int CLuaEngineDefs::EngineSetModelCollisionData(lua_State* luaVM)
                             }
                         break;
                         case COLLISION_VERTEX:
-                            if (true)
+                            if (false)
                             {
                                 CompressedVector* pVector = &pColData->pVertices[usShapeId];
                                 switch (eCollisionKey)
@@ -1411,7 +1451,6 @@ int CLuaEngineDefs::EngineSetModelCollisionData(lua_State* luaVM)
                             }
                         break;
                     }
-                    return 1;
                 }
             }
         }
@@ -1426,6 +1465,7 @@ int CLuaEngineDefs::EngineSetModelCollisionData(lua_State* luaVM)
 int CLuaEngineDefs::EngineModelCollisionCreateShape(lua_State* luaVM)
 {
     ushort usModel;
+    float fRadius;
     eCollisionShapes eCollisionShape;
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
@@ -1442,26 +1482,26 @@ int CLuaEngineDefs::EngineModelCollisionCreateShape(lua_State* luaVM)
                 {
                     CColDataSA* pColData = pCol->pColData;
 
-                    CVector vecMin, vecMax;
+                    CVector vecMin, vecMax, vecPosition;
                     uchar cMaterial;
                     switch (eCollisionShape)
                     {
                         case COLLISION_BOX:
                             argStream.ReadVector3D(vecMin);
                             argStream.ReadVector3D(vecMax);
-                            argStream.ReadNumber(cMaterial);
+                            argStream.ReadNumber(cMaterial, 0);
                             if (!argStream.HasErrors())
                             {
                                 CColBoxSA* newArr = new CColBoxSA[pColData->numColBoxes + 1];
                                 memcpy(newArr, pColData->pColBoxes, sizeof(CColBoxSA) * pColData->numColBoxes);
 
                                 CColBoxSA* newBox = new CColBoxSA;
-                                newBox->min = vecMin;
-                                newBox->min = vecMax;
-                                newBox->material = cMaterial;
+                                memcpy(newArr + sizeof(CColBoxSA) * pColData->numColBoxes, newBox, sizeof(CColBoxSA));
 
-                                //memcpy(newArr + sizeof(CColBoxSA) * pColData->numColBoxes, &newBox, sizeof(CColBoxSA));
-                                newArr[pColData->numColBoxes] = *newBox;
+                                CColBoxSA* lastBox = &newArr[pColData->numColBoxes];
+                                lastBox->min = vecMin;
+                                lastBox->max = vecMax;
+                                lastBox->material = cMaterial;
                                 pColData->numColBoxes++;
                                 pColData->pColBoxes = newArr;
                                 lua_pushnumber(luaVM, pColData->numColBoxes);
@@ -1469,6 +1509,26 @@ int CLuaEngineDefs::EngineModelCollisionCreateShape(lua_State* luaVM)
                             }
                         break;
                         case COLLISION_SPHERE:
+                            argStream.ReadVector3D(vecPosition);
+                            argStream.ReadNumber(fRadius);
+                            argStream.ReadNumber(cMaterial, 0);
+                            if (!argStream.HasErrors())
+                            {
+                                CColSphereSA* newArr = new CColSphereSA[pColData->numColSpheres + 1];
+                                memcpy(newArr, pColData->pColSpheres, sizeof(CColBoxSA) * pColData->numColSpheres);
+
+                                CColSphereSA* newSphere = new CColSphereSA;
+                                memcpy(newArr + sizeof(CColSphereSA) * pColData->numColSpheres, newSphere, sizeof(CColSphereSA));
+
+                                CColSphereSA* lastSphere = &newArr[pColData->numColSpheres];
+                                lastSphere->vecCenter = vecPosition;
+                                lastSphere->material = cMaterial;
+                                lastSphere->fRadius = fRadius;
+                                pColData->numColSpheres++;
+                                pColData->pColSpheres = newArr;
+                                lua_pushnumber(luaVM, pColData->numColSpheres);
+                                return 1;
+                            }
                         break;
                         case COLLISION_TRIANGLE:
                         break;
