@@ -35,6 +35,9 @@ static CPedManager*          m_pPedManager;
 static CWaterManager*        m_pWaterManager;
 static CCustomWeaponManager* m_pCustomWeaponManager;
 
+// Disables pay and sprays (making sounds when closing) / https://wiki.multitheftauto.com/wiki/Garage
+static const int iDisabledGarages[] = {1, 8, 11, 12, 19, 23, 26, 27, 29, 32, 36, 40, 41, 47};
+
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN(func) \
     if (pElement->CountChildren() && pElement->IsCallPropagationEnabled()) \
@@ -9943,7 +9946,19 @@ bool CStaticFunctionDefinitions::GetMinuteDuration(unsigned long& ulDuration)
 
 bool CStaticFunctionDefinitions::IsGarageOpen(unsigned char ucGarageID, bool& bIsOpen)
 {
-    if (ucGarageID >= 0 && ucGarageID < MAX_GARAGES)
+    bool bIsDisabled = false;
+    
+    // Check if garage has been disabled
+    for (unsigned int i = 0; i < sizeof(iDisabledGarages) / sizeof(int); ++i)
+    {
+        if ((DWORD)ucGarageID == iDisabledGarages[i])
+        {
+            bIsDisabled = true;
+            break;
+        }
+    }
+
+    if (!bIsDisabled && ucGarageID >= 0 && ucGarageID < MAX_GARAGES)
     {
         const SGarageStates& garageStates = g_pGame->GetGarageStates();
         bIsOpen = garageStates[ucGarageID];
@@ -10536,7 +10551,19 @@ bool CStaticFunctionDefinitions::SetMinuteDuration(unsigned long ulDuration)
 
 bool CStaticFunctionDefinitions::SetGarageOpen(unsigned char ucGarageID, bool bIsOpen)
 {
-    if (ucGarageID < MAX_GARAGES)
+    bool bIsDisabled = false;
+
+     // Check if garage has been disabled
+    for (unsigned int i = 0; i < sizeof(iDisabledGarages) / sizeof(int); ++i)
+    {
+        if ((DWORD)ucGarageID == iDisabledGarages[i])
+        {
+            bIsDisabled = true;
+            break;
+        }
+    }
+
+    if (!bIsDisabled && ucGarageID < MAX_GARAGES)
     {
         SGarageStates& garageStates = g_pGame->GetGarageStates();
         garageStates[ucGarageID] = bIsOpen;
