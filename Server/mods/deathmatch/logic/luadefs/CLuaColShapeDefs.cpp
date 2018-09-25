@@ -14,10 +14,16 @@
 void CLuaColShapeDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
-        {"createColCircle", CreateColCircle},       {"createColCuboid", CreateColCuboid},   {"createColSphere", CreateColSphere},
-        {"createColRectangle", CreateColRectangle}, {"createColPolygon", CreateColPolygon}, {"createColTube", CreateColTube},
+        {"createColCircle", CreateColCircle},
+        {"createColCuboid", CreateColCuboid},
+        {"createColSphere", CreateColSphere},
+        {"createColRectangle", CreateColRectangle},
+        {"createColPolygon", CreateColPolygon},
+        {"createColTube", CreateColTube},
 
-        {"isInsideColShape", IsInsideColShape},     {"getColShapeType", GetColShapeType},   {"getColShapeCount", GetColShapeCount},
+        {"isInsideColShape", IsInsideColShape},
+        {"getColShapeType", GetColShapeType}, 
+        {"getColShapeCount", GetColShapeCount},
     };
 
     // Add functions
