@@ -64,6 +64,7 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setScale", "setObjectScale");
     lua_classfunction(luaVM, "setBreakable", "setObjectBreakable");
     lua_classfunction(luaVM, "setMass", "setObjectMass");
+    lua_classfunction(luaVM, "setProperty", "setObjectProperty");
 
     lua_classvariable(luaVM, "scale", "setObjectScale", "getObjectScale");
     lua_classvariable(luaVM, "breakable", "setObjectBreakable", "isObjectBreakable");
