@@ -2106,19 +2106,32 @@ bool CClientPed::SetCurrentWeaponSlot(eWeaponSlot weaponSlot)
                     DWORD       ammoInClip = oldWeapon->GetAmmoInClip();
                     DWORD       ammoInTotal = oldWeapon->GetAmmoTotal();
                     eWeaponType weaponType = oldWeapon->GetType();
-                    RemoveWeapon(oldWeapon->GetType());
+                    if (weaponSlot != WEAPONSLOT_TYPE_PARACHUTE && weaponType != WEAPONTYPE_NIGHTVISION && weaponType != WEAPONTYPE_INFRARED)
+                    {
+                        RemoveWeapon(oldWeapon->GetType());
 
-                    m_pPlayerPed->SetCurrentWeaponSlot(WEAPONSLOT_TYPE_UNARMED);
+                        m_pPlayerPed->SetCurrentWeaponSlot(WEAPONSLOT_TYPE_UNARMED);
 
-                    CWeapon* newWeapon = GiveWeapon(weaponType, ammoInTotal);
-                    newWeapon->SetAmmoInClip(ammoInClip);
-                    newWeapon->SetAmmoTotal(ammoInTotal);
+                        CWeapon* newWeapon = GiveWeapon(weaponType, ammoInTotal);
+                        newWeapon->SetAmmoInClip(ammoInClip);
+                        newWeapon->SetAmmoTotal(ammoInTotal);
 
-                    // Don't allow doing gang driveby while unarmed
-                    if (IsDoingGangDriveby())
-                        SetDoingGangDriveby(false);
-                    m_CurrentWeaponSlot = weaponSlot;
-                    return true;
+                        // Don't allow doing gang driveby while unarmed
+                        if (IsDoingGangDriveby())
+                            SetDoingGangDriveby(false);
+                        m_CurrentWeaponSlot = weaponSlot;
+                        return true;
+                    }
+                    else
+                    {
+                        m_pPlayerPed->SetCurrentWeaponSlot(WEAPONSLOT_TYPE_UNARMED);
+
+                        // Don't allow doing gang driveby while unarmed
+                        if (IsDoingGangDriveby())
+                            SetDoingGangDriveby(false);
+                        m_CurrentWeaponSlot = weaponSlot;
+                        return true;
+                    }
                 }
                 else
                 {
