@@ -21,6 +21,7 @@ void CLuaObjectDefs::LoadFunctions(void)
         {"isObjectStatic", IsObjectStatic},
         {"getObjectScale", GetObjectScale},
         {"isObjectBreakable", IsObjectBreakable},
+        {"getObjectMass", GetObjectMass},
         {"getObjectProperty", GetObjectProperty},
 
         // Object set funcs
@@ -32,6 +33,7 @@ void CLuaObjectDefs::LoadFunctions(void)
         {"breakObject", BreakObject},
         {"respawnObject", RespawnObject},
         {"toggleObjectRespawn", ToggleObjectRespawn},
+        {"setObjectMass", SetObjectMass},
         {"setObjectProperty", SetObjectProperty},
     };
 
@@ -55,14 +57,18 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "getScale", "getObjectScale");
     lua_classfunction(luaVM, "isBreakable", "isObjectBreakable");
+    lua_classfunction(luaVM, "getMass", "getObjectMass");
     lua_classfunction(luaVM, "getProperties", GetObjectProperties);
     lua_classfunction(luaVM, "getProperty", "getObjectProperty");
 
     lua_classfunction(luaVM, "setScale", "setObjectScale");
     lua_classfunction(luaVM, "setBreakable", "setObjectBreakable");
+    lua_classfunction(luaVM, "setMass", "setObjectMass");
+    lua_classfunction(luaVM, "setProperty", "setObjectProperty");
 
     lua_classvariable(luaVM, "scale", "setObjectScale", "getObjectScale");
     lua_classvariable(luaVM, "breakable", "setObjectBreakable", "isObjectBreakable");
+    lua_classvariable(luaVM, "mass", "setObjectMass", "getObjectMass");
     lua_classvariable(luaVM, "properties", nullptr, GetObjectProperties);
 
     // Add deprecated methods for backwards compatibility
@@ -195,6 +201,29 @@ int CLuaObjectDefs::IsObjectBreakable(lua_State* luaVM)
         if (CStaticFunctionDefinitions::IsObjectBreakable(*pObject, bBreakable))
         {
             lua_pushboolean(luaVM, bBreakable);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaObjectDefs::GetObjectMass(lua_State* luaVM)
+{
+    //  float getObjectMass ( object theObject )
+    CClientObject* pObject;
+    float          fMass;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pObject);
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::GetObjectMass(*pObject, fMass))
+        {
+            lua_pushnumber(luaVM, fMass);
             return 1;
         }
     }
@@ -532,6 +561,31 @@ int CLuaObjectDefs::ToggleObjectRespawn(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         if (CStaticFunctionDefinitions::ToggleObjectRespawn(*pEntity, bRespawn))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaObjectDefs::SetObjectMass(lua_State* luaVM)
+{
+    //  bool setObjectMass ( object theObject, float fMass )
+    CClientEntity* pEntity;
+    float          fMass;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+    argStream.ReadNumber(fMass);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetObjectMass(*pEntity, fMass))
         {
             lua_pushboolean(luaVM, true);
             return 1;

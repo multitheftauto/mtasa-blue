@@ -147,8 +147,11 @@ public:
     LUA_DECLARE_OOP(GetVehicleComponentPosition);
     LUA_DECLARE(SetVehicleComponentRotation);
     LUA_DECLARE_OOP(GetVehicleComponentRotation);
+    LUA_DECLARE(SetVehicleComponentScale);
+    LUA_DECLARE_OOP(GetVehicleComponentScale);
     LUA_DECLARE(ResetVehicleComponentPosition);
     LUA_DECLARE(ResetVehicleComponentRotation);
+    LUA_DECLARE(ResetVehicleComponentScale);
     LUA_DECLARE(SetVehicleComponentVisible);
     LUA_DECLARE(GetVehicleComponentVisible);
     LUA_DECLARE(GetVehicleComponents);
