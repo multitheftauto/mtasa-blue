@@ -495,21 +495,7 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
     }
 
     unsigned int uiNumArgs;
-    bool         bResult;
-#if MTA_DM_VERSION >= 0x150
-    bResult = bitStream.ReadCompressed(uiNumArgs);
-#else
-    if (bitStream.Version() < 0x05B)
-    {
-        unsigned short usNumArgs;
-        bResult = bitStream.ReadCompressed(usNumArgs);
-        uiNumArgs = usNumArgs;
-    }
-    else
-        bResult = bitStream.ReadCompressed(uiNumArgs);
-#endif
-
-    if (bResult)
+    if (bitStream.ReadCompressed(uiNumArgs))
     {
         pKnownTables->push_back(this);
         for (unsigned int ui = 0; ui < uiNumArgs; ++ui)
@@ -543,20 +529,7 @@ bool CLuaArguments::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHash
 
     bool bSuccess = true;
     pKnownTables->insert(make_pair((CLuaArguments*)this, pKnownTables->size()));
-
-#if MTA_DM_VERSION >= 0x150
     bitStream.WriteCompressed(static_cast<unsigned int>(m_Arguments.size()));
-#else
-    if (ExtractVersionStringBuildNumber(g_pGame->GetPlayerManager()->GetLowestConnectedPlayerVersion()) < ExtractVersionStringBuildNumber("1.4.0-9.06858") &&
-        MTASA_VERSION_TYPE != VERSION_TYPE_CUSTOM)
-        bitStream.WriteCompressed(static_cast<unsigned short>(m_Arguments.size()));
-    else
-    {
-        // Send 0xFFFF to indicate that we're using the new version | TODO: Remove this in 1.5
-        bitStream.WriteCompressed(static_cast<unsigned short>(0xFFFF));
-        bitStream.WriteCompressed(static_cast<unsigned int>(m_Arguments.size()));
-    }
-#endif
 
     vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
     for (; iter != m_Arguments.end(); ++iter)
