@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PLAYERINFO
-#define __CGAMESA_PLAYERINFO
+#pragma once
 
 #include <game/CPlayerInfo.h>
 #include "Common.h"
@@ -313,5 +312,3 @@ public:
     DWORD GetBikeFrontWheelCounter(void) { return internalInterface->nBikeFrontWheelCounter; }
     float GetBikeFrontWheelDist(void) { return internalInterface->fBikeFrontWheelDist; }
 };
-
-#endif

@@ -37,15 +37,14 @@ namespace
     void RwMatrixGetRotation(const RwMatrix& rwMatrix, CVector& vecOutRotation)
     {
         CMatrix matTemp;
-        matTemp.vRight = (CVector&)rwMatrix.right;
-        matTemp.vFront = (CVector&)rwMatrix.up;
-        matTemp.vUp = (CVector&)rwMatrix.at;
+        RwMatrixToCMatrix(rwMatrix, matTemp);
         vecOutRotation = matTemp.GetRotation();
     }
 
     void RwMatrixSetRotation(RwMatrix& rwInOutMatrix, const CVector& vecRotation)
     {
         CMatrix matTemp;
+        RwMatrixToCMatrix(rwInOutMatrix, matTemp);
         matTemp.SetRotation(vecRotation);
         rwInOutMatrix.right = (RwV3d&)matTemp.vRight;
         rwInOutMatrix.up = (RwV3d&)matTemp.vFront;
@@ -55,6 +54,23 @@ namespace
     void RwMatrixGetPosition(const RwMatrix& rwMatrix, CVector& vecOutPosition) { vecOutPosition = (CVector&)rwMatrix.pos; }
 
     void RwMatrixSetPosition(RwMatrix& rwInOutMatrix, const CVector& vecPosition) { rwInOutMatrix.pos = (RwV3d&)vecPosition; }
+
+    void RwMatrixGetScale(const RwMatrix& rwMatrix, CVector& vecOutScale)
+    {
+        CMatrix matTemp;
+        RwMatrixToCMatrix(rwMatrix, matTemp);
+        vecOutScale = matTemp.GetScale();
+    }
+
+    void RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale)
+    {
+        CMatrix matTemp;
+        RwMatrixToCMatrix(rwInOutMatrix, matTemp);
+        matTemp.SetScale(vecScale);
+        rwInOutMatrix.right = (RwV3d&)matTemp.vRight;
+        rwInOutMatrix.up = (RwV3d&)matTemp.vFront;
+        rwInOutMatrix.at = (RwV3d&)matTemp.vUp;
+    }
 
     bool ClumpDumpCB(RpAtomic* pAtomic, void* data)
     {
@@ -2415,6 +2431,28 @@ bool CVehicleSA::GetComponentPosition(const SString& vehicleComponent, CVector& 
     if (pComponent && pComponent->pFrame != NULL)
     {
         RwMatrixGetPosition(pComponent->pFrame->modelling, vecPositionModelling);
+        return true;
+    }
+    return false;
+}
+
+bool CVehicleSA::SetComponentScale(const SString& vehicleComponent, const CVector& vecScale)
+{
+    SVehicleFrame* pComponent = GetVehicleComponent(vehicleComponent);
+    if(pComponent && pComponent->pFrame != NULL)
+    {
+        RwMatrixSetScale(pComponent->pFrame->modelling, vecScale);
+        return true;
+    }
+    return false;
+}
+
+bool CVehicleSA::GetComponentScale(const SString& vehicleComponent, CVector& vecScaleModelling)
+{
+    SVehicleFrame* pComponent = GetVehicleComponent(vehicleComponent);
+    if(pComponent && pComponent->pFrame != NULL)
+    {
+        RwMatrixGetScale(pComponent->pFrame->modelling, vecScaleModelling);
         return true;
     }
     return false;

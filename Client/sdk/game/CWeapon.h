@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CWEAPON
-#define __CGAME_CWEAPON
+#pragma once
 
 #include "Common.h"
 
@@ -58,5 +57,3 @@ public:
     virtual bool FireBullet(CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget) = 0;
     virtual int  GetWeaponReloadTime(CWeaponStat* pWeaponStat) = 0;
 };
-
-#endif

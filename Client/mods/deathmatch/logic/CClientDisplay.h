@@ -10,8 +10,7 @@
 
 class CClientDisplay;
 
-#ifndef __ClientDisplay_H
-#define __ClientDisplay_H
+#pragma once
 
 #include "CClientCommon.h"
 
@@ -59,5 +58,3 @@ protected:
     CVector       m_vecPosition;
     SColor        m_Color;
 };
-
-#endif

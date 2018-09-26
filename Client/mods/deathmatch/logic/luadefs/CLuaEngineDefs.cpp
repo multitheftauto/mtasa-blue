@@ -13,35 +13,41 @@
 
 void CLuaEngineDefs::LoadFunctions(void)
 {
-    CLuaCFunctions::AddFunction("engineLoadTXD", EngineLoadTXD);
-    CLuaCFunctions::AddFunction("engineLoadCOL", EngineLoadCOL);
-    CLuaCFunctions::AddFunction("engineLoadDFF", EngineLoadDFF);
-    CLuaCFunctions::AddFunction("engineLoadIFP", EngineLoadIFP);
-    CLuaCFunctions::AddFunction("engineImportTXD", EngineImportTXD);
-    CLuaCFunctions::AddFunction("engineReplaceCOL", EngineReplaceCOL);
-    CLuaCFunctions::AddFunction("engineRestoreCOL", EngineRestoreCOL);
-    CLuaCFunctions::AddFunction("engineReplaceModel", EngineReplaceModel);
-    CLuaCFunctions::AddFunction("engineRestoreModel", EngineRestoreModel);
-    CLuaCFunctions::AddFunction("engineRequestModel", EngineRequestModel);
-    CLuaCFunctions::AddFunction("engineFreeModel", EngineFreeModel);
-    CLuaCFunctions::AddFunction("engineReplaceAnimation", EngineReplaceAnimation);
-    CLuaCFunctions::AddFunction("engineRestoreAnimation", EngineRestoreAnimation);
-    CLuaCFunctions::AddFunction("engineGetModelLODDistance", EngineGetModelLODDistance);
-    CLuaCFunctions::AddFunction("engineSetModelLODDistance", EngineSetModelLODDistance);
-    CLuaCFunctions::AddFunction("engineSetAsynchronousLoading", EngineSetAsynchronousLoading);
-    CLuaCFunctions::AddFunction("engineApplyShaderToWorldTexture", EngineApplyShaderToWorldTexture);
-    CLuaCFunctions::AddFunction("engineRemoveShaderFromWorldTexture", EngineRemoveShaderFromWorldTexture);
-    CLuaCFunctions::AddFunction("engineGetModelNameFromID", EngineGetModelNameFromID);
-    CLuaCFunctions::AddFunction("engineGetModelIDFromName", EngineGetModelIDFromName);
-    CLuaCFunctions::AddFunction("engineGetModelTextureNames", EngineGetModelTextureNames);
-    CLuaCFunctions::AddFunction("engineGetVisibleTextureNames", EngineGetVisibleTextureNames);
+    std::map<const char*, lua_CFunction> functions{
+        {"engineLoadTXD", EngineLoadTXD},
+        {"engineLoadCOL", EngineLoadCOL},
+        {"engineLoadDFF", EngineLoadDFF},
+        {"engineLoadIFP", EngineLoadIFP},
+        {"engineImportTXD", EngineImportTXD},
+        {"engineReplaceCOL", EngineReplaceCOL},
+        {"engineRestoreCOL", EngineRestoreCOL},
+        {"engineReplaceModel", EngineReplaceModel},
+        {"engineRestoreModel", EngineRestoreModel},
+        {"engineReplaceAnimation", EngineReplaceAnimation},
+        {"engineRestoreAnimation", EngineRestoreAnimation},
+        {"engineGetModelLODDistance", EngineGetModelLODDistance},
+        {"engineSetModelLODDistance", EngineSetModelLODDistance},
+        {"engineSetAsynchronousLoading", EngineSetAsynchronousLoading},
+        {"engineApplyShaderToWorldTexture", EngineApplyShaderToWorldTexture},
+        {"engineRemoveShaderFromWorldTexture", EngineRemoveShaderFromWorldTexture},
+        {"engineGetModelNameFromID", EngineGetModelNameFromID},
+        {"engineGetModelIDFromName", EngineGetModelIDFromName},
+        {"engineGetModelTextureNames", EngineGetModelTextureNames},
+        {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
 
-    // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
-    // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
-    // CLuaCFunctions::AddFunction ( "enginePositionAtomic", EnginePositionAtomic );
-    // CLuaCFunctions::AddFunction ( "enginePositionSeats", EnginePositionSeats );
-    // CLuaCFunctions::AddFunction ( "engineAddAllAtomics", EngineAddAllAtomics );
-    // CLuaCFunctions::AddFunction ( "engineReplaceVehiclePart", EngineReplaceVehiclePart );
+        // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
+        // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
+        // CLuaCFunctions::AddFunction ( "enginePositionAtomic", EnginePositionAtomic );
+        // CLuaCFunctions::AddFunction ( "enginePositionSeats", EnginePositionSeats );
+        // CLuaCFunctions::AddFunction ( "engineAddAllAtomics", EngineAddAllAtomics );
+        // CLuaCFunctions::AddFunction ( "engineReplaceVehiclePart", EngineReplaceVehiclePart );
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaEngineDefs::AddClass(lua_State* luaVM)
@@ -475,73 +481,6 @@ int CLuaEngineDefs::EngineRestoreModel(lua_State* luaVM)
     }
 
     // Failure
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
-{
-    SString strModelType;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strModelType);
-
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (pLuaMain)
-    {
-        CResource* pResource = pLuaMain->GetResource();
-        if (pResource)
-        {
-            if (!argStream.HasErrors())
-            {
-                eClientModelType eModelType;
-                if (strModelType == "ped")
-                {
-                    eModelType = CCLIENTMODELPED;
-                }
-                else
-                {
-                    lua_pushboolean(luaVM, false);
-                    return 1;
-                }
-
-                int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
-                if (iModelID != INVALID_MODEL_ID) {
-                    CClientModel* pModel = new CClientModel(m_pManager, iModelID, eModelType);
-                    pModel->Allocate();
-                    pModel->SetParentResource(pResource);
-
-                    lua_pushinteger(luaVM, iModelID);
-                    return 1;
-                }
-            }
-            else
-                m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-        }
-    }
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaEngineDefs::EngineFreeModel(lua_State* luaVM)
-{
-    int iModelID;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(iModelID);
-
-    if (!argStream.HasErrors())
-    {
-        CClientModel* pModel = m_pManager->GetModelManager()->FindModelByID(iModelID);
-
-        if (pModel && pModel->Deallocate())
-            lua_pushboolean(luaVM, true);
-
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
     lua_pushboolean(luaVM, false);
     return 1;
 }

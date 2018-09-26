@@ -21,6 +21,14 @@ namespace SharedUtil
 
     struct SLibVersionInfo : VS_FIXEDFILEINFO
     {
+        int     GetFileVersionMajor(void) { return HIWORD(dwFileVersionMS); }
+        int     GetFileVersionMinor(void) { return LOWORD(dwFileVersionMS); }
+        int     GetFileVersionBuild(void) { return HIWORD(dwFileVersionLS); }
+        int     GetFileVersionRelease(void) { return LOWORD(dwFileVersionLS); }
+        SString GetFileVersionString(void)
+        {
+            return SString("%d.%d.%d.%d", GetFileVersionMajor(), GetFileVersionMinor(), GetFileVersionBuild(), GetFileVersionRelease());
+        }
         SString strCompanyName;
         SString strProductName;
     };
@@ -30,6 +38,8 @@ namespace SharedUtil
     long long GetWMIVideoAdapterMemorySize(const SString& strDisplay);
     long long GetWMITotalPhysicalMemory(void);
     void      GetWMIAntiVirusStatus(std::vector<SString>& outEnabledList, std::vector<SString>& outDisabledList);
+    void      GetInstalledHotFixList(std::vector<SString>& outInstalledList);
+    bool      IsHotFixInstalled(const SString& strHotFixId);
     bool      GetLibVersionInfo(const SString& strLibName, SLibVersionInfo* pOutLibVersionInfo);
     bool      Is64BitOS(void);
 }            // namespace SharedUtil

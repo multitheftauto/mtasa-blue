@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIRADIOBUTTON_IMPL_H
-#define __CGUIRADIOBUTTON_IMPL_H
+#pragma once
 
 #include <gui/CGUIRadioButton.h>
 #include "CGUIElement_Impl.h"
@@ -30,5 +29,3 @@ public:
 
 private:
 };
-
-#endif

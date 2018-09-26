@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUITAB_IMPL_H
-#define __CGUITAB_IMPL_H
+#pragma once
 
 #include <gui/CGUITab.h>
 #include "CGUIElement_Impl.h"
@@ -36,5 +35,3 @@ public:
     void SetEnabled(bool bEnabled);
     bool IsEnabled(void);
 };
-
-#endif

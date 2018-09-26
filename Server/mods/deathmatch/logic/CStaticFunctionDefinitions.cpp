@@ -37,13 +37,13 @@ static CWaterManager*        m_pWaterManager;
 static CCustomWeaponManager* m_pCustomWeaponManager;
 
 // Used to run a function on all the children of the elements too
-#define RUN_CHILDREN( func ) \
-    if ( pElement->CountChildren () && pElement->IsCallPropagationEnabled() ) \
+#define RUN_CHILDREN(func) \
+    if (pElement->CountChildren() && pElement->IsCallPropagationEnabled()) \
     { \
         CElementListSnapshot* pList = pElement->GetChildrenListSnapshot(); \
-        pList->AddRef();    /* Keep list alive during use */ \
-        for ( CElementListSnapshot::const_iterator iter = pList->begin() ; iter != pList->end() ; iter++ ) \
-            if ( !(*iter)->IsBeingDeleted() ) \
+        pList->AddRef(); /* Keep list alive during use */ \
+        for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++) \
+            if (!(*iter)->IsBeingDeleted()) \
                 func; \
         pList->Release(); \
     }
@@ -289,10 +289,6 @@ bool CStaticFunctionDefinitions::DestroyElement(CElement* pElement)
 
 CElement* CStaticFunctionDefinitions::CloneElement(CResource* pResource, CElement* pElement, const CVector& vecPosition, bool bCloneChildren)
 {
-    // TODO: Element types should be able to copy themselves... Some virtual copy constructor
-    //       or something so it can be done at CElement level so we can be type independant.
-    //       This code is ugly and does not support every option/element atm and won't in the future.
-
     // TODO: per-player entity stuff ( visibility )
     assert(pElement);
 
@@ -313,191 +309,27 @@ CElement* CStaticFunctionDefinitions::CloneElement(CResource* pResource, CElemen
         }
     }
 
+    // Can't clone the root
+    if (pElement == m_pMapManager->GetRootElement())
+    {
+        return nullptr;
+    }
+
     CElement* pParent = pElement->GetParentEntity();
-    if (pParent)
+    if (pParent && !pParent->IsCloneable())
     {
-        int iParentType = pParent->GetType();
-        switch (iParentType)
-        {
-            case CElement::DUMMY:
-            case CElement::VEHICLE:
-            case CElement::OBJECT:
-            case CElement::MARKER:
-            case CElement::BLIP:
-            case CElement::PICKUP:
-            case CElement::RADAR_AREA:
-            case CElement::PATH_NODE_UNUSED:
-                break;
-            default:
-                return NULL;
-        }
+        return nullptr;
     }
 
-    int       iType = pElement->GetType();
-    CVector   vecClonedPosition = pElement->GetPosition();
-    CElement* pNewElement = NULL;
-    bool      bAddEntity = true;
-    switch (iType)
-    {
-        case CElement::DUMMY:
-        {
-            // Can't clone the root
-            if (pElement != m_pMapManager->GetRootElement())
-            {
-                CDummy* pDummy = static_cast<CDummy*>(pElement);
-
-                pNewElement = new CDummy(g_pGame->GetGroups(), pElement->GetParentEntity());
-                pNewElement->SetName(pDummy->GetName());
-                pNewElement->SetTypeName(pDummy->GetTypeName());
-            }
-            break;
-        }
-
-        case CElement::VEHICLE:
-        {
-            CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
-
-            CVehicle* pTemp = m_pVehicleManager->Create(pVehicle->GetModel(), pVehicle->GetVariant(), pVehicle->GetVariant2(), pElement->GetParentEntity());
-            if (pTemp)
-            {
-                CVector vecRotationDegrees;
-                pVehicle->GetRotationDegrees(vecRotationDegrees);
-                pTemp->SetRotationDegrees(vecRotationDegrees);
-
-                pTemp->SetHealth(pVehicle->GetHealth());
-                pTemp->SetColor(pVehicle->GetColor());
-                pTemp->SetUpgrades(pVehicle->GetUpgrades());
-                pTemp->m_ucDoorStates = pVehicle->m_ucDoorStates;
-                pTemp->m_ucWheelStates = pVehicle->m_ucWheelStates;
-                pTemp->m_ucPanelStates = pVehicle->m_ucPanelStates;
-                pTemp->m_ucLightStates = pVehicle->m_ucLightStates;
-
-                pNewElement = pTemp;
-            }
-            break;
-        }
-
-        case CElement::OBJECT:
-        {
-            CObject* pObject = static_cast<CObject*>(pElement);
-
-            CObject* pTemp = m_pObjectManager->Create(pElement->GetParentEntity(), NULL, pObject->IsLowLod());
-            if (pTemp)
-            {
-                CVector vecRotation;
-                pObject->GetRotation(vecRotation);
-                pTemp->SetRotation(vecRotation);
-                pTemp->SetModel(pObject->GetModel());
-                pTemp->SetParentObject(pObject->GetParentEntity());
-                pTemp->SetLowLodObject(pObject->GetLowLodObject());
-
-                pNewElement = pTemp;
-            }
-            break;
-        }
-
-        case CElement::MARKER:
-        {
-            CMarker* pMarker = static_cast<CMarker*>(pElement);
-
-            CMarker* pTemp = m_pMarkerManager->Create(pElement->GetParentEntity());
-            if (pTemp)
-            {
-                pTemp->SetMarkerType(pMarker->GetMarkerType());
-                pTemp->SetColor(pMarker->GetColor());
-                pTemp->SetSize(pMarker->GetSize());
-
-                if (pResource->HasStarted())
-                    pTemp->Sync(true);
-                bAddEntity = false;
-
-                pNewElement = pTemp;
-            }
-            break;
-        }
-
-        case CElement::BLIP:
-        {
-            CBlip* pBlip = static_cast<CBlip*>(pElement);
-
-            CBlip* pTemp = m_pBlipManager->Create(pElement->GetParentEntity());
-            if (pTemp)
-            {
-                pTemp->m_ucIcon = pBlip->m_ucIcon;
-                pTemp->m_ucSize = pBlip->m_ucSize;
-                pTemp->SetColor(pBlip->GetColor());
-
-                if (pResource->HasStarted())
-                    pTemp->Sync(true);
-                bAddEntity = false;
-
-                pNewElement = pTemp;
-            }
-            break;
-        }
-
-        case CElement::PICKUP:
-        {
-            CPickup* pPickup = static_cast<CPickup*>(pElement);
-
-            CPickup* pTemp = m_pPickupManager->Create(pElement->GetParentEntity());
-            if (pTemp)
-            {
-                pTemp->SetPickupType(pPickup->GetPickupType());
-                pTemp->SetPickupType(pPickup->GetPickupType());
-                pTemp->SetModel(pPickup->GetModel());
-                pTemp->SetWeaponType(pPickup->GetWeaponType());
-                pTemp->SetAmmo(pPickup->GetAmmo());
-                pTemp->SetRespawnIntervals(pPickup->GetRespawnIntervals());
-
-                pNewElement = pTemp;
-            }
-            break;
-        }
-
-        case CElement::RADAR_AREA:
-        {
-            CRadarArea* pRadarArea = static_cast<CRadarArea*>(pElement);
-
-            CRadarArea* pTemp = m_pRadarAreaManager->Create(pElement->GetParentEntity(), NULL);
-            if (pTemp)
-            {
-                pTemp->SetSize(pRadarArea->GetSize());
-                pTemp->SetColor(pRadarArea->GetColor());
-
-                if (pResource->HasStarted())
-                    pTemp->Sync(true);
-                bAddEntity = false;
-
-                pNewElement = pTemp;
-            }
-            break;
-        }
-        case CElement::PED:
-        {
-            CPed* pPed = static_cast<CPed*>(pElement);
-
-            CPed* pTemp = m_pPedManager->Create(pPed->GetModel(), pElement->GetParentEntity(), NULL);
-            if (pTemp)
-            {
-                pTemp->SetPosition(pPed->GetPosition());
-                pTemp->SetRotation(pPed->GetRotation());
-                pTemp->SetHealth(pPed->GetHealth());
-                pTemp->SetArmor(pPed->GetArmor());
-                pTemp->SetSyncable(pTemp->IsSyncable());
-
-                pNewElement = pTemp;
-            }
-            break;
-        }
-    }
+    bool bAddEntity = true;
+    CElement* pNewElement = pElement->Clone(&bAddEntity, pResource);
 
     if (pNewElement)
     {
         CVector vecNewPosition = vecPosition;
         // If we're cloning children, use the given position as an offset
         if (bCloneChildren)
-            vecNewPosition += vecClonedPosition;
+            vecNewPosition += pElement->GetPosition();
 
         pNewElement->SetPosition(vecNewPosition);
         pNewElement->GetCustomDataPointer()->Copy(pElement->GetCustomDataPointer());
@@ -1227,6 +1059,26 @@ bool CStaticFunctionDefinitions::GetElementVelocity(CElement* pElement, CVector&
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetElementTurnVelocity(CElement* pElement, CVector& vecTurnVelocity)
+{
+    assert(pElement);
+
+    int iType = pElement->GetType();
+    switch (iType)
+    {
+        case CElement::VEHICLE:
+        {
+            CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+            vecTurnVelocity = pVehicle->GetTurnSpeed();
+
+            break;
+        }
+        default:
+            return false;
+    }
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetElementMatrix(CElement* pElement, const CMatrix& matrix)
 {
     RUN_CHILDREN(SetElementMatrix(*iter, matrix))
@@ -1379,6 +1231,46 @@ bool CStaticFunctionDefinitions::SetElementVelocity(CElement* pElement, const CV
     BitStream.pBitStream->Write(vecVelocity.fY);
     BitStream.pBitStream->Write(vecVelocity.fZ);
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_VELOCITY, *BitStream.pBitStream));
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetElementAngularVelocity(CElement* pElement, const CVector& vecTurnVelocity)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetElementAngularVelocity(*iter, vecTurnVelocity))
+
+    int iType = pElement->GetType();
+    switch (iType)
+    {
+        case CElement::PED:
+        case CElement::PLAYER:
+        {
+            // TODO
+            break;
+        }
+        case CElement::VEHICLE:
+        {
+            CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+            pVehicle->SetTurnSpeed(vecTurnVelocity);
+
+            break;
+        }
+        case CElement::OBJECT:
+        case CElement::WEAPON:
+        {
+            // Don't store velocity serverside (requires potentially needless additional sizeof(CVector) bytes per object)
+            break;
+        }
+        default:
+            return false;
+    }
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(vecTurnVelocity.fX);
+    BitStream.pBitStream->Write(vecTurnVelocity.fY);
+    BitStream.pBitStream->Write(vecTurnVelocity.fZ);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_ANGULAR_VELOCITY, *BitStream.pBitStream));
 
     return true;
 }
@@ -4023,7 +3915,7 @@ bool CStaticFunctionDefinitions::SetPedChoking(CElement* pElement, bool bChoking
                     // Remove jetpack now so it doesn't stay on (#9522#c25612)
                     if (pPed->HasJetPack())
                         pPed->SetHasJetPack(false);
-                    
+
                     pPed->SetChoking(bChoking);
 
                     CBitStream bitStream;
@@ -4301,6 +4193,33 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, con
                 BitStream.pBitStream->Write((unsigned char)0);
             }
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION_PROGRESS, *BitStream.pBitStream));
+
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CElement* pElement, const char* szAnimName, float fSpeed)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetPedAnimationSpeed(*iter, szAnimName, fSpeed))
+
+    if (IS_PED(pElement))
+    {
+        CPed* pPed = static_cast<CPed*>(pElement);
+        if (pPed->IsSpawned() && szAnimName)
+        {
+            CBitStream BitStream;
+            if (szAnimName)
+            {
+                unsigned char ucAnimSize = (unsigned char)strlen(szAnimName);
+
+                BitStream.pBitStream->Write(ucAnimSize);
+                BitStream.pBitStream->Write(szAnimName, ucAnimSize);
+                BitStream.pBitStream->Write(fSpeed);
+            }
+            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION_SPEED, *BitStream.pBitStream));
 
             return true;
         }
@@ -6728,17 +6647,31 @@ bool CStaticFunctionDefinitions::GetVehicleRespawnPosition(CElement* pElement, C
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleRespawnPosition(CElement* pElement, const CVector& vecPosition, const CVector& vecRotation)
+bool CStaticFunctionDefinitions::SetVehicleRespawnRotation(CElement* pElement, const CVector& vecRotation)
 {
     assert(pElement);
-    RUN_CHILDREN(SetVehicleRespawnPosition(*iter, vecPosition, vecRotation))
+    RUN_CHILDREN(SetVehicleRespawnRotation(*iter, vecRotation))
 
     if (IS_VEHICLE(pElement))
     {
         CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
-
-        pVehicle->SetRespawnPosition(vecPosition);
         pVehicle->SetRespawnRotationDegrees(vecRotation);
+
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleRespawnPosition(CElement* pElement, const CVector& vecPosition)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetVehicleRespawnPosition(*iter, vecPosition))
+
+    if (IS_VEHICLE(pElement))
+    {
+        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+        pVehicle->SetRespawnPosition(vecPosition);
 
         return true;
     }
@@ -9897,6 +9830,21 @@ bool CStaticFunctionDefinitions::OutputChatBox(const char* szText, CElement* pEl
         m_pMapManager->GetRootElement()->CallEvent("onChatMessage", Arguments);
     }
 
+    return false;
+}
+
+bool CStaticFunctionDefinitions::ClearChatBox(CElement* pElement)
+{
+    assert(pElement);
+
+    RUN_CHILDREN(ClearChatBox(*iter))
+
+    if (IS_PLAYER(pElement))
+    {
+        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
+        pPlayer->Send(CChatClearPacket());
+        return true;
+    }
     return false;
 }
 

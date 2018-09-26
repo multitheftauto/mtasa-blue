@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CRENDERWARESA
-#define __CRENDERWARESA
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 
@@ -158,5 +157,3 @@ public:
     std::set<RwTexture*>                m_SpecialTextures;
     static int                          ms_iRenderingType;
 };
-
-#endif

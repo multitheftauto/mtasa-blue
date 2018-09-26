@@ -491,6 +491,20 @@ bool CCore::IsChatVisible(void)
     return false;
 }
 
+bool CCore::ClearChat()
+{
+    if (m_pLocalGUI)
+    {
+        CChat* pChat = m_pLocalGUI->GetChat();
+        if (pChat)
+        {
+            pChat->Clear();
+            return true;
+        }
+    }
+    return false;
+}
+
 void CCore::TakeScreenShot(void)
 {
     bScreenShot = true;
@@ -1350,6 +1364,8 @@ void CCore::RegisterCommands()
     m_pCommands->Add("showframegraph", _("shows the frame timing graph"), CCommandFuncs::ShowFrameGraph);
     m_pCommands->Add("jinglebells", "", CCommandFuncs::JingleBells);
     m_pCommands->Add("fakelag", "", CCommandFuncs::FakeLag);
+
+    m_pCommands->Add("reloadnews", "for developers: reload news", CCommandFuncs::ReloadNews);
 }
 
 void CCore::SwitchRenderWindow(HWND hWnd, HWND hWndInput)

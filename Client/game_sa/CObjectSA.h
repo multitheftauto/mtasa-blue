@@ -12,8 +12,7 @@
 #include "CVehicleSA.h"
 #include "CPedSA.h"
 
-#ifndef __CGAMESA_OBJECT
-#define __CGAMESA_OBJECT
+#pragma once
 
 #include <game/CObject.h>
 #include "CPhysicalSA.h"
@@ -159,5 +158,3 @@ private:
 #define COBJECTSA_DEFINED
 #define COBJECTSAINTERFACE_DEFINED
 */
-
-#endif

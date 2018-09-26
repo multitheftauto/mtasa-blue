@@ -19,6 +19,7 @@
 #include <ctime>
 #include <sstream>
 #include <mutex>
+#include <unordered_set>
 
 // Forward declarations
 class CAclRightName;
@@ -47,6 +48,7 @@ struct SAclRequest;
 
 // Packet includes
 #include "packets/CCameraSyncPacket.h"
+#include "packets/CChatClearPacket.h"
 #include "packets/CChatEchoPacket.h"
 #include "packets/CCommandPacket.h"
 #include "packets/CConsoleEchoPacket.h"

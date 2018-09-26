@@ -63,6 +63,17 @@ int CLuaFunctionDefs::OutputChatBox(lua_State* luaVM)
     return 1;
 }
 
+int CLuaFunctionDefs::ClearChatBox(lua_State* luaVM)
+{
+    if (CStaticFunctionDefinitions::ClearChatBox())
+    {
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaFunctionDefs::SetClipboard(lua_State* luaVM)
 {
     SString          strText = "";

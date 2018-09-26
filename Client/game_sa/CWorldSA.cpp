@@ -174,9 +174,9 @@ void CWorldSA::RemoveReferencesToDeletedObject(CEntitySAInterface* entity)
     }
 }
 
+// THIS FUNCTION IS INCOMPLETE AND SHOULD NOT BE USED
 bool CWorldSA::TestLineSphere(CVector* vecStart, CVector* vecEnd, CVector* vecSphereCenter, float fSphereRadius, CColPoint** colCollision)
 {
-    // THIS FUNCTION IS INCOMPLETE AND SHOULD NOT BE USED
     // Create a CColLine for us
     DWORD dwFunc = FUNC_CColLine_Constructor;
     DWORD dwCColLine[10];            // I don't know how big CColLine is, so we'll just be safe

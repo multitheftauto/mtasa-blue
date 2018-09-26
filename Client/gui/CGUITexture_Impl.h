@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUITEXTURE_IMPL_H
-#define __CGUITEXTURE_IMPL_H
+#pragma once
 
 #include <gui/CGUITexture.h>
 
@@ -40,5 +39,3 @@ private:
     CEGUI::Renderer* m_pRenderer;
     CEGUI::Texture*  m_pTexture;
 };
-
-#endif

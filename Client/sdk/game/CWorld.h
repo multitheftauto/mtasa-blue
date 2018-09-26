@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_WORLD
-#define __CGAME_WORLD
+#pragma once
 
 #include "CEntity.h"
 #include "CColPoint.h"
@@ -194,5 +193,3 @@ public:
     virtual bool              IsEntityRemoved(CEntitySAInterface* pInterface) = 0;
     virtual bool              CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd) = 0;
 };
-
-#endif

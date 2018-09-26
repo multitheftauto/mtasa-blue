@@ -11,8 +11,7 @@
 
 class CLocalGUI;
 
-#ifndef __CLOCALGUI_H
-#define __CLOCALGUI_H
+#pragma once
 
 #ifndef WM_MOUSEWHEEL
 #define WM_MOUSEWHEEL 0x20A // Defined only when including Windows.h -> Not getting defined? (<=XP only?)
@@ -119,5 +118,3 @@ private:
     SString m_LastLocaleName;
     uint    m_LocaleChangeCounter;
 };
-
-#endif

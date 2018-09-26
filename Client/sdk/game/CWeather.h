@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_WEATHER
-#define __CGAME_WEATHER
+#pragma once
 
 #include "Common.h"
 
@@ -31,5 +30,3 @@ public:
     virtual void  SetAmountOfRain(float fAmount) = 0;
     virtual void  ResetAmountOfRain(void) = 0;
 };
-
-#endif

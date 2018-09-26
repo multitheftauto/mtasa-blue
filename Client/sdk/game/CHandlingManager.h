@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CHandlingManager
-#define __CGAME_CHandlingManager
+#pragma once
 
 #include "CHandlingEntry.h"
 
@@ -24,5 +23,3 @@ public:
     virtual void                  RemoveChangedVehicle(void) = 0;
     virtual void                  CheckSuspensionChanges(CHandlingEntry* pEntry) = 0;
 };
-
-#endif

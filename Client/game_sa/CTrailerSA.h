@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TRAILER
-#define __CGAMESA_TRAILER
+#pragma once
 
 #include <game/CTrailer.h>
 #include "CAutomobileSA.h"
@@ -29,5 +28,3 @@ public:
 
     virtual ~CTrailerSA(void) {}
 };
-
-#endif

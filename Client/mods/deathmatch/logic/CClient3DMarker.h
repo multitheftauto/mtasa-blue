@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENT3DMARKER_H
-#define __CCLIENT3DMARKER_H
+#pragma once
 
 #include "CClientMarker.h"
 class CClientMarker;
@@ -70,5 +69,3 @@ private:
     unsigned int m_ulIdentifier;
     bool         m_bMarkerStreamedIn;
 };
-
-#endif

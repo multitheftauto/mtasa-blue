@@ -8,8 +8,7 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-#ifndef __CGAMESA_POOLS
-#define __CGAMESA_POOLS
+#pragma once
 
 #include <game/CPools.h>
 #include "CPedSA.h"
@@ -211,5 +210,3 @@ private:
 
 #define FUNC_CTrain_CreateMissionTrain                      0x6F7550
 #define VAR_TrainModelArray                                 0x8D44F8
-
-#endif

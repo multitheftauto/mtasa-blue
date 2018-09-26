@@ -6089,6 +6089,7 @@ void CClientPed::ReplaceAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInterna
 void CClientPed::RestoreAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInternalAnimHierarchy)
 {
     m_mapOfReplacedAnimations.erase(pInternalAnimHierarchy->GetInterface());
+    CIFPEngine::EngineApplyAnimation(*this, pInternalAnimHierarchy->GetInterface());
 }
 
 void CClientPed::RestoreAnimations(const std::shared_ptr<CClientIFP>& IFP)
@@ -6098,23 +6099,47 @@ void CClientPed::RestoreAnimations(const std::shared_ptr<CClientIFP>& IFP)
         if (std::addressof(*IFP.get()) == std::addressof(*x.second.pIFP.get()))
         {
             m_mapOfReplacedAnimations.erase(x.first);
+            CIFPEngine::EngineApplyAnimation(*this, x.first);
         }
     }
 }
 
 void CClientPed::RestoreAnimations(CAnimBlock& animationBlock)
 {
-    const size_t cAnimations = animationBlock.GetAnimationCount();
+    CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
+    const size_t  cAnimations = animationBlock.GetAnimationCount();
     for (size_t i = 0; i < cAnimations; i++)
     {
         auto pAnimHierarchyInterface = animationBlock.GetAnimationHierarchyInterface(i);
         m_mapOfReplacedAnimations.erase(pAnimHierarchyInterface);
+        CIFPEngine::EngineApplyAnimation(*this, pAnimHierarchyInterface);
     }
 }
 
 void CClientPed::RestoreAllAnimations(void)
 {
     m_mapOfReplacedAnimations.clear();
+    CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
+    RpClump*      pClump = GetClump();
+    if (pClump)
+    {
+        auto pAnimAssociation = pAnimationManager->RpAnimBlendClumpGetFirstAssociation(pClump);
+        while (pAnimAssociation)
+        {
+            auto pAnimNextAssociation = pAnimationManager->RpAnimBlendGetNextAssociation(pAnimAssociation);
+            auto pAnimHierarchy = pAnimAssociation->GetAnimHierarchy();
+            int  iGroupID = pAnimAssociation->GetAnimGroup(), iAnimID = pAnimAssociation->GetAnimID();
+            if (pAnimHierarchy && iGroupID >= 0 && iAnimID >= 0)
+            {
+                auto pAnimStaticAssociation = pAnimationManager->GetAnimStaticAssociation(iGroupID, iAnimID);
+                if (pAnimStaticAssociation && pAnimHierarchy->IsCustom())
+                {
+                    CIFPEngine::EngineApplyAnimation(*this, pAnimStaticAssociation->GetAnimHierachyInterface());
+                }
+            }
+            pAnimAssociation = std::move(pAnimNextAssociation);
+        }
+    }
 }
 
 SReplacedAnimation* CClientPed::GetReplacedAnimation(CAnimBlendHierarchySAInterface* pInternalHierarchyInterface)

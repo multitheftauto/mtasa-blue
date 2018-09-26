@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTPOINTLIGHTSMANAGER_H
-#define __CCLIENTPOINTLIGHTSMANAGER_H
+#pragma once
 
 #include "CClientPointLights.h"
 #include <list>
@@ -58,5 +57,3 @@ private:
     bool                           m_bDontRemoveFromList;
     unsigned short                 m_usDimension;
 };
-
-#endif

@@ -102,7 +102,6 @@ public:
     virtual class CBaseModelInfoSAInterface* GetInterface(void) = 0;
 
     virtual DWORD GetModel() = 0;
-    virtual bool  IsPlayerModel() = 0;
     virtual BOOL  IsBoat() = 0;
     virtual BOOL  IsCar() = 0;
     virtual BOOL  IsTrain() = 0;
@@ -133,7 +132,6 @@ public:
     virtual void RemoveRef(bool bRemoveExtraGTARef = false) = 0;
     virtual int  GetRefCount() = 0;
     virtual bool ForceUnload(void) = 0;
-    virtual void DeallocateModel() = 0;
 
     virtual float GetDistanceFromCentreOfMassToBaseOfModel() = 0;
 
@@ -150,6 +148,8 @@ public:
     virtual void*        SetVehicleSuspensionData(void* pSuspensionLines) = 0;
     virtual CVector      GetVehicleExhaustFumesPosition() = 0;
     virtual void         SetVehicleExhaustFumesPosition(const CVector& position) = 0;
+    virtual CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) = 0;
+    virtual void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) = 0;
 
     // Init the supported upgrades structure
     virtual void InitialiseSupportedUpgrades(RpClump* pClump) = 0;
@@ -169,7 +169,6 @@ public:
     // Call this to make sure the custom vehicle models are being used after a load.
     virtual void      MakeCustomModel(void) = 0;
     virtual RwObject* GetRwObject(void) = 0;
-    virtual void      MakePedModel(char* szTexture) = 0;
 
     virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades(void) = 0;
     virtual void                      ResetSupportedUpgrades(void) = 0;

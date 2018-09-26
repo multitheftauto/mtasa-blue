@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMATRIX4_H
-#define __CMATRIX4_H
+#pragma once
 
 #include "CVector.h"
 
@@ -129,5 +128,3 @@ public:
 private:
     float m_cell[16];
 };
-
-#endif

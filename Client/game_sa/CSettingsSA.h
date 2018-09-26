@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_SETTINGS
-#define __CGAMESA_SETTINGS
+#pragma once
 
 // R* have this info inside CMenuManager but I can't believe that makes much sense
 
@@ -186,5 +185,3 @@ private:
     static unsigned long FUNC_GetCurrentSubSystem;
     static unsigned long FUNC_SetSubSystem;
 };
-
-#endif
