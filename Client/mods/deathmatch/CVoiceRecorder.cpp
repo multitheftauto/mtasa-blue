@@ -197,14 +197,14 @@ eSampleRate CVoiceRecorder::convertServerSampleRate(unsigned int uiServerSampleR
     return SAMPLERATE_WIDEBAND;
 }
 
-void CVoiceRecorder::UpdatePTTState(unsigned int uiState)
+void CVoiceRecorder::SetPTTState(bool bState)
 {
     if (!m_bEnabled)
         return;
 
     m_CS.Lock();
 
-    if (uiState == 1)
+    if (bState)
     {
         if (m_VoiceState == VOICESTATE_AWAITING_INPUT)
         {
@@ -224,7 +224,7 @@ void CVoiceRecorder::UpdatePTTState(unsigned int uiState)
             }
         }
     }
-    else if (uiState == 0)
+    else
     {
         if (m_VoiceState == VOICESTATE_RECORDING)
         {
@@ -240,7 +240,13 @@ void CVoiceRecorder::UpdatePTTState(unsigned int uiState)
             }
         }
     }
+
     m_CS.Unlock();
+}
+
+bool CVoiceRecorder::GetPTTState()
+{
+    return m_VoiceState == VOICESTATE_RECORDING;
 }
 
 void CVoiceRecorder::DoPulse(void)
