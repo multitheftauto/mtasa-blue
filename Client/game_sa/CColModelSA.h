@@ -67,6 +67,13 @@ typedef struct
     {
         return CVector(x * 0.0078125f, y * 0.0078125f, z * 0.0078125f);
     }
+    void setVector(CVector vec)
+    {
+        x = vec.fX * 128;
+        y = vec.fY * 128;
+        z = vec.fZ * 128;
+    }
+
 } CompressedVector;
 
 typedef struct
@@ -86,6 +93,75 @@ typedef struct
     unsigned int         m_nNumShadowVertices;
     CompressedVector*    m_pShadowVertices;
     CColTriangleSA*      m_pShadowTriangles;
+
+    ushort createCollisionBox(CVector vecMin, CVector vecMax, uchar cMaterial = 0)
+    {
+        CColBoxSA* newArr = new CColBoxSA[numColBoxes + 1];
+        memcpy(newArr, pColBoxes, sizeof(CColBoxSA) * numColBoxes);
+
+        CColBoxSA* newBox = new CColBoxSA;
+        memcpy(newArr + sizeof(CColBoxSA) * numColBoxes, newBox, sizeof(CColBoxSA));
+
+        CColBoxSA* lastBox = &newArr[numColBoxes];
+        lastBox->min = vecMin;
+        lastBox->max = vecMax;
+        lastBox->material = cMaterial;
+        numColBoxes++;
+        pColBoxes = newArr;
+        return numColBoxes;
+    }
+
+    ushort createCollisionSphere(CVector vecPosition, float fRadius, uchar cMaterial = 0)
+    {
+        CColSphereSA* newArr = new CColSphereSA[numColSpheres + 1];
+        memcpy(newArr, pColSpheres, sizeof(CColSphereSA) * numColSpheres);
+
+        CColSphereSA* newSphere = new CColSphereSA;
+        memcpy(newArr + sizeof(CColSphereSA) * numColSpheres, newSphere, sizeof(CColSphereSA));
+
+        CColSphereSA* lastSphere = &newArr[numColSpheres];
+        lastSphere->vecCenter = vecPosition;
+        lastSphere->material = cMaterial;
+        lastSphere->fRadius = fRadius;
+        numColSpheres++;
+        pColSpheres = newArr;
+        return numColSpheres;
+    }
+
+    ushort createCollisionTriangle(CVector vecVertices, CColLighting cLighting, uchar cMaterial = 0)
+    {
+        CColTriangleSA* newArr = new CColTriangleSA[numColTriangles + 1];
+        memcpy(newArr, pColSpheres, sizeof(CColTriangleSA) * numColTriangles);
+
+        CColTriangleSA* newSphere = new CColTriangleSA;
+        memcpy(newArr + sizeof(CColTriangleSA) * numColTriangles, newSphere, sizeof(CColTriangleSA));
+
+        CColTriangleSA* lastTriangle = &newArr[numColTriangles];
+        lastTriangle->vertex[0] = vecVertices.fX;
+        lastTriangle->vertex[1] = vecVertices.fY;
+        lastTriangle->vertex[2] = vecVertices.fZ;
+        lastTriangle->lighting = cLighting;
+        lastTriangle->material = cMaterial;
+        numColTriangles++;
+        pColTriangles = newArr;
+        return numColTriangles;
+    }
+
+    ushort createCollisionVertex(CVector vecPosition)
+    {
+        ushort numVertices = getNumVertices();
+        CompressedVector* newArr = new CompressedVector[numVertices + 1];
+        memcpy(newArr, pColSpheres, sizeof(CompressedVector) * numVertices);
+
+        CompressedVector* newVertex = new CompressedVector;
+        memcpy(newArr + sizeof(CompressedVector) * numVertices, newVertex, sizeof(CompressedVector));
+
+        CompressedVector* lastVertex = &newArr[numVertices];
+        lastVertex->setVector(vecPosition);
+        pVertices = newArr;
+        return numVertices + 1;
+    }
+
     std::map<ushort, CompressedVector> getAllVertices()
     {
         std::map<ushort, CompressedVector> vertices;
@@ -97,6 +173,18 @@ typedef struct
         }
         return vertices;
     }
+    ushort getNumVertices()
+    {
+        std::map<ushort, bool> vertices;
+        for (uint i = 0; numColTriangles > i; i++)
+        {
+            vertices[pColTriangles[i].vertex[0]] = true;
+            vertices[pColTriangles[i].vertex[1]] = true;
+            vertices[pColTriangles[i].vertex[2]] = true;
+        }
+        return vertices.size();
+    }
+
 } CColDataSA;
 
 class CColModelSAInterface

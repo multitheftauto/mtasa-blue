@@ -985,6 +985,11 @@ int CLuaEngineDefs::EngineGetModelCollisionProperties(lua_State* luaVM)
                     CColDataSA* pColData = pCol->pColData;
                     if (pColData != nullptr)
                     {
+                        int i = 0;
+                        while (pColData->pVertices[i].x != 0 || 100 > i)
+                        {
+                            i++;
+                        }
                         lua_settable(luaVM, -3);
                         lua_pushstring(luaVM, "colBoxes");
                         lua_pushnumber(luaVM, pColData->numColBoxes);
@@ -1003,6 +1008,9 @@ int CLuaEngineDefs::EngineGetModelCollisionProperties(lua_State* luaVM)
                         lua_settable(luaVM, -3);
                         lua_pushstring(luaVM, "shadowVertices");
                         lua_pushnumber(luaVM, pColData->m_nNumShadowVertices);
+                        lua_settable(luaVM, -3);
+                        lua_pushstring(luaVM, "test");
+                        lua_pushnumber(luaVM, i);
                         lua_settable(luaVM, -3);
                     }
 
@@ -1492,19 +1500,7 @@ int CLuaEngineDefs::EngineModelCollisionCreateShape(lua_State* luaVM)
                             argStream.ReadNumber(cMaterial, 0);
                             if (!argStream.HasErrors())
                             {
-                                CColBoxSA* newArr = new CColBoxSA[pColData->numColBoxes + 1];
-                                memcpy(newArr, pColData->pColBoxes, sizeof(CColBoxSA) * pColData->numColBoxes);
-
-                                CColBoxSA* newBox = new CColBoxSA;
-                                memcpy(newArr + sizeof(CColBoxSA) * pColData->numColBoxes, newBox, sizeof(CColBoxSA));
-
-                                CColBoxSA* lastBox = &newArr[pColData->numColBoxes];
-                                lastBox->min = vecMin;
-                                lastBox->max = vecMax;
-                                lastBox->material = cMaterial;
-                                pColData->numColBoxes++;
-                                pColData->pColBoxes = newArr;
-                                lua_pushnumber(luaVM, pColData->numColBoxes);
+                                lua_pushnumber(luaVM, pColData->createCollisionBox(vecMin, vecMax, cMaterial));
                                 return 1;
                             }
                         break;
@@ -1514,25 +1510,25 @@ int CLuaEngineDefs::EngineModelCollisionCreateShape(lua_State* luaVM)
                             argStream.ReadNumber(cMaterial, 0);
                             if (!argStream.HasErrors())
                             {
-                                CColSphereSA* newArr = new CColSphereSA[pColData->numColSpheres + 1];
-                                memcpy(newArr, pColData->pColSpheres, sizeof(CColBoxSA) * pColData->numColSpheres);
-
-                                CColSphereSA* newSphere = new CColSphereSA;
-                                memcpy(newArr + sizeof(CColSphereSA) * pColData->numColSpheres, newSphere, sizeof(CColSphereSA));
-
-                                CColSphereSA* lastSphere = &newArr[pColData->numColSpheres];
-                                lastSphere->vecCenter = vecPosition;
-                                lastSphere->material = cMaterial;
-                                lastSphere->fRadius = fRadius;
-                                pColData->numColSpheres++;
-                                pColData->pColSpheres = newArr;
-                                lua_pushnumber(luaVM, pColData->numColSpheres);
+                                lua_pushnumber(luaVM, pColData->createCollisionSphere(vecPosition, fRadius, cMaterial));
                                 return 1;
                             }
                         break;
                         case COLLISION_TRIANGLE:
+                            argStream.ReadVector3D(vecPosition);
+                            if (!argStream.HasErrors())
+                            {
+                                lua_pushnumber(luaVM, pColData->createCollisionVertex(vecPosition));
+                                return 1;
+                            }
                         break;
                         case COLLISION_VERTEX:
+                            argStream.ReadVector3D(vecPosition);
+                            if (!argStream.HasErrors())
+                            {
+                                lua_pushnumber(luaVM, pColData->createCollisionVertex(vecPosition));
+                                return 1;
+                            }
                         break;
                     }
                     return 1;
