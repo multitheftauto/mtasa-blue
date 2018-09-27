@@ -1170,8 +1170,7 @@ int CLuaElementDefs::IsElementAttached(lua_State* luaVM)
         CClientEntity* pEntityAttachedTo = pEntity->GetAttachedTo();
         if (pEntityAttachedTo)
         {
-            assert(pEntityAttachedTo->IsEntityAttached(pEntity));
-            lua_pushboolean(luaVM, true);
+            lua_pushboolean(luaVM, pEntityAttachedTo->IsEntityAttached(pEntity));
             return 1;
         }
     }
@@ -1179,7 +1178,7 @@ int CLuaElementDefs::IsElementAttached(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
-    lua_pushboolean(luaVM, false);
+    lua_pushnil(luaVM);
     return 1;
 }
 
