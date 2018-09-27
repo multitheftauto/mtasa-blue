@@ -17,9 +17,9 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-CPrimitiveBatcher::CPrimitiveBatcher(bool m_bZTest)
+CPrimitiveBatcher::CPrimitiveBatcher()
 {
-    m_bZTest = m_bZTest;
+    D3DXMatrixIdentity(&m_MatWorld);
 }
 ////////////////////////////////////////////////////////////////
 //
@@ -92,31 +92,15 @@ void CPrimitiveBatcher::UpdateMatrices(float fViewportSizeX, float fViewportSize
 }
 ////////////////////////////////////////////////////////////////
 //
-// CPrimitiveBatcher::Flush
+// CPrimitiveBatcher::SetDeviceStates
 //
-// Send all buffered vertices to D3D
+//
 //
 ////////////////////////////////////////////////////////////////
-void CPrimitiveBatcher::Flush(void)
+void CPrimitiveBatcher::SetDeviceStates()
 {
-    if (m_primitiveList.empty())
-        return;
-
-    // Save render states
-    IDirect3DStateBlock9* pSavedStateBlock = nullptr;
-    m_pDevice->CreateStateBlock(D3DSBT_ALL, &pSavedStateBlock);
-    // Set transformations
-    D3DXMATRIX matWorld;
-    D3DXMatrixIdentity(&matWorld);
-    m_pDevice->SetTransform(D3DTS_WORLD, &matWorld);
-    m_pDevice->SetTransform(D3DTS_VIEW, &m_MatView);
-    m_pDevice->SetTransform(D3DTS_PROJECTION, &m_MatProjection);
-
-    // Set vertex FVF
-    m_pDevice->SetFVF(PrimitiveVertice::FNV);
-
     // Set states
-    m_pDevice->SetRenderState(D3DRS_ZENABLE, m_bZTest ? D3DZB_TRUE : D3DZB_FALSE);
+    m_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
     m_pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
     m_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
     m_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
@@ -134,17 +118,42 @@ void CPrimitiveBatcher::Flush(void)
     m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
     m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
     m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+}
+////////////////////////////////////////////////////////////////
+//
+// CPrimitiveBatcher::Flush
+//
+// Send all buffered vertices to D3D
+//
+////////////////////////////////////////////////////////////////
+void CPrimitiveBatcher::Flush(void)
+{
+    if (m_primitiveList.empty())
+        return;
+
+    // Save render states
+    IDirect3DStateBlock9* pSavedStateBlock = nullptr;
+    m_pDevice->CreateStateBlock(D3DSBT_ALL, &pSavedStateBlock);
+
+    // Set transformations
+    m_pDevice->SetTransform(D3DTS_WORLD, &m_MatWorld);
+    m_pDevice->SetTransform(D3DTS_VIEW, &m_MatView);
+    m_pDevice->SetTransform(D3DTS_PROJECTION, &m_MatProjection);
+
+    // Set vertex FVF
+    m_pDevice->SetFVF(PrimitiveVertice::FNV);
+
+    // Set device states
+    SetDeviceStates();
 
     // Draw
     m_pDevice->SetTexture(0, nullptr);
-    for (int i = 0; i < m_primitiveList.size(); i++)
+    for (auto& primitive : m_primitiveList)
     {
-        sDrawQueuePrimitive primitive = m_primitiveList[i];
-
-        const void* pVertexStreamZeroData = &primitive.vertices[0];
+        const void* pVertexStreamZeroData = &primitive.pVecVertices->at(0);
         uint        uiVertexStreamZeroStride = sizeof(PrimitiveVertice);
 
-        DrawPrimitive(primitive.type, primitive.vertices.size(), pVertexStreamZeroData, uiVertexStreamZeroStride);
+        DrawPrimitive(primitive.eType, primitive.pVecVertices->size(), pVertexStreamZeroData, uiVertexStreamZeroStride);
     }
 
     // Clean up
@@ -197,6 +206,9 @@ void CPrimitiveBatcher::DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iCollection
 void CPrimitiveBatcher::ClearQueue()
 {
     // Clean up
+    for(auto& primitive : m_primitiveList){
+        delete primitive.pVecVertices;
+    }
     size_t prevSize = m_primitiveList.size();
     m_primitiveList.clear();
     m_primitiveList.reserve(prevSize);
@@ -208,7 +220,7 @@ void CPrimitiveBatcher::ClearQueue()
 // Add a new primitive to the list
 //
 ////////////////////////////////////////////////////////////////
-void CPrimitiveBatcher::AddPrimitive(sDrawQueuePrimitive primitive)
+void CPrimitiveBatcher::AddPrimitive(D3DPRIMITIVETYPE eType, std::vector<PrimitiveVertice>* pVecVertices)
 {
-    m_primitiveList.push_back(primitive);
+    m_primitiveList.push_back({eType, pVecVertices});
 }
