@@ -284,6 +284,7 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pGame->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pGame->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
     g_pGame->SetTaskSimpleBeHitHandler(CClientGame::StaticTaskSimpleBeHitHandler);
+    g_pGame->GetAudioEngine()->SetWorldSoundHandler(CClientGame::StaticWorldSoundHandler);
     g_pCore->SetMessageProcessor(CClientGame::StaticProcessMessage);
     g_pCore->GetKeyBinds()->SetKeyStrokeHandler(CClientGame::StaticKeyStrokeHandler);
     g_pCore->GetKeyBinds()->SetCharacterKeyHandler(CClientGame::StaticCharacterKeyHandler);
@@ -2890,7 +2891,10 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientFileDownloadComplete", "fileName, success", NULL, false);
 
     m_Events.AddEvent("onClientWeaponFire", "ped, x, y, z", NULL, false);
-    m_Events.AddEvent("onClientWaterCannonHit", "x, y, z, normalx, normaly, normalz, materialid", NULL, false);
+  
+    m_Events.AddEvent("onClientWaterCannonHit", "x, y, z, normalx, normaly, normalz, materialid", nullptr, false);
+  
+    m_Events.AddEvent("onClientWorldSound", "group, index, x, y, z", nullptr, false);
 }
 
 void CClientGame::DrawFPS(void)
@@ -6455,11 +6459,6 @@ void CClientGame::SetDevelopmentMode(bool bEnable, bool bEnableWeb)
 {
     m_bDevelopmentMode = bEnable;
 
-    if (m_bDevelopmentMode)
-        g_pGame->GetAudioEngine()->SetWorldSoundHandler(CClientGame::StaticWorldSoundHandler);
-    else
-        g_pGame->GetAudioEngine()->SetWorldSoundHandler(NULL);
-
     if (g_pCore->IsWebCoreLoaded())
         g_pCore->GetWebCore()->SetTestModeEnabled(bEnableWeb);
 }
@@ -6471,9 +6470,9 @@ void CClientGame::SetDevelopmentMode(bool bEnable, bool bEnableWeb)
 // Handle callback from CAudioSA when a world sound is played
 //
 //////////////////////////////////////////////////////////////////
-void CClientGame::StaticWorldSoundHandler(uint uiGroup, uint uiIndex)
+bool CClientGame::StaticWorldSoundHandler(const SWorldSoundEvent& event)
 {
-    g_pClientGame->WorldSoundHandler(uiGroup, uiIndex);
+    return g_pClientGame->WorldSoundHandler(event);
 }
 
 //////////////////////////////////////////////////////////////////
@@ -6483,10 +6482,31 @@ void CClientGame::StaticWorldSoundHandler(uint uiGroup, uint uiIndex)
 // Handle callback from CAudioSA when a world sound is played
 //
 //////////////////////////////////////////////////////////////////
-void CClientGame::WorldSoundHandler(uint uiGroup, uint uiIndex)
+bool CClientGame::WorldSoundHandler(const SWorldSoundEvent& event)
 {
     if (m_bShowSound)
-        m_pScriptDebugging->LogInformation(NULL, "%s - World sound group:%d index:%d", *GetLocalTimeString(false, true), uiGroup, uiIndex);
+        m_pScriptDebugging->LogInformation(NULL, "%s - World sound group:%d index:%d", *GetLocalTimeString(false, true), event.uiGroup, event.uiIndex);
+
+    // Audio events without a game entity could default to the root element, but the
+    // best approach is to avoid spamming the event with the barely notable sounds (without a source).
+    // Warning: Canceling sounds emitted by an audio entity (like vehicles do) will cause massive spam
+    if (event.pGameEntity)
+    {
+        CClientEntity* pEntity = g_pClientGame->GetGameEntityXRefManager()->FindClientEntity(event.pGameEntity);
+
+        if (pEntity)
+        {
+            CLuaArguments Arguments;
+            Arguments.PushNumber(event.uiGroup);
+            Arguments.PushNumber(event.uiIndex);
+            Arguments.PushNumber(event.vecPosition.fX);
+            Arguments.PushNumber(event.vecPosition.fY);
+            Arguments.PushNumber(event.vecPosition.fZ);
+            return pEntity->CallEvent("onClientWorldSound", Arguments, true);
+        }
+    }
+
+    return true;
 }
 
 //////////////////////////////////////////////////////////////////

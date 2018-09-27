@@ -783,6 +783,8 @@ public:
     bool                              GetComponentRotation(const SString& vehicleComponent, CVector& vecPositionModelling);
     bool                              SetComponentPosition(const SString& vehicleComponent, const CVector& vecPosition);
     bool                              GetComponentPosition(const SString& vehicleComponent, CVector& vecPositionModelling);
+    bool                              SetComponentScale(const SString & vehicleComponent, const CVector & vecScale);
+    bool                              GetComponentScale(const SString & vehicleComponent, CVector & vecScaleModelling);
     bool                              IsComponentPresent(const SString& vehicleComponent);
     bool                              SetComponentMatrix(const SString& vehicleComponent, const CMatrix& matOrientation);
     bool                              GetComponentMatrix(const SString& vehicleComponent, CMatrix& matOutOrientation);

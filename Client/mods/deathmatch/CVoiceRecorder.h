@@ -58,7 +58,8 @@ public:
 
     void DoPulse(void);
 
-    void UpdatePTTState(unsigned int uiState);
+    void SetPTTState(bool bState);
+    bool GetPTTState();
 
     unsigned int  GetSampleRate(void) { return m_SampleRate; }
     unsigned char GetSampleQuality(void) { return m_ucQuality; }
