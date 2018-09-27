@@ -1110,13 +1110,13 @@ int CLuaEngineDefs::EngineGetModelCollisionData(lua_State* luaVM)
                                 CColTriangleSA pTriangle = pColData->pColTriangles[i];
                                 lua_newtable(luaVM);
                                 lua_pushnumber(luaVM, 1);
-                                lua_pushnumber(luaVM, pTriangle.vertex[0]);
+                                lua_pushnumber(luaVM, pTriangle.vertex[0] + 1);
                                 lua_settable(luaVM, -3);
                                 lua_pushnumber(luaVM, 2);
-                                lua_pushnumber(luaVM, pTriangle.vertex[1]);
+                                lua_pushnumber(luaVM, pTriangle.vertex[1] + 1);
                                 lua_settable(luaVM, -3);
                                 lua_pushnumber(luaVM, 3);
-                                lua_pushnumber(luaVM, pTriangle.vertex[2]);
+                                lua_pushnumber(luaVM, pTriangle.vertex[2] + 1);
                                 lua_settable(luaVM, -3);
                                 lua_pushnumber(luaVM, 4);
                                 lua_pushnumber(luaVM, pTriangle.material);
@@ -1239,6 +1239,19 @@ int CLuaEngineDefs::EngineUpdateModelCollisionBoundingBox(lua_State* luaVM)
                         pBoxMaxVec.fX -= pSphere.fRadius * 2;
                         pBoxMaxVec.fY -= pSphere.fRadius * 2;
                         pBoxMaxVec.fZ -= pSphere.fRadius * 2;
+                        VectorAlign(maxVec, minVec, pBoxMaxVec);
+                        fDis = DistanceBetweenPoints3D(pBoxMaxVec, center);
+                        if (fDis > fRadius)
+                        {
+                            fRadius = fDis;
+                        }
+                    }
+
+                    std::map<ushort, CompressedVector> vecVertices = pColData->getAllVertices();
+                    std::map<ushort, CompressedVector>::iterator it;
+                    for (it = vecVertices.begin(); it != vecVertices.end(); it++)
+                    {
+                        pBoxMaxVec = it->second.getVector();
                         VectorAlign(maxVec, minVec, pBoxMaxVec);
                         fDis = DistanceBetweenPoints3D(pBoxMaxVec, center);
                         if (fDis > fRadius)
@@ -1490,48 +1503,157 @@ int CLuaEngineDefs::EngineModelCollisionCreateShape(lua_State* luaVM)
                 {
                     CColDataSA* pColData = pCol->pColData;
 
-                    CVector vecMin, vecMax, vecPosition;
+                    CVector vecArray[3];
+                    ushort usArray[3];
                     uchar cMaterial;
+                    char cLighting[2];
                     switch (eCollisionShape)
                     {
                         case COLLISION_BOX:
-                            argStream.ReadVector3D(vecMin);
-                            argStream.ReadVector3D(vecMax);
+                            argStream.ReadVector3D(vecArray[0]);
+                            argStream.ReadVector3D(vecArray[1]);
                             argStream.ReadNumber(cMaterial, 0);
                             if (!argStream.HasErrors())
                             {
-                                lua_pushnumber(luaVM, pColData->createCollisionBox(vecMin, vecMax, cMaterial));
+                                for (int i = 0; i < 2; i++)
+                                {
+                                    if (!pColData->checkVector(vecArray[i]))
+                                    {
+                                        argStream.SetCustomError(SString("Position at argument %i is out of bounding.", i + 2));
+                                        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+                                        lua_pushboolean(luaVM, false);
+                                        return 1;
+                                    }
+                                }
+                                lua_pushnumber(luaVM, pColData->createCollisionBox(vecArray[0], vecArray[1], cMaterial));
                                 return 1;
                             }
                         break;
                         case COLLISION_SPHERE:
-                            argStream.ReadVector3D(vecPosition);
+                            argStream.ReadVector3D(vecArray[0]);
                             argStream.ReadNumber(fRadius);
                             argStream.ReadNumber(cMaterial, 0);
                             if (!argStream.HasErrors())
                             {
-                                lua_pushnumber(luaVM, pColData->createCollisionSphere(vecPosition, fRadius, cMaterial));
+                                if (!pColData->checkVector(vecArray[0]))
+                                {
+                                    argStream.SetCustomError("Position at argument 3 is out of bounding.");
+                                    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+                                    lua_pushboolean(luaVM, false);
+                                    return 1;
+                                }
+                                lua_pushnumber(luaVM, pColData->createCollisionSphere(vecArray[0], fRadius, cMaterial));
                                 return 1;
                             }
                         break;
                         case COLLISION_TRIANGLE:
-                            argStream.ReadVector3D(vecPosition);
-                            if (!argStream.HasErrors())
+                            // vertex, vertex, vertex[, material = 0, dayLight = 12, nightLight = 6]
+                            // vertex is number ( vertex id ), or vector3d
+                            // if is used second verion, there is another argument ( by default = 0 ) determining distance to nearest vertex
+
+                            bool bVersion = false; // true = 3x ushort, false = 3x CVector
+                            if (argStream.NextIsVector3D() && argStream.NextIsVector3D(1) && argStream.NextIsVector3D(2))
                             {
-                                lua_pushnumber(luaVM, pColData->createCollisionVertex(vecPosition));
+                                argStream.ReadVector3D(vecArray[0]);
+                                argStream.ReadVector3D(vecArray[1]);
+                                argStream.ReadVector3D(vecArray[2]);
+                                bVersion = true;
+                            }
+                            else if (argStream.NextIsNumber() && argStream.NextIsNumber(1) && argStream.NextIsNumber(2))
+                            {
+                                argStream.ReadNumber(usArray[0]);
+                                argStream.ReadNumber(usArray[1]);
+                                argStream.ReadNumber(usArray[2]);
+                                bVersion = false;
+                            }
+                            else
+                            {
+                                argStream.SetCustomError("Expected 3 times vector3d or integers at arguments 3, 4 and 5.");
+                                m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+                                lua_pushboolean(luaVM, false);
                                 return 1;
                             }
-                        break;
-                        case COLLISION_VERTEX:
-                            argStream.ReadVector3D(vecPosition);
+
+                            argStream.ReadNumber(cMaterial, 0);
+                            argStream.ReadNumber(cLighting[0], 12); // @todo, find best values
+                            argStream.ReadNumber(cLighting[1], 6); // @todo, find best values
+                            argStream.ReadNumber(fRadius, 0); // ignored for 3x vertices
+
                             if (!argStream.HasErrors())
                             {
-                                lua_pushnumber(luaVM, pColData->createCollisionVertex(vecPosition));
-                                return 1;
+                                if (cMaterial < EColSurfaceValue::DEFAULT || cMaterial > EColSurfaceValue::RAILTRACK)
+                                {
+                                    argStream.SetCustomError("Expected valid material id between 0 and 178");
+                                    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+                                    lua_pushboolean(luaVM, false);
+                                    return 1;
+                                }
+
+                                if (cLighting[0] < 0 || cLighting[0] > 15)
+                                {
+                                    argStream.SetCustomError("Expected valid day lighting between 0 and 15");
+                                    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+                                    lua_pushboolean(luaVM, false);
+                                    return 1;
+                                }
+                                if (cLighting[1] < 0 || cLighting[1] > 15)
+                                {
+                                    argStream.SetCustomError("Expected valid night lighting between 0 and 15");
+                                    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+                                    lua_pushboolean(luaVM, false);
+                                    return 1;
+                                }
+
+                                if (bVersion)
+                                {
+                                    for (int i = 0; i < 3; i++) // check vectors
+                                    {
+                                        if (!pColData->checkVector(vecArray[i]))
+                                        {
+                                            argStream.SetCustomError(SString("Position at argument %i is out of bounding.", argStream.m_iIndex + i));
+                                            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+                                            lua_pushboolean(luaVM, false);
+                                            return 1;
+                                        }
+                                    }
+
+                                    ushort usVertices[3];
+                                    usVertices[0] = pColData->createCollisionVertex(vecArray[0]);
+                                    usVertices[1] = pColData->createCollisionVertex(vecArray[1], 1);
+                                    usVertices[2] = pColData->createCollisionVertex(vecArray[2], 2);
+                                    CColLighting colLighting;
+                                    colLighting.day = cLighting[0];
+                                    colLighting.night = cLighting[1];
+                                    lua_pushnumber(luaVM, pColData->createCollisionTriangle(usVertices[0] - 1, usVertices[1] - 1, usVertices[2] - 1, colLighting, cMaterial));
+                                    return 1;
+                                }
+                                else
+                                {
+                                    ushort usNumVertices = pColData->getNumVertices();
+
+                                    for (int i = 0; i < 3; i++) // 0-X instead of 1-X & check vertices
+                                    {
+                                        usArray[i]--;
+                                        if (usArray[0] < 0 || usArray[0] > usNumVertices)
+                                        {
+                                            argStream.SetCustomError(SString("Vertex id at argument %i", i + 2 ));
+                                            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+                                            lua_pushboolean(luaVM, false);
+                                            return 1;
+                                        }
+                                    }
+
+                                    if (fRadius < 0 || fRadius > 500) // this make no sense if someone pass others values
+                                    {
+                                        argStream.SetCustomError("Expected valid distance between 0 and 500");
+                                        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+                                        lua_pushboolean(luaVM, false);
+                                        return 1;
+                                    }
+                                }
                             }
                         break;
                     }
-                    return 1;
                 }
             }
         }

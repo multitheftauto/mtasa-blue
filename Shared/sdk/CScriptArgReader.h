@@ -1163,10 +1163,10 @@ public:
         return (NextCouldBeNumber() && NextCouldBeNumber(1) && NextCouldBeNumber(2) && NextCouldBeNumber(3)) || NextIsUserDataOfType<CLuaVector4D>();
     }
 
-    bool NextIsVector3D(void) const
+    bool NextIsVector3D(int iOffset = 0) const
     {
-        return (NextCouldBeNumber() && NextCouldBeNumber(1) && NextCouldBeNumber(2)) || NextIsUserDataOfType<CLuaVector3D>() ||
-               NextIsUserDataOfType<CLuaVector4D>();
+        return (NextCouldBeNumber(iOffset * 3) && NextCouldBeNumber(iOffset * 3 + 1) && NextCouldBeNumber(iOffset * 3 + 2)) || NextIsUserDataOfType<CLuaVector3D>(iOffset * 3) ||
+               NextIsUserDataOfType<CLuaVector4D>(iOffset * 3);
     }
 
     bool NextIsVector2D(void) const

@@ -128,18 +128,18 @@ typedef struct
         return numColSpheres;
     }
 
-    ushort createCollisionTriangle(CVector vecVertices, CColLighting cLighting, uchar cMaterial = 0)
+    ushort createCollisionTriangle(ushort usVertex1, ushort usVertex2, ushort usVertex3, CColLighting cLighting, uchar cMaterial = 0)
     {
         CColTriangleSA* newArr = new CColTriangleSA[numColTriangles + 1];
-        memcpy(newArr, pColSpheres, sizeof(CColTriangleSA) * numColTriangles);
+        memcpy(newArr, pColTriangles, sizeof(CColTriangleSA) * numColTriangles);
 
-        CColTriangleSA* newSphere = new CColTriangleSA;
-        memcpy(newArr + sizeof(CColTriangleSA) * numColTriangles, newSphere, sizeof(CColTriangleSA));
+        CColTriangleSA* newTriangle = new CColTriangleSA;
+        memcpy(newArr + sizeof(CColTriangleSA) * numColTriangles, newTriangle, sizeof(CColTriangleSA));
 
         CColTriangleSA* lastTriangle = &newArr[numColTriangles];
-        lastTriangle->vertex[0] = vecVertices.fX;
-        lastTriangle->vertex[1] = vecVertices.fY;
-        lastTriangle->vertex[2] = vecVertices.fZ;
+        lastTriangle->vertex[0] = usVertex1;
+        lastTriangle->vertex[1] = usVertex2;
+        lastTriangle->vertex[2] = usVertex3;
         lastTriangle->lighting = cLighting;
         lastTriangle->material = cMaterial;
         numColTriangles++;
@@ -147,11 +147,11 @@ typedef struct
         return numColTriangles;
     }
 
-    ushort createCollisionVertex(CVector vecPosition)
+    ushort createCollisionVertex(CVector vecPosition, uchar ucAddedSize = 0) // we don't know how many vertices already is
     {
-        ushort numVertices = getNumVertices();
+        ushort numVertices = getNumVertices() + ucAddedSize;
         CompressedVector* newArr = new CompressedVector[numVertices + 1];
-        memcpy(newArr, pColSpheres, sizeof(CompressedVector) * numVertices);
+        memcpy(newArr, pVertices, sizeof(CompressedVector) * numVertices);
 
         CompressedVector* newVertex = new CompressedVector;
         memcpy(newArr + sizeof(CompressedVector) * numVertices, newVertex, sizeof(CompressedVector));
@@ -183,6 +183,11 @@ typedef struct
             vertices[pColTriangles[i].vertex[2]] = true;
         }
         return vertices.size();
+    }
+
+    inline bool checkVector(CVector &vecVector)
+    {
+        return ((128 < vecVector.fX > -128) && (128 < vecVector.fY > -128) && (128 < vecVector.fZ > -128));
     }
 
 } CColDataSA;
