@@ -18,6 +18,7 @@ CClientRadarAreaManager::CClientRadarAreaManager(CClientManager* pManager)
     m_pManager = pManager;
     m_bDontRemoveFromList = false;
     m_usDimension = 0;
+    m_ucInterior = 0;
 }
 
 CClientRadarAreaManager::~CClientRadarAreaManager(void)
@@ -77,6 +78,17 @@ void CClientRadarAreaManager::SetDimension(unsigned short usDimension)
     }
 
     m_usDimension = usDimension;
+}
+
+void CClientRadarAreaManager::SetInterior(unsigned char ucInterior)
+{
+    list<CClientRadarArea*>::iterator iter = m_List.begin();
+    for (; iter != m_List.end(); iter++)
+    {
+        (*iter)->RelateInterior(ucInterior);
+    }
+
+    m_ucInterior = ucInterior;
 }
 
 void CClientRadarAreaManager::DoPulse(void)

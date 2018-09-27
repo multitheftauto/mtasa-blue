@@ -36,6 +36,9 @@ public:
     unsigned short GetDimension(void) { return m_usDimension; };
     void           SetDimension(unsigned short usDimension);
 
+    unsigned char GetInterior(void) { return m_ucInterior; };
+    void          SetInterior(unsigned char ucInterior);
+
 private:
     void DoPulse(void);
     void DoPulse(bool bRender);
@@ -49,4 +52,5 @@ private:
     std::list<CClientRadarArea*> m_List;
     bool                         m_bDontRemoveFromList;
     unsigned short               m_usDimension;
+    unsigned char                m_ucInterior;
 };

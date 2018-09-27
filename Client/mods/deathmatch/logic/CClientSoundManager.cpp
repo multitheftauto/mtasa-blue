@@ -123,6 +123,11 @@ void CClientSoundManager::SetDimension(unsigned short usDimension)
     m_usDimension = usDimension;
 }
 
+void CClientSoundManager::SetInterior(unsigned char ucInterior)
+{
+    m_ucInterior = ucInterior;
+}
+
 CClientSound* CClientSoundManager::PlaySound2D(const SString& strSound, bool bIsURL, bool bLoop, bool bThrottle)
 {
     CClientSound* pSound = new CClientSound(m_pClientManager, INVALID_ELEMENT_ID);
@@ -358,7 +363,7 @@ void CClientSoundManager::UpdateDistanceStreaming(const CVector& vecListenerPosi
         CSphere sphere = pSound->GetWorldBoundingSphere();
         float   fDistance = (vecListenerPosition - sphere.vecPosition).Length() - sphere.fRadius;
 
-        if (fDistance > 40 || m_usDimension != pSound->GetDimension())
+        if (fDistance > 40 || m_usDimension != pSound->GetDimension() || m_ucInterior != pSound->GetInterior())
             pSound->DistanceStreamOut();
         else if (fDistance < 20)
             pSound->DistanceStreamIn();

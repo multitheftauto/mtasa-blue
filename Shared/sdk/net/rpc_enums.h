@@ -263,5 +263,7 @@ enum eElementRPCFunctions
 
     SET_PED_ANIMATION_SPEED,
 
+    SET_OBJECT_VISIBLE_IN_ALL_INTERIORS,
+
     NUM_RPC_FUNCS // Add above this line
 };

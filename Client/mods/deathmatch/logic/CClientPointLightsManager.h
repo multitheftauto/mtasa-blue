@@ -37,6 +37,9 @@ public:
     unsigned short GetDimension(void) { return m_usDimension; };
     void           SetDimension(unsigned short usDimension);
 
+    unsigned char GetInterior(void) { return m_ucInterior; };
+    void          SetInterior(unsigned char ucInterior);
+
     void DoPulse(void);
     void RenderHeliLightHandler(void);
 
@@ -56,4 +59,5 @@ private:
     std::list<CClientSearchLight*> m_SearchLightList;
     bool                           m_bDontRemoveFromList;
     unsigned short                 m_usDimension;
+    unsigned char                  m_ucInterior;
 };

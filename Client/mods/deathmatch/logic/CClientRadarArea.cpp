@@ -47,7 +47,7 @@ void CClientRadarArea::DoPulse(void)
 
 void CClientRadarArea::DoPulse(bool bRender)
 {
-    #define RADAR_FLASH_CYCLETIME 1000
+#define RADAR_FLASH_CYCLETIME 1000
 
     // Suppose to show?
     if (m_bStreamedIn)
@@ -116,4 +116,15 @@ void CClientRadarArea::SetDimension(unsigned short usDimension)
 void CClientRadarArea::RelateDimension(unsigned short usDimension)
 {
     m_bStreamedIn = (usDimension == m_usDimension);
+}
+
+void CClientRadarArea::SetInterior(unsigned char ucInterior)
+{
+    m_ucInterior = ucInterior;
+    RelateInterior(m_pRadarAreaManager->GetInterior());
+}
+
+void CClientRadarArea::RelateInterior(unsigned char ucInterior)
+{
+    m_bStreamedIn = (ucInterior == m_ucInterior);
 }

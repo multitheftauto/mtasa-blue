@@ -39,6 +39,9 @@ public:
     unsigned short GetDimension(void) { return m_usDimension; };
     void           SetDimension(unsigned short usDimension);
 
+    unsigned char GetInterior(void) { return m_ucInterior; };
+    void          SetInterior(unsigned char ucInterior);
+
     std::list<CClientWater*>::const_iterator IterBegin(void) { return m_List.begin(); };
     std::list<CClientWater*>::const_iterator IterEnd(void) { return m_List.end(); };
 
@@ -54,4 +57,5 @@ private:
     std::list<CClientWater*> m_List;
     bool                     m_bDontRemoveFromList;
     unsigned short           m_usDimension;
+    unsigned char            m_ucInterior;
 };

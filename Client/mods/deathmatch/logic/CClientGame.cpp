@@ -29,7 +29,7 @@ using std::list;
 using std::vector;
 
 // Hide the "conversion from 'unsigned long' to 'DWORD*' of greater size" warning
-#pragma warning(disable:4312)
+#pragma warning(disable : 4312)
 
 // Used within this file by the packet handler to grab the this pointer of CClientGame
 extern CClientGame* g_pClientGame;
@@ -41,15 +41,15 @@ bool                g_bBulletFireVectorsValid;
 CVector             g_vecBulletFireStartPosition;
 CVector             g_vecBulletFireEndPosition;
 
-#define DEFAULT_GRAVITY              0.008f
-#define DEFAULT_GAME_SPEED           1.0f
-#define DEFAULT_BLUR_LEVEL           36
-#define DEFAULT_JETPACK_MAXHEIGHT    100
-#define DEFAULT_AIRCRAFT_MAXHEIGHT   800
+#define DEFAULT_GRAVITY 0.008f
+#define DEFAULT_GAME_SPEED 1.0f
+#define DEFAULT_BLUR_LEVEL 36
+#define DEFAULT_JETPACK_MAXHEIGHT 100
+#define DEFAULT_AIRCRAFT_MAXHEIGHT 800
 #define DEFAULT_AIRCRAFT_MAXVELOCITY 1.5f
-#define DEFAULT_MINUTE_DURATION      1000
-#define DOUBLECLICK_TIMEOUT          330
-#define DOUBLECLICK_MOVE_THRESHOLD   10.0f
+#define DEFAULT_MINUTE_DURATION 1000
+#define DOUBLECLICK_TIMEOUT 330
+#define DOUBLECLICK_MOVE_THRESHOLD 10.0f
 
 CClientGame::CClientGame(bool bLocalPlay)
 {
@@ -315,17 +315,17 @@ CClientGame::CClientGame(bool bLocalPlay)
 
     m_bBeingDeleted = false;
 
-    #if defined (MTA_DEBUG) || defined (MTA_BETA)
+#if defined(MTA_DEBUG) || defined(MTA_BETA)
     m_bShowSyncingInfo = false;
-    #endif
+#endif
 
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
     m_pShowPlayer = m_pShowPlayerTasks = NULL;
     m_bMimicLag = false;
     m_ulLastMimicLag = 0;
     m_bDoPaintballs = false;
     m_bShowInterpolation = false;
-    #endif
+#endif
 
     // Add our lua events
     AddBuiltInEvents();
@@ -370,8 +370,8 @@ CClientGame::~CClientGame(void)
     // Reset CGUI's global events
     g_pCore->GetGUI()->ClearInputHandlers(INPUT_MOD);
 
-    // Destroy mimics
-    #ifdef MTA_DEBUG
+// Destroy mimics
+#ifdef MTA_DEBUG
     list<CClientPlayer*>::const_iterator iterMimics = m_Mimics.begin();
     for (; iterMimics != m_Mimics.end(); iterMimics++)
     {
@@ -382,7 +382,7 @@ CClientGame::~CClientGame(void)
 
         delete pPlayer;
     }
-    #endif
+#endif
 
     // Hide the transfer box incase it is showing
     m_pTransferBox->Hide();
@@ -754,7 +754,7 @@ void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRend
 void CClientGame::DoPulsePostFrame(void)
 {
     TIMING_CHECKPOINT("+CClientGame::DoPulsePostFrame");
-    #ifdef DEBUG_KEYSTATES
+#ifdef DEBUG_KEYSTATES
     // Get the controller state
     CControllerState cs;
     g_pGame->GetPad()->GetCurrentControllerState(&cs);
@@ -792,7 +792,7 @@ void CClientGame::DoPulsePostFrame(void)
         cs.m_bVehicleMouseLook, cs.LeftStickX, cs.LeftStickY, cs.RightStickX, cs.RightStickY);
 
     g_pCore->GetGraphics()->DrawTextTTF(300, 320, 1280, 800, 0xFFFFFFFF, strBuffer, 1.0f, 0);
-    #endif
+#endif
 
     UpdateModuleTickCount64();
 
@@ -861,7 +861,7 @@ void CClientGame::DoPulsePostFrame(void)
             g_pMultiplayer->GetLimits()->SetStreamingMemory(iStreamingMemoryBytes);
 
             // If we're in debug mode and are supposed to show task data, do it
-        #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
         if (m_pShowPlayerTasks)
         {
             DrawTasks(m_pShowPlayerTasks);
@@ -879,9 +879,9 @@ void CClientGame::DoPulsePostFrame(void)
             if (pPlayer->IsStreamedIn() && pPlayer->IsShowingWepdata())
                 DrawWeaponsyncData(pPlayer);
         }
-        #endif
+#endif
 
-        #if defined (MTA_DEBUG) || defined (MTA_BETA)
+#if defined(MTA_DEBUG) || defined(MTA_BETA)
         if (m_bShowSyncingInfo)
         {
             // Draw the header boxz
@@ -901,7 +901,7 @@ void CClientGame::DoPulsePostFrame(void)
                 m_pDisplayManager->DrawText2D(strBuffer, vecPosition, 1.0f, 0xFFFFFFFF);
             }
         }
-        #endif
+#endif
         // Heli Clear time
         if (m_LastClearTime.Get() > HeliKill_List_Clear_Rate)
         {
@@ -1031,9 +1031,9 @@ void CClientGame::DoPulses(void)
 
     GetModelCacheManager()->DoPulse();
 
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
     UpdateMimics();
-    #endif
+#endif
 
     // Grab the current time
     unsigned long ulCurrentTime = CClientTime::GetTime();
@@ -2291,6 +2291,23 @@ void CClientGame::SetAllDimensions(unsigned short usDimension)
     m_pManager->GetWaterManager()->SetDimension(usDimension);
     m_pNametags->SetDimension(usDimension);
     m_pCamera->SetDimension(usDimension);
+}
+
+void CClientGame::SetAllInteriors(unsigned char ucInterior)
+{
+    m_pManager->GetMarkerStreamer()->SetInterior(ucInterior);
+    m_pManager->GetObjectStreamer()->SetInterior(ucInterior);
+    m_pManager->GetObjectLodStreamer()->SetInterior(ucInterior);
+    m_pManager->GetPickupStreamer()->SetInterior(ucInterior);
+    m_pManager->GetPlayerStreamer()->SetInterior(ucInterior);
+    m_pManager->GetRadarAreaManager()->SetInterior(ucInterior);
+    m_pManager->GetVehicleStreamer()->SetInterior(ucInterior);
+    m_pManager->GetRadarMarkerManager()->SetInterior(ucInterior);
+    m_pManager->GetSoundManager()->SetInterior(ucInterior);
+    m_pManager->GetPointLightsManager()->SetInterior(ucInterior);
+    m_pManager->GetWaterManager()->SetInterior(ucInterior);
+    m_pNametags->SetInterior(ucInterior);
+    m_pCamera->SetInterior(ucInterior);
 }
 
 bool CClientGame::StaticKeyStrokeHandler(const SString& strKey, bool bState, bool bIsConsoleInputKey)
@@ -4079,13 +4096,13 @@ bool CClientGame::ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CE
 
                 if (pEntity && pColEntity)
                 {
-                    #if MTA_DEBUG
+#if MTA_DEBUG
                     CClientEntity* ppThisEntity2 = iter1->second;
                     CClientEntity* ppOtherEntity2 = iter2->second;
                     // These should match, but its not essential.
                     assert(ppThisEntity2 == pEntity);
                     assert(ppOtherEntity2 == pColEntity);
-                    #endif
+#endif
                     if (!pEntity->IsCollidableWith(pColEntity))
                         return false;
                 }
@@ -5524,6 +5541,9 @@ void CClientGame::ResetMapInfo(void)
 
     // Dimension
     SetAllDimensions(0);
+
+    // Interior
+    SetAllInteriors(0);
 
     // Hud
     g_pGame->GetHud()->SetComponentVisible(HUD_ALL, true);

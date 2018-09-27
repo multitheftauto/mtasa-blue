@@ -17,6 +17,7 @@ CClientRadarMarkerManager::CClientRadarMarkerManager(CClientManager* pManager)
     m_pManager = pManager;
     m_bCanRemoveFromList = true;
     m_usDimension = 0;
+    m_ucInterior = 0;
     m_bOrderOnPulse = false;
 }
 
@@ -84,6 +85,12 @@ void CClientRadarMarkerManager::SetDimension(unsigned short usDimension)
     m_bOrderOnPulse = true;
 }
 
+void CClientRadarMarkerManager::SetInterior(unsigned char ucInterior)
+{
+    m_ucInterior = ucInterior;
+    m_bOrderOnPulse = true;
+}
+
 bool CClientRadarMarkerManager::Exists(CClientRadarMarker* pRadarMarker)
 {
     list<CClientRadarMarker*>::const_iterator iter = m_Markers.begin();
@@ -110,7 +117,7 @@ void CClientRadarMarkerManager::OrderMarkers(void)
     iter = m_Markers.begin();
     for (; iter != m_Markers.end(); iter++)
     {
-        if ((*iter)->GetDimension() == m_usDimension)
+        if ((*iter)->GetDimension() == m_usDimension && (*iter)->GetInterior() == m_ucInterior)
         {
             (*iter)->CreateMarker();
         }

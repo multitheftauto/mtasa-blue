@@ -160,6 +160,18 @@ void CClientStreamElement::SetDimension(unsigned short usDimension)
     }
 }
 
+void CClientStreamElement::SetInterior(unsigned char ucInterior)
+{
+    // Different interior than before?
+    if (m_ucInterior != ucInterior)
+    {
+        // Set the new interior
+        m_ucInterior = ucInterior;
+
+        m_pStreamer->OnElementInterior(this);
+    }
+}
+
 CSphere CClientStreamElement::GetWorldBoundingSphere(void)
 {
     // Default to a point at stream position

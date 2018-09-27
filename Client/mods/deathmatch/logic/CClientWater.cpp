@@ -169,6 +169,20 @@ void CClientWater::RelateDimension(unsigned short usWorldDimension)
         Destroy();
 }
 
+void CClientWater::SetInterior(unsigned char ucInterior)
+{
+    m_ucInterior = ucInterior;
+    RelateInterior(m_pManager->GetWaterManager()->GetInterior());
+}
+
+void CClientWater::RelateInterior(unsigned char ucWorldInterior)
+{
+    if (ucWorldInterior == m_ucInterior)
+        Create();
+    else
+        Destroy();
+}
+
 bool CClientWater::SetLevel(float fLevel, void* pChangeSource)
 {
     CVector vecVertexPos;

@@ -109,6 +109,9 @@ public:
     bool IsVisibleInAllDimensions(void) { return m_bVisibleInAllDimensions; };
     void SetVisibleInAllDimensions(bool bVisible, unsigned short usNewDimension = 0);
 
+    bool IsVisibleInAllInteriors(void) { return m_bVisibleInAllInteriors; };
+    void SetVisibleInAllInteriors(bool bVisible, unsigned char ucNewInterior = 0);
+
     void ReCreate(void);
     void UpdateVisibility(void);
 
@@ -150,6 +153,7 @@ protected:
     float         m_fBuoyancyConstant;
     CVector       m_vecCenterOfMass;
     bool          m_bVisibleInAllDimensions = false;
+    bool          m_bVisibleInAllInteriors = false;
 
     CVector m_vecMoveSpeed;
     CVector m_vecTurnSpeed;

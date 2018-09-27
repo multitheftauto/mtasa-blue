@@ -49,6 +49,9 @@ public:
     void SetDimension(unsigned short usDimension);
     void RelateDimension(unsigned short usDimension);
 
+    void SetInterior(unsigned char ucInterior);
+    void RelateInterior(unsigned char ucInterior);
+
 protected:
     void DoPulse(void);
     void DoPulse(bool bRender);

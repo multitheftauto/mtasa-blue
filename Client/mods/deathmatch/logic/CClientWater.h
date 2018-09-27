@@ -34,6 +34,9 @@ public:
     void SetDimension(unsigned short usDimension);
     void RelateDimension(unsigned short usWorldDimension);
 
+    void SetInterior(unsigned char ucInterior);
+    void RelateInterior(unsigned char ucWorldInterior);
+
 private:
     CWaterPoly*          m_pPoly;
     CClientWaterManager* m_pWaterManager;
@@ -41,6 +44,7 @@ private:
     bool                 m_bShallow;             // Shallow water?
     std::vector<CVector> m_Vertices;             // List of vertices for this water
     unsigned short       m_usDimension;
+    unsigned char        m_ucInterior;
 
     friend class CClientWaterManager;
 };

@@ -8123,6 +8123,41 @@ bool CStaticFunctionDefinitions::IsObjectVisibleInAllDimensions(CElement* pEleme
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetObjectVisibleInAllInteriors(CElement* pElement, bool bVisible, unsigned char ucNewInterior)
+{
+    RUN_CHILDREN(SetObjectVisibleInAllInteriors(*iter, bVisible, ucNewInterior))
+
+    if (IS_OBJECT(pElement))
+    {
+        CObject* pObject = static_cast<CObject*>(pElement);
+
+        pObject->SetVisibleInAllInteriors(bVisible);
+
+        CBitStream BitStream;
+        BitStream.pBitStream->WriteBit(bVisible);
+        BitStream.pBitStream->Write(ucNewInterior);
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_OBJECT_VISIBLE_IN_ALL_INTERIORS, *BitStream.pBitStream));
+
+        // As setObjectVisibleInAllInteriors already takes care of setting the client-side dimension we need to update it here too
+        if (!bVisible)
+            pObject->SetDimension(ucNewInterior);
+
+        return true;
+    }
+}
+
+bool CStaticFunctionDefinitions::IsObjectVisibleInAllInteriors(CElement* pElement)
+{
+    if (IS_OBJECT(pElement))
+    {
+        CObject* pObject = static_cast<CObject*>(pElement);
+
+        return pObject->IsVisibleInAllInteriors();
+    }
+
+    return false;
+}
+
 CRadarArea* CStaticFunctionDefinitions::CreateRadarArea(CResource* pResource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color,
                                                         CElement* pVisibleTo)
 {

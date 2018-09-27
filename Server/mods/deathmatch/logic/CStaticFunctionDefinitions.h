@@ -402,6 +402,7 @@ public:
     // Object get functions
     static bool GetObjectRotation(CObject* pObject, CVector& vecRotation);
     static bool IsObjectVisibleInAllDimensions(CElement* pElement);
+    static bool IsObjectVisibleInAllInteriors(CElement* pElement);
 
     // Object set functions
     static bool SetObjectRotation(CElement* pElement, const CVector& vecRotation);
@@ -410,6 +411,7 @@ public:
                            CEasingCurve::eType a_easingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot);
     static bool StopObject(CElement* pElement);
     static bool SetObjectVisibleInAllDimensions(CElement* pElement, bool bVisible, unsigned short usNewDimension = 0);
+    static bool SetObjectVisibleInAllInteriors(CElement* pElement, bool bVisible, unsigned char ucNewInterior = 0);
 
     // Radar area create/destroy funcs
     static CRadarArea* CreateRadarArea(CResource* pResource, const CVector2D& vecPosition, const CVector2D& vecSize, const SColor color, CElement* pVisibleTo);

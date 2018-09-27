@@ -282,6 +282,7 @@ public:
     static bool           GetObjectBuoyancyConstant(CClientObject& Object, float& fBuoyancyConstant);
     static bool           GetObjectCenterOfMass(CClientObject& Object, CVector& vecCenterOfMass);
     static bool           IsObjectVisibleInAllDimensions(CClientEntity& Entity);
+    static bool           IsObjectVisibleInAllInteriors(CClientEntity& Entity);
 
     // Object set funcs
     static bool SetObjectRotation(CClientEntity& Entity, const CVector& vecRotation);
@@ -301,6 +302,7 @@ public:
     static bool SetObjectBuoyancyConstant(CClientEntity& Entity, float fBuoyancyConstant);
     static bool SetObjectCenterOfMass(CClientEntity& Entity, const CVector& vecCenterOfMass);
     static bool SetObjectVisibleInAllDimensions(CClientEntity& Entity, bool bVisible, unsigned short usNewDimension = 0);
+    static bool SetObjectVisibleInAllInteriors(CClientEntity& Entity, bool bVisible, unsigned char ucNewInterior);
 
     // Radar-area get funcs
     static CClientRadarArea* CreateRadarArea(CResource& Resource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color);

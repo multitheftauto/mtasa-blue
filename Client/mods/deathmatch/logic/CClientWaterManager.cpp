@@ -128,3 +128,14 @@ void CClientWaterManager::SetDimension(unsigned short usDimension)
         (*iter)->RelateDimension(m_usDimension);
     }
 }
+
+void CClientWaterManager::SetInterior(unsigned char ucInterior)
+{
+    m_ucInterior = ucInterior;
+
+    list<CClientWater*>::const_iterator iter = m_List.begin();
+    for (; iter != m_List.end(); iter++)
+    {
+        (*iter)->RelateInterior(m_ucInterior);
+    }
+}

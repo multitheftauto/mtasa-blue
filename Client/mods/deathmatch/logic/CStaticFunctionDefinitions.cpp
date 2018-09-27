@@ -4087,6 +4087,32 @@ bool CStaticFunctionDefinitions::IsObjectVisibleInAllDimensions(CClientEntity& E
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetObjectVisibleInAllInteriors(CClientEntity& Entity, bool bVisible, unsigned char ucNewInterior)
+{
+    RUN_CHILDREN(SetObjectVisibleInAllInteriors(**iter, bVisible, ucNewInterior))
+
+    if (IS_OBJECT(&Entity))
+    {
+        CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
+        Object.SetVisibleInAllInteriors(bVisible, ucNewInterior);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::IsObjectVisibleInAllInteriors(CClientEntity& Entity)
+{
+    if (IS_OBJECT(&Entity))
+    {
+        CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
+
+        return Object.IsVisibleInAllInteriors();
+    }
+
+    return false;
+}
+
 CClientRadarArea* CStaticFunctionDefinitions::CreateRadarArea(CResource& Resource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color)
 {
     // Create it
@@ -5431,7 +5457,7 @@ int CStaticFunctionDefinitions::GUIComboBoxGetItemCount(CClientEntity& Entity)
             return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetItemCount();
         }
     }
-    
+
     return 0;
 }
 
@@ -5458,7 +5484,7 @@ bool CStaticFunctionDefinitions::GUIComboBoxSetOpen(CClientEntity& Entity, bool 
             return true;
         }
     }
-    
+
     return false;
 }
 
@@ -5468,14 +5494,14 @@ bool CStaticFunctionDefinitions::GUIComboBoxIsOpen(CClientEntity& Entity)
     if (IS_GUI(&Entity))
     {
         CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-        
+
         // Are we a combobox?
         if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
         {
             return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->IsOpen();
         }
     }
-    
+
     return false;
 }
 

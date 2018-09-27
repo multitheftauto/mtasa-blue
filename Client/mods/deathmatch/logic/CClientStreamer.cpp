@@ -20,6 +20,7 @@ CClientStreamer::CClientStreamer(StreamerLimitReachedFunction* pLimitReachedFunc
     m_fMaxDistanceExp = fMaxDistance * fMaxDistance;
     m_fMaxDistanceThreshold = (fMaxDistance + 50.0f) * (fMaxDistance + 50.0f);
     m_usDimension = 0;
+    m_ucInterior = 0;
 
     // We need the limit reached func
     assert(pLimitReachedFunc);
@@ -200,6 +201,33 @@ void CClientStreamer::SetDimension(unsigned short usDimension)
                 if (!pElement->IsVisibleInAllDimensions())
                 {
                     // Unstream it
+                    m_ToStreamOut.push_back(pElement);
+                }
+            }
+        }
+    }
+}
+
+void CClientStreamer::SetInterior(unsigned char ucInterior)
+{
+    // Different interior than before?
+    if (ucInterior != m_ucInterior)
+    {
+        // Set the new interior
+        m_ucInterior = ucInterior;
+
+        // That means all of the currently streamed in elements will have to
+        // go. Unstream all elements that are streamed in
+        CClientStreamElement*                 pElement = NULL;
+        list<CClientStreamElement*>::iterator iter = m_ActiveElements.begin();
+        for (; iter != m_ActiveElements.end(); iter++)
+        {
+            pElement = *iter;
+            if (pElement->IsStreamedIn())
+            {
+                if (!pElement->IsVisibleInAllInteriors())
+                {
+                    //Unstream it
                     m_ToStreamOut.push_back(pElement);
                 }
             }
@@ -489,8 +517,8 @@ void CClientStreamer::Restream(bool bMovedFar)
         }
         else
         {
-            // Same dimension as us?
-            if (pElement->GetDimension() == m_usDimension || pElement->IsVisibleInAllDimensions())
+            // Same dimension and interior as us?
+            if (pElement->GetDimension() == m_usDimension || pElement->IsVisibleInAllDimensions() && pElement->GetInterior() == m_ucInterior || pElement->IsVisibleInAllInteriors())
             {
                 // Too far away? Stop here.
                 if (fElementDistanceExp > m_fMaxDistanceExp)
@@ -732,6 +760,22 @@ void CClientStreamer::OnElementDimension(CClientStreamElement* pElement)
     {
         // Has it moved to a different dimension to us?
         if (usDimension != m_usDimension)
+        {
+            // Stream it out
+            m_ToStreamOut.push_back(pElement);
+        }
+    }
+}
+
+void CClientStreamer::OnElementInterior(CClientStreamElement* pElement)
+{
+    // Grab its new interior
+    unsigned char ucInterior = pElement->GetInterior();
+    // Is it streamed in?
+    if (pElement->IsStreamedIn())
+    {
+        // Has it moved to a different interior to us?
+        if (ucInterior != m_ucInterior)
         {
             // Stream it out
             m_ToStreamOut.push_back(pElement);

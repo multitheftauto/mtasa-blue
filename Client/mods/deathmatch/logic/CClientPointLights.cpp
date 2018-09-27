@@ -65,3 +65,14 @@ void CClientPointLights::RelateDimension(unsigned short usDimension)
 {
     m_bStreamedIn = (usDimension == m_usDimension);
 }
+
+void CClientPointLights::SetInterior(unsigned char ucInterior)
+{
+    m_ucInterior = ucInterior;
+    RelateInterior(m_pPointLightsManager->GetInterior());
+}
+
+void CClientPointLights::RelateInterior(unsigned char ucInterior)
+{
+    m_bStreamedIn = (ucInterior == m_ucInterior);
+}

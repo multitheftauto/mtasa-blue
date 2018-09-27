@@ -18,6 +18,7 @@ CClientPointLightsManager::CClientPointLightsManager(CClientManager* pManager)
     m_pManager = pManager;
     m_bDontRemoveFromList = false;
     m_usDimension = 0;
+    m_ucInterior = 0;
 }
 
 CClientPointLightsManager::~CClientPointLightsManager(void)
@@ -83,6 +84,17 @@ void CClientPointLightsManager::SetDimension(unsigned short usDimension)
     }
 
     m_usDimension = usDimension;
+}
+
+void CClientPointLightsManager::SetInterior(unsigned char ucInterior)
+{
+    list<CClientPointLights*>::iterator iter = m_List.begin();
+    for (; iter != m_List.end(); iter++)
+    {
+        (*iter)->RelateInterior(ucInterior);
+    }
+
+    m_ucInterior = ucInterior;
 }
 
 void CClientPointLightsManager::DoPulse(void)

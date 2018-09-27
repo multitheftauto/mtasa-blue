@@ -41,6 +41,7 @@ public:
     unsigned long           GetTotalStreamReferences(void) { return m_usStreamReferences + m_usStreamReferencesScript; }
     void                    StreamOutForABit(void);
     void                    SetDimension(unsigned short usDimension);
+    void                    SetInterior(unsigned char ucInterior);
     float                   GetExpDistance(void) { return m_fExpDistance; }
     virtual CSphere         GetWorldBoundingSphere(void);
     float                   GetDistanceToBoundingBoxSquared(const CVector& vecPosition);
@@ -48,6 +49,7 @@ public:
     bool IsStreamingCompatibleClass(void) { return true; };
 
     virtual bool IsVisibleInAllDimensions(void) { return false; };
+    virtual bool IsVisibleInAllInteriors(void) { return false; };
 
 private:
     void SetStreamRow(CClientStreamSectorRow* pRow) { m_pStreamRow = pRow; }

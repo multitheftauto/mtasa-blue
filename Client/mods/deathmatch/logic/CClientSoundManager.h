@@ -26,6 +26,8 @@ public:
     void DoPulse(void);
 
     void SetDimension(unsigned short usDimension);
+    
+    void SetInterior(unsigned char ucInterior);
 
     CClientSound* PlaySound2D(const SString& strSound, bool bIsURL, bool bLoop, bool bThrottle);
     CClientSound* PlaySound2D(void* pMemory, unsigned int uiLength, bool bLoop);
@@ -62,6 +64,7 @@ private:
     CClientManager* m_pClientManager;
 
     unsigned short m_usDimension;
+    unsigned char  m_ucInterior;
 
     std::list<CClientSound*> m_Sounds;
     std::set<CClientSound*>  m_DistanceStreamedInMap;

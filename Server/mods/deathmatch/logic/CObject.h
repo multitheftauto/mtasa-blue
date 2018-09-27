@@ -79,6 +79,9 @@ public:
     bool IsVisibleInAllDimensions(void) { return m_bVisibleInAllDimensions; };
     void SetVisibleInAllDimensions(bool bVisible) { m_bVisibleInAllDimensions = bVisible; };
 
+    bool IsVisibleInAllInteriors(void) { return m_bVisibleInAllInteriors; };
+    void SetVisibleInAllInteriors(bool bVisible) { m_bVisibleInAllInteriors = bVisible; };
+
 private:
     CObjectManager* m_pObjectManager;
     CVector         m_vecRotation;
@@ -91,6 +94,7 @@ private:
     bool            m_bSyncable;
     CPlayer*        m_pSyncer;
     bool            m_bVisibleInAllDimensions = false;
+    bool            m_bVisibleInAllInteriors = false;
 
 protected:
     bool m_bCollisionsEnabled;

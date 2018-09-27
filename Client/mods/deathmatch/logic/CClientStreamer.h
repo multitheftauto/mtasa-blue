@@ -27,6 +27,7 @@ public:
 
     void DoPulse(CVector& vecPosition);
     void SetDimension(unsigned short usDimension);
+    void SetInterior(unsigned char ucInterior);
 
     static bool CompareExpDistance(CClientStreamElement* p1, CClientStreamElement* p2);
 
@@ -58,6 +59,7 @@ private:
     void OnElementForceStreamIn(CClientStreamElement* pElement);
     void OnElementForceStreamOut(CClientStreamElement* pElement);
     void OnElementDimension(CClientStreamElement* pElement);
+    void OnElementInterior(CClientStreamElement* pElement);
 
     const float                        m_fSectorSize;
     const float                        m_fRowSize;
@@ -70,6 +72,7 @@ private:
     CClientStreamSector*               m_pSector;
     CVector                            m_vecPosition;
     unsigned short                     m_usDimension;
+    unsigned char                      m_ucInterior;
     std::list<CClientStreamElement*>   m_ActiveElements;
     std::list<CClientStreamElement*>   m_ToStreamOut;
 
