@@ -501,9 +501,9 @@ void CClientObject::Create(void)
                 // Apply our data to the object
                 m_pObject->Teleport(m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ);
                 m_pObject->SetOrientation(m_vecRotation.fX, m_vecRotation.fY, m_vecRotation.fZ);
-#ifndef MTA_BUILDINGS
+                #ifndef MTA_BUILDINGS
                 m_pObject->ProcessCollision();
-#endif
+                #endif
                 m_pObject->SetupLighting();
                 m_pObject->SetFrozen(m_bIsFrozen);
 
@@ -529,7 +529,7 @@ void CClientObject::Create(void)
                     m_pObject->SetBuoyancyConstant(m_fBuoyancyConstant);
                 if (m_vecCenterOfMass.fX != 0.0f || m_vecCenterOfMass.fY != 0.0f || m_vecCenterOfMass.fZ != 0.0f)
                     m_pObject->SetCenterOfMass(m_vecCenterOfMass);
-
+                
                 // Reattach to an entity + any entities attached to this
                 ReattachEntities();
 
