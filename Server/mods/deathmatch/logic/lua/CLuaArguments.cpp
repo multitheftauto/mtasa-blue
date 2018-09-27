@@ -18,13 +18,8 @@
 extern CGame* g_pGame;
 
 #ifndef VERIFY_ELEMENT
-#define VERIFY_ELEMENT(element) (g_pGame->GetMapManager()->GetRootElement ()->IsMyChild(element,true)&&!element->IsBeingDeleted())
+#define VERIFY_ELEMENT(element) (g_pGame->GetMapManager()->GetRootElement()->IsMyChild(element, true) && !element->IsBeingDeleted())
 #endif
-
-CLuaArguments::CLuaArguments(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables)
-{
-    ReadFromBitStream(bitStream, pKnownTables);
-}
 
 CLuaArguments::CLuaArguments(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables)
 {
@@ -265,12 +260,23 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
     lua_pushstring(luaVM, szFunction);
     lua_gettable(luaVM, LUA_GLOBALSINDEX);
 
+    // If that function doesn't exist, return false
+    if (lua_isnil(luaVM, -1))
+    {
+        // cleanup the stack
+        while (lua_gettop(luaVM) - luaStackPointer > 0)
+            lua_pop(luaVM, 1);
+
+        return false;
+    }
+
     // Push our arguments onto the stack
     PushArguments(luaVM);
 
-    // Call the function with our arguments
+    // Reset function call timer (checks long-running functions)
     pLuaMain->ResetInstructionCount();
 
+    // Call the function with our arguments
     int iret = pLuaMain->PCall(luaVM, m_Arguments.size(), LUA_MULTRET, 0);
     if (iret == LUA_ERRRUN || iret == LUA_ERRMEM)
     {
@@ -489,26 +495,19 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
     }
 
     unsigned int uiNumArgs;
-    bool         bResult;
-#if MTA_DM_VERSION >= 0x150
-    bResult = bitStream.ReadCompressed(uiNumArgs);
-#else
-    if (bitStream.Version() < 0x05B)
-    {
-        unsigned short usNumArgs;
-        bResult = bitStream.ReadCompressed(usNumArgs);
-        uiNumArgs = usNumArgs;
-    }
-    else
-        bResult = bitStream.ReadCompressed(uiNumArgs);
-#endif
-
-    if (bResult)
+    if (bitStream.ReadCompressed(uiNumArgs))
     {
         pKnownTables->push_back(this);
         for (unsigned int ui = 0; ui < uiNumArgs; ++ui)
         {
-            CLuaArgument* pArgument = new CLuaArgument(bitStream, pKnownTables);
+            CLuaArgument* pArgument = new CLuaArgument();
+            if (!pArgument->ReadFromBitStream(bitStream, pKnownTables))
+            {
+                delete pArgument;
+                if (bKnownTablesCreated)
+                    delete pKnownTables;
+                return false;
+            }
             m_Arguments.push_back(pArgument);
         }
     }
@@ -530,20 +529,7 @@ bool CLuaArguments::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHash
 
     bool bSuccess = true;
     pKnownTables->insert(make_pair((CLuaArguments*)this, pKnownTables->size()));
-
-#if MTA_DM_VERSION >= 0x150
     bitStream.WriteCompressed(static_cast<unsigned int>(m_Arguments.size()));
-#else
-    if (ExtractVersionStringBuildNumber(g_pGame->GetPlayerManager()->GetLowestConnectedPlayerVersion()) < ExtractVersionStringBuildNumber("1.4.0-9.06858") &&
-        MTASA_VERSION_TYPE != VERSION_TYPE_CUSTOM)
-        bitStream.WriteCompressed(static_cast<unsigned short>(m_Arguments.size()));
-    else
-    {
-        // Send 0xFFFF to indicate that we're using the new version | TODO: Remove this in 1.5
-        bitStream.WriteCompressed(static_cast<unsigned short>(0xFFFF));
-        bitStream.WriteCompressed(static_cast<unsigned int>(m_Arguments.size()));
-    }
-#endif
 
     vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
     for (; iter != m_Arguments.end(); ++iter)

@@ -10,8 +10,7 @@
 
 class CClientEntity;
 
-#ifndef __CCLIENTENTITY_H
-#define __CCLIENTENTITY_H
+#pragma once
 
 #include "CElementArray.h"
 #include "CClientCommon.h"
@@ -37,7 +36,7 @@ class CClientManager;
 #define IS_PROJECTILE(entity) ((entity)->GetType()==CCLIENTPROJECTILE)
 #define IS_GUI(entity) ((entity)->GetType()==CCLIENTGUI)
 #define IS_IFP(entity) ((entity)->GetType()==CCLIENTIFP)
-#define CHECK_CGUI(entity,type) (((CClientGUIElement*)entity)->GetCGUIElement()->GetType()==type)
+#define CHECK_CGUI(entity,type) (((CClientGUIElement*)entity)->GetCGUIElement()->GetType()==(type))
 
 enum eClientEntityType
 {
@@ -386,5 +385,3 @@ private:
     static void _GetEntitiesFromRoot(unsigned int uiTypeHash, std::map<CClientEntity*, int>& mapResults);
 #endif
 };
-
-#endif

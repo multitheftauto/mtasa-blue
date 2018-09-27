@@ -44,6 +44,7 @@ public:
 public:
     CMarker(class CMarkerManager* pMarkerManager, CColManager* pColManager, CElement* pParent, CXMLNode* pNode);
     ~CMarker(void);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
     void Unlink(void);
     bool ReadSpecialData(void);

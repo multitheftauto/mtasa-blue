@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTEFFECT_H
-#define __CCLIENTEFFECT_H
+#pragma once
 
 #include <game/CFxSystem.h>
 #include "CClientEntity.h"
@@ -51,5 +50,3 @@ private:
     SString         m_strEffectName;
     float           m_fMaxDensity;
 };
-
-#endif

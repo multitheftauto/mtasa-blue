@@ -26,7 +26,7 @@ parser.add_option("-v", "--version", dest="version",
 (options, args) = parser.parse_args()
 
 directories = {
-    "client.pot" : [ "../Client", "../Shared" ],
+    "client.pot" : [ "..\\Client", "..\\Shared" ],
     #"../Server/locale/client.pot" : [ "../Server", "../Shared" ],
 }
 
@@ -45,7 +45,7 @@ for output,dirList in directories.iteritems():
             for file in files:
                 filename,ext = os.path.splitext(file)
                 if ext == ".c" or ext == ".cpp" or ext == ".h" or ext == ".hpp":
-                    filePath = os.path.abspath(os.path.join(root,file))
+                    filePath = os.path.join(root,file)
                     print ( filePath )
                     # Add each file to a list
                     scanDirsList.append ( filePath + "\n" )

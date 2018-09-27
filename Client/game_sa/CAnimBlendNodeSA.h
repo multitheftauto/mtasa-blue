@@ -8,8 +8,6 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimBlendNodeSA_H
-#define __CAnimBlendNodeSA_H
 #pragma once
 
 class CAnimBlendNodeSAInterface
@@ -24,5 +22,3 @@ public:
     class CAnimBlendAssociationSAInterface* pAnimBlendAssociation;
 };
 static_assert(sizeof(CAnimBlendNodeSAInterface) == 0x18, "Incorrect class size: CAnimBlendNodeSAInterface");
-
-#endif

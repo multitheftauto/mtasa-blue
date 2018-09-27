@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCOLRECTANGLE_H
-#define __CCLIENTCOLRECTANGLE_H
+#pragma once
 
 class CClientColRectangle : public CClientColShape
 {
@@ -34,5 +33,3 @@ public:
 protected:
     CVector2D m_vecSize;
 };
-
-#endif

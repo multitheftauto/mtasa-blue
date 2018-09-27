@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TASKATTACK
-#define __CGAMESA_TASKATTACK
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -192,5 +191,3 @@ public:
     CTaskSimpleFightSA(void){};
     CTaskSimpleFightSA(CEntity* pTargetEntity, int nCommand, unsigned int nIdlePeriod = 10000);
 };
-
-#endif

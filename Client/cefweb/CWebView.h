@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CWEBVIEW_H
-#define __CWEBVIEW_H
+#pragma once
 
 #undef GetNextSibling
 #undef GetFirstChild
@@ -196,5 +195,3 @@ public:
     // Implement smartpointer methods (all Cef-classes require that since they are derived from CefBase)
     IMPLEMENT_REFCOUNTING(CWebView);
 };
-
-#endif

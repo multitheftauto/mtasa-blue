@@ -27,6 +27,7 @@ public:
     explicit CObject(CElement* pParent, CXMLNode* pNode, class CObjectManager* pObjectManager, bool bIsLowLod);
     explicit CObject(const CObject& Copy);
     ~CObject(void);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
     bool IsEntity(void) { return true; }
 

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CDEATHMATCHOBJECT_H
-#define __CDEATHMATCHOBJECT_H
+#pragma once
 
 #include "CClientObject.h"
 
@@ -51,5 +50,3 @@ protected:
 
     CPositionRotationAnimation* m_pMoveAnimation;
 };
-
-#endif

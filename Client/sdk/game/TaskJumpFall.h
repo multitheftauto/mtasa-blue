@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TASKJUMPFALL
-#define __CGAME_TASKJUMPFALL
+#pragma once
 
 #include "Task.h"
 
@@ -25,5 +24,3 @@ class CTaskSimpleJetPack : public virtual CTaskSimple
 public:
     virtual ~CTaskSimpleJetPack(void){};
 };
-
-#endif

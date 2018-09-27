@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CElementRPCs_H
-#define __CElementRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
@@ -51,5 +50,3 @@ public:
     DECLARE_ELEMENT_RPC(SetWeaponConfig);
     DECLARE_ELEMENT_RPC(SetCallPropagationEnabled);
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PEDDAMAGERESPONSE
-#define __CGAMESA_PEDDAMAGERESPONSE
+#pragma once
 
 #include <game/CPedDamageResponse.h>
 
@@ -37,5 +36,3 @@ public:
 private:
     CPedDamageResponseSAInterface* m_pInterface;
 };
-
-#endif

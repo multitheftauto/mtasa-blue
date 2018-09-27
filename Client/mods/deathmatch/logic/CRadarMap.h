@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CRADARMAP_H
-#define __CRADARMAP_H
+#pragma once
 
 #include "CClientCommon.h"
 #include <CClientManager.h>
@@ -118,5 +117,3 @@ private:
     bool m_bDebugVisible;
     bool m_bTextVisible;
 };
-
-#endif

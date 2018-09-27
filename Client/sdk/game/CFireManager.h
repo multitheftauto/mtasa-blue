@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_FIREMANAGER
-#define __CGAME_FIREMANAGER
+#pragma once
 
 #include <CVector.h>
 #include "CFire.h"
@@ -26,5 +25,3 @@ public:
     virtual VOID   ExtinguishAllFires() = 0;
     virtual CFire* GetFire(DWORD ID) = 0;
 };
-
-#endif

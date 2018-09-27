@@ -74,42 +74,87 @@ CInstallManager* GetInstallManager(void)
 void CInstallManager::InitSequencer(void)
 {
     #define CR "\n"
-    SString strSource = CR "initial: "            // *** Starts here  by default
-        CR "            CALL CheckOnRestartCommand " CR "            IF LastResult != ok GOTO update_end: " CR
-                           " "                                                  ////// Start of 'update game' //////
-        CR "            CALL MaybeSwitchToTempExe "                             // If update files comes with an .exe, switch to that for the install
-        CR " " CR "copy_files: " CR "            CALL InstallFiles "            // Try to install update files
-        CR "            IF LastResult == ok GOTO update_end: " CR " " CR "            CALL ChangeToAdmin "            // If install failed, try as admin
-        CR " " CR "copy_files_admin: " CR "            CALL InstallFiles "                                            // Try to install update files
-        CR "            IF LastResult == ok GOTO update_end_admin: " CR " " CR
-                           "            CALL ShowCopyFailDialog "            // If install failed as admin, show message box
-        CR "            IF LastResult == retry GOTO copy_files_admin: " CR " " CR "update_end_admin: " CR "            CALL ChangeFromAdmin " CR " " CR
-                           "update_end: "                                                    ////// End of 'update game' //////
-        CR "            CALL SwitchBackFromTempExe " CR " " CR "newlayout_check:"            ////// Start of 'new layout check' //////
-        CR "            CALL ProcessLayoutChecks " CR "            IF LastResult == ok GOTO newlayout_end: " CR " " CR
-                           "            CALL ChangeToAdmin "                                        // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO newlayout_check: " CR "newlayout_end: "            ////// End of 'new layout check' //////
-        CR " " CR "langfile_check: "                                                                ////// Start of 'Lang file fix' //////
-        CR "            CALL ProcessLangFileChecks "                                                // Make changes to comply with requirements
-        CR "            IF LastResult == ok GOTO langfile_end: " CR " " CR "            CALL ChangeToAdmin "            // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO langfile_check: " CR " " CR "langfile_end: "                           ////// End of 'Lang file fix' //////
-        CR " " CR "exepatch_check: "                                                                                    ////// Start of 'Exe patch fix' //////
-        CR "            CALL ProcessExePatchChecks "            // Make changes to comply with requirements
-        CR "            IF LastResult == ok GOTO exepatch_end: " CR " " CR "            CALL ChangeToAdmin "            // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO exepatch_check: " CR " " CR "exepatch_end: "                           ////// End of 'Exe patch fix' //////
-        CR " " CR "service_check: "                                                                                     ////// Start of 'Service checks' //////
-        CR "            CALL ProcessServiceChecks "            // Make changes to comply with service requirements
-        CR "            IF LastResult == ok GOTO service_end: " CR " " CR "            CALL ChangeToAdmin "            // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO service_check: " CR "            CALL Quit " CR " " CR
-                           "service_end: "                       ////// End of 'Service checks' //////
-        CR " " CR "appcompat_check: "                            ////// Start of 'AppCompat checks' //////
-        CR "            CALL ProcessAppCompatChecks "            // Make changes to comply with appcompat requirements
-        CR "            IF LastResult == ok GOTO appcompat_end: " CR " " CR "            CALL ChangeToAdmin "            // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO appcompat_check: " CR "            CALL Quit " CR " " CR
-                           "appcompat_end: "                                                             ////// End of 'AppCompat checks' //////
-        CR " " CR "            CALL ChangeFromAdmin " CR "            CALL InstallNewsItems "            // Install pending news
-        CR "            GOTO launch: " CR " " CR "crashed: "                                             // *** Starts here when restarting after crash
-        CR "            CALL ShowCrashFailDialog " CR "            IF LastResult == ok GOTO initial: " CR "            CALL Quit " CR " " CR "launch: ";
+    SString strSource = CR "initial: "                                             // *** Starts here  by default
+        CR "            CALL CheckOnRestartCommand "                               //
+        CR "            IF LastResult != ok GOTO update_end: "                     //
+        CR " "                                                                     ////// Start of 'update game' //////
+        CR "            CALL MaybeSwitchToTempExe "                                // If update files comes with an .exe, switch to that for the install
+        CR " "                                                                     //
+        CR "copy_files: "                                                          //
+        CR "            CALL InstallFiles "                                        // Try to install update files
+        CR "            IF LastResult == ok GOTO update_end: "                     //
+        CR " "                                                                     //
+        CR "            CALL ChangeToAdmin "                                       // If install failed, try as admin
+        CR " "                                                                     //
+        CR "copy_files_admin: "                                                    //
+        CR "            CALL InstallFiles "                                        // Try to install update files
+        CR "            IF LastResult == ok GOTO update_end_admin: "               //
+        CR " "                                                                     //
+        CR "            CALL ShowCopyFailDialog "                                  // If install failed as admin, show message box
+        CR "            IF LastResult == retry GOTO copy_files_admin: "            //
+        CR " "                                                                     //
+        CR "update_end_admin: "                                                    //
+        CR "            CALL ChangeFromAdmin "                                     //
+        CR " "                                                                     //
+        CR "update_end: "                                                          ////// End of 'update game' //////
+        CR "            CALL SwitchBackFromTempExe "                               //
+        CR " "                                                                     //
+        CR "newlayout_check:"                                                      ////// Start of 'new layout check' //////
+        CR "            CALL ProcessLayoutChecks "                                 //
+        CR "            IF LastResult == ok GOTO newlayout_end: "                  //
+        CR " "                                                                     //
+        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO newlayout_check: "                //
+        CR "newlayout_end: "                                                       ////// End of 'new layout check' //////
+        CR " "                                                                     //
+        CR "langfile_check: "                                                      ////// Start of 'Lang file fix' //////
+        CR "            CALL ProcessLangFileChecks "                               // Make changes to comply with requirements
+        CR "            IF LastResult == ok GOTO langfile_end: "                   //
+        CR " "                                                                     //
+        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO langfile_check: "                 //
+        CR " "                                                                     //
+        CR "langfile_end: "                                                        ////// End of 'Lang file fix' //////
+        CR " "                                                                     //
+        CR "exepatch_check: "                                                      ////// Start of 'Exe patch fix' //////
+        CR "            CALL ProcessExePatchChecks "                               // Make changes to comply with requirements
+        CR "            IF LastResult == ok GOTO exepatch_end: "                   //
+        CR " "                                                                     //
+        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO exepatch_check: "                 //
+        CR " "                                                                     //
+        CR "exepatch_end: "                                                        ////// End of 'Exe patch fix' //////
+        CR " "                                                                     //
+        CR "service_check: "                                                       ////// Start of 'Service checks' //////
+        CR "            CALL ProcessServiceChecks "                                // Make changes to comply with service requirements
+        CR "            IF LastResult == ok GOTO service_end: "                    //
+        CR " "                                                                     //
+        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO service_check: "                  //
+        CR "            CALL Quit "                                                //
+        CR " "                                                                     //
+        CR "service_end: "                                                         ////// End of 'Service checks' //////
+        CR " "                                                                     //
+        CR "appcompat_check: "                                                     ////// Start of 'AppCompat checks' //////
+        CR "            CALL ProcessAppCompatChecks "                              // Make changes to comply with appcompat requirements
+        CR "            IF LastResult == ok GOTO appcompat_end: "                  //
+        CR " "                                                                     //
+        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO appcompat_check: "                //
+        CR "            CALL Quit "                                                //
+        CR " "                                                                     //
+        CR "appcompat_end: "                                                       ////// End of 'AppCompat checks' //////
+        CR " "                                                                     //
+        CR "            CALL ChangeFromAdmin "                                     //
+        CR "            CALL InstallNewsItems "                                    // Install pending news
+        CR "            GOTO launch: "                                             //
+        CR " "                                                                     //
+        CR "crashed: "                                                             // *** Starts here when restarting after crash
+        CR "            CALL ShowCrashFailDialog "                                 //
+        CR "            IF LastResult == ok GOTO initial: "                        //
+        CR "            CALL Quit "                                                //
+        CR " "                                                                     //
+        CR "launch: ";
 
     m_pSequencer = new CSequencerType();
     m_pSequencer->SetSource(this, strSource);

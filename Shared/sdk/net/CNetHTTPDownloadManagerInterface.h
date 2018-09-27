@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CNETHTTPDOWNLOADMANAGERINTERFACE_H
-#define __CNETHTTPDOWNLOADMANAGERINTERFACE_H
+#pragma once
 
 struct SHttpRequestOptions
 {
@@ -167,5 +166,3 @@ public:
 
     virtual void Reset(void) = 0;
 };
-
-#endif

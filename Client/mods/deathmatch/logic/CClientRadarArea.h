@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTRADARAREA_H
-#define __CCLIENTRADARAREA_H
+#pragma once
 
 #include "CClientEntity.h"
 #include <gui/CGUI.h>
@@ -65,5 +64,3 @@ protected:
     unsigned long m_ulFlashCycleStart;
     float         m_fAlphaFactor;
 };
-
-#endif

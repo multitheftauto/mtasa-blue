@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIRADIOBUTTON_H
-#define __CGUIRADIOBUTTON_H
+#pragma once
 
 #include "CGUIElement.h"
 #include "CGUICallback.h"
@@ -23,5 +22,3 @@ public:
     virtual void SetSelected(bool bSelected) = 0;
     virtual bool GetSelected(void) = 0;
 };
-
-#endif

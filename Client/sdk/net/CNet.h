@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CNET_H
-#define __CNET_H
+#pragma once
 
 #include <string>
 #include "net_common.h"
@@ -135,5 +134,3 @@ public:
     virtual void PostCrash(void) = 0;
     virtual int  SendTo(SOCKET s, const char* buf, int len, int flags, const struct sockaddr* to, int tolen) = 0;
 };
-
-#endif

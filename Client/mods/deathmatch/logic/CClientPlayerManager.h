@@ -10,8 +10,7 @@
 
 // ## TODO ## : Make it possible to delete the local player without crashin ( m_pLocalPlayer not NULL-ed )
 
-#ifndef __CCLIENTPLAYERMANAGER_H
-#define __CCLIENTPLAYERMANAGER_H
+#pragma once
 
 #include <list>
 
@@ -59,5 +58,3 @@ private:
     CMappedArray<CClientPlayer*> m_Players;
     CClientPlayer*               m_pLocalPlayer;
 };
-
-#endif

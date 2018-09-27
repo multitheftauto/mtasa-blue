@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CIVILIANPED
-#define __CGAME_CIVILIANPED
+#pragma once
 
 #include "CPed.h"
 
@@ -19,5 +18,3 @@ class CCivilianPed : public virtual CPed
 public:
     virtual ~CCivilianPed(void){};
 };
-
-#endif

@@ -11,87 +11,95 @@
 
 #include "StdInc.h"
 
-void CLuaElementDefs::LoadFunctions(void)
+void CLuaElementDefs::LoadFunctions()
 {
-    // Create/destroy
-    CLuaCFunctions::AddFunction("createElement", createElement);
-    CLuaCFunctions::AddFunction("destroyElement", destroyElement);
-    CLuaCFunctions::AddFunction("cloneElement", cloneElement);
+    std::map<const char*, lua_CFunction> functions{
+        // Create/destroy
+        {"createElement", createElement},
+        {"destroyElement", destroyElement},
+        {"cloneElement", cloneElement},
 
-    // Get
-    CLuaCFunctions::AddFunction("isElement", isElement);
-    CLuaCFunctions::AddFunction("isElementWithinColShape", isElementWithinColShape);
-    CLuaCFunctions::AddFunction("isElementWithinMarker", isElementWithinMarker);
-    CLuaCFunctions::AddFunction("isElementInWater", isElementInWater);
-    CLuaCFunctions::AddFunction("isElementFrozen", isElementFrozen);
-    CLuaCFunctions::AddFunction("isElementLowLOD", isElementLowLOD);
-    CLuaCFunctions::AddFunction("setElementCallPropagationEnabled", setElementCallPropagationEnabled);
-    CLuaCFunctions::AddFunction("isElementCallPropagationEnabled", isElementCallPropagationEnabled);
+        // Get
+        {"isElement", isElement},
+        {"isElementWithinColShape", isElementWithinColShape},
+        {"isElementWithinMarker", isElementWithinMarker},
+        {"isElementInWater", isElementInWater},
+        {"isElementFrozen", isElementFrozen},
+        {"isElementLowLOD", isElementLowLOD},
+        {"setElementCallPropagationEnabled", setElementCallPropagationEnabled},
+        {"isElementCallPropagationEnabled", isElementCallPropagationEnabled},
 
-    CLuaCFunctions::AddFunction("getElementByID", getElementByID);
-    CLuaCFunctions::AddFunction("getElementByIndex", getElementByIndex);
-    CLuaCFunctions::AddFunction("getElementChildren", getElementChildren);
-    CLuaCFunctions::AddFunction("getElementChild", getElementChild);
-    CLuaCFunctions::AddFunction("getElementChildrenCount", getElementChildrenCount);
-    CLuaCFunctions::AddFunction("getAllElementData", getAllElementData);
-    CLuaCFunctions::AddFunction("getElementID", getElementID);
-    CLuaCFunctions::AddFunction("getElementParent", getElementParent);
-    CLuaCFunctions::AddFunction("getElementMatrix", getElementMatrix);
-    CLuaCFunctions::AddFunction("getElementPosition", getElementPosition);
-    CLuaCFunctions::AddFunction("getElementRotation", getElementRotation);
-    CLuaCFunctions::AddFunction("getElementVelocity", getElementVelocity);
-    CLuaCFunctions::AddFunction("getElementAngularVelocity", getElementTurnVelocity);
-    CLuaCFunctions::AddFunction("getElementsByType", getElementsByType);
-    CLuaCFunctions::AddFunction("getElementType", getElementType);
-    CLuaCFunctions::AddFunction("getElementInterior", getElementInterior);
-    CLuaCFunctions::AddFunction("getElementsWithinColShape", getElementsWithinColShape);
-    CLuaCFunctions::AddFunction("getElementsWithinRange", getElementsWithinRange);
-    CLuaCFunctions::AddFunction("getElementDimension", getElementDimension);
-    CLuaCFunctions::AddFunction("getElementZoneName", getElementZoneName);
-    CLuaCFunctions::AddFunction("getElementColShape", getElementColShape);
-    CLuaCFunctions::AddFunction("getElementAlpha", getElementAlpha);
-    CLuaCFunctions::AddFunction("isElementDoubleSided", isElementDoubleSided);
-    CLuaCFunctions::AddFunction("getElementHealth", getElementHealth);
-    CLuaCFunctions::AddFunction("getElementModel", getElementModel);
-    CLuaCFunctions::AddFunction("getElementSyncer", getElementSyncer);
-    CLuaCFunctions::AddFunction("getElementCollisionsEnabled", getElementCollisionsEnabled);
-    CLuaCFunctions::AddFunction("getLowLODElement", getLowLODElement);
+        {"getElementByID", getElementByID},
+        {"getElementByIndex", getElementByIndex},
+        {"getElementChildren", getElementChildren},
+        {"getElementChild", getElementChild},
+        {"getElementChildrenCount", getElementChildrenCount},
+        {"getAllElementData", getAllElementData},
+        {"getElementID", getElementID},
+        {"getElementParent", getElementParent},
+        {"getElementMatrix", getElementMatrix},
+        {"getElementPosition", getElementPosition},
+        {"getElementRotation", getElementRotation},
+        {"getElementVelocity", getElementVelocity},
+        {"getElementAngularVelocity", getElementTurnVelocity},
+        {"getElementsByType", getElementsByType},
+        {"getElementType", getElementType},
+        {"getElementInterior", getElementInterior},
+        {"getElementsWithinColShape", getElementsWithinColShape},
+        {"getElementsWithinRange", getElementsWithinRange},
+        {"getElementDimension", getElementDimension},
+        {"getElementZoneName", getElementZoneName},
+        {"getElementColShape", getElementColShape},
+        {"getElementAlpha", getElementAlpha},
+        {"isElementDoubleSided", isElementDoubleSided},
+        {"getElementHealth", getElementHealth},
+        {"getElementModel", getElementModel},
+        {"getElementSyncer", getElementSyncer},
+        {"getElementCollisionsEnabled", getElementCollisionsEnabled},
+        {"getLowLODElement", getLowLODElement},
 
-    // Attachement
-    CLuaCFunctions::AddFunction("attachElements", attachElements);
-    CLuaCFunctions::AddFunction("detachElements", detachElements);
-    CLuaCFunctions::AddFunction("isElementAttached", isElementAttached);
-    CLuaCFunctions::AddFunction("getAttachedElements", getAttachedElements);
-    CLuaCFunctions::AddFunction("getElementAttachedTo", getElementAttachedTo);
-    CLuaCFunctions::AddFunction("setElementAttachedOffsets", setElementAttachedOffsets);
-    CLuaCFunctions::AddFunction("getElementAttachedOffsets", getElementAttachedOffsets);
+        // Attachement
+        {"attachElements", attachElements},
+        {"detachElements", detachElements},
+        {"isElementAttached", isElementAttached},
+        {"getAttachedElements", getAttachedElements},
+        {"getElementAttachedTo", getElementAttachedTo},
+        {"setElementAttachedOffsets", setElementAttachedOffsets},
+        {"getElementAttachedOffsets", getElementAttachedOffsets},
 
-    // Element data
-    CLuaCFunctions::AddFunction("getElementData", getElementData);
-    CLuaCFunctions::AddFunction("setElementData", setElementData);
-    CLuaCFunctions::AddFunction("removeElementData", removeElementData);
+        // Element data
+        {"getElementData", getElementData},
+        {"setElementData", setElementData},
+        {"removeElementData", removeElementData},
 
-    // Set
-    CLuaCFunctions::AddFunction("setElementID", setElementID);
-    CLuaCFunctions::AddFunction("setElementParent", setElementParent);
-    CLuaCFunctions::AddFunction("setElementMatrix", setElementMatrix);
-    CLuaCFunctions::AddFunction("setElementPosition", setElementPosition);
-    CLuaCFunctions::AddFunction("setElementRotation", setElementRotation);
-    CLuaCFunctions::AddFunction("setElementVelocity", setElementVelocity);
-    CLuaCFunctions::AddFunction("setElementAngularVelocity", setElementTurnVelocity);
-    CLuaCFunctions::AddFunction("setElementVisibleTo", setElementVisibleTo);
-    CLuaCFunctions::AddFunction("clearElementVisibleTo", clearElementVisibleTo);
-    CLuaCFunctions::AddFunction("isElementVisibleTo", isElementVisibleTo);
-    CLuaCFunctions::AddFunction("setElementInterior", setElementInterior);
-    CLuaCFunctions::AddFunction("setElementDimension", setElementDimension);
-    CLuaCFunctions::AddFunction("setElementAlpha", setElementAlpha);
-    CLuaCFunctions::AddFunction("setElementDoubleSided", setElementDoubleSided);
-    CLuaCFunctions::AddFunction("setElementHealth", setElementHealth);
-    CLuaCFunctions::AddFunction("setElementModel", setElementModel);
-    CLuaCFunctions::AddFunction("setElementSyncer", setElementSyncer);
-    CLuaCFunctions::AddFunction("setElementCollisionsEnabled", setElementCollisionsEnabled);
-    CLuaCFunctions::AddFunction("setElementFrozen", setElementFrozen);
-    CLuaCFunctions::AddFunction("setLowLODElement", setLowLODElement);
+        // Set
+        {"setElementID", setElementID},
+        {"setElementParent", setElementParent},
+        {"setElementMatrix", setElementMatrix},
+        {"setElementPosition", setElementPosition},
+        {"setElementRotation", setElementRotation},
+        {"setElementVelocity", setElementVelocity},
+        {"setElementAngularVelocity", setElementTurnVelocity},
+        {"setElementVisibleTo", setElementVisibleTo},
+        {"clearElementVisibleTo", clearElementVisibleTo},
+        {"isElementVisibleTo", isElementVisibleTo},
+        {"setElementInterior", setElementInterior},
+        {"setElementDimension", setElementDimension},
+        {"setElementAlpha", setElementAlpha},
+        {"setElementDoubleSided", setElementDoubleSided},
+        {"setElementHealth", setElementHealth},
+        {"setElementModel", setElementModel},
+        {"setElementSyncer", setElementSyncer},
+        {"setElementCollisionsEnabled", setElementCollisionsEnabled},
+        {"setElementFrozen", setElementFrozen},
+        {"setLowLODElement", setLowLODElement},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 // TODO: specials

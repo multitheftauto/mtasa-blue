@@ -407,7 +407,8 @@ void CSettings::CreateGUI(void)
     /**
      *  Audio tab
      **/
-    fIndentX = pManager->CGUI_GetMaxTextExtent("default-normal", _("Master volume:"), _("Radio volume:"), _("SFX volume:"), _("MTA volume:"), _("Voice volume:"), _("Play mode:"));
+    fIndentX = pManager->CGUI_GetMaxTextExtent("default-normal", _("Master volume:"), _("Radio volume:"), _("SFX volume:"), _("MTA volume:"),
+                                               _("Voice volume:"), _("Play mode:"));
 
     m_pAudioGeneralLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("General")));
     m_pAudioGeneralLabel->SetPosition(CVector2D(11, 13));
@@ -1934,13 +1935,10 @@ void CSettings::CreateInterfaceTabGUI(void)
         m_pInterfaceLanguageSelector->SetReadOnly(true);
 
         // Grab languages and populate
-        std::map<SString, SString> availableLanguagesMap = g_pCore->GetLocalization()->GetAvailableLanguages();
-        availableLanguagesMap["English"] = "en_US";
-
-        for (const auto& language : availableLanguagesMap)
+        for (const auto& strLocale : g_pCore->GetLocalization()->GetAvailableLocales())
         {
-            SString strLanguageName = g_pLocalization->GetLanguageNativeName(language.second);
-            m_pInterfaceLanguageSelector->AddItem(strLanguageName)->SetData(language.second);
+            SString strLanguageName = g_pLocalization->GetLanguageNativeName(strLocale);
+            m_pInterfaceLanguageSelector->AddItem(strLanguageName)->SetData(strLocale);
         }
 
         // Skin

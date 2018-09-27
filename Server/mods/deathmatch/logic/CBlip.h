@@ -20,6 +20,7 @@ class CBlip : public CPerPlayerEntity
 public:
     CBlip(CElement* pParent, CXMLNode* pNode, class CBlipManager* pBlipManager);
     ~CBlip(void);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
     void Unlink(void);
     bool ReadSpecialData(void);

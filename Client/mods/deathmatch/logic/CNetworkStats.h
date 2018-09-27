@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CNETWORKSTATS_H
-#define __CNETWORKSTATS_H
+#pragma once
 
 #include "CClientDisplayManager.h"
 
@@ -38,5 +37,3 @@ private:
     float m_fByteSendRate;
     float m_fByteReceiveRate;
 };
-
-#endif
