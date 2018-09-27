@@ -523,7 +523,7 @@ private:
     static void StaticGamePlayerDestructHandler(CEntitySAInterface* pPlayer);
     static void StaticGameProjectileDestructHandler(CEntitySAInterface* pProjectile);
     static void StaticGameModelRemoveHandler(ushort usModelId);
-    static void StaticWorldSoundHandler(uint uiGroup, uint uiIndex);
+    static bool StaticWorldSoundHandler(const SWorldSoundEvent& event);
     static void StaticGameEntityRenderHandler(CEntitySAInterface* pEntity);
     static void StaticTaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     static void StaticFxSystemDestructionHandler(void* pFxSAInterface);
@@ -562,7 +562,7 @@ private:
     void        GamePlayerDestructHandler(CEntitySAInterface* pPlayer);
     void        GameProjectileDestructHandler(CEntitySAInterface* pProjectile);
     void        GameModelRemoveHandler(ushort usModelId);
-    void        WorldSoundHandler(uint uiGroup, uint uiIndex);
+    bool        WorldSoundHandler(const SWorldSoundEvent& event);
     void        TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     AnimationId DrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
 
