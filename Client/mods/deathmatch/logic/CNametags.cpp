@@ -33,6 +33,7 @@ CNametags::CNametags(CClientManager* pManager)
     m_pHud = g_pGame->GetHud();
     m_bDrawFromAim = false;
     m_usDimension = 0;
+    m_usInterior = 0;
     m_bVisible = true;
     m_pConnectionTroubleIcon =
         g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\16-message-warn.png"), NULL, false);
@@ -428,8 +429,8 @@ void CNametags::DrawDefault(void)
 
 void CNametags::DrawTagForPlayer(CClientPlayer* pPlayer, unsigned char ucAlpha)
 {
-    // If they aren't in the same dimension, dont draw
-    if (pPlayer->GetDimension() != m_usDimension || !pPlayer->IsNametagShowing())
+    // If they aren't in the same dimension or interior, dont draw
+    if (pPlayer->GetDimension() != m_usDimension || pPlayer->GetInterior() != m_usInterior || !pPlayer->IsNametagShowing())
         return;
 
     // Grab the resolution width and height

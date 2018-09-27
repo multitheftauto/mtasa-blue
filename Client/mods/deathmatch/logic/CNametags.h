@@ -37,6 +37,9 @@ public:
     unsigned int GetDimension(void) { return m_usDimension; }
     void         SetDimension(unsigned short usDimension) { m_usDimension = usDimension; }
 
+    unsigned int GetInterior(void) { return m_usInterior; }
+    void         SetInterior(unsigned short usInterior) { m_usInterior = usInterior; }
+
     bool IsVisible(void) { return m_bVisible; }
     void SetVisible(bool bVisible) { m_bVisible = bVisible; }
 
@@ -49,6 +52,7 @@ private:
     CHud*                 m_pHud;
     bool                  m_bDrawFromAim;
     unsigned short        m_usDimension;
+    unsigned short        m_usInterior;
     bool                  m_bVisible;
     CTextureItem*         m_pConnectionTroubleIcon;
 };
