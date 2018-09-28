@@ -197,6 +197,39 @@ typedef struct
     {
         return ((128 < vecVector.fX > -128) && (128 < vecVector.fY > -128) && (128 < vecVector.fZ > -128));
     }
+    /*
+    enum eCollisionShapes
+{
+    COLLISION_BOX,
+    COLLISION_SPHERE,
+    COLLISION_TRIANGLE,
+    COLLISION_VERTEX,
+};
+
+WORD                 numColSpheres;
+WORD                 numColBoxes;
+WORD                 numColTriangles;
+    */
+    bool isValidIndex(char eShape, ushort usIndex)
+    {
+        switch (eShape)
+        {
+            case 0:
+                return (usIndex >= 0 && usIndex < numColBoxes);
+            break;
+            case 1:
+                return (usIndex >= 0 && usIndex < numColSpheres);
+            break;
+            case 2:
+                return (usIndex >= 0 && usIndex < numColTriangles);
+            break;
+            case 3:
+                 ushort numVertices = getNumVertices();
+                 return (usIndex >= 0 && usIndex < numVertices);
+            break;
+        }
+        return false;
+    }
 
 } CColDataSA;
 
