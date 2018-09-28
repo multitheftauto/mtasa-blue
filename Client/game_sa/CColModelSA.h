@@ -17,6 +17,11 @@
 #define FUNC_CColModel_Constructor      0x40FB60
 #define FUNC_CColModel_Destructor       0x40F700
 
+typedef void *(__cdecl * hCMemoryMgr_Malloc) (unsigned int size);
+auto CMemoryMgr_Malloc = (hCMemoryMgr_Malloc)0x72F420;
+typedef void(__cdecl * hCMemoryMgr_Free) (void *memory);
+auto CMemoryMgr_Free = (hCMemoryMgr_Free)0x72F430;
+
 typedef struct
 {
     CVector vecMin;
@@ -130,7 +135,8 @@ typedef struct
 
     ushort createCollisionTriangle(ushort usVertex1, ushort usVertex2, ushort usVertex3, CColLighting cLighting, uchar cMaterial = 0)
     {
-        CColTriangleSA* newArr = new CColTriangleSA[numColTriangles + 1];
+        CColTriangleSA* newArr = reinterpret_cast<CColTriangleSA*>(CMemoryMgr_Malloc(sizeof(CColTriangleSA) * numColTriangles + sizeof(CColTriangleSA)));
+
         memcpy(newArr, pColTriangles, sizeof(CColTriangleSA) * numColTriangles);
 
         CColTriangleSA* newTriangle = new CColTriangleSA;
@@ -143,6 +149,7 @@ typedef struct
         lastTriangle->lighting = cLighting;
         lastTriangle->material = cMaterial;
         numColTriangles++;
+        //CMemoryMgr_Free(reinterpret_cast<void*>(pColTriangles));
         pColTriangles = newArr;
         return numColTriangles;
     }
@@ -150,15 +157,16 @@ typedef struct
     ushort createCollisionVertex(CVector vecPosition, uchar ucAddedSize = 0) // we don't know how many vertices already is
     {
         ushort numVertices = getNumVertices() + ucAddedSize;
-        CompressedVector* newArr = new CompressedVector[numVertices + 1];
-        memcpy(newArr, pVertices, sizeof(CompressedVector) * numVertices);
+        CompressedVector* newPVertices = reinterpret_cast<CompressedVector*>(CMemoryMgr_Malloc(sizeof(CompressedVector) * numVertices + sizeof(CompressedVector)));
+        memcpy(newPVertices, pVertices, sizeof(CompressedVector) * numVertices);
 
         CompressedVector* newVertex = new CompressedVector;
-        memcpy(newArr + sizeof(CompressedVector) * numVertices, newVertex, sizeof(CompressedVector));
+        memcpy(newPVertices + sizeof(CompressedVector) * numVertices, newVertex, sizeof(CompressedVector));
 
-        CompressedVector* lastVertex = &newArr[numVertices];
+        CompressedVector* lastVertex = &newPVertices[numVertices];
         lastVertex->setVector(vecPosition);
-        pVertices = newArr;
+        //CMemoryMgr_Free(reinterpret_cast<void*>(pColTriangles));
+        pVertices = newPVertices;
         return numVertices + 1;
     }
 

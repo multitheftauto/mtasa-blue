@@ -1568,7 +1568,7 @@ int CLuaEngineDefs::EngineModelCollisionCreateShape(lua_State* luaVM)
                             }
                             else
                             {
-                                argStream.SetCustomError("Expected 3 times vector3d or integers at arguments 3, 4 and 5.");
+                                argStream.SetCustomError("Expected 3 vector3d or integers at arguments 3, 4 and 5.");
                                 m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
                                 lua_pushboolean(luaVM, false);
                                 return 1;
