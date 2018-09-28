@@ -2746,6 +2746,7 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientElementStreamIn", "", NULL, false);
     m_Events.AddEvent("onClientElementStreamOut", "", NULL, false);
     m_Events.AddEvent("onClientElementDestroy", "", NULL, false);
+    m_Events.AddEvent("onClientElementHitByWaterCannon", "vehicle, hitX, hitY, hitZ, normalX, normalY, normalZ, model, materialID", nullptr, false);
 
     // Player events
     m_Events.AddEvent("onClientPlayerJoin", "", NULL, false);
@@ -2891,8 +2892,6 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientFileDownloadComplete", "fileName, success", NULL, false);
 
     m_Events.AddEvent("onClientWeaponFire", "ped, x, y, z", NULL, false);
-  
-    m_Events.AddEvent("onClientWaterCannonHit", "x, y, z, normalx, normaly, normalz, materialid", nullptr, false);
   
     m_Events.AddEvent("onClientWorldSound", "group, index, x, y, z", nullptr, false);
 }
@@ -3802,9 +3801,9 @@ AnimationId CClientGame::StaticDrivebyAnimationHandler(AnimationId animGroup, As
     return g_pClientGame->DrivebyAnimationHandler(animGroup, animId);
 }
 
-void CClientGame::StaticWaterCannonHitWorldHandler(CColPointSAInterface& pColPoint)
+void CClientGame::StaticWaterCannonHitWorldHandler(SWaterCannonHitEvent& event)
 {
-    return g_pClientGame->WaterCannonHitWorldHandler(pColPoint);
+    g_pClientGame->WaterCannonHitWorldHandler(event);
 }
 
 void CClientGame::DrawRadarAreasHandler(void)
@@ -6895,15 +6894,27 @@ void CClientGame::RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInter
     m_mapOfCustomAnimationAssociations.erase(pAnimAssociation);
 }
 
-void CClientGame::WaterCannonHitWorldHandler(CColPointSAInterface& pColPoint)
+void CClientGame::WaterCannonHitWorldHandler(SWaterCannonHitEvent& event)
 {
-    CLuaArguments Arguments;
-    Arguments.PushNumber(pColPoint.Position.fX);
-    Arguments.PushNumber(pColPoint.Position.fY);
-    Arguments.PushNumber(pColPoint.Position.fZ);
-    Arguments.PushNumber(pColPoint.Normal.fX);
-    Arguments.PushNumber(pColPoint.Normal.fY);
-    Arguments.PushNumber(pColPoint.Normal.fZ);
-    Arguments.PushNumber(pColPoint.ucSurfaceTypeB);
-    GetRootEntity()->CallEvent("onClientWaterCannonHit", Arguments, true);
+    CClientEntity* const pVehicle = event.pGameVehicle ? g_pClientGame->GetGameEntityXRefManager()->FindClientVehicle(event.pGameVehicle) : nullptr;
+    
+    if (!pVehicle)
+        return;
+    
+    CClientEntity* pEntity = event.pHitGameEntity ? g_pClientGame->GetGameEntityXRefManager()->FindClientEntity(event.pHitGameEntity) : nullptr;
+
+    if (!pEntity)
+        pEntity = m_pRootEntity;
+    
+    CLuaArguments arguments;
+    arguments.PushElement(pVehicle);
+    arguments.PushNumber(event.vecPosition.fX);
+    arguments.PushNumber(event.vecPosition.fY);
+    arguments.PushNumber(event.vecPosition.fZ);
+    arguments.PushNumber(event.vecNormal.fX);
+    arguments.PushNumber(event.vecNormal.fY);
+    arguments.PushNumber(event.vecNormal.fZ);
+    arguments.PushNumber(event.iModel);
+    arguments.PushNumber(event.colSurface);
+    pEntity->CallEvent("onClientElementHitByWaterCannon", arguments, false);
 }

@@ -38,6 +38,16 @@ struct SClothesCacheStats
     uint uiNumRemoved;
 };
 
+struct SWaterCannonHitEvent
+{
+    CEntitySAInterface* pGameVehicle;
+    CEntitySAInterface* pHitGameEntity;
+    CVector             vecPosition;
+    CVector             vecNormal;
+    int                 iModel;
+    EColSurface         colSurface;
+};
+
 class CAnimBlendAssociationSAInterface;
 class CAnimBlendStaticAssociationSAInterface;
 class CAnimBlendAssocGroupSAInterface;
@@ -98,7 +108,7 @@ typedef void(GameModelRemoveHandler)(ushort usModelId);
 typedef void(GameEntityRenderHandler)(CEntitySAInterface* pEntity);
 typedef void(FxSystemDestructionHandler)(void* pFxSA);
 typedef AnimationId(DrivebyAnimationHandler)(AnimationId animGroup, AssocGroupId animId);
-typedef void(WaterCannonHitWorldHandler)(CColPointSAInterface& pColPoint);
+typedef void(WaterCannonHitWorldHandler)(SWaterCannonHitEvent& event);
 
 /**
  * This class contains information used for shot syncing, one exists per player.

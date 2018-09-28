@@ -300,8 +300,8 @@ DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIProp = FUNC_CAEVehicleAudioEntity__
 #define HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance   0x68A4EF
 DWORD RETURN_CTaskSimpleSwim_ProcessSwimmingResistance = 0x68A50E;
 
-#define HOOKPOS_CWaterCannon_Render   0x72932A
-DWORD CONTINUE_WaterCannonHit = 0x72932F;
+#define HOOKPOS_CWaterCannon__Render   0x72932A
+static DWORD CONTINUE_CWaterCannon__Render = 0x72932F;
 
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
@@ -528,7 +528,7 @@ void HOOK_CAEVehicleAudioEntity__ProcessDummyProp();
 
 void HOOK_CTaskSimpleSwim_ProcessSwimmingResistance();
 
-void HOOK_WaterCannonHitWorld();
+static void HOOK_CWaterCannon__Render();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -763,7 +763,7 @@ void CMultiplayerSA::InitHooks()
     // Fix GTA:SA swimming speed problem on higher fps
     HookInstall(HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance, (DWORD)HOOK_CTaskSimpleSwim_ProcessSwimmingResistance, 6);
 
-    HookInstall(HOOKPOS_CWaterCannon_Render, (DWORD)HOOK_WaterCannonHitWorld, 5);
+    HookInstall(HOOKPOS_CWaterCannon__Render, (DWORD)HOOK_CWaterCannon__Render, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -1498,9 +1498,10 @@ void CMultiplayerSA::InitHooks()
     // Allow to switch weapons while glued
     MemSetFast((void*)0x60D861, 0x90, 14);
 
-    // Allow water cannon hit objects created by CreateObject
-    MemSetFast((void*)0x72925D, 0x1, 1);
-
+    // Allow water cannon to hit objects and players visually
+    MemSet((void*)0x72925D, 0x1, 1); // objects
+    MemSet((void*)0x729263, 0x1, 1); // players
+    
     InitHooks_CrashFixHacks();
 
     // Init our 1.3 hooks.
@@ -6907,27 +6908,41 @@ void _declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
     }
 }
 
-static void __cdecl WaterCannonHitWorld(CColPointSAInterface& pColPoint)
+static void __cdecl WaterCannonHitWorld(CVehicleSAInterface* pGameVehicle, CColPointSAInterface* pColPoint, CEntitySAInterface** ppGameEntity)
 {
     if (m_pWaterCannonHitWorldHandler)
     {
-        m_pWaterCannonHitWorldHandler(pColPoint);
+        CEntitySAInterface* const pGameEntity = ppGameEntity ? *ppGameEntity : nullptr;
+        const int iModel = pGameEntity ? pGameEntity->m_nModelIndex : -1;
+
+        SWaterCannonHitEvent event = {
+            pGameVehicle,
+            pGameEntity,
+            pColPoint->Position,
+            pColPoint->Normal,
+            iModel,
+            pColPoint->ucSurfaceTypeB,
+        };
+
+        m_pWaterCannonHitWorldHandler(event);
     }
 }
 
-static void _declspec(naked) HOOK_WaterCannonHitWorld()
+static void _declspec(naked) HOOK_CWaterCannon__Render()
 {
     _asm
     {
         pushad
-        lea eax, [esp + 100h - 54h]
-        push eax
-        call WaterCannonHitWorld
-        add     esp, 4
+        mov     eax, [ebx]              // CVehicleSAInterface* CWaterCannon::m_pVehicle
+        lea     ebx, [esp + 100h - 54h] // CColPointSAInterface*
+        lea     ecx, [esp + 100h - 58h] // CEntitySAInterface**
+        push    ecx                     // ppGameEntity
+        push    ebx                     // pColPoint
+        push    eax                     // pGameVehicle
+        call    WaterCannonHitWorld
+        add     esp, 12
         popad
-
-        push 3E4CCCCDh
-        mov eax, CONTINUE_WaterCannonHit
-        jmp eax
+        push    3E4CCCCDh
+        jmp     CONTINUE_CWaterCannon__Render
     }
 }
