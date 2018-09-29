@@ -42,6 +42,7 @@ void CLuaEngineDefs::LoadFunctions(void)
         {"engineSetModelCollisionData", EngineSetModelCollisionData},
         {"engineUpdateModelCollisionBoundingBox", EngineUpdateModelCollisionBoundingBox },
         {"engineModelCollisionCreateShape", EngineModelCollisionCreateShape },
+        {"engineModelIsCollisionLoaded", EngineModelIsCollisionLoaded },
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -1063,6 +1064,26 @@ bool checkVector(CVector& vec, float fRadius = 0)
         return (128 > vec.fX > -128 && 128 > vec.fY > -128 && 128 > vec.fZ > -128);
     }
 }
+
+
+int CLuaEngineDefs::EngineModelIsCollisionLoaded(lua_State* luaVM)
+{
+    ushort usModel;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(usModel);
+    if (!argStream.HasErrors())
+    {
+        CColModelSAInterface* pCol;
+        lua_pushboolean(luaVM, GetModelCollisionInterface(usModel, pCol));
+        return 1;
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushnil(luaVM);
+    return 1;
+}
+
 
 int CLuaEngineDefs::EngineGetModelCollisionData(lua_State* luaVM)
 {
