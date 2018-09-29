@@ -135,12 +135,13 @@ typedef struct
 
     ushort createCollisionTriangle(ushort usVertex1, ushort usVertex2, ushort usVertex3, CColLighting cLighting, uchar cMaterial = 0)
     {
-        CColTriangleSA* newArr = reinterpret_cast<CColTriangleSA*>(CMemoryMgr_Malloc(sizeof(CColTriangleSA) * numColTriangles + sizeof(CColTriangleSA)));
+        DWORD dwSizeInBytes = sizeof(CColTriangleSA) * numColTriangles;
+        CColTriangleSA* newArr = reinterpret_cast<CColTriangleSA*>(CMemoryMgr_Malloc(dwSizeInBytes + sizeof(CColTriangleSA)));
 
-        memcpy(newArr, pColTriangles, sizeof(CColTriangleSA) * numColTriangles);
+        memcpy(newArr, pColTriangles, dwSizeInBytes);
 
         CColTriangleSA* newTriangle = new CColTriangleSA;
-        memcpy(newArr + sizeof(CColTriangleSA) * numColTriangles, newTriangle, sizeof(CColTriangleSA));
+        memcpy((unsigned char*)newArr + dwSizeInBytes, newTriangle, sizeof(CColTriangleSA));
 
         CColTriangleSA* lastTriangle = &newArr[numColTriangles];
         lastTriangle->vertex[0] = usVertex1;
@@ -193,23 +194,6 @@ typedef struct
         return vertices.size();
     }
 
-    inline bool checkVector(CVector &vecVector)
-    {
-        return ((128 < vecVector.fX > -128) && (128 < vecVector.fY > -128) && (128 < vecVector.fZ > -128));
-    }
-    /*
-    enum eCollisionShapes
-{
-    COLLISION_BOX,
-    COLLISION_SPHERE,
-    COLLISION_TRIANGLE,
-    COLLISION_VERTEX,
-};
-
-WORD                 numColSpheres;
-WORD                 numColBoxes;
-WORD                 numColTriangles;
-    */
     bool isValidIndex(char eShape, ushort usIndex)
     {
         switch (eShape)

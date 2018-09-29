@@ -1005,7 +1005,8 @@ public:
     // Reads a table of floating point numbers
     // Taken from CrosRoad95 dxDrawPrimitive pull request
     //
-    void ReadNumberTable(std::vector<float>& outList)
+    template <typename T>
+    void ReadNumberTable(std::vector<T>& outList)
     {
         outList.clear();
         int iArgument = lua_type(m_luaVM, m_iIndex);
