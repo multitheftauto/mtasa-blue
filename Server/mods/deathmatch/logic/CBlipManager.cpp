@@ -15,14 +15,14 @@ CBlipManager::CBlipManager(void)
 {
 }
 
-CBlip* CBlipManager::Create(CElement* pParent, CXMLNode* pNode)
+CBlip* CBlipManager::Create(CElement* pParent)
 {
     CBlip* const pBlip = new CBlip(pParent, this);
 
     if (pBlip->GetID() == INVALID_ELEMENT_ID)
     {
         delete pBlip;
-        return NULL;
+        return nullptr;
     }
 
     return pBlip;
