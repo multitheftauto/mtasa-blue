@@ -458,7 +458,7 @@ int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
                     g_pCore->GetGraphics()->DrawCircleQueued(vecPosition.fX, vecPosition.fY, fRadius, fStartAngle, fStopAngle, color, colorCenter, siSegments,
                                                              fRatio, bPostGUI);
                     lua_pushboolean(luaVM, true);
-                    return 1; 
+                    return 1;
                 }
             }
             else
