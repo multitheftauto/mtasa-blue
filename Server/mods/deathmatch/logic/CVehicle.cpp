@@ -13,9 +13,9 @@
 
 extern CGame* g_pGame;
 
-CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel, unsigned char ucVariant,
+CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned short usModel, unsigned char ucVariant,
                    unsigned char ucVariant2)
-    : CElement(pParent, pNode)
+    : CElement(pParent)
 {
     CElementRefManager::AddElementRefs(ELEMENT_REF_DEBUG(this, "CVehicle"), &m_pTowedVehicle, &m_pTowedByVehicle, &m_pSyncer, &m_pJackingPlayer, NULL);
 
@@ -178,7 +178,8 @@ CVehicle::~CVehicle(void)
 
 CElement* CVehicle::Clone(bool* bAddEntity, CResource* pResource)
 {
-    CVehicle* pTemp = m_pVehicleManager->Create(GetModel(), GetVariant(), GetVariant2(), GetParentEntity());
+    CVehicle* const pTemp = m_pVehicleManager->Create(GetParentEntity(), GetModel(), GetVariant(), GetVariant2());
+
     if (pTemp)
     {
         CVector vecRotationDegrees;
@@ -202,26 +203,26 @@ void CVehicle::Unlink(void)
     m_pVehicleManager->RemoveFromList(this);
 }
 
-bool CVehicle::ReadSpecialData(void)
+bool CVehicle::ReadSpecialData(const int iLine)
 {
     // Grab the "posX" data
     if (!GetCustomDataFloat("posX", m_vecPosition.fX, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <vehicle> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <vehicle> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posY" data
     if (!GetCustomDataFloat("posY", m_vecPosition.fY, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <vehicle> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <vehicle> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posZ" data
     if (!GetCustomDataFloat("posZ", m_vecPosition.fZ, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <vehicle> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <vehicle> (line %d)\n", iLine);
         return false;
     }
 
@@ -253,13 +254,13 @@ bool CVehicle::ReadSpecialData(void)
         }
         else
         {
-            CLogger::ErrorPrintf("Bad 'model'(%d) id specified in <vehicle> (line %u)\n", iTemp, m_uiLine);
+            CLogger::ErrorPrintf("Bad 'model'(%d) id specified in <vehicle> (line %d)\n", iTemp, iLine);
             return false;
         }
     }
     else
     {
-        CLogger::ErrorPrintf("Bad/missing 'model' attribute in <vehicle> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'model' attribute in <vehicle> (line %d)\n", iLine);
         return false;
     }
 

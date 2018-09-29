@@ -13,8 +13,8 @@
 
 extern CGame* g_pGame;
 
-CObject::CObject(CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectManager, bool bIsLowLod)
-    : CElement(pParent, pNode), m_bIsLowLod(bIsLowLod), m_pLowLodObject(NULL)
+CObject::CObject(CElement* pParent, CObjectManager* pObjectManager, bool bIsLowLod)
+    : CElement(pParent), m_bIsLowLod(bIsLowLod), m_pLowLodObject(NULL)
 {
     // Init
     m_iType = CElement::OBJECT;
@@ -38,7 +38,7 @@ CObject::CObject(CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectMana
     pObjectManager->AddToList(this);
 }
 
-CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent, Copy.m_pXMLNode), m_bIsLowLod(Copy.m_bIsLowLod), m_pLowLodObject(Copy.m_pLowLodObject)
+CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Copy.m_bIsLowLod), m_pLowLodObject(Copy.m_pLowLodObject)
 {
     // Init
     m_iType = CElement::OBJECT;
@@ -101,26 +101,26 @@ void CObject::Unlink(void)
         m_HighLodObjectList[0]->SetLowLodObject(NULL);
 }
 
-bool CObject::ReadSpecialData(void)
+bool CObject::ReadSpecialData(const int iLine)
 {
     // Grab the "posX" data
     if (!GetCustomDataFloat("posX", m_vecPosition.fX, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <object> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <object> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posY" data
     if (!GetCustomDataFloat("posY", m_vecPosition.fY, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <object> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <object> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posZ" data
     if (!GetCustomDataFloat("posZ", m_vecPosition.fZ, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <object> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <object> (line %d)\n", iLine);
         return false;
     }
 
@@ -143,13 +143,13 @@ bool CObject::ReadSpecialData(void)
         }
         else
         {
-            CLogger::ErrorPrintf("Bad 'model' id specified in <object> (line %u)\n", m_uiLine);
+            CLogger::ErrorPrintf("Bad 'model' id specified in <object> (line %d)\n", iLine);
             return false;
         }
     }
     else
     {
-        CLogger::ErrorPrintf("Bad/missing 'model' attribute in <object> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'model' attribute in <object> (line %d)\n", iLine);
         return false;
     }
 

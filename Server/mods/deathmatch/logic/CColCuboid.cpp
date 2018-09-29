@@ -11,8 +11,8 @@
 
 #include "StdInc.h"
 
-CColCuboid::CColCuboid(CColManager* pManager, CElement* pParent, const CVector& vecPosition, const CVector& vecSize, CXMLNode* pNode)
-    : CColShape(pManager, pParent, pNode)
+CColCuboid::CColCuboid(CColManager* pManager, CElement* pParent, const CVector& vecPosition, const CVector& vecSize)
+    : CColShape(pManager, pParent)
 {
     m_vecPosition = vecPosition;
     m_vecSize = vecSize;
@@ -30,7 +30,7 @@ bool CColCuboid::DoHitDetection(const CVector& vecNowPosition)
             vecNowPosition.fZ <= m_vecPosition.fZ + m_vecSize.fZ);
 }
 
-bool CColCuboid::ReadSpecialData(void)
+bool CColCuboid::ReadSpecialData(const int iLine)
 {
     int iTemp;
     if (GetCustomDataInt("dimension", iTemp, true))

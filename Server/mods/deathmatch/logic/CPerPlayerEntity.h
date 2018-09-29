@@ -19,7 +19,7 @@ class CPerPlayerEntity : public CElement
     friend class CElement;
 
 public:
-    CPerPlayerEntity(CElement* pParent, CXMLNode* pNode = NULL);
+    CPerPlayerEntity(CElement* pParent);
     ~CPerPlayerEntity(void);
 
     bool IsEntity(void) { return true; }

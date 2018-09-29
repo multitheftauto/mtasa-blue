@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CMarker::CMarker(CMarkerManager* pMarkerManager, CColManager* pColManager, CElement* pParent, CXMLNode* pNode) : CPerPlayerEntity(pParent, pNode)
+CMarker::CMarker(CMarkerManager* pMarkerManager, CColManager* pColManager, CElement* pParent) : CPerPlayerEntity(pParent)
 {
     // Init
     m_pMarkerManager = pMarkerManager;
@@ -25,7 +25,7 @@ CMarker::CMarker(CMarkerManager* pMarkerManager, CColManager* pColManager, CElem
     m_ucIcon = ICON_NONE;
 
     // Create our collision object
-    m_pCollision = new CColCircle(pColManager, NULL, m_vecPosition, m_fSize, NULL, true);
+    m_pCollision = new CColCircle(pColManager, nullptr, m_vecPosition, m_fSize, true);
     m_pCollision->SetCallback(this);
     m_pCollision->SetAutoCallEvent(false);
 
@@ -65,26 +65,26 @@ void CMarker::Unlink(void)
     m_pMarkerManager->RemoveFromList(this);
 }
 
-bool CMarker::ReadSpecialData(void)
+bool CMarker::ReadSpecialData(const int iLine)
 {
     // Grab the "posX" data
     if (!GetCustomDataFloat("posX", m_vecPosition.fX, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <marker> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <marker> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posY" data
     if (!GetCustomDataFloat("posY", m_vecPosition.fY, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <marker> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <marker> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posZ" data
     if (!GetCustomDataFloat("posZ", m_vecPosition.fZ, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <marker> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <marker> (line %d)\n", iLine);
         return false;
     }
 
@@ -101,7 +101,7 @@ bool CMarker::ReadSpecialData(void)
         ucType = static_cast<unsigned char>(CMarkerManager::StringToType(szBuffer));
         if (ucType == CMarker::TYPE_INVALID)
         {
-            CLogger::LogPrintf("WARNING: Unknown 'type' value specified in <marker>; defaulting to \"default\" (line %u)\n", m_uiLine);
+            CLogger::LogPrintf("WARNING: Unknown 'type' value specified in <marker>; defaulting to \"default\" (line %d)\n", iLine);
             ucType = CMarker::TYPE_CHECKPOINT;
         }
     }
@@ -117,7 +117,7 @@ bool CMarker::ReadSpecialData(void)
         // Convert the HTML-style color to RGB
         if (!XMLColorToInt(szBuffer, m_Color.R, m_Color.G, m_Color.B, m_Color.A))
         {
-            CLogger::ErrorPrintf("Bad 'color' specified in <marker> (line %u)\n", m_uiLine);
+            CLogger::ErrorPrintf("Bad 'color' specified in <marker> (line %d)\n", iLine);
             return false;
         }
     }
@@ -354,13 +354,15 @@ void CMarker::UpdateCollisionObject(unsigned char ucOldType)
         {
             if (m_pCollision)
                 g_pGame->GetElementDeleter()->Delete(m_pCollision);
-            m_pCollision = new CColCircle(m_pColManager, NULL, m_vecPosition, m_fSize, NULL, true);
+
+            m_pCollision = new CColCircle(m_pColManager, nullptr, m_vecPosition, m_fSize, true);
         }
         else if (ucOldType == CMarker::TYPE_CHECKPOINT)
         {
             if (m_pCollision)
                 g_pGame->GetElementDeleter()->Delete(m_pCollision);
-            m_pCollision = new CColSphere(m_pColManager, NULL, m_vecPosition, m_fSize, NULL, true);
+
+            m_pCollision = new CColSphere(m_pColManager, nullptr, m_vecPosition, m_fSize, true);
         }
 
         m_pCollision->SetCallback(this);

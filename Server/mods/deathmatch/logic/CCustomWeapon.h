@@ -57,7 +57,7 @@ struct SWeaponConfiguration
 class CCustomWeapon : public CObject
 {
 public:
-    CCustomWeapon(CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectManager, CCustomWeaponManager* pWeaponManager, eWeaponType weaponType);
+    CCustomWeapon(CElement* pParent, CObjectManager* pObjectManager, CCustomWeaponManager* pWeaponManager, eWeaponType weaponType);
     ~CCustomWeapon(void);
 
     void SetWeaponTarget(CElement* pTarget, int subTarget);

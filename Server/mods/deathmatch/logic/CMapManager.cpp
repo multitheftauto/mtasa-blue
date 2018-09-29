@@ -37,7 +37,7 @@ CMapManager::CMapManager(CBlipManager* pBlipManager, CObjectManager* pObjectMana
     m_pScriptDebugging = pScriptDebugging;
     m_pElementDeleter = pElementDeleter;
 
-    m_pRootElement = new CDummy(NULL, NULL, NULL);
+    m_pRootElement = new CDummy(nullptr, nullptr);
     m_pRootElement->SetTypeName("root");
 
     m_llLastRespawnTime = 0;
