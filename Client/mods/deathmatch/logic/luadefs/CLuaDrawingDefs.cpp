@@ -455,14 +455,10 @@ int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
                     if (fStartAngle + 360.0f < fStopAngle)
                         fStopAngle = fStartAngle + 360.0f;
 
-                    // Check if we even have any circle to draw
-                    if (fStopAngle - fStartAngle > 1e-3f)
-                    {
-                        g_pCore->GetGraphics()->DrawCircleQueued(vecPosition.fX, vecPosition.fY, fRadius, fStartAngle, fStopAngle, color, colorCenter, siSegments,
-                                                                 fRatio, bPostGUI);
-                        lua_pushboolean(luaVM, true);
-                        return 1;
-                    }  
+                    g_pCore->GetGraphics()->DrawCircleQueued(vecPosition.fX, vecPosition.fY, fRadius, fStartAngle, fStopAngle, color, colorCenter, siSegments,
+                                                             fRatio, bPostGUI);
+                    lua_pushboolean(luaVM, true);
+                    return 1; 
                 }
             }
             else
