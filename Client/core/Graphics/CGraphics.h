@@ -85,8 +85,6 @@ public:
     void DrawLine3D(const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f);
     void DrawRectangle(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning = false);
     void DrawStringOutline(const RECT& rect, unsigned long ulColor, const wchar_t* szText, unsigned long ulFormat, LPD3DXFONT pDXFont);
-    void DrawCircleInternal(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
-                            short siSegments, float fRatio, bool bPostGUI);
 
     void           SetBlendMode(EBlendModeType blendMode);
     EBlendModeType GetBlendMode(void);
@@ -238,7 +236,6 @@ private:
         QUEUE_RECT,
         QUEUE_TEXTURE,
         QUEUE_SHADER,
-        QUEUE_CIRCLE,
         QUEUE_PRIMITIVE,
         QUEUE_PRIMITIVEMATERIAL,
     };
@@ -277,20 +274,6 @@ private:
         float         fHeight;
         unsigned long ulColor;
         bool          bSubPixelPositioning;
-    };
-
-    struct sDrawQueueCircle
-    {
-        float         fX;
-        float         fY;
-        float         fRadius;
-        short         fStartAngle;
-        short         fStopAngle;
-        float         fSegments;
-        float         fRatio;
-        float         bPostGUI;
-        unsigned long ulColor;
-        unsigned long ulColorCenter;
     };
 
     struct sDrawQueueTexture
@@ -336,7 +319,6 @@ private:
             sDrawQueueText              Text;
             sDrawQueueRect              Rect;
             sDrawQueueTexture           Texture;
-            sDrawQueueCircle            Circle;
             sDrawQueuePrimitive         Primitive;
             sDrawQueuePrimitiveMaterial PrimitiveMaterial;
         };
