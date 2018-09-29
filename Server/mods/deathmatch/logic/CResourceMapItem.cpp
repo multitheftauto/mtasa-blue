@@ -79,8 +79,14 @@ bool CResourceMapItem::LoadMap(const char* szMapFilename)
 
     CXMLFile* const pXMLFile = g_pServerInterface->GetXML()->CreateXML(szMapFilename);
 
-    if (!pXMLFile || !pXMLFile->Parse())
+    if (!pXMLFile)
         return false;
+
+    if (!pXMLFile->Parse())
+    {
+        delete pXMLFile;
+        return false;
+    }
 
     CXMLNode* const pRootNode = pXMLFile->GetRootNode();
 
