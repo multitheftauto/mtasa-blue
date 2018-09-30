@@ -1581,74 +1581,72 @@ int CLuaEngineDefs::EngineSetModelCollisionData(lua_State* luaVM)
                     }
                 break;
                 case COLLISION_SPHERE:
-                    if (usShapeId >= 0 && usShapeId < pColData->numColSpheres)
+                    CColSphereSA* pSphere;
+                    switch (eCollisionKey)
                     {
-                        CColSphereSA* pSphere;
-                        switch (eCollisionKey)
+                    case COLLISION_KEY_POSITION:
+                        argStream.ReadVector3D(vec1);
+                        if (!argStream.HasErrors())
                         {
-                        case COLLISION_KEY_POSITION:
-                            argStream.ReadVector3D(vec1);
-                            if (!argStream.HasErrors())
-                            {
-                                if (checkVector(vec1))
-                                {
-                                    for (std::vector<ushort>::iterator it = vecShapeId.begin(); it != vecShapeId.end(); ++it)
-                                    {
-                                        pSphere = &pColData->pColSpheres[*it];
-                                        if (checkVector(vec1, pSphere->fRadius))
-                                        {
-                                            pSphere->vecCenter = vec1;
-                                        }
-                                    }
-                                    lua_pushboolean(luaVM, true);
-                                    return 1;
-                                }
-                            }
-                        case COLLISION_KEY_MOVE:
-                            argStream.ReadVector3D(vec1);
-                            if (!argStream.HasErrors())
+                            if (checkVector(vec1))
                             {
                                 for (std::vector<ushort>::iterator it = vecShapeId.begin(); it != vecShapeId.end(); ++it)
                                 {
+                                    ushort val = *it;
                                     pSphere = &pColData->pColSpheres[*it];
-                                    if (checkVector(pSphere->vecCenter + vec1, pSphere->fRadius))
-                                        pSphere->vecCenter += vec1;
+                                    if (checkVector(vec1, pSphere->fRadius))
+                                    {
+                                        pSphere->vecCenter = vec1;
+                                    }
                                 }
                                 lua_pushboolean(luaVM, true);
                                 return 1;
                             }
-                        case COLLISION_KEY_RADIUS:
-                            argStream.ReadNumber(fNumber);
-                            if (!argStream.HasErrors())
+                        }
+                    case COLLISION_KEY_MOVE:
+                        argStream.ReadVector3D(vec1);
+                        if (!argStream.HasErrors())
+                        {
+                            for (std::vector<ushort>::iterator it = vecShapeId.begin(); it != vecShapeId.end(); ++it)
                             {
-                                if (fNumber >= 0 && fNumber <= 256) // bigger than 256 are sure that are outside bounding
-                                {
-                                    for (std::vector<ushort>::iterator it = vecShapeId.begin(); it != vecShapeId.end(); ++it)
-                                    {
-                                        pSphere = &pColData->pColSpheres[*it];
-                                        if (checkVector(pSphere->vecCenter, fNumber))
-                                            pSphere->fRadius = fNumber;
-                                    }
-                                    lua_pushboolean(luaVM, true);
-                                    return 1;
-                                }
+                                pSphere = &pColData->pColSpheres[*it];
+                                if (checkVector(pSphere->vecCenter + vec1, pSphere->fRadius))
+                                    pSphere->vecCenter += vec1;
                             }
-
-                            break;
-                        case COLLISION_KEY_MATERIAL:
-                            argStream.ReadNumber(cSurface);
-                            if (!argStream.HasErrors())
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
+                    case COLLISION_KEY_RADIUS:
+                        argStream.ReadNumber(fNumber);
+                        if (!argStream.HasErrors())
+                        {
+                            if (fNumber >= 0 && fNumber <= 256) // bigger than 256 are sure that are outside bounding
                             {
-                                if (cSurface >= EColSurfaceValue::DEFAULT && cSurface <= EColSurfaceValue::RAILTRACK)
+                                for (std::vector<ushort>::iterator it = vecShapeId.begin(); it != vecShapeId.end(); ++it)
                                 {
-                                    for (std::vector<ushort>::iterator it = vecShapeId.begin(); it != vecShapeId.end(); ++it)
-                                    {
-                                        pSphere = &pColData->pColSpheres[*it];
-                                        pSphere->material = cSurface;
-                                    }
-                                    lua_pushboolean(luaVM, true);
-                                    return 1;
+                                    pSphere = &pColData->pColSpheres[*it];
+                                    if (checkVector(pSphere->vecCenter, fNumber))
+                                        pSphere->fRadius = fNumber;
                                 }
+                                lua_pushboolean(luaVM, true);
+                                return 1;
+                            }
+                        }
+
+                        break;
+                    case COLLISION_KEY_MATERIAL:
+                        argStream.ReadNumber(cSurface);
+                        if (!argStream.HasErrors())
+                        {
+                            if (cSurface >= EColSurfaceValue::DEFAULT && cSurface <= EColSurfaceValue::RAILTRACK)
+                            {
+                                for (std::vector<ushort>::iterator it = vecShapeId.begin(); it != vecShapeId.end(); ++it)
+                                {
+                                    pSphere = &pColData->pColSpheres[*it];
+                                    pSphere->material = cSurface;
+                                }
+                                lua_pushboolean(luaVM, true);
+                                return 1;
                             }
                         }
                     }
