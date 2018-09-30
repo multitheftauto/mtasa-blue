@@ -194,7 +194,7 @@ typedef struct
         return vertices.size();
     }
 
-    bool isValidIndex(char eShape, ushort usIndex)
+    bool isValidIndex(char eShape, ushort usIndex, ushort numVertices = 0)
     {
         switch (eShape)
         {
@@ -208,7 +208,10 @@ typedef struct
                 return (usIndex >= 0 && usIndex < numColTriangles);
             break;
             case 3:
-                 ushort numVertices = getNumVertices();
+                if (numVertices == 0)
+                {
+                    numVertices = getNumVertices();
+                }
                  return (usIndex >= 0 && usIndex < numVertices);
             break;
         }

@@ -48,6 +48,7 @@ public:
     LUA_DECLARE(EngineGetModelCollisionData);
     LUA_DECLARE(EngineSetModelCollisionData);
     LUA_DECLARE(EngineModelCollisionCreate);
+    LUA_DECLARE(EngineModelCollisionRemove);
     LUA_DECLARE(EngineUpdateModelCollisionBoundingBox);
     LUA_DECLARE(IsModelCollisionLoaded);
     LUA_DECLARE(EngineRestoreOriginalCollision);

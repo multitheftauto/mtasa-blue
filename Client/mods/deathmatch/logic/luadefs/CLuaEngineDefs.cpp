@@ -12,6 +12,7 @@
 #include "StdInc.h"
 
 #include "../Client/game_sa/CModelInfoSA.h"
+#include "../Client/game_sa/CColModelSA.h"
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
 void CLuaEngineDefs::LoadFunctions(void)
@@ -999,7 +1000,7 @@ int CLuaEngineDefs::EngineGetModelCollisionProperties(lua_State* luaVM)
                         lua_pushnumber(luaVM, pColData->numColTriangles);
                         lua_settable(luaVM, -3);
                         lua_pushstring(luaVM, "colVertices");
-                        lua_pushnumber(luaVM, 0);
+                        lua_pushnumber(luaVM, pColData->getNumVertices());
                         lua_settable(luaVM, -3);
                         lua_pushstring(luaVM, "shadowTriangles");
                         lua_pushnumber(luaVM, pColData->m_nNumShadowTriangles);
@@ -1026,7 +1027,6 @@ bool GetModelCollisionInterface(ushort usModel, CColModelSAInterface* &pColModel
     if (CClientObjectManager::IsValidModel(usModel))
     {
         CBaseModelInfoSAInterface* pModelInfo = ppModelInfo[usModel];
-        pModelInfo->bDontCastShadowsOn = 0;
         if (pModelInfo != nullptr)
         {
             pColModelInterface = pModelInfo->pColModel;
@@ -1515,9 +1515,10 @@ int CLuaEngineDefs::EngineSetModelCollisionData(lua_State* luaVM)
         if (GetModelCollisionInterface(usModel, pCol))
         {
             CColDataSA* pColData = pCol->pColData;
+            ushort numVertices = pColData->getNumVertices();
             for (int i = 0; i != vecShapeId.size(); i++) {
                 vecShapeId[i]--;
-                if (!pColData->isValidIndex(eCollisionShape, vecShapeId[i]))
+                if (!pColData->isValidIndex(eCollisionShape, vecShapeId[i], numVertices))
                 {
                     lua_pushboolean(luaVM, false);
                     lua_pushnumber(luaVM, vecShapeId[i]); // return which is invalid
@@ -1805,9 +1806,9 @@ int CLuaEngineDefs::EngineSetModelCollisionData(lua_State* luaVM)
     return 1;
 }
 
-int CLuaEngineDefs::EngineModelCollisionCreate(lua_State* luaVM)
+int CLuaEngineDefs::EngineModelCollisionRemove(lua_State* luaVM)
 {
-    ushort usModel,usIndex;
+    ushort usModel, usIndex;
     float fRadius;
     std::vector<ushort> vecIndexes;
     eCollisionShapes eCollisionShape;
@@ -1821,6 +1822,72 @@ int CLuaEngineDefs::EngineModelCollisionCreate(lua_State* luaVM)
     }
     else
         argStream.ReadNumberTable(vecIndexes);
+
+    if (!argStream.HasErrors())
+    {
+        CColModelSAInterface* pCol;
+        if (GetModelCollisionInterface(usModel, pCol))
+        {
+            CColDataSA* pColData = pCol->pColData;
+            ushort numVertices = pColData->getNumVertices();
+            for (int i = 0; i != vecIndexes.size(); i++) {
+                vecIndexes[i]--;
+                if (!pColData->isValidIndex(eCollisionShape, vecIndexes[i], numVertices))
+                {
+                    lua_pushboolean(luaVM, false);
+                    lua_pushnumber(luaVM, vecIndexes[i]); // return which is invalid
+                    return 2;
+                }
+            }
+
+            sort(vecIndexes.begin(), vecIndexes.end());
+            vecIndexes.erase(unique(vecIndexes.begin(), vecIndexes.end()), vecIndexes.end());
+
+            CColBoxSA* pBox;
+            CColBoxSA* newArr;
+            ushort usIndex;
+            switch (eCollisionShape)
+            {
+            case COLLISION_BOX:
+                newArr = new CColBoxSA[pColData->numColBoxes - vecIndexes.size()];
+                usIndex = 0;
+                for (ushort i = 0; i < pColData->numColBoxes; i++)
+                {
+                    if ( std::find(vecIndexes.begin(), vecIndexes.end(), i) == vecIndexes.end())
+                    {
+                        pBox = &pColData->pColBoxes[i];
+                        newArr[usIndex] = *pBox;
+                        usIndex++;
+                    }
+                }
+                pColData->numColBoxes -= vecIndexes.size();
+                pColData->pColBoxes = newArr;
+                lua_pushboolean(luaVM, true);
+                lua_pushnumber(luaVM, usIndex);
+                 return 2;
+            break;
+            case COLLISION_SPHERE:
+                break;
+            case COLLISION_TRIANGLE:
+                break;
+            }
+        }
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineModelCollisionCreate(lua_State* luaVM)
+{
+    ushort usModel;
+    float fRadius;
+    eCollisionShapes eCollisionShape;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(usModel);
+    argStream.ReadEnumString(eCollisionShape);
 
     if (!argStream.HasErrors())
     {
