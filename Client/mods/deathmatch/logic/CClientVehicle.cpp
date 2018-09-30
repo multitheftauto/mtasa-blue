@@ -3843,17 +3843,13 @@ bool CClientVehicle::IsEnterable(void)
 {
     if (m_pVehicle)
     {
-        // Server vehicle?
-        if (!IsLocalEntity())
+        if (GetHealth() > 0.0f)
         {
-            if (GetHealth() > 0.0f)
+            if (!IsInWater() || (GetVehicleType() == CLIENTVEHICLE_BOAT || m_usModel == 447 /* sea sparrow */
+                                    || m_usModel == 417                                        /* levithan */
+                                    || m_usModel == 460 /* skimmer */))
             {
-                if (!IsInWater() || (GetVehicleType() == CLIENTVEHICLE_BOAT || m_usModel == 447 /* sea sparrow */
-                                     || m_usModel == 417                                        /* levithan */
-                                     || m_usModel == 460 /* skimmer */))
-                {
-                    return true;
-                }
+                return true;
             }
         }
     }

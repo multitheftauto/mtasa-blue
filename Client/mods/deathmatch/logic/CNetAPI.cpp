@@ -313,7 +313,7 @@ void CNetAPI::DoPulse(void)
             if (IsPureSyncNeeded() && !g_pClientGame->IsDownloadingBigPacket())
             {
                 // Are in a vehicle?
-                if (pVehicle)
+                if (pVehicle && !pVehicle->IsLocalEntity())
                 {
                     // Send a puresync packet
                     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
@@ -1118,11 +1118,14 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
     // If the player is in contact with a object/vehicle, make that the origin
     if (bInContact)
     {
-        BitStream.Write(pContactEntity->GetID());
+        if (!pContactEntity->IsLocalEntity())
+        {
+            BitStream.Write(pContactEntity->GetID());
 
-        CVector vecOrigin;
-        pContactEntity->GetPosition(vecOrigin);
-        vecPosition -= vecOrigin;
+            CVector vecOrigin;
+            pContactEntity->GetPosition(vecOrigin);
+            vecPosition -= vecOrigin;
+        }
     }
 
     SPositionSync position(false);
