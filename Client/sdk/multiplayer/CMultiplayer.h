@@ -20,7 +20,6 @@
 #include "CLimits.h"
 #include <../Client/game_sa/CAnimBlendAssociationSA.h>
 #include <../Client/game_sa/CAnimBlendStaticAssociationSA.h>
-#include <../Client/game_sa/CColPointSA.h>
 
 struct SRwResourceStats
 {
@@ -45,7 +44,7 @@ struct SWaterCannonHitEvent
     CVector             vecPosition;
     CVector             vecNormal;
     int                 iModel;
-    EColSurface         colSurface;
+    unsigned char       ucColSurface;
 };
 
 class CAnimBlendAssociationSAInterface;

@@ -2892,7 +2892,7 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientFileDownloadComplete", "fileName, success", NULL, false);
 
     m_Events.AddEvent("onClientWeaponFire", "ped, x, y, z", NULL, false);
-  
+
     m_Events.AddEvent("onClientWorldSound", "group, index, x, y, z", nullptr, false);
 }
 
@@ -6915,6 +6915,6 @@ void CClientGame::WaterCannonHitWorldHandler(SWaterCannonHitEvent& event)
     arguments.PushNumber(event.vecNormal.fY);
     arguments.PushNumber(event.vecNormal.fZ);
     arguments.PushNumber(event.iModel);
-    arguments.PushNumber(event.colSurface);
+    arguments.PushNumber(event.ucColSurface);
     pEntity->CallEvent("onClientElementHitByWaterCannon", arguments, false);
 }
