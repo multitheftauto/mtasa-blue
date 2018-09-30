@@ -42,7 +42,7 @@ void CLuaEngineDefs::LoadFunctions(void)
         {"engineSetModelCollisionData", EngineSetModelCollisionData},
         {"engineUpdateModelCollisionBoundingBox", EngineUpdateModelCollisionBoundingBox },
         {"engineModelCollisionCreateShape", EngineModelCollisionCreateShape },
-        {"engineModelIsCollisionLoaded", EngineModelIsCollisionLoaded },
+        {"isModelCollisionLoaded", IsModelCollisionLoaded },
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -1066,7 +1066,7 @@ bool checkVector(CVector& vec, float fRadius = 0)
 }
 
 
-int CLuaEngineDefs::EngineModelIsCollisionLoaded(lua_State* luaVM)
+int CLuaEngineDefs::IsModelCollisionLoaded(lua_State* luaVM)
 {
     ushort usModel;
     CScriptArgReader argStream(luaVM);
