@@ -1587,6 +1587,8 @@ void CClientGame::UpdateVehicleInOut(void)
                         pInOutVehicle->CalcAndUpdateTyresCanBurstFlag();
                     }
 
+                    unsigned char ucSeat = m_ucVehicleInOutSeat;
+
                     // Reset the vehicle in out stuff so we're ready for another car entry/leave.
                     // Don't allow a new entry/leave until we've gotten the notify return packet
                     ElementID ReasonVehicleID = m_VehicleInOutID;
@@ -1604,6 +1606,11 @@ void CClientGame::UpdateVehicleInOut(void)
                     else
                     {
                         CClientVehicle::UnpairPedAndVehicle(m_pLocalPlayer, pInOutVehicle);
+
+                        CLuaArguments Arguments;
+                        Arguments.PushElement(m_pLocalPlayer);
+                        Arguments.PushNumber(ucSeat);
+                        pInOutVehicle->CallEvent("onClientVehicleExit", Arguments, true);
                     }
                 }
                 // Are we still inside the car?
@@ -1770,6 +1777,8 @@ void CClientGame::UpdateVehicleInOut(void)
                     }
                 }
 
+                unsigned char ucSeat = m_ucVehicleInOutSeat;
+
                 // Reset
                 // Don't allow a new entry/leave until we've gotten the notify return packet
                 ElementID ReasonID = m_VehicleInOutID;
@@ -1779,6 +1788,12 @@ void CClientGame::UpdateVehicleInOut(void)
                 {
                     m_bNoNewVehicleTask = true;
                     m_NoNewVehicleTaskReasonID = ReasonID;
+                // Check if player is actually in the vehicle and didn't abandon entering before firing the event.
+                } else if(m_pLocalPlayer->IsInVehicle()) {
+                    CLuaArguments Arguments;
+                    Arguments.PushElement(m_pLocalPlayer);
+                    Arguments.PushNumber(ucSeat);
+                    pInOutVehicle->CallEvent("onClientVehicleEnter", Arguments, true);
                 }
             }
         }
@@ -1820,13 +1835,6 @@ void CClientGame::UpdateVehicleInOut(void)
                         g_pNet->SendPacket(PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
                         g_pNet->DeallocateNetBitStream(pBitStream);
 
-                        // We're not allowed to enter any vehicle before we get a confirm
-                        m_bNoNewVehicleTask = true;
-                        m_NoNewVehicleTaskReasonID = pOccupiedVehicle->GetID();
-
-                        // Remove him from the vehicle
-                        m_pLocalPlayer->RemoveFromVehicle();
-
                         /*
                         // Make it undamagable if we're not syncing it
                         CDeathmatchVehicle* pInOutVehicle = static_cast < CDeathmatchVehicle* > ( pOccupiedVehicle );
@@ -1844,11 +1852,30 @@ void CClientGame::UpdateVehicleInOut(void)
                             }
                         }
                         */
-
-#ifdef MTA_DEBUG
-                        g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_notify_fell_off");
-#endif
                     }
+                }
+
+                if (!pOccupiedVehicle->IsLocalEntity())
+                {
+                    // We're not allowed to enter any vehicle before we get a confirm
+                    m_bNoNewVehicleTask = true;
+                    m_NoNewVehicleTaskReasonID = pOccupiedVehicle->GetID();
+
+                    // Remove him from the vehicle
+                    m_pLocalPlayer->RemoveFromVehicle();
+
+                    #ifdef MTA_DEBUG
+                    g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_notify_out");
+                    #endif
+                }
+                else
+                {
+                    CLuaArguments Arguments;
+                    Arguments.PushElement(m_pLocalPlayer);
+                    Arguments.PushNumber(m_pLocalPlayer->GetOccupiedVehicleSeat());
+                    pOccupiedVehicle->CallEvent("onClientVehicleExit", Arguments, true);
+
+                    CClientVehicle::UnpairPedAndVehicle(m_pLocalPlayer, pOccupiedVehicle);
                 }
             }
         }
@@ -4997,8 +5024,9 @@ void CClientGame::ProcessVehicleInOutKey(bool bPassenger)
 
         if (pOccupiedVehicle->IsLocalEntity())
         {
-            g_pClientGame->m_VehicleInOutID = pOccupiedVehicle->GetID();
-            g_pClientGame->m_ucVehicleInOutSeat = m_pLocalPlayer->GetOccupiedVehicleSeat();
+            unsigned char ucSeat = m_pLocalPlayer->GetOccupiedVehicleSeat();
+            m_VehicleInOutID = pOccupiedVehicle->GetID();
+            m_ucVehicleInOutSeat = ucSeat;
 
             m_VehicleInOutID = pOccupiedVehicle->GetID();
             m_bIsGettingOutOfVehicle = true;
@@ -5011,6 +5039,12 @@ void CClientGame::ProcessVehicleInOutKey(bool bPassenger)
 
             m_pLocalPlayer->GetOutOfVehicle(ucDoor);
             m_pLocalPlayer->SetVehicleInOutState(VEHICLE_INOUT_GETTING_OUT);
+
+            CLuaArguments Arguments;
+            Arguments.PushElement(m_pLocalPlayer);
+            Arguments.PushNumber(ucSeat);
+            Arguments.PushNumber(ucDoor);
+            pOccupiedVehicle->CallEvent("onClientVehicleStartExit", Arguments, true);
 
             return;
         }
@@ -5122,21 +5156,6 @@ void CClientGame::ProcessVehicleInOutKey(bool bPassenger)
         return;
     }
 
-    if (pVehicle->IsLocalEntity())
-    {
-        g_pClientGame->m_VehicleInOutID = pVehicle->GetID();
-        g_pClientGame->m_ucVehicleInOutSeat = uiSeat;
-
-        m_VehicleInOutID = pVehicle->GetID();
-        m_bIsGettingIntoVehicle = true;
-        m_ulLastVehicleInOutTime = CClientTime::GetTime();
-
-        m_pLocalPlayer->GetIntoVehicle(pVehicle, uiSeat, uiDoor);
-        m_pLocalPlayer->SetVehicleInOutState(VEHICLE_INOUT_GETTING_IN);
-
-        return;
-    }
-
     // Call the onClientVehicleStartEnter event for remote players
     // Local player triggered before sending packet in CClientGame
     CLuaArguments Arguments;
@@ -5147,6 +5166,21 @@ void CClientGame::ProcessVehicleInOutKey(bool bPassenger)
     if (!pVehicle->CallEvent("onClientVehicleStartEnter", Arguments, true))
     {
         // Event has been cancelled
+        return;
+    }
+
+    if (pVehicle->IsLocalEntity())
+    {
+        m_VehicleInOutID = pVehicle->GetID();
+        m_ucVehicleInOutSeat = uiSeat;
+
+        m_VehicleInOutID = pVehicle->GetID();
+        m_bIsGettingIntoVehicle = true;
+        m_ulLastVehicleInOutTime = CClientTime::GetTime();
+
+        m_pLocalPlayer->GetIntoVehicle(pVehicle, uiSeat, uiDoor);
+        m_pLocalPlayer->SetVehicleInOutState(VEHICLE_INOUT_GETTING_IN);
+
         return;
     }
 
