@@ -179,4 +179,5 @@ public:
     CVector* GetTargetHistoryPos() const { return m_pInterface->m_aTargetHistoryPos; }
 
     CEntity* GetTargetEntity() const;
+    void     SetTargetEntity(CEntity* pEntity) override;
 };
