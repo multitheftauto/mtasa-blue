@@ -13,8 +13,7 @@
 
 extern CGame* g_pGame;
 
-CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned short usModel, unsigned char ucVariant,
-                   unsigned char ucVariant2)
+CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2)
     : CElement(pParent)
 {
     CElementRefManager::AddElementRefs(ELEMENT_REF_DEBUG(this, "CVehicle"), &m_pTowedVehicle, &m_pTowedByVehicle, &m_pSyncer, &m_pJackingPlayer, NULL);

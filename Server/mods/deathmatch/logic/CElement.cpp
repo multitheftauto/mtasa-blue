@@ -477,7 +477,7 @@ void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
     // Iterate the attributes of our XML node
     CXMLAttributes* pAttributes = &(Node.GetAttributes());
     unsigned int    uiAttributeCount = pAttributes->Count();
-    
+
     for (unsigned int uiIndex = 0; uiIndex < uiAttributeCount; uiIndex++)
     {
         // Grab the node (we can assume it exists here)

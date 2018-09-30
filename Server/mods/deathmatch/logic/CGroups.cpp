@@ -19,7 +19,7 @@ CDummy* CGroups::Create(CElement* pParent)
 CDummy* CGroups::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
 {
     CDummy* const pTemp = new CDummy(this, pParent);
-    
+
     if (!pTemp->LoadFromCustomData(pEvents, Node))
     {
         delete pTemp;

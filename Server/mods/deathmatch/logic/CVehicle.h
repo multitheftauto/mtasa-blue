@@ -142,8 +142,7 @@ class CVehicle : public CElement
 
 public:
     ZERO_ON_NEW
-    CVehicle(class CVehicleManager* pVehicleManager, CElement* pParent, unsigned short usModel, unsigned char ucVariant,
-             unsigned char ucVariant2);
+    CVehicle(class CVehicleManager* pVehicleManager, CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
     ~CVehicle(void);
     CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 

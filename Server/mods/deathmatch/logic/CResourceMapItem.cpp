@@ -12,7 +12,8 @@
 
 extern CGame* g_pGame;
 
-CResourceMapItem::CResourceMapItem(CResource* pResource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* pXMLAttributes, int iDimension)
+CResourceMapItem::CResourceMapItem(CResource* pResource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* pXMLAttributes,
+                                   int iDimension)
     : CResourceFile(pResource, szShortName, szResourceFileName, pXMLAttributes)
 {
     m_pGroups = g_pGame->GetGroups();
@@ -47,7 +48,7 @@ bool CResourceMapItem::Start()
         return false;
 
     m_pElementGroup = new CElementGroup();
-    
+
     if (!LoadMap(m_strResourceFileName.c_str()))
     {
         delete m_pElementGroup;
@@ -66,9 +67,9 @@ bool CResourceMapItem::Stop()
         m_pElementGroup = nullptr;
 
         // m_pMapElement has been deleted by m_pElementGroup
-        m_pMapElement = nullptr; 
+        m_pMapElement = nullptr;
     }
-    
+
     return true;
 }
 
@@ -246,7 +247,7 @@ void CResourceMapItem::LinkupElements()
         if (szAttachToID[0])
         {
             CElement* const pElement = pRootElement->FindChild(szAttachToID, 0, true);
-            
+
             if (pElement)
                 pBlip->AttachTo(pElement);
         }

@@ -11,8 +11,7 @@
 
 #include "StdInc.h"
 
-CTeam::CTeam(CTeamManager* pTeamManager, CElement* pParent, const char* szName, unsigned char ucRed, unsigned char ucGreen,
-             unsigned char ucBlue)
+CTeam::CTeam(CTeamManager* pTeamManager, CElement* pParent, const char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
     : CElement(pParent)
 {
     m_pTeamManager = pTeamManager;

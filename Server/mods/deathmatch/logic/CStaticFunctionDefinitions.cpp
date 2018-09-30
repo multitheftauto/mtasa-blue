@@ -319,7 +319,7 @@ CElement* CStaticFunctionDefinitions::CloneElement(CResource* pResource, CElemen
         return nullptr;
     }
 
-    bool bAddEntity = true;
+    bool      bAddEntity = true;
     CElement* pNewElement = pElement->Clone(&bAddEntity, pResource);
 
     if (pNewElement)
@@ -9056,7 +9056,7 @@ CWater* CStaticFunctionDefinitions::CreateWater(CResource* pResource, CVector* p
 
     if (!pWater)
         return nullptr;
-    
+
     pWater->SetVertex(0, *pV1);
     pWater->SetVertex(1, *pV2);
     pWater->SetVertex(2, *pV3);

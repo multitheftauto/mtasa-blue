@@ -55,7 +55,7 @@ public:
 
     // Debug info for garbage collected files
     const SLuaDebugInfo& GetLuaDebugInfo(void) { return m_LuaDebugInfo; };
-    void SetLuaDebugInfo(const SLuaDebugInfo& luaDebugInfo) { m_LuaDebugInfo = luaDebugInfo; };
+    void                 SetLuaDebugInfo(const SLuaDebugInfo& luaDebugInfo) { m_LuaDebugInfo = luaDebugInfo; };
 
 protected:
     bool ReadSpecialData(const int iLine) override { return true; }

@@ -11,8 +11,7 @@
 
 #include "StdInc.h"
 
-CColRectangle::CColRectangle(CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, const CVector2D& vecSize)
-    : CColShape(pManager, pParent)
+CColRectangle::CColRectangle(CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, const CVector2D& vecSize) : CColShape(pManager, pParent)
 {
     m_vecPosition.fX = vecPosition.fX;
     m_vecPosition.fY = vecPosition.fY;

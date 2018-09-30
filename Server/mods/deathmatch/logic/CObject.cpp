@@ -13,8 +13,7 @@
 
 extern CGame* g_pGame;
 
-CObject::CObject(CElement* pParent, CObjectManager* pObjectManager, bool bIsLowLod)
-    : CElement(pParent), m_bIsLowLod(bIsLowLod), m_pLowLodObject(NULL)
+CObject::CObject(CElement* pParent, CObjectManager* pObjectManager, bool bIsLowLod) : CElement(pParent), m_bIsLowLod(bIsLowLod), m_pLowLodObject(NULL)
 {
     // Init
     m_iType = CElement::OBJECT;

@@ -11,8 +11,7 @@
 
 #include "StdInc.h"
 
-CColCuboid::CColCuboid(CColManager* pManager, CElement* pParent, const CVector& vecPosition, const CVector& vecSize)
-    : CColShape(pManager, pParent)
+CColCuboid::CColCuboid(CColManager* pManager, CElement* pParent, const CVector& vecPosition, const CVector& vecSize) : CColShape(pManager, pParent)
 {
     m_vecPosition = vecPosition;
     m_vecSize = vecSize;

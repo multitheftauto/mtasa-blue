@@ -11,8 +11,7 @@
 
 #include "StdInc.h"
 
-CColTube::CColTube(CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, float fHeight)
-    : CColShape(pManager, pParent)
+CColTube::CColTube(CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, float fHeight) : CColShape(pManager, pParent)
 {
     m_vecPosition = vecPosition;
     m_fRadius = fRadius;
