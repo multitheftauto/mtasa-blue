@@ -280,6 +280,7 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->SetGameEntityRenderHandler(CClientGame::StaticGameEntityRenderHandler);
     g_pMultiplayer->SetFxSystemDestructionHandler(CClientGame::StaticFxSystemDestructionHandler);
     g_pMultiplayer->SetDrivebyAnimationHandler(CClientGame::StaticDrivebyAnimationHandler);
+    g_pMultiplayer->SetWaterCannonHitWorldHandler(CClientGame::StaticWaterCannonHitWorldHandler);
     g_pGame->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pGame->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
     g_pGame->SetTaskSimpleBeHitHandler(CClientGame::StaticTaskSimpleBeHitHandler);
@@ -440,6 +441,7 @@ CClientGame::~CClientGame(void)
     g_pMultiplayer->SetGameModelRemoveHandler(NULL);
     g_pMultiplayer->SetGameEntityRenderHandler(NULL);
     g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
+    g_pMultiplayer->SetWaterCannonHitWorldHandler(nullptr);
     g_pGame->SetPreWeaponFireHandler(NULL);
     g_pGame->SetPostWeaponFireHandler(NULL);
     g_pGame->SetTaskSimpleBeHitHandler(NULL);
@@ -2744,6 +2746,7 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientElementStreamIn", "", NULL, false);
     m_Events.AddEvent("onClientElementStreamOut", "", NULL, false);
     m_Events.AddEvent("onClientElementDestroy", "", NULL, false);
+    m_Events.AddEvent("onClientElementHitByWaterCannon", "vehicle, hitX, hitY, hitZ, normalX, normalY, normalZ, model, materialID", nullptr, false);
 
     // Player events
     m_Events.AddEvent("onClientPlayerJoin", "", NULL, false);
@@ -3796,6 +3799,11 @@ void CClientGame::StaticFxSystemDestructionHandler(void* pFxSAInterface)
 AnimationId CClientGame::StaticDrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId)
 {
     return g_pClientGame->DrivebyAnimationHandler(animGroup, animId);
+}
+
+void CClientGame::StaticWaterCannonHitWorldHandler(SWaterCannonHitEvent& event)
+{
+    g_pClientGame->WaterCannonHitWorldHandler(event);
 }
 
 void CClientGame::DrawRadarAreasHandler(void)
@@ -6884,4 +6892,29 @@ void CClientGame::InsertAnimationAssociationToMap(CAnimBlendAssociationSAInterfa
 void CClientGame::RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation)
 {
     m_mapOfCustomAnimationAssociations.erase(pAnimAssociation);
+}
+
+void CClientGame::WaterCannonHitWorldHandler(SWaterCannonHitEvent& event)
+{
+    CClientEntity* const pVehicle = event.pGameVehicle ? g_pClientGame->GetGameEntityXRefManager()->FindClientVehicle(event.pGameVehicle) : nullptr;
+    
+    if (!pVehicle)
+        return;
+    
+    CClientEntity* pEntity = event.pHitGameEntity ? g_pClientGame->GetGameEntityXRefManager()->FindClientEntity(event.pHitGameEntity) : nullptr;
+
+    if (!pEntity)
+        pEntity = m_pRootEntity;
+    
+    CLuaArguments arguments;
+    arguments.PushElement(pVehicle);
+    arguments.PushNumber(event.vecPosition.fX);
+    arguments.PushNumber(event.vecPosition.fY);
+    arguments.PushNumber(event.vecPosition.fZ);
+    arguments.PushNumber(event.vecNormal.fX);
+    arguments.PushNumber(event.vecNormal.fY);
+    arguments.PushNumber(event.vecNormal.fZ);
+    arguments.PushNumber(event.iModel);
+    arguments.PushNumber(event.ucColSurface);
+    pEntity->CallEvent("onClientElementHitByWaterCannon", arguments, false);
 }
