@@ -41,8 +41,10 @@ void CLuaEngineDefs::LoadFunctions(void)
         {"engineGetModelCollisionData", EngineGetModelCollisionData},
         {"engineSetModelCollisionData", EngineSetModelCollisionData},
         {"engineUpdateModelCollisionBoundingBox", EngineUpdateModelCollisionBoundingBox },
-        {"engineModelCollisionCreateShape", EngineModelCollisionCreateShape },
+        {"engineModelCollisionCreate", EngineModelCollisionCreate },
+        {"engineModelCollisionRemove", EngineModelCollisionRemove },
         {"isModelCollisionLoaded", IsModelCollisionLoaded },
+        {"engineRestoreOriginalCollision", EngineRestoreOriginalCollision },
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -1024,6 +1026,7 @@ bool GetModelCollisionInterface(ushort usModel, CColModelSAInterface* &pColModel
     if (CClientObjectManager::IsValidModel(usModel))
     {
         CBaseModelInfoSAInterface* pModelInfo = ppModelInfo[usModel];
+        pModelInfo->bDontCastShadowsOn = 0;
         if (pModelInfo != nullptr)
         {
             pColModelInterface = pModelInfo->pColModel;
@@ -1065,6 +1068,37 @@ bool checkVector(CVector& vec, float fRadius = 0)
     }
 }
 
+//CColStore::RemoveAllCollision(void).text	00410E00	00000060	00000004	00000000	R	.	.	.	.	.	.
+
+typedef void(__cdecl * hRemoveModel) (void);
+auto cRemoveModel = (hRemoveModel)0x410E00;
+
+int CLuaEngineDefs::EngineRestoreOriginalCollision(lua_State* luaVM)
+{
+    ushort usModel;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(usModel);
+    if (!argStream.HasErrors())
+    {
+        CColModelSAInterface* pCol;
+        if (GetModelCollisionInterface(usModel, pCol))
+        {
+            cRemoveModel();
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        else
+        {
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
 
 int CLuaEngineDefs::IsModelCollisionLoaded(lua_State* luaVM)
 {
@@ -1083,7 +1117,6 @@ int CLuaEngineDefs::IsModelCollisionLoaded(lua_State* luaVM)
     lua_pushnil(luaVM);
     return 1;
 }
-
 
 int CLuaEngineDefs::EngineGetModelCollisionData(lua_State* luaVM)
 {
@@ -1772,14 +1805,23 @@ int CLuaEngineDefs::EngineSetModelCollisionData(lua_State* luaVM)
     return 1;
 }
 
-int CLuaEngineDefs::EngineModelCollisionCreateShape(lua_State* luaVM)
+int CLuaEngineDefs::EngineModelCollisionCreate(lua_State* luaVM)
 {
-    ushort usModel;
+    ushort usModel,usIndex;
     float fRadius;
+    std::vector<ushort> vecIndexes;
     eCollisionShapes eCollisionShape;
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
     argStream.ReadEnumString(eCollisionShape);
+    if (argStream.NextIsNumber())
+    {
+        argStream.ReadNumber(usIndex);
+        vecIndexes.push_back(usIndex);
+    }
+    else
+        argStream.ReadNumberTable(vecIndexes);
+
     if (!argStream.HasErrors())
     {
         CColModelSAInterface* pCol;
