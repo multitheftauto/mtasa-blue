@@ -843,7 +843,7 @@ void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStart
         PrimitiveVertice vert;
         float curAngle = fStartAngle + siSeg * kfSegmentAngle;
         vert.fX = fX + fRadius * cos(curAngle) * fRatio;
-        vert.fY = fY + fRadius * sin(curAngle) / fRatio;
+        vert.fY = fY + fRadius * sin(curAngle);
         vert.fZ = 0.0f;
         vert.Color = ulColor;
         pVecVertices->push_back(vert);
