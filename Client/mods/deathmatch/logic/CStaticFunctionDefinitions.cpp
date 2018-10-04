@@ -8033,6 +8033,58 @@ bool CStaticFunctionDefinitions::SetSoundEffectEnabled(CClientPlayer& Player, co
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetSoundEffectParameters(CClientSound& Sound, const SString& strEffectName, void* params)
+{
+    int iFxEffect = m_pSoundManager->GetFxEffectFromName(strEffectName);
+
+    if (iFxEffect >= 0)
+        if (Sound.IsFxEffectEnabled(iFxEffect))
+            if (Sound.SetFxEffectParameters(iFxEffect, params))
+                return true;
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetSoundEffectParameters(CClientPlayer& Player, const SString& strEffectName, void* params)
+{
+    CClientPlayerVoice* pVoice = Player.GetVoice();
+    if (pVoice)
+    {
+        int iFxEffect = m_pSoundManager->GetFxEffectFromName(strEffectName);
+
+        if (iFxEffect >= 0 && pVoice->IsFxEffectEnabled(iFxEffect))
+            if (pVoice->SetFxEffectParameters(iFxEffect, params))
+                return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetSoundEffectParameters(CClientSound& Sound, const SString& strEffectName, void* params)
+{
+    int iFxEffect = m_pSoundManager->GetFxEffectFromName(strEffectName);
+
+    if (iFxEffect >= 0)
+        if (Sound.IsFxEffectEnabled(iFxEffect))
+            if (Sound.GetFxEffectParameters(iFxEffect, params))
+                return true;
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetSoundEffectParameters(CClientPlayer& Player, const SString& strEffectName, void* params)
+{
+    CClientPlayerVoice* pVoice = Player.GetVoice();
+    if (pVoice)
+    {
+        int iFxEffect = m_pSoundManager->GetFxEffectFromName(strEffectName);
+
+        if (iFxEffect >= 0 && pVoice->IsFxEffectEnabled(iFxEffect))
+            if (pVoice->GetFxEffectParameters(iFxEffect, params))
+                return true;
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetSoundPan(CClientPlayer& Player, float fPan)
 {
     CClientPlayerVoice* pVoice = Player.GetVoice();

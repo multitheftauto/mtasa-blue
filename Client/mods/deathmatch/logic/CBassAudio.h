@@ -76,6 +76,8 @@ public:
     bool    GetPanEnabled() { return m_bPan; };
     void    SetPanEnabled(bool bPan) { m_bPan = bPan; };
     void    SetFxEffects(int* pEnabledEffects, uint iNumElements);
+    BOOL    SetFxParameters(uint iFxEffect, void* params);
+    BOOL    GetFxParameters(uint iFxEffect, void* params);
     SString GetMetaTags(const SString& strFormat);
     uint    GetReachedEndCount();
     bool    IsFreed();

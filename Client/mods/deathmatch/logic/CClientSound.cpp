@@ -616,6 +616,30 @@ bool CClientSound::IsFxEffectEnabled(uint uiFxEffect)
     return m_EnabledEffects[uiFxEffect] ? true : false;
 }
 
+bool CClientSound::SetFxEffectParameters(uint uiFxEffect, void* params)
+{
+    if (uiFxEffect >= NUMELMS(m_EnabledEffects))
+        return false;
+
+    if (m_pAudio)
+        if (m_pAudio->SetFxParameters(uiFxEffect, params))
+            return true;
+
+    return false;
+}
+
+bool CClientSound::GetFxEffectParameters(uint uiFxEffect, void* params)
+{
+    if (uiFxEffect >= NUMELMS(m_EnabledEffects))
+        return false;
+
+    if (m_pAudio)
+        if (m_pAudio->GetFxParameters(uiFxEffect, params))
+            return true;
+
+    return false;
+}
+
 ////////////////////////////////////////////////////////////
 //
 // CClientSound::Process3D
