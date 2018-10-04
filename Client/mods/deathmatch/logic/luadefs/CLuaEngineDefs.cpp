@@ -1844,31 +1844,33 @@ int CLuaEngineDefs::EngineModelCollisionRemove(lua_State* luaVM)
             vecIndexes.erase(unique(vecIndexes.begin(), vecIndexes.end()), vecIndexes.end());
 
             CColBoxSA* pBox;
-            CColBoxSA* newArr;
+            CColBoxSA* pBoxArray;
+
+            CColSphereSA* pSphere;
+            CColSphereSA* pSphereArray;
+
             ushort usIndex;
             switch (eCollisionShape)
             {
             case COLLISION_BOX:
-                newArr = new CColBoxSA[pColData->numColBoxes - vecIndexes.size()];
-                usIndex = 0;
-                for (ushort i = 0; i < pColData->numColBoxes; i++)
-                {
-                    if ( std::find(vecIndexes.begin(), vecIndexes.end(), i) == vecIndexes.end())
-                    {
-                        pBox = &pColData->pColBoxes[i];
-                        newArr[usIndex] = *pBox;
-                        usIndex++;
-                    }
-                }
-                pColData->numColBoxes -= vecIndexes.size();
-                pColData->pColBoxes = newArr;
+                pColData->removeColBoxes(vecIndexes);
                 lua_pushboolean(luaVM, true);
-                lua_pushnumber(luaVM, usIndex);
-                 return 2;
+                return 1;
             break;
             case COLLISION_SPHERE:
+                pColData->removeColSpheres(vecIndexes);
+                lua_pushboolean(luaVM, true);
+                return 1;
                 break;
             case COLLISION_TRIANGLE:
+                pColData->removeColTriangles(vecIndexes);
+                lua_pushboolean(luaVM, true);
+                return 1;
+                break;
+            case COLLISION_VERTEX:
+                pColData->removeColVertices(vecIndexes);
+                lua_pushboolean(luaVM, true);
+                return 1;
                 break;
             }
         }

@@ -218,6 +218,145 @@ typedef struct
         return false;
     }
 
+    std::vector<ushort> getTrianglesByVertex(ushort usVertex)
+    {
+        std::vector<ushort> vecTriangles;
+        CColTriangleSA colTriangle;
+        for (ushort i = 0; i < numColTriangles; i++)
+        {
+            colTriangle = pColTriangles[i];
+            if (colTriangle.vertex[0] == usVertex || colTriangle.vertex[1] == usVertex || colTriangle.vertex[2] == usVertex)
+                vecTriangles.push_back(i);
+        }
+        return vecTriangles;
+    }
+
+    void removeColBoxes(std::vector<ushort> vecIndexes)
+    {
+        CColBoxSA* pBoxArray = new CColBoxSA[numColBoxes - vecIndexes.size()];
+        ushort usIndex = 0;
+        for (ushort i = 0; i < numColBoxes; i++)
+        {
+            if (std::find(vecIndexes.begin(), vecIndexes.end(), i) == vecIndexes.end())
+            {
+                pBoxArray[usIndex++] = pColBoxes[i];
+            }
+        }
+        numColBoxes -= vecIndexes.size();
+        pColBoxes = pBoxArray;
+    }
+    void removeColSpheres(std::vector<ushort> vecIndexes)
+    {
+        CColSphereSA* pSphereArray = new CColSphereSA[numColSpheres - vecIndexes.size()];
+        ushort usIndex = 0;
+        for (ushort i = 0; i < numColBoxes; i++)
+        {
+            if (std::find(vecIndexes.begin(), vecIndexes.end(), i) == vecIndexes.end())
+            {
+                pSphereArray[usIndex++] = pColSpheres[i];
+            }
+        }
+        numColSpheres -= vecIndexes.size();
+        pColSpheres = pSphereArray;
+    }
+    void removeColTriangles(std::vector<ushort> vecIndexes, bool removeVertices = true)
+    {
+        CColTriangleSA colTriangle;
+        if (removeVertices)
+        {
+            std::vector<ushort> usIndexVertices;
+            for (ushort i = 0; i < numColTriangles; i++)
+            {
+                if (std::find(vecIndexes.begin(), vecIndexes.end(), i) != vecIndexes.end())
+                {
+                    colTriangle = pColTriangles[i];
+                    for (char k = 0; k < 3; k++)
+                    {
+                        if (getTrianglesByVertex(colTriangle.vertex[k]).size() <= 1) // remove if is used only by this triangle
+                        {
+                            usIndexVertices.push_back(colTriangle.vertex[k]);
+                        }
+                    }
+                }
+            }
+            if (usIndexVertices.size() > 0)
+            {
+                sort(usIndexVertices.begin(), usIndexVertices.end());
+                usIndexVertices.erase(unique(usIndexVertices.begin(), usIndexVertices.end()), usIndexVertices.end());
+
+                removeColVertices(usIndexVertices, false);
+            }
+        }
+
+        CColTriangleSA* pTriangleArray = reinterpret_cast<CColTriangleSA*>(CMemoryMgr_Malloc((numColTriangles - vecIndexes.size()) * sizeof(CColTriangleSA)));
+                                        //new CColTriangleSA[numColTriangles - vecIndexes.size()];
+        ushort usIndex = 0;
+        for (ushort i = 0; i < numColTriangles; i++)
+        {
+            if (std::find(vecIndexes.begin(), vecIndexes.end(), i) == vecIndexes.end())
+            {
+                pTriangleArray[i] = pColTriangles[i];
+            }
+        }
+
+
+        numColTriangles -= vecIndexes.size();
+        pColTriangles = pTriangleArray;
+    }
+
+    void removeColVertices(std::vector<ushort> vecIndexes, bool removeTriangles = true)
+    {
+        ushort usVertices, usTotalVertices;
+        ushort usNumVertices = getNumVertices();
+        usVertices = usNumVertices - vecIndexes.size();
+        if (removeTriangles)
+        {
+            std::vector<ushort> vecTriangles;
+            std::vector<ushort> vecVertexTriangles;
+            for (ushort i = 0; i < usNumVertices; i++)
+            {
+                if (std::find(vecIndexes.begin(), vecIndexes.end(), i) != vecIndexes.end())
+                {
+                    vecVertexTriangles = getTrianglesByVertex(i);
+                    vecTriangles.insert(vecTriangles.end(), vecVertexTriangles.begin(), vecVertexTriangles.end());
+                }
+            }
+            sort(vecTriangles.begin(), vecTriangles.end());
+            vecTriangles.erase(unique(vecTriangles.begin(), vecTriangles.end()), vecTriangles.end());
+            removeColTriangles(vecTriangles, false);
+        }
+
+        CompressedVector* pVerticesArray = reinterpret_cast<CompressedVector*>(CMemoryMgr_Malloc((usNumVertices - vecIndexes.size()) * sizeof(CompressedVector)));
+
+            //new CompressedVector[usVertices];
+
+        ushort usIndex = 0;
+        CColTriangleSA* colTriangle;
+        for (ushort i = 0; i < usNumVertices; i++)
+        {
+            if (std::find(vecIndexes.begin(), vecIndexes.end(), i) == vecIndexes.end())
+            {
+                pVerticesArray[usIndex++] = pVertices[i];
+            }
+            else
+            {
+                for (ushort triangleIndex = 0; triangleIndex < numColTriangles; triangleIndex++)
+                {
+                    colTriangle = &pColTriangles[triangleIndex];
+                    for (char k = 0; k < 3; k++)
+                    {
+                        if (colTriangle->vertex[k] > i)
+                        {
+                            colTriangle->vertex[k]--;
+                        }
+                    }
+                }
+            }
+        }
+
+        pVertices = pVerticesArray;
+    }
+
 } CColDataSA;
 
 class CColModelSAInterface
