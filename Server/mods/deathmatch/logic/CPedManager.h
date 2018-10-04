@@ -21,7 +21,7 @@ public:
     CPedManager(void);
     ~CPedManager(void);
 
-    class CPed* Create(unsigned short usModel, CElement* pParent, CXMLNode* pNode = NULL);
+    class CPed* Create(unsigned short usModel, CElement* pParent);
     class CPed* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void        DeleteAll(void);
 

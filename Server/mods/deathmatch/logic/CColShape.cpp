@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CColShape::CColShape(CColManager* pManager, CElement* pParent, CXMLNode* pNode, bool bIsPartnered) : CElement(pParent, pNode)
+CColShape::CColShape(CColManager* pManager, CElement* pParent, bool bIsPartnered) : CElement(pParent)
 {
     // Init
     m_bIsEnabled = true;

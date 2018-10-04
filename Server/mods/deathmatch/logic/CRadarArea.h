@@ -24,8 +24,6 @@ public:
 
     void Unlink(void);
 
-    bool ReadSpecialData(void);
-
     const CVector2D& GetSize(void) { return m_vecSize; };
     SColor           GetColor(void) const { return m_Color; };
     bool             IsFlashing(void) { return m_bIsFlashing; };
@@ -35,8 +33,11 @@ public:
     void SetColor(const SColor color);
     void SetFlashing(bool bFlashing);
 
+protected:
+    bool ReadSpecialData(const int iLine) override;
+
 private:
-    CRadarArea(class CRadarAreaManager* pRadarAreaManager, CElement* pParent, CXMLNode* pNode);
+    CRadarArea(class CRadarAreaManager* pRadarAreaManager, CElement* pParent);
 
     class CRadarAreaManager* m_pRadarAreaManager;
 

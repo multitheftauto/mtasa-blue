@@ -24,7 +24,7 @@ class CObject : public CElement
     friend class CPlayer;
 
 public:
-    explicit CObject(CElement* pParent, CXMLNode* pNode, class CObjectManager* pObjectManager, bool bIsLowLod);
+    explicit CObject(CElement* pParent, class CObjectManager* pObjectManager, bool bIsLowLod);
     explicit CObject(const CObject& Copy);
     ~CObject(void);
     CElement* Clone(bool* bAddEntity, CResource* pResource) override;
@@ -32,7 +32,6 @@ public:
     bool IsEntity(void) { return true; }
 
     void Unlink(void);
-    bool ReadSpecialData(void);
 
     const CVector& GetPosition(void);
     void           SetPosition(const CVector& vecPosition);
@@ -78,9 +77,11 @@ public:
 
     bool IsVisibleInAllDimensions(void) { return m_bVisibleInAllDimensions; };
     void SetVisibleInAllDimensions(bool bVisible) { m_bVisibleInAllDimensions = bVisible; };
-
     bool IsVisibleInAllInteriors(void) { return m_bVisibleInAllInteriors; };
     void SetVisibleInAllInteriors(bool bVisible) { m_bVisibleInAllInteriors = bVisible; };
+
+protected:
+    bool ReadSpecialData(const int iLine) override;
 
 private:
     CObjectManager* m_pObjectManager;

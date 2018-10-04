@@ -451,6 +451,10 @@ int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
                     if (fStopAngle < fStartAngle)
                         std::swap(fStopAngle, fStartAngle);
 
+                    // Clamp the angle, so we never draw more than 360 degrees
+                    if (fStartAngle + 360.0f < fStopAngle)
+                        fStopAngle = fStartAngle + 360.0f;
+
                     g_pCore->GetGraphics()->DrawCircleQueued(vecPosition.fX, vecPosition.fY, fRadius, fStartAngle, fStopAngle, color, colorCenter, siSegments,
                                                              fRatio, bPostGUI);
                     lua_pushboolean(luaVM, true);

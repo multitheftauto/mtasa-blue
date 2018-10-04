@@ -319,7 +319,7 @@ CElement* CStaticFunctionDefinitions::CloneElement(CResource* pResource, CElemen
         return nullptr;
     }
 
-    bool bAddEntity = true;
+    bool      bAddEntity = true;
     CElement* pNewElement = pElement->Clone(&bAddEntity, pResource);
 
     if (pNewElement)
@@ -4671,38 +4671,37 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsign
 {
     unsigned char ucVariation = ucVariant;
     unsigned char ucVariation2 = ucVariant2;
+
     if (ucVariant == 254 && ucVariant2 == 254)
         CVehicleManager::GetRandomVariation(usModel, ucVariation, ucVariation2);
 
     if (CVehicleManager::IsValidModel(usModel) && (ucVariation <= 5 || ucVariation == 255) && (ucVariation2 <= 5 || ucVariation2 == 255))
     {
-        // CVehicle* pVehicle = m_pVehicleManager->Create ( usModel, m_pMapManager->GetRootElement () );
-        CVehicle* pVehicle = m_pVehicleManager->Create(usModel, ucVariation, ucVariation2, pResource->GetDynamicElementRoot());
-        if (pVehicle)
+        CVehicle* const pVehicle = m_pVehicleManager->Create(pResource->GetDynamicElementRoot(), usModel, ucVariation, ucVariation2);
+
+        if (!pVehicle)
+            return nullptr;
+
+        pVehicle->SetPosition(vecPosition);
+        pVehicle->SetRotationDegrees(vecRotation);
+        pVehicle->SetRespawnPosition(vecPosition);
+        pVehicle->SetRespawnRotationDegrees(vecRotation);
+
+        if (szRegPlate && szRegPlate[0])
+            pVehicle->SetRegPlate(szRegPlate);
+
+        // Only sync if the resource has fully started
+        if (pResource->HasStarted())
         {
-            pVehicle->SetPosition(vecPosition);
-            pVehicle->SetRotationDegrees(vecRotation);
-
-            pVehicle->SetRespawnPosition(vecPosition);
-            pVehicle->SetRespawnRotationDegrees(vecRotation);
-
-            if (szRegPlate && szRegPlate[0])
-            {
-                pVehicle->SetRegPlate(szRegPlate);
-            }
-
-            // Only sync if the resource has fully started
-            if (pResource->HasStarted())
-            {
-                CEntityAddPacket Packet;
-                Packet.Add(pVehicle);
-                m_pPlayerManager->BroadcastOnlyJoined(Packet);
-            }
-            return pVehicle;
+            CEntityAddPacket Packet;
+            Packet.Add(pVehicle);
+            m_pPlayerManager->BroadcastOnlyJoined(Packet);
         }
+
+        return pVehicle;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool CStaticFunctionDefinitions::SetVehicleVariant(CVehicle* pVehicle, unsigned char ucVariant, unsigned char ucVariant2)
@@ -7929,29 +7928,27 @@ bool CStaticFunctionDefinitions::SetBlipVisibleDistance(CElement* pElement, unsi
 CObject* CStaticFunctionDefinitions::CreateObject(CResource* pResource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation,
                                                   bool bIsLowLod)
 {
-    // CObject* pObject = m_pObjectManager->Create ( m_pMapManager->GetRootElement () );
-    CObject* pObject = m_pObjectManager->Create(pResource->GetDynamicElementRoot(), NULL, bIsLowLod);
-    if (pObject)
+    CObject* const pObject = m_pObjectManager->Create(pResource->GetDynamicElementRoot(), bIsLowLod);
+
+    if (!pObject)
+        return nullptr;
+
+    // Convert the rotation from degrees to radians managed internally
+    CVector vecRadians = vecRotation;
+    ConvertDegreesToRadians(vecRadians);
+
+    pObject->SetPosition(vecPosition);
+    pObject->SetRotation(vecRadians);
+    pObject->SetModel(usModelID);
+
+    if (pResource->HasStarted())
     {
-        // Convert the rotation from degrees to radians managed internally
-        CVector vecRadians = vecRotation;
-        ConvertDegreesToRadians(vecRadians);
-
-        pObject->SetPosition(vecPosition);
-        pObject->SetRotation(vecRadians);
-        pObject->SetModel(usModelID);
-
-        if (pResource->HasStarted())
-        {
-            CEntityAddPacket Packet;
-            Packet.Add(pObject);
-            m_pPlayerManager->BroadcastOnlyJoined(Packet);
-        }
-
-        return pObject;
+        CEntityAddPacket Packet;
+        Packet.Add(pObject);
+        m_pPlayerManager->BroadcastOnlyJoined(Packet);
     }
 
-    return NULL;
+    return pObject;
 }
 
 bool CStaticFunctionDefinitions::GetObjectRotation(CObject* pObject, CVector& vecRotation)
@@ -8161,31 +8158,29 @@ bool CStaticFunctionDefinitions::IsObjectVisibleInAllInteriors(CElement* pElemen
 CRadarArea* CStaticFunctionDefinitions::CreateRadarArea(CResource* pResource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color,
                                                         CElement* pVisibleTo)
 {
-    // Create it
-    // CRadarArea* pRadarArea = m_pRadarAreaManager->Create ( m_pMapManager->GetRootElement (), NULL );
-    CRadarArea* pRadarArea = m_pRadarAreaManager->Create(pResource->GetDynamicElementRoot(), NULL);
-    if (pRadarArea)
+    CRadarArea* const pRadarArea = m_pRadarAreaManager->Create(pResource->GetDynamicElementRoot());
+
+    if (!pRadarArea)
+        return nullptr;
+
+    // Set the properties
+    CVector vecPosition = CVector(vecPosition2D.fX, vecPosition2D.fY, 0.0f);
+    pRadarArea->SetPosition(vecPosition);
+    pRadarArea->SetSize(vecSize);
+    pRadarArea->SetColor(color);
+
+    // Make him visible to the root
+    if (pVisibleTo)
     {
-        // Set the properties
-        CVector vecPosition = CVector(vecPosition2D.fX, vecPosition2D.fY, 0.0f);
-        pRadarArea->SetPosition(vecPosition);
-        pRadarArea->SetSize(vecSize);
-        pRadarArea->SetColor(color);
-
-        // Make him visible to the root
-        if (pVisibleTo)
-        {
-            pRadarArea->RemoveVisibleToReference(m_pMapManager->GetRootElement());
-            pRadarArea->AddVisibleToReference(pVisibleTo);
-        }
-
-        // Tell all the players
-        if (pResource->HasStarted())
-            pRadarArea->Sync(true);
-        return pRadarArea;
+        pRadarArea->RemoveVisibleToReference(m_pMapManager->GetRootElement());
+        pRadarArea->AddVisibleToReference(pVisibleTo);
     }
 
-    return NULL;
+    // Tell all the players
+    if (pResource->HasStarted())
+        pRadarArea->Sync(true);
+
+    return pRadarArea;
 }
 
 bool CStaticFunctionDefinitions::GetRadarAreaSize(CRadarArea* pRadarArea, CVector2D& vecSize)
@@ -8942,13 +8937,11 @@ CTeam* CStaticFunctionDefinitions::CreateTeam(CResource* pResource, const char* 
     assert(szTeamName);
 
     // If it already exists, do nothing
-    CTeam* pTeam = m_pTeamManager->GetTeam(szTeamName);
-    if (pTeam)
-        return NULL;
+    if (m_pTeamManager->GetTeam(szTeamName))
+        return nullptr;
 
     // Create the new team
-    // pTeam = new CTeam ( m_pTeamManager, m_pMapManager->GetRootElement (), NULL, szTeamName, ucRed, ucGreen, ucBlue );
-    pTeam = new CTeam(m_pTeamManager, pResource->GetDynamicElementRoot(), NULL, szTeamName, ucRed, ucGreen, ucBlue);
+    CTeam* const pTeam = new CTeam(m_pTeamManager, pResource->GetDynamicElementRoot(), szTeamName, ucRed, ucGreen, ucBlue);
 
     // Tell everyone to add this team
     if (pResource->HasStarted())
@@ -9092,35 +9085,34 @@ bool CStaticFunctionDefinitions::SetTeamFriendlyFire(CTeam* pTeam, bool bFriendl
 CWater* CStaticFunctionDefinitions::CreateWater(CResource* pResource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow)
 {
     if (!pV1 || !pV2 || !pV3)
-        return NULL;
+        return nullptr;
 
-    CWater* pWater = m_pWaterManager->Create(pV4 ? CWater::QUAD : CWater::TRIANGLE, pResource->GetDynamicElementRoot(), NULL, bShallow);
+    CWater* const pWater = m_pWaterManager->Create(pV4 ? CWater::QUAD : CWater::TRIANGLE, pResource->GetDynamicElementRoot(), bShallow);
 
-    if (pWater)
+    if (!pWater)
+        return nullptr;
+
+    pWater->SetVertex(0, *pV1);
+    pWater->SetVertex(1, *pV2);
+    pWater->SetVertex(2, *pV3);
+
+    if (pWater->GetWaterType() == CWater::QUAD)
+        pWater->SetVertex(3, *pV4);
+
+    if (!pWater->Valid())
     {
-        pWater->SetVertex(0, *pV1);
-        pWater->SetVertex(1, *pV2);
-        pWater->SetVertex(2, *pV3);
-        if (pWater->GetWaterType() == CWater::QUAD)
-            pWater->SetVertex(3, *pV4);
-
-        if (!pWater->Valid())
-        {
-            delete pWater;
-            return NULL;
-        }
-
-        if (pResource->HasStarted())
-        {
-            CEntityAddPacket Packet;
-            Packet.Add(pWater);
-            m_pPlayerManager->BroadcastOnlyJoined(Packet);
-        }
-
-        return pWater;
+        delete pWater;
+        return nullptr;
     }
 
-    return NULL;
+    if (pResource->HasStarted())
+    {
+        CEntityAddPacket Packet;
+        Packet.Add(pWater);
+        m_pPlayerManager->BroadcastOnlyJoined(Packet);
+    }
+
+    return pWater;
 }
 
 bool CStaticFunctionDefinitions::SetElementWaterLevel(CWater* pWater, float fLevel)
@@ -9237,8 +9229,7 @@ bool CStaticFunctionDefinitions::ResetWaterColor()
 
 CColCircle* CStaticFunctionDefinitions::CreateColCircle(CResource* pResource, const CVector2D& vecPosition, float fRadius)
 {
-    // CColCircle * pColShape = new CColCircle ( m_pColManager, m_pMapManager->GetRootElement (), vecPosition, fRadius );
-    CColCircle* pColShape = new CColCircle(m_pColManager, pResource->GetDynamicElementRoot(), vecPosition, fRadius);
+    CColCircle* const pColShape = new CColCircle(m_pColManager, pResource->GetDynamicElementRoot(), vecPosition, fRadius);
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement();
@@ -9396,7 +9387,7 @@ bool CStaticFunctionDefinitions::GetWeaponIDFromName(const char* szName, unsigne
 
 CCustomWeapon* CStaticFunctionDefinitions::CreateWeapon(CResource* pResource, eWeaponType weaponType, CVector vecPosition)
 {
-    CCustomWeapon* pWeapon = new CCustomWeapon(pResource->GetDynamicElementRoot(), NULL, m_pObjectManager, m_pCustomWeaponManager, weaponType);
+    CCustomWeapon* const pWeapon = new CCustomWeapon(pResource->GetDynamicElementRoot(), m_pObjectManager, m_pCustomWeaponManager, weaponType);
     pWeapon->SetPosition(vecPosition);
 
     if (pResource->HasStarted())
@@ -9405,6 +9396,7 @@ CCustomWeapon* CStaticFunctionDefinitions::CreateWeapon(CResource* pResource, eW
         Packet.Add(pWeapon);
         m_pPlayerManager->BroadcastOnlyJoined(Packet);
     }
+
     return pWeapon;
 }
 
