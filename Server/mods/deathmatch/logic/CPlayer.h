@@ -77,7 +77,6 @@ public:
     void DoPulse(void);
 
     void Unlink(void);
-    bool ReadSpecialData(void) { return true; };
 
     bool DoNotSendEntities(void) { return m_bDoNotSendEntities; };
     void SetDoNotSendEntities(bool bDont) { m_bDoNotSendEntities = bDont; };
@@ -254,6 +253,9 @@ public:
 
     CVehicle* GetJackingVehicle(void) { return m_pJackingVehicle; }
     void      SetJackingVehicle(CVehicle* pVehicle);
+
+protected:
+    bool ReadSpecialData(const int iLine) override { return true; }
 
 public:
     //

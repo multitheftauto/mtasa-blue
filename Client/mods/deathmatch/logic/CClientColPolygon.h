@@ -35,8 +35,6 @@ public:
 protected:
     std::vector<CVector2D> m_Points;
 
-    bool ReadSpecialData(void);
-
     bool IsInBounds(CVector vecPoint);
 
     float m_fRadius;

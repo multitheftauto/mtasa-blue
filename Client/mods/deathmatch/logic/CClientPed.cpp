@@ -1435,6 +1435,10 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
                 // Tell vehicle audio we have driver
                 pGameVehicle->GetVehicleAudioEntity()->JustGotInVehicleAsDriver();
             }
+
+            // Make sure our camera is fixed on the new vehicle
+            if (m_bIsLocalPlayer)
+                m_pManager->GetCamera()->SetTargetEntity(pVehicle);
         }
 
         // Update the vehicle and us so we know we've occupied it
@@ -1477,6 +1481,10 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
                         // Tell vehicle audio we have driver
                         pGameVehicle->GetVehicleAudioEntity()->JustGotInVehicleAsDriver();
                     }
+
+                    // Make sure our camera is fixed on the new vehicle
+                    if (m_bIsLocalPlayer)
+                        m_pManager->GetCamera()->SetTargetEntity(pVehicle);
                 }
             }
 
@@ -4156,17 +4164,6 @@ void CClientPed::InternalWarpIntoVehicle(CVehicle* pGameVehicle)
         {
             // Make sure we can't fall off
             SetCanBeKnockedOffBike(false);
-        }
-
-        // Jax: make sure our camera is fixed on the new vehicle
-        if (m_bIsLocalPlayer)
-        {
-            CClientCamera* pCamera = m_pManager->GetCamera();
-            if (!pCamera->IsInFixedMode())
-            {
-                // Jax: very hacky, clean up if possible (some camera-target pointer)
-                *(unsigned long*)(0xB6F3B8) = (unsigned long)pGameVehicle->GetVehicleInterface();
-            }
         }
     }
 }

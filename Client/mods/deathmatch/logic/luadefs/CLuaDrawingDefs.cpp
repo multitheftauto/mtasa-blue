@@ -451,6 +451,10 @@ int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
                     if (fStopAngle < fStartAngle)
                         std::swap(fStopAngle, fStartAngle);
 
+                    // Clamp the angle, so we never draw more than 360 degrees
+                    if (fStartAngle + 360.0f < fStopAngle)
+                        fStopAngle = fStartAngle + 360.0f;
+
                     g_pCore->GetGraphics()->DrawCircleQueued(vecPosition.fX, vecPosition.fY, fRadius, fStartAngle, fStopAngle, color, colorCenter, siSegments,
                                                              fRatio, bPostGUI);
                     lua_pushboolean(luaVM, true);
@@ -565,12 +569,12 @@ int CLuaDrawingDefs::DxDrawImageSection(lua_State* luaVM)
 int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
 {
     // bool dxDrawPrimitive (string primitiveType, bool postGUI, table vertice1, ...)
-    D3DPRIMITIVETYPE              primitiveType;
-    std::vector<PrimitiveVertice> vecVertices;
-    bool                          bPostGUI;
+    D3DPRIMITIVETYPE    ePrimitiveType;
+    auto                pVecVertices = new std::vector<PrimitiveVertice>();
+    bool                bPostGUI;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadEnumString(primitiveType);
+    argStream.ReadEnumString(ePrimitiveType);
     argStream.ReadBool(bPostGUI);
 
     while (argStream.NextIsTable())
@@ -579,58 +583,23 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
         argStream.ReadNumberTable(vecTableContent);
         switch (vecTableContent.size())
         {
-            case 2:
-                vecVertices.push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], 0, (DWORD)0xFFFFFFFF});
+            case PrimitiveVerticeSizes::VERT_XY:
+                pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], 0, (DWORD)0xFFFFFFFF});
                 break;
-            case 3:
-                vecVertices.push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(vecTableContent[2])});
+            case PrimitiveVerticeSizes::VERT_XY_COLOR:
+                pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(vecTableContent[2])});
                 break;
         }
     }
 
     if (!argStream.HasErrors())
     {
-        if (vecVertices.size() < 1)
+        if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
         {
-            lua_pushboolean(luaVM, false);
+            g_pCore->GetGraphics()->DrawPrimitiveQueued(pVecVertices, ePrimitiveType, bPostGUI);
+            lua_pushboolean(luaVM, true);
             return 1;
-        }
-
-        switch (primitiveType)
-        {
-            case D3DPT_LINESTRIP:
-                if (vecVertices.size() < 2)
-                {
-                    lua_pushboolean(luaVM, false);
-                    return 1;
-                }
-                break;
-            case D3DPT_LINELIST:
-                if (vecVertices.size() % 2 != 0)
-                {
-                    lua_pushboolean(luaVM, false);
-                    return 1;
-                }
-                break;
-            case D3DPT_TRIANGLELIST:
-                if (vecVertices.size() % 3 != 0)
-                {
-                    lua_pushboolean(luaVM, false);
-                    return 1;
-                }
-            case D3DPT_TRIANGLEFAN:
-            case D3DPT_TRIANGLESTRIP:
-                if (vecVertices.size() < 3)
-                {
-                    lua_pushboolean(luaVM, false);
-                    return 1;
-                }
-                break;
-        }
-
-        g_pCore->GetGraphics()->DrawPrimitiveQueued(vecVertices, primitiveType, bPostGUI);
-        lua_pushboolean(luaVM, true);
-        return 1;
+        }       
     }
     else
     {
@@ -638,6 +607,7 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
     }
 
     // Failed
+    delete pVecVertices;
     lua_pushboolean(luaVM, false);
     return 1;
 }
@@ -645,13 +615,13 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
 int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
 {
     // bool dxDrawPrimitive (string primitiveType, dxMaterial material, bool postGUI, table vertice1, ...)
-    D3DPRIMITIVETYPE                      primitiveType;
-    std::vector<PrimitiveMaterialVertice> vecVertices;
-    CClientMaterial*                      pMaterialElement;
-    bool                                  bPostGUI;
+    D3DPRIMITIVETYPE    ePrimitiveType;
+    auto                pVecVertices = new std::vector<PrimitiveMaterialVertice>();
+    CClientMaterial*    pMaterialElement;
+    bool                bPostGUI;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadEnumString(primitiveType);
+    argStream.ReadEnumString(ePrimitiveType);
     MixedReadMaterialString(argStream, pMaterialElement);
     argStream.ReadBool(bPostGUI);
 
@@ -661,12 +631,12 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
         argStream.ReadNumberTable(vecTableContent);
         switch (vecTableContent.size())
         {
-            case 4:
-                vecVertices.push_back(
+            case PrimitiveVerticeSizes::VERT_XY_UV:
+                pVecVertices->push_back(
                     PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], 0, (DWORD)0xFFFFFFFF, vecTableContent[2], vecTableContent[3]});
                 break;
-            case 5:
-                vecVertices.push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(vecTableContent[2]),
+            case PrimitiveVerticeSizes::VERT_XY_COLOR_UV:
+                pVecVertices->push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(vecTableContent[2]),
                                                                vecTableContent[3], vecTableContent[4]});
                 break;
         }
@@ -674,47 +644,9 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (pMaterialElement)
+        if (pMaterialElement && g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
         {
-            if (vecVertices.size() < 1)
-            {
-                lua_pushboolean(luaVM, false);
-                return 1;
-            }
-
-            switch (primitiveType)
-            {
-                case D3DPT_LINESTRIP:
-                    if (vecVertices.size() < 2)
-                    {
-                        lua_pushboolean(luaVM, false);
-                        return 1;
-                    }
-                    break;
-                case D3DPT_LINELIST:
-                    if (vecVertices.size() % 2 != 0)
-                    {
-                        lua_pushboolean(luaVM, false);
-                        return 1;
-                    }
-                    break;
-                case D3DPT_TRIANGLELIST:
-                    if (vecVertices.size() % 3 != 0)
-                    {
-                        lua_pushboolean(luaVM, false);
-                        return 1;
-                    }
-                case D3DPT_TRIANGLEFAN:
-                case D3DPT_TRIANGLESTRIP:
-                    if (vecVertices.size() < 3)
-                    {
-                        lua_pushboolean(luaVM, false);
-                        return 1;
-                    }
-                    break;
-            }
-
-            g_pCore->GetGraphics()->DrawMaterialPrimitiveQueued(vecVertices, primitiveType, pMaterialElement->GetMaterialItem(), bPostGUI);
+            g_pCore->GetGraphics()->DrawMaterialPrimitiveQueued(pVecVertices, ePrimitiveType, pMaterialElement->GetMaterialItem(), bPostGUI);
             lua_pushboolean(luaVM, true);
             return 1;
         }
@@ -725,6 +657,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
     }
 
     // Failed
+    delete pVecVertices;
     lua_pushboolean(luaVM, false);
     return 1;
 }

@@ -22,7 +22,7 @@ public:
         QUAD
     };
 
-    CWater(CWaterManager* pWaterManager, CElement* pParent, CXMLNode* pNode = NULL, EWaterType waterType = QUAD, bool bShallow = false);
+    CWater(CWaterManager* pWaterManager, CElement* pParent, EWaterType waterType = QUAD, bool bShallow = false);
     ~CWater();
 
     bool IsEntity() { return true; }
@@ -33,7 +33,6 @@ public:
     void           SetLevel(float fLevel);
 
     void Unlink();
-    bool ReadSpecialData();
 
     bool       IsWaterShallow() const { return m_bShallow; }
     EWaterType GetWaterType() const { return m_WaterType; }
@@ -42,6 +41,9 @@ public:
     void       SetVertex(int index, CVector& vecPosition);
 
     bool Valid();
+
+protected:
+    bool ReadSpecialData(const int iLine) override;
 
 private:
     void RoundVertices();

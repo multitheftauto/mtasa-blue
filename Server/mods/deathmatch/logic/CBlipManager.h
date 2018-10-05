@@ -24,7 +24,7 @@ public:
     CBlipManager(void);
     ~CBlipManager(void) { DeleteAll(); };
 
-    CBlip* Create(CElement* pParent, CXMLNode* pNode = NULL);
+    CBlip* Create(CElement* pParent);
     CBlip* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void   DeleteAll(void);
 

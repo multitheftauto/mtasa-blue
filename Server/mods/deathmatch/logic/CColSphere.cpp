@@ -13,8 +13,8 @@
 
 using namespace std;
 
-CColSphere::CColSphere(CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, CXMLNode* pNode, bool bIsPartnered)
-    : CColShape(pManager, pParent, pNode, bIsPartnered)
+CColSphere::CColSphere(CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, bool bIsPartnered)
+    : CColShape(pManager, pParent, bIsPartnered)
 {
     m_vecPosition = vecPosition;
     m_fRadius = fRadius;
@@ -27,7 +27,7 @@ bool CColSphere::DoHitDetection(const CVector& vecNowPosition)
     return IsPointNearPoint3D(vecNowPosition, m_vecPosition, m_fRadius);
 }
 
-bool CColSphere::ReadSpecialData(void)
+bool CColSphere::ReadSpecialData(const int iLine)
 {
     int iTemp;
     if (GetCustomDataInt("dimension", iTemp, true))

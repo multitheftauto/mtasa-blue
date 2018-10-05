@@ -69,6 +69,7 @@ public:
     bool IsInFixedMode(void) { return m_bFixed; }
     void ToggleCameraFixedMode(bool bEnabled);
 
+    void           SetTargetEntity(CClientEntity* pEntity);
     CClientEntity* GetTargetEntity(void);
 
     void UnreferencePlayer(CClientPlayer* pPlayer);
