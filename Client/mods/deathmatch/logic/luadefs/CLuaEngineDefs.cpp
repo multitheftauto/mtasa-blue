@@ -45,7 +45,7 @@ void CLuaEngineDefs::LoadFunctions(void)
         {"engineModelCollisionCreate", EngineModelCollisionCreate },
         {"engineModelCollisionRemove", EngineModelCollisionRemove },
         {"isModelCollisionLoaded", IsModelCollisionLoaded },
-        {"engineRestoreOriginalCollision", EngineRestoreOriginalCollision },
+        {"engineRestoreOriginalCollisions", EngineRestoreOriginalCollisions },
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -1069,29 +1069,31 @@ bool checkVector(CVector& vec, float fRadius = 0)
 }
 
 //CColStore::RemoveAllCollision(void).text	00410E00	00000060	00000004	00000000	R	.	.	.	.	.	.
+//CStreaming::RemoveModel(int)	.text	004089A0	000002C4	00000004	00000004	R	.	.	.	.	T	.
 
-typedef void(__cdecl * hRemoveModel) (void);
-auto cRemoveModel = (hRemoveModel)0x410E00;
+typedef void(__cdecl * hRemoveAllCollision) (void);
+auto cRemoveAllCollision = (hRemoveAllCollision)0x410E00;
+typedef void(__cdecl * hRemoveModel) (int index); // index from 0 to 254 + 25000 ( 25000 - 25255 are collisions )
+auto cRemoveModel = (hRemoveModel)0x4089A0;
 
-int CLuaEngineDefs::EngineRestoreOriginalCollision(lua_State* luaVM)
+struct CLASS_CColModelPoolStruct {
+    int m_pObjects;
+    int m_byteMap;
+    int m_nSize;
+    int top;
+    char m_bOwnsAllocations;
+    char bLocked;
+    char _pad[2];
+};
+
+int CLuaEngineDefs::EngineRestoreOriginalCollisions(lua_State* luaVM)
 {
-    ushort usModel;
     CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(usModel);
     if (!argStream.HasErrors())
     {
-        CColModelSAInterface* pCol;
-        if (GetModelCollisionInterface(usModel, pCol))
-        {
-            cRemoveModel();
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-        else
-        {
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
+        cRemoveAllCollision();
+        lua_pushboolean(luaVM, true);
+        return 1;
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -1863,12 +1865,14 @@ int CLuaEngineDefs::EngineModelCollisionRemove(lua_State* luaVM)
                 return 1;
                 break;
             case COLLISION_TRIANGLE:
-                pColData->removeColTriangles(vecIndexes);
+                pColData->removeColTriangles_(vecIndexes);
+                m_pManager->GetObjectManager()->RestreamObjects(usModel);
+                g_pGame->GetModelInfo(usModel)->RestreamIPL();
                 lua_pushboolean(luaVM, true);
                 return 1;
                 break;
             case COLLISION_VERTEX:
-                pColData->removeColVertices(vecIndexes);
+                //pColData->removeColVertices(vecIndexes);
                 lua_pushboolean(luaVM, true);
                 return 1;
                 break;
