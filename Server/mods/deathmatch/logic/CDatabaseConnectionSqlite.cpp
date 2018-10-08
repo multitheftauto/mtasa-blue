@@ -389,14 +389,35 @@ SString InsertQueryArgumentsSqlite(const SString& strQuery, CLuaArguments* pArgs
     SString strParsedQuery;
 
     // Walk through the query and replace the variable placeholders with the actual variables
-    unsigned int uiLen = strQuery.length();
-    unsigned int a = 0;
+    uint uiLen = strQuery.length();
+    uint a = 0;
+    bool bInQuotes = false;
+    char cQuoteChar;
     for (unsigned int i = 0; i < uiLen; i++)
     {
-        if (strQuery[i] != SQL_VARIABLE_PLACEHOLDER)
+        const char c = strQuery[i];
+        if (!bInQuotes)
         {
-            // If we found a normal character, copy it into the destination buffer
-            strParsedQuery += strQuery[i];
+            // Check if start of quoted string
+            if (c == '\'')
+            {
+                bInQuotes = true;
+                cQuoteChar = c;
+            }
+        }
+        else
+        {
+            // Check if end of quoted string
+            if (c == cQuoteChar)
+            {
+                bInQuotes = false;
+            }
+        }
+
+        if (c != SQL_VARIABLE_PLACEHOLDER || bInQuotes)
+        {
+            // If we found a normal character or are inside quotes, copy it into the destination buffer
+            strParsedQuery += c;
         }
         else
         {
