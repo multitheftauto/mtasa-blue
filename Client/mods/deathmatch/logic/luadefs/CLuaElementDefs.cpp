@@ -1170,8 +1170,7 @@ int CLuaElementDefs::IsElementAttached(lua_State* luaVM)
         CClientEntity* pEntityAttachedTo = pEntity->GetAttachedTo();
         if (pEntityAttachedTo)
         {
-            assert(pEntityAttachedTo->IsEntityAttached(pEntity));
-            lua_pushboolean(luaVM, true);
+            lua_pushboolean(luaVM, pEntityAttachedTo->IsEntityAttached(pEntity));
             return 1;
         }
     }
