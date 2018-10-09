@@ -205,10 +205,8 @@ void CLuaManager::LoadCFunctions(void)
         {"outputDebugString", CLuaFunctionDefs::OutputDebugString}, {"outputServerLog", CLuaFunctionDefs::OutputServerLog},
         {"getServerName", CLuaFunctionDefs::GetServerName}, {"getServerHttpPort", CLuaFunctionDefs::GetServerHttpPort},
         {"getServerPassword", CLuaFunctionDefs::GetServerPassword}, {"setServerPassword", CLuaFunctionDefs::SetServerPassword},
-        {"getServerConfigSetting", CLuaFunctionDefs::GetServerConfigSetting}, {"setServerConfigSetting", CLuaFunctionDefs::SetServerConfigSetting},
+        {"getServerConfigSetting", CLuaFunctionDefs::GetServerConfigSetting},
         {"clearChatBox", CLuaFunctionDefs::ClearChatBox},
-
-        {"shutdown", CLuaFunctionDefs::shutdown},
 
         // Loaded map funcs
         {"getRootElement", CLuaFunctionDefs::GetRootElement}, {"loadMapData", CLuaFunctionDefs::LoadMapData},
@@ -330,10 +328,12 @@ void CLuaManager::LoadCFunctions(void)
     // Add all functions
     for (const auto& pair : functions)
     {
-        bool bRestricted = strcmp(pair.first, "setServerConfigSetting") == 0 || strcmp(pair.first, "shutdown") == 0;
-        
-        CLuaCFunctions::AddFunction(pair.first, pair.second, bRestricted);
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
     }
+    
+    // Restricted functions
+    CLuaCFunctions::AddFunction("setServerConfigSetting", CLuaFunctionDefs::SetServerConfigSetting, true);
+    CLuaCFunctions::AddFunction("shutdown", CLuaFunctionDefs::shutdown, true);
 
     // Load the functions from our classes
     CLuaACLDefs::LoadFunctions();
