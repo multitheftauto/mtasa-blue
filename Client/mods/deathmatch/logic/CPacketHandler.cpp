@@ -1644,10 +1644,23 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
 
                     case CClientGame::VEHICLE_NOTIFY_IN_RETURN:
                     {
+                        bool bEnteringThis = pPlayer->IsGettingIntoVehicle() && pVehicle == pPlayer->m_pOccupyingVehicle;
+
                         if (!pPlayer->IsLocalPlayer() || pPlayer->GetOccupiedVehicle() != pVehicle)
                         {
                             // Warp him in. Don't do that for local player as he is already sitting inside.
                             pPlayer->WarpIntoVehicle(pVehicle, ucSeat);
+                        }
+
+                        if ( bEnteringThis )
+                        {
+                            // WarpIntoVehicle can premature kill entering task which can freeze door mid-closing
+                            // So shut the door
+                            float fRatio = pVehicle->GetDoorOpenRatio ( pPlayer->m_ucEnteringDoor );
+                            if ( fRatio > 0 )
+                            {
+                                pVehicle->SetDoorOpenRatio ( pPlayer->m_ucEnteringDoor, 0, 0, true );
+                            }
                         }
 
                         // Reset vehicle in out state
@@ -1913,6 +1926,13 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                                 {
                                     g_pClientGame->m_bIsGettingJacked = false;
                                     g_pClientGame->m_bIsJackingVehicle = false;
+
+                                    // Fix driver door ajar state if he jacked from passenger side
+                                    // so he will be able to close it
+                                    if ( pInsidePlayer->m_ucEnteringDoor == 3 && pVehicle->GetDoorAjarStatus ( 2 ) == false )
+                                    {
+                                        pVehicle->SetDoorAjarStatus ( 2, true );
+                                    }
                                 }
 
                                 // Reset vehicle in out state

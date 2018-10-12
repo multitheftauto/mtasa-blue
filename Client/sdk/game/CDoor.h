@@ -23,4 +23,5 @@ public:
     virtual BOOL       IsFullyOpen() = 0;
     virtual VOID       Open(float fRatio) = 0;
     virtual eDoorState GetDoorState() = 0;
+    virtual void       SetDoorState(unsigned char ucState) = 0;
 };

@@ -1552,7 +1552,10 @@ CClientVehicle* CClientPed::RemoveFromVehicle(bool bSkipWarpIfGettingOut)
 
     if (pVehicle)
     {
-        pVehicle->SetSwingingDoorsAllowed(false);
+        if (m_bIsLocalPlayer)
+        {
+            pVehicle->SetSwingingDoorsAllowed(false);
+        }
 
         // Warp the player out of the vehicle
         CVehicle* pGameVehicle = pVehicle->m_pVehicle;

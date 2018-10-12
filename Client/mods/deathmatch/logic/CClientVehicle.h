@@ -256,16 +256,18 @@ private:
 public:
     bool          HasDamageModel(void) { return m_bHasDamageModel; }
     unsigned char GetDoorStatus(unsigned char ucDoor);
+    bool          GetDoorAjarStatus(unsigned char ucDoor);
     unsigned char GetWheelStatus(unsigned char ucWheel);
-    bool          IsWheelCollided(unsigned char ucWheel);
     unsigned char GetPanelStatus(unsigned char ucPanel);
     unsigned char GetLightStatus(unsigned char ucLight);
+    bool          IsWheelCollided(unsigned char ucWheel);
+    bool          GetWheelMissing(unsigned char ucWheel, const SString& strWheelName = "");
 
-    void SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus);
+    void SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus, bool bFlyingComponent = true);
+    void SetDoorAjarStatus(unsigned char ucDoor, bool bAjar);
     void SetWheelStatus(unsigned char ucWheel, unsigned char ucStatus, bool bSilent = true);
-    void SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus);
+    void SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus, bool bFlyingComponent = true);
     void SetLightStatus(unsigned char ucLight, unsigned char ucStatus);
-    bool GetWheelMissing(unsigned char ucWheel, const SString& strWheelName = "");
 
     // TODO: Make the class remember on virtualization
     float GetHeliRotorSpeed(void);
@@ -289,6 +291,7 @@ public:
     void          SetAlpha(unsigned char ucAlpha);
 
     CClientPed* GetOccupant(int iSeat = 0) const;
+    CClientPed* GetOccupyingPed(unsigned char uiSeat) const;
     CClientPed* GetControllingPlayer(void);
     void        ClearForOccupants(void);
 

@@ -654,8 +654,6 @@ void CClientVehicle::ProcessDoorInterpolation()
 
 void CClientVehicle::SetDoorOpenRatio(unsigned char ucDoor, float fRatio, unsigned long ulDelay, bool bForced)
 {
-    unsigned char ucSeat;
-
     if (ucDoor <= 5)
     {
         bool bAllow = m_bAllowDoorRatioSetting[ucDoor];
@@ -663,17 +661,22 @@ void CClientVehicle::SetDoorOpenRatio(unsigned char ucDoor, float fRatio, unsign
         // Prevent setting the door angle ratio while a ped is entering/leaving the vehicle.
         if (bAllow && bForced == false)
         {
-            switch (ucDoor)
+            CClientPed * pPed = GetOccupyingPed(ucDoor - 2);
+            if (pPed)
             {
-                case 2:
-                    bAllow = m_pOccupyingDriver == 0;
-                    break;
-                case 3:
-                case 4:
-                case 5:
-                    ucSeat = ucDoor - 2;
-                    bAllow = m_pOccupyingPassengers[ucSeat] == 0;
-                    break;
+                // Don't change angle if somebody is messing with this door
+                // Allow critical values like fully closed or open.
+                bAllow = !pPed->IsGettingIntoVehicle() || fRatio == 0 || fRatio == 1;
+
+                /*
+                Driver closing door minor desync:
+                
+                Player enters a car which has already open driver door (he enters via passenger side or warpPedIntoVehicle).
+                He closes the door and sends new ratio to other clients.
+                But other clients are also closing this door which causes ugly effect.
+
+                TODO: Find a way to detect if ped is closing door.
+                */
             }
         }
 
@@ -825,13 +828,13 @@ void CClientVehicle::Fix(void)
     SFixedArray<unsigned char, MAX_DOORS> ucDoorStates;
     GetInitialDoorStates(ucDoorStates);
     for (int i = 0; i < MAX_DOORS; i++)
-        SetDoorStatus(i, ucDoorStates[i]);
-    for (int i = 0; i < MAX_PANELS; i++)
-        SetPanelStatus(i, 0);
-    for (int i = 0; i < MAX_LIGHTS; i++)
-        SetLightStatus(i, 0);
-    for (int i = 0; i < MAX_WHEELS; i++)
-        SetWheelStatus(i, 0);
+    {
+        SetDoorStatus(i, ucDoorStates[i], false);
+        SetDoorOpenRatio(i, 0, 0, true);
+    }
+    for (int i = 0; i < MAX_PANELS; i++) SetPanelStatus(i, 0, false);
+    for (int i = 0; i < MAX_LIGHTS; i++) SetLightStatus(i, 0);
+    for (int i = 0; i < MAX_WHEELS; i++) SetWheelStatus(i, 0);
 
     // These components get a funny rotation when calling Fix() (unknown reason)
     struct
@@ -1482,13 +1485,59 @@ unsigned char CClientVehicle::GetLightStatus(unsigned char ucLight)
     return 0;
 }
 
-void CClientVehicle::SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus)
+// Helpers for dealing with door ajar status without chance to accidently broke bashed status
+void CClientVehicle::SetDoorAjarStatus(unsigned char ucDoor, bool bAjar)
+{
+    unsigned char ucStatus = GetDoorStatus(ucDoor);
+    if (ucStatus != DT_DOOR_MISSING)
+    {
+        unsigned char ucNewStatus;
+        if (ucStatus == DT_DOOR_INTACT || ucStatus == DT_DOOR_SWINGING_FREE)
+        {
+            ucNewStatus = bAjar;
+        }
+        else if (ucStatus == DT_DOOR_BASHED || ucStatus == DT_DOOR_BASHED_AND_SWINGING_FREE)
+        {
+            ucNewStatus = bAjar + 2;
+        }
+        SetDoorStatus(ucDoor, ucNewStatus, false);
+    }
+}
+
+bool CClientVehicle::GetDoorAjarStatus(unsigned char ucDoor)
+{
+    unsigned char ucStatus = GetDoorStatus(ucDoor);
+    if (ucStatus == DT_DOOR_MISSING)
+    {
+        // Let's say they are ajar but this really shouldn't be used without checking if they are missing first
+        return true;
+    }
+    return ucStatus == DT_DOOR_SWINGING_FREE || ucStatus == DT_DOOR_BASHED_AND_SWINGING_FREE;
+}
+
+void CClientVehicle::SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus, bool bFlyingComponent)
 {
     if (ucDoor < MAX_DOORS)
     {
         if (m_pVehicle && HasDamageModel())
         {
-            m_pVehicle->GetDamageManager()->SetDoorStatus(static_cast<eDoors>(ucDoor), ucStatus);
+            if (ucStatus == DT_DOOR_BASHED_AND_SWINGING_FREE)
+            {
+                // Set it to bashed first
+                SetDoorStatus(ucDoor, DT_DOOR_BASHED, bFlyingComponent);
+            }
+            else if (ucStatus == DT_DOOR_SWINGING_FREE)
+            {
+                // Set it to intact first
+                SetDoorStatus(ucDoor, DT_DOOR_INTACT, bFlyingComponent);
+            }
+
+            m_pVehicle->GetDamageManager()->SetDoorStatus(static_cast<eDoors>(ucDoor), ucStatus, bFlyingComponent);
+            CDoor* pDoor = m_pVehicle->GetDoor(ucDoor);
+            if (pDoor)
+            {
+                pDoor->SetDoorState(ucStatus);
+            }
         }
         m_ucDoorStates[ucDoor] = ucStatus;
     }
@@ -1554,13 +1603,13 @@ bool CClientVehicle::GetWheelMissing(unsigned char ucWheel, const SString& strWh
     return false;
 }
 
-void CClientVehicle::SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus)
+void CClientVehicle::SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus, bool bSpawnComponent)
 {
     if (ucPanel < MAX_PANELS)
     {
         if (m_pVehicle && HasDamageModel())
         {
-            m_pVehicle->GetDamageManager()->SetPanelStatus(static_cast<ePanels>(ucPanel), ucStatus);
+            m_pVehicle->GetDamageManager()->SetPanelStatus(static_cast<ePanels>(ucPanel), ucStatus, bSpawnComponent);
         }
         m_ucPanelStates[ucPanel] = ucStatus;
     }
@@ -1691,6 +1740,20 @@ CClientPed* CClientVehicle::GetOccupant(int iSeat) const
         return m_pPassengers[iSeat - 1];
     }
 
+    return NULL;
+}
+
+// Returns ped which is TRYING to get this seat.
+CClientPed* CClientVehicle::GetOccupyingPed(unsigned char uiSeat) const
+{
+    if (uiSeat == 0)
+    {
+        return (CClientPed*)(const CClientPed*)m_pOccupyingDriver;
+    }
+    else if (uiSeat <= (sizeof(m_pOccupyingPassengers) / sizeof(CClientPed*)))
+    {
+        return m_pOccupyingPassengers[uiSeat - 1];
+    }
     return NULL;
 }
 
@@ -2195,9 +2258,13 @@ void CClientVehicle::StreamedInPulse(void)
                 CDamageManager* pDamageManager = m_pVehicle->GetDamageManager();
 
                 for (int i = 0; i < MAX_DOORS; i++)
-                    pDamageManager->SetDoorStatus(static_cast<eDoors>(i), m_ucDoorStates[i]);
+                {
+                    float fRatio = GetDoorOpenRatio(i);
+                    SetDoorStatus(i, m_ucDoorStates[i], false);
+                    SetDoorOpenRatio(i, fRatio, 0, true);
+                }
                 for (int i = 0; i < MAX_PANELS; i++)
-                    pDamageManager->SetPanelStatus(static_cast<ePanels>(i), m_ucPanelStates[i]);
+                    pDamageManager->SetPanelStatus(static_cast<ePanels>(i), m_ucPanelStates[i], false);
                 for (int i = 0; i < MAX_LIGHTS; i++)
                     pDamageManager->SetLightStatus(static_cast<eLights>(i), m_ucLightStates[i]);
             }
