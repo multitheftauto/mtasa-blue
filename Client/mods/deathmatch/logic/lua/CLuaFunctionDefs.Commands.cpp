@@ -103,3 +103,44 @@ int CLuaFunctionDefs::ExecuteCommandHandler(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
+
+int CLuaFunctionDefs::GetCommandHandlers(lua_State* luaVM)
+{
+    // table getCommandHandlers ( [ resource sourceResource ] );
+    CResource* pResource;
+    bool       bSpecificResource = false;
+
+    CScriptArgReader argStream(luaVM);
+    if (argStream.NextIsUserData())
+    {
+        argStream.ReadUserData(pResource);
+        bSpecificResource = true;
+    }
+
+    if (!argStream.HasErrors())
+    {
+        if (bSpecificResource)
+        {
+            // Grab resource virtual machine
+            CLuaMain* pLuaMain = pResource->GetVM();
+
+            if (pLuaMain)
+            {
+                m_pRegisteredCommands->GetCommands(luaVM, pLuaMain);
+
+                return 1;
+            }
+        }
+        else
+        {
+            m_pRegisteredCommands->GetCommands(luaVM);
+
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
