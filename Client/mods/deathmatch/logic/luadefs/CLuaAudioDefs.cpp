@@ -284,7 +284,7 @@ int CLuaAudioDefs::SetSoundPosition(lua_State* luaVM)
     {
         if (pSound)
         {
-            if (!pSound->IsSoundStream() && CStaticFunctionDefinitions::SetSoundPosition(*pSound, dPosition))
+            if (CStaticFunctionDefinitions::SetSoundPosition(*pSound, dPosition))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;

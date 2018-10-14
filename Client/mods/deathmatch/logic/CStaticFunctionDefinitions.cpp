@@ -7586,6 +7586,9 @@ bool CStaticFunctionDefinitions::StopSound(CClientSound& Sound)
 
 bool CStaticFunctionDefinitions::SetSoundPosition(CClientSound& Sound, double dPosition)
 {
+    if (Sound.IsSoundStream())
+        return false;
+
     Sound.SetPlayPosition(dPosition);
     return true;
 }
