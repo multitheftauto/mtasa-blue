@@ -331,7 +331,7 @@ double CClientSound::GetLength(bool bAvoidLoad)
     {
         // Not loaded by this entity yet
 
-#if 0            // TODO
+#if 0       // TODO
         if ( bAvoidLoad )
         {
             // Caller wants to avoid loading the file to find out the length,
