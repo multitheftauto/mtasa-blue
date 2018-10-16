@@ -110,7 +110,6 @@ private:
     const bool    m_bStream;
     const SString m_strPath;
     const bool    m_b3D;
-    const bool    m_bLoop;
     const bool    m_bThrottle;
     void*         m_pBuffer;
     unsigned int  m_uiBufferLength;
@@ -119,6 +118,7 @@ private:
     DWORD m_pSound;
 
     // Playback state
+    bool    m_bLoop;
     bool    m_bPaused;
     bool    m_bReversed;
     bool    m_bPan;

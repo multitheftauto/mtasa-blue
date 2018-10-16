@@ -33,6 +33,8 @@ void CLuaAudioDefs::LoadFunctions(void)
         {"setSoundPosition", SetSoundPosition},
         {"getSoundPosition", GetSoundPosition},
         {"getSoundLength", GetSoundLength},
+        {"setSoundLooped", SetSoundLooped},
+        {"isSoundLooped", IsSoundLooped},
         {"setSoundPaused", SetSoundPaused},
         {"isSoundPaused", IsSoundPaused},
         {"setSoundVolume", SetSoundVolume},
@@ -85,11 +87,13 @@ void CLuaAudioDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setSpeed", "setSoundSpeed");
     lua_classfunction(luaVM, "setVolume", "setSoundVolume");
     lua_classfunction(luaVM, "setPaused", "setSoundPaused");
+    lua_classfunction(luaVM, "setLoop", "setSoundLooped");
     lua_classfunction(luaVM, "setPan", "setSoundPan");
     lua_classfunction(luaVM, "setPannningEnabled", "setSoundPanningEnabled");
     lua_classfunction(luaVM, "setProperties", "setSoundProperties");
 
     lua_classfunction(luaVM, "getLength", "getSoundLength");
+    lua_classfunction(luaVM, "isLoop", "isSoundLooped");
     lua_classfunction(luaVM, "getMetaTags", "getSoundMetaTags");
     lua_classfunction(luaVM, "getBPM", "getSoundBPM");
     lua_classfunction(luaVM, "getFFTData", "getSoundFFTData");
@@ -106,6 +110,7 @@ void CLuaAudioDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "playbackPosition", "setSoundPosition", "getSoundPosition");
     lua_classvariable(luaVM, "speed", "setSoundSpeed", "getSoundSpeed");
     lua_classvariable(luaVM, "volume", "setSoundVolume", "getSoundVolume");
+    lua_classvariable(luaVM, "loop", "setSoundLooped", "isSoundLooped");
     lua_classvariable(luaVM, "paused", "setSoundPaused", "isSoundPaused");
     lua_classvariable(luaVM, "pan", "setSoundPan", "getSoundPan");
     lua_classvariable(luaVM, "panningEnabled", "setSoundPanningEnabled", "isSoundPanningEnabled");
@@ -391,6 +396,75 @@ int CLuaAudioDefs::GetSoundLength(lua_State* luaVM)
             if (CStaticFunctionDefinitions::GetSoundLength(*pPlayer, dLength))
             {
                 lua_pushnumber(luaVM, dLength);
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaAudioDefs::SetSoundLooped(lua_State* luaVM)
+{
+    CClientSound*    pSound = NULL;
+    bool             bLoop = false;
+    CScriptArgReader argStream(luaVM);
+    if (argStream.NextIsUserDataOfType<CClientSound>())
+    {
+        argStream.ReadUserData(pSound);
+    }
+    else
+    {
+        m_pScriptDebugging->LogBadPointer(luaVM, "sound", 1);
+        lua_pushboolean(luaVM, false);
+        return false;
+    }
+    argStream.ReadBool(bLoop);
+
+    if (!argStream.HasErrors())
+    {
+        if (pSound)
+        {
+            if (CStaticFunctionDefinitions::SetSoundLooped(*pSound, bLoop))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaAudioDefs::IsSoundLooped(lua_State* luaVM)
+{
+    CClientSound*    pSound = NULL;
+    CScriptArgReader argStream(luaVM);
+    if (argStream.NextIsUserDataOfType<CClientSound>())
+    {
+        argStream.ReadUserData(pSound);
+    }
+    else
+    {
+        m_pScriptDebugging->LogBadPointer(luaVM, "sound", 1);
+        lua_pushboolean(luaVM, false);
+        return false;
+    }
+
+    if (!argStream.HasErrors())
+    {
+        if (pSound)
+        {
+            bool bLoop = false;
+            if (CStaticFunctionDefinitions::IsSoundLooped(*pSound, bLoop))
+            {
+                lua_pushboolean(luaVM, bLoop);
                 return 1;
             }
         }

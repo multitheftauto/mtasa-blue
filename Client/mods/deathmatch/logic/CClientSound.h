@@ -39,6 +39,9 @@ public:
     void SetPaused(bool bPaused);
     bool IsPaused(void);
 
+    void SetLooped(bool bLoop);
+    bool IsLooped(void);
+
     void   SetPlayPosition(double dPosition);
     double GetPlayPosition(void);
 

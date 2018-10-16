@@ -7637,6 +7637,18 @@ bool CStaticFunctionDefinitions::GetSoundLength(CClientPlayer& Player, double& d
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetSoundLooped(CClientSound& Sound, bool bLoop)
+{
+    Sound.SetLooped(bLoop);
+    return true;
+}
+
+bool CStaticFunctionDefinitions::IsSoundLooped(CClientSound& Sound, bool& bLoop)
+{
+    bLoop = Sound.IsLooped();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetSoundPaused(CClientSound& Sound, bool bPaused)
 {
     Sound.SetPaused(bPaused);

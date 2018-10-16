@@ -331,7 +331,7 @@ double CClientSound::GetLength(bool bAvoidLoad)
     {
         // Not loaded by this entity yet
 
-#if 0       // TODO
+#if 0            // TODO
         if ( bAvoidLoad )
         {
             // Caller wants to avoid loading the file to find out the length,
@@ -412,6 +412,29 @@ void CClientSound::SetVelocity(const CVector& vecVelocity)
 void CClientSound::GetVelocity(CVector& vecVelocity)
 {
     vecVelocity = m_vecVelocity;
+}
+
+void CClientSound::SetLooped(bool bLoop)
+{
+    if (m_bLoop != bLoop)
+    {
+        m_bLoop = bLoop;
+        m_SimulatedPlayPosition.SetLooped(bLoop);
+
+        if (m_pAudio)
+        {
+            double savedPosition = m_pAudio->GetPlayPosition();
+            Destroy();
+            Create();
+            if (m_pAudio)
+                m_pAudio->SetPlayPosition(savedPosition);
+        }
+    }
+}
+
+bool CClientSound::IsLooped(void)
+{
+    return m_bLoop;
 }
 
 void CClientSound::SetPaused(bool bPaused)
