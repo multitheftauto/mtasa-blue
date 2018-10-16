@@ -358,8 +358,15 @@ bool CResource::Load(void)
         }
         else
         {
+            SString strError;
+            metaFile->GetLastError(strError);
+
             char szBuffer[255] = {0};
-            snprintf(szBuffer, 254, "Couldn't parse meta file for resource '%s'\n", m_strResourceName.c_str());
+            if (!strError.empty())
+                snprintf(szBuffer, 254, "Couldn't parse meta file for resource '%s' [%s]\n", m_strResourceName.c_str(), strError.c_str());
+            else
+                snprintf(szBuffer, 254, "Couldn't parse meta file for resource '%s'\n", m_strResourceName.c_str());
+
             m_strFailureReason = szBuffer;
             CLogger::ErrorPrintf(szBuffer);
 
