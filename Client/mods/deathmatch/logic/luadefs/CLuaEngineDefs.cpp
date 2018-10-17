@@ -43,6 +43,42 @@ void CLuaEngineDefs::LoadFunctions(void)
     // CLuaCFunctions::AddFunction ( "enginePositionSeats", EnginePositionSeats );
     // CLuaCFunctions::AddFunction ( "engineAddAllAtomics", EngineAddAllAtomics );
     // CLuaCFunctions::AddFunction ( "engineReplaceVehiclePart", EngineReplaceVehiclePart );
+    
+    std::map<const char*, lua_CFunction> functions{
+        {"engineLoadTXD", EngineLoadTXD},
+        {"engineLoadCOL", EngineLoadCOL},
+        {"engineLoadDFF", EngineLoadDFF},
+        {"engineLoadIFP", EngineLoadIFP},
+        {"engineImportTXD", EngineImportTXD},
+        {"engineReplaceCOL", EngineReplaceCOL},
+        {"engineRestoreCOL", EngineRestoreCOL},
+        {"engineReplaceModel", EngineReplaceModel},
+        {"engineRestoreModel", EngineRestoreModel},
+        {"engineReplaceAnimation", EngineReplaceAnimation},
+        {"engineRestoreAnimation", EngineRestoreAnimation},
+        {"engineGetModelLODDistance", EngineGetModelLODDistance},
+        {"engineSetModelLODDistance", EngineSetModelLODDistance},
+        {"engineSetAsynchronousLoading", EngineSetAsynchronousLoading},
+        {"engineApplyShaderToWorldTexture", EngineApplyShaderToWorldTexture},
+        {"engineRemoveShaderFromWorldTexture", EngineRemoveShaderFromWorldTexture},
+        {"engineGetModelNameFromID", EngineGetModelNameFromID},
+        {"engineGetModelIDFromName", EngineGetModelIDFromName},
+        {"engineGetModelTextureNames", EngineGetModelTextureNames},
+        {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
+
+        // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
+        // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
+        // CLuaCFunctions::AddFunction ( "enginePositionAtomic", EnginePositionAtomic );
+        // CLuaCFunctions::AddFunction ( "enginePositionSeats", EnginePositionSeats );
+        // CLuaCFunctions::AddFunction ( "engineAddAllAtomics", EngineAddAllAtomics );
+        // CLuaCFunctions::AddFunction ( "engineReplaceVehiclePart", EngineReplaceVehiclePart );
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaEngineDefs::AddClass(lua_State* luaVM)

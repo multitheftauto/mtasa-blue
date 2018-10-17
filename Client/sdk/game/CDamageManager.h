@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_DAMAGEMANAGER
-#define __CGAME_DAMAGEMANAGER
+#pragma once
 
 #include <windows.h>
 
@@ -212,5 +211,3 @@ public:
 
     virtual VOID FuckCarCompletely(BOOL bKeepWheels) = 0;
 };
-
-#endif

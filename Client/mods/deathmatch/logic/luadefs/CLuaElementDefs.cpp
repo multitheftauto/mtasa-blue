@@ -16,83 +16,91 @@ using std::list;
 
 void CLuaElementDefs::LoadFunctions(void)
 {
-    // Element get funcs
-    CLuaCFunctions::AddFunction("getRootElement", GetRootElement);
-    CLuaCFunctions::AddFunction("isElement", IsElement);
-    CLuaCFunctions::AddFunction("getElementByID", GetElementByID);
-    CLuaCFunctions::AddFunction("getElementByIndex", GetElementByIndex);
-    CLuaCFunctions::AddFunction("getElementData", GetElementData);
-    CLuaCFunctions::AddFunction("getElementMatrix", GetElementMatrix);
-    CLuaCFunctions::AddFunction("getElementPosition", GetElementPosition);
-    CLuaCFunctions::AddFunction("getElementRotation", GetElementRotation);
-    CLuaCFunctions::AddFunction("getElementVelocity", GetElementVelocity);
-    CLuaCFunctions::AddFunction("getElementAngularVelocity", GetElementTurnVelocity);
-    CLuaCFunctions::AddFunction("getElementType", GetElementType);
-    CLuaCFunctions::AddFunction("getElementChildren", GetElementChildren);
-    CLuaCFunctions::AddFunction("getElementChild", GetElementChild);
-    CLuaCFunctions::AddFunction("getElementChildrenCount", GetElementChildrenCount);
-    CLuaCFunctions::AddFunction("getElementID", GetElementID);
-    CLuaCFunctions::AddFunction("getElementParent", GetElementParent);
-    CLuaCFunctions::AddFunction("getElementsByType", GetElementsByType);
-    CLuaCFunctions::AddFunction("getElementInterior", GetElementInterior);
-    CLuaCFunctions::AddFunction("isElementWithinColShape", IsElementWithinColShape);
-    CLuaCFunctions::AddFunction("isElementWithinMarker", IsElementWithinMarker);
-    CLuaCFunctions::AddFunction("getElementsWithinColShape", GetElementsWithinColShape);
-    CLuaCFunctions::AddFunction("getElementsWithinRange", GetElementsWithinRange);
-    CLuaCFunctions::AddFunction("getElementDimension", GetElementDimension);
-    CLuaCFunctions::AddFunction("getElementBoundingBox", GetElementBoundingBox);
-    CLuaCFunctions::AddFunction("getElementRadius", GetElementRadius);
-    CLuaCFunctions::AddFunction("isElementAttached", IsElementAttached);
-    CLuaCFunctions::AddFunction("getElementAttachedTo", GetElementAttachedTo);
-    CLuaCFunctions::AddFunction("getAttachedElements", GetAttachedElements);
-    CLuaCFunctions::AddFunction("getElementDistanceFromCentreOfMassToBaseOfModel", GetElementDistanceFromCentreOfMassToBaseOfModel);
-    CLuaCFunctions::AddFunction("isElementLocal", IsElementLocal);
-    CLuaCFunctions::AddFunction("getElementAttachedOffsets", GetElementAttachedOffsets);
-    CLuaCFunctions::AddFunction("getElementAlpha", GetElementAlpha);
-    CLuaCFunctions::AddFunction("isElementOnScreen", IsElementOnScreen);
-    CLuaCFunctions::AddFunction("getElementHealth", GetElementHealth);
-    CLuaCFunctions::AddFunction("getElementModel", GetElementModel);
-    CLuaCFunctions::AddFunction("isElementStreamedIn", IsElementStreamedIn);
-    CLuaCFunctions::AddFunction("isElementStreamable", IsElementStreamable);
-    CLuaCFunctions::AddFunction("getElementColShape", GetElementColShape);
-    CLuaCFunctions::AddFunction("isElementInWater", IsElementInWater);
-    CLuaCFunctions::AddFunction("isElementSyncer", IsElementSyncer);
-    CLuaCFunctions::AddFunction("isElementCollidableWith", IsElementCollidableWith);
-    CLuaCFunctions::AddFunction("isElementDoubleSided", IsElementDoubleSided);
-    CLuaCFunctions::AddFunction("getElementCollisionsEnabled", GetElementCollisionsEnabled);
-    CLuaCFunctions::AddFunction("isElementFrozen", IsElementFrozen);
-    CLuaCFunctions::AddFunction("getLowLODElement", GetLowLodElement);
-    CLuaCFunctions::AddFunction("isElementLowLOD", IsElementLowLod);
-    CLuaCFunctions::AddFunction("isElementCallPropagationEnabled", IsElementCallPropagationEnabled);
-    CLuaCFunctions::AddFunction("isElementWaitingForGroundToLoad", IsElementWaitingForGroundToLoad);
+    std::map<const char*, lua_CFunction> functions{
+        // Element get funcs
+        {"getRootElement", GetRootElement},
+        {"isElement", IsElement},
+        {"getElementByID", GetElementByID},
+        {"getElementByIndex", GetElementByIndex},
+        {"getElementData", GetElementData},
+        {"getElementMatrix", GetElementMatrix},
+        {"getElementPosition", GetElementPosition},
+        {"getElementRotation", GetElementRotation},
+        {"getElementVelocity", GetElementVelocity},
+        {"getElementAngularVelocity", GetElementTurnVelocity},
+        {"getElementType", GetElementType},
+        {"getElementChildren", GetElementChildren},
+        {"getElementChild", GetElementChild},
+        {"getElementChildrenCount", GetElementChildrenCount},
+        {"getElementID", GetElementID},
+        {"getElementParent", GetElementParent},
+        {"getElementsByType", GetElementsByType},
+        {"getElementInterior", GetElementInterior},
+        {"isElementWithinColShape", IsElementWithinColShape},
+        {"isElementWithinMarker", IsElementWithinMarker},
+        {"getElementsWithinColShape", GetElementsWithinColShape},
+        {"getElementsWithinRange", GetElementsWithinRange},
+        {"getElementDimension", GetElementDimension},
+        {"getElementBoundingBox", GetElementBoundingBox},
+        {"getElementRadius", GetElementRadius},
+        {"isElementAttached", IsElementAttached},
+        {"getElementAttachedTo", GetElementAttachedTo},
+        {"getAttachedElements", GetAttachedElements},
+        {"getElementDistanceFromCentreOfMassToBaseOfModel", GetElementDistanceFromCentreOfMassToBaseOfModel},
+        {"isElementLocal", IsElementLocal},
+        {"getElementAttachedOffsets", GetElementAttachedOffsets},
+        {"getElementAlpha", GetElementAlpha},
+        {"isElementOnScreen", IsElementOnScreen},
+        {"getElementHealth", GetElementHealth},
+        {"getElementModel", GetElementModel},
+        {"isElementStreamedIn", IsElementStreamedIn},
+        {"isElementStreamable", IsElementStreamable},
+        {"getElementColShape", GetElementColShape},
+        {"isElementInWater", IsElementInWater},
+        {"isElementSyncer", IsElementSyncer},
+        {"isElementCollidableWith", IsElementCollidableWith},
+        {"isElementDoubleSided", IsElementDoubleSided},
+        {"getElementCollisionsEnabled", GetElementCollisionsEnabled},
+        {"isElementFrozen", IsElementFrozen},
+        {"getLowLODElement", GetLowLodElement},
+        {"isElementLowLOD", IsElementLowLod},
+        {"isElementCallPropagationEnabled", IsElementCallPropagationEnabled},
+        {"isElementWaitingForGroundToLoad", IsElementWaitingForGroundToLoad},
 
-    // Element set funcs
-    CLuaCFunctions::AddFunction("createElement", CreateElement);
-    CLuaCFunctions::AddFunction("destroyElement", DestroyElement);
-    CLuaCFunctions::AddFunction("setElementID", SetElementID);
-    CLuaCFunctions::AddFunction("setElementParent", SetElementParent);
-    CLuaCFunctions::AddFunction("setElementData", SetElementData);
-    // CLuaCFunctions::AddFunction("removeElementData", RemoveElementData); TODO Clientside
-    CLuaCFunctions::AddFunction("setElementMatrix", SetElementMatrix);
-    CLuaCFunctions::AddFunction("setElementPosition", SetElementPosition);
-    CLuaCFunctions::AddFunction("setElementRotation", SetElementRotation);
-    CLuaCFunctions::AddFunction("setElementVelocity", SetElementVelocity);
-    CLuaCFunctions::AddFunction("setElementAngularVelocity", SetElementAngularVelocity);
-    CLuaCFunctions::AddFunction("setElementInterior", SetElementInterior);
-    CLuaCFunctions::AddFunction("setElementDimension", SetElementDimension);
-    CLuaCFunctions::AddFunction("attachElements", AttachElements);
-    CLuaCFunctions::AddFunction("detachElements", DetachElements);
-    CLuaCFunctions::AddFunction("setElementAttachedOffsets", SetElementAttachedOffsets);
-    CLuaCFunctions::AddFunction("setElementAlpha", SetElementAlpha);
-    CLuaCFunctions::AddFunction("setElementHealth", SetElementHealth);
-    CLuaCFunctions::AddFunction("setElementModel", SetElementModel);
-    CLuaCFunctions::AddFunction("setElementStreamable", SetElementStreamable);
-    CLuaCFunctions::AddFunction("setElementCollisionsEnabled", SetElementCollisionsEnabled);
-    CLuaCFunctions::AddFunction("setElementCollidableWith", SetElementCollidableWith);
-    CLuaCFunctions::AddFunction("setElementDoubleSided", SetElementDoubleSided);
-    CLuaCFunctions::AddFunction("setElementFrozen", SetElementFrozen);
-    CLuaCFunctions::AddFunction("setLowLODElement", SetLowLodElement);
-    CLuaCFunctions::AddFunction("setElementCallPropagationEnabled", SetElementCallPropagationEnabled);
+        // Element set funcs
+        {"createElement", CreateElement},
+        {"destroyElement", DestroyElement},
+        {"setElementID", SetElementID},
+        {"setElementParent", SetElementParent},
+        {"setElementData", SetElementData},
+        // {"removeElementData", RemoveElementData}, TODO Clientside
+        {"setElementMatrix", SetElementMatrix},
+        {"setElementPosition", SetElementPosition},
+        {"setElementRotation", SetElementRotation},
+        {"setElementVelocity", SetElementVelocity},
+        {"setElementAngularVelocity", SetElementAngularVelocity},
+        {"setElementInterior", SetElementInterior},
+        {"setElementDimension", SetElementDimension},
+        {"attachElements", AttachElements},
+        {"detachElements", DetachElements},
+        {"setElementAttachedOffsets", SetElementAttachedOffsets},
+        {"setElementAlpha", SetElementAlpha},
+        {"setElementHealth", SetElementHealth},
+        {"setElementModel", SetElementModel},
+        {"setElementStreamable", SetElementStreamable},
+        {"setElementCollisionsEnabled", SetElementCollisionsEnabled},
+        {"setElementCollidableWith", SetElementCollidableWith},
+        {"setElementDoubleSided", SetElementDoubleSided},
+        {"setElementFrozen", SetElementFrozen},
+        {"setLowLODElement", SetLowLodElement},
+        {"setElementCallPropagationEnabled", SetElementCallPropagationEnabled},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaElementDefs::AddClass(lua_State* luaVM)

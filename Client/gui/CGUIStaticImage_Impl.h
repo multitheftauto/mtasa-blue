@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUISTATICIMAGE_IMPL_H
-#define __CGUISTATICIMAGE_IMPL_H
+#pragma once
 
 #include <gui/CGUIStaticImage.h>
 #include "CGUITexture_Impl.h"
@@ -48,5 +47,3 @@ private:
 
     #include "CGUIElement_Inc.h"
 };
-
-#endif

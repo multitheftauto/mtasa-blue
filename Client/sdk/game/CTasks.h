@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TASKS
-#define __CGAME_TASKS
+#pragma once
 
 #include <CVector.h>
 #include "CTaskManager.h"
@@ -89,5 +88,3 @@ public:
                                                            unsigned char bAimImmediate = false) = 0;
     virtual CTaskSimpleFight*       CreateTaskSimpleFight(CEntity* pTargetEntity, int nCommand, unsigned int nIdlePeriod = 10000) = 0;
 };
-
-#endif

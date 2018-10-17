@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGRAPHICSINTERFACE_H
-#define __CGRAPHICSINTERFACE_H
+#pragma once
 
 #include "CVector.h"
 #include <d3d9.h>
@@ -28,6 +27,14 @@ struct PrimitiveMaterialVertice
     float             fX, fY, fZ;
     D3DCOLOR          Color;
     float             u, v;
+};
+
+enum PrimitiveVerticeSizes
+{
+    VERT_XY = 2,
+    VERT_XY_COLOR = 3,
+    VERT_XY_UV = 4,
+    VERT_XY_COLOR_UV = 5
 };
 
 struct ID3DXFont;
@@ -143,11 +150,13 @@ public:
                                   float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bColorCoded = false,
                                   bool bSubPixelPositioning = false, float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0) = 0;
 
-    virtual void DrawPrimitiveQueued(const std::vector<PrimitiveVertice>& vertices, D3DPRIMITIVETYPE type, bool bPostGUI) = 0;
-    virtual void DrawMaterialPrimitiveQueued(const std::vector<PrimitiveMaterialVertice>& vertices, D3DPRIMITIVETYPE type, CMaterialItem* pMaterial,
+    virtual void DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI) = 0;
+    virtual void DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
                                              bool bPostGUI) = 0;
     virtual void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
                                   short siSegments, float fRatio, bool bPostGUI) = 0;
+
+    virtual bool IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType) = 0;
 
     // Subsystems
     virtual CRenderItemManagerInterface* GetRenderItemManager(void) = 0;
@@ -164,5 +173,3 @@ public:
     virtual bool ResizeTextureData(const void* pData, uint uiDataPitch, uint uiWidth, uint uiHeight, uint d3dFormat, uint uiNewWidth, uint uiNewHeight,
                                    CBuffer& outBuffer) = 0;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_ENTITY
-#define __CGAMESA_ENTITY
+#pragma once
 
 #include "Common.h"
 #include "COffsets.h"
@@ -330,5 +329,3 @@ inline bool IsValidMatrix(const CMatrix& mat)
 {
     return IsValidPosition(mat.vPos) && IsValidPosition(mat.vFront);
 }
-
-#endif

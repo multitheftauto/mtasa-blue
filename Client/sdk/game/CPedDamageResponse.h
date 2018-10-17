@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_PEDDAMAGERESPONSE
-#define __CGAME_PEDDAMAGERESPONSE
+#pragma once
 
 class CPedDamageResponseSAInterface;
 
@@ -20,5 +19,3 @@ public:
     virtual CPedDamageResponseSAInterface* GetInterface(void) = 0;
     virtual void Calculate(CEntity* pEntity, float fDamage, eWeaponType weaponType, ePedPieceTypes bodyPart, bool b_1, bool bSpeak) = 0;
 };
-
-#endif

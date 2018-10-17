@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CBITSTREAM_H
-#define __CBITSTREAM_H
+#pragma once
 
 #include "..\CClient.h"
 extern CNet* g_pNet;
@@ -23,5 +22,3 @@ public:
 
     NetBitStreamInterface* pBitStream;
 };
-
-#endif

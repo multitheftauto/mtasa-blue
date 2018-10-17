@@ -39,6 +39,7 @@ DECLARE_ENUM(EEntityTypeMask);
 DECLARE_ENUM(eWeaponState);
 DECLARE_ENUM(eWeaponFlags);
 DECLARE_ENUM(eVehicleComponent);
+DECLARE_ENUM(eObjectProperty);
 DECLARE_ENUM(eFontType);
 DECLARE_ENUM(eFontQuality);
 DECLARE_ENUM(eAudioLookupIndex);
@@ -50,12 +51,15 @@ DECLARE_ENUM(eTrayIconType)
 DECLARE_ENUM(eCursorType)
 DECLARE_ENUM(eWheelPosition)
 DECLARE_ENUM(D3DPRIMITIVETYPE);
+
 DECLARE_ENUM(eSurfaceProperties);
 DECLARE_ENUM(eSurfaceAudio);
 DECLARE_ENUM(eSurfaceStepEffect);
 DECLARE_ENUM(eSurfaceBulletEffect);
 DECLARE_ENUM(eSurfaceWheelEffect);
 DECLARE_ENUM(eSurfaceSkidMarkType);
+
+DECLARE_ENUM(eVehicleDummies);
 
 enum eDXHorizontalAlign
 {
@@ -402,6 +406,10 @@ inline SString GetClassTypeName(eSurfaceWheelEffect*)
 inline SString GetClassTypeName(eSurfaceSkidMarkType*)
 {
     return "surface-skidmark-type";
+}
+inline SString GetClassTypeName(eVehicleDummies*)
+{
+    return "vehicle-dummy";
 }
 
 //

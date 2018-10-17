@@ -23,7 +23,7 @@ using std::list;
 #define MAX_ALPHA                   180.0f // max value is 255
 
 #define DEFAULT_VIEW_RANGE          45.0f
-#define DEFAULT_VIEW_RANGE_EXP      DEFAULT_VIEW_RANGE*DEFAULT_VIEW_RANGE
+#define DEFAULT_VIEW_RANGE_EXP      ((DEFAULT_VIEW_RANGE)*(DEFAULT_VIEW_RANGE))
 
 CNametags::CNametags(CClientManager* pManager)
 {

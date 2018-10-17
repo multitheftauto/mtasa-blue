@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUI_CGUISIZE
-#define __CGUI_CGUISIZE
+#pragma once
 
 class CGUISize
 {
@@ -24,5 +23,3 @@ public:
     float fWidth;
     float fHeight;
 };
-
-#endif

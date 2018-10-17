@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMULTIPLAYER
-#define __CMULTIPLAYER
+#pragma once
 
 #include <CMatrix.h>
 #include <CVector.h>
@@ -36,6 +35,16 @@ struct SClothesCacheStats
     uint uiNumTotal;
     uint uiNumUnused;
     uint uiNumRemoved;
+};
+
+struct SWaterCannonHitEvent
+{
+    CEntitySAInterface* pGameVehicle;
+    CEntitySAInterface* pHitGameEntity;
+    CVector             vecPosition;
+    CVector             vecNormal;
+    int                 iModel;
+    unsigned char       ucColSurface;
 };
 
 class CAnimBlendAssociationSAInterface;
@@ -98,6 +107,7 @@ typedef void(GameModelRemoveHandler)(ushort usModelId);
 typedef void(GameEntityRenderHandler)(CEntitySAInterface* pEntity);
 typedef void(FxSystemDestructionHandler)(void* pFxSA);
 typedef AnimationId(DrivebyAnimationHandler)(AnimationId animGroup, AssocGroupId animId);
+typedef void(WaterCannonHitWorldHandler)(SWaterCannonHitEvent& event);
 
 /**
  * This class contains information used for shot syncing, one exists per player.
@@ -215,6 +225,7 @@ public:
     virtual void SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler) = 0;
     virtual void SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler) = 0;
     virtual void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler) = 0;
+    virtual void SetWaterCannonHitWorldHandler(WaterCannonHitWorldHandler* pHandler) = 0;
 
     virtual void  AllowMouseMovement(bool bAllow) = 0;
     virtual void  DoSoundHacksOnLostFocus(bool bLostFocus) = 0;
@@ -353,5 +364,3 @@ public:
     virtual void SetBoatWaterSplashEnabled(bool bEnabled) = 0;
     virtual void SetTyreSmokeEnabled(bool bEnabled) = 0;
 };
-
-#endif

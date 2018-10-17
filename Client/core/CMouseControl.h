@@ -11,8 +11,7 @@
 
 #include <game/CPad.h>
 
-#ifndef __CMOUSECONTROL_H
-#define __CMOUSECONTROL_H
+#pragma once
 
 enum MouseControlVehicleType
 {
@@ -36,5 +35,3 @@ protected:
     short m_usLeftStickX;
     short m_usLeftStickY;
 };
-
-#endif

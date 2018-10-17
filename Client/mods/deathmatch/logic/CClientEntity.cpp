@@ -1218,7 +1218,7 @@ bool CClientEntity::IsStatic(void)
     CEntity* pEntity = GetGameEntity();
     if (pEntity)
     {
-        return (pEntity->IsStatic() == TRUE);
+        return pEntity->IsStatic();
     }
     return false;
 }

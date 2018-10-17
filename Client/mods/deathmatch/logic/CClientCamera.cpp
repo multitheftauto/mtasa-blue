@@ -531,6 +531,19 @@ void CClientCamera::ToggleCameraFixedMode(bool bEnabled)
     }
 }
 
+void CClientCamera::SetTargetEntity(CClientEntity* pEntity)
+{
+    if (m_bFixed)
+        return;
+
+    CCam* const pCam = m_pCamera->GetCam(m_pCamera->GetActiveCam());
+
+    if (!pCam)
+        return;
+
+    pCam->SetTargetEntity(pEntity->GetGameEntity());
+}
+
 CClientEntity* CClientCamera::GetTargetEntity(void)
 {
     CClientEntity* pReturn = NULL;

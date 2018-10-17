@@ -26,7 +26,7 @@ enum eColShapeType
 class CColShape : public CElement
 {
 public:
-    CColShape(class CColManager* pManager, CElement* pParent, CXMLNode* pNode = NULL, bool bIsPartnered = false);
+    CColShape(class CColManager* pManager, CElement* pParent, bool bIsPartnered = false);
     virtual ~CColShape(void);
 
     virtual eColShapeType GetShapeType(void) = 0;

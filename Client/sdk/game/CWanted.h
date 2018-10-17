@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_WANTED
-#define __CGAME_WANTED
+#pragma once
 
 #include <windows.h>
 
@@ -23,5 +22,3 @@ public:
     virtual void SetWantedLevelNoDrop(DWORD dwWantedLevel) = 0;
     virtual void SetWantedLevelNoFlash(DWORD dwWantedLevel) = 0;
 };
-
-#endif

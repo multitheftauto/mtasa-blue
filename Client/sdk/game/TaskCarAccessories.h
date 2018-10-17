@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TASKCARACCESSORIES
-#define __CGAME_TASKCARACCESSORIES
+#pragma once
 
 #include "Task.h"
 
@@ -45,5 +44,3 @@ public:
     virtual void SetDoorFlagsToClear(const unsigned char nDoorFlagsToClear) = 0;
     virtual void SetNumGettingInToClear(const unsigned char nNumGettingInToClear) = 0;
 };
-
-#endif

@@ -10,8 +10,7 @@
 
 class CClientRadarMarker;
 
-#ifndef __CCLIENTRADARMARKER_H
-#define __CCLIENTRADARMARKER_H
+#pragma once
 
 #include "CClientCommon.h"
 #include "CClientEntity.h"
@@ -83,5 +82,3 @@ private:
     short          m_sOrdering;
     unsigned short m_usVisibleDistance;
 };
-
-#endif

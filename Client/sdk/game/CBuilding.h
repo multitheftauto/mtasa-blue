@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_BUILDING
-#define __CGAME_BUILDING
+#pragma once
 
 #include "CEntity.h"
 
@@ -19,5 +18,3 @@ class CBuilding : public virtual CEntity
 public:
     virtual ~CBuilding(void){};
 };
-
-#endif

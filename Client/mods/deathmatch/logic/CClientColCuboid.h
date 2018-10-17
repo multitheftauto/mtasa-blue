@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCOLCUBOID_H
-#define __CCLIENTCOLCUBOID_H
+#pragma once
 
 class CClientColCuboid : public CClientColShape
 {
@@ -34,5 +33,3 @@ public:
 protected:
     CVector m_vecSize;
 };
-
-#endif

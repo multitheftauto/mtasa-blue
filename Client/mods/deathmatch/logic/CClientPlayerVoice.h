@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTPLAYERVOICE_H
-#define __CCLIENTPLAYERVOICE_H
+#pragma once
 
 /*
 #define VOICE_FREQUENCY                 44100
@@ -104,4 +103,3 @@ private:
     SFixedArray<int, 9> m_EnabledEffects;
     SFixedArray<HFX, 9> m_FxEffects;
 };
-#endif

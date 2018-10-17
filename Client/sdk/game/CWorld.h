@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_WORLD
-#define __CGAME_WORLD
+#pragma once
 
 #include "CEntity.h"
 #include "CColPoint.h"

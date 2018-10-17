@@ -42,11 +42,11 @@ public:
     };
 
 public:
-    CMarker(class CMarkerManager* pMarkerManager, CColManager* pColManager, CElement* pParent, CXMLNode* pNode);
+    CMarker(class CMarkerManager* pMarkerManager, CColManager* pColManager, CElement* pParent);
     ~CMarker(void);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
     void Unlink(void);
-    bool ReadSpecialData(void);
 
     bool           HasTarget(void) { return m_bHasTarget; };
     const CVector& GetTarget(void) { return m_vecTarget; };
@@ -66,6 +66,9 @@ public:
     CColShape* GetColShape(void) { return m_pCollision; }
 
     virtual CSphere GetWorldBoundingSphere(void);
+
+protected:
+    bool ReadSpecialData(const int iLine) override;
 
 private:
     void Callback_OnCollision(CColShape& Shape, CElement& Element);

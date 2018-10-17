@@ -21,35 +21,29 @@ CRadarAreaManager::~CRadarAreaManager(void)
     DeleteAll();
 }
 
-CRadarArea* CRadarAreaManager::Create(CElement* pParent, CXMLNode* pNode)
+CRadarArea* CRadarAreaManager::Create(CElement* pParent)
 {
-    // Create the radar area
-    CRadarArea* pArea = new CRadarArea(this, pParent, pNode);
+    CRadarArea* const pArea = new CRadarArea(this, pParent);
 
-    // If the id was invalid, delete it and return NULL
     if (pArea->GetID() == INVALID_ELEMENT_ID)
     {
         delete pArea;
-        return NULL;
+        return nullptr;
     }
 
-    // Otherwize return it
     return pArea;
 }
 
 CRadarArea* CRadarAreaManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
 {
-    // Create the radar area
-    CRadarArea* pArea = new CRadarArea(this, pParent, &Node);
+    CRadarArea* const pArea = new CRadarArea(this, pParent);
 
-    // If the id was invalid, delete it and return NULL
-    if (pArea->GetID() == INVALID_ELEMENT_ID || !pArea->LoadFromCustomData(pEvents))
+    if (pArea->GetID() == INVALID_ELEMENT_ID || !pArea->LoadFromCustomData(pEvents, Node))
     {
         delete pArea;
-        return NULL;
+        return nullptr;
     }
 
-    // Otherwize return it
     return pArea;
 }
 

@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCUSTOMDATA_H
-#define __CCUSTOMDATA_H
+#pragma once
 
 #include "lua/CLuaArgument.h"
 
@@ -37,5 +36,3 @@ public:
 private:
     std::map<std::string, SCustomData> m_Data;
 };
-
-#endif
