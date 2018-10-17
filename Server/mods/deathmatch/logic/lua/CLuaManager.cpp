@@ -295,6 +295,8 @@ void CLuaManager::LoadCFunctions(void)
 
     CLuaCFunctions::AddFunction("callRemote", CLuaFunctionDefs::CallRemote);
     CLuaCFunctions::AddFunction("fetchRemote", CLuaFunctionDefs::FetchRemote);
+    CLuaCFunctions::AddFunction("getNetworkRequests", CLuaFunctionDefs::GetNetworkRequests);
+    CLuaCFunctions::AddFunction("getNetworkRequestInfo", CLuaFunctionDefs::GetNetworkRequestInfo);
 
     // Misc funcs
     CLuaCFunctions::AddFunction("resetMapInfo", CLuaFunctionDefs::ResetMapInfo);

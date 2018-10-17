@@ -27,6 +27,8 @@ DECLARE_ENUM(CAccessControlListRight::ERightType);
 DECLARE_ENUM(CElement::EElementType);
 DECLARE_ENUM(CAccountPassword::EAccountPasswordType);
 
+class CRemoteCall;
+
 enum eHudComponent
 {
     HUD_AMMO,
@@ -154,8 +156,11 @@ inline SString GetClassTypeName(CPed*)
 {
     return "ped";
 }
-inline SString GetClassTypeName(CColShape*)
+inline SString GetClassTypeName(CRemoteCall*)
 {
+    return "remotecall";
+}
+inline SString GetClassTypeName(CColShape*) {
     return "colshape";
 }
 inline SString GetClassTypeName(CDummy*)
@@ -405,6 +410,15 @@ CPed* UserDataCast(CPed*, void* ptr, lua_State*)
 }
 
 //
+// CRemoteCall from userdata
+//
+template <class T>
+CRemoteCall* UserDataCast(CRemoteCall*, void* ptr, lua_State*)
+{
+    return (CRemoteCall*)ptr;
+}
+
+//
 // CPlayer from userdata
 //
 // Disallows conversion of CPeds to CPlayers
@@ -465,8 +479,8 @@ enum class eResourceModifyScope
 eResourceModifyScope GetResourceModifyScope(CResource* pThisResource, CResource* pOtherResource);
 void                 CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource);
 void                 CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisResource, std::initializer_list<CResource*> resourceList);
-void                 CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath,
-                                                     bool* pbReadOnly = nullptr);
+void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath,
+                                     bool* pbReadOnly = nullptr);
 
 //
 // Other misc helpers
