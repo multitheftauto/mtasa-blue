@@ -1161,6 +1161,9 @@ void CClientVehicle::CalcAndUpdateCanBeDamagedFlag(void)
     if (m_bSyncUnoccupiedDamage)
         bCanBeDamaged = true;
 
+    if (IsLocalEntity())
+        bCanBeDamaged = true;
+
     // Script override
     if (!m_bScriptCanBeDamaged)
         bCanBeDamaged = false;
@@ -1208,6 +1211,9 @@ void CClientVehicle::CalcAndUpdateTyresCanBurstFlag(void)
         bTyresCanBurst = true;
 
     if (m_bSyncUnoccupiedDamage)
+        bTyresCanBurst = true;
+
+    if (IsLocalEntity())
         bTyresCanBurst = true;
 
     // Script override

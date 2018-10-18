@@ -2668,6 +2668,9 @@ CClientVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource& Resource, u
         if (szRegPlate)
             pVehicle->SetRegPlate(szRegPlate);
 
+        pVehicle->CalcAndUpdateCanBeDamagedFlag();
+        pVehicle->CalcAndUpdateTyresCanBurstFlag();
+
         return pVehicle;
     }
 
