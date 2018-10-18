@@ -227,7 +227,7 @@ void CRemoteCall::MakeCall()
     bool                              bAnyHost = (g_pCore->GetWebCore()->GetDomainState(strDomain) == eURLState::WEBPAGE_ALLOWED);
     EDownloadModeType                 downloadMode = g_pClientGame->GetRemoteCalls()->GetDownloadModeForQueueName(m_strQueueName, bAnyHost);
     CNetHTTPDownloadManagerInterface* pDownloadManager = g_pNet->GetHTTPDownloadManager(downloadMode);
-    pDownloadManager->QueueFile(m_strURL, NULL, this, DownloadFinishedCallback, false, m_options, false, false);
+    pDownloadManager->QueueFile(m_strURL, NULL, this, DownloadFinishedCallback, m_options);
 }
 
 void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
