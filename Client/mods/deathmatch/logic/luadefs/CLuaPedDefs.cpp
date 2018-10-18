@@ -43,6 +43,7 @@ void CLuaPedDefs::LoadFunctions(void)
         {"getPedTotalAmmo", GetPedTotalAmmo},
         {"getPedOccupiedVehicle", GetPedOccupiedVehicle},
         {"getPedOccupiedVehicleSeat", GetPedOccupiedVehicleSeat},
+        {"getPedNearestCarEntryPoint", GetPedNearestCarEntryPoint},
         {"getPedArmor", GetPedArmor},
         {"isPedChoking", IsPedChoking},
         {"isPedDucked", IsPedDucked},
@@ -127,6 +128,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getMoveState", "getPedMoveState");
     lua_classfunction(luaVM, "getOccupiedVehicle", "getPedOccupiedVehicle");
     lua_classfunction(luaVM, "getOccupiedVehicleSeat", "getPedOccupiedVehicleSeat");
+    lua_classfunction(luaVM, "getNearestCarEntryPoint", OOP_GetPedNearestCarEntryPoint);
     lua_classfunction(luaVM, "getOxygenLevel", "getPedOxygenLevel");
     lua_classfunction(luaVM, "getStat", "getPedStat");
     lua_classfunction(luaVM, "getTarget", "getPedTarget");
@@ -485,6 +487,78 @@ int CLuaPedDefs::GetPedOccupiedVehicleSeat(lua_State* luaVM)
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPedDefs::GetPedNearestCarEntryPoint(lua_State* luaVM)
+{
+    // Verify the argument
+    CClientPed*     pPed = NULL;
+    bool            bCheckDriverDoor = true;
+    bool            bCheckPassengersDoors = true;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPed);
+    argStream.ReadBool(bCheckDriverDoor, true);
+    argStream.ReadBool(bCheckPassengersDoors, true);
+
+    if (!argStream.HasErrors())
+    {
+        unsigned int        uiEntryPoint;
+        CVector             vecClosestDoorPosition;
+
+        CClientVehicle*     pVehicle = CStaticFunctionDefinitions::GetPedNearestCarEntryPoint(*pPed, bCheckDriverDoor, bCheckPassengersDoors, 
+                                                                                              uiEntryPoint, vecClosestDoorPosition);
+ 
+        if (pVehicle)
+        {
+            lua_pushelement(luaVM, pVehicle);
+            lua_pushnumber(luaVM, uiEntryPoint);
+            lua_pushnumber(luaVM, vecClosestDoorPosition.fX);
+            lua_pushnumber(luaVM, vecClosestDoorPosition.fY);
+            lua_pushnumber(luaVM, vecClosestDoorPosition.fZ);
+            return 5;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPedDefs::OOP_GetPedNearestCarEntryPoint(lua_State* luaVM)
+{
+    // Verify the argument
+    CClientPed*     pPed = NULL;
+    bool            bCheckDriverDoor = true;
+    bool            bCheckPassengersDoors = true;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPed);
+    argStream.ReadBool(bCheckDriverDoor, true);
+    argStream.ReadBool(bCheckPassengersDoors, true);
+
+    if (!argStream.HasErrors())
+    {
+        unsigned int        uiEntryPoint;
+        CVector             vecClosestDoorPosition;
+
+        CClientVehicle*     pVehicle = CStaticFunctionDefinitions::GetPedNearestCarEntryPoint(*pPed, bCheckDriverDoor, bCheckPassengersDoors, 
+                                                                                              uiEntryPoint, vecClosestDoorPosition);
+
+        if (pVehicle)
+        {
+            lua_pushelement(luaVM, pVehicle);
+            lua_pushnumber(luaVM, uiEntryPoint);
+            lua_pushvector(luaVM, vecClosestDoorPosition);
+            return 3;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
     lua_pushboolean(luaVM, false);
     return 1;
 }

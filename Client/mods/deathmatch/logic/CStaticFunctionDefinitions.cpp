@@ -1771,6 +1771,20 @@ bool CStaticFunctionDefinitions::GetPedOccupiedVehicleSeat(CClientPed& pPed, uin
     return false;
 }
 
+CClientVehicle* CStaticFunctionDefinitions::GetPedNearestCarEntryPoint(CClientPed& pPed, bool bCheckDriverDoor, bool bCheckPassengersDoors,
+                                                                 uint& uiEntryPoint, CVector& vecClosestDoorPosition)
+{
+    if (pPed.IsInVehicle())
+    {
+        // The ped is already in a car, why bother checking the nearest car seat?
+        return false;
+    }
+
+    CClientVehicle* pVehicle = pPed.GetClosestVehicleInRange(true, bCheckDriverDoor, bCheckPassengersDoors, false, &uiEntryPoint, &vecClosestDoorPosition, 20.0f);
+
+    return pVehicle;
+}
+
 const char* CStaticFunctionDefinitions::GetPedSimplestTask(CClientPed& Ped)
 {
     CTaskManager* pTaskManager = Ped.GetTaskManager();

@@ -1156,10 +1156,10 @@ CClientVehicle* CClientPed::GetClosestVehicleInRange(bool bGetPositionFromCloses
                 iClosestDoor = iPassengerDoor;
                 vecClosestDoorPosition = vecVehiclePosition = vecPassengerPos;
             }
-            if (bCheckDriverDoor)
+            if (bCheckDriverDoor && bCheckPassengerDoors)
             {
                 // If they're different, find the closest
-                if (iFrontDoor != iPassengerDoor && iPassengerDoor < 2)
+                if (iFrontDoor != iPassengerDoor)
                 {
                     float fDistanceFromFront = DistanceBetweenPoints3D(vecPosition, vecFrontPos);
                     float fDistanceFromPassenger = DistanceBetweenPoints3D(vecPosition, vecPassengerPos);
@@ -1167,6 +1167,9 @@ CClientVehicle* CClientPed::GetClosestVehicleInRange(bool bGetPositionFromCloses
                     {
                         iClosestDoor = iPassengerDoor;
                         vecClosestDoorPosition = vecVehiclePosition = vecPassengerPos;
+                    } else {
+                        iClosestDoor = iFrontDoor;
+                        vecClosestDoorPosition = vecFrontPos;
                     }
                 }
             }
@@ -1250,7 +1253,7 @@ bool CClientPed::GetClosestDoor(CClientVehicle* pVehicle, bool bCheckDriverDoor,
                 iClosestDoor = iPassengerDoor;
                 vecClosestDoorPosition = vecPassengerPos;
             }
-            if (bCheckDriverDoor)
+            if (bCheckDriverDoor && bCheckPassengerDoors)
             {
                 // If they're different, find the closest
                 if (iFrontDoor != iPassengerDoor)
@@ -1261,6 +1264,9 @@ bool CClientPed::GetClosestDoor(CClientVehicle* pVehicle, bool bCheckDriverDoor,
                     {
                         iClosestDoor = iPassengerDoor;
                         vecClosestDoorPosition = vecPassengerPos;
+                    } else {
+                        iClosestDoor = iFrontDoor;
+                        vecClosestDoorPosition = vecFrontPos;
                     }
                 }
             }
