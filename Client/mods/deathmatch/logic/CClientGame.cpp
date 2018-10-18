@@ -5179,7 +5179,16 @@ void CClientGame::ProcessVehicleInOutKey(bool bPassenger)
         m_ulLastVehicleInOutTime = CClientTime::GetTime();
 
         m_pLocalPlayer->GetIntoVehicle(pVehicle, uiSeat, uiDoor);
-        m_pLocalPlayer->SetVehicleInOutState(VEHICLE_INOUT_GETTING_IN);
+
+        CClientPed* pOccupyingPed = pVehicle->GetOccupant(uiSeat);
+
+        if (pOccupyingPed) {
+            m_bIsJackingVehicle = true;
+            m_pLocalPlayer->SetVehicleInOutState(VEHICLE_INOUT_JACKING);
+            pOccupyingPed->SetVehicleInOutState(VEHICLE_INOUT_GETTING_JACKED);
+        } else {
+            m_pLocalPlayer->SetVehicleInOutState(VEHICLE_INOUT_GETTING_IN);
+        }
 
         return;
     }

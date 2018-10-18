@@ -36,7 +36,7 @@ public:
     LUA_DECLARE(GetPedStat);
     LUA_DECLARE(GetPedOccupiedVehicle);
     LUA_DECLARE(GetPedOccupiedVehicleSeat);
-    LUA_DECLARE_OOP(GetPedNearestCarEntryPoint);
+    LUA_DECLARE_OOP(GetPedNearestVehicleEntryPoint);
     LUA_DECLARE(GetPedArmor);
     LUA_DECLARE(IsPedChoking);
     LUA_DECLARE(IsPedDucked);

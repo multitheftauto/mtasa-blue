@@ -1771,7 +1771,7 @@ bool CStaticFunctionDefinitions::GetPedOccupiedVehicleSeat(CClientPed& pPed, uin
     return false;
 }
 
-CClientVehicle* CStaticFunctionDefinitions::GetPedNearestCarEntryPoint(CClientPed& pPed, bool bCheckDriverDoor, bool bCheckPassengersDoors,
+CClientVehicle* CStaticFunctionDefinitions::GetPedNearestVehicleEntryPoint(CClientPed& pPed, bool bCheckDriverDoor, bool bCheckPassengersDoors,
                                                                  uint& uiEntryPoint, CVector& vecClosestDoorPosition)
 {
     if (pPed.IsInVehicle())

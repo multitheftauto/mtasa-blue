@@ -43,7 +43,7 @@ void CLuaPedDefs::LoadFunctions(void)
         {"getPedTotalAmmo", GetPedTotalAmmo},
         {"getPedOccupiedVehicle", GetPedOccupiedVehicle},
         {"getPedOccupiedVehicleSeat", GetPedOccupiedVehicleSeat},
-        {"getPedNearestCarEntryPoint", GetPedNearestCarEntryPoint},
+        {"getPedNearestVehicleEntryPoint", GetPedNearestVehicleEntryPoint},
         {"getPedArmor", GetPedArmor},
         {"isPedChoking", IsPedChoking},
         {"isPedDucked", IsPedDucked},
@@ -128,7 +128,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getMoveState", "getPedMoveState");
     lua_classfunction(luaVM, "getOccupiedVehicle", "getPedOccupiedVehicle");
     lua_classfunction(luaVM, "getOccupiedVehicleSeat", "getPedOccupiedVehicleSeat");
-    lua_classfunction(luaVM, "getNearestCarEntryPoint", OOP_GetPedNearestCarEntryPoint);
+    lua_classfunction(luaVM, "getNearestVehicleEntryPoint", OOP_GetPedNearestVehicleEntryPoint);
     lua_classfunction(luaVM, "getOxygenLevel", "getPedOxygenLevel");
     lua_classfunction(luaVM, "getStat", "getPedStat");
     lua_classfunction(luaVM, "getTarget", "getPedTarget");
@@ -491,7 +491,7 @@ int CLuaPedDefs::GetPedOccupiedVehicleSeat(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::GetPedNearestCarEntryPoint(lua_State* luaVM)
+int CLuaPedDefs::GetPedNearestVehicleEntryPoint(lua_State* luaVM)
 {
     // Verify the argument
     CClientPed*     pPed = NULL;
@@ -507,8 +507,8 @@ int CLuaPedDefs::GetPedNearestCarEntryPoint(lua_State* luaVM)
         unsigned int        uiEntryPoint;
         CVector             vecClosestDoorPosition;
 
-        CClientVehicle*     pVehicle = CStaticFunctionDefinitions::GetPedNearestCarEntryPoint(*pPed, bCheckDriverDoor, bCheckPassengersDoors, 
-                                                                                              uiEntryPoint, vecClosestDoorPosition);
+        CClientVehicle*     pVehicle = CStaticFunctionDefinitions::GetPedNearestVehicleEntryPoint(*pPed, bCheckDriverDoor, bCheckPassengersDoors, 
+                                                                                                  uiEntryPoint, vecClosestDoorPosition);
  
         if (pVehicle)
         {
@@ -528,7 +528,7 @@ int CLuaPedDefs::GetPedNearestCarEntryPoint(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::OOP_GetPedNearestCarEntryPoint(lua_State* luaVM)
+int CLuaPedDefs::OOP_GetPedNearestVehicleEntryPoint(lua_State* luaVM)
 {
     // Verify the argument
     CClientPed*     pPed = NULL;
@@ -544,8 +544,8 @@ int CLuaPedDefs::OOP_GetPedNearestCarEntryPoint(lua_State* luaVM)
         unsigned int        uiEntryPoint;
         CVector             vecClosestDoorPosition;
 
-        CClientVehicle*     pVehicle = CStaticFunctionDefinitions::GetPedNearestCarEntryPoint(*pPed, bCheckDriverDoor, bCheckPassengersDoors, 
-                                                                                              uiEntryPoint, vecClosestDoorPosition);
+        CClientVehicle*     pVehicle = CStaticFunctionDefinitions::GetPedNearestVehicleEntryPoint(*pPed, bCheckDriverDoor, bCheckPassengersDoors, 
+                                                                                                  uiEntryPoint, vecClosestDoorPosition);
 
         if (pVehicle)
         {
