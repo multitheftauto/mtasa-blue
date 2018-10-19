@@ -3205,9 +3205,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer(void)
     m_JobInfo.downloadStatus = EDownloadStatus::Running;
     m_JobInfo.iDownloadResultCode = 0;
     GetHTTP()->Reset();
-    SHttpRequestOptions options;
-    options.bResumeFile = true;
-    GetHTTP()->QueueFile(strQueryURL, m_JobInfo.strResumableSaveLocation, this, StaticDownloadFinished, options);
+    GetHTTP()->QueueFile(strQueryURL, m_JobInfo.strResumableSaveLocation, NULL, 0, false, this, StaticDownloadFinished, false, 10, 10000, false, true);
     m_strLastQueryURL = strQueryURL;
     OutputDebugLine(SString("[Updater] DoSendDownloadRequestToNextServer %d/%d %s", m_JobInfo.iCurrent, m_JobInfo.serverList.size(), strQueryURL.c_str()));
     return RES_OK;
@@ -3263,7 +3261,7 @@ int CVersionUpdater::DoPollDownload(void)
     {
         m_llTimeStart = GetTickCount64_();
         m_JobInfo.uiBytesDownloaded = uiBytesDownloaded;
-        OutputDebugLine(SString("[Updater] uiBytesDownloaded:%d", uiBytesDownloaded));
+        OutputDebugLine(SString("uiBytesDownloaded:%d", uiBytesDownloaded));
     }
 
     // Are we done yet?
@@ -3351,10 +3349,7 @@ int CVersionUpdater::DoSendPostToNextServer(void)
     // Send data. Doesn't check if it was received.
     //
     GetHTTP()->Reset();
-    SHttpRequestOptions options;
-    options.strPostData = SStringX(&m_JobInfo.postContent.at(0), m_JobInfo.postContent.size());
-    options.bPostBinary = m_JobInfo.bPostContentBinary;
-    GetHTTP()->QueueFile(strQueryURL, nullptr, nullptr, nullptr, options);
+    GetHTTP()->QueueFile(strQueryURL, NULL, &m_JobInfo.postContent.at(0), m_JobInfo.postContent.size(), m_JobInfo.bPostContentBinary);
 
     return RES_OK;
 }

@@ -490,11 +490,9 @@ bool CWebCore::UpdateListsFromMaster()
         #ifdef MTA_DEBUG
             OutputDebugLine("Updating white- and blacklist...");
         #endif
-            SHttpRequestOptions options;
-            options.uiConnectionAttempts = 3;
             g_pCore->GetNetwork()
                 ->GetHTTPDownloadManager(EDownloadModeType::WEBBROWSER_LISTS)
-                ->QueueFile(SString("%s?type=getrev", BROWSER_UPDATE_URL), NULL, this, &CWebCore::StaticFetchRevisionFinished, options);
+                ->QueueFile(SString("%s?type=getrev", BROWSER_UPDATE_URL), NULL, NULL, 0, false, this, &CWebCore::StaticFetchRevisionFinished, false, 3);
 
             pLastUpdateNode->SetTagContent(SString("%d", (long long)currentTime));
             m_pXmlConfig->Write();
@@ -688,22 +686,20 @@ void CWebCore::StaticFetchRevisionFinished(const SHttpDownloadResult& result)
             int iWhiteListRevision = atoi(strWhiteRevision);
             if (iWhiteListRevision > pWebCore->m_iWhitelistRevision)
             {
-                SHttpRequestOptions options;
-                options.uiConnectionAttempts = 3;
                 g_pCore->GetNetwork()
                     ->GetHTTPDownloadManager(EDownloadModeType::WEBBROWSER_LISTS)
-                    ->QueueFile(SString("%s?type=fetchwhite", BROWSER_UPDATE_URL), NULL, pWebCore, &CWebCore::StaticFetchWhitelistFinished, options);
+                    ->QueueFile(SString("%s?type=fetchwhite", BROWSER_UPDATE_URL), NULL, NULL, 0, false, pWebCore, &CWebCore::StaticFetchWhitelistFinished,
+                                false, 3);
 
                 pWebCore->m_iWhitelistRevision = iWhiteListRevision;
             }
             int iBlackListRevision = atoi(strBlackRevision);
             if (iBlackListRevision > pWebCore->m_iBlacklistRevision)
             {
-                SHttpRequestOptions options;
-                options.uiConnectionAttempts = 3;
                 g_pCore->GetNetwork()
                     ->GetHTTPDownloadManager(EDownloadModeType::WEBBROWSER_LISTS)
-                    ->QueueFile(SString("%s?type=fetchblack", BROWSER_UPDATE_URL), NULL, pWebCore, &CWebCore::StaticFetchBlacklistFinished, options);
+                    ->QueueFile(SString("%s?type=fetchblack", BROWSER_UPDATE_URL), NULL, NULL, 0, false, pWebCore, &CWebCore::StaticFetchBlacklistFinished,
+                                false, 3);
 
                 pWebCore->m_iBlacklistRevision = iBlackListRevision;
             }

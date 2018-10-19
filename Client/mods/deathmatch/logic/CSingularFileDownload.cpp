@@ -31,10 +31,8 @@ CSingularFileDownload::CSingularFileDownload(CResource* pResource, const char* s
 
     if (!DoesClientAndServerChecksumMatch())
     {
-        SHttpRequestOptions options;
-        options.bCheckContents = true;
         CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::RESOURCE_SINGULAR_FILES);
-        pHTTP->QueueFile(strHTTPURL.c_str(), szName, this, DownloadFinishedCallBack, options);
+        pHTTP->QueueFile(strHTTPURL.c_str(), szName, NULL, 0, false, this, DownloadFinishedCallBack, false, 10, 10000, true);
         m_bComplete = false;
         g_pClientGame->SetTransferringSingularFiles(true);
     }

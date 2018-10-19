@@ -479,19 +479,17 @@ void CConnectManager::OpenServerFirewall(in_addr Address, ushort usHttpPort, boo
     if (usHttpPort)
     {
         // Send to server http port if known
-        SHttpRequestOptions options;
-        options.uiConnectionAttempts = 1;
-        options.uiConnectTimeoutMs = uiTimeOut;
         SString strDummyUrl("http://%s:%d/mta_client_firewall_probe/", inet_ntoa(Address), usHttpPort);
-        g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::CONNECT_TCP_SEND)->QueueFile(strDummyUrl, NULL, NULL, NULL, options);
+        g_pCore->GetNetwork()
+            ->GetHTTPDownloadManager(EDownloadMode::CONNECT_TCP_SEND)
+            ->QueueFile(strDummyUrl, NULL, "", 0, true, NULL, NULL, false, 1, uiTimeOut);
     }
     if (usHttpPort == 0 || bHighPriority)
     {
         // Send to standard http port
-        SHttpRequestOptions options;
-        options.uiConnectionAttempts = 1;
-        options.uiConnectTimeoutMs = uiTimeOut;
         SString strDummyUrl("http://%s/mta_client_firewall_probe/", inet_ntoa(Address));
-        g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::CONNECT_TCP_SEND)->QueueFile(strDummyUrl, NULL, NULL, NULL, options);
+        g_pCore->GetNetwork()
+            ->GetHTTPDownloadManager(EDownloadMode::CONNECT_TCP_SEND)
+            ->QueueFile(strDummyUrl, NULL, "", 0, true, NULL, NULL, false, 1, uiTimeOut);
     }
 }

@@ -222,7 +222,7 @@ void CRemoteCall::MakeCall()
 {
     EDownloadModeType                 downloadMode = g_pGame->GetRemoteCalls()->GetDownloadModeForQueueName(m_strQueueName);
     CNetHTTPDownloadManagerInterface* pDownloadManager = g_pNetServer->GetHTTPDownloadManager(downloadMode);
-    pDownloadManager->QueueFile(m_strURL, NULL, this, DownloadFinishedCallback, m_options);
+    pDownloadManager->QueueFile(m_strURL, NULL, this, DownloadFinishedCallback, false, m_options, false, false);
 }
 
 void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)

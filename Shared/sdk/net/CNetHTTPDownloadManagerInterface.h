@@ -15,13 +15,10 @@ struct SHttpRequestOptions
 {
     SHttpRequestOptions() {}
     SHttpRequestOptions(const struct SHttpRequestOptionsTx& in);
-    bool    bIsLegacy = false;                 // true = sets CURLOPT_FAILONERROR
-    bool    bIsLocal = false;                  // false = download aborts if < 10 bytes/s for uiConnectTimeoutMs
-    bool    bCheckContents = false;            // true = check for naughty things before saving file
-    bool    bResumeFile = false;               // true = attempt to resume previously interrupted download
+    bool    bIsLegacy = false;            // true = old error behaviour
     SString strPostData;
-    bool    bPostBinary = false;                      // false = truncate strPostData to first null character and send as text/plain
-                                                      // (true = send as application/octet-stream)
+    bool    bPostBinary =
+        false;            // false = truncate strPostData to first null character and send as text/plain (true = send as application/octet-stream)
     std::map<SString, SString> formFields;            // If set, send items as multipart/formdata (and ignore strPostData)
     uint                       uiConnectionAttempts = 10;
     uint                       uiConnectTimeoutMs = 10000;
@@ -90,9 +87,6 @@ struct SHttpRequestOptionsTx
     SHttpRequestOptionsTx() {}
     SHttpRequestOptionsTx(const SHttpRequestOptions& in);
     bool              bIsLegacy = false;
-    bool              bIsLocal = false;
-    bool              bCheckContents = false;
-    bool              bResumeFile = false;
     SStringContent    strPostData;
     bool              bPostBinary = false;
     SStringMapContent formFields;
@@ -109,9 +103,6 @@ struct SHttpRequestOptionsTx
 inline SHttpRequestOptions::SHttpRequestOptions(const SHttpRequestOptionsTx& in)
 {
     bIsLegacy = in.bIsLegacy;
-    bIsLocal = in.bIsLocal;
-    bCheckContents = in.bCheckContents;
-    bResumeFile = in.bResumeFile;
     strPostData = in.strPostData;
     bPostBinary = in.bPostBinary;
     formFields = in.formFields;
@@ -128,9 +119,6 @@ inline SHttpRequestOptions::SHttpRequestOptions(const SHttpRequestOptionsTx& in)
 inline SHttpRequestOptionsTx::SHttpRequestOptionsTx(const SHttpRequestOptions& in)
 {
     bIsLegacy = in.bIsLegacy;
-    bIsLocal = in.bIsLocal;
-    bCheckContents = in.bCheckContents;
-    bResumeFile = in.bResumeFile;
     strPostData = in.strPostData;
     bPostBinary = in.bPostBinary;
     formFields = in.formFields;
@@ -166,9 +154,12 @@ public:
     virtual bool ProcessQueuedFiles(void) = 0;
 
     // Queue a file to download
+    virtual bool QueueFile(const char* szURL, const char* szOutputFile, const char* szPostData = NULL, unsigned int uiPostSize = 0, bool bPostBinary = false,
+                           void* objectPtr = NULL, PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback = NULL, bool bIsLocal = false,
+                           uint uiConnectionAttempts = 10, uint uiConnectTimeoutMs = 10000, bool bCheckContents = false, bool bResumeFile = false) = 0;
     virtual bool QueueFile(const char* szURL, const char* szOutputFile, void* objectPtr = NULL,
-                           PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback = NULL,
-                           const SHttpRequestOptionsTx&   options = SHttpRequestOptionsTx()) = 0;
+                           PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback = NULL, bool bIsLocal = false,
+                           const SHttpRequestOptionsTx& options = SHttpRequestOptionsTx(), bool bCheckContents = false, bool bResumeFile = false) = 0;
 
     // Limit number of concurrent http client connections
     virtual void SetMaxConnections(int iMaxConnections) = 0;
