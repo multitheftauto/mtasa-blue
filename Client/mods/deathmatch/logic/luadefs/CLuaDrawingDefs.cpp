@@ -954,7 +954,7 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
             if (bIsRawData)
             {
                 strPath = strFile;
-                strRootPath = pFileResource->GetResourceDirectoryPath(ACCESS_PUBLIC, NULL);
+                strRootPath = pFileResource->GetResourceDirectoryPath(ACCESS_PUBLIC, strMetaPath);
             }
             else
                 strRootPath = strPath.Left(strPath.length() - strMetaPath.length());
