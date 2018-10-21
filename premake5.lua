@@ -48,7 +48,7 @@ workspace "MTASA"
 		
 	-- Helper function for output path 
 	buildpath = function(p) return "%{wks.location}/../Bin/"..p.."/" end
-	copy = function(p) return "{COPY} %{cfg.buildtarget.abspath} %{wks.location}../Bin/"..p.."/" end 
+	copy = function(p) return "{COPY} %{cfg.buildtarget.abspath} \"%{wks.location}../Bin/"..p.."/\"" end 
 
 	if GLIBC_COMPAT then 
 		filter { "system:linux" }

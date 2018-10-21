@@ -1410,8 +1410,27 @@ void CMultiplayerSA::InitHooks()
 
     // Clip camera also outside the world bounds.
     MemSet((void*)0x41AD12, 0x90, 2);
+    MemSet((void*)0x41AD5E, 0x90, 2);
     MemSet((void*)0x41ADA7, 0x90, 2);
     MemSet((void*)0x41ADF3, 0x90, 2);
+
+    // Fix melee doesn't work outside the world bounds.
+    MemSet((void*)0x5FFAEE, 0x90, 2);
+    MemSet((void*)0x5FFB4B, 0x90, 2);
+    MemSet((void*)0x5FFBA5, 0x90, 2);
+    MemSet((void*)0x5FFC03, 0x90, 2);
+
+    // Fix shooting sniper doesn't work outside the world bounds (for local player).
+    MemSet((void*)0x7361BF, 0x90, 6);
+    MemSet((void*)0x7361D4, 0x90, 6);
+    MemSet((void*)0x7361E9, 0x90, 6);
+    MemSet((void*)0x7361FE, 0x90, 6);
+
+    // Fix heli blades lacks collision outside the world bounds.
+    MemSet((void*)0x6E2FBC, 0x90, 2);
+    MemSet((void*)0x6E301C, 0x90, 2);
+    MemSet((void*)0x6E3075, 0x90, 2);
+    MemSet((void*)0x6E30D6, 0x90, 2);
 
     // Allow Player Garages to shut with players inside.
     MemSet((void*)0x44C6FA, 0x90, 4);
