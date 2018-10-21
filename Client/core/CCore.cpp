@@ -1807,29 +1807,19 @@ void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
     // Get delta time in ms since last frame
     double dTimeUsed = dTimeMs - m_dLastTimeMs;
 
-    // Apply any over/underrun carried over from the previous frame
-    dTimeUsed += m_dPrevOverrun;
-
     if (dTimeUsed < dTargetTimeToUse)
     {
         // Have time spare - maybe eat some of that now
         double dSpare = dTargetTimeToUse - dTimeUsed;
 
         double dUseUpNow = dSpare - dTargetTimeToUse * 0.2f;
-        if (dUseUpNow >= 1)
-            Sleep(static_cast<DWORD>(floor(dUseUpNow)));
+        if (dUseUpNow >= 2)
+            Sleep(static_cast<DWORD>(floor(dUseUpNow-1)));
 
         // Redo timing calcs
         dTimeMs = GetTickCount32();
         dTimeUsed = dTimeMs - m_dLastTimeMs;
-        dTimeUsed += m_dPrevOverrun;
     }
-
-    // Update over/underrun for next frame
-    m_dPrevOverrun = dTimeUsed - dTargetTimeToUse;
-
-    // Limit carry over
-    m_dPrevOverrun = Clamp(dTargetTimeToUse * -0.9f, m_dPrevOverrun, dTargetTimeToUse * 0.1f);
 
     m_dLastTimeMs = dTimeMs;
 
