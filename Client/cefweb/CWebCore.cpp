@@ -168,15 +168,16 @@ void CWebCore::RemoveWebViewEvents(CWebView* pWebView)
 
 void CWebCore::DoEventQueuePulse()
 {
-    std::lock_guard<std::mutex> lock(m_EventQueueMutex);
+    std::list<EventEntry> eventQueue;
+    {
+        std::lock_guard<std::mutex> lock(m_EventQueueMutex);
+        std::swap(eventQueue, m_EventQueue);
+    }
 
-    for (auto& event : m_EventQueue)
+    for (auto& event : eventQueue)
     {
         event.callback();
     }
-
-    // Clear message queue
-    m_EventQueue.clear();
 
     // Invoke paint method if necessary on the main thread
     for (auto& view : m_WebViews)
