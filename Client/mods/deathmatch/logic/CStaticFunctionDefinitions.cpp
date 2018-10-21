@@ -9550,7 +9550,7 @@ bool CStaticFunctionDefinitions::GetPedOxygenLevel(CClientPed& Ped, float& fOxyg
 
 bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CClientPed* pPed, CClientVehicle* pVehicle, unsigned int uiSeat)
 {
-    if (pPed->IsLocalEntity() != pVehicle->IsLocalEntity())
+    if (pPed->IsLocalEntity() != pVehicle->IsLocalEntity() && !pPed->IsLocalPlayer())
         return false;
 
     if (pPed->IsLocalEntity())

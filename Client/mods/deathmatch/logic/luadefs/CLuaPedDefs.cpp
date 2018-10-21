@@ -1495,7 +1495,7 @@ int CLuaPedDefs::WarpPedIntoVehicle(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (!pPed->IsLocalEntity() || !pVehicle->IsLocalEntity())
+        if ((!pPed->IsLocalEntity() && !pPed->IsLocalPlayer()) || !pVehicle->IsLocalEntity())
             argStream.SetCustomError("This client side function will only work with client created peds and vehicles");
     }
 
@@ -1531,7 +1531,7 @@ int CLuaPedDefs::OOP_WarpPedIntoVehicle(lua_State* luaVM)
         MinClientReqCheck(argStream, MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE, "function is being called client side");
         if (!argStream.HasErrors())
         {
-            if (!pPed->IsLocalEntity() || !pVehicle->IsLocalEntity())
+            if ((!pPed->IsLocalEntity() && !pPed->IsLocalPlayer()) || !pVehicle->IsLocalEntity())
                 argStream.SetCustomError("This client side function will only work with client created peds and vehicles");
         }
 
@@ -1583,8 +1583,16 @@ int CLuaPedDefs::RemovePedFromVehicle(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (!pPed->IsLocalEntity())
+        CClientVehicle* pOccupiedVehicle = pPed->GetOccupiedVehicle();
+
+        if (!pPed->IsLocalEntity() && !pPed->IsLocalPlayer())
             argStream.SetCustomError("This client side function will only work with client created peds");
+
+        if (pOccupiedVehicle)
+        {
+            if (!pOccupiedVehicle->IsLocalEntity())
+                argStream.SetCustomError("This client side function will only work with client created peds");
+        }
     }
 
     if (!argStream.HasErrors())
