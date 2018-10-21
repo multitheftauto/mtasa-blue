@@ -92,4 +92,6 @@ public:
     LUA_DECLARE(RemovePedFromVehicle);
     LUA_DECLARE(SetPedOxygenLevel);
     LUA_DECLARE(SetPedStat);
+    LUA_DECLARE(SetPedExitVehicle);
+    LUA_DECLARE(SetPedEnterVehicle);
 };

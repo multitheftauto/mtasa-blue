@@ -340,6 +340,8 @@ public:
     bool           GetDamageSent(void) { return m_bDamageSent; }
     void           SetDamageSent(bool b) { m_bDamageSent = b; }
 
+    bool ProcessExitVehicle();
+    bool ProcessEnterVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, unsigned int uiDoor);
     void ProcessVehicleInOutKey(bool bPassenger);
 
     void ResetVehicleInOut(void);
@@ -587,6 +589,14 @@ public:
     void SendFireSync(CFire* pFire);
     void SendProjectileSync(CClientProjectile* pProjectile);
 
+    void SetGettingOutOfVehicle(bool bGettingOutOfVehicle) { m_bIsGettingOutOfVehicle = bGettingOutOfVehicle; };
+    void SetGettingIntoVehicle(bool bGettingIntoVehicle) { m_bIsGettingIntoVehicle = bGettingIntoVehicle; };
+    void SetVehicleInOutID(ElementID vehicleInOutID) { m_VehicleInOutID = vehicleInOutID; };
+    void SetVehicleInOutSeat(unsigned char ucVehicleInOutSeat) { m_ucVehicleInOutSeat = ucVehicleInOutSeat; };
+
+    void SetGettingJacked(bool bIsGettingJacked) { m_bIsGettingJacked = bIsGettingJacked; };
+    void SetGettingJackedBy(CClientPed* pJacker) { m_pGettingJackedBy = pJacker; };
+
     void           SetServerVersionSortable(const SString& strVersion) { m_strServerVersionSortable = strVersion; }
     const SString& GetServerVersionSortable(void) { return m_strServerVersionSortable; }
 
@@ -714,7 +724,7 @@ private:
     unsigned char  m_ucVehicleInOutSeat;
     bool           m_bNoNewVehicleTask;
     ElementID      m_NoNewVehicleTaskReasonID;
-    CClientPlayer* m_pGettingJackedBy;
+    CClientPed*    m_pGettingJackedBy;
 
     CEntity*       m_pTargetedGameEntity;
     CClientEntity* m_pTargetedEntity;

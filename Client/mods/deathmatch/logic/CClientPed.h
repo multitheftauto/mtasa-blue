@@ -225,6 +225,9 @@ public:
     void GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat = 0, unsigned char ucDoor = 0);
     void GetOutOfVehicle(unsigned char ucDoor);
 
+    bool GracefullyEnterCar(CClientVehicle* pVehicle, unsigned int uiSeat, unsigned int uiDoor);
+    bool GracefullyExitCar();
+
     void            WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat = 0);
     CClientVehicle* RemoveFromVehicle(bool bIgnoreIfGettingOut = false);
 
@@ -347,6 +350,13 @@ public:
     bool IsInWater(void);
     bool IsOnGround(void);
 
+    void SetJacker(CClientPed* pJacker) { m_pJacker = pJacker; };
+    void SetJacking(CClientPed* pJacking) { m_pJacking = pJacking; };
+
+    void SetEnteringVehicle(bool bIsEnteringVehicle) { m_bIsEnteringVehicle -= bIsEnteringVehicle; };
+    void SetLeavingVehicle(bool bIsLeavingVehicle) { m_bIsLeavingVehicle = bIsLeavingVehicle; };
+    void SetInOutVehicle(CClientVehicle* pVehicle) { m_pInOutVehicle = pVehicle; };
+
     bool          IsClimbing(void);
     bool          IsRadioOn(void) { return m_bRadioOn; };
     void          NextRadioChannel(void);
@@ -382,6 +392,9 @@ public:
     bool IsGettingIntoVehicle(void);
     bool IsGettingOutOfVehicle(void);
     bool IsGettingJacked(void);
+
+    CClientPed* GetJacker(void) { return m_pJacker; };
+    CClientPed* GetJacking(void) { return m_pJacking; };
 
     CClientEntity* GetContactEntity(void);
 
@@ -578,6 +591,12 @@ public:
     unsigned long                            m_ulLastTimeSprintPressed;
     unsigned long                            m_ulBlockSprintReleaseTime;
     bool                                     m_bWasSprintButtonDown;
+    CClientPed*                              m_pJacking;
+    CClientPed*                              m_pJacker;
+    bool                                     m_bIsEnteringVehicle;
+    bool                                     m_bIsLeavingVehicle;
+    unsigned int                             m_uiInOutSeat;
+    CClientVehicle*                          m_pInOutVehicle;
     CModelInfo*                              m_pLoadedModelInfo;
     eWeaponSlot                              m_pOutOfVehicleWeaponSlot;
     float                                    m_fBeginAimX;

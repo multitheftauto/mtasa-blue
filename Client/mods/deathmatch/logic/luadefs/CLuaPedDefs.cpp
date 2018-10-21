@@ -88,6 +88,8 @@ void CLuaPedDefs::LoadFunctions(void)
         {"setPedOxygenLevel", SetPedOxygenLevel},
         {"givePedWeapon", GivePedWeapon},
         {"isPedReloadingWeapon", IsPedReloadingWeapon},
+        {"setPedExitVehicle", SetPedExitVehicle},
+        {"setPedEnterVehicle", SetPedEnterVehicle}
     };
 
     // Add functions
@@ -179,6 +181,8 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setStat", "setPedStat");
     lua_classfunction(luaVM, "giveWeapon", "givePedWeapon");
     lua_classfunction(luaVM, "isReloadingWeapon", "isPedReloadingWeapon");
+    lua_classfunction(luaVM, "setExitVehicle", "setPedExitVehicle");
+    lua_classfunction(luaVM, "setEnterVehicle", "setPedEnterVehicle");
 
     lua_classvariable(luaVM, "vehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle);
     lua_classvariable(luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat");
@@ -493,7 +497,6 @@ int CLuaPedDefs::GetPedOccupiedVehicleSeat(lua_State* luaVM)
 
 int CLuaPedDefs::GetPedNearestVehicleEntryPoint(lua_State* luaVM)
 {
-    // Verify the argument
     CClientPed*     pPed = NULL;
     bool            bCheckDriverDoor = true;
     bool            bCheckPassengersDoors = true;
@@ -2177,6 +2180,54 @@ int CLuaPedDefs::SetPedOxygenLevel(lua_State* luaVM)
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPedDefs::SetPedExitVehicle(lua_State* luaVM)
+{
+    CClientPed*     pPed = NULL;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPed);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetPedExitVehicle(*pPed))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPedDefs::SetPedEnterVehicle(lua_State* luaVM)
+{
+    CClientPed*     pPed = NULL;
+    CClientVehicle* pVehicle = NULL;
+    unsigned int    uiSeat = 0;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPed);
+    argStream.ReadUserData(pVehicle);
+    argStream.ReadNumber(uiSeat);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetPedEnterVehicle(*pPed, *pVehicle, uiSeat))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
     lua_pushboolean(luaVM, false);
     return 1;
 }

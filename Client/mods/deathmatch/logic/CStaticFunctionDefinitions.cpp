@@ -1774,6 +1774,12 @@ bool CStaticFunctionDefinitions::GetPedOccupiedVehicleSeat(CClientPed& pPed, uin
 CClientVehicle* CStaticFunctionDefinitions::GetPedNearestVehicleEntryPoint(CClientPed& pPed, bool bCheckDriverDoor, bool bCheckPassengersDoors,
                                                                  uint& uiEntryPoint, CVector& vecClosestDoorPosition)
 {
+    // This function should only work on local peds.
+    if (!pPed.IsLocalEntity() && !pPed.IsLocalPlayer())
+    {
+        return false;
+    }
+
     if (pPed.IsInVehicle())
     {
         // The ped is already in a car, why bother checking the nearest car seat?
@@ -2431,6 +2437,92 @@ bool CStaticFunctionDefinitions::SetPedOxygenLevel(CClientEntity& Entity, float 
         Ped.SetOxygenLevel(fOxygen);
         return true;
     }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetPedExitVehicle(CClientPed& pPed)
+{
+    // This function only works on local peds.
+    if (!pPed.IsLocalEntity() && !pPed.IsLocalPlayer())
+    {
+        return false;
+    }
+
+    if (!pPed.GetGamePlayer())
+    {
+        return false;
+    }
+
+    // We are not inside a vehicle, how are we supposed to exit?
+    if (!pPed.GetOccupiedVehicle())
+    {
+        return false;
+    }
+
+    if (pPed.IsLocalPlayer())
+    {
+        m_pClientGame->ResetVehicleInOut();
+        return m_pClientGame->ProcessExitVehicle();
+    } 
+    else 
+    {
+        return pPed.GracefullyExitCar();
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetPedEnterVehicle(CClientPed& pPed, CClientVehicle& pVehicle, unsigned int uiSeat)
+{
+    // This function only works on local peds.
+    if (!pPed.IsLocalEntity() && !pPed.IsLocalPlayer())
+    {
+        return false;
+    }
+
+    if (!pPed.GetGamePlayer())
+    {
+        return false;
+    }
+
+    // We are already inside a vehicle.
+    if (pPed.GetOccupiedVehicle())
+    {
+        return false;
+    }
+
+    if (!pVehicle.IsEnterable())
+    {
+        return false;
+    }
+
+    if (pPed.IsDead() || pVehicle.GetHealth() <= 0.0f)
+    {
+        return false;
+    }
+
+    // Valid seat id for that vehicle?
+    uchar ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(pVehicle.GetModel());
+    if (uiSeat > ucMaxPassengers || ucMaxPassengers == 255)
+    {
+        return false;
+    }
+
+    if (pPed.IsLocalPlayer())
+    {
+        m_pClientGame->ResetVehicleInOut();
+        return m_pClientGame->ProcessEnterVehicle(&pVehicle, uiSeat, uiSeat);
+    }
+    else
+    {
+        if (!pVehicle.IsLocalEntity())
+        {
+            return false;
+        }
+
+        return pPed.GracefullyEnterCar(&pVehicle, uiSeat, uiSeat);
+    }
+
     return false;
 }
 

@@ -1295,6 +1295,197 @@ bool CClientPed::GetClosestDoor(CClientVehicle* pVehicle, bool bCheckDriverDoor,
     return false;
 }
 
+bool CClientPed::GracefullyEnterCar(CClientVehicle* pVehicle, unsigned int uiSeat, unsigned int uiDoor)
+{
+    // Check if we are already entering a vehicle or are already in a vehicle.
+    // Player leaves should be handled in CClientGame instead.
+    if (IsEnteringVehicle() || IsInVehicle() || IsLocalPlayer() || !IsLocalEntity())
+    {
+        return false;
+    }
+
+    if (!pVehicle || !pVehicle->IsEnterable())
+    {
+        // Stop if there isn't a vehicle, or the vehicle is not enterable
+        return false;
+    }
+
+    CVector vecPedPosition;
+    CVector vecVehiclePosition;
+
+    GetPosition(vecPedPosition);
+    pVehicle->GetPosition(vecVehiclePosition);
+
+    // Check if the is too far away from the vehicle.
+    if (DistanceBetweenPoints3D(vecPedPosition, vecVehiclePosition) > 20.0f)
+    {
+        return false;
+    }
+
+    // Make sure the ped doesn't have any other primary tasks running, otherwise our 'enter-vehicle'
+    // task will replace it and fuck it up!
+    //
+    if (GetCurrentPrimaryTask())
+    {
+        // We already have a primary task, so stop.
+        return false;
+    }
+
+    if (IsClimbing()               // Make sure we're not currently climbing
+        || HasJetPack()            // Make sure we don't have a jetpack
+        || IsUsingGun()            // Make sure we're not using a gun (have the gun task active)
+        || IsRunningAnimation()            // Make sure we aren't running an animation
+        )
+    {
+        return false;
+    }
+
+    // If the vehicle's a boat, make sure we're standing on it (we need a dif task to enter boats properly)
+    if (pVehicle->GetVehicleType() == CLIENTVEHICLE_BOAT && GetContactEntity() != pVehicle)
+    {
+        return false;
+    }
+
+    m_ucEnteringDoor = uiDoor;
+    m_uiInOutSeat = uiSeat;
+    
+    CClientPed* pOccupyingPed = pVehicle->GetOccupant(uiSeat);
+
+    CLuaArguments Arguments;
+    Arguments.PushElement(this);            // ped
+    Arguments.PushNumber(uiSeat);           // seat
+    Arguments.PushNumber(uiDoor);           // Door
+
+    if (pOccupyingPed)
+    {
+        Arguments.PushElement(pOccupyingPed);   // ped being jacked
+    }
+
+    if (!this->CallEvent("onClientPedStartEnterVehicle", Arguments, true))
+    {
+        // Event has been cancelled
+        return false;
+    }
+
+    if (pOccupyingPed)
+    {
+        unsigned char ucOccupyingDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(pOccupyingPed->GetGamePlayer(), pVehicle->GetGameVehicle());
+        unsigned char ucOccupyingSeat = pOccupyingPed->GetOccupiedVehicleSeat();
+
+        if (ucOccupyingDoor >= 2 && ucOccupyingDoor <= 5)
+        {
+            ucOccupyingDoor -= 2;
+        }
+
+        CLuaArguments ExitArguments;
+        ExitArguments.PushElement(pOccupyingPed);           // ped
+        ExitArguments.PushNumber(ucOccupyingSeat);          // seat
+        ExitArguments.PushNumber(ucOccupyingDoor);          // door
+
+        if (pOccupyingPed->IsLocalPlayer())
+        {
+            if (!pVehicle->CallEvent("onClientVehicleStartExit", ExitArguments, true))
+            {
+                // Event has been cancelled
+                return false;
+            }
+        } 
+        else 
+        {
+            ExitArguments.PushElement(this);                    // ped that is carjacking.
+
+            if (!this->CallEvent("onClientPedStartExitVehicle", ExitArguments, true))
+            {
+                // Event has been cancelled
+                return false;
+            }
+        }
+    }
+
+    SetEnteringVehicle(true);
+    SetInOutVehicle(pVehicle);
+
+    GetIntoVehicle(pVehicle, uiSeat, uiDoor);
+
+    if (pOccupyingPed) {
+        SetVehicleInOutState(VEHICLE_INOUT_JACKING);
+        pOccupyingPed->SetVehicleInOutState(VEHICLE_INOUT_GETTING_JACKED);
+        
+        if (pOccupyingPed->IsLocalPlayer())
+        {
+            g_pClientGame->SetGettingJacked(true);
+            g_pClientGame->SetGettingJackedBy(this);
+            g_pClientGame->SetGettingOutOfVehicle(true);
+            g_pClientGame->SetVehicleInOutID(pVehicle->GetID());
+            g_pClientGame->SetVehicleInOutSeat(uiSeat);
+        } 
+        else 
+        {
+            pOccupyingPed->SetJacker(this);
+        }
+    
+        this->SetJacking(pOccupyingPed);
+
+        // We haven't yet entered the car. The ped being carjacked is still occopying it.
+        // Workaround for early-unpair issue.
+        CClientVehicle::SetPedOccupiedVehicle(pOccupyingPed, pVehicle, uiSeat, uiDoor);
+        CClientVehicle::SetPedOccupyingVehicle(pOccupyingPed, pVehicle, uiSeat, uiDoor);
+
+        
+    } else {
+        SetVehicleInOutState(VEHICLE_INOUT_GETTING_IN);
+    }
+
+    return true;
+}
+
+bool CClientPed::GracefullyExitCar()
+{
+    // Check if we are already leaving a vehicle or aren't in a vehicle.
+    // Player leaves should be handled in CClientGame instead.
+    if (IsLeavingVehicle() || !IsInVehicle() || IsLocalPlayer() || !IsLocalEntity())
+    {
+        return false;
+    }
+
+    CClientVehicle* pOccupiedVehicle = GetOccupiedVehicle();
+
+    if (!pOccupiedVehicle)
+    {
+        return false;
+    }
+
+    unsigned char ucDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(GetGamePlayer(), pOccupiedVehicle->GetGameVehicle());
+    unsigned char ucSeat = GetOccupiedVehicleSeat();
+
+    if (ucDoor >= 2 && ucDoor <= 5)
+    {
+        ucDoor -= 2;
+    }
+
+    CLuaArguments Arguments;
+    Arguments.PushElement(this);            // ped
+    Arguments.PushNumber(ucSeat);           // seat
+    Arguments.PushNumber(ucDoor);           // Door
+
+    if (!this->CallEvent("onClientPedStartExitVehicle", Arguments, true))
+    {
+        // Event has been cancelled
+        return false;
+    }
+
+    m_ucLeavingDoor = ucDoor;
+    m_uiInOutSeat = GetOccupiedVehicleSeat();
+
+    SetLeavingVehicle(true);
+    SetInOutVehicle(pOccupiedVehicle);
+
+    GetOutOfVehicle(ucDoor);
+    SetVehicleInOutState(VEHICLE_INOUT_GETTING_OUT);
+
+    return true;
+}
+
 void CClientPed::GetOutOfVehicle(unsigned char ucDoor)
 {
     if (ucDoor != 0xFF)
@@ -2627,6 +2818,90 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
 
     // ControllerState checks and fixes are done at the same same as everything else unless using alt pulse order
     bool bDoControllerStateFixPulse = g_pClientGame->IsUsingAlternatePulseOrder() ? !bDoStandardPulses : bDoStandardPulses;
+
+    if (IsLocalEntity())
+    {
+        // Are we being carjacked?
+        if (!m_bIsLeavingVehicle && (IsGettingJacked() || IsLeavingVehicle()))
+        {
+            CClientPed* pJacker = GetJacker();
+            CClientVehicle* pOccupiedVehicle = GetOccupiedVehicle();
+
+            if (pJacker && pOccupiedVehicle)
+            {
+                unsigned char ucDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(GetGamePlayer(), pOccupiedVehicle->GetGameVehicle());
+                unsigned char ucSeat = GetOccupiedVehicleSeat();
+
+                if (ucDoor >= 2 && ucDoor <= 5)
+                {
+                    ucDoor -= 2;
+                }
+
+                m_ucLeavingDoor = ucDoor;
+                m_uiInOutSeat = GetOccupiedVehicleSeat();
+
+                SetLeavingVehicle(true);
+                SetInOutVehicle(pOccupiedVehicle);
+
+                SetVehicleInOutState(VEHICLE_INOUT_GETTING_OUT);
+            }
+        }
+
+        if (m_bIsLeavingVehicle && !IsLeavingVehicle() && !IsGettingJacked() && !IsGettingOutOfVehicle() && m_pInOutVehicle != NULL)
+        {
+            m_pInOutVehicle->UnpairPedAndVehicle(this);
+            m_pOccupyingVehicle = NULL;
+
+            m_pInOutVehicle->CalcAndUpdateCanBeDamagedFlag();
+            m_pInOutVehicle->CalcAndUpdateTyresCanBurstFlag();
+
+            CLuaArguments Arguments;
+            Arguments.PushElement(this);            // ped
+            Arguments.PushNumber(m_uiInOutSeat);    // seat
+
+            if (GetJacker())
+            {
+                Arguments.PushElement(GetJacker());     // ped who has carjacked us
+            }
+
+            this->CallEvent("onClientPedExitVehicle", Arguments, true);
+
+            m_pInOutVehicle = NULL;
+            m_bIsLeavingVehicle = false;
+            m_uiInOutSeat = NULL;
+            m_ucLeavingDoor = NULL;
+            SetJacker(NULL);
+            SetJacking(NULL);
+        }
+
+        if (m_bIsEnteringVehicle && !IsEnteringVehicle() && !IsGettingIntoVehicle() && m_pInOutVehicle != NULL)
+        {
+            CClientVehicle::SetPedOccupiedVehicle(this, m_pInOutVehicle, m_uiInOutSeat, m_ucEnteringDoor);
+            CClientVehicle::SetPedOccupyingVehicle(this, m_pInOutVehicle, m_uiInOutSeat, m_ucEnteringDoor);
+
+            m_pInOutVehicle->CalcAndUpdateCanBeDamagedFlag();
+            m_pInOutVehicle->CalcAndUpdateTyresCanBurstFlag();
+
+            CLuaArguments Arguments;
+            Arguments.PushElement(this);            // ped
+            Arguments.PushNumber(m_uiInOutSeat);    // seat
+
+            if (GetJacking())
+            {
+                Arguments.PushElement(GetJacking());     // ped we have carjacked
+            }
+
+            this->CallEvent("onClientPedEnterVehicle", Arguments, true);
+
+            m_pInOutVehicle = NULL;
+            m_bIsEnteringVehicle = false;
+            m_uiInOutSeat = NULL;
+            m_ucEnteringDoor = NULL;
+
+            SetJacker(NULL);
+            SetJacking(NULL);
+        }
+    }
 
     if (!bDoStandardPulses)
     {
@@ -4461,6 +4736,7 @@ void CClientPed::_GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, 
             {
                 // Create and set the get-in task
                 CTaskComplexEnterCarAsDriver* pInTask = g_pGame->GetTasks()->CreateTaskComplexEnterCarAsDriver(pGameVehicle);
+
                 if (pInTask)
                 {
                     pInTask->SetTargetDoor(ucDoor);

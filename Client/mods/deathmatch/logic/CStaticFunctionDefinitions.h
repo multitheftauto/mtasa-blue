@@ -148,7 +148,7 @@ public:
     static bool             IsPedHeadless(CClientPed& Ped, bool& bHeadless);
     static bool             IsPedFrozen(CClientPed& Ped, bool& bFrozen);
     static bool             GetPedOccupiedVehicleSeat(CClientPed& Ped, uint& uiSeat);
-    static CClientVehicle*  GetPedNearestVehicleEntryPoint(CClientPed& Ped, bool bCheckDriverDoor, bool bCheckPassengersDoors, uint& uiEntryPoint, CVector& vecClosestDoorPosition);
+    static CClientVehicle*  GetPedNearestVehicleEntryPoint(CClientPed& pPed, bool bCheckDriverDoor, bool bCheckPassengersDoors, uint& uiEntryPoint, CVector& vecClosestDoorPosition);
     static bool             IsPedFootBloodEnabled(CClientPed& Ped, bool& bHasFootBlood);
     static bool             GetPedCameraRotation(CClientPed& Ped, float& fRotation);
     static bool             GetPedWeaponMuzzlePosition(CClientPed& Ped, CVector& vecPosition);
@@ -189,6 +189,8 @@ public:
     static bool RemovePedFromVehicle(CClientPed* pPed);
     static bool WarpPedIntoVehicle(CClientPed* pPed, CClientVehicle* pVehicle, unsigned int uiSeat);
     static bool SetPedOxygenLevel(CClientEntity& Entity, float fOxygen);
+    static bool SetPedExitVehicle(CClientPed& pPed);
+    static bool SetPedEnterVehicle(CClientPed& pPed, CClientVehicle& pVehicle, unsigned int uiSeat);
 
     // Extra Clothes functions
     static bool GetBodyPartName(unsigned char ucID, SString& strOutName);

@@ -1538,10 +1538,11 @@ void CClientGame::UpdateVehicleInOut(void)
         if (m_bIsGettingOutOfVehicle)
         {
             // If we aren't working on leaving the car (he's eiter finished or cancelled/failed leaving)
-            if (!m_pLocalPlayer->IsLeavingVehicle())
+            if (!m_pLocalPlayer->IsLeavingVehicle() && !m_pLocalPlayer->IsGettingJacked())
             {
                 // Are we outside the car?
                 CClientVehicle* pVehicle = m_pLocalPlayer->GetRealOccupiedVehicle();
+
                 if (!pVehicle)
                 {
                     // Check if vehicle isn't local.
@@ -1592,7 +1593,7 @@ void CClientGame::UpdateVehicleInOut(void)
                     // Reset the vehicle in out stuff so we're ready for another car entry/leave.
                     // Don't allow a new entry/leave until we've gotten the notify return packet
                     ElementID ReasonVehicleID = m_VehicleInOutID;
-                    g_pClientGame->ResetVehicleInOut();
+                    ResetVehicleInOut();
 
                     if (!pInOutVehicle->IsLocalEntity())
                     {
@@ -1611,10 +1612,16 @@ void CClientGame::UpdateVehicleInOut(void)
                         Arguments.PushElement(m_pLocalPlayer);
                         Arguments.PushNumber(ucSeat);
                         pInOutVehicle->CallEvent("onClientVehicleExit", Arguments, true);
+
+                        Arguments.DeleteArguments();
+                        Arguments.PushElement(pInOutVehicle);
+                        Arguments.PushNumber(ucSeat);
+
+                        m_pLocalPlayer->CallEvent("onClientPlayerVehicleExit", Arguments, true);
                     }
                 }
                 // Are we still inside the car?
-                else
+                else if(!pVehicle->IsLocalEntity())
                 {
                     // Warp us out now to keep in sync with the server
                     m_pLocalPlayer->RemoveFromVehicle();
@@ -1794,6 +1801,12 @@ void CClientGame::UpdateVehicleInOut(void)
                     Arguments.PushElement(m_pLocalPlayer);
                     Arguments.PushNumber(ucSeat);
                     pInOutVehicle->CallEvent("onClientVehicleEnter", Arguments, true);
+
+                    Arguments.DeleteArguments();
+                    Arguments.PushElement(pInOutVehicle);
+                    Arguments.PushNumber(ucSeat);
+
+                    m_pLocalPlayer->CallEvent("onClientPlayerVehicleEnter", Arguments, true);
                 }
             }
         }
@@ -1855,6 +1868,8 @@ void CClientGame::UpdateVehicleInOut(void)
                     }
                 }
 
+                ResetVehicleInOut();
+
                 if (!pOccupiedVehicle->IsLocalEntity())
                 {
                     // We're not allowed to enter any vehicle before we get a confirm
@@ -1874,6 +1889,12 @@ void CClientGame::UpdateVehicleInOut(void)
                     Arguments.PushElement(m_pLocalPlayer);
                     Arguments.PushNumber(m_pLocalPlayer->GetOccupiedVehicleSeat());
                     pOccupiedVehicle->CallEvent("onClientVehicleExit", Arguments, true);
+
+                    Arguments.DeleteArguments();
+                    Arguments.PushElement(pOccupiedVehicle);
+                    Arguments.PushNumber(m_pLocalPlayer->GetOccupiedVehicleSeat());
+
+                    m_pLocalPlayer->CallEvent("onClientPlayerVehicleExit", Arguments, true);
 
                     CClientVehicle::UnpairPedAndVehicle(m_pLocalPlayer, pOccupiedVehicle);
                 }
@@ -2835,6 +2856,10 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientPedChoke", "", NULL, false);
     m_Events.AddEvent("onClientPedHeliKilled", "heli", NULL, false);
     m_Events.AddEvent("onClientPedHitByWaterCannon", "vehicle", NULL, false);
+    m_Events.AddEvent("onClientPedEnterVehicle", "ped, seat, jacking", NULL, false);
+    m_Events.AddEvent("onClientPedExitVehicle", "ped, seat, jacker", NULL, false);
+    m_Events.AddEvent("onClientPedStartEnterVehicle", "ped, seat, door, jacking", NULL, false);
+    m_Events.AddEvent("onClientPedStartExitVehicle", "ped, seat, door, jacker", NULL, false);
 
     // Vehicle events
     m_Events.AddEvent("onClientVehicleRespawn", "", NULL, false);
@@ -4506,6 +4531,14 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
                     AnimationId  animID;
                     GetDeathAnim(pDamagedPed, pEvent, animGroup, animID);
                     pDamagedPed->Kill(weaponUsed, hitZone, false, false, animGroup, animID);
+
+                    CClientVehicle* pOccupiedVehicle = pDamagedPed->GetOccupiedVehicle();
+
+                    if (pOccupiedVehicle)
+                    {
+                        pOccupiedVehicle->UnpairPedAndVehicle(pDamagedPed);
+                    }
+
                     return true;
                 }
                 if (fPreviousHealth > 0.0f)
@@ -4564,8 +4597,20 @@ void CClientGame::DeathHandler(CPed* pKilledPedSA, unsigned char ucDeathReason, 
 
     pKilledPed->CallEvent("onClientPedWasted", Arguments, true);
 
-    // Notify the server
-    SendPedWastedPacket(pKilledPed, INVALID_ELEMENT_ID, ucDeathReason, ucBodyPart);
+    if (!pKilledPed->IsLocalEntity())
+    {
+        // Notify the server
+        SendPedWastedPacket(pKilledPed, INVALID_ELEMENT_ID, ucDeathReason, ucBodyPart);
+    } 
+    else 
+    {
+        CClientVehicle* pOccupiedVehicle = pKilledPed->GetOccupiedVehicle();
+
+        if (pOccupiedVehicle)
+        {
+            pOccupiedVehicle->UnpairPedAndVehicle(pKilledPed);
+        }
+    }
 }
 
 bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedWith, int iModelIndex, float fDamageImpulseMag,
@@ -4983,6 +5028,287 @@ bool CClientGame::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
     return false;
 }
 
+bool CClientGame::ProcessExitVehicle()
+{
+    // Are we already sending an in/out request or not allowed to create a new in/out?
+    if (m_bNoNewVehicleTask                                  // Are we permitted to even enter a vehicle?
+        || m_VehicleInOutID != INVALID_ELEMENT_ID            // Make sure we're not already processing a vehicle enter (would refer to valid ID if we were)
+        || m_bIsGettingJacked                                // Make sure we're not currently getting carjacked &&
+        || m_bIsGettingIntoVehicle                           // We can't enter a vehicle we're currently entering...
+        || m_bIsGettingOutOfVehicle                          // We can't enter a vehicle we're currently leaving...
+        || CClientTime::GetTime() < m_ulLastVehicleInOutTime + VEHICLE_INOUT_DELAY            // We are trying to enter the vehicle to soon
+        )
+    {
+        return false;
+    }
+
+    // Reset the "is jacking" bit
+    m_bIsJackingVehicle = false;
+
+    // Got a local player model?
+    if (!m_pLocalPlayer)
+    {
+        // No local player. Stop.
+        return false;
+    }
+
+    CClientVehicle* pOccupiedVehicle = m_pLocalPlayer->GetOccupiedVehicle();
+
+    if (!pOccupiedVehicle)
+    {
+        return false;
+    }
+
+    unsigned char ucDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(m_pLocalPlayer->GetGamePlayer(), pOccupiedVehicle->GetGameVehicle());
+
+    if (pOccupiedVehicle->IsLocalEntity())
+    {
+        unsigned char ucSeat = m_pLocalPlayer->GetOccupiedVehicleSeat();
+        m_VehicleInOutID = pOccupiedVehicle->GetID();
+        m_ucVehicleInOutSeat = ucSeat;
+
+        m_VehicleInOutID = pOccupiedVehicle->GetID();
+        m_bIsGettingOutOfVehicle = true;
+        m_ulLastVehicleInOutTime = CClientTime::GetTime();
+
+        if (ucDoor >= 2 && ucDoor <= 5)
+        {
+            ucDoor -= 2;
+        }
+
+        m_pLocalPlayer->GetOutOfVehicle(ucDoor);
+        m_pLocalPlayer->SetVehicleInOutState(VEHICLE_INOUT_GETTING_OUT);
+
+        CLuaArguments Arguments;
+        Arguments.PushElement(m_pLocalPlayer);
+        Arguments.PushNumber(ucSeat);
+        Arguments.PushNumber(ucDoor);
+        pOccupiedVehicle->CallEvent("onClientVehicleStartExit", Arguments, true);
+
+        return true;
+    }
+
+    // We're about to exit a vehicle
+    // Send an in request
+    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+    if (!pBitStream)
+    {
+        return false;
+    }
+
+    // Write the vehicle id to it and that we're requesting to get out of it
+    pBitStream->Write(pOccupiedVehicle->GetID());
+    unsigned char ucAction = static_cast<unsigned char>(VEHICLE_REQUEST_OUT);
+    pBitStream->WriteBits(&ucAction, 4);
+
+    if (ucDoor >= 2 && ucDoor <= 5)
+    {
+        ucDoor -= 2;
+        pBitStream->WriteBits(&ucDoor, 2);
+    }
+
+    // Send and destroy it
+    g_pNet->SendPacket(PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+    g_pNet->DeallocateNetBitStream(pBitStream);
+
+    // We're now exiting a vehicle
+    m_bIsGettingOutOfVehicle = true;
+    m_ulLastVehicleInOutTime = CClientTime::GetTime();
+
+#ifdef MTA_DEBUG
+    g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_request_out");
+#endif
+
+    return true;
+}
+
+bool CClientGame::ProcessEnterVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, unsigned int uiDoor)
+{
+    // Are we already sending an in/out request or not allowed to create a new in/out?
+    if (m_bNoNewVehicleTask                                  // Are we permitted to even enter a vehicle?
+        || m_VehicleInOutID != INVALID_ELEMENT_ID            // Make sure we're not already processing a vehicle enter (would refer to valid ID if we were)
+        || m_bIsGettingJacked                                // Make sure we're not currently getting carjacked &&
+        || m_bIsGettingIntoVehicle                           // We can't enter a vehicle we're currently entering...
+        || m_bIsGettingOutOfVehicle                          // We can't enter a vehicle we're currently leaving...
+        || CClientTime::GetTime() < m_ulLastVehicleInOutTime + VEHICLE_INOUT_DELAY            // We are trying to enter the vehicle to soon
+        )
+    {
+        return false;
+    }
+
+    // Reset the "is jacking" bit
+    m_bIsJackingVehicle = false;
+
+    // Got a local player model?
+    if (!m_pLocalPlayer)
+    {
+        // No local player. Stop.
+        return false;
+    }
+
+    if (!pVehicle || !pVehicle->IsEnterable())
+    {
+        // Stop if there isn't a vehicle, or the vehicle is not enterable
+        return false;
+    }
+    
+    CVector vecPlayerPosition;
+    CVector vecVehiclePosition;
+    
+    m_pLocalPlayer->GetPosition(vecPlayerPosition);
+    pVehicle->GetPosition(vecVehiclePosition);
+
+    // Check if we are too far away from the vehicle.
+    if (DistanceBetweenPoints3D(vecPlayerPosition, vecVehiclePosition) > 20.0f)
+    {
+        return false;
+    }
+
+    // If the Jump task is playing and we are in water - I know right
+    // Kill the task.
+    //
+    CTask* pTask = m_pLocalPlayer->GetCurrentPrimaryTask();
+    if (pTask && pTask->GetTaskType() == TASK_COMPLEX_JUMP)            // Kill jump task - breaks warp in entry and doesn't really matter
+    {
+        if (pVehicle &&
+            (pVehicle->IsInWater() ||
+                m_pLocalPlayer->IsInWater()))            // Make sure we are about to warp in (this bug only happens when someone jumps into water with a vehicle)
+        {
+            m_pLocalPlayer->KillTask(3, true);            // Kill jump task if we are about to warp in
+        }
+    }
+
+    // Make sure we don't have any other primary tasks running, otherwise our 'enter-vehicle'
+    // task will replace it and fuck it up!
+    //
+    if (m_pLocalPlayer->GetCurrentPrimaryTask())
+    {
+        // We already have a primary task, so stop.
+        return false;
+    }
+
+    // Are we holding the aim_weapon key?
+    SBindableGTAControl* pBind = g_pCore->GetKeyBinds()->GetBindableFromControl("aim_weapon");
+    if (pBind && pBind->bState)
+    {
+        // Stop because the player is probably using rshift + f/g
+        return false;
+    }
+
+    if (m_pLocalPlayer->IsClimbing()               // Make sure we're not currently climbing
+        || m_pLocalPlayer->HasJetPack()            // Make sure we don't have a jetpack
+        || m_pLocalPlayer->IsUsingGun()            // Make sure we're not using a gun (have the gun task active) - we stop it in UpdatePlayerTasks anyway
+        || m_pLocalPlayer->IsRunningAnimation()            // Make sure we aren't running an animation
+        )
+    {
+        return false;
+    }
+
+    // If the vehicle's a boat, make sure we're standing on it (we need a dif task to enter boats properly)
+    if (pVehicle->GetVehicleType() == CLIENTVEHICLE_BOAT && m_pLocalPlayer->GetContactEntity() != pVehicle)
+    {
+        return false;
+    }
+
+    // Call the onClientVehicleStartEnter event for remote players
+    // Local player triggered before sending packet in CClientGame
+    CLuaArguments Arguments;
+    Arguments.PushElement(m_pLocalPlayer);            // player
+    Arguments.PushNumber(uiSeat);                     // seat
+    Arguments.PushNumber(uiDoor);                     // Door
+
+    if (!pVehicle->CallEvent("onClientVehicleStartEnter", Arguments, true))
+    {
+        // Event has been cancelled
+        return false;
+    }
+
+    if (pVehicle->IsLocalEntity())
+    {
+        CClientPed* pOccupyingPed = pVehicle->GetOccupant(uiSeat);
+
+        if (pOccupyingPed)
+        {
+            unsigned char ucOccupyingDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(pOccupyingPed->GetGamePlayer(), pVehicle->GetGameVehicle());
+            unsigned char ucOccupyingSeat = pOccupyingPed->GetOccupiedVehicleSeat();
+
+            if (ucOccupyingDoor >= 2 && ucOccupyingDoor <= 5)
+            {
+                ucOccupyingDoor -= 2;
+            }
+
+            CLuaArguments ExitArguments;
+            ExitArguments.PushElement(pOccupyingPed);           // ped
+            ExitArguments.PushNumber(ucOccupyingSeat);          // seat
+            ExitArguments.PushNumber(ucOccupyingDoor);          // door
+
+            ExitArguments.PushElement(m_pLocalPlayer);          // ped that is carjacking.
+
+            if (!pVehicle->CallEvent("onClientPedStartExitVehicle", ExitArguments, true))
+            {
+                // Event has been cancelled
+                return false;
+            }
+        }
+
+        m_VehicleInOutID = pVehicle->GetID();
+        m_ucVehicleInOutSeat = uiSeat;
+
+        m_VehicleInOutID = pVehicle->GetID();
+        m_bIsGettingIntoVehicle = true;
+        m_ulLastVehicleInOutTime = CClientTime::GetTime();
+    
+        m_pLocalPlayer->GetIntoVehicle(pVehicle, uiSeat, uiDoor);
+
+        if (pOccupyingPed) {
+            m_bIsJackingVehicle = true;
+
+            pOccupyingPed->SetJacker(m_pLocalPlayer);
+            m_pLocalPlayer->SetVehicleInOutState(VEHICLE_INOUT_JACKING);
+            pOccupyingPed->SetVehicleInOutState(VEHICLE_INOUT_GETTING_JACKED);
+    
+            CClientVehicle::SetPedOccupiedVehicle(pOccupyingPed, pVehicle, uiSeat, uiDoor);
+            CClientVehicle::SetPedOccupyingVehicle(pOccupyingPed, pVehicle, uiSeat, uiDoor);
+        } else {
+            m_pLocalPlayer->SetVehicleInOutState(VEHICLE_INOUT_GETTING_IN);
+        }
+
+        return true;
+    }
+
+    // Send an in request
+    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+    if (!pBitStream)
+    {
+        return false;
+    }
+
+    // Write the vehicle id to it and that we're requesting to get into it
+    pBitStream->Write(pVehicle->GetID());
+    unsigned char ucAction = static_cast<unsigned char>(VEHICLE_REQUEST_IN);
+    unsigned char ucSeat = static_cast<unsigned char>(uiSeat);
+    bool          bIsOnWater = pVehicle->IsOnWater();
+    unsigned char ucDoor = static_cast<unsigned char>(uiDoor);
+    pBitStream->WriteBits(&ucAction, 4);
+    pBitStream->WriteBits(&ucSeat, 4);
+    pBitStream->WriteBit(bIsOnWater);
+    pBitStream->WriteBits(&ucDoor, 3);
+
+    // Send and destroy it
+    g_pNet->SendPacket(PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+    g_pNet->DeallocateNetBitStream(pBitStream);
+
+    // We're now entering a vehicle
+    m_bIsGettingIntoVehicle = true;
+    m_ulLastVehicleInOutTime = CClientTime::GetTime();
+
+#ifdef MTA_DEBUG
+    g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_request_in");
+#endif
+
+    return true;
+}
+
 void CClientGame::ProcessVehicleInOutKey(bool bPassenger)
 {
     // Are we already sending an in/out request or not allowed to create a new in/out?
@@ -4996,9 +5322,6 @@ void CClientGame::ProcessVehicleInOutKey(bool bPassenger)
     {
         return;
     }
-
-    // Reset the "is jacking" bit
-    m_bIsJackingVehicle = false;
 
     // Got a local player model?
     if (!m_pLocalPlayer)
@@ -5020,65 +5343,7 @@ void CClientGame::ProcessVehicleInOutKey(bool bPassenger)
             return;
         }
 
-        unsigned char ucDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(m_pLocalPlayer->GetGamePlayer(), pOccupiedVehicle->GetGameVehicle());
-
-        if (pOccupiedVehicle->IsLocalEntity())
-        {
-            unsigned char ucSeat = m_pLocalPlayer->GetOccupiedVehicleSeat();
-            m_VehicleInOutID = pOccupiedVehicle->GetID();
-            m_ucVehicleInOutSeat = ucSeat;
-
-            m_VehicleInOutID = pOccupiedVehicle->GetID();
-            m_bIsGettingOutOfVehicle = true;
-            m_ulLastVehicleInOutTime = CClientTime::GetTime();
-
-            if (ucDoor >= 2 && ucDoor <= 5)
-            {
-                ucDoor -= 2;
-            }
-
-            m_pLocalPlayer->GetOutOfVehicle(ucDoor);
-            m_pLocalPlayer->SetVehicleInOutState(VEHICLE_INOUT_GETTING_OUT);
-
-            CLuaArguments Arguments;
-            Arguments.PushElement(m_pLocalPlayer);
-            Arguments.PushNumber(ucSeat);
-            Arguments.PushNumber(ucDoor);
-            pOccupiedVehicle->CallEvent("onClientVehicleStartExit", Arguments, true);
-
-            return;
-        }
-
-        // We're about to exit a vehicle
-        // Send an in request
-        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-        if (!pBitStream)
-        {
-            return;
-        }
-
-        // Write the vehicle id to it and that we're requesting to get out of it
-        pBitStream->Write(pOccupiedVehicle->GetID());
-        unsigned char ucAction = static_cast<unsigned char>(VEHICLE_REQUEST_OUT);
-        pBitStream->WriteBits(&ucAction, 4);
-
-        if (ucDoor >= 2 && ucDoor <= 5)
-        {
-            ucDoor -= 2;
-            pBitStream->WriteBits(&ucDoor, 2);
-        }
-
-        // Send and destroy it
-        g_pNet->SendPacket(PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
-        g_pNet->DeallocateNetBitStream(pBitStream);
-
-        // We're now exiting a vehicle
-        m_bIsGettingOutOfVehicle = true;
-        m_ulLastVehicleInOutTime = CClientTime::GetTime();
-
-#ifdef MTA_DEBUG
-        g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_request_out");
-#endif
+        ProcessExitVehicle();        
         return;
     }
 
@@ -5144,84 +5409,7 @@ void CClientGame::ProcessVehicleInOutKey(bool bPassenger)
         uiSeat = 0;
     }
 
-    if (!pVehicle || !pVehicle->IsEnterable())
-    {
-        // Stop if there isn't a vehicle, or the vehicle is not enterable
-        return;
-    }
-
-    // If the vehicle's a boat, make sure we're standing on it (we need a dif task to enter boats properly)
-    if (pVehicle->GetVehicleType() == CLIENTVEHICLE_BOAT && m_pLocalPlayer->GetContactEntity() != pVehicle)
-    {
-        return;
-    }
-
-    // Call the onClientVehicleStartEnter event for remote players
-    // Local player triggered before sending packet in CClientGame
-    CLuaArguments Arguments;
-    Arguments.PushElement(m_pLocalPlayer);            // player
-    Arguments.PushNumber(uiSeat);                     // seat
-    Arguments.PushNumber(uiDoor);                     // Door
-
-    if (!pVehicle->CallEvent("onClientVehicleStartEnter", Arguments, true))
-    {
-        // Event has been cancelled
-        return;
-    }
-
-    if (pVehicle->IsLocalEntity())
-    {
-        m_VehicleInOutID = pVehicle->GetID();
-        m_ucVehicleInOutSeat = uiSeat;
-
-        m_VehicleInOutID = pVehicle->GetID();
-        m_bIsGettingIntoVehicle = true;
-        m_ulLastVehicleInOutTime = CClientTime::GetTime();
-
-        m_pLocalPlayer->GetIntoVehicle(pVehicle, uiSeat, uiDoor);
-
-        CClientPed* pOccupyingPed = pVehicle->GetOccupant(uiSeat);
-
-        if (pOccupyingPed) {
-            m_bIsJackingVehicle = true;
-            m_pLocalPlayer->SetVehicleInOutState(VEHICLE_INOUT_JACKING);
-            pOccupyingPed->SetVehicleInOutState(VEHICLE_INOUT_GETTING_JACKED);
-        } else {
-            m_pLocalPlayer->SetVehicleInOutState(VEHICLE_INOUT_GETTING_IN);
-        }
-
-        return;
-    }
-
-    // Send an in request
-    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-    if (!pBitStream)
-    {
-        return;
-    }
-
-    // Write the vehicle id to it and that we're requesting to get into it
-    pBitStream->Write(pVehicle->GetID());
-    unsigned char ucAction = static_cast<unsigned char>(VEHICLE_REQUEST_IN);
-    unsigned char ucSeat = static_cast<unsigned char>(uiSeat);
-    bool          bIsOnWater = pVehicle->IsOnWater();
-    unsigned char ucDoor = static_cast<unsigned char>(uiDoor);
-    pBitStream->WriteBits(&ucAction, 4);
-    pBitStream->WriteBits(&ucSeat, 4);
-    pBitStream->WriteBit(bIsOnWater);
-    pBitStream->WriteBits(&ucDoor, 3);
-
-    // Send and destroy it
-    g_pNet->SendPacket(PACKET_ID_VEHICLE_INOUT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
-    g_pNet->DeallocateNetBitStream(pBitStream);
-
-    // We're now entering a vehicle
-    m_bIsGettingIntoVehicle = true;
-    m_ulLastVehicleInOutTime = CClientTime::GetTime();
-
-#ifdef MTA_DEBUG
-    g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_request_in");
-#endif
+    ProcessEnterVehicle(pVehicle, uiSeat, uiDoor);
 }
 
 // Shot compensation (Jax):
