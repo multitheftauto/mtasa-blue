@@ -143,6 +143,13 @@ inline SHttpRequestOptionsTx::SHttpRequestOptionsTx(const SHttpRequestOptions& i
     strPassword = in.strPassword;
 }
 
+struct SDownloadStatus
+{
+    uint uiAttemptNumber;   // 0=Queued 1+=Downloading
+    uint uiContentLength;   // Item total size. Will be 0 if http header 'Content-Length' is missing
+    uint uiBytesReceived;   // Download progress
+};
+
 // PFN_DOWNLOAD_FINISHED_CALLBACK is called once at the end of the download.
 // If bSuccess is true, then pData+dataSize will be set or the output file will be ready.
 // If bSuccess is false, then iErrorCode and CNetHTTPDownloadManagerInterface->GetError() will reveal the problem.
@@ -174,4 +181,8 @@ public:
     virtual void SetMaxConnections(int iMaxConnections) = 0;
 
     virtual void Reset(void) = 0;
+
+    // objectPtr and pfnDownloadFinishedCallback are used to identify the download and should be the same as when QueueFile was originally called
+    virtual bool CancelDownload(void* objectPtr, PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback) = 0;
+    virtual bool GetDownloadStatus(void* objectPtr, PFN_DOWNLOAD_FINISHED_CALLBACK pfnDownloadFinishedCallback, SDownloadStatus& outDownloadStatus) = 0;
 };
