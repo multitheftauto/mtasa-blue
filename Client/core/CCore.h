@@ -347,6 +347,7 @@ private:
     uint                 m_uiClientScriptFrameRateLimit;
     uint                 m_uiFrameRateLimit;
     double               m_dLastTimeMs;
+    double               m_dPrevOverrun;
     bool                 m_bWaitToSetNick;
     uint                 m_uiNewNickWaitFrames;
     EDiagnosticDebugType m_DiagnosticDebug;
