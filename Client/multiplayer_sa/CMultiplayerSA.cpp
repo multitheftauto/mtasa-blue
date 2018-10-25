@@ -370,7 +370,6 @@ ObjectDamageHandler*        m_pObjectDamageHandler = NULL;
 ObjectBreakHandler*         m_pObjectBreakHandler = NULL;
 FxSystemDestructionHandler* m_pFxSystemDestructionHandler = NULL;
 DrivebyAnimationHandler*    m_pDrivebyAnimationHandler = NULL;
-PedStepHandler*             m_pPedStepHandler = nullptr;
 WaterCannonHitWorldHandler* m_pWaterCannonHitWorldHandler = nullptr;
 
 CEntitySAInterface* dwSavedPlayerPointer = 0;
@@ -2280,11 +2279,6 @@ void CMultiplayerSA::SetFxSystemDestructionHandler(FxSystemDestructionHandler* p
 void CMultiplayerSA::SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler)
 {
     m_pDrivebyAnimationHandler = pHandler;
-}
-
-void CMultiplayerSA::SetPedStepHandler(PedStepHandler* pHandler)
-{
-    m_pPedStepHandler = pHandler;
 }
 
 void CMultiplayerSA::SetWaterCannonHitWorldHandler(WaterCannonHitWorldHandler* pHandler)
