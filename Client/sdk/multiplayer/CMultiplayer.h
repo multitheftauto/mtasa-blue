@@ -107,6 +107,7 @@ typedef void(GameModelRemoveHandler)(ushort usModelId);
 typedef void(GameEntityRenderHandler)(CEntitySAInterface* pEntity);
 typedef void(FxSystemDestructionHandler)(void* pFxSA);
 typedef AnimationId(DrivebyAnimationHandler)(AnimationId animGroup, AssocGroupId animId);
+typedef void(PedStepHandler)(CPedSAInterface* pPed, bool bFoot);
 typedef void(WaterCannonHitWorldHandler)(SWaterCannonHitEvent& event);
 
 /**
@@ -225,6 +226,7 @@ public:
     virtual void SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler) = 0;
     virtual void SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler) = 0;
     virtual void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler) = 0;
+    virtual void SetPedStepHandler(PedStepHandler* pHandler) = 0;
     virtual void SetWaterCannonHitWorldHandler(WaterCannonHitWorldHandler* pHandler) = 0;
 
     virtual void  AllowMouseMovement(bool bAllow) = 0;

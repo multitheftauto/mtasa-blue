@@ -527,7 +527,9 @@ private:
     static void StaticGameEntityRenderHandler(CEntitySAInterface* pEntity);
     static void StaticTaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     static void StaticFxSystemDestructionHandler(void* pFxSAInterface);
+    static void StaticPedStepHandler(CPedSAInterface* pPed, bool bFoot);
     static void StaticWaterCannonHitWorldHandler(SWaterCannonHitEvent& event);
+
     static AnimationId StaticDrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
 
     bool                              DamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
@@ -574,7 +576,6 @@ private:
     static void PostWeaponFire(void);
     static void BulletImpact(CPed* pInitiator, CEntity* pVictim, const CVector* pStartPosition, const CVector* pEndPosition);
     static void BulletFire(CPed* pInitiator, const CVector* pStartPosition, const CVector* pEndPosition);
-
 public:
     static bool StaticProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream);
 
@@ -617,6 +618,7 @@ public:
     void InsertAnimationAssociationToMap(CAnimBlendAssociationSAInterface* pAnimAssociation, const std::shared_ptr<CIFPAnimations>& pIFPAnimations);
     void RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation);
 
+    void PedStepHandler(CPedSAInterface* pPed, bool bFoot);
     void WaterCannonHitWorldHandler(SWaterCannonHitEvent& event);
 
 private:
