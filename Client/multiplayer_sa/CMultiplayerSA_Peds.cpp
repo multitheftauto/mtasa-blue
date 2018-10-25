@@ -16,7 +16,7 @@
 // Whenever a pedestrian's foot hits the ground
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-static PedStepHandler* pPedStepHandler;
+static PedStepHandler* pPedStepHandler = nullptr;
 
 void CMultiplayerSA::SetPedStepHandler(PedStepHandler* pHandler)
 {
