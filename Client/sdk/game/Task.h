@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TASK
-#define __CGAME_TASK
+#pragma once
 
 #include "TaskTypes.h"
 
@@ -68,5 +67,3 @@ public:
     virtual CTask* CreateFirstSubTask(CPed* pPed) = 0;
     virtual CTask* ControlSubTask(CPed* pPed) = 0;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CXMLATTRIBUTE_H
-#define __CXMLATTRIBUTE_H
+#pragma once
 
 #include "CXMLCommon.h"
 #include <string>
@@ -31,5 +30,3 @@ public:
 
     virtual void DeleteWrapper(void) = 0;
 };
-
-#endif

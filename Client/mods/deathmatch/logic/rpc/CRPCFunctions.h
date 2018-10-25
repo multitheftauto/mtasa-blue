@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CRPCFunctions_H
-#define __CRPCFunctions_H
+#pragma once
 
 class CRPCFunctions;
 
@@ -72,5 +71,3 @@ protected:
     static SFixedArray<SRPCHandler, NUM_RPC_FUNCS>        m_RPCHandlers;
     static SFixedArray<SElementRPCHandler, NUM_RPC_FUNCS> m_ElementRPCHandlers;
 };
-
-#endif

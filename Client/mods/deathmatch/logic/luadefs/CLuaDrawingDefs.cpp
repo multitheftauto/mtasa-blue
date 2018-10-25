@@ -15,41 +15,52 @@ extern bool g_bAllowAspectRatioAdjustment;
 
 void CLuaDrawingDefs::LoadFunctions(void)
 {
-    CLuaCFunctions::AddFunction("dxDrawLine", DxDrawLine);
-    CLuaCFunctions::AddFunction("dxDrawMaterialLine3D", DxDrawMaterialLine3D);
-    CLuaCFunctions::AddFunction("dxDrawMaterialSectionLine3D", DxDrawMaterialSectionLine3D);
-    CLuaCFunctions::AddFunction("dxDrawLine3D", DxDrawLine3D);
-    CLuaCFunctions::AddFunction("dxDrawText", DxDrawText);
-    CLuaCFunctions::AddFunction("dxDrawRectangle", DxDrawRectangle);
-    CLuaCFunctions::AddFunction("dxDrawImage", DxDrawImage);
-    CLuaCFunctions::AddFunction("dxDrawImageSection", DxDrawImageSection);
-    CLuaCFunctions::AddFunction("dxGetTextWidth", DxGetTextWidth);
-    CLuaCFunctions::AddFunction("dxGetFontHeight", DxGetFontHeight);
-    CLuaCFunctions::AddFunction("dxCreateFont", DxCreateFont);
-    CLuaCFunctions::AddFunction("dxCreateTexture", DxCreateTexture);
-    CLuaCFunctions::AddFunction("dxCreateShader", DxCreateShader);
-    CLuaCFunctions::AddFunction("dxCreateRenderTarget", DxCreateRenderTarget);
-    CLuaCFunctions::AddFunction("dxCreateScreenSource", DxCreateScreenSource);
-    CLuaCFunctions::AddFunction("dxGetMaterialSize", DxGetMaterialSize);
-    CLuaCFunctions::AddFunction("dxSetShaderValue", DxSetShaderValue);
-    CLuaCFunctions::AddFunction("dxSetShaderTessellation", DxSetShaderTessellation);
-    CLuaCFunctions::AddFunction("dxSetShaderTransform", DxSetShaderTransform);
-    CLuaCFunctions::AddFunction("dxSetRenderTarget", DxSetRenderTarget);
-    CLuaCFunctions::AddFunction("dxUpdateScreenSource", DxUpdateScreenSource);
-    CLuaCFunctions::AddFunction("dxGetStatus", DxGetStatus);
-    CLuaCFunctions::AddFunction("dxSetTestMode", DxSetTestMode);
-    CLuaCFunctions::AddFunction("dxGetTexturePixels", DxGetTexturePixels);
-    CLuaCFunctions::AddFunction("dxSetTexturePixels", DxSetTexturePixels);
-    CLuaCFunctions::AddFunction("dxGetPixelsSize", DxGetPixelsSize);
-    CLuaCFunctions::AddFunction("dxGetPixelsFormat", DxGetPixelsFormat);
-    CLuaCFunctions::AddFunction("dxConvertPixels", DxConvertPixels);
-    CLuaCFunctions::AddFunction("dxGetPixelColor", DxGetPixelColor);
-    CLuaCFunctions::AddFunction("dxSetPixelColor", DxSetPixelColor);
-    CLuaCFunctions::AddFunction("dxSetBlendMode", DxSetBlendMode);
-    CLuaCFunctions::AddFunction("dxGetBlendMode", DxGetBlendMode);
-    CLuaCFunctions::AddFunction("dxSetAspectRatioAdjustmentEnabled", DxSetAspectRatioAdjustmentEnabled);
-    CLuaCFunctions::AddFunction("dxIsAspectRatioAdjustmentEnabled", DxIsAspectRatioAdjustmentEnabled);
-    CLuaCFunctions::AddFunction("dxSetTextureEdge", DxSetTextureEdge);
+    std::map<const char*, lua_CFunction> functions{
+        {"dxDrawLine", DxDrawLine},
+        {"dxDrawMaterialLine3D", DxDrawMaterialLine3D},
+        {"dxDrawMaterialSectionLine3D", DxDrawMaterialSectionLine3D},
+        {"dxDrawLine3D", DxDrawLine3D},
+        {"dxDrawText", DxDrawText},
+        {"dxDrawRectangle", DxDrawRectangle},
+        {"dxDrawCircle", DxDrawCircle},
+        {"dxDrawImage", DxDrawImage},
+        {"dxDrawImageSection", DxDrawImageSection},
+        {"dxDrawPrimitive", DxDrawPrimitive},
+        {"dxDrawMaterialPrimitive", DxDrawMaterialPrimitive},
+        {"dxGetTextWidth", DxGetTextWidth},
+        {"dxGetFontHeight", DxGetFontHeight},
+        {"dxCreateFont", DxCreateFont},
+        {"dxCreateTexture", DxCreateTexture},
+        {"dxCreateShader", DxCreateShader},
+        {"dxCreateRenderTarget", DxCreateRenderTarget},
+        {"dxCreateScreenSource", DxCreateScreenSource},
+        {"dxGetMaterialSize", DxGetMaterialSize},
+        {"dxSetShaderValue", DxSetShaderValue},
+        {"dxSetShaderTessellation", DxSetShaderTessellation},
+        {"dxSetShaderTransform", DxSetShaderTransform},
+        {"dxSetRenderTarget", DxSetRenderTarget},
+        {"dxUpdateScreenSource", DxUpdateScreenSource},
+        {"dxGetStatus", DxGetStatus},
+        {"dxSetTestMode", DxSetTestMode},
+        {"dxGetTexturePixels", DxGetTexturePixels},
+        {"dxSetTexturePixels", DxSetTexturePixels},
+        {"dxGetPixelsSize", DxGetPixelsSize},
+        {"dxGetPixelsFormat", DxGetPixelsFormat},
+        {"dxConvertPixels", DxConvertPixels},
+        {"dxGetPixelColor", DxGetPixelColor},
+        {"dxSetPixelColor", DxSetPixelColor},
+        {"dxSetBlendMode", DxSetBlendMode},
+        {"dxGetBlendMode", DxGetBlendMode},
+        {"dxSetAspectRatioAdjustmentEnabled", DxSetAspectRatioAdjustmentEnabled},
+        {"dxIsAspectRatioAdjustmentEnabled", DxIsAspectRatioAdjustmentEnabled},
+        {"dxSetTextureEdge", DxSetTextureEdge},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaDrawingDefs::AddClass(lua_State* luaVM)
@@ -402,6 +413,74 @@ int CLuaDrawingDefs::DxDrawRectangle(lua_State* luaVM)
     return 1;
 }
 
+int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
+{
+    CVector2D vecPosition;
+    float     fRadius;
+    float     fStartAngle;
+    float     fStopAngle;
+    SColor    color;
+    SColor    colorCenter;
+    short     siSegments;
+    float     fRatio;
+    bool      bPostGUI;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadVector2D(vecPosition);
+    argStream.ReadNumber(fRadius);
+    argStream.ReadNumber(fStartAngle, 0);
+    argStream.ReadNumber(fStopAngle, 360);
+    argStream.ReadColor(color, 0xFFFFFFFF);
+    argStream.ReadColor(colorCenter, color);
+    argStream.ReadNumber(siSegments, 32);
+    argStream.ReadNumber(fRatio, 1);
+    argStream.ReadBool(bPostGUI, false);
+
+    if (!argStream.HasErrors())
+    {
+        const short siMinimumSegments = 3;
+        const short siMaximumSegments = 1024;
+        if (siSegments >= siMinimumSegments && siSegments <= siMaximumSegments)
+        {
+            const float fMinimumRatio = 0;
+            const float fMaximumRatio = 100;
+            if (fRatio > fMinimumRatio && fRatio <= fMaximumRatio)
+            {
+                if (fRadius > 0 && fStartAngle != fStopAngle)
+                {
+                    if (fStopAngle < fStartAngle)
+                        std::swap(fStopAngle, fStartAngle);
+
+                    // Clamp the angle, so we never draw more than 360 degrees
+                    if (fStartAngle + 360.0f < fStopAngle)
+                        fStopAngle = fStartAngle + 360.0f;
+
+                    g_pCore->GetGraphics()->DrawCircleQueued(vecPosition.fX, vecPosition.fY, fRadius, fStartAngle, fStopAngle, color, colorCenter, siSegments,
+                                                             fRatio, bPostGUI);
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+            }
+            else
+            {
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+        }
+        else
+        {
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaDrawingDefs::DxDrawImage(lua_State* luaVM)
 {
     //  bool dxDrawImage ( float posX, float posY, float width, float height, string filepath [, float rotation = 0, float rotationCenterOffsetX = 0,
@@ -483,6 +562,102 @@ int CLuaDrawingDefs::DxDrawImageSection(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
+{
+    // bool dxDrawPrimitive (string primitiveType, bool postGUI, table vertice1, ...)
+    D3DPRIMITIVETYPE    ePrimitiveType;
+    auto                pVecVertices = new std::vector<PrimitiveVertice>();
+    bool                bPostGUI;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadEnumString(ePrimitiveType);
+    argStream.ReadBool(bPostGUI);
+
+    while (argStream.NextIsTable())
+    {
+        std::vector<float> vecTableContent;
+        argStream.ReadNumberTable(vecTableContent);
+        switch (vecTableContent.size())
+        {
+            case PrimitiveVerticeSizes::VERT_XY:
+                pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], 0, (DWORD)0xFFFFFFFF});
+                break;
+            case PrimitiveVerticeSizes::VERT_XY_COLOR:
+                pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(vecTableContent[2])});
+                break;
+        }
+    }
+
+    if (!argStream.HasErrors())
+    {
+        if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
+        {
+            g_pCore->GetGraphics()->DrawPrimitiveQueued(pVecVertices, ePrimitiveType, bPostGUI);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }       
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    // Failed
+    delete pVecVertices;
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
+{
+    // bool dxDrawPrimitive (string primitiveType, dxMaterial material, bool postGUI, table vertice1, ...)
+    D3DPRIMITIVETYPE    ePrimitiveType;
+    auto                pVecVertices = new std::vector<PrimitiveMaterialVertice>();
+    CClientMaterial*    pMaterialElement;
+    bool                bPostGUI;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadEnumString(ePrimitiveType);
+    MixedReadMaterialString(argStream, pMaterialElement);
+    argStream.ReadBool(bPostGUI);
+
+    while (argStream.NextIsTable())
+    {
+        std::vector<float> vecTableContent;
+        argStream.ReadNumberTable(vecTableContent);
+        switch (vecTableContent.size())
+        {
+            case PrimitiveVerticeSizes::VERT_XY_UV:
+                pVecVertices->push_back(
+                    PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], 0, (DWORD)0xFFFFFFFF, vecTableContent[2], vecTableContent[3]});
+                break;
+            case PrimitiveVerticeSizes::VERT_XY_COLOR_UV:
+                pVecVertices->push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], 0, static_cast<DWORD>(vecTableContent[2]),
+                                                               vecTableContent[3], vecTableContent[4]});
+                break;
+        }
+    }
+
+    if (!argStream.HasErrors())
+    {
+        if (pMaterialElement && g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
+        {
+            g_pCore->GetGraphics()->DrawMaterialPrimitiveQueued(pVecVertices, ePrimitiveType, pMaterialElement->GetMaterialItem(), bPostGUI);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    // Failed
+    delete pVecVertices;
     lua_pushboolean(luaVM, false);
     return 1;
 }
@@ -746,69 +921,101 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
 {
-    //  element dxCreateShader( string filepath [, float priority = 0, float maxdistance = 0, bool layered = false, string elementTypes =
+    //  element dxCreateShader( string filepath / string raw_data [, float priority = 0, float maxdistance = 0, bool layered = false, string elementTypes =
     //  "world,vehicle,object,other" ] )
-    SString                      strFilePath;
+    SString                      strFile;
     float                        fPriority;
     float                        fMaxDistance;
     bool                         bLayered;
     std::vector<EEntityTypeMask> elementTypeList;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strFilePath);
+    argStream.ReadString(strFile);
     argStream.ReadNumber(fPriority, 0.0f);
     argStream.ReadNumber(fMaxDistance, 0.0f);
     argStream.ReadBool(bLayered, false);
     argStream.ReadEnumStringList(elementTypeList, "world,vehicle,object,other");
 
-    if (!argStream.HasErrors())
-    {
-        int iEntityTypeMaskResult = 0;
-        for (uint i = 0; i < elementTypeList.size(); i++)
-            iEntityTypeMaskResult |= elementTypeList[i];
-
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pParentResource = pLuaMain->GetResource();
-            CResource* pFileResource = pParentResource;
-            SString    strPath, strMetaPath;
-            if (CResourceManager::ParseResourcePathInput(strFilePath, pFileResource, &strPath, &strMetaPath))
-            {
-                if (FileExists(strPath))
-                {
-                    SString        strRootPath = strPath.Left(strPath.length() - strMetaPath.length());
-                    SString        strStatus;
-                    CClientShader* pShader = g_pClientGame->GetManager()->GetRenderElementManager()->CreateShader(
-                        strPath, strRootPath, strStatus, fPriority, fMaxDistance, bLayered, false, iEntityTypeMaskResult);
-                    if (pShader)
-                    {
-                        // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's
-                        // ElementGroup? **
-                        pShader->SetParent(pParentResource->GetResourceDynamicEntity());
-                        lua_pushelement(luaVM, pShader);
-                        lua_pushstring(luaVM, strStatus);            // String containing name of technique being used.
-                        return 2;
-                    }
-                    else
-                    {
-                        // Replace any path in the error message with our own one
-                        SString strRootPathWithoutResource = strRootPath.Left(strRootPath.TrimEnd("\\").length() - SStringX(pFileResource->GetName()).length());
-                        strStatus = strStatus.ReplaceI(strRootPathWithoutResource, "");
-                        argStream.SetCustomError(strFilePath, strStatus);
-                    }
-                }
-                else
-                    argStream.SetCustomError(strFilePath, "File not found");
-            }
-            else
-                argStream.SetCustomError(strFilePath, "Bad file path");
-        }
-    }
     if (argStream.HasErrors())
+    {
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushnil(luaVM);
+        return 1;
+    }
 
-    // error: bad arguments
+    if (strFile.empty())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, "expected non-empty string at argument 1");
+        lua_pushnil(luaVM);
+        return 1;
+    }
+
+    CLuaMain* const pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+
+    if (!pLuaMain)
+    {
+        lua_pushnil(luaVM);
+        return 1;
+    }
+
+    int iEntityTypeMaskResult = 0;
+
+    for (EEntityTypeMask elementType : elementTypeList)
+        iEntityTypeMaskResult |= elementType;
+
+    CResource* pParentResource = pLuaMain->GetResource();
+    CResource* pFileResource = pParentResource;
+    SString    strPath, strMetaPath;
+
+    bool bIsRawData = false;
+
+    const bool bValidFilePath = CResourceManager::ParseResourcePathInput(strFile, pFileResource, &strPath, &strMetaPath);
+
+    if (!bValidFilePath || (strFile[0] != '@' && strFile[0] != ':'))
+    {
+        bIsRawData = (strFile.find("technique ") != std::string::npos) &&
+            (strFile.find("pass ") != std::string::npos) &&
+            (strFile.find('{') != std::string::npos) &&
+            (strFile.find('}') != std::string::npos);
+    }
+
+    SString strRootPath;
+
+    if (bIsRawData)
+    {
+        strPath = strFile;
+        pFileResource = pParentResource;
+        strRootPath = pFileResource->GetResourceDirectoryPath(ACCESS_PUBLIC, strMetaPath);
+    }
+    else
+    {
+        if (!pFileResource || !FileExists(strPath))
+        {
+            argStream.SetCustomError(strFile, "file doesn't exist");
+            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
+        strRootPath = strPath.Left(strPath.length() - strMetaPath.length());
+    }
+
+    SString        strStatus;
+    CClientShader* pShader = g_pClientGame->GetManager()->GetRenderElementManager()->CreateShader(
+        strPath, strRootPath, bIsRawData, strStatus, fPriority, fMaxDistance, bLayered, false, iEntityTypeMaskResult);
+
+    if (pShader)
+    {
+        pShader->SetParent(pParentResource->GetResourceDynamicEntity());
+        lua_pushelement(luaVM, pShader);
+        lua_pushstring(luaVM, strStatus);
+        return 2;
+    }
+
+    // Replace any path in the error message with our own one
+    SString strRootPathWithoutResource = strRootPath.Left(strRootPath.TrimEnd("\\").length() - SStringX(pFileResource->GetName()).length());
+    strStatus = strStatus.ReplaceI(strRootPathWithoutResource, "");
+    argStream.SetCustomError(bIsRawData ? "raw data" : strFile, strStatus);
     lua_pushboolean(luaVM, false);
     return 1;
 }
@@ -925,7 +1132,45 @@ int CLuaDrawingDefs::DxSetShaderValue(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Try each mixed type in turn
-        if (argStream.NextIsUserData())
+        if (argStream.NextIsUserDataOfType<CLuaVector2D>())
+        {
+            CVector2D vecValue;
+            argStream.ReadVector2D(vecValue);
+
+            bool bResult = pShader->GetShaderItem()->SetValue(strName, &vecValue.fX, 2);
+            lua_pushboolean(luaVM, bResult);
+            return 1;
+        }
+        else if (argStream.NextIsUserDataOfType<CLuaVector3D>())
+        {
+            CVector vecValue;
+            argStream.ReadVector3D(vecValue);
+
+            bool bResult = pShader->GetShaderItem()->SetValue(strName, &vecValue.fX, 3);
+            lua_pushboolean(luaVM, bResult);
+            return 1;
+        }
+        else if (argStream.NextIsUserDataOfType<CLuaVector4D>())
+        {
+            CVector4D vecValue;
+            argStream.ReadVector4D(vecValue);
+
+            bool bResult = pShader->GetShaderItem()->SetValue(strName, &vecValue.fX, 4);
+            lua_pushboolean(luaVM, bResult);
+            return 1;
+        }
+        else if (argStream.NextIsUserDataOfType<CLuaMatrix>())
+        {
+            CMatrix matValue;
+            argStream.ReadMatrix(matValue);
+            float fBuffer[16];
+            matValue.GetBuffer(fBuffer);
+
+            bool bResult = pShader->GetShaderItem()->SetValue(strName, fBuffer, 16);
+            lua_pushboolean(luaVM, bResult);
+            return 1;
+        }
+        else if (argStream.NextIsUserData())
         {
             // Texture
             CClientTexture* pTexture;

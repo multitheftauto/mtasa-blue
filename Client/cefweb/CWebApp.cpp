@@ -31,6 +31,8 @@ void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRe
     command_line->AppendSwitch("disable-gpu");
     // command_line->AppendSwitch("disable-d3d11");
     command_line->AppendSwitch("enable-begin-frame-scheduling");
+
+    command_line->AppendSwitchWithValue("autoplay-policy", "no-user-gesture-required");
 }
 
 CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& scheme_name,

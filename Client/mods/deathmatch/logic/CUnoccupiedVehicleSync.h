@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CUNOCCUPIEDVEHICLESYNC_H
-#define __CUNOCCUPIEDVEHICLESYNC_H
+#pragma once
 
 #include <CClientCommon.h>
 #include "CDeathmatchVehicle.h"
@@ -46,5 +45,3 @@ private:
     CMappedList<CDeathmatchVehicle*> m_List;
     unsigned long                    m_ulLastSyncTime;
 };
-
-#endif

@@ -62,8 +62,12 @@ BOOL WINAPI ConsoleEventHandler(DWORD dwCtrlType)
     {
         if (g_pGame)
         {
-            // Graceful close on Ctrl-C or Ctrl-Break
-            g_pGame->SetIsFinished(true);
+            // If we have nothing in the input buffer, let's close the server, otherwise just reset input
+            if (!g_pServerInterface->ResetInput())
+            {
+                // Graceful close on Ctrl-C or Ctrl-Break
+                g_pGame->SetIsFinished(true);
+            }
             return TRUE;
         }
     }
@@ -74,7 +78,8 @@ void sighandler(int sig)
 {
     if (sig == SIGTERM || sig == SIGINT)
     {
-        if (g_pGame)
+        // If we received a Ctrl-C, let's try resetting input buffer first, otherwise close the server
+        if (g_pGame && (sig != SIGINT || (sig == SIGINT && !g_pServerInterface->ResetInput())))
         {
             // Graceful close on Ctrl-C or 'kill'
             g_pGame->SetIsFinished(true);
@@ -469,6 +474,8 @@ void CGame::DoPulse(void)
 
     CLOCK_CALL1(m_pAsyncTaskScheduler->CollectResults());
 
+    CLOCK_CALL1(m_pMapManager->GetWeather()->DoPulse(););
+
     PrintLogOutputFromNetModule();
     m_pScriptDebugging->UpdateLogOutput();
 
@@ -512,7 +519,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pRegisteredCommands = new CRegisteredCommands(m_pACLManager);
     m_pLuaManager = new CLuaManager(m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pRegisteredCommands,
                                     m_pMapManager, &m_Events);
-    m_pConsole = new CConsole(m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager, m_pLuaManager, &m_WhoWas,
+    m_pConsole = new CConsole(m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager, m_pLuaManager,
                               m_pBanManager, m_pACLManager);
     m_pMainConfig = new CMainConfig(m_pConsole, m_pLuaManager);
     m_pRPCFunctions = new CRPCFunctions;
@@ -1784,9 +1791,6 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                     return;
                                 }
                             #endif
-
-                                // Add him to the whowas list
-                                m_WhoWas.Add(szNick, Packet.GetSourceIP(), pPlayer->GetSerial(), pPlayer->GetPlayerVersion(), pPlayer->GetAccount()->GetName());
 
                                 PlayerCompleteConnect(pPlayer);
                             }

@@ -46,31 +46,6 @@ int CLuaFunctionDefs::CreateExplosion(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::CreateFire(lua_State* luaVM)
-{
-    //  bool createFire ( float x, float y, float z [, float size = 1.8 ] )
-    CVector vecPosition;
-    float   fSize;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadNumber(fSize, 1.8f);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::CreateFire(vecPosition, fSize))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
 int CLuaFunctionDefs::GetTime_(lua_State* luaVM)
 {
     // Get the time
@@ -1571,6 +1546,40 @@ int CLuaFunctionDefs::ResetVehiclesLODDistance(lua_State* luaVM)
     g_pGame->GetSettings()->ResetVehiclesLODDistance();
     lua_pushboolean(luaVM, true);
     return 1;
+}
+
+int CLuaFunctionDefs::GetPedsLODDistance(lua_State* luaVM) 
+{  
+    lua_pushnumber(luaVM, g_pGame->GetSettings()->GetPedsLODDistance());
+    return 1; 
+}
+ 
+int CLuaFunctionDefs::SetPedsLODDistance(lua_State* luaVM) 
+{ 
+    float fPedsDistance; 
+ 
+    CScriptArgReader argStream(luaVM); 
+    argStream.ReadNumber(fPedsDistance); 
+ 
+    if (!argStream.HasErrors()) 
+    {
+        fPedsDistance = Clamp(0.0f, fPedsDistance, 500.0f);
+        g_pGame->GetSettings()->SetPedsLODDistance(fPedsDistance); 
+        lua_pushboolean(luaVM, true);
+        return 1; 
+    } 
+    else 
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage()); 
+ 
+    lua_pushboolean(luaVM, false); 
+    return 1; 
+}
+ 
+int CLuaFunctionDefs::ResetPedsLODDistance(lua_State* luaVM) 
+{ 
+    g_pGame->GetSettings()->ResetPedsLODDistance(); 
+    lua_pushboolean(luaVM, true); 
+    return 1; 
 }
 
 int CLuaFunctionDefs::GetFogDistance(lua_State* luaVM)

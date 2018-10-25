@@ -8,8 +8,6 @@
  *
  *****************************************************************************/
 
-#ifndef CFILEREADER_H
-#define CFILEREADER_H
 #pragma once
 
 #include <cstdint>
@@ -24,6 +22,7 @@ public:
 
     CFileReader(void);
     bool LoadFileToMemory(const SString& strFilePath);
+    bool LoadDataBufferToMemory(const SString& buffer);
     // Do not call any file reader functions after calling this function
     void FreeFileReaderMemory(void);
 
@@ -43,5 +42,3 @@ private:
     std::vector<char> m_vecFileDataBuffer;
     std::uint32_t     m_u32BytesReadFromBuffer;
 };
-
-#endif

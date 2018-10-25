@@ -15,29 +15,37 @@
 
 void CLuaWeaponDefs::LoadFunctions(void)
 {
-    CLuaCFunctions::AddFunction("getWeaponNameFromID", GetWeaponNameFromID);
-    CLuaCFunctions::AddFunction("getWeaponIDFromName", GetWeaponIDFromName);
-    CLuaCFunctions::AddFunction("getSlotFromWeapon", GetSlotFromWeapon);
-    CLuaCFunctions::AddFunction("createWeapon", CreateWeapon);
-    CLuaCFunctions::AddFunction("setWeaponProperty", SetWeaponProperty);
-    CLuaCFunctions::AddFunction("getWeaponProperty", GetWeaponProperty);
-    CLuaCFunctions::AddFunction("getOriginalWeaponProperty", GetOriginalWeaponProperty);
-    CLuaCFunctions::AddFunction("fireWeapon", FireWeapon);
-    CLuaCFunctions::AddFunction("setWeaponState", SetWeaponState);
-    CLuaCFunctions::AddFunction("getWeaponState", GetWeaponState);
-    CLuaCFunctions::AddFunction("setWeaponTarget", SetWeaponTarget);
-    CLuaCFunctions::AddFunction("getWeaponTarget", GetWeaponTarget);
-    // CLuaCFunctions::AddFunction ( "setWeaponOwner", SetWeaponOwner );
-    CLuaCFunctions::AddFunction("getWeaponOwner", GetWeaponOwner);
-    CLuaCFunctions::AddFunction("setWeaponFlags", SetWeaponFlags);
-    CLuaCFunctions::AddFunction("getWeaponFlags", GetWeaponFlags);
-    CLuaCFunctions::AddFunction("setWeaponFiringRate", SetWeaponFiringRate);
-    CLuaCFunctions::AddFunction("getWeaponFiringRate", GetWeaponFiringRate);
-    CLuaCFunctions::AddFunction("resetWeaponFiringRate", ResetWeaponFiringRate);
-    CLuaCFunctions::AddFunction("getWeaponAmmo", GetWeaponAmmo);
-    CLuaCFunctions::AddFunction("getWeaponClipAmmo", GetWeaponClipAmmo);
-    CLuaCFunctions::AddFunction("setWeaponAmmo", SetWeaponAmmo);
-    CLuaCFunctions::AddFunction("setWeaponClipAmmo", SetWeaponClipAmmo);
+    std::map<const char*, lua_CFunction> functions{
+        {"getWeaponNameFromID", GetWeaponNameFromID},
+        {"getWeaponIDFromName", GetWeaponIDFromName},
+        {"getSlotFromWeapon", GetSlotFromWeapon},
+        {"createWeapon", CreateWeapon},
+        {"setWeaponProperty", SetWeaponProperty},
+        {"getWeaponProperty", GetWeaponProperty},
+        {"getOriginalWeaponProperty", GetOriginalWeaponProperty},
+        {"fireWeapon", FireWeapon},
+        {"setWeaponState", SetWeaponState},
+        {"getWeaponState", GetWeaponState},
+        {"setWeaponTarget", SetWeaponTarget},
+        {"getWeaponTarget", GetWeaponTarget},
+        // {"setWeaponOwner", SetWeaponOwner},
+        {"getWeaponOwner", GetWeaponOwner},
+        {"setWeaponFlags", SetWeaponFlags},
+        {"getWeaponFlags", GetWeaponFlags},
+        {"setWeaponFiringRate", SetWeaponFiringRate},
+        {"getWeaponFiringRate", GetWeaponFiringRate},
+        {"resetWeaponFiringRate", ResetWeaponFiringRate},
+        {"getWeaponAmmo", GetWeaponAmmo},
+        {"getWeaponClipAmmo", GetWeaponClipAmmo},
+        {"setWeaponAmmo", SetWeaponAmmo},
+        {"setWeaponClipAmmo", SetWeaponClipAmmo},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaWeaponDefs::AddClass(lua_State* luaVM)

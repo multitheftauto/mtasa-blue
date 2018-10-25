@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CFX
-#define __CFX
+#pragma once
 
 #include "RenderWare.h"
 
@@ -37,5 +36,3 @@ public:
     virtual void TriggerBulletSplash(CVector& vecPosition) = 0;
     virtual void TriggerFootSplash(CVector& vecPosition) = 0;
 };
-
-#endif

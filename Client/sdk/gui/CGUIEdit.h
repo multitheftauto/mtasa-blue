@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIEDIT_H
-#define __CGUIEDIT_H
+#pragma once
 
 #include "CGUIElement.h"
 #include "CGUICallback.h"
@@ -43,5 +42,3 @@ public:
     virtual void SetRenderingEndedHandler(GUI_CALLBACK Callback) = 0;
     virtual void SetRenderingStartedHandler(GUI_CALLBACK Callback) = 0;
 };
-
-#endif

@@ -13,53 +13,61 @@
 
 void CLuaAudioDefs::LoadFunctions(void)
 {
-    // Audio funcs
-    CLuaCFunctions::AddFunction("playSoundFrontEnd", PlaySoundFrontEnd);
-    CLuaCFunctions::AddFunction("setAmbientSoundEnabled", SetAmbientSoundEnabled);
-    CLuaCFunctions::AddFunction("isAmbientSoundEnabled", IsAmbientSoundEnabled);
-    CLuaCFunctions::AddFunction("resetAmbientSounds", ResetAmbientSounds);
-    CLuaCFunctions::AddFunction("setWorldSoundEnabled", SetWorldSoundEnabled);
-    CLuaCFunctions::AddFunction("isWorldSoundEnabled", IsWorldSoundEnabled);
-    CLuaCFunctions::AddFunction("resetWorldSounds", ResetWorldSounds);
-    CLuaCFunctions::AddFunction("playSFX", PlaySFX);
-    CLuaCFunctions::AddFunction("playSFX3D", PlaySFX3D);
-    CLuaCFunctions::AddFunction("getSFXStatus", GetSFXStatus);
+    std::map<const char*, lua_CFunction> functions{
+        // Audio funcs
+        {"playSoundFrontEnd", PlaySoundFrontEnd},
+        {"setAmbientSoundEnabled", SetAmbientSoundEnabled},
+        {"isAmbientSoundEnabled", IsAmbientSoundEnabled},
+        {"resetAmbientSounds", ResetAmbientSounds},
+        {"setWorldSoundEnabled", SetWorldSoundEnabled},
+        {"isWorldSoundEnabled", IsWorldSoundEnabled},
+        {"resetWorldSounds", ResetWorldSounds},
+        {"playSFX", PlaySFX},
+        {"playSFX3D", PlaySFX3D},
+        {"getSFXStatus", GetSFXStatus},
 
-    // Sound effects and synth funcs
-    CLuaCFunctions::AddFunction("playSound", PlaySound);
-    CLuaCFunctions::AddFunction("playSound3D", PlaySound3D);
-    CLuaCFunctions::AddFunction("stopSound", StopSound);
-    CLuaCFunctions::AddFunction("setSoundPosition", SetSoundPosition);
-    CLuaCFunctions::AddFunction("getSoundPosition", GetSoundPosition);
-    CLuaCFunctions::AddFunction("getSoundLength", GetSoundLength);
-    CLuaCFunctions::AddFunction("setSoundPaused", SetSoundPaused);
-    CLuaCFunctions::AddFunction("isSoundPaused", IsSoundPaused);
-    CLuaCFunctions::AddFunction("setSoundVolume", SetSoundVolume);
-    CLuaCFunctions::AddFunction("getSoundVolume", GetSoundVolume);
-    CLuaCFunctions::AddFunction("setSoundSpeed", SetSoundSpeed);
-    CLuaCFunctions::AddFunction("getSoundSpeed", GetSoundSpeed);
-    CLuaCFunctions::AddFunction("setSoundProperties", SetSoundProperties);
-    CLuaCFunctions::AddFunction("getSoundProperties", GetSoundProperties);
-    CLuaCFunctions::AddFunction("getSoundFFTData", GetSoundFFTData);
-    CLuaCFunctions::AddFunction("getSoundWaveData", GetSoundWaveData);
-    CLuaCFunctions::AddFunction("getSoundLevelData", GetSoundLevelData);
-    CLuaCFunctions::AddFunction("getSoundBPM", GetSoundBPM);
-    CLuaCFunctions::AddFunction("setSoundPanningEnabled", SetSoundPanEnabled);
-    CLuaCFunctions::AddFunction("isSoundPanningEnabled", IsSoundPanEnabled);
-    CLuaCFunctions::AddFunction("setSoundMinDistance", SetSoundMinDistance);
-    CLuaCFunctions::AddFunction("getSoundMinDistance", GetSoundMinDistance);
-    CLuaCFunctions::AddFunction("setSoundMaxDistance", SetSoundMaxDistance);
-    CLuaCFunctions::AddFunction("getSoundMaxDistance", GetSoundMaxDistance);
-    CLuaCFunctions::AddFunction("getSoundMetaTags", GetSoundMetaTags);
-    CLuaCFunctions::AddFunction("setSoundEffectEnabled", SetSoundEffectEnabled);
-    CLuaCFunctions::AddFunction("getSoundEffects", GetSoundEffects);
-    CLuaCFunctions::AddFunction("setSoundPan", SetSoundPan);
-    CLuaCFunctions::AddFunction("getSoundPan", GetSoundPan);
+        // Sound effects and synth funcs
+        {"playSound", PlaySound},
+        {"playSound3D", PlaySound3D},
+        {"stopSound", StopSound},
+        {"setSoundPosition", SetSoundPosition},
+        {"getSoundPosition", GetSoundPosition},
+        {"getSoundLength", GetSoundLength},
+        {"setSoundPaused", SetSoundPaused},
+        {"isSoundPaused", IsSoundPaused},
+        {"setSoundVolume", SetSoundVolume},
+        {"getSoundVolume", GetSoundVolume},
+        {"setSoundSpeed", SetSoundSpeed},
+        {"getSoundSpeed", GetSoundSpeed},
+        {"setSoundProperties", SetSoundProperties},
+        {"getSoundProperties", GetSoundProperties},
+        {"getSoundFFTData", GetSoundFFTData},
+        {"getSoundWaveData", GetSoundWaveData},
+        {"getSoundLevelData", GetSoundLevelData},
+        {"getSoundBPM", GetSoundBPM},
+        {"setSoundPanningEnabled", SetSoundPanEnabled},
+        {"isSoundPanningEnabled", IsSoundPanEnabled},
+        {"setSoundMinDistance", SetSoundMinDistance},
+        {"getSoundMinDistance", GetSoundMinDistance},
+        {"setSoundMaxDistance", SetSoundMaxDistance},
+        {"getSoundMaxDistance", GetSoundMaxDistance},
+        {"getSoundMetaTags", GetSoundMetaTags},
+        {"setSoundEffectEnabled", SetSoundEffectEnabled},
+        {"getSoundEffects", GetSoundEffects},
+        {"setSoundPan", SetSoundPan},
+        {"getSoundPan", GetSoundPan},
 
-    // Radio funcs
-    CLuaCFunctions::AddFunction("setRadioChannel", SetRadioChannel);
-    CLuaCFunctions::AddFunction("getRadioChannel", GetRadioChannel);
-    CLuaCFunctions::AddFunction("getRadioChannelName", GetRadioChannelName);
+        // Radio funcs
+        {"setRadioChannel", SetRadioChannel},
+        {"getRadioChannel", GetRadioChannel},
+        {"getRadioChannelName", GetRadioChannelName},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaAudioDefs::AddClass(lua_State* luaVM)

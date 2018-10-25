@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_QUADBIKE
-#define __CGAMESA_QUADBIKE
+#pragma once
 
 #include <game/CQuadBike.h>
 #include "CAutomobileSA.h"
@@ -29,5 +28,3 @@ public:
 
     virtual ~CQuadBikeSA(void) {}
 };
-
-#endif

@@ -1,6 +1,6 @@
 namespace EmbeddedLuaCode
 {
-    const SString inspect = R"~LUA~(
+    const char* const inspect = R"~LUA~(
 
 --[[
     SERVER AND CLIENT.

@@ -88,8 +88,11 @@ public:
 
             // Send request
             this->AddRef();            // Keep object alive
-            GetDownloadManager()->QueueFile(m_strURL, NULL, (const char*)bitStream->GetData(), bitStream->GetNumberOfBytesUsed(), true, this,
-                                            StaticDownloadFinishedCallback, false, 2);
+            SHttpRequestOptions options;
+            options.strPostData = SStringX((const char*)bitStream->GetData(), bitStream->GetNumberOfBytesUsed());
+            options.bPostBinary = true;
+            options.uiConnectionAttempts = 2;
+            GetDownloadManager()->QueueFile(m_strURL, NULL, this, StaticDownloadFinishedCallback, options);
         }
     }
 

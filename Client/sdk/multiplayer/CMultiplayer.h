@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMULTIPLAYER
-#define __CMULTIPLAYER
+#pragma once
 
 #include <CMatrix.h>
 #include <CVector.h>
@@ -36,6 +35,16 @@ struct SClothesCacheStats
     uint uiNumTotal;
     uint uiNumUnused;
     uint uiNumRemoved;
+};
+
+struct SWaterCannonHitEvent
+{
+    CEntitySAInterface* pGameVehicle;
+    CEntitySAInterface* pHitGameEntity;
+    CVector             vecPosition;
+    CVector             vecNormal;
+    int                 iModel;
+    unsigned char       ucColSurface;
 };
 
 class CAnimBlendAssociationSAInterface;
@@ -75,8 +84,8 @@ typedef CAnimBlendAssociationSAInterface*(AddAnimationHandler)(RpClump* pClump, 
 typedef CAnimBlendAssociationSAInterface*(AddAnimationAndSyncHandler)(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
                                                                       AssocGroupId animGroup, AnimationId animID);
 typedef void(CAnimBlendAssocDestructorHandler)(CAnimBlendAssociationSAInterface* pThis);
-typedef bool(AssocGroupCopyAnimationHandler)(CAnimBlendStaticAssociationSAInterface* pOutAnimStaticAssoc, CAnimBlendAssociationSAInterface* pAnimAssoc,
-                                             RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, AnimationId animID);
+typedef bool(AssocGroupCopyAnimationHandler)(CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroup,
+                                             AnimationId animID);
 typedef bool(BlendAnimationHierarchyHandler)(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy, int* pFlags,
                                              RpClump* pClump);
 typedef bool(ProcessCollisionHandler)(class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface);
@@ -99,6 +108,7 @@ typedef void(GameEntityRenderHandler)(CEntitySAInterface* pEntity);
 typedef void(FxSystemDestructionHandler)(void* pFxSA);
 typedef AnimationId(DrivebyAnimationHandler)(AnimationId animGroup, AssocGroupId animId);
 typedef void(PedStepHandler)(CPedSAInterface* pPed, bool bFoot);
+typedef void(WaterCannonHitWorldHandler)(SWaterCannonHitEvent& event);
 
 /**
  * This class contains information used for shot syncing, one exists per player.
@@ -194,6 +204,7 @@ public:
     virtual void SetIdleHandler(IdleHandler* pHandler) = 0;
     virtual void SetPreFxRenderHandler(PreFxRenderHandler* pHandler) = 0;
     virtual void SetPreHudRenderHandler(PreHudRenderHandler* pHandler) = 0;
+    virtual void DisableCallsToCAnimBlendNode(bool bDisableCalls) = 0;
     virtual void SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler) = 0;
     virtual void SetAddAnimationHandler(AddAnimationHandler* pHandler) = 0;
     virtual void SetAddAnimationAndSyncHandler(AddAnimationAndSyncHandler* pHandler) = 0;
@@ -216,6 +227,7 @@ public:
     virtual void SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler) = 0;
     virtual void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler) = 0;
     virtual void SetPedStepHandler(PedStepHandler* pHandler) = 0;
+    virtual void SetWaterCannonHitWorldHandler(WaterCannonHitWorldHandler* pHandler) = 0;
 
     virtual void  AllowMouseMovement(bool bAllow) = 0;
     virtual void  DoSoundHacksOnLostFocus(bool bLostFocus) = 0;
@@ -264,8 +276,8 @@ public:
 
     virtual void DisableEnterExitVehicleKey(bool bDisabled) = 0;
 
-    virtual void SetNightVisionEnabled(bool bEnabled) = 0;
-    virtual void SetThermalVisionEnabled(bool bEnabled) = 0;
+    virtual void SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled) = 0;
+    virtual void SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled) = 0;
     virtual bool IsNightVisionEnabled() = 0;
     virtual bool IsThermalVisionEnabled() = 0;
 
@@ -354,5 +366,3 @@ public:
     virtual void SetBoatWaterSplashEnabled(bool bEnabled) = 0;
     virtual void SetTyreSmokeEnabled(bool bEnabled) = 0;
 };
-
-#endif

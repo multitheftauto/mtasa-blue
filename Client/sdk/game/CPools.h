@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_POOLS
-#define __CGAME_POOLS
+#pragma once
 
 #include "Common.h"
 
@@ -119,5 +118,3 @@ public:
     virtual CPointerNodeSingleLinkPool* GetPointerNodeSingleLinkPool() = 0;
     virtual CPointerNodeDoubleLinkPool* GetPointerNodeDoubleLinkPool() = 0;
 };
-
-#endif

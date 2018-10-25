@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_WEAPON
-#define __CGAMESA_WEAPON
+#pragma once
 
 #include "CGameSA.h"
 #include <game/CWeapon.h>
@@ -86,5 +85,3 @@ public:
     int  GetWeaponReloadTime(CWeaponStat* pWeaponStat);
     static int GetWeaponFireTime(CWeaponStat* pWeaponStat);
 };
-
-#endif

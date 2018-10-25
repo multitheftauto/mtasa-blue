@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_PLAYERINFO
-#define __CGAME_PLAYERINFO
+#pragma once
 
 #include "Common.h"
 #include "CWanted.h"
@@ -52,5 +51,3 @@ public:
     virtual DWORD GetBikeFrontWheelCounter(void) = 0;
     virtual float GetBikeFrontWheelDist(void) = 0;
 };
-
-#endif

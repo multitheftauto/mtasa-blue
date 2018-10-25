@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTVEHICLEMANAGER_H
-#define __CCLIENTVEHICLEMANAGER_H
+#pragma once
 
 #include "CClientVehicle.h"
 
@@ -77,5 +76,3 @@ protected:
     CMappedArray<CClientVehicle*> m_List;
     CMappedArray<CClientVehicle*> m_StreamedIn;
 };
-
-#endif

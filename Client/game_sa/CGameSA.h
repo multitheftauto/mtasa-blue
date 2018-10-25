@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA
-#define __CGAMESA
+#pragma once
 
 #include "CModelInfoSA.h"
 #include "CFxManagerSA.h"
@@ -83,6 +82,7 @@
 #define PROP_RANDOM_FOLIAGE         "randomfoliage"
 #define PROP_SNIPER_MOON            "snipermoon"
 #define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
+#define PROP_UNDERWORLD_WARP        "underworldwarp"
 
 struct SCheatSA
 {
@@ -226,11 +226,6 @@ public:
         return m_pAEAudioHardware;
     };
     CAESoundManager* GetAESoundManager() override { return m_pAESoundManager; }
-    CAudioEngine*    GetAudio()
-    {
-        DEBUG_TRACE("CAudio     * GetAudioEngine()");
-        return m_pAudioEngine;
-    };
     CAudioContainer* GetAudioContainer()
     {
         DEBUG_TRACE("CAudio     * GetAudioContainer()");
@@ -399,6 +394,9 @@ public:
     bool IsExtraAirResistanceEnabled();
     void SetExtraAirResistanceEnabled(bool bEnable);
 
+    bool IsUnderWorldWarpEnabled();
+    void SetUnderWorldWarpEnabled(bool bEnable);
+
     bool VerifySADataFileNames();
     bool PerformChecks();
     int& GetCheckStatus(void) { return m_iCheckStatus; }
@@ -489,6 +487,7 @@ private:
     bool         m_bAsyncScriptForced;
     bool         m_bASyncLoadingSuspended;
     int          m_iCheckStatus;
+    bool         m_bUnderworldWarp;
 
     static unsigned long* VAR_SystemTime;
     static unsigned long* VAR_IsAtMenu;
@@ -512,5 +511,3 @@ private:
     CPed*      m_pPedContext;
     CTickCount m_llASyncLoadingAutoUnsuspendTime;
 };
-
-#endif

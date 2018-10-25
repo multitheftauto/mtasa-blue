@@ -11,8 +11,7 @@
 
 class CCore;
 
-#ifndef __CCORE_H
-#define __CCORE_H
+#pragma once
 
 #include "../version.h"
 
@@ -124,6 +123,7 @@ public:
     bool IsChatVisible(void);
     void EnableChatInput(char* szCommand, DWORD dwColor);
     bool IsChatInputEnabled(void);
+    bool ClearChat();
 
     // Screenshots
     void TakeScreenShot(void);
@@ -368,5 +368,3 @@ private:
     std::map<std::string, std::string> m_CommandLineOptions;            // e.g. "-o option" -> {"o" = "option"}
     const char*                        m_szCommandLineArgs;             // Everything that comes after the options
 };
-
-#endif

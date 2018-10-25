@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_PLANE
-#define __CGAME_PLANE
+#pragma once
 
 #include "CVehicle.h"
 
@@ -19,5 +18,3 @@ class CPlane : public virtual CVehicle
 public:
     virtual ~CPlane(void){};
 };
-
-#endif

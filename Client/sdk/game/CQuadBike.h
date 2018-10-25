@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_QUADBIKE
-#define __CGAME_QUADBIKE
+#pragma once
 
 #include "CVehicle.h"
 
@@ -19,5 +18,3 @@ class CQuadBike : public virtual CVehicle
 public:
     virtual ~CQuadBike(void){};
 };
-
-#endif

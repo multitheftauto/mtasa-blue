@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CTRANSFERBOX_H
-#define __CTRANSFERBOX_H
+#pragma once
 
 #define TRANSFERBOX_FRAMES  10
 #define TRANSFERBOX_DELAY   50
@@ -58,5 +57,3 @@ private:
 
     SString m_strTransferText[Type::MAX_TYPES];
 };
-
-#endif

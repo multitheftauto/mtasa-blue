@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_OBJECT
-#define __CGAME_OBJECT
+#pragma once
 
 #include "CPhysical.h"
 
@@ -41,5 +40,3 @@ public:
     virtual CVector* GetScale() = 0;
     virtual void     ResetScale() = 0;
 };
-
-#endif

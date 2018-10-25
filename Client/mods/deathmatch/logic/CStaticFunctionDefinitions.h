@@ -44,6 +44,7 @@ public:
     static bool SetClipboard(SString& strText);
     static bool GetClipboard(SString& strText);
     static bool SetWindowFlashing(bool flash, uint count);
+    static bool ClearChatBox(void);
 
     // Notification funcs
     static bool CreateTrayNotification(SString strText, eTrayIconType eType, bool useSound);
@@ -58,6 +59,7 @@ public:
     static bool           GetElementPosition(CClientEntity& Entity, CVector& vecPosition);
     static bool           GetElementRotation(CClientEntity& Entity, CVector& vecRotation, eEulerRotationOrder rotationOrder);
     static bool           GetElementVelocity(CClientEntity& Entity, CVector& vecVelocity);
+    static bool           GetElementTurnVelocity(CClientEntity& Entity, CVector& vecTurnVelocity);
     static bool           GetElementInterior(CClientEntity& Entity, unsigned char& ucInterior);
     static bool           GetElementBoundingBox(CClientEntity& Entity, CVector& vecMin, CVector& vecMax);
     static bool           GetElementRadius(CClientEntity& Entity, float& fRadius);
@@ -87,6 +89,7 @@ public:
     static bool          SetElementPosition(CClientEntity& Entity, const CVector& vecPosition, bool bWarp = true);
     static bool          SetElementRotation(CClientEntity& Entity, const CVector& vecRotation, eEulerRotationOrder rotationOrder, bool bNewWay);
     static bool          SetElementVelocity(CClientEntity& Element, const CVector& vecVelocity);
+    static bool          SetElementAngularVelocity(CClientEntity& Element, const CVector& vecTurnVelocity);
     static bool          SetElementParent(CClientEntity& Element, CClientEntity& Parent, CLuaMain* pLuaMain);
     static bool          SetElementInterior(CClientEntity& Entity, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition);
     static bool          SetElementDimension(CClientEntity& Entity, unsigned short usDimension);
@@ -167,6 +170,7 @@ public:
     static bool SetPedAnimation(CClientEntity& Entity, const SString& strBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop,
                                 bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame);
     static bool SetPedAnimationProgress(CClientEntity& Entity, const SString& strAnimName, float fProgress);
+    static bool SetPedAnimationSpeed(CClientEntity& Entity, const SString& strAnimName, float fSpeed);
     static bool SetPedMoveAnim(CClientEntity& Entity, unsigned int iMoveAnim);
     static bool AddPedClothes(CClientEntity& Entity, const char* szTexture, const char* szModel, unsigned char ucType);
     static bool RemovePedClothes(CClientEntity& Entity, unsigned char ucType);
@@ -218,6 +222,10 @@ public:
     static bool            GetVehicleNitroLevel(CClientVehicle& Vehicle, float& fLevel);
     static bool            GetHeliBladeCollisionsEnabled(CClientVehicle& Vehicle);
     static bool            IsVehicleWindowOpen(CClientVehicle& Vehicle, uchar ucWindow);
+    static bool            SetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
+    static bool            GetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
+    static bool            SetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition);
+    static bool            GetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition);
 
     // Vehicle set functions
     static bool FixVehicle(CClientEntity& Entity);
@@ -268,6 +276,11 @@ public:
     static bool           GetObjectScale(CClientObject& Object, CVector& vecScale);
     static bool           IsObjectBreakable(CClientObject& Object, bool& bBreakable);
     static bool           GetObjectMass(CClientObject& Object, float& fMass);
+    static bool           GetObjectTurnMass(CClientObject& Object, float& fTurnMass);
+    static bool           GetObjectAirResistance(CClientObject& Object, float& fAirResistance);
+    static bool           GetObjectElasticity(CClientObject& Object, float& fElasticity);
+    static bool           GetObjectBuoyancyConstant(CClientObject& Object, float& fBuoyancyConstant);
+    static bool           GetObjectCenterOfMass(CClientObject& Object, CVector& vecCenterOfMass);
     static bool           IsObjectVisibleInAllDimensions(CClientEntity& Entity);
 
     // Object set funcs
@@ -282,6 +295,11 @@ public:
     static bool RespawnObject(CClientEntity& Entity);
     static bool ToggleObjectRespawn(CClientEntity& Entity, bool bRespawn);
     static bool SetObjectMass(CClientEntity& Entity, float fMass);
+    static bool SetObjectTurnMass(CClientEntity& Entity, float fTurnMass);
+    static bool SetObjectAirResistance(CClientEntity& Entity, float fAirResistance);
+    static bool SetObjectElasticity(CClientEntity& Entity, float fElasticity);
+    static bool SetObjectBuoyancyConstant(CClientEntity& Entity, float fBuoyancyConstant);
+    static bool SetObjectCenterOfMass(CClientEntity& Entity, const CVector& vecCenterOfMass);
     static bool SetObjectVisibleInAllDimensions(CClientEntity& Entity, bool bVisible, unsigned short usNewDimension = 0);
 
     // Radar-area get funcs
@@ -307,6 +325,8 @@ public:
 
     // Fire funcs
     static bool CreateFire(CVector& vecPosition, float fSize);
+    static bool ExtinguishFireInRadius(CVector& vecPosition, float fRadius);
+    static bool ExtinguishAllFires();
 
     // Light funcs
     static CClientPointLights* CreateLight(CResource& Resource, int iMode, const CVector& vecPosition, float fRadius, SColor color, CVector& vecDirection);
@@ -458,6 +478,7 @@ public:
 
     static void GUIMemoSetReadOnly(CClientEntity& Element, bool bFlag);
     static void GUIMemoSetCaretIndex(CClientEntity& Element, unsigned int iCaret);
+    static void GUIMemoSetVerticalScrollPosition(CClientEntity& Element, float fPosition);
 
     static void                GUIGridListSetSortingEnabled(CClientEntity& Element, bool bEnabled);
     static inline unsigned int GUIGridListAddColumn(CClientGUIElement& GUIElement, const char* szTitle, float fWidth)
@@ -527,6 +548,9 @@ public:
     static bool        GUIComboBoxSetSelected(CClientEntity& Entity, int index);
     static std::string GUIComboBoxGetItemText(CClientEntity& Entity, int index);
     static bool        GUIComboBoxSetItemText(CClientEntity& Entity, int index, const char* szText);
+    static int         GUIComboBoxGetItemCount(CClientEntity& Entity);
+    static bool        GUIComboBoxSetOpen(CClientEntity& Entity, bool state);
+    static bool        GUIComboBoxIsOpen(CClientEntity& Entity);
 
     // World functions
     static bool GetTime(unsigned char& ucHour, unsigned char& ucMin);
@@ -631,6 +655,7 @@ public:
     static CClientColPolygon*   CreateColPolygon(CResource& Resource, const CVector2D& vecPosition);
     static CClientColTube*      CreateColTube(CResource& Resource, const CVector& vecPosition, float fRadius, float fHeight);
     static CClientColShape*     GetElementColShape(CClientEntity* pEntity);
+    static bool                 IsInsideColShape(CClientColShape* pColShape, const CVector& vecPosition, bool& inside);
     static void                 RefreshColShapeColliders(CClientColShape* pColShape);
 
     // Weapon funcs

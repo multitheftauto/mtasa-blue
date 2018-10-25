@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CWATERSA_H
-#define __CWATERSA_H
+#pragma once
 
 // -------------------------------
 // SA interfaces
@@ -130,5 +129,3 @@ public:
     EWaterPolyType GetType() { return WATER_POLY_TRIANGLE; }
     int            GetNumVertices() { return 3; }
 };
-
-#endif

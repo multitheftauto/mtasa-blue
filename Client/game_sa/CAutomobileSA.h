@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_AUTOMOBILE
-#define __CGAMESA_AUTOMOBILE
+#pragma once
 
 #include <game/CAutomobile.h>
 
@@ -219,5 +218,3 @@ public:
 
     CDoor* GetDoor(eDoors doorID);
 };
-
-#endif

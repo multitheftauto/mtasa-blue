@@ -1,3 +1,7 @@
+XPStyle on
+RequestExecutionLevel user
+SetCompressor /SOLID lzma
+
 !addincludedir "NSIS dirs\Include"
 !addplugindir "NSIS dirs\Plugins"
 !include nsDialogs.nsh
@@ -9,12 +13,11 @@
 !include nsArray.nsh
 !include Utils.nsh
 !include WordFunc.nsh
-
-XPStyle on
-RequestExecutionLevel user
-SetCompressor /SOLID lzma
-
 !include textlog.nsh
+!include x64.nsh
+!include procfunc.nsh
+!include KBInstall.nsh
+
 Var GTA_DIR
 Var Install_Dir
 Var CreateSMShortcuts
@@ -653,6 +656,21 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         ${EndIf}
         #############################################################
 
+        #############################################################
+        # Install SHA2 support for older Win7 x64
+        ${If} ${IsWin7}
+            ${If} ${RunningX64}
+                ${GetDLLVersionNumbers} "$SYSDIR\crypt32.dll" $0 $1 $2 $3
+                ${If} $2 == 7601
+                    ${If} $3 < 18741
+                        ${InstallKB} "KB3035131" "Windows6.1-KB3035131-x64" "http://download.microsoft.com/download/3/D/F/3DF6B0B1-D849-4272-AA98-3AA8BB456CCC/Windows6.1-KB3035131-x64.msu"
+                        ${InstallKB} "KB3033929" "Windows6.1-KB3033929-x64" "http://download.microsoft.com/download/C/8/7/C87AE67E-A228-48FB-8F02-B2A9A1238099/Windows6.1-KB3033929-x64.msu"
+                    ${EndIf}
+                ${EndIf}
+            ${EndIf}
+        ${EndIf}
+        #############################################################
+
         SetOutPath "$INSTDIR\MTA"
         SetOverwrite on
 
@@ -671,7 +689,18 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\cefweb.dll"
         File "${FILES_ROOT}\mta\libwow64.dll"
         File "${FILES_ROOT}\mta\wow64_helper.exe"
-        
+
+        File "${FILES_ROOT}\mta\bass.dll"
+        File "${FILES_ROOT}\mta\bass_aac.dll"
+        File "${FILES_ROOT}\mta\bass_ac3.dll"
+        File "${FILES_ROOT}\mta\bass_fx.dll"
+        File "${FILES_ROOT}\mta\bassflac.dll"
+        File "${FILES_ROOT}\mta\bassmidi.dll"
+        File "${FILES_ROOT}\mta\bassmix.dll"
+        File "${FILES_ROOT}\mta\bassopus.dll"
+        File "${FILES_ROOT}\mta\basswma.dll"
+        File "${FILES_ROOT}\mta\tags.dll"
+
         SetOutPath "$INSTDIR\MTA"
 		File "${FILES_ROOT}\mta\chrome_elf.dll"
         File "${FILES_ROOT}\mta\libcef.dll"
@@ -680,6 +709,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\libGLESv2.dll"
         File "${FILES_ROOT}\mta\natives_blob.bin"
         File "${FILES_ROOT}\mta\snapshot_blob.bin"
+        File "${FILES_ROOT}\mta\v8_context_snapshot.bin"
         
         SetOutPath "$INSTDIR\MTA\CEF"
         File "${FILES_ROOT}\mta\CEF\CEFLauncher.exe"
@@ -704,16 +734,6 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             SetOutPath "$INSTDIR\MTA"
             File "${FILES_ROOT}\mta\d3dx9_42.dll"
             File "${FILES_ROOT}\mta\D3DCompiler_42.dll"
-            File "${FILES_ROOT}\mta\bass.dll"
-            File "${FILES_ROOT}\mta\basswma.dll"
-            File "${FILES_ROOT}\mta\bassmidi.dll"
-            File "${FILES_ROOT}\mta\bassflac.dll"
-            File "${FILES_ROOT}\mta\bass_aac.dll"
-            File "${FILES_ROOT}\mta\bass_ac3.dll"
-            File "${FILES_ROOT}\mta\bassmix.dll"
-            File "${FILES_ROOT}\mta\bass_fx.dll"
-            File "${FILES_ROOT}\mta\bassopus.dll"
-            File "${FILES_ROOT}\mta\tags.dll"
             File "${FILES_ROOT}\mta\sa.dat"
             File "${FILES_ROOT}\mta\vea.dll"
             File "${FILES_ROOT}\mta\vog.dll"

@@ -11,8 +11,7 @@
 class CClientSound;
 class CBassAudio;
 
-#ifndef __CCLIENTSOUND_H
-#define __CCLIENTSOUND_H
+#pragma once
 
 #include "CClientSoundManager.h"
 #include "CClientEntity.h"
@@ -135,5 +134,3 @@ private:
     SFixedArray<int, 9> m_EnabledEffects;
     uint                m_uiFrameNumberCreated;
 };
-
-#endif

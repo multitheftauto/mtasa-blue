@@ -34,8 +34,6 @@
 #define GLOBERROR(string, column, code) \
   glob->error = string, glob->pos = column, code
 
-void glob_cleanup(URLGlob* glob);
-
 static CURLcode glob_fixed(URLGlob *glob, char *fixed, size_t len)
 {
   URLPattern *pat = &glob->pattern[glob->size];
@@ -116,7 +114,7 @@ static CURLcode glob_set(URLGlob *glob, char **patternp,
       if(multiply(amount, pat->content.Set.size + 1))
         return GLOBERROR("range overflow", 0, CURLE_URL_MALFORMAT);
 
-      /* fall-through */
+      /* FALLTHROUGH */
     case ',':
 
       *buf = '\0';
@@ -159,7 +157,7 @@ static CURLcode glob_set(URLGlob *glob, char **patternp,
         ++pattern;
         ++(*posp);
       }
-      /* intentional fallthrough */
+      /* FALLTHROUGH */
     default:
       *buf++ = *pattern++;              /* copy character to set element */
       ++(*posp);
@@ -579,7 +577,7 @@ CURLcode glob_next_url(char **globbed, URLGlob *glob)
       }
       break;
     case UPTNumRange:
-      snprintf(buf, buflen, "%0*ld",
+      snprintf(buf, buflen, "%0*lu",
                pat->content.NumRange.padlength,
                pat->content.NumRange.ptr_n);
       len = strlen(buf);
@@ -622,12 +620,12 @@ CURLcode glob_match_url(char **result, char *filename, URLGlob *glob)
 
   while(*filename) {
     if(*filename == '#' && ISDIGIT(filename[1])) {
-      unsigned long i;
       char *ptr = filename;
       unsigned long num = strtoul(&filename[1], &filename, 10);
       URLPattern *pat = NULL;
 
       if(num < glob->size) {
+        unsigned long i;
         num--; /* make it zero based */
         /* find the correct glob entry */
         for(i = 0; i<glob->size; i++) {

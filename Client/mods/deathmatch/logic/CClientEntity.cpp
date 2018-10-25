@@ -28,6 +28,7 @@ CClientEntity::CClientEntity(ElementID ID) : ClassInit(this)
     m_bDoubleSided = false;
     m_bDoubleSidedInit = false;
     m_bCallPropagationEnabled = true;
+    m_bSmartPointer = false;
 
     // Need to generate a clientside ID?
     if (ID == INVALID_ELEMENT_ID)
@@ -171,11 +172,11 @@ CClientEntity::~CClientEntity(void)
 //    return MapContains ( ms_ValidEntityMap, pEntity );
 //}
 
-void CClientEntity::SetTypeName(const char* szName)
+void CClientEntity::SetTypeName(const SString& name)
 {
     CClientEntity::RemoveEntityFromRoot(m_uiTypeHash, this);
-    m_strTypeName.AssignLeft(szName, MAX_TYPENAME_LENGTH);
-    m_uiTypeHash = HashString(szName);
+    m_strTypeName.AssignLeft(name, MAX_TYPENAME_LENGTH);
+    m_uiTypeHash = HashString(name);
     if (IsFromRoot(m_pParent))
         CClientEntity::AddEntityFromRoot(m_uiTypeHash, this);
 }
@@ -1217,7 +1218,7 @@ bool CClientEntity::IsStatic(void)
     CEntity* pEntity = GetGameEntity();
     if (pEntity)
     {
-        return (pEntity->IsStatic() == TRUE);
+        return pEntity->IsStatic();
     }
     return false;
 }

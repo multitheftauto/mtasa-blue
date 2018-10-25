@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CORONAS
-#define __CGAME_CORONAS
+#pragma once
 
 #include "Common.h"
 #include "CRegisteredCorona.h"
@@ -30,4 +29,3 @@ public:
     virtual CRegisteredCorona* FindCorona(DWORD Identifier) = 0;
     virtual void               DisableSunAndMoon(bool bDisabled) = 0;
 };
-#endif

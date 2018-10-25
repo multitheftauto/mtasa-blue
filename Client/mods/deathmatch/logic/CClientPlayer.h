@@ -10,8 +10,7 @@
 
 class CClientPlayer;
 
-#ifndef __CCLIENTPLAYER_H
-#define __CCLIENTPLAYER_H
+#pragma once
 
 #include <game/CPlayerPed.h>
 
@@ -177,5 +176,3 @@ public:
     bool IsShowingWepdata() const { return m_bShowingWepdata; }
 #endif
 };
-
-#endif

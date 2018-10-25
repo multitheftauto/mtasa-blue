@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_PED
-#define __CGAME_PED
+#pragma once
 
 class CTaskManager;
 
@@ -270,5 +269,3 @@ public:
 
     virtual int GetCustomMoveAnim(void) = 0;
 };
-
-#endif

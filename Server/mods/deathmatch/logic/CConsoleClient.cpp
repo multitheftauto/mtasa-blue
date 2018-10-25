@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CConsoleClient::CConsoleClient(CConsole* pConsole) : CElement(pConsole->GetMapManager()->GetRootElement(), NULL), CClient(false)
+CConsoleClient::CConsoleClient(CConsole* pConsole) : CElement(pConsole->GetMapManager()->GetRootElement()), CClient(false)
 {
     m_pAccount = g_pGame->GetAccountManager()->AddConsoleAccount(CONSOLE_ACCOUNT_NAME);
     m_iType = CElement::CONSOLE;

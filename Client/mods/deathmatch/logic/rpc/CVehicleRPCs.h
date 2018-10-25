@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CVehicleRPCs_H
-#define __CVehicleRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
@@ -59,5 +58,3 @@ public:
     DECLARE_ELEMENT_RPC(SetVehicleSirens);
     DECLARE_ELEMENT_RPC(SetVehiclePlateText);
 };
-
-#endif

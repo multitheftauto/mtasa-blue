@@ -10,8 +10,7 @@
 
 class CClientManager;
 
-#ifndef __CCLIENTMANAGER_H
-#define __CCLIENTMANAGER_H
+#pragma once
 
 #include "CAntiCheat.h"
 #include "CClientCamera.h"
@@ -152,5 +151,3 @@ private:
     bool                         m_bGameUnloadedFlag;
     int                          m_iNumLowLODElements;
 };
-
-#endif

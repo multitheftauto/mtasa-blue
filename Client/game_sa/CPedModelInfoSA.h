@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPedModelInfoSA_H
-#define __CPedModelInfoSA_H
+#pragma once
 
 #include "CModelInfoSA.h"
 #include <game/CPedModelInfo.h>
@@ -70,5 +69,3 @@ public:
 private:
     CPedModelInfoSAInterface* m_pPedModelInterface;
 };
-
-#endif

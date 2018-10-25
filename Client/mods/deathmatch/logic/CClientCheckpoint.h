@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCHECKPOINT_H
-#define __CCLIENTCHECKPOINT_H
+#pragma once
 
 #include "CClientMarkerCommon.h"
 #include <list>
@@ -100,5 +99,3 @@ private:
     bool    m_bHasTarget;
     CVector m_vecTarget;
 };
-
-#endif

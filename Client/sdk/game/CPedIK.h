@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_PEDIK
-#define __CGAME_PEDIK
+#pragma once
 
 #include <windows.h>
 #include <CVector.h>
@@ -21,5 +20,3 @@ class CPedIK
     virtual void ClearFlag(DWORD flag) = 0;
     virtual bool IsFlagSet(DWORD flag) = 0;
 };
-
-#endif
