@@ -254,8 +254,8 @@ public:
     CVehicle* GetJackingVehicle(void) { return m_pJackingVehicle; }
     void      SetJackingVehicle(CVehicle* pVehicle);
 
-    void      SetLeavingServer(bool bLeaving) noexcept { m_bIsLeavingServer = bLeaving; }
-    bool      IsLeavingServer() const noexcept { return m_bIsLeavingServer; }
+    void SetLeavingServer(bool bLeaving) noexcept { m_bIsLeavingServer = bLeaving; }
+    bool IsLeavingServer() const noexcept { return m_bIsLeavingServer; }
 
 protected:
     bool ReadSpecialData(const int iLine) override { return true; }
