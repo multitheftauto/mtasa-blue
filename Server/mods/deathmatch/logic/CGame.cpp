@@ -1356,7 +1356,7 @@ void CGame::QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason, bool bSayI
     if (Player.IsLeavingServer())
         return;
 
-    Player.SetLeavingServer();
+    Player.SetLeavingServer(true);
     
     // Grab quit reaason
     const char* szReason = "Unknown";
