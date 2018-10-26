@@ -3278,9 +3278,9 @@ bool CStaticFunctionDefinitions::RedirectPlayer(CElement* pElement, const char* 
     if (IS_PLAYER(pElement))
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
-        if (pPlayer->IsLeavingServer()) {
+
+        if (pPlayer->IsLeavingServer())
             return false;
-        }
 
         unsigned char ucHostLength = static_cast<unsigned char>(strlen(szHost));
 
@@ -11174,10 +11174,6 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pPlayer, bool bIP, bool bUs
 {
     // Make sure we have a player
     assert(pPlayer);
-
-    if (pPlayer->IsLeavingServer()) {
-        return nullptr;
-    }
 
     // Initialize variables
     CBan* pBan = NULL;
