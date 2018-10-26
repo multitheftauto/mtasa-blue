@@ -4517,12 +4517,12 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle
 {
     if (pCollidingVehicle && pCollidedWith)
     {
-        CVehicle*      pColliderVehicle = g_pGame->GetPools()->GetVehicle((DWORD*)pCollidingVehicle);
-        CClientEntity* pVehicleClientEntity = m_pManager->FindEntity(pColliderVehicle, true);
-        if (pVehicleClientEntity && !static_cast<CClientVehicle*>(pVehicleClientEntity)->IsBlown())
+        CVehicle*       pColliderVehicle = g_pGame->GetPools()->GetVehicle((DWORD*)pCollidingVehicle);
+        CClientEntity*  pVehicleClientEntity = m_pManager->FindEntity(pColliderVehicle, true);
+        CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(pVehicleClientEntity);
+        
+        if (pClientVehicle && !pClientVehicle->IsBlown())
         {
-            CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(pVehicleClientEntity);
-
             CEntity*       pCollidedWithEntity = g_pGame->GetPools()->GetEntity((DWORD*)pCollidedWith);
             CClientEntity* pCollidedWithClientEntity = NULL;
             if (pCollidedWithEntity)
