@@ -55,6 +55,7 @@ typedef float          FLOAT;            //  32
 #include <string.h>
 #include <string>
 #include <stdarg.h>
+#include <chrono>
 
 // Vendor
 #ifndef _

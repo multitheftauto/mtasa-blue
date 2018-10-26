@@ -1804,37 +1804,16 @@ void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
     // Calc required time in ms between frames
     const double dTargetTimeToUse = 1000.0 / uiUseRate;
 
-    // Time now
-    double dTimeMs = GetTickCount32();
-
-    // Get delta time in ms since last frame
-    double dTimeUsed = dTimeMs - m_dLastTimeMs;
-
-    // Apply any over/underrun carried over from the previous frame
-    dTimeUsed += m_dPrevOverrun;
-
-    if (dTimeUsed < dTargetTimeToUse)
+    while(true)
     {
-        // Have time spare - maybe eat some of that now
-        double dSpare = dTargetTimeToUse - dTimeUsed;
-
-        double dUseUpNow = dSpare - dTargetTimeToUse * 0.2f;
-        if (dUseUpNow >= 1)
-            Sleep(static_cast<DWORD>(floor(dUseUpNow)));
-
-        // Redo timing calcs
-        dTimeMs = GetTickCount32();
-        dTimeUsed = dTimeMs - m_dLastTimeMs;
-        dTimeUsed += m_dPrevOverrun;
+        // See if we need to wait
+        double dSpare = dTargetTimeToUse - m_FrameRateTimer.Get();
+        if (dSpare <= 0.0)
+            break;
+        if (dSpare >= 2.0)
+            Sleep(1);
     }
-
-    // Update over/underrun for next frame
-    m_dPrevOverrun = dTimeUsed - dTargetTimeToUse;
-
-    // Limit carry over
-    m_dPrevOverrun = Clamp(dTargetTimeToUse * -0.9f, m_dPrevOverrun, dTargetTimeToUse * 0.1f);
-
-    m_dLastTimeMs = dTimeMs;
+    m_FrameRateTimer.Reset();
 
     DoReliablePulse();
 
