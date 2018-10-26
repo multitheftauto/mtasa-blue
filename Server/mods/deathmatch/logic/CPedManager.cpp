@@ -20,40 +20,36 @@ CPedManager::~CPedManager(void)
     DeleteAll();
 }
 
-CPed* CPedManager::Create(unsigned short usModel, CElement* pParent, CXMLNode* pNode)
+CPed* CPedManager::Create(unsigned short usModel, CElement* pParent)
 {
-    // Create the ped
-    CPed* pPed = new CPed(this, pParent, pNode, usModel);
+    CPed* const pPed = new CPed(this, pParent, usModel);
 
-    // Invalid ped id?
     if (pPed->GetID() == INVALID_ELEMENT_ID)
     {
         delete pPed;
-        return NULL;
+        return nullptr;
     }
 
-    // Return the created ped
     return pPed;
 }
 
 CPed* CPedManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
 {
-    // Create the Ped
-    CPed* pPed = new CPed(this, pParent, &Node, 400);
+    CPed* const pPed = new CPed(this, pParent, 400);
 
-    // Verify the Ped id and load the data from xml
-    if (pPed->GetID() == INVALID_ELEMENT_ID || !pPed->LoadFromCustomData(pEvents))
+    if (pPed->GetID() == INVALID_ELEMENT_ID || !pPed->LoadFromCustomData(pEvents, Node))
     {
         delete pPed;
-        return NULL;
+        return nullptr;
     }
 
-    // Make sure hes alive (leave to scripts?)
-    pPed->SetIsDead(false);
     pPed->SetSpawned(true);
-    pPed->SetHealth(100.0f);
 
-    // Return the created Ped
+    if (pPed->GetHealth() > 0)
+    {
+        pPed->SetIsDead(false);
+    }
+
     return pPed;
 }
 

@@ -568,10 +568,6 @@ bool CAccountManager::LogIn(CClient* pClient, CClient* pEchoClient, const char* 
         pEchoClient->SendEcho("login: You successfully logged in");
     }
 
-    // Update who was info
-    if (pClient->GetClientType() == CClient::CLIENT_PLAYER)
-        g_pGame->GetConsole()->GetWhoWas()->OnPlayerLogin(static_cast<CPlayer*>(pClient));
-
     // Delete the old account if it was a guest account
     if (!pCurrentAccount->IsRegistered())
         delete pCurrentAccount;
@@ -910,6 +906,21 @@ void CAccountManager::GetAccountsByIP(const SString& strIP, std::vector<CAccount
         if (pAccount)
             outAccounts.push_back(pAccount);
     }
+}
+
+CAccount* CAccountManager::GetAccountByID(int ID)
+{
+    CRegistryResult result;
+    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM accounts WHERE id = ?", SQLITE_INTEGER, ID);
+
+    for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+    {
+        const auto& row = *iter;
+
+        return Get(reinterpret_cast<const char*>(row[0].pVal));
+    }
+
+    return nullptr;
 }
 
 void CAccountManager::GetAccountsByData(const SString& dataName, const SString& value, std::vector<CAccount*>& outAccounts)

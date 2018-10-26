@@ -9,15 +9,14 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOLTUBE_H
-#define __CCOLTUBE_H
+#pragma once
 
 #include "CColShape.h"
 
 class CColTube : public CColShape
 {
 public:
-    CColTube(CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, float fHeight, CXMLNode* pNode = NULL);
+    CColTube(CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, float fHeight);
 
     virtual CSphere GetWorldBoundingSphere(void);
 
@@ -38,10 +37,8 @@ public:
     };
 
 protected:
-    bool ReadSpecialData(void);
+    bool ReadSpecialData(const int iLine) override;
 
     float m_fRadius;
     float m_fHeight;
 };
-
-#endif

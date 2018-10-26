@@ -11,8 +11,7 @@
 
 class CGame;
 
-#ifndef __CGAME_H
-#define __CGAME_H
+#pragma once
 
 #include "CCommon.h"
 #include <net/CNetServer.h>
@@ -21,7 +20,6 @@ class CGame;
 #include "CCommandLineParser.h"
 #include "CConnectHistory.h"
 #include "CElementDeleter.h"
-#include "CWhoWas.h"
 
 #include "packets/CCommandPacket.h"
 #include "packets/CExplosionSyncPacket.h"
@@ -498,7 +496,7 @@ private:
     void Packet_PlayerNoSocket(class CPlayerNoSocketPacket& Packet);
     void Packet_PlayerNetworkStatus(class CPlayerNetworkStatusPacket& Packet);
 
-    static void PlayerCompleteConnect(CPlayer* pPlayer, bool bSuccess, const char* szError);
+    static void PlayerCompleteConnect(CPlayer* pPlayer);
 
     // Technically, this could be put somewhere else.  It's a callback function
     // which the voice server library will call to send out data.
@@ -531,7 +529,6 @@ private:
     CClock*                    m_pClock;
     CBanManager*               m_pBanManager;
     CTeamManager*              m_pTeamManager;
-    CWhoWas                    m_WhoWas;
     CCommandLineParser         m_CommandLineParser;
     CRegisteredCommands*       m_pRegisteredCommands;
     CDatabaseManager*          m_pDatabaseManager;
@@ -648,5 +645,3 @@ private:
 
     bool m_DevelopmentModeEnabled;
 };
-
-#endif

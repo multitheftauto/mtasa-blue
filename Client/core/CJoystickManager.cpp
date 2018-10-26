@@ -1050,11 +1050,9 @@ void CJoystickManager::ApplyAxes(CControllerState& cs, bool bInVehicle)
 
         if (line.SourceAxisDir == eDirPos)
             value = std::max(0.f, value);
-        else
-        if (line.SourceAxisDir == eDirNeg)
+        else if (line.SourceAxisDir == eDirNeg)
             value = -std::min(0.f, value);
-        else
-        if (line.SourceAxisDir == eDirNegToPos)
+        else if (line.SourceAxisDir == eDirNegToPos)
             value = value * 0.5f + 0.5f;
 
         if (line.OutputAxisDir == eDirNeg)

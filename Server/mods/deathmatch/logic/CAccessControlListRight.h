@@ -11,8 +11,7 @@
 
 class CAccessControlListRight;
 
-#ifndef __CACCESSCONTROLLISTRIGHT_H
-#define __CACCESSCONTROLLISTRIGHT_H
+#pragma once
 
 #define MAX_ACL_RIGHT_NAME_LENGTH 256
 
@@ -57,5 +56,3 @@ private:
     class CAccessControlListManager* m_pACLManager;
     std::map<SString, SString>       m_ExtraAttributeMap;
 };
-
-#endif

@@ -11,8 +11,7 @@
 
 class CPickup;
 
-#ifndef __CPICKUP_H
-#define __CPICKUP_H
+#pragma once
 
 #include "CColCallback.h"
 #include "CColManager.h"
@@ -90,13 +89,13 @@ public:
         WEAPON_INVALID = 0xFF,
     };
 
-    CPickup(CElement* pParent, CXMLNode* pNode, class CPickupManager* pPickupManager, CColManager* pColManager);
+    CPickup(CElement* pParent, class CPickupManager* pPickupManager, CColManager* pColManager);
     ~CPickup(void);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
     bool IsEntity(void) { return true; }
 
     void Unlink(void);
-    bool ReadSpecialData(void);
 
     void SetPosition(const CVector& vecPosition);
 
@@ -146,6 +145,9 @@ public:
     void SetDoneDelayHack(bool bDone) { m_bDoneDelayHack = bDone; }
     bool HasDoneDelayHack(void) { return m_bDoneDelayHack; }
 
+protected:
+    bool ReadSpecialData(const int iLine) override;
+
 private:
     void Callback_OnCollision(CColShape& Shape, CElement& Element);
     void Callback_OnLeave(CColShape& Shape, CElement& Element);
@@ -172,5 +174,3 @@ private:
     bool m_bSpawned;
     bool m_bDoneDelayHack;
 };
-
-#endif

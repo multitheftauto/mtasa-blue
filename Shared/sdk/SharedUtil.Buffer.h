@@ -224,9 +224,8 @@ namespace SharedUtil
                     return false;
                 usLength = ucLength;
             }
-            else
-                if (!Read(usLength))
-                    return false;
+            else if (!Read(usLength))
+                return false;
 
             if (bDoesLengthIncludeLengthOfLength && usLength)
                 usLength -= bByteLength ? 1 : 2;

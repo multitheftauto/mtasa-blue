@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_MENUMANAGER
-#define __CGAMESA_MENUMANAGER
+#pragma once
 
 #include <game/CMenuManager.h>
 #define WIN32_LEAN_AND_MEAN
@@ -34,17 +33,15 @@ public:
 class CMenuManagerSA : public CMenuManager
 {
 private:
-    CMenuManagerSAInterface *internalInterface;
+    CMenuManagerSAInterface* internalInterface;
 
 public:
-    CMenuManagerSA() { internalInterface = (CMenuManagerSAInterface *)CLASS_CMenuManager; }
+    CMenuManagerSA() { internalInterface = (CMenuManagerSAInterface*)CLASS_CMenuManager; }
 
-    CMenuManagerSAInterface *GetInterface() { return internalInterface; }
+    CMenuManagerSAInterface* GetInterface() { return internalInterface; }
 
     BYTE GetCurrentScreen();
     BYTE GetPreviousScreen();
     void SwitchToNewScreen(BYTE ScreenID);
-    void DisplayHelpText(char *szHelpText);
+    void DisplayHelpText(char* szHelpText);
 };
-
-#endif

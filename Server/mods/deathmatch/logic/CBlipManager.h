@@ -11,8 +11,7 @@
 
 class CBlipManager;
 
-#ifndef __CBLIPMANAGER_H
-#define __CBLIPMANAGER_H
+#pragma once
 
 #include "CBlip.h"
 #include <list>
@@ -25,7 +24,7 @@ public:
     CBlipManager(void);
     ~CBlipManager(void) { DeleteAll(); };
 
-    CBlip* Create(CElement* pParent, CXMLNode* pNode = NULL);
+    CBlip* Create(CElement* pParent);
     CBlip* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void   DeleteAll(void);
 
@@ -40,5 +39,3 @@ public:
 private:
     list<CBlip*> m_List;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimBlockSA_H
-#define __CAnimBlockSA_H
+#pragma once
 
 #include <game/CAnimBlock.h>
 #include "Common.h"
@@ -26,7 +25,9 @@ public:
     bool           bLoaded;            // ?
     BYTE           pad[1];
     unsigned short usRefs;
-    BYTE           pad2[12];
+    int            idOffset;
+    size_t         nAnimations;
+    DWORD          dwAssocGroup;
 };
 
 class CAnimBlockSA : public CAnimBlock
@@ -36,16 +37,17 @@ class CAnimBlockSA : public CAnimBlock
 public:
     CAnimBlockSA(CAnimBlockSAInterface* pInterface) { m_pInterface = pInterface; }
 
-    CAnimBlockSAInterface* GetInterface(void) { return m_pInterface; }
-    char*                  GetName(void) { return m_pInterface->szName; }
-    int                    GetIndex(void) { return m_pInterface->GetIndex(); }
-    void                   AddRef(void) { m_pInterface->usRefs++; }
-    unsigned short         GetRefs(void) { return m_pInterface->usRefs; }
-    void                   Request(EModelRequestType requestType, bool bAllowBlockingFail = false);
-    bool                   IsLoaded(void) { return m_pInterface->bLoaded; }
+    CAnimBlockSAInterface*          GetInterface(void) { return m_pInterface; }
+    char*                           GetName(void) { return m_pInterface->szName; }
+    int                             GetIndex(void) { return m_pInterface->GetIndex(); }
+    void                            AddRef(void) { m_pInterface->usRefs++; }
+    unsigned short                  GetRefs(void) { return m_pInterface->usRefs; }
+    bool                            IsLoaded(void) { return m_pInterface->bLoaded; }
+    int                             GetIDOffset(void) { return m_pInterface->idOffset; }
+    size_t                          GetAnimationCount(void) { return m_pInterface->nAnimations; }
+    void                            Request(EModelRequestType requestType, bool bAllowBlockingFail = false);
+    CAnimBlendHierarchySAInterface* GetAnimationHierarchyInterface(size_t iAnimation);
 
 protected:
     CAnimBlockSAInterface* m_pInterface;
 };
-
-#endif

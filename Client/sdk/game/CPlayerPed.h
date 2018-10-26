@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_PLAYERPED
-#define __CGAME_PLAYERPED
+#pragma once
 
 #include "CPed.h"
 #include "CWanted.h"
@@ -30,5 +29,3 @@ public:
     virtual eMoveAnim GetMoveAnim(void) = 0;
     virtual void      SetMoveAnim(eMoveAnim iAnimGroup) = 0;
 };
-
-#endif

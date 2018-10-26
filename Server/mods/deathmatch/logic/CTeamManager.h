@@ -11,8 +11,7 @@
 
 class CTeamManager;
 
-#ifndef __CTEAMMANAGER_H
-#define __CTEAMMANAGER_H
+#pragma once
 
 #include <list>
 #include "CTeam.h"
@@ -29,7 +28,7 @@ public:
 
     CTeam* GetTeam(const char* szName);
     bool   Exists(CTeam* pTeam);
-    CTeam* Create(CElement* pParent, CXMLNode* pNode, char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
+    CTeam* Create(CElement* pParent, char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
     CTeam* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
 
     std::list<CTeam*>::const_iterator IterBegin(void) { return m_List.begin(); }
@@ -38,5 +37,3 @@ public:
 private:
     std::list<CTeam*> m_List;
 };
-
-#endif

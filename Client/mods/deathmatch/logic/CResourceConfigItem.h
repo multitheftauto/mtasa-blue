@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef CRESOURCECONFIGITEM_H
-#define CRESOURCECONFIGITEM_H
+#pragma once
 
 #include "CResource.h"
 #include "CDownloadableResource.h"
@@ -35,5 +34,3 @@ private:
     class CXMLFile* m_pXMLFile;
     CXMLNode*       m_pXMLRootNode;
 };
-
-#endif

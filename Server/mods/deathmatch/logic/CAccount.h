@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CACCOUNT_H
-#define __CACCOUNT_H
+#pragma once
 
 #include <list>
 #include <string>
@@ -157,5 +156,3 @@ private:
     std::string m_strValue;
     int         m_iType;
 };
-
-#endif

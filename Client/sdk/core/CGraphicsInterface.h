@@ -9,10 +9,33 @@
  *
  *****************************************************************************/
 
-#ifndef __CGRAPHICSINTERFACE_H
-#define __CGRAPHICSINTERFACE_H
+#pragma once
 
 #include "CVector.h"
+#include <d3d9.h>
+
+// Vertex type used by the primitives batchers
+struct PrimitiveVertice
+{
+    static const uint FNV = D3DFVF_XYZ | D3DFVF_DIFFUSE;
+    float             fX, fY, fZ;
+    D3DCOLOR          Color;
+};
+struct PrimitiveMaterialVertice
+{
+    static const uint FNV = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1;
+    float             fX, fY, fZ;
+    D3DCOLOR          Color;
+    float             u, v;
+};
+
+enum PrimitiveVerticeSizes
+{
+    VERT_XY = 2,
+    VERT_XY_COLOR = 3,
+    VERT_XY_UV = 4,
+    VERT_XY_COLOR_UV = 5
+};
 
 struct ID3DXFont;
 struct IDirect3DDevice9;
@@ -116,7 +139,7 @@ public:
 
     virtual void DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, CMaterialItem* pMaterial,
                                           float fU = 0, float fV = 0, float fSizeU = 1, float fSizeV = 1, bool bRelativeUV = true, bool bUseFaceToward = false,
-                                          const CVector& vecFaceToward = CVector()) = 0;
+                                          const CVector& vecFaceToward = CVector(), bool bPostGUI = false) = 0;
 
     virtual void DrawRectQueued(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bPostGUI, bool bSubPixelPositioning = false) = 0;
 
@@ -126,6 +149,14 @@ public:
     virtual void DrawStringQueued(float fLeft, float fTop, float fRight, float fBottom, unsigned long dwColor, const char* wszText, float fScaleX,
                                   float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bColorCoded = false,
                                   bool bSubPixelPositioning = false, float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0) = 0;
+
+    virtual void DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI) = 0;
+    virtual void DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
+                                             bool bPostGUI) = 0;
+    virtual void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
+                                  short siSegments, float fRatio, bool bPostGUI) = 0;
+
+    virtual bool IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType) = 0;
 
     // Subsystems
     virtual CRenderItemManagerInterface* GetRenderItemManager(void) = 0;
@@ -142,5 +173,3 @@ public:
     virtual bool ResizeTextureData(const void* pData, uint uiDataPitch, uint uiWidth, uint uiHeight, uint d3dFormat, uint uiNewWidth, uint uiNewHeight,
                                    CBuffer& outBuffer) = 0;
 };
-
-#endif

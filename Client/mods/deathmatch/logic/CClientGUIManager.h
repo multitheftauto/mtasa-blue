@@ -11,8 +11,7 @@
 class CClientGUIManager;
 struct SGUIManagerListEntry;
 
-#ifndef __CCLIENTGUIMANAGER_H
-#define __CCLIENTGUIMANAGER_H
+#pragma once
 
 #include <list>
 #include "CClientManager.h"
@@ -49,5 +48,3 @@ private:
     CMappedList<CClientGUIElement*> m_Elements;
     std::map<ElementID, bool>       m_QueuedGridListUpdates;
 };
-
-#endif

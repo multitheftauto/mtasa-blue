@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMODMANAGER_H
-#define __CMODMANAGER_H
+#pragma once
 
 #include <core/CModManagerInterface.h>
 #include <core/CClientBase.h>
@@ -63,5 +62,3 @@ private:
     SString m_strRequestedMod;
     SString m_strRequestedModArguments;
 };
-
-#endif

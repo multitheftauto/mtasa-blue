@@ -9,15 +9,14 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOLSPHERE_H
-#define __CCOLSPHERE_H
+#pragma once
 
 #include "CColShape.h"
 
 class CColSphere : public CColShape
 {
 public:
-    CColSphere(CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, CXMLNode* pNode = NULL, bool bIsPartnered = false);
+    CColSphere(CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, bool bIsPartnered = false);
 
     virtual CSphere GetWorldBoundingSphere(void);
 
@@ -33,9 +32,7 @@ public:
     };
 
 protected:
-    bool ReadSpecialData(void);
+    bool ReadSpecialData(const int iLine) override;
 
     float m_fRadius;
 };
-
-#endif

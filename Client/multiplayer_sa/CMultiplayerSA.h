@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMULTIPLAYERSA
-#define __CMULTIPLAYERSA
+#pragma once
 
 #include <game/CGame.h>
 #include <multiplayer/CMultiplayer.h>
@@ -20,6 +19,7 @@
 #include "CLimitsSA.h"
 
 #include "CRemoteDataSA.h"
+
 class CRemoteDataSA;
 #define DEFAULT_NEAR_CLIP_DISTANCE  ( 0.3f )
 
@@ -38,6 +38,8 @@ enum eRadioStationID
     Master_Sounds,
     WCTR,
 };
+
+typedef void*(__cdecl* hCAnimBlendAssociation_NewOperator)(size_t iSizeInBytes);
 
 class CMultiplayerSA : public CMultiplayer
 {
@@ -63,6 +65,7 @@ public:
     void                InitHooks_ClothesCache(void);
     void                InitHooks_Files(void);
     void                InitHooks_Weapons(void);
+    void                InitHooks_Peds();
     void                InitHooks_Rendering(void);
     void                InitHooks_LicensePlate(void);
     void                InitHooks_VehicleLights(void);
@@ -106,8 +109,12 @@ public:
     void SetIdleHandler(IdleHandler* pHandler);
     void SetPreFxRenderHandler(PreFxRenderHandler* pHandler);
     void SetPreHudRenderHandler(PreHudRenderHandler* pHandler);
+    void DisableCallsToCAnimBlendNode(bool bDisableCalls);
+    void SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler);
     void SetAddAnimationHandler(AddAnimationHandler* pHandler);
-    void SetBlendAnimationHandler(BlendAnimationHandler* pHandler);
+    void SetAddAnimationAndSyncHandler(AddAnimationAndSyncHandler* pHandler);
+    void SetAssocGroupCopyAnimationHandler(AssocGroupCopyAnimationHandler* pHandler);
+    void SetBlendAnimationHierarchyHandler(BlendAnimationHierarchyHandler* pHandler);
     void SetProcessCollisionHandler(ProcessCollisionHandler* pHandler);
     void SetVehicleCollisionHandler(VehicleCollisionHandler* pHandler);
     void SetVehicleDamageHandler(VehicleDamageHandler* pHandler);
@@ -124,6 +131,8 @@ public:
     void SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler);
     void SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler);
     void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler);
+    void SetPedStepHandler(PedStepHandler* pHandler);
+    void SetWaterCannonHitWorldHandler(WaterCannonHitWorldHandler* pHandler);
 
     void  AllowMouseMovement(bool bAllow);
     void  DoSoundHacksOnLostFocus(bool bLostFocus);
@@ -172,8 +181,8 @@ public:
     int   GetMoonSize();
     void  ResetMoonSize();
 
-    void SetNightVisionEnabled(bool bEnabled);
-    void SetThermalVisionEnabled(bool bEnabled);
+    void SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled);
+    void SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled);
     bool IsNightVisionEnabled();
     bool IsThermalVisionEnabled();
 
@@ -329,5 +338,3 @@ private:
 
     static unsigned long FUNC_CPlayerInfoBase;
 };
-
-#endif

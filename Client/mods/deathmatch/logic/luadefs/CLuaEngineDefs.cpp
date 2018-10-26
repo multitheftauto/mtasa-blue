@@ -13,30 +13,41 @@
 
 void CLuaEngineDefs::LoadFunctions(void)
 {
-    CLuaCFunctions::AddFunction("engineLoadTXD", EngineLoadTXD);
-    CLuaCFunctions::AddFunction("engineLoadCOL", EngineLoadCOL);
-    CLuaCFunctions::AddFunction("engineLoadDFF", EngineLoadDFF);
-    CLuaCFunctions::AddFunction("engineImportTXD", EngineImportTXD);
-    CLuaCFunctions::AddFunction("engineReplaceCOL", EngineReplaceCOL);
-    CLuaCFunctions::AddFunction("engineRestoreCOL", EngineRestoreCOL);
-    CLuaCFunctions::AddFunction("engineReplaceModel", EngineReplaceModel);
-    CLuaCFunctions::AddFunction("engineRestoreModel", EngineRestoreModel);
-    CLuaCFunctions::AddFunction("engineGetModelLODDistance", EngineGetModelLODDistance);
-    CLuaCFunctions::AddFunction("engineSetModelLODDistance", EngineSetModelLODDistance);
-    CLuaCFunctions::AddFunction("engineSetAsynchronousLoading", EngineSetAsynchronousLoading);
-    CLuaCFunctions::AddFunction("engineApplyShaderToWorldTexture", EngineApplyShaderToWorldTexture);
-    CLuaCFunctions::AddFunction("engineRemoveShaderFromWorldTexture", EngineRemoveShaderFromWorldTexture);
-    CLuaCFunctions::AddFunction("engineGetModelNameFromID", EngineGetModelNameFromID);
-    CLuaCFunctions::AddFunction("engineGetModelIDFromName", EngineGetModelIDFromName);
-    CLuaCFunctions::AddFunction("engineGetModelTextureNames", EngineGetModelTextureNames);
-    CLuaCFunctions::AddFunction("engineGetVisibleTextureNames", EngineGetVisibleTextureNames);
+    std::map<const char*, lua_CFunction> functions{
+        {"engineLoadTXD", EngineLoadTXD},
+        {"engineLoadCOL", EngineLoadCOL},
+        {"engineLoadDFF", EngineLoadDFF},
+        {"engineLoadIFP", EngineLoadIFP},
+        {"engineImportTXD", EngineImportTXD},
+        {"engineReplaceCOL", EngineReplaceCOL},
+        {"engineRestoreCOL", EngineRestoreCOL},
+        {"engineReplaceModel", EngineReplaceModel},
+        {"engineRestoreModel", EngineRestoreModel},
+        {"engineReplaceAnimation", EngineReplaceAnimation},
+        {"engineRestoreAnimation", EngineRestoreAnimation},
+        {"engineGetModelLODDistance", EngineGetModelLODDistance},
+        {"engineSetModelLODDistance", EngineSetModelLODDistance},
+        {"engineSetAsynchronousLoading", EngineSetAsynchronousLoading},
+        {"engineApplyShaderToWorldTexture", EngineApplyShaderToWorldTexture},
+        {"engineRemoveShaderFromWorldTexture", EngineRemoveShaderFromWorldTexture},
+        {"engineGetModelNameFromID", EngineGetModelNameFromID},
+        {"engineGetModelIDFromName", EngineGetModelIDFromName},
+        {"engineGetModelTextureNames", EngineGetModelTextureNames},
+        {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
 
-    // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
-    // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
-    // CLuaCFunctions::AddFunction ( "enginePositionAtomic", EnginePositionAtomic );
-    // CLuaCFunctions::AddFunction ( "enginePositionSeats", EnginePositionSeats );
-    // CLuaCFunctions::AddFunction ( "engineAddAllAtomics", EngineAddAllAtomics );
-    // CLuaCFunctions::AddFunction ( "engineReplaceVehiclePart", EngineReplaceVehiclePart );
+        // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
+        // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
+        // CLuaCFunctions::AddFunction ( "enginePositionAtomic", EnginePositionAtomic );
+        // CLuaCFunctions::AddFunction ( "enginePositionSeats", EnginePositionSeats );
+        // CLuaCFunctions::AddFunction ( "engineAddAllAtomics", EngineAddAllAtomics );
+        // CLuaCFunctions::AddFunction ( "engineReplaceVehiclePart", EngineReplaceVehiclePart );
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaEngineDefs::AddClass(lua_State* luaVM)
@@ -274,6 +285,54 @@ int CLuaEngineDefs::EngineLoadTXD(lua_State* luaVM)
     return 1;
 }
 
+int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
+{
+    SString strFile = "";
+    SString strBlockName = "";
+
+    CScriptArgReader argStream(luaVM);
+    // Grab the IFP filename or data
+    argStream.ReadString(strFile);
+    argStream.ReadString(strBlockName);
+
+    if (!argStream.HasErrors())
+    {
+        // Grab our virtual machine and grab our resource from that.
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
+        {
+            // Grab this resource
+            CResource* pResource = pLuaMain->GetResource();
+            if (pResource)
+            {
+                bool bIsRawData = CIFPEngine::IsIFPData(strFile);
+                SString strPath;
+                // Is this a legal filepath?
+                if (bIsRawData || CResourceManager::ParseResourcePathInput(strFile, pResource, &strPath))
+                {
+                    std::shared_ptr<CClientIFP> pIFP = CIFPEngine::EngineLoadIFP(pResource, m_pManager, bIsRawData ? strFile : strPath, bIsRawData, strBlockName);
+                    if (pIFP != nullptr)
+                    {
+                        // Return the IFP element
+                        lua_pushelement(luaVM, pIFP.get());
+                        return 1;
+                    }
+                    else
+                        argStream.SetCustomError(bIsRawData ? "raw data" : strFile, "Error loading IFP");
+                }
+                else
+                    argStream.SetCustomError(bIsRawData ? "raw data" : strFile, "Bad file path");
+            }
+        }
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // We failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaEngineDefs::EngineReplaceCOL(lua_State* luaVM)
 {
     CClientColModel* pCol = NULL;
@@ -422,6 +481,77 @@ int CLuaEngineDefs::EngineRestoreModel(lua_State* luaVM)
     }
 
     // Failure
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineReplaceAnimation(lua_State* luaVM)
+{
+    CClientEntity* pEntity = nullptr;
+    SString        strInternalBlockName = "";
+    SString        strInternalAnimName = "";
+    SString        strCustomBlockName = "";
+    SString        strCustomAnimName = "";
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+    argStream.ReadString(strInternalBlockName);
+    argStream.ReadString(strInternalAnimName);
+    argStream.ReadString(strCustomBlockName);
+    argStream.ReadString(strCustomAnimName);
+
+    if (!argStream.HasErrors())
+    {
+        if (CIFPEngine::EngineReplaceAnimation(pEntity, strInternalBlockName, strInternalAnimName, strCustomBlockName, strCustomAnimName))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineRestoreAnimation(lua_State* luaVM)
+{
+    CClientEntity*                pEntity = nullptr;
+    CIFPEngine::eRestoreAnimation eRestoreType = CIFPEngine::eRestoreAnimation::SINGLE;
+    SString                       strInternalBlockName = "";
+    SString                       strInternalAnimName = "";
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+    if (argStream.NextIsNil() || argStream.NextIsNone())
+    {
+        eRestoreType = CIFPEngine::eRestoreAnimation::ALL;
+    }
+    else
+    {
+        argStream.ReadString(strInternalBlockName);
+        if (argStream.NextIsNil() || argStream.NextIsNone())
+        {
+            eRestoreType = CIFPEngine::eRestoreAnimation::BLOCK;
+        }
+        else
+        {
+            argStream.ReadString(strInternalAnimName);
+        }
+    }
+
+    if (!argStream.HasErrors())
+    {
+        if (CIFPEngine::EngineRestoreAnimation(pEntity, strInternalBlockName, strInternalAnimName, eRestoreType))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
     lua_pushboolean(luaVM, false);
     return 1;
 }

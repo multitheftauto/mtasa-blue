@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CSERVERTEXTITEMPACKET_H
-#define __CSERVERTEXTITEMPACKET_H
+#pragma once
 
 #include "CPacket.h"
 
@@ -36,5 +35,3 @@ private:
     unsigned long m_ulUniqueId;
     bool          m_bDeletable;
 };
-
-#endif

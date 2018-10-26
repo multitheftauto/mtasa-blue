@@ -48,7 +48,7 @@ public:
     LUA_DECLARE(GetPedContactElement);
     LUA_DECLARE(GetPedRotation);
     LUA_DECLARE(CanPedBeKnockedOffBike);
-    LUA_DECLARE(GetPedBonePosition);
+    LUA_DECLARE_OOP(GetPedBonePosition);
     LUA_DECLARE(GetPedClothes);
     LUA_DECLARE(GetPedControlState);
     LUA_DECLARE(GetPedAnalogControlState);
@@ -69,6 +69,7 @@ public:
     LUA_DECLARE(SetPedCanBeKnockedOffBike);
     LUA_DECLARE(SetPedAnimation);
     LUA_DECLARE(SetPedAnimationProgress);
+    LUA_DECLARE(SetPedAnimationSpeed);
     LUA_DECLARE(SetPedMoveAnim);
     LUA_DECLARE(SetPedWeaponSlot);
     LUA_DECLARE(GivePedWeapon);

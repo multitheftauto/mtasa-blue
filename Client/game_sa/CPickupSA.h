@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PICKUP
-#define __CGAMESA_PICKUP
+#pragma once
 
 #include <game/CPickup.h>
 #include "CObjectSA.h"
@@ -25,7 +24,7 @@ class CPickupSAInterface
 {
 public:
     float               CurrentValue;                      // For the revenue pickups  0
-    CObjectSAInterface *pObject;                           // 4
+    CObjectSAInterface* pObject;                           // 4
     long                MonetaryValue;                     // 8
     DWORD               RegenerationTime;                  // 12
     short               CoorsX, CoorsY, CoorsZ;            // 16 // 18 // 20
@@ -43,17 +42,17 @@ public:
 class CPickupSA : public CPickup
 {
 private:
-    CPickupSAInterface *internalInterface;
-    CObjectSA *         object;
+    CPickupSAInterface* internalInterface;
+    CObjectSA*          object;
     CBPickup            callback;            // function to call when the pickup is picked up [not used yet/ever]
 public:
     // constructor
-    CPickupSA(CPickupSAInterface *pickupInterface);
-    CPickupSAInterface *GetInterface() { return internalInterface; };            // not to be exported
-    CObject *           GetObject() { return object; };
+    CPickupSA(CPickupSAInterface* pickupInterface);
+    CPickupSAInterface* GetInterface() { return internalInterface; };            // not to be exported
+    CObject*            GetObject() { return object; };
 
-    VOID     SetPosition(CVector *vecPosition);
-    CVector *GetPosition(CVector *vecPosition);
+    VOID     SetPosition(CVector* vecPosition);
+    CVector* GetPosition(CVector* vecPosition);
 
     ePickupType  GetType();
     VOID         SetType(ePickupType type);
@@ -75,5 +74,3 @@ public:
     VOID         GetRidOfObjects();
     VOID         Remove();
 };
-
-#endif

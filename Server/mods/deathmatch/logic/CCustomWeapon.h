@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCUSTOMWEAPON_H
-#define __CCUSTOMWEAPON_H
+#pragma once
 #include "CCommon.h"
 #include "CCustomWeaponManager.h"
 #include "CWeaponStat.h"
@@ -58,7 +57,7 @@ struct SWeaponConfiguration
 class CCustomWeapon : public CObject
 {
 public:
-    CCustomWeapon(CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectManager, CCustomWeaponManager* pWeaponManager, eWeaponType weaponType);
+    CCustomWeapon(CElement* pParent, CObjectManager* pObjectManager, CCustomWeaponManager* pWeaponManager, eWeaponType weaponType);
     ~CCustomWeapon(void);
 
     void SetWeaponTarget(CElement* pTarget, int subTarget);
@@ -127,4 +126,3 @@ private:
 
     CCustomWeaponManager* m_pWeaponManager;
 };
-#endif

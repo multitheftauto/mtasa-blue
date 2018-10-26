@@ -11,8 +11,7 @@
 
 class CPlayerTasks;
 
-#ifndef __CPlayerTasks_H
-#define __CPlayerTasks_H
+#pragma once
 
 #include <string.h>
 #include "TaskNames.h"
@@ -81,5 +80,3 @@ protected:
     unsigned short m_usID;
     CPlayerTask*   m_pSubTask;
 };
-
-#endif

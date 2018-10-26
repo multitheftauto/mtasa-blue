@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_SETTINGS
-#define __CGAME_SETTINGS
+#pragma once
 
 #if (!defined(RWFORCEENUMSIZEINT))
 #define RWFORCEENUMSIZEINT ((int)((~((unsigned int)0))>>1))
@@ -161,7 +160,9 @@ public:
     virtual void ResetVehiclesLODDistance(void) = 0;
     virtual void GetVehiclesLODDistance(float& fVehiclesLODDistance, float& fTrainsPlanesLODDistance) = 0;
 
+    virtual void  SetPedsLODDistance(float fPedsLODDistance) = 0;
+    virtual void  ResetPedsLODDistance(void) = 0;
+    virtual float GetPedsLODDistance(void) = 0;
+
     virtual void Save(void) = 0;
 };
-
-#endif

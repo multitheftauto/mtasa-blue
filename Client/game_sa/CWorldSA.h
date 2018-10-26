@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_WORLD
-#define __CGAMESA_WORLD
+#pragma once
 
 #define FUNC_Add                                            0x563220 // ##SA##
 #define FUNC_Remove                                         0x563280 // ##SA##
@@ -55,6 +54,7 @@ class CWorldSA : public CWorld
 {
 public:
     CWorldSA();
+    void InstallHooks(void);
     void Add(CEntity* entity, eDebugCaller CallerId);
     void Add(CEntitySAInterface* entityInterface, eDebugCaller CallerId);
     void Remove(CEntity* entity, eDebugCaller CallerId);
@@ -127,5 +127,3 @@ private:
     std::map<DWORD, bool>                                     m_pAddedEntities;
     float                                                     m_fAircraftMaxHeight;
 };
-
-#endif

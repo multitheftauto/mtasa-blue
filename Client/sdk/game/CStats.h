@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_STATS
-#define __CGAME_STATS
+#pragma once
 
 #include "CWeaponInfo.h"
 
@@ -533,9 +532,9 @@ enum
 
     // every time player dies and gets respawned we count it up
     // so we can decrement max health
-    STAT_TIMELIMIT_DEATH_HEALTH,            // 57
-                                            // every time player adds to their health we count it up
-                                            // so this limit is a direct amount of health added
+    STAT_TIMELIMIT_DEATH_HEALTH,             // 57
+                                             // every time player adds to their health we count it up
+                                             // so this limit is a direct amount of health added
     STAT_TIMELIMIT_ADD_TO_HEALTH,            // 58
 
     MAX_REACTION_STATS
@@ -557,5 +556,3 @@ public:
 
     virtual unsigned short GetSkillStatIndex(eWeaponType type) = 0;
 };
-
-#endif

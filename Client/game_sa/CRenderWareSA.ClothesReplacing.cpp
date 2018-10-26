@@ -110,8 +110,7 @@ bool CRenderWareSA::HasClothesReplacementChanged(void)
 // then maybe switch to replacement txd file data
 //
 ////////////////////////////////////////////////////////////////
-__declspec(noinline)
-bool _cdecl OnCStreaming_RequestModel_Mid(int flags, SImgGTAItemInfo* pImgGTAInfo)
+__declspec(noinline) bool _cdecl OnCStreaming_RequestModel_Mid(int flags, SImgGTAItemInfo* pImgGTAInfo)
 {
     // Check is player.img
     if (pImgGTAInfo->ucImgId != 5)

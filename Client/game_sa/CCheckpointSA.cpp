@@ -11,25 +11,25 @@
 
 #include "StdInc.h"
 
-VOID CCheckpointSA::SetPosition(CVector *vecPosition)
+VOID CCheckpointSA::SetPosition(CVector* vecPosition)
 {
     DEBUG_TRACE("VOID CCheckpointSA::SetPosition(CVector * vecPosition)");
     MemCpyFast(&this->GetInterface()->m_pos, vecPosition, sizeof(CVector));
 }
 
-CVector *CCheckpointSA::GetPosition()
+CVector* CCheckpointSA::GetPosition()
 {
     DEBUG_TRACE("CVector * CCheckpointSA::GetPosition()");
     return &this->GetInterface()->m_pos;
 }
 
-VOID CCheckpointSA::SetPointDirection(CVector *vecPointDirection)
+VOID CCheckpointSA::SetPointDirection(CVector* vecPointDirection)
 {
     DEBUG_TRACE("VOID CCheckpointSA::SetPointDirection(CVector * vecPointDirection)");
     MemCpyFast(&this->GetInterface()->m_pointDir, vecPointDirection, sizeof(CVector));
 }
 
-CVector *CCheckpointSA::GetPointDirection()
+CVector* CCheckpointSA::GetPointDirection()
 {
     DEBUG_TRACE("CVector * CCheckpointSA::GetPointDirection()");
     return &this->GetInterface()->m_pointDir;
@@ -148,7 +148,7 @@ VOID CCheckpointSA::Remove()
     this->GetInterface()->m_bIsUsed = false;
     this->GetInterface()->m_nType = 257;
     this->GetInterface()->rwColour = 0;
-    C3DMarkerSA *pMarker = (C3DMarkerSA *)(((C3DMarkersSA *)pGame->Get3DMarkers())->FindMarker(this->GetIdentifier()));
+    C3DMarkerSA* pMarker = (C3DMarkerSA*)(((C3DMarkersSA*)pGame->Get3DMarkers())->FindMarker(this->GetIdentifier()));
     if (pMarker)
     {
         // pMarker->Disable();

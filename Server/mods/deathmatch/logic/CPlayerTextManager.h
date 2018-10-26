@@ -11,8 +11,7 @@
 
 class CPlayerTextManager;
 
-#ifndef __CPLAYERTEXTMANAGER_H
-#define __CPLAYERTEXTMANAGER_H
+#pragma once
 
 //#include <queue>
 #include <list>
@@ -43,5 +42,3 @@ public:
 
     CPlayer* GetPlayer(void);
 };
-
-#endif

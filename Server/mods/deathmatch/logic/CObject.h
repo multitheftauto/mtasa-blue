@@ -8,8 +8,7 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-#ifndef __COBJECT_H
-#define __COBJECT_H
+#pragma once
 
 // Kayl: There is now too many includes here, try to make it work with StdInc.h if possible
 #include "CElement.h"
@@ -25,14 +24,14 @@ class CObject : public CElement
     friend class CPlayer;
 
 public:
-    explicit CObject(CElement* pParent, CXMLNode* pNode, class CObjectManager* pObjectManager, bool bIsLowLod);
+    explicit CObject(CElement* pParent, class CObjectManager* pObjectManager, bool bIsLowLod);
     explicit CObject(const CObject& Copy);
     ~CObject(void);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
     bool IsEntity(void) { return true; }
 
     void Unlink(void);
-    bool ReadSpecialData(void);
 
     const CVector& GetPosition(void);
     void           SetPosition(const CVector& vecPosition);
@@ -79,6 +78,9 @@ public:
     bool IsVisibleInAllDimensions(void) { return m_bVisibleInAllDimensions; };
     void SetVisibleInAllDimensions(bool bVisible) { m_bVisibleInAllDimensions = bVisible; };
 
+protected:
+    bool ReadSpecialData(const int iLine) override;
+
 private:
     CObjectManager* m_pObjectManager;
     CVector         m_vecRotation;
@@ -102,5 +104,3 @@ protected:
 public:
     CPositionRotationAnimation* m_pMoveAnimation;
 };
-
-#endif

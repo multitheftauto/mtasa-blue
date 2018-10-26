@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIWINDOW_IMPL_H
-#define __CGUIWINDOW_IMPL_H
+#pragma once
 
 #include <gui/CGUIWindow.h>
 #include "CGUIElement_Impl.h"
@@ -43,5 +42,3 @@ protected:
 
     GUI_CALLBACK m_OnCloseClick;
 };
-
-#endif

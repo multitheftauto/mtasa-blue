@@ -22,8 +22,9 @@ SMaterialLine3DItem* CMaterialLine3DBatcher::ms_pLines = NULL;
 //
 //
 ////////////////////////////////////////////////////////////////
-CMaterialLine3DBatcher::CMaterialLine3DBatcher(void)
+CMaterialLine3DBatcher::CMaterialLine3DBatcher(bool bPreGUI)
 {
+    m_bPreGUI = bPreGUI;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -80,7 +81,7 @@ void CMaterialLine3DBatcher::Flush(void)
     // Set render states
     if (g_pDeviceState->AdapterState.bRequiresClipping)
         m_pDevice->SetRenderState(D3DRS_CLIPPING, TRUE);
-    m_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
+    m_pDevice->SetRenderState(D3DRS_ZENABLE, m_bPreGUI ? D3DZB_TRUE : D3DZB_FALSE);
     m_pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
     m_pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
     m_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
@@ -203,9 +204,12 @@ void CMaterialLine3DBatcher::DrawBatch(const CVector& vecCameraPos, uint* pBatch
         const SMaterialLine3DItem& item = m_LineList[pBatchIndices[i]];
 
         SColor color = item.ulColor;
-        color.R /= 2;
-        color.G /= 2;
-        color.B /= 2;
+        if (m_bPreGUI)
+        {
+            color.R /= 2;
+            color.G /= 2;
+            color.B /= 2;
+        }
         const ulong    ulColor = color;
         const CVector& vecA = item.vecFrom;
         const CVector& vecB = item.vecTo;

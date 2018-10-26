@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOLRECTANGLE_H
-#define __CCOLRECTANGLE_H
+#pragma once
 
 #include "CColShape.h"
 #include <CVector2D.h>
@@ -18,7 +17,7 @@
 class CColRectangle : public CColShape
 {
 public:
-    CColRectangle(CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, const CVector2D& vecSize, CXMLNode* pNode = NULL);
+    CColRectangle(CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, const CVector2D& vecSize);
 
     virtual CSphere GetWorldBoundingSphere(void);
 
@@ -34,9 +33,7 @@ public:
     };
 
 protected:
-    bool ReadSpecialData(void);
+    bool ReadSpecialData(const int iLine) override;
 
     CVector2D m_vecSize;
 };
-
-#endif

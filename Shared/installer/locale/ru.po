@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:23\n"
-"PO-Revision-Date: 2017-11-21 10:08+0000\n"
+"PO-Revision-Date: 2018-07-28 11:11+0000\n"
 "Last-Translator: Easterdie <easterdie@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: ru\n"
@@ -12,9 +12,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"Translators: Easterdie; Александр Шилякин; CoolDark; Kenix; Dr.CrazY; Nexus_; GTA-Multiplayer.com; Stanislav Zverev; Alexander Romanov; SalwadoR; lil_Toady; Gallardo994; Pavel Andreychenko; Nikita Obrekht; MeowCola; ccw; The_Creator; Talidan; FranklinRoosevelt; Rocketman\n"
+"Translators: Easterdie; Александр Шилякин; CoolDark; Kenix; Dr.CrazY; Nexus_; GTA-Multiplayer.com; Stanislav Zverev; Alexander Romanov; SalwadoR; lil_Toady; Gallardo994; Pavel Andreychenko; MeowCola; qaisjp; Nikita Obrekht; Talidan; FranklinRoosevelt; Rocketman; ccw; The_Creator\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1511258918.0\n"
+"X-POOTLE-MTIME: 1532776271.0\n"
 
 #. GET_XPVISTA_PLEASE
 #: ../Shared/installer/nightly.nsi:183
@@ -22,6 +22,9 @@ msgid ""
 "The version of MTA:SA you've downloaded does not support Windows XP or "
 "Vista.  Please download an alternative version from www.mtasa.com."
 msgstr ""
+"Версия MTA:SA, которую вы скачали, не поддерживает Windows XP или Vista.\n"
+"\n"
+"Пожалуйста, скачайте другую версию с www.mtasa.com."
 
 #. GET_MASTER_PLEASE
 #: ../Shared/installer/nightly.nsi:184
@@ -29,6 +32,9 @@ msgid ""
 "The version of MTA:SA is designed for old versions of Windows.  Please "
 "download the newest version from www.mtasa.com."
 msgstr ""
+"Версия MTA:SA предназначена для старых версий Windows. \n"
+" \n"
+" Пожалуйста, скачайте новую версию с www.mtasa.com."
 
 #. WELCOME_TEXT
 #: ../Shared/installer/nightly.nsi:188
@@ -99,7 +105,7 @@ msgstr "Добавить в папку \"Игры\" (Если имеется)."
 #. DESC_DirectX
 #: ../Shared/installer/nightly.nsi:198
 msgid "Install or update DirectX (if required)."
-msgstr ""
+msgstr "Установите или обновите DirectX (если требуется)."
 
 #. DESC_Section1
 #: ../Shared/installer/nightly.nsi:199
@@ -208,7 +214,7 @@ msgstr "Добавить в папку \"Игры\""
 #. INST_DIRECTX
 #: ../Shared/installer/nightly.nsi:428
 msgid "Install DirectX"
-msgstr ""
+msgstr "Установите DirectX"
 
 #. INST_SEC_CLIENT
 #: ../Shared/installer/nightly.nsi:462

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CXMLATTRIBUTESIMPL_H
-#define __CXMLATTRIBUTESIMPL_H
+#pragma once
 
 #include <tinyxml.h>
 #include <xml/CXMLAttributes.h>
@@ -52,5 +51,3 @@ private:
 
     std::list<CXMLAttribute*> m_Attributes;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CLUAARGUMENTS_H
-#define __CLUAARGUMENTS_H
+#pragma once
 
 extern "C"
 {
@@ -47,7 +46,7 @@ class CLuaArguments
 public:
     CLuaArguments(void) {}
     CLuaArguments(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
-    CLuaArguments(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
+    
     ~CLuaArguments(void) { DeleteArguments(); };
 
     void CopyRecursive(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
@@ -102,5 +101,3 @@ public:
 private:
     std::vector<CLuaArgument*> m_Arguments;
 };
-
-#endif

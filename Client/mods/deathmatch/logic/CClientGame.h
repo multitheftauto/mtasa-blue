@@ -44,6 +44,7 @@
 #include "CVoiceRecorder.h"
 #include "CSingularFileDownloadManager.h"
 #include "CObjectRespawner.h"
+
 #define HeliKill_List_Clear_Rate 500
 #define MIN_PUSH_ANTISPAM_RATE 1500
 #define INVALID_DOWNLOAD_PRIORITY_GROUP (INT_MIN)
@@ -72,6 +73,7 @@ struct SMiscGameSettings
 class CClientGame
 {
     friend class CPacketHandler;
+    typedef std::map<CAnimBlendAssociationSAInterface*, std::shared_ptr<CIFPAnimations> > AnimAssociations_type;
 
 public:
     enum eStatus
@@ -227,7 +229,7 @@ public:
     bool StartGame(const char* szNick, const char* szPassword, eServerType Type = SERVER_TYPE_NORMAL);
     bool StartLocalGame(eServerType Type, const char* szPassword = NULL);
     void SetupLocalGame(eServerType Type);
-    // bool                                StartGame                       ( void );
+    // bool                                    StartGame                       ( void );
     bool IsLocalGame(void) const { return m_bLocalPlay; }
     bool OnCancelLocalGameClick(CGUIElement* pElement);
 
@@ -484,21 +486,27 @@ private:
     void Event_OnIngame(void);
     void Event_OnIngameAndConnected(void);
 
-    static bool StaticDamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
-    static void StaticDeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
-    static void StaticFireHandler(CFire* pFire);
-    static bool StaticBreakTowLinkHandler(CVehicle* pTowedVehicle);
-    static void StaticDrawRadarAreasHandler(void);
-    static void StaticRender3DStuffHandler(void);
-    static void StaticPreRenderSkyHandler(void);
-    static void StaticRenderHeliLightHandler(void);
-    static bool StaticChokingHandler(unsigned char ucWeaponType);
-    static void StaticPreWorldProcessHandler(void);
-    static void StaticPostWorldProcessHandler(void);
-    static void StaticPreFxRenderHandler(void);
-    static void StaticPreHudRenderHandler(void);
-    static void StaticAddAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
-    static void StaticBlendAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta);
+    static bool                              StaticDamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
+    static void                              StaticDeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
+    static void                              StaticFireHandler(CFire* pFire);
+    static bool                              StaticBreakTowLinkHandler(CVehicle* pTowedVehicle);
+    static void                              StaticDrawRadarAreasHandler(void);
+    static void                              StaticRender3DStuffHandler(void);
+    static void                              StaticPreRenderSkyHandler(void);
+    static void                              StaticRenderHeliLightHandler(void);
+    static bool                              StaticChokingHandler(unsigned char ucWeaponType);
+    static void                              StaticPreWorldProcessHandler(void);
+    static void                              StaticPostWorldProcessHandler(void);
+    static void                              StaticPreFxRenderHandler(void);
+    static void                              StaticPreHudRenderHandler(void);
+    static void                              StaticCAnimBlendAssocDestructorHandler(CAnimBlendAssociationSAInterface* pThis);
+    static CAnimBlendAssociationSAInterface* StaticAddAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
+    static CAnimBlendAssociationSAInterface* StaticAddAnimationAndSyncHandler(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
+                                                                              AssocGroupId animGroup, AnimationId animID);
+    static bool                              StaticAssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump,
+                                                                                  CAnimBlendAssocGroupSAInterface* pAnimAssocGroup, AnimationId animID);
+    static bool StaticBlendAnimationHierarchyHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy,
+                                                     int* pFlags, RpClump* pClump);
     static bool StaticProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface);
     static bool StaticVehicleCollisionHandler(CVehicleSAInterface* pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex,
                                               float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos,
@@ -515,24 +523,33 @@ private:
     static void StaticGamePlayerDestructHandler(CEntitySAInterface* pPlayer);
     static void StaticGameProjectileDestructHandler(CEntitySAInterface* pProjectile);
     static void StaticGameModelRemoveHandler(ushort usModelId);
-    static void StaticWorldSoundHandler(uint uiGroup, uint uiIndex);
+    static bool StaticWorldSoundHandler(const SWorldSoundEvent& event);
     static void StaticGameEntityRenderHandler(CEntitySAInterface* pEntity);
     static void StaticTaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     static void StaticFxSystemDestructionHandler(void* pFxSAInterface);
+    static void StaticPedStepHandler(CPedSAInterface* pPed, bool bFoot);
+    static void StaticWaterCannonHitWorldHandler(SWaterCannonHitEvent& event);
+
     static AnimationId StaticDrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
 
-    bool        DamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
-    void        DeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
-    void        FireHandler(CFire* pFire);
-    bool        BreakTowLinkHandler(CVehicle* pTowedVehicle);
-    void        DrawRadarAreasHandler(void);
-    void        Render3DStuffHandler(void);
-    void        PreRenderSkyHandler(void);
-    bool        ChokingHandler(unsigned char ucWeaponType);
-    void        PreWorldProcessHandler(void);
-    void        PostWorldProcessHandler(void);
-    void        AddAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
-    void        BlendAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta);
+    bool                              DamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
+    void                              DeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
+    void                              FireHandler(CFire* pFire);
+    bool                              BreakTowLinkHandler(CVehicle* pTowedVehicle);
+    void                              DrawRadarAreasHandler(void);
+    void                              Render3DStuffHandler(void);
+    void                              PreRenderSkyHandler(void);
+    bool                              ChokingHandler(unsigned char ucWeaponType);
+    void                              PreWorldProcessHandler(void);
+    void                              PostWorldProcessHandler(void);
+    void                              CAnimBlendAssocDestructorHandler(CAnimBlendAssociationSAInterface* pThis);
+    CAnimBlendAssociationSAInterface* AddAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
+    CAnimBlendAssociationSAInterface* AddAnimationAndSyncHandler(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
+                                                                 AssocGroupId animGroup, AnimationId animID);
+    bool        AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroup,
+                                               AnimationId animID);
+    bool        BlendAnimationHierarchyHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy, int* pFlags,
+                                               RpClump* pClump);
     bool        ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface);
     bool        VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag,
                                         float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity);
@@ -548,7 +565,7 @@ private:
     void        GamePlayerDestructHandler(CEntitySAInterface* pPlayer);
     void        GameProjectileDestructHandler(CEntitySAInterface* pProjectile);
     void        GameModelRemoveHandler(ushort usModelId);
-    void        WorldSoundHandler(uint uiGroup, uint uiIndex);
+    bool        WorldSoundHandler(const SWorldSoundEvent& event);
     void        TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     AnimationId DrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
 
@@ -559,7 +576,6 @@ private:
     static void PostWeaponFire(void);
     static void BulletImpact(CPed* pInitiator, CEntity* pVictim, const CVector* pStartPosition, const CVector* pEndPosition);
     static void BulletFire(CPed* pInitiator, const CVector* pStartPosition, const CVector* pEndPosition);
-
 public:
     static bool StaticProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream);
 
@@ -586,6 +602,24 @@ public:
     bool                           IsUsingAlternatePulseOrder(bool bAdvanceDelayCounter = false);
     void                           SetFileCacheRoot(void);
     const char*                    GetFileCacheRoot(void) { return m_strFileCacheRoot; }
+
+    void                        CopyStaticAssociationProperties(std::unique_ptr<CAnimBlendStaticAssociation>& pOutAnimStaticAssoc,
+                                                                std::unique_ptr<CAnimBlendStaticAssociation>& pOriginalAnimStaticAssoc);
+    void                        InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP);
+    void                        RemoveIFPPointerFromMap(const unsigned int u32BlockNameHash);
+    std::shared_ptr<CClientIFP> GetIFPPointerFromMap(const unsigned int u32BlockNameHash);
+
+    void        InsertPedPointerToSet(CClientPed* pPed);
+    void        RemovePedPointerFromSet(CClientPed* pPed);
+    CClientPed* GetClientPedByClump(const RpClump& Clump);
+
+    void OnClientIFPUnload(const std::shared_ptr<CClientIFP>& IFP);
+
+    void InsertAnimationAssociationToMap(CAnimBlendAssociationSAInterface* pAnimAssociation, const std::shared_ptr<CIFPAnimations>& pIFPAnimations);
+    void RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation);
+
+    void PedStepHandler(CPedSAInterface* pPed, bool bFoot);
+    void WaterCannonHitWorldHandler(SWaterCannonHitEvent& event);
 
 private:
     eStatus       m_Status;
@@ -628,7 +662,7 @@ private:
     CNetAPI*               m_pNetAPI;
     CNetworkStats*         m_pNetworkStats;
     CSyncDebug*            m_pSyncDebug;
-    // CScreenshot*                        m_pScreenshot;
+    // CScreenshot*                          m_pScreenshot;
     CRadarMap*                    m_pRadarMap;
     CTransferBox*                 m_pTransferBox;
     CResourceManager*             m_pResourceManager;
@@ -799,6 +833,11 @@ private:
     SString           m_strFileCacheRoot;
 
     SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler;
+
+    // (unsigned int) Key is the hash of custom block name that is supplied to engineLoadIFP
+    std::map<unsigned int, std::shared_ptr<CClientIFP> > m_mapOfIfpPointers;
+    std::set<CClientPed*>                                m_setOfPedPointers;
+    AnimAssociations_type                                m_mapOfCustomAnimationAssociations;
 };
 
 extern CClientGame* g_pClientGame;

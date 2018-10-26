@@ -469,8 +469,8 @@ void CGameSA::Reset(void)
         m_pHud->Disable(false);
         m_pHud->SetComponentVisible(HUD_ALL, true);
 
-        // Restore model exhaust fumes positions
-        CModelInfoSA::ResetAllVehicleExhaustFumes();
+        // Restore model dummies' positions
+        CModelInfoSA::ResetAllVehicleDummies();
     }
 }
 
@@ -581,6 +581,9 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
     if (!strcmp(szCheatName, PROP_EXTRA_AIR_RESISTANCE))
         return IsExtraAirResistanceEnabled();
 
+    if (!strcmp(szCheatName, PROP_UNDERWORLD_WARP))
+        return IsUnderWorldWarpEnabled();
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -607,6 +610,12 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
         return true;
     }
 
+    if (!strcmp(szCheatName, PROP_UNDERWORLD_WARP))
+    {
+        SetUnderWorldWarpEnabled(bEnable);
+        return true;
+    }
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -622,6 +631,7 @@ void CGameSA::ResetCheats()
     SetRandomFoliageEnabled(true);
     SetMoonEasterEggEnabled(false);
     SetExtraAirResistanceEnabled(true);
+    SetUnderWorldWarpEnabled(true);
 
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
@@ -666,6 +676,16 @@ bool CGameSA::IsExtraAirResistanceEnabled()
 void CGameSA::SetExtraAirResistanceEnabled(bool bEnable)
 {
     MemPut<BYTE>(0x72DDD9, bEnable ? 0x01 : 0x00);
+}
+
+void CGameSA::SetUnderWorldWarpEnabled(bool bEnable)
+{
+    m_bUnderworldWarp = !bEnable;
+}
+
+bool CGameSA::IsUnderWorldWarpEnabled()
+{
+    return !m_bUnderworldWarp;
 }
 
 bool CGameSA::GetJetpackWeaponEnabled(eWeaponType weaponType)

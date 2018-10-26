@@ -20,6 +20,7 @@
 #include "CTimingCheckpoints.hpp"
 #include "CModelCacheManager.h"
 #include "detours/include/detours.h"
+#include <ServerBrowser/CServerCache.h>
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -183,6 +184,10 @@ CCore::~CCore(void)
 
     // Destroy tray icon
     delete m_pTrayIcon;
+
+    // This will set the GTA volume to the GTA volume value in the settings,
+    // and is not affected by the master volume setting.
+    m_pLocalGUI->GetMainMenu()->GetSettingsWindow()->ResetGTAVolume();
 
     // Delete the mod manager
     delete m_pModManager;
@@ -482,6 +487,20 @@ bool CCore::IsChatVisible(void)
     if (m_pLocalGUI)
     {
         return m_pLocalGUI->IsChatBoxVisible();
+    }
+    return false;
+}
+
+bool CCore::ClearChat()
+{
+    if (m_pLocalGUI)
+    {
+        CChat* pChat = m_pLocalGUI->GetChat();
+        if (pChat)
+        {
+            pChat->Clear();
+            return true;
+        }
     }
     return false;
 }
@@ -995,6 +1014,9 @@ void CCore::CreateNetwork()
         ulong ulNetModuleVersion = 0;
         pfnCheckCompatibility(1, &ulNetModuleVersion);
         SString strMessage("Network module not compatible! (Expected 0x%x, got 0x%x)", MTA_DM_CLIENT_NET_MODULE_VERSION, ulNetModuleVersion);
+#if !defined(MTA_DM_CONNECT_TO_PUBLIC)
+        strMessage += "\n\n(Devs: Update source and run win-install-data.bat)";
+#endif
         BrowseToSolution("netc-not-compatible", ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage);
     }
 
@@ -1345,6 +1367,8 @@ void CCore::RegisterCommands()
     m_pCommands->Add("showframegraph", _("shows the frame timing graph"), CCommandFuncs::ShowFrameGraph);
     m_pCommands->Add("jinglebells", "", CCommandFuncs::JingleBells);
     m_pCommands->Add("fakelag", "", CCommandFuncs::FakeLag);
+
+    m_pCommands->Add("reloadnews", "for developers: reload news", CCommandFuncs::ReloadNews);
 }
 
 void CCore::SwitchRenderWindow(HWND hWnd, HWND hWndInput)
@@ -1780,37 +1804,16 @@ void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
     // Calc required time in ms between frames
     const double dTargetTimeToUse = 1000.0 / uiUseRate;
 
-    // Time now
-    double dTimeMs = GetTickCount32();
-
-    // Get delta time in ms since last frame
-    double dTimeUsed = dTimeMs - m_dLastTimeMs;
-
-    // Apply any over/underrun carried over from the previous frame
-    dTimeUsed += m_dPrevOverrun;
-
-    if (dTimeUsed < dTargetTimeToUse)
+    while(true)
     {
-        // Have time spare - maybe eat some of that now
-        double dSpare = dTargetTimeToUse - dTimeUsed;
-
-        double dUseUpNow = dSpare - dTargetTimeToUse * 0.2f;
-        if (dUseUpNow >= 1)
-            Sleep(static_cast<DWORD>(floor(dUseUpNow)));
-
-        // Redo timing calcs
-        dTimeMs = GetTickCount32();
-        dTimeUsed = dTimeMs - m_dLastTimeMs;
-        dTimeUsed += m_dPrevOverrun;
+        // See if we need to wait
+        double dSpare = dTargetTimeToUse - m_FrameRateTimer.Get();
+        if (dSpare <= 0.0)
+            break;
+        if (dSpare >= 2.0)
+            Sleep(1);
     }
-
-    // Update over/underrun for next frame
-    m_dPrevOverrun = dTimeUsed - dTargetTimeToUse;
-
-    // Limit carry over
-    m_dPrevOverrun = Clamp(dTargetTimeToUse * -0.9f, m_dPrevOverrun, dTargetTimeToUse * 0.1f);
-
-    m_dLastTimeMs = dTimeMs;
+    m_FrameRateTimer.Reset();
 
     DoReliablePulse();
 
@@ -1870,12 +1873,12 @@ void CCore::OnDeviceRestore(void)
 void CCore::OnPreFxRender(void)
 {
     // Don't do nothing if nothing won't be drawn
-    if (!CGraphics::GetSingleton().HasMaterialLine3DQueueItems())
+    if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems())
         return;
 
     CGraphics::GetSingleton().EnteringMTARenderZone();
 
-    CGraphics::GetSingleton().DrawMaterialLine3DQueue();
+    CGraphics::GetSingleton().DrawLine3DPreGUIQueue();
 
     CGraphics::GetSingleton().LeavingMTARenderZone();
 }

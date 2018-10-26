@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_MARKER
-#define __CGAMESA_MARKER
+#pragma once
 
 #include <game/CMarker.h>
 #include "Common.h"
@@ -76,5 +75,3 @@ public:
 private:
     CMarkerSAInterface* internalInterface;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CVector4D_H
-#define __CVector4D_H
+#pragma once
 
 #include <cmath>
 #include "CVector.h"
@@ -149,7 +148,7 @@ public:
         fX /= vecRight.fX;
         fY /= vecRight.fY;
         fZ /= vecRight.fZ;
-        fW /= vecRight.fZ;
+        fW /= vecRight.fW;
     }
 
     bool operator==(const CVector4D& param) const
@@ -169,5 +168,3 @@ public:
     float fZ;
     float fW;
 };
-
-#endif

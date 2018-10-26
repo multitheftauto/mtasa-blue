@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_BMX
-#define __CGAME_BMX
+#pragma once
 
 #include "CVehicle.h"
 
@@ -19,5 +18,3 @@ class CBmx : public virtual CVehicle
 public:
     virtual ~CBmx(void){};
 };
-
-#endif

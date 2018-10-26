@@ -768,7 +768,6 @@ bool CMainConfig::LoadExtended(void)
     RegisterCommand("aexec", CConsoleCommands::AExec, false);
 
     RegisterCommand("whois", CConsoleCommands::WhoIs, false);
-    RegisterCommand("whowas", CConsoleCommands::WhoWas, false);
 
     RegisterCommand("debugscript", CConsoleCommands::DebugScript, false);
 

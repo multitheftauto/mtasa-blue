@@ -10,7 +10,7 @@
 
 #include "StdInc.h"
 
-CClientWeapon::CClientWeapon(CClientManager *pManager, ElementID ID, eWeaponType type)
+CClientWeapon::CClientWeapon(CClientManager* pManager, ElementID ID, eWeaponType type)
     : ClassInit(this), CClientObject(pManager, ID, CClientPickupManager::GetWeaponModel(type), false)
 {
     // Ensure m_pTarget and m_pOwner get NULLed when they are destroyed
@@ -96,7 +96,7 @@ void CClientWeapon::DoPulse(void)
             {
                 if (m_pTarget->GetType() == CCLIENTPED || m_pTarget->GetType() == CCLIENTPLAYER)
                 {
-                    CClientPed *pPed = (CClientPed *)(CClientEntity *)(m_pTarget);
+                    CClientPed* pPed = (CClientPed*)(CClientEntity*)(m_pTarget);
                     pPed->GetBonePosition(m_targetBone, vecTargetPos);
                 }
                 else
@@ -190,7 +190,7 @@ void CClientWeapon::Create(void)
     if (!m_pWeapon)
     {
         m_pWeapon = g_pGame->CreateWeapon();
-        CPlayerPed *pPed = m_pManager->GetPlayerManager()->GetLocalPlayer()->GetGamePlayer();
+        CPlayerPed* pPed = m_pManager->GetPlayerManager()->GetLocalPlayer()->GetGamePlayer();
         m_pWeapon->Initialize(m_Type, 9999, NULL);
     }
 }
@@ -241,7 +241,7 @@ void CClientWeapon::Fire(bool bServerFire)
                 {
                     if (m_pTarget->GetType() == CCLIENTPED || m_pTarget->GetType() == CCLIENTPLAYER)
                     {
-                        CClientPed *pPed = (CClientPed *)(CClientEntity *)m_pTarget;
+                        CClientPed* pPed = (CClientPed*)(CClientEntity*)m_pTarget;
                         pPed->GetBonePosition(m_targetBone, vecTarget);
                     }
                     else
@@ -250,7 +250,7 @@ void CClientWeapon::Fire(bool bServerFire)
                         {
                             if (m_itargetWheel <= MAX_WHEELS)
                             {
-                                CClientVehicle *pTarget = (CClientVehicle *)(CClientEntity *)m_pTarget;
+                                CClientVehicle* pTarget = (CClientVehicle*)(CClientEntity*)m_pTarget;
                                 vecTarget = pTarget->GetGameVehicle()->GetWheelPosition((eWheelPosition)m_itargetWheel);
                             }
                             else
@@ -332,30 +332,30 @@ void CClientWeapon::Fire(bool bServerFire)
 }
 
 #ifdef SHOTGUN_TEST
-void CClientWeapon::FireInstantHit(CVector &vecOrigin, CVector &vecTarget, CVector &vecRotation, bool bRemote)
+void CClientWeapon::FireInstantHit(CVector& vecOrigin, CVector& vecTarget, CVector& vecRotation, bool bRemote)
 #else
 void CClientWeapon::FireInstantHit(CVector vecOrigin, CVector vecTarget, bool bServerFire, bool bRemote)
 #endif
 {
     CVector vecDirection = vecTarget - vecOrigin;
     vecDirection.Normalize();
-    CClientEntity *            pAttachedTo = GetAttachedTo();
+    CClientEntity*             pAttachedTo = GetAttachedTo();
     CVector                    vecOriginalTarget = vecTarget;
-    CEntity *                  pColEntity = NULL;
-    CColPoint *                pColPoint = NULL;
+    CEntity*                   pColEntity = NULL;
+    CColPoint*                 pColPoint = NULL;
     SLineOfSightBuildingResult pBuildingResult;
-    CEntitySAInterface *       pEntity = NULL;
+    CEntitySAInterface*        pEntity = NULL;
 
     if (m_Type != WEAPONTYPE_SHOTGUN)
     {
         CVector vecWeaponFirePosition;
         if (!IsLocalEntity() && m_pOwner)
         {
-            CClientPlayer *pPlayer = m_pOwner;
-            CClientPed *   pLocalPlayer = g_pClientGame->GetLocalPlayer();
+            CClientPlayer* pPlayer = m_pOwner;
+            CClientPed*    pLocalPlayer = g_pClientGame->GetLocalPlayer();
             if (pLocalPlayer && pPlayer)
             {
-                CClientVehicle *pVehicle = pLocalPlayer->GetRealOccupiedVehicle();
+                CClientVehicle* pVehicle = pLocalPlayer->GetRealOccupiedVehicle();
 
                 // Move both players to where they should be for shot compensation
                 if (pPlayer && !pPlayer->IsLocalPlayer())
@@ -407,7 +407,7 @@ void CClientWeapon::FireInstantHit(CVector vecOrigin, CVector vecTarget, bool bS
             return;
         }
         // Execute our weapon fire event
-        CClientEntity *pClientEntity = m_pManager->FindEntitySafe(pColEntity);
+        CClientEntity* pClientEntity = m_pManager->FindEntitySafe(pColEntity);
         CLuaArguments  Arguments;
         if (pClientEntity)
             Arguments.PushElement(pClientEntity);            // entity that got hit
@@ -444,14 +444,14 @@ void CClientWeapon::FireInstantHit(CVector vecOrigin, CVector vecTarget, bool bS
 
         if (!IsLocalEntity() && m_pOwner)
         {
-            CClientPed *pPed = m_pOwner;
-            CClientPed *pLocalPlayer = g_pClientGame->GetLocalPlayer();
+            CClientPed* pPed = m_pOwner;
+            CClientPed* pLocalPlayer = g_pClientGame->GetLocalPlayer();
             if (pPed->GetType() == CCLIENTPLAYER)
             {
                 // Restore compensated positions
                 if (!pPed->IsLocalPlayer())
                 {
-                    CClientVehicle *pVehicle = pLocalPlayer->GetRealOccupiedVehicle();
+                    CClientVehicle* pVehicle = pLocalPlayer->GetRealOccupiedVehicle();
                     if (!pVehicle)
                     {
                         pLocalPlayer->SetPosition(vecWeaponFirePosition, false, false);
@@ -481,12 +481,12 @@ void CClientWeapon::FireInstantHit(CVector vecOrigin, CVector vecTarget, bool bS
         pColPoint->Destroy();
 }
 
-void CClientWeapon::FireShotgun(CEntity *pFiringEntity, const CVector &vecOrigin, const CVector &vecTarget, CVector &vecRotation)
+void CClientWeapon::FireShotgun(CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget, CVector& vecRotation)
 {
     // m_pWeapon->FireBullet ( pFiringEntity, vecOrigin, vecTarget, false, vecRotation );
 }
 
-void CClientWeapon::GetDirection(CVector &vecDirection)
+void CClientWeapon::GetDirection(CVector& vecDirection)
 {
     CVector vecRotation;
     GetRotationRadians(vecRotation);
@@ -495,7 +495,7 @@ void CClientWeapon::GetDirection(CVector &vecDirection)
     RotateVector(vecDirection, vecRotation);
 }
 
-void CClientWeapon::SetDirection(CVector &vecDirection)
+void CClientWeapon::SetDirection(CVector& vecDirection)
 {
     CVector vecRotation;
     GetRotationRadians(vecRotation);
@@ -510,13 +510,13 @@ void CClientWeapon::SetDirection(CVector &vecDirection)
     SetRotationRadians(vecRotation);
 }
 
-void CClientWeapon::SetTargetDirection(CVector &vecDirection)
+void CClientWeapon::SetTargetDirection(CVector& vecDirection)
 {
     m_vecTargetDirection = vecDirection;
     m_bHasTargetDirection = true;
 }
 
-void CClientWeapon::LookAt(CVector &vecPosition, bool bInterpolate)
+void CClientWeapon::LookAt(CVector& vecPosition, bool bInterpolate)
 {
     CVector vecCurrentPosition;
     GetPosition(vecCurrentPosition);
@@ -529,7 +529,7 @@ void CClientWeapon::LookAt(CVector &vecPosition, bool bInterpolate)
         SetDirection(vecDirection);
 }
 
-void CClientWeapon::SetWeaponTarget(CClientEntity *pTarget, int subTarget)
+void CClientWeapon::SetWeaponTarget(CClientEntity* pTarget, int subTarget)
 {
     m_pTarget = pTarget;
     m_targetType = TARGET_TYPE_ENTITY;
@@ -594,7 +594,7 @@ bool CClientWeapon::SetFlags(const SLineOfSightFlags flags)
     return true;
 }
 
-bool CClientWeapon::GetFlags(eWeaponFlags flag, bool &bData)
+bool CClientWeapon::GetFlags(eWeaponFlags flag, bool& bData)
 {
     switch (flag)
     {
@@ -614,7 +614,7 @@ bool CClientWeapon::GetFlags(eWeaponFlags flag, bool &bData)
     return false;
 }
 
-bool CClientWeapon::GetFlags(SLineOfSightFlags &flags)
+bool CClientWeapon::GetFlags(SLineOfSightFlags& flags)
 {
     flags = m_weaponConfig.flags;
     return true;
@@ -680,7 +680,7 @@ void CClientWeapon::DoGunShells(CVector vecOrigin, CVector vecDirection)
     }
 }
 
-int CClientWeapon::GetWeaponFireTime(CWeaponStat *pWeaponStat)
+int CClientWeapon::GetWeaponFireTime(CWeaponStat* pWeaponStat)
 {
     float fWeaponFireTime = (pWeaponStat->GetWeaponAnimLoopStop() - pWeaponStat->GetWeaponAnimLoopStart()) * 1000.0f;
     return (int)fWeaponFireTime;
@@ -711,7 +711,7 @@ CVector CClientWeapon::GetWeaponVectorTarget(void)
     return m_vecTarget;
 }
 
-CClientEntity *CClientWeapon::GetWeaponEntityTarget(void)
+CClientEntity* CClientWeapon::GetWeaponEntityTarget(void)
 {
     return m_pTarget;
 }

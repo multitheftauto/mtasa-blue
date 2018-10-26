@@ -24,8 +24,11 @@ public:
     LUA_DECLARE(DxDrawMaterialSectionLine3D);
     LUA_DECLARE(DxDrawText);
     LUA_DECLARE(DxDrawRectangle);
+    LUA_DECLARE(DxDrawCircle);
     LUA_DECLARE(DxDrawImage);
     LUA_DECLARE(DxDrawImageSection);
+    LUA_DECLARE(DxDrawPrimitive);
+    LUA_DECLARE(DxDrawMaterialPrimitive);
     LUA_DECLARE_OOP(DxGetTextWidth);
     LUA_DECLARE_OOP(DxGetFontHeight);
     LUA_DECLARE(DxCreateFont);

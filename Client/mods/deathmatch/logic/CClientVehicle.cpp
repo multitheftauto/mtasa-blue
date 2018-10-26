@@ -882,6 +882,17 @@ void CClientVehicle::Fix(void)
                 SetComponentRotation(strTemp, (*iter).second.m_vecComponentRotation);
             }
         }
+        // is our scale changed?
+        if((*iter).second.m_bScaleChanged)
+        {
+            // Make sure it's different
+            if((*iter).second.m_vecOriginalComponentScale != (*iter).second.m_vecComponentScale)
+            {
+                // apply our new rotation
+                SetComponentScale(strTemp, (*iter).second.m_vecComponentScale);
+            }
+        }
+
         // set our visibility
         SetComponentVisible(strTemp, (*iter).second.m_bVisible);
     }
@@ -941,6 +952,7 @@ CVehicleColor& CClientVehicle::GetColor(void)
 void CClientVehicle::SetColor(const CVehicleColor& color)
 {
     m_Color = color;
+    m_bColorSaved = true;
     if (m_pVehicle)
     {
         m_pVehicle->SetColor(m_Color.GetRGBColor(0), m_Color.GetRGBColor(1), m_Color.GetRGBColor(2), m_Color.GetRGBColor(3), 0);
@@ -2790,10 +2802,12 @@ void CClientVehicle::Create(void)
                 // Grab our start position
                 GetComponentPosition((*iter).first, vehicleComponentData.m_vecComponentPosition);
                 GetComponentRotation((*iter).first, vehicleComponentData.m_vecComponentRotation);
+                GetComponentScale((*iter).first, vehicleComponentData.m_vecComponentScale);
 
                 // copy it into our original positions
                 vehicleComponentData.m_vecOriginalComponentPosition = vehicleComponentData.m_vecComponentPosition;
                 vehicleComponentData.m_vecOriginalComponentRotation = vehicleComponentData.m_vecComponentRotation;
+                vehicleComponentData.m_vecOriginalComponentScale = vehicleComponentData.m_vecComponentScale;
 
                 // insert it into our component data list
                 m_ComponentData.insert(std::pair<SString, SVehicleComponentData>((*iter).first, vehicleComponentData));
@@ -2825,14 +2839,24 @@ void CClientVehicle::Create(void)
                     SetComponentPosition(strTemp, (*iter).second.m_vecComponentPosition);
                 }
             }
-            // is our position changed?
+            // is our rotation changed?
             if ((*iter).second.m_bRotationChanged)
             {
                 // Make sure it's different
                 if ((*iter).second.m_vecOriginalComponentRotation != (*iter).second.m_vecComponentRotation)
                 {
-                    // apple our new position
+                    // apple our new rotation
                     SetComponentRotation(strTemp, (*iter).second.m_vecComponentRotation);
+                }
+            }
+            // is our scale changed?
+            if((*iter).second.m_bScaleChanged)
+            {
+                // Make sure it's different
+                if((*iter).second.m_vecOriginalComponentScale != (*iter).second.m_vecComponentScale)
+                {
+                    // apple our new scale
+                    SetComponentScale(strTemp, (*iter).second.m_vecComponentScale);
                 }
             }
             // set our visibility
@@ -3062,7 +3086,7 @@ bool CClientVehicle::SetTowedVehicle(CClientVehicle* pVehicle, const CVector* ve
             pVehicle->SetTrainTrack(pChainEngine->GetTrainTrack());
             pVehicle->SetTrainPosition(pChainEngine->GetTrainPosition());
             pVehicle->SetTrainDirection(pChainEngine->GetTrainDirection());
-    
+
             CVector vecPosition;
             pChainEngine->GetPosition(vecPosition);
             pVehicle->SetPosition(vecPosition);
@@ -3739,8 +3763,8 @@ void CClientVehicle::UpdateTargetPosition(void)
 #endif
 
         // Update our contact players
-        CVector                     vecPlayerPosition;
-        CVector                     vecOffset;
+        CVector vecPlayerPosition;
+        CVector vecOffset;
         for (uint i = 0; i < m_Contacts.size(); i++)
         {
             CClientPed* pModel = m_Contacts[i];
@@ -4516,6 +4540,74 @@ bool CClientVehicle::GetComponentRotation(const SString& vehicleComponent, CVect
     return false;
 }
 
+bool CClientVehicle::SetComponentScale(const SString& vehicleComponent, CVector vecScale, EComponentBaseType inputBase)
+{
+    // Ensure scale is parent relative
+    ConvertComponentScaleBase(vehicleComponent, vecScale, inputBase, EComponentBase::PARENT);
+
+    if(m_pVehicle)
+    {
+        // set our rotation on the model
+        if(m_pVehicle->SetComponentScale(vehicleComponent, vecScale))
+        {
+            // update our cache
+            m_ComponentData[vehicleComponent].m_vecComponentScale = vecScale;
+            m_ComponentData[vehicleComponent].m_bScaleChanged = true;
+
+            return true;
+        }
+    }
+    else
+    {
+        if(m_ComponentData.find(vehicleComponent) != m_ComponentData.end())
+        {
+            // update our cache
+            m_ComponentData[vehicleComponent].m_vecComponentScale = vecScale;
+            m_ComponentData[vehicleComponent].m_bScaleChanged = true;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CClientVehicle::GetComponentScale(const SString& vehicleComponent, CVector& vecScale , EComponentBaseType outputBase)
+{
+    if(m_pVehicle)
+    {
+        // fill our scale from the actual rotation
+        bool bResult = m_pVehicle->GetComponentScale(vehicleComponent, vecScale);
+
+        // Convert to required base
+        ConvertComponentScaleBase(vehicleComponent, vecScale, EComponentBase::PARENT, outputBase);
+
+        return bResult;
+    }
+    else
+    {
+        if(m_ComponentData.find(vehicleComponent) != m_ComponentData.end())
+        {
+            // fill our rotation from the cached rotation
+            vecScale = m_ComponentData[vehicleComponent].m_vecComponentScale;
+
+            // Convert to required base
+            ConvertComponentScaleBase(vehicleComponent, vecScale, EComponentBase::PARENT, outputBase);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CClientVehicle::ResetComponentScale(const SString& vehicleComponent)
+{
+    // set our rotation on the model
+    if(SetComponentScale(vehicleComponent, m_ComponentData[vehicleComponent].m_vecOriginalComponentScale))
+    {
+        // update our cache
+        m_ComponentData[vehicleComponent].m_bScaleChanged = false;
+        return true;
+    }
+    return false;
+}
 bool CClientVehicle::ResetComponentRotation(const SString& vehicleComponent)
 {
     // set our rotation on the model
@@ -4564,7 +4656,7 @@ void CClientVehicle::GetComponentParentToRootMatrix(const SString& vehicleCompon
         CMatrix matCombo;
         for (uint i = 0; pComponentData && i < 10; i++)
         {
-            CMatrix matFrame(pComponentData->m_vecComponentPosition, pComponentData->m_vecComponentRotation);
+            CMatrix matFrame(pComponentData->m_vecComponentPosition, pComponentData->m_vecComponentRotation, pComponentData->m_vecComponentScale);
             matCombo = matCombo * matFrame;
             pComponentData = MapFind(m_ComponentData, pComponentData->m_strParentName);
         }
@@ -4595,6 +4687,17 @@ void CClientVehicle::ConvertComponentPositionBase(const SString& vehicleComponen
         CMatrix matTemp(vecPosition);
         ConvertComponentMatrixBase(vehicleComponent, matTemp, inputBase, outputBase);
         vecPosition = matTemp.GetPosition();
+    }
+}
+
+void CClientVehicle::ConvertComponentScaleBase(const SString& vehicleComponent, CVector& vecScale, EComponentBaseType inputBase,
+    EComponentBaseType outputBase)
+{
+    if(inputBase != outputBase)
+    {
+        CMatrix matTemp(CVector(), CVector(), vecScale);
+        ConvertComponentMatrixBase(vehicleComponent, matTemp, inputBase, outputBase);
+        vecScale = matTemp.GetScale();
     }
 }
 
@@ -4721,22 +4824,6 @@ bool CClientVehicle::DoesSupportUpgrade(const SString& strFrameName)
         return m_pVehicle->DoesSupportUpgrade(strFrameName);
     }
     return true;
-}
-
-void CClientVehicle::SetModelExhaustFumesPosition(unsigned short modelID, const CVector& position)
-{
-    auto pModelInfo = g_pGame->GetModelInfo(modelID);
-    if (pModelInfo)
-        pModelInfo->SetVehicleExhaustFumesPosition(position);
-}
-
-CVector CClientVehicle::GetModelExhaustFumesPosition(unsigned short modelID)
-{
-    auto pModelInfo = g_pGame->GetModelInfo(modelID);
-    if (pModelInfo)
-        return pModelInfo->GetVehicleExhaustFumesPosition();
-
-    return CVector();
 }
 
 bool CClientVehicle::OnVehicleFallThroughMap()

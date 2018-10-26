@@ -31,14 +31,21 @@ void CElementDeleter::Delete(class CClientEntity* pElement)
         // Add it to our list
         if (!pElement->IsBeingDeleted())
         {
-            m_List.push_back(pElement);
-        }
+            // Flag it as being deleted and unlink it from the tree/managers
+            pElement->SetBeingDeleted(true);
+            pElement->ClearChildren();
+            pElement->SetParent(NULL);
 
-        // Flag it as being deleted and unlink it from the tree/managers
-        pElement->SetBeingDeleted(true);
-        pElement->ClearChildren();
-        pElement->SetParent(NULL);
-        pElement->Unlink();
+            if (pElement->IsSmartPointer())
+            {
+                m_ListRawSmartPointer.push_back(pElement);
+            }
+            else
+            {
+                m_List.push_back(pElement);
+                pElement->Unlink();
+            }
+        }
     }
 }
 
@@ -63,16 +70,24 @@ void CElementDeleter::DeleteRecursive(class CClientEntity* pElement)
     // Add it to our list over deleting objects
     if (!pElement->IsBeingDeleted())
     {
-        m_List.push_back(pElement);
-    }
+        // Mark us as being deleted, unlink from parent and unlink from manager classes eventually
+        pElement->SetBeingDeleted(true);
+        pElement->SetParent(NULL);
 
-    // Mark us as being deleted, unlink from parent and unlink from manager classes eventually
-    pElement->SetBeingDeleted(true);
-    pElement->SetParent(NULL);
-    pElement->Unlink();
+        if (pElement->IsSmartPointer())
+        {
+            m_ListRawSmartPointer.push_back(pElement);
+        }
+        else
+        {
+            m_List.push_back(pElement);
+            pElement->Unlink();
+        }
+    }
 }
 
-void CElementDeleter::DoDeleteAll(void)
+
+void CElementDeleter::DoDeleteAll()
 {
     // Make sure elements won't call us back and screw with our list (would crash)
     m_bAllowUnreference = false;
@@ -88,8 +103,21 @@ void CElementDeleter::DoDeleteAll(void)
         iter = m_List.erase(iter);
     }
 
+    DoDeleteAllSmartPointers();
+
     // We can now allow unrefernecs again
     m_bAllowUnreference = true;
+}
+ 
+void CElementDeleter::DoDeleteAllSmartPointers()
+{
+    // Delete all the elements
+    list<CClientEntity*>::iterator iter = m_ListRawSmartPointer.begin();
+    while (iter != m_ListRawSmartPointer.end())
+    {
+        (*iter)->Unlink();
+        iter = m_ListRawSmartPointer.erase(iter);
+    }
 }
 
 bool CElementDeleter::IsBeingDeleted(CClientEntity* pElement)

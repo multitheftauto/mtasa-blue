@@ -11,8 +11,7 @@
 
 class CHandlingEntry;
 
-#ifndef __CHANDLINGENTRY_H
-#define __CHANDLINGENTRY_H
+#pragma once
 
 class CTransmissionSAInterface
 {
@@ -199,5 +198,3 @@ public:
 private:
     tHandlingData m_Handling;
 };
-
-#endif

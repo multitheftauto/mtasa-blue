@@ -62,8 +62,12 @@ BOOL WINAPI ConsoleEventHandler(DWORD dwCtrlType)
     {
         if (g_pGame)
         {
-            // Graceful close on Ctrl-C or Ctrl-Break
-            g_pGame->SetIsFinished(true);
+            // If we have nothing in the input buffer, let's close the server, otherwise just reset input
+            if (!g_pServerInterface->ResetInput())
+            {
+                // Graceful close on Ctrl-C or Ctrl-Break
+                g_pGame->SetIsFinished(true);
+            }
             return TRUE;
         }
     }
@@ -74,7 +78,8 @@ void sighandler(int sig)
 {
     if (sig == SIGTERM || sig == SIGINT)
     {
-        if (g_pGame)
+        // If we received a Ctrl-C, let's try resetting input buffer first, otherwise close the server
+        if (g_pGame && (sig != SIGINT || (sig == SIGINT && !g_pServerInterface->ResetInput())))
         {
             // Graceful close on Ctrl-C or 'kill'
             g_pGame->SetIsFinished(true);
@@ -469,6 +474,8 @@ void CGame::DoPulse(void)
 
     CLOCK_CALL1(m_pAsyncTaskScheduler->CollectResults());
 
+    CLOCK_CALL1(m_pMapManager->GetWeather()->DoPulse(););
+
     PrintLogOutputFromNetModule();
     m_pScriptDebugging->UpdateLogOutput();
 
@@ -512,7 +519,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pRegisteredCommands = new CRegisteredCommands(m_pACLManager);
     m_pLuaManager = new CLuaManager(m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pRegisteredCommands,
                                     m_pMapManager, &m_Events);
-    m_pConsole = new CConsole(m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager, m_pLuaManager, &m_WhoWas,
+    m_pConsole = new CConsole(m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager, m_pLuaManager,
                               m_pBanManager, m_pACLManager);
     m_pMainConfig = new CMainConfig(m_pConsole, m_pLuaManager);
     m_pRPCFunctions = new CRPCFunctions;
@@ -1243,7 +1250,7 @@ void CGame::InitialDataStream(CPlayer& Player)
     marker.Set("SetParentObject");
 
     // He's joined now
-    Player.SetStatus(STATUS_JOINED);
+    Player.SetJoined();
     m_pPlayerManager->OnPlayerJoin(&Player);
 
     // Console
@@ -1380,7 +1387,7 @@ void CGame::QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason, bool bSayI
     }
 
     // If he had joined
-    if (Player.GetStatus() == STATUS_JOINED)
+    if (Player.IsJoined())
     {
         // Tell our scripts the player has quit, but only if the scripts got told he joined
         CLuaArguments Arguments;
@@ -1790,10 +1797,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                 }
                             #endif
 
-                                // Add him to the whowas list
-                                m_WhoWas.Add(szNick, Packet.GetSourceIP(), pPlayer->GetSerial(), pPlayer->GetPlayerVersion(), pPlayer->GetAccount()->GetName());
-
-                                PlayerCompleteConnect(pPlayer, true, NULL);
+                                PlayerCompleteConnect(pPlayer);
                             }
                             else
                             {
@@ -3643,7 +3647,7 @@ void CGame::Packet_CameraSync(CCameraSyncPacket& Packet)
 void CGame::Packet_PlayerTransgression(CPlayerTransgressionPacket& Packet)
 {
     CPlayer* pPlayer = Packet.GetSourcePlayer();
-    if (pPlayer && pPlayer->IsJoined())
+    if (pPlayer)
     {
         // If ac# not disabled on this server, do a kick
         if (!g_pGame->GetConfig()->IsDisableAC(SString("%d", Packet.m_uiLevel)))
@@ -3880,51 +3884,39 @@ void CGame::Packet_PlayerACInfo(CPlayerACInfoPacket& Packet)
     }
 }
 
-void CGame::PlayerCompleteConnect(CPlayer* pPlayer, bool bSuccess, const char* szError)
+void CGame::PlayerCompleteConnect(CPlayer* pPlayer)
 {
     SString strIPAndSerial("IP: %s  Serial: %s  Version: %s", pPlayer->GetSourceIP(), pPlayer->GetSerial().c_str(), pPlayer->GetPlayerVersion().c_str());
-    if (bSuccess)
+    // Call the onPlayerConnect event. If it returns false, disconnect the player
+    CLuaArguments Arguments;
+    Arguments.PushString(pPlayer->GetNick());
+    Arguments.PushString(pPlayer->GetSourceIP());
+    Arguments.PushString(pPlayer->GetSerialUser().c_str());
+    Arguments.PushString(pPlayer->GetSerial().c_str());
+    Arguments.PushNumber(pPlayer->GetMTAVersion());
+    Arguments.PushString(pPlayer->GetPlayerVersion());
+    if (!g_pGame->GetMapManager()->GetRootElement()->CallEvent("onPlayerConnect", Arguments))
     {
-        // Call the onPlayerConnect event. If it returns false, disconnect the player
-        CLuaArguments Arguments;
-        Arguments.PushString(pPlayer->GetNick());
-        Arguments.PushString(pPlayer->GetSourceIP());
-        Arguments.PushString(pPlayer->GetSerialUser().c_str());
-        Arguments.PushString(pPlayer->GetSerial().c_str());
-        Arguments.PushNumber(pPlayer->GetMTAVersion());
-        Arguments.PushString(pPlayer->GetPlayerVersion());
-        if (!g_pGame->GetMapManager()->GetRootElement()->CallEvent("onPlayerConnect", Arguments))
+        // event cancelled, disconnect the player
+        CLogger::LogPrintf("CONNECT: %s failed to connect. (onPlayerConnect event cancelled) (%s)\n", pPlayer->GetNick(), strIPAndSerial.c_str());
+        const char* szError = g_pGame->GetEvents()->GetLastError();
+        if (szError && szError[0])
         {
-            // event cancelled, disconnect the player
-            CLogger::LogPrintf("CONNECT: %s failed to connect. (onPlayerConnect event cancelled) (%s)\n", pPlayer->GetNick(), strIPAndSerial.c_str());
-            const char* szError = g_pGame->GetEvents()->GetLastError();
-            if (szError && szError[0])
-            {
-                DisconnectPlayer(g_pGame, *pPlayer, szError);
-                return;
-            }
-            DisconnectPlayer(g_pGame, *pPlayer, CPlayerDisconnectedPacket::GENERAL_REFUSED);
+            DisconnectPlayer(g_pGame, *pPlayer, szError);
             return;
         }
-
-        // Tell the console
-        CLogger::LogPrintf("CONNECT: %s connected (%s)\n", pPlayer->GetNick(), strIPAndSerial.c_str());
-
-        // Send him the join details
-        pPlayer->Send(CPlayerConnectCompletePacket());
-
-        // The player is spawned when he's connected, just the Camera is not faded in/not targetting
-        pPlayer->SetSpawned(true);
-    }
-    else
-    {
-        CLogger::LogPrintf("CONNECT: %s failed to connect (Invalid serial) (%s)\n", pPlayer->GetNick(), strIPAndSerial.c_str());
-        if (szError && strlen(szError) > 0)
-            DisconnectPlayer(g_pGame, *pPlayer, szError);
-        else
-            DisconnectPlayer(g_pGame, *pPlayer, CPlayerDisconnectedPacket::SERIAL_VERIFICATION);
+        DisconnectPlayer(g_pGame, *pPlayer, CPlayerDisconnectedPacket::GENERAL_REFUSED);
         return;
     }
+
+    // Tell the console
+    CLogger::LogPrintf("CONNECT: %s connected (%s)\n", pPlayer->GetNick(), strIPAndSerial.c_str());
+
+    // Send him the join details
+    pPlayer->Send(CPlayerConnectCompletePacket());
+
+    // The player is spawned when he's connected, just the Camera is not faded in/not targetting
+    pPlayer->SetSpawned(true);
 }
 
 void CGame::Lock(void)

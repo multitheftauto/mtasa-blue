@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLOCK_H
-#define __CCLOCK_H
+#pragma once
 
 class CClock
 {
@@ -27,5 +26,3 @@ private:
     unsigned long long m_ullMidnightTime;
     unsigned long      m_ulMinuteDuration;
 };
-
-#endif

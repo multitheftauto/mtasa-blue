@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPERPLAYERENTITY_H
-#define __CPERPLAYERENTITY_H
+#pragma once
 
 #include "CElement.h"
 #include "packets/CPacket.h"
@@ -20,7 +19,7 @@ class CPerPlayerEntity : public CElement
     friend class CElement;
 
 public:
-    CPerPlayerEntity(CElement* pParent, CXMLNode* pNode = NULL);
+    CPerPlayerEntity(CElement* pParent);
     ~CPerPlayerEntity(void);
 
     bool IsEntity(void) { return true; }
@@ -70,5 +69,3 @@ private:
 
     static std::set<CPerPlayerEntity*> ms_AllPerPlayerEntityMap;
 };
-
-#endif

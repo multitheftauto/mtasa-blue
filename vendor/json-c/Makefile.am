@@ -1,9 +1,18 @@
-include Makefile.am.inc
+#ACLOCAL_AMFLAGS = -I autoconf-archive/m4
 
-EXTRA_DIST = README.html README-WIN32.html config.h.win32 doc json-c.vcproj
+EXTRA_DIST = README.md README.html
+EXTRA_DIST += config.h.win32
+EXTRA_DIST += Doxyfile
+EXTRA_DIST += issues_closed_for_0.13.md
+
+dist-hook:
+	test -d "$(distdir)/doc" || mkdir "$(distdir)/doc"
+	chmod -R u+w "$(distdir)/doc"
+	cd "$(distdir)" && doxygen
+
 SUBDIRS = . tests
 
-noinst_LTLIBRARIES = libjson-c.la 
+lib_LTLIBRARIES = libjson-c.la
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = json-c.pc
@@ -14,24 +23,28 @@ libjson_cinclude_HEADERS = \
 	bits.h \
 	debug.h \
 	json.h \
-	json_config.h \
 	json_c_version.h \
+	json_config.h \
 	json_inttypes.h \
 	json_object.h \
 	json_object_iterator.h \
-	json_object_private.h \
+	json_pointer.h \
 	json_tokener.h \
 	json_util.h \
+	json_visit.h \
 	linkhash.h \
-	printbuf.h \
-	random_seed.h
+	printbuf.h
 
-#libjsonx_includedir = $(libdir)/json-c-@VERSION@
-#
-#libjsonx_include_HEADERS = \
-#	json_config.h
+noinst_HEADERS=\
+	json_object_private.h \
+	math_compat.h \
+	strdup_compat.h \
+	snprintf_compat.h \
+	vasprintf_compat.h \
+	random_seed.h \
+	strerror_override.h
 
-libjson_c_la_LDFLAGS = -version-info 2:1:0 -no-undefined @JSON_BSYMBOLIC_LDFLAGS@
+libjson_c_la_LDFLAGS = -version-info 4:0:0 -no-undefined @JSON_BSYMBOLIC_LDFLAGS@
 
 libjson_c_la_SOURCES = \
 	arraylist.c \
@@ -39,20 +52,53 @@ libjson_c_la_SOURCES = \
 	json_c_version.c \
 	json_object.c \
 	json_object_iterator.c \
+	json_pointer.c \
 	json_tokener.c \
 	json_util.c \
+	json_visit.c \
 	linkhash.c \
 	printbuf.c \
-	random_seed.c
+	random_seed.c \
+	strerror_override.c \
+	strerror_override_private.h
 
+
+DISTCLEANFILES=
+DISTCLEANFILES+= \
+	config.h \
+	json-c-uninstalled.pc \
+	json-c.pc \
+	json_config.h
 
 distclean-local:
 	-rm -rf $(testsubdir)
-	-rm -rf config.h.in~ Makefile.in aclocal.m4 autom4te.cache/ config.guess config.sub depcomp install-sh ltmain.sh missing
-	-rm -f INSTALL test-driver tests/Makefile.in compile
 
-maintainer-clean-local:
-	-rm -rf configure
+JSON_CLEANFILES=
+JSON_CLEANFILES+= \
+	Makefile.in \
+	aclocal.m4 \
+	autom4te.cache/ \
+	compile \
+	config.guess \
+	config.h.in \
+	config.sub \
+	configure \
+	depcomp \
+	install-sh \
+	ltmain.sh \
+	missing \
+	test-driver \
+	tests/Makefile.in
+JSON_CLEANFILES+= \
+	libtool \
+	stamp-h1 \
+	stamp-h2
+
+# There's no built-in way to remove these after all the other
+# maintainer-clean steps happen, so do it explicitly here.
+really-clean:
+	$(MAKE) maintainer-clean
+	rm -rf ${JSON_CLEANFILES}
 
 uninstall-local:
 	rm -rf "$(DESTDIR)@includedir@/json-c"

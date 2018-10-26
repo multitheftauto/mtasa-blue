@@ -9,18 +9,16 @@
  *
  *****************************************************************************/
 
-#ifndef __CCONSOLE_H
-#define __CCONSOLE_H
+#pragma once
 
 #include "CConsoleCommand.h"
 #include <list>
-#include "CWhoWas.h"
 
 class CConsole
 {
 public:
     CConsole(class CBlipManager* pBlipManager, class CMapManager* pMapManager, class CPlayerManager* pPlayerManager,
-             class CRegisteredCommands* pRegisteredCommands, class CVehicleManager* pVehicleManager, class CLuaManager* pLuaManager, CWhoWas* pWhoWas,
+             class CRegisteredCommands* pRegisteredCommands, class CVehicleManager* pVehicleManager, class CLuaManager* pLuaManager,
              class CBanManager* pBanManager, class CAccessControlListManager* pACLManager);
     ~CConsole(void);
 
@@ -40,7 +38,6 @@ public:
     class CPlayerManager*  GetPlayerManager(void) { return m_pPlayerManager; };
     class CVehicleManager* GetVehicleManager(void) { return m_pVehicleManager; };
     class CBanManager*     GetBanManager(void) { return m_pBanManager; };
-    class CWhoWas*         GetWhoWas(void) { return m_pWhoWas; };
 
 private:
     class CBlipManager*              m_pBlipManager;
@@ -50,10 +47,7 @@ private:
     class CVehicleManager*           m_pVehicleManager;
     class CLuaManager*               m_pLuaManager;
     class CBanManager*               m_pBanManager;
-    class CWhoWas*                   m_pWhoWas;
     class CAccessControlListManager* m_pACLManager;
 
     list<CConsoleCommand*> m_Commands;
 };
-
-#endif

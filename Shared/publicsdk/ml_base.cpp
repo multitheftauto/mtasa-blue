@@ -4,9 +4,9 @@
  *
  *  ml_base, External lua add-on module
  *
- *  Copyright © 2003-2008 MTA.  All Rights Reserved.
+ *  Copyright Â© 2003-2018 MTA.  All Rights Reserved.
  *
- *  Grand Theft Auto is © 2002-2003 Rockstar North
+ *  Grand Theft Auto is Â© 2002-2018 Rockstar North
  *
  *  THE FOLLOWING SOURCES ARE PART OF THE MULTI THEFT
  *  AUTO SOFTWARE DEVELOPMENT KIT AND ARE RELEASED AS
@@ -18,10 +18,10 @@
 
 #include "ml_base.h"
 
-ILuaModuleManager10 *pModuleManager = NULL;
+ILuaModuleManager10* pModuleManager = NULL;
 
 // Initialisation function (module entrypoint)
-MTAEXPORT bool InitModule(ILuaModuleManager10 *pManager, char *szModuleName, char *szAuthor, float *fVersion)
+MTAEXPORT bool InitModule(ILuaModuleManager10* pManager, char* szModuleName, char* szAuthor, float* fVersion)
 {
     pModuleManager = pManager;
 
@@ -33,7 +33,7 @@ MTAEXPORT bool InitModule(ILuaModuleManager10 *pManager, char *szModuleName, cha
     return true;
 }
 
-MTAEXPORT void RegisterFunctions(lua_State *luaVM)
+MTAEXPORT void RegisterFunctions(lua_State* luaVM)
 {
     if (pModuleManager && luaVM)
     {
@@ -51,12 +51,12 @@ MTAEXPORT bool ShutdownModule(void)
     return true;
 }
 
-MTAEXPORT bool ResourceStopping(lua_State *luaVM)
+MTAEXPORT bool ResourceStopping(lua_State* luaVM)
 {
     return true;
 }
 
-MTAEXPORT bool ResourceStopped(lua_State *luaVM)
+MTAEXPORT bool ResourceStopped(lua_State* luaVM)
 {
     return true;
 }

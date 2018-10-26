@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPed_H
-#define __CPed_H
+#pragma once
 
 #include "CCommon.h"
 #include "CElement.h"
@@ -132,13 +131,13 @@ public:
         VEHICLEACTION_JACKED,
     };
 
-    CPed(class CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel);
+    CPed(class CPedManager* pPedManager, CElement* pParent, unsigned short usModel);
     ~CPed(void);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
     bool IsEntity(void) { return true; }
 
     virtual void Unlink(void);
-    virtual bool ReadSpecialData(void);
 
     bool HasValidModel(void);
 
@@ -267,6 +266,9 @@ public:
     void SetCollisionEnabled(bool bCollisionEnabled) { m_bCollisionsEnabled = bCollisionEnabled; }
 
 protected:
+    bool ReadSpecialData(const int iLine) override;
+
+protected:
     unsigned short                       m_usModel;
     CMatrix                              m_Matrix;
     bool                                 m_bDucked;
@@ -311,5 +313,3 @@ protected:
 private:
     CPedManager* m_pPedManager;
 };
-
-#endif

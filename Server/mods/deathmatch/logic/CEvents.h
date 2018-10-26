@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CEVENTS_H
-#define __CEVENTS_H
+#pragma once
 
 #include <string>
 #include <list>
@@ -60,5 +59,3 @@ private:
 
     SString m_strLastError;
 };
-
-#endif

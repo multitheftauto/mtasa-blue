@@ -11,8 +11,7 @@
 
 class CMarkerManager;
 
-#ifndef __CMarkerManager_H
-#define __CMarkerManager_H
+#pragma once
 
 #include "CColManager.h"
 #include "CMarker.h"
@@ -26,7 +25,7 @@ public:
     CMarkerManager(CColManager* pColManager);
     ~CMarkerManager(void) { DeleteAll(); };
 
-    CMarker* Create(CElement* pParent, CXMLNode* pNode = NULL);
+    CMarker* Create(CElement* pParent);
     CMarker* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void     DeleteAll(void);
 
@@ -48,5 +47,3 @@ private:
     CColManager*   m_pColManager;
     list<CMarker*> m_Markers;
 };
-
-#endif

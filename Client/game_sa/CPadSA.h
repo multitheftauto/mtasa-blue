@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PAD
-#define __CGAMESA_PAD
+#pragma once
 
 #include <game/CPad.h>
 #define WIN32_LEAN_AND_MEAN
@@ -92,5 +91,3 @@ public:
         internalInterface->DrunkDrivingBufferUsed = inputDelay;
     };            // Does not work yet, guess it's caused by MTA's control logic
 };
-
-#endif

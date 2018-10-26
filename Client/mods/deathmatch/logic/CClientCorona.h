@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCORONA_H
-#define __CCLIENTCORONA_H
+#pragma once
 
 #include "CClientMarker.h"
 class CClientMarker;
@@ -56,5 +55,3 @@ private:
     SColor           m_Color;
     CCoronas*        m_pCoronas;
 };
-
-#endif

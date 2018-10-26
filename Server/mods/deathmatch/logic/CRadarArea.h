@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CRADARAREA_H
-#define __CRADARAREA_H
+#pragma once
 
 #include "CPerPlayerEntity.h"
 #include <CVector2D.h>
@@ -21,10 +20,9 @@ class CRadarArea : public CPerPlayerEntity
 
 public:
     ~CRadarArea(void);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
     void Unlink(void);
-
-    bool ReadSpecialData(void);
 
     const CVector2D& GetSize(void) { return m_vecSize; };
     SColor           GetColor(void) const { return m_Color; };
@@ -35,8 +33,11 @@ public:
     void SetColor(const SColor color);
     void SetFlashing(bool bFlashing);
 
+protected:
+    bool ReadSpecialData(const int iLine) override;
+
 private:
-    CRadarArea(class CRadarAreaManager* pRadarAreaManager, CElement* pParent, CXMLNode* pNode);
+    CRadarArea(class CRadarAreaManager* pRadarAreaManager, CElement* pParent);
 
     class CRadarAreaManager* m_pRadarAreaManager;
 
@@ -44,5 +45,3 @@ private:
     SColor    m_Color;
     bool      m_bIsFlashing;
 };
-
-#endif

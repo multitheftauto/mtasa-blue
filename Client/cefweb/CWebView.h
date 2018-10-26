@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CWEBVIEW_H
-#define __CWEBVIEW_H
+#pragma once
 
 #undef GetNextSibling
 #undef GetFirstChild
@@ -129,7 +128,7 @@ public:
                              const CefString& failedURL) override;
 
     // CefRequestHandler methods
-    virtual bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool isRedirect) override;
+    virtual bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool userGesture, bool isRedirect) override;
     virtual CefRequestHandler::ReturnValue OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request,
                                                                 CefRefPtr<CefRequestCallback> callback) override;
 
@@ -196,5 +195,3 @@ public:
     // Implement smartpointer methods (all Cef-classes require that since they are derived from CefBase)
     IMPLEMENT_REFCOUNTING(CWebView);
 };
-
-#endif

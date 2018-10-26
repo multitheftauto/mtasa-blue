@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TASKATTACK
-#define __CGAME_TASKATTACK
+#pragma once
 
 #include "Task.h"
 
@@ -39,9 +38,9 @@ class CTaskSimpleUseGun : public virtual CTaskSimple
 public:
     virtual ~CTaskSimpleUseGun(void){};
 
-    virtual bool ControlGun(CPed *pPed, CEntity *pTargetEntity, char nCommand) = 0;
-    virtual bool ControlGunMove(CVector2D *pMoveVec) = 0;
-    virtual void Reset(CPed *pPed, CEntity *pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength = 1) = 0;
+    virtual bool ControlGun(CPed* pPed, CEntity* pTargetEntity, char nCommand) = 0;
+    virtual bool ControlGunMove(CVector2D* pMoveVec) = 0;
+    virtual void Reset(CPed* pPed, CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength = 1) = 0;
 };
 
 class CTaskSimpleFight : public virtual CTaskSimple
@@ -49,5 +48,3 @@ class CTaskSimpleFight : public virtual CTaskSimple
 public:
     virtual ~CTaskSimpleFight(void){};
 };
-
-#endif

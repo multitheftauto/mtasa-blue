@@ -11,8 +11,7 @@
 
 class CVehicleManager;
 
-#ifndef __CVEHICLEMANAGER_H
-#define __CVEHICLEMANAGER_H
+#pragma once
 
 #include "CVehicle.h"
 #include "CVehicleColorManager.h"
@@ -30,7 +29,7 @@ public:
     CVehicleManager(void);
     ~CVehicleManager(void);
 
-    CVehicle* Create(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2, CElement* pParent, CXMLNode* pNode = NULL);
+    CVehicle* Create(CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
     CVehicle* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void      DeleteAll(void);
 
@@ -72,5 +71,3 @@ private:
     list<CVehicle*> m_List;
     list<CVehicle*> m_RespawnEnabledVehicles;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_3DMARKER
-#define __CGAMESA_3DMARKER
+#pragma once
 
 #include <game/C3DMarker.h>
 #include <CMatrix_Pad.h>
@@ -31,8 +30,8 @@ class C3DMarkerSAInterface
 public:
     CMatrix_Padded m_mat;                    // local space to world space transform // 0
     DWORD          dwPad, dwPad2;            // not sure why we need these, it appears to be this way though (eAi)  // 64/68
-    RpClump *      m_pRwObject;              // 72
-    DWORD *        m_pMaterial;              // 76
+    RpClump*       m_pRwObject;              // 72
+    DWORD*         m_pMaterial;              // 76
 
     WORD  m_nType;                  // 80
     bool  m_bIsUsed;                // has this marker been allocated this frame?    // 82
@@ -61,18 +60,18 @@ public:
 class C3DMarkerSA : public C3DMarker
 {
 private:
-    C3DMarkerSAInterface *internalInterface;
+    C3DMarkerSAInterface* internalInterface;
 
 public:
     // constructor
-    C3DMarkerSA(C3DMarkerSAInterface *markerInterface) { internalInterface = markerInterface; };
+    C3DMarkerSA(C3DMarkerSAInterface* markerInterface) { internalInterface = markerInterface; };
 
-    C3DMarkerSAInterface *GetInterface() { return internalInterface; }
+    C3DMarkerSAInterface* GetInterface() { return internalInterface; }
 
-    void     GetMatrix(CMatrix *pMatrix);
-    void     SetMatrix(CMatrix *pMatrix);
-    void     SetPosition(CVector *vecPosition);
-    CVector *GetPosition();
+    void     GetMatrix(CMatrix* pMatrix);
+    void     SetMatrix(CMatrix* pMatrix);
+    void     SetPosition(CVector* vecPosition);
+    CVector* GetPosition();
     DWORD    GetType();                        // need enum?
     void     SetType(DWORD dwType);            // doesn't work propperly (not virtualed)
     BOOL     IsActive();
@@ -92,7 +91,5 @@ public:
     void     DeleteMarkerObject();
     void     Reset();
     void     SetActive() { this->internalInterface->m_bIsUsed = true; };
-    RpClump *GetRwObject() { return this->internalInterface->m_pRwObject; }
+    RpClump* GetRwObject() { return this->internalInterface->m_pRwObject; }
 };
-
-#endif

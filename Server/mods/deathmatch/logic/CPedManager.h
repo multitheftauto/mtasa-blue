@@ -11,8 +11,7 @@
 
 class CPedManager;
 
-#ifndef __CPedManager_H
-#define __CPedManager_H
+#pragma once
 
 class CPedManager
 {
@@ -22,7 +21,7 @@ public:
     CPedManager(void);
     ~CPedManager(void);
 
-    class CPed* Create(unsigned short usModel, CElement* pParent, CXMLNode* pNode = NULL);
+    class CPed* Create(unsigned short usModel, CElement* pParent);
     class CPed* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void        DeleteAll(void);
 
@@ -40,5 +39,3 @@ protected:
 
     list<class CPed*> m_List;
 };
-
-#endif

@@ -11,8 +11,7 @@
 
 class CEntityAddPacket;
 
-#ifndef __PACKETS_CENTITYADDPACKET_H
-#define __PACKETS_CENTITYADDPACKET_H
+#pragma once
 
 #include "../packets/CPacket.h"
 #include <vector>
@@ -34,5 +33,3 @@ public:
 private:
     std::vector<class CElement*> m_Entities;
 };
-
-#endif

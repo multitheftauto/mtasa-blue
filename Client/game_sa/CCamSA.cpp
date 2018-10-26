@@ -37,6 +37,11 @@ CEntity* CCamSA::GetTargetEntity(void) const
     return pReturn;
 }
 
+void CCamSA::SetTargetEntity(CEntity* pEntity)
+{
+    m_pInterface->CamTargetEntity = pEntity->GetInterface();
+}
+
 void CCamSA::GetDirection(float& fHorizontal, float& fVertical)
 {
     fHorizontal = m_pInterface->m_fHorizontalAngle;

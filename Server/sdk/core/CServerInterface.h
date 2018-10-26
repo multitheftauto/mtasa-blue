@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CSERVERINTERFACE_H
-#define __CSERVERINTERFACE_H
+#pragma once
 
 #include "net/CNetServer.h"
 #include "CModManager.h"
@@ -28,6 +27,9 @@ public:
 
     virtual void Printf(const char* szFormat, ...) = 0;
     virtual bool IsRequestingExit(void) = 0;
-};
 
-#endif
+    // Clears input buffer
+    virtual bool ClearInput(void) = 0;
+    // Prints current input buffer on a new line, clears the input buffer and resets history selection
+    virtual bool ResetInput(void) = 0;
+};

@@ -11,8 +11,7 @@
 
 class CGraphics;
 
-#ifndef __CGRAPHICS_H
-#define __CGRAPHICS_H
+#pragma once
 
 #include <core/CGraphicsInterface.h>
 #include <gui/CGUI.h>
@@ -27,6 +26,8 @@ class CGraphics;
 class CTileBatcher;
 class CLine3DBatcher;
 class CMaterialLine3DBatcher;
+class CPrimitiveBatcher;
+class CPrimitiveMaterialBatcher;
 class CAspectRatioConverter;
 struct IDirect3DDevice9;
 struct IDirect3DSurface9;
@@ -39,6 +40,8 @@ namespace EDrawMode
         DX_LINE,
         DX_SPRITE,
         TILE_BATCHER,
+        PRIMITIVE,
+        PRIMITIVE_MATERIAL
     };
 }
 using EDrawMode::EDrawModeType;
@@ -61,6 +64,7 @@ struct sFontInfo
 class CGraphics : public CGraphicsInterface, public CSingleton<CGraphics>
 {
     friend class CDirect3DEvents9;
+    friend CPrimitiveMaterialBatcher;
 
 public:
     ZERO_ON_NEW
@@ -130,7 +134,7 @@ public:
 
     void DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, CMaterialItem* pMaterial, float fU = 0,
                                   float fV = 0, float fSizeU = 1, float fSizeV = 1, bool bRelativeUV = true, bool bUseFaceToward = false,
-                                  const CVector& vecFaceToward = CVector());
+                                  const CVector& vecFaceToward = CVector(), bool bPostGUI = false);
 
     void DrawRectQueued(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bPostGUI, bool bSubPixelPositioning = false);
 
@@ -140,6 +144,13 @@ public:
     void DrawStringQueued(float iLeft, float iTop, float iRight, float iBottom, unsigned long dwColor, const char* wszText, float fScaleX, float fScaleY,
                           unsigned long ulFormat, ID3DXFont* pDXFont = NULL, bool bPostGUI = false, bool bColorCoded = false, bool bSubPixelPositioning = false,
                           float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0);
+
+    void DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI = false);
+    void DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* vertices, D3DPRIMITIVETYPE type, CMaterialItem* pMaterial, bool bPostGUI);
+    void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
+                          short siSegments, float fRatio, bool bPostGUI);
+
+    bool IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType);
 
     void OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
 
@@ -165,8 +176,8 @@ public:
     // To draw queued up drawings
     void DrawPreGUIQueue(void);
     void DrawPostGUIQueue(void);
-    void DrawMaterialLine3DQueue(void);
-    bool HasMaterialLine3DQueueItems(void);
+    void DrawLine3DPreGUIQueue(void);
+    bool HasLine3DPreGUIQueueItems(void);
 
     void DidRenderScene(void);
     void SetProgressMessage(const SString& strMessage);
@@ -196,14 +207,17 @@ private:
 
     IDirect3DDevice9* m_pDevice;
 
-    CRenderItemManager*      m_pRenderItemManager;
-    CScreenGrabberInterface* m_pScreenGrabber;
-    CPixelsManagerInterface* m_pPixelsManager;
-    CTileBatcher*            m_pTileBatcher;
-    CLine3DBatcher*          m_pLine3DBatcherPreGUI;
-    CLine3DBatcher*          m_pLine3DBatcherPostGUI;
-    CMaterialLine3DBatcher*  m_pMaterialLine3DBatcher;
-    CAspectRatioConverter*   m_pAspectRatioConverter;
+    CRenderItemManager*        m_pRenderItemManager;
+    CScreenGrabberInterface*   m_pScreenGrabber;
+    CPixelsManagerInterface*   m_pPixelsManager;
+    CTileBatcher*              m_pTileBatcher;
+    CLine3DBatcher*            m_pLine3DBatcherPreGUI;
+    CLine3DBatcher*            m_pLine3DBatcherPostGUI;
+    CMaterialLine3DBatcher*    m_pMaterialLine3DBatcherPreGUI;
+    CMaterialLine3DBatcher*    m_pMaterialLine3DBatcherPostGUI;
+    CPrimitiveBatcher*         m_pPrimitiveBatcher;
+    CPrimitiveMaterialBatcher* m_pPrimitiveMaterialBatcher;
+    CAspectRatioConverter*     m_pAspectRatioConverter;
 
     // Fonts
     ID3DXFont* m_pDXFonts[NUM_FONTS];
@@ -222,6 +236,8 @@ private:
         QUEUE_RECT,
         QUEUE_TEXTURE,
         QUEUE_SHADER,
+        QUEUE_PRIMITIVE,
+        QUEUE_PRIMITIVEMATERIAL,
     };
 
     struct sDrawQueueLine
@@ -278,6 +294,19 @@ private:
         bool           bRelativeUV;
     };
 
+    struct sDrawQueuePrimitive
+    {
+        D3DPRIMITIVETYPE                eType;
+        std::vector<PrimitiveVertice>*  pVecVertices;
+    };
+
+    struct sDrawQueuePrimitiveMaterial
+    {
+        D3DPRIMITIVETYPE                        eType;
+        CMaterialItem*                          pMaterial;
+        std::vector<PrimitiveMaterialVertice>*  pVecVertices;
+    };
+
     struct sDrawQueueItem
     {
         eDrawQueueType eType;
@@ -286,10 +315,12 @@ private:
 
         // Queue item data based on the eType.
         union {
-            sDrawQueueLine    Line;
-            sDrawQueueText    Text;
-            sDrawQueueRect    Rect;
-            sDrawQueueTexture Texture;
+            sDrawQueueLine              Line;
+            sDrawQueueText              Text;
+            sDrawQueueRect              Rect;
+            sDrawQueueTexture           Texture;
+            sDrawQueuePrimitive         Primitive;
+            sDrawQueuePrimitiveMaterial PrimitiveMaterial;
         };
     };
 
@@ -333,5 +364,3 @@ private:
     uint                                    m_uiProgressAnimFrame;
     std::map<SString, SCustomScaleFontInfo> m_CustomScaleFontMap;
 };
-
-#endif

@@ -11,8 +11,7 @@
 
 class CCore;
 
-#ifndef __CCORE_H
-#define __CCORE_H
+#pragma once
 
 #include "../version.h"
 
@@ -124,6 +123,7 @@ public:
     bool IsChatVisible(void);
     void EnableChatInput(char* szCommand, DWORD dwColor);
     bool IsChatInputEnabled(void);
+    bool ClearChat();
 
     // Screenshots
     void TakeScreenShot(void);
@@ -346,8 +346,7 @@ private:
     uint                 m_uiServerFrameRateLimit;
     uint                 m_uiClientScriptFrameRateLimit;
     uint                 m_uiFrameRateLimit;
-    double               m_dLastTimeMs;
-    double               m_dPrevOverrun;
+    CElapsedTimeHD       m_FrameRateTimer;
     bool                 m_bWaitToSetNick;
     uint                 m_uiNewNickWaitFrames;
     EDiagnosticDebugType m_DiagnosticDebug;
@@ -368,5 +367,3 @@ private:
     std::map<std::string, std::string> m_CommandLineOptions;            // e.g. "-o option" -> {"o" = "option"}
     const char*                        m_szCommandLineArgs;             // Everything that comes after the options
 };
-
-#endif

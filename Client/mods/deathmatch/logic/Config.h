@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CONFIG_H
-#define __CONFIG_H
+#pragma once
 
 // The almighty windows define and include
 #define WIN32_LEAN_AND_MEAN
@@ -98,9 +97,6 @@ public:
     #error MAX_CHAT_LENGTH "macro can't exceed 255"
 #endif
 
-// Defines how long the whowas list can be
-#define MAX_WHOWAS_LENGTH 1024
-
 // Max valid weather id
 #define MAX_VALID_WEATHER 255
 
@@ -119,5 +115,3 @@ public:
 
 // Vehicle in-out delay (to prevent messed up like 1765/1956/1880
 #define VEHICLE_INOUT_DELAY 1500
-
-#endif

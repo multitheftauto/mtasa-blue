@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CRADARAREAMANAGER_H
-#define __CRADARAREAMANAGER_H
+#pragma once
 
 #include "CRadarArea.h"
 #include <list>
@@ -23,7 +22,7 @@ public:
     CRadarAreaManager(void);
     ~CRadarAreaManager(void);
 
-    CRadarArea* Create(CElement* pParent, CXMLNode* pNode);
+    CRadarArea* Create(CElement* pParent);
     CRadarArea* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void        DeleteAll(void);
 
@@ -39,5 +38,3 @@ private:
 
     list<CRadarArea*> m_List;
 };
-
-#endif

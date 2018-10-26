@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CEventDamage_H
-#define __CEventDamage_H
+#pragma once
 
 enum eWeaponType;
 enum ePedPieceTypes;
@@ -62,5 +61,3 @@ public:
     virtual void              SetDamageReason(EDamageReasonType damageReason) = 0;
     virtual EDamageReasonType GetDamageReason(void) = 0;
 };
-
-#endif

@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMAPEVENTMANAGER_H
-#define __CMAPEVENTMANAGER_H
+#pragma once
 
 #include "lua/CLuaArguments.h"
 #include "CMapEvent.h"
@@ -45,5 +44,3 @@ private:
     typedef std::multimap<SString, CMapEvent*>::iterator       EventsIter;
     typedef std::pair<EventsIter, EventsIter>                  EventsIterPair;
 };
-
-#endif

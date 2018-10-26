@@ -70,7 +70,7 @@ public:
     LUA_DECLARE(GetVehicleHeadLightColor);
     LUA_DECLARE(GetVehicleCurrentGear);
     LUA_DECLARE(GetVehicleHandling);
-    LUA_DECLARE(GetOriginalHandling)
+    LUA_DECLARE(GetOriginalHandling);
     LUA_DECLARE(GetVehicleDoorOpenRatio);
     LUA_DECLARE(IsVehicleNitroRecharging);
     LUA_DECLARE(IsVehicleNitroActivated);
@@ -125,6 +125,7 @@ public:
     LUA_DECLARE(SetVehicleHeadLightColor);
     LUA_DECLARE(SetVehicleTurretPosition);
     LUA_DECLARE(SetVehicleDoorOpenRatio);
+    LUA_DECLARE(SetVehicleHandling);
     LUA_DECLARE(SetVehicleSirens);
     LUA_DECLARE(GetVehicleSirens);
     LUA_DECLARE(GetVehicleSirenParams);
@@ -135,16 +136,22 @@ public:
     LUA_DECLARE(SetHeliBladeCollisionsEnabled);
     LUA_DECLARE(SetVehicleWindowOpen);
 
+    LUA_DECLARE(SetVehicleModelDummyPosition);
+    LUA_DECLARE_OOP(GetVehicleModelDummyPosition)
+
     LUA_DECLARE(SetVehicleModelExhaustFumesPosition);
-    LUA_DECLARE(GetVehicleModelExhaustFumesPosition);
+    LUA_DECLARE_OOP(GetVehicleModelExhaustFumesPosition);
 
     // Components
     LUA_DECLARE(SetVehicleComponentPosition);
     LUA_DECLARE_OOP(GetVehicleComponentPosition);
     LUA_DECLARE(SetVehicleComponentRotation);
     LUA_DECLARE_OOP(GetVehicleComponentRotation);
+    LUA_DECLARE(SetVehicleComponentScale);
+    LUA_DECLARE_OOP(GetVehicleComponentScale);
     LUA_DECLARE(ResetVehicleComponentPosition);
     LUA_DECLARE(ResetVehicleComponentRotation);
+    LUA_DECLARE(ResetVehicleComponentScale);
     LUA_DECLARE(SetVehicleComponentVisible);
     LUA_DECLARE(GetVehicleComponentVisible);
     LUA_DECLARE(GetVehicleComponents);
