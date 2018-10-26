@@ -254,6 +254,9 @@ public:
     CVehicle* GetJackingVehicle(void) { return m_pJackingVehicle; }
     void      SetJackingVehicle(CVehicle* pVehicle);
 
+    void SetLeavingServer(bool bLeaving) noexcept { m_bIsLeavingServer = bLeaving; }
+    bool IsLeavingServer() const noexcept { return m_bIsLeavingServer; }
+
 protected:
     bool ReadSpecialData(const int iLine) override { return true; }
 
@@ -350,6 +353,7 @@ private:
     unsigned short m_usBitStreamVersion;
     SString        m_strPlayerVersion;
     bool           m_bIsMuted;
+    bool           m_bIsLeavingServer;
     bool           m_bIsJoined;
 
     bool m_bNametagColorOverridden;
