@@ -280,9 +280,12 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->SetGameEntityRenderHandler(CClientGame::StaticGameEntityRenderHandler);
     g_pMultiplayer->SetFxSystemDestructionHandler(CClientGame::StaticFxSystemDestructionHandler);
     g_pMultiplayer->SetDrivebyAnimationHandler(CClientGame::StaticDrivebyAnimationHandler);
+    g_pMultiplayer->SetPedStepHandler(CClientGame::StaticPedStepHandler);
+    g_pMultiplayer->SetWaterCannonHitWorldHandler(CClientGame::StaticWaterCannonHitWorldHandler);
     g_pGame->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pGame->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
     g_pGame->SetTaskSimpleBeHitHandler(CClientGame::StaticTaskSimpleBeHitHandler);
+    g_pGame->GetAudioEngine()->SetWorldSoundHandler(CClientGame::StaticWorldSoundHandler);
     g_pCore->SetMessageProcessor(CClientGame::StaticProcessMessage);
     g_pCore->GetKeyBinds()->SetKeyStrokeHandler(CClientGame::StaticKeyStrokeHandler);
     g_pCore->GetKeyBinds()->SetCharacterKeyHandler(CClientGame::StaticCharacterKeyHandler);
@@ -439,6 +442,8 @@ CClientGame::~CClientGame(void)
     g_pMultiplayer->SetGameModelRemoveHandler(NULL);
     g_pMultiplayer->SetGameEntityRenderHandler(NULL);
     g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
+    g_pMultiplayer->SetPedStepHandler(nullptr);
+    g_pMultiplayer->SetWaterCannonHitWorldHandler(nullptr);
     g_pGame->SetPreWeaponFireHandler(NULL);
     g_pGame->SetPostWeaponFireHandler(NULL);
     g_pGame->SetTaskSimpleBeHitHandler(NULL);
@@ -2820,6 +2825,7 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientElementStreamIn", "", NULL, false);
     m_Events.AddEvent("onClientElementStreamOut", "", NULL, false);
     m_Events.AddEvent("onClientElementDestroy", "", NULL, false);
+    m_Events.AddEvent("onClientElementHitByWaterCannon", "vehicle, hitX, hitY, hitZ, normalX, normalY, normalZ, model, materialID", nullptr, false);
 
     // Player events
     m_Events.AddEvent("onClientPlayerJoin", "", NULL, false);
@@ -2860,6 +2866,7 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientPedExitVehicle", "ped, seat, jacker", NULL, false);
     m_Events.AddEvent("onClientPedStartEnterVehicle", "ped, seat, door, jacking", NULL, false);
     m_Events.AddEvent("onClientPedStartExitVehicle", "ped, seat, door, jacker", NULL, false);
+    m_Events.AddEvent("onClientPedStep", "foot", nullptr, false);
 
     // Vehicle events
     m_Events.AddEvent("onClientVehicleRespawn", "", NULL, false);
@@ -2969,6 +2976,8 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientFileDownloadComplete", "fileName, success", NULL, false);
 
     m_Events.AddEvent("onClientWeaponFire", "ped, x, y, z", NULL, false);
+
+    m_Events.AddEvent("onClientWorldSound", "group, index, x, y, z", nullptr, false);
 }
 
 void CClientGame::DrawFPS(void)
@@ -3876,6 +3885,16 @@ AnimationId CClientGame::StaticDrivebyAnimationHandler(AnimationId animGroup, As
     return g_pClientGame->DrivebyAnimationHandler(animGroup, animId);
 }
 
+void CClientGame::StaticPedStepHandler(CPedSAInterface* pPed, bool bFoot)
+{
+    return g_pClientGame->PedStepHandler(pPed, bFoot);
+}
+
+void CClientGame::StaticWaterCannonHitWorldHandler(SWaterCannonHitEvent& event)
+{
+    g_pClientGame->WaterCannonHitWorldHandler(event);
+}
+
 void CClientGame::DrawRadarAreasHandler(void)
 {
     m_pRadarAreaManager->DoPulse();
@@ -4618,12 +4637,12 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle
 {
     if (pCollidingVehicle && pCollidedWith)
     {
-        CVehicle*      pColliderVehicle = g_pGame->GetPools()->GetVehicle((DWORD*)pCollidingVehicle);
-        CClientEntity* pVehicleClientEntity = m_pManager->FindEntity(pColliderVehicle, true);
-        if (pVehicleClientEntity)
+        CVehicle*       pColliderVehicle = g_pGame->GetPools()->GetVehicle((DWORD*)pCollidingVehicle);
+        CClientEntity*  pVehicleClientEntity = m_pManager->FindEntity(pColliderVehicle, true);
+        CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(pVehicleClientEntity);
+        
+        if (pClientVehicle && !pClientVehicle->IsBlown())
         {
-            CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(pVehicleClientEntity);
-
             CEntity*       pCollidedWithEntity = g_pGame->GetPools()->GetEntity((DWORD*)pCollidedWith);
             CClientEntity* pCollidedWithClientEntity = NULL;
             if (pCollidedWithEntity)
@@ -6743,11 +6762,6 @@ void CClientGame::SetDevelopmentMode(bool bEnable, bool bEnableWeb)
 {
     m_bDevelopmentMode = bEnable;
 
-    if (m_bDevelopmentMode)
-        g_pGame->GetAudioEngine()->SetWorldSoundHandler(CClientGame::StaticWorldSoundHandler);
-    else
-        g_pGame->GetAudioEngine()->SetWorldSoundHandler(NULL);
-
     if (g_pCore->IsWebCoreLoaded())
         g_pCore->GetWebCore()->SetTestModeEnabled(bEnableWeb);
 }
@@ -6759,9 +6773,9 @@ void CClientGame::SetDevelopmentMode(bool bEnable, bool bEnableWeb)
 // Handle callback from CAudioSA when a world sound is played
 //
 //////////////////////////////////////////////////////////////////
-void CClientGame::StaticWorldSoundHandler(uint uiGroup, uint uiIndex)
+bool CClientGame::StaticWorldSoundHandler(const SWorldSoundEvent& event)
 {
-    g_pClientGame->WorldSoundHandler(uiGroup, uiIndex);
+    return g_pClientGame->WorldSoundHandler(event);
 }
 
 //////////////////////////////////////////////////////////////////
@@ -6771,10 +6785,31 @@ void CClientGame::StaticWorldSoundHandler(uint uiGroup, uint uiIndex)
 // Handle callback from CAudioSA when a world sound is played
 //
 //////////////////////////////////////////////////////////////////
-void CClientGame::WorldSoundHandler(uint uiGroup, uint uiIndex)
+bool CClientGame::WorldSoundHandler(const SWorldSoundEvent& event)
 {
     if (m_bShowSound)
-        m_pScriptDebugging->LogInformation(NULL, "%s - World sound group:%d index:%d", *GetLocalTimeString(false, true), uiGroup, uiIndex);
+        m_pScriptDebugging->LogInformation(NULL, "%s - World sound group:%d index:%d", *GetLocalTimeString(false, true), event.uiGroup, event.uiIndex);
+
+    // Audio events without a game entity could default to the root element, but the
+    // best approach is to avoid spamming the event with the barely notable sounds (without a source).
+    // Warning: Canceling sounds emitted by an audio entity (like vehicles do) will cause massive spam
+    if (event.pGameEntity)
+    {
+        CClientEntity* pEntity = g_pClientGame->GetGameEntityXRefManager()->FindClientEntity(event.pGameEntity);
+
+        if (pEntity)
+        {
+            CLuaArguments Arguments;
+            Arguments.PushNumber(event.uiGroup);
+            Arguments.PushNumber(event.uiIndex);
+            Arguments.PushNumber(event.vecPosition.fX);
+            Arguments.PushNumber(event.vecPosition.fY);
+            Arguments.PushNumber(event.vecPosition.fZ);
+            return pEntity->CallEvent("onClientWorldSound", Arguments, true);
+        }
+    }
+
+    return true;
 }
 
 //////////////////////////////////////////////////////////////////
@@ -7161,4 +7196,37 @@ void CClientGame::InsertAnimationAssociationToMap(CAnimBlendAssociationSAInterfa
 void CClientGame::RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation)
 {
     m_mapOfCustomAnimationAssociations.erase(pAnimAssociation);
+}
+
+void CClientGame::PedStepHandler(CPedSAInterface* pPedSA, bool bFoot)
+{    
+    CLuaArguments Arguments;
+    CClientPed* pClientPed = DynamicCast<CClientPed>(GetGameEntityXRefManager()->FindClientEntity((CEntitySAInterface*)pPedSA));
+    Arguments.PushBoolean(bFoot);
+    pClientPed->CallEvent("onClientPedStep", Arguments, true);
+}
+
+void CClientGame::WaterCannonHitWorldHandler(SWaterCannonHitEvent& event)
+{
+    CClientEntity* const pVehicle = event.pGameVehicle ? g_pClientGame->GetGameEntityXRefManager()->FindClientVehicle(event.pGameVehicle) : nullptr;
+    
+    if (!pVehicle)
+        return;
+    
+    CClientEntity* pEntity = event.pHitGameEntity ? g_pClientGame->GetGameEntityXRefManager()->FindClientEntity(event.pHitGameEntity) : nullptr;
+
+    if (!pEntity)
+        pEntity = m_pRootEntity;
+    
+    CLuaArguments arguments;
+    arguments.PushElement(pVehicle);
+    arguments.PushNumber(event.vecPosition.fX);
+    arguments.PushNumber(event.vecPosition.fY);
+    arguments.PushNumber(event.vecPosition.fZ);
+    arguments.PushNumber(event.vecNormal.fX);
+    arguments.PushNumber(event.vecNormal.fY);
+    arguments.PushNumber(event.vecNormal.fZ);
+    arguments.PushNumber(event.iModel);
+    arguments.PushNumber(event.ucColSurface);
+    pEntity->CallEvent("onClientElementHitByWaterCannon", arguments, false);
 }

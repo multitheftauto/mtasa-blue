@@ -732,8 +732,17 @@ void COMMAND_ShowSyncData(const char* szCmdLine)
 
 void COMMAND_VoicePushToTalk(const char* szCmdLine)
 {
-    if (g_pClientGame->GetVoiceRecorder()->IsEnabled())
-        g_pClientGame->GetVoiceRecorder()->UpdatePTTState(atoi(szCmdLine));
+    CVoiceRecorder* const pVoiceRecorder = g_pClientGame->GetVoiceRecorder();
+
+    if (pVoiceRecorder->IsEnabled())
+    {
+        if (!szCmdLine)
+            pVoiceRecorder->SetPTTState(!pVoiceRecorder->GetPTTState());
+        else if (szCmdLine[0] == '0')
+            pVoiceRecorder->SetPTTState(false);
+        else if (szCmdLine[0] == '1')
+            pVoiceRecorder->SetPTTState(true);
+    }
     else
     {
         // Show warning only once per server

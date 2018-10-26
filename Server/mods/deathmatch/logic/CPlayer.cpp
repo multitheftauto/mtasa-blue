@@ -14,7 +14,7 @@
 
 extern CGame* g_pGame;
 
-CPlayer::CPlayer(CPlayerManager* pPlayerManager, class CScriptDebugging* pScriptDebugging, const NetServerPlayerID& PlayerSocket) : CPed(NULL, NULL, NULL, 0)
+CPlayer::CPlayer(CPlayerManager* pPlayerManager, class CScriptDebugging* pScriptDebugging, const NetServerPlayerID& PlayerSocket) : CPed(nullptr, nullptr, 0)
 {
     CElementRefManager::AddElementRefs(ELEMENT_REF_DEBUG(this, "CPlayer"), &m_pTeam, NULL);
     CElementRefManager::AddElementListRef(ELEMENT_REF_DEBUG(this, "CPlayer m_lstBroadcastList"), &m_lstBroadcastList);
@@ -101,6 +101,7 @@ CPlayer::CPlayer(CPlayerManager* pPlayerManager, class CScriptDebugging* pScript
     m_UpdateNearListTimer.SetMaxIncrement(500, true);
     m_LastReceivedSyncTimer.SetUseModuleTickCount(true);
     m_ConnectedTimer.SetUseModuleTickCount(true);
+    m_bIsLeavingServer = false;
 }
 
 CPlayer::~CPlayer(void)

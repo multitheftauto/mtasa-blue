@@ -300,6 +300,9 @@ DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIProp = FUNC_CAEVehicleAudioEntity__
 #define HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance   0x68A4EF
 DWORD RETURN_CTaskSimpleSwim_ProcessSwimmingResistance = 0x68A50E;
 
+#define HOOKPOS_CWaterCannon__Render   0x72932A
+static DWORD CONTINUE_CWaterCannon__Render = 0x72932F;
+
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
 FLOAT         fFalseHeading;
@@ -367,6 +370,7 @@ ObjectDamageHandler*        m_pObjectDamageHandler = NULL;
 ObjectBreakHandler*         m_pObjectBreakHandler = NULL;
 FxSystemDestructionHandler* m_pFxSystemDestructionHandler = NULL;
 DrivebyAnimationHandler*    m_pDrivebyAnimationHandler = NULL;
+WaterCannonHitWorldHandler* m_pWaterCannonHitWorldHandler = nullptr;
 
 CEntitySAInterface* dwSavedPlayerPointer = 0;
 CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active
@@ -523,6 +527,8 @@ void HOOK_CAEVehicleAudioEntity__ProcessDummyHeli();
 void HOOK_CAEVehicleAudioEntity__ProcessDummyProp();
 
 void HOOK_CTaskSimpleSwim_ProcessSwimmingResistance();
+
+static void HOOK_CWaterCannon__Render();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -756,6 +762,8 @@ void CMultiplayerSA::InitHooks()
 
     // Fix GTA:SA swimming speed problem on higher fps
     HookInstall(HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance, (DWORD)HOOK_CTaskSimpleSwim_ProcessSwimmingResistance, 6);
+
+    HookInstall(HOOKPOS_CWaterCannon__Render, (DWORD)HOOK_CWaterCannon__Render, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -1402,8 +1410,27 @@ void CMultiplayerSA::InitHooks()
 
     // Clip camera also outside the world bounds.
     MemSet((void*)0x41AD12, 0x90, 2);
+    MemSet((void*)0x41AD5E, 0x90, 2);
     MemSet((void*)0x41ADA7, 0x90, 2);
     MemSet((void*)0x41ADF3, 0x90, 2);
+
+    // Fix melee doesn't work outside the world bounds.
+    MemSet((void*)0x5FFAEE, 0x90, 2);
+    MemSet((void*)0x5FFB4B, 0x90, 2);
+    MemSet((void*)0x5FFBA5, 0x90, 2);
+    MemSet((void*)0x5FFC03, 0x90, 2);
+
+    // Fix shooting sniper doesn't work outside the world bounds (for local player).
+    MemSet((void*)0x7361BF, 0x90, 6);
+    MemSet((void*)0x7361D4, 0x90, 6);
+    MemSet((void*)0x7361E9, 0x90, 6);
+    MemSet((void*)0x7361FE, 0x90, 6);
+
+    // Fix heli blades lacks collision outside the world bounds.
+    MemSet((void*)0x6E2FBC, 0x90, 2);
+    MemSet((void*)0x6E301C, 0x90, 2);
+    MemSet((void*)0x6E3075, 0x90, 2);
+    MemSet((void*)0x6E30D6, 0x90, 2);
 
     // Allow Player Garages to shut with players inside.
     MemSet((void*)0x44C6FA, 0x90, 4);
@@ -1490,6 +1517,10 @@ void CMultiplayerSA::InitHooks()
     // Allow to switch weapons while glued
     MemSetFast((void*)0x60D861, 0x90, 14);
 
+    // Allow water cannon to hit objects and players visually
+    MemSet((void*)0x72925D, 0x1, 1); // objects
+    MemSet((void*)0x729263, 0x1, 1); // players
+    
     InitHooks_CrashFixHacks();
 
     // Init our 1.3 hooks.
@@ -2248,6 +2279,11 @@ void CMultiplayerSA::SetFxSystemDestructionHandler(FxSystemDestructionHandler* p
 void CMultiplayerSA::SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler)
 {
     m_pDrivebyAnimationHandler = pHandler;
+}
+
+void CMultiplayerSA::SetWaterCannonHitWorldHandler(WaterCannonHitWorldHandler* pHandler)
+{
+    m_pWaterCannonHitWorldHandler = pHandler;
 }
 
 // What we do here is check if the idle handler has been set
@@ -6888,5 +6924,44 @@ void _declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
         fmul    kfTimeStepOriginal
 
         jmp     RETURN_CTaskSimpleSwim_ProcessSwimmingResistance
+    }
+}
+
+static void __cdecl WaterCannonHitWorld(CVehicleSAInterface* pGameVehicle, CColPointSAInterface* pColPoint, CEntitySAInterface** ppGameEntity)
+{
+    if (m_pWaterCannonHitWorldHandler)
+    {
+        CEntitySAInterface* const pGameEntity = ppGameEntity ? *ppGameEntity : nullptr;
+        const int iModel = pGameEntity ? pGameEntity->m_nModelIndex : -1;
+
+        SWaterCannonHitEvent event = {
+            pGameVehicle,
+            pGameEntity,
+            pColPoint->Position,
+            pColPoint->Normal,
+            iModel,
+            pColPoint->ucSurfaceTypeB,
+        };
+
+        m_pWaterCannonHitWorldHandler(event);
+    }
+}
+
+static void _declspec(naked) HOOK_CWaterCannon__Render()
+{
+    _asm
+    {
+        pushad
+        mov     eax, [ebx]              // CVehicleSAInterface* CWaterCannon::m_pVehicle
+        lea     ebx, [esp + 100h - 54h] // CColPointSAInterface*
+        lea     ecx, [esp + 100h - 58h] // CEntitySAInterface**
+        push    ecx                     // ppGameEntity
+        push    ebx                     // pColPoint
+        push    eax                     // pGameVehicle
+        call    WaterCannonHitWorld
+        add     esp, 12
+        popad
+        push    3E4CCCCDh
+        jmp     CONTINUE_CWaterCannon__Render
     }
 }

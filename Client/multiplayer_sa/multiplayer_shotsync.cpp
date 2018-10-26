@@ -74,8 +74,9 @@ extern ProjectileStopHandler* m_pProjectileStopHandler;
 
 char szDebug[255] = {'\0'};
 
-DWORD   RETURN_CProjectile__AddProjectile = 0x401C3D;
-DWORD   RETURN_CProjectile__CProjectile = 0x4037B3;
+DWORD RETURN_CProjectile__AddProjectile = 0x401C3D;
+DWORD RETURN_CProjectile__CProjectile = 0x4037B3;
+
 CPools* m_pools = 0;
 
 #define VAR_CWorld_IncludeCarTyres 0xb7cd70 // Used for CWorld_ProcessLineOfSight

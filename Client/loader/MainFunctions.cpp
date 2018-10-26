@@ -836,7 +836,7 @@ void CheckDataFiles(void)
         const char* szFilename;
     } integrityCheckList[] = {
         {
-            "4783E7C0D0005B80673A972E4231A230",
+            "725427593CF994799733A5B4BB74A2F8",
             "bass.dll",
         },
         {
@@ -848,7 +848,7 @@ void CheckDataFiles(void)
             "bass_ac3.dll",
         },
         {
-            "E7F4494BDF7B1C49A303FE56C6B52DC9",
+            "9CA432745025427D6FF6C2B38F63A89F",
             "bass_fx.dll",
         },
         {
@@ -856,11 +856,11 @@ void CheckDataFiles(void)
             "bassflac.dll",
         },
         {
-            "13A3F5637A93F0340161A40C6FBD3F1F",
+            "0F07AA5995BAEF697AD80D8F393EB9AC",
             "bassmidi.dll",
         },
         {
-            "BCB4A47D5CBF53515AAE135AAA9C1C52",
+            "39613507057827F338CFA4519ACCA7A9",
             "bassmix.dll",
         },
         {
