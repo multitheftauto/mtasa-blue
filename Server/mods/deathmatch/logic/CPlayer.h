@@ -266,7 +266,9 @@ public:
 
     CVehicle* GetJackingVehicle(void) { return m_pJackingVehicle; }
     void      SetJackingVehicle(CVehicle* pVehicle);
-    bool      IsLeavingServer(void) { return m_bIsLeavingServer; }
+
+    void      SetLeavingServer() noexcept { m_bIsLeavingServer = true; }
+    bool      IsLeavingServer() const noexcept { return m_bIsLeavingServer; }
 
 public:
     //
@@ -342,7 +344,6 @@ public:
     uint                   m_uiD3d9Size;
     SString                m_strD3d9Md5;
     SString                m_strD3d9Sha256;
-    bool                   m_bIsLeavingServer;
 
 private:
     SLightweightSyncData m_lightweightSyncData;
@@ -362,6 +363,7 @@ private:
     unsigned short m_usBitStreamVersion;
     SString        m_strPlayerVersion;
     bool           m_bIsMuted;
+    bool           m_bIsLeavingServer;
     int            m_iStatus;
 
     bool m_bNametagColorOverridden;
