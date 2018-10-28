@@ -563,17 +563,21 @@ double CBassAudio::GetLength(void)
     return 0;
 }
 
-// Non-streams only
+// Streams only
 double CBassAudio::GetBufferLength(void)
 {
-    if (m_pSound)
+    if (m_bStream && m_pSound)
     {
         QWORD length = BASS_ChannelGetLength(m_pSound, BASS_POS_BYTE);
         if (length != -1)
         {
-            QWORD bufferPosition = (BASS_StreamGetFilePosition(m_pSound, BASS_FILEPOS_START) + BASS_StreamGetFilePosition(m_pSound, BASS_FILEPOS_BUFFER));
-            QWORD bufferLength = static_cast<QWORD>(static_cast<double>(length) / BASS_StreamGetFilePosition(m_pSound, BASS_FILEPOS_SIZE) * bufferPosition);
-            return BASS_ChannelBytes2Seconds(m_pSound, bufferLength);
+            QWORD fileSize = BASS_StreamGetFilePosition(m_pSound, BASS_FILEPOS_SIZE);
+            if (fileSize > 0)
+            {
+                QWORD bufferPosition = (BASS_StreamGetFilePosition(m_pSound, BASS_FILEPOS_START) + BASS_StreamGetFilePosition(m_pSound, BASS_FILEPOS_BUFFER));
+                QWORD bufferLength = static_cast<QWORD>(static_cast<double>(length) / fileSize * bufferPosition);
+                return BASS_ChannelBytes2Seconds(m_pSound, bufferLength);
+            }
         }
     }
     return 0;

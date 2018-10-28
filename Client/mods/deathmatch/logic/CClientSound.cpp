@@ -360,12 +360,11 @@ double CClientSound::GetLength(bool bAvoidLoad)
 
 double CClientSound::GetBufferLength()
 {
-    if (!m_bStream && m_pAudio)
+    if (m_bStream && m_pAudio)
     {
-        return 0;
+        return m_pAudio->GetBufferLength();
     }
-
-    return m_pAudio->GetBufferLength();
+    return 0;
 }
 
 float CClientSound::GetVolume(void)
