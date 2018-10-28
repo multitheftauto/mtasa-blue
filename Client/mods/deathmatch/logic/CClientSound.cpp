@@ -293,18 +293,20 @@ void CClientSound::PlayStream(const SString& strURL, bool bLoop, bool bThrottle,
 //
 //
 ////////////////////////////////////////////////////////////
-void CClientSound::SetPlayPosition(double dPosition)
+bool CClientSound::SetPlayPosition(double dPosition)
 {
     if (m_pAudio)
     {
         // Use actual audio if active
-        m_pAudio->SetPlayPosition(dPosition);
+        return m_pAudio->SetPlayPosition(dPosition);
     }
     else
     {
         // Use simulation if not active
         m_SimulatedPlayPosition.SetPlayPositionNow(dPosition);
+        return true;
     }
+    return false;
 }
 
 double CClientSound::GetPlayPosition(void)
@@ -354,6 +356,16 @@ double CClientSound::GetLength(bool bAvoidLoad)
     }
 
     return m_dLength;
+}
+
+double CClientSound::GetBufferLength()
+{
+    if (!m_bStream && m_pAudio)
+    {
+        return 0;
+    }
+
+    return m_pAudio->GetBufferLength();
 }
 
 float CClientSound::GetVolume(void)

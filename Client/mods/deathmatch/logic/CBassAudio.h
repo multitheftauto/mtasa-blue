@@ -54,9 +54,10 @@ public:
     bool BeginLoadingMedia(void);
 
     void   SetPaused(bool bPaused);
-    void   SetPlayPosition(double dPosition);
+    bool   SetPlayPosition(double dPosition);
     double GetPlayPosition(void);
     double GetLength(void);
+    double GetBufferLength(void);
     void   SetVolume(float fVolume);
     void   SetPlaybackSpeed(float fSpeed);
     void   SetPosition(const CVector& vecPosition);

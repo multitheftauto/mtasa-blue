@@ -521,7 +521,7 @@ void CBassAudio::SetPaused(bool bPaused)
 }
 
 // Non-streams only
-void CBassAudio::SetPlayPosition(double dPosition)
+bool CBassAudio::SetPlayPosition(double dPosition)
 {
     // Only relevant for non-streams, which are always ready if valid
     if (m_pSound)
@@ -529,8 +529,12 @@ void CBassAudio::SetPlayPosition(double dPosition)
         // Make sure position is in range
         QWORD bytePosition = BASS_ChannelSeconds2Bytes(m_pSound, dPosition);
         QWORD byteLength = BASS_ChannelGetLength(m_pSound, BASS_POS_BYTE);
-        BASS_ChannelSetPosition(m_pSound, Clamp<QWORD>(0, bytePosition, byteLength - 1), BASS_POS_BYTE);
+        if (BASS_ChannelSetPosition(m_pSound, Clamp<QWORD>(0, bytePosition, byteLength - 1), BASS_POS_BYTE))
+        {
+            return true;
+        }
     }
+    return false;
 }
 
 // Non-streams only
@@ -555,6 +559,22 @@ double CBassAudio::GetLength(void)
         QWORD length = BASS_ChannelGetLength(m_pSound, BASS_POS_BYTE);
         if (length != -1)
             return BASS_ChannelBytes2Seconds(m_pSound, length);
+    }
+    return 0;
+}
+
+// Non-streams only
+double CBassAudio::GetBufferLength(void)
+{
+    if (m_pSound)
+    {
+        QWORD length = BASS_ChannelGetLength(m_pSound, BASS_POS_BYTE);
+        if (length != -1)
+        {
+            QWORD bufferPosition = (BASS_StreamGetFilePosition(m_pSound, BASS_FILEPOS_START) + BASS_StreamGetFilePosition(m_pSound, BASS_FILEPOS_BUFFER));
+            QWORD bufferLength = static_cast<QWORD>(static_cast<double>(length) / BASS_StreamGetFilePosition(m_pSound, BASS_FILEPOS_SIZE) * bufferPosition);
+            return BASS_ChannelBytes2Seconds(m_pSound, bufferLength);
+        }
     }
     return 0;
 }

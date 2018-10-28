@@ -39,10 +39,11 @@ public:
     void SetPaused(bool bPaused);
     bool IsPaused(void);
 
-    void   SetPlayPosition(double dPosition);
+    bool   SetPlayPosition(double dPosition);
     double GetPlayPosition(void);
 
     double GetLength(bool bAvoidLoad = false);
+    double GetBufferLength();
 
     void  SetVolume(float fVolume, bool bStore = true);
     float GetVolume(void);

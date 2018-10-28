@@ -7586,11 +7586,7 @@ bool CStaticFunctionDefinitions::StopSound(CClientSound& Sound)
 
 bool CStaticFunctionDefinitions::SetSoundPosition(CClientSound& Sound, double dPosition)
 {
-    if (Sound.IsSoundStream())
-        return false;
-
-    Sound.SetPlayPosition(dPosition);
-    return true;
+    return Sound.SetPlayPosition(dPosition);;
 }
 
 bool CStaticFunctionDefinitions::SetSoundPosition(CClientPlayer& Player, double dPosition)
@@ -7638,6 +7634,12 @@ bool CStaticFunctionDefinitions::GetSoundLength(CClientPlayer& Player, double& d
         return true;
     }
     return false;
+}
+
+bool CStaticFunctionDefinitions::GetSoundBufferLength(CClientSound& Sound, double& dBufferLength)
+{
+    dBufferLength = Sound.GetBufferLength();
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetSoundPaused(CClientSound& Sound, bool bPaused)
