@@ -7586,7 +7586,7 @@ bool CStaticFunctionDefinitions::StopSound(CClientSound& Sound)
 
 bool CStaticFunctionDefinitions::SetSoundPosition(CClientSound& Sound, double dPosition)
 {
-    return Sound.SetPlayPosition(dPosition);;
+    return Sound.SetPlayPosition(dPosition);
 }
 
 bool CStaticFunctionDefinitions::SetSoundPosition(CClientPlayer& Player, double dPosition)
