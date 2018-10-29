@@ -407,23 +407,10 @@ int CLuaAudioDefs::GetSoundLength(lua_State* luaVM)
 
 int CLuaAudioDefs::GetSoundBufferLength(lua_State* luaVM)
 {
-    CClientPlayer*   pPlayer = NULL;
-    CClientSound*    pSound = NULL;
+    CClientSound*    pSound;
+
     CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-    {
-        argStream.ReadUserData(pPlayer);
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
-        return false;
-    }
+    argStream.ReadUserData(pSound);
 
     if (!argStream.HasErrors())
     {
@@ -435,15 +422,6 @@ int CLuaAudioDefs::GetSoundBufferLength(lua_State* luaVM)
                 lua_pushnumber(luaVM, dBufferLength);
                 return 1;
             }
-        }
-        else if (pPlayer)
-        {
-            //double dLength = 0;
-            //if (CStaticFunctionDefinitions::GetSoundBufferLength(*pPlayer, dLength))
-            //{
-            //    lua_pushnumber(luaVM, dLength);
-            //    return 1;
-            //}
         }
     }
     else
