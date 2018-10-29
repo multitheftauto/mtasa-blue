@@ -6235,19 +6235,21 @@ void _declspec(naked) HOOK_CEventVehicleDamageCollision()
     // .006A7657 64 A1 00 00 00 00                       mov     eax, large fs:0 < Hook >
     // .006A765D 50                                      push    eax < Jmp Back >
 
-    // ecx = this ptr
+    // ecx = this ptr, copied from esi
     // pVehicle->damageEntity = damage entity
     _asm
     {
         pushad
         mov pCollisionVehicle, ecx
     }
+
     TriggerVehicleCollisionEvent();
 
     // do the replaced code and return back as if nothing happened.
     _asm
     {
         popad
+        mov esi, pCollisionVehicle
         mov eax, fs:0
         jmp JMP_CEventVehicleDamageCollision_RETN
     }

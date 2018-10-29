@@ -3690,7 +3690,7 @@ bool CClientGame::StaticProcessCollisionHandler(CEntitySAInterface* pThisInterfa
     return g_pClientGame->ProcessCollisionHandler(pThisInterface, pOtherInterface);
 }
 
-bool CClientGame::StaticVehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex,
+bool CClientGame::StaticVehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex,
                                                 float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos,
                                                 CVector vecCollisionVelocity)
 {
@@ -4531,19 +4531,20 @@ void CClientGame::DeathHandler(CPed* pKilledPedSA, unsigned char ucDeathReason, 
     SendPedWastedPacket(pKilledPed, INVALID_ELEMENT_ID, ucDeathReason, ucBodyPart);
 }
 
-bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedWith, int iModelIndex, float fDamageImpulseMag,
+bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicle, CEntitySAInterface* pCollidedWith, int iModelIndex, float fDamageImpulseMag,
                                           float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity)
 {
     if (pCollidingVehicle && pCollidedWith)
     {
-        CVehicle*       pColliderVehicle = g_pGame->GetPools()->GetVehicle((DWORD*)pCollidingVehicle);
-        CClientEntity*  pVehicleClientEntity = m_pManager->FindEntity(pColliderVehicle, true);
-        CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(pVehicleClientEntity);
+        CVehicle*      pColliderVehicle = g_pGame->GetPools()->GetVehicle((DWORD*)pCollidingVehicle);
+        CClientEntity* pVehicleClientEntity = m_pManager->FindEntity(pColliderVehicle, true);
+        auto           pClientVehicle = static_cast<CClientVehicle*>(pVehicleClientEntity);
         
-        if (pClientVehicle && !pClientVehicle->IsBlown())
+        if (pVehicleClientEntity)
         {
             CEntity*       pCollidedWithEntity = g_pGame->GetPools()->GetEntity((DWORD*)pCollidedWith);
-            CClientEntity* pCollidedWithClientEntity = NULL;
+            CClientEntity* pCollidedWithClientEntity = nullptr;
+
             if (pCollidedWithEntity)
             {
                 if (pCollidedWithEntity->GetEntityType() == ENTITY_TYPE_VEHICLE)
@@ -4562,6 +4563,7 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle
                     pCollidedWithClientEntity = m_pManager->FindEntity(pCollidedWithPed, true);
                 }
             }
+
             CLuaArguments Arguments;
             if (pCollidedWithClientEntity)
             {
@@ -4583,7 +4585,11 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle
             Arguments.PushNumber(iModelIndex);
 
             pVehicleClientEntity->CallEvent("onClientVehicleCollision", Arguments, true);
-            // Alocate a BitStream
+
+            // Update the colliding vehicle, because it might have been invalidated in onClientVehicleCollision (e.g. fixVehicle)
+            pCollidingVehicle = reinterpret_cast<CVehicleSAInterface*>(pVehicleClientEntity->GetGameEntity()->GetInterface());
+
+            // Allocate a BitStream
             NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
             // Make sure it created
             if (pBitStream)
