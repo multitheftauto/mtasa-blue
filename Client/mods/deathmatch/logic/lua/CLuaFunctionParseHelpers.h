@@ -53,6 +53,8 @@ DECLARE_ENUM(eWheelPosition)
 DECLARE_ENUM(D3DPRIMITIVETYPE);
 DECLARE_ENUM(eVehicleDummies);
 
+class CRemoteCall;
+
 enum eDXHorizontalAlign
 {
     DX_ALIGN_LEFT = DT_LEFT,
@@ -204,6 +206,10 @@ inline SString GetClassTypeName(CClientTeam*)
 inline SString GetClassTypeName(CClientPed*)
 {
     return "ped";
+}
+inline SString GetClassTypeName(CRemoteCall*)
+{
+    return "remotecall";
 }
 inline SString GetClassTypeName(CClientProjectile*)
 {
@@ -459,6 +465,15 @@ CClientEntity* UserDataCast(CClientEntity*, void* ptr, lua_State*)
     if (!pEntity || pEntity->IsBeingDeleted() || !pEntity->IsA(T::GetClassId()))
         return NULL;
     return pEntity;
+}
+
+//
+// CRemoteCall from userdata
+//
+template <class T>
+CRemoteCall* UserDataCast(CRemoteCall*, void* ptr, lua_State*)
+{
+    return (CRemoteCall*)ptr;
 }
 
 //

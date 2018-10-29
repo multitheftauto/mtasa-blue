@@ -385,6 +385,8 @@ void CLuaManager::LoadCFunctions(void)
     CLuaCFunctions::AddFunction("addDebugHook", CLuaFunctionDefs::AddDebugHook);
     CLuaCFunctions::AddFunction("removeDebugHook", CLuaFunctionDefs::RemoveDebugHook);
     CLuaCFunctions::AddFunction("fetchRemote", CLuaFunctionDefs::FetchRemote);
+    CLuaCFunctions::AddFunction("getNetworkRequests", CLuaFunctionDefs::GetNetworkRequests);
+    CLuaCFunctions::AddFunction("getNetworkRequestInfo", CLuaFunctionDefs::GetNetworkRequestInfo);
 
     // Version functions
     CLuaCFunctions::AddFunction("getVersion", CLuaFunctionDefs::GetVersion);

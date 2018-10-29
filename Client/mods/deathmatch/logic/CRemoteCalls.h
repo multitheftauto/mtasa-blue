@@ -23,6 +23,7 @@ private:
     bool                m_bIsFetch;
     class CLuaMain*     m_VM;
     CLuaFunctionRef     m_iFunction;
+    signed int          m_iStartTime;
     SString             m_strURL;
     SString             m_strQueueName;
     CLuaArguments       m_FetchArguments;
@@ -39,14 +40,19 @@ public:
     CRemoteCall(const char* szURL, CLuaArguments* fetchArguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
                 const SHttpRequestOptions& options);
     ~CRemoteCall();
-    void           MakeCall();
-    static void    DownloadFinishedCallback(const SHttpDownloadResult& result);
-    bool           CancelDownload(void);
-    bool           GetDownloadStatus(SDownloadStatus& outDownloadStatus);
-    CLuaMain*      GetVM() { return m_VM; };
-    bool           IsFetch() { return m_bIsFetch; }
-    bool           IsLegacy() { return m_options.bIsLegacy; }
-    CLuaArguments& GetFetchArguments() { return m_FetchArguments; }
+    void        MakeCall();
+    static void DownloadFinishedCallback(const SHttpDownloadResult& result);
+    bool        CancelDownload(void);
+    bool        GetDownloadStatus(SDownloadStatus& outDownloadStatus);
+
+    CLuaMain*           GetVM() { return m_VM; };
+    signed int          GetStartTime() { return m_iStartTime; };
+    SString             GetURL() { return m_strURL; };
+    SString             GetQueueName() { return m_strQueueName; };
+    bool                IsFetch() { return m_bIsFetch; }
+    bool                IsLegacy() { return m_options.bIsLegacy; }
+    CLuaArguments&      GetFetchArguments() { return m_FetchArguments; }
+    SHttpRequestOptions GetOptions() { return m_options; };
 };
 
 /*
@@ -64,13 +70,13 @@ public:
     CRemoteCalls();
     ~CRemoteCalls();
 
-    void              Call(const char* szServerHost, const char* szResourceName, const char* szFunctionName, CLuaArguments* arguments, CLuaMain* luaMain,
+    CRemoteCall*      Call(const char* szServerHost, const char* szResourceName, const char* szFunctionName, CLuaArguments* arguments, CLuaMain* luaMain,
                            const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs);
-    void              Call(const char* szURL, CLuaArguments* arguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
+    CRemoteCall*      Call(const char* szURL, CLuaArguments* arguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
                            uint uiConnectionAttempts, uint uiConnectTimeoutMs);
-    void              Call(const char* szURL, CLuaArguments* fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain* luaMain,
+    CRemoteCall*      Call(const char* szURL, CLuaArguments* fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain* luaMain,
                            const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs);
-    void              Call(const char* szURL, CLuaArguments* fetchArguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
+    CRemoteCall*      Call(const char* szURL, CLuaArguments* fetchArguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
                            const SHttpRequestOptions& options);
     void              Remove(CLuaMain* luaMain);
     void              Remove(CRemoteCall* call);
@@ -78,4 +84,6 @@ public:
     void              ProcessQueuedFiles(void);
     EDownloadModeType GetDownloadModeForQueueName(const SString& strQueueName, bool bAnyHost);
     EDownloadModeType GetDownloadModeFromQueueIndex(uint uiIndex, bool bAnyHost);
+
+    std::list<CRemoteCall*> GetCalls() { return m_calls; }
 };

@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <ctime>
 
 using std::list;
 
@@ -28,34 +29,62 @@ CRemoteCalls::~CRemoteCalls()
     m_calls.clear();
 }
 
-void CRemoteCalls::Call(const char* szServerHost, const char* szResourceName, const char* szFunctionName, CLuaArguments* arguments, CLuaMain* luaMain,
+CRemoteCall* CRemoteCalls::Call(const char* szServerHost, const char* szResourceName, const char* szFunctionName, CLuaArguments* arguments, CLuaMain* luaMain,
                         const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs)
 {
-    m_calls.push_back(
-        new CRemoteCall(szServerHost, szResourceName, szFunctionName, arguments, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs));
-    m_calls.back()->MakeCall();
+    CRemoteCall* pRemoteCall = new CRemoteCall(szServerHost, szResourceName, szFunctionName, arguments, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs);
+    
+    if (pRemoteCall)
+    {
+        m_calls.push_back(pRemoteCall);
+        m_calls.back()->MakeCall();
+        return pRemoteCall;
+    }
+    return nullptr;
 }
 
-void CRemoteCalls::Call(const char* szURL, CLuaArguments* arguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
-                        uint uiConnectionAttempts, uint uiConnectTimeoutMs)
+CRemoteCall* CRemoteCalls::Call(const char* szURL, CLuaArguments* arguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
+                                uint uiConnectionAttempts, uint uiConnectTimeoutMs)
 {
-    m_calls.push_back(new CRemoteCall(szURL, arguments, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs));
-    m_calls.back()->MakeCall();
+    CRemoteCall* pRemoteCall = new CRemoteCall(szURL, arguments, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs);
+
+    if (pRemoteCall)
+    {
+        m_calls.push_back(pRemoteCall);
+        m_calls.back()->MakeCall();
+        return pRemoteCall;
+    }
+    return nullptr;
 }
 
-void CRemoteCalls::Call(const char* szURL, CLuaArguments* fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain* luaMain,
-                        const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs)
+CRemoteCall* CRemoteCalls::Call(const char* szURL, CLuaArguments* fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain* luaMain,
+                                const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs)
 {
-    m_calls.push_back(
-        new CRemoteCall(szURL, fetchArguments, strPostData, bPostBinary, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs));
-    m_calls.back()->MakeCall();
+    CRemoteCall* pRemoteCall =
+        new CRemoteCall(szURL, fetchArguments, strPostData, bPostBinary, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs);
+
+    if (pRemoteCall)
+    {
+        m_calls.push_back(pRemoteCall);
+        m_calls.back()->MakeCall();
+        return pRemoteCall;
+    }
+    return nullptr;
 }
 
-void CRemoteCalls::Call(const char* szURL, CLuaArguments* fetchArguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
+CRemoteCall* CRemoteCalls::Call(const char* szURL, CLuaArguments* fetchArguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction,
+                               const SString& strQueueName,
                         const SHttpRequestOptions& options)
 {
-    m_calls.push_back(new CRemoteCall(szURL, fetchArguments, luaMain, iFunction, strQueueName, options));
-    m_calls.back()->MakeCall();
+    CRemoteCall* pRemoteCall = new CRemoteCall(szURL, fetchArguments, luaMain, iFunction, strQueueName, options);
+
+    if (pRemoteCall)
+    {
+        m_calls.push_back(pRemoteCall);
+        m_calls.back()->MakeCall();
+        return pRemoteCall;
+    }
+    return nullptr;
 }
 
 void CRemoteCalls::Remove(CLuaMain* lua)
@@ -219,6 +248,13 @@ CRemoteCall::~CRemoteCall()
 
 void CRemoteCall::MakeCall()
 {
+    time_t timer;
+    
+    time(&timer);
+    localtime(&timer);
+    
+    m_iStartTime = timer;
+
     // GetDomainFromURL requires protocol://, but curl does not (defaults to http)
     SString strDomain = g_pCore->GetWebCore()->GetDomainFromURL(m_strURL);
     if (strDomain.empty())
