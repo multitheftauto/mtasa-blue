@@ -10,9 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <ctime>
 
-extern CGame* g_pGame;
+using std::list;
 
 CRemoteCalls::CRemoteCalls()
 {
@@ -29,60 +28,34 @@ CRemoteCalls::~CRemoteCalls()
     m_calls.clear();
 }
 
-CRemoteCall* CRemoteCalls::Call(const char* szServerHost, const char* szResourceName, const char* szFunctionName, CLuaArguments* arguments, CLuaMain* luaMain,
+void CRemoteCalls::Call(const char* szServerHost, const char* szResourceName, const char* szFunctionName, CLuaArguments* arguments, CLuaMain* luaMain,
                         const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs)
 {
-    CRemoteCall* pRemoteCall = new CRemoteCall(szServerHost, szResourceName, szFunctionName, arguments, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs);
-    
-    if (pRemoteCall)
-    {
-        m_calls.push_back(pRemoteCall);
-        m_calls.back()->MakeCall();
-        return pRemoteCall;
-    }
-    return nullptr;
+    m_calls.push_back(
+        new CRemoteCall(szServerHost, szResourceName, szFunctionName, arguments, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs));
+    m_calls.back()->MakeCall();
 }
 
-CRemoteCall* CRemoteCalls::Call(const char* szURL, CLuaArguments* arguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
+void CRemoteCalls::Call(const char* szURL, CLuaArguments* arguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
                         uint uiConnectionAttempts, uint uiConnectTimeoutMs)
 {
-    CRemoteCall* pRemoteCall = new CRemoteCall(szURL, arguments, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs);
-    
-    if (pRemoteCall)
-    {
-        m_calls.push_back(pRemoteCall);
-        m_calls.back()->MakeCall();
-        return pRemoteCall;
-    }
-    return nullptr;
+    m_calls.push_back(new CRemoteCall(szURL, arguments, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs));
+    m_calls.back()->MakeCall();
 }
 
-CRemoteCall* CRemoteCalls::Call(const char* szURL, CLuaArguments* fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain* luaMain,
+void CRemoteCalls::Call(const char* szURL, CLuaArguments* fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain* luaMain,
                         const CLuaFunctionRef& iFunction, const SString& strQueueName, uint uiConnectionAttempts, uint uiConnectTimeoutMs)
 {
-    CRemoteCall* pRemoteCall = new CRemoteCall(szURL, fetchArguments, strPostData, bPostBinary, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs);
-    
-    if (pRemoteCall)
-    {
-        m_calls.push_back(pRemoteCall);
-        m_calls.back()->MakeCall();
-        return pRemoteCall;
-    }
-    return nullptr;
+    m_calls.push_back(
+        new CRemoteCall(szURL, fetchArguments, strPostData, bPostBinary, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs));
+    m_calls.back()->MakeCall();
 }
 
-CRemoteCall* CRemoteCalls::Call(const char* szURL, CLuaArguments* fetchArguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
+void CRemoteCalls::Call(const char* szURL, CLuaArguments* fetchArguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
                         const SHttpRequestOptions& options)
 {
-    CRemoteCall* pRemoteCall = new CRemoteCall(szURL, fetchArguments, luaMain, iFunction, strQueueName, options);
-
-    if (pRemoteCall)
-    {
-        m_calls.push_back(pRemoteCall);
-        m_calls.back()->MakeCall();
-        return pRemoteCall;
-    }
-    return nullptr;
+    m_calls.push_back(new CRemoteCall(szURL, fetchArguments, luaMain, iFunction, strQueueName, options));
+    m_calls.back()->MakeCall();
 }
 
 void CRemoteCalls::Remove(CLuaMain* lua)
@@ -123,20 +96,20 @@ bool CRemoteCalls::CallExists(CRemoteCall* call)
 }
 
 // Map queue index into download manager id
-EDownloadModeType CRemoteCalls::GetDownloadModeFromQueueIndex(uint uiIndex)
+EDownloadModeType CRemoteCalls::GetDownloadModeFromQueueIndex(uint uiIndex, bool bAnyHost)
 {
     uiIndex %= MAX_CALL_REMOTE_QUEUES;
-    uiIndex += EDownloadMode::CALL_REMOTE;
+    uiIndex += bAnyHost ? EDownloadMode::CALL_REMOTE_ANY_HOST : EDownloadMode::CALL_REMOTE_RESTRICTED;
     return (EDownloadModeType)uiIndex;
 }
 
 // Map queue name to download manager id
-EDownloadModeType CRemoteCalls::GetDownloadModeForQueueName(const SString& strQueueName)
+EDownloadModeType CRemoteCalls::GetDownloadModeForQueueName(const SString& strQueueName, bool bAnyHost)
 {
     uint* pIndex = MapFind(m_QueueIndexMap, strQueueName);
     if (pIndex)
     {
-        return GetDownloadModeFromQueueIndex(*pIndex);
+        return GetDownloadModeFromQueueIndex(*pIndex, bAnyHost);
     }
     else
     {
@@ -148,7 +121,7 @@ EDownloadModeType CRemoteCalls::GetDownloadModeForQueueName(const SString& strQu
         }
         // Add new mapping
         MapSet(m_QueueIndexMap, strQueueName, idx);
-        return GetDownloadModeFromQueueIndex(idx);
+        return GetDownloadModeFromQueueIndex(idx, bAnyHost);
     }
 }
 
@@ -156,8 +129,9 @@ void CRemoteCalls::ProcessQueuedFiles(void)
 {
     for (auto iter = m_QueueIndexMap.cbegin(); iter != m_QueueIndexMap.cend();)
     {
-        EDownloadModeType downloadMode = GetDownloadModeFromQueueIndex(iter->second);
-        if (g_pNetServer->GetHTTPDownloadManager(downloadMode)->ProcessQueuedFiles())
+        EDownloadModeType downloadMode = GetDownloadModeFromQueueIndex(iter->second, false);
+        EDownloadModeType downloadModeAnyIp = GetDownloadModeFromQueueIndex(iter->second, true);
+        if (g_pNet->GetHTTPDownloadManager(downloadMode)->ProcessQueuedFiles() && g_pNet->GetHTTPDownloadManager(downloadModeAnyIp)->ProcessQueuedFiles())
         {
             // Queue empty, so remove name mapping if not default queue
             if (iter->first != CALL_REMOTE_DEFAULT_QUEUE_NAME)
@@ -181,7 +155,6 @@ CRemoteCall::CRemoteCall(const char* szServerHost, const char* szResourceName, c
     arguments->WriteToJSONString(m_options.strPostData, true);
     m_options.bPostBinary = false;
     m_options.bIsLegacy = true;
-    m_options.requestHeaders["Content-Type"] = "application/json";
     m_bIsFetch = false;
 
     m_strURL = SString("http://%s/%s/call/%s", szServerHost, szResourceName, szFunctionName);
@@ -200,7 +173,6 @@ CRemoteCall::CRemoteCall(const char* szURL, CLuaArguments* arguments, CLuaMain* 
     arguments->WriteToJSONString(m_options.strPostData, true);
     m_options.bPostBinary = false;
     m_options.bIsLegacy = true;
-    m_options.requestHeaders["Content-Type"] = "application/json";
     m_bIsFetch = false;
 
     m_strURL = szURL;
@@ -247,22 +219,21 @@ CRemoteCall::~CRemoteCall()
 
 void CRemoteCall::MakeCall()
 {
-    time_t timer;
-    
-    time(&timer);
-    localtime(&timer);
-    
-    m_iStartTime = timer;
-    
-    m_downloadMode = g_pGame->GetRemoteCalls()->GetDownloadModeForQueueName(m_strQueueName);
-    CNetHTTPDownloadManagerInterface* pDownloadManager = g_pNetServer->GetHTTPDownloadManager(m_downloadMode);
+    // GetDomainFromURL requires protocol://, but curl does not (defaults to http)
+    SString strDomain = g_pCore->GetWebCore()->GetDomainFromURL(m_strURL);
+    if (strDomain.empty())
+        strDomain = g_pCore->GetWebCore()->GetDomainFromURL("http://" + m_strURL);
+    // Bypass net module IP check if we are allowed to access the URL
+    bool bAnyHost = (g_pCore->GetWebCore()->GetDomainState(strDomain) == eURLState::WEBPAGE_ALLOWED);
+    m_downloadMode = g_pClientGame->GetRemoteCalls()->GetDownloadModeForQueueName(m_strQueueName, bAnyHost);
+    CNetHTTPDownloadManagerInterface* pDownloadManager = g_pNet->GetHTTPDownloadManager(m_downloadMode);
     pDownloadManager->QueueFile(m_strURL, NULL, this, DownloadFinishedCallback, m_options);
 }
 
 void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
 {
     CRemoteCall* pCall = (CRemoteCall*)result.pObj;
-    if (!g_pGame->GetRemoteCalls()->CallExists(pCall))
+    if (!g_pClientGame->GetRemoteCalls()->CallExists(pCall))
         return;
     pCall->m_downloadMode = EDownloadModeType::NONE;
 
@@ -322,7 +293,7 @@ void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
             arguments.PushArgument(*(pCall->GetFetchArguments()[i]));
 
     arguments.Call(pCall->m_VM, pCall->m_iFunction);
-    g_pGame->GetRemoteCalls()->Remove(pCall);
+    g_pClientGame->GetRemoteCalls()->Remove(pCall);
 }
 
 // Return true if cancel was done
@@ -330,7 +301,7 @@ bool CRemoteCall::CancelDownload(void)
 {
     if (m_downloadMode != EDownloadModeType::NONE)
     {
-        return g_pNetServer->GetHTTPDownloadManager(m_downloadMode)->CancelDownload(this, DownloadFinishedCallback);
+        return g_pNet->GetHTTPDownloadManager(m_downloadMode)->CancelDownload(this, DownloadFinishedCallback);
     }
     return false;
 }
@@ -340,7 +311,7 @@ bool CRemoteCall::GetDownloadStatus(SDownloadStatus& outDownloadStatus)
 {
     if (m_downloadMode != EDownloadModeType::NONE)
     {
-        return g_pNetServer->GetHTTPDownloadManager(m_downloadMode)->GetDownloadStatus(this, DownloadFinishedCallback, outDownloadStatus);
+        return g_pNet->GetHTTPDownloadManager(m_downloadMode)->GetDownloadStatus(this, DownloadFinishedCallback, outDownloadStatus);
     }
     outDownloadStatus = {0};
     return false;
