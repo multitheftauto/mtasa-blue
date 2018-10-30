@@ -11,8 +11,8 @@
 
 extern CCoreInterface* g_pCore;
 
-static CVehicleSAInterface*     pCollisionVehicle = nullptr;
-static VehicleCollisionHandler* pVehicleCollisionHandler = nullptr;
+static CVehicleSAInterface* pCollisionVehicle = nullptr;
+VehicleCollisionHandler*    pVehicleCollisionHandler = nullptr;
 
 void CMultiplayerSA::SetVehicleCollisionHandler(VehicleCollisionHandler* pHandler)
 {
