@@ -92,6 +92,23 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
         if (bLocal)
         {
             CClientEntity* pOriginSource = NULL;
+            
+            // Check if the "weapon" used was a rocket or a tank grenade.
+            if (explosionWeaponType == WEAPONTYPE_ROCKET || explosionWeaponType == WEAPONTYPE_TANK_GRENADE)
+            {
+                CClientVehicle* pOccupiedVehicle = pLocalPlayer->GetOccupiedVehicle();
+
+                // Is the player in a vehicle?
+                if (pOccupiedVehicle)
+                {
+                    // Is the vehicle only available locally?
+                    if (pOccupiedVehicle->IsLocalEntity())
+                    {
+                        // It is pretty safe to asume this was a projectile from a client-side vehicle driven by the player. Abort.
+                        return true;
+                    }
+                }
+            }
 
             // Is this an exploding vehicle?
             if (pGameExplodingEntity && pGameExplodingEntity->GetEntityType() == ENTITY_TYPE_VEHICLE)
