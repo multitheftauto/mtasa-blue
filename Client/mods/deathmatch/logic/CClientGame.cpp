@@ -3928,10 +3928,14 @@ void CClientGame::FireHandler(CFire* pFire)
 
 void CClientGame::ProjectileInitiateHandler(CClientProjectile* pProjectile)
 {
+    CClientEntity* pCreator = pProjectile->GetCreator();
+
     if (pProjectile->IsLocal())
     {
+        bool bSyncProjectile = true;
+
         // Did the local player create this projectile?
-        if (m_pLocalPlayer && pProjectile->GetCreator() == m_pLocalPlayer)
+        if (m_pLocalPlayer && pCreator == m_pLocalPlayer)
         {
             // Physics says our projectile should start off at our velocity
             CVector vecVelocity, vecPlayerVelocity;
@@ -3939,16 +3943,30 @@ void CClientGame::ProjectileInitiateHandler(CClientProjectile* pProjectile)
             m_pLocalPlayer->GetMoveSpeed(vecPlayerVelocity);
             vecVelocity += vecPlayerVelocity;
             pProjectile->SetVelocity(vecVelocity);
+        } 
+        else if(pCreator) 
+        {
+            if (pCreator->GetType() == CCLIENTVEHICLE)
+            {
+                if (pCreator->IsLocalEntity()) 
+                {
+                    // Projectiles created by client-side vehicles should not be synced.
+                    bSyncProjectile = false;
+                }
+            }
         }
 
-        SendProjectileSync(pProjectile);
+        if (bSyncProjectile)
+        {
+            SendProjectileSync(pProjectile);
+        }
     }
 
     // Renew the interior and dimension
-    if (pProjectile->GetCreator())
+    if (pCreator)
     {
-        pProjectile->SetInterior(pProjectile->GetCreator()->GetInterior());
-        pProjectile->SetDimension(pProjectile->GetCreator()->GetDimension());
+        pProjectile->SetInterior(pCreator->GetInterior());
+        pProjectile->SetDimension(pCreator->GetDimension());
     }
 
     // Validate the projectile for our element tree
@@ -3956,7 +3974,7 @@ void CClientGame::ProjectileInitiateHandler(CClientProjectile* pProjectile)
 
     // Call our creation event
     CLuaArguments Arguments;
-    Arguments.PushElement(pProjectile->GetCreator());
+    Arguments.PushElement(pCreator);
     pProjectile->CallEvent("onClientProjectileCreation", Arguments, true);
 }
 
