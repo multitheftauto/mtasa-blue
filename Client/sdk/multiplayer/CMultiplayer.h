@@ -89,7 +89,7 @@ typedef bool(AssocGroupCopyAnimationHandler)(CAnimBlendAssociationSAInterface* p
 typedef bool(BlendAnimationHierarchyHandler)(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy, int* pFlags,
                                              RpClump* pClump);
 typedef bool(ProcessCollisionHandler)(class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface);
-typedef bool(VehicleCollisionHandler)(class CVehicleSAInterface* pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, int iModelIndex,
+typedef bool(VehicleCollisionHandler)(class CVehicleSAInterface*& pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, int iModelIndex,
                                       float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos,
                                       CVector vecCollisionVelocity);
 typedef bool(VehicleDamageHandler)(CEntitySAInterface* pVehicle, float fLoss, CEntitySAInterface* pAttacker, eWeaponType weaponType,
@@ -107,6 +107,7 @@ typedef void(GameModelRemoveHandler)(ushort usModelId);
 typedef void(GameEntityRenderHandler)(CEntitySAInterface* pEntity);
 typedef void(FxSystemDestructionHandler)(void* pFxSA);
 typedef AnimationId(DrivebyAnimationHandler)(AnimationId animGroup, AssocGroupId animId);
+typedef void(PedStepHandler)(CPedSAInterface* pPed, bool bFoot);
 typedef void(WaterCannonHitWorldHandler)(SWaterCannonHitEvent& event);
 
 /**
@@ -225,6 +226,7 @@ public:
     virtual void SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler) = 0;
     virtual void SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler) = 0;
     virtual void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler) = 0;
+    virtual void SetPedStepHandler(PedStepHandler* pHandler) = 0;
     virtual void SetWaterCannonHitWorldHandler(WaterCannonHitWorldHandler* pHandler) = 0;
 
     virtual void  AllowMouseMovement(bool bAllow) = 0;

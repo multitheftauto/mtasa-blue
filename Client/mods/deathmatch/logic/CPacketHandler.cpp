@@ -5032,6 +5032,7 @@ void CPacketHandler::Packet_VoiceData(NetBitStreamInterface& bitStream)
         if (pPlayer && bitStream.Read(usPacketSize))
         {
             char* pBuf = new char[usPacketSize];
+
             if (bitStream.Read(pBuf, usPacketSize))
             {
                 if (pPlayer->GetVoice())
@@ -5039,6 +5040,8 @@ void CPacketHandler::Packet_VoiceData(NetBitStreamInterface& bitStream)
                     pPlayer->GetVoice()->DecodeAndBuffer(pBuf, usPacketSize);
                 }
             }
+
+            delete[] pBuf;
         }
     }
 }
@@ -5314,6 +5317,7 @@ SString CPacketHandler::EntityAddDebugRead(NetBitStreamInterface& bitStream)
         }
 
         strStatus += SString("NameLen:%d Name:'%s'", usNameLength, *SStringX(szName).Left(40));
+        delete[] szName;
 
         return strStatus;
     }

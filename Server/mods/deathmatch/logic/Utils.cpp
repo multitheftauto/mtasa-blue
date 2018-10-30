@@ -262,6 +262,9 @@ void DisconnectPlayer(CGame* pGame, CPlayer& Player, const char* szMessage)
 
 void DisconnectPlayer(CGame* pGame, CPlayer& Player, CPlayerDisconnectedPacket::ePlayerDisconnectType eDisconnectType, const char* szMessage)
 {
+    if (Player.IsLeavingServer())
+        return;
+
     // Send it to the disconnected player
     Player.Send(CPlayerDisconnectedPacket(eDisconnectType, szMessage));
 
@@ -272,12 +275,18 @@ void DisconnectPlayer(CGame* pGame, CPlayer& Player, CPlayerDisconnectedPacket::
 void DisconnectPlayer(CGame* pGame, CPlayer& Player, CPlayerDisconnectedPacket::ePlayerDisconnectType eDisconnectType, time_t BanDuration,
                       const char* szMessage)
 {
+    if (Player.IsLeavingServer())
+        return;
+
     Player.Send(CPlayerDisconnectedPacket(eDisconnectType, BanDuration, szMessage));
     pGame->QuitPlayer(Player);
 }
 
 void DisconnectConnectionDesync(CGame* pGame, CPlayer& Player, unsigned int uiCode)
 {
+    if (Player.IsLeavingServer())
+        return;
+
     // Send message to the disconnected player
     Player.Send(CPlayerDisconnectedPacket(CPlayerDisconnectedPacket::CONNECTION_DESYNC, SString("(%u)", uiCode)));
 

@@ -246,15 +246,6 @@ DWORD JMP_RETN_Cancelled_CPopulation_ConvertToDummyObject = 0x614715;
 #define HOOKPOS_CEntity_IsOnScreen_FixObjectsScale      0x534575
 DWORD JMP_CEntity_IsOnScreen_FixObjectsScale = 0x53457C;
 
-#define HOOKPOS_CEventVehicleDamageCollision                    0x6A7657
-DWORD JMP_CEventVehicleDamageCollision_RETN = 0x6A765D;
-
-#define HOOKPOS_CEventVehicleDamageCollision_Plane              0x6CC4B3
-DWORD JMP_CEventVehicleDamageCollision_Plane_RETN = 0x6CC4B8;
-
-#define HOOKPOS_CEventVehicleDamageCollision_Bike               0x6B8EC6
-DWORD JMP_CEventVehicleDamageCollision_Bike_RETN = 0x6B8ECC;
-
 #define HOOKPOS_CClothes_RebuildPlayer                      0x5A82C0
 DWORD RETURN_CClothes_RebuildPlayera = 0x5A82C8;
 DWORD RETURN_CClothes_RebuildPlayerb = 0x5A837F;
@@ -364,7 +355,6 @@ IdleHandler*                m_pIdleHandler = NULL;
 PreFxRenderHandler*         m_pPreFxRenderHandler = NULL;
 PreHudRenderHandler*        m_pPreHudRenderHandler = NULL;
 ProcessCollisionHandler*    m_pProcessCollisionHandler = NULL;
-VehicleCollisionHandler*    m_pVehicleCollisionHandler = NULL;
 HeliKillHandler*            m_pHeliKillHandler = NULL;
 ObjectDamageHandler*        m_pObjectDamageHandler = NULL;
 ObjectBreakHandler*         m_pObjectBreakHandler = NULL;
@@ -498,12 +488,6 @@ void Hook_CDummy_DTR();
 void Hook_CObject_DTR();
 
 void HOOK_CEntity_IsOnScreen_FixObjectScale();
-
-void HOOK_CEventVehicleDamageCollision();
-
-void HOOK_CEventVehicleDamageCollision_Plane();
-
-void HOOK_CEventVehicleDamageCollision_Bike();
 
 void HOOK_CClothes_RebuildPlayer();
 
@@ -719,14 +703,6 @@ void CMultiplayerSA::InitHooks()
 
     HookInstall(HOOKPOS_ConvertToObject_CPopulationManageDummy, (DWORD)HOOK_ConvertToObject_CPopulationManageDummy, 6);
     // End of building removal hooks
-
-    // Vehicle Collision Event Hooks
-    HookInstall(HOOKPOS_CEventVehicleDamageCollision, (DWORD)HOOK_CEventVehicleDamageCollision, 6);
-
-    HookInstall(HOOKPOS_CEventVehicleDamageCollision_Plane, (DWORD)HOOK_CEventVehicleDamageCollision_Plane, 5);
-
-    HookInstall(HOOKPOS_CEventVehicleDamageCollision_Bike, (DWORD)HOOK_CEventVehicleDamageCollision_Bike, 6);
-    // End of Vehicle Collision Event Hooks
 
     // Spider CJ fix
     HookInstall(HOOKPOS_CClothes_RebuildPlayer, (DWORD)HOOK_CClothes_RebuildPlayer, 8);
@@ -2249,11 +2225,6 @@ void CMultiplayerSA::SetPreHudRenderHandler(PreHudRenderHandler* pHandler)
 void CMultiplayerSA::SetProcessCollisionHandler(ProcessCollisionHandler* pHandler)
 {
     m_pProcessCollisionHandler = pHandler;
-}
-
-void CMultiplayerSA::SetVehicleCollisionHandler(VehicleCollisionHandler* pHandler)
-{
-    m_pVehicleCollisionHandler = pHandler;
 }
 
 void CMultiplayerSA::SetHeliKillHandler(HeliKillHandler* pHandler)
@@ -6196,109 +6167,7 @@ IsOnScreen_IsObject:
         jmp     JMP_CEntity_IsOnScreen_FixObjectsScale
     }
 }
-CVehicleSAInterface* pCollisionVehicle = NULL;
-void                 TriggerVehicleCollisionEvent()
-{
-    if (pCollisionVehicle)
-    {
-        CEntitySAInterface* pEntity = pCollisionVehicle->m_pCollidedEntity;
-        if (pEntity)
-        {
-            // Not handled because it triggers too much
-            // if ( pEntity->nType != ENTITY_TYPE_BUILDING )
-            {
-                if (m_pVehicleCollisionHandler)
-                {
-                    TIMING_CHECKPOINT("+TriggerVehColEvent");
-                    if (pEntity->nType == ENTITY_TYPE_VEHICLE)
-                    {
-                        CVehicleSAInterface* pInterface = static_cast<CVehicleSAInterface*>(pEntity);
-                        m_pVehicleCollisionHandler(pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude,
-                                                   pInterface->m_fDamageImpulseMagnitude, pCollisionVehicle->m_usPieceType,
-                                                   pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity);
-                    }
-                    else
-                    {
-                        m_pVehicleCollisionHandler(pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude, 0.0f,
-                                                   pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition,
-                                                   pCollisionVehicle->m_vecCollisionImpactVelocity);
-                    }
-                    TIMING_CHECKPOINT("-TriggerVehColEvent");
-                }
-            }
-        }
-    }
-}
 
-void _declspec(naked) HOOK_CEventVehicleDamageCollision()
-{
-    // .006A7657 64 A1 00 00 00 00                       mov     eax, large fs:0 < Hook >
-    // .006A765D 50                                      push    eax < Jmp Back >
-
-    // ecx = this ptr
-    // pVehicle->damageEntity = damage entity
-    _asm
-    {
-        pushad
-        mov pCollisionVehicle, ecx
-    }
-    TriggerVehicleCollisionEvent();
-
-    // do the replaced code and return back as if nothing happened.
-    _asm
-    {
-        popad
-        mov eax, fs:0
-        jmp JMP_CEventVehicleDamageCollision_RETN
-    }
-}
-
-DWORD dwPlaneDamageThreadshold = 0x8D33E4;
-void _declspec(naked) HOOK_CEventVehicleDamageCollision_Plane()
-{
-    // .006CC4B3 A1 E4 33 8D 00                            mov     eax, ds:?PLANE_DAMAGE_THRESHHOLD@@3MA
-    //  006CC4B8 53                                        push    ebx < Jmp Back >
-
-    // ecx = this ptr
-    // pVehicle->damageEntity = damage entity
-    _asm
-    {
-        pushad
-        mov pCollisionVehicle, ecx
-    }
-    TriggerVehicleCollisionEvent();
-
-    // do the replaced code and return back as if nothing happened.
-    _asm
-    {
-        popad
-        mov eax, DWORD PTR DS:[8D33E4h]
-        jmp JMP_CEventVehicleDamageCollision_Plane_RETN
-    }
-}
-
-void _declspec(naked) HOOK_CEventVehicleDamageCollision_Bike()
-{
-    // .006B8EC6 DC 1D F8 9E 85 00                       fcomp   ds:__real@0000000000000000 < Hook >
-    //  006B8ECC 8B F1                                   mov     esi, ecx < Jmp Back >
-
-    // ecx = this ptr
-    // pVehicle->damageEntity = damage entity
-    _asm
-    {
-        pushad
-        mov pCollisionVehicle, ecx
-    }
-    TriggerVehicleCollisionEvent();
-
-    // do the replaced code and return back as if nothing happened.
-    _asm
-    {
-        popad
-        fcomp DWORD PTR DS:[859EF8h]
-        jmp JMP_CEventVehicleDamageCollision_Bike_RETN
-    }
-}
 //////////////////////////////////////////////////////////////////////////////////////////
 // Only allow rebuild player on CJ - Stops other models getting corrupted (spider CJ)
 // hooked at 5A82C0 8 bytes
