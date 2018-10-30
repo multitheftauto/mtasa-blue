@@ -172,6 +172,7 @@ public:
     virtual void        SetFakeLagCommandEnabled(bool bEnabled) = 0;
     virtual SString     GetBlueCopyrightString(void) = 0;
     virtual bool        ClearChat() = 0;
+    virtual void        OnGameTimerUpdate(void) = 0;
 };
 
 class CClientTime
