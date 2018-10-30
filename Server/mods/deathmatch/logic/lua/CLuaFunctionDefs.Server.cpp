@@ -804,13 +804,13 @@ int CLuaFunctionDefs::GetNetworkRequestInfo(lua_State* luaVM)
 
             info.PushString("start");
             info.PushNumber(pRemoteCall->GetStartTime());
-        
+
             info.PushString("post_data");
             info.PushString(pRemoteCall->GetOptions().strPostData.c_str());
 
             info.PushString("method");
             info.PushString((pRemoteCall->GetOptions().strRequestMethod.length() >= 1 ? pRemoteCall->GetOptions().strRequestMethod.ToUpper().c_str() : "POST"));
-        
+
             info.PushString("connection_attempts");
             info.PushNumber(pRemoteCall->GetOptions().uiConnectionAttempts);
 
@@ -829,6 +829,30 @@ int CLuaFunctionDefs::GetNetworkRequestInfo(lua_State* luaVM)
             info.PushTable(&requestedHeaders);
             info.PushAsTable(luaVM);
 
+            return 1;
+        }
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFunctionDefs::AbortNetworkRequest(lua_State* luaVM)
+{
+    CScriptArgReader argStream(luaVM);
+    CRemoteCall*     pRemoteCall = nullptr;
+
+    argStream.ReadUserData(pRemoteCall);
+
+    if (!argStream.HasErrors())
+    {
+        if (pRemoteCall)
+        {
+            lua_pushboolean(luaVM, pRemoteCall->CancelDownload());
             return 1;
         }
     }

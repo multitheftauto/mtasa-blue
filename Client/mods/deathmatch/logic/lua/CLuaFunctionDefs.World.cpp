@@ -2010,3 +2010,27 @@ int CLuaFunctionDefs::GetNetworkRequestInfo(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
+
+int CLuaFunctionDefs::AbortNetworkRequest(lua_State* luaVM)
+{
+    CScriptArgReader argStream(luaVM);
+    CRemoteCall*     pRemoteCall = nullptr;
+
+    argStream.ReadUserData(pRemoteCall);
+
+    if (!argStream.HasErrors())
+    {
+        if (pRemoteCall)
+        {
+            lua_pushboolean(luaVM, pRemoteCall->CancelDownload());
+            return 1;
+        }
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}

@@ -180,6 +180,7 @@ public:
     LUA_DECLARE(FetchRemote);
     LUA_DECLARE(GetNetworkRequests);
     LUA_DECLARE(GetNetworkRequestInfo);
+    LUA_DECLARE(AbortNetworkRequest);
 
     // Input functions
     LUA_DECLARE(BindKey);
