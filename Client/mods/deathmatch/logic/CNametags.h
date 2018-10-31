@@ -34,10 +34,10 @@ public:
 
     void DrawTagForPlayer(CClientPlayer* pPlayer, unsigned char ucAlpha);
 
-    const unsigned int GetDimension(void) { return m_usDimension; }
+    unsigned int GetDimension() const { return m_usDimension; }
     void         SetDimension(unsigned short usDimension) { m_usDimension = usDimension; }
 
-    const unsigned char GetInterior(void) { return m_ucInterior; }
+    unsigned char GetInterior() const { return m_ucInterior; }
     void         SetInterior(unsigned char ucInterior) { m_ucInterior = ucInterior; }
 
     bool IsVisible(void) { return m_bVisible; }
