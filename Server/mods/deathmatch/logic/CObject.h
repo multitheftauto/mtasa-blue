@@ -77,8 +77,8 @@ public:
 
     bool IsVisibleInAllDimensions(void) { return m_bVisibleInAllDimensions; };
     void SetVisibleInAllDimensions(bool bVisible) { m_bVisibleInAllDimensions = bVisible; };
-    bool IsVisibleInAllInteriors(void) { return m_bVisibleInAllInteriors; };
-    void SetVisibleInAllInteriors(bool bVisible) { m_bVisibleInAllInteriors = bVisible; };
+    const bool IsVisibleInAllInteriors(void) { return m_bVisibleInAllInteriors; }
+    void SetVisibleInAllInteriors(bool bVisible) { m_bVisibleInAllInteriors = bVisible; }
 
 protected:
     bool ReadSpecialData(const int iLine) override;
