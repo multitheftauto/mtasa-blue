@@ -48,8 +48,8 @@ public:
 
     bool IsStreamingCompatibleClass(void) { return true; };
 
-    virtual bool IsVisibleInAllDimensions(void) { return false; };
-    virtual bool IsVisibleInAllInteriors(void) { return false; };
+    const virtual bool IsVisibleInAllDimensions(void) { return false; }
+    const virtual bool IsVisibleInAllInteriors(void) { return false; }
 
 private:
     void SetStreamRow(CClientStreamSectorRow* pRow) { m_pStreamRow = pRow; }
