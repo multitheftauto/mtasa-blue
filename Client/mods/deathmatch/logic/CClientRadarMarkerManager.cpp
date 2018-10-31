@@ -109,18 +109,17 @@ void CClientRadarMarkerManager::OrderMarkers(void)
 {
     m_Markers.sort(CompareOrderingIndex);
 
-    list<CClientRadarMarker*>::iterator iter = m_Markers.begin();
-    for (; iter != m_Markers.end(); iter++)
+    for (const auto &iter: m_Markers)
     {
-        (*iter)->DestroyMarker();
+    	(*iter)->DestroyMarker();
     }
-    iter = m_Markers.begin();
-    for (; iter != m_Markers.end(); iter++)
+
+    for (const auto &iter: m_Markers)
     {
-        if ((*iter)->GetDimension() == m_usDimension && (*iter)->GetInterior() == m_ucInterior)
-        {
-            (*iter)->CreateMarker();
-        }
+    	if ((*iter)->GetDimension() == m_usDimension && (*iter)->GetInterior() == m_ucInterior)
+    	{
+    		(*iter)->CreateMarker();
+    	}
     }
 }
 
