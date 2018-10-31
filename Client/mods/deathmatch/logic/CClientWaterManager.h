@@ -36,10 +36,10 @@ public:
     float GetWaveLevel();
     void  SetWaveLevel(float fWaveLevel);
 
-    unsigned short GetDimension(void) { return m_usDimension; };
+    unsigned short GetDimension() const { return m_usDimension; };
     void           SetDimension(unsigned short usDimension);
 
-    const unsigned char GetInterior(void) { return m_ucInterior; }
+    cunsigned char GetInterior() const { return m_ucInterior; }
     void          SetInterior(unsigned char ucInterior);
 
     std::list<CClientWater*>::const_iterator IterBegin(void) { return m_List.begin(); };
