@@ -19,6 +19,8 @@ extern CCoreInterface* g_pCore;
 CClientSoundManager::CClientSoundManager(CClientManager* pClientManager)
 {
     m_pClientManager = pClientManager;
+    m_usDimension = 0;
+    m_ucInterior = 0;
 
     // Initialize BASS audio library
     if (!BASS_Init(-1, 44100, NULL, NULL, NULL))
