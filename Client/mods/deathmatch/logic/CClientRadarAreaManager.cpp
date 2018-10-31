@@ -82,9 +82,9 @@ void CClientRadarAreaManager::SetDimension(unsigned short usDimension)
 
 void CClientRadarAreaManager::SetInterior(unsigned char ucInterior)
 {
-    for (const auto &iter: m_List)
+    for (CClientRadarArea *pArea : m_List)
     {
-    	(*iter)->RelateInterior(ucInterior);
+        pArea->RelateInterior(ucInterior);
     }
 
     m_ucInterior = ucInterior;
