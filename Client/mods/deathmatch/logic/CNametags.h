@@ -37,7 +37,7 @@ public:
     const unsigned int GetDimension(void) { return m_usDimension; }
     void         SetDimension(unsigned short usDimension) { m_usDimension = usDimension; }
 
-    const unsigned int GetInterior(void) { return m_ucInterior; }
+    const unsigned char GetInterior(void) { return m_ucInterior; }
     void         SetInterior(unsigned char ucInterior) { m_ucInterior = ucInterior; }
 
     bool IsVisible(void) { return m_bVisible; }
