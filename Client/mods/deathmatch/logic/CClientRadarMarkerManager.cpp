@@ -82,15 +82,19 @@ void CClientRadarMarkerManager::RemoveFromList(CClientRadarMarker* pMarker)
 void CClientRadarMarkerManager::SetDimension(unsigned short usDimension)
 {
     if (m_usDimension != usDimension)
+    {
         m_usDimension = usDimension;
         m_bOrderOnPulse = true;
+    }
 }
 
 void CClientRadarMarkerManager::SetInterior(unsigned char ucInterior)
 {
     if (m_ucInterior != ucInterior)
+    {
         m_ucInterior = ucInterior;
         m_bOrderOnPulse = true;
+    }
 }
 
 bool CClientRadarMarkerManager::Exists(CClientRadarMarker* pRadarMarker)
