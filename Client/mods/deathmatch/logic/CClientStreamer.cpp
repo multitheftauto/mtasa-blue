@@ -518,7 +518,7 @@ void CClientStreamer::Restream(bool bMovedFar)
         else
         {
             // Same dimension and interior as us?
-            if (pElement->GetDimension() == m_usDimension || pElement->IsVisibleInAllDimensions() && pElement->GetInterior() == m_ucInterior || pElement->IsVisibleInAllInteriors())
+            if ((pElement->GetDimension() == m_usDimension || pElement->IsVisibleInAllDimensions()) && (pElement->GetInterior() == m_ucInterior || pElement->IsVisibleInAllInteriors()))
             {
                 // Too far away? Stop here.
                 if (fElementDistanceExp > m_fMaxDistanceExp)
