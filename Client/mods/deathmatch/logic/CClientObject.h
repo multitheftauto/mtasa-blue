@@ -109,7 +109,7 @@ public:
     bool IsVisibleInAllDimensions(void) { return m_bVisibleInAllDimensions; };
     void SetVisibleInAllDimensions(bool bVisible, unsigned short usNewDimension = 0);
 
-    bool IsVisibleInAllInteriors(void) { return m_bVisibleInAllInteriors; };
+    const bool IsVisibleInAllInteriors(void) { return m_bVisibleInAllInteriors; }
     void SetVisibleInAllInteriors(bool bVisible, unsigned char ucNewInterior = 0);
 
     void ReCreate(void);
