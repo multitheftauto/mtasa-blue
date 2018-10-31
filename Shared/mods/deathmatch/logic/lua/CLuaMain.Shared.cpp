@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        Shared/mods/logic/lua/CLuaMainShared.cpp
+ *  FILE:        Shared/mods/logic/lua/CLuaMain.Shared.cpp
  *
  *****************************************************************************/
 
