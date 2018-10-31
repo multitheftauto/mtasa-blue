@@ -142,7 +142,6 @@ typedef DWORD HPLUGIN;		// Plugin handle
 #define BASS_CONFIG_NET_PLAYLIST_DEPTH	59
 #define BASS_CONFIG_NET_PREBUF_WAIT	60
 #define BASS_CONFIG_LIBSSL			64
-#define BASS_CONFIG_WASAPI_PERSIST	65
 
 // BASS_SetConfigPtr options
 #define BASS_CONFIG_NET_AGENT		16
@@ -509,7 +508,6 @@ RETURN : Number of bytes written. Set the BASS_STREAMPROC_END flag to end the st
 #define STREAMPROC_DUMMY		(STREAMPROC*)0		// "dummy" stream
 #define STREAMPROC_PUSH			(STREAMPROC*)-1		// push stream
 #define STREAMPROC_DEVICE		(STREAMPROC*)-2		// device mix stream
-#define STREAMPROC_DEVICE_3D	(STREAMPROC*)-3		// device 3D mix stream
 
 // BASS_StreamCreateFileUser file systems
 #define STREAMFILE_NOBUFFER		0
