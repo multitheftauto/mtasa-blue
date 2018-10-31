@@ -19,6 +19,7 @@
 
 #include <sys/types.h>
 #include <fstream>
+#include "SharedUtil.h"
 #ifdef WIN32
   #include <dirent_win32.h>
 #else
@@ -73,13 +74,21 @@ UnixFileSystem::open_directory(const std::string& pathname, std::vector<std::str
 std::auto_ptr<std::istream>
 UnixFileSystem::open_file(const std::string& filename)
 {
+#ifdef WIN32
+  return std::auto_ptr<std::istream>(new std::ifstream(FromUTF8(filename.c_str())));
+#else
   return std::auto_ptr<std::istream>(new std::ifstream(filename.c_str()));
+#endif
 }
 
 bool
 UnixFileSystem::file_exists(const std::string& filename)
 {
+#ifdef WIN32
+  std::ifstream file( FromUTF8(filename.c_str()).c_str () );
+#else
   std::ifstream file(filename.c_str());
+#endif
   if (file.good())
   {
     file.close();

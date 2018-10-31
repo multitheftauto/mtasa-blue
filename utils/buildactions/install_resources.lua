@@ -4,10 +4,10 @@ local unzip = function(zip_path, target_path)
 	zip_path = path.translate(zip_path)
 	target_path = path.translate(target_path)
 
-	if os.get() == "windows" then
+	if os.host() == "windows" then
 		os.executef("call \"utils\\7z\\7za.exe\" x \"%s\" -aoa -o\"%s\"", zip_path, target_path)
 	else
-		-- Linux: TODO
+		os.executef("unzip \"%s\" -d \"%s\"", zip_path, target_path)
 	end
 end
 

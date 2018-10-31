@@ -1,18 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CSingularFileDownloadManager.h
-*  PURPOSE:     Header for downloading single files
-*  DEVELOPERS:  Kevin Whiteside <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CSingularFileDownloadManager.h
+ *  PURPOSE:     Header for downloading single files
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-
-#ifndef CSINGULARFILEDOWNLOADMANAGER_H
-#define CSINGULARFILEDOWNLOADMANAGER_H
+#pragma once
 
 #ifndef _WINDOWS_
 
@@ -27,28 +24,17 @@
 
 class CSingularFileDownloadManager
 {
-
 public:
-    
-                                CSingularFileDownloadManager    ( void );
-                                ~CSingularFileDownloadManager   ( void );
+    CSingularFileDownloadManager(void);
+    ~CSingularFileDownloadManager(void);
 
-    CSingularFileDownload*      AddFile                         ( CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CChecksum checksum = CChecksum () );
-    void                        CancelResourceDownloads         ( CResource* pResource );
+    CSingularFileDownload* AddFile(CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CChecksum checksum = CChecksum());
+    void                   CancelResourceDownloads(CResource* pResource);
 
-    void                        ClearList                       ( void );
+    void ClearList(void);
 
-    bool                        AllComplete                     ( void );
-
+    bool AllComplete(void);
 
 protected:
-
-    std::list < CSingularFileDownload* >    m_Downloads;
-
+    std::list<CSingularFileDownload*> m_Downloads;
 };
-
-
-
-
-
-#endif

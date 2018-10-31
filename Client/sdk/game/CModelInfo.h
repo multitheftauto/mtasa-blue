@@ -1,16 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/game/CModelInfo.h
-*  PURPOSE:     Entity model info interface
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/game/CModelInfo.h
+ *  PURPOSE:     Entity model info interface
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CGAME_MODELINFO
-#define __CGAME_MODELINFO
+#pragma once
 
 #include "Common.h"
 #include "RenderWare.h"
@@ -52,11 +51,8 @@ enum eVehicleUpgradePosn
 
 struct SVehicleSupportedUpgrades
 {
-    SVehicleSupportedUpgrades ( )
-    {
-        Reset ( );
-    }
-    void Reset ( )
+    SVehicleSupportedUpgrades() { Reset(); }
+    void Reset()
     {
         m_bBonnet = false;
         m_bBonnet_Left = false;
@@ -103,76 +99,77 @@ struct SVehicleSupportedUpgrades
 class CModelInfo
 {
 public:
-    virtual class CBaseModelInfoSAInterface *     GetInterface            ( void ) = 0;
+    virtual class CBaseModelInfoSAInterface* GetInterface(void) = 0;
 
-    virtual DWORD           GetModel                () = 0;
-    virtual BOOL            IsBoat                  () = 0;
-    virtual BOOL            IsCar                   () = 0;
-    virtual BOOL            IsTrain                 () = 0;
-    virtual BOOL            IsHeli                  () = 0;
-    virtual BOOL            IsPlane                 () = 0;
-    virtual BOOL            IsBike                  () = 0;
-    virtual BOOL            IsFakePlane             () = 0;
-    virtual BOOL            IsMonsterTruck          () = 0;
-    virtual BOOL            IsQuadBike              () = 0;
-    virtual BOOL            IsBmx                   () = 0;
-    virtual BOOL            IsTrailer               () = 0;
-    virtual BOOL            IsVehicle               () = 0;
+    virtual DWORD GetModel() = 0;
+    virtual BOOL  IsBoat() = 0;
+    virtual BOOL  IsCar() = 0;
+    virtual BOOL  IsTrain() = 0;
+    virtual BOOL  IsHeli() = 0;
+    virtual BOOL  IsPlane() = 0;
+    virtual BOOL  IsBike() = 0;
+    virtual BOOL  IsFakePlane() = 0;
+    virtual BOOL  IsMonsterTruck() = 0;
+    virtual BOOL  IsQuadBike() = 0;
+    virtual BOOL  IsBmx() = 0;
+    virtual BOOL  IsTrailer() = 0;
+    virtual BOOL  IsVehicle() = 0;
 
-    virtual char*           GetNameIfVehicle        () = 0;
+    virtual char* GetNameIfVehicle() = 0;
 
-    virtual VOID            Request                 ( EModelRequestType requestType, const char* szTag/* = NULL*/ ) = 0;
-    virtual BYTE            GetLevelFromPosition    ( CVector * vecPosition ) = 0;
-    virtual BOOL            IsLoaded                () = 0;
-    virtual BYTE            GetFlags                () = 0;
-    virtual CBoundingBox*   GetBoundingBox          () = 0;
-    virtual bool            IsValid                 () = 0;
-    virtual unsigned short  GetTextureDictionaryID  () = 0;
-    virtual float           GetLODDistance          () = 0;
-    virtual void            SetLODDistance          ( float fDistance ) = 0;
-    virtual void            RestreamIPL             () = 0;
+    virtual VOID           Request(EModelRequestType requestType, const char* szTag /* = NULL*/) = 0;
+    virtual BYTE           GetLevelFromPosition(CVector* vecPosition) = 0;
+    virtual BOOL           IsLoaded() = 0;
+    virtual BYTE           GetFlags() = 0;
+    virtual CBoundingBox*  GetBoundingBox() = 0;
+    virtual bool           IsValid() = 0;
+    virtual unsigned short GetTextureDictionaryID() = 0;
+    virtual float          GetLODDistance() = 0;
+    virtual void           SetLODDistance(float fDistance) = 0;
+    virtual void           RestreamIPL() = 0;
 
-    virtual void            ModelAddRef             ( EModelRequestType requestType, const char* szTag/* = NULL*/ ) = 0;
-    virtual void            RemoveRef               ( bool bRemoveExtraGTARef = false ) = 0;
-    virtual int             GetRefCount             () = 0;
-    virtual bool            ForceUnload             ( void ) = 0;
+    virtual void ModelAddRef(EModelRequestType requestType, const char* szTag /* = NULL*/) = 0;
+    virtual void RemoveRef(bool bRemoveExtraGTARef = false) = 0;
+    virtual int  GetRefCount() = 0;
+    virtual bool ForceUnload(void) = 0;
 
-    virtual float           GetDistanceFromCentreOfMassToBaseOfModel () = 0;
+    virtual float GetDistanceFromCentreOfMassToBaseOfModel() = 0;
 
-    virtual void            SetAlphaTransparencyEnabled ( BOOL bEnabled ) = 0;
-    virtual bool            IsAlphaTransparencyEnabled () = 0;
-    virtual void            ResetAlphaTransparency  () = 0;
+    virtual void SetAlphaTransparencyEnabled(BOOL bEnabled) = 0;
+    virtual bool IsAlphaTransparencyEnabled() = 0;
+    virtual void ResetAlphaTransparency() = 0;
 
     // ONLY use for CVehicleModelInfos
-    virtual short           GetAvailableVehicleMod  ( unsigned short usSlot ) = 0;
-    virtual bool            IsUpgradeAvailable      ( eVehicleUpgradePosn posn ) = 0;
-    virtual void            SetCustomCarPlateText   ( const char * szText ) = 0;
-    virtual unsigned int    GetNumRemaps            ( void ) = 0;
-    virtual void*           GetVehicleSuspensionData( void ) = 0;
-    virtual void*           SetVehicleSuspensionData( void* pSuspensionLines ) = 0;
+    virtual short        GetAvailableVehicleMod(unsigned short usSlot) = 0;
+    virtual bool         IsUpgradeAvailable(eVehicleUpgradePosn posn) = 0;
+    virtual void         SetCustomCarPlateText(const char* szText) = 0;
+    virtual unsigned int GetNumRemaps(void) = 0;
+    virtual void*        GetVehicleSuspensionData(void) = 0;
+    virtual void*        SetVehicleSuspensionData(void* pSuspensionLines) = 0;
+    virtual CVector      GetVehicleExhaustFumesPosition() = 0;
+    virtual void         SetVehicleExhaustFumesPosition(const CVector& position) = 0;
+    virtual CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) = 0;
+    virtual void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) = 0;
 
     // Init the supported upgrades structure
-    virtual void            InitialiseSupportedUpgrades ( RpClump * pClump ) = 0;
+    virtual void InitialiseSupportedUpgrades(RpClump* pClump) = 0;
 
     // ONLY use for peds
-    virtual void            GetVoice                ( short* psVoiceType, short* psVoice ) = 0;
-    virtual void            GetVoice                ( const char** pszVoiceType, const char** szVoice ) = 0;
-    virtual void            SetVoice                ( short sVoiceType, short sVoice ) = 0;
-    virtual void            SetVoice                ( const char* szVoiceType, const char* szVoice ) = 0;
+    virtual void GetVoice(short* psVoiceType, short* psVoice) = 0;
+    virtual void GetVoice(const char** pszVoiceType, const char** szVoice) = 0;
+    virtual void SetVoice(short sVoiceType, short sVoice) = 0;
+    virtual void SetVoice(const char* szVoiceType, const char* szVoice) = 0;
 
     // Custom collision related functions
-    virtual void            SetCustomModel          ( RpClump* pClump ) = 0;
-    virtual void            RestoreOriginalModel    ( void ) = 0;
-    virtual void            SetColModel             ( CColModel* pColModel ) = 0;
-    virtual void            RestoreColModel         ( void ) = 0;
+    virtual void SetCustomModel(RpClump* pClump) = 0;
+    virtual void RestoreOriginalModel(void) = 0;
+    virtual void SetColModel(CColModel* pColModel) = 0;
+    virtual void RestoreColModel(void) = 0;
 
     // Call this to make sure the custom vehicle models are being used after a load.
-    virtual void            MakeCustomModel         ( void ) = 0;
-    virtual RwObject*       GetRwObject             ( void ) = 0;
+    virtual void      MakeCustomModel(void) = 0;
+    virtual RwObject* GetRwObject(void) = 0;
 
-
-    virtual SVehicleSupportedUpgrades               GetVehicleSupportedUpgrades         ( void ) = 0;
-    virtual void                                    ResetSupportedUpgrades              ( void ) = 0;
+    virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades(void) = 0;
+    virtual void                      ResetSupportedUpgrades(void) = 0;
 };
-
-#endif

@@ -1,17 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        xml/CXMLFileImpl.h
-*  PURPOSE:     XML file class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        xml/CXMLFileImpl.h
+ *  PURPOSE:     XML file class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CXMLFILEIMPL_H
-#define __CXMLFILEIMPL_H
+#pragma once
 
 #include <tinyxml.h>
 #include <iostream>
@@ -23,55 +21,58 @@ class CXMLFileImpl : public CXMLFile
     friend class CXMLNodeImpl;
 
 public:
-                                    CXMLFileImpl        ( const char* szFilename, bool bUseIDs );
-                                    ~CXMLFileImpl       ( void );
+    CXMLFileImpl(const char* szFilename, bool bUseIDs, bool bReadOnly);
+    ~CXMLFileImpl(void);
 
-    const char*                     GetFilename         ( void );
-    void                            SetFilename         ( const char* szFilename );
+    const char* GetFilename(void);
+    void        SetFilename(const char* szFilename);
 
-    bool                            Parse               ( std::vector < char >* pOutFileContents = NULL );
-    bool                            Write               ( void );
-    void                            Clear               ( void );
-    void                            Reset               ( void );
+    bool Parse(std::vector<char>* pOutFileContents = NULL);
+    bool Write(void);
+    void Clear(void);
+    void Reset(void);
 
-    CXMLNode*                       CreateRootNode      ( const std::string& strTagName );
-    CXMLNode*                       GetRootNode         ( void );
+    CXMLNode* CreateRootNode(const std::string& strTagName);
+    CXMLNode* GetRootNode(void);
 
-    CXMLErrorCodes::Code            GetLastError        ( std::string& strOut );
-    void                            ResetLastError      ( void );
+    CXMLErrorCodes::Code GetLastError(std::string& strOut);
+    void                 ResetLastError(void);
 
     // Private functions
-    void                            SetLastError        ( CXMLErrorCodes::Code errCode, const std::string& strDescription );
+    void SetLastError(CXMLErrorCodes::Code errCode, const std::string& strDescription);
 
-    TiXmlDocument*                  GetDocument         ( void );
+    TiXmlDocument* GetDocument(void);
 
-    eXMLClass                       GetClassType        ( void )    { return CXML_FILE; };
-    unsigned long                   GetID               ( void )    { dassert ( m_bUsingIDs ); return m_ulID; };
-    bool                            IsValid             ( void )    { return !m_bUsingIDs || m_ulID != INVALID_XML_ID; };
-    bool                            IsUsingIDs          ( void )    { return m_bUsingIDs; }
+    eXMLClass     GetClassType(void) { return CXML_FILE; };
+    unsigned long GetID(void)
+    {
+        dassert(m_bUsingIDs);
+        return m_ulID;
+    };
+    bool IsValid(void) { return !m_bUsingIDs || m_ulID != INVALID_XML_ID; };
+    bool IsUsingIDs(void) { return m_bUsingIDs; }
 
-    static void                     InitFileRecovery    ( const char* szSaveFlagDirectory );
-    void                            FileRecoveryPreSave ( const SString& strFilename );
-    void                            FileRecoveryPostSave( void );
+    static void InitFileRecovery(const char* szSaveFlagDirectory);
+    void        FileRecoveryPreSave(const SString& strFilename);
+    void        FileRecoveryPostSave(void);
 
 private:
-    bool                            BuildWrapperTree    ( void );
-    bool                            BuildSubElements    ( class CXMLNodeImpl* pNode );
-    void                            ClearWrapperTree    ( void );
-    bool                            WriteSafer          ( void );
+    bool BuildWrapperTree(void);
+    bool BuildSubElements(class CXMLNodeImpl* pNode);
+    void ClearWrapperTree(void);
+    bool WriteSafer(void);
 
-    std::string                     m_strFilename;
+    std::string m_strFilename;
 
-    CXMLErrorCodes::Code            m_errLastError;
-    std::string                     m_strLastError;
+    CXMLErrorCodes::Code m_errLastError;
+    std::string          m_strLastError;
 
-    TiXmlDocument*                  m_pDocument;
+    TiXmlDocument* m_pDocument;
 
-    class CXMLNodeImpl*             m_pRootNode;
-    unsigned long                   m_ulID;
-    const bool                      m_bUsingIDs;
+    class CXMLNodeImpl* m_pRootNode;
+    unsigned long       m_ulID;
+    const bool          m_bUsingIDs;
+    const bool          m_bReadOnly;
 
-    static SString                  ms_strSaveFlagFile;
+    static SString ms_strSaveFlagFile;
 };
-
-#endif

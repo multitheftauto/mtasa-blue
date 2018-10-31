@@ -29,3 +29,6 @@ project "Falagard"
 		flags { "ExcludeFromBuild" } 
 	filter "system:not windows"
 		flags { "ExcludeFromBuild" } 
+	
+	filter {"system:windows"}
+		disablewarnings { "4297" }

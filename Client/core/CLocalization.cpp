@@ -1,146 +1,185 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CLanguage.cpp
-*  PURPOSE:     Automatically load required language and localize MTA text according to locale
-*  DEVELOPERS:  Dan Chowdhury <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CLanguage.cpp
+ *  PURPOSE:     Automatically load required language and localize MTA text according to locale
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 #include "../../vendor/tinygettext/log.hpp"
-#define MTA_LOCALE_DIR              "MTA/locale/"
 #define MTA_LOCALE_TEXTDOMAIN       "client"
+// TRANSLATORS: Replace with your language native name
+#define NATIVE_LANGUAGE_NAME _td("English")
 
-CLocalization::CLocalization ( SString strLocale, SString strLocalePath )
+CLocalization::CLocalization(const SString& strLocale, const SString& strLocalePath)
 {
-    strLocalePath = strLocalePath.empty() ? CalcMTASAPath ( MTA_LOCALE_DIR ) : strLocalePath;
+    // Set log callbacks so we can record problems
+    Log::set_log_info_callback(NULL);
+    Log::set_log_warning_callback(LogCallback);
+    Log::set_log_error_callback(LogCallback);
+
+    // Setup our dictionary manager
+    m_DictManager.add_directory(strLocalePath.empty() ? CalcMTASAPath(MTA_LOCALE_DIR) : strLocalePath);
 
     // Initialize our language
-    if ( strLocale.empty() && !CVARS_GET("locale", strLocale) )
+    SetCurrentLanguage(strLocale);
+}
+
+CLocalization::~CLocalization(void)
+{
+    for (auto iter : m_LanguageMap)
+    {
+        delete iter.second;
+    }
+}
+
+//
+// Ensure supplied locale is valid. Uses settings if input is empty
+//
+SString CLocalization::ValidateLocale(SString strLocale)
+{
+    if (strLocale.empty() && !CVARS_GET("locale", strLocale))
         strLocale = "en_US";
-    
-    WriteDebugEvent( SString("CLocalization::CLocalization Localization set to '%s'",strLocale.c_str()) );
-
-    // Set log callbacks so we can record problems
-    Log::set_log_info_callback( NULL );
-    Log::set_log_warning_callback( LogCallback );
-    Log::set_log_error_callback( LogCallback );
-
-    // Grab the nearest language based upon our setting, or revert to en_US
     Language Lang = Language::from_name(strLocale);
     Lang = Lang ? Lang : Language::from_name("en_US");
+    return Lang.str();
+}
+
+//
+// Switch current language to supplied locale
+//
+void CLocalization::SetCurrentLanguage(SString strLocale)
+{
+    strLocale = ValidateLocale(strLocale);
+    WriteDebugEvent(SString("Localization set to '%s'", strLocale.c_str()));
 
     // Update our locale setting with full country code, now that we've matched it
-    strLocale = Lang.str();
-    if ( g_pCore )
-        CVARS_SET("locale", strLocale); 
-    
-    // Setup our dictionary manager
-    m_DictManager.add_directory ( strLocalePath );
-    
-    // Grab our translation dictionary from this dir
-    m_CurrentDict = m_DictManager.get_dictionary ( Lang, MTA_LOCALE_TEXTDOMAIN );
+    if (g_pCore)
+        CVARS_SET("locale", strLocale);
 
-    m_pCurrentLang = new CLanguage ( m_CurrentDict, strLocale, Lang.get_name() );
+    m_pCurrentLang = GetLanguage(strLocale);
 }
 
-CLocalization::~CLocalization ( void )
+CLanguage* CLocalization::GetLanguage(SString strLocale)
 {
-    delete m_pCurrentLang;
+    strLocale = ValidateLocale(strLocale);
+    CLanguage* pLanguage = MapFindRef(m_LanguageMap, strLocale);
+    if (!pLanguage)
+    {
+        Language Lang = Language::from_name(strLocale);
+        Lang = Lang ? Lang : Language::from_name("en_US");
+        pLanguage = new CLanguage(m_DictManager.get_dictionary(Lang, MTA_LOCALE_TEXTDOMAIN), Lang.str(), Lang.get_name());
+        MapSet(m_LanguageMap, strLocale, pLanguage);
+    }
+    return pLanguage;
 }
 
-SString CLocalization::Translate ( const SString & strMessage )
+//
+// Get translated language name
+//
+SString CLocalization::GetLanguageNativeName(SString strLocale)
 {
-    return m_pCurrentLang->Translate( strMessage ) ;
+    strLocale = ValidateLocale(strLocale);
+    SString strNativeName = GetLanguage(strLocale)->Translate(NATIVE_LANGUAGE_NAME);
+    if (strNativeName == "English" && strLocale != "en_US")
+    {
+        // If native name not available, use English version
+        strNativeName = GetLanguage(strLocale)->GetName();
+    }
+    return strNativeName;
 }
 
-SString CLocalization::TranslateWithContext ( const SString& strContext, const SString & strMessage )
+SString CLocalization::Translate(const SString& strMessage)
 {
-    return m_pCurrentLang->TranslateWithContext( strContext, strMessage );
+    return m_pCurrentLang->Translate(strMessage);
 }
 
-SString CLocalization::TranslatePlural ( const SString& strSingular, const SString & strPlural, const int iNum )
+SString CLocalization::TranslateWithContext(const SString& strContext, const SString& strMessage)
 {
-    return m_pCurrentLang->TranslatePlural ( strSingular, strPlural, iNum );
+    return m_pCurrentLang->TranslateWithContext(strContext, strMessage);
 }
 
-SString CLocalization::TranslatePluralWithContext ( const SString& strContext, const SString& strSingular, const SString& strPlural, int iNum )
+SString CLocalization::TranslatePlural(const SString& strSingular, const SString& strPlural, const int iNum)
 {
-    return m_pCurrentLang->TranslatePluralWithContext ( strContext, strSingular, strPlural, iNum );
+    return m_pCurrentLang->TranslatePlural(strSingular, strPlural, iNum);
 }
 
-SString CLocalization::GetTranslators ( )
+SString CLocalization::TranslatePluralWithContext(const SString& strContext, const SString& strSingular, const SString& strPlural, int iNum)
 {
-    std::map<std::string,std::string> metaData = m_CurrentDict.get_metadata();
-    if ( metaData.find("Translators") != metaData.end() )
+    return m_pCurrentLang->TranslatePluralWithContext(strContext, strSingular, strPlural, iNum);
+}
+
+SString CLocalization::GetTranslators()
+{
+    std::map<std::string, std::string> metaData = m_pCurrentLang->GetDictionary().get_metadata();
+    if (metaData.find("Translators") != metaData.end())
     {
         SString strTranslatorsList = metaData["Translators"];
-        return strTranslatorsList.Replace("; ","\n");
+        return strTranslatorsList.Replace("; ", "\n");
     }
     return "";
 }
 
-std::map<SString,SString> CLocalization::GetAvailableLanguages ( void )
+std::vector<SString> CLocalization::GetAvailableLocales(void)
 {
-    std::map<SString,SString> m_LanguageMap;
-    const std::set<Language>& languages = m_DictManager.get_languages( MTA_LOCALE_TEXTDOMAIN );
-
-    for (std::set<Language>::const_iterator i = languages.begin(); i != languages.end(); ++i)
-         m_LanguageMap[i->get_name()] = i->str();
-    
-    return m_LanguageMap;
+    std::vector<SString> localeList = {"en_US"};
+    for (const auto& language : m_DictManager.get_languages(MTA_LOCALE_TEXTDOMAIN))
+        localeList.push_back(language.str());
+    // Alpha sort
+    std::sort(localeList.begin(), localeList.end());
+    return localeList;
 }
 
 // Tell whether the client is translated
-bool CLocalization::IsLocalized ( void )
+bool CLocalization::IsLocalized(void)
 {
     std::string strLocale;
     CVARS_GET("locale", strLocale);
     return strLocale != "en_US";
 }
 
-SString CLocalization::GetLanguageCode ( void )
+SString CLocalization::GetLanguageCode(void)
 {
     return m_pCurrentLang->GetCode();
 }
 
-SString CLocalization::GetLanguageName ( void )
+SString CLocalization::GetLanguageName(void)
 {
     return m_pCurrentLang->GetName();
 }
 
 // Get the file directory of the current language
-SString CLocalization::GetLanguageDirectory ( void )
+SString CLocalization::GetLanguageDirectory(void)
 {
-    SString strFullPath = m_CurrentDict.get_filepath();
-    
+    SString strFullPath = m_pCurrentLang->GetDictionary().get_filepath();
+
     // Replace all backslashes with forward slashes
     int idx = 0;
-    while( (idx=strFullPath.find_first_of("\\", idx)) >= 0 )
+    while ((idx = strFullPath.find_first_of("\\", idx)) >= 0)
         strFullPath.replace(idx, 1, "/");
 
     // Return everything up until (and including) the final forwardslash
-    return strFullPath.substr( 0, strFullPath.find_last_of( '/' ) +1 );
+    return strFullPath.substr(0, strFullPath.find_last_of('/') + 1);
 }
 
-void CLocalization::LogCallback( const std::string& str )
+void CLocalization::LogCallback(const std::string& str)
 {
-    WriteDebugEvent( ( SStringX( "Localization: " ) + str ).TrimEnd( "\n" ) );
+    WriteDebugEvent((SStringX("Localization: ") + str).TrimEnd("\n"));
 }
 
 ///////////////////////////////////////////////////////
 //
 // Global interface
 //
-extern "C" _declspec(dllexport) CLocalizationInterface* __cdecl L10n_CreateLocalization ( SString strLocale )
+MTAEXPORT CLocalizationInterface* __cdecl L10n_CreateLocalization(SString strLocale)
 {
     // Eventually create a localization interface
-    if ( !g_pLocalization )
-        g_pLocalization = new CLocalization ( strLocale );
+    if (!g_pLocalization)
+        g_pLocalization = new CLocalization(strLocale);
 
     return g_pLocalization;
 }

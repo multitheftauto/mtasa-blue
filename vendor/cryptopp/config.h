@@ -57,20 +57,13 @@
 // Define this to ensure C/C++ standard compliance and respect for GCC aliasing rules and other alignment fodder. If you
 // experience a break with GCC at -O3, you should try this first. Guard it in case its set on the command line (and it differs).
 #ifndef CRYPTOPP_NO_UNALIGNED_DATA_ACCESS
-// # define CRYPTOPP_NO_UNALIGNED_DATA_ACCESS
+# define CRYPTOPP_NO_UNALIGNED_DATA_ACCESS
 #endif
-
-// Define this to choose the FIPS 202 version of SHA3, and not the original version of SHA3. NIST selected Keccak as SHA3
-// in January 2013. SHA3 was finalized in FIPS 202 in August 2015, and it was a modified version of the original selection.
-// If CRYPTOPP_USE_FIPS_202_SHA3 is defined, then sha3_fips_202.txt test vectors will be used instead of sha3.txt.
-// #ifndef CRYPTOPP_USE_FIPS_202_SHA3
-// # define CRYPTOPP_USE_FIPS_202_SHA3
-// #endif
 
 // ***************** Less Important Settings ***************
 
 // Library version
-#define CRYPTOPP_VERSION 563
+#define CRYPTOPP_VERSION 565
 
 // Define this if you want to set a prefix for TestData/ and TestVectors/
 //   Be mindful of the trailing slash since its simple concatenation.
@@ -84,11 +77,7 @@
 
 // Define this to retain (as much as possible) ABI and binary compatibility with Crypto++ 5.6.2.
 // Also see https://cryptopp.com/wiki/Config.h#Avoid_MAINTAIN_BACKWARDS_COMPATIBILITY
-#if (CRYPTOPP_VERSION <= 600)
-# if !defined(CRYPTOPP_NO_BACKWARDS_COMPATIBILITY_562) && !defined(CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562)
-#  define CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
-# endif
-#endif
+// #define CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
 
 // Define this if you want or need the library's memcpy_s and memmove_s.
 //   See http://github.com/weidai11/cryptopp/issues/28.
@@ -130,11 +119,28 @@
 // set the name of Rijndael cipher, was "Rijndael" before version 5.3
 #define CRYPTOPP_RIJNDAEL_NAME "AES"
 
+// CRYPTOPP_DEBUG enables the library's CRYPTOPP_ASSERT. CRYPTOPP_ASSERT
+//   raises a SIGTRAP (Unix) or calls DebugBreak() (Windows). CRYPTOPP_ASSERT
+//   is only in effect when CRYPTOPP_DEBUG, DEBUG or _DEBUG is defined. Unlike
+//   Posix assert, CRYPTOPP_ASSERT is not affected by NDEBUG (or failure to
+//   define it).
+//   Also see http://github.com/weidai11/cryptopp/issues/277, CVE-2016-7420
+#if (defined(DEBUG) || defined(_DEBUG)) && !defined(CRYPTOPP_DEBUG)
+# define CRYPTOPP_DEBUG 1
+#endif
+
+// ***************** Initialization and Constructor priorities ********************
+
+// MacPorts/GCC and Solaris/GCC does not provide constructor(priority). Apple/GCC and Fink/GCC do provide it.
+// See http://cryptopp.com/wiki/Static_Initialization_Order_Fiasco
+
 // CRYPTOPP_INIT_PRIORITY attempts to manage initialization of C++ static objects.
 // Under GCC, the library uses init_priority attribute in the range
 // [CRYPTOPP_INIT_PRIORITY, CRYPTOPP_INIT_PRIORITY+100]. Under Windows,
 // CRYPTOPP_INIT_PRIORITY enlists "#pragma init_seg(lib)".
-// #define CRYPTOPP_INIT_PRIORITY 250
+#ifndef CRYPTOPP_INIT_PRIORITY
+# define CRYPTOPP_INIT_PRIORITY 250
+#endif
 
 // CRYPTOPP_USER_PRIORITY is for other libraries and user code that is using Crypto++
 // and managing C++ static object creation. It is guaranteed not to conflict with
@@ -142,7 +148,21 @@
 #if defined(CRYPTOPP_INIT_PRIORITY) && (CRYPTOPP_INIT_PRIORITY > 0)
 # define CRYPTOPP_USER_PRIORITY (CRYPTOPP_INIT_PRIORITY + 101)
 #else
-# define CRYPTOPP_USER_PRIORITY 250
+# define CRYPTOPP_USER_PRIORITY 350
+#endif
+
+// __attribute__(init_priority(250)) is supported
+#if (__GNUC__ && (CRYPTOPP_INIT_PRIORITY > 0) && ((CRYPTOPP_GCC_VERSION >= 40300) || (CRYPTOPP_LLVM_CLANG_VERSION >= 20900) || (_INTEL_COMPILER >= 300)) && !(MACPORTS_GCC_COMPILER > 0) && !defined(__sun__))
+# define HAVE_GCC_CONSTRUCTOR1 1
+#endif
+
+// __attribute__(init_priority()) is supported
+#if (__GNUC__ && (CRYPTOPP_INIT_PRIORITY > 0) && !HAVE_GCC_CONSTRUCTOR1 && !(MACPORTS_GCC_COMPILER > 0) && !defined(__sun__))
+# define HAVE_GCC_CONSTRUCTOR0 1
+#endif
+
+#if (_MSC_VER && (CRYPTOPP_INIT_PRIORITY > 0))
+# define HAVE_MSC_INIT_PRIORITY 1
 #endif
 
 // ***************** Important Settings Again ********************
@@ -217,6 +237,9 @@ typedef unsigned int word32;
 #if defined(_MSC_VER) || defined(__BORLANDC__)
 	typedef unsigned __int64 word64;
 	#define W64LIT(x) x##ui64
+#elif (_LP64 || __LP64__)
+	typedef unsigned long word64;
+	#define W64LIT(x) x##UL
 #else
 	typedef unsigned long long word64;
 	#define W64LIT(x) x##ULL
@@ -266,7 +289,7 @@ const lword LWORD_MAX = W64LIT(0xffffffffffffffff);
 	typedef word32 hword;
 	typedef word64 word;
 #else
-	#define CRYPTOPP_NATIVE_DWORD_AVAILABLE
+	#define CRYPTOPP_NATIVE_DWORD_AVAILABLE 1
 	#if defined(__alpha__) || defined(__ia64__) || defined(_ARCH_PPC64) || defined(__x86_64__) || defined(__mips64) || defined(__sparc64__)
 		#if defined(__GNUC__) && !defined(__INTEL_COMPILER) && !(CRYPTOPP_GCC_VERSION == 40001 && defined(__APPLE__)) && CRYPTOPP_GCC_VERSION >= 30400
 			// GCC 4.0.1 on MacOS X is missing __umodti3 and __udivti3
@@ -275,7 +298,7 @@ const lword LWORD_MAX = W64LIT(0xffffffffffffffff);
 			typedef word64 word;
 			typedef __uint128_t dword;
 			typedef __uint128_t word128;
-			#define CRYPTOPP_WORD128_AVAILABLE
+			#define CRYPTOPP_WORD128_AVAILABLE 1
 		#else
 			// if we're here, it means we're on a 64-bit CPU but we don't have a way to obtain 128-bit multiplication results
 			typedef word16 hword;
@@ -340,6 +363,15 @@ NAMESPACE_END
 	#endif
 #endif
 
+// The section attribute attempts to initialize CPU flags to avoid Valgrind findings above -O1
+#if ((__MACH__ >= 1) && ((CRYPTOPP_LLVM_CLANG_VERSION >= 30600) || (CRYPTOPP_APPLE_CLANG_VERSION >= 70100) || (CRYPTOPP_GCC_VERSION >= 40300)))
+	#define CRYPTOPP_SECTION_INIT __attribute__((section ("__DATA,__data")))
+#elif ((__ELF__ >= 1) && (CRYPTOPP_GCC_VERSION >= 40300))
+	#define CRYPTOPP_SECTION_INIT __attribute__((section ("nocommon")))
+#else
+	#define CRYPTOPP_SECTION_INIT
+#endif
+
 #if defined(_MSC_VER) || defined(__fastcall)
 	#define CRYPTOPP_FASTCALL __fastcall
 #else
@@ -396,6 +428,9 @@ NAMESPACE_END
 # pragma GCC diagnostic ignored "-Wunused-function"
 #endif
 
+// You may need to force include a C++ header on Android when using STLPort to ensure
+// _STLPORT_VERSION is defined: CXXFLAGS="-DNDEBUG -g2 -O2 -std=c++11 -include iosfwd"
+// TODO: Figure out C++17 and lack of std::uncaught_exception
 #if (defined(_MSC_VER) && _MSC_VER <= 1300) || defined(__MWERKS__) || (defined(_STLPORT_VERSION) && ((_STLPORT_VERSION < 0x450) || defined(_STLP_NO_UNCAUGHT_EXCEPT_SUPPORT)))
 #define CRYPTOPP_DISABLE_UNCAUGHT_EXCEPTION
 #endif
@@ -416,7 +451,7 @@ NAMESPACE_END
 
 // Sun Studio 12 provides GCC inline assembly, http://blogs.oracle.com/x86be/entry/gcc_style_asm_inlining_support
 // We can enable SSE2 for Sun Studio in the makefile with -D__SSE2__, but users may not compile with it.
-#if !defined(CRYPTOPP_DISABLE_ASM) && defined(__x86_64__) && (__SUNPRO_CC >= 0x5100) && !defined(__SSE2__)
+#if !defined(CRYPTOPP_DISABLE_ASM) && !defined(__SSE2__) && defined(__x86_64__) && (__SUNPRO_CC >= 0x5100)
 # define __SSE2__ 1
 #endif
 
@@ -430,10 +465,7 @@ NAMESPACE_END
 		#define CRYPTOPP_BOOL_SSE2_ASM_AVAILABLE 0
 	#endif
 
-	// SSE3 was actually introduced in GNU as 2.17, which was released 6/23/2006, but we can't tell what version of binutils is installed.
-	// GCC 4.1.2 was released on 2/13/2007, so we'll use that as a proxy for the binutils version. Also see the output of
-	// `gcc -dM -E -march=native - < /dev/null | grep -i SSE` for preprocessor defines available.
-	#if !defined(CRYPTOPP_DISABLE_SSSE3) && (_MSC_VER >= 1400 || CRYPTOPP_GCC_VERSION >= 40102 || defined(__SSSE3__))
+	#if !defined(CRYPTOPP_DISABLE_SSE3) && (_MSC_VER >= 1500 || (defined(__SSE3__) && defined(__SSSE3__)))
 		#define CRYPTOPP_BOOL_SSSE3_ASM_AVAILABLE 1
 	#else
 		#define CRYPTOPP_BOOL_SSSE3_ASM_AVAILABLE 0
@@ -448,7 +480,7 @@ NAMESPACE_END
 	#define CRYPTOPP_X64_ASM_AVAILABLE
 #endif
 
-#if !defined(CRYPTOPP_DISABLE_SSE2) && (defined(CRYPTOPP_MSVC6PP_OR_LATER) || defined(__SSE2__)) && !defined(_M_ARM)
+#if !defined(CRYPTOPP_DISABLE_ASM) && (defined(CRYPTOPP_MSVC6PP_OR_LATER) || defined(__SSE2__)) && !defined(_M_ARM)
 	#define CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE 1
 #else
 	#define CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE 0
@@ -456,16 +488,25 @@ NAMESPACE_END
 
 // Intrinsics availible in GCC 4.3 (http://gcc.gnu.org/gcc-4.3/changes.html) and
 //   MSVC 2008 (http://msdn.microsoft.com/en-us/library/bb892950%28v=vs.90%29.aspx)
-#if !defined(CRYPTOPP_DISABLE_SSE2) && !defined(CRYPTOPP_DISABLE_SSE4) && (((_MSC_VER >= 1500) && !defined(_M_ARM)) || defined(__SSE4_2__))
+//   SunCC could generate SSE4 at 12.1, but the intrinsics are missing until 12.4.
+#if !defined(CRYPTOPP_DISABLE_ASM) && !defined(CRYPTOPP_DISABLE_SSE4) && !defined(_M_ARM) && ((_MSC_VER >= 1500) || (defined(__SSE4_1__) && defined(__SSE4_2__)))
 	#define CRYPTOPP_BOOL_SSE4_INTRINSICS_AVAILABLE 1
 #else
 	#define CRYPTOPP_BOOL_SSE4_INTRINSICS_AVAILABLE 0
 #endif
 
-#if !defined(CRYPTOPP_DISABLE_SSSE3) && !defined(CRYPTOPP_DISABLE_AESNI) && CRYPTOPP_BOOL_SSE2_INTRINSICS_AVAILABLE && (CRYPTOPP_GCC_VERSION >= 40400 || _MSC_FULL_VER >= 150030729 || __INTEL_COMPILER >= 1110 || defined(__AES__))
+// Don't disgorge AES-NI from CLMUL. There will be two to four subtle breaks
+#if !defined(CRYPTOPP_DISABLE_ASM) && !defined(CRYPTOPP_DISABLE_AESNI) && !defined(_M_ARM) && (_MSC_FULL_VER >= 150030729 || __INTEL_COMPILER >= 1110 || (defined(__AES__) && defined(__PCLMUL__)))
 	#define CRYPTOPP_BOOL_AESNI_INTRINSICS_AVAILABLE 1
 #else
 	#define CRYPTOPP_BOOL_AESNI_INTRINSICS_AVAILABLE 0
+#endif
+
+// AVX2 in MSC 18.00
+#if !defined(CRYPTOPP_DISABLE_ASM) && !defined(CRYPTOPP_DISABLE_AVX) && !defined(_M_ARM) && ((_MSC_VER >= 1600) || (defined(__RDRND__) || defined(__RDSEED__) || defined(__AVX__)))
+	#define CRYPTOPP_BOOL_AVX_AVAILABLE 1
+#else
+	#define CRYPTOPP_BOOL_AVX_AVAILABLE 0
 #endif
 
 // Requires ARMv7 and ACLE 1.0. Testing shows ARMv7 is really ARMv7a under most toolchains.
@@ -475,7 +516,7 @@ NAMESPACE_END
 # endif
 #endif
 
-// Requires ARMv8 and ACLE 2.0.
+// Requires ARMv8 and ACLE 2.0. For GCC, requires 4.8 and above.
 // Microsoft plans to support ARM-64, but its not clear how to detect it.
 // TODO: Add MSC_VER and ARM-64 platform define when available
 #if !defined(CRYPTOPP_BOOL_ARM_CRC32_INTRINSICS_AVAILABLE) && !defined(CRYPTOPP_DISABLE_ASM)
@@ -484,7 +525,7 @@ NAMESPACE_END
 # endif
 #endif
 
-// Requires ARMv8 and ACLE 2.0.
+// Requires ARMv8 and ACLE 2.0. For GCC, requires 4.8 and above.
 // Microsoft plans to support ARM-64, but its not clear how to detect it.
 // TODO: Add MSC_VER and ARM-64 platform define when available
 #if !defined(CRYPTOPP_BOOL_ARM_CRYPTO_INTRINSICS_AVAILABLE) && !defined(CRYPTOPP_DISABLE_ASM)
@@ -527,7 +568,8 @@ NAMESPACE_END
 #	define CRYPTOPP_NOINLINE
 #endif
 
-// how to declare class constants
+// How to declare class constants
+// Use enum for OS X 10.5 ld, http://github.com/weidai11/cryptopp/issues/255
 #if (defined(_MSC_VER) && _MSC_VER <= 1300) || defined(__INTEL_COMPILER) || defined(__BORLANDC__)
 #	define CRYPTOPP_CONSTANT(x) enum {x};
 #else
@@ -648,6 +690,10 @@ NAMESPACE_END
 #	define THREADS_AVAILABLE
 #endif
 
+#if defined(CRYPTOPP_BSD_AVAILABLE) || defined(CRYPTOPP_UNIX_AVAILABLE) || defined(__CYGWIN__)
+# define UNIX_SIGNALS_AVAILABLE 1
+#endif
+
 #ifdef CRYPTOPP_WIN32_AVAILABLE
 # if !defined(WINAPI_FAMILY)
 #	define HAS_WINTHREADS
@@ -726,7 +772,7 @@ NAMESPACE_END
 
 // Portable way to suppress warnings.
 //   Moved from misc.h due to circular depenedencies.
-#define CRYPTOPP_UNUSED(x) ((void)x)
+#define CRYPTOPP_UNUSED(x) ((void)(x))
 
 // ************** Deprecated ***************
 
@@ -744,7 +790,7 @@ NAMESPACE_END
 // Intel and C++11 language features, http://software.intel.com/en-us/articles/c0x-features-supported-by-intel-c-compiler
 // GCC and C++11 language features, http://gcc.gnu.org/projects/cxx0x.html
 // Clang and C++11 language features, http://clang.llvm.org/cxx_status.html
-#if (_MSC_VER >= 1600) || (__cplusplus >= 201103L)
+#if ((_MSC_VER >= 1600) || (__cplusplus >= 201103L)) && !defined(_STLPORT_VERSION)
 # define CRYPTOPP_CXX11 1
 #endif
 
@@ -765,7 +811,7 @@ NAMESPACE_END
 // atomics: MS at VS2012 (17.00); GCC at 4.4; Clang at 3.1/3.2; Intel 13.0; SunCC 12.5.
 #if (CRYPTOPP_MSC_VERSION >= 1700)
 #  define CRYPTOPP_CXX11_ATOMICS 1
-#elif defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 1300)
+#elif (__INTEL_COMPILER >= 1300)
 #  define CRYPTOPP_CXX11_ATOMICS 1
 #elif defined(__clang__)
 #  if __has_feature(cxx_atomic)
@@ -781,7 +827,7 @@ NAMESPACE_END
 // TODO: verify Clang and Intel versions; find __has_feature(x) extension for Clang
 #if (CRYPTOPP_MSC_VERSION >= 1700)
 #  define CRYPTOPP_CXX11_SYNCHRONIZATION 1
-#elif defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 1200)
+#elif (__INTEL_COMPILER >= 1200)
 #  define CRYPTOPP_CXX11_SYNCHRONIZATION 1
 #elif (CRYPTOPP_LLVM_CLANG_VERSION >= 30300) || (CRYPTOPP_APPLE_CLANG_VERSION >= 50000)
 #  define CRYPTOPP_CXX11_SYNCHRONIZATION 1
@@ -795,7 +841,7 @@ NAMESPACE_END
 #if (CRYPTOPP_MSC_VERSION >= 1900)
 #  define CRYPTOPP_CXX11_ALIGNAS 1
 #  define CRYPTOPP_CXX11_ALIGNOF 1
-#elif defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 1500)
+#elif (__INTEL_COMPILER >= 1500)
 #  define CRYPTOPP_CXX11_ALIGNAS 1
 #  define CRYPTOPP_CXX11_ALIGNOF 1
 #elif defined(__clang__)
@@ -816,7 +862,7 @@ NAMESPACE_END
 // noexcept: MS at VS2015 (19.00); GCC at 4.6; Clang at 3.0; Intel 14.0; SunCC 12.4.
 #if (CRYPTOPP_MSC_VERSION >= 1900)
 #  define CRYPTOPP_CXX11_NOEXCEPT 1
-#elif defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 1400)
+#elif (__INTEL_COMPILER >= 1400)
 #  define CRYPTOPP_CXX11_NOEXCEPT 1
 #elif defined(__clang__)
 #  if __has_feature(cxx_noexcept)
@@ -831,7 +877,7 @@ NAMESPACE_END
 // variadic templates: MS at VS2013 (18.00); GCC at 4.3; Clang at 2.9; Intel 12.1; SunCC 12.4.
 #if (CRYPTOPP_MSC_VERSION >= 1800)
 #  define CRYPTOPP_CXX11_VARIADIC_TEMPLATES 1
-#elif defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 1210)
+#elif (__INTEL_COMPILER >= 1210)
 #  define CRYPTOPP_CXX11_VARIADIC_TEMPLATES 1
 #elif defined(__clang__)
 #  if __has_feature(cxx_variadic_templates)
@@ -843,16 +889,26 @@ NAMESPACE_END
 #  define CRYPTOPP_CXX11_VARIADIC_TEMPLATES 1
 #endif // variadic templates
 
+// constexpr: MS at VS2015 (19.00); GCC at 4.6; Clang at 3.0; Intel 16.0; SunCC 12.4.
+// Intel has mis-supported the feature since at least ICPC 13.00
+#if (CRYPTOPP_MSC_VERSION >= 1900)
+#  define CRYPTOPP_CXX11_CONSTEXPR 1
+#elif (__INTEL_COMPILER >= 1600)
+#  define CRYPTOPP_CXX11_CONSTEXPR 1
+#elif defined(__clang__)
+#  if __has_feature(cxx_constexpr)
+#    define CRYPTOPP_CXX11_CONSTEXPR 1
+#  endif
+#elif (CRYPTOPP_GCC_VERSION >= 40600)
+#  define CRYPTOPP_CXX11_CONSTEXPR 1
+#elif (__SUNPRO_CC >= 0x5130)
+#  define CRYPTOPP_CXX11_CONSTEXPR 1
+#endif // constexpr compilers
+
 // TODO: Emplacement, R-values and Move semantics
 // Needed because we are catching warnings with GCC and MSC
 
 #endif // CRYPTOPP_CXX11
-
-// Hack... CRYPTOPP_ALIGN_DATA is defined earlier, before C++11 alignas available
-#if defined(CRYPTOPP_CXX11_ALIGNAS)
-# undef CRYPTOPP_ALIGN_DATA
-# define CRYPTOPP_ALIGN_DATA(x) alignas(x)
-#endif  // CRYPTOPP_CXX11_ALIGNAS
 
 #if defined(CRYPTOPP_CXX11_NOEXCEPT)
 #  define CRYPTOPP_THROW noexcept(false)
@@ -862,14 +918,27 @@ NAMESPACE_END
 #  define CRYPTOPP_NO_THROW
 #endif // CRYPTOPP_CXX11_NOEXCEPT
 
+#if defined(CRYPTOPP_CXX11_CONSTEXPR)
+#  define CRYPTOPP_CONSTEXPR constexpr
+#else
+#  define CRYPTOPP_CONSTEXPR
+#endif // CRYPTOPP_CXX11_CONSTEXPR
+
 // Hack... CRYPTOPP_ALIGN_DATA is defined earlier, before C++11 alignas availability is determined
 #if defined(CRYPTOPP_CXX11_ALIGNAS)
 # undef CRYPTOPP_ALIGN_DATA
 # define CRYPTOPP_ALIGN_DATA(x) alignas(x)
 #endif  // CRYPTOPP_CXX11_ALIGNAS
 
+// Hack... CRYPTOPP_CONSTANT is defined earlier, before C++11 constexpr availability is determined
+#if defined(CRYPTOPP_CXX11_CONSTEXPR)
+# undef CRYPTOPP_CONSTANT
+# define CRYPTOPP_CONSTANT(x) constexpr static int x;
+#endif
+
 // OK to comment the following out, but please report it so we can fix it.
-#if (defined(__cplusplus) && (__cplusplus >= 199711L)) && !defined(CRYPTOPP_UNCAUGHT_EXCEPTION_AVAILABLE)
+// C++17 value taken from http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4567.pdf.
+#if (defined(__cplusplus) && (__cplusplus >= 199711L) && (__cplusplus < 201402L)) && !defined(CRYPTOPP_UNCAUGHT_EXCEPTION_AVAILABLE)
 # error "std::uncaught_exception is not available. This is likely a configuration error."
 #endif
 

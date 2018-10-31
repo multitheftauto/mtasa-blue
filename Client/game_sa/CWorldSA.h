@@ -1,18 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CWorldSA.h
-*  PURPOSE:     Header file for game world
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CWorldSA.h
+ *  PURPOSE:     Header file for game world
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CGAMESA_WORLD
-#define __CGAMESA_WORLD
+#pragma once
 
 #define FUNC_Add                                            0x563220 // ##SA##
 #define FUNC_Remove                                         0x563280 // ##SA##
@@ -56,34 +53,36 @@
 class CWorldSA : public CWorld
 {
 public:
-    CWorldSA ( );
-    void        Add                       ( CEntity * entity, eDebugCaller CallerId );
-    void        Add                       ( CEntitySAInterface * entityInterface, eDebugCaller CallerId );
-    void        Remove                    ( CEntity * entity, eDebugCaller CallerId );
-    void        Remove                    ( CEntitySAInterface * entityInterface, eDebugCaller CallerId );
-    void        RemoveReferencesToDeletedObject ( CEntitySAInterface * entity );
-    bool        ProcessLineOfSight        ( const CVector * vecStart, const CVector * vecEnd, CColPoint ** colCollision, CEntity ** CollisionEntity, const SLineOfSightFlags flags, SLineOfSightBuildingResult* pBuildingResult );
-    bool        TestLineSphere            ( CVector * vecStart, CVector * vecEnd, CVector * vecSphereCenter, float fSphereRadius, CColPoint ** colCollision );
-    //bool      ProcessLineOfSight        ( CVector * vecStart, CVector * vecEnd, CColPoint * colCollision, CEntity * CollisionEntity );
-    void        IgnoreEntity              ( CEntity * entity );
-    BYTE        GetLevelFromPosition      ( CVector * vecPosition );
-    float       FindGroundZForPosition    ( float fX, float fY );
-    float       FindGroundZFor3DPosition  ( CVector * vecPosition );
-    void        LoadMapAroundPoint        ( CVector * vecPosition, float fRadius );
-    bool        IsLineOfSightClear        ( const CVector * vecStart, const CVector * vecEnd, const SLineOfSightFlags flags );
-    bool        HasCollisionBeenLoaded    ( CVector * vecPosition );
-    DWORD       GetCurrentArea            ( void );
-    void        SetCurrentArea            ( DWORD dwArea );
-    void        SetJetpackMaxHeight       ( float fHeight );
-    float       GetJetpackMaxHeight       ( void );
-    void        SetAircraftMaxHeight      ( float fHeight );
-    float       GetAircraftMaxHeight      ( void );
-    void        SetAircraftMaxVelocity    ( float fVelocity );
-    float       GetAircraftMaxVelocity    ( void );
-    void        SetOcclusionsEnabled      ( bool bEnabled );
-    bool        GetOcclusionsEnabled      ( void );
-    void        FindWorldPositionForRailTrackPosition ( float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition );
-    int         FindClosestRailTrackNode  ( const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance );
+    CWorldSA();
+    void InstallHooks(void);
+    void Add(CEntity* entity, eDebugCaller CallerId);
+    void Add(CEntitySAInterface* entityInterface, eDebugCaller CallerId);
+    void Remove(CEntity* entity, eDebugCaller CallerId);
+    void Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId);
+    void RemoveReferencesToDeletedObject(CEntitySAInterface* entity);
+    bool ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity, const SLineOfSightFlags flags,
+                            SLineOfSightBuildingResult* pBuildingResult);
+    bool TestLineSphere(CVector* vecStart, CVector* vecEnd, CVector* vecSphereCenter, float fSphereRadius, CColPoint** colCollision);
+    // bool      ProcessLineOfSight        ( CVector * vecStart, CVector * vecEnd, CColPoint * colCollision, CEntity * CollisionEntity );
+    void  IgnoreEntity(CEntity* entity);
+    BYTE  GetLevelFromPosition(CVector* vecPosition);
+    float FindGroundZForPosition(float fX, float fY);
+    float FindGroundZFor3DPosition(CVector* vecPosition);
+    void  LoadMapAroundPoint(CVector* vecPosition, float fRadius);
+    bool  IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd, const SLineOfSightFlags flags);
+    bool  HasCollisionBeenLoaded(CVector* vecPosition);
+    DWORD GetCurrentArea(void);
+    void  SetCurrentArea(DWORD dwArea);
+    void  SetJetpackMaxHeight(float fHeight);
+    float GetJetpackMaxHeight(void);
+    void  SetAircraftMaxHeight(float fHeight);
+    float GetAircraftMaxHeight(void);
+    void  SetAircraftMaxVelocity(float fVelocity);
+    float GetAircraftMaxVelocity(void);
+    void  SetOcclusionsEnabled(bool bEnabled);
+    bool  GetOcclusionsEnabled(void);
+    void  FindWorldPositionForRailTrackPosition(float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition);
+    int   FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance);
 
     /**
      * \todo Add FindObjectsKindaColliding (see 0x430577)
@@ -105,28 +104,26 @@ public:
      * StopAllLawEnforcersInTheirTracks
 
      */
-    void                RemoveBuilding                  ( unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL );
-    bool                IsRemovedModelInRadius          ( SIPLInst* pInst );
-    bool                IsModelRemoved                  ( unsigned short modelID );
-    void                ClearRemovedBuildingLists       ( uint* pOutAmount = NULL );
-    bool                RestoreBuilding                 ( unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL );
-    SBuildingRemoval*   GetBuildingRemoval              ( CEntitySAInterface * pInterface );
-    void                AddDataBuilding                 ( CEntitySAInterface * pInterface );
-    void                RemoveWorldBuildingFromLists    ( CEntitySAInterface * pInterface );
-    void                AddBinaryBuilding               ( CEntitySAInterface * pInterface );
-    bool                IsObjectRemoved                 ( CEntitySAInterface * pInterface );
-    bool                IsDataModelRemoved              ( unsigned short usModelID );
-    bool                IsEntityRemoved                 ( CEntitySAInterface * pInterface );
-    bool                CalculateImpactPosition         ( const CVector &vecInputStart, CVector &vecInputEnd );
+    void              RemoveBuilding(unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL);
+    bool              IsRemovedModelInRadius(SIPLInst* pInst);
+    bool              IsModelRemoved(unsigned short modelID);
+    void              ClearRemovedBuildingLists(uint* pOutAmount = NULL);
+    bool              RestoreBuilding(unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL);
+    SBuildingRemoval* GetBuildingRemoval(CEntitySAInterface* pInterface);
+    void              AddDataBuilding(CEntitySAInterface* pInterface);
+    void              RemoveWorldBuildingFromLists(CEntitySAInterface* pInterface);
+    void              AddBinaryBuilding(CEntitySAInterface* pInterface);
+    bool              IsObjectRemoved(CEntitySAInterface* pInterface);
+    bool              IsDataModelRemoved(unsigned short usModelID);
+    bool              IsEntityRemoved(CEntitySAInterface* pInterface);
+    bool              CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd);
 
 private:
-    std::multimap< unsigned short, SBuildingRemoval* >          *m_pBuildingRemovals;
-    std::multimap < unsigned short, sDataBuildingRemovalItem* > *m_pDataBuildings;
-    std::multimap < unsigned short, sBuildingRemovalItem* >     *m_pBinaryBuildings;
-    std::map < unsigned short, unsigned short >                 *m_pRemovedObjects;
-    std::map < DWORD, bool >                                    m_pRemovedEntities;
-    std::map < DWORD, bool >                                    m_pAddedEntities;
-    float                                                       m_fAircraftMaxHeight;
+    std::multimap<unsigned short, SBuildingRemoval*>*         m_pBuildingRemovals;
+    std::multimap<unsigned short, sDataBuildingRemovalItem*>* m_pDataBuildings;
+    std::multimap<unsigned short, sBuildingRemovalItem*>*     m_pBinaryBuildings;
+    std::map<unsigned short, unsigned short>*                 m_pRemovedObjects;
+    std::map<DWORD, bool>                                     m_pRemovedEntities;
+    std::map<DWORD, bool>                                     m_pAddedEntities;
+    float                                                     m_fAircraftMaxHeight;
 };
-
-#endif

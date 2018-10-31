@@ -7,9 +7,9 @@ project "Client Deathmatch"
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 	
+	defines { "LUA_USE_APICHECK", "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", 
-		"../../../vendor/libspeex/libspeexd2013", -- todo: use debug variant
+		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp", "libspeex", "blowfish_bcrypt",
 		"../../../vendor/bass/lib/bass",
 		"../../../vendor/bass/lib/bass_fx",
 		"../../../vendor/bass/lib/bassmix",
@@ -17,13 +17,13 @@ project "Client Deathmatch"
 	}
 	
 	vpaths {
-		["Headers/*"] = {"**.h", "../../../**.h"},
-		["Sources/*"] = {"**.cpp", "../../../**.cpp"},
+		["Headers/*"] = {"**.h", "../../../Shared/mods/deathmatch/**.h", "../../**.h"},
+		["Sources/*"] = {"**.cpp", "../../../Shared/mods/deathmatch/**.cpp", "../../../Shared/**.cpp", "../../../vendor/**.cpp"},
 		["*"] = "premake5.lua"
 	}
 	
 	filter "system:windows"
-		includedirs { "../../../vendor/sparsehash/current/src/windows" }
+		includedirs { "../../../vendor/sparsehash/src/windows" }
 		linkoptions { "/SAFESEH\:NO" }
 	
 	filter {}
@@ -42,7 +42,7 @@ project "Client Deathmatch"
 			"../../../vendor/lua/src", 
 			"../../../Shared/mods/deathmatch/logic", 
 			"../../../Shared/animation", 
-			"../../../vendor/sparsehash/current/src/"
+			"../../../vendor/sparsehash/src/"
 	}
 	
 	files {
@@ -53,13 +53,9 @@ project "Client Deathmatch"
 		"../../../Shared/mods/deathmatch/logic/**.h",
 		"../../../Shared/animation/CEasingCurve.cpp", 
 		"../../../Shared/animation/CPositionRotationAnimation.cpp",
+		"../../version.h",
 		-- Todo: Replace these two by using the CryptoPP functions instead
-		"../../../vendor/bob_withers/base64.cpp",
 		"../../../vendor/bochs/bochs_internal/crc32.cpp"
-	}
-	
-	defines {
-		"LUA_USE_APICHECK"
 	}
 	
 	configuration "windows"

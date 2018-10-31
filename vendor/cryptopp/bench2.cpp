@@ -21,6 +21,8 @@
 #include "asn.h"
 #include "dh.h"
 #include "mqv.h"
+#include "hmqv.h"
+#include "fhmqv.h"
 #include "xtrcrypt.h"
 #include "esign.h"
 #include "pssr.h"
@@ -209,6 +211,32 @@ void BenchMarkAgreement(const char *name, AuthenticatedKeyAgreementDomain &d, do
 	OutputResultOperations(name, "Key Agreement", pc, i, timeTaken);
 }
 
+#if 0
+void BenchMarkAgreement(const char *name, AuthenticatedKeyAgreementDomainWithRoles &d, double timeTotal, bool pc=false)
+{
+	SecByteBlock spriv1(d.StaticPrivateKeyLength()), spriv2(d.StaticPrivateKeyLength());
+	SecByteBlock epriv1(d.EphemeralPrivateKeyLength()), epriv2(d.EphemeralPrivateKeyLength());
+	SecByteBlock spub1(d.StaticPublicKeyLength()), spub2(d.StaticPublicKeyLength());
+	SecByteBlock epub1(d.EphemeralPublicKeyLength()), epub2(d.EphemeralPublicKeyLength());
+	d.GenerateStaticKeyPair(GlobalRNG(), spriv1, spub1);
+	d.GenerateStaticKeyPair(GlobalRNG(), spriv2, spub2);
+	d.GenerateEphemeralKeyPair(GlobalRNG(), epriv1, epub1);
+	d.GenerateEphemeralKeyPair(GlobalRNG(), epriv2, epub2);
+	SecByteBlock val(d.AgreedValueLength());
+
+	const clock_t start = clock();
+	unsigned int i;
+	double timeTaken;
+	for (timeTaken=(double)0, i=0; timeTaken < timeTotal; timeTaken = double(clock() - start) / CLOCK_TICKS_PER_SECOND, i+=2)
+	{
+		d.Agree(val, spriv1, epriv1, spub2, epub2);
+		d.Agree(val, spriv2, epriv2, spub1, epub1);
+	}
+
+	OutputResultOperations(name, "Key Agreement", pc, i, timeTaken);
+}
+#endif
+
 //VC60 workaround: compiler bug triggered without the extra dummy parameters
 template <class SCHEME>
 void BenchMarkCrypto(const char *filename, const char *name, double timeTotal, SCHEME *x=NULL)
@@ -295,6 +323,18 @@ void BenchmarkAll2(double t, double hertz)
 	BenchMarkKeyAgreement<LUC_DH>(CRYPTOPP_DATA_DIR "TestData/lucd1024.dat", "LUCDIF 1024", t);
 	BenchMarkKeyAgreement<MQV>(CRYPTOPP_DATA_DIR "TestData/mqv1024.dat", "MQV 1024", t);
 	BenchMarkKeyAgreement<MQV>(CRYPTOPP_DATA_DIR "TestData/mqv2048.dat", "MQV 2048", t);
+
+#if 0
+	BenchMarkKeyAgreement<ECHMQV160>(CRYPTOPP_DATA_DIR "TestData/hmqv160.dat", "HMQV P-160", t);
+	BenchMarkKeyAgreement<ECHMQV256>(CRYPTOPP_DATA_DIR "TestData/hmqv256.dat", "HMQV P-256", t);
+	BenchMarkKeyAgreement<ECHMQV384>(CRYPTOPP_DATA_DIR "TestData/hmqv384.dat", "HMQV P-384", t);
+	BenchMarkKeyAgreement<ECHMQV512>(CRYPTOPP_DATA_DIR "TestData/hmqv512.dat", "HMQV P-512", t);
+
+	BenchMarkKeyAgreement<ECFHMQV160>(CRYPTOPP_DATA_DIR "TestData/fhmqv160.dat", "FHMQV P-160", t);
+	BenchMarkKeyAgreement<ECFHMQV256>(CRYPTOPP_DATA_DIR "TestData/fhmqv256.dat", "FHMQV P-256", t);
+	BenchMarkKeyAgreement<ECFHMQV384>(CRYPTOPP_DATA_DIR "TestData/fhmqv384.dat", "FHMQV P-384", t);
+	BenchMarkKeyAgreement<ECFHMQV512>(CRYPTOPP_DATA_DIR "TestData/fhmqv512.dat", "FHMQV P-512", t);
+#endif
 
 	cout << "\n<TBODY style=\"background: white\">";
 	{

@@ -3,7 +3,7 @@
 //! \file pubkey.h
 //! \brief This file contains helper classes/functions for implementing public key algorithms.
 //! \details The class hierachies in this header file tend to look like this:
-//! 
+//!
 //! <pre>
 //!                   x1
 //!                  +--+
@@ -18,7 +18,7 @@
 //!                  |  |
 //!                 y3  z3
 //! </pre>
-//! 
+//!
 //! <ul>
 //!   <li>x1, y1, z1 are abstract interface classes defined in cryptlib.h
 //!   <li>x2, y2, z2 are implementations of the interfaces using "abstract policies", which
@@ -27,9 +27,9 @@
 //!   <li>x3, y3, z3 hold actual algorithms and implement those virtual functions.
 //! 	  These classes have \p Impl suffixes.
 //! </ul>
-//! 
+//!
 //! \details The \p TF_ prefix means an implementation using trapdoor functions on integers.
-//! \details The \p DL_ prefix means an implementation using group operations (in groups where discrete log is hard).
+//! \details The \p DL_ prefix means an implementation using group operations in groups where discrete log is hard.
 
 #ifndef CRYPTOPP_PUBKEY_H
 #define CRYPTOPP_PUBKEY_H
@@ -54,6 +54,12 @@
 
 // VC60 workaround: this macro is defined in shlobj.h and conflicts with a template parameter used in this file
 #undef INTERFACE
+
+#if defined(__SUNPRO_CC)
+# define MAYBE_RETURN(x) return x
+#else
+# define MAYBE_RETURN(x) CRYPTOPP_UNUSED(x)
+#endif
 
 NAMESPACE_BEGIN(CryptoPP)
 
@@ -111,7 +117,7 @@ public:
 	//!    cryptosystem. The \p RandomNumberGenerator may (or may not) be required.
 	//!    Derived classes must implement it.
 	virtual Integer ApplyRandomizedFunction(RandomNumberGenerator &rng, const Integer &x) const =0;
-	
+
 	//! \brief Determines if the encryption algorithm is randomized
 	//! \returns \p true if the encryption algorithm is randomized, \p false otherwise
 	//! \details If \p IsRandomized() returns \p false, then \p NullRNG() can be used.
@@ -168,7 +174,7 @@ public:
 	//! \details \p CalculateRandomizedInverse is a generalization of decryption using the private key
 	//!    The \p RandomNumberGenerator may (or may not) be required. Derived classes must implement it.
 	virtual Integer CalculateRandomizedInverse(RandomNumberGenerator &rng, const Integer &x) const =0;
-	
+
 	//! \brief Determines if the decryption algorithm is randomized
 	//! \returns \p true if the decryption algorithm is randomized, \p false otherwise
 	//! \details If \p IsRandomized() returns \p false, then \p NullRNG() can be used.
@@ -195,7 +201,7 @@ public:
 	//!   without the \p RandomNumberGenerator.
 	Integer CalculateRandomizedInverse(RandomNumberGenerator &rng, const Integer &x) const
 		{return CalculateInverse(rng, x);}
-	
+
 	//! \brief Determines if the decryption algorithm is randomized
 	//! \returns \p true if the decryption algorithm is randomized, \p false otherwise
 	//! \details If \p IsRandomized() returns \p false, then \p NullRNG() can be used.
@@ -321,7 +327,8 @@ public:
 
 // ********************************************************
 
-typedef std::pair<const byte *, size_t> HashIdentifier;
+// Typedef change due to Clang, http://github.com/weidai11/cryptopp/issues/300
+typedef std::pair<const byte *, unsigned int> HashIdentifier;
 
 //! \class PK_SignatureMessageEncodingMethod
 //! \brief Interface for message encoding method for public key signature schemes.
@@ -351,18 +358,18 @@ public:
 		{CRYPTOPP_UNUSED(hash); CRYPTOPP_UNUSED(semisignature); CRYPTOPP_UNUSED(semisignatureLength);}
 
 	// for signature
-	virtual void ProcessRecoverableMessage(HashTransformation &hash, 
-		const byte *recoverableMessage, size_t recoverableMessageLength, 
+	virtual void ProcessRecoverableMessage(HashTransformation &hash,
+		const byte *recoverableMessage, size_t recoverableMessageLength,
 		const byte *presignature, size_t presignatureLength,
 		SecByteBlock &semisignature) const
 	{
 		CRYPTOPP_UNUSED(hash);CRYPTOPP_UNUSED(recoverableMessage); CRYPTOPP_UNUSED(recoverableMessageLength);
 		CRYPTOPP_UNUSED(presignature); CRYPTOPP_UNUSED(presignatureLength); CRYPTOPP_UNUSED(semisignature);
 		if (RecoverablePartFirst())
-			assert(!"ProcessRecoverableMessage() not implemented");
+			CRYPTOPP_ASSERT(!"ProcessRecoverableMessage() not implemented");
 	}
 
-	virtual void ComputeMessageRepresentative(RandomNumberGenerator &rng, 
+	virtual void ComputeMessageRepresentative(RandomNumberGenerator &rng,
 		const byte *recoverableMessage, size_t recoverableMessageLength,
 		HashTransformation &hash, HashIdentifier hashIdentifier, bool messageEmpty,
 		byte *representative, size_t representativeBitLength) const =0;
@@ -384,8 +391,8 @@ public:
 		const byte *presignature, size_t presignatureLength,
 		const byte *semisignature, size_t semisignatureLength,
 		byte *recoveredMessage) const
-		{CRYPTOPP_UNUSED(hash);CRYPTOPP_UNUSED(hashIdentifier); CRYPTOPP_UNUSED(presignature); CRYPTOPP_UNUSED(presignatureLength); 
-		CRYPTOPP_UNUSED(semisignature); CRYPTOPP_UNUSED(semisignatureLength); CRYPTOPP_UNUSED(recoveredMessage); 
+		{CRYPTOPP_UNUSED(hash);CRYPTOPP_UNUSED(hashIdentifier); CRYPTOPP_UNUSED(presignature); CRYPTOPP_UNUSED(presignatureLength);
+		CRYPTOPP_UNUSED(semisignature); CRYPTOPP_UNUSED(semisignatureLength); CRYPTOPP_UNUSED(recoveredMessage);
 		throw NotImplemented("PK_MessageEncodingMethod: this signature scheme does not support message recovery");}
 
 	// VC60 workaround
@@ -432,7 +439,7 @@ public:
 class CRYPTOPP_DLL DL_SignatureMessageEncodingMethod_DSA : public PK_DeterministicSignatureMessageEncodingMethod
 {
 public:
-	void ComputeMessageRepresentative(RandomNumberGenerator &rng, 
+	void ComputeMessageRepresentative(RandomNumberGenerator &rng,
 		const byte *recoverableMessage, size_t recoverableMessageLength,
 		HashTransformation &hash, HashIdentifier hashIdentifier, bool messageEmpty,
 		byte *representative, size_t representativeBitLength) const;
@@ -445,7 +452,7 @@ public:
 class CRYPTOPP_DLL DL_SignatureMessageEncodingMethod_NR : public PK_DeterministicSignatureMessageEncodingMethod
 {
 public:
-	void ComputeMessageRepresentative(RandomNumberGenerator &rng, 
+	void ComputeMessageRepresentative(RandomNumberGenerator &rng,
 		const byte *recoverableMessage, size_t recoverableMessageLength,
 		HashTransformation &hash, HashIdentifier hashIdentifier, bool messageEmpty,
 		byte *representative, size_t representativeBitLength) const;
@@ -493,18 +500,18 @@ public:
 	virtual ~TF_SignatureSchemeBase() { }
 #endif
 
-	size_t SignatureLength() const 
+	size_t SignatureLength() const
 		{return this->GetTrapdoorFunctionBounds().MaxPreimage().ByteCount();}
-	size_t MaxRecoverableLength() const 
+	size_t MaxRecoverableLength() const
 		{return this->GetMessageEncodingInterface().MaxRecoverableLength(MessageRepresentativeBitLength(), GetHashIdentifier().second, GetDigestSize());}
 	size_t MaxRecoverableLengthFromSignatureLength(size_t signatureLength) const
 		{CRYPTOPP_UNUSED(signatureLength); return this->MaxRecoverableLength();}
 
-	bool IsProbabilistic() const 
+	bool IsProbabilistic() const
 		{return this->GetTrapdoorFunctionInterface().IsRandomized() || this->GetMessageEncodingInterface().IsProbabilistic();}
-	bool AllowNonrecoverablePart() const 
+	bool AllowNonrecoverablePart() const
 		{return this->GetMessageEncodingInterface().AllowNonrecoverablePart();}
-	bool RecoverablePartFirst() const 
+	bool RecoverablePartFirst() const
 		{return this->GetMessageEncodingInterface().RecoverablePartFirst();}
 
 protected:
@@ -594,11 +601,11 @@ public:
 	}
 
 protected:
-	const typename BASE::MessageEncodingInterface & GetMessageEncodingInterface() const 
+	const typename BASE::MessageEncodingInterface & GetMessageEncodingInterface() const
 		{return Singleton<CPP_TYPENAME SCHEME_OPTIONS::MessageEncodingMethod>().Ref();}
-	const TrapdoorFunctionBounds & GetTrapdoorFunctionBounds() const 
+	const TrapdoorFunctionBounds & GetTrapdoorFunctionBounds() const
 		{return GetKey();}
-	const typename BASE::TrapdoorFunctionInterface & GetTrapdoorFunctionInterface() const 
+	const typename BASE::TrapdoorFunctionInterface & GetTrapdoorFunctionInterface() const
 		{return GetKey();}
 
 	// for signature scheme
@@ -712,7 +719,7 @@ CRYPTOPP_DLL void CRYPTOPP_API P1363_MGF1KDF2_Common(HashTransformation &hash, b
 class P1363_MGF1 : public MaskGeneratingFunction
 {
 public:
-	static const char * CRYPTOPP_API StaticAlgorithmName() {return "MGF1";}
+	CRYPTOPP_CONSTEXPR static const char * CRYPTOPP_API StaticAlgorithmName() {return "MGF1";}
 	void GenerateAndMask(HashTransformation &hash, byte *output, size_t outputLength, const byte *input, size_t inputLength, bool mask = true) const
 	{
 		P1363_MGF1KDF2_Common(hash, output, outputLength, input, inputLength, NULL, 0, mask, 0);
@@ -752,7 +759,7 @@ template <class T>
 class CRYPTOPP_NO_VTABLE DL_GroupParameters : public CryptoParameters
 {
 	typedef DL_GroupParameters<T> ThisClass;
-	
+
 public:
 	typedef T Element;
 
@@ -929,7 +936,7 @@ public:
 	virtual bool ValidateElement(unsigned int level, const Element &element, const DL_FixedBasePrecomputation<Element> *precomp) const =0;
 
 	virtual bool FastSubgroupCheckAvailable() const =0;
-	
+
 	//! \brief Determines if an element is an identity
 	//! \param element element to check
 	//! \return true if the element is an identity, false otherwise
@@ -1029,7 +1036,7 @@ public:
 	}
 
 	void AssignFrom(const NameValuePairs &source);
-	
+
 	// non-inherited
 	virtual const Element & GetPublicElement() const {return GetPublicPrecomputation().GetBase(this->GetAbstractGroupParameters().GetGroupPrecomputation());}
 	virtual void SetPublicElement(const Element &y) {AccessPublicPrecomputation().SetBase(this->GetAbstractGroupParameters().GetGroupPrecomputation(), y);}
@@ -1308,6 +1315,7 @@ public:
 	{
 		CRYPTOPP_UNUSED(params); CRYPTOPP_UNUSED(publicKey); CRYPTOPP_UNUSED(r); CRYPTOPP_UNUSED(s);
 		throw NotImplemented("DL_ElgamalLikeSignatureAlgorithm: this signature scheme does not support message recovery");
+		MAYBE_RETURN(Integer::Zero());
 	}
 	virtual size_t RLen(const DL_GroupParameters<T> &params) const
 		{return params.GetSubgroupOrder().ByteCount();}
@@ -1405,7 +1413,7 @@ public:
 
 	//! \brief Provides the maximum recoverable length
 	//! \returns maximum recoverable length, in bytes
-	size_t MaxRecoverableLength() const 
+	size_t MaxRecoverableLength() const
 		{return GetMessageEncodingInterface().MaxRecoverableLength(0, GetHashIdentifier().second, GetDigestSize());}
 
 	//! \brief Provides the maximum recoverable length
@@ -1413,21 +1421,21 @@ public:
 	//! \returns maximum recoverable length based on signature length, in bytes
 	//! \details this function is not implemented and always returns 0.
 	size_t MaxRecoverableLengthFromSignatureLength(size_t signatureLength) const
-		{CRYPTOPP_UNUSED(signatureLength); assert(false); return 0;}	// TODO
+		{CRYPTOPP_UNUSED(signatureLength); CRYPTOPP_ASSERT(false); return 0;}	// TODO
 
 	//! \brief Determines if the scheme is probabilistic
 	//! \returns true if the scheme is probabilistic, false otherwise
-	bool IsProbabilistic() const 
+	bool IsProbabilistic() const
 		{return true;}
 
 	//! \brief Determines if the scheme has non-recoverable part
 	//! \returns true if the message encoding has a non-recoverable part, false otherwise.
-	bool AllowNonrecoverablePart() const 
+	bool AllowNonrecoverablePart() const
 		{return GetMessageEncodingInterface().AllowNonrecoverablePart();}
 
 	//! \brief Determines if the scheme allows recoverable part first
 	//! \returns true if the message encoding allows the recoverable part, false otherwise.
-	bool RecoverablePartFirst() const 
+	bool RecoverablePartFirst() const
 		{return GetMessageEncodingInterface().RecoverablePartFirst();}
 
 protected:
@@ -1469,8 +1477,8 @@ public:
 	{
 		PK_MessageAccumulatorBase &ma = static_cast<PK_MessageAccumulatorBase &>(messageAccumulator);
 		ma.m_recoverableMessage.Assign(recoverableMessage, recoverableMessageLength);
-		this->GetMessageEncodingInterface().ProcessRecoverableMessage(ma.AccessHash(), 
-			recoverableMessage, recoverableMessageLength, 
+		this->GetMessageEncodingInterface().ProcessRecoverableMessage(ma.AccessHash(),
+			recoverableMessage, recoverableMessageLength,
 			ma.m_presignature, ma.m_presignature.size(),
 			ma.m_semisignature);
 	}
@@ -1486,9 +1494,9 @@ public:
 
 		SecByteBlock representative(this->MessageRepresentativeLength());
 		this->GetMessageEncodingInterface().ComputeMessageRepresentative(
-			rng, 
-			ma.m_recoverableMessage, ma.m_recoverableMessage.size(), 
-			ma.AccessHash(), this->GetHashIdentifier(), ma.m_empty, 
+			rng,
+			ma.m_recoverableMessage, ma.m_recoverableMessage.size(),
+			ma.AccessHash(), this->GetHashIdentifier(), ma.m_empty,
 			representative, this->MessageRepresentativeBitLength());
 		ma.m_empty = true;
 		Integer e(representative, representative.size());
@@ -1535,7 +1543,7 @@ protected:
 		ma.m_presignature.New(params.GetEncodedElementSize(false));
 		params.ConvertElementToInteger(params.ExponentiateBase(ma.m_k)).Encode(ma.m_presignature, ma.m_presignature.size());
 		*/
-		CRYPTOPP_UNUSED(rng); CRYPTOPP_UNUSED(ma); 
+		CRYPTOPP_UNUSED(rng); CRYPTOPP_UNUSED(ma);
 	}
 };
 
@@ -1550,7 +1558,7 @@ public:
 
 	void InputSignature(PK_MessageAccumulator &messageAccumulator, const byte *signature, size_t signatureLength) const
 	{
-		CRYPTOPP_UNUSED(signature); CRYPTOPP_UNUSED(signatureLength); 
+		CRYPTOPP_UNUSED(signature); CRYPTOPP_UNUSED(signatureLength);
 		PK_MessageAccumulatorBase &ma = static_cast<PK_MessageAccumulatorBase &>(messageAccumulator);
 		const DL_ElgamalLikeSignatureAlgorithm<T> &alg = this->GetSignatureAlgorithm();
 		const DL_GroupParameters<T> &params = this->GetAbstractGroupParameters();
@@ -1561,7 +1569,7 @@ public:
 
 		this->GetMessageEncodingInterface().ProcessSemisignature(ma.AccessHash(), ma.m_semisignature, ma.m_semisignature.size());
 	}
-	
+
 	bool VerifyAndRestart(PK_MessageAccumulator &messageAccumulator) const
 	{
 		this->GetMaterial().DoQuickSanityCheck();
@@ -1572,7 +1580,7 @@ public:
 		const DL_PublicKey<T> &key = this->GetKeyInterface();
 
 		SecByteBlock representative(this->MessageRepresentativeLength());
-		this->GetMessageEncodingInterface().ComputeMessageRepresentative(NullRNG(), ma.m_recoverableMessage, ma.m_recoverableMessage.size(), 
+		this->GetMessageEncodingInterface().ComputeMessageRepresentative(NullRNG(), ma.m_recoverableMessage, ma.m_recoverableMessage.size(),
 			ma.AccessHash(), this->GetHashIdentifier(), ma.m_empty,
 			representative, this->MessageRepresentativeBitLength());
 		ma.m_empty = true;
@@ -1593,8 +1601,8 @@ public:
 
 		SecByteBlock representative(this->MessageRepresentativeLength());
 		this->GetMessageEncodingInterface().ComputeMessageRepresentative(
-			NullRNG(), 
-			ma.m_recoverableMessage, ma.m_recoverableMessage.size(), 
+			NullRNG(),
+			ma.m_recoverableMessage, ma.m_recoverableMessage.size(),
 			ma.AccessHash(), this->GetHashIdentifier(), ma.m_empty,
 			representative, this->MessageRepresentativeBitLength());
 		ma.m_empty = true;
@@ -1824,7 +1832,7 @@ class CRYPTOPP_NO_VTABLE DL_ObjectImpl : public DL_ObjectImplBase<BASE, SCHEME_O
 {
 public:
 	typedef typename KEY::Element Element;
-	
+
 #ifndef CRYPTOPP_MAINTAIN_BACKWARDS_COMPATIBILITY_562
 	virtual ~DL_ObjectImpl() { }
 #endif
@@ -1840,7 +1848,7 @@ protected:
 		{return Singleton<CPP_TYPENAME SCHEME_OPTIONS::SymmetricEncryptionAlgorithm>().Ref();}
 	HashIdentifier GetHashIdentifier() const
 		{return HashIdentifier();}
-	const PK_SignatureMessageEncodingMethod & GetMessageEncodingInterface() const 
+	const PK_SignatureMessageEncodingMethod & GetMessageEncodingInterface() const
 		{return Singleton<CPP_TYPENAME SCHEME_OPTIONS::MessageEncodingMethod>().Ref();}
 };
 
@@ -1917,7 +1925,7 @@ public:
 		Element y = params.ExponentiateBase(x);
 		params.EncodeElement(true, y, publicKey);
 	}
-	
+
 	bool Agree(byte *agreedValue, const byte *privateKey, const byte *otherPublicKey, bool validateOtherPublicKey=true) const
 	{
 		try
@@ -1978,12 +1986,12 @@ public:
 	virtual ~DL_KeyAgreementAlgorithm_DH() {}
 #endif
 
-	static const char * CRYPTOPP_API StaticAlgorithmName()
+	CRYPTOPP_CONSTEXPR static const char * CRYPTOPP_API StaticAlgorithmName()
 		{return COFACTOR_OPTION::ToEnum() == INCOMPATIBLE_COFACTOR_MULTIPLICTION ? "DHC" : "DH";}
 
 	Element AgreeWithEphemeralPrivateKey(const DL_GroupParameters<Element> &params, const DL_FixedBasePrecomputation<Element> &publicPrecomputation, const Integer &privateExponent) const
 	{
-		return publicPrecomputation.Exponentiate(params.GetGroupPrecomputation(), 
+		return publicPrecomputation.Exponentiate(params.GetGroupPrecomputation(),
 			COFACTOR_OPTION::ToEnum() == INCOMPATIBLE_COFACTOR_MULTIPLICTION ? privateExponent*params.GetCofactor() : privateExponent);
 	}
 
@@ -1992,14 +2000,14 @@ public:
 		if (COFACTOR_OPTION::ToEnum() == COMPATIBLE_COFACTOR_MULTIPLICTION)
 		{
 			const Integer &k = params.GetCofactor();
-			return params.ExponentiateElement(publicElement, 
+			return params.ExponentiateElement(publicElement,
 				ModularArithmetic(params.GetSubgroupOrder()).Divide(privateExponent, k)*k);
 		}
 		else if (COFACTOR_OPTION::ToEnum() == INCOMPATIBLE_COFACTOR_MULTIPLICTION)
 			return params.ExponentiateElement(publicElement, privateExponent*params.GetCofactor());
 		else
 		{
-			assert(COFACTOR_OPTION::ToEnum() == NO_COFACTOR_MULTIPLICTION);
+			CRYPTOPP_ASSERT(COFACTOR_OPTION::ToEnum() == NO_COFACTOR_MULTIPLICTION);
 
 			if (!validateOtherPublicKey)
 				return params.ExponentiateElement(publicElement, privateExponent);
@@ -2053,7 +2061,7 @@ public:
 	template <class T1, class T2, class T3>
 	PK_FinalTemplate(T1 &v1, T2 &v2, T3 &v3)
 		{this->AccessKey().Initialize(v1, v2, v3);}
-	
+
 	template <class T1, class T2, class T3, class T4>
 	PK_FinalTemplate(T1 &v1, T2 &v2, T3 &v3, T4 &v4)
 		{this->AccessKey().Initialize(v1, v2, v3, v4);}
@@ -2083,7 +2091,7 @@ public:
 	template <class T1, class T2, class T3>
 	PK_FinalTemplate(const T1 &v1, const T2 &v2, const T3 &v3)
 		{this->AccessKey().Initialize(v1, v2, v3);}
-	
+
 	template <class T1, class T2, class T3, class T4>
 	PK_FinalTemplate(const T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4)
 		{this->AccessKey().Initialize(v1, v2, v3, v4);}
@@ -2111,7 +2119,7 @@ public:
 	template <class T1, class T2, class T3>
 	PK_FinalTemplate(T1 &v1, const T2 &v2, const T3 &v3)
 		{this->AccessKey().Initialize(v1, v2, v3);}
-	
+
 	template <class T1, class T2, class T3, class T4>
 	PK_FinalTemplate(T1 &v1, const T2 &v2, const T3 &v3, const T4 &v4)
 		{this->AccessKey().Initialize(v1, v2, v3, v4);}

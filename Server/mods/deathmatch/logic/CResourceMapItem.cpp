@@ -1,30 +1,22 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CResourceMapItem.cpp
-*  PURPOSE:     Resource server-side map item class
-*  DEVELOPERS:  Ed Lyons <>
-*               Kevin Whiteside <>
-*               Christian Myhre Lundheim <>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
-
-// This class represents a single resource map item, being a .map file
-// It's task is to load the .map file into elements and store them
-// as a reference in a CElementGroup. This allows easy removal on the deletion
-// of the resource.
-
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CResourceMapItem.cpp
+ *  PURPOSE:     Resource server-side map item class
+ *
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 #include "StdInc.h"
 
 extern CGame* g_pGame;
 
-CResourceMapItem::CResourceMapItem ( CResource * resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes * xmlAttributes, int iDimension ) : CResourceFile ( resource, szShortName, szResourceFileName, xmlAttributes )
+CResourceMapItem::CResourceMapItem(CResource* pResource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* pXMLAttributes,
+                                   int iDimension)
+    : CResourceFile(pResource, szShortName, szResourceFileName, pXMLAttributes)
 {
-    m_pGroups = g_pGame->GetGroups();  // isn't in CGame
+    m_pGroups = g_pGame->GetGroups();
     m_pMarkerManager = g_pGame->GetMarkerManager();
     m_pBlipManager = g_pGame->GetBlipManager();
     m_pObjectManager = g_pGame->GetObjectManager();
@@ -34,317 +26,232 @@ CResourceMapItem::CResourceMapItem ( CResource * resource, const char* szShortNa
     m_pVehicleManager = g_pGame->GetVehicleManager();
     m_pTeamManager = g_pGame->GetTeamManager();
     m_pPedManager = g_pGame->GetPedManager();
-    m_pWaterManager = g_pGame->GetWaterManager ();
-    m_pLuaManager = g_pGame->GetLuaManager();
+    m_pWaterManager = g_pGame->GetWaterManager();
     m_pEvents = g_pGame->GetEvents();
-    m_pScriptDebugging = g_pGame->GetScriptDebugging();
-    m_pElementGroup = NULL;
-
+    m_pElementGroup = nullptr;
     m_iDimension = iDimension;
-
     m_type = RESOURCE_FILE_TYPE_MAP;
-
-    m_pMapElement = NULL;
-    m_pXMLFile = NULL;
-    m_pXMLRootNode = NULL;
-    m_pRootElement = NULL;
-    m_pVM = NULL;
+    m_pMapElement = nullptr;
 }
 
-CResourceMapItem::~CResourceMapItem ( void )
+CResourceMapItem::~CResourceMapItem()
 {
-    Stop ();
+    Stop();
 }
 
-
-bool CResourceMapItem::Start ( void )
+bool CResourceMapItem::Start()
 {
-    // Not already been run?
-    if ( !m_pElementGroup )
-    {
-        m_pVM = m_resource->GetVirtualMachine ();
-        m_pElementGroup = new CElementGroup ();
+    if (m_pElementGroup)
+        return false;
 
-        LoadMap ( m_strResourceFileName.c_str () );
-        return true;
-    }
+    if (m_strResourceFileName.empty())
+        return false;
 
-    return false;
-}
+    m_pElementGroup = new CElementGroup();
 
-bool CResourceMapItem::Stop ( void )
-{
-    // Delete our element group, including all the elements in it
-    if ( m_pElementGroup )
+    if (!LoadMap(m_strResourceFileName.c_str()))
     {
         delete m_pElementGroup;
-        m_pElementGroup = NULL;
+        m_pElementGroup = nullptr;
+        return false;
     }
 
-    // Destroy our XML too
-    if ( m_pXMLFile )
-    {
-        delete m_pXMLFile;
-        m_pXMLFile = NULL;
-        m_pXMLRootNode = NULL;
-    }
-
-    // Map element is deleted by element group
-    m_pMapElement = NULL;
     return true;
 }
 
-bool CResourceMapItem::LoadMap ( const char * szMapFilename )
-{ 
-    assert ( szMapFilename );
-    assert ( strlen ( szMapFilename ) > 0 );
-
-    // Don't load twice
-    if ( !m_pMapElement && !m_pXMLRootNode )
-    {
-        // Grab the root element
-        m_pRootElement = g_pGame->GetMapManager ()->GetRootElement();
-
-        // Create Map Element
-        m_pMapElement = new CDummy ( g_pGame->GetGroups(), m_resource->GetResourceRootElement () );
-        m_pMapElement->SetTypeName ( "map" );
-        m_pMapElement->SetName ( m_strShortName );
-
-        // Load and parse it
-        m_pXMLFile = g_pServerInterface->GetXML ()->CreateXML ( szMapFilename );
-        if ( m_pXMLFile )
-        {
-            // Try to parse it
-            if ( m_pXMLFile->Parse () )
-            {
-                // Grab the root item
-                m_pXMLRootNode = m_pXMLFile->GetRootNode ();
-                if ( m_pXMLRootNode )
-                {
-                    // Is the rootnode's name <map>?
-                    std::string strBuffer;
-                    strBuffer = m_pXMLRootNode->GetTagName ();
-                    if ( strBuffer.compare ( "map" ) == 0 )
-                    {
-                        // Load the data
-                        m_bIsLoaded = LoadSubNodes ( *m_pXMLRootNode, m_pMapElement, NULL, true );
-                        if ( m_bIsLoaded )
-                        {
-                            LinkupElements ();
-
-                            // Add map element to element group
-                            m_pElementGroup->Add ( m_pMapElement );
-
-                            // Success
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            // Failed, destroy the XML
-            delete m_pXMLRootNode;
-            m_pXMLRootNode = NULL;
-        }
-
-        // Delete map element
-        delete m_pMapElement;
-    }
-
-    // Failed
-    return false;
-}
-
-
-bool CResourceMapItem::LoadSubNodes ( CXMLNode& Node, CElement* pParent, vector < CElement* >* pAdded, bool bIsDuringStart )
+bool CResourceMapItem::Stop()
 {
-    // Iterate the nodes
-    CXMLNode* pNode = NULL;
-    list < CXMLNode * > ::iterator iter = Node.ChildrenBegin ();
-    for ( ; iter != Node.ChildrenEnd () ; iter++ )
+    if (m_pElementGroup)
     {
-        // Grab the node
-        pNode = *iter;
-        if ( pNode )
-        {
-            // Handle it (if it can't be handled, just ignore it and continue to the next)
-            HandleNode ( *pNode, pParent, pAdded, bIsDuringStart, NULL );
-        }
+        delete m_pElementGroup;
+        m_pElementGroup = nullptr;
+
+        // m_pMapElement has been deleted by m_pElementGroup
+        m_pMapElement = nullptr;
     }
 
-    // Success
     return true;
 }
 
-bool CResourceMapItem::HandleNode ( CXMLNode& Node, CElement* pParent, vector < CElement* >* pAdded, bool bIsDuringStart, CElement** pCreated )
+bool CResourceMapItem::LoadMap(const char* szMapFilename)
 {
-    // Grab the name
-    std::string strBuffer;
-    strBuffer = Node.GetTagName ();
+    if (m_pMapElement)
+        return false;
+
+    CXMLFile* const pXMLFile = g_pServerInterface->GetXML()->CreateXML(szMapFilename);
+
+    if (!pXMLFile)
+        return false;
+
+    if (!pXMLFile->Parse())
+    {
+        delete pXMLFile;
+        return false;
+    }
+
+    CXMLNode* const pRootNode = pXMLFile->GetRootNode();
+
+    if (!pRootNode || pRootNode->GetTagName() != std::string("map"))
+    {
+        delete pXMLFile;
+        return false;
+    }
+
+    CDummy* const pMapElement = new CDummy(g_pGame->GetGroups(), m_resource->GetResourceRootElement());
+    pMapElement->SetTypeName("map");
+    pMapElement->SetName(m_strShortName);
+
+    LoadChildNodes(*pRootNode, pMapElement);
+    LinkupElements();
+    m_pElementGroup->Add(pMapElement);
+    m_pMapElement = pMapElement;
+    delete pXMLFile;
+    return true;
+}
+
+void CResourceMapItem::LoadChildNodes(CXMLNode& Node, CElement* pParent)
+{
+    for (auto iter = Node.ChildrenBegin(); iter != Node.ChildrenEnd(); ++iter)
+        HandleNode(**iter, pParent);
+}
+
+void CResourceMapItem::HandleNode(CXMLNode& Node, CElement* pParent)
+{
+    std::string strTagName = Node.GetTagName();
+
+    if (strTagName.empty())
+        return;
 
     EElementType elementType;
-    StringToEnum ( strBuffer, elementType );
+    StringToEnum(strTagName, elementType);
 
-    // Handle it based on the tag name
-    CElement* pNode = NULL;
-    if ( elementType == CElement::VEHICLE )
+    CElement* pNode = nullptr;
+
+    switch (elementType)
     {
-        pNode = m_pVehicleManager->CreateFromXML ( pParent, Node, m_pEvents );
-    }
-    else if ( elementType == CElement::OBJECT )
-    {
-        bool bIsLowLod = false;
-        pNode = m_pObjectManager->CreateFromXML ( pParent, Node, m_pEvents, bIsLowLod );
-    }
-    else if ( elementType == CElement::BLIP )
-    {
-        CBlip* pBlip = m_pBlipManager->CreateFromXML ( pParent, Node, m_pEvents );
-        pNode = pBlip;
-        /*
-        if ( pBlip )
+        case CElement::VEHICLE:
         {
-            pBlip->SetIsSynced ( bIsDuringStart );
+            pNode = m_pVehicleManager->CreateFromXML(pParent, Node, m_pEvents);
+            break;
         }
-        */
-    }
-    else if ( elementType == CElement::PICKUP )
-    {
-        pNode = m_pPickupManager->CreateFromXML ( pParent, Node, m_pEvents );
-    }
-    else if ( elementType == CElement::MARKER )
-    {
-        CMarker* pMarker = m_pMarkerManager->CreateFromXML ( pParent, Node, m_pEvents );
-        pNode = pMarker;
-        /*
-        if ( pMarker )
+        case CElement::OBJECT:
         {
-            pMarker->SetIsSynced ( bIsDuringStart );
+            pNode = m_pObjectManager->CreateFromXML(pParent, Node, m_pEvents, false);
+            break;
         }
-        */
-    }
-    else if ( elementType == CElement::RADAR_AREA )
-    {
-        CRadarArea* pRadarArea = m_pRadarAreaManager->CreateFromXML ( pParent, Node, m_pEvents );
-        pNode = pRadarArea;
-        /*
-        if ( pRadarArea )
+        case CElement::BLIP:
         {
-            pRadarArea->SetIsSynced ( bIsDuringStart );
+            pNode = m_pBlipManager->CreateFromXML(pParent, Node, m_pEvents);
+            break;
         }
-        */
-    }
-    else if ( elementType == CElement::TEAM )
-    {
-        pNode = m_pTeamManager->CreateFromXML ( pParent, Node, m_pEvents );
-    }
-    else if ( elementType == CElement::PED )
-    {
-        pNode = m_pPedManager->CreateFromXML ( pParent, Node, m_pEvents );
-    }
-    else if ( elementType == CElement::WATER )
-    {
-        pNode = m_pWaterManager->CreateFromXML ( pParent, Node, m_pEvents );
-    }
-    else if ( strBuffer.empty () )
-    {
-        // Comment, return true
-        return true;
-    }
-    else
-    {
-        pNode = m_pGroups->CreateFromXML ( pParent, Node, m_pEvents );
-    }
-
-    // Set the node we created in the pointer we were given
-    if ( pCreated )
-    {
-        *pCreated = pNode;
-    }
-
-    // Got a node created?
-    if ( pNode )
-    {
-        // Set its typename to the name of the tag
-        pNode->SetTypeName ( strBuffer.c_str () );
-
-        // Add it to our list over elements added
-        if ( pAdded )
+        case CElement::PICKUP:
         {
-            pAdded->push_back ( pNode );
+            pNode = m_pPickupManager->CreateFromXML(pParent, Node, m_pEvents);
+            break;
         }
-
-        // Add this element to this map's element group
-        if ( m_pElementGroup )
-            m_pElementGroup->Add ( pNode );
-
-        // Load the elements below it
-        return LoadSubNodes ( Node, pNode, pAdded, bIsDuringStart );
+        case CElement::MARKER:
+        {
+            pNode = m_pMarkerManager->CreateFromXML(pParent, Node, m_pEvents);
+            break;
+        }
+        case CElement::RADAR_AREA:
+        {
+            m_pRadarAreaManager->CreateFromXML(pParent, Node, m_pEvents);
+            break;
+        }
+        case CElement::TEAM:
+        {
+            pNode = m_pTeamManager->CreateFromXML(pParent, Node, m_pEvents);
+            break;
+        }
+        case CElement::PED:
+        {
+            pNode = m_pPedManager->CreateFromXML(pParent, Node, m_pEvents);
+            break;
+        }
+        case CElement::WATER:
+        {
+            pNode = m_pWaterManager->CreateFromXML(pParent, Node, m_pEvents);
+            break;
+        }
+        default:
+        {
+            pNode = m_pGroups->CreateFromXML(pParent, Node, m_pEvents);
+            break;
+        }
     }
-    return false;
+
+    if (!pNode)
+        return;
+
+    pNode->SetTypeName(strTagName);
+
+    if (!pNode->GetDimension())
+        pNode->SetDimension(m_iDimension);
+
+    if (m_pElementGroup)
+        m_pElementGroup->Add(pNode);
+
+    LoadChildNodes(Node, pNode);
 }
 
-CElement* CResourceMapItem::LoadNode ( CXMLNode& Node, CElement* pParent, vector < CElement* >* pAdded, bool bIsDuringStart )
+void CResourceMapItem::LinkupElements()
 {
-    // Load the given node and its children
-    CElement* pLoadedRoot;
-    HandleNode ( Node, pParent, pAdded, bIsDuringStart, &pLoadedRoot );
-    return pLoadedRoot;
-}
+    CDummy* const pRootElement = g_pGame->GetMapManager()->GetRootElement();
 
-
-void CResourceMapItem::LinkupElements ( void )
-{
-    // Link up all the attaching elements
-    list < CVehicle* > ::const_iterator iterVehicles = m_pVehicleManager->IterBegin ();
-    for ( ; iterVehicles != m_pVehicleManager->IterEnd (); iterVehicles++ )
+    for (auto iter = m_pVehicleManager->IterBegin(); iter != m_pVehicleManager->IterEnd(); ++iter)
     {
-        CVehicle* pVehicle = *iterVehicles;
+        CVehicle* const pVehicle = *iter;
+        const char*     szAttachToID = pVehicle->GetAttachToID();
 
-        const char* szAttachToID = pVehicle->GetAttachToID ();
-        if ( szAttachToID [ 0 ] )
+        if (szAttachToID[0])
         {
-            CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
-            if ( pElement )
-                pVehicle->AttachTo ( pElement );
+            CElement* const pElement = pRootElement->FindChild(szAttachToID, 0, true);
+
+            if (pElement)
+                pVehicle->AttachTo(pElement);
         }
     }
 
-    list < CPlayer* > ::const_iterator iterPlayers = m_pPlayerManager->IterBegin ();
-    for ( ; iterPlayers != m_pPlayerManager->IterEnd (); iterPlayers++ )
+    for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); ++iter)
     {
-        CPlayer* pPlayer = *iterPlayers;
-        const char* szAttachToID = pPlayer->GetAttachToID ();
-        if ( szAttachToID [ 0 ] )
+        CPlayer* const pPlayer = *iter;
+        const char*    szAttachToID = pPlayer->GetAttachToID();
+
+        if (szAttachToID[0])
         {
-            CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
-            if ( pElement )
-                pPlayer->AttachTo ( pElement );
+            CElement* const pElement = pRootElement->FindChild(szAttachToID, 0, true);
+
+            if (pElement)
+                pPlayer->AttachTo(pElement);
         }
     }
 
-    CObjectListType::const_iterator iterObjects = m_pObjectManager->IterBegin ();
-    for ( ; iterObjects != m_pObjectManager->IterEnd (); iterObjects++ )
+    for (auto iter = m_pObjectManager->IterBegin(); iter != m_pObjectManager->IterEnd(); ++iter)
     {
-        CObject* pObject = *iterObjects;
-        const char* szAttachToID = pObject->GetAttachToID ();
-        if ( szAttachToID [ 0 ] )
+        CObject* const pObject = *iter;
+        const char*    szAttachToID = pObject->GetAttachToID();
+
+        if (szAttachToID[0])
         {
-            CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
-            if ( pElement )
-                pObject->AttachTo ( pElement );
+            CElement* const pElement = pRootElement->FindChild(szAttachToID, 0, true);
+
+            if (pElement)
+                pObject->AttachTo(pElement);
         }
     }
 
-    list < CBlip* > ::const_iterator iterBlips = m_pBlipManager->IterBegin ();
-    for ( ; iterBlips != m_pBlipManager->IterEnd (); iterBlips++ )
+    for (auto iter = m_pBlipManager->IterBegin(); iter != m_pBlipManager->IterEnd(); ++iter)
     {
-        CBlip* pBlip = *iterBlips;
-        const char* szAttachToID = pBlip->GetAttachToID ();
-        if ( szAttachToID [ 0 ] )
+        CBlip* const pBlip = *iter;
+        const char*  szAttachToID = pBlip->GetAttachToID();
+
+        if (szAttachToID[0])
         {
-            CElement* pElement = g_pGame->GetMapManager ()->GetRootElement ()->FindChild ( szAttachToID, 0, true );
-            if ( pElement )
-                pBlip->AttachTo ( pElement );
+            CElement* const pElement = pRootElement->FindChild(szAttachToID, 0, true);
+
+            if (pElement)
+                pBlip->AttachTo(pElement);
         }
     }
 }

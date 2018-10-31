@@ -1,137 +1,132 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        xml/CXMLFileImpl.cpp
-*  PURPOSE:     XML file class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        xml/CXMLFileImpl.cpp
+ *  PURPOSE:     XML file class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 SString CXMLFileImpl::ms_strSaveFlagFile;
 
-CXMLFileImpl::CXMLFileImpl ( const char* szFilename, bool bUseIDs ) :
-    m_ulID ( INVALID_XML_ID ),
-    m_bUsingIDs ( bUseIDs )
+CXMLFileImpl::CXMLFileImpl(const char* szFilename, bool bUseIDs, bool bReadOnly) : m_ulID(INVALID_XML_ID), m_bUsingIDs(bUseIDs), m_bReadOnly(bReadOnly)
 {
     // Init
     m_pDocument = NULL;
     m_pRootNode = NULL;
-    ResetLastError ();
+    ResetLastError();
 
     // Create the document
     m_pDocument = new TiXmlDocument;
 
     // Set the filename
-    if ( szFilename )
+    if (szFilename)
     {
         m_strFilename = szFilename;
     }
 
     // Add to array over XML stuff
-    if ( m_bUsingIDs )
-        m_ulID = CXMLArray::PopUniqueID ( this );
+    if (m_bUsingIDs)
+        m_ulID = CXMLArray::PopUniqueID(this);
 }
 
-
-CXMLFileImpl::~CXMLFileImpl ( void )
+CXMLFileImpl::~CXMLFileImpl(void)
 {
     // Remove from array over XML stuff
-    if ( m_bUsingIDs )
-        CXMLArray::PushUniqueID ( this );
+    if (m_bUsingIDs)
+        CXMLArray::PushUniqueID(this);
 
     // Delete our wrappers
-    ClearWrapperTree ();
+    ClearWrapperTree();
 
     // Delete the document and the builder
     delete m_pDocument;
 }
 
-
-const char* CXMLFileImpl::GetFilename ( void )
+const char* CXMLFileImpl::GetFilename(void)
 {
-    return m_strFilename.c_str ();
+    return m_strFilename.c_str();
 }
 
-
-void CXMLFileImpl::SetFilename ( const char* szFilename )
+void CXMLFileImpl::SetFilename(const char* szFilename)
 {
     // Valid?
-    if ( szFilename )
+    if (szFilename)
         m_strFilename = szFilename;
     else
         m_strFilename = "";
 }
 
-
-bool CXMLFileImpl::Parse ( std::vector < char >* pOutFileContents )
+bool CXMLFileImpl::Parse(std::vector<char>* pOutFileContents)
 {
     // Do we have a filename?
-    if ( m_strFilename != "" )
+    if (m_strFilename != "")
     {
         // Reset previous file
-        Reset ();
+        Reset();
 
         // Parse from the current file
         FILE* file;
-        if ( m_pDocument->LoadFile ( m_strFilename.c_str (), TIXML_DEFAULT_ENCODING, &file ) )
-        {        
+        if (m_pDocument->LoadFile(m_strFilename.c_str(), TIXML_DEFAULT_ENCODING, &file))
+        {
             // Also read the file bytes to a buffer if requested
-            if ( pOutFileContents )
+            if (pOutFileContents)
             {
-                fseek( file, 0, SEEK_END );
-                long size = ftell ( file );
-                fseek( file, 0, SEEK_SET );
-                if ( size > 0 )
+                fseek(file, 0, SEEK_END);
+                long size = ftell(file);
+                fseek(file, 0, SEEK_SET);
+                if (size > 0)
                 {
-                    pOutFileContents->resize( size );
-                    fread( &pOutFileContents->at(0), 1, size, file );
+                    pOutFileContents->resize(size);
+                    fread(&pOutFileContents->at(0), 1, size, file);
                 }
             }
-		    fclose( file );
+            fclose(file);
 
             // Build our wrapper
-            if ( BuildWrapperTree () )
+            if (BuildWrapperTree())
             {
-                ResetLastError ();
+                ResetLastError();
                 return true;
             }
             else
             {
-                SetLastError ( CXMLErrorCodes::OtherError, "Out of Elements" );
+                SetLastError(CXMLErrorCodes::OtherError, "Out of Elements");
                 return false;
             }
         }
 
         SString strErrorDesc;
-        if ( m_pDocument->Error() )
-            strErrorDesc = SString( "Line %d: %s", m_pDocument->ErrorRow(), m_pDocument->ErrorDesc() );
+        if (m_pDocument->Error())
+            strErrorDesc = SString("Line %d: %s", m_pDocument->ErrorRow(), m_pDocument->ErrorDesc());
         else
             strErrorDesc = "Invalid file";
-        SetLastError ( CXMLErrorCodes::OtherError, strErrorDesc );
+        SetLastError(CXMLErrorCodes::OtherError, strErrorDesc);
         return false;
     }
 
     // No filename specified
-    SetLastError ( CXMLErrorCodes::NoFileSpecified, "No file specified" );
+    SetLastError(CXMLErrorCodes::NoFileSpecified, "No file specified");
     return false;
 }
 
-
-bool CXMLFileImpl::Write ( void )
+bool CXMLFileImpl::Write(void)
 {
+    if (m_bReadOnly)
+        return false;
+
     // We have a filename?
-    if ( m_strFilename != "" )
+    if (m_strFilename != "")
     {
         // Try a safe method of saving first
-        if ( WriteSafer () )
+        if (WriteSafer())
         {
             return true;
         }
-        if ( m_pDocument->SaveFile ( m_strFilename.c_str () ) )
+        if (m_pDocument->SaveFile(m_strFilename.c_str()))
         {
             return true;
         }
@@ -140,36 +135,35 @@ bool CXMLFileImpl::Write ( void )
     return false;
 }
 
-
-bool CXMLFileImpl::WriteSafer ( void )
+bool CXMLFileImpl::WriteSafer(void)
 {
     // We have a filename?
-    if ( m_strFilename != "" )
+    if (m_strFilename != "")
     {
         SString strFilename = m_strFilename;
-        SString strTemp     = strFilename + "_new_";
-        SString strBackup   = strFilename + "_old_";
+        SString strTemp = strFilename + "_new_";
+        SString strBackup = strFilename + "_old_";
 
         // Save to temp
-        if ( !m_pDocument->SaveFile ( strTemp ) )
+        if (!m_pDocument->SaveFile(strTemp))
         {
-            SetLastError ( CXMLErrorCodes::OtherError, "Could not save temporary file" );
+            SetLastError(CXMLErrorCodes::OtherError, "Could not save temporary file");
             return false;
         }
 
         // Delete any leftover backup
-        unlink ( strBackup );
+        File::Delete(strBackup);
 
         // Save filename being saved
-        FileRecoveryPreSave( strFilename );
+        FileRecoveryPreSave(strFilename);
 
         // Rename current to backup
-        rename ( strFilename, strBackup );
+        File::Rename(strFilename, strBackup);
 
         // Rename temp to current
-        if ( rename ( strTemp, strFilename ) )
+        if (File::Rename(strTemp, strFilename))
         {
-            SetLastError ( CXMLErrorCodes::OtherError, "Could not rename temporary to current" );
+            SetLastError(CXMLErrorCodes::OtherError, "Could not rename temporary to current");
             return false;
         }
 
@@ -177,7 +171,7 @@ bool CXMLFileImpl::WriteSafer ( void )
         FileRecoveryPostSave();
 
         // Delete backup
-        unlink ( strBackup );
+        File::Delete(strBackup);
 
         return true;
     }
@@ -185,104 +179,94 @@ bool CXMLFileImpl::WriteSafer ( void )
     return false;
 }
 
-
-
-void CXMLFileImpl::Clear ( void )
+void CXMLFileImpl::Clear(void)
 {
-    if ( m_pRootNode )
+    if (m_pRootNode)
     {
         delete m_pRootNode;
         m_pRootNode = NULL;
     }
 }
 
-
-void CXMLFileImpl::Reset ( void )
+void CXMLFileImpl::Reset(void)
 {
     // Clear our wrapper tree
-    ClearWrapperTree ();
+    ClearWrapperTree();
 
     // Delete our document and recreate it
     delete m_pDocument;
     m_pDocument = new TiXmlDocument;
 }
 
-
-CXMLNode* CXMLFileImpl::CreateRootNode ( const std::string& strTagName )
+CXMLNode* CXMLFileImpl::CreateRootNode(const std::string& strTagName)
 {
     // Make sure we always have a root node
-    if ( !m_pRootNode )
+    if (!m_pRootNode)
     {
         // Grab the document's root, create it if neccessary
-        TiXmlElement* pRootNode = m_pDocument->RootElement ();
-        if ( !pRootNode )
+        TiXmlElement* pRootNode = m_pDocument->RootElement();
+        if (!pRootNode)
         {
-            pRootNode = new TiXmlElement ( strTagName );
-            m_pDocument->LinkEndChild ( pRootNode );
+            pRootNode = new TiXmlElement(strTagName);
+            m_pDocument->LinkEndChild(pRootNode);
         }
 
-        m_pRootNode = new CXMLNodeImpl ( this, NULL, *pRootNode );
+        m_pRootNode = new CXMLNodeImpl(this, NULL, *pRootNode);
     }
 
     // We have a root node now. Make sure ith as the correct name.
-    m_pRootNode->SetTagName ( strTagName );
+    m_pRootNode->SetTagName(strTagName);
     return m_pRootNode;
 }
 
-
-CXMLNode* CXMLFileImpl::GetRootNode ( void )
+CXMLNode* CXMLFileImpl::GetRootNode(void)
 {
     // Return it
     return m_pRootNode;
 }
 
-
-CXMLErrorCodes::Code CXMLFileImpl::GetLastError ( std::string& strOut )
+CXMLErrorCodes::Code CXMLFileImpl::GetLastError(std::string& strOut)
 {
     // Copy out the last error string and return the last error
     strOut = m_strLastError;
     return m_errLastError;
 }
 
-
-void CXMLFileImpl::ResetLastError ( void )
+void CXMLFileImpl::ResetLastError(void)
 {
     // Set the code and the string
     m_errLastError = CXMLErrorCodes::NoError;
     m_strLastError = "";
 }
 
-
-void CXMLFileImpl::SetLastError ( CXMLErrorCodes::Code errCode, const std::string& strDescription )
+void CXMLFileImpl::SetLastError(CXMLErrorCodes::Code errCode, const std::string& strDescription)
 {
     // Set the code and the string
     m_errLastError = errCode;
     m_strLastError = strDescription;
 }
 
-
-TiXmlDocument* CXMLFileImpl::GetDocument ( void )
+TiXmlDocument* CXMLFileImpl::GetDocument(void)
 {
     return m_pDocument;
 }
 
-
-bool CXMLFileImpl::BuildWrapperTree ( void )
+bool CXMLFileImpl::BuildWrapperTree(void)
 {
     // Clear the previous tree
-    ClearWrapperTree ();
+    ClearWrapperTree();
 
     // Grab the root element
-    TiXmlElement* pRootNode = m_pDocument->RootElement ();
-    if ( pRootNode )
+    TiXmlElement* pRootNode = m_pDocument->RootElement();
+    if (pRootNode)
     {
         // Create an XML node for it
-        m_pRootNode = new CXMLNodeImpl ( this, NULL, *pRootNode );
+        m_pRootNode = new CXMLNodeImpl(this, NULL, *pRootNode);
 
         // And build all sub-nodes
-        if ( !BuildSubElements ( m_pRootNode ) )
+        if (!BuildSubElements(m_pRootNode))
         {
-            Reset ( );
+            Reset();
             return false;
         }
         return true;
@@ -290,27 +274,26 @@ bool CXMLFileImpl::BuildWrapperTree ( void )
     return false;
 }
 
-
-bool CXMLFileImpl::BuildSubElements ( CXMLNodeImpl* pNode )
+bool CXMLFileImpl::BuildSubElements(CXMLNodeImpl* pNode)
 {
     // Grab the node
-    TiXmlElement* pRawNode = pNode->GetNode ();
-    if ( pRawNode )
+    TiXmlElement* pRawNode = pNode->GetNode();
+    if (pRawNode)
     {
         // Iterate the children
-        TiXmlNode* pChild = NULL;
+        TiXmlNode*    pChild = NULL;
         TiXmlElement* pElement;
-        while ( ( pChild = pRawNode->IterateChildren ( pChild ) ) )
+        while ((pChild = pRawNode->IterateChildren(pChild)))
         {
             // If it's not a comment or something else, build it to our tree
             // TODO: Support comments
-            if ( ( pElement = pChild->ToElement () ) )
+            if ((pElement = pChild->ToElement()))
             {
                 // Create the child and build its subnodes again
-                CXMLNodeImpl* pTempNode = new CXMLNodeImpl ( this, pNode, *pElement );
-                if ( pTempNode->IsValid ( ) )
+                CXMLNodeImpl* pTempNode = new CXMLNodeImpl(this, pNode, *pElement);
+                if (pTempNode->IsValid())
                 {
-                    if ( !BuildSubElements ( pTempNode ) )
+                    if (!BuildSubElements(pTempNode))
                     {
                         delete pTempNode;
                         return false;
@@ -327,13 +310,12 @@ bool CXMLFileImpl::BuildSubElements ( CXMLNodeImpl* pNode )
     return true;
 }
 
-
-void CXMLFileImpl::ClearWrapperTree ( void )
+void CXMLFileImpl::ClearWrapperTree(void)
 {
     // Delete the previous wrapper tree
-    if ( m_pRootNode )
+    if (m_pRootNode)
     {
-        m_pRootNode->DeleteWrapper ();
+        m_pRootNode->DeleteWrapper();
         m_pRootNode = NULL;
     }
 }
@@ -341,51 +323,50 @@ void CXMLFileImpl::ClearWrapperTree ( void )
 //
 // Initialize and do any file recovery as necessary
 //
-void CXMLFileImpl::InitFileRecovery( const char* szSaveFlagDirectory )
+void CXMLFileImpl::InitFileRecovery(const char* szSaveFlagDirectory)
 {
-    if ( !szSaveFlagDirectory )
+    if (!szSaveFlagDirectory)
         return;
-    ms_strSaveFlagFile = PathJoin( szSaveFlagDirectory, "_xml_save.info" );
+    ms_strSaveFlagFile = PathJoin(szSaveFlagDirectory, "_xml_save.info");
 
     // Check if recover is required
     SString strFilename;
-    FileLoad( ms_strSaveFlagFile, strFilename );
-    if ( strFilename.empty() )
+    FileLoad(ms_strSaveFlagFile, strFilename);
+    if (strFilename.empty())
         return;
 
-    if ( !FileExists( strFilename ) )
+    if (!FileExists(strFilename))
     {
         // Try to recover from new file
         SString strTemp = strFilename + "_new_";
-        if ( FileExists( strTemp ) )
+        if (FileExists(strTemp))
         {
-            rename( strTemp, strFilename );
+            File::Rename(strTemp, strFilename);
         }
     }
 
-    if ( !FileExists( strFilename ) )
+    if (!FileExists(strFilename))
     {
         // Try to recover from old file
         SString strBackup = strFilename + "_old_";
-        if ( FileExists( strBackup ) )
+        if (FileExists(strBackup))
         {
-            rename( strBackup, strFilename );
+            File::Rename(strBackup, strFilename);
         }
     }
-    FileDelete( ms_strSaveFlagFile );
+    FileDelete(ms_strSaveFlagFile);
 }
 
 // Store filename in case of problems during save
-void CXMLFileImpl::FileRecoveryPreSave( const SString& strFilename )
+void CXMLFileImpl::FileRecoveryPreSave(const SString& strFilename)
 {
-    if ( !ms_strSaveFlagFile.empty() )
-        FileSave( ms_strSaveFlagFile, strFilename );
+    if (!ms_strSaveFlagFile.empty())
+        FileSave(ms_strSaveFlagFile, strFilename);
 }
 
 // Unstore filename in case of problems during save
-void CXMLFileImpl::FileRecoveryPostSave( void )
+void CXMLFileImpl::FileRecoveryPostSave(void)
 {
-    if ( !ms_strSaveFlagFile.empty() )
-        FileDelete( ms_strSaveFlagFile );
+    if (!ms_strSaveFlagFile.empty())
+        FileDelete(ms_strSaveFlagFile);
 }
-

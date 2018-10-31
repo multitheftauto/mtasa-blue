@@ -1,19 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/TaskCarSA.h
-*  PURPOSE:     Car game tasks
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Jax <>
-*               Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/TaskCarSA.h
+ *  PURPOSE:     Car game tasks
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CGAMESA_TASKCAR
-#define __CGAMESA_TASKCAR
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -33,7 +29,7 @@ typedef DWORD AnimationId;
 #define FUNC_CTaskComplexLeaveCar__Constructor                      0x63B8C0
 
 // ##############################################################################
-// ## Name:    CTaskComplexEnterCar                                    
+// ## Name:    CTaskComplexEnterCar
 // ## Purpose: Makes the ped enter the specified vehicle
 // ## Notes:   Shouldn't be used directly, use CTaskComplexEnterCarAsDriver or
 // ##          CTaskComplexEnterCarAsPassenger instead
@@ -42,156 +38,152 @@ typedef DWORD AnimationId;
 class CTaskComplexEnterCarSAInterface : public CTaskComplexSAInterface
 {
 public:
-    CVehicle* m_pTargetVehicle;
-    unsigned char m_bAsDriver:1;
-    unsigned char m_bQuitAfterOpeningDoor:1;
-    unsigned char m_bQuitAfterDraggingPedOut:1;
-    unsigned char m_bCarryOnAfterFallingOff:1;
-    
+    CVehicle*     m_pTargetVehicle;
+    unsigned char m_bAsDriver : 1;
+    unsigned char m_bQuitAfterOpeningDoor : 1;
+    unsigned char m_bQuitAfterDraggingPedOut : 1;
+    unsigned char m_bCarryOnAfterFallingOff : 1;
+
     int m_iTargetDoor;
     int m_iTargetDoorOppositeToFlag;
     int m_iTargetSeat;
     int m_iDraggedPedDownTime;
     int m_iMoveState;
-    
+
     unsigned char m_nNumGettingInSet;
     unsigned char m_nCamMovementChoice;
 
-    CVector m_vTargetDoorPos;
+    CVector                       m_vTargetDoorPos;
     CTaskUtilityLineUpPedWithCar* m_pTaskUtilityLineUpPedWithCar;
-    bool m_bIsAborting;
-    CPed* m_pDraggedPed;
-    unsigned char m_nDoorFlagsSet;
-    float m_fCruiseSpeed;
-    int m_iEnterCarStartTime;
+    bool                          m_bIsAborting;
+    CPed*                         m_pDraggedPed;
+    unsigned char                 m_nDoorFlagsSet;
+    float                         m_fCruiseSpeed;
+    int                           m_iEnterCarStartTime;
 };
 
 class CTaskComplexEnterCarSA : public virtual CTaskComplexSA
 {
 public:
-    CTaskComplexEnterCarSA ( void ) {};
-    CTaskComplexEnterCarSA ( CVehicle* pTargetVehicle, const bool bAsDriver, const bool bQuitAfterOpeningDoor, const bool bQuitAfterDraggingPedOut, const bool bCarryOnAfterFallingOff=false );
+    CTaskComplexEnterCarSA(void){};
+    CTaskComplexEnterCarSA(CVehicle* pTargetVehicle, const bool bAsDriver, const bool bQuitAfterOpeningDoor, const bool bQuitAfterDraggingPedOut,
+                           const bool bCarryOnAfterFallingOff = false);
 
-    int     GetTargetDoor() 
-    { 
-        CTaskComplexEnterCarSAInterface * thisInterface = (CTaskComplexEnterCarSAInterface*)this->GetInterface();
+    int GetTargetDoor()
+    {
+        CTaskComplexEnterCarSAInterface* thisInterface = (CTaskComplexEnterCarSAInterface*)this->GetInterface();
         return thisInterface->m_iTargetDoor;
     }
-    void    SetTargetDoor( int iDoor )
+    void SetTargetDoor(int iDoor)
     {
-        CTaskComplexEnterCarSAInterface * thisInterface = (CTaskComplexEnterCarSAInterface*)this->GetInterface();
+        CTaskComplexEnterCarSAInterface* thisInterface = (CTaskComplexEnterCarSAInterface*)this->GetInterface();
         thisInterface->m_iTargetDoor = iDoor;
     }
 
-    int     GetEnterCarStartTime()     
-    { 
-        CTaskComplexEnterCarSAInterface * thisInterface = (CTaskComplexEnterCarSAInterface*)this->GetInterface();
+    int GetEnterCarStartTime()
+    {
+        CTaskComplexEnterCarSAInterface* thisInterface = (CTaskComplexEnterCarSAInterface*)this->GetInterface();
         return thisInterface->m_iEnterCarStartTime;
     }
 };
 
 // ##############################################################################
-// ## Name:    CTaskComplexEnterCarAsDriver                                    
+// ## Name:    CTaskComplexEnterCarAsDriver
 // ## Purpose: Makes the ped enter the specified vehicle
 // ##############################################################################
 
 class CTaskComplexEnterCarAsDriverSAInterface : public CTaskComplexEnterCarSAInterface
 {
 public:
-
 };
 
 class CTaskComplexEnterCarAsDriverSA : public virtual CTaskComplexEnterCarSA, public virtual CTaskComplexEnterCarAsDriver
 {
 public:
-    CTaskComplexEnterCarAsDriverSA ( void ) {};
-    CTaskComplexEnterCarAsDriverSA ( CVehicle* pTargetVehicle );
-    
+    CTaskComplexEnterCarAsDriverSA(void){};
+    CTaskComplexEnterCarAsDriverSA(CVehicle* pTargetVehicle);
+
     // from CTaskComplexEnterCarSA
-    int     GetTargetDoor() { return CTaskComplexEnterCarSA::GetTargetDoor(); };
-    void    SetTargetDoor(int iDoor) { return CTaskComplexEnterCarSA::SetTargetDoor(iDoor); };
-    int     GetEnterCarStartTime() { return CTaskComplexEnterCarSA::GetEnterCarStartTime(); };
+    int  GetTargetDoor() { return CTaskComplexEnterCarSA::GetTargetDoor(); };
+    void SetTargetDoor(int iDoor) { return CTaskComplexEnterCarSA::SetTargetDoor(iDoor); };
+    int  GetEnterCarStartTime() { return CTaskComplexEnterCarSA::GetEnterCarStartTime(); };
 };
 
 // ##############################################################################
-// ## Name:    CTaskComplexEnterCarAsPassenger                                    
+// ## Name:    CTaskComplexEnterCarAsPassenger
 // ## Purpose: Makes the ped enter the specified vehicle as a passenger
 // ##############################################################################
 
 class CTaskComplexEnterCarAsPassengerSAInterface : public CTaskComplexEnterCarSAInterface
 {
 public:
-
 };
 
 class CTaskComplexEnterCarAsPassengerSA : public virtual CTaskComplexEnterCarSA, public virtual CTaskComplexEnterCarAsPassenger
 {
 public:
-    CTaskComplexEnterCarAsPassengerSA ( void ) {};
-    CTaskComplexEnterCarAsPassengerSA ( CVehicle* pTargetVehicle, const int iTargetSeat=0, const bool bCarryOnAfterFallingOff=false );
-    
+    CTaskComplexEnterCarAsPassengerSA(void){};
+    CTaskComplexEnterCarAsPassengerSA(CVehicle* pTargetVehicle, const int iTargetSeat = 0, const bool bCarryOnAfterFallingOff = false);
+
     // from CTaskComplexEnterCarSA
-    int     GetTargetDoor() { return CTaskComplexEnterCarSA::GetTargetDoor(); };
-    void    SetTargetDoor(int iDoor) { return CTaskComplexEnterCarSA::SetTargetDoor(iDoor); };
-    int     GetEnterCarStartTime() { return CTaskComplexEnterCarSA::GetEnterCarStartTime(); };
+    int  GetTargetDoor() { return CTaskComplexEnterCarSA::GetTargetDoor(); };
+    void SetTargetDoor(int iDoor) { return CTaskComplexEnterCarSA::SetTargetDoor(iDoor); };
+    int  GetEnterCarStartTime() { return CTaskComplexEnterCarSA::GetEnterCarStartTime(); };
 };
 
 // ##############################################################################
-// ## Name:    CTaskComplexEnterBoatAsDriver                                    
+// ## Name:    CTaskComplexEnterBoatAsDriver
 // ## Purpose: Makes the ped enter the specified boat as the driver
 // ##############################################################################
 
 class CTaskComplexEnterBoatAsDriverSAInterface : public CTaskComplexSAInterface
 {
 public:
-
 };
 
 class CTaskComplexEnterBoatAsDriverSA : public virtual CTaskComplexSA, public virtual CTaskComplexEnterBoatAsDriver
 {
 public:
-    CTaskComplexEnterBoatAsDriverSA ( void ) {};
-    CTaskComplexEnterBoatAsDriverSA ( CVehicle* pTargetVehicle );
+    CTaskComplexEnterBoatAsDriverSA(void){};
+    CTaskComplexEnterBoatAsDriverSA(CVehicle* pTargetVehicle);
 };
 
 // ##############################################################################
-// ## Name:    CTaskComplexLeaveCar                                    
+// ## Name:    CTaskComplexLeaveCar
 // ## Purpose: Makes the ped leave a specific vehicle
 // ##############################################################################
 
 class CTaskComplexLeaveCarSAInterface : public CTaskComplexSAInterface
 {
 public:
-    CVehicle* m_pTargetVehicle;    
-    int m_iTargetDoor;
-    int m_iDelayTime;
-    bool m_bSensibleLeaveCar;
-    bool m_bForceGetOut;
+    CVehicle* m_pTargetVehicle;
+    int       m_iTargetDoor;
+    int       m_iDelayTime;
+    bool      m_bSensibleLeaveCar;
+    bool      m_bForceGetOut;
 
     bool m_bDie;
 
     unsigned char m_nDoorFlagsSet;
     unsigned char m_nNumGettingInSet;
-    
+
     AnimationId m_dieAnim;
-    float m_fDieAnimBlendDelta;
-    float m_fDieAnimSpeed;
-    
+    float       m_fDieAnimBlendDelta;
+    float       m_fDieAnimSpeed;
+
     unsigned char m_bIsInAir;
 };
 
 class CTaskComplexLeaveCarSA : public virtual CTaskComplexSA, public virtual CTaskComplexLeaveCar
 {
 public:
-    CTaskComplexLeaveCarSA ( void ) {};
-    CTaskComplexLeaveCarSA ( CVehicle* pTargetVehicle, const int iTargetDoor=0, const int iDelayTime=0, const bool bSensibleLeaveCar=true, const bool bForceGetOut=false );
+    CTaskComplexLeaveCarSA(void){};
+    CTaskComplexLeaveCarSA(CVehicle* pTargetVehicle, const int iTargetDoor = 0, const int iDelayTime = 0, const bool bSensibleLeaveCar = true,
+                           const bool bForceGetOut = false);
 
-    int     GetTargetDoor() 
-    { 
-        CTaskComplexLeaveCarSAInterface * thisInterface = (CTaskComplexLeaveCarSAInterface*)this->GetInterface();
+    int GetTargetDoor()
+    {
+        CTaskComplexLeaveCarSAInterface* thisInterface = (CTaskComplexLeaveCarSAInterface*)this->GetInterface();
         return thisInterface->m_iTargetDoor;
     }
 };
-
-
-#endif

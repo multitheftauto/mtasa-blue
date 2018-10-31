@@ -1,26 +1,20 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/ASE.h
-*  PURPOSE:     All-Seeing Eye server query protocol handler class
-*  DEVELOPERS:  Derek Abdine <>
-*               Christian Myhre Lundheim <>
-*               Jax <>
-*               Stanislav Bobrov <lil_toady@hotmail.com>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/ASE.h
+ *  PURPOSE:     All-Seeing Eye server query protocol handler class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 class ASE;
 
-#ifndef __ASE_H__
-#define __ASE_H__
+#pragma once
 
 #ifdef WIN32
     #include <conio.h>
-    #include <winsock.h>
     #define sockclose closesocket
 #else
     #include <sys/socket.h>
@@ -28,7 +22,7 @@ class ASE;
     #include <netinet/in.h>
     #include <arpa/inet.h>
     #define sockclose close
-    typedef int SOCKET;
+typedef int SOCKET;
 #endif
 
 #include <string.h>
@@ -52,116 +46,110 @@ class ASE
 {
 public:
     ZERO_ON_NEW
-                            ASE                      ( CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const SString& strServerIPList );
-                            ~ASE                     ( void );
+    ASE(CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const SString& strServerIPList);
+    ~ASE(void);
 
-    void                    DoPulse                  ( void );
-    bool                    SetPortEnabled           ( bool bInternetEnabled, bool bLanEnabled );
+    void DoPulse(void);
+    bool SetPortEnabled(bool bInternetEnabled, bool bLanEnabled);
 
-    static ASE*             GetInstance              ( void )                { return _instance; }
+    static ASE* GetInstance(void) { return _instance; }
 
-    unsigned long           GetMasterServerQueryCount ( void )          { return m_ulMasterServerQueryCount; }
-    uint                    GetTotalQueryCount      ( void )            { return m_uiNumQueriesTotal; }
-    uint                    GetQueriesPerMinute     ( void )            { return m_uiNumQueriesPerMinute; }
+    unsigned long GetMasterServerQueryCount(void) { return m_ulMasterServerQueryCount; }
+    uint          GetTotalQueryCount(void) { return m_uiNumQueriesTotal; }
+    uint          GetQueriesPerMinute(void) { return m_uiNumQueriesPerMinute; }
 
-    CLanBroadcast*          InitLan             ( void );
+    CLanBroadcast* InitLan(void);
 
-    const char*             GetGameType         ( void )                { return m_strGameType.c_str(); }
-    void                    SetGameType         ( const char * szGameType );
-    const char*             GetMapName          ( void )                { return m_strMapName.c_str(); }
-    void                    SetMapName          ( const char * szMapName );
+    const char* GetGameType(void) { return m_strGameType.c_str(); }
+    void        SetGameType(const char* szGameType);
+    const char* GetMapName(void) { return m_strMapName.c_str(); }
+    void        SetMapName(const char* szMapName);
 
-    CMainConfig*            GetMainConfig       ( void )                { return m_pMainConfig; };
-    CPlayerManager*         GetPlayerManager    ( void )                { return m_pPlayerManager; };
+    CMainConfig*    GetMainConfig(void) { return m_pMainConfig; };
+    CPlayerManager* GetPlayerManager(void) { return m_pPlayerManager; };
 
-    const char*             GetRuleValue        ( const char* szKey );
-    void                    SetRuleValue        ( const char* szKey, const char* szValue );
-    bool                    RemoveRuleValue     ( const char* szKey );
-    void                    ClearRules          ( void );
+    const char* GetRuleValue(const char* szKey);
+    void        SetRuleValue(const char* szKey, const char* szValue);
+    bool        RemoveRuleValue(const char* szKey);
+    void        ClearRules(void);
 
-    list < CASERule* > ::iterator IterBegin     ( void )                { return m_Rules.begin (); }
-    list < CASERule* > ::iterator IterEnd       ( void )                { return m_Rules.end (); }
+    list<CASERule*>::iterator IterBegin(void) { return m_Rules.begin(); }
+    list<CASERule*>::iterator IterEnd(void) { return m_Rules.end(); }
 
-    std::string             QueryLight               ( void );
+    std::string QueryLight(void);
+
 private:
-    const std::string*      QueryFullCached          ( void );
-    std::string             QueryFull                ( void );
-    const std::string*      QueryLightCached         ( void );
-    const std::string*      QueryXfireLightCached    ( void );
-    std::string             QueryXfireLight          ( void );
+    const std::string* QueryFullCached(void);
+    std::string        QueryFull(void);
+    const std::string* QueryLightCached(void);
+    const std::string* QueryXfireLightCached(void);
+    std::string        QueryXfireLight(void);
 
-    long long               m_llCurrentTime;
-    uint                    m_uiCurrentPlayerCount;
+    long long m_llCurrentTime;
+    uint      m_uiCurrentPlayerCount;
 
-    CMainConfig*            m_pMainConfig;
-    CPlayerManager*         m_pPlayerManager;
+    CMainConfig*    m_pMainConfig;
+    CPlayerManager* m_pPlayerManager;
 
-    std::string             m_strGameType;
-    SString                 m_strMapName;
-    SString                 m_strIPList;
-    std::string             m_strPort;
+    std::string m_strGameType;
+    SString     m_strMapName;
+    SString     m_strIPList;
+    std::string m_strPort;
 
-    static ASE*             _instance;
-    time_t                  m_tStartTime;
+    static ASE* _instance;
+    time_t      m_tStartTime;
 
-    list < CASERule* >      m_Rules;
+    list<CASERule*> m_Rules;
 
-    std::vector < SOCKET >  m_SocketList;
+    std::vector<SOCKET> m_SocketList;
 
-    unsigned short          m_usPortBase;
-    unsigned short          m_usPort;
+    unsigned short m_usPortBase;
+    unsigned short m_usPort;
 
     // Full query cache
-    unsigned int            m_uiFullLastPlayerCount;
-    long long               m_llFullLastTime;
-    long                    m_lFullMinInterval;
-    std::string             m_strFullCached;
+    unsigned int m_uiFullLastPlayerCount;
+    long long    m_llFullLastTime;
+    long         m_lFullMinInterval;
+    std::string  m_strFullCached;
 
     // Light query cache
-    unsigned int            m_uiLightLastPlayerCount;
-    long long               m_llLightLastTime;
-    long                    m_lLightMinInterval;
-    std::string             m_strLightCached;
+    unsigned int m_uiLightLastPlayerCount;
+    long long    m_llLightLastTime;
+    long         m_lLightMinInterval;
+    std::string  m_strLightCached;
 
     // XFire Light query cache
-    unsigned int            m_uiXfireLightLastPlayerCount;
-    long long               m_llXfireLightLastTime;
-    long                    m_lXfireLightMinInterval;
-    std::string             m_strXfireLightCached;
+    unsigned int m_uiXfireLightLastPlayerCount;
+    long long    m_llXfireLightLastTime;
+    long         m_lXfireLightMinInterval;
+    std::string  m_strXfireLightCached;
 
-    std::string             m_strMtaAseVersion;
+    std::string m_strMtaAseVersion;
 
     // Stats
-    unsigned long           m_ulMasterServerQueryCount;
-    uint                    m_uiNumQueriesTotal;
-    uint                    m_uiNumQueriesPerMinute;
-    uint                    m_uiTotalAtMinuteStart;
-    CElapsedTime            m_MinuteTimer;
+    unsigned long m_ulMasterServerQueryCount;
+    uint          m_uiNumQueriesTotal;
+    uint          m_uiNumQueriesPerMinute;
+    uint          m_uiTotalAtMinuteStart;
+    CElapsedTime  m_MinuteTimer;
 
-    CConnectHistory         m_QueryDosProtect;
+    CConnectHistory m_QueryDosProtect;
 };
 
 class CASERule
 {
 public:
-    inline              CASERule        ( const char* szKey, const char* szValue )
+    CASERule(const char* szKey, const char* szValue)
     {
         m_strKey = szKey;
         m_strValue = szValue;
     }
-    inline const char*  GetKey          ( void )            { return m_strKey.c_str (); }
-    inline void         SetKey          ( const char* szKey )
-    {
-        m_strKey = szKey;
-    }
-    inline const char*  GetValue          ( void )          { return m_strValue.c_str (); }
-    inline void         SetValue          ( const char* szValue )
-    {
-        m_strValue = szValue;
-    }
-private:
-    std::string         m_strKey;
-    std::string         m_strValue;
-};
+    const char* GetKey(void) { return m_strKey.c_str(); }
+    void        SetKey(const char* szKey) { m_strKey = szKey; }
+    const char* GetValue(void) { return m_strValue.c_str(); }
+    void        SetValue(const char* szValue) { m_strValue = szValue; }
 
-#endif
+private:
+    std::string m_strKey;
+    std::string m_strValue;
+};

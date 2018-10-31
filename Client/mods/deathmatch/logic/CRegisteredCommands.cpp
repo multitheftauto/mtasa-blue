@@ -1,89 +1,83 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CRegisteredCommands.cpp
-*  PURPOSE:     Registered commands class
-*  DEVELOPERS:  Jax <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*               Alberto Alonso <rydencillo@gmail.com>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CRegisteredCommands.cpp
+ *  PURPOSE:     Registered commands class
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
 using std::list;
 
-CRegisteredCommands::CRegisteredCommands ( void )
+CRegisteredCommands::CRegisteredCommands(void)
 {
     m_bIteratingList = false;
 }
 
-
-CRegisteredCommands::~CRegisteredCommands ( void )
+CRegisteredCommands::~CRegisteredCommands(void)
 {
-    ClearCommands ();
+    ClearCommands();
 }
 
-
-bool CRegisteredCommands::AddCommand ( CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction, bool bCaseSensitive )
+bool CRegisteredCommands::AddCommand(CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction, bool bCaseSensitive)
 {
-    assert ( pLuaMain );
-    assert ( szKey );
+    assert(pLuaMain);
+    assert(szKey);
 
     // Check if we already have this key and handler
-    SCommand* pCommand = GetCommand ( szKey, pLuaMain );
-    if ( pCommand )
+    SCommand* pCommand = GetCommand(szKey, pLuaMain);
+    if (pCommand)
     {
-        if ( pCommand->iLuaFunction == iLuaFunction )
+        if (pCommand->iLuaFunction == iLuaFunction)
             return false;
     }
 
     // Create the entry
     pCommand = new SCommand;
     pCommand->pLuaMain = pLuaMain;
-    pCommand->strKey.AssignLeft ( szKey, MAX_REGISTERED_COMMAND_LENGTH );
+    pCommand->strKey.AssignLeft(szKey, MAX_REGISTERED_COMMAND_LENGTH);
     pCommand->iLuaFunction = iLuaFunction;
     pCommand->bCaseSensitive = bCaseSensitive;
 
     // Add it to our list
-    m_Commands.push_back ( pCommand );
+    m_Commands.push_back(pCommand);
     return true;
 }
 
-
-bool CRegisteredCommands::RemoveCommand ( CLuaMain* pLuaMain, const char* szKey )
+bool CRegisteredCommands::RemoveCommand(CLuaMain* pLuaMain, const char* szKey)
 {
-    assert ( pLuaMain );
-    assert ( szKey );
+    assert(pLuaMain);
+    assert(szKey);
 
     // Call the handler for every virtual machine that matches the given key
-    bool bFound = false;
-    list < SCommand* > ::iterator iter = m_Commands.begin ();
-    int iCompareResult;
+    bool                      bFound = false;
+    list<SCommand*>::iterator iter = m_Commands.begin();
+    int                       iCompareResult;
 
-    while ( iter != m_Commands.end () )
+    while (iter != m_Commands.end())
     {
-        if ( (*iter)->bCaseSensitive )
-            iCompareResult = strcmp ( (*iter)->strKey, szKey );
+        if ((*iter)->bCaseSensitive)
+            iCompareResult = strcmp((*iter)->strKey, szKey);
         else
-            iCompareResult = stricmp ( (*iter)->strKey, szKey );
+            iCompareResult = stricmp((*iter)->strKey, szKey);
 
         // Matching vm's and names?
-        if ( (*iter)->pLuaMain == pLuaMain && iCompareResult == 0 )
+        if ((*iter)->pLuaMain == pLuaMain && iCompareResult == 0)
         {
             bFound = true;
             // Delete it and remove it from our list
-            if ( m_bIteratingList )
+            if (m_bIteratingList)
             {
-                m_TrashCan.push_back ( *iter );
+                m_TrashCan.push_back(*iter);
             }
             else
             {
                 delete *iter;
-                m_Commands.erase ( iter );
-                iter = m_Commands.begin ();
+                m_Commands.erase(iter);
+                iter = m_Commands.begin();
                 continue;
             }
         }
@@ -93,35 +87,33 @@ bool CRegisteredCommands::RemoveCommand ( CLuaMain* pLuaMain, const char* szKey 
     return bFound;
 }
 
-
-void CRegisteredCommands::ClearCommands ( void )
+void CRegisteredCommands::ClearCommands(void)
 {
     // Delete all the commands
-    list < SCommand* > ::const_iterator iter = m_Commands.begin ();
-    for ( ; iter != m_Commands.end (); iter++ )
+    list<SCommand*>::const_iterator iter = m_Commands.begin();
+    for (; iter != m_Commands.end(); iter++)
     {
         delete *iter;
     }
 
     // Clear the list
-    m_Commands.clear ();
+    m_Commands.clear();
 }
 
-
-void CRegisteredCommands::CleanUpForVM ( CLuaMain* pLuaMain )
+void CRegisteredCommands::CleanUpForVM(CLuaMain* pLuaMain)
 {
-    assert ( pLuaMain );
+    assert(pLuaMain);
 
     // Delete every command that matches
-    list < SCommand* > ::iterator iter = m_Commands.begin ();
-    for ( ; iter != m_Commands.end (); )
+    list<SCommand*>::iterator iter = m_Commands.begin();
+    for (; iter != m_Commands.end();)
     {
         // Matching VM's?
-        if ( (*iter)->pLuaMain == pLuaMain )
+        if ((*iter)->pLuaMain == pLuaMain)
         {
             // Delete the entry and remove it from the list
             delete *iter;
-            iter = m_Commands.erase ( iter );
+            iter = m_Commands.erase(iter);
         }
         else
         {
@@ -130,64 +122,61 @@ void CRegisteredCommands::CleanUpForVM ( CLuaMain* pLuaMain )
     }
 }
 
-
-bool CRegisteredCommands::CommandExists ( const char* szKey, CLuaMain* pLuaMain )
+bool CRegisteredCommands::CommandExists(const char* szKey, CLuaMain* pLuaMain)
 {
-    assert ( szKey );
+    assert(szKey);
 
-    return GetCommand ( szKey, pLuaMain ) != NULL;
+    return GetCommand(szKey, pLuaMain) != NULL;
 }
 
-
-bool CRegisteredCommands::ProcessCommand ( const char* szKey, const char* szArguments )
+bool CRegisteredCommands::ProcessCommand(const char* szKey, const char* szArguments)
 {
-    assert ( szKey );
+    assert(szKey);
 
     // Call the handler for every virtual machine that matches the given key
-    int iCompareResult;
+    int  iCompareResult;
     bool bHandled = false;
     m_bIteratingList = true;
-    list < SCommand* > ::const_iterator iter = m_Commands.begin ();
-    for ( ; iter != m_Commands.end (); iter++ )
+    list<SCommand*>::const_iterator iter = m_Commands.begin();
+    for (; iter != m_Commands.end(); iter++)
     {
-        if ( (*iter)->bCaseSensitive )
-            iCompareResult = strcmp ( (*iter)->strKey, szKey );
+        if ((*iter)->bCaseSensitive)
+            iCompareResult = strcmp((*iter)->strKey, szKey);
         else
-            iCompareResult = stricmp ( (*iter)->strKey, szKey );
+            iCompareResult = stricmp((*iter)->strKey, szKey);
 
         // Matching names?
-        if ( iCompareResult == 0 )
+        if (iCompareResult == 0)
         {
             // Call it
-            CallCommandHandler ( (*iter)->pLuaMain, (*iter)->iLuaFunction, szKey, szArguments );
+            CallCommandHandler((*iter)->pLuaMain, (*iter)->iLuaFunction, (*iter)->strKey, szArguments);
             bHandled = true;
         }
     }
     m_bIteratingList = false;
-    TakeOutTheTrash ();
+    TakeOutTheTrash();
 
     // Return whether some handler was called or not
     return bHandled;
 }
 
-
-CRegisteredCommands::SCommand* CRegisteredCommands::GetCommand ( const char* szKey, class CLuaMain* pLuaMain )
+CRegisteredCommands::SCommand* CRegisteredCommands::GetCommand(const char* szKey, class CLuaMain* pLuaMain)
 {
-    assert ( szKey );
+    assert(szKey);
 
     // Try to find an entry with a matching name in our list
-    list < SCommand* > ::const_iterator iter = m_Commands.begin ();
-    int iCompareResult;
+    list<SCommand*>::const_iterator iter = m_Commands.begin();
+    int                             iCompareResult;
 
-    for ( ; iter != m_Commands.end (); iter++ )
+    for (; iter != m_Commands.end(); iter++)
     {
-        if ( (*iter)->bCaseSensitive )
-            iCompareResult = strcmp ( (*iter)->strKey, szKey );
+        if ((*iter)->bCaseSensitive)
+            iCompareResult = strcmp((*iter)->strKey, szKey);
         else
-            iCompareResult = stricmp ( (*iter)->strKey, szKey );
+            iCompareResult = stricmp((*iter)->strKey, szKey);
 
         // Matching name and no given VM or matching VM
-        if ( iCompareResult == 0 && ( !pLuaMain || pLuaMain == (*iter)->pLuaMain ) )
+        if (iCompareResult == 0 && (!pLuaMain || pLuaMain == (*iter)->pLuaMain))
         {
             return *iter;
         }
@@ -197,43 +186,42 @@ CRegisteredCommands::SCommand* CRegisteredCommands::GetCommand ( const char* szK
     return NULL;
 }
 
-
-void CRegisteredCommands::CallCommandHandler ( CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, const char* szKey, const char* szArguments )
+void CRegisteredCommands::CallCommandHandler(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, const char* szKey, const char* szArguments)
 {
-    assert ( pLuaMain );
-    assert ( szKey );
+    assert(pLuaMain);
+    assert(szKey);
 
     CLuaArguments Arguments;
-    Arguments.PushString ( szKey );
+    Arguments.PushString(szKey);
 
-    if ( szArguments )
+    if (szArguments)
     {
         // Create a copy and strtok modifies the string
-        char * szTempArguments = new char[strlen(szArguments) + 1];
-        strcpy ( szTempArguments, szArguments );
-        char * arg;
-        arg = strtok ( szTempArguments, " " );
-        while ( arg )
+        char* szTempArguments = new char[strlen(szArguments) + 1];
+        strcpy(szTempArguments, szArguments);
+        char* arg;
+        arg = strtok(szTempArguments, " ");
+        while (arg)
         {
-            Arguments.PushString ( arg );
-            arg = strtok ( NULL, " " );
+            Arguments.PushString(arg);
+            arg = strtok(NULL, " ");
         }
-        delete [] szTempArguments;
+        delete[] szTempArguments;
     }
 
     // Call the handler with the arguments we pushed
-    Arguments.Call ( pLuaMain, iLuaFunction );
+    Arguments.Call(pLuaMain, iLuaFunction);
 }
 
-
-void CRegisteredCommands::TakeOutTheTrash ( void )
+void CRegisteredCommands::TakeOutTheTrash(void)
 {
-    list < SCommand* > ::iterator iter = m_TrashCan.begin ();
-    for ( ; iter != m_TrashCan.end (); iter++ )
+    list<SCommand*>::iterator iter = m_TrashCan.begin();
+    for (; iter != m_TrashCan.end(); iter++)
     {
         SCommand* pCommand = *iter;
-        if ( !m_Commands.empty() ) m_Commands.remove ( pCommand );
+        if (!m_Commands.empty())
+            m_Commands.remove(pCommand);
         delete pCommand;
     }
-    m_TrashCan.clear ();
+    m_TrashCan.clear();
 }

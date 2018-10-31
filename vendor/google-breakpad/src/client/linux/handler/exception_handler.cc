@@ -118,7 +118,7 @@ namespace {
 // all these signals must be Core (see man 7 signal) because we rethrow the
 // signal after handling it and expect that it'll be fatal.
 const int kExceptionSignals[] = {
-  SIGSEGV, SIGABRT, SIGFPE, SIGILL, SIGBUS
+  SIGSEGV, SIGABRT, SIGFPE, SIGILL, SIGBUS, SIGTRAP
 };
 const int kNumHandledSignals =
     sizeof(kExceptionSignals) / sizeof(kExceptionSignals[0]);
@@ -212,6 +212,12 @@ void InstallDefaultHandler(int sig) {
 std::vector<ExceptionHandler*>* g_handler_stack_ = NULL;
 pthread_mutex_t g_handler_stack_mutex_ = PTHREAD_MUTEX_INITIALIZER;
 
+// sizeof(CrashContext) can be too big w.r.t the size of alternatate stack
+// for SignalHandler(). Keep the crash context as a .bss field. Exception
+// handlers are serialized by the |g_handler_stack_mutex_| and at most one at a
+// time can use |g_crash_context_|.
+ExceptionHandler::CrashContext g_crash_context_;
+
 }  // namespace
 
 // Runs before crashing: normal context.
@@ -239,6 +245,11 @@ ExceptionHandler::ExceptionHandler(const MinidumpDescriptor& descriptor,
 #endif
 
   pthread_mutex_lock(&g_handler_stack_mutex_);
+
+  // Pre-fault the crash context struct. This is to avoid failing due to OOM
+  // if handling an exception when the process ran out of virtual memory.
+  memset(&g_crash_context_, 0, sizeof(g_crash_context_));
+
   if (!g_handler_stack_)
     g_handler_stack_ = new std::vector<ExceptionHandler*>;
   if (install_handler) {
@@ -424,36 +435,37 @@ bool ExceptionHandler::HandleSignal(int sig, siginfo_t* info, void* uc) {
   if (signal_trusted || (signal_pid_trusted && info->si_pid == getpid())) {
     sys_prctl(PR_SET_DUMPABLE, 1, 0, 0, 0);
   }
-  CrashContext context;
+
   // Fill in all the holes in the struct to make Valgrind happy.
-  memset(&context, 0, sizeof(context));
-  memcpy(&context.siginfo, info, sizeof(siginfo_t));
-  memcpy(&context.context, uc, sizeof(struct ucontext));
+  memset(&g_crash_context_, 0, sizeof(g_crash_context_));
+  memcpy(&g_crash_context_.siginfo, info, sizeof(siginfo_t));
+  memcpy(&g_crash_context_.context, uc, sizeof(struct ucontext));
 #if defined(__aarch64__)
-  struct ucontext *uc_ptr = (struct ucontext*)uc;
-  struct fpsimd_context *fp_ptr =
+  struct ucontext* uc_ptr = (struct ucontext*)uc;
+  struct fpsimd_context* fp_ptr =
       (struct fpsimd_context*)&uc_ptr->uc_mcontext.__reserved;
   if (fp_ptr->head.magic == FPSIMD_MAGIC) {
-    memcpy(&context.float_state, fp_ptr, sizeof(context.float_state));
+    memcpy(&g_crash_context_.float_state, fp_ptr,
+           sizeof(g_crash_context_.float_state));
   }
-#elif !defined(__ARM_EABI__)  && !defined(__mips__)
+#elif !defined(__ARM_EABI__) && !defined(__mips__)
   // FP state is not part of user ABI on ARM Linux.
   // In case of MIPS Linux FP state is already part of struct ucontext
   // and 'float_state' is not a member of CrashContext.
-  struct ucontext *uc_ptr = (struct ucontext*)uc;
+  struct ucontext* uc_ptr = (struct ucontext*)uc;
   if (uc_ptr->uc_mcontext.fpregs) {
-    memcpy(&context.float_state,
-           uc_ptr->uc_mcontext.fpregs,
-           sizeof(context.float_state));
+    memcpy(&g_crash_context_.float_state, uc_ptr->uc_mcontext.fpregs,
+           sizeof(g_crash_context_.float_state));
   }
 #endif
-  context.tid = syscall(__NR_gettid);
+  g_crash_context_.tid = syscall(__NR_gettid);
   if (crash_handler_ != NULL) {
-    if (crash_handler_(&context, sizeof(context), callback_context_)) {
+    if (crash_handler_(&g_crash_context_, sizeof(g_crash_context_),
+                       callback_context_)) {
       return true;
     }
   }
-  return GenerateDump(&context);
+  return GenerateDump(&g_crash_context_);
 }
 
 // This is a public interface to HandleSignal that allows the client to
@@ -580,8 +592,7 @@ bool ExceptionHandler::DoDump(pid_t crashing_process, const void* context,
         context,
         context_size,
         mapping_list_,
-        minidump_descriptor_.microdump_build_fingerprint(),
-        minidump_descriptor_.microdump_product_info());
+        *minidump_descriptor_.microdump_extra_info());
   }
   if (minidump_descriptor_.IsFD()) {
     return google_breakpad::WriteMinidump(minidump_descriptor_.fd(),

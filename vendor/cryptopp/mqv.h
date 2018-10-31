@@ -22,6 +22,7 @@ NAMESPACE_BEGIN(CryptoPP)
 //! \details GROUP_PARAMETERS paramters include the curve coefcients and the base point.
 //!   Binary curves use a polynomial to represent its characteristic, while prime curves
 //!   use a prime number.
+//! \sa MQV, HMQV, FHMQV, and AuthenticatedKeyAgreementDomain
 template <class GROUP_PARAMETERS, class COFACTOR_OPTION = CPP_TYPENAME GROUP_PARAMETERS::DefaultCofactorOption>
 class MQV_Domain : public AuthenticatedKeyAgreementDomain
 {
@@ -46,7 +47,7 @@ public:
 	//! \brief Construct a MQV domain
 	//! \tparam T1 template parameter used as a constructor parameter
 	//! \tparam T2 template parameter used as a constructor parameter
-	//! \param v1 first parameter 
+	//! \param v1 first parameter
 	//! \param v2 second parameter
 	//! \details v1 and v2 are passed directly to the GROUP_PARAMETERS object.
 	template <class T1, class T2>
@@ -57,7 +58,7 @@ public:
 	//! \tparam T1 template parameter used as a constructor parameter
 	//! \tparam T2 template parameter used as a constructor parameter
 	//! \tparam T3 template parameter used as a constructor parameter
-	//! \param v1 first parameter 
+	//! \param v1 first parameter
 	//! \param v2 second parameter
 	//! \param v3 third parameter
 	//! \details v1, v2 and v3 are passed directly to the GROUP_PARAMETERS object.
@@ -70,7 +71,7 @@ public:
 	//! \tparam T2 template parameter used as a constructor parameter
 	//! \tparam T3 template parameter used as a constructor parameter
 	//! \tparam T4 template parameter used as a constructor parameter
-	//! \param v1 first parameter 
+	//! \param v1 first parameter
 	//! \param v2 second parameter
 	//! \param v3 third parameter
 	//! \param v4 third parameter
@@ -156,7 +157,7 @@ public:
 	}
 
 	bool Agree(byte *agreedValue,
-		const byte *staticPrivateKey, const byte *ephemeralPrivateKey, 
+		const byte *staticPrivateKey, const byte *ephemeralPrivateKey,
 		const byte *staticOtherPublicKey, const byte *ephemeralOtherPublicKey,
 		bool validateStaticOtherPublicKey=true) const
 	{
@@ -212,6 +213,7 @@ private:
 };
 
 //! Menezes-Qu-Vanstone in GF(p) with key validation, AKA <a href="http://www.weidai.com/scan-mirror/ka.html#MQV">MQV</a>
+//! \sa MQV, HMQV_Domain, FHMQV_Domain, AuthenticatedKeyAgreementDomain
 typedef MQV_Domain<DL_GroupParameters_GFP_DefaultSafePrime> MQV;
 
 NAMESPACE_END

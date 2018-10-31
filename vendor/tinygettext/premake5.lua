@@ -19,3 +19,6 @@ project "tinygettext"
 	
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 
+	
+	filter "system:windows"
+		disablewarnings { "4800", "4309", "4503", "4099", "4503" }

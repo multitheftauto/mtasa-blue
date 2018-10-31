@@ -34,7 +34,6 @@
 #include <iomanip>
 #include <functional>
 
-
 // Localization
 #include "../../vendor/tinygettext/tinygettext.hpp"
 #include "CLocalization.h"
@@ -55,19 +54,18 @@
 #include "CCore.h"
 #include "CDebugView.h"
 #include "CChat.h"
-#include "CDirect3DHookManager.h"
-#include "CDirectInputHookManager.h"
-#include "CDirect3DEvents9.h"
-#include "CProxyDirectInput8.h"
-#include "CProxyDirect3D9.h"
-#include "CPEHookUtils.h"
+#include <DXHook/CDirect3DHookManager.h>
+#include <DXHook/CDirectInputHookManager.h>
+#include <DXHook/CDirect3DEvents9.h>
+#include <DXHook/CProxyDirectInput8.h>
+#include <DXHook/CProxyDirect3D9.h>
 #include "CCommandFuncs.h"
 #include "CExceptionInformation_Impl.h"
 #include "CJoystickManager.h"
-#include "CVideoModeManager.h"
-#include "CServerCache.h"
+#include <Graphics/CVideoModeManager.h>
 #include "CCrashDumpWriter.h"
 #include "CMemStats.h"
 #include "CGraphStats.h"
 #include "CNickGen.h"
-#include "CWebView.h"
+#include <core/CWebViewInterface.h>
+#include "CTrayIcon.h"

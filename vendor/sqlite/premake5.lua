@@ -15,3 +15,6 @@ project "sqlite"
 		"*.c"
 	}
 	
+	filter {"system:windows"}
+		disablewarnings { "4996" }
+	

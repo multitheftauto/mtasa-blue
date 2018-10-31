@@ -1,19 +1,19 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CSettingsSA.cpp
-*  PURPOSE:     Game settings
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CSettingsSA.cpp
+ *  PURPOSE:     Game settings
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-static const float MOUSE_SENSITIVITY_MIN     = 0.000312f;
+static const float MOUSE_SENSITIVITY_MIN = 0.000312f;
 static const float MOUSE_SENSITIVITY_DEFAULT = 0.0025f;
-static const float MOUSE_SENSITIVITY_MAX     = MOUSE_SENSITIVITY_DEFAULT * 2 - MOUSE_SENSITIVITY_MIN;
+static const float MOUSE_SENSITIVITY_MAX = MOUSE_SENSITIVITY_DEFAULT * 2 - MOUSE_SENSITIVITY_MIN;
 
 unsigned long CSettingsSA::FUNC_GetNumVideoModes;
 unsigned long CSettingsSA::FUNC_GetVideoModeInfo;
@@ -29,40 +29,46 @@ unsigned long CSettingsSA::FUNC_SetSubSystem;
 #define VAR_CurAdapter              (*((uint*)(0x0C920F4)))
 
 #define HOOKPOS_GetFxQuality                0x49EA50
-void HOOK_GetFxQuality ();
+void HOOK_GetFxQuality();
 
 #define HOOKPOS_StoreShadowForVehicle       0x70BDA0
-DWORD RETURN_StoreShadowForVehicle =        0x70BDA9;
-void HOOK_StoreShadowForVehicle ();
+DWORD RETURN_StoreShadowForVehicle = 0x70BDA9;
+void  HOOK_StoreShadowForVehicle();
 
-CSettingsSA::CSettingsSA ( void )
+float ms_fVehicleLODDistance, ms_fTrainPlaneLODDistance, ms_fPedsLODDistance;
+
+CSettingsSA::CSettingsSA(void)
 {
-    m_pInterface = (CSettingsSAInterface *)CLASS_CMenuManager;
+    m_pInterface = (CSettingsSAInterface*)CLASS_CMenuManager;
     m_pInterface->bFrameLimiter = false;
     m_bVolumetricShadowsEnabled = false;
     m_bVolumetricShadowsSuspended = false;
-    SetAspectRatio ( ASPECT_RATIO_4_3 );
-    HookInstall ( HOOKPOS_GetFxQuality, (DWORD)HOOK_GetFxQuality, 5 );
-    HookInstall ( HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9 );
+    SetAspectRatio(ASPECT_RATIO_4_3);
+    HookInstall(HOOKPOS_GetFxQuality, (DWORD)HOOK_GetFxQuality, 5);
+    HookInstall(HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9);
     m_iDesktopWidth = 0;
     m_iDesktopHeight = 0;
-    MemPut < BYTE > ( 0x6FF420, 0xC3 );     // Truncate CalculateAspectRatio
+    MemPut<BYTE>(0x6FF420, 0xC3);            // Truncate CalculateAspectRatio
+
+    MemPut(0x732926, &ms_fVehicleLODDistance);
+    MemPut(0x732940, &ms_fTrainPlaneLODDistance);
+    MemPut(0x73295E, &ms_fPedsLODDistance);
 
     // Set "radar map and radar" as default radar mode
-    SetRadarMode ( RADAR_MODE_ALL );
+    SetRadarMode(RADAR_MODE_ALL);
 }
 
-bool CSettingsSA::IsWideScreenEnabled ( void )
+bool CSettingsSA::IsWideScreenEnabled(void)
 {
     return m_pInterface->bUseWideScreen;
 }
 
-void CSettingsSA::SetWideScreenEnabled ( bool bEnabled )
+void CSettingsSA::SetWideScreenEnabled(bool bEnabled)
 {
     m_pInterface->bUseWideScreen = bEnabled;
 }
 
-unsigned int CSettingsSA::GetNumVideoModes ( void )
+unsigned int CSettingsSA::GetNumVideoModes(void)
 {
     unsigned int uiReturn = 0;
     _asm
@@ -73,7 +79,7 @@ unsigned int CSettingsSA::GetNumVideoModes ( void )
     return uiReturn;
 }
 
-VideoMode * CSettingsSA::GetVideoModeInfo ( VideoMode * modeInfo, unsigned int modeIndex )
+VideoMode* CSettingsSA::GetVideoModeInfo(VideoMode* modeInfo, unsigned int modeIndex)
 {
     VideoMode* pReturn = NULL;
     _asm
@@ -87,7 +93,7 @@ VideoMode * CSettingsSA::GetVideoModeInfo ( VideoMode * modeInfo, unsigned int m
     return pReturn;
 }
 
-unsigned int CSettingsSA::GetCurrentVideoMode ( void )
+unsigned int CSettingsSA::GetCurrentVideoMode(void)
 {
     unsigned int uiReturn = 0;
     _asm
@@ -98,9 +104,9 @@ unsigned int CSettingsSA::GetCurrentVideoMode ( void )
     return uiReturn;
 }
 
-void CSettingsSA::SetCurrentVideoMode ( unsigned int modeIndex, bool bOnRestart )
+void CSettingsSA::SetCurrentVideoMode(unsigned int modeIndex, bool bOnRestart)
 {
-    if ( !bOnRestart )
+    if (!bOnRestart)
     {
         _asm
         {
@@ -110,11 +116,11 @@ void CSettingsSA::SetCurrentVideoMode ( unsigned int modeIndex, bool bOnRestart 
         }
     }
     // Only update settings variables for fullscreen modes
-    if ( modeIndex )
+    if (modeIndex)
         m_pInterface->dwVideoMode = modeIndex;
 }
 
-uint CSettingsSA::GetNumAdapters ( void )
+uint CSettingsSA::GetNumAdapters(void)
 {
     unsigned int uiReturn = 0;
     _asm
@@ -125,7 +131,7 @@ uint CSettingsSA::GetNumAdapters ( void )
     return uiReturn;
 }
 
-void CSettingsSA::SetAdapter ( unsigned int uiAdapterIndex )
+void CSettingsSA::SetAdapter(unsigned int uiAdapterIndex)
 {
     _asm
     {
@@ -135,7 +141,7 @@ void CSettingsSA::SetAdapter ( unsigned int uiAdapterIndex )
     }
 }
 
-unsigned int CSettingsSA::GetCurrentAdapter ( void )
+unsigned int CSettingsSA::GetCurrentAdapter(void)
 {
     unsigned int uiReturn = 0;
     _asm
@@ -146,79 +152,79 @@ unsigned int CSettingsSA::GetCurrentAdapter ( void )
     return uiReturn;
 }
 
-unsigned char CSettingsSA::GetRadioVolume ( void )
+unsigned char CSettingsSA::GetRadioVolume(void)
 {
     return m_pInterface->ucRadioVolume;
 }
 
-void CSettingsSA::SetRadioVolume ( unsigned char ucVolume )
+void CSettingsSA::SetRadioVolume(unsigned char ucVolume)
 {
     m_pInterface->ucRadioVolume = ucVolume;
-    pGame->GetAudioEngine ()->SetMusicMasterVolume ( ucVolume );
+    pGame->GetAudioEngine()->SetMusicMasterVolume(ucVolume);
 }
 
-unsigned char CSettingsSA::GetSFXVolume ( void )
+unsigned char CSettingsSA::GetSFXVolume(void)
 {
     return m_pInterface->ucSfxVolume;
 }
 
-void CSettingsSA::SetSFXVolume ( unsigned char ucVolume )
+void CSettingsSA::SetSFXVolume(unsigned char ucVolume)
 {
     m_pInterface->ucSfxVolume = ucVolume;
-    pGame->GetAudioEngine ()->SetEffectsMasterVolume ( ucVolume );
+    pGame->GetAudioEngine()->SetEffectsMasterVolume(ucVolume);
 }
 
-unsigned int CSettingsSA::GetUsertrackMode ( void )
+unsigned int CSettingsSA::GetUsertrackMode(void)
 {
     // 0 = radio, 1 = random, 2 = sequential
     return m_pInterface->ucUsertrackMode;
 }
 
-void CSettingsSA::SetUsertrackMode ( unsigned int uiMode )
+void CSettingsSA::SetUsertrackMode(unsigned int uiMode)
 {
     m_pInterface->ucUsertrackMode = uiMode;
 }
 
-bool CSettingsSA::IsUsertrackAutoScan ( void )
+bool CSettingsSA::IsUsertrackAutoScan(void)
 {
     // 1 = yes, 0 = no
     return m_pInterface->bUsertrackAutoScan;
 }
 
-void CSettingsSA::SetUsertrackAutoScan ( bool bEnable )
+void CSettingsSA::SetUsertrackAutoScan(bool bEnable)
 {
     m_pInterface->bUsertrackAutoScan = bEnable;
 }
 
-bool CSettingsSA::IsRadioEqualizerEnabled ( void )
+bool CSettingsSA::IsRadioEqualizerEnabled(void)
 {
     // 1 = on, 0 = off
     return m_pInterface->bRadioEqualizer;
 }
 
-void CSettingsSA::SetRadioEqualizerEnabled ( bool bEnable )
+void CSettingsSA::SetRadioEqualizerEnabled(bool bEnable)
 {
     m_pInterface->bRadioEqualizer = bEnable;
 }
 
-bool CSettingsSA::IsRadioAutotuneEnabled ( void )
+bool CSettingsSA::IsRadioAutotuneEnabled(void)
 {
     // 1 = on, 0 = off
     return m_pInterface->bRadioAutotune;
 }
 
-void CSettingsSA::SetRadioAutotuneEnabled ( bool bEnable )
+void CSettingsSA::SetRadioAutotuneEnabled(bool bEnable)
 {
     m_pInterface->bRadioAutotune = bEnable;
 }
 
 // Minimum is 0.925 and maximum is 1.8
-float CSettingsSA::GetDrawDistance ( void )
+float CSettingsSA::GetDrawDistance(void)
 {
     return m_pInterface->fDrawDistance;
 }
 
-void CSettingsSA::SetDrawDistance ( float fDistance )
+void CSettingsSA::SetDrawDistance(float fDistance)
 {
     _asm
     {
@@ -229,49 +235,49 @@ void CSettingsSA::SetDrawDistance ( float fDistance )
     m_pInterface->fDrawDistance = fDistance;
 }
 
-unsigned int CSettingsSA::GetBrightness ( )
+unsigned int CSettingsSA::GetBrightness()
 {
     // up to 384
     return m_pInterface->dwBrightness;
 }
 
-void CSettingsSA::SetBrightness ( unsigned int uiBrightness )
+void CSettingsSA::SetBrightness(unsigned int uiBrightness)
 {
     m_pInterface->dwBrightness = uiBrightness;
 }
 
-unsigned int CSettingsSA::GetFXQuality ( )
+unsigned int CSettingsSA::GetFXQuality()
 {
     // 0 = low, 1 = medium, 2 = high, 3 = very high
-    return *(BYTE *)VAR_ucFxQuality;
+    return *(BYTE*)VAR_ucFxQuality;
 }
 
-void CSettingsSA::SetFXQuality ( unsigned int fxQualityId )
+void CSettingsSA::SetFXQuality(unsigned int fxQualityId)
 {
-    MemPutFast < BYTE > ( VAR_ucFxQuality, fxQualityId );
+    MemPutFast<BYTE>(VAR_ucFxQuality, fxQualityId);
 }
 
-float CSettingsSA::GetMouseSensitivity ( )
+float CSettingsSA::GetMouseSensitivity()
 {
-    float fRawValue = *(FLOAT *)VAR_fMouseSensitivity;
-    return UnlerpClamped( MOUSE_SENSITIVITY_MIN, fRawValue, MOUSE_SENSITIVITY_MAX );    // Remap to 0-1
+    float fRawValue = *(FLOAT*)VAR_fMouseSensitivity;
+    return UnlerpClamped(MOUSE_SENSITIVITY_MIN, fRawValue, MOUSE_SENSITIVITY_MAX);            // Remap to 0-1
 }
 
-void CSettingsSA::SetMouseSensitivity ( float fSensitivity )
+void CSettingsSA::SetMouseSensitivity(float fSensitivity)
 {
-    float fRawValue = Lerp( MOUSE_SENSITIVITY_MIN, fSensitivity, MOUSE_SENSITIVITY_MAX );
-    MemPutFast < FLOAT > ( VAR_fMouseSensitivity, fRawValue );
+    float fRawValue = Lerp(MOUSE_SENSITIVITY_MIN, fSensitivity, MOUSE_SENSITIVITY_MAX);
+    MemPutFast<FLOAT>(VAR_fMouseSensitivity, fRawValue);
 }
 
-unsigned int CSettingsSA::GetAntiAliasing ( )
+unsigned int CSettingsSA::GetAntiAliasing()
 {
     // 1 = disabled, 2 = 1x, 3 = 2x, 4 = 3x
     return m_pInterface->dwAntiAliasing;
 }
 
-void CSettingsSA::SetAntiAliasing ( unsigned int uiAntiAliasing, bool bOnRestart )
+void CSettingsSA::SetAntiAliasing(unsigned int uiAntiAliasing, bool bOnRestart)
 {
-    if ( !bOnRestart )
+    if (!bOnRestart)
     {
         DWORD dwFunc = FUNC_SetAntiAliasing;
         _asm
@@ -280,23 +286,23 @@ void CSettingsSA::SetAntiAliasing ( unsigned int uiAntiAliasing, bool bOnRestart
             call    dwFunc
             add     esp, 4
         }
-        SetCurrentVideoMode ( m_pInterface->dwVideoMode, false );
+        SetCurrentVideoMode(m_pInterface->dwVideoMode, false);
     }
 
     m_pInterface->dwAntiAliasing = uiAntiAliasing;
 }
 
-bool CSettingsSA::IsMipMappingEnabled ( void )
+bool CSettingsSA::IsMipMappingEnabled(void)
 {
     return m_pInterface->bMipMapping;
 }
 
-void CSettingsSA::SetMipMappingEnabled ( bool bEnable )
+void CSettingsSA::SetMipMappingEnabled(bool bEnable)
 {
     m_pInterface->bMipMapping = bEnable;
 }
 
-void CSettingsSA::Save ()
+void CSettingsSA::Save()
 {
     _asm
     {
@@ -306,17 +312,17 @@ void CSettingsSA::Save ()
     }
 }
 
-bool CSettingsSA::IsVolumetricShadowsEnabled ( void )
+bool CSettingsSA::IsVolumetricShadowsEnabled(void)
 {
     return m_bVolumetricShadowsEnabled && !m_bVolumetricShadowsSuspended;
 }
 
-void CSettingsSA::SetVolumetricShadowsEnabled ( bool bEnable )
+void CSettingsSA::SetVolumetricShadowsEnabled(bool bEnable)
 {
     m_bVolumetricShadowsEnabled = bEnable;
 }
 
-void CSettingsSA::SetVolumetricShadowsSuspended ( bool bSuspended )
+void CSettingsSA::SetVolumetricShadowsSuspended(bool bSuspended)
 {
     m_bVolumetricShadowsSuspended = bSuspended;
 }
@@ -325,32 +331,32 @@ void CSettingsSA::SetVolumetricShadowsSuspended ( bool bSuspended )
 // Volumetric shadow hooks
 //
 DWORD dwFxQualityValue = 0;
-WORD usCallingForVehicleModel = 0;
+WORD  usCallingForVehicleModel = 0;
 
-void _cdecl MaybeAlterFxQualityValue ( DWORD dwAddrCalledFrom )
+__declspec(noinline) void _cdecl MaybeAlterFxQualityValue(DWORD dwAddrCalledFrom)
 {
     // Handle all calls from CVolumetricShadowMgr
-    if ( dwAddrCalledFrom > 0x70F990 && dwAddrCalledFrom < 0x711EB0 )
+    if (dwAddrCalledFrom > 0x70F990 && dwAddrCalledFrom < 0x711EB0)
     {
         // Force blob shadows if volumetric shadows are not enabled
-        if ( !pGame->GetSettings ()->IsVolumetricShadowsEnabled () )
+        if (!pGame->GetSettings()->IsVolumetricShadowsEnabled())
             dwFxQualityValue = 0;
 
         // These vehicles seem to have problems with volumetric shadows, so force blob shadows
-        switch ( usCallingForVehicleModel )
+        switch (usCallingForVehicleModel)
         {
-            case 460:   // Skimmer
-            case 511:   // Beagle
-            case 572:   // Mower
-            case 590:   // Box Freight
-            case 592:   // Andromada
+            case 460:            // Skimmer
+            case 511:            // Beagle
+            case 572:            // Mower
+            case 590:            // Box Freight
+            case 592:            // Andromada
                 dwFxQualityValue = 0;
         }
         usCallingForVehicleModel = 0;
     }
     else
-    // Handle all calls from CPed::PreRenderAfterTest
-    if ( dwAddrCalledFrom > 0x5E65A0 && dwAddrCalledFrom < 0x5E7680 )
+        // Handle all calls from CPed::PreRenderAfterTest
+        if (dwAddrCalledFrom > 0x5E65A0 && dwAddrCalledFrom < 0x5E7680)
     {
         // Always use blob shadows for peds as realtime shadows are disabled in MTA (context switching issues)
         dwFxQualityValue = 0;
@@ -358,7 +364,7 @@ void _cdecl MaybeAlterFxQualityValue ( DWORD dwAddrCalledFrom )
 }
 
 // Hooked from 0x49EA50
-void _declspec(naked) HOOK_GetFxQuality ()
+void _declspec(naked) HOOK_GetFxQuality()
 {
     _asm
     {
@@ -367,7 +373,7 @@ void _declspec(naked) HOOK_GetFxQuality ()
         mov     dwFxQualityValue, eax
 
         mov     eax, [esp+32]           // Address GetFxQuality was called from
-        push    eax                     
+        push    eax
         call    MaybeAlterFxQualityValue
         add     esp, 4
 
@@ -378,7 +384,7 @@ void _declspec(naked) HOOK_GetFxQuality ()
 }
 
 // Hook to discover what vehicle will be calling GetFxQuality
-void _declspec(naked) HOOK_StoreShadowForVehicle ()
+void _declspec(naked) HOOK_StoreShadowForVehicle()
 {
     _asm
     {
@@ -386,7 +392,7 @@ void _declspec(naked) HOOK_StoreShadowForVehicle ()
         mov     eax, [esp+4]        // Get vehicle
         mov     ax, [eax+34]        // pEntity->m_nModelIndex
         mov     usCallingForVehicleModel, ax
-        sub     esp, 44h 
+        sub     esp, 44h
         push    ebx
         mov     eax, 0x70F9B0       // CVolumetricShadowMgr::IsAvailable
         call    eax
@@ -394,56 +400,53 @@ void _declspec(naked) HOOK_StoreShadowForVehicle ()
     }
 }
 
-
 ////////////////////////////////////////////////
 //
 // AspectRatio
 //
 ////////////////////////////////////////////////
-eAspectRatio CSettingsSA::GetAspectRatio ( void )
+eAspectRatio CSettingsSA::GetAspectRatio(void)
 {
     return m_AspectRatio;
 }
 
-float CSettingsSA::GetAspectRatioValue ( void )
+float CSettingsSA::GetAspectRatioValue(void)
 {
     return *(float*)0xC3EFA4;
 }
 
-void CSettingsSA::SetAspectRatio ( eAspectRatio aspectRatio, bool bAdjustmentEnabled )
+void CSettingsSA::SetAspectRatio(eAspectRatio aspectRatio, bool bAdjustmentEnabled)
 {
     // Process change
     m_AspectRatio = aspectRatio;
 
     float fValue;
-    if ( m_AspectRatio == ASPECT_RATIO_AUTO )
+    if (m_AspectRatio == ASPECT_RATIO_AUTO)
     {
         VideoMode modeInfo;
-        pGame->GetSettings ()->GetVideoModeInfo ( &modeInfo, pGame->GetSettings ()->GetCurrentVideoMode () );
+        pGame->GetSettings()->GetVideoModeInfo(&modeInfo, pGame->GetSettings()->GetCurrentVideoMode());
         fValue = modeInfo.width / (float)modeInfo.height;
     }
-    else
-    if ( m_AspectRatio == ASPECT_RATIO_4_3 )
+    else if (m_AspectRatio == ASPECT_RATIO_4_3)
     {
         fValue = 4 / 3.f;
     }
-    else
-    if ( m_AspectRatio == ASPECT_RATIO_16_10 )
+    else if (m_AspectRatio == ASPECT_RATIO_16_10)
     {
         fValue = 16 / 10.f;
     }
-    else    // ASPECT_RATIO_16_9
+    else            // ASPECT_RATIO_16_9
     {
         fValue = 16 / 9.f;
     }
 
-    MemPutFast < float > ( 0xC3EFA4, fValue );
+    MemPutFast<float>(0xC3EFA4, fValue);
 
     // Adjust position and size of our HUD components
-    if ( bAdjustmentEnabled )
-        pGame->GetHud ()->AdjustComponents ( fValue );
+    if (bAdjustmentEnabled)
+        pGame->GetHud()->AdjustComponents(fValue);
     else
-        pGame->GetHud ()->ResetComponentAdjustment ();
+        pGame->GetHud()->ResetComponentAdjustment();
 }
 
 ////////////////////////////////////////////////
@@ -451,32 +454,30 @@ void CSettingsSA::SetAspectRatio ( eAspectRatio aspectRatio, bool bAdjustmentEna
 // Grass
 //
 ////////////////////////////////////////////////
-bool CSettingsSA::IsGrassEnabled ( void )
+bool CSettingsSA::IsGrassEnabled(void)
 {
     return *(BYTE*)0x05DBAED == 0x85;
 }
 
-void CSettingsSA::SetGrassEnabled ( bool bEnable )
+void CSettingsSA::SetGrassEnabled(bool bEnable)
 {
-    MemPut < BYTE > ( 0x05DBAED, bEnable ? 0x85 : 0x33 );
+    MemPut<BYTE>(0x05DBAED, bEnable ? 0x85 : 0x33);
 }
-
 
 ////////////////////////////////////////////////
 //
 // HUD mode (radar map + blips, blips only, nothing)
 //
 ////////////////////////////////////////////////
-eRadarMode CSettingsSA::GetRadarMode ( void )
+eRadarMode CSettingsSA::GetRadarMode(void)
 {
     return *(eRadarMode*)VAR_RadarMode;
 }
 
-void CSettingsSA::SetRadarMode ( eRadarMode hudMode )
+void CSettingsSA::SetRadarMode(eRadarMode hudMode)
 {
-    MemPutFast < DWORD > ( VAR_RadarMode, hudMode );
+    MemPutFast<DWORD>(VAR_RadarMode, hudMode);
 }
-
 
 ////////////////////////////////////////////////
 //
@@ -485,55 +486,140 @@ void CSettingsSA::SetRadarMode ( eRadarMode hudMode )
 ////////////////////////////////////////////////
 float ms_fFOV = 70;
 float ms_fFOVCar = 70;
-float ms_fFOVCarMax = 100;  // at high vehicle velocity
+float ms_fFOVCarMax = 100;            // at high vehicle velocity
+bool  ms_bFOVPlayerFromScript = false;
+bool  ms_bFOVVehicleFromScript = false;
 
 // consider moving this to the camera class - qaisjp
-float CSettingsSA::GetFieldOfViewPlayer ( void )
+float CSettingsSA::GetFieldOfViewPlayer(void)
 {
     return ms_fFOV;
 }
 
-float CSettingsSA::GetFieldOfViewVehicle ( void )
+float CSettingsSA::GetFieldOfViewVehicle(void)
 {
     return ms_fFOVCar;
 }
 
-float CSettingsSA::GetFieldOfViewVehicleMax ( void )
+float CSettingsSA::GetFieldOfViewVehicleMax(void)
 {
     return ms_fFOVCarMax;
 }
 
-void CSettingsSA::SetFieldOfView ( float fAngle )
+void CSettingsSA::UpdateFieldOfViewFromSettings(void)
 {
-    SetFieldOfViewPlayer ( fAngle );
-    SetFieldOfViewVehicle ( fAngle );
+    float fFieldOfView;
+    g_pCore->GetCVars()->Get("fov", fFieldOfView);
+    fFieldOfView = Clamp(70.f, fFieldOfView, 100.f);
+    SetFieldOfViewPlayer(fFieldOfView, false);
+    SetFieldOfViewVehicle(fFieldOfView, false);
+    SetFieldOfViewVehicleMax(100, false);
 }
-    
-void CSettingsSA::SetFieldOfViewPlayer ( float fAngle )
+
+void CSettingsSA::ResetFieldOfViewFromScript(void)
 {
+    ms_bFOVPlayerFromScript = false;
+    ms_bFOVVehicleFromScript = false;
+    UpdateFieldOfViewFromSettings();
+}
+
+void CSettingsSA::SetFieldOfViewPlayer(float fAngle, bool bFromScript)
+{
+    if (!bFromScript && ms_bFOVPlayerFromScript)
+        return;
+    ms_bFOVPlayerFromScript = bFromScript;
     ms_fFOV = fAngle;
-    MemPut < void* > ( 0x0522F3A, &ms_fFOV );
-    MemPut < void* > ( 0x0522F5D, &ms_fFOV );
-    MemPut < float > ( 0x0522F7A, ms_fFOV );
+    MemPut<void*>(0x0522F3A, &ms_fFOV);
+    MemPut<void*>(0x0522F5D, &ms_fFOV);
+    MemPut<float>(0x0522F7A, ms_fFOV);
 }
 
-void CSettingsSA::SetFieldOfViewVehicle ( float fAngle )
+void CSettingsSA::SetFieldOfViewVehicle(float fAngle, bool bFromScript)
 {
+    if (!bFromScript && ms_bFOVVehicleFromScript)
+        return;
+    ms_bFOVVehicleFromScript = bFromScript;
     ms_fFOVCar = fAngle;
-    MemPut < void* > ( 0x0524B76, &ms_fFOVCar );
-    MemPut < void* > ( 0x0524B9A, &ms_fFOVCar );
-    MemPut < void* > ( 0x0524BA2, &ms_fFOVCar );
-    MemPut < void* > ( 0x0524BD3, &ms_fFOVCar );
-    MemPut < float > ( 0x0524BE4, ms_fFOVCar );
+    MemPut<void*>(0x0524B76, &ms_fFOVCar);
+    MemPut<void*>(0x0524B9A, &ms_fFOVCar);
+    MemPut<void*>(0x0524BA2, &ms_fFOVCar);
+    MemPut<void*>(0x0524BD3, &ms_fFOVCar);
+    MemPut<float>(0x0524BE4, ms_fFOVCar);
 }
 
-void CSettingsSA::SetFieldOfViewVehicleMax ( float fAngle )
+void CSettingsSA::SetFieldOfViewVehicleMax(float fAngle, bool bFromScript)
 {
+    if (!bFromScript && ms_bFOVVehicleFromScript)
+        return;
+    ms_bFOVVehicleFromScript = bFromScript;
     ms_fFOVCarMax = fAngle;
-    MemPut < void* > ( 0x0524BB4, &ms_fFOVCarMax );
-    MemPut < float > ( 0x0524BC5, ms_fFOVCarMax );
+    MemPut<void*>(0x0524BB4, &ms_fFOVCarMax);
+    MemPut<float>(0x0524BC5, ms_fFOVCarMax);
 }
 
+////////////////////////////////////////////////
+//
+// Vehicles LOD draw distance
+//
+////////////////////////////////////////////////
+void CSettingsSA::SetVehiclesLODDistance(float fVehiclesLODDistance, float fTrainsPlanesLODDistance)
+{
+    ms_fVehicleLODDistance = fVehiclesLODDistance;
+    ms_fTrainPlaneLODDistance = fTrainsPlanesLODDistance;
+}
+
+void CSettingsSA::ResetVehiclesLODDistance(void)
+{
+    bool bHighDetailVehicles;
+    g_pCore->GetCVars()->Get("high_detail_vehicles", bHighDetailVehicles);
+
+    if (bHighDetailVehicles)
+    {
+        ms_fVehicleLODDistance = MAX_VEHICLE_LOD_DISTANCE;
+        ms_fTrainPlaneLODDistance = MAX_VEHICLE_LOD_DISTANCE;
+    }
+    else
+    {
+        ms_fVehicleLODDistance = DEFAULT_VEHICLE_LOD_DISTANCE;
+        ms_fTrainPlaneLODDistance = DEFAULT_VEHICLE_LOD_DISTANCE * TRAIN_LOD_DISTANCE_MULTIPLIER;
+    }
+}
+
+void CSettingsSA::GetVehiclesLODDistance(float& fVehiclesLODDistance, float& fTrainsPlanesLODDistance)
+{
+    fVehiclesLODDistance = ms_fVehicleLODDistance;
+    fTrainsPlanesLODDistance = ms_fTrainPlaneLODDistance;
+}
+
+////////////////////////////////////////////////
+//
+// Peds LOD draw distance
+//
+////////////////////////////////////////////////
+ 
+void CSettingsSA::SetPedsLODDistance(float fPedsLODDistance)
+{
+    ms_fPedsLODDistance = fPedsLODDistance;
+}
+ 
+float CSettingsSA::GetPedsLODDistance()
+{
+    return ms_fPedsLODDistance;
+}
+ 
+void CSettingsSA::ResetPedsLODDistance()
+{
+    bool bHighDetailPeds;
+    g_pCore->GetCVars()->Get("high_detail_peds", bHighDetailPeds);
+    if (bHighDetailPeds)
+    {
+        ms_fPedsLODDistance = MAX_PEDS_LOD_DISTANCE;
+    }
+    else
+    {
+        ms_fPedsLODDistance = DEFAULT_PEDS_LOD_DISTANCE;
+    }
+}
 
 ////////////////////////////////////////////////
 //
@@ -542,23 +628,22 @@ void CSettingsSA::SetFieldOfViewVehicleMax ( float fAngle )
 // Return true if DirectX says we have resolutions available that are higher that the desktop
 //
 ////////////////////////////////////////////////
-bool CSettingsSA::HasUnsafeResolutions( void )
+bool CSettingsSA::HasUnsafeResolutions(void)
 {
     uint numVidModes = GetNumVideoModes();
-    for ( uint vidMode = 0; vidMode < numVidModes; vidMode++ )
+    for (uint vidMode = 0; vidMode < numVidModes; vidMode++)
     {
         VideoMode vidModeInfo;
-        GetVideoModeInfo( &vidModeInfo, vidMode );
+        GetVideoModeInfo(&vidModeInfo, vidMode);
 
-        if ( vidModeInfo.flags & rwVIDEOMODEEXCLUSIVE )
+        if (vidModeInfo.flags & rwVIDEOMODEEXCLUSIVE)
         {
-            if ( IsUnsafeResolution( vidModeInfo.width, vidModeInfo.height ) )
+            if (IsUnsafeResolution(vidModeInfo.width, vidModeInfo.height))
                 return true;
         }
     }
     return false;
 }
-
 
 ////////////////////////////////////////////////
 //
@@ -567,16 +652,16 @@ bool CSettingsSA::HasUnsafeResolutions( void )
 // Check if supplied resolution is higher than the desktop
 //
 ////////////////////////////////////////////////
-bool CSettingsSA::IsUnsafeResolution( int iWidth, int iHeight )
+bool CSettingsSA::IsUnsafeResolution(int iWidth, int iHeight)
 {
     // Check if we have gotten the desktop res yet
-    if ( m_iDesktopWidth == 0 )
+    if (m_iDesktopWidth == 0)
     {
         m_iDesktopWidth = 800;
         m_iDesktopHeight = 600;
 
         VideoMode currentModeInfo;
-        if ( GetVideoModeInfo( &currentModeInfo, 0 ) )
+        if (GetVideoModeInfo(&currentModeInfo, 0))
         {
             m_iDesktopWidth = currentModeInfo.width;
             m_iDesktopHeight = currentModeInfo.height;
@@ -585,7 +670,6 @@ bool CSettingsSA::IsUnsafeResolution( int iWidth, int iHeight )
     return iWidth > m_iDesktopWidth || iHeight > m_iDesktopHeight;
 }
 
-
 ////////////////////////////////////////////////
 //
 // CSettingsSA::FindVideoMode
@@ -593,38 +677,38 @@ bool CSettingsSA::IsUnsafeResolution( int iWidth, int iHeight )
 // Find best matching video mode
 //
 ////////////////////////////////////////////////
-uint CSettingsSA::FindVideoMode( int iResX, int iResY, int iColorBits )
+uint CSettingsSA::FindVideoMode(int iResX, int iResY, int iColorBits)
 {
     int iBestMode, iBestScore = -1;
 
     uint numVidModes = GetNumVideoModes();
-    for ( uint vidMode = 0; vidMode < numVidModes; vidMode++ )
+    for (uint vidMode = 0; vidMode < numVidModes; vidMode++)
     {
         VideoMode vidModeInfo;
-        GetVideoModeInfo( &vidModeInfo, vidMode );
+        GetVideoModeInfo(&vidModeInfo, vidMode);
 
         // Remove resolutions that will make the gui unusable
-        if ( vidModeInfo.width < 640 || vidModeInfo.height < 480 )
+        if (vidModeInfo.width < 640 || vidModeInfo.height < 480)
             continue;
 
-        if ( vidModeInfo.flags & rwVIDEOMODEEXCLUSIVE )
+        if (vidModeInfo.flags & rwVIDEOMODEEXCLUSIVE)
         {
             // Rate my res
-            int iScore = abs( iResX - vidModeInfo.width ) + abs( iResY - vidModeInfo.height );
+            int iScore = abs(iResX - vidModeInfo.width) + abs(iResY - vidModeInfo.height);
 
             // Penalize matches with wrong bit depth
-            if ( vidModeInfo.depth != iColorBits )
+            if (vidModeInfo.depth != iColorBits)
             {
                 iScore += 100000;
             }
 
             // Penalize matches with higher than requested resolution
-            if ( vidModeInfo.width > iResX || vidModeInfo.height > iResY )
+            if (vidModeInfo.width > iResX || vidModeInfo.height > iResY)
             {
                 iScore += 200000;
             }
 
-            if ( iScore < iBestScore || iBestScore == -1 )
+            if (iScore < iBestScore || iBestScore == -1)
             {
                 // Found a better match
                 iBestScore = iScore;
@@ -633,13 +717,12 @@ uint CSettingsSA::FindVideoMode( int iResX, int iResY, int iColorBits )
         }
     }
 
-    if ( iBestScore != -1 )
+    if (iBestScore != -1)
         return iBestMode;
 
-    BrowseToSolution ( "no-find-res", EXIT_GAME_FIRST | ASK_GO_ONLINE, _( "Can't find valid screen resolution." ) );
+    BrowseToSolution("no-find-res", EXIT_GAME_FIRST | ASK_GO_ONLINE, _("Can't find valid screen resolution."));
     return 1;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -648,39 +731,39 @@ uint CSettingsSA::FindVideoMode( int iResX, int iResY, int iColorBits )
 // Set/validate the required video mode
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CSettingsSA::SetValidVideoMode( void )
+void CSettingsSA::SetValidVideoMode(void)
 {
     bool bValid = false;
-    int iWidth, iHeight, iColorBits, iAdapterIndex;
+    int  iWidth, iHeight, iColorBits, iAdapterIndex;
     bool bAllowUnsafeResolutions = false;
 
     // First, try to get MTA saved info
-    if ( !bValid )
+    if (!bValid)
     {
-        bValid = g_pCore->GetRequiredDisplayResolution( iWidth, iHeight, iColorBits, iAdapterIndex, bAllowUnsafeResolutions );
+        bValid = g_pCore->GetRequiredDisplayResolution(iWidth, iHeight, iColorBits, iAdapterIndex, bAllowUnsafeResolutions);
     }
 
     // Otherwise deduce from GTA saved video mode
-    if ( !bValid )
+    if (!bValid)
     {
-        SetAdapter( 0 );
+        SetAdapter(0);
         uint numVidModes = GetNumVideoModes();
-        if ( VAR_SavedVideoMode > 0 && VAR_SavedVideoMode < numVidModes )
+        if (VAR_SavedVideoMode > 0 && VAR_SavedVideoMode < numVidModes)
         {
             VideoMode modeInfo;
-            if ( GetVideoModeInfo( &modeInfo, VAR_SavedVideoMode ) )
+            if (GetVideoModeInfo(&modeInfo, VAR_SavedVideoMode))
             {
                 iWidth = modeInfo.width;
                 iHeight = modeInfo.height;
                 iColorBits = modeInfo.depth;
                 iAdapterIndex = 0;
-                bValid = true;        
+                bValid = true;
             }
         }
     }
 
     // Finally use default
-    if ( !bValid )
+    if (!bValid)
     {
         bValid = true;
         iWidth = 800;
@@ -690,9 +773,9 @@ void CSettingsSA::SetValidVideoMode( void )
     }
 
     // Set adapter
-    if ( (uint)iAdapterIndex >= GetNumAdapters() )
+    if ((uint)iAdapterIndex >= GetNumAdapters())
         iAdapterIndex = 0;
-    SetAdapter( iAdapterIndex );
+    SetAdapter(iAdapterIndex);
 
     // Save desktop resolution
     {
@@ -700,7 +783,7 @@ void CSettingsSA::SetValidVideoMode( void )
         m_iDesktopHeight = 600;
 
         VideoMode currentModeInfo;
-        if ( GetVideoModeInfo( &currentModeInfo, GetCurrentVideoMode() ) )
+        if (GetVideoModeInfo(&currentModeInfo, GetCurrentVideoMode()))
         {
             m_iDesktopWidth = currentModeInfo.width;
             m_iDesktopHeight = currentModeInfo.height;
@@ -708,18 +791,18 @@ void CSettingsSA::SetValidVideoMode( void )
     }
 
     // Handle 'unsafe' resolution stuff
-    if ( IsUnsafeResolution( iWidth, iHeight ) )
+    if (IsUnsafeResolution(iWidth, iHeight))
     {
-        if ( bAllowUnsafeResolutions )
+        if (bAllowUnsafeResolutions)
         {
             // Confirm that res should be used
-            SString strMessage = _("Are you sure you want to use this screen resolution?" );
-            strMessage += SString( "\n\n%d x %d", iWidth, iHeight );
-            if ( MessageBoxUTF8( NULL, strMessage, _("MTA: San Andreas"), MB_YESNO | MB_TOPMOST | MB_ICONQUESTION ) == IDNO )
+            SString strMessage = _("Are you sure you want to use this screen resolution?");
+            strMessage += SString("\n\n%d x %d", iWidth, iHeight);
+            if (MessageBoxUTF8(NULL, strMessage, _("MTA: San Andreas"), MB_YESNO | MB_TOPMOST | MB_ICONQUESTION) == IDNO)
                 bAllowUnsafeResolutions = false;
         }
 
-        if ( !bAllowUnsafeResolutions )
+        if (!bAllowUnsafeResolutions)
         {
             // Force down to desktop res if required
             iWidth = m_iDesktopWidth;
@@ -728,18 +811,17 @@ void CSettingsSA::SetValidVideoMode( void )
     }
 
     // Ensure res is no smaller than 640 x 480
-    iWidth = Max( 640, iWidth );
-    iHeight = Max( 480, iHeight );
+    iWidth = std::max(640, iWidth);
+    iHeight = std::max(480, iHeight);
 
     // Find mode number which best matches required settings
-    uint uiUseVideoMode = FindVideoMode( iWidth, iHeight, iColorBits );
+    uint uiUseVideoMode = FindVideoMode(iWidth, iHeight, iColorBits);
 
     // Set for GTA to use
     VAR_CurVideoMode = uiUseVideoMode;
     VAR_SavedVideoMode = uiUseVideoMode;
     VAR_CurAdapter = iAdapterIndex;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -750,9 +832,9 @@ void CSettingsSA::SetValidVideoMode( void )
 // return 2 for multi adapter show dialog
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-int CSettingsSA::OnSelectDevice( void )
+int CSettingsSA::OnSelectDevice(void)
 {
-    if ( GetNumAdapters() > 1 && g_pCore->GetDeviceSelectionEnabled() )
+    if (GetNumAdapters() > 1 && g_pCore->GetDeviceSelectionEnabled())
     {
         // Show device selection
         return 1;
@@ -760,7 +842,7 @@ int CSettingsSA::OnSelectDevice( void )
 
     SetValidVideoMode();
 
-    if ( GetNumAdapters() > 1 )
+    if (GetNumAdapters() > 1)
     {
         // Hide device selection
         return 2;
@@ -771,7 +853,6 @@ int CSettingsSA::OnSelectDevice( void )
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Hook psSelectDevice so we can:
@@ -779,7 +860,7 @@ int CSettingsSA::OnSelectDevice( void )
 //   * Choose whether to show the device selection dialog box
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-int OnMY_SelectDevice( void )
+__declspec(noinline) int OnMY_SelectDevice(void)
 {
     CSettingsSA* gameSettings = (CSettingsSA*)pGame->GetSettings();
     return gameSettings->OnSelectDevice();
@@ -788,10 +869,10 @@ int OnMY_SelectDevice( void )
 // Hook info
 #define HOOKPOS_SelectDevice             0x0746219
 #define HOOKSIZE_SelectDevice            6
-DWORD RETURN_SelectDeviceSingle =        0x0746273;
-DWORD RETURN_SelectDeviceMultiHide =     0x074622C;
-DWORD RETURN_SelectDeviceMultiShow =     0x0746227;
-void _declspec(naked) HOOK_SelectDevice ()
+DWORD RETURN_SelectDeviceSingle = 0x0746273;
+DWORD RETURN_SelectDeviceMultiHide = 0x074622C;
+DWORD RETURN_SelectDeviceMultiShow = 0x0746227;
+void _declspec(naked) HOOK_SelectDevice()
 {
     _asm
     {
@@ -815,13 +896,12 @@ single:
     }
 }
 
-
 ////////////////////////////////////////////////
 //
 // Setup hooks
 //
 ////////////////////////////////////////////////
-void CSettingsSA::StaticSetHooks ( void )
+void CSettingsSA::StaticSetHooks(void)
 {
-    EZHookInstall( SelectDevice );
+    EZHookInstall(SelectDevice);
 }

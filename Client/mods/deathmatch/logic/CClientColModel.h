@@ -1,52 +1,47 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientColModel.h
-*  PURPOSE:     Model collision (.col file) entity class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientColModel.h
+ *  PURPOSE:     Model collision (.col file) entity class
+ *
+ *****************************************************************************/
 
-#ifndef __CCLIENTCOLMODEL_H
-#define __CCLIENTCOLMODEL_H
+#pragma once
 
 #include <list>
 #include "CClientEntity.h"
 
 class CClientColModel : public CClientEntity
 {
-    DECLARE_CLASS( CClientColModel, CClientEntity )
+    DECLARE_CLASS(CClientColModel, CClientEntity)
 public:
-                                    CClientColModel         ( class CClientManager* pManager, ElementID ID );
-                                    ~CClientColModel        ( void );
+    CClientColModel(class CClientManager* pManager, ElementID ID);
+    ~CClientColModel(void);
 
-    eClientEntityType               GetType                 ( void ) const              { return CCLIENTCOL; }
+    eClientEntityType GetType(void) const { return CCLIENTCOL; }
 
-    bool                            LoadCol                 ( const SString& strFile, bool bIsRawData );
-    inline bool                     IsLoaded                ( void )                    { return m_pColModel != NULL; };
+    bool LoadCol(const SString& strFile, bool bIsRawData);
+    bool IsLoaded(void) { return m_pColModel != NULL; };
 
-    bool                            Replace                 ( unsigned short usModel );
-    void                            Restore                 ( unsigned short usModel );
-    void                            RestoreAll              ( void );
+    bool Replace(unsigned short usModel);
+    void Restore(unsigned short usModel);
+    void RestoreAll(void);
 
-    bool                            HasReplaced             ( unsigned short usModel );
-    static bool                     IsCOLData               ( const SString& strData );
-
+    bool        HasReplaced(unsigned short usModel);
+    static bool IsCOLData(const SString& strData);
 
     // Sorta a hack that these are required by CClientEntity...
-    void                            Unlink                  ( void ) {};
-    void                            GetPosition             ( CVector& vecPosition ) const {};
-    void                            SetPosition             ( const CVector& vecPosition ) {};
+    void Unlink(void){};
+    void GetPosition(CVector& vecPosition) const {};
+    void SetPosition(const CVector& vecPosition){};
 
 private:
-    void                            InternalRestore         ( unsigned short usModel );
+    void InternalRestore(unsigned short usModel);
 
-    class CClientColModelManager*   m_pColModelManager;
-    
-    CColModel*                      m_pColModel;
-    std::list < unsigned short >    m_Replaced;
+    class CClientColModelManager* m_pColModelManager;
+
+    CColModel*                m_pColModel;
+    std::list<unsigned short> m_Replaced;
 };
-
-#endif

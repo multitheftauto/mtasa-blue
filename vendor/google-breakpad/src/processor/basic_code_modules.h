@@ -41,12 +41,13 @@
 #ifndef PROCESSOR_BASIC_CODE_MODULES_H__
 #define PROCESSOR_BASIC_CODE_MODULES_H__
 
+#include <stddef.h>
+
 #include "google_breakpad/processor/code_modules.h"
+#include "processor/linked_ptr.h"
+#include "processor/range_map.h"
 
 namespace google_breakpad {
-
-template<typename T> class linked_ptr;
-template<typename AddressType, typename EntryType> class RangeMap;
 
 class BasicCodeModules : public CodeModules {
  public:
@@ -75,7 +76,7 @@ class BasicCodeModules : public CodeModules {
 
   // The map used to contain each CodeModule, keyed by each CodeModule's
   // address range.
-  RangeMap<uint64_t, linked_ptr<const CodeModule> > *map_;
+  RangeMap<uint64_t, linked_ptr<const CodeModule> > map_;
 
  private:
   // Disallow copy constructor and assignment operator.

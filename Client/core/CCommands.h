@@ -1,54 +1,49 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CCommands.h
-*  PURPOSE:     Header file for dynamic command manager
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Derek Abdine <>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CCommands.h
+ *  PURPOSE:     Header file for dynamic command manager
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CCOMMANDS_H
-#define __CCOMMANDS_H
+#pragma once
 
 #include <core/CCommandsInterface.h>
 #include <string>
 #include "CSingleton.h"
 
-class CCommands : public CCommandsInterface, public CSingleton < CCommands >
+class CCommands : public CCommandsInterface, public CSingleton<CCommands>
 {
 public:
-                        CCommands                   ( void );
-                        ~CCommands                  ( void );
+    CCommands(void);
+    ~CCommands(void);
 
-    void                Add                         ( const char* szCommand, const char* szDescription, PFNCOMMANDHANDLER pfnHandler, bool bModCommand = false, bool bAllowScriptedBind = false );
+    void Add(const char* szCommand, const char* szDescription, PFNCOMMANDHANDLER pfnHandler, bool bModCommand = false, bool bAllowScriptedBind = false);
 
-    unsigned int        Count                       ( void );
-    bool                Exists                      ( const char* szCommand );
+    unsigned int Count(void);
+    bool         Exists(const char* szCommand);
 
-    bool                Execute                     ( const char* szCommandLine );
-    bool                Execute                     ( const char* szCommand, const char* szParameters, bool bHandleRemotely = false, bool bIsScriptedBind = false );
+    bool Execute(const char* szCommandLine);
+    bool Execute(const char* szCommand, const char* szParameters, bool bHandleRemotely = false, bool bIsScriptedBind = false);
 
-    void                Delete                      ( const char* szCommand );
-    void                DeleteAll                   ( void );
+    void Delete(const char* szCommand);
+    void DeleteAll(void);
 
-    inline void         SetExecuteHandler           ( pfnExecuteCommandHandler pfnHandler )         { m_pfnExecuteHandler = pfnHandler; };
+    void                     SetExecuteHandler(pfnExecuteCommandHandler pfnHandler) { m_pfnExecuteHandler = pfnHandler; }
+    pfnExecuteCommandHandler GetExecuteHandler(void) { return m_pfnExecuteHandler; }
 
-    tagCOMMANDENTRY*    Get                         ( const char* szCommand, bool bCheckIfMod = false, bool bModCommand = false );
+    tagCOMMANDENTRY* Get(const char* szCommand, bool bCheckIfMod = false, bool bModCommand = false);
 
-    std::list < COMMANDENTRY* > ::iterator IterBegin( void )                                        { return m_CommandList.begin (); }
-    std::list < COMMANDENTRY* > ::iterator IterEnd  ( void )                                        { return m_CommandList.end (); }
-private:    
+    std::list<COMMANDENTRY*>::iterator IterBegin(void) { return m_CommandList.begin(); }
+    std::list<COMMANDENTRY*>::iterator IterEnd(void) { return m_CommandList.end(); }
 
-    void                ExecuteHandler              ( PFNCOMMAND pfnHandler, const char* szParameters );
+private:
+    void ExecuteHandler(PFNCOMMAND pfnHandler, const char* szParameters);
 
-    std::list < COMMANDENTRY* >     m_CommandList;
+    std::list<COMMANDENTRY*> m_CommandList;
 
-    pfnExecuteCommandHandler        m_pfnExecuteHandler;
+    pfnExecuteCommandHandler m_pfnExecuteHandler;
 };
-
-#endif

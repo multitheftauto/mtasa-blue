@@ -1,16 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/game/CDamageManager.h
-*  PURPOSE:     Damage manager interface
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/game/CDamageManager.h
+ *  PURPOSE:     Damage manager interface
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CGAME_DAMAGEMANAGER
-#define __CGAME_DAMAGEMANAGER
+#pragma once
 
 #include <windows.h>
 
@@ -29,10 +28,11 @@ const unsigned char DT_ENG_RADIATOR_STEAM = 0x04;
 const unsigned char DT_ENG_ON_FIRE = 0x08;
 */
 
-enum eWheelStatus {
-    DT_WHEEL_INTACT=0,
-//  DT_WHEEL_CAP_MISSING,
-//  DT_WHEEL_WARPED,
+enum eWheelStatus
+{
+    DT_WHEEL_INTACT = 0,
+    //  DT_WHEEL_CAP_MISSING,
+    //  DT_WHEEL_WARPED,
     DT_WHEEL_BURST,
     DT_WHEEL_MISSING,
 
@@ -40,34 +40,35 @@ enum eWheelStatus {
     DT_WHEEL_INTACT_COLLISIONLESS,
 };
 
-enum eDoorStatus {
-    DT_DOOR_INTACT=0,
+enum eDoorStatus
+{
+    DT_DOOR_INTACT = 0,
     DT_DOOR_SWINGING_FREE,
     DT_DOOR_BASHED,
     DT_DOOR_BASHED_AND_SWINGING_FREE,
     DT_DOOR_MISSING
 };
 
-enum ePlaneComponentStatus 
+enum ePlaneComponentStatus
 {
-    DT_PLANE_INTACT=0,
+    DT_PLANE_INTACT = 0,
     DT_PLANE_BASHED,
-//  DT_PLANE_BASHED2,
+    //  DT_PLANE_BASHED2,
     DT_PLANE_MISSING
 };
 
-enum eComponentStatus 
+enum eComponentStatus
 {
-    DT_PANEL_INTACT=0,
-//  DT_PANEL_SHIFTED,
+    DT_PANEL_INTACT = 0,
+    //  DT_PANEL_SHIFTED,
     DT_PANEL_BASHED,
     DT_PANEL_BASHED2,
     DT_PANEL_MISSING
 };
 
-enum eLightStatus 
+enum eLightStatus
 {
-    DT_LIGHT_OK=0,
+    DT_LIGHT_OK = 0,
     DT_LIGHT_SMASHED
 };
 
@@ -82,7 +83,7 @@ enum eDoors
     MAX_DOORS
 };
 
-enum eWheels
+enum eWheelPosition
 {
     FRONT_LEFT_WHEEL = 0,
     REAR_LEFT_WHEEL,
@@ -99,11 +100,11 @@ enum ePanels
     FRONT_RIGHT_PANEL,
     REAR_LEFT_PANEL,
     REAR_RIGHT_PANEL,
-    WINDSCREEN_PANEL,   // needs to be in same order as in component.h
+    WINDSCREEN_PANEL,            // needs to be in same order as in component.h
     FRONT_BUMPER,
     REAR_BUMPER,
 
-    MAX_PANELS      // MUST BE 8 OR LESS
+    MAX_PANELS            // MUST BE 8 OR LESS
 };
 
 enum eLights
@@ -113,38 +114,35 @@ enum eLights
     RIGHT_HEADLIGHT,
     LEFT_TAIL_LIGHT,
     RIGHT_TAIL_LIGHT,
-/*  LEFT_BRAKE_LIGHT,
-    RIGHT_BRAKE_LIGHT,
-    FRONT_LEFT_INDICATOR,
-    FRONT_RIGHT_INDICATOR,
-    REAR_LEFT_INDICATOR,
-    REAR_RIGHT_INDICATOR,*/
+    /*  LEFT_BRAKE_LIGHT,
+        RIGHT_BRAKE_LIGHT,
+        FRONT_LEFT_INDICATOR,
+        FRONT_RIGHT_INDICATOR,
+        REAR_LEFT_INDICATOR,
+        REAR_RIGHT_INDICATOR,*/
 
-    MAX_LIGHTS          // MUST BE 16 OR LESS
+    MAX_LIGHTS            // MUST BE 16 OR LESS
 };
-
 
 class CDamageManager
 {
 public:
-    virtual BYTE            GetEngineStatus         ( void ) = 0;
-    virtual VOID            SetEngineStatus         ( BYTE bEngineState ) = 0;
-    virtual BYTE            GetDoorStatus           ( eDoors bDoor ) = 0;
-    virtual VOID            SetDoorStatus           ( eDoors bDoor, BYTE bDoorStatus ) = 0;
-    virtual BYTE            GetWheelStatus          ( eWheels bTire ) = 0;
-    virtual VOID            SetWheelStatus          ( eWheels bTire, BYTE bTireStatus ) = 0;
-    virtual BYTE            GetPanelStatus          ( BYTE bPanel ) = 0;
-    virtual unsigned long   GetPanelStatus          ( void ) = 0;
-    virtual VOID            SetPanelStatus          ( BYTE bPanel, BYTE bPanelStatus ) = 0;
-    virtual void            SetPanelStatus          ( unsigned long ulStatus ) = 0;
-    virtual BYTE            GetLightStatus          ( BYTE bLight ) = 0;
-    virtual unsigned char   GetLightStatus          ( void ) = 0;
-    virtual VOID            SetLightStatus          ( BYTE bLight, BYTE bLightStatus  ) = 0;
-    virtual void            SetLightStatus          ( unsigned char ucStatus ) = 0;
-    virtual BYTE            GetAeroplaneCompStatus  ( BYTE CompID ) = 0;
-    virtual VOID            SetAeroplaneCompStatus  ( BYTE CompID, BYTE Status) = 0; //component ids begin at 12 - probably
+    virtual BYTE          GetEngineStatus(void) = 0;
+    virtual VOID          SetEngineStatus(BYTE bEngineState) = 0;
+    virtual BYTE          GetDoorStatus(eDoors bDoor) = 0;
+    virtual VOID          SetDoorStatus(eDoors bDoor, BYTE bDoorStatus) = 0;
+    virtual BYTE          GetWheelStatus(eWheelPosition bTire) = 0;
+    virtual VOID          SetWheelStatus(eWheelPosition bTire, BYTE bTireStatus) = 0;
+    virtual BYTE          GetPanelStatus(BYTE bPanel) = 0;
+    virtual unsigned long GetPanelStatus(void) = 0;
+    virtual VOID          SetPanelStatus(BYTE bPanel, BYTE bPanelStatus) = 0;
+    virtual void          SetPanelStatus(unsigned long ulStatus) = 0;
+    virtual BYTE          GetLightStatus(BYTE bLight) = 0;
+    virtual unsigned char GetLightStatus(void) = 0;
+    virtual VOID          SetLightStatus(BYTE bLight, BYTE bLightStatus) = 0;
+    virtual void          SetLightStatus(unsigned char ucStatus) = 0;
+    virtual BYTE          GetAeroplaneCompStatus(BYTE CompID) = 0;
+    virtual VOID          SetAeroplaneCompStatus(BYTE CompID, BYTE Status) = 0;            // component ids begin at 12 - probably
 
-    virtual VOID            FuckCarCompletely       ( BOOL bKeepWheels ) = 0;
+    virtual VOID FuckCarCompletely(BOOL bKeepWheels) = 0;
 };
-
-#endif

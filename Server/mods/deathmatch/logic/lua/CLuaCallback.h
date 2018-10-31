@@ -1,13 +1,14 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/lua/CLuaCallback.h
-*  PURPOSE:     Lua callback handler
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/lua/CLuaCallback.h
+ *  PURPOSE:     Lua callback handler
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+#pragma once
 
 //
 // For saving a Lua callback function and arguments until needed
@@ -15,26 +16,24 @@
 class CLuaCallback
 {
 public:
-    CLuaCallback ( CLuaMain* pLuaMain, CLuaFunctionRef iLuaFunction, const CLuaArguments& Args )
-        : m_pLuaMain ( pLuaMain )
-        , m_iLuaFunction ( iLuaFunction )
-        , m_Arguments ( Args )
+    CLuaCallback(CLuaMain* pLuaMain, CLuaFunctionRef iLuaFunction, const CLuaArguments& Args)
+        : m_pLuaMain(pLuaMain), m_iLuaFunction(iLuaFunction), m_Arguments(Args)
     {
     }
 
-    void Call ( void )
+    void Call(void)
     {
-        if ( m_pLuaMain )
-            m_Arguments.Call ( m_pLuaMain, m_iLuaFunction );
+        if (m_pLuaMain)
+            m_Arguments.Call(m_pLuaMain, m_iLuaFunction);
     }
 
-    void OnLuaMainDestroy ( CLuaMain* pLuaMain )
+    void OnLuaMainDestroy(CLuaMain* pLuaMain)
     {
-        if ( pLuaMain == m_pLuaMain )
+        if (pLuaMain == m_pLuaMain)
         {
             m_pLuaMain = NULL;
-            m_iLuaFunction = CLuaFunctionRef ();
-            m_Arguments.DeleteArguments ();
+            m_iLuaFunction = CLuaFunctionRef();
+            m_Arguments.DeleteArguments();
         }
     }
 
@@ -44,32 +43,30 @@ protected:
     CLuaArguments   m_Arguments;
 };
 
-
 //
 // For managing Lua callbacks
 //
 class CLuaCallbackManager
 {
 public:
-
-    CLuaCallback* CreateCallback ( CLuaMain* pLuaMain, CLuaFunctionRef iLuaFunction, const CLuaArguments& Args )
+    CLuaCallback* CreateCallback(CLuaMain* pLuaMain, CLuaFunctionRef iLuaFunction, const CLuaArguments& Args)
     {
-        m_CallbackList.push_back ( new CLuaCallback ( pLuaMain, iLuaFunction, Args ) );
-        return m_CallbackList.back ();
+        m_CallbackList.push_back(new CLuaCallback(pLuaMain, iLuaFunction, Args));
+        return m_CallbackList.back();
     }
 
-    void DestroyCallback ( CLuaCallback* pCallback )
+    void DestroyCallback(CLuaCallback* pCallback)
     {
-        ListRemove ( m_CallbackList, pCallback );
+        ListRemove(m_CallbackList, pCallback);
         delete pCallback;
     }
 
-    void OnLuaMainDestroy ( CLuaMain* pLuaMain )
+    void OnLuaMainDestroy(CLuaMain* pLuaMain)
     {
-        for ( uint i = 0 ; i < m_CallbackList.size () ; i++ )
-            m_CallbackList[i]->OnLuaMainDestroy ( pLuaMain );
+        for (uint i = 0; i < m_CallbackList.size(); i++)
+            m_CallbackList[i]->OnLuaMainDestroy(pLuaMain);
     }
 
 protected:
-    std::vector < CLuaCallback* >   m_CallbackList;
+    std::vector<CLuaCallback*> m_CallbackList;
 };

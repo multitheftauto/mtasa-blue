@@ -1,0 +1,8 @@
+# Note: use objcopy --redefine-syms=glibc_version.redef sourcepath.a target.a
+# to build a static linkable libstdc++ from the system variant using old glibc references
+# documented above.
+# If you change this, remember to also change glibc_version.h
+# See also: create_static_libraries.sh 
+# 
+memcmp memcmp@GLIBC_2.2.5
+memcpy memcpy@GLIBC_2.2.5

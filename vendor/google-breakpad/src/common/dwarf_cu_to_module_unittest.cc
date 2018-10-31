@@ -31,6 +31,8 @@
 
 // dwarf_cu_to_module.cc: Unit tests for google_breakpad::DwarfCUToModule.
 
+#include <stdint.h>
+
 #include <string>
 #include <utility>
 #include <vector>
@@ -65,7 +67,7 @@ using ::testing::ValuesIn;
 class MockLineToModuleHandler: public DwarfCUToModule::LineToModuleHandler {
  public:
   MOCK_METHOD1(StartCompilationUnit, void(const string& compilation_dir));
-  MOCK_METHOD4(ReadProgram, void(const char* program, uint64 length,
+  MOCK_METHOD4(ReadProgram, void(const uint8_t *program, uint64 length,
                                  Module *module, vector<Module::Line> *lines));
 };
 
@@ -111,7 +113,7 @@ class CUFixtureBase {
    public:
     explicit AppendLinesFunctor(
         const vector<Module::Line> *lines) : lines_(lines) { }
-    void operator()(const char *program, uint64 length,
+    void operator()(const uint8_t *program, uint64 length,
                     Module *module, vector<Module::Line> *lines) {
       lines->insert(lines->end(), lines_->begin(), lines_->end());
     }
@@ -285,7 +287,7 @@ class CUFixtureBase {
   // Mock line program reader.
   MockLineToModuleHandler line_reader_;
   AppendLinesFunctor appender_;
-  static const char dummy_line_program_[];
+  static const uint8_t dummy_line_program_[];
   static const size_t dummy_line_size_;
 
   MockWarningReporter reporter_;
@@ -302,7 +304,7 @@ class CUFixtureBase {
   bool functions_filled_;
 };
 
-const char CUFixtureBase::dummy_line_program_[] = "lots of fun data";
+const uint8_t CUFixtureBase::dummy_line_program_[] = "lots of fun data";
 const size_t CUFixtureBase::dummy_line_size_ =
     sizeof(CUFixtureBase::dummy_line_program_);
 
@@ -375,7 +377,7 @@ void CUFixtureBase::ProcessStrangeAttributes(
   handler->ProcessAttributeReference((DwarfAttribute) 0xf7f7480f,
                                      (DwarfForm) 0x829e038a,
                                      0x50fddef44734fdecULL);
-  static const char buffer[10] = "frobynode";
+  static const uint8_t buffer[10] = "frobynode";
   handler->ProcessAttributeBuffer((DwarfAttribute) 0xa55ffb51,
                                   (DwarfForm) 0x2f43b041,
                                   buffer, sizeof(buffer));
@@ -1318,6 +1320,29 @@ TEST_F(Specifications, InlineFunction) {
 
   TestFunctionCount(1);
   TestFunction(0, "inline-name",
+               0x1758a0f941b71efbULL, 0x1cf154f1f545e146ULL);
+}
+
+// An inline function in a namespace should correctly derive its
+// name from its abstract origin, and not just the namespace name.
+TEST_F(Specifications, InlineFunctionInNamespace) {
+  PushLine(0x1758a0f941b71efbULL, 0x1cf154f1f545e146ULL, "line-file", 75173118);
+
+  StartCU();
+  DIEHandler* space_handler
+      = StartNamedDIE(&root_handler_, dwarf2reader::DW_TAG_namespace,
+                      "Namespace");
+  ASSERT_TRUE(space_handler != NULL);
+  AbstractInstanceDIE(space_handler, 0x1e8dac5d507ed7abULL,
+                      dwarf2reader::DW_INL_inlined, 0LL, "func-name");
+  DefineInlineInstanceDIE(space_handler, "", 0x1e8dac5d507ed7abULL,
+                       0x1758a0f941b71efbULL, 0x1cf154f1f545e146ULL);
+  space_handler->Finish();
+  delete space_handler;
+  root_handler_.Finish();
+
+  TestFunctionCount(1);
+  TestFunction(0, "Namespace::func-name",
                0x1758a0f941b71efbULL, 0x1cf154f1f545e146ULL);
 }
 

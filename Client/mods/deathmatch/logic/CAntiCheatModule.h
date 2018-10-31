@@ -1,30 +1,26 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CAntiCheatModule.cpp
-*  PURPOSE:     Anti-cheat module class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CAntiCheatModule.cpp
+ *  PURPOSE:     Anti-cheat module class
+ *
+ *****************************************************************************/
 
-#ifndef __CANTICHEATMODULE_H
-#define __CANTICHEATMODULE_H
+#pragma once
 
 class CAntiCheatModule
 {
 public:
-                        CAntiCheatModule        ( class CAntiCheat& AntiCheat );
-    virtual             ~CAntiCheatModule       ( void );
+    CAntiCheatModule(class CAntiCheat& AntiCheat);
+    virtual ~CAntiCheatModule(void);
 
-    // Implement this function in the anticheat module class. This should 
+    // Implement this function in the anticheat module class. This should
     // return true if the checks were successful, and false if the player
     // is a cheater.
-    virtual bool        PerformChecks           ( void ) = 0;
+    virtual bool PerformChecks(void) = 0;
 
 private:
-    class CAntiCheat&   m_AntiCheat;
+    class CAntiCheat& m_AntiCheat;
 };
-
-#endif

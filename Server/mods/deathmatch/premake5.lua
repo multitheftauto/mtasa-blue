@@ -8,7 +8,7 @@ project "Deathmatch"
 	pchsource "StdInc.cpp"
 
 	filter "system:windows"
-		includedirs { "../../../vendor/sparsehash/current/src/windows" }
+		includedirs { "../../../vendor/sparsehash/src/windows" }
 	
 	filter {}
 		includedirs { 
@@ -24,19 +24,20 @@ project "Deathmatch"
 			"../../../Shared/mods/deathmatch/logic", 
 			"../../../Shared/animation", 
 			"../../../Shared/publicsdk/include", 
-			"../../../vendor/sparsehash/current/src/",
+			"../../../vendor/sparsehash/src/",
 			"logic", 
 			"utils",
 			"."
 		}
 	
+	defines { "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Server", "pthread", "sqlite", "ehs", "cryptopp", "pcre", "pme", "json-c", "zlib", "zip"
+		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib", "blowfish_bcrypt",
 	}
 	
 	vpaths {
-		["Headers/*"] = {"**.h", "../../../**.h"},
-		["Sources/*"] = {"**.cpp", "../../../**.cpp"},
+		["Headers/*"] = {"**.h", "../../../Shared/mods/deathmatch/**.h", "../../**.h"},
+		["Sources/*"] = {"**.cpp", "../../../Shared/mods/deathmatch/**.cpp", "../../../Shared/**.cpp", "../../../vendor/**.cpp", "../../**.cpp"},
 		["*"] = "premake5.lua"
 	}
 	
@@ -48,21 +49,21 @@ project "Deathmatch"
 		"../../../Shared/mods/deathmatch/logic/**.h",
 		"../../../Shared/animation/CEasingCurve.cpp", 
 		"../../../Shared/animation/CPositionRotationAnimation.cpp",
-		"../../sdk/MTAPlatform.cpp",
-		"../../sdk/MTAPlatform.h",
 		"../../version.h",
 		-- Todo: Replace these two by using the CryptoPP functions instead
-		"../../../vendor/bob_withers/base64.cpp",
 		"../../../vendor/bochs/bochs_internal/crc32.cpp",
 	}
 	
 	filter "system:windows"
 		includedirs { "../../../vendor/pthreads/include" }
 		buildoptions { "-Zm130" }
-		links { "ws2_32" }
+		links { "ws2_32", "pthread" }
 		
 	filter "system:not windows"
 		buildoptions { "-Wno-narrowing" } -- We should fix the warnings at some point
+		links { "rt" }
+		buildoptions { "-pthread" }
+		linkoptions { "-pthread" }
 	
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))

@@ -1,24 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CPlayerPedSA.h
-*  PURPOSE:     Header file for player ped entity class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Christian Myhre Lundheim <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*               Jax <>
-*               Alberto Alonso <rydencillo@gmail.com>
-*               Stanislav Bobrov <lil_toady@hotmail.com>
-*               aru <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CPlayerPedSA.h
+ *  PURPOSE:     Header file for player ped entity class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CGAMESA_PLAYERPED
-#define __CGAMESA_PLAYERPED
-
+#pragma once
 
 #include <game/CPlayerPed.h>
 #include "CPedSA.h"
@@ -37,43 +28,40 @@
 
 #define SIZEOF_CPLAYERPED               1956
 
-class CPlayerPedSAInterface : public CPedSAInterface // CPlayerPed 1956 bytes in SA
+class CPlayerPedSAInterface : public CPedSAInterface            // CPlayerPed 1956 bytes in SA
 {
 public:
-
 };
 
 class CPlayerPedSA : public virtual CPlayerPed, public virtual CPedSA
 {
 private:
-    bool                                m_bIsLocal;
-    class CPlayerPedDataSAInterface*    m_pData;
-    CWantedSA*                          m_pWanted;
+    bool                             m_bIsLocal;
+    class CPlayerPedDataSAInterface* m_pData;
+    CWantedSA*                       m_pWanted;
 
 public:
-                        CPlayerPedSA                ( ePedModel pedType );
-                        CPlayerPedSA                ( CPlayerPedSAInterface * ped );
-                        ~CPlayerPedSA               ( void );
+    CPlayerPedSA(ePedModel pedType);
+    CPlayerPedSA(CPlayerPedSAInterface* ped);
+    ~CPlayerPedSA(void);
 
-    CWanted*            GetWanted                   ( void );
+    CWanted* GetWanted(void);
 
-    float               GetSprintEnergy             ( void );
-    void                SetSprintEnergy             ( float fSprintEnergy );
+    float GetSprintEnergy(void);
+    void  SetSprintEnergy(float fSprintEnergy);
 
-    void                SetInitialState             ( void );
+    void SetInitialState(void);
 
-    eMoveAnim           GetMoveAnim                 ( void );
-    void                SetMoveAnim                 ( eMoveAnim iAnimGroup );
+    eMoveAnim GetMoveAnim(void);
+    void      SetMoveAnim(eMoveAnim iAnimGroup);
 
-/*  DWORD               GetCurrentWeaponType        ( void );
-    DWORD               GetLastShotTime             ( void );
-    BOOL                IsStationaryOnFoot          ( void );
-    VOID                ResetToInitialState         ( void );
-    VOID                ClearWeaponTarget           ( void );*/
+    /*  DWORD               GetCurrentWeaponType        ( void );
+        DWORD               GetLastShotTime             ( void );
+        BOOL                IsStationaryOnFoot          ( void );
+        VOID                ResetToInitialState         ( void );
+        VOID                ClearWeaponTarget           ( void );*/
 
-    inline CPlayerPedSAInterface*   GetPlayerPedInterface   ( void )    { return static_cast < CPlayerPedSAInterface* > ( m_pInterface ); };
+    CPlayerPedSAInterface* GetPlayerPedInterface(void) { return static_cast<CPlayerPedSAInterface*>(m_pInterface); };
 
-    static void         StaticSetHooks              ( void );
+    static void StaticSetHooks(void);
 };
-
-#endif

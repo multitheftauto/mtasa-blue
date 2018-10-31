@@ -1,18 +1,16 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientTeam.h
-*  PURPOSE:     Team entity class header
-*  DEVELOPERS:  Jax <>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientTeam.h
+ *  PURPOSE:     Team entity class header
+ *
+ *****************************************************************************/
 
 class CClientTeam;
 
-#ifndef __CCLIENTTEAM_H
-#define __CCLIENTTEAM_H
+#pragma once
 
 #include "CClientEntity.h"
 #include "CClientPlayer.h"
@@ -20,56 +18,56 @@ class CClientTeam;
 
 class CClientTeam : public CClientEntity
 {
-    DECLARE_CLASS( CClientTeam, CClientEntity )
+    DECLARE_CLASS(CClientTeam, CClientEntity)
     friend class CClientTeamManager;
-public:    
-                                CClientTeam         ( CClientManager* pManager, ElementID ID, const char* szName = NULL, unsigned char ucRed = 0, unsigned char ucGreen = 0, unsigned char ucBlue = 0 );
-                                ~CClientTeam        ( void );
 
-    eClientEntityType           GetType             ( void ) const              { return CCLIENTTEAM; }
+public:
+    CClientTeam(CClientManager* pManager, ElementID ID, const char* szName = NULL, unsigned char ucRed = 0, unsigned char ucGreen = 0,
+                unsigned char ucBlue = 0);
+    ~CClientTeam(void);
 
-    void                        Unlink              ( void );
+    eClientEntityType GetType(void) const { return CCLIENTTEAM; }
 
-    inline unsigned char        GetID               ( void )                    { return m_ucID; }
+    void Unlink(void);
 
-    const char*                 GetTeamName         ( void )                    { return m_strTeamName; }
-    void                        SetTeamName         ( const char* szName );
+    unsigned char GetID(void) { return m_ucID; }
 
-    void                        GetColor            ( unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue );
-    void                        SetColor            ( unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue );
+    const char* GetTeamName(void) { return m_strTeamName; }
+    void        SetTeamName(const char* szName);
 
-    inline bool                 GetFriendlyFire     ( void )                    { return m_bFriendlyFire; }
-    inline void                 SetFriendlyFire     ( bool bFriendlyFire )      { m_bFriendlyFire = bFriendlyFire; }
+    void GetColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue);
+    void SetColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
 
-    void                        AddPlayer           ( CClientPlayer* pPlayer, bool bChangePlayer = false );
-    void                        RemovePlayer        ( CClientPlayer* pPlayer, bool bChangePlayer = false );
-    void                        RemoveAll           ( void );
+    bool GetFriendlyFire(void) { return m_bFriendlyFire; }
+    void SetFriendlyFire(bool bFriendlyFire) { m_bFriendlyFire = bFriendlyFire; }
 
-    bool                        Exists              ( CClientPlayer* pPlayer );
+    void AddPlayer(CClientPlayer* pPlayer, bool bChangePlayer = false);
+    void RemovePlayer(CClientPlayer* pPlayer, bool bChangePlayer = false);
+    void RemoveAll(void);
 
-    std::list < CClientPlayer* > ::const_iterator IterBegin ( void )         { return m_List.begin (); }
-    std::list < CClientPlayer* > ::const_iterator IterEnd   ( void )         { return m_List.end (); }
+    bool Exists(CClientPlayer* pPlayer);
 
-    void                        GetPosition         ( CVector& vecPosition ) const  { vecPosition = m_vecPosition; }
-    void                        SetPosition         ( const CVector& vecPosition )  { m_vecPosition = vecPosition; }
+    std::list<CClientPlayer*>::const_iterator IterBegin(void) { return m_List.begin(); }
+    std::list<CClientPlayer*>::const_iterator IterEnd(void) { return m_List.end(); }
 
-    inline unsigned int         CountPlayers        ( void )            { return static_cast < unsigned int > ( m_List.size () ); }
+    void GetPosition(CVector& vecPosition) const { vecPosition = m_vecPosition; }
+    void SetPosition(const CVector& vecPosition) { m_vecPosition = vecPosition; }
 
-protected:                        
-    CClientTeamManager*         m_pTeamManager;
+    unsigned int CountPlayers(void) { return static_cast<unsigned int>(m_List.size()); }
 
-    unsigned char               m_ucID;
-    SString                     m_strTeamName;
+protected:
+    CClientTeamManager* m_pTeamManager;
 
-    unsigned char               m_ucRed;
-    unsigned char               m_ucGreen;
-    unsigned char               m_ucBlue;
+    unsigned char m_ucID;
+    SString       m_strTeamName;
 
-    bool                        m_bFriendlyFire;
+    unsigned char m_ucRed;
+    unsigned char m_ucGreen;
+    unsigned char m_ucBlue;
 
-    std::list < CClientPlayer* > m_List;  
+    bool m_bFriendlyFire;
 
-    CVector                     m_vecPosition;
+    std::list<CClientPlayer*> m_List;
+
+    CVector m_vecPosition;
 };
-
-#endif

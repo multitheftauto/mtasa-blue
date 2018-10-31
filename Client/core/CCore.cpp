@@ -1,19 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CCore.cpp
-*  PURPOSE:     Base core class
-*  DEVELOPERS:  Cecill Etheredge <ijsf@gmx.net>
-*               Chris McArthur <>
-*               Christian Myhre Lundheim <>
-*               Derek Abdine <>
-*               Ed Lyons <eai@opencoding.net>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CCore.cpp
+ *  PURPOSE:     Base core class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 #include <game/CGame.h>
@@ -26,6 +20,7 @@
 #include "CTimingCheckpoints.hpp"
 #include "CModelCacheManager.h"
 #include "detours/include/detours.h"
+#include <ServerBrowser/CServerCache.h>
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -33,16 +28,16 @@ using namespace std;
 static float fTest = 1;
 
 extern CCore* g_pCore;
-bool g_bBoundsChecker = false;
-SString g_strJingleBells;
+bool          g_bBoundsChecker = false;
+SString       g_strJingleBells;
 
-BOOL AC_RestrictAccess( VOID )
+BOOL AC_RestrictAccess(VOID)
 {
     EXPLICIT_ACCESS NewAccess;
-    PACL pTempDacl;
-    HANDLE hProcess;
-    DWORD dwFlags;
-    DWORD dwErr;
+    PACL            pTempDacl;
+    HANDLE          hProcess;
+    DWORD           dwFlags;
+    DWORD           dwErr;
 
     ///////////////////////////////////////////////
     // Get the HANDLE to the current process.
@@ -50,16 +45,15 @@ BOOL AC_RestrictAccess( VOID )
 
     ///////////////////////////////////////////////
     // Setup which accesses we want to deny.
-    dwFlags = GENERIC_WRITE|PROCESS_ALL_ACCESS|WRITE_DAC|DELETE|WRITE_OWNER|READ_CONTROL;
+    dwFlags = GENERIC_WRITE | PROCESS_ALL_ACCESS | WRITE_DAC | DELETE | WRITE_OWNER | READ_CONTROL;
 
     ///////////////////////////////////////////////
     // Build our EXPLICIT_ACCESS structure.
-    BuildExplicitAccessWithName( &NewAccess, "CURRENT_USER", dwFlags, DENY_ACCESS, NO_INHERITANCE ); 
-
+    BuildExplicitAccessWithName(&NewAccess, "CURRENT_USER", dwFlags, DENY_ACCESS, NO_INHERITANCE);
 
     ///////////////////////////////////////////////
     // Create our Discretionary Access Control List.
-    if ( ERROR_SUCCESS != (dwErr = SetEntriesInAcl( 1, &NewAccess, NULL, &pTempDacl )) )
+    if (ERROR_SUCCESS != (dwErr = SetEntriesInAcl(1, &NewAccess, NULL, &pTempDacl)))
     {
         #ifdef DEBUG
 //        pConsole->Con_Printf("Error at SetEntriesInAcl(): %i", dwErr);
@@ -69,7 +63,7 @@ BOOL AC_RestrictAccess( VOID )
 
     ////////////////////////////////////////////////
     // Set the new DACL to our current process.
-    if ( ERROR_SUCCESS != (dwErr = SetSecurityInfo( hProcess, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pTempDacl, NULL )) )
+    if (ERROR_SUCCESS != (dwErr = SetSecurityInfo(hProcess, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, NULL, NULL, pTempDacl, NULL)))
     {
         #ifdef DEBUG
 //        pConsole->Con_Printf("Error at SetSecurityInfo(): %i", dwErr);
@@ -79,63 +73,59 @@ BOOL AC_RestrictAccess( VOID )
 
     ////////////////////////////////////////////////
     // Free the DACL (see msdn on SetEntriesInAcl)
-    LocalFree( pTempDacl );
-    CloseHandle( hProcess );
+    LocalFree(pTempDacl);
+    CloseHandle(hProcess);
 
     return TRUE;
 }
 
+template <>
+CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
-template<> CCore * CSingleton< CCore >::m_pSingleton = NULL;
-
-CCore::CCore ( void )
+CCore::CCore(void)
 {
     // Initialize the global pointer
     g_pCore = this;
 
     #if !defined(MTA_DEBUG) && !defined(MTA_ALLOW_DEBUG)
-    AC_RestrictAccess ();
+    AC_RestrictAccess();
     #endif
-    
+
     m_pConfigFile = NULL;
 
     // Set our locale to the C locale, except for character handling which is the system's default
-    std::setlocale(LC_ALL,"C");
-    std::setlocale(LC_CTYPE,"");
+    std::setlocale(LC_ALL, "C");
+    std::setlocale(LC_CTYPE, "");
     // check LC_COLLATE is the old-time raw ASCII sort order
-    assert ( strcoll( "a", "B" ) > 0 );
+    assert(strcoll("a", "B") > 0);
 
     // Parse the command line
-    const char* pszNoValOptions[] =
-    {
-        "window",
-        NULL
-    };
-    ParseCommandLine ( m_CommandLineOptions, m_szCommandLineArgs, pszNoValOptions );
+    const char* pszNoValOptions[] = {"window", NULL};
+    ParseCommandLine(m_CommandLineOptions, m_szCommandLineArgs, pszNoValOptions);
 
     // Load our settings and localization as early as possible
-    CreateXML ( );
+    CreateXML();
     g_pLocalization = new CLocalization;
 
     // Create a logger instance.
-    m_pConsoleLogger            = new CConsoleLogger ( );
+    m_pConsoleLogger = new CConsoleLogger();
 
     // Create interaction objects.
-    m_pCommands                 = new CCommands;
-    m_pConnectManager           = new CConnectManager;
+    m_pCommands = new CCommands;
+    m_pConnectManager = new CConnectManager;
 
     // Create the GUI manager and the graphics lib wrapper
-    m_pLocalGUI                 = new CLocalGUI;
-    m_pGraphics                 = new CGraphics ( m_pLocalGUI );
-    g_pGraphics                 = m_pGraphics;
-    m_pGUI                      = NULL;
+    m_pLocalGUI = new CLocalGUI;
+    m_pGraphics = new CGraphics(m_pLocalGUI);
+    g_pGraphics = m_pGraphics;
+    m_pGUI = NULL;
 
     // Create the mod manager
-    m_pModManager               = new CModManager;
+    m_pModManager = new CModManager;
 
     CCrashDumpWriter::SetHandlers();
 
-    m_pfnMessageProcessor       = NULL;
+    m_pfnMessageProcessor = NULL;
     m_pMessageBox = NULL;
 
     m_bFirstFrame = true;
@@ -150,24 +140,24 @@ CCore::CCore ( void )
     // Create our Direct3DData handler.
     m_pDirect3DData = new CDirect3DData;
 
-    WriteDebugEvent ( "CCore::CCore" );
+    WriteDebugEvent("CCore::CCore");
 
-    m_pKeyBinds = new CKeyBinds ( this );
+    m_pKeyBinds = new CKeyBinds(this);
 
     m_pMouseControl = new CMouseControl();
 
     // Create our hook objects.
-    //m_pFileSystemHook           = new CFileSystemHook ( );
-    m_pDirect3DHookManager      = new CDirect3DHookManager ( );
-    m_pDirectInputHookManager   = new CDirectInputHookManager ( );
-    m_pMessageLoopHook          = new CMessageLoopHook ( );
-    m_pSetCursorPosHook         = new CSetCursorPosHook ( );
+    // m_pFileSystemHook           = new CFileSystemHook ( );
+    m_pDirect3DHookManager = new CDirect3DHookManager();
+    m_pDirectInputHookManager = new CDirectInputHookManager();
+    m_pMessageLoopHook = new CMessageLoopHook();
+    m_pSetCursorPosHook = new CSetCursorPosHook();
 
     // Register internal commands.
-    RegisterCommands ( );
+    RegisterCommands();
 
     // Setup our hooks.
-    ApplyHooks ( );
+    ApplyHooks();
 
     // Reset the screenshot flag
     bScreenShot = false;
@@ -183,31 +173,41 @@ CCore::CCore ( void )
     m_fMaxStreamingMemory = 0;
     m_bGettingIdleCallsFromMultiplayer = false;
     m_bWindowsTimerEnabled = false;
+
+    // Create tray icon
+    m_pTrayIcon = new CTrayIcon();
 }
 
-CCore::~CCore ( void )
+CCore::~CCore(void)
 {
-    WriteDebugEvent ( "CCore::~CCore" );
+    WriteDebugEvent("CCore::~CCore");
+
+    // Destroy tray icon
+    delete m_pTrayIcon;
+
+    // This will set the GTA volume to the GTA volume value in the settings,
+    // and is not affected by the master volume setting.
+    m_pLocalGUI->GetMainMenu()->GetSettingsWindow()->ResetGTAVolume();
 
     // Delete the mod manager
     delete m_pModManager;
-    SAFE_DELETE ( m_pMessageBox );
+    SAFE_DELETE(m_pMessageBox);
 
     // Destroy early subsystems
     m_bModulesLoaded = false;
-    DestroyNetwork ();
-    DestroyMultiplayer ();
-    DestroyGame ();
+    DestroyNetwork();
+    DestroyMultiplayer();
+    DestroyGame();
 
     // Remove global events
-    g_pCore->m_pGUI->ClearInputHandlers( INPUT_CORE );
+    g_pCore->m_pGUI->ClearInputHandlers(INPUT_CORE);
 
     // Remove input hook
-    CMessageLoopHook::GetSingleton ( ).RemoveHook ( );
+    CMessageLoopHook::GetSingleton().RemoveHook();
 
     // Store core variables to cvars
-    CVARS_SET ( "console_pos",                  m_pLocalGUI->GetConsole ()->GetPosition () );
-    CVARS_SET ( "console_size",                 m_pLocalGUI->GetConsole ()->GetSize () );
+    CVARS_SET("console_pos", m_pLocalGUI->GetConsole()->GetPosition());
+    CVARS_SET("console_size", m_pLocalGUI->GetConsole()->GetSize());
 
     // Delete interaction objects.
     delete m_pCommands;
@@ -216,20 +216,20 @@ CCore::~CCore ( void )
 
     // Delete hooks.
     delete m_pSetCursorPosHook;
-    //delete m_pFileSystemHook;
+    // delete m_pFileSystemHook;
     delete m_pDirect3DHookManager;
     delete m_pDirectInputHookManager;
 
-    // Delete the GUI manager    
+    // Delete the GUI manager
     delete m_pLocalGUI;
     delete m_pGraphics;
 
     // Delete the web
-    SAFE_DELETE ( m_pWebCore );
+    DestroyWeb();
 
     // Delete lazy subsystems
-    DestroyGUI ();
-    DestroyXML ();
+    DestroyGUI();
+    DestroyXML();
 
     // Delete keybinds
     delete m_pKeyBinds;
@@ -244,449 +244,428 @@ CCore::~CCore ( void )
     delete m_pMessageLoopHook;
 }
 
-
-eCoreVersion CCore::GetVersion ( void )
+eCoreVersion CCore::GetVersion(void)
 {
     return MTACORE_20;
 }
 
-
-CConsoleInterface* CCore::GetConsole ( void )
+CConsoleInterface* CCore::GetConsole(void)
 {
-    return m_pLocalGUI->GetConsole ();
+    return m_pLocalGUI->GetConsole();
 }
 
-
-CCommandsInterface* CCore::GetCommands ( void )
+CCommandsInterface* CCore::GetCommands(void)
 {
     return m_pCommands;
 }
 
-
-CGame* CCore::GetGame ( void )
+CGame* CCore::GetGame(void)
 {
     return m_pGame;
 }
 
-
-CGraphicsInterface* CCore::GetGraphics ( void )
+CGraphicsInterface* CCore::GetGraphics(void)
 {
     return m_pGraphics;
 }
 
-
-CModManagerInterface* CCore::GetModManager ( void )
+CModManagerInterface* CCore::GetModManager(void)
 {
     return m_pModManager;
 }
 
-
-CMultiplayer* CCore::GetMultiplayer ( void )
+CMultiplayer* CCore::GetMultiplayer(void)
 {
     return m_pMultiplayer;
 }
 
-CXMLNode* CCore::GetConfig ( void )
+CXMLNode* CCore::GetConfig(void)
 {
-    if ( !m_pConfigFile )
+    if (!m_pConfigFile)
         return NULL;
-    CXMLNode* pRoot = m_pConfigFile->GetRootNode ();
-    if ( !pRoot )
-        pRoot = m_pConfigFile->CreateRootNode ( CONFIG_ROOT );
+    CXMLNode* pRoot = m_pConfigFile->GetRootNode();
+    if (!pRoot)
+        pRoot = m_pConfigFile->CreateRootNode(CONFIG_ROOT);
     return pRoot;
 }
 
-CGUI* CCore::GetGUI ( void )
+CGUI* CCore::GetGUI(void)
 {
     return m_pGUI;
 }
 
-
-CNet* CCore::GetNetwork ( void )
+CNet* CCore::GetNetwork(void)
 {
     return m_pNet;
 }
 
-
-CKeyBindsInterface* CCore::GetKeyBinds ( void )
+CKeyBindsInterface* CCore::GetKeyBinds(void)
 {
     return m_pKeyBinds;
 }
 
-
-CLocalGUI* CCore::GetLocalGUI ( void )
+CLocalGUI* CCore::GetLocalGUI(void)
 {
     return m_pLocalGUI;
 }
 
-
-void CCore::SaveConfig ( bool bWaitUntilFinished )
+void CCore::SaveConfig(bool bWaitUntilFinished)
 {
-    if ( m_pConfigFile )
+    if (m_pConfigFile)
     {
-        CXMLNode* pBindsNode = GetConfig ()->FindSubNode ( CONFIG_NODE_KEYBINDS );
-        if ( !pBindsNode )
-            pBindsNode = GetConfig ()->CreateSubNode ( CONFIG_NODE_KEYBINDS );
-        m_pKeyBinds->SaveToXML ( pBindsNode );
-        GetVersionUpdater ()->SaveConfigToXML ();
-        m_pConfigFile->Write ();
-        GetServerCache ()->SaveServerCache ( bWaitUntilFinished );
+        CXMLNode* pBindsNode = GetConfig()->FindSubNode(CONFIG_NODE_KEYBINDS);
+        if (!pBindsNode)
+            pBindsNode = GetConfig()->CreateSubNode(CONFIG_NODE_KEYBINDS);
+        m_pKeyBinds->SaveToXML(pBindsNode);
+        GetVersionUpdater()->SaveConfigToXML();
+        m_pConfigFile->Write();
+        GetServerCache()->SaveServerCache(bWaitUntilFinished);
     }
 }
 
-void CCore::ChatEcho ( const char* szText, bool bColorCoded )
+void CCore::ChatEcho(const char* szText, bool bColorCoded)
 {
-    CChat* pChat = m_pLocalGUI->GetChat ();
-    if ( pChat )
+    CChat* pChat = m_pLocalGUI->GetChat();
+    if (pChat)
     {
-        CColor color ( 255, 255, 255, 255 );
-        pChat->SetTextColor ( color );
+        CColor color(255, 255, 255, 255);
+        pChat->SetTextColor(color);
     }
 
     // Echo it to the console and chat
-    m_pLocalGUI->EchoChat ( szText, bColorCoded );
-    if ( bColorCoded )
+    m_pLocalGUI->EchoChat(szText, bColorCoded);
+    if (bColorCoded)
     {
-        m_pLocalGUI->EchoConsole ( RemoveColorCodes( szText ) );
+        m_pLocalGUI->EchoConsole(RemoveColorCodes(szText));
     }
     else
-        m_pLocalGUI->EchoConsole ( szText );
+        m_pLocalGUI->EchoConsole(szText);
 }
 
-
-void CCore::DebugEcho ( const char* szText )
+void CCore::DebugEcho(const char* szText)
 {
-    CDebugView * pDebugView = m_pLocalGUI->GetDebugView ();
-    if ( pDebugView )
+    CDebugView* pDebugView = m_pLocalGUI->GetDebugView();
+    if (pDebugView)
     {
-        CColor color ( 255, 255, 255, 255 );
-        pDebugView->SetTextColor ( color );
+        CColor color(255, 255, 255, 255);
+        pDebugView->SetTextColor(color);
     }
 
-    m_pLocalGUI->EchoDebug ( szText );
+    m_pLocalGUI->EchoDebug(szText);
 }
 
-void CCore::DebugPrintf ( const char* szFormat, ... )
+void CCore::DebugPrintf(const char* szFormat, ...)
 {
     // Convert it to a string buffer
-    char szBuffer [1024];
+    char    szBuffer[1024];
     va_list ap;
-    va_start ( ap, szFormat );
-    VSNPRINTF ( szBuffer, 1024, szFormat, ap );
-    va_end ( ap );
+    va_start(ap, szFormat);
+    VSNPRINTF(szBuffer, 1024, szFormat, ap);
+    va_end(ap);
 
-    DebugEcho ( szBuffer );
+    DebugEcho(szBuffer);
 }
 
-void CCore::SetDebugVisible ( bool bVisible )
+void CCore::SetDebugVisible(bool bVisible)
 {
-    if ( m_pLocalGUI )
+    if (m_pLocalGUI)
     {
-        m_pLocalGUI->SetDebugViewVisible ( bVisible );
+        m_pLocalGUI->SetDebugViewVisible(bVisible);
     }
 }
 
-
-bool CCore::IsDebugVisible ( void )
+bool CCore::IsDebugVisible(void)
 {
-    if ( m_pLocalGUI )
-        return m_pLocalGUI->IsDebugViewVisible ();
+    if (m_pLocalGUI)
+        return m_pLocalGUI->IsDebugViewVisible();
     else
         return false;
 }
 
-
-void CCore::DebugEchoColor ( const char* szText, unsigned char R, unsigned char G, unsigned char B )
+void CCore::DebugEchoColor(const char* szText, unsigned char R, unsigned char G, unsigned char B)
 {
     // Set the color
-    CDebugView * pDebugView = m_pLocalGUI->GetDebugView ();
-    if ( pDebugView )
+    CDebugView* pDebugView = m_pLocalGUI->GetDebugView();
+    if (pDebugView)
     {
-        CColor color ( R, G, B, 255 );
-        pDebugView->SetTextColor ( color );
+        CColor color(R, G, B, 255);
+        pDebugView->SetTextColor(color);
     }
 
-    m_pLocalGUI->EchoDebug ( szText );
+    m_pLocalGUI->EchoDebug(szText);
 }
 
-
-void CCore::DebugPrintfColor ( const char* szFormat, unsigned char R, unsigned char G, unsigned char B, ... )
+void CCore::DebugPrintfColor(const char* szFormat, unsigned char R, unsigned char G, unsigned char B, ...)
 {
     // Set the color
-    if ( szFormat )
+    if (szFormat)
     {
         // Convert it to a string buffer
-        char szBuffer [1024];
+        char    szBuffer[1024];
         va_list ap;
-        va_start ( ap, B );
-        VSNPRINTF ( szBuffer, 1024, szFormat, ap );
-        va_end ( ap );
+        va_start(ap, B);
+        VSNPRINTF(szBuffer, 1024, szFormat, ap);
+        va_end(ap);
 
         // Echo it to the console and chat
-        DebugEchoColor ( szBuffer, R, G, B );
+        DebugEchoColor(szBuffer, R, G, B);
     }
 }
 
-
-void CCore::DebugClear ( void )
+void CCore::DebugClear(void)
 {
-    CDebugView * pDebugView = m_pLocalGUI->GetDebugView ();
-    if ( pDebugView )
+    CDebugView* pDebugView = m_pLocalGUI->GetDebugView();
+    if (pDebugView)
     {
         pDebugView->Clear();
     }
 }
 
-
-void CCore::ChatEchoColor ( const char* szText, unsigned char R, unsigned char G, unsigned char B, bool bColorCoded )
+void CCore::ChatEchoColor(const char* szText, unsigned char R, unsigned char G, unsigned char B, bool bColorCoded)
 {
     // Set the color
-    CChat* pChat = m_pLocalGUI->GetChat ();
-    if ( pChat )
+    CChat* pChat = m_pLocalGUI->GetChat();
+    if (pChat)
     {
-        CColor color ( R, G, B, 255 );
-        pChat->SetTextColor ( color );
+        CColor color(R, G, B, 255);
+        pChat->SetTextColor(color);
     }
 
     // Echo it to the console and chat
-    m_pLocalGUI->EchoChat ( szText, bColorCoded );
-    if ( bColorCoded )
+    m_pLocalGUI->EchoChat(szText, bColorCoded);
+    if (bColorCoded)
     {
-        m_pLocalGUI->EchoConsole ( RemoveColorCodes( szText ) );
+        m_pLocalGUI->EchoConsole(RemoveColorCodes(szText));
     }
     else
-        m_pLocalGUI->EchoConsole ( szText );
+        m_pLocalGUI->EchoConsole(szText);
 }
 
-
-void CCore::ChatPrintf ( const char* szFormat, bool bColorCoded, ... )
+void CCore::ChatPrintf(const char* szFormat, bool bColorCoded, ...)
 {
     // Convert it to a string buffer
-    char szBuffer [1024];
+    char    szBuffer[1024];
     va_list ap;
-    va_start ( ap, bColorCoded );
-    VSNPRINTF ( szBuffer, 1024, szFormat, ap );
-    va_end ( ap );
+    va_start(ap, bColorCoded);
+    VSNPRINTF(szBuffer, 1024, szFormat, ap);
+    va_end(ap);
 
     // Echo it to the console and chat
-    ChatEcho ( szBuffer, bColorCoded );
+    ChatEcho(szBuffer, bColorCoded);
 }
 
-
-void CCore::ChatPrintfColor ( const char* szFormat, bool bColorCoded, unsigned char R, unsigned char G, unsigned char B, ... )
+void CCore::ChatPrintfColor(const char* szFormat, bool bColorCoded, unsigned char R, unsigned char G, unsigned char B, ...)
 {
     // Set the color
-    if ( szFormat )
+    if (szFormat)
     {
-        if ( m_pLocalGUI )
+        if (m_pLocalGUI)
         {
             // Convert it to a string buffer
-            char szBuffer [1024];
+            char    szBuffer[1024];
             va_list ap;
-            va_start ( ap, B );
-            VSNPRINTF ( szBuffer, 1024, szFormat, ap );
-            va_end ( ap );
+            va_start(ap, B);
+            VSNPRINTF(szBuffer, 1024, szFormat, ap);
+            va_end(ap);
 
             // Echo it to the console and chat
-            ChatEchoColor ( szBuffer, R, G, B, bColorCoded );
+            ChatEchoColor(szBuffer, R, G, B, bColorCoded);
         }
     }
 }
 
-
-void CCore::SetChatVisible ( bool bVisible )
+void CCore::SetChatVisible(bool bVisible)
 {
-    if ( m_pLocalGUI )
+    if (m_pLocalGUI)
     {
-        m_pLocalGUI->SetChatBoxVisible ( bVisible );
+        m_pLocalGUI->SetChatBoxVisible(bVisible);
     }
 }
 
-
-bool CCore::IsChatVisible ( void )
+bool CCore::IsChatVisible(void)
 {
-    if ( m_pLocalGUI )
+    if (m_pLocalGUI)
     {
-        return m_pLocalGUI->IsChatBoxVisible ();
+        return m_pLocalGUI->IsChatBoxVisible();
     }
     return false;
 }
 
+bool CCore::ClearChat()
+{
+    if (m_pLocalGUI)
+    {
+        CChat* pChat = m_pLocalGUI->GetChat();
+        if (pChat)
+        {
+            pChat->Clear();
+            return true;
+        }
+    }
+    return false;
+}
 
-void CCore::TakeScreenShot ( void )
+void CCore::TakeScreenShot(void)
 {
     bScreenShot = true;
 }
 
-
-void CCore::EnableChatInput ( char* szCommand, DWORD dwColor )
+void CCore::EnableChatInput(char* szCommand, DWORD dwColor)
 {
-    if ( m_pLocalGUI )
+    if (m_pLocalGUI)
     {
-        if ( m_pGame->GetSystemState () == 9 /* GS_PLAYING_GAME */ &&
-            m_pModManager->GetCurrentMod () != NULL &&
-            !IsOfflineMod () &&
-            !m_pGame->IsAtMenu () &&
-            !m_pLocalGUI->GetMainMenu ()->IsVisible () &&
-            !m_pLocalGUI->GetConsole ()->IsVisible () &&
-            !m_pLocalGUI->IsChatBoxInputEnabled () )
+        if (m_pGame->GetSystemState() == 9 /* GS_PLAYING_GAME */ && m_pModManager->GetCurrentMod() != NULL && !IsOfflineMod() && !m_pGame->IsAtMenu() &&
+            !m_pLocalGUI->GetMainMenu()->IsVisible() && !m_pLocalGUI->GetConsole()->IsVisible() && !m_pLocalGUI->IsChatBoxInputEnabled())
         {
-            CChat* pChat = m_pLocalGUI->GetChat ();
-            pChat->SetCommand ( szCommand );
-            m_pLocalGUI->SetChatBoxInputEnabled ( true );
+            CChat* pChat = m_pLocalGUI->GetChat();
+            pChat->SetCommand(szCommand);
+            m_pLocalGUI->SetChatBoxInputEnabled(true);
         }
     }
 }
 
-
-bool CCore::IsChatInputEnabled ( void )
+bool CCore::IsChatInputEnabled(void)
 {
-    if ( m_pLocalGUI )
+    if (m_pLocalGUI)
     {
-        return ( m_pLocalGUI->IsChatBoxInputEnabled () );
+        return (m_pLocalGUI->IsChatBoxInputEnabled());
     }
 
     return false;
 }
 
-
-bool CCore::IsSettingsVisible ( void )
+bool CCore::IsSettingsVisible(void)
 {
-    if ( m_pLocalGUI )
+    if (m_pLocalGUI)
     {
-        return ( m_pLocalGUI->GetMainMenu ()->GetSettingsWindow ()->IsVisible () );
-    }
-    
-    return false;
-}
-
-
-bool CCore::IsMenuVisible ( void )
-{
-    if ( m_pLocalGUI )
-    {
-        return ( m_pLocalGUI->GetMainMenu ()->IsVisible () );
+        return (m_pLocalGUI->GetMainMenu()->GetSettingsWindow()->IsVisible());
     }
 
     return false;
 }
 
-
-bool CCore::IsCursorForcedVisible ( void )
+bool CCore::IsMenuVisible(void)
 {
-    if ( m_pLocalGUI )
+    if (m_pLocalGUI)
     {
-        return ( m_pLocalGUI->IsCursorForcedVisible () );
+        return (m_pLocalGUI->GetMainMenu()->IsVisible());
     }
 
     return false;
 }
 
-void CCore::ApplyConsoleSettings ( void )
+bool CCore::IsCursorForcedVisible(void)
+{
+    if (m_pLocalGUI)
+    {
+        return (m_pLocalGUI->IsCursorForcedVisible());
+    }
+
+    return false;
+}
+
+void CCore::ApplyConsoleSettings(void)
 {
     CVector2D vec;
-    CConsole * pConsole = m_pLocalGUI->GetConsole ();
+    CConsole* pConsole = m_pLocalGUI->GetConsole();
 
-    CVARS_GET ( "console_pos", vec );
-    pConsole->SetPosition ( vec );
-    CVARS_GET ( "console_size", vec );
-    pConsole->SetSize ( vec );
+    CVARS_GET("console_pos", vec);
+    pConsole->SetPosition(vec);
+    CVARS_GET("console_size", vec);
+    pConsole->SetSize(vec);
 }
 
-void CCore::ApplyGameSettings ( void )
+void CCore::ApplyGameSettings(void)
 {
-    bool bval;
-    int iVal;
-    CControllerConfigManager * pController = m_pGame->GetControllerConfigManager ();
+    bool                      bval;
+    int                       iVal;
+    CControllerConfigManager* pController = m_pGame->GetControllerConfigManager();
 
-    CVARS_GET ( "invert_mouse",     bval ); pController->SetMouseInverted ( bval );
-    CVARS_GET ( "fly_with_mouse",   bval ); pController->SetFlyWithMouse ( bval );
-    CVARS_GET ( "steer_with_mouse", bval ); pController->SetSteerWithMouse ( bval );
-    CVARS_GET ( "classic_controls", bval ); pController->SetClassicControls ( bval );
-    CVARS_GET ( "volumetric_shadows", bval ); m_pGame->GetSettings ()->SetVolumetricShadowsEnabled ( bval );
-    CVARS_GET ( "aspect_ratio",     iVal ); m_pGame->GetSettings ()->SetAspectRatio ( (eAspectRatio)iVal, CVARS_GET_VALUE < bool > ( "hud_match_aspect_ratio" ) );
-    CVARS_GET ( "fov",              iVal ); iVal = Clamp ( 70, iVal, 100 ); m_pGame->GetSettings ()->SetFieldOfView ( iVal );
-    CVARS_GET ( "grass",            bval ); m_pGame->GetSettings ()->SetGrassEnabled ( bval );
-    CVARS_GET ( "heat_haze",        bval ); m_pMultiplayer->SetHeatHazeEnabled ( bval );
-    CVARS_GET ( "fast_clothes_loading", iVal ); m_pMultiplayer->SetFastClothesLoading ( (CMultiplayer::EFastClothesLoading)iVal );
-    CVARS_GET ( "tyre_smoke_enabled", bval ); m_pMultiplayer->SetTyreSmokeEnabled ( bval );
-    pController->SetVerticalAimSensitivityRawValue( CVARS_GET_VALUE < float > ( "vertical_aim_sensitivity" ) );
+    CVARS_GET("invert_mouse", bval);
+    pController->SetMouseInverted(bval);
+    CVARS_GET("fly_with_mouse", bval);
+    pController->SetFlyWithMouse(bval);
+    CVARS_GET("steer_with_mouse", bval);
+    pController->SetSteerWithMouse(bval);
+    CVARS_GET("classic_controls", bval);
+    pController->SetClassicControls(bval);
+    CVARS_GET("volumetric_shadows", bval);
+    m_pGame->GetSettings()->SetVolumetricShadowsEnabled(bval);
+    CVARS_GET("aspect_ratio", iVal);
+    m_pGame->GetSettings()->SetAspectRatio((eAspectRatio)iVal, CVARS_GET_VALUE<bool>("hud_match_aspect_ratio"));
+    CVARS_GET("grass", bval);
+    m_pGame->GetSettings()->SetGrassEnabled(bval);
+    CVARS_GET("heat_haze", bval);
+    m_pMultiplayer->SetHeatHazeEnabled(bval);
+    CVARS_GET("fast_clothes_loading", iVal);
+    m_pMultiplayer->SetFastClothesLoading((CMultiplayer::EFastClothesLoading)iVal);
+    CVARS_GET("tyre_smoke_enabled", bval);
+    m_pMultiplayer->SetTyreSmokeEnabled(bval);
+    m_pGame->GetSettings()->UpdateFieldOfViewFromSettings();
+    m_pGame->GetSettings()->ResetVehiclesLODDistance();
+    pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
 }
 
-void CCore::ApplyCommunityState ( void )
+void CCore::SetConnected(bool bConnected)
 {
-    bool bLoggedIn = g_pCore->GetCommunity()->IsLoggedIn();
-    if ( bLoggedIn )
-        m_pLocalGUI->GetMainMenu ()->GetSettingsWindow()->OnLoginStateChange ( true );
+    m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
+    UpdateIsWindowMinimized();            // Force update of stuff
 }
 
-void CCore::SetConnected ( bool bConnected )
+bool CCore::IsConnected(void)
 {
-    m_pLocalGUI->GetMainMenu ( )->SetIsIngame ( bConnected );
-    UpdateIsWindowMinimized ();  // Force update of stuff
+    return m_pLocalGUI->GetMainMenu() && m_pLocalGUI->GetMainMenu()->GetIsIngame();
 }
 
-
-bool CCore::IsConnected ( void )
+bool CCore::Reconnect(const char* szHost, unsigned short usPort, const char* szPassword, bool bSave)
 {
-    return m_pLocalGUI->GetMainMenu() && m_pLocalGUI->GetMainMenu ( )->GetIsIngame ();
+    return m_pConnectManager->Reconnect(szHost, usPort, szPassword, bSave);
 }
 
-
-bool CCore::Reconnect ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave )
-{
-    return m_pConnectManager->Reconnect ( szHost, usPort, szPassword, bSave );
-}
-
-
-void CCore::SetOfflineMod ( bool bOffline )
+void CCore::SetOfflineMod(bool bOffline)
 {
     m_bIsOfflineMod = bOffline;
 }
 
-
-const char* CCore::GetModInstallRoot ( const char* szModName )
+const char* CCore::GetModInstallRoot(const char* szModName)
 {
-    m_strModInstallRoot = CalcMTASAPath ( PathJoin ( "mods", szModName ) );
+    m_strModInstallRoot = CalcMTASAPath(PathJoin("mods", szModName));
     return m_strModInstallRoot;
 }
 
-
-void CCore::ForceCursorVisible ( bool bVisible, bool bToggleControls )
+void CCore::ForceCursorVisible(bool bVisible, bool bToggleControls)
 {
     m_bCursorToggleControls = bToggleControls;
-    m_pLocalGUI->ForceCursorVisible ( bVisible );
+    m_pLocalGUI->ForceCursorVisible(bVisible);
 }
 
-
-void CCore::SetMessageProcessor ( pfnProcessMessage pfnMessageProcessor )
+void CCore::SetMessageProcessor(pfnProcessMessage pfnMessageProcessor)
 {
     m_pfnMessageProcessor = pfnMessageProcessor;
 }
 
-
-void CCore::ShowMessageBox ( const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK * ResponseHandler )
+void CCore::ShowMessageBox(const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK* ResponseHandler)
 {
-    RemoveMessageBox ();
+    RemoveMessageBox();
 
     // Create the message box
-    m_pMessageBox = m_pGUI->CreateMessageBox ( szTitle, szText, uiFlags );
-    if ( ResponseHandler ) m_pMessageBox->SetClickHandler ( *ResponseHandler );
+    m_pMessageBox = m_pGUI->CreateMessageBox(szTitle, szText, uiFlags);
+    if (ResponseHandler)
+        m_pMessageBox->SetClickHandler(*ResponseHandler);
 
     // Make sure it doesn't auto-destroy, or we'll crash if the msgbox had buttons and the user clicks OK
-    m_pMessageBox->SetAutoDestroy ( false );
+    m_pMessageBox->SetAutoDestroy(false);
 }
 
-
-void CCore::RemoveMessageBox ( bool bNextFrame )
+void CCore::RemoveMessageBox(bool bNextFrame)
 {
-    if ( bNextFrame )
+    if (bNextFrame)
     {
         m_bDestroyMessageBox = true;
     }
     else
     {
-        if ( m_pMessageBox )
+        if (m_pMessageBox)
         {
             delete m_pMessageBox;
             m_pMessageBox = NULL;
@@ -697,24 +676,24 @@ void CCore::RemoveMessageBox ( bool bNextFrame )
 //
 // Show message box with possibility of on-line help
 //
-void CCore::ShowErrorMessageBox( const SString& strTitle, SString strMessage, const SString& strTroubleLink )
+void CCore::ShowErrorMessageBox(const SString& strTitle, SString strMessage, const SString& strTroubleLink)
 {
-    if ( strTroubleLink.empty() )
+    if (strTroubleLink.empty())
     {
-        CCore::GetSingleton ().ShowMessageBox ( strTitle, strMessage, MB_BUTTON_OK | MB_ICON_ERROR );
+        CCore::GetSingleton().ShowMessageBox(strTitle, strMessage, MB_BUTTON_OK | MB_ICON_ERROR);
     }
     else
     {
         strMessage += "\n\n";
         strMessage += _("Do you want to see some on-line help about this problem ?");
-        CQuestionBox* pQuestionBox = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ();
-        pQuestionBox->Reset ();
-        pQuestionBox->SetTitle ( strTitle );
-        pQuestionBox->SetMessage ( strMessage );
-        pQuestionBox->SetButton ( 0, _("No") );
-        pQuestionBox->SetButton ( 1, _("Yes") );
-        pQuestionBox->SetCallback ( CCore::ErrorMessageBoxCallBack, new SString( strTroubleLink ) );
-        pQuestionBox->Show ();
+        CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+        pQuestionBox->Reset();
+        pQuestionBox->SetTitle(strTitle);
+        pQuestionBox->SetMessage(strMessage);
+        pQuestionBox->SetButton(0, _("No"));
+        pQuestionBox->SetButton(1, _("Yes"));
+        pQuestionBox->SetCallback(CCore::ErrorMessageBoxCallBack, new SString(strTroubleLink));
+        pQuestionBox->Show();
     }
 }
 
@@ -722,163 +701,157 @@ void CCore::ShowErrorMessageBox( const SString& strTitle, SString strMessage, co
 // Show message box with possibility of on-line help
 //  + with net error code appended to message and trouble link
 //
-void CCore::ShowNetErrorMessageBox( const SString& strTitle, SString strMessage, SString strTroubleLink, bool bLinkRequiresErrorCode )
+void CCore::ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, SString strTroubleLink, bool bLinkRequiresErrorCode)
 {
-    uint uiErrorCode = CCore::GetSingleton ().GetNetwork ()->GetExtendedErrorCode ();
-    if ( uiErrorCode != 0 )
+    uint uiErrorCode = CCore::GetSingleton().GetNetwork()->GetExtendedErrorCode();
+    if (uiErrorCode != 0)
     {
         // Do anti-virus check soon
-        SetApplicationSettingInt( "noav-user-says-skip", 1 );
-        strMessage += SString ( " \nCode: %08X", uiErrorCode );
-        if ( !strTroubleLink.empty() )
-            strTroubleLink += SString ( "&neterrorcode=%08X", uiErrorCode );
+        SetApplicationSettingInt("noav-user-says-skip", 1);
+        strMessage += SString(" \nCode: %08X", uiErrorCode);
+        if (!strTroubleLink.empty())
+            strTroubleLink += SString("&neterrorcode=%08X", uiErrorCode);
     }
-    else
-    if ( bLinkRequiresErrorCode )
-        strTroubleLink = "";        // No link if no error code
+    else if (bLinkRequiresErrorCode)
+        strTroubleLink = "";            // No link if no error code
 
-    AddReportLog( 7100, SString( "Core - NetError (%s) (%s)", *strTitle, *strMessage ) );
-    ShowErrorMessageBox( strTitle, strMessage, strTroubleLink );
+    AddReportLog(7100, SString("Core - NetError (%s) (%s)", *strTitle, *strMessage));
+    ShowErrorMessageBox(strTitle, strMessage, strTroubleLink);
 }
 
 //
 // Callback used in CCore::ShowErrorMessageBox
 //
-void CCore::ErrorMessageBoxCallBack( void* pData, uint uiButton )
+void CCore::ErrorMessageBoxCallBack(void* pData, uint uiButton)
 {
-    CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetQuestionWindow ()->Reset ();
+    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
 
     SString* pstrTroubleLink = (SString*)pData;
-    if ( uiButton == 1 )
+    if (uiButton == 1)
     {
         uint uiErrorCode = (uint)pData;
-        BrowseToSolution ( *pstrTroubleLink, EXIT_GAME_FIRST );
+        BrowseToSolution(*pstrTroubleLink, EXIT_GAME_FIRST);
     }
     delete pstrTroubleLink;
 }
-
 
 //
 // Check for disk space problems
 // Returns false if low disk space, and dialog is being shown
 //
-bool CCore::CheckDiskSpace( uint uiResourcesPathMinMB, uint uiDataPathMinMB )
+bool CCore::CheckDiskSpace(uint uiResourcesPathMinMB, uint uiDataPathMinMB)
 {
-    SString strDriveWithNoSpace = GetDriveNameWithNotEnoughSpace( uiResourcesPathMinMB, uiDataPathMinMB );
-    if ( !strDriveWithNoSpace.empty() )
+    SString strDriveWithNoSpace = GetDriveNameWithNotEnoughSpace(uiResourcesPathMinMB, uiDataPathMinMB);
+    if (!strDriveWithNoSpace.empty())
     {
-        SString strMessage( _("MTA:SA cannot continue because drive %s does not have enough space."), *strDriveWithNoSpace );
-        SString strTroubleLink( SString( "low-disk-space&drive=%s", *strDriveWithNoSpace.Left( 1 ) ) );
-        g_pCore->ShowErrorMessageBox ( _("Fatal error")+_E("CC43"), strMessage, strTroubleLink );
+        SString strMessage(_("MTA:SA cannot continue because drive %s does not have enough space."), *strDriveWithNoSpace);
+        SString strTroubleLink(SString("low-disk-space&drive=%s", *strDriveWithNoSpace.Left(1)));
+        g_pCore->ShowErrorMessageBox(_("Fatal error") + _E("CC43"), strMessage, strTroubleLink);
         return false;
     }
     return true;
 }
 
-
-HWND CCore::GetHookedWindow ( void )
+HWND CCore::GetHookedWindow(void)
 {
-    return CMessageLoopHook::GetSingleton ().GetHookedWindowHandle ();
+    return CMessageLoopHook::GetSingleton().GetHookedWindowHandle();
 }
 
-
-void CCore::HideMainMenu ( void )
+void CCore::HideMainMenu(void)
 {
-    m_pLocalGUI->GetMainMenu ()->SetVisible ( false );
+    m_pLocalGUI->GetMainMenu()->SetVisible(false);
 }
 
-void CCore::HideQuickConnect ( void )
+void CCore::HideQuickConnect(void)
 {
-    m_pLocalGUI->GetMainMenu ()->GetQuickConnectWindow()->SetVisible( false );
+    m_pLocalGUI->GetMainMenu()->GetQuickConnectWindow()->SetVisible(false);
 }
 
-void CCore::ShowServerInfo ( unsigned int WindowType )
+void CCore::ShowServerInfo(unsigned int WindowType)
 {
-    RemoveMessageBox ();
-    CServerInfo::GetSingletonPtr()->Show( (eWindowType)WindowType );
+    RemoveMessageBox();
+    CServerInfo::GetSingletonPtr()->Show((eWindowType)WindowType);
 }
 
-void CCore::ApplyHooks ( )
-{ 
-    WriteDebugEvent ( "CCore::ApplyHooks" );
+void CCore::ApplyHooks()
+{
+    WriteDebugEvent("CCore::ApplyHooks");
 
     // Create our hooks.
-    m_pDirectInputHookManager->ApplyHook ( );
-    //m_pDirect3DHookManager->ApplyHook ( );
-    //m_pFileSystemHook->ApplyHook ( );
-    m_pSetCursorPosHook->ApplyHook ( );
+    m_pDirectInputHookManager->ApplyHook();
+    // m_pDirect3DHookManager->ApplyHook ( );
+    // m_pFileSystemHook->ApplyHook ( );
+    m_pSetCursorPosHook->ApplyHook();
 
     // Redirect basic files.
-    //m_pFileSystemHook->RedirectFile ( "main.scm", "../../mta/gtafiles/main.scm" );
+    // m_pFileSystemHook->RedirectFile ( "main.scm", "../../mta/gtafiles/main.scm" );
 
     // Remove useless DirectPlay dependency (dpnhpast.dll) @ 0x745701
     // We have to patch here as multiplayer_sa and game_sa are loaded too late
-    using LoadLibraryA_t = HMODULE (__stdcall *)(LPCTSTR fileName);
-    static LoadLibraryA_t oldLoadLibraryA = (LoadLibraryA_t)DetourFunction ( DetourFindFunction ( "KERNEL32.DLL", "LoadLibraryA" ),
-        (PBYTE)(LoadLibraryA_t)[](LPCSTR fileName) -> HMODULE
-    {
-        // Don't load dpnhpast.dll
-        if ( StrCmpA ( "dpnhpast.dll", fileName ) == 0 )
-        {
-            // Unfortunately, Microsoft's detours library doesn't support something like 'detour chains' properly,
-            // so that we cannot remove the hook flawlessly
-            // See http://read.pudn.com/downloads71/ebook/256925/%E5%BE%AE%E8%BD%AF%E6%8F%90%E4%BE%9B%E7%9A%84%E6%88%AA%E5%8F%96Win32%20API%E5%87%BD%E6%95%B0%E7%9A%84%E5%BC%80%E5%8F%91%E5%8C%85%E5%92%8C%E4%BE%8B%E5%AD%90detours-src-1.2/src/detours.cpp__.htm
+    using LoadLibraryA_t = HMODULE(__stdcall*)(LPCTSTR fileName);
+    static LoadLibraryA_t oldLoadLibraryA =
+        (LoadLibraryA_t)DetourFunction(DetourFindFunction("KERNEL32.DLL", "LoadLibraryA"), (PBYTE)(LoadLibraryA_t)[](LPCSTR fileName)->HMODULE {
+            // Don't load dpnhpast.dll
+            if (StrCmpA("dpnhpast.dll", fileName) == 0)
+            {
+                // Unfortunately, Microsoft's detours library doesn't support something like 'detour chains' properly,
+                // so that we cannot remove the hook flawlessly
+                // See
+                // http://read.pudn.com/downloads71/ebook/256925/%E5%BE%AE%E8%BD%AF%E6%8F%90%E4%BE%9B%E7%9A%84%E6%88%AA%E5%8F%96Win32%20API%E5%87%BD%E6%95%B0%E7%9A%84%E5%BC%80%E5%8F%91%E5%8C%85%E5%92%8C%E4%BE%8B%E5%AD%90detours-src-1.2/src/detours.cpp__.htm
 
-            // Do something hacky: GTA requires a valid module handle, so pass a module handle of a DLL that is already loaded
-            // as FreeLibrary is later called
-            return oldLoadLibraryA ( "D3D8.DLL" );
-        }
+                // Do something hacky: GTA requires a valid module handle, so pass a module handle of a DLL that is already loaded
+                // as FreeLibrary is later called
+                return oldLoadLibraryA("D3D8.DLL");
+            }
 
-        // Call old LoadLibraryA (this in our case SharedUtil::MyLoadLibraryA though)
-        return oldLoadLibraryA ( fileName );
-    });
+            // Call old LoadLibraryA (this in our case SharedUtil::MyLoadLibraryA though)
+            return oldLoadLibraryA(fileName);
+        });
 }
 
 bool UsingAltD3DSetup()
 {
-    static bool bAltStartup = GetApplicationSettingInt( "nvhacks", "optimus-alt-startup" ) ? true : false;
+    static bool bAltStartup = GetApplicationSettingInt("nvhacks", "optimus-alt-startup") ? true : false;
     return bAltStartup;
 }
 
-void CCore::ApplyHooks2 ( )
-{ 
-    WriteDebugEvent ( "CCore::ApplyHooks2" );
+void CCore::ApplyHooks2()
+{
+    WriteDebugEvent("CCore::ApplyHooks2");
     // Try this one a little later
-    if ( !UsingAltD3DSetup() )
-        m_pDirect3DHookManager->ApplyHook ( );
+    if (!UsingAltD3DSetup())
+        m_pDirect3DHookManager->ApplyHook();
     else
     {
-        // Done a little later to get past the loading time required to decrypt the gta 
+        // Done a little later to get past the loading time required to decrypt the gta
         // executable into memory...
-        if ( !CCore::GetSingleton ( ).AreModulesLoaded ( ) )
+        if (!CCore::GetSingleton().AreModulesLoaded())
         {
-            CCore::GetSingleton ( ).SetModulesLoaded ( true );
-            CCore::GetSingleton ( ).CreateNetwork ( );
-            CCore::GetSingleton ( ).CreateGame ( );
-            CCore::GetSingleton ( ).CreateMultiplayer ( );
-            CCore::GetSingleton ( ).CreateXML ( );
-            CCore::GetSingleton ( ).CreateGUI ( );
+            CCore::GetSingleton().SetModulesLoaded(true);
+            CCore::GetSingleton().CreateNetwork();
+            CCore::GetSingleton().CreateGame();
+            CCore::GetSingleton().CreateMultiplayer();
+            CCore::GetSingleton().CreateXML();
+            CCore::GetSingleton().CreateGUI();
         }
     }
 }
 
-void CCore::ApplyHooks3( bool bEnable )
+void CCore::ApplyHooks3(bool bEnable)
 {
-    if ( bEnable )
+    if (bEnable)
         CDirect3DHook9::GetSingletonPtr()->ApplyHook();
     else
         CDirect3DHook9::GetSingletonPtr()->RemoveHook();
 }
 
-
-void CCore::SetCenterCursor ( bool bEnabled )
+void CCore::SetCenterCursor(bool bEnabled)
 {
-    if ( bEnabled )
-        m_pSetCursorPosHook->EnableSetCursorPos ();
+    if (bEnabled)
+        m_pSetCursorPosHook->EnableSetCursorPos();
     else
-        m_pSetCursorPosHook->DisableSetCursorPos ();
+        m_pSetCursorPosHook->DisableSetCursorPos();
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -888,16 +861,16 @@ void CCore::SetCenterCursor ( bool bEnabled )
 // On failure, displays message box and terminates the current process.
 //
 ////////////////////////////////////////////////////////////////////////
-void LoadModule ( CModuleLoader& m_Loader, const SString& strName, const SString& strModuleName )
+void LoadModule(CModuleLoader& m_Loader, const SString& strName, const SString& strModuleName)
 {
-    WriteDebugEvent ( "Loading " + strName.ToLower () );
+    WriteDebugEvent("Loading " + strName.ToLower());
 
     // Ensure DllDirectory has not been changed
     SString strDllDirectory = GetSystemDllDirectory();
-    if ( CalcMTASAPath ( "mta" ).CompareI ( strDllDirectory ) == false )
+    if (CalcMTASAPath("mta").CompareI(strDllDirectory) == false)
     {
-        AddReportLog ( 3119, SString ( "DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", *strDllDirectory, *CalcMTASAPath ( "mta" ) ) );
-        SetDllDirectory( CalcMTASAPath ( "mta" ) );
+        AddReportLog(3119, SString("DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", *strDllDirectory, *CalcMTASAPath("mta")));
+        SetDllDirectory(CalcMTASAPath("mta"));
     }
 
     // Save current directory (shouldn't change anyway)
@@ -909,19 +882,29 @@ void LoadModule ( CModuleLoader& m_Loader, const SString& strName, const SString
 #else
     SString strModuleFileName = strModuleName + ".dll";
 #endif
-    m_Loader.LoadModule ( CalcMTASAPath ( PathJoin ( "mta", strModuleFileName ) ) );
+    m_Loader.LoadModule(CalcMTASAPath(PathJoin("mta", strModuleFileName)));
 
-    if ( m_Loader.IsOk () == false )
+    if (m_Loader.IsOk() == false)
     {
-        SString strMessage( "Error loading %s module! (%s)", *strName.ToLower (), *m_Loader.GetLastErrorMessage () );
-        BrowseToSolution ( "module-not-loadable&name=" + strModuleName, ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage );
+        SString strMessage("Error loading '%s' module!\n%s", *strName, *m_Loader.GetLastErrorMessage());
+        SString strType = "module-not-loadable&name=" + strModuleName;
+
+        // Extra message if d3d9.dll exists
+        SString strD3dModuleFilename = PathJoin(GetLaunchPath(), "d3d9.dll");
+        if (FileExists(strD3dModuleFilename))
+        {
+            strMessage += "\n\n";
+            strMessage += _("TO FIX, REMOVE THIS FILE:") + "\n";
+            strMessage += strD3dModuleFilename;
+            strType += "&d3d9=1";
+        }
+        BrowseToSolution(strType, ASK_GO_ONLINE | EXIT_GAME_FIRST, strMessage);
     }
     // Restore current directory
-    SetCurrentDirectory ( strSavedCwd );
+    SetCurrentDirectory(strSavedCwd);
 
-    WriteDebugEvent ( strName + " loaded." );
+    WriteDebugEvent(strName + " loaded.");
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -931,32 +914,31 @@ void LoadModule ( CModuleLoader& m_Loader, const SString& strName, const SString
 // On failure, displays message box and terminates the current process.
 //
 ////////////////////////////////////////////////////////////////////////
-template < class T, class U >
-T* InitModule ( CModuleLoader& m_Loader, const SString& strName, const SString& strInitializer, U* pObj )
+template <class T, class U>
+T* InitModule(CModuleLoader& m_Loader, const SString& strName, const SString& strInitializer, U* pObj)
 {
     // Save current directory (shouldn't change anyway)
     SString strSavedCwd = GetSystemCurrentDirectory();
 
     // Get initializer function from DLL.
-    typedef T* (*PFNINITIALIZER) ( U* );
-    PFNINITIALIZER pfnInit = static_cast < PFNINITIALIZER > ( m_Loader.GetFunctionPointer ( strInitializer ) );
+    typedef T* (*PFNINITIALIZER)(U*);
+    PFNINITIALIZER pfnInit = static_cast<PFNINITIALIZER>(m_Loader.GetFunctionPointer(strInitializer));
 
-    if ( pfnInit == NULL )
+    if (pfnInit == NULL)
     {
-        MessageBoxUTF8 ( 0, SString(_("%s module is incorrect!"),*strName), "Error"+_E("CC40"), MB_OK | MB_ICONERROR | MB_TOPMOST  );
-        TerminateProcess ( GetCurrentProcess (), 1 );
+        MessageBoxUTF8(0, SString(_("%s module is incorrect!"), *strName), "Error" + _E("CC40"), MB_OK | MB_ICONERROR | MB_TOPMOST);
+        TerminateProcess(GetCurrentProcess(), 1);
     }
 
     // If we have a valid initializer, call it.
-    T* pResult = pfnInit ( pObj );
+    T* pResult = pfnInit(pObj);
 
     // Restore current directory
-    SetCurrentDirectory ( strSavedCwd );
+    SetCurrentDirectory(strSavedCwd);
 
-    WriteDebugEvent ( strName + " initialized." );
+    WriteDebugEvent(strName + " initialized.");
     return pResult;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -966,146 +948,133 @@ T* InitModule ( CModuleLoader& m_Loader, const SString& strName, const SString& 
 // On failure, displays message box and terminates the current process.
 //
 ////////////////////////////////////////////////////////////////////////
-template < class T, class U >
-T* CreateModule ( CModuleLoader& m_Loader, const SString& strName, const SString& strModuleName, const SString& strInitializer, U* pObj )
+template <class T, class U>
+T* CreateModule(CModuleLoader& m_Loader, const SString& strName, const SString& strModuleName, const SString& strInitializer, U* pObj)
 {
-    LoadModule ( m_Loader, strName, strModuleName );
-    return InitModule < T > ( m_Loader, strName, strInitializer, pObj );
+    LoadModule(m_Loader, strName, strModuleName);
+    return InitModule<T>(m_Loader, strName, strInitializer, pObj);
 }
 
-
-void CCore::CreateGame ( )
+void CCore::CreateGame()
 {
-    m_pGame = CreateModule < CGame > ( m_GameModule, "Game", "game_sa", "GetGameInterface", this );
-    if ( m_pGame->GetGameVersion () >= VERSION_11 )
+    m_pGame = CreateModule<CGame>(m_GameModule, "Game", "game_sa", "GetGameInterface", this);
+    if (m_pGame->GetGameVersion() >= VERSION_11)
     {
-        BrowseToSolution ( "downgrade", TERMINATE_PROCESS, "Only GTA:SA version 1.0 is supported!\n\nYou are now being redirected to a page where you can patch your version." );
+        BrowseToSolution("downgrade", TERMINATE_PROCESS,
+                         "Only GTA:SA version 1.0 is supported!\n\nYou are now being redirected to a page where you can patch your version.");
     }
 }
 
-
-void CCore::CreateMultiplayer ( )
+void CCore::CreateMultiplayer()
 {
-    m_pMultiplayer = CreateModule < CMultiplayer > ( m_MultiplayerModule, "Multiplayer", "multiplayer_sa", "InitMultiplayerInterface", this );
-    if ( m_pMultiplayer )
-        m_pMultiplayer->SetIdleHandler ( CCore::StaticIdleHandler );
+    m_pMultiplayer = CreateModule<CMultiplayer>(m_MultiplayerModule, "Multiplayer", "multiplayer_sa", "InitMultiplayerInterface", this);
+    if (m_pMultiplayer)
+        m_pMultiplayer->SetIdleHandler(CCore::StaticIdleHandler);
 }
 
-
-void CCore::DeinitGUI ( void )
+void CCore::DeinitGUI(void)
 {
-
 }
 
-
-void CCore::InitGUI ( IDirect3DDevice9* pDevice )
+void CCore::InitGUI(IDirect3DDevice9* pDevice)
 {
-    m_pGUI = InitModule < CGUI > ( m_GUIModule, "GUI", "InitGUIInterface", pDevice );
+    m_pGUI = InitModule<CGUI>(m_GUIModule, "GUI", "InitGUIInterface", pDevice);
 
     // and set the screenshot path to this default library (screenshots shouldnt really be made outside mods)
-    std::string strScreenShotPath = CalcMTASAPath ( "screenshots" );
-    CVARS_SET ( "screenshot_path", strScreenShotPath );
-    CScreenShot::SetPath ( strScreenShotPath.c_str() );
+    std::string strScreenShotPath = CalcMTASAPath("screenshots");
+    CVARS_SET("screenshot_path", strScreenShotPath);
+    CScreenShot::SetPath(strScreenShotPath.c_str());
 }
 
-
-void CCore::CreateGUI ( void )
+void CCore::CreateGUI(void)
 {
-    LoadModule ( m_GUIModule, "GUI", "cgui" );
+    LoadModule(m_GUIModule, "GUI", "cgui");
 }
 
-void CCore::DestroyGUI ( )
+void CCore::DestroyGUI()
 {
-    WriteDebugEvent ( "CCore::DestroyGUI" );
-    if ( m_pGUI )
+    WriteDebugEvent("CCore::DestroyGUI");
+    if (m_pGUI)
     {
         m_pGUI = NULL;
     }
-    m_GUIModule.UnloadModule ();
+    m_GUIModule.UnloadModule();
 }
 
-
-void CCore::CreateNetwork ( )
+void CCore::CreateNetwork()
 {
-    m_pNet = CreateModule < CNet > ( m_NetModule, "Network", "netc", "InitNetInterface", this );
+    m_pNet = CreateModule<CNet>(m_NetModule, "Network", "netc", "InitNetInterface", this);
 
     // Network module compatibility check
-    typedef unsigned long (*PFNCHECKCOMPATIBILITY) ( unsigned long, unsigned long* );
-    PFNCHECKCOMPATIBILITY pfnCheckCompatibility = static_cast< PFNCHECKCOMPATIBILITY > ( m_NetModule.GetFunctionPointer ( "CheckCompatibility" ) );
-    if ( !pfnCheckCompatibility || !pfnCheckCompatibility ( MTA_DM_CLIENT_NET_MODULE_VERSION, NULL ) )
+    typedef unsigned long (*PFNCHECKCOMPATIBILITY)(unsigned long, unsigned long*);
+    PFNCHECKCOMPATIBILITY pfnCheckCompatibility = static_cast<PFNCHECKCOMPATIBILITY>(m_NetModule.GetFunctionPointer("CheckCompatibility"));
+    if (!pfnCheckCompatibility || !pfnCheckCompatibility(MTA_DM_CLIENT_NET_MODULE_VERSION, NULL))
     {
         // net.dll doesn't like our version number
         ulong ulNetModuleVersion = 0;
-        pfnCheckCompatibility ( 1, &ulNetModuleVersion );
-        SString strMessage( "Network module not compatible! (Expected 0x%x, got 0x%x)", MTA_DM_CLIENT_NET_MODULE_VERSION, ulNetModuleVersion );
-        BrowseToSolution ( "netc-not-compatible", ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage );
+        pfnCheckCompatibility(1, &ulNetModuleVersion);
+        SString strMessage("Network module not compatible! (Expected 0x%x, got 0x%x)", MTA_DM_CLIENT_NET_MODULE_VERSION, ulNetModuleVersion);
+#if !defined(MTA_DM_CONNECT_TO_PUBLIC)
+        strMessage += "\n\n(Devs: Update source and run win-install-data.bat)";
+#endif
+        BrowseToSolution("netc-not-compatible", ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage);
     }
 
     // Set mta version for report log here
-    SetApplicationSetting ( "mta-version-ext", SString ( "%d.%d.%d-%d.%05d.%d.%03d"
-                                ,MTASA_VERSION_MAJOR
-                                ,MTASA_VERSION_MINOR
-                                ,MTASA_VERSION_MAINTENANCE
-                                ,MTASA_VERSION_TYPE
-                                ,MTASA_VERSION_BUILD
-                                ,m_pNet->GetNetRev ()
-                                ,m_pNet->GetNetRel ()
-                                ) );
-    char szSerial [ 64 ];
-    m_pNet->GetSerial ( szSerial, sizeof ( szSerial ) );
-    SetApplicationSetting ( "serial", szSerial );
+    SetApplicationSetting("mta-version-ext", SString("%d.%d.%d-%d.%05d.%d.%03d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE,
+                                                     MTASA_VERSION_TYPE, MTASA_VERSION_BUILD, m_pNet->GetNetRev(), m_pNet->GetNetRel()));
+    char szSerial[64];
+    m_pNet->GetSerial(szSerial, sizeof(szSerial));
+    SetApplicationSetting("serial", szSerial);
 }
 
-
-void CCore::CreateXML ( )
+void CCore::CreateXML()
 {
-    if ( !m_pXML )
-        m_pXML = CreateModule < CXML > ( m_XMLModule, "XML", "xmll", "InitXMLInterface", *CalcMTASAPath ( "MTA" ) );
+    if (!m_pXML)
+        m_pXML = CreateModule<CXML>(m_XMLModule, "XML", "xmll", "InitXMLInterface", *CalcMTASAPath("MTA"));
 
-    if ( !m_pConfigFile )
+    if (!m_pConfigFile)
     {
         // Load config XML file
-        m_pConfigFile = m_pXML->CreateXML ( CalcMTASAPath ( MTA_CONFIG_PATH ) );
-        if ( !m_pConfigFile ) {
-            assert ( false );
+        m_pConfigFile = m_pXML->CreateXML(CalcMTASAPath(MTA_CONFIG_PATH));
+        if (!m_pConfigFile)
+        {
+            assert(false);
             return;
         }
 
-        m_pConfigFile->Parse ();
+        m_pConfigFile->Parse();
     }
 
     // Load the keybinds (loads defaults if the subnode doesn't exist)
-    if ( m_pKeyBinds )
+    if (m_pKeyBinds)
     {
-        m_pKeyBinds->LoadFromXML ( GetConfig ()->FindSubNode ( CONFIG_NODE_KEYBINDS ) );
-        m_pKeyBinds->LoadDefaultCommands( false );
+        m_pKeyBinds->LoadFromXML(GetConfig()->FindSubNode(CONFIG_NODE_KEYBINDS));
+        m_pKeyBinds->LoadDefaultCommands(false);
     }
 
     // Load XML-dependant subsystems
-    m_ClientVariables.Load ( );
+    m_ClientVariables.Load();
 }
 
-
-void CCore::DestroyGame ( )
+void CCore::DestroyGame()
 {
-    WriteDebugEvent ( "CCore::DestroyGame" );
+    WriteDebugEvent("CCore::DestroyGame");
 
-    if ( m_pGame )
+    if (m_pGame)
     {
-        m_pGame->Terminate ();
+        m_pGame->Terminate();
         m_pGame = NULL;
     }
 
     m_GameModule.UnloadModule();
-
 }
 
-
-void CCore::DestroyMultiplayer ( )
+void CCore::DestroyMultiplayer()
 {
-    WriteDebugEvent ( "CCore::DestroyMultiplayer" );
+    WriteDebugEvent("CCore::DestroyMultiplayer");
 
-    if ( m_pMultiplayer )
+    if (m_pMultiplayer)
     {
         m_pMultiplayer = NULL;
     }
@@ -1113,18 +1082,18 @@ void CCore::DestroyMultiplayer ( )
     m_MultiplayerModule.UnloadModule();
 }
 
-
-void CCore::DestroyXML ( )
+void CCore::DestroyXML()
 {
-    WriteDebugEvent ( "CCore::DestroyXML" );
+    WriteDebugEvent("CCore::DestroyXML");
 
     // Save and unload configuration
-    if ( m_pConfigFile ) {
-        SaveConfig ( true );
+    if (m_pConfigFile)
+    {
+        SaveConfig(true);
         delete m_pConfigFile;
     }
 
-    if ( m_pXML )
+    if (m_pXML)
     {
         m_pXML = NULL;
     }
@@ -1132,172 +1101,160 @@ void CCore::DestroyXML ( )
     m_XMLModule.UnloadModule();
 }
 
-
-void CCore::DestroyNetwork ( )
+void CCore::DestroyNetwork()
 {
-    WriteDebugEvent ( "CCore::DestroyNetwork" );
+    WriteDebugEvent("CCore::DestroyNetwork");
 
-    if ( m_pNet )
+    if (m_pNet)
     {
         m_pNet->Shutdown();
         m_pNet = NULL;
     }
 
     // Skip unload as it can cause exit crashes due to threading issues
-    //m_NetModule.UnloadModule();
+    // m_NetModule.UnloadModule();
 }
 
-
-void CCore::InitialiseWeb ()
+CWebCoreInterface* CCore::GetWebCore()
 {
-    // Don't initialise webcore twice
-    // Also disable webbrowser stuff if this PC still uses deprecated, vulnerable software e.g. XP
-    if ( m_pWebCore || !IsWindows7OrGreater() )
-        return;
-
-    // Ensure DllDirectory has not been changed
-    SString strDllDirectory = GetSystemDllDirectory();
-    SString strRequiredDllDirectory = CalcMTASAPath( "mta" );
-    if ( strRequiredDllDirectory.EqualsI( strDllDirectory ) == false )
+    if (m_pWebCore == nullptr)
     {
-        AddReportLog( 3118, SString ( "DllDirectory wrong:  DllDirectory:'%s'  Path:'%s'", *strDllDirectory, *strRequiredDllDirectory ) );
-        SetDllDirectory( strRequiredDllDirectory );
+        m_pWebCore = CreateModule<CWebCoreInterface>(m_WebCoreModule, "CefWeb", "cefweb", "InitWebCoreInterface", this);
     }
-
-    m_pWebCore = new CWebCore;
-    m_pWebCore->Initialise ();
+    return m_pWebCore;
 }
 
-
-void CCore::UpdateIsWindowMinimized ( void )
+void CCore::DestroyWeb()
 {
-    m_bIsWindowMinimized = IsIconic ( GetHookedWindow () ) ? true : false;
+    WriteDebugEvent("CCore::DestroyWeb");
+    SAFE_DELETE(m_pWebCore);
+    m_WebCoreModule.UnloadModule();
+}
+
+void CCore::UpdateIsWindowMinimized(void)
+{
+    m_bIsWindowMinimized = IsIconic(GetHookedWindow()) ? true : false;
     // Update CPU saver for when minimized and not connected
-    g_pCore->GetMultiplayer ()->SetIsMinimizedAndNotConnected ( m_bIsWindowMinimized && !IsConnected () );
-    g_pCore->GetMultiplayer ()->SetMirrorsEnabled ( !m_bIsWindowMinimized );
+    g_pCore->GetMultiplayer()->SetIsMinimizedAndNotConnected(m_bIsWindowMinimized && !IsConnected());
+    g_pCore->GetMultiplayer()->SetMirrorsEnabled(!m_bIsWindowMinimized);
 
     // Enable timer if not connected at least once
     bool bEnableTimer = !m_bGettingIdleCallsFromMultiplayer;
-    if ( m_bWindowsTimerEnabled != bEnableTimer )
+    if (m_bWindowsTimerEnabled != bEnableTimer)
     {
         m_bWindowsTimerEnabled = bEnableTimer;
-        if ( bEnableTimer )
-            SetTimer( GetHookedWindow(), IDT_TIMER1, 50, (TIMERPROC) NULL );
+        if (bEnableTimer)
+            SetTimer(GetHookedWindow(), IDT_TIMER1, 50, (TIMERPROC)NULL);
         else
-            KillTimer( GetHookedWindow(), IDT_TIMER1 );
+            KillTimer(GetHookedWindow(), IDT_TIMER1);
     }
 }
 
-
-bool CCore::IsWindowMinimized ( void )
+bool CCore::IsWindowMinimized(void)
 {
     return m_bIsWindowMinimized;
 }
 
-
-void CCore::DoPreFramePulse ( )
+void CCore::DoPreFramePulse()
 {
-    TIMING_CHECKPOINT( "+CorePreFrame" );
+    TIMING_CHECKPOINT("+CorePreFrame");
 
-    m_pKeyBinds->DoPreFramePulse ();
+    m_pKeyBinds->DoPreFramePulse();
 
     // Notify the mod manager
-    m_pModManager->DoPulsePreFrame ();  
+    m_pModManager->DoPulsePreFrame();
 
-    m_pLocalGUI->DoPulse ();
+    m_pLocalGUI->DoPulse();
 
     CCrashDumpWriter::UpdateCounters();
 
-    TIMING_CHECKPOINT( "-CorePreFrame" );
+    TIMING_CHECKPOINT("-CorePreFrame");
 }
 
-
-void CCore::DoPostFramePulse ( )
+void CCore::DoPostFramePulse()
 {
-    TIMING_CHECKPOINT( "+CorePostFrame1" );
-    if ( m_bQuitOnPulse )
-        Quit ();
+    TIMING_CHECKPOINT("+CorePostFrame1");
+    if (m_bQuitOnPulse)
+        Quit();
 
-    if ( m_bDestroyMessageBox )
+    if (m_bDestroyMessageBox)
     {
-        RemoveMessageBox ();
+        RemoveMessageBox();
         m_bDestroyMessageBox = false;
     }
 
     static bool bFirstPulse = true;
-    if ( bFirstPulse )
+    if (bFirstPulse)
     {
         bFirstPulse = false;
 
         // Validate CVARS
-        CClientVariables::GetSingleton().ValidateValues ();
+        CClientVariables::GetSingleton().ValidateValues();
 
         // Apply all settings
-        ApplyConsoleSettings ();
-        ApplyGameSettings ();
+        ApplyConsoleSettings();
+        ApplyGameSettings();
 
-        m_pGUI->SelectInputHandlers( INPUT_CORE );
-
-        m_Community.Initialize ();
+        m_pGUI->SelectInputHandlers(INPUT_CORE);
     }
 
-    if ( m_pGame->GetSystemState () == 5 ) // GS_INIT_ONCE
+    if (m_pGame->GetSystemState() == 5)            // GS_INIT_ONCE
     {
-        WatchDogCompletedSection ( "L2" );      // gta_sa.set seems ok
-        WatchDogCompletedSection ( "L3" );      // No hang on startup
+        WatchDogCompletedSection("L2");            // gta_sa.set seems ok
+        WatchDogCompletedSection("L3");            // No hang on startup
     }
 
     // This is the first frame in the menu?
-    if ( m_pGame->GetSystemState () == 7 ) // GS_FRONTEND
+    if (m_pGame->GetSystemState() == 7)            // GS_FRONTEND
     {
         // Wait 250 frames more than the time it took to get status 7 (fade-out time)
         static short WaitForMenu = 0;
 
         // Do crash dump encryption while the credit screen is displayed
-        if ( WaitForMenu == 0 )
+        if (WaitForMenu == 0)
             HandleCrashDumpEncryption();
 
         // Cope with early finish
-        if ( m_pGame->HasCreditScreenFadedOut () )
+        if (m_pGame->HasCreditScreenFadedOut())
             WaitForMenu = 250;
 
-        if ( WaitForMenu >= 250 )
+        if (WaitForMenu >= 250)
         {
-            if ( m_bFirstFrame )
+            if (m_bFirstFrame)
             {
                 m_bFirstFrame = false;
 
                 // Disable vsync while it's all dark
-                m_pGame->DisableVSync ();
+                m_pGame->DisableVSync();
 
                 // Parse the command line
                 // Does it begin with mtasa://?
-                if ( m_szCommandLineArgs && strnicmp ( m_szCommandLineArgs, "mtasa://", 8 ) == 0 )
+                if (m_szCommandLineArgs && strnicmp(m_szCommandLineArgs, "mtasa://", 8) == 0)
                 {
-                    SString strArguments = GetConnectCommandFromURI ( m_szCommandLineArgs );
+                    SString strArguments = GetConnectCommandFromURI(m_szCommandLineArgs);
                     // Run the connect command
-                    if ( strArguments.length () > 0 && !m_pCommands->Execute ( strArguments ) )
+                    if (strArguments.length() > 0 && !m_pCommands->Execute(strArguments))
                     {
-                        ShowMessageBox ( _("Error")+_E("CC41"), _("Error executing URL"), MB_BUTTON_OK | MB_ICON_ERROR );
+                        ShowMessageBox(_("Error") + _E("CC41"), _("Error executing URL"), MB_BUTTON_OK | MB_ICON_ERROR);
                     }
                 }
                 else
                 {
                     // We want to load a mod?
                     const char* szOptionValue;
-                    if ( szOptionValue = GetCommandLineOption( "l" ) )
+                    if (szOptionValue = GetCommandLineOption("l"))
                     {
                         // Try to load the mod
-                        if ( !m_pModManager->Load ( szOptionValue, m_szCommandLineArgs ) )
+                        if (!m_pModManager->Load(szOptionValue, m_szCommandLineArgs))
                         {
-                            SString strTemp ( _("Error running mod specified in command line ('%s')"), szOptionValue );
-                            ShowMessageBox ( _("Error")+_E("CC42"), strTemp, MB_BUTTON_OK | MB_ICON_ERROR ); // Command line Mod load failed
+                            SString strTemp(_("Error running mod specified in command line ('%s')"), szOptionValue);
+                            ShowMessageBox(_("Error") + _E("CC42"), strTemp, MB_BUTTON_OK | MB_ICON_ERROR);            // Command line Mod load failed
                         }
                     }
                     // We want to connect to a server?
-                    else if ( szOptionValue = GetCommandLineOption ( "c" ) )
+                    else if (szOptionValue = GetCommandLineOption("c"))
                     {
-                        CCommandFuncs::Connect ( szOptionValue );
+                        CCommandFuncs::Connect(szOptionValue);
                     }
                 }
             }
@@ -1307,9 +1264,9 @@ void CCore::DoPostFramePulse ( )
             WaitForMenu++;
         }
 
-        if ( m_bWaitToSetNick && GetLocalGUI()->GetMainMenu()->IsVisible() && !GetLocalGUI()->GetMainMenu()->IsFading() )
+        if (m_bWaitToSetNick && GetLocalGUI()->GetMainMenu()->IsVisible() && !GetLocalGUI()->GetMainMenu()->IsFading())
         {
-            if ( m_uiNewNickWaitFrames > 75 )
+            if (m_uiNewNickWaitFrames > 75)
             {
                 // Request a new nickname if we're waiting for one
                 GetLocalGUI()->GetMainMenu()->GetSettingsWindow()->RequestNewNickname();
@@ -1320,70 +1277,69 @@ void CCore::DoPostFramePulse ( )
         }
     }
 
-    if ( !IsFocused() && m_bLastFocused )
+    if (!IsFocused() && m_bLastFocused)
     {
         // Fix for #4948
-        m_pKeyBinds->CallAllGTAControlBinds ( CONTROL_BOTH, false );
+        m_pKeyBinds->CallAllGTAControlBinds(CONTROL_BOTH, false);
         m_bLastFocused = false;
     }
-    else if ( IsFocused() && !m_bLastFocused )
+    else if (IsFocused() && !m_bLastFocused)
     {
         m_bLastFocused = true;
     }
 
-    GetJoystickManager ()->DoPulse ();      // Note: This may indirectly call CMessageLoopHook::ProcessMessage
-    m_pKeyBinds->DoPostFramePulse ();
+    GetJoystickManager()->DoPulse();            // Note: This may indirectly call CMessageLoopHook::ProcessMessage
+    m_pKeyBinds->DoPostFramePulse();
 
-    if ( m_pWebCore )
-        m_pWebCore->DoPulse ();
+    if (m_pWebCore)
+        m_pWebCore->DoPulse();
 
     // Notify the mod manager and the connect manager
-    TIMING_CHECKPOINT( "-CorePostFrame1" );
-    m_pModManager->DoPulsePostFrame ();
-    TIMING_CHECKPOINT( "+CorePostFrame2" );
-    GetMemStats ()->Draw ();
-    GetGraphStats ()->Draw();
-    m_pConnectManager->DoPulse ();
+    TIMING_CHECKPOINT("-CorePostFrame1");
+    m_pModManager->DoPulsePostFrame();
+    TIMING_CHECKPOINT("+CorePostFrame2");
+    GetMemStats()->Draw();
+    GetGraphStats()->Draw();
+    m_pConnectManager->DoPulse();
 
-    m_Community.DoPulse ();
-
-    TIMING_CHECKPOINT( "-CorePostFrame2" );
+    TIMING_CHECKPOINT("-CorePostFrame2");
 }
 
-
 // Called after MOD is unloaded
-void CCore::OnModUnload ( )
+void CCore::OnModUnload()
 {
     // reattach the global event
-    m_pGUI->SelectInputHandlers( INPUT_CORE );
+    m_pGUI->SelectInputHandlers(INPUT_CORE);
     // remove unused events
-    m_pGUI->ClearInputHandlers( INPUT_MOD );
+    m_pGUI->ClearInputHandlers(INPUT_MOD);
 
     // Ensure all these have been removed
-    m_pKeyBinds->RemoveAllFunctions ();
-    m_pKeyBinds->RemoveAllControlFunctions ();
+    m_pKeyBinds->RemoveAllFunctions();
+    m_pKeyBinds->RemoveAllControlFunctions();
 
     // Reset client script frame rate limit
     m_uiClientScriptFrameRateLimit = 0;
 
     // Clear web whitelist
-    if ( m_pWebCore )
-        m_pWebCore->ResetFilter ();
+    if (m_pWebCore)
+        m_pWebCore->ResetFilter();
+
+    // Destroy tray icon
+    m_pTrayIcon->DestroyTrayIcon();
 }
 
-
-void CCore::RegisterCommands ( )
+void CCore::RegisterCommands()
 {
-    //m_pCommands->Add ( "e", CCommandFuncs::Editor );
-    //m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-    m_pCommands->Add ( "help",              _("this help screen"),                 CCommandFuncs::Help );
-    m_pCommands->Add ( "exit",              _("exits the application"),            CCommandFuncs::Exit );
-    m_pCommands->Add ( "quit",              _("exits the application"),            CCommandFuncs::Exit );
-    m_pCommands->Add ( "ver",               _("shows the version"),                CCommandFuncs::Ver );
-    m_pCommands->Add ( "time",              _("shows the time"),                   CCommandFuncs::Time );
-    m_pCommands->Add ( "showhud",           _("shows the hud"),                    CCommandFuncs::HUD );
-    m_pCommands->Add ( "binds",             _("shows all the binds"),              CCommandFuncs::Binds );
-    m_pCommands->Add ( "serial",            _("shows your serial"),                CCommandFuncs::Serial );
+    // m_pCommands->Add ( "e", CCommandFuncs::Editor );
+    // m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+    m_pCommands->Add("help", _("this help screen"), CCommandFuncs::Help);
+    m_pCommands->Add("exit", _("exits the application"), CCommandFuncs::Exit);
+    m_pCommands->Add("quit", _("exits the application"), CCommandFuncs::Exit);
+    m_pCommands->Add("ver", _("shows the version"), CCommandFuncs::Ver);
+    m_pCommands->Add("time", _("shows the time"), CCommandFuncs::Time);
+    m_pCommands->Add("showhud", _("shows the hud"), CCommandFuncs::HUD);
+    m_pCommands->Add("binds", _("shows all the binds"), CCommandFuncs::Binds);
+    m_pCommands->Add("serial", _("shows your serial"), CCommandFuncs::Serial);
 
 #if 0
     m_pCommands->Add ( "vid",               "changes the video settings (id)",  CCommandFuncs::Vid );
@@ -1392,34 +1348,32 @@ void CCore::RegisterCommands ( )
     m_pCommands->Add ( "unload",            "unloads a mod (name)",             CCommandFuncs::Unload );
 #endif
 
-    m_pCommands->Add ( "connect",           _("connects to a server (host port nick pass)"),   CCommandFuncs::Connect );
-    m_pCommands->Add ( "reconnect",         _("connects to a previous server"),    CCommandFuncs::Reconnect );
-    m_pCommands->Add ( "bind",              _("binds a key (key control)"),        CCommandFuncs::Bind );
-    m_pCommands->Add ( "unbind",            _("unbinds a key (key)"),              CCommandFuncs::Unbind );
-    m_pCommands->Add ( "copygtacontrols",   _("copies the default gta controls"),  CCommandFuncs::CopyGTAControls );
-    m_pCommands->Add ( "screenshot",        _("outputs a screenshot"),             CCommandFuncs::ScreenShot );
-    m_pCommands->Add ( "saveconfig",        _("immediately saves the config"),     CCommandFuncs::SaveConfig );
+    m_pCommands->Add("connect", _("connects to a server (host port nick pass)"), CCommandFuncs::Connect);
+    m_pCommands->Add("reconnect", _("connects to a previous server"), CCommandFuncs::Reconnect);
+    m_pCommands->Add("bind", _("binds a key (key control)"), CCommandFuncs::Bind);
+    m_pCommands->Add("unbind", _("unbinds a key (key)"), CCommandFuncs::Unbind);
+    m_pCommands->Add("copygtacontrols", _("copies the default gta controls"), CCommandFuncs::CopyGTAControls);
+    m_pCommands->Add("screenshot", _("outputs a screenshot"), CCommandFuncs::ScreenShot);
+    m_pCommands->Add("saveconfig", _("immediately saves the config"), CCommandFuncs::SaveConfig);
 
-    m_pCommands->Add ( "cleardebug",        _("clears the debug view"),            CCommandFuncs::DebugClear );
-    m_pCommands->Add ( "chatscrollup",      _("scrolls the chatbox upwards"),      CCommandFuncs::ChatScrollUp );
-    m_pCommands->Add ( "chatscrolldown",    _("scrolls the chatbox downwards"),    CCommandFuncs::ChatScrollDown );
-    m_pCommands->Add ( "debugscrollup",     _("scrolls the debug view upwards"),   CCommandFuncs::DebugScrollUp );
-    m_pCommands->Add ( "debugscrolldown",   _("scrolls the debug view downwards"), CCommandFuncs::DebugScrollDown );
+    m_pCommands->Add("cleardebug", _("clears the debug view"), CCommandFuncs::DebugClear);
+    m_pCommands->Add("chatscrollup", _("scrolls the chatbox upwards"), CCommandFuncs::ChatScrollUp);
+    m_pCommands->Add("chatscrolldown", _("scrolls the chatbox downwards"), CCommandFuncs::ChatScrollDown);
+    m_pCommands->Add("debugscrollup", _("scrolls the debug view upwards"), CCommandFuncs::DebugScrollUp);
+    m_pCommands->Add("debugscrolldown", _("scrolls the debug view downwards"), CCommandFuncs::DebugScrollDown);
 
-    m_pCommands->Add ( "test",              "",                                 CCommandFuncs::Test );
-    m_pCommands->Add ( "showmemstat",       _("shows the memory statistics"),      CCommandFuncs::ShowMemStat );
-    m_pCommands->Add ( "showframegraph",    _("shows the frame timing graph"),     CCommandFuncs::ShowFrameGraph );
-    m_pCommands->Add ( "jinglebells",       "",                                    CCommandFuncs::JingleBells );
+    m_pCommands->Add("test", "", CCommandFuncs::Test);
+    m_pCommands->Add("showmemstat", _("shows the memory statistics"), CCommandFuncs::ShowMemStat);
+    m_pCommands->Add("showframegraph", _("shows the frame timing graph"), CCommandFuncs::ShowFrameGraph);
+    m_pCommands->Add("jinglebells", "", CCommandFuncs::JingleBells);
+    m_pCommands->Add("fakelag", "", CCommandFuncs::FakeLag);
 
-#if defined(MTA_DEBUG) || defined(MTA_BETA)
-    m_pCommands->Add ( "fakelag",           "",                                 CCommandFuncs::FakeLag );
-#endif
+    m_pCommands->Add("reloadnews", "for developers: reload news", CCommandFuncs::ReloadNews);
 }
 
-
-void CCore::SwitchRenderWindow ( HWND hWnd, HWND hWndInput )
+void CCore::SwitchRenderWindow(HWND hWnd, HWND hWndInput)
 {
-    assert ( 0 );
+    assert(0);
 #if 0
     // Make GTA windowed
     m_pGame->GetSettings()->SetCurrentVideoMode(0);
@@ -1443,10 +1397,9 @@ void CCore::SwitchRenderWindow ( HWND hWnd, HWND hWndInput )
 #endif
 }
 
-
-bool CCore::IsValidNick ( const char* szNick )
+bool CCore::IsValidNick(const char* szNick)
 {
-    // Grab the size of the nick. Check that it's within the player 
+    // Grab the size of the nick. Check that it's within the player
     size_t sizeNick = strlen(szNick);
     if (sizeNick < MIN_PLAYER_NICK_LENGTH || sizeNick > MAX_PLAYER_NICK_LENGTH)
     {
@@ -1466,31 +1419,29 @@ bool CCore::IsValidNick ( const char* szNick )
 
     // Nickname is valid, return true
     return true;
-   
 }
 
-
-void CCore::Quit ( bool bInstantly )
+void CCore::Quit(bool bInstantly)
 {
-    if ( bInstantly )
+    if (bInstantly)
     {
-        AddReportLog( 7101, "Core - Quit" );
+        AddReportLog(7101, "Core - Quit");
         // Show that we are quiting (for the crash dump filename)
-        SetApplicationSettingInt ( "last-server-ip", 1 );
+        SetApplicationSettingInt("last-server-ip", 1);
 
-        WatchDogBeginSection( "Q0" );   // Allow loader to detect freeze on exit
+        WatchDogBeginSection("Q0");            // Allow loader to detect freeze on exit
 
         // Destroy the client
-        CModManager::GetSingleton ().Unload ();
+        CModManager::GetSingleton().Unload();
 
         // Destroy ourself
-        delete CCore::GetSingletonPtr ();
+        delete CCore::GetSingletonPtr();
 
-        WatchDogCompletedSection( "Q0" );
+        WatchDogCompletedSection("Q0");
 
         // Use TerminateProcess for now as exiting the normal way crashes
-        TerminateProcess ( GetCurrentProcess (), 0 );
-        //PostQuitMessage ( 0 );
+        TerminateProcess(GetCurrentProcess(), 0);
+        // PostQuitMessage ( 0 );
     }
     else
     {
@@ -1498,60 +1449,58 @@ void CCore::Quit ( bool bInstantly )
     }
 }
 
-
-bool CCore::WasLaunchedWithConnectURI ( void )
+bool CCore::WasLaunchedWithConnectURI(void)
 {
-    if ( m_szCommandLineArgs && strnicmp ( m_szCommandLineArgs, "mtasa://", 8 ) == 0 )
+    if (m_szCommandLineArgs && strnicmp(m_szCommandLineArgs, "mtasa://", 8) == 0)
         return true;
     return false;
 }
 
-
-void CCore::ParseCommandLine ( std::map < std::string, std::string > & options, const char*& szArgs, const char** pszNoValOptions )
+void CCore::ParseCommandLine(std::map<std::string, std::string>& options, const char*& szArgs, const char** pszNoValOptions)
 {
-    std::set < std::string > noValOptions;
-    if ( pszNoValOptions )
+    std::set<std::string> noValOptions;
+    if (pszNoValOptions)
     {
-        while ( *pszNoValOptions )
+        while (*pszNoValOptions)
         {
-            noValOptions.insert ( *pszNoValOptions );
+            noValOptions.insert(*pszNoValOptions);
             pszNoValOptions++;
         }
     }
 
-    const char* szCmdLine = GetCommandLine ();
-    char szCmdLineCopy[512];
-    STRNCPY ( szCmdLineCopy, szCmdLine, sizeof(szCmdLineCopy) );
-    
-    char* pCmdLineEnd = szCmdLineCopy + strlen ( szCmdLineCopy );
-    char* pStart = szCmdLineCopy;
-    char* pEnd = pStart;
-    bool bInQuoted = false;
+    const char* szCmdLine = GetCommandLine();
+    char        szCmdLineCopy[512];
+    STRNCPY(szCmdLineCopy, szCmdLine, sizeof(szCmdLineCopy));
+
+    char*       pCmdLineEnd = szCmdLineCopy + strlen(szCmdLineCopy);
+    char*       pStart = szCmdLineCopy;
+    char*       pEnd = pStart;
+    bool        bInQuoted = false;
     std::string strKey;
     szArgs = NULL;
 
-    while ( pEnd != pCmdLineEnd )
+    while (pEnd != pCmdLineEnd)
     {
-        pEnd = strchr ( pEnd + 1, ' ' );
-        if ( !pEnd )
+        pEnd = strchr(pEnd + 1, ' ');
+        if (!pEnd)
             pEnd = pCmdLineEnd;
-        if ( bInQuoted && *(pEnd - 1) == '"' )
+        if (bInQuoted && *(pEnd - 1) == '"')
             bInQuoted = false;
-        else if ( *pStart == '"' )
+        else if (*pStart == '"')
             bInQuoted = true;
 
-        if ( !bInQuoted )
+        if (!bInQuoted)
         {
             *pEnd = 0;
-            if ( strKey.empty () )
+            if (strKey.empty())
             {
-                if ( *pStart == '-' )
+                if (*pStart == '-')
                 {
                     strKey = pStart + 1;
-                    if ( noValOptions.find ( strKey ) != noValOptions.end () )
+                    if (noValOptions.find(strKey) != noValOptions.end())
                     {
-                        options [ strKey ] = "";
-                        strKey.clear ();
+                        options[strKey] = "";
+                        strKey.clear();
                     }
                 }
                 else
@@ -1562,91 +1511,92 @@ void CCore::ParseCommandLine ( std::map < std::string, std::string > & options, 
             }
             else
             {
-                if ( *pStart == '-' )
+                if (*pStart == '-')
                 {
-                    options [ strKey ] = "";
+                    options[strKey] = "";
                     strKey = pStart + 1;
                 }
                 else
                 {
-                    if ( *pStart == '"' )
+                    if (*pStart == '"')
                         pStart++;
-                    if ( *(pEnd - 1) == '"' )
+                    if (*(pEnd - 1) == '"')
                         *(pEnd - 1) = 0;
-                    options [ strKey ] = pStart;
-                    strKey.clear ();
+                    options[strKey] = pStart;
+                    strKey.clear();
                 }
             }
             pStart = pEnd;
-            while ( pStart != pCmdLineEnd && *(++pStart) == ' ' );
+            while (pStart != pCmdLineEnd && *(++pStart) == ' ')
+                ;
             pEnd = pStart;
         }
     }
 }
 
-const char* CCore::GetCommandLineOption ( const char* szOption )
+const char* CCore::GetCommandLineOption(const char* szOption)
 {
-    std::map < std::string, std::string >::iterator it = m_CommandLineOptions.find ( szOption );
-    if ( it != m_CommandLineOptions.end () )
-        return it->second.c_str ();
+    std::map<std::string, std::string>::iterator it = m_CommandLineOptions.find(szOption);
+    if (it != m_CommandLineOptions.end())
+        return it->second.c_str();
     else
         return NULL;
 }
 
-SString CCore::GetConnectCommandFromURI ( const char* szURI )
+SString CCore::GetConnectCommandFromURI(const char* szURI)
 {
     unsigned short usPort;
-    std::string strHost, strNick, strPassword;
-    GetConnectParametersFromURI ( szURI, strHost, usPort, strNick, strPassword );
+    std::string    strHost, strNick, strPassword;
+    GetConnectParametersFromURI(szURI, strHost, usPort, strNick, strPassword);
 
     // Generate a string with the arguments to send to the mod IF we got a host
     SString strDest;
-    if ( strHost.size() > 0 )
+    if (strHost.size() > 0)
     {
-        if ( strPassword.size() > 0 )
-            strDest.Format ( "connect %s %u %s %s", strHost.c_str (), usPort, strNick.c_str (), strPassword.c_str () );
+        if (strPassword.size() > 0)
+            strDest.Format("connect %s %u %s %s", strHost.c_str(), usPort, strNick.c_str(), strPassword.c_str());
         else
-            strDest.Format ( "connect %s %u %s", strHost.c_str (), usPort, strNick.c_str () );
+            strDest.Format("connect %s %u %s", strHost.c_str(), usPort, strNick.c_str());
     }
 
     return strDest;
 }
 
-void CCore::GetConnectParametersFromURI ( const char* szURI, std::string &strHost, unsigned short &usPort, std::string &strNick, std::string &strPassword )
+void CCore::GetConnectParametersFromURI(const char* szURI, std::string& strHost, unsigned short& usPort, std::string& strNick, std::string& strPassword)
 {
     // Grab the length of the string
-    size_t sizeURI = strlen ( szURI );
-    
+    size_t sizeURI = strlen(szURI);
+
     // Parse it right to left
-    char szLeft [256];
-    szLeft [255] = 0;
+    char szLeft[256];
+    szLeft[255] = 0;
     char* szLeftIter = szLeft + 255;
 
-    char szRight [256];
-    szRight [255] = 0;
+    char szRight[256];
+    szRight[255] = 0;
     char* szRightIter = szRight + 255;
 
     const char* szIterator = szURI + sizeURI;
-    bool bHitAt = false;
+    bool        bHitAt = false;
 
-    for ( ; szIterator >= szURI + 8; szIterator-- )
+    for (; szIterator >= szURI + 8; szIterator--)
     {
-        if ( !bHitAt && *szIterator == '@' )
+        if (!bHitAt && *szIterator == '@')
         {
             bHitAt = true;
         }
         else
         {
-            if ( bHitAt )
+            if (bHitAt)
             {
-                if ( szLeftIter > szLeft )
+                if (szLeftIter > szLeft)
                 {
                     *(--szLeftIter) = *szIterator;
                 }
             }
             else
             {
-                if ( szRightIter > szRight )
+                if (szRightIter > szRight)
                 {
                     *(--szRightIter) = *szIterator;
                 }
@@ -1655,121 +1605,125 @@ void CCore::GetConnectParametersFromURI ( const char* szURI, std::string &strHos
     }
 
     // Parse the host/port
-    char szHost [64];
-    char szPort [12];
+    char  szHost[64];
+    char  szPort[12];
     char* szHostIter = szHost;
     char* szPortIter = szPort;
-    memset ( szHost, 0, sizeof(szHost) );
-    memset ( szPort, 0, sizeof(szPort) );
+    memset(szHost, 0, sizeof(szHost));
+    memset(szPort, 0, sizeof(szPort));
 
-    bool bIsInPort = false;
-    size_t sizeRight = strlen ( szRightIter );
-    for ( size_t i = 0; i < sizeRight; i++ )
+    bool   bIsInPort = false;
+    size_t sizeRight = strlen(szRightIter);
+    for (size_t i = 0; i < sizeRight; i++)
     {
-        if ( !bIsInPort && szRightIter [i] == ':' )
+        if (!bIsInPort && szRightIter[i] == ':')
         {
             bIsInPort = true;
         }
         else
         {
-            if ( bIsInPort )
+            if (bIsInPort)
             {
-                if ( szPortIter < szPort + 11 )
+                if (szPortIter < szPort + 11)
                 {
-                    *(szPortIter++) = szRightIter [i];
+                    *(szPortIter++) = szRightIter[i];
                 }
             }
             else
             {
-                if ( szHostIter < szHost + 63 )
+                if (szHostIter < szHost + 63)
                 {
-                    *(szHostIter++) = szRightIter [i];
+                    *(szHostIter++) = szRightIter[i];
                 }
             }
         }
-
     }
 
     // Parse the nickname / password
-    char szNickname [64];
-    char szPassword [64];
+    char  szNickname[64];
+    char  szPassword[64];
     char* szNicknameIter = szNickname;
     char* szPasswordIter = szPassword;
-    memset ( szNickname, 0, sizeof(szNickname) );
-    memset ( szPassword, 0, sizeof(szPassword) );
+    memset(szNickname, 0, sizeof(szNickname));
+    memset(szPassword, 0, sizeof(szPassword));
 
-    bool bIsInPassword = false;
-    size_t sizeLeft = strlen ( szLeftIter );
-    for ( size_t i = 0; i < sizeLeft; i++ )
+    bool   bIsInPassword = false;
+    size_t sizeLeft = strlen(szLeftIter);
+    for (size_t i = 0; i < sizeLeft; i++)
     {
-        if ( !bIsInPassword && szLeftIter [i] == ':' )
+        if (!bIsInPassword && szLeftIter[i] == ':')
         {
             bIsInPassword = true;
         }
         else
         {
-            if ( bIsInPassword )
+            if (bIsInPassword)
             {
-                if ( szPasswordIter < szPassword + 63 )
+                if (szPasswordIter < szPassword + 63)
                 {
-                    *(szPasswordIter++) = szLeftIter [i];
+                    *(szPasswordIter++) = szLeftIter[i];
                 }
             }
             else
             {
-                if ( szNicknameIter < szNickname + 63 )
+                if (szNicknameIter < szNickname + 63)
                 {
-                    *(szNicknameIter++) = szLeftIter [i];
+                    *(szNicknameIter++) = szLeftIter[i];
                 }
             }
         }
-
     }
 
     // If we got any port, convert it to an integral type
     usPort = 22003;
-    if ( strlen ( szPort ) > 0 )
+    if (strlen(szPort) > 0)
     {
-        usPort = static_cast < unsigned short > ( atoi ( szPort ) );
+        usPort = static_cast<unsigned short>(atoi(szPort));
     }
 
     // Grab the nickname
-    if ( strlen ( szNickname ) > 0 )
+    if (strlen(szNickname) > 0)
     {
         strNick = szNickname;
     }
     else
     {
-        CVARS_GET ( "nick", strNick );
+        CVARS_GET("nick", strNick);
     }
     strHost = szHost;
     strPassword = szPassword;
 }
 
-
 void CCore::UpdateRecentlyPlayed()
 {
-    //Get the current host and port
+    // Get the current host and port
     unsigned int uiPort;
-    std::string strHost;
-    CVARS_GET ( "host", strHost );
-    CVARS_GET ( "port", uiPort );
+    std::string  strHost;
+    CVARS_GET("host", strHost);
+    CVARS_GET("port", uiPort);
     // Save the connection details into the recently played servers list
     in_addr Address;
-    if ( CServerListItem::Parse ( strHost.c_str(), Address ) )
+    if (CServerListItem::Parse(strHost.c_str(), Address))
     {
-        CServerBrowser* pServerBrowser = CCore::GetSingleton ().GetLocalGUI ()->GetMainMenu ()->GetServerBrowser ();
-        CServerList* pRecentList = pServerBrowser->GetRecentList ();
-        pRecentList->Remove ( Address, uiPort );
-        pRecentList->AddUnique ( Address, uiPort, true );
-       
-        pServerBrowser->SaveRecentlyPlayedList();
-        if ( !m_pConnectManager->m_strLastPassword.empty() )
-            pServerBrowser->SetServerPassword ( strHost + ":" + SString("%u",uiPort), m_pConnectManager->m_strLastPassword );
+        CServerBrowser* pServerBrowser = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetServerBrowser();
+        CServerList*    pRecentList = pServerBrowser->GetRecentList();
+        pRecentList->Remove(Address, uiPort);
+        pRecentList->AddUnique(Address, uiPort, true);
 
+        pServerBrowser->SaveRecentlyPlayedList();
+        if (!m_pConnectManager->m_strLastPassword.empty())
+            pServerBrowser->SetServerPassword(strHost + ":" + SString("%u", uiPort), m_pConnectManager->m_strLastPassword);
     }
-    //Save our configuration file
-    CCore::GetSingleton ().SaveConfig ();
+    // Save our configuration file
+    CCore::GetSingleton().SaveConfig();
+}
+
+//
+// Called just before GTA calculates frame time deltas
+//
+void CCore::OnGameTimerUpdate()
+{
+    ApplyQueuedFrameRateLimit();
 }
 
 //
@@ -1779,10 +1733,10 @@ void CCore::UpdateRecentlyPlayed()
 // Uses client rate from script
 // Uses server rate from argument, or last time if not supplied
 //
-void CCore::RecalculateFrameRateLimit ( uint uiServerFrameRateLimit, bool bLogToConsole )
+void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToConsole)
 {
     // Save rate from server if valid
-    if ( uiServerFrameRateLimit != -1 )
+    if (uiServerFrameRateLimit != -1)
         m_uiServerFrameRateLimit = uiServerFrameRateLimit;
 
     // Start with value set by the server
@@ -1790,215 +1744,198 @@ void CCore::RecalculateFrameRateLimit ( uint uiServerFrameRateLimit, bool bLogTo
 
     // Apply client config setting
     uint uiClientConfigRate;
-    g_pCore->GetCVars ()->Get ( "fps_limit", uiClientConfigRate );
+    g_pCore->GetCVars()->Get("fps_limit", uiClientConfigRate);
     // Lowest wins (Although zero is highest)
-    if ( ( m_uiFrameRateLimit == 0 || uiClientConfigRate < m_uiFrameRateLimit ) && uiClientConfigRate > 0 )
+    if ((m_uiFrameRateLimit == 0 || uiClientConfigRate < m_uiFrameRateLimit) && uiClientConfigRate > 0)
         m_uiFrameRateLimit = uiClientConfigRate;
 
     // Apply client script setting
     uint uiClientScriptRate = m_uiClientScriptFrameRateLimit;
     // Lowest wins (Although zero is highest)
-    if ( ( m_uiFrameRateLimit == 0 || uiClientScriptRate < m_uiFrameRateLimit ) && uiClientScriptRate > 0 )
+    if ((m_uiFrameRateLimit == 0 || uiClientScriptRate < m_uiFrameRateLimit) && uiClientScriptRate > 0)
         m_uiFrameRateLimit = uiClientScriptRate;
 
     // Print new limits to the console
-    if ( bLogToConsole )
+    if (bLogToConsole)
     {
-        SString strStatus (  "Server FPS limit: %d", m_uiServerFrameRateLimit );
-        if ( m_uiFrameRateLimit != m_uiServerFrameRateLimit )
-            strStatus += SString (  " (Using %d)", m_uiFrameRateLimit );
-        CCore::GetSingleton ().GetConsole ()->Print( strStatus );
+        SString strStatus("Server FPS limit: %d", m_uiServerFrameRateLimit);
+        if (m_uiFrameRateLimit != m_uiServerFrameRateLimit)
+            strStatus += SString(" (Using %d)", m_uiFrameRateLimit);
+        CCore::GetSingleton().GetConsole()->Print(strStatus);
     }
 }
-
 
 //
 // Change client rate as set by script
 //
-void CCore::SetClientScriptFrameRateLimit ( uint uiClientScriptFrameRateLimit )
+void CCore::SetClientScriptFrameRateLimit(uint uiClientScriptFrameRateLimit)
 {
     m_uiClientScriptFrameRateLimit = uiClientScriptFrameRateLimit;
-    RecalculateFrameRateLimit( -1, false );
+    RecalculateFrameRateLimit(-1, false);
 }
-
 
 //
 // Make sure the frame rate limit has been applied since the last call
 //
-void CCore::EnsureFrameRateLimitApplied ( void )
+void CCore::EnsureFrameRateLimitApplied(void)
 {
-    if ( !m_bDoneFrameRateLimit )
+    if (!m_bDoneFrameRateLimit)
     {
-        ApplyFrameRateLimit ();
+        ApplyFrameRateLimit();
     }
     m_bDoneFrameRateLimit = false;
 }
-
 
 //
 // Do FPS limiting
 //
 // This is called once a frame even if minimized
 //
-void CCore::ApplyFrameRateLimit ( uint uiOverrideRate )
+void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
 {
-    TIMING_CHECKPOINT( "-CallIdle1" );
-    ms_TimingCheckpoints.EndTimingCheckpoints ();
+    TIMING_CHECKPOINT("-CallIdle1");
+    ms_TimingCheckpoints.EndTimingCheckpoints();
 
     // Frame rate limit stuff starts here
     m_bDoneFrameRateLimit = true;
 
     uint uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
 
-    TIMING_GRAPH("Limiter");
+    if (uiUseRate < 1)
+        return DoReliablePulse();
 
-    if ( uiUseRate < 1 )
-        return DoReliablePulse ();
+    // Apply previous frame rate if is hasn't been done yet
+    ApplyQueuedFrameRateLimit();
 
-    if ( m_DiagnosticDebug != EDiagnosticDebug::D3D_6732 )
-         Sleep( 1 );    // Make frame rate smoother maybe
+    // Limit is usually applied in OnGameTimerUpdate
+    m_uiQueuedFrameRate = uiUseRate;
+    m_bQueuedFrameRateValid = true;
 
-    // Calc required time in ms between frames
-    const double dTargetTimeToUse = 1000.0 / uiUseRate;
-
-    // Time now
-    double dTimeMs = GetTickCount32 ();
-
-    // Get delta time in ms since last frame
-    double dTimeUsed = dTimeMs - m_dLastTimeMs;
-
-    // Apply any over/underrun carried over from the previous frame
-    dTimeUsed += m_dPrevOverrun;
-
-    if ( dTimeUsed < dTargetTimeToUse )
-    {
-        // Have time spare - maybe eat some of that now
-        double dSpare = dTargetTimeToUse - dTimeUsed;
-
-        double dUseUpNow = dSpare - dTargetTimeToUse * 0.2f;
-        if ( dUseUpNow >= 1 )
-            Sleep( static_cast < DWORD > ( floor ( dUseUpNow ) ) );
-
-        // Redo timing calcs
-        dTimeMs = GetTickCount32 ();
-        dTimeUsed = dTimeMs - m_dLastTimeMs;
-        dTimeUsed += m_dPrevOverrun;
-    }
-
-    // Update over/underrun for next frame
-    m_dPrevOverrun = dTimeUsed - dTargetTimeToUse;
-
-    // Limit carry over
-    m_dPrevOverrun = Clamp ( dTargetTimeToUse * -0.9f, m_dPrevOverrun, dTargetTimeToUse * 0.1f );
-
-    m_dLastTimeMs = dTimeMs;
-
-    DoReliablePulse ();
+    DoReliablePulse();
 
     TIMING_GRAPH("FrameEnd");
     TIMING_GRAPH("");
 }
 
+//
+// Frame rate limit (wait) is done here.
+//
+void CCore::ApplyQueuedFrameRateLimit()
+{
+    if (m_bQueuedFrameRateValid)
+    {
+        m_bQueuedFrameRateValid = false;
+        // Calc required time in ms between frames
+        const double dTargetTimeToUse = 1000.0 / m_uiQueuedFrameRate;
+
+        while(true)
+        {
+            // See if we need to wait
+            double dSpare = dTargetTimeToUse - m_FrameRateTimer.Get();
+            if (dSpare <= 0.0)
+                break;
+            if (dSpare >= 2.0)
+                Sleep(1);
+        }
+        m_FrameRateTimer.Reset();
+        TIMING_GRAPH("Limiter");
+    }
+}
 
 //
 // DoReliablePulse
 //
 // This is called once a frame even if minimized
 //
-void CCore::DoReliablePulse ( void )
+void CCore::DoReliablePulse(void)
 {
-    ms_TimingCheckpoints.BeginTimingCheckpoints ();
-    TIMING_CHECKPOINT( "+CallIdle2" );
+    ms_TimingCheckpoints.BeginTimingCheckpoints();
+    TIMING_CHECKPOINT("+CallIdle2");
 
-    UpdateIsWindowMinimized ();
+    UpdateIsWindowMinimized();
 
     // Non frame rate limit stuff
-    if ( IsWindowMinimized () )
-        m_iUnminimizeFrameCounter = 4;     // Tell script we have unminimized after a short delay
+    if (IsWindowMinimized())
+        m_iUnminimizeFrameCounter = 4;            // Tell script we have unminimized after a short delay
 
-    UpdateModuleTickCount64 ();
+    UpdateModuleTickCount64();
 }
-
 
 //
 // Debug timings
 //
-bool CCore::IsTimingCheckpoints ( void )
+bool CCore::IsTimingCheckpoints(void)
 {
-    return ms_TimingCheckpoints.IsTimingCheckpoints ();
+    return ms_TimingCheckpoints.IsTimingCheckpoints();
 }
 
-void CCore::OnTimingCheckpoint ( const char* szTag )
+void CCore::OnTimingCheckpoint(const char* szTag)
 {
-    ms_TimingCheckpoints.OnTimingCheckpoint ( szTag );
+    ms_TimingCheckpoints.OnTimingCheckpoint(szTag);
 }
 
-void CCore::OnTimingDetail ( const char* szTag )
+void CCore::OnTimingDetail(const char* szTag)
 {
-    ms_TimingCheckpoints.OnTimingDetail ( szTag );
+    ms_TimingCheckpoints.OnTimingDetail(szTag);
 }
-
 
 //
 // OnDeviceRestore
 //
-void CCore::OnDeviceRestore ( void )
+void CCore::OnDeviceRestore(void)
 {
-    m_iUnminimizeFrameCounter = 4;     // Tell script we have restored after 4 frames to avoid double sends
+    m_iUnminimizeFrameCounter = 4;            // Tell script we have restored after 4 frames to avoid double sends
     m_bDidRecreateRenderTargets = true;
 }
-
 
 //
 // OnPreFxRender
 //
-void CCore::OnPreFxRender ( void )
+void CCore::OnPreFxRender(void)
 {
     // Don't do nothing if nothing won't be drawn
-    if ( !CGraphics::GetSingleton ().HasMaterialLine3DQueueItems () )
+    if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems())
         return;
 
-    CGraphics::GetSingleton ().EnteringMTARenderZone();
+    CGraphics::GetSingleton().EnteringMTARenderZone();
 
-    CGraphics::GetSingleton ().DrawMaterialLine3DQueue ();
+    CGraphics::GetSingleton().DrawLine3DPreGUIQueue();
 
-    CGraphics::GetSingleton ().LeavingMTARenderZone();
+    CGraphics::GetSingleton().LeavingMTARenderZone();
 }
-
 
 //
 // OnPreHUDRender
 //
-void CCore::OnPreHUDRender ( void )
+void CCore::OnPreHUDRender(void)
 {
-    IDirect3DDevice9* pDevice = CGraphics::GetSingleton ().GetDevice ();
+    IDirect3DDevice9* pDevice = CGraphics::GetSingleton().GetDevice();
 
-    CGraphics::GetSingleton ().EnteringMTARenderZone();
+    CGraphics::GetSingleton().EnteringMTARenderZone();
 
     // Maybe capture screen and other stuff
-    CGraphics::GetSingleton ().GetRenderItemManager ()->DoPulse ();
+    CGraphics::GetSingleton().GetRenderItemManager()->DoPulse();
 
     // Handle script stuffs
-    if ( m_iUnminimizeFrameCounter && --m_iUnminimizeFrameCounter == 0 )
+    if (m_iUnminimizeFrameCounter && --m_iUnminimizeFrameCounter == 0)
     {
-        m_pModManager->DoPulsePreHUDRender ( true, m_bDidRecreateRenderTargets );
+        m_pModManager->DoPulsePreHUDRender(true, m_bDidRecreateRenderTargets);
         m_bDidRecreateRenderTargets = false;
     }
     else
-        m_pModManager->DoPulsePreHUDRender ( false, false );
+        m_pModManager->DoPulsePreHUDRender(false, false);
 
     // Handle saving depth buffer
-    CGraphics::GetSingleton ().GetRenderItemManager ()->SaveReadableDepthBuffer();
+    CGraphics::GetSingleton().GetRenderItemManager()->SaveReadableDepthBuffer();
 
     // Restore in case script forgets
-    CGraphics::GetSingleton ().GetRenderItemManager ()->RestoreDefaultRenderTarget ();
+    CGraphics::GetSingleton().GetRenderItemManager()->RestoreDefaultRenderTarget();
 
     // Draw pre-GUI primitives
-    CGraphics::GetSingleton ().DrawPreGUIQueue ();
+    CGraphics::GetSingleton().DrawPreGUIQueue();
 
-    CGraphics::GetSingleton ().LeavingMTARenderZone();
+    CGraphics::GetSingleton().LeavingMTARenderZone();
 }
-
 
 //
 // CCore::CalculateStreamingMemoryRange
@@ -2016,50 +1953,49 @@ void CCore::OnPreHUDRender ( void )
 //   Max should be no less than 96MB
 //   Gap between min and max should be no less than 32MB
 //
-void CCore::CalculateStreamingMemoryRange ( void )
+void CCore::CalculateStreamingMemoryRange(void)
 {
     // Only need to do this once
-    if ( m_fMinStreamingMemory != 0 )
+    if (m_fMinStreamingMemory != 0)
         return;
 
     // Get system info
-    int iSystemRamMB = static_cast < int > ( GetWMITotalPhysicalMemory () / 1024LL / 1024LL );
+    int iSystemRamMB = static_cast<int>(GetWMITotalPhysicalMemory() / 1024LL / 1024LL);
     int iVideoMemoryMB = g_pDeviceState->AdapterState.InstalledMemoryKB / 1024;
 
     // Calc min and max from lookup table
-    SSamplePoint < float > minPoints[] = { {512, 64},  {1024, 96},   {2048, 128} };
-    SSamplePoint < float > maxPoints[] = { {512, 96},  {1024, 128},  {2048, 256} };
+    SSamplePoint<float> minPoints[] = {{512, 64}, {1024, 96}, {2048, 128}};
+    SSamplePoint<float> maxPoints[] = {{512, 96}, {1024, 128}, {2048, 256}};
 
-    float fMinAmount = EvalSamplePosition < float > ( minPoints, NUMELMS ( minPoints ), iSystemRamMB );
-    float fMaxAmount = EvalSamplePosition < float > ( maxPoints, NUMELMS ( maxPoints ), iSystemRamMB );
+    float fMinAmount = EvalSamplePosition<float>(minPoints, NUMELMS(minPoints), iSystemRamMB);
+    float fMaxAmount = EvalSamplePosition<float>(maxPoints, NUMELMS(maxPoints), iSystemRamMB);
 
     // Scale max if gta3.img is over 1GB
-    SString strGta3imgFilename = PathJoin( GetLaunchPath(), "models", "gta3.img" );
-    uint uiFileSizeMB = FileSize( strGta3imgFilename ) / 0x100000LL;
-    float fSizeScale = UnlerpClamped( 1024, uiFileSizeMB, 2048 );
+    SString strGta3imgFilename = PathJoin(GetLaunchPath(), "models", "gta3.img");
+    uint    uiFileSizeMB = FileSize(strGta3imgFilename) / 0x100000LL;
+    float   fSizeScale = UnlerpClamped(1024, uiFileSizeMB, 2048);
     fMaxAmount += fMaxAmount * fSizeScale;
 
     // Apply cap dependant on video memory
-    fMaxAmount = Min ( fMaxAmount, iVideoMemoryMB * 2.f );
-    fMinAmount = Min ( fMinAmount, iVideoMemoryMB * 1.f );
+    fMaxAmount = std::min(fMaxAmount, iVideoMemoryMB * 2.f);
+    fMinAmount = std::min(fMinAmount, iVideoMemoryMB * 1.f);
 
     // Apply 96MB lower limit
-    fMaxAmount = Max ( fMaxAmount, 96.f );
+    fMaxAmount = std::max(fMaxAmount, 96.f);
 
     // Apply gap limit
-    fMinAmount = fMaxAmount - Max ( fMaxAmount - fMinAmount, 32.f );
+    fMinAmount = fMaxAmount - std::max(fMaxAmount - fMinAmount, 32.f);
 
     m_fMinStreamingMemory = fMinAmount;
     m_fMaxStreamingMemory = fMaxAmount;
 }
 
-
 //
 // GetMinStreamingMemory
 //
-uint CCore::GetMinStreamingMemory ( void )
+uint CCore::GetMinStreamingMemory(void)
 {
-    CalculateStreamingMemoryRange ();
+    CalculateStreamingMemoryRange();
 
 #ifdef MTA_DEBUG
     return 1;
@@ -2067,181 +2003,169 @@ uint CCore::GetMinStreamingMemory ( void )
     return m_fMinStreamingMemory;
 }
 
-
 //
 // GetMaxStreamingMemory
 //
-uint CCore::GetMaxStreamingMemory ( void )
+uint CCore::GetMaxStreamingMemory(void)
 {
-    CalculateStreamingMemoryRange ();
+    CalculateStreamingMemoryRange();
     return m_fMaxStreamingMemory;
 }
 
-
 //
 // OnCrashAverted
-// 
-void CCore::OnCrashAverted ( uint uiId )
+//
+void CCore::OnCrashAverted(uint uiId)
 {
-    CCrashDumpWriter::OnCrashAverted ( uiId );
+    CCrashDumpWriter::OnCrashAverted(uiId);
 }
-
 
 //
 // OnEnterCrashZone
-// 
-void CCore::OnEnterCrashZone ( uint uiId )
+//
+void CCore::OnEnterCrashZone(uint uiId)
 {
-    CCrashDumpWriter::OnEnterCrashZone ( uiId );
+    CCrashDumpWriter::OnEnterCrashZone(uiId);
 }
-
 
 //
 // LogEvent
-// 
-void CCore::LogEvent ( uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId )
+//
+void CCore::LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId)
 {
-    if ( uiAddReportLogId )
-        AddReportLog ( uiAddReportLogId, SString ( "%s - %s", szContext, szBody ) );
+    if (uiAddReportLogId)
+        AddReportLog(uiAddReportLogId, SString("%s - %s", szContext, szBody));
 
-    if ( GetDebugIdEnabled ( uiDebugId ) )
+    if (GetDebugIdEnabled(uiDebugId))
     {
-        CCrashDumpWriter::LogEvent ( szType, szContext, szBody );
-        OutputDebugLine ( SString ( "[LogEvent] %d %s %s %s", uiDebugId, szType, szContext, szBody ) );
+        CCrashDumpWriter::LogEvent(szType, szContext, szBody);
+        OutputDebugLine(SString("[LogEvent] %d %s %s %s", uiDebugId, szType, szContext, szBody));
     }
 }
 
-
 //
 // GetDebugIdEnabled
-// 
-bool CCore::GetDebugIdEnabled ( uint uiDebugId )
+//
+bool CCore::GetDebugIdEnabled(uint uiDebugId)
 {
-    static CFilterMap debugIdFilterMap ( GetVersionUpdater ()->GetDebugFilterString () );
-    return ( uiDebugId == 0 ) || !debugIdFilterMap.IsFiltered ( uiDebugId );
+    static CFilterMap debugIdFilterMap(GetVersionUpdater()->GetDebugFilterString());
+    return (uiDebugId == 0) || !debugIdFilterMap.IsFiltered(uiDebugId);
 }
 
-EDiagnosticDebugType CCore::GetDiagnosticDebug ( void )
+EDiagnosticDebugType CCore::GetDiagnosticDebug(void)
 {
     return m_DiagnosticDebug;
 }
 
-void CCore::SetDiagnosticDebug ( EDiagnosticDebugType value )
+void CCore::SetDiagnosticDebug(EDiagnosticDebugType value)
 {
     m_DiagnosticDebug = value;
 }
 
-
-CModelCacheManager* CCore::GetModelCacheManager ( void )
+CModelCacheManager* CCore::GetModelCacheManager(void)
 {
-    if ( !m_pModelCacheManager )
-        m_pModelCacheManager = NewModelCacheManager ();
+    if (!m_pModelCacheManager)
+        m_pModelCacheManager = NewModelCacheManager();
     return m_pModelCacheManager;
 }
 
-
-void CCore::AddModelToPersistentCache ( ushort usModelId )
+void CCore::AddModelToPersistentCache(ushort usModelId)
 {
-    return GetModelCacheManager ()->AddModelToPersistentCache ( usModelId );
+    return GetModelCacheManager()->AddModelToPersistentCache(usModelId);
 }
 
-
-void CCore::StaticIdleHandler ( void )
+void CCore::StaticIdleHandler(void)
 {
-    g_pCore->IdleHandler ();
+    g_pCore->IdleHandler();
 }
-
 
 // Gets called every game loop, after GTA has been loaded for the first time
-void CCore::IdleHandler ( void )
+void CCore::IdleHandler(void)
 {
     m_bGettingIdleCallsFromMultiplayer = true;
     HandleIdlePulse();
 }
 
-
 // Gets called every 50ms, before GTA has been loaded for the first time
-void CCore::WindowsTimerHandler ( void )
+void CCore::WindowsTimerHandler(void)
 {
-    if ( !m_bGettingIdleCallsFromMultiplayer )
+    if (!m_bGettingIdleCallsFromMultiplayer)
         HandleIdlePulse();
 }
 
-
 // Always called, even if minimized
-void CCore::HandleIdlePulse ( void )
+void CCore::HandleIdlePulse(void)
 {
     UpdateIsWindowMinimized();
 
-    if ( IsWindowMinimized() )
+    if (IsWindowMinimized())
     {
         DoPreFramePulse();
         DoPostFramePulse();
     }
-    if ( m_pModManager->GetCurrentMod() )
+    if (m_pModManager->GetCurrentMod())
         m_pModManager->GetCurrentMod()->IdleHandler();
 }
-
 
 //
 // Handle encryption of Windows crash dump files
 //
-void CCore::HandleCrashDumpEncryption( void )
+void CCore::HandleCrashDumpEncryption(void)
 {
     const int iMaxFiles = 10;
-    SString strDumpDirPath = CalcMTASAPath( "mta\\dumps" );
-    SString strDumpDirPrivatePath = PathJoin( strDumpDirPath, "private" );
-    SString strDumpDirPublicPath = PathJoin( strDumpDirPath, "public" );
-    MakeSureDirExists( strDumpDirPrivatePath + "/" );
-    MakeSureDirExists( strDumpDirPublicPath + "/" );
+    SString   strDumpDirPath = CalcMTASAPath("mta\\dumps");
+    SString   strDumpDirPrivatePath = PathJoin(strDumpDirPath, "private");
+    SString   strDumpDirPublicPath = PathJoin(strDumpDirPath, "public");
+    MakeSureDirExists(strDumpDirPrivatePath + "/");
+    MakeSureDirExists(strDumpDirPublicPath + "/");
 
     SString strMessage = "Dump files in this directory are encrypted and copied to 'dumps\\public' during startup\n\n";
-    FileSave( PathJoin( strDumpDirPrivatePath, "README.txt" ), strMessage );
+    FileSave(PathJoin(strDumpDirPrivatePath, "README.txt"), strMessage);
 
     // Limit number of files in the private folder
     {
-        std::vector < SString > privateList = FindFiles( PathJoin( strDumpDirPrivatePath, "*.dmp" ), true, false, true );
-        for ( int i = 0 ; i < (int)privateList.size() - iMaxFiles ; i++ )
-            FileDelete( PathJoin( strDumpDirPrivatePath, privateList[i] ) );
+        std::vector<SString> privateList = FindFiles(PathJoin(strDumpDirPrivatePath, "*.dmp"), true, false, true);
+        for (int i = 0; i < (int)privateList.size() - iMaxFiles; i++)
+            FileDelete(PathJoin(strDumpDirPrivatePath, privateList[i]));
     }
 
     // Copy and encrypt private files to public if they don't already exist
     {
-        std::vector < SString > privateList = FindFiles( PathJoin( strDumpDirPrivatePath, "*.dmp" ), true, false );
-        for ( uint i = 0 ; i < privateList.size() ; i++ )
+        std::vector<SString> privateList = FindFiles(PathJoin(strDumpDirPrivatePath, "*.dmp"), true, false);
+        for (uint i = 0; i < privateList.size(); i++)
         {
             const SString& strPrivateFilename = privateList[i];
-            SString strPublicFilename = ExtractBeforeExtension( strPrivateFilename ) + ".rsa." + ExtractExtension( strPrivateFilename );
-            SString strPrivatePathFilename = PathJoin( strDumpDirPrivatePath, strPrivateFilename );
-            SString strPublicPathFilename = PathJoin( strDumpDirPublicPath, strPublicFilename );
-            if ( !FileExists( strPublicPathFilename ) )
+            SString        strPublicFilename = ExtractBeforeExtension(strPrivateFilename) + ".rsa." + ExtractExtension(strPrivateFilename);
+            SString        strPrivatePathFilename = PathJoin(strDumpDirPrivatePath, strPrivateFilename);
+            SString        strPublicPathFilename = PathJoin(strDumpDirPublicPath, strPublicFilename);
+            if (!FileExists(strPublicPathFilename))
             {
-               GetNetwork()->EncryptDumpfile( strPrivatePathFilename, strPublicPathFilename );
+                GetNetwork()->EncryptDumpfile(strPrivatePathFilename, strPublicPathFilename);
             }
         }
     }
 
     // Limit number of files in the public folder
     {
-        std::vector < SString > publicList = FindFiles( PathJoin( strDumpDirPublicPath, "*.dmp" ), true, false, true );
-        for ( int i = 0 ; i < (int)publicList.size() - iMaxFiles ; i++ )
-            FileDelete( PathJoin( strDumpDirPublicPath, publicList[i] ) );
+        std::vector<SString> publicList = FindFiles(PathJoin(strDumpDirPublicPath, "*.dmp"), true, false, true);
+        for (int i = 0; i < (int)publicList.size() - iMaxFiles; i++)
+            FileDelete(PathJoin(strDumpDirPublicPath, publicList[i]));
     }
 
     // And while we are here, limit number of items in core.log as well
     {
-        SString strCoreLogPathFilename = CalcMTASAPath( "mta\\core.log" );
+        SString strCoreLogPathFilename = CalcMTASAPath("mta\\core.log");
         SString strFileContents;
-        FileLoad( strCoreLogPathFilename, strFileContents );
+        FileLoad(strCoreLogPathFilename, strFileContents);
 
-        SString strDelmiter = "** -- Unhandled exception -- **";
-        std::vector < SString > parts;
-        strFileContents.Split( strDelmiter, parts );
+        SString              strDelmiter = "** -- Unhandled exception -- **";
+        std::vector<SString> parts;
+        strFileContents.Split(strDelmiter, parts);
 
-        if ( parts.size() > iMaxFiles )
+        if (parts.size() > iMaxFiles)
         {
-            strFileContents = strDelmiter + strFileContents.Join( strDelmiter, parts, parts.size() - iMaxFiles );
-            FileSave( strCoreLogPathFilename, strFileContents );
+            strFileContents = strDelmiter + strFileContents.Join(strDelmiter, parts, parts.size() - iMaxFiles);
+            FileSave(strCoreLogPathFilename, strFileContents);
         }
     }
 }
@@ -2249,12 +2173,12 @@ void CCore::HandleCrashDumpEncryption( void )
 //
 // Flag to make sure stuff only gets done when everything is ready
 //
-void CCore::SetModulesLoaded( bool bLoaded )
+void CCore::SetModulesLoaded(bool bLoaded)
 {
     m_bModulesLoaded = bLoaded;
 }
 
-bool CCore::AreModulesLoaded( void )
+bool CCore::AreModulesLoaded(void)
 {
     return m_bModulesLoaded;
 }
@@ -2264,7 +2188,7 @@ bool CCore::AreModulesLoaded( void )
 //
 int ms_iDummyProgressTimerCounter = 0;
 
-void CALLBACK TimerProc( void* lpParametar, BOOLEAN TimerOrWaitFired )
+void CALLBACK TimerProc(void* lpParametar, BOOLEAN TimerOrWaitFired)
 {
     ms_iDummyProgressTimerCounter++;
 }
@@ -2272,73 +2196,80 @@ void CALLBACK TimerProc( void* lpParametar, BOOLEAN TimerOrWaitFired )
 //
 // Refresh progress output
 //
-void CCore::UpdateDummyProgress( int iValue, const char* szType )
+void CCore::UpdateDummyProgress(int iValue, const char* szType)
 {
-    if ( iValue != -1 )
+    if (iValue != -1)
     {
         m_iDummyProgressValue = iValue;
         m_strDummyProgressType = szType;
     }
 
-    if ( m_DummyProgressTimerHandle == NULL )
+    if (m_DummyProgressTimerHandle == NULL)
     {
         // Using this timer is quicker than checking tick count with every call to UpdateDummyProgress()
-        ::CreateTimerQueueTimer( &m_DummyProgressTimerHandle, NULL, TimerProc, this, DUMMY_PROGRESS_ANIMATION_INTERVAL, DUMMY_PROGRESS_ANIMATION_INTERVAL, WT_EXECUTEINTIMERTHREAD );
+        ::CreateTimerQueueTimer(&m_DummyProgressTimerHandle, NULL, TimerProc, this, DUMMY_PROGRESS_ANIMATION_INTERVAL, DUMMY_PROGRESS_ANIMATION_INTERVAL,
+                                WT_EXECUTEINTIMERTHREAD);
     }
 
-    if ( !ms_iDummyProgressTimerCounter )
+    if (!ms_iDummyProgressTimerCounter)
         return;
     ms_iDummyProgressTimerCounter = 0;
 
     // Compose message with amount
     SString strMessage;
-    if ( m_iDummyProgressValue )
-        strMessage = SString( "%d%s", m_iDummyProgressValue, *m_strDummyProgressType );
+    if (m_iDummyProgressValue)
+        strMessage = SString("%d%s", m_iDummyProgressValue, *m_strDummyProgressType);
 
-    CGraphics::GetSingleton().SetProgressMessage( strMessage );
+    CGraphics::GetSingleton().SetProgressMessage(strMessage);
 }
 
 //
 // Do SetCursorPos if allowed
 //
-void CCore::CallSetCursorPos( int X, int Y )
+void CCore::CallSetCursorPos(int X, int Y)
 {
-    if ( CCore::GetSingleton ( ).IsFocused ( ) && !CLocalGUI::GetSingleton ( ).IsMainMenuVisible ( ) )
-        m_pLocalGUI->SetCursorPos ( X, Y, true );
+    if (CCore::GetSingleton().IsFocused() && !CLocalGUI::GetSingleton().IsMainMenuVisible())
+        m_pLocalGUI->SetCursorPos(X, Y, true);
 }
 
-bool CCore::GetRequiredDisplayResolution( int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex, bool& bOutAllowUnsafeResolutions )
+bool CCore::GetRequiredDisplayResolution(int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex, bool& bOutAllowUnsafeResolutions)
 {
-    CVARS_GET( "show_unsafe_resolutions", bOutAllowUnsafeResolutions );
-    return GetVideoModeManager()->GetRequiredDisplayResolution( iOutWidth, iOutHeight, iOutColorBits, iOutAdapterIndex );
+    CVARS_GET("show_unsafe_resolutions", bOutAllowUnsafeResolutions);
+    return GetVideoModeManager()->GetRequiredDisplayResolution(iOutWidth, iOutHeight, iOutColorBits, iOutAdapterIndex);
 }
 
-bool CCore::GetDeviceSelectionEnabled( void )
+bool CCore::GetDeviceSelectionEnabled(void)
 {
-    return GetApplicationSettingInt ( "device-selection-disabled" ) ? false : true;
+    return GetApplicationSettingInt("device-selection-disabled") ? false : true;
 }
 
-void CCore::NotifyRenderingGrass( bool bIsRenderingGrass )
+void CCore::NotifyRenderingGrass(bool bIsRenderingGrass)
 {
     m_bIsRenderingGrass = bIsRenderingGrass;
     CDirect3DEvents9::CloseActiveShader();
 }
 
-bool CCore::GetRightSizeTxdEnabled( void )
+bool CCore::GetRightSizeTxdEnabled(void)
 {
-    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::RESIZE_NEVER_0000 )
+    if (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::RESIZE_NEVER_0000)
         return false;
-    if ( g_pCore->GetDiagnosticDebug () == EDiagnosticDebug::RESIZE_ALWAYS_0000 )
+    if (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::RESIZE_ALWAYS_0000)
         return true;
 
     // 32 bit users get rightsized txds
-    if ( !Is64BitOS() )
+    if (!Is64BitOS())
         return true;
 
     // Low ram users get rightsized txds
-    int iSystemRamMB = static_cast < int > ( GetWMITotalPhysicalMemory () / 1024LL / 1024LL );
-    if ( iSystemRamMB <= 2048 )
+    int iSystemRamMB = static_cast<int>(GetWMITotalPhysicalMemory() / 1024LL / 1024LL);
+    if (iSystemRamMB <= 2048)
         return true;
 
     return false;
+}
+
+SString CCore::GetBlueCopyrightString(void)
+{
+    SString strCopyright = BLUE_COPYRIGHT_STRING;
+    return strCopyright.Replace("%BUILD_YEAR%", std::to_string(BUILD_YEAR).c_str());
 }

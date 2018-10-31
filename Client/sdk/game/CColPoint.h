@@ -1,16 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/game/CColPoint.h
-*  PURPOSE:     Collision point interface
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/game/CColPoint.h
+ *  PURPOSE:     Collision point interface
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CGAME_CCOLPOINT
-#define __CGAME_CCOLPOINT
+#pragma once
 
 #include <CVector.h>
 class CColPointSAInterface;
@@ -202,58 +201,56 @@ struct EColSurface
     };
 
     // Enum in a byte
-    EColSurface     ( void )                       {}
-    EColSurface     ( EColSurfaceValue newValue )  { m_ucValue = newValue; }
-    operator uchar  ( void ) const                 { return m_ucValue; }
-    uchar   m_ucValue;
+    EColSurface(void) {}
+    EColSurface(EColSurfaceValue newValue) { m_ucValue = newValue; }
+          operator uchar(void) const { return m_ucValue; }
+    uchar m_ucValue;
 };
 typedef EColSurface::EColSurfaceValue EColSurfaceValue;
-C_ASSERT( EColSurfaceValue::RAILTRACK == 178 );
-C_ASSERT( sizeof ( EColSurface ) == 1 );
+C_ASSERT(EColSurfaceValue::RAILTRACK == 178);
+C_ASSERT(sizeof(EColSurface) == 1);
 
 // Collision stored lighting
 struct CColLighting
 {
-    uchar   day:4;    // 0-15
-    uchar   night:4;  // 0-15
+    uchar day : 4;              // 0-15
+    uchar night : 4;            // 0-15
 };
-C_ASSERT( sizeof ( CColLighting ) == 1 );
+C_ASSERT(sizeof(CColLighting) == 1);
 
 class CColPoint
 {
 public:
-    virtual                         ~CColPoint                  ( void ) {};
+    virtual ~CColPoint(void){};
 
-    virtual CColPointSAInterface*   GetInterface                ( void ) = 0;
-    virtual const CVector&          GetPosition                 ( void ) = 0;
-    virtual void                    SetPosition                 ( const CVector& vecPosition ) = 0;
+    virtual CColPointSAInterface* GetInterface(void) = 0;
+    virtual const CVector&        GetPosition(void) = 0;
+    virtual void                  SetPosition(const CVector& vecPosition) = 0;
 
-    virtual const CVector&          GetNormal                   ( void ) = 0;
-    virtual void                    SetNormal                   ( const CVector& vecNormal ) = 0;
+    virtual const CVector& GetNormal(void) = 0;
+    virtual void           SetNormal(const CVector& vecNormal) = 0;
 
-    virtual EColSurface             GetSurfaceTypeA             ( void ) = 0;
-    virtual EColSurface             GetSurfaceTypeB             ( void ) = 0;
+    virtual EColSurface GetSurfaceTypeA(void) = 0;
+    virtual EColSurface GetSurfaceTypeB(void) = 0;
 
-    virtual void                    SetSurfaceTypeA             ( EColSurface surfaceType ) = 0;
-    virtual void                    SetSurfaceTypeB             ( EColSurface surfaceType ) = 0;
+    virtual void SetSurfaceTypeA(EColSurface surfaceType) = 0;
+    virtual void SetSurfaceTypeB(EColSurface surfaceType) = 0;
 
-    virtual BYTE                    GetPieceTypeA               ( void ) = 0;
-    virtual BYTE                    GetPieceTypeB               ( void ) = 0;
+    virtual BYTE GetPieceTypeA(void) = 0;
+    virtual BYTE GetPieceTypeB(void) = 0;
 
-    virtual void                    SetPieceTypeA               ( BYTE ucPieceType ) = 0;
-    virtual void                    SetPieceTypeB               ( BYTE ucPieceType ) = 0;
+    virtual void SetPieceTypeA(BYTE ucPieceType) = 0;
+    virtual void SetPieceTypeB(BYTE ucPieceType) = 0;
 
-    virtual CColLighting            GetLightingA                ( void ) = 0;
-    virtual CColLighting            GetLightingB                ( void ) = 0;
+    virtual CColLighting GetLightingA(void) = 0;
+    virtual CColLighting GetLightingB(void) = 0;
 
-    virtual void                    SetLightingA                ( CColLighting lighting ) = 0;
-    virtual void                    SetLightingB                ( CColLighting lighting ) = 0;
+    virtual void SetLightingA(CColLighting lighting) = 0;
+    virtual void SetLightingB(CColLighting lighting) = 0;
 
-    virtual float                   GetDepth                    ( void ) = 0;
-    virtual void                    SetDepth                    ( float fDepth ) = 0;
+    virtual float GetDepth(void) = 0;
+    virtual void  SetDepth(float fDepth) = 0;
 
-    virtual void                    Destroy                     ( void ) = 0;
-    virtual float                   GetLightingForTimeOfDay     ( void ) = 0;
+    virtual void  Destroy(void) = 0;
+    virtual float GetLightingForTimeOfDay(void) = 0;
 };
-
-#endif

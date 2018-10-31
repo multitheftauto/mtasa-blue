@@ -2,9 +2,11 @@
 root = true
 
 [*]
-end_of_line = crlf
 insert_final_newline = true
 
 [*.{h,hpp,c,cpp,cc}]
 indent_style = space
 indent_size = 4
+
+[*.sh]
+end_of_line = lf

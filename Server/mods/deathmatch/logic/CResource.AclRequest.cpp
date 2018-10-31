@@ -1,15 +1,14 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CResource.AclRequest.cpp
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CResource.AclRequest.cpp
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -18,11 +17,10 @@
 // Get group name for aclrequest acl
 //
 ///////////////////////////////////////////////////////////////
-SString CResource::GetAutoGroupName ( void )
+SString CResource::GetAutoGroupName(void)
 {
-    return SString ( "autoGroup_%s", GetName ().c_str () );
+    return SString("autoGroup_%s", GetName().c_str());
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -31,11 +29,10 @@ SString CResource::GetAutoGroupName ( void )
 // Get acl name for aclrequest items
 //
 ///////////////////////////////////////////////////////////////
-SString CResource::GetAutoAclName ( void )
+SString CResource::GetAutoAclName(void)
 {
-    return SString ( "autoACL_%s", GetName ().c_str () );
+    return SString("autoACL_%s", GetName().c_str());
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -45,11 +42,10 @@ SString CResource::GetAutoAclName ( void )
 // Can't fail
 //
 ///////////////////////////////////////////////////////////////
-CAccessControlList* CResource::GetAutoAcl ( void )
+CAccessControlList* CResource::GetAutoAcl(void)
 {
-    return g_pGame->GetACLManager()->AddACL ( GetAutoAclName () );
+    return g_pGame->GetACLManager()->AddACL(GetAutoAclName());
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -59,12 +55,10 @@ CAccessControlList* CResource::GetAutoAcl ( void )
 // Will return NULL if it does not exist
 //
 ///////////////////////////////////////////////////////////////
-CAccessControlList* CResource::FindAutoAcl ( void )
+CAccessControlList* CResource::FindAutoAcl(void)
 {
-    return g_pGame->GetACLManager()->GetACL ( GetAutoAclName () );
+    return g_pGame->GetACLManager()->GetACL(GetAutoAclName());
 }
-
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -73,19 +67,46 @@ CAccessControlList* CResource::FindAutoAcl ( void )
 // Remove group and acl used for aclrequest items
 //
 ///////////////////////////////////////////////////////////////
-void CResource::RemoveAutoPermissions ( void )
+void CResource::RemoveAutoPermissions(void)
 {
-    CAccessControlListManager * pACLManager = g_pGame->GetACLManager();
+    CAccessControlListManager* pACLManager = g_pGame->GetACLManager();
 
     // Remove auto group by name
-    if ( CAccessControlListGroup* pGroup = pACLManager->GetGroup ( GetAutoGroupName () ) )
-        pACLManager->DeleteGroup ( pGroup );
+    if (CAccessControlListGroup* pGroup = pACLManager->GetGroup(GetAutoGroupName()))
+        pACLManager->DeleteGroup(pGroup);
 
     // Remove auto acl by name
-    if ( CAccessControlList* pAcl = pACLManager->GetACL ( GetAutoAclName () ) )
-        pACLManager->DeleteACL ( pAcl );
+    if (CAccessControlList* pAcl = pACLManager->GetACL(GetAutoAclName()))
+        pACLManager->DeleteACL(pAcl);
 }
 
+///////////////////////////////////////////////////////////////
+//
+// CResource::HasAutoPermissions
+//
+// Check if all requested permissions already exist somewhere
+//
+///////////////////////////////////////////////////////////////
+bool CResource::HasAutoPermissions(CXMLNode* pNodeAclRequest)
+{
+    for (uint uiIndex = 0; true; uiIndex++)
+    {
+        CXMLNode* pNodeRight = pNodeAclRequest->FindSubNode("right", uiIndex);
+        if (!pNodeRight)
+            break;
+
+        CAclRightName aclRight(pNodeRight->GetAttributeValue("name"));
+        bool          bAccessRequired = StringToBool(pNodeRight->GetAttributeValue("access"));
+
+        if (bAccessRequired && g_pGame->GetACLManager()->CanObjectUseRight(GetName(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, aclRight.GetName(),
+                                                                           aclRight.GetType(), false) == false)
+        {
+            // At least one right does not exist
+            return false;
+        }
+    }
+    return true;
+}
 
 ///////////////////////////////////////////////////////////////
 //
@@ -94,32 +115,36 @@ void CResource::RemoveAutoPermissions ( void )
 // Update group and acl used aclrequest items
 //
 ///////////////////////////////////////////////////////////////
-bool CResource::RefreshAutoPermissions ( CXMLNode* pNodeAclRequest )
+void CResource::RefreshAutoPermissions(CXMLNode* pNodeAclRequest)
 {
+    // Check if permissions already active
+    if (HasAutoPermissions(pNodeAclRequest))
+        return;
+
     // Ensure group and acl exist
-    CAccessControlListGroup* pAutoGroup = g_pGame->GetACLManager()->AddGroup ( GetAutoGroupName () );
-    pAutoGroup->AddACL ( GetAutoAcl () );
-    pAutoGroup->AddObject ( GetName ().c_str (), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE );
+    CAccessControlListGroup* pAutoGroup = g_pGame->GetACLManager()->AddGroup(GetAutoGroupName());
+    pAutoGroup->AddACL(GetAutoAcl());
+    pAutoGroup->AddObject(GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE);
 
     // Track unused right names
-    std::vector < CAclRightName > unusedRightNameMap;
-    std::vector < SAclRequest > unusedRequestList;
-    GetAclRequests ( unusedRequestList );
-    for ( uint i = 0 ; i < unusedRequestList.size () ; i++ )
-       unusedRightNameMap.push_back ( unusedRequestList[i].rightName );
+    std::vector<CAclRightName> unusedRightNameMap;
+    std::vector<SAclRequest>   unusedRequestList;
+    GetAclRequests(unusedRequestList);
+    for (uint i = 0; i < unusedRequestList.size(); i++)
+        unusedRightNameMap.push_back(unusedRequestList[i].rightName);
 
     // Track any pending requests
     bool bHasPending = false;
 
-    for ( uint uiIndex = 0 ; true ; uiIndex++ )
+    for (uint uiIndex = 0; true; uiIndex++)
     {
-        CXMLNode* pNodeRight = pNodeAclRequest->FindSubNode ( "right", uiIndex );
-        if ( !pNodeRight )
+        CXMLNode* pNodeRight = pNodeAclRequest->FindSubNode("right", uiIndex);
+        if (!pNodeRight)
             break;
 
         // Find existing
-        SAclRequest request ( CAclRightName ( pNodeRight->GetAttributeValue ( "name" ) ) );
-        if ( !FindAclRequest ( request ) )
+        SAclRequest request(CAclRightName(pNodeRight->GetAttributeValue("name")));
+        if (!FindAclRequest(request))
         {
             // Add new request
             request.bAccess = false;
@@ -128,35 +153,32 @@ bool CResource::RefreshAutoPermissions ( CXMLNode* pNodeAclRequest )
             request.strDate = "";
 
             // Validate request
-            if ( !request.rightName.IsValid () || !StringToBool ( pNodeRight->GetAttributeValue ( "access" ) ) )
+            if (!request.rightName.IsValid() || !StringToBool(pNodeRight->GetAttributeValue("access")))
             {
-                CLogger::ErrorPrintf ( "Invalid aclrequest line in %s (%s)\n", GetName ().c_str (), *request.rightName.GetFullName () );
-                return false;
+                CLogger::ErrorPrintf("Invalid aclrequest line in %s (%s)\n", GetName().c_str(), *request.rightName.GetFullName());
+                return;
             }
 
-            CommitAclRequest ( request );
+            CommitAclRequest(request);
         }
 
         // This right is used
-        ListRemove ( unusedRightNameMap, request.rightName );
+        ListRemove(unusedRightNameMap, request.rightName);
 
         // Update flag
         bHasPending |= request.bPending;
     }
 
     // Remove rights not requested
-    for ( std::vector < CAclRightName >::iterator iter = unusedRightNameMap.begin () ; iter != unusedRightNameMap.end () ; ++iter )
-        GetAutoAcl ()->RemoveRight ( iter->GetName (), iter->GetType () );
+    for (std::vector<CAclRightName>::iterator iter = unusedRightNameMap.begin(); iter != unusedRightNameMap.end(); ++iter)
+        GetAutoAcl()->RemoveRight(iter->GetName(), iter->GetType());
 
     // If any rights are pending, print message
-    if ( bHasPending )
+    if (bHasPending)
     {
-        CLogger::LogPrintf ( "Resource '%s' requests some acl rights. Use the command 'aclrequest list %s'\n", GetName ().c_str (), GetName ().c_str () );
+        CLogger::LogPrintf("Resource '%s' requests some acl rights. Use the command 'aclrequest list %s'\n", GetName().c_str(), GetName().c_str());
     }
-
-    return bHasPending;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -165,45 +187,44 @@ bool CResource::RefreshAutoPermissions ( CXMLNode* pNodeAclRequest )
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CResource::HandleAclRequestListCommand ( bool bDetail )
+bool CResource::HandleAclRequestListCommand(bool bDetail)
 {
     uint uiNumPending = 0;
     uint uiNumTotal = 0;
 
     // Get each request
-    std::vector < SAclRequest > currentRequestList;
-    GetAclRequests ( currentRequestList );
-    for ( std::vector < SAclRequest >::iterator iter = currentRequestList.begin () ; iter != currentRequestList.end () ; ++iter )
+    std::vector<SAclRequest> currentRequestList;
+    GetAclRequests(currentRequestList);
+    for (std::vector<SAclRequest>::iterator iter = currentRequestList.begin(); iter != currentRequestList.end(); ++iter)
     {
         const SAclRequest& request = *iter;
 
-        if ( request.bPending )
+        if (request.bPending)
             uiNumPending++;
         uiNumTotal++;
 
-        if ( bDetail )
+        if (bDetail)
         {
             SString strStatus = request.bPending ? "pending" : request.bAccess ? "allow" : "deny";
             SString strOutput;
-            strOutput += SString( "aclrequest: %s", GetName ().c_str () );
-            strOutput += SString( " [%s] for %s", *strStatus, *request.rightName.GetFullName () );
-            if ( !request.bPending )
-                strOutput += SString ( " (by %s on %s)", *request.strWho , *request.strDate );
-            CLogger::LogPrintf ( strOutput + "\n" );
+            strOutput += SString("aclrequest: %s", GetName().c_str());
+            strOutput += SString(" [%s] for %s", *strStatus, *request.rightName.GetFullName());
+            if (!request.bPending)
+                strOutput += SString(" (by %s on %s)", *request.strWho, *request.strDate);
+            CLogger::LogPrintf(strOutput + "\n");
         }
     }
 
-    if ( !bDetail && uiNumTotal > 0 )
+    if (!bDetail && uiNumTotal > 0)
     {
         SString strOutput;
-        strOutput += SString( "aclrequest: %s", GetName ().c_str () );
-        strOutput += SString( " has %d aclrequest(s) of which %d are pending", uiNumTotal, uiNumPending );
-        CLogger::LogPrintf ( strOutput + "\n" );
+        strOutput += SString("aclrequest: %s", GetName().c_str());
+        strOutput += SString(" has %d aclrequest(s) of which %d are pending", uiNumTotal, uiNumPending);
+        CLogger::LogPrintf(strOutput + "\n");
     }
 
     return uiNumTotal > 0;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -212,26 +233,25 @@ bool CResource::HandleAclRequestListCommand ( bool bDetail )
 // Returns true if any acl request was changed
 //
 ///////////////////////////////////////////////////////////////
-bool CResource::HandleAclRequestChangeCommand ( const SString& strRightFullName, bool bAccess, const SString& strWho )
+bool CResource::HandleAclRequestChangeCommand(const SString& strRightFullName, bool bAccess, const SString& strWho)
 {
-    if ( strRightFullName != "all" )
+    if (strRightFullName != "all")
     {
-        return HandleAclRequestChange ( CAclRightName ( strRightFullName ), bAccess, strWho );
+        return HandleAclRequestChange(CAclRightName(strRightFullName), bAccess, strWho);
     }
 
     bool bChanged = false;
 
     // Try to change every acl request
-    std::vector < SAclRequest > currentRequestList;
-    GetAclRequests ( currentRequestList );
-    for ( std::vector < SAclRequest >::iterator iter = currentRequestList.begin () ; iter != currentRequestList.end () ; ++iter )
+    std::vector<SAclRequest> currentRequestList;
+    GetAclRequests(currentRequestList);
+    for (std::vector<SAclRequest>::iterator iter = currentRequestList.begin(); iter != currentRequestList.end(); ++iter)
     {
-        bChanged |= HandleAclRequestChange ( iter->rightName, bAccess, strWho );
+        bChanged |= HandleAclRequestChange(iter->rightName, bAccess, strWho);
     }
 
     return bChanged;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -241,31 +261,30 @@ bool CResource::HandleAclRequestChangeCommand ( const SString& strRightFullName,
 // Returns true if the acl request was changed
 //
 ///////////////////////////////////////////////////////////////
-bool CResource::HandleAclRequestChange ( const CAclRightName& rightName, bool bAccess, const SString& strWho )
+bool CResource::HandleAclRequestChange(const CAclRightName& rightName, bool bAccess, const SString& strWho)
 {
     // Get current request
-    SAclRequest currentRequest ( rightName );
-    if ( !FindAclRequest ( currentRequest ) )
+    SAclRequest currentRequest(rightName);
+    if (!FindAclRequest(currentRequest))
         return false;
 
     // Check access is changing
-    if ( !currentRequest.bPending && currentRequest.bAccess == bAccess )
+    if (!currentRequest.bPending && currentRequest.bAccess == bAccess)
         return false;
 
     // Update
     currentRequest.bAccess = bAccess;
     currentRequest.bPending = false;
     currentRequest.strWho = strWho;
-    currentRequest.strDate = GetLocalTimeString ( true );
-    CommitAclRequest ( currentRequest );
+    currentRequest.strDate = GetLocalTimeString(true);
+    CommitAclRequest(currentRequest);
 
     SString strOutput;
-    strOutput += SString( "aclrequest: %s", GetName ().c_str () );
-    strOutput += SString( " %s changed to %s (%s)", *rightName.GetFullName (), bAccess ? "allow" : "deny", *strWho );
-    CLogger::LogPrintf ( strOutput + "\n" );
+    strOutput += SString("aclrequest: %s", GetName().c_str());
+    strOutput += SString(" %s changed to %s (%s)", *rightName.GetFullName(), bAccess ? "allow" : "deny", *strWho);
+    CLogger::LogPrintf(strOutput + "\n");
     return true;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -274,30 +293,29 @@ bool CResource::HandleAclRequestChange ( const CAclRightName& rightName, bool bA
 // Get all acl requests for this resource
 //
 ///////////////////////////////////////////////////////////////
-void CResource::GetAclRequests ( std::vector < SAclRequest >& outResultList )
+void CResource::GetAclRequests(std::vector<SAclRequest>& outResultList)
 {
-    outResultList.clear ();
+    outResultList.clear();
 
-    CAccessControlList* pAutoAcl = FindAutoAcl ();
-    if ( !pAutoAcl )
+    CAccessControlList* pAutoAcl = FindAutoAcl();
+    if (!pAutoAcl)
         return;
 
     // Get each right
-    for ( std::list < CAccessControlListRight* >::const_iterator iter = pAutoAcl->IterBegin () ; iter != pAutoAcl->IterEnd () ; ++iter )
+    for (std::list<CAccessControlListRight*>::const_iterator iter = pAutoAcl->IterBegin(); iter != pAutoAcl->IterEnd(); ++iter)
     {
         CAccessControlListRight* pAclRight = *iter;
 
         // Create SAclRequest from ACL
-        SAclRequest request ( CAclRightName ( pAclRight->GetRightType (), pAclRight->GetRightName () ) );
-        request.bAccess = StringToBool ( pAclRight->GetAttributeValue ( "access" ) );
-        request.bPending = StringToBool ( pAclRight->GetAttributeValue ( "pending" ) );
-        request.strWho = pAclRight->GetAttributeValue ( "who" );
-        request.strDate = pAclRight->GetAttributeValue ( "date" );
+        SAclRequest request(CAclRightName(pAclRight->GetRightType(), pAclRight->GetRightName()));
+        request.bAccess = StringToBool(pAclRight->GetAttributeValue("access"));
+        request.bPending = StringToBool(pAclRight->GetAttributeValue("pending"));
+        request.strWho = pAclRight->GetAttributeValue("who");
+        request.strDate = pAclRight->GetAttributeValue("date");
 
-        outResultList.push_back ( request );
+        outResultList.push_back(request);
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -307,16 +325,15 @@ void CResource::GetAclRequests ( std::vector < SAclRequest >& outResultList )
 // Can't fail
 //
 ///////////////////////////////////////////////////////////////
-void CResource::CommitAclRequest ( const SAclRequest& request )
+void CResource::CommitAclRequest(const SAclRequest& request)
 {
-    CAccessControlListRight* pAclRight = GetAutoAcl ()->AddRight ( request.rightName.GetName (), request.rightName.GetType (), request.bAccess );
+    CAccessControlListRight* pAclRight = GetAutoAcl()->AddRight(request.rightName.GetName(), request.rightName.GetType(), request.bAccess);
 
-    pAclRight->SetRightAccess ( request.bAccess );
-    pAclRight->SetAttributeValue ( "pending", request.bPending ? "true" : "false" );
-    pAclRight->SetAttributeValue ( "who", request.strWho );
-    pAclRight->SetAttributeValue ( "date", request.strDate );
+    pAclRight->SetRightAccess(request.bAccess);
+    pAclRight->SetAttributeValue("pending", request.bPending ? "true" : "false");
+    pAclRight->SetAttributeValue("who", request.strWho);
+    pAclRight->SetAttributeValue("date", request.strDate);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -325,27 +342,27 @@ void CResource::CommitAclRequest ( const SAclRequest& request )
 // Will fail if right does not have a pending attribute
 //
 ///////////////////////////////////////////////////////////////
-bool CResource::FindAclRequest ( SAclRequest& result )
+bool CResource::FindAclRequest(SAclRequest& result)
 {
-    if ( !FindAutoAcl () )
+    if (!FindAutoAcl())
         return false;
 
-    CAccessControlListRight* pAclRight = GetAutoAcl ()->GetRight ( result.rightName.GetName (), result.rightName.GetType () );
-    if ( !pAclRight )
+    CAccessControlListRight* pAclRight = GetAutoAcl()->GetRight(result.rightName.GetName(), result.rightName.GetType());
+    if (!pAclRight)
         return false;
 
     // Fill SAclRequest
-    result.bAccess = StringToBool ( pAclRight->GetAttributeValue ( "access" ) );
-    result.bPending = StringToBool ( pAclRight->GetAttributeValue ( "pending" ) );
-    result.strWho = pAclRight->GetAttributeValue ( "who" );
-    result.strDate = pAclRight->GetAttributeValue ( "date" );
+    result.bAccess = StringToBool(pAclRight->GetAttributeValue("access"));
+    result.bPending = StringToBool(pAclRight->GetAttributeValue("pending"));
+    result.strWho = pAclRight->GetAttributeValue("who");
+    result.strDate = pAclRight->GetAttributeValue("date");
 
     // Ensure not pending and allow
-    if ( result.bPending && result.bAccess )
+    if (result.bPending && result.bAccess)
     {
         result.bAccess = false;
-        CommitAclRequest ( result );
+        CommitAclRequest(result);
     }
 
-    return pAclRight->GetAttributeValue ( "pending" ) != "";
+    return pAclRight->GetAttributeValue("pending") != "";
 }

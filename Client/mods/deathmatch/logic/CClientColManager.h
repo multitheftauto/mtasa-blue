@@ -1,17 +1,14 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientColManager.h
-*  PURPOSE:     Collision entity manager class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientColManager.h
+ *  PURPOSE:     Collision entity manager class
+ *
+ *****************************************************************************/
 
-#ifndef __CCLIENTCOLMANAGER_H
-#define __CCLIENTCOLMANAGER_H
+#pragma once
 
 #include "CClientCommon.h"
 #include <list>
@@ -22,27 +19,26 @@ class CClientEntity;
 class CClientColManager
 {
     friend class CClientColShape;
+
 public:
-                                    ~CClientColManager          ( void );
+    ~CClientColManager(void);
 
-    void                            DoPulse                     ( void );
-    void                            DoHitDetection              ( const CVector& vecNowPosition, float fRadius, CClientEntity* pElement, CClientColShape * pJustThis = NULL, bool bChildren = false );
+    void DoPulse(void);
+    void DoHitDetection(const CVector& vecNowPosition, float fRadius, CClientEntity* pElement, CClientColShape* pJustThis = NULL, bool bChildren = false);
 
-    bool                            Exists                      ( CClientColShape* pShape );
-    void                            DeleteAll                   ( void );
+    bool Exists(CClientColShape* pShape);
+    void DeleteAll(void);
 
-    inline unsigned int             Count                       ( void )                            { return static_cast < unsigned int > ( m_List.size () ); }
+    unsigned int Count(void) { return static_cast<unsigned int>(m_List.size()); }
 
 protected:
-    inline void                     AddToList                   ( CClientColShape* pShape )         { m_List.push_back ( pShape ); };
-    void                            RemoveFromList              ( CClientColShape* pShape );
-    void                            DoHitDetectionOld           ( const CVector& vecNowPosition, float fRadius, CClientEntity* pElement, CClientColShape * pJustThis = NULL, bool bChildren = false );
-    void                            DoHitDetectionNew           ( const CVector& vecNowPosition, float fRadius, CClientEntity* pElement, CClientColShape * pJustThis = NULL, bool bChildren = false );
-    void                            DoHitDetectionForColShape   ( CClientColShape* pShape );
-    void                            DoHitDetectionForEntity     ( const CVector& vecNowPosition, float fRadius, CClientEntity* pEntity );
-    void                            HandleHitDetectionResult    ( bool bHit, CClientColShape* pShape, CClientEntity* pEntity );
+    void AddToList(CClientColShape* pShape) { m_List.push_back(pShape); };
+    void RemoveFromList(CClientColShape* pShape);
+    void DoHitDetectionOld(const CVector& vecNowPosition, float fRadius, CClientEntity* pElement, CClientColShape* pJustThis = NULL, bool bChildren = false);
+    void DoHitDetectionNew(const CVector& vecNowPosition, float fRadius, CClientEntity* pElement, CClientColShape* pJustThis = NULL, bool bChildren = false);
+    void DoHitDetectionForColShape(CClientColShape* pShape);
+    void DoHitDetectionForEntity(const CVector& vecNowPosition, float fRadius, CClientEntity* pEntity);
+    void HandleHitDetectionResult(bool bHit, CClientColShape* pShape, CClientEntity* pEntity);
 
-    std::vector < CClientColShape* >  m_List;
+    std::vector<CClientColShape*> m_List;
 };
-
-#endif

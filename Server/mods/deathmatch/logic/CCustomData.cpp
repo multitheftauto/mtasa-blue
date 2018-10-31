@@ -1,59 +1,54 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CCustomData.cpp
-*  PURPOSE:     Custom entity data class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Ed Lyons <>
-*               Jax <>
-*               Cecill Etheredge <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CCustomData.cpp
+ *  PURPOSE:     Custom entity data class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-void CCustomData::Copy ( CCustomData* pCustomData )
+void CCustomData::Copy(CCustomData* pCustomData)
 {
-    map < std::string, SCustomData > :: const_iterator iter = pCustomData->IterBegin ();
-    for ( ; iter != pCustomData->IterEnd (); iter++ )
+    map<std::string, SCustomData>::const_iterator iter = pCustomData->IterBegin();
+    for (; iter != pCustomData->IterEnd(); iter++)
     {
-        Set ( iter->first.c_str (), iter->second.Variable );
+        Set(iter->first.c_str(), iter->second.Variable);
     }
 }
 
-SCustomData* CCustomData::Get ( const char* szName )
+SCustomData* CCustomData::Get(const char* szName)
 {
-    assert ( szName );
+    assert(szName);
 
-    std::map < std::string, SCustomData > :: const_iterator it = m_Data.find ( szName );
-    if ( it != m_Data.end () )
-        return (SCustomData *)&it->second;
+    std::map<std::string, SCustomData>::const_iterator it = m_Data.find(szName);
+    if (it != m_Data.end())
+        return (SCustomData*)&it->second;
 
     return NULL;
 }
 
-SCustomData* CCustomData::GetSynced ( const char* szName )
+SCustomData* CCustomData::GetSynced(const char* szName)
 {
-    assert ( szName );
+    assert(szName);
 
-    std::map < std::string, SCustomData > :: const_iterator it = m_SyncedData.find ( szName );
-    if ( it != m_SyncedData.end () )
-        return (SCustomData *)&it->second;
+    std::map<std::string, SCustomData>::const_iterator it = m_SyncedData.find(szName);
+    if (it != m_SyncedData.end())
+        return (SCustomData*)&it->second;
 
     return NULL;
 }
 
-
-bool CCustomData::DeleteSynced ( const char* szName )
+bool CCustomData::DeleteSynced(const char* szName)
 {
     // Find the item and delete it
-    std::map < std::string, SCustomData > :: iterator iter = m_SyncedData.find ( szName );
-    if ( iter != m_SyncedData.end () )
+    std::map<std::string, SCustomData>::iterator iter = m_SyncedData.find(szName);
+    if (iter != m_SyncedData.end())
     {
-        m_SyncedData.erase ( iter );
+        m_SyncedData.erase(iter);
         return true;
     }
 
@@ -61,12 +56,12 @@ bool CCustomData::DeleteSynced ( const char* szName )
     return false;
 }
 
-void CCustomData::UpdateSynced ( const char* szName, const CLuaArgument& Variable, bool bSynchronized )
+void CCustomData::UpdateSynced(const char* szName, const CLuaArgument& Variable, bool bSynchronized)
 {
-    if ( bSynchronized )
+    if (bSynchronized)
     {
-        SCustomData* pDataSynced = GetSynced ( szName );
-        if ( pDataSynced )
+        SCustomData* pDataSynced = GetSynced(szName);
+        if (pDataSynced)
         {
             pDataSynced->Variable = Variable;
             pDataSynced->bSynchronized = bSynchronized;
@@ -76,28 +71,27 @@ void CCustomData::UpdateSynced ( const char* szName, const CLuaArgument& Variabl
             SCustomData newData;
             newData.Variable = Variable;
             newData.bSynchronized = bSynchronized;
-            m_SyncedData [ szName ] = newData;
+            m_SyncedData[szName] = newData;
         }
     }
     else
     {
-        DeleteSynced ( szName );
+        DeleteSynced(szName);
     }
 }
 
-
-void CCustomData::Set ( const char* szName, const CLuaArgument& Variable, bool bSynchronized )
+void CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized)
 {
-    assert ( szName );
+    assert(szName);
 
     // Grab the item with the given name
-    SCustomData* pData = Get ( szName );
-    if ( pData )
+    SCustomData* pData = Get(szName);
+    if (pData)
     {
         // Update existing
         pData->Variable = Variable;
         pData->bSynchronized = bSynchronized;
-        UpdateSynced ( szName, Variable, bSynchronized );
+        UpdateSynced(szName, Variable, bSynchronized);
     }
     else
     {
@@ -105,20 +99,19 @@ void CCustomData::Set ( const char* szName, const CLuaArgument& Variable, bool b
         SCustomData newData;
         newData.Variable = Variable;
         newData.bSynchronized = bSynchronized;
-        m_Data [ szName ] = newData;
-        UpdateSynced ( szName, Variable, bSynchronized );
+        m_Data[szName] = newData;
+        UpdateSynced(szName, Variable, bSynchronized);
     }
 }
 
-
-bool CCustomData::Delete ( const char* szName )
+bool CCustomData::Delete(const char* szName)
 {
     // Find the item and delete it
-    std::map < std::string, SCustomData > :: iterator it = m_Data.find ( szName );
-    if ( it != m_Data.end () )
+    std::map<std::string, SCustomData>::iterator it = m_Data.find(szName);
+    if (it != m_Data.end())
     {
-        DeleteSynced ( szName );
-        m_Data.erase ( it );
+        DeleteSynced(szName);
+        m_Data.erase(it);
         return true;
     }
 
@@ -126,39 +119,39 @@ bool CCustomData::Delete ( const char* szName )
     return false;
 }
 
-CXMLNode * CCustomData::OutputToXML ( CXMLNode * pNode )
+CXMLNode* CCustomData::OutputToXML(CXMLNode* pNode)
 {
-    std::map < std::string, SCustomData > :: const_iterator iter = m_Data.begin ();
-    for ( ; iter != m_Data.end (); iter++ )
+    std::map<std::string, SCustomData>::const_iterator iter = m_Data.begin();
+    for (; iter != m_Data.end(); iter++)
     {
-        CLuaArgument* arg = (CLuaArgument *)&iter->second.Variable;
-        
-        switch ( arg->GetType() )
+        CLuaArgument* arg = (CLuaArgument*)&iter->second.Variable;
+
+        switch (arg->GetType())
         {
-        case LUA_TSTRING:
+            case LUA_TSTRING:
             {
-                CXMLAttribute* attr = pNode->GetAttributes().Create( iter->first.c_str () );
-                attr->SetValue ( arg->GetString ().c_str () );
+                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first.c_str());
+                attr->SetValue(arg->GetString().c_str());
                 break;
             }
-        case LUA_TNUMBER:
+            case LUA_TNUMBER:
             {
-                CXMLAttribute* attr = pNode->GetAttributes().Create( iter->first.c_str () );
-                attr->SetValue ( (float)arg->GetNumber () );
+                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first.c_str());
+                attr->SetValue((float)arg->GetNumber());
                 break;
             }
-        case LUA_TBOOLEAN:
+            case LUA_TBOOLEAN:
             {
-                CXMLAttribute* attr = pNode->GetAttributes().Create( iter->first.c_str () );
-                attr->SetValue ( arg->GetBoolean () );
+                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first.c_str());
+                attr->SetValue(arg->GetBoolean());
                 break;
             }
         }
     }
-    return pNode;   
+    return pNode;
 }
 
-unsigned short CCustomData::CountOnlySynchronized ( void )
+unsigned short CCustomData::CountOnlySynchronized(void)
 {
-    return m_SyncedData.size ( ); 
+    return static_cast<unsigned short>(m_SyncedData.size());
 }

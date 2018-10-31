@@ -1,17 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/TaskPhysicalResponseSA.h
-*  PURPOSE:     Physical response game tasks
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/TaskPhysicalResponseSA.h
+ *  PURPOSE:     Physical response game tasks
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CGAMESA_TASKPHYSICALRESPONSE
-#define __CGAMESA_TASKPHYSICALRESPONSE
+#pragma once
 
 #include <game/TaskPhysicalResponse.h>
 #include "TaskSA.h"
@@ -22,27 +20,25 @@
 class CTaskSimpleChokingSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    class CPedSAInterface*      m_pAttacker;
-    DWORD*                      m_pAnim;
-    unsigned int                      m_nTimeRemaining;
-    unsigned int                      m_nTimeStarted;
-    unsigned char                       m_bIsTeargas;
-    bool                        m_bIsFinished;
+    class CPedSAInterface* m_pAttacker;
+    DWORD*                 m_pAnim;
+    unsigned int           m_nTimeRemaining;
+    unsigned int           m_nTimeStarted;
+    unsigned char          m_bIsTeargas;
+    bool                   m_bIsFinished;
 };
 
 class CTaskSimpleChokingSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleChoking
 {
 public:
-                        CTaskSimpleChokingSA    ( void ) {};
-                        CTaskSimpleChokingSA    ( CPed* pAttacker, bool bIsTearGas );
+    CTaskSimpleChokingSA(void){};
+    CTaskSimpleChokingSA(CPed* pAttacker, bool bIsTearGas);
 
-    CPed*               GetAttacker             ( void );
-    unsigned int        GetTimeRemaining        ( void );
-    unsigned int        GetTimeStarted          ( void );
-    bool                IsTeargas               ( void );
-    bool                IsFinished              ( void );
+    CPed*        GetAttacker(void);
+    unsigned int GetTimeRemaining(void);
+    unsigned int GetTimeStarted(void);
+    bool         IsTeargas(void);
+    bool         IsFinished(void);
 
-    void                UpdateChoke             ( CPed* pPed, CPed* pAttacker, bool bIsTearGas );
+    void UpdateChoke(CPed* pPed, CPed* pAttacker, bool bIsTearGas);
 };
-
-#endif

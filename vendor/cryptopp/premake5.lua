@@ -147,8 +147,9 @@ project "cryptopp"
 			"x64masm.asm"
 		}
 	
-	-- C++11 build fails with GCC4.8/4.9
-	-- See https://github.com/weidai11/cryptopp/issues/206
-	filter "system:not windows"
-		removeflags { "C++14" }
+	filter {"system:windows"}
+		linkoptions { "/ignore:4221" }
+		disablewarnings { "4005" }
 
+	filter {"system:windows", "toolset:*_xp*"}
+		defines { "USE_MS_CRYPTOAPI", "_WIN32_WINNT=0x502", "NTDDI_VERSION=0x05020300" }

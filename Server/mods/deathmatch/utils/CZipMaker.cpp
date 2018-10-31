@@ -1,15 +1,14 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        CZipMaker.cpp
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        CZipMaker.cpp
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -18,11 +17,17 @@
 //
 //
 ///////////////////////////////////////////////////////////////
-CZipMaker::CZipMaker ( const SString& strZipPathFilename )
+CZipMaker::CZipMaker(const SString& strZipPathFilename)
 {
-	m_uzFile = zipOpen ( strZipPathFilename, APPEND_STATUS_CREATE );      // Use APPEND_STATUS_ADDINZIP to open existing
+#ifdef WIN32
+    // This will use CreateFile instead of fopen
+    zlib_filefunc_def ffunc;
+    fill_win32_filefunc(&ffunc);
+    m_uzFile = zipOpen2(strZipPathFilename, APPEND_STATUS_CREATE, nullptr, &ffunc);
+#else
+    m_uzFile = zipOpen(strZipPathFilename, APPEND_STATUS_CREATE);            // Use APPEND_STATUS_ADDINZIP to open existing
+#endif
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -33,9 +38,8 @@ CZipMaker::CZipMaker ( const SString& strZipPathFilename )
 ///////////////////////////////////////////////////////////////
 CZipMaker::~CZipMaker()
 {
-    Close ();
+    Close();
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -44,11 +48,10 @@ CZipMaker::~CZipMaker()
 // Returns false if not valid
 //
 ///////////////////////////////////////////////////////////////
-bool CZipMaker::IsValid ( void )
+bool CZipMaker::IsValid(void)
 {
     return m_uzFile != NULL;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -57,16 +60,15 @@ bool CZipMaker::IsValid ( void )
 // Returns false if failed
 //
 ///////////////////////////////////////////////////////////////
-bool CZipMaker::Close ( void )
+bool CZipMaker::Close(void)
 {
-    if ( !m_uzFile )
+    if (!m_uzFile)
         return false;
 
-	int iResult = zipClose ( m_uzFile, NULL );
+    int iResult = zipClose(m_uzFile, NULL);
     m_uzFile = NULL;
     return iResult == ZIP_OK;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -75,18 +77,17 @@ bool CZipMaker::Close ( void )
 // Returns false if failed
 //
 ///////////////////////////////////////////////////////////////
-bool CZipMaker::InsertFile ( const SString& strInSrc, const SString& strInDest )
+bool CZipMaker::InsertFile(const SString& strInSrc, const SString& strInDest)
 {
-    SString strSrc = PathConform ( strInSrc );
-    SString strDest = PathConform ( strInDest );
+    SString strSrc = PathConform(strInSrc);
+    SString strDest = PathConform(strInDest);
 
-    std::vector < char > buffer;
-    if ( !FileLoad ( strSrc, buffer ) )
+    std::vector<char> buffer;
+    if (!FileLoad(strSrc, buffer))
         return false;
 
-    return AddFile ( strDest, buffer );
+    return AddFile(strDest, buffer);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -96,30 +97,28 @@ bool CZipMaker::InsertFile ( const SString& strInSrc, const SString& strInDest )
 // strDest is the destination directory, relative to the zip file root
 //
 ///////////////////////////////////////////////////////////////
-bool CZipMaker::InsertDirectoryTree ( const SString& strInSrc, const SString& strInDest )
+bool CZipMaker::InsertDirectoryTree(const SString& strInSrc, const SString& strInDest)
 {
-    SString strSrc = PathConform ( strInSrc );
-    SString strDest = PathConform ( strInDest );
+    SString strSrc = PathConform(strInSrc);
+    SString strDest = PathConform(strInDest);
 
-    std::vector < SString > fileList = FindFiles ( PathJoin ( strSrc, "" ), true, true );
-    for ( unsigned int i = 0 ; i < fileList.size () ; i++ )
+    std::vector<SString> fileList = FindFiles(PathJoin(strSrc, ""), true, true);
+    for (unsigned int i = 0; i < fileList.size(); i++)
     {
-        SString strSrcNext = PathConform ( PathJoin ( strSrc, fileList[i] ) );
-        SString strDestNext = PathConform ( PathJoin ( strDest, fileList[i] ) );
+        SString strSrcNext = PathConform(PathJoin(strSrc, fileList[i]));
+        SString strDestNext = PathConform(PathJoin(strDest, fileList[i]));
 
-        if ( FileExists ( strSrcNext ) )
+        if (FileExists(strSrcNext))
         {
-            InsertFile ( strSrcNext, strDestNext );
+            InsertFile(strSrcNext, strDestNext);
         }
-        else
-        if ( DirectoryExists ( strSrcNext ) )
+        else if (DirectoryExists(strSrcNext))
         {
-            InsertDirectoryTree ( strSrcNext, strDestNext );
+            InsertDirectoryTree(strSrcNext, strDestNext);
         }
     }
     return true;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -128,44 +127,35 @@ bool CZipMaker::InsertDirectoryTree ( const SString& strInSrc, const SString& st
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CZipMaker::AddFile ( const SString& strDest, const std::vector < char >& buffer )
+bool CZipMaker::AddFile(const SString& strDest, const std::vector<char>& buffer)
 {
-	// save file attributes
-	zip_fileinfo zfi;
+    // save file attributes
+    zip_fileinfo zfi;
 
-	zfi.internal_fa = 0;
-	zfi.external_fa = 0;
-	
-	// save file time
-    time_t secondsNow = time ( NULL );
-    tm* tmp = gmtime ( &secondsNow );
+    zfi.internal_fa = 0;
+    zfi.external_fa = 0;
 
-	zfi.dosDate = 0;
-	zfi.tmz_date.tm_year = tmp->tm_year + 1900;
-	zfi.tmz_date.tm_mon = tmp->tm_mon;
-	zfi.tmz_date.tm_mday = tmp->tm_mday;
-	zfi.tmz_date.tm_hour = tmp->tm_hour;
-	zfi.tmz_date.tm_min = tmp->tm_min;
-	zfi.tmz_date.tm_sec = tmp->tm_sec;
-	
-	int iResult = zipOpenNewFileInZip ( m_uzFile, 
-									strDest,
-									&zfi, 
-									NULL, 
-									0,
-									NULL,
-									0, 
-									NULL,
-									Z_DEFLATED,
-									Z_DEFAULT_COMPRESSION );
+    // save file time
+    time_t secondsNow = time(NULL);
+    tm*    tmp = gmtime(&secondsNow);
 
-	if ( iResult == ZIP_OK )
-	{
-        if ( !buffer.empty () )
-            iResult = zipWriteInFileInZip ( m_uzFile, &buffer[0], buffer.size () );
-	}
+    zfi.dosDate = 0;
+    zfi.tmz_date.tm_year = tmp->tm_year + 1900;
+    zfi.tmz_date.tm_mon = tmp->tm_mon;
+    zfi.tmz_date.tm_mday = tmp->tm_mday;
+    zfi.tmz_date.tm_hour = tmp->tm_hour;
+    zfi.tmz_date.tm_min = tmp->tm_min;
+    zfi.tmz_date.tm_sec = tmp->tm_sec;
 
-	zipCloseFileInZip ( m_uzFile );
+    int iResult = zipOpenNewFileInZip(m_uzFile, strDest, &zfi, NULL, 0, NULL, 0, NULL, Z_DEFLATED, Z_DEFAULT_COMPRESSION);
+
+    if (iResult == ZIP_OK)
+    {
+        if (!buffer.empty())
+            iResult = zipWriteInFileInZip(m_uzFile, &buffer[0], buffer.size());
+    }
+
+    zipCloseFileInZip(m_uzFile);
 
     return iResult == ZIP_OK;
 }

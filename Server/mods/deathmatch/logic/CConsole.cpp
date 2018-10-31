@@ -1,20 +1,18 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CConsole.cpp
-*  PURPOSE:     Console handler class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*               Oliver Brown <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CConsole.cpp
+ *  PURPOSE:     Console handler class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-CConsole::CConsole ( CBlipManager* pBlipManager, CMapManager* pMapManager, CPlayerManager* pPlayerManager, CRegisteredCommands* pRegisteredCommands, CVehicleManager* pVehicleManager, CLuaManager* pLuaManager, CWhoWas* pWhoWas, CBanManager* pBanManager, CAccessControlListManager* pACLManager )
+CConsole::CConsole(CBlipManager* pBlipManager, CMapManager* pMapManager, CPlayerManager* pPlayerManager, CRegisteredCommands* pRegisteredCommands,
+                   CVehicleManager* pVehicleManager, CLuaManager* pLuaManager, CBanManager* pBanManager, CAccessControlListManager* pACLManager)
 {
     // Init
     m_pBlipManager = pBlipManager;
@@ -23,102 +21,97 @@ CConsole::CConsole ( CBlipManager* pBlipManager, CMapManager* pMapManager, CPlay
     m_pRegisteredCommands = pRegisteredCommands;
     m_pVehicleManager = pVehicleManager;
     m_pLuaManager = pLuaManager;
-    m_pWhoWas = pWhoWas;
     m_pBanManager = pBanManager;
     m_pACLManager = pACLManager;
 }
 
-
-CConsole::~CConsole ( void )
+CConsole::~CConsole(void)
 {
     // Delete all our commands
-    DeleteAllCommands ();
+    DeleteAllCommands();
 }
 
-
-bool CConsole::HandleInput ( const char* szCommand, CClient* pClient, CClient* pEchoClient )
+bool CConsole::HandleInput(const char* szCommand, CClient* pClient, CClient* pEchoClient)
 {
     // Copy it
-    COPY_CSTR_TO_TEMP_BUFFER( szCommandBuffer, szCommand, 256 );
-    stripControlCodes ( szCommandBuffer );
+    COPY_CSTR_TO_TEMP_BUFFER(szCommandBuffer, szCommand, 256);
+    stripControlCodes(szCommandBuffer);
 
     // Split it into two parts: Key and argument
-    char* szKey = strtok ( szCommandBuffer, " " );
-    char* szArguments = strtok ( NULL, "\0" );
+    char* szKey = strtok(szCommandBuffer, " ");
+    char* szArguments = strtok(NULL, "\0");
 
     // Does the key exist?
-    if ( szKey && szKey [0] != 0 )
+    if (szKey && szKey[0] != 0)
     {
-        if ( pClient->GetClientType() == CClient::CLIENT_PLAYER )
+        if (pClient->GetClientType() == CClient::CLIENT_PLAYER)
         {
-            CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
+            CPlayer* pPlayer = static_cast<CPlayer*>(pClient);
 
             CLuaArguments Arguments;
-            Arguments.PushString ( szKey );
+            Arguments.PushString(szKey);
 
-            if ( !pPlayer->CallEvent ( "onPlayerCommand", Arguments ) )
+            if (!pPlayer->CallEvent("onPlayerCommand", Arguments))
                 return false;
         }
 
-        CConsoleCommand* pCommand = GetCommand ( szKey );
-        if ( pCommand )
+        CConsoleCommand* pCommand = GetCommand(szKey);
+        if (pCommand)
         {
             // Can this user use this command?
-            if ( m_pACLManager->CanObjectUseRight ( pClient->GetAccount ()->GetName ().c_str (),
-                                                    CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                                    szKey,
-                                                    CAccessControlListRight::RIGHT_TYPE_COMMAND,
-                                                    !pCommand->IsRestricted () ) )
+            if (m_pACLManager->CanObjectUseRight(pClient->GetAccount()->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, szKey,
+                                                 CAccessControlListRight::RIGHT_TYPE_COMMAND, !pCommand->IsRestricted()))
             {
-                return (*pCommand)( this, szArguments, pClient, pEchoClient );
+                return (*pCommand)(this, szArguments, pClient, pEchoClient);
             }
 
             // Not enough access, tell the console
-            CLogger::LogPrintf ( "ACL: Denied '%s' access to command '%s'\n", pClient->GetNick (), szKey );
+            CLogger::LogPrintf("ACL: Denied '%s' access to command '%s'\n", pClient->GetNick(), szKey);
 
             // Tell the client
-            char szBuffer [128];
-            snprintf ( szBuffer, sizeof(szBuffer), "ACL: Access denied for '%s'", szKey );
-            szBuffer[sizeof(szBuffer)-1] = '\0';
+            char szBuffer[128];
+            snprintf(szBuffer, sizeof(szBuffer), "ACL: Access denied for '%s'", szKey);
+            szBuffer[sizeof(szBuffer) - 1] = '\0';
 
-            pClient->SendEcho ( szBuffer );
+            pClient->SendEcho(szBuffer);
             return false;
         }
 
         // Let the script handle it
-        int iClientType = pClient->GetClientType ();
+        int iClientType = pClient->GetClientType();
 
-        switch ( iClientType )
+        switch (iClientType)
         {
             case CClient::CLIENT_PLAYER:
             {
                 // See if any registered command can process it
-                CPlayer* pPlayer = static_cast < CPlayer* > ( pClient );
-                m_pRegisteredCommands->ProcessCommand ( szKey, szArguments, pClient );
+                CPlayer* pPlayer = static_cast<CPlayer*>(pClient);
+                m_pRegisteredCommands->ProcessCommand(szKey, szArguments, pClient);
 
                 // HACK: if the client gets destroyed before here, dont continue
-                if ( m_pPlayerManager->Exists ( pPlayer ) )
+                if (m_pPlayerManager->Exists(pPlayer))
                 {
                     // Call the console event
                     CLuaArguments Arguments;
-                    Arguments.PushString ( szCommand );
-                    pPlayer->CallEvent ( "onConsole", Arguments );
+                    Arguments.PushString(szCommand);
+                    pPlayer->CallEvent("onConsole", Arguments);
                 }
                 break;
             }
             case CClient::CLIENT_CONSOLE:
             {
                 // See if any registered command can process it
-                CConsoleClient* pConsole = static_cast < CConsoleClient* > ( pClient );
-                m_pRegisteredCommands->ProcessCommand ( szKey, szArguments, pClient );
+                CConsoleClient* pConsole = static_cast<CConsoleClient*>(pClient);
+                m_pRegisteredCommands->ProcessCommand(szKey, szArguments, pClient);
 
                 // Call the console event
                 CLuaArguments Arguments;
-                Arguments.PushString ( szCommand );
-                pConsole->CallEvent ( "onConsole", Arguments );
+                Arguments.PushString(szCommand);
+                pConsole->CallEvent("onConsole", Arguments);
                 break;
             }
-            default: break;
+            default:
+                break;
         }
     }
 
@@ -126,23 +119,21 @@ bool CConsole::HandleInput ( const char* szCommand, CClient* pClient, CClient* p
     return false;
 }
 
-
-void CConsole::AddCommand ( FCommandHandler* pHandler, const char* szCommand, bool bRestricted )
+void CConsole::AddCommand(FCommandHandler* pHandler, const char* szCommand, bool bRestricted)
 {
     // Make a command class and add it to the list
-    CConsoleCommand* pCommand = new CConsoleCommand ( pHandler, szCommand, bRestricted );
-    m_Commands.push_back ( pCommand );
+    CConsoleCommand* pCommand = new CConsoleCommand(pHandler, szCommand, bRestricted);
+    m_Commands.push_back(pCommand);
 }
 
-
-void CConsole::DeleteCommand ( const char* szCommand )
+void CConsole::DeleteCommand(const char* szCommand)
 {
     // Find the command and delete it
-    list < CConsoleCommand* > ::const_iterator iter = m_Commands.begin ();
-    for ( ; iter != m_Commands.end (); iter++ )
+    list<CConsoleCommand*>::const_iterator iter = m_Commands.begin();
+    for (; iter != m_Commands.end(); iter++)
     {
         // Names match?
-        if ( strcmp ( szCommand, (*iter)->GetCommand () ) == 0 )
+        if (strcmp(szCommand, (*iter)->GetCommand()) == 0)
         {
             // Delete it and return (or we might crash)
             delete *iter;
@@ -151,29 +142,27 @@ void CConsole::DeleteCommand ( const char* szCommand )
     }
 }
 
-
-void CConsole::DeleteAllCommands ( void )
+void CConsole::DeleteAllCommands(void)
 {
     // Delete all the command classes
-    list < CConsoleCommand* > ::const_iterator iter = m_Commands.begin ();
-    for ( ; iter != m_Commands.end (); iter++ )
+    list<CConsoleCommand*>::const_iterator iter = m_Commands.begin();
+    for (; iter != m_Commands.end(); iter++)
     {
         delete *iter;
     }
 
     // Clear the commandlist
-    m_Commands.clear ();
+    m_Commands.clear();
 }
 
-
-CConsoleCommand* CConsole::GetCommand ( const char* szKey )
+CConsoleCommand* CConsole::GetCommand(const char* szKey)
 {
     // See if we have a command matching the key
-    list < CConsoleCommand* > ::const_iterator iter = m_Commands.begin ();
-    for ( ; iter != m_Commands.end (); iter++ )
+    list<CConsoleCommand*>::const_iterator iter = m_Commands.begin();
+    for (; iter != m_Commands.end(); iter++)
     {
         // Names match?
-        if ( strcmp ( szKey, (*iter)->GetCommand () ) == 0 )
+        if (strcmp(szKey, (*iter)->GetCommand()) == 0)
         {
             return *iter;
         }

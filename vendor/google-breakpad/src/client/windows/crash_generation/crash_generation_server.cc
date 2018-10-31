@@ -85,7 +85,7 @@ static bool IsClientRequestValid(const ProtocolMessage& msg) {
           msg.assert_info != NULL);
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 static bool CheckForIOIncomplete(bool success) {
   // We should never get an I/O incomplete since we should not execute this
   // unless the operation has finished and the overlapped event is signaled. If

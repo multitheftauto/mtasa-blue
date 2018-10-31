@@ -2,6 +2,8 @@ project "portaudio"
 	language "C++"
 	kind "StaticLib"
 	targetname "portaudio"
+
+	disablewarnings { "4996" }
 	
 	vpaths { 
 		["Headers/*"] = "**.h",

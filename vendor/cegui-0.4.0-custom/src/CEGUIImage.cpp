@@ -144,6 +144,15 @@ const Rect& Image::getSourceTextureArea(void) const
     return d_area;
 }
 
+/*************************************************************************
+    Sets Rect describing the source texture area used by this Image.
+    !!! ADDED BY MTA !!!
+*************************************************************************/
+void Image::setSourceTextureArea(const Rect& area)
+{
+    d_area = area;
+}
+
 
 /*************************************************************************
     Output XML <Image ... > element for this image

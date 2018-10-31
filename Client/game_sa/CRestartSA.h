@@ -1,17 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CRestartSA.h
-*  PURPOSE:     Header file for restart points class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CRestartSA.h
+ *  PURPOSE:     Header file for restart points class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CGAMESA_RESTART
-#define __CGAMESA_RESTART
+#pragma once
 
 #include <game/CRestart.h>
 #include <CVector.h>
@@ -37,15 +35,13 @@
 
 class CRestartSA : public CRestart
 {
-    VOID            CancelOverrideRestart (  );
-    VOID            OverrideNextRestart ( CVector * vecPosition, FLOAT fRotation );
-    VOID            FindClosestPoliceRestartPoint ( CVector * vecClosestTo, CVector * vecClosestRestartPoint, FLOAT * fRotation );
-    VOID            FindClosestHospitalRestartPoint ( CVector * vecClosestTo, CVector * vecClosestRestartPoint, FLOAT * fRotation );
-    VOID            AddPoliceRestartPoint ( CVector * vecPosition, FLOAT fRotation );
-    VOID            AddHospitalRestartPoint ( CVector * vecPosition, FLOAT fRotation );
+    VOID CancelOverrideRestart();
+    VOID OverrideNextRestart(CVector* vecPosition, FLOAT fRotation);
+    VOID FindClosestPoliceRestartPoint(CVector* vecClosestTo, CVector* vecClosestRestartPoint, FLOAT* fRotation);
+    VOID FindClosestHospitalRestartPoint(CVector* vecClosestTo, CVector* vecClosestRestartPoint, FLOAT* fRotation);
+    VOID AddPoliceRestartPoint(CVector* vecPosition, FLOAT fRotation);
+    VOID AddHospitalRestartPoint(CVector* vecPosition, FLOAT fRotation);
     // these really belong in CPlayerInfo, but make more sense here
-    BOOL            IsRestartingAfterArrest  (  );
-    BOOL            IsRestartingAfterDeath (  );
+    BOOL IsRestartingAfterArrest();
+    BOOL IsRestartingAfterDeath();
 };
-
-#endif

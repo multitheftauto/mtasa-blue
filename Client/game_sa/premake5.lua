@@ -14,23 +14,24 @@ project "Game SA"
 	}
 	
 	filter "system:windows"
-		includedirs { "../../vendor/sparsehash/current/src/windows" }
+		includedirs { "../../vendor/sparsehash/src/windows" }
 	
 	filter {}
-		includedirs {
-			"../sdk",
-			"../../vendor/sparsehash/current/src/"
-		}
+
+	includedirs {
+		"../sdk/",
+		"../../vendor/sparsehash/src/"
+	}
 	
 	files {
 		"premake5.lua",
-		"*.h",
-		"*.hpp",
-		"*.cpp"
+		"**.h",
+		"**.hpp",
+		"**.cpp"
 	}
 	
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 
 		
 	filter "system:not windows"
-		flags { "ExcludeFromBuild" } 
+		flags { "ExcludeFromBuild" }

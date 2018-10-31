@@ -1,28 +1,26 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CFireManagerSA.h
-*  PURPOSE:     Header file for fire manager class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Cecill Etheredge <ijsf@gmx.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CFireManagerSA.h
+ *  PURPOSE:     Header file for fire manager class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CGAMESA_FIREMANAGER
-#define __CGAMESA_FIREMANAGER
+#pragma once
 
 #include <game/CFireManager.h>
 #include "Common.h"
 #include "CFireSA.h"
 
-#define FUNC_ExtinguishPoint            0x48E520
-#define FUNC_StartFire                  0x48EC30
-#define FUNC_StartFire_Vec              0x539F00 // ##SA## 
+#define FUNC_ExtinguishPoint            0x539450
 
-#define ARRAY_CFire             VAR_CFireCount + 4
+#define FUNC_StartFire                  0x48EC30
+#define FUNC_StartFire_Vec              0x539F00 // ##SA##
+
+#define ARRAY_CFire             (VAR_CFireCount + 4)
 
 #define CLASS_CFireManager      0xB71F80 //##SA##
 
@@ -33,20 +31,19 @@
 class CFireManagerSA : public CFireManager
 {
 private:
-    CFireSA                 * Fires[MAX_FIRES];
+    CFireSA* Fires[MAX_FIRES];
+
 public:
     // constructor
     CFireManagerSA();
-    ~CFireManagerSA ( void );
+    ~CFireManagerSA(void);
 
-    VOID                    ExtinguishPoint ( CVector & vecPosition, float fRadius );
-    CFire                   * StartFire ( CEntity * entityTarget, CEntity * entityCreator, float fSize );
-    CFire                   * StartFire ( CVector & vecPosition, float fSize );
-    VOID                    ExtinguishAllFires (  );
-    CFire                   * GetFire ( DWORD ID );
-    DWORD                   GetFireCount (  ); 
-    CFire                   * FindFreeFire (  );
-    CFire                   * GetFire ( CFireSAInterface * fire );
+    VOID   ExtinguishPoint(CVector& vecPosition, float fRadius);
+    CFire* StartFire(CEntity* entityTarget, CEntity* entityCreator, float fSize);
+    CFire* StartFire(CVector& vecPosition, float fSize);
+    VOID   ExtinguishAllFires();
+    CFire* GetFire(DWORD ID);
+    DWORD  GetFireCount();
+    CFire* FindFreeFire();
+    CFire* GetFire(CFireSAInterface* fire);
 };
-
-#endif

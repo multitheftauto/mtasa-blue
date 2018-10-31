@@ -12,17 +12,25 @@ if ci and ci:lower() == "true" then
 else 
 	CI_BUILD = false
 end 
+GLIBC_COMPAT = os.getenv("GLIBC_COMPAT") == "true"
 
 workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
+
 	platforms { "x86", "x64"}
-	targetprefix ("")
-	
+	if os.host() == "macosx" then
+		removeplatforms { "x86" }
+	end
+
+	targetprefix ""
+
 	location "Build"
+	startproject "Client Launcher"
 	
-	flags { "C++14", "Symbols" }
+	cppdialect "C++14"
 	characterset "MBCS"
 	pic "On"
+	symbols "On"
 	
 	dxdir = os.getenv("DXSDK_DIR") or ""
 	includedirs { 
@@ -33,12 +41,25 @@ workspace "MTASA"
 	defines { 
 		"_CRT_SECURE_NO_WARNINGS",
 		"_SCL_SECURE_NO_WARNINGS",
-		"_CRT_NONSTDC_NO_DEPRECATE"
+		"_CRT_NONSTDC_NO_DEPRECATE",
+		"NOMINMAX",
+		"_TIMESPEC_DEFINED"
 	}
 		
 	-- Helper function for output path 
-	buildpath = function(p) return "%{wks.location}../Bin/"..p.."/" end
-	copy = function(p) return "{COPY} %{cfg.buildtarget.abspath} %{wks.location}../Bin/"..p.."/" end 
+	buildpath = function(p) return "%{wks.location}/../Bin/"..p.."/" end
+	copy = function(p) return "{COPY} %{cfg.buildtarget.abspath} \"%{wks.location}../Bin/"..p.."/\"" end 
+
+	if GLIBC_COMPAT then 
+		filter { "system:linux" }
+			includedirs "/compat"
+			linkoptions "-static-libstdc++ -static-libgcc"
+			forceincludes  { "glibc_version.h" }
+		filter { "system:linux", "platforms:x86" }
+			libdirs { "/compat/x86" }
+		filter { "system:linux", "platforms:x64" }
+			libdirs { "/compat/x64" }
+	end
 	
 	filter "platforms:x86"
 		architecture "x86"
@@ -49,39 +70,52 @@ workspace "MTASA"
 		defines { "MTA_DEBUG" }
 		targetsuffix "_d"
 	
-	if not CI_BUILD then
-		-- Only optimize outside of CI Builds
-		filter "configurations:Release or configurations:Nightly"
-			flags { "Optimize" }
-	else
+	filter "configurations:Release or configurations:Nightly"
+		optimize "Speed"	-- "On"=MS:/Ox GCC:/O2  "Speed"=MS:/O2 GCC:/O3  "Full"=MS:/Ox GCC:/O3
+	
+	if CI_BUILD then
 		filter {}
 			defines { "CI_BUILD=1" }
+		
+		filter { "system:linux" }
+			linkoptions { "-s" }
 	end 
 	
 	filter {"system:windows", "configurations:Nightly", "kind:not StaticLib"}
 		os.mkdir("Build/Symbols")
 		linkoptions "/PDB:\"Symbols\\$(ProjectName).pdb\""
-		
+	
+	filter {"system:windows", "toolset:*_xp*"}
+		buildoptions { "/Zc:threadSafeInit-" } -- Fix Windows XP not initialising TLS early
+	
 	filter "system:windows"
+		toolset "v141"
+		flags { "StaticRuntime" }
 		defines { "WIN32", "_WIN32" }
 		includedirs { 
-			dxdir.."Include"
+			path.join(dxdir, "Include")
 		}
 		libdirs {
-			dxdir.."Lib/x86"
+			path.join(dxdir, "Lib/x86")
 		}
-		
-	if _ACTION == "vs2015" then
-		defines { "_TIMESPEC_DEFINED" } -- fix pthread redefinition error, TODO: Remove when we fully moved to vs2015
-	end
+	
+	filter {"system:windows", "configurations:Debug"}
+		buildoptions { "/MT" } -- Don't use debug runtime when static linking
+		defines { "DEBUG" } -- Using DEBUG as _DEBUG is not available with /MT
+
+	filter "system:linux"
+		vectorextensions "SSE2"
+		buildoptions { "-fvisibility=hidden" }
 	
 	-- Only build the client on Windows
-	if os.get() == "windows" then
+	if os.target() == "windows" then
 		group "Client"
 		include "Client/ceflauncher"
 		include "Client/ceflauncher_DLL"
+		include "Client/cefweb"
 		include "Client/core"
 		include "Client/game_sa"
+		include "Client/sdk"
 		include "Client/gui"
 		include "Client/launch"
 		include "Client/loader"
@@ -96,11 +130,11 @@ workspace "MTASA"
 		group "Vendor"
 		include "vendor/portaudio"
 		include "vendor/cef3"
-		include "vendor/jpeg-8d"
+		include "vendor/jpeg-9b"
 		include "vendor/libpng"
 		include "vendor/tinygettext"
 		include "vendor/pthreads"
-		include "vendor/curl/lib"
+		include "vendor/libspeex"
 	end
 	
 	filter {}
@@ -109,16 +143,21 @@ workspace "MTASA"
 		include "Server/dbconmy"
 		include "Server/launcher"
 		include "Server/mods/deathmatch"
-		
+		include "Server/sdk"
+
 		group "Shared"
+		include "Shared"
 		include "Shared/XML"
 		
 		group "Vendor"
+		include "vendor/bcrypt"
 		include "vendor/cryptopp"
+		include "vendor/curl"
 		include "vendor/ehs"
 		include "vendor/google-breakpad"
 		include "vendor/json-c"
 		include "vendor/lua"
+		include "vendor/mbedtls"
 		include "vendor/pcre"
 		include "vendor/pme"
 		include "vendor/sqlite"
@@ -126,4 +165,3 @@ workspace "MTASA"
 		include "vendor/unrar"
 		include "vendor/zip"
 		include "vendor/zlib"
-		

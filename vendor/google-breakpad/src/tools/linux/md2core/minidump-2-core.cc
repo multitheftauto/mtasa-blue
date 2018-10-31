@@ -35,7 +35,6 @@
 
 #include <elf.h>
 #include <errno.h>
-#include <inttypes.h>
 #include <link.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,6 +49,7 @@
 #include "common/linux/memory_mapped_file.h"
 #include "common/minidump_type_helper.h"
 #include "common/scoped_ptr.h"
+#include "google_breakpad/common/breakpad_types.h"
 #include "google_breakpad/common/minidump_format.h"
 #include "third_party/lss/linux_syscall_support.h"
 #include "tools/linux/md2core/minidump_memory_range.h"
@@ -494,11 +494,21 @@ ParseSystemInfo(CrashedProcess* crashinfo, const MinidumpMemoryRange& range,
     _exit(1);
   }
 #elif defined(__mips__)
+# if _MIPS_SIM == _ABIO32
   if (sysinfo->processor_architecture != MD_CPU_ARCHITECTURE_MIPS) {
     fprintf(stderr,
-            "This version of minidump-2-core only supports mips (32bit).\n");
+            "This version of minidump-2-core only supports mips o32 (32bit).\n");
     _exit(1);
   }
+# elif _MIPS_SIM == _ABI64
+  if (sysinfo->processor_architecture != MD_CPU_ARCHITECTURE_MIPS64) {
+    fprintf(stderr,
+            "This version of minidump-2-core only supports mips n64 (64bit).\n");
+    _exit(1);
+  }
+# else
+#  error "This mips ABI is currently not supported (n32)"
+# endif
 #else
 #error "This code has not been ported to your platform yet"
 #endif
@@ -525,6 +535,8 @@ ParseSystemInfo(CrashedProcess* crashinfo, const MinidumpMemoryRange& range,
             ? "ARM"
             : sysinfo->processor_architecture == MD_CPU_ARCHITECTURE_MIPS
             ? "MIPS"
+            : sysinfo->processor_architecture == MD_CPU_ARCHITECTURE_MIPS64
+            ? "MIPS64"
             : "???",
             sysinfo->number_of_processors,
             sysinfo->processor_level,

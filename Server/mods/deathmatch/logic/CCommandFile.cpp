@@ -1,52 +1,45 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CCommandFile.cpp
-*  PURPOSE:     Command file parser class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CCommandFile.cpp
+ *  PURPOSE:     Command file parser class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-CCommandFile::CCommandFile ( const char* szFilename,
-                             CConsole& Console,
-                             CClient& Client ) :
-m_Console ( Console ),
-m_Client ( Client )
+CCommandFile::CCommandFile(const char* szFilename, CConsole& Console, CClient& Client) : m_Console(Console), m_Client(Client)
 
 {
     // Load the given file
-    m_pFile = fopen ( szFilename, "r" );
+    m_pFile = File::Fopen(szFilename, "r");
     m_bEcho = true;
 }
 
-
-CCommandFile::~CCommandFile ( void )
+CCommandFile::~CCommandFile(void)
 {
     // Unload it again
-    if ( m_pFile )
+    if (m_pFile)
     {
-        fclose ( m_pFile );
+        fclose(m_pFile);
     }
 }
 
-
-bool CCommandFile::Run ( void )
+bool CCommandFile::Run(void)
 {
     // Got a file?
-    if ( m_pFile )
+    if (m_pFile)
     {
         // Read lines
-        char szBuffer [2048];
-        szBuffer [2047] = 0;
-        while ( fgets ( szBuffer, 2047, m_pFile ) )
+        char szBuffer[2048];
+        szBuffer[2047] = 0;
+        while (fgets(szBuffer, 2047, m_pFile))
         {
             // Parse it. Don't continue on error.
-            if ( !Parse ( szBuffer ) )
+            if (!Parse(szBuffer))
             {
                 return false;
             }
@@ -60,36 +53,35 @@ bool CCommandFile::Run ( void )
     return false;
 }
 
-
-bool CCommandFile::Parse ( char* szLine )
+bool CCommandFile::Parse(char* szLine)
 {
     // Skip whitespace first, then trim off the right whitespace
-    szLine = SkipWhitespace ( szLine );
-    TrimRightWhitespace ( szLine );
+    szLine = SkipWhitespace(szLine);
+    TrimRightWhitespace(szLine);
 
     // More than 1 character left?
-    if ( szLine [0] != 0 )
+    if (szLine[0] != 0)
     {
         // Got a lua comment comming? --, skip it
-        if ( szLine [0] == '-' && szLine [1] == '-' )
+        if (szLine[0] == '-' && szLine[1] == '-')
         {
             return true;
-        } 
+        }
 
         // Is it @echo?
-        if ( strncmp ( szLine, "@echo", 5 ) == 0 )
+        if (strncmp(szLine, "@echo", 5) == 0)
         {
             // Skip whitespace again from the end of @echo
-            const char* szEchoMode = SkipWhitespace ( szLine + 5 );
+            const char* szEchoMode = SkipWhitespace(szLine + 5);
 
             // Off or on?
-            if ( stricmp ( szEchoMode, "off" ) == 0 )
+            if (stricmp(szEchoMode, "off") == 0)
                 m_bEcho = false;
-            else if ( stricmp ( szEchoMode, "on" ) == 0 )
+            else if (stricmp(szEchoMode, "on") == 0)
                 m_bEcho = true;
             else
             {
-                CLogger::ErrorPrintf ( "Unknown @echo mode. Valid modes are 'on' and 'off'.\n" );
+                CLogger::ErrorPrintf("Unknown @echo mode. Valid modes are 'on' and 'off'.\n");
                 return false;
             }
 
@@ -98,13 +90,13 @@ bool CCommandFile::Parse ( char* szLine )
         }
 
         // Echo the command if asked to
-        if ( m_bEcho )
+        if (m_bEcho)
         {
-            CLogger::LogPrintf ( "%s\n", szLine );
+            CLogger::LogPrintf("%s\n", szLine);
         }
 
         // Run the command
-        m_Console.HandleInput ( szLine, &m_Client, &m_Client );
+        m_Console.HandleInput(szLine, &m_Client, &m_Client);
         return true;
     }
 
@@ -112,14 +104,13 @@ bool CCommandFile::Parse ( char* szLine )
     return true;
 }
 
-
-char* CCommandFile::SkipWhitespace ( char* szLine )
+char* CCommandFile::SkipWhitespace(char* szLine)
 {
     // While we're not at the end
-    while ( *szLine != 0 )
+    while (*szLine != 0)
     {
         // Not a space, tab or line feed? Return this position
-        if ( !IsWhitespace ( *szLine ) )
+        if (!IsWhitespace(*szLine))
         {
             return szLine;
         }
@@ -132,19 +123,17 @@ char* CCommandFile::SkipWhitespace ( char* szLine )
     return szLine;
 }
 
-
-void CCommandFile::TrimRightWhitespace ( char* szLine )
+void CCommandFile::TrimRightWhitespace(char* szLine)
 {
     // Go to the end
     char* szOriginalLine = szLine;
-    while ( *szLine )
+    while (*szLine)
     {
         ++szLine;
     }
 
     // Go back trimming whitespace
-    while ( ( szLine >= szOriginalLine ) &&
-            ( *szLine == 0 || IsWhitespace ( *szLine ) ) )
+    while ((szLine >= szOriginalLine) && (*szLine == 0 || IsWhitespace(*szLine)))
     {
         *szLine = 0;
         --szLine;

@@ -4,9 +4,14 @@ premake.modules.install_cef = {}
 
 -- Config variables
 local CEF_PATH = "vendor/cef3/"
-local CEF_URL = "http://opensource.spotify.com/cefbuilds/cef_binary_3.2743.1444.g7c94121_windows32_minimal.tar.bz2"
---local CEF_URL = "http://mirror.mtasa.com/cef-latest.tar.bz2" -- TODO
-local CEF_URL_MD5 = "http://do-not.press/cef-latest.tar.bz2.md5" -- "http://mirror.mtasa.com/cef-latest.tar.bz2.md5"
+local CEF_URL_PREFIX = "https://mirror.mtasa.com/bdata/cef/"
+local CEF_URL_SUFFIX = "_windows32_minimal.tar.bz2"
+
+local CEF_VERSION = "3.3497.1840.gcd24143" -- Change here to update CEF version
+
+function make_cef_download_url()
+	return CEF_URL_PREFIX..CEF_VERSION..CEF_URL_SUFFIX
+end
 
 newaction {
 	trigger = "install_cef",
@@ -14,13 +19,15 @@ newaction {
 
 	execute = function()
 		-- Only execute on Windows
-		if os.get() ~= "windows" then return end
+		if os.host() ~= "windows" then return end
 
 		-- Download md5
-		local correct_checksum, result_string = http.get(CEF_URL_MD5)
+		local correct_checksum, result_string = http.get(make_cef_download_url()..".md5")
 		if result_string ~= "OK" and result_string then
 			print("Could not check CEF checksum: "..result_string)
 			return -- Do nothing and rely on earlier installed files (to allow working offline)
+
+			-- TODO(jusonex): It might make sense to fallback to spotify cef mirror
 		end
 
 		-- Trim whitespace
@@ -29,13 +36,13 @@ newaction {
 		-- Check md5
 		local archive_path = CEF_PATH.."temp.tar.bz2"
 		if os.md5_file(archive_path) == correct_checksum then
-			print("CEF is already up-to-date")
+			print("CEF consistency checks succeeded")
 			return
 		end
 
 		-- Download CEF
 		print("Downloading CEF...")
-		http.download(CEF_URL, archive_path)
+		http.download(make_cef_download_url(), archive_path)
 
 		-- Delete old CEF files
 		-- TODO: It might be better to download the files into a new folder and delete this folder at once

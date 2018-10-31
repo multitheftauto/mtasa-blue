@@ -35,6 +35,7 @@
 
 #include <string>
 
+#include "client/linux/handler/microdump_extra_info.h"
 #include "common/using_std_string.h"
 
 // This class describes how a crash dump should be generated, either:
@@ -49,20 +50,17 @@ class MinidumpDescriptor {
   struct MicrodumpOnConsole {};
   static const MicrodumpOnConsole kMicrodumpOnConsole;
 
-  MinidumpDescriptor() : mode_(kUninitialized),
-                         fd_(-1),
-                         size_limit_(-1),
-                         microdump_build_fingerprint_(NULL),
-                         microdump_product_info_(NULL) {}
+  MinidumpDescriptor()
+      : mode_(kUninitialized),
+        fd_(-1),
+        size_limit_(-1) {}
 
   explicit MinidumpDescriptor(const string& directory)
       : mode_(kWriteMinidumpToFile),
         fd_(-1),
         directory_(directory),
         c_path_(NULL),
-        size_limit_(-1),
-        microdump_build_fingerprint_(NULL),
-        microdump_product_info_(NULL) {
+        size_limit_(-1) {
     assert(!directory.empty());
   }
 
@@ -70,18 +68,14 @@ class MinidumpDescriptor {
       : mode_(kWriteMinidumpToFd),
         fd_(fd),
         c_path_(NULL),
-        size_limit_(-1),
-        microdump_build_fingerprint_(NULL),
-        microdump_product_info_(NULL) {
+        size_limit_(-1) {
     assert(fd != -1);
   }
 
   explicit MinidumpDescriptor(const MicrodumpOnConsole&)
       : mode_(kWriteMicrodumpToConsole),
         fd_(-1),
-        size_limit_(-1),
-        microdump_build_fingerprint_(NULL),
-        microdump_product_info_(NULL) {}
+        size_limit_(-1) {}
 
   explicit MinidumpDescriptor(const MinidumpDescriptor& descriptor);
   MinidumpDescriptor& operator=(const MinidumpDescriptor& descriptor);
@@ -107,17 +101,10 @@ class MinidumpDescriptor {
   off_t size_limit() const { return size_limit_; }
   void set_size_limit(off_t limit) { size_limit_ = limit; }
 
-  // TODO(primiano): make this and product info (below) just part of the
-  // microdump ctor once it is rolled stably into Chrome. ETA: June 2015.
-  void SetMicrodumpBuildFingerprint(const char* build_fingerprint);
-  const char* microdump_build_fingerprint() const {
-    return microdump_build_fingerprint_;
-  }
-
-  void SetMicrodumpProductInfo(const char* product_info);
-  const char* microdump_product_info() const {
-    return microdump_product_info_;
-  }
+  MicrodumpExtraInfo* microdump_extra_info() {
+    assert(IsMicrodumpOnConsole());
+    return &microdump_extra_info_;
+  };
 
  private:
   enum DumpMode {
@@ -145,15 +132,16 @@ class MinidumpDescriptor {
 
   off_t size_limit_;
 
-  // The product name/version and build fingerprint that should be appended to
-  // the dump (microdump only). Microdumps don't have the ability of appending
-  // extra metadata after the dump is generated (as opposite to minidumps
-  // MIME fields), therefore the product details must be provided upfront.
-  // The string pointers are supposed to be valid through all the lifetime of
-  // the process (read: the caller has to guarantee that they are stored in
-  // global static storage).
-  const char* microdump_build_fingerprint_;
-  const char* microdump_product_info_;
+  // The extra microdump data (e.g. product name/version, build
+  // fingerprint, gpu fingerprint) that should be appended to the dump
+  // (microdump only). Microdumps don't have the ability of appending
+  // extra metadata after the dump is generated (as opposite to
+  // minidumps MIME fields), therefore the extra data must be provided
+  // upfront. Any memory pointed to by members of the
+  // MicrodumpExtraInfo struct must be valid for the lifetime of the
+  // process (read: the caller has to guarantee that it is stored in
+  // global static storage.)
+  MicrodumpExtraInfo microdump_extra_info_;
 };
 
 }  // namespace google_breakpad

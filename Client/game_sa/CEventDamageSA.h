@@ -1,17 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CEventDamageSA.h
-*  PURPOSE:     Header file for damage event class
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CEventDamageSA.h
+ *  PURPOSE:     Header file for damage event class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CEventDamageSA_H
-#define __CEventDamageSA_H
+#pragma once
 
 #include <windows.h>
 #include <game/CEventDamage.h>
@@ -36,72 +34,71 @@ enum ePedPieceTypes;
 class CEventDamageSAInterface
 {
 public:
-    DWORD vmt;                                              // 0
-    DWORD ticks;                                            // 4
-    BYTE unk8;                                              // 8
-    BYTE unk9;                                              // 9
-    BYTE unkA;                                              // Ah
-    BYTE unkB;                                              // Bh
-    BYTE unkC;                                              // Ch
-    BYTE unkD;                                              // Dh
-    WORD unkE;                                              // Eh
-    WORD unk10;                                             // 10h
-    WORD unk12;                                             // 12h
-    CEntitySAInterface *            pInflictor;             // 14h
-    DWORD                           damageTime;             // 18h
-    eWeaponType                     weaponUsed;             // 1Ch
-    ePedPieceTypes                  pedPieceType;           // 20h
-    BYTE                            ucDirection;            // 24h
-    BYTE                            ucFlags;                // 25h
-    BYTE unk26;                                             // 26h
-    BYTE unk27;                                             // 27h
-    DWORD                           dwAnimGroup;            // 28h
-    DWORD                           dwAnimID;               // 2Ch
-    float                           fAnimBlend;             // 30h
-    float                           fAnimSpeed;             // 34h
-    CPedDamageResponseSAInterface   damageResponseData;     // 38h
+    DWORD                         vmt;                           // 0
+    DWORD                         ticks;                         // 4
+    BYTE                          unk8;                          // 8
+    BYTE                          unk9;                          // 9
+    BYTE                          unkA;                          // Ah
+    BYTE                          unkB;                          // Bh
+    BYTE                          unkC;                          // Ch
+    BYTE                          unkD;                          // Dh
+    WORD                          unkE;                          // Eh
+    WORD                          unk10;                         // 10h
+    WORD                          unk12;                         // 12h
+    CEntitySAInterface*           pInflictor;                    // 14h
+    DWORD                         damageTime;                    // 18h
+    eWeaponType                   weaponUsed;                    // 1Ch
+    ePedPieceTypes                pedPieceType;                  // 20h
+    BYTE                          ucDirection;                   // 24h
+    BYTE                          ucFlags;                       // 25h
+    BYTE                          unk26;                         // 26h
+    BYTE                          unk27;                         // 27h
+    DWORD                         dwAnimGroup;                   // 28h
+    DWORD                         dwAnimID;                      // 2Ch
+    float                         fAnimBlend;                    // 30h
+    float                         fAnimSpeed;                    // 34h
+    CPedDamageResponseSAInterface damageResponseData;            // 38h
 };
 
 class CEventDamageSA : public CEventDamage
 {
 private:
-    CEventDamageSAInterface *           m_pInterface;
-    CPedDamageResponse *                m_pDamageResponse;
-    bool                                m_bDestroyInterface;
-    EDamageReasonType                   m_DamageReason;
+    CEventDamageSAInterface* m_pInterface;
+    CPedDamageResponse*      m_pDamageResponse;
+    bool                     m_bDestroyInterface;
+    EDamageReasonType        m_DamageReason;
+
 public:
-                                        CEventDamageSA      ( CEntity * pEntity, unsigned int i_1, eWeaponType weaponType, ePedPieceTypes hitZone, unsigned char uc_2, bool b_3, bool b_4 );
-                                        CEventDamageSA      ( CEventDamageSAInterface * pInterface );
-                                        ~CEventDamageSA     ( void );
+    CEventDamageSA(CEntity* pEntity, unsigned int i_1, eWeaponType weaponType, ePedPieceTypes hitZone, unsigned char uc_2, bool b_3, bool b_4);
+    CEventDamageSA(CEventDamageSAInterface* pInterface);
+    ~CEventDamageSA(void);
 
-    inline CEventDamageSAInterface *    GetInterface        ( void )        { return m_pInterface; }
+    CEventDamageSAInterface* GetInterface(void) { return m_pInterface; }
 
-    inline void                         Destroy             ( void )        { delete this; }
+    void Destroy(void) { delete this; }
 
     // Flag accessors
-    inline bool                         DidPedFallDown      ( void )                                    { return (m_pInterface->ucFlags & 2) != 0; }
-    inline bool                         WasStealthAttack    ( void )                                    { return (m_pInterface->ucFlags & 16) != 0; }
+    bool DidPedFallDown(void) { return (m_pInterface->ucFlags & 2) != 0; }
+    bool WasStealthAttack(void) { return (m_pInterface->ucFlags & 16) != 0; }
 
-    inline void                         MakePedFallDown     ( void )                                    { m_pInterface->ucFlags |= 2; }
+    void MakePedFallDown(void) { m_pInterface->ucFlags |= 2; }
 
-    inline DWORD                        GetDamageTime       ( void )                                    { return m_pInterface->damageTime; }
-    inline eWeaponType                  GetWeaponUsed       ( void )                                    { return m_pInterface->weaponUsed; }
-    inline ePedPieceTypes               GetPedPieceType     ( void )                                    { return m_pInterface->pedPieceType; }
-    inline char                         GetDirection        ( void )                                    { return m_pInterface->ucDirection; }
-    
-    CEntity *                           GetInflictingEntity ( void );
-    inline CPedDamageResponse *         GetDamageResponse   ( void )        { return m_pDamageResponse; }
+    DWORD          GetDamageTime(void) { return m_pInterface->damageTime; }
+    eWeaponType    GetWeaponUsed(void) { return m_pInterface->weaponUsed; }
+    ePedPieceTypes GetPedPieceType(void) { return m_pInterface->pedPieceType; }
+    char           GetDirection(void) { return m_pInterface->ucDirection; }
 
-    bool                                HasKilledPed        ( void );
-    float                               GetDamageApplied    ( void );
-    AssocGroupId                        GetAnimGroup        ( void );
-    AnimationId                         GetAnimId           ( void );
-    bool                                GetAnimAdded        ( void );
-    void                                ComputeDeathAnim    ( CPed * pPed, bool bUnk );
-    void                                ComputeDamageAnim   ( CPed * pPed, bool bUnk );
-    bool                                AffectsPed          ( CPed * pPed );
-    void                                SetDamageReason     ( EDamageReasonType damageReason )          { m_DamageReason = damageReason; }
-    EDamageReasonType                   GetDamageReason     ( void )                                    { return m_DamageReason; }
+    CEntity*            GetInflictingEntity(void);
+    CPedDamageResponse* GetDamageResponse(void) { return m_pDamageResponse; }
+
+    bool              HasKilledPed(void);
+    float             GetDamageApplied(void);
+    AssocGroupId      GetAnimGroup(void);
+    AnimationId       GetAnimId(void);
+    bool              GetAnimAdded(void);
+    void              ComputeDeathAnim(CPed* pPed, bool bUnk);
+    void              ComputeDamageAnim(CPed* pPed, bool bUnk);
+    bool              AffectsPed(CPed* pPed);
+    void              SetDamageReason(EDamageReasonType damageReason) { m_DamageReason = damageReason; }
+    EDamageReasonType GetDamageReason(void) { return m_DamageReason; }
 };
-
-#endif

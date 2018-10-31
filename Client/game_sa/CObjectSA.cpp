@@ -1,16 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CObjectSA.cpp
-*  PURPOSE:     Object entity
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Jax <>
-*               Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CObjectSA.cpp
+ *  PURPOSE:     Object entity
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
@@ -25,13 +22,13 @@ struct CFileObjectInstance
     float rx;
     float ry;
     float rz;
-    float rr; // = 1
+    float rr;            // = 1
     DWORD modelId;
     DWORD areaNumber;
-    long flags; // = -1
+    long  flags;            // = -1
 };
 
-CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)
+CObjectSA::CObjectSA(CObjectSAInterface* objectInterface)
 {
     DEBUG_TRACE("CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)");
     this->SetInterface(objectInterface);
@@ -41,27 +38,27 @@ CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)
     this->BeingDeleted = FALSE;
     this->DoNotRemoveFromGame = FALSE;
 
-    if ( m_pInterface )
+    if (m_pInterface)
     {
-        ResetScale ();
-        CheckForGangTag ();
+        ResetScale();
+        CheckForGangTag();
         m_pInterface->bStreamingDontDelete = true;
     }
 }
 
-CObjectSA::CObjectSA( DWORD dwModel, bool bBreakingDisabled )
+CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
 {
     DEBUG_TRACE("CObjectSA::CObjectSA( DWORD dwModel )");
 
-    CWorldSA * world = (CWorldSA *)pGame->GetWorld();
+    CWorldSA* world = (CWorldSA*)pGame->GetWorld();
 
     DWORD dwThis = 0;
-    
+
 #ifdef MTA_USE_BUILDINGS_AS_OBJECTS
 
-    DWORD dwFunc = 0x538090; // CFileLoader__LoadObjectInstance
+    DWORD               dwFunc = 0x538090;            // CFileLoader__LoadObjectInstance
     CFileObjectInstance fileLoader;
-    MemSetFast (&fileLoader, 0, sizeof(CFileObjectInstance));
+    MemSetFast(&fileLoader, 0, sizeof(CFileObjectInstance));
     fileLoader.modelId = dwModel;
     fileLoader.rr = 1;
     fileLoader.areaNumber = 0;
@@ -78,13 +75,13 @@ CObjectSA::CObjectSA( DWORD dwModel, bool bBreakingDisabled )
     }
 
     this->SetInterface((CEntitySAInterface*)dwThis);
-    
-    MemPutFast < DWORD > ( 0xBCC0E0, dwThis );
-    MemPutFast < DWORD > ( 0xBCC0D8, 1 );
 
-    dwFunc = 0x404DE0; // CIplStore__SetupRelatedIpls
+    MemPutFast<DWORD>(0xBCC0E0, dwThis);
+    MemPutFast<DWORD>(0xBCC0D8, 1);
+
+    dwFunc = 0x404DE0;            // CIplStore__SetupRelatedIpls
     DWORD dwTemp = 0;
-    char szTemp[255];
+    char  szTemp[255];
     strcpy(szTemp, "moo");
 
     _asm
@@ -98,8 +95,7 @@ CObjectSA::CObjectSA( DWORD dwModel, bool bBreakingDisabled )
         mov     dwTemp, eax
     }
 
-//    _asm int 3
-    dwFunc = 0x5B51E0; // AddBuildingInstancesToWorld
+    dwFunc = 0x5B51E0;            // AddBuildingInstancesToWorld
     _asm
     {
         push    dwTemp
@@ -107,7 +103,7 @@ CObjectSA::CObjectSA( DWORD dwModel, bool bBreakingDisabled )
         add     esp, 4
     }
 
-    dwFunc = 0x405110; // CIplStore__RemoveRelatedIpls
+    dwFunc = 0x405110;            // CIplStore__RemoveRelatedIpls
     _asm
     {
         push    -1
@@ -131,8 +127,7 @@ CObjectSA::CObjectSA( DWORD dwModel, bool bBreakingDisabled )
 
 #else
 
-
-    DWORD CObjectCreate = FUNC_CObject_Create;  
+    DWORD CObjectCreate = FUNC_CObject_Create;
     DWORD dwObjectPtr = 0;
     _asm
     {
@@ -142,17 +137,17 @@ CObjectSA::CObjectSA( DWORD dwModel, bool bBreakingDisabled )
         add     esp, 8
         mov     dwObjectPtr, eax
     }
-    if ( dwObjectPtr )
+    if (dwObjectPtr)
     {
-        this->SetInterface((CEntitySAInterface *)dwObjectPtr);
+        this->SetInterface((CEntitySAInterface*)dwObjectPtr);
 
-        world->Add( m_pInterface, CObject_Constructor );
+        world->Add(m_pInterface, CObject_Constructor);
 
         // Setup some flags
         this->BeingDeleted = FALSE;
         this->DoNotRemoveFromGame = FALSE;
-        MemPutFast < BYTE > ( dwObjectPtr + 316, 6 );
-        if ( bBreakingDisabled )
+        MemPutFast<BYTE>(dwObjectPtr + 316, 6);
+        if (bBreakingDisabled)
         {
             // Set our immunities
             // Sum of all flags checked @ CPhysical__CanPhysicalBeDamaged
@@ -168,44 +163,43 @@ CObjectSA::CObjectSA( DWORD dwModel, bool bBreakingDisabled )
     else
     {
         // The exception handler doesn't work for some reason, so do this
-        this->SetInterface ( NULL );
+        this->SetInterface(NULL);
     }
 #endif
 
-    this->internalID = pGame->GetPools ()->GetObjectRef ( (DWORD *)this->GetInterface () );
+    this->internalID = pGame->GetPools()->GetObjectRef((DWORD*)this->GetInterface());
 
     m_ucAlpha = 255;
 
-    if ( m_pInterface )
+    if (m_pInterface)
     {
-        ResetScale ();
-        CheckForGangTag ();
+        ResetScale();
+        CheckForGangTag();
     }
-
 }
 
-CObjectSA::~CObjectSA( )
+CObjectSA::~CObjectSA()
 {
     DEBUG_TRACE("CObjectSA::~CObjectSA( )");
-    //OutputDebugString("Attempting to destroy Object\n");
-    if(!this->BeingDeleted && DoNotRemoveFromGame == false)
+    // OutputDebugString("Attempting to destroy Object\n");
+    if (!this->BeingDeleted && DoNotRemoveFromGame == false)
     {
         DWORD dwInterface = (DWORD)this->GetInterface();
-        if ( dwInterface )
-        {       
-            if ( (DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable )
+        if (dwInterface)
+        {
+            if ((DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable)
             {
-                CWorldSA * world = (CWorldSA *)pGame->GetWorld();
+                CWorldSA* world = (CWorldSA*)pGame->GetWorld();
                 world->Remove(this->GetInterface(), CObject_Destructor);
-            
-                DWORD dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
-                _asm    
+
+                DWORD dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR;            // we use the vtbl so we can be type independent
+                _asm
                 {
                     mov     ecx, dwInterface
-                    push    1           //delete too
+                    push    1            // delete too
                     call    dwFunc
                 }
-        
+
 #ifdef MTA_USE_BUILDINGS_AS_OBJECTS
                 DWORD dwModelID = this->internalInterface->m_nModelIndex;
                 // REMOVE ref to colstore thingy
@@ -225,9 +219,9 @@ CObjectSA::~CObjectSA( )
         }
 
         this->BeingDeleted = true;
-        ((CPoolsSA *)pGame->GetPools())->RemoveObject((CObject *)(CObjectSA *)this);
+        ((CPoolsSA*)pGame->GetPools())->RemoveObject((CObject*)(CObjectSA*)this);
 
-        //OutputDebugString("Destroying Object\n");
+        // OutputDebugString("Destroying Object\n");
     }
 }
 
@@ -243,12 +237,12 @@ void CObjectSA::Explode()
     }
 }
 
-void CObjectSA::Break ()
+void CObjectSA::Break()
 {
     DWORD dwFunc = 0x5A0D90;
-    DWORD dwThis = (DWORD) GetInterface ();
+    DWORD dwThis = (DWORD)GetInterface();
 
-    float fHitVelocity = 1000.0f; // has no direct influence, but should be high enough to trigger the break (effect)
+    float fHitVelocity = 1000.0f;            // has no direct influence, but should be high enough to trigger the break (effect)
 
     _asm
     {
@@ -261,7 +255,7 @@ void CObjectSA::Break ()
         call    dwFunc
     }
 
-    if ( IsGlass () )
+    if (IsGlass())
     {
         float fX = 0.0f;
         float fY = 0.0f;
@@ -285,58 +279,64 @@ void CObjectSA::Break ()
     }
 }
 
-void CObjectSA::SetHealth ( float fHealth )
+void CObjectSA::SetHealth(float fHealth)
 {
-    static_cast < CObjectSAInterface* > ( this->GetInterface () )->fHealth = fHealth;
+    static_cast<CObjectSAInterface*>(this->GetInterface())->fHealth = fHealth;
 }
 
-float CObjectSA::GetHealth ( void )
+float CObjectSA::GetHealth(void)
 {
-    return static_cast < CObjectSAInterface* > ( this->GetInterface () )->fHealth;
+    return static_cast<CObjectSAInterface*>(this->GetInterface())->fHealth;
 }
 
-void CObjectSA::SetModelIndex ( unsigned long ulModel )
+void CObjectSA::SetModelIndex(unsigned long ulModel)
 {
     // Delete any existing RwObject first
     DWORD dwFunc = this->GetInterface()->vtbl->DeleteRwObject;
     DWORD dwThis = (DWORD)this->GetInterface();
-    _asm    
-    {
+    _asm
+        {
         mov     ecx, dwThis
         call    dwFunc
-    }
+        }
 
     // Jax: I'm not sure if using the vtbl is right (as ped and vehicle dont), but it works
     dwFunc = this->GetInterface()->vtbl->SetModelIndex;
-    _asm    
-    {
+    _asm
+        {
         mov     ecx, dwThis
         push    ulModel
         call    dwFunc
-    }
+        }
 
-    CheckForGangTag ();
+    CheckForGangTag();
 }
 
-void CObjectSA::CheckForGangTag ( )
+void CObjectSA::CheckForGangTag()
 {
-    switch ( GetModelIndex () )
+    switch (GetModelIndex())
     {
-        case 1524: case 1525: case 1526: case 1527:
-        case 1528: case 1529: case 1530: case 1531:
+        case 1524:
+        case 1525:
+        case 1526:
+        case 1527:
+        case 1528:
+        case 1529:
+        case 1530:
+        case 1531:
             m_bIsAGangTag = true;
             break;
         default:
-            m_bIsAGangTag = false; 
+            m_bIsAGangTag = false;
             break;
     }
 }
 
-bool CObjectSA::IsGlass ()
+bool CObjectSA::IsGlass()
 {
     DWORD dwFunc = 0x46A760;
-    DWORD dwThis = (DWORD) GetInterface ();
-    bool bResult;
+    DWORD dwThis = (DWORD)GetInterface();
+    bool  bResult;
 
     _asm
     {
@@ -348,19 +348,19 @@ bool CObjectSA::IsGlass ()
     return bResult;
 }
 
-void CObjectSA::SetScale ( float fX, float fY, float fZ )
+void CObjectSA::SetScale(float fX, float fY, float fZ)
 {
-    m_vecScale = CVector ( fX, fY, fZ );
-    GetObjectInterface ()->bUpdateScale = true;
-    GetObjectInterface ()->fScale = Max( fX, Max( fY, fZ ) );
+    m_vecScale = CVector(fX, fY, fZ);
+    GetObjectInterface()->bUpdateScale = true;
+    GetObjectInterface()->fScale = std::max(fX, std::max(fY, fZ));
 }
 
-CVector* CObjectSA::GetScale ( )
+CVector* CObjectSA::GetScale()
 {
     return &m_vecScale;
 }
 
-void CObjectSA::ResetScale ( )
+void CObjectSA::ResetScale()
 {
-    SetScale ( 1.0f, 1.0f, 1.0f );
+    SetScale(1.0f, 1.0f, 1.0f);
 }

@@ -328,6 +328,10 @@ typedef enum {
   MD_MEMORY_INFO_LIST_STREAM     = 16,  /* MDRawMemoryInfoList */
   MD_THREAD_INFO_LIST_STREAM     = 17,
   MD_HANDLE_OPERATION_LIST_STREAM = 18,
+  MD_TOKEN_STREAM                = 19,
+  MD_JAVASCRIPT_DATA_STREAM      = 20,
+  MD_SYSTEM_MEMORY_INFO_STREAM   = 21,
+  MD_PROCESS_VM_COUNTERS_STREAM  = 22,
   MD_LAST_RESERVED_STREAM        = 0x0000ffff,
 
   /* Breakpad extension types.  0x4767 = "Gg" */
@@ -449,14 +453,25 @@ static const size_t MDCVInfoPDB70_minsize = offsetof(MDCVInfoPDB70,
 
 #define MD_CVINFOPDB70_SIGNATURE 0x53445352  /* cvSignature = 'SDSR' */
 
+/*
+ * Modern ELF toolchains insert a "build id" into the ELF headers that
+ * usually contains a hash of some ELF headers + sections to uniquely
+ * identify a binary.
+ *
+ * https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Developer_Guide/compiling-build-id.html
+ * https://sourceware.org/binutils/docs-2.26/ld/Options.html#index-g_t_002d_002dbuild_002did-292
+ */
 typedef struct {
-  uint32_t data1[2];
-  uint32_t data2;
-  uint32_t data3;
-  uint32_t data4;
-  uint32_t data5[3];
-  uint8_t  extra[2];
+  uint32_t cv_signature;
+  uint8_t  build_id[1];  /* Bytes of build id from GNU_BUILD_ID ELF note.
+                          * This is variable-length, but usually 20 bytes
+                          * as the binutils ld default is a SHA-1 hash. */
 } MDCVInfoELF;
+
+static const size_t MDCVInfoELF_minsize = offsetof(MDCVInfoELF,
+                                                   build_id[0]);
+
+#define MD_CVINFOELF_SIGNATURE 0x4270454c  /* cvSignature = 'BpEL' */
 
 /* In addition to the two CodeView record formats above, used for linking
  * to external pdb files, it is possible for debugging data to be carried
@@ -638,6 +653,7 @@ typedef enum {
   MD_CPU_ARCHITECTURE_SPARC     = 0x8001, /* Breakpad-defined value for SPARC */
   MD_CPU_ARCHITECTURE_PPC64     = 0x8002, /* Breakpad-defined value for PPC64 */
   MD_CPU_ARCHITECTURE_ARM64     = 0x8003, /* Breakpad-defined value for ARM64 */
+  MD_CPU_ARCHITECTURE_MIPS64    = 0x8004, /* Breakpad-defined value for MIPS64 */
   MD_CPU_ARCHITECTURE_UNKNOWN   = 0xffff  /* PROCESSOR_ARCHITECTURE_UNKNOWN */
 } MDCPUArchitecture;
 

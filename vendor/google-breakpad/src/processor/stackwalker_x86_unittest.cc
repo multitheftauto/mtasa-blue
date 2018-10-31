@@ -1228,9 +1228,9 @@ TEST_F(GetCallerFrame, WindowsFPOSystemCall) {
 
 // Scan the stack for a better return address and potentially skip frames
 // when the calculated return address is not in a known module.  Note, that
-// the span of this scan is somewhat arbitrarily limited to 120 search words
-// for the context frame and 30 search words (pointers) for the other frames:
-//     const int kRASearchWords = 30;
+// the span of this scan is somewhat arbitrarily limited to 160 search words
+// for the context frame and 40 search words (pointers) for the other frames:
+//     const int kRASearchWords = 40;
 // This means that frames can be skipped only when their size is relatively
 // small: smaller than 4 * kRASearchWords * sizeof(InstructionType)
 TEST_F(GetCallerFrame, ReturnAddressIsNotInKnownModule) {

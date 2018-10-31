@@ -5,22 +5,23 @@ project "Client Core"
 	targetdir(buildpath("mta"))
 	
 	filter "system:windows"
-		includedirs { "../../vendor/sparsehash/current/src/windows" }
+		includedirs { "../../vendor/sparsehash/src/windows" }
 		linkoptions { "/SAFESEH\:NO" }
+		buildoptions { "-Zm130" }
 	
 	filter {}
 		includedirs { 
+			".",
 			"../sdk",
-			"../../vendor/cef3",
 			"../../vendor/tinygettext",
 			"../../vendor/zlib",
-			"../../vendor/jpeg-8d",
+			"../../vendor/jpeg-9b",
 			"../../vendor/pthreads/include",
-			"../../vendor/sparsehash/current/src/"
+			"../../vendor/sparsehash/src/"
 		}
 
 	libdirs {
-		"../../vendor/detours/lib"
+		"../../vendor/detours/lib",
 	}
 	
 
@@ -30,19 +31,22 @@ project "Client Core"
 	vpaths { 
 		["Headers/*"] = "**.h",
 		["Sources/*"] = "**.cpp",
+		["Resources/*"] = {"**.rc", "../launch/resource/mtaicon.ico"},
 		["*"] = "premake5.lua"
 	}
 	
 	files {
 		"premake5.lua",
-		"*.h",
-		"*.cpp"
+		"../launch/resource/mtaicon.ico",
+		"core.rc",
+		"**.h",
+		"**.cpp"
 	}
 
 	links {
 		"ws2_32", "d3dx9", "Userenv", "DbgHelp", "xinput", "Imagehlp", "dxguid", "dinput8", 
 		"strmiids",	"odbc32", "odbccp32", "shlwapi", "winmm", "gdi32", "Imm32", "Psapi", 
-		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "libcef", "CEF", "detours"
+		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "detours"
 	}
 
 	defines {
@@ -53,12 +57,6 @@ project "Client Core"
 
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" } 
-	
-	filter "configurations:Debug"		
-		libdirs { "../../vendor/cef3/Debug" }
-
-	filter "configurations:Release or configurations:Nightly"
-		libdirs { "../../vendor/cef3/Release" }
 		
 	filter "system:not windows"
 		flags { "ExcludeFromBuild" } 

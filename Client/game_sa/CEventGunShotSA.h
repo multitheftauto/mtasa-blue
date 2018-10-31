@@ -1,17 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CEventGunShotSA.h
-*  PURPOSE:     Header file for gunshot event class
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CEventGunShotSA.h
+ *  PURPOSE:     Header file for gunshot event class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CEventGunShotSA_H
-#define __CEventGunShotSA_H
+#pragma once
 
 #include <game/CEventGunShot.h>
 
@@ -21,22 +19,19 @@
 class CEventGunShotSAInterface
 {
 public:
-    char pad [ 100 ];
+    char pad[100];
 };
 
 class CEventGunShotSA : public CEventGunShot
 {
 public:
+    CEventGunShotSA(CEntity* pEntity, CVector& vecOrigin, CVector& vecTarget, bool b_1);
+    CEventGunShotSA(CEventGunShotSAInterface* pInterface) { m_pInterface = pInterface; }
 
-                                        CEventGunShotSA     ( CEntity * pEntity, CVector & vecOrigin, CVector & vecTarget, bool b_1 );
-                                        CEventGunShotSA     ( CEventGunShotSAInterface * pInterface )    { m_pInterface = pInterface; }
+    CEventGunShotSAInterface* GetInterface(void) { return m_pInterface; }
 
-    inline CEventGunShotSAInterface *   GetInterface        ( void )        { return m_pInterface; }
-
-    void                                Destroy             ( bool bDestroyInterface );
+    void Destroy(bool bDestroyInterface);
 
 private:
-    CEventGunShotSAInterface *          m_pInterface;
+    CEventGunShotSAInterface* m_pInterface;
 };
-
-#endif

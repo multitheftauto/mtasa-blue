@@ -34,16 +34,16 @@ bool ParseProcMaps(const std::string& input,
 
   // Split the string by newlines.
   std::vector<std::string> lines;
-  std::string line = "";
+  std::string l = "";
   for (size_t i = 0; i < input.size(); i++) {
     if (input[i] != '\n' && input[i] != '\r') {
-      line.push_back(input[i]);
-    } else if (line.size() > 0) {
-      lines.push_back(line);
-      line.clear();
+      l.push_back(input[i]);
+    } else if (l.size() > 0) {
+      lines.push_back(l);
+      l.clear();
     }
   }
-  if (line.size() > 0) {
+  if (l.size() > 0) {
     BPLOG(ERROR) << "Input doesn't end in newline";
     return false;
   }

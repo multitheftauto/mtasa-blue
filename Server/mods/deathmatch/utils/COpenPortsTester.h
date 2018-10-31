@@ -1,13 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/utils/COpenPortsTester.h
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
-
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/utils/COpenPortsTester.h
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 class COpenPortsTester
 {
@@ -17,39 +16,42 @@ public:
     //
     // Start a new test
     //
-    void Start ( void )
+    void Start(void)
     {
-        if ( m_iPortTestStage != 0 )
+        if (m_iPortTestStage != 0)
             return;
 
         // Construct URL
-        SString strServerIP = g_pGame->GetConfig ()->GetServerIP ();
-        ushort usServerPort = g_pGame->GetConfig ()->GetServerPort ();
-        ushort usHTTPPort   = g_pGame->GetConfig ()->GetHTTPPort ();
-        SString strURL ( PORT_TESTER_URL "?simple=1&g=%u", usServerPort );
+        SString strServerIP = g_pGame->GetConfig()->GetServerIP();
+        ushort  usServerPort = g_pGame->GetConfig()->GetServerPort();
+        ushort  usHTTPPort = g_pGame->GetConfig()->GetHTTPPort();
+        SString strURL(PORT_TESTER_URL "?simple=1&g=%u", usServerPort);
 
-        if ( ASE::GetInstance() )
+        if (ASE::GetInstance())
         {
-            strURL += SString ( "&a=%u", usServerPort + 123 );
+            strURL += SString("&a=%u", usServerPort + 123);
         }
         else
         {
-            CLogger::LogPrintfNoStamp ( "ASE is not enabled, so port UDP port %u will not be tested\n", usServerPort + 123 );
+            CLogger::LogPrintfNoStamp("ASE is not enabled, so port UDP port %u will not be tested\n", usServerPort + 123);
         }
 
-        if ( g_pGame->GetHTTPD () )
+        if (g_pGame->GetHTTPD())
         {
-            strURL += SString ( "&h=%u", usHTTPPort );
+            strURL += SString("&h=%u", usHTTPPort);
         }
         else
         {
-            CLogger::LogPrintfNoStamp ( "HTTP server is not enabled, so port TCP port %u will not be tested\n", usHTTPPort );
+            CLogger::LogPrintfNoStamp("HTTP server is not enabled, so port TCP port %u will not be tested\n", usHTTPPort);
         }
 
         // Send request
-        GetDownloadManager()->QueueFile ( strURL, NULL, 0, "", 0, true, this, DownloadFinishedCallback, false, 1, 15000 );
+        SHttpRequestOptions options;
+        options.uiConnectionAttempts = 1;
+        options.uiConnectTimeoutMs = 15000;
+        GetDownloadManager()->QueueFile(strURL, NULL, this, DownloadFinishedCallback, options);
 
-        CLogger::LogPrintfNoStamp ( "Testing ports...\n" );
+        CLogger::LogPrintfNoStamp("Testing ports...\n");
 
         // And now we wait...
         m_iPortTestStage = 1;
@@ -58,47 +60,45 @@ public:
     //
     // Process response from remote
     //
-    static void DownloadFinishedCallback( char * data, size_t dataLength, void * obj, bool bSuccess, int iErrorCode )
+    static void DownloadFinishedCallback(const SHttpDownloadResult& result)
     {
-        COpenPortsTester* pOpenPortsTester = (COpenPortsTester*)obj;
-        if ( bSuccess )
+        COpenPortsTester* pOpenPortsTester = (COpenPortsTester*)result.pObj;
+        if (result.bSuccess)
         {
             pOpenPortsTester->m_iPortTestStage = 0;
-            if ( iErrorCode != 200 )
+            if (result.iErrorCode != 200)
             {
-                CLogger::LogPrintfNoStamp ( "Port testing service unavailable! (%u: %s)\n", iErrorCode, GetDownloadManager()->GetError() );
+                CLogger::LogPrintfNoStamp("Port testing service unavailable! (%u: %s)\n", result.iErrorCode, GetDownloadManager()->GetError());
             }
             else
             {
                 // Parse each test result
-                uint uiLinesOutput = 0;
-                SStringX strResult( data, dataLength );
-                std::vector < SString > parts;
-                strResult.Split( "&", parts );
-                for ( uint i = 0 ; i < parts.size () ; i++ )
+                uint                 uiLinesOutput = 0;
+                SStringX             strResult(result.pData, result.dataSize);
+                std::vector<SString> parts;
+                strResult.Split("&", parts);
+                for (uint i = 0; i < parts.size(); i++)
                 {
                     // Parse one test result
-                    ushort usPort = 0;
+                    ushort  usPort = 0;
                     SString strType, strValue, strProtocol, strAction;
-                    parts[i].Split( "=", &strType, &strValue );
+                    parts[i].Split("=", &strType, &strValue);
 
-                    if ( strType == "a" )
+                    if (strType == "a")
                     {
-                        usPort = g_pGame->GetConfig ()->GetServerPort () + 123;
+                        usPort = g_pGame->GetConfig()->GetServerPort() + 123;
                         strProtocol = "UDP";
                         strAction = "browse";
                     }
-                    else
-                    if ( strType == "g" )
+                    else if (strType == "g")
                     {
-                        usPort = g_pGame->GetConfig ()->GetServerPort ();
+                        usPort = g_pGame->GetConfig()->GetServerPort();
                         strProtocol = "UDP";
                         strAction = "join";
                     }
-                    else
-                    if ( strType == "h" )
+                    else if (strType == "h")
                     {
-                        usPort = g_pGame->GetConfig ()->GetHTTPPort ();
+                        usPort = g_pGame->GetConfig()->GetHTTPPort();
                         strProtocol = "TCP";
                         strAction = "download";
                     }
@@ -106,35 +106,32 @@ public:
                         continue;
 
                     SString strStatus;
-                    if ( strValue == "1" )
-                        strStatus = SString ( "Port %u %s is open.", usPort, *strProtocol );
+                    if (strValue == "1")
+                        strStatus = SString("Port %u %s is open.", usPort, *strProtocol);
                     else
-                        strStatus = SString ( "Port %u %s is closed. Players can not %s!", usPort, *strProtocol, *strAction );
+                        strStatus = SString("Port %u %s is closed. Players can not %s!", usPort, *strProtocol, *strAction);
 
                     // Output test result
-                    CLogger::LogPrintfNoStamp ( "%s\n", *strStatus );
+                    CLogger::LogPrintfNoStamp("%s\n", *strStatus);
                     uiLinesOutput++;
                 }
 
-                if ( uiLinesOutput == 0 )
-                    CLogger::LogPrintfNoStamp ( "Unexpected response:\n%s\n", *strResult );
+                if (uiLinesOutput == 0)
+                    CLogger::LogPrintfNoStamp("Unexpected response:\n%s\n", *strResult);
             }
         }
         else
         {
             pOpenPortsTester->m_iPortTestStage = 0;
-            CLogger::LogPrintfNoStamp ( "Port testing service unavailable! (%u %s)\n", iErrorCode, GetDownloadManager()->GetError() );
+            CLogger::LogPrintfNoStamp("Port testing service unavailable! (%u %s)\n", result.iErrorCode, GetDownloadManager()->GetError());
         }
     }
 
     //
     // Get http downloader used for port testing
     //
-    static CNetHTTPDownloadManagerInterface* GetDownloadManager( void )
-    {
-        return g_pNetServer->GetHTTPDownloadManager( EDownloadMode::ASE );
-    }
+    static CNetHTTPDownloadManagerInterface* GetDownloadManager(void) { return g_pNetServer->GetHTTPDownloadManager(EDownloadMode::ASE); }
 
 protected:
-    int                 m_iPortTestStage;
+    int m_iPortTestStage;
 };

@@ -35,5 +35,8 @@ project "XML"
 			copy "mta"
 		}
 	
-	filter {"system:windows", "platforms:x64"}
+	filter "system:not windows"
+		links { "rt" }
+	
+	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))

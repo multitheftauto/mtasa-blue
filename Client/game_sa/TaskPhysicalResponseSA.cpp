@@ -1,35 +1,36 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/TaskPhysicalResponseSA.cpp
-*  PURPOSE:     Physical response game tasks
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/TaskPhysicalResponseSA.cpp
+ *  PURPOSE:     Physical response game tasks
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
 // ##############################################################################
-// ## Name:    CTaskSimpleChoking                                  
+// ## Name:    CTaskSimpleChoking
 // ## Purpose: Make the ped choke
 // ##############################################################################
 
-CTaskSimpleChokingSA::CTaskSimpleChokingSA ( CPed* pAttacker, bool bIsTearGas )
+CTaskSimpleChokingSA::CTaskSimpleChokingSA(CPed* pAttacker, bool bIsTearGas)
 {
-    CPedSA* pAttackerSA = dynamic_cast < CPedSA* > ( pAttacker );
+    CPedSA* pAttackerSA = dynamic_cast<CPedSA*>(pAttacker);
 
     DWORD dwFunc = FUNC_CTaskSimpleChoking__Constructor;
     DWORD dwIsTearGas = bIsTearGas;
 
     // Grab the GTA class for the attacker if any
     CPedSAInterface* pAttackerInterface = NULL;
-    if ( pAttackerSA ) pAttackerInterface = pAttackerSA->GetPedInterface ();
+    if (pAttackerSA)
+        pAttackerInterface = pAttackerSA->GetPedInterface();
 
-    this->CreateTaskInterface ( sizeof ( CTaskSimpleChokingSAInterface ) );
-    if ( !IsValid () ) return;
+    this->CreateTaskInterface(sizeof(CTaskSimpleChokingSAInterface));
+    if (!IsValid())
+        return;
     DWORD dwThisInterface = (DWORD)this->GetInterface();
     _asm
     {
@@ -42,56 +43,51 @@ CTaskSimpleChokingSA::CTaskSimpleChokingSA ( CPed* pAttacker, bool bIsTearGas )
     }
 }
 
-
-CPed* CTaskSimpleChokingSA::GetAttacker ( void )
+CPed* CTaskSimpleChokingSA::GetAttacker(void)
 {
-    CTaskSimpleChokingSAInterface * internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
-    return pGame->GetPools ()->GetPed ( (DWORD*) internalInterface->m_pAttacker );
+    CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
+    return pGame->GetPools()->GetPed((DWORD*)internalInterface->m_pAttacker);
 }
 
-
-unsigned int CTaskSimpleChokingSA::GetTimeRemaining ( void )
+unsigned int CTaskSimpleChokingSA::GetTimeRemaining(void)
 {
-    CTaskSimpleChokingSAInterface * internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
+    CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
     return internalInterface->m_nTimeRemaining;
 }
 
-
-unsigned int CTaskSimpleChokingSA::GetTimeStarted ( void )
+unsigned int CTaskSimpleChokingSA::GetTimeStarted(void)
 {
-    CTaskSimpleChokingSAInterface * internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
+    CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
     return internalInterface->m_nTimeStarted;
 }
 
-
-bool CTaskSimpleChokingSA::IsTeargas ( void )
+bool CTaskSimpleChokingSA::IsTeargas(void)
 {
-    CTaskSimpleChokingSAInterface * internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
+    CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
     return internalInterface->m_bIsTeargas ? true : false;
 }
 
-
-bool CTaskSimpleChokingSA::IsFinished ( void )
+bool CTaskSimpleChokingSA::IsFinished(void)
 {
-    CTaskSimpleChokingSAInterface * internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
+    CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
     return internalInterface->m_bIsFinished;
 }
 
-
-void CTaskSimpleChokingSA::UpdateChoke ( CPed* pPed, CPed* pAttacker, bool bIsTearGas )
+void CTaskSimpleChokingSA::UpdateChoke(CPed* pPed, CPed* pAttacker, bool bIsTearGas)
 {
     // Get game interfaces
-    CPedSA* pPedSA = dynamic_cast < CPedSA* > ( pPed );
-    if ( !pPedSA ) return;
+    CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
+    if (!pPedSA)
+        return;
 
-    CPedSAInterface* pPedInterface = pPedSA->GetPedInterface ();
+    CPedSAInterface* pPedInterface = pPedSA->GetPedInterface();
 
     CPedSAInterface* pAttackerInterface = NULL;
-    if ( pAttacker )
+    if (pAttacker)
     {
-        CPedSA* pAttackerSA = dynamic_cast < CPedSA* > ( pAttacker );
-        if ( pAttackerSA )
-            pAttackerInterface = pAttackerSA->GetPedInterface ();
+        CPedSA* pAttackerSA = dynamic_cast<CPedSA*>(pAttacker);
+        if (pAttackerSA)
+            pAttackerInterface = pAttackerSA->GetPedInterface();
     }
 
     // Call the func
@@ -106,4 +102,3 @@ void CTaskSimpleChokingSA::UpdateChoke ( CPed* pPed, CPed* pAttacker, bool bIsTe
         call        dwFunc
     }
 }
-

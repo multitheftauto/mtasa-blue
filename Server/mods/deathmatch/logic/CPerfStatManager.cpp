@@ -1,18 +1,17 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CPerfStatManager.cpp
-*  PURPOSE:     Performance stats manager class
-*  DEVELOPERS:  Mr OCD
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CPerfStatManager.cpp
+ *  PURPOSE:     Performance stats manager class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-std::unique_ptr<SStatData> g_pStats(new SStatData ());
+std::unique_ptr<SStatData> g_pStats(new SStatData());
 
 ///////////////////////////////////////////////////////////////
 //
@@ -23,24 +22,23 @@ std::unique_ptr<SStatData> g_pStats(new SStatData ());
 class CPerfStatManagerImpl : public CPerfStatManager
 {
 public:
-                                CPerfStatManagerImpl       ( void );
-    virtual                     ~CPerfStatManagerImpl      ( void );
+    CPerfStatManagerImpl(void);
+    virtual ~CPerfStatManagerImpl(void);
 
     // CPerfStatManager
-    virtual void                DoPulse                     ( void );
-    virtual void                GetStats                    ( CPerfStatResult* pOutResult, const SString& strCategory, const SString& strOptions, const SString& strFilter );
-    virtual void                Stop                        ( void );
+    virtual void DoPulse(void);
+    virtual void GetStats(CPerfStatResult* pOutResult, const SString& strCategory, const SString& strOptions, const SString& strFilter);
+    virtual void Stop(void);
 
     // CPerfStatManagerImpl
-    void                        AddModule                   ( CPerfStatModule* pModule );
-    void                        RemoveModule                ( CPerfStatModule* pModule );
-    uint                        GetModuleCount              ( void );
-    CPerfStatModule*            GetModuleByIndex            ( uint uiIndex );
-    CPerfStatModule*            GetModuleByCategoryName     ( const SString& strCategory );
+    void             AddModule(CPerfStatModule* pModule);
+    void             RemoveModule(CPerfStatModule* pModule);
+    uint             GetModuleCount(void);
+    CPerfStatModule* GetModuleByIndex(uint uiIndex);
+    CPerfStatModule* GetModuleByCategoryName(const SString& strCategory);
 
-    std::vector < CPerfStatModule* >    m_ModuleList;
+    std::vector<CPerfStatModule*> m_ModuleList;
 };
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -51,17 +49,42 @@ public:
 ///////////////////////////////////////////////////////////////
 static std::unique_ptr<CPerfStatManagerImpl> g_pPerfStatManagerImp;
 
-CPerfStatManager* CPerfStatManager::GetSingleton ( void )
+CPerfStatManager* CPerfStatManager::GetSingleton(void)
 {
     // If we're stopping the server, do not create a PerfStatManager just to destroy it
-    if ( g_pGame->IsBeingDeleted () )
+    if (g_pGame->IsBeingDeleted())
         return NULL;
 
-    if ( !g_pPerfStatManagerImp )
-        g_pPerfStatManagerImp.reset(new CPerfStatManagerImpl ());
+    if (!g_pPerfStatManagerImp)
+        g_pPerfStatManagerImp.reset(new CPerfStatManagerImpl());
     return g_pPerfStatManagerImp.get();
 }
 
+///////////////////////////////////////////////////////////////
+//
+// CPerfStatManagerImpl::CPerfStatManagerImpl
+//
+//
+//
+///////////////////////////////////////////////////////////////
+CPerfStatManagerImpl::CPerfStatManagerImpl(void)
+{
+    AddModule(CPerfStatLuaTiming::GetSingleton());
+    AddModule(CPerfStatLuaMemory::GetSingleton());
+    AddModule(CPerfStatLibMemory::GetSingleton());
+    AddModule(CPerfStatPacketUsage::GetSingleton());
+    AddModule(CPerfStatRPCPacketUsage::GetSingleton());
+    AddModule(CPerfStatEventPacketUsage::GetSingleton());
+    AddModule(CPerfStatPlayerPacketUsage::GetSingleton());
+    AddModule(CPerfStatSqliteTiming::GetSingleton());
+    AddModule(CPerfStatBandwidthReduction::GetSingleton());
+    AddModule(CPerfStatBandwidthUsage::GetSingleton());
+    AddModule(CPerfStatServerInfo::GetSingleton());
+    AddModule(CPerfStatServerTiming::GetSingleton());
+    AddModule(CPerfStatFunctionTiming::GetSingleton());
+    AddModule(CPerfStatDebugInfo::GetSingleton());
+    AddModule(CPerfStatDebugTable::GetSingleton());
+}
 
 ///////////////////////////////////////////////////////////////
 //
@@ -70,37 +93,9 @@ CPerfStatManager* CPerfStatManager::GetSingleton ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatManagerImpl::CPerfStatManagerImpl ( void )
-{
-    AddModule ( CPerfStatLuaTiming::GetSingleton () );
-    AddModule ( CPerfStatLuaMemory::GetSingleton () );
-    AddModule ( CPerfStatLibMemory::GetSingleton () );
-    AddModule ( CPerfStatPacketUsage::GetSingleton () );
-    AddModule ( CPerfStatRPCPacketUsage::GetSingleton () );
-    AddModule ( CPerfStatEventPacketUsage::GetSingleton () );
-    AddModule ( CPerfStatPlayerPacketUsage::GetSingleton () );
-    AddModule ( CPerfStatSqliteTiming::GetSingleton () );
-    AddModule ( CPerfStatBandwidthReduction::GetSingleton () );
-    AddModule ( CPerfStatBandwidthUsage::GetSingleton () );
-    AddModule ( CPerfStatServerInfo::GetSingleton () );
-    AddModule ( CPerfStatServerTiming::GetSingleton () );
-    AddModule ( CPerfStatFunctionTiming::GetSingleton () );
-    AddModule ( CPerfStatDebugInfo::GetSingleton () );
-    AddModule ( CPerfStatDebugTable::GetSingleton () );
-}
-
-
-///////////////////////////////////////////////////////////////
-//
-// CPerfStatManagerImpl::CPerfStatManagerImpl
-//
-//
-//
-///////////////////////////////////////////////////////////////
-CPerfStatManagerImpl::~CPerfStatManagerImpl ( void )
+CPerfStatManagerImpl::~CPerfStatManagerImpl(void)
 {
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -109,12 +104,11 @@ CPerfStatManagerImpl::~CPerfStatManagerImpl ( void )
 // Stops all modules by invoking Stop() on all modules
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManagerImpl::Stop ( void )
+void CPerfStatManagerImpl::Stop(void)
 {
-    for ( auto const& module : m_ModuleList )
-        module->Stop ();
+    for (auto const& module : m_ModuleList)
+        module->Stop();
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -123,14 +117,13 @@ void CPerfStatManagerImpl::Stop ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManagerImpl::AddModule ( CPerfStatModule* pModule )
+void CPerfStatManagerImpl::AddModule(CPerfStatModule* pModule)
 {
-    if ( !ListContains ( m_ModuleList, pModule ) )
+    if (!ListContains(m_ModuleList, pModule))
     {
-        m_ModuleList.push_back ( pModule );
+        m_ModuleList.push_back(pModule);
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -139,11 +132,10 @@ void CPerfStatManagerImpl::AddModule ( CPerfStatModule* pModule )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManagerImpl::RemoveModule ( CPerfStatModule* pModule )
+void CPerfStatManagerImpl::RemoveModule(CPerfStatModule* pModule)
 {
-    ListRemove ( m_ModuleList, pModule );
+    ListRemove(m_ModuleList, pModule);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -152,11 +144,10 @@ void CPerfStatManagerImpl::RemoveModule ( CPerfStatModule* pModule )
 //
 //
 ///////////////////////////////////////////////////////////////
-uint CPerfStatManagerImpl::GetModuleCount ( void )
+uint CPerfStatManagerImpl::GetModuleCount(void)
 {
-    return m_ModuleList.size ();
+    return m_ModuleList.size();
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -165,13 +156,12 @@ uint CPerfStatManagerImpl::GetModuleCount ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatModule* CPerfStatManagerImpl::GetModuleByIndex ( uint uiIndex )
+CPerfStatModule* CPerfStatManagerImpl::GetModuleByIndex(uint uiIndex)
 {
-    if ( uiIndex < m_ModuleList.size () )
-        return m_ModuleList[ uiIndex ];
+    if (uiIndex < m_ModuleList.size())
+        return m_ModuleList[uiIndex];
     return NULL;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -180,17 +170,16 @@ CPerfStatModule* CPerfStatManagerImpl::GetModuleByIndex ( uint uiIndex )
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatModule* CPerfStatManagerImpl::GetModuleByCategoryName ( const SString& strCategory )
+CPerfStatModule* CPerfStatManagerImpl::GetModuleByCategoryName(const SString& strCategory)
 {
-    for ( uint i = 0 ; i < GetModuleCount () ; i++ )
+    for (uint i = 0; i < GetModuleCount(); i++)
     {
-        CPerfStatModule* pModule = GetModuleByIndex ( i );
-        if ( pModule->GetCategoryName () == strCategory )
+        CPerfStatModule* pModule = GetModuleByIndex(i);
+        if (pModule->GetCategoryName() == strCategory)
             return pModule;
     }
     return NULL;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -199,15 +188,14 @@ CPerfStatModule* CPerfStatManagerImpl::GetModuleByCategoryName ( const SString& 
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManagerImpl::DoPulse ( void )
+void CPerfStatManagerImpl::DoPulse(void)
 {
-    for ( uint i = 0 ; i < GetModuleCount () ; i++ )
+    for (uint i = 0; i < GetModuleCount(); i++)
     {
-        CPerfStatModule* pModule = GetModuleByIndex ( i );
-        pModule->DoPulse ();
+        CPerfStatModule* pModule = GetModuleByIndex(i);
+        pModule->DoPulse();
     }
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -216,54 +204,53 @@ void CPerfStatManagerImpl::DoPulse ( void )
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManagerImpl::GetStats ( CPerfStatResult* pResult, const SString& strCategory, const SString& strOptions, const SString& strFilter )
+void CPerfStatManagerImpl::GetStats(CPerfStatResult* pResult, const SString& strCategory, const SString& strOptions, const SString& strFilter)
 {
-    pResult->Clear ();
+    pResult->Clear();
 
-    if ( strCategory == "" )
+    if (strCategory == "")
     {
         // List all modules
-        pResult->AddColumn ( "Categories" );
-        for ( uint i = 0 ; i < GetModuleCount () ; i++ )
+        pResult->AddColumn("Categories");
+        for (uint i = 0; i < GetModuleCount(); i++)
         {
-            CPerfStatModule* pModule = GetModuleByIndex ( i );
-            pResult->AddRow ()[0] = pModule->GetCategoryName ();
+            CPerfStatModule* pModule = GetModuleByIndex(i);
+            pResult->AddRow()[0] = pModule->GetCategoryName();
         }
-        pResult->AddRow ()[0] ="Help";
+        pResult->AddRow()[0] = "Help";
         return;
     }
 
     // Handle help
-    if ( strCategory == "Help" )
+    if (strCategory == "Help")
     {
-        pResult->AddColumn ( "Help" );
-        pResult->AddRow ()[0] ="Comma separate multiple options";
-        pResult->AddRow ()[0] ="Type h in options and select a category to see help for that category";
+        pResult->AddColumn("Help");
+        pResult->AddRow()[0] = "Comma separate multiple options";
+        pResult->AddRow()[0] = "Type h in options and select a category to see help for that category";
         return;
     }
 
     // Put options in a map
-    std::map < SString, int > strOptionMap;
+    std::map<SString, int> strOptionMap;
     {
-        std::vector < SString > strParts;
-        strOptions.Split ( ",", strParts );
-        for ( unsigned int i = 0 ; i < strParts.size (); i++ )
-            MapSet ( strOptionMap, strParts[i], 1 );
+        std::vector<SString> strParts;
+        strOptions.Split(",", strParts);
+        for (unsigned int i = 0; i < strParts.size(); i++)
+            MapSet(strOptionMap, strParts[i], 1);
     }
 
     // Find module
-    CPerfStatModule* pModule = GetModuleByCategoryName ( strCategory );
-    if ( !pModule )
+    CPerfStatModule* pModule = GetModuleByCategoryName(strCategory);
+    if (!pModule)
     {
-        pResult->AddColumn ( "Error" );
-        pResult->AddRow ()[0] = "Error: Unknown category '" + strCategory + "'";
+        pResult->AddColumn("Error");
+        pResult->AddRow()[0] = "Error: Unknown category '" + strCategory + "'";
         return;
     }
 
     // Get stats from module
-    pModule->GetStats ( pResult, strOptionMap, strFilter );
+    pModule->GetStats(pResult, strOptionMap, strFilter);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -272,23 +259,22 @@ void CPerfStatManagerImpl::GetStats ( CPerfStatResult* pResult, const SString& s
 //
 //
 ///////////////////////////////////////////////////////////////
-SString CPerfStatManager::GetScaledByteString ( long long Amount )
+SString CPerfStatManager::GetScaledByteString(long long Amount)
 {
-    if ( Amount > 1024LL * 1024 * 1024 * 1024 )
-        return SString ( "%.2f TB", Amount / ( 1024.0 * 1024 * 1024 * 1024 ) );
+    if (Amount > 1024LL * 1024 * 1024 * 1024)
+        return SString("%.2f TB", Amount / (1024.0 * 1024 * 1024 * 1024));
 
-    if ( Amount > 1024LL * 1024 * 1024 )
-        return SString ( "%.2f GB", Amount / ( 1024.0 * 1024 * 1024 ) );
+    if (Amount > 1024LL * 1024 * 1024)
+        return SString("%.2f GB", Amount / (1024.0 * 1024 * 1024));
 
-    if ( Amount > 1024 * 1024 )
-        return SString ( "%.2f MB", Amount / ( 1024.0 * 1024 ) );
+    if (Amount > 1024 * 1024)
+        return SString("%.2f MB", Amount / (1024.0 * 1024));
 
-    if ( Amount > 1024 )
-        return SString ( "%.2f KB", Amount / ( 1024.0 ) );
+    if (Amount > 1024)
+        return SString("%.2f KB", Amount / (1024.0));
 
-    return SString ( "%d", Amount );
+    return SString("%d", Amount);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -297,23 +283,22 @@ SString CPerfStatManager::GetScaledByteString ( long long Amount )
 //
 //
 ///////////////////////////////////////////////////////////////
-SString CPerfStatManager::GetScaledBitString ( long long Amount )
+SString CPerfStatManager::GetScaledBitString(long long Amount)
 {
-    if ( Amount > 1024LL * 1024 * 1024 * 1024 )
-        return SString ( "%.2f Tbit", Amount / ( 1024.0 * 1024 * 1024 * 1024 ) );
+    if (Amount > 1024LL * 1024 * 1024 * 1024)
+        return SString("%.2f Tbit", Amount / (1024.0 * 1024 * 1024 * 1024));
 
-    if ( Amount > 1024LL * 1024 * 1024 )
-        return SString ( "%.2f Gbit", Amount / ( 1024.0 * 1024 * 1024 ) );
+    if (Amount > 1024LL * 1024 * 1024)
+        return SString("%.2f Gbit", Amount / (1024.0 * 1024 * 1024));
 
-    if ( Amount > 1024 * 1024 )
-        return SString ( "%.2f Mbit", Amount / ( 1024.0 * 1024 ) );
+    if (Amount > 1024 * 1024)
+        return SString("%.2f Mbit", Amount / (1024.0 * 1024));
 
-    if ( Amount > 1024 )
-        return SString ( "%.2f kbit", Amount / ( 1024.0 ) );
+    if (Amount > 1024)
+        return SString("%.2f kbit", Amount / (1024.0));
 
-    return SString ( "%d bit", Amount );
+    return SString("%d bit", Amount);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -322,17 +307,16 @@ SString CPerfStatManager::GetScaledBitString ( long long Amount )
 //
 //
 ///////////////////////////////////////////////////////////////
-SString CPerfStatManager::GetScaledFloatString ( float fValue )
+SString CPerfStatManager::GetScaledFloatString(float fValue)
 {
-    if ( fValue < 1 )
-        return SString ( "%.2f", fValue );      // 0.00 to 0.99
+    if (fValue < 1)
+        return SString("%.2f", fValue);            // 0.00 to 0.99
 
-    if ( fValue < 5 )
-        return SString ( "%.1f", fValue );      // 1.0 to 4.9
+    if (fValue < 5)
+        return SString("%.1f", fValue);            // 1.0 to 4.9
 
-    return SString ( "%.0f", fValue );          // 5 to inf. and beyond
+    return SString("%.0f", fValue);            // 5 to inf. and beyond
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -341,12 +325,11 @@ SString CPerfStatManager::GetScaledFloatString ( float fValue )
 // Calculate per second rate
 //
 ///////////////////////////////////////////////////////////////
-long long CPerfStatManager::GetPerSecond ( long long llValue, long long llDeltaTickCount )
+long long CPerfStatManager::GetPerSecond(long long llValue, long long llDeltaTickCount)
 {
-    llDeltaTickCount = Max( 1LL, llDeltaTickCount );
-    return ( llValue * 1000LL + ( llDeltaTickCount / 2 ) ) / llDeltaTickCount;
+    llDeltaTickCount = std::max(1LL, llDeltaTickCount);
+    return (llValue * 1000LL + (llDeltaTickCount / 2)) / llDeltaTickCount;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -355,12 +338,11 @@ long long CPerfStatManager::GetPerSecond ( long long llValue, long long llDeltaT
 // Calculate per second rate in-place
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManager::ToPerSecond ( long long& llValue, long long llDeltaTickCount )
+void CPerfStatManager::ToPerSecond(long long& llValue, long long llDeltaTickCount)
 {
-    llDeltaTickCount = Max( 1LL, llDeltaTickCount );
-    llValue = ( llValue * 1000LL + ( llDeltaTickCount / 2 ) ) / llDeltaTickCount;
+    llDeltaTickCount = std::max(1LL, llDeltaTickCount);
+    llValue = (llValue * 1000LL + (llDeltaTickCount / 2)) / llDeltaTickCount;
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -369,13 +351,12 @@ void CPerfStatManager::ToPerSecond ( long long& llValue, long long llDeltaTickCo
 // Calculate per second rate with slightly better precision
 //
 ///////////////////////////////////////////////////////////////
-SString CPerfStatManager::GetPerSecondString ( long long llValue, double dDeltaTickCount )
+SString CPerfStatManager::GetPerSecondString(long long llValue, double dDeltaTickCount)
 {
-    dDeltaTickCount = Max( 1.0, dDeltaTickCount );
+    dDeltaTickCount = std::max(1.0, dDeltaTickCount);
     double dValue = llValue * 1000 / dDeltaTickCount;
-    return SString ( dValue < 5 ? "%1.1f" : "%1.0f", dValue );
+    return SString(dValue < 5 ? "%1.1f" : "%1.0f", dValue);
 }
-
 
 ///////////////////////////////////////////////////////////////
 //
@@ -384,14 +365,14 @@ SString CPerfStatManager::GetPerSecondString ( long long llValue, double dDeltaT
 //
 //
 ///////////////////////////////////////////////////////////////
-SString CPerfStatManager::GetPercentString ( long long llValue, long long llTotal )
+SString CPerfStatManager::GetPercentString(long long llValue, long long llTotal)
 {
-    llTotal = Max ( 1LL, llTotal );
+    llTotal = std::max(1LL, llTotal);
     double dValue = llValue * 100 / (double)llTotal;
-    dValue = Clamp ( 0.0, dValue, 100.0 );
-    if ( dValue < 1 )
-        return SString ( "%1.2f %%", dValue );
-    if ( dValue < 5 )
-        return SString ( "%1.1f %%", dValue );
-    return SString ( "%1.0f %%", dValue );
+    dValue = Clamp(0.0, dValue, 100.0);
+    if (dValue < 1)
+        return SString("%1.2f %%", dValue);
+    if (dValue < 5)
+        return SString("%1.1f %%", dValue);
+    return SString("%1.0f %%", dValue);
 }

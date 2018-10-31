@@ -1,18 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CMarker.h
-*  PURPOSE:     Marker entity class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CMarker.h
+ *  PURPOSE:     Marker entity class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CMARKER_H
-#define __CMARKER_H
+#pragma once
 
 #include <CVector.h>
 #include "CColCallback.h"
@@ -45,48 +42,49 @@ public:
     };
 
 public:
-                            CMarker                 ( class CMarkerManager* pMarkerManager, CColManager* pColManager, CElement* pParent, CXMLNode* pNode );
-                            ~CMarker                ( void );
+    CMarker(class CMarkerManager* pMarkerManager, CColManager* pColManager, CElement* pParent);
+    ~CMarker(void);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
-    void                    Unlink                  ( void );
-    bool                    ReadSpecialData         ( void );
+    void Unlink(void);
 
-    inline bool             HasTarget               ( void )                                        { return m_bHasTarget; };
-    inline const CVector&   GetTarget               ( void )                                        { return m_vecTarget; };
-    inline unsigned char    GetMarkerType           ( void )                                        { return m_ucType; };
-    inline float            GetSize                 ( void )                                        { return m_fSize; };
-    inline SColor           GetColor                ( void ) const                                  { return m_Color; };
-    inline unsigned char    GetIcon                 ( void )                                        { return m_ucIcon; }
-    
-    void                    SetPosition             ( const CVector& vecPosition );
-    void                    SetTarget               ( const CVector* pTargetVector );
-    void                    SetMarkerType           ( unsigned char ucType );
-    void                    SetSize                 ( float fSize );
-    void                    SetColor                ( const SColor color );
+    bool           HasTarget(void) { return m_bHasTarget; };
+    const CVector& GetTarget(void) { return m_vecTarget; };
+    unsigned char  GetMarkerType(void) { return m_ucType; };
+    float          GetSize(void) { return m_fSize; };
+    SColor         GetColor(void) const { return m_Color; };
+    unsigned char  GetIcon(void) { return m_ucIcon; }
 
-    void                    SetIcon                 ( unsigned char ucIcon );
+    void SetPosition(const CVector& vecPosition);
+    void SetTarget(const CVector* pTargetVector);
+    void SetMarkerType(unsigned char ucType);
+    void SetSize(float fSize);
+    void SetColor(const SColor color);
 
-    inline CColShape*       GetColShape             ( void )    { return m_pCollision; }
+    void SetIcon(unsigned char ucIcon);
 
-    virtual CSphere         GetWorldBoundingSphere  ( void );
+    CColShape* GetColShape(void) { return m_pCollision; }
+
+    virtual CSphere GetWorldBoundingSphere(void);
+
+protected:
+    bool ReadSpecialData(const int iLine) override;
 
 private:
-    void                    Callback_OnCollision    ( CColShape& Shape, CElement& Element );
-    void                    Callback_OnLeave        ( CColShape& Shape, CElement& Element );
-    void                    Callback_OnCollisionDestroy ( CColShape* pShape );
+    void Callback_OnCollision(CColShape& Shape, CElement& Element);
+    void Callback_OnLeave(CColShape& Shape, CElement& Element);
+    void Callback_OnCollisionDestroy(CColShape* pShape);
 
-    void                    UpdateCollisionObject   ( unsigned char ucOldType );
+    void UpdateCollisionObject(unsigned char ucOldType);
 
-    class CMarkerManager*   m_pMarkerManager;
-    CColManager*            m_pColManager;
-    bool                    m_bHasTarget;
-    CVector                 m_vecTarget;
-    unsigned char           m_ucType;
-    float                   m_fSize;
-    SColor                  m_Color;
-    unsigned char           m_ucIcon;
+    class CMarkerManager* m_pMarkerManager;
+    CColManager*          m_pColManager;
+    bool                  m_bHasTarget;
+    CVector               m_vecTarget;
+    unsigned char         m_ucType;
+    float                 m_fSize;
+    SColor                m_Color;
+    unsigned char         m_ucIcon;
 
-    CColShape*              m_pCollision;
+    CColShape* m_pCollision;
 };
-
-#endif

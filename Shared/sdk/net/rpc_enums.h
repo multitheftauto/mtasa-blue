@@ -1,20 +1,24 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        Shared/sdk/net/rpc_enums.h
-*  PURPOSE:     Lua common functions
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*               Alberto Alonso <rydencillo@gmail.com>
-*               Florian Busse <flobu@gmx.net>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Shared/sdk/net/rpc_enums.h
+ *  PURPOSE:     Lua RPC enums
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #pragma once
 
+/*
+    HEY, YOU!
+
+    ONLY ADD ENUMS TO THE END OF THIS FILE,
+    ABOVE `NUM_RPC_FUNCS`.
+
+    THANKS.
+*/
 enum eElementRPCFunctions
 {
     DONT_USE_0 = 0,
@@ -36,14 +40,14 @@ enum eElementRPCFunctions
     SET_ELEMENT_HEALTH,
     SET_ELEMENT_MODEL,
     SET_ELEMENT_ATTACHED_OFFSETS,
-    
-    SET_PLAYER_MONEY,            
+
+    SET_PLAYER_MONEY,
     SHOW_PLAYER_HUD_COMPONENT,
     FORCE_PLAYER_MAP,
     SET_PLAYER_NAMETAG_TEXT,
     REMOVE_PLAYER_NAMETAG_COLOR,
     SET_PLAYER_NAMETAG_COLOR,
-    SET_PLAYER_NAMETAG_SHOWING,                 
+    SET_PLAYER_NAMETAG_SHOWING,
 
     SET_PED_ARMOR,
     SET_PED_ROTATION,
@@ -243,7 +247,7 @@ enum eElementRPCFunctions
     SET_WEAPON_OWNER,
 
     SET_AIRCRAFT_MAXVELOCITY,
-    
+
     RESET_MOON_SIZE,
     SET_MOON_SIZE,
 
@@ -253,5 +257,11 @@ enum eElementRPCFunctions
     SET_TRAIN_TRACK,
     SET_TRAIN_POSITION,
 
-    NUM_RPC_FUNCS
+    SET_OBJECT_VISIBLE_IN_ALL_DIMENSIONS,
+
+    SET_ELEMENT_ANGULAR_VELOCITY,
+
+    SET_PED_ANIMATION_SPEED,
+
+    NUM_RPC_FUNCS // Add above this line
 };

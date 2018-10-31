@@ -1,26 +1,23 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        multiplayer_sa/multiplayer_hooksystem.h
-*  PURPOSE:     Multiplayer module hook system methods
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        multiplayer_sa/multiplayer_hooksystem.h
+ *  PURPOSE:     Multiplayer module hook system methods
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "multiplayersa_init.h"
 
-#ifndef __MULTIPLAYER_HOOKSYSTEM_INIT
-#define __MULTIPLAYER_HOOKSYSTEM_INIT
+#pragma once
 
-VOID HookInstallMethod( DWORD dwInstallAddress, DWORD dwHookFunction );
-VOID HookInstallCall( DWORD dwInstallAddress, DWORD dwHookFunction );
-BOOL HookInstall( DWORD dwInstallAddress, DWORD dwHookHandler, int iJmpCodeSize );
-BYTE * CreateJump ( DWORD dwFrom, DWORD dwTo, BYTE * ByteArray );
-VOID HookCheckOriginalByte( DWORD dwInstallAddress, uchar ucExpectedValue );
+VOID  HookInstallMethod(DWORD dwInstallAddress, DWORD dwHookFunction);
+VOID  HookInstallCall(DWORD dwInstallAddress, DWORD dwHookFunction);
+BOOL  HookInstall(DWORD dwInstallAddress, DWORD dwHookHandler, int iJmpCodeSize);
+BYTE* CreateJump(DWORD dwFrom, DWORD dwTo, BYTE* ByteArray);
+VOID  HookCheckOriginalByte(DWORD dwInstallAddress, uchar ucExpectedValue);
 
 // Auto detect requirement of US/EU hook installation
 #define EZHookInstall(type) \
@@ -39,7 +36,6 @@ VOID HookCheckOriginalByte( DWORD dwInstallAddress, uchar ucExpectedValue );
                 EZHookInstall_HERE( type, EU ) \
             } \
         }
-
 
 // US/EU hook installation
 // Includes additional return pointer copies if required
@@ -62,7 +58,6 @@ VOID HookCheckOriginalByte( DWORD dwInstallAddress, uchar ucExpectedValue );
             RETURN_##type##C_BOTH = RETURN_##type##C_##CO##; \
         }
 
-
 // Check original byte before hooking
 #define EZHookInstallChecked(type) \
         __if_not_exists( RETURN_##type##_US ) \
@@ -82,24 +77,23 @@ VOID HookCheckOriginalByte( DWORD dwInstallAddress, uchar ucExpectedValue );
         } \
         EZHookInstall( type )
 
-
 // Structure for holding hook info
 struct SHookInfo
 {
-    template < class T > SHookInfo ( DWORD dwAddress, T dwHook, uint uiSize ): dwAddress ( dwAddress ) , dwHook ( (DWORD)dwHook ) , uiSize ( uiSize ) {}
+    template <class T>
+    SHookInfo(DWORD dwAddress, T dwHook, uint uiSize) : dwAddress(dwAddress), dwHook((DWORD)dwHook), uiSize(uiSize)
+    {
+    }
     DWORD dwAddress;
     DWORD dwHook;
-    uint uiSize;
+    uint  uiSize;
 };
 
 #define MAKE_HOOK_INFO(type)  SHookInfo ( HOOKPOS_##type, HOOK_##type, HOOKSIZE_##type )
-
 
 // Structure for holding poke info
 struct SPokeInfo
 {
     DWORD dwAddress;
-    BYTE ucValue;
+    BYTE  ucValue;
 };
-
-#endif

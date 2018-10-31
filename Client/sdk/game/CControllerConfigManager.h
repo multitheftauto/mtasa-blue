@@ -1,19 +1,18 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/game/CControllerConfigManager.h
-*  PURPOSE:     Controller configuration manager interface
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/game/CControllerConfigManager.h
+ *  PURPOSE:     Controller configuration manager interface
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CGAME_CONTROLLER_CONFIG_MANAGER
-#define __CGAME_CONTROLLER_CONFIG_MANAGER
+#pragma once
 
 // FROM VC, unlikely that they were changed though
-#define GTA_KEY_NO_MOUSE_BUTTON 0   
+#define GTA_KEY_NO_MOUSE_BUTTON 0
 #define GTA_KEY_LMOUSE          1
 #define GTA_KEY_MMOUSE          2
 #define GTA_KEY_RMOUSE          3
@@ -117,7 +116,7 @@
 #define GTA_KEY_RETURN          1045    /* Enter on main keyboard */
 #define GTA_KEY_LSHIFT          1046
 #define GTA_KEY_RSHIFT          1047
-#define GTA_KEY_LCONTROL        1049    
+#define GTA_KEY_LCONTROL        1049
 #define GTA_KEY_RCONTROL        1050
 #define GTA_KEY_LMENU           1051    /* left Alt */
 #define GTA_KEY_RMENU           1052    /* right Alt */
@@ -133,7 +132,7 @@ FROM VC:
 #define JOY_STICK               3
 */
 
-enum eControllerType 
+enum eControllerType
 {
     KEYBOARD = 0,
     OPTIONAL_EXTRA,
@@ -144,7 +143,7 @@ enum eControllerType
 enum eControllerAction
 {
     FIRE = 0,
-    
+
     NEXT_WEAPON = 2,
     PREVIOUS_WEAPON,
     FORWARDS,
@@ -175,7 +174,7 @@ enum eControllerAction
     HORN,
     SUB_MISSION,
     HANDBRAKE,
-    
+
     VEHICLE_LOOK_LEFT = 0x22,
     VEHICLE_LOOK_RIGHT,
     VEHICLE_LOOK_BEHIND,
@@ -196,16 +195,15 @@ enum eControllerAction
 class CControllerConfigManager
 {
 public:
-    virtual void                SetControllerKeyAssociatedWithAction ( eControllerAction action, int iKey, eControllerType controllerType )=0;
-    virtual int                 GetControllerKeyAssociatedWithAction ( eControllerAction action, eControllerType controllerType )=0;
-    virtual void                SetClassicControls ( bool bClassicControls ) = 0;
-    virtual void                SetMouseInverted ( bool bInverted ) = 0;
-    virtual void                SetFlyWithMouse ( bool bFlyWithMouse ) = 0;
-    virtual void                SetSteerWithMouse ( bool bSteerWithMouse ) = 0;
-    virtual void                SuspendSteerAndFlyWithMouse ( bool bSuspend ) = 0;
-    virtual float               GetVerticalAimSensitivity         ( void ) = 0;
-    virtual void                SetVerticalAimSensitivity         ( float fSensitivity ) = 0;
-    virtual float               GetVerticalAimSensitivityRawValue ( void ) = 0;
-    virtual void                SetVerticalAimSensitivityRawValue ( float fRawValue ) = 0;
+    virtual void  SetControllerKeyAssociatedWithAction(eControllerAction action, int iKey, eControllerType controllerType) = 0;
+    virtual int   GetControllerKeyAssociatedWithAction(eControllerAction action, eControllerType controllerType) = 0;
+    virtual void  SetClassicControls(bool bClassicControls) = 0;
+    virtual void  SetMouseInverted(bool bInverted) = 0;
+    virtual void  SetFlyWithMouse(bool bFlyWithMouse) = 0;
+    virtual void  SetSteerWithMouse(bool bSteerWithMouse) = 0;
+    virtual void  SuspendSteerAndFlyWithMouse(bool bSuspend) = 0;
+    virtual float GetVerticalAimSensitivity(void) = 0;
+    virtual void  SetVerticalAimSensitivity(float fSensitivity) = 0;
+    virtual float GetVerticalAimSensitivityRawValue(void) = 0;
+    virtual void  SetVerticalAimSensitivityRawValue(float fRawValue) = 0;
 };
-#endif

@@ -37,6 +37,8 @@
 
 namespace google_breakpad {
 
+struct MicrodumpExtraInfo;
+
 // Writes a microdump (a reduced dump containing only the state of the crashing
 // thread) on the console (logcat on Android). These functions do not malloc nor
 // use libc functions which may. Thus, it can be used in contexts where the
@@ -56,8 +58,7 @@ bool WriteMicrodump(pid_t crashing_process,
                     const void* blob,
                     size_t blob_size,
                     const MappingList& mappings,
-                    const char* build_fingerprint,
-                    const char* product_info);
+                    const MicrodumpExtraInfo& microdump_extra_info);
 
 }  // namespace google_breakpad
 

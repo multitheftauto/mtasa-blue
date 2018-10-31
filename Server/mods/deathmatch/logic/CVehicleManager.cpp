@@ -1,35 +1,30 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CVehicleManager.cpp
-*  PURPOSE:     Vehicle entity manager class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*               Alberto Alonso <rydencillo@gmail.com>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CVehicleManager.cpp
+ *  PURPOSE:     Vehicle entity manager class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-static const SFixedArray < unsigned char, 212 > g_ucMaxPassengers = { {
-                                       3, 1, 1, 1, 3, 3, 0, 1, 1, 3, 1, 1, 1, 3, 1, 1,              // 400->415
-                                       3, 1, 3, 1, 3, 3, 1, 1, 1, 0, 3, 3, 3, 1, 0, 8,              // 416->431
-                                       0, 1, 1, 255, 1, 8, 3, 1, 3, 0, 1, 1, 1, 3, 0, 1,            // 432->447
-                                       0, 1, 255, 1, 0, 0, 0, 1, 1, 1, 3, 3, 1, 1, 1,               // 448->462
-                                       1, 1, 1, 3, 3, 1, 1, 3, 1, 0, 0, 1, 1, 0, 1, 1,              // 463->478
-                                       3, 1, 0, 3, 1, 0, 0, 0, 3, 1, 1, 3, 1, 3, 0, 1,              // 479->494
-                                       1, 1, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 0, 0,              // 495->510
-                                       1, 0, 0, 1, 1, 3, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,              // 511->526
-                                       1, 1, 3, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 3, 1,                 // 527->541
-                                       1, 1, 1, 1, 3, 3, 1, 1, 3, 3, 1, 0, 1, 1, 1, 1,              // 542->557
-                                       1, 1, 3, 3, 1, 1, 0, 1, 3, 3, 0, 255, 1, 0, 0,               // 558->572
-                                       1, 0, 1, 1, 1, 1, 3, 3, 1, 3, 0, 255, 3, 1, 1, 1,            // 573->588
-                                       1, 255, 255, 1, 1, 1, 0, 3, 3, 3, 1, 1, 1, 1, 1,             // 589->604
-                                       3, 1, 255, 255, 255, 3, 255, 255 } };                          // 605->611
-
+static const SFixedArray<unsigned char, 212> g_ucMaxPassengers = {{3, 1,   1,   1,   3,   3, 0,   1,  1, 3, 1, 1,   1, 3, 1, 1,            // 400->415
+                                                                   3, 1,   3,   1,   3,   3, 1,   1,  1, 0, 3, 3,   3, 1, 0, 8,            // 416->431
+                                                                   0, 1,   1,   255, 1,   8, 3,   1,  3, 0, 1, 1,   1, 3, 0, 1,            // 432->447
+                                                                   0, 1,   255, 1,   0,   0, 0,   1,  1, 1, 3, 3,   1, 1, 1,               // 448->462
+                                                                   1, 1,   1,   3,   3,   1, 1,   3,  1, 0, 0, 1,   1, 0, 1, 1,            // 463->478
+                                                                   3, 1,   0,   3,   1,   0, 0,   0,  3, 1, 1, 3,   1, 3, 0, 1,            // 479->494
+                                                                   1, 1,   3,   3,   1,   1, 1,   1,  1, 1, 1, 1,   3, 1, 0, 0,            // 495->510
+                                                                   1, 0,   0,   1,   1,   3, 1,   1,  0, 0, 1, 1,   1, 1, 1, 1,            // 511->526
+                                                                   1, 1,   3,   0,   0,   0, 1,   1,  1, 1, 1, 1,   0, 3, 1,               // 527->541
+                                                                   1, 1,   1,   1,   3,   3, 1,   1,  3, 3, 1, 0,   1, 1, 1, 1,            // 542->557
+                                                                   1, 1,   3,   3,   1,   1, 0,   1,  3, 3, 0, 255, 1, 0, 0,               // 558->572
+                                                                   1, 0,   1,   1,   1,   1, 3,   3,  1, 3, 0, 255, 3, 1, 1, 1,            // 573->588
+                                                                   1, 255, 255, 1,   1,   1, 0,   3,  3, 3, 1, 1,   1, 1, 1,               // 589->604
+                                                                   3, 1,   255, 255, 255, 3, 255, 255}};                                   // 605->611
 
 // List over all vehicles with their special attributes
 #define VEHICLE_HAS_TURRENT             0x001UL //1
@@ -41,64 +36,60 @@ static const SFixedArray < unsigned char, 212 > g_ucMaxPassengers = { {
 #define VEHICLE_HAS_SEARCH_LIGHT        0x040UL //64
 
 // Generated by MTA10\utils\gentable\gentable_vehattr.cpp
-static const SFixedArray < unsigned long, 212 > g_ulVehicleAttributes = { {
-  0, 0, 0, 0, 0, 0, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 32, 0, 0, 2, 0,    // 400-424
-  0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0,    // 425-449
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 450-474
-  0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 64, 0, 0,    // 475-499
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 16, 0, 0, 0, 0, 0, 4, 12, 0, 0, 2, 8, // 500-524
-  8, 0, 0, 2, 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0,    // 525-549
-  0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 550-574
-  0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 2, 2, 2, 2,   // 575-599
-  0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-} };
+static const SFixedArray<unsigned long, 212> g_ulVehicleAttributes = {
+    {0, 0, 0, 0, 0, 0, 8, 3, 0, 0, 0, 0, 0,  0,  0, 0, 2, 0,  0, 0, 32, 0, 0,  2, 0,            // 400-424
+     0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,  32, 0, 0, 0, 0,  8, 0, 0,  0, 0,  0, 0,            // 425-449
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  0, 0, 0, 0,  0, 0, 0,  0, 0,  0, 0,            // 450-474
+     0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0,  0,  0, 2, 0, 0,  0, 0, 0,  0, 64, 0, 0,            // 475-499
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 16, 0, 0, 0, 0,  0, 4, 12, 0, 0,  2, 8,            // 500-524
+     8, 0, 0, 2, 0, 8, 8, 0, 0, 0, 0, 0, 0,  0,  0, 0, 0, 0,  0, 2, 0,  0, 0,  0, 0,            // 525-549
+     0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  0, 0, 0, 0,  0, 0, 0,  0, 0,  0, 0,            // 550-574
+     0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  0, 0, 0, 12, 0, 0, 0,  2, 2,  2, 2,            // 575-599
+     0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
 
+static const SFixedArray<eVehicleType, 212> gs_vehicleTypes = {
+    {VEHICLE_CAR,     VEHICLE_CAR,   VEHICLE_CAR,     VEHICLE_CAR,     VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_MONSTERTRUCK, VEHICLE_CAR,
+     VEHICLE_CAR,     VEHICLE_CAR,   VEHICLE_CAR,     VEHICLE_CAR,     VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_CAR,
+     VEHICLE_CAR,     VEHICLE_HELI,  VEHICLE_CAR,     VEHICLE_CAR,     VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_CAR,
+     VEHICLE_CAR,     VEHICLE_HELI,  VEHICLE_CAR,     VEHICLE_CAR,     VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_BOAT,         VEHICLE_CAR,
+     VEHICLE_CAR,     VEHICLE_CAR,   VEHICLE_CAR,     VEHICLE_TRAILER, VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_CAR,
+     VEHICLE_CAR,     VEHICLE_CAR,   VEHICLE_CAR,     VEHICLE_CAR,     VEHICLE_MONSTERTRUCK, VEHICLE_CAR,          VEHICLE_BOAT,         VEHICLE_HELI,
+     VEHICLE_BIKE,    VEHICLE_TRAIN, VEHICLE_TRAILER, VEHICLE_CAR,     VEHICLE_BOAT,         VEHICLE_BOAT,         VEHICLE_BOAT,         VEHICLE_CAR,
+     VEHICLE_CAR,     VEHICLE_CAR,   VEHICLE_CAR,     VEHICLE_CAR,     VEHICLE_PLANE,        VEHICLE_BIKE,         VEHICLE_BIKE,         VEHICLE_BIKE,
+     VEHICLE_PLANE,   VEHICLE_HELI,  VEHICLE_CAR,     VEHICLE_CAR,     VEHICLE_BIKE,         VEHICLE_HELI,         VEHICLE_CAR,          VEHICLE_QUADBIKE,
+     VEHICLE_BOAT,    VEHICLE_BOAT,  VEHICLE_CAR,     VEHICLE_CAR,     VEHICLE_PLANE,        VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_CAR,
+     VEHICLE_CAR,     VEHICLE_BMX,   VEHICLE_CAR,     VEHICLE_CAR,     VEHICLE_BOAT,         VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_HELI,
+     VEHICLE_HELI,    VEHICLE_CAR,   VEHICLE_CAR,     VEHICLE_CAR,     VEHICLE_CAR,          VEHICLE_BOAT,         VEHICLE_CAR,          VEHICLE_CAR,
+     VEHICLE_CAR,     VEHICLE_HELI,  VEHICLE_CAR,     VEHICLE_CAR,     VEHICLE_CAR,          VEHICLE_HELI,         VEHICLE_CAR,          VEHICLE_CAR,
+     VEHICLE_CAR,     VEHICLE_CAR,   VEHICLE_CAR,     VEHICLE_CAR,     VEHICLE_CAR,          VEHICLE_BMX,          VEHICLE_BMX,          VEHICLE_PLANE,
+     VEHICLE_PLANE,   VEHICLE_PLANE, VEHICLE_CAR,     VEHICLE_CAR,     VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_PLANE,
+     VEHICLE_PLANE,   VEHICLE_BIKE,  VEHICLE_BIKE,    VEHICLE_BIKE,    VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_CAR,
+     VEHICLE_CAR,     VEHICLE_CAR,   VEHICLE_CAR,     VEHICLE_CAR,     VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_CAR,
+     VEHICLE_CAR,     VEHICLE_TRAIN, VEHICLE_TRAIN,   VEHICLE_PLANE,   VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_CAR,
+     VEHICLE_CAR,     VEHICLE_CAR,   VEHICLE_CAR,     VEHICLE_CAR,     VEHICLE_HELI,         VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_CAR,
+     VEHICLE_CAR,     VEHICLE_PLANE, VEHICLE_CAR,     VEHICLE_CAR,     VEHICLE_MONSTERTRUCK, VEHICLE_MONSTERTRUCK, VEHICLE_CAR,          VEHICLE_CAR,
+     VEHICLE_CAR,     VEHICLE_CAR,   VEHICLE_CAR,     VEHICLE_HELI,    VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_CAR,
+     VEHICLE_CAR,     VEHICLE_TRAIN, VEHICLE_TRAIN,   VEHICLE_CAR,     VEHICLE_CAR,          VEHICLE_MONSTERTRUCK, VEHICLE_CAR,          VEHICLE_CAR,
+     VEHICLE_CAR,     VEHICLE_PLANE, VEHICLE_CAR,     VEHICLE_CAR,     VEHICLE_CAR,          VEHICLE_BIKE,         VEHICLE_CAR,          VEHICLE_CAR,
+     VEHICLE_TRAILER, VEHICLE_CAR,   VEHICLE_BIKE,    VEHICLE_CAR,     VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_TRAIN,        VEHICLE_TRAILER,
+     VEHICLE_PLANE,   VEHICLE_PLANE, VEHICLE_CAR,     VEHICLE_BOAT,    VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_CAR,
+     VEHICLE_CAR,     VEHICLE_CAR,   VEHICLE_CAR,     VEHICLE_CAR,     VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_TRAILER,      VEHICLE_TRAILER,
+     VEHICLE_TRAILER, VEHICLE_CAR,   VEHICLE_TRAILER, VEHICLE_TRAILER}};
 
-static const SFixedArray < eVehicleType, 212 > gs_vehicleTypes = { {
-    VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_MONSTERTRUCK,
-    VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR,
-    VEHICLE_CAR, VEHICLE_CAR, VEHICLE_HELI, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR,
-    VEHICLE_CAR, VEHICLE_CAR, VEHICLE_HELI, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_BOAT,
-    VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_TRAILER, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR,
-    VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_MONSTERTRUCK, VEHICLE_CAR,
-    VEHICLE_BOAT, VEHICLE_HELI, VEHICLE_BIKE, VEHICLE_TRAIN, VEHICLE_TRAILER, VEHICLE_CAR, VEHICLE_BOAT,
-    VEHICLE_BOAT, VEHICLE_BOAT, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_PLANE,
-    VEHICLE_BIKE, VEHICLE_BIKE, VEHICLE_BIKE, VEHICLE_PLANE, VEHICLE_HELI, VEHICLE_CAR, VEHICLE_CAR,
-    VEHICLE_BIKE, VEHICLE_HELI, VEHICLE_CAR, VEHICLE_QUADBIKE, VEHICLE_BOAT, VEHICLE_BOAT, VEHICLE_CAR,
-    VEHICLE_CAR, VEHICLE_PLANE, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_BMX, VEHICLE_CAR,
-    VEHICLE_CAR, VEHICLE_BOAT, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_HELI, VEHICLE_HELI, VEHICLE_CAR, VEHICLE_CAR,
-    VEHICLE_CAR, VEHICLE_CAR, VEHICLE_BOAT, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_HELI, VEHICLE_CAR,
-    VEHICLE_CAR, VEHICLE_CAR, VEHICLE_HELI, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR,
-    VEHICLE_CAR, VEHICLE_CAR, VEHICLE_BMX, VEHICLE_BMX, VEHICLE_PLANE, VEHICLE_PLANE, VEHICLE_PLANE,
-    VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_PLANE, VEHICLE_PLANE, VEHICLE_BIKE,
-    VEHICLE_BIKE, VEHICLE_BIKE, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR,
-    VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_TRAIN,
-    VEHICLE_TRAIN, VEHICLE_PLANE, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR,
-    VEHICLE_CAR, VEHICLE_CAR, VEHICLE_HELI, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_PLANE,
-    VEHICLE_CAR, VEHICLE_CAR, VEHICLE_MONSTERTRUCK, VEHICLE_MONSTERTRUCK, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR,
-    VEHICLE_CAR, VEHICLE_CAR, VEHICLE_HELI, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR,
-    VEHICLE_TRAIN, VEHICLE_TRAIN, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_MONSTERTRUCK, VEHICLE_CAR, VEHICLE_CAR,
-    VEHICLE_CAR, VEHICLE_PLANE, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_BIKE, VEHICLE_CAR, VEHICLE_CAR,
-    VEHICLE_TRAILER, VEHICLE_CAR, VEHICLE_BIKE, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_TRAIN,
-    VEHICLE_TRAILER, VEHICLE_PLANE, VEHICLE_PLANE, VEHICLE_CAR, VEHICLE_BOAT, VEHICLE_CAR, VEHICLE_CAR,
-    VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR, VEHICLE_CAR,
-    VEHICLE_TRAILER, VEHICLE_TRAILER, VEHICLE_TRAILER, VEHICLE_CAR, VEHICLE_TRAILER, VEHICLE_TRAILER
-} };
+static SFixedArray<unsigned char, 212> g_ucVariants;
 
-static SFixedArray < unsigned char, 212 > g_ucVariants;
-
-CVehicleManager::CVehicleManager ( void )
+CVehicleManager::CVehicleManager(void)
 {
-    assert ( NUMELMS ( g_ucMaxPassengers ) == 212 );
-    assert ( NUMELMS ( g_ulVehicleAttributes ) == 212 );
-    assert ( NUMELMS ( gs_vehicleTypes ) == 212 );
+    assert(NUMELMS(g_ucMaxPassengers) == 212);
+    assert(NUMELMS(g_ulVehicleAttributes) == 212);
+    assert(NUMELMS(gs_vehicleTypes) == 212);
 
     int iVehicleID = 0;
-    for ( int i = 0; i < 212; i++ )
+    for (int i = 0; i < 212; i++)
     {
         g_ucVariants[i] = 255;
         iVehicleID = i + 400;
-        switch ( iVehicleID )
+        switch (iVehicleID)
         {
             case 416:
             {
@@ -379,201 +370,173 @@ CVehicleManager::CVehicleManager ( void )
     }
 }
 
-
-CVehicleManager::~CVehicleManager ( void )
+CVehicleManager::~CVehicleManager(void)
 {
-    DeleteAll ();
+    DeleteAll();
 }
 
-
-CVehicle* CVehicleManager::Create ( unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2, CElement* pParent, CXMLNode* pNode )
+CVehicle* CVehicleManager::Create(CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2)
 {
-    // Create the vehicle
-    CVehicle* pVehicle = new CVehicle ( this, pParent, pNode, usModel, ucVariant, ucVariant2 );
+    CVehicle* const pVehicle = new CVehicle(this, pParent, usModel, ucVariant, ucVariant2);
 
-    // Invalid vehicle id?
-    if ( pVehicle->GetID () == INVALID_ELEMENT_ID )
+    if (pVehicle->GetID() == INVALID_ELEMENT_ID)
     {
         delete pVehicle;
-        return NULL;
+        return nullptr;
     }
 
-    // Return the created vehicle
     return pVehicle;
 }
 
-
-CVehicle* CVehicleManager::CreateFromXML ( CElement* pParent, CXMLNode& Node, CEvents* pEvents )
+CVehicle* CVehicleManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
 {
-    // Create the vehicle
-    RandomizeRandomSeed ();
+    RandomizeRandomSeed();
+    CVehicle* pVehicle = new CVehicle(this, pParent, 400, 254, 254);
 
-    CVehicle* pVehicle = new CVehicle ( this, pParent, &Node, 400, 254, 254 );
-
-    // Verify the vehicle id and load the data from xml
-    if ( pVehicle->GetID () == INVALID_ELEMENT_ID ||
-         !pVehicle->LoadFromCustomData ( pEvents ) )
+    if (pVehicle->GetID() == INVALID_ELEMENT_ID || !pVehicle->LoadFromCustomData(pEvents, Node))
     {
         delete pVehicle;
-        return NULL;
+        return nullptr;
     }
 
-    // Return the created vehicle
     return pVehicle;
 }
 
-
-void CVehicleManager::DeleteAll ( void )
+void CVehicleManager::DeleteAll(void)
 {
     // Delete all items
-    DeletePointersAndClearList ( m_List );
+    DeletePointersAndClearList(m_List);
 }
 
-
-void CVehicleManager::RemoveFromList ( CVehicle* pVehicle )
+void CVehicleManager::RemoveFromList(CVehicle* pVehicle)
 {
-    m_List.remove ( pVehicle );
+    m_List.remove(pVehicle);
 }
 
-
-bool CVehicleManager::Exists ( CVehicle* pVehicle )
+bool CVehicleManager::Exists(CVehicle* pVehicle)
 {
-    return ListContains ( m_List, pVehicle );
+    return ListContains(m_List, pVehicle);
 }
 
-
-bool CVehicleManager::IsValidModel ( unsigned int ulVehicleModel )
+bool CVehicleManager::IsValidModel(unsigned int ulVehicleModel)
 {
     return ulVehicleModel >= 400 && ulVehicleModel <= 611;
 }
 
-eVehicleType CVehicleManager::GetVehicleType ( unsigned short usModel )
+eVehicleType CVehicleManager::GetVehicleType(unsigned short usModel)
 {
-    if ( !IsValidModel ( usModel ) )
+    if (!IsValidModel(usModel))
         return VEHICLE_NONE;
 
-    return gs_vehicleTypes [ usModel - 400 ];
+    return gs_vehicleTypes[usModel - 400];
 }
 
-
-bool CVehicleManager::IsValidUpgrade ( unsigned short usUpgrade )
+bool CVehicleManager::IsValidUpgrade(unsigned short usUpgrade)
 {
-    return ( usUpgrade >= 1000 && usUpgrade <= 1193 );
+    return (usUpgrade >= 1000 && usUpgrade <= 1193);
 }
 
-
-unsigned int CVehicleManager::GetMaxPassengers ( unsigned int uiVehicleModel )
+unsigned int CVehicleManager::GetMaxPassengers(unsigned int uiVehicleModel)
 {
-    if ( IsValidModel ( uiVehicleModel ) )
+    if (IsValidModel(uiVehicleModel))
     {
-        return g_ucMaxPassengers [uiVehicleModel - 400];
+        return g_ucMaxPassengers[uiVehicleModel - 400];
     }
 
     return 0xFF;
 }
 
-void CVehicleManager::GetRandomVariation ( unsigned short usModel, unsigned char &ucVariant, unsigned char &ucVariant2 )
+void CVehicleManager::GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2)
 {
-    RandomizeRandomSeed ();
+    RandomizeRandomSeed();
     ucVariant = 255;
     ucVariant2 = 255;
     // Valid model?
-    if ( IsValidModel( usModel ) && g_ucVariants[ usModel - 400 ] != 255 )
+    if (IsValidModel(usModel) && g_ucVariants[usModel - 400] != 255)
     {
         // caddy || cropduster
-        if ( usModel == 457 || usModel == 512 )
+        if (usModel == 457 || usModel == 512)
         {
             // 255, 0, 1, 2
-            ucVariant = ( rand ( ) % 4 ) - 1;
+            ucVariant = (rand() % 4) - 1;
 
             // 3, 4, 5
-            ucVariant2 = ( rand ( ) % 3 );
+            ucVariant2 = (rand() % 3);
             ucVariant2 += 3;
             return;
         }
         // Slamvan
-        else if ( usModel == 535 )
+        else if (usModel == 535)
         {
             // Slamvan has steering wheel "extras" we want one of those so default cannot be an option.
-            ucVariant = ( rand ( ) % ( g_ucVariants [usModel - 400] + 1 ) );
+            ucVariant = (rand() % (g_ucVariants[usModel - 400] + 1));
             return;
         }
         // NRG 500 || BF400
-        else if ( usModel == 522 || usModel == 581 )
+        else if (usModel == 522 || usModel == 581)
         {
             // e.g. 581 ( BF400 )
             // first 3 properties are Exhaust
             // last 2 are fairings.
 
             // 255, 0, 1, 2
-            ucVariant = ( rand ( ) % 4 ) - 1;
+            ucVariant = (rand() % 4) - 1;
 
             // 3, 4
-            ucVariant2 = ( rand ( ) % 2 );
+            ucVariant2 = (rand() % 2);
             ucVariant2 += 3;
             return;
         }
         // e.g. ( rand () % ( 5 + 2 ) ) - 1
         // Can generate 6 then minus 1 = 5
         // Can generate 0 then minus 1 = -1 (255) (default model with nothing)
-        ucVariant = ( rand ( ) % (g_ucVariants [usModel - 400] + 2) ) - 1;
+        ucVariant = (rand() % (g_ucVariants[usModel - 400] + 2)) - 1;
     }
 }
 
-bool CVehicleManager::HasTurret ( unsigned int uiModel )
+bool CVehicleManager::HasTurret(unsigned int uiModel)
 {
-    return ( IsValidModel ( uiModel ) &&
-             ( g_ulVehicleAttributes[ uiModel - 400 ] & VEHICLE_HAS_TURRENT ) );
+    return (IsValidModel(uiModel) && (g_ulVehicleAttributes[uiModel - 400] & VEHICLE_HAS_TURRENT));
 }
 
-
-bool CVehicleManager::HasSirens ( unsigned int uiModel )
+bool CVehicleManager::HasSirens(unsigned int uiModel)
 {
-    return ( IsValidModel ( uiModel ) &&
-             ( g_ulVehicleAttributes[ uiModel - 400 ] & VEHICLE_HAS_SIRENS ) );
+    return (IsValidModel(uiModel) && (g_ulVehicleAttributes[uiModel - 400] & VEHICLE_HAS_SIRENS));
 }
 
-bool CVehicleManager::HasTaxiLight ( unsigned int uiModel )
+bool CVehicleManager::HasTaxiLight(unsigned int uiModel)
 {
-    return ( IsValidModel ( uiModel ) &&
-             ( g_ulVehicleAttributes[ uiModel - 400 ] & VEHICLE_HAS_TAXI_LIGHTS ) );
+    return (IsValidModel(uiModel) && (g_ulVehicleAttributes[uiModel - 400] & VEHICLE_HAS_TAXI_LIGHTS));
 }
 
-bool CVehicleManager::HasLandingGears ( unsigned int uiModel )
+bool CVehicleManager::HasLandingGears(unsigned int uiModel)
 {
-    return ( IsValidModel ( uiModel ) &&
-             ( g_ulVehicleAttributes[ uiModel - 400 ] & VEHICLE_HAS_LANDING_GEARS ) );
+    return (IsValidModel(uiModel) && (g_ulVehicleAttributes[uiModel - 400] & VEHICLE_HAS_LANDING_GEARS));
 }
 
-
-bool CVehicleManager::HasAdjustableProperty ( unsigned int uiModel )
+bool CVehicleManager::HasAdjustableProperty(unsigned int uiModel)
 {
-    return ( IsValidModel ( uiModel ) &&
-             ( g_ulVehicleAttributes[ uiModel - 400 ] & VEHICLE_HAS_ADJUSTABLE_PROPERTY ) );
+    return (IsValidModel(uiModel) && (g_ulVehicleAttributes[uiModel - 400] & VEHICLE_HAS_ADJUSTABLE_PROPERTY));
 }
 
-
-bool CVehicleManager::HasSmokeTrail ( unsigned int uiModel )
+bool CVehicleManager::HasSmokeTrail(unsigned int uiModel)
 {
-    return ( IsValidModel ( uiModel ) &&
-             ( g_ulVehicleAttributes[ uiModel - 400 ] & VEHICLE_HAS_SMOKE_TRAIL ) );
+    return (IsValidModel(uiModel) && (g_ulVehicleAttributes[uiModel - 400] & VEHICLE_HAS_SMOKE_TRAIL));
 }
 
-bool CVehicleManager::IsTrailer ( unsigned int uiVehicleModel )
+bool CVehicleManager::IsTrailer(unsigned int uiVehicleModel)
 {
-    return ( IsValidModel ( uiVehicleModel ) &&
-             ( gs_vehicleTypes [uiVehicleModel - 400] == VEHICLE_TRAILER ) );
+    return (IsValidModel(uiVehicleModel) && (gs_vehicleTypes[uiVehicleModel - 400] == VEHICLE_TRAILER));
 }
 
-bool CVehicleManager::HasDamageModel ( unsigned short usModel )
+bool CVehicleManager::HasDamageModel(unsigned short usModel)
 {
-    return HasDamageModel ( GetVehicleType ( usModel ) );
+    return HasDamageModel(GetVehicleType(usModel));
 }
 
-
-bool CVehicleManager::HasDamageModel ( eVehicleType Type )
+bool CVehicleManager::HasDamageModel(eVehicleType Type)
 {
-    switch ( Type )
+    switch (Type)
     {
         case VEHICLE_TRAILER:
         case VEHICLE_MONSTERTRUCK:
@@ -587,13 +550,13 @@ bool CVehicleManager::HasDamageModel ( eVehicleType Type )
     }
 }
 
-bool CVehicleManager::HasDoors ( unsigned short usModel )
+bool CVehicleManager::HasDoors(unsigned short usModel)
 {
     bool bHasDoors = false;
 
-    if ( HasDamageModel ( usModel ) == true )
+    if (HasDamageModel(usModel) == true)
     {
-        switch ( usModel )
+        switch (usModel)
         {
             case VT_BFINJECT:
             case VT_RCBANDIT:
@@ -609,7 +572,6 @@ bool CVehicleManager::HasDoors ( unsigned short usModel )
             case VT_MOWER:
             case VT_RCCAM:
             case VT_RCGOBLIN:
-            case VT_BLOODRA:
                 break;
             default:
                 bHasDoors = true;
@@ -619,26 +581,26 @@ bool CVehicleManager::HasDoors ( unsigned short usModel )
     return bHasDoors;
 }
 
-CVehicleColor CVehicleManager::GetRandomColor ( unsigned short usModel )
+CVehicleColor CVehicleManager::GetRandomColor(unsigned short usModel)
 {
-    return m_ColorManager.GetRandomColor ( usModel );
+    return m_ColorManager.GetRandomColor(usModel);
 }
 
-void CVehicleManager::GetVehiclesOfType ( unsigned int uiModel, lua_State* luaVM )
+void CVehicleManager::GetVehiclesOfType(unsigned int uiModel, lua_State* luaVM)
 {
-    assert ( luaVM );
+    assert(luaVM);
 
     // Add all the matching vehicles to the table
-    unsigned int uiIndex = 0;
-    list < CVehicle* > ::iterator iter = m_List.begin ();
-    for ( ; iter != m_List.end () ; ++iter )
+    unsigned int              uiIndex = 0;
+    list<CVehicle*>::iterator iter = m_List.begin();
+    for (; iter != m_List.end(); ++iter)
     {
-        if ( (*iter)->GetModel () == uiModel )
+        if ((*iter)->GetModel() == uiModel)
         {
             // Add it to the table
-            lua_pushnumber ( luaVM, ++uiIndex );
-            lua_pushelement ( luaVM, *iter );
-            lua_settable ( luaVM, -3 );
+            lua_pushnumber(luaVM, ++uiIndex);
+            lua_pushelement(luaVM, *iter);
+            lua_settable(luaVM, -3);
         }
     }
 }

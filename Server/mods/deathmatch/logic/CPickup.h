@@ -1,20 +1,17 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CPickup.h
-*  PURPOSE:     Pickup entity class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*               Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CPickup.h
+ *  PURPOSE:     Pickup entity class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 class CPickup;
 
-#ifndef __CPICKUP_H
-#define __CPICKUP_H
+#pragma once
 
 #include "CColCallback.h"
 #include "CColManager.h"
@@ -38,7 +35,7 @@ public:
 
     enum
     {
-        WEAPON_BRASSKNUCKLE = 1, 
+        WEAPON_BRASSKNUCKLE = 1,
         WEAPON_GOLFCLUB,
         WEAPON_NIGHTSTICK,
         WEAPON_KNIFE,
@@ -69,11 +66,11 @@ public:
         WEAPON_MICRO_UZI,
         WEAPON_MP5,
         WEAPON_AK47,
-        WEAPON_M4,          
+        WEAPON_M4,
         WEAPON_TEC9,
-        
+
         WEAPON_COUNTRYRIFLE,
-        WEAPON_SNIPERRIFLE, 
+        WEAPON_SNIPERRIFLE,
         WEAPON_ROCKETLAUNCHER,
         WEAPON_ROCKETLAUNCHER_HS,
         WEAPON_FLAMETHROWER,
@@ -92,84 +89,88 @@ public:
         WEAPON_INVALID = 0xFF,
     };
 
-                                    CPickup                     ( CElement* pParent, CXMLNode* pNode, class CPickupManager* pPickupManager, CColManager* pColManager );
-                                    ~CPickup                    ( void );
+    CPickup(CElement* pParent, class CPickupManager* pPickupManager, CColManager* pColManager);
+    ~CPickup(void);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
-    bool                            IsEntity                    ( void )                    { return true; }
+    bool IsEntity(void) { return true; }
 
-    void                            Unlink                      ( void );
-    bool                            ReadSpecialData             ( void );
+    void Unlink(void);
 
-    void                            SetPosition                 ( const CVector& vecPosition );
+    void SetPosition(const CVector& vecPosition);
 
-    inline unsigned char            GetPickupType               ( void )                                { return m_ucType; };
-    void                            SetPickupType               ( unsigned char ucType );
-    inline bool                     IsTypeRandom                ( void )                                { return m_bIsTypeRandom; };
+    unsigned char GetPickupType(void) { return m_ucType; };
+    void          SetPickupType(unsigned char ucType);
+    bool          IsTypeRandom(void) { return m_bIsTypeRandom; };
 
-    inline unsigned char            GetWeaponType               ( void )                                { return m_ucWeaponType; };
-    void                            SetWeaponType               ( unsigned char ucWeaponType );
-    inline bool                     IsWeaponTypeRandom          ( void )                                { return m_bIsWeaponTypeRandom; };
+    unsigned char GetWeaponType(void) { return m_ucWeaponType; };
+    void          SetWeaponType(unsigned char ucWeaponType);
+    bool          IsWeaponTypeRandom(void) { return m_bIsWeaponTypeRandom; };
 
-    inline unsigned short           GetAmmo                     ( void )                                { return m_usAmmo; };
-    inline void                     SetAmmo                     ( unsigned short usAmmo )               { m_usAmmo = usAmmo; };
+    unsigned short GetAmmo(void) { return m_usAmmo; };
+    void           SetAmmo(unsigned short usAmmo) { m_usAmmo = usAmmo; };
 
-    inline float                    GetAmount                   ( void )                                { return m_fAmount; }
-    inline void                     SetAmount                   ( float fAmount )                       { m_fAmount = fAmount; }
-    inline bool                     IsHealthRandom              ( void )                                { return m_bIsHealthRandom; };
+    float GetAmount(void) { return m_fAmount; }
+    void  SetAmount(float fAmount) { m_fAmount = fAmount; }
+    bool  IsHealthRandom(void) { return m_bIsHealthRandom; };
 
-    inline unsigned long            GetRespawnIntervals         ( void )                                { return m_ulRespawnIntervals; };
-    inline void                     SetRespawnIntervals         ( unsigned long ulRespawnIntervals )    { m_ulRespawnIntervals = ulRespawnIntervals; };
+    unsigned long GetRespawnIntervals(void) { return m_ulRespawnIntervals; };
+    void          SetRespawnIntervals(unsigned long ulRespawnIntervals) { m_ulRespawnIntervals = ulRespawnIntervals; };
 
-    CTickCount                      GetLastUsedTime             ( void )                                { return m_LastUsedTime; }
-    CTickCount                      GetCreationTime             ( void )                                { return m_CreationTime; }
+    CTickCount GetLastUsedTime(void) { return m_LastUsedTime; }
+    CTickCount GetCreationTime(void) { return m_CreationTime; }
 
-    inline unsigned short           GetModel                    ( void )                                { return m_usModel; };
-    inline void                     SetModel                    ( unsigned short usModel )              { m_usModel = usModel; };
+    unsigned short GetModel(void) { return m_usModel; };
+    void           SetModel(unsigned short usModel) { m_usModel = usModel; };
 
-    inline bool                     IsVisible                   ( void )                                { return m_bVisible; };
-    void                            SetVisible                  ( bool bVisible );
+    bool IsVisible(void) { return m_bVisible; };
+    void SetVisible(bool bVisible);
 
-    void                            Randomize                   ( void );
+    void Randomize(void);
 
-    bool                            CanUse                      ( class CPlayer& Player, bool bOnfootCheck = true );
-    void                            Use                         ( class CPlayer& Player );
+    bool CanUse(class CPlayer& Player, bool bOnfootCheck = true);
+    void Use(class CPlayer& Player);
 
-    inline bool                     IsSpawned                   ( void )                                { return m_bSpawned; }
-    inline void                     SetSpawned                  ( bool bSpawned )                       { m_bSpawned = bSpawned; }
+    bool IsSpawned(void) { return m_bSpawned; }
+    void SetSpawned(bool bSpawned) { m_bSpawned = bSpawned; }
 
-    inline CColShape*               GetColShape                 ( void )                                { return m_pCollision; }
-    inline void                     SetEnabled                  ( bool bEnabled )                       { if ( m_pCollision ) m_pCollision->SetEnabled ( bEnabled ); }
-    inline bool                     IsEnabled                   ( void )                                { return m_pCollision && m_pCollision->IsEnabled (); }
+    CColShape* GetColShape(void) { return m_pCollision; }
+    void       SetEnabled(bool bEnabled)
+    {
+        if (m_pCollision)
+            m_pCollision->SetEnabled(bEnabled);
+    }
+    bool IsEnabled(void) { return m_pCollision && m_pCollision->IsEnabled(); }
 
-    inline void                     SetDoneDelayHack            ( bool bDone )                          { m_bDoneDelayHack = bDone; }
-    inline bool                     HasDoneDelayHack            ( void )                                { return m_bDoneDelayHack; }
+    void SetDoneDelayHack(bool bDone) { m_bDoneDelayHack = bDone; }
+    bool HasDoneDelayHack(void) { return m_bDoneDelayHack; }
 
+protected:
+    bool ReadSpecialData(const int iLine) override;
 
 private:
-    void                            Callback_OnCollision        ( CColShape& Shape, CElement& Element );
-    void                            Callback_OnLeave            ( CColShape& Shape, CElement& Element );
-    void                            Callback_OnCollisionDestroy ( CColShape* pShape );
+    void Callback_OnCollision(CColShape& Shape, CElement& Element);
+    void Callback_OnLeave(CColShape& Shape, CElement& Element);
+    void Callback_OnCollisionDestroy(CColShape* pShape);
 
-    class CPickupManager*           m_pPickupManager;
+    class CPickupManager* m_pPickupManager;
 
-    unsigned char                   m_ucType;
-    unsigned char                   m_ucWeaponType;
-    unsigned short                  m_usAmmo;
-    float                           m_fAmount;
-    unsigned long                   m_ulRespawnIntervals;
-    CTickCount                      m_LastUsedTime;
-    CTickCount                      m_CreationTime;
-    unsigned short                  m_usModel;
-    bool                            m_bVisible;
+    unsigned char  m_ucType;
+    unsigned char  m_ucWeaponType;
+    unsigned short m_usAmmo;
+    float          m_fAmount;
+    unsigned long  m_ulRespawnIntervals;
+    CTickCount     m_LastUsedTime;
+    CTickCount     m_CreationTime;
+    unsigned short m_usModel;
+    bool           m_bVisible;
 
-    bool                            m_bIsTypeRandom;
-    bool                            m_bIsWeaponTypeRandom;
-    bool                            m_bIsHealthRandom;
+    bool m_bIsTypeRandom;
+    bool m_bIsWeaponTypeRandom;
+    bool m_bIsHealthRandom;
 
-    CColSphere*                     m_pCollision;
+    CColSphere* m_pCollision;
 
-    bool                            m_bSpawned;
-    bool                            m_bDoneDelayHack;
+    bool m_bSpawned;
+    bool m_bDoneDelayHack;
 };
-
-#endif

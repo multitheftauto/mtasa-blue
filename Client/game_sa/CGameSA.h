@@ -1,23 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CGameSA.h
-*  PURPOSE:     Header file for base game logic handling class
-*  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*               Christian Myhre Lundheim <>
-*               Jax <>
-*               Cecill Etheredge <ijsf@gmx.net>
-*               Stanislav Bobrov <lil_toady@hotmail.com>
-*               Alberto Alonso <rydencillo@gmail.com>
-*               Sebas Lamers <sebasdevelopment@gmx.com>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CGameSA.h
+ *  PURPOSE:     Header file for base game logic handling class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CGAMESA
-#define __CGAMESA
+#pragma once
 
 #include "CModelInfoSA.h"
 #include "CFxManagerSA.h"
@@ -87,11 +79,18 @@
 #define CHEAT_NEVERWANTED           "neverwanted"
 #define CHEAT_HEALTARMORMONEY       "healtharmormoney"
 
-struct SCheatSA {
-    BYTE*   m_byAddress; //Cheat Address
-    bool    m_bEnabled; //Cheat State
-    bool    m_bCanBeSet; //Cheat can be set with setWorldSpecialPropertyEnabled
-    SCheatSA(BYTE* Address, bool bCanBeSet = true) {
+#define PROP_RANDOM_FOLIAGE         "randomfoliage"
+#define PROP_SNIPER_MOON            "snipermoon"
+#define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
+#define PROP_UNDERWORLD_WARP        "underworldwarp"
+
+struct SCheatSA
+{
+    BYTE* m_byAddress;            // Cheat Address
+    bool  m_bEnabled;             // Cheat State
+    bool  m_bCanBeSet;            // Cheat can be set with setWorldSpecialPropertyEnabled
+    SCheatSA(BYTE* Address, bool bCanBeSet = true)
+    {
         m_byAddress = Address;
         m_bCanBeSet = bCanBeSet;
     }
@@ -99,230 +98,416 @@ struct SCheatSA {
 class CGameSA : public CGame
 {
     friend class COffsets;
+    typedef std::unique_ptr<CAnimBlendAssocGroup> AssocGroup_type;
 
 private:
-    CWeaponInfo         * WeaponInfos[NUM_WeaponInfosTotal];
-    CModelInfoSA        ModelInfo[MODELINFO_MAX];
+    CWeaponInfo* WeaponInfos[NUM_WeaponInfosTotal];
+    CModelInfoSA ModelInfo[MODELINFO_MAX];
+
 public:
     ZERO_ON_NEW
 
-    CGameSA(); // constructor
-    ~CGameSA ();
+    CGameSA();            // constructor
+    ~CGameSA();
 
-    inline CPools                   * GetPools()                { DEBUG_TRACE("CPools     * GetPools()"); return m_pPools; };
-    inline CPlayerInfo              * GetPlayerInfo()           { DEBUG_TRACE("CPlayerInfo    * GetPlayerInfo()");return m_pPlayerInfo; };
-    inline CProjectileInfo          * GetProjectileInfo()       { DEBUG_TRACE("CProjectileInfo   * GetProjectileInfo()");return m_pProjectileInfo; };
-    inline CRadar                   * GetRadar()                { DEBUG_TRACE("CRadar     * GetRadar()"); return m_pRadar; };
-    inline CRestart                 * GetRestart()              { DEBUG_TRACE("CRestart    * GetRestart()"); return m_pRestart; };
-    inline CClock                   * GetClock()                { DEBUG_TRACE("CClock     * GetClock()"); return m_pClock; };
-    inline CCoronas                 * GetCoronas()              { DEBUG_TRACE("CCoronas    * GetCoronas()"); return m_pCoronas; };
-    inline CCheckpoints             * GetCheckpoints()          { DEBUG_TRACE("CCheckpoints   * GetCheckpoints()"); return m_pCheckpoints; };
-    inline CEventList               * GetEventList()            { DEBUG_TRACE("CEventList    * GetEventList()"); return m_pEventList; };
-    inline CFireManager             * GetFireManager()          { DEBUG_TRACE("CFireManager   * GetFireManager()"); return m_pFireManager; };
-    inline CExplosionManager        * GetExplosionManager()     { DEBUG_TRACE("CExplosionManager  * GetExplosionManager()");return m_pExplosionManager; };
-    inline CGarages                 * GetGarages()              { DEBUG_TRACE("CGarages    * GetGarages()"); return m_pGarages; };
-    inline CHud                     * GetHud()                  { DEBUG_TRACE("CHud     * GetHud()"); return m_pHud; };
-    inline CWeather                 * GetWeather()              { DEBUG_TRACE("CWeather    * GetWeather()");return m_pWeather; };
-    inline CWorld                   * GetWorld()                { DEBUG_TRACE("CWorld     * GetWorld()"); return m_pWorld; };
-    inline CCamera                  * GetCamera()               { DEBUG_TRACE("CCamera     * GetCamera()"); return m_pCamera; };
-    inline CPickups                 * GetPickups()              { DEBUG_TRACE("CPickups    * GetPickups()"); return m_pPickups; };
-    inline C3DMarkers               * Get3DMarkers()            { DEBUG_TRACE("C3DMarkers    * Get3DMarkers()");return m_p3DMarkers; };
-    inline CPad                     * GetPad()                  { DEBUG_TRACE("CPad     * GetPad()");return m_pPad; };
-    inline CTheCarGenerators        * GetTheCarGenerators()     { DEBUG_TRACE("CTheCarGenerators  * GetTheCarGenerators()");return m_pTheCarGenerators; };
-    inline CAERadioTrackManager     * GetAERadioTrackManager()  { DEBUG_TRACE("CAERadioTrackManager * GetAERadioTrackManager()");return m_pCAERadioTrackManager; };
-    inline CAudioEngine             * GetAudioEngine()          { DEBUG_TRACE("CAudio     * GetAudioEngine()");return m_pAudioEngine; };
-    inline CAudioEngine             * GetAudio()                { DEBUG_TRACE("CAudio     * GetAudioEngine()");return m_pAudioEngine; };
-    inline CAudioContainer          * GetAudioContainer()       { DEBUG_TRACE("CAudio     * GetAudioContainer()");return m_pAudioContainer; };
-    inline CMenuManager             * GetMenuManager()          { DEBUG_TRACE("CMenuManager         * GetMenuManager()");return m_pMenuManager; };
-    inline CText                    * GetText()                 { DEBUG_TRACE("CText                    * GetText()");return m_pText; };
-    inline CStats                   * GetStats()                { DEBUG_TRACE("CStats                   * GetStats()");return m_pStats; };
-    inline CFont                    * GetFont()                 { DEBUG_TRACE("CFont                    * GetFont()");return m_pFont; };
-    inline CPathFind                * GetPathFind()             { DEBUG_TRACE("CPathFind                * GetPathFind()");return m_pPathFind; };
-    inline CPopulation              * GetPopulation()           { DEBUG_TRACE("CPopulation              * GetPopulation()");return m_pPopulation; };
-    inline CTaskManagementSystem    * GetTaskManagementSystem() { DEBUG_TRACE("CTaskManagementSystemSA * GetTaskManagementSystem()");return m_pTaskManagementSystem; };
-    inline CTasks                   * GetTasks() { DEBUG_TRACE("CTasks * GetTasks()");return m_pTasks; };
-    inline CGameSettings            * GetSettings()             { DEBUG_TRACE("CGameSettings * GetSettings()");return m_pSettings; };
-    inline CCarEnterExit            * GetCarEnterExit()         { DEBUG_TRACE("CCarEnterExit           * GetCarEnterExit()");return m_pCarEnterExit; };
-    inline CControllerConfigManager * GetControllerConfigManager()  { DEBUG_TRACE("CControllerConfigManager* GetControllerConfigManager()");return m_pControllerConfigManager; };
-    inline CRenderWare              * GetRenderWare()           { DEBUG_TRACE("CRenderWare * GetRenderWare()");return m_pRenderWare; };
-    inline CHandlingManager         * GetHandlingManager ()      { return m_pHandlingManager; };
-    inline CAnimManager             * GetAnimManager ()          { return m_pAnimManager; }
-    inline CStreaming               * GetStreaming ()            { return m_pStreaming; }
-    inline CVisibilityPlugins       * GetVisibilityPlugins ()    { return m_pVisibilityPlugins; }
-    inline CKeyGen                  * GetKeyGen ()               { return m_pKeyGen; }
-    inline CRopes                   * GetRopes ()                { return m_pRopes; }
-    inline CFx                      * GetFx ()                   { return m_pFx; }
-    inline CFxManager               * GetFxManager ()            { return m_pFxManager; }
-    inline CWaterManager            * GetWaterManager ()         { return m_pWaterManager; }
-    inline CWeaponStatManager       * GetWeaponStatManager()     { return m_pWeaponStatsManager; }
-    inline CPointLights             * GetPointLights ()          { return m_pPointLights; }
-    CRenderWareSA*                  GetRenderWareSA()            { return m_pRenderWare; }
-    CFxManagerSA*                   GetFxManagerSA ()            { return m_pFxManager; }
+    CPools* GetPools()
+    {
+        DEBUG_TRACE("CPools     * GetPools()");
+        return m_pPools;
+    };
+    CPlayerInfo* GetPlayerInfo()
+    {
+        DEBUG_TRACE("CPlayerInfo    * GetPlayerInfo()");
+        return m_pPlayerInfo;
+    };
+    CProjectileInfo* GetProjectileInfo()
+    {
+        DEBUG_TRACE("CProjectileInfo   * GetProjectileInfo()");
+        return m_pProjectileInfo;
+    };
+    CRadar* GetRadar()
+    {
+        DEBUG_TRACE("CRadar     * GetRadar()");
+        return m_pRadar;
+    };
+    CRestart* GetRestart()
+    {
+        DEBUG_TRACE("CRestart    * GetRestart()");
+        return m_pRestart;
+    };
+    CClock* GetClock()
+    {
+        DEBUG_TRACE("CClock     * GetClock()");
+        return m_pClock;
+    };
+    CCoronas* GetCoronas()
+    {
+        DEBUG_TRACE("CCoronas    * GetCoronas()");
+        return m_pCoronas;
+    };
+    CCheckpoints* GetCheckpoints()
+    {
+        DEBUG_TRACE("CCheckpoints   * GetCheckpoints()");
+        return m_pCheckpoints;
+    };
+    CEventList* GetEventList()
+    {
+        DEBUG_TRACE("CEventList    * GetEventList()");
+        return m_pEventList;
+    };
+    CFireManager* GetFireManager()
+    {
+        DEBUG_TRACE("CFireManager   * GetFireManager()");
+        return m_pFireManager;
+    };
+    CExplosionManager* GetExplosionManager()
+    {
+        DEBUG_TRACE("CExplosionManager  * GetExplosionManager()");
+        return m_pExplosionManager;
+    };
+    CGarages* GetGarages()
+    {
+        DEBUG_TRACE("CGarages    * GetGarages()");
+        return m_pGarages;
+    };
+    CHud* GetHud()
+    {
+        DEBUG_TRACE("CHud     * GetHud()");
+        return m_pHud;
+    };
+    CWeather* GetWeather()
+    {
+        DEBUG_TRACE("CWeather    * GetWeather()");
+        return m_pWeather;
+    };
+    CWorld* GetWorld()
+    {
+        DEBUG_TRACE("CWorld     * GetWorld()");
+        return m_pWorld;
+    };
+    CCamera* GetCamera()
+    {
+        DEBUG_TRACE("CCamera     * GetCamera()");
+        return m_pCamera;
+    };
+    CPickups* GetPickups()
+    {
+        DEBUG_TRACE("CPickups    * GetPickups()");
+        return m_pPickups;
+    };
+    C3DMarkers* Get3DMarkers()
+    {
+        DEBUG_TRACE("C3DMarkers    * Get3DMarkers()");
+        return m_p3DMarkers;
+    };
+    CPad* GetPad()
+    {
+        DEBUG_TRACE("CPad     * GetPad()");
+        return m_pPad;
+    };
+    CTheCarGenerators* GetTheCarGenerators()
+    {
+        DEBUG_TRACE("CTheCarGenerators  * GetTheCarGenerators()");
+        return m_pTheCarGenerators;
+    };
+    CAERadioTrackManager* GetAERadioTrackManager()
+    {
+        DEBUG_TRACE("CAERadioTrackManager * GetAERadioTrackManager()");
+        return m_pCAERadioTrackManager;
+    };
+    CAudioEngine* GetAudioEngine()
+    {
+        DEBUG_TRACE("CAudio     * GetAudioEngine()");
+        return m_pAudioEngine;
+    };
+    CAEAudioHardware* GetAEAudioHardware()
+    {
+        DEBUG_TRACE("CAEAudioHardware     * GetAEAudioHardware()");
+        return m_pAEAudioHardware;
+    };
+    CAESoundManager* GetAESoundManager() override { return m_pAESoundManager; }
+    CAudioContainer* GetAudioContainer()
+    {
+        DEBUG_TRACE("CAudio     * GetAudioContainer()");
+        return m_pAudioContainer;
+    };
+    CMenuManager* GetMenuManager()
+    {
+        DEBUG_TRACE("CMenuManager         * GetMenuManager()");
+        return m_pMenuManager;
+    };
+    CText* GetText()
+    {
+        DEBUG_TRACE("CText                    * GetText()");
+        return m_pText;
+    };
+    CStats* GetStats()
+    {
+        DEBUG_TRACE("CStats                   * GetStats()");
+        return m_pStats;
+    };
+    CFont* GetFont()
+    {
+        DEBUG_TRACE("CFont                    * GetFont()");
+        return m_pFont;
+    };
+    CPathFind* GetPathFind()
+    {
+        DEBUG_TRACE("CPathFind                * GetPathFind()");
+        return m_pPathFind;
+    };
+    CPopulation* GetPopulation()
+    {
+        DEBUG_TRACE("CPopulation              * GetPopulation()");
+        return m_pPopulation;
+    };
+    CTaskManagementSystem* GetTaskManagementSystem()
+    {
+        DEBUG_TRACE("CTaskManagementSystemSA * GetTaskManagementSystem()");
+        return m_pTaskManagementSystem;
+    };
+    CTasks* GetTasks()
+    {
+        DEBUG_TRACE("CTasks * GetTasks()");
+        return m_pTasks;
+    };
+    CGameSettings* GetSettings()
+    {
+        DEBUG_TRACE("CGameSettings * GetSettings()");
+        return m_pSettings;
+    };
+    CCarEnterExit* GetCarEnterExit()
+    {
+        DEBUG_TRACE("CCarEnterExit           * GetCarEnterExit()");
+        return m_pCarEnterExit;
+    };
+    CControllerConfigManager* GetControllerConfigManager()
+    {
+        DEBUG_TRACE("CControllerConfigManager* GetControllerConfigManager()");
+        return m_pControllerConfigManager;
+    };
+    CRenderWare* GetRenderWare()
+    {
+        DEBUG_TRACE("CRenderWare * GetRenderWare()");
+        return m_pRenderWare;
+    };
+    CHandlingManager*   GetHandlingManager() { return m_pHandlingManager; };
+    CAnimManager*       GetAnimManager() { return m_pAnimManager; }
+    CStreaming*         GetStreaming() { return m_pStreaming; }
+    CVisibilityPlugins* GetVisibilityPlugins() { return m_pVisibilityPlugins; }
+    CKeyGen*            GetKeyGen() { return m_pKeyGen; }
+    CRopes*             GetRopes() { return m_pRopes; }
+    CFx*                GetFx() { return m_pFx; }
+    CFxManager*         GetFxManager() { return m_pFxManager; }
+    CWaterManager*      GetWaterManager() { return m_pWaterManager; }
+    CWeaponStatManager* GetWeaponStatManager() { return m_pWeaponStatsManager; }
+    CPointLights*       GetPointLights() { return m_pPointLights; }
+    CRenderWareSA*      GetRenderWareSA() { return m_pRenderWare; }
+    CFxManagerSA*       GetFxManagerSA() { return m_pFxManager; }
 
-    CWeaponInfo             * GetWeaponInfo(eWeaponType weapon,eWeaponSkill skill=WEAPONSKILL_STD);
-    CModelInfo              * GetModelInfo( DWORD dwModelID );
+    CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
+    CModelInfo*  GetModelInfo(DWORD dwModelID);
 
-    inline DWORD            GetSystemTime (  )      { DEBUG_TRACE("DWORD     GetSystemTime (  )");return *VAR_SystemTime; };
-    inline BOOL             IsAtMenu (  )           { DEBUG_TRACE("BOOL     IsAtMenu (  )");if(*VAR_IsAtMenu) return TRUE; else return FALSE; };
-    inline BOOL             IsGameLoaded (  )       { DEBUG_TRACE("BOOL     IsGameLoaded (  )");if(*VAR_IsGameLoaded) return TRUE; else return FALSE; };
-    VOID                    StartGame ( );
-    VOID                    SetSystemState ( eSystemState State );
-    eSystemState            GetSystemState ( );
-    inline BOOL             IsNastyGame (  )                    { DEBUG_TRACE("BOOL     IsNastyGame (  )"); return *VAR_IsNastyGame; };
-    inline VOID             SetNastyGame ( BOOL IsNasty )       { DEBUG_TRACE("VOID     SetNastyGame ( BOOL IsNasty )"); *VAR_IsNastyGame = IsNasty?true:false; };
-    VOID                    Pause ( bool bPaused );
-    bool                    IsPaused ( );
-    bool                    IsInForeground ( );
-    VOID                    DisableRenderer( bool bDisabled );
-    VOID                    TakeScreenshot ( char * szFileName );
-    DWORD                   * GetMemoryValue ( DWORD dwOffset );
+    DWORD GetSystemTime()
+    {
+        DEBUG_TRACE("DWORD     GetSystemTime (  )");
+        return *VAR_SystemTime;
+    };
+    BOOL IsAtMenu()
+    {
+        DEBUG_TRACE("BOOL     IsAtMenu (  )");
+        if (*VAR_IsAtMenu)
+            return TRUE;
+        else
+            return FALSE;
+    };
+    BOOL IsGameLoaded()
+    {
+        DEBUG_TRACE("BOOL     IsGameLoaded (  )");
+        if (*VAR_IsGameLoaded)
+            return TRUE;
+        else
+            return FALSE;
+    };
+    VOID         StartGame();
+    VOID         SetSystemState(eSystemState State);
+    eSystemState GetSystemState();
+    BOOL         IsNastyGame()
+    {
+        DEBUG_TRACE("BOOL     IsNastyGame (  )");
+        return *VAR_IsNastyGame;
+    };
+    VOID SetNastyGame(BOOL IsNasty)
+    {
+        DEBUG_TRACE("VOID     SetNastyGame ( BOOL IsNasty )");
+        *VAR_IsNastyGame = IsNasty ? true : false;
+    };
+    VOID   Pause(bool bPaused);
+    bool   IsPaused();
+    bool   IsInForeground();
+    VOID   DisableRenderer(bool bDisabled);
+    VOID   TakeScreenshot(char* szFileName);
+    DWORD* GetMemoryValue(DWORD dwOffset);
 
-    VOID                    SetRenderHook ( InRenderer* pInRenderer );
+    VOID SetRenderHook(InRenderer* pInRenderer);
 
-    void                    Initialize  ( void );
-    void                    Reset                       ( void );
-    void                    Terminate ( void );
+    void Initialize(void);
+    void Reset(void);
+    void Terminate(void);
 
-    eGameVersion            GetGameVersion ( void );
-    eGameVersion            FindGameVersion ( void );
+    eGameVersion GetGameVersion(void);
+    eGameVersion FindGameVersion(void);
 
-    float                   GetFPS ( void );
-    float                   GetTimeStep ( void );
-    float                   GetOldTimeStep ( void );
-    float                   GetTimeScale ( void );
-    void                    SetTimeScale ( float fTimeScale );
+    float GetFPS(void);
+    float GetTimeStep(void);
+    float GetOldTimeStep(void);
+    float GetTimeScale(void);
+    void  SetTimeScale(float fTimeScale);
 
-    BOOL                    InitLocalPlayer(  );
+    BOOL InitLocalPlayer();
 
-    float                   GetGravity              ( void );
-    void                    SetGravity              ( float fGravity );
+    float GetGravity(void);
+    void  SetGravity(float fGravity);
 
-    float                   GetGameSpeed            ( void );
-    void                    SetGameSpeed            ( float fSpeed );
+    float GetGameSpeed(void);
+    void  SetGameSpeed(float fSpeed);
 
-    unsigned char           GetBlurLevel            ( void );
-    void                    SetBlurLevel            ( unsigned char ucLevel );
+    unsigned char GetBlurLevel(void);
+    void          SetBlurLevel(unsigned char ucLevel);
 
-    void                    SetJetpackWeaponEnabled     ( eWeaponType weaponType, bool bEnabled );
-    bool                    GetJetpackWeaponEnabled     ( eWeaponType weaponType );
+    void SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled);
+    bool GetJetpackWeaponEnabled(eWeaponType weaponType);
 
-    unsigned long           GetMinuteDuration       ( void );
-    void                    SetMinuteDuration       ( unsigned long ulTime );
+    unsigned long GetMinuteDuration(void);
+    void          SetMinuteDuration(unsigned long ulTime);
 
-    bool                    IsCheatEnabled          ( const char* szCheatName );
-    bool                    SetCheatEnabled         ( const char* szCheatName, bool bEnable );
-    void                    ResetCheats             ();
+    bool IsCheatEnabled(const char* szCheatName);
+    bool SetCheatEnabled(const char* szCheatName, bool bEnable);
+    void ResetCheats();
 
-    bool                    VerifySADataFileNames   ();
-    bool                    PerformChecks           ();
-    int&                    GetCheckStatus          ( void )            { return m_iCheckStatus; }
+    bool IsRandomFoliageEnabled();
+    void SetRandomFoliageEnabled(bool bEnable);
 
+    bool IsMoonEasterEggEnabled();
+    void SetMoonEasterEggEnabled(bool bEnabled);
 
-    void                    SetAsyncLoadingFromScript       ( bool bScriptEnabled, bool bScriptForced );
-    void                    SuspendASyncLoading             ( bool bSuspend, uint uiAutoUnsuspendDelay = 0 );
-    bool                    IsASyncLoadingEnabled           ( bool bIgnoreSuspend = false );
+    bool IsExtraAirResistanceEnabled();
+    void SetExtraAirResistanceEnabled(bool bEnable);
 
-    bool                    HasCreditScreenFadedOut         ( void );
+    bool IsUnderWorldWarpEnabled();
+    void SetUnderWorldWarpEnabled(bool bEnable);
 
-    void                    SetupSpecialCharacters          ( void );
-    CWeapon *               CreateWeapon                    ( void );
-    CWeaponStat *           CreateWeaponStat                ( eWeaponType weaponType, eWeaponSkill weaponSkill );
-    void                    FlushPendingRestreamIPL         ( void );
-    void                    ResetModelLodDistances          ( void );
-    void                    ResetAlphaTransparencies         ( void );
-    void                    DisableVSync                    ( void );
+    bool VerifySADataFileNames();
+    bool PerformChecks();
+    int& GetCheckStatus(void) { return m_iCheckStatus; }
 
-    void                    OnPedContextChange              ( CPed* pPedContext );
-    CPed*                   GetPedContext                   ( void );
+    void SetAsyncLoadingFromScript(bool bScriptEnabled, bool bScriptForced);
+    void SuspendASyncLoading(bool bSuspend, uint uiAutoUnsuspendDelay = 0);
+    bool IsASyncLoadingEnabled(bool bIgnoreSuspend = false);
 
-    void                    GetShaderReplacementStats       ( SShaderReplacementStats& outStats );
+    bool HasCreditScreenFadedOut(void);
 
-    void                    SetPreWeaponFireHandler         ( PreWeaponFireHandler* pPreWeaponFireHandler )     { m_pPreWeaponFireHandler = pPreWeaponFireHandler; }
-    void                    SetPostWeaponFireHandler        ( PostWeaponFireHandler* pPostWeaponFireHandler )   { m_pPostWeaponFireHandler = pPostWeaponFireHandler; }
-    void                    SetTaskSimpleBeHitHandler       ( TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler ) { m_pTaskSimpleBeHitHandler = pTaskSimpleBeHitHandler; }
+    void         SetupSpecialCharacters(void);
+    CWeapon*     CreateWeapon(void);
+    CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill);
+    void         FlushPendingRestreamIPL(void);
+    void         ResetModelLodDistances(void);
+    void         ResetAlphaTransparencies(void);
+    void         DisableVSync(void);
+
+    void  OnPedContextChange(CPed* pPedContext);
+    CPed* GetPedContext(void);
+
+    void GetShaderReplacementStats(SShaderReplacementStats& outStats);
+
+    void SetPreWeaponFireHandler(PreWeaponFireHandler* pPreWeaponFireHandler) { m_pPreWeaponFireHandler = pPreWeaponFireHandler; }
+    void SetPostWeaponFireHandler(PostWeaponFireHandler* pPostWeaponFireHandler) { m_pPostWeaponFireHandler = pPostWeaponFireHandler; }
+    void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) { m_pTaskSimpleBeHitHandler = pTaskSimpleBeHitHandler; }
 
     PreWeaponFireHandler*   m_pPreWeaponFireHandler;
     PostWeaponFireHandler*  m_pPostWeaponFireHandler;
     TaskSimpleBeHitHandler* m_pTaskSimpleBeHitHandler;
+
 private:
-    CPools                  * m_pPools;
-    CPlayerInfo             * m_pPlayerInfo;
-    CProjectileInfo         * m_pProjectileInfo;
-    CRadar                  * m_pRadar;
-    CRestart                * m_pRestart;
-    CClock                  * m_pClock;
-    CCoronas                * m_pCoronas;
-    CCheckpoints            * m_pCheckpoints;
-    CEventList              * m_pEventList;
-    CFireManager            * m_pFireManager;
-    CGarages                * m_pGarages;
-    CHud                    * m_pHud;
-    CWanted                 * m_pWanted;
-    CWeather                * m_pWeather;
-    CWorld                  * m_pWorld;
-    CCamera                 * m_pCamera;
-    CModelInfo              * m_pModelInfo; 
-    CPickups                * m_pPickups;
-    CWeaponInfo             * m_pWeaponInfo;
-    CExplosionManager       * m_pExplosionManager;
-    C3DMarkers              * m_p3DMarkers;
-    CRenderWareSA           * m_pRenderWare;
-    CHandlingManager        * m_pHandlingManager;
-    CAnimManager            * m_pAnimManager;
-    CStreaming              * m_pStreaming;
-    CVisibilityPlugins      * m_pVisibilityPlugins;
-    CKeyGen                 * m_pKeyGen;
-    CRopes                  * m_pRopes;
-    CFx                     * m_pFx;
-    CFxManagerSA            * m_pFxManager;
-    CWaterManager           * m_pWaterManager;
-    CWeaponStatManager      * m_pWeaponStatsManager;
-    CPointLights            * m_pPointLights;
+    CPools*             m_pPools;
+    CPlayerInfo*        m_pPlayerInfo;
+    CProjectileInfo*    m_pProjectileInfo;
+    CRadar*             m_pRadar;
+    CRestart*           m_pRestart;
+    CClock*             m_pClock;
+    CCoronas*           m_pCoronas;
+    CCheckpoints*       m_pCheckpoints;
+    CEventList*         m_pEventList;
+    CFireManager*       m_pFireManager;
+    CGarages*           m_pGarages;
+    CHud*               m_pHud;
+    CWanted*            m_pWanted;
+    CWeather*           m_pWeather;
+    CWorld*             m_pWorld;
+    CCamera*            m_pCamera;
+    CModelInfo*         m_pModelInfo;
+    CPickups*           m_pPickups;
+    CWeaponInfo*        m_pWeaponInfo;
+    CExplosionManager*  m_pExplosionManager;
+    C3DMarkers*         m_p3DMarkers;
+    CRenderWareSA*      m_pRenderWare;
+    CHandlingManager*   m_pHandlingManager;
+    CAnimManager*       m_pAnimManager;
+    CStreaming*         m_pStreaming;
+    CVisibilityPlugins* m_pVisibilityPlugins;
+    CKeyGen*            m_pKeyGen;
+    CRopes*             m_pRopes;
+    CFx*                m_pFx;
+    CFxManagerSA*       m_pFxManager;
+    CWaterManager*      m_pWaterManager;
+    CWeaponStatManager* m_pWeaponStatsManager;
+    CPointLights*       m_pPointLights;
 
-    CPad                        * m_pPad;
-    CTheCarGenerators           * m_pTheCarGenerators;
-    CAERadioTrackManager        * m_pCAERadioTrackManager;
-    CAudioEngine                * m_pAudioEngine;
-    CAudioContainer             * m_pAudioContainer;
-    CMenuManager                * m_pMenuManager;
-    CText                       * m_pText;
-    CStats                      * m_pStats;
-    CFont                       * m_pFont;
-    CPathFind                   * m_pPathFind;
-    CPopulation                 * m_pPopulation;
-    CTaskManagementSystem       * m_pTaskManagementSystem; // not used outside the game_sa
-    CTasks                      * m_pTasks;
-    CGameSettings               * m_pSettings;
-    CCarEnterExit               * m_pCarEnterExit;
-    CControllerConfigManager    * m_pControllerConfigManager;
+    CPad*                     m_pPad;
+    CTheCarGenerators*        m_pTheCarGenerators;
+    CAERadioTrackManager*     m_pCAERadioTrackManager;
+    CAudioEngine*             m_pAudioEngine;
+    CAEAudioHardware*         m_pAEAudioHardware;
+    CAESoundManager*          m_pAESoundManager;
+    CAudioContainer*          m_pAudioContainer;
+    CMenuManager*             m_pMenuManager;
+    CText*                    m_pText;
+    CStats*                   m_pStats;
+    CFont*                    m_pFont;
+    CPathFind*                m_pPathFind;
+    CPopulation*              m_pPopulation;
+    CTaskManagementSystem*    m_pTaskManagementSystem;            // not used outside the game_sa
+    CTasks*                   m_pTasks;
+    CGameSettings*            m_pSettings;
+    CCarEnterExit*            m_pCarEnterExit;
+    CControllerConfigManager* m_pControllerConfigManager;
 
-    eGameVersion            m_eGameVersion;
-    bool                    m_bAsyncScriptEnabled;
-    bool                    m_bAsyncScriptForced;
-    bool                    m_bASyncLoadingSuspended;
-    int                     m_iCheckStatus;
+    eGameVersion m_eGameVersion;
+    bool         m_bAsyncScriptEnabled;
+    bool         m_bAsyncScriptForced;
+    bool         m_bASyncLoadingSuspended;
+    int          m_iCheckStatus;
+    bool         m_bUnderworldWarp;
 
-    static unsigned long*   VAR_SystemTime;
-    static unsigned long*   VAR_IsAtMenu;
-    static unsigned long*   VAR_IsGameLoaded;
-    static bool*            VAR_GamePaused;
-    static bool*            VAR_IsForegroundWindow;;
-    static unsigned long*   VAR_SystemState;
-    static void*            VAR_StartGame;
-    static bool*            VAR_IsNastyGame;
-    static float*           VAR_TimeScale;
-    static float*           VAR_FPS;
-    static float*           VAR_OldTimeStep;
-    static float*           VAR_TimeStep;
-    static unsigned long*   VAR_Framelimiter;
+    static unsigned long* VAR_SystemTime;
+    static unsigned long* VAR_IsAtMenu;
+    static unsigned long* VAR_IsGameLoaded;
+    static bool*          VAR_GamePaused;
+    static bool*          VAR_IsForegroundWindow;
+    ;
+    static unsigned long* VAR_SystemState;
+    static void*          VAR_StartGame;
+    static bool*          VAR_IsNastyGame;
+    static float*         VAR_TimeScale;
+    static float*         VAR_FPS;
+    static float*         VAR_OldTimeStep;
+    static float*         VAR_TimeStep;
+    static unsigned long* VAR_Framelimiter;
 
-    std::map < std::string, SCheatSA* > m_Cheats;
+    std::map<std::string, SCheatSA*> m_Cheats;
 
-    SFixedArray < bool, WEAPONTYPE_LAST_WEAPONTYPE > m_JetpackWeapons;
+    SFixedArray<bool, WEAPONTYPE_LAST_WEAPONTYPE> m_JetpackWeapons;
 
-    CPed*                   m_pPedContext;
-    CTickCount              m_llASyncLoadingAutoUnsuspendTime;
+    CPed*      m_pPedContext;
+    CTickCount m_llASyncLoadingAutoUnsuspendTime;
 };
-
-#endif
-

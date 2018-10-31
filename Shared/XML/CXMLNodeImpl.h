@@ -1,17 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        xml/CXMLNodeImpl.h
-*  PURPOSE:     XML node class
-*  DEVELOPERS:  Christian Myhre Lundheim <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        xml/CXMLNodeImpl.h
+ *  PURPOSE:     XML node class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CXMLNODEIMPL_H
-#define __CXMLNODEIMPL_H
+#pragma once
 
 #include "CXMLAttributesImpl.h"
 #include <tinyxml.h>
@@ -23,76 +21,78 @@
 class CXMLNodeImpl : public CXMLNode
 {
 public:
-                            CXMLNodeImpl        ( class CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node );
-                            ~CXMLNodeImpl       ( void );
+    CXMLNodeImpl(class CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node);
+    ~CXMLNodeImpl(void);
 
-    CXMLNode*               CreateSubNode       ( const char* szTagName );
-    void                    DeleteSubNode       ( CXMLNode* pNode ) { delete pNode; };
-    void                    DeleteAllSubNodes   ( void );
+    CXMLNode* CreateSubNode(const char* szTagName, CXMLNode* pInsertBefore = nullptr);
+    void      DeleteSubNode(CXMLNode* pNode) { delete pNode; };
+    void      DeleteAllSubNodes(void);
 
-    unsigned int            GetSubNodeCount     ( void );
-    CXMLNode*               GetSubNode          ( unsigned int uiIndex );
-    CXMLNode*               FindSubNode         ( const char* szTagName, unsigned int uiIndex = 0 );
+    unsigned int GetSubNodeCount(void);
+    CXMLNode*    GetSubNode(unsigned int uiIndex);
+    CXMLNode*    FindSubNode(const char* szTagName, unsigned int uiIndex = 0);
 
-    std::list < CXMLNode* > ::iterator
-                            ChildrenBegin       ( void ) { return m_Children.begin (); };
-    std::list < CXMLNode* > ::iterator
-                            ChildrenEnd         ( void ) { return m_Children.end (); };
+    std::list<CXMLNode*>::iterator ChildrenBegin(void) { return m_Children.begin(); };
+    std::list<CXMLNode*>::iterator ChildrenEnd(void) { return m_Children.end(); };
 
-    CXMLAttributes&         GetAttributes       ( void );
-    CXMLNode*               GetParent           ( void );
+    CXMLAttributes& GetAttributes(void);
+    CXMLNode*       GetParent(void);
 
-    int                     GetLine             ( void );
+    int GetLine(void);
 
-    const std::string&      GetTagName          ( void );
-    void                    SetTagName          ( const std::string& strString );
+    const std::string& GetTagName(void);
+    void               SetTagName(const std::string& strString);
 
-    const std::string       GetTagContent       ( void );
-    bool                    GetTagContent       ( bool& bContent );
-    bool                    GetTagContent       ( int& iContent );
-    bool                    GetTagContent       ( unsigned int& uiContent );
-    bool                    GetTagContent       ( float& fContent );
+    const std::string GetTagContent(void);
+    bool              GetTagContent(bool& bContent);
+    bool              GetTagContent(int& iContent);
+    bool              GetTagContent(unsigned int& uiContent);
+    bool              GetTagContent(float& fContent);
 
-    void                    SetTagContent       ( const char* szContent, bool bCDATA = false );
-    void                    SetTagContent       ( bool bContent );
-    void                    SetTagContent       ( int iContent );
-    void                    SetTagContent       ( unsigned int uiContent );
-    void                    SetTagContent       ( float fContent );
-    void                    SetTagContentf      ( const char* szFormat, ... );
+    void SetTagContent(const char* szContent, bool bCDATA = false);
+    void SetTagContent(bool bContent);
+    void SetTagContent(int iContent);
+    void SetTagContent(unsigned int uiContent);
+    void SetTagContent(float fContent);
+    void SetTagContentf(const char* szFormat, ...);
 
-    eXMLClass               GetClassType        ( void )    { return CXML_NODE; };
-    unsigned long           GetID               ( void )    { dassert ( m_pFile && m_pFile->IsUsingIDs () ); return m_ulID; };
-    bool                    IsUsingIDs          ( void )    { return m_bUsingIDs; };
+    eXMLClass     GetClassType(void) { return CXML_NODE; };
+    unsigned long GetID(void)
+    {
+        dassert(m_pFile && m_pFile->IsUsingIDs());
+        return m_ulID;
+    };
+    bool IsUsingIDs(void) { return m_bUsingIDs; };
 
-    CXMLNode*               CopyNode            ( CXMLNode* pParent = NULL );
-    bool                    CopyChildrenInto    ( CXMLNode* pDestination, bool bRecursive );
+    CXMLNode* CopyNode(CXMLNode* pParent = NULL);
+    bool      CopyChildrenInto(CXMLNode* pDestination, bool bRecursive);
 
-    TiXmlElement*           GetNode             ( void );
-    void                    DeleteWrapper       ( void );
+    TiXmlElement* GetNode(void);
+    void          DeleteWrapper(void);
 
-    void                    AddToList           ( CXMLNode* pNode );
-    void                    RemoveFromList      ( CXMLNode* pNode );
-    void                    RemoveAllFromList   ( void );
+    void AddToList(CXMLNode* pNode);
+    void RemoveFromList(CXMLNode* pNode);
+    void RemoveAllFromList(void);
 
-    bool                    IsValid             ( void ) { return !m_bUsingIDs || m_ulID != INVALID_XML_ID; };
+    bool IsValid(void) { return !m_bUsingIDs || m_ulID != INVALID_XML_ID; };
 
-    virtual SString         GetAttributeValue   ( const SString& strAttributeName );
+    virtual SString GetAttributeValue(const SString& strAttributeName);
+    virtual SString GetCommentText(void);
+    virtual void    SetCommentText(const char* szCommentText, bool bLeadingBlankLine = false);
 
 private:
-    bool                    StringToLong        ( const char* szString, long& lValue );
+    bool StringToLong(const char* szString, long& lValue);
 
-    unsigned long               m_ulID;
-    const bool                  m_bUsingIDs;
+    unsigned long m_ulID;
+    const bool    m_bUsingIDs;
 
-    class CXMLFileImpl*         m_pFile;
-    CXMLNodeImpl*               m_pParent;
-    TiXmlElement*               m_pNode;
-    TiXmlDocument*              m_pDocument;
+    class CXMLFileImpl* m_pFile;
+    CXMLNodeImpl*       m_pParent;
+    TiXmlElement*       m_pNode;
+    TiXmlDocument*      m_pDocument;
 
-    std::list < CXMLNode* >     m_Children;
-    bool                        m_bCanRemoveFromList;
+    std::list<CXMLNode*> m_Children;
+    bool                 m_bCanRemoveFromList;
 
-    CXMLAttributesImpl          m_Attributes;
+    CXMLAttributesImpl m_Attributes;
 };
-
-#endif

@@ -1,23 +1,23 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CEvenGunShotSA.cpp
-*  PURPOSE:     Gunshot event
-*  DEVELOPERS:  Jax <>
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CEvenGunShotSA.cpp
+ *  PURPOSE:     Gunshot event
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
-CEventGunShotSA::CEventGunShotSA ( CEntity * pEntity, CVector & vecOrigin, CVector & vecTarget, bool b_1 )
+CEventGunShotSA::CEventGunShotSA(CEntity* pEntity, CVector& vecOrigin, CVector& vecTarget, bool b_1)
 {
     m_pInterface = new CEventGunShotSAInterface;
 
     DWORD dwEntityInterface = 0;
-    if ( pEntity ) dwEntityInterface = (DWORD)pEntity->GetInterface ();
+    if (pEntity)
+        dwEntityInterface = (DWORD)pEntity->GetInterface();
     float originX = vecOrigin.fX, originY = vecOrigin.fY, originZ = vecOrigin.fZ;
     float targetX = vecTarget.fX, targetY = vecTarget.fY, targetZ = vecTarget.fZ;
     DWORD dwThis = (DWORD)m_pInterface;
@@ -37,9 +37,9 @@ CEventGunShotSA::CEventGunShotSA ( CEntity * pEntity, CVector & vecOrigin, CVect
     }
 }
 
-void CEventGunShotSA::Destroy ( bool bDestroyInterface )
+void CEventGunShotSA::Destroy(bool bDestroyInterface)
 {
-    if ( bDestroyInterface )
+    if (bDestroyInterface)
     {
         DWORD dwThis = (DWORD)m_pInterface;
         DWORD dwFunc = FUNC_CEventGunShot_Destructor;

@@ -141,6 +141,17 @@ public:
     */
     const Rect& getSourceTextureArea(void) const;
 
+    /*!
+    \brief
+        Sets area describing the source texture area used by this Image.
+        !!! ADDED BY MTA !!!
+
+    \param
+        area object that describes, in pixels, the area upon the source texture
+        which is used when rendering this Image.
+    */
+    void setSourceTextureArea(const Rect& area);
+
 	/*!
 	\brief
 		Queue the image to be drawn. 

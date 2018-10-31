@@ -1,16 +1,15 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/game/TaskCar.h
-*  PURPOSE:     Car task interface
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/game/TaskCar.h
+ *  PURPOSE:     Car task interface
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
-#ifndef __CGAME_TASKCAR
-#define __CGAME_TASKCAR
+#pragma once
 
 #include "Task.h"
 
@@ -25,37 +24,35 @@ enum
 class CTaskComplexEnterCar : public virtual CTaskComplex
 {
 public:
-    virtual         ~CTaskComplexEnterCar ( void ) {};
+    virtual ~CTaskComplexEnterCar(void){};
 
-    virtual int     GetTargetDoor()=0;
-    virtual void    SetTargetDoor(int iDoor)=0;
-    virtual int     GetEnterCarStartTime()=0;
+    virtual int  GetTargetDoor() = 0;
+    virtual void SetTargetDoor(int iDoor) = 0;
+    virtual int  GetEnterCarStartTime() = 0;
 };
 
 class CTaskComplexEnterCarAsDriver : public virtual CTaskComplexEnterCar
 {
 public:
-    virtual         ~CTaskComplexEnterCarAsDriver ( void ) {};
+    virtual ~CTaskComplexEnterCarAsDriver(void){};
 };
 
 class CTaskComplexEnterCarAsPassenger : public virtual CTaskComplexEnterCar
 {
 public:
-    virtual         ~CTaskComplexEnterCarAsPassenger ( void ) {};
+    virtual ~CTaskComplexEnterCarAsPassenger(void){};
 };
 
 class CTaskComplexEnterBoatAsDriver : public virtual CTaskComplex
 {
 public:
-    virtual         ~CTaskComplexEnterBoatAsDriver ( void ) {};
+    virtual ~CTaskComplexEnterBoatAsDriver(void){};
 };
 
 class CTaskComplexLeaveCar : public virtual CTaskComplex
 {
 public:
-    virtual         ~CTaskComplexLeaveCar ( void ) {};
+    virtual ~CTaskComplexLeaveCar(void){};
 
-    virtual int     GetTargetDoor()=0;
+    virtual int GetTargetDoor() = 0;
 };
-
-#endif

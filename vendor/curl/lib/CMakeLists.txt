@@ -1,7 +1,13 @@
 set(LIB_NAME libcurl)
 
-configure_file(${CURL_SOURCE_DIR}/include/curl/curlbuild.h.cmake
-  ${CURL_BINARY_DIR}/include/curl/curlbuild.h)
+if(BUILD_SHARED_LIBS)
+  set(CURL_STATICLIB NO)
+else()
+  set(CURL_STATICLIB YES)
+endif()
+
+# Use:
+# * CURL_STATICLIB
 configure_file(curl_config.h.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/curl_config.h)
 
@@ -10,11 +16,11 @@ include(${CMAKE_CURRENT_BINARY_DIR}/Makefile.inc.cmake)
 
 list(APPEND HHEADERS
   ${CMAKE_CURRENT_BINARY_DIR}/curl_config.h
-  ${CURL_BINARY_DIR}/include/curl/curlbuild.h
   )
 
 if(MSVC)
   list(APPEND CSOURCES libcurl.rc)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4127")
 endif()
 
 # SET(CSOURCES
@@ -48,25 +54,6 @@ endif()
 # )
 # ENDIF(NOT HAVE_STRTOLL AND NOT HAVE__STRTOI64)
 
-if(HAVE_FEATURES_H)
-  set_source_files_properties(
-    cookie.c
-    easy.c
-    formdata.c
-    getenv.c
-    nonblock.c
-    hash.c
-    http.c
-    if2ip.c
-    mprintf.c
-    multi.c
-    sendf.c
-    telnet.c
-    transfer.c
-    url.c
-    COMPILE_FLAGS -D_BSD_SOURCE)
-endif(HAVE_FEATURES_H)
-
 
 # The rest of the build
 
@@ -76,47 +63,65 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/..)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-if(CURL_USE_ARES)
+if(USE_ARES)
   include_directories(${CARES_INCLUDE_DIR})
-endif()
-
-if(CURL_STATICLIB)
-  # Static lib
-  set(CURL_USER_DEFINED_DYNAMIC_OR_STATIC STATIC)
-else()
-  # DLL / so dynamic lib
-  set(CURL_USER_DEFINED_DYNAMIC_OR_STATIC SHARED)
 endif()
 
 add_library(
   ${LIB_NAME}
-  ${CURL_USER_DEFINED_DYNAMIC_OR_STATIC}
   ${HHEADERS} ${CSOURCES}
   )
 
-if(MSVC AND CURL_STATICLIB)
+if(MSVC AND NOT BUILD_SHARED_LIBS)
   set_target_properties(${LIB_NAME} PROPERTIES STATIC_LIBRARY_FLAGS ${CMAKE_EXE_LINKER_FLAGS})
+endif()
+
+if(NOT BUILD_SHARED_LIBS)
+    set_target_properties(${LIB_NAME} PROPERTIES INTERFACE_COMPILE_DEFINITIONS CURL_STATICLIB)
 endif()
 
 target_link_libraries(${LIB_NAME} ${CURL_LIBS})
 
 if(WIN32)
-  add_definitions( -D_USRDLL )
+  add_definitions(-D_USRDLL)
 endif()
 
 set_target_properties(${LIB_NAME} PROPERTIES COMPILE_DEFINITIONS BUILDING_LIBCURL)
 
-setup_curl_dependencies(${LIB_NAME})
+if(HIDES_CURL_PRIVATE_SYMBOLS)
+  set_property(TARGET ${LIB_NAME} APPEND PROPERTY COMPILE_DEFINITIONS "CURL_HIDDEN_SYMBOLS")
+  set_property(TARGET ${LIB_NAME} APPEND PROPERTY COMPILE_FLAGS ${CURL_CFLAG_SYMBOLS_HIDE})
+endif()
 
 # Remove the "lib" prefix since the library is already named "libcurl".
 set_target_properties(${LIB_NAME} PROPERTIES PREFIX "")
 set_target_properties(${LIB_NAME} PROPERTIES IMPORT_PREFIX "")
 
 if(WIN32)
-  if(NOT CURL_STATICLIB)
+  if(BUILD_SHARED_LIBS)
     # Add "_imp" as a suffix before the extension to avoid conflicting with the statically linked "libcurl.lib"
     set_target_properties(${LIB_NAME} PROPERTIES IMPORT_SUFFIX "_imp.lib")
   endif()
 endif()
 
-install(TARGETS ${LIB_NAME} DESTINATION lib)
+target_include_directories(${LIB_NAME} INTERFACE
+  $<INSTALL_INTERFACE:include>)
+
+install(TARGETS ${LIB_NAME}
+  EXPORT libcurl-target
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+export(TARGETS ${LIB_NAME}
+       APPEND FILE ${PROJECT_BINARY_DIR}/libcurl-target.cmake
+       NAMESPACE CURL::
+)
+
+install(EXPORT libcurl-target
+        FILE libcurl-target.cmake
+        NAMESPACE CURL::
+        DESTINATION ${CURL_INSTALL_CMAKE_DIR}
+)
+
