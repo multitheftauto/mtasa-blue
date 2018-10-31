@@ -1719,6 +1719,14 @@ void CCore::UpdateRecentlyPlayed()
 }
 
 //
+// Called just before GTA calculates frame time deltas
+//
+void CCore::OnGameTimerUpdate()
+{
+    ApplyQueuedFrameRateLimit();
+}
+
+//
 // Recalculate FPS limit to use
 //
 // Uses client rate from config
@@ -1793,53 +1801,45 @@ void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
 
     uint uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
 
-    TIMING_GRAPH("Limiter");
-
     if (uiUseRate < 1)
         return DoReliablePulse();
 
-    if (m_DiagnosticDebug != EDiagnosticDebug::D3D_6732)
-        Sleep(1);            // Make frame rate smoother maybe
+    // Apply previous frame rate if is hasn't been done yet
+    ApplyQueuedFrameRateLimit();
 
-    // Calc required time in ms between frames
-    const double dTargetTimeToUse = 1000.0 / uiUseRate;
-
-    // Time now
-    double dTimeMs = GetTickCount32();
-
-    // Get delta time in ms since last frame
-    double dTimeUsed = dTimeMs - m_dLastTimeMs;
-
-    // Apply any over/underrun carried over from the previous frame
-    dTimeUsed += m_dPrevOverrun;
-
-    if (dTimeUsed < dTargetTimeToUse)
-    {
-        // Have time spare - maybe eat some of that now
-        double dSpare = dTargetTimeToUse - dTimeUsed;
-
-        double dUseUpNow = dSpare - dTargetTimeToUse * 0.2f;
-        if (dUseUpNow >= 1)
-            Sleep(static_cast<DWORD>(floor(dUseUpNow)));
-
-        // Redo timing calcs
-        dTimeMs = GetTickCount32();
-        dTimeUsed = dTimeMs - m_dLastTimeMs;
-        dTimeUsed += m_dPrevOverrun;
-    }
-
-    // Update over/underrun for next frame
-    m_dPrevOverrun = dTimeUsed - dTargetTimeToUse;
-
-    // Limit carry over
-    m_dPrevOverrun = Clamp(dTargetTimeToUse * -0.9f, m_dPrevOverrun, dTargetTimeToUse * 0.1f);
-
-    m_dLastTimeMs = dTimeMs;
+    // Limit is usually applied in OnGameTimerUpdate
+    m_uiQueuedFrameRate = uiUseRate;
+    m_bQueuedFrameRateValid = true;
 
     DoReliablePulse();
 
     TIMING_GRAPH("FrameEnd");
     TIMING_GRAPH("");
+}
+
+//
+// Frame rate limit (wait) is done here.
+//
+void CCore::ApplyQueuedFrameRateLimit()
+{
+    if (m_bQueuedFrameRateValid)
+    {
+        m_bQueuedFrameRateValid = false;
+        // Calc required time in ms between frames
+        const double dTargetTimeToUse = 1000.0 / m_uiQueuedFrameRate;
+
+        while(true)
+        {
+            // See if we need to wait
+            double dSpare = dTargetTimeToUse - m_FrameRateTimer.Get();
+            if (dSpare <= 0.0)
+                break;
+            if (dSpare >= 2.0)
+                Sleep(1);
+        }
+        m_FrameRateTimer.Reset();
+        TIMING_GRAPH("Limiter");
+    }
 }
 
 //

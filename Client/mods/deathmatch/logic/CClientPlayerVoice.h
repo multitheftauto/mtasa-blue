@@ -16,6 +16,7 @@
 #define VOICE_SAMPLE_SIZE               2
 */
 
+#include <mutex>
 #include <speex/speex.h>
 #include <CClientPlayer.h>
 #include <../deathmatch/CVoiceRecorder.h>
@@ -33,7 +34,7 @@ public:
     bool m_bVoiceActive;
 
     std::list<SString> m_EventQueue;
-    CCriticalSection   m_CS;
+    std::mutex         m_Mutex; // Only for m_EventQueue and m_bVoiceActive
 
     void GetTempoValues(float& fSampleRate, float& fTempo, float& fPitch, bool& bReverse)
     {

@@ -1353,6 +1353,11 @@ void CGame::InitialDataStream(CPlayer& Player)
 
 void CGame::QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason, bool bSayInConsole, const char* szKickReason, const char* szResponsiblePlayer)
 {
+    if (Player.IsLeavingServer())
+        return;
+
+    Player.SetLeavingServer(true);
+    
     // Grab quit reaason
     const char* szReason = "Unknown";
     switch (Reason)
