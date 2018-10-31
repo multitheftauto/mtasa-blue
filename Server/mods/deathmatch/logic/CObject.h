@@ -75,9 +75,9 @@ public:
     bool     SetLowLodObject(CObject* pLowLodObject);
     CObject* GetLowLodObject(void);
 
-    bool IsVisibleInAllDimensions(void) { return m_bVisibleInAllDimensions; };
+    bool IsVisibleInAllDimensions() const { return m_bVisibleInAllDimensions; };
     void SetVisibleInAllDimensions(bool bVisible) { m_bVisibleInAllDimensions = bVisible; };
-    const bool IsVisibleInAllInteriors(void) { return m_bVisibleInAllInteriors; }
+    bool IsVisibleInAllInteriors() const { return m_bVisibleInAllInteriors; }
     void SetVisibleInAllInteriors(bool bVisible) { m_bVisibleInAllInteriors = bVisible; }
 
 protected:
