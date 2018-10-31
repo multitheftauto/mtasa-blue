@@ -29,11 +29,11 @@ public:
 
     static CClientRadarMarker* Get(ElementID ID);
 
-    unsigned short GetDimension(void) { return m_usDimension; }
+    const unsigned short GetDimension(void) { return m_usDimension; }
     void           SetDimension(unsigned short usDimension);
 
-    unsigned char GetInterior(void) { return m_ucInterior; }
-    void           SetInterior(unsigned char ucInterior);
+    const unsigned char GetInterior(void) { return m_ucInterior; }
+    void          SetInterior(unsigned char ucInterior);
 
     std::list<CClientRadarMarker*>::const_iterator IterBegin(void) { return m_Markers.begin(); };
     std::list<CClientRadarMarker*>::const_iterator IterEnd(void) { return m_Markers.end(); };
