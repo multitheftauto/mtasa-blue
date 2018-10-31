@@ -18,6 +18,7 @@ class CLuaMain;
 #include "lua/CLuaVector3.h"
 #include "lua/CLuaVector4.h"
 #include "lua/CLuaMatrix.h"
+#include "lua/CLuaMainShared.h"
 
 #include "CLuaFunctionDefs.h"
 
@@ -35,6 +36,8 @@ struct CRefInfo
 
 class CLuaMain            //: public CClient
 {
+    friend class CLuaMainShared;
+
 public:
     ZERO_ON_NEW
     CLuaMain(class CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP);
@@ -78,7 +81,6 @@ public:
 
     bool IsOOPEnabled(void) { return m_bEnableOOP; }
 
-    void InitPackageStorage(lua_State* L);                                        // Create a psuedo package.loaded table
     void GetPackage(lua_State* L, SString& strName);                              // Push the package value to the top of the stack
     void SetPackage(lua_State* L, SString& strName);                              // Set the package to the value at the top of the stack
     bool LoadLuaLib(lua_State* L, SString strName, SString& strError);            // Load a lua library of a given name

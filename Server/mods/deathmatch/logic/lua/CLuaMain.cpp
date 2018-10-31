@@ -188,7 +188,7 @@ void CLuaMain::InitVM(void)
     luaopen_os(m_luaVM);
 
     // Initialize packages system
-    InitPackageStorage(m_luaVM);
+    CLuaMainShared::InitPackageStorage(this, m_luaVM);
 
     // Initialize security restrictions. Very important to prevent lua trojans and viruses!
     InitSecurity();
@@ -659,37 +659,6 @@ int CLuaMain::OnUndump(const char* p, size_t n)
         return 0;
     }
     return 1;
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CLuaMain::InitPackageStorage
-//
-// Create a table for storage of Lua packages - stored in the Lua VM
-//
-///////////////////////////////////////////////////////////////
-void CLuaMain::InitPackageStorage(lua_State* L)
-{
-    lua_newtable(L);                        // stack: [tbl_new]
-    lua_pushstring(L, "loaded");            // stack: [tbl_new,"loaded"]
-    lua_newtable(L);                        // stack: [tbl_new,"loaded",tbl_new2]
-
-    // We push our default Lua libs are loaded packages
-    std::vector<const char*> szDefaultLibs = {"math", "string", "table", "debug", "utf8"};
-    for (auto it : szDefaultLibs)
-    {
-        lua_pushstring(L, it);            // stack: [tbl_new,"loaded",tbl_new2,"math"]
-        lua_getglobal(L, it);             // stack: [tbl_new,"loaded",tbl_new2,"math",_G.math]
-        lua_settable(L, -3);              // stack: [tbl_new,"loaded",tbl_new2]
-    }
-
-    // Keep our package.loaded table safely in registry
-    m_iPackageLoadedRef = luaL_ref(L, LUA_REGISTRYINDEX);              // stack: [tbl_new,"loaded"]
-    lua_rawgeti(L, LUA_REGISTRYINDEX, m_iPackageLoadedRef);            // stack: [tbl_new,"loaded",tbl_new2]
-
-    // Finally, store our original table as global package.loaded
-    lua_settable(L, -3);                    // stack: [tbl_new]
-    lua_setglobal(L, "package");            // stack: []
 }
 
 ///////////////////////////////////////////////////////////////
