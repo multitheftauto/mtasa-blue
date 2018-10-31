@@ -219,10 +219,9 @@ void CClientStreamer::SetInterior(unsigned char ucInterior)
         // That means all of the currently streamed in elements will have to
         // go. Unstream all elements that are streamed in
         CClientStreamElement*                 pElement = nullptr;
-        list<CClientStreamElement*>::iterator iter = m_ActiveElements.begin();
-        for (; iter != m_ActiveElements.end(); iter++)
+        for (CClientStreamElement *pStreamElement : m_ActiveElements)
         {
-            pElement = *iter;
+            pElement = pStreamElement;
             if (pElement->IsStreamedIn())
             {
                 if (!pElement->IsVisibleInAllInteriors())
