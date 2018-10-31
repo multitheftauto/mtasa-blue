@@ -34,10 +34,10 @@ public:
 
     void DrawTagForPlayer(CClientPlayer* pPlayer, unsigned char ucAlpha);
 
-    unsigned int GetDimension(void) { return m_usDimension; }
+    const unsigned int GetDimension(void) { return m_usDimension; }
     void         SetDimension(unsigned short usDimension) { m_usDimension = usDimension; }
 
-    unsigned int GetInterior(void) { return m_ucInterior; }
+    const unsigned int GetInterior(void) { return m_ucInterior; }
     void         SetInterior(unsigned char ucInterior) { m_ucInterior = ucInterior; }
 
     bool IsVisible(void) { return m_bVisible; }
@@ -52,7 +52,7 @@ private:
     CHud*                 m_pHud;
     bool                  m_bDrawFromAim;
     unsigned short        m_usDimension;
-    unsigned char        m_ucInterior;
+    unsigned char         m_ucInterior;
     bool                  m_bVisible;
     CTextureItem*         m_pConnectionTroubleIcon;
 };
