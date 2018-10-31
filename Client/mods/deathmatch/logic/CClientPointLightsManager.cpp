@@ -88,9 +88,9 @@ void CClientPointLightsManager::SetDimension(unsigned short usDimension)
 
 void CClientPointLightsManager::SetInterior(unsigned char ucInterior)
 {
-    for (const auto &iter: m_List)
+    for (CClientPointLights *pPointLights : m_List)
     {
-    	(*iter)->RelateInterior(ucInterior);
+        pPointLights->RelateInterior(ucInterior);
     }
 
     m_ucInterior = ucInterior;
