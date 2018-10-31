@@ -131,11 +131,14 @@ void CClientWaterManager::SetDimension(unsigned short usDimension)
 
 void CClientWaterManager::SetInterior(unsigned char ucInterior)
 {
-    m_ucInterior = ucInterior;
-
-    list<CClientWater*>::const_iterator iter = m_List.begin();
-    for (; iter != m_List.end(); iter++)
+    if (m_ucInterior != ucInterior)
     {
-        (*iter)->RelateInterior(m_ucInterior);
+        m_ucInterior = ucInterior;
+
+        list<CClientWater*>::const_iterator iter = m_List.begin();
+        for (CClientWater *pWater : m_List)
+        {
+            pWater->RelateInterior(m_ucInterior);
+        }
     }
 }
