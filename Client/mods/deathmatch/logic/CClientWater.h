@@ -44,7 +44,6 @@ private:
     bool                 m_bShallow;             // Shallow water?
     std::vector<CVector> m_Vertices;             // List of vertices for this water
     unsigned short       m_usDimension;
-    unsigned char        m_ucInterior;
 
     friend class CClientWaterManager;
 };
