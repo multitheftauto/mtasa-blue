@@ -155,7 +155,7 @@ DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse = 0x4BA076;
 #define HOOKPOS_CAnimBlendAssociation_SetCurrentTime        0x4CEA80
 #define HOOKPOS_RpAnimBlendClumpUpdateAnimations            0x4D34F0
 #define HOOKPOS_CAnimBlendAssoc_destructor                  0x4CECF0
-#define HOOKPOS_CAnimBlendAssocGroup_CopyAnimation          0x4CE14C
+#define HOOKPOS_CAnimBlendAssocGroupCopyAnimation           0x4CE130
 #define HOOKPOS_CAnimManager_AddAnimation                   0x4d3aa0
 #define HOOKPOS_CAnimManager_AddAnimationAndSync            0x4D3B30
 #define HOOKPOS_CAnimManager_BlendAnimation_Hierarchy       0x4D453E
@@ -422,7 +422,7 @@ void HOOK_RpAnimBlendClumpUpdateAnimations();
 void HOOK_CAnimBlendAssoc_destructor();
 void HOOK_CAnimManager_AddAnimation();
 void HOOK_CAnimManager_AddAnimationAndSync();
-void HOOK_CAnimBlendAssocGroup_CopyAnimation();
+void HOOK_CAnimBlendAssocGroupCopyAnimation();
 void HOOK_CAnimManager_BlendAnimation_Hierarchy();
 void HOOK_CPed_GetWeaponSkill();
 void HOOK_CPed_AddGogglesModel();
@@ -640,10 +640,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CAnimBlendAssociation_SetCurrentTime, (DWORD)HOOK_CAnimBlendAssociation_SetCurrentTime, 8);
     HookInstall(HOOKPOS_RpAnimBlendClumpUpdateAnimations, (DWORD)HOOK_RpAnimBlendClumpUpdateAnimations, 8);
     HookInstall(HOOKPOS_CAnimBlendAssoc_destructor, (DWORD)HOOK_CAnimBlendAssoc_destructor, 6);
-    HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
-    HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
-    HookInstall(HOOKPOS_CAnimBlendAssocGroup_CopyAnimation, (DWORD)HOOK_CAnimBlendAssocGroup_CopyAnimation, 5);
-    HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8);
     HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
     HookInstall(HOOKPOS_CPhysical_ProcessCollisionSectorList, (DWORD)HOOK_CPhysical_ProcessCollisionSectorList, 7);
@@ -1494,9 +1490,9 @@ void CMultiplayerSA::InitHooks()
     MemSetFast((void*)0x60D861, 0x90, 14);
 
     // Allow water cannon to hit objects and players visually
-    MemSet((void*)0x72925D, 0x1, 1); // objects
-    MemSet((void*)0x729263, 0x1, 1); // players
-    
+    MemSet((void*)0x72925D, 0x1, 1);            // objects
+    MemSet((void*)0x729263, 0x1, 1);            // players
+
     InitHooks_CrashFixHacks();
 
     // Init our 1.3 hooks.
@@ -1533,6 +1529,30 @@ void RemoveFxSystemPointer(DWORD* pPointer)
             free(pPointer);
             return;
         }
+    }
+}
+
+void CMultiplayerSA::InitializeAnimationHooks(bool bIsHostSmotra)
+{
+    if (bIsHostSmotra)
+    {
+        BYTE originalCode_CAnimManager_AddAnimation[10] = {0x8B, 0x44, 0x24, 0x0C, 0x8B, 0x15, 0x34, 0xEA, 0xB4, 0x0};
+        BYTE originalCode_CAnimManager_AddAnimationAndSync[10] = {0x8B, 0x44, 0x24, 0x10, 0x8B, 0x15, 0x34, 0xEA, 0xB4, 0x00};
+        BYTE originalCode_CAnimManager_BlendAnimation_Hierarchy[5] = {0x8B, 0x54, 0x24, 0x2C, 0x51};
+        MemCpy((LPVOID)HOOKPOS_CAnimManager_AddAnimation, &originalCode_CAnimManager_AddAnimation, 10);
+        MemCpy((LPVOID)HOOKPOS_CAnimManager_AddAnimationAndSync, &originalCode_CAnimManager_AddAnimationAndSync, 10);
+        MemCpy((LPVOID)HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, &originalCode_CAnimManager_BlendAnimation_Hierarchy, 5);
+
+        HookInstall(HOOKPOS_CAnimBlendAssocGroupCopyAnimation, (DWORD)HOOK_CAnimBlendAssocGroupCopyAnimation, 6);
+    }
+    else
+    {
+        BYTE originalCode_CAnimBlendAssocGroupCopyAnimation[6] = {0x64, 0xA1, 0x00, 0x00, 0x00, 0x00};
+        MemCpy((LPVOID)HOOKPOS_CAnimBlendAssocGroupCopyAnimation, &originalCode_CAnimBlendAssocGroupCopyAnimation, 6);
+
+        HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
+        HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
+        HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
     }
 }
 
@@ -4215,7 +4235,7 @@ void _cdecl CPhysical_ApplyGravity(DWORD dwThis)
     }
 }
 
-const float kfTimeStepOrg = 5.0f/3.0f;
+const float kfTimeStepOrg = 5.0f / 3.0f;
 void _declspec(naked) HOOK_CVehicle_ApplyBoatWaterResistance()
 {
     _asm
@@ -6801,15 +6821,10 @@ static void __cdecl WaterCannonHitWorld(CVehicleSAInterface* pGameVehicle, CColP
     if (m_pWaterCannonHitWorldHandler)
     {
         CEntitySAInterface* const pGameEntity = ppGameEntity ? *ppGameEntity : nullptr;
-        const int iModel = pGameEntity ? pGameEntity->m_nModelIndex : -1;
+        const int                 iModel = pGameEntity ? pGameEntity->m_nModelIndex : -1;
 
         SWaterCannonHitEvent event = {
-            pGameVehicle,
-            pGameEntity,
-            pColPoint->Position,
-            pColPoint->Normal,
-            iModel,
-            pColPoint->ucSurfaceTypeB,
+            pGameVehicle, pGameEntity, pColPoint->Position, pColPoint->Normal, iModel, pColPoint->ucSurfaceTypeB,
         };
 
         m_pWaterCannonHitWorldHandler(event);

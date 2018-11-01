@@ -276,6 +276,8 @@ public:
     bool        IsFakeLagCommandEnabled(void) { return m_bFakeLagCommandEnabled; }
     SString     GetBlueCopyrightString(void);
 
+    bool IsHostSmotraServer();
+
 private:
     // Core devices.
     CXML*               m_pXML;
