@@ -744,7 +744,7 @@ void CLuaMain::GetPackage(lua_State* L, SString& strName)
 // Load a Lua lib of a given name
 //
 ///////////////////////////////////////////////////////////////
-bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError)
+bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError, bool& bEmpty)
 {
     SString strPath = strName;
     // Name format shouldn't include slashes.  Subdirs are dots.
@@ -755,6 +755,7 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError)
     SString strResPath = m_pResource->IsResourceZip() ? m_pResource->GetResourceCacheDirectoryPath() : m_pResource->GetResourceDirectoryPath();
 
     std::vector<char> buffer;
+    strError = "could not load module '" + strName + "'. Not found in locations:\n\t";
     // Try <resource>/?.lua
     SString strFilePath = PathJoin(strResPath, strPath + ".lua");
     if (FileExists(strFilePath))
@@ -762,7 +763,7 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError)
     else
     {
         // Don't use a format string for safety, so we construct the error by hand
-        strError += "error loading module " + strName + " from file " + strFilePath + ":\n\t The specified module could not be found";
+        strError += "#1: " + ConformPath(strFilePath, "resources/") + "\n\t";
 
         // Try <resource>/?/init.lua
         strFilePath = PathJoin(strResPath, strPath, "init.lua");
@@ -770,8 +771,7 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError)
             FileLoad(strFilePath, buffer);
         else
         {
-            strError += "\n";
-            strError += "error loading module " + strName + " from file " + strFilePath + ":\n\t The specified module could not be found";
+            strError += "#2: " + ConformPath(strFilePath, "resources/") + "\n\t";
             return false;
         }
     }
@@ -786,7 +786,7 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError)
 
         if (lua_type(L, -1) == LUA_TNIL)
         {
-            strError += "error loading module " + strName + " from file " + strFilePath + ":\n\t Module didn't return a value";
+            strError += "#3: " + ConformPath(strFilePath, "modules/") + "\n\t";
             return false;
         }
 
@@ -794,7 +794,10 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError)
         return true;
     }
     else
-        strError += "error loading module " + strName + " from file " + strFilePath + ":\n\t Error loading script file";
+    {
+        strError = "could not load module '" + strName + "' from file " + ConformPath(strFilePath, "resources/") + ": File is empty.";
+        bEmpty = true;
+    }
 
     return false;
 }
@@ -824,7 +827,7 @@ bool CLuaMain::LoadClib(lua_State* L, SString strName, SString& strError)
 
     if (!FileExists(strPath))
     {
-        strError += "error loading module " + strName + " from file " + strPath + ":\n\t The specified module could not be found";
+        strError += "#3: " + ConformPath(strPath,"modules/");
         return false;
     }
 
@@ -834,14 +837,14 @@ bool CLuaMain::LoadClib(lua_State* L, SString strName, SString& strError)
         !g_pGame->GetACLManager()->CanObjectUseRight(m_pResource->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, strName.c_str(),
                                                      CAccessControlListRight::RIGHT_TYPE_MODULE, false))
     {
-        strError += "error loading module " + strName + " from file " + strPath + ":\n\t ACL access denied.  Grant \"module." + strName +
+        strError = "could not load module '" + strName + "' from file " + ConformPath(strPath, "modules/") + ":\n\t ACL access denied.  Grant \"module." + strName +
                     "\" right to resource " + m_pResource->GetName();
         return false;
     }
 
     if (!luaL_loader_C(L, strName.c_str(), strPath.c_str()) || lua_type(L, -1) == LUA_TNIL)
     {
-        strError += "error loading module " + strName + " from file " + strPath + ":\n\t Failed to load module";
+        strError = "failed to load module '" + strName + "' from file " + ConformPath(strPath, "modules/");
         return false;
     }
 

@@ -1448,6 +1448,43 @@ SString SharedUtil::ConformResourcePath(const char* szRes, bool bConvertToUnixPa
     return strText;
 }
 
+SString SharedUtil::ConformPath(const char* szRes, SString szPath, bool bConvertToUnixPathSep)
+{
+    SString strText = szRes ? szRes : "";
+    char    cPathSep;
+
+    // Handle which path sep char
+#ifdef WIN32
+    if (!bConvertToUnixPathSep)
+    {
+        cPathSep = '\\';
+        szPath = szPath.Replace("/", "\\");
+        strText = strText.Replace("/", "\\");
+    }
+    else
+#endif
+    {
+        cPathSep = '/';
+        szPath = szPath.Replace("\\", "/");
+        strText = strText.Replace("\\", "/");
+    }
+
+    // Remove up to first occurrence
+    int iPos = strText.find(szPath);
+    if (iPos >= 0)
+        return SString("%s%s",szPath.c_str(), strText.substr(iPos + szPath.length()).c_str());
+
+    if (strText.substr(0, 3) == "...")
+    {
+        // Remove up to first '/'
+        int iPos = strText.find(cPathSep);
+        if (iPos >= 0)
+            return SString("%s%s",szPath.c_str(), strText.substr(iPos + 1).c_str());
+    }
+
+    return strText;
+}
+
 namespace SharedUtil
 {
     CArgMap::CArgMap(const SString& strArgSep, const SString& strPartsSep, const SString& strExtraDisallowedChars)
