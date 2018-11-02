@@ -99,11 +99,11 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError, bool
     ReplaceOccurrencesInString(strPath, "/", "");
     ReplaceOccurrencesInString(strPath, ".", "/");
 
-    #ifdef MTA_CLIENT
-        SString strResPath = m_pResource->GetResourceDirectoryPath(ACCESS_PUBLIC, "");
-    #else
-        SString strResPath = m_pResource->IsResourceZip() ? m_pResource->GetResourceCacheDirectoryPath() : m_pResource->GetResourceDirectoryPath();
-    #endif
+#ifdef MTA_CLIENT
+    SString strResPath = m_pResource->GetResourceDirectoryPath(ACCESS_PUBLIC, "");
+#else
+    SString strResPath = m_pResource->IsResourceZip() ? m_pResource->GetResourceCacheDirectoryPath() : m_pResource->GetResourceDirectoryPath();
+#endif
 
     std::vector<char> buffer;
     strError = "could not load module '" + strName + "'. Not found in locations:\n\t";
