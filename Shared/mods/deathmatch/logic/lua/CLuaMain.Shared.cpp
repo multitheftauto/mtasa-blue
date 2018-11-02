@@ -1,10 +1,10 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        Shared/mods/logic/lua/CLuaMain.Shared.cpp
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Shared/mods/logic/lua/CLuaMain.Shared.cpp
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
@@ -21,8 +21,8 @@ void CLuaMain::InitPackageStorage(lua_State* L)
     lua_pushstring(L, "loaded");            // stack: [tbl_new,"loaded"]
     lua_newtable(L);                        // stack: [tbl_new,"loaded",tbl_new2]
 
-                                            // We push our default Lua libs are loaded packages
-    std::vector<const char*> szDefaultLibs = { "math", "string", "table", "debug", "utf8" };
+    // We push our default Lua libs are loaded packages
+    std::vector<const char*> szDefaultLibs = {"math", "string", "table", "debug", "utf8"};
     for (auto it : szDefaultLibs)
     {
         lua_pushstring(L, it);            // stack: [tbl_new,"loaded",tbl_new2,"math"]
@@ -34,7 +34,7 @@ void CLuaMain::InitPackageStorage(lua_State* L)
     m_iPackageLoadedRef = luaL_ref(L, LUA_REGISTRYINDEX);              // stack: [tbl_new,"loaded"]
     lua_rawgeti(L, LUA_REGISTRYINDEX, m_iPackageLoadedRef);            // stack: [tbl_new,"loaded",tbl_new2]
 
-                                                                       // Finally, store our original table as global package.loaded
+    // Finally, store our original table as global package.loaded
     lua_settable(L, -3);                    // stack: [tbl_new]
     lua_setglobal(L, "package");            // stack: []
 }
@@ -61,7 +61,7 @@ void CLuaMain::SetPackage(lua_State* L, SString& strName)
     lua_pop(L, 2);                                      // stack: []
     lua_rawgeti(L, LUA_REGISTRYINDEX, iPkg);            // stack: [varPkg]
 
-                                                        // Cleanup our used registry entry, i.e. REGISTRY[i] = nil.
+    // Cleanup our used registry entry, i.e. REGISTRY[i] = nil.
     lua_pushnil(L);                                     // stack: [varPkg,nil]
     lua_rawseti(L, LUA_REGISTRYINDEX, iPkg);            // stack: [varPkg]
 }
