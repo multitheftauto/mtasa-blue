@@ -12,7 +12,7 @@
 #include "StdInc.h"
 #include "../game_sa/CAnimBlendAssocGroupSA.h"
 
-constexpr CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(AssocGroupId animGroup);
+CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(AssocGroupId animGroup);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Check for anims that will crash and change to one that wont. (The new anim will be wrong and look crap though)

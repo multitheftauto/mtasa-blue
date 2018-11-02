@@ -65,7 +65,7 @@ void CMultiplayerSA::DisableCallsToCAnimBlendNode(bool bDisableCalls)
     bDisableCallsToCAnimBlendNode = bDisableCalls;
 }
 
-constexpr CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(AssocGroupId animGroup)
+CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(AssocGroupId animGroup)
 {
     DWORD* pAnimAssocGroupsArray = reinterpret_cast<DWORD*>(*(DWORD*)0xb4ea34);
     return reinterpret_cast<CAnimBlendAssocGroupSAInterface*>(pAnimAssocGroupsArray + 5 * animGroup);
