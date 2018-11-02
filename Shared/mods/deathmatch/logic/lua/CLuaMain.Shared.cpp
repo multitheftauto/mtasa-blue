@@ -1,10 +1,10 @@
 /*****************************************************************************
- *
- *  PROJECT:     Multi Theft Auto
- *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        Shared/mods/logic/lua/CLuaMain.Shared.cpp
- *
- *****************************************************************************/
+*
+*  PROJECT:     Multi Theft Auto
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        Shared/mods/logic/lua/CLuaMain.Shared.cpp
+*
+*****************************************************************************/
 
 #include "StdInc.h"
 
@@ -21,8 +21,8 @@ void CLuaMain::InitPackageStorage(lua_State* L)
     lua_pushstring(L, "loaded");            // stack: [tbl_new,"loaded"]
     lua_newtable(L);                        // stack: [tbl_new,"loaded",tbl_new2]
 
-    // We push our default Lua libs are loaded packages
-    std::vector<const char*> szDefaultLibs = {"math", "string", "table", "debug", "utf8"};
+                                            // We push our default Lua libs are loaded packages
+    std::vector<const char*> szDefaultLibs = { "math", "string", "table", "debug", "utf8" };
     for (auto it : szDefaultLibs)
     {
         lua_pushstring(L, it);            // stack: [tbl_new,"loaded",tbl_new2,"math"]
@@ -34,7 +34,7 @@ void CLuaMain::InitPackageStorage(lua_State* L)
     m_iPackageLoadedRef = luaL_ref(L, LUA_REGISTRYINDEX);              // stack: [tbl_new,"loaded"]
     lua_rawgeti(L, LUA_REGISTRYINDEX, m_iPackageLoadedRef);            // stack: [tbl_new,"loaded",tbl_new2]
 
-    // Finally, store our original table as global package.loaded
+                                                                       // Finally, store our original table as global package.loaded
     lua_settable(L, -3);                    // stack: [tbl_new]
     lua_setglobal(L, "package");            // stack: []
 }
@@ -61,7 +61,7 @@ void CLuaMain::SetPackage(lua_State* L, SString& strName)
     lua_pop(L, 2);                                      // stack: []
     lua_rawgeti(L, LUA_REGISTRYINDEX, iPkg);            // stack: [varPkg]
 
-    // Cleanup our used registry entry, i.e. REGISTRY[i] = nil.
+                                                        // Cleanup our used registry entry, i.e. REGISTRY[i] = nil.
     lua_pushnil(L);                                     // stack: [varPkg,nil]
     lua_rawseti(L, LUA_REGISTRYINDEX, iPkg);            // stack: [varPkg]
 }
@@ -91,7 +91,7 @@ void CLuaMain::GetPackage(lua_State* L, SString& strName)
 // Load a Lua lib of a given name
 //
 ///////////////////////////////////////////////////////////////
-bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError)
+bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError, bool& bEmpty)
 {
     SString strPath = strName;
     // Name format shouldn't include slashes.  Subdirs are dots.
@@ -99,13 +99,14 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError)
     ReplaceOccurrencesInString(strPath, "/", "");
     ReplaceOccurrencesInString(strPath, ".", "/");
 
-#ifdef MTA_CLIENT
-    SString strResPath = m_pResource->GetResourceDirectoryPath(ACCESS_PUBLIC, "");
-#else
-    SString strResPath = m_pResource->IsResourceZip() ? m_pResource->GetResourceCacheDirectoryPath() : m_pResource->GetResourceDirectoryPath();
-#endif
+    #ifdef MTA_CLIENT
+        SString strResPath = m_pResource->GetResourceDirectoryPath(ACCESS_PUBLIC, "");
+    #else
+        SString strResPath = m_pResource->IsResourceZip() ? m_pResource->GetResourceCacheDirectoryPath() : m_pResource->GetResourceDirectoryPath();
+    #endif
 
     std::vector<char> buffer;
+    strError = "could not load module '" + strName + "'. Not found in locations:\n\t";
     // Try <resource>/?.lua
     SString strFilePath = PathJoin(strResPath, strPath + ".lua");
     if (FileExists(strFilePath))
@@ -113,7 +114,7 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError)
     else
     {
         // Don't use a format string for safety, so we construct the error by hand
-        strError += "error loading module " + strName + " from file " + strFilePath + ":\n\t The specified module could not be found";
+        strError += "#1: " + ConformPath(strFilePath, "resources/") + "\n\t";
 
         // Try <resource>/?/init.lua
         strFilePath = PathJoin(strResPath, strPath, "init.lua");
@@ -121,8 +122,7 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError)
             FileLoad(strFilePath, buffer);
         else
         {
-            strError += "\n";
-            strError += "error loading module " + strName + " from file " + strFilePath + ":\n\t The specified module could not be found";
+            strError += "#2: " + ConformPath(strFilePath, "resources/") + "\n\t";
             return false;
         }
     }
@@ -137,7 +137,7 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError)
 
         if (lua_type(L, -1) == LUA_TNIL)
         {
-            strError += "error loading module " + strName + " from file " + strFilePath + ":\n\t Module didn't return a value";
+            strError += "#3: " + ConformPath(strFilePath, "modules/") + "\n\t";
             return false;
         }
 
@@ -145,7 +145,10 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError)
         return true;
     }
     else
-        strError += "error loading module " + strName + " from file " + strFilePath + ":\n\t Error loading script file";
+    {
+        strError = "could not load module '" + strName + "' from file " + ConformPath(strFilePath, "resources/") + ": File is empty.";
+        bEmpty = true;
+    }
 
     return false;
 }
