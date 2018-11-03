@@ -137,7 +137,7 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError, bool
 
         if (lua_type(L, -1) == LUA_TNIL)
         {
-            strError += "#3: " + ConformPath(strFilePath, "modules/") + "\n\t";
+            strError += "#3: " + ConformPath(strFilePath, "resources/") + "\n\t";
             return false;
         }
 
