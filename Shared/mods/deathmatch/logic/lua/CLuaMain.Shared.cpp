@@ -106,7 +106,7 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError, bool
 #endif
 
     std::vector<char> buffer;
-    strError = "could not load module '" + strName + "'. Not found in locations:\n\t";
+    strError = "error loading module '" + strName + "' from locations:\n\t";
     // Try <resource>/?.lua
     SString strFilePath = PathJoin(strResPath, strPath + ".lua");
     if (FileExists(strFilePath))
