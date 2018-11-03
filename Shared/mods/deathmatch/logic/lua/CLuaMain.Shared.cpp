@@ -99,14 +99,14 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError, bool
     ReplaceOccurrencesInString(strPath, "/", "");
     ReplaceOccurrencesInString(strPath, ".", "/");
 
-    #ifdef MTA_CLIENT
-        SString strResPath = m_pResource->GetResourceDirectoryPath(ACCESS_PUBLIC, "");
-    #else
-        SString strResPath = m_pResource->IsResourceZip() ? m_pResource->GetResourceCacheDirectoryPath() : m_pResource->GetResourceDirectoryPath();
-    #endif
+#ifdef MTA_CLIENT
+    SString strResPath = m_pResource->GetResourceDirectoryPath(ACCESS_PUBLIC, "");
+#else
+    SString strResPath = m_pResource->IsResourceZip() ? m_pResource->GetResourceCacheDirectoryPath() : m_pResource->GetResourceDirectoryPath();
+#endif
 
     std::vector<char> buffer;
-    strError = "could not load module '" + strName + "'. Not found in locations:\n\t";
+    strError = "error loading module '" + strName + "' from locations:\n\t";
     // Try <resource>/?.lua
     SString strFilePath = PathJoin(strResPath, strPath + ".lua");
     if (FileExists(strFilePath))
@@ -137,7 +137,8 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError, bool
 
         if (lua_type(L, -1) == LUA_TNIL)
         {
-            strError += "#3: " + ConformPath(strFilePath, "modules/") + "\n\t";
+            strError = "module '" + strName + "' in location " + ConformPath(strFilePath, "resources/") + " didn't return a value.";
+            bEmpty = true;
             return false;
         }
 
