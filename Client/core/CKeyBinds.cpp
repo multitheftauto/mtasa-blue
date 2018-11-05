@@ -23,12 +23,12 @@ const SBindableKey g_bkKeys[] = {{"mouse1", VK_LBUTTON, GTA_KEY_LMOUSE, DATA_NON
                                  {"mouse_wheel_down", 0x00, GTA_KEY_MSCROLLDOWN, DATA_NONE, 0},
                                  {"backspace", VK_BACK, GTA_KEY_BACK, DATA_NONE, 0},
                                  {"tab", VK_TAB, GTA_KEY_TAB, DATA_NONE, 0},
-                                 {"lshift", VK_SHIFT, GTA_KEY_LSHIFT, DATA_NOT_EXTENDED, 0},
-                                 {"rshift", VK_SHIFT, GTA_KEY_RSHIFT, DATA_EXTENDED, 0},            // 10
-                                 {"lctrl", VK_CONTROL, GTA_KEY_LCONTROL, DATA_NOT_EXTENDED, 0},
-                                 {"rctrl", VK_CONTROL, GTA_KEY_RCONTROL, DATA_EXTENDED, 0},
-                                 {"lalt", VK_MENU, GTA_KEY_LMENU, DATA_NOT_EXTENDED, 0, true},
-                                 {"ralt", VK_MENU, GTA_KEY_RMENU, DATA_EXTENDED, 0, true},
+                                 {"lshift", VK_LSHIFT, GTA_KEY_LSHIFT, DATA_NOT_EXTENDED, 0},
+                                 {"rshift", VK_RSHIFT, GTA_KEY_RSHIFT, DATA_EXTENDED, 0},            // 10
+                                 {"lctrl", VK_LCONTROL, GTA_KEY_LCONTROL, DATA_NOT_EXTENDED, 0},
+                                 {"rctrl", VK_RCONTROL, GTA_KEY_RCONTROL, DATA_EXTENDED, 0},
+                                 {"lalt", VK_LMENU, GTA_KEY_LMENU, DATA_NOT_EXTENDED, 0, true},
+                                 {"ralt", VK_RMENU, GTA_KEY_RMENU, DATA_EXTENDED, 0, true},
                                  {"pause", VK_PAUSE, GTA_KEY_PAUSE, DATA_NONE, 0, true},
                                  {"capslock", VK_CAPITAL, GTA_KEY_CAPSLOCK, DATA_NONE, 0},
                                  {"enter", VK_RETURN, GTA_KEY_RETURN, DATA_NOT_EXTENDED, 0},
