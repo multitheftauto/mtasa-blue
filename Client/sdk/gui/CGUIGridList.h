@@ -69,7 +69,7 @@ public:
     virtual void          Clear(void) = 0;
     virtual CGUIListItem* GetItem(int iRow, int hColumn) = 0;
     virtual const char*   GetItemText(int iRow, int hColumn) = 0;
-    virtual int           SetItemText(int iRow, int hColumn, const char* szText, bool bNumber = false, bool bSection = false, bool bChangeFont, bool bFast = false,
+    virtual int           SetItemText(int iRow, int hColumn, const char* szText, bool bNumber = false, bool bSection = false, bool bChangeFont = false, bool bFast = false,
                                       const char* szSortText = NULL) = 0;
     virtual void          SetItemData(int iRow, int hColumn, void* pData, CGUICallback<void, void*> deleteDataCallback = NULL) = 0;
     virtual void          SetItemData(int iRow, int hColumn, const char* pszData) = 0;
