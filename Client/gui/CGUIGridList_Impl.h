@@ -40,7 +40,7 @@ public:
     void          Clear(void);
     CGUIListItem* GetItem(int iRow, int hColumn);
     const char*   GetItemText(int iRow, int hColumn);
-    int  SetItemText(int iRow, int hColumn, const char* szText, bool bNumber = false, bool bSection = false, bool bFast = false, const char* szSortText = NULL);
+    int  SetItemText(int iRow, int hColumn, const char* szText, bool bNumber = false, bool bSection = false, bool bChangeFont = false, bool bFast = false, const char* szSortText = NULL);
     void SetItemData(int iRow, int hColumn, void* pData, CGUICallback<void, void*> deleteDataCallback = NULL);
     void SetItemData(int iRow, int hColumn, const char* pszData);
     void* GetItemData(int iRow, int hColumn);
@@ -88,6 +88,8 @@ private:
     bool Event_OnSortColumn(const CEGUI::EventArgs& e);
 
     int m_iIndex;
+
+    SString& m_Font;
 
     unsigned int       GetUniqueHandle(void);
     CGUIListItem_Impl* GetListItem(CEGUI::ListboxItem* pItem);

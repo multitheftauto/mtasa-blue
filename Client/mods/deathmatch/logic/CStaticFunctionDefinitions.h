@@ -515,9 +515,9 @@ public:
         static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->AutoSizeColumn(uiColumn);
     };
     static void        GUIGridListClear(CClientEntity& Element);
-    static inline void GUIGridListSetItemText(CClientGUIElement& GUIElement, int iRow, int iColumn, const char* szText, bool bSection, bool bNumber, bool bFast)
+    static inline void GUIGridListSetItemText(CClientGUIElement& GUIElement, int iRow, int iColumn, const char* szText, bool bSection, bool bNumber, bool bChangeFont, bool bFast)
     {
-        static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetItemText(iRow, iColumn, szText, bNumber, bSection, bFast);
+        static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetItemText(iRow, iColumn, szText, bNumber, bSection, bChangeFont, bFast);
     };
     static void        GUIGridListSetItemData(CClientGUIElement& GUIElement, int iRow, int iColumn, CLuaArgument* Variable);
     static void        GUIItemDataDestroyCallback(void* m_data);

@@ -12,10 +12,10 @@
 #include "StdInc.h"
 
 #define CGUIGRIDLIST_NAME "CGUI/MultiColumnList"
-#define CGUIGRIDLISTNOFRAME_NAME "CGUI/MultiColumnList" //MultiColumnListNoFrame
+#define CGUIGRIDLISTNOFRAME_NAME "CGUI/MultiColumnList"            // MultiColumnListNoFrame
 #define CGUIGRIDLIST_SPACER "   "
 
-#define CGUIGRIDLIST_MAX_TEXT_LENGTH    256
+#define CGUIGRIDLIST_MAX_TEXT_LENGTH 256
 
 CGUIGridList_Impl::CGUIGridList_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, bool bFrame)
 {
@@ -364,7 +364,7 @@ void CGUIGridList_Impl::SetItemData(int iRow, int hColumn, const char* pszData)
     }
 }
 
-int CGUIGridList_Impl::SetItemText(int iRow, int hColumn, const char* szText, bool bNumber, bool bSection, bool bFast, const char* szSortText)
+int CGUIGridList_Impl::SetItemText(int iRow, int hColumn, const char* szText, bool bNumber, bool bSection, bool bChangeFont, bool bFast, const char* szSortText)
 {
     try
     {
@@ -377,13 +377,18 @@ int CGUIGridList_Impl::SetItemText(int iRow, int hColumn, const char* szText, bo
             if (bSection)
             {
                 // Set section properties
-                pItem->SetFont("default-bold-small");
+                // check if user change font with guiSetFont
+                if (!bChangeFont)
+                    pItem->SetFont("default-bold-small");
                 pItem->SetDisabled(true);
                 pItem->SetText(szText, szSortText);
             }
             else
             {
-                pItem->SetFont("default-normal");
+                // check if user change font with guiSetFont
+                if (!bChangeFont)
+                    pItem->SetFont("default-normal");
+
                 pItem->SetDisabled(false);
 
                 if (GetColumnIndex(hColumn) == 0)
@@ -427,7 +432,9 @@ int CGUIGridList_Impl::SetItemText(int iRow, int hColumn, const char* szText, bo
             if (bSection)
             {
                 // Set section properties
-                pItem->SetFont("default-bold-small");
+                // check if user change font with guiSetFont
+                if (!bChangeFont)
+                    pItem->SetFont("default-bold-small");
                 pItem->SetDisabled(true);
             }
             else if (GetColumnIndex(hColumn) == 0)
