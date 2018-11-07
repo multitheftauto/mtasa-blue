@@ -89,8 +89,6 @@ private:
 
     int m_iIndex;
 
-    SString& m_Font;
-
     unsigned int       GetUniqueHandle(void);
     CGUIListItem_Impl* GetListItem(CEGUI::ListboxItem* pItem);
     unsigned int       m_hUniqueHandle;

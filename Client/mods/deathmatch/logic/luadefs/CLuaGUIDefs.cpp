@@ -11,26 +11,28 @@
 
 #include "StdInc.h"
 
-static const SFixedArray<const char*, MAX_CHATBOX_LAYOUT_CVARS> g_chatboxLayoutCVars = {{"chat_font",
-                                                                                         "chat_lines",
-                                                                                         "chat_color",
-                                                                                         "chat_text_color",
-                                                                                         "chat_input_color",
-                                                                                         "chat_input_prefix_color",
-                                                                                         "chat_input_text_color",
-                                                                                         "chat_scale",
-                                                                                         "chat_position_offset_x",
-                                                                                         "chat_position_offset_y",
-                                                                                         "chat_position_horizontal",
-                                                                                         "chat_position_vertical",
-                                                                                         "chat_text_alignment",
-                                                                                         "chat_width",
-                                                                                         "chat_css_style_text",
-                                                                                         "chat_css_style_background",
-                                                                                         "chat_line_life",
-                                                                                         "chat_line_fade_out",
-                                                                                         "chat_use_cegui",
-                                                                                         "text_scale"}};
+static const SFixedArray<const char*, MAX_CHATBOX_LAYOUT_CVARS> g_chatboxLayoutCVars = {{
+    "chat_font",
+    "chat_lines",
+    "chat_color",
+    "chat_text_color",
+    "chat_input_color",
+    "chat_input_prefix_color",
+    "chat_input_text_color",
+    "chat_scale",
+    "chat_position_offset_x",
+    "chat_position_offset_y",
+    "chat_position_horizontal",
+    "chat_position_vertical",
+    "chat_text_alignment",
+    "chat_width",
+    "chat_css_style_text",
+    "chat_css_style_background",
+    "chat_line_life",
+    "chat_line_fade_out",
+    "chat_use_cegui",
+    "text_scale"
+}};
 
 void CLuaGUIDefs::LoadFunctions(void)
 {
@@ -3093,12 +3095,12 @@ int CLuaGUIDefs::GUIEditSetMasked(lua_State* luaVM)
 
 int CLuaGUIDefs::GUIEditIsMasked(lua_State* luaVM)
 {
-    // bool guiEditIsMasked(element theElement)
+    //bool guiEditIsMasked(element theElement)
     CClientGUIElement* theElement;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData<CGUIEdit>(theElement);
-
+    
     if (!argStream.HasErrors())
     {
         bool masked = static_cast<CGUIEdit*>(theElement->GetCGUIElement())->IsMasked();
@@ -3380,7 +3382,7 @@ int CLuaGUIDefs::GUIWindowIsSizable(lua_State* luaVM)
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
+    
     // error: bad arguments
     lua_pushnil(luaVM);
     return 1;
@@ -3582,8 +3584,11 @@ int CLuaGUIDefs::GUIGetChatboxLayout(lua_State* luaVM)
             if (bAll || !stricmp(g_chatboxLayoutCVars[i], strCVarArg))
             {
                 // Push color values into a table
-                if (g_chatboxLayoutCVars[i] == "chat_color" || g_chatboxLayoutCVars[i] == "chat_text_color" || g_chatboxLayoutCVars[i] == "chat_input_color" ||
-                    g_chatboxLayoutCVars[i] == "chat_input_prefix_color" || g_chatboxLayoutCVars[i] == "chat_input_text_color")
+                if (g_chatboxLayoutCVars[i] == "chat_color" ||
+                    g_chatboxLayoutCVars[i] == "chat_text_color" ||
+                    g_chatboxLayoutCVars[i] == "chat_input_color" ||
+                    g_chatboxLayoutCVars[i] == "chat_input_prefix_color" ||
+                    g_chatboxLayoutCVars[i] == "chat_input_text_color")
                 {
                     pCVars->Get(g_chatboxLayoutCVars[i], strCVarValue);
                     if (!strCVarValue.empty())
@@ -3633,7 +3638,7 @@ int CLuaGUIDefs::GUIGetChatboxLayout(lua_State* luaVM)
                     else
                         lua_pushnumber(luaVM, fNumber);
                 }
-
+                
                 // If we are asking for all CVars, push this into the table with its CVar name, otherwise just stop here
                 if (bAll)
                     lua_setfield(luaVM, -2, g_chatboxLayoutCVars[i]);
@@ -3853,7 +3858,7 @@ int CLuaGUIDefs::GUIComboBoxGetItemCount(lua_State* luaVM)
 {
     // int guiComboBoxGetItemCount( element comboBox )
     CClientGUIElement* comboBox;
-    CScriptArgReader   argStream(luaVM);
+    CScriptArgReader argStream(luaVM);
     argStream.ReadUserData<CGUIComboBox>(comboBox);
 
     if (!argStream.HasErrors())
@@ -3874,8 +3879,8 @@ int CLuaGUIDefs::GUIComboBoxSetOpen(lua_State* luaVM)
 {
     // bool guiComboBoxSetOpen( element comboBox, bool state)
     CClientGUIElement* comboBox;
-    bool               state;
-    CScriptArgReader   argStream(luaVM);
+    bool state;
+    CScriptArgReader argStream(luaVM);
     argStream.ReadUserData<CGUIComboBox>(comboBox);
     argStream.ReadBool(state);
 
@@ -3896,7 +3901,7 @@ int CLuaGUIDefs::GUIComboBoxIsOpen(lua_State* luaVM)
 {
     // bool guiComboBoxIsOpen( element comboBox )
     CClientGUIElement* comboBox;
-    CScriptArgReader   argStream(luaVM);
+    CScriptArgReader argStream(luaVM);
     argStream.ReadUserData<CGUIComboBox>(comboBox);
 
     if (!argStream.HasErrors())

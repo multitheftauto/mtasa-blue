@@ -12,10 +12,10 @@
 #include "StdInc.h"
 
 #define CGUIGRIDLIST_NAME "CGUI/MultiColumnList"
-#define CGUIGRIDLISTNOFRAME_NAME "CGUI/MultiColumnList"            // MultiColumnListNoFrame
+#define CGUIGRIDLISTNOFRAME_NAME "CGUI/MultiColumnList" //MultiColumnListNoFrame
 #define CGUIGRIDLIST_SPACER "   "
 
-#define CGUIGRIDLIST_MAX_TEXT_LENGTH 256
+#define CGUIGRIDLIST_MAX_TEXT_LENGTH    256
 
 CGUIGridList_Impl::CGUIGridList_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, bool bFrame)
 {
