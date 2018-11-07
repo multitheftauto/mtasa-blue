@@ -5918,7 +5918,7 @@ void CStaticFunctionDefinitions::GUIGridListSetSortingEnabled(CClientEntity& Ent
         if (IS_CGUIELEMENT_GRIDLIST(&GUIElement))
         {
             // Set sorting is enabled
-            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetSorting(bEnabled);
+            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetSortingEnabled(bEnabled);
         }
     }
 }
@@ -5993,6 +5993,7 @@ void CStaticFunctionDefinitions::GUIGridListSetSelectionMode(CClientEntity& Enti
         }
     }
 }
+
 
 void CStaticFunctionDefinitions::GUIGridListSetHorizontalScrollPosition(CClientEntity& Entity, float fPosition)
 {
