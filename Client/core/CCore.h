@@ -124,6 +124,7 @@ public:
     void EnableChatInput(char* szCommand, DWORD dwColor);
     bool IsChatInputEnabled(void);
     bool ClearChat();
+    void OnGameTimerUpdate(void);
 
     // Screenshots
     void TakeScreenShot(void);
@@ -213,6 +214,7 @@ public:
     uint GetFrameRateLimit(void) { return m_uiFrameRateLimit; }
     void RecalculateFrameRateLimit(uint uiServerFrameRateLimit = -1, bool bLogToConsole = true);
     void ApplyFrameRateLimit(uint uiOverrideRate = -1);
+    void ApplyQueuedFrameRateLimit(void);
     void EnsureFrameRateLimitApplied(void);
     void SetClientScriptFrameRateLimit(uint uiClientScriptFrameRateLimit);
     void DoReliablePulse(void);
@@ -273,6 +275,8 @@ public:
     void        SetFakeLagCommandEnabled(bool bEnabled) { m_bFakeLagCommandEnabled = bEnabled; }
     bool        IsFakeLagCommandEnabled(void) { return m_bFakeLagCommandEnabled; }
     SString     GetBlueCopyrightString(void);
+
+    bool IsHostSmotraServer();
 
 private:
     // Core devices.
@@ -346,8 +350,9 @@ private:
     uint                 m_uiServerFrameRateLimit;
     uint                 m_uiClientScriptFrameRateLimit;
     uint                 m_uiFrameRateLimit;
-    double               m_dLastTimeMs;
-    double               m_dPrevOverrun;
+    CElapsedTimeHD       m_FrameRateTimer;
+    uint                 m_uiQueuedFrameRate;
+    bool                 m_bQueuedFrameRateValid;
     bool                 m_bWaitToSetNick;
     uint                 m_uiNewNickWaitFrames;
     EDiagnosticDebugType m_DiagnosticDebug;

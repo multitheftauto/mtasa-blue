@@ -498,7 +498,21 @@ bool CAudioEngineSA::OnWorldSound(CAESound* pAESound)
         return false;
 
     if (m_pWorldSoundHandler)
-        m_pWorldSoundHandler(pAESound->usGroup, pAESound->usIndex);
+    {
+        CEntitySAInterface* pGameEntity = pAESound->pGameEntity;
+
+        if (!pGameEntity && pAESound->pAudioEntity)
+            pGameEntity = pAESound->pAudioEntity->pEntity;
+        
+        SWorldSoundEvent event = {
+            pAESound->usGroup,
+            pAESound->usIndex,
+            pGameEntity,
+            pAESound->m_vCurrPosn,
+        };
+
+        return m_pWorldSoundHandler(event);
+    }
 
     return true;
 }

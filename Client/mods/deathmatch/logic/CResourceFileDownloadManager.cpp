@@ -221,10 +221,14 @@ bool CResourceFileDownloadManager::BeginResourceFileDownload(CDownloadableResour
     CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork()->GetHTTPDownloadManager(serverInfo.downloadChannel);
     SString strHTTPDownloadURLFull("%s/%s/%s", *serverInfo.strUrl, pResourceFile->GetResource()->GetName(), pResourceFile->GetShortName());
 
+    SHttpRequestOptions options;
+    options.uiConnectionAttempts = serverInfo.uiConnectionAttempts;
+    options.uiConnectTimeoutMs = serverInfo.uiConnectTimeoutMs;
+    options.bCheckContents = true;
+    options.bIsLocal = g_pClientGame->IsLocalGame();
     SString* pstrContext = MakeDownloadContextString(pResourceFile);
     SString  strFilename = pResourceFile->GetName();
-    bool     bUniqueDownload = pHTTP->QueueFile(strHTTPDownloadURLFull, strFilename, NULL, 0, false, pstrContext, StaticDownloadFinished,
-                                            g_pClientGame->IsLocalGame(), serverInfo.uiConnectionAttempts, serverInfo.uiConnectTimeoutMs, true);
+    bool bUniqueDownload = pHTTP->QueueFile(strHTTPDownloadURLFull, strFilename, pstrContext, StaticDownloadFinished, options);
     if (!bUniqueDownload)
     {
         // TODO - If piggybacking on another matching download, then adjust progress bar

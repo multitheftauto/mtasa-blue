@@ -116,3 +116,22 @@ HRESULT WINAPI MyD3DXCreateEffectFromFile(LPDIRECT3DDEVICE9 pDevice, LPCSTR pSrc
     }
     return hr;
 }
+
+/////////////////////////////////////////////////////////////
+//
+// D3DXCreateEffect
+//
+// Wrap result of orignal function
+//
+/////////////////////////////////////////////////////////////
+HRESULT WINAPI MyD3DXCreateEffect(LPDIRECT3DDEVICE9 pDevice, LPCVOID pSrcData, UINT SrcDataLen, CONST D3DXMACRO* pDefines, LPD3DXINCLUDE pInclude, DWORD Flags,
+    LPD3DXEFFECTPOOL pPool, LPD3DXEFFECT* ppEffect, LPD3DXBUFFER* ppCompilationErrors)
+{
+    HRESULT hr = D3DXCreateEffect(pDevice, pSrcData, SrcDataLen, pDefines, pInclude, Flags, pPool, ppEffect, ppCompilationErrors);
+    if (SUCCEEDED(hr))
+    {
+        // Create proxy so we can track when it's finished with
+        *ppEffect = new CProxyDirect3DEffect(pDevice, *ppEffect);
+    }
+    return hr;
+}

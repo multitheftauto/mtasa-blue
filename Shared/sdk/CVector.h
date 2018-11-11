@@ -94,6 +94,15 @@ public:
         return vecResult;
     }
 
+    CVector Clone(void) const
+    {
+        CVector vecResult;
+        vecResult.fX = fX;
+        vecResult.fY = fY;
+        vecResult.fZ = fZ;
+        return vecResult;
+    }
+
     CVector operator+(const CVector& vecRight) const { return CVector(fX + vecRight.fX, fY + vecRight.fY, fZ + vecRight.fZ); }
 
     CVector operator-(const CVector& vecRight) const { return CVector(fX - vecRight.fX, fY - vecRight.fY, fZ - vecRight.fZ); }

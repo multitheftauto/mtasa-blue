@@ -239,7 +239,6 @@ public:
     void DoPulses(void);
     void DoPulses2(bool bCalledFromIdle);
 
-    uint GetFrameTimeSlice(void) { return m_uiFrameTimeSlice; }
     uint GetFrameCount(void) { return m_uiFrameCount; }
 
     void        HandleException(CExceptionInformation* pExceptionInformation);
@@ -508,7 +507,7 @@ private:
     static bool StaticBlendAnimationHierarchyHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy,
                                                      int* pFlags, RpClump* pClump);
     static bool StaticProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface);
-    static bool StaticVehicleCollisionHandler(CVehicleSAInterface* pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex,
+    static bool StaticVehicleCollisionHandler(CVehicleSAInterface*& pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex,
                                               float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos,
                                               CVector vecCollisionVelocity);
     static bool StaticVehicleDamageHandler(CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType,
@@ -523,10 +522,13 @@ private:
     static void StaticGamePlayerDestructHandler(CEntitySAInterface* pPlayer);
     static void StaticGameProjectileDestructHandler(CEntitySAInterface* pProjectile);
     static void StaticGameModelRemoveHandler(ushort usModelId);
-    static void StaticWorldSoundHandler(uint uiGroup, uint uiIndex);
+    static bool StaticWorldSoundHandler(const SWorldSoundEvent& event);
     static void StaticGameEntityRenderHandler(CEntitySAInterface* pEntity);
     static void StaticTaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     static void StaticFxSystemDestructionHandler(void* pFxSAInterface);
+    static void StaticPedStepHandler(CPedSAInterface* pPed, bool bFoot);
+    static void StaticWaterCannonHitWorldHandler(SWaterCannonHitEvent& event);
+
     static AnimationId StaticDrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
 
     bool                              DamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
@@ -548,7 +550,7 @@ private:
     bool        BlendAnimationHierarchyHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy, int* pFlags,
                                                RpClump* pClump);
     bool        ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface);
-    bool        VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag,
+    bool        VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag,
                                         float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity);
     bool        VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType,
                                      const CVector& vecDamagePos, uchar ucTyre);
@@ -562,7 +564,7 @@ private:
     void        GamePlayerDestructHandler(CEntitySAInterface* pPlayer);
     void        GameProjectileDestructHandler(CEntitySAInterface* pProjectile);
     void        GameModelRemoveHandler(ushort usModelId);
-    void        WorldSoundHandler(uint uiGroup, uint uiIndex);
+    bool        WorldSoundHandler(const SWorldSoundEvent& event);
     void        TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     AnimationId DrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
 
@@ -573,7 +575,6 @@ private:
     static void PostWeaponFire(void);
     static void BulletImpact(CPed* pInitiator, CEntity* pVictim, const CVector* pStartPosition, const CVector* pEndPosition);
     static void BulletFire(CPed* pInitiator, const CVector* pStartPosition, const CVector* pEndPosition);
-
 public:
     static bool StaticProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream);
 
@@ -615,6 +616,9 @@ public:
 
     void InsertAnimationAssociationToMap(CAnimBlendAssociationSAInterface* pAnimAssociation, const std::shared_ptr<CIFPAnimations>& pIFPAnimations);
     void RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation);
+
+    void PedStepHandler(CPedSAInterface* pPed, bool bFoot);
+    void WaterCannonHitWorldHandler(SWaterCannonHitEvent& event);
 
 private:
     eStatus       m_Status;
@@ -761,9 +765,8 @@ private:
     unsigned long m_ulBigPacketBytesReceivedBase;
     CTransferBox* m_pBigPacketTransferBox;
 
-    uint m_uiFrameTimeSlice;            // how long it took (in ms) to process the current frame
-    uint m_uiLastFrameTick;             // time at which the previous frame was processed
-    uint m_uiFrameCount;                // Frame counter
+    CElapsedTimeHD m_TimeSliceTimer;
+    uint           m_uiFrameCount;
 
     long long m_llLastTransgressionTime;
     SString   m_strLastDiagnosticStatus;

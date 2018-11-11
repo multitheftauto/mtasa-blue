@@ -54,6 +54,8 @@ public:
     // CDatabaseManagerImpl
     SString InsertQueryArguments(SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs);
     SString InsertQueryArguments(SConnectionHandle hConnection, const char* szQuery, va_list vl);
+    SString HideQuestionMark(const SString& strQuery);
+    SString RestoreQuestionMark(const SString& strQuery);
     void    ClearLastErrorMessage(void)
     {
         m_strLastErrorMessage.clear();
@@ -214,7 +216,7 @@ SString CDatabaseManagerImpl::PrepareString(SConnectionHandle hConnection, const
     }
 
     // Insert arguments with correct escapement
-    return InsertQueryArguments(hConnection, strQuery, pArgs);
+    return HideQuestionMark(InsertQueryArguments(hConnection, strQuery, pArgs));
 }
 
 ///////////////////////////////////////////////////////////////
@@ -236,7 +238,7 @@ CDbJobData* CDatabaseManagerImpl::Exec(SConnectionHandle hConnection, const SStr
     }
 
     // Insert arguments with correct escapement
-    SString strEscapedQuery = InsertQueryArguments(hConnection, strQuery, pArgs);
+    SString strEscapedQuery = RestoreQuestionMark(InsertQueryArguments(hConnection, strQuery, pArgs));
 
     // Start query
     CDbJobData* pJobData = m_JobQueue->AddCommand(EJobCommand::QUERY, hConnection, strEscapedQuery);
@@ -273,7 +275,7 @@ SString CDatabaseManagerImpl::PrepareStringf(SConnectionHandle hConnection, cons
     }
 
     // Insert arguments with correct escapement
-    return InsertQueryArguments(hConnection, szQuery, vl);
+    return HideQuestionMark(InsertQueryArguments(hConnection, szQuery, vl));
 }
 
 ///////////////////////////////////////////////////////////////
@@ -298,7 +300,7 @@ CDbJobData* CDatabaseManagerImpl::Execf(SConnectionHandle hConnection, const cha
     }
 
     // Insert arguments with correct escapement
-    SString strEscapedQuery = InsertQueryArguments(hConnection, szQuery, vl);
+    SString strEscapedQuery = RestoreQuestionMark(InsertQueryArguments(hConnection, szQuery, vl));
 
     // Start query
     CDbJobData* pJobData = m_JobQueue->AddCommand(EJobCommand::QUERY, hConnection, strEscapedQuery);
@@ -332,7 +334,7 @@ CDbJobData* CDatabaseManagerImpl::QueryStart(SConnectionHandle hConnection, cons
     }
 
     // Insert arguments with correct escapement
-    SString strEscapedQuery = InsertQueryArguments(hConnection, strQuery, pArgs);
+    SString strEscapedQuery = RestoreQuestionMark(InsertQueryArguments(hConnection, strQuery, pArgs));
 
     // Start query
     CDbJobData* pJobData = m_JobQueue->AddCommand(EJobCommand::QUERY, hConnection, strEscapedQuery);
@@ -366,7 +368,7 @@ CDbJobData* CDatabaseManagerImpl::QueryStartf(SConnectionHandle hConnection, con
     }
 
     // Insert arguments with correct escapement
-    SString strEscapedQuery = InsertQueryArguments(hConnection, szQuery, vl);
+    SString strEscapedQuery = RestoreQuestionMark(InsertQueryArguments(hConnection, szQuery, vl));
 
     // Start query
     CDbJobData* pJobData = m_JobQueue->AddCommand(EJobCommand::QUERY, hConnection, strEscapedQuery);
@@ -400,7 +402,7 @@ bool CDatabaseManagerImpl::QueryWithResultf(SConnectionHandle hConnection, CRegi
     }
 
     // Insert arguments with correct escapement
-    SString strEscapedQuery = InsertQueryArguments(hConnection, szQuery, vl);
+    SString strEscapedQuery = RestoreQuestionMark(InsertQueryArguments(hConnection, szQuery, vl));
 
     // Start query
     CDbJobData* pJobData = m_JobQueue->AddCommand(EJobCommand::QUERY, hConnection, strEscapedQuery);
@@ -448,7 +450,7 @@ bool CDatabaseManagerImpl::QueryWithCallback(SConnectionHandle hConnection, PFN_
     }
 
     // Insert arguments with correct escapement
-    SString strEscapedQuery = InsertQueryArguments(hConnection, strQuery, pArgs);
+    SString strEscapedQuery = RestoreQuestionMark(InsertQueryArguments(hConnection, strQuery, pArgs));
 
     // Start query
     CDbJobData* pJobData = m_JobQueue->AddCommand(EJobCommand::QUERY, hConnection, strEscapedQuery);
@@ -486,7 +488,7 @@ bool CDatabaseManagerImpl::QueryWithCallbackf(SConnectionHandle hConnection, PFN
     }
 
     // Insert arguments with correct escapement
-    SString strEscapedQuery = InsertQueryArguments(hConnection, szQuery, vl);
+    SString strEscapedQuery = RestoreQuestionMark(InsertQueryArguments(hConnection, szQuery, vl));
 
     // Start query
     CDbJobData* pJobData = m_JobQueue->AddCommand(EJobCommand::QUERY, hConnection, strEscapedQuery);
@@ -610,6 +612,31 @@ SString CDatabaseManagerImpl::InsertQueryArguments(SConnectionHandle hConnection
     // 'Helpful' error message
     CLogger::ErrorPrintf("DatabaseManager internal error #2");
     return "";
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseManagerImpl::HideQuestionMark
+//
+// '?' must be hidden to prevent it being used as a variable placeholder in subsequent InsertQueryArguments calls.
+// Uses an unlikely UTF-8 sequence.
+//
+///////////////////////////////////////////////////////////////
+SString CDatabaseManagerImpl::HideQuestionMark(const SString& strQuery)
+{
+    return strQuery.Replace("?", "\xF3\xB0\x83\xBF\xF4\x80\x81\x9A");
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseManagerImpl::RestoreQuestionMark
+//
+// Undo HideQuestionMark()
+//
+///////////////////////////////////////////////////////////////
+SString CDatabaseManagerImpl::RestoreQuestionMark(const SString& strQuery)
+{
+    return strQuery.Replace("\xF3\xB0\x83\xBF\xF4\x80\x81\x9A", "?");
 }
 
 ///////////////////////////////////////////////////////////////

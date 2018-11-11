@@ -13,7 +13,7 @@
 
 std::set<CPerPlayerEntity*> CPerPlayerEntity::ms_AllPerPlayerEntityMap;
 
-CPerPlayerEntity::CPerPlayerEntity(CElement* pParent, CXMLNode* pNode) : CElement(pParent, pNode)
+CPerPlayerEntity::CPerPlayerEntity(CElement* pParent) : CElement(pParent)
 {
     MapInsert(ms_AllPerPlayerEntityMap, this);
     m_bIsSynced = false;

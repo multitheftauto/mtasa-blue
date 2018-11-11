@@ -174,6 +174,17 @@ void CClientObject::SetRotationRadians(const CVector& vecRotation)
     m_vecRotation = vecRotation;
 }
 
+void CClientObject::AttachTo(CClientEntity* pEntity)
+{
+    CClientEntity::AttachTo(pEntity);
+
+    if (m_pAttachedToEntity)
+    {
+        DoAttaching();
+        UpdateStreamPosition(m_vecPosition);
+    }
+}
+
 void CClientObject::GetOrientation(CVector& vecPosition, CVector& vecRotationRadians)
 {
     GetPosition(vecPosition);

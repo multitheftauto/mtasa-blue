@@ -125,6 +125,9 @@ DWORD RETURN_UnoccupiedVehicleBurnCheck = 0x6A76E4;
 #define HOOKPOS_ApplyCarBlowHop                             0x6B3816
 DWORD RETURN_ApplyCarBlowHop = 0x6B3831;
 
+#define HOOKPOS_CVehicle_ApplyBoatWaterResistance           0x6D2771
+DWORD RETURN_CVehicle_ApplyBoatWaterResistance = 0x6D2777;
+
 #define HOOKPOS_CPhysical_ApplyGravity                      0x543081
 DWORD RETURN_CPhysical_ApplyGravity = 0x543093;
 
@@ -152,7 +155,7 @@ DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse = 0x4BA076;
 #define HOOKPOS_CAnimBlendAssociation_SetCurrentTime        0x4CEA80
 #define HOOKPOS_RpAnimBlendClumpUpdateAnimations            0x4D34F0
 #define HOOKPOS_CAnimBlendAssoc_destructor                  0x4CECF0
-#define HOOKPOS_CAnimBlendAssocGroup_CopyAnimation          0x4CE14C
+#define HOOKPOS_CAnimBlendAssocGroupCopyAnimation           0x4CE130
 #define HOOKPOS_CAnimManager_AddAnimation                   0x4d3aa0
 #define HOOKPOS_CAnimManager_AddAnimationAndSync            0x4D3B30
 #define HOOKPOS_CAnimManager_BlendAnimation_Hierarchy       0x4D453E
@@ -243,15 +246,6 @@ DWORD JMP_RETN_Cancelled_CPopulation_ConvertToDummyObject = 0x614715;
 #define HOOKPOS_CEntity_IsOnScreen_FixObjectsScale      0x534575
 DWORD JMP_CEntity_IsOnScreen_FixObjectsScale = 0x53457C;
 
-#define HOOKPOS_CEventVehicleDamageCollision                    0x6A7657
-DWORD JMP_CEventVehicleDamageCollision_RETN = 0x6A765D;
-
-#define HOOKPOS_CEventVehicleDamageCollision_Plane              0x6CC4B3
-DWORD JMP_CEventVehicleDamageCollision_Plane_RETN = 0x6CC4B8;
-
-#define HOOKPOS_CEventVehicleDamageCollision_Bike               0x6B8EC6
-DWORD JMP_CEventVehicleDamageCollision_Bike_RETN = 0x6B8ECC;
-
 #define HOOKPOS_CClothes_RebuildPlayer                      0x5A82C0
 DWORD RETURN_CClothes_RebuildPlayera = 0x5A82C8;
 DWORD RETURN_CClothes_RebuildPlayerb = 0x5A837F;
@@ -296,6 +290,9 @@ DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIProp = FUNC_CAEVehicleAudioEntity__
 
 #define HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance   0x68A4EF
 DWORD RETURN_CTaskSimpleSwim_ProcessSwimmingResistance = 0x68A50E;
+
+#define HOOKPOS_CWaterCannon__Render   0x72932A
+static DWORD CONTINUE_CWaterCannon__Render = 0x72932F;
 
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
@@ -358,12 +355,12 @@ IdleHandler*                m_pIdleHandler = NULL;
 PreFxRenderHandler*         m_pPreFxRenderHandler = NULL;
 PreHudRenderHandler*        m_pPreHudRenderHandler = NULL;
 ProcessCollisionHandler*    m_pProcessCollisionHandler = NULL;
-VehicleCollisionHandler*    m_pVehicleCollisionHandler = NULL;
 HeliKillHandler*            m_pHeliKillHandler = NULL;
 ObjectDamageHandler*        m_pObjectDamageHandler = NULL;
 ObjectBreakHandler*         m_pObjectBreakHandler = NULL;
 FxSystemDestructionHandler* m_pFxSystemDestructionHandler = NULL;
 DrivebyAnimationHandler*    m_pDrivebyAnimationHandler = NULL;
+WaterCannonHitWorldHandler* m_pWaterCannonHitWorldHandler = nullptr;
 
 CEntitySAInterface* dwSavedPlayerPointer = 0;
 CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active
@@ -394,6 +391,7 @@ void HOOK_EndWorldColors();
 void HOOK_CWorld_ProcessVerticalLineSectorList();
 void HOOK_ComputeDamageResponse_StartChoking();
 void HOOK_CollisionStreamRead();
+void HOOK_CVehicle_ApplyBoatWaterResistance();
 void HOOK_CPhysical_ApplyGravity();
 void HOOK_VehicleCamStart();
 void HOOK_VehicleCamTargetZTweak();
@@ -424,7 +422,7 @@ void HOOK_RpAnimBlendClumpUpdateAnimations();
 void HOOK_CAnimBlendAssoc_destructor();
 void HOOK_CAnimManager_AddAnimation();
 void HOOK_CAnimManager_AddAnimationAndSync();
-void HOOK_CAnimBlendAssocGroup_CopyAnimation();
+void HOOK_CAnimBlendAssocGroupCopyAnimation();
 void HOOK_CAnimManager_BlendAnimation_Hierarchy();
 void HOOK_CPed_GetWeaponSkill();
 void HOOK_CPed_AddGogglesModel();
@@ -491,12 +489,6 @@ void Hook_CObject_DTR();
 
 void HOOK_CEntity_IsOnScreen_FixObjectScale();
 
-void HOOK_CEventVehicleDamageCollision();
-
-void HOOK_CEventVehicleDamageCollision_Plane();
-
-void HOOK_CEventVehicleDamageCollision_Bike();
-
 void HOOK_CClothes_RebuildPlayer();
 
 void HOOK_CProjectileInfo_Update_FindLocalPlayer_FindLocalPlayerVehicle();
@@ -519,6 +511,8 @@ void HOOK_CAEVehicleAudioEntity__ProcessDummyHeli();
 void HOOK_CAEVehicleAudioEntity__ProcessDummyProp();
 
 void HOOK_CTaskSimpleSwim_ProcessSwimmingResistance();
+
+static void HOOK_CWaterCannon__Render();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -629,6 +623,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_VehicleCamEnd, (DWORD)HOOK_VehicleCamEnd, 6);
     HookInstall(HOOKPOS_VehicleLookBehind, (DWORD)HOOK_VehicleLookBehind, 6);
     HookInstall(HOOKPOS_VehicleLookAside, (DWORD)HOOK_VehicleLookAside, 6);
+    HookInstall(HOOKPOS_CVehicle_ApplyBoatWaterResistance, (DWORD)HOOK_CVehicle_ApplyBoatWaterResistance, 6);
     HookInstall(HOOKPOS_CPhysical_ApplyGravity, (DWORD)HOOK_CPhysical_ApplyGravity, 6);
     HookInstall(HOOKPOS_OccupiedVehicleBurnCheck, (DWORD)HOOK_OccupiedVehicleBurnCheck, 6);
     HookInstall(HOOKPOS_UnoccupiedVehicleBurnCheck, (DWORD)HOOK_UnoccupiedVehicleBurnCheck, 5);
@@ -645,10 +640,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CAnimBlendAssociation_SetCurrentTime, (DWORD)HOOK_CAnimBlendAssociation_SetCurrentTime, 8);
     HookInstall(HOOKPOS_RpAnimBlendClumpUpdateAnimations, (DWORD)HOOK_RpAnimBlendClumpUpdateAnimations, 8);
     HookInstall(HOOKPOS_CAnimBlendAssoc_destructor, (DWORD)HOOK_CAnimBlendAssoc_destructor, 6);
-    HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
-    HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
-    HookInstall(HOOKPOS_CAnimBlendAssocGroup_CopyAnimation, (DWORD)HOOK_CAnimBlendAssocGroup_CopyAnimation, 5);
-    HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8);
     HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
     HookInstall(HOOKPOS_CPhysical_ProcessCollisionSectorList, (DWORD)HOOK_CPhysical_ProcessCollisionSectorList, 7);
@@ -709,14 +700,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_ConvertToObject_CPopulationManageDummy, (DWORD)HOOK_ConvertToObject_CPopulationManageDummy, 6);
     // End of building removal hooks
 
-    // Vehicle Collision Event Hooks
-    HookInstall(HOOKPOS_CEventVehicleDamageCollision, (DWORD)HOOK_CEventVehicleDamageCollision, 6);
-
-    HookInstall(HOOKPOS_CEventVehicleDamageCollision_Plane, (DWORD)HOOK_CEventVehicleDamageCollision_Plane, 5);
-
-    HookInstall(HOOKPOS_CEventVehicleDamageCollision_Bike, (DWORD)HOOK_CEventVehicleDamageCollision_Bike, 6);
-    // End of Vehicle Collision Event Hooks
-
     // Spider CJ fix
     HookInstall(HOOKPOS_CClothes_RebuildPlayer, (DWORD)HOOK_CClothes_RebuildPlayer, 8);
 
@@ -751,6 +734,8 @@ void CMultiplayerSA::InitHooks()
 
     // Fix GTA:SA swimming speed problem on higher fps
     HookInstall(HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance, (DWORD)HOOK_CTaskSimpleSwim_ProcessSwimmingResistance, 6);
+
+    HookInstall(HOOKPOS_CWaterCannon__Render, (DWORD)HOOK_CWaterCannon__Render, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -1397,8 +1382,27 @@ void CMultiplayerSA::InitHooks()
 
     // Clip camera also outside the world bounds.
     MemSet((void*)0x41AD12, 0x90, 2);
+    MemSet((void*)0x41AD5E, 0x90, 2);
     MemSet((void*)0x41ADA7, 0x90, 2);
     MemSet((void*)0x41ADF3, 0x90, 2);
+
+    // Fix melee doesn't work outside the world bounds.
+    MemSet((void*)0x5FFAEE, 0x90, 2);
+    MemSet((void*)0x5FFB4B, 0x90, 2);
+    MemSet((void*)0x5FFBA5, 0x90, 2);
+    MemSet((void*)0x5FFC03, 0x90, 2);
+
+    // Fix shooting sniper doesn't work outside the world bounds (for local player).
+    MemSet((void*)0x7361BF, 0x90, 6);
+    MemSet((void*)0x7361D4, 0x90, 6);
+    MemSet((void*)0x7361E9, 0x90, 6);
+    MemSet((void*)0x7361FE, 0x90, 6);
+
+    // Fix heli blades lacks collision outside the world bounds.
+    MemSet((void*)0x6E2FBC, 0x90, 2);
+    MemSet((void*)0x6E301C, 0x90, 2);
+    MemSet((void*)0x6E3075, 0x90, 2);
+    MemSet((void*)0x6E30D6, 0x90, 2);
 
     // Allow Player Garages to shut with players inside.
     MemSet((void*)0x44C6FA, 0x90, 4);
@@ -1482,6 +1486,13 @@ void CMultiplayerSA::InitHooks()
     // Disable call to CAEVehicleAudioEntity::JustGotOutOfVehicleAsDriver
     MemSetFast((void*)0x502341, 0x90, 5);
 
+    // Allow to switch weapons while glued
+    MemSetFast((void*)0x60D861, 0x90, 14);
+
+    // Allow water cannon to hit objects and players visually
+    MemSet((void*)0x72925D, 0x1, 1);            // objects
+    MemSet((void*)0x729263, 0x1, 1);            // players
+
     InitHooks_CrashFixHacks();
 
     // Init our 1.3 hooks.
@@ -1518,6 +1529,30 @@ void RemoveFxSystemPointer(DWORD* pPointer)
             free(pPointer);
             return;
         }
+    }
+}
+
+void CMultiplayerSA::InitializeAnimationHooks(bool bIsHostSmotra)
+{
+    if (bIsHostSmotra)
+    {
+        BYTE originalCode_CAnimManager_AddAnimation[10] = {0x8B, 0x44, 0x24, 0x0C, 0x8B, 0x15, 0x34, 0xEA, 0xB4, 0x0};
+        BYTE originalCode_CAnimManager_AddAnimationAndSync[10] = {0x8B, 0x44, 0x24, 0x10, 0x8B, 0x15, 0x34, 0xEA, 0xB4, 0x00};
+        BYTE originalCode_CAnimManager_BlendAnimation_Hierarchy[5] = {0x8B, 0x54, 0x24, 0x2C, 0x51};
+        MemCpy((LPVOID)HOOKPOS_CAnimManager_AddAnimation, &originalCode_CAnimManager_AddAnimation, 10);
+        MemCpy((LPVOID)HOOKPOS_CAnimManager_AddAnimationAndSync, &originalCode_CAnimManager_AddAnimationAndSync, 10);
+        MemCpy((LPVOID)HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, &originalCode_CAnimManager_BlendAnimation_Hierarchy, 5);
+
+        HookInstall(HOOKPOS_CAnimBlendAssocGroupCopyAnimation, (DWORD)HOOK_CAnimBlendAssocGroupCopyAnimation, 6);
+    }
+    else
+    {
+        BYTE originalCode_CAnimBlendAssocGroupCopyAnimation[6] = {0x64, 0xA1, 0x00, 0x00, 0x00, 0x00};
+        MemCpy((LPVOID)HOOKPOS_CAnimBlendAssocGroupCopyAnimation, &originalCode_CAnimBlendAssocGroupCopyAnimation, 6);
+
+        HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
+        HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
+        HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
     }
 }
 
@@ -2212,11 +2247,6 @@ void CMultiplayerSA::SetProcessCollisionHandler(ProcessCollisionHandler* pHandle
     m_pProcessCollisionHandler = pHandler;
 }
 
-void CMultiplayerSA::SetVehicleCollisionHandler(VehicleCollisionHandler* pHandler)
-{
-    m_pVehicleCollisionHandler = pHandler;
-}
-
 void CMultiplayerSA::SetHeliKillHandler(HeliKillHandler* pHandler)
 {
     m_pHeliKillHandler = pHandler;
@@ -2240,6 +2270,11 @@ void CMultiplayerSA::SetFxSystemDestructionHandler(FxSystemDestructionHandler* p
 void CMultiplayerSA::SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler)
 {
     m_pDrivebyAnimationHandler = pHandler;
+}
+
+void CMultiplayerSA::SetWaterCannonHitWorldHandler(WaterCannonHitWorldHandler* pHandler)
+{
+    m_pWaterCannonHitWorldHandler = pHandler;
 }
 
 // What we do here is check if the idle handler has been set
@@ -4200,6 +4235,18 @@ void _cdecl CPhysical_ApplyGravity(DWORD dwThis)
     }
 }
 
+const float kfTimeStepOrg = 5.0f / 3.0f;
+void _declspec(naked) HOOK_CVehicle_ApplyBoatWaterResistance()
+{
+    _asm
+    {
+        fmul    ds : 0x871DDC   // Original constant used in code
+        fmul    ds : 0xB7CB5C   // Multiply by current timestep
+        fdiv    kfTimeStepOrg   // Divide by desired timestep, used at 30fps
+        jmp     RETURN_CVehicle_ApplyBoatWaterResistance
+    }
+}
+
 void _declspec(naked) HOOK_CPhysical_ApplyGravity()
 {
     _asm
@@ -6140,109 +6187,7 @@ IsOnScreen_IsObject:
         jmp     JMP_CEntity_IsOnScreen_FixObjectsScale
     }
 }
-CVehicleSAInterface* pCollisionVehicle = NULL;
-void                 TriggerVehicleCollisionEvent()
-{
-    if (pCollisionVehicle)
-    {
-        CEntitySAInterface* pEntity = pCollisionVehicle->m_pCollidedEntity;
-        if (pEntity)
-        {
-            // Not handled because it triggers too much
-            // if ( pEntity->nType != ENTITY_TYPE_BUILDING )
-            {
-                if (m_pVehicleCollisionHandler)
-                {
-                    TIMING_CHECKPOINT("+TriggerVehColEvent");
-                    if (pEntity->nType == ENTITY_TYPE_VEHICLE)
-                    {
-                        CVehicleSAInterface* pInterface = static_cast<CVehicleSAInterface*>(pEntity);
-                        m_pVehicleCollisionHandler(pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude,
-                                                   pInterface->m_fDamageImpulseMagnitude, pCollisionVehicle->m_usPieceType,
-                                                   pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity);
-                    }
-                    else
-                    {
-                        m_pVehicleCollisionHandler(pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude, 0.0f,
-                                                   pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition,
-                                                   pCollisionVehicle->m_vecCollisionImpactVelocity);
-                    }
-                    TIMING_CHECKPOINT("-TriggerVehColEvent");
-                }
-            }
-        }
-    }
-}
 
-void _declspec(naked) HOOK_CEventVehicleDamageCollision()
-{
-    // .006A7657 64 A1 00 00 00 00                       mov     eax, large fs:0 < Hook >
-    // .006A765D 50                                      push    eax < Jmp Back >
-
-    // ecx = this ptr
-    // pVehicle->damageEntity = damage entity
-    _asm
-    {
-        pushad
-        mov pCollisionVehicle, ecx
-    }
-    TriggerVehicleCollisionEvent();
-
-    // do the replaced code and return back as if nothing happened.
-    _asm
-    {
-        popad
-        mov eax, fs:0
-        jmp JMP_CEventVehicleDamageCollision_RETN
-    }
-}
-
-DWORD dwPlaneDamageThreadshold = 0x8D33E4;
-void _declspec(naked) HOOK_CEventVehicleDamageCollision_Plane()
-{
-    // .006CC4B3 A1 E4 33 8D 00                            mov     eax, ds:?PLANE_DAMAGE_THRESHHOLD@@3MA
-    //  006CC4B8 53                                        push    ebx < Jmp Back >
-
-    // ecx = this ptr
-    // pVehicle->damageEntity = damage entity
-    _asm
-    {
-        pushad
-        mov pCollisionVehicle, ecx
-    }
-    TriggerVehicleCollisionEvent();
-
-    // do the replaced code and return back as if nothing happened.
-    _asm
-    {
-        popad
-        mov eax, DWORD PTR DS:[8D33E4h]
-        jmp JMP_CEventVehicleDamageCollision_Plane_RETN
-    }
-}
-
-void _declspec(naked) HOOK_CEventVehicleDamageCollision_Bike()
-{
-    // .006B8EC6 DC 1D F8 9E 85 00                       fcomp   ds:__real@0000000000000000 < Hook >
-    //  006B8ECC 8B F1                                   mov     esi, ecx < Jmp Back >
-
-    // ecx = this ptr
-    // pVehicle->damageEntity = damage entity
-    _asm
-    {
-        pushad
-        mov pCollisionVehicle, ecx
-    }
-    TriggerVehicleCollisionEvent();
-
-    // do the replaced code and return back as if nothing happened.
-    _asm
-    {
-        popad
-        fcomp DWORD PTR DS:[859EF8h]
-        jmp JMP_CEventVehicleDamageCollision_Bike_RETN
-    }
-}
 //////////////////////////////////////////////////////////////////////////////////////////
 // Only allow rebuild player on CJ - Stops other models getting corrupted (spider CJ)
 // hooked at 5A82C0 8 bytes
@@ -6868,5 +6813,39 @@ void _declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
         fmul    kfTimeStepOriginal
 
         jmp     RETURN_CTaskSimpleSwim_ProcessSwimmingResistance
+    }
+}
+
+static void __cdecl WaterCannonHitWorld(CVehicleSAInterface* pGameVehicle, CColPointSAInterface* pColPoint, CEntitySAInterface** ppGameEntity)
+{
+    if (m_pWaterCannonHitWorldHandler)
+    {
+        CEntitySAInterface* const pGameEntity = ppGameEntity ? *ppGameEntity : nullptr;
+        const int                 iModel = pGameEntity ? pGameEntity->m_nModelIndex : -1;
+
+        SWaterCannonHitEvent event = {
+            pGameVehicle, pGameEntity, pColPoint->Position, pColPoint->Normal, iModel, pColPoint->ucSurfaceTypeB,
+        };
+
+        m_pWaterCannonHitWorldHandler(event);
+    }
+}
+
+static void _declspec(naked) HOOK_CWaterCannon__Render()
+{
+    _asm
+    {
+        pushad
+        mov     eax, [ebx]              // CVehicleSAInterface* CWaterCannon::m_pVehicle
+        lea     ebx, [esp + 100h - 54h] // CColPointSAInterface*
+        lea     ecx, [esp + 100h - 58h] // CEntitySAInterface**
+        push    ecx                     // ppGameEntity
+        push    ebx                     // pColPoint
+        push    eax                     // pGameVehicle
+        call    WaterCannonHitWorld
+        add     esp, 12
+        popad
+        push    3E4CCCCDh
+        jmp     CONTINUE_CWaterCannon__Render
     }
 }
