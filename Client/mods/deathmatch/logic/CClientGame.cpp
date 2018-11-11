@@ -6910,6 +6910,10 @@ void CClientGame::PedStepHandler(CPedSAInterface* pPedSA, bool bFoot)
 {
     CLuaArguments Arguments;
     CClientPed*   pClientPed = DynamicCast<CClientPed>(GetGameEntityXRefManager()->FindClientEntity((CEntitySAInterface*)pPedSA));
+
+    if (!pClientPed)
+        return;
+
     Arguments.PushBoolean(bFoot);
     pClientPed->CallEvent("onClientPedStep", Arguments, true);
 }
