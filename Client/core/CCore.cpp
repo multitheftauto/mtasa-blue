@@ -1367,7 +1367,7 @@ void CCore::RegisterCommands()
     m_pCommands->Add("showframegraph", _("shows the frame timing graph"), CCommandFuncs::ShowFrameGraph);
     m_pCommands->Add("jinglebells", "", CCommandFuncs::JingleBells);
     m_pCommands->Add("fakelag", "", CCommandFuncs::FakeLag);
-
+    
     m_pCommands->Add("reloadnews", "for developers: reload news", CCommandFuncs::ReloadNews);
 }
 
@@ -1828,7 +1828,7 @@ void CCore::ApplyQueuedFrameRateLimit()
         // Calc required time in ms between frames
         const double dTargetTimeToUse = 1000.0 / m_uiQueuedFrameRate;
 
-        while(true)
+        while (true)
         {
             // See if we need to wait
             double dSpare = dTargetTimeToUse - m_FrameRateTimer.Get();
@@ -2272,4 +2272,27 @@ SString CCore::GetBlueCopyrightString(void)
 {
     SString strCopyright = BLUE_COPYRIGHT_STRING;
     return strCopyright.Replace("%BUILD_YEAR%", std::to_string(BUILD_YEAR).c_str());
+}
+
+bool CCore::IsHostSmotraServer()
+{
+    unsigned int uiPort;
+    SString      strHost;
+    CVARS_GET("host", strHost);
+    CVARS_GET("port", uiPort);
+
+    if (uiPort != 22003)
+    {
+        return false;
+    }
+
+    unsigned int arrSmotraHostIps[3] = {HashString("164.132.204.62"), HashString("149.202.223.26"), HashString("151.80.111.167")};
+    for (int i = 0; i < 3; i++)
+    {
+        if (arrSmotraHostIps[i] == HashString(strHost))
+        {
+            return true;
+        }
+    }
+    return false;
 }

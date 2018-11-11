@@ -237,6 +237,9 @@ CClientGame::CClientGame(bool bLocalPlay)
     // Singular file download manager
     m_pSingularFileDownloadManager = new CSingularFileDownloadManager();
 
+    bool bIsHostSmotraServer = g_pCore->IsHostSmotraServer();
+    g_pMultiplayer->InitializeAnimationHooks(bIsHostSmotraServer);
+
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pMultiplayer->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
@@ -4534,7 +4537,7 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicl
         CVehicle*      pColliderVehicle = g_pGame->GetPools()->GetVehicle((DWORD*)pCollidingVehicle);
         CClientEntity* pVehicleClientEntity = m_pManager->FindEntity(pColliderVehicle, true);
         auto           pClientVehicle = static_cast<CClientVehicle*>(pVehicleClientEntity);
-        
+
         if (pVehicleClientEntity)
         {
             CEntity*       pCollidedWithEntity = g_pGame->GetPools()->GetEntity((DWORD*)pCollidedWith);
@@ -6904,9 +6907,9 @@ void CClientGame::RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInter
 }
 
 void CClientGame::PedStepHandler(CPedSAInterface* pPedSA, bool bFoot)
-{    
+{
     CLuaArguments Arguments;
-    CClientPed* pClientPed = DynamicCast<CClientPed>(GetGameEntityXRefManager()->FindClientEntity((CEntitySAInterface*)pPedSA));
+    CClientPed*   pClientPed = DynamicCast<CClientPed>(GetGameEntityXRefManager()->FindClientEntity((CEntitySAInterface*)pPedSA));
     Arguments.PushBoolean(bFoot);
     pClientPed->CallEvent("onClientPedStep", Arguments, true);
 }
@@ -6914,15 +6917,15 @@ void CClientGame::PedStepHandler(CPedSAInterface* pPedSA, bool bFoot)
 void CClientGame::WaterCannonHitWorldHandler(SWaterCannonHitEvent& event)
 {
     CClientEntity* const pVehicle = event.pGameVehicle ? g_pClientGame->GetGameEntityXRefManager()->FindClientVehicle(event.pGameVehicle) : nullptr;
-    
+
     if (!pVehicle)
         return;
-    
+
     CClientEntity* pEntity = event.pHitGameEntity ? g_pClientGame->GetGameEntityXRefManager()->FindClientEntity(event.pHitGameEntity) : nullptr;
 
     if (!pEntity)
         pEntity = m_pRootEntity;
-    
+
     CLuaArguments arguments;
     arguments.PushElement(pVehicle);
     arguments.PushNumber(event.vecPosition.fX);

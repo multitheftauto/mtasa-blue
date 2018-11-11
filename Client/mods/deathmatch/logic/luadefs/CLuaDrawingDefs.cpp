@@ -1016,6 +1016,7 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
     SString strRootPathWithoutResource = strRootPath.Left(strRootPath.TrimEnd("\\").length() - SStringX(pFileResource->GetName()).length());
     strStatus = strStatus.ReplaceI(strRootPathWithoutResource, "");
     argStream.SetCustomError(bIsRawData ? "raw data" : strFile, strStatus);
+    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
     lua_pushboolean(luaVM, false);
     return 1;
 }
