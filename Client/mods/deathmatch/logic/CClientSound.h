@@ -39,7 +39,7 @@ public:
     void SetPaused(bool bPaused);
     bool IsPaused(void);
 
-    bool   SetPlayPosition(double dPosition);
+    void   SetPlayPosition(double dPosition);
     double GetPlayPosition(void);
 
     double GetLength(bool bAvoidLoad = false);

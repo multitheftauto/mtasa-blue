@@ -293,20 +293,18 @@ void CClientSound::PlayStream(const SString& strURL, bool bLoop, bool bThrottle,
 //
 //
 ////////////////////////////////////////////////////////////
-bool CClientSound::SetPlayPosition(double dPosition)
+void CClientSound::SetPlayPosition(double dPosition)
 {
     if (m_pAudio)
     {
         // Use actual audio if active
-        return m_pAudio->SetPlayPosition(dPosition);
+        m_pAudio->SetPlayPosition(dPosition);
     }
     else
     {
         // Use simulation if not active
         m_SimulatedPlayPosition.SetPlayPositionNow(dPosition);
-        return true;
     }
-    return false;
 }
 
 double CClientSound::GetPlayPosition(void)

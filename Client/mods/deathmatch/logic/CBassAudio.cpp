@@ -521,7 +521,7 @@ void CBassAudio::SetPaused(bool bPaused)
 }
 
 // Non-streams only
-bool CBassAudio::SetPlayPosition(double dPosition)
+void CBassAudio::SetPlayPosition(double dPosition)
 {
     // Only relevant for non-streams, which are always ready if valid
     if (m_pSound)
@@ -529,12 +529,8 @@ bool CBassAudio::SetPlayPosition(double dPosition)
         // Make sure position is in range
         QWORD bytePosition = BASS_ChannelSeconds2Bytes(m_pSound, dPosition);
         QWORD byteLength = BASS_ChannelGetLength(m_pSound, BASS_POS_BYTE);
-        if (BASS_ChannelSetPosition(m_pSound, Clamp<QWORD>(0, bytePosition, byteLength - 1), BASS_POS_BYTE))
-        {
-            return true;
-        }
+        BASS_ChannelSetPosition(m_pSound, Clamp<QWORD>(0, bytePosition, byteLength - 1), BASS_POS_BYTE);
     }
-    return false;
 }
 
 // Non-streams only
