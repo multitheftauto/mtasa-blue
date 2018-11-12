@@ -1145,12 +1145,12 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
-const char* cSurfaceAudio[8] = { "concrete", "grass", "sand", "gravel", "wood", "water", "metal", "longGrass" };
-const char* cSurfaceStepEffect[2] = { "sand", "water" };
-const char* cSurfaceBulletEffect[4] = { "concrete", "metal", "wood", "sand" };
-const char* cSurfaceWheelEffect[5] = { "grass", "gravel", "mud", "sand", "dust" };
-const char* cSurfaceSkidMark[3] = { "asphalt", "dirt", "dust" };
-const char* cSurfaceAdhesionGroup[6] = { "rubber", "hard", "road", "loose", "sand", "wet" };
+const char* cSurfaceAudio[8] = {"concrete", "grass", "sand", "gravel", "wood", "water", "metal", "longGrass"};
+const char* cSurfaceStepEffect[2] = {"sand", "water" };
+const char* cSurfaceBulletEffect[4] = {"metal", "sand", "wood", "concrete"};
+const char* cSurfaceWheelEffect[5] = {"grass", "gravel", "mud", "sand", "dust"};
+const char* cSurfaceSkidMark[3] = {"asphalt", "dirt", "dust" };
+const char* cSurfaceAdhesionGroup[6] = {"rubber", "hard", "road", "loose", "sand", "wet"};
 
 int CLuaEngineDefs::EngineGetSurfaceProperties(lua_State* luaVM)
 {
@@ -1196,7 +1196,15 @@ int CLuaEngineDefs::EngineGetSurfaceProperties(lua_State* luaVM)
                 return 1;
                 break;
             case SURFACE_PROPERTY_BULLETEFFECT:
-                lua_pushstring(luaVM, cSurfaceBulletEffect[pSurface->m_bulletFx]);
+                if (pSurface->m_bulletFx == 0)
+                {
+                    lua_pushstring(luaVM, "disabled");
+                    return 1;
+                }
+                else
+                {
+                    lua_pushstring(luaVM, cSurfaceBulletEffect[pSurface->m_bulletFx - 1]);
+                }
                 return 1;
                 break;
             case SURFACE_PROPERTY_SHOOTTHROUGH:
