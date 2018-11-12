@@ -22,7 +22,7 @@
 void CALLBACK BPMCallback(int handle, float bpm, void* user);
 void CALLBACK BeatCallback(DWORD chan, double beatpos, void* user);
 
-#define INVALID_FX_HANDLE (-1)            // Hope that BASS doesn't use this as a valid Fx handle
+#define INVALID_FX_HANDLE (-1)  // Hope that BASS doesn't use this as a valid Fx handle
 
 namespace
 {
@@ -134,7 +134,7 @@ bool CBassAudio::BeginLoadingMedia(void)
 
     // Calc the flags
     long lFlags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_SOFTWARE;
-#if 0            // Everything sounds better in ste-reo
+#if 0   // Everything sounds better in ste-reo
     if ( m_b3D )
         lFlags |= BASS_SAMPLE_MONO;
 #endif
