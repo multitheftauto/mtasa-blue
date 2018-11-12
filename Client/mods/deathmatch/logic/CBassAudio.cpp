@@ -22,7 +22,7 @@
 void CALLBACK BPMCallback(int handle, float bpm, void* user);
 void CALLBACK BeatCallback(DWORD chan, double beatpos, void* user);
 
-#define INVALID_FX_HANDLE (-1)  // Hope that BASS doesn't use this as a valid Fx handle
+#define INVALID_FX_HANDLE (-1)            // Hope that BASS doesn't use this as a valid Fx handle
 
 namespace
 {
@@ -134,7 +134,7 @@ bool CBassAudio::BeginLoadingMedia(void)
 
     // Calc the flags
     long lFlags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_SOFTWARE;
-#if 0   // Everything sounds better in ste-reo
+#if 0            // Everything sounds better in ste-reo
     if ( m_b3D )
         lFlags |= BASS_SAMPLE_MONO;
 #endif
@@ -521,7 +521,7 @@ void CBassAudio::SetPaused(bool bPaused)
 }
 
 // Non-streams only
-void CBassAudio::SetPlayPosition(double dPosition)
+bool CBassAudio::SetPlayPosition(double dPosition)
 {
     // Only relevant for non-streams, which are always ready if valid
     if (m_pSound)
@@ -529,8 +529,9 @@ void CBassAudio::SetPlayPosition(double dPosition)
         // Make sure position is in range
         QWORD bytePosition = BASS_ChannelSeconds2Bytes(m_pSound, dPosition);
         QWORD byteLength = BASS_ChannelGetLength(m_pSound, BASS_POS_BYTE);
-        BASS_ChannelSetPosition(m_pSound, Clamp<QWORD>(0, bytePosition, byteLength - 1), BASS_POS_BYTE);
+        return BASS_ChannelSetPosition(m_pSound, Clamp<QWORD>(0, bytePosition, byteLength - 1), BASS_POS_BYTE);
     }
+    return false;
 }
 
 // Non-streams only

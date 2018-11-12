@@ -54,7 +54,7 @@ public:
     bool BeginLoadingMedia(void);
 
     void   SetPaused(bool bPaused);
-    void   SetPlayPosition(double dPosition);
+    bool   SetPlayPosition(double dPosition);
     double GetPlayPosition(void);
     double GetLength(void);
     void   SetVolume(float fVolume);
