@@ -5431,7 +5431,7 @@ int CStaticFunctionDefinitions::GUIComboBoxGetItemCount(CClientEntity& Entity)
             return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetItemCount();
         }
     }
-
+    
     return 0;
 }
 
@@ -5458,7 +5458,7 @@ bool CStaticFunctionDefinitions::GUIComboBoxSetOpen(CClientEntity& Entity, bool 
             return true;
         }
     }
-
+    
     return false;
 }
 
@@ -5468,14 +5468,14 @@ bool CStaticFunctionDefinitions::GUIComboBoxIsOpen(CClientEntity& Entity)
     if (IS_GUI(&Entity))
     {
         CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
+        
         // Are we a combobox?
         if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
         {
             return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->IsOpen();
         }
     }
-
+    
     return false;
 }
 
