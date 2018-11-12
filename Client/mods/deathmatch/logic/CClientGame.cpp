@@ -99,6 +99,11 @@ CClientGame::CClientGame(bool bLocalPlay)
     m_lastWeaponSlot = WEAPONSLOT_MAX;            // last stored weapon slot, for weapon slot syncing to server (sets to invalid value)
     ResetAmmoInClip();
 
+    m_pSurfaceInfo = reinterpret_cast<CSurfaceType*>(0xB79538);
+    // Store default surface properties
+    m_pOriginalSurfaceInfo = new CSurfaceType;
+    memcpy(m_pOriginalSurfaceInfo, (void *)0xB79538, sizeof(CSurfaceType));
+
     m_bNoNewVehicleTask = false;
     m_NoNewVehicleTaskReasonID = INVALID_ELEMENT_ID;
 
@@ -512,6 +517,8 @@ CClientGame::~CClientGame(void)
     // NULL the global CClientGame var
     g_pClientGame = NULL;
     m_bBeingDeleted = false;
+
+    memcpy(m_pSurfaceInfo, m_pOriginalSurfaceInfo, sizeof(CSurfaceType));
 }
 
 /*
