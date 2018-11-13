@@ -358,10 +358,15 @@ bool CResource::Load(void)
         }
         else
         {
-            char szBuffer[255] = {0};
-            snprintf(szBuffer, 254, "Couldn't parse meta file for resource '%s'\n", m_strResourceName.c_str());
-            m_strFailureReason = szBuffer;
-            CLogger::ErrorPrintf(szBuffer);
+            SString strError;
+            metaFile->GetLastError(strError);
+
+            if (strError.empty())
+                m_strFailureReason = SString("Couldn't parse meta file for resource '%s'\n", m_strResourceName.c_str());
+            else
+                m_strFailureReason = SString("Couldn't parse meta file for resource '%s' [%s]\n", m_strResourceName.c_str(), strError.c_str());
+
+            CLogger::ErrorPrintf(m_strFailureReason.c_str());
 
             // Delete the XML file if we somehow got to load it halfway
             if (metaFile)

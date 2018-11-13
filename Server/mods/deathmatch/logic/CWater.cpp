@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CWater::CWater(CWaterManager* pWaterManager, CElement* pParent, CXMLNode* pNode, EWaterType waterType, bool bShallow) : CElement(pParent, pNode)
+CWater::CWater(CWaterManager* pWaterManager, CElement* pParent, EWaterType waterType, bool bShallow) : CElement(pParent)
 {
     m_pWaterManager = pWaterManager;
 
@@ -81,7 +81,7 @@ void CWater::SetLevel(float fLevel)
     }
 }
 
-bool CWater::ReadSpecialData()
+bool CWater::ReadSpecialData(const int iLine)
 {
     char szPropName[10];
     m_WaterType = QUAD;
@@ -97,7 +97,7 @@ bool CWater::ReadSpecialData()
             }
             else
             {
-                CLogger::ErrorPrintf("Bad/missing 'posX%d' attribute in <water> (line %u)\n", i + 1, m_uiLine);
+                CLogger::ErrorPrintf("Bad/missing 'posX%d' attribute in <water> (line %d)\n", i + 1, iLine);
                 return false;
             }
         }
@@ -111,7 +111,7 @@ bool CWater::ReadSpecialData()
             }
             else
             {
-                CLogger::ErrorPrintf("Bad/missing 'posY%d' attribute in <water> (line %u)\n", i + 1, m_uiLine);
+                CLogger::ErrorPrintf("Bad/missing 'posY%d' attribute in <water> (line %d)\n", i + 1, iLine);
                 return false;
             }
         }
@@ -125,7 +125,7 @@ bool CWater::ReadSpecialData()
             }
             else
             {
-                CLogger::ErrorPrintf("Bad/missing 'posZ%d' attribute in <water> (line %u)\n", i + 1, m_uiLine);
+                CLogger::ErrorPrintf("Bad/missing 'posZ%d' attribute in <water> (line %d)\n", i + 1, iLine);
                 return false;
             }
         }
@@ -137,7 +137,7 @@ bool CWater::ReadSpecialData()
     RoundVertices();
     if (!Valid())
     {
-        CLogger::ErrorPrintf("Invalid <water> element (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Invalid <water> element (line %d)\n", iLine);
         return false;
     }
     return true;

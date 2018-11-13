@@ -1017,7 +1017,7 @@ public:
                 int iArgument = lua_type(m_luaVM, -1);
                 if (iArgument == LUA_TNUMBER)
                 {
-                    outList.push_back(lua_tonumber(m_luaVM, -1));
+                    outList.push_back(static_cast<float>(lua_tonumber(m_luaVM, -1)));
                 }
             }
             m_iIndex++;

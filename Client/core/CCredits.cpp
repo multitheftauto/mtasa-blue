@@ -158,6 +158,7 @@ CCredits::CCredits(void)
         "FileEX\n"
         "Pirulax\n"
         "SDraw\n"
+        "samr46\n"
         "\n"
         "\n";
 

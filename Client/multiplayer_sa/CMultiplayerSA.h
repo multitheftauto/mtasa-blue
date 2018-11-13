@@ -65,6 +65,8 @@ public:
     void                InitHooks_ClothesCache(void);
     void                InitHooks_Files(void);
     void                InitHooks_Weapons(void);
+    void                InitHooks_Peds();
+    void                InitHooks_VehicleCollision();
     void                InitHooks_Rendering(void);
     void                InitHooks_LicensePlate(void);
     void                InitHooks_VehicleLights(void);
@@ -77,6 +79,8 @@ public:
     CRemoteDataStorage* GetRemoteDataStorage(CPlayerPed* pPed);
     void                RemoveRemoteDataStorage(CPlayerPed* pPed);
     void                EnableHooks_ClothesMemFix(bool bEnable);
+
+    void InitializeAnimationHooks(bool bIsHostSmotra);
 
     CPed* GetContextSwitchedPed(void);
 
@@ -130,6 +134,8 @@ public:
     void SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler);
     void SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler);
     void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler);
+    void SetPedStepHandler(PedStepHandler* pHandler);
+    void SetWaterCannonHitWorldHandler(WaterCannonHitWorldHandler* pHandler);
 
     void  AllowMouseMovement(bool bAllow);
     void  DoSoundHacksOnLostFocus(bool bLostFocus);

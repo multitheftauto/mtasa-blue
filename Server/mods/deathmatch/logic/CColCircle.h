@@ -16,7 +16,7 @@
 class CColCircle : public CColShape
 {
 public:
-    CColCircle(CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, float fRadius, CXMLNode* pNode = NULL, bool bIsPartnered = false);
+    CColCircle(CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, float fRadius, bool bIsPartnered = false);
 
     virtual CSphere GetWorldBoundingSphere(void);
 
@@ -32,7 +32,7 @@ public:
     };
 
 protected:
-    bool ReadSpecialData(void);
+    bool ReadSpecialData(const int iLine) override;
 
     float m_fRadius;
 };

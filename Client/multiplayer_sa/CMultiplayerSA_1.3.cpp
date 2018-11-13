@@ -205,6 +205,8 @@ void CMultiplayerSA::InitHooks_13(void)
     InitHooks_ClothesCache();
     InitHooks_Files();
     InitHooks_Weapons();
+    InitHooks_Peds();
+    InitHooks_VehicleCollision();
     InitHooks_Rendering();
 }
 

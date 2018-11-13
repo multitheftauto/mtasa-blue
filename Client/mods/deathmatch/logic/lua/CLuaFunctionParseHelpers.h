@@ -284,6 +284,10 @@ inline SString GetClassTypeName(CClientTexture*)
 {
     return "texture";
 }
+inline SString GetClassTypeName(CClientWebBrowser*)
+{
+    return "browser";
+}
 inline SString GetClassTypeName(CClientWeapon*)
 {
     return "weapon";
