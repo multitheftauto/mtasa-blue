@@ -172,7 +172,8 @@ CClientPed* CGameEntityXRefManagerImpl::FindClientPed(CEntity* pPedSA)
 
 CClientVehicle* CGameEntityXRefManagerImpl::FindClientVehicle(CEntity* pVehicleSA)
 {
-    return DynamicCast<CClientVehicle>(FindClientEntity(pVehicleSA));
+    CClientEntity * pClientEntity = FindClientEntity(pVehicleSA);
+    return DynamicCast<CClientVehicle>(pClientEntity);
 }
 
 ///////////////////////////////////////////////////////////////

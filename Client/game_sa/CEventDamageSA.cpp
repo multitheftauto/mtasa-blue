@@ -70,13 +70,13 @@ CEntity* CEventDamageSA::GetInflictingEntity(void)
         switch (pInterface->nType)
         {
             case ENTITY_TYPE_PED:
-                pReturn = pPools->GetPed((DWORD*)pInterface);
+                pReturn = pPools->GetPed((DWORD*)pInterface)->pEntity;
                 break;
             case ENTITY_TYPE_VEHICLE:
-                pReturn = pPools->GetVehicle((DWORD*)pInterface);
+                pReturn = pPools->GetVehicle((DWORD*)pInterface)->pEntity;
                 break;
             case ENTITY_TYPE_OBJECT:
-                pReturn = pPools->GetObject((DWORD*)pInterface);
+                pReturn = pPools->GetObject((DWORD*)pInterface)->pEntity;
                 break;
             default:
                 break;

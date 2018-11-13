@@ -22,13 +22,13 @@ CEntity* CCamSA::GetTargetEntity(void) const
         switch (pInterface->nType)
         {
             case ENTITY_TYPE_PED:
-                pReturn = (CEntity*)(pPools->GetPed((DWORD*)pInterface));
+                pReturn = (CEntity*)(pPools->GetPed((DWORD*)pInterface)->pEntity);
                 break;
             case ENTITY_TYPE_VEHICLE:
-                pReturn = (CEntity*)(pPools->GetVehicle((DWORD*)pInterface));
+                pReturn = (CEntity*)(pPools->GetVehicle((DWORD*)pInterface)->pEntity);
                 break;
             case ENTITY_TYPE_OBJECT:
-                pReturn = (CEntity*)(pPools->GetObject((DWORD*)pInterface));
+                pReturn = (CEntity*)(pPools->GetObject((DWORD*)pInterface)->pEntity);
                 break;
             default:
                 break;

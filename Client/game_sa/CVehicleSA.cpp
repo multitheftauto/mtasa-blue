@@ -440,7 +440,7 @@ CVehicle* CVehicleSA::GetNextTrainCarriage(void)
 {
     CVehicleSAInterface* pVehicle = GetNextCarriageInTrain();
     if (pVehicle)
-        return pGame->GetPools()->GetVehicle((DWORD*)pVehicle);
+        return pGame->GetPools()->GetVehicle((DWORD*)pVehicle)->pEntity;
     else
         return NULL;
 }
@@ -495,7 +495,7 @@ CVehicle* CVehicleSA::GetPreviousTrainCarriage(void)
 {
     CVehicleSAInterface* pVehicle = GetPreviousCarriageInTrain();
     if (pVehicle)
-        return pGame->GetPools()->GetVehicle((DWORD*)pVehicle);
+        return pGame->GetPools()->GetVehicle((DWORD*)pVehicle)->pEntity;
     else
         return NULL;
 }
@@ -1172,7 +1172,7 @@ CPed* CVehicleSA::GetDriver(void)
 
     CPedSAInterface* pDriver = GetVehicleInterface()->pDriver;
     if (pDriver)
-        return pPools->GetPed((DWORD*)pDriver);
+        return pPools->GetPed((DWORD*)pDriver)->pEntity;
     else
         return NULL;
 }
@@ -1186,7 +1186,7 @@ CPed* CVehicleSA::GetPassenger(unsigned char ucSlot)
     {
         CPedSAInterface* pPassenger = GetVehicleInterface()->pPassengers[ucSlot];
         if (pPassenger)
-            return pPools->GetPed((DWORD*)pPassenger);
+            return pPools->GetPed((DWORD*)pPassenger)->pEntity;
     }
 
     return NULL;
@@ -1734,7 +1734,7 @@ CVehicle* CVehicleSA::GetTowedVehicle(void)
     DEBUG_TRACE("CVehicle * CVehicleSA::GetTowedVehicle ( void )");
     CVehicleSAInterface* pTowedVehicle = (CVehicleSAInterface*)*(DWORD*)((DWORD)this->GetInterface() + 1224);
     if (pTowedVehicle)
-        return pGame->GetPools()->GetVehicle((DWORD*)pTowedVehicle);
+        return pGame->GetPools()->GetVehicle((DWORD*)pTowedVehicle)->pEntity;
     return NULL;
 }
 
@@ -1743,7 +1743,7 @@ CVehicle* CVehicleSA::GetTowedByVehicle(void)
     DEBUG_TRACE("CVehicle * CVehicleSA::GetTowedVehicle ( void )");
     CVehicleSAInterface* pTowedVehicle = (CVehicleSAInterface*)*(DWORD*)((DWORD)this->GetInterface() + 1220);
     if (pTowedVehicle)
-        return pGame->GetPools()->GetVehicle((DWORD*)pTowedVehicle);
+        return pGame->GetPools()->GetVehicle((DWORD*)pTowedVehicle)->pEntity;
     return NULL;
 }
 
@@ -1819,13 +1819,13 @@ CPhysical* CVehicleSA::QueryPickedUpEntityWithWinch()
         switch (phys->nType)
         {
             case ENTITY_TYPE_PED:
-                physRet = (CPhysical*)pPools->GetPed((DWORD*)phys);
+                physRet = (CPhysical*)pPools->GetPed((DWORD*)phys)->pEntity;
                 break;
             case ENTITY_TYPE_VEHICLE:
-                physRet = (CPhysical*)pGame->GetPools()->GetVehicle((DWORD*)phys);
+                physRet = (CPhysical*)pGame->GetPools()->GetVehicle((DWORD*)phys)->pEntity;
                 break;
             case ENTITY_TYPE_OBJECT:
-                physRet = (CPhysical*)pPools->GetObject((DWORD*)phys);
+                physRet = (CPhysical*)pPools->GetObject((DWORD*)phys)->pEntity;
                 break;
             default:
                 physRet = NULL;
@@ -2100,7 +2100,7 @@ CObject* CVehicleSA::SpawnFlyingComponent(int i_1, unsigned int ui_2)
 
     CObject* pObject = NULL;
     if (dwReturn)
-        pObject = pGame->GetPools()->GetObject((DWORD*)dwReturn);
+        pObject = pGame->GetPools()->GetObject((DWORD*)dwReturn)->pEntity;
     return pObject;
 }
 

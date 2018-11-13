@@ -35,7 +35,7 @@ CRemoteDataStorageSA* CRemoteDataSA::GetRemoteDataStorage(CPlayerPed* pPlayerPed
 
 CRemoteDataStorageSA* CRemoteDataSA::GetRemoteDataStorage(CPedSAInterface* ped)
 {
-    CPlayerPed* pPed = dynamic_cast<CPlayerPed*>(m_pPools->GetPed((DWORD*)ped));
+    CPlayerPed* pPed = dynamic_cast<CPlayerPed*>(m_pPools->GetPed((DWORD*)ped)->pEntity);
     if (pPed)
         return GetRemoteDataStorage(pPed);
 

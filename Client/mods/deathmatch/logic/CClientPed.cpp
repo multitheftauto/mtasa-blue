@@ -3842,6 +3842,8 @@ void CClientPed::_DestroyLocalModel()
     // Remove XRef
     g_pClientGame->GetGameEntityXRefManager()->RemoveEntityXRef(this, m_pPlayerPed);
 
+    g_pGame->GetPools()->InvalidateLocalPlayerClientEntity();
+
     // Make sure we are CJ again
     if (m_pPlayerPed->GetModelIndex() != 0)
     {
@@ -5079,6 +5081,20 @@ bool CClientPed::IsGettingJacked(void)
 
 CClientEntity* CClientPed::GetContactEntity(void)
 {
+    CPools*  pPools = g_pGame->GetPools();
+    CClientEntity* pReturn = nullptr;
+
+    if (pPools && m_pPlayerPed)
+    {
+        CEntity* pEntity = m_pPlayerPed->GetContactEntity();
+        if (pEntity)
+        {
+            return pPools->GetClientEntity((DWORD*)pEntity->GetInterface());
+        }
+    }
+    return pReturn;
+
+   /* CPools* pPools = g_pGame->GetPools();
     CClientEntity* pReturn = NULL;
     if (m_pPlayerPed)
     {
@@ -5088,17 +5104,19 @@ CClientEntity* CClientPed::GetContactEntity(void)
             switch (pEntity->GetEntityType())
             {
                 case ENTITY_TYPE_VEHICLE:
-                    pReturn = m_pManager->GetVehicleManager()->Get(dynamic_cast<CVehicle*>(pEntity), false);
+                {
+                    pReturn = m_pManager->GetVehicleManager()->Get(reinterpret_cast<CVehicle*>(pEntity), false);
                     break;
+                }
                 case ENTITY_TYPE_OBJECT:
-                    pReturn = m_pManager->GetObjectManager()->Get(dynamic_cast<CObject*>(pEntity), false);
+                    pReturn = m_pManager->GetObjectManager()->Get(reinterpret_cast<CObject*>(pEntity), false);
                     break;
                 default:
                     break;
             }
         }
     }
-    return pReturn;
+    return pReturn;*/
 }
 
 bool CClientPed::HasAkimboPointingUpwards(void)
@@ -5442,20 +5460,8 @@ CClientEntity* CClientPed::GetTargetedEntity(void)
         CEntity* pEntity = m_pPlayerPed->GetTargetedEntity();
         if (pEntity)
         {
-            switch (pEntity->GetEntityType())
-            {
-                case ENTITY_TYPE_PED:
-                    pReturn = m_pManager->GetPedManager()->Get(dynamic_cast<CPlayerPed*>(pEntity), true, false);
-                    break;
-                case ENTITY_TYPE_VEHICLE:
-                    pReturn = m_pManager->GetVehicleManager()->Get(dynamic_cast<CVehicle*>(pEntity), false);
-                    break;
-                case ENTITY_TYPE_OBJECT:
-                    pReturn = m_pManager->GetObjectManager()->Get(dynamic_cast<CObject*>(pEntity), false);
-                    break;
-                default:
-                    break;
-            }
+            CPools* pPools = g_pGame->GetPools();
+            pReturn = pPools->GetClientEntity((DWORD*)pEntity->GetInterface());
         }
     }
     return pReturn;

@@ -1,13 +1,13 @@
 /*****************************************************************************
- *
- *  PROJECT:     Multi Theft Auto v1.0
- *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CPoolsSA.h
- *  PURPOSE:     Header file for game entity pools class
- *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
- *
- *****************************************************************************/
+*
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        game_sa/CPoolsSA.h
+*  PURPOSE:     Header file for game entity pools class
+*
+*  Multi Theft Auto is available from http://www.multitheftauto.com/
+*
+*****************************************************************************/
 #pragma once
 
 #include <game/CPools.h>
@@ -56,7 +56,7 @@ class CPoolSAInterface
 {
 public:
     // m_pObjects contains all interfaces. 140 maximum for ped objects.
-    B*                m_pObjects;
+    B * m_pObjects;
     tPoolObjectFlags* m_byteMap;
     int               m_nSize;
     int               m_nFirstFree;
@@ -88,12 +88,12 @@ private:
     bool AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleSA* pVehicle);
 
 public:
-    void          RemoveVehicle(CVehicle* pVehicle, bool bDelete = true);
-    CVehicle*     GetVehicle(DWORD* pGameInterface);
-    DWORD         GetVehicleRef(CVehicle* pVehicle);
-    DWORD         GetVehicleRef(DWORD* pGameInterface);
-    CVehicle*     GetVehicleFromRef(DWORD dwGameRef);
-    unsigned long GetVehicleCount()
+    void                       RemoveVehicle(CVehicle* pVehicle, bool bDelete = true);
+    SClientEntity<CVehicleSA>* GetVehicle(DWORD* pGameInterface);
+    DWORD                      GetVehicleRef(CVehicle* pVehicle);
+    DWORD                      GetVehicleRef(DWORD* pGameInterface);
+    CVehicle*                  GetVehicleFromRef(DWORD dwGameRef);
+    unsigned long              GetVehicleCount()
     {
         return m_vehiclePool.ulCount;
         ;
@@ -107,13 +107,13 @@ private:
     bool AddObjectToPool(CClientObject* pClientObject, CObjectSA* pObject);
 
 public:
-    void          RemoveObject(CObject* pObject, bool bDelete = true);
-    CObject*      GetObject(DWORD* pGameInterface);
-    DWORD         GetObjectRef(CObject* pObject);
-    DWORD         GetObjectRef(DWORD* pGameInterface);
-    CObject*      GetObjectFromRef(DWORD dwGameRef);
-    unsigned long GetObjectCount() { return m_objectPool.ulCount; }
-    void          DeleteAllObjects();
+    void                      RemoveObject(CObject* pObject, bool bDelete = true);
+    SClientEntity<CObjectSA>* GetObject(DWORD* pGameInterface);
+    DWORD                     GetObjectRef(CObject* pObject);
+    DWORD                     GetObjectRef(DWORD* pGameInterface);
+    CObject*                  GetObjectFromRef(DWORD dwGameRef);
+    unsigned long             GetObjectCount() { return m_objectPool.ulCount; }
+    void                      DeleteAllObjects();
 
     // Peds pool
     CPed* AddPed(CClientPed* pClientPed, ePedModel ePedType);
@@ -125,8 +125,9 @@ private:
 
 public:
     void RemovePed(CPed* ped, bool bDelete = true);
-    // CPed*            GetPed(unsigned long ulID);
-    CPed*            GetPed(DWORD* pGameInterface);
+
+    SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface);
+
     DWORD            GetPedRef(CPed* pPed);
     DWORD            GetPedRef(DWORD* pGameInterface);
     CPed*            GetPedFromRef(DWORD dwGameRef);
@@ -134,8 +135,9 @@ public:
     unsigned long    GetPedCount() { return m_pedPool.ulCount; }
     void             DeleteAllPeds();
 
-    CEntity* GetEntity(DWORD* pGameInterface);
-    uint     GetModelIdFromClump(RpClump* pRpClump);
+    CEntity*       GetEntity(DWORD* pGameInterface);
+    CClientEntity* GetClientEntity(DWORD* pGameInterface);
+    uint           GetModelIdFromClump(RpClump* pRpClump);
 
     // Others
     CBuilding* AddBuilding(DWORD dwModelID);
@@ -156,6 +158,8 @@ public:
     CPointerNodeSingleLinkPool* GetPointerNodeSingleLinkPool();
     CPointerNodeDoubleLinkPool* GetPointerNodeDoubleLinkPool();
 
+    void ResetPedPoolCount() { m_pedPool.ulCount = 0; }
+    void InvalidateLocalPlayerClientEntity();
 private:
     // Generic container for pools
     template <class T, class I, unsigned long MAX>
@@ -180,7 +184,7 @@ private:
             std::printf("max for CPoolSA: %u\n", MAX);
             for (unsigned int i = 0; i < MAX; ++i)
             {
-                arrayOfClientEntities[i] = {nullptr, nullptr};
+                arrayOfClientEntities[i] = { nullptr, nullptr };
             }
 
             for (unsigned int i = 0; i < MAX; ++i)

@@ -395,7 +395,9 @@ CClientVehicle* CClientVehicleManager::Get(ElementID ID)
 
 CClientVehicle* CClientVehicleManager::Get(CVehicle* pVehicle, bool bValidatePointer)
 {
-    return g_pClientGame->GetGameEntityXRefManager()->FindClientVehicle(pVehicle);
+    auto pXrefManager = g_pClientGame->GetGameEntityXRefManager();
+    CClientVehicle * pReturnEntity = pXrefManager->FindClientVehicle(pVehicle);
+    return pReturnEntity;
 }
 
 CClientVehicle* CClientVehicleManager::GetSafe(CEntity* pEntity)

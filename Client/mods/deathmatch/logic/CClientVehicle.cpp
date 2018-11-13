@@ -3035,7 +3035,11 @@ CClientVehicle* CClientVehicle::GetTowedVehicle(void)
     {
         CVehicle* pGameVehicle = m_pVehicle->GetTowedVehicle();
         if (pGameVehicle)
-            return m_pVehicleManager->Get(pGameVehicle, false);
+        {
+            CPools* pPools = g_pGame->GetPools();
+            SClientEntity<CVehicleSA>* pVehicleEntity = pPools->GetVehicle((DWORD*)pGameVehicle->GetInterface());
+            return reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity); 
+        }
     }
 
     return m_pTowedVehicle;
@@ -3047,7 +3051,11 @@ CClientVehicle* CClientVehicle::GetRealTowedVehicle(void)
     {
         CVehicle* pGameVehicle = m_pVehicle->GetTowedVehicle();
         if (pGameVehicle)
-            return m_pVehicleManager->Get(pGameVehicle, false);
+        {
+            CPools* pPools = g_pGame->GetPools();
+            SClientEntity<CVehicleSA>* pVehicleEntity = pPools->GetVehicle((DWORD*)pGameVehicle->GetInterface());
+            return reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity); 
+        }
 
         // This is the only difference from ::GetTowedVehicle
         return NULL;
@@ -3310,34 +3318,8 @@ CClientEntity* CClientVehicle::GetPickedUpEntityWithWinch(void)
         CPhysical* pPhysical = m_pVehicle->QueryPickedUpEntityWithWinch();
         if (pPhysical)
         {
-            eEntityType entityType = pPhysical->GetEntityType();
-            switch (entityType)
-            {
-                case ENTITY_TYPE_VEHICLE:
-                {
-                    CVehicle*       pGameVehicle = dynamic_cast<CVehicle*>(pPhysical);
-                    CClientVehicle* pVehicle = m_pVehicleManager->Get(pGameVehicle, false);
-                    if (pVehicle)
-                        pEntity = static_cast<CClientEntity*>(pVehicle);
-                    break;
-                }
-                case ENTITY_TYPE_PED:
-                {
-                    CPlayerPed* pPlayerPed = dynamic_cast<CPlayerPed*>(pPhysical);
-                    CClientPed* pModel = m_pManager->GetPedManager()->Get(pPlayerPed, false, false);
-                    if (pModel)
-                        pEntity = static_cast<CClientEntity*>(pModel);
-                    break;
-                }
-                case ENTITY_TYPE_OBJECT:
-                {
-                    CObject*       pGameObject = dynamic_cast<CObject*>(pPhysical);
-                    CClientObject* pObject = m_pManager->GetObjectManager()->Get(pGameObject, false);
-                    if (pObject)
-                        pEntity = static_cast<CClientEntity*>(pObject);
-                    break;
-                }
-            }
+            CPools* pPools = g_pGame->GetPools();
+            pEntity = pPools->GetClientEntity((DWORD*)pPhysical->GetInterface());
         }
     }
 
