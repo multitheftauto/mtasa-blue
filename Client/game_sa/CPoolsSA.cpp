@@ -85,10 +85,8 @@ inline bool CPoolsSA::AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleS
         {
             return false;
         }
+
         m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool] = { pVehicle, (CClientEntity*)pClientVehicle };
-
-        //std::printf("ADD: vehicle ref: %u | pInterface = %p | pool capacity: %u\n", dwElementIndexInPool, pInterface, GetPoolCapacity(VEHICLE_POOL));
-
         ++m_vehiclePool.ulCount;
     }
 
@@ -99,8 +97,6 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVe
 {
     DEBUG_TRACE("CVehicle* CPoolsSA::AddVehicle ( CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType )");
     CVehicleSA* pVehicle = NULL;
-
-    //std::printf("CPoolsSA::Vehicle called | m_pedPool.ulCount: %u \n", m_vehiclePool.ulCount);
 
     if (m_vehiclePool.ulCount < MAX_VEHICLES)
     {
@@ -172,11 +168,8 @@ void CPoolsSA::RemoveVehicle(CVehicle* pVehicle, bool bDelete)
         {
             return;
         }
+
         CVehicleSA* pVehicleSA = m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
-
-        //std::printf("REMOVE vehicle: dwElementIndexInPool: %u | pInterface = %p | UsedSpaces: %d\n", dwElementIndexInPool, pInterface,
-        //    GetNumberOfUsedSpaces(VEHICLE_POOL));
-
         m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool] = { nullptr, nullptr };
 
         // Delete it from memory
@@ -326,8 +319,8 @@ inline bool CPoolsSA::AddObjectToPool(CClientObject* pClientObject, CObjectSA* p
         {
             return false;
         }
+
         m_objectPool.arrayOfClientEntities[dwElementIndexInPool] = { pObject, (CClientEntity*)pClientObject };
-        //std::printf("ADD: object index: %u | pInterface = %p | pool capacity: %u\n", dwElementIndexInPool, pInterface, GetPoolCapacity(OBJECT_POOL));
 
         // Increase the count of objects
         ++m_objectPool.ulCount;
@@ -341,8 +334,6 @@ CObject* CPoolsSA::AddObject(CClientObject* pClientObject, DWORD dwModelID, bool
     DEBUG_TRACE("CObject * CPoolsSA::AddObject ( CClientObject* pClientObject, DWORD dwModelID, bool bLowLod, bool bBreakingDisabled )");
 
     CObjectSA* pObject = NULL;
-
-    //std::printf("CPoolsSA::AddObject called | m_pedPool.ulCount: %u \n", m_objectPool.ulCount);
 
     if (m_objectPool.ulCount < MAX_OBJECTS)
     {
@@ -389,11 +380,8 @@ void CPoolsSA::RemoveObject(CObject* pObject, bool bDelete)
         {
             return;
         }
+
         CObjectSA* pObjectSA = m_objectPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
-
-        //std::printf("REMOVE object: dwElementIndexInPool: %u | pInterface = %p | UsedSpaces = %d \n", dwElementIndexInPool, pInterface,
-         //   GetNumberOfUsedSpaces(OBJECT_POOL));
-
         m_objectPool.arrayOfClientEntities[dwElementIndexInPool] = { nullptr, nullptr };
 
         // Delete it from memory
@@ -540,14 +528,7 @@ inline bool CPoolsSA::AddPedToPool(CClientPed* pClientPed, CPedSA* pPed)
             return false;
         }
 
-        //std::printf("Okay boss, we added a ped | m_pedPool.ulCount: %u \n", m_pedPool.ulCount);
-
         m_pedPool.arrayOfClientEntities[dwElementIndexInPool] = { pPed, (CClientEntity*)pClientPed };
-
-        //std::printf("ADD: ped ref: %u | pInterface = %p | GetPedPoolIndex:: %d | pool capacity: %u\n", dwElementIndexInPool, pInterface,
-       //     GetPedPoolIndex((std::uint8_t*)pInterface), GetPoolCapacity(PED_POOL));
-
-        // Increase the count of peds
         ++m_pedPool.ulCount;
     }
 
@@ -662,17 +643,13 @@ void CPoolsSA::RemovePed(CPed* pPed, bool bDelete)
 
         CPedSAInterface* pInterface = pPed->GetPedInterface();
 
-        // Extract the element index from the handle
         DWORD dwElementIndexInPool = GetPedPoolIndex((std::uint8_t*)pInterface);
         if (dwElementIndexInPool >= MAX_PEDS)
         {
             return;
         }
+
         CPedSA* pPed = m_pedPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
-
-        //std::printf("REMOVE ped: dwElementIndexInPool: %u | pInterface = %p | UsedSpaces: %d\n", dwElementIndexInPool, pInterface,
-        //    GetNumberOfUsedSpaces(PED_POOL));
-
         m_pedPool.arrayOfClientEntities[dwElementIndexInPool] = { nullptr, nullptr };
 
         // Delete the element from memory
@@ -833,7 +810,6 @@ CEntity* CPoolsSA::GetEntity(DWORD* pGameInterface)
 {
     if (pGameInterface)
     {
-        //std::printf("getEntity: poolO, poolV, poolP: %u, %u, %u\n", m_objectPool.ulCount, m_vehiclePool.ulCount, m_pedPool.ulCount);
         auto pTheObjectEntity = GetObject(pGameInterface);
         if (pTheObjectEntity->pEntity)
         {
@@ -859,8 +835,6 @@ CClientEntity* CPoolsSA::GetClientEntity(DWORD* pGameInterface)
 {
     if (pGameInterface)
     {
-        //std::printf("poolO, poolV, poolP: %u, %u, %u\n", m_objectPool.ulCount, m_vehiclePool.ulCount, m_pedPool.ulCount);
-
         auto pTheObjectEntity = GetObject(pGameInterface);
         if (pTheObjectEntity->pClientEntity)
         {
@@ -1014,10 +988,8 @@ DWORD CPoolsSA::GetPedPoolIndex(std::uint8_t* pInterface)
     DWORD dwMaxIndex = MAX_PEDS - 1;
     if (pInterface < pTheObjects || pInterface > pTheObjects + (dwMaxIndex * dwAlignedSize))
     {
-        ////std::printf("\nGetPedPoolIndex: pInterface index is NOT less than MAX_PEDS\n\n");
         return MAX_PEDS;
     }
-    ////std::printf("GetPedPoolIndex: pInterface: %p | pTheObjects: %p | last object: %p\n", pInterface, pTheObjects, pTheObjects + (dwMaxIndex * dwAlignedSize));
     return ((pInterface - pTheObjects) / dwAlignedSize);
 }
 
@@ -1026,7 +998,6 @@ DWORD CPoolsSA::GetVehiclePoolIndex(std::uint8_t* pInterface)
     DWORD dwAlignedSize = 2584;
     std::uint8_t* pTheObjects = (std::uint8_t*)(*m_ppVehiclePoolInterface)->m_pObjects;
     DWORD dwMaxIndex = MAX_VEHICLES - 1;
-    ////std::printf("GetVehiclePoolIndex: pInterface: %p | pTheObjects: %p | last object: %p\n", pInterface, pTheObjects, pTheObjects + (dwMaxIndex * dwAlignedSize));
     if (pInterface < pTheObjects || pInterface > pTheObjects + (dwMaxIndex * dwAlignedSize))
     {
         return MAX_VEHICLES;
@@ -1039,7 +1010,6 @@ DWORD CPoolsSA::GetObjectPoolIndex(std::uint8_t* pInterface)
     DWORD dwAlignedSize = 412;
     std::uint8_t* pTheObjects = (std::uint8_t*)(*m_ppObjectPoolInterface)->m_pObjects;
     DWORD dwMaxIndex = MAX_OBJECTS - 1;
-    ////std::printf("GetObjectPoolIndex: pInterface: %p | pTheObjects: %p | last object: %p\n", pInterface, pTheObjects, pTheObjects + (dwMaxIndex * dwAlignedSize));
     if (pInterface < pTheObjects || pInterface > pTheObjects + (dwMaxIndex * dwAlignedSize))
     {
         return MAX_OBJECTS;
