@@ -309,42 +309,12 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
 
     if (CollisionEntity)
     {
-        CPoolsSA* pPools = ((CPoolsSA*)pGame->GetPools());
+        CPools* pPools = pGame->GetPools();
         if (pPools)
         {
             if (targetEntity)
             {
-                switch (targetEntity->nType)
-                {
-                    case ENTITY_TYPE_PED:
-                        *CollisionEntity = pPools->GetPed((DWORD*)targetEntity)->pEntity;
-                        break;
-                    case ENTITY_TYPE_OBJECT:
-                        *CollisionEntity = pPools->GetObject((DWORD*)targetEntity)->pEntity;
-                        break;
-                    case ENTITY_TYPE_VEHICLE:
-                        *CollisionEntity = pPools->GetVehicle((DWORD*)targetEntity)->pEntity;
-                        break;
-                }
-
-                /*CEntitySA * entity = new CEntitySA();
-                entity->SetInterface((CEntitySAInterface *)targetEntity);
-                eEntityType EntityType = entity->GetEntityType();
-                delete entity;
-                switch(EntityType)
-                {
-                case ENTITY_TYPE_PED:
-                case ENTITY_TYPE_OBJECT:
-                    *CollisionEntity = pPools->GetPed((DWORD *)targetEntity);
-                    if ( *CollisionEntity )
-                        break;
-                    *CollisionEntity = pPools->GetObject((CObjectSAInterface *)targetEntity);
-                    break;
-                case ENTITY_TYPE_VEHICLE:
-                    *CollisionEntity = pPools->GetVehicle((CVehicleSAInterface *)targetEntity);
-                    break;
-
-                }*/
+                *CollisionEntity = pPools->GetEntity((DWORD*)targetEntity);
             }
         }
     }

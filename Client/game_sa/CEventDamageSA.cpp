@@ -66,21 +66,8 @@ CEntity* CEventDamageSA::GetInflictingEntity(void)
     CEntitySAInterface* pInterface = m_pInterface->pInflictor;
     if (pInterface)
     {
-        CPoolsSA* pPools = ((CPoolsSA*)pGame->GetPools());
-        switch (pInterface->nType)
-        {
-            case ENTITY_TYPE_PED:
-                pReturn = pPools->GetPed((DWORD*)pInterface)->pEntity;
-                break;
-            case ENTITY_TYPE_VEHICLE:
-                pReturn = pPools->GetVehicle((DWORD*)pInterface)->pEntity;
-                break;
-            case ENTITY_TYPE_OBJECT:
-                pReturn = pPools->GetObject((DWORD*)pInterface)->pEntity;
-                break;
-            default:
-                break;
-        }
+        CPools* pPools = pGame->GetPools();
+        return pPools->GetEntity((DWORD*)pInterface);
     }
     return pReturn;
 }

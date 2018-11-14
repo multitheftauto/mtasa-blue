@@ -179,19 +179,14 @@ CEntity* CProjectileInfoSA::GetTarget(void)
         {
             case ENTITY_TYPE_PED:
             {
-                pTarget = pGame->GetPools()->GetPed((DWORD*)pTargetInterface)->pEntity;
+                SClientEntity<CPedSA>* pPedClientEntity = pGame->GetPools()->GetPed((DWORD*)pTargetInterface);
+                pTarget = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
                 break;
             }
-
             case ENTITY_TYPE_VEHICLE:
             {
-                pTarget = pGame->GetPools()->GetVehicle((DWORD*)pTargetInterface)->pEntity;
-                break;
-            }
-
-            case ENTITY_TYPE_OBJECT:
-            {
-                // pTarget = pGame->GetPools ()->GetObject ( (DWORD *) pExplodingEntityInterface );
+                SClientEntity<CVehicleSA>* pVehicleClientEntity = pGame->GetPools()->GetVehicle((DWORD*)pTargetInterface);
+                pTarget = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
                 break;
             }
         }

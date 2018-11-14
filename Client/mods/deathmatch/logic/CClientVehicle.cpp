@@ -1929,7 +1929,11 @@ CClientVehicle* CClientVehicle::GetPreviousTrainCarriage(void)
         {
             CPools* pPools = g_pGame->GetPools();
             CEntitySAInterface * pInterface = pPreviousTrainCarriage->GetInterface();
-            return reinterpret_cast<CClientVehicle*>(pPools->GetVehicle((DWORD*)pInterface)->pClientEntity);
+            SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pInterface);
+            if (pVehicleClientEntity)
+            {
+                return reinterpret_cast<CClientVehicle*>(pVehicleClientEntity->pClientEntity);
+            }
         }
     }
     return m_pPreviousLink;
@@ -1947,7 +1951,11 @@ CClientVehicle* CClientVehicle::GetNextTrainCarriage(void)
         {
             CPools* pPools = g_pGame->GetPools();
             CEntitySAInterface * pInterface = pNextTrainCarriage->GetInterface();
-            return reinterpret_cast<CClientVehicle*>(pPools->GetVehicle((DWORD*)pInterface)->pClientEntity);
+            SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pInterface);
+            if (pVehicleClientEntity)
+            {
+                return reinterpret_cast<CClientVehicle*>(pVehicleClientEntity->pClientEntity);
+            }
         }
     }
     return m_pNextLink;
@@ -3044,7 +3052,10 @@ CClientVehicle* CClientVehicle::GetTowedVehicle(void)
         {
             CPools* pPools = g_pGame->GetPools();
             SClientEntity<CVehicleSA>* pVehicleEntity = pPools->GetVehicle((DWORD*)pGameVehicle->GetInterface());
-            return reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity); 
+            if (pVehicleEntity)
+            {
+                return reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity); 
+            }
         }
     }
 
@@ -3060,7 +3071,10 @@ CClientVehicle* CClientVehicle::GetRealTowedVehicle(void)
         {
             CPools* pPools = g_pGame->GetPools();
             SClientEntity<CVehicleSA>* pVehicleEntity = pPools->GetVehicle((DWORD*)pGameVehicle->GetInterface());
-            return reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity); 
+            if (pVehicleEntity)
+            {
+                return reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity); 
+            }
         }
 
         // This is the only difference from ::GetTowedVehicle

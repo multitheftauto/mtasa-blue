@@ -242,7 +242,10 @@ CVehicle* CPedSA::GetVehicle()
     {
         CVehicleSAInterface* vehicle = (CVehicleSAInterface*)(((CPedSAInterface*)this->GetInterface())->CurrentObjective);
         if (vehicle)
-            return ((CPoolsSA*)pGame->GetPools())->GetVehicle((DWORD*)vehicle)->pEntity;
+        {
+            SClientEntity<CVehicleSA>* pVehicleClientEntity = pGame->GetPools()->GetVehicle((DWORD*)vehicle);
+            return pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
+        }
     }
     return NULL;
 }
@@ -764,24 +767,36 @@ void CPedSA::SetFightingStyle(eFightingStyle style, BYTE bStyleExtra)
 CEntity* CPedSA::GetContactEntity(void)
 {
     CEntitySAInterface* pInterface = ((CPedSAInterface*)this->GetInterface())->pContactEntity;
-    CPoolsSA*           pPools = ((CPoolsSA*)pGame->GetPools());
-    CEntity*            pReturn = NULL;
-
-    if (pPools && pInterface)
+    if (pInterface)
     {
+        CPools* pPools = pGame->GetPools();
         switch (pInterface->nType)
         {
             case ENTITY_TYPE_VEHICLE:
-                pReturn = (CEntity*)(pPools->GetVehicle((DWORD*)pInterface)->pEntity);
+            {
+                SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pInterface);
+                if (pVehicleClientEntity)
+                {
+                    return pVehicleClientEntity->pEntity;
+                }
                 break;
+            }
             case ENTITY_TYPE_OBJECT:
-                pReturn = (CEntity*)(pPools->GetObject((DWORD*)pInterface)->pEntity);
+            {
+                SClientEntity<CObjectSA>* pObjectClientEntity = pPools->GetObject((DWORD*)pInterface);
+                if (pObjectClientEntity)
+                {
+                    return pObjectClientEntity->pEntity;
+                }
                 break;
+            }
             default:
+            {
                 break;
+            }
         }
     }
-    return pReturn;
+    return nullptr;
 }
 
 unsigned char CPedSA::GetRunState(void)
@@ -792,27 +807,12 @@ unsigned char CPedSA::GetRunState(void)
 CEntity* CPedSA::GetTargetedEntity(void)
 {
     CEntitySAInterface* pInterface = ((CPedSAInterface*)this->GetInterface())->pTargetedEntity;
-    CPoolsSA*           pPools = ((CPoolsSA*)pGame->GetPools());
-    CEntity*            pReturn = NULL;
-
-    if (pPools && pInterface)
+    if (pInterface)
     {
-        switch (pInterface->nType)
-        {
-            case ENTITY_TYPE_PED:
-                pReturn = (CEntity*)(pPools->GetPed((DWORD*)pInterface)->pEntity);
-                break;
-            case ENTITY_TYPE_VEHICLE:
-                pReturn = (CEntity*)(pPools->GetVehicle((DWORD*)pInterface)->pEntity);
-                break;
-            case ENTITY_TYPE_OBJECT:
-                pReturn = (CEntity*)(pPools->GetObject((DWORD*)pInterface)->pEntity);
-                break;
-            default:
-                break;
-        }
+        CPools* pPools = pGame->GetPools();
+        return pPools->GetEntity((DWORD*)pInterface);
     }
-    return pReturn;
+    return nullptr;
 }
 
 void CPedSA::SetTargetedEntity(CEntity* pEntity)
