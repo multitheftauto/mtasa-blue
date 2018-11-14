@@ -102,15 +102,15 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVe
 
     //std::printf("CPoolsSA::Vehicle called | m_pedPool.ulCount: %u \n", m_vehiclePool.ulCount);
 
-    //if (m_vehiclePool.ulCount < MAX_VEHICLES)
-    //{
+    if (m_vehiclePool.ulCount < MAX_VEHICLES)
+    {
         pVehicle = new CVehicleSA(eVehicleType, ucVariation, ucVariation2);
         if (!AddVehicleToPool(pClientVehicle, pVehicle))
         {
             delete pVehicle;
             pVehicle = NULL;
         }
-   // }
+    }
 
     return pVehicle;
 }
@@ -344,8 +344,8 @@ CObject* CPoolsSA::AddObject(CClientObject* pClientObject, DWORD dwModelID, bool
 
     //std::printf("CPoolsSA::AddObject called | m_pedPool.ulCount: %u \n", m_objectPool.ulCount);
 
-    //if (m_objectPool.ulCount < MAX_OBJECTS)
-    //{
+    if (m_objectPool.ulCount < MAX_OBJECTS)
+    {
         pObject = new CObjectSA(dwModelID, bBreakingDisabled);
 
         if (pObject && AddObjectToPool(pClientObject, pObject))
@@ -365,7 +365,7 @@ CObject* CPoolsSA::AddObject(CClientObject* pClientObject, DWORD dwModelID, bool
             delete pObject;
             pObject = NULL;
         }
-   // }
+    }
 
     return pObject;
 }
