@@ -49,7 +49,6 @@
 #define MIN_PUSH_ANTISPAM_RATE 1500
 #define INVALID_DOWNLOAD_PRIORITY_GROUP (INT_MIN)
 
-class CGameEntityXRefManager;
 class CClientModelCacheManager;
 class CDebugHookManager;
 class CResourceFileDownloadManager;
@@ -292,7 +291,6 @@ public:
     CObjectSync* GetObjectSync(void) { return m_pObjectSync; }
 #endif
     CLatentTransferManager*   GetLatentTransferManager(void) { return m_pLatentTransferManager; }
-    CGameEntityXRefManager*   GetGameEntityXRefManager(void) { return m_pGameEntityXRefManager; }
     CClientModelCacheManager* GetModelCacheManager(void) { return m_pModelCacheManager; }
     CDebugHookManager*        GetDebugHookManager(void) { return m_pDebugHookManager; }
 
@@ -675,7 +673,6 @@ private:
     bool                          m_bInitiallyFadedOut;
     bool                          m_bHudAreaNameDisabled;
     CSingularFileDownloadManager* m_pSingularFileDownloadManager;
-    CGameEntityXRefManager*       m_pGameEntityXRefManager;
     CClientModelCacheManager*     m_pModelCacheManager;
     CDebugHookManager*            m_pDebugHookManager;
     CRemoteCalls*                 m_pRemoteCalls;

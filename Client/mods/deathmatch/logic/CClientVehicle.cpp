@@ -1922,9 +1922,15 @@ CClientVehicle* CClientVehicle::GetPreviousTrainCarriage(void)
     if (IsDerailed())
         return NULL;
 
-    if (m_pVehicle && m_pVehicle->GetPreviousTrainCarriage())
+    if (m_pVehicle)
     {
-        return m_pVehicleManager->Get(m_pVehicle->GetPreviousTrainCarriage(), false);
+        CVehicle* pPreviousTrainCarriage = m_pVehicle->GetPreviousTrainCarriage();
+        if (pPreviousTrainCarriage)
+        {
+            CPools* pPools = g_pGame->GetPools();
+            CEntitySAInterface * pInterface = pPreviousTrainCarriage->GetInterface();
+            return reinterpret_cast<CClientVehicle*>(pPools->GetVehicle((DWORD*)pInterface)->pClientEntity);
+        }
     }
     return m_pPreviousLink;
 }
@@ -1934,9 +1940,15 @@ CClientVehicle* CClientVehicle::GetNextTrainCarriage(void)
     if (IsDerailed())
         return NULL;
 
-    if (m_pVehicle && m_pVehicle->GetNextTrainCarriage())
+    if (m_pVehicle)
     {
-        return m_pVehicleManager->Get(m_pVehicle->GetNextTrainCarriage(), false);
+        CVehicle* pNextTrainCarriage = m_pVehicle->GetNextTrainCarriage();
+        if (pNextTrainCarriage)
+        {
+            CPools* pPools = g_pGame->GetPools();
+            CEntitySAInterface * pInterface = pNextTrainCarriage->GetInterface();
+            return reinterpret_cast<CClientVehicle*>(pPools->GetVehicle((DWORD*)pInterface)->pClientEntity);
+        }
     }
     return m_pNextLink;
 }
@@ -2545,9 +2557,6 @@ void CClientVehicle::Create(void)
         // Put our pointer in its custom data
         m_pVehicle->SetStoredPointer(this);
 
-        // Add XRef
-        g_pClientGame->GetGameEntityXRefManager()->AddEntityXRef(this, m_pVehicle);
-
         /*if ( DoesNeedToWaitForGroundToLoad() )
         {
             // waiting for ground to load
@@ -2984,9 +2993,6 @@ void CClientVehicle::Destroy(void)
             if (m_pPreviousLink && m_pPreviousLink->GetGameVehicle())
                 m_pPreviousLink->GetGameVehicle()->SetNextTrainCarriage(NULL);
         }
-
-        // Remove XRef
-        g_pClientGame->GetGameEntityXRefManager()->RemoveEntityXRef(this, m_pVehicle);
 
         // Destroy the vehicle
         g_pGame->GetPools()->RemoveVehicle(m_pVehicle);

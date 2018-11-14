@@ -158,7 +158,6 @@ CClientGame::CClientGame(bool bLocalPlay)
     CClientEntity::StartupEntitiesFromRoot();
 
     // Startup game entity tracking manager
-    m_pGameEntityXRefManager = NewGameEntityXRefManager();
     m_pModelCacheManager = NewClientModelCacheManager();
 
     // Initialize our root entity with an invalid id, we dont know the true id until map-start
@@ -489,7 +488,7 @@ CClientGame::~CClientGame(void)
     SAFE_DELETE(m_pRootEntity);
 
     SAFE_DELETE(m_pModelCacheManager);
-    SAFE_DELETE(m_pGameEntityXRefManager);
+    //SAFE_DELETE(m_pGameEntityXRefManager);
     SAFE_DELETE(m_pZoneNames);
     SAFE_DELETE(m_pScriptKeyBinds);
 
@@ -3766,7 +3765,6 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
         CPools* pPools = g_pGame->GetPools();
         // Map to client entity and pass to the texture replacer
         CClientEntity* pClientEntity = pPools->GetClientEntity((DWORD*)pGameEntity);
-        //CClientEntity* pClientEntity = g_pClientGame->GetGameEntityXRefManager()->FindClientEntity(pGameEntity);
         if (pClientEntity)
         {
             int    iTypeMask;
@@ -3828,7 +3826,9 @@ void CClientGame::DrawRadarAreasHandler(void)
 
 bool CClientGame::BreakTowLinkHandler(CVehicle* pTowedVehicle)
 {
-    CClientVehicle* pVehicle = m_pVehicleManager->Get(pTowedVehicle, false);
+    CPools* pPools = g_pGame->GetPools();
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pTowedVehicle->GetInterface());
+    CClientVehicle* pVehicle = reinterpret_cast<CClientVehicle*>(pVehicleClientEntity->pClientEntity);
     if (pVehicle)
     {
         // Check if this is a legal break
@@ -4848,17 +4848,17 @@ bool CClientGame::VehicleFellThroughMapHandler(CVehicleSAInterface* pVehicleInte
 // Validate known objects
 void CClientGame::GameObjectDestructHandler(CEntitySAInterface* pObject)
 {
-    m_pGameEntityXRefManager->OnGameEntityDestruct(pObject);
+    //m_pGameEntityXRefManager->OnGameEntityDestruct(pObject);
 }
 
 void CClientGame::GameVehicleDestructHandler(CEntitySAInterface* pVehicle)
 {
-    m_pGameEntityXRefManager->OnGameEntityDestruct(pVehicle);
+    //m_pGameEntityXRefManager->OnGameEntityDestruct(pVehicle);
 }
 
 void CClientGame::GamePlayerDestructHandler(CEntitySAInterface* pPlayer)
 {
-    m_pGameEntityXRefManager->OnGameEntityDestruct(pPlayer);
+    //m_pGameEntityXRefManager->OnGameEntityDestruct(pPlayer);
 }
 
 void CClientGame::GameProjectileDestructHandler(CEntitySAInterface* pProjectile)
@@ -4874,7 +4874,7 @@ void CClientGame::GameProjectileDestructHandler(CEntitySAInterface* pProjectile)
 
 void CClientGame::GameModelRemoveHandler(ushort usModelId)
 {
-    m_pGameEntityXRefManager->OnGameModelRemove(usModelId);
+    //m_pGameEntityXRefManager->OnGameModelRemove(usModelId);
 }
 
 void CClientGame::TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId)
@@ -6480,7 +6480,6 @@ bool CClientGame::WorldSoundHandler(const SWorldSoundEvent& event)
     {
         CPools* pPools = g_pGame->GetPools();
         CClientEntity* pEntity = pPools->GetClientEntity((DWORD*)event.pGameEntity);
-        //CClientEntity* pEntity = g_pClientGame->GetGameEntityXRefManager()->FindClientEntity(event.pGameEntity);
         if (pEntity)
         {
             CLuaArguments Arguments;
