@@ -181,7 +181,6 @@ private:
 
         SPoolData() : map(MAX), ulCount(0UL)
         {
-            std::printf("max for CPoolSA: %u\n", MAX);
             for (unsigned int i = 0; i < MAX; ++i)
             {
                 arrayOfClientEntities[i] = { nullptr, nullptr };
