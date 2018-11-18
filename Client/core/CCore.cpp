@@ -1801,15 +1801,15 @@ void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
 
     uint uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
 
-    if (uiUseRate < 1)
-        return DoReliablePulse();
+    if (uiUseRate > 0)
+    {
+        // Apply previous frame rate if is hasn't been done yet
+        ApplyQueuedFrameRateLimit();
 
-    // Apply previous frame rate if is hasn't been done yet
-    ApplyQueuedFrameRateLimit();
-
-    // Limit is usually applied in OnGameTimerUpdate
-    m_uiQueuedFrameRate = uiUseRate;
-    m_bQueuedFrameRateValid = true;
+        // Limit is usually applied in OnGameTimerUpdate
+        m_uiQueuedFrameRate = uiUseRate;
+        m_bQueuedFrameRateValid = true;
+    }
 
     DoReliablePulse();
 
