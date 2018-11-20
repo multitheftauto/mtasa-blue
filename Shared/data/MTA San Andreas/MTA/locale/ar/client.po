@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-10 02:54+0100\n"
-"PO-Revision-Date: 2018-09-02 02:18+0000\n"
+"PO-Revision-Date: 2018-11-19 11:50+0000\n"
 "Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: ar\n"
@@ -15,9 +15,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"Translators: Byldo1; Mr.Pres[T]ege; iMr.Dawix; MSHOOSH; KING-ABADY; ALBANDER; SoRa; Alnassre; UAEpro; Majed-HQ; Tete; TAPL; Ahmed Ly; 3BaDy; Avenger; Live; Tifa_1999; MR.NaiF-MTA D:\n"
+"Translators: Mr.Pres[T]ege; iMr.Dawix; MSHOOSH; KING-ABADY; ALBANDER; SoRa; Alnassre; UAEpro; Majed-HQ; Tete; TAPL; 3BaDy; Ahmed Ly; MR.NaiF-MTA D:; Nawaf Alqarni; Avenger; Bydlo; Tifa_1999\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1535854695.0\n"
+"X-POOTLE-MTIME: 1542628244.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -2518,7 +2518,7 @@ msgid ""
 "\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr ""
-"هل تواجه مشاكل في تشغيل MTA:SA\n"
+"هل تواجه مشاكل في تشغيل MTA:SA؟\n"
 "جرب إيقاف كل منتجات GTA و MTA التالية:"
 
 #: ..\Client\loader\MainFunctions.cpp:446
@@ -2722,7 +2722,7 @@ msgstr "GTA:SA تفقد الملف '%s'."
 
 #: ..\Client\loader\Utils.cpp:1824
 msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA عانت من مشكلة اثناء تحميل الموديل '%s'."
+msgstr "GTA:SA عانت من مشكلة اثناء تحميل الموديل."
 
 #: ..\Client\loader\Utils.cpp:1826
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
@@ -2730,7 +2730,7 @@ msgstr "اذا كنت قد عدلت على الملف gta3.img مسبقًا، ف
 
 #: ..\Client\loader\Utils.cpp:1851
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SA عانت من مشكلة اثناء إضافة تحسينات المركبة '%s'."
+msgstr "GTA:SA عانت من مشكلة اثناء إضافة تحسينات المركبة."
 
 #: ..\Client\loader\Utils.cpp:1870
 #, c-format

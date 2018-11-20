@@ -4,17 +4,17 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:23\n"
-"PO-Revision-Date: 2018-11-11 10:48+0000\n"
-"Last-Translator: Kristupas <bufilio@gmail.com>\n"
+"PO-Revision-Date: 2018-11-19 10:47+0000\n"
+"Last-Translator: 99 <loctiem@yahoo.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: lt\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"Translators: Kristupas Skabeikis; Rytis Jankauskas; Gabrielius  Laurinavičius; ccw; Tadas Lapė; qaisjp; Karolis Vaikutis; Dzinas\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Translators: bromboy2010; steroidz; 99 isme; ccw; Jacek Hałas vel Łagoda\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1541933293.0\n"
+"X-POOTLE-MTIME: 1542624474.0\n"
 
 #. GET_XPVISTA_PLEASE
 #: ../Shared/installer/nightly.nsi:183
@@ -22,8 +22,8 @@ msgid ""
 "The version of MTA:SA you've downloaded does not support Windows XP or "
 "Vista.  Please download an alternative version from www.mtasa.com."
 msgstr ""
-"Ši MTA:SA versija, kurią atsisiuntėte, nepalaiko Windows XP ar Vista "
-"operacinės sitemos. Prašome atsisiųsti tinkamą versiją iš www.mtasa.com."
+"Phiên bản của MTA:SA mà bạn đã tải xuống không còn hỗ trợ windows XP hoặc "
+"Vista. Hãy tải xuống phiên bản phù hợp từ www.mtasa.com ."
 
 #. GET_MASTER_PLEASE
 #: ../Shared/installer/nightly.nsi:184
@@ -31,8 +31,8 @@ msgid ""
 "The version of MTA:SA is designed for old versions of Windows.  Please "
 "download the newest version from www.mtasa.com."
 msgstr ""
-"Ši MTA:SA versija yra skirta senesnėms Windows versijoms. Prašome atsisiųsti"
-" naujausią versiją iš www.mtasa.com."
+"Phiên bản của MTA:SA được thiết kế cho những phiên bản Windows cũ. Hãy tải "
+"xuống phiên bản mới nhất từ www.mtasa.com ."
 
 #. WELCOME_TEXT
 #: ../Shared/installer/nightly.nsi:188
@@ -45,23 +45,23 @@ msgid ""
 "\n"
 "Click Next to continue."
 msgstr ""
-"Šis įdiegimo gidas jums padės įdiegti ar atnaujinti $(^Name) ${REVISION_TAG}\n"
+"Phần mềm này sẽ hướng dẫn bạn suốt quá trình cài đặt hay cập nhật của $((^Name) ${REVISION_TAG}\n"
 "\n"
-"Rekomenduojame išjungti visas kitas programas prieš pradedant Įdiegimą.\n"
+"Phần mềm gợi ý bạn tắt hết ứng dụng trước khi bắt đầu cài đặt.\n"
 "\n"
-"[Administratoriaus teisės gali būti pareikalautos naudojantis Vista ir vėlesnėmis operacinėmis sistemomis]\n"
+"[Quyền quản trị viên (Admin) có thể được yêu cầu cho Vista hoặc hơn] \n"
 "\n"
-"Norėdami tęsti, spauskite Toliau."
+"Ấn Next để tiếp tục."
 
 #. HEADER_Text
 #: ../Shared/installer/nightly.nsi:189
 msgid "Grand Theft Auto: San Andreas location"
-msgstr "Grand Theft Auto: San Andreas įdiegimo vieta"
+msgstr "Chọn nơi cài đặt Grand Theft Auto: San Andreas"
 
 #. DIRECTORY_Text_Dest
 #: ../Shared/installer/nightly.nsi:190
 msgid "Grand Theft Auto: San Andreas folder"
-msgstr "Grand Theft Auto: San Andreas aplankas"
+msgstr "Thư mục đã cài Grand Theft Auto: San Andreas"
 
 #. DIRECTORY_Text_Top
 #: ../Shared/installer/nightly.nsi:191
@@ -72,46 +72,47 @@ msgid ""
 "$\n"
 "Click Install to begin installing."
 msgstr ""
-"Pasirinkite Grand Theft Auto: San Andreas aplanką.$\n"
+"Hãy chọn thư mục Grand Theft Auto: San Andreas.$\n"
 "$\n"
-"Jūs PRIVALOTE turėti Grand Theft Auto: Sand Andreas 1.0 įdiegtą, norėdami naudoti MTA:SA, kitos versijos nepalaikomos.$\n"
+"Bạn PHẢI có Grand Theft Auto: San Andreas 1.0 (đã cài đặt) để sử dụng MTA:SA, nó không hỗ trợ các phiên bản khác.$\n"
 "$\n"
-"Spauskite Įdiegti norėdami pradėti įdiegimą."
+"Ấn Install để bắt đầu cài đặt."
 
 #. DESC_Section10
 #: ../Shared/installer/nightly.nsi:194
 msgid "Create a Start Menu group for installed applications"
-msgstr "Sukurti Pradžios Meniu grupę įdiegtoms programoms"
+msgstr "Tạo nhóm ở Start Menu cho các phần mềm đã được cài đặt"
 
 #. DESC_Section11
 #: ../Shared/installer/nightly.nsi:195
 msgid "Create a Desktop Shortcut for the MTA:SA Client."
-msgstr "Sukurti Darbalaukio Nuorodą MTA:SA Klientui."
+msgstr "Tạo icon MTA:SA ngoài Desktop"
 
 #. DESC_Section12
 #: ../Shared/installer/nightly.nsi:196
 msgid "Register mtasa:// protocol for browser clickable-ness."
-msgstr "Leisti mtasa:// protokolo panaudojimą naršyklėse."
+msgstr ""
+"Đăng ký giao thức kết nối mtasa:// để có thể sử dụng ở trình duyệt web."
 
 #. DESC_Section13
 #: ../Shared/installer/nightly.nsi:197
 msgid "Add to Windows Games Explorer (if present)."
-msgstr "Pridėti prie Windows Games Explorer (jei yra)."
+msgstr "Thêm vào Windows Games Explorer (nếu có)."
 
 #. DESC_DirectX
 #: ../Shared/installer/nightly.nsi:198
 msgid "Install or update DirectX (if required)."
-msgstr "Įdiegti ar atnaujinti DirectX (jei reikalinga)."
+msgstr "Cài đặt hoặc cập nhật DirectX (nếu cần thiết)."
 
 #. DESC_Section1
 #: ../Shared/installer/nightly.nsi:199
 msgid "The core components required to run Multi Theft Auto."
-msgstr "Pagrindiniai komponentai reikalingi, kad veiktų Multi Theft Auto."
+msgstr "Các thành phần lõi cần thiết để chạy Multi Theft Auto."
 
 #. DESC_Section2
 #: ../Shared/installer/nightly.nsi:200
 msgid "The MTA:SA modification, allowing you to play online."
-msgstr "MTA:SA modifikacija, leidžianti jums žaisti internetu."
+msgstr "Phiên bản chỉnh sửa của MTA:SA, cho phép bạn chơi trực tuyến."
 
 #. DESC_SectionGroupServer
 #: ../Shared/installer/nightly.nsi:203
@@ -119,29 +120,30 @@ msgid ""
 "The Multi Theft Auto Server. This allows you to host games from your "
 "computer. This requires a fast internet connection."
 msgstr ""
-"Multi Theft Auto serveris. Naudodamiesi juo jūs galite sukurti savo žaidimo "
-"serverį. Reikalingas greitas interneto ryšys."
+"Máy chủ Multi Theft Auto. Nó cho phép bạn để tạo máy chủ từ máy của bạn. Nó "
+"cần kết nối mạng nhanh."
 
 #. DESC_Section4
 #: ../Shared/installer/nightly.nsi:204
 msgid "The Multi Theft Auto server. This is a required component."
-msgstr "Multi Theft Auto serveris. Šis komponentas yra privalomas."
+msgstr "The Multi Theft Auto server. Đây là thành phần cần thiết."
 
 #. DESC_Section5
 #: ../Shared/installer/nightly.nsi:205
 msgid "The MTA:SA modification for the server."
-msgstr "MTA:SA modifikacija serveriui."
+msgstr "Phiên bản chỉnh sửa MTA:SA cho máy chủ."
 
 #. DESC_Section6
 #: ../Shared/installer/nightly.nsi:206
 msgid "This is a set of required resources for your server."
-msgstr "Tai yra reikalingų resursų rinkinys jūsų serveriui."
+msgstr "Đây là một bộ tài nguyên cần thiết cho máy chủ của bạn."
 
 #. DESC_Section7
 #: ../Shared/installer/nightly.nsi:207
 msgid "This is an optional set of gamemodes and maps for your server."
 msgstr ""
-"Tai yra neprivalomas žaidimo režimų ir žemėlapių rinkinys jūsų serveriui."
+"Đây là một bộ tùy chọn chế độ (gamemodes) và bản đồ (maps) cho máy chủ của "
+"bạn."
 
 #. DESC_Section8
 #: ../Shared/installer/nightly.nsi:208
@@ -149,8 +151,8 @@ msgid ""
 "The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps "
 "for use in gamemodes for MTA."
 msgstr ""
-"MTA:SA 1.0 Žemėlapių Redaktorius.  Gali būti panaudotas norint sukurti jūsų "
-"pačių trokštamus žemėlapius skirtus MTA žaidimo tipams."
+"The MTA:SA 1.0 Map Editor. Được sử dụng để bạn có thể tạo bản đồ tùy thích "
+"sử dụng trong các chế độ chơi cho MTA."
 
 #. DESC_Section9
 #: ../Shared/installer/nightly.nsi:209
@@ -158,8 +160,8 @@ msgid ""
 "This is the SDK for creating binary modules for the MTA server. Only install"
 " if you have a good understanding of C++!"
 msgstr ""
-"Tai yra SDK norint kurti dvejetainius modulius MTA serveriui. Įdiekite tik "
-"tuomet, jei turite gerą supratimą apie C++!"
+"Đây là SDK để tạo mô-đun nhị phân cho máy chủ MTA. Chỉ cài đặt nếu bạn có "
+"kiến thức tốt về C++!"
 
 #. DESC_SectionGroupDev
 #: ../Shared/installer/nightly.nsi:211
@@ -167,79 +169,78 @@ msgid ""
 "Development code and tools that aid in the creation of mods for Multi Theft "
 "Auto"
 msgstr ""
-"Vystymo kodas ir įrankiai, kurie padeda Multi Theft Auto modifikacijų kūrime"
+"Lập trình và các công cụ hỗ trợ trong việc tạo ra các mods cho Multi Theft "
+"Auto"
 
 #. DESC_SectionGroupClient
 #: ../Shared/installer/nightly.nsi:212
 msgid "The client is the program you run to play on a Multi Theft Auto server"
-msgstr ""
-"Klientas yra programa, kurią jūs naudojate žaisdami Multi Theft Auto "
-"serveryje"
+msgstr "Client là phần mềm giúp bạn kết nối đến server Multi Theft Auto"
 
 #. INST_CLIENTSERVER
 #: ../Shared/installer/nightly.nsi:409
 msgid "Client and Server"
-msgstr "Klientas ir Serveris"
+msgstr "Client và Server"
 
 #. INST_SERVER
 #: ../Shared/installer/nightly.nsi:410
 msgid "Server only"
-msgstr "Tik serveris"
+msgstr "Server"
 
 #. INST_STARTMENU_GROUP
 #: ../Shared/installer/nightly.nsi:424
 msgid "Start menu group"
-msgstr "Pradžios meniu grupė"
+msgstr "Nhóm mục Start menu"
 
 #. INST_DESKTOP_ICON
 #: ../Shared/installer/nightly.nsi:425
 msgid "Desktop icon"
-msgstr "Darbalaukio piktograma"
+msgstr "Desktop icon"
 
 #. INST_PROTOCOL
 #: ../Shared/installer/nightly.nsi:426
 msgid "Register mtasa:// protocol"
-msgstr "Registruoti mtasa:// protokolą"
+msgstr "Đăng ký giao thức mtasa:// protocol"
 
 #. INST_GAMES_EXPLORER
 #: ../Shared/installer/nightly.nsi:427
 msgid "Add to Games Explorer"
-msgstr "Pridėti prie Games Explorer"
+msgstr "Thêm vào Games Explorer"
 
 #. INST_DIRECTX
 #: ../Shared/installer/nightly.nsi:428
 msgid "Install DirectX"
-msgstr "Įdiegti DirectX"
+msgstr "Cài đặt DirectX"
 
 #. INST_SEC_CLIENT
 #: ../Shared/installer/nightly.nsi:462
 msgid "Game client"
-msgstr "Žaidimo klientas"
+msgstr "Game client"
 
 #. INST_SEC_SERVER
 #: ../Shared/installer/nightly.nsi:463
 msgid "Dedicated server"
-msgstr "Dedikuotas serveris"
+msgstr "Dedicated server"
 
 #. INST_SEC_CORE
 #: ../Shared/installer/nightly.nsi:464
 msgid "Core components"
-msgstr "Pagrindiniai komponentai"
+msgstr "Thành phần cốt lõi"
 
 #. INST_SEC_GAME
 #: ../Shared/installer/nightly.nsi:465
 msgid "Game module"
-msgstr "Žaidimo modulis"
+msgstr "Mô-đun trò chơi"
 
 #. INFO_INPLACE_UPGRADE
 #: ../Shared/installer/nightly.nsi:467
 msgid "Performing in-place upgrade..."
-msgstr "Atliekamas vietos atnaujinimas..."
+msgstr "Đang thực hiện nâng cấp..."
 
 #. INFO_UPDATE_PERMISSIONS
 #: ../Shared/installer/nightly.nsi:468
 msgid "Updating permissions. This could take a few minutes..."
-msgstr "Atnaujinami leidimai. Tai gali užtrukti kelias minutes..."
+msgstr "Đang cập nhật quyền hạn. Có thể mất vài phút..."
 
 #. MSGBOX_INVALID_GTASA
 #: ../Shared/installer/nightly.nsi:471
@@ -250,47 +251,49 @@ msgid ""
 "$\n"
 "Please reinstall if there are problems later."
 msgstr ""
-"Galiojanti Grand Theft Auto: San Andreas versija nerasta.$\r"
+"Không tìm thấy phên bản Windows phù hợp với Grand Theft Auto: San Andreas.$\r"
 "$\n"
-"Tačiau diegimas tęsis.$\r"
-"Jei kils problemų, prašome įdiegti iš naujo."
+"Quá trình cài đặt vẫn sẽ tiếp tục.$\r"
+"$\n"
+"Vui lòng cài đặt lại nếu bị lỗi trong quá trình cài đặt."
 
 #. INST_SEC_CORE_RESOURCES
 #: ../Shared/installer/nightly.nsi:472
 msgid "Core Resources"
-msgstr "Pagrindiniai Resursai"
+msgstr "Core Resources"
 
 #. INST_SEC_OPTIONAL_RESOURCES
 #: ../Shared/installer/nightly.nsi:473
 msgid "Optional Resources"
-msgstr "Nebūtini Resursai"
+msgstr "Optional Resources"
 
 #. INST_SEC_EDITOR
 #: ../Shared/installer/nightly.nsi:474
 msgid "Editor"
-msgstr "Redaktorius"
+msgstr "Editor"
 
 #. INST_SEC_DEVELOPER
 #: ../Shared/installer/nightly.nsi:967
 msgid "Development"
-msgstr "Plėtojimas"
+msgstr "Development"
 
 #. UNINST_SUCCESS
 #: ../Shared/installer/nightly.nsi:1015
 msgid "$(^Name) was successfully removed from your computer."
-msgstr "$(^Name) buvo sėkmingai pašalintas iš jūsų kompiuterio."
+msgstr "$(^Name) đã được xóa thành công khỏi máy tính của bạn."
 
 #. UNINST_FAIL
 #: ../Shared/installer/nightly.nsi:1022
 msgid "Uninstallation has failed!"
-msgstr "Pašalinimas nepavyko!"
+msgstr "Gỡ bỏ phần mềm thất bại!"
 
 #. UNINST_REQUEST
 #: ../Shared/installer/nightly.nsi:1030
 msgid ""
 "Are you sure you want to completely remove $(^Name) and all of its "
 "components?"
-msgstr "Ar tikrai norite pašalinti $(^Name) ir visus jo komponentus?"
+msgstr ""
+"Bạn có muốn xóa hoàn toàn $(^Name) và tất cả các thành phần khác của nó?"
 
 #. UNINST_REQUEST_NOTE
 #: ../Shared/installer/nightly.nsi:1033
@@ -301,11 +304,11 @@ msgid ""
 "$\n"
 "Run the new installer to upgrade and preserve your settings."
 msgstr ""
-"Pašalinama prieš atnaujinimą?$\r"
+"Gỡ bỏ trước khi cập nhật?$\r"
 "$\n"
-"Nėra būtina pašalinti šios versijos prieš diegiant naują MTA:SA versiją$\r"
+"Bạn không cần thiết phải gỡ bỏ MTA:SA cũ trước khi cài đặt phiên bản MTA:SA mới$\r"
 "$\n"
-"Paleiskite atnaujinimo diegimą ir išsaugosite savo nustatymus."
+"Chạy file cài đặt để nâng cấp và sao lưu các tùy chọn của bạn."
 
 #. UNINST_DATA_REQUEST
 #: ../Shared/installer/nightly.nsi:1044
@@ -314,9 +317,9 @@ msgid ""
 "server configuration)? If you click no, any resources, configurations or "
 "screenshots you have created will be lost."
 msgstr ""
-"Ar norėtumėte palikti savo duomenų bylas (pavyzdžiui resursus, nuotraukas ir"
-" serverio konfigūraciją)? Jei paspausite ne, tai visi resursai, "
-"konfigūracijos ar nuotraukos kurias padarėte, bus pašalinti."
+"Bạn có muốn giữ lại dữ liệu của bạn (Chẳng hạn như resources, ảnh chụp màn "
+"hình trong game và các tùy chỉnh server)? Nếu bạn chọn không, thì resources,"
+" các tùy chỉnh hay ảnh chụp màn hình trong game mà bạn đang có sẽ bị xóa."
 
 #. MSGBOX_PATCH_FAIL1
 #: ../Shared/installer/nightly.nsi:1144
@@ -324,8 +327,7 @@ msgid ""
 "Unable to download the patch file for your version of Grand Theft Auto: San "
 "Andreas"
 msgstr ""
-"Nepavyko atsisiųsti papildomų klaidų ištaisymo paketo jūsų Grand Theft Auto:"
-" San Andreas versijai"
+"Không thể tải bản patch cho phiên bản Grand Theft Auto: San Andreas của bạn"
 
 #. MSGBOX_PATCH_FAIL2
 #: ../Shared/installer/nightly.nsi:1145
@@ -333,32 +335,28 @@ msgid ""
 "Unable to install the patch file for your version of Grand Theft Auto: San "
 "Andreas"
 msgstr ""
-"Nepavyko įdiegti papildomų klaidų ištaisymo paketo jūsų Grand Theft Auto: "
-"San Andreas versijai"
+"Không thể cài đặt bản patch cho phiên bản Grand Theft Auto: San Andreas của "
+"bạn"
 
 #. UAC_RIGHTS1
 #: ../Shared/installer/nightly.nsi:1181
 msgid "This installer requires admin access, try again"
-msgstr ""
-"Šis įdiegimo procesas reikalauja administratoriaus teisių, bandykite dar "
-"kartą"
+msgstr "Trình cài đặt này cần quyền Administrator, vui lòng thử lại"
 
 #. UAC_RIGHTS_UN
 #: ../Shared/installer/nightly.nsi:1182
 msgid "This uninstaller requires admin access, try again"
-msgstr ""
-"Šis pašalinimas reikalauja administratoriaus teisių, bandykite dar kartą"
+msgstr "Trình gỡ bỏ này cần quyền Administrator, vui lòng thử lại"
 
 #. UAC_RIGHTS3
 #: ../Shared/installer/nightly.nsi:1183
 msgid "Logon service not running, aborting!"
-msgstr "Prisijungimo paslauga neveikia, nutraukiama!"
+msgstr "Login service không hoạt động, đang hủy lệnh!"
 
 #. UAC_RIGHTS4
-# Elevate what ? More specific ?
 #: ../Shared/installer/nightly.nsi:1184
 msgid "Unable to elevate"
-msgstr "Nepavyko iškelti"
+msgstr "Unable to elevate"
 
 #. INST_MTA_CONFLICT
 #: ../Shared/installer/nightly.nsi:1775
@@ -368,10 +366,10 @@ msgid ""
 "MTA is designed for major versions to be installed in different paths.$\n"
 " Are you sure you want to overwrite MTA $1 at $INSTDIR ?"
 msgstr ""
-"Kita MTA ($1) pagrindinė versija jau egzistuoja pasirinktoje vietoje.$\n"
+"Một phiên bản khác của MTA ($1) đã được cài đặt tại mục đó rồi.$\n"
 "$\n"
-"MTA yra pritaikytas pagrindinėms versijoms įdiegti skirtingose vietose.$\n"
-" Ar jūs įsitikinę, jog norite perrašyti MTA $1 direktorijoje $INSTDIR ?"
+"MTA phiên bản chính được cài đặt ở đường dẫn khác.$\n"
+"Bạn có muốn ghi đè MTA $1 vào mục $INSTDIR ?"
 
 #. INST_GTA_CONFLICT
 #: ../Shared/installer/nightly.nsi:1778
@@ -381,9 +379,9 @@ msgid ""
 "Do you want to use the default install directory$\n"
 "$DEFAULT_INSTDIR ?"
 msgstr ""
-"MTA negali būti įdiegtas į tą pačią vietą kaip GTA:SA.$\n"
+"MTA không thể cài đặt trong cùng một thư mục với GTA:SA.$\n"
 "$\n"
-"Ar norite naudoti įprastinę įdiegimo vietą$\n"
+"Bạn có muốn cài đặt vào mục mặt định$\n"
 "$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
@@ -393,9 +391,9 @@ msgid ""
 "$\n"
 "Please select the GTA:SA install directory"
 msgstr ""
-"Pasirinkta direktorija neegzistuoja.$\n"
+"Thư mục bạn vừa chọn không tồn tại.$\n"
 "$\n"
-"Prašome pasirinkti GTA:SA įdiegimo direktoriją"
+"Hãy chọn đường dẫn đến thư mục cài đặt GTA:SA"
 
 #. INST_GTA_ERROR2
 #: ../Shared/installer/nightly.nsi:1782
@@ -404,23 +402,21 @@ msgid ""
 "$\n"
 "Are you sure you want to continue ?"
 msgstr ""
-"Nepavyko rasti GTA:SA pasirinktoje direktorijoje $GTA_DIR $\n"
+"Không tìm thấy GTA:SA tại mục $GTA_DIR $\n"
 "$\n"
-"Ar tikrai norite tęsti ?"
+"Bạn có muốn tiếp tục?"
 
 #. INST_CHOOSE_LOC_TOP
 #: ../Shared/installer/nightly.nsi:1905
 msgid "Choose Install Location"
-msgstr "Pasirinkite Įdiegimo Vietą"
+msgstr "Chọn đường dẫn cài đặt"
 
 #. INST_CHOOSE_LOC
 #: ../Shared/installer/nightly.nsi:1906
 msgid ""
 "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} "
 "${PRODUCT_VERSION}"
-msgstr ""
-"Pasirinkite aplanką, kuriame norėtumėte įdiegti ${PRODUCT_NAME_NO_VER} "
-"${PRODUCT_VERSION}"
+msgstr "Chọn thư mục để cài đặt ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 
 #. INST_CHOOSE_LOC2
 #: ../Shared/installer/nightly.nsi:1908
@@ -430,110 +426,73 @@ msgid ""
 "$\n"
 " Click Next to continue."
 msgstr ""
-"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} bus įdiegta šiame aplanke.$\n"
-"Norėdami įdiegti į kitą aplanką, paspauskite Naršyti ir pasirinkite kitą aplanką.$\n"
+"${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} sẽ được cài đặt vào thư mục sau.$\n"
+"Nếu bạn muốn cài đặt vào thư mục khác, click vào Tìm duyệt và chọn một thư mục mà bạn muốn.$\n"
 "$\n"
-"Norėdami tęsti, spauskite Toliau."
+" Nhấn Next để tiếp tục."
 
 #. INST_CHOOSE_LOC3
 #: ../Shared/installer/nightly.nsi:1909
 msgid "Destination Folder"
-msgstr "Pasirinktas Aplankas įdiegimui"
+msgstr "Thư cài đặt"
 
 #. INST_CHOOSE_LOC_BROWSE
 #: ../Shared/installer/nightly.nsi:1910
 msgid "Browse..."
-msgstr "Naršyti..."
+msgstr "Tìm duyệt..."
 
 #. INST_CHOOSE_LOC_DEFAULT
 #: ../Shared/installer/nightly.nsi:1911
 msgid "Default"
-msgstr "Numatytasis"
+msgstr "Mặc định"
 
 #. INST_CHOOSE_LOC_LAST_USED
 #: ../Shared/installer/nightly.nsi:1912
 msgid "Last used"
-msgstr "Paskutinį kartą naudota(s)"
+msgstr "Như cũ"
 
 #. INST_CHOOSE_LOC_CUSTOM
 #: ../Shared/installer/nightly.nsi:1913
 msgid "Custom"
-msgstr "Pasirinktinis"
+msgstr "Tùy chọn"
 
 #. INST_CHOOSE_LOC4
 #: ../Shared/installer/nightly.nsi:2091
 msgid ""
 "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
 msgstr ""
-"Pasirinkite aplanką įdiegti ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}:"
+"Chọn thư mục để cài đặt ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} vào trong:"
 
 #. INST_LOC_OW
 #: ../Shared/installer/nightly.nsi:2109
 msgid ""
 "Warning: A different major version of MTA ($1) already exists at that path."
 msgstr ""
-"Dėmesio: Kita pagrindinė MTA ($1) versija jau egzistuoja pasirinktoje "
-"vietoje."
+"Cảnh báo: Một phiên bản chính khác của MTA ($1) đã được cài đặt ở đường dẫn "
+"đó."
 
 #. INST_LOC_UPGRADE
 #: ../Shared/installer/nightly.nsi:2110
 msgid "Installation type:  Upgrade"
-msgstr "Įdiegimo tipas: Atnaujinimas"
+msgstr "Loại cài đặt:  Nâng cấp"
 
 #. NETTEST_TITLE1
 #: ../Shared/installer/nightly.nsi:2353
 msgid "Online update"
-msgstr "Atnaujinimas tinklu"
+msgstr "Cập nhật trực tuyến"
 
 #. NETTEST_TITLE2
 #: ../Shared/installer/nightly.nsi:2354
 msgid "Checking for update information"
-msgstr "Tikrinama ar yra atnaujinimų"
+msgstr "Đang kiểm tra thông tin cập nhật"
 
 #. NETTEST_STATUS1
 #: ../Shared/installer/nightly.nsi:2355
 msgid "Checking for installer update information..."
-msgstr "Tikrinama ar yra diegimo atnaujinimų..."
+msgstr "Đang kiểm tra thông tin cập nhật của trình cài đặt..."
 
 #. NETTEST_STATUS2
 #: ../Shared/installer/nightly.nsi:2356
 msgid "Please ensure your firewall is not blocking"
-msgstr "Prašome įsitinkinti ar ugniasienė neblokuoja"
-
-#~ msgid "Unable to download Microsoft Visual Studio 2008 SP1 redistributable"
-#~ msgstr "Nepavyko atsisiųsti Microsoft Visual Studio 2008 SP1 redistributable"
-
-#~ msgid "Unable to install Microsoft Visual Studio 2008 SP1 redistributable"
-#~ msgstr "Nepavyko įdiegti Microsoft Visual Studio 2008 SP1 redistributable"
-
-#~ msgid ""
-#~ "Unable to download Microsoft Visual Studio 2008 SP1 redistributable.$\r"
-#~ "$\n"
-#~ "However installation will continue.$\r"
-#~ "$\n"
-#~ "Please reinstall if there are problems later."
-#~ msgstr ""
-#~ "Nepavyko atsisiųsti Microsoft Visual Studio 2008 SP1 redistributable.$\r"
-#~ "$\n"
-#~ "Tačiau instaliacija tęsis.$\r"
-#~ "$\n"
-#~ "Jei kils problemų, įdiekite iš naujo."
-
-#~ msgid "Unable to download Microsoft Visual Studio 2013 redistributable"
-#~ msgstr "Nepavyko atsisiųsti Microsoft Visual Studio 2008 SP1 redistributable"
-
-#~ msgid "Unable to install Microsoft Visual Studio 2013 redistributable"
-#~ msgstr "Nepavyko įdiegti Microsoft Visual Studio 2008 SP1 redistributable"
-
-#~ msgid ""
-#~ "Unable to download Microsoft Visual Studio 2013 redistributable.$\r"
-#~ "$\n"
-#~ "However installation will continue.$\r"
-#~ "$\n"
-#~ "Please reinstall if there are problems later."
-#~ msgstr ""
-#~ "Nepavyko atsisiųsti Microsoft Visual Studio 2013 redistributable.$\r"
-#~ "$\n"
-#~ "Nepaisant to, diegimas tęsiasi.$\r"
-#~ "$\n"
-#~ "Prašome įdiegti iš naujo jei kils problemų."
+msgstr ""
+"Chắc chắc rằng tường lửa (firewall) của máy bạn không chặn phần mềm này"
