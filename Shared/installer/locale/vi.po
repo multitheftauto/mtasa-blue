@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:23\n"
-"PO-Revision-Date: 2018-11-19 10:47+0000\n"
-"Last-Translator: 99 <loctiem@yahoo.com>\n"
+"PO-Revision-Date: 2018-11-21 11:10+0000\n"
+"Last-Translator: Jacek <jhxp@poczta.onet.pl>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Translators: bromboy2010; steroidz; 99 isme; ccw; Jacek Hałas vel Łagoda\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1542624474.0\n"
+"X-POOTLE-MTIME: 1542798658.0\n"
 
 #. GET_XPVISTA_PLEASE
 #: ../Shared/installer/nightly.nsi:183
@@ -22,8 +22,9 @@ msgid ""
 "The version of MTA:SA you've downloaded does not support Windows XP or "
 "Vista.  Please download an alternative version from www.mtasa.com."
 msgstr ""
-"Phiên bản của MTA:SA mà bạn đã tải xuống không còn hỗ trợ windows XP hoặc "
-"Vista. Hãy tải xuống phiên bản phù hợp từ www.mtasa.com ."
+"Phiên bản MTA:SA này không hỗ trợ Windows XP và Vista. Truy cập vào trang "
+"www.mtasa.com hoặc mtasa.vn để tải về phiên bản phù hợp với máy tính của "
+"bạn."
 
 #. GET_MASTER_PLEASE
 #: ../Shared/installer/nightly.nsi:184
@@ -31,8 +32,9 @@ msgid ""
 "The version of MTA:SA is designed for old versions of Windows.  Please "
 "download the newest version from www.mtasa.com."
 msgstr ""
-"Phiên bản của MTA:SA được thiết kế cho những phiên bản Windows cũ. Hãy tải "
-"xuống phiên bản mới nhất từ www.mtasa.com ."
+"Phiên bản MTA:SA này chỉ có thể chạy trên các phiên bản Windows cũ hơn. Vui "
+"lòng truy cập vào website www.mtasa.com hoặc mtasa.vn để tải về phiên bản "
+"mới nhất."
 
 #. WELCOME_TEXT
 #: ../Shared/installer/nightly.nsi:188
@@ -45,13 +47,13 @@ msgid ""
 "\n"
 "Click Next to continue."
 msgstr ""
-"Phần mềm này sẽ hướng dẫn bạn suốt quá trình cài đặt hay cập nhật của $((^Name) ${REVISION_TAG}\n"
+"Thuật sỹ này sẽ hướng dẫn bạn trong quá trình cài đặt hoặc cập nhật $(^Name) ${REVISION_TAG}\n"
 "\n"
-"Phần mềm gợi ý bạn tắt hết ứng dụng trước khi bắt đầu cài đặt.\n"
+"Bạn nên tắt tất cả các chương trình khác trước khi bắt đầu cài đặt.\n"
 "\n"
-"[Quyền quản trị viên (Admin) có thể được yêu cầu cho Vista hoặc hơn] \n"
+"[Nếu bạn sử dụng Windows Vista hoặc mới hơn thì nên chạy trên quyền Admin]\n"
 "\n"
-"Ấn Next để tiếp tục."
+"Nhấn Next để tiếp tục."
 
 #. HEADER_Text
 #: ../Shared/installer/nightly.nsi:189
@@ -72,16 +74,16 @@ msgid ""
 "$\n"
 "Click Install to begin installing."
 msgstr ""
-"Hãy chọn thư mục Grand Theft Auto: San Andreas.$\n"
+"Hãy chọn thư mục chứa game Grand Theft Auto: San Andreas.$\n"
 "$\n"
-"Bạn PHẢI có Grand Theft Auto: San Andreas 1.0 (đã cài đặt) để sử dụng MTA:SA, nó không hỗ trợ các phiên bản khác.$\n"
+"Để có thể chơi được MTA:SA thì bạn PHẢI có game Grand Theft Auto: San Andreas phiên bản 1.0 sẵn trong máy tính, ngoài ra MTA:SA sẽ không hỗ trợ phiên bản khác.$\n"
 "$\n"
-"Ấn Install để bắt đầu cài đặt."
+"Chọn \"Install\" để bắt đầu cài đặt."
 
 #. DESC_Section10
 #: ../Shared/installer/nightly.nsi:194
 msgid "Create a Start Menu group for installed applications"
-msgstr "Tạo nhóm ở Start Menu cho các phần mềm đã được cài đặt"
+msgstr "Tạo nhóm mục ở Start Menu cho các phần mềm đã được cài đặt"
 
 #. DESC_Section11
 #: ../Shared/installer/nightly.nsi:195
@@ -112,7 +114,7 @@ msgstr "Các thành phần lõi cần thiết để chạy Multi Theft Auto."
 #. DESC_Section2
 #: ../Shared/installer/nightly.nsi:200
 msgid "The MTA:SA modification, allowing you to play online."
-msgstr "Phiên bản chỉnh sửa của MTA:SA, cho phép bạn chơi trực tuyến."
+msgstr "The MTA:SA modification, cho phép bạn chơi trực tuyến."
 
 #. DESC_SectionGroupServer
 #: ../Shared/installer/nightly.nsi:203
@@ -120,8 +122,8 @@ msgid ""
 "The Multi Theft Auto Server. This allows you to host games from your "
 "computer. This requires a fast internet connection."
 msgstr ""
-"Máy chủ Multi Theft Auto. Nó cho phép bạn để tạo máy chủ từ máy của bạn. Nó "
-"cần kết nối mạng nhanh."
+"The Multi Theft Auto Server. Cho phép bạn tự tạo server MTA:SA từ chính máy "
+"tính của bạn. Cần có đường truyền mạng nhanh."
 
 #. DESC_Section4
 #: ../Shared/installer/nightly.nsi:204
@@ -131,18 +133,18 @@ msgstr "The Multi Theft Auto server. Đây là thành phần cần thiết."
 #. DESC_Section5
 #: ../Shared/installer/nightly.nsi:205
 msgid "The MTA:SA modification for the server."
-msgstr "Phiên bản chỉnh sửa MTA:SA cho máy chủ."
+msgstr "Phiên bản MTA:SA modification cho server"
 
 #. DESC_Section6
 #: ../Shared/installer/nightly.nsi:206
 msgid "This is a set of required resources for your server."
-msgstr "Đây là một bộ tài nguyên cần thiết cho máy chủ của bạn."
+msgstr "Đây là một bộ resources cần thiết cho server của bạn."
 
 #. DESC_Section7
 #: ../Shared/installer/nightly.nsi:207
 msgid "This is an optional set of gamemodes and maps for your server."
 msgstr ""
-"Đây là một bộ tùy chọn chế độ (gamemodes) và bản đồ (maps) cho máy chủ của "
+"Đây là một bộ tùy chọn chế độ (gamemodes) và bản đồ (maps) cho server của "
 "bạn."
 
 #. DESC_Section8
@@ -151,7 +153,7 @@ msgid ""
 "The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps "
 "for use in gamemodes for MTA."
 msgstr ""
-"The MTA:SA 1.0 Map Editor. Được sử dụng để bạn có thể tạo bản đồ tùy thích "
+"The MTA:SA 1.0 Map Editor.  Được sử dụng để bạn có thể tạo bản đồ tùy thích "
 "sử dụng trong các chế độ chơi cho MTA."
 
 #. DESC_Section9
@@ -160,8 +162,8 @@ msgid ""
 "This is the SDK for creating binary modules for the MTA server. Only install"
 " if you have a good understanding of C++!"
 msgstr ""
-"Đây là SDK để tạo mô-đun nhị phân cho máy chủ MTA. Chỉ cài đặt nếu bạn có "
-"kiến thức tốt về C++!"
+"Đây là bộ SDK dùng để tạo các mô-đun binary cho server MTA. Cài đặt nó nếu "
+"bạn có thể lập trình bằng C++!"
 
 #. DESC_SectionGroupDev
 #: ../Shared/installer/nightly.nsi:211
@@ -169,7 +171,7 @@ msgid ""
 "Development code and tools that aid in the creation of mods for Multi Theft "
 "Auto"
 msgstr ""
-"Lập trình và các công cụ hỗ trợ trong việc tạo ra các mods cho Multi Theft "
+"Viết code và các công cụ hỗ trợ trong việc tạo ra các mods cho Multi Theft "
 "Auto"
 
 #. DESC_SectionGroupClient
@@ -225,12 +227,12 @@ msgstr "Dedicated server"
 #. INST_SEC_CORE
 #: ../Shared/installer/nightly.nsi:464
 msgid "Core components"
-msgstr "Thành phần cốt lõi"
+msgstr "Các thành phần lõi"
 
 #. INST_SEC_GAME
 #: ../Shared/installer/nightly.nsi:465
 msgid "Game module"
-msgstr "Mô-đun trò chơi"
+msgstr "Mô-đun game"
 
 #. INFO_INPLACE_UPGRADE
 #: ../Shared/installer/nightly.nsi:467
