@@ -35,6 +35,9 @@ typedef struct
     CVector        vecCenter;
     float          fRadius;
     uchar          material;
+    uchar          flags;
+    CColLighting   lighting;
+    uchar          light;
 } CColSphereSA;
 
 typedef struct
@@ -42,6 +45,9 @@ typedef struct
     CVector        min;
     CVector        max;
     uchar          material;
+    uchar          flags;
+    CColLighting   lighting;
+    uchar          light;
 } CColBoxSA;
 
 typedef struct
@@ -62,6 +68,26 @@ typedef struct
     DWORD size;
     char  name[0x18];
 } ColModelFileHeader;
+
+typedef struct
+{
+    CVector m_vecStart;
+    float   m_fStartSize;
+    CVector m_vecEnd;
+    float   m_fEndSize;
+} CColLine;
+
+typedef struct
+{
+    CVector m_vecStart;
+    float m_fStartRadius;
+    unsigned char m_nMaterial;
+    unsigned char m_nPiece;
+    unsigned char m_nLighting;
+    char _pad13;
+    CVector m_vecEnd;
+    float m_fEndRadius;
+} CColDisk;
 
 typedef struct
 {
@@ -87,9 +113,9 @@ typedef struct
     WORD                 numColBoxes;
     WORD                 numColTriangles;
     BYTE                 ucNumWheels;
-    BYTE                 pad3;
+    BYTE                 m_nFlags;
     CColSphereSA*        pColSpheres;
-    CColBoxSA*           pColBoxes;
+    CColBoxSA*           pColBoxes; 
     void*                pSuspensionLines;
     CompressedVector*    pVertices;
     CColTriangleSA*      pColTriangles;

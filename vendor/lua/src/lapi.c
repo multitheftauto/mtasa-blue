@@ -1134,3 +1134,11 @@ LUA_API void lua_addtotalbytes(lua_State *L, int n)
     global_State *g = G(L);
     g->totalbytes += n;
 }
+
+// MTA addition to shorten the code mainly for collision functions
+LUA_API void lua_pushtablevalue(lua_State *L, int n, float v)
+{
+	lua_pushnumber(L, n);
+	lua_pushnumber(L, v);
+	lua_settable(L, -3);
+}

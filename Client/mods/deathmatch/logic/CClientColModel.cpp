@@ -148,3 +148,46 @@ bool CClientColModel::IsCOLData(const SString& strData)
 {
     return strData.length() > 32 && memcmp(strData, "COL", 3) == 0 && strData[7] == 0;
 }
+
+CColModelSAInterface* CClientColModel::GetColModelInterface()
+{
+    if (m_pColModel)
+    {
+        return m_pColModel->GetInterface();
+    }
+    return nullptr;
+}
+
+bool CClientColModel::CheckVector(CVector& vec, float fRadius)
+{
+    if (fRadius > 0)
+    {
+        return (128 > vec.fX + fRadius > -128 && 128 > vec.fY + fRadius > -128 && 128 > vec.fZ + fRadius > -128)
+            && (128 > vec.fX - fRadius > -128 && 128 > vec.fY - fRadius > -128 && 128 > vec.fZ - fRadius > -128);
+    }
+    else
+    {
+        return (128 > vec.fX && vec.fX > -128 && 128 > vec.fY && vec.fY > -128 && 128 > vec.fZ && vec.fZ > -128);
+    }
+}
+
+bool CClientColModel::CompareVector(CVector& vecMin, CVector& vecMax)
+{
+    return vecMax.fX >= vecMin.fX && vecMax.fY >= vecMin.fY && vecMax.fZ >= vecMin.fZ;
+}
+void CClientColModel::AlignVector(CVector& destMin, CVector& destMax, CVector& src)
+{
+    if (src.fX < destMax.fX)
+        destMax.fX = src.fX;
+    if (src.fY < destMax.fY)
+        destMax.fY = src.fY;
+    if (src.fZ < destMax.fZ)
+        destMax.fZ = src.fZ;
+
+    if (src.fX > destMin.fX)
+        destMin.fX = src.fX;
+    if (src.fY > destMin.fY)
+        destMin.fY = src.fY;
+    if (src.fZ > destMin.fZ)
+        destMin.fZ = src.fZ;
+}

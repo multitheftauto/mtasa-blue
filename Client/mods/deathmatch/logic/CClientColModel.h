@@ -31,6 +31,11 @@ public:
 
     bool        HasReplaced(unsigned short usModel);
     static bool IsCOLData(const SString& strData);
+    static bool CheckVector(CVector& vec, float fRadius = 0);
+    static bool CompareVector(CVector& vecMin, CVector& vecMax);
+    static void AlignVector(CVector& destMin, CVector& destMax, CVector& src);
+
+    CColModelSAInterface* GetColModelInterface();
 
     // Sorta a hack that these are required by CClientEntity...
     void Unlink(void){};
