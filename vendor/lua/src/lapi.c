@@ -1136,6 +1136,7 @@ LUA_API void lua_addtotalbytes(lua_State *L, int n)
 }
 
 // MTA addition to shorten the code mainly for collision functions
+// working as lua: thisTable[n] = v
 LUA_API void lua_pushtablevalue(lua_State *L, int n, float v)
 {
 	lua_pushnumber(L, n);

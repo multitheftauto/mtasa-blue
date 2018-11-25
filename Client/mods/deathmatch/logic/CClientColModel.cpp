@@ -9,6 +9,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "../Client/game_sa/CModelInfoSA.h"
+#include "../Client/game_sa/CColModelSA.h"
+#define MAX_COLLISION_SIZE 128 // collision bounding box in each axis
+#define MAX_COLLISION_SIZE2 256 // twice bigger than MAX_COLLISION_SIZE
 
 CClientColModel::CClientColModel(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
@@ -162,12 +166,25 @@ bool CClientColModel::CheckVector(CVector& vec, float fRadius)
 {
     if (fRadius > 0)
     {
-        return (128 > vec.fX + fRadius > -128 && 128 > vec.fY + fRadius > -128 && 128 > vec.fZ + fRadius > -128)
-            && (128 > vec.fX - fRadius > -128 && 128 > vec.fY - fRadius > -128 && 128 > vec.fZ - fRadius > -128);
+        return (MAX_COLLISION_SIZE >= vec.fX + fRadius && vec.fX + fRadius >= -MAX_COLLISION_SIZE && MAX_COLLISION_SIZE >= vec.fY + fRadius && vec.fY + fRadius >= -MAX_COLLISION_SIZE && MAX_COLLISION_SIZE >= vec.fZ + fRadius && vec.fZ + fRadius >= -MAX_COLLISION_SIZE)
+            && (MAX_COLLISION_SIZE >= vec.fX - fRadius && vec.fX - fRadius >= -MAX_COLLISION_SIZE && MAX_COLLISION_SIZE >= vec.fY - fRadius && vec.fY - fRadius >= -MAX_COLLISION_SIZE && MAX_COLLISION_SIZE >= vec.fZ - fRadius && vec.fZ - fRadius >= -MAX_COLLISION_SIZE);
     }
     else
     {
-        return (128 > vec.fX && vec.fX > -128 && 128 > vec.fY && vec.fY > -128 && 128 > vec.fZ && vec.fZ > -128);
+        return (MAX_COLLISION_SIZE >= vec.fX && vec.fX >= -MAX_COLLISION_SIZE && MAX_COLLISION_SIZE >= vec.fY && vec.fY >= -MAX_COLLISION_SIZE && MAX_COLLISION_SIZE >= vec.fZ && vec.fZ >= -MAX_COLLISION_SIZE);
+    }
+}
+
+bool CClientColModel::CheckMoveVector(CVector& vec, float fRadius)
+{
+    if (fRadius > 0)
+    {
+        return ((MAX_COLLISION_SIZE2 >= vec.fX + fRadius >= -MAX_COLLISION_SIZE2 && MAX_COLLISION_SIZE2 >= vec.fY + fRadius >= -MAX_COLLISION_SIZE2 && MAX_COLLISION_SIZE2 >= vec.fZ + fRadius >= -MAX_COLLISION_SIZE2)
+            && (MAX_COLLISION_SIZE2 >= vec.fX - fRadius >= -MAX_COLLISION_SIZE2 && MAX_COLLISION_SIZE2 >= vec.fY - fRadius >= -MAX_COLLISION_SIZE2 && MAX_COLLISION_SIZE2 >= vec.fZ - fRadius >= -MAX_COLLISION_SIZE2));
+    }
+    else
+    {
+        return (MAX_COLLISION_SIZE2 >= vec.fX && vec.fX >= -MAX_COLLISION_SIZE2 && MAX_COLLISION_SIZE2 >= vec.fY && vec.fY >= -MAX_COLLISION_SIZE2 && MAX_COLLISION_SIZE2 >= vec.fZ && vec.fZ >= -MAX_COLLISION_SIZE2);
     }
 }
 
@@ -175,6 +192,7 @@ bool CClientColModel::CompareVector(CVector& vecMin, CVector& vecMax)
 {
     return vecMax.fX >= vecMin.fX && vecMax.fY >= vecMin.fY && vecMax.fZ >= vecMin.fZ;
 }
+
 void CClientColModel::AlignVector(CVector& destMin, CVector& destMax, CVector& src)
 {
     if (src.fX < destMax.fX)
@@ -190,4 +208,16 @@ void CClientColModel::AlignVector(CVector& destMin, CVector& destMax, CVector& s
         destMin.fY = src.fY;
     if (src.fZ > destMin.fZ)
         destMin.fZ = src.fZ;
+}
+
+void CClientColModel::UpdateVerticesCount()
+{
+    CColModelSAInterface* a = GetColModelInterface();
+
+    CColDataSA* pColData = a->pColData;;
+
+    if (pColData)
+    {
+        m_usVerticesCount = static_cast<unsigned short>(pColData->getNumVertices());
+    }
 }
