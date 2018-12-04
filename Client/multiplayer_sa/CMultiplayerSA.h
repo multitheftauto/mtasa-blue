@@ -71,6 +71,7 @@ public:
     void                InitHooks_LicensePlate(void);
     void                InitHooks_VehicleLights(void);
     void                InitHooks_VehicleDamage(void);
+    void                InitHooks_VehicleWeapons();
     void                InitHooks_Direct3D(void);
     void                InitHooks_FixLineOfSightArgs(void);
     CRemoteDataStorage* CreateRemoteDataStorage();
@@ -135,7 +136,7 @@ public:
     void SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler);
     void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler);
     void SetPedStepHandler(PedStepHandler* pHandler);
-    void SetWaterCannonHitWorldHandler(WaterCannonHitWorldHandler* pHandler);
+    void SetVehicleWeaponHitHandler(VehicleWeaponHitHandler* pHandler) override;
 
     void  AllowMouseMovement(bool bAllow);
     void  DoSoundHacksOnLostFocus(bool bLostFocus);
