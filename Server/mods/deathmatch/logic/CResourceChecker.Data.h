@@ -269,8 +269,9 @@ namespace
     };
 
     SDeprecatedItem clientDeprecatedList[] = {
+        // Client events
+        {true, "onClientElementHitByWaterCannon", "Use onClientVehicleWeaponHit instead"},
         // Client functions
-
         {false, "getPlayerRotation", "getPedRotation"},
         {false, "canPlayerBeKnockedOffBike", "canPedBeKnockedOffBike"},
         {false, "getPlayerContactElement", "getPedContactElement"},
