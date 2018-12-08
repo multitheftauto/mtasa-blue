@@ -1,12 +1,5 @@
-/vendor/curl/*
-!/vendor/curl/.gitignore
-!/vendor/curl/premake5.lua
-!/vendor/curl/include/
-!/vendor/curl/lib/
-lib/vauth/.deps/
-lib/vauth/.libs/
-/vendor/curl/**/.dirstamp
-/vendor/curl/**/*.sh
-/vendor/curl/**/stamp-h1
-/vendor/curl/**/CMakeLists.txt
-/vendor/curl/**/Makefile.*
+*
+!.gitignore
+!premake5.lua
+!include/
+!lib/
