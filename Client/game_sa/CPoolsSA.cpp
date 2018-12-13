@@ -286,8 +286,6 @@ void CPoolsSA::DeleteAllVehicles()
 
         RemoveVehicle(pVehicle);
     }
-
-    m_vehiclePool.map.clear();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -489,8 +487,6 @@ void CPoolsSA::DeleteAllObjects()
 
         RemoveObject(pObject);
     }
-
-    m_objectPool.map.clear();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -778,7 +774,6 @@ void CPoolsSA::DeleteAllPeds()
         CPedSA* pPed = m_pedPool.arrayOfClientEntities[m_pedPool.ulCount - 1].pEntity;
         RemovePed(pPed);
     }
-    m_pedPool.map.clear();
 }
 
 CEntity* CPoolsSA::GetEntity(DWORD* pGameInterface)

@@ -167,29 +167,16 @@ private:
     struct SPoolData
     {
         std::array<SClientEntity<T>, MAX> arrayOfClientEntities;
-
-        typedef CFastHashMap<I*, T*> mapType;
-
-        // we are not using array and map members for ped pool.
-        // These two members can be removed after we've done the same
-        // for other pools in CPoolsSA.cpp
-        mapType       map;
-        T*            array[MAX];
-        unsigned long ulCount;
+        unsigned long                     ulCount;
 
     private:
         friend class CPoolsSA;
 
-        SPoolData() : map(MAX), ulCount(0UL)
+        SPoolData() : ulCount(0UL)
         {
             for (unsigned int i = 0; i < MAX; ++i)
             {
                 arrayOfClientEntities[i] = {nullptr, nullptr};
-            }
-
-            for (unsigned int i = 0; i < MAX; ++i)
-            {
-                array[i] = NULL;
             }
         }
     };
