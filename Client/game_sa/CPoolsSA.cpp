@@ -601,14 +601,7 @@ CPed* CPoolsSA::AddCivilianPed(DWORD* pGameInterface)
             }
             else
             {
-                /*
-                // Create it
-                pPed = new CCivilianPedSA(pInterface);
-                if (!AddPedToPool(pClientPed, pPed))
-                {
-                delete pPed;
-                pPed = NULL;
-                }*/
+                // create new  ped here
             }
         }
     }

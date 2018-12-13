@@ -352,14 +352,6 @@ BOOL CGameSA::InitLocalPlayer(CClientPed* pClientPed)
 {
     DEBUG_TRACE("BOOL CGameSA::InitLocalPlayer(  )");
 
-    // Added by ChrML - Looks like it isn't safe to call this more than once but mod code might do
-    /*static bool bAlreadyInited = false;
-    if (bAlreadyInited)
-    {
-        return TRUE;
-    }
-    bAlreadyInited = true;
-    */
     CPoolsSA* pools = (CPoolsSA*)this->GetPools();
     if (pools)
     {
