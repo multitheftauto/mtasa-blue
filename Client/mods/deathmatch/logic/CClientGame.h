@@ -525,7 +525,7 @@ private:
     static void StaticTaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     static void StaticFxSystemDestructionHandler(void* pFxSAInterface);
     static void StaticPedStepHandler(CPedSAInterface* pPed, bool bFoot);
-    static void StaticWaterCannonHitWorldHandler(SWaterCannonHitEvent& event);
+    static void StaticVehicleWeaponHitHandler(SVehicleWeaponHitEvent& event);
 
     static AnimationId StaticDrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
 
@@ -616,7 +616,7 @@ public:
     void RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation);
 
     void PedStepHandler(CPedSAInterface* pPed, bool bFoot);
-    void WaterCannonHitWorldHandler(SWaterCannonHitEvent& event);
+    void VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event);
 
 private:
     eStatus       m_Status;

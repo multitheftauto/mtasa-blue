@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-10 02:54+0100\n"
-"PO-Revision-Date: 2018-09-01 13:23+0000\n"
+"PO-Revision-Date: 2018-11-19 12:56+0000\n"
 "Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: tr\n"
@@ -15,9 +15,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"Translators: Furkan Özden; Avenger; Mert \"MaXenon\"; Darkneblade; Semih; Oguzcan Uyar; Colegon; Samurai; Mert; WindowsOttoman; RaceXtreme; Oguzcan; Eren Yücel; Cynydlan; TRFURKAN; velona77; Wickness\n"
+"Translators: Furkan Özden; Avenger; Mert \"MaXenon\"; Darkneblade; Semih; Oguzcan Uyar; Colegon; Samurai; Mert; WindowsOttoman; RaceXtreme; Oguzcan; Eren Yücel; Cynydlan; velona77; Wickness; TRFURKAN\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1535808194.0\n"
+"X-POOTLE-MTIME: 1542632185.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -71,7 +71,7 @@ msgstr "bağlantı:  %s:%u...'e Bağlanılıyor"
 #: ..\Client\core\CCommandFuncs.cpp:300 ..\Client\core\CCommandFuncs.cpp:361
 #, c-format, c-format
 msgid "connect: could not connect to %s:%u!"
-msgstr "Bağlantı:  %s:%u'e bağlanılamadı %s:%u!"
+msgstr "Bağlantı:  %s:%u'e bağlanılamadı!"
 
 #: ..\Client\core\CCommandFuncs.cpp:305
 msgid "connect: Failed to unload current mod"
@@ -159,7 +159,7 @@ msgstr "%s sunucusuna %u portundan yapılan bağlantı başarısız!"
 #: ..\Client\core\CConnectManager.cpp:147
 #, c-format, c-format
 msgid "Connecting to %s:%u ..."
-msgstr "%s:%u'a bağlanılıyor %s:%u ..."
+msgstr "%s:%u'a bağlanılıyor ..."
 
 #. Display the status box
 #: ..\Client\core\CConnectManager.cpp:148
@@ -1516,7 +1516,7 @@ msgid ""
 msgstr ""
 "Ekran yükleme bazı sunucular için anti-hile amacıyla gerekmektedir.\n"
 "\n"
-"(Sohbet kutusu ve GUI yüklemenin dışındadır)"
+"(Sohbet kutusu ve GUI yüklemenin dışındadır)\n"
 
 #: ..\Client\core\CSettings.cpp:4291
 msgid "SCREEN UPLOAD INFORMATION"
@@ -1535,6 +1535,7 @@ msgstr ""
 "MTA bu dosyaları sadece kontrol kutusu işaretlenmişse kullanır\n"
 "\n"
 "Ancak, ÖZELLEŞTİRİLMİŞ GTA:SA DOSYALARI ÇOĞU SUNUCU TARAFINDAN ENGELLENMİŞTİR.\n"
+"\n"
 "Bu dosyaları kullanmak istediğinizden emin misiniz?"
 
 #: ..\Client\core\CSettings.cpp:4318 ..\Client\core\CVersionUpdater.cpp:2079
@@ -3002,21 +3003,27 @@ msgstr "Sunucu bağlantısını sonlandır"
 msgid ""
 "Disconnected: Serial is banned.\n"
 "Reason: %s"
-msgstr "Bağlantı kesildi. Seri kodu yasaklandı. Gerekçe: %s"
+msgstr ""
+"Bağlantı kesildi. Seri kodu yasaklandı.\n"
+"Gerekçe: %s"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:489
 #, c-format, c-format
 msgid ""
 "Disconnected: You are banned.\n"
 "Reason: %s"
-msgstr "Bağlantı kesildi: Yasaklandınız. Gerekçe: %s"
+msgstr ""
+"Bağlantı kesildi: Yasaklandınız.\n"
+"Gerekçe: %s"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:495
 #, c-format, c-format
 msgid ""
 "Disconnected: Account is banned.\n"
 "Reason: %s"
-msgstr "Bağlantı kesildi: Hesap yasaklandı. Gerekçe: %s"
+msgstr ""
+"Bağlantı kesildi: Hesap yasaklandı.\n"
+"Gerekçe: %s"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:500
 msgid "Disconnected: Version mismatch"
@@ -3126,7 +3133,7 @@ msgstr[0] "%d dakika"
 #, c-format, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] "%d saniye%d saniye"
+msgstr[0] "%d saniye"
 
 #. Display the error
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:615

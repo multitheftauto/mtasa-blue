@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-10 02:54+0100\n"
-"PO-Revision-Date: 2018-09-01 13:10+0000\n"
+"PO-Revision-Date: 2018-11-19 12:25+0000\n"
 "Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: hr\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "Translators: CapY; Josip Devedžić; JoeBullet; Blast3r; GodFather; Playboy\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1535807426.0\n"
+"X-POOTLE-MTIME: 1542630323.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -1505,9 +1505,6 @@ msgstr ""
 #: ..\Client\core\CSettings.cpp:4269
 msgid "PERFORMANCE WARNING"
 msgstr ""
-"Volumetrične sjene mogu uzrokovati usporavanje nekih sistema.\n"
-"\n"
-"Jeste li sigurni da ih želite omogućiti?"
 
 #: ..\Client\core\CSettings.cpp:4289
 msgid ""
@@ -2447,6 +2444,7 @@ msgid ""
 "If this problem persists, please restart your computer"
 msgstr ""
 "Jedna instanca MTA je već pokrenuta.\n"
+"\n"
 "Ako ovaj problem ustraje, molimo da ponovno pokrenite vaše računalo."
 
 #: ..\Client\loader\MainFunctions.cpp:256
@@ -2603,6 +2601,7 @@ msgid ""
 msgstr ""
 "Direktorij od instalacije 'MTA:SA' ili 'GTA: San Andreas'\n"
 "sadrži ';' (točka-zarez).\n"
+"\n"
 " Ukoliko budete imali problema tijekom korištenja MTA:SA,\n"
 " premjestite instalaciju(e) u direktorij koji ne sadrži točku-zarez."
 

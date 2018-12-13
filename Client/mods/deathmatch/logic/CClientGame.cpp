@@ -283,7 +283,7 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pMultiplayer->SetFxSystemDestructionHandler(CClientGame::StaticFxSystemDestructionHandler);
     g_pMultiplayer->SetDrivebyAnimationHandler(CClientGame::StaticDrivebyAnimationHandler);
     g_pMultiplayer->SetPedStepHandler(CClientGame::StaticPedStepHandler);
-    g_pMultiplayer->SetWaterCannonHitWorldHandler(CClientGame::StaticWaterCannonHitWorldHandler);
+    g_pMultiplayer->SetVehicleWeaponHitHandler(CClientGame::StaticVehicleWeaponHitHandler);
     g_pGame->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pGame->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
     g_pGame->SetTaskSimpleBeHitHandler(CClientGame::StaticTaskSimpleBeHitHandler);
@@ -445,7 +445,7 @@ CClientGame::~CClientGame(void)
     g_pMultiplayer->SetGameEntityRenderHandler(NULL);
     g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
     g_pMultiplayer->SetPedStepHandler(nullptr);
-    g_pMultiplayer->SetWaterCannonHitWorldHandler(nullptr);
+    g_pMultiplayer->SetVehicleWeaponHitHandler(nullptr);
     g_pGame->SetPreWeaponFireHandler(NULL);
     g_pGame->SetPostWeaponFireHandler(NULL);
     g_pGame->SetTaskSimpleBeHitHandler(NULL);
@@ -2752,7 +2752,6 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientElementStreamIn", "", NULL, false);
     m_Events.AddEvent("onClientElementStreamOut", "", NULL, false);
     m_Events.AddEvent("onClientElementDestroy", "", NULL, false);
-    m_Events.AddEvent("onClientElementHitByWaterCannon", "vehicle, hitX, hitY, hitZ, normalX, normalY, normalZ, model, materialID", nullptr, false);
 
     // Player events
     m_Events.AddEvent("onClientPlayerJoin", "", NULL, false);
@@ -2803,6 +2802,7 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientVehicleCollision", "collidedelement, damageImpulseMag, bodypart, x, y, z, velX, velY, velZ", NULL, false);
     m_Events.AddEvent("onClientVehicleDamage", "attacker, weapon, loss, x, y, z, tyre", NULL, false);
     m_Events.AddEvent("onClientVehicleNitroStateChange", "activated", NULL, false);
+    m_Events.AddEvent("onClientVehicleWeaponHit", "weaponType, hitElement, hitX, hitY, hitZ, model, materialID", nullptr, false);
 
     // GUI events
     m_Events.AddEvent("onClientGUIClick", "button, state, absoluteX, absoluteY", NULL, false);
@@ -3814,9 +3814,9 @@ void CClientGame::StaticPedStepHandler(CPedSAInterface* pPed, bool bFoot)
     return g_pClientGame->PedStepHandler(pPed, bFoot);
 }
 
-void CClientGame::StaticWaterCannonHitWorldHandler(SWaterCannonHitEvent& event)
+void CClientGame::StaticVehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
 {
-    g_pClientGame->WaterCannonHitWorldHandler(event);
+    g_pClientGame->VehicleWeaponHitHandler(event);
 }
 
 void CClientGame::DrawRadarAreasHandler(void)
@@ -6901,7 +6901,7 @@ void CClientGame::PedStepHandler(CPedSAInterface* pPedSA, bool bFoot)
     }
 }
 
-void CClientGame::WaterCannonHitWorldHandler(SWaterCannonHitEvent& event)
+void CClientGame::VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
 {
     CPools* pPools = g_pGame->GetPools();
     SClientEntity<CVehicleSA>* pVehicleEntity = pPools->GetVehicle((DWORD*)event.pGameVehicle);
@@ -6918,18 +6918,18 @@ void CClientGame::WaterCannonHitWorldHandler(SWaterCannonHitEvent& event)
 
     CClientEntity* pEntity = event.pHitGameEntity ? pPools->GetClientEntity((DWORD*)event.pHitGameEntity) : nullptr;
 
-    if (!pEntity)
-        pEntity = m_pRootEntity;
-
     CLuaArguments arguments;
-    arguments.PushElement(pVehicle);
+    arguments.PushNumber(static_cast<int>(event.weaponType));
+
+    if (pEntity)
+        arguments.PushElement(pEntity);
+    else
+        arguments.PushBoolean(false);
+
     arguments.PushNumber(event.vecPosition.fX);
     arguments.PushNumber(event.vecPosition.fY);
     arguments.PushNumber(event.vecPosition.fZ);
-    arguments.PushNumber(event.vecNormal.fX);
-    arguments.PushNumber(event.vecNormal.fY);
-    arguments.PushNumber(event.vecNormal.fZ);
     arguments.PushNumber(event.iModel);
-    arguments.PushNumber(event.ucColSurface);
-    pEntity->CallEvent("onClientElementHitByWaterCannon", arguments, false);
+    arguments.PushNumber(event.iColSurface);
+    pVehicle->CallEvent("onClientVehicleWeaponHit", arguments, false);
 }
