@@ -15,12 +15,22 @@
 void CLuaFileDefs::LoadFunctions(void)
 {
     std::map<const char*, lua_CFunction> functions{
-        {"fileOpen", fileOpen},     {"fileCreate", fileCreate},   {"fileExists", fileExists},   {"fileCopy", fileCopy},
-        {"fileRename", fileRename}, {"fileDelete", fileDelete},
+        {"fileOpen", fileOpen},
+        {"fileCreate", fileCreate},
+        {"fileExists", fileExists},
+        {"fileCopy", fileCopy},
+        {"fileRename", fileRename},
+        {"fileDelete", fileDelete},
 
-        {"fileClose", fileClose},   {"fileFlush", fileFlush},     {"fileRead", fileRead},       {"fileWrite", fileWrite},
+        {"fileClose", fileClose},
+        {"fileFlush", fileFlush},
+        {"fileRead", fileRead},
+        {"fileWrite", fileWrite},
 
-        {"fileGetPos", fileGetPos}, {"fileGetSize", fileGetSize}, {"fileGetPath", fileGetPath}, {"fileIsEOF", fileIsEOF},
+        {"fileGetPos", fileGetPos},
+        {"fileGetSize", fileGetSize},
+        {"fileGetPath", fileGetPath},
+        {"fileIsEOF", fileIsEOF},
 
         {"fileSetPos", fileSetPos},
     };
@@ -432,7 +442,7 @@ int CLuaFileDefs::fileCopy(lua_State* luaVM)
         if (CResourceManager::ParseResourcePathInput(strInputSrcPath, pSrcResource, &strSrcAbsPath) &&
             CResourceManager::ParseResourcePathInput(strInputDestPath, pDestResource, &strDestAbsPath))
         {
-            CheckCanModifyOtherResources(argStream, pThisResource, {pSrcResource, pDestResource});
+            CheckCanModifyOtherResources(argStream, pThisResource, { pSrcResource, pDestResource });
             CheckCanAccessOtherResourceFile(argStream, pThisResource, pSrcResource, strSrcAbsPath);
             CheckCanAccessOtherResourceFile(argStream, pThisResource, pDestResource, strDestAbsPath);
             if (!argStream.HasErrors())
@@ -523,7 +533,7 @@ int CLuaFileDefs::fileRename(lua_State* luaVM)
         if (CResourceManager::ParseResourcePathInput(strInputSrcPath, pSrcResource, &strSrcAbsPath) &&
             CResourceManager::ParseResourcePathInput(strInputDestPath, pDestResource, &strDestAbsPath))
         {
-            CheckCanModifyOtherResources(argStream, pThisResource, {pSrcResource, pDestResource});
+            CheckCanModifyOtherResources(argStream, pThisResource, { pSrcResource, pDestResource });
             CheckCanAccessOtherResourceFile(argStream, pThisResource, pSrcResource, strSrcAbsPath);
             CheckCanAccessOtherResourceFile(argStream, pThisResource, pDestResource, strDestAbsPath);
             if (!argStream.HasErrors())
@@ -935,9 +945,8 @@ int CLuaFileDefs::fileCloseGC(lua_State* luaVM)
     {
         // This file wasn't closed, so we should warn
         // the scripter that they forgot to close it.
-        m_pScriptDebugging->LogWarning(pFile->GetLuaDebugInfo(), "Unclosed file (%s) was garbage collected. Check your resource for dereferenced files.",
-                                       *pFile->GetFilePath());
-
+        m_pScriptDebugging->LogWarning(pFile->GetLuaDebugInfo(), "Unclosed file (%s) was garbage collected. Check your resource for dereferenced files.", *pFile->GetFilePath());
+       
         // Close the file and delete it from elements
         pFile->Unload();
         m_pElementDeleter->Delete(pFile);
