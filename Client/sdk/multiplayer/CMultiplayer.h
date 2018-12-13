@@ -43,7 +43,7 @@ enum EVehicleWeaponType : int
     WATER_CANNON,
     TANK_GUN,
     ROCKET,
-    HEAT_SEAKING_ROCKET,
+    HEAT_SEEKING_ROCKET,
 };
 
 struct SVehicleWeaponHitEvent
