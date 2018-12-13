@@ -5069,18 +5069,21 @@ bool CClientPed::IsGettingJacked(void)
 
 CClientEntity* CClientPed::GetContactEntity(void)
 {
-    CPools*        pPools = g_pGame->GetPools();
-    CClientEntity* pReturn = nullptr;
-
+    CPools* pPools = g_pGame->GetPools();
     if (pPools && m_pPlayerPed)
     {
         CEntity* pEntity = m_pPlayerPed->GetContactEntity();
         if (pEntity)
         {
-            return pPools->GetClientEntity((DWORD*)pEntity->GetInterface());
+            CEntitySAInterface* pInterface = pEntity->GetInterface();
+            eEntityType entityType = pInterface ? pEntity->GetEntityType() : ENTITY_TYPE_NOTHING;
+            if (entityType == ENTITY_TYPE_VEHICLE || entityType == ENTITY_TYPE_OBJECT)
+            {
+                return pPools->GetClientEntity((DWORD*)pInterface);
+            }
         }
     }
-    return pReturn;
+    return nullptr;
 }
 
 bool CClientPed::HasAkimboPointingUpwards(void)
