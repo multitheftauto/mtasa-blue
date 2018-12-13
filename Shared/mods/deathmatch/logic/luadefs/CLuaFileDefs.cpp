@@ -1,12 +1,12 @@
 /*****************************************************************************
- *
- *  PROJECT:     Multi Theft Auto
- *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        Shared/mods/deathmatch/logic/luadefs/CLuaFileDefs.cpp
- *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
- *
- *****************************************************************************/
+*
+*  PROJECT:     Multi Theft Auto
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        Shared/mods/deathmatch/logic/luadefs/CLuaFileDefs.cpp
+*
+*  Multi Theft Auto is available from http://www.multitheftauto.com/
+*
+*****************************************************************************/
 
 #include "StdInc.h"
 
@@ -15,24 +15,24 @@
 void CLuaFileDefs::LoadFunctions(void)
 {
     std::map<const char*, lua_CFunction> functions{
-        {"fileOpen", fileOpen},
-        {"fileCreate", fileCreate},
-        {"fileExists", fileExists},
-        {"fileCopy", fileCopy},
-        {"fileRename", fileRename},
-        {"fileDelete", fileDelete},
+        { "fileOpen", fileOpen },
+    { "fileCreate", fileCreate },
+    { "fileExists", fileExists },
+    { "fileCopy", fileCopy },
+    { "fileRename", fileRename },
+    { "fileDelete", fileDelete },
 
-        {"fileClose", fileClose},
-        {"fileFlush", fileFlush},
-        {"fileRead", fileRead},
-        {"fileWrite", fileWrite},
+    { "fileClose", fileClose },
+    { "fileFlush", fileFlush },
+    { "fileRead", fileRead },
+    { "fileWrite", fileWrite },
 
-        {"fileGetPos", fileGetPos},
-        {"fileGetSize", fileGetSize},
-        {"fileGetPath", fileGetPath},
-        {"fileIsEOF", fileIsEOF},
+    { "fileGetPos", fileGetPos },
+    { "fileGetSize", fileGetSize },
+    { "fileGetPath", fileGetPath },
+    { "fileIsEOF", fileIsEOF },
 
-        {"fileSetPos", fileSetPos},
+    { "fileSetPos", fileSetPos },
     };
 
     // Add functions
@@ -732,7 +732,7 @@ int CLuaFileDefs::fileWrite(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pFile);
 
-    // Ensure we have atleast one string
+    // Ensure we have at least one string
     if (!argStream.NextIsString())
         argStream.SetTypeError("string");
 
@@ -740,17 +740,19 @@ int CLuaFileDefs::fileWrite(lua_State* luaVM)
     {
         long lBytesWritten = 0;            // Total bytes written
 
-        // While we're not out of string arguments
-        // (we will always have at least one string because we validated it above)
+                                           // While we're not out of string arguments
+                                           // (we will always have at least one string because we validated it above)
         while (argStream.NextIsString())
         {
             // Grab argument and length
-            SString strData;
-            argStream.ReadString(strData);
-            unsigned long ulDataLen = strData.length();
+            SCharStringRef strData;
+            argStream.ReadCharStringRef(strData);
+
+            if (argStream.HasErrors() || !strData.pData)
+                continue;
 
             // Write the data
-            long lArgBytesWritten = pFile->Write(ulDataLen, strData);
+            long lArgBytesWritten = pFile->Write(strData.uiSize, strData.pData);
 
             // Did the file mysteriously disappear?
             if (lArgBytesWritten == -1)
@@ -944,7 +946,7 @@ int CLuaFileDefs::fileCloseGC(lua_State* luaVM)
         // This file wasn't closed, so we should warn
         // the scripter that they forgot to close it.
         m_pScriptDebugging->LogWarning(pFile->GetLuaDebugInfo(), "Unclosed file (%s) was garbage collected. Check your resource for dereferenced files.", *pFile->GetFilePath());
-       
+
         // Close the file and delete it from elements
         pFile->Unload();
         m_pElementDeleter->Delete(pFile);

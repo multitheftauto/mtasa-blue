@@ -1,13 +1,13 @@
 /*****************************************************************************
- *
- *  PROJECT:     Multi Theft Auto v1.0
- *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        CScriptArgReader.h
- *  PURPOSE:
- *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
- *
- *****************************************************************************/
+*
+*  PROJECT:     Multi Theft Auto v1.0
+*  LICENSE:     See LICENSE in the top level directory
+*  FILE:        CScriptArgReader.h
+*  PURPOSE:
+*
+*  Multi Theft Auto is available from http://www.multitheftauto.com/
+*
+*****************************************************************************/
 #pragma once
 #include <limits>
 #include <type_traits>
@@ -15,7 +15,7 @@
 #include "CStringMap.h"
 
 #ifdef MTA_CLIENT
-    #include "CScriptDebugging.h"
+#include "CScriptDebugging.h"
 #endif
 
 /////////////////////////////////////////////////////////////////////////
@@ -579,23 +579,23 @@ public:
 
         switch (lua_type(m_luaVM, m_iIndex))
         {
-            case LUA_TNUMBER:
-            case LUA_TSTRING:
-                outValue = lua_tostring(m_luaVM, m_iIndex);
-                break;
-            case LUA_TBOOLEAN:
-                outValue = lua_toboolean(m_luaVM, m_iIndex) ? "true" : "false";
-                break;
-            case LUA_TNIL:
-                outValue = "nil";
-                break;
-            case LUA_TNONE:
-                outValue = "";
-                SetTypeError("non-none");
-                break;
-            default:
-                outValue = SString("%s: %p", luaL_typename(m_luaVM, m_iIndex), lua_topointer(m_luaVM, m_iIndex));
-                break;
+        case LUA_TNUMBER:
+        case LUA_TSTRING:
+            outValue = lua_tostring(m_luaVM, m_iIndex);
+            break;
+        case LUA_TBOOLEAN:
+            outValue = lua_toboolean(m_luaVM, m_iIndex) ? "true" : "false";
+            break;
+        case LUA_TNIL:
+            outValue = "nil";
+            break;
+        case LUA_TNONE:
+            outValue = "";
+            SetTypeError("non-none");
+            break;
+        default:
+            outValue = SString("%s: %p", luaL_typename(m_luaVM, m_iIndex), lua_topointer(m_luaVM, m_iIndex));
+            break;
         }
 
         ++m_iIndex;
@@ -1016,7 +1016,7 @@ public:
                 int iArgument = lua_type(m_luaVM, -1);
                 if (iArgument == LUA_TNUMBER)
                 {
-                    outList.push_back(lua_tonumber(m_luaVM, -1));
+                    outList.push_back(static_cast<float>(lua_tonumber(m_luaVM, -1)));
                 }
             }
             m_iIndex++;
@@ -1050,7 +1050,7 @@ protected:
                     // Recurse
                     InternalReadStringMap(value.subMap, lua_gettop(m_luaVM));
                 }
-                outMap.insert({SStringX(lua_tostring(m_luaVM, -2)), value});
+                outMap.insert({ SStringX(lua_tostring(m_luaVM, -2)), value });
             }
             lua_pop(m_luaVM, 1);
         }
@@ -1166,13 +1166,13 @@ public:
     bool NextIsVector3D(void) const
     {
         return (NextCouldBeNumber() && NextCouldBeNumber(1) && NextCouldBeNumber(2)) || NextIsUserDataOfType<CLuaVector3D>() ||
-               NextIsUserDataOfType<CLuaVector4D>();
+            NextIsUserDataOfType<CLuaVector4D>();
     }
 
     bool NextIsVector2D(void) const
     {
         return (NextCouldBeNumber() && NextCouldBeNumber(1)) || NextIsUserDataOfType<CLuaVector2D>() || NextIsUserDataOfType<CLuaVector3D>() ||
-               NextIsUserDataOfType<CLuaVector4D>();
+            NextIsUserDataOfType<CLuaVector4D>();
     }
 
     //
@@ -1267,11 +1267,11 @@ public:
         // Output warning here (there's no better way to integrate it without huge code changes
         if (!m_bError && !m_strCustomWarning.empty())
         {
-            #ifdef MTA_CLIENT
+#ifdef MTA_CLIENT
             CLuaFunctionDefs::m_pScriptDebugging->LogWarning(m_luaVM, m_strCustomWarning);
-            #else
+#else
             g_pGame->GetScriptDebugging()->LogWarning(m_luaVM, m_strCustomWarning);
-            #endif
+#endif
 
             m_strCustomWarning.clear();
         }
