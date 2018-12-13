@@ -573,6 +573,7 @@ private:
     static void PostWeaponFire(void);
     static void BulletImpact(CPed* pInitiator, CEntity* pVictim, const CVector* pStartPosition, const CVector* pEndPosition);
     static void BulletFire(CPed* pInitiator, const CVector* pStartPosition, const CVector* pEndPosition);
+
 public:
     static bool StaticProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream);
 

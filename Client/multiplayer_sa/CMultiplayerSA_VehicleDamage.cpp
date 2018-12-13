@@ -42,7 +42,7 @@ bool OnMY_CVehicle_BurstTyre(CVehicleSAInterface* pVehicle, uchar ucTyre)
 
         // Discover weapon if possible
         SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)pBulletImpactInitiator);
-        CPed* pInitiator = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
+        CPed*                  pInitiator = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
         if (pInitiator)
         {
             CWeapon* pWeapon = pInitiator->GetWeapon(pInitiator->GetCurrentWeaponSlot());

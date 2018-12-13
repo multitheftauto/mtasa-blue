@@ -11247,7 +11247,7 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pPlayer, bool bIP, bool bUs
         // Call the event
         CLuaArguments Arguments;
         Arguments.PushBan(pBan);
-        
+
         if (pResponsible)
             Arguments.PushElement(pResponsible);
 
@@ -11420,10 +11420,10 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
                 // Call the event
                 CLuaArguments Arguments;
                 Arguments.PushBan(pBan);
-                
+
                 if (pResponsible)
                     Arguments.PushElement(pResponsible);
-                
+
                 // A script can call kickPlayer in the onPlayerBan event, which would
                 // show him the 'kicked' message instead of our 'banned' message.
                 const bool bLeavingServer = pPlayer->IsLeavingServer();

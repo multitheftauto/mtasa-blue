@@ -1,12 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        Shared/mods/deathmatch/logic/luadefs/CLuaFileDefs.cpp
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Shared/mods/deathmatch/logic/luadefs/CLuaFileDefs.cpp
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
@@ -15,24 +15,14 @@
 void CLuaFileDefs::LoadFunctions(void)
 {
     std::map<const char*, lua_CFunction> functions{
-        { "fileOpen", fileOpen },
-    { "fileCreate", fileCreate },
-    { "fileExists", fileExists },
-    { "fileCopy", fileCopy },
-    { "fileRename", fileRename },
-    { "fileDelete", fileDelete },
+        {"fileOpen", fileOpen},     {"fileCreate", fileCreate},   {"fileExists", fileExists},   {"fileCopy", fileCopy},
+        {"fileRename", fileRename}, {"fileDelete", fileDelete},
 
-    { "fileClose", fileClose },
-    { "fileFlush", fileFlush },
-    { "fileRead", fileRead },
-    { "fileWrite", fileWrite },
+        {"fileClose", fileClose},   {"fileFlush", fileFlush},     {"fileRead", fileRead},       {"fileWrite", fileWrite},
 
-    { "fileGetPos", fileGetPos },
-    { "fileGetSize", fileGetSize },
-    { "fileGetPath", fileGetPath },
-    { "fileIsEOF", fileIsEOF },
+        {"fileGetPos", fileGetPos}, {"fileGetSize", fileGetSize}, {"fileGetPath", fileGetPath}, {"fileIsEOF", fileIsEOF},
 
-    { "fileSetPos", fileSetPos },
+        {"fileSetPos", fileSetPos},
     };
 
     // Add functions
@@ -442,7 +432,7 @@ int CLuaFileDefs::fileCopy(lua_State* luaVM)
         if (CResourceManager::ParseResourcePathInput(strInputSrcPath, pSrcResource, &strSrcAbsPath) &&
             CResourceManager::ParseResourcePathInput(strInputDestPath, pDestResource, &strDestAbsPath))
         {
-            CheckCanModifyOtherResources(argStream, pThisResource, { pSrcResource, pDestResource });
+            CheckCanModifyOtherResources(argStream, pThisResource, {pSrcResource, pDestResource});
             CheckCanAccessOtherResourceFile(argStream, pThisResource, pSrcResource, strSrcAbsPath);
             CheckCanAccessOtherResourceFile(argStream, pThisResource, pDestResource, strDestAbsPath);
             if (!argStream.HasErrors())
@@ -533,7 +523,7 @@ int CLuaFileDefs::fileRename(lua_State* luaVM)
         if (CResourceManager::ParseResourcePathInput(strInputSrcPath, pSrcResource, &strSrcAbsPath) &&
             CResourceManager::ParseResourcePathInput(strInputDestPath, pDestResource, &strDestAbsPath))
         {
-            CheckCanModifyOtherResources(argStream, pThisResource, { pSrcResource, pDestResource });
+            CheckCanModifyOtherResources(argStream, pThisResource, {pSrcResource, pDestResource});
             CheckCanAccessOtherResourceFile(argStream, pThisResource, pSrcResource, strSrcAbsPath);
             CheckCanAccessOtherResourceFile(argStream, pThisResource, pDestResource, strDestAbsPath);
             if (!argStream.HasErrors())
@@ -740,8 +730,8 @@ int CLuaFileDefs::fileWrite(lua_State* luaVM)
     {
         long lBytesWritten = 0;            // Total bytes written
 
-                                           // While we're not out of string arguments
-                                           // (we will always have at least one string because we validated it above)
+        // While we're not out of string arguments
+        // (we will always have at least one string because we validated it above)
         while (argStream.NextIsString())
         {
             // Grab argument and length
@@ -945,7 +935,8 @@ int CLuaFileDefs::fileCloseGC(lua_State* luaVM)
     {
         // This file wasn't closed, so we should warn
         // the scripter that they forgot to close it.
-        m_pScriptDebugging->LogWarning(pFile->GetLuaDebugInfo(), "Unclosed file (%s) was garbage collected. Check your resource for dereferenced files.", *pFile->GetFilePath());
+        m_pScriptDebugging->LogWarning(pFile->GetLuaDebugInfo(), "Unclosed file (%s) was garbage collected. Check your resource for dereferenced files.",
+                                       *pFile->GetFilePath());
 
         // Close the file and delete it from elements
         pFile->Unload();

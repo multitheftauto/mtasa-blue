@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CPoolsSA.h
-*  PURPOSE:     Header file for game entity pools class
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CPoolsSA.h
+ *  PURPOSE:     Header file for game entity pools class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 #pragma once
 
 #include <game/CPools.h>
@@ -56,7 +56,7 @@ class CPoolSAInterface
 {
 public:
     // m_pObjects contains all interfaces. 140 maximum for ped objects.
-    B * m_pObjects;
+    B*                m_pObjects;
     tPoolObjectFlags* m_byteMap;
     int               m_nSize;
     int               m_nFirstFree;
@@ -160,6 +160,7 @@ public:
 
     void ResetPedPoolCount() { m_pedPool.ulCount = 0; }
     void InvalidateLocalPlayerClientEntity();
+
 private:
     // Generic container for pools
     template <class T, class I, unsigned long MAX>
@@ -183,7 +184,7 @@ private:
         {
             for (unsigned int i = 0; i < MAX; ++i)
             {
-                arrayOfClientEntities[i] = { nullptr, nullptr };
+                arrayOfClientEntities[i] = {nullptr, nullptr};
             }
 
             for (unsigned int i = 0; i < MAX; ++i)

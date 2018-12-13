@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        sdk/game/CPools.h
-*  PURPOSE:     Game pool interface
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/game/CPools.h
+ *  PURPOSE:     Game pool interface
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #pragma once
 
@@ -58,8 +58,6 @@ struct SClientEntity
     T*             pEntity;
     CClientEntity* pClientEntity;
 };
-
-
 
 class CEntryInfoNodePool
 {
@@ -119,7 +117,7 @@ public:
     // Others
     virtual CBuilding* AddBuilding(DWORD dwModelID) = 0;
     virtual CVehicle*  AddTrain(class CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool iDirection,
-        uchar ucTrackId = 0xFF) = 0;
+                                uchar ucTrackId = 0xFF) = 0;
 
     virtual CEntity*       GetEntity(DWORD* pGameInterface) = 0;
     virtual CClientEntity* GetClientEntity(DWORD* pGameInterface) = 0;

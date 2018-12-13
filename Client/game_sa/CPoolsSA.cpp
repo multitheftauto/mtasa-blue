@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        game_sa/CPoolsSA.cpp
-*  PURPOSE:     Game entity pools
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CPoolsSA.cpp
+ *  PURPOSE:     Game entity pools
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 
@@ -83,7 +83,7 @@ inline bool CPoolsSA::AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleS
             return false;
         }
 
-        m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool] = { pVehicle, (CClientEntity*)pClientVehicle };
+        m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool] = {pVehicle, (CClientEntity*)pClientVehicle};
         ++m_vehiclePool.ulCount;
     }
 
@@ -167,7 +167,7 @@ void CPoolsSA::RemoveVehicle(CVehicle* pVehicle, bool bDelete)
         }
 
         CVehicleSA* pVehicleSA = m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
-        m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool] = { nullptr, nullptr };
+        m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool] = {nullptr, nullptr};
 
         // Delete it from memory
         delete pVehicleSA;
@@ -312,7 +312,7 @@ inline bool CPoolsSA::AddObjectToPool(CClientObject* pClientObject, CObjectSA* p
             return false;
         }
 
-        m_objectPool.arrayOfClientEntities[dwElementIndexInPool] = { pObject, (CClientEntity*)pClientObject };
+        m_objectPool.arrayOfClientEntities[dwElementIndexInPool] = {pObject, (CClientEntity*)pClientObject};
 
         // Increase the count of objects
         ++m_objectPool.ulCount;
@@ -374,7 +374,7 @@ void CPoolsSA::RemoveObject(CObject* pObject, bool bDelete)
         }
 
         CObjectSA* pObjectSA = m_objectPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
-        m_objectPool.arrayOfClientEntities[dwElementIndexInPool] = { nullptr, nullptr };
+        m_objectPool.arrayOfClientEntities[dwElementIndexInPool] = {nullptr, nullptr};
 
         // Delete it from memory
         delete pObjectSA;
@@ -515,7 +515,7 @@ inline bool CPoolsSA::AddPedToPool(CClientPed* pClientPed, CPedSA* pPed)
             return false;
         }
 
-        m_pedPool.arrayOfClientEntities[dwElementIndexInPool] = { pPed, (CClientEntity*)pClientPed };
+        m_pedPool.arrayOfClientEntities[dwElementIndexInPool] = {pPed, (CClientEntity*)pClientPed};
         ++m_pedPool.ulCount;
     }
 
@@ -558,7 +558,7 @@ CPed* CPoolsSA::AddPed(CClientPed* pClientPed, DWORD* pGameInterface)
                 SClientEntity<CPedSA>* pPedEntity = &m_pedPool.arrayOfClientEntities[dwElementIndexInPool];
                 if (pPedEntity && pPedEntity->pEntity)
                 {
-                    m_pedPool.arrayOfClientEntities[dwElementIndexInPool] = { pPedEntity->pEntity, (CClientEntity*)pClientPed };
+                    m_pedPool.arrayOfClientEntities[dwElementIndexInPool] = {pPedEntity->pEntity, (CClientEntity*)pClientPed};
                 }
                 else
                 {
@@ -630,36 +630,36 @@ void CPoolsSA::RemovePed(CPed* pPed, bool bDelete)
         }
 
         CPedSA* pPed = m_pedPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
-        m_pedPool.arrayOfClientEntities[dwElementIndexInPool] = { nullptr, nullptr };
+        m_pedPool.arrayOfClientEntities[dwElementIndexInPool] = {nullptr, nullptr};
 
         // Delete the element from memory
         switch (pPed->GetType())
         {
-        case PLAYER_PED:
-        {
-            CPlayerPedSA* pPlayerPed = dynamic_cast<CPlayerPedSA*>(pPed);
-            if (pPlayerPed)
+            case PLAYER_PED:
             {
-                if (!bDelete)
-                    pPlayerPed->SetDoNotRemoveFromGameWhenDeleted(true);
+                CPlayerPedSA* pPlayerPed = dynamic_cast<CPlayerPedSA*>(pPed);
+                if (pPlayerPed)
+                {
+                    if (!bDelete)
+                        pPlayerPed->SetDoNotRemoveFromGameWhenDeleted(true);
+                }
+
+                delete pPlayerPed;
+
+                break;
             }
 
-            delete pPlayerPed;
-
-            break;
-        }
-
-        default:
-        {
-            CCivilianPedSA* pCivPed = dynamic_cast<CCivilianPedSA*>(pPed);
-            if (pCivPed)
+            default:
             {
-                if (!bDelete)
-                    pCivPed->SetDoNotRemoveFromGameWhenDeleted(true);
-            }
+                CCivilianPedSA* pCivPed = dynamic_cast<CCivilianPedSA*>(pPed);
+                if (pCivPed)
+                {
+                    if (!bDelete)
+                        pCivPed->SetDoNotRemoveFromGameWhenDeleted(true);
+                }
 
-            delete pCivPed;
-        }
+                delete pCivPed;
+            }
         }
 
         // Decrease the count of elements in the pool
@@ -958,9 +958,9 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPositio
 
 DWORD CPoolsSA::GetPedPoolIndex(std::uint8_t* pInterface)
 {
-    DWORD dwAlignedSize = 1988;
+    DWORD         dwAlignedSize = 1988;
     std::uint8_t* pTheObjects = (std::uint8_t*)(*m_ppPedPoolInterface)->m_pObjects;
-    DWORD dwMaxIndex = MAX_PEDS - 1;
+    DWORD         dwMaxIndex = MAX_PEDS - 1;
     if (pInterface < pTheObjects || pInterface > pTheObjects + (dwMaxIndex * dwAlignedSize))
     {
         return MAX_PEDS;
@@ -970,9 +970,9 @@ DWORD CPoolsSA::GetPedPoolIndex(std::uint8_t* pInterface)
 
 DWORD CPoolsSA::GetVehiclePoolIndex(std::uint8_t* pInterface)
 {
-    DWORD dwAlignedSize = 2584;
+    DWORD         dwAlignedSize = 2584;
     std::uint8_t* pTheObjects = (std::uint8_t*)(*m_ppVehiclePoolInterface)->m_pObjects;
-    DWORD dwMaxIndex = MAX_VEHICLES - 1;
+    DWORD         dwMaxIndex = MAX_VEHICLES - 1;
     if (pInterface < pTheObjects || pInterface > pTheObjects + (dwMaxIndex * dwAlignedSize))
     {
         return MAX_VEHICLES;
@@ -982,9 +982,9 @@ DWORD CPoolsSA::GetVehiclePoolIndex(std::uint8_t* pInterface)
 
 DWORD CPoolsSA::GetObjectPoolIndex(std::uint8_t* pInterface)
 {
-    DWORD dwAlignedSize = 412;
+    DWORD         dwAlignedSize = 412;
     std::uint8_t* pTheObjects = (std::uint8_t*)(*m_ppObjectPoolInterface)->m_pObjects;
-    DWORD dwMaxIndex = MAX_OBJECTS - 1;
+    DWORD         dwMaxIndex = MAX_OBJECTS - 1;
     if (pInterface < pTheObjects || pInterface > pTheObjects + (dwMaxIndex * dwAlignedSize))
     {
         return MAX_OBJECTS;
@@ -1048,46 +1048,46 @@ int CPoolsSA::GetPoolDefaultCapacity(ePools pool)
 {
     switch (pool)
     {
-    case BUILDING_POOL:
-        return 13000;
-    case PED_POOL:
-        return 140;
-    case OBJECT_POOL:
-        return 350;            // Modded to 700   @ CGameSA.cpp
-    case DUMMY_POOL:
-        return 2500;
-    case VEHICLE_POOL:
-        return 110;
-    case COL_MODEL_POOL:
-        return 10150;            // Modded to 12000  @ CGameSA.cpp
-    case TASK_POOL:
-        return 500;            // Modded to 5000   @ CGameSA.cpp
-    case EVENT_POOL:
-        return 200;            // Modded to 5000   @ CGameSA.cpp
-    case TASK_ALLOCATOR_POOL:
-        return 16;
-    case PED_INTELLIGENCE_POOL:
-        return 140;
-    case PED_ATTRACTOR_POOL:
-        return 64;
-    case ENTRY_INFO_NODE_POOL:
-        return 500;            // Modded to 4096   @ CGameSA.cpp
-    case NODE_ROUTE_POOL:
-        return 64;
-    case PATROL_ROUTE_POOL:
-        return 32;
-    case POINT_ROUTE_POOL:
-        return 64;
-    case POINTER_DOUBLE_LINK_POOL:
-        return 3200;            // Modded to 8000   @ CGameSA.cpp
-    case POINTER_SINGLE_LINK_POOL:
-        return 70000;
-    case ENV_MAP_MATERIAL_POOL:
-        return 4096;            // Modded to 16000   @ CGameSA.cpp
-    case ENV_MAP_ATOMIC_POOL:
-        return 1024;            // Modded to 8000    @ CGameSA.cpp
-    case SPEC_MAP_MATERIAL_POOL:
-        return 4096;            // Modded to 16000   @ CGameSA.cpp
+        case BUILDING_POOL:
+            return 13000;
+        case PED_POOL:
+            return 140;
+        case OBJECT_POOL:
+            return 350;            // Modded to 700   @ CGameSA.cpp
+        case DUMMY_POOL:
+            return 2500;
+        case VEHICLE_POOL:
+            return 110;
+        case COL_MODEL_POOL:
+            return 10150;            // Modded to 12000  @ CGameSA.cpp
+        case TASK_POOL:
+            return 500;            // Modded to 5000   @ CGameSA.cpp
+        case EVENT_POOL:
+            return 200;            // Modded to 5000   @ CGameSA.cpp
+        case TASK_ALLOCATOR_POOL:
+            return 16;
+        case PED_INTELLIGENCE_POOL:
+            return 140;
+        case PED_ATTRACTOR_POOL:
+            return 64;
+        case ENTRY_INFO_NODE_POOL:
+            return 500;            // Modded to 4096   @ CGameSA.cpp
+        case NODE_ROUTE_POOL:
+            return 64;
+        case PATROL_ROUTE_POOL:
+            return 32;
+        case POINT_ROUTE_POOL:
+            return 64;
+        case POINTER_DOUBLE_LINK_POOL:
+            return 3200;            // Modded to 8000   @ CGameSA.cpp
+        case POINTER_SINGLE_LINK_POOL:
+            return 70000;
+        case ENV_MAP_MATERIAL_POOL:
+            return 4096;            // Modded to 16000   @ CGameSA.cpp
+        case ENV_MAP_ATOMIC_POOL:
+            return 1024;            // Modded to 8000    @ CGameSA.cpp
+        case SPEC_MAP_MATERIAL_POOL:
+            return 4096;            // Modded to 16000   @ CGameSA.cpp
     }
     return 0;
 }
@@ -1098,66 +1098,66 @@ int CPoolsSA::GetPoolCapacity(ePools pool)
     DWORD cPtr = NULL;
     switch (pool)
     {
-    case BUILDING_POOL:
-        iPtr = 0x55105F;
-        break;
-    case PED_POOL:
-        iPtr = 0x550FF2;
-        break;
-    case OBJECT_POOL:
-        iPtr = 0x551097;
-        break;
-    case DUMMY_POOL:
-        iPtr = 0x5510CF;
-        break;
-    case VEHICLE_POOL:
-        cPtr = 0x55102A;
-        break;
-    case COL_MODEL_POOL:
-        iPtr = 0x551107;
-        break;
-    case TASK_POOL:
-        iPtr = 0x55113F;
-        break;
-    case EVENT_POOL:
-        iPtr = 0x551177;
-        break;
-    case TASK_ALLOCATOR_POOL:
-        cPtr = 0x55124E;
-        break;
-    case PED_INTELLIGENCE_POOL:
-        iPtr = 0x551283;
-        break;
-    case PED_ATTRACTOR_POOL:
-        cPtr = 0x5512BC;
-        break;
-    case ENTRY_INFO_NODE_POOL:
-        iPtr = 0x550FBA;
-        break;
-    case NODE_ROUTE_POOL:
-        cPtr = 0x551219;
-        break;
-    case PATROL_ROUTE_POOL:
-        cPtr = 0x5511E4;
-        break;
-    case POINT_ROUTE_POOL:
-        cPtr = 0x5511AF;
-        break;
-    case POINTER_DOUBLE_LINK_POOL:
-        iPtr = 0x550F82;
-        break;
-    case POINTER_SINGLE_LINK_POOL:
-        iPtr = 0x550F46;
-        break;
-    case ENV_MAP_MATERIAL_POOL:
-        iPtr = 0x5DA08E;
-        break;
-    case ENV_MAP_ATOMIC_POOL:
-        iPtr = 0x5DA0CA;
-        break;
-    case SPEC_MAP_MATERIAL_POOL:
-        iPtr = 0x5DA106;
-        break;
+        case BUILDING_POOL:
+            iPtr = 0x55105F;
+            break;
+        case PED_POOL:
+            iPtr = 0x550FF2;
+            break;
+        case OBJECT_POOL:
+            iPtr = 0x551097;
+            break;
+        case DUMMY_POOL:
+            iPtr = 0x5510CF;
+            break;
+        case VEHICLE_POOL:
+            cPtr = 0x55102A;
+            break;
+        case COL_MODEL_POOL:
+            iPtr = 0x551107;
+            break;
+        case TASK_POOL:
+            iPtr = 0x55113F;
+            break;
+        case EVENT_POOL:
+            iPtr = 0x551177;
+            break;
+        case TASK_ALLOCATOR_POOL:
+            cPtr = 0x55124E;
+            break;
+        case PED_INTELLIGENCE_POOL:
+            iPtr = 0x551283;
+            break;
+        case PED_ATTRACTOR_POOL:
+            cPtr = 0x5512BC;
+            break;
+        case ENTRY_INFO_NODE_POOL:
+            iPtr = 0x550FBA;
+            break;
+        case NODE_ROUTE_POOL:
+            cPtr = 0x551219;
+            break;
+        case PATROL_ROUTE_POOL:
+            cPtr = 0x5511E4;
+            break;
+        case POINT_ROUTE_POOL:
+            cPtr = 0x5511AF;
+            break;
+        case POINTER_DOUBLE_LINK_POOL:
+            iPtr = 0x550F82;
+            break;
+        case POINTER_SINGLE_LINK_POOL:
+            iPtr = 0x550F46;
+            break;
+        case ENV_MAP_MATERIAL_POOL:
+            iPtr = 0x5DA08E;
+            break;
+        case ENV_MAP_ATOMIC_POOL:
+            iPtr = 0x5DA0CA;
+            break;
+        case SPEC_MAP_MATERIAL_POOL:
+            iPtr = 0x5DA106;
+            break;
     }
     if (iPtr)
         return *(int*)iPtr;
@@ -1175,66 +1175,66 @@ void CPoolsSA::SetPoolCapacity(ePools pool, int iValue)
     DWORD cPtr = NULL;
     switch (pool)
     {
-    case BUILDING_POOL:
-        iPtr = 0x55105F;
-        break;
-    case PED_POOL:
-        iPtr = 0x550FF2;
-        break;
-    case OBJECT_POOL:
-        iPtr = 0x551097;
-        break;
-    case DUMMY_POOL:
-        iPtr = 0x5510CF;
-        break;
-    case VEHICLE_POOL:
-        iPtr = 0x55102A;
-        break;
-    case COL_MODEL_POOL:
-        iPtr = 0x551107;
-        break;
-    case TASK_POOL:
-        iPtr = 0x55113F;
-        break;
-    case EVENT_POOL:
-        iPtr = 0x551177;
-        break;
-    case TASK_ALLOCATOR_POOL:
-        cPtr = 0x55124E;
-        break;            // 0 - 127
-    case PED_INTELLIGENCE_POOL:
-        iPtr = 0x551283;
-        break;
-    case PED_ATTRACTOR_POOL:
-        cPtr = 0x5512BB;
-        break;            // 0 - 127
-    case ENTRY_INFO_NODE_POOL:
-        iPtr = 0x550FBA;
-        break;
-    case NODE_ROUTE_POOL:
-        cPtr = 0x551218;
-        break;            // 0 - 127
-    case PATROL_ROUTE_POOL:
-        cPtr = 0x5511E4;
-        break;            // 0 - 127
-    case POINT_ROUTE_POOL:
-        cPtr = 0x5511AF;
-        break;            // 0 - 127
-    case POINTER_DOUBLE_LINK_POOL:
-        iPtr = 0x550F82;
-        break;
-    case POINTER_SINGLE_LINK_POOL:
-        iPtr = 0x550F46;
-        break;
-    case ENV_MAP_MATERIAL_POOL:
-        iPtr = 0x5DA08E;
-        break;
-    case ENV_MAP_ATOMIC_POOL:
-        iPtr = 0x5DA0CA;
-        break;
-    case SPEC_MAP_MATERIAL_POOL:
-        iPtr = 0x5DA106;
-        break;
+        case BUILDING_POOL:
+            iPtr = 0x55105F;
+            break;
+        case PED_POOL:
+            iPtr = 0x550FF2;
+            break;
+        case OBJECT_POOL:
+            iPtr = 0x551097;
+            break;
+        case DUMMY_POOL:
+            iPtr = 0x5510CF;
+            break;
+        case VEHICLE_POOL:
+            iPtr = 0x55102A;
+            break;
+        case COL_MODEL_POOL:
+            iPtr = 0x551107;
+            break;
+        case TASK_POOL:
+            iPtr = 0x55113F;
+            break;
+        case EVENT_POOL:
+            iPtr = 0x551177;
+            break;
+        case TASK_ALLOCATOR_POOL:
+            cPtr = 0x55124E;
+            break;            // 0 - 127
+        case PED_INTELLIGENCE_POOL:
+            iPtr = 0x551283;
+            break;
+        case PED_ATTRACTOR_POOL:
+            cPtr = 0x5512BB;
+            break;            // 0 - 127
+        case ENTRY_INFO_NODE_POOL:
+            iPtr = 0x550FBA;
+            break;
+        case NODE_ROUTE_POOL:
+            cPtr = 0x551218;
+            break;            // 0 - 127
+        case PATROL_ROUTE_POOL:
+            cPtr = 0x5511E4;
+            break;            // 0 - 127
+        case POINT_ROUTE_POOL:
+            cPtr = 0x5511AF;
+            break;            // 0 - 127
+        case POINTER_DOUBLE_LINK_POOL:
+            iPtr = 0x550F82;
+            break;
+        case POINTER_SINGLE_LINK_POOL:
+            iPtr = 0x550F46;
+            break;
+        case ENV_MAP_MATERIAL_POOL:
+            iPtr = 0x5DA08E;
+            break;
+        case ENV_MAP_ATOMIC_POOL:
+            iPtr = 0x5DA0CA;
+            break;
+        case SPEC_MAP_MATERIAL_POOL:
+            iPtr = 0x5DA106;
+            break;
     }
     if (iPtr)
         MemPut<int>(iPtr, iValue);
@@ -1249,76 +1249,76 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
     DWORD dwThis = NULL;
     switch (pool)
     {
-    case BUILDING_POOL:
-        dwFunc = FUNC_CBuildingPool_GetNoOfUsedSpaces;
-        dwThis = CLASS_CBuildingPool;
-        break;
-    case PED_POOL:
-        dwFunc = FUNC_CPedPool_GetNoOfUsedSpaces;
-        dwThis = CLASS_CPedPool;
-        break;
-    case OBJECT_POOL:
-        dwFunc = FUNC_CObjectPool_GetNoOfUsedSpaces;
-        dwThis = CLASS_CObjectPool;
-        break;
-    case DUMMY_POOL:
-        dwFunc = FUNC_CDummyPool_GetNoOfUsedSpaces;
-        dwThis = CLASS_CDummyPool;
-        break;
-    case VEHICLE_POOL:
-        dwFunc = FUNC_CVehiclePool_GetNoOfUsedSpaces;
-        dwThis = CLASS_CVehiclePool;
-        break;
-    case COL_MODEL_POOL:
-        dwFunc = FUNC_CColModelPool_GetNoOfUsedSpaces;
-        dwThis = CLASS_CColModelPool;
-        break;
-    case TASK_POOL:
-        dwFunc = FUNC_CTaskPool_GetNoOfUsedSpaces;
-        dwThis = CLASS_CTaskPool;
-        break;
-    case EVENT_POOL:
-        dwFunc = FUNC_CEventPool_GetNoOfUsedSpaces;
-        dwThis = CLASS_CEventPool;
-        break;
-    case TASK_ALLOCATOR_POOL:
-        dwFunc = FUNC_CTaskAllocatorPool_GetNoOfUsedSpaces;
-        dwThis = CLASS_CTaskAllocatorPool;
-        break;
-    case PED_INTELLIGENCE_POOL:
-        dwFunc = FUNC_CPedIntelligencePool_GetNoOfUsedSpaces;
-        dwThis = CLASS_CPedIntelligencePool;
-        break;
-    case PED_ATTRACTOR_POOL:
-        dwFunc = FUNC_CPedAttractorPool_GetNoOfUsedSpaces;
-        dwThis = CLASS_CPedAttractorPool;
-        break;
-    case ENTRY_INFO_NODE_POOL:
-        dwFunc = FUNC_CEntryInfoNodePool_GetNoOfUsedSpaces;
-        dwThis = CLASS_CEntryInfoNodePool;
-        break;
-    case NODE_ROUTE_POOL:
-        dwFunc = FUNC_CNodeRoutePool_GetNoOfUsedSpaces;
-        dwThis = CLASS_CNodeRoutePool;
-        break;
-    case PATROL_ROUTE_POOL:
-        dwFunc = FUNC_CPatrolRoutePool_GetNoOfUsedSpaces;
-        dwThis = CLASS_CPatrolRoutePool;
-        break;
-    case POINT_ROUTE_POOL:
-        dwFunc = FUNC_CPointRoutePool_GetNoOfUsedSpaces;
-        dwThis = CLASS_CPointRoutePool;
-        break;
-    case POINTER_DOUBLE_LINK_POOL:
-        dwFunc = FUNC_CPtrNodeDoubleLinkPool_GetNoOfUsedSpaces;
-        dwThis = CLASS_CPtrNodeDoubleLinkPool;
-        break;
-    case POINTER_SINGLE_LINK_POOL:
-        dwFunc = FUNC_CPtrNodeSingleLinkPool_GetNoOfUsedSpaces;
-        dwThis = CLASS_CPtrNodeSingleLinkPool;
-        break;
-    default:
-        return -1;
+        case BUILDING_POOL:
+            dwFunc = FUNC_CBuildingPool_GetNoOfUsedSpaces;
+            dwThis = CLASS_CBuildingPool;
+            break;
+        case PED_POOL:
+            dwFunc = FUNC_CPedPool_GetNoOfUsedSpaces;
+            dwThis = CLASS_CPedPool;
+            break;
+        case OBJECT_POOL:
+            dwFunc = FUNC_CObjectPool_GetNoOfUsedSpaces;
+            dwThis = CLASS_CObjectPool;
+            break;
+        case DUMMY_POOL:
+            dwFunc = FUNC_CDummyPool_GetNoOfUsedSpaces;
+            dwThis = CLASS_CDummyPool;
+            break;
+        case VEHICLE_POOL:
+            dwFunc = FUNC_CVehiclePool_GetNoOfUsedSpaces;
+            dwThis = CLASS_CVehiclePool;
+            break;
+        case COL_MODEL_POOL:
+            dwFunc = FUNC_CColModelPool_GetNoOfUsedSpaces;
+            dwThis = CLASS_CColModelPool;
+            break;
+        case TASK_POOL:
+            dwFunc = FUNC_CTaskPool_GetNoOfUsedSpaces;
+            dwThis = CLASS_CTaskPool;
+            break;
+        case EVENT_POOL:
+            dwFunc = FUNC_CEventPool_GetNoOfUsedSpaces;
+            dwThis = CLASS_CEventPool;
+            break;
+        case TASK_ALLOCATOR_POOL:
+            dwFunc = FUNC_CTaskAllocatorPool_GetNoOfUsedSpaces;
+            dwThis = CLASS_CTaskAllocatorPool;
+            break;
+        case PED_INTELLIGENCE_POOL:
+            dwFunc = FUNC_CPedIntelligencePool_GetNoOfUsedSpaces;
+            dwThis = CLASS_CPedIntelligencePool;
+            break;
+        case PED_ATTRACTOR_POOL:
+            dwFunc = FUNC_CPedAttractorPool_GetNoOfUsedSpaces;
+            dwThis = CLASS_CPedAttractorPool;
+            break;
+        case ENTRY_INFO_NODE_POOL:
+            dwFunc = FUNC_CEntryInfoNodePool_GetNoOfUsedSpaces;
+            dwThis = CLASS_CEntryInfoNodePool;
+            break;
+        case NODE_ROUTE_POOL:
+            dwFunc = FUNC_CNodeRoutePool_GetNoOfUsedSpaces;
+            dwThis = CLASS_CNodeRoutePool;
+            break;
+        case PATROL_ROUTE_POOL:
+            dwFunc = FUNC_CPatrolRoutePool_GetNoOfUsedSpaces;
+            dwThis = CLASS_CPatrolRoutePool;
+            break;
+        case POINT_ROUTE_POOL:
+            dwFunc = FUNC_CPointRoutePool_GetNoOfUsedSpaces;
+            dwThis = CLASS_CPointRoutePool;
+            break;
+        case POINTER_DOUBLE_LINK_POOL:
+            dwFunc = FUNC_CPtrNodeDoubleLinkPool_GetNoOfUsedSpaces;
+            dwThis = CLASS_CPtrNodeDoubleLinkPool;
+            break;
+        case POINTER_SINGLE_LINK_POOL:
+            dwFunc = FUNC_CPtrNodeSingleLinkPool_GetNoOfUsedSpaces;
+            dwThis = CLASS_CPtrNodeSingleLinkPool;
+            break;
+        default:
+            return -1;
     }
 
     int iOut = -2;
@@ -1384,7 +1384,7 @@ CPointerNodeSingleLinkPool* CPoolsSA::GetPointerNodeSingleLinkPool(void)
 
 void CPoolsSA::InvalidateLocalPlayerClientEntity()
 {
-    m_pedPool.arrayOfClientEntities[0] = { m_pedPool.arrayOfClientEntities[0].pEntity, nullptr };
+    m_pedPool.arrayOfClientEntities[0] = {m_pedPool.arrayOfClientEntities[0].pEntity, nullptr};
 }
 
 int CPointerNodeSingleLinkPoolSA::GetNumberOfUsedSpaces(void)

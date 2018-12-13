@@ -5069,7 +5069,7 @@ bool CClientPed::IsGettingJacked(void)
 
 CClientEntity* CClientPed::GetContactEntity(void)
 {
-    CPools*  pPools = g_pGame->GetPools();
+    CPools*        pPools = g_pGame->GetPools();
     CClientEntity* pReturn = nullptr;
 
     if (pPools && m_pPlayerPed)
@@ -5082,29 +5082,29 @@ CClientEntity* CClientPed::GetContactEntity(void)
     }
     return pReturn;
 
-   /* CPools* pPools = g_pGame->GetPools();
-    CClientEntity* pReturn = NULL;
-    if (m_pPlayerPed)
-    {
-        CEntity* pEntity = m_pPlayerPed->GetContactEntity();
-        if (pEntity)
-        {
-            switch (pEntity->GetEntityType())
-            {
-                case ENTITY_TYPE_VEHICLE:
-                {
-                    pReturn = m_pManager->GetVehicleManager()->Get(reinterpret_cast<CVehicle*>(pEntity), false);
-                    break;
-                }
-                case ENTITY_TYPE_OBJECT:
-                    pReturn = m_pManager->GetObjectManager()->Get(reinterpret_cast<CObject*>(pEntity), false);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-    return pReturn;*/
+    /* CPools* pPools = g_pGame->GetPools();
+     CClientEntity* pReturn = NULL;
+     if (m_pPlayerPed)
+     {
+         CEntity* pEntity = m_pPlayerPed->GetContactEntity();
+         if (pEntity)
+         {
+             switch (pEntity->GetEntityType())
+             {
+                 case ENTITY_TYPE_VEHICLE:
+                 {
+                     pReturn = m_pManager->GetVehicleManager()->Get(reinterpret_cast<CVehicle*>(pEntity), false);
+                     break;
+                 }
+                 case ENTITY_TYPE_OBJECT:
+                     pReturn = m_pManager->GetObjectManager()->Get(reinterpret_cast<CObject*>(pEntity), false);
+                     break;
+                 default:
+                     break;
+             }
+         }
+     }
+     return pReturn;*/
 }
 
 bool CClientPed::HasAkimboPointingUpwards(void)

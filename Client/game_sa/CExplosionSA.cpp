@@ -48,7 +48,8 @@ CEntity* CExplosionSA::GetExplosionCreator(void)
             SClientEntity<CPedSA>* pPedClientEntity = pools->GetPed((DWORD*)entity->m_pInterface);
             if (pPedClientEntity)
             {
-                return pPedClientEntity->pEntity;;
+                return pPedClientEntity->pEntity;
+                ;
             }
             break;
         }

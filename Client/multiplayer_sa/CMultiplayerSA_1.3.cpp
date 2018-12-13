@@ -293,7 +293,7 @@ void GetVehicleSirenType()
     {
         // Grab the CVehicle
         SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
-        CVehicle* pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
+        CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
         // Valid ? I see a pattern here!
         if (pVehicle)
         {
@@ -399,7 +399,7 @@ bool ProcessVehicleSirenPosition()
     {
         // Grab our vehicle from the interface
         SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
-        CVehicle* pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
+        CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
         // Valid - Wait this seems familiar
         if (pVehicle)
         {
@@ -774,7 +774,7 @@ bool TestVehicleForSiren()
     {
         // Grab our vehicle
         SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
-        CVehicle* pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
+        CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
         // Is it valid and it doesn't have a siren by default
         if (pVehicle)
         {
@@ -824,7 +824,7 @@ bool SirenCheckCameraPosition()
     // if ( DoesVehicleHaveSiren ( ) == false )
     {
         SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
-        CVehicle* pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
+        CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
         // Do we have sirens given by us and is the 360 flag set?
         if (pVehicle->DoesVehicleHaveSirens() && pVehicle->IsSiren360EffectEnabled())
         {
@@ -873,7 +873,7 @@ bool DisableVehicleSiren()
     if (pVehicleWithTheSiren && pVehicleWithTheSiren->vtbl != NULL)
     {
         SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
-        CVehicle* pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
+        CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
         if (pVehicle && (pVehicle->IsSirenSilentEffectEnabled() || pVehicle->GetModelIndex() == 420 || pVehicle->GetModelIndex() == 438))
         {
             return true;
@@ -1324,7 +1324,7 @@ CObjectSAInterface* pCurrentObject;
 bool                CObject_GetScale()
 {
     SClientEntity<CObjectSA>* pObjectClientEntity = pGameInterface->GetPools()->GetObjectA((DWORD*)pCurrentObject);
-    CObject* pObject = pObjectClientEntity ? pObjectClientEntity->pEntity : nullptr;
+    CObject*                  pObject = pObjectClientEntity ? pObjectClientEntity->pEntity : nullptr;
     if (pObject)
     {
         vecObjectScale = *pObject->GetScale();
@@ -1370,7 +1370,7 @@ CPedSAInterface* pFallingPedInterface;
 bool             CWorld_Remove_FallenPedsCheck()
 {
     SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)pFallingPedInterface);
-    CPed* pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
+    CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
     if (pPed && pPed->GetVehicle() != NULL)
     {
         // Disallow
@@ -1416,7 +1416,7 @@ CVehicleSAInterface* pFallingVehicleInterface;
 bool                 CWorld_Remove_FallenVehiclesCheck()
 {
     SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pFallingVehicleInterface);
-    CVehicle* pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (pVehicle && m_pVehicleFellThroughMapHandler(pFallingVehicleInterface))
     {
         // Disallow
@@ -1586,7 +1586,7 @@ CPedSAInterface* pTyreSmokePed = NULL;
 bool IsPlayerPedLocal()
 {
     SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)pTyreSmokePed);
-    CPed* pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
+    CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
     if (pPed)
     {
         CPed* pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);

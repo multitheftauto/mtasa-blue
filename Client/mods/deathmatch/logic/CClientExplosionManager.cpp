@@ -43,7 +43,7 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
 {
     CClientPlayer* pLocalPlayer = m_pManager->GetPlayerManager()->GetLocalPlayer();
 
-    CPools* pPools = g_pGame->GetPools(); 
+    CPools* pPools = g_pGame->GetPools();
 
     // Grab the entity responsible
     CClientEntity* pResponsible = NULL;

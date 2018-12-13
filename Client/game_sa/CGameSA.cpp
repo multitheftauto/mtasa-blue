@@ -862,4 +862,3 @@ CPed* CGameSA::GetPedContext(void)
         m_pPedContext = pGame->GetPools()->GetPedFromRef((DWORD)1);
     return m_pPedContext;
 }
-

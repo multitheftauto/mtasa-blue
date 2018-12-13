@@ -883,10 +883,10 @@ void CClientVehicle::Fix(void)
             }
         }
         // is our scale changed?
-        if((*iter).second.m_bScaleChanged)
+        if ((*iter).second.m_bScaleChanged)
         {
             // Make sure it's different
-            if((*iter).second.m_vecOriginalComponentScale != (*iter).second.m_vecComponentScale)
+            if ((*iter).second.m_vecOriginalComponentScale != (*iter).second.m_vecComponentScale)
             {
                 // apply our new rotation
                 SetComponentScale(strTemp, (*iter).second.m_vecComponentScale);
@@ -1927,8 +1927,8 @@ CClientVehicle* CClientVehicle::GetPreviousTrainCarriage(void)
         CVehicle* pPreviousTrainCarriage = m_pVehicle->GetPreviousTrainCarriage();
         if (pPreviousTrainCarriage)
         {
-            CPools* pPools = g_pGame->GetPools();
-            CEntitySAInterface * pInterface = pPreviousTrainCarriage->GetInterface();
+            CPools*                    pPools = g_pGame->GetPools();
+            CEntitySAInterface*        pInterface = pPreviousTrainCarriage->GetInterface();
             SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pInterface);
             if (pVehicleClientEntity)
             {
@@ -1949,8 +1949,8 @@ CClientVehicle* CClientVehicle::GetNextTrainCarriage(void)
         CVehicle* pNextTrainCarriage = m_pVehicle->GetNextTrainCarriage();
         if (pNextTrainCarriage)
         {
-            CPools* pPools = g_pGame->GetPools();
-            CEntitySAInterface * pInterface = pNextTrainCarriage->GetInterface();
+            CPools*                    pPools = g_pGame->GetPools();
+            CEntitySAInterface*        pInterface = pNextTrainCarriage->GetInterface();
             SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pInterface);
             if (pVehicleClientEntity)
             {
@@ -2867,10 +2867,10 @@ void CClientVehicle::Create(void)
                 }
             }
             // is our scale changed?
-            if((*iter).second.m_bScaleChanged)
+            if ((*iter).second.m_bScaleChanged)
             {
                 // Make sure it's different
-                if((*iter).second.m_vecOriginalComponentScale != (*iter).second.m_vecComponentScale)
+                if ((*iter).second.m_vecOriginalComponentScale != (*iter).second.m_vecComponentScale)
                 {
                     // apple our new scale
                     SetComponentScale(strTemp, (*iter).second.m_vecComponentScale);
@@ -3050,11 +3050,11 @@ CClientVehicle* CClientVehicle::GetTowedVehicle(void)
         CVehicle* pGameVehicle = m_pVehicle->GetTowedVehicle();
         if (pGameVehicle)
         {
-            CPools* pPools = g_pGame->GetPools();
+            CPools*                    pPools = g_pGame->GetPools();
             SClientEntity<CVehicleSA>* pVehicleEntity = pPools->GetVehicle((DWORD*)pGameVehicle->GetInterface());
             if (pVehicleEntity)
             {
-                return reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity); 
+                return reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity);
             }
         }
     }
@@ -3069,11 +3069,11 @@ CClientVehicle* CClientVehicle::GetRealTowedVehicle(void)
         CVehicle* pGameVehicle = m_pVehicle->GetTowedVehicle();
         if (pGameVehicle)
         {
-            CPools* pPools = g_pGame->GetPools();
+            CPools*                    pPools = g_pGame->GetPools();
             SClientEntity<CVehicleSA>* pVehicleEntity = pPools->GetVehicle((DWORD*)pGameVehicle->GetInterface());
             if (pVehicleEntity)
             {
-                return reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity); 
+                return reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity);
             }
         }
 
@@ -4547,10 +4547,10 @@ bool CClientVehicle::SetComponentScale(const SString& vehicleComponent, CVector 
     // Ensure scale is parent relative
     ConvertComponentScaleBase(vehicleComponent, vecScale, inputBase, EComponentBase::PARENT);
 
-    if(m_pVehicle)
+    if (m_pVehicle)
     {
         // set our rotation on the model
-        if(m_pVehicle->SetComponentScale(vehicleComponent, vecScale))
+        if (m_pVehicle->SetComponentScale(vehicleComponent, vecScale))
         {
             // update our cache
             m_ComponentData[vehicleComponent].m_vecComponentScale = vecScale;
@@ -4561,7 +4561,7 @@ bool CClientVehicle::SetComponentScale(const SString& vehicleComponent, CVector 
     }
     else
     {
-        if(m_ComponentData.find(vehicleComponent) != m_ComponentData.end())
+        if (m_ComponentData.find(vehicleComponent) != m_ComponentData.end())
         {
             // update our cache
             m_ComponentData[vehicleComponent].m_vecComponentScale = vecScale;
@@ -4572,9 +4572,9 @@ bool CClientVehicle::SetComponentScale(const SString& vehicleComponent, CVector 
     return false;
 }
 
-bool CClientVehicle::GetComponentScale(const SString& vehicleComponent, CVector& vecScale , EComponentBaseType outputBase)
+bool CClientVehicle::GetComponentScale(const SString& vehicleComponent, CVector& vecScale, EComponentBaseType outputBase)
 {
-    if(m_pVehicle)
+    if (m_pVehicle)
     {
         // fill our scale from the actual rotation
         bool bResult = m_pVehicle->GetComponentScale(vehicleComponent, vecScale);
@@ -4586,7 +4586,7 @@ bool CClientVehicle::GetComponentScale(const SString& vehicleComponent, CVector&
     }
     else
     {
-        if(m_ComponentData.find(vehicleComponent) != m_ComponentData.end())
+        if (m_ComponentData.find(vehicleComponent) != m_ComponentData.end())
         {
             // fill our rotation from the cached rotation
             vecScale = m_ComponentData[vehicleComponent].m_vecComponentScale;
@@ -4602,7 +4602,7 @@ bool CClientVehicle::GetComponentScale(const SString& vehicleComponent, CVector&
 bool CClientVehicle::ResetComponentScale(const SString& vehicleComponent)
 {
     // set our rotation on the model
-    if(SetComponentScale(vehicleComponent, m_ComponentData[vehicleComponent].m_vecOriginalComponentScale))
+    if (SetComponentScale(vehicleComponent, m_ComponentData[vehicleComponent].m_vecOriginalComponentScale))
     {
         // update our cache
         m_ComponentData[vehicleComponent].m_bScaleChanged = false;
@@ -4692,10 +4692,9 @@ void CClientVehicle::ConvertComponentPositionBase(const SString& vehicleComponen
     }
 }
 
-void CClientVehicle::ConvertComponentScaleBase(const SString& vehicleComponent, CVector& vecScale, EComponentBaseType inputBase,
-    EComponentBaseType outputBase)
+void CClientVehicle::ConvertComponentScaleBase(const SString& vehicleComponent, CVector& vecScale, EComponentBaseType inputBase, EComponentBaseType outputBase)
 {
-    if(inputBase != outputBase)
+    if (inputBase != outputBase)
     {
         CMatrix matTemp(CVector(), CVector(), vecScale);
         ConvertComponentMatrixBase(vehicleComponent, matTemp, inputBase, outputBase);

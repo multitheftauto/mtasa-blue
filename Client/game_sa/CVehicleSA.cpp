@@ -1197,7 +1197,7 @@ CPed* CVehicleSA::GetPassenger(unsigned char ucSlot)
         if (pPassenger)
         {
             SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)pPassenger);
-            if(pPedClientEntity)
+            if (pPedClientEntity)
             {
                 return pPedClientEntity->pEntity;
             }
@@ -2443,7 +2443,7 @@ bool CVehicleSA::GetComponentPosition(const SString& vehicleComponent, CVector& 
 bool CVehicleSA::SetComponentScale(const SString& vehicleComponent, const CVector& vecScale)
 {
     SVehicleFrame* pComponent = GetVehicleComponent(vehicleComponent);
-    if(pComponent && pComponent->pFrame != NULL)
+    if (pComponent && pComponent->pFrame != NULL)
     {
         RwMatrixSetScale(pComponent->pFrame->modelling, vecScale);
         return true;
@@ -2454,7 +2454,7 @@ bool CVehicleSA::SetComponentScale(const SString& vehicleComponent, const CVecto
 bool CVehicleSA::GetComponentScale(const SString& vehicleComponent, CVector& vecScaleModelling)
 {
     SVehicleFrame* pComponent = GetVehicleComponent(vehicleComponent);
-    if(pComponent && pComponent->pFrame != NULL)
+    if (pComponent && pComponent->pFrame != NULL)
     {
         RwMatrixGetScale(pComponent->pFrame->modelling, vecScaleModelling);
         return true;

@@ -139,7 +139,7 @@ void CClientProjectileManager::Hook_ProjectileCreation(CEntity* pGameCreator, CP
     WEAPONTYPE_REMOTE_SATCHEL_CHARGE, WEAPONTYPE_ROCKET, WEAPONTYPE_ROCKET_HS,
     WEAPONTYPE_FLARE, WEAPONTYPE_FREEFALL_BOMB */
 
-    CPools* pPools = g_pGame->GetPools(); 
+    CPools*        pPools = g_pGame->GetPools();
     CClientEntity* pTarget = pGameTarget ? pPools->GetClientEntity((DWORD*)pGameTarget->GetInterface()) : nullptr;
     m_pLastCreated = new CClientProjectile(m_pManager, pGameProjectile, pProjectileInfo, m_pCreator, pTarget, weaponType, origin, target, fForce, m_bIsLocal);
 }
