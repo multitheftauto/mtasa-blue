@@ -441,7 +441,7 @@ void CFoo::Test(const char* szString)
         fclose(pFile);
     }
 
-    else if (strnicmp(szString, "veh", 3) == 0)
+    /*else if (strnicmp(szString, "veh", 3) == 0)
     {
         int   i = 600;
         FILE* p = fopen("C:/dump.txt", "w+");
@@ -468,7 +468,7 @@ void CFoo::Test(const char* szString)
         }
 
         fclose(p);
-    }
+    }*/
 
     else if (strnicmp(szString, "groups", 6) == 0)
     {
