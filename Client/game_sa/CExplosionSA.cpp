@@ -45,22 +45,21 @@ CEntity* CExplosionSA::GetExplosionCreator(void)
     {
         case ENTITY_TYPE_PED:
         {
-            SClientEntity<CPedSA>* pPedClientEntity = pools->GetPed((DWORD*)entity->m_pInterface);
+            SClientEntity<CPedSA>* pPedClientEntity = pools->GetPed((DWORD*)this->GetInterface()->m_pEntExplosionOwner);
             if (pPedClientEntity)
             {
                 return pPedClientEntity->pEntity;
-                ;
             }
             break;
         }
         case ENTITY_TYPE_VEHICLE:
         {
-            SClientEntity<CVehicleSA>* pVehicleClientEntity = pools->GetVehicle((DWORD*)entity->m_pInterface);
+            SClientEntity<CVehicleSA>* pVehicleClientEntity = pools->GetVehicle((DWORD*)this->GetInterface()->m_pEntExplosionOwner);
             if (pVehicleClientEntity)
             {
                 return pVehicleClientEntity->pEntity;
-                break;
             }
+            break;
         }
         case ENTITY_TYPE_OBJECT:
         {
