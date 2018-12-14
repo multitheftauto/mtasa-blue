@@ -195,8 +195,7 @@ SClientEntity<CVehicleSA>* CPoolsSA::GetVehicle(DWORD* pGameInterface)
 
             if (dwElementIndexInPool < MAX_VEHICLES)
             {
-                SClientEntity<CVehicleSA>* pVehicleClientEntity = &m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool];
-                return pVehicleClientEntity->pClientEntity ? pVehicleClientEntity : nullptr;
+                return &m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool];
             }
         }
     }
@@ -396,8 +395,7 @@ SClientEntity<CObjectSA>* CPoolsSA::GetObject(DWORD* pGameInterface)
 
         if (dwElementIndexInPool < MAX_OBJECTS)
         {
-            SClientEntity<CObjectSA>* pObjectClientEntity = &m_objectPool.arrayOfClientEntities[dwElementIndexInPool];
-            return pObjectClientEntity->pClientEntity ? pObjectClientEntity : nullptr;
+            return &m_objectPool.arrayOfClientEntities[dwElementIndexInPool];
         }
     }
     return nullptr;
@@ -679,8 +677,7 @@ SClientEntity<CPedSA>* CPoolsSA::GetPed(DWORD* pGameInterface)
 
         if (dwElementIndexInPool < MAX_PEDS)
         {
-            SClientEntity<CPedSA>* pPedClientEntity = &m_pedPool.arrayOfClientEntities[dwElementIndexInPool];
-            return pPedClientEntity->pClientEntity ? pPedClientEntity : nullptr;
+            return &m_pedPool.arrayOfClientEntities[dwElementIndexInPool];
         }
     }
     return nullptr;
