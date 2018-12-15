@@ -1930,7 +1930,7 @@ CClientVehicle* CClientVehicle::GetPreviousTrainCarriage(void)
             CPools*                    pPools = g_pGame->GetPools();
             CEntitySAInterface*        pInterface = pPreviousTrainCarriage->GetInterface();
             SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pInterface);
-            if (pVehicleClientEntity)
+            if (pVehicleClientEntity && pVehicleClientEntity->pClientEntity)
             {
                 return reinterpret_cast<CClientVehicle*>(pVehicleClientEntity->pClientEntity);
             }
@@ -1952,7 +1952,7 @@ CClientVehicle* CClientVehicle::GetNextTrainCarriage(void)
             CPools*                    pPools = g_pGame->GetPools();
             CEntitySAInterface*        pInterface = pNextTrainCarriage->GetInterface();
             SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pInterface);
-            if (pVehicleClientEntity)
+            if (pVehicleClientEntity && pVehicleClientEntity->pClientEntity)
             {
                 return reinterpret_cast<CClientVehicle*>(pVehicleClientEntity->pClientEntity);
             }
@@ -3052,7 +3052,7 @@ CClientVehicle* CClientVehicle::GetTowedVehicle(void)
         {
             CPools*                    pPools = g_pGame->GetPools();
             SClientEntity<CVehicleSA>* pVehicleEntity = pPools->GetVehicle((DWORD*)pGameVehicle->GetInterface());
-            if (pVehicleEntity)
+            if (pVehicleEntity && pVehicleEntity->pClientEntity)
             {
                 return reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity);
             }
@@ -3071,7 +3071,7 @@ CClientVehicle* CClientVehicle::GetRealTowedVehicle(void)
         {
             CPools*                    pPools = g_pGame->GetPools();
             SClientEntity<CVehicleSA>* pVehicleEntity = pPools->GetVehicle((DWORD*)pGameVehicle->GetInterface());
-            if (pVehicleEntity)
+            if (pVehicleEntity && pVehicleEntity->pClientEntity)
             {
                 return reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity);
             }

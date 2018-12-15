@@ -4561,10 +4561,14 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicl
     {
         CPools*                    pPools = g_pGame->GetPools();
         SClientEntity<CVehicleSA>* pColliderEntity = pPools->GetVehicle((DWORD*)pCollidingVehicle);
-        ;
         if (pColliderEntity)
         {
-            CClientEntity*  pVehicleClientEntity = pColliderEntity->pClientEntity;
+            CClientEntity* pVehicleClientEntity = pColliderEntity->pClientEntity;
+            if (!pVehicleClientEntity)
+            {
+                return false;
+            }
+
             CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(pVehicleClientEntity);
             CClientEntity*  pCollidedWithClientEntity = pPools->GetClientEntity((DWORD*)pCollidedWith);
 
@@ -4644,8 +4648,12 @@ bool CClientGame::HeliKillHandler(CVehicleSAInterface* pHeliInterface, CEntitySA
         SClientEntity<CVehicleSA>* pVehicleEntity = pPools->GetVehicle((DWORD*)pHeliInterface);
         if (pVehicleEntity)
         {
-            CVehicle*       pHeli = reinterpret_cast<CVehicle*>(pVehicleEntity->pEntity);
             CClientVehicle* pClientHeli = reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity);
+            if (!pClientHeli)
+            {
+                return true;
+            }
+
             if (!pClientHeli->AreHeliBladeCollisionsEnabled())
             {
                 return false;
@@ -4654,8 +4662,11 @@ bool CClientGame::HeliKillHandler(CVehicleSAInterface* pHeliInterface, CEntitySA
             SClientEntity<CPedSA>* pPedEntity = pPools->GetPed((DWORD*)pHitInterface);
             if (pPedEntity)
             {
-                CPed*       pPed = reinterpret_cast<CPed*>(pPedEntity->pEntity);
                 CClientPed* pClientPed = reinterpret_cast<CClientPed*>(pPedEntity->pClientEntity);
+                if (!pClientPed)
+                {
+                    return false;
+                }
 
                 // Iterate our "stored" cancel state and find the heli in question
                 std::pair<std::multimap<CClientVehicle*, CClientPed*>::iterator, std::multimap<CClientVehicle*, CClientPed*>::iterator> iterators =
@@ -4714,7 +4725,12 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
     if (pVehicleEntity)
     {
         CClientVehicle* pClientVehicle = reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity);
-        CClientEntity*  pClientAttacker = pPools->GetClientEntity((DWORD*)pAttackerInterface);
+        if (!pClientVehicle)
+        {
+            return bAllowDamage;
+        }
+
+        CClientEntity* pClientAttacker = pPools->GetClientEntity((DWORD*)pAttackerInterface);
 
         // Compose arguments
         // attacker, weapon, loss, damagepos, tyreIdx
@@ -4754,6 +4770,10 @@ bool CClientGame::ObjectDamageHandler(CObjectSAInterface* pObjectInterface, floa
         if (pObjectEntity)
         {
             CClientObject* pClientObject = reinterpret_cast<CClientObject*>(pObjectEntity->pClientEntity);
+            if (!pClientObject)
+            {
+                return true;
+            }
             CLuaArguments  Arguments;
             Arguments.PushNumber(fLoss);
 
@@ -4778,6 +4798,11 @@ bool CClientGame::ObjectBreakHandler(CObjectSAInterface* pObjectInterface, CEnti
         if (pObjectEntity)
         {
             CClientObject* pClientObject = reinterpret_cast<CClientObject*>(pObjectEntity->pClientEntity);
+            if (!pClientObject)
+            {
+                return true;
+            }
+
             if (!pClientObject->IsBreakable(false))
                 return false;
 
@@ -4808,13 +4833,21 @@ bool CClientGame::WaterCannonHitHandler(CVehicleSAInterface* pCannonVehicle, CPe
         {
             CLuaArguments Arguments;
 
-            CClientVehicle*        pCannonClientVehicle = reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity);
+            CClientVehicle* pCannonClientVehicle = reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity);
+            if (!pCannonClientVehicle)
+            {
+                return false;
+            }
+
             CClientPed*            pClientPed = nullptr;
             SClientEntity<CPedSA>* pPedEntity = pPools->GetPed((DWORD*)pHitPed);
             if (pPedEntity)
             {
                 pClientPed = reinterpret_cast<CClientPed*>(pPedEntity->pClientEntity);
-                Arguments.PushElement(pClientPed);
+                if (pClientPed)
+                {
+                    Arguments.PushElement(pClientPed);
+                }
             }
             else
             {
@@ -4823,7 +4856,7 @@ bool CClientGame::WaterCannonHitHandler(CVehicleSAInterface* pCannonVehicle, CPe
 
             // Trigger our event
             bool bContinue = true;
-            if (!IS_PLAYER(pClientPed))
+            if (pClientPed && !IS_PLAYER(pClientPed))
                 bContinue = pCannonClientVehicle->CallEvent("onClientPedHitByWaterCannon", Arguments, true);
             else
                 bContinue = pCannonClientVehicle->CallEvent("onClientPlayerHitByWaterCannon", Arguments, true);
@@ -4844,8 +4877,11 @@ bool CClientGame::VehicleFellThroughMapHandler(CVehicleSAInterface* pVehicleInte
         if (pVehicleEntity)
         {
             CClientVehicle* pClientVehicle = reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity);
-            // handle or don't
-            return pClientVehicle->OnVehicleFallThroughMap();
+            if (pClientVehicle)
+            {
+                // handle or don't
+                return pClientVehicle->OnVehicleFallThroughMap();
+            }
         }
     }
     // unhandled
@@ -5309,6 +5345,10 @@ void CClientGame::BulletImpact(CPed* pInitiator, CEntity* pVictim, const CVector
         {
             // Find the client ped that initiated the bullet impact
             CClientPed* pInitiatorPed = reinterpret_cast<CClientPed*>(pPedEntity->pClientEntity);
+            if (!pInitiatorPed)
+            {
+                return;
+            }
 
             // Calculate the collision of the bullet
             CVector    vecCollision;

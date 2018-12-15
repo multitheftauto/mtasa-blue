@@ -825,11 +825,14 @@ bool SirenCheckCameraPosition()
     {
         SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
         CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
-        // Do we have sirens given by us and is the 360 flag set?
-        if (pVehicle->DoesVehicleHaveSirens() && pVehicle->IsSiren360EffectEnabled())
+        if (pVehicle)
         {
-            // Do 360 code
-            return true;
+            // Do we have sirens given by us and is the 360 flag set?
+            if (pVehicle->DoesVehicleHaveSirens() && pVehicle->IsSiren360EffectEnabled())
+            {
+                // Do 360 code
+                return true;
+            }
         }
     }
     // Only visible from the front

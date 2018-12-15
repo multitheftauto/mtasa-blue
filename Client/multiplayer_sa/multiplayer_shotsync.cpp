@@ -1160,7 +1160,7 @@ void OnMy_CWeapon_FireInstantHit_Mid(CEntitySAInterface* pEntity, CVector* pvecN
 {
     SClientEntity<CPedSA>* pPedClientEntity = m_pools->GetPed((DWORD*)pEntity);
     CPed*                  pTargetingPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
-    if (IsLocalPlayer(pTargetingPed))
+    if (pTargetingPed && IsLocalPlayer(pTargetingPed))
     {
         CVector vecEnd = *pvecEnd;
         CVector vecStart = *pvecAimedStart;
@@ -1246,7 +1246,7 @@ void OnMy_CWeapon_FireSniper_Mid(CEntitySAInterface* pEntity, CVector* pvecEndHi
 {
     SClientEntity<CPedSA>* pPedClientEntity = m_pools->GetPed((DWORD*)pEntity);
     CPed*                  pTargetingPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
-    if (IsLocalPlayer(pTargetingPed))
+    if (pTargetingPed && IsLocalPlayer(pTargetingPed))
     {
         CVector vecEnd = *pvecEndMaxRange;
         CVector vecStart = *pvecStart;

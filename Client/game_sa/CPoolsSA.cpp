@@ -183,8 +183,6 @@ SClientEntity<CVehicleSA>* CPoolsSA::GetVehicle(DWORD* pGameInterface)
 {
     DEBUG_TRACE("SClientEntity<CVehicleSA>* CPoolsSA::GetVehicle ( DWORD* pGameInterface )");
 
-    assert(pGameInterface);
-
     if (m_bGetVehicleEnabled)
     {
         CVehicleSAInterface* pInterface = reinterpret_cast<CVehicleSAInterface*>(pGameInterface);
