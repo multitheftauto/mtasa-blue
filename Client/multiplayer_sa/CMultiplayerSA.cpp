@@ -5292,19 +5292,22 @@ bool             CPed_GetWeaponSkill()
                 if (playerPed)
                 {
                     CRemoteDataStorageSA* data = CRemoteDataSA::GetRemoteDataStorage(playerPed);
-                    float                 stat = data->m_stats.StatTypesFloat[pGameInterface->GetStats()->GetSkillStatIndex(weaponSkillWeapon)];
+                    if (data)
+                    {
+                        float stat = data->m_stats.StatTypesFloat[pGameInterface->GetStats()->GetSkillStatIndex(weaponSkillWeapon)];
 
-                    CWeaponInfo* pPoor = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_POOR);
-                    CWeaponInfo* pStd = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_STD);
-                    CWeaponInfo* pPro = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_PRO);
+                        CWeaponInfo* pPoor = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_POOR);
+                        CWeaponInfo* pStd = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_STD);
+                        CWeaponInfo* pPro = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_PRO);
 
-                    if (stat >= pPro->GetRequiredStatLevel())
-                        weaponSkill = WEAPONSKILL_PRO;
-                    else if (stat >= pStd->GetRequiredStatLevel())
-                        weaponSkill = WEAPONSKILL_STD;
-                    else
-                        weaponSkill = WEAPONSKILL_POOR;
-                    return true;
+                        if (stat >= pPro->GetRequiredStatLevel())
+                            weaponSkill = WEAPONSKILL_PRO;
+                        else if (stat >= pStd->GetRequiredStatLevel())
+                            weaponSkill = WEAPONSKILL_STD;
+                        else
+                            weaponSkill = WEAPONSKILL_POOR;
+                        return true;
+                    }
                 }
             }
         }

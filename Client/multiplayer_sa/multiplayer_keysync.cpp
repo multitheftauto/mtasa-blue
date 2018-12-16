@@ -253,12 +253,9 @@ VOID ReturnContextToLocalPlayer()
 
 void SwitchContext(CPed* thePed)
 {
-    if (thePed == NULL)
-        return;
-
     pContextSwitchedPed = thePed;
     // Are we not already in another context?
-    if (!bNotInLocalContext)
+    if (thePed && !bNotInLocalContext)
     {
         // Grab the local ped and the local pad
         CPed*            pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);            // the player
@@ -435,10 +432,7 @@ void SwitchContext(CPedSAInterface* ped)
 {
     SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)ped);
     CPed*                  thePed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
-    if (thePed)
-    {
-        SwitchContext(thePed);
-    }
+    SwitchContext(thePed);
 }
 
 void SwitchContext(CVehicle* pVehicle)
