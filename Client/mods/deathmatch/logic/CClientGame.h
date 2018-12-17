@@ -49,7 +49,6 @@
 #define MIN_PUSH_ANTISPAM_RATE 1500
 #define INVALID_DOWNLOAD_PRIORITY_GROUP (INT_MIN)
 
-class CGameEntityXRefManager;
 class CClientModelCacheManager;
 class CDebugHookManager;
 class CResourceFileDownloadManager;
@@ -292,7 +291,6 @@ public:
     CObjectSync* GetObjectSync(void) { return m_pObjectSync; }
 #endif
     CLatentTransferManager*   GetLatentTransferManager(void) { return m_pLatentTransferManager; }
-    CGameEntityXRefManager*   GetGameEntityXRefManager(void) { return m_pGameEntityXRefManager; }
     CClientModelCacheManager* GetModelCacheManager(void) { return m_pModelCacheManager; }
     CDebugHookManager*        GetDebugHookManager(void) { return m_pDebugHookManager; }
 
@@ -527,7 +525,7 @@ private:
     static void StaticTaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     static void StaticFxSystemDestructionHandler(void* pFxSAInterface);
     static void StaticPedStepHandler(CPedSAInterface* pPed, bool bFoot);
-    static void StaticWaterCannonHitWorldHandler(SWaterCannonHitEvent& event);
+    static void StaticVehicleWeaponHitHandler(SVehicleWeaponHitEvent& event);
 
     static AnimationId StaticDrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
 
@@ -575,6 +573,7 @@ private:
     static void PostWeaponFire(void);
     static void BulletImpact(CPed* pInitiator, CEntity* pVictim, const CVector* pStartPosition, const CVector* pEndPosition);
     static void BulletFire(CPed* pInitiator, const CVector* pStartPosition, const CVector* pEndPosition);
+
 public:
     static bool StaticProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream);
 
@@ -618,7 +617,7 @@ public:
     void RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation);
 
     void PedStepHandler(CPedSAInterface* pPed, bool bFoot);
-    void WaterCannonHitWorldHandler(SWaterCannonHitEvent& event);
+    void VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event);
 
 private:
     eStatus       m_Status;
@@ -675,7 +674,6 @@ private:
     bool                          m_bInitiallyFadedOut;
     bool                          m_bHudAreaNameDisabled;
     CSingularFileDownloadManager* m_pSingularFileDownloadManager;
-    CGameEntityXRefManager*       m_pGameEntityXRefManager;
     CClientModelCacheManager*     m_pModelCacheManager;
     CDebugHookManager*            m_pDebugHookManager;
     CRemoteCalls*                 m_pRemoteCalls;

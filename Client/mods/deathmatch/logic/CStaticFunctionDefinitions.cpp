@@ -1541,8 +1541,8 @@ CClientEntity* CStaticFunctionDefinitions::GetPedTarget(CClientPed& Ped)
     CClientEntity* pCollisionEntity = NULL;
     if (pCollisionGameEntity)
     {
-        pCollisionEntity = m_pManager->FindEntity(pCollisionGameEntity);
-
+        CPools* pPools = g_pGame->GetPools();
+        pCollisionEntity = pPools->GetClientEntity((DWORD*)pCollisionGameEntity->GetInterface());
         return pCollisionEntity;
     }
 
@@ -5431,7 +5431,7 @@ int CStaticFunctionDefinitions::GUIComboBoxGetItemCount(CClientEntity& Entity)
             return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetItemCount();
         }
     }
-    
+
     return 0;
 }
 
@@ -5458,7 +5458,7 @@ bool CStaticFunctionDefinitions::GUIComboBoxSetOpen(CClientEntity& Entity, bool 
             return true;
         }
     }
-    
+
     return false;
 }
 
@@ -5468,14 +5468,14 @@ bool CStaticFunctionDefinitions::GUIComboBoxIsOpen(CClientEntity& Entity)
     if (IS_GUI(&Entity))
     {
         CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-        
+
         // Are we a combobox?
         if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
         {
             return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->IsOpen();
         }
     }
-    
+
     return false;
 }
 
@@ -6148,8 +6148,8 @@ bool CStaticFunctionDefinitions::ProcessLineOfSight(const CVector& vecStart, con
     if (pIgnoredEntity)
         g_pGame->GetWorld()->IgnoreEntity(NULL);
 
-    *pColEntity = m_pManager->FindEntity(pColGameEntity);
-
+    CPools* pPools = g_pGame->GetPools();
+    *pColEntity = pColGameEntity ? pPools->GetClientEntity((DWORD*)pColGameEntity->GetInterface()) : nullptr;
     return true;
 }
 

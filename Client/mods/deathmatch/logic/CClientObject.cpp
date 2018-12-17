@@ -496,7 +496,7 @@ void CClientObject::Create(void)
             g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest(!CClientObjectManager::IsBreakableModel(m_usModel));
 
             // Create the object
-            m_pObject = g_pGame->GetPools()->AddObject(m_usModel, m_bIsLowLod, m_bBreakingDisabled);
+            m_pObject = g_pGame->GetPools()->AddObject(this, m_usModel, m_bIsLowLod, m_bBreakingDisabled);
 
             // Restore default behaviour
             g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest(false);
@@ -505,9 +505,6 @@ void CClientObject::Create(void)
             {
                 // Put our pointer in its stored pointer
                 m_pObject->SetStoredPointer(this);
-
-                // Add XRef
-                g_pClientGame->GetGameEntityXRefManager()->AddEntityXRef(this, m_pObject);
 
                 // Apply our data to the object
                 m_pObject->Teleport(m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ);
@@ -540,7 +537,7 @@ void CClientObject::Create(void)
                     m_pObject->SetBuoyancyConstant(m_fBuoyancyConstant);
                 if (m_vecCenterOfMass.fX != 0.0f || m_vecCenterOfMass.fY != 0.0f || m_vecCenterOfMass.fZ != 0.0f)
                     m_pObject->SetCenterOfMass(m_vecCenterOfMass);
-                
+
                 // Reattach to an entity + any entities attached to this
                 ReattachEntities();
 
@@ -572,9 +569,6 @@ void CClientObject::Destroy(void)
     {
         // Invalidate
         m_pManager->InvalidateEntity(this);
-
-        // Remove XRef
-        g_pClientGame->GetGameEntityXRefManager()->RemoveEntityXRef(this, m_pObject);
 
         // Destroy the object
         g_pGame->GetPools()->RemoveObject(m_pObject);

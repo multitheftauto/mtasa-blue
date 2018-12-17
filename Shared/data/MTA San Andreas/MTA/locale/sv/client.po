@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-10 02:54+0100\n"
-"PO-Revision-Date: 2018-09-02 02:28+0000\n"
+"PO-Revision-Date: 2018-11-19 12:53+0000\n"
 "Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: sv\n"
@@ -15,38 +15,40 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Translators: Cheeze; Vovven; SWEMike; Magnus Burton\n"
+"Translators: Cheeze; Vovven; Napoleon  Hill; SWEMike; Magnus Burton\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1535855308.0\n"
+"X-POOTLE-MTIME: 1542631999.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
-msgstr ""
+msgstr "Webbplatsbegäran"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:27
 msgid ""
 "The server requests the following websites in order to load them (later):"
 msgstr ""
+"Servern gör förfrågningar till följande webbplatser för att ladda ner dem "
+"senare:"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:32
 msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr ""
+msgstr "INTE INNEHÅLLER KONFIDENTIELLA DATA, FÖR ATT SKYDDA DEM FRÅN KRAZH"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:44
 msgid "Remember decision"
-msgstr ""
+msgstr "Kom ihåg beslut"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:49 ..\Client\core\CSettings.cpp:907
 msgid "Allow"
-msgstr ""
+msgstr "Tillåta"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:55
 msgid "Deny"
-msgstr ""
+msgstr "Förneka"
 
 #: ..\Client\core\CCommandFuncs.cpp:31
 msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ KOMMANDO HJÄLP ]***\n"
+msgstr "***[ KOMMANDOHJÄLP ]***\n"
 
 #: ..\Client\core\CCommandFuncs.cpp:182
 #, c-format, c-format
@@ -73,11 +75,11 @@ msgstr "anslut: kunde inte ansluta till %s:%u!"
 
 #: ..\Client\core\CCommandFuncs.cpp:305
 msgid "connect: Failed to unload current mod"
-msgstr "anslut: Misslyckades att deaktivera aktuell modifikation"
+msgstr "anslut: Misslyckade att deaktivera aktuellt mod"
 
 #: ..\Client\core\CCommandFuncs.cpp:395
 msgid "Bound all controls from GTA"
-msgstr "Alla kontroller från GTA har bundits"
+msgstr "Bind alla tangenter från GTA"
 
 #: ..\Client\core\CCommandFuncs.cpp:409
 msgid "Saved configuration file"
@@ -92,7 +94,7 @@ msgstr "* Ditt serienummer är: %s"
 #. Unknown command
 #: ..\Client\core\CCommands.cpp:209
 msgid "Unknown command or cvar: "
-msgstr "Okänt kommando eller cvar: "
+msgstr "Okänt kommando eller cvar"
 
 #: ..\Client\core\CConnectManager.cpp:79
 msgid "Connecting failed. Invalid nick provided!"
@@ -261,6 +263,8 @@ msgstr "Ja"
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr ""
+"MTA:SA kan inte fortsätta eftersom enheten %s inte har tillräckligt med "
+"utrymme."
 
 #: ..\Client\core\CCore.cpp:749 ..\Client\mods\deathmatch\logic\Utils.cpp:144
 msgid "Fatal error"
@@ -268,7 +272,7 @@ msgstr "Allvarligt fel"
 
 #: ..\Client\core\CCore.cpp:897
 msgid "TO FIX, REMOVE THIS FILE:"
-msgstr ""
+msgstr "ATT FIX, FÖLJ DENNA FIL:"
 
 #: ..\Client\core\CCore.cpp:929
 #, c-format, c-format
@@ -607,6 +611,8 @@ msgid ""
 "You are using a feature-branch build! This is a test build only which cannot"
 " be used to connect to public servers!"
 msgstr ""
+"Du använder en funktion-gren byggnad! Detta är en testbyggnad som inte kan "
+"användas för att ansluta till offentliga servrar!"
 
 #: ..\Client\core\CMainMenu.cpp:1129
 msgid ""
@@ -678,7 +684,7 @@ msgstr "Gränssnitt"
 
 #: ..\Client\core\CSettings.cpp:120
 msgid "Web Browser"
-msgstr ""
+msgstr "Webbläsare"
 
 #: ..\Client\core\CSettings.cpp:121
 msgid "Advanced"
@@ -826,7 +832,7 @@ msgstr "Genomskinlighet:"
 #. *
 #: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:418
 msgid "Master volume:"
-msgstr ""
+msgstr "Mastervolym:"
 
 #: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:437
 msgid "Radio volume:"
@@ -859,7 +865,7 @@ msgstr "Allmänt"
 
 #: ..\Client\core\CSettings.cpp:513
 msgid "Radio options"
-msgstr ""
+msgstr "Radio alternativ"
 
 #: ..\Client\core\CSettings.cpp:519
 msgid "Radio Equalizer"
@@ -867,7 +873,7 @@ msgstr "Radio Equalizer"
 
 #: ..\Client\core\CSettings.cpp:524
 msgid "Radio Auto-tune"
-msgstr "Radio Auto-station"
+msgstr "Radio Auto-låt"
 
 #: ..\Client\core\CSettings.cpp:529
 msgid "Usertrack options"
@@ -890,12 +896,10 @@ msgid "Automatic Media Scan"
 msgstr "Automatisk Media Skanning"
 
 #: ..\Client\core\CSettings.cpp:555
-#, fuzzy
 msgid "Mute options"
-msgstr "Musinställningar"
+msgstr "Stänga alternativ"
 
 #: ..\Client\core\CSettings.cpp:561
-#, fuzzy
 msgid "Mute All sounds when minimized"
 msgstr "Stäng ljudeffekter i minimerat läge"
 
@@ -924,7 +928,7 @@ msgstr "Upplösning:"
 
 #: ..\Client\core\CSettings.cpp:597 ..\Client\core\CSettings.cpp:647
 msgid "FOV:"
-msgstr ""
+msgstr "FOV:"
 
 #: ..\Client\core\CSettings.cpp:597 ..\Client\core\CSettings.cpp:663
 msgid "Draw Distance:"
@@ -1032,7 +1036,7 @@ msgstr "16:9"
 
 #: ..\Client\core\CSettings.cpp:770
 msgid "HUD Match Aspect Ratio"
-msgstr ""
+msgstr "HUD Matchbildsförhållande"
 
 #: ..\Client\core\CSettings.cpp:776
 msgid "Volumetric Shadows"
@@ -1048,15 +1052,15 @@ msgstr "Soldis"
 
 #: ..\Client\core\CSettings.cpp:788
 msgid "Tyre Smoke etc"
-msgstr ""
+msgstr "Däck rök etc"
 
 #: ..\Client\core\CSettings.cpp:792
 msgid "Render vehicles always in high detail"
-msgstr ""
+msgstr "Rendera fordon alltid i stor detalj"
 
 #: ..\Client\core\CSettings.cpp:797
 msgid "Full Screen Minimize"
-msgstr "Fullskärmsminimera"
+msgstr "Fullskärmsläge Minimerat"
 
 #: ..\Client\core\CSettings.cpp:809
 msgid "Enable Device Selection Dialog"
@@ -1064,40 +1068,40 @@ msgstr "Aktivera enhetsväljardialogen"
 
 #: ..\Client\core\CSettings.cpp:821
 msgid "Show unsafe resolutions"
-msgstr ""
+msgstr "Visa osäkra upplösningar"
 
 #: ..\Client\core\CSettings.cpp:857
 msgid "Enable remote websites"
-msgstr ""
+msgstr "Aktivera fjärrwebbplatser"
 
 #: ..\Client\core\CSettings.cpp:862
 msgid "Enable Javascript on remote websites"
-msgstr ""
+msgstr "Aktivera Javascript på externa webbplatser"
 
 #: ..\Client\core\CSettings.cpp:867
 msgid "Custom blacklist"
-msgstr ""
+msgstr "Anpassad svartlista"
 
 #: ..\Client\core\CSettings.cpp:877 ..\Client\core\CSettings.cpp:905
 msgid "Enter a domain e.g. google.com"
-msgstr ""
+msgstr "Ange en domän, t.ex. google.com"
 
 #: ..\Client\core\CSettings.cpp:879
 msgid "Block"
-msgstr ""
+msgstr "Blockera"
 
 #: ..\Client\core\CSettings.cpp:887 ..\Client\core\CSettings.cpp:915
 msgid "Domain"
-msgstr ""
+msgstr "Domän"
 
 #: ..\Client\core\CSettings.cpp:889 ..\Client\core\CSettings.cpp:917
 msgid "Remove domain"
-msgstr ""
+msgstr "Ta bort domänen"
 
 #. Reset vecTemp
 #: ..\Client\core\CSettings.cpp:895
 msgid "Custom whitelist"
-msgstr ""
+msgstr "Anpassad vitlista"
 
 #. Misc section label
 #: ..\Client\core\CSettings.cpp:930
@@ -1126,13 +1130,13 @@ msgstr "Singel anslutning:"
 #: ..\Client\core\CSettings.cpp:936 ..\Client\core\CSettings.cpp:984
 #: ..\Client\core\CSettings.cpp:4469
 msgid "Packet tag:"
-msgstr ""
+msgstr "Paketetikett:"
 
 #. Progress animation
 #: ..\Client\core\CSettings.cpp:937 ..\Client\core\CSettings.cpp:997
 #: ..\Client\core\CSettings.cpp:4471
 msgid "Progress animation:"
-msgstr ""
+msgstr "Progress animation:"
 
 #. Process priority
 #: ..\Client\core\CSettings.cpp:937 ..\Client\core\CSettings.cpp:1010
@@ -1160,7 +1164,7 @@ msgstr "Uppdatera byggtyp:"
 #. UpdateAutoInstall
 #: ..\Client\core\CSettings.cpp:938 ..\Client\core\CSettings.cpp:1128
 msgid "Install important updates:"
-msgstr ""
+msgstr "Installera viktiga uppdateringar:"
 
 #: ..\Client\core\CSettings.cpp:951 ..\Client\core\CSettings.cpp:979
 #: ..\Client\core\CSettings.cpp:992 ..\Client\core\CSettings.cpp:3005
@@ -1188,11 +1192,11 @@ msgstr "Snabb"
 
 #: ..\Client\core\CSettings.cpp:1017 ..\Client\core\CSettings.cpp:2990
 msgid "Normal"
-msgstr ""
+msgstr "Vanligt"
 
 #: ..\Client\core\CSettings.cpp:1018 ..\Client\core\CSettings.cpp:2992
 msgid "Above normal"
-msgstr ""
+msgstr "Above vanlight"
 
 #: ..\Client\core\CSettings.cpp:1054
 msgid "Min"
@@ -1205,39 +1209,38 @@ msgstr "Max"
 #. Windows 8 compatibility
 #: ..\Client\core\CSettings.cpp:1074
 msgid "Windows 8 compatibility:"
-msgstr ""
+msgstr "Windows 8-kompatibilitet:"
 
 #: ..\Client\core\CSettings.cpp:1079
 msgid "16-bit color"
-msgstr ""
+msgstr "16-bitars färg"
 
 #: ..\Client\core\CSettings.cpp:1084
 msgid "Mouse fix"
-msgstr ""
+msgstr "Mus fixa"
 
 #. Cache path info
 #: ..\Client\core\CSettings.cpp:1102
 msgid "Client resource files:"
-msgstr ""
+msgstr "Klientresursfiler:"
 
 #: ..\Client\core\CSettings.cpp:1106
 msgid "Show in Explorer"
-msgstr ""
+msgstr "Visa i Explorer"
 
 #. Auto updater section label
 #: ..\Client\core\CSettings.cpp:1121 ..\Client\core\CSettings.cpp:1124
 msgid "Auto updater"
-msgstr "Autouppdaterare"
+msgstr "Auto uppdaterare"
 
 #. Check for updates
 #: ..\Client\core\CSettings.cpp:1162
 msgid "Check for update now"
-msgstr "Sök efter uppdatering nu"
+msgstr "Kolla efter uppdatering nu"
 
 #: ..\Client\core\CSettings.cpp:1309
-#, fuzzy
 msgid "Some settings will be changed when you next start MTA"
-msgstr "Some settings kommer att ändras nästa gång du startar MTA"
+msgstr "Vissa inställningar ändras när du börjar MTA"
 
 #: ..\Client\core\CSettings.cpp:1310
 msgid ""
@@ -1255,10 +1258,9 @@ msgstr "OMSTART KRÄVS"
 
 #: ..\Client\core\CSettings.cpp:1333
 msgid "Some settings will be changed when you disconnect the current server"
-msgstr ""
+msgstr "Vissa inställningar ändras när du kopplar bort den aktuella servern"
 
 #: ..\Client\core\CSettings.cpp:1334
-#, fuzzy
 msgid ""
 "\n"
 "\n"
@@ -1270,7 +1272,7 @@ msgstr ""
 
 #: ..\Client\core\CSettings.cpp:1337
 msgid "DISCONNECT REQUIRED"
-msgstr ""
+msgstr "DISCONNECT REQUIRED"
 
 #. Update the joystick name
 #: ..\Client\core\CSettings.cpp:1645
@@ -1308,19 +1310,19 @@ msgstr "Ladda"
 
 #: ..\Client\core\CSettings.cpp:1988
 msgid "Colors"
-msgstr ""
+msgstr "Calar"
 
 #: ..\Client\core\CSettings.cpp:1989
 msgid "Layout"
-msgstr ""
+msgstr "Layout"
 
 #: ..\Client\core\CSettings.cpp:1990 ..\Client\core\CSettings.cpp:2236
 msgid "Options"
-msgstr ""
+msgstr "alternativ"
 
 #: ..\Client\core\CSettings.cpp:1996
 msgid "Chat Background"
-msgstr ""
+msgstr "Chatt bakgrund"
 
 #: ..\Client\core\CSettings.cpp:1996
 msgid "Chat Text"
@@ -1328,11 +1330,11 @@ msgstr "Chattext"
 
 #: ..\Client\core\CSettings.cpp:1996
 msgid "Input Background"
-msgstr ""
+msgstr "Inmatningsbakgrund"
 
 #: ..\Client\core\CSettings.cpp:1996
 msgid "Input Text"
-msgstr "Inmatningstext"
+msgstr "Skriv in Text"
 
 #: ..\Client\core\CSettings.cpp:2019
 msgid "Lines:"
@@ -1348,7 +1350,7 @@ msgstr "Bredd:"
 
 #: ..\Client\core\CSettings.cpp:2022
 msgid "Size"
-msgstr ""
+msgstr "Storlek"
 
 #: ..\Client\core\CSettings.cpp:2071
 msgid "after"
@@ -1364,7 +1366,7 @@ msgstr "sek"
 
 #: ..\Client\core\CSettings.cpp:2074
 msgid "Fading"
-msgstr ""
+msgstr "Fadinge"
 
 #: ..\Client\core\CSettings.cpp:2080
 msgid "Fade out old lines"
@@ -1372,42 +1374,41 @@ msgstr "Tona ut gamla linjer"
 
 #: ..\Client\core\CSettings.cpp:2120
 msgid "Horizontal:"
-msgstr ""
+msgstr "Horizontal:"
 
 #: ..\Client\core\CSettings.cpp:2120
 msgid "Vertical:"
-msgstr ""
+msgstr "Verticale:"
 
 #: ..\Client\core\CSettings.cpp:2120
 msgid "Text-Align:"
-msgstr ""
+msgstr "Texte-Aligne:"
 
 #: ..\Client\core\CSettings.cpp:2120
 msgid "X-Offset:"
-msgstr ""
+msgstr "X-Offset:"
 
 #: ..\Client\core\CSettings.cpp:2121
 msgid "Y-Offset:"
-msgstr ""
+msgstr "Y-Offset:"
 
 #: ..\Client\core\CSettings.cpp:2127
 msgid "Position"
-msgstr ""
+msgstr "Placera"
 
 #: ..\Client\core\CSettings.cpp:2142 ..\Client\core\CSettings.cpp:2156
 msgid "Center"
-msgstr ""
+msgstr "Centrum"
 
 #: ..\Client\core\CSettings.cpp:2155
 msgid "Top"
-msgstr ""
+msgstr "Topp"
 
 #: ..\Client\core\CSettings.cpp:2157
 msgid "Bottom"
-msgstr ""
+msgstr "Botten"
 
 #: ..\Client\core\CSettings.cpp:2205
-#, fuzzy
 msgid "Font"
 msgstr "Typsnitt:"
 
@@ -1417,19 +1418,19 @@ msgstr "Göm bakgrund när man inte skriver"
 
 #: ..\Client\core\CSettings.cpp:2247
 msgid "Nickname completion using the \"Tab\" key"
-msgstr ""
+msgstr "Avsluta smeknamnet med knappen \"Tab\""
 
 #: ..\Client\core\CSettings.cpp:2252
 msgid "Allow server to flash the window"
-msgstr ""
+msgstr "Tillåt servern att blinka i fönstret"
 
 #: ..\Client\core\CSettings.cpp:2257
 msgid "Allow tray balloon notifications"
-msgstr ""
+msgstr "Tillåt meddelanden om brickballong"
 
 #: ..\Client\core\CSettings.cpp:2262
 msgid "Chat text black/white outline"
-msgstr ""
+msgstr "Chat text svart / vit skiss"
 
 #. Create a messagebox to notify the user
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'",
@@ -1439,19 +1440,19 @@ msgstr ""
 #. pItemBind->GetText ().c_str () );
 #: ..\Client\core\CSettings.cpp:2510 ..\Client\core\CSettings.cpp:2517
 msgid "Press a key to bind, or escape to clear"
-msgstr "Tryck på en tangent för binda, eller tryck på escape för nollställa"
+msgstr "Tryck Tangent för bind, eller escape för nolställa"
 
 #: ..\Client\core\CSettings.cpp:2511
 msgid "Binding a primary key"
-msgstr "Binder en primär tangent"
+msgstr "Binder primär tangent"
 
 #: ..\Client\core\CSettings.cpp:2518
 msgid "Binding a secondary key"
-msgstr "Binder en sekundär tangent"
+msgstr "Binder sekundär tangent"
 
 #: ..\Client\core\CSettings.cpp:2592
 msgid "GTA GAME CONTROLS"
-msgstr "GTA SPELKONTROLLER"
+msgstr "GTA SPEL KONTROLLER"
 
 #: ..\Client\core\CSettings.cpp:2594
 msgid "MULTIPLAYER CONTROLS"
@@ -1459,7 +1460,7 @@ msgstr "MULTIPLAYER KONTROLLER"
 
 #: ..\Client\core\CSettings.cpp:2823 ..\Client\core\CSettings.cpp:4424
 msgid "Your nickname contains invalid characters!"
-msgstr "Ditt användarnamn innehåller ogiltiga tecken!"
+msgstr "Användarnamnet innehåller ogiltiga tecken!"
 
 #: ..\Client\core\CSettings.cpp:3563
 msgid "Red:"
@@ -1479,16 +1480,15 @@ msgstr "Genomskinlighet:"
 
 #: ..\Client\core\CSettings.cpp:3566
 msgid "Color"
-msgstr ""
+msgstr "Färg"
 
 #: ..\Client\core\CSettings.cpp:3643
 msgid "Preview"
-msgstr ""
+msgstr "Förhandsvisning"
 
 #: ..\Client\core\CSettings.cpp:3951
-#, fuzzy
 msgid "Please disconnect before changing language"
-msgstr "Avbryt anslutningen innan du ändrar skin"
+msgstr "Koppla av innan du byter språk"
 
 #: ..\Client\core\CSettings.cpp:3979
 msgid "Please disconnect before changing skin"
@@ -1506,7 +1506,7 @@ msgstr ""
 
 #: ..\Client\core\CSettings.cpp:4269
 msgid "PERFORMANCE WARNING"
-msgstr "PRESTANDAVARNING"
+msgstr "PRESTANDA VARNING"
 
 #: ..\Client\core\CSettings.cpp:4289
 msgid ""
@@ -1573,10 +1573,12 @@ msgstr "Aktivera för att bara använda en anslutning för nedladdningar."
 #: ..\Client\core\CSettings.cpp:4469
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr ""
+"Tag nätverkspaket för att hjälpa Internetleverantörer att identifiera MTA-"
+"trafik."
 
 #: ..\Client\core\CSettings.cpp:4471
 msgid "Spinning circle animation at the bottom of the screen"
-msgstr ""
+msgstr "Spinning cirkel animering längst ner på skärmen"
 
 #: ..\Client\core\CSettings.cpp:4473
 msgid "Select default always. (This setting is not saved)"
@@ -1596,23 +1598,23 @@ msgstr "Välj standard såvida du inte gillar att fylla i buggrapporter."
 
 #: ..\Client\core\CSettings.cpp:4479
 msgid "Select default to automatically install important updates."
-msgstr ""
+msgstr "Välj standard för att automatiskt installera viktiga uppdateringar."
 
 #: ..\Client\core\CSettings.cpp:4481
 msgid "16-bit color:"
-msgstr ""
+msgstr "16-bitars färg:"
 
 #: ..\Client\core\CSettings.cpp:4481
 msgid "Enable 16 bit color modes - Requires MTA restart"
-msgstr ""
+msgstr "Aktivera 16-bitars färglägen - Kräver MTA-omstart"
 
 #: ..\Client\core\CSettings.cpp:4483
 msgid "Mouse fix:"
-msgstr ""
+msgstr "Musfix:"
 
 #: ..\Client\core\CSettings.cpp:4483
 msgid "Mouse movement fix - May need PC restart"
-msgstr ""
+msgstr "Mus rörelse fix - kan behöva starta om datorn"
 
 #: ..\Client\core\CVersionUpdater.cpp:624
 msgid "Busy"
@@ -1662,7 +1664,7 @@ msgstr "Ansluter"
 #: ..\Client\core\CVersionUpdater.cpp:1787
 #: ..\Client\core\CVersionUpdater.cpp:1803
 msgid "Please wait..."
-msgstr "Var god vänta..."
+msgstr "Vänta..."
 
 #: ..\Client\core\CVersionUpdater.cpp:1802
 msgid "CHECKING"
@@ -1671,7 +1673,7 @@ msgstr "KOLLAR"
 #: ..\Client\core\CVersionUpdater.cpp:1819
 #: ..\Client\core\CVersionUpdater.cpp:1912
 msgid "UPDATE CHECK"
-msgstr "UPPDATERINGSKONTROLL"
+msgstr "Uppdateringskoll"
 
 #: ..\Client\core\CVersionUpdater.cpp:1820
 msgid "No update needed"
@@ -2128,42 +2130,41 @@ msgstr "Försöker hitta LAN servrar"
 
 #: ..\Client\game_sa\CSettingsSA.cpp:723
 msgid "Can't find valid screen resolution."
-msgstr ""
+msgstr "Det går inte att hitta en giltig skärmupplösning."
 
 #. Confirm that res should be used
 #: ..\Client\game_sa\CSettingsSA.cpp:799
 msgid "Are you sure you want to use this screen resolution?"
-msgstr ""
+msgstr "Är du säker på att du vill använda den här skärmupplösningen?"
 
 #: ..\Client\game_sa\CSettingsSA.cpp:801 ..\Client\loader\Dialogs.cpp:94
 msgid "MTA: San Andreas"
-msgstr ""
+msgstr "MTA: San Andreas"
 
 #: ..\Client\loader\CExePatchedStatus.cpp:153
 msgid "Update Aero setting"
-msgstr "Uppdatera Aero-inställning"
+msgstr "Uppdatera Aeroinstallningär"
 
 #: ..\Client\loader\CExePatchedStatus.cpp:155
 msgid "Update Large Memory setting"
 msgstr "Uppdatera Large Memory-inställning"
 
 #: ..\Client\loader\CExePatchedStatus.cpp:157
-#, fuzzy
 msgid "Update DEP setting"
-msgstr "Uppdatera Aero-inställning"
+msgstr "Uppdatera DEP-inställningen"
 
 #: ..\Client\loader\CExePatchedStatus.cpp:159
 msgid "Update graphics driver compliance"
-msgstr ""
+msgstr "Uppdatera grafikkortets överensstämmelse"
 
 #: ..\Client\loader\CExePatchedStatus.cpp:161
 #: ..\Client\loader\CExePatchedStatus.cpp:163
 msgid "Fix file issues"
-msgstr ""
+msgstr "Fixa filproblem"
 
 #: ..\Client\loader\CExePatchedStatus.cpp:164
 msgid "Copy main executable to avoid graphic driver issues"
-msgstr ""
+msgstr "Kopiera huvudkörningsbar för att undvika problem med drivrutiner"
 
 #: ..\Client\loader\CInstallManager.cpp:315 ..\Client\loader\Utils.cpp:1207
 #, c-format, c-format
@@ -2221,11 +2222,11 @@ msgstr ""
 
 #: ..\Client\loader\CInstallManager.cpp:714
 msgid "Missing file:"
-msgstr ""
+msgstr "Saknad fil:"
 
 #: ..\Client\loader\CInstallManager.cpp:718
 msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr ""
+msgstr "Om MTA inte laddas, vänligen installera om GTA:SA"
 
 #: ..\Client\loader\CInstallManager.cpp:839
 msgid "Update install settings"
@@ -2233,42 +2234,46 @@ msgstr "Uppdatera installationsinställningar"
 
 #: ..\Client\loader\CInstallManager.cpp:950
 msgid "Update compatibility settings"
-msgstr ""
+msgstr "Uppdatera kompatibilitetsinställningar"
 
 #: ..\Client\loader\Dialogs.cpp:34
 msgid "Quit"
-msgstr ""
+msgstr "Sluta"
 
 #: ..\Client\loader\Dialogs.cpp:51
 msgid "MTA: San Andreas has encountered a problem"
-msgstr ""
+msgstr "MTA: San Andreas har stött på ett problem"
 
 #: ..\Client\loader\Dialogs.cpp:52
 msgid "Crash information"
-msgstr ""
+msgstr "Kraschinformation"
 
 #: ..\Client\loader\Dialogs.cpp:53
 msgid ""
 "Tick the check box to send this crash info to MTA devs using the 'internet'"
 msgstr ""
+"Markera kryssrutan för att skicka denna kraschinformation till MTA devs med "
+"hjälp av \"internet\""
 
 #: ..\Client\loader\Dialogs.cpp:54
 msgid "Doing so will increase the chance of this crash being fixed."
-msgstr ""
+msgstr "Om du gör det ökar risken för att denna krasch blir fixad."
 
 #: ..\Client\loader\Dialogs.cpp:55
 msgid "Do you want to restart MTA: San Andreas ?"
-msgstr ""
+msgstr "Vill du starta om MTA: San Andreas?"
 
 #: ..\Client\loader\Dialogs.cpp:62
 msgid "MTA: San Andreas - Warning"
-msgstr ""
+msgstr "MTA: San Andreas - Varning"
 
 #: ..\Client\loader\Dialogs.cpp:63
 msgid ""
 "Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll "
 "file:"
 msgstr ""
+"Din Grand Theft Auto: San Andreas Install Directory innehåller en d3d9.dll "
+"fil:"
 
 #: ..\Client\loader\Dialogs.cpp:65
 msgid ""
@@ -2276,74 +2281,77 @@ msgid ""
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
+"Filen är inte nödvändig och kan störa de grafiska funktionerna i den här versionen av MTA: SA.\n"
+"\n"
+"Det rekommenderas att du tar bort eller byter namn på d3d9.dll"
 
 #: ..\Client\loader\Dialogs.cpp:67
 msgid "Do not tell me about this d3d9.dll again"
-msgstr ""
+msgstr "Berätta inte om den här d3d9.dll igen"
 
 #: ..\Client\loader\Dialogs.cpp:68
 msgid "Show me the file"
-msgstr ""
+msgstr "Visa mig filen"
 
 #: ..\Client\loader\Dialogs.cpp:69
 msgid "Play MTA:SA"
-msgstr ""
+msgstr "Spela MTA:SA"
 
 #: ..\Client\loader\Dialogs.cpp:75
 msgid "MTA: San Andreas - Confusing options"
-msgstr ""
+msgstr "MTA: San Andreas - Förvirrande alternativ"
 
 #: ..\Client\loader\Dialogs.cpp:76
 msgid "NVidia Optimus detected!"
-msgstr ""
+msgstr "NVidia Optimus upptäckt!"
 
 #: ..\Client\loader\Dialogs.cpp:77
 msgid "Try each option and see what works:"
-msgstr ""
+msgstr "Prova varje alternativ och se vad som fungerar:"
 
 #: ..\Client\loader\Dialogs.cpp:78
 msgid "A - Standard NVidia"
-msgstr ""
+msgstr "A - Standard NVidia"
 
 #: ..\Client\loader\Dialogs.cpp:79
 msgid "B - Alternate NVidia"
-msgstr ""
+msgstr "B - Alternativ NVidia"
 
 #: ..\Client\loader\Dialogs.cpp:80
 msgid "C - Standard NVidia with exe rename"
-msgstr ""
+msgstr "C - Standard NVidia med exe byta namn"
 
 #: ..\Client\loader\Dialogs.cpp:81
 msgid "D - Alternate NVidia with exe rename"
-msgstr ""
+msgstr "D - Alternativ NVidia med exe byta namn"
 
 #: ..\Client\loader\Dialogs.cpp:82
 msgid "E - Standard Intel"
-msgstr ""
+msgstr "E - Standard Intel"
 
 #: ..\Client\loader\Dialogs.cpp:83
 msgid "F - Alternate Intel"
-msgstr ""
+msgstr "F - Alternativ Intel"
 
 #: ..\Client\loader\Dialogs.cpp:84
 msgid "G - Standard Intel with exe rename"
-msgstr ""
+msgstr "G - Standard Intel med exe byta namn"
 
 #: ..\Client\loader\Dialogs.cpp:85
 msgid "H - Alternate Intel with exe rename"
-msgstr ""
+msgstr "H - Alternativ Intel med exe byta namn"
 
 #: ..\Client\loader\Dialogs.cpp:86
 msgid "If you get desperate, this might help:"
-msgstr ""
+msgstr "Om du blir desperat kan det här hjälpa till:"
 
 #: ..\Client\loader\Dialogs.cpp:87
 msgid "Force windowed mode"
-msgstr ""
+msgstr "Tvinga windowed-läge"
 
 #: ..\Client\loader\Dialogs.cpp:95
 msgid "Warning: Could not detect anti-virus product"
-msgstr ""
+msgstr "Varning: Det gick inte att upptäcka antivirusprodukt"
 
 #: ..\Client\loader\Dialogs.cpp:97
 msgid ""
@@ -2353,16 +2361,23 @@ msgid ""
 "\n"
 "Press 'Help' for more information."
 msgstr ""
+"MTA kunde inte upptäcka ett antivirusprogram på din dator.\n"
+"\n"
+"Virus stör MTA och försämra din spelupplevelse.\n"
+"\n"
+"Tryck på \"Hjälp\" för mer information."
 
 #: ..\Client\loader\Dialogs.cpp:100
 msgid "I have already installed an anti-virus"
-msgstr ""
+msgstr "Jag har redan installerat ett antivirusprogram"
 
 #: ..\Client\loader\Dialogs.cpp:102
 msgid ""
 "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr ""
+"Jag kommer inte installera ett antivirusprogram.\n"
+"Jag vill att min dator ska lagras och vara en del av en botnet."
 
 #: ..\Client\loader\Dialogs.cpp:691 ..\Client\loader\Utils.cpp:747
 msgid "Searching for Grand Theft Auto San Andreas"
@@ -2374,11 +2389,11 @@ msgstr "Var god starta Grand Theft Auto San Andreas"
 
 #: ..\Client\loader\Dialogs.cpp:702 ..\Client\loader\Install.cpp:187
 msgid "Installing update..."
-msgstr ""
+msgstr "Installerar uppdatering..."
 
 #: ..\Client\loader\Dialogs.cpp:710 ..\Client\loader\Install.cpp:288
 msgid "Extracting files..."
-msgstr ""
+msgstr "Extrahera filer..."
 
 #: ..\Client\loader\Dialogs.cpp:715 ..\Client\loader\Utils.cpp:1630
 msgid "Copying files..."
@@ -2398,7 +2413,7 @@ msgstr "Klart!"
 
 #: ..\Client\loader\Install.cpp:92
 msgid "Do you want to terminate the MTA Server and continue updating?"
-msgstr ""
+msgstr "Vill du säga upp MTA-servern och fortsätta att uppdatera?"
 
 #: ..\Client\loader\MainFunctions.cpp:235
 msgid ""
@@ -2493,6 +2508,9 @@ msgid ""
 "\n"
 "Do you want to change the following setting?"
 msgstr ""
+"Har du problem med att köra MTA: SA?.\n"
+"\n"
+"Vill du ändra följande inställning?"
 
 #: ..\Client\loader\MainFunctions.cpp:412
 msgid ""
@@ -2500,6 +2518,9 @@ msgid ""
 "\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr ""
+"Har du problem med att köra MTA: SA?.\n"
+"\n"
+"Försök inaktivera följande produkter för GTA och MTA:"
 
 #: ..\Client\loader\MainFunctions.cpp:446
 msgid ""
@@ -2509,11 +2530,16 @@ msgid ""
 "Please run a virus scan to ensure your system is secure.\n"
 "\n"
 msgstr ""
+"VARNING\n"
+"\n"
+"MTA: SA har upptäckt ovanlig aktivitet.\n"
+"Vänligen kör en virusskanning för att säkerställa att ditt system är säkert.\n"
+"\n"
 
 #: ..\Client\loader\MainFunctions.cpp:449
 #, c-format
 msgid "The detected file was:  %s\n"
-msgstr ""
+msgstr "Den upptäckta filen var: %s\n"
 
 #: ..\Client\loader\MainFunctions.cpp:583
 msgid ""
@@ -2605,7 +2631,7 @@ msgstr ""
 #: ..\Client\loader\MainFunctions.cpp:816
 #, c-format
 msgid "Main file has an incorrect name (%s)"
-msgstr ""
+msgstr "Huvudfilen har ett felaktigt namn (%s)"
 
 #: ..\Client\loader\MainFunctions.cpp:827
 msgid ""
@@ -2613,6 +2639,9 @@ msgid ""
 "\n"
 "See online help if MTA does not work correctly."
 msgstr ""
+"Huvudfilen är osignerad. Möjlig virusaktivitet.\n"
+"\n"
+"Se onlinehjälp om MTA inte fungerar korrekt."
 
 #: ..\Client\loader\MainFunctions.cpp:900
 msgid ""
@@ -2620,6 +2649,9 @@ msgid ""
 "\n"
 "See online help if MTA does not work correctly."
 msgstr ""
+"Datafiler ändrade. Möjlig virusaktivitet.\n"
+"\n"
+"Se onlinehjälp om MTA inte fungerar korrekt."
 
 #: ..\Client\loader\MainFunctions.cpp:912
 msgid ""
@@ -2627,15 +2659,20 @@ msgid ""
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
+".asi filer finns i katalogen \"MTA: SA\" eller \"GTA: San Andreas\".\n"
+"\n"
+"Ta bort dessa .asi-filer om du har problem med MTA: SA."
 
 #: ..\Client\loader\MainFunctions.cpp:974
 msgid ""
 "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr ""
+"Felaktigt fel i filversionen. Installera om MTA: SA om du upplever "
+"problem.\n"
 
 #: ..\Client\loader\MainFunctions.cpp:983
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr ""
+msgstr "Vissa filer saknas. Installera om MTA: SA om du upplever problem.\n"
 
 #: ..\Client\loader\MainFunctions.cpp:995
 msgid ""
@@ -2643,15 +2680,18 @@ msgid ""
 "\n"
 "Please restart your PC.\n"
 msgstr ""
+"MTA: SA är inte kompatibel med Windows Säkert läge.\n"
+"\n"
+"Vänligen starta om datorn.\n"
 
 #: ..\Client\loader\MainFunctions.cpp:1131
 msgid "Fix configuration issue"
-msgstr ""
+msgstr "Lös konfigurationsproblem"
 
 #. Try to relaunch as admin if not done so already
 #: ..\Client\loader\MainFunctions.cpp:1173
 msgid "Fix elevation required error"
-msgstr ""
+msgstr "Fixa höjning krävs fel"
 
 #: ..\Client\loader\MainFunctions.cpp:1180
 #, c-format, c-format
@@ -2673,7 +2713,7 @@ msgstr ""
 
 #: ..\Client\loader\Utils.cpp:832
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "Välj din Grand Theft Auto: San Andreas Installationsmapp"
+msgstr "Välj din Grand Theft Auto: San Andreas Installations Katalog"
 
 #: ..\Client\loader\Utils.cpp:1308
 #, c-format, c-format
@@ -2687,41 +2727,46 @@ msgid ""
 "\n"
 "Do you want to copy your settings from %s ?"
 msgstr ""
+"Ny installation av %s upptäckt.\n"
+"\n"
+"Vill du kopiera dina inställningar från %s?"
 
 #: ..\Client\loader\Utils.cpp:1777
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
-msgstr ""
+msgstr "GTA: SA hade problem med att öppna filen '%s'"
 
 #: ..\Client\loader\Utils.cpp:1799
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
-msgstr ""
+msgstr "GTA: SA hade problem med att öppna filen '%s'"
 
 #: ..\Client\loader\Utils.cpp:1824
 msgid "GTA:SA had trouble loading a model."
-msgstr ""
+msgstr "GTA: SA hade problem med att ladda en modell."
 
 #: ..\Client\loader\Utils.cpp:1826
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr ""
+"Om du nyligen modifierade gta3.img, försök sedan installera om GTA: SA."
 
 #: ..\Client\loader\Utils.cpp:1851
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
 msgstr ""
+"GTA: SA hade problem med att lägga till en uppgradering till ett fordon."
 
 #: ..\Client\loader\Utils.cpp:1870
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
-msgstr ""
+msgstr "GTA: SA hittade fel i filen '%s'"
 
 #: ..\Client\loader\Utils.cpp:1943
 msgid "Did your computer restart when playing MTA:SA?"
-msgstr ""
+msgstr "Har datorn startat om du spelade MTA: SA?"
 
 #: ..\Client\loader\Utils.cpp:2008
 msgid "Please terminate the following programs before continuing:"
-msgstr ""
+msgstr "Vänligen avsluta följande program innan du fortsätter:"
 
 #: ..\Client\mods\deathmatch\CClient.cpp:35
 msgid "This version has expired."
@@ -2822,7 +2867,7 @@ msgstr "ändrar till det föregående vapnet inifrån fordonet"
 
 #: ..\Client\mods\deathmatch\CClient.cpp:81
 msgid "outputs info about the current server"
-msgstr ""
+msgstr "Utmatar information om den aktuella servern"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
 #: ..\Client\mods\deathmatch\CClient.cpp:84
@@ -3055,7 +3100,7 @@ msgstr "Frånkopplad: Du blev avstängd av %s"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:570
 msgid "Disconnected: Server shutdown or restarting"
-msgstr ""
+msgstr "Avkopplad: Serveravstängning eller omstart"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:595
 msgid "Time Remaining: "
@@ -3086,8 +3131,8 @@ msgstr[1] "%d minuter"
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d sekund"
+msgstr[1] "%d sekunder"
 
 #. Display the error
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:615
@@ -3160,7 +3205,7 @@ msgstr "Anslutnings fel"
 #. Couldn't create render target for CPostEffects
 #: ..\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1377
 msgid "Problem with graphics driver"
-msgstr ""
+msgstr "Problem med grafikdrivrutinen"
 
 #: ..\Shared\sdk\SharedUtil.Misc.hpp:85
 msgid "Multi Theft Auto has not been installed properly, please reinstall."

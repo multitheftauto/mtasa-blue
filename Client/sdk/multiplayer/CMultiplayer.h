@@ -37,14 +37,23 @@ struct SClothesCacheStats
     uint uiNumRemoved;
 };
 
-struct SWaterCannonHitEvent
+enum EVehicleWeaponType : int
 {
+    INVALID,
+    WATER_CANNON,
+    TANK_GUN,
+    ROCKET,
+    HEAT_SEEKING_ROCKET,
+};
+
+struct SVehicleWeaponHitEvent
+{
+    EVehicleWeaponType  weaponType;
     CEntitySAInterface* pGameVehicle;
     CEntitySAInterface* pHitGameEntity;
     CVector             vecPosition;
-    CVector             vecNormal;
     int                 iModel;
-    unsigned char       ucColSurface;
+    int                 iColSurface;
 };
 
 class CAnimBlendAssociationSAInterface;
@@ -108,7 +117,8 @@ typedef void(GameEntityRenderHandler)(CEntitySAInterface* pEntity);
 typedef void(FxSystemDestructionHandler)(void* pFxSA);
 typedef AnimationId(DrivebyAnimationHandler)(AnimationId animGroup, AssocGroupId animId);
 typedef void(PedStepHandler)(CPedSAInterface* pPed, bool bFoot);
-typedef void(WaterCannonHitWorldHandler)(SWaterCannonHitEvent& event);
+
+using VehicleWeaponHitHandler = void(SVehicleWeaponHitEvent& event);
 
 /**
  * This class contains information used for shot syncing, one exists per player.
@@ -228,7 +238,7 @@ public:
     virtual void  SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler) = 0;
     virtual void  SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler) = 0;
     virtual void  SetPedStepHandler(PedStepHandler* pHandler) = 0;
-    virtual void  SetWaterCannonHitWorldHandler(WaterCannonHitWorldHandler* pHandler) = 0;
+    virtual void  SetVehicleWeaponHitHandler(VehicleWeaponHitHandler* pHandler) = 0;
     virtual void  AllowMouseMovement(bool bAllow) = 0;
     virtual void  DoSoundHacksOnLostFocus(bool bLostFocus) = 0;
     virtual bool  HasSkyColor() = 0;
