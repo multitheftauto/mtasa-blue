@@ -101,8 +101,7 @@ CClientGame::CClientGame(bool bLocalPlay)
 
     m_pSurfaceInfo = reinterpret_cast<CSurfaceType*>(0xB79538);
     // Store default surface properties
-    m_pOriginalSurfaceInfo = new CSurfaceType;
-    memcpy(m_pOriginalSurfaceInfo, (void *)0xB79538, sizeof(CSurfaceType));
+    memcpy(&m_pOriginalSurfaceInfo, (void *)0xB79538, sizeof(CSurfaceType));
 
     m_bNoNewVehicleTask = false;
     m_NoNewVehicleTaskReasonID = INVALID_ELEMENT_ID;
@@ -518,7 +517,7 @@ CClientGame::~CClientGame(void)
     g_pClientGame = NULL;
     m_bBeingDeleted = false;
 
-    memcpy(m_pSurfaceInfo, m_pOriginalSurfaceInfo, sizeof(CSurfaceType));
+    memcpy(m_pSurfaceInfo, &m_pOriginalSurfaceInfo, sizeof(CSurfaceType));
 }
 
 /*

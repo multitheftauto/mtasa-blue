@@ -629,7 +629,8 @@ public:
     static bool SetFPSLimit(int iLimit);
     static bool GetFPSLimit(int& iLimit);
 
-    static bool ResetSurfaceInfo(short sSurfaceID = 255);
+    static bool ResetSurfaceInfo(void);
+    static bool ResetSurfaceInfo(short sSurfaceID);
 
     // Input functions
     static bool BindKey(const char* szKey, const char* szHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments);

@@ -594,7 +594,7 @@ public:
     void SetTransferringSingularFiles(bool bTransfer) { m_bTransferringSingularFiles = bTransfer; }
     bool IsTransferringSingularFiles(void) { return m_bTransferringSingularFiles; }
 
-    CSurfaceType* GetOriginalSurfaceInfo() { return m_pOriginalSurfaceInfo; }
+    CSurfaceType GetOriginalSurfaceInfo() { return m_pOriginalSurfaceInfo; }
     CSurfaceType* GetSurfaceInfo() { return m_pSurfaceInfo; }
 
     void                           SetVehExtrapolateSettings(const SVehExtrapolateSettings& settings) { m_VehExtrapolateSettings = settings; }
@@ -739,7 +739,7 @@ private:
     SFixedArray<DWORD, WEAPONSLOT_MAX + 1> m_wasWeaponAmmoInClip;
 
     CSurfaceType* m_pSurfaceInfo;
-    CSurfaceType* m_pOriginalSurfaceInfo;
+    CSurfaceType m_pOriginalSurfaceInfo;
 
     bool m_bCursorEventsEnabled;
     bool m_bLocalPlay;

@@ -1301,7 +1301,7 @@ int CLuaEngineDefs::EngineResetSurfaceProperties(lua_State* luaVM)
         argStream.ReadNumber(sSurfaceID);
         if (!argStream.HasErrors())
         {
-            if (sSurfaceID >= 0 && sSurfaceID <= 179)
+            if (sSurfaceID >= EColSurfaceValue::DEFAULT && sSurfaceID <= EColSurfaceValue::SIZE)
             {
                 lua_pushboolean(luaVM, CStaticFunctionDefinitions::ResetSurfaceInfo(sSurfaceID));
                 return 1;

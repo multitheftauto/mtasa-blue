@@ -9675,23 +9675,35 @@ CClientSearchLight* CStaticFunctionDefinitions::CreateSearchLight(CResource& Res
     return nullptr;
 }
 
-bool CStaticFunctionDefinitions::ResetSurfaceInfo(short sSurfaceID)
+bool CStaticFunctionDefinitions::ResetSurfaceInfo()
 {
-    CSurfaceType* pOriginalSurfaceInfo = m_pClientGame->GetOriginalSurfaceInfo();
     CSurfaceType* pSurfaceInfo = m_pClientGame->GetSurfaceInfo();
     DWORD dwSurfaceInfo = (DWORD)pSurfaceInfo;
-    DWORD dwOriginalSurfaceInfo = (DWORD)pOriginalSurfaceInfo;
-    short sOffset, sSize;
-    if (sSurfaceID >= 0 && sSurfaceID <= 179)
-    {
-        sOffset = 144 + sizeof(SurfaceInfo_c) * sSurfaceID;
-        sSize = sizeof(SurfaceInfo_c);
-    }
-    else // reset all
-    {
-        sOffset = 144;
-        sSize = sizeof(SurfaceInfo_c) * 179;
-    }
+
+    CSurfaceType pOriginalSurfaceInfo = m_pClientGame->GetOriginalSurfaceInfo();
+    DWORD dwOriginalSurfaceInfo = (DWORD)(&pOriginalSurfaceInfo);
+
+    short sOffset = 144;
+    short sSize = sizeof(SurfaceInfo_c) * EColSurfaceValue::SIZE;
+
     memcpy((void*)(dwSurfaceInfo + sOffset), (void*)(dwOriginalSurfaceInfo + sOffset), sSize);
     return true;
+}
+bool CStaticFunctionDefinitions::ResetSurfaceInfo(short sSurfaceID)
+{
+    if (sSurfaceID >= EColSurfaceValue::DEFAULT && sSurfaceID <= EColSurfaceValue::RAILTRACK)
+    {
+        CSurfaceType pOriginalSurfaceInfo = m_pClientGame->GetOriginalSurfaceInfo();
+        CSurfaceType* pSurfaceInfo = m_pClientGame->GetSurfaceInfo();
+        DWORD dwSurfaceInfo = (DWORD)pSurfaceInfo;
+        DWORD dwOriginalSurfaceInfo = (DWORD)(&pOriginalSurfaceInfo);
+
+        short sOffset = 144 + sizeof(SurfaceInfo_c) * sSurfaceID;
+        short sSize = sizeof(SurfaceInfo_c);
+
+        memcpy((void*)(dwSurfaceInfo + sOffset), (void*)(dwOriginalSurfaceInfo + sOffset), sSize);
+        return true;
+    }
+    else
+        return false;
 }
