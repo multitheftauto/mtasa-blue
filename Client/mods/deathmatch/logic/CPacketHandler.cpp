@@ -626,28 +626,50 @@ void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)
 
 void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
 {
-    // bool                  - show the "X has joined the game" messages?
+        // bool                                 - show the "X has joined the game" messages?
     // [ following repeats <number of players joined> times ]
-    // unsigned char  (1)    - assigned player id
-    // unsigned char  (1)    - player nick length
-    // unsigned char  (X)    - player nick (X = player nick length)
-    // unsigned char  (1)    - nametag text length
-    // unsigned char  (X)    - nametag text (X = nametag text length)
-    // unsigned char  (3)    - nametag color
-    // unsigned char  (1)    - nametag showing
-    // bool                  - is he dead?
-    // bool                  - spawned? (following data only if this is TRUE)
-    // unsigned char  (1)    - model id
-    // ElementID      (2)    - team id
-    // bool                  - in a vehicle?
-    // ElementID      (2)    - vehicle id (if vehicle)
-    // unsigned char  (1)    - vehicle seat (if vehicle)
-    // CVector        (12)   - position (if player)
-    // float          (4)    - rotation (if player)
-    // bool                  - has a jetpack?
-    // unsigned short (2)    - dimension
-    // unsigned char  (1)    - fighting style
-    // Dear God, please fix issue #7376
+    // ElementID             (4)            - assigned player id(I'm not sure it's 4 bytes, but -- Pirulax)
+    // unsigned int          (4)            - Time sync context
+    // unsigned char         (1)            - player rp name length
+    // unsigned char         (X)            - player rp name (X = player rp name length)
+    // unsigned short        (1)            - player bitstream version
+    // unsigned int          (4)            - bitstream build number
+    // bool                                 - is he dead? (UNUSED)
+    // bool                                 - spawned? (unused as well, but here because of bckward compatiblity)
+    // bool                                 - Is in vehicle
+    // bool                                 - has a jetpack?
+    // bool                                 - is his nametag showing?
+    // bool                                 - is his nametag color overridden?
+    // bool                                 - is headless?
+    // bool                                 - is frozen?
+    // unsigned char         (1)            - nametag text length
+    // char*                 (x)            - nametag text(x = nametag text length)
+
+    // Following only if nametag color is overridden:
+    //    unsigned char      (1)            - nametag R
+    //    unsigned char      (1)            - nametag G
+    //    unsigned char      (1)            - nametag B
+
+    // unsigned char         (1)            - Move anim(dafaqs that ? -Pirulax)
+    // unsigned char         (1)            - model id
+    // bool                                 - is in team
+    // unsigned char         (1)            - team id (only if in team)
+
+    // Following if in vehicle: 
+    //    ElementID(4)                      - Vehicle elementid
+    //    SOccupiedSeatSync  (1)            - SeatID
+    // If not in vehicle:
+    //    CVector            (12)           - Player position
+    //    CVector            (12)           - Player rotation
+    
+    // unsigned short        (2)            - dimension
+    // unsigned char         (1)            - Fighting style   
+    // SEntityAlphaSyn       (1)            - Alpha
+
+// 16x times:
+    // bool                                 - true / false (for more info go to the comment in this file called: 
+                                              //"Write the weapons of the player weapon slots")
+    // SWeaponTypeSync     (6 bit)          - Take a look at it if you want to buddy
 
     // The game must be loaded or the game will crash
     if (g_pClientGame->m_Status != CClientGame::STATUS_JOINED)
