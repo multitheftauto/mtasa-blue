@@ -21,7 +21,6 @@
 #include <mutex>
 #include <unordered_set>
 #include <future>
-#include <optional>
 
 // Forward declarations
 class CAclRightName;
