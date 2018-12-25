@@ -622,36 +622,32 @@ void CResource::SetInfoValue(const char* szKey, const char* szValue, bool bSave)
     }
 }
 
-bool CResource::GenerateChecksums(void)
+bool CResource::GenerateChecksums()
 {
-    bool bOk = true;
+    std::vector<std::future<SString>> checksumTasks;
+    checksumTasks.reserve(m_resourceFiles.size());
 
-    list<CResourceFile*>::iterator iterf = m_resourceFiles.begin();
-    for (; iterf != m_resourceFiles.end(); iterf++)
+    for (CResourceFile* pResourceFile : m_resourceFiles)
     {
-        CResourceFile* pResourceFile = *iterf;
-        SString        strPath;
-        if (GetFilePath(pResourceFile->GetName(), strPath))
-        {
+        checksumTasks.push_back(std::async(std::launch::async, [pResourceFile, this] {
+            SString strPath;
+            if (!GetFilePath(pResourceFile->GetName(), strPath))
+                return SString();
             std::vector<char> buffer;
             FileLoad(strPath, buffer);
             uint        uiFileSize = buffer.size();
-            const char* pFileContents = uiFileSize ? &buffer[0] : "";
-
-            CChecksum checksum = CChecksum::GenerateChecksumFromBuffer(pFileContents, uiFileSize);
+            const char* pFileContents = uiFileSize ? buffer.data() : "";
+            CChecksum   checksum = CChecksum::GenerateChecksumFromBuffer(pFileContents, uiFileSize);
             pResourceFile->SetLastChecksum(checksum);
             pResourceFile->SetLastFileSize(uiFileSize);
 
             // Check if file is blocked
             char szHashResult[33];
-            CMD5Hasher::ConvertToHex(checksum.md5, szHashResult);
+            CMD5Hasher::ConvertToHex(pResourceFile->GetLastChecksum().md5, szHashResult);
             SString strBlockReason = m_resourceManager->GetBlockedFileReason(szHashResult);
             if (!strBlockReason.empty())
             {
-                m_strFailureReason = SString("file '%s' is blocked (%s)", pResourceFile->GetName(), *strBlockReason);
-                CLogger::LogPrintf(SString("ERROR: Resource '%s' %s\n", GetName().c_str(), *m_strFailureReason));
-                bOk = false;
-                continue;
+                return SString("file '%s' is blocked (%s)", pResourceFile->GetName(), *strBlockReason);
             }
 
             // Copy file to http holding directory
@@ -665,19 +661,15 @@ bool CResource::GenerateChecksums(void)
                     if (!g_pRealNetServer->ValidateHttpCacheFileName(strCachedFilePath))
                     {
                         FileDelete(strCachedFilePath);
-                        CLogger::LogPrintf(
-                            SString("ERROR: Resource '%s' client filename '%s' not allowed\n", GetName().c_str(), *ExtractFilename(strCachedFilePath)));
-                        bOk = false;
-                        continue;
+                        return SString("ERROR: Resource '%s' client filename '%s' not allowed\n", GetName().c_str(), *ExtractFilename(strCachedFilePath));
                     }
 
                     CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFile(strCachedFilePath);
-                    if (checksum != cachedChecksum)
+                    if (pResourceFile->GetLastChecksum() != cachedChecksum)
                     {
                         if (!FileSave(strCachedFilePath, pFileContents, uiFileSize))
                         {
-                            CLogger::LogPrintf("Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath);
-                            bOk = false;
+                            return SString("Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath);
                         }
 
                         // If script is 'no client cache', make sure there is no trace of it in the output dir
@@ -690,6 +682,20 @@ bool CResource::GenerateChecksums(void)
                 default:
                     break;
             }
+            return SString();
+        }));
+    }
+
+    bool bOk = true;
+
+    for (auto& task : checksumTasks)
+    {
+        auto& result = task.get();
+        if (!result.empty())
+        {
+            m_strFailureReason = result;
+            CLogger::LogPrintf(result);
+            bOk = false;
         }
     }
 
@@ -1378,7 +1384,6 @@ bool CResource::GetFilePath(const char* szFilename, string& strPath)
     else
         strPath = m_strResourceDirectoryPath + szFilename;
     return FileExists(strPath);
-
 }
 
 // Return true if file name is used by this resource
