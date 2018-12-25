@@ -108,6 +108,72 @@ CResource::CResource(CResourceManager* resourceManager, bool bIsZipped, const ch
     Load();
 }
 
+bool CResource::UnzipResource()
+{
+    m_zipfile = unzOpenUtf8(m_strResourceZip.c_str());
+    if (!m_zipfile)
+        return false;
+
+    // See if the dir already exists
+    bool bDirExists = DoesDirectoryExist(m_strResourceCachePath.c_str());
+
+    // If the folder doesn't exist, create it
+    if (!bDirExists)
+    {
+        // If we're using a zip file, we need a temp directory for extracting
+        // 17 = already exists (on windows)
+        if (File::Mkdir(m_strResourceCachePath.c_str()) == -1 && errno != EEXIST)            // check this is the correct return for *NIX too
+        {
+            // Show error
+            m_strFailureReason = SString("Couldn't create directory '%s' for resource '%s', check that the server has write access to the resources folder.\n",
+                                         m_strResourceCachePath.c_str(), m_strResourceName.c_str());
+            CLogger::ErrorPrintf(m_strFailureReason);
+            return false;
+        }
+    }
+
+    unzGoToFirstFile(m_zipfile);
+
+    std::vector<char> strFileName;
+    std::string       strPath;
+    while (unzGoToNextFile(m_zipfile) != UNZ_END_OF_LIST_OF_FILE)
+    {
+        // Check if we have this file already extracted
+        unz_file_info fileInfo;
+        memset(&fileInfo, 0, sizeof(unz_file_info));
+
+        if (unzGetCurrentFileInfo(m_zipfile, &fileInfo, nullptr, 0, nullptr, 0, nullptr, 0) != UNZ_OK)
+            return false;
+
+        strFileName.reserve(fileInfo.size_filename + 1);
+        unzGetCurrentFileInfo(m_zipfile, &fileInfo, strFileName.data(), strFileName.capacity() - 1, nullptr, 0, nullptr, 0);
+
+        strPath = m_strResourceCachePath + strFileName.data();
+        if (FileExists(strPath))
+        {
+            // we've already got a cached copy of this file, check its still the same
+            unsigned long ulFileInZipCRC = fileInfo.crc;
+            unsigned long ulFileOnDiskCRC = CRCGenerator::GetCRCFromFile(strPath.c_str());
+            if (ulFileInZipCRC == ulFileOnDiskCRC)
+                continue;            // we've already extracted EXACTLY this file before
+            RemoveFile(strPath.c_str());
+        }
+
+        // Doesn't exist or bad crc
+        int opt_extract_without_path = 0;
+        int opt_overwrite = 1;
+
+        int ires = do_extract_currentfile(m_zipfile, &opt_extract_without_path, &opt_overwrite, NULL, m_strResourceCachePath.c_str());
+        if (ires != UNZ_OK)
+            return false;
+    }
+
+    // Close the zip file
+    unzClose(m_zipfile);
+    m_zipfile = NULL;
+    return true;
+}
+
 bool CResource::Load(void)
 {
     if (!m_bLoaded)
@@ -158,45 +224,11 @@ bool CResource::Load(void)
 
         if (m_bResourceIsZip)
         {
-            // See if zip file is actually a zip file
-            m_zipfile = unzOpenUtf8(m_strResourceZip.c_str());
-            if (!m_zipfile)
+            if (!UnzipResource())
             {
                 // Unregister EHS stuff
                 g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
-
-                // Show error
-                m_strFailureReason = SString("Couldn't find resource archive or directory (%s) for resource '%s'.\n", m_strResourceDirectoryPath.c_str(),
-                                             m_strResourceName.c_str());
-                CLogger::ErrorPrintf(m_strFailureReason);
                 return false;
-            }
-
-            // Close the zip file
-            unzClose(m_zipfile);
-            m_zipfile = NULL;
-
-            // See if the dir already exists
-            bool bDirExists = DoesDirectoryExist(m_strResourceCachePath.c_str());
-
-            // If the folder doesn't exist, create it
-            if (!bDirExists)
-            {
-                // If we're using a zip file, we need a temp directory for extracting
-                // 17 = already exists (on windows)
-
-                if (File::Mkdir(m_strResourceCachePath.c_str()) == -1 && errno != EEXIST)            // check this is the correct return for *NIX too
-                {
-                    // Unregister EHS stuff
-                    g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
-
-                    // Show error
-                    m_strFailureReason =
-                        SString("Couldn't create directory '%s' for resource '%s', check that the server has write access to the resources folder.\n",
-                                m_strResourceCachePath.c_str(), m_strResourceName.c_str());
-                    CLogger::ErrorPrintf(m_strFailureReason);
-                    return false;
-                }
             }
         }
 
@@ -1338,75 +1370,15 @@ bool CResource::HasGoneAway(void)
     }
 }
 
-// gets the path of the file specified, may extract it from the zip
+// gets the path of the file specified
 bool CResource::GetFilePath(const char* szFilename, string& strPath)
 {
-    // first, check the resource folder, then check the zip file
-    strPath = m_strResourceDirectoryPath + szFilename;
-    FILE* temp = File::Fopen(strPath.c_str(), "r");
-    if (temp)
-    {
-        fclose(temp);
-#ifdef RESOURCE_DEBUG_MESSAGES
-        CLogger::LogPrintf("%s is in resource folder\n", szFilename);
-#endif
-        return true;
-    }
+    if (IsResourceZip())
+        strPath = m_strResourceCachePath + szFilename;
+    else
+        strPath = m_strResourceDirectoryPath + szFilename;
+    return FileExists(strPath);
 
-    // Don't check zip file if resource was not identified as zipped
-    if (!IsResourceZip())
-        return false;
-
-    if (!m_zipfile)
-        m_zipfile = unzOpenUtf8(m_strResourceZip.c_str());
-    if (m_zipfile)
-    {
-        if (unzLocateFile(m_zipfile, szFilename, false) != UNZ_END_OF_LIST_OF_FILE)
-        {
-            strPath = m_strResourceCachePath + szFilename;
-            temp = File::Fopen(strPath.c_str(), "r");
-            if (temp)
-            {
-                fclose(temp);
-
-                // we've already got a cached copy of this file, check its still the same
-                unsigned long ulFileInZipCRC = get_current_file_crc(m_zipfile);
-                unsigned long ulFileOnDiskCRC = CRCGenerator::GetCRCFromFile(strPath.c_str());
-
-                if (ulFileInZipCRC == ulFileOnDiskCRC)
-                {
-#ifdef RESOURCE_DEBUG_MESSAGES
-                    CLogger::LogPrintf("Up to date %s already extracted from zip\n", szFilename);
-#endif
-                    unzClose(m_zipfile);
-                    m_zipfile = NULL;
-                    return true;            // we've already extracted EXACTLY this file before
-                }
-                else
-                {
-#ifdef RESOURCE_DEBUG_MESSAGES
-                    CLogger::LogPrintf("Old version of %s already extracted, extracting again\n", szFilename);
-#endif
-                }
-            }
-            else
-            {
-#ifdef RESOURCE_DEBUG_MESSAGES
-                CLogger::LogPrintf("Extracting %s from zip\n", szFilename);
-#endif
-            }
-
-            // we've never extracted this EXACT file (maybe an old version), so do it again
-            ExtractFile(szFilename);
-            unzClose(m_zipfile);
-            m_zipfile = NULL;
-            return true;
-        }
-    }
-#ifdef RESOURCE_DEBUG_MESSAGES
-    CLogger::LogPrintf("Can't find %s in zip or in folder\n", szFilename);
-#endif
-    return false;
 }
 
 // Return true if file name is used by this resource
@@ -2594,7 +2566,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
         return g_pGame->GetHTTPD()->RequestLogin(ipoHttpRequest, ipoHttpResponse);
     }
 
-    #define MAX_INPUT_VARIABLES       25
+#define MAX_INPUT_VARIABLES 25
 
     if (!m_bActive)
     {

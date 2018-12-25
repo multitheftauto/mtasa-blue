@@ -225,6 +225,7 @@ private:
     bool         CreateVM(bool bEnableOOP);
     bool         DestroyVM(void);
     void         TidyUp(void);
+    bool         UnzipResource();
     ResponseCode HandleRequestActive(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, class CAccount* account);
     ResponseCode HandleRequestCall(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, class CAccount* account);
 
