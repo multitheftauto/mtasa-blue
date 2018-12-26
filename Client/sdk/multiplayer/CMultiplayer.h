@@ -375,4 +375,7 @@ public:
 
     virtual void SetBoatWaterSplashEnabled(bool bEnabled) = 0;
     virtual void SetTyreSmokeEnabled(bool bEnabled) = 0;
+
+    virtual DWORD GetLastStaticAnimationGroupID() = 0;
+    virtual DWORD GetLastStaticAnimationID() = 0;
 };

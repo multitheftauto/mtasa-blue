@@ -556,6 +556,8 @@ CMultiplayerSA::CMultiplayerSA()
     m_bHeatHazeEnabled = true;
     m_bHeatHazeCustomized = false;
     m_fMaddDoggPoolLevel = 1082.73f;
+    m_dwLastStaticAnimGroupID = 0;
+    m_dwLastStaticAnimID = 0;
 }
 
 void CMultiplayerSA::InitHooks()
