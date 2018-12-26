@@ -9691,7 +9691,7 @@ bool CStaticFunctionDefinitions::ResetSurfaceInfo()
 }
 bool CStaticFunctionDefinitions::ResetSurfaceInfo(short sSurfaceID)
 {
-    if (sSurfaceID >= EColSurfaceValue::DEFAULT && sSurfaceID <= EColSurfaceValue::RAILTRACK)
+    if (sSurfaceID >= EColSurfaceValue::DEFAULT && sSurfaceID <= EColSurfaceValue::SIZE)
     {
         CSurfaceType pOriginalSurfaceInfo = m_pClientGame->GetOriginalSurfaceInfo();
         CSurfaceType* pSurfaceInfo = m_pClientGame->GetSurfaceInfo();
