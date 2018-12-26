@@ -278,6 +278,10 @@ public:
     void SetBoatWaterSplashEnabled(bool bEnabled);
     void SetTyreSmokeEnabled(bool bEnabled);
 
+    void  SetLastStaticAnimationPlayed(DWORD dwGroupID, DWORD dwAnimID) { m_dwLastStaticAnimGroupID = dwGroupID; m_dwLastStaticAnimID = dwAnimID; }
+    DWORD GetLastStaticAnimationGroupID() { return m_dwLastStaticAnimGroupID; }
+    DWORD GetLastStaticAnimationID() { return m_dwLastStaticAnimID; }
+
     CVector      m_vecAkimboTarget;
     bool         m_bAkimboTargetUp;
     static char* ms_PlayerImgCachePtr;
@@ -298,6 +302,8 @@ private:
     bool                m_bHeatHazeCustomized;
     float               m_fNearClipDistance;
     float               m_fMaddDoggPoolLevel;
+    DWORD               m_dwLastStaticAnimGroupID;
+    DWORD               m_dwLastStaticAnimID;
 
     /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
         VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);
