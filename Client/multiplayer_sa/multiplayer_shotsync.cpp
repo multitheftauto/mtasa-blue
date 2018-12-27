@@ -938,69 +938,76 @@ void _declspec(naked) HOOK_CFireManager__StartFire_()
     }
 }
 
+static CEntity* GetProjectileOwner(CPools*  pPools)
+{
+    CEntity* pOwner = nullptr;
+    if (pProjectileOwner)
+    {
+        switch (pProjectileOwner->nType)
+        {
+            case ENTITY_TYPE_VEHICLE:
+            {
+                SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pProjectileOwner);
+                if (pVehicleClientEntity)
+                {
+                    pOwner = pVehicleClientEntity->pEntity;
+                }
+                break;
+            }
+            case ENTITY_TYPE_PED:
+            {
+                SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)pProjectileOwner);
+                if (pPedClientEntity)
+                {
+                    pOwner = pPedClientEntity->pEntity;
+                }
+                break;
+            }
+        }
+    }
+    return pOwner;
+}
+
+static void GetProjectileTarget(CPools*  pPools)
+{
+    if (projectileTargetEntityInterface)
+    {
+        switch (projectileTargetEntityInterface->nType)
+        {
+            case ENTITY_TYPE_VEHICLE:
+            {
+                SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)projectileTargetEntityInterface);
+                if (pVehicleClientEntity)
+                {
+                    projectileTargetEntity = pVehicleClientEntity->pEntity;
+                }
+                break;
+            }
+            case ENTITY_TYPE_PED:
+            {
+                SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)projectileTargetEntityInterface);
+                if (pPedClientEntity)
+                {
+                    projectileTargetEntity = pPedClientEntity->pEntity;
+                }
+                break;
+            }
+            default:
+            {
+                projectileTargetEntity = NULL;
+            }
+        }
+    }
+}
+
 bool ProcessProjectileAdd()
 {
     if (m_pProjectileStopHandler)
     {
         CPools*  pPools = pGameInterface->GetPools();
-        CEntity* pOwner = NULL;
-        if (pProjectileOwner)
-        {
-            switch (pProjectileOwner->nType)
-            {
-                case ENTITY_TYPE_VEHICLE:
-                {
-                    SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pProjectileOwner);
-                    if (pVehicleClientEntity)
-                    {
-                        pOwner = pVehicleClientEntity->pEntity;
-                    }
-                    break;
-                }
-                case ENTITY_TYPE_PED:
-                {
-                    SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)pProjectileOwner);
-                    if (pPedClientEntity)
-                    {
-                        pOwner = pPedClientEntity->pEntity;
-                    }
-                    break;
-                }
-                default:
-                {
-                    pOwner = NULL;
-                }
-            }
-        }
+        CEntity* pOwner = GetProjectileOwner(pPools);
+        GetProjectileTarget(pPools);
 
-        if (projectileTargetEntityInterface)
-        {
-            switch (projectileTargetEntityInterface->nType)
-            {
-                case ENTITY_TYPE_VEHICLE:
-                {
-                    SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)projectileTargetEntityInterface);
-                    if (pVehicleClientEntity)
-                    {
-                        projectileTargetEntity = pVehicleClientEntity->pEntity;
-                    }
-                    break;
-                }
-                case ENTITY_TYPE_PED:
-                {
-                    SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)projectileTargetEntityInterface);
-                    if (pPedClientEntity)
-                    {
-                        projectileTargetEntity = pPedClientEntity->pEntity;
-                    }
-                    break;
-                }
-                default:
-                {
-                    projectileTargetEntity = NULL;
-                }
-            }
-        }
         return m_pProjectileStopHandler(pOwner, projectileWeaponType, projectileOrigin, projectileForce, projectileTarget, projectileTargetEntity);
     }
     return true;
@@ -1011,35 +1018,8 @@ void ProcessProjectile()
     if (m_pProjectileHandler != NULL)
     {
         CPoolsSA* pPools = (CPoolsSA*)pGameInterface->GetPools();
-        CEntity*  pOwner = NULL;
-        if (pProjectileOwner)
-        {
-            switch (pProjectileOwner->nType)
-            {
-                case ENTITY_TYPE_VEHICLE:
-                {
-                    SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pProjectileOwner);
-                    if (pVehicleClientEntity)
-                    {
-                        pOwner = pVehicleClientEntity->pEntity;
-                    }
-                    break;
-                }
-                case ENTITY_TYPE_PED:
-                {
-                    SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)pProjectileOwner);
-                    if (pPedClientEntity)
-                    {
-                        pOwner = pPedClientEntity->pEntity;
-                    }
-                    break;
-                }
-                default:
-                {
-                    pOwner = NULL;
-                }
-            }
-        }
+        CEntity* pOwner = GetProjectileOwner(pPools);
+        GetProjectileTarget(pPools);
 
         CProjectileInfo* projectileInfo = pGameInterface->GetProjectileInfo()->GetProjectileInfo(dwProjectileInfoIndex);
         CProjectile*     projectile = pGameInterface->GetProjectileInfo()->GetProjectile(pProjectile);
