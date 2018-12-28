@@ -145,7 +145,7 @@ typedef enum {
   CURLSSLBACKEND_WOLFSSL = 7,
   CURLSSLBACKEND_SCHANNEL = 8,
   CURLSSLBACKEND_DARWINSSL = 9,
-  CURLSSLBACKEND_AXTLS = 10,
+  CURLSSLBACKEND_AXTLS = 10, /* never used since 7.63.0 */
   CURLSSLBACKEND_MBEDTLS = 11,
   CURLSSLBACKEND_MESALINK = 12
 } curl_sslbackend;
@@ -585,9 +585,6 @@ typedef enum {
   CURL_LAST /* never use! */
 } CURLcode;
 
-/* added in 7.62.0 */
-#define CURLE_SSL_CACERT CURLE_PEER_FAILED_VERIFICATION
-
 #ifndef CURL_NO_OLDIES /* define this to test if your app builds with all
                           the obsolete stuff removed! */
 
@@ -601,6 +598,9 @@ typedef enum {
 /*  compatibility with older names */
 #define CURLOPT_ENCODING CURLOPT_ACCEPT_ENCODING
 #define CURLE_FTP_WEIRD_SERVER_REPLY CURLE_WEIRD_SERVER_REPLY
+
+/* The following were added in 7.62.0 */
+#define CURLE_SSL_CACERT CURLE_PEER_FAILED_VERIFICATION
 
 /* The following were added in 7.21.5, April 2011 */
 #define CURLE_UNKNOWN_TELNET_OPTION CURLE_UNKNOWN_OPTION
@@ -1871,6 +1871,9 @@ typedef enum {
 
   /* Time in ms between connection upkeep calls for long-lived connections. */
   CINIT(UPKEEP_INTERVAL_MS, LONG, 281),
+
+  /* Specify URL using CURL URL API. */
+  CINIT(CURLU, OBJECTPOINT, 282),
 
   CURLOPT_LASTENTRY /* the last unused */
 } CURLoption;

@@ -23,7 +23,7 @@
  ***************************************************************************/
 
 /*
- * Source file for SChannel-specific certificate verification. This code should
+ * Source file for Schannel-specific certificate verification. This code should
  * only be invoked by code in schannel.c.
  */
 
@@ -406,7 +406,7 @@ cleanup:
   return result;
 }
 
-CURLcode verify_certificate(struct connectdata *conn, int sockindex)
+CURLcode Curl_verify_certificate(struct connectdata *conn, int sockindex)
 {
   SECURITY_STATUS status;
   struct Curl_easy *data = conn->data;

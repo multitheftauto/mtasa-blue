@@ -218,8 +218,8 @@ CURLcode Curl_fillreadbuffer(struct connectdata *conn, size_t bytes,
       endofline_native  = "\r\n";
       endofline_network = "\x0d\x0a";
     }
-    hexlen = snprintf(hexbuffer, sizeof(hexbuffer),
-                      "%x%s", nread, endofline_native);
+    hexlen = msnprintf(hexbuffer, sizeof(hexbuffer),
+                       "%x%s", nread, endofline_native);
 
     /* move buffer pointer */
     data->req.upload_fromhere -= hexlen;
@@ -844,6 +844,11 @@ static CURLcode readwrite_data(struct Curl_easy *data,
       k->keepon &= ~KEEP_RECV;
     }
 
+    if(k->keepon & KEEP_RECV_PAUSE) {
+      /* this is a paused transfer */
+      break;
+    }
+
   } while(data_pending(conn) && maxloops--);
 
   if(maxloops <= 0) {
@@ -1348,17 +1353,30 @@ void Curl_init_CONNECT(struct Curl_easy *data)
 CURLcode Curl_pretransfer(struct Curl_easy *data)
 {
   CURLcode result;
-  if(!data->change.url) {
+
+  if(!data->change.url && !data->set.uh) {
     /* we can't do anything without URL */
     failf(data, "No URL set!");
     return CURLE_URL_MALFORMAT;
   }
+
   /* since the URL may have been redirected in a previous use of this handle */
   if(data->change.url_alloc) {
     /* the already set URL is allocated, free it first! */
     Curl_safefree(data->change.url);
     data->change.url_alloc = FALSE;
   }
+
+  if(!data->change.url && data->set.uh) {
+    CURLUcode uc;
+    uc = curl_url_get(data->set.uh,
+                        CURLUPART_URL, &data->set.str[STRING_SET_URL], 0);
+    if(uc) {
+      failf(data, "No URL set!");
+      return CURLE_URL_MALFORMAT;
+    }
+  }
+
   data->change.url = data->set.str[STRING_SET_URL];
 
   /* Init the SSL session ID cache here. We do it here since we want to do it
@@ -1514,13 +1532,24 @@ CURLcode Curl_follow(struct Curl_easy *data,
     disallowport = TRUE;
 
   DEBUGASSERT(data->state.uh);
-  uc = curl_url_set(data->state.uh, CURLUPART_URL, newurl, 0);
-  if(uc)
-    return Curl_uc_to_curlcode(uc);
+  uc = curl_url_set(data->state.uh, CURLUPART_URL, newurl,
+                    (type == FOLLOW_FAKE) ? CURLU_NON_SUPPORT_SCHEME : 0);
+  if(uc) {
+    if(type != FOLLOW_FAKE)
+      return Curl_uc_to_curlcode(uc);
 
-  uc = curl_url_get(data->state.uh, CURLUPART_URL, &newurl, 0);
-  if(uc)
-    return Curl_uc_to_curlcode(uc);
+    /* the URL could not be parsed for some reason, but since this is FAKE
+       mode, just duplicate the field as-is */
+    newurl = strdup(newurl);
+    if(!newurl)
+      return CURLE_OUT_OF_MEMORY;
+  }
+  else {
+
+    uc = curl_url_get(data->state.uh, CURLUPART_URL, &newurl, 0);
+    if(uc)
+      return Curl_uc_to_curlcode(uc);
+  }
 
   if(type == FOLLOW_FAKE) {
     /* we're only figuring out the new url if we would've followed locations

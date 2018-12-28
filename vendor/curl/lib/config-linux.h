@@ -176,9 +176,6 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
 
-/* Define to 1 if you have the `ENGINE_cleanup' function. */
-/* #undef HAVE_ENGINE_CLEANUP */
-
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
 
@@ -928,9 +925,6 @@
 
 /* Define to enable c-ares support */
 /* #undef USE_ARES */
-
-/* if axTLS is enabled */
-/* #undef USE_AXTLS */
 
 /* if CyaSSL/WolfSSL is enabled */
 /* #undef USE_CYASSL */
