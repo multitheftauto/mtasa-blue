@@ -16,18 +16,14 @@ void CMultiplayerSA::SetVehicleWeaponHitHandler(VehicleWeaponHitHandler* pHandle
     pVehicleWeaponHitHandler = pHandler;
 }
 
-static void TriggerVehicleWeaponHitEvent(EVehicleWeaponType weaponType, CVehicleSAInterface* pGameVehicle, CEntitySAInterface* pHitGameEntity, CVector& vecPosition, int iModel, int iSurfaceType)
+static void TriggerVehicleWeaponHitEvent(EVehicleWeaponType weaponType, CVehicleSAInterface* pGameVehicle, CEntitySAInterface* pHitGameEntity,
+                                         CVector& vecPosition, int iModel, int iSurfaceType)
 {
     if (!pVehicleWeaponHitHandler)
         return;
 
     SVehicleWeaponHitEvent event = {
-        weaponType,
-        pGameVehicle,
-        pHitGameEntity,
-        vecPosition,
-        iModel,
-        iSurfaceType,
+        weaponType, pGameVehicle, pHitGameEntity, vecPosition, iModel, iSurfaceType,
     };
 
     pVehicleWeaponHitHandler(event);

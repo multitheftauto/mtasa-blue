@@ -883,10 +883,10 @@ void CClientVehicle::Fix(void)
             }
         }
         // is our scale changed?
-        if((*iter).second.m_bScaleChanged)
+        if ((*iter).second.m_bScaleChanged)
         {
             // Make sure it's different
-            if((*iter).second.m_vecOriginalComponentScale != (*iter).second.m_vecComponentScale)
+            if ((*iter).second.m_vecOriginalComponentScale != (*iter).second.m_vecComponentScale)
             {
                 // apply our new rotation
                 SetComponentScale(strTemp, (*iter).second.m_vecComponentScale);
@@ -1922,9 +1922,19 @@ CClientVehicle* CClientVehicle::GetPreviousTrainCarriage(void)
     if (IsDerailed())
         return NULL;
 
-    if (m_pVehicle && m_pVehicle->GetPreviousTrainCarriage())
+    if (m_pVehicle)
     {
-        return m_pVehicleManager->Get(m_pVehicle->GetPreviousTrainCarriage(), false);
+        CVehicle* pPreviousTrainCarriage = m_pVehicle->GetPreviousTrainCarriage();
+        if (pPreviousTrainCarriage)
+        {
+            CPools*                    pPools = g_pGame->GetPools();
+            CEntitySAInterface*        pInterface = pPreviousTrainCarriage->GetInterface();
+            SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pInterface);
+            if (pVehicleClientEntity && pVehicleClientEntity->pClientEntity)
+            {
+                return reinterpret_cast<CClientVehicle*>(pVehicleClientEntity->pClientEntity);
+            }
+        }
     }
     return m_pPreviousLink;
 }
@@ -1934,9 +1944,19 @@ CClientVehicle* CClientVehicle::GetNextTrainCarriage(void)
     if (IsDerailed())
         return NULL;
 
-    if (m_pVehicle && m_pVehicle->GetNextTrainCarriage())
+    if (m_pVehicle)
     {
-        return m_pVehicleManager->Get(m_pVehicle->GetNextTrainCarriage(), false);
+        CVehicle* pNextTrainCarriage = m_pVehicle->GetNextTrainCarriage();
+        if (pNextTrainCarriage)
+        {
+            CPools*                    pPools = g_pGame->GetPools();
+            CEntitySAInterface*        pInterface = pNextTrainCarriage->GetInterface();
+            SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pInterface);
+            if (pVehicleClientEntity && pVehicleClientEntity->pClientEntity)
+            {
+                return reinterpret_cast<CClientVehicle*>(pVehicleClientEntity->pClientEntity);
+            }
+        }
     }
     return m_pNextLink;
 }
@@ -2525,11 +2545,11 @@ void CClientVehicle::Create(void)
         {
             DWORD dwModels[1];
             dwModels[0] = m_usModel;
-            m_pVehicle = g_pGame->GetPools()->AddTrain(&m_Matrix.vPos, dwModels, 1, m_bTrainDirection, m_ucTrackID);
+            m_pVehicle = g_pGame->GetPools()->AddTrain(this, &m_Matrix.vPos, dwModels, 1, m_bTrainDirection, m_ucTrackID);
         }
         else
         {
-            m_pVehicle = g_pGame->GetPools()->AddVehicle(static_cast<eVehicleTypes>(m_usModel), m_ucVariation, m_ucVariation2);
+            m_pVehicle = g_pGame->GetPools()->AddVehicle(this, static_cast<eVehicleTypes>(m_usModel), m_ucVariation, m_ucVariation2);
         }
 
         // Failed. Remove our reference to the vehicle model and return
@@ -2544,9 +2564,6 @@ void CClientVehicle::Create(void)
 
         // Put our pointer in its custom data
         m_pVehicle->SetStoredPointer(this);
-
-        // Add XRef
-        g_pClientGame->GetGameEntityXRefManager()->AddEntityXRef(this, m_pVehicle);
 
         /*if ( DoesNeedToWaitForGroundToLoad() )
         {
@@ -2850,10 +2867,10 @@ void CClientVehicle::Create(void)
                 }
             }
             // is our scale changed?
-            if((*iter).second.m_bScaleChanged)
+            if ((*iter).second.m_bScaleChanged)
             {
                 // Make sure it's different
-                if((*iter).second.m_vecOriginalComponentScale != (*iter).second.m_vecComponentScale)
+                if ((*iter).second.m_vecOriginalComponentScale != (*iter).second.m_vecComponentScale)
                 {
                     // apple our new scale
                     SetComponentScale(strTemp, (*iter).second.m_vecComponentScale);
@@ -2985,9 +3002,6 @@ void CClientVehicle::Destroy(void)
                 m_pPreviousLink->GetGameVehicle()->SetNextTrainCarriage(NULL);
         }
 
-        // Remove XRef
-        g_pClientGame->GetGameEntityXRefManager()->RemoveEntityXRef(this, m_pVehicle);
-
         // Destroy the vehicle
         g_pGame->GetPools()->RemoveVehicle(m_pVehicle);
         m_pVehicle = NULL;
@@ -3035,7 +3049,14 @@ CClientVehicle* CClientVehicle::GetTowedVehicle(void)
     {
         CVehicle* pGameVehicle = m_pVehicle->GetTowedVehicle();
         if (pGameVehicle)
-            return m_pVehicleManager->Get(pGameVehicle, false);
+        {
+            CPools*                    pPools = g_pGame->GetPools();
+            SClientEntity<CVehicleSA>* pVehicleEntity = pPools->GetVehicle((DWORD*)pGameVehicle->GetInterface());
+            if (pVehicleEntity && pVehicleEntity->pClientEntity)
+            {
+                return reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity);
+            }
+        }
     }
 
     return m_pTowedVehicle;
@@ -3047,7 +3068,14 @@ CClientVehicle* CClientVehicle::GetRealTowedVehicle(void)
     {
         CVehicle* pGameVehicle = m_pVehicle->GetTowedVehicle();
         if (pGameVehicle)
-            return m_pVehicleManager->Get(pGameVehicle, false);
+        {
+            CPools*                    pPools = g_pGame->GetPools();
+            SClientEntity<CVehicleSA>* pVehicleEntity = pPools->GetVehicle((DWORD*)pGameVehicle->GetInterface());
+            if (pVehicleEntity && pVehicleEntity->pClientEntity)
+            {
+                return reinterpret_cast<CClientVehicle*>(pVehicleEntity->pClientEntity);
+            }
+        }
 
         // This is the only difference from ::GetTowedVehicle
         return NULL;
@@ -3310,34 +3338,8 @@ CClientEntity* CClientVehicle::GetPickedUpEntityWithWinch(void)
         CPhysical* pPhysical = m_pVehicle->QueryPickedUpEntityWithWinch();
         if (pPhysical)
         {
-            eEntityType entityType = pPhysical->GetEntityType();
-            switch (entityType)
-            {
-                case ENTITY_TYPE_VEHICLE:
-                {
-                    CVehicle*       pGameVehicle = dynamic_cast<CVehicle*>(pPhysical);
-                    CClientVehicle* pVehicle = m_pVehicleManager->Get(pGameVehicle, false);
-                    if (pVehicle)
-                        pEntity = static_cast<CClientEntity*>(pVehicle);
-                    break;
-                }
-                case ENTITY_TYPE_PED:
-                {
-                    CPlayerPed* pPlayerPed = dynamic_cast<CPlayerPed*>(pPhysical);
-                    CClientPed* pModel = m_pManager->GetPedManager()->Get(pPlayerPed, false, false);
-                    if (pModel)
-                        pEntity = static_cast<CClientEntity*>(pModel);
-                    break;
-                }
-                case ENTITY_TYPE_OBJECT:
-                {
-                    CObject*       pGameObject = dynamic_cast<CObject*>(pPhysical);
-                    CClientObject* pObject = m_pManager->GetObjectManager()->Get(pGameObject, false);
-                    if (pObject)
-                        pEntity = static_cast<CClientEntity*>(pObject);
-                    break;
-                }
-            }
+            CPools* pPools = g_pGame->GetPools();
+            pEntity = pPools->GetClientEntity((DWORD*)pPhysical->GetInterface());
         }
     }
 
@@ -4545,10 +4547,10 @@ bool CClientVehicle::SetComponentScale(const SString& vehicleComponent, CVector 
     // Ensure scale is parent relative
     ConvertComponentScaleBase(vehicleComponent, vecScale, inputBase, EComponentBase::PARENT);
 
-    if(m_pVehicle)
+    if (m_pVehicle)
     {
         // set our rotation on the model
-        if(m_pVehicle->SetComponentScale(vehicleComponent, vecScale))
+        if (m_pVehicle->SetComponentScale(vehicleComponent, vecScale))
         {
             // update our cache
             m_ComponentData[vehicleComponent].m_vecComponentScale = vecScale;
@@ -4559,7 +4561,7 @@ bool CClientVehicle::SetComponentScale(const SString& vehicleComponent, CVector 
     }
     else
     {
-        if(m_ComponentData.find(vehicleComponent) != m_ComponentData.end())
+        if (m_ComponentData.find(vehicleComponent) != m_ComponentData.end())
         {
             // update our cache
             m_ComponentData[vehicleComponent].m_vecComponentScale = vecScale;
@@ -4570,9 +4572,9 @@ bool CClientVehicle::SetComponentScale(const SString& vehicleComponent, CVector 
     return false;
 }
 
-bool CClientVehicle::GetComponentScale(const SString& vehicleComponent, CVector& vecScale , EComponentBaseType outputBase)
+bool CClientVehicle::GetComponentScale(const SString& vehicleComponent, CVector& vecScale, EComponentBaseType outputBase)
 {
-    if(m_pVehicle)
+    if (m_pVehicle)
     {
         // fill our scale from the actual rotation
         bool bResult = m_pVehicle->GetComponentScale(vehicleComponent, vecScale);
@@ -4584,7 +4586,7 @@ bool CClientVehicle::GetComponentScale(const SString& vehicleComponent, CVector&
     }
     else
     {
-        if(m_ComponentData.find(vehicleComponent) != m_ComponentData.end())
+        if (m_ComponentData.find(vehicleComponent) != m_ComponentData.end())
         {
             // fill our rotation from the cached rotation
             vecScale = m_ComponentData[vehicleComponent].m_vecComponentScale;
@@ -4600,7 +4602,7 @@ bool CClientVehicle::GetComponentScale(const SString& vehicleComponent, CVector&
 bool CClientVehicle::ResetComponentScale(const SString& vehicleComponent)
 {
     // set our rotation on the model
-    if(SetComponentScale(vehicleComponent, m_ComponentData[vehicleComponent].m_vecOriginalComponentScale))
+    if (SetComponentScale(vehicleComponent, m_ComponentData[vehicleComponent].m_vecOriginalComponentScale))
     {
         // update our cache
         m_ComponentData[vehicleComponent].m_bScaleChanged = false;
@@ -4690,10 +4692,9 @@ void CClientVehicle::ConvertComponentPositionBase(const SString& vehicleComponen
     }
 }
 
-void CClientVehicle::ConvertComponentScaleBase(const SString& vehicleComponent, CVector& vecScale, EComponentBaseType inputBase,
-    EComponentBaseType outputBase)
+void CClientVehicle::ConvertComponentScaleBase(const SString& vehicleComponent, CVector& vecScale, EComponentBaseType inputBase, EComponentBaseType outputBase)
 {
-    if(inputBase != outputBase)
+    if (inputBase != outputBase)
     {
         CMatrix matTemp(CVector(), CVector(), vecScale);
         ConvertComponentMatrixBase(vehicleComponent, matTemp, inputBase, outputBase);

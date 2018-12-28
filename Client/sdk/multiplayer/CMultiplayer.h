@@ -43,7 +43,7 @@ enum EVehicleWeaponType : int
     WATER_CANNON,
     TANK_GUN,
     ROCKET,
-    HEAT_SEAKING_ROCKET,
+    HEAT_SEEKING_ROCKET,
 };
 
 struct SVehicleWeaponHitEvent
@@ -375,4 +375,7 @@ public:
 
     virtual void SetBoatWaterSplashEnabled(bool bEnabled) = 0;
     virtual void SetTyreSmokeEnabled(bool bEnabled) = 0;
+
+    virtual DWORD GetLastStaticAnimationGroupID() = 0;
+    virtual DWORD GetLastStaticAnimationID() = 0;
 };
