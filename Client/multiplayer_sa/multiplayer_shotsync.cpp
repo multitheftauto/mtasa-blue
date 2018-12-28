@@ -297,7 +297,6 @@ static void Event_BulletImpact(void)
 CPedSAInterface*       pAPed = NULL;
 float                  fTempPosX = 0, fTempPosY = 0, fTempPosZ = 0;
 CPed*                  pATargetingPed = NULL;
-SClientEntity<CPedSA>* pATargetingPedClient = nullptr;
 CVector*               pTempVec;
 bool*                  pSkipAim;
 CRemoteDataStorageSA*  pTempRemote;
@@ -322,6 +321,12 @@ VOID _declspec(naked) HOOK_CTaskSimpleUsegun_ProcessPed()
     }
 }
 
+static CPed * GetTargetingPed()
+{
+    SClientEntity<CPedSA>* pClientEntity = m_pools->GetPed((DWORD*)pAPed);
+    return pClientEntity ? pClientEntity->pEntity : nullptr;
+}
+
 VOID _declspec(naked) HOOK_SkipAim()
 {
     // We can use ECX
@@ -338,17 +343,7 @@ VOID _declspec(naked) HOOK_SkipAim()
         pushad
     }
 
-    pATargetingPedClient = m_pools->GetPed((DWORD*)pAPed);
-    if (pATargetingPedClient)
-    {
-        // access pEntity member, not using [0] will crash it
-        pATargetingPed = reinterpret_cast<CPed*>(((DWORD*)pATargetingPedClient)[0]);
-    }
-    else
-    {
-        pATargetingPed = nullptr;
-    }
-
+    pATargetingPed = GetTargetingPed();
     if (pATargetingPed)
     {
         // If this is the local player
@@ -419,18 +414,7 @@ VOID _declspec(naked) HOOK_IKChainManager_PointArm()
         pushad
     }
 
-    pATargetingPedClient = m_pools->GetPed((DWORD*)pAPed);
-
-    if (pATargetingPedClient)
-    {
-        // access pEntity member, not using [0] will crash it
-        pATargetingPed = reinterpret_cast<CPed*>(((DWORD*)pATargetingPedClient)[0]);
-    }
-    else
-    {
-        pATargetingPed = nullptr;
-    }
-
+    pATargetingPed = GetTargetingPed();
     if (pATargetingPed)
     {
         // If this is the local player
@@ -493,18 +477,7 @@ VOID _declspec(naked) HOOK_IKChainManager_LookAt()
     // Jax: this gets called on vehicle collision and pTargetVector is null
     if (pTargetVector)
     {
-        pATargetingPedClient = m_pools->GetPed((DWORD*)pAPed);
-
-        if (pATargetingPedClient)
-        {
-            // access pEntity member, not using [0] will crash it
-            pATargetingPed = reinterpret_cast<CPed*>(((DWORD*)pATargetingPedClient)[0]);
-        }
-        else
-        {
-            pATargetingPed = nullptr;
-        }
-
+        pATargetingPed = GetTargetingPed();
         if (pATargetingPed)
         {
             // If this is the local player
