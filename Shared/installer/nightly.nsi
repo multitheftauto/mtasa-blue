@@ -2594,9 +2594,8 @@ Function SetPermissionsGroup
         ${EndIf}
         ${LogText} "AccessControl::SidToName failed with '$1': '$2' '$3'"
     ${Next}
-    MessageBox MB_ICONEXCLAMATION|MB_TOPMOST|MB_SETFOREGROUND \
-        "Can't find valid SID"
-    ${LogText} "Can't find valid SID"
-    Abort
+    ; Default to \LOCAL
+    StrCpy $PermissionsGroup "S-1-2-0"
+    ${LogText} "SetPermissionsGroup using '$PermissionsGroup'"
 FunctionEnd
 
