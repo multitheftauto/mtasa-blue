@@ -564,6 +564,38 @@ float CModelInfoSA::GetLODDistance()
     return 0.0f;
 }
 
+bool CModelInfoSA::SetTime(char hour1, char hour2)
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (m_pInterface)
+    {
+        TimeInfo* time = ((TimeInfo*(*)(void))m_pInterface->VFTBL->GetTimeInfo)();
+        if (time)
+        {
+            time->m_nTimeOn = hour1;
+            time->m_nTimeOff = hour2;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CModelInfoSA::GetTime(char& hour1, char& hour2)
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (m_pInterface)
+    {
+        TimeInfo* time = ((TimeInfo*(*)(void))m_pInterface->VFTBL->GetTimeInfo)();
+        if (time)
+        {
+            hour1 = time->m_nTimeOn;
+            hour2 = time->m_nTimeOff;
+            return true;
+        }
+    }
+    return false;
+}
+
 void CModelInfoSA::SetLODDistance(float fDistance)
 {
 #if 0

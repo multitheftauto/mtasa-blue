@@ -34,6 +34,8 @@ void CLuaEngineDefs::LoadFunctions(void)
         {"engineGetModelIDFromName", EngineGetModelIDFromName},
         {"engineGetModelTextureNames", EngineGetModelTextureNames},
         {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
+        {"engineSetModelTime", EngineSetModelTime },
+        {"engineGetModelTime", EngineGetModelTime },
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -58,12 +60,14 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "restoreModel", "engineRestoreModel");
     lua_classfunction(luaVM, "setAsynchronousLoading", "engineSetAsynchronousLoading");
     lua_classfunction(luaVM, "setModelLODDistance", "engineSetModelLODDistance");
+    lua_classfunction(luaVM, "setModelTime", "engineSetModelTime");
 
     lua_classfunction(luaVM, "getVisibleTextureNames", "engineGetVisibleTextureNames");
     lua_classfunction(luaVM, "getModelLODDistance", "engineGetModelLODDistance");
     lua_classfunction(luaVM, "getModelTextureNames", "engineGetModelTextureNames");
     lua_classfunction(luaVM, "getModelIDFromName", "engineGetModelIDFromName");
     lua_classfunction(luaVM, "getModelNameFromID", "engineGetModelNameFromID");
+    lua_classfunction(luaVM, "getModelTime", "engineGetModelTime");
 
     //  lua_classvariable ( luaVM, "modelLODDistance", "engineSetModelLODDistance", "engineGetModelLODDistance" ); .modelLODDistance[model] = distance
     //  lua_classvariable ( luaVM, "modelNameFromID", NULL, "engineGetModelNameFromID" ); .modelNameFromID[id] = "name"
@@ -910,6 +914,77 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // We failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineSetModelTime(lua_State* luaVM)
+{
+    // bool engineSetModelTime ( int/string modelID, int hourOn, int hourOff )
+    SString strModelId;
+    char hour[2];
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strModelId);
+    argStream.ReadNumber(hour[0]);
+    argStream.ReadNumber(hour[1]);
+
+    if (!argStream.HasErrors())
+    {
+        ushort      usModelID = CModelNames::ResolveModelID(strModelId);
+        CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
+        if (pModelInfo)
+        {
+            if (hour[0] > hour[1])
+                std::swap(hour[0], hour[1]);
+
+            if (hour[0] >= 0 && hour[0] <= 23 && hour[1] >= 0 && hour[1] <= 23)
+            {
+                lua_pushboolean(luaVM, pModelInfo->SetTime(hour[0], hour[1]));
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineGetModelTime(lua_State* luaVM)
+{
+    // int, int engineSetModelTime ( int/string modelID )
+    SString strModelId;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strModelId);
+
+    if (!argStream.HasErrors())
+    {
+        ushort      usModelID = CModelNames::ResolveModelID(strModelId);
+        CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
+        if (pModelInfo)
+        {
+            char hour[2];
+            if (pModelInfo->GetTime(hour[0], hour[1]))
+            {
+                lua_pushnumber(luaVM, hour[0]);
+                lua_pushnumber(luaVM, hour[1]);
+                return 2;
+            }
+            else // Model is incompatible, don't let confuse user.
+            {
+                lua_pushnumber(luaVM, 0);
+                lua_pushnumber(luaVM, 0);
+                return 2;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
     lua_pushboolean(luaVM, false);
     return 1;
 }

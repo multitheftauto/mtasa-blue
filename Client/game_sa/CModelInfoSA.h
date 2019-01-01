@@ -326,6 +326,8 @@ public:
     void           RestreamIPL(void);
     static void    StaticFlushPendingRestreamIPL(void);
     static void    StaticSetHooks(void);
+    bool           GetTime(char& hour1, char& hour2);
+    bool           SetTime(char hour1, char hour2);
 
     void        SetAlphaTransparencyEnabled(BOOL bEnabled);
     bool        IsAlphaTransparencyEnabled();

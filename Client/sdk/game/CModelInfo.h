@@ -127,6 +127,8 @@ public:
     virtual float          GetLODDistance() = 0;
     virtual void           SetLODDistance(float fDistance) = 0;
     virtual void           RestreamIPL() = 0;
+    virtual bool           GetTime(char& hour1, char& hour2) = 0;
+    virtual bool           SetTime(char hour1, char hour2) = 0;
 
     virtual void ModelAddRef(EModelRequestType requestType, const char* szTag /* = NULL*/) = 0;
     virtual void RemoveRef(bool bRemoveExtraGTARef = false) = 0;
