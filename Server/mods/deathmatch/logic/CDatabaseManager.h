@@ -190,10 +190,12 @@ public:
 
     // CElement
     virtual void Unlink(void) { g_pGame->GetDatabaseManager()->Disconnect(m_Connection); }
-    virtual bool ReadSpecialData(void) { return false; }
 
     // CDatabaseConnectionElement
     SConnectionHandle GetConnectionHandle(void) { return m_Connection; }
+
+protected:
+    bool ReadSpecialData(const int iLine) override { return false; }
 
 protected:
     SConnectionHandle m_Connection;

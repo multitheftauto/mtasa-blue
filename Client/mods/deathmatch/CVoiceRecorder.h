@@ -18,9 +18,7 @@
 #define FRAME_OUTGOING_BUFFER_COUNT 100
 #define FRAME_INCOMING_BUFFER_COUNT 100
 
-// Uncomment this to hear yourself speak locally (Voice is still encoded & decoded to simulate network transmission)
-#define VOICE_DEBUG_LOCAL_PLAYBACK
-
+#include <mutex>
 #include <speex/speex.h>
 #include <speex/speex_preprocess.h>
 #include <portaudio/portaudio.h>
@@ -96,5 +94,5 @@ private:
     unsigned char m_ucQuality;
 
     std::list<SString> m_EventQueue;
-    CCriticalSection   m_CS;
+    std::mutex         m_Mutex;
 };

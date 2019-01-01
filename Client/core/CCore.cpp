@@ -1014,6 +1014,9 @@ void CCore::CreateNetwork()
         ulong ulNetModuleVersion = 0;
         pfnCheckCompatibility(1, &ulNetModuleVersion);
         SString strMessage("Network module not compatible! (Expected 0x%x, got 0x%x)", MTA_DM_CLIENT_NET_MODULE_VERSION, ulNetModuleVersion);
+#if !defined(MTA_DM_CONNECT_TO_PUBLIC)
+        strMessage += "\n\n(Devs: Update source and run win-install-data.bat)";
+#endif
         BrowseToSolution("netc-not-compatible", ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage);
     }
 
@@ -1364,7 +1367,7 @@ void CCore::RegisterCommands()
     m_pCommands->Add("showframegraph", _("shows the frame timing graph"), CCommandFuncs::ShowFrameGraph);
     m_pCommands->Add("jinglebells", "", CCommandFuncs::JingleBells);
     m_pCommands->Add("fakelag", "", CCommandFuncs::FakeLag);
-
+    
     m_pCommands->Add("reloadnews", "for developers: reload news", CCommandFuncs::ReloadNews);
 }
 
@@ -1716,6 +1719,14 @@ void CCore::UpdateRecentlyPlayed()
 }
 
 //
+// Called just before GTA calculates frame time deltas
+//
+void CCore::OnGameTimerUpdate()
+{
+    ApplyQueuedFrameRateLimit();
+}
+
+//
 // Recalculate FPS limit to use
 //
 // Uses client rate from config
@@ -1790,53 +1801,45 @@ void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
 
     uint uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
 
-    TIMING_GRAPH("Limiter");
-
-    if (uiUseRate < 1)
-        return DoReliablePulse();
-
-    if (m_DiagnosticDebug != EDiagnosticDebug::D3D_6732)
-        Sleep(1);            // Make frame rate smoother maybe
-
-    // Calc required time in ms between frames
-    const double dTargetTimeToUse = 1000.0 / uiUseRate;
-
-    // Time now
-    double dTimeMs = GetTickCount32();
-
-    // Get delta time in ms since last frame
-    double dTimeUsed = dTimeMs - m_dLastTimeMs;
-
-    // Apply any over/underrun carried over from the previous frame
-    dTimeUsed += m_dPrevOverrun;
-
-    if (dTimeUsed < dTargetTimeToUse)
+    if (uiUseRate > 0)
     {
-        // Have time spare - maybe eat some of that now
-        double dSpare = dTargetTimeToUse - dTimeUsed;
+        // Apply previous frame rate if is hasn't been done yet
+        ApplyQueuedFrameRateLimit();
 
-        double dUseUpNow = dSpare - dTargetTimeToUse * 0.2f;
-        if (dUseUpNow >= 1)
-            Sleep(static_cast<DWORD>(floor(dUseUpNow)));
-
-        // Redo timing calcs
-        dTimeMs = GetTickCount32();
-        dTimeUsed = dTimeMs - m_dLastTimeMs;
-        dTimeUsed += m_dPrevOverrun;
+        // Limit is usually applied in OnGameTimerUpdate
+        m_uiQueuedFrameRate = uiUseRate;
+        m_bQueuedFrameRateValid = true;
     }
-
-    // Update over/underrun for next frame
-    m_dPrevOverrun = dTimeUsed - dTargetTimeToUse;
-
-    // Limit carry over
-    m_dPrevOverrun = Clamp(dTargetTimeToUse * -0.9f, m_dPrevOverrun, dTargetTimeToUse * 0.1f);
-
-    m_dLastTimeMs = dTimeMs;
 
     DoReliablePulse();
 
     TIMING_GRAPH("FrameEnd");
     TIMING_GRAPH("");
+}
+
+//
+// Frame rate limit (wait) is done here.
+//
+void CCore::ApplyQueuedFrameRateLimit()
+{
+    if (m_bQueuedFrameRateValid)
+    {
+        m_bQueuedFrameRateValid = false;
+        // Calc required time in ms between frames
+        const double dTargetTimeToUse = 1000.0 / m_uiQueuedFrameRate;
+
+        while (true)
+        {
+            // See if we need to wait
+            double dSpare = dTargetTimeToUse - m_FrameRateTimer.Get();
+            if (dSpare <= 0.0)
+                break;
+            if (dSpare >= 2.0)
+                Sleep(1);
+        }
+        m_FrameRateTimer.Reset();
+        TIMING_GRAPH("Limiter");
+    }
 }
 
 //
@@ -2269,4 +2272,27 @@ SString CCore::GetBlueCopyrightString(void)
 {
     SString strCopyright = BLUE_COPYRIGHT_STRING;
     return strCopyright.Replace("%BUILD_YEAR%", std::to_string(BUILD_YEAR).c_str());
+}
+
+bool CCore::IsHostSmotraServer()
+{
+    unsigned int uiPort;
+    SString      strHost;
+    CVARS_GET("host", strHost);
+    CVARS_GET("port", uiPort);
+
+    if (uiPort != 22003)
+    {
+        return false;
+    }
+
+    unsigned int arrSmotraHostIps[3] = {HashString("164.132.204.62"), HashString("149.202.223.26"), HashString("151.80.111.167")};
+    for (int i = 0; i < 3; i++)
+    {
+        if (arrSmotraHostIps[i] == HashString(strHost))
+        {
+            return true;
+        }
+    }
+    return false;
 }

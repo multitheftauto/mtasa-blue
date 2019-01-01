@@ -824,25 +824,32 @@ void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, 
 void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
                                  short siSegments, float fRatio, bool bPostGUI)
 {
+    // Check if window is minimized so we don't calculate vertices for no reason.
     if (g_pCore->IsWindowMinimized())
         return;
 
-    // Set up a queue item
-    sDrawQueueItem Item;
-    Item.eType = QUEUE_CIRCLE;
-    Item.blendMode = m_ActiveBlendMode;
-    Item.Circle.fX = fX;
-    Item.Circle.fY = fY;
-    Item.Circle.fRadius = fRadius;
-    Item.Circle.fStartAngle = fStartAngle;
-    Item.Circle.fStopAngle = fStopAngle;
-    Item.Circle.bPostGUI = bPostGUI;
-    Item.Circle.fSegments = siSegments;
-    Item.Circle.fRatio = fRatio;
-    Item.Circle.ulColor = ulColor;
-    Item.Circle.ulColorCenter = ulColorCenter;
-    // Add it to the queue
-    AddQueueItem(Item, bPostGUI);
+    auto pVecVertices = new std::vector<PrimitiveVertice>();
+    fStartAngle = D3DXToRadian(fStartAngle);
+    fStopAngle = D3DXToRadian(fStopAngle);
+    // Calculate each segment angle
+    const float kfSegmentAngle = (fStopAngle - fStartAngle) / (siSegments-1);
+
+    // Add center point
+    pVecVertices->push_back({ fX,fY,0.0f,ulColorCenter });
+
+    // And calculate all other vertices
+    for (short siSeg = 0; siSeg < siSegments; siSeg++)
+    {
+        PrimitiveVertice vert;
+        float curAngle = fStartAngle + siSeg * kfSegmentAngle;
+        vert.fX = fX + fRadius * cos(curAngle) * fRatio;
+        vert.fY = fY + fRadius * sin(curAngle);
+        vert.fZ = 0.0f;
+        vert.Color = ulColor;
+        pVecVertices->push_back(vert);
+    }
+
+    DrawPrimitiveQueued(pVecVertices, D3DPT_TRIANGLEFAN, bPostGUI);
 }
 
 void CGraphics::DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI)
@@ -931,68 +938,6 @@ bool CGraphics::IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType)
     }
     
     return true;
-}
-
-struct stVertex
-{
-    float    x, y, z;
-    D3DCOLOR color;
-};
-
-void CGraphics::DrawCircleInternal(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
-                                   short siSegments, float fRatio, bool bPostGUI)
-{
-    fStartAngle = D3DXToRadian(fStartAngle);
-    fStopAngle = D3DXToRadian(fStopAngle);
-
-    std::vector<stVertex> vecPoints;
-
-    // center
-    stVertex vertCenter;
-    vertCenter.x = fX;
-    vertCenter.y = fY;
-    vertCenter.z = 0;
-    vertCenter.color = ulColorCenter;
-    vecPoints.push_back(vertCenter);
-
-    // first
-    stVertex vertFirst;
-    vertFirst.x = fX + fRadius * cos(fStartAngle) * fRatio;
-    vertFirst.y = fY + fRadius * sin(fStartAngle) / fRatio;
-    vertFirst.z = 0;
-    vertFirst.color = ulColor;
-    vecPoints.push_back(vertFirst);
-
-    const float kfSegmentAngle = (fStopAngle - fStartAngle) / siSegments;
-
-    // if kfSegmentAngle is 0.0f or less, we'll enter an infinte loop
-    if (kfSegmentAngle > 0.0f)
-    {
-        for (float fAngle = fStartAngle; fAngle <= fStopAngle;)
-        {
-            stVertex vertex;
-            vertex.x = fX + fRadius * cos(fAngle) * fRatio;
-            vertex.y = fY + fRadius * sin(fAngle) / fRatio;
-            vertex.z = 0;
-            vertex.color = ulColor;
-            vecPoints.push_back(vertex);
-            fAngle += kfSegmentAngle;
-        }
-    }
-
-    // last
-    stVertex vertLast;
-    vertLast.x = fX + fRadius * cos(fStopAngle) * fRatio;
-    vertLast.y = fY + fRadius * sin(fStopAngle) / fRatio;
-    vertLast.z = 0;
-    vertLast.color = ulColor;
-    vecPoints.push_back(vertLast);
-
-    if (vecPoints.size() >= 3)
-    {
-        m_pDevice->SetTexture(0, 0);
-        m_pDevice->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, vecPoints.size() - 2, &vecPoints[0], sizeof(stVertex));
-    }
 }
 
 void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeight, float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV,
@@ -1633,13 +1578,6 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
         {
             CheckModes(EDrawMode::DX_SPRITE, Item.blendMode);
             DrawRectangleInternal(Item.Rect.fX, Item.Rect.fY, Item.Rect.fWidth, Item.Rect.fHeight, Item.Rect.ulColor, Item.Rect.bSubPixelPositioning);
-            break;
-        }
-        case QUEUE_CIRCLE:
-        {
-            CheckModes(EDrawMode::DX_SPRITE, Item.blendMode);
-            DrawCircleInternal(Item.Circle.fX, Item.Circle.fY, Item.Circle.fRadius, Item.Circle.fStartAngle, Item.Circle.fStopAngle, Item.Circle.ulColor,
-                               Item.Circle.ulColorCenter, Item.Circle.fSegments, Item.Circle.fRatio, Item.Circle.bPostGUI);
             break;
         }
 

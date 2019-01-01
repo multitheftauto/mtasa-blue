@@ -22,7 +22,7 @@ public:
     CRadarAreaManager(void);
     ~CRadarAreaManager(void);
 
-    CRadarArea* Create(CElement* pParent, CXMLNode* pNode);
+    CRadarArea* Create(CElement* pParent);
     CRadarArea* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void        DeleteAll(void);
 

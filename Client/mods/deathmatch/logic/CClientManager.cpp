@@ -270,16 +270,6 @@ void CClientManager::UnreferenceEntity(CClientEntity* pEntity)
     }
 }
 
-CClientEntity* CClientManager::FindEntity(CEntity* pGameEntity, bool bValidatePointer)
-{
-    return g_pClientGame->GetGameEntityXRefManager()->FindClientEntity(pGameEntity);
-}
-
-CClientEntity* CClientManager::FindEntitySafe(CEntity* pGameEntity)
-{
-    return g_pClientGame->GetGameEntityXRefManager()->FindClientEntity(pGameEntity);
-}
-
 void CClientManager::OnUpdateStreamPosition(CClientStreamElement* pElement)
 {
     if (m_pColManager && m_pColManager->Count() > 0)

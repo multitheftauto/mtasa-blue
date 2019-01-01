@@ -1435,6 +1435,10 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
                 // Tell vehicle audio we have driver
                 pGameVehicle->GetVehicleAudioEntity()->JustGotInVehicleAsDriver();
             }
+
+            // Make sure our camera is fixed on the new vehicle
+            if (m_bIsLocalPlayer)
+                m_pManager->GetCamera()->SetTargetEntity(pVehicle);
         }
 
         // Update the vehicle and us so we know we've occupied it
@@ -1477,6 +1481,10 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
                         // Tell vehicle audio we have driver
                         pGameVehicle->GetVehicleAudioEntity()->JustGotInVehicleAsDriver();
                     }
+
+                    // Make sure our camera is fixed on the new vehicle
+                    if (m_bIsLocalPlayer)
+                        m_pManager->GetCamera()->SetTargetEntity(pVehicle);
                 }
             }
 
@@ -3561,14 +3569,11 @@ void CClientPed::_CreateModel(void)
     m_pLoadedModelInfo->ModelAddRef(BLOCKING, "CClientPed::_CreateModel");
 
     // Create the new ped
-    m_pPlayerPed = dynamic_cast<CPlayerPed*>(g_pGame->GetPools()->AddPed(static_cast<ePedModel>(m_ulModel)));
+    m_pPlayerPed = dynamic_cast<CPlayerPed*>(g_pGame->GetPools()->AddPed(this, static_cast<ePedModel>(m_ulModel)));
     if (m_pPlayerPed)
     {
         // Put our pointer in the stored data and update the remote data with the new model pointer
         m_pPlayerPed->SetStoredPointer(this);
-
-        // Add XRef
-        g_pClientGame->GetGameEntityXRefManager()->AddEntityXRef(this, m_pPlayerPed);
 
         g_pMultiplayer->AddRemoteDataStorage(m_pPlayerPed, m_remoteDataStorage);
 
@@ -3686,7 +3691,7 @@ void CClientPed::_CreateModel(void)
 void CClientPed::_CreateLocalModel(void)
 {
     // Init the local player and grab the pointers
-    g_pGame->InitLocalPlayer();
+    g_pGame->InitLocalPlayer(this);
     m_pPlayerPed = dynamic_cast<CPlayerPed*>(g_pGame->GetPools()->GetPedFromRef((DWORD)1));
 
     if (m_pPlayerPed)
@@ -3695,9 +3700,6 @@ void CClientPed::_CreateLocalModel(void)
 
         // Put our pointer in its stored pointer
         m_pPlayerPed->SetStoredPointer(this);
-
-        // Add XRef
-        g_pClientGame->GetGameEntityXRefManager()->AddEntityXRef(this, m_pPlayerPed);
 
         // Add a reference to the model we're using
         m_pLoadedModelInfo = m_pModelInfo;
@@ -3786,9 +3788,6 @@ void CClientPed::_DestroyModel()
     // Invalidate
     m_pManager->InvalidateEntity(this);
 
-    // Remove XRef
-    g_pClientGame->GetGameEntityXRefManager()->RemoveEntityXRef(this, m_pPlayerPed);
-
     // Remove the ped from the world
     g_pGame->GetPools()->RemovePed(m_pPlayerPed);
     m_pPlayerPed = NULL;
@@ -3831,8 +3830,7 @@ void CClientPed::_DestroyLocalModel()
     // Invalidate
     m_pManager->InvalidateEntity(this);
 
-    // Remove XRef
-    g_pClientGame->GetGameEntityXRefManager()->RemoveEntityXRef(this, m_pPlayerPed);
+    g_pGame->GetPools()->InvalidateLocalPlayerClientEntity();
 
     // Make sure we are CJ again
     if (m_pPlayerPed->GetModelIndex() != 0)
@@ -4156,17 +4154,6 @@ void CClientPed::InternalWarpIntoVehicle(CVehicle* pGameVehicle)
         {
             // Make sure we can't fall off
             SetCanBeKnockedOffBike(false);
-        }
-
-        // Jax: make sure our camera is fixed on the new vehicle
-        if (m_bIsLocalPlayer)
-        {
-            CClientCamera* pCamera = m_pManager->GetCamera();
-            if (!pCamera->IsInFixedMode())
-            {
-                // Jax: very hacky, clean up if possible (some camera-target pointer)
-                *(unsigned long*)(0xB6F3B8) = (unsigned long)pGameVehicle->GetVehicleInterface();
-            }
         }
     }
 }
@@ -5082,26 +5069,21 @@ bool CClientPed::IsGettingJacked(void)
 
 CClientEntity* CClientPed::GetContactEntity(void)
 {
-    CClientEntity* pReturn = NULL;
-    if (m_pPlayerPed)
+    CPools* pPools = g_pGame->GetPools();
+    if (pPools && m_pPlayerPed)
     {
         CEntity* pEntity = m_pPlayerPed->GetContactEntity();
         if (pEntity)
         {
-            switch (pEntity->GetEntityType())
+            CEntitySAInterface* pInterface = pEntity->GetInterface();
+            eEntityType entityType = pInterface ? pEntity->GetEntityType() : ENTITY_TYPE_NOTHING;
+            if (entityType == ENTITY_TYPE_VEHICLE || entityType == ENTITY_TYPE_OBJECT)
             {
-                case ENTITY_TYPE_VEHICLE:
-                    pReturn = m_pManager->GetVehicleManager()->Get(dynamic_cast<CVehicle*>(pEntity), false);
-                    break;
-                case ENTITY_TYPE_OBJECT:
-                    pReturn = m_pManager->GetObjectManager()->Get(dynamic_cast<CObject*>(pEntity), false);
-                    break;
-                default:
-                    break;
+                return pPools->GetClientEntity((DWORD*)pInterface);
             }
         }
     }
-    return pReturn;
+    return nullptr;
 }
 
 bool CClientPed::HasAkimboPointingUpwards(void)
@@ -5445,20 +5427,8 @@ CClientEntity* CClientPed::GetTargetedEntity(void)
         CEntity* pEntity = m_pPlayerPed->GetTargetedEntity();
         if (pEntity)
         {
-            switch (pEntity->GetEntityType())
-            {
-                case ENTITY_TYPE_PED:
-                    pReturn = m_pManager->GetPedManager()->Get(dynamic_cast<CPlayerPed*>(pEntity), true, false);
-                    break;
-                case ENTITY_TYPE_VEHICLE:
-                    pReturn = m_pManager->GetVehicleManager()->Get(dynamic_cast<CVehicle*>(pEntity), false);
-                    break;
-                case ENTITY_TYPE_OBJECT:
-                    pReturn = m_pManager->GetObjectManager()->Get(dynamic_cast<CObject*>(pEntity), false);
-                    break;
-                default:
-                    break;
-            }
+            CPools* pPools = g_pGame->GetPools();
+            pReturn = pPools->GetClientEntity((DWORD*)pEntity->GetInterface());
         }
     }
     return pReturn;

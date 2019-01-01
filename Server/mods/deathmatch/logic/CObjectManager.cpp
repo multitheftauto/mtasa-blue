@@ -92,35 +92,29 @@ CObjectManager::~CObjectManager(void)
     DeleteAll();
 }
 
-CObject* CObjectManager::Create(CElement* pParent, CXMLNode* pNode, bool bIsLowLod)
+CObject* CObjectManager::Create(CElement* pParent, bool bIsLowLod)
 {
-    // Create the object
-    CObject* pObject = new CObject(pParent, pNode, this, bIsLowLod);
+    CObject* const pObject = new CObject(pParent, this, bIsLowLod);
 
-    // Valid object id?
     if (pObject->GetID() == INVALID_ELEMENT_ID)
     {
         delete pObject;
-        return NULL;
+        return nullptr;
     }
 
-    // Return the object
     return pObject;
 }
 
 CObject* CObjectManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents, bool bIsLowLod)
 {
-    // Create the object
-    CObject* pObject = new CObject(pParent, &Node, this, bIsLowLod);
+    CObject* const pObject = new CObject(pParent, this, bIsLowLod);
 
-    // Valid object id and load it from xml
-    if (pObject->GetID() == INVALID_ELEMENT_ID || !pObject->LoadFromCustomData(pEvents))
+    if (pObject->GetID() == INVALID_ELEMENT_ID || !pObject->LoadFromCustomData(pEvents, Node))
     {
         delete pObject;
-        return NULL;
+        return nullptr;
     }
 
-    // Return the object
     return pObject;
 }
 

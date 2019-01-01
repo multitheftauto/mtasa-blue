@@ -17,14 +17,13 @@ extern CGame* g_pGame;
 #pragma warning( disable : 4355 )   // warning C4355: 'this' : used in base member initializer list
 #endif
 
-CElement::CElement(CElement* pParent, CXMLNode* pNode)
+CElement::CElement(CElement* pParent)
 {
     // Allocate us an unique ID
     m_ID = CElementIDs::PopUniqueID(this);
 
     // Init
     m_pParent = pParent;
-    m_pXMLNode = pNode;
     m_pElementGroup = NULL;
     m_bCallPropagationEnabled = true;
 
@@ -39,16 +38,6 @@ CElement::CElement(CElement* pParent, CXMLNode* pNode)
     m_bUpdatingSpatialData = false;
     m_pChildrenListSnapshot = NULL;
     m_uiChildrenListSnapshotRevision = 0;
-
-    // Store the line
-    if (m_pXMLNode)
-    {
-        m_uiLine = m_pXMLNode->GetLine();
-    }
-    else
-    {
-        m_uiLine = 0;
-    }
 
     // Add us to our parent's list
     if (pParent)
@@ -424,22 +413,6 @@ CElement* CElement::SetParentObject(CElement* pParent, bool bUpdatePerPlayerEnti
     return pParent;
 }
 
-void CElement::SetXMLNode(CXMLNode* pNode)
-{
-    // Set the node
-    m_pXMLNode = pNode;
-
-    // If the node exists, set our line
-    if (pNode)
-    {
-        m_uiLine = pNode->GetLine();
-    }
-    else
-    {
-        m_uiLine = 0;
-    }
-};
-
 bool CElement::AddEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority,
                         float fPriorityMod)
 {
@@ -497,29 +470,26 @@ void CElement::DeleteAllEvents(void)
     m_pEventManager->DeleteAll();
 }
 
-void CElement::ReadCustomData(CEvents* pEvents)
+void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
 {
     assert(pEvents);
 
-    // Got an XML node?
-    if (m_pXMLNode)
+    // Iterate the attributes of our XML node
+    CXMLAttributes* pAttributes = &(Node.GetAttributes());
+    unsigned int    uiAttributeCount = pAttributes->Count();
+
+    for (unsigned int uiIndex = 0; uiIndex < uiAttributeCount; uiIndex++)
     {
-        // Iterate the attributes of our XML node
-        CXMLAttributes* pAttributes = &(m_pXMLNode->GetAttributes());
-        unsigned int    uiAttributeCount = pAttributes->Count();
-        for (unsigned int uiIndex = 0; uiIndex < uiAttributeCount; uiIndex++)
-        {
-            // Grab the node (we can assume it exists here)
-            CXMLAttribute* pAttribute = pAttributes->Get(uiIndex);
+        // Grab the node (we can assume it exists here)
+        CXMLAttribute* pAttribute = pAttributes->Get(uiIndex);
 
-            // Make a lua argument from it and set the content
-            CLuaArguments args;
-            if (!args.ReadFromJSONString(pAttribute->GetValue().c_str()))
-                args.PushString(pAttribute->GetValue().c_str());
+        // Make a lua argument from it and set the content
+        CLuaArguments args;
+        if (!args.ReadFromJSONString(pAttribute->GetValue().c_str()))
+            args.PushString(pAttribute->GetValue().c_str());
 
-            // Don't trigger onElementDataChanged event
-            SetCustomData(pAttribute->GetName().c_str(), *args[0], g_pGame->GetConfig()->GetSyncMapElementData(), NULL, false);
-        }
+        // Don't trigger onElementDataChanged event
+        SetCustomData(pAttribute->GetName().c_str(), *args[0], g_pGame->GetConfig()->GetSyncMapElementData(), NULL, false);
     }
 }
 
@@ -828,12 +798,12 @@ void CElement::CleanUpForVM(CLuaMain* pLuaMain, bool bRecursive)
     }
 }
 
-bool CElement::LoadFromCustomData(CEvents* pEvents)
+bool CElement::LoadFromCustomData(CEvents* pEvents, CXMLNode& Node)
 {
     assert(pEvents);
 
     // Read out all the attributes into our custom data records
-    ReadCustomData(pEvents);
+    ReadCustomData(pEvents, Node);
 
     // Grab the "id" custom data into our m_strName member
     char szBuf[MAX_ELEMENT_NAME_LENGTH + 1] = {0};
@@ -849,7 +819,7 @@ bool CElement::LoadFromCustomData(CEvents* pEvents)
     GetCustomDataFloat("attachZ", m_vecAttachedPosition.fZ, true);
 
     // Load the special attributes from our custom data
-    return ReadSpecialData();
+    return ReadSpecialData(Node.GetLine());
 }
 
 void CElement::OnSubtreeAdd(CElement* pElement)

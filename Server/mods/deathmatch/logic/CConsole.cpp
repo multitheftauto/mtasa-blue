@@ -12,8 +12,7 @@
 #include "StdInc.h"
 
 CConsole::CConsole(CBlipManager* pBlipManager, CMapManager* pMapManager, CPlayerManager* pPlayerManager, CRegisteredCommands* pRegisteredCommands,
-                   CVehicleManager* pVehicleManager, CLuaManager* pLuaManager, CBanManager* pBanManager,
-                   CAccessControlListManager* pACLManager)
+                   CVehicleManager* pVehicleManager, CLuaManager* pLuaManager, CBanManager* pBanManager, CAccessControlListManager* pACLManager)
 {
     // Init
     m_pBlipManager = pBlipManager;
