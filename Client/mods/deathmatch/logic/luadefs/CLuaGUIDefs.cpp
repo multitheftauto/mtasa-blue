@@ -1918,13 +1918,13 @@ int CLuaGUIDefs::GUIBlur(lua_State* luaVM)
 
 int CLuaGUIDefs::GUIFocus(lua_State* luaVM)
 {
-    //  bool guiFocus ( element guiElement [, bool bMoveCaretToEnd = true ] )
+    //  bool guiFocus ( element guiElement [, bool bMoveCaretToEnd = false ] )
     CClientGUIElement* guiElement;
     bool               bMoveCaretToEnd;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(guiElement);
-    argStream.ReadBool(bMoveCaretToEnd, true);
+    argStream.ReadBool(bMoveCaretToEnd, false);
 
     if (!argStream.HasErrors())
     {
