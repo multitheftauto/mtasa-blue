@@ -922,11 +922,11 @@ int CLuaEngineDefs::EngineSetModelTime(lua_State* luaVM)
 {
     // bool engineSetModelTime ( int/string modelID, int hourOn, int hourOff )
     SString strModelId;
-    char hour[2];
+    char cHourOn,cHourOff;
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strModelId);
-    argStream.ReadNumber(hour[0]);
-    argStream.ReadNumber(hour[1]);
+    argStream.ReadNumber(cHourOn);
+    argStream.ReadNumber(cHourOff);
 
     if (!argStream.HasErrors())
     {
@@ -934,12 +934,12 @@ int CLuaEngineDefs::EngineSetModelTime(lua_State* luaVM)
         CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
         if (pModelInfo)
         {
-            if (hour[0] > hour[1])
-                std::swap(hour[0], hour[1]);
+            if (cHourOn > cHourOff)
+                std::swap(cHourOn, cHourOff);
 
-            if (hour[0] >= 0 && hour[0] <= 23 && hour[1] >= 0 && hour[1] <= 23)
+            if (cHourOn >= 0 && cHourOn <= 23 && cHourOff >= 0 && cHourOff <= 23)
             {
-                lua_pushboolean(luaVM, pModelInfo->SetTime(hour[0], hour[1]));
+                lua_pushboolean(luaVM, pModelInfo->SetTime(cHourOn, cHourOff));
                 return 1;
             }
         }
@@ -966,11 +966,11 @@ int CLuaEngineDefs::EngineGetModelTime(lua_State* luaVM)
         CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
         if (pModelInfo)
         {
-            char hour[2];
-            if (pModelInfo->GetTime(hour[0], hour[1]))
+            char cHourOn, cHourOff;
+            if (pModelInfo->GetTime(cHourOn, cHourOff))
             {
-                lua_pushnumber(luaVM, hour[0]);
-                lua_pushnumber(luaVM, hour[1]);
+                lua_pushnumber(luaVM, cHourOn);
+                lua_pushnumber(luaVM, cHourOff);
                 return 2;
             }
             else // Model is incompatible, don't let confuse user.

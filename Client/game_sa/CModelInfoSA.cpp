@@ -564,7 +564,7 @@ float CModelInfoSA::GetLODDistance()
     return 0.0f;
 }
 
-bool CModelInfoSA::SetTime(char hour1, char hour2)
+bool CModelInfoSA::SetTime(char cHourOn, char cHourOff)
 {
     m_pInterface = ppModelInfo[m_dwModelID];
     if (m_pInterface)
@@ -572,15 +572,15 @@ bool CModelInfoSA::SetTime(char hour1, char hour2)
         TimeInfo* time = ((TimeInfo*(*)(void))m_pInterface->VFTBL->GetTimeInfo)();
         if (time)
         {
-            time->m_nTimeOn = hour1;
-            time->m_nTimeOff = hour2;
+            time->m_nTimeOn = cHourOn;
+            time->m_nTimeOff = cHourOff;
             return true;
         }
     }
     return false;
 }
 
-bool CModelInfoSA::GetTime(char& hour1, char& hour2)
+bool CModelInfoSA::GetTime(char& cHourOn, char& cHourOff)
 {
     m_pInterface = ppModelInfo[m_dwModelID];
     if (m_pInterface)
@@ -588,8 +588,8 @@ bool CModelInfoSA::GetTime(char& hour1, char& hour2)
         TimeInfo* time = ((TimeInfo*(*)(void))m_pInterface->VFTBL->GetTimeInfo)();
         if (time)
         {
-            hour1 = time->m_nTimeOn;
-            hour2 = time->m_nTimeOff;
+            cHourOn = time->m_nTimeOn;
+            cHourOff = time->m_nTimeOff;
             return true;
         }
     }
