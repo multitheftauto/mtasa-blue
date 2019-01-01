@@ -20,6 +20,7 @@ std::map<unsigned short, int>                                                   
 std::map<DWORD, float>                                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
 std::map<DWORD, BYTE>                                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<CVehicleModelInfoSAInterface*, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
+std::map<TimeInfo*, TimeInfo*>                                                        CModelInfoSA::ms_ModelDefaultModelTimeInfo;
 
 CModelInfoSA::CModelInfoSA(void)
 {
@@ -569,11 +570,15 @@ bool CModelInfoSA::SetTime(char cHourOn, char cHourOff)
     m_pInterface = ppModelInfo[m_dwModelID];
     if (m_pInterface)
     {
-        TimeInfo* time = ((TimeInfo*(*)(void))m_pInterface->VFTBL->GetTimeInfo)();
-        if (time)
+        TimeInfo* pTime = ((TimeInfo*(*)(void))m_pInterface->VFTBL->GetTimeInfo)();
+        if (pTime)
         {
-            time->m_nTimeOn = cHourOn;
-            time->m_nTimeOff = cHourOff;
+            if (!MapContains(ms_ModelDefaultModelTimeInfo, pTime))
+            {
+                MapSet(ms_ModelDefaultModelTimeInfo, pTime, new TimeInfo(pTime->m_nTimeOn, pTime->m_nTimeOff, pTime->m_wOtherTimeModel));
+            }
+            pTime->m_nTimeOn = cHourOn;
+            pTime->m_nTimeOff = cHourOff;
             return true;
         }
     }
@@ -594,6 +599,18 @@ bool CModelInfoSA::GetTime(char& cHourOn, char& cHourOff)
         }
     }
     return false;
+}
+
+void CModelInfoSA::StaticResetModelTimes()
+{
+    // Restore default values
+    for (std::map<TimeInfo*, TimeInfo*>::const_iterator iter = ms_ModelDefaultModelTimeInfo.begin(); iter != ms_ModelDefaultModelTimeInfo.end(); ++iter)
+    {
+        iter->first->m_nTimeOn = iter->second->m_nTimeOn;
+        iter->first->m_nTimeOff = iter->second->m_nTimeOff;
+    }
+
+    ms_ModelDefaultModelTimeInfo.clear();
 }
 
 void CModelInfoSA::SetLODDistance(float fDistance)

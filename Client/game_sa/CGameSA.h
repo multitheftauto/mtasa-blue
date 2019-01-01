@@ -413,6 +413,7 @@ public:
     void         FlushPendingRestreamIPL(void);
     void         ResetModelLodDistances(void);
     void         ResetAlphaTransparencies(void);
+    void         ResetModelTimes(void);
     void         DisableVSync(void);
 
     void  OnPedContextChange(CPed* pPedContext);

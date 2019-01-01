@@ -277,6 +277,7 @@ protected:
     static std::map<DWORD, float>                                                                ms_ModelDefaultLodDistanceMap;
     static std::map<DWORD, BYTE>                                                                 ms_ModelDefaultAlphaTransparencyMap;
     static std::unordered_map<CVehicleModelInfoSAInterface*, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
+    static std::map<TimeInfo*, TimeInfo*>                                                        ms_ModelDefaultModelTimeInfo;
     bool                                                                                         m_bAddedRefForCollision;
     SVehicleSupportedUpgrades                                                                    m_ModelSupportedUpgrades;
 
@@ -328,6 +329,7 @@ public:
     static void    StaticSetHooks(void);
     bool           GetTime(char& cHourOn, char& cHourOff);
     bool           SetTime(char cHourOn, char cHourOff);
+    static void    StaticResetModelTimes(void);
 
     void        SetAlphaTransparencyEnabled(BOOL bEnabled);
     bool        IsAlphaTransparencyEnabled();
