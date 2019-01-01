@@ -443,7 +443,7 @@ static CURLcode pop3_perform_apop(struct connectdata *conn)
 
   /* Convert the calculated 16 octet digest into a 32 byte hex string */
   for(i = 0; i < MD5_DIGEST_LEN; i++)
-    snprintf(&secret[2 * i], 3, "%02x", digest[i]);
+    msnprintf(&secret[2 * i], 3, "%02x", digest[i]);
 
   result = Curl_pp_sendf(&pop3c->pp, "APOP %s %s", conn->user, secret);
 
@@ -613,7 +613,6 @@ static CURLcode pop3_state_servergreet_resp(struct connectdata *conn,
   struct pop3_conn *pop3c = &conn->proto.pop3c;
   const char *line = data->state.buffer;
   size_t len = strlen(line);
-  size_t i;
 
   (void)instate; /* no use for this yet */
 
@@ -625,10 +624,12 @@ static CURLcode pop3_state_servergreet_resp(struct connectdata *conn,
     /* Does the server support APOP authentication? */
     if(len >= 4 && line[len - 2] == '>') {
       /* Look for the APOP timestamp */
+      size_t i;
       for(i = 3; i < len - 2; ++i) {
         if(line[i] == '<') {
           /* Calculate the length of the timestamp */
           size_t timestamplen = len - 1 - i;
+          char *at;
           if(!timestamplen)
             break;
 
@@ -642,8 +643,15 @@ static CURLcode pop3_state_servergreet_resp(struct connectdata *conn,
           memcpy(pop3c->apoptimestamp, line + i, timestamplen);
           pop3c->apoptimestamp[timestamplen] = '\0';
 
-          /* Store the APOP capability */
-          pop3c->authtypes |= POP3_TYPE_APOP;
+          /* If the timestamp does not contain '@' it is not (as required by
+             RFC-1939) conformant to the RFC-822 message id syntax, and we
+             therefore do not use APOP authentication. */
+          at = strchr(pop3c->apoptimestamp, '@');
+          if(!at)
+            Curl_safefree(pop3c->apoptimestamp);
+          else
+            /* Store the APOP capability */
+            pop3c->authtypes |= POP3_TYPE_APOP;
           break;
         }
       }
@@ -664,7 +672,6 @@ static CURLcode pop3_state_capa_resp(struct connectdata *conn, int pop3code,
   struct pop3_conn *pop3c = &conn->proto.pop3c;
   const char *line = data->state.buffer;
   size_t len = strlen(line);
-  size_t wordlen;
 
   (void)instate; /* no use for this yet */
 
@@ -689,6 +696,7 @@ static CURLcode pop3_state_capa_resp(struct connectdata *conn, int pop3code,
       /* Loop through the data line */
       for(;;) {
         size_t llen;
+        size_t wordlen;
         unsigned int mechbit;
 
         while(len &&
@@ -1303,8 +1311,6 @@ static CURLcode pop3_regular_transfer(struct connectdata *conn,
 
 static CURLcode pop3_setup_connection(struct connectdata *conn)
 {
-  struct Curl_easy *data = conn->data;
-
   /* Initialise the POP3 layer */
   CURLcode result = pop3_init(conn);
   if(result)
@@ -1312,7 +1318,6 @@ static CURLcode pop3_setup_connection(struct connectdata *conn)
 
   /* Clear the TLS upgraded flag */
   conn->tls_upgraded = FALSE;
-  data->state.path++;   /* don't include the initial slash */
 
   return CURLE_OK;
 }
@@ -1387,7 +1392,7 @@ static CURLcode pop3_parse_url_path(struct connectdata *conn)
   /* The POP3 struct is already initialised in pop3_connect() */
   struct Curl_easy *data = conn->data;
   struct POP3 *pop3 = data->req.protop;
-  const char *path = data->state.path;
+  const char *path = &data->state.up.path[1]; /* skip leading path */
 
   /* URL decode the path for the message ID */
   return Curl_urldecode(data, path, 0, &pop3->id, NULL, TRUE);

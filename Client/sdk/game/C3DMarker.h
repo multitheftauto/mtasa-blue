@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_3DMARKER
-#define __CGAME_3DMARKER
+#pragma once
 
 #include "Common.h"
 
@@ -48,5 +47,3 @@ public:
     virtual VOID     SetActive() = 0;
     virtual RpClump* GetRwObject() = 0;
 };
-
-#endif

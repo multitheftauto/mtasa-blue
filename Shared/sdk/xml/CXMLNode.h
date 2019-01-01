@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CXMLNODE_H
-#define __CXMLNODE_H
+#pragma once
 
 #include "CXMLCommon.h"
 #include "CXMLAttributes.h"
@@ -61,5 +60,3 @@ public:
     virtual SString GetCommentText(void) = 0;
     virtual void    SetCommentText(const char* szCommentText, bool bLeadingBlankLine = false) = 0;
 };
-
-#endif

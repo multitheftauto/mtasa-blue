@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUILISTITEM_H
-#define __CGUILISTITEM_H
+#pragma once
 
 #include "CGUIStaticImage.h"
 #include <string>
@@ -37,5 +36,3 @@ public:
     virtual bool GetColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha) = 0;
     virtual void SetColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha) = 0;
 };
-
-#endif

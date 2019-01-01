@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CWEAPONSTATSA_H
-#define __CWEAPONSTATSA_H
+#pragma once
 #include "CWeaponInfoSA.h"
 class CWeaponStatSA : public CWeaponStat
 {
@@ -144,4 +143,3 @@ private:
     eWeaponSkill            skillLevel;
     CWeaponInfoSAInterface* pWeaponStats;
 };
-#endif

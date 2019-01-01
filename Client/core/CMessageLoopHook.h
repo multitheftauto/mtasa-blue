@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMESSAGELOOPHOOK_H
-#define __CMESSAGELOOPHOOK_H
+#pragma once
 
 #include <windows.h>
 #include "CSingleton.h"
@@ -47,5 +46,3 @@ private:
     static UCHAR  m_LastScanCode;
     static BYTE*  m_LastKeyboardState;
 };
-
-#endif

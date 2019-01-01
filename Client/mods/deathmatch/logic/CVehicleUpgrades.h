@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CVEHICLEUPGRADES_H
-#define __CVEHICLEUPGRADES_H
+#pragma once
 
 #define VEHICLE_UPGRADE_SLOTS 17
 
@@ -54,5 +53,3 @@ protected:
     ushort          m_usLastLocalAddNitroType;
     CElapsedTime    m_lastLocalAddNitroTimer;
 };
-
-#endif

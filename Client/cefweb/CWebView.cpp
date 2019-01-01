@@ -593,16 +593,20 @@ bool CWebView::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProces
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#GetViewRect(CefRefPtr%3CCefBrowser%3E,CefRect&) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
+void CWebView::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
 {
-    if (m_bBeingDestroyed)
-        return false;
-
     rect.x = 0;
     rect.y = 0;
+
+    if (m_bBeingDestroyed)
+    {
+        rect.width = 1;
+        rect.height = 1;
+        return;
+    }
+    
     rect.width = static_cast<int>(m_pWebBrowserRenderItem->m_uiSizeX);
     rect.height = static_cast<int>(m_pWebBrowserRenderItem->m_uiSizeY);
-    return true;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -752,7 +756,7 @@ void CWebView::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> fr
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool isRedirect)
+bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool userGesture, bool isRedirect)
 {
     /*
         From documentation:

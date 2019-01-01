@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_AUTOMOBILE
-#define __CGAME_AUTOMOBILE
+#pragma once
 
 #include "CDamageManager.h"
 #include "CDoor.h"
@@ -61,5 +60,3 @@ public:
 
     virtual CDoor* GetDoor(eDoors doorID) = 0;
 };
-
-#endif

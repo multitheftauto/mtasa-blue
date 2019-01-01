@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTMARKER_H
-#define __CCLIENTMARKER_H
+#pragma once
 
 #include "CClientStreamElement.h"
 #include "CClientMarkerCommon.h"
@@ -96,5 +95,3 @@ private:
 
     CClientColShape* m_pCollision;
 };
-
-#endif

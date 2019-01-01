@@ -69,6 +69,10 @@ bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfa
             Packet_ChatEcho(bitStream);
             return true;
 
+        case PACKET_ID_CHAT_CLEAR:
+            Packet_ChatClear(bitStream);
+            return true;
+
         case PACKET_ID_CONSOLE_ECHO:
             Packet_ConsoleEcho(bitStream);
             return true;
@@ -1331,6 +1335,11 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
             delete[] szMessage;
         }
     }
+}
+
+void CPacketHandler::Packet_ChatClear(NetBitStreamInterface& bitStream)
+{
+    CStaticFunctionDefinitions::ClearChatBox();
 }
 
 void CPacketHandler::Packet_ConsoleEcho(NetBitStreamInterface& bitStream)
@@ -3902,14 +3911,19 @@ retry:
                         vecVertices[i].fX = sX;
                         vecVertices[i].fY = sY;
                     }
+
+                    bool bShallow = false;
+                    if (bitStream.Version() >= 0x06C)
+                        bitStream.ReadBit(bShallow);
+
                     CClientWater* pWater = NULL;
                     if (ucNumVertices == 3)
                     {
-                        pWater = new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2]);
+                        pWater = new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], bShallow);
                     }
                     else
                     {
-                        pWater = new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3]);
+                        pWater = new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3], bShallow);
                     }
                     if (!pWater->Exists())
                     {
@@ -5018,6 +5032,7 @@ void CPacketHandler::Packet_VoiceData(NetBitStreamInterface& bitStream)
         if (pPlayer && bitStream.Read(usPacketSize))
         {
             char* pBuf = new char[usPacketSize];
+
             if (bitStream.Read(pBuf, usPacketSize))
             {
                 if (pPlayer->GetVoice())
@@ -5025,6 +5040,8 @@ void CPacketHandler::Packet_VoiceData(NetBitStreamInterface& bitStream)
                     pPlayer->GetVoice()->DecodeAndBuffer(pBuf, usPacketSize);
                 }
             }
+
+            delete[] pBuf;
         }
     }
 }
@@ -5300,6 +5317,7 @@ SString CPacketHandler::EntityAddDebugRead(NetBitStreamInterface& bitStream)
         }
 
         strStatus += SString("NameLen:%d Name:'%s'", usNameLength, *SStringX(szName).Left(40));
+        delete[] szName;
 
         return strStatus;
     }

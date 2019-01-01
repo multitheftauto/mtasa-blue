@@ -10,8 +10,7 @@
 
 class CLuaCFunctions;
 
-#ifndef __CLUACFUNCTIONS_H
-#define __CLUACFUNCTIONS_H
+#pragma once
 
 #include "LuaCommon.h"
 #include <string>
@@ -52,5 +51,3 @@ public:
 
     static void RemoveAllFunctions(void);
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENT_H
-#define __CCLIENT_H
+#pragma once
 
 #include <core/CClientBase.h>
 
@@ -34,5 +33,3 @@ public:
     bool HandleException(CExceptionInformation* pExceptionInformation);
     void GetPlayerNames(std::vector<SString>& vPlayerNames);
 };
-
-#endif

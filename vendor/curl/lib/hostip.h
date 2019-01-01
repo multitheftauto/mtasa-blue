@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -145,12 +145,7 @@ int curl_dogetnameinfo(GETNAMEINFO_QUAL_ARG1 GETNAMEINFO_TYPE_ARG1 sa,
 /* IPv4 threadsafe resolve function used for synch and asynch builds */
 Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname, int port);
 
-CURLcode Curl_async_resolved(struct connectdata *conn,
-                             bool *protocol_connect);
-
-#ifndef CURLRES_ASYNCH
-#define Curl_async_resolved(x,y) CURLE_OK
-#endif
+CURLcode Curl_once_resolved(struct connectdata *conn, bool *protocol_connect);
 
 /*
  * Curl_addrinfo_callback() is used when we build with any asynch specialty.
@@ -182,6 +177,17 @@ struct Curl_dns_entry *
 Curl_fetch_addr(struct connectdata *conn,
                 const char *hostname,
                 int port);
+
+/*
+ * Curl_shuffle_addr() shuffles the order of addresses in a 'Curl_addrinfo'
+ * struct by re-linking its linked list.
+ *
+ * The addr argument should be the address of a pointer to the head node of a
+ * `Curl_addrinfo` list and it will be modified to point to the new head after
+ * shuffling.
+ */
+CURLcode Curl_shuffle_addr(struct Curl_easy *data, Curl_addrinfo **addr);
+
 /*
  * Curl_cache_addr() stores a 'Curl_addrinfo' struct in the DNS cache.
  *
@@ -246,5 +252,11 @@ void Curl_hostcache_destroy(struct Curl_easy *data);
  * Populate the cache with specified entries from CURLOPT_RESOLVE.
  */
 CURLcode Curl_loadhostpairs(struct Curl_easy *data);
+
+CURLcode Curl_resolv_check(struct connectdata *conn,
+                           struct Curl_dns_entry **dns);
+int Curl_resolv_getsock(struct connectdata *conn,
+                        curl_socket_t *socks,
+                        int numsocks);
 
 #endif /* HEADER_CURL_HOSTIP_H */

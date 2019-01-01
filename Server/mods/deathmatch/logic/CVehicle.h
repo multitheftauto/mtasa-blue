@@ -142,14 +142,13 @@ class CVehicle : public CElement
 
 public:
     ZERO_ON_NEW
-    CVehicle(class CVehicleManager* pVehicleManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel, unsigned char ucVariant,
-             unsigned char ucVariant2);
+    CVehicle(class CVehicleManager* pVehicleManager, CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
     ~CVehicle(void);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
     bool IsEntity(void) { return true; }
 
     void Unlink(void);
-    bool ReadSpecialData(void);
 
     void DoPulse(void);
 
@@ -308,8 +307,8 @@ public:
 
     // Functions used to remember where this vehicle spawns
     const CVector& GetRespawnPosition(void) { return m_vecRespawnPosition; };
+    const CVector& GetRespawnRotationDegrees(void) { return m_vecRespawnRotationDegrees; };
     void           SetRespawnPosition(const CVector& vecPosition) { m_vecRespawnPosition = vecPosition; };
-    void           GetRespawnRotationDegrees(CVector& vecRotation) { vecRotation = m_vecRespawnRotationDegrees; };
     void           SetRespawnRotationDegrees(const CVector& vecRotation) { m_vecRespawnRotationDegrees = vecRotation; };
     float          GetRespawnHealth(void) { return m_fRespawnHealth; };
     void           SetRespawnHealth(float fHealth) { m_fRespawnHealth = fHealth; };
@@ -346,6 +345,9 @@ public:
     bool IsStationary(void);
     void OnRelayUnoccupiedSync(void);
     void HandleDimensionResync(void);
+
+protected:
+    bool ReadSpecialData(const int iLine) override;
 
 private:
     class CVehicleManager* m_pVehicleManager;

@@ -25,7 +25,7 @@ public:
     CMarkerManager(CColManager* pColManager);
     ~CMarkerManager(void) { DeleteAll(); };
 
-    CMarker* Create(CElement* pParent, CXMLNode* pNode = NULL);
+    CMarker* Create(CElement* pParent);
     CMarker* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void     DeleteAll(void);
 

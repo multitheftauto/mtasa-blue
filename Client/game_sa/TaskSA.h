@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TASK
-#define __CGAMESA_TASK
+#pragma once
 
 #include <game/Task.h>
 #include "TaskNamesSA.h"
@@ -211,5 +210,3 @@ static T* NewTask(const A& a, const B& b, const C& c, const D& d, const E& e, co
 {
     return ValidNewTask(new T(a, b, c, d, e, f, g, h, i, j));
 }
-
-#endif

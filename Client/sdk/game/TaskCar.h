@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TASKCAR
-#define __CGAME_TASKCAR
+#pragma once
 
 #include "Task.h"
 
@@ -57,5 +56,3 @@ public:
 
     virtual int GetTargetDoor() = 0;
 };
-
-#endif

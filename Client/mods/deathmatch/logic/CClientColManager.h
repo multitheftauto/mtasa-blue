@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCOLMANAGER_H
-#define __CCLIENTCOLMANAGER_H
+#pragma once
 
 #include "CClientCommon.h"
 #include <list>
@@ -43,5 +42,3 @@ protected:
 
     std::vector<CClientColShape*> m_List;
 };
-
-#endif

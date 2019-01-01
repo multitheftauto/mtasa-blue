@@ -10,8 +10,7 @@
 
 class CClientCivilian;
 
-#ifndef __CCLIENTCIVILIAN_H
-#define __CCLIENTCIVILIAN_H
+#pragma once
 
 #include <game/CCivilianPed.h>
 #include <game/TaskGoTo.h>
@@ -78,5 +77,3 @@ private:
 
     CCivilianPed* m_pCivilianPed;
 };
-
-#endif

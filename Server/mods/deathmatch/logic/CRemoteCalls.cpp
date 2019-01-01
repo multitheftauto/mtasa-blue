@@ -154,6 +154,7 @@ CRemoteCall::CRemoteCall(const char* szServerHost, const char* szResourceName, c
     arguments->WriteToJSONString(m_options.strPostData, true);
     m_options.bPostBinary = false;
     m_options.bIsLegacy = true;
+    m_options.requestHeaders["Content-Type"] = "application/json";
     m_bIsFetch = false;
 
     m_strURL = SString("http://%s/%s/call/%s", szServerHost, szResourceName, szFunctionName);
@@ -172,6 +173,7 @@ CRemoteCall::CRemoteCall(const char* szURL, CLuaArguments* arguments, CLuaMain* 
     arguments->WriteToJSONString(m_options.strPostData, true);
     m_options.bPostBinary = false;
     m_options.bIsLegacy = true;
+    m_options.requestHeaders["Content-Type"] = "application/json";
     m_bIsFetch = false;
 
     m_strURL = szURL;
@@ -218,9 +220,9 @@ CRemoteCall::~CRemoteCall()
 
 void CRemoteCall::MakeCall()
 {
-    EDownloadModeType                 downloadMode = g_pGame->GetRemoteCalls()->GetDownloadModeForQueueName(m_strQueueName);
-    CNetHTTPDownloadManagerInterface* pDownloadManager = g_pNetServer->GetHTTPDownloadManager(downloadMode);
-    pDownloadManager->QueueFile(m_strURL, NULL, this, DownloadFinishedCallback, false, m_options, false, false);
+    m_downloadMode = g_pGame->GetRemoteCalls()->GetDownloadModeForQueueName(m_strQueueName);
+    CNetHTTPDownloadManagerInterface* pDownloadManager = g_pNetServer->GetHTTPDownloadManager(m_downloadMode);
+    pDownloadManager->QueueFile(m_strURL, NULL, this, DownloadFinishedCallback, m_options);
 }
 
 void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
@@ -228,6 +230,7 @@ void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
     CRemoteCall* pCall = (CRemoteCall*)result.pObj;
     if (!g_pGame->GetRemoteCalls()->CallExists(pCall))
         return;
+    pCall->m_downloadMode = EDownloadModeType::NONE;
 
     CLuaArguments arguments;
     if (pCall->IsLegacy())
@@ -286,4 +289,25 @@ void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
 
     arguments.Call(pCall->m_VM, pCall->m_iFunction);
     g_pGame->GetRemoteCalls()->Remove(pCall);
+}
+
+// Return true if cancel was done
+bool CRemoteCall::CancelDownload(void)
+{
+    if (m_downloadMode != EDownloadModeType::NONE)
+    {
+        return g_pNetServer->GetHTTPDownloadManager(m_downloadMode)->CancelDownload(this, DownloadFinishedCallback);
+    }
+    return false;
+}
+
+// Return true if outDownloadStatus contains valid data
+bool CRemoteCall::GetDownloadStatus(SDownloadStatus& outDownloadStatus)
+{
+    if (m_downloadMode != EDownloadModeType::NONE)
+    {
+        return g_pNetServer->GetHTTPDownloadManager(m_downloadMode)->GetDownloadStatus(this, DownloadFinishedCallback, outDownloadStatus);
+    }
+    outDownloadStatus = {0};
+    return false;
 }

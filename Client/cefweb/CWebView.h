@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CWEBVIEW_H
-#define __CWEBVIEW_H
+#pragma once
 
 #undef GetNextSibling
 #undef GetFirstChild
@@ -115,7 +114,7 @@ public:
     virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message) override;
 
     // CefRenderHandler methods
-    virtual bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect) override;
+    virtual void GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect) override;
     virtual void OnPopupShow(CefRefPtr<CefBrowser> browser, bool show) override;
     virtual void OnPopupSize(CefRefPtr<CefBrowser> browser, const CefRect& rect) override;
     virtual void OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType paintType, const CefRenderHandler::RectList& dirtyRects,
@@ -129,7 +128,7 @@ public:
                              const CefString& failedURL) override;
 
     // CefRequestHandler methods
-    virtual bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool isRedirect) override;
+    virtual bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool userGesture, bool isRedirect) override;
     virtual CefRequestHandler::ReturnValue OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request,
                                                                 CefRefPtr<CefRequestCallback> callback) override;
 
@@ -196,5 +195,3 @@ public:
     // Implement smartpointer methods (all Cef-classes require that since they are derived from CefBase)
     IMPLEMENT_REFCOUNTING(CWebView);
 };
-
-#endif

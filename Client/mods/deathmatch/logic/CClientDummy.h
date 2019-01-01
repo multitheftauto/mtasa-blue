@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef CClientDummy_H
-#define CClientDummy_H
+#pragma once
 
 #include "CClientEntity.h"
 
@@ -31,5 +30,3 @@ private:
     class CClientGroups* m_pGroups;
     CVector              m_vecPosition;
 };
-
-#endif

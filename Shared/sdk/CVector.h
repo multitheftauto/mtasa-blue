@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CVector_H
-#define __CVector_H
+#pragma once
 
 #ifdef WIN32
 #include <windows.h>
@@ -92,6 +91,15 @@ public:
         else
             vecResult = CVector(0, -fZ, fY);
         vecResult.Normalize();
+        return vecResult;
+    }
+
+    CVector Clone(void) const
+    {
+        CVector vecResult;
+        vecResult.fX = fX;
+        vecResult.fY = fY;
+        vecResult.fZ = fZ;
         return vecResult;
     }
 
@@ -188,5 +196,3 @@ public:
         return *this;
     }
 };
-
-#endif

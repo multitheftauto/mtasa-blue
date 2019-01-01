@@ -1,6 +1,6 @@
 ## Multi Theft Auto: San Andreas [![Build Status](https://img.shields.io/travis/multitheftauto/mtasa-blue/master.svg?label=Linux:master)](https://travis-ci.org/multitheftauto/mtasa-blue) [![Build Status](https://img.shields.io/appveyor/ci/multitheftauto/mtasa-blue/master.svg?label=Windows:master)](https://ci.appveyor.com/project/multitheftauto/mtasa-blue)
 
-[Multi Theft Auto](https://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game. 
+[Multi Theft Auto](https://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game.
 
 ## Introduction
 
@@ -26,7 +26,6 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 
 * [Coding guidelines](https://wiki.mtasa.com/index.php?title=Coding_guidelines)
 * [Nightly Builds](https://nightly.mtasa.com/)
-* [Bugtracker Roadmap](https://bugs.mtasa.com/roadmap_page.php)
 * [Wiki Roadmap](https://wiki.mtasa.com/wiki/Roadmap)
 
 ### IDE Setup

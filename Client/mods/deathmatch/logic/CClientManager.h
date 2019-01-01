@@ -10,8 +10,7 @@
 
 class CClientManager;
 
-#ifndef __CCLIENTMANAGER_H
-#define __CCLIENTMANAGER_H
+#pragma once
 
 #include "CAntiCheat.h"
 #include "CClientCamera.h"
@@ -103,8 +102,6 @@ public:
     void           InvalidateEntity(CClientEntity* pEntity);
     void           RestoreEntity(CClientEntity* pEntity);
     void           UnreferenceEntity(CClientEntity* pEntity);
-    CClientEntity* FindEntity(CEntity* pGameEntity, bool bValidatePointer = false);
-    CClientEntity* FindEntitySafe(CEntity* pGameEntity);
 
     void OnUpdateStreamPosition(CClientStreamElement* pElement);
     void OnLowLODElementCreated(void);
@@ -152,5 +149,3 @@ private:
     bool                         m_bGameUnloadedFlag;
     int                          m_iNumLowLODElements;
 };
-
-#endif

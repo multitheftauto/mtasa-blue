@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CFxManager
-#define __CFxManager
+#pragma once
 
 #include "RenderWare.h"
 
@@ -25,5 +24,3 @@ public:
     virtual void       DestroyFxSystem(CFxSystem* pFxSystem) = 0;
     virtual void       OnFxSystemSAInterfaceDestroyed(CFxSystemSAInterface* pFxSystemSAInterface) = 0;
 };
-
-#endif

@@ -45,7 +45,7 @@ class CGUI;
 #define CGUI_ICON_SERVER_PASSWORD       "cgui\\images\\locked.png"
 #define CGUI_GetMaxTextExtent(...) GetMaxTextExtent(__VA_ARGS__, SString())
 
-#define CHECK_CHANNEL(channel) assert ( channel >= 0 && channel < INPUT_CHANNEL_COUNT )
+#define CHECK_CHANNEL(channel) assert ( (channel) >= 0 && (channel) < INPUT_CHANNEL_COUNT )
 
 class CGUI
 {

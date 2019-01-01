@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef CDOWNLOADABLERESOURCE_H
-#define CDOWNLOADABLERESOURCE_H
+#pragma once
 
 #ifndef _WINDOWS_
 
@@ -80,5 +79,3 @@ protected:
     uint m_uiHttpServerIndex;
     bool m_bModifedByScript;
 };
-
-#endif

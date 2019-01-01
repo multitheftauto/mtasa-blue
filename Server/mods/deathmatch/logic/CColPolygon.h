@@ -18,7 +18,7 @@
 class CColPolygon : public CColShape
 {
 public:
-    CColPolygon(CColManager* pManager, CElement* pParent, const CVector& vecPosition, CXMLNode* pNode = NULL);
+    CColPolygon(CColManager* pManager, CElement* pParent, const CVector& vecPosition);
 
     virtual CSphere GetWorldBoundingSphere(void);
 
@@ -37,7 +37,7 @@ public:
 protected:
     std::vector<CVector2D> m_Points;
 
-    bool ReadSpecialData(void);
+    bool ReadSpecialData(const int iLine) override;
 
     bool IsInBounds(CVector vecPoint);
 

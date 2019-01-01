@@ -30,7 +30,6 @@ public:
 
     // Functions required by CElement
     void Unlink(void){};
-    bool ReadSpecialData(void) { return true; };
 
     // Load and unload routines
     bool           Load(CResource* pResourceForFilePath, eMode Mode);
@@ -54,10 +53,18 @@ public:
     long Read(unsigned long ulSize, CBuffer& outBuffer);
     long Write(unsigned long ulSize, const char* pData);
 
+    // Debug info for garbage collected files
+    const SLuaDebugInfo& GetLuaDebugInfo(void) { return m_LuaDebugInfo; };
+    void                 SetLuaDebugInfo(const SLuaDebugInfo& luaDebugInfo) { m_LuaDebugInfo = luaDebugInfo; };
+
+protected:
+    bool ReadSpecialData(const int iLine) override { return true; }
+
 private:
     CResource*    m_pResource;
     FILE*         m_pFile;
     uint          m_uiScriptId;
     SString       m_strFilename;
     unsigned long m_ulMaxSize;
+    SLuaDebugInfo m_LuaDebugInfo;
 };

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOREINTERFACE_H
-#define __CCOREINTERFACE_H
+#pragma once
 
 #include "CConsoleInterface.h"
 #include "CCommandsInterface.h"
@@ -172,6 +171,10 @@ public:
     virtual const char* GetProductVersion(void) = 0;
     virtual void        SetFakeLagCommandEnabled(bool bEnabled) = 0;
     virtual SString     GetBlueCopyrightString(void) = 0;
+    virtual bool        ClearChat() = 0;
+    virtual void        OnGameTimerUpdate(void) = 0;
+
+    virtual bool IsHostSmotraServer() = 0;
 };
 
 class CClientTime
@@ -179,5 +182,3 @@ class CClientTime
 public:
     static unsigned long GetTime(void) { return GetTickCount32(); }
 };
-
-#endif

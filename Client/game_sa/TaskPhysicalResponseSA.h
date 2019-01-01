@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TASKPHYSICALRESPONSE
-#define __CGAMESA_TASKPHYSICALRESPONSE
+#pragma once
 
 #include <game/TaskPhysicalResponse.h>
 #include "TaskSA.h"
@@ -43,5 +42,3 @@ public:
 
     void UpdateChoke(CPed* pPed, CPed* pAttacker, bool bIsTearGas);
 };
-
-#endif

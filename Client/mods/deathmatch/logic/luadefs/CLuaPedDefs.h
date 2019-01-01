@@ -69,6 +69,7 @@ public:
     LUA_DECLARE(SetPedCanBeKnockedOffBike);
     LUA_DECLARE(SetPedAnimation);
     LUA_DECLARE(SetPedAnimationProgress);
+    LUA_DECLARE(SetPedAnimationSpeed);
     LUA_DECLARE(SetPedMoveAnim);
     LUA_DECLARE(SetPedWeaponSlot);
     LUA_DECLARE(GivePedWeapon);

@@ -20,7 +20,7 @@ class CEffectTemplate : public CEffectParameters
 {
     DECLARE_CLASS(CEffectTemplate, CEffectParameters)
     CEffectTemplate(void) : ClassInit(this) {}
-    virtual void PostConstruct(CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug);
+    virtual void PostConstruct(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug);
     virtual void PreDestruct(void);
     virtual bool IsValid(void);
     virtual void OnLostDevice(void);
@@ -29,7 +29,7 @@ class CEffectTemplate : public CEffectParameters
     int          GetTicksSinceLastUsed(void);
     CEffectWrap* CloneD3DEffect(SString& strOutStatus);
     void         UnCloneD3DEffect(CEffectWrap* pD3DEffect);
-    void         CreateUnderlyingData(const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug);
+    void         CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug);
     void         ReleaseUnderlyingData(void);
     bool         ValidateDepthBufferUsage(D3DXHANDLE hTechnique, SString& strOutErrorExtra);
 
@@ -41,5 +41,5 @@ class CEffectTemplate : public CEffectParameters
     HRESULT                    m_CreateHResult;
 };
 
-CEffectTemplate* NewEffectTemplate(CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug,
+CEffectTemplate* NewEffectTemplate(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug,
                                    HRESULT& outHResult);

@@ -11,90 +11,98 @@
 
 #include "StdInc.h"
 
-void CLuaPlayerDefs::LoadFunctions(void)
+void CLuaPlayerDefs::LoadFunctions()
 {
-    // Player get funcs
-    CLuaCFunctions::AddFunction("getPlayerCount", GetPlayerCount);
-    CLuaCFunctions::AddFunction("getPlayerFromNick", GetPlayerFromName);
-    CLuaCFunctions::AddFunction("getPlayerFromName", GetPlayerFromName);
-    CLuaCFunctions::AddFunction("getPlayerMoney", GetPlayerMoney);
-    CLuaCFunctions::AddFunction("getPlayerPing", GetPlayerPing);
-    CLuaCFunctions::AddFunction("getRandomPlayer", GetRandomPlayer);
-    CLuaCFunctions::AddFunction("isPlayerMuted", IsPlayerMuted);
-    CLuaCFunctions::AddFunction("getPlayerTeam", GetPlayerTeam);
-    CLuaCFunctions::AddFunction("getPlayerWantedLevel", GetPlayerWantedLevel);
-    CLuaCFunctions::AddFunction("getAlivePlayers", GetAlivePlayers);
-    CLuaCFunctions::AddFunction("getDeadPlayers", GetDeadPlayers);
-    CLuaCFunctions::AddFunction("getPlayerIdleTime", GetPlayerIdleTime);
-    CLuaCFunctions::AddFunction("isPlayerScoreboardForced", IsPlayerScoreboardForced);
-    CLuaCFunctions::AddFunction("isPlayerMapForced", IsPlayerMapForced);
-    CLuaCFunctions::AddFunction("getPlayerNametagText", GetPlayerNametagText);
-    CLuaCFunctions::AddFunction("getPlayerNametagColor", GetPlayerNametagColor);
-    CLuaCFunctions::AddFunction("isPlayerNametagShowing", IsPlayerNametagShowing);
-    CLuaCFunctions::AddFunction("getPlayerSerial", GetPlayerSerial);
-    CLuaCFunctions::AddFunction("getPlayerUserName", GetPlayerUserName);
-    CLuaCFunctions::AddFunction("getPlayerCommunityID", GetPlayerCommunityID);
-    CLuaCFunctions::AddFunction("getPlayerBlurLevel", GetPlayerBlurLevel);
-    CLuaCFunctions::AddFunction("getPlayerName", GetPlayerName);
-    CLuaCFunctions::AddFunction("getPlayerIP", GetPlayerIP);
-    CLuaCFunctions::AddFunction("getPlayerAccount", GetPlayerAccount);
-    CLuaCFunctions::AddFunction("getPlayerVersion", GetPlayerVersion);
-    CLuaCFunctions::AddFunction("getPlayerACInfo", GetPlayerACInfo);
-    CLuaCFunctions::AddFunction("resendPlayerModInfo", ResendPlayerModInfo);
-    CLuaCFunctions::AddFunction("resendPlayerACInfo", ResendPlayerACInfo);
+    std::map<const char*, lua_CFunction> functions{
+        // Player get funcs
+        {"getPlayerCount", GetPlayerCount},
+        {"getPlayerFromNick", GetPlayerFromName},
+        {"getPlayerFromName", GetPlayerFromName},
+        {"getPlayerMoney", GetPlayerMoney},
+        {"getPlayerPing", GetPlayerPing},
+        {"getRandomPlayer", GetRandomPlayer},
+        {"isPlayerMuted", IsPlayerMuted},
+        {"getPlayerTeam", GetPlayerTeam},
+        {"getPlayerWantedLevel", GetPlayerWantedLevel},
+        {"getAlivePlayers", GetAlivePlayers},
+        {"getDeadPlayers", GetDeadPlayers},
+        {"getPlayerIdleTime", GetPlayerIdleTime},
+        {"isPlayerScoreboardForced", IsPlayerScoreboardForced},
+        {"isPlayerMapForced", IsPlayerMapForced},
+        {"getPlayerNametagText", GetPlayerNametagText},
+        {"getPlayerNametagColor", GetPlayerNametagColor},
+        {"isPlayerNametagShowing", IsPlayerNametagShowing},
+        {"getPlayerSerial", GetPlayerSerial},
+        {"getPlayerUserName", GetPlayerUserName},
+        {"getPlayerCommunityID", GetPlayerCommunityID},
+        {"getPlayerBlurLevel", GetPlayerBlurLevel},
+        {"getPlayerName", GetPlayerName},
+        {"getPlayerIP", GetPlayerIP},
+        {"getPlayerAccount", GetPlayerAccount},
+        {"getPlayerVersion", GetPlayerVersion},
+        {"getPlayerACInfo", GetPlayerACInfo},
+        {"resendPlayerModInfo", ResendPlayerModInfo},
+        {"resendPlayerACInfo", ResendPlayerACInfo},
 
-    // Player set funcs
-    CLuaCFunctions::AddFunction("setPlayerMoney", SetPlayerMoney);
-    CLuaCFunctions::AddFunction("setPlayerAmmo", SetPlayerAmmo);
-    CLuaCFunctions::AddFunction("givePlayerMoney", GivePlayerMoney);
-    CLuaCFunctions::AddFunction("takePlayerMoney", TakePlayerMoney);
-    CLuaCFunctions::AddFunction("spawnPlayer", SpawnPlayer);
-    CLuaCFunctions::AddFunction("showPlayerHudComponent", ShowPlayerHudComponent);
-    CLuaCFunctions::AddFunction("setPlayerHudComponentVisible", ShowPlayerHudComponent);
-    CLuaCFunctions::AddFunction("setPlayerWantedLevel", SetPlayerWantedLevel);
-    CLuaCFunctions::AddFunction("forcePlayerMap", ForcePlayerMap);
-    CLuaCFunctions::AddFunction("setPlayerNametagText", SetPlayerNametagText);
-    CLuaCFunctions::AddFunction("setPlayerNametagColor", SetPlayerNametagColor);
-    CLuaCFunctions::AddFunction("setPlayerNametagShowing", SetPlayerNametagShowing);
-    CLuaCFunctions::AddFunction("setPlayerMuted", SetPlayerMuted);
-    CLuaCFunctions::AddFunction("setPlayerBlurLevel", SetPlayerBlurLevel);
-    CLuaCFunctions::AddFunction("redirectPlayer", RedirectPlayer);
-    CLuaCFunctions::AddFunction("setPlayerName", SetPlayerName);
-    CLuaCFunctions::AddFunction("detonateSatchels", DetonateSatchels);
-    CLuaCFunctions::AddFunction("takePlayerScreenShot", TakePlayerScreenShot);
+        // Player set funcs
+        {"setPlayerMoney", SetPlayerMoney},
+        {"setPlayerAmmo", SetPlayerAmmo},
+        {"givePlayerMoney", GivePlayerMoney},
+        {"takePlayerMoney", TakePlayerMoney},
+        {"spawnPlayer", SpawnPlayer},
+        {"showPlayerHudComponent", ShowPlayerHudComponent},
+        {"setPlayerHudComponentVisible", ShowPlayerHudComponent},
+        {"setPlayerWantedLevel", SetPlayerWantedLevel},
+        {"forcePlayerMap", ForcePlayerMap},
+        {"setPlayerNametagText", SetPlayerNametagText},
+        {"setPlayerNametagColor", SetPlayerNametagColor},
+        {"setPlayerNametagShowing", SetPlayerNametagShowing},
+        {"setPlayerMuted", SetPlayerMuted},
+        {"setPlayerBlurLevel", SetPlayerBlurLevel},
+        {"redirectPlayer", RedirectPlayer},
+        {"setPlayerName", SetPlayerName},
+        {"detonateSatchels", DetonateSatchels},
+        {"takePlayerScreenShot", TakePlayerScreenShot},
 
-    // All seeing eye
-    CLuaCFunctions::AddFunction("getPlayerAnnounceValue", GetPlayerAnnounceValue);
-    CLuaCFunctions::AddFunction("setPlayerAnnounceValue", SetPlayerAnnounceValue);
+        // All seeing eye
+        {"getPlayerAnnounceValue", GetPlayerAnnounceValue},
+        {"setPlayerAnnounceValue", SetPlayerAnnounceValue},
 
-    // Audio funcs
-    // CLuaCFunctions::AddFunction ( "playMissionAudio", CLuaFunctionDefinitions::PlayMissionAudio );
-    // CLuaCFunctions::AddFunction ( "preloadMissionAudio", CLuaFunctionDefinitions::PreloadMissionAudio );
-    CLuaCFunctions::AddFunction("playSoundFrontEnd", PlaySoundFrontEnd);
+        // Audio funcs
+        // {"playMissionAudio", CLuaFunctionDefinitions::PlayMissionAudio},
+        // {"preloadMissionAudio", CLuaFunctionDefinitions::PreloadMissionAudio},
+        {"playSoundFrontEnd", PlaySoundFrontEnd},
 
-    // Input funcs
-    CLuaCFunctions::AddFunction("bindKey", BindKey);
-    CLuaCFunctions::AddFunction("unbindKey", UnbindKey);
-    CLuaCFunctions::AddFunction("isKeyBound", IsKeyBound);
-    CLuaCFunctions::AddFunction("getFunctionsBoundToKey", GetFunctionsBoundToKey);
-    CLuaCFunctions::AddFunction("getKeyBoundToFunction", GetKeyBoundToFunction);
-    CLuaCFunctions::AddFunction("getControlState", GetControlState);
-    CLuaCFunctions::AddFunction("isControlEnabled", IsControlEnabled);
+        // Input funcs
+        {"bindKey", BindKey},
+        {"unbindKey", UnbindKey},
+        {"isKeyBound", IsKeyBound},
+        {"getFunctionsBoundToKey", GetFunctionsBoundToKey},
+        {"getKeyBoundToFunction", GetKeyBoundToFunction},
+        {"getControlState", GetControlState},
+        {"isControlEnabled", IsControlEnabled},
 
-    CLuaCFunctions::AddFunction("setControlState", SetControlState);
-    CLuaCFunctions::AddFunction("toggleControl", ToggleControl);
-    CLuaCFunctions::AddFunction("toggleAllControls", ToggleAllControls);
+        {"setControlState", SetControlState},
+        {"toggleControl", ToggleControl},
+        {"toggleAllControls", ToggleAllControls},
 
-    // Cursor funcs
-    CLuaCFunctions::AddFunction("isCursorShowing", IsCursorShowing);
-    CLuaCFunctions::AddFunction("showCursor", ShowCursor);
+        // Cursor funcs
+        {"isCursorShowing", IsCursorShowing},
+        {"showCursor", ShowCursor},
 
-    // Chat funcs
-    CLuaCFunctions::AddFunction("showChat", ShowChat);
+        // Chat funcs
+        {"showChat", ShowChat},
 
-    // Admin functions
-    CLuaCFunctions::AddFunction("kickPlayer", KickPlayer);
-    CLuaCFunctions::AddFunction("banPlayer", BanPlayer);
+        // Admin functions
+        {"kickPlayer", KickPlayer},
+        {"banPlayer", BanPlayer},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaPlayerDefs::AddClass(lua_State* luaVM)
@@ -223,21 +231,26 @@ int CLuaPlayerDefs::CanPlayerUseFunction(lua_State* luaVM)
 int CLuaPlayerDefs::GetPlayerName(lua_State* luaVM)
 {
     //  string getPlayerName ( player thePlayer )
-    CElement* pElement;
+    CElement* pElement; // player or console
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
 
     if (!argStream.HasErrors())
     {
-        SString strNick;
-        if (CStaticFunctionDefinitions::GetPlayerName(pElement, strNick))
+        if (IS_PLAYER(pElement) || IS_CONSOLE(pElement))
         {
-            lua_pushstring(luaVM, strNick);
-            return 1;
+            SString strNick;
+            if (CStaticFunctionDefinitions::GetPlayerName(pElement, strNick))
+            {
+                lua_pushstring(luaVM, strNick);
+                return 1;
+            }
         }
+        else
+            argStream.SetTypeError("player or console", 1);
     }
-    else
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
@@ -247,21 +260,26 @@ int CLuaPlayerDefs::GetPlayerName(lua_State* luaVM)
 int CLuaPlayerDefs::GetPlayerIP(lua_State* luaVM)
 {
     //  string getPlayerIP ( player thePlayer )
-    CElement* pElement;
+    CElement* pElement; // player or console
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
 
     if (!argStream.HasErrors())
     {
-        SString strIP;
-        if (CStaticFunctionDefinitions::GetPlayerIP(pElement, strIP))
+        if (IS_PLAYER(pElement) || IS_CONSOLE(pElement))
         {
-            lua_pushstring(luaVM, strIP);
-            return 1;
+            SString strIP;
+            if (CStaticFunctionDefinitions::GetPlayerIP(pElement, strIP))
+            {
+                lua_pushstring(luaVM, strIP);
+                return 1;
+            }
         }
+        else
+            argStream.SetTypeError("player or console", 1);
     }
-    else
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
@@ -292,21 +310,26 @@ int CLuaPlayerDefs::GetPlayerVersion(lua_State* luaVM)
 int CLuaPlayerDefs::GetPlayerAccount(lua_State* luaVM)
 {
     //  account getPlayerAccount ( player thePlayer )
-    CElement* pElement;
+    CElement* pElement; // player or console
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
 
     if (!argStream.HasErrors())
     {
-        CAccount* pAccount = CStaticFunctionDefinitions::GetPlayerAccount(pElement);
-        if (pAccount)
+        if (IS_PLAYER(pElement) || IS_CONSOLE(pElement))
         {
-            lua_pushaccount(luaVM, pAccount);
-            return 1;
+            CAccount* pAccount = CStaticFunctionDefinitions::GetPlayerAccount(pElement);
+            if (pAccount)
+            {
+                lua_pushaccount(luaVM, pAccount);
+                return 1;
+            }
         }
+        else
+            argStream.SetTypeError("player or console", 1);
     }
-    else
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
@@ -316,8 +339,8 @@ int CLuaPlayerDefs::GetPlayerAccount(lua_State* luaVM)
 int CLuaPlayerDefs::SetPlayerName(lua_State* luaVM)
 {
     //  bool setPlayerName ( player thePlayer, string newName )
-    CElement* pElement;
-    SString   strName;
+    CPlayer* pElement;
+    SString  strName;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -1118,7 +1141,7 @@ int CLuaPlayerDefs::SetPlayerBlurLevel(lua_State* luaVM)
 
 int CLuaPlayerDefs::RedirectPlayer(lua_State* luaVM)
 {
-    CElement*      pElement;
+    CPlayer*       pElement;
     SString        strHost;
     unsigned short usPort;
     SString        strPassword;

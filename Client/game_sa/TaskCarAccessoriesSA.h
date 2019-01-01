@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TASKCARACCESSORIES
-#define __CGAMESA_TASKCARACCESSORIES
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -117,5 +116,3 @@ public:
     void SetNumGettingInToClear(const unsigned char nNumGettingInToClear);
     void PositionPedOutOfCollision(CPed* ped, CVehicle* vehicle, int nDoor);
 };
-
-#endif

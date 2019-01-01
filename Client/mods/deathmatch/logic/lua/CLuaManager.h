@@ -12,8 +12,7 @@
 // This class manages all the CLuaMain instances (Virtual Machines)
 class CLuaManager;
 
-#ifndef __CLUAMANAGER_H
-#define __CLUAMANAGER_H
+#pragma once
 
 #include <list>
 #include "../CClientGUIManager.h"
@@ -56,5 +55,3 @@ private:
     std::list<CLuaMain*>                m_virtualMachines;
     std::list<lua_State*>               m_PendingDeleteList;
 };
-
-#endif
