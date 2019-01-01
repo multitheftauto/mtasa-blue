@@ -349,6 +349,9 @@ Function .onInit
 
     InitPluginsDir
     ;File /oname=$PLUGINSDIR\serialdialog.ini "serialdialog.ini"
+
+    # Set Windows SID to use for permissions fixing
+    Call SetPermissionsGroup
     ${LogText} "-Function end - .onInit"
 FunctionEnd
 
@@ -507,9 +510,6 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         # Ensure install dir exists so the permissions can be set
         SetOutPath "$INSTDIR\MTA"
         SetOverwrite on
-
-        # Set Windows SID to use for permissions fixing
-        Call SetPermissionsGroup
 
         #############################################################
         # Make the directory "$INSTDIR" read write accessible by all users
