@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PICKUP
-#define __CGAMESA_PICKUP
+#pragma once
 
 #include <game/CPickup.h>
 #include "CObjectSA.h"
@@ -75,5 +74,3 @@ public:
     VOID         GetRidOfObjects();
     VOID         Remove();
 };
-
-#endif

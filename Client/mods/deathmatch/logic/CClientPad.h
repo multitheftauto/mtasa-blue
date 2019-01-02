@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CClientPad_H
-#define __CClientPad_H
+#pragma once
 
 #define MAX_GTA_CONTROLS 44
 #define MAX_GTA_ANALOG_CONTROLS 14
@@ -54,5 +53,3 @@ public:
 protected:
     SFixedArray<float, MAX_GTA_CONTROLS> m_fStates;
 };
-
-#endif

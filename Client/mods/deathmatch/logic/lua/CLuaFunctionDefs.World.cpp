@@ -1565,7 +1565,7 @@ int CLuaFunctionDefs::SetPedsLODDistance(lua_State* luaVM)
     {
         fPedsDistance = Clamp(0.0f, fPedsDistance, 500.0f);
         g_pGame->GetSettings()->SetPedsLODDistance(fPedsDistance); 
-        lua_pushnumber(luaVM, fPedsDistance); 
+        lua_pushboolean(luaVM, true);
         return 1; 
     } 
     else 

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CDEATHMATCHVEHICLE_H
-#define __CDEATHMATCHVEHICLE_H
+#pragma once
 
 #include "CClientVehicle.h"
 
@@ -37,5 +36,3 @@ private:
     SFixedArray<unsigned char, MAX_PANELS> m_ucLastPanelStates;
     SFixedArray<unsigned char, MAX_LIGHTS> m_ucLastLightStates;
 };
-
-#endif

@@ -11,8 +11,7 @@
 
 class CPedSA;
 
-#ifndef __CGAMESA_PED
-#define __CGAMESA_PED
+#pragma once
 
 #include <game/CPed.h>
 #include <game/CWeapon.h>
@@ -450,5 +449,3 @@ public:
 
     static void StaticSetHooks(void);
 };
-
-#endif

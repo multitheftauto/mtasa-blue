@@ -76,13 +76,27 @@ CEntity* CFireSA::GetCreator()
         switch (createEntitySA->nType)
         {
             case ENTITY_TYPE_PED:
-                creatorEntity = pPools->GetPed((DWORD*)createEntitySA);
+            {
+                SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)createEntitySA);
+                if (pPedClientEntity)
+                {
+                    creatorEntity = pPedClientEntity->pEntity;
+                }
                 break;
+            }
             case ENTITY_TYPE_VEHICLE:
-                creatorEntity = pPools->GetVehicle((DWORD*)createEntitySA);
+            {
+                SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)createEntitySA);
+                if (pVehicleClientEntity)
+                {
+                    creatorEntity = pVehicleClientEntity->pEntity;
+                }
                 break;
+            }
             default:
+            {
                 creatorEntity = NULL;
+            }
         }
     }
     return creatorEntity;
@@ -99,13 +113,27 @@ CEntity* CFireSA::GetEntityOnFire()
         switch (TargetEntitySA->nType)
         {
             case ENTITY_TYPE_PED:
-                TargetEntity = pPools->GetPed((DWORD*)TargetEntitySA);
+            {
+                SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)TargetEntitySA);
+                if (pPedClientEntity)
+                {
+                    TargetEntity = pPedClientEntity->pEntity;
+                }
                 break;
+            }
             case ENTITY_TYPE_VEHICLE:
-                TargetEntity = pPools->GetVehicle((DWORD*)TargetEntitySA);
+            {
+                SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)TargetEntitySA);
+                if (pVehicleClientEntity)
+                {
+                    TargetEntity = pVehicleClientEntity->pEntity;
+                }
                 break;
+            }
             default:
+            {
                 TargetEntity = NULL;
+            }
         }
     }
     return TargetEntity;

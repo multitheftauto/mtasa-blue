@@ -56,9 +56,9 @@ announcement.
   then a separate earlier release for security reasons should be considered.
 
 - Write a security advisory draft about the problem that explains what the
-  problem is, its impact, which versions it affects, solutions or
-  workarounds, when the release is out and make sure to credit all
-  contributors properly.
+  problem is, its impact, which versions it affects, solutions or workarounds,
+  when the release is out and make sure to credit all contributors properly.
+  Figure out the CWE (Common Weakness Enumeration) number for the flaw.
 
 - Request a CVE number from
   [distros@openwall](http://oss-security.openwall.org/wiki/mailing-lists/distros)
@@ -90,18 +90,6 @@ announcement.
 - The security web page on the web site should get the new vulnerability
   mentioned.
 
-Pre-notification
-----------------
-
-If you think you are or should be eligible for a pre-notification about
-upcoming security announcements for curl, we urge OS distros and similar
-vendors to primarily join the distros@openwall list as that is one of the
-purposes of that list - and not just for curl of course.
-
-If you are not a distro or otherwise not suitable for distros@openwall and yet
-want pre-notifications from us, contact the curl security team with a detailed
-and clear explanation why this is the case.
-
 curl-security (at haxx dot se)
 ------------------------------
 
@@ -114,3 +102,34 @@ plans in vanishing in the near future.
 
 We do not make the list of participants public mostly because it tends to vary
 somewhat over time and a list somewhere will only risk getting outdated.
+
+Publishing Security Advisories
+------------------------------
+
+1. Write up the security advisory, using markdown syntax. Use the same
+   subtitles as last time to maintain consistency.
+
+2. Name the advisory file after the allocated CVE id.
+
+3. Add a line on the top of the array in `curl-www/docs/vuln.pm'.
+
+4. Put the new advisory markdown file in the curl-www/docs/ directory. Add it
+   to the git repo.
+
+5. Run `make` in your local web checkout and verify that things look fine.
+
+6. On security advisory release day, push the changes on the curl-www
+   repository's remote master branch.
+
+Hackerone Internet Bug Bounty
+-----------------------------
+
+The curl project does not run any bounty program on its own, but there are
+outside organizations that do. First report your issue the normal way and
+proceed as described in this document.
+
+Then, if the issue is [critical](https://hackerone.com/ibb-data), you are
+eligible to apply for a bounty from Hackerone for your find.
+
+Once your reported vulnerability has been publicly disclosed by the curl
+project, you can submit a [report to them](https://hackerone.com/ibb-data).

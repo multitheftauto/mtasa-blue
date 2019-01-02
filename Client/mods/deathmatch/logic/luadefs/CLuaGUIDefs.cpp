@@ -11,192 +11,152 @@
 
 #include "StdInc.h"
 
-static const SFixedArray<const char*, MAX_CHATBOX_LAYOUT_CVARS> g_chatboxLayoutCVars = { {
-        "chat_font",
-        "chat_lines",
-        "chat_color",
-        "chat_text_color",
-        "chat_input_color",
-        "chat_input_prefix_color",
-        "chat_input_text_color",
-        "chat_scale",
-        "chat_position_offset_x",
-        "chat_position_offset_y",
-        "chat_position_horizontal",
-        "chat_position_vertical",
-        "chat_text_alignment",
-        "chat_width",
-        "chat_css_style_text",
-        "chat_css_style_background",
-        "chat_line_life",
-        "chat_line_fade_out",
-        "chat_use_cegui",
-        "text_scale"
-    } };
-
 void CLuaGUIDefs::LoadFunctions(void)
 {
-    std::map<const char*, lua_CFunction> functions{
-        { "guiGetInputEnabled", GUIGetInputEnabled },
-    { "guiSetInputEnabled", GUISetInputEnabled },
-    { "guiGetInputMode", GUIGetInputMode },
-    { "guiSetInputMode", GUISetInputMode },
+    CLuaCFunctions::AddFunction("guiGetInputEnabled", GUIGetInputEnabled);
+    CLuaCFunctions::AddFunction("guiSetInputEnabled", GUISetInputEnabled);
+    CLuaCFunctions::AddFunction("guiGetInputMode", GUIGetInputMode);
+    CLuaCFunctions::AddFunction("guiSetInputMode", GUISetInputMode);
 
-    { "isChatBoxInputActive", GUIIsChatBoxInputActive },
-    { "isConsoleActive", GUIIsConsoleActive },
-    { "isDebugViewActive", GUIIsDebugViewActive },
-    { "setDebugViewActive", GUISetDebugViewActive },
-    { "isMainMenuActive", GUIIsMainMenuActive },
-    { "isMTAWindowActive", GUIIsMTAWindowActive },
-    { "isTransferBoxActive", GUIIsTransferBoxActive },
-    { "isTransferBoxEnabled", GUIIsTransferBoxEnabled },
-    { "setTransferBoxEnabled", GUISetTransferBoxEnabled },
+    CLuaCFunctions::AddFunction("isChatBoxInputActive", GUIIsChatBoxInputActive);
+    CLuaCFunctions::AddFunction("isConsoleActive", GUIIsConsoleActive);
+    CLuaCFunctions::AddFunction("isDebugViewActive", GUIIsDebugViewActive);
+    CLuaCFunctions::AddFunction("setDebugViewActive", GUISetDebugViewActive);
+    CLuaCFunctions::AddFunction("isMainMenuActive", GUIIsMainMenuActive);
+    CLuaCFunctions::AddFunction("isMTAWindowActive", GUIIsMTAWindowActive);
+    CLuaCFunctions::AddFunction("isTransferBoxActive", GUIIsTransferBoxActive);
 
-    { "guiCreateWindow", GUICreateWindow },
-    { "guiCreateLabel", GUICreateLabel },
-    { "guiCreateButton", GUICreateButton },
-    { "guiCreateEdit", GUICreateEdit },
-    { "guiCreateMemo", GUICreateMemo },
-    { "guiCreateGridList", GUICreateGridList },
-    { "guiCreateScrollPane", GUICreateScrollPane },
-    { "guiCreateScrollBar", GUICreateScrollBar },
-    { "guiCreateTabPanel", GUICreateTabPanel },
-    { "guiCreateTab", GUICreateTab },
-    { "guiCreateProgressBar", GUICreateProgressBar },
-    { "guiCreateCheckBox", GUICreateCheckBox },
-    { "guiCreateRadioButton", GUICreateRadioButton },
-    { "guiCreateStaticImage", GUICreateStaticImage },
-    { "guiCreateComboBox", GUICreateComboBox },
-    { "guiCreateFont", GUICreateFont },
+    CLuaCFunctions::AddFunction("guiCreateWindow", GUICreateWindow);
+    CLuaCFunctions::AddFunction("guiCreateLabel", GUICreateLabel);
+    CLuaCFunctions::AddFunction("guiCreateButton", GUICreateButton);
+    CLuaCFunctions::AddFunction("guiCreateEdit", GUICreateEdit);
+    CLuaCFunctions::AddFunction("guiCreateMemo", GUICreateMemo);
+    CLuaCFunctions::AddFunction("guiCreateGridList", GUICreateGridList);
+    CLuaCFunctions::AddFunction("guiCreateScrollPane", GUICreateScrollPane);
+    CLuaCFunctions::AddFunction("guiCreateScrollBar", GUICreateScrollBar);
+    CLuaCFunctions::AddFunction("guiCreateTabPanel", GUICreateTabPanel);
+    CLuaCFunctions::AddFunction("guiCreateTab", GUICreateTab);
+    CLuaCFunctions::AddFunction("guiCreateProgressBar", GUICreateProgressBar);
+    CLuaCFunctions::AddFunction("guiCreateCheckBox", GUICreateCheckBox);
+    CLuaCFunctions::AddFunction("guiCreateRadioButton", GUICreateRadioButton);
+    CLuaCFunctions::AddFunction("guiCreateStaticImage", GUICreateStaticImage);
+    CLuaCFunctions::AddFunction("guiCreateComboBox", GUICreateComboBox);
+    CLuaCFunctions::AddFunction("guiCreateFont", GUICreateFont);
 
-    { "guiStaticImageLoadImage", GUIStaticImageLoadImage },
-    { "guiStaticImageGetNativeSize", GUIStaticImageGetNativeSize },
-    { "guiGetSelectedTab", GUIGetSelectedTab },
-    { "guiSetSelectedTab", GUISetSelectedTab },
-    { "guiDeleteTab", GUIDeleteTab },
+    CLuaCFunctions::AddFunction("guiStaticImageLoadImage", GUIStaticImageLoadImage);
+    CLuaCFunctions::AddFunction("guiStaticImageGetNativeSize", GUIStaticImageGetNativeSize);
+    CLuaCFunctions::AddFunction("guiGetSelectedTab", GUIGetSelectedTab);
+    CLuaCFunctions::AddFunction("guiSetSelectedTab", GUISetSelectedTab);
+    CLuaCFunctions::AddFunction("guiDeleteTab", GUIDeleteTab);
 
-    { "guiGridListSetSortingEnabled", GUIGridListSetSortingEnabled },
-    { "guiGridListAddColumn", GUIGridListAddColumn },
-    { "guiGridListRemoveColumn", GUIGridListRemoveColumn },
-    { "guiGridListSetColumnWidth", GUIGridListSetColumnWidth },
-    { "guiGridListGetColumnWidth", GUIGridListGetColumnWidth },
-    { "guiGridListSetColumnTitle", GUIGridListSetColumnTitle },
-    { "guiGridListGetColumnTitle", GUIGridListGetColumnTitle },
-    { "guiGridListSetScrollBars", GUIGridListSetScrollBars },
-    { "guiGridListGetRowCount", GUIGridListGetRowCount },
-    { "guiGridListGetColumnCount", GUIGridListGetColumnCount },
-    { "guiGridListAddRow", GUIGridListAddRow },
-    { "guiGridListInsertRowAfter", GUIGridListInsertRowAfter },
-    { "guiGridListRemoveRow", GUIGridListRemoveRow },
-    { "guiGridListAutoSizeColumn", GUIGridListAutoSizeColumn },
-    { "guiGridListClear", GUIGridListClear },
-    { "guiGridListSetItemText", GUIGridListSetItemText },
-    { "guiGridListGetItemText", GUIGridListGetItemText },
-    { "guiGridListSetItemData", GUIGridListSetItemData },
-    { "guiGridListGetItemData", GUIGridListGetItemData },
-    { "guiGridListSetItemColor", GUIGridListSetItemColor },
-    { "guiGridListGetItemColor", GUIGridListGetItemColor },
-    { "guiGridListSetSelectionMode", GUIGridListSetSelectionMode },
-    { "guiGridListGetSelectedItem", GUIGridListGetSelectedItem },
-    { "guiGridListGetSelectedItems", GUIGridListGetSelectedItems },
-    { "guiGridListGetSelectedCount", GUIGridListGetSelectedCount },
-    { "guiGridListSetSelectedItem", GUIGridListSetSelectedItem },
-    { "guiGridListSetHorizontalScrollPosition", GUIGridListSetHorizontalScrollPosition },
-    { "guiGridListGetHorizontalScrollPosition", GUIGridListGetHorizontalScrollPosition },
-    { "guiGridListSetVerticalScrollPosition", GUIGridListSetVerticalScrollPosition },
-    { "guiGridListGetVerticalScrollPosition", GUIGridListGetVerticalScrollPosition },
+    CLuaCFunctions::AddFunction("guiGridListSetSortingEnabled", GUIGridListSetSortingEnabled);
+    CLuaCFunctions::AddFunction("guiGridListAddColumn", GUIGridListAddColumn);
+    CLuaCFunctions::AddFunction("guiGridListRemoveColumn", GUIGridListRemoveColumn);
+    CLuaCFunctions::AddFunction("guiGridListSetColumnWidth", GUIGridListSetColumnWidth);
+    CLuaCFunctions::AddFunction("guiGridListGetColumnWidth", GUIGridListGetColumnWidth);
+    CLuaCFunctions::AddFunction("guiGridListSetColumnTitle", GUIGridListSetColumnTitle);
+    CLuaCFunctions::AddFunction("guiGridListGetColumnTitle", GUIGridListGetColumnTitle);
+    CLuaCFunctions::AddFunction("guiGridListSetScrollBars", GUIGridListSetScrollBars);
+    CLuaCFunctions::AddFunction("guiGridListGetRowCount", GUIGridListGetRowCount);
+    CLuaCFunctions::AddFunction("guiGridListGetColumnCount", GUIGridListGetColumnCount);
+    CLuaCFunctions::AddFunction("guiGridListAddRow", GUIGridListAddRow);
+    CLuaCFunctions::AddFunction("guiGridListInsertRowAfter", GUIGridListInsertRowAfter);
+    CLuaCFunctions::AddFunction("guiGridListRemoveRow", GUIGridListRemoveRow);
+    CLuaCFunctions::AddFunction("guiGridListAutoSizeColumn", GUIGridListAutoSizeColumn);
+    CLuaCFunctions::AddFunction("guiGridListClear", GUIGridListClear);
+    CLuaCFunctions::AddFunction("guiGridListSetItemText", GUIGridListSetItemText);
+    CLuaCFunctions::AddFunction("guiGridListGetItemText", GUIGridListGetItemText);
+    CLuaCFunctions::AddFunction("guiGridListSetItemData", GUIGridListSetItemData);
+    CLuaCFunctions::AddFunction("guiGridListGetItemData", GUIGridListGetItemData);
+    CLuaCFunctions::AddFunction("guiGridListSetItemColor", GUIGridListSetItemColor);
+    CLuaCFunctions::AddFunction("guiGridListGetItemColor", GUIGridListGetItemColor);
+    CLuaCFunctions::AddFunction("guiGridListSetSelectionMode", GUIGridListSetSelectionMode);
+    CLuaCFunctions::AddFunction("guiGridListGetSelectedItem", GUIGridListGetSelectedItem);
+    CLuaCFunctions::AddFunction("guiGridListGetSelectedItems", GUIGridListGetSelectedItems);
+    CLuaCFunctions::AddFunction("guiGridListGetSelectedCount", GUIGridListGetSelectedCount);
+    CLuaCFunctions::AddFunction("guiGridListSetSelectedItem", GUIGridListSetSelectedItem);
+    CLuaCFunctions::AddFunction("guiGridListSetHorizontalScrollPosition", GUIGridListSetHorizontalScrollPosition);
+    CLuaCFunctions::AddFunction("guiGridListGetHorizontalScrollPosition", GUIGridListGetHorizontalScrollPosition);
+    CLuaCFunctions::AddFunction("guiGridListSetVerticalScrollPosition", GUIGridListSetVerticalScrollPosition);
+    CLuaCFunctions::AddFunction("guiGridListGetVerticalScrollPosition", GUIGridListGetVerticalScrollPosition);
 
-    { "guiScrollPaneSetScrollBars", GUIScrollPaneSetScrollBars },
-    { "guiScrollPaneSetHorizontalScrollPosition", GUIScrollPaneSetHorizontalScrollPosition },
-    { "guiScrollPaneGetHorizontalScrollPosition", GUIScrollPaneGetHorizontalScrollPosition },
-    { "guiScrollPaneSetVerticalScrollPosition", GUIScrollPaneSetVerticalScrollPosition },
-    { "guiScrollPaneGetVerticalScrollPosition", GUIScrollPaneGetVerticalScrollPosition },
+    CLuaCFunctions::AddFunction("guiScrollPaneSetScrollBars", GUIScrollPaneSetScrollBars);
+    CLuaCFunctions::AddFunction("guiScrollPaneSetHorizontalScrollPosition", GUIScrollPaneSetHorizontalScrollPosition);
+    CLuaCFunctions::AddFunction("guiScrollPaneGetHorizontalScrollPosition", GUIScrollPaneGetHorizontalScrollPosition);
+    CLuaCFunctions::AddFunction("guiScrollPaneSetVerticalScrollPosition", GUIScrollPaneSetVerticalScrollPosition);
+    CLuaCFunctions::AddFunction("guiScrollPaneGetVerticalScrollPosition", GUIScrollPaneGetVerticalScrollPosition);
 
-    { "guiScrollBarSetScrollPosition", GUIScrollBarSetScrollPosition },
-    { "guiScrollBarGetScrollPosition", GUIScrollBarGetScrollPosition },
+    CLuaCFunctions::AddFunction("guiScrollBarSetScrollPosition", GUIScrollBarSetScrollPosition);
+    CLuaCFunctions::AddFunction("guiScrollBarGetScrollPosition", GUIScrollBarGetScrollPosition);
 
-    { "guiSetEnabled", GUISetEnabled },
-    { "guiSetProperty", GUISetProperty },
-    { "guiSetAlpha", GUISetAlpha },
-    { "guiSetText", GUISetText },
-    { "guiSetFont", GUISetFont },
-    { "guiSetSize", GUISetSize },
-    { "guiSetPosition", GUISetPosition },
-    { "guiSetVisible", GUISetVisible },
+    CLuaCFunctions::AddFunction("guiSetEnabled", GUISetEnabled);
+    CLuaCFunctions::AddFunction("guiSetProperty", GUISetProperty);
+    CLuaCFunctions::AddFunction("guiSetAlpha", GUISetAlpha);
+    CLuaCFunctions::AddFunction("guiSetText", GUISetText);
+    CLuaCFunctions::AddFunction("guiSetFont", GUISetFont);
+    CLuaCFunctions::AddFunction("guiSetSize", GUISetSize);
+    CLuaCFunctions::AddFunction("guiSetPosition", GUISetPosition);
+    CLuaCFunctions::AddFunction("guiSetVisible", GUISetVisible);
 
-    { "guiBringToFront", GUIBringToFront },
-    { "guiMoveToBack", GUIMoveToBack },
+    CLuaCFunctions::AddFunction("guiBringToFront", GUIBringToFront);
+    CLuaCFunctions::AddFunction("guiMoveToBack", GUIMoveToBack);
 
-    { "guiCheckBoxSetSelected", GUICheckBoxSetSelected },
-    { "guiRadioButtonSetSelected", GUIRadioButtonSetSelected },
+    CLuaCFunctions::AddFunction("guiCheckBoxSetSelected", GUICheckBoxSetSelected);
+    CLuaCFunctions::AddFunction("guiRadioButtonSetSelected", GUIRadioButtonSetSelected);
 
-    { "guiGetEnabled", GUIGetEnabled },
-    { "guiGetProperty", GUIGetProperty },
-    { "guiGetProperties", GUIGetProperties },
-    { "guiGetAlpha", GUIGetAlpha },
-    { "guiGetText", GUIGetText },
-    { "guiGetFont", GUIGetFont },
-    { "guiGetSize", GUIGetSize },
-    { "guiGetPosition", GUIGetPosition },
-    { "guiGetVisible", GUIGetVisible },
-    { "guiGetCursorType", GUIGetCursorType },
+    CLuaCFunctions::AddFunction("guiGetEnabled", GUIGetEnabled);
+    CLuaCFunctions::AddFunction("guiGetProperty", GUIGetProperty);
+    CLuaCFunctions::AddFunction("guiGetProperties", GUIGetProperties);
+    CLuaCFunctions::AddFunction("guiGetAlpha", GUIGetAlpha);
+    CLuaCFunctions::AddFunction("guiGetText", GUIGetText);
+    CLuaCFunctions::AddFunction("guiGetFont", GUIGetFont);
+    CLuaCFunctions::AddFunction("guiGetSize", GUIGetSize);
+    CLuaCFunctions::AddFunction("guiGetPosition", GUIGetPosition);
+    CLuaCFunctions::AddFunction("guiGetVisible", GUIGetVisible);
+    CLuaCFunctions::AddFunction("guiGetCursorType", GUIGetCursorType);
 
-    { "guiCheckBoxGetSelected", GUICheckBoxGetSelected },
-    { "guiRadioButtonGetSelected", GUIRadioButtonGetSelected },
+    CLuaCFunctions::AddFunction("guiCheckBoxGetSelected", GUICheckBoxGetSelected);
+    CLuaCFunctions::AddFunction("guiRadioButtonGetSelected", GUIRadioButtonGetSelected);
 
-    { "guiProgressBarSetProgress", GUIProgressBarSetProgress },
-    { "guiProgressBarGetProgress", GUIProgressBarGetProgress },
+    CLuaCFunctions::AddFunction("guiProgressBarSetProgress", GUIProgressBarSetProgress);
+    CLuaCFunctions::AddFunction("guiProgressBarGetProgress", GUIProgressBarGetProgress);
 
-    { "guiGetScreenSize", GUIGetScreenSize },
+    CLuaCFunctions::AddFunction("guiGetScreenSize", GUIGetScreenSize);
 
-    { "guiEditSetCaretIndex", GUIEditSetCaretIndex },
-    { "guiEditGetCaretIndex", GUIEditGetCaretIndex },
-    { "guiEditSetMasked", GUIEditSetMasked },
-    { "guiEditIsMasked", GUIEditIsMasked },
-    { "guiEditSetMaxLength", GUIEditSetMaxLength },
-    { "guiEditGetMaxLength", GUIEditGetMaxLength },
-    { "guiEditSetReadOnly", GUIEditSetReadOnly },
-    { "guiEditIsReadOnly", GUIEditIsReadOnly },
+    CLuaCFunctions::AddFunction("guiEditSetCaretIndex", GUIEditSetCaretIndex);
+    CLuaCFunctions::AddFunction("guiEditGetCaretIndex", GUIEditGetCaretIndex);
+    CLuaCFunctions::AddFunction("guiEditSetMasked", GUIEditSetMasked);
+    CLuaCFunctions::AddFunction("guiEditSetMaxLength", GUIEditSetMaxLength);
+    CLuaCFunctions::AddFunction("guiEditSetReadOnly", GUIEditSetReadOnly);
+    CLuaCFunctions::AddFunction("guiEditIsReadOnly", GUIEditIsReadOnly);
 
-    { "guiMemoSetCaretIndex", GUIMemoSetCaretIndex },
-    { "guiMemoGetCaretIndex", GUIMemoGetCaretIndex },
-    { "guiMemoSetReadOnly", GUIMemoSetReadOnly },
-    { "guiMemoIsReadOnly", GUIMemoIsReadOnly },
-    { "guiMemoSetVerticalScrollPosition", GUIMemoSetVerticalScrollPosition },
-    { "guiMemoGetVerticalScrollPosition", GUIMemoGetVerticalScrollPosition },
+    CLuaCFunctions::AddFunction("guiMemoSetCaretIndex", GUIMemoSetCaretIndex);
+    CLuaCFunctions::AddFunction("guiMemoGetCaretIndex", GUIMemoGetCaretIndex);
+    CLuaCFunctions::AddFunction("guiMemoSetReadOnly", GUIMemoSetReadOnly);
+    CLuaCFunctions::AddFunction("guiMemoIsReadOnly", GUIMemoIsReadOnly);
+    CLuaCFunctions::AddFunction("guiMemoSetVerticalScrollPosition", GUIMemoSetVerticalScrollPosition);
+    CLuaCFunctions::AddFunction("guiMemoGetVerticalScrollPosition", GUIMemoGetVerticalScrollPosition);
 
-    { "guiLabelSetColor", GUILabelSetColor },
-    { "guiLabelGetColor", GUILabelGetColor },
-    { "guiLabelSetVerticalAlign", GUILabelSetVerticalAlign },
-    { "guiLabelSetHorizontalAlign", GUILabelSetHorizontalAlign },
+    CLuaCFunctions::AddFunction("guiLabelSetColor", GUILabelSetColor);
+    CLuaCFunctions::AddFunction("guiLabelGetColor", GUILabelGetColor);
+    CLuaCFunctions::AddFunction("guiLabelSetVerticalAlign", GUILabelSetVerticalAlign);
+    CLuaCFunctions::AddFunction("guiLabelSetHorizontalAlign", GUILabelSetHorizontalAlign);
 
-    { "guiLabelGetTextExtent", GUILabelGetTextExtent },
-    { "guiLabelGetFontHeight", GUILabelGetFontHeight },
+    CLuaCFunctions::AddFunction("guiLabelGetTextExtent", GUILabelGetTextExtent);
+    CLuaCFunctions::AddFunction("guiLabelGetFontHeight", GUILabelGetFontHeight);
 
-    { "guiWindowSetMovable", GUIWindowSetMovable },
-    { "guiWindowSetSizable", GUIWindowSetSizable },
-    { "guiWindowIsMovable", GUIWindowIsMovable },
-    { "guiWindowIsSizable", GUIWindowIsSizable },
+    CLuaCFunctions::AddFunction("guiWindowSetMovable", GUIWindowSetMovable);
+    CLuaCFunctions::AddFunction("guiWindowSetSizable", GUIWindowSetSizable);
 
-    { "getChatboxLayout", GUIGetChatboxLayout },
+    CLuaCFunctions::AddFunction("getChatboxLayout", GUIGetChatboxLayout);
 
-    { "guiComboBoxAddItem", GUIComboBoxAddItem },
-    { "guiComboBoxRemoveItem", GUIComboBoxRemoveItem },
-    { "guiComboBoxClear", GUIComboBoxClear },
-    { "guiComboBoxGetSelected", GUIComboBoxGetSelected },
-    { "guiComboBoxSetSelected", GUIComboBoxSetSelected },
-    { "guiComboBoxGetItemText", GUIComboBoxGetItemText },
-    { "guiComboBoxSetItemText", GUIComboBoxSetItemText },
-    { "guiComboBoxGetItemCount", GUIComboBoxGetItemCount },
-    { "guiComboBoxSetOpen", GUIComboBoxSetOpen },
-    { "guiComboBoxIsOpen", GUIComboBoxIsOpen },
-    };
-
-    // Add functions
-    for (const auto& pair : functions)
-    {
-        CLuaCFunctions::AddFunction(pair.first, pair.second);
-    }
+    CLuaCFunctions::AddFunction("guiComboBoxAddItem", GUIComboBoxAddItem);
+    CLuaCFunctions::AddFunction("guiComboBoxRemoveItem", GUIComboBoxRemoveItem);
+    CLuaCFunctions::AddFunction("guiComboBoxClear", GUIComboBoxClear);
+    CLuaCFunctions::AddFunction("guiComboBoxGetSelected", GUIComboBoxGetSelected);
+    CLuaCFunctions::AddFunction("guiComboBoxSetSelected", GUIComboBoxSetSelected);
+    CLuaCFunctions::AddFunction("guiComboBoxGetItemText", GUIComboBoxGetItemText);
+    CLuaCFunctions::AddFunction("guiComboBoxSetItemText", GUIComboBoxSetItemText);
 }
 
 void CLuaGUIDefs::AddClass(lua_State* luaVM)
@@ -3093,28 +3053,6 @@ int CLuaGUIDefs::GUIEditSetMasked(lua_State* luaVM)
     return 1;
 }
 
-int CLuaGUIDefs::GUIEditIsMasked(lua_State* luaVM)
-{
-    //bool guiEditIsMasked(element theElement)
-    CClientGUIElement* theElement;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData<CGUIEdit>(theElement);
-
-    if (!argStream.HasErrors())
-    {
-        bool masked = static_cast<CGUIEdit*>(theElement->GetCGUIElement())->IsMasked();
-        lua_pushboolean(luaVM, masked);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // error: bad arguments
-    lua_pushnil(luaVM);
-    return 1;
-}
-
 int CLuaGUIDefs::GUIEditSetMaxLength(lua_State* luaVM)
 {
     //  bool guiEditSetMaxLength ( element theElement, int length )
@@ -3366,28 +3304,6 @@ int CLuaGUIDefs::GUIWindowSetSizable(lua_State* luaVM)
     return 1;
 }
 
-int CLuaGUIDefs::GUIWindowIsSizable(lua_State* luaVM)
-{
-    // bool guiWindowIsSizable( elemen theElement )
-    CClientGUIElement* theElement;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData<CGUIWindow>(theElement);
-
-    if (!argStream.HasErrors())
-    {
-        bool sizable = static_cast<CGUIWindow*>(theElement->GetCGUIElement())->IsSizingEnabled();
-        lua_pushboolean(luaVM, sizable);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // error: bad arguments
-    lua_pushnil(luaVM);
-    return 1;
-}
-
 int CLuaGUIDefs::GUILabelGetTextExtent(lua_State* luaVM)
 {
     //  float guiLabelGetTextExtent ( element theLabel )
@@ -3577,79 +3493,23 @@ int CLuaGUIDefs::GUIGetChatboxLayout(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Loop through all CVars
-        for (unsigned int i = 0; i < MAX_CHATBOX_LAYOUT_CVARS; i++)
-        {
-            // If we are asking for all CVars, or we can match the requested CVar with this CVar
-            if (bAll || !stricmp(g_chatboxLayoutCVars[i], strCVarArg))
-            {
-                // Push color values into a table
-                if (g_chatboxLayoutCVars[i] == "chat_color" ||
-                    g_chatboxLayoutCVars[i] == "chat_text_color" ||
-                    g_chatboxLayoutCVars[i] == "chat_input_color" ||
-                    g_chatboxLayoutCVars[i] == "chat_input_prefix_color" ||
-                    g_chatboxLayoutCVars[i] == "chat_input_text_color")
-                {
-                    pCVars->Get(g_chatboxLayoutCVars[i], strCVarValue);
-                    if (!strCVarValue.empty())
-                    {
-                        ss.clear();
-                        ss.str(strCVarValue);
-                        ss >> iR >> iG >> iB >> iA;
-                        lua_newtable(luaVM);
-                        lua_pushnumber(luaVM, 1);
-                        lua_pushnumber(luaVM, iR);
-                        lua_settable(luaVM, -3);
-                        lua_pushnumber(luaVM, 2);
-                        lua_pushnumber(luaVM, iG);
-                        lua_settable(luaVM, -3);
-                        lua_pushnumber(luaVM, 3);
-                        lua_pushnumber(luaVM, iB);
-                        lua_settable(luaVM, -3);
-                        lua_pushnumber(luaVM, 4);
-                        lua_pushnumber(luaVM, iA);
-                        lua_settable(luaVM, -3);
-                    }
-                }
-                // Push chat scale into a table
-                else if (g_chatboxLayoutCVars[i] == "chat_scale")
-                {
-                    pCVars->Get(g_chatboxLayoutCVars[i], strCVarValue);
-                    if (!strCVarValue.empty())
-                    {
-                        float fX, fY;
-                        ss.clear();
-                        ss.str(strCVarValue);
-                        ss >> fX >> fY;
-                        lua_newtable(luaVM);
-                        lua_pushnumber(luaVM, 1);
-                        lua_pushnumber(luaVM, fX);
-                        lua_settable(luaVM, -3);
-                        lua_pushnumber(luaVM, 2);
-                        lua_pushnumber(luaVM, fY);
-                        lua_settable(luaVM, -3);
-                    }
-                }
-                else
-                {
-                    pCVars->Get(g_chatboxLayoutCVars[i], fNumber);
-                    if (g_chatboxLayoutCVars[i] == "chat_use_cegui")
-                        lua_pushboolean(luaVM, fNumber ? true : false);
-                    else
-                        lua_pushnumber(luaVM, fNumber);
-                }
-
-                // If we are asking for all CVars, push this into the table with its CVar name, otherwise just stop here
-                if (bAll)
-                    lua_setfield(luaVM, -2, g_chatboxLayoutCVars[i]);
-                else
-                    return 1;
-            }
-        }
-
-        // We wanted all CVars and that's done so let's stop now
-        if (bAll)
-            return 1;
+        ss.clear();
+        ss.str(strCVar);
+        ss >> iR >> iG >> iB >> iA;
+        lua_newtable(luaVM);
+        lua_pushnumber(luaVM, 1);
+        lua_pushnumber(luaVM, iR);
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 2);
+        lua_pushnumber(luaVM, iG);
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 3);
+        lua_pushnumber(luaVM, iB);
+        lua_settable(luaVM, -3);
+        lua_pushnumber(luaVM, 4);
+        lua_pushnumber(luaVM, iA);
+        lua_settable(luaVM, -3);
+        lua_setfield(luaVM, -2, "chat_text_color");
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -4007,3 +3867,285 @@ int CLuaGUIDefs::GUIIsTransferBoxEnabled(lua_State* luaVM)
     lua_pushboolean(luaVM, g_pClientGame->GetTransferBox()->IsEnabled());
     return 1;
 }
+
+static const SFixedArray<const char*, MAX_CHATBOX_LAYOUT_CVARS> g_chatboxLayoutCVars = { {
+        "chat_font",
+        "chat_lines",
+        "chat_color",
+        "chat_text_color",
+        "chat_input_color",
+        "chat_input_prefix_color",
+        "chat_input_text_color",
+        "chat_scale",
+        "chat_position_offset_x",
+        "chat_position_offset_y",
+        "chat_position_horizontal",
+        "chat_position_vertical",
+        "chat_text_alignment",
+        "chat_width",
+        "chat_css_style_text",
+        "chat_css_style_background",
+        "chat_line_life",
+        "chat_line_fade_out",
+        "chat_use_cegui",
+        "text_scale"
+    } };
+
+    std::map<const char*, lua_CFunction> functions{
+        { "guiGetInputEnabled", GUIGetInputEnabled },
+    { "guiSetInputEnabled", GUISetInputEnabled },
+    { "guiGetInputMode", GUIGetInputMode },
+    { "guiSetInputMode", GUISetInputMode },
+    { "isChatBoxInputActive", GUIIsChatBoxInputActive },
+    { "isConsoleActive", GUIIsConsoleActive },
+    { "isDebugViewActive", GUIIsDebugViewActive },
+    { "setDebugViewActive", GUISetDebugViewActive },
+    { "isMainMenuActive", GUIIsMainMenuActive },
+    { "isMTAWindowActive", GUIIsMTAWindowActive },
+    { "isTransferBoxActive", GUIIsTransferBoxActive },
+    { "isTransferBoxEnabled", GUIIsTransferBoxEnabled },
+    { "setTransferBoxEnabled", GUISetTransferBoxEnabled },
+    { "guiCreateWindow", GUICreateWindow },
+    { "guiCreateLabel", GUICreateLabel },
+    { "guiCreateButton", GUICreateButton },
+    { "guiCreateEdit", GUICreateEdit },
+    { "guiCreateMemo", GUICreateMemo },
+    { "guiCreateGridList", GUICreateGridList },
+    { "guiCreateScrollPane", GUICreateScrollPane },
+    { "guiCreateScrollBar", GUICreateScrollBar },
+    { "guiCreateTabPanel", GUICreateTabPanel },
+    { "guiCreateTab", GUICreateTab },
+    { "guiCreateProgressBar", GUICreateProgressBar },
+    { "guiCreateCheckBox", GUICreateCheckBox },
+    { "guiCreateRadioButton", GUICreateRadioButton },
+    { "guiCreateStaticImage", GUICreateStaticImage },
+    { "guiCreateComboBox", GUICreateComboBox },
+    { "guiCreateFont", GUICreateFont },
+    { "guiStaticImageLoadImage", GUIStaticImageLoadImage },
+    { "guiStaticImageGetNativeSize", GUIStaticImageGetNativeSize },
+    { "guiGetSelectedTab", GUIGetSelectedTab },
+    { "guiSetSelectedTab", GUISetSelectedTab },
+    { "guiDeleteTab", GUIDeleteTab },
+    { "guiGridListSetSortingEnabled", GUIGridListSetSortingEnabled },
+    { "guiGridListAddColumn", GUIGridListAddColumn },
+    { "guiGridListRemoveColumn", GUIGridListRemoveColumn },
+    { "guiGridListSetColumnWidth", GUIGridListSetColumnWidth },
+    { "guiGridListGetColumnWidth", GUIGridListGetColumnWidth },
+    { "guiGridListSetColumnTitle", GUIGridListSetColumnTitle },
+    { "guiGridListGetColumnTitle", GUIGridListGetColumnTitle },
+    { "guiGridListSetScrollBars", GUIGridListSetScrollBars },
+    { "guiGridListGetRowCount", GUIGridListGetRowCount },
+    { "guiGridListGetColumnCount", GUIGridListGetColumnCount },
+    { "guiGridListAddRow", GUIGridListAddRow },
+    { "guiGridListInsertRowAfter", GUIGridListInsertRowAfter },
+    { "guiGridListRemoveRow", GUIGridListRemoveRow },
+    { "guiGridListAutoSizeColumn", GUIGridListAutoSizeColumn },
+    { "guiGridListClear", GUIGridListClear },
+    { "guiGridListSetItemText", GUIGridListSetItemText },
+    { "guiGridListGetItemText", GUIGridListGetItemText },
+    { "guiGridListSetItemData", GUIGridListSetItemData },
+    { "guiGridListGetItemData", GUIGridListGetItemData },
+    { "guiGridListSetItemColor", GUIGridListSetItemColor },
+    { "guiGridListGetItemColor", GUIGridListGetItemColor },
+    { "guiGridListSetSelectionMode", GUIGridListSetSelectionMode },
+    { "guiGridListGetSelectedItem", GUIGridListGetSelectedItem },
+    { "guiGridListGetSelectedItems", GUIGridListGetSelectedItems },
+    { "guiGridListGetSelectedCount", GUIGridListGetSelectedCount },
+    { "guiGridListSetSelectedItem", GUIGridListSetSelectedItem },
+    { "guiGridListSetHorizontalScrollPosition", GUIGridListSetHorizontalScrollPosition },
+    { "guiGridListGetHorizontalScrollPosition", GUIGridListGetHorizontalScrollPosition },
+    { "guiGridListSetVerticalScrollPosition", GUIGridListSetVerticalScrollPosition },
+    { "guiGridListGetVerticalScrollPosition", GUIGridListGetVerticalScrollPosition },
+    { "guiScrollPaneSetScrollBars", GUIScrollPaneSetScrollBars },
+    { "guiScrollPaneSetHorizontalScrollPosition", GUIScrollPaneSetHorizontalScrollPosition },
+    { "guiScrollPaneGetHorizontalScrollPosition", GUIScrollPaneGetHorizontalScrollPosition },
+    { "guiScrollPaneSetVerticalScrollPosition", GUIScrollPaneSetVerticalScrollPosition },
+    { "guiScrollPaneGetVerticalScrollPosition", GUIScrollPaneGetVerticalScrollPosition },
+    { "guiScrollBarSetScrollPosition", GUIScrollBarSetScrollPosition },
+    { "guiScrollBarGetScrollPosition", GUIScrollBarGetScrollPosition },
+    { "guiSetEnabled", GUISetEnabled },
+    { "guiSetProperty", GUISetProperty },
+    { "guiSetAlpha", GUISetAlpha },
+    { "guiSetText", GUISetText },
+    { "guiSetFont", GUISetFont },
+    { "guiSetSize", GUISetSize },
+    { "guiSetPosition", GUISetPosition },
+    { "guiSetVisible", GUISetVisible },
+    { "guiBringToFront", GUIBringToFront },
+    { "guiMoveToBack", GUIMoveToBack },
+    { "guiCheckBoxSetSelected", GUICheckBoxSetSelected },
+    { "guiRadioButtonSetSelected", GUIRadioButtonSetSelected },
+    { "guiGetEnabled", GUIGetEnabled },
+    { "guiGetProperty", GUIGetProperty },
+    { "guiGetProperties", GUIGetProperties },
+    { "guiGetAlpha", GUIGetAlpha },
+    { "guiGetText", GUIGetText },
+    { "guiGetFont", GUIGetFont },
+    { "guiGetSize", GUIGetSize },
+    { "guiGetPosition", GUIGetPosition },
+    { "guiGetVisible", GUIGetVisible },
+    { "guiGetCursorType", GUIGetCursorType },
+    { "guiCheckBoxGetSelected", GUICheckBoxGetSelected },
+    { "guiRadioButtonGetSelected", GUIRadioButtonGetSelected },
+    { "guiProgressBarSetProgress", GUIProgressBarSetProgress },
+    { "guiProgressBarGetProgress", GUIProgressBarGetProgress },
+    { "guiGetScreenSize", GUIGetScreenSize },
+    { "guiEditSetCaretIndex", GUIEditSetCaretIndex },
+    { "guiEditGetCaretIndex", GUIEditGetCaretIndex },
+    { "guiEditSetMasked", GUIEditSetMasked },
+    { "guiEditIsMasked", GUIEditIsMasked },
+    { "guiEditSetMaxLength", GUIEditSetMaxLength },
+    { "guiEditGetMaxLength", GUIEditGetMaxLength },
+    { "guiEditSetReadOnly", GUIEditSetReadOnly },
+    { "guiEditIsReadOnly", GUIEditIsReadOnly },
+    { "guiMemoSetCaretIndex", GUIMemoSetCaretIndex },
+    { "guiMemoGetCaretIndex", GUIMemoGetCaretIndex },
+    { "guiMemoSetReadOnly", GUIMemoSetReadOnly },
+    { "guiMemoIsReadOnly", GUIMemoIsReadOnly },
+    { "guiMemoSetVerticalScrollPosition", GUIMemoSetVerticalScrollPosition },
+    { "guiMemoGetVerticalScrollPosition", GUIMemoGetVerticalScrollPosition },
+    { "guiLabelSetColor", GUILabelSetColor },
+    { "guiLabelGetColor", GUILabelGetColor },
+    { "guiLabelSetVerticalAlign", GUILabelSetVerticalAlign },
+    { "guiLabelSetHorizontalAlign", GUILabelSetHorizontalAlign },
+    { "guiLabelGetTextExtent", GUILabelGetTextExtent },
+    { "guiLabelGetFontHeight", GUILabelGetFontHeight },
+    { "guiWindowSetMovable", GUIWindowSetMovable },
+    { "guiWindowSetSizable", GUIWindowSetSizable },
+    { "guiWindowIsMovable", GUIWindowIsMovable },
+    { "guiWindowIsSizable", GUIWindowIsSizable },
+    { "getChatboxLayout", GUIGetChatboxLayout },
+    { "guiComboBoxAddItem", GUIComboBoxAddItem },
+    { "guiComboBoxRemoveItem", GUIComboBoxRemoveItem },
+    { "guiComboBoxClear", GUIComboBoxClear },
+    { "guiComboBoxGetSelected", GUIComboBoxGetSelected },
+    { "guiComboBoxSetSelected", GUIComboBoxSetSelected },
+    { "guiComboBoxGetItemText", GUIComboBoxGetItemText },
+    { "guiComboBoxSetItemText", GUIComboBoxSetItemText },
+    { "guiComboBoxGetItemCount", GUIComboBoxGetItemCount },
+    { "guiComboBoxSetOpen", GUIComboBoxSetOpen },
+    { "guiComboBoxIsOpen", GUIComboBoxIsOpen },
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
+int CLuaGUIDefs::GUIEditIsMasked(lua_State* luaVM)
+{
+    //bool guiEditIsMasked(element theElement)
+    CClientGUIElement* theElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIEdit>(theElement);
+
+    if (!argStream.HasErrors())
+    {
+        bool masked = static_cast<CGUIEdit*>(theElement->GetCGUIElement())->IsMasked();
+        lua_pushboolean(luaVM, masked);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushnil(luaVM);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIWindowIsSizable(lua_State* luaVM)
+{
+    // bool guiWindowIsSizable( elemen theElement )
+    CClientGUIElement* theElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData<CGUIWindow>(theElement);
+
+    if (!argStream.HasErrors())
+    {
+        bool sizable = static_cast<CGUIWindow*>(theElement->GetCGUIElement())->IsSizingEnabled();
+        lua_pushboolean(luaVM, sizable);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushnil(luaVM);
+    return 1;
+}
+
+        // Loop through all CVars
+        for (unsigned int i = 0; i < MAX_CHATBOX_LAYOUT_CVARS; i++)
+        {
+            // If we are asking for all CVars, or we can match the requested CVar with this CVar
+            if (bAll || !stricmp(g_chatboxLayoutCVars[i], strCVarArg))
+            {
+                // Push color values into a table
+                if (g_chatboxLayoutCVars[i] == "chat_color" ||
+                    g_chatboxLayoutCVars[i] == "chat_text_color" ||
+                    g_chatboxLayoutCVars[i] == "chat_input_color" ||
+                    g_chatboxLayoutCVars[i] == "chat_input_prefix_color" ||
+                    g_chatboxLayoutCVars[i] == "chat_input_text_color")
+                {
+                    pCVars->Get(g_chatboxLayoutCVars[i], strCVarValue);
+                    if (!strCVarValue.empty())
+                    {
+                        ss.clear();
+                        ss.str(strCVarValue);
+                        ss >> iR >> iG >> iB >> iA;
+                        lua_newtable(luaVM);
+                        lua_pushnumber(luaVM, 1);
+                        lua_pushnumber(luaVM, iR);
+                        lua_settable(luaVM, -3);
+                        lua_pushnumber(luaVM, 2);
+                        lua_pushnumber(luaVM, iG);
+                        lua_settable(luaVM, -3);
+                        lua_pushnumber(luaVM, 3);
+                        lua_pushnumber(luaVM, iB);
+                        lua_settable(luaVM, -3);
+                        lua_pushnumber(luaVM, 4);
+                        lua_pushnumber(luaVM, iA);
+                        lua_settable(luaVM, -3);
+                    }
+                }
+                // Push chat scale into a table
+                else if (g_chatboxLayoutCVars[i] == "chat_scale")
+                {
+                    pCVars->Get(g_chatboxLayoutCVars[i], strCVarValue);
+                    if (!strCVarValue.empty())
+                    {
+                        float fX, fY;
+                        ss.clear();
+                        ss.str(strCVarValue);
+                        ss >> fX >> fY;
+                        lua_newtable(luaVM);
+                        lua_pushnumber(luaVM, 1);
+                        lua_pushnumber(luaVM, fX);
+                        lua_settable(luaVM, -3);
+                        lua_pushnumber(luaVM, 2);
+                        lua_pushnumber(luaVM, fY);
+                        lua_settable(luaVM, -3);
+                    }
+                }
+                else
+                {
+                    pCVars->Get(g_chatboxLayoutCVars[i], fNumber);
+                    if (g_chatboxLayoutCVars[i] == "chat_use_cegui")
+                        lua_pushboolean(luaVM, fNumber ? true : false);
+                    else
+                        lua_pushnumber(luaVM, fNumber);
+                }
+
+                // If we are asking for all CVars, push this into the table with its CVar name, otherwise just stop here
+                if (bAll)
+                    lua_setfield(luaVM, -2, g_chatboxLayoutCVars[i]);
+                else
+                    return 1;
+            }
+        }
+
+        // We wanted all CVars and that's done so let's stop now
+        if (bAll)
+            return 1;

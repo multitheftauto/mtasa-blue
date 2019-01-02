@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CWaterRPCs_H
-#define __CWaterRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
@@ -27,5 +26,3 @@ public:
     DECLARE_RPC(SetWaterColor);
     DECLARE_RPC(ResetWaterColor);
 };
-
-#endif

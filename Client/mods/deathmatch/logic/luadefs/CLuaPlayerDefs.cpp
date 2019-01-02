@@ -13,39 +13,47 @@
 
 void CLuaPlayerDefs::LoadFunctions(void)
 {
-    // Player get funcs
-    CLuaCFunctions::AddFunction("getLocalPlayer", GetLocalPlayer);
-    CLuaCFunctions::AddFunction("getPlayerName", GetPlayerName);
-    CLuaCFunctions::AddFunction("getPlayerNametagText", GetPlayerNametagText);
-    CLuaCFunctions::AddFunction("getPlayerNametagColor", GetPlayerNametagColor);
-    CLuaCFunctions::AddFunction("isPlayerNametagShowing", IsPlayerNametagShowing);
-    CLuaCFunctions::AddFunction("getPlayerPing", GetPlayerPing);
-    CLuaCFunctions::AddFunction("getPlayerTeam", GetPlayerTeam);
-    CLuaCFunctions::AddFunction("getPlayerFromNick", GetPlayerFromName);
-    CLuaCFunctions::AddFunction("getPlayerFromName", GetPlayerFromName);
-    CLuaCFunctions::AddFunction("isPlayerHudComponentVisible", IsPlayerHudComponentVisible);
-    CLuaCFunctions::AddFunction("getPlayerMoney", GetPlayerMoney);
-    CLuaCFunctions::AddFunction("getPlayerWantedLevel", GetPlayerWantedLevel);
+    std::map<const char*, lua_CFunction> functions{
+        // Player get funcs
+        {"getLocalPlayer", GetLocalPlayer},
+        {"getPlayerName", GetPlayerName},
+        {"getPlayerNametagText", GetPlayerNametagText},
+        {"getPlayerNametagColor", GetPlayerNametagColor},
+        {"isPlayerNametagShowing", IsPlayerNametagShowing},
+        {"getPlayerPing", GetPlayerPing},
+        {"getPlayerTeam", GetPlayerTeam},
+        {"getPlayerFromNick", GetPlayerFromName},
+        {"getPlayerFromName", GetPlayerFromName},
+        {"isPlayerHudComponentVisible", IsPlayerHudComponentVisible},
+        {"getPlayerMoney", GetPlayerMoney},
+        {"getPlayerWantedLevel", GetPlayerWantedLevel},
 
-    // Player set funcs
-    CLuaCFunctions::AddFunction("showPlayerHudComponent", ShowPlayerHudComponent);
-    CLuaCFunctions::AddFunction("setPlayerHudComponentVisible", ShowPlayerHudComponent);
-    CLuaCFunctions::AddFunction("setPlayerMoney", SetPlayerMoney);
-    CLuaCFunctions::AddFunction("givePlayerMoney", GivePlayerMoney);
-    CLuaCFunctions::AddFunction("takePlayerMoney", TakePlayerMoney);
-    CLuaCFunctions::AddFunction("setPlayerNametagText", SetPlayerNametagText);
-    CLuaCFunctions::AddFunction("setPlayerNametagColor", SetPlayerNametagColor);
-    CLuaCFunctions::AddFunction("setPlayerNametagShowing", SetPlayerNametagShowing);
+        // Player set funcs
+        {"showPlayerHudComponent", ShowPlayerHudComponent},
+        {"setPlayerHudComponentVisible", ShowPlayerHudComponent},
+        {"setPlayerMoney", SetPlayerMoney},
+        {"givePlayerMoney", GivePlayerMoney},
+        {"takePlayerMoney", TakePlayerMoney},
+        {"setPlayerNametagText", SetPlayerNametagText},
+        {"setPlayerNametagColor", SetPlayerNametagColor},
+        {"setPlayerNametagShowing", SetPlayerNametagShowing},
 
-    // Community funcs
-    CLuaCFunctions::AddFunction("getPlayerUserName", GetPlayerUserName);
-    CLuaCFunctions::AddFunction("getPlayerSerial", GetPlayerSerial);
+        // Community funcs
+        {"getPlayerUserName", GetPlayerUserName},
+        {"getPlayerSerial", GetPlayerSerial},
 
-    // Map funcs
-    CLuaCFunctions::AddFunction("forcePlayerMap", ForcePlayerMap);
-    CLuaCFunctions::AddFunction("isPlayerMapForced", IsPlayerMapForced);
-    CLuaCFunctions::AddFunction("isPlayerMapVisible", IsPlayerMapVisible);
-    CLuaCFunctions::AddFunction("getPlayerMapBoundingBox", GetPlayerMapBoundingBox);
+        // Map funcs
+        {"forcePlayerMap", ForcePlayerMap},
+        {"isPlayerMapForced", IsPlayerMapForced},
+        {"isPlayerMapVisible", IsPlayerMapVisible},
+        {"getPlayerMapBoundingBox", GetPlayerMapBoundingBox},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaPlayerDefs::AddClass(lua_State* luaVM)

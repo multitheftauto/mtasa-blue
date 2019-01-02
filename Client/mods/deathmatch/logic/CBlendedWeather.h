@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CBLENDEDWEATHER_H
-#define __CBLENDEDWEATHER_H
+#pragma once
 
 class CBlendedWeather
 {
@@ -39,5 +38,3 @@ private:
     CClock*   m_pClock;
     CWeather* m_pWeather;
 };
-
-#endif

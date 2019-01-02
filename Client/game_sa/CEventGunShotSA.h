@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CEventGunShotSA_H
-#define __CEventGunShotSA_H
+#pragma once
 
 #include <game/CEventGunShot.h>
 
@@ -36,5 +35,3 @@ public:
 private:
     CEventGunShotSAInterface* m_pInterface;
 };
-
-#endif

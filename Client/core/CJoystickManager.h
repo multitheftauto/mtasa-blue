@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CJOYSTICKMANAGER_H
-#define __CJOYSTICKMANAGER_H
+#pragma once
 
 class CJoystickManagerInterface
 {
@@ -57,5 +56,3 @@ CJoystickManagerInterface* GetJoystickManager(void);
 
 // Unique numbers for the joystick buttons - Used to identify buttons in the GTA settings
 #define GTA_KEY_JOY(x)  ( 500+(x) )
-
-#endif

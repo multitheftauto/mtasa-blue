@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CWEAPONSTATMANAGERSA_H
-#define __CWEAPONSTATMANAGERSA_H
+#pragma once
 
 #include <list>
 
@@ -98,5 +97,3 @@ private:
     static sWeaponInfo      OriginalNormalWeaponData[WEAPONTYPE_MAX + 1];
     static sWeaponInfo      OriginalHitmanWeaponData[WEAPONTYPE_MAX + 1];
 };
-
-#endif

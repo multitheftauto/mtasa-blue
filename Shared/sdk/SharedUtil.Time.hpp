@@ -237,9 +237,10 @@ void SharedUtil::UpdateModuleTickCount64(void)
 //   Returns the number of milliseconds since some fixed point in time.
 //   Wraps every 49.71 days and should always increase monotonically.
 //
+// TODO:
 // ACHTUNG: This function should be scrapped and replaced by a cross-platform time class
 //
-#if defined(__APPLE__) && defined(__MACH__)
+#if defined(__APPLE__)
 
 // Apple / Darwin platforms with Mach monotonic clock support
 #include <mach/mach_time.h>

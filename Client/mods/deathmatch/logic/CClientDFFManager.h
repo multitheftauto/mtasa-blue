@@ -10,8 +10,7 @@
 
 class CClientDFFManager;
 
-#ifndef __CCLIENTDFFMANAGER_H
-#define __CCLIENTDFFMANAGER_H
+#pragma once
 
 #include <list>
 #include "CClientDFF.h"
@@ -45,5 +44,3 @@ private:
     std::list<CClientDFF*> m_List;
     bool                   m_bRemoveFromList;
 };
-
-#endif

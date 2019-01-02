@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CBlipRPCs_H
-#define __CBlipRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
@@ -26,5 +25,3 @@ public:
     DECLARE_ELEMENT_RPC(SetBlipOrdering);
     DECLARE_ELEMENT_RPC(SetBlipVisibleDistance);
 };
-
-#endif

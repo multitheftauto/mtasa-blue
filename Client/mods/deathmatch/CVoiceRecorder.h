@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CVOICE_H
-#define __CVOICE_H
+#pragma once
 
 #define VOICE_BUFFER_LENGTH             200000
 #define VOICE_FREQUENCY                 44100
@@ -19,9 +18,7 @@
 #define FRAME_OUTGOING_BUFFER_COUNT 100
 #define FRAME_INCOMING_BUFFER_COUNT 100
 
-// Uncomment this to hear yourself speak locally (Voice is still encoded & decoded to simulate network transmission)
-#define VOICE_DEBUG_LOCAL_PLAYBACK
-
+#include <mutex>
 #include <speex/speex.h>
 #include <speex/speex_preprocess.h>
 #include <portaudio/portaudio.h>
@@ -59,7 +56,8 @@ public:
 
     void DoPulse(void);
 
-    void UpdatePTTState(unsigned int uiState);
+    void SetPTTState(bool bState);
+    bool GetPTTState();
 
     unsigned int  GetSampleRate(void) { return m_SampleRate; }
     unsigned char GetSampleQuality(void) { return m_ucQuality; }
@@ -96,6 +94,5 @@ private:
     unsigned char m_ucQuality;
 
     std::list<SString> m_EventQueue;
-    CCriticalSection   m_CS;
+    std::mutex         m_Mutex;
 };
-#endif

@@ -505,6 +505,7 @@ void CChat::Clear(void)
     }
     m_uiMostRecentLine = 0;
     m_fSmoothScroll = 0;
+    m_iCacheTextureRevision = -1;
 }
 
 void CChat::ClearInput(void)

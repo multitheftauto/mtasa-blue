@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include <multiplayer/CMultiplayer.h>
 
 #define LOG_EVENT_SIZE 200
 
@@ -472,6 +473,13 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
                 reportLogContent.LoadFromFile(PathJoin(GetMTADataPath(), "report.log"));
                 AppendToDumpFile(strPathFilename, reportLogContent, 'REPs', 'REPe');
                 SetApplicationSetting("diagnostics", "last-dump-extra", "added-report");
+
+                // Try to append current animation and task to dump file
+                SetApplicationSetting("diagnostics", "last-dump-extra", "try-anim-task");
+                CBuffer currentAnimTaskInfo;
+                GetCurrentAnimTaskInfo(currentAnimTaskInfo);
+                AppendToDumpFile(strPathFilename, currentAnimTaskInfo, 'CATs', 'CATe');
+                SetApplicationSetting("diagnostics", "last-dump-extra", "added-anim-task");
             }
         }
 
@@ -1009,6 +1017,24 @@ void CCrashDumpWriter::GetMemoryInfo(CBuffer& buffer)
     for (int i = 0; i < iNumLines; i++)
     {
         stream.Write(memStatsNow.modelInfo.uiArray[i]);
+    }
+}
+
+void CCrashDumpWriter::GetCurrentAnimTaskInfo(CBuffer& buffer)
+{
+    CBufferWriteStream stream(buffer);
+
+    // Write info version
+    stream.Write(1);
+    stream.WriteString("-- ** Current Animation Task Info -- **\n\n");
+
+    CMultiplayer* pMultiplayer = g_pCore->GetMultiplayer();
+    if (pMultiplayer)
+    {
+        stream.WriteString ( SString (
+            "Last Animation Added: group ID = %u, animation ID = %u\n",
+            pMultiplayer->GetLastStaticAnimationGroupID(), pMultiplayer->GetLastStaticAnimationID()
+        ));
     }
 }
 

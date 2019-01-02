@@ -327,5 +327,6 @@ CClientEntity* CClientProjectile::GetSatchelAttachedTo(void)
     if (!pAttachedToSA)
         return NULL;
 
-    return m_pManager->FindEntity(pAttachedToSA, false);
+    CPools* pPools = g_pGame->GetPools();
+    return pPools->GetClientEntity((DWORD*)pAttachedToSA->GetInterface());
 }

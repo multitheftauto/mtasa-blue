@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCOLTUBE_H
-#define __CCLIENTCOLTUBE_H
+#pragma once
 
 class CClientColTube : public CClientColShape
 {
@@ -41,5 +40,3 @@ protected:
     float m_fRadius;
     float m_fHeight;
 };
-
-#endif

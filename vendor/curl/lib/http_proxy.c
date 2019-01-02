@@ -188,12 +188,10 @@ static CURLcode CONNECT(struct connectdata *conn,
   struct SingleRequest *k = &data->req;
   CURLcode result;
   curl_socket_t tunnelsocket = conn->sock[sockindex];
-  timediff_t check;
   struct http_connect_state *s = conn->connect_state;
 
 #define SELECT_OK      0
 #define SELECT_ERROR   1
-#define SELECT_TIMEOUT 2
 
   if(Curl_connect_complete(conn))
     return CURLE_OK; /* CONNECT is already completed */
@@ -201,12 +199,13 @@ static CURLcode CONNECT(struct connectdata *conn,
   conn->bits.proxy_connect_closed = FALSE;
 
   do {
+    timediff_t check;
     if(TUNNEL_INIT == s->tunnel_state) {
       /* BEGIN CONNECT PHASE */
       char *host_port;
       Curl_send_buffer *req_buffer;
 
-      infof(data, "Establish HTTP proxy tunnel to %s:%hu\n",
+      infof(data, "Establish HTTP proxy tunnel to %s:%d\n",
             hostname, remote_port);
 
         /* This only happens if we've looped here due to authentication
@@ -221,7 +220,7 @@ static CURLcode CONNECT(struct connectdata *conn,
       if(!req_buffer)
         return CURLE_OUT_OF_MEMORY;
 
-      host_port = aprintf("%s:%hu", hostname, remote_port);
+      host_port = aprintf("%s:%d", hostname, remote_port);
       if(!host_port) {
         Curl_add_buffer_free(req_buffer);
         return CURLE_OUT_OF_MEMORY;
@@ -245,7 +244,7 @@ static CURLcode CONNECT(struct connectdata *conn,
         if(hostname != conn->host.name)
           ipv6_ip = (strchr(hostname, ':') != NULL);
         hostheader = /* host:port with IPv6 support */
-          aprintf("%s%s%s:%hu", ipv6_ip?"[":"", hostname, ipv6_ip?"]":"",
+          aprintf("%s%s%s:%d", ipv6_ip?"[":"", hostname, ipv6_ip?"]":"",
                   remote_port);
         if(!hostheader) {
           Curl_add_buffer_free(req_buffer);
@@ -419,7 +418,7 @@ static CURLcode CONNECT(struct connectdata *conn,
         /* output debug if that is requested */
         if(data->set.verbose)
           Curl_debug(data, CURLINFO_HEADER_IN,
-                     s->line_start, (size_t)s->perline, conn);
+                     s->line_start, (size_t)s->perline);
 
         if(!data->set.suppress_connect_headers) {
           /* send the header to the callback */

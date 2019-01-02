@@ -11,8 +11,7 @@
 struct CClientVehicleProperties;
 class CClientVehicle;
 
-#ifndef __CCLIENTVEHICLE_H
-#define __CCLIENTVEHICLE_H
+#pragma once
 
 #include <game/CPlane.h>
 #include <game/CVehicle.h>
@@ -109,15 +108,19 @@ struct SVehicleComponentData
     {
         m_bPositionChanged = false;
         m_bRotationChanged = false;
+        m_bScaleChanged = false;
         m_bVisible = true;
     }
     SString m_strParentName;
     CVector m_vecComponentPosition;                    // Parent relative
     CVector m_vecComponentRotation;                    // Parent relative radians
+    CVector m_vecComponentScale;                       // Parent relative
     CVector m_vecOriginalComponentPosition;            // Parent relative
     CVector m_vecOriginalComponentRotation;            // Parent relative radians
+    CVector m_vecOriginalComponentScale;               // Parent relative
     bool    m_bPositionChanged;
     bool    m_bRotationChanged;
+    bool    m_bScaleChanged;
     bool    m_bVisible;
 };
 class CClientProjectile;
@@ -473,6 +476,10 @@ public:
     bool SetComponentRotation(const SString& vehicleComponent, CVector vecRotation, EComponentBaseType base = EComponentBase::PARENT);
     bool GetComponentRotation(const SString& vehicleComponent, CVector& vecRotation, EComponentBaseType base = EComponentBase::PARENT);
 
+    bool ResetComponentScale(const SString& vehicleComponent);
+    bool SetComponentScale(const SString& vehicleComponent, CVector vecScale, EComponentBaseType base = EComponentBase::PARENT);
+    bool GetComponentScale(const SString& vehicleComponent, CVector& vecScale, EComponentBaseType base = EComponentBase::PARENT);
+
     bool                                               SetComponentVisible(const SString& vehicleComponent, bool bVisible);
     bool                                               GetComponentVisible(const SString& vehicleComponent, bool& bVisible);
     std::map<SString, SVehicleComponentData>::iterator ComponentsBegin(void) { return m_ComponentData.begin(); }
@@ -489,6 +496,7 @@ public:
 protected:
     void ConvertComponentRotationBase(const SString& vehicleComponent, CVector& vecInOutRotation, EComponentBaseType inputBase, EComponentBaseType outputBase);
     void ConvertComponentPositionBase(const SString& vehicleComponent, CVector& vecInOutPosition, EComponentBaseType inputBase, EComponentBaseType outputBase);
+    void ConvertComponentScaleBase(const SString& vehicleComponent, CVector& vecScale, EComponentBaseType inputBase, EComponentBaseType outputBase);
     void ConvertComponentMatrixBase(const SString& vehicleComponent, CMatrix& matInOutOrientation, EComponentBaseType inputBase, EComponentBaseType outputBase);
     void GetComponentParentToRootMatrix(const SString& vehicleComponent, CMatrix& matOutParentToRoot);
 
@@ -674,5 +682,3 @@ public:
     std::map<SString, SVehicleComponentData> m_ComponentData;
     bool                                     m_bAsyncLoadingDisabled;
 };
-
-#endif

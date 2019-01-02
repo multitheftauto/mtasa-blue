@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTRADARAREAMANAGER_H
-#define __CCLIENTRADARAREAMANAGER_H
+#pragma once
 
 #include "CClientRadarArea.h"
 #include <list>
@@ -51,5 +50,3 @@ private:
     bool                         m_bDontRemoveFromList;
     unsigned short               m_usDimension;
 };
-
-#endif

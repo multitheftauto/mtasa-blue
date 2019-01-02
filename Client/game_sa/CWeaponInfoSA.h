@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_WEAPONINFO
-#define __CGAMESA_WEAPONINFO
+#pragma once
 
 #include <game/CWeaponInfo.h>
 #include <CVector.h>
@@ -190,5 +189,3 @@ public:
     BYTE GetDefaultCombo(void) { return internalInterface->m_defaultCombo; }
     BYTE GetCombosAvailable(void) { return internalInterface->m_nCombosAvailable; }
 };
-
-#endif

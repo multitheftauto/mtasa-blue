@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCAMERA_H
-#define __CCLIENTCAMERA_H
+#pragma once
 
 #include "CClientCommon.h"
 #include "CClientEntity.h"
@@ -70,6 +69,7 @@ public:
     bool IsInFixedMode(void) { return m_bFixed; }
     void ToggleCameraFixedMode(bool bEnabled);
 
+    void           SetTargetEntity(CClientEntity* pEntity);
     CClientEntity* GetTargetEntity(void);
 
     void UnreferencePlayer(CClientPlayer* pPlayer);
@@ -106,5 +106,3 @@ private:
 
     CCamera* m_pCamera;
 };
-
-#endif

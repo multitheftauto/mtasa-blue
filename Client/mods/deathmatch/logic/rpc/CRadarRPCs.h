@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CRadarRPCs_H
-#define __CRadarRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
@@ -24,5 +23,3 @@ public:
     DECLARE_ELEMENT_RPC(SetRadarAreaColor);
     DECLARE_ELEMENT_RPC(SetRadarAreaFlashing);
 };
-
-#endif

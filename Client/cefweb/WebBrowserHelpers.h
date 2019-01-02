@@ -7,8 +7,7 @@
  *  PURPOSE:     Webbrowser helper classes and functions
  *
  *****************************************************************************/
-#ifndef __WEBBROWSERHELPERS
-#define __WEBBROWSERHELPERS
+#pragma once
 #include <cef3/include/cef_v8.h>
 #include <SString.h>
 
@@ -98,5 +97,3 @@ int GetCefKeyboardModifiers(WPARAM wParam, LPARAM lParam)
     }
     return modifiers;
 }
-
-#endif

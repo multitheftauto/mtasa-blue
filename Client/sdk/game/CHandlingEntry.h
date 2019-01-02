@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CHANDLINGENTRY
-#define __CHANDLINGENTRY
+#pragma once
 
 #include <CVector.h>
 
@@ -191,5 +190,3 @@ public:
     // all transmission/handling values according to the new values.
     virtual void Recalculate(unsigned short usModel) = 0;
 };
-
-#endif
