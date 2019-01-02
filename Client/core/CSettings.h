@@ -446,5 +446,5 @@ private:
 
     std::list<SKeyBindSection*> m_pKeyBindSections;
 
-    bool bAllowScreenUploadEnabled;
+    bool bAllowServerTransferBoxControl;
 };

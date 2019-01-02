@@ -3304,7 +3304,7 @@ void CSettings::SaveData(void)
     CVARS_SET("show_unsafe_resolutions", bShowUnsafeResolutions);
 
     // Allow screen upload
-    bAllowScreenUploadEnabled = m_pCheckBoxAllowScreenUpload->GetSelected();
+    bool bAllowScreenUploadEnabled = m_pCheckBoxAllowScreenUpload->GetSelected();
     CVARS_SET("allow_screen_upload", bAllowScreenUploadEnabled);
 
     // Allow screen upload
