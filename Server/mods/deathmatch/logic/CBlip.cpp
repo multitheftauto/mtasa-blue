@@ -87,7 +87,7 @@ bool CBlip::ReadSpecialData(const int iLine)
             m_ucIcon = static_cast<unsigned char>(iTemp);
         else
         {
-            CLogger::ErrorPrintf("Bad 'icon'(%d) id specified in <blip> (line %u)\n", iTemp, iLine);
+            CLogger::ErrorPrintf("Bad 'icon' (%d) id specified in <blip> (line %d)\n", iTemp, iLine);
             return false;
         }
     }

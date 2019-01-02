@@ -405,7 +405,7 @@ bool CVehicle::ReadSpecialData(const int iLine)
     // Grab the "explodableFuelTank" data
     GetCustomDataBool("explodableFuelTank", m_bFuelTankExplodable, true);
 
-    // Grab the "respawnOn" data
+    // Grab the "toggleRespawn" data
     bool bRespawnOn;
     if (GetCustomDataBool("toggleRespawn", bRespawnOn, true))
         SetRespawnEnabled(bRespawnOn);

@@ -188,7 +188,7 @@ bool CPed::ReadSpecialData(const int iLine)
         }
         else
         {
-            CLogger::ErrorPrintf("Bad 'model'(%d) id specified in <ped> (line %u)\n", iTemp, iLine);
+            CLogger::ErrorPrintf("Bad 'model' (%d) id specified in <ped> (line %d)\n", iTemp, iLine);
             return false;
         }
     }

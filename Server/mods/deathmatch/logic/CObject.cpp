@@ -142,7 +142,7 @@ bool CObject::ReadSpecialData(const int iLine)
         }
         else
         {
-            CLogger::ErrorPrintf("Bad 'model'(%d) id specified in <object> (line %u)\n", iTemp, iLine);
+            CLogger::ErrorPrintf("Bad 'model' (%d) id specified in <object> (line %d)\n", iTemp, iLine);
             return false;
         }
     }
