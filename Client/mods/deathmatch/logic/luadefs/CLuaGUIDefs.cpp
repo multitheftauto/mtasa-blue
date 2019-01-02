@@ -2120,8 +2120,7 @@ int CLuaGUIDefs::GUIGridListIsSortingEnabled(lua_State* luaVM)
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    // error: bad arguments
-    lua_pushboolean(luaVM, false);
+    lua_pushnil(luaVM);
     return 1;
 }
 
@@ -2490,7 +2489,7 @@ int CLuaGUIDefs::GUIGridListSetSelectionMode(lua_State* luaVM)
 
 int CLuaGUIDefs::GUIGridListGetSelectionMode(lua_State* luaVM)
 {
-    //  bool guiGridListGetSelectionMode ( guiElement gridlist )
+    //  int guiGridListGetSelectionMode ( guiElement gridlist )
     CClientGUIElement* guiGridlist;
 
     CScriptArgReader argStream(luaVM);
@@ -2504,7 +2503,6 @@ int CLuaGUIDefs::GUIGridListGetSelectionMode(lua_State* luaVM)
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    // error: bad arguments
     lua_pushnil(luaVM);
     return 1;
 }

@@ -5994,7 +5994,6 @@ void CStaticFunctionDefinitions::GUIGridListSetSelectionMode(CClientEntity& Enti
     }
 }
 
-
 void CStaticFunctionDefinitions::GUIGridListSetHorizontalScrollPosition(CClientEntity& Entity, float fPosition)
 {
     RUN_CHILDREN(GUIGridListSetHorizontalScrollPosition(**iter, fPosition))
