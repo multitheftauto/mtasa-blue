@@ -141,9 +141,9 @@ void CResourceFileDownloadManager::DoPulse(void)
     GetTransferBox()->DoPulse();
 
     CLuaArguments Arguments;
-    Arguments.PushNumber( uiDownloadSizeTotal );
-    Arguments.PushNumber( GetTransferBox()->GetTotalSize() );
-    g_pClientGame->GetLocalPlayer()->CallEvent( "onTransferBoxProgressChange", Arguments, false );
+    Arguments.PushNumber(uiDownloadSizeTotal);
+    Arguments.PushNumber(GetTransferBox()->GetTotalSize());
+    g_pClientGame->GetLocalPlayer()->CallEvent("onTransferBoxProgressChange", Arguments, false);
 
     // Check if completed downloading current group
     if (m_ActiveFileDownloadList.empty())

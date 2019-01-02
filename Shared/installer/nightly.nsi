@@ -349,6 +349,9 @@ Function .onInit
 
     InitPluginsDir
     ;File /oname=$PLUGINSDIR\serialdialog.ini "serialdialog.ini"
+
+    # Set Windows SID to use for permissions fixing
+    Call SetPermissionsGroup
     ${LogText} "-Function end - .onInit"
 FunctionEnd
 
@@ -507,9 +510,6 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         # Ensure install dir exists so the permissions can be set
         SetOutPath "$INSTDIR\MTA"
         SetOverwrite on
-
-        # Set Windows SID to use for permissions fixing
-        Call SetPermissionsGroup
 
         #############################################################
         # Make the directory "$INSTDIR" read write accessible by all users
@@ -2594,9 +2594,8 @@ Function SetPermissionsGroup
         ${EndIf}
         ${LogText} "AccessControl::SidToName failed with '$1': '$2' '$3'"
     ${Next}
-    MessageBox MB_ICONEXCLAMATION|MB_TOPMOST|MB_SETFOREGROUND \
-        "Can't find valid SID"
-    ${LogText} "Can't find valid SID"
-    Abort
+    ; Default to \LOCAL
+    StrCpy $PermissionsGroup "S-1-2-0"
+    ${LogText} "SetPermissionsGroup using '$PermissionsGroup'"
 FunctionEnd
 
