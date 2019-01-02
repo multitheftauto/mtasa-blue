@@ -69,9 +69,14 @@ CGUIGridList_Impl::~CGUIGridList_Impl(void)
     DestroyElement();
 }
 
-void CGUIGridList_Impl::SetSorting(bool bEnabled)
+void CGUIGridList_Impl::SetSortingEnabled(bool bEnabled)
 {
     reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->setUserSortControlEnabled(bEnabled);
+}
+
+bool CGUIGridList_Impl::IsSortingEnabled(void)
+{
+    return reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->isUserSortControlEnabled();
 }
 
 void CGUIGridList_Impl::RemoveColumn(unsigned int uiColumn)
@@ -665,6 +670,11 @@ void CGUIGridList_Impl::SetSelectionMode(SelectionMode mode)
     catch (CEGUI::Exception)
     {
     }
+}
+
+SelectionMode CGUIGridList_Impl::GetSelectionMode(void)
+{
+    return (SelectionMode)reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->getSelectionMode();
 }
 
 void CGUIGridList_Impl::GetVisibleRowRange(int& iFirst, int& iLast)

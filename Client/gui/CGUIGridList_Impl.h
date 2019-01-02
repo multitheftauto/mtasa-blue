@@ -30,8 +30,9 @@ public:
     void         SetColumnTitle(int hColumn, const char* szTitle);
     const char*  GetColumnTitle(int hColumn);
 
-    void SetSelectionMode(SelectionMode mode);
-    int  SetRowItemsText(int iRow, std::vector<std::pair<SString, bool> >* m_items);
+    void          SetSelectionMode(SelectionMode mode);
+    SelectionMode GetSelectionMode(void);
+    int           SetRowItemsText(int iRow, std::vector<std::pair<SString, bool> >* m_items);
 
     void          ForceUpdate(void);
     int           AddRow(bool bFast = false, std::vector<std::pair<SString, bool> >* m_items = NULL);
@@ -49,7 +50,8 @@ public:
 
     void SetHorizontalScrollBar(bool bEnabled);
     void SetVerticalScrollBar(bool bEnabled);
-    void SetSorting(bool bEnabled);
+    void SetSortingEnabled(bool bEnabled);
+    bool IsSortingEnabled(void);
     void SetItemImage(int iRow, int hColumn, CGUIStaticImage* pImage);
 
     float GetHorizontalScrollPosition(void);
