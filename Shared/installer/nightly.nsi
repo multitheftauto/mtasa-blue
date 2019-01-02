@@ -31,6 +31,7 @@ Var LAST_INSTDIR
 Var CUSTOM_INSTDIR
 Var WhichRadio
 Var ShowLastUsed
+Var PermissionsGroup
 
 ; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\GDFImp.gdf.xml
 !define GUID "{DF780162-2450-4665-9BA2-EAB14ED640A3}"
@@ -348,6 +349,9 @@ Function .onInit
 
     InitPluginsDir
     ;File /oname=$PLUGINSDIR\serialdialog.ini "serialdialog.ini"
+
+    # Set Windows SID to use for permissions fixing
+    Call SetPermissionsGroup
     ${LogText} "-Function end - .onInit"
 FunctionEnd
 
@@ -392,7 +396,7 @@ Function .onInstSuccess
         CreateShortCut "$DESKTOP\MTA San Andreas ${0.0}.lnk" "$INSTDIR\Multi Theft Auto.exe" \
             "" "$INSTDIR\Multi Theft Auto.exe" 0 SW_SHOWNORMAL \
             "" "Play Multi Theft Auto: San Andreas ${0.0}"
-        AccessControl::GrantOnFile "$DESKTOP\MTA San Andreas ${0.0}.lnk" "(BU)" "FullAccess"
+        AccessControl::GrantOnFile "$DESKTOP\MTA San Andreas ${0.0}.lnk" "($PermissionsGroup)" "FullAccess"
 
         skip4:
     ${EndIf}
@@ -535,21 +539,21 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
 
             ${LogText} "FullAccess $INSTDIR"
             ${If} $3 == "1"
-                FastPerms::FullAccessPlox "$INSTDIR"
+                FastPerms::FullAccessPlox "$INSTDIR" "($PermissionsGroup)"
             ${Else}
                 # More conservative permissions blat if install directory it too different from default
                 CreateDirectory "$INSTDIR\mods"
                 CreateDirectory "$INSTDIR\screenshots"
                 CreateDirectory "$INSTDIR\server"
                 CreateDirectory "$INSTDIR\skins"
-                FastPerms::FullAccessPlox "$INSTDIR\mods"
-                FastPerms::FullAccessPlox "$INSTDIR\MTA"
-                FastPerms::FullAccessPlox "$INSTDIR\screenshots"
-                FastPerms::FullAccessPlox "$INSTDIR\server"
-                FastPerms::FullAccessPlox "$INSTDIR\skins"
+                FastPerms::FullAccessPlox "$INSTDIR\mods" "($PermissionsGroup)"
+                FastPerms::FullAccessPlox "$INSTDIR\MTA" "($PermissionsGroup)"
+                FastPerms::FullAccessPlox "$INSTDIR\screenshots" "($PermissionsGroup)"
+                FastPerms::FullAccessPlox "$INSTDIR\server" "($PermissionsGroup)"
+                FastPerms::FullAccessPlox "$INSTDIR\skins" "($PermissionsGroup)"
             ${EndIf}
             ${LogText} "FullAccess $APPDATA\MTA San Andreas All"
-            FastPerms::FullAccessPlox "$APPDATA\MTA San Andreas All"
+            FastPerms::FullAccessPlox "$APPDATA\MTA San Andreas All" "($PermissionsGroup)"
 
             # Remove MTA virtual store
             StrCpy $0 $INSTDIR
@@ -562,7 +566,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             Pop $0
             ${If} $0 == "gta"
                 # Fix permissions for GTA install directory
-                FastPerms::FullAccessPlox "$GTA_DIR"
+                FastPerms::FullAccessPlox "$GTA_DIR" "($PermissionsGroup)"
 
                 # Remove GTA virtual store
                 StrCpy $0 $GTA_DIR
@@ -663,8 +667,8 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
                 ${GetDLLVersionNumbers} "$SYSDIR\crypt32.dll" $0 $1 $2 $3
                 ${If} $2 == 7601
                     ${If} $3 < 18741
-                        ${InstallKB} "KB3035131" "http://download.microsoft.com/download/3/D/F/3DF6B0B1-D849-4272-AA98-3AA8BB456CCC/Windows6.1-KB3035131-x64.msu"
-                        ${InstallKB} "KB3033929" "http://download.microsoft.com/download/C/8/7/C87AE67E-A228-48FB-8F02-B2A9A1238099/Windows6.1-KB3033929-x64.msu"
+                        ${InstallKB} "KB3035131" "Windows6.1-KB3035131-x64" "http://download.microsoft.com/download/3/D/F/3DF6B0B1-D849-4272-AA98-3AA8BB456CCC/Windows6.1-KB3035131-x64.msu"
+                        ${InstallKB} "KB3033929" "Windows6.1-KB3033929-x64" "http://download.microsoft.com/download/C/8/7/C87AE67E-A228-48FB-8F02-B2A9A1238099/Windows6.1-KB3033929-x64.msu"
                     ${EndIf}
                 ${EndIf}
             ${EndIf}
@@ -675,7 +679,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         SetOverwrite on
 
         # Make some keys in HKLM read write accessible by all users
-        AccessControl::GrantOnRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All" "(BU)" "FullAccess"
+        AccessControl::GrantOnRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All" "($PermissionsGroup)" "FullAccess"
 
         SetOutPath "$INSTDIR\MTA"
         File "${FILES_ROOT}\mta\cgui.dll"
@@ -801,7 +805,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\Multi Theft Auto.exe"
 
         # Ensure exe file can be updated without admin
-        AccessControl::GrantOnFile "$INSTDIR\Multi Theft Auto.exe" "(BU)" "FullAccess"
+        AccessControl::GrantOnFile "$INSTDIR\Multi Theft Auto.exe" "($PermissionsGroup)" "FullAccess"
 
         ${If} $AddToGameExplorer == 1
             ${GameExplorer_UpdateGame} ${GUID}
@@ -2570,5 +2574,28 @@ FunctionEnd
 
 Function NoteGTAWasPresent
     StrCpy $NetPrevInfo "$NetPrevInfo&pg=1"
+FunctionEnd
+
+# Find valid Windows SID to use for permissions fixing
+Function SetPermissionsGroup
+    #   BU      = BUILTIN\Users
+    #   S-1-2-0 = \LOCAL
+    #   S-1-1-0 = \Everyone
+    nsArray::SetList array "BU" "S-1-2-0" "S-1-1-0" /end
+    ${ForEachIn} array $0 $1
+        AccessControl::SidToName $1
+        Pop $2  # Domain
+        Pop $3  # Name
+        StrLen $0 $2
+        ${If} $0 < 20   # HACK: Error message is longer than this
+            StrCpy $PermissionsGroup "$1"
+            ${LogText} "SetPermissionsGroup using '$PermissionsGroup'"
+            Return
+        ${EndIf}
+        ${LogText} "AccessControl::SidToName failed with '$1': '$2' '$3'"
+    ${Next}
+    ; Default to \LOCAL
+    StrCpy $PermissionsGroup "S-1-2-0"
+    ${LogText} "SetPermissionsGroup using '$PermissionsGroup'"
 FunctionEnd
 

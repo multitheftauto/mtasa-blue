@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_BOAT
-#define __CGAMESA_BOAT
+#pragma once
 
 #include <game/CBoat.h>
 #include "CVehicleSA.h"
@@ -46,5 +45,3 @@ public:
 
     virtual ~CBoatSA(void){};
 };
-
-#endif

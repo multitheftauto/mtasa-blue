@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCOLSPHERE_H
-#define __CCLIENTCOLSPHERE_H
+#pragma once
 
 class CClientColSphere : public CClientColShape
 {
@@ -34,5 +33,3 @@ public:
 protected:
     float m_fRadius;
 };
-
-#endif

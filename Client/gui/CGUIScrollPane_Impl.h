@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUISCROLLPANE_IMPL_H
-#define __CGUISCROLLPANE_IMPL_H
+#pragma once
 
 #include <gui/CGUIScrollPane.h>
 #include "CGUIElement_Impl.h"
@@ -43,5 +42,3 @@ public:
 private:
     class CGUI_Impl* m_pGUI;
 };
-
-#endif

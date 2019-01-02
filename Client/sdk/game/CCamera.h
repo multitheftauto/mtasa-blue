@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CAMERA
-#define __CGAME_CAMERA
+#pragma once
 
 #include "CEntity.h"
 #include "CCam.h"
@@ -141,5 +140,3 @@ public:
     virtual void      SetShakeForce(float fShakeForce) = 0;
     virtual float     GetShakeForce(void) = 0;
 };
-
-#endif

@@ -11,8 +11,7 @@
 
 class CLuaTimer;
 
-#ifndef __CLUATIMER_H
-#define __CLUATIMER_H
+#pragma once
 
 // Define includes
 #include "LuaCommon.h"
@@ -54,5 +53,3 @@ private:
     uint            m_uiScriptID;
     SLuaDebugInfo   m_LuaDebugInfo;
 };
-
-#endif

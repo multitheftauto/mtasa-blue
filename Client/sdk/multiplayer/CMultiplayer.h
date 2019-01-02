@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMULTIPLAYER
-#define __CMULTIPLAYER
+#pragma once
 
 #include <CMatrix.h>
 #include <CVector.h>
@@ -36,6 +35,25 @@ struct SClothesCacheStats
     uint uiNumTotal;
     uint uiNumUnused;
     uint uiNumRemoved;
+};
+
+enum EVehicleWeaponType : int
+{
+    INVALID,
+    WATER_CANNON,
+    TANK_GUN,
+    ROCKET,
+    HEAT_SEEKING_ROCKET,
+};
+
+struct SVehicleWeaponHitEvent
+{
+    EVehicleWeaponType  weaponType;
+    CEntitySAInterface* pGameVehicle;
+    CEntitySAInterface* pHitGameEntity;
+    CVector             vecPosition;
+    int                 iModel;
+    int                 iColSurface;
 };
 
 class CAnimBlendAssociationSAInterface;
@@ -80,7 +98,7 @@ typedef bool(AssocGroupCopyAnimationHandler)(CAnimBlendAssociationSAInterface* p
 typedef bool(BlendAnimationHierarchyHandler)(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy, int* pFlags,
                                              RpClump* pClump);
 typedef bool(ProcessCollisionHandler)(class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface);
-typedef bool(VehicleCollisionHandler)(class CVehicleSAInterface* pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, int iModelIndex,
+typedef bool(VehicleCollisionHandler)(class CVehicleSAInterface*& pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, int iModelIndex,
                                       float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos,
                                       CVector vecCollisionVelocity);
 typedef bool(VehicleDamageHandler)(CEntitySAInterface* pVehicle, float fLoss, CEntitySAInterface* pAttacker, eWeaponType weaponType,
@@ -98,6 +116,9 @@ typedef void(GameModelRemoveHandler)(ushort usModelId);
 typedef void(GameEntityRenderHandler)(CEntitySAInterface* pEntity);
 typedef void(FxSystemDestructionHandler)(void* pFxSA);
 typedef AnimationId(DrivebyAnimationHandler)(AnimationId animGroup, AssocGroupId animId);
+typedef void(PedStepHandler)(CPedSAInterface* pPed, bool bFoot);
+
+using VehicleWeaponHitHandler = void(SVehicleWeaponHitEvent& event);
 
 /**
  * This class contains information used for shot syncing, one exists per player.
@@ -158,6 +179,7 @@ public:
         FAST_CLOTHES_ON = 2,
     };
 
+    virtual void                InitializeAnimationHooks(bool bIsHostSmotra) = 0;
     virtual CRemoteDataStorage* CreateRemoteDataStorage() = 0;
     virtual void                DestroyRemoteDataStorage(CRemoteDataStorage* pData) = 0;
     virtual void                AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData) = 0;
@@ -177,45 +199,46 @@ public:
     virtual void                 DisableCloseRangeDamage(bool bDisable) = 0;
     virtual void                 DisableBadDrivebyHitboxes(bool bDisable) = 0;
 
-    virtual bool GetExplosionsDisabled() = 0;
-    virtual void DisableExplosions(bool bDisabled) = 0;
-    virtual void SetExplosionHandler(ExplosionHandler* pExplosionHandler) = 0;
-    virtual void SetBreakTowLinkHandler(BreakTowLinkHandler* pBreakTowLinkHandler) = 0;
-    virtual void SetDamageHandler(DamageHandler* pDamageHandler) = 0;
-    virtual void SetDeathHandler(DeathHandler* pDeathHandler) = 0;
-    virtual void SetFireHandler(FireHandler* pFireHandler) = 0;
-    virtual void SetProcessCamHandler(ProcessCamHandler* pProcessCamHandler) = 0;
-    virtual void SetChokingHandler(ChokingHandler* pChokingHandler) = 0;
-    virtual void SetProjectileHandler(ProjectileHandler* pProjectileHandler) = 0;
-    virtual void SetProjectileStopHandler(ProjectileStopHandler* pProjectileHandler) = 0;
-    virtual void SetPreWorldProcessHandler(PreWorldProcessHandler* pHandler) = 0;
-    virtual void SetPostWorldProcessHandler(PostWorldProcessHandler* pHandler) = 0;
-    virtual void SetIdleHandler(IdleHandler* pHandler) = 0;
-    virtual void SetPreFxRenderHandler(PreFxRenderHandler* pHandler) = 0;
-    virtual void SetPreHudRenderHandler(PreHudRenderHandler* pHandler) = 0;
-    virtual void DisableCallsToCAnimBlendNode(bool bDisableCalls) = 0;
-    virtual void SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler) = 0;
-    virtual void SetAddAnimationHandler(AddAnimationHandler* pHandler) = 0;
-    virtual void SetAddAnimationAndSyncHandler(AddAnimationAndSyncHandler* pHandler) = 0;
-    virtual void SetAssocGroupCopyAnimationHandler(AssocGroupCopyAnimationHandler* pHandler) = 0;
-    virtual void SetBlendAnimationHierarchyHandler(BlendAnimationHierarchyHandler* pHandler) = 0;
-    virtual void SetProcessCollisionHandler(ProcessCollisionHandler* pHandler) = 0;
-    virtual void SetVehicleCollisionHandler(VehicleCollisionHandler* pHandler) = 0;
-    virtual void SetVehicleDamageHandler(VehicleDamageHandler* pHandler) = 0;
-    virtual void SetHeliKillHandler(HeliKillHandler* pHandler) = 0;
-    virtual void SetObjectDamageHandler(ObjectDamageHandler* pHandler) = 0;
-    virtual void SetObjectBreakHandler(ObjectBreakHandler* pHandler) = 0;
-    virtual void SetWaterCannonHitHandler(WaterCannonHitHandler* pHandler) = 0;
-    virtual void SetVehicleFellThroughMapHandler(VehicleFellThroughMapHandler* pHandler) = 0;
-    virtual void SetGameObjectDestructHandler(GameObjectDestructHandler* pHandler) = 0;
-    virtual void SetGameVehicleDestructHandler(GameVehicleDestructHandler* pHandler) = 0;
-    virtual void SetGamePlayerDestructHandler(GamePlayerDestructHandler* pHandler) = 0;
-    virtual void SetGameProjectileDestructHandler(GameProjectileDestructHandler* pHandler) = 0;
-    virtual void SetGameModelRemoveHandler(GameModelRemoveHandler* pHandler) = 0;
-    virtual void SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler) = 0;
-    virtual void SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler) = 0;
-    virtual void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler) = 0;
-
+    virtual bool  GetExplosionsDisabled() = 0;
+    virtual void  DisableExplosions(bool bDisabled) = 0;
+    virtual void  SetExplosionHandler(ExplosionHandler* pExplosionHandler) = 0;
+    virtual void  SetBreakTowLinkHandler(BreakTowLinkHandler* pBreakTowLinkHandler) = 0;
+    virtual void  SetDamageHandler(DamageHandler* pDamageHandler) = 0;
+    virtual void  SetDeathHandler(DeathHandler* pDeathHandler) = 0;
+    virtual void  SetFireHandler(FireHandler* pFireHandler) = 0;
+    virtual void  SetProcessCamHandler(ProcessCamHandler* pProcessCamHandler) = 0;
+    virtual void  SetChokingHandler(ChokingHandler* pChokingHandler) = 0;
+    virtual void  SetProjectileHandler(ProjectileHandler* pProjectileHandler) = 0;
+    virtual void  SetProjectileStopHandler(ProjectileStopHandler* pProjectileHandler) = 0;
+    virtual void  SetPreWorldProcessHandler(PreWorldProcessHandler* pHandler) = 0;
+    virtual void  SetPostWorldProcessHandler(PostWorldProcessHandler* pHandler) = 0;
+    virtual void  SetIdleHandler(IdleHandler* pHandler) = 0;
+    virtual void  SetPreFxRenderHandler(PreFxRenderHandler* pHandler) = 0;
+    virtual void  SetPreHudRenderHandler(PreHudRenderHandler* pHandler) = 0;
+    virtual void  DisableCallsToCAnimBlendNode(bool bDisableCalls) = 0;
+    virtual void  SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler) = 0;
+    virtual void  SetAddAnimationHandler(AddAnimationHandler* pHandler) = 0;
+    virtual void  SetAddAnimationAndSyncHandler(AddAnimationAndSyncHandler* pHandler) = 0;
+    virtual void  SetAssocGroupCopyAnimationHandler(AssocGroupCopyAnimationHandler* pHandler) = 0;
+    virtual void  SetBlendAnimationHierarchyHandler(BlendAnimationHierarchyHandler* pHandler) = 0;
+    virtual void  SetProcessCollisionHandler(ProcessCollisionHandler* pHandler) = 0;
+    virtual void  SetVehicleCollisionHandler(VehicleCollisionHandler* pHandler) = 0;
+    virtual void  SetVehicleDamageHandler(VehicleDamageHandler* pHandler) = 0;
+    virtual void  SetHeliKillHandler(HeliKillHandler* pHandler) = 0;
+    virtual void  SetObjectDamageHandler(ObjectDamageHandler* pHandler) = 0;
+    virtual void  SetObjectBreakHandler(ObjectBreakHandler* pHandler) = 0;
+    virtual void  SetWaterCannonHitHandler(WaterCannonHitHandler* pHandler) = 0;
+    virtual void  SetVehicleFellThroughMapHandler(VehicleFellThroughMapHandler* pHandler) = 0;
+    virtual void  SetGameObjectDestructHandler(GameObjectDestructHandler* pHandler) = 0;
+    virtual void  SetGameVehicleDestructHandler(GameVehicleDestructHandler* pHandler) = 0;
+    virtual void  SetGamePlayerDestructHandler(GamePlayerDestructHandler* pHandler) = 0;
+    virtual void  SetGameProjectileDestructHandler(GameProjectileDestructHandler* pHandler) = 0;
+    virtual void  SetGameModelRemoveHandler(GameModelRemoveHandler* pHandler) = 0;
+    virtual void  SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler) = 0;
+    virtual void  SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler) = 0;
+    virtual void  SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler) = 0;
+    virtual void  SetPedStepHandler(PedStepHandler* pHandler) = 0;
+    virtual void  SetVehicleWeaponHitHandler(VehicleWeaponHitHandler* pHandler) = 0;
     virtual void  AllowMouseMovement(bool bAllow) = 0;
     virtual void  DoSoundHacksOnLostFocus(bool bLostFocus) = 0;
     virtual bool  HasSkyColor() = 0;
@@ -352,6 +375,7 @@ public:
 
     virtual void SetBoatWaterSplashEnabled(bool bEnabled) = 0;
     virtual void SetTyreSmokeEnabled(bool bEnabled) = 0;
-};
 
-#endif
+    virtual DWORD GetLastStaticAnimationGroupID() = 0;
+    virtual DWORD GetLastStaticAnimationID() = 0;
+};

@@ -10,8 +10,7 @@
 
 class CClientDisplayManager;
 
-#ifndef __CClientDisplayManager_H
-#define __CClientDisplayManager_H
+#pragma once
 
 #include "CClientManager.h"
 #include <list>
@@ -42,5 +41,3 @@ public:
     std::list<CClientDisplay*> m_List;
     bool                       m_bCanRemoveFromList;
 };
-
-#endif

@@ -62,8 +62,12 @@ BOOL WINAPI ConsoleEventHandler(DWORD dwCtrlType)
     {
         if (g_pGame)
         {
-            // Graceful close on Ctrl-C or Ctrl-Break
-            g_pGame->SetIsFinished(true);
+            // If we have nothing in the input buffer, let's close the server, otherwise just reset input
+            if (!g_pServerInterface->ResetInput())
+            {
+                // Graceful close on Ctrl-C or Ctrl-Break
+                g_pGame->SetIsFinished(true);
+            }
             return TRUE;
         }
     }
@@ -74,7 +78,8 @@ void sighandler(int sig)
 {
     if (sig == SIGTERM || sig == SIGINT)
     {
-        if (g_pGame)
+        // If we received a Ctrl-C, let's try resetting input buffer first, otherwise close the server
+        if (g_pGame && (sig != SIGINT || (sig == SIGINT && !g_pServerInterface->ResetInput())))
         {
             // Graceful close on Ctrl-C or 'kill'
             g_pGame->SetIsFinished(true);
@@ -1348,6 +1353,11 @@ void CGame::InitialDataStream(CPlayer& Player)
 
 void CGame::QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason, bool bSayInConsole, const char* szKickReason, const char* szResponsiblePlayer)
 {
+    if (Player.IsLeavingServer())
+        return;
+
+    Player.SetLeavingServer(true);
+    
     // Grab quit reaason
     const char* szReason = "Unknown";
     switch (Reason)

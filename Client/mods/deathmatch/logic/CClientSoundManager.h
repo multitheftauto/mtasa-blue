@@ -10,8 +10,7 @@
 
 class CClientSoundManager;
 
-#ifndef __CCLIENTSOUNDMANAGER_H
-#define __CCLIENTSOUNDMANAGER_H
+#pragma once
 
 #include <list>
 #include <bass.h>
@@ -78,5 +77,3 @@ private:
     std::map<CBassAudio*, CElapsedTime> m_AudioStopQueue;
     CCriticalSection                    m_CS;
 };
-
-#endif

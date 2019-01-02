@@ -1,9 +1,10 @@
 /*
+ * !checksrc! disable COPYRIGHT
  * This is an OpenSSL-compatible implementation of the RSA Data Security, Inc.
  * MD4 Message-Digest Algorithm (RFC 1320).
  *
  * Homepage:
- http://openwall.info/wiki/people/solar/software/public-domain-source-code/md4
+ https://openwall.info/wiki/people/solar/software/public-domain-source-code/md4
  *
  * Author:
  * Alexander Peslyak, better known as Solar Designer <solar at openwall.com>

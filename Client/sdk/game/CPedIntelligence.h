@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_PEDINTELLIGENCE
-#define __CGAME_PEDINTELLIGENCE
+#pragma once
 
 #include "CTaskManager.h"
 #include "CVehicleScanner.h"
@@ -28,5 +27,3 @@ public:
     virtual CVehicleScanner* GetVehicleScanner(void) = 0;
     virtual bool             TestForStealthKill(CPed* pPed, bool bUnk) = 0;
 };
-
-#endif

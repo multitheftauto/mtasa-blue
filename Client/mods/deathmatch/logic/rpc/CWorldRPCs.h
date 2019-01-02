@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CWorldRPCs_H
-#define __CWorldRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
@@ -66,5 +65,3 @@ public:
     DECLARE_RPC(ResetMoonSize);
     DECLARE_RPC(SetSyncIntervals);
 };
-
-#endif

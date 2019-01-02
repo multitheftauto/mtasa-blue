@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CXMLATTRIBUTEIMPL_H
-#define __CXMLATTRIBUTEIMPL_H
+#pragma once
 
 #include <tinyxml.h>
 #include <string>
@@ -50,5 +49,3 @@ private:
     TiXmlElement&       m_Node;
     TiXmlAttribute&     m_Attribute;
 };
-
-#endif

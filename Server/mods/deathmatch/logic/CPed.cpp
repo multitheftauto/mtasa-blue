@@ -19,7 +19,7 @@ struct SBodyPartName
 SBodyPartName BodyPartNames[10] = {{"Unknown"},  {"Unknown"},   {"Unknown"},  {"Torso"},     {"Ass"},
                                    {"Left Arm"}, {"Right Arm"}, {"Left Leg"}, {"Right Leg"}, {"Head"}};
 
-CPed::CPed(CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel) : CElement(pParent, pNode)
+CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) : CElement(pParent)
 {
     // Init
     m_pPedManager = pPedManager;
@@ -101,6 +101,22 @@ CPed::~CPed(void)
     Unlink();
 }
 
+CElement* CPed::Clone(bool* bAddEntity, CResource* pResource)
+{
+    CPed* const pTemp = m_pPedManager->Create(GetModel(), GetParentEntity());
+
+    if (pTemp)
+    {
+        pTemp->SetPosition(GetPosition());
+        pTemp->SetRotation(GetRotation());
+        pTemp->SetHealth(GetHealth());
+        pTemp->SetArmor(GetArmor());
+        pTemp->SetSyncable(IsSyncable());
+    }
+
+    return pTemp;
+}
+
 void CPed::Unlink(void)
 {
     // Remove us from the Ped manager
@@ -131,26 +147,26 @@ void CPed::SetMatrix(const CMatrix& matrix)
     SetRotation(vecRotation.fZ);
 }
 
-bool CPed::ReadSpecialData(void)
+bool CPed::ReadSpecialData(const int iLine)
 {
     // Grab the "posX" data
     if (!GetCustomDataFloat("posX", m_vecPosition.fX, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <ped> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <ped> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posY" data
     if (!GetCustomDataFloat("posY", m_vecPosition.fY, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <ped> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <ped> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posZ" data
     if (!GetCustomDataFloat("posZ", m_vecPosition.fZ, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <ped> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <ped> (line %d)\n", iLine);
         return false;
     }
 
@@ -172,13 +188,13 @@ bool CPed::ReadSpecialData(void)
         }
         else
         {
-            CLogger::ErrorPrintf("Bad 'model'(%d) id specified in <ped> (line %u)\n", iTemp, m_uiLine);
+            CLogger::ErrorPrintf("Bad 'model'(%d) id specified in <ped> (line %u)\n", iTemp, iLine);
             return false;
         }
     }
     else
     {
-        CLogger::ErrorPrintf("Bad/missing 'model' attribute in <ped> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'model' attribute in <ped> (line %d)\n", iLine);
         return false;
     }
 

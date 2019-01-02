@@ -393,16 +393,6 @@ CClientVehicle* CClientVehicleManager::Get(ElementID ID)
     return NULL;
 }
 
-CClientVehicle* CClientVehicleManager::Get(CVehicle* pVehicle, bool bValidatePointer)
-{
-    return g_pClientGame->GetGameEntityXRefManager()->FindClientVehicle(pVehicle);
-}
-
-CClientVehicle* CClientVehicleManager::GetSafe(CEntity* pEntity)
-{
-    return g_pClientGame->GetGameEntityXRefManager()->FindClientVehicle(pEntity);
-}
-
 CClientVehicle* CClientVehicleManager::GetClosest(CVector& vecPosition, float fRadius)
 {
     float                                   fClosestDistance = 0.0f;

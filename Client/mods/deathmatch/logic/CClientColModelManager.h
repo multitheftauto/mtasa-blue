@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCOLMODELMANAGER_H
-#define __CCLIENTCOLMODELMANAGER_H
+#pragma once
 
 #include <list>
 #include "CClientColModel.h"
@@ -40,5 +39,3 @@ private:
     std::list<CClientColModel*> m_List;
     bool                        m_bRemoveFromList;
 };
-
-#endif

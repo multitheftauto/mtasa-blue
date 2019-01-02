@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUISCROLLPANE_H
-#define __CGUISCROLLPANE_H
+#pragma once
 
 #include "CGUIElement.h"
 
@@ -33,5 +32,3 @@ public:
     virtual void  SetVerticalScrollStepSize(float fPosition) = 0;
     virtual float GetVerticalScrollStepSize(void) = 0;
 };
-
-#endif

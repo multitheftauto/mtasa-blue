@@ -122,7 +122,9 @@ void CRemoteMasterServer::Refresh(void)
     m_strStage = "waitingreply";
     m_llLastRefreshTime = GetTickCount64_();
     AddRef();            // Keep alive
-    GetHTTP()->QueueFile(m_strURL, NULL, NULL, 0, false, this, &CRemoteMasterServer::StaticDownloadFinished, false, 1);
+    SHttpRequestOptions options;
+    options.uiConnectionAttempts = 1;
+    GetHTTP()->QueueFile(m_strURL, NULL, this, &CRemoteMasterServer::StaticDownloadFinished, options);
 }
 
 ///////////////////////////////////////////////////////////////

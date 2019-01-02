@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CREMOTECALLS_H
-#define __CREMOTECALLS_H
+#pragma once
 #include "lua/CLuaArguments.h"
 #define CALL_REMOTE_DEFAULT_QUEUE_NAME  "default"
 
@@ -28,6 +27,7 @@ private:
     SString             m_strQueueName;
     CLuaArguments       m_FetchArguments;
     SHttpRequestOptions m_options;
+    EDownloadModeType   m_downloadMode = EDownloadModeType::NONE;
 
 public:
     CRemoteCall(const char* szServerHost, const char* szResourceName, const char* szFunctionName, CLuaArguments* arguments, CLuaMain* luaMain,
@@ -41,6 +41,8 @@ public:
     ~CRemoteCall();
     void           MakeCall();
     static void    DownloadFinishedCallback(const SHttpDownloadResult& result);
+    bool           CancelDownload(void);
+    bool           GetDownloadStatus(SDownloadStatus& outDownloadStatus);
     CLuaMain*      GetVM() { return m_VM; };
     bool           IsFetch() { return m_bIsFetch; }
     bool           IsLegacy() { return m_options.bIsLegacy; }
@@ -77,4 +79,3 @@ public:
     EDownloadModeType GetDownloadModeForQueueName(const SString& strQueueName, bool bAnyHost);
     EDownloadModeType GetDownloadModeFromQueueIndex(uint uiIndex, bool bAnyHost);
 };
-#endif

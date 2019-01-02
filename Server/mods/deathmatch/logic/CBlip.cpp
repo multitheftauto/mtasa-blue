@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CBlip::CBlip(CElement* pParent, CXMLNode* pNode, CBlipManager* pBlipManager) : CPerPlayerEntity(pParent, pNode)
+CBlip::CBlip(CElement* pParent, CBlipManager* pBlipManager) : CPerPlayerEntity(pParent)
 {
     // Init
     m_iType = CElement::BLIP;
@@ -33,32 +33,49 @@ CBlip::~CBlip(void)
     Unlink();
 }
 
+CElement* CBlip::Clone(bool* bAddEntity, CResource* pResource)
+{
+    CBlip* pTemp = m_pBlipManager->Create(GetParentEntity());
+    if (pTemp)
+    {
+        pTemp->m_ucIcon = m_ucIcon;
+        pTemp->m_ucSize = m_ucSize;
+        pTemp->m_sOrdering = m_sOrdering;
+        pTemp->m_usVisibleDistance = m_usVisibleDistance;
+        pTemp->SetColor(GetColor());
+        if (pResource->HasStarted())
+            pTemp->Sync(true);
+        *bAddEntity = false;
+    }
+    return pTemp;
+}
+
 void CBlip::Unlink(void)
 {
     // Remove us from the manager's list
     m_pBlipManager->m_List.remove(this);
 }
 
-bool CBlip::ReadSpecialData(void)
+bool CBlip::ReadSpecialData(const int iLine)
 {
     // Grab the "posX" data
     if (!GetCustomDataFloat("posX", m_vecPosition.fX, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <blip> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <blip> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posY" data
     if (!GetCustomDataFloat("posY", m_vecPosition.fY, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <blip> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <blip> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posZ" data
     if (!GetCustomDataFloat("posZ", m_vecPosition.fZ, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <blip> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <blip> (line %d)\n", iLine);
         return false;
     }
 
@@ -70,7 +87,7 @@ bool CBlip::ReadSpecialData(void)
             m_ucIcon = static_cast<unsigned char>(iTemp);
         else
         {
-            CLogger::ErrorPrintf("Bad 'icon'(%d) id specified in <blip> (line %u)\n", iTemp, m_uiLine);
+            CLogger::ErrorPrintf("Bad 'icon'(%d) id specified in <blip> (line %u)\n", iTemp, iLine);
             return false;
         }
     }
@@ -88,7 +105,7 @@ bool CBlip::ReadSpecialData(void)
         // Convert it to RGBA
         if (!XMLColorToInt(szColor, m_Color.R, m_Color.G, m_Color.B, m_Color.A))
         {
-            CLogger::ErrorPrintf("Bad 'color' value specified in <blip> (line %u)\n", m_uiLine);
+            CLogger::ErrorPrintf("Bad 'color' value specified in <blip> (line %d)\n", iLine);
             return false;
         }
     }
@@ -99,7 +116,21 @@ bool CBlip::ReadSpecialData(void)
 
     // Grab the "ordering" data
     if (GetCustomDataInt("ordering", iTemp, true))
-        m_sOrdering = static_cast<short>(Clamp(-32768, iTemp, 32767));
+    {
+        if (iTemp >= -32768 && iTemp <= 32767)
+        {
+            m_sOrdering = static_cast<short>(iTemp);
+        }
+        else
+        {
+            CLogger::ErrorPrintf("Bad 'ordering' id specified in <blip> (line %d)\n", iLine);
+            return false;
+        }
+    }
+    else
+    {
+        m_sOrdering = 0;
+    }
 
     // Grab the "visibleDistance" data
     if (GetCustomDataInt("visibleDistance", iTemp, true))

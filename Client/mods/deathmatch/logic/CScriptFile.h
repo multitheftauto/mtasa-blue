@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CFILE_H
-#define __CFILE_H
+#pragma once
 
 #include "CClientEntity.h"
 #include <stdio.h>
@@ -36,7 +35,6 @@ public:
     // Functions required by CClientEntity
     eClientEntityType GetType(void) const { return SCRIPTFILE; };
     void              Unlink(void){};
-    bool              ReadSpecialData(void) { return true; };
 
     // Load and unload routines
     bool           Load(CResource* pResourceForFilePath, eMode Mode);
@@ -77,5 +75,3 @@ private:
     eAccessType           m_accessType;
     SLuaDebugInfo         m_LuaDebugInfo;
 };
-
-#endif

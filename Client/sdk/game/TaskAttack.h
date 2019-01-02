@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TASKATTACK
-#define __CGAME_TASKATTACK
+#pragma once
 
 #include "Task.h"
 
@@ -49,5 +48,3 @@ class CTaskSimpleFight : public virtual CTaskSimple
 public:
     virtual ~CTaskSimpleFight(void){};
 };
-
-#endif

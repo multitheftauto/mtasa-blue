@@ -107,8 +107,7 @@ void CLocalGUI::ChangeLocale(const char* szName)
     CClientVariables* cvars = CCore::GetSingleton().GetCVars();
     m_LastSettingsRevision = cvars->GetRevision();
 
-    // Don't delete old Localization as it crashes
-    g_pLocalization = new CLocalization;
+    g_pLocalization->SetCurrentLanguage();
     m_LastLocaleName = szName;
 
     if (guiWasLoaded)
@@ -241,7 +240,7 @@ void CLocalGUI::DoPulse(void)
             }
             else
             {
-                // Do actual local change
+                // Do actual locale change
                 m_LocaleChangeCounter = 0;
                 CCore::GetSingleton().RemoveMessageBox();
 

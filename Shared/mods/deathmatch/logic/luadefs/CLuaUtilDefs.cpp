@@ -12,39 +12,47 @@
 
 void CLuaUtilDefs::LoadFunctions(void)
 {
-    // Util functions to make scripting easier for the end user
-    // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
-    CLuaCFunctions::AddFunction("deref", Dereference);
-    CLuaCFunctions::AddFunction("ref", Reference);
-    CLuaCFunctions::AddFunction("getTickCount", GetTickCount_);
-    CLuaCFunctions::AddFunction("getRealTime", GetCTime);
-    CLuaCFunctions::AddFunction("split", Split);
-    CLuaCFunctions::AddFunction("isOOPEnabled", IsOOPEnabled);
-    CLuaCFunctions::AddFunction("getUserdataType", GetUserdataType);
-    CLuaCFunctions::AddFunction("print", luaB_print);
-    CLuaCFunctions::AddFunction("getColorFromString", GetColorFromString);
+    std::map<const char*, lua_CFunction> functions{
+        // Util functions to make scripting easier for the end user
+        // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
+        {"deref", Dereference},
+        {"ref", Reference},
+        {"getTickCount", GetTickCount_},
+        {"getRealTime", GetCTime},
+        {"split", Split},
+        {"isOOPEnabled", IsOOPEnabled},
+        {"getUserdataType", GetUserdataType},
+        {"print", luaB_print},
+        {"getColorFromString", GetColorFromString},
 
-    // Utility vector math functions
-    CLuaCFunctions::AddFunction("getDistanceBetweenPoints2D", GetDistanceBetweenPoints2D);
-    CLuaCFunctions::AddFunction("getDistanceBetweenPoints3D", GetDistanceBetweenPoints3D);
-    CLuaCFunctions::AddFunction("getEasingValue", GetEasingValue);
-    CLuaCFunctions::AddFunction("interpolateBetween", InterpolateBetween);
+        // Utility vector math functions
+        {"getDistanceBetweenPoints2D", GetDistanceBetweenPoints2D},
+        {"getDistanceBetweenPoints3D", GetDistanceBetweenPoints3D},
+        {"getEasingValue", GetEasingValue},
+        {"interpolateBetween", InterpolateBetween},
 
-    // JSON funcs
-    CLuaCFunctions::AddFunction("toJSON", toJSON);
-    CLuaCFunctions::AddFunction("fromJSON", fromJSON);
+        // JSON funcs
+        {"toJSON", toJSON},
+        {"fromJSON", fromJSON},
 
-    // PCRE functions
-    CLuaCFunctions::AddFunction("pregFind", PregFind);
-    CLuaCFunctions::AddFunction("pregReplace", PregReplace);
-    CLuaCFunctions::AddFunction("pregMatch", PregMatch);
+        // PCRE functions
+        {"pregFind", PregFind},
+        {"pregReplace", PregReplace},
+        {"pregMatch", PregMatch},
 
-    // Debug functions
-    CLuaCFunctions::AddFunction("debugSleep", DebugSleep);
+        // Debug functions
+        {"debugSleep", DebugSleep},
 
-    // Utility functions
-    CLuaCFunctions::AddFunction("gettok", GetTok);
-    CLuaCFunctions::AddFunction("tocolor", tocolor);
+        // Utility functions
+        {"gettok", GetTok},
+        {"tocolor", tocolor},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 int CLuaUtilDefs::DisabledFunction(lua_State* luaVM)

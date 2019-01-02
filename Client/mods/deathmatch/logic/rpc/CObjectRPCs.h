@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CObjectRPCs_H
-#define __CObjectRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
@@ -27,5 +26,3 @@ public:
     DECLARE_ELEMENT_RPC(SetObjectScale);
     DECLARE_ELEMENT_RPC(SetObjectVisibleInAllDimensions);
 };
-
-#endif

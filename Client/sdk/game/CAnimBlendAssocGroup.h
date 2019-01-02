@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimBlendAssocGroup_H
-#define __CAnimBlendAssocGroup_H
+#pragma once
 
 typedef unsigned char BYTE;
 typedef unsigned long AssocGroupId;
@@ -33,5 +32,3 @@ public:
     virtual bool                              IsLoaded(void) = 0;
     virtual void                              SetIDOffset(int iOffset) = 0;
 };
-
-#endif

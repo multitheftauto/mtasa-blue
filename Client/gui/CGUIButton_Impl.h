@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIBUTTON_IMPL_H
-#define __CGUIBUTTON_IMPL_H
+#pragma once
 
 #include <gui/CGUIButton.h>
 #include "CGUIElement_Impl.h"
@@ -25,5 +24,3 @@ public:
 
     #include "CGUIElement_Inc.h"
 };
-
-#endif

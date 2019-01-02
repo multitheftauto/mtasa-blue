@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TASKGOTO
-#define __CGAME_TASKGOTO
+#pragma once
 
 #include "Task.h"
 #include "CPathFind.h"
@@ -45,5 +44,3 @@ class CTaskComplexWanderStandard : public virtual CTaskComplexWander
 public:
     virtual ~CTaskComplexWanderStandard(void){};
 };
-
-#endif

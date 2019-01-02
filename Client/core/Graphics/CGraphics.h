@@ -1,13 +1,13 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        core/CGraphics.h
-*  PURPOSE:     Header file for general graphics subsystem class
-*
-*  Multi Theft Auto is available from http://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        core/CGraphics.h
+ *  PURPOSE:     Header file for general graphics subsystem class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 class CGraphics;
 
@@ -26,6 +26,8 @@ class CGraphics;
 class CTileBatcher;
 class CLine3DBatcher;
 class CMaterialLine3DBatcher;
+class CPrimitiveBatcher;
+class CPrimitiveMaterialBatcher;
 class CAspectRatioConverter;
 struct IDirect3DDevice9;
 struct IDirect3DSurface9;
@@ -38,6 +40,8 @@ namespace EDrawMode
         DX_LINE,
         DX_SPRITE,
         TILE_BATCHER,
+        PRIMITIVE,
+        PRIMITIVE_MATERIAL
     };
 }
 using EDrawMode::EDrawModeType;
@@ -60,10 +64,11 @@ struct sFontInfo
 class CGraphics : public CGraphicsInterface, public CSingleton<CGraphics>
 {
     friend class CDirect3DEvents9;
+    friend CPrimitiveMaterialBatcher;
 
 public:
     ZERO_ON_NEW
-        CGraphics(CLocalGUI* pGUI);
+    CGraphics(CLocalGUI* pGUI);
     ~CGraphics(void);
 
     // DirectX misc. functions
@@ -75,13 +80,11 @@ public:
 
     // DirectX drawing functions
     void DrawString(int iLeft, int iTop, int iRight, int iBottom, unsigned long dwColor, const char* wszText, float fScaleX, float fScaleY,
-        unsigned long ulFormat, ID3DXFont* pDXFont = NULL, bool bOutline = false);
+                    unsigned long ulFormat, ID3DXFont* pDXFont = NULL, bool bOutline = false);
     void DrawString(int iX, int iY, unsigned long dwColor, float fScale, const char* szText, ...);
     void DrawLine3D(const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f);
     void DrawRectangle(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning = false);
     void DrawStringOutline(const RECT& rect, unsigned long ulColor, const wchar_t* szText, unsigned long ulFormat, LPD3DXFONT pDXFont);
-    void DrawCircleInternal(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
-        short siSegments, float fRatio, bool bPostGUI);
 
     void           SetBlendMode(EBlendModeType blendMode);
     EBlendModeType GetBlendMode(void);
@@ -118,8 +121,8 @@ public:
 
     // Textures
     void DrawTexture(CTextureItem* texture, float fX, float fY, float fScaleX = 1.0f, float fScaleY = 1.0f, float fRotation = 0.0f, float fCenterX = 0.0f,
-        float fCenterY = 0.0f, DWORD dwColor = 0xFFFFFFFF, float fU = 0, float fV = 0, float fSizeU = 1, float fSizeV = 1,
-        bool bRelativeUV = true);
+                     float fCenterY = 0.0f, DWORD dwColor = 0xFFFFFFFF, float fU = 0, float fV = 0, float fSizeU = 1, float fSizeV = 1,
+                     bool bRelativeUV = true);
 
     // Interface functions
     void SetCursorPosition(int iX, int iY, DWORD Flags);
@@ -130,20 +133,24 @@ public:
     void DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, bool bPostGUI);
 
     void DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, CMaterialItem* pMaterial, float fU = 0,
-        float fV = 0, float fSizeU = 1, float fSizeV = 1, bool bRelativeUV = true, bool bUseFaceToward = false,
-        const CVector& vecFaceToward = CVector(), bool bPostGUI = false);
+                                  float fV = 0, float fSizeU = 1, float fSizeV = 1, bool bRelativeUV = true, bool bUseFaceToward = false,
+                                  const CVector& vecFaceToward = CVector(), bool bPostGUI = false);
 
     void DrawRectQueued(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bPostGUI, bool bSubPixelPositioning = false);
 
     void DrawTextureQueued(float fX, float fY, float fWidth, float fHeight, float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV,
-        CMaterialItem* pMaterial, float fRotation, float fRotCenOffX, float fRotCenOffY, unsigned long ulColor, bool bPostGUI);
+                           CMaterialItem* pMaterial, float fRotation, float fRotCenOffX, float fRotCenOffY, unsigned long ulColor, bool bPostGUI);
 
     void DrawStringQueued(float iLeft, float iTop, float iRight, float iBottom, unsigned long dwColor, const char* wszText, float fScaleX, float fScaleY,
-        unsigned long ulFormat, ID3DXFont* pDXFont = NULL, bool bPostGUI = false, bool bColorCoded = false, bool bSubPixelPositioning = false,
-        float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0);
+                          unsigned long ulFormat, ID3DXFont* pDXFont = NULL, bool bPostGUI = false, bool bColorCoded = false, bool bSubPixelPositioning = false,
+                          float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0);
 
+    void DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI = false);
+    void DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* vertices, D3DPRIMITIVETYPE type, CMaterialItem* pMaterial, bool bPostGUI);
     void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
-        short siSegments, float fRatio, bool bPostGUI);
+                          short siSegments, float fRatio, bool bPostGUI);
+
+    bool IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType);
 
     void OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
 
@@ -162,7 +169,7 @@ public:
 
     // Texture data manipulation
     bool ResizeTextureData(const void* pData, uint uiDataPitch, uint uiWidth, uint uiHeight, uint d3dFormat, uint uiNewWidth, uint uiNewHeight,
-        CBuffer& outBuffer);
+                           CBuffer& outBuffer);
     bool CopyDataToSurface(IDirect3DSurface9* pSurface, const uchar* pPixelsData, uint uiDataPitch);
     bool CopyDataFromSurface(IDirect3DSurface9* pSurface, CBuffer& outBuffer);
 
@@ -185,8 +192,8 @@ private:
     ID3DXFont* MaybeGetBigFont(ID3DXFont* pDXFont, float& fScaleX, float& fScaleY);
     void       CheckModes(EDrawModeType newDrawMode, EBlendModeType newBlendMode = EBlendMode::NONE);
     void       DrawColorCodedTextLine(float fLeft, float fRight, float fY, SColor& currentColor, const wchar_t* wszText, float fScaleX, float fScaleY,
-        unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning, float fRotation, float fRotationCenterX,
-        float fRotationCenterY);
+                                      unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning, float fRotation, float fRotationCenterX,
+                                      float fRotationCenterY);
 
     CLocalGUI* m_pGUI;
 
@@ -200,15 +207,17 @@ private:
 
     IDirect3DDevice9* m_pDevice;
 
-    CRenderItemManager*      m_pRenderItemManager;
-    CScreenGrabberInterface* m_pScreenGrabber;
-    CPixelsManagerInterface* m_pPixelsManager;
-    CTileBatcher*            m_pTileBatcher;
-    CLine3DBatcher*          m_pLine3DBatcherPreGUI;
-    CLine3DBatcher*          m_pLine3DBatcherPostGUI;
-    CMaterialLine3DBatcher*  m_pMaterialLine3DBatcherPreGUI;
-    CMaterialLine3DBatcher*  m_pMaterialLine3DBatcherPostGUI;
-    CAspectRatioConverter*   m_pAspectRatioConverter;
+    CRenderItemManager*        m_pRenderItemManager;
+    CScreenGrabberInterface*   m_pScreenGrabber;
+    CPixelsManagerInterface*   m_pPixelsManager;
+    CTileBatcher*              m_pTileBatcher;
+    CLine3DBatcher*            m_pLine3DBatcherPreGUI;
+    CLine3DBatcher*            m_pLine3DBatcherPostGUI;
+    CMaterialLine3DBatcher*    m_pMaterialLine3DBatcherPreGUI;
+    CMaterialLine3DBatcher*    m_pMaterialLine3DBatcherPostGUI;
+    CPrimitiveBatcher*         m_pPrimitiveBatcher;
+    CPrimitiveMaterialBatcher* m_pPrimitiveMaterialBatcher;
+    CAspectRatioConverter*     m_pAspectRatioConverter;
 
     // Fonts
     ID3DXFont* m_pDXFonts[NUM_FONTS];
@@ -227,7 +236,8 @@ private:
         QUEUE_RECT,
         QUEUE_TEXTURE,
         QUEUE_SHADER,
-        QUEUE_CIRCLE,
+        QUEUE_PRIMITIVE,
+        QUEUE_PRIMITIVEMATERIAL,
     };
 
     struct sDrawQueueLine
@@ -266,20 +276,6 @@ private:
         bool          bSubPixelPositioning;
     };
 
-    struct sDrawQueueCircle
-    {
-        float         fX;
-        float         fY;
-        float         fRadius;
-        short         fStartAngle;
-        short         fStopAngle;
-        float         fSegments;
-        float         fRatio;
-        float         bPostGUI;
-        unsigned long ulColor;
-        unsigned long ulColorCenter;
-    };
-
     struct sDrawQueueTexture
     {
         CMaterialItem* pMaterial;
@@ -298,6 +294,19 @@ private:
         bool           bRelativeUV;
     };
 
+    struct sDrawQueuePrimitive
+    {
+        D3DPRIMITIVETYPE                eType;
+        std::vector<PrimitiveVertice>*  pVecVertices;
+    };
+
+    struct sDrawQueuePrimitiveMaterial
+    {
+        D3DPRIMITIVETYPE                        eType;
+        CMaterialItem*                          pMaterial;
+        std::vector<PrimitiveMaterialVertice>*  pVecVertices;
+    };
+
     struct sDrawQueueItem
     {
         eDrawQueueType eType;
@@ -306,11 +315,12 @@ private:
 
         // Queue item data based on the eType.
         union {
-            sDrawQueueLine    Line;
-            sDrawQueueText    Text;
-            sDrawQueueRect    Rect;
-            sDrawQueueTexture Texture;
-            sDrawQueueCircle  Circle;
+            sDrawQueueLine              Line;
+            sDrawQueueText              Text;
+            sDrawQueueRect              Rect;
+            sDrawQueueTexture           Texture;
+            sDrawQueuePrimitive         Primitive;
+            sDrawQueuePrimitiveMaterial PrimitiveMaterial;
         };
     };
 

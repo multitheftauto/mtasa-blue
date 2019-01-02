@@ -26,11 +26,11 @@ public:
     virtual SString TranslatePlural(const SString& strSingular, const SString& strPlural, int iNum) { return strPlural; }
     virtual SString TranslatePluralWithContext(const SString& strContext, const SString& strSingular, const SString& strPlural, int iNum) { return strPlural; }
 
-    virtual std::map<SString, SString> GetAvailableLanguages(void) { return std::map<SString, SString>(); }
-    virtual bool                       IsLocalized(void) { return false; }
-    virtual SString                    GetLanguageDirectory(void) { return ""; }
-    virtual SString                    GetLanguageCode(void) { return "en_US"; }
-    virtual SString                    GetLanguageName(void) { return "English"; }
+    virtual std::vector<SString> GetAvailableLocales(void) { return std::vector<SString>(); }
+    virtual bool                 IsLocalized(void) { return false; }
+    virtual SString              GetLanguageDirectory(void) { return ""; }
+    virtual SString              GetLanguageCode(void) { return "en_US"; }
+    virtual SString              GetLanguageName(void) { return "English"; }
 };
 
 CLocalizationInterface* g_pLocalization = new CLocalizationDummy();
@@ -836,7 +836,7 @@ void CheckDataFiles(void)
         const char* szFilename;
     } integrityCheckList[] = {
         {
-            "4783E7C0D0005B80673A972E4231A230",
+            "E370F030BDC5369424FE9BC24068C47D",
             "bass.dll",
         },
         {
@@ -848,7 +848,7 @@ void CheckDataFiles(void)
             "bass_ac3.dll",
         },
         {
-            "E7F4494BDF7B1C49A303FE56C6B52DC9",
+            "9CA432745025427D6FF6C2B38F63A89F",
             "bass_fx.dll",
         },
         {
@@ -856,15 +856,15 @@ void CheckDataFiles(void)
             "bassflac.dll",
         },
         {
-            "13A3F5637A93F0340161A40C6FBD3F1F",
+            "CC27BE72D0519D8C863F1DAB1BBE5633",
             "bassmidi.dll",
         },
         {
-            "BCB4A47D5CBF53515AAE135AAA9C1C52",
+            "39613507057827F338CFA4519ACCA7A9",
             "bassmix.dll",
         },
         {
-            "02C9E8F0288D15FF290DD31EB1C7BFBC",
+            "A417017D402C542912493A3BE8DBE87F",
             "basswma.dll",
         },
         {

@@ -269,8 +269,9 @@ namespace
     };
 
     SDeprecatedItem clientDeprecatedList[] = {
+        // Client events
+        {true, "onClientElementHitByWaterCannon", "Use onClientVehicleWeaponHit instead"},
         // Client functions
-
         {false, "getPlayerRotation", "getPedRotation"},
         {false, "canPlayerBeKnockedOffBike", "canPedBeKnockedOffBike"},
         {false, "getPlayerContactElement", "getPedContactElement"},
@@ -342,7 +343,7 @@ namespace
         {false, "getBoundingBox", "will return 6 floats instead of 2 Vector3", "1.5.5-9.13999"},
 
         // Ped jetpacks
-        {false, "doesPedHaveJetPack", "isPedWearingJetpack"},
+        //{false, "doesPedHaveJetPack", "isPedWearingJetpack"},
     };
 
     SDeprecatedItem serverDeprecatedList[] = {
@@ -402,7 +403,7 @@ namespace
         {true, "removePlayerJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
         //{true, "givePedJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
         //{true, "removePedJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
-        {false, "doesPedHaveJetPack", "isPedWearingJetpack"},
+        //{false, "doesPedHaveJetPack", "isPedWearingJetpack"},
 
         // XML
         {false, "xmlNodeGetSubNodes", "xmlNodeGetChildren"},

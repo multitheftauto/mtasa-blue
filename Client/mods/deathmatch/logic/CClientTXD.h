@@ -9,8 +9,7 @@
 *
 *****************************************************************************/
 
-#ifndef __CCLIENTTXD_H
-#define __CCLIENTTXD_H
+#pragma once
 
 #include "CClientEntity.h"
 
@@ -42,5 +41,3 @@ protected:
     CBuffer              m_FileData;
     SReplacementTextures m_ReplacementTextures;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CSERVER_H
-#define __CSERVER_H
+#pragma once
 
 #include "CDynamicLibrary.h"
 #include <list>
@@ -58,5 +57,3 @@ private:
 
     static void AddServerOutput(const char* szOutput);
 };
-
-#endif
