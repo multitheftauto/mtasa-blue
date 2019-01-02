@@ -422,12 +422,17 @@ int CLuaAudioDefs::GetSoundBufferLength(lua_State* luaVM)
                 lua_pushnumber(luaVM, dBufferLength);
                 return 1;
             }
+            else
+            {
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
         }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
+    lua_pushnil(luaVM);
     return 1;
 }
 
