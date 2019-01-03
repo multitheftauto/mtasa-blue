@@ -9683,7 +9683,7 @@ bool CStaticFunctionDefinitions::ResetSurfaceInfo()
     CSurfaceType pOriginalSurfaceInfo = m_pClientGame->GetOriginalSurfaceInfo();
     DWORD dwOriginalSurfaceInfo = (DWORD)(&pOriginalSurfaceInfo);
 
-    short sOffset = 144;
+    short sOffset = offsetof(CSurfaceType, CSurfaceType::surfType);
     short sSize = sizeof(SurfaceInfo_c) * EColSurfaceValue::SIZE;
 
     memcpy((void*)(dwSurfaceInfo + sOffset), (void*)(dwOriginalSurfaceInfo + sOffset), sSize);
@@ -9698,7 +9698,7 @@ bool CStaticFunctionDefinitions::ResetSurfaceInfo(short sSurfaceID)
         DWORD dwSurfaceInfo = (DWORD)pSurfaceInfo;
         DWORD dwOriginalSurfaceInfo = (DWORD)(&pOriginalSurfaceInfo);
 
-        short sOffset = 144 + sizeof(SurfaceInfo_c) * sSurfaceID;
+        short sOffset = offsetof(CSurfaceType, CSurfaceType::surfType) + sizeof(SurfaceInfo_c) * sSurfaceID;
         short sSize = sizeof(SurfaceInfo_c);
 
         memcpy((void*)(dwSurfaceInfo + sOffset), (void*)(dwOriginalSurfaceInfo + sOffset), sSize);
