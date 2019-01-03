@@ -690,7 +690,7 @@ bool CResource::GenerateChecksums()
 
     for (auto& task : checksumTasks)
     {
-        auto& result = task.get();
+        const auto& result = task.get();
         if (!result.empty())
         {
             m_strFailureReason = result;
