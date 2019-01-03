@@ -2114,13 +2114,21 @@ bool CClientPed::SetCurrentWeaponSlot(eWeaponSlot weaponSlot)
                     DWORD       ammoInClip = oldWeapon->GetAmmoInClip();
                     DWORD       ammoInTotal = oldWeapon->GetAmmoTotal();
                     eWeaponType weaponType = oldWeapon->GetType();
-                    RemoveWeapon(oldWeapon->GetType());
+
+                    bool isGoggles = currentSlot == WEAPONSLOT_TYPE_PARACHUTE && (weaponType == WEAPONTYPE_NIGHTVISION || weaponType == WEAPONTYPE_INFRARED);
+                    if (!isGoggles)
+                    {
+                        RemoveWeapon(oldWeapon->GetType());
+                    }
 
                     m_pPlayerPed->SetCurrentWeaponSlot(WEAPONSLOT_TYPE_UNARMED);
 
-                    CWeapon* newWeapon = GiveWeapon(weaponType, ammoInTotal);
-                    newWeapon->SetAmmoInClip(ammoInClip);
-                    newWeapon->SetAmmoTotal(ammoInTotal);
+                    if (!isGoggles)
+                    {
+                        CWeapon* newWeapon = GiveWeapon(weaponType, ammoInTotal);
+                        newWeapon->SetAmmoInClip(ammoInClip);
+                        newWeapon->SetAmmoTotal(ammoInTotal);
+                    }
 
                     // Don't allow doing gang driveby while unarmed
                     if (IsDoingGangDriveby())
