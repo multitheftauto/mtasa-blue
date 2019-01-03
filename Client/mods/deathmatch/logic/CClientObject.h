@@ -48,6 +48,8 @@ public:
     void         SetRotationDegrees(const CVector& vecRotation);
     virtual void SetRotationRadians(const CVector& vecRotation);
 
+    void AttachTo(CClientEntity* pEntity) override;
+
     void GetMoveSpeed(CVector& vecMoveSpeed) const;
     void SetMoveSpeed(const CVector& vecMoveSpeed);
 

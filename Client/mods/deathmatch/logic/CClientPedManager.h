@@ -27,8 +27,6 @@ public:
 
     void        DoPulse(bool bDoStandardPulses);
     CClientPed* Get(ElementID ID, bool bCheckPlayers = false);
-    CClientPed* Get(CPlayerPed* pPlayer, bool bValidatePointer, bool bCheckPlayers);
-    CClientPed* GetSafe(CEntity* pEntity, bool bCheckPlayers);
 
     bool Exists(CClientPed* pPed);
 

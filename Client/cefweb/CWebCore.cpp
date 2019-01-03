@@ -127,12 +127,24 @@ void CWebCore::DoPulse()
 
 CWebView* CWebCore::FindWebView(CefRefPtr<CefBrowser> browser)
 {
+    if (!browser)
+        return nullptr;
+
     for (auto pWebView : m_WebViews)
     {
+        if (!pWebView)
+            continue;
+
+        CefRefPtr<CefBrowser> pBrowser = pWebView->GetCefBrowser();
+
+        if (!pBrowser)
+            continue;
+
         // CefBrowser objects are not unique
-        if (pWebView->GetCefBrowser()->GetIdentifier() == browser->GetIdentifier())
+        if (pBrowser->GetIdentifier() == browser->GetIdentifier())
             return pWebView.get();
     }
+
     return nullptr;
 }
 

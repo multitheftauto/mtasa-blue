@@ -142,6 +142,12 @@ enum eMoveAnim
     MOVE_SKATE,
 };
 
+enum eLandedPedFoot
+{
+    LANDED_PED_RIGHT_FOOT = 0,
+    LANDED_PED_LEFT_FOOT = 1,
+};
+
 inline bool IsValidMoveAnim(uint iMoveAnim)
 {
     return (iMoveAnim == MOVE_DEFAULT) || (iMoveAnim >= MOVE_PLAYER && iMoveAnim <= MOVE_JETPACK) || (iMoveAnim >= MOVE_MAN && iMoveAnim <= MOVE_SKATE);

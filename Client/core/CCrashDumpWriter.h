@@ -44,6 +44,7 @@ public:
     static void        GetLogInfo(CBuffer& buffer);
     static void        GetDxInfo(CBuffer& buffer);
     static void        GetMemoryInfo(CBuffer& buffer);
+    static void        GetCurrentAnimTaskInfo(CBuffer& buffer);
     static void        GetMiscInfo(CBuffer& buffer);
     static void        OnCrashAverted(uint uiId);
     static void        OnEnterCrashZone(uint uiId);
