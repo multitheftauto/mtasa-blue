@@ -737,6 +737,7 @@ void CClientPed::Spawn(const CVector& vecPosition, float fRotation, unsigned sho
     SetMoveSpeed(CVector());
     SetInterior(ucInterior);
     SetFootBloodEnabled(false);
+    SetIsDead(false);
 }
 
 void CClientPed::ResetInterpolation(void)
@@ -1813,15 +1814,11 @@ bool CClientPed::IsDead(void)
     if (m_pPlayerPed)
     {
         CTask* pTask = m_pTaskManager->GetTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
+
         if (pTask)
-        {
-            if (pTask->GetTaskType() == TASK_SIMPLE_DEAD)
-            {
-                return true;
-            }
-        }
-        return false;
+            return pTask->GetTaskType() == TASK_SIMPLE_DEAD;
     }
+
     return m_bDead;
 }
 
