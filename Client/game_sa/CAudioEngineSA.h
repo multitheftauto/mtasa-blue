@@ -34,6 +34,7 @@
 #define CLASS_CAudioEngine                      0xB6BC90
 #define CLASS_AERadioTrackManager               0x8CB6F8
 #define CLASS_AECutsceneTrackManager            0x8AE554
+#define CLASS_AEAmbienceTrackManager            0x8AC15C
 #define FUNC_CAudioEngine_ReportBulletHit                   0x506ec0
 #define FUNC_CAudioEngine_ReportWeaponEvent                 0x506f40
 

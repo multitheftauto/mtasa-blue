@@ -96,8 +96,9 @@ VOID CAudioEngineSA::StartRadio(unsigned int station)
     if (m_bRadioMuted)
         return;
 
-    DWORD dwFunc = 0x4DBEC3;
-    DWORD dwFunc2 = 0x4EB3C3;
+    DWORD dwFunc = 0x4D76C0;
+    DWORD dwFunc2 = 0x4DBEC3;
+    DWORD dwFunc3 = 0x4EB3C3;
     _asm
     {
         // We can't do this anymore as we've returned out StartRadio
@@ -105,8 +106,13 @@ VOID CAudioEngineSA::StartRadio(unsigned int station)
         push    0
         push    station
         mov     ecx, CLASS_CAudioEngine
-        call    dwFunc
+        call    dwFunc3
         */
+        
+        // Call CAEAmbienceTrackManager::Service to make sure radio will work on first try (GitHub #423)
+        mov         ecx,CLASS_AEAmbienceTrackManager
+        push        0
+        call        dwFunc
 
         // Push our arguments onto the stack
         push        0
@@ -115,7 +121,7 @@ VOID CAudioEngineSA::StartRadio(unsigned int station)
         // Call something, skip 3 bytes that we have our return instruction on (no arguments)
         mov         ecx,CLASS_AECutsceneTrackManager
         mov         eax,dword ptr [ecx+8]
-        call        dwFunc
+        call        dwFunc2
 
         // Check the return value, eventually skip
         test        al,al
@@ -135,7 +141,7 @@ VOID CAudioEngineSA::StartRadio(unsigned int station)
         push        done
         push        ebx
         mov         bl,byte ptr [esp+8]
-        jmp         dwFunc2
+        jmp         dwFunc3
 
         // Pop our arguments back
         done:
