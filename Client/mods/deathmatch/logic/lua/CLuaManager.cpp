@@ -306,7 +306,7 @@ void CLuaManager::LoadCFunctions(void)
 
         // World set funcs
         {"setTime", CLuaFunctionDefs::SetTime},
-        {"setTimeCycle", CLuaFunctionDefs::SetTimeCycle}
+        {"setTimeCycle", CLuaFunctionDefs::SetTimeCycle},
         {"setSkyGradient", CLuaFunctionDefs::SetSkyGradient},
         {"setHeatHaze", CLuaFunctionDefs::SetHeatHaze},
         {"setWeather", CLuaFunctionDefs::SetWeather},

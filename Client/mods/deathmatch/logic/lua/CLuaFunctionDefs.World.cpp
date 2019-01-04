@@ -1777,7 +1777,7 @@ int CLuaFunctionDefs::RemoveBirds(lua_State* luaVM)
 
 int CLuaFunctionDefs::AddBirds(lua_State* luaVM)
 {
-    //  bool addBirds ( float startX, float startY, float startZ, float destX, float destY, float destZ, [int birdsCount = 1], [int birdType = 0], [bool checkObstacles = false] )
+    //  bool addBirds ( float startX, float startY, float startZ, float destX, float destY, float destZ, [int birdsCount = 1, int birdType = 0, bool checkObstacles = false] )
 
     CVector          vecStartPosition, vecDestPosition;
     int              iNumBirds, iBirdType;
@@ -1819,7 +1819,7 @@ int CLuaFunctionDefs::ResetTimeCycle(lua_State* luaVM)
 
 int CLuaFunctionDefs::SetTimeCycle(lua_State* luaVM)
 {
-    //  bool setTimeCycle ( string property, [float value = -1], [int weatherID = -1], [int cycle = -1] )
+    //  bool setTimeCycle ( string property, [float value = -1, int weatherID = -1, int cycle = -1] )
 
     SString          strPropertyName;
     float            fValue;
@@ -1867,7 +1867,7 @@ int CLuaFunctionDefs::SetTimeCycle(lua_State* luaVM)
 
 int CLuaFunctionDefs::GetTimeCycle(lua_State* luaVM)
 {
-    //  mixed getTimeCycle ( int weatherID, [int cycle = -1], [string property = ""] )
+    //  mixed getTimeCycle ( int weatherID, [int cycle = -1, string property = ""] )
 
     int              iWeatherID, iCycleNum;
     SString          strPropertyName;
@@ -1945,7 +1945,7 @@ int CLuaFunctionDefs::GetTimeCycle(lua_State* luaVM)
 
 int CLuaFunctionDefs::GetOriginalTimeCycle(lua_State* luaVM)
 {
-    //  mixed getOriginalTimeCycle ( int weatherID, [int cycle = -1], [string property = ""] )
+    //  mixed getOriginalTimeCycle ( int weatherID, [int cycle = -1, string property = ""] )
 
     int              iWeatherID, iCycleNum;
     SString          strPropertyName;
