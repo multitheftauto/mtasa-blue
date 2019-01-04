@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TIMECYCLE
-#define __CGAME_TIMECYCLE
+#pragma once
 
 #include "Common.h"
 
@@ -35,5 +34,3 @@ public:
     virtual void    GetOriginalTimeCycle(int iWeatherID, int iCycleNum, std::map<const char*, float>& m_Properties) = 0;
     virtual void    GetOriginalTimeCycle(int iWeatherID, std::map<int, std::map<const char*, float>>& m_Properties) = 0;
 };
-
-#endif

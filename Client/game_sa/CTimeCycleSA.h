@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TIMECYCLE
-#define __CGAMESA_TIMECYCLE
+#pragma once
 
 #include <game/CTimeCycle.h>
 #include "Common.h"
@@ -131,5 +130,3 @@ public:
 private:
     std::map<std::string, CTimeCyclePropertyInterface*> m_TimeCycleProps;
 };
-
-#endif
