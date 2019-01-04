@@ -87,7 +87,7 @@ void CLuaAudioDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setSpeed", "setSoundSpeed");
     lua_classfunction(luaVM, "setVolume", "setSoundVolume");
     lua_classfunction(luaVM, "setPaused", "setSoundPaused");
-    lua_classfunction(luaVM, "setLoop", "setSoundLooped");
+    lua_classfunction(luaVM, "setLooped", "setSoundLooped");
     lua_classfunction(luaVM, "setPan", "setSoundPan");
     lua_classfunction(luaVM, "setPannningEnabled", "setSoundPanningEnabled");
     lua_classfunction(luaVM, "setProperties", "setSoundProperties");
