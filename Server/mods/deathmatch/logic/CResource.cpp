@@ -438,13 +438,13 @@ void CResource::TidyUp()
     for (CResourceFile* pResourceFile : m_ResourceFiles)
         delete pResourceFile;
 
-    m_ResourceFiles.swap(std::list<CResourceFile*>{});
+    (std::list<CResourceFile*>{}).swap(m_ResourceFiles);
 
     // Go through each included resource item and delete it
     for (CIncludedResources* pIncludedResources : m_IncludedResources)
         delete pIncludedResources;
 
-    m_IncludedResources.swap(std::list<CIncludedResources*>{});
+    (std::list<CIncludedResources*>{}).swap(m_IncludedResources);
 
     // Go through each of the dependent resources (those that include this one) and remove the reference to this
     for (CResource* pDependent : m_Dependents)
@@ -1057,7 +1057,7 @@ bool CResource::Stop(bool bStopManually)
     for (CResource* pResource : m_TemporaryIncludes)
         pResource->RemoveDependent(this);
 
-    m_TemporaryIncludes.swap(std::list<CResource*>{});
+    (std::list<CResource*>{}).swap(m_TemporaryIncludes);
 
     // Stop all the resource files we have. The files we share with our clients we remove from the resource file list.
     for (CResourceFile* pResourceFile : m_ResourceFiles)
