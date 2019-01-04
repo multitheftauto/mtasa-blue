@@ -110,7 +110,7 @@ void CLuaAudioDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "playbackPosition", "setSoundPosition", "getSoundPosition");
     lua_classvariable(luaVM, "speed", "setSoundSpeed", "getSoundSpeed");
     lua_classvariable(luaVM, "volume", "setSoundVolume", "getSoundVolume");
-    lua_classvariable(luaVM, "loop", "setSoundLooped", "isSoundLooped");
+    lua_classvariable(luaVM, "looped", "setSoundLooped", "isSoundLooped");
     lua_classvariable(luaVM, "paused", "setSoundPaused", "isSoundPaused");
     lua_classvariable(luaVM, "pan", "setSoundPan", "getSoundPan");
     lua_classvariable(luaVM, "panningEnabled", "setSoundPanningEnabled", "isSoundPanningEnabled");
