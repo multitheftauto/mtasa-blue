@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME
-#define __CGAME
+#pragma once
 
 // use this to check if you're using SA or VC headers
 #define GTA_SA
@@ -84,6 +83,8 @@ typedef void(InRenderer)(void);
 
 #include <windows.h>
 
+enum eEntityType;
+
 typedef bool(PreWeaponFireHandler)(class CPlayerPed* pPlayer, bool bStopIfUsingBulletSync);
 typedef void(PostWeaponFireHandler)(void);
 typedef void(TaskSimpleBeHitHandler)(class CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
@@ -143,7 +144,6 @@ public:
     virtual CAudioEngine*             GetAudioEngine() = 0;
     virtual CAEAudioHardware*         GetAEAudioHardware() = 0;
     virtual CAESoundManager*          GetAESoundManager() = 0;
-    virtual CAudioEngine*             GetAudio() = 0;
     virtual CAudioContainer*          GetAudioContainer() = 0;
     virtual CMenuManager*             GetMenuManager() = 0;
     virtual CText*                    GetText() = 0;
@@ -170,7 +170,7 @@ public:
     virtual CTimeCycle*               GetTimeCycle() = 0;
 
     virtual CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
-    virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;
+    virtual CModelInfo*  GetModelInfo(DWORD dwModelID) = 0;
 
     virtual DWORD        GetSystemTime() = 0;
     virtual BOOL         IsAtMenu() = 0;
@@ -195,7 +195,7 @@ public:
     virtual void Reset(void) = 0;
     virtual void Terminate(void) = 0;
 
-    virtual BOOL InitLocalPlayer() = 0;
+    virtual BOOL InitLocalPlayer(class CClientPed* pClientPed) = 0;
 
     virtual float GetGravity(void) = 0;
     virtual void  SetGravity(float fGravity) = 0;
@@ -253,5 +253,3 @@ public:
     virtual void SetPostWeaponFireHandler(PostWeaponFireHandler* pPostWeaponFireHandler) = 0;
     virtual void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) = 0;
 };
-
-#endif

@@ -37,15 +37,14 @@ namespace
     void RwMatrixGetRotation(const RwMatrix& rwMatrix, CVector& vecOutRotation)
     {
         CMatrix matTemp;
-        matTemp.vRight = (CVector&)rwMatrix.right;
-        matTemp.vFront = (CVector&)rwMatrix.up;
-        matTemp.vUp = (CVector&)rwMatrix.at;
+        RwMatrixToCMatrix(rwMatrix, matTemp);
         vecOutRotation = matTemp.GetRotation();
     }
 
     void RwMatrixSetRotation(RwMatrix& rwInOutMatrix, const CVector& vecRotation)
     {
         CMatrix matTemp;
+        RwMatrixToCMatrix(rwInOutMatrix, matTemp);
         matTemp.SetRotation(vecRotation);
         rwInOutMatrix.right = (RwV3d&)matTemp.vRight;
         rwInOutMatrix.up = (RwV3d&)matTemp.vFront;
@@ -55,6 +54,23 @@ namespace
     void RwMatrixGetPosition(const RwMatrix& rwMatrix, CVector& vecOutPosition) { vecOutPosition = (CVector&)rwMatrix.pos; }
 
     void RwMatrixSetPosition(RwMatrix& rwInOutMatrix, const CVector& vecPosition) { rwInOutMatrix.pos = (RwV3d&)vecPosition; }
+
+    void RwMatrixGetScale(const RwMatrix& rwMatrix, CVector& vecOutScale)
+    {
+        CMatrix matTemp;
+        RwMatrixToCMatrix(rwMatrix, matTemp);
+        vecOutScale = matTemp.GetScale();
+    }
+
+    void RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale)
+    {
+        CMatrix matTemp;
+        RwMatrixToCMatrix(rwInOutMatrix, matTemp);
+        matTemp.SetScale(vecScale);
+        rwInOutMatrix.right = (RwV3d&)matTemp.vRight;
+        rwInOutMatrix.up = (RwV3d&)matTemp.vFront;
+        rwInOutMatrix.at = (RwV3d&)matTemp.vUp;
+    }
 
     bool ClumpDumpCB(RpAtomic* pAtomic, void* data)
     {
@@ -424,9 +440,11 @@ CVehicle* CVehicleSA::GetNextTrainCarriage(void)
 {
     CVehicleSAInterface* pVehicle = GetNextCarriageInTrain();
     if (pVehicle)
-        return pGame->GetPools()->GetVehicle((DWORD*)pVehicle);
-    else
-        return NULL;
+    {
+        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGame->GetPools()->GetVehicle((DWORD*)pVehicle);
+        return pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
+    }
+    return nullptr;
 }
 
 bool CVehicleSA::AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity)
@@ -479,9 +497,11 @@ CVehicle* CVehicleSA::GetPreviousTrainCarriage(void)
 {
     CVehicleSAInterface* pVehicle = GetPreviousCarriageInTrain();
     if (pVehicle)
-        return pGame->GetPools()->GetVehicle((DWORD*)pVehicle);
-    else
-        return NULL;
+    {
+        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGame->GetPools()->GetVehicle((DWORD*)pVehicle);
+        return pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
+    }
+    return nullptr;
 }
 
 float CVehicleSA::GetDistanceToCarriage(CVehicle* pCarriage)
@@ -1156,9 +1176,14 @@ CPed* CVehicleSA::GetDriver(void)
 
     CPedSAInterface* pDriver = GetVehicleInterface()->pDriver;
     if (pDriver)
-        return pPools->GetPed((DWORD*)pDriver);
-    else
-        return NULL;
+    {
+        SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)pDriver);
+        if (pPedClientEntity)
+        {
+            return pPedClientEntity->pEntity;
+        }
+    }
+    return nullptr;
 }
 
 CPed* CVehicleSA::GetPassenger(unsigned char ucSlot)
@@ -1170,7 +1195,13 @@ CPed* CVehicleSA::GetPassenger(unsigned char ucSlot)
     {
         CPedSAInterface* pPassenger = GetVehicleInterface()->pPassengers[ucSlot];
         if (pPassenger)
-            return pPools->GetPed((DWORD*)pPassenger);
+        {
+            SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)pPassenger);
+            if (pPedClientEntity)
+            {
+                return pPedClientEntity->pEntity;
+            }
+        }
     }
 
     return NULL;
@@ -1718,7 +1749,10 @@ CVehicle* CVehicleSA::GetTowedVehicle(void)
     DEBUG_TRACE("CVehicle * CVehicleSA::GetTowedVehicle ( void )");
     CVehicleSAInterface* pTowedVehicle = (CVehicleSAInterface*)*(DWORD*)((DWORD)this->GetInterface() + 1224);
     if (pTowedVehicle)
-        return pGame->GetPools()->GetVehicle((DWORD*)pTowedVehicle);
+    {
+        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGame->GetPools()->GetVehicle((DWORD*)pTowedVehicle);
+        return pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
+    }
     return NULL;
 }
 
@@ -1727,7 +1761,10 @@ CVehicle* CVehicleSA::GetTowedByVehicle(void)
     DEBUG_TRACE("CVehicle * CVehicleSA::GetTowedVehicle ( void )");
     CVehicleSAInterface* pTowedVehicle = (CVehicleSAInterface*)*(DWORD*)((DWORD)this->GetInterface() + 1220);
     if (pTowedVehicle)
-        return pGame->GetPools()->GetVehicle((DWORD*)pTowedVehicle);
+    {
+        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGame->GetPools()->GetVehicle((DWORD*)pTowedVehicle);
+        return pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
+    }
     return NULL;
 }
 
@@ -1789,7 +1826,6 @@ CPhysical* CVehicleSA::QueryPickedUpEntityWithWinch()
     DWORD dwThis = (DWORD)GetInterface();
 
     CPhysicalSAInterface* phys;
-    CPhysical*            physRet;
     _asm
     {
         mov     ecx, dwThis
@@ -1799,23 +1835,10 @@ CPhysical* CVehicleSA::QueryPickedUpEntityWithWinch()
 
     if (phys)
     {
-        CPoolsSA* pPools = ((CPoolsSA*)pGame->GetPools());
-        switch (phys->nType)
-        {
-            case ENTITY_TYPE_PED:
-                physRet = (CPhysical*)pPools->GetPed((DWORD*)phys);
-                break;
-            case ENTITY_TYPE_VEHICLE:
-                physRet = (CPhysical*)pGame->GetPools()->GetVehicle((DWORD*)phys);
-                break;
-            case ENTITY_TYPE_OBJECT:
-                physRet = (CPhysical*)pPools->GetObject((DWORD*)phys);
-                break;
-            default:
-                physRet = NULL;
-        }
+        CPools* pPools = pGame->GetPools();
+        return reinterpret_cast<CPhysical*>(pPools->GetEntity((DWORD*)phys));
     }
-    return physRet;
+    return nullptr;
 }
 
 void CVehicleSA::SetRemap(int iRemap)
@@ -2084,7 +2107,10 @@ CObject* CVehicleSA::SpawnFlyingComponent(int i_1, unsigned int ui_2)
 
     CObject* pObject = NULL;
     if (dwReturn)
-        pObject = pGame->GetPools()->GetObject((DWORD*)dwReturn);
+    {
+        SClientEntity<CObjectSA>* pObjectClientEntity = pGame->GetPools()->GetObject((DWORD*)dwReturn);
+        pObject = pObjectClientEntity ? pObjectClientEntity->pEntity : nullptr;
+    }
     return pObject;
 }
 
@@ -2409,6 +2435,28 @@ bool CVehicleSA::GetComponentPosition(const SString& vehicleComponent, CVector& 
     if (pComponent && pComponent->pFrame != NULL)
     {
         RwMatrixGetPosition(pComponent->pFrame->modelling, vecPositionModelling);
+        return true;
+    }
+    return false;
+}
+
+bool CVehicleSA::SetComponentScale(const SString& vehicleComponent, const CVector& vecScale)
+{
+    SVehicleFrame* pComponent = GetVehicleComponent(vehicleComponent);
+    if (pComponent && pComponent->pFrame != NULL)
+    {
+        RwMatrixSetScale(pComponent->pFrame->modelling, vecScale);
+        return true;
+    }
+    return false;
+}
+
+bool CVehicleSA::GetComponentScale(const SString& vehicleComponent, CVector& vecScaleModelling)
+{
+    SVehicleFrame* pComponent = GetVehicleComponent(vehicleComponent);
+    if (pComponent && pComponent->pFrame != NULL)
+    {
+        RwMatrixGetScale(pComponent->pFrame->modelling, vecScaleModelling);
         return true;
     }
     return false;

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PICKUPS
-#define __CGAMESA_PICKUPS
+#pragma once
 
 #include <game/CPickups.h>
 #include "CPickupSA.h"
@@ -37,5 +36,3 @@ public:
     CPickup* CreatePickup(CVector* position, DWORD ModelIndex, ePickupType Type, DWORD dwMonetaryValue, DWORD dwMoneyPerDay, BYTE bPingOutOfPlayer);
     void     DisablePickupProcessing(bool bDisabled);
 };
-
-#endif

@@ -31,6 +31,7 @@ void CPedRPCs::LoadFunctions(void)
     AddHandler(SET_PED_DOING_GANG_DRIVEBY, SetPedDoingGangDriveby, "SetPedDoingGangDriveby");
     AddHandler(SET_PED_ANIMATION, SetPedAnimation, "SetPedAnimation");
     AddHandler(SET_PED_ANIMATION_PROGRESS, SetPedAnimationProgress, "SetPedAnimationProgress");
+    AddHandler(SET_PED_ANIMATION_SPEED, SetPedAnimationSpeed, "SetPedAnimationSpeed");
     AddHandler(SET_PED_ON_FIRE, SetPedOnFire, "SetPedOnFire");
     AddHandler(SET_PED_HEADLESS, SetPedHeadless, "SetPedHeadless");
     AddHandler(SET_PED_FROZEN, SetPedFrozen, "SetPedFrozen");
@@ -312,6 +313,36 @@ void CPedRPCs::SetPedAnimationProgress(CClientEntity* pSource, NetBitStreamInter
             else
             {
                 pPed->KillAnimation();
+            }
+        }
+    }
+}
+
+void CPedRPCs::SetPedAnimationSpeed(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    char          szAnimName[64];
+    unsigned char ucAnimSize;
+    float         fSpeed;
+
+    if (bitStream.Read(ucAnimSize))
+    {
+        CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
+        if (pPed)
+        {
+            if (ucAnimSize > 0)
+            {
+                if (bitStream.Read(szAnimName, ucAnimSize))
+                {
+                    szAnimName[ucAnimSize] = 0;
+                    if (bitStream.Read(fSpeed))
+                    {
+                        auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pPed->GetClump(), szAnimName);
+                        if (pAnimAssociation)
+                        {
+                            pAnimAssociation->SetCurrentSpeed(fSpeed);
+                        }
+                    }
+                }
             }
         }
     }

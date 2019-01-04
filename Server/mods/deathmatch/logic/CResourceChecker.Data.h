@@ -167,6 +167,8 @@ namespace
         {"isElementCallPropagationEnabled", "1.3.5-9.06118"},
         {"getResourceState", "1.3.5-9.06194"},
         {"isPedWearingJetpack", "1.5.5-9.13846"},
+        {"setElementAngularVelocity", "1.5.5-9.14060"},
+        {"getElementAngularVelocity", "1.5.5-9.14060"},
     };
 
     SVersionItem serverFunctionInitList[] = {
@@ -245,6 +247,8 @@ namespace
         {"dbPrepareString", "1.5.2"},
         {"isPedWearingJetpack", "1.5.5-9.13846"},
         {"setPedWearingJetpack", "1.5.5-9.13846"},
+        {"setElementAngularVelocity", "1.5.5-9.14060"},
+        {"getElementAngularVelocity", "1.5.5-9.14060"},
     };
 
     //
@@ -265,8 +269,9 @@ namespace
     };
 
     SDeprecatedItem clientDeprecatedList[] = {
+        // Client events
+        {true, "onClientElementHitByWaterCannon", "Use onClientVehicleWeaponHit instead"},
         // Client functions
-
         {false, "getPlayerRotation", "getPedRotation"},
         {false, "canPlayerBeKnockedOffBike", "canPedBeKnockedOffBike"},
         {false, "getPlayerContactElement", "getPedContactElement"},
@@ -324,6 +329,8 @@ namespace
         {false, "showPlayerHudComponent", "setPlayerHudComponentVisible"},
         {false, "setControlState", "setPedControlState"},
         {false, "getControlState", "getPedControlState"},
+        {false, "getVehicleTurnVelocity", "getElementAngularVelocity"},
+        {false, "setVehicleTurnVelocity", "setElementAngularVelocity"},
         // Edit
         {false, "guiEditSetCaratIndex", "guiEditSetCaretIndex"},
         {false, "guiMemoSetCaratIndex", "guiMemoSetCaretIndex"},
@@ -336,7 +343,7 @@ namespace
         {false, "getBoundingBox", "will return 6 floats instead of 2 Vector3", "1.5.5-9.13999"},
 
         // Ped jetpacks
-        {false, "doesPedHaveJetPack", "isPedWearingJetpack"},
+        //{false, "doesPedHaveJetPack", "isPedWearingJetpack"},
     };
 
     SDeprecatedItem serverDeprecatedList[] = {
@@ -388,12 +395,16 @@ namespace
         {false, "attachElementToElement", "attachElements"},
         {false, "detachElementFromElement", "detachElements"},
         {false, "showPlayerHudComponent", "setPlayerHudComponentVisible"},
+        {false, "getVehicleTurnVelocity", "getElementAngularVelocity"},
+        {false, "setVehicleTurnVelocity", "setElementAngularVelocity"},
+
         // Server ped jetpack
         {true, "givePlayerJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
         {true, "removePlayerJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
         //{true, "givePedJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
         //{true, "removePedJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
-        {false, "doesPedHaveJetPack", "isPedWearingJetpack"},
+        //{false, "doesPedHaveJetPack", "isPedWearingJetpack"},
+
         // XML
         {false, "xmlNodeGetSubNodes", "xmlNodeGetChildren"},
         {false, "xmlCreateSubNode", "xmlCreateChild"},

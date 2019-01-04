@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUICOMBOBOX_IMPL_H
-#define __CGUICOMBOBOX_IMPL_H
+#pragma once
 
 #include "CGUIElement_Impl.h"
 #include "CGUIListItem_Impl.h"
@@ -35,6 +34,7 @@ public:
     bool          SetItemText(int index, const char* szText);
     bool          SetSelectedItemByIndex(int index);
     void          Clear(void);
+    bool          IsOpen(void);
 
     void SetReadOnly(bool bReadonly);
 
@@ -56,5 +56,3 @@ protected:
     GUI_CALLBACK       m_OnSelectChange;
     GUI_CALLBACK       m_OnDropListRemoved;
 };
-
-#endif

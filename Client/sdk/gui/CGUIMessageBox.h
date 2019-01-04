@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIMESSAGEBOX_H
-#define __CGUIMESSAGEBOX_H
+#pragma once
 
 #include "CGUIElement.h"
 #include "CGUIWindow.h"
@@ -31,5 +30,3 @@ public:
 
     virtual CGUIWindow* GetWindow(void) = 0;
 };
-
-#endif

@@ -14,56 +14,65 @@
 
 extern CNetServer* g_pRealNetServer;
 
-void CLuaResourceDefs::LoadFunctions(void)
+void CLuaResourceDefs::LoadFunctions()
 {
-    // Create/edit functions
-    CLuaCFunctions::AddFunction("createResource", createResource);
-    CLuaCFunctions::AddFunction("copyResource", copyResource);
-    CLuaCFunctions::AddFunction("renameResource", renameResource);
-    CLuaCFunctions::AddFunction("deleteResource", deleteResource);
+    std::map<const char*, lua_CFunction> functions{
+        // Create/edit functions
+        {"createResource", createResource},
+        {"copyResource", copyResource},
+        {"renameResource", renameResource},
+        {"deleteResource", deleteResource},
 
-    CLuaCFunctions::AddFunction("addResourceMap", addResourceMap);
-    CLuaCFunctions::AddFunction("addResourceConfig", addResourceConfig);
-    CLuaCFunctions::AddFunction("removeResourceFile", removeResourceFile);
+        {"addResourceMap", addResourceMap},
+        {"addResourceConfig", addResourceConfig},
+        {"removeResourceFile", removeResourceFile},
 
-    CLuaCFunctions::AddFunction("setResourceDefaultSetting", setResourceDefaultSetting);
-    CLuaCFunctions::AddFunction("removeResourceDefaultSetting", removeResourceDefaultSetting);
+        {"setResourceDefaultSetting", setResourceDefaultSetting},
+        {"removeResourceDefaultSetting", removeResourceDefaultSetting},
 
-    // Start/stop management
-    CLuaCFunctions::AddFunction("startResource", startResource);
-    CLuaCFunctions::AddFunction("stopResource", stopResource);
-    CLuaCFunctions::AddFunction("restartResource", restartResource);
+        // Start/stop management
+        {"startResource", startResource},
+        {"stopResource", stopResource},
+        {"restartResource", restartResource},
 
-    // Get stuff
-    CLuaCFunctions::AddFunction("getThisResource", getThisResource);
-    CLuaCFunctions::AddFunction("getResourceFromName", getResourceFromName);
-    CLuaCFunctions::AddFunction("getResources", getResources);
+        // Get stuff
+        {"getThisResource", getThisResource},
+        {"getResourceFromName", getResourceFromName},
+        {"getResources", getResources},
 
-    CLuaCFunctions::AddFunction("getResourceState", getResourceState);
-    CLuaCFunctions::AddFunction("getResourceInfo", getResourceInfo);
-    CLuaCFunctions::AddFunction("getResourceConfig", getResourceConfig);
-    CLuaCFunctions::AddFunction("getResourceLoadFailureReason", getResourceLoadFailureReason);
-    CLuaCFunctions::AddFunction("getResourceLastStartTime", getResourceLastStartTime);
-    CLuaCFunctions::AddFunction("getResourceLoadTime", getResourceLoadTime);
-    CLuaCFunctions::AddFunction("getResourceName", getResourceName);
-    CLuaCFunctions::AddFunction("getResourceRootElement", getResourceRootElement);
-    CLuaCFunctions::AddFunction("getResourceDynamicElementRoot", getResourceDynamicElementRoot);
-    CLuaCFunctions::AddFunction("getResourceMapRootElement", getResourceMapRootElement);
-    CLuaCFunctions::AddFunction("getResourceExportedFunctions", getResourceExportedFunctions);
-    CLuaCFunctions::AddFunction("getResourceOrganizationalPath", getResourceOrganizationalPath);
-    CLuaCFunctions::AddFunction("isResourceArchived", isResourceArchived);
+        {"getResourceState", getResourceState},
+        {"getResourceInfo", getResourceInfo},
+        {"getResourceConfig", getResourceConfig},
+        {"getResourceLoadFailureReason", getResourceLoadFailureReason},
+        {"getResourceLastStartTime", getResourceLastStartTime},
+        {"getResourceLoadTime", getResourceLoadTime},
+        {"getResourceName", getResourceName},
+        {"getResourceRootElement", getResourceRootElement},
+        {"getResourceDynamicElementRoot", getResourceDynamicElementRoot},
+        {"getResourceMapRootElement", getResourceMapRootElement},
+        {"getResourceExportedFunctions", getResourceExportedFunctions},
+        {"getResourceOrganizationalPath", getResourceOrganizationalPath},
+        {"isResourceArchived", isResourceArchived},
 
-    // Set stuff
-    CLuaCFunctions::AddFunction("setResourceInfo", setResourceInfo);
+        // Set stuff
+        {"setResourceInfo", setResourceInfo},
 
-    // Misc
-    CLuaCFunctions::AddFunction("call", call);
-    CLuaCFunctions::AddFunction("refreshResources", refreshResources);
+        // Misc
+        {"call", call},
+        {"refreshResources", refreshResources},
 
-    CLuaCFunctions::AddFunction("getResourceACLRequests", getResourceACLRequests);
+        {"getResourceACLRequests", getResourceACLRequests},
+        {"loadstring", LoadString},
+        {"load", Load},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
+
     CLuaCFunctions::AddFunction("updateResourceACLRequest", updateResourceACLRequest, true);
-    CLuaCFunctions::AddFunction("loadstring", LoadString);
-    CLuaCFunctions::AddFunction("load", Load);
 }
 
 void CLuaResourceDefs::AddClass(lua_State* luaVM)

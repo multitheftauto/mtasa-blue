@@ -142,14 +142,13 @@ class CVehicle : public CElement
 
 public:
     ZERO_ON_NEW
-    CVehicle(class CVehicleManager* pVehicleManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel, unsigned char ucVariant,
-             unsigned char ucVariant2);
+    CVehicle(class CVehicleManager* pVehicleManager, CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
     ~CVehicle(void);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
     bool IsEntity(void) { return true; }
 
     void Unlink(void);
-    bool ReadSpecialData(void);
 
     void DoPulse(void);
 
@@ -346,6 +345,9 @@ public:
     bool IsStationary(void);
     void OnRelayUnoccupiedSync(void);
     void HandleDimensionResync(void);
+
+protected:
+    bool ReadSpecialData(const int iLine) override;
 
 private:
     class CVehicleManager* m_pVehicleManager;

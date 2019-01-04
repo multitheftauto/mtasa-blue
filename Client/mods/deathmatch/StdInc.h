@@ -93,7 +93,6 @@
 #include <CElementArray.h>
 #include <CLogger.h>
 #include <CMapEventManager.h>
-#include <CClientModelManager.h>
 #include <CModelNames.h>
 #include <CIFPEngine.h>
 #include <CFileReader.h>
@@ -151,7 +150,6 @@
 #include "CEvents.h"
 #include "HeapTrace.h"
 #include "logic/CClientGame.h"
-#include "logic/CGameEntityXRefManager.h"
 #include "logic/CClientModelCacheManager.h"
 #include "logic/CClientPerfStatManager.h"
 #include "logic/CDeathmatchVehicle.h"

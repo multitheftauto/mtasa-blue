@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_CAM
-#define __CGAMESA_CAM
+#pragma once
 
 #include <game/CCam.h>
 #include "CEntitySA.h"
@@ -180,6 +179,5 @@ public:
     CVector* GetTargetHistoryPos() const { return m_pInterface->m_aTargetHistoryPos; }
 
     CEntity* GetTargetEntity() const;
+    void     SetTargetEntity(CEntity* pEntity) override;
 };
-
-#endif

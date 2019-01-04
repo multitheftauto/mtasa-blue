@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CElementRPCs_H
-#define __CElementRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
@@ -24,6 +23,7 @@ public:
     DECLARE_ELEMENT_RPC(RemoveElementData);
     DECLARE_ELEMENT_RPC(SetElementPosition);
     DECLARE_ELEMENT_RPC(SetElementVelocity);
+    DECLARE_ELEMENT_RPC(SetElementAngularVelocity);
     DECLARE_ELEMENT_RPC(SetElementInterior);
     DECLARE_ELEMENT_RPC(SetElementDimension);
     DECLARE_ELEMENT_RPC(AttachElements);
@@ -50,5 +50,3 @@ public:
     DECLARE_ELEMENT_RPC(SetWeaponConfig);
     DECLARE_ELEMENT_RPC(SetCallPropagationEnabled);
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAudioRPCs_H
-#define __CAudioRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
@@ -29,5 +28,3 @@ private:
         AUDIO_MISSION_PLAY
     };
 };
-
-#endif

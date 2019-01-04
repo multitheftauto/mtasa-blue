@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PROJECTILE
-#define __CGAMESA_PROJECTILE
+#pragma once
 
 #include <game/CProjectile.h>
 #include "CObjectSA.h"
@@ -35,5 +34,3 @@ public:
     void SetProjectileInfo(CProjectileInfo* pProjectileInfo) { projectileInfo = pProjectileInfo; }
     bool CorrectPhysics(void);
 };
-
-#endif

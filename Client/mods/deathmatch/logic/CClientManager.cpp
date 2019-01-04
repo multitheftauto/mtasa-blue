@@ -52,7 +52,6 @@ CClientManager::CClientManager(void)
     m_pWeaponManager = new CClientWeaponManager(this);
     m_pEffectManager = new CClientEffectManager(this);
     m_pPointLightsManager = new CClientPointLightsManager(this);
-    m_pModelManager = new CClientModelManager(this);
     m_pPacketRecorder = new CClientPacketRecorder(this);
 
     m_bBeingDeleted = false;
@@ -174,9 +173,6 @@ CClientManager::~CClientManager(void)
 
     delete m_pPointLightsManager;
     m_pPointLightsManager = NULL;
-
-    delete m_pModelManager;
-    m_pModelManager = nullptr;
 }
 
 //
@@ -272,16 +268,6 @@ void CClientManager::UnreferenceEntity(CClientEntity* pEntity)
     {
         m_pCamera->UnreferenceEntity(pEntity);
     }
-}
-
-CClientEntity* CClientManager::FindEntity(CEntity* pGameEntity, bool bValidatePointer)
-{
-    return g_pClientGame->GetGameEntityXRefManager()->FindClientEntity(pGameEntity);
-}
-
-CClientEntity* CClientManager::FindEntitySafe(CEntity* pGameEntity)
-{
-    return g_pClientGame->GetGameEntityXRefManager()->FindClientEntity(pGameEntity);
 }
 
 void CClientManager::OnUpdateStreamPosition(CClientStreamElement* pElement)

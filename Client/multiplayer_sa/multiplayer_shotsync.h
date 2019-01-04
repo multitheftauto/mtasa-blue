@@ -12,8 +12,7 @@
 #include "multiplayersa_init.h"
 #include <multiplayer/CMultiplayer.h>
 
-#ifndef __CMULTIPLAYERSASHOTSYNC
-#define __CMULTIPLAYERSASHOTSYNC
+#pragma once
 
 #include <game/CPlayerPed.h>
 
@@ -68,5 +67,3 @@ VOID HOOK_CWeapon_FireInstantHit();
 VOID HOOK_CWeapon_FireInstantHit_CameraMode();
 VOID HOOK_CWeapon_FireInstantHit_IsPlayer();
 VOID HOOK_CWeapon_DoBulletImpact();
-
-#endif

@@ -27,4 +27,9 @@ public:
 
     virtual void Printf(const char* szFormat, ...) = 0;
     virtual bool IsRequestingExit(void) = 0;
+
+    // Clears input buffer
+    virtual bool ClearInput(void) = 0;
+    // Prints current input buffer on a new line, clears the input buffer and resets history selection
+    virtual bool ResetInput(void) = 0;
 };

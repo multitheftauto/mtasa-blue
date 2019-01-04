@@ -4,9 +4,9 @@
  *
  *  ml_base, External lua add-on module
  *
- *  Copyright © 2003-2008 MTA.  All Rights Reserved.
+ *  Copyright Â© 2003-2018 MTA.  All Rights Reserved.
  *
- *  Grand Theft Auto is © 2002-2003 Rockstar North
+ *  Grand Theft Auto is Â© 2002-2018 Rockstar North
  *
  *  THE FOLLOWING SOURCES ARE PART OF THE MULTI THEFT
  *  AUTO SOFTWARE DEVELOPMENT KIT AND ARE RELEASED AS
@@ -18,8 +18,7 @@
 
 class CThreadData;
 
-#ifndef __CTHREADDATA_H
-#define __CTHREADDATA_H
+#pragma once
 
 #include "CThread.h"
 
@@ -33,5 +32,3 @@ public:
     ThreadMutex MutexPrimary;            // primary mutex for suspend/resume operations
     ThreadMutex MutexLogical;            // logical mutex for proper CThreadData sync
 };
-
-#endif

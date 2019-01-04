@@ -10,8 +10,7 @@
 
 class CClientPathNode;
 
-#ifndef __CCLIENTPATHNODE_H
-#define __CCLIENTPATHNODE_H
+#pragma once
 
 #include "CClientManager.h"
 
@@ -71,5 +70,3 @@ private:
 
     std::list<CClientEntity*> m_List;
 };
-
-#endif

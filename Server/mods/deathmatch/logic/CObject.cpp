@@ -13,8 +13,7 @@
 
 extern CGame* g_pGame;
 
-CObject::CObject(CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectManager, bool bIsLowLod)
-    : CElement(pParent, pNode), m_bIsLowLod(bIsLowLod), m_pLowLodObject(NULL)
+CObject::CObject(CElement* pParent, CObjectManager* pObjectManager, bool bIsLowLod) : CElement(pParent), m_bIsLowLod(bIsLowLod), m_pLowLodObject(NULL)
 {
     // Init
     m_iType = CElement::OBJECT;
@@ -29,6 +28,8 @@ CObject::CObject(CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectMana
     m_bSyncable = true;
     m_pSyncer = NULL;
     m_bIsFrozen = false;
+    m_bDoubleSided = false;
+    m_bBreakable = false;
 
     m_bCollisionsEnabled = true;
 
@@ -36,11 +37,22 @@ CObject::CObject(CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectMana
     pObjectManager->AddToList(this);
 }
 
-CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent, Copy.m_pXMLNode), m_bIsLowLod(Copy.m_bIsLowLod), m_pLowLodObject(Copy.m_pLowLodObject)
+CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Copy.m_bIsLowLod), m_pLowLodObject(Copy.m_pLowLodObject)
 {
     // Init
+    m_iType = CElement::OBJECT;
+    SetTypeName("object");
+
     m_pObjectManager = Copy.m_pObjectManager;
     m_usModel = Copy.m_usModel;
+    m_ucAlpha = Copy.m_ucAlpha;
+    m_vecScale = CVector(Copy.m_vecScale.fX, Copy.m_vecScale.fY, Copy.m_vecScale.fZ);
+    m_fHealth = Copy.m_fHealth;
+    m_bSyncable = Copy.m_bSyncable;
+    m_pSyncer = Copy.m_pSyncer;
+    m_bIsFrozen = Copy.m_bIsFrozen;
+    m_bDoubleSided = Copy.m_bDoubleSided;
+    m_bBreakable = Copy.m_bBreakable;
     m_vecPosition = Copy.m_vecPosition;
     m_vecRotation = Copy.m_vecRotation;
 
@@ -72,6 +84,11 @@ CObject::~CObject(void)
     Unlink();
 }
 
+CElement* CObject::Clone(bool* bAddEntity, CResource* pResource)
+{
+    return new CObject(*this);
+}
+
 void CObject::Unlink(void)
 {
     // Remove us from the manager's list
@@ -83,26 +100,26 @@ void CObject::Unlink(void)
         m_HighLodObjectList[0]->SetLowLodObject(NULL);
 }
 
-bool CObject::ReadSpecialData(void)
+bool CObject::ReadSpecialData(const int iLine)
 {
     // Grab the "posX" data
     if (!GetCustomDataFloat("posX", m_vecPosition.fX, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <object> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posX' attribute in <object> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posY" data
     if (!GetCustomDataFloat("posY", m_vecPosition.fY, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <object> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posY' attribute in <object> (line %d)\n", iLine);
         return false;
     }
 
     // Grab the "posZ" data
     if (!GetCustomDataFloat("posZ", m_vecPosition.fZ, true))
     {
-        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <object> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'posZ' attribute in <object> (line %d)\n", iLine);
         return false;
     }
 
@@ -125,13 +142,13 @@ bool CObject::ReadSpecialData(void)
         }
         else
         {
-            CLogger::ErrorPrintf("Bad 'model' id specified in <object> (line %u)\n", m_uiLine);
+            CLogger::ErrorPrintf("Bad 'model' id specified in <object> (line %d)\n", iLine);
             return false;
         }
     }
     else
     {
-        CLogger::ErrorPrintf("Bad/missing 'model' attribute in <object> (line %u)\n", m_uiLine);
+        CLogger::ErrorPrintf("Bad/missing 'model' attribute in <object> (line %d)\n", iLine);
         return false;
     }
 

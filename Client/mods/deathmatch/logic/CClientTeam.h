@@ -10,8 +10,7 @@
 
 class CClientTeam;
 
-#ifndef __CCLIENTTEAM_H
-#define __CCLIENTTEAM_H
+#pragma once
 
 #include "CClientEntity.h"
 #include "CClientPlayer.h"
@@ -72,5 +71,3 @@ protected:
 
     CVector m_vecPosition;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PEDDAMAGERESPONSECALCULATOR
-#define __CGAMESA_PEDDAMAGERESPONSECALCULATOR
+#pragma once
 
 #include <game/CPedDamageResponseCalculator.h>
 
@@ -41,5 +40,3 @@ private:
     CPedDamageResponseCalculatorSAInterface* m_pInterface;
     bool                                     m_bDestroyInterface;
 };
-
-#endif

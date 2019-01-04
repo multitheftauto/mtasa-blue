@@ -398,8 +398,8 @@ void CClientMarker::Callback_OnLeave(CClientColShape& Shape, CClientEntity& Enti
     {
         // Call the marker hit event
         CLuaArguments Arguments;
-        Arguments.PushElement(&Entity);                                                    // player that hit it
-        Arguments.PushBoolean((Shape.GetDimension() == Entity.GetDimension()));            // matching dimension?
+        Arguments.PushElement(&Entity);                                              // player that hit it
+        Arguments.PushBoolean((GetDimension() == Entity.GetDimension()));            // matching dimension?
         CallEvent("onClientMarkerLeave", Arguments, true);
     }
 }

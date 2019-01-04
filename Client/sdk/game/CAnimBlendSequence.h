@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimBlendSequence_H
-#define __CAnimBlendSequence_H
+#pragma once
 
 class CAnimBlendSequence
 {
@@ -28,5 +27,3 @@ public:
     virtual void                           CopySequenceProperties(CAnimBlendSequenceSAInterface* pAnimSequenceInterface) = 0;
     virtual CAnimBlendSequenceSAInterface* GetInterface(void) = 0;
 };
-
-#endif

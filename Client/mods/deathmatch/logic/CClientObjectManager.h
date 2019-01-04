@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTOBJECTMANAGER_H
-#define __CCLIENTOBJECTMANAGER_H
+#pragma once
 
 class CClientManager;
 class CClientObject;
@@ -29,8 +28,6 @@ public:
     unsigned int          Count(void) { return static_cast<unsigned int>(m_Objects.size()); };
     unsigned int          CountCreatedObjects(void) { return static_cast<unsigned int>(g_pGame->GetPools()->GetObjectCount()); };
     static CClientObject* Get(ElementID ID);
-    CClientObject*        Get(CObject* pObject, bool bValidatePointer);
-    CClientObject*        GetSafe(CEntity* pEntity);
 
     static bool IsValidModel(unsigned long ulObjectModel);
     static bool IsBreakableModel(unsigned long ulObjectModel);
@@ -68,5 +65,3 @@ protected:
     CMappedArray<CClientObject*> m_Objects;
     CMappedArray<CClientObject*> m_StreamedIn;
 };
-
-#endif

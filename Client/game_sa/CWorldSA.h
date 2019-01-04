@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_WORLD
-#define __CGAMESA_WORLD
+#pragma once
 
 #define FUNC_Add                                            0x563220 // ##SA##
 #define FUNC_Remove                                         0x563280 // ##SA##
@@ -128,5 +127,3 @@ private:
     std::map<DWORD, bool>                                     m_pAddedEntities;
     float                                                     m_fAircraftMaxHeight;
 };
-
-#endif

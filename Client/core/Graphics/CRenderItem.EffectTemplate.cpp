@@ -16,11 +16,11 @@
 // CEffectTemplate instantiation
 //
 ///////////////////////////////////////////////////////////////
-CEffectTemplate* NewEffectTemplate(CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug,
+CEffectTemplate* NewEffectTemplate(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug,
                                    HRESULT& outHResult)
 {
     CEffectTemplate* pEffectTemplate = new CEffectTemplate();
-    pEffectTemplate->PostConstruct(pManager, strFilename, strRootPath, strOutStatus, bDebug);
+    pEffectTemplate->PostConstruct(pManager, strFile, strRootPath, bIsRawData, strOutStatus, bDebug);
 
     outHResult = pEffectTemplate->m_CreateHResult;
     if (!pEffectTemplate->IsValid())
@@ -35,7 +35,7 @@ namespace
 {
     ////////////////////////////////////////////////////////////////////////////////////
     //
-    // Helper class for D3DXCreateEffectFromFile() to ensure includes are correctly found and don't go outside the resource directory
+    // Helper class for D3DXCreateEffect functions to ensure includes are correctly found and don't go outside the resource directory
     //
     ////////////////////////////////////////////////////////////////////////////////////
     class CIncludeManager : public ID3DXInclude
@@ -121,12 +121,12 @@ namespace
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplate::PostConstruct(CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug)
+void CEffectTemplate::PostConstruct(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug)
 {
     Super::PostConstruct(pManager);
 
     // Initial creation of d3d data
-    CreateUnderlyingData(strFilename, strRootPath, strOutStatus, bDebug);
+    CreateUnderlyingData(strFile, strRootPath, bIsRawData, strOutStatus, bDebug);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -201,7 +201,7 @@ void CEffectTemplate::OnResetDevice(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplate::CreateUnderlyingData(const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug)
+void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug)
 {
     assert(!m_pD3DEffect);
 
@@ -223,11 +223,13 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFilename, const SSt
     if (bDebug)
         dwFlags |= D3DXSHADER_DEBUG;
 
-    SString         strMetaPath = strFilename.Right(strFilename.length() - strRootPath.length());
+    SString         strMetaPath = bIsRawData ? "" : strFile.Right(strFile.length() - strRootPath.length());
     CIncludeManager IncludeManager(strRootPath, ExtractPath(strMetaPath));
     LPD3DXBUFFER    pBufferErrors = NULL;
-    m_CreateHResult =
-        MyD3DXCreateEffectFromFile(m_pDevice, ExtractFilename(strMetaPath), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors);
+    if (bIsRawData)
+        m_CreateHResult = MyD3DXCreateEffect(m_pDevice, strFile, strFile.length(), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors);
+    else
+        m_CreateHResult = MyD3DXCreateEffectFromFile(m_pDevice, ExtractFilename(strMetaPath), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors);
 
     // Handle compile errors
     strOutStatus = "";
@@ -342,7 +344,7 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFilename, const SSt
             {
                 SString strDisassemblyContents;
                 strDisassemblyContents.assign((const char*)pData, Size - 1);
-                FileSave(strFilename + ".dis", strDisassemblyContents);
+                FileSave(bIsRawData ? strRootPath + "raw_data.dis" : strFile + ".dis", strDisassemblyContents);
             }
 
             SAFE_RELEASE(pDisassembly);

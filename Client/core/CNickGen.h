@@ -7,8 +7,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CNICKGEN_H
-#define __CNICKGEN_H
+#pragma once
 
 #define NICKGEN_NUM_ADJECTIVES      1048
 #define NICKGEN_NUM_NOUNS           934
@@ -20,5 +19,3 @@ public:
     static const char* const m_szNouns[NICKGEN_NUM_NOUNS];
     static SString           GetRandomNickname(void);
 };
-
-#endif

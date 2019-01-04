@@ -13,25 +13,33 @@
 
 void CLuaEffectDefs::LoadFunctions(void)
 {
-    CLuaCFunctions::AddFunction("fxAddBlood", fxAddBlood);
-    CLuaCFunctions::AddFunction("fxAddWood", fxAddWood);
-    CLuaCFunctions::AddFunction("fxAddSparks", fxAddSparks);
-    CLuaCFunctions::AddFunction("fxAddTyreBurst", fxAddTyreBurst);
-    CLuaCFunctions::AddFunction("fxAddBulletImpact", fxAddBulletImpact);
-    CLuaCFunctions::AddFunction("fxAddPunchImpact", fxAddPunchImpact);
-    CLuaCFunctions::AddFunction("fxAddDebris", fxAddDebris);
-    CLuaCFunctions::AddFunction("fxAddGlass", fxAddGlass);
-    CLuaCFunctions::AddFunction("fxAddWaterHydrant", fxAddWaterHydrant);
-    CLuaCFunctions::AddFunction("fxAddGunshot", fxAddGunshot);
-    CLuaCFunctions::AddFunction("fxAddTankFire", fxAddTankFire);
-    CLuaCFunctions::AddFunction("fxAddWaterSplash", fxAddWaterSplash);
-    CLuaCFunctions::AddFunction("fxAddBulletSplash", fxAddBulletSplash);
-    CLuaCFunctions::AddFunction("fxAddFootSplash", fxAddFootSplash);
-    CLuaCFunctions::AddFunction("createEffect", CreateEffect);
-    CLuaCFunctions::AddFunction("setEffectSpeed", SetEffectSpeed);
-    CLuaCFunctions::AddFunction("getEffectSpeed", GetEffectSpeed);
-    CLuaCFunctions::AddFunction("setEffectDensity", SetEffectDensity);
-    CLuaCFunctions::AddFunction("getEffectDensity", GetEffectDensity);
+    std::map<const char*, lua_CFunction> functions{
+        {"fxAddBlood", fxAddBlood},
+        {"fxAddWood", fxAddWood},
+        {"fxAddSparks", fxAddSparks},
+        {"fxAddTyreBurst", fxAddTyreBurst},
+        {"fxAddBulletImpact", fxAddBulletImpact},
+        {"fxAddPunchImpact", fxAddPunchImpact},
+        {"fxAddDebris", fxAddDebris},
+        {"fxAddGlass", fxAddGlass},
+        {"fxAddWaterHydrant", fxAddWaterHydrant},
+        {"fxAddGunshot", fxAddGunshot},
+        {"fxAddTankFire", fxAddTankFire},
+        {"fxAddWaterSplash", fxAddWaterSplash},
+        {"fxAddBulletSplash", fxAddBulletSplash},
+        {"fxAddFootSplash", fxAddFootSplash},
+        {"createEffect", CreateEffect},
+        {"setEffectSpeed", SetEffectSpeed},
+        {"getEffectSpeed", GetEffectSpeed},
+        {"setEffectDensity", SetEffectDensity},
+        {"getEffectDensity", GetEffectDensity},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaEffectDefs::AddClass(lua_State* luaVM)

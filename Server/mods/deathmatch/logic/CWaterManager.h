@@ -21,7 +21,7 @@ public:
     CWaterManager();
     ~CWaterManager();
 
-    CWater* Create(CWater::EWaterType waterType, CElement* pParent, CXMLNode* Node = NULL, bool bShallow = false);
+    CWater* Create(CWater::EWaterType waterType, CElement* pParent, bool bShallow = false);
     CWater* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void    DeleteAll();
 

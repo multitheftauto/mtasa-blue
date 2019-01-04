@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCOLSHAPE_H
-#define __CCLIENTCOLSHAPE_H
+#pragma once
 
 #include "CClientEntity.h"
 
@@ -82,5 +81,3 @@ private:
     bool                      m_bAutoCallEvent;
     CFastList<CClientEntity*> m_Colliders;
 };
-
-#endif

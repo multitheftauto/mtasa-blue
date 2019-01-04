@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CClientStreamer_H
-#define __CClientStreamer_H
+#pragma once
 
 #include "CClientCommon.h"
 #include <list>
@@ -76,5 +75,3 @@ private:
 
     static void* pAddingElement;
 };
-
-#endif

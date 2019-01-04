@@ -6,12 +6,11 @@
  *  PURPOSE:     RenderWare interface mappings to Grand Theft Auto: San Andreas
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
- *  RenderWare is © Criterion Software
+ *  RenderWare is Â© Criterion Software
  *
  *****************************************************************************/
 
-#ifndef __GAMESA_RENDERWARE
-#define __GAMESA_RENDERWARE
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 
@@ -253,5 +252,3 @@ inline RwFrame* RwFrameFindFrame(RwFrame* parent, const char* name)
     }
     return NULL;
 }
-
-#endif

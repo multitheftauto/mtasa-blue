@@ -10,8 +10,7 @@
 
 class CClientEntity;
 
-#ifndef __CCLIENTENTITY_H
-#define __CCLIENTENTITY_H
+#pragma once
 
 #include "CElementArray.h"
 #include "CClientCommon.h"
@@ -37,7 +36,7 @@ class CClientManager;
 #define IS_PROJECTILE(entity) ((entity)->GetType()==CCLIENTPROJECTILE)
 #define IS_GUI(entity) ((entity)->GetType()==CCLIENTGUI)
 #define IS_IFP(entity) ((entity)->GetType()==CCLIENTIFP)
-#define CHECK_CGUI(entity,type) (((CClientGUIElement*)entity)->GetCGUIElement()->GetType()==type)
+#define CHECK_CGUI(entity,type) (((CClientGUIElement*)entity)->GetCGUIElement()->GetType()==(type))
 
 enum eClientEntityType
 {
@@ -154,6 +153,8 @@ public:
 
     virtual eClientEntityType GetType(void) const = 0;
     bool                      IsLocalEntity(void) { return m_ID >= MAX_SERVER_ELEMENTS; };
+    bool                      IsSmartPointer() { return m_bSmartPointer; }
+    void                      SetSmartPointer(bool bSmartPointer) { m_bSmartPointer = bSmartPointer; }
 
     // System entity? A system entity means it can't be removed by the server
     // or the client scripts.
@@ -341,6 +342,7 @@ private:
     unsigned int m_uiTypeHash;
     SString      m_strTypeName;
     SString      m_strName;
+    bool         m_bSmartPointer;
 
 protected:
     unsigned char m_ucSyncTimeContext;
@@ -383,5 +385,3 @@ private:
     static void _GetEntitiesFromRoot(unsigned int uiTypeHash, std::map<CClientEntity*, int>& mapResults);
 #endif
 };
-
-#endif

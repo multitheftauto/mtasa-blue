@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTVEHICLEMANAGER_H
-#define __CCLIENTVEHICLEMANAGER_H
+#pragma once
 
 #include "CClientVehicle.h"
 
@@ -29,8 +28,6 @@ public:
 
     unsigned int           Count(void) { return static_cast<unsigned int>(m_List.size()); };
     static CClientVehicle* Get(ElementID ID);
-    CClientVehicle*        Get(CVehicle* pVehicle, bool bValidatePointer);
-    CClientVehicle*        GetSafe(CEntity* pEntity);
     CClientVehicle*        GetClosest(CVector& vecPosition, float fRadius);
 
     void DoPulse(void);
@@ -77,5 +74,3 @@ protected:
     CMappedArray<CClientVehicle*> m_List;
     CMappedArray<CClientVehicle*> m_StreamedIn;
 };
-
-#endif

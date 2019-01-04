@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CXMLARRAY_H
-#define __CXMLARRAY_H
+#pragma once
 
 class CXMLCommon;
 
@@ -34,5 +33,3 @@ private:
     static std::vector<CXMLCommon*> m_Elements;
     static unsigned long            m_ulCapacity;
 };
-
-#endif

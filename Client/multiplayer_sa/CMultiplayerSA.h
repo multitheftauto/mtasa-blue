@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMULTIPLAYERSA
-#define __CMULTIPLAYERSA
+#pragma once
 
 #include <game/CGame.h>
 #include <multiplayer/CMultiplayer.h>
@@ -66,10 +65,13 @@ public:
     void                InitHooks_ClothesCache(void);
     void                InitHooks_Files(void);
     void                InitHooks_Weapons(void);
+    void                InitHooks_Peds();
+    void                InitHooks_VehicleCollision();
     void                InitHooks_Rendering(void);
     void                InitHooks_LicensePlate(void);
     void                InitHooks_VehicleLights(void);
     void                InitHooks_VehicleDamage(void);
+    void                InitHooks_VehicleWeapons();
     void                InitHooks_Direct3D(void);
     void                InitHooks_FixLineOfSightArgs(void);
     CRemoteDataStorage* CreateRemoteDataStorage();
@@ -78,6 +80,8 @@ public:
     CRemoteDataStorage* GetRemoteDataStorage(CPlayerPed* pPed);
     void                RemoveRemoteDataStorage(CPlayerPed* pPed);
     void                EnableHooks_ClothesMemFix(bool bEnable);
+
+    void InitializeAnimationHooks(bool bIsHostSmotra);
 
     CPed* GetContextSwitchedPed(void);
 
@@ -109,6 +113,7 @@ public:
     void SetIdleHandler(IdleHandler* pHandler);
     void SetPreFxRenderHandler(PreFxRenderHandler* pHandler);
     void SetPreHudRenderHandler(PreHudRenderHandler* pHandler);
+    void DisableCallsToCAnimBlendNode(bool bDisableCalls);
     void SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler);
     void SetAddAnimationHandler(AddAnimationHandler* pHandler);
     void SetAddAnimationAndSyncHandler(AddAnimationAndSyncHandler* pHandler);
@@ -130,6 +135,8 @@ public:
     void SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler);
     void SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler);
     void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler);
+    void SetPedStepHandler(PedStepHandler* pHandler);
+    void SetVehicleWeaponHitHandler(VehicleWeaponHitHandler* pHandler) override;
 
     void  AllowMouseMovement(bool bAllow);
     void  DoSoundHacksOnLostFocus(bool bLostFocus);
@@ -273,6 +280,10 @@ public:
     void SetBoatWaterSplashEnabled(bool bEnabled);
     void SetTyreSmokeEnabled(bool bEnabled);
 
+    void  SetLastStaticAnimationPlayed(DWORD dwGroupID, DWORD dwAnimID) { m_dwLastStaticAnimGroupID = dwGroupID; m_dwLastStaticAnimID = dwAnimID; }
+    DWORD GetLastStaticAnimationGroupID() { return m_dwLastStaticAnimGroupID; }
+    DWORD GetLastStaticAnimationID() { return m_dwLastStaticAnimID; }
+
     CVector      m_vecAkimboTarget;
     bool         m_bAkimboTargetUp;
     static char* ms_PlayerImgCachePtr;
@@ -293,6 +304,8 @@ private:
     bool                m_bHeatHazeCustomized;
     float               m_fNearClipDistance;
     float               m_fMaddDoggPoolLevel;
+    DWORD               m_dwLastStaticAnimGroupID;
+    DWORD               m_dwLastStaticAnimID;
 
     /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
         VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);
@@ -337,5 +350,3 @@ private:
 
     static unsigned long FUNC_CPlayerInfoBase;
 };
-
-#endif

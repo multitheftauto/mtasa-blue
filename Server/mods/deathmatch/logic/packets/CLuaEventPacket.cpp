@@ -33,7 +33,8 @@ bool CLuaEventPacket::Read(NetBitStreamInterface& BitStream)
         {
             // Faster than using a constructor
             m_ArgumentsStore.DeleteArguments();
-            m_ArgumentsStore.ReadFromBitStream(BitStream);
+            if(!m_ArgumentsStore.ReadFromBitStream(BitStream))
+                return false;
             m_pArguments = &m_ArgumentsStore;
 
             return true;

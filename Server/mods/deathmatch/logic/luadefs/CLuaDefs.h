@@ -34,13 +34,13 @@
 
 // Used by script handlers to verify elements
 #define SCRIPT_VERIFY_BLIP(blip) (m_pBlipManager->Exists(blip)&&!blip->IsBeingDeleted())
-#define SCRIPT_VERIFY_ELEMENT(element) (element!=NULL&&m_pRootElement->IsMyChild(element,true)&&!element->IsBeingDeleted())
-#define SCRIPT_VERIFY_ENTITY(entity) (entity!=NULL&&m_pRootElement->IsMyChild(entity,true)&&entity->IsEntity()&&!entity->IsBeingDeleted())
+#define SCRIPT_VERIFY_ELEMENT(element) ((element)!=NULL&&m_pRootElement->IsMyChild((element),true)&&!element->IsBeingDeleted())
+#define SCRIPT_VERIFY_ENTITY(entity) ((entity)!=NULL&&m_pRootElement->IsMyChild((entity),true)&&entity->IsEntity()&&!entity->IsBeingDeleted())
 #define SCRIPT_VERIFY_MARKER(marker) (m_pMarkerManager->Exists(marker)&&!marker->IsBeingDeleted())
 #define SCRIPT_VERIFY_OBJECT(object) (m_pObjectManager->Exists(object)&&!object->IsBeingDeleted())
 #define SCRIPT_VERIFY_PICKUP(pickup) (m_pPickupManager->Exists(pickup)&&!pickup->IsBeingDeleted())
 #define SCRIPT_VERIFY_PLAYER(player) (m_pPlayerManager->Exists(player)&&!player->IsBeingDeleted())
-#define SCRIPT_VERIFY_FUNCTION(func) (func!=LUA_REFNIL)
+#define SCRIPT_VERIFY_FUNCTION(func) ((func)!=LUA_REFNIL)
 #define SCRIPT_VERIFY_RADAR_AREA(radararea) (m_pRadarAreaManager->Exists(radararea)&&!radararea->IsBeingDeleted())
 #define SCRIPT_VERIFY_VEHICLE(vehicle) (m_pVehicleManager->Exists(vehicle)&&!vehicle->IsBeingDeleted())
 #define SCRIPT_VERIFY_TIMER(timer) (luaMain->GetTimerManager ()->Exists(timer))

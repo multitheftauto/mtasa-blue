@@ -274,7 +274,7 @@ eHandlingTypes CHandlingManager::GetHandlingID(eVehicleTypes eModel)
         case VT_SEASPAR:
             return HT_SEASPAR;
         case VT_PIZZABOY:
-            return HT_MOPED;
+            return HT_PIZZABOY;
         case VT_TRAM:
             return HT_TRAM;
         case VT_ARTICT2:
@@ -302,7 +302,7 @@ eHandlingTypes CHandlingManager::GetHandlingID(eVehicleTypes eModel)
         case VT_PCJ600:
             return HT_BIKE;
         case VT_FAGGIO:
-            return HT_MOPED;
+            return HT_FAGGIO;
         case VT_FREEWAY:
             return HT_FREEWAY;
         case VT_RCBARON:
@@ -382,13 +382,13 @@ eHandlingTypes CHandlingManager::GetHandlingID(eVehicleTypes eModel)
         case VT_RCGOBLIN:
             return HT_RCGOBLIN;
         case VT_HOTRINA:
-            return HT_HOTRING;
+            return HT_HOTRINA;
         case VT_HOTRINB:
-            return HT_HOTRING;
+            return HT_HOTRINB;
         case VT_BLOODRA:
             return HT_BLOODRA;
         case VT_RNCHLURE:
-            return HT_RANCHER;
+            return HT_RNCHLURE;
         case VT_SUPERGT:
             return HT_SUPERGT;
         case VT_ELEGANT:
@@ -466,7 +466,7 @@ eHandlingTypes CHandlingManager::GetHandlingID(eVehicleTypes eModel)
         case VT_SADLER:
             return HT_SADLER;
         case VT_FIRELA:
-            return HT_FIRETRUK;
+            return HT_FIRELA;
         case VT_HUSTLER:
             return HT_HUSTLER;
         case VT_INTRUDER:
@@ -558,7 +558,7 @@ eHandlingTypes CHandlingManager::GetHandlingID(eVehicleTypes eModel)
         case VT_CLUB:
             return HT_CLUB;
         case VT_FREIBOX:
-            return HT_FREIFLAT;
+            return HT_FREIBOX;
         case VT_ARTICT3:
             return HT_ARTICT3;
         case VT_ANDROM:
@@ -586,9 +586,9 @@ eHandlingTypes CHandlingManager::GetHandlingID(eVehicleTypes eModel)
         case VT_PHOENIX:
             return HT_PHOENIX;
         case VT_GLENSHIT:
-            return HT_GLENDALE;
+            return HT_GLENSHIT;
         case VT_SADLSHIT:
-            return HT_SADLER;
+            return HT_SADLSHIT;
         case VT_BAGBOXA:
             return HT_BAGBOXA;
         case VT_BAGBOXB:
@@ -8173,4 +8173,28 @@ void CHandlingManager::InitializeDefaultHandlings(void)
     m_OriginalHandlingData[209].ucHeadLight = 0;
     m_OriginalHandlingData[209].ucTailLight = 1;
     m_OriginalHandlingData[209].ucAnimGroup = 0;
+
+    m_OriginalHandlingData[210] = m_OriginalHandlingData[69];   // HT_HOTRINA = HT_HOTRING
+    m_OriginalHandlingData[210].iVehicleID = 210;
+
+    m_OriginalHandlingData[211] = m_OriginalHandlingData[69];   // HT_HOTRINB = HT_HOTRING
+    m_OriginalHandlingData[211].iVehicleID = 211;
+
+    m_OriginalHandlingData[212] = m_OriginalHandlingData[103];  // HT_SADLSHIT = HT_SADLER
+    m_OriginalHandlingData[212].iVehicleID = 212;
+
+    m_OriginalHandlingData[213] = m_OriginalHandlingData[52];   // HT_GLENSHIT = HT_GLENDALE
+    m_OriginalHandlingData[213].iVehicleID = 213;
+
+    m_OriginalHandlingData[214] = m_OriginalHandlingData[163];  // HT_FAGGIO = HT_PIZZABOY
+    m_OriginalHandlingData[214].iVehicleID = 214;
+
+    m_OriginalHandlingData[215] = m_OriginalHandlingData[7];    // HT_FIRELA = HT_FIRETRUK
+    m_OriginalHandlingData[215].iVehicleID = 215;
+
+    m_OriginalHandlingData[216] = m_OriginalHandlingData[65];   // HT_RNCHLURE = HT_RANCHER
+    m_OriginalHandlingData[216].iVehicleID = 216;
+
+    m_OriginalHandlingData[217] = m_OriginalHandlingData[126];  // HT_FREIBOX = HT_FREIFLAT
+    m_OriginalHandlingData[217].iVehicleID = 217;
 }

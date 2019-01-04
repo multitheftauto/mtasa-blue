@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_EXPLOSION
-#define __CGAMESA_EXPLOSION
+#pragma once
 
 #include <game/CExplosion.h>
 #include "CEntitySA.h"
@@ -66,5 +65,3 @@ public:
     float          GetExplosionRadius(void);
     void           SetExplosionRadius(float fRadius);
 };
-
-#endif

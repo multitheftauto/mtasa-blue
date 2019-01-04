@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CStreamingSA_H
-#define __CStreamingSA_H
+#pragma once
 
 #include <game/CStreaming.h>
 #include "Common.h"
@@ -29,5 +28,3 @@ public:
     BOOL HasModelLoaded(DWORD dwModelID);
     void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel);
 };
-
-#endif

@@ -296,18 +296,24 @@ bool CGameSA::IsInForeground()
     return *VAR_IsForegroundWindow;
 }
 
-CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
+CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID)
 {
-    DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)");
+    DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID )");
     if (dwModelID < MODELINFO_MAX)
     {
-        if (ModelInfo[dwModelID].IsValid() || bCanBeInvalid)
+        if (ModelInfo[dwModelID].IsValid())
         {
             return &ModelInfo[dwModelID];
         }
-        return nullptr;
+        else
+        {
+            return NULL;
+        }
     }
-    return nullptr;
+    else
+    {
+        return NULL;
+    }
 }
 
 /**
@@ -344,17 +350,9 @@ eSystemState CGameSA::GetSystemState()
  * This adds the local player to the ped pool, nothing else
  * @return BOOL TRUE if success, FALSE otherwise
  */
-BOOL CGameSA::InitLocalPlayer()
+BOOL CGameSA::InitLocalPlayer(CClientPed* pClientPed)
 {
     DEBUG_TRACE("BOOL CGameSA::InitLocalPlayer(  )");
-
-    // Added by ChrML - Looks like it isn't safe to call this more than once but mod code might do
-    static bool bAlreadyInited = false;
-    if (bAlreadyInited)
-    {
-        return TRUE;
-    }
-    bAlreadyInited = true;
 
     CPoolsSA* pools = (CPoolsSA*)this->GetPools();
     if (pools)
@@ -364,7 +362,8 @@ BOOL CGameSA::InitLocalPlayer()
 
         if (pInterface)
         {
-            pools->AddPed((DWORD*)pInterface);
+            pools->ResetPedPoolCount();
+            pools->AddPed(pClientPed, (DWORD*)pInterface);
             return TRUE;
         }
 
@@ -465,8 +464,8 @@ void CGameSA::Reset(void)
         m_pHud->Disable(false);
         m_pHud->SetComponentVisible(HUD_ALL, true);
 
-        // Restore model exhaust fumes positions
-        CModelInfoSA::ResetAllVehicleExhaustFumes();
+        // Restore model dummies' positions
+        CModelInfoSA::ResetAllVehicleDummies();
     }
 }
 

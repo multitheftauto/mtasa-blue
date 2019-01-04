@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIMEMO_H
-#define __CGUIMEMO_H
+#pragma once
 
 #include "CGUIElement.h"
 #include "CGUICallback.h"
@@ -41,5 +40,3 @@ public:
 
     virtual void SetTextChangedHandler(const GUI_CALLBACK& Callback) = 0;
 };
-
-#endif

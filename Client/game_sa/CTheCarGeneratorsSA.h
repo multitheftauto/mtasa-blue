@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_THECARGENERATORS
-#define __CGAMESA_THECARGENERATORS
+#pragma once
 
 #include <game/CTheCarGenerators.h>
 #include "Common.h"
@@ -32,5 +31,3 @@ public:
 
     CCarGenerator* GetCarGenerator(DWORD dwIndex);
 };
-
-#endif

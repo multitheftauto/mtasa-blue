@@ -40,6 +40,11 @@ CClientObject::CClientObject(CClientManager* pManager, ElementID ID, unsigned sh
     m_bBreakingDisabled = false;
     m_bRespawnEnabled = true;
     m_fMass = -1.0f;
+    m_fTurnMass = -1.0f;
+    m_fAirResistance = -1.0f;
+    m_fElasticity = -1.0f;
+    m_fBuoyancyConstant = -1.0f;
+    m_vecCenterOfMass = CVector(0.0f, 0.0f, 0.0f);
 
     m_pModelInfo = g_pGame->GetModelInfo(usModel);
 
@@ -167,6 +172,17 @@ void CClientObject::SetRotationRadians(const CVector& vecRotation)
 
     // Store it in our datastruct
     m_vecRotation = vecRotation;
+}
+
+void CClientObject::AttachTo(CClientEntity* pEntity)
+{
+    CClientEntity::AttachTo(pEntity);
+
+    if (m_pAttachedToEntity)
+    {
+        DoAttaching();
+        UpdateStreamPosition(m_vecPosition);
+    }
 }
 
 void CClientObject::GetOrientation(CVector& vecPosition, CVector& vecRotationRadians)
@@ -480,7 +496,7 @@ void CClientObject::Create(void)
             g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest(!CClientObjectManager::IsBreakableModel(m_usModel));
 
             // Create the object
-            m_pObject = g_pGame->GetPools()->AddObject(m_usModel, m_bIsLowLod, m_bBreakingDisabled);
+            m_pObject = g_pGame->GetPools()->AddObject(this, m_usModel, m_bIsLowLod, m_bBreakingDisabled);
 
             // Restore default behaviour
             g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest(false);
@@ -489,9 +505,6 @@ void CClientObject::Create(void)
             {
                 // Put our pointer in its stored pointer
                 m_pObject->SetStoredPointer(this);
-
-                // Add XRef
-                g_pClientGame->GetGameEntityXRefManager()->AddEntityXRef(this, m_pObject);
 
                 // Apply our data to the object
                 m_pObject->Teleport(m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ);
@@ -511,9 +524,19 @@ void CClientObject::Create(void)
                 SetAlpha(m_ucAlpha);
                 m_pObject->SetHealth(m_fHealth);
 
-                // Set object mass
+                // Set object properties
                 if (m_fMass != -1.0f)
                     m_pObject->SetMass(m_fMass);
+                if (m_fTurnMass != -1.0f)
+                    m_pObject->SetTurnMass(m_fTurnMass);
+                if (m_fAirResistance != -1.0f)
+                    m_pObject->SetAirResistance(m_fAirResistance);
+                if (m_fElasticity != -1.0f)
+                    m_pObject->SetElasticity(m_fElasticity);
+                if (m_fBuoyancyConstant != -1.0f)
+                    m_pObject->SetBuoyancyConstant(m_fBuoyancyConstant);
+                if (m_vecCenterOfMass.fX != 0.0f || m_vecCenterOfMass.fY != 0.0f || m_vecCenterOfMass.fZ != 0.0f)
+                    m_pObject->SetCenterOfMass(m_vecCenterOfMass);
 
                 // Reattach to an entity + any entities attached to this
                 ReattachEntities();
@@ -546,9 +569,6 @@ void CClientObject::Destroy(void)
     {
         // Invalidate
         m_pManager->InvalidateEntity(this);
-
-        // Remove XRef
-        g_pClientGame->GetGameEntityXRefManager()->RemoveEntityXRef(this, m_pObject);
 
         // Destroy the object
         g_pGame->GetPools()->RemoveObject(m_pObject);
@@ -728,6 +748,86 @@ void CClientObject::SetMass(float fMass)
         m_pObject->SetMass(fMass);
 
     m_fMass = fMass;
+}
+
+float CClientObject::GetTurnMass(void)
+{
+    if (m_pObject)
+        return m_pObject->GetTurnMass();
+
+    return m_fTurnMass;
+}
+
+void CClientObject::SetTurnMass(float fTurnMass)
+{
+    if (m_pObject)
+        m_pObject->SetTurnMass(fTurnMass);
+
+    m_fTurnMass = fTurnMass;
+}
+
+float CClientObject::GetAirResistance(void)
+{
+    if (m_pObject)
+        return m_pObject->GetAirResistance();
+
+    return m_fAirResistance;
+}
+
+void CClientObject::SetAirResistance(float fAirResistance)
+{
+    if (m_pObject)
+        m_pObject->SetAirResistance(fAirResistance);
+
+    m_fAirResistance = fAirResistance;
+}
+
+float CClientObject::GetElasticity(void)
+{
+    if (m_pObject)
+        return m_pObject->GetElasticity();
+
+    return m_fElasticity;
+}
+
+void CClientObject::SetElasticity(float fElasticity)
+{
+    if (m_pObject)
+        m_pObject->SetElasticity(fElasticity);
+
+    m_fElasticity = fElasticity;
+}
+
+float CClientObject::GetBuoyancyConstant(void)
+{
+    if (m_pObject)
+        return m_pObject->GetBuoyancyConstant();
+
+    return m_fBuoyancyConstant;
+}
+
+void CClientObject::SetBuoyancyConstant(float fBuoyancyConstant)
+{
+    if (m_pObject)
+        m_pObject->SetBuoyancyConstant(fBuoyancyConstant);
+
+    m_fBuoyancyConstant = fBuoyancyConstant;
+}
+
+void CClientObject::GetCenterOfMass(CVector& vecCenterOfMass) const
+{
+    if (m_pObject)
+        m_pObject->GetCenterOfMass(vecCenterOfMass);
+    else
+        vecCenterOfMass = m_vecCenterOfMass;
+}
+
+void CClientObject::SetCenterOfMass(const CVector& vecCenterOfMass)
+{
+    if (m_pObject)
+        m_pObject->SetCenterOfMass(const_cast<CVector&>(vecCenterOfMass));
+
+    m_vecCenterOfMass = vecCenterOfMass;
 }
 
 void CClientObject::SetVisibleInAllDimensions(bool bVisible, unsigned short usNewDimension)

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIMESSAGEBOX_IMPL_H
-#define __CGUIMESSAGEBOX_IMPL_H
+#pragma once
 
 #include <gui/CGUIMessageBox.h>
 #include "CGUIButton_Impl.h"
@@ -44,5 +43,3 @@ private:
 
     bool m_bAutoDestroy;
 };
-
-#endif

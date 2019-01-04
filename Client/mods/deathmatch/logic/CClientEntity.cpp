@@ -28,6 +28,7 @@ CClientEntity::CClientEntity(ElementID ID) : ClassInit(this)
     m_bDoubleSided = false;
     m_bDoubleSidedInit = false;
     m_bCallPropagationEnabled = true;
+    m_bSmartPointer = false;
 
     // Need to generate a clientside ID?
     if (ID == INVALID_ELEMENT_ID)
@@ -53,8 +54,6 @@ CClientEntity::CClientEntity(ElementID ID) : ClassInit(this)
 
     m_pElementGroup = NULL;
     m_pModelInfo = NULL;
-
-    g_pClientGame->GetGameEntityXRefManager()->OnClientEntityCreate(this);
 
     m_bWorldIgnored = false;
     g_pCore->UpdateDummyProgress();
@@ -159,7 +158,6 @@ CClientEntity::~CClientEntity(void)
     if (!g_pClientGame->IsBeingDeleted())
         CClientEntityRefManager::OnEntityDelete(this);
 
-    g_pClientGame->GetGameEntityXRefManager()->OnClientEntityDelete(this);
     SAFE_RELEASE(m_pChildrenListSnapshot);
     g_pCore->GetGraphics()->GetRenderItemManager()->RemoveClientEntityRefs(this);
     g_pCore->UpdateDummyProgress();
@@ -1217,7 +1215,7 @@ bool CClientEntity::IsStatic(void)
     CEntity* pEntity = GetGameEntity();
     if (pEntity)
     {
-        return (pEntity->IsStatic() == TRUE);
+        return pEntity->IsStatic();
     }
     return false;
 }

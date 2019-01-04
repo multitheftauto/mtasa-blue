@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUISCROLLBAR_IMPL_H
-#define __CGUISCROLLBAR_IMPL_H
+#pragma once
 
 #include <gui/CGUIScrollBar.h>
 #include "CGUIElement_Impl.h"
@@ -35,5 +34,3 @@ private:
 
     GUI_CALLBACK m_OnScroll;
 };
-
-#endif
