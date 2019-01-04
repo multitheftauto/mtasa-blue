@@ -93,7 +93,7 @@ void CLuaAudioDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setProperties", "setSoundProperties");
 
     lua_classfunction(luaVM, "getLength", "getSoundLength");
-    lua_classfunction(luaVM, "isLoop", "isSoundLooped");
+    lua_classfunction(luaVM, "isLooped", "isSoundLooped");
     lua_classfunction(luaVM, "getMetaTags", "getSoundMetaTags");
     lua_classfunction(luaVM, "getBPM", "getSoundBPM");
     lua_classfunction(luaVM, "getFFTData", "getSoundFFTData");
