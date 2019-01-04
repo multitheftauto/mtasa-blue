@@ -87,8 +87,8 @@ private:
     class CResourceManager* m_pResourceManager;
 
 public:
-    CIncludedResources(CResourceManager* pResourceManager, const std::string& strResourceName, SVersion svMinVersion, SVersion svMaxVersion, unsigned int uiMinVersion,
-                       unsigned int uiMaxVersion, CResource* pOwner)
+    CIncludedResources(CResourceManager* pResourceManager, const std::string& strResourceName, SVersion svMinVersion, SVersion svMaxVersion,
+                       unsigned int uiMinVersion, unsigned int uiMaxVersion, CResource* pOwner)
     {
         m_pResourceManager = pResourceManager;
         m_pOwner = pOwner;
@@ -124,10 +124,10 @@ public:
 enum class EResourceStatus
 {
     None,
-    Loaded,     // its been loaded successfully (i.e. meta parsed ok), included resources loaded ok
-    Starting,   // the resource is starting
-    Running,    // resource items are running
-    Stopping,   // the resource is stopping
+    Loaded,              // its been loaded successfully (i.e. meta parsed ok), included resources loaded ok
+    Starting,            // the resource is starting
+    Running,             // resource items are running
+    Stopping,            // the resource is stopping
 };
 
 class CResource : public EHS
@@ -168,8 +168,8 @@ public:
     /* Remove any included file from this loaded resource */
     bool RemoveFile(const char* szName);
 
-    bool Start(list<CResource*>* dependents = nullptr, bool bStartManually = false, bool bStartIncludedResources = true, bool bConfigs = true, bool bMaps = true,
-               bool bScripts = true, bool bHTML = true, bool bClientConfigs = true, bool bClientScripts = true, bool bClientFiles = true);
+    bool Start(std::list<CResource*>* dependents = nullptr, bool bStartManually = false, bool bStartIncludedResources = true, bool bConfigs = true,
+               bool bMaps = true, bool bScripts = true, bool bHTML = true, bool bClientConfigs = true, bool bClientScripts = true, bool bClientFiles = true);
     bool Stop(bool bStopManually = false);
 
     bool IsClientConfigsOn() { return m_bClientConfigs; }
@@ -209,8 +209,8 @@ public:
     bool            IsStopping() const noexcept { return m_eStatus == EResourceStatus::Stopping; }
     bool            HasStarted() const noexcept { return m_eStatus == EResourceStatus::Running; }
 
-    const SString&             GetName() { return m_strResourceName; }
-    CLuaMain*                  GetVirtualMachine() { return m_pVM; }
+    const SString& GetName() { return m_strResourceName; }
+    CLuaMain*      GetVirtualMachine() { return m_pVM; }
 
     void AddDependent(CResource* pResource);
     void RemoveDependent(CResource* pResource);

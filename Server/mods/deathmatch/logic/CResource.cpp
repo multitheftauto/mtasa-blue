@@ -154,8 +154,8 @@ bool CResource::Load()
             g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
 
             // Show error
-            m_strFailureReason = SString("Couldn't find resource archive or directory (%s) for resource '%s'.\n", m_strResourceDirectoryPath.c_str(),
-                                            m_strResourceName.c_str());
+            m_strFailureReason =
+                SString("Couldn't find resource archive or directory (%s) for resource '%s'.\n", m_strResourceDirectoryPath.c_str(), m_strResourceName.c_str());
             CLogger::ErrorPrintf(m_strFailureReason);
             return false;
         }
@@ -759,15 +759,15 @@ bool CResource::GetCompatibilityStatus(SString& strOutStatus)
     return true;
 }
 
-bool CResource::Start(std::list<CResource*>* dependents, bool bStartedManually, bool bStartIncludedResources, bool bConfigs, bool bMaps, bool bScripts, bool bHTML,
-                      bool bClientConfigs, bool bClientScripts, bool bClientFiles)
+bool CResource::Start(std::list<CResource*>* dependents, bool bStartedManually, bool bStartIncludedResources, bool bConfigs, bool bMaps, bool bScripts,
+                      bool bHTML, bool bClientConfigs, bool bClientScripts, bool bClientFiles)
 {
     if (m_eStatus == EResourceStatus::Running)
         return true;
 
     if (m_eStatus != EResourceStatus::Loaded)
         return false;
-    
+
     m_eStatus = EResourceStatus::Starting;
 
     CLuaArguments PreStartArguments;
@@ -785,7 +785,7 @@ bool CResource::Start(std::list<CResource*>* dependents, bool bStartedManually, 
     {
         m_bDoneUpgradeWarnings = true;
         CResourceChecker().LogUpgradeWarnings(this, m_strResourceZip, m_strMinClientReqFromSource, m_strMinServerReqFromSource, m_strMinClientReason,
-                                                m_strMinServerReason);
+                                              m_strMinServerReason);
     }
 
     // MTA version check
@@ -953,7 +953,7 @@ bool CResource::Start(std::list<CResource*>* dependents, bool bStartedManually, 
                     else
                     {
                         CLogger::LogPrintf("WARNING: Included resource %s has changed but unable to reload due to resource already being in use\n",
-                                            pIncluded->GetName().c_str());
+                                           pIncluded->GetName().c_str());
                     }
                 }
 
@@ -1007,7 +1007,7 @@ bool CResource::Start(std::list<CResource*>* dependents, bool bStartedManually, 
 
     // Sort by priority, for start grouping on the client
     m_StartedResources.sort([](CResource* a, CResource* b) { return a->m_iDownloadPriorityGroup > b->m_iDownloadPriorityGroup; });
-    
+
     return true;
 }
 
@@ -1355,9 +1355,9 @@ bool CResource::IsFilenameUsed(const SString& strFilename, bool bClient)
     {
         if (strFilename.CompareI(pResourceFile->GetName()))
         {
-            bool bIsClientFile =
-                (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT || pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG ||
-                 pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE);
+            bool bIsClientFile = (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT ||
+                                  pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG ||
+                                  pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE);
 
             if (bIsClientFile == bClient)
             {
@@ -1444,8 +1444,7 @@ bool CResource::ReadIncludedHTML(CXMLNode* pRoot)
                 // This one is supposed to be default, but there's already a default page
                 if (bFoundDefault && bIsDefault)
                 {
-                    CLogger::LogPrintf("Only one html item can be default per resource, ignoring %s in %s\n", strFilename.c_str(),
-                                        m_strResourceName.c_str());
+                    CLogger::LogPrintf("Only one html item can be default per resource, ignoring %s in %s\n", strFilename.c_str(), m_strResourceName.c_str());
                     bIsDefault = false;
                 }
 
@@ -1454,8 +1453,8 @@ bool CResource::ReadIncludedHTML(CXMLNode* pRoot)
                     bFoundDefault = true;
 
                 // Create a new resource HTML file and add it to the list
-                auto pResourceFile = new CResourceHTMLItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, bIsDefault, bIsRaw,
-                                                                bIsRestricted, m_bOOPEnabledInMetaXml);
+                auto pResourceFile = new CResourceHTMLItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, bIsDefault, bIsRaw, bIsRestricted,
+                                                           m_bOOPEnabledInMetaXml);
                 m_ResourceFiles.push_back(pResourceFile);
 
                 // This is the first HTML file? Remember it
@@ -1523,8 +1522,7 @@ bool CResource::ReadIncludedConfigs(CXMLNode* pRoot)
 
             if (bClient && IsFilenameUsed(strFilename, true))
             {
-                CLogger::LogPrintf("WARNING: Ignoring duplicate client config file in resource '%s': '%s'\n", m_strResourceName.c_str(),
-                                    strFilename.c_str());
+                CLogger::LogPrintf("WARNING: Ignoring duplicate client config file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
                 bClient = false;
             }
             if (bServer && IsFilenameUsed(strFilename, false))
@@ -1551,8 +1549,7 @@ bool CResource::ReadIncludedConfigs(CXMLNode* pRoot)
         }
         else
         {
-            CLogger::LogPrintf("WARNING: Missing 'src' attribute from 'config' node of 'meta.xml' for resource '%s', ignoring\n",
-                                m_strResourceName.c_str());
+            CLogger::LogPrintf("WARNING: Missing 'src' attribute from 'config' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
         }
     }
 
@@ -1697,13 +1694,13 @@ bool CResource::ReadIncludedExports(CXMLNode* pRoot)
             else
             {
                 CLogger::ErrorPrintf("WARNING: Empty 'function' attribute of 'export' node of 'meta.xml' for resource '%s', ignoring\n",
-                                        m_strResourceName.c_str());
+                                     m_strResourceName.c_str());
             }
         }
         else
         {
             CLogger::LogPrintf("WARNING: Missing 'function' attribute from 'export' node of 'meta.xml' for resource '%s', ignoring\n",
-                                m_strResourceName.c_str());
+                               m_strResourceName.c_str());
         }
     }
 
@@ -1752,8 +1749,7 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
 
             if (bClient && IsFilenameUsed(strFilename, true))
             {
-                CLogger::LogPrintf("WARNING: Ignoring duplicate client script file in resource '%s': '%s'\n", m_strResourceName.c_str(),
-                                    strFilename.c_str());
+                CLogger::LogPrintf("WARNING: Ignoring duplicate client script file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
                 bClient = false;
             }
             if (bServer && IsFilenameUsed(strFilename, false))
@@ -1779,8 +1775,7 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
         }
         else
         {
-            CLogger::LogPrintf("WARNING: Missing 'src' attribute from 'script' node of 'meta.xml' for resource '%s', ignoring\n",
-                                m_strResourceName.c_str());
+            CLogger::LogPrintf("WARNING: Missing 'src' attribute from 'script' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
         }
     }
 
@@ -1795,7 +1790,7 @@ bool CResource::ReadIncludedMaps(CXMLNode* pRoot)
     for (CXMLNode* pMap = pRoot->FindSubNode("map", i); pMap != nullptr; pMap = pRoot->FindSubNode("map", ++i))
     {
         CXMLAttributes& Attributes = pMap->GetAttributes();
-         
+
         // Grab the dimension attribute
         int            iDimension = 0;
         CXMLAttribute* pDimension = Attributes.Find("dimension");
@@ -2038,8 +2033,8 @@ bool CResource::RemoveFile(const char* szName)
             // Grab the tag name
             const std::string& strTempBuffer = pNode->GetTagName();
 
-            if (!stricmp(strTempBuffer.c_str(), "map") || !stricmp(strTempBuffer.c_str(), "config") ||
-                !stricmp(strTempBuffer.c_str(), "script") || !stricmp(strTempBuffer.c_str(), "html"))
+            if (!stricmp(strTempBuffer.c_str(), "map") || !stricmp(strTempBuffer.c_str(), "config") || !stricmp(strTempBuffer.c_str(), "script") ||
+                !stricmp(strTempBuffer.c_str(), "html"))
             {
                 // Grab the src attribute? Same name?
                 CXMLAttribute* pAttrib = pNode->GetAttributes().Find("src");
@@ -2236,7 +2231,7 @@ bool CResource::LinkToIncludedResources()
             CLogger::LogPrintf("  Links to %s .. OK\n", pIncludedResources->GetName().c_str());
 #endif
     }
-    
+
     return m_bLinked;
 }
 
@@ -2452,17 +2447,17 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
     // Old way part 1
     // Check for "resource.blah" being specifically denied
     bool bResourceBlah = pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, m_strResourceName.c_str(),
-                                                       CAccessControlListRight::RIGHT_TYPE_RESOURCE, true);
+                                                        CAccessControlListRight::RIGHT_TYPE_RESOURCE, true);
 
     // Old way part 2
     // Check for "general.http" being specifically denied
     bool bGeneralHttp = pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "http",
-                                                      CAccessControlListRight::RIGHT_TYPE_GENERAL, true);
+                                                       CAccessControlListRight::RIGHT_TYPE_GENERAL, true);
 
     // New way
     // Check for "resource.blah.http" being specifically allowed
     bool bResourceBlahHttp = pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                                           SString("%s.http", m_strResourceName.c_str()), CAccessControlListRight::RIGHT_TYPE_RESOURCE, false);
+                                                            SString("%s.http", m_strResourceName.c_str()), CAccessControlListRight::RIGHT_TYPE_RESOURCE, false);
 
     // If denied with both 'new way' and 'old way' then stop here
     if (!bResourceBlahHttp && (!bResourceBlah || !bGeneralHttp))
@@ -2624,7 +2619,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
             FormData.PushString(pair.first.c_str());
             FormData.PushString(pair.second.sBody.c_str());
         }
- 
+
         CLuaArguments Cookies;
         for (const auto& pair : ipoHttpRequest->oCookieMap)
         {
@@ -2638,7 +2633,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
             Headers.PushString(pair.first.c_str());
             Headers.PushString(pair.second.c_str());
         }
-        
+
         LUA_CHECKSTACK(m_pVM->GetVM(), 1);            // Ensure some room
 
         // cache old data
@@ -2709,8 +2704,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
         lua_setglobal(m_pVM->GetVM(), "user");
 
         // Set debug info in case error occurs in WriteToJSONString
-        g_pGame->GetScriptDebugging()->SaveLuaDebugInfo(
-            SLuaDebugInfo(m_strResourceName, INVALID_LINE_NUMBER, SString("[HTTP:%s]", strFuncName.c_str())));
+        g_pGame->GetScriptDebugging()->SaveLuaDebugInfo(SLuaDebugInfo(m_strResourceName, INVALID_LINE_NUMBER, SString("[HTTP:%s]", strFuncName.c_str())));
 
         std::string strJSON;
         Returns.WriteToJSONString(strJSON, true);
@@ -2775,13 +2769,13 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
                     // Old way part 2
                     // Check for "general.http" being specifically denied
                     bool bGeneralHttp = pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "http",
-                                                                        CAccessControlListRight::RIGHT_TYPE_GENERAL, true);
+                                                                       CAccessControlListRight::RIGHT_TYPE_GENERAL, true);
 
                     // New way
                     // Check for "resource.blah.http" being specifically allowed
                     bool bResourceBlahHttp =
                         pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                                        SString("%s.http", m_strResourceName.c_str()), CAccessControlListRight::RIGHT_TYPE_RESOURCE, false);
+                                                       SString("%s.http", m_strResourceName.c_str()), CAccessControlListRight::RIGHT_TYPE_RESOURCE, false);
 
                     // If denied with both 'new way' and 'old way' then stop here
                     if (!bResourceBlahHttp && (!bResourceBlah || !bGeneralHttp))
@@ -2794,7 +2788,7 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
                     SString strResourceFileName("%s.file.%s", m_strResourceName.c_str(), pHtml->GetName());
 
                     if (pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                                        strResourceFileName.c_str(), CAccessControlListRight::RIGHT_TYPE_RESOURCE, !pHtml->IsRestricted()))
+                                                       strResourceFileName.c_str(), CAccessControlListRight::RIGHT_TYPE_RESOURCE, !pHtml->IsRestricted()))
                     {
                         return pHtml->Request(ipoHttpRequest, ipoHttpResponse, pAccount);
                     }
@@ -2827,13 +2821,13 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
             // Old way
             // Check for "general.http" being specifically denied
             bool bGeneralHttp = pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, "http",
-                                                              CAccessControlListRight::RIGHT_TYPE_GENERAL, true);
+                                                               CAccessControlListRight::RIGHT_TYPE_GENERAL, true);
 
             // New way
             // Check for "resource.blah.http" being specifically allowed
             bool bResourceBlahHttp =
                 pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
-                                              SString("%s.http", m_strResourceName.c_str()), CAccessControlListRight::RIGHT_TYPE_RESOURCE, false);
+                                               SString("%s.http", m_strResourceName.c_str()), CAccessControlListRight::RIGHT_TYPE_RESOURCE, false);
 
             // If denied with both 'new way' and 'old way' then stop here
             if (!bResourceBlahHttp && !bGeneralHttp)
@@ -2851,9 +2845,9 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
 
                     SString strResourceFileName("%s.file.%s", m_strResourceName.c_str(), pResourceFile->GetName());
                     if (pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, m_strResourceName.c_str(),
-                                                      CAccessControlListRight::RIGHT_TYPE_RESOURCE, true) &&
-                        pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, strResourceFileName.c_str(),
-                                                      CAccessControlListRight::RIGHT_TYPE_RESOURCE, !pHtml->IsRestricted()))
+                                                       CAccessControlListRight::RIGHT_TYPE_RESOURCE, true) &&
+                        pACLManager->CanObjectUseRight(pAccount->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER,
+                                                       strResourceFileName.c_str(), CAccessControlListRight::RIGHT_TYPE_RESOURCE, !pHtml->IsRestricted()))
                     {
                         return pHtml->Request(ipoHttpRequest, ipoHttpResponse, pAccount);
                     }
