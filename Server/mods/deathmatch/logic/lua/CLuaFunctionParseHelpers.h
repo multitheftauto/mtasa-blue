@@ -415,7 +415,12 @@ CPed* UserDataCast(CPed*, void* ptr, lua_State*)
 template <class T>
 CRemoteCall* UserDataCast(CRemoteCall*, void* ptr, lua_State*)
 {
-    return (CRemoteCall*)ptr;
+    CRemoteCall* pRemoteCall = (CRemoteCall*)ptr;
+
+    if (pRemoteCall && g_pGame->GetRemoteCalls()->CallExists(pRemoteCall))
+        return pRemoteCall;
+    
+    return nullptr;
 }
 
 //
