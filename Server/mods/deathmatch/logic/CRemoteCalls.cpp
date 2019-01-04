@@ -35,13 +35,10 @@ CRemoteCall* CRemoteCalls::Call(const char* szServerHost, const char* szResource
     CRemoteCall* pRemoteCall =
         new CRemoteCall(szServerHost, szResourceName, szFunctionName, arguments, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs);
 
-    if (pRemoteCall)
-    {
-        m_calls.push_back(pRemoteCall);
-        m_calls.back()->MakeCall();
-        return pRemoteCall;
-    }
-    return nullptr;
+    m_calls.push_back(pRemoteCall);
+    m_calls.back()->MakeCall();
+
+    return pRemoteCall;
 }
 
 CRemoteCall* CRemoteCalls::Call(const char* szURL, CLuaArguments* arguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction, const SString& strQueueName,
@@ -49,13 +46,10 @@ CRemoteCall* CRemoteCalls::Call(const char* szURL, CLuaArguments* arguments, CLu
 {
     CRemoteCall* pRemoteCall = new CRemoteCall(szURL, arguments, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs);
 
-    if (pRemoteCall)
-    {
-        m_calls.push_back(pRemoteCall);
-        m_calls.back()->MakeCall();
-        return pRemoteCall;
-    }
-    return nullptr;
+    m_calls.push_back(pRemoteCall);
+    m_calls.back()->MakeCall();
+
+    return pRemoteCall;
 }
 
 CRemoteCall* CRemoteCalls::Call(const char* szURL, CLuaArguments* fetchArguments, const SString& strPostData, bool bPostBinary, CLuaMain* luaMain,
@@ -64,13 +58,10 @@ CRemoteCall* CRemoteCalls::Call(const char* szURL, CLuaArguments* fetchArguments
     CRemoteCall* pRemoteCall =
         new CRemoteCall(szURL, fetchArguments, strPostData, bPostBinary, luaMain, iFunction, strQueueName, uiConnectionAttempts, uiConnectTimeoutMs);
 
-    if (pRemoteCall)
-    {
-        m_calls.push_back(pRemoteCall);
-        m_calls.back()->MakeCall();
-        return pRemoteCall;
-    }
-    return nullptr;
+    m_calls.push_back(pRemoteCall);
+    m_calls.back()->MakeCall();
+
+    return pRemoteCall;
 }
 
 CRemoteCall* CRemoteCalls::Call(const char* szURL, CLuaArguments* fetchArguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction,
@@ -78,13 +69,10 @@ CRemoteCall* CRemoteCalls::Call(const char* szURL, CLuaArguments* fetchArguments
 {
     CRemoteCall* pRemoteCall = new CRemoteCall(szURL, fetchArguments, luaMain, iFunction, strQueueName, options);
 
-    if (pRemoteCall)
-    {
-        m_calls.push_back(pRemoteCall);
-        m_calls.back()->MakeCall();
-        return pRemoteCall;
-    }
-    return nullptr;
+    m_calls.push_back(pRemoteCall);
+    m_calls.back()->MakeCall();
+
+    return pRemoteCall;
 }
 
 void CRemoteCalls::Remove(CLuaMain* lua)
