@@ -9,10 +9,8 @@
  *
  *****************************************************************************/
 
-// This class controls a single resource, being a zip file
-// or a folder that contains a number of files
-
-//#define RESOURCE_DEBUG_MESSAGES // show info about where the actual files are coming from
+// Show info about where the actual files are coming from
+//#define RESOURCE_DEBUG_MESSAGES
 
 #include "StdInc.h"
 #include "net/SimHeaders.h"
@@ -52,58 +50,16 @@ static unzFile unzOpenUtf8(const char* path)
 }
 
 CResource::CResource(CResourceManager* pResourceManager, bool bIsZipped, const char* szAbsPath, const char* szResourceName)
+    : m_pResourceManager(pResourceManager), m_bResourceIsZip(bIsZipped), m_strResourceName(SStringX(szResourceName)), m_strAbsPath(SStringX(szAbsPath))
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::RESOURCE);
-    m_bHandlingHTTPRequest = false;
-    m_pDefaultElementGroup = nullptr;
-    m_pNodeSettings = nullptr;
-    m_pNodeStorage = nullptr;
-    m_pResourceManager = pResourceManager;
-    m_zipfile = nullptr;
-
-    // store the name
-    m_strAbsPath = szAbsPath;
-    m_strResourceName = szResourceName ? szResourceName : "";
-
-    // Initialize
-    m_bIsPersistent = false;
-    m_bLinked = false;
-    m_pResourceElement = nullptr;
-    m_pResourceDynamicElementRoot = nullptr;
-    m_pVM = nullptr;
-    m_timeLoaded = 0;
-    m_timeStarted = 0;
-    m_bResourceIsZip = bIsZipped;
-    m_bProtected = false;
-    m_bStartedManually = false;
-    m_iDownloadPriorityGroup = 0;
-    m_bDestroyed = false;
-
-    m_uiVersionMajor = 0;
-    m_uiVersionMinor = 0;
-    m_uiVersionRevision = 0;
-    m_uiVersionState = 2;            // release
-
-    m_bClientConfigs = true;
-    m_bClientScripts = true;
-    m_bClientFiles = true;
-
-    m_bSyncMapElementData = true;
-    m_bSyncMapElementDataDefined = false;
-
-    pthread_mutex_init(&m_mutex, nullptr);
-
-    m_bDoneUpgradeWarnings = false;
-    m_uiFunctionRightCacheRevision = 0;
-
-    m_bOOPEnabledInMetaXml = false;
 
     Load();
 }
 
 bool CResource::Load()
 {
-    if (m_eStatus != EResourceStatus::None)
+    if (m_eState != EResourceState::None)
         return true;
 
     m_strCircularInclude = "";
@@ -202,13 +158,12 @@ bool CResource::Load()
     }
 
     // Load the XML file and parse it
-    CXMLFile* metaFile = g_pServerInterface->GetXML()->CreateXML(strMeta.c_str());
-    bool      bParsedSuccessfully = metaFile ? metaFile->Parse() : false;
+    CXMLFile* pMetaFile = g_pServerInterface->GetXML()->CreateXML(strMeta.c_str());
+    bool      bParsedSuccessfully = pMetaFile ? pMetaFile->Parse() : false;
 
-    // If we parsed it successfully
     if (bParsedSuccessfully)
     {
-        CXMLNode* pRoot = metaFile->GetRootNode();
+        CXMLNode* pRoot = pMetaFile->GetRootNode();
 
         if (pRoot)
         {
@@ -305,9 +260,9 @@ bool CResource::Load()
                 {
                     const char* szVersion = pVersion->GetValue().c_str();
 
-                    if (stricmp(szVersion, "alpha") == 0)
+                    if (!stricmp(szVersion, "alpha"))
                         m_uiVersionState = 0;
-                    else if (stricmp(szVersion, "beta") == 0)
+                    else if (!stricmp(szVersion, "beta"))
                         m_uiVersionState = 1;
                     else
                         m_uiVersionState = 2;
@@ -318,19 +273,19 @@ bool CResource::Load()
             if (!ReadIncludedResources(pRoot) || !ReadIncludedMaps(pRoot) || !ReadIncludedFiles(pRoot) || !ReadIncludedScripts(pRoot) ||
                 !ReadIncludedHTML(pRoot) || !ReadIncludedExports(pRoot) || !ReadIncludedConfigs(pRoot))
             {
-                delete metaFile;
+                delete pMetaFile;
                 g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
                 return false;
             }
         }
 
         // Delete the XML we created to save memory
-        delete metaFile;
+        delete pMetaFile;
     }
     else
     {
         SString strError;
-        metaFile->GetLastError(strError);
+        pMetaFile->GetLastError(strError);
 
         if (strError.empty())
             m_strFailureReason = SString("Couldn't parse meta file for resource '%s'\n", m_strResourceName.c_str());
@@ -340,8 +295,8 @@ bool CResource::Load()
         CLogger::ErrorPrintf(m_strFailureReason.c_str());
 
         // Delete the XML file if we somehow got to load it halfway
-        if (metaFile)
-            delete metaFile;
+        if (pMetaFile)
+            delete pMetaFile;
 
         g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
         return false;
@@ -351,7 +306,7 @@ bool CResource::Load()
     if (!GenerateChecksums())
         return false;
 
-    m_eStatus = EResourceStatus::Loaded;
+    m_eState = EResourceState::Loaded;
     m_bDoneUpgradeWarnings = false;
     return true;
 }
@@ -363,7 +318,8 @@ void ReplaceSlashes(string& strPath)
 
 void ReplaceSlashes(char* szPath)
 {
-    size_t iLen = strlen(szPath);
+    const size_t iLen = strlen(szPath);
+
     for (size_t i = 0; i < iLen; i++)
     {
         if (szPath[i] == '\\')
@@ -373,7 +329,7 @@ void ReplaceSlashes(char* szPath)
 
 bool CResource::Unload()
 {
-    if (m_eStatus == EResourceStatus::Running)
+    if (m_eState == EResourceState::Running)
         Stop(true);
 
     TidyUp();
@@ -393,7 +349,7 @@ bool CResource::Unload()
     m_strResourceZip = "";
     m_strResourceCachePath = "";
     m_strResourceDirectoryPath = "";
-    m_eStatus = EResourceStatus::None;
+    m_eState = EResourceState::None;
     return true;
 }
 
@@ -422,8 +378,6 @@ CResource::~CResource()
     }
 
     m_strResourceName = "";
-
-    pthread_mutex_destroy(&m_mutex);
 }
 
 void CResource::TidyUp()
@@ -438,13 +392,13 @@ void CResource::TidyUp()
     for (CResourceFile* pResourceFile : m_ResourceFiles)
         delete pResourceFile;
 
-    (std::list<CResourceFile*>{}).swap(m_ResourceFiles);
+    m_ResourceFiles.clear();
 
     // Go through each included resource item and delete it
     for (CIncludedResources* pIncludedResources : m_IncludedResources)
         delete pIncludedResources;
 
-    (std::list<CIncludedResources*>{}).swap(m_IncludedResources);
+    m_IncludedResources.clear();
 
     // Go through each of the dependent resources (those that include this one) and remove the reference to this
     for (CResource* pDependent : m_Dependents)
@@ -454,7 +408,7 @@ void CResource::TidyUp()
     g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
 }
 
-bool CResource::GetInfoValue(const char* szKey, std::string& strValue)
+bool CResource::GetInfoValue(const char* szKey, std::string& strValue) const
 {
     auto iter = m_Info.find(std::string(szKey));
 
@@ -668,6 +622,7 @@ bool CResource::HasResourceChanged()
         if (checksum != m_metaChecksum)
             return true;
     }
+
     return false;
 }
 
@@ -759,16 +714,15 @@ bool CResource::GetCompatibilityStatus(SString& strOutStatus)
     return true;
 }
 
-bool CResource::Start(std::list<CResource*>* dependents, bool bStartedManually, bool bStartIncludedResources, bool bConfigs, bool bMaps, bool bScripts,
-                      bool bHTML, bool bClientConfigs, bool bClientScripts, bool bClientFiles)
+bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, const SResourceStartOptions& StartOptions)
 {
-    if (m_eStatus == EResourceStatus::Running)
+    if (m_eState == EResourceState::Running)
         return true;
 
-    if (m_eStatus != EResourceStatus::Loaded)
+    if (m_eState != EResourceState::Loaded)
         return false;
 
-    m_eStatus = EResourceStatus::Starting;
+    m_eState = EResourceState::Starting;
 
     CLuaArguments PreStartArguments;
     PreStartArguments.PushResource(this);
@@ -776,7 +730,8 @@ bool CResource::Start(std::list<CResource*>* dependents, bool bStartedManually, 
     if (!g_pGame->GetMapManager()->GetRootElement()->CallEvent("onResourcePreStart", PreStartArguments))
     {
         // Start cancelled by another resource
-        m_eStatus = EResourceStatus::Loaded;
+        m_strFailureReason = "Start cancelled by script\n";
+        m_eState = EResourceState::Loaded;
         return false;
     }
 
@@ -795,7 +750,7 @@ bool CResource::Start(std::list<CResource*>* dependents, bool bStartedManually, 
     {
         m_strFailureReason = SString("Not starting resource %s as %s\n", m_strResourceName.c_str(), strStatus.c_str());
         CLogger::LogPrint(m_strFailureReason);
-        m_eStatus = EResourceStatus::Loaded;
+        m_eState = EResourceState::Loaded;
         return false;
     }
     else if (!strStatus.empty())
@@ -810,7 +765,7 @@ bool CResource::Start(std::list<CResource*>* dependents, bool bStartedManually, 
     {
         if (!LinkToIncludedResources())
         {
-            m_eStatus = EResourceStatus::Loaded;
+            m_eState = EResourceState::Loaded;
             return false;
         }
     }
@@ -868,11 +823,11 @@ bool CResource::Start(std::list<CResource*>* dependents, bool bStartedManually, 
         }
 
         // Start if applicable
-        if ((pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_MAP && bMaps) ||
-            (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CONFIG && bConfigs) ||
-            (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_SCRIPT && bScripts) ||
-            (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT && bScripts) ||
-            (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML && bHTML))
+        if ((pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_MAP && StartOptions.bMaps) ||
+            (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CONFIG && StartOptions.bConfigs) ||
+            (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_SCRIPT && StartOptions.bScripts) ||
+            (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT && StartOptions.bClientScripts) ||
+            (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML && StartOptions.bHTML))
         {
             // Start. Failed?
             if (!pResourceFile->Start())
@@ -924,12 +879,12 @@ bool CResource::Start(std::list<CResource*>* dependents, bool bStartedManually, 
             }
 
             g_pGame->GetPlayerManager()->BroadcastOnlyJoined(removePacket);
-            m_eStatus = EResourceStatus::Loaded;
+            m_eState = EResourceState::Loaded;
             return false;
         }
     }
 
-    if (bStartIncludedResources)
+    if (StartOptions.bIncludedResources)
     {
         // Copy the list over included resources because reloading them might change the list
         std::list<CIncludedResources*> includedResources = m_IncludedResources;
@@ -964,13 +919,13 @@ bool CResource::Start(std::list<CResource*>* dependents, bool bStartedManually, 
     }
 
     // Add the resources depending on us
-    if (dependents)
+    if (pDependents)
     {
-        for (CResource* pDependent : *dependents)
+        for (CResource* pDependent : *pDependents)
             AddDependent(pDependent);
     }
 
-    m_eStatus = EResourceStatus::Running;
+    m_eState = EResourceState::Running;
 
     // Call the onResourceStart event. If it returns false, cancel this script again
     CLuaArguments Arguments;
@@ -985,12 +940,12 @@ bool CResource::Start(std::list<CResource*>* dependents, bool bStartedManually, 
         return false;
     }
 
-    m_bStartedManually = bStartedManually;
+    m_bStartedManually = bManualStart;
 
     // Remember the client files state
-    m_bClientConfigs = bClientConfigs;
-    m_bClientScripts = bClientScripts;
-    m_bClientFiles = bClientFiles;
+    m_bClientConfigs = StartOptions.bClientConfigs;
+    m_bClientScripts = StartOptions.bClientScripts;
+    m_bClientFiles = StartOptions.bClientFiles;
 
     m_pResourceManager->ApplyMinClientRequirement(this, m_strMinClientReqFromMetaXml);
 
@@ -1011,18 +966,18 @@ bool CResource::Start(std::list<CResource*>* dependents, bool bStartedManually, 
     return true;
 }
 
-bool CResource::Stop(bool bStopManually)
+bool CResource::Stop(bool bManualStop)
 {
-    if (m_eStatus == EResourceStatus::Loaded)
+    if (m_eState == EResourceState::Loaded)
         return true;
 
-    if (m_eStatus != EResourceStatus::Running)
+    if (m_eState != EResourceState::Running)
         return false;
 
-    if (m_bStartedManually && !bStopManually)
+    if (m_bStartedManually && !bManualStop)
         return false;
 
-    m_eStatus = EResourceStatus::Stopping;
+    m_eState = EResourceState::Stopping;
     m_pResourceManager->RemoveMinClientRequirement(this);
     m_pResourceManager->RemoveSyncMapElementDataOption(this);
 
@@ -1057,7 +1012,7 @@ bool CResource::Stop(bool bStopManually)
     for (CResource* pResource : m_TemporaryIncludes)
         pResource->RemoveDependent(this);
 
-    (std::list<CResource*>{}).swap(m_TemporaryIncludes);
+    m_TemporaryIncludes.clear();
 
     // Stop all the resource files we have. The files we share with our clients we remove from the resource file list.
     for (CResourceFile* pResourceFile : m_ResourceFiles)
@@ -1107,7 +1062,7 @@ bool CResource::Stop(bool bStopManually)
     // Broadcast the packet to joined players
     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(removePacket);
 
-    m_eStatus = EResourceStatus::Loaded;
+    m_eState = EResourceState::Loaded;
     return true;
 }
 
@@ -1154,31 +1109,31 @@ void CResource::DisplayInfo()            // duplicated for HTML
 {
     CLogger::LogPrintf("== Details for resource '%s' ==\n", m_strResourceName.c_str());
 
-    switch (m_eStatus)
+    switch (m_eState)
     {
-        case EResourceStatus::Loaded:
+        case EResourceState::Loaded:
         {
             CLogger::LogPrintf("Status: Stopped\n");
             break;
         }
-        case EResourceStatus::Starting:
+        case EResourceState::Starting:
         {
             CLogger::LogPrintf("Status: Starting\n");
             break;
         }
-        case EResourceStatus::Running:
+        case EResourceState::Running:
         {
             CLogger::LogPrintf("Status: Running    Dependents: %d\n", m_Dependents.size());
 
             for (CResource* pDependent : m_Dependents)
                 CLogger::LogPrintf("  %s\n", pDependent->GetName().c_str());
         }
-        case EResourceStatus::Stopping:
+        case EResourceState::Stopping:
         {
             CLogger::LogPrintf("Status: Stopping\n");
             break;
         }
-        case EResourceStatus::None:
+        case EResourceState::None:
         default:
         {
             CLogger::LogPrintf("Status: Failed to load\n");
@@ -2105,16 +2060,7 @@ bool CResource::ReadIncludedResources(CXMLNode* pRoot)
         CXMLAttributes& Attributes = pInclude->GetAttributes();
 
         // Grab the minversion attribute (minimum version the included resource needs to be)
-        SVersion svMinVersion;
-        SVersion svMaxVersion;
-        svMinVersion.m_uiMajor = 0;
-        svMinVersion.m_uiMinor = 0;
-        svMinVersion.m_uiRevision = 0;
-        svMaxVersion.m_uiMajor = 0;
-        svMaxVersion.m_uiMinor = 0;
-        svMaxVersion.m_uiRevision = 0;
-        unsigned int   uiMinVersion = 0;
-        unsigned int   uiMaxVersion = 0;
+        SVersion       svMinVersion;
         CXMLAttribute* pMinVersion = Attributes.Find("minversion");
 
         if (pMinVersion)
@@ -2123,32 +2069,16 @@ bool CResource::ReadIncludedResources(CXMLNode* pRoot)
 
             if (!strMinVersion.empty())
             {
-                char szMinVersion[MAX_RESOURCE_VERSION_LENGTH];
-                strncpy(szMinVersion, strMinVersion.c_str(), MAX_RESOURCE_VERSION_LENGTH - 1);
-                uiMinVersion = atoi(szMinVersion);
-
-                const char* szToken = strtok(szMinVersion, " ");
-
-                if (szToken)
-                {
-                    svMinVersion.m_uiMajor = atoi(szToken);
-                    szToken = strtok(nullptr, " ");
-
-                    if (szToken)
-                    {
-                        svMinVersion.m_uiMinor = atoi(szToken);
-                        szToken = strtok(nullptr, " ");
-
-                        if (szToken)
-                        {
-                            svMinVersion.m_uiRevision = atoi(szToken);
-                        }
-                    }
-                }
+                std::stringstream ss;
+                ss << strMinVersion;
+                ss >> svMinVersion.m_uiMajor;
+                ss >> svMinVersion.m_uiMinor;
+                ss >> svMinVersion.m_uiRevision;
             }
         }
 
         // Grab the maxversion attribute (maximum version the included resource needs to be)
+        SVersion       svMaxVersion;
         CXMLAttribute* pMaxVersion = Attributes.Find("maxversion");
 
         if (pMaxVersion)
@@ -2157,28 +2087,11 @@ bool CResource::ReadIncludedResources(CXMLNode* pRoot)
 
             if (!strMaxVersion.empty())
             {
-                char szMaxVersion[MAX_RESOURCE_VERSION_LENGTH];
-                strncpy(szMaxVersion, strMaxVersion.c_str(), MAX_RESOURCE_VERSION_LENGTH - 1);
-                uiMaxVersion = atoi(szMaxVersion);
-
-                const char* szToken = strtok(szMaxVersion, " ");
-
-                if (szToken)
-                {
-                    svMaxVersion.m_uiMajor = atoi(szToken);
-                    szToken = strtok(nullptr, " ");
-
-                    if (szToken)
-                    {
-                        svMaxVersion.m_uiMinor = atoi(szToken);
-                        szToken = strtok(nullptr, " ");
-
-                        if (szToken)
-                        {
-                            svMaxVersion.m_uiRevision = atoi(szToken);
-                        }
-                    }
-                }
+                std::stringstream ss;
+                ss << strMaxVersion;
+                ss >> svMaxVersion.m_uiMajor;
+                ss >> svMaxVersion.m_uiMinor;
+                ss >> svMaxVersion.m_uiRevision;
             }
         }
 
@@ -2192,8 +2105,7 @@ bool CResource::ReadIncludedResources(CXMLNode* pRoot)
 
             // If there's text in the node
             if (!strIncludedResource.empty())
-                m_IncludedResources.push_back(
-                    new CIncludedResources(m_pResourceManager, strIncludedResource.c_str(), svMinVersion, svMaxVersion, uiMinVersion, uiMaxVersion, this));
+                m_IncludedResources.push_back(new CIncludedResources(m_pResourceManager, strIncludedResource.c_str(), svMinVersion, svMaxVersion, this));
             else
                 CLogger::LogPrintf("WARNING: Empty 'resource' attribute from 'include' node of 'meta.xml' for resource '%s', ignoring\n",
                                    m_strResourceName.c_str());
@@ -2239,7 +2151,7 @@ bool CResource::CheckIfStartable()
 {
     // return straight away if we know we've already got a circular include, otherwise
     // it spams it every few seconds
-    if (m_eStatus != EResourceStatus::Loaded)
+    if (m_eState == EResourceState::None)
         return false;
 
     // Check that the included resources aren't circular
@@ -2467,7 +2379,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
 
     #define MAX_INPUT_VARIABLES       25
 
-    if (m_eStatus != EResourceStatus::Running)
+    if (m_eState != EResourceState::Running)
     {
         const char* szError = "error: resource not running";
         ipoHttpResponse->SetBody(szError, strlen(szError));
@@ -2755,7 +2667,7 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
                 CResourceHTMLItem* pHtml = (CResourceHTMLItem*)pResourceFile;
 
                 // We need to be active if downloading a HTML file
-                if (m_eStatus == EResourceStatus::Running)
+                if (m_eState == EResourceState::Running)
                 {
                     // Check for http general and if we have access to this resource
                     // if we're trying to return a http file. Otherwise it's the MTA
@@ -2867,7 +2779,7 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
 
 bool CResource::CallExportedFunction(const char* szFunctionName, CLuaArguments& Arguments, CLuaArguments& Returns, CResource& Caller)
 {
-    if (m_eStatus != EResourceStatus::Running)
+    if (m_eState != EResourceState::Running)
         return false;
 
     for (CExportedFunction& Exported : m_ExportedFunctions)
@@ -2903,7 +2815,7 @@ bool CResource::CallExportedFunction(const char* szFunctionName, CLuaArguments& 
 
 bool CResource::CheckState()
 {
-    if (m_Dependents.empty() && m_bIsPersistent == false)
+    if (m_Dependents.empty() && !m_bIsPersistent)
     {
         Stop(false);
         return false;
