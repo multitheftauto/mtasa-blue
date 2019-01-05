@@ -10,7 +10,7 @@
  * Copyright (c) 1998, 1999, 2017 Kungliga Tekniska Högskolan
  * (Royal Institute of Technology, Stockholm, Sweden).
  *
- * Copyright (C) 2001 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2001 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * All rights reserved.
  *
@@ -61,7 +61,9 @@
 #include "strcase.h"
 #include "warnless.h"
 #include "strdup.h"
-/* The last #include file should be: */
+/* The last 3 #include files should be in this order */
+#include "curl_printf.h"
+#include "curl_memory.h"
 #include "memdebug.h"
 
 static const struct {
@@ -118,7 +120,7 @@ static int ftp_send_command(struct connectdata *conn, const char *message, ...)
   char print_buffer[50];
 
   va_start(args, message);
-  vsnprintf(print_buffer, sizeof(print_buffer), message, args);
+  mvsnprintf(print_buffer, sizeof(print_buffer), message, args);
   va_end(args);
 
   if(Curl_ftpsend(conn, print_buffer)) {
@@ -422,7 +424,7 @@ static int sec_set_protection_level(struct connectdata *conn)
 
   if(!conn->sec_complete) {
     infof(conn->data, "Trying to change the protection level after the"
-                      "completion of the data exchange.\n");
+                      " completion of the data exchange.\n");
     return -1;
   }
 
