@@ -102,8 +102,6 @@ public:
     void           InvalidateEntity(CClientEntity* pEntity);
     void           RestoreEntity(CClientEntity* pEntity);
     void           UnreferenceEntity(CClientEntity* pEntity);
-    CClientEntity* FindEntity(CEntity* pGameEntity, bool bValidatePointer = false);
-    CClientEntity* FindEntitySafe(CEntity* pGameEntity);
 
     void OnUpdateStreamPosition(CClientStreamElement* pElement);
     void OnLowLODElementCreated(void);

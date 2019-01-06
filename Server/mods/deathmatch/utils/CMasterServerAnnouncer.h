@@ -78,7 +78,9 @@ public:
                 // Send request
                 this->AddRef();            // Keep object alive
                 m_bStatusBusy = true;
-                GetDownloadManager()->QueueFile(m_Definition.strURL, NULL, "", 0, false, this, StaticDownloadFinishedCallback, false, 2);
+                SHttpRequestOptions options;
+                options.uiConnectionAttempts = 2;
+                GetDownloadManager()->QueueFile(m_Definition.strURL, NULL, this, StaticDownloadFinishedCallback, options);
             }
         }
         else
@@ -92,10 +94,11 @@ public:
             if (m_llLastPushTime == 0 || llTickCountNow - m_llLastPushTime > m_uiPushInterval)
             {
                 m_llLastPushTime = llTickCountNow;
-                SString strPostContent = ASE::GetInstance()->QueryLight();
-                bool    bPostContentBinary = true;
-                GetDownloadManager()->QueueFile(m_Definition.strURL, NULL, &strPostContent.at(0), strPostContent.length(), bPostContentBinary, NULL, NULL,
-                                                false, 1);
+                SHttpRequestOptions options;
+                options.strPostData = ASE::GetInstance()->QueryLight();
+                options.bPostBinary = true;
+                options.uiConnectionAttempts = 1;
+                GetDownloadManager()->QueueFile(m_Definition.strURL, NULL, NULL, NULL, options);
             }
         }
     }

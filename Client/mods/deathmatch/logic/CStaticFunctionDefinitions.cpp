@@ -1541,8 +1541,8 @@ CClientEntity* CStaticFunctionDefinitions::GetPedTarget(CClientPed& Ped)
     CClientEntity* pCollisionEntity = NULL;
     if (pCollisionGameEntity)
     {
-        pCollisionEntity = m_pManager->FindEntity(pCollisionGameEntity);
-
+        CPools* pPools = g_pGame->GetPools();
+        pCollisionEntity = pPools->GetClientEntity((DWORD*)pCollisionGameEntity->GetInterface());
         return pCollisionEntity;
     }
 
@@ -5431,7 +5431,7 @@ int CStaticFunctionDefinitions::GUIComboBoxGetItemCount(CClientEntity& Entity)
             return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetItemCount();
         }
     }
-    
+
     return 0;
 }
 
@@ -5458,7 +5458,7 @@ bool CStaticFunctionDefinitions::GUIComboBoxSetOpen(CClientEntity& Entity, bool 
             return true;
         }
     }
-    
+
     return false;
 }
 
@@ -5468,14 +5468,14 @@ bool CStaticFunctionDefinitions::GUIComboBoxIsOpen(CClientEntity& Entity)
     if (IS_GUI(&Entity))
     {
         CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-        
+
         // Are we a combobox?
         if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
         {
             return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->IsOpen();
         }
     }
-    
+
     return false;
 }
 
@@ -5918,7 +5918,7 @@ void CStaticFunctionDefinitions::GUIGridListSetSortingEnabled(CClientEntity& Ent
         if (IS_CGUIELEMENT_GRIDLIST(&GUIElement))
         {
             // Set sorting is enabled
-            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetSorting(bEnabled);
+            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetSortingEnabled(bEnabled);
         }
     }
 }
@@ -6148,8 +6148,8 @@ bool CStaticFunctionDefinitions::ProcessLineOfSight(const CVector& vecStart, con
     if (pIgnoredEntity)
         g_pGame->GetWorld()->IgnoreEntity(NULL);
 
-    *pColEntity = m_pManager->FindEntity(pColGameEntity);
-
+    CPools* pPools = g_pGame->GetPools();
+    *pColEntity = pColGameEntity ? pPools->GetClientEntity((DWORD*)pColGameEntity->GetInterface()) : nullptr;
     return true;
 }
 
@@ -7586,6 +7586,9 @@ bool CStaticFunctionDefinitions::StopSound(CClientSound& Sound)
 
 bool CStaticFunctionDefinitions::SetSoundPosition(CClientSound& Sound, double dPosition)
 {
+    if (Sound.IsSoundStream())
+        return false;
+
     Sound.SetPlayPosition(dPosition);
     return true;
 }
@@ -7647,6 +7650,16 @@ bool CStaticFunctionDefinitions::IsSoundLooped(CClientSound& Sound, bool& bLoop)
 {
     bLoop = Sound.IsLooped();
     return true;
+}
+
+bool CStaticFunctionDefinitions::GetSoundBufferLength(CClientSound& Sound, double& dBufferLength)
+{
+    if (Sound.IsSoundStream())
+    {
+        dBufferLength = Sound.GetBufferLength();
+        return true;
+    }
+    return false;
 }
 
 bool CStaticFunctionDefinitions::SetSoundPaused(CClientSound& Sound, bool bPaused)

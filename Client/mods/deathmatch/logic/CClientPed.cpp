@@ -737,6 +737,7 @@ void CClientPed::Spawn(const CVector& vecPosition, float fRotation, unsigned sho
     SetMoveSpeed(CVector());
     SetInterior(ucInterior);
     SetFootBloodEnabled(false);
+    SetIsDead(false);
 }
 
 void CClientPed::ResetInterpolation(void)
@@ -1813,15 +1814,11 @@ bool CClientPed::IsDead(void)
     if (m_pPlayerPed)
     {
         CTask* pTask = m_pTaskManager->GetTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
+
         if (pTask)
-        {
-            if (pTask->GetTaskType() == TASK_SIMPLE_DEAD)
-            {
-                return true;
-            }
-        }
-        return false;
+            return pTask->GetTaskType() == TASK_SIMPLE_DEAD;
     }
+
     return m_bDead;
 }
 
@@ -2114,13 +2111,21 @@ bool CClientPed::SetCurrentWeaponSlot(eWeaponSlot weaponSlot)
                     DWORD       ammoInClip = oldWeapon->GetAmmoInClip();
                     DWORD       ammoInTotal = oldWeapon->GetAmmoTotal();
                     eWeaponType weaponType = oldWeapon->GetType();
-                    RemoveWeapon(oldWeapon->GetType());
+
+                    bool isGoggles = currentSlot == WEAPONSLOT_TYPE_PARACHUTE && (weaponType == WEAPONTYPE_NIGHTVISION || weaponType == WEAPONTYPE_INFRARED);
+                    if (!isGoggles)
+                    {
+                        RemoveWeapon(oldWeapon->GetType());
+                    }
 
                     m_pPlayerPed->SetCurrentWeaponSlot(WEAPONSLOT_TYPE_UNARMED);
 
-                    CWeapon* newWeapon = GiveWeapon(weaponType, ammoInTotal);
-                    newWeapon->SetAmmoInClip(ammoInClip);
-                    newWeapon->SetAmmoTotal(ammoInTotal);
+                    if (!isGoggles)
+                    {
+                        CWeapon* newWeapon = GiveWeapon(weaponType, ammoInTotal);
+                        newWeapon->SetAmmoInClip(ammoInClip);
+                        newWeapon->SetAmmoTotal(ammoInTotal);
+                    }
 
                     // Don't allow doing gang driveby while unarmed
                     if (IsDoingGangDriveby())
@@ -3569,14 +3574,11 @@ void CClientPed::_CreateModel(void)
     m_pLoadedModelInfo->ModelAddRef(BLOCKING, "CClientPed::_CreateModel");
 
     // Create the new ped
-    m_pPlayerPed = dynamic_cast<CPlayerPed*>(g_pGame->GetPools()->AddPed(static_cast<ePedModel>(m_ulModel)));
+    m_pPlayerPed = dynamic_cast<CPlayerPed*>(g_pGame->GetPools()->AddPed(this, static_cast<ePedModel>(m_ulModel)));
     if (m_pPlayerPed)
     {
         // Put our pointer in the stored data and update the remote data with the new model pointer
         m_pPlayerPed->SetStoredPointer(this);
-
-        // Add XRef
-        g_pClientGame->GetGameEntityXRefManager()->AddEntityXRef(this, m_pPlayerPed);
 
         g_pMultiplayer->AddRemoteDataStorage(m_pPlayerPed, m_remoteDataStorage);
 
@@ -3694,7 +3696,7 @@ void CClientPed::_CreateModel(void)
 void CClientPed::_CreateLocalModel(void)
 {
     // Init the local player and grab the pointers
-    g_pGame->InitLocalPlayer();
+    g_pGame->InitLocalPlayer(this);
     m_pPlayerPed = dynamic_cast<CPlayerPed*>(g_pGame->GetPools()->GetPedFromRef((DWORD)1));
 
     if (m_pPlayerPed)
@@ -3703,9 +3705,6 @@ void CClientPed::_CreateLocalModel(void)
 
         // Put our pointer in its stored pointer
         m_pPlayerPed->SetStoredPointer(this);
-
-        // Add XRef
-        g_pClientGame->GetGameEntityXRefManager()->AddEntityXRef(this, m_pPlayerPed);
 
         // Add a reference to the model we're using
         m_pLoadedModelInfo = m_pModelInfo;
@@ -3794,9 +3793,6 @@ void CClientPed::_DestroyModel()
     // Invalidate
     m_pManager->InvalidateEntity(this);
 
-    // Remove XRef
-    g_pClientGame->GetGameEntityXRefManager()->RemoveEntityXRef(this, m_pPlayerPed);
-
     // Remove the ped from the world
     g_pGame->GetPools()->RemovePed(m_pPlayerPed);
     m_pPlayerPed = NULL;
@@ -3839,8 +3835,7 @@ void CClientPed::_DestroyLocalModel()
     // Invalidate
     m_pManager->InvalidateEntity(this);
 
-    // Remove XRef
-    g_pClientGame->GetGameEntityXRefManager()->RemoveEntityXRef(this, m_pPlayerPed);
+    g_pGame->GetPools()->InvalidateLocalPlayerClientEntity();
 
     // Make sure we are CJ again
     if (m_pPlayerPed->GetModelIndex() != 0)
@@ -5079,26 +5074,21 @@ bool CClientPed::IsGettingJacked(void)
 
 CClientEntity* CClientPed::GetContactEntity(void)
 {
-    CClientEntity* pReturn = NULL;
-    if (m_pPlayerPed)
+    CPools* pPools = g_pGame->GetPools();
+    if (pPools && m_pPlayerPed)
     {
         CEntity* pEntity = m_pPlayerPed->GetContactEntity();
         if (pEntity)
         {
-            switch (pEntity->GetEntityType())
+            CEntitySAInterface* pInterface = pEntity->GetInterface();
+            eEntityType entityType = pInterface ? pEntity->GetEntityType() : ENTITY_TYPE_NOTHING;
+            if (entityType == ENTITY_TYPE_VEHICLE || entityType == ENTITY_TYPE_OBJECT)
             {
-                case ENTITY_TYPE_VEHICLE:
-                    pReturn = m_pManager->GetVehicleManager()->Get(dynamic_cast<CVehicle*>(pEntity), false);
-                    break;
-                case ENTITY_TYPE_OBJECT:
-                    pReturn = m_pManager->GetObjectManager()->Get(dynamic_cast<CObject*>(pEntity), false);
-                    break;
-                default:
-                    break;
+                return pPools->GetClientEntity((DWORD*)pInterface);
             }
         }
     }
-    return pReturn;
+    return nullptr;
 }
 
 bool CClientPed::HasAkimboPointingUpwards(void)
@@ -5442,20 +5432,8 @@ CClientEntity* CClientPed::GetTargetedEntity(void)
         CEntity* pEntity = m_pPlayerPed->GetTargetedEntity();
         if (pEntity)
         {
-            switch (pEntity->GetEntityType())
-            {
-                case ENTITY_TYPE_PED:
-                    pReturn = m_pManager->GetPedManager()->Get(dynamic_cast<CPlayerPed*>(pEntity), true, false);
-                    break;
-                case ENTITY_TYPE_VEHICLE:
-                    pReturn = m_pManager->GetVehicleManager()->Get(dynamic_cast<CVehicle*>(pEntity), false);
-                    break;
-                case ENTITY_TYPE_OBJECT:
-                    pReturn = m_pManager->GetObjectManager()->Get(dynamic_cast<CObject*>(pEntity), false);
-                    break;
-                default:
-                    break;
-            }
+            CPools* pPools = g_pGame->GetPools();
+            pReturn = pPools->GetClientEntity((DWORD*)pEntity->GetInterface());
         }
     }
     return pReturn;

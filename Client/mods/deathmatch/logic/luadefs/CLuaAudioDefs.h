@@ -37,6 +37,7 @@ public:
     LUA_DECLARE(SetSoundPosition);
     LUA_DECLARE(GetSoundPosition);
     LUA_DECLARE(GetSoundLength);
+    LUA_DECLARE(GetSoundBufferLength);
     LUA_DECLARE(SetSoundLooped);
     LUA_DECLARE(IsSoundLooped);
     LUA_DECLARE(SetSoundPaused);

@@ -28,8 +28,6 @@ public:
 
     unsigned int           Count(void) { return static_cast<unsigned int>(m_List.size()); };
     static CClientVehicle* Get(ElementID ID);
-    CClientVehicle*        Get(CVehicle* pVehicle, bool bValidatePointer);
-    CClientVehicle*        GetSafe(CEntity* pEntity);
     CClientVehicle*        GetClosest(CVector& vecPosition, float fRadius);
 
     void DoPulse(void);

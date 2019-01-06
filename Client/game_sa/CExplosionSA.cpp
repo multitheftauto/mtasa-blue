@@ -40,18 +40,31 @@ CEntity* CExplosionSA::GetExplosionCreator(void)
     eEntityType entityType = entity->GetEntityType();
     delete entity;
 
-    CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
-
+    CPools* pools = pGame->GetPools();
     switch (entityType)
     {
         case ENTITY_TYPE_PED:
-            return (CEntity*)(pools->GetPed((DWORD*)this->GetInterface()->m_pEntExplosionOwner));
+        {
+            SClientEntity<CPedSA>* pPedClientEntity = pools->GetPed((DWORD*)this->GetInterface()->m_pEntExplosionOwner);
+            if (pPedClientEntity)
+            {
+                return pPedClientEntity->pEntity;
+            }
             break;
+        }
         case ENTITY_TYPE_VEHICLE:
-            return (CEntity*)(pools->GetVehicle((DWORD*)this->GetInterface()->m_pEntExplosionOwner));
+        {
+            SClientEntity<CVehicleSA>* pVehicleClientEntity = pools->GetVehicle((DWORD*)this->GetInterface()->m_pEntExplosionOwner);
+            if (pVehicleClientEntity)
+            {
+                return pVehicleClientEntity->pEntity;
+            }
             break;
+        }
         case ENTITY_TYPE_OBJECT:
+        {
             break;
+        }
     }
     return NULL;
 }

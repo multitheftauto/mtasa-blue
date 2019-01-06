@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-10 02:54+0100\n"
-"PO-Revision-Date: 2018-09-01 13:19+0000\n"
+"PO-Revision-Date: 2018-11-19 12:36+0000\n"
 "Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: mk\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n==1 || n%10==1 ? 0 : 1;\n"
 "Translators: Mercy; Rilind\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1535807973.0\n"
+"X-POOTLE-MTIME: 1542630982.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -1780,7 +1780,9 @@ msgid ""
 "Please reinstall MTA:SA"
 msgstr ""
 "Некои MTA:SA дата фајлови недостасуваат.\n"
-"/n/nВе молиме ре-инсталирајте ја MTA:SA"
+"\n"
+"\n"
+"Ве молиме ре-инсталирајте ја MTA:SA"
 
 #: ..\Client\core\CVersionUpdater.cpp:2722
 #, c-format, c-format
@@ -2689,7 +2691,6 @@ msgstr ""
 "MTA:SA не е компатибилен со Windows 'Safe Mode'.\n"
 "\n"
 "Ве молиме рестартирајте го компјутерот.\n"
-" "
 
 #: ..\Client\loader\MainFunctions.cpp:1131
 msgid "Fix configuration issue"
@@ -3118,29 +3119,29 @@ msgstr "Преостанато време:~"
 #, c-format, c-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] "%д ден"
-msgstr[1] "%д денови"
+msgstr[0] "%d ден"
+msgstr[1] "%d денови"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:607
 #, c-format, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] "%д час"
-msgstr[1] "%д часови"
+msgstr[0] "%d час"
+msgstr[1] "%d часови"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:609
 #, c-format, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] "%д минута"
-msgstr[1] "%д минути"
+msgstr[0] "%d минута"
+msgstr[1] "%d минути"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:611
 #, c-format, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] "%д секунда"
-msgstr[1] "%д секунди"
+msgstr[0] "%d секунда"
+msgstr[1] "%d секунди"
 
 #. Display the error
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:615

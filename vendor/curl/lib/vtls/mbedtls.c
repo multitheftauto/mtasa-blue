@@ -205,14 +205,11 @@ set_ssl_version_min_max(struct connectdata *conn, int sockindex)
     case CURL_SSLVERSION_DEFAULT:
     case CURL_SSLVERSION_TLSv1:
       ssl_version = CURL_SSLVERSION_TLSv1_0;
-      ssl_version_max = CURL_SSLVERSION_MAX_TLSv1_2;
       break;
   }
 
   switch(ssl_version_max) {
     case CURL_SSLVERSION_MAX_NONE:
-      ssl_version_max = ssl_version << 16;
-      break;
     case CURL_SSLVERSION_MAX_DEFAULT:
       ssl_version_max = CURL_SSLVERSION_MAX_TLSv1_2;
       break;
@@ -583,7 +580,7 @@ mbed_connect_step2(struct connectdata *conn,
 
     if(ret & MBEDTLS_X509_BADCERT_REVOKED) {
       failf(data, "Cert verify failed: BADCERT_REVOKED");
-      return CURLE_SSL_CACERT;
+      return CURLE_PEER_FAILED_VERIFICATION;
     }
 
     if(ret & MBEDTLS_X509_BADCERT_CN_MISMATCH)
@@ -815,8 +812,8 @@ static void Curl_mbedtls_session_free(void *ptr)
 static size_t Curl_mbedtls_version(char *buffer, size_t size)
 {
   unsigned int version = mbedtls_version_get_number();
-  return snprintf(buffer, size, "mbedTLS/%u.%u.%u", version>>24,
-                  (version>>16)&0xff, (version>>8)&0xff);
+  return msnprintf(buffer, size, "mbedTLS/%u.%u.%u", version>>24,
+                   (version>>16)&0xff, (version>>8)&0xff);
 }
 
 static CURLcode Curl_mbedtls_random(struct Curl_easy *data,
