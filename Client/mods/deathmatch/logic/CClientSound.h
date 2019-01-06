@@ -43,6 +43,7 @@ public:
     double GetPlayPosition(void);
 
     double GetLength(bool bAvoidLoad = false);
+    double GetBufferLength();
 
     void  SetVolume(float fVolume, bool bStore = true);
     float GetVolume(void);

@@ -720,6 +720,7 @@ public:
     static bool          SetSoundPosition(CClientSound& Sound, double dPosition);
     static bool          GetSoundPosition(CClientSound& Sound, double& dPosition);
     static bool          GetSoundLength(CClientSound& Sound, double& dLength);
+    static bool          GetSoundBufferLength(CClientSound& Sound, double& dBufferLength);
     static bool          SetSoundPaused(CClientSound& Sound, bool bPaused);
     static bool          IsSoundPaused(CClientSound& Sound, bool& bPaused);
     static bool          SetSoundVolume(CClientSound& Sound, float fVolume);

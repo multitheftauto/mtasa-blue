@@ -5942,7 +5942,7 @@ void CStaticFunctionDefinitions::GUIGridListSetSortingEnabled(CClientEntity& Ent
         if (IS_CGUIELEMENT_GRIDLIST(&GUIElement))
         {
             // Set sorting is enabled
-            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetSorting(bEnabled);
+            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetSortingEnabled(bEnabled);
         }
     }
 }
@@ -7659,6 +7659,16 @@ bool CStaticFunctionDefinitions::GetSoundLength(CClientPlayer& Player, double& d
     if (pVoice != NULL)
     {
         dLength = pVoice->GetLength();
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetSoundBufferLength(CClientSound& Sound, double& dBufferLength)
+{
+    if (Sound.IsSoundStream())
+    {
+        dBufferLength = Sound.GetBufferLength();
         return true;
     }
     return false;

@@ -94,7 +94,7 @@ CLocalServer::CLocalServer(const char* szConfig)
     m_pResourcesCur = reinterpret_cast<CGUIGridList*>(m_pGUI->CreateGridList(m_pTabResources, false));
     m_pResourcesCur->SetPosition(CVector2D(0.03f, 0.06f), true);
     m_pResourcesCur->SetSize(CVector2D(0.45f, 0.5f), true);
-    m_pResourcesCur->SetSorting(false);
+    m_pResourcesCur->SetSortingEnabled(false);
     m_pResourcesCur->SetSelectionMode(SelectionModes::CellSingle);
     m_hResourcesCur = m_pResourcesCur->AddColumn(_("Selected"), 0.80f);
 
@@ -111,7 +111,7 @@ CLocalServer::CLocalServer(const char* szConfig)
     m_pResourcesAll = reinterpret_cast<CGUIGridList*>(m_pGUI->CreateGridList(m_pTabResources, false));
     m_pResourcesAll->SetPosition(CVector2D(0.52f, 0.06f), true);
     m_pResourcesAll->SetSize(CVector2D(0.45f, 0.9f), true);
-    m_pResourcesAll->SetSorting(false);
+    m_pResourcesAll->SetSortingEnabled(false);
     m_pResourcesAll->SetSelectionMode(SelectionModes::CellSingle);
     m_hResourcesAll = m_pResourcesAll->AddColumn(_("All"), 0.80f);
 

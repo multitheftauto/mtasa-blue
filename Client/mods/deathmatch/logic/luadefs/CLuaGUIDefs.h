@@ -54,6 +54,7 @@ public:
     LUA_DECLARE(GUIScrollBarSetScrollPosition);
     LUA_DECLARE(GUIScrollBarGetScrollPosition);
     LUA_DECLARE(GUIGridListSetSortingEnabled);
+    LUA_DECLARE(GUIGridListIsSortingEnabled);
     LUA_DECLARE(GUIGridListAddColumn);
     LUA_DECLARE(GUIGridListRemoveColumn);
     LUA_DECLARE(GUIGridListSetColumnWidth);
@@ -75,6 +76,7 @@ public:
     LUA_DECLARE(GUIGridListSetItemColor);
     LUA_DECLARE(GUIGridListGetItemColor);
     LUA_DECLARE(GUIGridListSetSelectionMode);
+    LUA_DECLARE(GUIGridListGetSelectionMode);
     LUA_DECLARE(GUIGridListGetSelectedItem);
     LUA_DECLARE(GUIGridListGetSelectedItems);
     LUA_DECLARE(GUIGridListGetSelectedCount);
