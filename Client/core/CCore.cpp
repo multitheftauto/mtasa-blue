@@ -1894,6 +1894,10 @@ void CCore::OnDeviceRestore(void)
 void CCore::OnPreFxRender(void)
 {
     // Don't do nothing if nothing won't be drawn
+
+    if (CGraphics::GetSingleton().HasPrimitive3DPreGUIQueueItems())
+        CGraphics::GetSingleton().DrawPrimitive3DPreGUIQueue();
+
     if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems())
         return;
 

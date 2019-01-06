@@ -26,7 +26,9 @@ void CLuaDrawingDefs::LoadFunctions(void)
         {"dxDrawImage", DxDrawImage},
         {"dxDrawImageSection", DxDrawImageSection},
         {"dxDrawPrimitive", DxDrawPrimitive},
+        {"dxDrawPrimitive3D", DxDrawPrimitive3D},
         {"dxDrawMaterialPrimitive", DxDrawMaterialPrimitive},
+        {"dxDrawMaterialPrimitive3D", DxDrawMaterialPrimitive3D},
         {"dxGetTextWidth", DxGetTextWidth},
         {"dxGetFontHeight", DxGetFontHeight},
         {"dxCreateFont", DxCreateFont},
@@ -562,6 +564,98 @@ int CLuaDrawingDefs::DxDrawImageSection(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
+{
+    // bool dxDrawPrimitive (string primitiveType, bool postGUI, table vertice1, ...)
+    D3DPRIMITIVETYPE    ePrimitiveType;
+    auto                pVecVertices = new std::vector<PrimitiveVertice>();
+    bool                bPostGUI;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadEnumString(ePrimitiveType);
+    argStream.ReadBool(bPostGUI, false);
+
+    while (argStream.NextIsTable())
+    {
+        std::vector<float> vecTableContent;
+        argStream.ReadNumberTable(vecTableContent);
+        switch (vecTableContent.size())
+        {
+            case Primitive3DVerticeSizes::VERT_XYZ:
+                pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], vecTableContent[2], (DWORD)0xFFFFFFFF});
+                break;
+            case Primitive3DVerticeSizes::VERT_XYZ_COLOR:
+                pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], vecTableContent[2], static_cast<DWORD>(vecTableContent[3])});
+                break;
+        }
+    }
+
+    if (!argStream.HasErrors())
+    {
+        if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
+        {
+            g_pCore->GetGraphics()->DrawPrimitive3DQueued(pVecVertices, ePrimitiveType, bPostGUI);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }       
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    // Failed
+    delete pVecVertices;
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
+{
+    // bool dxDrawPrimitive (string primitiveType, bool postGUI, table vertice1, ...)
+    D3DPRIMITIVETYPE    ePrimitiveType;
+    auto                pVecVertices = new std::vector<PrimitiveMaterialVertice>();
+    CClientMaterial*    pMaterialElement;
+    bool                bPostGUI;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadEnumString(ePrimitiveType);
+    MixedReadMaterialString(argStream, pMaterialElement);
+    argStream.ReadBool(bPostGUI, false);
+
+    while (argStream.NextIsTable())
+    {
+        std::vector<float> vecTableContent;
+        argStream.ReadNumberTable(vecTableContent);
+        switch (vecTableContent.size())
+        {
+            case Primitive3DVerticeSizes::VERT_XYZ_UV:
+                pVecVertices->push_back(PrimitiveMaterialVertice{vecTableContent[0], vecTableContent[1], vecTableContent[2], (DWORD)0xFFFFFFFF, vecTableContent[3], vecTableContent[4] });
+                break;
+            case Primitive3DVerticeSizes::VERT_XYZ_COLOR_UV:
+                pVecVertices->push_back(PrimitiveMaterialVertice{ vecTableContent[0], vecTableContent[1], vecTableContent[2], static_cast<DWORD>(vecTableContent[3]),vecTableContent[4], vecTableContent[5] });
+                break;
+        }
+    }
+
+    if (!argStream.HasErrors())
+    {
+        if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
+        {
+            g_pCore->GetGraphics()->DrawMaterialPrimitive3DQueued(pVecVertices, ePrimitiveType, pMaterialElement->GetMaterialItem(), bPostGUI);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }       
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+
+    // Failed
+    delete pVecVertices;
     lua_pushboolean(luaVM, false);
     return 1;
 }
