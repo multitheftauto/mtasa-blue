@@ -2799,6 +2799,7 @@ void CResource::SendNoClientCacheScripts(CPlayer* pPlayer)
 bool CResource::UnzipResource()
 {
     m_zipfile = unzOpenUtf8(m_strResourceZip.c_str());
+
     if (!m_zipfile)
         return false;
 
@@ -2820,45 +2821,55 @@ bool CResource::UnzipResource()
         }
     }
 
-    unzGoToFirstFile(m_zipfile);
-
     std::vector<char> strFileName;
     std::string       strPath;
-    while (unzGoToNextFile(m_zipfile) != UNZ_END_OF_LIST_OF_FILE)
+
+    if (unzGoToFirstFile(m_zipfile) == UNZ_OK)
     {
-        // Check if we have this file already extracted
-        unz_file_info fileInfo;
-        memset(&fileInfo, 0, sizeof(unz_file_info));
-
-        if (unzGetCurrentFileInfo(m_zipfile, &fileInfo, nullptr, 0, nullptr, 0, nullptr, 0) != UNZ_OK)
-            return false;
-
-        strFileName.reserve(fileInfo.size_filename + 1);
-        unzGetCurrentFileInfo(m_zipfile, &fileInfo, strFileName.data(), strFileName.capacity() - 1, nullptr, 0, nullptr, 0);
-
-        strPath = m_strResourceCachePath + strFileName.data();
-        if (FileExists(strPath))
+        do
         {
-            // we've already got a cached copy of this file, check its still the same
-            unsigned long ulFileInZipCRC = fileInfo.crc;
-            unsigned long ulFileOnDiskCRC = CRCGenerator::GetCRCFromFile(strPath.c_str());
-            if (ulFileInZipCRC == ulFileOnDiskCRC)
-                continue;            // we've already extracted EXACTLY this file before
-            RemoveFile(strPath.c_str());
+            // Check if we have this file already extracted
+            unz_file_info fileInfo = {0};
+
+            if (unzGetCurrentFileInfo(m_zipfile, &fileInfo, nullptr, 0, nullptr, 0, nullptr, 0) != UNZ_OK)
+                return false;
+
+            strFileName.reserve(fileInfo.size_filename + 1);
+            unzGetCurrentFileInfo(m_zipfile, &fileInfo, strFileName.data(), strFileName.capacity() - 1, nullptr, 0, nullptr, 0);
+
+            // Check if the current file is a directory path
+            if (strFileName[fileInfo.size_filename - 1] == '/')
+                continue;
+
+            strFileName[fileInfo.size_filename] = '\0';
+            strPath = m_strResourceCachePath + strFileName.data();
+
+            if (FileExists(strPath))
+            {
+                // We've already got a cached copy of this file, check its still the same
+                unsigned long ulFileInZipCRC = fileInfo.crc;
+                unsigned long ulFileOnDiskCRC = CRCGenerator::GetCRCFromFile(strPath.c_str());
+
+                if (ulFileInZipCRC == ulFileOnDiskCRC)
+                    continue;            // we've already extracted EXACTLY this file before
+
+                RemoveFile(strPath.c_str());
+            }
+
+            // Doesn't exist or bad crc
+            int opt_extract_without_path = 0;
+            int opt_overwrite = 1;
+            int ires = do_extract_currentfile(m_zipfile, &opt_extract_without_path, &opt_overwrite, nullptr, m_strResourceCachePath.c_str());
+
+            if (ires != UNZ_OK)
+                return false;
         }
-
-        // Doesn't exist or bad crc
-        int opt_extract_without_path = 0;
-        int opt_overwrite = 1;
-
-        int ires = do_extract_currentfile(m_zipfile, &opt_extract_without_path, &opt_overwrite, NULL, m_strResourceCachePath.c_str());
-        if (ires != UNZ_OK)
-            return false;
+        while (unzGoToNextFile(m_zipfile) != UNZ_END_OF_LIST_OF_FILE);
     }
 
     // Close the zip file
     unzClose(m_zipfile);
-    m_zipfile = NULL;
+    m_zipfile = nullptr;
     return true;
 }
 
