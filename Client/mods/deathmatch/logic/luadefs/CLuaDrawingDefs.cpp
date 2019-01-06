@@ -570,7 +570,7 @@ int CLuaDrawingDefs::DxDrawImageSection(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
 {
-    // bool dxDrawPrimitive (string primitiveType, bool postGUI, table vertice1, ...)
+    // bool DxDrawPrimitive3D (string primitiveType, bool postGUI, table vertice1, ...)
     D3DPRIMITIVETYPE    ePrimitiveType;
     auto                pVecVertices = new std::vector<PrimitiveVertice>();
     bool                bPostGUI;
@@ -615,7 +615,7 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
 {
-    // bool dxDrawPrimitive (string primitiveType, bool postGUI, table vertice1, ...)
+    // bool DxDrawMaterialPrimitive3D (string primitiveType, dxMaterial material, bool postGUI, table vertice1, ...)
     D3DPRIMITIVETYPE    ePrimitiveType;
     auto                pVecVertices = new std::vector<PrimitiveMaterialVertice>();
     CClientMaterial*    pMaterialElement;
