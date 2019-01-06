@@ -13,6 +13,8 @@
 #include "CTileBatcher.h"
 #include "CLine3DBatcher.h"
 #include "CMaterialLine3DBatcher.h"
+#include "CPrimitiveBatcher.h"
+#include "CPrimitiveMaterialBatcher.h"
 #include "CAspectRatioConverter.h"
 extern CCore* g_pCore;
 extern bool   g_bInGTAScene;
@@ -56,6 +58,8 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_pLine3DBatcherPostGUI = new CLine3DBatcher(false);
     m_pMaterialLine3DBatcherPreGUI = new CMaterialLine3DBatcher(true);
     m_pMaterialLine3DBatcherPostGUI = new CMaterialLine3DBatcher(false);
+    m_pPrimitiveBatcher = new CPrimitiveBatcher();
+    m_pPrimitiveMaterialBatcher = new CPrimitiveMaterialBatcher(this);
 
     m_pScreenGrabber = NewScreenGrabber();
     m_pPixelsManager = NewPixelsManager();
@@ -78,6 +82,8 @@ CGraphics::~CGraphics(void)
     SAFE_DELETE(m_pLine3DBatcherPostGUI);
     SAFE_DELETE(m_pMaterialLine3DBatcherPreGUI);
     SAFE_DELETE(m_pMaterialLine3DBatcherPostGUI);
+    SAFE_DELETE(m_pPrimitiveBatcher);
+    SAFE_DELETE(m_pPrimitiveMaterialBatcher);
     SAFE_DELETE(m_pScreenGrabber);
     SAFE_DELETE(m_pPixelsManager);
     SAFE_DELETE(m_pAspectRatioConverter);
@@ -498,6 +504,14 @@ void CGraphics::CheckModes(EDrawModeType newDrawMode, EBlendModeType newBlendMod
         {
             m_pTileBatcher->Flush();
         }
+        else if (m_CurDrawMode == EDrawMode::PRIMITIVE)
+        {
+            m_pPrimitiveBatcher->Flush();
+        }
+        else if (m_CurDrawMode == EDrawMode::PRIMITIVE_MATERIAL)
+        {
+            m_pPrimitiveMaterialBatcher->Flush();
+        }
 
         // Start new
         if (newDrawMode == EDrawMode::DX_SPRITE)
@@ -805,6 +819,125 @@ void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, 
 
     // Add it to the queue
     AddQueueItem(Item, bPostGUI);
+}
+
+void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
+                                 short siSegments, float fRatio, bool bPostGUI)
+{
+    // Check if window is minimized so we don't calculate vertices for no reason.
+    if (g_pCore->IsWindowMinimized())
+        return;
+
+    auto pVecVertices = new std::vector<PrimitiveVertice>();
+    fStartAngle = D3DXToRadian(fStartAngle);
+    fStopAngle = D3DXToRadian(fStopAngle);
+    // Calculate each segment angle
+    const float kfSegmentAngle = (fStopAngle - fStartAngle) / (siSegments-1);
+
+    // Add center point
+    pVecVertices->push_back({ fX,fY,0.0f,ulColorCenter });
+
+    // And calculate all other vertices
+    for (short siSeg = 0; siSeg < siSegments; siSeg++)
+    {
+        PrimitiveVertice vert;
+        float curAngle = fStartAngle + siSeg * kfSegmentAngle;
+        vert.fX = fX + fRadius * cos(curAngle) * fRatio;
+        vert.fY = fY + fRadius * sin(curAngle);
+        vert.fZ = 0.0f;
+        vert.Color = ulColor;
+        pVecVertices->push_back(vert);
+    }
+
+    DrawPrimitiveQueued(pVecVertices, D3DPT_TRIANGLEFAN, bPostGUI);
+}
+
+void CGraphics::DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI)
+{
+    // Prevent queuing when minimized
+    if (g_pCore->IsWindowMinimized())
+    {
+        delete pVecVertices;
+        m_pPrimitiveBatcher->ClearQueue();
+        return;
+    }
+
+    for (auto& vert : *pVecVertices)
+    {
+        vert.fY = m_pAspectRatioConverter->ConvertPositionForAspectRatio(vert.fY);
+    }
+
+    // Set up a queue item
+    sDrawQueueItem Item;
+    Item.eType = QUEUE_PRIMITIVE;
+    Item.Primitive.eType = eType;
+    Item.Primitive.pVecVertices = pVecVertices;
+    AddQueueItem (Item, bPostGUI);
+}
+
+void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
+                                            bool bPostGUI)
+{
+    // Prevent queuing when minimized
+    if (g_pCore->IsWindowMinimized())
+    {
+        delete pVecVertices;
+        m_pPrimitiveMaterialBatcher->ClearQueue();
+        return;
+    }
+
+    for (auto& vert : *pVecVertices)
+    {
+        vert.fY = m_pAspectRatioConverter->ConvertPositionForAspectRatio(vert.fY);
+    }
+
+    // Set up a queue item
+    sDrawQueueItem Item;
+    Item.eType = QUEUE_PRIMITIVEMATERIAL;
+    Item.PrimitiveMaterial.eType = eType;
+    Item.PrimitiveMaterial.pMaterial = pMaterial;
+    Item.PrimitiveMaterial.pVecVertices = pVecVertices;
+    AddQueueItem(Item, bPostGUI);
+
+    AddQueueRef(pMaterial);
+}
+
+bool CGraphics::IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType)
+{
+    if (iNumVertives < 1)
+    {
+        return false;
+    }
+
+    switch (eType)
+    {
+        case D3DPT_LINESTRIP:
+            if (iNumVertives < 2)
+            {
+                return false;
+            }
+            break;
+        case D3DPT_LINELIST:
+            if (iNumVertives % 2 != 0)
+            {
+                return false;
+            }
+            break;
+        case D3DPT_TRIANGLELIST:
+            if (iNumVertives % 3 != 0)
+            {
+                return false;
+            }
+        case D3DPT_TRIANGLEFAN:
+        case D3DPT_TRIANGLESTRIP:
+            if (iNumVertives < 3)
+            {
+                return false;
+            }
+            break;
+    }
+    
+    return true;
 }
 
 void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeight, float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV,
@@ -1274,6 +1407,8 @@ void CGraphics::OnDeviceCreate(IDirect3DDevice9* pDevice)
     m_pLine3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialLine3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialLine3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitiveBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitiveMaterialBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pRenderItemManager->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pScreenGrabber->OnDeviceCreate(pDevice);
     m_pPixelsManager->OnDeviceCreate(pDevice);
@@ -1407,7 +1542,7 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
 {
     switch (Item.eType)
     {
-        // Line type?
+            // Line type?
         case QUEUE_LINE:
         {
             // Got a line interface?
@@ -1445,6 +1580,7 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
             DrawRectangleInternal(Item.Rect.fX, Item.Rect.fY, Item.Rect.fWidth, Item.Rect.fHeight, Item.Rect.ulColor, Item.Rect.bSubPixelPositioning);
             break;
         }
+
         case QUEUE_TEXT:
         {
             RECT rect;
@@ -1515,6 +1651,20 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
             m_pTileBatcher->AddTile(t.fX, t.fY, t.fX + t.fWidth, t.fY + t.fHeight, fU1, fV1, fU2, fV2, t.pMaterial, t.fRotation, t.fRotCenOffX, t.fRotCenOffY,
                                     t.ulColor);
             RemoveQueueRef(Item.Texture.pMaterial);
+            break;
+        }
+        case QUEUE_PRIMITIVE:
+        {
+            const sDrawQueuePrimitive primitive = Item.Primitive;
+            CheckModes (EDrawMode::PRIMITIVE);
+            m_pPrimitiveBatcher->AddPrimitive (primitive.eType, primitive.pVecVertices);
+            break;
+        }
+        case QUEUE_PRIMITIVEMATERIAL:
+        {
+            const sDrawQueuePrimitiveMaterial primitive = Item.PrimitiveMaterial;
+            CheckModes(EDrawMode::PRIMITIVE_MATERIAL);
+            m_pPrimitiveMaterialBatcher->AddPrimitive(primitive.eType, primitive.pMaterial, primitive.pVecVertices);
             break;
         }
     }
@@ -1590,8 +1740,10 @@ void CGraphics::OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewpo
 {
     // Flush dx draws
     DrawPreGUIQueue();
-    // Inform tile batcher
+    // Inform batchers
     m_pTileBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
+    m_pPrimitiveBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
+    m_pPrimitiveMaterialBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
 }
 
 ////////////////////////////////////////////////////////////////

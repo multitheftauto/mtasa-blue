@@ -10,8 +10,7 @@
 
 class CClientModelRequestManager;
 
-#ifndef __CCLIENTMODELREQUESTMANAGER_H
-#define __CCLIENTMODELREQUESTMANAGER_H
+#pragma once
 
 #include "CClientCommon.h"
 #include "CClientEntity.h"
@@ -50,5 +49,3 @@ private:
     std::list<SClientModelRequest*> m_Requests;
     std::list<CClientEntity*>       m_CancelQueue;
 };
-
-#endif

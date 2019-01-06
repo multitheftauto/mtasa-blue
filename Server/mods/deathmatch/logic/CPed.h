@@ -131,13 +131,13 @@ public:
         VEHICLEACTION_JACKED,
     };
 
-    CPed(class CPedManager* pPedManager, CElement* pParent, CXMLNode* pNode, unsigned short usModel);
+    CPed(class CPedManager* pPedManager, CElement* pParent, unsigned short usModel);
     ~CPed(void);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
     bool IsEntity(void) { return true; }
 
     virtual void Unlink(void);
-    virtual bool ReadSpecialData(void);
 
     bool HasValidModel(void);
 
@@ -264,6 +264,9 @@ public:
 
     bool GetCollisionEnabled(void) { return m_bCollisionsEnabled; }
     void SetCollisionEnabled(bool bCollisionEnabled) { m_bCollisionsEnabled = bCollisionEnabled; }
+
+protected:
+    bool ReadSpecialData(const int iLine) override;
 
 protected:
     unsigned short                       m_usModel;

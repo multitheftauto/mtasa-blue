@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TASKNAMES
-#define __CGAMESA_TASKNAMES
+#pragma once
 
 struct sTaskName
 {
@@ -20,4 +19,3 @@ struct sTaskName
 extern const char* const sNoTaskName;
 
 extern const sTaskName TaskNames[1802];
-#endif

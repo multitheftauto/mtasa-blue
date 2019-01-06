@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_PROJECTILEINFO
-#define __CGAME_PROJECTILEINFO
+#pragma once
 
 class CProjectile;
 class CPlayerPed;
@@ -34,5 +33,3 @@ public:
     virtual void  SetCounter(DWORD dwCounter) = 0;
     virtual DWORD GetCounter(void) = 0;
 };
-
-#endif

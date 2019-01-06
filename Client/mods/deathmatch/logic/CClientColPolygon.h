@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCOLPOLYGON_H
-#define __CCLIENTCOLPOLYGON_H
+#pragma once
 
 class CClientColPolygon : public CClientColShape
 {
@@ -36,11 +35,7 @@ public:
 protected:
     std::vector<CVector2D> m_Points;
 
-    bool ReadSpecialData(void);
-
     bool IsInBounds(CVector vecPoint);
 
     float m_fRadius;
 };
-
-#endif

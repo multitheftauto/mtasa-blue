@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CXML_H
-#define __CXML_H
+#pragma once
 
 class CXMLNode;
 class CXMLFile;
@@ -27,5 +26,3 @@ public:
     virtual CXMLFile*      GetFileFromID(unsigned long ulID) = 0;
     virtual CXMLNode*      GetNodeFromID(unsigned long ulID) = 0;
 };
-
-#endif

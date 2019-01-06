@@ -289,8 +289,8 @@ SString CheckOnRestartCommand(void)
             // Try to extract the files
             if (!ExtractFiles(strFile))
             {
-                // If extract failed and update file is an exe, try to run it
-                if (ExtractExtension(strFile).CompareI("exe"))
+                // If extract failed and update file is an .exe or .msu, try to run it
+                if (ExtractExtension(strFile).EqualsI("exe") || ExtractExtension(strFile).EqualsI("msu"))
                     ShellExecuteBlocking("open", strFile, strParameters.SplitRight("###"));
             }
 

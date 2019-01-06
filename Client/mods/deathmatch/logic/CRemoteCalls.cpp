@@ -224,10 +224,10 @@ void CRemoteCall::MakeCall()
     if (strDomain.empty())
         strDomain = g_pCore->GetWebCore()->GetDomainFromURL("http://" + m_strURL);
     // Bypass net module IP check if we are allowed to access the URL
-    bool                              bAnyHost = (g_pCore->GetWebCore()->GetDomainState(strDomain) == eURLState::WEBPAGE_ALLOWED);
-    EDownloadModeType                 downloadMode = g_pClientGame->GetRemoteCalls()->GetDownloadModeForQueueName(m_strQueueName, bAnyHost);
-    CNetHTTPDownloadManagerInterface* pDownloadManager = g_pNet->GetHTTPDownloadManager(downloadMode);
-    pDownloadManager->QueueFile(m_strURL, NULL, this, DownloadFinishedCallback, false, m_options, false, false);
+    bool bAnyHost = (g_pCore->GetWebCore()->GetDomainState(strDomain) == eURLState::WEBPAGE_ALLOWED);
+    m_downloadMode = g_pClientGame->GetRemoteCalls()->GetDownloadModeForQueueName(m_strQueueName, bAnyHost);
+    CNetHTTPDownloadManagerInterface* pDownloadManager = g_pNet->GetHTTPDownloadManager(m_downloadMode);
+    pDownloadManager->QueueFile(m_strURL, NULL, this, DownloadFinishedCallback, m_options);
 }
 
 void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
@@ -235,6 +235,7 @@ void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
     CRemoteCall* pCall = (CRemoteCall*)result.pObj;
     if (!g_pClientGame->GetRemoteCalls()->CallExists(pCall))
         return;
+    pCall->m_downloadMode = EDownloadModeType::NONE;
 
     CLuaArguments arguments;
     if (pCall->IsLegacy())
@@ -293,4 +294,25 @@ void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
 
     arguments.Call(pCall->m_VM, pCall->m_iFunction);
     g_pClientGame->GetRemoteCalls()->Remove(pCall);
+}
+
+// Return true if cancel was done
+bool CRemoteCall::CancelDownload(void)
+{
+    if (m_downloadMode != EDownloadModeType::NONE)
+    {
+        return g_pNet->GetHTTPDownloadManager(m_downloadMode)->CancelDownload(this, DownloadFinishedCallback);
+    }
+    return false;
+}
+
+// Return true if outDownloadStatus contains valid data
+bool CRemoteCall::GetDownloadStatus(SDownloadStatus& outDownloadStatus)
+{
+    if (m_downloadMode != EDownloadModeType::NONE)
+    {
+        return g_pNet->GetHTTPDownloadManager(m_downloadMode)->GetDownloadStatus(this, DownloadFinishedCallback, outDownloadStatus);
+    }
+    outDownloadStatus = {0};
+    return false;
 }

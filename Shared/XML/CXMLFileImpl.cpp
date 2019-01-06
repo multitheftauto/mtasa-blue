@@ -63,7 +63,7 @@ void CXMLFileImpl::SetFilename(const char* szFilename)
 bool CXMLFileImpl::Parse(std::vector<char>* pOutFileContents)
 {
     // Do we have a filename?
-    if (m_strFilename != "")
+    if (m_strFilename != "" && FileExists(m_strFilename))
     {
         // Reset previous file
         Reset();

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TASK_MANAGER
-#define __CGAMESA_TASK_MANAGER
+#pragma once
 
 #include <game/CTaskManager.h>
 #include "Common.h"
@@ -80,5 +79,3 @@ public:
     void   ClearTaskEventResponse();
     void   Flush(const int iPriority);
 };
-
-#endif

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -50,7 +50,7 @@
  *
  * data    [in]     - The session handle.
  * userp   [in]     - The user name.
- * passdwp [in]     - The user's password.
+ * passwdp [in]     - The user's password.
  * outptr  [in/out] - The address where a pointer to newly allocated memory
  *                    holding the result will be stored upon completion.
  * outlen  [out]    - The length of the output message.
@@ -73,16 +73,10 @@ CURLcode Curl_auth_create_plain_message(struct Curl_easy *data,
   ulen = strlen(userp);
   plen = strlen(passwdp);
 
-  /* Compute binary message length, checking for overflows. */
-  plainlen = 2 * ulen;
-  if(plainlen < ulen)
+  /* Compute binary message length. Check for overflows. */
+  if((ulen > SIZE_T_MAX/4) || (plen > (SIZE_T_MAX/2 - 2)))
     return CURLE_OUT_OF_MEMORY;
-  plainlen += plen;
-  if(plainlen < plen)
-    return CURLE_OUT_OF_MEMORY;
-  plainlen += 2;
-  if(plainlen < 2)
-    return CURLE_OUT_OF_MEMORY;
+  plainlen = 2 * ulen + plen + 2;
 
   plainauth = malloc(plainlen);
   if(!plainauth)

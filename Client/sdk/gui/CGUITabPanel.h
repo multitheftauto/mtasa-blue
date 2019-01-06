@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUITABPANEL_H
-#define __CGUITABPANEL_H
+#pragma once
 
 #include "CGUIElement.h"
 #include "CGUITab.h"
@@ -35,5 +34,3 @@ public:
 
     virtual bool IsTabSelected(CGUITab* pTab) = 0;
 };
-
-#endif

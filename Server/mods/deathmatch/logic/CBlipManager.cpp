@@ -15,35 +15,29 @@ CBlipManager::CBlipManager(void)
 {
 }
 
-CBlip* CBlipManager::Create(CElement* pParent, CXMLNode* pNode)
+CBlip* CBlipManager::Create(CElement* pParent)
 {
-    // Create the blip
-    CBlip* pBlip = new CBlip(pParent, pNode, this);
+    CBlip* const pBlip = new CBlip(pParent, this);
 
-    // Is the id valid?
     if (pBlip->GetID() == INVALID_ELEMENT_ID)
     {
         delete pBlip;
-        return NULL;
+        return nullptr;
     }
 
-    // Return the created blip
     return pBlip;
 }
 
 CBlip* CBlipManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents)
 {
-    // Create the blip
-    CBlip* pBlip = new CBlip(pParent, &Node, this);
+    CBlip* const pBlip = new CBlip(pParent, this);
 
-    // Is the id valid?
-    if (pBlip->GetID() == INVALID_ELEMENT_ID || !pBlip->LoadFromCustomData(pEvents))
+    if (pBlip->GetID() == INVALID_ELEMENT_ID || !pBlip->LoadFromCustomData(pEvents, Node))
     {
         delete pBlip;
-        return NULL;
+        return nullptr;
     }
 
-    // Return the created blip
     return pBlip;
 }
 

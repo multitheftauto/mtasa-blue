@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CKEYBINDSINTERFACE_H
-#define __CKEYBINDSINTERFACE_H
+#pragma once
 
 // Beware: this class is poorly written and depends on game while it shouldn't
 #include <game/CControllerConfigManager.h>
@@ -245,5 +244,3 @@ public:
     virtual void PrintBindsCommand(const char* szCmdLine) = 0;
     virtual bool TriggerKeyStrokeHandler(const SString& strKey, bool bActive, bool bIsConsoleInputKey) = 0;
 };
-
-#endif

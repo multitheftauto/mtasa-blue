@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTPROJECTILEMANAGER_H
-#define __CCLIENTPROJECTILEMANAGER_H
+#pragma once
 
 #include "CClientProjectile.h"
 #include <list>
@@ -58,5 +57,3 @@ private:
     bool                 m_bCreating;
     CClientProjectilePtr m_pLastCreated;
 };
-
-#endif

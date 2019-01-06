@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CMODMANAGERINTERFACE_H
-#define __CMODMANAGERINTERFACE_H
+#pragma once
 
 class CClientBase;
 
@@ -24,5 +23,3 @@ public:
     virtual bool         IsLoaded(void) = 0;
     virtual CClientBase* GetCurrentMod(void) = 0;
 };
-
-#endif

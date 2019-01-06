@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_WEATHER
-#define __CGAMESA_WEATHER
+#pragma once
 
 #include <game/CWeather.h>
 #include "Common.h"
@@ -42,5 +41,3 @@ private:
 
     static unsigned long FUNC_IsRaining;
 };
-
-#endif

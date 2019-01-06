@@ -27,7 +27,7 @@ public:
     CObjectManager(void);
     ~CObjectManager(void);
 
-    CObject* Create(CElement* pParent, CXMLNode* pNode, bool bIsLowLod);
+    CObject* Create(CElement* pParent, bool bIsLowLod);
     CObject* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents, bool bIsLowLod);
     void     DeleteAll(void);
 

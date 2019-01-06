@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TASKBASIC
-#define __CGAMESA_TASKBASIC
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -244,5 +243,3 @@ class CTaskComplexFacialSA : public virtual CTaskComplexSA, public virtual CTask
 public:
     CTaskComplexFacialSA(void);
 };
-
-#endif

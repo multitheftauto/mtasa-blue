@@ -10,8 +10,7 @@
 
 class CClientObject;
 
-#ifndef __CCLIENTOBJECT_H
-#define __CCLIENTOBJECT_H
+#pragma once
 
 #include "CClientStreamElement.h"
 
@@ -48,6 +47,8 @@ public:
     void         GetRotationRadians(CVector& vecRotation) const;
     void         SetRotationDegrees(const CVector& vecRotation);
     virtual void SetRotationRadians(const CVector& vecRotation);
+
+    void AttachTo(CClientEntity* pEntity) override;
 
     void GetMoveSpeed(CVector& vecMoveSpeed) const;
     void SetMoveSpeed(const CVector& vecMoveSpeed);
@@ -87,6 +88,16 @@ public:
 
     float GetHealth(void);
     void  SetHealth(float fHealth);
+    float GetTurnMass(void);
+    void  SetTurnMass(float fTurnMass);
+    float GetAirResistance(void);
+    void  SetAirResistance(float fAirResistance);
+    float GetElasticity(void);
+    void  SetElasticity(float fElasticity);
+    float GetBuoyancyConstant(void);
+    void  SetBuoyancyConstant(float fBuoyancyConstant);
+    void  GetCenterOfMass(CVector& vecCenterOfMass) const;
+    void  SetCenterOfMass(const CVector& vecCenterOfMass);
 
     bool IsBreakable(bool bCheckModelList = true);
     bool SetBreakable(bool bBreakable);
@@ -135,6 +146,11 @@ protected:
     bool          m_bBeingRespawned;
     bool          m_bRespawnEnabled;
     float         m_fMass;
+    float         m_fTurnMass;
+    float         m_fAirResistance;
+    float         m_fElasticity;
+    float         m_fBuoyancyConstant;
+    CVector       m_vecCenterOfMass;
     bool          m_bVisibleInAllDimensions = false;
 
     CVector m_vecMoveSpeed;
@@ -149,5 +165,3 @@ public:
     CObject*              m_pObject;
     SLastSyncedObjectData m_LastSyncedData;
 };
-
-#endif

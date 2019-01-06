@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CInputRPCs_H
-#define __CInputRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
@@ -30,5 +29,3 @@ public:
     DECLARE_RPC(ShowCursor);
     DECLARE_RPC(ShowChat);
 };
-
-#endif

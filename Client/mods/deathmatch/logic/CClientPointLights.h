@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTPOINTLIGHTS_H
-#define __CCLIENTPOINTLIGHTS_H
+#pragma once
 
 #include "CClientEntity.h"
 
@@ -67,5 +66,3 @@ protected:
 
     bool m_bStreamedIn;
 };
-
-#endif

@@ -14,56 +14,65 @@
 
 extern CNetServer* g_pRealNetServer;
 
-void CLuaResourceDefs::LoadFunctions(void)
+void CLuaResourceDefs::LoadFunctions()
 {
-    // Create/edit functions
-    CLuaCFunctions::AddFunction("createResource", createResource);
-    CLuaCFunctions::AddFunction("copyResource", copyResource);
-    CLuaCFunctions::AddFunction("renameResource", renameResource);
-    CLuaCFunctions::AddFunction("deleteResource", deleteResource);
+    std::map<const char*, lua_CFunction> functions{
+        // Create/edit functions
+        {"createResource", createResource},
+        {"copyResource", copyResource},
+        {"renameResource", renameResource},
+        {"deleteResource", deleteResource},
 
-    CLuaCFunctions::AddFunction("addResourceMap", addResourceMap);
-    CLuaCFunctions::AddFunction("addResourceConfig", addResourceConfig);
-    CLuaCFunctions::AddFunction("removeResourceFile", removeResourceFile);
+        {"addResourceMap", addResourceMap},
+        {"addResourceConfig", addResourceConfig},
+        {"removeResourceFile", removeResourceFile},
 
-    CLuaCFunctions::AddFunction("setResourceDefaultSetting", setResourceDefaultSetting);
-    CLuaCFunctions::AddFunction("removeResourceDefaultSetting", removeResourceDefaultSetting);
+        {"setResourceDefaultSetting", setResourceDefaultSetting},
+        {"removeResourceDefaultSetting", removeResourceDefaultSetting},
 
-    // Start/stop management
-    CLuaCFunctions::AddFunction("startResource", startResource);
-    CLuaCFunctions::AddFunction("stopResource", stopResource);
-    CLuaCFunctions::AddFunction("restartResource", restartResource);
+        // Start/stop management
+        {"startResource", startResource},
+        {"stopResource", stopResource},
+        {"restartResource", restartResource},
 
-    // Get stuff
-    CLuaCFunctions::AddFunction("getThisResource", getThisResource);
-    CLuaCFunctions::AddFunction("getResourceFromName", getResourceFromName);
-    CLuaCFunctions::AddFunction("getResources", getResources);
+        // Get stuff
+        {"getThisResource", getThisResource},
+        {"getResourceFromName", getResourceFromName},
+        {"getResources", getResources},
 
-    CLuaCFunctions::AddFunction("getResourceState", getResourceState);
-    CLuaCFunctions::AddFunction("getResourceInfo", getResourceInfo);
-    CLuaCFunctions::AddFunction("getResourceConfig", getResourceConfig);
-    CLuaCFunctions::AddFunction("getResourceLoadFailureReason", getResourceLoadFailureReason);
-    CLuaCFunctions::AddFunction("getResourceLastStartTime", getResourceLastStartTime);
-    CLuaCFunctions::AddFunction("getResourceLoadTime", getResourceLoadTime);
-    CLuaCFunctions::AddFunction("getResourceName", getResourceName);
-    CLuaCFunctions::AddFunction("getResourceRootElement", getResourceRootElement);
-    CLuaCFunctions::AddFunction("getResourceDynamicElementRoot", getResourceDynamicElementRoot);
-    CLuaCFunctions::AddFunction("getResourceMapRootElement", getResourceMapRootElement);
-    CLuaCFunctions::AddFunction("getResourceExportedFunctions", getResourceExportedFunctions);
-    CLuaCFunctions::AddFunction("getResourceOrganizationalPath", getResourceOrganizationalPath);
-    CLuaCFunctions::AddFunction("isResourceArchived", isResourceArchived);
+        {"getResourceState", getResourceState},
+        {"getResourceInfo", getResourceInfo},
+        {"getResourceConfig", getResourceConfig},
+        {"getResourceLoadFailureReason", getResourceLoadFailureReason},
+        {"getResourceLastStartTime", getResourceLastStartTime},
+        {"getResourceLoadTime", getResourceLoadTime},
+        {"getResourceName", getResourceName},
+        {"getResourceRootElement", getResourceRootElement},
+        {"getResourceDynamicElementRoot", getResourceDynamicElementRoot},
+        {"getResourceMapRootElement", getResourceMapRootElement},
+        {"getResourceExportedFunctions", getResourceExportedFunctions},
+        {"getResourceOrganizationalPath", getResourceOrganizationalPath},
+        {"isResourceArchived", isResourceArchived},
 
-    // Set stuff
-    CLuaCFunctions::AddFunction("setResourceInfo", setResourceInfo);
+        // Set stuff
+        {"setResourceInfo", setResourceInfo},
 
-    // Misc
-    CLuaCFunctions::AddFunction("call", call);
-    CLuaCFunctions::AddFunction("refreshResources", refreshResources);
+        // Misc
+        {"call", call},
+        {"refreshResources", refreshResources},
 
-    CLuaCFunctions::AddFunction("getResourceACLRequests", getResourceACLRequests);
+        {"getResourceACLRequests", getResourceACLRequests},
+        {"loadstring", LoadString},
+        {"load", Load},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
+
     CLuaCFunctions::AddFunction("updateResourceACLRequest", updateResourceACLRequest, true);
-    CLuaCFunctions::AddFunction("loadstring", LoadString);
-    CLuaCFunctions::AddFunction("load", Load);
 }
 
 void CLuaResourceDefs::AddClass(lua_State* luaVM)
@@ -452,139 +461,154 @@ int CLuaResourceDefs::removeResourceDefaultSetting(lua_State* luaVM)
 
 int CLuaResourceDefs::startResource(lua_State* luaVM)
 {
-    CResource* pResource;
-    bool       bPersistent, bStartIncludedResources, bConfigs, bClientFiles;
-    bool       bMaps, bScripts, bHTML, bClientConfigs, bClientScripts;
+    CResource*            pResource = nullptr;
+    bool                  bPersistent = false;
+    SResourceStartOptions StartOptions;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pResource);
     argStream.ReadBool(bPersistent, false);
-    argStream.ReadBool(bStartIncludedResources, true);
-    argStream.ReadBool(bConfigs, true);
-    argStream.ReadBool(bMaps, true);
-    argStream.ReadBool(bScripts, true);
-    argStream.ReadBool(bHTML, true);
-    argStream.ReadBool(bClientConfigs, true);
-    argStream.ReadBool(bClientScripts, true);
-    argStream.ReadBool(bClientFiles, true);
+    argStream.ReadBool(StartOptions.bIncludedResources, true);
+    argStream.ReadBool(StartOptions.bConfigs, true);
+    argStream.ReadBool(StartOptions.bMaps, true);
+    argStream.ReadBool(StartOptions.bScripts, true);
+    argStream.ReadBool(StartOptions.bHTML, true);
+    argStream.ReadBool(StartOptions.bClientConfigs, true);
+    argStream.ReadBool(StartOptions.bClientScripts, true);
+    argStream.ReadBool(StartOptions.bClientFiles, true);
 
-    if (!argStream.HasErrors())
+    if (argStream.HasErrors())
     {
-        if (pResource->IsLoaded() && !pResource->IsActive() && !pResource->IsStarting())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushnil(luaVM);
+        return 1;
+    }
+
+    if (pResource->IsLoaded() && !pResource->IsActive() && !pResource->IsStarting())
+    {
+        std::string strResourceName = pResource->GetName();
+
+        if (!m_pResourceManager->StartResource(pResource, nullptr, bPersistent, StartOptions))
         {
-            std::string strResourceName = pResource->GetName();
+            CLogger::LogPrintf("%s: Failed to start resource '%s'\n", lua_tostring(luaVM, lua_upvalueindex(1)), strResourceName.c_str());
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
 
-            if (!m_pResourceManager->StartResource(pResource, NULL, bPersistent, bStartIncludedResources, bConfigs, bMaps, bScripts, bHTML, bClientConfigs,
-                                                   bClientScripts, bClientFiles))
+        if (pResource->IsActive())
+        {
+            // If the resource is persistent, set that flag
+            pResource->SetPersistent(bPersistent);
+
+            if (!bPersistent)
             {
-                CLogger::LogPrintf("%s: Failed to start resource '%s'\n", lua_tostring(luaVM, lua_upvalueindex(1)), strResourceName.c_str());
-                lua_pushboolean(luaVM, false);
-                return 1;
-            }
+                // Add the new resource to the list of included resources so that when
+                // we unload this resource, the new resource goes with it
+                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
 
-            if (pResource->IsActive())
-            {
-                // if the resource is persistent, set that flag
-                pResource->SetPersistent(bPersistent);
-
-                if (!bPersistent)
+                if (pLuaMain)
                 {
-                    // Add the new resource to the list of included resources so that when
-                    // we unload this resource, the new resource goes with it
-                    CLuaMain* main = m_pLuaManager->GetVirtualMachine(luaVM);
-                    if (main)
+                    CResource* pThisResource = pLuaMain->GetResource();
+
+                    if (pThisResource)
                     {
-                        CResource* pThisResource = main->GetResource();
-                        if (pThisResource)
-                        {
-                            pThisResource->AddTemporaryInclude(pResource);
-                            // Make sure the new resource is dependent on this one
-                            pResource->AddDependent(pThisResource);
-                        }
+                        pThisResource->AddTemporaryInclude(pResource);
+                        // Make sure the new resource is dependent on this one
+                        pResource->AddDependent(pThisResource);
                     }
                 }
-                CLogger::LogPrintf("%s: Resource '%s' started\n", lua_tostring(luaVM, lua_upvalueindex(1)), pResource->GetName().c_str());
-                lua_pushboolean(luaVM, true);
-                return 1;
             }
+
+            CLogger::LogPrintf("%s: Resource '%s' started\n", lua_tostring(luaVM, lua_upvalueindex(1)), pResource->GetName().c_str());
+            lua_pushboolean(luaVM, true);
+        }
+        else
+        {
+            m_pScriptDebugging->LogWarning(luaVM, "Failed to start resource '%s'", strResourceName.c_str());
+            lua_pushboolean(luaVM, false);
         }
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
     return 1;
 }
 
 int CLuaResourceDefs::stopResource(lua_State* luaVM)
 {
-    CResource* pResource;
+    CResource* pResource = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pResource);
 
-    if (!argStream.HasErrors())
+    if (argStream.HasErrors())
     {
-        if (pResource->IsActive())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushnil(luaVM);
+        return 1;
+    }
+
+    if (pResource->IsActive())
+    {
+        if (pResource->IsProtected())
         {
-            if (pResource->IsProtected())
+            CResource* pThisResource = m_pLuaManager->GetVirtualMachineResource(luaVM);
+
+            if (!pThisResource || !m_pACLManager->CanObjectUseRight(pThisResource->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                                                                    "stopResource.protected", CAccessControlListRight::RIGHT_TYPE_FUNCTION, false))
             {
-                CResource* pThisResource = m_pLuaManager->GetVirtualMachineResource(luaVM);
-                if (!pThisResource || !m_pACLManager->CanObjectUseRight(pThisResource->GetName().c_str(),
-
-                                                                        CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, "stopResource.protected",
-                                                                        CAccessControlListRight::RIGHT_TYPE_FUNCTION, false))
-                {
-                    m_pScriptDebugging->LogError(luaVM, "%s: Resource could not be stopped as it is protected", lua_tostring(luaVM, lua_upvalueindex(1)));
-                    lua_pushboolean(luaVM, false);
-                    return 1;
-                }
+                m_pScriptDebugging->LogError(luaVM, "%s: Resource could not be stopped as it is protected", lua_tostring(luaVM, lua_upvalueindex(1)));
+                lua_pushboolean(luaVM, false);
+                return 1;
             }
-
-            // Schedule it for a stop
-            m_pResourceManager->QueueResource(pResource, CResourceManager::QUEUE_STOP, NULL);
-            lua_pushboolean(luaVM, true);
-            return 1;
         }
+
+        // Schedule it for a stop
+        m_pResourceManager->QueueResource(pResource, CResourceManager::QUEUE_STOP, nullptr);
+        lua_pushboolean(luaVM, true);
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    {
+        m_pScriptDebugging->LogWarning(luaVM, "Attempt to stop a stopped resource");
+        lua_pushboolean(luaVM, false);
+    }
 
-    lua_pushboolean(luaVM, false);
     return 1;
 }
 
 int CLuaResourceDefs::restartResource(lua_State* luaVM)
 {
-    CResource*                            pResource;
-    bool                                  bPersistent;            // unused
-    CResourceManager::sResourceStartFlags sFlags;
+    CResource*            pResource = nullptr;
+    bool                  bPersistent = false;            // unused
+    SResourceStartOptions StartOptions;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pResource);
     argStream.ReadBool(bPersistent, false);
-    argStream.ReadBool(sFlags.bConfigs, true);
-    argStream.ReadBool(sFlags.bMaps, true);
-    argStream.ReadBool(sFlags.bScripts, true);
-    argStream.ReadBool(sFlags.bHTML, true);
-    argStream.ReadBool(sFlags.bClientConfigs, true);
-    argStream.ReadBool(sFlags.bClientScripts, true);
-    argStream.ReadBool(sFlags.bClientFiles, true);
+    argStream.ReadBool(StartOptions.bConfigs, true);
+    argStream.ReadBool(StartOptions.bMaps, true);
+    argStream.ReadBool(StartOptions.bScripts, true);
+    argStream.ReadBool(StartOptions.bHTML, true);
+    argStream.ReadBool(StartOptions.bClientConfigs, true);
+    argStream.ReadBool(StartOptions.bClientScripts, true);
+    argStream.ReadBool(StartOptions.bClientFiles, true);
 
-    if (!argStream.HasErrors())
+    if (argStream.HasErrors())
     {
-        if (pResource->IsActive())
-        {
-            m_pResourceManager->QueueResource(pResource, CResourceManager::QUEUE_RESTART, &sFlags);
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushnil(luaVM);
+        return 1;
+    }
 
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+    if (!pResource->IsActive())
+    {
+        m_pResourceManager->QueueResource(pResource, CResourceManager::QUEUE_RESTART, &StartOptions);
+        lua_pushboolean(luaVM, true);
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    {
+        m_pScriptDebugging->LogWarning(luaVM, "Attempt to restart a stopped resource");
+        lua_pushboolean(luaVM, false);
+    }
 
-    lua_pushboolean(luaVM, false);
     return 1;
 }
 
@@ -762,21 +786,22 @@ int CLuaResourceDefs::getResourceConfig(lua_State* luaVM)
             CheckCanModifyOtherResource(argStream, pThisResource, pResource);
             if (!argStream.HasErrors())
             {
-                list<CResourceFile*>*          resourceFileList = pResource->GetFiles();
-                list<CResourceFile*>::iterator iterd = resourceFileList->begin();
-                for (; iterd != resourceFileList->end(); ++iterd)
+                for (CResourceFile* pResourceFile : pResource->GetFiles())
                 {
-                    CResourceConfigItem* config = (CResourceConfigItem*)(*iterd);
+                    if (pResourceFile->GetType() != CResourceFile::RESOURCE_FILE_TYPE_CONFIG)
+                        continue;
 
-                    if (config && config->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CONFIG && strcmp(config->GetName(), strMetaPath.c_str()) == 0)
-                    {
-                        CXMLNode* pNode = config->GetRoot();
-                        if (pNode)
-                        {
-                            lua_pushxmlnode(luaVM, pNode);
-                            return 1;
-                        }
-                    }
+                    if (strcmp(pResourceFile->GetName(), strMetaPath.c_str()) != 0)
+                        continue;
+
+                    auto      pConfigItem = static_cast<CResourceConfigItem*>(pResourceFile);
+                    CXMLNode* pRootNode = pConfigItem->GetRoot();
+
+                    if (!pRootNode)
+                        continue;
+
+                    lua_pushxmlnode(luaVM, pRootNode);
+                    return 1;
                 }
             }
         }

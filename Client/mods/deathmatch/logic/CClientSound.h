@@ -11,8 +11,7 @@
 class CClientSound;
 class CBassAudio;
 
-#ifndef __CCLIENTSOUND_H
-#define __CCLIENTSOUND_H
+#pragma once
 
 #include "CClientSoundManager.h"
 #include "CClientEntity.h"
@@ -44,6 +43,7 @@ public:
     double GetPlayPosition(void);
 
     double GetLength(bool bAvoidLoad = false);
+    double GetBufferLength();
 
     void  SetVolume(float fVolume, bool bStore = true);
     float GetVolume(void);
@@ -135,5 +135,3 @@ private:
     SFixedArray<int, 9> m_EnabledEffects;
     uint                m_uiFrameNumberCreated;
 };
-
-#endif

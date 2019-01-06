@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIEDIT_IMPL_H
-#define __CGUIEDIT_IMPL_H
+#pragma once
 
 #include <gui/CGUIEdit.h>
 #include "CGUIElement_Impl.h"
@@ -61,5 +60,3 @@ protected:
     GUI_CALLBACK m_OnRenderingEnded;
     GUI_CALLBACK m_OnRenderingStarted;
 };
-
-#endif

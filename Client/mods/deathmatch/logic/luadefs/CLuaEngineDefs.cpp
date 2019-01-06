@@ -13,33 +13,41 @@
 
 void CLuaEngineDefs::LoadFunctions(void)
 {
-    CLuaCFunctions::AddFunction("engineLoadTXD", EngineLoadTXD);
-    CLuaCFunctions::AddFunction("engineLoadCOL", EngineLoadCOL);
-    CLuaCFunctions::AddFunction("engineLoadDFF", EngineLoadDFF);
-    CLuaCFunctions::AddFunction("engineLoadIFP", EngineLoadIFP);
-    CLuaCFunctions::AddFunction("engineImportTXD", EngineImportTXD);
-    CLuaCFunctions::AddFunction("engineReplaceCOL", EngineReplaceCOL);
-    CLuaCFunctions::AddFunction("engineRestoreCOL", EngineRestoreCOL);
-    CLuaCFunctions::AddFunction("engineReplaceModel", EngineReplaceModel);
-    CLuaCFunctions::AddFunction("engineRestoreModel", EngineRestoreModel);
-    CLuaCFunctions::AddFunction("engineReplaceAnimation", EngineReplaceAnimation);
-    CLuaCFunctions::AddFunction("engineRestoreAnimation", EngineRestoreAnimation);
-    CLuaCFunctions::AddFunction("engineGetModelLODDistance", EngineGetModelLODDistance);
-    CLuaCFunctions::AddFunction("engineSetModelLODDistance", EngineSetModelLODDistance);
-    CLuaCFunctions::AddFunction("engineSetAsynchronousLoading", EngineSetAsynchronousLoading);
-    CLuaCFunctions::AddFunction("engineApplyShaderToWorldTexture", EngineApplyShaderToWorldTexture);
-    CLuaCFunctions::AddFunction("engineRemoveShaderFromWorldTexture", EngineRemoveShaderFromWorldTexture);
-    CLuaCFunctions::AddFunction("engineGetModelNameFromID", EngineGetModelNameFromID);
-    CLuaCFunctions::AddFunction("engineGetModelIDFromName", EngineGetModelIDFromName);
-    CLuaCFunctions::AddFunction("engineGetModelTextureNames", EngineGetModelTextureNames);
-    CLuaCFunctions::AddFunction("engineGetVisibleTextureNames", EngineGetVisibleTextureNames);
+    std::map<const char*, lua_CFunction> functions{
+        {"engineLoadTXD", EngineLoadTXD},
+        {"engineLoadCOL", EngineLoadCOL},
+        {"engineLoadDFF", EngineLoadDFF},
+        {"engineLoadIFP", EngineLoadIFP},
+        {"engineImportTXD", EngineImportTXD},
+        {"engineReplaceCOL", EngineReplaceCOL},
+        {"engineRestoreCOL", EngineRestoreCOL},
+        {"engineReplaceModel", EngineReplaceModel},
+        {"engineRestoreModel", EngineRestoreModel},
+        {"engineReplaceAnimation", EngineReplaceAnimation},
+        {"engineRestoreAnimation", EngineRestoreAnimation},
+        {"engineGetModelLODDistance", EngineGetModelLODDistance},
+        {"engineSetModelLODDistance", EngineSetModelLODDistance},
+        {"engineSetAsynchronousLoading", EngineSetAsynchronousLoading},
+        {"engineApplyShaderToWorldTexture", EngineApplyShaderToWorldTexture},
+        {"engineRemoveShaderFromWorldTexture", EngineRemoveShaderFromWorldTexture},
+        {"engineGetModelNameFromID", EngineGetModelNameFromID},
+        {"engineGetModelIDFromName", EngineGetModelIDFromName},
+        {"engineGetModelTextureNames", EngineGetModelTextureNames},
+        {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
 
-    // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
-    // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
-    // CLuaCFunctions::AddFunction ( "enginePositionAtomic", EnginePositionAtomic );
-    // CLuaCFunctions::AddFunction ( "enginePositionSeats", EnginePositionSeats );
-    // CLuaCFunctions::AddFunction ( "engineAddAllAtomics", EngineAddAllAtomics );
-    // CLuaCFunctions::AddFunction ( "engineReplaceVehiclePart", EngineReplaceVehiclePart );
+        // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
+        // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
+        // CLuaCFunctions::AddFunction ( "enginePositionAtomic", EnginePositionAtomic );
+        // CLuaCFunctions::AddFunction ( "enginePositionSeats", EnginePositionSeats );
+        // CLuaCFunctions::AddFunction ( "engineAddAllAtomics", EngineAddAllAtomics );
+        // CLuaCFunctions::AddFunction ( "engineReplaceVehiclePart", EngineReplaceVehiclePart );
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaEngineDefs::AddClass(lua_State* luaVM)

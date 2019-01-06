@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CLUACOMMON_H
-#define __CLUACOMMON_H
+#pragma once
 
 extern "C"
 {
@@ -98,5 +97,3 @@ struct SLuaDebugInfo
     int     iLine;
     int     infoType;
 };
-
-#endif

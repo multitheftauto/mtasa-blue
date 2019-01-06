@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include <windowsx.h>
 
 using std::string;
 
@@ -106,8 +107,7 @@ void CLocalGUI::ChangeLocale(const char* szName)
     CClientVariables* cvars = CCore::GetSingleton().GetCVars();
     m_LastSettingsRevision = cvars->GetRevision();
 
-    // Don't delete old Localization as it crashes
-    g_pLocalization = new CLocalization;
+    g_pLocalization->SetCurrentLanguage();
     m_LastLocaleName = szName;
 
     if (guiWasLoaded)
@@ -240,7 +240,7 @@ void CLocalGUI::DoPulse(void)
             }
             else
             {
-                // Do actual local change
+                // Do actual locale change
                 m_LocaleChangeCounter = 0;
                 CCore::GetSingleton().RemoveMessageBox();
 
@@ -541,7 +541,7 @@ bool CLocalGUI::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 return true;
 
             case WM_MOUSEMOVE:
-                pGUI->ProcessMouseInput(CGUI_MI_MOUSEPOS, LOWORD(lParam), HIWORD(lParam));
+                pGUI->ProcessMouseInput(CGUI_MI_MOUSEPOS, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
                 return true;
 
             case WM_LBUTTONDOWN:

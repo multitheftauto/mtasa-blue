@@ -50,6 +50,7 @@ public:
     static bool           GetElementPosition(CElement* pElement, CVector& vecPosition);
     static bool           GetElementRotation(CElement* pElement, CVector& vecRotation, eEulerRotationOrder rotationOrder);
     static bool           GetElementVelocity(CElement* pElement, CVector& vecVelocity);
+    static bool           GetElementTurnVelocity(CElement* pElement, CVector& vecTurnVelocity);
     static bool           GetElementInterior(CElement* pElement, unsigned char& ucInterior);
     static bool           IsElementWithinColShape(CElement* pElement, CColShape* pColShape, bool& bWithin);
     static bool           IsElementWithinMarker(CElement* pElement, CMarker* pMarker, bool& bWithin);
@@ -81,6 +82,7 @@ public:
     static bool SetElementPosition(CElement* pElement, const CVector& vecPosition, bool bWarp = true);
     static bool SetElementRotation(CElement* pElement, const CVector& vecRotation, eEulerRotationOrder rotationOrder, bool bNewWay);
     static bool SetElementVelocity(CElement* pElement, const CVector& vecVelocity);
+    static bool SetElementAngularVelocity(CElement* pElement, const CVector& vecTurnVelocity);
     static bool SetElementVisibleTo(CElement* pElement, CElement* pReference, bool bVisible);
     static bool SetElementInterior(CElement* pElement, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition);
     static bool SetElementDimension(CElement* pElement, unsigned short usDimension);
@@ -186,6 +188,7 @@ public:
     static bool RemovePedClothes(CElement* pElement, unsigned char ucType, const char* szTexture = NULL, const char* szModel = NULL);
     static bool GivePedJetPack(CElement* pElement);
     static bool RemovePedJetPack(CElement* pElement);
+    static bool SetPedWearingJetpack(CElement* pElement, bool bJetPack);
     static bool SetPedFightingStyle(CElement* pElement, unsigned char ucStyle);
     static bool SetPedMoveAnim(CElement* pElement, unsigned int iMoveAnim);
     static bool SetPedGravity(CElement* pElement, float fGravity);
@@ -197,6 +200,7 @@ public:
     static bool SetPedAnimation(CElement* pElement, const char* szBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
                                 bool bInterruptable, bool bFreezeLastFrame);
     static bool SetPedAnimationProgress(CElement* pElement, const char* szAnimName, float fProgress);
+    static bool SetPedAnimationSpeed(CElement* pElement, const char* szAnimName, float fSpeed);
     static bool SetPedOnFire(CElement* pElement, bool bIsOnFire);
     static bool SetPedHeadless(CElement* pElement, bool bIsHeadless);
     static bool SetPedFrozen(CElement* pElement, bool bIsFrozen);
@@ -300,7 +304,10 @@ public:
     static bool SetVehiclePanelState(CElement* pElement, unsigned char ucPanel, unsigned char ucState);
     static bool SetVehicleIdleRespawnDelay(CElement* pElement, unsigned long ulTime);
     static bool SetVehicleRespawnDelay(CElement* pElement, unsigned long ulTime);
-    static bool SetVehicleRespawnPosition(CElement* pElement, const CVector& vecPosition, const CVector& vecRotation);
+    static bool GetVehicleRespawnPosition(CElement* pElement, CVector& vecPosition);
+    static bool GetVehicleRespawnRotation(CElement* pElement, CVector& vecRotation);
+    static bool SetVehicleRespawnRotation(CElement* pElement, const CVector& vecRotation);
+    static bool SetVehicleRespawnPosition(CElement* pElement, const CVector& vecPosition);
     static bool ToggleVehicleRespawn(CElement* pElement, bool bRespawn);
     static bool ResetVehicleExplosionTime(CElement* pElement);
     static bool ResetVehicleIdleTime(CElement* pElement);
@@ -326,7 +333,7 @@ public:
     static bool SetVehicleDoorOpenRatio(CElement* pElement, unsigned char ucDoor, float fRatio, unsigned long ulTime = 0);
     static bool SetVehiclePlateText(CElement* pElement, const SString& strPlateText);
 
-    // static bool                 SetVehicleHandling                  ( CVehicle* pVehicle, bool bValue );
+    // static bool SetVehicleHandling(CVehicle* pVehicle, bool bValue);
     static bool ResetVehicleHandling(CVehicle* pVehicle, bool bUseOriginal);
     static bool ResetVehicleHandlingProperty(CVehicle* pVehicle, eHandlingProperty eProperty, bool bUseOriginal);
     static bool SetVehicleHandling(CVehicle* pVehicle, eHandlingProperty eProperty, float fValue);
@@ -521,7 +528,7 @@ public:
     static bool SetTeamFriendlyFire(CTeam* pTeam, bool bFriendlyFire);
 
     // Water funcs
-    static CWater* CreateWater(CResource* pResource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4);
+    static CWater* CreateWater(CResource* pResource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow);
     static bool    SetElementWaterLevel(CWater* pWater, float fLevel);
     static bool    SetAllElementWaterLevel(float fLevel);
     static bool    SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLevel);
@@ -539,6 +546,7 @@ public:
                               CLuaMain* pLuaMain);
     static bool OutputConsole(const char* szText, CElement* pElement);
     static bool SetServerPassword(const SString& strPassword, bool bSave);
+    static bool ClearChatBox(CElement* pElement);
 
     // General world get funcs
     static bool GetTime(unsigned char& ucHour, unsigned char& ucMinute);

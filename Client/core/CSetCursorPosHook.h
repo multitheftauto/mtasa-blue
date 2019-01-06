@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CSETCURSORPOSHOOK_H
-#define __CSETCURSORPOSHOOK_H
+#pragma once
 
 #include <windows.h>
 #include "CSingleton.h"
@@ -39,5 +38,3 @@ private:
     bool          m_bCanCall;
     pSetCursorPos m_pfnSetCursorPos;
 };
-
-#endif

@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTCOLMODEL_H
-#define __CCLIENTCOLMODEL_H
+#pragma once
 
 #include <list>
 #include "CClientEntity.h"
@@ -46,5 +45,3 @@ private:
     CColModel*                m_pColModel;
     std::list<unsigned short> m_Replaced;
 };
-
-#endif

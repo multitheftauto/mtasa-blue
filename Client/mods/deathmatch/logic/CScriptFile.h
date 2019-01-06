@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CFILE_H
-#define __CFILE_H
+#pragma once
 
 #include "CClientEntity.h"
 #include <stdio.h>
@@ -36,7 +35,6 @@ public:
     // Functions required by CClientEntity
     eClientEntityType GetType(void) const { return SCRIPTFILE; };
     void              Unlink(void){};
-    bool              ReadSpecialData(void) { return true; };
 
     // Load and unload routines
     bool           Load(CResource* pResourceForFilePath, eMode Mode);
@@ -48,7 +46,7 @@ public:
     // Get the owning resource
     CResource* GetResource(void);
 
-    // Only call functions belw this if you're sure that the file is loaded.
+    // Only call functions below this if you're sure that the file is loaded.
     // Or you will crash.
     bool IsEOF(void);
     long GetPointer(void);
@@ -59,6 +57,10 @@ public:
     void Flush(void);
     long Read(unsigned long ulSize, CBuffer& outBuffer);
     long Write(unsigned long ulSize, const char* pData);
+
+    // Debug info for garbage collected files
+    const SLuaDebugInfo& GetLuaDebugInfo(void) { return m_LuaDebugInfo; };
+    void SetLuaDebugInfo(const SLuaDebugInfo& luaDebugInfo) { m_LuaDebugInfo = luaDebugInfo; };
 
 private:
     void DoResourceFileCheck(void);
@@ -71,6 +73,5 @@ private:
     unsigned int          m_uiScriptId;
     CResource*            m_pResource;
     eAccessType           m_accessType;
+    SLuaDebugInfo         m_LuaDebugInfo;
 };
-
-#endif

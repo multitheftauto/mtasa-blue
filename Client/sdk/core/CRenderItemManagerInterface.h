@@ -148,7 +148,7 @@ public:
     virtual CTextureItem* CreateTexture(const SString& strFullFilePath, const CPixels* pPixels = NULL, bool bMipMaps = true, uint uiSizeX = RDEFAULT,
                                         uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP,
                                         ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1) = 0;
-    virtual CShaderItem*  CreateShader(const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance,
+    virtual CShaderItem*  CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority, float fMaxDistance,
                                        bool bLayered, bool bDebug, int iTypeMask) = 0;
     virtual CRenderTargetItem* CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false) = 0;
     virtual CScreenSourceItem* CreateScreenSource(uint uiSizeX, uint uiSizeY) = 0;
@@ -352,13 +352,13 @@ class CShaderItem : public CMaterialItem
 {
     DECLARE_CLASS(CShaderItem, CMaterialItem)
     CShaderItem(void) : ClassInit(this) {}
-    virtual void PostConstruct(CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, float fPriority,
+    virtual void PostConstruct(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority,
                                float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask);
     virtual void PreDestruct(void);
     virtual bool IsValid(void);
     virtual void OnLostDevice(void);
     virtual void OnResetDevice(void);
-    void         CreateUnderlyingData(const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug);
+    void         CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug);
     void         ReleaseUnderlyingData(void);
     virtual bool SetValue(const SString& strName, CTextureItem* pTextureItem);
     virtual bool SetValue(const SString& strName, bool bValue);

@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTWEBBROWSER_H
-#define __CCLIENTWEBBROWSER_H
+#pragma once
 
 #include <core/CWebViewInterface.h>
 #include <core/CAjaxResourceHandlerInterface.h>
@@ -102,5 +101,3 @@ public:
 private:
     CClientWebBrowser* m_pBrowser;
 };
-
-#endif
