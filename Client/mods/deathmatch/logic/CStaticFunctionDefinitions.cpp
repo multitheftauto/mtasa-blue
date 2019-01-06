@@ -7640,6 +7640,16 @@ bool CStaticFunctionDefinitions::GetSoundLength(CClientPlayer& Player, double& d
     return false;
 }
 
+bool CStaticFunctionDefinitions::GetSoundBufferLength(CClientSound& Sound, double& dBufferLength)
+{
+    if (Sound.IsSoundStream())
+    {
+        dBufferLength = Sound.GetBufferLength();
+        return true;
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetSoundPaused(CClientSound& Sound, bool bPaused)
 {
     Sound.SetPaused(bPaused);
