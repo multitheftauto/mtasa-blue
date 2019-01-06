@@ -1143,6 +1143,11 @@ SString CResourceManager::GetResourceOrganizationalPath(CResource* pResource)
 bool CResourceManager::ParseResourcePathInput(std::string strInput, CResource*& pResource, std::string* pStrPath, std::string* pstrMetaPath)
 {
     ReplaceOccurrencesInString(strInput, "\\", "/");
+
+    // Disallow file paths with a directory separator at the end
+    if (strInput.back() == '/')
+        return false;
+
     std::string strMetaPath;
 
     if (strInput[0] == '@')
