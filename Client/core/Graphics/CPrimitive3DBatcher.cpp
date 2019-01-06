@@ -42,8 +42,6 @@ void CPrimitive3DBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewp
 {
     m_pDevice = pDevice;
 }
-
-
 ////////////////////////////////////////////////////////////////
 //
 // CPrimitive3DBatcher::Flush
@@ -106,29 +104,7 @@ void CPrimitive3DBatcher::Flush(void)
 
     uint VertexStreamZeroStride = sizeof(PrimitiveVertice);
     for (auto& primitive : m_primitiveList) {
-        size_t iSize = 1;
-        size_t iCollectionSize = primitive.pVecVertices->size();
-        switch (primitive.eType)
-        {
-        case D3DPT_POINTLIST:
-            iSize = iCollectionSize;
-            break;
-        case D3DPT_LINELIST:
-            iSize = iCollectionSize / 2;
-            break;
-        case D3DPT_LINESTRIP:
-            iSize = iCollectionSize - 1;
-            break;
-        case D3DPT_TRIANGLEFAN:
-        case D3DPT_TRIANGLESTRIP:
-            iSize = iCollectionSize - 2;
-            break;
-        case D3DPT_TRIANGLELIST:
-            iSize = iCollectionSize / 3;
-            break;
-        }
-
-        m_pDevice->DrawPrimitiveUP(primitive.eType, iSize, (const void*)(&primitive.pVecVertices->at(0)), VertexStreamZeroStride);
+        DrawPrimitive(primitive.eType, primitive.pVecVertices->size(), &primitive.pVecVertices->at(0), VertexStreamZeroStride);
     }
 
     // Clean up
@@ -149,7 +125,37 @@ void CPrimitive3DBatcher::Flush(void)
         SAFE_RELEASE(pSavedStateBlock);
     }
 }
-
+////////////////////////////////////////////////////////////////
+//
+// CPrimitiveMaterialBatcher::DrawPrimitive
+//
+// Draws the primitives on render target
+//
+////////////////////////////////////////////////////////////////
+void CPrimitive3DBatcher::DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iCollectionSize, const void* pDataAddr, size_t uiVertexStride)
+{
+    int iSize = 1;
+    switch (eType)
+    {
+    case D3DPT_POINTLIST:
+        iSize = iCollectionSize;
+        break;
+    case D3DPT_LINELIST:
+        iSize = iCollectionSize / 2;
+        break;
+    case D3DPT_LINESTRIP:
+        iSize = iCollectionSize - 1;
+        break;
+    case D3DPT_TRIANGLEFAN:
+    case D3DPT_TRIANGLESTRIP:
+        iSize = iCollectionSize - 2;
+        break;
+    case D3DPT_TRIANGLELIST:
+        iSize = iCollectionSize / 3;
+        break;
+    }
+    m_pDevice->DrawPrimitiveUP(eType, iSize, pDataAddr, uiVertexStride);
+}
 ////////////////////////////////////////////////////////////////
 //
 // CPrimitive3DBatcher::AddTriangle
