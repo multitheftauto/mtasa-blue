@@ -1909,14 +1909,13 @@ int CLuaGUIDefs::GUIBlur(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CStaticFunctionDefinitions::GUIBlur(*guiElement);
-        lua_pushboolean(luaVM, true);
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::GUIBlur(*guiElement));
         return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
+    lua_pushnil(luaVM);
     return 1;
 }
 
@@ -1932,9 +1931,10 @@ int CLuaGUIDefs::GUIFocus(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CStaticFunctionDefinitions::GUIFocus(*guiElement);
+        bool bResult = CStaticFunctionDefinitions::GUIFocus(*guiElement);
 
-        if (bMoveCaretToEnd) {
+        if (bResult && bMoveCaretToEnd)
+        {
             CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(*guiElement);
 
             if (IS_CGUIELEMENT_EDIT(&GUIElement))
@@ -1949,13 +1949,13 @@ int CLuaGUIDefs::GUIFocus(lua_State* luaVM)
             }
         }
         
-        lua_pushboolean(luaVM, true);
+        lua_pushboolean(luaVM, bResult);
         return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
+    lua_pushnil(luaVM);
     return 1;
 }
 
