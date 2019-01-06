@@ -676,6 +676,7 @@ int CLuaFunctionDefs::FetchRemote(lua_State* luaVM)
                 CRemoteCall* pRemoteCall = g_pGame->GetRemoteCalls()->Call(strURL, &callbackArguments, luaMain, iLuaFunction, strQueueName, httpRequestOptions);
 
                 lua_pushuserdata(luaVM, pRemoteCall);
+                return 1;
             }
         }
     }
