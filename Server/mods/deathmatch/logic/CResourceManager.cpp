@@ -323,36 +323,40 @@ void CResourceManager::ListResourcesLoaded(const SString& strListType)
 }
 
 // check all loaded resources and see if they're still valid (i.e. have a meta.xml file)
-void CResourceManager::UnloadRemovedResources(void)
+void CResourceManager::UnloadRemovedResources()
 {
-    list<CResource*>                 resourcesToDelete;
-    list<CResource*>::const_iterator iter = m_resources.begin();
-    string                           strPath;
-    for (; iter != m_resources.end(); iter++)
+    // Create a temporary list for removed resources because 'Unload' would otherwise change
+    // the 'm_resources' member variable while we iterate over it
+    std::list<CResource*> resourcesToDelete;
+
+    for (CResource* pResource : m_resources)
     {
-        if ((*iter)->HasGoneAway())
-        {
-            if ((*iter)->IsActive())
-                CLogger::ErrorPrintf("Resource '%s' has been removed while running! Stopping resource.\n", (*iter)->GetName().c_str());
-            else
-                CLogger::LogPrintf("Resource '%s' has been removed, unloading\n", (*iter)->GetName().c_str());
-            resourcesToDelete.push_back((*iter));
-        }
+        if (!pResource->HasGoneAway())
+            continue;
+
+        if (pResource->IsActive())
+            CLogger::ErrorPrintf("Resource '%s' has been removed while running! Stopping resource.\n", pResource->GetName().c_str());
+        else
+            CLogger::LogPrintf("Resource '%s' has been removed, unloading\n", pResource->GetName().c_str());
+
+        resourcesToDelete.push_back(pResource);
     }
 
-    iter = resourcesToDelete.begin();
-    for (; iter != resourcesToDelete.end(); iter++)
-    {
-        UnloadAndDelete(*iter);
-    }
+    for (CResource* pResource : resourcesToDelete)
+        UnloadAndDelete(pResource);
 }
 
-void CResourceManager::UnloadAndDelete(CResource* resource)
+void CResourceManager::UnloadAndDelete(CResource* pResource)
 {
-    RemoveResourceFromLists(resource);
-    m_resourcesToStartAfterRefresh.remove(resource);
-    RemoveFromQueue(resource);
-    delete resource;
+    // Stop resource before removing the resource pointer from our lists
+    if (pResource->IsActive())
+        pResource->Stop(true);
+
+    RemoveResourceFromLists(pResource);
+    m_resourcesToStartAfterRefresh.remove(pResource);
+    RemoveFromQueue(pResource);
+
+    delete pResource;
 }
 
 CResource* CResourceManager::Load(bool bIsZipped, const char* szAbsPath, const char* szResourceName)
@@ -381,11 +385,6 @@ CResource* CResourceManager::Load(bool bIsZipped, const char* szAbsPath, const c
         {
             CLogger::LogPrintf("Resource '%s' changed, reloading\n", szResourceName);
         }
-
-        // Stop it first. This fixes bug #3729 because it isn't removed from the list before it's stopped.
-        // Removing it from the resources list first caused the resource pointer to be unverifyable, and
-        // the pointer wouldn't work in resource LUA functions.
-        pResource->Stop(true);
 
         UnloadAndDelete(pResource);
         pResource = nullptr;
@@ -1043,9 +1042,8 @@ CResource* CResourceManager::RenameResource(CResource* pSourceResource, const SS
         return NULL;
     }
 
-    // Unload - this will also free the resource object
     UnloadAndDelete(pSourceResource);
-    pSourceResource = NULL;
+    pSourceResource = nullptr;
 
     // Rename
     MakeSureDirExists(strDstResourceLocation);
@@ -1096,9 +1094,8 @@ bool CResourceManager::DeleteResource(const SString& strResourceName, SString& s
         return false;
     }
 
-    // Unload - this will also free the resource object
     UnloadAndDelete(pSourceResource);
-    pSourceResource = NULL;
+    pSourceResource = nullptr;
 
     // Move resource dir/zip to the trash
     return MoveDirToTrash(strSrcResourceLocation);

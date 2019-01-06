@@ -722,6 +722,9 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     if (m_eState != EResourceState::Loaded)
         return false;
 
+    if (m_bDestroyed)
+        return false;
+
     m_eState = EResourceState::Starting;
 
     CLuaArguments PreStartArguments;
