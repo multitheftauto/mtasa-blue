@@ -42,7 +42,7 @@ CLocalization::~CLocalization(void)
 //
 SString CLocalization::ValidateLocale(SString strLocale)
 {
-    if (strLocale.empty() && !CVARS_GET("locale", strLocale))
+    if (strLocale.empty() && (CClientVariables::GetSingletonPtr() == nullptr || !CVARS_GET("locale", strLocale)))
         strLocale = "en_US";
     Language Lang = Language::from_name(strLocale);
     Lang = Lang ? Lang : Language::from_name("en_US");

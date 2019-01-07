@@ -82,6 +82,8 @@ typedef void(InRenderer)(void);
 
 #include <windows.h>
 
+enum eEntityType;
+
 typedef bool(PreWeaponFireHandler)(class CPlayerPed* pPlayer, bool bStopIfUsingBulletSync);
 typedef void(PostWeaponFireHandler)(void);
 typedef void(TaskSimpleBeHitHandler)(class CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
@@ -191,7 +193,7 @@ public:
     virtual void Reset(void) = 0;
     virtual void Terminate(void) = 0;
 
-    virtual BOOL InitLocalPlayer() = 0;
+    virtual BOOL InitLocalPlayer(class CClientPed* pClientPed) = 0;
 
     virtual float GetGravity(void) = 0;
     virtual void  SetGravity(float fGravity) = 0;

@@ -16,7 +16,7 @@
 class CColCuboid : public CColShape
 {
 public:
-    CColCuboid(CColManager* pManager, CElement* pParent, const CVector& vecPosition, const CVector& vecSize, CXMLNode* pNode = NULL);
+    CColCuboid(CColManager* pManager, CElement* pParent, const CVector& vecPosition, const CVector& vecSize);
 
     virtual CSphere GetWorldBoundingSphere(void);
 
@@ -32,7 +32,7 @@ public:
     };
 
 protected:
-    bool ReadSpecialData(void);
+    bool ReadSpecialData(const int iLine) override;
 
     CVector m_vecSize;
 };

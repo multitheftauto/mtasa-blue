@@ -207,6 +207,38 @@ namespace SharedUtil
     };
 
     //
+    // Measure time passing with microsecond resolution
+    //
+    class CElapsedTimeHD
+    {
+    public:
+        CElapsedTimeHD(void)
+        {
+            Reset();
+        }
+
+        void Reset(void)
+        {
+            m_resetTime = DoGetTickCount();
+        }
+
+        // Returns time in milliseconds since last reset
+        double Get(void)
+        {
+            std::chrono::duration<double, std::micro> elapsedTime = DoGetTickCount() - m_resetTime;
+            return elapsedTime.count() / 1000.0;
+        }
+
+    protected:
+        std::chrono::high_resolution_clock::time_point DoGetTickCount(void)
+        {
+            return std::chrono::high_resolution_clock::now();
+        }
+
+        std::chrono::high_resolution_clock::time_point m_resetTime;
+    };
+
+    //
     // Timing sections of code
     //
     template <int RESERVE_NUM_ITEMS = 20>

@@ -751,7 +751,7 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
         }
 
         // Player flags
-        bool bIsDead = bitStream.ReadBit();               // Unused.
+        bool bIsDead = bitStream.ReadBit();
         bool bIsSpawned = bitStream.ReadBit();            // Indicates extra info in packet. Always true for newer server builds.
         bool bInVehicle = bitStream.ReadBit();
         bool bHasJetPack = bitStream.ReadBit();
@@ -863,7 +863,14 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
 
             // Store the nick and if he's dead
             pPlayer->SetNick(szNickBuffer);
-            pPlayer->SetDeadOnNetwork(false);
+            pPlayer->SetDeadOnNetwork(bIsDead);
+            pPlayer->SetIsDead(bIsDead);
+
+            if (bIsDead)
+            {
+                pPlayer->LockHealth(0.0f);
+                pPlayer->LockArmor(0.0f);
+            }
 
             if (!strNametagText.empty())
                 pPlayer->SetNametagText(strNametagText);
@@ -5032,6 +5039,7 @@ void CPacketHandler::Packet_VoiceData(NetBitStreamInterface& bitStream)
         if (pPlayer && bitStream.Read(usPacketSize))
         {
             char* pBuf = new char[usPacketSize];
+
             if (bitStream.Read(pBuf, usPacketSize))
             {
                 if (pPlayer->GetVoice())
@@ -5039,6 +5047,8 @@ void CPacketHandler::Packet_VoiceData(NetBitStreamInterface& bitStream)
                     pPlayer->GetVoice()->DecodeAndBuffer(pBuf, usPacketSize);
                 }
             }
+
+            delete[] pBuf;
         }
     }
 }
@@ -5314,6 +5324,7 @@ SString CPacketHandler::EntityAddDebugRead(NetBitStreamInterface& bitStream)
         }
 
         strStatus += SString("NameLen:%d Name:'%s'", usNameLength, *SStringX(szName).Left(40));
+        delete[] szName;
 
         return strStatus;
     }

@@ -103,11 +103,11 @@ CURLcode Curl_none_md5sum(unsigned char *input, size_t inputlen,
 #include "nssg.h"           /* NSS versions */
 #include "gskit.h"          /* Global Secure ToolKit versions */
 #include "polarssl.h"       /* PolarSSL versions */
-#include "axtls.h"          /* axTLS versions */
 #include "cyassl.h"         /* CyaSSL versions */
 #include "schannel.h"       /* Schannel SSPI version */
 #include "darwinssl.h"      /* SecureTransport (Darwin) version */
 #include "mbedtls.h"        /* mbedTLS versions */
+#include "mesalink.h"       /* MesaLink versions */
 
 #ifndef MAX_PINNED_PUBKEY_SIZE
 #define MAX_PINNED_PUBKEY_SIZE 1048576 /* 1MB */

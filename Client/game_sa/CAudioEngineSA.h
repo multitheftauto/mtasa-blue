@@ -107,7 +107,7 @@ public:
     short          m_wPlayingState;                   // +104
     char           unk6[2];                           // +106
     float          m_fSoundHeadRoom;                  // +108
-    short          unk7;                              // +112
+    short          m_wSoundLength;                    // +112
     short          unk8;                              // +114
 };
 static_assert(sizeof(CAESound) == 0x74, "Invalid size for CAESound");
