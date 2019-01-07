@@ -387,22 +387,46 @@ bool CAccountManager::IntegrityCheck()
     return true;
 }
 
-CAccount* CAccountManager::Get(const char* szName)
+CAccount* CAccountManager::Get(const char* szName, const char* szPassword, bool bCaseSensitive)
 {
     if (szName && szName[0])
     {
         std::vector<CAccount*> results;
-        m_List.FindAccountMatches(&results, szName, true);
-        for (uint i = 0; i < results.size(); i++)
+        m_List.FindAccountMatches(&results, szName, bCaseSensitive);
+
+        if (!bCaseSensitive)
         {
-            CAccount* pAccount = results[i];
-            if (pAccount->IsRegistered())
+            CAccount* pFirstMatchAccount = nullptr;
+
+            for (CAccount* pAccount : results)
             {
-                return pAccount;
+                if (!pAccount->IsRegistered())
+                    continue;
+
+                if (szPassword && !pAccount->IsPassword(szPassword))
+                    continue;
+
+                if (pAccount->GetName() == szName)
+                {
+                    return pAccount;
+                }
+                else if (!pFirstMatchAccount)
+                {
+                    pFirstMatchAccount = pAccount;
+                }
             }
+
+            return pFirstMatchAccount;
+        }
+
+        for (CAccount* pAccount : results)
+        {
+            if (pAccount->IsRegistered())
+                return pAccount;
         }
     }
-    return NULL;
+
+    return nullptr;
 }
 
 CAccount* CAccountManager::GetAccountFromScriptID(uint uiScriptID)
