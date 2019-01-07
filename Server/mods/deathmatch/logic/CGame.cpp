@@ -1353,6 +1353,11 @@ void CGame::InitialDataStream(CPlayer& Player)
 
 void CGame::QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason, bool bSayInConsole, const char* szKickReason, const char* szResponsiblePlayer)
 {
+    if (Player.IsLeavingServer())
+        return;
+
+    Player.SetLeavingServer(true);
+    
     // Grab quit reaason
     const char* szReason = "Unknown";
     switch (Reason)
@@ -1934,6 +1939,8 @@ void CGame::Packet_PlayerWasted(CPlayerWastedPacket& Packet)
     {
         pPlayer->SetSpawned(false);
         pPlayer->SetIsDead(true);
+        pPlayer->SetHealth(0.0f);
+        pPlayer->SetArmor(0.0f);
         pPlayer->SetPosition(Packet.m_vecPosition);
 
         // Remove him from any occupied vehicle

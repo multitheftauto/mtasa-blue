@@ -60,7 +60,8 @@ public:
     virtual void         SetColumnTitle(int hColumn, const char* szTitle) = 0;
     virtual const char*  GetColumnTitle(int hColumn) = 0;
 
-    virtual void SetSelectionMode(SelectionMode mode) = 0;
+    virtual void          SetSelectionMode(SelectionMode mode) = 0;
+    virtual SelectionMode GetSelectionMode(void) = 0;
 
     virtual void          ForceUpdate(void) = 0;
     virtual int           AddRow(bool bFast = false, std::vector<std::pair<SString, bool> >* m_items = NULL) = 0;
@@ -79,7 +80,8 @@ public:
 
     virtual void SetHorizontalScrollBar(bool bEnabled) = 0;
     virtual void SetVerticalScrollBar(bool bEnabled) = 0;
-    virtual void SetSorting(bool bEnabled) = 0;
+    virtual void SetSortingEnabled(bool bEnabled) = 0;
+    virtual bool IsSortingEnabled(void) = 0;
     virtual void SetItemImage(int iRow, int hColumn, CGUIStaticImage* pImage) = 0;
 
     virtual float GetHorizontalScrollPosition(void) = 0;

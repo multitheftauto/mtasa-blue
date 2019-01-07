@@ -22,11 +22,10 @@ DWORD FUNC_CAnimBlendAssociation__CAnimBlendAssociation_hierarchy = 0x4CEFC0;
 DWORD RETURN_CAnimBlendNode_GetCurrentTranslation_NORMALFLOW = 0x4CFC55;
 DWORD RETURN_CAnimBlendAssociation_SetCurrentTime_NORMALFLOW = 0x4CEA88;
 DWORD RETURN_RpAnimBlendClumpUpdateAnimations_NORMALFLOW = 0x4D34F8;
-DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation_NORMALFLOW = 0x4CE151;
-DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation = 0x4CE187;
-DWORD RETURN_CAnimBlendAssocGroup_CopyAnimation_ERROR = 0x4CE199;
-DWORD RETURN_CAnimManager_AddAnimation = 0x4D3AB1;
-DWORD RETURN_CAnimManager_AddAnimationAndSync = 0x4D3B41;
+DWORD RETURN_CAnimManager_AddAnimation_NORMAL_FLOW = 0x4D3AAA;
+DWORD RETURN_CAnimManager_AddAnimation = 0x4D3ABC;
+DWORD RETURN_CAnimManager_AddAnimationAndSync_NORMAL_FLOW = 0x4D3B3A;
+DWORD RETURN_CAnimManager_AddAnimationAndSync = 0x4D3B4C;
 DWORD RETURN_CAnimManager_BlendAnimation_Hierarchy = 0x4D4577;
 
 auto CAnimBlendAssociation_NewOperator_US = (hCAnimBlendAssociation_NewOperator)0x82119A;
@@ -39,7 +38,7 @@ BlendAnimationHierarchyHandler* m_pBlendAnimationHierarchyHandler = nullptr;
 
 static bool bDisableCallsToCAnimBlendNode = true;
 
-int _cdecl OnCAnimBlendAssocGroupCopyAnimation(AssocGroupId* pAnimGroup, int* pAnimId);
+int _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim(AssocGroupId* pAnimGroup, int* pAnimId);
 
 void CMultiplayerSA::SetAddAnimationHandler(AddAnimationHandler* pHandler)
 {
@@ -64,6 +63,12 @@ void CMultiplayerSA::SetBlendAnimationHierarchyHandler(BlendAnimationHierarchyHa
 void CMultiplayerSA::DisableCallsToCAnimBlendNode(bool bDisableCalls)
 {
     bDisableCallsToCAnimBlendNode = bDisableCalls;
+}
+
+CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(AssocGroupId animGroup)
+{
+    DWORD* pAnimAssocGroupsArray = reinterpret_cast<DWORD*>(*(DWORD*)0xb4ea34);
+    return reinterpret_cast<CAnimBlendAssocGroupSAInterface*>(pAnimAssocGroupsArray + 5 * animGroup);
 }
 
 void _declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
@@ -141,8 +146,7 @@ void _declspec(naked) HOOK_RpAnimBlendClumpUpdateAnimations()
     }
 }
 
-CAnimBlendAssociationSAInterface* __cdecl CAnimBlendAssocGroup_CopyAnimation(RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroupInterface,
-                                                                             AnimationId animID)
+CAnimBlendAssociationSAInterface* __cdecl CAnimBlendAssocGroup_CopyAnimation(RpClump* pClump, AssocGroupId u32AnimGroupID, AnimationId animID)
 {
     auto CAnimBlendAssociation_NewOperator =
         pGameInterface->GetGameVersion() == VERSION_EU_10 ? CAnimBlendAssociation_NewOperator_EU : CAnimBlendAssociation_NewOperator_US;
@@ -151,55 +155,22 @@ CAnimBlendAssociationSAInterface* __cdecl CAnimBlendAssocGroup_CopyAnimation(RpC
 
     if (pAnimAssociationInterface)
     {
+        auto* pAnimAssocGroupInterface = getAnimAssocGroupInterface(u32AnimGroupID);
         m_pAssocGroupCopyAnimationHandler(pAnimAssociationInterface, pClump, pAnimAssocGroupInterface, animID);
     }
     return pAnimAssociationInterface;
-}
-
-void _declspec(naked) HOOK_CAnimBlendAssocGroup_CopyAnimation()
-{
-    _asm
-    {
-        pushad
-    }
-
-    if (m_pAssocGroupCopyAnimationHandler)
-    {
-        _asm
-        {
-            popad
-
-            push    esi
-
-            push    eax // animID
-            push    ecx // pAnimAssocGroupInterface
-            push    edi // pClump
-            call    CAnimBlendAssocGroup_CopyAnimation
-            add     esp, 0Ch
-
-            test    eax, eax
-            jz      ERROR_CopyAnimation
-
-            jmp     RETURN_CAnimBlendAssocGroup_CopyAnimation
-
-            ERROR_CopyAnimation:
-            jmp        RETURN_CAnimBlendAssocGroup_CopyAnimation_ERROR
-        }
-    }
-
-    _asm
-    {
-        popad
-        mov     ecx, [ecx+4]
-        sub     eax, edx
-        jmp RETURN_CAnimBlendAssocGroup_CopyAnimation_NORMALFLOW
-    }
 }
 
 void _declspec(naked) HOOK_CAnimManager_AddAnimation()
 {
     _asm
     {
+        lea     edx, [esp + 8]  // animationGroupID address
+        lea     eax, [esp + 12] // animationID address
+        push    eax
+        push    edx
+        call    OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim
+        add     esp, 8
         pushad
     }
 
@@ -208,88 +179,70 @@ void _declspec(naked) HOOK_CAnimManager_AddAnimation()
         _asm
         {
             popad
-            mov     ecx, [esp+4]  // animationClump
-            lea     edx, [esp+8]  // animationGroup address
-            lea     eax, [esp+12] // animationID address
+            mov     ecx, [esp + 4]  // animationClump
+            mov     edx, [esp + 8]  // animationGroupID
+            mov     eax, [esp + 12] // animationID
             push    eax
             push    edx
-            call    OnCAnimBlendAssocGroupCopyAnimation
-            add     esp, 8
-
-            // call our handler function
-            push    eax
-            push    edx
-            mov     ecx, [esp+12] // animationClump
             push    ecx
-            call    m_pAddAnimationHandler
-            add     esp, 0Ch
-            pushad
-            jmp     NORMAL_FLOW_AddAnimation
+            call    CAnimBlendAssocGroup_CopyAnimation
+            add     esp, 12
+            push    esi
+            push    edi
+            jmp     RETURN_CAnimManager_AddAnimation
+
         }
     }
 
     _asm
     {
-        NORMAL_FLOW_AddAnimation:
         popad
-        mov     eax, dword ptr [esp+0Ch]
-        mov     edx, dword ptr ds:[0B4EA34h]
-        push    esi
-        push    edi
-        push    eax
-        mov     eax, dword ptr [esp+14h] // animationGroup
-        mov     edi, dword ptr [esp+10h] // animationClump
-        jmp     RETURN_CAnimManager_AddAnimation
+        mov     eax, dword ptr[esp + 0Ch]
+        mov     edx, dword ptr ds : [0B4EA34h]
+        jmp     RETURN_CAnimManager_AddAnimation_NORMAL_FLOW
     }
 }
 
 void _declspec(naked) HOOK_CAnimManager_AddAnimationAndSync()
 {
-    _asm
-    {
-        pushad
-    }
+     _asm
+     {
+         lea     edx, [esp + 12] // animationGroup address
+         lea     eax, [esp + 16] // animationID address
+         push    eax
+         push    edx
+         call    OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim
+         add     esp, 8
+         pushad
+     }
 
     if (m_pAddAnimationAndSyncHandler)
     {
          _asm
-        {
-            popad
-            mov     ecx, [esp+4]  // animationClump
-            lea     edx, [esp+12] // animationGroup address
-            lea     eax, [esp+16] // animationID address
-            push    eax
-            push    edx
-            call    OnCAnimBlendAssocGroupCopyAnimation
-            add     esp, 8
-
-            // call our handler function
-            push    eax
-            mov     eax, [esp+12] // pAnimAssociationToSyncWith
-            push    edx
-            push    eax
-            mov     ecx, [esp+16] // animationClump
-            push    ecx
-            call    m_pAddAnimationAndSyncHandler
-            add     esp, 10h
-            pushad
-            jmp     NORMAL_FLOW_AddAnimationAndSync
-        }
+         {
+             popad
+             mov     ecx, [esp + 4]  // animationClump
+             mov     edx, [esp + 12] // animationGroupID
+             mov     eax, [esp + 16] // animationID
+             push    eax
+             push    edx
+             push    ecx
+             call    CAnimBlendAssocGroup_CopyAnimation
+             add     esp, 12
+             push    esi
+             push    edi
+             jmp     RETURN_CAnimManager_AddAnimationAndSync
+         }
     }
 
-    _asm
-    {
-        NORMAL_FLOW_AddAnimationAndSync:
-        popad
-        mov     eax, dword ptr [esp+10h]
-        mov     edx, dword ptr ds:[0B4EA34h]
-        push    esi
-        push    edi
-        push    eax
-        mov     eax, dword ptr [esp+18h] // animationGroup
-        mov     edi, dword ptr [esp+10h] // animationClump
-        jmp     RETURN_CAnimManager_AddAnimationAndSync
-    }
+     _asm
+     {
+
+         popad
+             mov     eax, dword ptr[esp + 10h]
+             mov     edx, dword ptr ds : [0B4EA34h]
+             jmp     RETURN_CAnimManager_AddAnimationAndSync_NORMAL_FLOW
+     }
 }
 
 void _declspec(naked) HOOK_CAnimManager_BlendAnimation_Hierarchy()
