@@ -19,6 +19,7 @@
 class CGarages
 {
 public:
-    virtual CGarage* GetGarage(DWORD dwID) = 0;
+    virtual ~CGarages() = default;
+    virtual CGarage* GetGarage(size_t uiIndex) = 0;
     virtual void     Initialize() = 0;
 };

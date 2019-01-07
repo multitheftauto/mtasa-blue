@@ -13,6 +13,7 @@
 
 #include <game/CGarages.h>
 #include "CGarageSA.h"
+#include <array>
 
 class CGaragesSAInterface
 {
@@ -24,13 +25,13 @@ class CGaragesSA : public CGarages
 {
 public:
     CGaragesSA(CGaragesSAInterface* pInterface);
-    virtual ~CGaragesSA();
+    ~CGaragesSA() override;
 
-    CGarageSA* GetGarage(DWORD dwID);
+    CGarageSA* GetGarage(size_t uiIndex) override;
 
-    void Initialize();
+    void Initialize() override;
 
 private:
-    CGaragesSAInterface* internalInterface;
-    CGarageSA*           Garages[MAX_GARAGES];
+    CGaragesSAInterface*                m_pInterface;
+    std::array<CGarageSA*, MAX_GARAGES> m_Garages;
 };

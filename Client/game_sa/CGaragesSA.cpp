@@ -12,52 +12,45 @@
 #include "StdInc.h"
 
 // Disables pay and sprays (making sounds when closing) / https://wiki.multitheftauto.com/wiki/Garage
-static const int iDisabledGarages[] = {1, 8, 11, 12, 19, 23, 26, 27, 29, 32, 36, 40, 41, 47};
-
-CGaragesSA::CGaragesSA(CGaragesSAInterface* pInterface)
+static const std::array<bool, MAX_GARAGES> aDisabledGarages =
 {
-    this->internalInterface = pInterface;
+    false, true, false, false, false, false, false, false, true, false, false, true, true, false, false, false, false, false, false, true, false,
+    false, false, true, false, false, true, true, false, true, false, false, true, false, false, false, true, false, false, false, true, true,
+    false, false, false, false, false, true, false, false,
+};
 
-    for (int i = 0; i < MAX_GARAGES; i++)
+CGaragesSA::CGaragesSA(CGaragesSAInterface* pInterface) : m_pInterface(pInterface)
+{
+    for (size_t i = 0; i < m_Garages.size(); ++i)
     {
-        this->Garages[i] = new CGarageSA((CGarageSAInterface*)(CLASS_CGarages + 216 * i));
+        auto pGarageInterface = reinterpret_cast<CGarageSAInterface*>(CLASS_CGarages + 216 * i);
+        m_Garages[i] = new CGarageSA(pGarageInterface);
     }
 }
 
 CGaragesSA::~CGaragesSA()
 {
-    for (int i = 0; i < MAX_GARAGES; i++)
-    {
-        delete this->Garages[i];
-        this->Garages[i] = NULL;
-    }
+    for (CGarageSA* pGarage : m_Garages)
+        delete pGarage;
 }
 
 void CGaragesSA::Initialize()
 {
-    for (unsigned int i = 0; i < sizeof(iDisabledGarages) / sizeof(int); ++i)
+    for (size_t i = 0; i < aDisabledGarages.size(); ++i)
     {
-        this->Garages[iDisabledGarages[i]]->SetType(1);
+        if (aDisabledGarages[i])
+            m_Garages[i]->SetType(1);
     }
 }
 
-CGarageSA* CGaragesSA::GetGarage(DWORD dwID)
+CGarageSA* CGaragesSA::GetGarage(size_t uiIndex)
 {
-    bool bIsDisabled = false;
+    if (uiIndex >= m_Garages.size())
+        return nullptr;
 
-     // Check if garage has been disabled
-    for (unsigned int i = 0; i < sizeof(iDisabledGarages) / sizeof(int); ++i)
-    {
-        if (dwID == iDisabledGarages[i])
-        {
-            bIsDisabled = true;
-            break;
-        }
-    }
+    // Check if garage is disabled
+    if (aDisabledGarages[uiIndex])
+        return nullptr;
 
-    if (!bIsDisabled && dwID >= 0 && dwID < MAX_GARAGES)
-    {
-        return this->Garages[dwID];
-    }
-    return NULL;
+    return m_Garages[uiIndex];
 }

@@ -36,7 +36,12 @@ static CWaterManager*        m_pWaterManager;
 static CCustomWeaponManager* m_pCustomWeaponManager;
 
 // Disables pay and sprays (making sounds when closing) / https://wiki.multitheftauto.com/wiki/Garage
-static const int iDisabledGarages[] = {1, 8, 11, 12, 19, 23, 26, 27, 29, 32, 36, 40, 41, 47};
+static const std::array<bool, MAX_GARAGES> aDisabledGarages =
+{
+    false, true, false, false, false, false, false, false, true, false, false, true, true, false, false, false, false, false, false, true, false,
+    false, false, true, false, false, true, true, false, true, false, false, true, false, false, false, true, false, false, false, true, true,
+    false, false, false, false, false, true, false, false,
+};
 
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN(func) \
@@ -9941,25 +9946,12 @@ bool CStaticFunctionDefinitions::GetMinuteDuration(unsigned long& ulDuration)
 
 bool CStaticFunctionDefinitions::IsGarageOpen(unsigned char ucGarageID, bool& bIsOpen)
 {
-    bool bIsDisabled = false;
-    
-    // Check if garage has been disabled
-    for (unsigned int i = 0; i < sizeof(iDisabledGarages) / sizeof(int); ++i)
-    {
-        if ((DWORD)ucGarageID == iDisabledGarages[i])
-        {
-            bIsDisabled = true;
-            break;
-        }
-    }
+    if (ucGarageID >= MAX_GARAGES || aDisabledGarages[ucGarageID])
+        return false;
 
-    if (!bIsDisabled && ucGarageID >= 0 && ucGarageID < MAX_GARAGES)
-    {
-        const SGarageStates& garageStates = g_pGame->GetGarageStates();
-        bIsOpen = garageStates[ucGarageID];
-        return true;
-    }
-    return false;
+    const SGarageStates& GarageStates = g_pGame->GetGarageStates();
+    bIsOpen = GarageStates[ucGarageID];
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetTrafficLightState(unsigned char& ucState)
@@ -10546,32 +10538,17 @@ bool CStaticFunctionDefinitions::SetMinuteDuration(unsigned long ulDuration)
 
 bool CStaticFunctionDefinitions::SetGarageOpen(unsigned char ucGarageID, bool bIsOpen)
 {
-    bool bIsDisabled = false;
+    if (ucGarageID >= MAX_GARAGES || aDisabledGarages[ucGarageID])
+        return false;
 
-     // Check if garage has been disabled
-    for (unsigned int i = 0; i < sizeof(iDisabledGarages) / sizeof(int); ++i)
-    {
-        if ((DWORD)ucGarageID == iDisabledGarages[i])
-        {
-            bIsDisabled = true;
-            break;
-        }
-    }
+    SGarageStates& GarageStates = g_pGame->GetGarageStates();
+    GarageStates[ucGarageID] = bIsOpen;
 
-    if (!bIsDisabled && ucGarageID < MAX_GARAGES)
-    {
-        SGarageStates& garageStates = g_pGame->GetGarageStates();
-        garageStates[ucGarageID] = bIsOpen;
-
-        CBitStream BitStream;
-        BitStream.pBitStream->Write(ucGarageID);
-        BitStream.pBitStream->Write(bIsOpen);
-        m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_GARAGE_OPEN, *BitStream.pBitStream));
-
-        return true;
-    }
-
-    return false;
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(ucGarageID);
+    BitStream.pBitStream->Write(bIsOpen);
+    m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_GARAGE_OPEN, *BitStream.pBitStream));
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetSkyGradient(unsigned char& ucTopRed, unsigned char& ucTopGreen, unsigned char& ucTopBlue, unsigned char& ucBottomRed,
