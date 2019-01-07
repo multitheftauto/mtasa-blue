@@ -50,10 +50,10 @@ public:
     ~CResourceManager(void);
 
     CResource*                            Load(bool bIsZipped, const char* szAbsPath, const char* szResourceName);
-    void                                  UnloadAndDelete(CResource* resource);
+    void                                  UnloadAndDelete(CResource* pResource);
     CResource*                            GetResource(const char* szResourceName);
     CResource*                            GetResourceFromScriptID(uint uiScriptID);
-    void                                  UnloadRemovedResources(void);
+    void                                  UnloadRemovedResources();
     void                                  CheckResourceDependencies(void);
     void                                  ListResourcesLoaded(const SString& strListType);
     std::list<CResource*>::const_iterator IterBegin(void) { return m_resources.begin(); };
