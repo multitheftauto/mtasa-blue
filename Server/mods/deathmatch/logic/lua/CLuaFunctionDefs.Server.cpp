@@ -342,7 +342,7 @@ int CLuaFunctionDefs::GetCommandHandlers(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
 
-    if (!argStream.NextIsNone())
+    if (!argStream.NextIsNil() && !argStream.NextIsNone())
         argStream.ReadUserData(pResource);
 
     if (argStream.HasErrors())
