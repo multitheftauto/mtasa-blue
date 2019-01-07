@@ -376,6 +376,7 @@ void CLuaManager::LoadCFunctions(void)
         {"addCommandHandler", CLuaFunctionDefs::AddCommandHandler},
         {"removeCommandHandler", CLuaFunctionDefs::RemoveCommandHandler},
         {"executeCommandHandler", CLuaFunctionDefs::ExecuteCommandHandler},
+        {"getCommandHandlers", CLuaFunctionDefs::GetCommandHandlers},
 
         // Utility
         {"getNetworkUsageData", CLuaFunctionDefs::GetNetworkUsageData},
