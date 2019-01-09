@@ -39,7 +39,7 @@ public:
     unsigned short GetDimension() const { return m_usDimension; };
     void           SetDimension(unsigned short usDimension);
 
-    cunsigned char GetInterior() const { return m_ucInterior; }
+    unsigned char GetInterior() const { return m_ucInterior; }
     void          SetInterior(unsigned char ucInterior);
 
     std::list<CClientWater*>::const_iterator IterBegin(void) { return m_List.begin(); };
