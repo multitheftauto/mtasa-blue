@@ -8127,19 +8127,17 @@ bool CStaticFunctionDefinitions::SetObjectVisibleInAllInteriors(CElement* pEleme
     if (IS_OBJECT(pElement))
     {
         CObject* pObject = static_cast<CObject*>(pElement);
-        if (!pObject->IsVisibleInAllInteriors())
-        {
-            pObject->SetVisibleInAllInteriors(bVisible);
 
-            CBitStream BitStream;
-            BitStream.pBitStream->WriteBit(bVisible);
-            BitStream.pBitStream->Write(ucNewInterior);
-            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_OBJECT_VISIBLE_IN_ALL_INTERIORS, *BitStream.pBitStream));
+        pObject->SetVisibleInAllInteriors(bVisible);
 
-            // As setObjectVisibleInAllInteriors already takes care of setting the client-side interior we need to update it here too
-            if (!bVisible)
-                pObject->SetInterior(ucNewInterior);
+        CBitStream BitStream;
+        BitStream.pBitStream->WriteBit(bVisible);
+        BitStream.pBitStream->Write(ucNewInterior);
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_OBJECT_VISIBLE_IN_ALL_INTERIORS, *BitStream.pBitStream));
 
+        // As setObjectVisibleInAllInteriors already takes care of setting the client-side interior we need to update it here too
+        if (!bVisible)
+            pObject->SetInterior(ucNewInterior);
             return true;
         }
     }
