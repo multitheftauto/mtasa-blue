@@ -1719,14 +1719,6 @@ void CCore::UpdateRecentlyPlayed()
 }
 
 //
-// Called just before GTA calculates frame time deltas
-//
-void CCore::OnGameTimerUpdate()
-{
-    ApplyQueuedFrameRateLimit();
-}
-
-//
 // Recalculate FPS limit to use
 //
 // Uses client rate from config
@@ -1801,45 +1793,32 @@ void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
 
     uint uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
 
-    if (uiUseRate > 0)
-    {
-        // Apply previous frame rate if is hasn't been done yet
-        ApplyQueuedFrameRateLimit();
+    TIMING_GRAPH("Limiter");
 
-        // Limit is usually applied in OnGameTimerUpdate
-        m_uiQueuedFrameRate = uiUseRate;
-        m_bQueuedFrameRateValid = true;
+    if (uiUseRate < 1)
+        return DoReliablePulse();
+
+    if (m_DiagnosticDebug != EDiagnosticDebug::D3D_6732)
+        Sleep(1);            // Make frame rate smoother maybe
+
+    // Calc required time in ms between frames
+    const double dTargetTimeToUse = 1000.0 / uiUseRate;
+
+    while(true)
+    {
+        // See if we need to wait
+        double dSpare = dTargetTimeToUse - m_FrameRateTimer.Get();
+        if (dSpare <= 0.0)
+            break;
+        if (dSpare >= 2.0)
+            Sleep(1);
     }
+    m_FrameRateTimer.Reset();
 
     DoReliablePulse();
 
     TIMING_GRAPH("FrameEnd");
     TIMING_GRAPH("");
-}
-
-//
-// Frame rate limit (wait) is done here.
-//
-void CCore::ApplyQueuedFrameRateLimit()
-{
-    if (m_bQueuedFrameRateValid)
-    {
-        m_bQueuedFrameRateValid = false;
-        // Calc required time in ms between frames
-        const double dTargetTimeToUse = 1000.0 / m_uiQueuedFrameRate;
-
-        while (true)
-        {
-            // See if we need to wait
-            double dSpare = dTargetTimeToUse - m_FrameRateTimer.Get();
-            if (dSpare <= 0.0)
-                break;
-            if (dSpare >= 2.0)
-                Sleep(1);
-        }
-        m_FrameRateTimer.Reset();
-        TIMING_GRAPH("Limiter");
-    }
 }
 
 //

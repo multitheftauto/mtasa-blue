@@ -3909,14 +3909,19 @@ void CClientGame::PostWorldProcessHandler(void)
     m_pManager->GetPointLightsManager()->DoPulse();
     m_pManager->GetObjectManager()->DoPulse();
 
-    double dTimeSlice = m_TimeSliceTimer.Get();
-    m_TimeSliceTimer.Reset();
-    m_uiFrameCount++;
+    // Update frame time slice
+    uint uiCurrentTick = GetTickCount32();
+    if (m_uiLastFrameTick)
+    {
+        m_uiFrameTimeSlice = uiCurrentTick - m_uiLastFrameTick;
+        m_uiFrameCount++;
 
-    // Call onClientPreRender LUA event
-    CLuaArguments Arguments;
-    Arguments.PushNumber(dTimeSlice);
-    m_pRootEntity->CallEvent("onClientPreRender", Arguments, false);
+        // Call onClientPreRender LUA event
+        CLuaArguments Arguments;
+        Arguments.PushNumber(m_uiFrameTimeSlice);
+        m_pRootEntity->CallEvent("onClientPreRender", Arguments, false);
+    }
+    m_uiLastFrameTick = uiCurrentTick;
 }
 
 void CClientGame::IdleHandler(void)
