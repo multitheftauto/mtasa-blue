@@ -120,8 +120,10 @@ void CClientRadarArea::RelateDimension(unsigned short usDimension)
 
 void CClientRadarArea::SetInterior(unsigned char ucInterior)
 {
-    m_ucInterior = ucInterior;
-    RelateInterior(m_pRadarAreaManager->GetInterior());
+    if (m_ucInterior != ucInterior) {
+        m_ucInterior = ucInterior;
+        RelateInterior(m_pRadarAreaManager->GetInterior());
+    }
 }
 
 void CClientRadarArea::RelateInterior(unsigned char ucInterior)
