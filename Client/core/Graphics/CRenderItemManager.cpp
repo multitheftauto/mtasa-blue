@@ -231,7 +231,7 @@ CWebBrowserItem* CRenderItemManager::CreateWebBrowser(uint uiSizeX, uint uiSizeY
 // Create a D3DX effect from .fx file
 //
 ////////////////////////////////////////////////////////////////
-CShaderItem* CRenderItemManager::CreateShader(const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority,
+CShaderItem* CRenderItemManager::CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority,
                                               float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask)
 {
     if (!CanCreateRenderItem(CShaderItem::GetClassId()))
@@ -240,7 +240,7 @@ CShaderItem* CRenderItemManager::CreateShader(const SString& strFullFilePath, co
     strOutStatus = "";
 
     CShaderItem* pShaderItem = new CShaderItem();
-    pShaderItem->PostConstruct(this, strFullFilePath, strRootPath, strOutStatus, fPriority, fMaxDistance, bLayered, bDebug, iTypeMask);
+    pShaderItem->PostConstruct(this, strFile, strRootPath, bIsRawData, strOutStatus, fPriority, fMaxDistance, bLayered, bDebug, iTypeMask);
 
     if (!pShaderItem->IsValid())
     {

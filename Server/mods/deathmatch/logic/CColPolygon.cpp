@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CColPolygon::CColPolygon(CColManager* pManager, CElement* pParent, const CVector& vecPosition, CXMLNode* pNode) : CColShape(pManager, pParent, pNode)
+CColPolygon::CColPolygon(CColManager* pManager, CElement* pParent, const CVector& vecPosition) : CColShape(pManager, pParent)
 {
     m_vecPosition = vecPosition;
 
@@ -56,7 +56,7 @@ bool CColPolygon::DoHitDetection(const CVector& vecNowPosition)
     return collides;
 }
 
-bool CColPolygon::ReadSpecialData(void)
+bool CColPolygon::ReadSpecialData(const int iLine)
 {
     int iTemp;
     if (GetCustomDataInt("dimension", iTemp, true))

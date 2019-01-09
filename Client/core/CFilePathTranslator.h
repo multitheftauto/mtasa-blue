@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CFILEPATHTRANSLATOR_H
-#define __CFILEPATHTRANSLATOR_H
+#pragma once
 
 #include <string>
 
@@ -37,5 +36,3 @@ private:
     std::string m_ModPath;
     std::string m_WorkingDirectory;
 };
-
-#endif

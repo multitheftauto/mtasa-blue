@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CWATERMANAGERSA_H
-#define __CWATERMANAGERSA_H
+#pragma once
 
 #include "CWaterSA.h"
 
@@ -200,5 +199,3 @@ private:
     friend class CWaterZoneSA;
     friend class CWaterZoneSA::iterator;
 };
-
-#endif

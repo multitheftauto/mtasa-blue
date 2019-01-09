@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CFXSA_H
-#define __CFXSA_H
+#pragma once
 
 #include <game/CFx.h>
 
@@ -64,5 +63,3 @@ public:
 private:
     CFxSAInterface* m_pInterface;
 };
-
-#endif

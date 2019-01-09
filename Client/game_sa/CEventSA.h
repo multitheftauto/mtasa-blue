@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_EVENT
-#define __CGAMESA_EVENT
+#pragma once
 
 #include <game/CEvent.h>
 
@@ -43,5 +42,3 @@ public:
 protected:
     CEventSAInterface* m_pInterface;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPEDSYNC_H
-#define __CPEDSYNC_H
+#pragma once
 
 #include <CClientCommon.h>
 #include "CClientVehicle.h"
@@ -44,5 +43,3 @@ private:
     CMappedList<CClientPed*> m_List;
     unsigned long            m_ulLastSyncTime;
 };
-
-#endif

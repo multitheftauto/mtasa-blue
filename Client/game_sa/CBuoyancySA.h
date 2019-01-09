@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_BUOYANCY
-#define __CGAMESA_BUOYANCY
+#pragma once
 
 #include <game/CPhysical.h>
 #include "CEntitySA.h"
@@ -50,5 +49,3 @@ public:
     uint32    pad8;                       // 204
 };
 static_assert(sizeof(CBuoyancySA) == 0xD0, "Invalid size for CBuoyancySA");
-
-#endif

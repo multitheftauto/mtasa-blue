@@ -12,8 +12,7 @@
 
 class CQuestionBox;
 
-#ifndef __CQUESTIONBOX_H
-#define __CQUESTIONBOX_H
+#pragma once
 
 #include "CMainMenu.h"
 
@@ -58,5 +57,3 @@ private:
     SString                  m_strMsg;
     bool                     m_bAutoCloseOnConnect;
 };
-
-#endif

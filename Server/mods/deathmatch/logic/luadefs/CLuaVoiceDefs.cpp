@@ -11,11 +11,19 @@
 
 #include "StdInc.h"
 
-void CLuaVoiceDefs::LoadFunctions(void)
+void CLuaVoiceDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("isVoiceEnabled", CLuaVoiceDefs::IsVoiceEnabled);
-    CLuaCFunctions::AddFunction("setPlayerVoiceBroadcastTo", CLuaVoiceDefs::SetPlayerVoiceBroadcastTo);
-    CLuaCFunctions::AddFunction("setPlayerVoiceIgnoreFrom", CLuaVoiceDefs::setPlayerVoiceIgnoreFrom);
+    std::map<const char*, lua_CFunction> functions{
+        {"isVoiceEnabled", IsVoiceEnabled},
+        {"setPlayerVoiceBroadcastTo", SetPlayerVoiceBroadcastTo},
+        {"setPlayerVoiceIgnoreFrom", setPlayerVoiceIgnoreFrom},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 int CLuaVoiceDefs::IsVoiceEnabled(lua_State* luaVM)

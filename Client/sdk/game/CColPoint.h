@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CCOLPOINT
-#define __CGAME_CCOLPOINT
+#pragma once
 
 #include <CVector.h>
 class CColPointSAInterface;
@@ -255,5 +254,3 @@ public:
     virtual void  Destroy(void) = 0;
     virtual float GetLightingForTimeOfDay(void) = 0;
 };
-
-#endif

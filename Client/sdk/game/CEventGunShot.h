@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CEventGunShot_H
-#define __CEventGunShot_H
+#pragma once
 
 class CEventGunShotSAInterface;
 
@@ -21,5 +20,3 @@ public:
 
     virtual void Destroy(bool bDestroyInterface) = 0;
 };
-
-#endif

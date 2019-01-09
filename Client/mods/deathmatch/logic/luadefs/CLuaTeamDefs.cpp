@@ -14,12 +14,20 @@ using std::list;
 
 void CLuaTeamDefs::LoadFunctions(void)
 {
-    CLuaCFunctions::AddFunction("getTeamFromName", GetTeamFromName);
-    CLuaCFunctions::AddFunction("getTeamName", GetTeamName);
-    CLuaCFunctions::AddFunction("getTeamColor", GetTeamColor);
-    CLuaCFunctions::AddFunction("getTeamFriendlyFire", GetTeamFriendlyFire);
-    CLuaCFunctions::AddFunction("getPlayersInTeam", GetPlayersInTeam);
-    CLuaCFunctions::AddFunction("countPlayersInTeam", CountPlayersInTeam);
+    std::map<const char*, lua_CFunction> functions{
+        {"getTeamFromName", GetTeamFromName},
+        {"getTeamName", GetTeamName},
+        {"getTeamColor", GetTeamColor},
+        {"getTeamFriendlyFire", GetTeamFriendlyFire},
+        {"getPlayersInTeam", GetPlayersInTeam},
+        {"countPlayersInTeam", CountPlayersInTeam},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaTeamDefs::AddClass(lua_State* luaVM)

@@ -249,13 +249,13 @@ public:
     {
         if (uiLength <= 0x7F)            // One byte for length up to 127
             Write((uchar)uiLength);
-        else if (uiLength <= 0x7FFF)
-        {            // Two bytes for length from 128 to 32767
+        else if (uiLength <= 0x7EFF)
+        {            // Two bytes for length from 128 to 32511
             Write((uchar)((uiLength >> 8) + 128));
             Write((uchar)(uiLength & 0xFF));
         }
         else
-        {            // Five bytes for length 32768 and up
+        {            // Five bytes for length 32512 and up
             Write((uchar)255);
             Write(uiLength);
         }
@@ -275,14 +275,14 @@ public:
             uiOutLength = ucValue;
         }
         else if (ucValue != 255)
-        {            // Two bytes for length from 128 to 32767
+        {            // Two bytes for length from 128 to 32511
             uchar ucValue2 = 0;
             if (!Read(ucValue2))
                 return false;
             uiOutLength = ((ucValue - 128) << 8) + ucValue2;
         }
         else
-        {            // Five bytes for length 32768 and up
+        {            // Five bytes for length 32512 and up
             if (!Read(uiOutLength))
                 return false;
         }

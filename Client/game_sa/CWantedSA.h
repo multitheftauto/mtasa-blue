@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_WANTED
-#define __CGAMESA_WANTED
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -99,5 +98,3 @@ public:
     char GetWantedLevel(void) { return this->internalInterface->m_WantedLevel; };
     void SetWantedLevelNoDrop(DWORD dwWantedLevel);
 };
-
-#endif

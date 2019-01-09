@@ -19,6 +19,7 @@
 
 #include <sys/types.h>
 #include <fstream>
+#include "SharedUtil.h"
 #ifdef WIN32
   #include <dirent_win32.h>
 #else
@@ -26,7 +27,6 @@
 #endif
 #include <stdlib.h>
 #include <string.h>
-#include "SharedUtil.h"
 
 namespace tinygettext {
 

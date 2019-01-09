@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CXMLFILEIMPL_H
-#define __CXMLFILEIMPL_H
+#pragma once
 
 #include <tinyxml.h>
 #include <iostream>
@@ -77,5 +76,3 @@ private:
 
     static SString ms_strSaveFlagFile;
 };
-
-#endif

@@ -11,8 +11,7 @@
 
 class CKeyBinds;
 
-#ifndef __CKEYBINDS_H
-#define __CKEYBINDS_H
+#pragma once
 
 #include <windows.h>
 #include <string.h>
@@ -165,5 +164,3 @@ private:
     CharacterKeyHandler   m_CharacterKeyHandler;
     bool                  m_bWaitingToLoadDefaults;
 };
-
-#endif

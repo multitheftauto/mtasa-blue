@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CNEWSBROWSER_H
-#define __CNEWSBROWSER_H
+#pragma once
 
 struct SNewsItem
 {
@@ -48,5 +47,3 @@ protected:
     std::vector<CGUITab*>    m_TabList;
     std::vector<CGUIWindow*> m_TabContentList;
 };
-
-#endif

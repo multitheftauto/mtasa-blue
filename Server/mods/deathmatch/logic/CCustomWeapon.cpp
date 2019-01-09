@@ -10,8 +10,8 @@
 
 #include "StdInc.h"
 
-CCustomWeapon::CCustomWeapon(CElement* pParent, CXMLNode* pNode, CObjectManager* pObjectManager, CCustomWeaponManager* pWeaponManager, eWeaponType weaponType)
-    : CObject(pParent, pNode, pObjectManager, false)
+CCustomWeapon::CCustomWeapon(CElement* pParent, CObjectManager* pObjectManager, CCustomWeaponManager* pWeaponManager, eWeaponType weaponType)
+    : CObject(pParent, pObjectManager, false)
 {
     // Init
     m_iType = CElement::WEAPON;

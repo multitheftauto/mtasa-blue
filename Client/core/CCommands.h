@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCOMMANDS_H
-#define __CCOMMANDS_H
+#pragma once
 
 #include <core/CCommandsInterface.h>
 #include <string>
@@ -48,5 +47,3 @@ private:
 
     pfnExecuteCommandHandler m_pfnExecuteHandler;
 };
-
-#endif

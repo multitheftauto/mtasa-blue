@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA
-#define __CGAMESA
+#pragma once
 
 #include "CModelInfoSA.h"
 #include "CFxManagerSA.h"
@@ -227,11 +226,6 @@ public:
         return m_pAEAudioHardware;
     };
     CAESoundManager* GetAESoundManager() override { return m_pAESoundManager; }
-    CAudioEngine*    GetAudio()
-    {
-        DEBUG_TRACE("CAudio     * GetAudioEngine()");
-        return m_pAudioEngine;
-    };
     CAudioContainer* GetAudioContainer()
     {
         DEBUG_TRACE("CAudio     * GetAudioContainer()");
@@ -370,7 +364,7 @@ public:
     float GetTimeScale(void);
     void  SetTimeScale(float fTimeScale);
 
-    BOOL InitLocalPlayer();
+    BOOL InitLocalPlayer(class CClientPed* pClientPed);
 
     float GetGravity(void);
     void  SetGravity(float fGravity);
@@ -517,5 +511,3 @@ private:
     CPed*      m_pPedContext;
     CTickCount m_llASyncLoadingAutoUnsuspendTime;
 };
-
-#endif

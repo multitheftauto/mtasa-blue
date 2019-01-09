@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -54,23 +54,13 @@
 
 #ifdef USE_OPENSSL
 
-#  ifdef USE_OPENSSL
-#    include <openssl/des.h>
-#    ifndef OPENSSL_NO_MD4
-#      include <openssl/md4.h>
-#    endif
-#    include <openssl/md5.h>
-#    include <openssl/ssl.h>
-#    include <openssl/rand.h>
-#  else
-#    include <des.h>
-#    ifndef OPENSSL_NO_MD4
-#      include <md4.h>
-#    endif
-#    include <md5.h>
-#    include <ssl.h>
-#    include <rand.h>
+#  include <openssl/des.h>
+#  ifndef OPENSSL_NO_MD4
+#    include <openssl/md4.h>
 #  endif
+#  include <openssl/md5.h>
+#  include <openssl/ssl.h>
+#  include <openssl/rand.h>
 #  if (OPENSSL_VERSION_NUMBER < 0x00907001L)
 #    define DES_key_schedule des_key_schedule
 #    define DES_cblock des_cblock
@@ -557,8 +547,11 @@ CURLcode Curl_ntlm_core_mk_nt_hash(struct Curl_easy *data,
                                    unsigned char *ntbuffer /* 21 bytes */)
 {
   size_t len = strlen(password);
-  unsigned char *pw = len ? malloc(len * 2) : strdup("");
+  unsigned char *pw;
   CURLcode result;
+  if(len > SIZE_T_MAX/2) /* avoid integer overflow */
+    return CURLE_OUT_OF_MEMORY;
+  pw = len ? malloc(len * 2) : strdup("");
   if(!pw)
     return CURLE_OUT_OF_MEMORY;
 
@@ -645,15 +638,6 @@ CURLcode Curl_hmac_md5(const unsigned char *key, unsigned int keylen,
 
   return CURLE_OK;
 }
-
-#ifndef SIZE_T_MAX
-/* some limits.h headers have this defined, some don't */
-#if defined(SIZEOF_SIZE_T) && (SIZEOF_SIZE_T > 4)
-#define SIZE_T_MAX 18446744073709551615U
-#else
-#define SIZE_T_MAX 4294967295U
-#endif
-#endif
 
 /* This creates the NTLMv2 hash by using NTLM hash as the key and Unicode
  * (uppercase UserName + Domain) as the data
@@ -754,19 +738,17 @@ CURLcode Curl_ntlm_core_mk_ntlmv2_resp(unsigned char *ntlmv2hash,
   len = NTLM_HMAC_MD5_LEN + NTLMv2_BLOB_LEN;
 
   /* Allocate the response */
-  ptr = malloc(len);
+  ptr = calloc(1, len);
   if(!ptr)
     return CURLE_OUT_OF_MEMORY;
 
-  memset(ptr, 0, len);
-
   /* Create the BLOB structure */
-  snprintf((char *)ptr + NTLM_HMAC_MD5_LEN, NTLMv2_BLOB_LEN,
-           "%c%c%c%c"   /* NTLMv2_BLOB_SIGNATURE */
-           "%c%c%c%c",  /* Reserved = 0 */
-           NTLMv2_BLOB_SIGNATURE[0], NTLMv2_BLOB_SIGNATURE[1],
-           NTLMv2_BLOB_SIGNATURE[2], NTLMv2_BLOB_SIGNATURE[3],
-           0, 0, 0, 0);
+  msnprintf((char *)ptr + NTLM_HMAC_MD5_LEN, NTLMv2_BLOB_LEN,
+            "%c%c%c%c"   /* NTLMv2_BLOB_SIGNATURE */
+            "%c%c%c%c",  /* Reserved = 0 */
+            NTLMv2_BLOB_SIGNATURE[0], NTLMv2_BLOB_SIGNATURE[1],
+            NTLMv2_BLOB_SIGNATURE[2], NTLMv2_BLOB_SIGNATURE[3],
+            0, 0, 0, 0);
 
   Curl_write64_le(tw, ptr + 24);
   memcpy(ptr + 32, challenge_client, 8);

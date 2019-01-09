@@ -11,13 +11,12 @@
 
 using namespace tinygettext;
 
-#ifndef __CLANGUAGE_H
-#define __CLANGUAGE_H
+#pragma once
 
 class CLanguage
 {
 public:
-    CLanguage(Dictionary Dict, const SString& strLocale = "", const SString& strLangName = "");
+    CLanguage(const Dictionary& Dict, const SString& strLocale = "", const SString& strLangName = "");
     CLanguage(const SString& strPOPath);
     ~CLanguage(void);
 
@@ -26,13 +25,12 @@ public:
     SString TranslatePlural(const SString& strSingular, const SString& strPlural, int iNum);
     SString TranslatePluralWithContext(const SString& strContext, const SString& strSingular, const SString& strPlural, int iNum);
 
-    SString GetCode(void) { return m_strCode; }
-    SString GetName(void) { return m_strName; }
+    SString     GetCode(void) { return m_strCode; }
+    SString     GetName(void) { return m_strName; }
+    Dictionary& GetDictionary(void) { return m_Dict; }
 
 private:
     Dictionary m_Dict;
     SString    m_strCode;            // Language code
     SString    m_strName;            // Human readable name
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_DOOR
-#define __CGAMESA_DOOR
+#pragma once
 
 #include <game/CDoor.h>
 #include <CVector.h>
@@ -63,5 +62,3 @@ public:
     VOID       Open(float fOpenRatio);
     eDoorState GetDoorState() { return (eDoorState)this->GetInterface()->m_nDoorState; };
 };
-
-#endif

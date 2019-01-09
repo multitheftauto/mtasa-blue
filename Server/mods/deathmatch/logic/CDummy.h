@@ -16,13 +16,16 @@
 class CDummy : public CElement
 {
 public:
-    CDummy(class CGroups* pGroups, CElement* pParent, CXMLNode* pNode = NULL);
+    CDummy(class CGroups* pGroups, CElement* pParent);
     ~CDummy(void);
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
     bool IsEntity(void) { return true; }
 
     void Unlink(void);
-    bool ReadSpecialData(void);
+
+protected:
+    bool ReadSpecialData(const int iLine) override;
 
 private:
     class CGroups* m_pGroups;

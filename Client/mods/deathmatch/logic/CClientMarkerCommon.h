@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTMARKERCOMMON_H
-#define __CCLIENTMARKERCOMMON_H
+#pragma once
 
 #include "CClientEntity.h"
 
@@ -58,5 +57,3 @@ public:
     virtual void StreamIn(void) = 0;
     virtual void StreamOut(void) = 0;
 };
-
-#endif

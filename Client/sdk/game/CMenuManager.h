@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_MENUMANAGER
-#define __CGAME_MENUMANAGER
+#pragma once
 
 #include <windows.h>
 
@@ -22,5 +21,3 @@ public:
     virtual void SwitchToNewScreen(BYTE ScreenID) = 0;
     virtual void DisplayHelpText(char* szHelpText) = 0;
 };
-
-#endif

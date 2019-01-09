@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __COBJECTRESPAWNER_H
-#define __COBJECTRESPAWNER_H
+#pragma once
 
 class CObjectRespawner
 {
@@ -27,5 +26,3 @@ public:
 private:
     std::vector<CClientObject*> m_List;
 };
-
-#endif

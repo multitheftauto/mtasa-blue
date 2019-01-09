@@ -10,8 +10,7 @@
 
 class CClientPacketRecorder;
 
-#ifndef __CCLIENTPACKETRECORDER_H
-#define __CCLIENTPACKETRECORDER_H
+#pragma once
 
 #include "CClientManager.h"
 #include <ctime>
@@ -61,5 +60,3 @@ private:
 
     unsigned int m_uiFrameSkip;
 };
-
-#endif

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_EVENT
-#define __CGAME_EVENT
+#pragma once
 
 class CEventSAInterface;
 
@@ -19,5 +18,3 @@ class CEvent
 public:
     virtual CEventSAInterface* GetInterface(void) = 0;
 };
-
-#endif

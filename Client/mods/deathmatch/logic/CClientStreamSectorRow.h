@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CClientStreamSectorRow_H
-#define __CClientStreamSectorRow_H
+#pragma once
 
 #define WORLD_SIZE          6000.0f     // was 3000.0f
 
@@ -58,5 +57,3 @@ private:
     bool                            m_bExtra;
     CClientStreamSectorRow *        m_pTop, *m_pBottom;
 };
-
-#endif

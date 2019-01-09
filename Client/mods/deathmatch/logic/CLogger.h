@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CLOGGER_H
-#define __CLOGGER_H
+#pragma once
 
 #include <cstdio>
 //#include "../Config.h"
@@ -33,5 +32,3 @@ private:
 
     static FILE* m_pLogFile;
 };
-
-#endif

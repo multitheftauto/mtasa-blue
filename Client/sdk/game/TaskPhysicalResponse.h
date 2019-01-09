@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_TASKPHYSICALRESPONSE
-#define __CGAME_TASKPHYSICALRESPONSE
+#pragma once
 
 #include "Task.h"
 
@@ -27,5 +26,3 @@ public:
 
     virtual void UpdateChoke(CPed* pPed, CPed* pAttacker, bool bIsTearGas) = 0;
 };
-
-#endif
