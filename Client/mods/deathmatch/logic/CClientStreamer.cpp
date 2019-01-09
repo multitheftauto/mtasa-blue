@@ -218,7 +218,7 @@ void CClientStreamer::SetInterior(unsigned char ucInterior)
 
         // That means all of the currently streamed in elements will have to
         // go. Unstream all elements that are streamed in
-        CClientStreamElement*                 pElement = nullptr;
+        CClientStreamElement*   pElement = nullptr;
         for (CClientStreamElement *pStreamElement : m_ActiveElements)
         {
             pElement = pStreamElement;
