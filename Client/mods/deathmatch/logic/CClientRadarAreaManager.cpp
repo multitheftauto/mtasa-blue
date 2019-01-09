@@ -82,12 +82,15 @@ void CClientRadarAreaManager::SetDimension(unsigned short usDimension)
 
 void CClientRadarAreaManager::SetInterior(unsigned char ucInterior)
 {
-    for (CClientRadarArea *pArea : m_List)
+    if (m_ucInterior != ucInterior)
     {
-        pArea->RelateInterior(ucInterior);
-    }
+        for (CClientRadarArea *pArea : m_List)
+        {
+            pArea->RelateInterior(ucInterior);
+        }
 
-    m_ucInterior = ucInterior;
+        m_ucInterior = ucInterior;   
+    }
 }
 
 void CClientRadarAreaManager::DoPulse(void)
