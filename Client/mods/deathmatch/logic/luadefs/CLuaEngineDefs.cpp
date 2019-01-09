@@ -34,8 +34,8 @@ void CLuaEngineDefs::LoadFunctions(void)
         {"engineGetModelIDFromName", EngineGetModelIDFromName},
         {"engineGetModelTextureNames", EngineGetModelTextureNames},
         {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
-        {"engineSetModelTime", EngineSetModelTime},
-        {"engineGetModelTime", EngineGetModelTime},
+        {"engineSetModelVisibleTime", EngineSetModelVisibleTime },
+        {"engineGetModelVisibleTime", EngineGetModelVisibleTime },
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -60,14 +60,14 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "restoreModel", "engineRestoreModel");
     lua_classfunction(luaVM, "setAsynchronousLoading", "engineSetAsynchronousLoading");
     lua_classfunction(luaVM, "setModelLODDistance", "engineSetModelLODDistance");
-    lua_classfunction(luaVM, "setModelTime", "engineSetModelTime");
+    lua_classfunction(luaVM, "setModelVisibleTime", "engineSetModelVisibleTime");
 
     lua_classfunction(luaVM, "getVisibleTextureNames", "engineGetVisibleTextureNames");
     lua_classfunction(luaVM, "getModelLODDistance", "engineGetModelLODDistance");
     lua_classfunction(luaVM, "getModelTextureNames", "engineGetModelTextureNames");
     lua_classfunction(luaVM, "getModelIDFromName", "engineGetModelIDFromName");
     lua_classfunction(luaVM, "getModelNameFromID", "engineGetModelNameFromID");
-    lua_classfunction(luaVM, "getModelTime", "engineGetModelTime");
+    lua_classfunction(luaVM, "getModelVisibleTime", "engineGetModelVisibleTime");
 
     //  lua_classvariable ( luaVM, "modelLODDistance", "engineSetModelLODDistance", "engineGetModelLODDistance" ); .modelLODDistance[model] = distance
     //  lua_classvariable ( luaVM, "modelNameFromID", NULL, "engineGetModelNameFromID" ); .modelNameFromID[id] = "name"
@@ -918,9 +918,9 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
     return 1;
 }
 
-int CLuaEngineDefs::EngineSetModelTime(lua_State* luaVM)
+int CLuaEngineDefs::EngineSetModelVisibleTime(lua_State* luaVM)
 {
-    // bool engineSetModelTime ( int/string modelID, int hourOn, int hourOff )
+    // bool engineSetModelVisibleTime ( int/string modelID, int hourOn, int hourOff )
     SString strModelId;
     char cHourOn,cHourOff;
     CScriptArgReader argStream(luaVM);
@@ -937,7 +937,7 @@ int CLuaEngineDefs::EngineSetModelTime(lua_State* luaVM)
             if (cHourOn > cHourOff)
                 std::swap(cHourOn, cHourOff);
 
-            if (cHourOn >= 0 && cHourOn <= 23 && cHourOff >= 0 && cHourOff <= 23)
+            if (cHourOn >= 0 && cHourOn <= 24 && cHourOff >= 0 && cHourOff <= 24)
             {
                 lua_pushboolean(luaVM, pModelInfo->SetTime(cHourOn, cHourOff));
                 return 1;
@@ -952,9 +952,9 @@ int CLuaEngineDefs::EngineSetModelTime(lua_State* luaVM)
     return 1;
 }
 
-int CLuaEngineDefs::EngineGetModelTime(lua_State* luaVM)
+int CLuaEngineDefs::EngineGetModelVisibleTime(lua_State* luaVM)
 {
-    // int, int engineSetModelTime ( int/string modelID )
+    // int, int engineGetModelVisibleTime ( int/string modelID )
     SString strModelId;
 
     CScriptArgReader argStream(luaVM);
