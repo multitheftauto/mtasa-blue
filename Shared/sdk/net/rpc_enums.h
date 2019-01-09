@@ -263,4 +263,6 @@ enum eElementRPCFunctions
     SET_PED_ANIMATION_SPEED,
 
     COLSHAPE_POLYGON_SET_HEIGHT,
+
+    NUM_RPC_FUNCS,
 };

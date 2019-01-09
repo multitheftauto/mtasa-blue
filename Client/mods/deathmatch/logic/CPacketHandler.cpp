@@ -3878,10 +3878,13 @@ retry:
                                 pPolygon->AddPoint(vertex.data.vecPosition);
                             }
                             pEntity = pShape = pPolygon;
-                            float fFloor, fCeil;
-                            bitStream.Read(fFloor);
-                            bitStream.Read(fCeil);
-                            pPolygon->SetHeight(fFloor, fCeil);
+                            if (bitStream.Version() >= 0x1DA)
+                            {
+                                float fFloor, fCeil;
+                                bitStream.Read(fFloor);
+                                bitStream.Read(fCeil);
+                                pPolygon->SetHeight(fFloor, fCeil);
+                            }
                             break;
                         }
                         default:

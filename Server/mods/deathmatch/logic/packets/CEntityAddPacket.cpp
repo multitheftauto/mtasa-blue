@@ -1029,10 +1029,15 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                                 vertex.data.vecPosition = *iter;
                                 BitStream.Write(&vertex);
                             }
-                            float fFloor, fCeil;
-                            pPolygon->GetHeight(fFloor, fCeil);
-                            BitStream.Write(fFloor);
-                            BitStream.Write(fCeil);
+
+                            if (BitStream.Version() >= 0x1DA)
+                            {
+                                float fFloor, fCeil;
+                                pPolygon->GetHeight(fFloor, fCeil);
+
+                                BitStream.Write(fFloor);
+                                BitStream.Write(fCeil);
+                            }
                             break;
                         }
                         default:

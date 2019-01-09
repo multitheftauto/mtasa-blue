@@ -1,8 +1,8 @@
 /*****************************************************************************
 *
-*  PROJECT:     Multi Theft Auto v1.0
+*  PROJECT:     Multi Theft Auto
 *  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/rpc/CObjectRPCs.cpp
+*  FILE:        mods/deathmatch/logic/rpc/CColShapeRPC.cpp
 *  PURPOSE:     Colshapes remote procedure calls
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -21,11 +21,13 @@ void CColShapeRPCs::SetColShapePolygonHeight(CClientEntity* pSource, NetBitStrea
 {
     float fFloor;
     float fCeil;
-
-    bitStream.Read(fFloor);
-    bitStream.Read(fCeil);
-    if (pSource)
+    unsigned char ucTimeContext;
+    if (bitStream.Read(fFloor) && bitStream.Read(fCeil) && bitStream.Read(ucTimeContext))
     {
-        static_cast<CClientColPolygon*>(pSource)->SetHeight(fFloor, fCeil);
+        if (pSource)
+        {
+            static_cast<CClientColPolygon*>(pSource)->SetHeight(fFloor, fCeil);
+            pSource->SetSyncTimeContext(ucTimeContext);
+        }
     }
 }

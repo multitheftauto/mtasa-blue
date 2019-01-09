@@ -11933,5 +11933,6 @@ void CStaticFunctionDefinitions::SetColPolygonHeight(CColShape* pElement, float 
     BitStream.pBitStream->Write(fFloor);
     BitStream.pBitStream->Write(fCeil);
     m_pColManager->DoHitDetection(pElement->GetPosition(), pElement);
+    BitStream.pBitStream->Write(pElement->GenerateSyncTimeContext());
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, COLSHAPE_POLYGON_SET_HEIGHT, *BitStream.pBitStream));
 }

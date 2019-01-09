@@ -409,19 +409,18 @@ int CLuaColShapeDefs::SetColPolygonHeight(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         if (fCeil > fFloor)
+            std::swap(fCeil, fFloor);
+
+        if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
         {
-            if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
-            {
-                CColPolygon* pColPolygon = static_cast<CColPolygon*>(pColShape);
-                pColPolygon->SetHeight(fFloor, fCeil);
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-            else
-                argStream.SetCustomError("Colshape have to be type: Polygon to use this function!");
+            CColPolygon* pColPolygon = static_cast<CColPolygon*>(pColShape);
+            pColPolygon->SetHeight(fFloor, fCeil);
+            lua_pushboolean(luaVM, true);
+            return 1;
         }
         else
-            argStream.SetCustomError("Floor Height have to be greater then ceil Height!");
+            argStream.SetCustomError("Colshape have to be type: Polygon to use this function!");
+
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
