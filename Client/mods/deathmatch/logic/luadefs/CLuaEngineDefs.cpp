@@ -976,7 +976,7 @@ int CLuaEngineDefs::EngineGetModelVisibleTime(lua_State* luaVM)
             else // Model is incompatible, don't let confuse user.
             {
                 lua_pushnumber(luaVM, 0);
-                lua_pushnumber(luaVM, 0);
+                lua_pushnumber(luaVM, 24);
                 return 2;
             }
         }
