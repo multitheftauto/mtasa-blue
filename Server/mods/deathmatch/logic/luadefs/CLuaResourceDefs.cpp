@@ -598,7 +598,7 @@ int CLuaResourceDefs::restartResource(lua_State* luaVM)
         return 1;
     }
 
-    if (!pResource->IsActive())
+    if (pResource->IsActive())
     {
         m_pResourceManager->QueueResource(pResource, CResourceManager::QUEUE_RESTART, &StartOptions);
         lua_pushboolean(luaVM, true);
