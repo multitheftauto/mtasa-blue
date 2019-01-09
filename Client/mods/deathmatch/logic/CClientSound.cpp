@@ -396,7 +396,8 @@ void CClientSound::SetPosition(const CVector& vecPosition)
 {
     m_vecPosition = vecPosition;
     UpdateSpatialData();
-    if (m_pAudio)
+    if (
+    )
         m_pAudio->SetPosition(m_vecPosition);
 }
 
@@ -432,28 +433,7 @@ void CClientSound::SetLooped(bool bLoop)
 
         if (m_pAudio)
         {
-            // get info about sound
-            double savedPosition = m_pAudio->GetPlayPosition();
-            float volume = m_pAudio->GetVolume();
-            bool paused = m_pAudio->IsPaused();
-            float speed = m_pAudio->GetPlaybackSpeed();
-            float minDist = m_pAudio->GetMinDistance();
-            float maxDist = m_pAudio->GetMaxDistance();
-            bool pain = m_pAudio->IsPanEnabled();
-            float pan = m_pAudio->GetPan();
-            Destroy();
-            Create();
-            if (m_pAudio)
-                // set sound properties
-                m_pAudio->SetPlayPosition(savedPosition);
-                m_pAudio->SetVolume(volume);
-                m_pAudio->SetPaused(paused);
-                m_pAudio->SetPlaybackSpeed(speed);
-                m_pAudio->SetMinDistance(minDist);
-                m_pAudio->SetMaxDistance(maxDist);
-                m_pAudio->SetPanEnabled(pain);
-                m_pAudio->SetPan(pan);
-        }
+            m_pAudio->SetLooped(m_bLoop);
     }
 }
 
