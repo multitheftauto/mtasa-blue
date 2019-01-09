@@ -396,8 +396,7 @@ void CClientSound::SetPosition(const CVector& vecPosition)
 {
     m_vecPosition = vecPosition;
     UpdateSpatialData();
-    if (
-    )
+    if (m_pAudio)
         m_pAudio->SetPosition(m_vecPosition);
 }
 
