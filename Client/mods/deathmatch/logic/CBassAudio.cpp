@@ -643,6 +643,21 @@ void CBassAudio::SetPlaybackSpeed(float fSpeed)
         BASS_ChannelSetAttribute(m_pSound, BASS_ATTRIB_FREQ, fSpeed * m_fDefaultFrequency);
 }
 
+void CBassAudio::SetLooped(bool bLoop)
+{
+  if (m_pSound)
+  {
+      if (bLoop)
+      {
+        BASS_ChannelFlags(m_pSound, BASS_SAMPLE_LOOP, BASS_SAMPLE_LOOP);
+      }
+      else
+      {
+        BASS_ChannelFlags(m_pSound, 0, BASS_SAMPLE_LOOP);
+      }
+  }
+}
+
 void CBassAudio::SetPosition(const CVector& vecPosition)
 {
     m_vecPosition = vecPosition;
