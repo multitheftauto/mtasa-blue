@@ -432,7 +432,6 @@ void CClientSound::SetLooped(bool bLoop)
         m_SimulatedPlayPosition.SetLooped(bLoop);
 
         if (m_pAudio)
-        {
             m_pAudio->SetLooped(m_bLoop);
     }
 }
