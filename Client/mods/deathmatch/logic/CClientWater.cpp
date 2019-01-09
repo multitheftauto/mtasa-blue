@@ -172,8 +172,10 @@ void CClientWater::RelateDimension(unsigned short usWorldDimension)
 void CClientWater::SetInterior(unsigned char ucInterior)
 {
     if (m_ucInterior != ucInterior)
+    {
         m_ucInterior = ucInterior;
         RelateInterior(m_pManager->GetWaterManager()->GetInterior());
+    }
 }
 
 void CClientWater::RelateInterior(unsigned char ucWorldInterior)
