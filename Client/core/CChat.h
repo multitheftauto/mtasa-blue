@@ -155,7 +155,7 @@ class CChat
 public:
     CChat(void){};
     CChat(CGUI* pManager, const CVector2D& vecPosition);
-    ~CChat(void);
+    virtual ~CChat();
 
     virtual void Draw(bool bUseCacheTexture, bool bAllowOutline);
     virtual void Output(const char* szText, bool bColorCoded = true);
@@ -198,8 +198,9 @@ private:
     void LoadCVars(void);
 
 protected:
+    virtual void UpdatePosition(void);
+
     void UpdateGUI(void);
-    void UpdatePosition(void);
     void UpdateSmoothScroll(float* pfPixelScroll, int* piLineScroll);
     void DrawDrawList(const SDrawList& drawList, const CVector2D& topLeftOffset = CVector2D(0, 0));
     void GetDrawList(SDrawList& outDrawList, bool bUsingOutline);
