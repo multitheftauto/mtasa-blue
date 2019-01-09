@@ -81,6 +81,7 @@ public:
     bool    IsFreed(void);
     float   GetPan(void);
     void    SetPan(float fPan);
+    void    SetLooped(bool bLoop);
 
     void   DoPulse(const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt);
     void   AddQueuedEvent(eSoundEventType type, const SString& strString, double dNumber = 0.0, bool bBool = false, const SString& strError = "");
