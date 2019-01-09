@@ -928,7 +928,7 @@ int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
     {
         if (iSurfaceID >= 0 && iSurfaceID <= 179)
         {
-            CSurfaceType*  pSurfaceInfo = m_pClientGame->GetSurfaceInfo();
+            CSurfaceType*  pSurfaceInfo = g_pGame->GetWorld()->GetSurfaceInfo();
             SurfaceInfo_c* pSurface = &pSurfaceInfo->surfType[iSurfaceID];
 
             bool bEnabled;
@@ -1162,9 +1162,9 @@ int CLuaEngineDefs::EngineGetSurfaceProperties(lua_State* luaVM)
     argStream.ReadEnumString(eType);
     if (!argStream.HasErrors())
     {
-        if (iSurfaceID >= 0 && iSurfaceID <= 179)
+        if (iSurfaceID >= EColSurfaceValue::DEFAULT && iSurfaceID <= EColSurfaceValue::SIZE)
         {
-            CSurfaceType*  pSurfaceInfo = m_pClientGame->GetSurfaceInfo();
+            CSurfaceType*  pSurfaceInfo = g_pGame->GetWorld()->GetSurfaceInfo();
             SurfaceInfo_c* pSurface = &pSurfaceInfo->surfType[iSurfaceID];
             switch (eType)
             {
@@ -1312,7 +1312,7 @@ int CLuaEngineDefs::EngineResetSurfaceProperties(lua_State* luaVM)
     }
     else
     {
-        lua_pushboolean(luaVM, CStaticFunctionDefinitions::ResetSurfaceInfo());
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::ResetAllSurfaceInfo());
         return 1;
     }
     if (argStream.HasErrors())

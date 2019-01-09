@@ -118,6 +118,9 @@ public:
     bool              IsEntityRemoved(CEntitySAInterface* pInterface);
     bool              CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd);
 
+    CSurfaceType*     GetSurfaceInfo();
+    bool              ResetAllSurfaceInfo();
+    bool              ResetSurfaceInfo(short sSurfaceID);
 private:
     std::multimap<unsigned short, SBuildingRemoval*>*         m_pBuildingRemovals;
     std::multimap<unsigned short, sDataBuildingRemovalItem*>* m_pDataBuildings;
@@ -126,4 +129,7 @@ private:
     std::map<DWORD, bool>                                     m_pRemovedEntities;
     std::map<DWORD, bool>                                     m_pAddedEntities;
     float                                                     m_fAircraftMaxHeight;
+
+    CSurfaceType*                                             m_pSurfaceInfo;
+    CSurfaceType                                              m_pOriginalSurfaceInfo;
 };

@@ -594,9 +594,6 @@ public:
     void SetTransferringSingularFiles(bool bTransfer) { m_bTransferringSingularFiles = bTransfer; }
     bool IsTransferringSingularFiles(void) { return m_bTransferringSingularFiles; }
 
-    CSurfaceType  GetOriginalSurfaceInfo() { return m_pOriginalSurfaceInfo; }
-    CSurfaceType* GetSurfaceInfo() { return m_pSurfaceInfo; }
-
     void                           SetVehExtrapolateSettings(const SVehExtrapolateSettings& settings) { m_VehExtrapolateSettings = settings; }
     const SVehExtrapolateSettings& GetVehExtrapolateSettings(void) { return m_VehExtrapolateSettings; }
     void                           SetMiscGameSettings(const SMiscGameSettings& settings) { m_MiscGameSettings = settings; }
@@ -737,9 +734,6 @@ private:
 
     eWeaponSlot                            m_lastWeaponSlot;
     SFixedArray<DWORD, WEAPONSLOT_MAX + 1> m_wasWeaponAmmoInClip;
-
-    CSurfaceType* m_pSurfaceInfo;
-    CSurfaceType  m_pOriginalSurfaceInfo;
 
     bool m_bCursorEventsEnabled;
     bool m_bLocalPlay;

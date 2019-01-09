@@ -222,51 +222,6 @@ enum eSurfaceAdhesionGroup
     SURFACE_ADHESION_GROUP_WET,
 };
 
-class CWorld
-{
-public:
-    virtual void Add(CEntity* entity, eDebugCaller CallerId) = 0;
-    virtual void Remove(CEntity* entity, eDebugCaller CallerId) = 0;
-    virtual void Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId) = 0;
-    virtual bool ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity,
-                                    const SLineOfSightFlags flags = SLineOfSightFlags(), SLineOfSightBuildingResult* pBuildingResult = NULL) = 0;
-    // THIS FUNCTION IS INCOMPLETE AND SHOULD NOT BE USED ----------v
-    virtual bool  TestLineSphere(CVector* vecStart, CVector* vecEnd, CVector* vecSphereCenter, float fSphereRadius, CColPoint** colCollision) = 0;
-    virtual void  IgnoreEntity(CEntity* entity) = 0;
-    virtual BYTE  GetLevelFromPosition(CVector* vecPosition) = 0;
-    virtual float FindGroundZForPosition(float fX, float fY) = 0;
-    virtual float FindGroundZFor3DPosition(CVector* vecPosition) = 0;
-    virtual void  LoadMapAroundPoint(CVector* vecPosition, float fRadius) = 0;
-    virtual bool  IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd, const SLineOfSightFlags flags = SLineOfSightFlags()) = 0;
-    virtual bool  HasCollisionBeenLoaded(CVector* vecPosition) = 0;
-    virtual DWORD GetCurrentArea(void) = 0;
-    virtual void  SetCurrentArea(DWORD dwArea) = 0;
-    virtual void  SetJetpackMaxHeight(float fHeight) = 0;
-    virtual float GetJetpackMaxHeight(void) = 0;
-    virtual void  SetAircraftMaxHeight(float fHeight) = 0;
-    virtual float GetAircraftMaxHeight(void) = 0;
-    virtual void  SetAircraftMaxVelocity(float fVelocity) = 0;
-    virtual float GetAircraftMaxVelocity(void) = 0;
-    virtual void  SetOcclusionsEnabled(bool bEnabled) = 0;
-    virtual bool  GetOcclusionsEnabled(void) = 0;
-    virtual void  FindWorldPositionForRailTrackPosition(float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition) = 0;
-    virtual int   FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance) = 0;
-
-    virtual void RemoveBuilding(unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL) = 0;
-    virtual bool IsRemovedModelInRadius(SIPLInst* pInst) = 0;
-    virtual bool IsModelRemoved(unsigned short usModelID) = 0;
-    virtual void ClearRemovedBuildingLists(uint* pOutAmount = NULL) = 0;
-    virtual bool RestoreBuilding(unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL) = 0;
-    virtual SBuildingRemoval* GetBuildingRemoval(CEntitySAInterface* pInterface) = 0;
-    virtual void              AddDataBuilding(CEntitySAInterface* pInterface) = 0;
-    virtual void              AddBinaryBuilding(CEntitySAInterface* pInterface) = 0;
-    virtual void              RemoveWorldBuildingFromLists(CEntitySAInterface* pInterface) = 0;
-    virtual bool              IsObjectRemoved(CEntitySAInterface* pInterface) = 0;
-    virtual bool              IsDataModelRemoved(unsigned short usModelID) = 0;
-    virtual bool              IsEntityRemoved(CEntitySAInterface* pInterface) = 0;
-    virtual bool              CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd) = 0;
-};
-
 class SurfaceInfo_c
 {
 public:
@@ -325,23 +280,59 @@ public:
             uint32_t m_audioTile : 1;
         };
     };
-
-    void setFlagEnabled(short flagsGroup, short sFlagID, bool bEnabled, short usForNext = 1)
-    {
-        for (usForNext--; usForNext >= 0; usForNext--)
-        {
-            if (bEnabled)
-                flags[flagsGroup] = flags[flagsGroup] |= 1UL << sFlagID + usForNext;
-            else
-                flags[flagsGroup] = flags[flagsGroup] &= ~(1UL << sFlagID + usForNext);
-        }
-    }
-
-    inline bool getFlagEnabled(char flagsGroup, short sFlagID) { return (flags[flagsGroup] >> sFlagID) & 1U == 1; }
 };
 
 struct CSurfaceType
 {
     float         m_adhesivaeLimits[6][6];
     SurfaceInfo_c surfType[179];
+};
+
+class CWorld
+{
+public:
+    virtual void Add(CEntity* entity, eDebugCaller CallerId) = 0;
+    virtual void Remove(CEntity* entity, eDebugCaller CallerId) = 0;
+    virtual void Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId) = 0;
+    virtual bool ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity,
+                                    const SLineOfSightFlags flags = SLineOfSightFlags(), SLineOfSightBuildingResult* pBuildingResult = NULL) = 0;
+    // THIS FUNCTION IS INCOMPLETE AND SHOULD NOT BE USED ----------v
+    virtual bool  TestLineSphere(CVector* vecStart, CVector* vecEnd, CVector* vecSphereCenter, float fSphereRadius, CColPoint** colCollision) = 0;
+    virtual void  IgnoreEntity(CEntity* entity) = 0;
+    virtual BYTE  GetLevelFromPosition(CVector* vecPosition) = 0;
+    virtual float FindGroundZForPosition(float fX, float fY) = 0;
+    virtual float FindGroundZFor3DPosition(CVector* vecPosition) = 0;
+    virtual void  LoadMapAroundPoint(CVector* vecPosition, float fRadius) = 0;
+    virtual bool  IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd, const SLineOfSightFlags flags = SLineOfSightFlags()) = 0;
+    virtual bool  HasCollisionBeenLoaded(CVector* vecPosition) = 0;
+    virtual DWORD GetCurrentArea(void) = 0;
+    virtual void  SetCurrentArea(DWORD dwArea) = 0;
+    virtual void  SetJetpackMaxHeight(float fHeight) = 0;
+    virtual float GetJetpackMaxHeight(void) = 0;
+    virtual void  SetAircraftMaxHeight(float fHeight) = 0;
+    virtual float GetAircraftMaxHeight(void) = 0;
+    virtual void  SetAircraftMaxVelocity(float fVelocity) = 0;
+    virtual float GetAircraftMaxVelocity(void) = 0;
+    virtual void  SetOcclusionsEnabled(bool bEnabled) = 0;
+    virtual bool  GetOcclusionsEnabled(void) = 0;
+    virtual void  FindWorldPositionForRailTrackPosition(float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition) = 0;
+    virtual int   FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance) = 0;
+
+    virtual void RemoveBuilding(unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL) = 0;
+    virtual bool IsRemovedModelInRadius(SIPLInst* pInst) = 0;
+    virtual bool IsModelRemoved(unsigned short usModelID) = 0;
+    virtual void ClearRemovedBuildingLists(uint* pOutAmount = NULL) = 0;
+    virtual bool RestoreBuilding(unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL) = 0;
+    virtual SBuildingRemoval* GetBuildingRemoval(CEntitySAInterface* pInterface) = 0;
+    virtual void              AddDataBuilding(CEntitySAInterface* pInterface) = 0;
+    virtual void              AddBinaryBuilding(CEntitySAInterface* pInterface) = 0;
+    virtual void              RemoveWorldBuildingFromLists(CEntitySAInterface* pInterface) = 0;
+    virtual bool              IsObjectRemoved(CEntitySAInterface* pInterface) = 0;
+    virtual bool              IsDataModelRemoved(unsigned short usModelID) = 0;
+    virtual bool              IsEntityRemoved(CEntitySAInterface* pInterface) = 0;
+    virtual bool              CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd) = 0;
+
+    virtual CSurfaceType*     GetSurfaceInfo() = 0;
+    virtual bool              ResetAllSurfaceInfo() = 0;
+    virtual bool              ResetSurfaceInfo(short sSurfaceID) = 0;
 };
