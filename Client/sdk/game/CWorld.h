@@ -280,6 +280,19 @@ public:
             uint32_t m_audioTile : 1;
         };
     };
+    void setFlagEnabled(short flagsGroup, short sFlagID, bool bEnabled, short usForNext = 1)
+    {
+        for (usForNext--; usForNext >= 0; usForNext--)
+        {
+            if (bEnabled)
+                flags[flagsGroup] = flags[flagsGroup] |= 1UL << sFlagID + usForNext;
+            else
+                flags[flagsGroup] = flags[flagsGroup] &= ~(1UL << sFlagID + usForNext);
+        }
+    }
+    inline bool getFlagEnabled(char flagsGroup, short sFlagID) {
+        return (flags[flagsGroup] >> sFlagID) & 1U == 1;
+    }
 };
 
 struct CSurfaceType
