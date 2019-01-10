@@ -96,7 +96,17 @@ bool CBlip::ReadSpecialData(const int iLine)
 
     // Grab the "size" data
     if (GetCustomDataInt("size", iTemp, true))
-        m_ucSize = static_cast<unsigned char>(Clamp(0, iTemp, 25));
+    {
+        if (iTemp >= 0 && iTemp <= 25)
+        {
+            m_ucSize = static_cast<unsigned char>(iTemp);
+        }
+        else
+        {
+            CLogger::ErrorPrintf("Bad 'size' value specified in <blip> (line %d)\n", iLine);
+            return false;
+        }
+    }
 
     // Grab the "color" data
     char szColor[64];
@@ -134,8 +144,18 @@ bool CBlip::ReadSpecialData(const int iLine)
 
     // Grab the "visibleDistance" data
     if (GetCustomDataInt("visibleDistance", iTemp, true))
-        m_usVisibleDistance = static_cast<unsigned short>(Clamp(0, iTemp, 65535));
-
+    {
+        if (iTemp >= 0 && iTemp <= 65535)
+        {
+            m_usVisibleDistance = static_cast<unsigned short>(iTemp);
+        }
+        else
+        {
+            CLogger::ErrorPrintf("Bad 'visibleDistance' value specified in <blip> (line %d)\n", iLine);
+            return false;
+        }
+    }
+    
     return true;
 }
 
