@@ -335,7 +335,7 @@ bool CVehicle::ReadSpecialData(const int iLine)
         // Convert it to RGBA
         if (!XMLColorToInt(szTemp, m_HeadLightColor.R, m_HeadLightColor.G, m_HeadLightColor.B, m_HeadLightColor.A))
         {
-            CLogger::ErrorPrintf("Bad 'headLightColor' value specified in <vehicle> (line %u)\n", m_uiLine);
+            CLogger::ErrorPrintf("Bad 'headLightColor' value specified in <vehicle> (line %u)\n", iLine);
             return false;
         }
     }
