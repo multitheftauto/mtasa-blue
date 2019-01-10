@@ -444,7 +444,7 @@ int CLuaAudioDefs::GetSoundBufferLength(lua_State* luaVM)
 int CLuaAudioDefs::SetSoundLooped(lua_State* luaVM)
 {
     CClientSound*    pSound;
-    bool             bLoop = false;
+    bool             bLoop;
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsUserDataOfType<CClientSound>())
     {
