@@ -341,33 +341,6 @@ void _declspec(naked) HOOK_WinLoop()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
-// CTimer::Update
-//
-// Just before GTA calculates frame time deltas
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CTimer_Update               0x561B10
-#define HOOKSIZE_CTimer_Update              6
-static const DWORD CONTINUE_CTimer_Update = 0x561B16;
-static void _declspec(naked) HOOK_CTimer_Update()
-{
-    _asm
-    {
-        pushad
-    }
-
-    g_pCore->OnGameTimerUpdate();
-
-    _asm
-    {
-        popad
-        mov     ecx,dword ptr ds:[0B7CB28h]
-        jmp     CONTINUE_CTimer_Update
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//
 // Photograph screen grab in windowed mode
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -651,7 +624,6 @@ void CMultiplayerSA::InitHooks_Rendering(void)
     EZHookInstall(Check_NoOfVisibleLods);
     EZHookInstall(Check_NoOfVisibleEntities);
     EZHookInstall(WinLoop);
-    EZHookInstall(CTimer_Update);
     EZHookInstall(psGrabScreen);
     EZHookInstallChecked(CClouds_RenderSkyPolys);
     EZHookInstallChecked(RwCameraSetNearClipPlane);

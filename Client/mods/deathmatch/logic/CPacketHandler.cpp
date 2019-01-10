@@ -751,7 +751,7 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
         }
 
         // Player flags
-        bool bIsDead = bitStream.ReadBit();               // Unused.
+        bool bIsDead = bitStream.ReadBit();
         bool bIsSpawned = bitStream.ReadBit();            // Indicates extra info in packet. Always true for newer server builds.
         bool bInVehicle = bitStream.ReadBit();
         bool bHasJetPack = bitStream.ReadBit();
@@ -863,7 +863,14 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
 
             // Store the nick and if he's dead
             pPlayer->SetNick(szNickBuffer);
-            pPlayer->SetDeadOnNetwork(false);
+            pPlayer->SetDeadOnNetwork(bIsDead);
+            pPlayer->SetIsDead(bIsDead);
+
+            if (bIsDead)
+            {
+                pPlayer->LockHealth(0.0f);
+                pPlayer->LockArmor(0.0f);
+            }
 
             if (!strNametagText.empty())
                 pPlayer->SetNametagText(strNametagText);

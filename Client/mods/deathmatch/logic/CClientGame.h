@@ -238,6 +238,7 @@ public:
     void DoPulses(void);
     void DoPulses2(bool bCalledFromIdle);
 
+    uint GetFrameTimeSlice(void) { return m_uiFrameTimeSlice; }
     uint GetFrameCount(void) { return m_uiFrameCount; }
 
     void        HandleException(CExceptionInformation* pExceptionInformation);
@@ -763,8 +764,9 @@ private:
     unsigned long m_ulBigPacketBytesReceivedBase;
     CTransferBox* m_pBigPacketTransferBox;
 
-    CElapsedTimeHD m_TimeSliceTimer;
-    uint           m_uiFrameCount;
+    uint m_uiFrameTimeSlice;            // how long it took (in ms) to process the current frame
+    uint m_uiLastFrameTick;             // time at which the previous frame was processed
+    uint m_uiFrameCount;                // Frame counter
 
     long long m_llLastTransgressionTime;
     SString   m_strLastDiagnosticStatus;
