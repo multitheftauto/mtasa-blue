@@ -356,6 +356,15 @@ double CClientSound::GetLength(bool bAvoidLoad)
     return m_dLength;
 }
 
+double CClientSound::GetBufferLength()
+{
+    if (m_bStream && m_pAudio)
+    {
+        return m_pAudio->GetBufferLength();
+    }
+    return 0;
+}
+
 float CClientSound::GetVolume(void)
 {
     return m_fVolume;

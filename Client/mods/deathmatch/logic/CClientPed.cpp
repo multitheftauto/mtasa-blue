@@ -737,6 +737,7 @@ void CClientPed::Spawn(const CVector& vecPosition, float fRotation, unsigned sho
     SetMoveSpeed(CVector());
     SetInterior(ucInterior);
     SetFootBloodEnabled(false);
+    SetIsDead(false);
 }
 
 void CClientPed::ResetInterpolation(void)
@@ -1813,15 +1814,11 @@ bool CClientPed::IsDead(void)
     if (m_pPlayerPed)
     {
         CTask* pTask = m_pTaskManager->GetTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
+
         if (pTask)
-        {
-            if (pTask->GetTaskType() == TASK_SIMPLE_DEAD)
-            {
-                return true;
-            }
-        }
-        return false;
+            return pTask->GetTaskType() == TASK_SIMPLE_DEAD;
     }
+
     return m_bDead;
 }
 
@@ -2114,13 +2111,21 @@ bool CClientPed::SetCurrentWeaponSlot(eWeaponSlot weaponSlot)
                     DWORD       ammoInClip = oldWeapon->GetAmmoInClip();
                     DWORD       ammoInTotal = oldWeapon->GetAmmoTotal();
                     eWeaponType weaponType = oldWeapon->GetType();
-                    RemoveWeapon(oldWeapon->GetType());
+
+                    bool isGoggles = currentSlot == WEAPONSLOT_TYPE_PARACHUTE && (weaponType == WEAPONTYPE_NIGHTVISION || weaponType == WEAPONTYPE_INFRARED);
+                    if (!isGoggles)
+                    {
+                        RemoveWeapon(oldWeapon->GetType());
+                    }
 
                     m_pPlayerPed->SetCurrentWeaponSlot(WEAPONSLOT_TYPE_UNARMED);
 
-                    CWeapon* newWeapon = GiveWeapon(weaponType, ammoInTotal);
-                    newWeapon->SetAmmoInClip(ammoInClip);
-                    newWeapon->SetAmmoTotal(ammoInTotal);
+                    if (!isGoggles)
+                    {
+                        CWeapon* newWeapon = GiveWeapon(weaponType, ammoInTotal);
+                        newWeapon->SetAmmoInClip(ammoInClip);
+                        newWeapon->SetAmmoTotal(ammoInTotal);
+                    }
 
                     // Don't allow doing gang driveby while unarmed
                     if (IsDoingGangDriveby())

@@ -153,6 +153,11 @@ void CResourceManager::StopAll(void)
 bool CResourceManager::ParseResourcePathInput(std::string strInput, CResource*& pResource, std::string* pStrPath, std::string* pStrMetaPath)
 {
     ReplaceOccurrencesInString(strInput, "\\", "/");
+
+    // Disallow file paths with a directory separator at the end
+    if (strInput.back() == '/')
+        return false;
+
     eAccessType accessType = ACCESS_PUBLIC;
     std::string strMetaPath;
 
