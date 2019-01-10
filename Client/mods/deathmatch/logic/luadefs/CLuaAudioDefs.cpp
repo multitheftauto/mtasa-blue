@@ -478,7 +478,7 @@ int CLuaAudioDefs::SetSoundLooped(lua_State* luaVM)
 
 int CLuaAudioDefs::IsSoundLooped(lua_State* luaVM)
 {
-    CClientSound*    pSound = NULL;
+    CClientSound*    pSound;
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsUserDataOfType<CClientSound>())
     {
