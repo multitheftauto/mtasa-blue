@@ -835,6 +835,8 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
 			format_drops_decimals = 1;
 
 		// Commented out to fix GitHub #572 https://github.com/multitheftauto/mtasa-blue/issues/572
+		// Please read GitHub #767 comments if you are reapplying this patch.
+		//
 		// Before toJSON(1234567890000) => [ 1234567890000.0 ]
 		// After toJSON(1234567890000) => [ 1234567890000 ]
 		//if (size < (int)sizeof(buf) - 2 &&
