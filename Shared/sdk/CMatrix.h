@@ -275,7 +275,7 @@ public:
     // Set matrix translational part
     void SetPosition(const CVector& vecPosition) { vPos = vecPosition; }
 
-    const CVector& GetScale() const
+    CVector GetScale() const
     {
         return CVector(vRight.Length(), vFront.Length(), vUp.Length());
     }

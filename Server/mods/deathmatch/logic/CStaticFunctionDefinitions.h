@@ -651,7 +651,7 @@ public:
     static bool               ExecuteSQLQuery(const std::string& str, CLuaArguments* pArgs, CRegistryResult* pResult);
 
     // Account get funcs
-    static CAccount*                     GetAccount(const char* szName, const char* szPassword);
+    static CAccount*                     GetAccount(const char* szName, const char* szPassword, bool bCaseSensitive = true);
     static void                          GetAccounts(lua_State* pLua);
     static CClient*                      GetAccountPlayer(CAccount* pAccount);
     static bool                          IsGuestAccount(CAccount* pAccount, bool& bGuest);

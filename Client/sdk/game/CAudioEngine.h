@@ -14,7 +14,17 @@
 #include <windows.h>
 #include "CVehicle.h"
 
-typedef void(WorldSoundHandler)(uint uiGroup, uint uiIndex);
+class CEntitySAInterface;
+
+struct SWorldSoundEvent
+{
+    unsigned int        uiGroup;
+    unsigned int        uiIndex;
+    CEntitySAInterface* pGameEntity;
+    CVector             vecPosition;
+};
+
+using WorldSoundHandler = bool(const SWorldSoundEvent& event);
 
 enum eSurfaceType
 {

@@ -49,7 +49,6 @@
 #define MIN_PUSH_ANTISPAM_RATE 1500
 #define INVALID_DOWNLOAD_PRIORITY_GROUP (INT_MIN)
 
-class CGameEntityXRefManager;
 class CClientModelCacheManager;
 class CDebugHookManager;
 class CResourceFileDownloadManager;
@@ -239,7 +238,6 @@ public:
     void DoPulses(void);
     void DoPulses2(bool bCalledFromIdle);
 
-    uint GetFrameTimeSlice(void) { return m_uiFrameTimeSlice; }
     uint GetFrameCount(void) { return m_uiFrameCount; }
 
     void        HandleException(CExceptionInformation* pExceptionInformation);
@@ -293,7 +291,6 @@ public:
     CObjectSync* GetObjectSync(void) { return m_pObjectSync; }
 #endif
     CLatentTransferManager*   GetLatentTransferManager(void) { return m_pLatentTransferManager; }
-    CGameEntityXRefManager*   GetGameEntityXRefManager(void) { return m_pGameEntityXRefManager; }
     CClientModelCacheManager* GetModelCacheManager(void) { return m_pModelCacheManager; }
     CDebugHookManager*        GetDebugHookManager(void) { return m_pDebugHookManager; }
 
@@ -508,7 +505,7 @@ private:
     static bool StaticBlendAnimationHierarchyHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy,
                                                      int* pFlags, RpClump* pClump);
     static bool StaticProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface);
-    static bool StaticVehicleCollisionHandler(CVehicleSAInterface* pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex,
+    static bool StaticVehicleCollisionHandler(CVehicleSAInterface*& pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex,
                                               float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos,
                                               CVector vecCollisionVelocity);
     static bool StaticVehicleDamageHandler(CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType,
@@ -523,10 +520,13 @@ private:
     static void StaticGamePlayerDestructHandler(CEntitySAInterface* pPlayer);
     static void StaticGameProjectileDestructHandler(CEntitySAInterface* pProjectile);
     static void StaticGameModelRemoveHandler(ushort usModelId);
-    static void StaticWorldSoundHandler(uint uiGroup, uint uiIndex);
+    static bool StaticWorldSoundHandler(const SWorldSoundEvent& event);
     static void StaticGameEntityRenderHandler(CEntitySAInterface* pEntity);
     static void StaticTaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     static void StaticFxSystemDestructionHandler(void* pFxSAInterface);
+    static void StaticPedStepHandler(CPedSAInterface* pPed, bool bFoot);
+    static void StaticVehicleWeaponHitHandler(SVehicleWeaponHitEvent& event);
+
     static AnimationId StaticDrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
 
     bool                              DamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
@@ -548,7 +548,7 @@ private:
     bool        BlendAnimationHierarchyHandler(CAnimBlendAssociationSAInterface* pAnimAssoc, CAnimBlendHierarchySAInterface** pOutAnimHierarchy, int* pFlags,
                                                RpClump* pClump);
     bool        ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface);
-    bool        VehicleCollisionHandler(CVehicleSAInterface* pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag,
+    bool        VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag,
                                         float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity);
     bool        VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType,
                                      const CVector& vecDamagePos, uchar ucTyre);
@@ -562,7 +562,7 @@ private:
     void        GamePlayerDestructHandler(CEntitySAInterface* pPlayer);
     void        GameProjectileDestructHandler(CEntitySAInterface* pProjectile);
     void        GameModelRemoveHandler(ushort usModelId);
-    void        WorldSoundHandler(uint uiGroup, uint uiIndex);
+    bool        WorldSoundHandler(const SWorldSoundEvent& event);
     void        TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     AnimationId DrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
 
@@ -615,6 +615,9 @@ public:
 
     void InsertAnimationAssociationToMap(CAnimBlendAssociationSAInterface* pAnimAssociation, const std::shared_ptr<CIFPAnimations>& pIFPAnimations);
     void RemoveAnimationAssociationFromMap(CAnimBlendAssociationSAInterface* pAnimAssociation);
+
+    void PedStepHandler(CPedSAInterface* pPed, bool bFoot);
+    void VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event);
 
 private:
     eStatus       m_Status;
@@ -671,7 +674,6 @@ private:
     bool                          m_bInitiallyFadedOut;
     bool                          m_bHudAreaNameDisabled;
     CSingularFileDownloadManager* m_pSingularFileDownloadManager;
-    CGameEntityXRefManager*       m_pGameEntityXRefManager;
     CClientModelCacheManager*     m_pModelCacheManager;
     CDebugHookManager*            m_pDebugHookManager;
     CRemoteCalls*                 m_pRemoteCalls;
@@ -761,9 +763,8 @@ private:
     unsigned long m_ulBigPacketBytesReceivedBase;
     CTransferBox* m_pBigPacketTransferBox;
 
-    uint m_uiFrameTimeSlice;            // how long it took (in ms) to process the current frame
-    uint m_uiLastFrameTick;             // time at which the previous frame was processed
-    uint m_uiFrameCount;                // Frame counter
+    CElapsedTimeHD m_TimeSliceTimer;
+    uint           m_uiFrameCount;
 
     long long m_llLastTransgressionTime;
     SString   m_strLastDiagnosticStatus;

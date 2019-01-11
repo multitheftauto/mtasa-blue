@@ -83,7 +83,7 @@ public:
     };
 
 public:
-    CElement(CElement* pParent, CXMLNode* pNode = NULL);
+    CElement(CElement* pParent);
     virtual ~CElement(void);
 
     virtual CElement* Clone(bool* bAddEntity, CResource* pResource) { return nullptr; }
@@ -122,10 +122,8 @@ public:
 
     CMapEventManager* GetEventManager(void) { return m_pEventManager; };
     CElement*         GetParentEntity(void) { return m_pParent; };
-    CXMLNode*         GetXMLNode(void) { return m_pXMLNode; };
 
     CElement* SetParentObject(CElement* pParent, bool bUpdatePerPlayerEntities = true);
-    void      SetXMLNode(CXMLNode* pNode);
 
     bool AddEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority,
                   float fPriorityMod);
@@ -134,7 +132,7 @@ public:
     void DeleteEvents(CLuaMain* pLuaMain, bool bRecursive);
     void DeleteAllEvents(void);
 
-    void           ReadCustomData(CEvents* pEvents);
+    void           ReadCustomData(CEvents* pEvents, CXMLNode& Node);
     CCustomData*   GetCustomDataPointer(void) { return m_pCustomData; }
     CLuaArgument*  GetCustomData(const char* szName, bool bInheritData, bool* pbIsSynced = NULL);
     CLuaArguments* GetAllCustomData(CLuaArguments* table);
@@ -167,7 +165,7 @@ public:
     const std::string& GetName(void) { return m_strName; };
     void               SetName(const std::string& strName) { m_strName = strName; };
 
-    bool LoadFromCustomData(CEvents* pEvents);
+    bool LoadFromCustomData(CEvents* pEvents, CXMLNode& Node);
 
     void OnSubtreeAdd(CElement* pElement);
     void OnSubtreeRemove(CElement* pElement);
@@ -233,7 +231,7 @@ public:
 
 protected:
     CElement*    GetRootElement(void);
-    virtual bool ReadSpecialData(void) = 0;
+    virtual bool ReadSpecialData(const int iLine) = 0;
 
     CElement* FindChildIndex(const char* szName, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive);
     CElement* FindChildByTypeIndex(unsigned int uiTypeHash, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive);
@@ -248,8 +246,6 @@ protected:
     EElementType m_iType;
     ElementID    m_ID;
     CElement*    m_pParent;
-    CXMLNode*    m_pXMLNode;
-    unsigned int m_uiLine;
     bool         m_bIsBeingDeleted;
 
     CVector m_vecPosition;

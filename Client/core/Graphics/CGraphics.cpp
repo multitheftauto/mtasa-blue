@@ -58,10 +58,8 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_pLine3DBatcherPostGUI = new CLine3DBatcher(false);
     m_pMaterialLine3DBatcherPreGUI = new CMaterialLine3DBatcher(true);
     m_pMaterialLine3DBatcherPostGUI = new CMaterialLine3DBatcher(false);
-    m_pPrimitiveBatcherPreGUI = new CPrimitiveBatcher(true);
-    m_pPrimitiveBatcherPostGUI = new CPrimitiveBatcher(false);
-    m_pPrimitiveMaterialBatcherPreGUI = new CPrimitiveMaterialBatcher(true, this);
-    m_pPrimitiveMaterialBatcherPostGUI = new CPrimitiveMaterialBatcher(false, this);
+    m_pPrimitiveBatcher = new CPrimitiveBatcher();
+    m_pPrimitiveMaterialBatcher = new CPrimitiveMaterialBatcher(this);
 
     m_pScreenGrabber = NewScreenGrabber();
     m_pPixelsManager = NewPixelsManager();
@@ -84,10 +82,8 @@ CGraphics::~CGraphics(void)
     SAFE_DELETE(m_pLine3DBatcherPostGUI);
     SAFE_DELETE(m_pMaterialLine3DBatcherPreGUI);
     SAFE_DELETE(m_pMaterialLine3DBatcherPostGUI);
-    SAFE_DELETE(m_pPrimitiveBatcherPreGUI);
-    SAFE_DELETE(m_pPrimitiveBatcherPostGUI);
-    SAFE_DELETE(m_pPrimitiveMaterialBatcherPreGUI);
-    SAFE_DELETE(m_pPrimitiveMaterialBatcherPostGUI);
+    SAFE_DELETE(m_pPrimitiveBatcher);
+    SAFE_DELETE(m_pPrimitiveMaterialBatcher);
     SAFE_DELETE(m_pScreenGrabber);
     SAFE_DELETE(m_pPixelsManager);
     SAFE_DELETE(m_pAspectRatioConverter);
@@ -508,6 +504,14 @@ void CGraphics::CheckModes(EDrawModeType newDrawMode, EBlendModeType newBlendMod
         {
             m_pTileBatcher->Flush();
         }
+        else if (m_CurDrawMode == EDrawMode::PRIMITIVE)
+        {
+            m_pPrimitiveBatcher->Flush();
+        }
+        else if (m_CurDrawMode == EDrawMode::PRIMITIVE_MATERIAL)
+        {
+            m_pPrimitiveMaterialBatcher->Flush();
+        }
 
         // Start new
         if (newDrawMode == EDrawMode::DX_SPRITE)
@@ -820,141 +824,126 @@ void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, 
 void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
                                  short siSegments, float fRatio, bool bPostGUI)
 {
+    // Check if window is minimized so we don't calculate vertices for no reason.
     if (g_pCore->IsWindowMinimized())
         return;
 
-    // Set up a queue item
-    sDrawQueueItem Item;
-    Item.eType = QUEUE_CIRCLE;
-    Item.blendMode = m_ActiveBlendMode;
-    Item.Circle.fX = fX;
-    Item.Circle.fY = fY;
-    Item.Circle.fRadius = fRadius;
-    Item.Circle.fStartAngle = fStartAngle;
-    Item.Circle.fStopAngle = fStopAngle;
-    Item.Circle.bPostGUI = bPostGUI;
-    Item.Circle.fSegments = siSegments;
-    Item.Circle.fRatio = fRatio;
-    Item.Circle.ulColor = ulColor;
-    Item.Circle.ulColorCenter = ulColorCenter;
-    // Add it to the queue
-    AddQueueItem(Item, bPostGUI);
+    auto pVecVertices = new std::vector<PrimitiveVertice>();
+    fStartAngle = D3DXToRadian(fStartAngle);
+    fStopAngle = D3DXToRadian(fStopAngle);
+    // Calculate each segment angle
+    const float kfSegmentAngle = (fStopAngle - fStartAngle) / (siSegments-1);
+
+    // Add center point
+    pVecVertices->push_back({ fX,fY,0.0f,ulColorCenter });
+
+    // And calculate all other vertices
+    for (short siSeg = 0; siSeg < siSegments; siSeg++)
+    {
+        PrimitiveVertice vert;
+        float curAngle = fStartAngle + siSeg * kfSegmentAngle;
+        vert.fX = fX + fRadius * cos(curAngle) * fRatio;
+        vert.fY = fY + fRadius * sin(curAngle);
+        vert.fZ = 0.0f;
+        vert.Color = ulColor;
+        pVecVertices->push_back(vert);
+    }
+
+    DrawPrimitiveQueued(pVecVertices, D3DPT_TRIANGLEFAN, bPostGUI);
 }
 
-void CGraphics::DrawPrimitiveQueued(const std::vector<PrimitiveVertice>& vecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI)
+void CGraphics::DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI)
 {
     // Prevent queuing when minimized
     if (g_pCore->IsWindowMinimized())
     {
-        m_pPrimitiveBatcherPreGUI->ClearQueue();
-        m_pPrimitiveBatcherPostGUI->ClearQueue();
+        delete pVecVertices;
+        m_pPrimitiveBatcher->ClearQueue();
         return;
     }
 
-    for (PrimitiveVertice vert : vecVertices)
+    for (auto& vert : *pVecVertices)
     {
         vert.fY = m_pAspectRatioConverter->ConvertPositionForAspectRatio(vert.fY);
     }
 
-    sDrawQueuePrimitive primitive;
-    primitive.vertices = vecVertices;
-    primitive.type = eType;
-    // Add it to the queue
-    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
-        m_pPrimitiveBatcherPostGUI->AddPrimitive(primitive);
-    else
-        m_pPrimitiveBatcherPreGUI->AddPrimitive(primitive);
+    // Set up a queue item
+    sDrawQueueItem Item;
+    Item.eType = QUEUE_PRIMITIVE;
+    Item.Primitive.eType = eType;
+    Item.Primitive.pVecVertices = pVecVertices;
+    AddQueueItem (Item, bPostGUI);
 }
 
-void CGraphics::DrawMaterialPrimitiveQueued(const std::vector<PrimitiveMaterialVertice>& vecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
+void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
                                             bool bPostGUI)
 {
     // Prevent queuing when minimized
     if (g_pCore->IsWindowMinimized())
     {
-        m_pPrimitiveBatcherPreGUI->ClearQueue();
-        m_pPrimitiveBatcherPostGUI->ClearQueue();
+        delete pVecVertices;
+        m_pPrimitiveMaterialBatcher->ClearQueue();
         return;
     }
 
-    for (PrimitiveMaterialVertice vert : vecVertices)
+    for (auto& vert : *pVecVertices)
     {
         vert.fY = m_pAspectRatioConverter->ConvertPositionForAspectRatio(vert.fY);
     }
 
-    sDrawQueuePrimitiveMaterial primitive;
-    primitive.vertices = vecVertices;
-    primitive.material = pMaterial;
-    primitive.type = eType;
+    if (CShaderItem* pShaderItem = DynamicCast<CShaderItem>(pMaterial))
+    {
+        // If material is a shader, use its current instance
+        pMaterial = pShaderItem->m_pShaderInstance;
+    }
 
-    AddQueueRef(primitive.material);
-    // Add it to the queue
-    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
-        m_pPrimitiveMaterialBatcherPostGUI->AddPrimitive(primitive);
-    else
-        m_pPrimitiveMaterialBatcherPreGUI->AddPrimitive(primitive);
+    // Set up a queue item
+    sDrawQueueItem Item;
+    Item.eType = QUEUE_PRIMITIVEMATERIAL;
+    Item.PrimitiveMaterial.eType = eType;
+    Item.PrimitiveMaterial.pMaterial = pMaterial;
+    Item.PrimitiveMaterial.pVecVertices = pVecVertices;
+    AddQueueItem(Item, bPostGUI);
+
+    AddQueueRef(pMaterial);
 }
 
-struct stVertex
+bool CGraphics::IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType)
 {
-    float    x, y, z;
-    D3DCOLOR color;
-};
-
-void CGraphics::DrawCircleInternal(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
-                                   short siSegments, float fRatio, bool bPostGUI)
-{
-    fStartAngle = D3DXToRadian(fStartAngle);
-    fStopAngle = D3DXToRadian(fStopAngle);
-
-    std::vector<stVertex> vecPoints;
-
-    // center
-    stVertex vertCenter;
-    vertCenter.x = fX;
-    vertCenter.y = fY;
-    vertCenter.z = 0;
-    vertCenter.color = ulColorCenter;
-    vecPoints.push_back(vertCenter);
-
-    // first
-    stVertex vertFirst;
-    vertFirst.x = fX + fRadius * cos(fStartAngle) * fRatio;
-    vertFirst.y = fY + fRadius * sin(fStartAngle) / fRatio;
-    vertFirst.z = 0;
-    vertFirst.color = ulColor;
-    vecPoints.push_back(vertFirst);
-
-    const float kfSegmentAngle = (fStopAngle - fStartAngle) / siSegments;
-
-    // if kfSegmentAngle is 0.0f or less, we'll enter an infinte loop
-    if (kfSegmentAngle > 0.0f)
+    if (iNumVertives < 1)
     {
-        for (float fAngle = fStartAngle; fAngle <= fStopAngle;)
-        {
-            stVertex vertex;
-            vertex.x = fX + fRadius * cos(fAngle) * fRatio;
-            vertex.y = fY + fRadius * sin(fAngle) / fRatio;
-            vertex.z = 0;
-            vertex.color = ulColor;
-            vecPoints.push_back(vertex);
-            fAngle += kfSegmentAngle;
-        }
+        return false;
     }
 
-    // last
-    stVertex vertLast;
-    vertLast.x = fX + fRadius * cos(fStopAngle) * fRatio;
-    vertLast.y = fY + fRadius * sin(fStopAngle) / fRatio;
-    vertLast.z = 0;
-    vertLast.color = ulColor;
-    vecPoints.push_back(vertLast);
-
-    if (vecPoints.size() >= 3)
+    switch (eType)
     {
-        m_pDevice->SetTexture(0, 0);
-        m_pDevice->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, vecPoints.size() - 2, &vecPoints[0], sizeof(stVertex));
+        case D3DPT_LINESTRIP:
+            if (iNumVertives < 2)
+            {
+                return false;
+            }
+            break;
+        case D3DPT_LINELIST:
+            if (iNumVertives % 2 != 0)
+            {
+                return false;
+            }
+            break;
+        case D3DPT_TRIANGLELIST:
+            if (iNumVertives % 3 != 0)
+            {
+                return false;
+            }
+        case D3DPT_TRIANGLEFAN:
+        case D3DPT_TRIANGLESTRIP:
+            if (iNumVertives < 3)
+            {
+                return false;
+            }
+            break;
     }
+    
+    return true;
 }
 
 void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeight, float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV,
@@ -1424,10 +1413,8 @@ void CGraphics::OnDeviceCreate(IDirect3DDevice9* pDevice)
     m_pLine3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialLine3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialLine3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
-    m_pPrimitiveBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
-    m_pPrimitiveBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
-    m_pPrimitiveMaterialBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
-    m_pPrimitiveMaterialBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitiveBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitiveMaterialBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pRenderItemManager->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pScreenGrabber->OnDeviceCreate(pDevice);
     m_pPixelsManager->OnDeviceCreate(pDevice);
@@ -1496,15 +1483,11 @@ void CGraphics::OnZBufferModified(void)
 void CGraphics::DrawPreGUIQueue(void)
 {
     DrawQueue(m_PreGUIQueue);
-    m_pPrimitiveBatcherPreGUI->Flush();
-    m_pPrimitiveMaterialBatcherPreGUI->Flush();
 }
 
 void CGraphics::DrawPostGUIQueue(void)
 {
     DrawQueue(m_PostGUIQueue);
-    m_pPrimitiveBatcherPostGUI->Flush();
-    m_pPrimitiveMaterialBatcherPostGUI->Flush();
     m_pLine3DBatcherPostGUI->Flush();
     m_pMaterialLine3DBatcherPostGUI->Flush();
 
@@ -1603,13 +1586,6 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
             DrawRectangleInternal(Item.Rect.fX, Item.Rect.fY, Item.Rect.fWidth, Item.Rect.fHeight, Item.Rect.ulColor, Item.Rect.bSubPixelPositioning);
             break;
         }
-        case QUEUE_CIRCLE:
-        {
-            CheckModes(EDrawMode::DX_SPRITE, Item.blendMode);
-            DrawCircleInternal(Item.Circle.fX, Item.Circle.fY, Item.Circle.fRadius, Item.Circle.fStartAngle, Item.Circle.fStopAngle, Item.Circle.ulColor,
-                               Item.Circle.ulColorCenter, Item.Circle.fSegments, Item.Circle.fRatio, Item.Circle.bPostGUI);
-            break;
-        }
 
         case QUEUE_TEXT:
         {
@@ -1681,6 +1657,20 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
             m_pTileBatcher->AddTile(t.fX, t.fY, t.fX + t.fWidth, t.fY + t.fHeight, fU1, fV1, fU2, fV2, t.pMaterial, t.fRotation, t.fRotCenOffX, t.fRotCenOffY,
                                     t.ulColor);
             RemoveQueueRef(Item.Texture.pMaterial);
+            break;
+        }
+        case QUEUE_PRIMITIVE:
+        {
+            const sDrawQueuePrimitive primitive = Item.Primitive;
+            CheckModes (EDrawMode::PRIMITIVE);
+            m_pPrimitiveBatcher->AddPrimitive (primitive.eType, primitive.pVecVertices);
+            break;
+        }
+        case QUEUE_PRIMITIVEMATERIAL:
+        {
+            const sDrawQueuePrimitiveMaterial primitive = Item.PrimitiveMaterial;
+            CheckModes(EDrawMode::PRIMITIVE_MATERIAL);
+            m_pPrimitiveMaterialBatcher->AddPrimitive(primitive.eType, primitive.pMaterial, primitive.pVecVertices);
             break;
         }
     }
@@ -1758,10 +1748,8 @@ void CGraphics::OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewpo
     DrawPreGUIQueue();
     // Inform batchers
     m_pTileBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
-    m_pPrimitiveBatcherPreGUI->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
-    m_pPrimitiveBatcherPostGUI->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
-    m_pPrimitiveMaterialBatcherPreGUI->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
-    m_pPrimitiveMaterialBatcherPostGUI->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
+    m_pPrimitiveBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
+    m_pPrimitiveMaterialBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
 }
 
 ////////////////////////////////////////////////////////////////

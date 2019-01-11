@@ -46,7 +46,10 @@ public:
         }
 
         // Send request
-        GetDownloadManager()->QueueFile(strURL, NULL, "", 0, true, this, DownloadFinishedCallback, false, 1, 15000);
+        SHttpRequestOptions options;
+        options.uiConnectionAttempts = 1;
+        options.uiConnectTimeoutMs = 15000;
+        GetDownloadManager()->QueueFile(strURL, NULL, this, DownloadFinishedCallback, options);
 
         CLogger::LogPrintfNoStamp("Testing ports...\n");
 

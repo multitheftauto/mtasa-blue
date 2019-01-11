@@ -137,7 +137,7 @@ void CSettings::CreateGUI(void)
     m_pBindsList = reinterpret_cast<CGUIGridList*>(pManager->CreateGridList(pTabBinds, false));
     m_pBindsList->SetPosition(CVector2D(10, 15));
     m_pBindsList->SetSize(CVector2D(620, 357));
-    m_pBindsList->SetSorting(false);
+    m_pBindsList->SetSortingEnabled(false);
     m_pBindsList->SetSelectionMode(SelectionModes::CellSingle);
     m_pBindsList->SetDoubleClickHandler(GUI_CALLBACK(&CSettings::OnBindsListClick, this));
 
