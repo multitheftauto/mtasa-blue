@@ -605,11 +605,6 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
             lua_pushboolean(luaVM, true);
             return 1;
         }
-        else
-        {
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
     }
     else
     {
@@ -618,7 +613,7 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
 
     // Failed
     delete pVecVertices;
-    lua_pushnil(luaVM);
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
@@ -661,11 +656,6 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
             lua_pushboolean(luaVM, true);
             return 1;
         }
-        else
-        {
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
     }
     else
     {
@@ -674,7 +664,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
 
     // Failed
     delete pVecVertices;
-    lua_pushnil(luaVM);
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
