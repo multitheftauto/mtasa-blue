@@ -10,15 +10,18 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+
+#define ARRAY_SurfaceInfos 0xB79538
+
 CWorldSA::CWorldSA()
 {
     m_pBuildingRemovals = new std::multimap<unsigned short, SBuildingRemoval*>;
     m_pDataBuildings = new std::multimap<unsigned short, sDataBuildingRemovalItem*>;
     m_pBinaryBuildings = new std::multimap<unsigned short, sBuildingRemovalItem*>;
 
-    m_pSurfaceInfo = reinterpret_cast<CSurfaceType*>(0xB79538);
+    m_pSurfaceInfo = reinterpret_cast<CSurfaceType*>(ARRAY_SurfaceInfos);
     // Store default surface properties
-    memcpy(&m_pOriginalSurfaceInfo, (void *)0xB79538, sizeof(CSurfaceType));
+    memcpy(&m_pOriginalSurfaceInfo, (void *)ARRAY_SurfaceInfos, sizeof(CSurfaceType));
 
     InstallHooks();
 }
@@ -28,7 +31,7 @@ CSurfaceType* CWorldSA::GetSurfaceInfo()
     return m_pSurfaceInfo;
 }
 
-bool CWorldSA::ResetAllSurfaceInfo()
+void CWorldSA::ResetAllSurfaceInfo()
 {
     DWORD dwSurfaceInfo = (DWORD)m_pSurfaceInfo;
 
@@ -38,7 +41,6 @@ bool CWorldSA::ResetAllSurfaceInfo()
     short sSize = sizeof(SurfaceInfo_c) * EColSurfaceValue::SIZE;
 
     memcpy((void*)(dwSurfaceInfo + sOffset), (void*)(dwOriginalSurfaceInfo + sOffset), sSize);
-    return true;
 }
 
 bool CWorldSA::ResetSurfaceInfo(short sSurfaceID)

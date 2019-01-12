@@ -346,6 +346,6 @@ public:
     virtual bool              CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd) = 0;
 
     virtual CSurfaceType*     GetSurfaceInfo() = 0;
-    virtual bool              ResetAllSurfaceInfo() = 0;
+    virtual void              ResetAllSurfaceInfo() = 0;
     virtual bool              ResetSurfaceInfo(short sSurfaceID) = 0;
 };
