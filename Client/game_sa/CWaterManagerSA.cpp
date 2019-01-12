@@ -518,15 +518,15 @@ void CWaterManagerSA::GetZonesContaining(const CVector& v1, const CVector& v2, c
 void CWaterManagerSA::GetZonesIntersecting(const CVector& startPos, const CVector& endPos, std::vector<CWaterZoneSA*>& vecOut)
 {
     vecOut.clear();
-    float minX = std::max<float>(std::min<float>(startPos.fX, endPos.fX), -3000.0f);
-    float maxX = std::min<float>(std::max<float>(startPos.fX, endPos.fX), 3000.0f);
-    float minY = std::max<float>(std::min<float>(startPos.fY, endPos.fY), -3000.0f);
-    float maxY = std::min<float>(std::max<float>(startPos.fY, endPos.fY), 3000.0f);
+    float minX = Clamp<float>(-3000.0f, std::min<float>(startPos.fX, endPos.fX), 3000.0f);
+    float maxX = Clamp<float>(-3000.0f, std::max<float>(startPos.fX, endPos.fX), 3000.0f);
+    float minY = Clamp<float>(-3000.0f, std::min<float>(startPos.fY, endPos.fY), 3000.0f);
+    float maxY = Clamp<float>(-3000.0f, std::max<float>(startPos.fY, endPos.fY), 3000.0f);
 
-    int lowXZone = std::max<int>((minX + 3000.0f) / 500.0f, 0);
-    int lowYZone = std::max<int>((minY + 3000.0f) / 500.0f, 0);
-    int highXZone = std::min<int>((maxX + 3000.0f) / 500.0f, 11);
-    int highYZone = std::min<int>((maxY + 3000.0f) / 500.0f, 11);
+    int lowXZone = Clamp<int>(0, (minX + 3000.0f) / 500.0f, 11);
+    int lowYZone = Clamp<int>(0, (minY + 3000.0f) / 500.0f, 11);
+    int highXZone = Clamp<int>(0, (maxX + 3000.0f) / 500.0f, 11);
+    int highYZone = Clamp<int>(0, (maxY + 3000.0f) / 500.0f, 11);
 
     if (lowXZone == highXZone)
     {
@@ -814,12 +814,23 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
 
     // Check if we're outside of map area.
     CVector zeroPoint;
-    if (vecStart.IntersectsSegmentPlane(rayDir, CVector(0, 0, 1), CVector(0, 0, 0), &zeroPoint))
+    if (vecStart.IntersectsSegmentPlane(rayDir, CVector(0, 0, 1), CVector(0, 0, 0), &zeroPoint) && IsPointOutsideOfGameArea(zeroPoint))
     {
-        if (IsPointOutsideOfGameArea(zeroPoint))
+        *vecCollision = zeroPoint;
+        return true;
+    }
+
+    // Early out in case of both points being out of map
+    if (IsPointOutsideOfGameArea(vecStart) && IsPointOutsideOfGameArea(vecEnd))
+    {
+        // Check if both points are on the same side of the map, in case of some mad person
+        // trying to testLineAgainstWater over entire SA landmass, which is still a valid option.
+        if ((vecStart.fX < -3000.0f && vecEnd.fX < -3000.0f) ||
+            (vecStart.fX > 3000.0f && vecEnd.fX > 3000.0f) ||
+            (vecStart.fY < -3000.0f && vecEnd.fY < -3000.0f) ||
+            (vecStart.fY > 3000.0f && vecEnd.fY > 3000.0f))
         {
-            *vecCollision = zeroPoint;
-            return true;
+            return false;
         }
     }
 

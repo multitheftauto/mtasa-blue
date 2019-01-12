@@ -134,7 +134,7 @@ public:
         const float fSegLength = vecSegment.Length();
         
         *outVec = *this + vecRay * fDist;
-        return bIntersects && (fabs(fDist) <= fSegLength);
+        return bIntersects && fDist >= 0 && (fDist <= fSegLength);
     }
 
     // https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
