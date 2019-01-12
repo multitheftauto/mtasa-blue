@@ -459,8 +459,8 @@ int CLuaAudioDefs::SetSoundLooped(lua_State* luaVM)
         else
         {
             m_pScriptDebugging->LogBadPointer(luaVM, "sound", 1);
-        lua_pushboolean(luaVM, false);
-        return false;
+            lua_pushboolean(luaVM, false);
+        return 1;
         }
     }
     else
