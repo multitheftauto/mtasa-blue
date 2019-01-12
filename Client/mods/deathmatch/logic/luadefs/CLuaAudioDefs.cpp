@@ -462,17 +462,14 @@ int CLuaAudioDefs::SetSoundLooped(lua_State* luaVM)
     {
         if (pSound)
         {
-            if (CStaticFunctionDefinitions::SetSoundLooped(*pSound, bLoop))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
+            lua_pushboolean(luaVM, CStaticFunctionDefinitions::SetSoundLooped(*pSound, bLoop));
+            return 1;
         }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
+    lua_pushnil(luaVM);
     return 1;
 }
 
