@@ -19,12 +19,12 @@ class CConsoleCommand
 {
 public:
     CConsoleCommand(FCommandHandler* pHandler, const char* szCommand, bool bRestricted);
-    ~CConsoleCommand(void) { delete[] m_szCommand; };
+    ~CConsoleCommand() { delete[] m_szCommand; };
 
     bool             operator()(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
-    FCommandHandler* GetHandler(void) { return m_pHandler; };
-    const char*      GetCommand(void) { return m_szCommand; };
-    bool             IsRestricted(void) { return m_bRestricted; };
+    FCommandHandler* GetHandler() { return m_pHandler; };
+    const char*      GetCommand() { return m_szCommand; };
+    bool             IsRestricted() { return m_bRestricted; };
 
 private:
     FCommandHandler* m_pHandler;

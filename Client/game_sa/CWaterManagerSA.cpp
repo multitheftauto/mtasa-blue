@@ -828,7 +828,7 @@ void CWaterManagerSA::Reset()
 }
 
 // Dynamically hook/unhook water rendering when required
-void CWaterManagerSA::UpdateRenderOrderRequirement(void)
+void CWaterManagerSA::UpdateRenderOrderRequirement()
 {
     bool bAltRenderOrderRequired = ms_iNumNonDefaultAndNonZeroVertices != 0 || m_iActivePolyCount > 0 || m_bWaterDrawnLast;
     if (m_bAltRenderOrder != bAltRenderOrderRequired)
@@ -847,7 +847,7 @@ void CWaterManagerSA::SetWaterDrawnLast(bool bEnable)
     UpdateRenderOrderRequirement();
 }
 
-bool CWaterManagerSA::IsWaterDrawnLast(void)
+bool CWaterManagerSA::IsWaterDrawnLast()
 {
     return m_bWaterDrawnLast;
 }

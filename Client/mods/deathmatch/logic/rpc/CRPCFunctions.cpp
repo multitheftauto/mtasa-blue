@@ -74,11 +74,11 @@ CRPCFunctions::CRPCFunctions(CClientGame* pClientGame)
     AddHandlers();
 }
 
-CRPCFunctions::~CRPCFunctions(void)
+CRPCFunctions::~CRPCFunctions()
 {
 }
 
-void CRPCFunctions::AddHandlers(void)
+void CRPCFunctions::AddHandlers()
 {
     CAudioRPCs::LoadFunctions();
     CBlipRPCs::LoadFunctions();

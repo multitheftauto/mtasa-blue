@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-int CAnimBlockSAInterface::GetIndex(void)
+int CAnimBlockSAInterface::GetIndex()
 {
     return (((DWORD)this - ARRAY_CAnimManager_AnimBlocks) / 32);
 }

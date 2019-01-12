@@ -86,7 +86,7 @@ void CTextItem::AddObserver(CTextDisplay* pObserver)
     m_Observers.push_back(pObserver);
 }
 
-void CTextItem::NotifyObservers(void)
+void CTextItem::NotifyObservers()
 {
     // Update all our observers
     list<CTextDisplay*>::iterator iter = m_Observers.begin();

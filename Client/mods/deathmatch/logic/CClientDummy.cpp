@@ -30,12 +30,12 @@ CClientDummy::CClientDummy(CClientManager* pManager, ElementID ID, const char* s
     }
 }
 
-CClientDummy::~CClientDummy(void)
+CClientDummy::~CClientDummy()
 {
     Unlink();
 }
 
-void CClientDummy::Unlink(void)
+void CClientDummy::Unlink()
 {
     if (m_pGroups)
     {

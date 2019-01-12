@@ -322,7 +322,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
 #endif
 }
 
-CMainMenu::~CMainMenu(void)
+CMainMenu::~CMainMenu()
 {
     // Destroy GUI items
     delete m_pBackground;
@@ -395,7 +395,7 @@ void CMainMenu::SetMenuUnhovered()            // Dehighlight all our items
     }
 }
 
-void CMainMenu::Update(void)
+void CMainMenu::Update()
 {
     if (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::JOYSTICK_0000)
     {
@@ -663,13 +663,13 @@ void CMainMenu::Show(bool bOverlay)
     SetVisible(true, bOverlay);
 }
 
-void CMainMenu::Hide(void)
+void CMainMenu::Hide()
 {
     SetVisible(false);
 }
 
 // When escape key pressed and not connected, hide these windows
-void CMainMenu::OnEscapePressedOffLine(void)
+void CMainMenu::OnEscapePressedOffLine()
 {
     m_ServerBrowser.SetVisible(false);
     m_Credits.SetVisible(false);
@@ -716,7 +716,7 @@ void CMainMenu::SetVisible(bool bVisible, bool bOverlay, bool bFrameDelay)
     m_bHideGame = !bOverlay;
 }
 
-bool CMainMenu::IsVisible(void)
+bool CMainMenu::IsVisible()
 {
     return m_bIsVisible;
 }
@@ -752,7 +752,7 @@ void CMainMenu::SetIsIngame(bool bIsIngame)
     }
 }
 
-bool CMainMenu::GetIsIngame(void)
+bool CMainMenu::GetIsIngame()
 {
     return m_bIsIngame;
 }
@@ -867,7 +867,7 @@ bool CMainMenu::OnBrowseServersButtonClick(CGUIElement* pElement)
     return true;
 }
 
-void CMainMenu::HideServerInfo(void)
+void CMainMenu::HideServerInfo()
 {
     m_ServerInfo.Hide();
 }
@@ -884,7 +884,7 @@ bool CMainMenu::OnDisconnectButtonClick(CGUIElement* pElement)
     return true;
 }
 
-bool CMainMenu::OnHostGameButtonClick(void)
+bool CMainMenu::OnHostGameButtonClick()
 {
     // Return if we haven't faded in yet
     if (m_ucFade != FADE_VISIBLE)
@@ -896,7 +896,7 @@ bool CMainMenu::OnHostGameButtonClick(void)
     return true;
 }
 
-bool CMainMenu::OnEditorButtonClick(void)
+bool CMainMenu::OnEditorButtonClick()
 {
     // Return if we haven't faded in yet
     if (m_ucFade != FADE_VISIBLE)

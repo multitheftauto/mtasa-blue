@@ -28,7 +28,7 @@ struct SLogEventLine
     SString strBody;
     SString strType;
     SString strContext;
-            operator SString&(void) { return strBody; }
+            operator SString&() { return strBody; }
     bool    operator==(const SLogEventLine& other) const { return strBody == other.strBody && strType == other.strType && strContext == other.strContext; }
 };
 
@@ -116,7 +116,7 @@ void CCrashDumpWriter::LogEvent(const char* szType, const char* szContext, const
 // Static function. Initialize handlers for crash situations
 //
 ///////////////////////////////////////////////////////////////
-void CCrashDumpWriter::SetHandlers(void)
+void CCrashDumpWriter::SetHandlers()
 {
 #ifndef MTA_DEBUG
     _set_invalid_parameter_handler(CCrashDumpWriter::HandleInvalidParameter);
@@ -132,7 +132,7 @@ void CCrashDumpWriter::SetHandlers(void)
 // Static function. Called every so often, you know
 //
 ///////////////////////////////////////////////////////////////
-void CCrashDumpWriter::UpdateCounters(void)
+void CCrashDumpWriter::UpdateCounters()
 {
     if (ms_uiInvalidParameterCount > ms_uiInvalidParameterCountLogged && ms_uiInvalidParameterCountLogged < 10)
     {
@@ -168,7 +168,7 @@ void CCrashDumpWriter::ReserveMemoryKBForCrashDumpProcessing(uint uiMemoryKB)
     ms_pReservedMemory = malloc(uiMemoryKB * 1024);
 }
 
-void CCrashDumpWriter::FreeMemoryForCrashDumpProcessing(void)
+void CCrashDumpWriter::FreeMemoryForCrashDumpProcessing()
 {
     if (ms_pReservedMemory)
     {

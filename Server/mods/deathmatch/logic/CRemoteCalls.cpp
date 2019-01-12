@@ -125,7 +125,7 @@ EDownloadModeType CRemoteCalls::GetDownloadModeForQueueName(const SString& strQu
     }
 }
 
-void CRemoteCalls::ProcessQueuedFiles(void)
+void CRemoteCalls::ProcessQueuedFiles()
 {
     for (auto iter = m_QueueIndexMap.cbegin(); iter != m_QueueIndexMap.cend();)
     {
@@ -292,7 +292,7 @@ void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
 }
 
 // Return true if cancel was done
-bool CRemoteCall::CancelDownload(void)
+bool CRemoteCall::CancelDownload()
 {
     if (m_downloadMode != EDownloadModeType::NONE)
     {

@@ -79,7 +79,7 @@ void CCustomWeapon::SetWeaponTarget(CVector vecTarget)
     m_targetType = TARGET_TYPE_VECTOR;
 }
 
-void CCustomWeapon::ResetWeaponTarget(void)
+void CCustomWeapon::ResetWeaponTarget()
 {
     m_pTarget = NULL;
     m_vecTarget = CVector(0, 0, 0);
@@ -162,12 +162,12 @@ void CCustomWeapon::SetWeaponFireTime(int iFireTime)
     m_iWeaponFireRate = iFireTime;
 }
 
-int CCustomWeapon::GetWeaponFireTime(void)
+int CCustomWeapon::GetWeaponFireTime()
 {
     return m_iWeaponFireRate;
 }
 
-void CCustomWeapon::ResetWeaponFireTime(void)
+void CCustomWeapon::ResetWeaponFireTime()
 {
     m_iWeaponFireRate = GetWeaponFireTime(m_pWeaponStat);
 }

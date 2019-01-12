@@ -82,7 +82,7 @@ __declspec(noinline) void DumpHandlingData(tHandlingDataSA* pData)
     fclose(pFile);
 }
 
-__declspec(naked) void Hook_Calculate(void)
+__declspec(naked) void Hook_Calculate()
 {
     tHandlingDataSA* pData;
     DWORD            dwHandlingData;
@@ -101,7 +101,7 @@ __declspec(naked) void Hook_Calculate(void)
     }
 }
 
-CHandlingManagerSA::CHandlingManagerSA(void)
+CHandlingManagerSA::CHandlingManagerSA()
 {
     // Initialize all default handlings
     InitializeDefaultHandlings();
@@ -151,7 +151,7 @@ CHandlingManagerSA::CHandlingManagerSA(void)
     iChangedVehicles = 0;
 }
 
-CHandlingManagerSA::~CHandlingManagerSA(void)
+CHandlingManagerSA::~CHandlingManagerSA()
 {
     // Destroy all original handling entries
     for (int i = 0; i < HT_MAX; i++)
@@ -172,7 +172,7 @@ eHandlingProperty CHandlingManagerSA::GetPropertyEnumFromName(std::string strNam
     return HANDLING_MAX;
 }
 
-CHandlingEntry* CHandlingManagerSA::CreateHandlingData(void)
+CHandlingEntry* CHandlingManagerSA::CreateHandlingData()
 {
     CHandlingEntrySA* pHandlingEntry = new CHandlingEntrySA();
     return pHandlingEntry;
@@ -625,7 +625,7 @@ eHandlingTypes CHandlingManagerSA::GetHandlingID(eVehicleTypes eModel)
     return HT_LANDSTAL;
 }
 
-void CHandlingManagerSA::InitializeDefaultHandlings(void)
+void CHandlingManagerSA::InitializeDefaultHandlings()
 {
     // Reset
     MemSetFast(m_OriginalHandlingData, 0, sizeof(m_OriginalHandlingData));

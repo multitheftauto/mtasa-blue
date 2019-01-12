@@ -24,7 +24,7 @@ CClientExplosionManager::CClientExplosionManager(CClientManager* pManager)
     m_pLastCreator = NULL;
 }
 
-CClientExplosionManager::~CClientExplosionManager(void)
+CClientExplosionManager::~CClientExplosionManager()
 {
     if (g_pExplosionManager == this)
         g_pExplosionManager = NULL;

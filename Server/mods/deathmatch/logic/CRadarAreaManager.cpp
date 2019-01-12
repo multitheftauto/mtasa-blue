@@ -11,11 +11,11 @@
 
 #include "StdInc.h"
 
-CRadarAreaManager::CRadarAreaManager(void)
+CRadarAreaManager::CRadarAreaManager()
 {
 }
 
-CRadarAreaManager::~CRadarAreaManager(void)
+CRadarAreaManager::~CRadarAreaManager()
 {
     // Delete all the radar areas
     DeleteAll();
@@ -47,7 +47,7 @@ CRadarArea* CRadarAreaManager::CreateFromXML(CElement* pParent, CXMLNode& Node, 
     return pArea;
 }
 
-void CRadarAreaManager::DeleteAll(void)
+void CRadarAreaManager::DeleteAll()
 {
     // Delete all the radar areas
     DeletePointersAndClearList(m_List);

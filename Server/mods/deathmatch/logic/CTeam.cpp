@@ -26,13 +26,13 @@ CTeam::CTeam(CTeamManager* pTeamManager, CElement* pParent, const char* szName, 
     m_pTeamManager->AddToList(this);
 }
 
-CTeam::~CTeam(void)
+CTeam::~CTeam()
 {
     RemoveAllPlayers();
     Unlink();
 }
 
-void CTeam::Unlink(void)
+void CTeam::Unlink()
 {
     m_pTeamManager->RemoveFromList(this);
 }
@@ -112,7 +112,7 @@ void CTeam::RemovePlayer(CPlayer* pPlayer, bool bChangePlayer)
         pPlayer->SetTeam(NULL, false);
 }
 
-void CTeam::RemoveAllPlayers(void)
+void CTeam::RemoveAllPlayers()
 {
     list<CPlayer*>::const_iterator iter = m_Players.begin();
     for (; iter != m_Players.end(); ++iter)

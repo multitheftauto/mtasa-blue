@@ -103,7 +103,7 @@ CAccountManager::CAccountManager(const SString& strDbPathFilename)
     }
 }
 
-CAccountManager::~CAccountManager(void)
+CAccountManager::~CAccountManager()
 {
     // Save everything
     Save(true);
@@ -112,7 +112,7 @@ CAccountManager::~CAccountManager(void)
     RemoveAll();
 }
 
-void CAccountManager::ReconnectToDatabase(void)
+void CAccountManager::ReconnectToDatabase()
 {
     if (m_hDbConnection != INVALID_DB_HANDLE)
     {
@@ -130,7 +130,7 @@ void CAccountManager::ReconnectToDatabase(void)
     m_hDbConnection = m_pDatabaseManager->Connect("sqlite", PathConform(m_strDbPathFilename), "", "", strOptions);
 }
 
-void CAccountManager::DoPulse(void)
+void CAccountManager::DoPulse()
 {
     // Save it only once in a while whenever something has changed
     if (m_bChangedSinceSaved && GetTickCount64_() > m_llLastTimeSaved + 15000)
@@ -140,7 +140,7 @@ void CAccountManager::DoPulse(void)
     }
 }
 
-bool CAccountManager::Load(void)
+bool CAccountManager::Load()
 {
     // Create a registry result
     CRegistryResult result;
@@ -476,7 +476,7 @@ void CAccountManager::MarkAsChanged(CAccount* pAccount)
     }
 }
 
-void CAccountManager::RemoveAll(void)
+void CAccountManager::RemoveAll()
 {
     DeletePointersAndClearList(m_List);
 }

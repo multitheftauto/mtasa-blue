@@ -20,10 +20,10 @@ class CPed;
 class CPedIntelligence
 {
 public:
-    virtual CTaskManager*    GetTaskManager(void) = 0;
-    virtual bool             IsRespondingToEvent(void) = 0;
-    virtual int              GetCurrentEventType(void) = 0;
-    virtual CEvent*          GetCurrentEvent(void) = 0;
-    virtual CVehicleScanner* GetVehicleScanner(void) = 0;
+    virtual CTaskManager*    GetTaskManager() = 0;
+    virtual bool             IsRespondingToEvent() = 0;
+    virtual int              GetCurrentEventType() = 0;
+    virtual CEvent*          GetCurrentEvent() = 0;
+    virtual CVehicleScanner* GetVehicleScanner() = 0;
     virtual bool             TestForStealthKill(CPed* pPed, bool bUnk) = 0;
 };

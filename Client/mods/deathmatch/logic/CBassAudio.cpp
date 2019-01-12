@@ -60,7 +60,7 @@ namespace
     }
 
     // Finish with pointer
-    void UnlockCallbackId(void) { ms_CallbackCS.Unlock(); }
+    void UnlockCallbackId() { ms_CallbackCS.Unlock(); }
 }            // namespace
 
 CBassAudio::CBassAudio(bool bStream, const SString& strPath, bool bLoop, bool bThrottle, bool b3D)
@@ -89,7 +89,7 @@ CBassAudio::CBassAudio(void* pBuffer, unsigned int uiBufferLength, bool bLoop, b
     m_uiCallbackId = AddCallbackId(this);
 }
 
-CBassAudio::~CBassAudio(void)
+CBassAudio::~CBassAudio()
 {
     assert(m_uiCallbackId == 0);
     if (m_pSound)
@@ -100,7 +100,7 @@ CBassAudio::~CBassAudio(void)
     SAFE_DELETE(m_pVars);
 }
 
-void CBassAudio::Destroy(void)
+void CBassAudio::Destroy()
 {
     RemoveCallbackId(m_uiCallbackId);
     m_uiCallbackId = 0;
@@ -128,7 +128,7 @@ void CBassAudio::Destroy(void)
 //
 // This will return false for non streams if the file is not correct
 //
-bool CBassAudio::BeginLoadingMedia(void)
+bool CBassAudio::BeginLoadingMedia()
 {
     assert(!m_pSound && !m_bPendingPlay);
 
@@ -478,7 +478,7 @@ void CALLBACK FreeSync(HSYNC handle, DWORD channel, DWORD data, void* user)
     UnlockCallbackId();
 }
 
-void CBassAudio::SetFinishedCallbacks(void)
+void CBassAudio::SetFinishedCallbacks()
 {
     m_hSyncEnd = BASS_ChannelSetSync(m_pSound, BASS_SYNC_END, 0, &EndSync, m_uiCallbackId);
     m_hSyncFree = BASS_ChannelSetSync(m_pSound, BASS_SYNC_FREE, 0, &FreeSync, m_uiCallbackId);
@@ -487,7 +487,7 @@ void CBassAudio::SetFinishedCallbacks(void)
 //
 // CBassAudio::GetReachedEndCount
 //
-uint CBassAudio::GetReachedEndCount(void)
+uint CBassAudio::GetReachedEndCount()
 {
     // Return the number of times the sound has gotten to the end
     return uiEndSyncCount;
@@ -496,7 +496,7 @@ uint CBassAudio::GetReachedEndCount(void)
 //
 // CBassAudio::IsFreed
 //
-bool CBassAudio::IsFreed(void)
+bool CBassAudio::IsFreed()
 {
     // Check if BASS has freed the sound handle.
     // This could be some time after the actual sound has stopped.
@@ -534,7 +534,7 @@ void CBassAudio::SetPlayPosition(double dPosition)
 }
 
 // Non-streams only
-double CBassAudio::GetPlayPosition(void)
+double CBassAudio::GetPlayPosition()
 {
     // Only relevant for non-streams, which are always ready if valid
     if (m_pSound)
@@ -547,7 +547,7 @@ double CBassAudio::GetPlayPosition(void)
 }
 
 // Non-streams only
-double CBassAudio::GetLength(void)
+double CBassAudio::GetLength()
 {
     // Only relevant for non-streams, which are always ready if valid
     if (m_pSound)
@@ -560,7 +560,7 @@ double CBassAudio::GetLength(void)
 }
 
 // Streams only
-double CBassAudio::GetBufferLength(void)
+double CBassAudio::GetBufferLength()
 {
     if (m_bStream && m_pSound)
     {
@@ -608,7 +608,7 @@ SString CBassAudio::GetMetaTags(const SString& strFormat)
     return strMetaTags;
 }
 
-float CBassAudio::GetPan(void)
+float CBassAudio::GetPan()
 {
     if (m_pSound)
     {
@@ -748,7 +748,7 @@ float* CBassAudio::GetWaveData(int iLength)
     }
     return NULL;
 }
-DWORD CBassAudio::GetLevelData(void)
+DWORD CBassAudio::GetLevelData()
 {
     if (m_pSound)
     {
@@ -759,7 +759,7 @@ DWORD CBassAudio::GetLevelData(void)
     return 0;
 }
 
-float CBassAudio::GetSoundBPM(void)
+float CBassAudio::GetSoundBPM()
 {
     if (m_fBPM == 0.0f && !m_bStream)
     {
@@ -806,7 +806,7 @@ void CBassAudio::SetFxEffects(int* pEnabledEffects, uint iNumElements)
 //
 // Copy state stored in m_EnabledEffects to actual BASS sound
 //
-void CBassAudio::ApplyFxEffects(void)
+void CBassAudio::ApplyFxEffects()
 {
     for (uint i = 0; i < NUMELMS(m_FxEffects) && NUMELMS(m_EnabledEffects); i++)
     {
@@ -903,7 +903,7 @@ void CBassAudio::Process3D(const CVector& vecPlayerPosition, const CVector& vecC
 //
 // Handle stored data from other threads
 //
-void CBassAudio::ServiceVars(void)
+void CBassAudio::ServiceVars()
 {
     // Temp
     DWORD              pSound = 0;

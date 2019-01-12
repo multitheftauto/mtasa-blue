@@ -15,7 +15,7 @@
 ///////////////////////////////////////////////////////////////
 // Object creation
 ///////////////////////////////////////////////////////////////
-CPixelsManagerInterface* NewPixelsManager(void)
+CPixelsManagerInterface* NewPixelsManager()
 {
     return new CPixelsManager();
 }
@@ -27,7 +27,7 @@ CPixelsManagerInterface* NewPixelsManager(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-CPixelsManager::CPixelsManager(void)
+CPixelsManager::CPixelsManager()
 {
 }
 
@@ -38,7 +38,7 @@ CPixelsManager::CPixelsManager(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-CPixelsManager::~CPixelsManager(void)
+CPixelsManager::~CPixelsManager()
 {
     SAFE_RELEASE(m_pTempOffscreenSurface);
 }

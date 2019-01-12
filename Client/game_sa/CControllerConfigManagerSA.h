@@ -34,13 +34,13 @@ public:
     void  SetFlyWithMouse(bool bFlyWithMouse);
     void  SetSteerWithMouse(bool bSteerWithMouse);
     void  SuspendSteerAndFlyWithMouse(bool bSuspend);
-    float GetVerticalAimSensitivity(void);
+    float GetVerticalAimSensitivity();
     void  SetVerticalAimSensitivity(float fSensitivity);
-    float GetVerticalAimSensitivityRawValue(void);
+    float GetVerticalAimSensitivityRawValue();
     void  SetVerticalAimSensitivityRawValue(float fRawValue);
 
     // CControllerConfigManagerSA
-    void ApplySteerAndFlyWithMouseSettings(void);
+    void ApplySteerAndFlyWithMouseSettings();
 
 protected:
     bool m_bSteerWithMouse;

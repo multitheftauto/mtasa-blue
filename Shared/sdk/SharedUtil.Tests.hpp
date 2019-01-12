@@ -13,13 +13,13 @@
  *****************************************************************************/
 
 // Fwd decl
-void SString_Tests(void);
-void SharedUtil_File_Tests(void);
-void SharedUtil_ClassIdent_Tests(void);
-void SharedUtil_WildcardMatch_Tests(void);
-void SharedUtil_Collection_Tests(void);
-void SharedUtil_String_Tests(void);
-void SharedUtil_Hash_Tests(void);
+void SString_Tests();
+void SharedUtil_File_Tests();
+void SharedUtil_ClassIdent_Tests();
+void SharedUtil_WildcardMatch_Tests();
+void SharedUtil_Collection_Tests();
+void SharedUtil_String_Tests();
+void SharedUtil_Hash_Tests();
 
 ///////////////////////////////////////////////////////////////
 //
@@ -28,7 +28,7 @@ void SharedUtil_Hash_Tests(void);
 //
 //
 ///////////////////////////////////////////////////////////////
-void SharedUtil_Tests(void)
+void SharedUtil_Tests()
 {
     SString_Tests();
     SharedUtil_File_Tests();
@@ -70,7 +70,7 @@ void SharedUtil_Tests(void)
 // Tests for functions from SString.hpp
 //
 ///////////////////////////////////////////////////////////////
-void SString_Tests(void)
+void SString_Tests()
 {
     // vFormat
     {
@@ -206,7 +206,7 @@ void SString_Tests(void)
 // Tests for functions from SharedUtil.File.hpp
 //
 ///////////////////////////////////////////////////////////////
-void SharedUtil_File_Tests(void)
+void SharedUtil_File_Tests()
 {
 #ifdef WIN32
 
@@ -260,7 +260,7 @@ void SharedUtil_File_Tests(void)
 // Tests for macros in SharedUtil.ClassIdent.h
 //
 ///////////////////////////////////////////////////////////////
-void SharedUtil_ClassIdent_Tests(void)
+void SharedUtil_ClassIdent_Tests()
 {
 #if WIN32
     // Setup
@@ -276,31 +276,31 @@ void SharedUtil_ClassIdent_Tests(void)
     struct SPlant
     {
         DECLARE_BASE_CLASS(SPlant)
-        SPlant(void) : ClassInit(this) {}
+        SPlant() : ClassInit(this) {}
     };
 
     struct STree : SPlant
     {
         DECLARE_CLASS(STree, SPlant)
-        STree(void) : ClassInit(this) {}
+        STree() : ClassInit(this) {}
     };
 
     struct SFlower : SPlant
     {
         DECLARE_CLASS(SFlower, SPlant)
-        SFlower(void) : ClassInit(this) {}
+        SFlower() : ClassInit(this) {}
     };
 
     struct SBlueBell : SFlower
     {
         DECLARE_CLASS(SBlueBell, SFlower)
-        SBlueBell(void) : ClassInit(this) {}
+        SBlueBell() : ClassInit(this) {}
     };
 
     struct SDaffodil : SFlower
     {
         DECLARE_CLASS(SDaffodil, SFlower)
-        SDaffodil(void) : ClassInit(this) {}
+        SDaffodil() : ClassInit(this) {}
     };
 
     // Create test data
@@ -394,7 +394,7 @@ void SharedUtil_ClassIdent_Tests(void)
 // Tests for WildcardMatch
 //
 ///////////////////////////////////////////////////////////////
-void SharedUtil_WildcardMatch_Tests(void)
+void SharedUtil_WildcardMatch_Tests()
 {
     // WildcardMatch
     {
@@ -422,7 +422,7 @@ void SharedUtil_WildcardMatch_Tests(void)
 // Test behaviour of iterators and such
 //
 ///////////////////////////////////////////////////////////////
-void SharedUtil_Collection_Tests(void)
+void SharedUtil_Collection_Tests()
 {
     // std::map
     {
@@ -508,7 +508,7 @@ void SharedUtil_Collection_Tests(void)
 // Test behaviour of strings
 //
 ///////////////////////////////////////////////////////////////
-void SharedUtil_String_Tests(void)
+void SharedUtil_String_Tests()
 {
     // Formatting
     {
@@ -603,7 +603,7 @@ void SharedUtil_String_Tests(void)
 // Test behaviour of hashing/crypt related functions
 //
 ///////////////////////////////////////////////////////////////
-void SharedUtil_Hash_Tests(void)
+void SharedUtil_Hash_Tests()
 {
     // ConvertHexStringToData/ConvertDataToHexString
     {

@@ -15,7 +15,7 @@
 class CClientStreamSector;
 class CClientStreamSectorRow;
 class CClientStreamElement;
-typedef bool(StreamerLimitReachedFunction)(void);
+typedef bool(StreamerLimitReachedFunction)();
 
 class CClientStreamer
 {
@@ -23,17 +23,17 @@ class CClientStreamer
 
 public:
     CClientStreamer(StreamerLimitReachedFunction* pLimitReachedFunc, float fMaxDistance, float fSectorSize, float fRowSize);
-    ~CClientStreamer(void);
+    ~CClientStreamer();
 
     void DoPulse(CVector& vecPosition);
     void SetDimension(unsigned short usDimension);
 
     static bool CompareExpDistance(CClientStreamElement* p1, CClientStreamElement* p2);
 
-    unsigned int                               CountActiveElements(void) { return (unsigned int)m_ActiveElements.size(); }
+    unsigned int                               CountActiveElements() { return (unsigned int)m_ActiveElements.size(); }
     bool                                       IsActiveElement(CClientStreamElement* pElement);
-    std::list<CClientStreamElement*>::iterator ActiveElementsBegin(void) { return m_ActiveElements.begin(); }
-    std::list<CClientStreamElement*>::iterator ActiveElementsEnd(void) { return m_ActiveElements.end(); }
+    std::list<CClientStreamElement*>::iterator ActiveElementsBegin() { return m_ActiveElements.begin(); }
+    std::list<CClientStreamElement*>::iterator ActiveElementsEnd() { return m_ActiveElements.end(); }
 
 private:
     void CreateSectors(std::list<CClientStreamSectorRow*>* pList, CVector2D& vecSize, CVector2D& vecBottomLeft, CVector2D& vecTopRight);
@@ -51,7 +51,7 @@ private:
     void AddToSortedList(std::list<CClientStreamElement*>* pList, CClientStreamElement* pElement);
 
     void Restream(bool bMovedFar);
-    bool ReachedLimit(void) { return m_pLimitReachedFunc(); }
+    bool ReachedLimit() { return m_pLimitReachedFunc(); }
 
     void OnEnterSector(CClientStreamSector* pSector);
     void OnElementEnterSector(CClientStreamElement* pElement, CClientStreamSector* pSector);

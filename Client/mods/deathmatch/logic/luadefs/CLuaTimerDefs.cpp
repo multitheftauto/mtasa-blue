@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CLuaTimerDefs::LoadFunctions(void)
+void CLuaTimerDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"setTimer", SetTimer},

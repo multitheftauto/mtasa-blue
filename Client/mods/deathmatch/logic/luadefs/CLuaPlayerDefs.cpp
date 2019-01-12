@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CLuaPlayerDefs::LoadFunctions(void)
+void CLuaPlayerDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         // Player get funcs
