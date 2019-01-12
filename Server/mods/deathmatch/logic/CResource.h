@@ -288,6 +288,7 @@ public:
     bool IsProtected() const noexcept { return m_bProtected; }
 
     bool IsResourceZip() const noexcept { return m_bResourceIsZip; }
+    bool UnzipResource();
 
     ResponseCode HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse);
 
