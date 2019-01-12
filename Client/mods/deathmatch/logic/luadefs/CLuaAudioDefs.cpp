@@ -446,16 +446,7 @@ int CLuaAudioDefs::SetSoundLooped(lua_State* luaVM)
     CClientSound*    pSound;
     bool             bLoop;
     CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound", 1);
-        lua_pushboolean(luaVM, false);
-        return false;
-    }
+    argStream.ReadUserData(pSound);
     argStream.ReadBool(bLoop);
 
     if (!argStream.HasErrors())
@@ -464,6 +455,12 @@ int CLuaAudioDefs::SetSoundLooped(lua_State* luaVM)
         {
             lua_pushboolean(luaVM, CStaticFunctionDefinitions::SetSoundLooped(*pSound, bLoop));
             return 1;
+        }
+        else
+        {
+            m_pScriptDebugging->LogBadPointer(luaVM, "sound", 1);
+        lua_pushboolean(luaVM, false);
+        return false;
         }
     }
     else
