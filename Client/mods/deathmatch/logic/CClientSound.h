@@ -40,7 +40,7 @@ public:
     bool IsPaused(void);
 
     void SetLooped(bool bLoop);
-    bool IsLooped(void);
+    bool IsLooped() const;
 
     void   SetPlayPosition(double dPosition);
     double GetPlayPosition(void);
