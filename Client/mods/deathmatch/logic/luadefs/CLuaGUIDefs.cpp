@@ -1915,47 +1915,27 @@ int CLuaGUIDefs::GUIBlur(lua_State* luaVM)
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushnil(luaVM);
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
 int CLuaGUIDefs::GUIFocus(lua_State* luaVM)
 {
-    //  bool guiFocus ( element guiElement [, bool bMoveCaretToEnd = false ] )
+    //  bool guiFocus ( element guiElement )
     CClientGUIElement* guiElement;
-    bool               bMoveCaretToEnd;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(guiElement);
-    argStream.ReadBool(bMoveCaretToEnd, false);
 
     if (!argStream.HasErrors())
     {
-        bool bResult = CStaticFunctionDefinitions::GUIFocus(*guiElement);
-
-        if (bResult && bMoveCaretToEnd)
-        {
-            CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(*guiElement);
-
-            if (IS_CGUIELEMENT_EDIT(&GUIElement))
-            {
-                CGUIEdit* GUIEdit = static_cast<CGUIEdit*>(GUIElement.GetCGUIElement());
-                GUIEdit->SetCaretIndex(GUIEdit->GetText().length());
-            }
-            else if (IS_CGUIELEMENT_MEMO(&GUIElement))
-            {
-                CGUIMemo* GUIMemo = static_cast<CGUIMemo*>(GUIElement.GetCGUIElement());
-                GUIMemo->SetCaretIndex(GUIMemo->GetText().length());
-            }
-        }
-        
-        lua_pushboolean(luaVM, bResult);
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::GUIFocus(*guiElement));
         return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushnil(luaVM);
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
