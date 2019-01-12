@@ -39,7 +39,7 @@ public:
     void SetPaused(bool bPaused);
     bool IsPaused(void);
 
-    void SetLooped(bool bLoop);
+    bool SetLooped(bool bLoop);
     bool IsLooped() const;
 
     void   SetPlayPosition(double dPosition);
