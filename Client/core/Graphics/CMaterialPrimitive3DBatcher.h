@@ -5,8 +5,12 @@
  *  FILE:        CMaterialPrimitive3DBatcher.h
  *  PURPOSE:
  *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+
+#pragma once
+
 // Vertex type used by the primitives 3d batcher
 struct sPrimitiveMaterial3D
 {
@@ -22,13 +26,12 @@ class CMaterialPrimitive3DBatcher
 {
 public:
     ZERO_ON_NEW
-    CMaterialPrimitive3DBatcher(bool bPreGUI, CGraphics* graphics);
-    ~CMaterialPrimitive3DBatcher(void);
+    CMaterialPrimitive3DBatcher(bool bPreGUI, CGraphics* pGraphics);
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
-    void Flush(void);
+    void Flush();
     void AddPrimitive(D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, std::vector<PrimitiveMaterialVertice>* pVecVertices);
     void DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iCollectionSize, const void* pDataAddr, size_t uiVertexStride);
-    bool HasItems(void) { return !m_primitiveList.empty(); }
+    bool HasItems() const { return !m_primitiveList.empty(); }
     void ClearQueue();
 
 protected:

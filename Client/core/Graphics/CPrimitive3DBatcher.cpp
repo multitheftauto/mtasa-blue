@@ -6,6 +6,7 @@
  *  FILE:        CPrimitive3DBatcher.cpp
  *  PURPOSE:
  *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 #include <StdInc.h>
@@ -18,17 +19,7 @@
 //
 ////////////////////////////////////////////////////////////////
 CPrimitive3DBatcher::CPrimitive3DBatcher(bool bPreGUI)
-{
-    m_bPreGUI = bPreGUI;
-}
-////////////////////////////////////////////////////////////////
-//
-// CPrimitive3DBatcher::~CPrimitive3DBatcher
-//
-//
-//
-////////////////////////////////////////////////////////////////
-CPrimitive3DBatcher::~CPrimitive3DBatcher(void)
+    : m_bPreGUI(bPreGUI)
 {
 }
 ////////////////////////////////////////////////////////////////
@@ -49,7 +40,7 @@ void CPrimitive3DBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewp
 // Send all buffered vertices to D3D
 //
 ////////////////////////////////////////////////////////////////
-void CPrimitive3DBatcher::Flush(void)
+void CPrimitive3DBatcher::Flush()
 {
     if (m_primitiveList.empty())
         return;
@@ -112,9 +103,7 @@ void CPrimitive3DBatcher::Flush(void)
         delete primitive.pVecVertices;
     }
 
-    size_t prevSize = m_primitiveList.size();
     m_primitiveList.clear();
-    m_primitiveList.reserve(prevSize);
 
     if (g_pDeviceState->AdapterState.bRequiresClipping)
         m_pDevice->SetRenderState(D3DRS_CLIPPING, FALSE);

@@ -578,9 +578,10 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
     argStream.ReadEnumString(ePrimitiveType);
     argStream.ReadBool(bPostGUI, false);
 
+    std::vector<float> vecTableContent;
+
     while (argStream.NextIsTable())
     {
-        std::vector<float> vecTableContent;
         argStream.ReadNumberTable(vecTableContent);
         switch (vecTableContent.size())
         {
@@ -589,6 +590,9 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
                 break;
             case Primitive3DVerticeSizes::VERT_XYZ_COLOR:
                 pVecVertices->push_back(PrimitiveVertice{vecTableContent[0], vecTableContent[1], vecTableContent[2], static_cast<DWORD>(vecTableContent[3])});
+                break;
+            default:
+                argStream.SetCustomError(SString("Expected table with 3 or 4 numbers, got %i numbers", vecTableContent.size()).c_str());
                 break;
         }
     }
@@ -600,7 +604,12 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
             g_pCore->GetGraphics()->DrawPrimitive3DQueued(pVecVertices, ePrimitiveType, bPostGUI);
             lua_pushboolean(luaVM, true);
             return 1;
-        }       
+        }
+        else
+        {
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
     }
     else
     {
@@ -609,7 +618,7 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
 
     // Failed
     delete pVecVertices;
-    lua_pushboolean(luaVM, false);
+    lua_pushnil(luaVM);
     return 1;
 }
 
@@ -625,9 +634,10 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
     MixedReadMaterialString(argStream, pMaterialElement);
     argStream.ReadBool(bPostGUI, false);
 
+    std::vector<float> vecTableContent;
+
     while (argStream.NextIsTable())
     {
-        std::vector<float> vecTableContent;
         argStream.ReadNumberTable(vecTableContent);
         switch (vecTableContent.size())
         {
@@ -636,6 +646,9 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
                 break;
             case Primitive3DVerticeSizes::VERT_XYZ_COLOR_UV:
                 pVecVertices->push_back(PrimitiveMaterialVertice{ vecTableContent[0], vecTableContent[1], vecTableContent[2], static_cast<DWORD>(vecTableContent[3]),vecTableContent[4], vecTableContent[5] });
+                break;
+            default:
+                argStream.SetCustomError(SString("Expected table with 5 or 6 numbers, got %i numbers", vecTableContent.size()).c_str());
                 break;
         }
     }
@@ -647,7 +660,12 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
             g_pCore->GetGraphics()->DrawMaterialPrimitive3DQueued(pVecVertices, ePrimitiveType, pMaterialElement->GetMaterialItem(), bPostGUI);
             lua_pushboolean(luaVM, true);
             return 1;
-        }       
+        }
+        else
+        {
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
     }
     else
     {
@@ -656,7 +674,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
 
     // Failed
     delete pVecVertices;
-    lua_pushboolean(luaVM, false);
+    lua_pushnil(luaVM);
     return 1;
 }
 

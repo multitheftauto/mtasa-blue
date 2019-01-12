@@ -6,6 +6,7 @@
  *  FILE:        CMaterialPrimitive3DBatcher.cpp
  *  PURPOSE:
  *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 #include <StdInc.h>
@@ -17,19 +18,8 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-CMaterialPrimitive3DBatcher::CMaterialPrimitive3DBatcher(bool bPreGUI, CGraphics* graphics)
-{
-    m_bPreGUI = bPreGUI;
-    m_pGraphics = graphics;
-}
-////////////////////////////////////////////////////////////////
-//
-// CMaterialPrimitive3DBatcher::~CMaterialPrimitive3DBatcher
-//
-//
-//
-////////////////////////////////////////////////////////////////
-CMaterialPrimitive3DBatcher::~CMaterialPrimitive3DBatcher(void)
+CMaterialPrimitive3DBatcher::CMaterialPrimitive3DBatcher(bool bPreGUI, CGraphics* pGraphics)
+    : m_bPreGUI(bPreGUI), m_pGraphics(pGraphics)
 {
 }
 ////////////////////////////////////////////////////////////////
@@ -43,8 +33,6 @@ void CMaterialPrimitive3DBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, floa
 {
     m_pDevice = pDevice;
 }
-
-
 ////////////////////////////////////////////////////////////////
 //
 // CMaterialPrimitive3DBatcher::Flush
@@ -52,7 +40,7 @@ void CMaterialPrimitive3DBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, floa
 // Send all buffered vertices to D3D
 //
 ////////////////////////////////////////////////////////////////
-void CMaterialPrimitive3DBatcher::Flush(void)
+void CMaterialPrimitive3DBatcher::Flush()
 {
     if (m_primitiveList.empty())
         return;
