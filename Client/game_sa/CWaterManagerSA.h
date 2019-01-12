@@ -165,7 +165,7 @@ public:
     bool  IsWaterDrawnLast(void);
 
     bool IsPointOutsideOfGameArea(const CVector& vecPos);
-    bool TestLineAgainstWater(const CVector& vecStart, const CVector& vecEnd, CVector* vecCollision, bool bUseLegacy);
+    bool TestLineAgainstWater(const CVector& vecStart, const CVector& vecEnd, CVector* vecCollision);
 
     void AddChange(void* pChangeSource, void* pChangedObject, CWaterChange* pChange);
     void UndoChanges(void* pChangeSource = NULL);

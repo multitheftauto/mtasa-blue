@@ -6167,9 +6167,9 @@ bool CStaticFunctionDefinitions::IsLineOfSightClear(const CVector& vecStart, con
     return true;
 }
 
-bool CStaticFunctionDefinitions::TestLineAgainstWater(CVector& vecStart, CVector& vecEnd, CVector& vecCollision, bool bUseLegacy)
+bool CStaticFunctionDefinitions::TestLineAgainstWater(CVector& vecStart, CVector& vecEnd, CVector& vecCollision)
 {
-    return g_pGame->GetWaterManager()->TestLineAgainstWater(vecStart, vecEnd, &vecCollision, bUseLegacy);
+    return g_pGame->GetWaterManager()->TestLineAgainstWater(vecStart, vecEnd, &vecCollision);
 }
 
 CClientWater* CStaticFunctionDefinitions::CreateWater(CResource& resource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow)

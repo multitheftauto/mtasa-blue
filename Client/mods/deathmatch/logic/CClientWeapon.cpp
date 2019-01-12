@@ -435,7 +435,7 @@ void CClientWeapon::FireInstantHit(CVector vecOrigin, CVector vecTarget, bool bS
         DoGunShells(vecOrigin, vecDirection);
 
         CVector vecCollision;
-        if (g_pGame->GetWaterManager()->TestLineAgainstWater(vecOrigin, vecTarget, &vecCollision, false))
+        if (g_pGame->GetWaterManager()->TestLineAgainstWater(vecOrigin, vecTarget, &vecCollision))
         {
             g_pGame->GetFx()->TriggerBulletSplash(vecCollision);
             g_pGame->GetAudioEngine()->ReportBulletHit(NULL, SURFACE_TYPE_WATER_SHALLOW, &vecCollision, 0.0f);

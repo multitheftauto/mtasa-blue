@@ -115,20 +115,18 @@ int CLuaWaterDefs::CreateWater(lua_State* luaVM)
 
 int CLuaWaterDefs::TestLineAgainstWater(lua_State* luaVM)
 {
-    //  bool float float float testLineAgainstWater ( float startX, float startY, float startZ, float endX, float endY, float endZ, [bool bUseLegacy = true] )
+    //  bool float float float testLineAgainstWater ( float startX, float startY, float startZ, float endX, float endY, float endZ )
     CVector vecStart;
     CVector vecEnd;
-    bool    bUseLegacy;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecStart);
     argStream.ReadVector3D(vecEnd);
-    argStream.ReadBool(bUseLegacy, true);
 
     if (!argStream.HasErrors())
     {
         CVector vecCollision;
-        if (CStaticFunctionDefinitions::TestLineAgainstWater(vecStart, vecEnd, vecCollision, bUseLegacy))
+        if (CStaticFunctionDefinitions::TestLineAgainstWater(vecStart, vecEnd, vecCollision))
         {
             lua_pushboolean(luaVM, true);
             lua_pushnumber(luaVM, vecCollision.fX);

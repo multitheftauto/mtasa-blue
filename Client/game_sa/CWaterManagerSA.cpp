@@ -808,12 +808,8 @@ bool CWaterManagerSA::IsPointOutsideOfGameArea(const CVector& vecPos)
     return vecPos.fX < -3000 || vecPos.fX > 3000 || vecPos.fY < -3000 || vecPos.fY > 3000;
 }
 
-bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVector& vecEnd, CVector* vecCollision, bool bUseLegacy)
+bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVector& vecEnd, CVector* vecCollision)
 {
-    if (bUseLegacy)
-    {
-        return ((TestLineAgainstWater_t)FUNC_TestLineAgainstWater)(vecEnd.fX, vecEnd.fY, vecEnd.fZ, vecStart.fX, vecStart.fY, vecStart.fZ, vecCollision);
-    }
     CVector rayDir = vecEnd - vecStart;
 
     // Check if we're outside of map area.
