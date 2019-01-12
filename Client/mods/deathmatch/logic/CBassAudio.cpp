@@ -648,7 +648,7 @@ void CBassAudio::SetLooped(bool bLoop)
     m_bLoop = bLoop;
     
   if (m_pSound)
-    BASS_ChannelFlags(m_pSound, bLoop ? BASS_SAMPLE_OOP : 0, BASS_SAMPLE_LOOP);
+    BASS_ChannelFlags(m_pSound, bLoop ? BASS_SAMPLE_LOOP : 0, BASS_SAMPLE_LOOP);
 }
 
 void CBassAudio::SetPosition(const CVector& vecPosition)
