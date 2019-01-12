@@ -9687,6 +9687,5 @@ bool CStaticFunctionDefinitions::ResetSurfaceInfo(short sSurfaceID)
         g_pGame->GetWorld()->ResetSurfaceInfo(sSurfaceID);
         return true;
     }
-    else
-        return false;
+    return false;
 }
