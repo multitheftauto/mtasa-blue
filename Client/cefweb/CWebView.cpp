@@ -593,7 +593,7 @@ bool CWebView::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProces
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#GetViewRect(CefRefPtr%3CCefBrowser%3E,CefRect&) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-void CWebView::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
+bool CWebView::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
 {
     rect.x = 0;
     rect.y = 0;
@@ -602,11 +602,12 @@ void CWebView::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
     {
         rect.width = 1;
         rect.height = 1;
-        return;
+        return false;
     }
 
     rect.width = static_cast<int>(m_pWebBrowserRenderItem->m_uiSizeX);
     rect.height = static_cast<int>(m_pWebBrowserRenderItem->m_uiSizeY);
+    return true;
 }
 
 ////////////////////////////////////////////////////////////////////
