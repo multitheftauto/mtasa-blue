@@ -87,13 +87,13 @@ public:
     CFxSystemSA(CFxSystemSAInterface* pInterface);
     ~CFxSystemSA();
 
-    void PlayAndKill(void);
+    void PlayAndKill();
 
     void  SetEffectSpeed(float fSpeed);
-    float GetEffectSpeed(void);
+    float GetEffectSpeed();
 
     void  SetEffectDensity(float fDensity);
-    float GetEffectDensity(void);
+    float GetEffectDensity();
 
     void GetPosition(CVector& vecPos);
     void SetPosition(const CVector& vecPos);
@@ -102,12 +102,12 @@ public:
     void SetMatrix(const CMatrix& matrix);
 
     void  SetDrawDistance(float fDrawDistance);
-    float GetDrawDistance(void);
-    bool  HasCustomDrawDistance(void);
+    float GetDrawDistance();
+    bool  HasCustomDrawDistance();
 
-    void* GetInterface(void) { return (void*)m_pInterface; }
+    void* GetInterface() { return (void*)m_pInterface; }
 
-    static void StaticSetHooks(void);
+    static void StaticSetHooks();
 
 protected:
     CFxSystemSAInterface* m_pInterface;

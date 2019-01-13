@@ -15,7 +15,7 @@
 
 class CLuaArguments;
 
-void CPedRPCs::LoadFunctions(void)
+void CPedRPCs::LoadFunctions()
 {
     AddHandler(SET_PED_ARMOR, SetPedArmor, "SetPedArmor");
     AddHandler(SET_PED_ROTATION, SetPedRotation, "SetPedRotation");

@@ -12,7 +12,7 @@
 #include <StdInc.h>
 #include "CWorldRPCs.h"
 
-void CWorldRPCs::LoadFunctions(void)
+void CWorldRPCs::LoadFunctions()
 {
     AddHandler(SET_TIME, SetTime, "SetTime");
     AddHandler(SET_WEATHER, SetWeather, "SetWeather");

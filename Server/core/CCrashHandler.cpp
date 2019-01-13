@@ -288,7 +288,7 @@ void CCrashHandler::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInfo
     }
 }
 
-void CCrashHandler::RunErrorTool(void)
+void CCrashHandler::RunErrorTool()
 {
 }
 

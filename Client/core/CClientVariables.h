@@ -32,8 +32,8 @@ class CClientVariables : public CCVarsInterface, public CSingleton<CClientVariab
     #define SANGET  if(!Node(strVariable)) return false
 
 public:
-    CClientVariables(void);
-    ~CClientVariables(void);
+    CClientVariables();
+    ~CClientVariables();
 
     // Get queries
     bool Get(const std::string& strVariable, bool& val)
@@ -112,14 +112,14 @@ public:
 
     bool Exists(const std::string& strVariable);
 
-    bool Load(void);
-    bool IsLoaded(void) { return m_bLoaded; }
-    int  GetRevision(void) { return m_iRevision; }
-    void ValidateValues(void);
+    bool Load();
+    bool IsLoaded() { return m_bLoaded; }
+    int  GetRevision() { return m_iRevision; }
+    void ValidateValues();
 
 private:
     CXMLNode* Node(const std::string& strVariable);
-    void      LoadDefaults(void);
+    void      LoadDefaults();
 
     bool      m_bLoaded;
     CXMLNode* m_pStorage;

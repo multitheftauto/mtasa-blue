@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CLuaEngineDefs::LoadFunctions(void)
+void CLuaEngineDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"engineLoadTXD", EngineLoadTXD},

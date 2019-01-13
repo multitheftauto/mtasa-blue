@@ -15,13 +15,13 @@
 
 #define ANTICHEAT_CHECKS_PER_CYCLE 5
 
-CAntiCheat::CAntiCheat(void)
+CAntiCheat::CAntiCheat()
 {
     // Start at the first index
     m_LastEntry = m_Entries.begin();
 }
 
-CAntiCheat::~CAntiCheat(void)
+CAntiCheat::~CAntiCheat()
 {
     // All modules should've been removed now
     assert(m_Entries.size() == 0);
@@ -58,12 +58,12 @@ void CAntiCheat::RemoveModule(CAntiCheatModule& Module)
     }
 }
 
-void CAntiCheat::ClearModules(void)
+void CAntiCheat::ClearModules()
 {
     m_Entries.clear();
 }
 
-bool CAntiCheat::PerformChecks(void)
+bool CAntiCheat::PerformChecks()
 {
     // We have entries in our vector?
     if (m_Entries.size() > 0)

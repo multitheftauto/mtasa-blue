@@ -141,13 +141,13 @@ void HOOK_CBoat_ApplyDamage();
 void HOOK_CProjectile_FixTearGasCrash();
 void HOOK_CProjectile_FixExplosionLocation();
 
-void CMultiplayerSA::Init_13(void)
+void CMultiplayerSA::Init_13()
 {
     InitHooks_13();
     InitMemoryCopies_13();
 }
 
-void CMultiplayerSA::InitHooks_13(void)
+void CMultiplayerSA::InitHooks_13()
 {
     // HookInstalls go here
     HookInstall(HOOKPOS_CEventHitByWaterCannon, (DWORD)HOOK_CEventHitByWaterCannon, 9);
@@ -210,7 +210,7 @@ void CMultiplayerSA::InitHooks_13(void)
     InitHooks_Rendering();
 }
 
-void CMultiplayerSA::InitMemoryCopies_13(void)
+void CMultiplayerSA::InitMemoryCopies_13()
 {
     // Memory based fixes go here
     // MemSet ( (void*)0x6AB35A, 0x90, 12 ); // Ignore some retarded R* if statement that checks if the model is the buffalo and jumps the siren code even
@@ -1474,7 +1474,7 @@ void CMultiplayerSA::SetPedTargetingMarkerEnabled(bool bEnable)
     }
 }
 
-bool CMultiplayerSA::IsPedTargetingMarkerEnabled(void)
+bool CMultiplayerSA::IsPedTargetingMarkerEnabled()
 {
     uint32 dwFunc = FUNC_CPed__RenderTargetMarker;
     return *(uint8*)dwFunc != 0xC3;

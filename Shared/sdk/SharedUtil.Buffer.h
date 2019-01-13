@@ -25,7 +25,7 @@ namespace SharedUtil
 
         void resize(size_t newSizeInBytes) { buffer.resize(newSizeInBytes); }
 
-        operator T*(void) { return buffer.empty() ? nullptr : reinterpret_cast<T*>(&buffer.at(0)); }
+        operator T*() { return buffer.empty() ? nullptr : reinterpret_cast<T*>(&buffer.at(0)); }
     };
 
     // Assuming compiled on little endian machine
@@ -42,12 +42,12 @@ namespace SharedUtil
     class CBuffer : protected std::vector<char>
     {
     public:
-        CBuffer(void) {}
+        CBuffer() {}
         CBuffer(const void* pData, uint uiSize) { AddBytes(pData, uiSize, 0); }
 
-        void Clear(void) { clear(); }
+        void Clear() { clear(); }
 
-        bool IsEmpty(void) const { return empty(); }
+        bool IsEmpty() const { return empty(); }
 
         void Reserve(uint uiSize) { return reserve(uiSize); }
 
@@ -65,7 +65,7 @@ namespace SharedUtil
                 memset(GetData() + uiOldSize, 0, uiSize - uiOldSize);
         }
 
-        uint GetSize(void) const { return (uint)size(); }
+        uint GetSize() const { return (uint)size(); }
 
         // Access
         char* GetData(uint uiOffset = 0) { return size() ? &at(uiOffset) : NULL; }
@@ -160,11 +160,11 @@ namespace SharedUtil
     public:
         CBufferStream(bool bToFromNetwork) : m_iPos(0), m_uiVersion(0), m_bToFromNetwork(bToFromNetwork) {}
         void        Seek(int iPos) { m_iPos = Clamp(0, iPos, GetSize()); }
-        int         Tell(void) const { return m_iPos; }
-        virtual int GetSize(void) const = 0;
+        int         Tell() const { return m_iPos; }
+        virtual int GetSize() const = 0;
         bool        AtEnd(int iOffset = 0) const { return m_iPos + iOffset >= GetSize(); }
         void        SetVersion(uint uiVersion) { m_uiVersion = uiVersion; }
-        uint        Version(void) const { return m_uiVersion; }
+        uint        Version() const { return m_uiVersion; }
 
     protected:
         int  m_iPos;
@@ -186,8 +186,8 @@ namespace SharedUtil
     public:
         CBufferReadStream(const CBuffer& source, bool bToFromNetwork = false) : CBufferStream(bToFromNetwork), pBuffer(&source) {}
 
-        virtual int         GetSize(void) const { return pBuffer->GetSize(); }
-        virtual const char* GetData(void) const { return pBuffer->GetData(); }
+        virtual int         GetSize() const { return pBuffer->GetSize(); }
+        virtual const char* GetData() const { return pBuffer->GetData(); }
 
         // Return true if enough bytes left in the buffer
         bool CanReadNumberOfBytes(int iLength)
@@ -323,7 +323,7 @@ namespace SharedUtil
     public:
         CBufferWriteStream(CBuffer& source, bool bToFromNetwork = false) : CBufferStream(bToFromNetwork), pBuffer(&source) {}
 
-        virtual int GetSize(void) const { return pBuffer->GetSize(); }
+        virtual int GetSize() const { return pBuffer->GetSize(); }
 
         void WriteBytes(const void* pData, int iLength, bool bToFromNetwork = false)
         {

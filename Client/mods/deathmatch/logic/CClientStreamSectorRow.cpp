@@ -21,7 +21,7 @@ CClientStreamSectorRow::CClientStreamSectorRow(float fBottom, float fTop, float 
     m_pBottom = NULL;
 }
 
-CClientStreamSectorRow::~CClientStreamSectorRow(void)
+CClientStreamSectorRow::~CClientStreamSectorRow()
 {
     // Clear our sectors
     list<CClientStreamSector*>::iterator iter = m_Sectors.begin();

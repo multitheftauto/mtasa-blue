@@ -14,7 +14,7 @@
 class CLuaFireDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     LUA_DECLARE(CreateFire);
     LUA_DECLARE(ExtinguishFire);

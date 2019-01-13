@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CLuaProjectileDefs::LoadFunctions(void)
+void CLuaProjectileDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"createProjectile", CreateProjectile},

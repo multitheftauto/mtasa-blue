@@ -23,14 +23,14 @@ class CClientStreamSectorRow
 
 public:
     CClientStreamSectorRow(float fBottom, float fTop, float fSectorSize, float fRowSize);
-    ~CClientStreamSectorRow(void);
+    ~CClientStreamSectorRow();
 
-    std::list<CClientStreamSector*>::iterator Begin(void) { return m_Sectors.begin(); }
-    std::list<CClientStreamSector*>::iterator End(void) { return m_Sectors.end(); }
-    CClientStreamSector*                      Front(void) { return m_Sectors.front(); }
+    std::list<CClientStreamSector*>::iterator Begin() { return m_Sectors.begin(); }
+    std::list<CClientStreamSector*>::iterator End() { return m_Sectors.end(); }
+    CClientStreamSector*                      Front() { return m_Sectors.front(); }
     void                                      Add(CClientStreamSector* pSector);
     void                                      Remove(CClientStreamSector* pSector);
-    unsigned int                              CountSectors(void) { return m_Sectors.size(); }
+    unsigned int                              CountSectors() { return m_Sectors.size(); }
 
     bool DoesContain(CVector& vecPosition);
     bool DoesContain(float fY);
@@ -47,7 +47,7 @@ public:
     }
 
 private:
-    bool IsExtra(void) { return m_bExtra; }
+    bool IsExtra() { return m_bExtra; }
     void SetExtra(bool bExtra) { m_bExtra = bExtra; }
 
     const float                     m_fSectorSize;

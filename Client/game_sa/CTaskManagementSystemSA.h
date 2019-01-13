@@ -24,8 +24,8 @@ class CTaskManagementSystemSA;
 class CTaskManagementSystemSA : public CTaskManagementSystem
 {
 public:
-    CTaskManagementSystemSA(void);
-    ~CTaskManagementSystemSA(void);
+    CTaskManagementSystemSA();
+    ~CTaskManagementSystemSA();
 
     CTask* AddTask(CTaskSA* pTask);
     void   RemoveTask(CTaskSAInterface* pTaskInterface);

@@ -16,7 +16,7 @@ CAEVehicleAudioEntitySA::CAEVehicleAudioEntitySA(CAEVehicleAudioEntitySAInterfac
     m_pInterface = pInterface;
 }
 
-void CAEVehicleAudioEntitySA::JustGotInVehicleAsDriver(void)
+void CAEVehicleAudioEntitySA::JustGotInVehicleAsDriver()
 {
     m_pInterface->m_bPlayerDriver = true;
     DWORD dwFunc = FUNC_CAEVehicleAudioEntity__JustGotInVehicleAsDriver;
@@ -28,7 +28,7 @@ void CAEVehicleAudioEntitySA::JustGotInVehicleAsDriver(void)
     }
 }
 
-void CAEVehicleAudioEntitySA::JustGotOutOfVehicleAsDriver(void)
+void CAEVehicleAudioEntitySA::JustGotOutOfVehicleAsDriver()
 {
     m_pInterface->m_bPlayerDriver = false;
     DWORD dwFunc = FUNC_CAEVehicleAudioEntity__JustGotOutOfVehicleAsDriver;
@@ -40,7 +40,7 @@ void CAEVehicleAudioEntitySA::JustGotOutOfVehicleAsDriver(void)
     }
 }
 
-void CAEVehicleAudioEntitySA::TurnOnRadioForVehicle(void)
+void CAEVehicleAudioEntitySA::TurnOnRadioForVehicle()
 {
     DWORD dwFunc = FUNC_CAEVehicleAudioEntity__TurnOnRadioForVehicle;
     DWORD dwThis = (DWORD)m_pInterface;

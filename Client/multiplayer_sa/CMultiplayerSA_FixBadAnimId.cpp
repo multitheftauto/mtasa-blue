@@ -158,7 +158,7 @@ void _declspec(naked) HOOK_GetAnimHierarchyFromSkinClump()
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_FixBadAnimId(void)
+void CMultiplayerSA::InitHooks_FixBadAnimId()
 {
     EZHookInstall(GetAnimHierarchyFromSkinClump);
 }

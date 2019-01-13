@@ -106,7 +106,7 @@ const char* CClientPad::GetControlName(unsigned int uiIndex)
     return NULL;
 }
 
-CClientPad::CClientPad(void)
+CClientPad::CClientPad()
 {
     memset(&m_fStates, 0, sizeof(m_fStates));
 

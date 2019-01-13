@@ -27,19 +27,19 @@ public:
         MAX_TYPES
     };
 
-    CTransferBox(void);
-    virtual ~CTransferBox(void);
+    CTransferBox();
+    virtual ~CTransferBox();
 
-    void Show(void);
-    void Hide(void);
+    void Show();
+    void Hide();
 
     void SetInfo(double dDownloadSizeNow, CTransferBox::Type eTransferType = CTransferBox::NORMAL);
 
-    void DoPulse(void);
+    void DoPulse();
 
     bool OnCancelClick(CGUIElement* pElement);
 
-    bool IsVisible(void) { return m_pWindow->IsVisible(); };
+    bool IsVisible() { return m_pWindow->IsVisible(); };
 
     void AddToTotalSize(double dSize) { m_dTotalSize += dSize; };
 

@@ -49,10 +49,10 @@ public:
     static void        OnCrashAverted(uint uiId);
     static void        OnEnterCrashZone(uint uiId);
     static void        LogEvent(const char* szType, const char* szContext, const char* szBody);
-    static SString     GetCrashAvertedStatsSoFar(void);
+    static SString     GetCrashAvertedStatsSoFar();
     static void        ReserveMemoryKBForCrashDumpProcessing(uint uiMemoryKB);
-    static void        FreeMemoryForCrashDumpProcessing(void);
-    static void        SetHandlers(void);
-    static void        UpdateCounters(void);
+    static void        FreeMemoryForCrashDumpProcessing();
+    static void        SetHandlers();
+    static void        UpdateCounters();
     static void        HandleInvalidParameter(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved);
 };

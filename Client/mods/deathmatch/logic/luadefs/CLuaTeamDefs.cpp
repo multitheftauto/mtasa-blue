@@ -12,7 +12,7 @@
 #include "StdInc.h"
 using std::list;
 
-void CLuaTeamDefs::LoadFunctions(void)
+void CLuaTeamDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"getTeamFromName", GetTeamFromName},

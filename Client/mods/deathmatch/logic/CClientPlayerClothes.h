@@ -49,14 +49,14 @@ class CClientPlayerClothes
 {
 public:
     CClientPlayerClothes(CClientPed* pPed);
-    ~CClientPlayerClothes(void);
+    ~CClientPlayerClothes();
 
     const SPlayerClothing* GetClothing(unsigned char ucType);
     void                   AddClothes(const char* szTexture, const char* szModel, unsigned char ucType, bool bAddToModel = true);
     void                   InternalAddClothes(const SPlayerClothing* pClothing, unsigned char ucType);
     bool                   RemoveClothes(unsigned char ucType, bool bRemoveFromModel = true);
 
-    void AddAllToModel(void);
+    void AddAllToModel();
     void RemoveAll(bool bRemoveFromModel = true);
 
     void DefaultClothes(bool bAddToModel = true);

@@ -74,7 +74,7 @@ void CWaterManager::SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLev
     }
 }
 
-void CWaterManager::ResetWorldWaterLevel(void)
+void CWaterManager::ResetWorldWaterLevel()
 {
     m_WorldWaterLevelInfo.bNonSeaLevelSet = false;
     m_WorldWaterLevelInfo.fSeaLevel = 0;

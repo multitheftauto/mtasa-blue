@@ -10,7 +10,7 @@
 
 #include "StdInc.h"
 
-void CLuaUTFDefs::LoadFunctions(void)
+void CLuaUTFDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"utfLen", UtfLen},

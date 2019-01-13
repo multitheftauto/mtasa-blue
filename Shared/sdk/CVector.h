@@ -42,7 +42,7 @@ public:
         this->fZ = fZ;
     }
 
-    float Normalize(void)
+    float Normalize()
     {
         float t = sqrt(fX * fX + fY * fY + fZ * fZ);
         if (t > FLOAT_EPSILON)
@@ -57,9 +57,9 @@ public:
         return t;
     }
 
-    float Length(void) const { return sqrt((fX * fX) + (fY * fY) + (fZ * fZ)); }
+    float Length() const { return sqrt((fX * fX) + (fY * fY) + (fZ * fZ)); }
 
-    float LengthSquared(void) const { return (fX * fX) + (fY * fY) + (fZ * fZ); }
+    float LengthSquared() const { return (fX * fX) + (fY * fY) + (fZ * fZ); }
 
     float DotProduct(const CVector* param) const { return fX * param->fX + fY * param->fY + fZ * param->fZ; }
 
@@ -72,7 +72,7 @@ public:
     }
 
     // Convert (direction) to rotation
-    CVector ToRotation(void) const
+    CVector ToRotation() const
     {
         CVector vecRotation;
         vecRotation.fZ = atan2(fY, fX);
@@ -83,7 +83,7 @@ public:
     }
 
     // Return a perpendicular direction
-    CVector GetOtherAxis(void) const
+    CVector GetOtherAxis() const
     {
         CVector vecResult;
         if (std::abs(fX) > std::abs(fY))
@@ -94,7 +94,7 @@ public:
         return vecResult;
     }
 
-    CVector Clone(void) const
+    CVector Clone() const
     {
         CVector vecResult;
         vecResult.fX = fX;

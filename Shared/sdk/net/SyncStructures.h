@@ -82,10 +82,10 @@ struct SIntegerSync : public ISyncStructure
     }
     void Write(NetBitStreamInterface& bitStream) const { bitStream.WriteBits(reinterpret_cast<const char*>(&data), bits); }
 
-    SIntegerSync(void) { assert(bits <= sizeof(type) * 8); }
+    SIntegerSync() { assert(bits <= sizeof(type) * 8); }
     SIntegerSync(type value) { data.value = value; }
 
-    operator type(void) const { return data.value; }
+    operator type() const { return data.value; }
 
     struct
     {
@@ -2047,7 +2047,7 @@ struct SColorSync : public ISyncStructure
     void Write(NetBitStreamInterface& bitStream) const { bitStream.WriteBits(reinterpret_cast<const char*>(&data), 32); }
 
     // From SColor
-    SColorSync(void) {}
+    SColorSync() {}
     SColorSync(SColor color)
     {
         data.ucR = color.R;
@@ -2057,7 +2057,7 @@ struct SColorSync : public ISyncStructure
     }
 
     // To SColor
-    operator SColor(void) const { return SColorRGBA(data.ucR, data.ucG, data.ucB, data.ucA); }
+    operator SColor() const { return SColorRGBA(data.ucR, data.ucG, data.ucB, data.ucA); }
 
     struct
     {
@@ -2180,11 +2180,11 @@ struct SMouseButtonSync : public ISyncStructure
 //////////////////////////////////////////
 struct SHeatHazeSync : public ISyncStructure
 {
-    SHeatHazeSync(void) {}
+    SHeatHazeSync() {}
     SHeatHazeSync(const SHeatHazeSettings& settings) { data.settings = settings; }
 
     // To SHeatHazeSettings
-    operator SHeatHazeSettings(void) const { return data.settings; }
+    operator SHeatHazeSettings() const { return data.settings; }
 
     template <unsigned int bits, typename T>
     bool ReadRange(NetBitStreamInterface& bitStream, T& outvalue, const T low, const T hi)

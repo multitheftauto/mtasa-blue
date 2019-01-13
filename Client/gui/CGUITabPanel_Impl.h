@@ -23,22 +23,22 @@ class CGUITabPanel_Impl : public CGUITabPanel, public CGUIElement_Impl
 
 public:
     CGUITabPanel_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL);
-    ~CGUITabPanel_Impl(void);
+    ~CGUITabPanel_Impl();
 
     CGUITab* CreateTab(const char* szCaption);
     void     DeleteTab(CGUITab* pTab);
 
-    CGUITab* GetSelectedTab(void);
+    CGUITab* GetSelectedTab();
     void     SetSelectedTab(CGUITab* pTab);
 
     void         SetSelectedIndex(unsigned int uiIndex);
-    unsigned int GetSelectedIndex(void);
+    unsigned int GetSelectedIndex();
 
-    unsigned int GetTabCount(void);
+    unsigned int GetTabCount();
 
     bool IsTabSelected(CGUITab* pTab);
 
-    eCGUIType GetType(void) { return CGUI_TABPANEL; };
+    eCGUIType GetType() { return CGUI_TABPANEL; };
 
     void SetSelectionHandler(GUI_CALLBACK Callback);
 

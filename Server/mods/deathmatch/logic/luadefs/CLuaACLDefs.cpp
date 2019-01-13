@@ -18,7 +18,7 @@ static const char* GetResourceName(lua_State* luaVM)
     return luaMain ? luaMain->GetScriptName() : "";
 }
 
-void CLuaACLDefs::LoadFunctions(void)
+void CLuaACLDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"aclReload", aclReload},

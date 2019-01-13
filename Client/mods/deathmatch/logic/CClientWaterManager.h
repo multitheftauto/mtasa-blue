@@ -21,30 +21,30 @@ class CClientWaterManager
     friend class CClientWater;
 
 public:
-    unsigned int         Count(void) { return static_cast<unsigned int>(m_List.size()); };
+    unsigned int         Count() { return static_cast<unsigned int>(m_List.size()); };
     static CClientWater* Get(ElementID ID);
 
-    void DeleteAll(void);
+    void DeleteAll();
     bool Exists(CClientWater* pWater);
 
     bool GetWaterLevel(CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown);
     bool SetPositionWaterLevel(const CVector& vecPosition, float fLevel, void* pChangeSource);
     bool SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel);
     bool SetAllElementWaterLevel(float fLevel, void* pChangeSource);
-    void ResetWorldWaterLevel(void);
+    void ResetWorldWaterLevel();
 
     float GetWaveLevel();
     void  SetWaveLevel(float fWaveLevel);
 
-    unsigned short GetDimension(void) { return m_usDimension; };
+    unsigned short GetDimension() { return m_usDimension; };
     void           SetDimension(unsigned short usDimension);
 
-    std::list<CClientWater*>::const_iterator IterBegin(void) { return m_List.begin(); };
-    std::list<CClientWater*>::const_iterator IterEnd(void) { return m_List.end(); };
+    std::list<CClientWater*>::const_iterator IterBegin() { return m_List.begin(); };
+    std::list<CClientWater*>::const_iterator IterEnd() { return m_List.end(); };
 
 private:
     CClientWaterManager(CClientManager* pManager);
-    ~CClientWaterManager(void);
+    ~CClientWaterManager();
 
     void AddToList(CClientWater* pWater);
     void RemoveFromList(CClientWater* pWater);

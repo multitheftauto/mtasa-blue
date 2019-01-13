@@ -27,9 +27,9 @@ class CClientPlayerVoice
 public:
     ZERO_ON_NEW
     CClientPlayerVoice(CClientPlayer* pPlayer, CVoiceRecorder* pVoiceRecorder);
-    ~CClientPlayerVoice(void);
+    ~CClientPlayerVoice();
     void DecodeAndBuffer(char* pBuffer, unsigned int bytesWritten);
-    void DoPulse(void);
+    void DoPulse();
 
     bool m_bVoiceActive;
 
@@ -45,40 +45,40 @@ public:
     };
 
     void SetPaused(bool bPaused);
-    bool IsPaused(void);
+    bool IsPaused();
 
     void   SetPlayPosition(double dPosition);
-    double GetPlayPosition(void);
+    double GetPlayPosition();
 
     double GetLength(bool bAvoidLoad = false);
 
     void  SetVolume(float fVolume, bool bStore = true);
-    float GetVolume(void);
+    float GetVolume();
 
     void  SetPlaybackSpeed(float fSpeed);
-    float GetPlaybackSpeed(void);
+    float GetPlaybackSpeed();
 
     void   ApplyFXModifications(float fSampleRate, float fTempo, float fPitch, bool bReversed);
     void   GetFXModifications(float& fSampleRate, float& fTempo, float& fPitch, bool& bReversed);
     float* GetFFTData(int iLength);
     float* GetWaveData(int iLength);
-    bool   IsPanEnabled(void);
+    bool   IsPanEnabled();
     bool   SetPanEnabled(bool bPan);
-    DWORD  GetLevelData(void);
-    float  GetSoundBPM(void);
+    DWORD  GetLevelData();
+    float  GetSoundBPM();
 
     bool SetPan(float fPan);
     bool GetPan(float& fPan);
 
     bool SetFxEffect(uint uiFxEffect, bool bEnable);
     bool IsFxEffectEnabled(uint uiFxEffect);
-    bool IsActive(void) { return m_bVoiceActive; }
+    bool IsActive() { return m_bVoiceActive; }
 
 private:
-    void Init(void);
-    void DeInit(void);
-    void ServiceEventQueue(void);
-    void ApplyFxEffects(void);
+    void Init();
+    void DeInit();
+    void ServiceEventQueue();
+    void ApplyFxEffects();
 
     CClientPlayer*  m_pPlayer;
     CVoiceRecorder* m_pVoiceRecorder;

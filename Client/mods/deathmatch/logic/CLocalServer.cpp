@@ -133,7 +133,7 @@ CLocalServer::CLocalServer(const char* szConfig)
     Load();
 }
 
-CLocalServer::~CLocalServer(void)
+CLocalServer::~CLocalServer()
 {
     if (m_pConfig)
         delete m_pConfig;
@@ -178,7 +178,7 @@ bool CLocalServer::OnCancelButtonClick(CGUIElement* pElement)
     return true;
 }
 
-bool CLocalServer::Load(void)
+bool CLocalServer::Load()
 {
     // Get server module root
     SString strServerPath = CalcMTASAPath(PathJoin("server", "mods", "deathmatch"));
@@ -334,7 +334,7 @@ void CLocalServer::GetResourceNameList(std::vector<SString>& outResourceNameList
     }
 }
 
-bool CLocalServer::Save(void)
+bool CLocalServer::Save()
 {
     if (m_pConfig && m_pConfig->GetRootNode())
     {

@@ -22,7 +22,7 @@ CWorldSA::CWorldSA()
 void HOOK_FallenPeds();
 void HOOK_FallenCars();
 
-void CWorldSA::InstallHooks(void)
+void CWorldSA::InstallHooks()
 {
     HookInstall(0x565CB0, (DWORD)HOOK_FallenPeds, 5);
     HookInstall(0x565E80, (DWORD)HOOK_FallenCars, 5);
@@ -467,7 +467,7 @@ bool CWorldSA::HasCollisionBeenLoaded(CVector* vecPosition)
     return bRet;
 }
 
-DWORD CWorldSA::GetCurrentArea(void)
+DWORD CWorldSA::GetCurrentArea()
 {
     return *(DWORD*)VAR_currArea;
 }
@@ -490,7 +490,7 @@ void CWorldSA::SetJetpackMaxHeight(float fHeight)
     MemPut<float>(VAR_fJetpackMaxHeight, fHeight);
 }
 
-float CWorldSA::GetJetpackMaxHeight(void)
+float CWorldSA::GetJetpackMaxHeight()
 {
     return *(float*)(VAR_fJetpackMaxHeight);
 }
@@ -500,7 +500,7 @@ void CWorldSA::SetAircraftMaxHeight(float fHeight)
     g_pCore->GetMultiplayer()->SetAircraftMaxHeight(fHeight);
 }
 
-float CWorldSA::GetAircraftMaxHeight(void)
+float CWorldSA::GetAircraftMaxHeight()
 {
     return g_pCore->GetMultiplayer()->GetAircraftMaxHeight();
 }
@@ -510,7 +510,7 @@ void CWorldSA::SetAircraftMaxVelocity(float fVelocity)
     g_pCore->GetMultiplayer()->SetAircraftMaxVelocity(fVelocity);
 }
 
-float CWorldSA::GetAircraftMaxVelocity(void)
+float CWorldSA::GetAircraftMaxVelocity()
 {
     return g_pCore->GetMultiplayer()->GetAircraftMaxVelocity();
 }
@@ -530,7 +530,7 @@ void CWorldSA::SetOcclusionsEnabled(bool bEnabled)
     }
 }
 
-bool CWorldSA::GetOcclusionsEnabled(void)
+bool CWorldSA::GetOcclusionsEnabled()
 {
     if (*(BYTE*)FUNC_COcclusion_ProcessBeforeRendering == 0x51)            // Is standard value ?
         return true;

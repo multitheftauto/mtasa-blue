@@ -81,7 +81,7 @@ public:
     void              Remove(CLuaMain* luaMain);
     void              Remove(CRemoteCall* call);
     bool              CallExists(CRemoteCall* call);
-    void              ProcessQueuedFiles(void);
+    void              ProcessQueuedFiles();
     EDownloadModeType GetDownloadModeForQueueName(const SString& strQueueName, bool bAnyHost);
     EDownloadModeType GetDownloadModeFromQueueIndex(uint uiIndex, bool bAnyHost);
 

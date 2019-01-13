@@ -35,7 +35,7 @@ CClientRenderElementManager::CClientRenderElementManager(CClientManager* pClient
 //
 //
 ////////////////////////////////////////////////////////////////
-CClientRenderElementManager::~CClientRenderElementManager(void)
+CClientRenderElementManager::~CClientRenderElementManager()
 {
     // Remove any existing
     while (m_ItemElementMap.size())
