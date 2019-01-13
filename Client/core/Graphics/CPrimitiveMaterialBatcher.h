@@ -24,14 +24,14 @@ class CPrimitiveMaterialBatcher
 public:
     ZERO_ON_NEW
     CPrimitiveMaterialBatcher(CGraphics* graphics);
-    ~CPrimitiveMaterialBatcher(void);
+    ~CPrimitiveMaterialBatcher();
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
     void OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
     void UpdateMatrices(float fViewportSizeX, float fViewportSizeY);
     void SetDeviceStates();
-    void Flush(void);
+    void Flush();
     void DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iSize, const void* pDataAddr, size_t iVertexStride);
-    void ClearQueue(void);
+    void ClearQueue();
     void AddPrimitive(D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, std::vector<PrimitiveMaterialVertice>* pVecVertices);
 
 protected:

@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CLuaObjectDefs::LoadFunctions(void)
+void CLuaObjectDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         // Object create/destroy funcs

@@ -18,16 +18,16 @@ class CLanguage
 public:
     CLanguage(const Dictionary& Dict, const SString& strLocale = "", const SString& strLangName = "");
     CLanguage(const SString& strPOPath);
-    ~CLanguage(void);
+    ~CLanguage();
 
     SString Translate(const SString& strMessage);
     SString TranslateWithContext(const SString& strContext, const SString& strMessage);
     SString TranslatePlural(const SString& strSingular, const SString& strPlural, int iNum);
     SString TranslatePluralWithContext(const SString& strContext, const SString& strSingular, const SString& strPlural, int iNum);
 
-    SString     GetCode(void) { return m_strCode; }
-    SString     GetName(void) { return m_strName; }
-    Dictionary& GetDictionary(void) { return m_Dict; }
+    SString     GetCode() { return m_strCode; }
+    SString     GetName() { return m_strName; }
+    Dictionary& GetDictionary() { return m_Dict; }
 
 private:
     Dictionary m_Dict;

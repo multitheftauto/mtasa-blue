@@ -14,7 +14,7 @@
 using std::list;
 #define MIN_CLIENT_REQ_GETBOUNDINGBOX_OOP      "1.5.5-9.13999"
 
-void CLuaElementDefs::LoadFunctions(void)
+void CLuaElementDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         // Element get funcs

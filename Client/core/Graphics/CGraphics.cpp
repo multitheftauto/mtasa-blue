@@ -67,7 +67,7 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_pAspectRatioConverter = new CAspectRatioConverter();
 }
 
-CGraphics::~CGraphics(void)
+CGraphics::~CGraphics()
 {
     if (m_pLineInterface)
         m_pLineInterface->Release();
@@ -286,12 +286,12 @@ void CGraphics::SetAspectRatioAdjustmentEnabled(bool bEnabled, float fSourceRati
     m_pAspectRatioConverter->SetSourceRatioValue(bEnabled ? fSourceRatio : 0);
 }
 
-bool CGraphics::IsAspectRatioAdjustmentEnabled(void)
+bool CGraphics::IsAspectRatioAdjustmentEnabled()
 {
     return m_pAspectRatioConverter->IsEnabled();
 }
 
-float CGraphics::GetAspectRatioAdjustmentSourceRatio(void)
+float CGraphics::GetAspectRatioAdjustmentSourceRatio()
 {
     return m_pAspectRatioConverter->GetSourceRatioValue();
 }
@@ -319,7 +319,7 @@ void CGraphics::SetBlendMode(EBlendModeType blendMode)
     m_ActiveBlendMode = blendMode;
 }
 
-EBlendModeType CGraphics::GetBlendMode(void)
+EBlendModeType CGraphics::GetBlendMode()
 {
     return m_ActiveBlendMode;
 }
@@ -472,7 +472,7 @@ void CGraphics::BeginDrawBatch(EBlendModeType xxblendMode)
 //
 // EndDrawBatch
 //
-void CGraphics::EndDrawBatch(void)
+void CGraphics::EndDrawBatch()
 {
     if (--m_iDrawBatchRefCount == 0)
         CheckModes(EDrawMode::NONE, EBlendMode::BLEND);
@@ -581,12 +581,12 @@ void CGraphics::CalcScreenCoors(CVector* vecWorld, CVector* vecScreen)
     vecScreen->fY *= fRecip * (*dwLenY);
 }
 
-unsigned int CGraphics::GetViewportWidth(void)
+unsigned int CGraphics::GetViewportWidth()
 {
     return CDirect3DData::GetSingleton().GetViewportWidth();
 }
 
-unsigned int CGraphics::GetViewportHeight(void)
+unsigned int CGraphics::GetViewportHeight()
 {
     return CDirect3DData::GetSingleton().GetViewportHeight();
 }
@@ -1236,7 +1236,7 @@ static const sFontInfo fontInfos[] = {{"tahoma", 15, FW_NORMAL},
                                       {"beckett", 30, FW_NORMAL},
                                       {"unifont", 14, FW_NORMAL}};
 
-bool CGraphics::LoadStandardDXFonts(void)
+bool CGraphics::LoadStandardDXFonts()
 {
     // Add our custom font resources
     if (m_FontResourceNames.empty())
@@ -1341,7 +1341,7 @@ bool CGraphics::DestroyAdditionalDXFont(std::string strFontPath, ID3DXFont* pD3D
     return bResult;
 }
 
-bool CGraphics::DestroyStandardDXFonts(void)
+bool CGraphics::DestroyStandardDXFonts()
 {
     // Remove our custom font resources (needs to be identical to LoadFonts)
     for (uint i = 0; i < m_FontResourceNames.size(); i++)
@@ -1475,17 +1475,17 @@ void CGraphics::OnDeviceRestore(IDirect3DDevice9* pDevice)
     m_pScreenGrabber->OnResetDevice();
 }
 
-void CGraphics::OnZBufferModified(void)
+void CGraphics::OnZBufferModified()
 {
     m_pTileBatcher->OnZBufferModified();
 }
 
-void CGraphics::DrawPreGUIQueue(void)
+void CGraphics::DrawPreGUIQueue()
 {
     DrawQueue(m_PreGUIQueue);
 }
 
-void CGraphics::DrawPostGUIQueue(void)
+void CGraphics::DrawPostGUIQueue()
 {
     DrawQueue(m_PostGUIQueue);
     m_pLine3DBatcherPostGUI->Flush();
@@ -1495,13 +1495,13 @@ void CGraphics::DrawPostGUIQueue(void)
     assert(m_PreGUIQueue.empty() && m_iDebugQueueRefs == 0);
 }
 
-void CGraphics::DrawLine3DPreGUIQueue(void)
+void CGraphics::DrawLine3DPreGUIQueue()
 {
     m_pLine3DBatcherPreGUI->Flush();
     m_pMaterialLine3DBatcherPreGUI->Flush();
 }
 
-bool CGraphics::HasLine3DPreGUIQueueItems(void)
+bool CGraphics::HasLine3DPreGUIQueueItems()
 {
     return m_pLine3DBatcherPreGUI->HasItems() || m_pMaterialLine3DBatcherPreGUI->HasItems();
 }
@@ -1759,7 +1759,7 @@ void CGraphics::OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewpo
 // Called when entering known areas of MTA rendering activity
 //
 ////////////////////////////////////////////////////////////////
-void CGraphics::EnteringMTARenderZone(void)
+void CGraphics::EnteringMTARenderZone()
 {
     SaveGTARenderStates();
     m_MTARenderZone = MTA_RZONE_MAIN;
@@ -1773,7 +1773,7 @@ void CGraphics::EnteringMTARenderZone(void)
 // Called when leaving known areas of MTA rendering activity
 //
 ////////////////////////////////////////////////////////////////
-void CGraphics::LeavingMTARenderZone(void)
+void CGraphics::LeavingMTARenderZone()
 {
     RestoreGTARenderStates();
     m_MTARenderZone = MTA_RZONE_NONE;
@@ -1787,7 +1787,7 @@ void CGraphics::LeavingMTARenderZone(void)
 // Should be called before MTA rendering activity, if there is a chance it will be outside the known areas
 //
 ////////////////////////////////////////////////////////////////
-void CGraphics::MaybeEnteringMTARenderZone(void)
+void CGraphics::MaybeEnteringMTARenderZone()
 {
     if (m_MTARenderZone == MTA_RZONE_OUTSIDE)
     {
@@ -1813,7 +1813,7 @@ void CGraphics::MaybeEnteringMTARenderZone(void)
 // Should be called sometime after MaybeEnteringMTARenderZone
 //
 ////////////////////////////////////////////////////////////////
-void CGraphics::MaybeLeavingMTARenderZone(void)
+void CGraphics::MaybeLeavingMTARenderZone()
 {
     if (m_MTARenderZone == MTA_RZONE_OUTSIDE)
     {
@@ -1835,7 +1835,7 @@ void CGraphics::MaybeLeavingMTARenderZone(void)
 // Handle moving into MTA controlled rendering
 //
 ////////////////////////////////////////////////////////////////
-void CGraphics::SaveGTARenderStates(void)
+void CGraphics::SaveGTARenderStates()
 {
     SAFE_RELEASE(m_pSavedStateBlock);
     // Create a state block.
@@ -1857,7 +1857,7 @@ void CGraphics::SaveGTARenderStates(void)
 // Handle moving out of MTA controlled rendering
 //
 ////////////////////////////////////////////////////////////////
-void CGraphics::RestoreGTARenderStates(void)
+void CGraphics::RestoreGTARenderStates()
 {
     // Restore these transforms to fix various weird stuff
     m_pDevice->SetTransform(D3DTS_PROJECTION, &g_pDeviceState->TransformState.PROJECTION);
@@ -1879,7 +1879,7 @@ void CGraphics::RestoreGTARenderStates(void)
 // Notify that scene rendering is working
 //
 ////////////////////////////////////////////////////////////////
-void CGraphics::DidRenderScene(void)
+void CGraphics::DidRenderScene()
 {
     if (m_bProgressVisible)
     {

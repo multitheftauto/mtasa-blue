@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CLuaPickupDefs::LoadFunctions(void)
+void CLuaPickupDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"createPickup", CreatePickup},

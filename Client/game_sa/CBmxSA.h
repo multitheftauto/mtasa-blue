@@ -26,5 +26,5 @@ public:
     CBmxSA(CBmxSAInterface* bmx);
     CBmxSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
 
-    virtual ~CBmxSA(void){};
+    virtual ~CBmxSA(){};
 };

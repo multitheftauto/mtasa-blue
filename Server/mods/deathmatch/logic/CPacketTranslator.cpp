@@ -16,7 +16,7 @@ CPacketTranslator::CPacketTranslator(CPlayerManager* pPlayerManager)
     m_pPlayerManager = pPlayerManager;
 }
 
-CPacketTranslator::~CPacketTranslator(void)
+CPacketTranslator::~CPacketTranslator()
 {
 }
 

@@ -104,7 +104,7 @@ bool CLuaArguments::Call(lua_State* luaVM, const char* szFunction) const
     return true;
 }
 
-CLuaArgument* CLuaArguments::PushNil(void)
+CLuaArgument* CLuaArguments::PushNil()
 {
     CLuaArgument* pArgument = new CLuaArgument;
     m_Arguments.push_back(pArgument);
@@ -139,7 +139,7 @@ CLuaArgument* CLuaArguments::PushUserData(void* pUserData)
     return pArgument;
 }
 
-void CLuaArguments::DeleteArguments(void)
+void CLuaArguments::DeleteArguments()
 {
     // Delete each item
     vector<CLuaArgument*>::iterator iter = m_Arguments.begin();

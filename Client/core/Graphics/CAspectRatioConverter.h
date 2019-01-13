@@ -43,12 +43,12 @@ public:
         }
     }
 
-    float GetSourceRatioValue(void) const { return m_fSourceRatioValue; }
+    float GetSourceRatioValue() const { return m_fSourceRatioValue; }
 
     // Temp suspend conversion. i.e. When F11 map is displayed
     void SetSuspended(bool bSuspended) { m_bSuspended = bSuspended; }
 
-    bool IsEnabled(void) const { return (m_bValidRatios && !m_bSuspended); }
+    bool IsEnabled() const { return (m_bValidRatios && !m_bSuspended); }
 
     // Convert a y screen position
     float ConvertPositionForAspectRatio(const float fY) const

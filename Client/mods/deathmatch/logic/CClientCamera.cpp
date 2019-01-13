@@ -37,7 +37,7 @@ CClientCamera::CClientCamera(CClientManager* pManager) : ClassInit(this), CClien
     m_FixedCameraMode = EFixedCameraMode::ROTATION;
 }
 
-CClientCamera::~CClientCamera(void)
+CClientCamera::~CClientCamera()
 {
     // We need to be ingame
     if (g_pGame->GetSystemState() == 9)
@@ -48,7 +48,7 @@ CClientCamera::~CClientCamera(void)
     CClientEntityRefManager::RemoveEntityRefs(0, &m_pFocusedPlayer, &m_pFocusedEntity, NULL);
 }
 
-void CClientCamera::DoPulse(void)
+void CClientCamera::DoPulse()
 {
     // If we're fixed, force the target vector
     if (m_bFixed)
@@ -407,7 +407,7 @@ void CClientCamera::SetFocus(CVector* vecTarget, bool bSmoothTransition)
     }
 }
 
-void CClientCamera::SetFocusToLocalPlayer(void)
+void CClientCamera::SetFocusToLocalPlayer()
 {
     // Restore the camera
     SetFocusToLocalPlayerImpl();
@@ -425,7 +425,7 @@ void CClientCamera::SetFocusToLocalPlayer(void)
     m_fFOV = 70.0f;
 }
 
-void CClientCamera::SetFocusToLocalPlayerImpl(void)
+void CClientCamera::SetFocusToLocalPlayerImpl()
 {
     // Restore the camera
     m_pCamera->RestoreWithJumpCut();
@@ -544,7 +544,7 @@ void CClientCamera::SetTargetEntity(CClientEntity* pEntity)
     pCam->SetTargetEntity(pEntity->GetGameEntity());
 }
 
-CClientEntity* CClientCamera::GetTargetEntity(void)
+CClientEntity* CClientCamera::GetTargetEntity()
 {
     CClientEntity* pReturn = NULL;
     if (m_pCamera)
@@ -589,7 +589,7 @@ bool CClientCamera::ProcessFixedCamera(CCam* pCam)
 //
 // Return matrix being used by GTA right now
 //
-CMatrix CClientCamera::GetGtaMatrix(void) const
+CMatrix CClientCamera::GetGtaMatrix() const
 {
     CCam* pCam = m_pCamera->GetCam(m_pCamera->GetActiveCam());
 

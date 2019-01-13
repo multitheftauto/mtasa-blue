@@ -393,13 +393,13 @@ bool CAudioEngineSA::IsAmbientSoundEnabled(eAmbientSoundType eType)
         return false;
 }
 
-VOID CAudioEngineSA::ResetAmbientSounds(void)
+VOID CAudioEngineSA::ResetAmbientSounds()
 {
     SetAmbientSoundEnabled(AMBIENT_SOUND_GENERAL, true);
     SetAmbientSoundEnabled(AMBIENT_SOUND_GUNFIRE, true);
 }
 
-VOID CAudioEngineSA::UpdateAmbientSoundSettings(void)
+VOID CAudioEngineSA::UpdateAmbientSoundSettings()
 {
     // Update gunfire setting
     if (IsAmbientSoundEnabled(AMBIENT_SOUND_GUNFIRE))
@@ -408,7 +408,7 @@ VOID CAudioEngineSA::UpdateAmbientSoundSettings(void)
         MemPut<BYTE>(0x507814, 0x33);            // No gunfire
 }
 
-__declspec(noinline) bool _cdecl IsAmbientSoundGeneralEnabled(void)
+__declspec(noinline) bool _cdecl IsAmbientSoundGeneralEnabled()
 {
     if (pGame)
     {
@@ -464,7 +464,7 @@ bool CAudioEngineSA::IsWorldSoundEnabled(uint uiGroup, uint uiIndex)
     return !m_DisabledWorldSounds.IsRangeSet(uiFirst, uiLast - uiFirst + 1);
 }
 
-void CAudioEngineSA::ResetWorldSounds(void)
+void CAudioEngineSA::ResetWorldSounds()
 {
     m_DisabledWorldSounds = CRanges();
 }

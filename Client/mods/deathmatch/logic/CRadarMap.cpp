@@ -100,7 +100,7 @@ CRadarMap::CRadarMap(CClientManager* pManager)
     SetAttachedToLocalPlayer(true);
 }
 
-CRadarMap::~CRadarMap(void)
+CRadarMap::~CRadarMap()
 {
     // Delete our images
     SAFE_RELEASE(m_pRadarImage);
@@ -114,7 +114,7 @@ CRadarMap::~CRadarMap(void)
     // Don't need to delete the help texts as those are destroyed by the display manager
 }
 
-void CRadarMap::DoPulse(void)
+void CRadarMap::DoPulse()
 {
     // If our radar image exists
     if (IsRadarShowing())
@@ -156,7 +156,7 @@ void CRadarMap::DoPulse(void)
 //
 // Precreate all the textures for the radar map markers
 //
-void CRadarMap::CreateMarkerTextures(void)
+void CRadarMap::CreateMarkerTextures()
 {
     assert(m_MarkerTextureList.empty());
     SString strRadarSetDirectory = CalcMTASAPath("MTA\\cgui\\images\\radarset\\");
@@ -226,7 +226,7 @@ CTextureItem* CRadarMap::GetMarkerTexture(CClientRadarMarker* pMarker, float fLo
     return m_MarkerTextureList[uiListIndex];
 }
 
-void CRadarMap::DoRender(void)
+void CRadarMap::DoRender()
 {
     bool bIsRadarShowing = IsRadarShowing();
 
@@ -427,7 +427,7 @@ bool CRadarMap::CalculateEntityOnScreenPosition(CVector vecPosition, CVector2D& 
     return false;
 }
 
-void CRadarMap::SetupMapVariables(void)
+void CRadarMap::SetupMapVariables()
 {
     // Calculate the map size and the middle of the screen coords
     m_fMapSize = static_cast<float>(m_uiHeight * m_fZoom);
@@ -523,7 +523,7 @@ void CRadarMap::SetupMapVariables(void)
     }
 }
 
-void CRadarMap::ZoomIn(void)
+void CRadarMap::ZoomIn()
 {
     if (m_fZoom <= 4)
     {
@@ -532,7 +532,7 @@ void CRadarMap::ZoomIn(void)
     }
 }
 
-void CRadarMap::ZoomOut(void)
+void CRadarMap::ZoomOut()
 {
     if (m_fZoom >= 1)
     {
@@ -558,7 +558,7 @@ void CRadarMap::ZoomOut(void)
     }
 }
 
-void CRadarMap::MoveNorth(void)
+void CRadarMap::MoveNorth()
 {
     if (!m_bIsAttachedToLocal)
     {
@@ -578,7 +578,7 @@ void CRadarMap::MoveNorth(void)
     }
 }
 
-void CRadarMap::MoveSouth(void)
+void CRadarMap::MoveSouth()
 {
     if (!m_bIsAttachedToLocal)
     {
@@ -598,7 +598,7 @@ void CRadarMap::MoveSouth(void)
     }
 }
 
-void CRadarMap::MoveEast(void)
+void CRadarMap::MoveEast()
 {
     if (!m_bIsAttachedToLocal)
     {
@@ -618,7 +618,7 @@ void CRadarMap::MoveEast(void)
     }
 }
 
-void CRadarMap::MoveWest(void)
+void CRadarMap::MoveWest()
 {
     if (!m_bIsAttachedToLocal)
     {
@@ -653,7 +653,7 @@ void CRadarMap::SetAttachedToLocalPlayer(bool bIsAttachedToLocal)
     }
 }
 
-bool CRadarMap::IsRadarShowing(void)
+bool CRadarMap::IsRadarShowing()
 {
     return ((m_bIsRadarEnabled || m_bForcedState) && m_pRadarImage && m_pLocalPlayerBlip && (!g_pCore->GetConsole()->IsVisible() && !g_pCore->IsMenuVisible()));
 }
@@ -677,7 +677,7 @@ bool CRadarMap::GetBoundingBox(CVector& vecMin, CVector& vecMax)
     }
 }
 
-void CRadarMap::ToggleHelpText(void)
+void CRadarMap::ToggleHelpText()
 {
     m_bHideHelpText = !m_bHideHelpText;
 }

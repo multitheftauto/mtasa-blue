@@ -12,12 +12,12 @@
 
 using std::list;
 
-CRegisteredCommands::CRegisteredCommands(void)
+CRegisteredCommands::CRegisteredCommands()
 {
     m_bIteratingList = false;
 }
 
-CRegisteredCommands::~CRegisteredCommands(void)
+CRegisteredCommands::~CRegisteredCommands()
 {
     ClearCommands();
 }
@@ -87,7 +87,7 @@ bool CRegisteredCommands::RemoveCommand(CLuaMain* pLuaMain, const char* szKey)
     return bFound;
 }
 
-void CRegisteredCommands::ClearCommands(void)
+void CRegisteredCommands::ClearCommands()
 {
     // Delete all the commands
     list<SCommand*>::const_iterator iter = m_Commands.begin();
@@ -252,7 +252,7 @@ void CRegisteredCommands::GetCommands(lua_State* luaVM, CLuaMain* pTargetLuaMain
     }
 }
 
-void CRegisteredCommands::TakeOutTheTrash(void)
+void CRegisteredCommands::TakeOutTheTrash()
 {
     list<SCommand*>::iterator iter = m_TrashCan.begin();
     for (; iter != m_TrashCan.end(); iter++)

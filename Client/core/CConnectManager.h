@@ -18,17 +18,17 @@
 class CConnectManager
 {
 public:
-    CConnectManager(void);
-    ~CConnectManager(void);
+    CConnectManager();
+    ~CConnectManager();
 
     bool Connect(const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser = false);
     bool Reconnect(const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true);
 
-    bool Abort(void);
+    bool Abort();
 
-    void DoPulse(void);
+    void DoPulse();
 
-    void OnServerExists(void);
+    void OnServerExists();
 
     static void OpenServerFirewall(in_addr Address, ushort usHttpPort = 80, bool bHighPriority = false);
 

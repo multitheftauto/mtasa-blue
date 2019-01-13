@@ -202,7 +202,7 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
     return 0;
 }
 
-void CClient::ClientShutdown(void)
+void CClient::ClientShutdown()
 {
     // Unbind our radio controls
     g_pCore->GetKeyBinds()->RemoveControlFunction("radio_next", CClientGame::HandleRadioNext);
@@ -216,7 +216,7 @@ void CClient::ClientShutdown(void)
     }
 }
 
-void CClient::PreFrameExecutionHandler(void)
+void CClient::PreFrameExecutionHandler()
 {
     // If the client modification is loaded, pulse it
     if (g_pClientGame)
@@ -233,7 +233,7 @@ void CClient::PreHUDRenderExecutionHandler(bool bDidUnminimize, bool bDidRecreat
     }
 }
 
-void CClient::PostFrameExecutionHandler(void)
+void CClient::PostFrameExecutionHandler()
 {
     // If the client modification is loaded, pulse it
     if (g_pClientGame)
@@ -242,7 +242,7 @@ void CClient::PostFrameExecutionHandler(void)
     }
 }
 
-void CClient::IdleHandler(void)
+void CClient::IdleHandler()
 {
     if (g_pClientGame)
     {

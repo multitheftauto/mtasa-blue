@@ -21,7 +21,7 @@ public:
     {
     }
 
-    void Call(void)
+    void Call()
     {
         if (m_pLuaMain)
             m_Arguments.Call(m_pLuaMain, m_iLuaFunction);
