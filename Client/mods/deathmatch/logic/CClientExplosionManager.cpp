@@ -49,10 +49,7 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
     if (!pResponsibleGameEntity)
         return false;
 
-    CClientEntity* pResponsible = nullptr;
-
-    if (pResponsibleGameEntity)
-        pResponsible = pPools->GetClientEntity(reinterpret_cast<DWORD*>(pResponsibleGameEntity->GetInterface()));
+    CClientEntity* const pResponsible = pPools->GetClientEntity(reinterpret_cast<DWORD*>(pResponsibleGameEntity->GetInterface()));;
 
     if (!pResponsible)
         return false;
