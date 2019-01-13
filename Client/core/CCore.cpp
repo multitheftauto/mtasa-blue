@@ -2082,14 +2082,6 @@ void CCore::StaticIdleHandler(void)
 // Gets called every game loop, after GTA has been loaded for the first time
 void CCore::IdleHandler(void)
 {
-    MSG msg = {0};
-
-    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-    {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
-
     m_bGettingIdleCallsFromMultiplayer = true;
     HandleIdlePulse();
 }
