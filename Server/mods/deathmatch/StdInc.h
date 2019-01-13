@@ -26,6 +26,8 @@
 class CAclRightName;
 struct SAclRequest;
 
+class CRemoteCalls;
+
 // SDK includes
 #include "MTAPlatform.h"
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
