@@ -26,8 +26,6 @@
 class CAclRightName;
 struct SAclRequest;
 
-class CRemoteCalls;
-
 // SDK includes
 #include "MTAPlatform.h"
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
@@ -143,6 +141,9 @@ class CRemoteCalls;
 #include "luadefs/CLuaWaterDefs.h"
 #include "luadefs/CLuaWorldDefs.h"
 
+// has to be included before CLuaFunctionParseHelpers to prevent "invalid use of incomplete type ‘class CRemoteCalls´
+#include "CRemoteCalls.h"
+
 // Lua includes
 #include "lua/LuaCommon.h"
 #include "lua/CLuaMain.h"
@@ -254,7 +255,6 @@ class CRemoteCalls;
 #include "CRegisteredCommands.h"
 #include "CRegistryManager.h"
 #include "CRegistry.h"
-#include "CRemoteCalls.h"
 #include "CResource.h"
 #include "CResourceChecker.h"
 #include "CResourceClientConfigItem.h"
