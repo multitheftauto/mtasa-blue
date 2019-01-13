@@ -291,9 +291,6 @@ DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIProp = FUNC_CAEVehicleAudioEntity__
 #define HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance   0x68A4EF
 DWORD RETURN_CTaskSimpleSwim_ProcessSwimmingResistance = 0x68A50E;
 
-#define HOOKPOS_CWaterCannon__Render   0x72932A
-static DWORD CONTINUE_CWaterCannon__Render = 0x72932F;
-
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
 FLOAT         fFalseHeading;
@@ -360,7 +357,6 @@ ObjectDamageHandler*        m_pObjectDamageHandler = NULL;
 ObjectBreakHandler*         m_pObjectBreakHandler = NULL;
 FxSystemDestructionHandler* m_pFxSystemDestructionHandler = NULL;
 DrivebyAnimationHandler*    m_pDrivebyAnimationHandler = NULL;
-WaterCannonHitWorldHandler* m_pWaterCannonHitWorldHandler = nullptr;
 
 CEntitySAInterface* dwSavedPlayerPointer = 0;
 CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active
@@ -512,8 +508,6 @@ void HOOK_CAEVehicleAudioEntity__ProcessDummyProp();
 
 void HOOK_CTaskSimpleSwim_ProcessSwimmingResistance();
 
-static void HOOK_CWaterCannon__Render();
-
 CMultiplayerSA::CMultiplayerSA()
 {
     // Unprotect all of the GTASA code at once and leave it that way
@@ -562,6 +556,8 @@ CMultiplayerSA::CMultiplayerSA()
     m_bHeatHazeEnabled = true;
     m_bHeatHazeCustomized = false;
     m_fMaddDoggPoolLevel = 1082.73f;
+    m_dwLastStaticAnimGroupID = 0;
+    m_dwLastStaticAnimID = 0;
 }
 
 void CMultiplayerSA::InitHooks()
@@ -734,8 +730,6 @@ void CMultiplayerSA::InitHooks()
 
     // Fix GTA:SA swimming speed problem on higher fps
     HookInstall(HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance, (DWORD)HOOK_CTaskSimpleSwim_ProcessSwimmingResistance, 6);
-
-    HookInstall(HOOKPOS_CWaterCannon__Render, (DWORD)HOOK_CWaterCannon__Render, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -1502,6 +1496,7 @@ void CMultiplayerSA::InitHooks()
     InitHooks_FixLineOfSightArgs();
     InitHooks_VehicleDamage();
     InitHooks_VehicleLights();
+    InitHooks_VehicleWeapons();
 }
 
 // Used to store copied pointers for explosions in the FxSystem
@@ -2272,11 +2267,6 @@ void CMultiplayerSA::SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandle
     m_pDrivebyAnimationHandler = pHandler;
 }
 
-void CMultiplayerSA::SetWaterCannonHitWorldHandler(WaterCannonHitWorldHandler* pHandler)
-{
-    m_pWaterCannonHitWorldHandler = pHandler;
-}
-
 // What we do here is check if the idle handler has been set
 bool CMultiplayerSA::IsConnected(void)
 {
@@ -2608,7 +2598,8 @@ no_render:
 
 bool CallBreakTowLinkHandler(CVehicleSAInterface* vehicle)
 {
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)vehicle);
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)vehicle);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (pVehicle && m_pBreakTowLinkHandler)
     {
         return m_pBreakTowLinkHandler(pVehicle);
@@ -2681,52 +2672,12 @@ bool CallExplosionHandler(void)
 
     if (pInterface)
     {
-        // See what type it is and grab the SA interface depending on type
-        switch (pInterface->nType)
-        {
-            case ENTITY_TYPE_PED:
-            {
-                pExplosionCreator = pGameInterface->GetPools()->GetPed((DWORD*)pInterface);
-                break;
-            }
-
-            case ENTITY_TYPE_VEHICLE:
-            {
-                pExplosionCreator = pGameInterface->GetPools()->GetVehicle((DWORD*)pInterface);
-                break;
-            }
-
-            case ENTITY_TYPE_OBJECT:
-            {
-                pExplosionCreator = pGameInterface->GetPools()->GetObject((DWORD*)pInterface);
-                break;
-            }
-        }
+        pExplosionCreator = pGameInterface->GetPools()->GetEntity((DWORD*)pInterface);
     }
 
     if (pExplodingEntityInterface)
     {
-        // See what type it is and grab the SA interface depending on type
-        switch (pExplodingEntityInterface->nType)
-        {
-            case ENTITY_TYPE_PED:
-            {
-                pExplodingEntity = dynamic_cast<CEntity*>(pGameInterface->GetPools()->GetPed((DWORD*)pExplodingEntityInterface));
-                break;
-            }
-
-            case ENTITY_TYPE_VEHICLE:
-            {
-                pExplodingEntity = dynamic_cast<CEntity*>(pGameInterface->GetPools()->GetVehicle((DWORD*)pExplodingEntityInterface));
-                break;
-            }
-
-            case ENTITY_TYPE_OBJECT:
-            {
-                pExplodingEntity = pGameInterface->GetPools()->GetObject((DWORD*)pExplodingEntityInterface);
-                break;
-            }
-        }
+        pExplodingEntity = pGameInterface->GetPools()->GetEntity((DWORD*)pExplodingEntityInterface);
     }
 
     return m_pExplosionHandler(pExplodingEntity, pExplosionCreator, vecExplosionLocation, explosionType);
@@ -3041,7 +2992,8 @@ bool             ProcessPlayerWeapon()
     if (IsLocalPlayer(pProcessPlayerWeaponPed))
         return true;
 
-    CPlayerPed* pPed = dynamic_cast<CPlayerPed*>(pGameInterface->GetPools()->GetPed((DWORD*)pProcessPlayerWeaponPed));
+    SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)pProcessPlayerWeaponPed);
+    CPlayerPed*            pPed = pPedClientEntity ? dynamic_cast<CPlayerPed*>(pPedClientEntity->pEntity) : nullptr;
     if (pPed)
     {
         CRemoteDataStorageSA* pData = CRemoteDataSA::GetRemoteDataStorage(pPed);
@@ -3463,7 +3415,8 @@ static void SetObjectAlpha()
 
     if (dwAlphaEntity)
     {
-        CObject* pObject = pGameInterface->GetPools()->GetObject((DWORD*)dwAlphaEntity);
+        SClientEntity<CObjectSA>* pObjectClientEntity = pGameInterface->GetPools()->GetObject((DWORD*)dwAlphaEntity);
+        CObject*                  pObject = pObjectClientEntity ? pObjectClientEntity->pEntity : nullptr;
         if (pObject)
         {
             if (pObject->IsAGangTag())
@@ -4218,7 +4171,8 @@ void _cdecl CPhysical_ApplyGravity(DWORD dwThis)
     if (dwType == 2)
     {
         // It's a vehicle, use the gravity vector
-        CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)dwThis);
+        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)dwThis);
+        CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
         if (!pVehicle)
             return;
 
@@ -4304,7 +4258,8 @@ bool _cdecl VehicleCamStart(DWORD dwCam, DWORD pVehicleInterface)
     // This way SA's gravity-goes-downward assumptive code can calculate the camera
     // spherical coords correctly. Of course we restore these after the camera function
     // completes.
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (!pVehicle)
         return false;
 
@@ -4512,7 +4467,8 @@ docustom:
 void _cdecl VehicleCamEnd(DWORD pVehicleInterface)
 {
     // Restore the things that we inverse transformed in VehicleCamStart
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (!pVehicle)
         return;
 
@@ -4603,7 +4559,8 @@ float _cdecl VehicleBurnCheck(DWORD pVehicleInterface)
     // To check if a vehicle is lying upside down on its roof, SA checks if the z coordinate
     // of the vehicle's up vector is negative. We replace this z by the dot product of the up vector
     // and the negated gravity vector.
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (!pVehicle)
         return 1.0f;
 
@@ -4645,7 +4602,8 @@ void _cdecl ApplyVehicleBlowHop(DWORD pVehicleInterface)
 {
     // Custom application of the little jump that vehicles make when they blow up,
     // taking into account custom gravity
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (!pVehicle)
         return;
 
@@ -4843,8 +4801,9 @@ void _declspec(naked) HOOK_CVehicle_DoVehicleLights()
 unsigned long ulHeadLightR = 0, ulHeadLightG = 0, ulHeadLightB = 0;
 void          CVehicle_GetHeadLightColor(CVehicleSAInterface* pInterface, float fR, float fG, float fB)
 {
-    SColor    color = SColorRGBA(255, 255, 255, 255);
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)pInterface);
+    SColor                     color = SColorRGBA(255, 255, 255, 255);
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pInterface);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (pVehicle)
     {
         color = pVehicle->GetHeadLightColor();
@@ -5280,8 +5239,9 @@ CPedSAInterface*         pBikePedInterface;
 float                    fBikeDamage;
 void                     CEventHandler_ComputeKnockOffBikeResponse()
 {
-    CEventDamage* pEvent = pGameInterface->GetEventList()->GetEventDamage(pBikeDamageInterface);
-    CPed*         pPed = pGameInterface->GetPools()->GetPed((DWORD*)pBikePedInterface);
+    CEventDamage*          pEvent = pGameInterface->GetEventList()->GetEventDamage(pBikeDamageInterface);
+    SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)pBikePedInterface);
+    CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
     if (pEvent && pPed)
     {
         CPedDamageResponse* pResponse = pEvent->GetDamageResponse();
@@ -5321,7 +5281,8 @@ eWeaponType      weaponSkillWeapon;
 BYTE             weaponSkill;
 bool             CPed_GetWeaponSkill()
 {
-    CPed* pPed = pGameInterface->GetPools()->GetPed((DWORD*)weaponSkillPed);
+    SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)weaponSkillPed);
+    CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
     if (pPed)
     {
         CPed* pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);
@@ -5333,19 +5294,22 @@ bool             CPed_GetWeaponSkill()
                 if (playerPed)
                 {
                     CRemoteDataStorageSA* data = CRemoteDataSA::GetRemoteDataStorage(playerPed);
-                    float                 stat = data->m_stats.StatTypesFloat[pGameInterface->GetStats()->GetSkillStatIndex(weaponSkillWeapon)];
+                    if (data)
+                    {
+                        float stat = data->m_stats.StatTypesFloat[pGameInterface->GetStats()->GetSkillStatIndex(weaponSkillWeapon)];
 
-                    CWeaponInfo* pPoor = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_POOR);
-                    CWeaponInfo* pStd = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_STD);
-                    CWeaponInfo* pPro = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_PRO);
+                        CWeaponInfo* pPoor = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_POOR);
+                        CWeaponInfo* pStd = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_STD);
+                        CWeaponInfo* pPro = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_PRO);
 
-                    if (stat >= pPro->GetRequiredStatLevel())
-                        weaponSkill = WEAPONSKILL_PRO;
-                    else if (stat >= pStd->GetRequiredStatLevel())
-                        weaponSkill = WEAPONSKILL_STD;
-                    else
-                        weaponSkill = WEAPONSKILL_POOR;
-                    return true;
+                        if (stat >= pPro->GetRequiredStatLevel())
+                            weaponSkill = WEAPONSKILL_PRO;
+                        else if (stat >= pStd->GetRequiredStatLevel())
+                            weaponSkill = WEAPONSKILL_STD;
+                        else
+                            weaponSkill = WEAPONSKILL_POOR;
+                        return true;
+                    }
                 }
             }
         }
@@ -5389,7 +5353,9 @@ void _declspec(naked) HOOK_CPed_GetWeaponSkill()
 // applying the visual effect
 bool _cdecl CPed_AddGogglesModelCheck(void* pPedInterface)
 {
-    return pGameInterface->GetPools()->GetPed((DWORD*)pPedInterface) == pGameInterface->GetPools()->GetPedFromRef(1);
+    SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)pPedInterface);
+    CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
+    return pPed == pGameInterface->GetPools()->GetPedFromRef(1);
 }
 
 void _declspec(naked) HOOK_CPed_AddGogglesModel()
@@ -5594,7 +5560,8 @@ static SColor vehColors[4];
 
 void _cdecl SaveVehColors(DWORD dwThis)
 {
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)dwThis);
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)dwThis);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (pVehicle)
     {
         pVehicle->GetColor(&vehColors[0], &vehColors[1], &vehColors[2], &vehColors[3], true);
@@ -5651,7 +5618,8 @@ static const DWORD dwSwingingRet1 = 0x6A9DB6;
 static const DWORD dwSwingingRet2 = 0x6AA1DA;
 static bool        AllowSwingingDoors()
 {
-    CVehicle* pVehicle = pGameInterface->GetPools()->GetVehicle((DWORD*)dwSwingingDoorAutomobile);
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)dwSwingingDoorAutomobile);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (pVehicle == 0 || pVehicle->AreSwingingDoorsAllowed())
         return true;
     else
@@ -6813,39 +6781,5 @@ void _declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
         fmul    kfTimeStepOriginal
 
         jmp     RETURN_CTaskSimpleSwim_ProcessSwimmingResistance
-    }
-}
-
-static void __cdecl WaterCannonHitWorld(CVehicleSAInterface* pGameVehicle, CColPointSAInterface* pColPoint, CEntitySAInterface** ppGameEntity)
-{
-    if (m_pWaterCannonHitWorldHandler)
-    {
-        CEntitySAInterface* const pGameEntity = ppGameEntity ? *ppGameEntity : nullptr;
-        const int                 iModel = pGameEntity ? pGameEntity->m_nModelIndex : -1;
-
-        SWaterCannonHitEvent event = {
-            pGameVehicle, pGameEntity, pColPoint->Position, pColPoint->Normal, iModel, pColPoint->ucSurfaceTypeB,
-        };
-
-        m_pWaterCannonHitWorldHandler(event);
-    }
-}
-
-static void _declspec(naked) HOOK_CWaterCannon__Render()
-{
-    _asm
-    {
-        pushad
-        mov     eax, [ebx]              // CVehicleSAInterface* CWaterCannon::m_pVehicle
-        lea     ebx, [esp + 100h - 54h] // CColPointSAInterface*
-        lea     ecx, [esp + 100h - 58h] // CEntitySAInterface**
-        push    ecx                     // ppGameEntity
-        push    ebx                     // pColPoint
-        push    eax                     // pGameVehicle
-        call    WaterCannonHitWorld
-        add     esp, 12
-        popad
-        push    3E4CCCCDh
-        jmp     CONTINUE_CWaterCannon__Render
     }
 }

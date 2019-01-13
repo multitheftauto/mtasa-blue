@@ -109,6 +109,7 @@ CCredits::CCredits(void)
         "Robin \"robhol\" Holm\n"
         "Patrik \"myonlake\" Juvonen\n"
         "Gabrielius \"Dezash\" Laurinavicius\n"
+        "Nikita \"StrixG\" Obrecht\n"
         "Adam \"50p\" Telega\n"
         "Ilya \"Kenix\" Volkov\n"
         "Gothem\n"

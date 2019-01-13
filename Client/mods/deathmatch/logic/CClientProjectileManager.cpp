@@ -115,8 +115,10 @@ bool CClientProjectileManager::Hook_ProjectileAllow(CEntity* pGameCreator, eWeap
     // Is this a local projectile?
     CClientPlayer* pLocalPlayer = m_pManager->GetPlayerManager()->GetLocalPlayer();
 
+    CPools* pPools = g_pGame->GetPools();
+
     // Store the creator/local variables for the next stage
-    m_pCreator = m_pManager->FindEntity(pGameCreator, true);
+    m_pCreator = pGameCreator ? pPools->GetClientEntity((DWORD*)pGameCreator->GetInterface()) : nullptr;
     m_bIsLocal = (m_pCreator == pLocalPlayer || (pLocalPlayer->GetOccupiedVehicleSeat() == 0 && m_pCreator == pLocalPlayer->GetOccupiedVehicle()));
 
     return (m_bCreating || m_bIsLocal);
@@ -137,7 +139,8 @@ void CClientProjectileManager::Hook_ProjectileCreation(CEntity* pGameCreator, CP
     WEAPONTYPE_REMOTE_SATCHEL_CHARGE, WEAPONTYPE_ROCKET, WEAPONTYPE_ROCKET_HS,
     WEAPONTYPE_FLARE, WEAPONTYPE_FREEFALL_BOMB */
 
-    CClientEntity* pTarget = m_pManager->FindEntity(pGameTarget, true);
+    CPools*        pPools = g_pGame->GetPools();
+    CClientEntity* pTarget = pGameTarget ? pPools->GetClientEntity((DWORD*)pGameTarget->GetInterface()) : nullptr;
     m_pLastCreated = new CClientProjectile(m_pManager, pGameProjectile, pProjectileInfo, m_pCreator, pTarget, weaponType, origin, target, fForce, m_bIsLocal);
 }
 

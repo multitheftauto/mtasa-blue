@@ -323,36 +323,40 @@ void CResourceManager::ListResourcesLoaded(const SString& strListType)
 }
 
 // check all loaded resources and see if they're still valid (i.e. have a meta.xml file)
-void CResourceManager::UnloadRemovedResources(void)
+void CResourceManager::UnloadRemovedResources()
 {
-    list<CResource*>                 resourcesToDelete;
-    list<CResource*>::const_iterator iter = m_resources.begin();
-    string                           strPath;
-    for (; iter != m_resources.end(); iter++)
+    // Create a temporary list for removed resources because 'Unload' would otherwise change
+    // the 'm_resources' member variable while we iterate over it
+    std::list<CResource*> resourcesToDelete;
+
+    for (CResource* pResource : m_resources)
     {
-        if ((*iter)->HasGoneAway())
-        {
-            if ((*iter)->IsActive())
-                CLogger::ErrorPrintf("Resource '%s' has been removed while running! Stopping resource.\n", (*iter)->GetName().c_str());
-            else
-                CLogger::LogPrintf("Resource '%s' has been removed, unloading\n", (*iter)->GetName().c_str());
-            resourcesToDelete.push_back((*iter));
-        }
+        if (!pResource->HasGoneAway())
+            continue;
+
+        if (pResource->IsActive())
+            CLogger::ErrorPrintf("Resource '%s' has been removed while running! Stopping resource.\n", pResource->GetName().c_str());
+        else
+            CLogger::LogPrintf("Resource '%s' has been removed, unloading\n", pResource->GetName().c_str());
+
+        resourcesToDelete.push_back(pResource);
     }
 
-    iter = resourcesToDelete.begin();
-    for (; iter != resourcesToDelete.end(); iter++)
-    {
-        UnloadAndDelete(*iter);
-    }
+    for (CResource* pResource : resourcesToDelete)
+        UnloadAndDelete(pResource);
 }
 
-void CResourceManager::UnloadAndDelete(CResource* resource)
+void CResourceManager::UnloadAndDelete(CResource* pResource)
 {
-    RemoveResourceFromLists(resource);
-    m_resourcesToStartAfterRefresh.remove(resource);
-    RemoveFromQueue(resource);
-    delete resource;
+    // Stop resource before removing the resource pointer from our lists
+    if (pResource->IsActive())
+        pResource->Stop(true);
+
+    RemoveResourceFromLists(pResource);
+    m_resourcesToStartAfterRefresh.remove(pResource);
+    RemoveFromQueue(pResource);
+
+    delete pResource;
 }
 
 CResource* CResourceManager::Load(bool bIsZipped, const char* szAbsPath, const char* szResourceName)
@@ -381,11 +385,6 @@ CResource* CResourceManager::Load(bool bIsZipped, const char* szAbsPath, const c
         {
             CLogger::LogPrintf("Resource '%s' changed, reloading\n", szResourceName);
         }
-
-        // Stop it first. This fixes bug #3729 because it isn't removed from the list before it's stopped.
-        // Removing it from the resources list first caused the resource pointer to be unverifyable, and
-        // the pointer wouldn't work in resource LUA functions.
-        pResource->Stop(true);
 
         UnloadAndDelete(pResource);
         pResource = nullptr;
@@ -621,37 +620,21 @@ bool CResourceManager::IsAResourceElement(CElement* pElement)
     return false;
 }
 
-bool CResourceManager::StartResource(CResource* pResource, list<CResource*>* dependents, bool bStartedManually, bool bStartIncludedResources, bool bConfigs,
-                                     bool bMaps, bool bScripts, bool bHTML, bool bClientConfigs, bool bClientScripts, bool bClientFiles)
+bool CResourceManager::StartResource(CResource* pResource, list<CResource*>* pDependents, bool bManualStart, const SResourceStartOptions& StartOptions)
 {
-    // Has resurce changed since load?
     if (pResource->HasResourceChanged())
     {
-        // Attempt to reload it
-        if (Reload(pResource))
-        {
-            // Start the resource
-            return pResource->Start(NULL, bStartedManually, bStartIncludedResources, bConfigs, bMaps, bScripts, bHTML, bClientConfigs, bClientScripts,
-                                    bClientFiles);
-        }
-        else
+        if (!Reload(pResource))
             return false;
+
+        pDependents = nullptr;
     }
-    else
+    else if (pResource->IsActive())
     {
-        // If it's not running yet
-        if (!pResource->IsActive())
-        {
-            // Start it
-            return pResource->Start(dependents, bStartedManually, bStartIncludedResources, bConfigs, bMaps, bScripts, bHTML, bClientConfigs, bClientScripts,
-                                    bClientFiles);
-        }
         return false;
     }
 
-    // Stop it again if it failed starting
-    pResource->Stop();
-    return false;
+    return pResource->Start(pDependents, bManualStart, StartOptions);
 }
 
 bool CResourceManager::Reload(CResource* pResource)
@@ -710,33 +693,23 @@ bool CResourceManager::StopAllResources(void)
     return true;
 }
 
-void CResourceManager::QueueResource(CResource* pResource, eResourceQueue eQueueType, const sResourceStartFlags* Flags, list<CResource*>* dependents)
+void CResourceManager::QueueResource(CResource* pResource, eResourceQueue eQueueType, const SResourceStartOptions* pStartOptions,
+                                     std::list<CResource*>* pDependents)
 {
-    // Make the queue item
-    sResourceQueue sItem;
-    sItem.pResource = pResource;
-    sItem.eQueue = eQueueType;
-    if (dependents)
-        for (list<CResource*>::iterator it = dependents->begin(); it != dependents->end(); ++it)
-            sItem.dependents.push_back((*it)->GetName());
+    sResourceQueue Item;
+    Item.pResource = pResource;
+    Item.eQueue = eQueueType;
 
-    if (Flags)
+    if (pDependents)
     {
-        sItem.Flags = *Flags;
-    }
-    else
-    {
-        sItem.Flags.bClientConfigs = true;
-        sItem.Flags.bClientFiles = true;
-        sItem.Flags.bClientScripts = true;
-        sItem.Flags.bHTML = true;
-        sItem.Flags.bScripts = true;
-        sItem.Flags.bMaps = true;
-        sItem.Flags.bConfigs = true;
+        for (CResource* pDependent : *pDependents)
+            Item.dependents.push_back(pDependent->GetName());
     }
 
-    // Push it to the back of the queue
-    m_resourceQueue.push_back(sItem);
+    if (pStartOptions)
+        Item.StartOptions = *pStartOptions;
+
+    m_resourceQueue.push_back(Item);
 }
 
 void CResourceManager::ProcessQueue(void)
@@ -789,19 +762,13 @@ void CResourceManager::ProcessQueue(void)
                 }
 
                 // Copy the dependents
-                list<CResource*>*          resourceList = sItem.pResource->GetDependents();
-                list<CResource*>           resourceListCopy;
-                list<CResource*>::iterator iterd = resourceList->begin();
-                for (; iterd != resourceList->end(); iterd++)
-                {
-                    resourceListCopy.push_back((*iterd));
-                }
+                std::list<CResource*> resourceListCopy = sItem.pResource->GetDependents();
 
                 // Stop it
                 if (sItem.pResource->Stop(true))
                 {
                     // Continue after the rest of the queue is processed
-                    QueueResource(sItem.pResource, QUEUE_RESTART2, &sItem.Flags, &resourceListCopy);
+                    QueueResource(sItem.pResource, QUEUE_RESTART2, &sItem.StartOptions, &resourceListCopy);
                 }
                 else
                     CLogger::ErrorPrintf("Unable to stop resource %s for restart\n", sItem.pResource->GetName().c_str());
@@ -819,8 +786,7 @@ void CResourceManager::ProcessQueue(void)
             }
 
             // Start it again
-            if (!StartResource(sItem.pResource, &resourceListCopy, true, true, sItem.Flags.bConfigs, sItem.Flags.bMaps, sItem.Flags.bScripts, sItem.Flags.bHTML,
-                               sItem.Flags.bClientConfigs, sItem.Flags.bClientScripts, sItem.Flags.bClientFiles))
+            if (!StartResource(sItem.pResource, &resourceListCopy, true, sItem.StartOptions))
             {
                 // Failed
                 CLogger::ErrorPrintf("Unable to restart resource %s\n", sItem.pResource->GetName().c_str());
@@ -1076,9 +1042,8 @@ CResource* CResourceManager::RenameResource(CResource* pSourceResource, const SS
         return NULL;
     }
 
-    // Unload - this will also free the resource object
     UnloadAndDelete(pSourceResource);
-    pSourceResource = NULL;
+    pSourceResource = nullptr;
 
     // Rename
     MakeSureDirExists(strDstResourceLocation);
@@ -1129,9 +1094,8 @@ bool CResourceManager::DeleteResource(const SString& strResourceName, SString& s
         return false;
     }
 
-    // Unload - this will also free the resource object
     UnloadAndDelete(pSourceResource);
-    pSourceResource = NULL;
+    pSourceResource = nullptr;
 
     // Move resource dir/zip to the trash
     return MoveDirToTrash(strSrcResourceLocation);
@@ -1179,6 +1143,11 @@ SString CResourceManager::GetResourceOrganizationalPath(CResource* pResource)
 bool CResourceManager::ParseResourcePathInput(std::string strInput, CResource*& pResource, std::string* pStrPath, std::string* pstrMetaPath)
 {
     ReplaceOccurrencesInString(strInput, "\\", "/");
+
+    // Disallow file paths with a directory separator at the end
+    if (strInput.back() == '/')
+        return false;
+
     std::string strMetaPath;
 
     if (strInput[0] == '@')

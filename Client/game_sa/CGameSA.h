@@ -364,7 +364,7 @@ public:
     float GetTimeScale(void);
     void  SetTimeScale(float fTimeScale);
 
-    BOOL InitLocalPlayer();
+    BOOL InitLocalPlayer(class CClientPed* pClientPed);
 
     float GetGravity(void);
     void  SetGravity(float fGravity);

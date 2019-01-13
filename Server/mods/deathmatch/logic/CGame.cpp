@@ -1939,6 +1939,8 @@ void CGame::Packet_PlayerWasted(CPlayerWastedPacket& Packet)
     {
         pPlayer->SetSpawned(false);
         pPlayer->SetIsDead(true);
+        pPlayer->SetHealth(0.0f);
+        pPlayer->SetArmor(0.0f);
         pPlayer->SetPosition(Packet.m_vecPosition);
 
         // Remove him from any occupied vehicle

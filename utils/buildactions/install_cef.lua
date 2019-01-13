@@ -6,7 +6,7 @@ premake.modules.install_cef = {}
 local CEF_PATH = "vendor/cef3/"
 local CEF_URL = "https://mirror.mtasa.com/bdata/cef-latest_xp.tar.bz2"
 
-local CEF_VERSION = "3.3538.1852.gcb937fc" -- Change here to update CEF version
+local CEF_VERSION = "3.3578.1860.g36610bd" -- Change here to update CEF version
 
 function make_cef_download_url()
 	return CEF_URL

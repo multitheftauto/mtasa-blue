@@ -35,24 +35,13 @@ public:
         QUEUE_REFRESHALL,
     };
 
-    struct sResourceStartFlags
-    {
-        bool bConfigs;
-        bool bMaps;
-        bool bScripts;
-        bool bHTML;
-        bool bClientConfigs;
-        bool bClientScripts;
-        bool bClientFiles;
-    };
-
 private:
     struct sResourceQueue
     {
-        CResource*          pResource;
-        eResourceQueue      eQueue;
-        sResourceStartFlags Flags;
-        vector<SString>     dependents;
+        CResource*            pResource;
+        eResourceQueue        eQueue;
+        SResourceStartOptions StartOptions;
+        vector<SString>       dependents;
     };
 
 public:
@@ -61,10 +50,10 @@ public:
     ~CResourceManager(void);
 
     CResource*                            Load(bool bIsZipped, const char* szAbsPath, const char* szResourceName);
-    void                                  UnloadAndDelete(CResource* resource);
+    void                                  UnloadAndDelete(CResource* pResource);
     CResource*                            GetResource(const char* szResourceName);
     CResource*                            GetResourceFromScriptID(uint uiScriptID);
-    void                                  UnloadRemovedResources(void);
+    void                                  UnloadRemovedResources();
     void                                  CheckResourceDependencies(void);
     void                                  ListResourcesLoaded(const SString& strListType);
     std::list<CResource*>::const_iterator IterBegin(void) { return m_resources.begin(); };
@@ -79,13 +68,13 @@ public:
 
     const char* GetResourceDirectory(void);
 
-    bool StartResource(CResource* pResource, list<CResource*>* dependents = NULL, bool bStartedManually = false, bool bStartIncludedResources = true,
-                       bool bConfigs = true, bool bMaps = true, bool bScripts = true, bool bHTML = true, bool bClientConfigs = true, bool bClientScripts = true,
-                       bool bClientFiles = true);
+    bool StartResource(CResource* pResource, std::list<CResource*>* pDependents = nullptr, bool bManualStart = false,
+                       const SResourceStartOptions& StartOptions = SResourceStartOptions());
     bool Reload(CResource* pResource);
     bool StopAllResources(void);
 
-    void QueueResource(CResource* pResource, eResourceQueue eQueueType, const sResourceStartFlags* Flags, list<CResource*>* dependents = NULL);
+    void QueueResource(CResource* pResource, eResourceQueue eQueueType, const SResourceStartOptions* pStartOptions,
+                       std::list<CResource*>* pDependents = nullptr);
     void ProcessQueue(void);
     void RemoveFromQueue(CResource* pResource);
 

@@ -127,6 +127,7 @@ void CClientObjectManager::DeleteAll(void)
     m_bCanRemoveFromList = true;
 }
 
+
 CClientObject* CClientObjectManager::Get(ElementID ID)
 {
     // Grab the element with the given id. Check its type.
@@ -137,16 +138,6 @@ CClientObject* CClientObjectManager::Get(ElementID ID)
     }
 
     return NULL;
-}
-
-CClientObject* CClientObjectManager::Get(CObject* pObject, bool bValidatePointer)
-{
-    return g_pClientGame->GetGameEntityXRefManager()->FindClientObject(pObject);
-}
-
-CClientObject* CClientObjectManager::GetSafe(CEntity* pEntity)
-{
-    return g_pClientGame->GetGameEntityXRefManager()->FindClientObject(pEntity);
 }
 
 bool CClientObjectManager::IsValidModel(unsigned long ulObjectModel)

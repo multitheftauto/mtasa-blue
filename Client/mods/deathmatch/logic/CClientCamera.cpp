@@ -553,7 +553,8 @@ CClientEntity* CClientCamera::GetTargetEntity(void)
         CEntity* pEntity = pCam->GetTargetEntity();
         if (pEntity)
         {
-            pReturn = m_pManager->FindEntitySafe(pEntity);
+            CPools* pPools = g_pGame->GetPools();
+            pReturn = pPools->GetClientEntity((DWORD*)pEntity->GetInterface());
         }
     }
     return pReturn;
