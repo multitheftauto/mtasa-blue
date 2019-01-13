@@ -213,6 +213,45 @@ void CRegisteredCommands::CallCommandHandler(CLuaMain* pLuaMain, const CLuaFunct
     Arguments.Call(pLuaMain, iLuaFunction);
 }
 
+void CRegisteredCommands::GetCommands(lua_State* luaVM)
+{
+    unsigned int uiIndex = 0;
+
+    lua_newtable(luaVM);
+
+    for (SCommand* pCommand : m_Commands)
+    {
+        // Create an entry table: {'command', resource}
+        lua_pushinteger(luaVM, ++uiIndex);
+        lua_createtable(luaVM, 0, 2);
+        {
+            lua_pushstring(luaVM, pCommand->strKey.c_str());
+            lua_rawseti(luaVM, -2, 1);
+
+            lua_pushresource(luaVM, pCommand->pLuaMain->GetResource());
+            lua_rawseti(luaVM, -2, 2);
+        }
+        lua_settable(luaVM, -3);
+    }
+}
+
+void CRegisteredCommands::GetCommands(lua_State* luaVM, CLuaMain* pTargetLuaMain)
+{
+    unsigned int uiIndex = 0;
+
+    lua_newtable(luaVM);
+
+    for (SCommand* pCommand : m_Commands)
+    {
+        if (pCommand->pLuaMain == pTargetLuaMain)
+        {
+            lua_pushinteger(luaVM, ++uiIndex);
+            lua_pushstring(luaVM, pCommand->strKey.c_str());
+            lua_settable(luaVM, -3);
+        }
+    }
+}
+
 void CRegisteredCommands::TakeOutTheTrash(void)
 {
     list<SCommand*>::iterator iter = m_TrashCan.begin();

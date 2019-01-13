@@ -204,6 +204,7 @@ public:
     LUA_DECLARE(AddCommandHandler);
     LUA_DECLARE(RemoveCommandHandler);
     LUA_DECLARE(ExecuteCommandHandler);
+    LUA_DECLARE(GetCommandHandlers);
 
     // Utility
     LUA_DECLARE(GetNetworkUsageData);

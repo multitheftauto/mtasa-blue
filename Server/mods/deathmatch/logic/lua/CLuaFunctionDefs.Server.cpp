@@ -338,41 +338,34 @@ int CLuaFunctionDefs::ExecuteCommandHandler(lua_State* luaVM)
 int CLuaFunctionDefs::GetCommandHandlers(lua_State* luaVM)
 {
     // table getCommandHandlers ( [ resource sourceResource ] );
-    CResource* pResource;
-    bool       bSpecificResource = false;
+    CResource* pResource = nullptr;
 
     CScriptArgReader argStream(luaVM);
-    if (!argStream.NextIsNone())
-    {
+
+    if (!argStream.NextIsNil() && !argStream.NextIsNone())
         argStream.ReadUserData(pResource);
-        bSpecificResource = true;
+
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushnil(luaVM);
+        return 1;
     }
 
-    if (!argStream.HasErrors())
+    if (pResource)
     {
-        if (bSpecificResource)
-        {
-            // Grab resource virtual machine
-            CLuaMain* pLuaMain = pResource->GetVirtualMachine();
+        CLuaMain* pLuaMain = pResource->GetVirtualMachine();
 
-            if (pLuaMain)
-            {
-                m_pRegisteredCommands->GetCommands(luaVM, pLuaMain);
-
-                return 1;
-            }
-        }
+        if (pLuaMain)
+            m_pRegisteredCommands->GetCommands(luaVM, pLuaMain);
         else
-        {
-            m_pRegisteredCommands->GetCommands(luaVM);
-
-            return 1;
-        }
+            lua_newtable(luaVM);
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    {
+        m_pRegisteredCommands->GetCommands(luaVM);
+    }
 
-    lua_pushboolean(luaVM, false);
     return 1;
 }
 

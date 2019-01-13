@@ -891,6 +891,12 @@ void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice
         vert.fY = m_pAspectRatioConverter->ConvertPositionForAspectRatio(vert.fY);
     }
 
+    if (CShaderItem* pShaderItem = DynamicCast<CShaderItem>(pMaterial))
+    {
+        // If material is a shader, use its current instance
+        pMaterial = pShaderItem->m_pShaderInstance;
+    }
+
     // Set up a queue item
     sDrawQueueItem Item;
     Item.eType = QUEUE_PRIMITIVEMATERIAL;

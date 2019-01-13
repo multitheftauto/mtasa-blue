@@ -99,48 +99,15 @@ bool CResource::Load()
     m_strResourceDirectoryPath = PathJoin(m_strAbsPath, m_strResourceName, "/");
     m_strResourceCachePath = PathJoin(g_pServerInterface->GetServerModPath(), "resource-cache", "unzipped", m_strResourceName, "/");
     m_strResourceZip = PathJoin(m_strAbsPath, m_strResourceName + ".zip");
-
+    
     if (m_bResourceIsZip)
     {
-        // See if zip file is actually a zip file
-        m_zipfile = unzOpenUtf8(m_strResourceZip.c_str());
-        if (!m_zipfile)
+        if (!UnzipResource())
         {
             // Unregister EHS stuff
             g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
-
-            // Show error
-            m_strFailureReason =
-                SString("Couldn't find resource archive or directory (%s) for resource '%s'.\n", m_strResourceDirectoryPath.c_str(), m_strResourceName.c_str());
-            CLogger::ErrorPrintf(m_strFailureReason);
+            
             return false;
-        }
-
-        // Close the zip file
-        unzClose(m_zipfile);
-        m_zipfile = nullptr;
-
-        // See if the dir already exists
-        bool bDirExists = DoesDirectoryExist(m_strResourceCachePath.c_str());
-
-        // If the folder doesn't exist, create it
-        if (!bDirExists)
-        {
-            // If we're using a zip file, we need a temp directory for extracting
-            // 17 = already exists (on windows)
-
-            if (File::Mkdir(m_strResourceCachePath.c_str()) == -1 && errno != EEXIST)            // check this is the correct return for *NIX too
-            {
-                // Unregister EHS stuff
-                g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
-
-                // Show error
-                m_strFailureReason =
-                    SString("Couldn't create directory '%s' for resource '%s', check that the server has write access to the resources folder.\n",
-                            m_strResourceCachePath.c_str(), m_strResourceName.c_str());
-                CLogger::ErrorPrintf(m_strFailureReason);
-                return false;
-            }
         }
     }
 
@@ -501,74 +468,84 @@ void CResource::SetInfoValue(const char* szKey, const char* szValue, bool bSave)
 
 bool CResource::GenerateChecksums()
 {
-    bool bOk = true;
+    std::vector<std::future<SString>> checksumTasks;
+    checksumTasks.reserve(m_ResourceFiles.size());
 
     for (CResourceFile* pResourceFile : m_ResourceFiles)
     {
-        SString strPath;
+        checksumTasks.push_back(std::async(std::launch::async, [pResourceFile, this] {
+            SString strPath;
+            
+            if (!GetFilePath(pResourceFile->GetName(), strPath))
+                return SString();
+            
+            std::vector<char> buffer;
+            FileLoad(strPath, buffer);
+            uint        uiFileSize = buffer.size();
+            const char* pFileContents = uiFileSize ? buffer.data() : "";
+            CChecksum   Checksum = CChecksum::GenerateChecksumFromBuffer(pFileContents, uiFileSize);
+            pResourceFile->SetLastChecksum(Checksum);
+            pResourceFile->SetLastFileSize(uiFileSize);
 
-        if (!GetFilePath(pResourceFile->GetName(), strPath))
-            continue;
-
-        std::vector<char> buffer;
-        FileLoad(strPath, buffer);
-        uint        uiFileSize = buffer.size();
-        const char* pFileContents = uiFileSize ? &buffer[0] : "";
-
-        CChecksum checksum = CChecksum::GenerateChecksumFromBuffer(pFileContents, uiFileSize);
-        pResourceFile->SetLastChecksum(checksum);
-        pResourceFile->SetLastFileSize(uiFileSize);
-
-        // Check if file is blocked
-        char szHashResult[33];
-        CMD5Hasher::ConvertToHex(checksum.md5, szHashResult);
-        SString strBlockReason = m_pResourceManager->GetBlockedFileReason(szHashResult);
-
-        if (!strBlockReason.empty())
-        {
-            m_strFailureReason = SString("file '%s' is blocked (%s)", pResourceFile->GetName(), *strBlockReason);
-            CLogger::LogPrintf(SString("ERROR: Resource '%s' %s\n", GetName().c_str(), *m_strFailureReason));
-            bOk = false;
-            continue;
-        }
-
-        // Copy file to http holding directory
-        switch (pResourceFile->GetType())
-        {
-            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
-            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
-            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
+            // Check if file is blocked
+            char szHashResult[33];
+            CMD5Hasher::ConvertToHex(pResourceFile->GetLastChecksum().md5, szHashResult);
+            SString strBlockReason = m_pResourceManager->GetBlockedFileReason(szHashResult);
+            
+            if (!strBlockReason.empty())
             {
-                SString strCachedFilePath = pResourceFile->GetCachedPathFilename();
-
-                if (!g_pRealNetServer->ValidateHttpCacheFileName(strCachedFilePath))
-                {
-                    FileDelete(strCachedFilePath);
-                    CLogger::LogPrintf(
-                        SString("ERROR: Resource '%s' client filename '%s' not allowed\n", GetName().c_str(), *ExtractFilename(strCachedFilePath)));
-                    bOk = false;
-                    continue;
-                }
-
-                CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFile(strCachedFilePath);
-
-                if (checksum != cachedChecksum)
-                {
-                    if (!FileSave(strCachedFilePath, pFileContents, uiFileSize))
-                    {
-                        CLogger::LogPrintf("Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath);
-                        bOk = false;
-                    }
-
-                    // If script is 'no client cache', make sure there is no trace of it in the output dir
-                    if (pResourceFile->IsNoClientCache())
-                        FileDelete(pResourceFile->GetCachedPathFilename(true));
-                }
-
-                break;
+                return SString("file '%s' is blocked (%s)", pResourceFile->GetName(), *strBlockReason);
             }
-            default:
-                break;
+    
+            // Copy file to http holding directory
+            switch (pResourceFile->GetType())
+            {
+                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
+                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
+                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
+                {
+                    SString strCachedFilePath = pResourceFile->GetCachedPathFilename();
+    
+                    if (!g_pRealNetServer->ValidateHttpCacheFileName(strCachedFilePath))
+                    {
+                        FileDelete(strCachedFilePath);
+                        return SString("ERROR: Resource '%s' client filename '%s' not allowed\n", GetName().c_str(), *ExtractFilename(strCachedFilePath));
+                    }
+    
+                    CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFile(strCachedFilePath);
+                        
+                    if (pResourceFile->GetLastChecksum() != cachedChecksum)
+                    {
+                        if (!FileSave(strCachedFilePath, pFileContents, uiFileSize))
+                        {
+                            return SString("Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath);
+                        }
+    
+                        // If script is 'no client cache', make sure there is no trace of it in the output dir
+                        if (pResourceFile->IsNoClientCache())
+                            FileDelete(pResourceFile->GetCachedPathFilename(true));
+                    }
+    
+                    break;
+                }
+                default:
+                    break;
+            }
+            
+            return SString();
+        }));
+    }
+
+    bool bOk = true;
+
+    for (auto& task : checksumTasks)
+    {
+        const auto& result = task.get();
+        if (!result.empty())
+        {
+            m_strFailureReason = result;
+            CLogger::LogPrintf(result);
+            bOk = false;
         }
     }
 
@@ -720,6 +697,9 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
         return true;
 
     if (m_eState != EResourceState::Loaded)
+        return false;
+
+    if (m_bDestroyed)
         return false;
 
     m_eState = EResourceState::Starting;
@@ -1228,79 +1208,14 @@ bool CResource::HasGoneAway()
     }
 }
 
-// gets the path of the file specified, may extract it from the zip
+// gets the path of the file specified
 bool CResource::GetFilePath(const char* szFilename, string& strPath)
 {
-    // first, check the resource folder, then check the zip file
-    strPath = m_strResourceDirectoryPath + szFilename;
-    FILE* temp = File::Fopen(strPath.c_str(), "r");
-
-    if (temp)
-    {
-        fclose(temp);
-#ifdef RESOURCE_DEBUG_MESSAGES
-        CLogger::LogPrintf("%s is in resource folder\n", szFilename);
-#endif
-        return true;
-    }
-
-    // Don't check zip file if resource was not identified as zipped
-    if (!IsResourceZip())
-        return false;
-
-    if (!m_zipfile)
-        m_zipfile = unzOpenUtf8(m_strResourceZip.c_str());
-
-    if (m_zipfile)
-    {
-        if (unzLocateFile(m_zipfile, szFilename, false) != UNZ_END_OF_LIST_OF_FILE)
-        {
-            strPath = m_strResourceCachePath + szFilename;
-            temp = File::Fopen(strPath.c_str(), "r");
-
-            if (temp)
-            {
-                fclose(temp);
-
-                // we've already got a cached copy of this file, check its still the same
-                unsigned long ulFileInZipCRC = get_current_file_crc(m_zipfile);
-                unsigned long ulFileOnDiskCRC = CRCGenerator::GetCRCFromFile(strPath.c_str());
-
-                if (ulFileInZipCRC == ulFileOnDiskCRC)
-                {
-#ifdef RESOURCE_DEBUG_MESSAGES
-                    CLogger::LogPrintf("Up to date %s already extracted from zip\n", szFilename);
-#endif
-                    unzClose(m_zipfile);
-                    m_zipfile = nullptr;
-                    return true;            // we've already extracted EXACTLY this file before
-                }
-                else
-                {
-#ifdef RESOURCE_DEBUG_MESSAGES
-                    CLogger::LogPrintf("Old version of %s already extracted, extracting again\n", szFilename);
-#endif
-                }
-            }
-            else
-            {
-#ifdef RESOURCE_DEBUG_MESSAGES
-                CLogger::LogPrintf("Extracting %s from zip\n", szFilename);
-#endif
-            }
-
-            // we've never extracted this EXACT file (maybe an old version), so do it again
-            ExtractFile(szFilename);
-            unzClose(m_zipfile);
-            m_zipfile = nullptr;
-            return true;
-        }
-    }
-
-#ifdef RESOURCE_DEBUG_MESSAGES
-    CLogger::LogPrintf("Can't find %s in zip or in folder\n", szFilename);
-#endif
-    return false;
+    if (IsResourceZip())
+        strPath = m_strResourceCachePath + szFilename;
+    else
+        strPath = m_strResourceDirectoryPath + szFilename;
+    return FileExists(strPath);
 }
 
 // Return true if file name is used by this resource
@@ -1384,43 +1299,52 @@ bool CResource::ReadIncludedHTML(CXMLNode* pRoot)
         if (pSrc)
         {
             // If we found it grab the value
-            string strFilename = pSrc->GetValue();
-            string strFullFilename;
-            ReplaceSlashes(strFilename);
+            std::string strFilename = pSrc->GetValue();
 
-            if (IsFilenameUsed(strFilename, false))
+            if (!strFilename.empty())
             {
-                CLogger::LogPrintf("WARNING: Duplicate html file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
-            }
+                std::string strFullFilename;
+                ReplaceSlashes(strFilename);
 
-            // Try to find the file
-            if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
-            {
-                // This one is supposed to be default, but there's already a default page
-                if (bFoundDefault && bIsDefault)
+                if (IsFilenameUsed(strFilename, false))
                 {
-                    CLogger::LogPrintf("Only one html item can be default per resource, ignoring %s in %s\n", strFilename.c_str(), m_strResourceName.c_str());
-                    bIsDefault = false;
+                    CLogger::LogPrintf("WARNING: Duplicate html file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
                 }
 
-                // If this is supposed to be default, we've now found our default page
-                if (bIsDefault)
-                    bFoundDefault = true;
+                // Try to find the file
+                if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
+                {
+                    // This one is supposed to be default, but there's already a default page
+                    if (bFoundDefault && bIsDefault)
+                    {
+                        CLogger::LogPrintf("Only one html item can be default per resource, ignoring %s in %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                        bIsDefault = false;
+                    }
 
-                // Create a new resource HTML file and add it to the list
-                auto pResourceFile = new CResourceHTMLItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, bIsDefault, bIsRaw, bIsRestricted,
-                                                           m_bOOPEnabledInMetaXml);
-                m_ResourceFiles.push_back(pResourceFile);
+                    // If this is supposed to be default, we've now found our default page
+                    if (bIsDefault)
+                        bFoundDefault = true;
 
-                // This is the first HTML file? Remember it
-                if (!pFirstHTML)
-                    pFirstHTML = pResourceFile;
+                    // Create a new resource HTML file and add it to the list
+                    auto pResourceFile = new CResourceHTMLItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, bIsDefault, bIsRaw, bIsRestricted,
+                                                               m_bOOPEnabledInMetaXml);
+                    m_ResourceFiles.push_back(pResourceFile);
+
+                    // This is the first HTML file? Remember it
+                    if (!pFirstHTML)
+                        pFirstHTML = pResourceFile;
+                }
+                else
+                {
+                    m_strFailureReason = SString("Couldn't find html %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    CLogger::ErrorPrintf(m_strFailureReason);
+                    return false;
+                }
             }
             else
             {
-                m_strFailureReason = SString("Couldn't find html %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
-                CLogger::ErrorPrintf(m_strFailureReason);
-                return false;
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'html' node of 'meta.xml' for resource '%s', ignoring\n",
+                                   m_strResourceName.c_str());
             }
         }
         else
@@ -1471,35 +1395,44 @@ bool CResource::ReadIncludedConfigs(CXMLNode* pRoot)
         if (pSrc)
         {
             // Grab the filename
-            string strFilename = pSrc->GetValue();
-            string strFullFilename;
-            ReplaceSlashes(strFilename);
+            std::string strFilename = pSrc->GetValue();
 
-            if (bClient && IsFilenameUsed(strFilename, true))
+            if (!strFilename.empty())
             {
-                CLogger::LogPrintf("WARNING: Ignoring duplicate client config file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
-                bClient = false;
-            }
-            if (bServer && IsFilenameUsed(strFilename, false))
-            {
-                CLogger::LogPrintf("WARNING: Duplicate config file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
-            }
+                std::string strFullFilename;
+                ReplaceSlashes(strFilename);
 
-            // Extract / grab the filepath
-            if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
-            {
-                // Create it and push it to the list over resource files. Depending on if it's client or server type
-                if (bServer)
-                    m_ResourceFiles.push_back(new CResourceConfigItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes));
+                if (bClient && IsFilenameUsed(strFilename, true))
+                {
+                    CLogger::LogPrintf("WARNING: Ignoring duplicate client config file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
+                    bClient = false;
+                }
+                if (bServer && IsFilenameUsed(strFilename, false))
+                {
+                    CLogger::LogPrintf("WARNING: Duplicate config file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
+                }
 
-                if (bClient)
-                    m_ResourceFiles.push_back(new CResourceClientConfigItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes));
+                // Extract / grab the filepath
+                if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
+                {
+                    // Create it and push it to the list over resource files. Depending on if it's client or server type
+                    if (bServer)
+                        m_ResourceFiles.push_back(new CResourceConfigItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes));
+
+                    if (bClient)
+                        m_ResourceFiles.push_back(new CResourceClientConfigItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes));
+                }
+                else
+                {
+                    m_strFailureReason = SString("Couldn't find config %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    CLogger::ErrorPrintf(m_strFailureReason);
+                    return false;
+                }
             }
             else
             {
-                m_strFailureReason = SString("Couldn't find config %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
-                CLogger::ErrorPrintf(m_strFailureReason);
-                return false;
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'config' node of 'meta.xml' for resource '%s', ignoring\n",
+                                   m_strResourceName.c_str());
             }
         }
         else
@@ -1526,37 +1459,46 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
         if (pSrc)
         {
             // Grab the value
-            string strFilename = pSrc->GetValue();
-            string strFullFilename;
-            ReplaceSlashes(strFilename);
+            std::string strFilename = pSrc->GetValue();
 
-            if (IsFilenameUsed(strFilename, true))
+            if (!strFilename.empty())
             {
-                CLogger::LogPrintf("WARNING: Ignoring duplicate client file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
-                continue;
-            }
+                std::string strFullFilename;
+                ReplaceSlashes(strFilename);
 
-            bool           bDownload = true;
-            CXMLAttribute* pDownload = Attributes.Find("download");
+                if (IsFilenameUsed(strFilename, true))
+                {
+                    CLogger::LogPrintf("WARNING: Ignoring duplicate client file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
+                    continue;
+                }
 
-            if (pDownload)
-            {
-                const char* szDownload = pDownload->GetValue().c_str();
+                bool           bDownload = true;
+                CXMLAttribute* pDownload = Attributes.Find("download");
 
-                if (!stricmp(szDownload, "no") || !stricmp(szDownload, "false"))
-                    bDownload = false;
-            }
+                if (pDownload)
+                {
+                    const char* szDownload = pDownload->GetValue().c_str();
 
-            // Create a new resourcefile item
-            if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
-            {
-                m_ResourceFiles.push_back(new CResourceClientFileItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, bDownload));
+                    if (!stricmp(szDownload, "no") || !stricmp(szDownload, "false"))
+                        bDownload = false;
+                }
+
+                // Create a new resourcefile item
+                if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
+                {
+                    m_ResourceFiles.push_back(new CResourceClientFileItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, bDownload));
+                }
+                else
+                {
+                    m_strFailureReason = SString("Couldn't find file %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    CLogger::ErrorPrintf(m_strFailureReason);
+                    return false;
+                }
             }
             else
             {
-                m_strFailureReason = SString("Couldn't find file %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
-                CLogger::ErrorPrintf(m_strFailureReason);
-                return false;
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'file' node of 'meta.xml' for resource '%s', ignoring\n",
+                                   m_strResourceName.c_str());
             }
         }
         else
@@ -1698,34 +1640,43 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
         if (pSrc)
         {
             // Grab the source value from the attribute
-            string strFilename = pSrc->GetValue();
-            string strFullFilename;
-            ReplaceSlashes(strFilename);
+            std::string strFilename = pSrc->GetValue();
 
-            if (bClient && IsFilenameUsed(strFilename, true))
+            if (!strFilename.empty())
             {
-                CLogger::LogPrintf("WARNING: Ignoring duplicate client script file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
-                bClient = false;
-            }
-            if (bServer && IsFilenameUsed(strFilename, false))
-            {
-                CLogger::LogPrintf("WARNING: Duplicate script file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
-            }
+                std::string strFullFilename;
+                ReplaceSlashes(strFilename);
 
-            // Extract / get the filepath of the file
-            if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
-            {
-                // Create it depending on the type (client or server or shared) and add it to the list of resource files
-                if (bServer)
-                    m_ResourceFiles.push_back(new CResourceScriptItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes));
-                if (bClient)
-                    m_ResourceFiles.push_back(new CResourceClientScriptItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes));
+                if (bClient && IsFilenameUsed(strFilename, true))
+                {
+                    CLogger::LogPrintf("WARNING: Ignoring duplicate client script file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
+                    bClient = false;
+                }
+                if (bServer && IsFilenameUsed(strFilename, false))
+                {
+                    CLogger::LogPrintf("WARNING: Duplicate script file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
+                }
+
+                // Extract / get the filepath of the file
+                if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
+                {
+                    // Create it depending on the type (client or server or shared) and add it to the list of resource files
+                    if (bServer)
+                        m_ResourceFiles.push_back(new CResourceScriptItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes));
+                    if (bClient)
+                        m_ResourceFiles.push_back(new CResourceClientScriptItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes));
+                }
+                else
+                {
+                    m_strFailureReason = SString("Couldn't find script %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    CLogger::ErrorPrintf(m_strFailureReason);
+                    return false;
+                }
             }
             else
             {
-                m_strFailureReason = SString("Couldn't find script %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
-                CLogger::ErrorPrintf(m_strFailureReason);
-                return false;
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'script' node of 'meta.xml' for resource '%s', ignoring\n",
+                                   m_strResourceName.c_str());
             }
         }
         else
@@ -1763,25 +1714,34 @@ bool CResource::ReadIncludedMaps(CXMLNode* pRoot)
 
         if (pSrc)
         {
-            string strFilename = pSrc->GetValue();
-            string strFullFilename;
-            ReplaceSlashes(strFilename);
+            std::string strFilename = pSrc->GetValue();
 
-            if (IsFilenameUsed(strFilename, false))
+            if (!strFilename.empty())
             {
-                CLogger::LogPrintf("WARNING: Duplicate map file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
-            }
+                std::string strFullFilename;
+                ReplaceSlashes(strFilename);
 
-            // Grab the file (evt extract it). Make a map item resource and put it into the resourcefiles list
-            if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
-            {
-                m_ResourceFiles.push_back(new CResourceMapItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, iDimension));
+                if (IsFilenameUsed(strFilename, false))
+                {
+                    CLogger::LogPrintf("WARNING: Duplicate map file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
+                }
+
+                // Grab the file (evt extract it). Make a map item resource and put it into the resourcefiles list
+                if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
+                {
+                    m_ResourceFiles.push_back(new CResourceMapItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, iDimension));
+                }
+                else
+                {
+                    m_strFailureReason = SString("Couldn't find map %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    CLogger::ErrorPrintf(m_strFailureReason);
+                    return false;
+                }
             }
             else
             {
-                m_strFailureReason = SString("Couldn't find map %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
-                CLogger::ErrorPrintf(m_strFailureReason);
-                return false;
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'map' node of 'meta.xml' for resource '%s', ignoring\n",
+                                   m_strResourceName.c_str());
             }
         }
         else
@@ -2377,7 +2337,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
         return g_pGame->GetHTTPD()->RequestLogin(ipoHttpRequest, ipoHttpResponse);
     }
 
-    #define MAX_INPUT_VARIABLES       25
+#define MAX_INPUT_VARIABLES 25
 
     if (m_eState != EResourceState::Running)
     {
@@ -2882,6 +2842,83 @@ void CResource::SendNoClientCacheScripts(CPlayer* pPlayer)
             }
         }
     }
+}
+
+bool CResource::UnzipResource()
+{
+    m_zipfile = unzOpenUtf8(m_strResourceZip.c_str());
+
+    if (!m_zipfile)
+        return false;
+
+    // See if the dir already exists
+    bool bDirExists = DoesDirectoryExist(m_strResourceCachePath.c_str());
+
+    // If the folder doesn't exist, create it
+    if (!bDirExists)
+    {
+        // If we're using a zip file, we need a temp directory for extracting
+        // 17 = already exists (on windows)
+        if (File::Mkdir(m_strResourceCachePath.c_str()) == -1 && errno != EEXIST)            // check this is the correct return for *NIX too
+        {
+            // Show error
+            m_strFailureReason = SString("Couldn't create directory '%s' for resource '%s', check that the server has write access to the resources folder.\n",
+                                         m_strResourceCachePath.c_str(), m_strResourceName.c_str());
+            CLogger::ErrorPrintf(m_strFailureReason);
+            return false;
+        }
+    }
+
+    std::vector<char> strFileName;
+    std::string       strPath;
+
+    if (unzGoToFirstFile(m_zipfile) == UNZ_OK)
+    {
+        do
+        {
+            // Check if we have this file already extracted
+            unz_file_info fileInfo = {0};
+
+            if (unzGetCurrentFileInfo(m_zipfile, &fileInfo, nullptr, 0, nullptr, 0, nullptr, 0) != UNZ_OK)
+                return false;
+
+            strFileName.reserve(fileInfo.size_filename + 1);
+            unzGetCurrentFileInfo(m_zipfile, &fileInfo, strFileName.data(), strFileName.capacity() - 1, nullptr, 0, nullptr, 0);
+
+            // Check if the current file is a directory path
+            if (strFileName[fileInfo.size_filename - 1] == '/')
+                continue;
+
+            strFileName[fileInfo.size_filename] = '\0';
+            strPath = m_strResourceCachePath + strFileName.data();
+
+            if (FileExists(strPath))
+            {
+                // We've already got a cached copy of this file, check its still the same
+                unsigned long ulFileInZipCRC = fileInfo.crc;
+                unsigned long ulFileOnDiskCRC = CRCGenerator::GetCRCFromFile(strPath.c_str());
+
+                if (ulFileInZipCRC == ulFileOnDiskCRC)
+                    continue;            // we've already extracted EXACTLY this file before
+
+                RemoveFile(strPath.c_str());
+            }
+
+            // Doesn't exist or bad crc
+            int opt_extract_without_path = 0;
+            int opt_overwrite = 1;
+            int ires = do_extract_currentfile(m_zipfile, &opt_extract_without_path, &opt_overwrite, nullptr, m_strResourceCachePath.c_str());
+
+            if (ires != UNZ_OK)
+                return false;
+        }
+        while (unzGoToNextFile(m_zipfile) != UNZ_END_OF_LIST_OF_FILE);
+    }
+
+    // Close the zip file
+    unzClose(m_zipfile);
+    m_zipfile = nullptr;
+    return true;
 }
 
 unsigned long get_current_file_crc(unzFile uf)
