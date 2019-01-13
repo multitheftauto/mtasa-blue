@@ -2013,10 +2013,6 @@ int CLuaFunctionDefs::GetNetworkRequestInfo(lua_State* luaVM)
         info.PushAsTable(luaVM);
         return 1;
     }
-    else
-    {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    }
 
     lua_pushboolean(luaVM, false);
     return 1;
