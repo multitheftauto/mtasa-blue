@@ -27,8 +27,6 @@ DECLARE_ENUM(CAccessControlListRight::ERightType);
 DECLARE_ENUM(CElement::EElementType);
 DECLARE_ENUM(CAccountPassword::EAccountPasswordType);
 
-class CRemoteCall;
-
 enum eHudComponent
 {
     HUD_AMMO,

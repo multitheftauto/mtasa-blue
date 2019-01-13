@@ -760,12 +760,24 @@ int CLuaFunctionDefs::GetNetworkRequestInfo(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     CLuaArguments    info, requestedHeaders;
     CRemoteCall*     pRemoteCall = nullptr;
+    CResource*       pThisResource = m_pResourceManager->GetResourceFromLuaState(luaVM);
 
     argStream.ReadUserData(pRemoteCall);
 
     if (!argStream.HasErrors())
     {
         CResource* pResource = pRemoteCall->GetVM()->GetResource();
+
+        SString strResourceFuncName("%s.function.getNetworkRequestInfo", pResource->GetName().c_str());
+
+        if (pThisResource != pResource && 
+            !m_pACLManager->CanObjectUseRight(pThisResource->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, strResourceFuncName, CAccessControlListRight::RIGHT_TYPE_RESOURCE, false) &&
+            !m_pACLManager->CanObjectUseRight(pThisResource->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, "*.function.getNetworkRequestInfo", CAccessControlListRight::RIGHT_TYPE_RESOURCE, false))
+        {
+            m_pScriptDebugging->LogBadAccess(luaVM);
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
 
         info.PushString("type");
         info.PushString((pRemoteCall->IsFetch() ? "fetch" : "call"));
