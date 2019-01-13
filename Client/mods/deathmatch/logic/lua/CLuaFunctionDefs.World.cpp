@@ -1956,12 +1956,20 @@ int CLuaFunctionDefs::GetNetworkRequestInfo(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     CLuaArguments    info, requestedHeaders;
     CRemoteCall*     pRemoteCall = nullptr;
+    CResource*       pThisResource = g_pClientGame->GetResourceManager()->GetResourceFromLuaState(luaVM);
 
     argStream.ReadUserData(pRemoteCall);
 
     if (!argStream.HasErrors())
     {
         CResource* pResource = pRemoteCall->GetVM()->GetResource();
+
+        if (pResource != pThisResource)
+        {
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
         info.PushString("type");
         info.PushString((pRemoteCall->IsFetch() ? "fetch" : "call"));
         info.PushString("url");
