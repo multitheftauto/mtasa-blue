@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CLuaBlipDefs::LoadFunctions(void)
+void CLuaBlipDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"createBlip", CreateBlip},

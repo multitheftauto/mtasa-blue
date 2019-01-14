@@ -19,7 +19,7 @@ CStack<unsigned long, 1> CXMLArray::m_IDStack;
 std::vector<CXMLCommon*> CXMLArray::m_Elements;
 unsigned long            CXMLArray::m_ulCapacity = 0;
 
-void CXMLArray::Initialize(void)
+void CXMLArray::Initialize()
 {
     m_ulCapacity = 0;
     ExpandBy(20000);
@@ -88,12 +88,12 @@ void CXMLArray::ExpandBy(unsigned long ulAmount)
     assert(m_IDStack.GetCapacity() == m_ulCapacity);
 }
 
-unsigned long CXMLArray::GetCapacity(void)
+unsigned long CXMLArray::GetCapacity()
 {
     return m_ulCapacity;
 }
 
-unsigned long CXMLArray::GetUnusedAmount(void)
+unsigned long CXMLArray::GetUnusedAmount()
 {
     return m_IDStack.GetUnusedAmount();
 }

@@ -16,7 +16,7 @@ using namespace std;
 static CConnectManager* g_pConnectManager = NULL;
 extern CCore*           g_pCore;
 
-CConnectManager::CConnectManager(void)
+CConnectManager::CConnectManager()
 {
     g_pConnectManager = this;
 
@@ -34,7 +34,7 @@ CConnectManager::CConnectManager(void)
     m_bNotifyServerBrowser = false;
 }
 
-CConnectManager::~CConnectManager(void)
+CConnectManager::~CConnectManager()
 {
     if (m_pOnCancelClick)
     {
@@ -196,7 +196,7 @@ bool CConnectManager::Event_OnCancelClick(CGUIElement* pElement)
     return true;
 }
 
-bool CConnectManager::Abort(void)
+bool CConnectManager::Abort()
 {
     // Stop the attempt
     CNet* pNet = CCore::GetSingleton().GetNetwork();
@@ -219,7 +219,7 @@ bool CConnectManager::Abort(void)
     return true;
 }
 
-void CConnectManager::DoPulse(void)
+void CConnectManager::DoPulse()
 {
     // Are we connecting?
     if (m_bIsConnecting)
@@ -449,7 +449,7 @@ bool CConnectManager::CheckNickProvided(const char* szNick)
 //
 // Called at least once (maybe more) if a MTA server exists at the current address/port
 //
-void CConnectManager::OnServerExists(void)
+void CConnectManager::OnServerExists()
 {
     if (m_bNotifyServerBrowser)
     {

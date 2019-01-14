@@ -54,7 +54,7 @@ class CWorldSA : public CWorld
 {
 public:
     CWorldSA();
-    void InstallHooks(void);
+    void InstallHooks();
     void Add(CEntity* entity, eDebugCaller CallerId);
     void Add(CEntitySAInterface* entityInterface, eDebugCaller CallerId);
     void Remove(CEntity* entity, eDebugCaller CallerId);
@@ -71,16 +71,16 @@ public:
     void  LoadMapAroundPoint(CVector* vecPosition, float fRadius);
     bool  IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd, const SLineOfSightFlags flags);
     bool  HasCollisionBeenLoaded(CVector* vecPosition);
-    DWORD GetCurrentArea(void);
+    DWORD GetCurrentArea();
     void  SetCurrentArea(DWORD dwArea);
     void  SetJetpackMaxHeight(float fHeight);
-    float GetJetpackMaxHeight(void);
+    float GetJetpackMaxHeight();
     void  SetAircraftMaxHeight(float fHeight);
-    float GetAircraftMaxHeight(void);
+    float GetAircraftMaxHeight();
     void  SetAircraftMaxVelocity(float fVelocity);
-    float GetAircraftMaxVelocity(void);
+    float GetAircraftMaxVelocity();
     void  SetOcclusionsEnabled(bool bEnabled);
-    bool  GetOcclusionsEnabled(void);
+    bool  GetOcclusionsEnabled();
     void  FindWorldPositionForRailTrackPosition(float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition);
     int   FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance);
 

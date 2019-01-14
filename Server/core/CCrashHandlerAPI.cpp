@@ -107,10 +107,10 @@ LPCTSTR __stdcall InternalGetStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* 
 BOOL InternalSymGetLineFromAddr(IN HANDLE hProcess, IN DWORD dwAddr, OUT PDWORD pdwDisplacement, OUT PIMAGEHLP_LINE Line);
 
 // Initializes the symbol engine if needed
-void InitSymEng(void);
+void InitSymEng();
 
 // Cleans up the symbol engine if needed
-void CleanupSymEng(void);
+void CleanupSymEng();
 
 /*//////////////////////////////////////////////////////////////////////
                             Destructor Class
@@ -122,8 +122,8 @@ void CleanupSymEng(void);
 class CleanUpCrashHandler
 {
 public:
-    CleanUpCrashHandler(void) {}
-    ~CleanUpCrashHandler(void)
+    CleanUpCrashHandler() {}
+    ~CleanUpCrashHandler()
     {
         // Are there any outstanding memory allocations?
         if (NULL != g_ahMod)
@@ -237,7 +237,7 @@ BOOL __stdcall AddCrashHandlerLimitModule(HMODULE hMod)
     return (TRUE);
 }
 
-UINT __stdcall GetLimitModuleCount(void)
+UINT __stdcall GetLimitModuleCount()
 {
     return (g_uiModCount);
 }
@@ -1001,7 +1001,7 @@ BOOL InternalSymGetLineFromAddr(IN HANDLE hProcess, IN DWORD dwAddr, OUT PDWORD 
 }
 
 // Initializes the symbol engine if needed
-void InitSymEng(void)
+void InitSymEng()
 {
     if (FALSE == g_bSymEngInit)
     {
@@ -1020,7 +1020,7 @@ void InitSymEng(void)
 }
 
 // Cleans up the symbol engine if needed
-void CleanupSymEng(void)
+void CleanupSymEng()
 {
     if (TRUE == g_bSymEngInit)
     {
@@ -1037,7 +1037,7 @@ static BOOL g_bHasVersion = FALSE;
 // Indicates NT or 95/98.
 static BOOL g_bIsNT = TRUE;
 
-BOOL __stdcall IsNT(void)
+BOOL __stdcall IsNT()
 {
     if (TRUE == g_bHasVersion)
     {
@@ -1262,7 +1262,7 @@ RETURNS         :
     TRUE  - Everything initialized properly.
     FALSE - There was a problem.
 ----------------------------------------------------------------------*/
-static BOOL InitPSAPI(void)
+static BOOL InitPSAPI()
 {
     if (TRUE == g_bInitialized)
     {
@@ -1510,7 +1510,7 @@ RETURNS         :
     TRUE  - Everything initialized properly.
     FALSE - There was a problem.
 ----------------------------------------------------------------------*/
-static BOOL InitTOOLHELP32(void)
+static BOOL InitTOOLHELP32()
 {
     if (TRUE == g_bInitialized)
     {

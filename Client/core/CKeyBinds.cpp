@@ -285,7 +285,7 @@ CKeyBinds::CKeyBinds(CCore* pCore)
     m_bWaitingToLoadDefaults = false;
 }
 
-CKeyBinds::~CKeyBinds(void)
+CKeyBinds::~CKeyBinds()
 {
     Clear();
     delete m_pList;
@@ -498,7 +498,7 @@ void CKeyBinds::Remove(CKeyBind* pKeyBind)
     }
 }
 
-void CKeyBinds::Clear(void)
+void CKeyBinds::Clear()
 {
     list<CKeyBind*>::const_iterator iter = m_pList->begin();
     for (; iter != m_pList->end(); iter++)
@@ -509,7 +509,7 @@ void CKeyBinds::Clear(void)
     m_pList->clear();
 }
 
-void CKeyBinds::RemoveDeletedBinds(void)
+void CKeyBinds::RemoveDeletedBinds()
 {
     list<CKeyBind*>::iterator iter = m_pList->begin();
     while (iter != m_pList->end())
@@ -524,7 +524,7 @@ void CKeyBinds::RemoveDeletedBinds(void)
     }
 }
 
-void CKeyBinds::ClearCommandsAndControls(void)
+void CKeyBinds::ClearCommandsAndControls()
 {
     list<CKeyBind*>*                keyList = new list<CKeyBind*>;
     list<CKeyBind*>::const_iterator iter = m_pList->begin();
@@ -730,7 +730,7 @@ bool CKeyBinds::RemoveAllCommands(const char* szKey, bool bCheckState, bool bSta
     return bFound;
 }
 
-bool CKeyBinds::RemoveAllCommands(void)
+bool CKeyBinds::RemoveAllCommands()
 {
     bool                      bFound = false;
     list<CKeyBind*>           cloneList = *m_pList;
@@ -953,7 +953,7 @@ void CKeyBinds::UserChangeCommandBoundKey(CCommandBind* pBind, const SBindableKe
 //
 // Sort command binds for consistency in settings gui
 //
-void CKeyBinds::SortCommandBinds(void)
+void CKeyBinds::SortCommandBinds()
 {
     struct Sorter
     {
@@ -1106,7 +1106,7 @@ bool CKeyBinds::RemoveAllGTAControls(const char* szKey)
     return bFound;
 }
 
-bool CKeyBinds::RemoveAllGTAControls(void)
+bool CKeyBinds::RemoveAllGTAControls()
 {
     bool                      bFound = false;
     list<CKeyBind*>::iterator iter = m_pList->begin();
@@ -1376,7 +1376,7 @@ void CKeyBinds::ResetGTAControlState(SBindableGTAControl* pControl)
     }
 }
 
-void CKeyBinds::ResetAllGTAControlStates(void)
+void CKeyBinds::ResetAllGTAControlStates()
 {
     // Set all our control states to false
     for (int i = 0; *g_bcControls[i].szControl != NULL; i++)
@@ -1518,7 +1518,7 @@ bool CKeyBinds::RemoveAllFunctions(KeyFunctionBindHandler Handler)
     return bFound;
 }
 
-bool CKeyBinds::RemoveAllFunctions(void)
+bool CKeyBinds::RemoveAllFunctions()
 {
     bool                      bFound = false;
     list<CKeyBind*>::iterator iter = m_pList->begin();
@@ -1700,7 +1700,7 @@ bool CKeyBinds::RemoveAllControlFunctions(ControlFunctionBindHandler Handler)
     return bFound;
 }
 
-bool CKeyBinds::RemoveAllControlFunctions(void)
+bool CKeyBinds::RemoveAllControlFunctions()
 {
     bool                      bFound = false;
     list<CKeyBind*>::iterator iter = m_pList->begin();
@@ -2013,7 +2013,7 @@ unsigned int CKeyBinds::Count(eKeyBindType bindType)
     return uiCount;
 }
 
-void CKeyBinds::DoPreFramePulse(void)
+void CKeyBinds::DoPreFramePulse()
 {
     CControllerState cs;
     m_pCore->GetGame()->GetPad()->GetCurrentControllerState(&cs);
@@ -2053,7 +2053,7 @@ void CKeyBinds::DoPreFramePulse(void)
     }
 }
 
-void CKeyBinds::DoPostFramePulse(void)
+void CKeyBinds::DoPostFramePulse()
 {
     eSystemState SystemState = CCore::GetSingleton().GetGame()->GetSystemState();
 
@@ -2422,7 +2422,7 @@ bool CKeyBinds::SaveToXML(CXMLNode* pMainNode)
     return false;
 }
 
-void CKeyBinds::LoadDefaultBinds(void)
+void CKeyBinds::LoadDefaultBinds()
 {
     ClearCommandsAndControls();
 
@@ -2440,7 +2440,7 @@ void CKeyBinds::LoadDefaultCommands(bool bForce)
     }
 }
 
-void CKeyBinds::LoadControlsFromGTA(void)
+void CKeyBinds::LoadControlsFromGTA()
 {
     for (int i = FIRE; i <= GROUP_CONTROL_BACK; i++)
     {

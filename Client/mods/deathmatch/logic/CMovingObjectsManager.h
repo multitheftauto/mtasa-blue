@@ -24,7 +24,7 @@ public:
             m_List.remove(pObject);
     };
 
-    void DoPulse(void);
+    void DoPulse();
 
 private:
     std::list<CDeathmatchObject*> m_List;

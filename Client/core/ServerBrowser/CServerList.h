@@ -97,7 +97,7 @@ class CServerListItem
     friend class CServerList;
 
 public:
-    CServerListItem(void)
+    CServerListItem()
     {
         Address.S_un.S_addr = 0;
         usGamePort = 0;
@@ -109,7 +109,7 @@ public:
         Init();
     }
     CServerListItem(in_addr _Address, unsigned short _usGamePort, CServerListItemList* pItemList = NULL, bool bAtFront = false);
-    ~CServerListItem(void);
+    ~CServerListItem();
     void ChangeAddress(in_addr _Address, unsigned short _usGamePort);
 
     static bool Parse(const char* szAddress, in_addr& Address)
@@ -132,7 +132,7 @@ public:
 
     bool operator==(const CServerListItem& other) const { return (Address.S_un.S_addr == other.Address.S_un.S_addr && usGamePort == other.usGamePort); }
 
-    void Init(void)
+    void Init()
     {
         MapInsert(ms_ValidServerListItemMap, this);
         // Initialize variables
@@ -172,7 +172,7 @@ public:
         m_iBuildNumber = 0;
     }
 
-    void CloseSocket(void)
+    void CloseSocket()
     {
         if (m_Socket != INVALID_SOCKET)
         {
@@ -182,10 +182,10 @@ public:
     }
 
     bool           ParseQuery(const char* szBuffer, unsigned int nLength);
-    void           Query(void);
+    void           Query();
     std::string    Pulse(bool bCanSendQuery, bool bRemoveNonResponding = false);
-    void           ResetForRefresh(void);
-    unsigned short GetQueryPort(void);
+    void           ResetForRefresh();
+    unsigned short GetQueryPort();
 
     in_addr        AddressCopy;            // Copy to ensure it doesn't get changed without us knowing
     unsigned short usGamePortCopy;
@@ -230,13 +230,13 @@ public:
 
     std::vector<SString> vecPlayers;
 
-    bool WaitingToSendQuery(void) const { return !bScanned && !bSkipped && m_Socket == INVALID_SOCKET; }
+    bool WaitingToSendQuery() const { return !bScanned && !bSkipped && m_Socket == INVALID_SOCKET; }
 
-    const SString& GetEndpoint(void) const { return strEndpoint; }
+    const SString& GetEndpoint() const { return strEndpoint; }
 
-    const SString& GetEndpointSortKey(void) const { return strEndpointSortKey; }
+    const SString& GetEndpointSortKey() const { return strEndpointSortKey; }
 
-    void PostChange(void)
+    void PostChange()
     {
         // Update tie break sort key
         strTieBreakSortKey = SString("%04d", uiTieBreakPosition);
@@ -278,9 +278,9 @@ public:
             strSearchableName = strName;
     }
 
-    const SString& GetVersionSortKey(void) const { return strVersionSortKey; }
+    const SString& GetVersionSortKey() const { return strVersionSortKey; }
 
-    bool MaybeWontRespond(void) const
+    bool MaybeWontRespond() const
     {
         if (bMasterServerSaysNoResponse || uiCacheNoReplyCount > 0)
             if (GetDataQuality() < SERVER_INFO_QUERY)
@@ -294,9 +294,9 @@ public:
         m_iDataQuality = iDataQuality;
         uiRevision++;
     }
-    int GetDataQuality(void) const { return m_iDataQuality; }
+    int GetDataQuality() const { return m_iDataQuality; }
 
-    uint GetMaxRetries(void) const { return GetDataQuality() <= SERVER_INFO_ASE_0 || MaybeWontRespond() ? 0 : 1; }
+    uint GetMaxRetries() const { return GetDataQuality() <= SERVER_INFO_ASE_0 || MaybeWontRespond() ? 0 : 1; }
 
     static bool StaticIsValid(CServerListItem* pServer) { return MapContains(ms_ValidServerListItemMap, pServer); }
 
@@ -338,7 +338,7 @@ class CServerListItemList
     std::map<SAddressPort, CServerListItem*> m_AddressMap;
 
 public:
-    std::list<CServerListItem*>& GetList(void) { return m_List; }
+    std::list<CServerListItem*>& GetList() { return m_List; }
 
     std::list<CServerListItem*>::iterator begin() { return m_List.begin(); }
 
@@ -350,8 +350,8 @@ public:
 
     size_t size() const { return m_List.size(); }
 
-    ~CServerListItemList(void);
-    void             DeleteAll(void);
+    ~CServerListItemList();
+    void             DeleteAll();
     CServerListItem* Find(in_addr Address, ushort usGamePort);
     CServerListItem* AddUnique(in_addr Address, ushort usGamePort, bool bAtFront = false);
     void             AddNewItem(CServerListItem* pItem, bool bAtFront);
@@ -363,29 +363,29 @@ public:
 class CServerList
 {
 public:
-    CServerList(void);
-    virtual ~CServerList(void);
+    CServerList();
+    virtual ~CServerList();
 
     // Base implementation scans all listed servers
-    virtual void Pulse(void);
-    virtual void Refresh(void);
-    virtual bool RemoveNonResponding(void) { return true; }
+    virtual void Pulse();
+    virtual void Refresh();
+    virtual bool RemoveNonResponding() { return true; }
 
-    CServerListIterator        IteratorBegin(void) { return m_Servers.begin(); };
-    CServerListIterator        IteratorEnd(void) { return m_Servers.end(); };
-    CServerListReverseIterator ReverseIteratorBegin(void) { return m_Servers.rbegin(); };
-    CServerListReverseIterator ReverseIteratorEnd(void) { return m_Servers.rend(); };
-    unsigned int               GetServerCount(void) { return m_Servers.size(); };
+    CServerListIterator        IteratorBegin() { return m_Servers.begin(); };
+    CServerListIterator        IteratorEnd() { return m_Servers.end(); };
+    CServerListReverseIterator ReverseIteratorBegin() { return m_Servers.rbegin(); };
+    CServerListReverseIterator ReverseIteratorEnd() { return m_Servers.rend(); };
+    unsigned int               GetServerCount() { return m_Servers.size(); };
 
     bool AddUnique(in_addr Address, ushort usGamePort, bool addAtFront = false);
-    void Clear(void);
+    void Clear();
     bool Remove(in_addr Address, ushort usGamePort);
 
-    std::string& GetStatus(void) { return m_strStatus; };
-    bool         IsUpdated(void) { return m_bUpdated; };
+    std::string& GetStatus() { return m_strStatus; };
+    bool         IsUpdated() { return m_bUpdated; };
     void         SetUpdated(bool bUpdated) { m_bUpdated = bUpdated; };
-    int          GetRevision(void) { return m_iRevision; }
-    void         SortByASEVersion(void);
+    int          GetRevision() { return m_iRevision; }
+    void         SortByASEVersion();
 
 protected:
     bool                m_bUpdated;
@@ -403,11 +403,11 @@ protected:
 class CServerListInternet : public CServerList
 {
 public:
-    CServerListInternet(void);
-    ~CServerListInternet(void);
-    void Pulse(void);
-    void Refresh(void);
-    bool RemoveNonResponding(void) { return m_nScanned > 10; }            // Don't remove until net access is confirmed
+    CServerListInternet();
+    ~CServerListInternet();
+    void Pulse();
+    void Refresh();
+    bool RemoveNonResponding() { return m_nScanned > 10; }            // Don't remove until net access is confirmed
 
 private:
     CMasterServerManagerInterface* m_pMasterServerManager;
@@ -418,11 +418,11 @@ private:
 class CServerListLAN : public CServerList
 {
 public:
-    void Pulse(void);
-    void Refresh(void);
+    void Pulse();
+    void Refresh();
 
 private:
-    void Discover(void);
+    void Discover();
 
     int           m_Socket;
     sockaddr_in   m_Remote;

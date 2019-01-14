@@ -21,9 +21,9 @@ class CClientDFFManager
 
 public:
     CClientDFFManager(class CClientManager* pManager);
-    ~CClientDFFManager(void);
+    ~CClientDFFManager();
 
-    void RemoveAll(void);
+    void RemoveAll();
     bool Exists(CClientDFF* pDFF);
 
     CClientDFF* GetElementThatReplaced(unsigned short usModel, CClientDFF* pDontSearch = NULL);
@@ -31,8 +31,8 @@ public:
     static bool IsReplacableModel(unsigned short usModel);
     bool        RestoreModel(unsigned short usModel);
 
-    std::list<CClientDFF*>::const_iterator IterBegin(void) { return m_List.begin(); }
-    std::list<CClientDFF*>::const_iterator IterEnd(void) { return m_List.end(); }
+    std::list<CClientDFF*>::const_iterator IterBegin() { return m_List.begin(); }
+    std::list<CClientDFF*>::const_iterator IterEnd() { return m_List.end(); }
 
 private:
     void AddToList(CClientDFF* pDFF) { m_List.push_back(pDFF); }

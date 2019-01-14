@@ -20,7 +20,7 @@ CGUITexture_Impl::CGUITexture_Impl(CGUI_Impl* pGUI)
     m_pTexture = m_pRenderer->createTexture();
 }
 
-CGUITexture_Impl::~CGUITexture_Impl(void)
+CGUITexture_Impl::~CGUITexture_Impl()
 {
     if (m_pTexture)
         m_pRenderer->destroyTexture(m_pTexture);
@@ -45,14 +45,14 @@ void CGUITexture_Impl::LoadFromMemory(const void* pBuffer, unsigned int uiWidth,
     m_pTexture->loadFromMemory(pBuffer, uiWidth, uiHeight);
 }
 
-void CGUITexture_Impl::Clear(void)
+void CGUITexture_Impl::Clear()
 {
     // Destroy the previous texture and recreate it (empty)
     m_pRenderer->destroyTexture(m_pTexture);
     m_pTexture = m_pRenderer->createTexture();
 }
 
-CEGUI::Texture* CGUITexture_Impl::GetTexture(void)
+CEGUI::Texture* CGUITexture_Impl::GetTexture()
 {
     return m_pTexture;
 }
@@ -62,7 +62,7 @@ void CGUITexture_Impl::SetTexture(CEGUI::Texture* pTexture)
     m_pTexture = pTexture;
 }
 
-LPDIRECT3DTEXTURE9 CGUITexture_Impl::GetD3DTexture(void)
+LPDIRECT3DTEXTURE9 CGUITexture_Impl::GetD3DTexture()
 {
     return reinterpret_cast<CEGUI::DirectX9Texture*>(m_pTexture)->getD3DTexture();
 }

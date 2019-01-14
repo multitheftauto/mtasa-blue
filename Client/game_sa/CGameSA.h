@@ -351,34 +351,34 @@ public:
 
     VOID SetRenderHook(InRenderer* pInRenderer);
 
-    void Initialize(void);
-    void Reset(void);
-    void Terminate(void);
+    void Initialize();
+    void Reset();
+    void Terminate();
 
-    eGameVersion GetGameVersion(void);
-    eGameVersion FindGameVersion(void);
+    eGameVersion GetGameVersion();
+    eGameVersion FindGameVersion();
 
-    float GetFPS(void);
-    float GetTimeStep(void);
-    float GetOldTimeStep(void);
-    float GetTimeScale(void);
+    float GetFPS();
+    float GetTimeStep();
+    float GetOldTimeStep();
+    float GetTimeScale();
     void  SetTimeScale(float fTimeScale);
 
     BOOL InitLocalPlayer(class CClientPed* pClientPed);
 
-    float GetGravity(void);
+    float GetGravity();
     void  SetGravity(float fGravity);
 
-    float GetGameSpeed(void);
+    float GetGameSpeed();
     void  SetGameSpeed(float fSpeed);
 
-    unsigned char GetBlurLevel(void);
+    unsigned char GetBlurLevel();
     void          SetBlurLevel(unsigned char ucLevel);
 
     void SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled);
     bool GetJetpackWeaponEnabled(eWeaponType weaponType);
 
-    unsigned long GetMinuteDuration(void);
+    unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
 
     bool IsCheatEnabled(const char* szCheatName);
@@ -399,25 +399,25 @@ public:
 
     bool VerifySADataFileNames();
     bool PerformChecks();
-    int& GetCheckStatus(void) { return m_iCheckStatus; }
+    int& GetCheckStatus() { return m_iCheckStatus; }
 
     void SetAsyncLoadingFromScript(bool bScriptEnabled, bool bScriptForced);
     void SuspendASyncLoading(bool bSuspend, uint uiAutoUnsuspendDelay = 0);
     bool IsASyncLoadingEnabled(bool bIgnoreSuspend = false);
 
-    bool HasCreditScreenFadedOut(void);
+    bool HasCreditScreenFadedOut();
 
-    void         SetupSpecialCharacters(void);
-    CWeapon*     CreateWeapon(void);
+    void         SetupSpecialCharacters();
+    CWeapon*     CreateWeapon();
     CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill);
-    void         FlushPendingRestreamIPL(void);
-    void         ResetModelLodDistances(void);
-    void         ResetAlphaTransparencies(void);
+    void         FlushPendingRestreamIPL();
+    void         ResetModelLodDistances();
+    void         ResetAlphaTransparencies();
+    void         DisableVSync();
     void         ResetModelTimes(void);
-    void         DisableVSync(void);
 
     void  OnPedContextChange(CPed* pPedContext);
-    CPed* GetPedContext(void);
+    CPed* GetPedContext();
 
     void GetShaderReplacementStats(SShaderReplacementStats& outStats);
 

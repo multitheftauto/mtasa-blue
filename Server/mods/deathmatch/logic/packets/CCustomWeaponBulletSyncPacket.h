@@ -13,19 +13,19 @@
 class CCustomWeaponBulletSyncPacket : public CPacket
 {
 public:
-    CCustomWeaponBulletSyncPacket(void){};
+    CCustomWeaponBulletSyncPacket(){};
     CCustomWeaponBulletSyncPacket(class CPlayer* pPlayer);
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_WEAPON_BULLETSYNC; };
-    unsigned long GetFlags(void) const { return PACKET_MEDIUM_PRIORITY | PACKET_RELIABLE; };
+    ePacketID     GetPacketID() const { return PACKET_ID_WEAPON_BULLETSYNC; };
+    unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_RELIABLE; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;
 
-    CPlayer*       GetWeaponOwner(void) { return m_pWeapon != NULL ? m_pWeapon->GetOwner() : NULL; };
-    CCustomWeapon* GetWeapon(void) { return m_pWeapon; };
-    CVector        GetStart(void) { return m_vecStart; };
-    CVector        GetEnd(void) { return m_vecEnd; };
+    CPlayer*       GetWeaponOwner() { return m_pWeapon != NULL ? m_pWeapon->GetOwner() : NULL; };
+    CCustomWeapon* GetWeapon() { return m_pWeapon; };
+    CVector        GetStart() { return m_vecStart; };
+    CVector        GetEnd() { return m_vecEnd; };
 
     CCustomWeapon* m_pWeapon;
     CVector        m_vecStart;

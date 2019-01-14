@@ -29,7 +29,7 @@ class CPedDamageResponseSA : public CPedDamageResponse
 public:
     CPedDamageResponseSA(CPedDamageResponseSAInterface* pInterface) { m_pInterface = pInterface; }
 
-    CPedDamageResponseSAInterface* GetInterface(void) { return m_pInterface; }
+    CPedDamageResponseSAInterface* GetInterface() { return m_pInterface; }
 
     void Calculate(CEntity* pEntity, float fDamage, eWeaponType weaponType, ePedPieceTypes bodyPart, bool b_1, bool bSpeak);
 

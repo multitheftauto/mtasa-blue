@@ -12,12 +12,12 @@
 
 using std::list;
 
-CClientModelRequestManager::CClientModelRequestManager(void)
+CClientModelRequestManager::CClientModelRequestManager()
 {
     m_bDoingPulse = false;
 }
 
-CClientModelRequestManager::~CClientModelRequestManager(void)
+CClientModelRequestManager::~CClientModelRequestManager()
 {
     // Delete all our requests.
     list<SClientModelRequest*>::iterator iter;
@@ -247,7 +247,7 @@ void CClientModelRequestManager::Cancel(CClientEntity* pEntity, bool bAllowQueue
     }
 }
 
-void CClientModelRequestManager::DoPulse(void)
+void CClientModelRequestManager::DoPulse()
 {
     // Any requests?
     if (m_Requests.size() > 0)

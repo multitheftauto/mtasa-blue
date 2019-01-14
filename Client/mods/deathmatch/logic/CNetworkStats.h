@@ -18,11 +18,11 @@ class CNetworkStats
 public:
     CNetworkStats(CClientDisplayManager* pDisplayManager);
 
-    void Draw(void);
-    void Reset(void);
+    void Draw();
+    void Reset();
 
 private:
-    void Update(void);
+    void Update();
 
     CClientDisplayManager* m_pDisplayManager;
 

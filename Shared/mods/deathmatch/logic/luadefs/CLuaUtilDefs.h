@@ -14,7 +14,7 @@
 class CLuaUtilDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     // Reserved functions
     LUA_DECLARE(DisabledFunction);

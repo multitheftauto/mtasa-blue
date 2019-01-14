@@ -22,7 +22,7 @@ CScriptDebugging::CScriptDebugging(CLuaManager* pLuaManager)
     m_bTriggeringMessageEvent = false;
 }
 
-CScriptDebugging::~CScriptDebugging(void)
+CScriptDebugging::~CScriptDebugging()
 {
     // Flush any pending duplicate loggings
     m_DuplicateLineFilter.Flush();
@@ -71,7 +71,7 @@ bool CScriptDebugging::RemovePlayer(CPlayer& Player)
     return false;
 }
 
-void CScriptDebugging::ClearPlayers(void)
+void CScriptDebugging::ClearPlayers()
 {
     // Unreference us from all players that we are script logging to
     list<CPlayer*>::const_iterator iter = m_Players.begin();
@@ -113,7 +113,7 @@ bool CScriptDebugging::SetLogfile(const char* szFilename, unsigned int uiLevel)
     return false;
 }
 
-void CScriptDebugging::UpdateLogOutput(void)
+void CScriptDebugging::UpdateLogOutput()
 {
     SLogLine line;
     while (m_DuplicateLineFilter.PopOutputLine(line))

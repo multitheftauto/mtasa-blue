@@ -32,7 +32,7 @@ void CObjectRespawner::Respawn(CClientObject* pObject)
     }
 }
 
-void CObjectRespawner::DoRespawnAll(void)
+void CObjectRespawner::DoRespawnAll()
 {
     for (uint i = 0; i < m_List.size(); i++)
     {

@@ -26,11 +26,11 @@ class CDatabaseManagerImpl : public CDatabaseManager
 {
 public:
     ZERO_ON_NEW
-    CDatabaseManagerImpl(void);
-    virtual ~CDatabaseManagerImpl(void);
+    CDatabaseManagerImpl();
+    virtual ~CDatabaseManagerImpl();
 
     // CDatabaseManager
-    virtual void              DoPulse(void);
+    virtual void              DoPulse();
     virtual SConnectionHandle Connect(const SString& strType, const SString& strHost, const SString& strUsername, const SString& strPassword,
                                       const SString& strOptions);
     virtual bool              Disconnect(SConnectionHandle hConnection);
@@ -43,8 +43,8 @@ public:
     virtual bool              QueryPoll(CDbJobData* pJobData, uint ulTimeout);
     virtual bool              QueryFree(CDbJobData* pJobData);
     virtual CDbJobData*       GetQueryFromId(SDbJobId id);
-    virtual const SString&    GetLastErrorMessage(void) { return m_strLastErrorMessage; }
-    virtual bool              IsLastErrorSuppressed(void) { return m_bLastErrorSuppressed; }
+    virtual const SString&    GetLastErrorMessage() { return m_strLastErrorMessage; }
+    virtual bool              IsLastErrorSuppressed() { return m_bLastErrorSuppressed; }
     virtual bool              QueryWithResultf(SConnectionHandle hConnection, CRegistryResult* pResult, const char* szQuery, ...);
     virtual bool              QueryWithCallback(SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const SString& strQuery,
                                                 CLuaArguments* pArgs = nullptr);
@@ -56,7 +56,7 @@ public:
     SString InsertQueryArguments(SConnectionHandle hConnection, const char* szQuery, va_list vl);
     SString HideQuestionMark(const SString& strQuery);
     SString RestoreQuestionMark(const SString& strQuery);
-    void    ClearLastErrorMessage(void)
+    void    ClearLastErrorMessage()
     {
         m_strLastErrorMessage.clear();
         m_bLastErrorSuppressed = false;
@@ -76,7 +76,7 @@ public:
 ///////////////////////////////////////////////////////////////
 // Object creation
 ///////////////////////////////////////////////////////////////
-CDatabaseManager* NewDatabaseManager(void)
+CDatabaseManager* NewDatabaseManager()
 {
     return new CDatabaseManagerImpl();
 }
@@ -88,7 +88,7 @@ CDatabaseManager* NewDatabaseManager(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseManagerImpl::CDatabaseManagerImpl(void)
+CDatabaseManagerImpl::CDatabaseManagerImpl()
 {
     m_JobQueue = new CDatabaseJobQueueManager();
 }
@@ -100,7 +100,7 @@ CDatabaseManagerImpl::CDatabaseManagerImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseManagerImpl::~CDatabaseManagerImpl(void)
+CDatabaseManagerImpl::~CDatabaseManagerImpl()
 {
     // Disconnect all active connections
     std::map<SConnectionHandle, SString> connectionTypeMapCopy = m_ConnectionTypeMap;
@@ -117,7 +117,7 @@ CDatabaseManagerImpl::~CDatabaseManagerImpl(void)
 // Check if any callback functions are due
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseManagerImpl::DoPulse(void)
+void CDatabaseManagerImpl::DoPulse()
 {
     m_JobQueue->DoPulse();
 }
@@ -646,7 +646,7 @@ SString CDatabaseManagerImpl::RestoreQuestionMark(const SString& strQuery)
 //
 //
 ///////////////////////////////////////////////////////////////
-CDbJobData::CDbJobData(void)
+CDbJobData::CDbJobData()
 {
     id = CIdArray::PopUniqueId(this, EIdClass::DB_JOBDATA);
 }
@@ -658,7 +658,7 @@ CDbJobData::CDbJobData(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CDbJobData::~CDbJobData(void)
+CDbJobData::~CDbJobData()
 {
     CIdArray::PushUniqueId(this, EIdClass::DB_JOBDATA, id);
 }
@@ -693,7 +693,7 @@ bool CDbJobData::SetCallback(PFN_DBRESULT pfnDbResult, void* pContext)
 // Returns true if callback has been set and has not been called yet
 //
 ///////////////////////////////////////////////////////////////
-bool CDbJobData::HasCallback(void)
+bool CDbJobData::HasCallback()
 {
     return callback.bSet && !callback.bDone;
 }
@@ -705,7 +705,7 @@ bool CDbJobData::HasCallback(void)
 // Do callback
 //
 ///////////////////////////////////////////////////////////////
-void CDbJobData::ProcessCallback(void)
+void CDbJobData::ProcessCallback()
 {
     assert(HasCallback());
     callback.bDone = true;
@@ -719,7 +719,7 @@ void CDbJobData::ProcessCallback(void)
 // Remove sensitive info
 //
 ///////////////////////////////////////////////////////////////
-SString CDbJobData::GetCommandStringForLog(void)
+SString CDbJobData::GetCommandStringForLog()
 {
     if (command.type == EJobCommand::CONNECT)
     {

@@ -34,19 +34,19 @@ struct SScriptBindableGTAControl
 class CScriptKeyBind
 {
 public:
-    CScriptKeyBind(void) : boundKey(NULL), luaMain(NULL), beingDeleted(false) {}
-    virtual ~CScriptKeyBind(void) {}
-    bool                       IsBeingDeleted(void) { return beingDeleted; }
+    CScriptKeyBind() : boundKey(NULL), luaMain(NULL), beingDeleted(false) {}
+    virtual ~CScriptKeyBind() {}
+    bool                       IsBeingDeleted() { return beingDeleted; }
     const SScriptBindableKey*  boundKey;
     CLuaMain*                  luaMain;
     bool                       beingDeleted;
-    virtual eScriptKeyBindType GetType(void) = 0;
+    virtual eScriptKeyBindType GetType() = 0;
 };
 
 class CScriptKeyBindWithState : public CScriptKeyBind
 {
 public:
-    CScriptKeyBindWithState(void) { bHitState = true; }
+    CScriptKeyBindWithState() { bHitState = true; }
     bool bHitState;
 };
 
@@ -60,21 +60,21 @@ public:
 class CScriptKeyFunctionBind : public CScriptKeyBindWithState, public CScriptFunctionBind
 {
 public:
-    eScriptKeyBindType GetType(void) { return SCRIPT_KEY_BIND_FUNCTION; }
+    eScriptKeyBindType GetType() { return SCRIPT_KEY_BIND_FUNCTION; }
 };
 
 class CScriptControlFunctionBind : public CScriptKeyBindWithState, public CScriptFunctionBind
 {
 public:
-    eScriptKeyBindType               GetType(void) { return SCRIPT_KEY_BIND_CONTROL_FUNCTION; }
+    eScriptKeyBindType               GetType() { return SCRIPT_KEY_BIND_CONTROL_FUNCTION; }
     const SScriptBindableGTAControl* boundControl;
 };
 
 class CScriptKeyBinds
 {
 public:
-    CScriptKeyBinds(void) : m_bProcessingKey(false) {}
-    ~CScriptKeyBinds(void);
+    CScriptKeyBinds() : m_bProcessingKey(false) {}
+    ~CScriptKeyBinds();
 
     static const SScriptBindableKey*        GetBindableFromKey(const char* szKey);
     static const SScriptBindableGTAControl* GetBindableFromControl(const char* szControl);
@@ -85,8 +85,8 @@ public:
     void Call(CScriptKeyBind* pKeyBind);
     bool ProcessKey(const char* szKey, bool bHitState, eScriptKeyBindType bindTypeconst);
 
-    std::list<CScriptKeyBind*>::iterator IterBegin(void) { return m_List.begin(); }
-    std::list<CScriptKeyBind*>::iterator IterEnd(void) { return m_List.end(); }
+    std::list<CScriptKeyBind*>::iterator IterBegin() { return m_List.begin(); }
+    std::list<CScriptKeyBind*>::iterator IterEnd() { return m_List.end(); }
 
     // Key-function bind funcs
     bool AddKeyFunction(const char* szKey, bool bHitState, CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments& Arguments);
@@ -116,7 +116,7 @@ public:
     void RemoveAllKeys(CLuaMain* pLuaMain);
 
     static bool IsMouse(const SScriptBindableKey* pKey);
-    void        RemoveDeletedBinds(void);
+    void        RemoveDeletedBinds();
 
 protected:
     std::list<CScriptKeyBind*> m_List;

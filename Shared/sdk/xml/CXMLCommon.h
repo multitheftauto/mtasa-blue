@@ -23,8 +23,8 @@ enum eXMLClass
 class CXMLCommon
 {
 public:
-    virtual ~CXMLCommon(void){};
+    virtual ~CXMLCommon(){};
 
-    virtual eXMLClass     GetClassType(void) = 0;
-    virtual unsigned long GetID(void) = 0;
+    virtual eXMLClass     GetClassType() = 0;
+    virtual unsigned long GetID() = 0;
 };

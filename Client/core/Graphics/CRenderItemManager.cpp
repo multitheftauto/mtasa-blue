@@ -26,7 +26,7 @@ struct SRTVertex
 //
 //
 ////////////////////////////////////////////////////////////////
-CRenderItemManager::CRenderItemManager(void)
+CRenderItemManager::CRenderItemManager()
 {
     m_pEffectCloner = new CEffectCloner(this);
 }
@@ -38,7 +38,7 @@ CRenderItemManager::CRenderItemManager(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-CRenderItemManager::~CRenderItemManager(void)
+CRenderItemManager::~CRenderItemManager()
 {
     SAFE_DELETE(m_pEffectCloner);
 }
@@ -91,7 +91,7 @@ void CRenderItemManager::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewpo
 // Release device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::OnLostDevice(void)
+void CRenderItemManager::OnLostDevice()
 {
     for (std::set<CRenderItem*>::iterator iter = m_CreatedItemList.begin(); iter != m_CreatedItemList.end(); iter++)
         (*iter)->OnLostDevice();
@@ -111,7 +111,7 @@ void CRenderItemManager::OnLostDevice(void)
 // Recreate device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::OnResetDevice(void)
+void CRenderItemManager::OnResetDevice()
 {
     for (std::set<CRenderItem*>::iterator iter = m_CreatedItemList.begin(); iter != m_CreatedItemList.end(); iter++)
         (*iter)->OnResetDevice();
@@ -352,7 +352,7 @@ void CRenderItemManager::NotifyDestructRenderItem(CRenderItem* pItem)
 // Update stuff
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::DoPulse(void)
+void CRenderItemManager::DoPulse()
 {
     m_pRenderWare->PulseWorldTextureWatch();
 
@@ -371,7 +371,7 @@ void CRenderItemManager::DoPulse(void)
 // Save back buffer pixels in our special place
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::UpdateBackBufferCopy(void)
+void CRenderItemManager::UpdateBackBufferCopy()
 {
     if (m_bBackBufferCopyMaybeNeedsResize)
         UpdateBackBufferCopySize();
@@ -446,7 +446,7 @@ void CRenderItemManager::UpdateScreenSource(CScreenSourceItem* pScreenSourceItem
 // Create/resize/destroy back buffer copy depending on what is required
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::UpdateBackBufferCopySize(void)
+void CRenderItemManager::UpdateBackBufferCopySize()
 {
     m_bBackBufferCopyMaybeNeedsResize = false;
 
@@ -501,7 +501,7 @@ bool CRenderItemManager::SetRenderTarget(CRenderTargetItem* pItem, bool bClear)
 // See if in enabled zones for old versions
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderItemManager::IsSetRenderTargetEnabledOldVer(void)
+bool CRenderItemManager::IsSetRenderTargetEnabledOldVer()
 {
     return m_bSetRenderTargetEnabledOldVer;
 }
@@ -525,7 +525,7 @@ void CRenderItemManager::EnableSetRenderTargetOldVer(bool bEnable)
 // Save current render target as the default one
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderItemManager::SaveDefaultRenderTarget(void)
+bool CRenderItemManager::SaveDefaultRenderTarget()
 {
     // Make sure any special depth buffer has been removed
     SaveReadableDepthBuffer();
@@ -555,7 +555,7 @@ bool CRenderItemManager::SaveDefaultRenderTarget(void)
 // Set render target back to the default one
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderItemManager::RestoreDefaultRenderTarget(void)
+bool CRenderItemManager::RestoreDefaultRenderTarget()
 {
     // Only need to change if we have info
     if (m_pDefaultD3DRenderTarget)
@@ -577,7 +577,7 @@ bool CRenderItemManager::RestoreDefaultRenderTarget(void)
 // Check if currently drawing to the default render target
 //
 ////////////////////////////////////////////////////////////////
-bool CRenderItemManager::IsUsingDefaultRenderTarget(void)
+bool CRenderItemManager::IsUsingDefaultRenderTarget()
 {
     // If this is NULL, it means we haven't saved it, so aren't using another render target
     return m_pDefaultD3DRenderTarget == NULL;
@@ -682,7 +682,7 @@ void CRenderItemManager::SetTestMode(eDxTestMode testMode)
 // Should be called when a render item is created/destroyed or changes
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::UpdateMemoryUsage(void)
+void CRenderItemManager::UpdateMemoryUsage()
 {
     m_iTextureMemoryKBUsed = 0;
     m_iRenderTargetMemoryKBUsed = 0;
@@ -1031,7 +1031,7 @@ void CRenderItemManager::NotifyShaderItemUsesMultipleRenderTargets(CShaderItem* 
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::PreDrawWorld(void)
+void CRenderItemManager::PreDrawWorld()
 {
     // Save scene matrices
     g_pDeviceState->MainSceneState.TransformState = g_pDeviceState->TransformState;
@@ -1133,7 +1133,7 @@ void CRenderItemManager::PreDrawWorld(void)
 // Ensure our readable depth buffer is no longer being used
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::SaveReadableDepthBuffer(void)
+void CRenderItemManager::SaveReadableDepthBuffer()
 {
     if (m_bUsingReadableDepthBuffer)
     {
@@ -1164,7 +1164,7 @@ void CRenderItemManager::SaveReadableDepthBuffer(void)
 // If using AA hacks, change everything back
 //
 ////////////////////////////////////////////////////////////////
-void CRenderItemManager::FlushNonAARenderTarget(void)
+void CRenderItemManager::FlushNonAARenderTarget()
 {
     if (m_pSavedSceneDepthSurface)
     {

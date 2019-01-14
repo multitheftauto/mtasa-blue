@@ -49,12 +49,12 @@ public:
     typedef std::unique_ptr<CAnimBlendAssociation>       AnimBlendAssoc_type;
     typedef std::unique_ptr<CAnimBlendStaticAssociation> StaticAssocIntface_type;
 
-    virtual void Initialize(void) = 0;
-    virtual void Shutdown(void) = 0;
+    virtual void Initialize() = 0;
+    virtual void Shutdown() = 0;
 
-    virtual int GetNumAnimations(void) = 0;
-    virtual int GetNumAnimBlocks(void) = 0;
-    virtual int GetNumAnimAssocDefinitions(void) = 0;
+    virtual int GetNumAnimations() = 0;
+    virtual int GetNumAnimBlocks() = 0;
+    virtual int GetNumAnimAssocDefinitions() = 0;
 
     virtual std::unique_ptr<CAnimBlendHierarchy> GetAnimation(int ID) = 0;
     virtual std::unique_ptr<CAnimBlendHierarchy> GetAnimation(const char* szName, CAnimBlock* pBlock) = 0;
@@ -88,8 +88,8 @@ public:
 
     virtual AnimAssocDefinition* AddAnimAssocDefinition(const char* szBlockName, const char* szAnimName, AssocGroupId animGroup, AnimationId animID,
                                                         AnimDescriptor* pDescriptor) = 0;
-    virtual void                 ReadAnimAssociationDefinitions(void) = 0;
-    virtual void                 CreateAnimAssocGroups(void) = 0;
+    virtual void                 ReadAnimAssociationDefinitions() = 0;
+    virtual void                 CreateAnimAssocGroups() = 0;
 
     virtual void UncompressAnimation(CAnimBlendHierarchy* pHierarchy) = 0;
     virtual void RemoveFromUncompressedCache(CAnimBlendHierarchy* pHierarchy) = 0;
@@ -97,8 +97,8 @@ public:
 
     virtual void  LoadAnimFile(const char* szFile) = 0;
     virtual void  LoadAnimFile(RwStream* pStream, bool b1, const char* sz1) = 0;
-    virtual void  LoadAnimFiles(void) = 0;
-    virtual void  RemoveLastAnimFile(void) = 0;
+    virtual void  LoadAnimFiles() = 0;
+    virtual void  RemoveLastAnimFile() = 0;
     virtual BYTE* AllocateKeyFramesMemory(uint32_t u32BytesToAllocate) = 0;
     virtual void  FreeKeyFramesMemory(void* pKeyFrames) = 0;
 
@@ -123,12 +123,12 @@ public:
     // MTA members, but use this strictly for custom animations only
     virtual std::unique_ptr<CAnimBlendHierarchy> GetCustomAnimBlendHierarchy(CAnimBlendHierarchySAInterface* pInterface) = 0;
     virtual std::unique_ptr<CAnimBlendSequence>  GetCustomAnimBlendSequence(CAnimBlendSequenceSAInterface* pInterface) = 0;
-    virtual std::unique_ptr<CAnimBlendHierarchy> GetCustomAnimBlendHierarchy(void) = 0;
-    virtual std::unique_ptr<CAnimBlendSequence>  GetCustomAnimBlendSequence(void) = 0;
+    virtual std::unique_ptr<CAnimBlendHierarchy> GetCustomAnimBlendHierarchy() = 0;
+    virtual std::unique_ptr<CAnimBlendSequence>  GetCustomAnimBlendSequence() = 0;
     virtual void                                 DeleteCustomAnimHierarchyInterface(CAnimBlendHierarchySAInterface* pInterface) = 0;
     virtual void                                 DeleteCustomAnimSequenceInterface(CAnimBlendSequenceSAInterface* pInterface) = 0;
 
     virtual bool           isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface* pInterface) = 0;
-    virtual const SString& GetGateWayBlockName(void) = 0;
-    virtual const SString& GetGateWayAnimationName(void) = 0;
+    virtual const SString& GetGateWayBlockName() = 0;
+    virtual const SString& GetGateWayAnimationName() = 0;
 };
