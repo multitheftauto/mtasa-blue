@@ -19,10 +19,10 @@ extern CClientGame* g_pClientGame;
 #define M_PI 3.14159265358979323846
 #endif
 
-#define INVALID_VALUE 0xFFFFFFFF
+#define INVALID_VALUE   0xFFFFFFFF
 
-#define PED_INTERPOLATION_WARP_THRESHOLD 5                      // Minimal threshold
-#define PED_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED 5            // Units to increment the threshold per speed unit
+#define PED_INTERPOLATION_WARP_THRESHOLD            5   // Minimal threshold
+#define PED_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED  5   // Units to increment the threshold per speed unit
 
 enum eAnimGroups
 {
@@ -3926,17 +3926,17 @@ void CClientPed::_ChangeModel()
                 m_pPlayerPed->RebuildPlayer();
 
                 // ...and decrement the extra ref
-#ifdef NO_CRASH_FIX_TEST2
+            #ifdef NO_CRASH_FIX_TEST2
                 m_pPlayerPed->RemoveGeometryRef();
-#endif
+            #endif
             }
             else
             {
                 // When the local player changes to another (non CJ) model, the geometry gets an extra ref from somewhere, causing a memory leak.
                 // So decrement the extra ref here
-#ifdef NO_CRASH_FIX_TEST
+            #ifdef NO_CRASH_FIX_TEST
                 m_pPlayerPed->RemoveGeometryRef();
-#endif
+            #endif
                 // As we will have problem removing the geometry later, we might as well keep the model cached until exit
                 g_pCore->AddModelToPersistentCache((ushort)m_ulModel);
             }
@@ -5088,7 +5088,7 @@ CClientEntity* CClientPed::GetContactEntity()
         if (pEntity)
         {
             CEntitySAInterface* pInterface = pEntity->GetInterface();
-            eEntityType         entityType = pInterface ? pEntity->GetEntityType() : ENTITY_TYPE_NOTHING;
+            eEntityType entityType = pInterface ? pEntity->GetEntityType() : ENTITY_TYPE_NOTHING;
             if (entityType == ENTITY_TYPE_VEHICLE || entityType == ENTITY_TYPE_OBJECT)
             {
                 return pPools->GetClientEntity((DWORD*)pInterface);
@@ -6174,9 +6174,9 @@ void CClientPed::HandleWaitingForGroundToLoad()
     {
         // If not near any MTA objects, then don't bother waiting
         SetFrozenWaitingForGroundToLoad(false);
-#ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
         OutputDebugLine("[AsyncLoading]   FreezeUntilCollisionLoaded - Early stop");
-#endif
+        #endif
         return;
     }
 
@@ -6197,29 +6197,29 @@ void CClientPed::HandleWaitingForGroundToLoad()
     bool                  bASync = g_pGame->IsASyncLoadingEnabled();
     bool                  bMTAObjLimit = pObjectManager->IsObjectLimitReached();
     bool                  bHasModel = GetModelInfo() != NULL;
-#ifndef ASYNC_LOADING_DEBUG_OUTPUTA
+    #ifndef ASYNC_LOADING_DEBUG_OUTPUTA
     bool bMTALoaded = pObjectManager->ObjectsAroundPointLoaded(vecPosition, fUseRadius, m_usDimension);
-#else
+    #else
     SString strAround;
     bool    bMTALoaded = pObjectManager->ObjectsAroundPointLoaded(vecPosition, fUseRadius, m_usDimension, &strAround);
-#endif
+    #endif
 
-#ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+    #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
     SString status = SString(
         "%2.2f,%2.2f,%2.2f  bASync:%d   bHasModel:%d   bMTALoaded:%d   bMTAObjLimit:%d   m_fGroundCheckTolerance:%2.2f   m_fObjectsAroundTolerance:%2.2f  "
         "fUseRadius:%2.1f",
         vecPosition.fX, vecPosition.fY, vecPosition.fZ, bASync, bHasModel, bMTALoaded, bMTAObjLimit, m_fGroundCheckTolerance, m_fObjectsAroundTolerance,
         fUseRadius);
-#endif
+    #endif
 
     // See if ground is ready
     if ((!bHasModel || !bMTALoaded) && m_fObjectsAroundTolerance < 1.f)
     {
         m_fGroundCheckTolerance = 0.f;
         m_fObjectsAroundTolerance = std::min(1.f, m_fObjectsAroundTolerance + 0.01f);
-#ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
         status += ("  FreezeUntilCollisionLoaded - wait");
-#endif
+        #endif
     }
     else
     {
@@ -6232,16 +6232,16 @@ void CClientPed::HandleWaitingForGroundToLoad()
         if (fUseDist > -0.2f && fUseDist < 1.5f)
             SetFrozenWaitingForGroundToLoad(false);
 
-#ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+        #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
         status += (SString("  GetDistanceFromGround:  fDist:%2.2f   fUseDist:%2.2f", fDist, fUseDist));
-#endif
+        #endif
 
         // Stop waiting after 3 frames, if the object limit has not been reached. (bASync should always be false here)
         if (m_fGroundCheckTolerance > 0.03f && !bMTAObjLimit && !bASync)
             SetFrozenWaitingForGroundToLoad(false);
     }
 
-#ifdef ASYNC_LOADING_DEBUG_OUTPUTA
+    #ifdef ASYNC_LOADING_DEBUG_OUTPUTA
     OutputDebugLine(SStringX("[AsyncLoading] ")++ status);
     g_pCore->GetGraphics()->DrawString(10, 220, -1, 1, status);
 
@@ -6249,7 +6249,7 @@ void CClientPed::HandleWaitingForGroundToLoad()
     strAround.Split("\n", lineList);
     for (unsigned int i = 0; i < lineList.size(); i++)
         g_pCore->GetGraphics()->DrawString(10, 230 + i * 10, -1, 1, lineList[i]);
-#endif
+    #endif
 }
 
 //
