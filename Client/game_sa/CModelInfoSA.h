@@ -329,7 +329,7 @@ public:
     static void    StaticSetHooks();
     bool           GetTime(char& cHourOn, char& cHourOff);
     bool           SetTime(char cHourOn, char cHourOff);
-    static void    StaticResetModelTimes(void);
+    static void    StaticResetModelTimes();
 
     void        SetAlphaTransparencyEnabled(BOOL bEnabled);
     bool        IsAlphaTransparencyEnabled();

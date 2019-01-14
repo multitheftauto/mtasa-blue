@@ -829,7 +829,7 @@ void CGameSA::ResetModelLodDistances()
     CModelInfoSA::StaticResetLodDistances();
 }
 
-void CGameSA::ResetModelTimes(void)
+void CGameSA::ResetModelTimes()
 {
     CModelInfoSA::StaticResetModelTimes();
 }

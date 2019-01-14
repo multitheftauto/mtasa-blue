@@ -34,8 +34,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelIDFromName", EngineGetModelIDFromName},
         {"engineGetModelTextureNames", EngineGetModelTextureNames},
         {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
-        {"engineSetModelVisibleTime", EngineSetModelVisibleTime },
-        {"engineGetModelVisibleTime", EngineGetModelVisibleTime },
+        {"engineSetModelVisibleTime", EngineSetModelVisibleTime},
+        {"engineGetModelVisibleTime", EngineGetModelVisibleTime},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );

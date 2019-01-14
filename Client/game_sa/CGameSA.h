@@ -414,7 +414,7 @@ public:
     void         ResetModelLodDistances();
     void         ResetAlphaTransparencies();
     void         DisableVSync();
-    void         ResetModelTimes(void);
+    void         ResetModelTimes();
 
     void  OnPedContextChange(CPed* pPedContext);
     CPed* GetPedContext();
