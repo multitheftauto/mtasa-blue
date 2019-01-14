@@ -1887,16 +1887,10 @@ void CClientPed::Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bSt
             }
         }
     }
-    if (m_bIsLocalPlayer)
-    {
-        SetHealth(0.0f);
-        SetArmor(0.0f);
-    }
-    else
-    {
-        LockHealth(0.0f);
-        LockArmor(0.0f);
-    }
+    
+    // set health and armor to 0
+    SetHealth(0.0f);
+    SetArmor(0.0f);
 
     // Silently remove the ped satchels
     DestroySatchelCharges(false, true);
