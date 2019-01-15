@@ -315,6 +315,29 @@ struct CTrainFlags
     unsigned char unknown7 : 8;
 };
 
+struct CTransmissionGear
+{
+    float maxGearVelocity;
+    float changeUpVelocity;
+    float changeDownVelocity;
+};
+
+struct CTransmission
+{
+    CTransmissionGear gears[6];
+    byte              driveType;
+    byte              engineType;
+    byte              numOfGears;
+    byte              pad;
+    DWORD             flags;
+    float             engineAcceleration;
+    float             engineInertia;
+    float             maxVelocity;
+    byte              pad2[4];
+    float             minVelocity;
+    float             curVelocity;
+};
+
 class CAutoPilot
 {
     BYTE pad[56];
