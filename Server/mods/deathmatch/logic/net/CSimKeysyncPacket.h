@@ -18,8 +18,8 @@ public:
     CSimKeysyncPacket(ElementID PlayerID, bool bPlayerHasOccupiedVehicle, ushort usVehicleGotModel, uchar ucPlayerGotWeaponType, float fPlayerGotWeaponRange,
                       bool bVehicleHasHydraulics, bool bVehicleIsPlaneOrHeli, CControllerState& sharedControllerState);
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_PLAYER_KEYSYNC; };
-    unsigned long GetFlags(void) const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_KEYSYNC; };
+    unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;

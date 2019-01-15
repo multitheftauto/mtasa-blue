@@ -26,11 +26,11 @@ public:
     virtual SString TranslatePlural(const SString& strSingular, const SString& strPlural, int iNum) { return strPlural; }
     virtual SString TranslatePluralWithContext(const SString& strContext, const SString& strSingular, const SString& strPlural, int iNum) { return strPlural; }
 
-    virtual std::vector<SString> GetAvailableLocales(void) { return std::vector<SString>(); }
-    virtual bool                 IsLocalized(void) { return false; }
-    virtual SString              GetLanguageDirectory(void) { return ""; }
-    virtual SString              GetLanguageCode(void) { return "en_US"; }
-    virtual SString              GetLanguageName(void) { return "English"; }
+    virtual std::vector<SString> GetAvailableLocales() { return std::vector<SString>(); }
+    virtual bool                 IsLocalized() { return false; }
+    virtual SString              GetLanguageDirectory() { return ""; }
+    virtual SString              GetLanguageCode() { return "en_US"; }
+    virtual SString              GetLanguageName() { return "English"; }
 };
 
 CLocalizationInterface* g_pLocalization = new CLocalizationDummy();
@@ -149,7 +149,7 @@ void InitLocalization(bool bShowErrors)
 // Check and handle commands (from the installer)
 //
 //////////////////////////////////////////////////////////
-void HandleSpecialLaunchOptions(void)
+void HandleSpecialLaunchOptions()
 {
     // Handle service install request from the installer
     if (CommandLineContains("/kdinstall"))
@@ -185,7 +185,7 @@ void HandleSpecialLaunchOptions(void)
 // Handle duplicate launching, or running from mtasa:// URI ?
 //
 //////////////////////////////////////////////////////////
-void HandleDuplicateLaunching(void)
+void HandleDuplicateLaunching()
 {
     LPSTR lpCmdLine = GetCommandLine();
 
@@ -272,7 +272,7 @@ void HandleDuplicateLaunching(void)
 //
 //
 //////////////////////////////////////////////////////////
-void HandleTrouble(void)
+void HandleTrouble()
 {
     if (CheckAndShowFileOpenFailureMessage())
         return;
@@ -292,7 +292,7 @@ void HandleTrouble(void)
 //
 //
 //////////////////////////////////////////////////////////
-void HandleResetSettings(void)
+void HandleResetSettings()
 {
     if (CheckAndShowFileOpenFailureMessage())
         return;
@@ -347,7 +347,7 @@ void HandleResetSettings(void)
 // If fullscreen, then maybe change fullscreen mode
 //
 //////////////////////////////////////////////////////////
-void HandleNotUsedMainMenu(void)
+void HandleNotUsedMainMenu()
 {
     AddReportLog(9310, "Loader - HandleNotUsedMainMenu");
     {
@@ -428,7 +428,7 @@ void HandleNotUsedMainMenu(void)
 //
 //
 //////////////////////////////////////////////////////////
-void HandleCustomStartMessage(void)
+void HandleCustomStartMessage()
 {
     SString strStartMessage = GetApplicationSetting("diagnostics", "start-message");
     SString strTrouble = GetApplicationSetting("diagnostics", "start-message-trouble");
@@ -459,7 +459,7 @@ void HandleCustomStartMessage(void)
 //
 //
 //////////////////////////////////////////////////////////
-void PreLaunchWatchDogs(void)
+void PreLaunchWatchDogs()
 {
     assert(!CreateSingleInstanceMutex());
 
@@ -575,7 +575,7 @@ void PostRunWatchDogs(int iReturnCode)
 // Check for and maybe stop a running GTA process
 //
 //////////////////////////////////////////////////////////
-void HandleIfGTAIsAlreadyRunning(void)
+void HandleIfGTAIsAlreadyRunning()
 {
     if (IsGTARunning())
     {
@@ -604,7 +604,7 @@ void HandleIfGTAIsAlreadyRunning(void)
 // Check GTA path looks good
 //
 //////////////////////////////////////////////////////////
-void ValidateGTAPath(void)
+void ValidateGTAPath()
 {
     // Get path to GTA
     ePathResult iResult = DiscoverGTAPath(true);
@@ -653,7 +653,7 @@ void ValidateGTAPath(void)
 // Maybe warn user if no anti-virus running
 //
 //////////////////////////////////////////////////////////
-void CheckAntiVirusStatus(void)
+void CheckAntiVirusStatus()
 {
     // Get data from WMI
     std::vector<SString> enabledList;
@@ -757,7 +757,7 @@ void CheckAntiVirusStatus(void)
 // Basic check for some essential files
 //
 //////////////////////////////////////////////////////////
-void CheckDataFiles(void)
+void CheckDataFiles()
 {
     const SString strMTASAPath = GetMTASAPath();
     const SString strGTAPath = GetGTAPath();
@@ -939,7 +939,7 @@ void CheckDataFiles(void)
 // Ensure DLLs are the correct version
 //
 //////////////////////////////////////////////////////////
-void CheckLibVersions(void)
+void CheckLibVersions()
 {
 #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
 
@@ -1310,7 +1310,7 @@ int LaunchGame(SString strCmdLine)
 // Parse and do something with OnQuitCommand from registry
 //
 //////////////////////////////////////////////////////////
-void HandleOnQuitCommand(void)
+void HandleOnQuitCommand()
 {
     const SString strMTASAPath = GetMTASAPath();
     SetCurrentDirectory(strMTASAPath);

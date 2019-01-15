@@ -32,8 +32,8 @@ class CDebugHookManager
 {
 public:
     ZERO_ON_NEW
-    CDebugHookManager(void);
-    ~CDebugHookManager(void);
+    CDebugHookManager();
+    ~CDebugHookManager();
     bool AddDebugHook(EDebugHookType hookType, const CLuaFunctionRef& functionRef, const std::vector<SString>& allowedNameList);
     bool RemoveDebugHook(EDebugHookType hookType, const CLuaFunctionRef& functionRef);
     void OnLuaMainDestroy(CLuaMain* pLuaMain);
@@ -44,7 +44,7 @@ public:
     void OnPostEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller);
     bool OnPreEventFunction(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent);
     void OnPostEventFunction(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent);
-    bool HasPostFunctionHooks(void) const { return !m_PostFunctionHookList.empty() || m_uiPostFunctionOverride; }
+    bool HasPostFunctionHooks() const { return !m_PostFunctionHookList.empty() || m_uiPostFunctionOverride; }
 
 protected:
     std::vector<SDebugHookCallInfo>& GetHookInfoListForType(EDebugHookType hookType);

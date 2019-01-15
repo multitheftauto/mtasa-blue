@@ -24,7 +24,7 @@ CRadarArea::CRadarArea(CRadarAreaManager* pRadarAreaManager, CElement* pParent) 
     pRadarAreaManager->AddToList(this);
 }
 
-CRadarArea::~CRadarArea(void)
+CRadarArea::~CRadarArea()
 {
     // Unlink us from manager
     Unlink();
@@ -46,7 +46,7 @@ CElement* CRadarArea::Clone(bool* bAddEntity, CResource* pResource)
     return pTemp;
 }
 
-void CRadarArea::Unlink(void)
+void CRadarArea::Unlink()
 {
     // Remove us from the manager's list
     m_pRadarAreaManager->RemoveFromList(this);

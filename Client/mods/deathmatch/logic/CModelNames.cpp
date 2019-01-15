@@ -10519,7 +10519,7 @@ ushort CModelNames::ResolveClothesTexID(const SString& strTexNameOrNumber)
 //
 // Initialize id <-> name maps
 //
-void CModelNames::InitializeMaps(void)
+void CModelNames::InitializeMaps()
 {
     if (!ms_ModelIDNameMap.empty())
         return;

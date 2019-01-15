@@ -89,7 +89,7 @@ void _declspec(naked) HOOK_CWeapon_GenerateDamageEvent()
 DWORD RETURN_CShotInfo_Update = 0x739E66;
 
 // Clear all shotinfos
-void ResetShotInfoArray(void)
+void ResetShotInfoArray()
 {
     CFlameShotInfo* pInfo = (CFlameShotInfo*)ARRAY_CFlameShotInfo;
     memset(pInfo, 0, sizeof(CFlameShotInfo));
@@ -102,7 +102,7 @@ void ResetShotInfoArray(void)
 #pragma warning( push )
 #pragma warning( disable : 4731 )   // warning C4731: 'Call_CShotInfo_Update' : frame pointer register 'ebp' modified by inline assembly code
 
-void Call_CShotInfo_Update(void)
+void Call_CShotInfo_Update()
 {
     _asm
     {
@@ -120,7 +120,7 @@ void Call_CShotInfo_Update(void)
 #pragma warning( pop )
 
 // Our code for when CShotInfo_Update is called
-void OnMY_CShotInfo_Update(void)
+void OnMY_CShotInfo_Update()
 {
     if (!pMultiplayer->IsConnected())
     {
@@ -182,7 +182,7 @@ int OnMY_Fx_AddBulletImpact(int iType)
 #define HOOKSIZE_Fx_AddBulletImpact                        5
 DWORD RETURN_Fx_AddBulletImpact = 0x049F3ED;
 
-void _declspec(naked) HOOK_Fx_AddBulletImpact(void)
+void _declspec(naked) HOOK_Fx_AddBulletImpact()
 {
     _asm
     {
@@ -206,7 +206,7 @@ void _declspec(naked) HOOK_Fx_AddBulletImpact(void)
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_Weapons(void)
+void CMultiplayerSA::InitHooks_Weapons()
 {
     EZHookInstall(CWeapon_GenerateDamageEvent);
     EZHookInstall(CShotInfo_Update);

@@ -87,7 +87,7 @@ public:
     // Finish current match and push relevant lines to the output buffer
     //
     //////////////////////////////////////////////////////////
-    void Flush(void)
+    void Flush()
     {
         if (m_bIsMatching == false)
             return;

@@ -70,8 +70,8 @@ public:
 
     void OnChangeLevel(float fOldZ, float fNewZ);
     void Init(bool bIsWorldWaterVertex);
-    void Reset(void);
-    bool IsWorldNonSeaLevel(void);
+    void Reset();
+    bool IsWorldNonSeaLevel();
 
 protected:
     bool                     m_bIsWorldWaterVertex;

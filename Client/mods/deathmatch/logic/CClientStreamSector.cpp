@@ -27,7 +27,7 @@ CClientStreamSector::CClientStreamSector(CClientStreamSectorRow* pRow, CVector2D
     m_pArea = NULL;
 }
 
-CClientStreamSector::~CClientStreamSector(void)
+CClientStreamSector::~CClientStreamSector()
 {
     // Remove our connected sectors
     if (m_pLeft)

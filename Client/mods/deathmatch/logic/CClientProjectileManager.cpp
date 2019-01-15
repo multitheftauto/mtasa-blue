@@ -31,7 +31,7 @@ CClientProjectileManager::CClientProjectileManager(CClientManager* pManager)
     m_pLastCreated = NULL;
 }
 
-CClientProjectileManager::~CClientProjectileManager(void)
+CClientProjectileManager::~CClientProjectileManager()
 {
     RemoveAll();
     if (g_pProjectileManager == this)
@@ -39,7 +39,7 @@ CClientProjectileManager::~CClientProjectileManager(void)
     CClientEntityRefManager::RemoveEntityRefs(0, &m_pCreator, &m_pLastCreated, NULL);
 }
 
-void CClientProjectileManager::DoPulse(void)
+void CClientProjectileManager::DoPulse()
 {
     CElementDeleter*                   pElementDeleter = g_pClientGame->GetElementDeleter();
     CClientProjectile*                 pProjectile = NULL;
@@ -57,7 +57,7 @@ void CClientProjectileManager::DoPulse(void)
     }
 }
 
-void CClientProjectileManager::RemoveAll(void)
+void CClientProjectileManager::RemoveAll()
 {
     list<CClientProjectile*>           cloneList = m_List;
     list<CClientProjectile*>::iterator iter = cloneList.begin();

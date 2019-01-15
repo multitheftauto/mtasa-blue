@@ -20,7 +20,7 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-CTileBatcher::CTileBatcher(void)
+CTileBatcher::CTileBatcher()
 {
 }
 
@@ -31,7 +31,7 @@ CTileBatcher::CTileBatcher(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-CTileBatcher::~CTileBatcher(void)
+CTileBatcher::~CTileBatcher()
 {
 }
 
@@ -110,7 +110,7 @@ void CTileBatcher::UpdateMatrices(float fViewportSizeX, float fViewportSizeY)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CTileBatcher::OnZBufferModified(void)
+void CTileBatcher::OnZBufferModified()
 {
     m_bZBufferDirty = true;
 }
@@ -122,7 +122,7 @@ void CTileBatcher::OnZBufferModified(void)
 // Send all buffered vertices to D3D
 //
 ////////////////////////////////////////////////////////////////
-void CTileBatcher::Flush(void)
+void CTileBatcher::Flush()
 {
     if (!m_Vertices.empty())
     {

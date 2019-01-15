@@ -18,13 +18,13 @@ class CClientTXD : public CClientEntity
     DECLARE_CLASS(CClientTXD, CClientEntity)
 public:
     CClientTXD(class CClientManager* pManager, ElementID ID);
-    ~CClientTXD(void);
+    ~CClientTXD();
 
-    void Unlink(void){};
+    void Unlink(){};
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 
-    eClientEntityType GetType(void) const { return CCLIENTTXD; }
+    eClientEntityType GetType() const { return CCLIENTTXD; }
     bool              LoadTXD(const SString& strFile, bool bFilteringEnabled, bool bIsRawData);
     bool              Import(unsigned short usModelID);
     static bool       IsImportableModel(unsigned short usModelID);

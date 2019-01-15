@@ -23,16 +23,16 @@ class CPerfStatPacketUsageImpl : public CPerfStatPacketUsage
 public:
     ZERO_ON_NEW
 
-    CPerfStatPacketUsageImpl(void);
-    virtual ~CPerfStatPacketUsageImpl(void);
+    CPerfStatPacketUsageImpl();
+    virtual ~CPerfStatPacketUsageImpl();
 
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CPerfStatPacketUsageImpl
-    void MaybeRecordStats(void);
+    void MaybeRecordStats();
 
     int                         m_iStatsCleared;
     CElapsedTime                m_TimeSinceGetStats;
@@ -66,7 +66,7 @@ CPerfStatPacketUsage* CPerfStatPacketUsage::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatPacketUsageImpl::CPerfStatPacketUsageImpl(void)
+CPerfStatPacketUsageImpl::CPerfStatPacketUsageImpl()
 {
     m_strCategoryName = "Packet usage";
 }
@@ -78,7 +78,7 @@ CPerfStatPacketUsageImpl::CPerfStatPacketUsageImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CPerfStatPacketUsageImpl::~CPerfStatPacketUsageImpl(void)
+CPerfStatPacketUsageImpl::~CPerfStatPacketUsageImpl()
 {
 }
 
@@ -89,7 +89,7 @@ CPerfStatPacketUsageImpl::~CPerfStatPacketUsageImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CPerfStatPacketUsageImpl::GetCategoryName(void)
+const SString& CPerfStatPacketUsageImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -101,7 +101,7 @@ const SString& CPerfStatPacketUsageImpl::GetCategoryName(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatPacketUsageImpl::DoPulse(void)
+void CPerfStatPacketUsageImpl::DoPulse()
 {
     MaybeRecordStats();
 }
@@ -113,7 +113,7 @@ void CPerfStatPacketUsageImpl::DoPulse(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatPacketUsageImpl::MaybeRecordStats(void)
+void CPerfStatPacketUsageImpl::MaybeRecordStats()
 {
     // Someone watching?
     if (m_TimeSinceGetStats.Get() < 10000)

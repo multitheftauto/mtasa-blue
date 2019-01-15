@@ -46,7 +46,7 @@ CSettings::CSettings(CResourceManager* pResourceManager)
     }
 }
 
-CSettings::~CSettings(void)
+CSettings::~CSettings()
 {
     if (m_pNodeGlobalSettings)
         delete m_pNodeGlobalSettings;

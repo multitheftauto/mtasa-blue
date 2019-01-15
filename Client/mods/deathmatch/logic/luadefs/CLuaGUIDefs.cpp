@@ -34,7 +34,7 @@ static const SFixedArray<const char*, MAX_CHATBOX_LAYOUT_CVARS> g_chatboxLayoutC
     "text_scale"
 }};
 
-void CLuaGUIDefs::LoadFunctions(void)
+void CLuaGUIDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"guiGetInputEnabled", GUIGetInputEnabled},

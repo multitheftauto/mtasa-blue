@@ -155,12 +155,12 @@ public:
     bool SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel);
     bool SetPositionWaterLevel(const CVector& vecPosition, float fLevel, void* pChangeSource);
     bool SetPolyWaterLevel(CWaterPoly* pPoly, float fLevel, void* pChangeSource);
-    void ResetWorldWaterLevel(void);
+    void ResetWorldWaterLevel();
 
     float GetWaveLevel();
     void  SetWaveLevel(float fWaveLevel);
     void  SetWaterDrawnLast(bool bEnable);
-    bool  IsWaterDrawnLast(void);
+    bool  IsWaterDrawnLast();
 
     bool TestLineAgainstWater(const CVector& vecStart, const CVector& vecEnd, CVector* vecCollision);
 
@@ -168,7 +168,7 @@ public:
     void UndoChanges(void* pChangeSource = NULL);
     void RebuildIndex();
     void Reset();
-    void UpdateRenderOrderRequirement(void);
+    void UpdateRenderOrderRequirement();
 
 private:
     CWaterVertexSA   m_Vertices[NUM_NewWaterVertices];

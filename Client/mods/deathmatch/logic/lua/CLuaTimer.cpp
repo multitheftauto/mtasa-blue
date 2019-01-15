@@ -19,12 +19,12 @@ CLuaTimer::CLuaTimer(const CLuaFunctionRef& iLuaFunction, const CLuaArguments& A
     m_Arguments = Arguments;
 }
 
-CLuaTimer::~CLuaTimer(void)
+CLuaTimer::~CLuaTimer()
 {
     RemoveScriptID();
 }
 
-void CLuaTimer::RemoveScriptID(void)
+void CLuaTimer::RemoveScriptID()
 {
     if (m_uiScriptID != INVALID_ARRAY_ID)
     {
@@ -58,7 +58,7 @@ void CLuaTimer::ExecuteTimer(CLuaMain* pLuaMain)
     }
 }
 
-CTickCount CLuaTimer::GetTimeLeft(void)
+CTickCount CLuaTimer::GetTimeLeft()
 {
     CTickCount llCurrentTime = CTickCount::Now();
     CTickCount llTimeLeft = m_llStartTime + m_llDelay - llCurrentTime;

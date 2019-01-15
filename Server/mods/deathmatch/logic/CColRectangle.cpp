@@ -46,7 +46,7 @@ bool CColRectangle::ReadSpecialData(const int iLine)
     return true;
 }
 
-CSphere CColRectangle::GetWorldBoundingSphere(void)
+CSphere CColRectangle::GetWorldBoundingSphere()
 {
     CSphere sphere;
     sphere.vecPosition.fX = m_vecPosition.fX + m_vecSize.fX * 0.5f;
