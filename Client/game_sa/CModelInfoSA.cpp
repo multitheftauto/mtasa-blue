@@ -1385,7 +1385,7 @@ void CModelInfoSA::SetObjectPropertiesGroup(unsigned char ucNewGroup)
 unsigned char CModelInfoSA::GetObjectPropertiesGroup()
 {
     if (!m_pInterface)
-        return;
+        return 0;
 
     return m_pInterface->ucDynamicIndex;
 }

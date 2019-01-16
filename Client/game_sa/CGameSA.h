@@ -310,7 +310,6 @@ public:
 
     CWeaponInfo*        GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*         GetModelInfo(DWORD dwModelID);
-    CObjectDynamicInfo* GetObjectDynamicInfo(unsigned char ucObjectGroup);
 
     DWORD GetSystemTime()
     {
@@ -428,9 +427,12 @@ public:
     void SetPostWeaponFireHandler(PostWeaponFireHandler* pPostWeaponFireHandler) { m_pPostWeaponFireHandler = pPostWeaponFireHandler; }
     void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) { m_pTaskSimpleBeHitHandler = pTaskSimpleBeHitHandler; }
 
+    CObjectDynamicInfo*     GetObjectDynamicInfo(unsigned char ucObjectGroup);
+
     PreWeaponFireHandler*   m_pPreWeaponFireHandler;
     PostWeaponFireHandler*  m_pPostWeaponFireHandler;
     TaskSimpleBeHitHandler* m_pTaskSimpleBeHitHandler;
+
 
 private:
     CPools*             m_pPools;

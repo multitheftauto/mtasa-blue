@@ -320,15 +320,6 @@ CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID)
     }
 }
 
-CObjectDynamicInfo* CGameSA::GetObjectDynamicInfo(unsigned char ucObjectGroup) 
-{
-    DEBUG_TRACE("CObjectDynamicInfo * CGameSA::GetObjectDynamicInfo(unsigned char ucObjectGroup)");
-    if (ucObjectGroup < OBJECTDYNAMICINFO_MAX && ObjectDynamicInfo[ucObjectGroup].IsValid())
-        return &ObjectDynamicInfo[ucObjectGroup];
-
-    return nullptr;        
-}
-
 /**
  * Starts the game
  * \todo make addresses into constants
@@ -882,4 +873,13 @@ CPed* CGameSA::GetPedContext()
     if (!m_pPedContext)
         m_pPedContext = pGame->GetPools()->GetPedFromRef((DWORD)1);
     return m_pPedContext;
+}
+
+CObjectDynamicInfo* CGameSA::GetObjectDynamicInfo(unsigned char ucObjectGroup)
+{
+    DEBUG_TRACE("CObjectDynamicInfo * CGameSA::GetObjectDynamicInfo(unsigned char ucObjectGroup)");
+    if (ucObjectGroup < OBJECTDYNAMICINFO_MAX && ObjectDynamicInfo[ucObjectGroup].IsValid())
+        return &ObjectDynamicInfo[ucObjectGroup];
+
+    return nullptr;
 }

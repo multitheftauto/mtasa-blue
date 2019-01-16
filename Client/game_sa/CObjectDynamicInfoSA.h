@@ -12,7 +12,7 @@
 #pragma once
 
 #include <game/CObjectDynamicInfo.h>
-#include "Common.h"
+#include <game/Common.h>
 
 #define ARRAY_ObjectGroupsDynamicInfo 0xBB4A90
 

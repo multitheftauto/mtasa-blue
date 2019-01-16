@@ -50,7 +50,6 @@ typedef void(InRenderer)();
 #include "CKeyGen.h"
 #include "CMenuManager.h"
 #include "CModelInfo.h"
-#include "CObjectDynamicInfo.h"
 #include "CPad.h"
 #include "CPathFind.h"
 #include "CPedDamageResponse.h"
@@ -80,6 +79,7 @@ typedef void(InRenderer)();
 #include "CWeaponInfo.h"
 #include "CWorld.h"
 #include "TaskCarAccessories.h"
+#include "CObjectDynamicInfo.h"
 
 #include <windows.h>
 
@@ -170,7 +170,6 @@ public:
 
     virtual CWeaponInfo*        GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
     virtual CModelInfo*         GetModelInfo(DWORD dwModelID) = 0;
-    virtual CObjectDynamicInfo* GetObjectDynamicInfo(unsigned char ucObjectGroup) = 0;
 
     virtual DWORD        GetSystemTime() = 0;
     virtual BOOL         IsAtMenu() = 0;
@@ -249,4 +248,6 @@ public:
     virtual void SetPreWeaponFireHandler(PreWeaponFireHandler* pPreWeaponFireHandler) = 0;
     virtual void SetPostWeaponFireHandler(PostWeaponFireHandler* pPostWeaponFireHandler) = 0;
     virtual void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) = 0;
+
+    virtual CObjectDynamicInfo* GetObjectDynamicInfo(unsigned char ucObjectGroup) = 0;
 };

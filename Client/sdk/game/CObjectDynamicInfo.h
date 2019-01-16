@@ -2,14 +2,14 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        sdk/game/CObjectDynamicInfoSA.cpp
+ *  FILE:        sdk/game/CObjectDynamicInfo.h
  *  PURPOSE:     Objects dynamic physical properties handler interface
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#pragma once
 
-#include "Common.h"
 #include <CVector.h>
 
 class CObjectDynamicInfo
