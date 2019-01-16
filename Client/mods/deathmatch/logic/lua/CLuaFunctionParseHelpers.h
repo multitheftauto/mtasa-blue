@@ -40,6 +40,7 @@ DECLARE_ENUM(eWeaponState);
 DECLARE_ENUM(eWeaponFlags);
 DECLARE_ENUM(eVehicleComponent);
 DECLARE_ENUM(eObjectProperty);
+DECLARE_ENUM(eObjectGroupDynamicProperty);
 DECLARE_ENUM(eFontType);
 DECLARE_ENUM(eFontQuality);
 DECLARE_ENUM(eAudioLookupIndex);
@@ -382,6 +383,10 @@ inline SString GetClassTypeName(D3DPRIMITIVETYPE*)
 inline SString GetClassTypeName(eVehicleDummies*)
 {
     return "vehicle-dummy";
+}
+inline SString GetClassByTypeName(eObjectGroupDynamicProperty*)
+{
+    return "objectgroup-dynamic-property";
 }
 
 //
