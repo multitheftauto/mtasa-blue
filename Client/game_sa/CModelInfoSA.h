@@ -375,6 +375,8 @@ public:
     void InitialiseSupportedUpgrades(RpClump* pClump);
     void ResetSupportedUpgrades();
 
+    unsigned char GetObjectPropertiesGroup();
+
 private:
     void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);
 };

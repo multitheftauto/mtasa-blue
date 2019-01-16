@@ -1367,6 +1367,11 @@ void CModelInfoSA::ResetSupportedUpgrades()
     m_ModelSupportedUpgrades.Reset();
 }
 
+unsigned char CModelInfoSA::GetObjectPropertiesGroup()
+{
+    return m_pInterface->ucDynamicIndex;
+}
+
 eModelInfoType CModelInfoSA::GetModelType()
 {
     return ((eModelInfoType(*)())m_pInterface->VFTBL->GetModelType)();
