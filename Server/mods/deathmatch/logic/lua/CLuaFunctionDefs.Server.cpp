@@ -854,6 +854,7 @@ int CLuaFunctionDefs::AbortRemoteRequest(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         lua_pushboolean(luaVM, pRemoteCall->CancelDownload());
+        g_pGame->GetRemoteCalls()->Remove(pRemoteCall);
         return 1;
     }
     else
