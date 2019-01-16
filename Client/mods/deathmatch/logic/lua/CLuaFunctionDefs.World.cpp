@@ -1986,14 +1986,14 @@ int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
         info.PushString("start");
         info.PushNumber(pRemoteCall->GetStartTime());
 
-        info.PushString("post_data");
+        info.PushString("postData");
         info.PushString(pRemoteCall->GetOptions().strPostData.c_str());
         info.PushString("method");
         info.PushString((pRemoteCall->GetOptions().strRequestMethod.length() >= 1 ? pRemoteCall->GetOptions().strRequestMethod.ToUpper().c_str() : "POST"));
 
-        info.PushString("connection_attempts");
+        info.PushString("connectionAttempts");
         info.PushNumber(pRemoteCall->GetOptions().uiConnectionAttempts);
-        info.PushString("connection_timeout");
+        info.PushString("connectionTimeout");
         info.PushNumber(pRemoteCall->GetOptions().uiConnectTimeoutMs);
 
         // download info
