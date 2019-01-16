@@ -629,7 +629,7 @@ public:
     static bool SetFPSLimit(int iLimit);
     static bool GetFPSLimit(int& iLimit);
 
-    static bool ResetAllSurfaceInfo(void);
+    static bool ResetAllSurfaceInfo();
     static bool ResetSurfaceInfo(short sSurfaceID);
 
     // Input functions

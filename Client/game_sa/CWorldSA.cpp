@@ -37,8 +37,8 @@ void CWorldSA::ResetAllSurfaceInfo()
 
     DWORD dwOriginalSurfaceInfo = (DWORD)(&m_pOriginalSurfaceInfo);
 
-    short sOffset = offsetof(CSurfaceType, CSurfaceType::surfType);
-    short sSize = sizeof(SurfaceInfo_c) * EColSurfaceValue::SIZE;
+    size_t sOffset = offsetof(CSurfaceType, CSurfaceType::surfType);
+    size_t sSize = sizeof(SurfaceInfo_c) * EColSurfaceValue::SIZE;
 
     memcpy((void*)(dwSurfaceInfo + sOffset), (void*)(dwOriginalSurfaceInfo + sOffset), sSize);
 }
@@ -51,8 +51,8 @@ bool CWorldSA::ResetSurfaceInfo(short sSurfaceID)
         DWORD dwSurfaceInfo = (DWORD)pSurfaceInfo;
         DWORD dwOriginalSurfaceInfo = (DWORD)(&m_pOriginalSurfaceInfo);
 
-        short sOffset = offsetof(CSurfaceType, CSurfaceType::surfType) + sizeof(SurfaceInfo_c) * sSurfaceID;
-        short sSize = sizeof(SurfaceInfo_c);
+        size_t sOffset = offsetof(CSurfaceType, CSurfaceType::surfType) + sizeof(SurfaceInfo_c) * sSurfaceID;
+        size_t sSize = sizeof(SurfaceInfo_c);
 
         memcpy((void*)(dwSurfaceInfo + sOffset), (void*)(dwOriginalSurfaceInfo + sOffset), sSize);
         return true;
