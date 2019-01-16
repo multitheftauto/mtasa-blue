@@ -50,6 +50,7 @@ typedef void(InRenderer)();
 #include "CKeyGen.h"
 #include "CMenuManager.h"
 #include "CModelInfo.h"
+#include "CObjectDynamicInfo.h"
 #include "CPad.h"
 #include "CPathFind.h"
 #include "CPedDamageResponse.h"
@@ -167,8 +168,9 @@ public:
     virtual CWeaponStatManager*       GetWeaponStatManager() = 0;
     virtual CPointLights*             GetPointLights() = 0;
 
-    virtual CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
-    virtual CModelInfo*  GetModelInfo(DWORD dwModelID) = 0;
+    virtual CWeaponInfo*        GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
+    virtual CModelInfo*         GetModelInfo(DWORD dwModelID) = 0;
+    virtual CObjectDynamicInfo* GetObjectDynamicInfo(unsigned char ucObjectGroup) = 0;
 
     virtual DWORD        GetSystemTime() = 0;
     virtual BOOL         IsAtMenu() = 0;

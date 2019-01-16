@@ -33,6 +33,7 @@
 #define     NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
 
 #define     MODELINFO_MAX                   26000       // Actual max is 25755
+#define     OBJECTDYNAMICINFO_MAX           256
 
 #define     FUNC_GetLevelFromPosition       0x4DD300
 
@@ -103,6 +104,7 @@ class CGameSA : public CGame
 private:
     CWeaponInfo* WeaponInfos[NUM_WeaponInfosTotal];
     CModelInfoSA ModelInfo[MODELINFO_MAX];
+    CObjectDynamicInfoSA ObjectDynamicInfo[OBJECTDYNAMICINFO_MAX];
 
 public:
     ZERO_ON_NEW
@@ -305,8 +307,9 @@ public:
     CRenderWareSA*      GetRenderWareSA() { return m_pRenderWare; }
     CFxManagerSA*       GetFxManagerSA() { return m_pFxManager; }
 
-    CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
-    CModelInfo*  GetModelInfo(DWORD dwModelID);
+    CWeaponInfo*        GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
+    CModelInfo*         GetModelInfo(DWORD dwModelID);
+    CObjectDynamicInfo* GetObjectDynamicInfo(unsigned char ucObjectGroup);
 
     DWORD GetSystemTime()
     {
@@ -446,6 +449,7 @@ private:
     CWorld*             m_pWorld;
     CCamera*            m_pCamera;
     CModelInfo*         m_pModelInfo;
+    CObjectDynamicInfo* m_pObjectDynamicInfo;
     CPickups*           m_pPickups;
     CWeaponInfo*        m_pWeaponInfo;
     CExplosionManager*  m_pExplosionManager;

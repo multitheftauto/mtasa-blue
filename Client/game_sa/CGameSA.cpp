@@ -65,6 +65,12 @@ CGameSA::CGameSA()
         ModelInfo[i].SetModelID(i);
     }
 
+    // Prepare all object dynamic infos for CObjectDynamicInfoSA instances
+    for (unsigned char i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
+    {
+        ObjectDynamicInfo[i].SetObjectGroup(i);
+    }
+
     DEBUG_TRACE("CGameSA::CGameSA()");
     this->m_pAudioEngine = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
     this->m_pAEAudioHardware = new CAEAudioHardwareSA((CAEAudioHardwareSAInterface*)CLASS_CAEAudioHardware);
@@ -312,6 +318,15 @@ CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID)
     {
         return NULL;
     }
+}
+
+CObjectDynamicInfo* CGameSA::GetObjectDynamicInfo(unsigned char ucObjectGroup) 
+{
+    DEBUG_TRACE("CObjectDynamicInfo * CGameSA::GetObjectDynamicInfo(unsigned char ucObjectGroup)");
+    if (ucObjectGroup < OBJECTDYNAMICINFO_MAX && ObjectDynamicInfo[ucObjectGroup].IsValid())
+        return &ObjectDynamicInfo[ucObjectGroup];
+
+    return nullptr;        
 }
 
 /**
