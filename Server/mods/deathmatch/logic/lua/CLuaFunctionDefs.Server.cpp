@@ -720,7 +720,7 @@ int CLuaFunctionDefs::FetchRemote(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetNetworkRequests(lua_State* luaVM)
+int CLuaFunctionDefs::GetRemoteRequests(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
     CResource*       pResource = nullptr;
@@ -755,7 +755,7 @@ int CLuaFunctionDefs::GetNetworkRequests(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetNetworkRequestInfo(lua_State* luaVM)
+int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
     CLuaArguments    info, requestedHeaders;
@@ -768,11 +768,11 @@ int CLuaFunctionDefs::GetNetworkRequestInfo(lua_State* luaVM)
     {
         CResource* pResource = pRemoteCall->GetVM()->GetResource();
 
-        SString strResourceFuncName("%s.function.getNetworkRequestInfo", pResource->GetName().c_str());
+        SString strResourceFuncName("%s.function.getRemoteRequestInfo", pResource->GetName().c_str());
 
         if (pThisResource != pResource && 
             !m_pACLManager->CanObjectUseRight(pThisResource->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, strResourceFuncName, CAccessControlListRight::RIGHT_TYPE_RESOURCE, false) &&
-            !m_pACLManager->CanObjectUseRight(pThisResource->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, "*.function.getNetworkRequestInfo", CAccessControlListRight::RIGHT_TYPE_RESOURCE, false))
+            !m_pACLManager->CanObjectUseRight(pThisResource->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, "*.function.getRemoteRequestInfo", CAccessControlListRight::RIGHT_TYPE_RESOURCE, false))
         {
             m_pScriptDebugging->LogBadAccess(luaVM);
             lua_pushboolean(luaVM, false);
@@ -841,7 +841,7 @@ int CLuaFunctionDefs::GetNetworkRequestInfo(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::AbortNetworkRequest(lua_State* luaVM)
+int CLuaFunctionDefs::AbortRemoteRequest(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
     CRemoteCall*     pRemoteCall = nullptr;

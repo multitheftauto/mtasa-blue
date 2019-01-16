@@ -1923,7 +1923,7 @@ int CLuaFunctionDefs::FetchRemote(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::GetNetworkRequests(lua_State* luaVM)
+int CLuaFunctionDefs::GetRemoteRequests(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
     CResource*       pResource = nullptr;
@@ -1951,7 +1951,7 @@ int CLuaFunctionDefs::GetNetworkRequests(lua_State* luaVM)
     }
     return 1;
 }
-int CLuaFunctionDefs::GetNetworkRequestInfo(lua_State* luaVM)
+int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
     CLuaArguments    info, requestedHeaders;
@@ -2026,7 +2026,7 @@ int CLuaFunctionDefs::GetNetworkRequestInfo(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::AbortNetworkRequest(lua_State* luaVM)
+int CLuaFunctionDefs::AbortRemoteRequest(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
     CRemoteCall*     pRemoteCall = nullptr;

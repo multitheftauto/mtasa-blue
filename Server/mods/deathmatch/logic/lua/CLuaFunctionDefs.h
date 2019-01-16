@@ -37,9 +37,9 @@ public:
 
     LUA_DECLARE(CallRemote);
     LUA_DECLARE(FetchRemote);
-    LUA_DECLARE(GetNetworkRequests);
-    LUA_DECLARE(GetNetworkRequestInfo);
-    LUA_DECLARE(AbortNetworkRequest);
+    LUA_DECLARE(GetRemoteRequests);
+    LUA_DECLARE(GetRemoteRequestInfo);
+    LUA_DECLARE(AbortRemoteRequest);
 
     // Event functions
     LUA_DECLARE(AddEvent);
