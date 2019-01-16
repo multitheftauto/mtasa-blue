@@ -2001,12 +2001,15 @@ int CLuaFunctionDefs::GetRemoteRequestInfo(lua_State* luaVM)
 
         if (pRemoteCall->GetDownloadStatus(downloadInfo))
         {
-            info.PushString("bytes_received");
+            info.PushString("bytesReceived");
             info.PushNumber(downloadInfo.uiBytesReceived);
 
-            info.PushString("bytes_total");
+            info.PushString("bytesTotal");
             info.PushNumber(downloadInfo.uiContentLength);
         }
+
+        info.PushString("currentAttempt");
+        info.PushNumber(downloadInfo.uiAttemptNumber);
 
         // requested headers
         info.PushString("headers");
