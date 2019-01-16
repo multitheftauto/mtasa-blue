@@ -479,6 +479,12 @@ void CGameSA::Reset()
 
         // Restore model dummies' positions
         CModelInfoSA::ResetAllVehicleDummies();
+        CModelInfoSA::RestoreAllObjectsPropertiesGroups();
+        // restore default properties of all CObjectDynamicInfoSA instances
+        for (unsigned char i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
+        {
+            ObjectDynamicInfo[i].RestoreDefaultValues();
+        }
     }
 }
 

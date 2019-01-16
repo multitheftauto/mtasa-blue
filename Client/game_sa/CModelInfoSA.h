@@ -277,6 +277,7 @@ protected:
     static std::map<DWORD, float>                                                                ms_ModelDefaultLodDistanceMap;
     static std::map<DWORD, BYTE>                                                                 ms_ModelDefaultAlphaTransparencyMap;
     static std::unordered_map<CVehicleModelInfoSAInterface*, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
+    static std::map<DWORD, unsigned char>                                                        ms_OriginalObjectPropertiesGroups;
     bool                                                                                         m_bAddedRefForCollision;
     SVehicleSupportedUpgrades                                                                    m_ModelSupportedUpgrades;
 
@@ -375,7 +376,10 @@ public:
     void InitialiseSupportedUpgrades(RpClump* pClump);
     void ResetSupportedUpgrades();
 
+    void          SetObjectPropertiesGroup(unsigned char ucObjectGroup);
     unsigned char GetObjectPropertiesGroup();
+    void          RestoreObjectPropertiesGroup();
+    static void   RestoreAllObjectsPropertiesGroups();
 
 private:
     void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);

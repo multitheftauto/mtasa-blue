@@ -173,5 +173,7 @@ public:
     virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() = 0;
     virtual void                      ResetSupportedUpgrades() = 0;
 
+    virtual void          SetObjectPropertiesGroup(unsigned char ucObjectGroup) = 0;
     virtual unsigned char GetObjectPropertiesGroup() = 0;
+    virtual void          RestoreObjectPropertiesGroup() = 0;
 };

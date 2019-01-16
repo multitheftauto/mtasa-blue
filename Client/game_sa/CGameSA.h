@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CModelInfoSA.h"
+#include "CObjectDynamicInfoSA.h"
 #include "CFxManagerSA.h"
 
 #define     MAX_MEMORY_OFFSET_1_0           0xCAF008
