@@ -116,6 +116,17 @@ float CObjectGroupPhysicalPropertiesSA::GetElasticity()
     return m_pInterface->fElasticity;
 }
 
+void CObjectGroupPhysicalPropertiesSA::SetBuoyancy(float fBuoyancy)
+{
+    ChangeSafeguard();
+    m_pInterface->fBuoyancy = fBuoyancy;
+}
+
+float CObjectGroupPhysicalPropertiesSA::GetBuoyancy()
+{
+    return m_pInterface->fBuoyancy;
+}
+
 void CObjectGroupPhysicalPropertiesSA::SetUprootLimit(float fUprootLimit)
 {
     ChangeSafeguard();
@@ -138,26 +149,26 @@ float CObjectGroupPhysicalPropertiesSA::GetColissionDamageMultiplier()
     return m_pInterface->fColDamageMultiplier;
 }
 
-void CObjectGroupPhysicalPropertiesSA::SetColissionDamageEffect(unsigned char ucDamageEffect)
+void CObjectGroupPhysicalPropertiesSA::SetColissionDamageEffect(eDynamicObjectDamageEffect eDamageEffect)
 {
     ChangeSafeguard();
-    m_pInterface->ucColDamageEffect = ucDamageEffect;
+    m_pInterface->eColDamageEffect = eDamageEffect;
 }
 
-unsigned char CObjectGroupPhysicalPropertiesSA::GetCollisionDamageEffect()
+eDynamicObjectDamageEffect CObjectGroupPhysicalPropertiesSA::GetCollisionDamageEffect()
 {
-    return m_pInterface->ucColDamageEffect;
+    return m_pInterface->eColDamageEffect;
 }
 
-void CObjectGroupPhysicalPropertiesSA::SetCollisionSpecialResponseCase(unsigned char ucResponseCase)
+void CObjectGroupPhysicalPropertiesSA::SetCollisionSpecialResponseCase(eDynamicObjectCollisionResponse eResponseCase)
 {
     ChangeSafeguard();
-    m_pInterface->ucSpecialColResponse = ucResponseCase;
+    m_pInterface->eSpecialColResponse = eResponseCase;
 }
 
-unsigned char CObjectGroupPhysicalPropertiesSA::GetCollisionSpecialResponseCase()
+eDynamicObjectCollisionResponse CObjectGroupPhysicalPropertiesSA::GetCollisionSpecialResponseCase()
 {
-    return m_pInterface->ucSpecialColResponse;
+    return m_pInterface->eSpecialColResponse;
 }
 
 void CObjectGroupPhysicalPropertiesSA::SetCameraAvoidObject(bool bAvoid)
@@ -180,6 +191,17 @@ void CObjectGroupPhysicalPropertiesSA::SetCausesExplosion(bool bExplodes)
 bool CObjectGroupPhysicalPropertiesSA::GetCausesExplosion()
 {
     return m_pInterface->bCausesExplosion;
+}
+
+bool CObjectGroupPhysicalPropertiesSA::SetFxType(eDynamicPropertyFxType eFxType)
+{
+    ChangeSafeguard();
+    m_pInterface->eFxType = eFxType;
+}
+
+eDynamicPropertyFxType CObjectGroupPhysicalPropertiesSA::GetFxType()
+{
+    return m_pInterface->eFxType;
 }
 
 void CObjectGroupPhysicalPropertiesSA::SetFxOffset(CVector vecOffset)
@@ -226,24 +248,24 @@ float CObjectGroupPhysicalPropertiesSA::GetBreakVelocityRandomness()
     return m_pInterface->fBreakVelocityRand;
 }
 
-void CObjectGroupPhysicalPropertiesSA::SetGunBreakMode(DWORD dwBreakMode)
+void CObjectGroupPhysicalPropertiesSA::SetBreakMode(eDynamicPropertyBreakMode eBreakMode)
 {
     ChangeSafeguard();
-    m_pInterface->dwGunBreakMode = dwBreakMode;
+    m_pInterface->eBreakMode = eBreakMode;
 }
 
-DWORD CObjectGroupPhysicalPropertiesSA::GetGunBreakMode()
+eDynamicPropertyBreakMode CObjectGroupPhysicalPropertiesSA::GetBreakMode()
 {
-    return m_pInterface->dwGunBreakMode;
+    return m_pInterface->eBreakMode;
 }
 
-void CObjectGroupPhysicalPropertiesSA::SetSparksOnImpact(DWORD dwSparks)
+void CObjectGroupPhysicalPropertiesSA::SetSparksOnImpact(bool bSparks)
 {
     ChangeSafeguard();
-    m_pInterface->dwSparksOnImpact = dwSparks;
+    m_pInterface->dwSparksOnImpact = static_cast<bool>(bSparks);
 }
 
-DWORD CObjectGroupPhysicalPropertiesSA::GetSparksOnImpact()
+bool CObjectGroupPhysicalPropertiesSA::GetSparksOnImpact()
 {
-    return m_pInterface->dwSparksOnImpact;
+    return static_cast<bool>(m_pInterface->dwSparksOnImpact);
 }

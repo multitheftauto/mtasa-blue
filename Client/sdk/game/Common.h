@@ -1562,11 +1562,10 @@ enum eObjectGroupDynamicProperty
     CAMERAAVOID,
     EXPLOSION,
     FXTYPE,
-    FXOFFSET,
     SMASHMULTIPLIER,
     BREAKVELOCITY,
     BREAKVELOCITYRAND,
-    GUNBREAKMODE,
+    BREAKMODE,
     SPARKSONIMPACT
 };
 
@@ -1600,4 +1599,11 @@ enum eDynamicPropertyFxType : unsigned char
     PLAY_ON_HIT,
     PLAY_ON_DESTROYED,
     PLAY_ON_HIT_DESTROYED
+};
+
+enum eDynamicPropertyBreakMode
+{
+    NOT_BY_GUN,
+    BY_GUN,
+    SMASHABLE,
 };

@@ -400,6 +400,10 @@ inline SString GetClassByTypeName(eDynamicPropertyFxType*)
 {
     return "objectgroup-property-fxtype";
 }
+inline SString GetClassByTypeName(eDynamicPropertyBreakMode*)
+{
+    return "objectgroup-property-breakmode";
+}
 
 //
 // CResource from userdata

@@ -313,12 +313,13 @@ int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (pResource)
             {
-                bool bIsRawData = CIFPEngine::IsIFPData(strFile);
+                bool    bIsRawData = CIFPEngine::IsIFPData(strFile);
                 SString strPath;
                 // Is this a legal filepath?
                 if (bIsRawData || CResourceManager::ParseResourcePathInput(strFile, pResource, &strPath))
                 {
-                    std::shared_ptr<CClientIFP> pIFP = CIFPEngine::EngineLoadIFP(pResource, m_pManager, bIsRawData ? strFile : strPath, bIsRawData, strBlockName);
+                    std::shared_ptr<CClientIFP> pIFP =
+                        CIFPEngine::EngineLoadIFP(pResource, m_pManager, bIsRawData ? strFile : strPath, bIsRawData, strBlockName);
                     if (pIFP != nullptr)
                     {
                         // Return the IFP element
@@ -937,7 +938,7 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
         {
             lua_pushnumber(luaVM, pModelInfo->GetObjectPropertiesGroup());
             return 1;
-        }        
+        }
         argStream.SetCustomError("Expected valid model ID at argument 1");
     }
     if (argStream.HasErrors())
@@ -951,7 +952,7 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
 int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
 {
     //  bool engineSetModelPhysicalPropertiesGroup ( int modelID, int newGroup )
-    int iModelID;
+    int           iModelID;
     unsigned char ucNewGroup;
 
     CScriptArgReader argStream(luaVM);
@@ -1007,11 +1008,11 @@ int CLuaEngineDefs::EngineRestoreModelPhysicalPropertiesGroup(lua_State* luaVM)
 int CLuaEngineDefs::EngineSetModelGroupPhysicalProperty(lua_State* luaVM)
 {
     //  bool engineSetModelGroupPhysicalProperty ( int groupID, string property, ...)
-    unsigned char ucNewGroup;
+    unsigned char               ucGroup;
     eObjectGroupDynamicProperty eProperty;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(ucNewGroup);
+    argStream.ReadNumber(ucGroup);
     argStream.ReadEnumString(eProperty);
 
     if (argStream.HasErrors())
@@ -1021,11 +1022,11 @@ int CLuaEngineDefs::EngineSetModelGroupPhysicalProperty(lua_State* luaVM)
         lua_pushboolean(luaVM, false);
         return 1;
     }
-    
-    auto pGroup = g_pGame->GetObjectDynamicInfo(ucNewGroup);
+
+    auto pGroup = g_pGame->ObjectGroupPhysicalProperties(ucGroup);
     if (!pGroup)
     {
-        argStream.SetCustomError("Expected valid group ID at argument 1");  
+        argStream.SetCustomError("Expected valid group ID at argument 1");
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
         lua_pushboolean(luaVM, false);
         return 1;
@@ -1033,6 +1034,116 @@ int CLuaEngineDefs::EngineSetModelGroupPhysicalProperty(lua_State* luaVM)
 
     switch (eProperty)
     {
+        case MASS:
+        {
+            float fMass;
+            argStream.ReadNumber(fMass);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetMass(fMass);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case TURNMASS:
+        {
+            float fTurnMass;
+            argStream.ReadNumber(fTurnMass);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetTurnMass(fTurnMass);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case AIRRESISTANCE:
+        {
+            float fAirResistance;
+            argStream.ReadNumber(fAirResistance);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetAirResistance(fAirResistance);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case ELASTICITY:
+        {
+            float fElasticity;
+            argStream.ReadNumber(fElasticity);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetElasticity(fElasticity);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case BUOYANCY:
+        {
+            float fBuoyancy;
+            argStream.ReadNumber(fBuoyancy);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetBuoyancy(fBuoyancy);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case UPROOTLIMIT:
+        {
+            float fUprootLimit;
+            argStream.ReadNumber(fUprootLimit);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetUprootLimit(fUprootLimit);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case COLDAMAGEMULTIPLIER:
+        {
+            float fDamMultiplier;
+            argStream.ReadNumber(fDamMultiplier);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetColissionDamageMultiplier(fDamMultiplier);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case COLDAMAGEEFFECT:
+        {
+            eDynamicObjectDamageEffect eDamEffect;
+            argStream.ReadEnumString(eDamEffect);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetColissionDamageEffect(eDamEffect);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case SPECIALCOLRESPONSE:
+        {
+            eDynamicObjectCollisionResponse eColRepsonse;
+            argStream.ReadEnumString(eColRepsonse);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetCollisionSpecialResponseCase(eColRepsonse);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case CAMERAAVOID:
+        {
+            bool bAvoid;
+            argStream.ReadBool(bAvoid);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetCameraAvoidObject(bAvoid);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
         case EXPLOSION:
         {
             bool bExplode;
@@ -1040,16 +1151,79 @@ int CLuaEngineDefs::EngineSetModelGroupPhysicalProperty(lua_State* luaVM)
             if (argStream.HasErrors())
                 break;
 
-            if (CStaticFunctionDefinitions::SetDynamicPropertiesGroupCausesExplosion(pGroup, bExplode))                        
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-            break;
+            pGroup->SetCausesExplosion(bExplode);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case FXTYPE:
+        {
+            eDynamicPropertyFxType eFxType;
+            argStream.ReadEnumString(eFxType);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetFxType(eFxType);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case SMASHMULTIPLIER:
+        {
+            float fSmashMultiplier;
+            argStream.ReadNumber(fSmashMultiplier);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetSmashMultiplier(fSmashMultiplier);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case BREAKVELOCITY:
+        {
+            CVector vecVelocity;
+            argStream.ReadVector3D(vecVelocity);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetBreakVelocity(vecVelocity);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case BREAKVELOCITYRAND:
+        {
+            float fRandomness;
+            argStream.ReadNumber(fRandomness);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetBreakVelocityRandomness(fRandomness);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case BREAKMODE:
+        {
+            eDynamicPropertyBreakMode eBreakMode;
+            argStream.ReadEnumString(eBreakMode);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetBreakMode(eBreakMode);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case SPARKSONIMPACT:
+        {
+            bool bSparks;
+            argStream.ReadBool(bSparks);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetSparksOnImpact(bSparks);
+            lua_pushboolean(luaVM, true);
+            return 1;
         }
     }
 
     m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
     lua_pushboolean(luaVM, false);
-    return 1;        
+    return 1;
 }
