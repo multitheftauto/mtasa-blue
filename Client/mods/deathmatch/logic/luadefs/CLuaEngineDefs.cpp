@@ -1014,30 +1014,42 @@ int CLuaEngineDefs::EngineSetModelGroupPhysicalProperty(lua_State* luaVM)
     argStream.ReadNumber(ucNewGroup);
     argStream.ReadEnumString(eProperty);
 
-    if (!argStream.HasErrors())
-    {
-        auto pGroup = g_pGame->GetObjectDynamicInfo(ucNewGroup);
-        switch (eProperty)
-        {
-            case EXPLOSION:
-            {
-                bool bExplode;
-                argStream.ReadBool(bExplode);
-                if (CStaticFunctionDefinitions::SetDynamicPropertiesGroupCausesExplosion(pGroup, bExplode))                        
-                {
-                    lua_pushboolean(luaVM, true);
-                    return 1;
-                }
-                break;
-            }
-        }
-
-        argStream.SetCustomError("Expected valid group ID at argument 1");
-    }
     if (argStream.HasErrors())
+    {
+        // We failed
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+    
+    auto pGroup = g_pGame->GetObjectDynamicInfo(ucNewGroup);
+    if (!pGroup)
+    {
+        argStream.SetCustomError("Expected valid group ID at argument 1");  
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
 
-    // We failed
+    switch (eProperty)
+    {
+        case EXPLOSION:
+        {
+            bool bExplode;
+            argStream.ReadBool(bExplode);
+            if (argStream.HasErrors())
+                break;
+
+            if (CStaticFunctionDefinitions::SetDynamicPropertiesGroupCausesExplosion(pGroup, bExplode))                        
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+            break;
+        }
+    }
+
+    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
     lua_pushboolean(luaVM, false);
-    return 1;
+    return 1;        
 }

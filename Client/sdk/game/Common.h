@@ -1569,3 +1569,35 @@ enum eObjectGroupDynamicProperty
     GUNBREAKMODE,
     SPARKSONIMPACT
 };
+
+enum eDynamicObjectDamageEffect : unsigned char
+{
+    NONE = 0,
+    CHANGE_MODEL = 1,
+    SMASH_COMPLETELY = 20,
+    CHANGE_THEN_SMASH = 21,
+    BREAKABLE = 200,
+    BREAKABLE_REMOVED = 202
+};
+
+enum eDynamicObjectCollisionResponse : unsigned char
+{
+    NONE,
+    LAMPPOST,
+    SMALLBOX,
+    BIGBOX,
+    FENCEPART,
+    GRENADE,
+    SWINGDOOR,
+    LOCKDOOR,
+    HANGING,
+    POOLBALL
+};
+
+enum eDynamicPropertyFxType : unsigned char
+{
+    NONE,
+    PLAY_ON_HIT,
+    PLAY_ON_DESTROYED,
+    PLAY_ON_HIT_DESTROYED
+};

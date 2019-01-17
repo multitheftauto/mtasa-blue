@@ -875,7 +875,7 @@ CPed* CGameSA::GetPedContext()
 CObjectGroupPhysicalProperties* CGameSA::GetObjectDynamicInfo(unsigned char ucObjectGroup)
 {
     DEBUG_TRACE("CObjectGroupPhysicalProperties * CGameSA::GetObjectDynamicInfo(unsigned char ucObjectGroup)");
-    if (ucObjectGroup < OBJECTDYNAMICINFO_MAX && ObjectDynamicInfo[ucObjectGroup].IsValid())
+    if (ObjectDynamicInfo[ucObjectGroup].IsValid())
         return &ObjectDynamicInfo[ucObjectGroup];
 
     return nullptr;

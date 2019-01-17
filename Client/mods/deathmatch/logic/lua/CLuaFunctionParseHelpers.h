@@ -388,6 +388,18 @@ inline SString GetClassByTypeName(eObjectGroupDynamicProperty*)
 {
     return "objectgroup-dynamic-property";
 }
+inline SString GetClassByTypeName(eDynamicObjectDamageEffect*)
+{
+    return "objectgroup-property-damageeffect";
+}
+inline SString GetClassByTypeName(eDynamicObjectCollisionResponse*)
+{
+    return "objectgroup-property-colissionresponse";
+}
+inline SString GetClassByTypeName(eDynamicPropertyFxType*)
+{
+    return "objectgroup-property-fxtype";
+}
 
 //
 // CResource from userdata

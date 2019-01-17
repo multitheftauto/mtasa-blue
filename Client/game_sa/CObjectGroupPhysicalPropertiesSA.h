@@ -19,26 +19,26 @@
 class CObjectGroupPhysicalPropertiesSAInterface
 {
 public:
-    float         fMass;
-    float         fTurnMass;
-    float         fAirResistance;
-    float         fElasticity;
-    float         fBuoyancy;
-    float         fUprootLimit;
-    float         fColDamageMultiplier;
-    unsigned char ucColDamageEffect;
-    unsigned char ucSpecialColResponse;
-    bool          bCameraAvoidObject;
-    bool          bCausesExplosion;
-    unsigned char ucFxType;
-    unsigned char pad[3];
-    CVector       vecFxOffset;
-    DWORD         pad2;
-    float         fSmashMultiplier;
-    CVector       vecBreakVelocity;
-    float         fBreakVelocityRand;
-    DWORD         dwGunBreakMode;
-    DWORD         dwSparksOnImpact;
+    float                           fMass;
+    float                           fTurnMass;
+    float                           fAirResistance;
+    float                           fElasticity;
+    float                           fBuoyancy;
+    float                           fUprootLimit;
+    float                           fColDamageMultiplier;
+    eDynamicObjectDamageEffect      ucColDamageEffect;
+    eDynamicObjectCollisionResponse ucSpecialColResponse;
+    bool                            bCameraAvoidObject;
+    bool                            bCausesExplosion;
+    eDynamicPropertyFxType          ucFxType;
+    unsigned char                   pad[3];
+    CVector                         vecFxOffset;
+    void*                           pFxSystemPtr;
+    float                           fSmashMultiplier;
+    CVector                         vecBreakVelocity;
+    float                           fBreakVelocityRand;
+    DWORD                           dwGunBreakMode;
+    DWORD                           dwSparksOnImpact;
 };
 
 class CObjectGroupPhysicalPropertiesSA : public CObjectGroupPhysicalProperties
@@ -54,11 +54,11 @@ public:
     CObjectGroupPhysicalPropertiesSA(unsigned char ucObjectGroup);
 
     CObjectGroupPhysicalPropertiesSAInterface* GetInterface();
-    void                                     SetGroup(unsigned char ucObjectGroup);
-    unsigned char                            GetGroup();
-    bool                                     IsValid();
-    void                                     ChangeSafeguard();
-    static void                              RestoreDefaultValues();
+    void                                       SetGroup(unsigned char ucObjectGroup);
+    unsigned char                              GetGroup();
+    bool                                       IsValid();
+    void                                       ChangeSafeguard();
+    static void                                RestoreDefaultValues();
 
     void          SetMass(float fMass);
     float         GetMass();
