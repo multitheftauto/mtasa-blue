@@ -12,7 +12,7 @@
 #pragma once
 
 #include "CModelInfoSA.h"
-#include "CObjectDynamicInfoSA.h"
+#include "CObjectGroupPhysicalPropertiesSA.h"
 #include "CFxManagerSA.h"
 
 #define     MAX_MEMORY_OFFSET_1_0           0xCAF008
@@ -105,7 +105,7 @@ class CGameSA : public CGame
 private:
     CWeaponInfo* WeaponInfos[NUM_WeaponInfosTotal];
     CModelInfoSA ModelInfo[MODELINFO_MAX];
-    CObjectDynamicInfoSA ObjectDynamicInfo[OBJECTDYNAMICINFO_MAX];
+    CObjectGroupPhysicalPropertiesSA ObjectDynamicInfo[OBJECTDYNAMICINFO_MAX];
 
 public:
     ZERO_ON_NEW
@@ -427,7 +427,7 @@ public:
     void SetPostWeaponFireHandler(PostWeaponFireHandler* pPostWeaponFireHandler) { m_pPostWeaponFireHandler = pPostWeaponFireHandler; }
     void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) { m_pTaskSimpleBeHitHandler = pTaskSimpleBeHitHandler; }
 
-    CObjectDynamicInfo*     GetObjectDynamicInfo(unsigned char ucObjectGroup);
+    CObjectGroupPhysicalProperties*     GetObjectDynamicInfo(unsigned char ucObjectGroup);
 
     PreWeaponFireHandler*   m_pPreWeaponFireHandler;
     PostWeaponFireHandler*  m_pPostWeaponFireHandler;
@@ -452,7 +452,7 @@ private:
     CWorld*             m_pWorld;
     CCamera*            m_pCamera;
     CModelInfo*         m_pModelInfo;
-    CObjectDynamicInfo* m_pObjectDynamicInfo;
+    CObjectGroupPhysicalProperties* m_pObjectDynamicInfo;
     CPickups*           m_pPickups;
     CWeaponInfo*        m_pWeaponInfo;
     CExplosionManager*  m_pExplosionManager;

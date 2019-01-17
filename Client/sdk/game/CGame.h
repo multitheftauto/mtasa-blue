@@ -79,7 +79,7 @@ typedef void(InRenderer)();
 #include "CWeaponInfo.h"
 #include "CWorld.h"
 #include "TaskCarAccessories.h"
-#include "CObjectDynamicInfo.h"
+#include "CObjectGroupPhysicalProperties.h"
 
 #include <windows.h>
 
@@ -249,5 +249,5 @@ public:
     virtual void SetPostWeaponFireHandler(PostWeaponFireHandler* pPostWeaponFireHandler) = 0;
     virtual void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) = 0;
 
-    virtual CObjectDynamicInfo* GetObjectDynamicInfo(unsigned char ucObjectGroup) = 0;
+    virtual CObjectGroupPhysicalProperties* GetObjectDynamicInfo(unsigned char ucObjectGroup) = 0;
 };

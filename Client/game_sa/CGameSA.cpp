@@ -65,7 +65,7 @@ CGameSA::CGameSA()
         ModelInfo[i].SetModelID(i);
     }
 
-    // Prepare all object dynamic infos for CObjectDynamicInfoSA instances
+    // Prepare all object dynamic infos for CObjectGroupPhysicalPropertiesSA instances
     for (int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
     {
         ObjectDynamicInfo[i].SetGroup(i);
@@ -471,8 +471,8 @@ void CGameSA::Reset()
         // Restore model dummies' positions
         CModelInfoSA::ResetAllVehicleDummies();
         CModelInfoSA::RestoreAllObjectsPropertiesGroups();
-        // restore default properties of all CObjectDynamicInfoSA instances
-        CObjectDynamicInfoSA::RestoreDefaultValues();
+        // restore default properties of all CObjectGroupPhysicalPropertiesSA instances
+        CObjectGroupPhysicalPropertiesSA::RestoreDefaultValues();
     }
 }
 
@@ -872,9 +872,9 @@ CPed* CGameSA::GetPedContext()
     return m_pPedContext;
 }
 
-CObjectDynamicInfo* CGameSA::GetObjectDynamicInfo(unsigned char ucObjectGroup)
+CObjectGroupPhysicalProperties* CGameSA::GetObjectDynamicInfo(unsigned char ucObjectGroup)
 {
-    DEBUG_TRACE("CObjectDynamicInfo * CGameSA::GetObjectDynamicInfo(unsigned char ucObjectGroup)");
+    DEBUG_TRACE("CObjectGroupPhysicalProperties * CGameSA::GetObjectDynamicInfo(unsigned char ucObjectGroup)");
     if (ucObjectGroup < OBJECTDYNAMICINFO_MAX && ObjectDynamicInfo[ucObjectGroup].IsValid())
         return &ObjectDynamicInfo[ucObjectGroup];
 

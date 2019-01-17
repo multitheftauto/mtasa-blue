@@ -9685,7 +9685,7 @@ CClientSearchLight* CStaticFunctionDefinitions::CreateSearchLight(CResource& Res
     return nullptr;
 }
 
-bool CStaticFunctionDefinitions::SetDynamicPropertiesGroupCausesExplosion(CObjectDynamicInfo* pGroup, bool bExplode)
+bool CStaticFunctionDefinitions::SetDynamicPropertiesGroupCausesExplosion(CObjectGroupPhysicalProperties* pGroup, bool bExplode)
 {
     if (!pGroup)
         return false;

@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CObjectDynamicInfoSA.h
+ *  FILE:        game_sa/CObjectGroupPhysicalPropertiesSA.h
  *  PURPOSE:     Header file for objects dynamic physical properties handler class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -11,12 +11,12 @@
 
 #pragma once
 
-#include <game/CObjectDynamicInfo.h>
+#include <game/CObjectGroupPhysicalProperties.h>
 #include <game/Common.h>
 
 #define ARRAY_ObjectGroupsDynamicInfo 0xBB4A90
 
-class CObjectGroupPhysicalPropertiesInterface
+class CObjectGroupPhysicalPropertiesSAInterface
 {
 public:
     float         fMass;
@@ -41,19 +41,19 @@ public:
     DWORD         dwSparksOnImpact;
 };
 
-class CObjectDynamicInfoSA : public CObjectDynamicInfo
+class CObjectGroupPhysicalPropertiesSA : public CObjectGroupPhysicalProperties
 {
 protected:
-    CObjectDynamicInfoSAInterface* m_pInterface;
-    unsigned char                  m_ucObjectGroup;
-    bool                           m_bModified;
-    static std::unordered_map<unsigned char, CObjectGroupPhysicalPropertiesInterface*> ms_OriginalGroupProperties;
+    CObjectGroupPhysicalPropertiesSAInterface*                                           m_pInterface;
+    unsigned char                                                                        m_ucObjectGroup;
+    bool                                                                                 m_bModified;
+    static std::unordered_map<unsigned char, CObjectGroupPhysicalPropertiesSAInterface*> ms_OriginalGroupProperties;
 
 public:
-    CObjectDynamicInfoSA();
-    CObjectDynamicInfoSA(unsigned char ucObjectGroup);
+    CObjectGroupPhysicalPropertiesSA();
+    CObjectGroupPhysicalPropertiesSA(unsigned char ucObjectGroup);
 
-    CObjectGroupPhysicalPropertiesInterface* GetInterface();
+    CObjectGroupPhysicalPropertiesSAInterface* GetInterface();
     void                                     SetGroup(unsigned char ucObjectGroup);
     unsigned char                            GetGroup();
     bool                                     IsValid();

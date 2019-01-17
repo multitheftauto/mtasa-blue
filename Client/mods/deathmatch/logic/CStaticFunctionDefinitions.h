@@ -796,5 +796,5 @@ public:
     static SString       GetVersionSortable();
 
     // Model groups physical properties funcs
-    static bool SetDynamicPropertiesGroupCausesExplosion(CObjectDynamicInfo* pGroup, bool bExplodes);
+    static bool SetDynamicPropertiesGroupCausesExplosion(CObjectGroupPhysicalProperties* pGroup, bool bExplodes);
 };
