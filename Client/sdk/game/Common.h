@@ -1548,62 +1548,66 @@ enum eObjectProperty
     OBJECT_PROPERTY_MAX,
 };
 
-enum eObjectGroupDynamicProperty
+namespace eModelGroup
 {
-    MASS,
-    TURNMASS,
-    AIRRESISTANCE,
-    ELASTICITY,
-    BUOYANCY,
-    UPROOTLIMIT,
-    COLDAMAGEMULTIPLIER,
-    COLDAMAGEEFFECT,
-    SPECIALCOLRESPONSE,
-    CAMERAAVOID,
-    EXPLOSION,
-    FXTYPE,
-    SMASHMULTIPLIER,
-    BREAKVELOCITY,
-    BREAKVELOCITYRAND,
-    BREAKMODE,
-    SPARKSONIMPACT
-};
+    enum Modifiable
+    {
+        MASS,
+        TURNMASS,
+        AIRRESISTANCE,
+        ELASTICITY,
+        BUOYANCY,
+        UPROOTLIMIT,
+        COLDAMAGEMULTIPLIER,
+        COLDAMAGEEFFECT,
+        SPECIALCOLRESPONSE,
+        CAMERAAVOID,
+        EXPLOSION,
+        FXTYPE,
+        FXOFFSET,
+        SMASHMULTIPLIER,
+        BREAKVELOCITY,
+        BREAKVELOCITYRAND,
+        BREAKMODE,
+        SPARKSONIMPACT
+    };
 
-enum eDynamicObjectDamageEffect : unsigned char
-{
-    NONE = 0,
-    CHANGE_MODEL = 1,
-    SMASH_COMPLETELY = 20,
-    CHANGE_THEN_SMASH = 21,
-    BREAKABLE = 200,
-    BREAKABLE_REMOVED = 202
-};
+    enum DamageEffect : unsigned char
+    {
+        NO_EFFECT = 0,
+        CHANGE_MODEL = 1,
+        SMASH_COMPLETELY = 20,
+        CHANGE_THEN_SMASH = 21,
+        BREAKABLE = 200,
+        BREAKABLE_REMOVED = 202
+    };
 
-enum eDynamicObjectCollisionResponse : unsigned char
-{
-    NONE,
-    LAMPPOST,
-    SMALLBOX,
-    BIGBOX,
-    FENCEPART,
-    GRENADE,
-    SWINGDOOR,
-    LOCKDOOR,
-    HANGING,
-    POOLBALL
-};
+    enum CollisionResponse : unsigned char
+    {
+        NO_RESPONSE,
+        LAMPPOST,
+        SMALLBOX,
+        BIGBOX,
+        FENCEPART,
+        GRENADE,
+        SWINGDOOR,
+        LOCKDOOR,
+        HANGING,
+        POOLBALL
+    };
 
-enum eDynamicPropertyFxType : unsigned char
-{
-    NONE,
-    PLAY_ON_HIT,
-    PLAY_ON_DESTROYED,
-    PLAY_ON_HIT_DESTROYED
-};
+    enum FxType : unsigned char
+    {
+        NO_FX,
+        PLAY_ON_HIT,
+        PLAY_ON_DESTROYED,
+        PLAY_ON_HIT_DESTROYED
+    };
 
-enum eDynamicPropertyBreakMode
-{
-    NOT_BY_GUN,
-    BY_GUN,
-    SMASHABLE,
-};
+    enum BreakMode
+    {
+        NOT_BY_GUN,
+        BY_GUN,
+        SMASHABLE,
+    };
+}

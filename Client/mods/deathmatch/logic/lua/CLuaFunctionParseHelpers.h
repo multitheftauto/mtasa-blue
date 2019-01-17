@@ -40,7 +40,11 @@ DECLARE_ENUM(eWeaponState);
 DECLARE_ENUM(eWeaponFlags);
 DECLARE_ENUM(eVehicleComponent);
 DECLARE_ENUM(eObjectProperty);
-DECLARE_ENUM(eObjectGroupDynamicProperty);
+DECLARE_ENUM(eModelGroup::Modifiable);
+DECLARE_ENUM(eModelGroup::DamageEffect);
+DECLARE_ENUM(eModelGroup::CollisionResponse);
+DECLARE_ENUM(eModelGroup::FxType);
+DECLARE_ENUM(eModelGroup::BreakMode);
 DECLARE_ENUM(eFontType);
 DECLARE_ENUM(eFontQuality);
 DECLARE_ENUM(eAudioLookupIndex);
@@ -384,25 +388,25 @@ inline SString GetClassTypeName(eVehicleDummies*)
 {
     return "vehicle-dummy";
 }
-inline SString GetClassByTypeName(eObjectGroupDynamicProperty*)
+inline SString GetClassByTypeName(eModelGroup::Modifiable*)
 {
-    return "objectgroup-property";
+    return "modelgroup-modifiable";
 }
-inline SString GetClassByTypeName(eDynamicObjectDamageEffect*)
+inline SString GetClassByTypeName(eModelGroup::DamageEffect*)
 {
-    return "objectgroup-damageeffect";
+    return "modelgroup-damageeffect";
 }
-inline SString GetClassByTypeName(eDynamicObjectCollisionResponse*)
+inline SString GetClassByTypeName(eModelGroup::CollisionResponse*)
 {
-    return "objectgroup-colissionresponse";
+    return "modelgroup-collisionresponse";
 }
-inline SString GetClassByTypeName(eDynamicPropertyFxType*)
+inline SString GetClassByTypeName(eModelGroup::FxType*)
 {
-    return "objectgroup-fxtype";
+    return "modelgroup-fxtype";
 }
-inline SString GetClassByTypeName(eDynamicPropertyBreakMode*)
+inline SString GetClassByTypeName(eModelGroup::BreakMode*)
 {
-    return "objectgroup-breakmode";
+    return "modelgroup-breakmode";
 }
 
 //

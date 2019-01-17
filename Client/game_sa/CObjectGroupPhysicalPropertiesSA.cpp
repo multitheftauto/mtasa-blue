@@ -149,24 +149,24 @@ float CObjectGroupPhysicalPropertiesSA::GetColissionDamageMultiplier()
     return m_pInterface->fColDamageMultiplier;
 }
 
-void CObjectGroupPhysicalPropertiesSA::SetColissionDamageEffect(eDynamicObjectDamageEffect eDamageEffect)
+void CObjectGroupPhysicalPropertiesSA::SetColissionDamageEffect(eModelGroup::DamageEffect eDamageEffect)
 {
     ChangeSafeguard();
     m_pInterface->eColDamageEffect = eDamageEffect;
 }
 
-eDynamicObjectDamageEffect CObjectGroupPhysicalPropertiesSA::GetCollisionDamageEffect()
+eModelGroup::DamageEffect CObjectGroupPhysicalPropertiesSA::GetCollisionDamageEffect()
 {
     return m_pInterface->eColDamageEffect;
 }
 
-void CObjectGroupPhysicalPropertiesSA::SetCollisionSpecialResponseCase(eDynamicObjectCollisionResponse eResponseCase)
+void CObjectGroupPhysicalPropertiesSA::SetCollisionSpecialResponseCase(eModelGroup::CollisionResponse eResponseCase)
 {
     ChangeSafeguard();
     m_pInterface->eSpecialColResponse = eResponseCase;
 }
 
-eDynamicObjectCollisionResponse CObjectGroupPhysicalPropertiesSA::GetCollisionSpecialResponseCase()
+eModelGroup::CollisionResponse CObjectGroupPhysicalPropertiesSA::GetCollisionSpecialResponseCase()
 {
     return m_pInterface->eSpecialColResponse;
 }
@@ -193,13 +193,13 @@ bool CObjectGroupPhysicalPropertiesSA::GetCausesExplosion()
     return m_pInterface->bCausesExplosion;
 }
 
-bool CObjectGroupPhysicalPropertiesSA::SetFxType(eDynamicPropertyFxType eFxType)
+void CObjectGroupPhysicalPropertiesSA::SetFxType(eModelGroup::FxType eFxType)
 {
     ChangeSafeguard();
     m_pInterface->eFxType = eFxType;
 }
 
-eDynamicPropertyFxType CObjectGroupPhysicalPropertiesSA::GetFxType()
+eModelGroup::FxType CObjectGroupPhysicalPropertiesSA::GetFxType()
 {
     return m_pInterface->eFxType;
 }
@@ -248,13 +248,13 @@ float CObjectGroupPhysicalPropertiesSA::GetBreakVelocityRandomness()
     return m_pInterface->fBreakVelocityRand;
 }
 
-void CObjectGroupPhysicalPropertiesSA::SetBreakMode(eDynamicPropertyBreakMode eBreakMode)
+void CObjectGroupPhysicalPropertiesSA::SetBreakMode(eModelGroup::BreakMode eBreakMode)
 {
     ChangeSafeguard();
     m_pInterface->eBreakMode = eBreakMode;
 }
 
-eDynamicPropertyBreakMode CObjectGroupPhysicalPropertiesSA::GetBreakMode()
+eModelGroup::BreakMode CObjectGroupPhysicalPropertiesSA::GetBreakMode()
 {
     return m_pInterface->eBreakMode;
 }
