@@ -16,7 +16,7 @@ class CObjectDynamicInfo
 {
 public:
     virtual class CObjectDynamicInfoSAInterface* GetInterface() = 0;
-    virtual unsigned char                        GetObjectGroup() = 0;
+    virtual unsigned char                        GetGroup() = 0;
 
     virtual void          SetMass(float fMass) = 0;
     virtual float         GetMass() = 0;
@@ -50,6 +50,4 @@ public:
     virtual DWORD         GetGunBreakMode() = 0;
     virtual void          SetSparksOnImpact(DWORD dwSparks) = 0;
     virtual DWORD         GetSparksOnImpact() = 0;
-
-    virtual void RestoreDefaultValues() = 0;
 };

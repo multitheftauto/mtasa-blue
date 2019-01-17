@@ -34,6 +34,9 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelIDFromName", EngineGetModelIDFromName},
         {"engineGetModelTextureNames", EngineGetModelTextureNames},
         {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
+        {"engineGetModelPhysicalPropertiesGroup", EngineGetModelPhysicalPropertiesGroup},
+        {"engineSetModelPhysicalPropertiesGroup", EngineSetModelPhysicalPropertiesGroup},
+        {"engineRestoreModelPhysicalPropertiesGroup", EngineRestoreModelPhysicalPropertiesGroup}
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -64,6 +67,9 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getModelTextureNames", "engineGetModelTextureNames");
     lua_classfunction(luaVM, "getModelIDFromName", "engineGetModelIDFromName");
     lua_classfunction(luaVM, "getModelNameFromID", "engineGetModelNameFromID");
+    lua_classfunction(luaVM, "getModelPhysicalPropertiesGroup", "engineGetModelPhysicalPropertiesGroup");
+    lua_classfunction(luaVM, "setModelPhysicalPropertiesGroup", "engineSetModelPhysicalPropertiesGroup");
+    lua_classfunction(luaVM, "restoreModelPhysicalPropertiesGroup", "engineRestoreModelPhysicalPropertiesGroup");
 
     //  lua_classvariable ( luaVM, "modelLODDistance", "engineSetModelLODDistance", "engineGetModelLODDistance" ); .modelLODDistance[model] = distance
     //  lua_classvariable ( luaVM, "modelNameFromID", NULL, "engineGetModelNameFromID" ); .modelNameFromID[id] = "name"
@@ -905,6 +911,88 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
             return 1;
         }
         argStream.SetCustomError("Expected valid model ID or name at argument 1");
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // We failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
+{
+    //  int engineGetModelPhysicalPropertiesGroup ( int modelID )
+    int iModelID;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(iModelID);
+
+    if (!argStream.HasErrors())
+    {
+        auto pModelInfo = g_pGame->GetModelInfo(iModelID);
+        if (pModelInfo)
+        {
+            lua_pushnumber(luaVM, pModelInfo->GetObjectPropertiesGroup());
+            return 1;
+        }        
+        argStream.SetCustomError("Expected valid model ID at argument 1");
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // We failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
+{
+    //  bool engineSetModelPhysicalPropertiesGroup ( int modelID, int newGroup )
+    int iModelID;
+    unsigned char ucNewGroup;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(iModelID);
+    argStream.ReadNumber(ucNewGroup);
+
+    if (!argStream.HasErrors())
+    {
+        auto pModelInfo = g_pGame->GetModelInfo(iModelID);
+        if (pModelInfo)
+        {
+            pModelInfo->SetObjectPropertiesGroup(ucNewGroup);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        argStream.SetCustomError("Expected valid model ID at argument 1");
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // We failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineRestoreModelPhysicalPropertiesGroup(lua_State* luaVM)
+{
+    //  bool engineRestoreModelPhysicalPropertiesGroup ( int modelID )
+    int iModelID;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(iModelID);
+
+    if (!argStream.HasErrors())
+    {
+        auto pModelInfo = g_pGame->GetModelInfo(iModelID);
+        if (pModelInfo)
+        {
+            pModelInfo->RestoreObjectPropertiesGroup();
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        argStream.SetCustomError("Expected valid model ID at argument 1");
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

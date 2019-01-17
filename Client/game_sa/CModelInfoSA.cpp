@@ -20,7 +20,7 @@ std::map<unsigned short, int>                                                   
 std::map<DWORD, float>                                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
 std::map<DWORD, BYTE>                                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<CVehicleModelInfoSAInterface*, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
-std::map<DWORD, unsigned char>                                                        CModelInfoSA::ms_OriginalObjectPropertiesGroups;
+std::unordered_map<DWORD, unsigned char>                                              CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 
 CModelInfoSA::CModelInfoSA()
 {
@@ -1370,35 +1370,24 @@ void CModelInfoSA::ResetSupportedUpgrades()
 
 void CModelInfoSA::SetObjectPropertiesGroup(unsigned char ucNewGroup)
 {
-    if (!m_pInterface)
-        return;
-
     unsigned char  ucOrgGroup = GetObjectPropertiesGroup();
-    unsigned char* ucGroupInMap = MapFind(ms_OriginalObjectPropertiesGroups, m_dwModelID);
-    if (ucGroupInMap)
-        ucOrgGroup = *ucGroupInMap;
+    if (!MapFind(ms_OriginalObjectPropertiesGroups, m_dwModelID))
+        MapSet(ms_OriginalObjectPropertiesGroups, m_dwModelID, ucOrgGroup);
 
-    m_pInterface->ucDynamicIndex = ucNewGroup;
-    MapSet(ms_OriginalObjectPropertiesGroups, m_dwModelID, ucOrgGroup);
+    GetInterface()->ucDynamicIndex = ucNewGroup;
 }
 
 unsigned char CModelInfoSA::GetObjectPropertiesGroup()
 {
-    if (!m_pInterface)
-        return 0;
-
-    return m_pInterface->ucDynamicIndex;
+    return GetInterface()->ucDynamicIndex;
 }
 
 void CModelInfoSA::RestoreObjectPropertiesGroup()
 {
-    if (!m_pInterface)
-        return;
-
     unsigned char* ucGroupInMap = MapFind(ms_OriginalObjectPropertiesGroups, m_dwModelID);
     if (ucGroupInMap)
     {
-        m_pInterface->ucDynamicIndex = *ucGroupInMap;
+        GetInterface()->ucDynamicIndex = *ucGroupInMap;
         MapRemove(ms_OriginalObjectPropertiesGroups, m_dwModelID);
     }
 }

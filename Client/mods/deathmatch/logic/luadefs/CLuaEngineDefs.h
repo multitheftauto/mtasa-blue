@@ -44,6 +44,9 @@ public:
     LUA_DECLARE(EngineGetModelIDFromName);
     LUA_DECLARE(EngineGetModelTextureNames);
     LUA_DECLARE(EngineGetVisibleTextureNames);
+    LUA_DECLARE(EngineGetModelPhysicalPropertiesGroup)
+    LUA_DECLARE(EngineSetModelPhysicalPropertiesGroup)
+    LUA_DECLARE(EngineRestoreModelPhysicalPropertiesGroup)
 
 private:
     static void AddEngineColClass(lua_State* luaVM);

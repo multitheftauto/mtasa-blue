@@ -45,18 +45,20 @@ class CObjectDynamicInfoSA : public CObjectDynamicInfo
 {
 protected:
     CObjectDynamicInfoSAInterface* m_pInterface;
-    CObjectDynamicInfoSAInterface* m_pOriginalCopy;
     unsigned char                  m_ucObjectGroup;
+    bool                           m_bModified;
+    static std::unordered_map<unsigned char, CObjectDynamicInfoSAInterface*> ms_OriginalGroupProperties;
 
 public:
     CObjectDynamicInfoSA();
     CObjectDynamicInfoSA(unsigned char ucObjectGroup);
-    ~CObjectDynamicInfoSA();
 
     CObjectDynamicInfoSAInterface* GetInterface();
-    void                           SetObjectGroup(unsigned char ucObjectGroup);
-    unsigned char                  GetObjectGroup();
+    void                           SetGroup(unsigned char ucObjectGroup);
+    unsigned char                  GetGroup();
     bool                           IsValid();
+    void                           ChangeSafeguard();
+    static void                    RestoreDefaultValues();
 
     void          SetMass(float fMass);
     float         GetMass();
@@ -90,5 +92,4 @@ public:
     DWORD         GetGunBreakMode();
     void          SetSparksOnImpact(DWORD dwSparks);
     DWORD         GetSparksOnImpact();
-    void          RestoreDefaultValues();
 };

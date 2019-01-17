@@ -66,9 +66,9 @@ CGameSA::CGameSA()
     }
 
     // Prepare all object dynamic infos for CObjectDynamicInfoSA instances
-    for (unsigned char i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
+    for (int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
     {
-        ObjectDynamicInfo[i].SetObjectGroup(i);
+        ObjectDynamicInfo[i].SetGroup(i);
     }
 
     DEBUG_TRACE("CGameSA::CGameSA()");
@@ -472,10 +472,7 @@ void CGameSA::Reset()
         CModelInfoSA::ResetAllVehicleDummies();
         CModelInfoSA::RestoreAllObjectsPropertiesGroups();
         // restore default properties of all CObjectDynamicInfoSA instances
-        for (unsigned char i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
-        {
-            ObjectDynamicInfo[i].RestoreDefaultValues();
-        }
+        CObjectDynamicInfoSA::RestoreDefaultValues();
     }
 }
 

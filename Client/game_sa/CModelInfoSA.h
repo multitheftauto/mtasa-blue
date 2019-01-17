@@ -277,7 +277,7 @@ protected:
     static std::map<DWORD, float>                                                                ms_ModelDefaultLodDistanceMap;
     static std::map<DWORD, BYTE>                                                                 ms_ModelDefaultAlphaTransparencyMap;
     static std::unordered_map<CVehicleModelInfoSAInterface*, std::map<eVehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
-    static std::map<DWORD, unsigned char>                                                        ms_OriginalObjectPropertiesGroups;
+    static std::unordered_map<DWORD, unsigned char>                                              ms_OriginalObjectPropertiesGroups;
     bool                                                                                         m_bAddedRefForCollision;
     SVehicleSupportedUpgrades                                                                    m_ModelSupportedUpgrades;
 

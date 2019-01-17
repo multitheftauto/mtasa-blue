@@ -13,28 +13,17 @@
 #include "CObjectDynamicInfoSA.h"
 
 CObjectDynamicInfoSAInterface* pObjectInfo = (CObjectDynamicInfoSAInterface*)ARRAY_ObjectGroupsDynamicInfo;
+std::unordered_map<unsigned char, CObjectDynamicInfoSAInterface*> CObjectDynamicInfoSA::ms_OriginalGroupProperties;
 
 CObjectDynamicInfoSA::CObjectDynamicInfoSA()
 {
     m_pInterface = nullptr;
-    m_pOriginalCopy = nullptr;
 }
 
 CObjectDynamicInfoSA::CObjectDynamicInfoSA(unsigned char ucObjectGroup) : m_ucObjectGroup(ucObjectGroup)
 {
     m_pInterface = &pObjectInfo[ucObjectGroup];
-    // Make copy of original
-    m_pOriginalCopy = new CObjectDynamicInfoSAInterface;
-    memcpy(m_pOriginalCopy, m_pInterface, sizeof(CObjectDynamicInfoSAInterface));
-}
-
-CObjectDynamicInfoSA::~CObjectDynamicInfoSA()
-{
-    if (m_pOriginalCopy != nullptr)
-    {
-        delete m_pOriginalCopy;
-        m_pOriginalCopy = nullptr;
-    }
+    m_bModified = MapFind(ms_OriginalGroupProperties, ucObjectGroup);    
 }
 
 CObjectDynamicInfoSAInterface* CObjectDynamicInfoSA::GetInterface()
@@ -42,28 +31,49 @@ CObjectDynamicInfoSAInterface* CObjectDynamicInfoSA::GetInterface()
     return m_pInterface;
 }
 
-void CObjectDynamicInfoSA::SetObjectGroup(unsigned char ucObjectGroup)
+void CObjectDynamicInfoSA::SetGroup(unsigned char ucObjectGroup)
 {
-    if (m_pOriginalCopy)
-        RestoreDefaultValues();
-
     m_pInterface = &pObjectInfo[ucObjectGroup];
-    // Make copy of original
-    memcpy(m_pOriginalCopy, m_pInterface, sizeof(CObjectDynamicInfoSAInterface));
+    m_ucObjectGroup = ucObjectGroup;
+    m_bModified = MapFind(ms_OriginalGroupProperties, ucObjectGroup);
 }
 
-unsigned char CObjectDynamicInfoSA::GetObjectGroup()
+unsigned char CObjectDynamicInfoSA::GetGroup()
 {
     return m_ucObjectGroup;
 }
 
 bool CObjectDynamicInfoSA::IsValid()
 {
-    return m_pInterface && m_pOriginalCopy;
+    return m_pInterface;
+}
+
+void CObjectDynamicInfoSA::ChangeSafeguard()
+{
+    if (m_bModified)
+        return;
+
+    m_bModified = true;
+    // Make copy of original
+    if (!MapFind(ms_OriginalGroupProperties, m_ucObjectGroup))
+    {
+        auto pOriginalCopy = new CObjectDynamicInfoSAInterface;
+        memcpy(pOriginalCopy, m_pInterface, sizeof(CObjectDynamicInfoSAInterface));
+        MapSet(ms_OriginalGroupProperties, m_ucObjectGroup, pOriginalCopy);
+    }
+}
+
+void CObjectDynamicInfoSA::RestoreDefaultValues()
+{
+    for (auto& entry : ms_OriginalGroupProperties)
+    {
+        memcpy(&pObjectInfo[entry.first], entry.second, sizeof(CObjectDynamicInfoSAInterface));
+    }
 }
 
 void CObjectDynamicInfoSA::SetMass(float fMass)
 {
+    ChangeSafeguard();
     m_pInterface->fMass = fMass;
 }
 
@@ -74,6 +84,7 @@ float CObjectDynamicInfoSA::GetMass()
 
 void CObjectDynamicInfoSA::SetTurnMass(float fTurnMass)
 {
+    ChangeSafeguard();
     m_pInterface->fTurnMass = fTurnMass;
 }
 
@@ -84,16 +95,19 @@ float CObjectDynamicInfoSA::GetTurnMass()
 
 void CObjectDynamicInfoSA::SetAirResistance(float fAirResistance)
 {
+    ChangeSafeguard();
     m_pInterface->fAirResistance = fAirResistance;
 }
 
 float CObjectDynamicInfoSA::GetAirResistance()
 {
+    ChangeSafeguard();
     return m_pInterface->fAirResistance;
 }
 
 void CObjectDynamicInfoSA::SetElasticity(float fElasticity)
 {
+    ChangeSafeguard();
     m_pInterface->fElasticity = fElasticity;
 }
 
@@ -104,6 +118,7 @@ float CObjectDynamicInfoSA::GetElasticity()
 
 void CObjectDynamicInfoSA::SetUprootLimit(float fUprootLimit)
 {
+    ChangeSafeguard();
     m_pInterface->fUprootLimit = fUprootLimit;
 }
 
@@ -114,6 +129,7 @@ float CObjectDynamicInfoSA::GetUprootLimit()
 
 void CObjectDynamicInfoSA::SetColissionDamageMultiplier(float fColMult)
 {
+    ChangeSafeguard();
     m_pInterface->fColDamageMultiplier = fColMult;
 }
 
@@ -124,6 +140,7 @@ float CObjectDynamicInfoSA::GetColissionDamageMultiplier()
 
 void CObjectDynamicInfoSA::SetColissionDamageEffect(unsigned char ucDamageEffect)
 {
+    ChangeSafeguard();
     m_pInterface->ucColDamageEffect = ucDamageEffect;
 }
 
@@ -134,6 +151,7 @@ unsigned char CObjectDynamicInfoSA::GetCollisionDamageEffect()
 
 void CObjectDynamicInfoSA::SetCollisionSpecialResponseCase(unsigned char ucResponseCase)
 {
+    ChangeSafeguard();
     m_pInterface->ucSpecialColResponse = ucResponseCase;
 }
 
@@ -144,6 +162,7 @@ unsigned char CObjectDynamicInfoSA::GetCollisionSpecialResponseCase()
 
 void CObjectDynamicInfoSA::SetCameraAvoidObject(bool bAvoid)
 {
+    ChangeSafeguard();
     m_pInterface->bCameraAvoidObject = bAvoid;
 }
 
@@ -154,6 +173,7 @@ bool CObjectDynamicInfoSA::GetCameraAvoidObject()
 
 void CObjectDynamicInfoSA::SetCausesExplosion(bool bExplodes)
 {
+    ChangeSafeguard();
     m_pInterface->bCausesExplosion = bExplodes;
 }
 
@@ -164,6 +184,7 @@ bool CObjectDynamicInfoSA::GetCausesExplosion()
 
 void CObjectDynamicInfoSA::SetFxOffset(CVector vecOffset)
 {
+    ChangeSafeguard();
     m_pInterface->vecFxOffset = vecOffset;
 }
 
@@ -174,6 +195,7 @@ CVector CObjectDynamicInfoSA::GetFxOffset()
 
 void CObjectDynamicInfoSA::SetSmashMultiplier(float fMult)
 {
+    ChangeSafeguard();
     m_pInterface->fSmashMultiplier = fMult;
 }
 
@@ -184,6 +206,7 @@ float CObjectDynamicInfoSA::GetSmashMultiplier()
 
 void CObjectDynamicInfoSA::SetBreakVelocity(CVector vecVelocity)
 {
+    ChangeSafeguard();
     m_pInterface->vecBreakVelocity = vecVelocity;
 }
 
@@ -194,6 +217,7 @@ CVector CObjectDynamicInfoSA::GetBreakVelocity()
 
 void CObjectDynamicInfoSA::SetBreakVelocityRandomness(float fRand)
 {
+    ChangeSafeguard();
     m_pInterface->fBreakVelocityRand = fRand;
 }
 
@@ -202,7 +226,9 @@ float CObjectDynamicInfoSA::GetBreakVelocityRandomness()
     return m_pInterface->fBreakVelocityRand;
 }
 
-void CObjectDynamicInfoSA::SetGunBreakMode(DWORD dwBreakMode){
+void CObjectDynamicInfoSA::SetGunBreakMode(DWORD dwBreakMode)
+{
+    ChangeSafeguard();
     m_pInterface->dwGunBreakMode = dwBreakMode;
 }
 
@@ -213,16 +239,11 @@ DWORD CObjectDynamicInfoSA::GetGunBreakMode()
 
 void CObjectDynamicInfoSA::SetSparksOnImpact(DWORD dwSparks)
 {
+    ChangeSafeguard();
     m_pInterface->dwSparksOnImpact = dwSparks;
 }
 
 DWORD CObjectDynamicInfoSA::GetSparksOnImpact()
 {
     return m_pInterface->dwSparksOnImpact;
-}
-
-void CObjectDynamicInfoSA::RestoreDefaultValues()
-{
-    assert(m_pOriginalCopy && m_pInterface);
-    memcpy(m_pInterface, m_pOriginalCopy, sizeof(CObjectDynamicInfoSAInterface));
 }
