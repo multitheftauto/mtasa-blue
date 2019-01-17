@@ -12,11 +12,11 @@
 
 #include <CVector.h>
 
-class CObjectDynamicInfo
+class CObjectGroupPhysicalProperties
 {
 public:
-    virtual class CObjectDynamicInfoSAInterface* GetInterface() = 0;
-    virtual unsigned char                        GetGroup() = 0;
+    virtual class CObjectGroupPhysicalPropertiesSAInterface* GetInterface() = 0;
+    virtual unsigned char                                    GetGroup() = 0;
 
     virtual void          SetMass(float fMass) = 0;
     virtual float         GetMass() = 0;

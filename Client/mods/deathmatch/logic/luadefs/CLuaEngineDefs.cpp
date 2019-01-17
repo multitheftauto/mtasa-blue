@@ -36,7 +36,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
         {"engineGetModelPhysicalPropertiesGroup", EngineGetModelPhysicalPropertiesGroup},
         {"engineSetModelPhysicalPropertiesGroup", EngineSetModelPhysicalPropertiesGroup},
-        {"engineRestoreModelPhysicalPropertiesGroup", EngineRestoreModelPhysicalPropertiesGroup}
+        {"engineRestoreModelPhysicalPropertiesGroup", EngineRestoreModelPhysicalPropertiesGroup},
+        {"engineSetModelGroupPhysicalProperty", EngineSetModelGroupPhysicalProperty}
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -70,6 +71,7 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getModelPhysicalPropertiesGroup", "engineGetModelPhysicalPropertiesGroup");
     lua_classfunction(luaVM, "setModelPhysicalPropertiesGroup", "engineSetModelPhysicalPropertiesGroup");
     lua_classfunction(luaVM, "restoreModelPhysicalPropertiesGroup", "engineRestoreModelPhysicalPropertiesGroup");
+    lua_classfunction(luaVM, "setModelGroupPhysicalProperty", "engineSetModelGroupPhysicalProperty");
 
     //  lua_classvariable ( luaVM, "modelLODDistance", "engineSetModelLODDistance", "engineGetModelLODDistance" ); .modelLODDistance[model] = distance
     //  lua_classvariable ( luaVM, "modelNameFromID", NULL, "engineGetModelNameFromID" ); .modelNameFromID[id] = "name"
@@ -993,6 +995,44 @@ int CLuaEngineDefs::EngineRestoreModelPhysicalPropertiesGroup(lua_State* luaVM)
             return 1;
         }
         argStream.SetCustomError("Expected valid model ID at argument 1");
+    }
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // We failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineSetModelGroupPhysicalProperty(lua_State* luaVM)
+{
+    //  bool engineSetModelGroupPhysicalProperty ( int groupID, string property, ...)
+    unsigned char ucNewGroup;
+    eObjectGroupDynamicProperty eProperty;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(ucNewGroup);
+    argStream.ReadEnumString(eProperty);
+
+    if (!argStream.HasErrors())
+    {
+        auto pGroup = g_pGame->GetObjectDynamicInfo(ucNewGroup);
+        switch (eProperty)
+        {
+            case EXPLOSION:
+            {
+                bool bExplode;
+                argStream.ReadBool(bExplode);
+                if (CStaticFunctionDefinitions::SetDynamicPropertiesGroupCausesExplosion(pGroup, bExplode))                        
+                {
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+                break;
+            }
+        }
+
+        argStream.SetCustomError("Expected valid group ID at argument 1");
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

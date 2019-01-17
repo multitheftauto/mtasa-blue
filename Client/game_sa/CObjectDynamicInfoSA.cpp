@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CObjectDynamicInfoSA.h"
+#include "CObjectGroupPhysicalPropertiesSA.h"
 
 CObjectDynamicInfoSAInterface* pObjectInfo = (CObjectDynamicInfoSAInterface*)ARRAY_ObjectGroupsDynamicInfo;
 std::unordered_map<unsigned char, CObjectDynamicInfoSAInterface*> CObjectDynamicInfoSA::ms_OriginalGroupProperties;

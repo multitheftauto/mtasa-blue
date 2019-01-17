@@ -16,7 +16,7 @@
 
 #define ARRAY_ObjectGroupsDynamicInfo 0xBB4A90
 
-class CObjectDynamicInfoSAInterface
+class CObjectGroupPhysicalPropertiesInterface
 {
 public:
     float         fMass;
@@ -47,18 +47,18 @@ protected:
     CObjectDynamicInfoSAInterface* m_pInterface;
     unsigned char                  m_ucObjectGroup;
     bool                           m_bModified;
-    static std::unordered_map<unsigned char, CObjectDynamicInfoSAInterface*> ms_OriginalGroupProperties;
+    static std::unordered_map<unsigned char, CObjectGroupPhysicalPropertiesInterface*> ms_OriginalGroupProperties;
 
 public:
     CObjectDynamicInfoSA();
     CObjectDynamicInfoSA(unsigned char ucObjectGroup);
 
-    CObjectDynamicInfoSAInterface* GetInterface();
-    void                           SetGroup(unsigned char ucObjectGroup);
-    unsigned char                  GetGroup();
-    bool                           IsValid();
-    void                           ChangeSafeguard();
-    static void                    RestoreDefaultValues();
+    CObjectGroupPhysicalPropertiesInterface* GetInterface();
+    void                                     SetGroup(unsigned char ucObjectGroup);
+    unsigned char                            GetGroup();
+    bool                                     IsValid();
+    void                                     ChangeSafeguard();
+    static void                              RestoreDefaultValues();
 
     void          SetMass(float fMass);
     float         GetMass();

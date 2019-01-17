@@ -794,4 +794,7 @@ public:
     static const char*   GetOperatingSystemName();
     static const char*   GetVersionBuildTag();
     static SString       GetVersionSortable();
+
+    // Model groups physical properties funcs
+    static bool SetDynamicPropertiesGroupCausesExplosion(CObjectDynamicInfo* pGroup, bool bExplodes);
 };

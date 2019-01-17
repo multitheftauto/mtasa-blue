@@ -9684,3 +9684,12 @@ CClientSearchLight* CStaticFunctionDefinitions::CreateSearchLight(CResource& Res
 
     return nullptr;
 }
+
+bool CStaticFunctionDefinitions::SetDynamicPropertiesGroupCausesExplosion(CObjectDynamicInfo* pGroup, bool bExplode)
+{
+    if (!pGroup)
+        return false;
+
+    pGroup->SetCausesExplosion(bExplode);
+    return true;
+}
