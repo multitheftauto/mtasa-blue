@@ -386,23 +386,23 @@ inline SString GetClassTypeName(eVehicleDummies*)
 }
 inline SString GetClassByTypeName(eObjectGroupDynamicProperty*)
 {
-    return "objectgroup-dynamic-property";
+    return "objectgroup-property";
 }
 inline SString GetClassByTypeName(eDynamicObjectDamageEffect*)
 {
-    return "objectgroup-property-damageeffect";
+    return "objectgroup-damageeffect";
 }
 inline SString GetClassByTypeName(eDynamicObjectCollisionResponse*)
 {
-    return "objectgroup-property-colissionresponse";
+    return "objectgroup-colissionresponse";
 }
 inline SString GetClassByTypeName(eDynamicPropertyFxType*)
 {
-    return "objectgroup-property-fxtype";
+    return "objectgroup-fxtype";
 }
 inline SString GetClassByTypeName(eDynamicPropertyBreakMode*)
 {
-    return "objectgroup-property-breakmode";
+    return "objectgroup-breakmode";
 }
 
 //

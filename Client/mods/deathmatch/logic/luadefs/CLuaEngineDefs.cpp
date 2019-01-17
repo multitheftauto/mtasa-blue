@@ -1035,79 +1035,89 @@ int CLuaEngineDefs::EngineSetModelGroupPhysicalProperty(lua_State* luaVM)
     switch (eProperty)
     {
         case MASS:
-        {
-            float fMass;
-            argStream.ReadNumber(fMass);
-            if (argStream.HasErrors())
-                break;
-
-            pGroup->SetMass(fMass);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
         case TURNMASS:
-        {
-            float fTurnMass;
-            argStream.ReadNumber(fTurnMass);
-            if (argStream.HasErrors())
-                break;
-
-            pGroup->SetTurnMass(fTurnMass);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
         case AIRRESISTANCE:
-        {
-            float fAirResistance;
-            argStream.ReadNumber(fAirResistance);
-            if (argStream.HasErrors())
-                break;
-
-            pGroup->SetAirResistance(fAirResistance);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
         case ELASTICITY:
-        {
-            float fElasticity;
-            argStream.ReadNumber(fElasticity);
-            if (argStream.HasErrors())
-                break;
-
-            pGroup->SetElasticity(fElasticity);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
         case BUOYANCY:
-        {
-            float fBuoyancy;
-            argStream.ReadNumber(fBuoyancy);
-            if (argStream.HasErrors())
-                break;
-
-            pGroup->SetBuoyancy(fBuoyancy);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
         case UPROOTLIMIT:
+        case COLDAMAGEMULTIPLIER:
+        case SMASHMULTIPLIER:
+        case BREAKVELOCITYRAND:
         {
-            float fUprootLimit;
-            argStream.ReadNumber(fUprootLimit);
+            float fValue;
+            argStream.ReadNumber(fValue);
+
             if (argStream.HasErrors())
                 break;
 
-            pGroup->SetUprootLimit(fUprootLimit);
+            switch (eProperty)
+            {
+                case MASS:
+                    pGroup->SetMass(fValue);
+                    break;
+                case TURNMASS:
+                    pGroup->SetTurnMass(fValue);
+                    break;
+                case AIRRESISTANCE:
+                    pGroup->SetAirResistance(fValue);
+                    break;
+                case ELASTICITY:
+                    pGroup->SetElasticity(fValue);
+                    break;
+                case BUOYANCY:
+                    pGroup->SetBuoyancy(fValue);
+                    break;
+                case UPROOTLIMIT:
+                    pGroup->SetUprootLimit(fValue);
+                    break;
+                case COLDAMAGEMULTIPLIER:
+                    pGroup->SetColissionDamageMultiplier(fValue);
+                    break;
+                case SMASHMULTIPLIER:
+                    pGroup->SetSmashMultiplier(fValue);
+                    break;
+                case BREAKVELOCITYRAND:
+                    pGroup->SetBreakVelocityRandomness(fValue);
+                    break;
+            }
+
             lua_pushboolean(luaVM, true);
             return 1;
         }
-        case COLDAMAGEMULTIPLIER:
+        case CAMERAAVOID:
+        case EXPLOSION:
+        case SPARKSONIMPACT:
         {
-            float fDamMultiplier;
-            argStream.ReadNumber(fDamMultiplier);
+            bool bValue;
+            argStream.ReadBool(bValue);
+
             if (argStream.HasErrors())
                 break;
 
-            pGroup->SetColissionDamageMultiplier(fDamMultiplier);
+            switch (eProperty)
+            {
+                case CAMERAAVOID:
+                    pGroup->SetCameraAvoidObject(bValue);
+                    break;
+                case EXPLOSION:
+                    pGroup->SetCausesExplosion(bValue);
+                    break;
+                case SPARKSONIMPACT:
+                    pGroup->SetSparksOnImpact(bValue);
+                    break;
+            }
+
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+        case BREAKVELOCITY:
+        {
+            CVector vecVelocity;
+            argStream.ReadVector3D(vecVelocity);
+            if (argStream.HasErrors())
+                break;
+
+            pGroup->SetBreakVelocity(vecVelocity);
             lua_pushboolean(luaVM, true);
             return 1;
         }
@@ -1133,28 +1143,6 @@ int CLuaEngineDefs::EngineSetModelGroupPhysicalProperty(lua_State* luaVM)
             lua_pushboolean(luaVM, true);
             return 1;
         }
-        case CAMERAAVOID:
-        {
-            bool bAvoid;
-            argStream.ReadBool(bAvoid);
-            if (argStream.HasErrors())
-                break;
-
-            pGroup->SetCameraAvoidObject(bAvoid);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-        case EXPLOSION:
-        {
-            bool bExplode;
-            argStream.ReadBool(bExplode);
-            if (argStream.HasErrors())
-                break;
-
-            pGroup->SetCausesExplosion(bExplode);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
         case FXTYPE:
         {
             eDynamicPropertyFxType eFxType;
@@ -1166,39 +1154,6 @@ int CLuaEngineDefs::EngineSetModelGroupPhysicalProperty(lua_State* luaVM)
             lua_pushboolean(luaVM, true);
             return 1;
         }
-        case SMASHMULTIPLIER:
-        {
-            float fSmashMultiplier;
-            argStream.ReadNumber(fSmashMultiplier);
-            if (argStream.HasErrors())
-                break;
-
-            pGroup->SetSmashMultiplier(fSmashMultiplier);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-        case BREAKVELOCITY:
-        {
-            CVector vecVelocity;
-            argStream.ReadVector3D(vecVelocity);
-            if (argStream.HasErrors())
-                break;
-
-            pGroup->SetBreakVelocity(vecVelocity);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-        case BREAKVELOCITYRAND:
-        {
-            float fRandomness;
-            argStream.ReadNumber(fRandomness);
-            if (argStream.HasErrors())
-                break;
-
-            pGroup->SetBreakVelocityRandomness(fRandomness);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
         case BREAKMODE:
         {
             eDynamicPropertyBreakMode eBreakMode;
@@ -1207,17 +1162,6 @@ int CLuaEngineDefs::EngineSetModelGroupPhysicalProperty(lua_State* luaVM)
                 break;
 
             pGroup->SetBreakMode(eBreakMode);
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-        case SPARKSONIMPACT:
-        {
-            bool bSparks;
-            argStream.ReadBool(bSparks);
-            if (argStream.HasErrors())
-                break;
-
-            pGroup->SetSparksOnImpact(bSparks);
             lua_pushboolean(luaVM, true);
             return 1;
         }
