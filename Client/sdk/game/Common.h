@@ -1572,7 +1572,7 @@ namespace eObjectGroup
         SPARKSONIMPACT
     };
 
-    enum DamageEffect : unsigned char
+    enum DamageEffect
     {
         NO_EFFECT = 0,
         CHANGE_MODEL = 1,
@@ -1582,7 +1582,7 @@ namespace eObjectGroup
         BREAKABLE_REMOVED = 202
     };
 
-    enum CollisionResponse : unsigned char
+    enum CollisionResponse
     {
         NO_RESPONSE,
         LAMPPOST,
@@ -1596,7 +1596,7 @@ namespace eObjectGroup
         POOLBALL
     };
 
-    enum FxType : unsigned char
+    enum FxType
     {
         NO_FX,
         PLAY_ON_HIT,

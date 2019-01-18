@@ -176,7 +176,7 @@ void CObjectGroupPhysicalPropertiesSA::SetCollisionDamageEffect(eObjectGroup::Da
 
 eObjectGroup::DamageEffect CObjectGroupPhysicalPropertiesSA::GetCollisionDamageEffect()
 {
-    return m_pInterface->eColDamageEffect;
+    return static_cast<eObjectGroup::DamageEffect>(m_pInterface->eColDamageEffect);
 }
 
 void CObjectGroupPhysicalPropertiesSA::SetCollisionSpecialResponseCase(eObjectGroup::CollisionResponse eResponseCase)
@@ -187,7 +187,7 @@ void CObjectGroupPhysicalPropertiesSA::SetCollisionSpecialResponseCase(eObjectGr
 
 eObjectGroup::CollisionResponse CObjectGroupPhysicalPropertiesSA::GetCollisionSpecialResponseCase()
 {
-    return m_pInterface->eSpecialColResponse;
+    return static_cast<eObjectGroup::CollisionResponse>(m_pInterface->eSpecialColResponse);
 }
 
 void CObjectGroupPhysicalPropertiesSA::SetCameraAvoidObject(bool bAvoid)
@@ -220,7 +220,7 @@ void CObjectGroupPhysicalPropertiesSA::SetFxType(eObjectGroup::FxType eFxType)
 
 eObjectGroup::FxType CObjectGroupPhysicalPropertiesSA::GetFxType()
 {
-    return m_pInterface->eFxType;
+    return static_cast<eObjectGroup::FxType>(m_pInterface->eFxType);
 }
 
 void CObjectGroupPhysicalPropertiesSA::SetFxOffset(CVector vecOffset)
@@ -275,7 +275,7 @@ void CObjectGroupPhysicalPropertiesSA::SetBreakMode(eObjectGroup::BreakMode eBre
 
 eObjectGroup::BreakMode CObjectGroupPhysicalPropertiesSA::GetBreakMode()
 {
-    return m_pInterface->eBreakMode;
+    return static_cast<eObjectGroup::BreakMode>(m_pInterface->eBreakMode);
 }
 
 void CObjectGroupPhysicalPropertiesSA::SetSparksOnImpact(bool bSparks)

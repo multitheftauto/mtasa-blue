@@ -26,18 +26,18 @@ public:
     float                           fBuoyancy;
     float                           fUprootLimit;
     float                           fColDamageMultiplier;
-    eObjectGroup::DamageEffect      eColDamageEffect;
-    eObjectGroup::CollisionResponse eSpecialColResponse;
+    unsigned char                   eColDamageEffect;
+    unsigned char                   eSpecialColResponse;
     bool                            bCameraAvoidObject;
     bool                            bCausesExplosion;
-    eObjectGroup::FxType            eFxType;
+    unsigned char                   eFxType;
     unsigned char                   pad[3];
     CVector                         vecFxOffset;
     void*                           pFxSystemPtr;
     float                           fSmashMultiplier;
     CVector                         vecBreakVelocity;
     float                           fBreakVelocityRand;
-    eObjectGroup::BreakMode         eBreakMode;
+    DWORD                           eBreakMode;
     DWORD                           dwSparksOnImpact;
 };
 
