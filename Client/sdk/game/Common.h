@@ -1548,7 +1548,7 @@ enum eObjectProperty
     OBJECT_PROPERTY_MAX,
 };
 
-namespace eModelGroup
+namespace eObjectGroup
 {
     enum Modifiable
     {
