@@ -157,18 +157,18 @@ float CObjectGroupPhysicalPropertiesSA::GetUprootLimit()
     return m_pInterface->fUprootLimit;
 }
 
-void CObjectGroupPhysicalPropertiesSA::SetColissionDamageMultiplier(float fColMult)
+void CObjectGroupPhysicalPropertiesSA::SetCollisionDamageMultiplier(float fColMult)
 {
     ChangeSafeguard();
     m_pInterface->fColDamageMultiplier = fColMult;
 }
 
-float CObjectGroupPhysicalPropertiesSA::GetColissionDamageMultiplier()
+float CObjectGroupPhysicalPropertiesSA::GetCollisionDamageMultiplier()
 {
     return m_pInterface->fColDamageMultiplier;
 }
 
-void CObjectGroupPhysicalPropertiesSA::SetColissionDamageEffect(eObjectGroup::DamageEffect eDamageEffect)
+void CObjectGroupPhysicalPropertiesSA::SetCollisionDamageEffect(eObjectGroup::DamageEffect eDamageEffect)
 {
     ChangeSafeguard();
     m_pInterface->eColDamageEffect = eDamageEffect;

@@ -31,9 +31,9 @@ public:
     virtual float                           GetBuoyancy() = 0;
     virtual void                            SetUprootLimit(float fUprootLimit) = 0;
     virtual float                           GetUprootLimit() = 0;
-    virtual void                            SetColissionDamageMultiplier(float fColMult) = 0;
-    virtual float                           GetColissionDamageMultiplier() = 0;
-    virtual void                            SetColissionDamageEffect(eObjectGroup::DamageEffect eDamageEffect) = 0;
+    virtual void                            SetCollisionDamageMultiplier(float fColMult) = 0;
+    virtual float                           GetCollisionDamageMultiplier() = 0;
+    virtual void                            SetCollisionDamageEffect(eObjectGroup::DamageEffect eDamageEffect) = 0;
     virtual eObjectGroup::DamageEffect      GetCollisionDamageEffect() = 0;
     virtual void                            SetCollisionSpecialResponseCase(eObjectGroup::CollisionResponse eResponseCase) = 0;
     virtual eObjectGroup::CollisionResponse GetCollisionSpecialResponseCase() = 0;

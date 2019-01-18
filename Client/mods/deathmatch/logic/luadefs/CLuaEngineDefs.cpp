@@ -37,7 +37,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelPhysicalPropertiesGroup", EngineGetModelPhysicalPropertiesGroup},
         {"engineSetModelPhysicalPropertiesGroup", EngineSetModelPhysicalPropertiesGroup},
         {"engineRestoreModelPhysicalPropertiesGroup", EngineRestoreModelPhysicalPropertiesGroup},
-        {"engineSetModelGroupPhysicalProperty", EngineSetModelGroupPhysicalProperty}
+        {"engineSetModelGroupPhysicalProperty", EngineSetModelGroupPhysicalProperty},
+        {"engineGetModelGroupPhysicalProperty", EngineGetModelGroupPhysicalProperty}
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -72,6 +73,7 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setModelPhysicalPropertiesGroup", "engineSetModelPhysicalPropertiesGroup");
     lua_classfunction(luaVM, "restoreModelPhysicalPropertiesGroup", "engineRestoreModelPhysicalPropertiesGroup");
     lua_classfunction(luaVM, "setModelGroupPhysicalProperty", "engineSetModelGroupPhysicalProperty");
+    lua_classfunction(luaVM, "getModelGroupPhysicalProperty", "engineGetModelGroupPhysicalProperty");
 
     //  lua_classvariable ( luaVM, "modelLODDistance", "engineSetModelLODDistance", "engineGetModelLODDistance" ); .modelLODDistance[model] = distance
     //  lua_classvariable ( luaVM, "modelNameFromID", NULL, "engineGetModelNameFromID" ); .modelNameFromID[id] = "name"
@@ -945,7 +947,7 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // We failed
-    lua_pushboolean(luaVM, false);
+    lua_pushnil(luaVM);
     return 1;
 }
 
@@ -974,7 +976,7 @@ int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // We failed
-    lua_pushboolean(luaVM, false);
+    lua_pushnil(luaVM);
     return 1;
 }
 
@@ -1071,7 +1073,7 @@ int CLuaEngineDefs::EngineSetModelGroupPhysicalProperty(lua_State* luaVM)
                     pGroup->SetUprootLimit(fValue);
                     break;
                 case eObjectGroup::Modifiable::COLDAMAGEMULTIPLIER:
-                    pGroup->SetColissionDamageMultiplier(fValue);
+                    pGroup->SetCollisionDamageMultiplier(fValue);
                     break;
                 case eObjectGroup::Modifiable::SMASHMULTIPLIER:
                     pGroup->SetSmashMultiplier(fValue);
@@ -1138,7 +1140,7 @@ int CLuaEngineDefs::EngineSetModelGroupPhysicalProperty(lua_State* luaVM)
             if (argStream.HasErrors())
                 break;
 
-            pGroup->SetColissionDamageEffect(eDamEffect);
+            pGroup->SetCollisionDamageEffect(eDamEffect);
             lua_pushboolean(luaVM, true);
             return 1;
         }
@@ -1179,5 +1181,162 @@ int CLuaEngineDefs::EngineSetModelGroupPhysicalProperty(lua_State* luaVM)
 
     m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineGetModelGroupPhysicalProperty(lua_State* luaVM)
+{
+    //  bool engineGetModelGroupPhysicalProperty ( int groupID, string property )
+    unsigned char            ucGroup;
+    eObjectGroup::Modifiable eProperty;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(ucGroup);
+    argStream.ReadEnumString(eProperty);
+
+    if (argStream.HasErrors())
+    {
+        // We failed
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushnil(luaVM);
+        return 1;
+    }
+
+    auto pGroup = g_pGame->GetObjectGroupPhysicalProperties(ucGroup);
+    if (!pGroup)
+    {
+        argStream.SetCustomError("Expected valid group ID at argument 1");
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushnil(luaVM);
+        return 1;
+    }
+
+    switch (eProperty)
+    {
+        case eObjectGroup::Modifiable::MASS:
+        case eObjectGroup::Modifiable::TURNMASS:
+        case eObjectGroup::Modifiable::AIRRESISTANCE:
+        case eObjectGroup::Modifiable::ELASTICITY:
+        case eObjectGroup::Modifiable::BUOYANCY:
+        case eObjectGroup::Modifiable::UPROOTLIMIT:
+        case eObjectGroup::Modifiable::COLDAMAGEMULTIPLIER:
+        case eObjectGroup::Modifiable::SMASHMULTIPLIER:
+        case eObjectGroup::Modifiable::BREAKVELOCITYRAND:
+        {
+            float fValue;
+            switch (eProperty)
+            {
+                case eObjectGroup::Modifiable::MASS:
+                    fValue = pGroup->GetMass();
+                    break;
+                case eObjectGroup::Modifiable::TURNMASS:
+                    fValue = pGroup->GetTurnMass();
+                    break;
+                case eObjectGroup::Modifiable::AIRRESISTANCE:
+                    fValue = pGroup->GetAirResistance();
+                    break;
+                case eObjectGroup::Modifiable::ELASTICITY:
+                    fValue = pGroup->GetElasticity();
+                    break;
+                case eObjectGroup::Modifiable::BUOYANCY:
+                    fValue = pGroup->GetBuoyancy();
+                    break;
+                case eObjectGroup::Modifiable::UPROOTLIMIT:
+                    fValue = pGroup->GetUprootLimit();
+                    break;
+                case eObjectGroup::Modifiable::COLDAMAGEMULTIPLIER:
+                    fValue = pGroup->GetCollisionDamageMultiplier();
+                    break;
+                case eObjectGroup::Modifiable::SMASHMULTIPLIER:
+                    fValue = pGroup->GetSmashMultiplier();
+                    break;
+                case eObjectGroup::Modifiable::BREAKVELOCITYRAND:
+                    fValue = pGroup->GetBreakVelocityRandomness();
+                    break;
+            }
+
+            lua_pushnumber(luaVM, fValue);
+            return 1;
+        }
+        case eObjectGroup::Modifiable::CAMERAAVOID:
+        case eObjectGroup::Modifiable::EXPLOSION:
+        case eObjectGroup::Modifiable::SPARKSONIMPACT:
+        {
+            bool bValue;
+            switch (eProperty)
+            {
+                case eObjectGroup::Modifiable::CAMERAAVOID:
+                    bValue = pGroup->GetCameraAvoidObject();
+                    break;
+                case eObjectGroup::Modifiable::EXPLOSION:
+                    bValue = pGroup->GetCausesExplosion();
+                    break;
+                case eObjectGroup::Modifiable::SPARKSONIMPACT:
+                    bValue = pGroup->GetSparksOnImpact();
+                    break;
+            }
+
+            lua_pushboolean(luaVM, bValue);
+            return 1;
+        }
+        case eObjectGroup::Modifiable::FXOFFSET:
+        case eObjectGroup::Modifiable::BREAKVELOCITY:
+        {
+            CVector vecValue;
+
+            switch (eProperty)
+            {
+                case eObjectGroup::Modifiable::FXOFFSET:
+                    vecValue = pGroup->GetFxOffset();
+                    break;
+                case eObjectGroup::Modifiable::BREAKVELOCITY:
+                    vecValue = pGroup->GetBreakVelocity();
+                    break;
+            }
+
+            lua_pushvector(luaVM, vecValue);
+            return 1;
+        }
+        case eObjectGroup::Modifiable::COLDAMAGEEFFECT:
+        {
+            eObjectGroup::DamageEffect eDamEffect = pGroup->GetCollisionDamageEffect();
+
+            if (!EnumValueValid(eDamEffect))
+                break;
+
+            lua_pushstring(luaVM, EnumToString(eDamEffect));
+            return 1;
+        }
+        case eObjectGroup::Modifiable::SPECIALCOLRESPONSE:
+        {
+            eObjectGroup::CollisionResponse eColRepsonse = pGroup->GetCollisionSpecialResponseCase();
+            if (!EnumValueValid(eColRepsonse))
+                break;
+
+            lua_pushstring(luaVM, EnumToString(eColRepsonse));
+            return 1;
+        }
+        case eObjectGroup::Modifiable::FXTYPE:
+        {
+            eObjectGroup::FxType eFxType = pGroup->GetFxType();
+            if (!EnumValueValid(eFxType))
+                break;
+
+            lua_pushstring(luaVM, EnumToString(eFxType));
+            return 1;
+        }
+        case eObjectGroup::Modifiable::BREAKMODE:
+        {
+            eObjectGroup::BreakMode eBreakMode = pGroup->GetBreakMode();
+            if (!EnumValueValid(eBreakMode))
+                break;
+
+            lua_pushstring(luaVM, EnumToString(eBreakMode));
+            return 1;
+        }
+    }
+
+    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    lua_pushnil(luaVM);
     return 1;
 }

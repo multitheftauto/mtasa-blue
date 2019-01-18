@@ -73,9 +73,9 @@ public:
     float                           GetBuoyancy() override;
     void                            SetUprootLimit(float fUprootLimit);
     float                           GetUprootLimit();
-    void                            SetColissionDamageMultiplier(float fColMult);
-    float                           GetColissionDamageMultiplier();
-    void                            SetColissionDamageEffect(eObjectGroup::DamageEffect ucDamageEffect);
+    void                            SetCollisionDamageMultiplier(float fColMult);
+    float                           GetCollisionDamageMultiplier();
+    void                            SetCollisionDamageEffect(eObjectGroup::DamageEffect ucDamageEffect);
     eObjectGroup::DamageEffect      GetCollisionDamageEffect();
     void                            SetCollisionSpecialResponseCase(eObjectGroup::CollisionResponse ucResponseCase);
     eObjectGroup::CollisionResponse GetCollisionSpecialResponseCase();
