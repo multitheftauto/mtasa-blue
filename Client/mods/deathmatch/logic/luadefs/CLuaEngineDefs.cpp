@@ -1023,7 +1023,7 @@ int CLuaEngineDefs::EngineSetModelGroupPhysicalProperty(lua_State* luaVM)
         return 1;
     }
 
-    auto pGroup = g_pGame->ObjectGroupPhysicalProperties(ucGroup);
+    auto pGroup = g_pGame->GetObjectGroupPhysicalProperties(ucGroup);
     if (!pGroup)
     {
         argStream.SetCustomError("Expected valid group ID at argument 1");

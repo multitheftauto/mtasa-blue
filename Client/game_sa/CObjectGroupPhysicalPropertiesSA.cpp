@@ -63,6 +63,25 @@ void CObjectGroupPhysicalPropertiesSA::ChangeSafeguard()
     }
 }
 
+void CObjectGroupPhysicalPropertiesSA::RestoreDefault()
+{
+    if (!m_bModified)
+        return;
+
+    auto ppOriginalCopy = MapFind(ms_OriginalGroupProperties, m_ucObjectGroup);
+    dassert(ppOriginalCopy);
+    if (!ppOriginalCopy)
+        return;
+
+    auto pOriginal = *ppOriginalCopy;
+    dassert(pOriginal);
+    if (!pOriginal)
+        return;
+    
+    memcpy(m_pInterface, pOriginal, sizeof(CObjectGroupPhysicalPropertiesSAInterface));
+    m_bModified = false;
+}
+
 void CObjectGroupPhysicalPropertiesSA::RestoreDefaultValues()
 {
     for (auto& entry : ms_OriginalGroupProperties)

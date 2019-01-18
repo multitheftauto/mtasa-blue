@@ -310,7 +310,7 @@ public:
 
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID);
-    CObjectGroupPhysicalProperties* ObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
+    CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
 
     DWORD GetSystemTime()
     {

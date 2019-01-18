@@ -249,5 +249,5 @@ public:
     virtual void SetPostWeaponFireHandler(PostWeaponFireHandler* pPostWeaponFireHandler) = 0;
     virtual void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) = 0;
 
-    virtual CObjectGroupPhysicalProperties* ObjectGroupPhysicalProperties(unsigned char ucObjectGroup) = 0;
+    virtual CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup) = 0;
 };

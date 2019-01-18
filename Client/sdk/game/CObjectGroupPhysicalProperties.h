@@ -17,6 +17,7 @@ class CObjectGroupPhysicalProperties
 public:
     virtual class CObjectGroupPhysicalPropertiesSAInterface* GetInterface() = 0;
     virtual unsigned char                                    GetGroup() = 0;
+    virtual void                                             RestoreDefault() = 0;
 
     virtual void                           SetMass(float fMass) = 0;
     virtual float                          GetMass() = 0;

@@ -872,7 +872,7 @@ CPed* CGameSA::GetPedContext()
     return m_pPedContext;
 }
 
-CObjectGroupPhysicalProperties* CGameSA::ObjectGroupPhysicalProperties(unsigned char ucObjectGroup)
+CObjectGroupPhysicalProperties* CGameSA::GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup)
 {
     DEBUG_TRACE("CObjectGroupPhysicalProperties * CGameSA::GetObjectDynamicInfo(unsigned char ucObjectGroup)");
     if (ObjectDynamicInfo[ucObjectGroup].IsValid())

@@ -58,6 +58,7 @@ public:
     unsigned char                              GetGroup();
     bool                                       IsValid();
     void                                       ChangeSafeguard();
+    void                                       RestoreDefault();
     static void                                RestoreDefaultValues();
 
     void                           SetMass(float fMass);
