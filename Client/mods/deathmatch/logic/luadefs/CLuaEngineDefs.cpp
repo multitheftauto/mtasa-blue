@@ -37,8 +37,9 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelPhysicalPropertiesGroup", EngineGetModelPhysicalPropertiesGroup},
         {"engineSetModelPhysicalPropertiesGroup", EngineSetModelPhysicalPropertiesGroup},
         {"engineRestoreModelPhysicalPropertiesGroup", EngineRestoreModelPhysicalPropertiesGroup},
-        {"engineSetModelGroupPhysicalProperty", EngineSetModelGroupPhysicalProperty},
-        {"engineGetModelGroupPhysicalProperty", EngineGetModelGroupPhysicalProperty}
+        {"engineSetObjectGroupPhysicalProperty", EngineSetObjectGroupPhysicalProperty},
+        {"engineGetObjectGroupPhysicalProperty", EngineGetObjectGroupPhysicalProperty},
+        {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties}
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -72,8 +73,9 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getModelPhysicalPropertiesGroup", "engineGetModelPhysicalPropertiesGroup");
     lua_classfunction(luaVM, "setModelPhysicalPropertiesGroup", "engineSetModelPhysicalPropertiesGroup");
     lua_classfunction(luaVM, "restoreModelPhysicalPropertiesGroup", "engineRestoreModelPhysicalPropertiesGroup");
-    lua_classfunction(luaVM, "setModelGroupPhysicalProperty", "engineSetModelGroupPhysicalProperty");
-    lua_classfunction(luaVM, "getModelGroupPhysicalProperty", "engineGetModelGroupPhysicalProperty");
+    lua_classfunction(luaVM, "setObjectGroupPhysicalProperty", "engineSetObjectGroupPhysicalProperty");
+    lua_classfunction(luaVM, "getObjectGroupPhysicalProperty", "engineGetObjectGroupPhysicalProperty");
+    lua_classfunction(luaVM, "restoreObjectGroupPhysicalProperties", "engineRestoreObjectGroupPhysicalProperties");
 
     //  lua_classvariable ( luaVM, "modelLODDistance", "engineSetModelLODDistance", "engineGetModelLODDistance" ); .modelLODDistance[model] = distance
     //  lua_classvariable ( luaVM, "modelNameFromID", NULL, "engineGetModelNameFromID" ); .modelNameFromID[id] = "name"
@@ -1039,8 +1041,7 @@ int CLuaEngineDefs::EngineRestoreModelPhysicalPropertiesGroup(lua_State* luaVM)
     return 1;
 }
 
-std::unordered_map<eObjectGroup::Modifiable, std::function<void(CObjectGroupPhysicalProperties*, float)>> g_GroupPropertiesSettersFloat
-{
+std::unordered_map<eObjectGroup::Modifiable, std::function<void(CObjectGroupPhysicalProperties*, float)>> g_GroupPropertiesSettersFloat{
     {eObjectGroup::Modifiable::MASS,                [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetMass(fValue); }},
     {eObjectGroup::Modifiable::TURNMASS,            [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetTurnMass(fValue); }},
     {eObjectGroup::Modifiable::AIRRESISTANCE,       [](CObjectGroupPhysicalProperties* pGroup, float fValue) { pGroup->SetAirResistance(fValue); }},
@@ -1061,9 +1062,9 @@ std::unordered_map<eObjectGroup::Modifiable, std::function<void(CObjectGroupPhys
     {eObjectGroup::Modifiable::BREAKVELOCITY, [](CObjectGroupPhysicalProperties* pGroup, CVector vecValue) { pGroup->SetBreakVelocity(vecValue); }},
 };
 
-int CLuaEngineDefs::EngineSetModelGroupPhysicalProperty(lua_State* luaVM)
+int CLuaEngineDefs::EngineSetObjectGroupPhysicalProperty(lua_State* luaVM)
 {
-    //  bool engineSetModelGroupPhysicalProperty ( int groupID, string property, ...)
+    //  bool engineSetObjectGroupPhysicalProperty ( int groupID, string property, ...)
     int                      iGivenGroup;
     eObjectGroup::Modifiable eProperty;
 
@@ -1256,9 +1257,9 @@ std::unordered_map<eObjectGroup::Modifiable, std::function<CVector(CObjectGroupP
     {eObjectGroup::Modifiable::FXOFFSET,      [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetFxOffset(); }},
     {eObjectGroup::Modifiable::BREAKVELOCITY, [](CObjectGroupPhysicalProperties* pGroup) { return pGroup->GetBreakVelocity(); }},
 };
-int CLuaEngineDefs::EngineGetModelGroupPhysicalProperty(lua_State* luaVM)
+int CLuaEngineDefs::EngineGetObjectGroupPhysicalProperty(lua_State* luaVM)
 {
-    //  bool engineGetModelGroupPhysicalProperty ( int groupID, string property )
+    //  bool engineGetObjectGroupPhysicalProperty ( int groupID, string property )
     int                      iGivenGroup;
     eObjectGroup::Modifiable eProperty;
 
@@ -1368,5 +1369,43 @@ int CLuaEngineDefs::EngineGetModelGroupPhysicalProperty(lua_State* luaVM)
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
     lua_pushnil(luaVM);
+    return 1;
+}
+
+int CLuaEngineDefs::EngineRestoreObjectGroupPhysicalProperties(lua_State* luaVM)
+{
+    //  bool engineRestoreObjectGroupPhysicalProperties ( int groupID )
+    int iGivenGroup;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadNumber(iGivenGroup);
+
+    if (argStream.HasErrors())
+    {
+        // We failed
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushnil(luaVM);
+        return 1;
+    }
+
+    if (iGivenGroup < 0 || iGivenGroup > 159)
+    {
+        argStream.SetCustomError("Expected group ID in range [0-159] at argument 1");
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushnil(luaVM);
+        return 1;
+    }
+
+    auto pGroup = g_pGame->GetObjectGroupPhysicalProperties(iGivenGroup);
+    if (!pGroup)
+    {
+        argStream.SetCustomError("Expected valid group ID at argument 1");
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushnil(luaVM);
+        return 1;
+    }
+
+    pGroup->RestoreDefault();
+    lua_pushboolean(luaVM, true);
     return 1;
 }

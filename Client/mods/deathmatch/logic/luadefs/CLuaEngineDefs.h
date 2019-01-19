@@ -47,8 +47,9 @@ public:
     LUA_DECLARE(EngineGetModelPhysicalPropertiesGroup)
     LUA_DECLARE(EngineSetModelPhysicalPropertiesGroup)
     LUA_DECLARE(EngineRestoreModelPhysicalPropertiesGroup)
-    LUA_DECLARE(EngineSetModelGroupPhysicalProperty)
-    LUA_DECLARE(EngineGetModelGroupPhysicalProperty)
+    LUA_DECLARE(EngineSetObjectGroupPhysicalProperty)
+    LUA_DECLARE(EngineGetObjectGroupPhysicalProperty)
+    LUA_DECLARE(EngineRestoreObjectGroupPhysicalProperties)
 
 private:
     static void AddEngineColClass(lua_State* luaVM);
