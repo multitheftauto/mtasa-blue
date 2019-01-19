@@ -932,9 +932,17 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(iModelID);
-
+    
     if (!argStream.HasErrors())
     {
+        if (iModelID < 0)
+        {
+            argStream.SetCustomError("Expected positive model at argument 1");
+            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+            lua_pushnil(luaVM);
+            return 1;
+        }
+
         auto pModelInfo = g_pGame->GetModelInfo(iModelID);
         if (pModelInfo)
         {
@@ -963,6 +971,14 @@ int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (iModelID < 0)
+        {
+            argStream.SetCustomError("Expected positive model at argument 1");
+            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+            lua_pushnil(luaVM);
+            return 1;
+        }
+
         auto pModelInfo = g_pGame->GetModelInfo(iModelID);
         if (pModelInfo)
         {
@@ -990,6 +1006,14 @@ int CLuaEngineDefs::EngineRestoreModelPhysicalPropertiesGroup(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (iModelID < 0)
+        {
+            argStream.SetCustomError("Expected positive model at argument 1");
+            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+            lua_pushnil(luaVM);
+            return 1;
+        }
+
         auto pModelInfo = g_pGame->GetModelInfo(iModelID);
         if (pModelInfo)
         {
@@ -1003,34 +1027,43 @@ int CLuaEngineDefs::EngineRestoreModelPhysicalPropertiesGroup(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // We failed
-    lua_pushboolean(luaVM, false);
+    lua_pushnil(luaVM);
     return 1;
 }
 
 int CLuaEngineDefs::EngineSetModelGroupPhysicalProperty(lua_State* luaVM)
 {
     //  bool engineSetModelGroupPhysicalProperty ( int groupID, string property, ...)
-    unsigned char           ucGroup;
+    int                      iGivenGroup;
     eObjectGroup::Modifiable eProperty;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(ucGroup);
+    argStream.ReadNumber(iGivenGroup);
     argStream.ReadEnumString(eProperty);
 
     if (argStream.HasErrors())
     {
         // We failed
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-        lua_pushboolean(luaVM, false);
+        lua_pushnil(luaVM);
         return 1;
     }
 
+    if (iGivenGroup < 0 || iGivenGroup > 0xFF)
+    {
+        argStream.SetCustomError("Expected group ID between 0 and 255 at argument 1");
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushnil(luaVM);        
+        return 1;
+    }
+
+    unsigned char ucGroup = iGivenGroup;
     auto pGroup = g_pGame->GetObjectGroupPhysicalProperties(ucGroup);
     if (!pGroup)
     {
         argStream.SetCustomError("Expected valid group ID at argument 1");
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-        lua_pushboolean(luaVM, false);
+        lua_pushnil(luaVM);
         return 1;
     }
 
@@ -1205,18 +1238,18 @@ int CLuaEngineDefs::EngineSetModelGroupPhysicalProperty(lua_State* luaVM)
     }
 
     m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    lua_pushboolean(luaVM, false);
+    lua_pushnil(luaVM);
     return 1;
 }
 
 int CLuaEngineDefs::EngineGetModelGroupPhysicalProperty(lua_State* luaVM)
 {
     //  bool engineGetModelGroupPhysicalProperty ( int groupID, string property )
-    unsigned char            ucGroup;
+    int                      iGivenGroup;
     eObjectGroup::Modifiable eProperty;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(ucGroup);
+    argStream.ReadNumber(iGivenGroup);
     argStream.ReadEnumString(eProperty);
 
     if (argStream.HasErrors())
@@ -1227,6 +1260,15 @@ int CLuaEngineDefs::EngineGetModelGroupPhysicalProperty(lua_State* luaVM)
         return 1;
     }
 
+    if (iGivenGroup < 0 || iGivenGroup > 0xFF)
+    {
+        argStream.SetCustomError("Expected group ID between 0 and 255 at argument 1");
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushnil(luaVM);
+        return 1;
+    }
+
+    unsigned char ucGroup = iGivenGroup;
     auto pGroup = g_pGame->GetObjectGroupPhysicalProperties(ucGroup);
     if (!pGroup)
     {
