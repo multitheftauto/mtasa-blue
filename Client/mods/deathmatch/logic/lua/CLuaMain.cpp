@@ -362,6 +362,13 @@ CXMLFile* CLuaMain::CreateXML(const char* szFilename, bool bUseIDs, bool bReadOn
     return pFile;
 }
 
+CXMLNode* CLuaMain::ParseString(const char* strXmlContent)
+{
+    CXMLNode* xmlNode = g_pCore->GetXML()->ParseString(strXmlContent);
+
+    return xmlNode;
+}
+
 void CLuaMain::DestroyXML(CXMLFile* pFile)
 {
     if (!m_XMLFiles.empty())

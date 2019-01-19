@@ -67,6 +67,7 @@ public:
     CMapManager*     GetMapManager() const { return m_pMapManager; };
 
     CXMLFile*     CreateXML(const char* szFilename, bool bUseIDs = true, bool bReadOnly = false);
+	CXMLNode*     ParseString(const char* strXmlContent);
     void          DestroyXML(CXMLFile* pFile);
     void          DestroyXML(CXMLNode* pRootNode);
     bool          SaveXML(CXMLNode* pRootNode);

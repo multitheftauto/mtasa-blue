@@ -15,6 +15,7 @@ void CLuaXMLDefs::LoadFunctions()
     std::map<const char*, lua_CFunction> functions{
         {"xmlCreateFile", xmlCreateFile},
         {"xmlLoadFile", xmlLoadFile},
+        {"xmlLoadString", xmlLoadString},
         {"xmlCopyFile", xmlCopyFile},
         {"xmlSaveFile", xmlSaveFile},
         {"xmlUnloadFile", xmlUnloadFile},
@@ -46,6 +47,7 @@ void CLuaXMLDefs::AddClass(lua_State* luaVM)
     lua_newclass(luaVM);
 
     lua_classfunction(luaVM, "load", "xmlLoadFile");
+    lua_classfunction(luaVM, "loadstring", "xmlLoadString");
     lua_classfunction(luaVM, "unload", "xmlUnloadFile");
     lua_classfunction(luaVM, "copy", "xmlCopyFile");
     lua_classfunction(luaVM, "create", "xmlCreateFile");
@@ -209,6 +211,34 @@ int CLuaXMLDefs::xmlLoadFile(lua_State* luaVM)
         if (argStream.HasErrors())
             m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
     }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaXMLDefs::xmlLoadString(lua_State* luaVM)
+{
+    SString strXmlContent;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strXmlContent);
+
+    if (!argStream.HasErrors())
+    {
+        // Grab our resource
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
+        {
+            CXMLNode* rootNode = pLuaMain->ParseString(strXmlContent);
+            if (rootNode->IsValid())
+            {
+                lua_pushxmlnode(luaVM, rootNode);
+                return 1;
+            }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;

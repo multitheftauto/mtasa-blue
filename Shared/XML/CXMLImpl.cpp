@@ -44,6 +44,23 @@ void CXMLImpl::DeleteXML(CXMLFile* pFile)
     delete pFile;
 }
 
+CXMLNode* CXMLImpl::ParseString(const char* strXmlContent)
+{
+    TiXmlDocument* xmlDoc = new TiXmlDocument;
+    if (xmlDoc)
+    {
+        xmlDoc->Parse(strXmlContent, 0, TIXML_ENCODING_UTF8);
+
+        CXMLNode* rootNode = new CXMLNodeImpl(NULL, NULL, *xmlDoc->RootElement());
+
+        return rootNode;
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
 CXMLNode* CXMLImpl::CreateDummyNode()
 {
     CXMLNode* xmlNode = new CXMLNodeImpl(NULL, NULL, *new TiXmlElement("dummy_storage"));
