@@ -45,6 +45,7 @@ public:
     virtual eObjectGroup::FxType            GetFxType() = 0;
     virtual void                            SetFxOffset(CVector vecOffset) = 0;
     virtual CVector                         GetFxOffset() = 0;
+    virtual bool                            SetFxParticleSystem(CFxSystemBPSAInterface* pBlueprint) = 0;
     virtual void                            SetSmashMultiplier(float fMult) = 0;
     virtual float                           GetSmashMultiplier() = 0;
     virtual void                            SetBreakVelocity(CVector vecVelocity) = 0;

@@ -1565,6 +1565,7 @@ namespace eObjectGroup
         EXPLOSION,
         FXTYPE,
         FXOFFSET,
+        FXSYSTEM,
         SMASHMULTIPLIER,
         BREAKVELOCITY,
         BREAKVELOCITYRAND,

@@ -67,6 +67,32 @@ void CFxManagerSA::OnFxSystemSAInterfaceDestroyed(CFxSystemSAInterface* pFxSyste
         delete pFxSystemSA;
 }
 
+CFxSystemBPSAInterface* CFxManagerSA::GetFxSystemBlueprintByName(SString sName)
+{
+    DWORD dwThis = (DWORD)m_pInterface;
+    DWORD dwFunc = FUNC_FxManager_c__GetSystemByName;
+    const char* pChars = sName;
+    CFxSystemBPSAInterface* pFxSystemBlueprint = nullptr;
+
+    _asm
+    {
+        mov     ecx, dwThis 
+        push    pChars
+        call    dwFunc
+        mov     pFxSystemBlueprint, eax
+    }
+
+    if (!pFxSystemBlueprint)
+        return nullptr;
+
+    return pFxSystemBlueprint;
+}
+
+bool CFxManagerSA::IsValidFxSystemBlueprintName(SString sName)
+{
+    return GetFxSystemBlueprintByName(sName) != nullptr;
+}
+
 //
 // AddToList/RemoveFromList called from CFxSystemSA constructor/destructor
 //

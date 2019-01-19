@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CObjectGroupPhysicalPropertiesSA.h"
+extern CGameSA* pGame;
 
 CObjectGroupPhysicalPropertiesSAInterface* pObjectInfo = (CObjectGroupPhysicalPropertiesSAInterface*)ARRAY_ObjectGroupsDynamicInfo;
 std::unordered_map<unsigned char, CObjectGroupPhysicalPropertiesSAInterface*> CObjectGroupPhysicalPropertiesSA::ms_OriginalGroupProperties;
@@ -232,6 +233,19 @@ void CObjectGroupPhysicalPropertiesSA::SetFxOffset(CVector vecOffset)
 CVector CObjectGroupPhysicalPropertiesSA::GetFxOffset()
 {
     return m_pInterface->vecFxOffset;
+}
+
+bool CObjectGroupPhysicalPropertiesSA::SetFxParticleSystem(CFxSystemBPSAInterface* pBlueprint)
+{
+    if (!pBlueprint)
+        return false;
+
+    if (pBlueprint->cPlayMode != 0)
+        return false;
+
+    ChangeSafeguard();
+    m_pInterface->pFxSystemBlueprintPtr = pBlueprint;
+    return true;
 }
 
 void CObjectGroupPhysicalPropertiesSA::SetSmashMultiplier(float fMult)

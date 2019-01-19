@@ -105,7 +105,7 @@ class CGameSA : public CGame
 private:
     CWeaponInfo* WeaponInfos[NUM_WeaponInfosTotal];
     CModelInfoSA ModelInfo[MODELINFO_MAX];
-    CObjectGroupPhysicalPropertiesSA ObjectDynamicInfo[OBJECTDYNAMICINFO_MAX];
+    CObjectGroupPhysicalPropertiesSA ObjectGroupsInfo[OBJECTDYNAMICINFO_MAX];
 
 public:
     ZERO_ON_NEW
@@ -434,40 +434,40 @@ public:
 
 
 private:
-    CPools*             m_pPools;
-    CPlayerInfo*        m_pPlayerInfo;
-    CProjectileInfo*    m_pProjectileInfo;
-    CRadar*             m_pRadar;
-    CRestart*           m_pRestart;
-    CClock*             m_pClock;
-    CCoronas*           m_pCoronas;
-    CCheckpoints*       m_pCheckpoints;
-    CEventList*         m_pEventList;
-    CFireManager*       m_pFireManager;
-    CGarages*           m_pGarages;
-    CHud*               m_pHud;
-    CWanted*            m_pWanted;
-    CWeather*           m_pWeather;
-    CWorld*             m_pWorld;
-    CCamera*            m_pCamera;
-    CModelInfo*         m_pModelInfo;
-    CObjectGroupPhysicalProperties* m_pObjectDynamicInfo;
-    CPickups*           m_pPickups;
-    CWeaponInfo*        m_pWeaponInfo;
-    CExplosionManager*  m_pExplosionManager;
-    C3DMarkers*         m_p3DMarkers;
-    CRenderWareSA*      m_pRenderWare;
-    CHandlingManager*   m_pHandlingManager;
-    CAnimManager*       m_pAnimManager;
-    CStreaming*         m_pStreaming;
-    CVisibilityPlugins* m_pVisibilityPlugins;
-    CKeyGen*            m_pKeyGen;
-    CRopes*             m_pRopes;
-    CFx*                m_pFx;
-    CFxManagerSA*       m_pFxManager;
-    CWaterManager*      m_pWaterManager;
-    CWeaponStatManager* m_pWeaponStatsManager;
-    CPointLights*       m_pPointLights;
+    CPools*                         m_pPools;
+    CPlayerInfo*                    m_pPlayerInfo;
+    CProjectileInfo*                m_pProjectileInfo;
+    CRadar*                         m_pRadar;
+    CRestart*                       m_pRestart;
+    CClock*                         m_pClock;
+    CCoronas*                       m_pCoronas;
+    CCheckpoints*                   m_pCheckpoints;
+    CEventList*                     m_pEventList;
+    CFireManager*                   m_pFireManager;
+    CGarages*                       m_pGarages;
+    CHud*                           m_pHud;
+    CWanted*                        m_pWanted;
+    CWeather*                       m_pWeather;
+    CWorld*                         m_pWorld;
+    CCamera*                        m_pCamera;
+    CModelInfo*                     m_pModelInfo;
+    CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
+    CPickups*                       m_pPickups;
+    CWeaponInfo*                    m_pWeaponInfo;
+    CExplosionManager*              m_pExplosionManager;
+    C3DMarkers*                     m_p3DMarkers;
+    CRenderWareSA*                  m_pRenderWare;
+    CHandlingManager*               m_pHandlingManager;
+    CAnimManager*                   m_pAnimManager;
+    CStreaming*                     m_pStreaming;
+    CVisibilityPlugins*             m_pVisibilityPlugins;
+    CKeyGen*                        m_pKeyGen;
+    CRopes*                         m_pRopes;
+    CFx*                            m_pFx;
+    CFxManagerSA*                   m_pFxManager;
+    CWaterManager*                  m_pWaterManager;
+    CWeaponStatManager*             m_pWeaponStatsManager;
+    CPointLights*                   m_pPointLights;
 
     CPad*                     m_pPad;
     CTheCarGenerators*        m_pTheCarGenerators;

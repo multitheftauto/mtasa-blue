@@ -1177,6 +1177,31 @@ int CLuaEngineDefs::EngineSetModelGroupPhysicalProperty(lua_State* luaVM)
             lua_pushboolean(luaVM, true);
             return 1;
         }
+        case eObjectGroup::Modifiable::FXSYSTEM:
+        {
+            SString sName;
+            argStream.ReadString(sName);
+            if (argStream.HasErrors())
+                break;
+
+            if (!g_pGame->GetFxManager()->IsValidFxSystemBlueprintName(sName))
+            {
+                argStream.SetCustomError("Expected valid fx system name at argument 3");
+                break;
+            }
+
+            CFxSystemBPSAInterface* pBlueprint = g_pGame->GetFxManager()->GetFxSystemBlueprintByName(sName);
+            if (pGroup->SetFxParticleSystem(pBlueprint))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;            
+            }
+            else
+            {
+                argStream.SetCustomError("Given fx system isn't supported");
+                break;
+            }            
+        }
     }
 
     m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -1333,6 +1358,11 @@ int CLuaEngineDefs::EngineGetModelGroupPhysicalProperty(lua_State* luaVM)
 
             lua_pushstring(luaVM, EnumToString(eBreakMode));
             return 1;
+        }
+        case eObjectGroup::Modifiable::FXSYSTEM:
+        {
+            argStream.SetCustomError("Fx system name isn't possible to be extracted.");
+            break;
         }
     }
 

@@ -19,26 +19,26 @@
 class CObjectGroupPhysicalPropertiesSAInterface
 {
 public:
-    float                           fMass;
-    float                           fTurnMass;
-    float                           fAirResistance;
-    float                           fElasticity;
-    float                           fBuoyancy;
-    float                           fUprootLimit;
-    float                           fColDamageMultiplier;
-    unsigned char                   eColDamageEffect;
-    unsigned char                   eSpecialColResponse;
-    bool                            bCameraAvoidObject;
-    bool                            bCausesExplosion;
-    unsigned char                   eFxType;
-    unsigned char                   pad[3];
-    CVector                         vecFxOffset;
-    void*                           pFxSystemPtr;
-    float                           fSmashMultiplier;
-    CVector                         vecBreakVelocity;
-    float                           fBreakVelocityRand;
-    DWORD                           eBreakMode;
-    DWORD                           dwSparksOnImpact;
+    float                   fMass;
+    float                   fTurnMass;
+    float                   fAirResistance;
+    float                   fElasticity;
+    float                   fBuoyancy;
+    float                   fUprootLimit;
+    float                   fColDamageMultiplier;
+    unsigned char           eColDamageEffect;
+    unsigned char           eSpecialColResponse;
+    bool                    bCameraAvoidObject;
+    bool                    bCausesExplosion;
+    unsigned char           eFxType;
+    unsigned char           pad[3];
+    CVector                 vecFxOffset;
+    CFxSystemBPSAInterface* pFxSystemBlueprintPtr;
+    float                   fSmashMultiplier;
+    CVector                 vecBreakVelocity;
+    float                   fBreakVelocityRand;
+    DWORD                   eBreakMode;
+    DWORD                   dwSparksOnImpact;
 };
 
 class CObjectGroupPhysicalPropertiesSA : public CObjectGroupPhysicalProperties
@@ -87,6 +87,7 @@ public:
     eObjectGroup::FxType            GetFxType();
     void                            SetFxOffset(CVector vecOffset);
     CVector                         GetFxOffset();
+    bool                            SetFxParticleSystem(CFxSystemBPSAInterface* pBlueprint);
     void                            SetSmashMultiplier(float fMult);
     float                           GetSmashMultiplier();
     void                            SetBreakVelocity(CVector vecVelocity);

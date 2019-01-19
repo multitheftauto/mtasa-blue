@@ -68,7 +68,7 @@ CGameSA::CGameSA()
     // Prepare all object dynamic infos for CObjectGroupPhysicalPropertiesSA instances
     for (int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
     {
-        ObjectDynamicInfo[i].SetGroup(i);
+        ObjectGroupsInfo[i].SetGroup(i);
     }
 
     DEBUG_TRACE("CGameSA::CGameSA()");
@@ -874,9 +874,9 @@ CPed* CGameSA::GetPedContext()
 
 CObjectGroupPhysicalProperties* CGameSA::GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup)
 {
-    DEBUG_TRACE("CObjectGroupPhysicalProperties * CGameSA::GetObjectDynamicInfo(unsigned char ucObjectGroup)");
-    if (ObjectDynamicInfo[ucObjectGroup].IsValid())
-        return &ObjectDynamicInfo[ucObjectGroup];
+    DEBUG_TRACE("CObjectGroupPhysicalProperties * CGameSA::GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup)");
+    if (ObjectGroupsInfo[ucObjectGroup].IsValid())
+        return &ObjectGroupsInfo[ucObjectGroup];
 
     return nullptr;
 }
