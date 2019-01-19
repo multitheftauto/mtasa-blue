@@ -962,12 +962,12 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
 int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
 {
     //  bool engineSetModelPhysicalPropertiesGroup ( int modelID, int newGroup )
-    int           iModelID;
-    unsigned char ucNewGroup;
+    int          iModelID;
+    unsigned int iNewGroup;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(iModelID);
-    argStream.ReadNumber(ucNewGroup);
+    argStream.ReadNumber(iNewGroup);
 
     if (!argStream.HasErrors())
     {
@@ -979,10 +979,18 @@ int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
             return 1;
         }
 
+        if (iNewGroup < 0 || iNewGroup > 159)
+        {
+            argStream.SetCustomError("Expected group ID in range [0-159] at argument 1");
+            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+            lua_pushnil(luaVM);
+            return 1;
+        }
+
         auto pModelInfo = g_pGame->GetModelInfo(iModelID);
         if (pModelInfo)
         {
-            pModelInfo->SetObjectPropertiesGroup(ucNewGroup);
+            pModelInfo->SetObjectPropertiesGroup(iNewGroup);
             lua_pushboolean(luaVM, true);
             return 1;
         }
@@ -1071,9 +1079,9 @@ int CLuaEngineDefs::EngineSetModelGroupPhysicalProperty(lua_State* luaVM)
         return 1;
     }
 
-    if (iGivenGroup < 0 || iGivenGroup > 0xFF)
+    if (iGivenGroup < 0 || iGivenGroup > 159)
     {
-        argStream.SetCustomError("Expected group ID between 0 and 255 at argument 1");
+        argStream.SetCustomError("Expected group ID in range [0-159] at argument 1");
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
         lua_pushnil(luaVM);
         return 1;
@@ -1266,9 +1274,9 @@ int CLuaEngineDefs::EngineGetModelGroupPhysicalProperty(lua_State* luaVM)
         return 1;
     }
 
-    if (iGivenGroup < 0 || iGivenGroup > 0xFF)
+    if (iGivenGroup < 0 || iGivenGroup > 159)
     {
-        argStream.SetCustomError("Expected group ID between 0 and 255 at argument 1");
+        argStream.SetCustomError("Expected group ID in range [0-159] at argument 1");
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
         lua_pushnil(luaVM);
         return 1;

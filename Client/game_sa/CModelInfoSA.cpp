@@ -20,7 +20,7 @@ std::map<unsigned short, int>                                                   
 std::map<DWORD, float>                                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
 std::map<DWORD, BYTE>                                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<CVehicleModelInfoSAInterface*, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
-std::unordered_map<DWORD, unsigned char>                                              CModelInfoSA::ms_OriginalObjectPropertiesGroups;
+std::unordered_map<DWORD, unsigned short>                                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 
 CModelInfoSA::CModelInfoSA()
 {
@@ -1368,26 +1368,30 @@ void CModelInfoSA::ResetSupportedUpgrades()
     m_ModelSupportedUpgrades.Reset();
 }
 
-void CModelInfoSA::SetObjectPropertiesGroup(unsigned char ucNewGroup)
+void CModelInfoSA::SetObjectPropertiesGroup(unsigned short usNewGroup)
 {
     unsigned char  ucOrgGroup = GetObjectPropertiesGroup();
     if (!MapFind(ms_OriginalObjectPropertiesGroups, m_dwModelID))
         MapSet(ms_OriginalObjectPropertiesGroups, m_dwModelID, ucOrgGroup);
 
-    GetInterface()->ucDynamicIndex = ucNewGroup;
+    GetInterface()->usDynamicIndex = usNewGroup;
 }
 
-unsigned char CModelInfoSA::GetObjectPropertiesGroup()
+unsigned short CModelInfoSA::GetObjectPropertiesGroup()
 {
-    return GetInterface()->ucDynamicIndex;
+    unsigned short usGroup = GetInterface()->usDynamicIndex;
+    if (usGroup == 0xFFFF)
+        usGroup = 0;
+
+    return usGroup;
 }
 
 void CModelInfoSA::RestoreObjectPropertiesGroup()
 {
-    unsigned char* ucGroupInMap = MapFind(ms_OriginalObjectPropertiesGroups, m_dwModelID);
-    if (ucGroupInMap)
+    unsigned short* usGroupInMap = MapFind(ms_OriginalObjectPropertiesGroups, m_dwModelID);
+    if (usGroupInMap)
     {
-        GetInterface()->ucDynamicIndex = *ucGroupInMap;
+        GetInterface()->usDynamicIndex = *usGroupInMap;
         MapRemove(ms_OriginalObjectPropertiesGroups, m_dwModelID);
     }
 }
@@ -1396,7 +1400,7 @@ void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
 {
     for (auto& pair : ms_OriginalObjectPropertiesGroups)
     {
-        pGame->GetModelInfo(pair.first)->GetInterface()->ucDynamicIndex = pair.second;
+        pGame->GetModelInfo(pair.first)->GetInterface()->usDynamicIndex = pair.second;
     }
     ms_OriginalObjectPropertiesGroups.clear();
 }
