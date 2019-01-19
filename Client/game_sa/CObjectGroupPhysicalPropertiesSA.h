@@ -88,6 +88,7 @@ public:
     void                            SetFxOffset(CVector vecOffset);
     CVector                         GetFxOffset();
     bool                            SetFxParticleSystem(CFxSystemBPSAInterface* pBlueprint);
+    void                            RemoveFxParticleSystem();
     void                            SetSmashMultiplier(float fMult);
     float                           GetSmashMultiplier();
     void                            SetBreakVelocity(CVector vecVelocity);

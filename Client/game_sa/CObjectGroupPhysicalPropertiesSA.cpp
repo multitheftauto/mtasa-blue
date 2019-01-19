@@ -87,12 +87,17 @@ void CObjectGroupPhysicalPropertiesSA::RestoreDefaultValues()
 {
     for (auto& entry : ms_OriginalGroupProperties)
     {
-        memcpy(&pObjectInfo[entry.first], entry.second, sizeof(CObjectGroupPhysicalPropertiesSAInterface));
+        pGame->GetObjectGroupPhysicalProperties(entry.first)->RestoreDefault();
+        delete entry.second;
+        MapRemove(ms_OriginalGroupProperties, entry.first);
     }
 }
 
 void CObjectGroupPhysicalPropertiesSA::SetMass(float fMass)
 {
+    if (fabs(m_pInterface->fMass - fMass) < FLOAT_EPSILON)
+        return;
+
     ChangeSafeguard();
     m_pInterface->fMass = fMass;
 }
@@ -104,6 +109,9 @@ float CObjectGroupPhysicalPropertiesSA::GetMass()
 
 void CObjectGroupPhysicalPropertiesSA::SetTurnMass(float fTurnMass)
 {
+    if (fabs(m_pInterface->fTurnMass - fTurnMass) < FLOAT_EPSILON)
+        return;
+
     ChangeSafeguard();
     m_pInterface->fTurnMass = fTurnMass;
 }
@@ -115,6 +123,9 @@ float CObjectGroupPhysicalPropertiesSA::GetTurnMass()
 
 void CObjectGroupPhysicalPropertiesSA::SetAirResistance(float fAirResistance)
 {
+    if (fabs(m_pInterface->fAirResistance - fAirResistance) < FLOAT_EPSILON)
+        return;
+
     ChangeSafeguard();
     m_pInterface->fAirResistance = fAirResistance;
 }
@@ -127,6 +138,9 @@ float CObjectGroupPhysicalPropertiesSA::GetAirResistance()
 
 void CObjectGroupPhysicalPropertiesSA::SetElasticity(float fElasticity)
 {
+    if (fabs(m_pInterface->fElasticity - fElasticity) < FLOAT_EPSILON)
+        return;
+
     ChangeSafeguard();
     m_pInterface->fElasticity = fElasticity;
 }
@@ -138,6 +152,9 @@ float CObjectGroupPhysicalPropertiesSA::GetElasticity()
 
 void CObjectGroupPhysicalPropertiesSA::SetBuoyancy(float fBuoyancy)
 {
+    if (fabs(m_pInterface->fBuoyancy - fBuoyancy) < FLOAT_EPSILON)
+        return;
+
     ChangeSafeguard();
     m_pInterface->fBuoyancy = fBuoyancy;
 }
@@ -149,6 +166,9 @@ float CObjectGroupPhysicalPropertiesSA::GetBuoyancy()
 
 void CObjectGroupPhysicalPropertiesSA::SetUprootLimit(float fUprootLimit)
 {
+    if (fabs(m_pInterface->fUprootLimit - fUprootLimit) < FLOAT_EPSILON)
+        return;
+
     ChangeSafeguard();
     m_pInterface->fUprootLimit = fUprootLimit;
 }
@@ -160,6 +180,9 @@ float CObjectGroupPhysicalPropertiesSA::GetUprootLimit()
 
 void CObjectGroupPhysicalPropertiesSA::SetCollisionDamageMultiplier(float fColMult)
 {
+    if (fabs(m_pInterface->fColDamageMultiplier - fColMult) < FLOAT_EPSILON)
+        return;
+
     ChangeSafeguard();
     m_pInterface->fColDamageMultiplier = fColMult;
 }
@@ -171,6 +194,9 @@ float CObjectGroupPhysicalPropertiesSA::GetCollisionDamageMultiplier()
 
 void CObjectGroupPhysicalPropertiesSA::SetCollisionDamageEffect(eObjectGroup::DamageEffect eDamageEffect)
 {
+    if (static_cast<eObjectGroup::DamageEffect>(m_pInterface->eColDamageEffect) == eDamageEffect)
+        return;
+
     ChangeSafeguard();
     m_pInterface->eColDamageEffect = eDamageEffect;
 }
@@ -182,6 +208,9 @@ eObjectGroup::DamageEffect CObjectGroupPhysicalPropertiesSA::GetCollisionDamageE
 
 void CObjectGroupPhysicalPropertiesSA::SetCollisionSpecialResponseCase(eObjectGroup::CollisionResponse eResponseCase)
 {
+    if (static_cast<eObjectGroup::CollisionResponse>(m_pInterface->eSpecialColResponse) == eResponseCase)
+        return;
+
     ChangeSafeguard();
     m_pInterface->eSpecialColResponse = eResponseCase;
 }
@@ -193,6 +222,9 @@ eObjectGroup::CollisionResponse CObjectGroupPhysicalPropertiesSA::GetCollisionSp
 
 void CObjectGroupPhysicalPropertiesSA::SetCameraAvoidObject(bool bAvoid)
 {
+    if (m_pInterface->bCameraAvoidObject == bAvoid)
+        return;
+
     ChangeSafeguard();
     m_pInterface->bCameraAvoidObject = bAvoid;
 }
@@ -204,6 +236,9 @@ bool CObjectGroupPhysicalPropertiesSA::GetCameraAvoidObject()
 
 void CObjectGroupPhysicalPropertiesSA::SetCausesExplosion(bool bExplodes)
 {
+    if (m_pInterface->bCausesExplosion == bExplodes)
+        return;
+
     ChangeSafeguard();
     m_pInterface->bCausesExplosion = bExplodes;
 }
@@ -215,6 +250,9 @@ bool CObjectGroupPhysicalPropertiesSA::GetCausesExplosion()
 
 void CObjectGroupPhysicalPropertiesSA::SetFxType(eObjectGroup::FxType eFxType)
 {
+    if (static_cast<eObjectGroup::FxType>(m_pInterface->eFxType) == eFxType)
+        return;
+
     ChangeSafeguard();
     m_pInterface->eFxType = eFxType;
 }
@@ -226,6 +264,9 @@ eObjectGroup::FxType CObjectGroupPhysicalPropertiesSA::GetFxType()
 
 void CObjectGroupPhysicalPropertiesSA::SetFxOffset(CVector vecOffset)
 {
+    if (m_pInterface->vecFxOffset == vecOffset)
+        return;
+
     ChangeSafeguard();
     m_pInterface->vecFxOffset = vecOffset;
 }
@@ -243,13 +284,28 @@ bool CObjectGroupPhysicalPropertiesSA::SetFxParticleSystem(CFxSystemBPSAInterfac
     if (pBlueprint->cPlayMode != 0)
         return false;
 
+    if (m_pInterface->pFxSystemBlueprintPtr == pBlueprint)
+        return true;
+
     ChangeSafeguard();
     m_pInterface->pFxSystemBlueprintPtr = pBlueprint;
     return true;
 }
 
+void CObjectGroupPhysicalPropertiesSA::RemoveFxParticleSystem()
+{
+    if (!m_pInterface->pFxSystemBlueprintPtr)
+        return;
+
+    ChangeSafeguard();
+    m_pInterface->pFxSystemBlueprintPtr = nullptr;
+}
+
 void CObjectGroupPhysicalPropertiesSA::SetSmashMultiplier(float fMult)
 {
+    if (fabs(m_pInterface->fSmashMultiplier - fMult) < FLOAT_EPSILON)
+        return;
+
     ChangeSafeguard();
     m_pInterface->fSmashMultiplier = fMult;
 }
@@ -261,6 +317,9 @@ float CObjectGroupPhysicalPropertiesSA::GetSmashMultiplier()
 
 void CObjectGroupPhysicalPropertiesSA::SetBreakVelocity(CVector vecVelocity)
 {
+    if (m_pInterface->vecBreakVelocity == vecVelocity)
+        return;
+
     ChangeSafeguard();
     m_pInterface->vecBreakVelocity = vecVelocity;
 }
@@ -272,6 +331,9 @@ CVector CObjectGroupPhysicalPropertiesSA::GetBreakVelocity()
 
 void CObjectGroupPhysicalPropertiesSA::SetBreakVelocityRandomness(float fRand)
 {
+    if (fabs(m_pInterface->fBreakVelocityRand - fRand) < FLOAT_EPSILON)
+        return;
+
     ChangeSafeguard();
     m_pInterface->fBreakVelocityRand = fRand;
 }
@@ -283,6 +345,9 @@ float CObjectGroupPhysicalPropertiesSA::GetBreakVelocityRandomness()
 
 void CObjectGroupPhysicalPropertiesSA::SetBreakMode(eObjectGroup::BreakMode eBreakMode)
 {
+    if (static_cast<eObjectGroup::BreakMode>(m_pInterface->eBreakMode) == eBreakMode)
+        return;
+
     ChangeSafeguard();
     m_pInterface->eBreakMode = eBreakMode;
 }
@@ -294,6 +359,9 @@ eObjectGroup::BreakMode CObjectGroupPhysicalPropertiesSA::GetBreakMode()
 
 void CObjectGroupPhysicalPropertiesSA::SetSparksOnImpact(bool bSparks)
 {
+    if (static_cast<bool>(m_pInterface->dwSparksOnImpact) == bSparks)
+        return;
+
     ChangeSafeguard();
     m_pInterface->dwSparksOnImpact = static_cast<bool>(bSparks);
 }
