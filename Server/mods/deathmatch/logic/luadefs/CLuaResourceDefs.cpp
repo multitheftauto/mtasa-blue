@@ -484,10 +484,18 @@ int CLuaResourceDefs::startResource(lua_State* luaVM)
         return 1;
     }
 
-    if (pResource->IsLoaded() && !pResource->IsActive() && !pResource->IsStarting())
-    {
-        std::string strResourceName = pResource->GetName();
+    const SString& strResourceName = pResource->GetName();
 
+    if (pResource->IsActive())
+    {
+        // The resource is either starting, running or stopping:
+        // In the event 'onResourcePreStart' the resource will be in the 'starting' state
+        // and in the event 'onResourceStart' the resource is already in the 'running' state
+        // and you can't force-start resources in the 'stopping' state
+        lua_pushboolean(luaVM, true);
+    }
+    else if (pResource->IsLoaded())
+    {
         if (!m_pResourceManager->StartResource(pResource, nullptr, bPersistent, StartOptions))
         {
             CLogger::LogPrintf("%s: Failed to start resource '%s'\n", lua_tostring(luaVM, lua_upvalueindex(1)), strResourceName.c_str());
@@ -527,6 +535,12 @@ int CLuaResourceDefs::startResource(lua_State* luaVM)
             m_pScriptDebugging->LogWarning(luaVM, "Failed to start resource '%s'", strResourceName.c_str());
             lua_pushboolean(luaVM, false);
         }
+    }
+    else
+    {
+        // Resource has loading issues
+        m_pScriptDebugging->LogWarning(luaVM, "Failed to start resource '%s': %s", strResourceName.c_str(), pResource->GetFailureReason().c_str());
+        lua_pushboolean(luaVM, false);
     }
 
     return 1;
