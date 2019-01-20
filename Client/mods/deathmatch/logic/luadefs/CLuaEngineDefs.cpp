@@ -317,13 +317,12 @@ int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (pResource)
             {
-                bool    bIsRawData = CIFPEngine::IsIFPData(strFile);
+                bool bIsRawData = CIFPEngine::IsIFPData(strFile);
                 SString strPath;
                 // Is this a legal filepath?
                 if (bIsRawData || CResourceManager::ParseResourcePathInput(strFile, pResource, &strPath))
                 {
-                    std::shared_ptr<CClientIFP> pIFP =
-                        CIFPEngine::EngineLoadIFP(pResource, m_pManager, bIsRawData ? strFile : strPath, bIsRawData, strBlockName);
+                    std::shared_ptr<CClientIFP> pIFP = CIFPEngine::EngineLoadIFP(pResource, m_pManager, bIsRawData ? strFile : strPath, bIsRawData, strBlockName);
                     if (pIFP != nullptr)
                     {
                         // Return the IFP element
