@@ -390,23 +390,23 @@ inline SString GetClassTypeName(eVehicleDummies*)
 }
 inline SString GetClassByTypeName(eObjectGroup::Modifiable*)
 {
-    return "modelgroup-modifiable";
+    return "objectgroup-modifiable";
 }
 inline SString GetClassByTypeName(eObjectGroup::DamageEffect*)
 {
-    return "modelgroup-damageeffect";
+    return "objectgroup-damageeffect";
 }
 inline SString GetClassByTypeName(eObjectGroup::CollisionResponse*)
 {
-    return "modelgroup-collisionresponse";
+    return "objectgroup-collisionresponse";
 }
 inline SString GetClassByTypeName(eObjectGroup::FxType*)
 {
-    return "modelgroup-fxtype";
+    return "objectgroup-fxtype";
 }
 inline SString GetClassByTypeName(eObjectGroup::BreakMode*)
 {
-    return "modelgroup-breakmode";
+    return "objectgroup-breakmode";
 }
 
 //
