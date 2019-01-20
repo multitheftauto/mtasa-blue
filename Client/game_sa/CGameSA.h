@@ -450,7 +450,6 @@ private:
     CWorld*                         m_pWorld;
     CCamera*                        m_pCamera;
     CModelInfo*                     m_pModelInfo;
-    CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
     CPickups*                       m_pPickups;
     CWeaponInfo*                    m_pWeaponInfo;
     CExplosionManager*              m_pExplosionManager;
@@ -467,6 +466,7 @@ private:
     CWaterManager*                  m_pWaterManager;
     CWeaponStatManager*             m_pWeaponStatsManager;
     CPointLights*                   m_pPointLights;
+    CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
 
     CPad*                     m_pPad;
     CTheCarGenerators*        m_pTheCarGenerators;
