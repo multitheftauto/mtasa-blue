@@ -560,7 +560,7 @@ int CLuaResourceDefs::stopResource(lua_State* luaVM)
         return 1;
     }
 
-    if (pResource->IsActive())
+    if (pResource->IsActive() && !pResource->IsStopping())
     {
         if (pResource->IsProtected())
         {
@@ -577,14 +577,9 @@ int CLuaResourceDefs::stopResource(lua_State* luaVM)
 
         // Schedule it for a stop
         m_pResourceManager->QueueResource(pResource, CResourceManager::QUEUE_STOP, nullptr);
-        lua_pushboolean(luaVM, true);
-    }
-    else
-    {
-        m_pScriptDebugging->LogWarning(luaVM, "Attempt to stop a stopped resource");
-        lua_pushboolean(luaVM, false);
     }
 
+    lua_pushboolean(luaVM, true);
     return 1;
 }
 
