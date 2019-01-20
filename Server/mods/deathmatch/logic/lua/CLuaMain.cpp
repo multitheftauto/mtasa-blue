@@ -418,7 +418,9 @@ CXMLFile* CLuaMain::CreateXML(const char* szFilename, bool bUseIDs, bool bReadOn
 
 CXMLNode* CLuaMain::ParseString(const char* strXmlContent)
 {
-    return g_pServerInterface->GetXML()->CreateDummyNode();
+	CXMLNode* xmlNode = g_pServerInterface->GetXML()->ParseString(strXmlContent);
+
+	return xmlNode;
 }
 
 
