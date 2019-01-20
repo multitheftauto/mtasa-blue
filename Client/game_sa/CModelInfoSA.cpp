@@ -1370,9 +1370,12 @@ void CModelInfoSA::ResetSupportedUpgrades()
 
 void CModelInfoSA::SetObjectPropertiesGroup(unsigned short usNewGroup)
 {
-    unsigned char  ucOrgGroup = GetObjectPropertiesGroup();
+    unsigned short usOrgGroup = GetObjectPropertiesGroup();
+    if (usOrgGroup == usNewGroup)
+        return;
+
     if (!MapFind(ms_OriginalObjectPropertiesGroups, m_dwModelID))
-        MapSet(ms_OriginalObjectPropertiesGroups, m_dwModelID, ucOrgGroup);
+        MapSet(ms_OriginalObjectPropertiesGroups, m_dwModelID, usOrgGroup);
 
     GetInterface()->usDynamicIndex = usNewGroup;
 }

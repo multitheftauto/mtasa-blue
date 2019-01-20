@@ -432,7 +432,6 @@ public:
     PostWeaponFireHandler*  m_pPostWeaponFireHandler;
     TaskSimpleBeHitHandler* m_pTaskSimpleBeHitHandler;
 
-
 private:
     CPools*                         m_pPools;
     CPlayerInfo*                    m_pPlayerInfo;
