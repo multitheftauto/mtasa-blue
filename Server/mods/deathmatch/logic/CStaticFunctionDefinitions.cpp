@@ -72,7 +72,7 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions(CGame* pGame)
     m_pCustomWeaponManager = pGame->GetCustomWeaponManager();
 }
 
-CStaticFunctionDefinitions::~CStaticFunctionDefinitions(void)
+CStaticFunctionDefinitions::~CStaticFunctionDefinitions()
 {
 }
 
@@ -190,7 +190,7 @@ const char* CStaticFunctionDefinitions::GetCancelReason()
     return m_pEvents->GetLastError();
 }
 
-bool CStaticFunctionDefinitions::WasEventCancelled(void)
+bool CStaticFunctionDefinitions::WasEventCancelled()
 {
     return m_pEvents->WasEventCancelled();
 }
@@ -1985,7 +1985,7 @@ CPed* CStaticFunctionDefinitions::CreatePed(CResource* pResource, unsigned short
     return NULL;
 }
 
-unsigned int CStaticFunctionDefinitions::GetPlayerCount(void)
+unsigned int CStaticFunctionDefinitions::GetPlayerCount()
 {
     return m_pPlayerManager->CountJoined();
 }
@@ -2727,7 +2727,7 @@ bool CStaticFunctionDefinitions::GetPlayerSourceIP(CPlayer* pPlayer, SString& st
     return true;
 }
 
-CPlayer* CStaticFunctionDefinitions::GetRandomPlayer(void)
+CPlayer* CStaticFunctionDefinitions::GetRandomPlayer()
 {
     unsigned int uiJoinedCount = m_pPlayerManager->CountJoined();
     if (uiJoinedCount > 0)
@@ -3278,6 +3278,9 @@ bool CStaticFunctionDefinitions::RedirectPlayer(CElement* pElement, const char* 
     if (IS_PLAYER(pElement))
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
+
+        if (pPlayer->IsLeavingServer())
+            return false;
 
         unsigned char ucHostLength = static_cast<unsigned char>(strlen(szHost));
 
@@ -9150,7 +9153,7 @@ bool CStaticFunctionDefinitions::SetWorldWaterLevel(float fLevel, bool bIncludeW
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetWorldWaterLevel(void)
+bool CStaticFunctionDefinitions::ResetWorldWaterLevel()
 {
     CBitStream BitStream;
     g_pGame->GetWaterManager()->ResetWorldWaterLevel();
@@ -9820,7 +9823,7 @@ bool CStaticFunctionDefinitions::GetClothesTypeName(unsigned char ucType, char* 
     return false;
 }
 
-unsigned int CStaticFunctionDefinitions::GetMaxPlayers(void)
+unsigned int CStaticFunctionDefinitions::GetMaxPlayers()
 {
     return m_pMainConfig->GetMaxPlayers();
 }
@@ -10394,7 +10397,7 @@ bool CStaticFunctionDefinitions::RestoreWorldModel(unsigned short usModel, float
     return true;
 }
 
-bool CStaticFunctionDefinitions::RestoreAllWorldModels(void)
+bool CStaticFunctionDefinitions::RestoreAllWorldModels()
 {
     g_pGame->GetBuildingRemovalManager()->ClearBuildingRemovals();
     CBitStream BitStream;
@@ -10403,7 +10406,7 @@ bool CStaticFunctionDefinitions::RestoreAllWorldModels(void)
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetMoonSize(void)
+bool CStaticFunctionDefinitions::ResetMoonSize()
 {
     CBitStream BitStream;
     g_pGame->SetHasMoonSize(false);
@@ -10611,7 +10614,7 @@ bool CStaticFunctionDefinitions::SetSkyGradient(unsigned char ucTopRed, unsigned
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetSkyGradient(void)
+bool CStaticFunctionDefinitions::ResetSkyGradient()
 {
     g_pGame->SetHasSkyGradient(false);
 
@@ -10642,7 +10645,7 @@ bool CStaticFunctionDefinitions::SetHeatHaze(const SHeatHazeSettings& settings)
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetHeatHaze(void)
+bool CStaticFunctionDefinitions::ResetHeatHaze()
 {
     g_pGame->SetHasHeatHaze(false);
 
@@ -10710,12 +10713,12 @@ bool CStaticFunctionDefinitions::SetCloudsEnabled(bool bEnabled)
     g_pGame->SetCloudsEnabled(bEnabled);
     return true;
 }
-bool CStaticFunctionDefinitions::GetCloudsEnabled(void)
+bool CStaticFunctionDefinitions::GetCloudsEnabled()
 {
     return g_pGame->GetCloudsEnabled();
 }
 
-CElement* CStaticFunctionDefinitions::GetRootElement(void)
+CElement* CStaticFunctionDefinitions::GetRootElement()
 {
     return m_pMapManager->GetRootElement();
 }
@@ -10875,7 +10878,7 @@ bool CStaticFunctionDefinitions::ExecuteSQLQuery(const std::string& strQuery, CL
     return m_pRegistry->Query(strQuery, pArgs, pResult);
 }
 
-const std::string& CStaticFunctionDefinitions::SQLGetLastError(void)
+const std::string& CStaticFunctionDefinitions::SQLGetLastError()
 {
     return m_pRegistry->GetLastError();
 }
@@ -11021,11 +11024,11 @@ CAccount* CStaticFunctionDefinitions::AddAccount(const SString& strName, const S
     return NULL;
 }
 
-CAccount* CStaticFunctionDefinitions::GetAccount(const char* szName, const char* szPassword)
+CAccount* CStaticFunctionDefinitions::GetAccount(const char* szName, const char* szPassword, bool bCaseSensitive)
 {
     assert(szName);
 
-    CAccount* pCurrentAccount = m_pAccountManager->Get(szName);
+    CAccount* pCurrentAccount = m_pAccountManager->Get(szName, szPassword, bCaseSensitive);
     if (pCurrentAccount && (!szPassword || pCurrentAccount->IsPassword(szPassword)))
         return pCurrentAccount;
     else
@@ -11161,6 +11164,9 @@ bool CStaticFunctionDefinitions::KickPlayer(CPlayer* pPlayer, SString strRespons
     // Make sure we have a player
     assert(pPlayer);
 
+    if (pPlayer->IsLeavingServer())
+        return false;
+
     // If our responsible string is too long, crop it to size and display ... in the end so it's obvious it's cropped
     if (strResponsible.length() > MAX_KICK_RESPONSIBLE_LENGTH)
         strResponsible = strResponsible.substr(0, MAX_KICK_RESPONSIBLE_LENGTH - 3) + "...";
@@ -11279,19 +11285,29 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pPlayer, bool bIP, bool bUs
         // Call the event
         CLuaArguments Arguments;
         Arguments.PushBan(pBan);
+        
         if (pResponsible)
             Arguments.PushElement(pResponsible);
+
+        // A script can call kickPlayer in the onPlayerBan event, which would
+        // show him the 'kicked' message instead of our 'banned' message.
+        const bool bLeavingServer = pPlayer->IsLeavingServer();
+        pPlayer->SetLeavingServer(true);
         pPlayer->CallEvent("onPlayerBan", Arguments);
+        pPlayer->SetLeavingServer(bLeavingServer);
 
         // Check if script removed the ban
         if (pBan->IsBeingDeleted())
             return NULL;
 
         // Tell the player that was banned why. QuitPlayer will delete the player.
-        time_t                    Duration = pBan->GetBanTimeRemaining();
-        CPlayerDisconnectedPacket Packet(CPlayerDisconnectedPacket::BAN, Duration, strMessage.c_str());
-        pPlayer->Send(Packet);
-        g_pGame->QuitPlayer(*pPlayer, CClient::QUIT_BAN, false, strReason.c_str(), strResponsible.c_str());
+        if (!pPlayer->IsLeavingServer())
+        {
+            time_t                    Duration = pBan->GetBanTimeRemaining();
+            CPlayerDisconnectedPacket Packet(CPlayerDisconnectedPacket::BAN, Duration, strMessage.c_str());
+            pPlayer->Send(Packet);
+            g_pGame->QuitPlayer(*pPlayer, CClient::QUIT_BAN, false, strReason.c_str(), strResponsible.c_str());
+        }
 
         // Tell everyone else that he was banned from the game including console
         CLogger::LogPrintf("BAN: %s\n", strInfoMessage.c_str());
@@ -11404,26 +11420,28 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
         list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
         for (; iter != m_pPlayerManager->IterEnd(); iter++)
         {
+            CPlayer* const pPlayer = *iter;
+
             // Default to not banning; if the IP, serial and username don't match, we don't want to kick the guy out
             bool bBan = false;
 
             // Check if the player's IP matches the specified one, if specified
             if (bIPSpecified)
             {
-                bBan = (strIP == (*iter)->GetSourceIP());
+                bBan = (strIP == pPlayer->GetSourceIP());
             }
 
             // Check if the player's username matches the specified one, if specified, and he wasn't banned over IP yet
             if (!bBan && bUsernameSpecified)
             {
-                const std::string& strPlayerUsername = (*iter)->GetSerialUser();
+                const std::string& strPlayerUsername = pPlayer->GetSerialUser();
                 bBan = stricmp(strPlayerUsername.c_str(), strUsername.c_str()) == 0;
             }
 
             // Check if the player's serial matches the specified one, if specified, and he wasn't banned over IP or username yet
             if (!bBan && bSerialSpecified)
             {
-                const std::string& strPlayerSerial = (*iter)->GetSerial();
+                const std::string& strPlayerSerial = pPlayer->GetSerial();
                 bBan = stricmp(strPlayerSerial.c_str(), strSerial.c_str()) == 0;
             }
 
@@ -11433,26 +11451,36 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
                 // Set the nick of the ban if this hasn't been done yet
                 if (!bNickSet)
                 {
-                    pBan->SetNick((*iter)->GetNick());
+                    pBan->SetNick(pPlayer->GetNick());
                     bNickSet = true;
                 }
 
                 // Call the event
                 CLuaArguments Arguments;
                 Arguments.PushBan(pBan);
+                
                 if (pResponsible)
                     Arguments.PushElement(pResponsible);
-                (*iter)->CallEvent("onPlayerBan", Arguments);
+                
+                // A script can call kickPlayer in the onPlayerBan event, which would
+                // show him the 'kicked' message instead of our 'banned' message.
+                const bool bLeavingServer = pPlayer->IsLeavingServer();
+                pPlayer->SetLeavingServer(true);
+                pPlayer->CallEvent("onPlayerBan", Arguments);
+                pPlayer->SetLeavingServer(bLeavingServer);
 
                 // Check if script removed the ban
                 if (pBan->IsBeingDeleted())
                     return NULL;
 
                 // Tell the player that was banned why. QuitPlayer will delete the player.
-                time_t                    Duration = pBan->GetBanTimeRemaining();
-                CPlayerDisconnectedPacket Packet(CPlayerDisconnectedPacket::BAN, Duration, strMessage.c_str());
-                (*iter)->Send(Packet);
-                g_pGame->QuitPlayer(**iter, CClient::QUIT_BAN, false, strReason.c_str(), strResponsible.c_str());
+                if (!pPlayer->IsLeavingServer())
+                {
+                    time_t                    Duration = pBan->GetBanTimeRemaining();
+                    CPlayerDisconnectedPacket Packet(CPlayerDisconnectedPacket::BAN, Duration, strMessage.c_str());
+                    pPlayer->Send(Packet);
+                    g_pGame->QuitPlayer(**iter, CClient::QUIT_BAN, false, strReason.c_str(), strResponsible.c_str());
+                }
             }
         }
 
@@ -11498,7 +11526,7 @@ bool CStaticFunctionDefinitions::GetBans(lua_State* pLua)
     return true;
 }
 
-bool CStaticFunctionDefinitions::ReloadBanList(void)
+bool CStaticFunctionDefinitions::ReloadBanList()
 {
     return m_pBanManager->ReloadBanList();
 }

@@ -78,7 +78,7 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions(CLuaManager* pLuaManager,
     m_pSoundManager = pManager->GetSoundManager();
 }
 
-CStaticFunctionDefinitions::~CStaticFunctionDefinitions(void)
+CStaticFunctionDefinitions::~CStaticFunctionDefinitions()
 {
 }
 
@@ -208,7 +208,7 @@ bool CStaticFunctionDefinitions::CancelEvent(bool bCancel)
     return true;
 }
 
-bool CStaticFunctionDefinitions::WasEventCancelled(void)
+bool CStaticFunctionDefinitions::WasEventCancelled()
 {
     return m_pEvents->WasEventCancelled();
 }
@@ -332,12 +332,12 @@ bool CStaticFunctionDefinitions::CreateTrayNotification(SString strText, eTrayIc
     return g_pCore->GetTrayIcon()->CreateTrayBallon(strText, eType, useSound);
 }
 
-bool CStaticFunctionDefinitions::IsTrayNotificationEnabled(void)
+bool CStaticFunctionDefinitions::IsTrayNotificationEnabled()
 {
     return g_pCore->GetCVars()->GetValue<bool>("allow_tray_notifications", true);
 }
 
-CClientEntity* CStaticFunctionDefinitions::GetRootElement(void)
+CClientEntity* CStaticFunctionDefinitions::GetRootElement()
 {
     return m_pRootEntity;
 }
@@ -1515,7 +1515,7 @@ bool CStaticFunctionDefinitions::GetRadioChannel(unsigned char& ucChannel)
     return true;
 }
 
-CClientPlayer* CStaticFunctionDefinitions::GetLocalPlayer(void)
+CClientPlayer* CStaticFunctionDefinitions::GetLocalPlayer()
 {
     return m_pPlayerManager->GetLocalPlayer();
 }
@@ -1541,8 +1541,8 @@ CClientEntity* CStaticFunctionDefinitions::GetPedTarget(CClientPed& Ped)
     CClientEntity* pCollisionEntity = NULL;
     if (pCollisionGameEntity)
     {
-        pCollisionEntity = m_pManager->FindEntity(pCollisionGameEntity);
-
+        CPools* pPools = g_pGame->GetPools();
+        pCollisionEntity = pPools->GetClientEntity((DWORD*)pCollisionGameEntity->GetInterface());
         return pCollisionEntity;
     }
 
@@ -4348,7 +4348,7 @@ bool CStaticFunctionDefinitions::CreateExplosion(CVector& vecPosition, unsigned 
     return true;
 }
 
-bool CStaticFunctionDefinitions::DetonateSatchels(void)
+bool CStaticFunctionDefinitions::DetonateSatchels()
 {
     CClientPlayer* pLocalPlayer = GetLocalPlayer();
     // does the local player exist and if so does he have any projectiles to destroy?
@@ -4400,7 +4400,7 @@ bool CStaticFunctionDefinitions::IsAmbientSoundEnabled(eAmbientSoundType eType, 
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetAmbientSounds(void)
+bool CStaticFunctionDefinitions::ResetAmbientSounds()
 {
     g_pGame->GetAudioEngine()->ResetAmbientSounds();
     return true;
@@ -4418,7 +4418,7 @@ bool CStaticFunctionDefinitions::IsWorldSoundEnabled(uint uiGroup, uint uiIndex,
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetWorldSounds(void)
+bool CStaticFunctionDefinitions::ResetWorldSounds()
 {
     g_pGame->GetAudioEngine()->ResetWorldSounds();
     return true;
@@ -4740,7 +4740,7 @@ bool CStaticFunctionDefinitions::GetCameraMatrix(CVector& vecPosition, CVector& 
     return true;
 }
 
-CClientEntity* CStaticFunctionDefinitions::GetCameraTarget(void)
+CClientEntity* CStaticFunctionDefinitions::GetCameraTarget()
 {
     if (!m_pCamera->IsInFixedMode())
         return m_pCamera->GetTargetEntity();
@@ -4915,7 +4915,7 @@ bool CStaticFunctionDefinitions::SetCursorAlpha(float fAlpha)
     return false;
 }
 
-bool CStaticFunctionDefinitions::GUIGetInputEnabled(void)
+bool CStaticFunctionDefinitions::GUIGetInputEnabled()
 {            // can't inline because statics are defined in .cpp not .h
     return m_pGUI->GetGUIInputEnabled();
 }
@@ -4925,12 +4925,12 @@ void CStaticFunctionDefinitions::GUISetInputMode(eInputMode inputMode)
     m_pGUI->SetGUIInputMode(inputMode);
 }
 
-eInputMode CStaticFunctionDefinitions::GUIGetInputMode(void)
+eInputMode CStaticFunctionDefinitions::GUIGetInputMode()
 {
     return m_pGUI->GetGUIInputMode();
 }
 
-eCursorType CStaticFunctionDefinitions::GUIGetCursorType(void)
+eCursorType CStaticFunctionDefinitions::GUIGetCursorType()
 {
     return m_pGUI->GetCursorType();
 }
@@ -5457,7 +5457,7 @@ int CStaticFunctionDefinitions::GUIComboBoxGetItemCount(CClientEntity& Entity)
             return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->GetItemCount();
         }
     }
-    
+
     return 0;
 }
 
@@ -5484,7 +5484,7 @@ bool CStaticFunctionDefinitions::GUIComboBoxSetOpen(CClientEntity& Entity, bool 
             return true;
         }
     }
-    
+
     return false;
 }
 
@@ -5494,14 +5494,14 @@ bool CStaticFunctionDefinitions::GUIComboBoxIsOpen(CClientEntity& Entity)
     if (IS_GUI(&Entity))
     {
         CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-        
+
         // Are we a combobox?
         if (IS_CGUIELEMENT_COMBOBOX(&GUIElement))
         {
             return static_cast<CGUIComboBox*>(GUIElement.GetCGUIElement())->IsOpen();
         }
     }
-    
+
     return false;
 }
 
@@ -5944,7 +5944,7 @@ void CStaticFunctionDefinitions::GUIGridListSetSortingEnabled(CClientEntity& Ent
         if (IS_CGUIELEMENT_GRIDLIST(&GUIElement))
         {
             // Set sorting is enabled
-            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetSorting(bEnabled);
+            static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetSortingEnabled(bEnabled);
         }
     }
 }
@@ -6174,8 +6174,8 @@ bool CStaticFunctionDefinitions::ProcessLineOfSight(const CVector& vecStart, con
     if (pIgnoredEntity)
         g_pGame->GetWorld()->IgnoreEntity(NULL);
 
-    *pColEntity = m_pManager->FindEntity(pColGameEntity);
-
+    CPools* pPools = g_pGame->GetPools();
+    *pColEntity = pColGameEntity ? pPools->GetClientEntity((DWORD*)pColGameEntity->GetInterface()) : nullptr;
     return true;
 }
 
@@ -6244,7 +6244,7 @@ bool CStaticFunctionDefinitions::SetAllElementWaterLevel(float fLevel, void* pCh
     return g_pClientGame->GetManager()->GetWaterManager()->SetAllElementWaterLevel(fLevel, pChangeSource);
 }
 
-bool CStaticFunctionDefinitions::ResetWorldWaterLevel(void)
+bool CStaticFunctionDefinitions::ResetWorldWaterLevel()
 {
     g_pClientGame->GetManager()->GetWaterManager()->ResetWorldWaterLevel();
     return true;
@@ -6467,7 +6467,7 @@ bool CStaticFunctionDefinitions::SetWindVelocity(float fX, float fY, float fZ)
     return true;
 }
 
-bool CStaticFunctionDefinitions::RestoreWindVelocity(void)
+bool CStaticFunctionDefinitions::RestoreWindVelocity()
 {
     g_pMultiplayer->RestoreWindVelocity();
     return true;
@@ -6530,7 +6530,7 @@ bool CStaticFunctionDefinitions::SetSkyGradient(unsigned char ucTopRed, unsigned
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetSkyGradient(void)
+bool CStaticFunctionDefinitions::ResetSkyGradient()
 {
     g_pMultiplayer->ResetSky();
     return true;
@@ -6548,7 +6548,7 @@ bool CStaticFunctionDefinitions::SetHeatHaze(const SHeatHazeSettings& settings)
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetHeatHaze(void)
+bool CStaticFunctionDefinitions::ResetHeatHaze()
 {
     g_pMultiplayer->ResetHeatHaze();
     return true;
@@ -6567,7 +6567,7 @@ bool CStaticFunctionDefinitions::SetWaterColor(float fWaterRed, float fWaterGree
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetWaterColor(void)
+bool CStaticFunctionDefinitions::ResetWaterColor()
 {
     g_pMultiplayer->ResetWater();
     return true;
@@ -6701,7 +6701,7 @@ bool CStaticFunctionDefinitions::SetBirdsEnabled(bool bEnabled)
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetBirdsEnabled(void)
+bool CStaticFunctionDefinitions::GetBirdsEnabled()
 {
     return g_pClientGame->GetBirdsEnabled();
 }
@@ -7612,6 +7612,9 @@ bool CStaticFunctionDefinitions::StopSound(CClientSound& Sound)
 
 bool CStaticFunctionDefinitions::SetSoundPosition(CClientSound& Sound, double dPosition)
 {
+    if (Sound.IsSoundStream())
+        return false;
+
     Sound.SetPlayPosition(dPosition);
     return true;
 }
@@ -7658,6 +7661,16 @@ bool CStaticFunctionDefinitions::GetSoundLength(CClientPlayer& Player, double& d
     if (pVoice != NULL)
     {
         dLength = pVoice->GetLength();
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetSoundBufferLength(CClientSound& Sound, double& dBufferLength)
+{
+    if (Sound.IsSoundStream())
+    {
+        dBufferLength = Sound.GetBufferLength();
         return true;
     }
     return false;

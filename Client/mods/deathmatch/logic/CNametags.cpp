@@ -39,12 +39,12 @@ CNametags::CNametags(CClientManager* pManager)
         g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\16-message-warn.png"), NULL, false);
 }
 
-CNametags::~CNametags(void)
+CNametags::~CNametags()
 {
     SAFE_RELEASE(m_pConnectionTroubleIcon);
 }
 
-void CNametags::DoPulse(void)
+void CNametags::DoPulse()
 {
     if (m_bVisible)
     {
@@ -55,7 +55,7 @@ void CNametags::DoPulse(void)
     }
 }
 
-void CNametags::DrawFromAim(void)
+void CNametags::DrawFromAim()
 {
     unsigned long ulCurrentTime = CClientTime::GetTime();
 
@@ -255,7 +255,7 @@ void CNametags::DrawFromAim(void)
     }
 }
 
-void CNametags::DrawDefault(void)
+void CNametags::DrawDefault()
 {
     // Grab the resolution width and height
     static float fResWidth = static_cast<float>(g_pCore->GetGraphics()->GetViewportWidth());

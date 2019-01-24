@@ -23,7 +23,7 @@ CPedSync::CPedSync(CClientPedManager* pPedManager)
     m_ulLastSyncTime = 0;
 }
 
-CPedSync::~CPedSync(void)
+CPedSync::~CPedSync()
 {
 }
 
@@ -53,7 +53,7 @@ bool CPedSync::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& Bi
     return false;
 }
 
-void CPedSync::DoPulse(void)
+void CPedSync::DoPulse()
 {
     // Has it been long enough since our last state's sync?
     unsigned long ulCurrentTime = CClientTime::GetTime();
@@ -227,7 +227,7 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
     }
 }
 
-void CPedSync::Update(void)
+void CPedSync::Update()
 {
     // Got any items?
     if (m_List.size() > 0)

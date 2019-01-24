@@ -21,11 +21,11 @@ class CClientRadarMarkerManager
 
 public:
     CClientRadarMarkerManager(class CClientManager* pManager);
-    ~CClientRadarMarkerManager(void);
+    ~CClientRadarMarkerManager();
 
-    void DoPulse(void);
+    void DoPulse();
 
-    void DeleteAll(void);
+    void DeleteAll();
 
     static CClientRadarMarker* Get(ElementID ID);
 
@@ -35,8 +35,8 @@ public:
     unsigned char GetInterior() const { return m_ucInterior; }
     void          SetInterior(unsigned char ucInterior);
 
-    std::list<CClientRadarMarker*>::const_iterator IterBegin(void) { return m_Markers.begin(); };
-    std::list<CClientRadarMarker*>::const_iterator IterEnd(void) { return m_Markers.end(); };
+    std::list<CClientRadarMarker*>::const_iterator IterBegin() { return m_Markers.begin(); };
+    std::list<CClientRadarMarker*>::const_iterator IterEnd() { return m_Markers.end(); };
 
     bool        Exists(CClientRadarMarker* pMarker);
     static bool IsValidIcon(unsigned long ulIcon) { return ulIcon <= RADAR_MARKER_LIMIT; }
@@ -45,7 +45,7 @@ private:
     void AddToList(CClientRadarMarker* pMarker) { m_Markers.push_back(pMarker); };
     void RemoveFromList(CClientRadarMarker* pMarker);
 
-    void        OrderMarkers(void);
+    void        OrderMarkers();
     static bool CompareOrderingIndex(CClientRadarMarker* p1, CClientRadarMarker* p2);
 
     class CClientManager*          m_pManager;

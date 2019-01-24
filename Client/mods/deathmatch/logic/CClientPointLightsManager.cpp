@@ -21,7 +21,7 @@ CClientPointLightsManager::CClientPointLightsManager(CClientManager* pManager)
     m_ucInterior = 0;
 }
 
-CClientPointLightsManager::~CClientPointLightsManager(void)
+CClientPointLightsManager::~CClientPointLightsManager()
 {
     // Make sure all the lights are deleted
     DeleteAll();
@@ -42,7 +42,7 @@ void CClientPointLightsManager::Delete(CClientPointLights* pLight)
     delete pLight;
 }
 
-void CClientPointLightsManager::DeleteAll(void)
+void CClientPointLightsManager::DeleteAll()
 {
     // Delete all the lights
     m_bDontRemoveFromList = true;
@@ -99,7 +99,7 @@ void CClientPointLightsManager::SetInterior(unsigned char ucInterior)
     }
 }
 
-void CClientPointLightsManager::DoPulse(void)
+void CClientPointLightsManager::DoPulse()
 {
     // Pulse each light
     list<CClientPointLights*>::const_iterator iter = m_List.begin();

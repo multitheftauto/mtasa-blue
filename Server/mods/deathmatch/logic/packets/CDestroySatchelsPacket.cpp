@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CDestroySatchelsPacket::CDestroySatchelsPacket(void)
+CDestroySatchelsPacket::CDestroySatchelsPacket()
 {
 }
 

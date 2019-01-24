@@ -19,9 +19,9 @@ class CClientWeaponManager
 
 public:
     CClientWeaponManager(class CClientManager* pManager);
-    ~CClientWeaponManager(void);
+    ~CClientWeaponManager();
 
-    void DoPulse(void);
+    void DoPulse();
 
 private:
     void AddToList(CClientWeapon* pWeapon) { m_Weapons.push_back(pWeapon); }

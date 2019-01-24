@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-10 02:54+0100\n"
-"PO-Revision-Date: 2018-09-01 13:23+0000\n"
+"PO-Revision-Date: 2018-11-19 12:57+0000\n"
 "Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: uk\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "Translators: HIKC; _Under; d9.error\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1535808206.0\n"
+"X-POOTLE-MTIME: 1542632262.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -1649,6 +1649,7 @@ msgid ""
 "Do you want to download and install MTA:SA %s ?"
 msgstr ""
 "Потрібно оновлення до MTA:SA %s, щоб під'єднатися до вибраного сервера.\n"
+"\n"
 "Ви хочете завантажити та інсталювати MTA:SA %s?"
 
 #: ..\Client\core\CVersionUpdater.cpp:1586
@@ -2438,7 +2439,9 @@ msgid ""
 "Try to launch MTA:SA again?"
 msgstr ""
 "Проблема перезапуску MTA:SA\n"
+"\n"
 "Якщо проблема збереглася, то відкрийте диспетчер завдань і зупиніть процеси 'gta_sa.exe' і 'Multi Theft Auto.exe' \n"
+"\n"
 "\n"
 "Спробувати запустити MTA:SA знову?"
 
@@ -2469,6 +2472,7 @@ msgid ""
 "Do you want to revert to an earlier version?"
 msgstr ""
 "У вас є проблеми з запуском MTA:SA?.\n"
+"\n"
 "Спробувати повернутися до попередньої версії?"
 
 #: ..\Client\loader\MainFunctions.cpp:309
@@ -2541,7 +2545,6 @@ msgstr ""
 "УВАГА\n"
 "\n"
 "MTA:SA виявив підозрілу активність.\n"
-"\n"
 "Перевірте вашу систему на наявність вірусів, щоб переконатися в безпеці.\n"
 "\n"
 
@@ -2605,6 +2608,7 @@ msgid ""
 msgstr ""
 "Шлях в теку MTA:SA або GTA: San Andreas\n"
 "має символ ';' (крапку з комою).\n"
+"\n"
 "Переінсталюйте MTA:SA и GTA: San Andreas, так, щоб в \n"
 "шляху до тек не було крапки з комою."
 
@@ -2704,6 +2708,7 @@ msgid ""
 "[%s]"
 msgstr ""
 "Не вдалося запустити Grand Theft Auto: San Andreas.   Спробуйте перезапустити. Якщо проблема не вирішена, то зверніться за допомогою на сайті www.multitheftauto.com. \n"
+"\n"
 "[%s]"
 
 #: ..\Client\loader\MainFunctions.cpp:1243
@@ -2731,6 +2736,7 @@ msgid ""
 "Do you want to copy your settings from %s ?"
 msgstr ""
 "Нова версія клієнта %s виявлена.\n"
+"\n"
 "Ви хочете скопіювати ваші налаштування з %s ?"
 
 #: ..\Client\loader\Utils.cpp:1777
@@ -3139,9 +3145,9 @@ msgstr[2] "%d хвилини"
 #, c-format, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] "секунда"
-msgstr[1] "секунд"
-msgstr[2] "секунди"
+msgstr[0] "%d секунда"
+msgstr[1] "%d секунд"
+msgstr[2] "%d секунди"
 
 #. Display the error
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:615

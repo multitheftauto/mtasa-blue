@@ -156,7 +156,7 @@ void CResourceMapItem::HandleNode(CXMLNode& Node, CElement* pParent)
         }
         case CElement::RADAR_AREA:
         {
-            m_pRadarAreaManager->CreateFromXML(pParent, Node, m_pEvents);
+            pNode = m_pRadarAreaManager->CreateFromXML(pParent, Node, m_pEvents);
             break;
         }
         case CElement::TEAM:
@@ -185,7 +185,9 @@ void CResourceMapItem::HandleNode(CXMLNode& Node, CElement* pParent)
         return;
 
     pNode->SetTypeName(strTagName);
-    pNode->SetDimension(m_iDimension);
+
+    if (!pNode->GetDimension())
+        pNode->SetDimension(m_iDimension);
 
     if (m_pElementGroup)
         m_pElementGroup->Add(pNode);

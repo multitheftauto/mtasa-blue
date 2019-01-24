@@ -106,7 +106,7 @@ void _declspec(naked) HOOK_CWorld_GetIsLineOfSightClear()
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_FixLineOfSightArgs(void)
+void CMultiplayerSA::InitHooks_FixLineOfSightArgs()
 {
     EZHookInstall(CWorld_ProcessLineOfSight);
     EZHookInstall(CWorld_GetIsLineOfSightClear);

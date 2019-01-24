@@ -20,7 +20,7 @@
 extern CCore*    g_pCore;
 extern HINSTANCE g_hModule;
 
-CTrayIcon::CTrayIcon(void) : m_bTrayIconExists{false}, m_pNID{new NOTIFYICONDATAW{0}}, m_llLastBalloonTime{0L}
+CTrayIcon::CTrayIcon() : m_bTrayIconExists{false}, m_pNID{new NOTIFYICONDATAW{0}}, m_llLastBalloonTime{0L}
 {
     m_pNID->cbSize = sizeof(NOTIFYICONDATAW);
     m_pNID->uID = 0;
@@ -29,7 +29,7 @@ CTrayIcon::CTrayIcon(void) : m_bTrayIconExists{false}, m_pNID{new NOTIFYICONDATA
     StringCchCopyW(m_pNID->szInfoTitle, ARRAYSIZE(m_pNID->szInfoTitle), TRAY_BALLOON_TITLE);
 }
 
-CTrayIcon::~CTrayIcon(void)
+CTrayIcon::~CTrayIcon()
 {
     if (m_bTrayIconExists)
         DestroyTrayIcon();
@@ -37,7 +37,7 @@ CTrayIcon::~CTrayIcon(void)
     delete m_pNID;
 }
 
-bool CTrayIcon::CreateTrayIcon(void)
+bool CTrayIcon::CreateTrayIcon()
 {
     if (m_bTrayIconExists)
         return true;
@@ -55,7 +55,7 @@ bool CTrayIcon::CreateTrayIcon(void)
     return m_bTrayIconExists;
 }
 
-void CTrayIcon::DestroyTrayIcon(void)
+void CTrayIcon::DestroyTrayIcon()
 {
     if (!m_bTrayIconExists)
         return;

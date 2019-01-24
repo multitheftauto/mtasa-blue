@@ -21,9 +21,9 @@ class CClientSoundManager
 public:
     ZERO_ON_NEW
     CClientSoundManager(CClientManager* pClientManager);
-    ~CClientSoundManager(void);
+    ~CClientSoundManager();
 
-    void DoPulse(void);
+    void DoPulse();
 
     void SetDimension(unsigned short usDimension);
     
@@ -44,16 +44,16 @@ public:
 
     int GetFxEffectFromName(const std::string& strEffectName);
 
-    std::map<std::string, int> GetFxEffects(void) { return m_FxEffectNames; }
+    std::map<std::string, int> GetFxEffects() { return m_FxEffectNames; }
 
-    void UpdateVolume(void);
+    void UpdateVolume();
 
     void UpdateDistanceStreaming(const CVector& vecListenerPosition);
 
     void OnDistanceStreamIn(CClientSound* pSound);
     void OnDistanceStreamOut(CClientSound* pSound);
 
-    bool IsMinimizeMuted(void) { return m_bMinimizeMuted; };
+    bool IsMinimizeMuted() { return m_bMinimizeMuted; };
     void SetMinimizeMuted(bool bMute) { m_bMinimizeMuted = bMute; };
 
     void QueueChannelStop(DWORD pSound);

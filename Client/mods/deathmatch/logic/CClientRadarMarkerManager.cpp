@@ -21,13 +21,13 @@ CClientRadarMarkerManager::CClientRadarMarkerManager(CClientManager* pManager)
     m_bOrderOnPulse = false;
 }
 
-CClientRadarMarkerManager::~CClientRadarMarkerManager(void)
+CClientRadarMarkerManager::~CClientRadarMarkerManager()
 {
     // Remove all markers from the list
     DeleteAll();
 }
 
-void CClientRadarMarkerManager::DoPulse(void)
+void CClientRadarMarkerManager::DoPulse()
 {
     // Grab the camera position here (so it isn't done for every marker)
     m_pManager->GetCamera()->GetPosition(m_vecCameraPosition);
@@ -43,7 +43,7 @@ void CClientRadarMarkerManager::DoPulse(void)
     }
 }
 
-void CClientRadarMarkerManager::DeleteAll(void)
+void CClientRadarMarkerManager::DeleteAll()
 {
     // Delete all the markers in our list
     m_bCanRemoveFromList = false;
@@ -111,7 +111,7 @@ bool CClientRadarMarkerManager::Exists(CClientRadarMarker* pRadarMarker)
     return false;
 }
 
-void CClientRadarMarkerManager::OrderMarkers(void)
+void CClientRadarMarkerManager::OrderMarkers()
 {
     m_Markers.sort(CompareOrderingIndex);
 

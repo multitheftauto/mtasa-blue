@@ -22,15 +22,15 @@ class CNametags
 {
 public:
     CNametags(CClientManager* pManager);
-    ~CNametags(void);
+    ~CNametags();
 
-    bool GetDrawHealth(void) { return m_bDrawHealth; };
+    bool GetDrawHealth() { return m_bDrawHealth; };
     void SetDrawHealth(bool bDrawHealth) { m_bDrawHealth = bDrawHealth; };
 
-    void DoPulse(void);
+    void DoPulse();
 
-    void DrawFromAim(void);
-    void DrawDefault(void);
+    void DrawFromAim();
+    void DrawDefault();
 
     void DrawTagForPlayer(CClientPlayer* pPlayer, unsigned char ucAlpha);
 
@@ -40,7 +40,7 @@ public:
     unsigned char GetInterior() const { return m_ucInterior; }
     void         SetInterior(unsigned char ucInterior) { m_ucInterior = ucInterior; }
 
-    bool IsVisible(void) { return m_bVisible; }
+    bool IsVisible() { return m_bVisible; }
     void SetVisible(bool bVisible) { m_bVisible = bVisible; }
 
 private:

@@ -41,9 +41,9 @@ namespace SharedUtil
     #define S43 15
     #define S44 21
 
-    CMD5Hasher::CMD5Hasher(void) {}
+    CMD5Hasher::CMD5Hasher() {}
 
-    CMD5Hasher::~CMD5Hasher(void) {}
+    CMD5Hasher::~CMD5Hasher() {}
 
     bool CMD5Hasher::Calculate(const char* szFilename, MD5& md5Result)
     {
@@ -128,7 +128,7 @@ namespace SharedUtil
         return "";
     }
 
-    void CMD5Hasher::Init(void)
+    void CMD5Hasher::Init()
     {
         // Nothing counted, so count=0
         m_count[0] = 0;
@@ -185,7 +185,7 @@ namespace SharedUtil
         // CRYPT_END
     }
 
-    void CMD5Hasher::Finalize(void)
+    void CMD5Hasher::Finalize()
     {
         unsigned char        bits[8];
         unsigned int         index, padLen;
@@ -210,7 +210,7 @@ namespace SharedUtil
         memset(m_buffer, 0, sizeof(m_buffer));
     }
 
-    const unsigned char* CMD5Hasher::GetResult(void) const { return m_digest; }
+    const unsigned char* CMD5Hasher::GetResult() const { return m_digest; }
 
     void CMD5Hasher::Transform(unsigned char block[64])
     {

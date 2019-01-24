@@ -32,18 +32,18 @@ CClientPointLights::CClientPointLights(class CClientManager* pManager, ElementID
     m_pPointLightsManager->AddToList(this);
 }
 
-CClientPointLights::~CClientPointLights(void)
+CClientPointLights::~CClientPointLights()
 {
     // Remove us from the manager's list
     Unlink();
 }
 
-void CClientPointLights::Unlink(void)
+void CClientPointLights::Unlink()
 {
     m_pPointLightsManager->RemoveFromList(this);
 }
 
-void CClientPointLights::DoPulse(void)
+void CClientPointLights::DoPulse()
 {
     // Update our position/rotation if we're attached
     DoAttaching();

@@ -18,8 +18,8 @@ public:
     CClientWater(CClientManager* pManager, ElementID ID, CVector& vecL, CVector& vecR, CVector& vecTB, bool bShallow = false);
     ~CClientWater();
 
-    bool Create(void);
-    bool Destroy(void);
+    bool Create();
+    bool Destroy();
     bool Exists() { return m_pPoly != nullptr; }
 
     eClientEntityType GetType() const { return CCLIENTWATER; }

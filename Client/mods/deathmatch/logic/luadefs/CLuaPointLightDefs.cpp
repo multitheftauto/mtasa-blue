@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CLuaPointLightDefs::LoadFunctions(void)
+void CLuaPointLightDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"createLight", CreateLight},

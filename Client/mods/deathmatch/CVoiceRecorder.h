@@ -18,9 +18,7 @@
 #define FRAME_OUTGOING_BUFFER_COUNT 100
 #define FRAME_INCOMING_BUFFER_COUNT 100
 
-// Uncomment this to hear yourself speak locally (Voice is still encoded & decoded to simulate network transmission)
-#define VOICE_DEBUG_LOCAL_PLAYBACK
-
+#include <mutex>
 #include <speex/speex.h>
 #include <speex/speex_preprocess.h>
 #include <portaudio/portaudio.h>
@@ -49,25 +47,25 @@ enum eServerSampleRate
 class CVoiceRecorder
 {
 public:
-    CVoiceRecorder(void);
-    ~CVoiceRecorder(void);
+    CVoiceRecorder();
+    ~CVoiceRecorder();
 
     void Init(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate);
 
-    bool IsEnabled(void) { return m_bEnabled; }
+    bool IsEnabled() { return m_bEnabled; }
 
-    void DoPulse(void);
+    void DoPulse();
 
     void SetPTTState(bool bState);
     bool GetPTTState();
 
-    unsigned int  GetSampleRate(void) { return m_SampleRate; }
-    unsigned char GetSampleQuality(void) { return m_ucQuality; }
+    unsigned int  GetSampleRate() { return m_SampleRate; }
+    unsigned char GetSampleQuality() { return m_ucQuality; }
 
-    const SpeexMode* getSpeexModeFromSampleRate(void);
+    const SpeexMode* getSpeexModeFromSampleRate();
 
 private:
-    void DeInit(void);
+    void DeInit();
     void SendFrame(const void* inputBuffer);
 
     static int PACallback(const void* inputBuffer, void* outputBuffer, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo,
@@ -96,5 +94,5 @@ private:
     unsigned char m_ucQuality;
 
     std::list<SString> m_EventQueue;
-    CCriticalSection   m_CS;
+    std::mutex         m_Mutex;
 };

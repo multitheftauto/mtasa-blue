@@ -19,7 +19,7 @@ namespace
     class CLuaMainMemory
     {
     public:
-        CLuaMainMemory(void) { memset(this, 0, sizeof(*this)); }
+        CLuaMainMemory() { memset(this, 0, sizeof(*this)); }
 
         int Delta;
         int Current;
@@ -48,12 +48,12 @@ namespace
 class CClientPerfStatLuaMemoryImpl : public CClientPerfStatLuaMemory
 {
 public:
-    CClientPerfStatLuaMemoryImpl(void);
-    virtual ~CClientPerfStatLuaMemoryImpl(void);
+    CClientPerfStatLuaMemoryImpl();
+    virtual ~CClientPerfStatLuaMemoryImpl();
 
     // CClientPerfStatModule
-    virtual const SString& GetCategoryName(void);
-    virtual void           DoPulse(void);
+    virtual const SString& GetCategoryName();
+    virtual void           DoPulse();
     virtual void           GetStats(CClientPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CClientPerfStatLuaMemory
@@ -92,7 +92,7 @@ CClientPerfStatLuaMemory* CClientPerfStatLuaMemory::GetSingleton()
 //
 //
 ///////////////////////////////////////////////////////////////
-CClientPerfStatLuaMemoryImpl::CClientPerfStatLuaMemoryImpl(void)
+CClientPerfStatLuaMemoryImpl::CClientPerfStatLuaMemoryImpl()
 {
     m_strCategoryName = "Lua memory";
 }
@@ -104,7 +104,7 @@ CClientPerfStatLuaMemoryImpl::CClientPerfStatLuaMemoryImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CClientPerfStatLuaMemoryImpl::~CClientPerfStatLuaMemoryImpl(void)
+CClientPerfStatLuaMemoryImpl::~CClientPerfStatLuaMemoryImpl()
 {
 }
 
@@ -115,7 +115,7 @@ CClientPerfStatLuaMemoryImpl::~CClientPerfStatLuaMemoryImpl(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-const SString& CClientPerfStatLuaMemoryImpl::GetCategoryName(void)
+const SString& CClientPerfStatLuaMemoryImpl::GetCategoryName()
 {
     return m_strCategoryName;
 }
@@ -178,7 +178,7 @@ void CClientPerfStatLuaMemoryImpl::UpdateLuaMemory(CLuaMain* pLuaMain, int iMemU
 //
 //
 ///////////////////////////////////////////////////////////////
-void CClientPerfStatLuaMemoryImpl::DoPulse(void)
+void CClientPerfStatLuaMemoryImpl::DoPulse()
 {
 }
 

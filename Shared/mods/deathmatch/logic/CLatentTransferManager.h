@@ -37,7 +37,7 @@ namespace LatentTransfer
 //
 struct SSendItem
 {
-    SSendItem(void)
+    SSendItem()
         : uiId(0),
           uiRate(0),
           usCategory(0),
@@ -70,7 +70,7 @@ struct SSendItem
 //
 struct SReceiveItem
 {
-    SReceiveItem(void) : usId(0), uiRate(0), usCategory(0), usResourceNetId(0xFFFF), uiWritePosition(0), bReceiveStarted(false) {}
+    SReceiveItem() : usId(0), uiRate(0), usCategory(0), usResourceNetId(0xFFFF), uiWritePosition(0), bReceiveStarted(false) {}
 
     ushort  usId;                       // Part of handle - Used for verification
     CBuffer buffer;                     // The receive buffer
@@ -105,19 +105,19 @@ class CLatentSendQueue
 public:
     ZERO_ON_NEW
     CLatentSendQueue(NetPlayerID remoteId, ushort usBitStreamVersion);
-    ~CLatentSendQueue(void);
+    ~CLatentSendQueue();
     void        DoPulse(int iTimeMsBetweenCalls);
     bool        OnLuaMainDestroy(void* pLuaMain);
     SSendHandle AddSend(CBufferRef bufferRef, uint uiRate, ushort usCategory, void* pLuaMain, ushort usResourceNetId);
     bool        CancelSend(SSendHandle handle);
-    void        CancelAllSends(void);
+    void        CancelAllSends();
     bool        GetSendStatus(SSendHandle handle, SSendStatus* pOutSendStatus);
     void        GetSendHandles(std::vector<SSendHandle>& outResultList);
 
 protected:
     void SendCancelNotification(SSendItem& activeTx);
-    void PostQueueRemove(void);
-    void UpdateEstimatedDurations(void);
+    void PostQueueRemove();
+    void UpdateEstimatedDurations();
 
     const NetPlayerID    m_RemoteId;
     const ushort         m_usBitStreamVersion;
@@ -139,7 +139,7 @@ class CLatentReceiver
 public:
     ZERO_ON_NEW
     CLatentReceiver(NetPlayerID remoteId, ushort usBitStreamVersion);
-    ~CLatentReceiver(void);
+    ~CLatentReceiver();
     void OnReceive(NetBitStreamInterface* pBitStream);
 
 protected:
@@ -161,16 +161,16 @@ class CLatentTransferManager
 {
 public:
     ZERO_ON_NEW
-    CLatentTransferManager(void);
-    ~CLatentTransferManager(void);
-    void DoPulse(void);
+    CLatentTransferManager();
+    ~CLatentTransferManager();
+    void DoPulse();
     void RemoveRemote(NetPlayerID remoteId);
     void OnLuaMainDestroy(void* pLuaMain);
 
     // Send functions
     void        AddSendBatchBegin(unsigned char ucPacketId, NetBitStreamInterface* pBitStream);
     SSendHandle AddSend(NetPlayerID remoteId, ushort usBitStreamVersion, uint uiRate, void* pLuaMain, ushort usResourceNetId);
-    void        AddSendBatchEnd(void);
+    void        AddSendBatchEnd();
 
     bool CancelSend(NetPlayerID remoteId, SSendHandle handle);
     void CancelAllSends(NetPlayerID remoteId);
