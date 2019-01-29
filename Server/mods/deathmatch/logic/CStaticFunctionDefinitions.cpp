@@ -4117,11 +4117,11 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby(CElement* pElement, bool
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const char* szBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop,
+bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SString& blockName, const SString& animName, int iTime, int iBlend, bool bLoop,
                                                  bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame)
 {
     assert(pElement);
-    RUN_CHILDREN(SetPedAnimation(*iter, szBlockName, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame))
+    RUN_CHILDREN(SetPedAnimation(*iter, blockName, animName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame))
 
     if (IS_PED(pElement))
     {
@@ -4140,15 +4140,10 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const char*
 
             // Tell the players
             CBitStream BitStream;
-            if (szBlockName && szAnimName)
+            if (!blockName.empty() && !animName.empty())
             {
-                unsigned char ucBlockSize = (unsigned char)strlen(szBlockName);
-                unsigned char ucAnimSize = (unsigned char)strlen(szAnimName);
-
-                BitStream.pBitStream->Write(ucBlockSize);
-                BitStream.pBitStream->Write(szBlockName, ucBlockSize);
-                BitStream.pBitStream->Write(ucAnimSize);
-                BitStream.pBitStream->Write(szAnimName, ucAnimSize);
+                BitStream.pBitStream->WriteString<unsigned char>(blockName);
+                BitStream.pBitStream->WriteString<unsigned char>(animName);
                 BitStream.pBitStream->Write(iTime);
                 BitStream.pBitStream->WriteBit(bLoop);
                 BitStream.pBitStream->WriteBit(bUpdatePosition);
@@ -4169,10 +4164,10 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const char*
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, const char* szAnimName, float fProgress)
+bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, const SString& animName, float fProgress)
 {
     assert(pElement);
-    RUN_CHILDREN(SetPedAnimationProgress(*iter, szAnimName, fProgress))
+    RUN_CHILDREN(SetPedAnimationProgress(*iter, animName, fProgress))
 
     if (IS_PED(pElement))
     {
@@ -4180,12 +4175,9 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, con
         if (pPed->IsSpawned())
         {
             CBitStream BitStream;
-            if (szAnimName)
+            if (!animName.empty())
             {
-                unsigned char ucAnimSize = (unsigned char)strlen(szAnimName);
-
-                BitStream.pBitStream->Write(ucAnimSize);
-                BitStream.pBitStream->Write(szAnimName, ucAnimSize);
+                BitStream.pBitStream->WriteString<unsigned char>(animName);
                 BitStream.pBitStream->Write(fProgress);
             }
             else
@@ -4201,25 +4193,20 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, con
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CElement* pElement, const char* szAnimName, float fSpeed)
+bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CElement* pElement, const SString& animName, float fSpeed)
 {
     assert(pElement);
-    RUN_CHILDREN(SetPedAnimationSpeed(*iter, szAnimName, fSpeed))
+    RUN_CHILDREN(SetPedAnimationSpeed(*iter, animName, fSpeed))
 
     if (IS_PED(pElement))
     {
         CPed* pPed = static_cast<CPed*>(pElement);
-        if (pPed->IsSpawned() && szAnimName)
+        if (pPed->IsSpawned() && !animName.empty())
         {
             CBitStream BitStream;
-            if (szAnimName)
-            {
-                unsigned char ucAnimSize = (unsigned char)strlen(szAnimName);
+            BitStream.pBitStream->WriteString<unsigned char>(animName);
+            BitStream.pBitStream->Write(fSpeed);
 
-                BitStream.pBitStream->Write(ucAnimSize);
-                BitStream.pBitStream->Write(szAnimName, ucAnimSize);
-                BitStream.pBitStream->Write(fSpeed);
-            }
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION_SPEED, *BitStream.pBitStream));
 
             return true;
