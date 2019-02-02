@@ -20,17 +20,17 @@ class CPedSyncPacket : public CPacket
 public:
     struct SyncData
     {
-        bool          bSend;
-        ElementID     Model;
-        unsigned char ucFlags;
-        unsigned char ucSyncTimeContext;
-        CVector       vecPosition;
-        float         fRotation;
-        CVector       vecVelocity;
-        float         fHealth;
-        float         fArmor;
-        bool          bOnFire;
-        bool          bIsInWater;
+        bool                bSend;
+        ElementID           Model;
+        unsigned char       ucFlags;
+        unsigned char       ucSyncTimeContext;
+        SPositionSync       position;
+        SPedRotationSync    rotation;
+        SVelocitySync       velocity;
+        float               fHealth;
+        float               fArmor;
+        bool                bOnFire;
+        bool                bIsInWater;
     };
 
 public:

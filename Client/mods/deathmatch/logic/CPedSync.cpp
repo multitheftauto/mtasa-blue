@@ -165,30 +165,24 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
             unsigned char ucFlags = 0;
             BitStream.Read(ucFlags);
 
-            CVector vecPosition, vecMoveSpeed;
-            float   fRotation, fHealth, fArmor;
+            float   fHealth, fArmor;
             bool    bOnFire;
             bool    bIsInWater;
 
             // Read out the position
+            SPositionSync position(false);
             if (ucFlags & 0x01)
-            {
-                BitStream.Read(vecPosition.fX);
-                BitStream.Read(vecPosition.fY);
-                BitStream.Read(vecPosition.fZ);
-            }
+                BitStream.Read(&position);
 
             // And rotation
-            if (ucFlags & 0x02)
-                BitStream.Read(fRotation);
+            SPedRotationSync rotation;
+            if (ucFlags & 0x02) 
+                BitStream.Read(&rotation);
 
             // And the move speed
+            SVelocitySync velocity;
             if (ucFlags & 0x04)
-            {
-                BitStream.Read(vecMoveSpeed.fX);
-                BitStream.Read(vecMoveSpeed.fY);
-                BitStream.Read(vecMoveSpeed.fZ);
-            }
+                BitStream.Read(&velocity);
 
             // And health with armour
             if (ucFlags & 0x08)
@@ -209,11 +203,11 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
             if (pPed && pPed->CanUpdateSync(ucSyncTimeContext))
             {
                 if (ucFlags & 0x01)
-                    pPed->SetPosition(vecPosition);
+                    pPed->SetTargetPosition(position.data.vecPosition, PED_SYNC_RATE);
                 if (ucFlags & 0x02)
-                    pPed->SetCurrentRotation(fRotation);
+                    pPed->SetTargetRotation(rotation.data.fRotation);
                 if (ucFlags & 0x04)
-                    pPed->SetMoveSpeed(vecMoveSpeed);
+                    pPed->SetMoveSpeed(velocity.data.vecVelocity);
                 if (ucFlags & 0x08)
                     pPed->LockHealth(fHealth);
                 if (ucFlags & 0x10)
@@ -289,24 +283,28 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
     // Write position if needed
     if (ucFlags & 0x01)
     {
-        pBitStream->Write(vecPosition.fX);
-        pBitStream->Write(vecPosition.fY);
-        pBitStream->Write(vecPosition.fZ);
+        SPositionSync position(false);
+        position.data.vecPosition = vecPosition;
+        pBitStream->Write(&position);
+
         pPed->m_LastSyncedData->vPosition = vecPosition;
     }
 
     if (ucFlags & 0x02)
     {
-        pBitStream->Write(pPed->GetCurrentRotation());
+        SPedRotationSync rotation;
+        rotation.data.fRotation = pPed->GetCurrentRotation();
+        pBitStream->Write(&rotation);
+
         pPed->m_LastSyncedData->fRotation = pPed->GetCurrentRotation();
     }
 
     // Write velocity
     if (ucFlags & 0x04)
     {
-        pBitStream->Write(vecVelocity.fX);
-        pBitStream->Write(vecVelocity.fY);
-        pBitStream->Write(vecVelocity.fZ);
+        SVelocitySync velocity;
+        pBitStream->Write(&velocity);
+
         pPed->m_LastSyncedData->vVelocity = vecVelocity;
     }
 

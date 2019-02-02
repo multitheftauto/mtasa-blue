@@ -3329,7 +3329,7 @@ void CClientPed::SetTargetRotation(unsigned long ulDelay, float fRotation, float
 {
     m_ulBeginRotationTime = CClientTime::GetTime();
     m_ulEndRotationTime = m_ulBeginRotationTime + ulDelay;
-    m_fBeginRotation = (m_pPlayerPed) ? m_pPlayerPed->GetTargetRotation() : m_fCurrentRotation;
+    m_fBeginRotation = (m_pPlayerPed) ? m_pPlayerPed->GetCurrentRotation() : m_fCurrentRotation;
     m_fTargetRotationA = fRotation;
     m_fBeginCameraRotation = GetCameraRotation();
     m_fTargetCameraRotation = fCameraRotation;
@@ -3390,14 +3390,14 @@ void CClientPed::Interpolate()
             {
                 // Interpolate the player rotation
                 float fDeltaTime = float(m_ulEndRotationTime - m_ulBeginRotationTime);
-                float fDelta = GetOffsetDegrees(m_fBeginRotation, m_fTargetRotationA);
-                float fCameraDelta = GetOffsetDegrees(m_fBeginCameraRotation, m_fTargetCameraRotation);
+                float fDelta = GetOffsetRadians(m_fBeginRotation, m_fTargetRotationA);
+                float fCameraDelta = GetOffsetRadians(m_fBeginCameraRotation, m_fTargetCameraRotation);
                 float fProgress = float(ulCurrentTime - m_ulBeginRotationTime);
                 float fNewRotation = m_fBeginRotation + (fDelta / fDeltaTime * fProgress);
                 float fNewCameraRotation = m_fBeginCameraRotation + (fCameraDelta / fDeltaTime * fProgress);
 
                 // Hack for the wrap-around (the edge seems to be varying...)
-                if (fDelta < -5.0f || fDelta > 5.0f)
+                if (fDelta < -0.00555555f || fDelta > 0.00555555f)
                 {
                     SetCurrentRotation(m_fTargetRotationA);
                     SetCameraRotation(m_fTargetCameraRotation);

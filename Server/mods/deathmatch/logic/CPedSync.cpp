@@ -210,16 +210,18 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
                 // this packet if the time context matches.
                 if (pPed->GetSyncer() == pPlayer && pPed->CanUpdateSync(pData->ucSyncTimeContext))
                 {
-                    // Apply the data to the ped
+                    // Apply the data to the ped 
                     if (pData->ucFlags & 0x01)
                     {
-                        pPed->SetPosition(pData->vecPosition);
+                        pPed->SetPosition(pData->position.data.vecPosition);
                         g_pGame->GetColManager()->DoHitDetection(pPed->GetPosition(), pPed);
                     }
+
                     if (pData->ucFlags & 0x02)
-                        pPed->SetRotation(pData->fRotation);
+                        pPed->SetRotation(pData->rotation.data.fRotation);
+
                     if (pData->ucFlags & 0x04)
-                        pPed->SetVelocity(pData->vecVelocity);
+                        pPed->SetVelocity(pData->velocity.data.vecVelocity);
 
                     if (pData->ucFlags & 0x08)
                     {
