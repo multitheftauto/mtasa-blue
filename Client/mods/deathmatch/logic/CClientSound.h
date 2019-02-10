@@ -40,8 +40,6 @@ public:
     bool IsPaused();
 
     bool   SetPlayPosition(double dPosition);
-    double GetPlayPosition(void);
-    bool   SetPlayPosition(double dPosition);
     double GetPlayPosition();
 
     double GetLength(bool bAvoidLoad = false);
