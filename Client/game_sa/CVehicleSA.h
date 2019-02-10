@@ -329,13 +329,13 @@ struct CTransmission
     byte              engineType;
     byte              numOfGears;
     byte              pad;
-    DWORD             flags;
+    DWORD             handlingFlags;
     float             engineAcceleration;
     float             engineInertia;
-    float             maxVelocity;
+    float             maxGearVelocity;
     byte              pad2[4];
-    float             minVelocity;
-    float             curVelocity;
+    float             minGearVelocity;
+    float             curSpeed;
 };
 
 class CAutoPilot
