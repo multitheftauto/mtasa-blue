@@ -229,6 +229,8 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "bringToFront", "guiBringToFront");
     lua_classfunction(luaVM, "moveToBack", "guiMoveToBack");
+    lua_classfunction(luaVM, "blur", "guiBlur");
+    lua_classfunction(luaVM, "focus", "guiFocus");
 
     lua_classfunction(luaVM, "isChatBoxInputActive", "isChatBoxInputActive");
     lua_classfunction(luaVM, "isConsoleActive", "isConsoleActive");
