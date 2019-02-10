@@ -837,7 +837,7 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
     std::vector<CWaterZoneSA*> vecZones;
     GetZonesIntersecting(vecStart, vecEnd, vecZones);
 
-    if (vecZones.size() < 1)
+    if (vecZones.empty())
     {
         return false;
     }
