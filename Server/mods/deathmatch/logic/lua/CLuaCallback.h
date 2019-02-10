@@ -37,6 +37,8 @@ public:
         }
     }
 
+    bool IsValid() const noexcept { return m_pLuaMain != nullptr; }
+
 protected:
     CLuaMain*       m_pLuaMain;
     CLuaFunctionRef m_iLuaFunction;
