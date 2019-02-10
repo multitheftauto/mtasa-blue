@@ -54,6 +54,7 @@ void CLuaPedDefs::LoadFunctions()
         {"isPedDead", IsPedDead},
 
         {"isPedDoingGangDriveby", IsPedDoingGangDriveby},
+        {"getPedFightingStyle", GetPedFightingStyle},
         {"getPedAnimation", GetPedAnimation},
         {"getPedMoveState", GetPedMoveState},
         {"getPedWalkingStyle", GetPedMoveAnim},
