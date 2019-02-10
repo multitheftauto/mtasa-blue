@@ -1688,6 +1688,12 @@ bool CStaticFunctionDefinitions::IsPedDoingGangDriveby(CClientPed& Ped, bool& bD
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetPedFightingStyle(CClientPed& Ped, unsigned char& ucStyle)
+{
+    ucStyle = Ped.GetFightingStyle();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::GetPedAnimation(CClientPed& Ped, SString& strBlockName, SString& strAnimName)
 {
     if (Ped.IsRunningAnimation())

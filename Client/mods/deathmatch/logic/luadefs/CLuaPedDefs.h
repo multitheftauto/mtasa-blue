@@ -54,6 +54,7 @@ public:
     LUA_DECLARE(GetPedAnalogControlState);
     LUA_DECLARE(IsPedSunbathing);
     LUA_DECLARE(IsPedDoingGangDriveby);
+    LUA_DECLARE(GetPedFightingStyle);
     LUA_DECLARE(GetPedAnimation);
     LUA_DECLARE(GetPedMoveState);
     LUA_DECLARE(GetPedMoveAnim);
