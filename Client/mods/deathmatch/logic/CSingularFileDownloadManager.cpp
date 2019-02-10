@@ -12,11 +12,11 @@
 #include <StdInc.h>
 using std::list;
 
-CSingularFileDownloadManager::CSingularFileDownloadManager(void)
+CSingularFileDownloadManager::CSingularFileDownloadManager()
 {
 }
 
-CSingularFileDownloadManager::~CSingularFileDownloadManager(void)
+CSingularFileDownloadManager::~CSingularFileDownloadManager()
 {
     // clear list
     ClearList();
@@ -40,7 +40,7 @@ void CSingularFileDownloadManager::CancelResourceDownloads(CResource* pResource)
     }
 }
 
-void CSingularFileDownloadManager::ClearList(void)
+void CSingularFileDownloadManager::ClearList()
 {
     list<CSingularFileDownload*>::const_iterator iter = m_Downloads.begin();
     for (; iter != m_Downloads.end(); ++iter)
@@ -50,7 +50,7 @@ void CSingularFileDownloadManager::ClearList(void)
     m_Downloads.clear();
 }
 
-bool CSingularFileDownloadManager::AllComplete(void)
+bool CSingularFileDownloadManager::AllComplete()
 {
     list<CSingularFileDownload*>::const_iterator iter = m_Downloads.begin();
     for (; iter != m_Downloads.end(); ++iter)

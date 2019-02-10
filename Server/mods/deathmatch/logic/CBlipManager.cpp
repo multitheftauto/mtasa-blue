@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CBlipManager::CBlipManager(void)
+CBlipManager::CBlipManager()
 {
 }
 
@@ -41,7 +41,7 @@ CBlip* CBlipManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* p
     return pBlip;
 }
 
-void CBlipManager::DeleteAll(void)
+void CBlipManager::DeleteAll()
 {
     // Delete all our blips
     DeletePointersAndClearList(m_List);

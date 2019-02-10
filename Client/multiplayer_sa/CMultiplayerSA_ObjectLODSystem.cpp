@@ -23,7 +23,7 @@ namespace
 
     void SetGlobalDrawDistanceScale(float fValue) { MemPut<float>(0x858FD8, 300.f * fValue); }
 
-    float GetDrawDistanceSetting(void) { return *(float*)0xB6F118; }
+    float GetDrawDistanceSetting() { return *(float*)0xB6F118; }
 
     float CalculateLowLodFadeAlpha(CBaseModelInfoSAInterface* pModelInfo, float fDist)
     {

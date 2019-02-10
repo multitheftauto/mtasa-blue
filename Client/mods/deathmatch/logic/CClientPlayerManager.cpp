@@ -23,13 +23,13 @@ CClientPlayerManager::CClientPlayerManager(CClientManager* pManager)
     m_pLocalPlayer = NULL;
 }
 
-CClientPlayerManager::~CClientPlayerManager(void)
+CClientPlayerManager::~CClientPlayerManager()
 {
     // Destroy all players
     DeleteAll();
 }
 
-void CClientPlayerManager::DoPulse(void)
+void CClientPlayerManager::DoPulse()
 {
     unsigned long                          ulCurrentTime = CClientTime::GetTime();
     CClientPlayer*                         pPlayer = NULL;
@@ -87,7 +87,7 @@ void CClientPlayerManager::DoPulse(void)
     }
 }
 
-void CClientPlayerManager::DeleteAll(void)
+void CClientPlayerManager::DeleteAll()
 {
     // Delete all the players
     m_bCanRemoveFromList = false;
@@ -169,7 +169,7 @@ bool CClientPlayerManager::Exists(CClientPlayer* pPlayer)
     return m_Players.Contains(pPlayer);
 }
 
-bool CClientPlayerManager::IsPlayerLimitReached(void)
+bool CClientPlayerManager::IsPlayerLimitReached()
 {
     return g_pGame->GetPools()->GetPedCount() >= 110;
 
@@ -184,7 +184,7 @@ bool CClientPlayerManager::IsValidModel(unsigned long ulModel)
             ulModel >= 274 && ulModel <= 288 || ulModel >= 290 && ulModel <= 312);
 }
 
-void CClientPlayerManager::ResetAll(void)
+void CClientPlayerManager::ResetAll()
 {
     vector<CClientPlayer*>::const_iterator iter = m_Players.begin();
     for (; iter != m_Players.end(); iter++)

@@ -22,7 +22,7 @@ CObjectSync::CObjectSync(CPlayerManager* pPlayerManager, CObjectManager* pObject
     m_pObjectManager = pObjectManager;
 }
 
-void CObjectSync::DoPulse(void)
+void CObjectSync::DoPulse()
 {
     // Time to check for players that should no longer be syncing a object or objects that should be synced?
     if (m_UpdateTimer.Get() > SYNC_RATE)
@@ -59,7 +59,7 @@ void CObjectSync::OverrideSyncer(CObject* pObject, CPlayer* pPlayer)
         StartSync(pPlayer, pObject);
 }
 
-void CObjectSync::Update(void)
+void CObjectSync::Update()
 {
     // Update all objects
     list<CObject*>::const_iterator iter = m_pObjectManager->IterBegin();

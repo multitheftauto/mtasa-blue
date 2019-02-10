@@ -10,7 +10,7 @@
 
 struct CLangListItem
 {
-    CLangListItem(void) : fFocusEffectPos(0), fFocusEffectTarget(0), pContainerPane(nullptr), pFlag(nullptr), pLabel(nullptr) {}
+    CLangListItem() : fFocusEffectPos(0), fFocusEffectTarget(0), pContainerPane(nullptr), pFlag(nullptr), pLabel(nullptr) {}
     float            fFocusEffectPos;
     float            fFocusEffectTarget;
     SString          strLocale;
@@ -28,8 +28,8 @@ class CLanguageSelector
 public:
     ZERO_ON_NEW
     CLanguageSelector(CGUIElement* pMainMenuCanvas);
-    ~CLanguageSelector(void);
-    void DoPulse(void);
+    ~CLanguageSelector();
+    void DoPulse();
 
 protected:
     void           CreateGUI(CGUIElement* pMainMenuCanvas);

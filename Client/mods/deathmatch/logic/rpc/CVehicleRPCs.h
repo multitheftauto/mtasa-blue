@@ -16,7 +16,7 @@
 class CVehicleRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(DestroyAllVehicles);
     DECLARE_ELEMENT_RPC(FixVehicle);

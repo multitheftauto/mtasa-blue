@@ -58,11 +58,11 @@ public:
     BYTE          GetWheelStatus(eWheelPosition bWheel);
     VOID          SetWheelStatus(eWheelPosition bWheel, BYTE bTireStatus);
     BYTE          GetPanelStatus(BYTE bPanel);
-    unsigned long GetPanelStatus(void);
+    unsigned long GetPanelStatus();
     VOID          SetPanelStatus(BYTE bPanel, BYTE bPanelStatus);
     void          SetPanelStatus(unsigned long ulStatus);
     BYTE          GetLightStatus(BYTE bLight);
-    unsigned char GetLightStatus(void);
+    unsigned char GetLightStatus();
     VOID          SetLightStatus(BYTE bLight, BYTE bLightStatus);
     void          SetLightStatus(unsigned char ucStatus);
     BYTE          GetAeroplaneCompStatus(BYTE CompID);

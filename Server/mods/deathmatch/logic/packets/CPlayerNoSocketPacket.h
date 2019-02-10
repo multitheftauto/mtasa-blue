@@ -12,9 +12,9 @@
 class CPlayerNoSocketPacket : public CPacket
 {
 public:
-    virtual bool  RequiresSourcePlayer(void) const { return true; }
-    ePacketID     GetPacketID(void) const { return PACKET_ID_PLAYER_NO_SOCKET; };
-    unsigned long GetFlags(void) const
+    virtual bool  RequiresSourcePlayer() const { return true; }
+    ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_NO_SOCKET; };
+    unsigned long GetFlags() const
     {
         assert(0);
         return 0;

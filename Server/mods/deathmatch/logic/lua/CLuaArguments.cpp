@@ -310,7 +310,7 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
     return true;
 }
 
-CLuaArgument* CLuaArguments::PushNil(void)
+CLuaArgument* CLuaArguments::PushNil()
 {
     CLuaArgument* pArgument = new CLuaArgument;
     m_Arguments.push_back(pArgument);
@@ -436,7 +436,7 @@ CLuaArgument* CLuaArguments::PushDbQuery(CDbJobData* pJobData)
     return pArgument;
 }
 
-void CLuaArguments::DeleteArguments(void)
+void CLuaArguments::DeleteArguments()
 {
     // Delete each item
     vector<CLuaArgument*>::iterator iter = m_Arguments.begin();
@@ -449,7 +449,7 @@ void CLuaArguments::DeleteArguments(void)
     m_Arguments.clear();
 }
 
-void CLuaArguments::ValidateTableKeys(void)
+void CLuaArguments::ValidateTableKeys()
 {
     // Iterate over m_Arguments as pairs
     // If first is LUA_TNIL, then remove pair

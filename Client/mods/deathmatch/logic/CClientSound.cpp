@@ -31,7 +31,7 @@ CClientSound::CClientSound(CClientManager* pManager, ElementID ID) : ClassInit(t
     m_uiFrameNumberCreated = g_pClientGame->GetFrameCount();
 }
 
-CClientSound::~CClientSound(void)
+CClientSound::~CClientSound()
 {
     Destroy();
     m_pSoundManager->RemoveFromList(this);
@@ -47,7 +47,7 @@ CClientSound::~CClientSound(void)
 // For spatial database
 //
 ////////////////////////////////////////////////////////////
-CSphere CClientSound::GetWorldBoundingSphere(void)
+CSphere CClientSound::GetWorldBoundingSphere()
 {
     return CSphere(m_vecPosition, m_fMaxDistance);
 }
@@ -59,7 +59,7 @@ CSphere CClientSound::GetWorldBoundingSphere(void)
 // Sound is now close enough to be heard, so must be activated
 //
 ////////////////////////////////////////////////////////////
-void CClientSound::DistanceStreamIn(void)
+void CClientSound::DistanceStreamIn()
 {
     if (!m_pAudio)
     {
@@ -79,7 +79,7 @@ void CClientSound::DistanceStreamIn(void)
 // Sound is now far enough away to not be heard, so can be deactivated
 //
 ////////////////////////////////////////////////////////////
-void CClientSound::DistanceStreamOut(void)
+void CClientSound::DistanceStreamOut()
 {
     if (m_pAudio)
     {
@@ -99,7 +99,7 @@ void CClientSound::DistanceStreamOut(void)
 // Create underlying audio
 //
 ////////////////////////////////////////////////////////////
-bool CClientSound::Create(void)
+bool CClientSound::Create()
 {
     if (m_pAudio)
         return false;
@@ -158,7 +158,7 @@ bool CClientSound::Create(void)
 // Destroy underlying audio
 //
 ////////////////////////////////////////////////////////////
-void CClientSound::Destroy(void)
+void CClientSound::Destroy()
 {
     if (!m_pAudio)
         return;
@@ -176,7 +176,7 @@ void CClientSound::Destroy(void)
 //
 //
 ////////////////////////////////////////////////////////////
-void CClientSound::BeginSimulationOfPlayPosition(void)
+void CClientSound::BeginSimulationOfPlayPosition()
 {
     // Only 3d sounds will be distance streamed in and out. Also streams can't be seeked.
     // So only non-streamed 3D sounds need the play position simulated.
@@ -198,7 +198,7 @@ void CClientSound::BeginSimulationOfPlayPosition(void)
 //
 //
 ////////////////////////////////////////////////////////////
-void CClientSound::EndSimulationOfPlayPositionAndApply(void)
+void CClientSound::EndSimulationOfPlayPositionAndApply()
 {
     if (m_SimulatedPlayPosition.IsValid())
     {
@@ -309,7 +309,7 @@ bool CClientSound::SetPlayPosition(double dPosition)
     return false;
 }
 
-double CClientSound::GetPlayPosition(void)
+double CClientSound::GetPlayPosition()
 {
     if (m_pAudio)
     {
@@ -358,7 +358,16 @@ double CClientSound::GetLength(bool bAvoidLoad)
     return m_dLength;
 }
 
-float CClientSound::GetVolume(void)
+double CClientSound::GetBufferLength()
+{
+    if (m_bStream && m_pAudio)
+    {
+        return m_pAudio->GetBufferLength();
+    }
+    return 0;
+}
+
+float CClientSound::GetVolume()
 {
     return m_fVolume;
 }
@@ -371,7 +380,7 @@ void CClientSound::SetVolume(float fVolume, bool bStore)
         m_pAudio->SetVolume(m_fVolume);
 }
 
-float CClientSound::GetPlaybackSpeed(void)
+float CClientSound::GetPlaybackSpeed()
 {
     return m_fPlaybackSpeed;
 }
@@ -444,7 +453,7 @@ void CClientSound::SetPaused(bool bPaused)
         m_pAudio->SetPaused(m_bPaused);
 }
 
-bool CClientSound::IsPaused(void)
+bool CClientSound::IsPaused()
 {
     return m_bPaused;
 }
@@ -456,7 +465,7 @@ void CClientSound::SetMinDistance(float fDistance)
         m_pAudio->SetMinDistance(m_fMinDistance);
 }
 
-float CClientSound::GetMinDistance(void)
+float CClientSound::GetMinDistance()
 {
     return m_fMinDistance;
 }
@@ -473,7 +482,7 @@ void CClientSound::SetMaxDistance(float fDistance)
         UpdateSpatialData();
 }
 
-float CClientSound::GetMaxDistance(void)
+float CClientSound::GetMaxDistance()
 {
     return m_fMaxDistance;
 }
@@ -524,7 +533,7 @@ bool CClientSound::SetPanEnabled(bool bPan)
     return false;
 }
 
-bool CClientSound::IsPanEnabled(void)
+bool CClientSound::IsPanEnabled()
 {
     if (m_pAudio)
     {
@@ -533,7 +542,7 @@ bool CClientSound::IsPanEnabled(void)
     return m_bPan;
 }
 
-DWORD CClientSound::GetLevelData(void)
+DWORD CClientSound::GetLevelData()
 {
     if (m_pAudio)
     {
@@ -542,7 +551,7 @@ DWORD CClientSound::GetLevelData(void)
     return 0;
 }
 
-float CClientSound::GetSoundBPM(void)
+float CClientSound::GetSoundBPM()
 {
     if (m_pAudio)
     {
@@ -682,7 +691,7 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
 //
 //
 ////////////////////////////////////////////////////////////
-bool CClientSound::IsFinished(void)
+bool CClientSound::IsFinished()
 {
     if (m_pAudio)
     {

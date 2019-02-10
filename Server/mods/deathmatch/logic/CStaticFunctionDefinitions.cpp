@@ -72,7 +72,7 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions(CGame* pGame)
     m_pCustomWeaponManager = pGame->GetCustomWeaponManager();
 }
 
-CStaticFunctionDefinitions::~CStaticFunctionDefinitions(void)
+CStaticFunctionDefinitions::~CStaticFunctionDefinitions()
 {
 }
 
@@ -190,7 +190,7 @@ const char* CStaticFunctionDefinitions::GetCancelReason()
     return m_pEvents->GetLastError();
 }
 
-bool CStaticFunctionDefinitions::WasEventCancelled(void)
+bool CStaticFunctionDefinitions::WasEventCancelled()
 {
     return m_pEvents->WasEventCancelled();
 }
@@ -1985,7 +1985,7 @@ CPed* CStaticFunctionDefinitions::CreatePed(CResource* pResource, unsigned short
     return NULL;
 }
 
-unsigned int CStaticFunctionDefinitions::GetPlayerCount(void)
+unsigned int CStaticFunctionDefinitions::GetPlayerCount()
 {
     return m_pPlayerManager->CountJoined();
 }
@@ -2727,7 +2727,7 @@ bool CStaticFunctionDefinitions::GetPlayerSourceIP(CPlayer* pPlayer, SString& st
     return true;
 }
 
-CPlayer* CStaticFunctionDefinitions::GetRandomPlayer(void)
+CPlayer* CStaticFunctionDefinitions::GetRandomPlayer()
 {
     unsigned int uiJoinedCount = m_pPlayerManager->CountJoined();
     if (uiJoinedCount > 0)
@@ -4117,11 +4117,11 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby(CElement* pElement, bool
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const char* szBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop,
+bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SString& blockName, const SString& animName, int iTime, int iBlend, bool bLoop,
                                                  bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame)
 {
     assert(pElement);
-    RUN_CHILDREN(SetPedAnimation(*iter, szBlockName, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame))
+    RUN_CHILDREN(SetPedAnimation(*iter, blockName, animName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame))
 
     if (IS_PED(pElement))
     {
@@ -4140,15 +4140,10 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const char*
 
             // Tell the players
             CBitStream BitStream;
-            if (szBlockName && szAnimName)
+            if (!blockName.empty() && !animName.empty())
             {
-                unsigned char ucBlockSize = (unsigned char)strlen(szBlockName);
-                unsigned char ucAnimSize = (unsigned char)strlen(szAnimName);
-
-                BitStream.pBitStream->Write(ucBlockSize);
-                BitStream.pBitStream->Write(szBlockName, ucBlockSize);
-                BitStream.pBitStream->Write(ucAnimSize);
-                BitStream.pBitStream->Write(szAnimName, ucAnimSize);
+                BitStream.pBitStream->WriteString<unsigned char>(blockName);
+                BitStream.pBitStream->WriteString<unsigned char>(animName);
                 BitStream.pBitStream->Write(iTime);
                 BitStream.pBitStream->WriteBit(bLoop);
                 BitStream.pBitStream->WriteBit(bUpdatePosition);
@@ -4169,10 +4164,10 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const char*
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, const char* szAnimName, float fProgress)
+bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, const SString& animName, float fProgress)
 {
     assert(pElement);
-    RUN_CHILDREN(SetPedAnimationProgress(*iter, szAnimName, fProgress))
+    RUN_CHILDREN(SetPedAnimationProgress(*iter, animName, fProgress))
 
     if (IS_PED(pElement))
     {
@@ -4180,12 +4175,9 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, con
         if (pPed->IsSpawned())
         {
             CBitStream BitStream;
-            if (szAnimName)
+            if (!animName.empty())
             {
-                unsigned char ucAnimSize = (unsigned char)strlen(szAnimName);
-
-                BitStream.pBitStream->Write(ucAnimSize);
-                BitStream.pBitStream->Write(szAnimName, ucAnimSize);
+                BitStream.pBitStream->WriteString<unsigned char>(animName);
                 BitStream.pBitStream->Write(fProgress);
             }
             else
@@ -4201,25 +4193,20 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, con
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CElement* pElement, const char* szAnimName, float fSpeed)
+bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CElement* pElement, const SString& animName, float fSpeed)
 {
     assert(pElement);
-    RUN_CHILDREN(SetPedAnimationSpeed(*iter, szAnimName, fSpeed))
+    RUN_CHILDREN(SetPedAnimationSpeed(*iter, animName, fSpeed))
 
     if (IS_PED(pElement))
     {
         CPed* pPed = static_cast<CPed*>(pElement);
-        if (pPed->IsSpawned() && szAnimName)
+        if (pPed->IsSpawned() && !animName.empty())
         {
             CBitStream BitStream;
-            if (szAnimName)
-            {
-                unsigned char ucAnimSize = (unsigned char)strlen(szAnimName);
+            BitStream.pBitStream->WriteString<unsigned char>(animName);
+            BitStream.pBitStream->Write(fSpeed);
 
-                BitStream.pBitStream->Write(ucAnimSize);
-                BitStream.pBitStream->Write(szAnimName, ucAnimSize);
-                BitStream.pBitStream->Write(fSpeed);
-            }
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION_SPEED, *BitStream.pBitStream));
 
             return true;
@@ -9115,7 +9102,7 @@ bool CStaticFunctionDefinitions::SetWorldWaterLevel(float fLevel, bool bIncludeW
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetWorldWaterLevel(void)
+bool CStaticFunctionDefinitions::ResetWorldWaterLevel()
 {
     CBitStream BitStream;
     g_pGame->GetWaterManager()->ResetWorldWaterLevel();
@@ -9785,7 +9772,7 @@ bool CStaticFunctionDefinitions::GetClothesTypeName(unsigned char ucType, char* 
     return false;
 }
 
-unsigned int CStaticFunctionDefinitions::GetMaxPlayers(void)
+unsigned int CStaticFunctionDefinitions::GetMaxPlayers()
 {
     return m_pMainConfig->GetMaxPlayers();
 }
@@ -10359,7 +10346,7 @@ bool CStaticFunctionDefinitions::RestoreWorldModel(unsigned short usModel, float
     return true;
 }
 
-bool CStaticFunctionDefinitions::RestoreAllWorldModels(void)
+bool CStaticFunctionDefinitions::RestoreAllWorldModels()
 {
     g_pGame->GetBuildingRemovalManager()->ClearBuildingRemovals();
     CBitStream BitStream;
@@ -10368,7 +10355,7 @@ bool CStaticFunctionDefinitions::RestoreAllWorldModels(void)
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetMoonSize(void)
+bool CStaticFunctionDefinitions::ResetMoonSize()
 {
     CBitStream BitStream;
     g_pGame->SetHasMoonSize(false);
@@ -10576,7 +10563,7 @@ bool CStaticFunctionDefinitions::SetSkyGradient(unsigned char ucTopRed, unsigned
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetSkyGradient(void)
+bool CStaticFunctionDefinitions::ResetSkyGradient()
 {
     g_pGame->SetHasSkyGradient(false);
 
@@ -10607,7 +10594,7 @@ bool CStaticFunctionDefinitions::SetHeatHaze(const SHeatHazeSettings& settings)
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetHeatHaze(void)
+bool CStaticFunctionDefinitions::ResetHeatHaze()
 {
     g_pGame->SetHasHeatHaze(false);
 
@@ -10675,12 +10662,12 @@ bool CStaticFunctionDefinitions::SetCloudsEnabled(bool bEnabled)
     g_pGame->SetCloudsEnabled(bEnabled);
     return true;
 }
-bool CStaticFunctionDefinitions::GetCloudsEnabled(void)
+bool CStaticFunctionDefinitions::GetCloudsEnabled()
 {
     return g_pGame->GetCloudsEnabled();
 }
 
-CElement* CStaticFunctionDefinitions::GetRootElement(void)
+CElement* CStaticFunctionDefinitions::GetRootElement()
 {
     return m_pMapManager->GetRootElement();
 }
@@ -10840,7 +10827,7 @@ bool CStaticFunctionDefinitions::ExecuteSQLQuery(const std::string& strQuery, CL
     return m_pRegistry->Query(strQuery, pArgs, pResult);
 }
 
-const std::string& CStaticFunctionDefinitions::SQLGetLastError(void)
+const std::string& CStaticFunctionDefinitions::SQLGetLastError()
 {
     return m_pRegistry->GetLastError();
 }
@@ -10986,11 +10973,11 @@ CAccount* CStaticFunctionDefinitions::AddAccount(const SString& strName, const S
     return NULL;
 }
 
-CAccount* CStaticFunctionDefinitions::GetAccount(const char* szName, const char* szPassword)
+CAccount* CStaticFunctionDefinitions::GetAccount(const char* szName, const char* szPassword, bool bCaseSensitive)
 {
     assert(szName);
 
-    CAccount* pCurrentAccount = m_pAccountManager->Get(szName);
+    CAccount* pCurrentAccount = m_pAccountManager->Get(szName, szPassword, bCaseSensitive);
     if (pCurrentAccount && (!szPassword || pCurrentAccount->IsPassword(szPassword)))
         return pCurrentAccount;
     else
@@ -11488,7 +11475,7 @@ bool CStaticFunctionDefinitions::GetBans(lua_State* pLua)
     return true;
 }
 
-bool CStaticFunctionDefinitions::ReloadBanList(void)
+bool CStaticFunctionDefinitions::ReloadBanList()
 {
     return m_pBanManager->ReloadBanList();
 }

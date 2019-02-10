@@ -109,7 +109,7 @@ void CPad::NewControllerState(const CControllerState& State)
     SetCurrentControllerState(State);
 }
 
-void CPad::UpdateKeys(void)
+void CPad::UpdateKeys()
 {
     if (m_pPlayer)
     {

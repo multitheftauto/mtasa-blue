@@ -21,7 +21,7 @@ class CStaticFunctionDefinitions
 public:
     CStaticFunctionDefinitions(class CLuaManager* pLuaManager, CEvents* pEvents, CCoreInterface* pCore, CGame* pGame, CClientGame* pClientGame,
                                CClientManager* pManager);
-    ~CStaticFunctionDefinitions(void);
+    ~CStaticFunctionDefinitions();
 
     static bool AddEvent(CLuaMain& LuaMain, const char* szName, bool bAllowRemoteTrigger);
     static bool AddEventHandler(CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated,
@@ -32,7 +32,7 @@ public:
     static bool TriggerLatentServerEvent(const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, int bandwidth, CLuaMain* pLuaMain,
                                          ushort usResourceNetId);
     static bool CancelEvent(bool bCancel);
-    static bool WasEventCancelled(void);
+    static bool WasEventCancelled();
 
     // Misc funcs
     static bool DownloadFile(CResource* pResource, const char* szFile, CChecksum checksum = CChecksum());
@@ -44,14 +44,14 @@ public:
     static bool SetClipboard(SString& strText);
     static bool GetClipboard(SString& strText);
     static bool SetWindowFlashing(bool flash, uint count);
-    static bool ClearChatBox(void);
+    static bool ClearChatBox();
 
     // Notification funcs
     static bool CreateTrayNotification(SString strText, eTrayIconType eType, bool useSound);
-    static bool IsTrayNotificationEnabled(void);
+    static bool IsTrayNotificationEnabled();
 
     // Element get funcs
-    static CClientEntity* GetRootElement(void);
+    static CClientEntity* GetRootElement();
     static CClientEntity* GetElementByID(const char* szID, unsigned int uiIndex);
     static CClientEntity* GetElementByIndex(const char* szType, unsigned int uiIndex);
     static CClientEntity* GetElementChild(CClientEntity& Entity, unsigned int uiIndex);
@@ -111,7 +111,7 @@ public:
     static bool GetRadioChannel(unsigned char& ucChannel);
 
     // Player get funcs
-    static CClientPlayer* GetLocalPlayer(void);
+    static CClientPlayer* GetLocalPlayer();
     static CClientPlayer* GetPlayerFromName(const char* szNick);
     static bool           GetPlayerMoney(long& lMoney);
     static bool           GetPlayerWantedLevel(char& cWanted);
@@ -321,7 +321,7 @@ public:
 
     // Explosion funcs
     static bool CreateExplosion(CVector& vecPosition, unsigned char ucType, bool bMakeSound, float fCamShake, bool bDamaging);
-    static bool DetonateSatchels(void);
+    static bool DetonateSatchels();
 
     // Fire funcs
     static bool CreateFire(CVector& vecPosition, float fSize);
@@ -346,10 +346,10 @@ public:
     static bool PlaySoundFrontEnd(unsigned char ucSound);
     static bool SetAmbientSoundEnabled(eAmbientSoundType eType, bool bMute);
     static bool IsAmbientSoundEnabled(eAmbientSoundType eType, bool& bOutMute);
-    static bool ResetAmbientSounds(void);
+    static bool ResetAmbientSounds();
     static bool SetWorldSoundEnabled(uint uiGroup, uint uiIndex, bool bMute, bool bImmediate);
     static bool IsWorldSoundEnabled(uint uiGroup, uint uiIndex, bool& bOutMute);
-    static bool ResetWorldSounds(void);
+    static bool ResetWorldSounds();
     static bool PlaySFX(CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop, CClientSound*& outSound);
     static bool PlaySFX3D(CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, const CVector& vecPosition, bool bLoop,
                           CClientSound*& outSound);
@@ -383,7 +383,7 @@ public:
     // Camera get funcs
     static bool           GetCameraViewMode(unsigned short& ucMode);
     static bool           GetCameraMatrix(CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV);
-    static CClientEntity* GetCameraTarget(void);
+    static CClientEntity* GetCameraTarget();
     static bool           GetCameraInterior(unsigned char& ucInterior);
 
     // Camera set funcs
@@ -404,10 +404,10 @@ public:
     static ID3DXFont* ResolveD3DXFont(eFontType fontType, CClientDxFont* pDxFontElement);
 
     // GUI funcs
-    static bool        GUIGetInputEnabled(void);
-    static eInputMode  GUIGetInputMode(void);
+    static bool        GUIGetInputEnabled();
+    static eInputMode  GUIGetInputMode();
     static void        GUISetInputMode(eInputMode inputMode);
-    static eCursorType GUIGetCursorType(void);
+    static eCursorType GUIGetCursorType();
 
     static CClientGUIElement* GUICreateWindow(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative);
     static CClientGUIElement* GUICreateLabel(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative,
@@ -469,7 +469,7 @@ public:
     static void GUIScrollPaneSetHorizontalScrollPosition(CClientEntity& Element, float fProgress);
     static void GUIScrollPaneSetVerticalScrollPosition(CClientEntity& Element, float fProgress);
 
-    static inline const CVector2D GUIGetScreenSize(void) { return g_pCore->GetGUI()->GetResolution(); };
+    static inline const CVector2D GUIGetScreenSize() { return g_pCore->GetGUI()->GetResolution(); };
 
     static void GUIEditSetReadOnly(CClientEntity& Element, bool bFlag);
     static void GUIEditSetMasked(CClientEntity& Element, bool bFlag);
@@ -567,7 +567,7 @@ public:
     static bool          SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel);
     static bool          SetPositionWaterLevel(const CVector& vecPosition, float fLevel, void* pChangeSource);
     static bool          SetAllElementWaterLevel(float fLevel, void* pChangeSource);
-    static bool          ResetWorldWaterLevel(void);
+    static bool          ResetWorldWaterLevel();
     static bool          SetWaterVertexPosition(CClientWater* pWater, int iVertexIndex, CVector& vecPosition);
     static bool          SetWaterDrawnLast(bool bEnabled);
     static bool          IsWaterDrawnLast(bool& bOutEnabled);
@@ -585,7 +585,7 @@ public:
     static bool          GetGarageBoundingBox(unsigned char ucGarageID, float& fLeft, float& fRight, float& fFront, float& fBack);
     static bool          IsWorldSpecialPropertyEnabled(const char* szPropName);
     static bool          SetCloudsEnabled(bool bEnabled);
-    static bool          GetCloudsEnabled(void);
+    static bool          GetCloudsEnabled();
     static bool          GetTrafficLightState(unsigned char& ucState);
     static bool          AreTrafficLightsLocked(bool& bLocked);
     static bool          RemoveWorldBuilding(unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior, uint& uiOutAmount);
@@ -597,13 +597,13 @@ public:
                                unsigned char& ucBottomGreen, unsigned char& ucBottomBlue);
     static bool SetSkyGradient(unsigned char ucTopRed, unsigned char ucTopGreen, unsigned char ucTopBlue, unsigned char ucBottomRed,
                                unsigned char ucBottomGreen, unsigned char ucBottomBlue);
-    static bool ResetSkyGradient(void);
+    static bool ResetSkyGradient();
     static bool GetHeatHaze(SHeatHazeSettings& settings);
     static bool SetHeatHaze(const SHeatHazeSettings& settings);
-    static bool ResetHeatHaze(void);
+    static bool ResetHeatHaze();
     static bool GetWaterColor(float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha);
     static bool SetWaterColor(float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha);
-    static bool ResetWaterColor(void);
+    static bool ResetWaterColor();
     static bool SetWeather(unsigned char ucWeather);
     static bool SetWeatherBlended(unsigned char ucWeather);
     static bool SetGravity(float fGravity);
@@ -617,14 +617,14 @@ public:
     static bool SetTrafficLightState(unsigned char ucState);
     static bool SetTrafficLightsLocked(bool bLocked);
     static bool SetWindVelocity(float fX, float fY, float fZ);
-    static bool RestoreWindVelocity(void);
+    static bool RestoreWindVelocity();
     static bool GetWindVelocity(float& fX, float& fY, float& fZ);
     static bool SetAircraftMaxHeight(float fHeight);
     static bool SetAircraftMaxVelocity(float fVelocity);
     static bool SetOcclusionsEnabled(bool bEnabled);
     static bool CreateSWATRope(CVector vecPosition, DWORD dwDuration);
     static bool SetBirdsEnabled(bool bEnabled);
-    static bool GetBirdsEnabled(void);
+    static bool GetBirdsEnabled();
     static bool SetMoonSize(int iSize);
     static bool SetFPSLimit(int iLimit);
     static bool GetFPSLimit(int& iLimit);
@@ -718,6 +718,7 @@ public:
     static bool          SetSoundPosition(CClientSound& Sound, double dPosition);
     static bool          GetSoundPosition(CClientSound& Sound, double& dPosition);
     static bool          GetSoundLength(CClientSound& Sound, double& dLength);
+    static bool          GetSoundBufferLength(CClientSound& Sound, double& dBufferLength);
     static bool          SetSoundPaused(CClientSound& Sound, bool bPaused);
     static bool          IsSoundPaused(CClientSound& Sound, bool& bPaused);
     static bool          SetSoundVolume(CClientSound& Sound, float fVolume);

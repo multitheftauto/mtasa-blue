@@ -17,7 +17,7 @@ CClientWeaponManager::CClientWeaponManager(CClientManager* pManager)
     m_bDeleteAll = false;
 }
 
-CClientWeaponManager::~CClientWeaponManager(void)
+CClientWeaponManager::~CClientWeaponManager()
 {
     m_bDeleteAll = true;
     list<CClientWeapon*>::iterator iter = m_Weapons.begin();
@@ -36,7 +36,7 @@ void CClientWeaponManager::RemoveFromList(CClientWeapon* pWeapon)
     }
 }
 
-void CClientWeaponManager::DoPulse(void)
+void CClientWeaponManager::DoPulse()
 {
     list<CClientWeapon*>::iterator iter = m_Weapons.begin();
     for (; iter != m_Weapons.end(); iter++)
