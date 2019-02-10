@@ -4074,14 +4074,14 @@ void                        GetVehicleDriveType()
     ucDriveType = static_cast<unsigned char>(pHandlingDriveTypeVeh->m_pVehicle->GetHandlingData()->GetCarDriveType());
 }
 
-static CTransmission* pCurTrasmision = nullptr;
+static CTransmission* pCurTransmission = nullptr;
 static byte*          pCurGear = nullptr;
 
 void CheckVehicleMaxGear()
 {
-    if (*pCurGear > pCurTrasmision->numOfGears)
+    if (*pCurGear > pCurTransmission->numOfGears)
     {
-        *pCurGear = pCurTrasmision->numOfGears;
+        *pCurGear = pCurTransmission->numOfGears;
     }
 }
 
@@ -4090,7 +4090,7 @@ void _declspec(naked) HOOK_Transmission_CalculateDriveAcceleration()
     _asm
     {
         push eax
-        mov pCurTrasmision, ecx
+        mov pCurTransmission, ecx
         mov eax, [esp+0xC]
         mov pCurGear, eax
         pop eax
