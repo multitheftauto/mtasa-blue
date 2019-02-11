@@ -1541,6 +1541,7 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
                 {
                     pPed->SetIsDead(false);
                 }
+
                 // set new health
                 pPed->SetHealth(fHealth);
             }
