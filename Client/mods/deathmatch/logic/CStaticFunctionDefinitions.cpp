@@ -2417,14 +2417,11 @@ bool CStaticFunctionDefinitions::SetPedOnFire(CClientEntity& Entity, bool bOnFir
 
 bool CStaticFunctionDefinitions::SetPedArmor(CClientEntity& Entity, float fArmor)
 {
-    if (IS_PED(&Entity))
+    if (IS_PED(&Entity) && Entity.IsLocalEntity())
     {
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
-        if (Ped.IsLocalEntity())
-        {
-            Ped.SetArmor(fArmor);
-            return true;
-        }
+        Ped.SetArmor(fArmor);
+        return true;
     }
     return false;
 }
