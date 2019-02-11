@@ -1740,6 +1740,8 @@ void CClientPed::InternalSetHealth(float fHealth)
 
             // Set the new health
             m_pPlayerPed->SetHealth(fHealth);
+
+            // Recover from dead state to bring the ped back to life
             m_pTaskManager->RemoveTask(TASK_SIMPLE_DEAD);
         }
     }
