@@ -1174,7 +1174,6 @@ int CLuaPedDefs::IsPedDoingGangDriveby(lua_State* luaVM)
 int CLuaPedDefs::GetPedFightingStyle(lua_State* luaVM)
 {
     CClientPed*      pPed;
-
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
 
