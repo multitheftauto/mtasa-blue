@@ -178,6 +178,7 @@ public:
     static bool SetPedControlState(CClientEntity& Entity, const char* szControl, bool bState);
     static bool SetPedAnalogControlState(CClientEntity& Entity, const char* szControl, float fState);
     static bool SetPedDoingGangDriveby(CClientEntity& Entity, bool bGangDriveby);
+    static bool SetPedFightingStyle(CClientEntity& Entity, unsigned char ucStyle);
     static bool SetPedLookAt(CClientEntity& Entity, CVector& vecPosition, int iTime, int iBlend, CClientEntity* pTarget);
     static bool SetPedHeadless(CClientEntity& Entity, bool bHeadless);
     static bool SetPedFrozen(CClientEntity& Entity, bool bFrozen);

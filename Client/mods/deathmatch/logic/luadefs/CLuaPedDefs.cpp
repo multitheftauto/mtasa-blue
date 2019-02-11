@@ -76,6 +76,7 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedControlState", SetPedControlState},
         {"setPedAnalogControlState", SetPedAnalogControlState},
         {"setPedDoingGangDriveby", SetPedDoingGangDriveby},
+        {"setPedFightingStyle", SetPedFightingStyle},
         {"setPedLookAt", SetPedLookAt},
         {"setPedHeadless", SetPedHeadless},
         {"setPedFrozen", SetPedFrozen},
@@ -168,6 +169,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setOxygenLevel", "setPedOxygenLevel");
     lua_classfunction(luaVM, "setWeaponSlot", "setPedWeaponSlot");
     lua_classfunction(luaVM, "setDoingGangDriveby", "setPedDoingGangDriveby");
+    lua_classfunction(luaVM, "setFightingStyle", "setPedFightingStyle");
     lua_classfunction(luaVM, "setHeadless", "setPedHeadless");
     lua_classfunction(luaVM, "setOnFire", "setPedOnFire");
     lua_classfunction(luaVM, "setTargetingMarkerEnabled", "setPedTargetingMarkerEnabled");
@@ -186,7 +188,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "hasJetPack", NULL, "doesPedHaveJetPack");
     lua_classvariable(luaVM, "jetpack", NULL, "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
     lua_classvariable(luaVM, "armor", NULL, "getPedArmor");
-    lua_classvariable(luaVM, "fightingStyle", NULL, "getPedFightingStyle");
+    lua_classvariable(luaVM, "fightingStyle", "setPedFightingStyle", "getPedFightingStyle");
     lua_classvariable(luaVM, "cameraRotation", "setPedCameraRotation", "getPedCameraRotation");
     lua_classvariable(luaVM, "contactElement", NULL, "getPedContactElement");
     lua_classvariable(luaVM, "moveState", NULL, "getPedMoveState");
@@ -1688,6 +1690,29 @@ int CLuaPedDefs::SetPedDoingGangDriveby(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         if (CStaticFunctionDefinitions::SetPedDoingGangDriveby(*pEntity, bDoingGangDriveby))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPedDefs::SetPedFightingStyle(lua_State* luaVM)
+{
+    CClientEntity*   pEntity;
+    unsigned char    ucStyle;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+    argStream.ReadNumber(ucStyle);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetPedFightingStyle(*pEntity, ucStyle))
         {
             lua_pushboolean(luaVM, true);
             return 1;

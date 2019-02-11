@@ -2292,6 +2292,29 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby(CClientEntity& Entity, b
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetPedFightingStyle(CClientEntity& Entity, unsigned char ucStyle)
+{
+    RUN_CHILDREN(SetPedFightingStyle(**iter, ucStyle))
+    if (IS_PED(&Entity))
+    {
+        CClientPed& Ped = static_cast<CClientPed&>(Entity);
+        // Make sure it's a client ped and not a player
+        if (Ped.GetType() == CCLIENTPED && Ped.IsLocalEntity())
+        {
+            if (Ped.GetFightingStyle() != ucStyle)
+            {
+                // Is valid style
+                if (ucStyle >= 4 && ucStyle <= 16)
+                {
+                    Ped.SetFightingStyle(static_cast<eFightingStyle>(ucStyle));
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetPedLookAt(CClientEntity& Entity, CVector& vecPosition, int iTime, int iBlend, CClientEntity* pTarget)
 {
     RUN_CHILDREN(SetPedLookAt(**iter, vecPosition, iTime, iBlend, pTarget))
