@@ -189,6 +189,7 @@ public:
     static bool RemovePedFromVehicle(CClientPed* pPed);
     static bool WarpPedIntoVehicle(CClientPed* pPed, CClientVehicle* pVehicle, unsigned int uiSeat);
     static bool SetPedOxygenLevel(CClientEntity& Entity, float fOxygen);
+    static bool SetPedArmor(CClientEntity& Entity, float fArmor);
 
     // Extra Clothes functions
     static bool GetBodyPartName(unsigned char ucID, SString& strOutName);

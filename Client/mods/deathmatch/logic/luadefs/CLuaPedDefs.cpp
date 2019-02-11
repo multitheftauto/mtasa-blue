@@ -86,6 +86,7 @@ void CLuaPedDefs::LoadFunctions()
         {"warpPedIntoVehicle", WarpPedIntoVehicle},
         {"removePedFromVehicle", RemovePedFromVehicle},
         {"setPedOxygenLevel", SetPedOxygenLevel},
+        {"setPedArmor", SetPedArmor},
         {"givePedWeapon", GivePedWeapon},
         {"isPedReloadingWeapon", IsPedReloadingWeapon},
     };
@@ -166,6 +167,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setControlState", "setPedControlState");
     lua_classfunction(luaVM, "warpIntoVehicle", "warpPedIntoVehicle");
     lua_classfunction(luaVM, "setOxygenLevel", "setPedOxygenLevel");
+    lua_classfunction(luaVM, "setArmor", "setPedArmor");
     lua_classfunction(luaVM, "setWeaponSlot", "setPedWeaponSlot");
     lua_classfunction(luaVM, "setDoingGangDriveby", "setPedDoingGangDriveby");
     lua_classfunction(luaVM, "setHeadless", "setPedHeadless");
@@ -185,7 +187,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "canBeKnockedOffBike", "setPedCanBeKnockedOffBike", "canPedBeKnockedOffBike");
     lua_classvariable(luaVM, "hasJetPack", NULL, "doesPedHaveJetPack");
     lua_classvariable(luaVM, "jetpack", NULL, "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
-    lua_classvariable(luaVM, "armor", NULL, "getPedArmor");
+    lua_classvariable(luaVM, "armor", "setPedArmor", "getPedArmor");
     lua_classvariable(luaVM, "fightingStyle", NULL, "getPedFightingStyle");
     lua_classvariable(luaVM, "cameraRotation", "setPedCameraRotation", "getPedCameraRotation");
     lua_classvariable(luaVM, "contactElement", NULL, "getPedContactElement");
@@ -2104,6 +2106,29 @@ int CLuaPedDefs::SetPedMoveAnim(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPedDefs::SetPedArmor(lua_State* luaVM)
+{
+    CClientEntity*   pEntity;
+    float            fArmor;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+    argStream.ReadNumber(fArmor);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetPedArmor(*pEntity, fArmor))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
     lua_pushboolean(luaVM, false);
     return 1;
 }

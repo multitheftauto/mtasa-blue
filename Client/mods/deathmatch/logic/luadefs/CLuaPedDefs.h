@@ -72,6 +72,7 @@ public:
     LUA_DECLARE(SetPedAnimationProgress);
     LUA_DECLARE(SetPedAnimationSpeed);
     LUA_DECLARE(SetPedMoveAnim);
+    LUA_DECLARE(SetPedArmor);
     LUA_DECLARE(SetPedWeaponSlot);
     LUA_DECLARE(GivePedWeapon);
     LUA_DECLARE(IsPedReloadingWeapon);
