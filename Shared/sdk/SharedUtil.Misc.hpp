@@ -39,7 +39,7 @@ struct SReportLine
 {
     SString strText;
     uint    uiId;
-            operator SString&(void) { return strText; }
+            operator SString&() { return strText; }
     bool    operator==(const SReportLine& other) const { return strText == other.strText && uiId == other.uiId; }
 };
 CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
@@ -74,7 +74,7 @@ int SharedUtil::MessageBoxUTF8(HWND hWnd, SString lpText, SString lpCaption, UIN
 // Get startup directory as saved in the registry by the launcher
 // Used in the Win32 Client only
 //
-SString SharedUtil::GetMTASABaseDir(void)
+SString SharedUtil::GetMTASABaseDir()
 {
     static SString strInstallRoot;
     if (strInstallRoot.empty())
@@ -102,7 +102,7 @@ SString SharedUtil::CalcMTASAPath(const SString& strPath)
 //
 // Returns true if current process is GTA (i.e not MTA process)
 //
-bool SharedUtil::IsGTAProcess(void)
+bool SharedUtil::IsGTAProcess()
 {
     SString strLaunchPathFilename = GetLaunchPathFilename();
     if (strLaunchPathFilename.EndsWithI("gta_sa.exe") || strLaunchPathFilename.EndsWithI("proxy_sa.exe"))
@@ -175,7 +175,7 @@ static bool DeleteRegistryKey(HKEY hkRoot, const char* szSubKey)
 //
 // GetMajorVersionString
 //
-SString SharedUtil::GetMajorVersionString(void)
+SString SharedUtil::GetMajorVersionString()
 {
     return SStringX(MTA_DM_ASE_VERSION).Left(3);
 }
@@ -307,7 +307,7 @@ void SharedUtil::SetPostUpdateConnect(const SString& strHost)
 //
 // What server to connect to after update
 //
-SString SharedUtil::GetPostUpdateConnect(void)
+SString SharedUtil::GetPostUpdateConnect()
 {
     SString strPostUpdateConnect = GetRegistryValue("", "PostUpdateConnect");
     SetPostUpdateConnect("");
@@ -404,7 +404,7 @@ int SharedUtil::IncApplicationSettingInt(const SString& strName)
 // WatchDog
 //
 
-void SharedUtil::WatchDogReset(void)
+void SharedUtil::WatchDogReset()
 {
     RemoveApplicationSettingKey("watchdog");
 }
@@ -447,7 +447,7 @@ void SharedUtil::WatchDogClearCounter(const SString& str)
 static bool bWatchDogWasUncleanStopCached = false;
 static bool bWatchDogWasUncleanStopValue = false;
 
-bool SharedUtil::WatchDogWasUncleanStop(void)
+bool SharedUtil::WatchDogWasUncleanStop()
 {
     if (!bWatchDogWasUncleanStopCached)
     {
@@ -470,7 +470,7 @@ void SharedUtil::WatchDogSetUncleanStop(bool bOn)
 static bool bWatchDogWasLastRunCrashCached = false;
 static bool bWatchDogWasLastRunCrashValue = false;
 
-bool SharedUtil::WatchDogWasLastRunCrash(void)
+bool SharedUtil::WatchDogWasLastRunCrash()
 {
     if (!bWatchDogWasLastRunCrashCached)
     {
@@ -490,7 +490,7 @@ void SharedUtil::WatchDogSetLastRunCrash(bool bOn)
 //
 // Special things
 //
-void SharedUtil::WatchDogUserDidInteractWithMenu(void)
+void SharedUtil::WatchDogUserDidInteractWithMenu()
 {
     WatchDogCompletedSection(WD_SECTION_NOT_USED_MAIN_MENU);
     WatchDogCompletedSection(WD_SECTION_POST_INSTALL);
@@ -502,7 +502,7 @@ void SharedUtil::SetProductRegistryPath(const SString& strRegistryPath)
     ms_strProductRegistryPath = strRegistryPath;
 }
 
-const SString& SharedUtil::GetProductRegistryPath(void)
+const SString& SharedUtil::GetProductRegistryPath()
 {
     if (ms_strProductRegistryPath.empty())
         ms_strProductRegistryPath = PRODUCT_REGISTRY_PATH;
@@ -515,7 +515,7 @@ void SharedUtil::SetProductCommonDataDir(const SString& strCommonDataDir)
     ms_strProductCommonDataDir = strCommonDataDir;
 }
 
-const SString& SharedUtil::GetProductCommonDataDir(void)
+const SString& SharedUtil::GetProductCommonDataDir()
 {
     if (ms_strProductCommonDataDir.empty())
         ms_strProductCommonDataDir = PRODUCT_COMMON_DATA_DIR;
@@ -528,7 +528,7 @@ void SharedUtil::SetProductVersion(const SString& strVersion)
     ms_strProductVersion = strVersion;
 }
 
-const SString& SharedUtil::GetProductVersion(void)
+const SString& SharedUtil::GetProductVersion()
 {
     if (ms_strProductVersion.empty())
         ms_strProductVersion =
@@ -596,7 +596,7 @@ void SharedUtil::BrowseToSolution(const SString& strType, int iFlags, const SStr
 // Process next BrowseToSolution
 // Return true if did browse
 //
-bool SharedUtil::ProcessPendingBrowseToSolution(void)
+bool SharedUtil::ProcessPendingBrowseToSolution()
 {
     SString strType, strMessageBoxMessage, strErrorCode;
     int     iFlags;
@@ -651,7 +651,7 @@ bool SharedUtil::ProcessPendingBrowseToSolution(void)
 //
 // Clear BrowseToSolution
 //
-void SharedUtil::ClearPendingBrowseToSolution(void)
+void SharedUtil::ClearPendingBrowseToSolution()
 {
     SetApplicationSetting("pending-browse-to-solution", "");
 }
@@ -659,7 +659,7 @@ void SharedUtil::ClearPendingBrowseToSolution(void)
 //
 // For tracking results of new features
 //
-static SString GetReportLogHeaderText(void)
+static SString GetReportLogHeaderText()
 {
     SString strMTABuild = GetApplicationSetting("mta-version-ext").SplitRight("-");
     SString strOSVersion = GetApplicationSetting("os-version");
@@ -750,7 +750,7 @@ void SharedUtil::SetReportLogContents(const SString& strText)
     FileSave(strPathFilename, strText.length() ? &strText.at(0) : NULL, strText.length());
 }
 
-SString SharedUtil::GetReportLogContents(void)
+SString SharedUtil::GetReportLogContents()
 {
     SString strReportFilename = PathJoin(GetMTADataPath(), "report.log");
     // Load file into a string
@@ -760,7 +760,7 @@ SString SharedUtil::GetReportLogContents(void)
     return &buffer[0];
 }
 
-SString SharedUtil::GetReportLogProcessTag(void)
+SString SharedUtil::GetReportLogProcessTag()
 {
     static SString strResult;
     if (strResult.empty())
@@ -826,7 +826,7 @@ void SharedUtil::WriteErrorEvent(const SString& strText)
     WriteEvent("[Error]", strText);
 }
 
-void SharedUtil::BeginEventLog(void)
+void SharedUtil::BeginEventLog()
 {
     // Cycle now if flag requires it
     if (GetApplicationSettingInt("no-cycle-event-log") == 0)
@@ -837,7 +837,7 @@ void SharedUtil::BeginEventLog(void)
     WriteDebugEvent("BeginEventLog");
 }
 
-void SharedUtil::CycleEventLog(void)
+void SharedUtil::CycleEventLog()
 {
     // Set flag to cycle on next start
     SetApplicationSettingInt("no-cycle-event-log", 0);
@@ -1073,25 +1073,25 @@ SString SharedUtil::EscapeURLArgument(const SString& strArg)
 //
 #ifdef WIN32
 
-SharedUtil::CCriticalSection::CCriticalSection(void)
+SharedUtil::CCriticalSection::CCriticalSection()
 {
     m_pCriticalSection = new CRITICAL_SECTION;
     InitializeCriticalSection((CRITICAL_SECTION*)m_pCriticalSection);
 }
 
-SharedUtil::CCriticalSection::~CCriticalSection(void)
+SharedUtil::CCriticalSection::~CCriticalSection()
 {
     DeleteCriticalSection((CRITICAL_SECTION*)m_pCriticalSection);
     delete (CRITICAL_SECTION*)m_pCriticalSection;
 }
 
-void SharedUtil::CCriticalSection::Lock(void)
+void SharedUtil::CCriticalSection::Lock()
 {
     if (m_pCriticalSection)
         EnterCriticalSection((CRITICAL_SECTION*)m_pCriticalSection);
 }
 
-void SharedUtil::CCriticalSection::Unlock(void)
+void SharedUtil::CCriticalSection::Unlock()
 {
     if (m_pCriticalSection)
         LeaveCriticalSection((CRITICAL_SECTION*)m_pCriticalSection);
@@ -1100,24 +1100,24 @@ void SharedUtil::CCriticalSection::Unlock(void)
 #else
     #include <pthread.h>
 
-SharedUtil::CCriticalSection::CCriticalSection(void)
+SharedUtil::CCriticalSection::CCriticalSection()
 {
     m_pCriticalSection = new pthread_mutex_t;
     pthread_mutex_init((pthread_mutex_t*)m_pCriticalSection, NULL);
 }
 
-SharedUtil::CCriticalSection::~CCriticalSection(void)
+SharedUtil::CCriticalSection::~CCriticalSection()
 {
     pthread_mutex_destroy((pthread_mutex_t*)m_pCriticalSection);
     delete (pthread_mutex_t*)m_pCriticalSection;
 }
 
-void SharedUtil::CCriticalSection::Lock(void)
+void SharedUtil::CCriticalSection::Lock()
 {
     pthread_mutex_lock((pthread_mutex_t*)m_pCriticalSection);
 }
 
-void SharedUtil::CCriticalSection::Unlock(void)
+void SharedUtil::CCriticalSection::Unlock()
 {
     pthread_mutex_unlock((pthread_mutex_t*)m_pCriticalSection);
 }
@@ -1127,7 +1127,7 @@ void SharedUtil::CCriticalSection::Unlock(void)
 //
 // Ensure rand() seed gets set to a new unique value
 //
-void SharedUtil::RandomizeRandomSeed(void)
+void SharedUtil::RandomizeRandomSeed()
 {
     srand(rand() + GetTickCount32());
 }
@@ -1136,7 +1136,7 @@ void SharedUtil::RandomizeRandomSeed(void)
 // Return true if currently executing the main thread.
 // (Linux: Main thread being defined as the thread the function is first called from.)
 //
-bool SharedUtil::IsMainThread(void)
+bool SharedUtil::IsMainThread()
 {
 #ifdef WIN32
     static DWORD dwMainThreadID = 0;
@@ -1191,7 +1191,7 @@ bool SharedUtil::IsMainThread(void)
 #ifdef WIN32
     #include <time.h>
 
-int SharedUtil::GetBuildAge(void)
+int SharedUtil::GetBuildAge()
 {
     tm when;
     memset(&when, 0, sizeof(when));
@@ -1202,7 +1202,7 @@ int SharedUtil::GetBuildAge(void)
 }
 
 #if defined(MTA_DM_EXPIRE_DAYS)
-int SharedUtil::GetDaysUntilExpire(void)
+int SharedUtil::GetDaysUntilExpire()
 {
     tm when;
     memset(&when, 0, sizeof(when));
@@ -1482,7 +1482,7 @@ namespace SharedUtil
         }
     }
 
-    SString CArgMap::ToString(void) const
+    SString CArgMap::ToString() const
     {
         SString strResult;
         for (std::multimap<SString, SString>::const_iterator iter = m_Map.begin(); iter != m_Map.end(); ++iter)
@@ -1494,7 +1494,7 @@ namespace SharedUtil
         return strResult;
     }
 
-    bool CArgMap::HasMultiValues(void) const
+    bool CArgMap::HasMultiValues() const
     {
         for (std::multimap<SString, SString>::const_iterator iter = m_Map.begin(); iter != m_Map.end(); ++iter)
         {
@@ -1506,7 +1506,7 @@ namespace SharedUtil
         return false;
     }
 
-    void CArgMap::RemoveMultiValues(void)
+    void CArgMap::RemoveMultiValues()
     {
         if (HasMultiValues())
             SetFromString(ToString(), false);
@@ -1602,11 +1602,11 @@ namespace SharedUtil
     // Only a guide as it could change after the call has returned
     //
     ///////////////////////////////////////////////////////////////////////////
-    DWORD _GetCurrentProcessorNumber(void)
+    DWORD _GetCurrentProcessorNumber()
     {
         DWORD dwProcessorNumber = -1;
 #ifdef WIN32
-        typedef DWORD(WINAPI * FUNC_GetCurrentProcessorNumber)(VOID);
+        typedef DWORD(WINAPI * FUNC_GetCurrentProcessorNumber)();
 
         // Dynamically load GetCurrentProcessorNumber, as it does not exist on XP
         static FUNC_GetCurrentProcessorNumber pfn = NULL;

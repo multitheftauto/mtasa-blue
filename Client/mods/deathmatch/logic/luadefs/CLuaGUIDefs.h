@@ -17,7 +17,7 @@
 class CLuaGUIDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
     LUA_DECLARE(GUIGetInputEnabled);
@@ -54,6 +54,7 @@ public:
     LUA_DECLARE(GUIScrollBarSetScrollPosition);
     LUA_DECLARE(GUIScrollBarGetScrollPosition);
     LUA_DECLARE(GUIGridListSetSortingEnabled);
+    LUA_DECLARE(GUIGridListIsSortingEnabled);
     LUA_DECLARE(GUIGridListAddColumn);
     LUA_DECLARE(GUIGridListRemoveColumn);
     LUA_DECLARE(GUIGridListSetColumnWidth);
@@ -75,6 +76,7 @@ public:
     LUA_DECLARE(GUIGridListSetItemColor);
     LUA_DECLARE(GUIGridListGetItemColor);
     LUA_DECLARE(GUIGridListSetSelectionMode);
+    LUA_DECLARE(GUIGridListGetSelectionMode);
     LUA_DECLARE(GUIGridListGetSelectedItem);
     LUA_DECLARE(GUIGridListGetSelectedItems);
     LUA_DECLARE(GUIGridListGetSelectedCount);
@@ -99,6 +101,8 @@ public:
     LUA_DECLARE(GUISetProperty);
     LUA_DECLARE(GUIBringToFront);
     LUA_DECLARE(GUIMoveToBack);
+    LUA_DECLARE(GUIBlur);
+    LUA_DECLARE(GUIFocus);
     LUA_DECLARE(GUICheckBoxSetSelected);
     LUA_DECLARE(GUIRadioButtonSetSelected);
     LUA_DECLARE(GUIGetEnabled);
@@ -150,6 +154,9 @@ public:
     LUA_DECLARE(GUIComboBoxSetSelected);
     LUA_DECLARE(GUIComboBoxGetItemText);
     LUA_DECLARE(GUIComboBoxSetItemText);
+    LUA_DECLARE(GUIComboBoxGetItemCount);
+    LUA_DECLARE(GUIComboBoxSetOpen);
+    LUA_DECLARE(GUIComboBoxIsOpen);
     LUA_DECLARE(GUIGetCursorType);
 
 private:

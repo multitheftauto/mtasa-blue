@@ -834,17 +834,22 @@ static int json_object_double_to_json_string_format(struct json_object* jso,
 		if (format == std_format || strstr(format, ".0f") == NULL)
 			format_drops_decimals = 1;
 
-		if (size < (int)sizeof(buf) - 2 &&
-		    isdigit((int)buf[0]) && /* Looks like *some* kind of number */
-			!p && /* Has no decimal point */
-		    strchr(buf, 'e') == NULL && /* Not scientific notation */
-			format_drops_decimals)
-		{
-			// Ensure it looks like a float, even if snprintf didn't,
-			//  unless a custom format is set to omit the decimal.
-			strcat(buf, ".0");
-			size += 2;
-		}
+		// Commented out to fix GitHub #572 https://github.com/multitheftauto/mtasa-blue/issues/572
+		// Please read GitHub #767 comments if you are reapplying this patch.
+		//
+		// Before toJSON(1234567890000) => [ 1234567890000.0 ]
+		// After toJSON(1234567890000) => [ 1234567890000 ]
+		//if (size < (int)sizeof(buf) - 2 &&
+		//    isdigit((int)buf[0]) && /* Looks like *some* kind of number */
+		//	!p && /* Has no decimal point */
+		//    strchr(buf, 'e') == NULL && /* Not scientific notation */
+		//	format_drops_decimals)
+		//{
+		//	// Ensure it looks like a float, even if snprintf didn't,
+		//	//  unless a custom format is set to omit the decimal.
+		//	strcat(buf, ".0");
+		//	size += 2;
+		//}
 		if (p && (flags & JSON_C_TO_STRING_NOZERO))
 		{
 			/* last useful digit, always keep 1 zero */

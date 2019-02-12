@@ -11,27 +11,26 @@
 
 class CQuickConnect;
 
-#ifndef __CQUICKCONNECT_H
-#define __CQUICKCONNECT_H
+#pragma once
 
 #include "CMainMenu.h"
 
 class CQuickConnect
 {
 public:
-    CQuickConnect(void);
-    ~CQuickConnect(void);
+    CQuickConnect();
+    ~CQuickConnect();
 
     void SetVisible(bool bVisible);
-    bool IsVisible(void);
-    void Reset(void);
+    bool IsVisible();
+    void Reset();
 
 private:
     bool OnConnectButtonClick(CGUIElement* pElement);
     bool OnBackButtonClick(CGUIElement* pElement);
     bool OnHostChanged(CGUIElement* pElement);
 
-    void LoadData(void);
+    void LoadData();
 
     CGUIWindow* m_pWindow;
     CGUIEdit*   m_pEditHost;
@@ -43,5 +42,3 @@ private:
     CGUIButton* m_pButtonConnect;
     CGUIButton* m_pButtonBack;
 };
-
-#endif

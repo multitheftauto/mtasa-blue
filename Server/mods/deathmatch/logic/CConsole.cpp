@@ -12,8 +12,7 @@
 #include "StdInc.h"
 
 CConsole::CConsole(CBlipManager* pBlipManager, CMapManager* pMapManager, CPlayerManager* pPlayerManager, CRegisteredCommands* pRegisteredCommands,
-                   CVehicleManager* pVehicleManager, CLuaManager* pLuaManager, CBanManager* pBanManager,
-                   CAccessControlListManager* pACLManager)
+                   CVehicleManager* pVehicleManager, CLuaManager* pLuaManager, CBanManager* pBanManager, CAccessControlListManager* pACLManager)
 {
     // Init
     m_pBlipManager = pBlipManager;
@@ -26,7 +25,7 @@ CConsole::CConsole(CBlipManager* pBlipManager, CMapManager* pMapManager, CPlayer
     m_pACLManager = pACLManager;
 }
 
-CConsole::~CConsole(void)
+CConsole::~CConsole()
 {
     // Delete all our commands
     DeleteAllCommands();
@@ -143,7 +142,7 @@ void CConsole::DeleteCommand(const char* szCommand)
     }
 }
 
-void CConsole::DeleteAllCommands(void)
+void CConsole::DeleteAllCommands()
 {
     // Delete all the command classes
     list<CConsoleCommand*>::const_iterator iter = m_Commands.begin();

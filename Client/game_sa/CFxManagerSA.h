@@ -8,8 +8,7 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-#ifndef __CFXMANAGERSA_H
-#define __CFXMANAGERSA_H
+#pragma once
 
 #include <game/CFxManager.h>
 
@@ -76,5 +75,3 @@ private:
     CFxManagerSAInterface*                            m_pInterface;
     CFastHashMap<CFxSystemSAInterface*, CFxSystemSA*> m_FxInterfaceMap;
 };
-
-#endif

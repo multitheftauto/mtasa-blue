@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CLuaBrowserDefs::LoadFunctions(void)
+void CLuaBrowserDefs::LoadFunctions()
 {
     // Define browser functions
     std::map<const char*, lua_CFunction> functions{

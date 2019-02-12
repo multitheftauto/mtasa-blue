@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CStreaming_H
-#define __CStreaming_H
+#pragma once
 
 class CStreaming
 {
@@ -20,5 +19,3 @@ public:
     virtual BOOL HasModelLoaded(DWORD dwModelID) = 0;
     virtual void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel) = 0;
 };
-
-#endif

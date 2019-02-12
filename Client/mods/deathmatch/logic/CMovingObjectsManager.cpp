@@ -13,7 +13,7 @@
 
 using std::list;
 
-void CMovingObjectsManager::DoPulse(void)
+void CMovingObjectsManager::DoPulse()
 {
     // Pulse all the objects we're moving
     bool                               bRemoved = false;

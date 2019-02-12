@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCUSTOMDATA_H
-#define __CCUSTOMDATA_H
+#pragma once
 
 #include "lua/CLuaArgument.h"
 
@@ -31,11 +30,9 @@ public:
 
     bool Delete(const char* szName);
 
-    std::map<std::string, SCustomData>::const_iterator IterBegin(void) { return m_Data.begin(); }
-    std::map<std::string, SCustomData>::const_iterator IterEnd(void) { return m_Data.end(); }
+    std::map<std::string, SCustomData>::const_iterator IterBegin() { return m_Data.begin(); }
+    std::map<std::string, SCustomData>::const_iterator IterEnd() { return m_Data.end(); }
 
 private:
     std::map<std::string, SCustomData> m_Data;
 };
-
-#endif

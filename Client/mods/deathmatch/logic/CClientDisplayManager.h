@@ -10,8 +10,7 @@
 
 class CClientDisplayManager;
 
-#ifndef __CClientDisplayManager_H
-#define __CClientDisplayManager_H
+#pragma once
 
 #include "CClientManager.h"
 #include <list>
@@ -24,17 +23,17 @@ class CClientDisplayManager
     friend class CClientDisplay;
 
 public:
-    CClientDisplayManager(void);
-    ~CClientDisplayManager(void);
+    CClientDisplayManager();
+    ~CClientDisplayManager();
 
-    void DoPulse(void);
+    void DoPulse();
 
-    unsigned int    Count(void) { return static_cast<unsigned int>(m_List.size()); };
+    unsigned int    Count() { return static_cast<unsigned int>(m_List.size()); };
     CClientDisplay* Get(unsigned long ulID);
 
     void DrawText2D(const char* szCaption, const CVector& vecPosition, float fScale = 1.0f, RGBA rgbaColor = 0xFFFFFFFF);
 
-    void RemoveAll(void);
+    void RemoveAll();
 
     void AddToList(CClientDisplay* pDisplay);
     void RemoveFromList(CClientDisplay* pDisplay);
@@ -42,5 +41,3 @@ public:
     std::list<CClientDisplay*> m_List;
     bool                       m_bCanRemoveFromList;
 };
-
-#endif

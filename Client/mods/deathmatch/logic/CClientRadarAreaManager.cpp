@@ -20,7 +20,7 @@ CClientRadarAreaManager::CClientRadarAreaManager(CClientManager* pManager)
     m_usDimension = 0;
 }
 
-CClientRadarAreaManager::~CClientRadarAreaManager(void)
+CClientRadarAreaManager::~CClientRadarAreaManager()
 {
     // Make sure all the radar areas are deleted
     DeleteAll();
@@ -41,7 +41,7 @@ void CClientRadarAreaManager::Delete(CClientRadarArea* pRadarArea)
     delete pRadarArea;
 }
 
-void CClientRadarAreaManager::DeleteAll(void)
+void CClientRadarAreaManager::DeleteAll()
 {
     // Delete all the radar areas
     m_bDontRemoveFromList = true;
@@ -79,7 +79,7 @@ void CClientRadarAreaManager::SetDimension(unsigned short usDimension)
     m_usDimension = usDimension;
 }
 
-void CClientRadarAreaManager::DoPulse(void)
+void CClientRadarAreaManager::DoPulse()
 {
     // Always assume that we are rendering
     DoPulse(true);

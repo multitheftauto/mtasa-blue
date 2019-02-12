@@ -22,6 +22,7 @@ class CMainMenu;
 #include "CCredits.h"
 #include <Graphics/CGraphics.h>
 class CNewsBrowser;
+class CLanguageSelector;
 
 #define CORE_MTA_NEWS_ITEMS         3
 
@@ -44,33 +45,34 @@ class CMainMenu
 
 public:
     CMainMenu(CGUI* pManager);
-    ~CMainMenu(void);
+    ~CMainMenu();
 
-    void Update(void);
+    void Update();
 
     void Show(bool bOverlay);
-    void Hide(void);
+    void Hide();
 
     void SetVisible(bool bVisible, bool bOverlay = true, bool bFrameDelay = true);
-    bool IsVisible(void);
-    bool IsFading(void) { return m_ucFade == FADE_IN || m_ucFade == FADE_OUT; }
+    bool IsVisible();
+    bool IsFading() { return m_ucFade == FADE_IN || m_ucFade == FADE_OUT; }
 
     void SetIsIngame(bool bIsIngame);
-    bool GetIsIngame(void);
+    bool GetIsIngame();
 
-    CServerBrowser* GetServerBrowser(void) { return &m_ServerBrowser; };
-    CSettings*      GetSettingsWindow(void) { return &m_Settings; };
-    CQuickConnect*  GetQuickConnectWindow(void) { return &m_QuickConnect; };
-    CQuestionBox*   GetQuestionWindow(void) { return &m_QuestionBox; };
-    CNewsBrowser*   GetNewsBrowser(void) { return m_pNewsBrowser; };
+    CServerBrowser* GetServerBrowser() { return &m_ServerBrowser; };
+    CSettings*      GetSettingsWindow() { return &m_Settings; };
+    CQuickConnect*  GetQuickConnectWindow() { return &m_QuickConnect; };
+    CQuestionBox*   GetQuestionWindow() { return &m_QuestionBox; };
+    CNewsBrowser*   GetNewsBrowser() { return m_pNewsBrowser; };
 
     void SetMenuVerticalPosition(int iPosY);
-    void SetMenuUnhovered(void);
+    void SetMenuUnhovered();
 
-    bool HasStarted(void) { return m_bStarted; };
+    bool HasStarted() { return m_bStarted; };
 
     void SetNewsHeadline(int iIndex, const SString& strHeadline, const SString& strDate, bool bIsNew);
-    void OnEscapePressedOffLine(void);
+    void ReloadNews();
+    void OnEscapePressedOffLine();
 
     static void StaticWantsToDisconnectCallBack(void* pData, uint uiButton);
     void        WantsToDisconnectCallBack(void* pData, uint uiButton);
@@ -86,15 +88,15 @@ private:
     bool OnQuickConnectButtonClick(CGUIElement* pElement);
     bool OnResumeButtonClick(CGUIElement* pElement);
     bool OnBrowseServersButtonClick(CGUIElement* pElement);
-    bool OnHostGameButtonClick(void);
+    bool OnHostGameButtonClick();
     bool OnDisconnectButtonClick(CGUIElement* pElement);
-    bool OnEditorButtonClick(void);
+    bool OnEditorButtonClick();
     bool OnSettingsButtonClick(CGUIElement* pElement);
     bool OnAboutButtonClick(CGUIElement* pElement);
     bool OnQuitButtonClick(CGUIElement* pElement);
     bool OnNewsButtonClick(CGUIElement* pElement);
 
-    void HideServerInfo(void);
+    void HideServerInfo();
 
     CGUI* m_pManager;
 
@@ -116,13 +118,14 @@ private:
     bool                   m_bMouseOverMenu;
 
     // Submenu classes
-    CQuestionBox   m_QuestionBox;
-    CQuickConnect  m_QuickConnect;
-    CSettings      m_Settings;
-    CNewsBrowser*  m_pNewsBrowser;
-    CCredits       m_Credits;
-    CServerBrowser m_ServerBrowser;
-    CServerInfo    m_ServerInfo;
+    CQuestionBox       m_QuestionBox;
+    CQuickConnect      m_QuickConnect;
+    CSettings          m_Settings;
+    CNewsBrowser*      m_pNewsBrowser;
+    CCredits           m_Credits;
+    CServerBrowser     m_ServerBrowser;
+    CServerInfo        m_ServerInfo;
+    CLanguageSelector* m_pLanguageSelector;
 
     // Properties
     bool m_bIsIngame;

@@ -17,13 +17,13 @@
 #include <stdio.h>
 #endif
 
-CDynamicLibrary::CDynamicLibrary(void)
+CDynamicLibrary::CDynamicLibrary()
 {
     // Init
     m_hModule = 0;
 }
 
-CDynamicLibrary::~CDynamicLibrary(void)
+CDynamicLibrary::~CDynamicLibrary()
 {
     // Make sure we unload
     Unload();
@@ -97,7 +97,7 @@ bool CDynamicLibrary::Load(const char* szFilename)
     return m_hModule != 0;
 }
 
-void CDynamicLibrary::Unload(void)
+void CDynamicLibrary::Unload()
 {
     // Got a module?
     if (m_hModule != 0)
@@ -113,7 +113,7 @@ void CDynamicLibrary::Unload(void)
     }
 }
 
-bool CDynamicLibrary::IsLoaded(void)
+bool CDynamicLibrary::IsLoaded()
 {
     return m_hModule != 0;
 }

@@ -13,13 +13,13 @@
 
 using std::list;
 
-CAnimManagerSA::CAnimManagerSA(void)
+CAnimManagerSA::CAnimManagerSA()
 {
     MemSetFast(m_pAnimAssocGroups, 0, sizeof(m_pAnimAssocGroups));
     MemSetFast(m_pAnimBlocks, 0, sizeof(m_pAnimBlocks));
 }
 
-CAnimManagerSA::~CAnimManagerSA(void)
+CAnimManagerSA::~CAnimManagerSA()
 {
     for (unsigned int i = 0; i < MAX_ANIM_GROUPS; i++)
         if (m_pAnimAssocGroups[i])
@@ -29,7 +29,7 @@ CAnimManagerSA::~CAnimManagerSA(void)
             delete m_pAnimBlocks[i];
 }
 
-void CAnimManagerSA::Initialize(void)
+void CAnimManagerSA::Initialize()
 {
     DWORD dwFunc = FUNC_CAnimManager_Initialize;
     _asm
@@ -38,7 +38,7 @@ void CAnimManagerSA::Initialize(void)
     }
 }
 
-void CAnimManagerSA::Shutdown(void)
+void CAnimManagerSA::Shutdown()
 {
     DWORD dwFunc = FUNC_CAnimManager_Shutdown;
     _asm
@@ -47,17 +47,17 @@ void CAnimManagerSA::Shutdown(void)
     }
 }
 
-int CAnimManagerSA::GetNumAnimations(void)
+int CAnimManagerSA::GetNumAnimations()
 {
     return *(int*)(VAR_CAnimManager_NumAnimations);
 }
 
-int CAnimManagerSA::GetNumAnimBlocks(void)
+int CAnimManagerSA::GetNumAnimBlocks()
 {
     return *(int*)(VAR_CAnimManager_NumAnimBlocks);
 }
 
-int CAnimManagerSA::GetNumAnimAssocDefinitions(void)
+int CAnimManagerSA::GetNumAnimAssocDefinitions()
 {
     return *(int*)(VAR_CAnimManager_NumAnimAssocDefinitions);
 }
@@ -489,7 +489,7 @@ AnimAssocDefinition* CAnimManagerSA::AddAnimAssocDefinition(const char* szBlockN
     return NULL;
 }
 
-void CAnimManagerSA::ReadAnimAssociationDefinitions(void)
+void CAnimManagerSA::ReadAnimAssociationDefinitions()
 {
     DWORD dwFunc = FUNC_CAnimManager_ReadAnimAssociationDefinitions;
     _asm
@@ -498,7 +498,7 @@ void CAnimManagerSA::ReadAnimAssociationDefinitions(void)
     }
 }
 
-void CAnimManagerSA::CreateAnimAssocGroups(void)
+void CAnimManagerSA::CreateAnimAssocGroups()
 {
     DWORD dwFunc = FUNC_CAnimManager_CreateAnimAssocGroups;
     _asm
@@ -566,7 +566,7 @@ void CAnimManagerSA::LoadAnimFile(RwStream* pStream, bool b1, const char* sz1)
     }
 }
 
-void CAnimManagerSA::LoadAnimFiles(void)
+void CAnimManagerSA::LoadAnimFiles()
 {
     DWORD dwFunc = FUNC_CAnimManager_LoadAnimFiles;
     _asm
@@ -575,7 +575,7 @@ void CAnimManagerSA::LoadAnimFiles(void)
     }
 }
 
-void CAnimManagerSA::RemoveLastAnimFile(void)
+void CAnimManagerSA::RemoveLastAnimFile()
 {
     DWORD dwFunc = FUNC_CAnimManager_RemoveLastAnimFile;
     _asm
@@ -684,6 +684,30 @@ std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::RpAnimBlendClumpGetAssoci
     if (pInterface)
     {
         return std::make_unique<CAnimBlendAssociationSA>(pInterface);
+    }
+    return nullptr;
+}
+
+std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::RpAnimBlendClumpGetAssociationHashKey(RpClump* pClump, const unsigned int& uiAnimNameHashKey)
+{
+    if (!pClump)
+    {
+        return nullptr;
+    }
+
+    auto pAnimAssociation = RpAnimBlendClumpGetFirstAssociation(pClump);
+    while (pAnimAssociation)
+    {
+        auto pAnimNextAssociation = RpAnimBlendGetNextAssociation(pAnimAssociation);
+        auto pAnimHierarchy = pAnimAssociation->GetAnimHierarchy();
+        if (pAnimHierarchy)
+        {
+            if (pAnimHierarchy->GetNameHashKey() == uiAnimNameHashKey)
+            {
+                return pAnimAssociation;
+            }
+        }
+        pAnimAssociation = std::move(pAnimNextAssociation);
     }
     return nullptr;
 }
@@ -816,13 +840,13 @@ std::unique_ptr<CAnimBlendSequence> CAnimManagerSA::GetCustomAnimBlendSequence(C
     return nullptr;
 }
 
-std::unique_ptr<CAnimBlendHierarchy> CAnimManagerSA::GetCustomAnimBlendHierarchy(void)
+std::unique_ptr<CAnimBlendHierarchy> CAnimManagerSA::GetCustomAnimBlendHierarchy()
 {
     auto pInterface = new CAnimBlendHierarchySAInterface;
     return std::make_unique<CAnimBlendHierarchySA>(pInterface);
 }
 
-std::unique_ptr<CAnimBlendSequence> CAnimManagerSA::GetCustomAnimBlendSequence(void)
+std::unique_ptr<CAnimBlendSequence> CAnimManagerSA::GetCustomAnimBlendSequence()
 {
     auto pInterface = new CAnimBlendSequenceSAInterface;
     return std::make_unique<CAnimBlendSequenceSA>(pInterface);
@@ -840,5 +864,5 @@ void CAnimManagerSA::DeleteCustomAnimSequenceInterface(CAnimBlendSequenceSAInter
 
 bool CAnimManagerSA::isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface* pInterface)
 {
-    return pGame->GetKeyGen()->GetUppercaseKey(m_kGateWayAnimationName.c_str()) == pInterface->iHashKey;
+    return pGame->GetKeyGen()->GetUppercaseKey(m_kGateWayAnimationName.c_str()) == pInterface->uiHashKey;
 }

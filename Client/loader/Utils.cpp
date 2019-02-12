@@ -528,7 +528,7 @@ DWORD FindProcessId(const SString& processName)
 // Get list of process id's with the image name ending in "gta_sa.exe" or "proxy_sa.exe"
 //
 ///////////////////////////////////////////////////////////////////////////
-std::vector<DWORD> GetGTAProcessList(void)
+std::vector<DWORD> GetGTAProcessList()
 {
     std::vector<DWORD> result;
 
@@ -555,7 +555,7 @@ std::vector<DWORD> GetGTAProcessList(void)
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-bool IsGTARunning(void)
+bool IsGTARunning()
 {
     return !GetGTAProcessList().empty();
 }
@@ -567,7 +567,7 @@ bool IsGTARunning(void)
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-void TerminateGTAIfRunning(void)
+void TerminateGTAIfRunning()
 {
     std::vector<DWORD> processIdList = GetGTAProcessList();
 
@@ -590,7 +590,7 @@ void TerminateGTAIfRunning(void)
 // Get list of process id's with the image name ending with the same name as this process
 //
 ///////////////////////////////////////////////////////////////////////////
-std::vector<DWORD> GetOtherMTAProcessList(void)
+std::vector<DWORD> GetOtherMTAProcessList()
 {
     std::vector<DWORD> result;
 
@@ -617,7 +617,7 @@ std::vector<DWORD> GetOtherMTAProcessList(void)
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-bool IsOtherMTARunning(void)
+bool IsOtherMTARunning()
 {
     return !GetOtherMTAProcessList().empty();
 }
@@ -629,7 +629,7 @@ bool IsOtherMTARunning(void)
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-void TerminateOtherMTAIfRunning(void)
+void TerminateOtherMTAIfRunning()
 {
     std::vector<DWORD> processIdList = GetOtherMTAProcessList();
 
@@ -705,7 +705,7 @@ void SetMTASAPathSource(bool bReadFromRegistry)
     }
 }
 
-SString GetMTASAPath(void)
+SString GetMTASAPath()
 {
     if (g_strMTASAPath == "")
         SetMTASAPathSource(false);
@@ -740,7 +740,7 @@ bool LookForGtaProcess(SString& strOutPathFilename)
 //
 //
 ///////////////////////////////////////////////////////////////
-SString DoUserAssistedSearch(void)
+SString DoUserAssistedSearch()
 {
     SString strResult;
 
@@ -894,7 +894,7 @@ ePathResult DiscoverGTAPath(bool bFindIfMissing)
 //
 //
 ///////////////////////////////////////////////////////////////
-SString GetGTAPath(void)
+SString GetGTAPath()
 {
     if (g_strGTAPath == "")
         DiscoverGTAPath(false);
@@ -908,7 +908,7 @@ SString GetGTAPath(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-bool HasGTAPath(void)
+bool HasGTAPath()
 {
     SString strGTAPath = GetGTAPath();
     if (!strGTAPath.empty())
@@ -1090,7 +1090,7 @@ void MakeRandomIndexList(int Size, std::vector<int>& outList)
 // Affected by compatibility mode
 //
 ///////////////////////////////////////////////////////////////
-SOSVersionInfo GetOSVersion(void)
+SOSVersionInfo GetOSVersion()
 {
     OSVERSIONINFO versionInfo;
     memset(&versionInfo, 0, sizeof(versionInfo));
@@ -1106,7 +1106,7 @@ SOSVersionInfo GetOSVersion(void)
 // Ignoring compatibility mode
 //
 ///////////////////////////////////////////////////////////////
-SOSVersionInfo GetRealOSVersion(void)
+SOSVersionInfo GetRealOSVersion()
 {
     static SOSVersionInfo versionInfo = {0};
 
@@ -1146,13 +1146,13 @@ SOSVersionInfo GetRealOSVersion(void)
 // Works around limit for applications not manifested for Windows 10
 //
 ///////////////////////////////////////////////////////////////
-bool IsWindows10OrGreater(void)
+bool IsWindows10OrGreater()
 {
     SOSVersionInfo info = GetRealOSVersion();
     return info.dwMajor >= 10;
 }
 
-bool IsWindows10Threshold2OrGreater(void)
+bool IsWindows10Threshold2OrGreater()
 {
     SOSVersionInfo info = GetRealOSVersion();
     return info.dwMajor > 10 || (info.dwMajor == 10 && info.dwBuild >= 10586);
@@ -1165,7 +1165,7 @@ bool IsWindows10Threshold2OrGreater(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-BOOL IsUserAdmin(VOID)
+BOOL IsUserAdmin()
 /*++
 Routine Description: This routine returns TRUE if the caller's
 process is a member of the Administrators local group. Caller is NOT
@@ -1247,7 +1247,7 @@ HMODULE GetLibraryHandle(const SString& strFilename, DWORD* pdwOutLastError)
 //
 //
 /////////////////////////////////////////////////////////////////////
-void FreeLibraryHandle(void)
+void FreeLibraryHandle()
 {
     if (hLibraryModule)
     {
@@ -1294,7 +1294,7 @@ void UpdateMTAVersionApplicationSetting(bool bQuiet)
         PFNINITNETREV pfnInitNetRev = static_cast<PFNINITNETREV>(static_cast<PVOID>(GetProcAddress(hModule, "InitNetRev")));
         if (pfnInitNetRev)
             pfnInitNetRev(GetProductRegistryPath(), GetProductCommonDataDir(), GetProductVersion());
-        typedef unsigned short (*PFNGETNETREV)(void);
+        typedef unsigned short (*PFNGETNETREV)();
         PFNGETNETREV pfnGetNetRev = static_cast<PFNGETNETREV>(static_cast<PVOID>(GetProcAddress(hModule, "GetNetRev")));
         if (pfnGetNetRev)
             usNetRev = pfnGetNetRev();
@@ -1426,7 +1426,7 @@ void TerminateProcess(DWORD dwProcessID, uint uiExitCode)
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-bool CreateSingleInstanceMutex(void)
+bool CreateSingleInstanceMutex()
 {
     HANDLE hMutex = CreateMutex(NULL, FALSE, TEXT(MTA_GUID));
 
@@ -1448,7 +1448,7 @@ bool CreateSingleInstanceMutex(void)
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-void ReleaseSingleInstanceMutex(void)
+void ReleaseSingleInstanceMutex()
 {
     assert(g_hMutex);
     CloseHandle(g_hMutex);
@@ -1539,7 +1539,7 @@ int GetFileAge(const SString& strPathFilename)
 // Remove old files from the download cache
 //
 ///////////////////////////////////////////////////////////////////////////
-void CleanDownloadCache(void)
+void CleanDownloadCache()
 {
     const uint uiMaxCleanTime = 5;                           // Limit clean time (seconds)
     const uint uiCleanFileAge = 60 * 60 * 24 * 7;            // Delete files older than this
@@ -1711,7 +1711,7 @@ stop_copy:
 // settings from a previous version
 //
 //////////////////////////////////////////////////////////
-void MaybeShowCopySettingsDialog(void)
+void MaybeShowCopySettingsDialog()
 {
     // Check if coreconfig.xml is present
     const SString strMTASAPath = GetMTASAPath();
@@ -1767,7 +1767,7 @@ void MaybeShowCopySettingsDialog(void)
 // Returns true if message was displayed
 //
 //////////////////////////////////////////////////////////
-bool CheckAndShowFileOpenFailureMessage(void)
+bool CheckAndShowFileOpenFailureMessage()
 {
     SString strFilename = GetApplicationSetting("diagnostics", "gta-fopen-fail");
 
@@ -1788,7 +1788,7 @@ bool CheckAndShowFileOpenFailureMessage(void)
 // Check for missing files that could cause a crash
 //
 //////////////////////////////////////////////////////////
-void CheckAndShowMissingFileMessage(void)
+void CheckAndShowMissingFileMessage()
 {
     SString strFilename = PathJoin("text", "american.gxt");
 
@@ -1808,7 +1808,7 @@ void CheckAndShowMissingFileMessage(void)
 // Check for flagged model problems
 //
 //////////////////////////////////////////////////////////
-void CheckAndShowModelProblems(void)
+void CheckAndShowModelProblems()
 {
     SString strReason;
     int     iModelId = 0;
@@ -1835,7 +1835,7 @@ void CheckAndShowModelProblems(void)
 // Check for flagged upgrade problems
 //
 //////////////////////////////////////////////////////////
-void CheckAndShowUpgradeProblems(void)
+void CheckAndShowUpgradeProblems()
 {
     int     iModelId = 0, iUpgradeId, iFrame;
     CArgMap argMap;
@@ -1861,7 +1861,7 @@ void CheckAndShowUpgradeProblems(void)
 // Check for flagged img problems
 //
 //////////////////////////////////////////////////////////
-void CheckAndShowImgProblems(void)
+void CheckAndShowImgProblems()
 {
     SString strFilename = GetApplicationSetting("diagnostics", "img-file-corrupt");
     SetApplicationSetting("diagnostics", "img-file-corrupt", "");
@@ -1899,7 +1899,7 @@ void* LoadFunction(const char* szLibName, const char* c, const char* a, const ch
 // Possible BSOD situation if a new mini-dump file was created after the last game was started
 //
 //////////////////////////////////////////////////////////
-void BsodDetectionPreLaunch(void)
+void BsodDetectionPreLaunch()
 {
     // BSOD detection being handled elsewhere ?
     int iBsodDetectSkip = GetApplicationSettingInt(DIAG_BSOD_DETECT_SKIP);
@@ -1965,7 +1965,7 @@ void BsodDetectionPreLaunch(void)
 // Record game start time
 //
 //////////////////////////////////////////////////////////
-void BsodDetectionOnGameBegin(void)
+void BsodDetectionOnGameBegin()
 {
     SetApplicationSetting("diagnostics", "game-begin-time", GetTimeString(true));
 }
@@ -1977,7 +1977,7 @@ void BsodDetectionOnGameBegin(void)
 // Unrecord game start time
 //
 //////////////////////////////////////////////////////////
-void BsodDetectionOnGameEnd(void)
+void BsodDetectionOnGameEnd()
 {
     SetApplicationSetting("diagnostics", "game-begin-time", "");
 }
@@ -1989,7 +1989,7 @@ void BsodDetectionOnGameEnd(void)
 // Message to advise against running certain other programs
 //
 //////////////////////////////////////////////////////////
-void ForbodenProgramsMessage(void)
+void ForbodenProgramsMessage()
 {
     std::vector<SString> forbodenList = {"ProcessHacker", "CheatEngine", "PCHunter"};
     std::vector<SString> foundList;
@@ -2048,7 +2048,7 @@ bool VerifyEmbeddedSignature(const SString& strFilename)
 // Dump some settings to the log file to help debugging
 //
 //////////////////////////////////////////////////////////
-void LogSettings(void)
+void LogSettings()
 {
     struct
     {

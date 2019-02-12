@@ -217,10 +217,15 @@ static const cipher_s cipherlist[] = {
 #endif
 };
 
+#ifdef WIN32
+static const char *pem_library = "nsspem.dll";
+static const char *trust_library = "nssckbi.dll";
+#else
 static const char *pem_library = "libnsspem.so";
-static SECMODModule *pem_module = NULL;
-
 static const char *trust_library = "libnssckbi.so";
+#endif
+
+static SECMODModule *pem_module = NULL;
 static SECMODModule *trust_module = NULL;
 
 /* NSPR I/O layer we use to detect blocking direction during SSL handshake */
@@ -239,6 +244,32 @@ static const char *nss_error_to_name(PRErrorCode code)
 static void nss_print_error_message(struct Curl_easy *data, PRUint32 err)
 {
   failf(data, "%s", PR_ErrorToString(err, PR_LANGUAGE_I_DEFAULT));
+}
+
+static char *nss_sslver_to_name(PRUint16 nssver)
+{
+  switch(nssver) {
+  case SSL_LIBRARY_VERSION_2:
+    return strdup("SSLv2");
+  case SSL_LIBRARY_VERSION_3_0:
+    return strdup("SSLv3");
+  case SSL_LIBRARY_VERSION_TLS_1_0:
+    return strdup("TLSv1.0");
+#ifdef SSL_LIBRARY_VERSION_TLS_1_1
+  case SSL_LIBRARY_VERSION_TLS_1_1:
+    return strdup("TLSv1.1");
+#endif
+#ifdef SSL_LIBRARY_VERSION_TLS_1_2
+  case SSL_LIBRARY_VERSION_TLS_1_2:
+    return strdup("TLSv1.2");
+#endif
+#ifdef SSL_LIBRARY_VERSION_TLS_1_3
+  case SSL_LIBRARY_VERSION_TLS_1_3:
+    return strdup("TLSv1.3");
+#endif
+  default:
+    return curl_maprintf("0x%04x", nssver);
+  }
 }
 
 static SECStatus set_ciphers(struct Curl_easy *data, PRFileDesc * model,
@@ -1522,7 +1553,6 @@ static bool is_nss_error(CURLcode err)
 {
   switch(err) {
   case CURLE_PEER_FAILED_VERIFICATION:
-  case CURLE_SSL_CACERT:
   case CURLE_SSL_CERTPROBLEM:
   case CURLE_SSL_CONNECT_ERROR:
   case CURLE_SSL_ISSUER_ERROR:
@@ -1579,8 +1609,9 @@ static CURLcode nss_load_ca_certificates(struct connectdata *conn,
     infof(data, "%s %s\n", (result) ? "failed to load" : "loaded",
           trust_library);
     if(result == CURLE_FAILED_INIT)
-      /* make the error non-fatal if we are not going to verify peer */
-      result = CURLE_SSL_CACERT_BADFILE;
+      /* If libnssckbi.so is not available (or fails to load), one can still
+         use CA certificates stored in NSS database.  Ignore the failure. */
+      result = CURLE_OK;
   }
   else if(!use_trust_module && trust_module) {
     /* libnssckbi.so not needed but already loaded --> unload it! */
@@ -1633,17 +1664,6 @@ static CURLcode nss_load_ca_certificates(struct connectdata *conn,
 static CURLcode nss_sslver_from_curl(PRUint16 *nssver, long version)
 {
   switch(version) {
-  case CURL_SSLVERSION_TLSv1:
-    /* TODO: set sslver->max to SSL_LIBRARY_VERSION_TLS_1_3 once stable */
-#ifdef SSL_LIBRARY_VERSION_TLS_1_2
-    *nssver = SSL_LIBRARY_VERSION_TLS_1_2;
-#elif defined SSL_LIBRARY_VERSION_TLS_1_1
-    *nssver = SSL_LIBRARY_VERSION_TLS_1_1;
-#else
-    *nssver = SSL_LIBRARY_VERSION_TLS_1_0;
-#endif
-    return CURLE_OK;
-
   case CURL_SSLVERSION_SSLv2:
     *nssver = SSL_LIBRARY_VERSION_2;
     return CURLE_OK;
@@ -1704,10 +1724,8 @@ static CURLcode nss_init_sslver(SSLVersionRange *sslver,
   }
 
   switch(min) {
-  case CURL_SSLVERSION_DEFAULT:
-    break;
   case CURL_SSLVERSION_TLSv1:
-    sslver->min = SSL_LIBRARY_VERSION_TLS_1_0;
+  case CURL_SSLVERSION_DEFAULT:
     break;
   default:
     result = nss_sslver_from_curl(&sslver->min, min);
@@ -1715,8 +1733,6 @@ static CURLcode nss_init_sslver(SSLVersionRange *sslver,
       failf(data, "unsupported min version passed via CURLOPT_SSLVERSION");
       return result;
     }
-    if(max == CURL_SSLVERSION_MAX_NONE)
-      sslver->max = sslver->min;
   }
 
   switch(max) {
@@ -1786,10 +1802,19 @@ static CURLcode nss_setup_connect(struct connectdata *conn, int sockindex)
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   CURLcode result;
   bool second_layer = FALSE;
+  SSLVersionRange sslver_supported;
 
   SSLVersionRange sslver = {
     SSL_LIBRARY_VERSION_TLS_1_0,  /* min */
-    SSL_LIBRARY_VERSION_TLS_1_0   /* max */
+#ifdef SSL_LIBRARY_VERSION_TLS_1_3
+    SSL_LIBRARY_VERSION_TLS_1_3   /* max */
+#elif defined SSL_LIBRARY_VERSION_TLS_1_2
+    SSL_LIBRARY_VERSION_TLS_1_2
+#elif defined SSL_LIBRARY_VERSION_TLS_1_1
+    SSL_LIBRARY_VERSION_TLS_1_1
+#else
+    SSL_LIBRARY_VERSION_TLS_1_0
+#endif
   };
 
   BACKEND->data = data;
@@ -1838,6 +1863,20 @@ static CURLcode nss_setup_connect(struct connectdata *conn, int sockindex)
   /* enable/disable the requested SSL version(s) */
   if(nss_init_sslver(&sslver, data, conn) != CURLE_OK)
     goto error;
+  if(SSL_VersionRangeGetSupported(ssl_variant_stream,
+                                  &sslver_supported) != SECSuccess)
+    goto error;
+  if(sslver_supported.max < sslver.max && sslver_supported.max >= sslver.min) {
+    char *sslver_req_str, *sslver_supp_str;
+    sslver_req_str = nss_sslver_to_name(sslver.max);
+    sslver_supp_str = nss_sslver_to_name(sslver_supported.max);
+    if(sslver_req_str && sslver_supp_str)
+      infof(data, "Falling back from %s to max supported SSL version (%s)\n",
+                  sslver_req_str, sslver_supp_str);
+    free(sslver_req_str);
+    free(sslver_supp_str);
+    sslver.max = sslver_supported.max;
+  }
   if(SSL_VersionRangeSet(model, &sslver) != SECSuccess)
     goto error;
 
@@ -2087,7 +2126,7 @@ static CURLcode nss_do_connect(struct connectdata *conn, int sockindex)
     else if(*certverifyresult == SSL_ERROR_BAD_CERT_DOMAIN)
       result = CURLE_PEER_FAILED_VERIFICATION;
     else if(*certverifyresult != 0)
-      result = CURLE_SSL_CACERT;
+      result = CURLE_PEER_FAILED_VERIFICATION;
     goto error;
   }
 
@@ -2161,7 +2200,7 @@ static CURLcode nss_connect_common(struct connectdata *conn, int sockindex,
     if(!blocking)
       /* CURLE_AGAIN in non-blocking mode is not an error */
       return CURLE_OK;
-    /* fall through */
+    /* FALLTHROUGH */
   default:
     return result;
   }
@@ -2276,7 +2315,7 @@ static ssize_t nss_recv(struct connectdata *conn,  /* connection data */
 
 static size_t Curl_nss_version(char *buffer, size_t size)
 {
-  return snprintf(buffer, size, "NSS/%s", NSS_VERSION);
+  return msnprintf(buffer, size, "NSS/%s", NSS_VERSION);
 }
 
 /* data might be NULL */

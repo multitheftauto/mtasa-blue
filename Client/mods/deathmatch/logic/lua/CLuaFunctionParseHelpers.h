@@ -39,6 +39,7 @@ DECLARE_ENUM(EEntityTypeMask);
 DECLARE_ENUM(eWeaponState);
 DECLARE_ENUM(eWeaponFlags);
 DECLARE_ENUM(eVehicleComponent);
+DECLARE_ENUM(eObjectProperty);
 DECLARE_ENUM(eFontType);
 DECLARE_ENUM(eFontQuality);
 DECLARE_ENUM(eAudioLookupIndex);
@@ -49,6 +50,8 @@ DECLARE_ENUM(eWebBrowserMouseButton);
 DECLARE_ENUM(eTrayIconType)
 DECLARE_ENUM(eCursorType)
 DECLARE_ENUM(eWheelPosition)
+DECLARE_ENUM(D3DPRIMITIVETYPE);
+DECLARE_ENUM(eVehicleDummies);
 
 enum eDXHorizontalAlign
 {
@@ -258,6 +261,10 @@ inline SString GetClassTypeName(CClientTexture*)
 {
     return "texture";
 }
+inline SString GetClassTypeName(CClientWebBrowser*)
+{
+    return "browser";
+}
 inline SString GetClassTypeName(CClientWeapon*)
 {
     return "weapon";
@@ -367,6 +374,14 @@ inline SString GetClassTypeName(CLuaVector4D*)
 inline SString GetClassTypeName(CLuaMatrix*)
 {
     return "matrix";
+}
+inline SString GetClassTypeName(D3DPRIMITIVETYPE*)
+{
+    return "primitive-type";
+}
+inline SString GetClassTypeName(eVehicleDummies*)
+{
+    return "vehicle-dummy";
 }
 
 //

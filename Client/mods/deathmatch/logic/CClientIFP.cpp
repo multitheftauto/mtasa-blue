@@ -236,14 +236,8 @@ std::int32_t CClientIFP::ReadSequenceVersion1(SAnim& Anim)
     RoundSize(Anim.Base.Size);
     ReadBytes(&Anim.Name, Anim.Base.Size);
 
-    std::int32_t iBoneID = eBoneType::UNKNOWN;
-    if (Anim.Base.Size == 0x2C)
-    {
-        iBoneID = Anim.Next;
-    }
-
-    SString strBoneName = ConvertStringToKey(Anim.Name);
-    iBoneID = GetBoneIDFromName(strBoneName);
+    SString      strBoneName = ConvertStringToKey(Anim.Name);
+    std::int32_t iBoneID = GetBoneIDFromName(strBoneName);
 
     SString strCorrectBoneName = GetCorrectBoneNameFromName(strBoneName);
     strncpy(Anim.Name, strCorrectBoneName, strCorrectBoneName.size() + 1);
@@ -453,7 +447,7 @@ void CClientIFP::InitializeAnimationHierarchy(std::unique_ptr<CAnimBlendHierarch
     pAnimationHierarchy->Initialize();
     pAnimationHierarchy->SetName(strAnimationName);
     pAnimationHierarchy->SetNumSequences(iSequences);
-    pAnimationHierarchy->SetAnimationBlockID(0);
+    pAnimationHierarchy->SetAnimationBlockID(-1);
     pAnimationHierarchy->SetRunningCompressed(m_kbAllKeyFramesCompressed);
 }
 
@@ -466,7 +460,7 @@ void CClientIFP::InitializeAnimationSequence(std::unique_ptr<CAnimBlendSequence>
 
 void CClientIFP::PreProcessAnimationHierarchy(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy)
 {
-    if (!pAnimationHierarchy->isRunningCompressed())
+    if (!pAnimationHierarchy->IsRunningCompressed())
     {
         pAnimationHierarchy->RemoveQuaternionFlips();
         pAnimationHierarchy->CalculateTotalTime();

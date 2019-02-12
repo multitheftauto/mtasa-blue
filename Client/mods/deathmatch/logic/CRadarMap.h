@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CRADARMAP_H
-#define __CRADARMAP_H
+#pragma once
 
 #include "CClientCommon.h"
 #include <CClientManager.h>
@@ -21,59 +20,59 @@ class CRadarMap
 {
 public:
     CRadarMap(class CClientManager* pManager);
-    virtual ~CRadarMap(void);
+    virtual ~CRadarMap();
 
-    void DoPulse(void);
-    void DoRender(void);
+    void DoPulse();
+    void DoRender();
 
-    bool IsRadarShowing(void);
+    bool IsRadarShowing();
 
-    bool GetRadarEnabled(void) const { return m_bIsRadarEnabled; };
+    bool GetRadarEnabled() const { return m_bIsRadarEnabled; };
     void SetRadarEnabled(bool bIsRadarEnabled);
 
-    bool GetForcedState(void) const { return m_bForcedState; }
+    bool GetForcedState() const { return m_bForcedState; }
     void SetForcedState(bool bState);
 
     bool GetBoundingBox(CVector& vecMin, CVector& vecMax);
 
-    void ToggleHelpText(void);
+    void ToggleHelpText();
 
 protected:
     void InternalSetRadarEnabled(bool bEnabled);
 
-    void          CreateMarkerTextures(void);
+    void          CreateMarkerTextures();
     CTextureItem* GetMarkerTexture(CClientRadarMarker* pMarker, float fLocalZ, float* pfScale, SColor* pColor);
 
 public:
-    bool IsAttachedToLocalPlayer(void) const { return m_bIsAttachedToLocal; };
+    bool IsAttachedToLocalPlayer() const { return m_bIsAttachedToLocal; };
     void SetAttachedToLocalPlayer(bool bIsAttachedToLocal);
 
-    bool IsMovingNorth(void) const { return m_bIsMovingNorth; };
+    bool IsMovingNorth() const { return m_bIsMovingNorth; };
     void SetMovingNorth(bool bIsMovingNorth) { m_bIsMovingNorth = bIsMovingNorth; };
 
-    bool IsMovingSouth(void) const { return m_bIsMovingSouth; };
+    bool IsMovingSouth() const { return m_bIsMovingSouth; };
     void SetMovingSouth(bool bIsMovingSouth) { m_bIsMovingSouth = bIsMovingSouth; };
 
-    bool IsMovingEast(void) const { return m_bIsMovingEast; };
+    bool IsMovingEast() const { return m_bIsMovingEast; };
     void SetMovingEast(bool bIsMovingEast) { m_bIsMovingEast = bIsMovingEast; };
 
-    bool IsMovingWest(void) const { return m_bIsMovingWest; };
+    bool IsMovingWest() const { return m_bIsMovingWest; };
     void SetMovingWest(bool bIsMovingWest) { m_bIsMovingWest = bIsMovingWest; };
 
-    void ZoomIn(void);
-    void ZoomOut(void);
+    void ZoomIn();
+    void ZoomOut();
 
     SString GetBoundKeyName(const SString& strCommand);
 
 private:
     bool CalculateEntityOnScreenPosition(class CClientEntity* pEntity, CVector2D& vecLocalPos);
     bool CalculateEntityOnScreenPosition(CVector vecPosition, CVector2D& vecLocalPos);
-    void SetupMapVariables(void);
+    void SetupMapVariables();
 
-    void MoveNorth(void);
-    void MoveSouth(void);
-    void MoveEast(void);
-    void MoveWest(void);
+    void MoveNorth();
+    void MoveSouth();
+    void MoveEast();
+    void MoveWest();
 
 private:
     class CClientManager*            m_pManager;
@@ -118,5 +117,3 @@ private:
     bool m_bDebugVisible;
     bool m_bTextVisible;
 };
-
-#endif

@@ -11,8 +11,7 @@
 
 class CCredits;
 
-#ifndef __CCREDITS_H
-#define __CCREDITS_H
+#pragma once
 
 #include "CMainMenu.h"
 #include <ctime>
@@ -20,13 +19,13 @@ class CCredits;
 class CCredits
 {
 public:
-    CCredits(void);
-    ~CCredits(void);
+    CCredits();
+    ~CCredits();
 
     void SetVisible(bool bVisible);
-    bool IsVisible(void);
+    bool IsVisible();
 
-    void Update(void);
+    void Update();
 
     bool OnOKButtonClick(CGUIElement* pElement);
 
@@ -38,5 +37,3 @@ private:
 
     clock_t m_clkStart;
 };
-
-#endif

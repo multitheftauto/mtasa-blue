@@ -37,7 +37,7 @@ CMapManager::CMapManager(CBlipManager* pBlipManager, CObjectManager* pObjectMana
     m_pScriptDebugging = pScriptDebugging;
     m_pElementDeleter = pElementDeleter;
 
-    m_pRootElement = new CDummy(NULL, NULL, NULL);
+    m_pRootElement = new CDummy(nullptr, nullptr);
     m_pRootElement->SetTypeName("root");
 
     m_llLastRespawnTime = 0;
@@ -46,7 +46,7 @@ CMapManager::CMapManager(CBlipManager* pBlipManager, CObjectManager* pObjectMana
     m_pBlendedWeather = new CBlendedWeather(m_pServerClock);
 }
 
-CMapManager::~CMapManager(void)
+CMapManager::~CMapManager()
 {
     // Delete the weather manager
     delete m_pBlendedWeather;
@@ -54,7 +54,7 @@ CMapManager::~CMapManager(void)
     delete m_pRootElement;
 }
 
-void CMapManager::DoPulse(void)
+void CMapManager::DoPulse()
 {
     // Do the respawning checks
     DoRespawning();
@@ -101,7 +101,7 @@ CElement* CMapManager::LoadMapData(CResource& Loader, CElement& Parent, CXMLNode
     return NULL;
 }
 
-void CMapManager::BroadcastMapInformation(void)
+void CMapManager::BroadcastMapInformation()
 {
     // Start an entity list packet
     CEntityAddPacket EntityPacket;
@@ -618,7 +618,7 @@ void CMapManager::SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float
     Player.CallEvent("onPlayerSpawn", OnPlayerSpawnArguments);
 }
 
-void CMapManager::DoRespawning(void)
+void CMapManager::DoRespawning()
 {
     // Time to do the next search for respawnable things?
     if (SharedUtil::GetModuleTickCount64() >= m_llLastRespawnTime + 1000)
@@ -632,7 +632,7 @@ void CMapManager::DoRespawning(void)
     }
 }
 
-void CMapManager::DoPickupRespawning(void)
+void CMapManager::DoPickupRespawning()
 {
     // Grab the current time
     CTickCount currentTime = CTickCount::Now();
@@ -746,7 +746,7 @@ bool CMapManager::ParseVisibleToData(CPerPlayerEntity& Entity, char* szData)
     return bAnyReferences;
 }
 
-void CMapManager::DoVehicleRespawning(void)
+void CMapManager::DoVehicleRespawning()
 {
     CVehicleSpawnPacket VehicleSpawnPacket;
 
@@ -949,7 +949,7 @@ bool CMapManager::HandleNode(CResource& Loader, CXMLNode& Node, CElement* pParen
     return false;
 }
 
-void CMapManager::LinkupElements(void)
+void CMapManager::LinkupElements()
 {
     // * Link up all the attaching elements
     list<CVehicle*>::const_iterator iterVehicles = m_pVehicleManager->IterBegin();

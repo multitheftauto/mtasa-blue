@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIRADIOBUTTON_H
-#define __CGUIRADIOBUTTON_H
+#pragma once
 
 #include "CGUIElement.h"
 #include "CGUICallback.h"
@@ -18,10 +17,8 @@
 class CGUIRadioButton : public CGUIElement
 {
 public:
-    virtual ~CGUIRadioButton(void){};
+    virtual ~CGUIRadioButton(){};
 
     virtual void SetSelected(bool bSelected) = 0;
-    virtual bool GetSelected(void) = 0;
+    virtual bool GetSelected() = 0;
 };
-
-#endif

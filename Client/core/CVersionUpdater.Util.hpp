@@ -133,7 +133,7 @@ namespace
         BUTTON_3,
     };
 
-    CQuestionBox& GetQuestionBox(void) { return *CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow(); }
+    CQuestionBox& GetQuestionBox() { return *CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow(); }
 
 }            // namespace
 
@@ -150,7 +150,7 @@ namespace
     {
     public:
         virtual bool    SetFromString(const SString& str) = 0;
-        virtual SString ToString(void) const = 0;
+        virtual SString ToString() const = 0;
     };
 
     ///////////////////////////////////////////////////////////////
@@ -167,13 +167,13 @@ namespace
     public:
         CValueInt(int iValue = 0) : m_iValue(iValue) {}
         void         operator=(int iValue) { m_iValue = iValue; }
-                     operator int(void) const { return m_iValue; }
+                     operator int() const { return m_iValue; }
         virtual bool SetFromString(const SString& str)
         {
             m_iValue = atoi(str);
             return true;
         }
-        virtual SString ToString(void) const { return SString("%d", m_iValue); }
+        virtual SString ToString() const { return SString("%d", m_iValue); }
     };
 
     ///////////////////////////////////////////////////////////////
@@ -188,7 +188,7 @@ namespace
         time_t m_Seconds;
 
     public:
-        CTimeSpan(void) : m_Seconds(0) {}
+        CTimeSpan() : m_Seconds(0) {}
         CTimeSpan(const SString& strSpan) { SetFromString(strSpan); }
 
         void SetFromSeconds(time_t seconds) { m_Seconds = seconds; }
@@ -218,9 +218,9 @@ namespace
             return true;
         }
 
-        time_t ToSeconds(void) const { return m_Seconds; }
+        time_t ToSeconds() const { return m_Seconds; }
 
-        SString ToString(void) const
+        SString ToString() const
         {
             if (m_Seconds < 60)
                 return SString("%ds", m_Seconds);
@@ -244,7 +244,7 @@ namespace
         time_t m_Seconds;
 
     public:
-        CDateTime(void) : m_Seconds(0) {}
+        CDateTime() : m_Seconds(0) {}
         CDateTime(const SString& strDate) { SetFromString(strDate); }
 
         CDateTime operator-(const CDateTime& other) const
@@ -296,9 +296,9 @@ namespace
             return true;
         }
 
-        time_t ToSeconds(void) const { return m_Seconds; }
+        time_t ToSeconds() const { return m_Seconds; }
 
-        SString ToString(void) const
+        SString ToString() const
         {
             time_t t = ToSeconds();
             tm*    tmp = localtime(&t);
@@ -578,7 +578,7 @@ namespace
     public:
         CReportWrap() : iMinSize(DEFAULT_MIN_SIZE), iMaxSize(DEFAULT_MAX_SIZE) { LoadReportSettings(); }
 
-        void SaveReportSettings(void) const
+        void SaveReportSettings() const
         {
             CArgMap m_ArgMap("@", ";");
             m_ArgMap.Set("filter2", strFilter);
@@ -588,7 +588,7 @@ namespace
             SetApplicationSetting("reportsettings", m_ArgMap.ToString());
         }
 
-        void LoadReportSettings(void)
+        void LoadReportSettings()
         {
             SString strSettings;
             CVARS_GET("reportsettings", strSettings);
@@ -606,11 +606,11 @@ namespace
             SaveReportSettings();
         }
 
-        SString GetFilter(void) const { return strFilter != "" ? strFilter : "+all"; }
+        SString GetFilter() const { return strFilter != "" ? strFilter : "+all"; }
 
-        int GetMinSize(void) const { return iMinSize; }
+        int GetMinSize() const { return iMinSize; }
 
-        int GetMaxSize(void) const { return iMaxSize; }
+        int GetMaxSize() const { return iMaxSize; }
 
         static void ClearLogContents(const SString& strIdFilter)
         {
@@ -768,7 +768,7 @@ namespace
     ///////////////////////////////////////////////////////////////
     struct SJobInfo
     {
-        SJobInfo(void)
+        SJobInfo()
             : iMaxServersToTry(3),
               iTimeoutConnect(10000),
               iTimeoutTransfer(25000),
@@ -918,7 +918,7 @@ namespace
         }
     };
 
-    typedef void (CVersionUpdater::*PFNVOIDVOID)(void);
+    typedef void (CVersionUpdater::*PFNVOIDVOID)();
 
     enum class EUpdaterProgramType
     {

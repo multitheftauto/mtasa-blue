@@ -22,13 +22,13 @@ enum
 struct CBandwidthSettings
 {
 public:
-    CBandwidthSettings(void)
+    CBandwidthSettings()
     {
         bBulletSyncEnabled = false;
         SetNone();
     }
 
-    void SetNone(void)
+    void SetNone()
     {
         EnableLightSync(false);
         fZone0Radius = 50;
@@ -43,7 +43,7 @@ public:
         UpdateCachedValues();
     }
 
-    void SetMedium(void)
+    void SetMedium()
     {
         EnableLightSync(false);
         fZone0Radius = 50;
@@ -58,7 +58,7 @@ public:
         UpdateCachedValues();
     }
 
-    void SetMaximum(void)
+    void SetMaximum()
     {
         EnableLightSync(true);
         fZone0Radius = 20;
@@ -84,7 +84,7 @@ public:
         }
     }
 
-    void UpdateCachedValues(void)
+    void UpdateCachedValues()
     {
         fZone1Dot = cos(fZone1Angle / 180.f * PI * 0.5f);
         fZone2Dot = cos(fZone2Angle / 180.f * PI * 0.5f);

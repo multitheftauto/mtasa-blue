@@ -275,7 +275,7 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
 //
 //
 /////////////////////////////////////////////////////////////////////
-SString SharedUtil::GetWMIOSVersion(void)
+SString SharedUtil::GetWMIOSVersion()
 {
     SQueryWMIResult result;
 
@@ -295,7 +295,7 @@ SString SharedUtil::GetWMIOSVersion(void)
 //
 //
 /////////////////////////////////////////////////////////////////////
-long long SharedUtil::GetWMITotalPhysicalMemory(void)
+long long SharedUtil::GetWMITotalPhysicalMemory()
 {
     // This won't change after the first call
     static long long llResult = 0;
@@ -549,7 +549,7 @@ bool SharedUtil::GetLibVersionInfo(const SString& strLibName, SLibVersionInfo* p
 // Return true if is Windows 64 bit OS
 //
 ///////////////////////////////////////////////////////////////
-bool SharedUtil::Is64BitOS(void)
+bool SharedUtil::Is64BitOS()
 {
     typedef BOOL(WINAPI * LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
     static LPFN_ISWOW64PROCESS fnIsWow64Process = NULL;

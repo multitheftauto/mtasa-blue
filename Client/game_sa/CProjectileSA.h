@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PROJECTILE
-#define __CGAMESA_PROJECTILE
+#pragma once
 
 #include <game/CProjectile.h>
 #include "CObjectSA.h"
@@ -33,7 +32,5 @@ public:
     bool CalculateImpactPosition(CEntitySAInterface* pCollidedWith, CVector vecInputStart, CVector& vecInputEnd);
 
     void SetProjectileInfo(CProjectileInfo* pProjectileInfo) { projectileInfo = pProjectileInfo; }
-    bool CorrectPhysics(void);
+    bool CorrectPhysics();
 };
-
-#endif

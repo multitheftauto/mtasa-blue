@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUITAB_IMPL_H
-#define __CGUITAB_IMPL_H
+#pragma once
 
 #include <gui/CGUITab.h>
 #include "CGUIElement_Impl.h"
@@ -19,11 +18,11 @@ class CGUITab_Impl : public CGUITab, public CGUIElement_Impl, public CGUITabList
 {
 public:
     CGUITab_Impl(class CGUI_Impl* pManager, CGUIElement_Impl* pParent, const char* szCaption);
-    ~CGUITab_Impl(void);
+    ~CGUITab_Impl();
 
     void SetCaption(const char* szCaption);
 
-    eCGUIType GetType(void) { return CGUI_TAB; };
+    eCGUIType GetType() { return CGUI_TAB; };
 
 #define SETVISIBLE_HACK
 #define SETENABLED_HACK
@@ -32,9 +31,7 @@ public:
 #undef SETVISIBLE_HACK
 
     void SetVisible(bool bVisible);
-    bool IsVisible(void);
+    bool IsVisible();
     void SetEnabled(bool bEnabled);
-    bool IsEnabled(void);
+    bool IsEnabled();
 };
-
-#endif

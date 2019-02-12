@@ -26,14 +26,14 @@ class CVehicleManager
     friend class CVehicle;
 
 public:
-    CVehicleManager(void);
-    ~CVehicleManager(void);
+    CVehicleManager();
+    ~CVehicleManager();
 
-    CVehicle* Create(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2, CElement* pParent, CXMLNode* pNode = NULL);
+    CVehicle* Create(CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
     CVehicle* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
-    void      DeleteAll(void);
+    void      DeleteAll();
 
-    unsigned int Count(void) { return static_cast<unsigned int>(m_List.size()); };
+    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
     bool         Exists(CVehicle* pVehicle);
 
     static bool         IsValidModel(unsigned int uiVehicleModel);
@@ -52,15 +52,15 @@ public:
     static bool         HasDoors(unsigned short usModel);
     static void         GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2);
 
-    CVehicleColorManager* GetColorManager(void) { return &m_ColorManager; };
+    CVehicleColorManager* GetColorManager() { return &m_ColorManager; };
     CVehicleColor         GetRandomColor(unsigned short usModel);
 
     void GetVehiclesOfType(unsigned int uiModel, lua_State* luaVM);
 
-    list<CVehicle*>::const_iterator IterBegin(void) { return m_List.begin(); };
-    list<CVehicle*>::const_iterator IterEnd(void) { return m_List.end(); };
+    list<CVehicle*>::const_iterator IterBegin() { return m_List.begin(); };
+    list<CVehicle*>::const_iterator IterEnd() { return m_List.end(); };
 
-    list<CVehicle*>& GetRespawnEnabledVehicles(void) { return m_RespawnEnabledVehicles; };
+    list<CVehicle*>& GetRespawnEnabledVehicles() { return m_RespawnEnabledVehicles; };
 
 private:
     void AddToList(CVehicle* pVehicle) { m_List.push_back(pVehicle); };

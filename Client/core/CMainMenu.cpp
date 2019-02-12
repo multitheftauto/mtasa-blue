@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include <game/CGame.h>
 #include "CNewsBrowser.h"
+#include "CLanguageSelector.h"
 
 #define NATIVE_RES_X    1280.0f
 #define NATIVE_RES_Y    1024.0f
@@ -281,6 +282,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_Settings.SetVisible(false);
     m_Credits.SetVisible(false);
     m_pNewsBrowser->SetVisible(false);
+    m_pLanguageSelector = new CLanguageSelector(m_pCanvas);
 
     // We're not ingame
     SetIsIngame(false);
@@ -320,7 +322,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
 #endif
 }
 
-CMainMenu::~CMainMenu(void)
+CMainMenu::~CMainMenu()
 {
     // Destroy GUI items
     delete m_pBackground;
@@ -348,6 +350,7 @@ CMainMenu::~CMainMenu(void)
 
     delete m_pDisconnect->image;
     delete m_pDisconnect;
+    delete m_pLanguageSelector;
 }
 
 void CMainMenu::SetMenuVerticalPosition(int iPosY)
@@ -392,7 +395,7 @@ void CMainMenu::SetMenuUnhovered()            // Dehighlight all our items
     }
 }
 
-void CMainMenu::Update(void)
+void CMainMenu::Update()
 {
     if (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::JOYSTICK_0000)
     {
@@ -652,6 +655,7 @@ void CMainMenu::Update(void)
     // Call subdialog pulses
     m_ServerBrowser.Update();
     m_ServerInfo.DoPulse();
+    m_pLanguageSelector->DoPulse();
 }
 
 void CMainMenu::Show(bool bOverlay)
@@ -659,13 +663,13 @@ void CMainMenu::Show(bool bOverlay)
     SetVisible(true, bOverlay);
 }
 
-void CMainMenu::Hide(void)
+void CMainMenu::Hide()
 {
     SetVisible(false);
 }
 
 // When escape key pressed and not connected, hide these windows
-void CMainMenu::OnEscapePressedOffLine(void)
+void CMainMenu::OnEscapePressedOffLine()
 {
     m_ServerBrowser.SetVisible(false);
     m_Credits.SetVisible(false);
@@ -712,7 +716,7 @@ void CMainMenu::SetVisible(bool bVisible, bool bOverlay, bool bFrameDelay)
     m_bHideGame = !bOverlay;
 }
 
-bool CMainMenu::IsVisible(void)
+bool CMainMenu::IsVisible()
 {
     return m_bIsVisible;
 }
@@ -748,7 +752,7 @@ void CMainMenu::SetIsIngame(bool bIsIngame)
     }
 }
 
-bool CMainMenu::GetIsIngame(void)
+bool CMainMenu::GetIsIngame()
 {
     return m_bIsIngame;
 }
@@ -863,7 +867,7 @@ bool CMainMenu::OnBrowseServersButtonClick(CGUIElement* pElement)
     return true;
 }
 
-void CMainMenu::HideServerInfo(void)
+void CMainMenu::HideServerInfo()
 {
     m_ServerInfo.Hide();
 }
@@ -880,7 +884,7 @@ bool CMainMenu::OnDisconnectButtonClick(CGUIElement* pElement)
     return true;
 }
 
-bool CMainMenu::OnHostGameButtonClick(void)
+bool CMainMenu::OnHostGameButtonClick()
 {
     // Return if we haven't faded in yet
     if (m_ucFade != FADE_VISIBLE)
@@ -892,7 +896,7 @@ bool CMainMenu::OnHostGameButtonClick(void)
     return true;
 }
 
-bool CMainMenu::OnEditorButtonClick(void)
+bool CMainMenu::OnEditorButtonClick()
 {
     // Return if we haven't faded in yet
     if (m_ucFade != FADE_VISIBLE)
@@ -1083,6 +1087,14 @@ void CMainMenu::SetNewsHeadline(int iIndex, const SString& strHeadline, const SS
     CGUILabel* pNewLabel = m_pNewsItemNEWLabels[iIndex];
     pNewLabel->SetVisible(bIsNew);
     pNewLabel->SetPosition(CVector2D(pItem->GetPosition().fX + 4, pItem->GetPosition().fY - 4));
+}
+
+void CMainMenu::ReloadNews()
+{
+    delete m_pNewsBrowser;
+    m_pNewsBrowser = new CNewsBrowser();
+    m_pNewsBrowser->CreateHeadlines();
+    m_pNewsBrowser->SetVisible(true);
 }
 
 /////////////////////////////////////////////////////////////
