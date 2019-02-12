@@ -16,12 +16,12 @@
 class CGUIFont
 {
 public:
-    virtual ~CGUIFont(void){};
+    virtual ~CGUIFont(){};
 
     virtual void SetAntiAliasingEnabled(bool bAntialiased) = 0;
-    virtual bool IsAntiAliasingEnabled(void) = 0;
+    virtual bool IsAntiAliasingEnabled() = 0;
     virtual void SetAutoScalingEnabled(bool bAutoScaled) = 0;
-    virtual bool IsAutoScalingEnabled(void) = 0;
+    virtual bool IsAutoScalingEnabled() = 0;
 
     virtual void SetNativeResolution(int iX, int iY) = 0;
 

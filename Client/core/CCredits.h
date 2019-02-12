@@ -19,13 +19,13 @@ class CCredits;
 class CCredits
 {
 public:
-    CCredits(void);
-    ~CCredits(void);
+    CCredits();
+    ~CCredits();
 
     void SetVisible(bool bVisible);
-    bool IsVisible(void);
+    bool IsVisible();
 
-    void Update(void);
+    void Update();
 
     bool OnOKButtonClick(CGUIElement* pElement);
 

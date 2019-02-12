@@ -89,7 +89,7 @@ void CMessageLoopHook::SetRefreshMsgQueueEnabled(bool bEnable)
 }
 
 // Process one message every 5 seconds during busy periods to stop Windows 'Not responding' stuff
-void CMessageLoopHook::MaybeRefreshMsgQueue(void)
+void CMessageLoopHook::MaybeRefreshMsgQueue()
 {
     if (m_ProcessMessageTimer.Get() < 5000)
         return;

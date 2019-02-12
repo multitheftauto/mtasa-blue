@@ -553,7 +553,7 @@ void CMultiplayerSA::SetGameModelRemoveHandler(GameModelRemoveHandler* pHandler)
 // Setup hooks for HookDestructors
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_HookDestructors(void)
+void CMultiplayerSA::InitHooks_HookDestructors()
 {
     EZHookInstall(CObjectDestructor);
     EZHookInstall(CVehicleDestructor);

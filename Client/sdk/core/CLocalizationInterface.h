@@ -29,9 +29,9 @@ public:
     virtual SString TranslatePlural(const SString& strSingular, const SString& strPlural, int iNum) = 0;
     virtual SString TranslatePluralWithContext(const SString& strContext, const SString& strSingular, const SString& strPlural, int iNum) = 0;
 
-    virtual std::vector<SString> GetAvailableLocales(void) = 0;
-    virtual bool                 IsLocalized(void) = 0;
-    virtual SString              GetLanguageDirectory(void) = 0;
-    virtual SString              GetLanguageCode(void) = 0;
-    virtual SString              GetLanguageName(void) = 0;
+    virtual std::vector<SString> GetAvailableLocales() = 0;
+    virtual bool                 IsLocalized() = 0;
+    virtual SString              GetLanguageDirectory() = 0;
+    virtual SString              GetLanguageCode() = 0;
+    virtual SString              GetLanguageName() = 0;
 };

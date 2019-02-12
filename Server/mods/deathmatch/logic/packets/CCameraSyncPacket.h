@@ -18,8 +18,8 @@
 class CCameraSyncPacket : public CPacket
 {
 public:
-    ePacketID     GetPacketID(void) const { return PACKET_ID_CAMERA_SYNC; };
-    unsigned long GetFlags(void) const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_CAMERA_SYNC; };
+    unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
 

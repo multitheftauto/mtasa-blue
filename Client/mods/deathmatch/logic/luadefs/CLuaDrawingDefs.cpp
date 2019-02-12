@@ -13,7 +13,7 @@
 #define MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS  "1.3.0-9.04431"
 extern bool g_bAllowAspectRatioAdjustment;
 
-void CLuaDrawingDefs::LoadFunctions(void)
+void CLuaDrawingDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"dxDrawLine", DxDrawLine},

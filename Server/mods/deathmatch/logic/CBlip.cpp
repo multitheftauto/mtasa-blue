@@ -27,7 +27,7 @@ CBlip::CBlip(CElement* pParent, CBlipManager* pBlipManager) : CPerPlayerEntity(p
     m_pBlipManager->m_List.push_back(this);
 }
 
-CBlip::~CBlip(void)
+CBlip::~CBlip()
 {
     // Remove us from the manager's list
     Unlink();
@@ -50,7 +50,7 @@ CElement* CBlip::Clone(bool* bAddEntity, CResource* pResource)
     return pTemp;
 }
 
-void CBlip::Unlink(void)
+void CBlip::Unlink()
 {
     // Remove us from the manager's list
     m_pBlipManager->m_List.remove(this);
@@ -159,7 +159,7 @@ bool CBlip::ReadSpecialData(const int iLine)
     return true;
 }
 
-const CVector& CBlip::GetPosition(void)
+const CVector& CBlip::GetPosition()
 {
     // Are we attached to something?
     if (m_pAttachedTo)

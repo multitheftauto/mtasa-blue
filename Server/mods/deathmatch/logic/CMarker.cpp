@@ -34,7 +34,7 @@ CMarker::CMarker(CMarkerManager* pMarkerManager, CColManager* pColManager, CElem
     UpdateSpatialData();
 }
 
-CMarker::~CMarker(void)
+CMarker::~CMarker()
 {
     // Delete our collision object
     if (m_pCollision)
@@ -59,7 +59,7 @@ CElement* CMarker::Clone(bool* bAddEntity, CResource* pResource)
     return pTemp;
 }
 
-void CMarker::Unlink(void)
+void CMarker::Unlink()
 {
     // Remove us from the marker manager
     m_pMarkerManager->RemoveFromList(this);
@@ -380,7 +380,7 @@ void CMarker::UpdateCollisionObject(unsigned char ucOldType)
     }
 }
 
-CSphere CMarker::GetWorldBoundingSphere(void)
+CSphere CMarker::GetWorldBoundingSphere()
 {
     return CSphere(GetPosition(), GetSize());
 }

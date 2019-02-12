@@ -16,7 +16,7 @@
 class CWeaponRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_ELEMENT_RPC(GiveWeapon);
     DECLARE_ELEMENT_RPC(TakeWeapon);

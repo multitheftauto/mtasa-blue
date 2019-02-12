@@ -197,7 +197,7 @@ BYTE CDamageManagerSA::GetPanelStatus(BYTE bPanel)
     return 0;
 }
 
-unsigned long CDamageManagerSA::GetPanelStatus(void)
+unsigned long CDamageManagerSA::GetPanelStatus()
 {
     return internalInterface->Panels;
 }
@@ -240,7 +240,7 @@ BYTE CDamageManagerSA::GetLightStatus(BYTE bLight)
     return bReturn;
 }
 
-unsigned char CDamageManagerSA::GetLightStatus(void)
+unsigned char CDamageManagerSA::GetLightStatus()
 {
     return static_cast<unsigned char>(internalInterface->Lights);
 }

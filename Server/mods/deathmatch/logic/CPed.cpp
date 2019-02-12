@@ -81,7 +81,7 @@ CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) 
     }
 }
 
-CPed::~CPed(void)
+CPed::~CPed()
 {
     // Make sure we've no longer occupied any vehicle
     if (m_pVehicle)
@@ -117,7 +117,7 @@ CElement* CPed::Clone(bool* bAddEntity, CResource* pResource)
     return pTemp;
 }
 
-void CPed::Unlink(void)
+void CPed::Unlink()
 {
     // Remove us from the Ped manager
     if (m_pPedManager)
@@ -242,7 +242,7 @@ bool CPed::ReadSpecialData(const int iLine)
     return true;
 }
 
-bool CPed::HasValidModel(void)
+bool CPed::HasValidModel()
 {
     return CPedManager::IsValidModel(m_usModel);
 }
@@ -329,7 +329,7 @@ void CPed::SetWeaponTotalAmmo(unsigned short usTotalAmmo, unsigned char ucSlot)
     }
 }
 
-float CPed::GetMaxHealth(void)
+float CPed::GetMaxHealth()
 {
     // TODO: Verify this formula
 
@@ -401,7 +401,7 @@ void CPed::SetVehicleAction(unsigned int uiAction)
     m_uiVehicleAction = uiAction;
 }
 
-bool CPed::IsAttachToable(void)
+bool CPed::IsAttachToable()
 {
     // We're not attachable if we're inside a vehicle (that would get messy)
     if (!GetOccupiedVehicle())

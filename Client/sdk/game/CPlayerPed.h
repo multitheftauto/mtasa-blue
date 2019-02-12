@@ -17,15 +17,15 @@
 class CPlayerPed : public virtual CPed
 {
 public:
-    virtual ~CPlayerPed(void){};
+    virtual ~CPlayerPed(){};
 
-    virtual CWanted* GetWanted(void) = 0;
+    virtual CWanted* GetWanted() = 0;
 
-    virtual float GetSprintEnergy(void) = 0;
+    virtual float GetSprintEnergy() = 0;
     virtual void  SetSprintEnergy(float fSprintEnergy) = 0;
 
-    virtual void SetInitialState(void) = 0;
+    virtual void SetInitialState() = 0;
 
-    virtual eMoveAnim GetMoveAnim(void) = 0;
+    virtual eMoveAnim GetMoveAnim() = 0;
     virtual void      SetMoveAnim(eMoveAnim iAnimGroup) = 0;
 };

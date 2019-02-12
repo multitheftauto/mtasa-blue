@@ -16,7 +16,7 @@
 
 struct SLineOfSightFlags
 {
-    SLineOfSightFlags(void)
+    SLineOfSightFlags()
         : bCheckBuildings(true),
           bCheckVehicles(true),
           bCheckPeds(true),
@@ -41,7 +41,7 @@ struct SLineOfSightFlags
 
 struct SLineOfSightBuildingResult
 {
-    SLineOfSightBuildingResult(void) : bValid(false) {}
+    SLineOfSightBuildingResult() : bValid(false) {}
     bool                bValid;
     ushort              usModelID;
     ushort              usLODModelID;
@@ -165,16 +165,16 @@ public:
     virtual void  LoadMapAroundPoint(CVector* vecPosition, float fRadius) = 0;
     virtual bool  IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd, const SLineOfSightFlags flags = SLineOfSightFlags()) = 0;
     virtual bool  HasCollisionBeenLoaded(CVector* vecPosition) = 0;
-    virtual DWORD GetCurrentArea(void) = 0;
+    virtual DWORD GetCurrentArea() = 0;
     virtual void  SetCurrentArea(DWORD dwArea) = 0;
     virtual void  SetJetpackMaxHeight(float fHeight) = 0;
-    virtual float GetJetpackMaxHeight(void) = 0;
+    virtual float GetJetpackMaxHeight() = 0;
     virtual void  SetAircraftMaxHeight(float fHeight) = 0;
-    virtual float GetAircraftMaxHeight(void) = 0;
+    virtual float GetAircraftMaxHeight() = 0;
     virtual void  SetAircraftMaxVelocity(float fVelocity) = 0;
-    virtual float GetAircraftMaxVelocity(void) = 0;
+    virtual float GetAircraftMaxVelocity() = 0;
     virtual void  SetOcclusionsEnabled(bool bEnabled) = 0;
-    virtual bool  GetOcclusionsEnabled(void) = 0;
+    virtual bool  GetOcclusionsEnabled() = 0;
     virtual void  FindWorldPositionForRailTrackPosition(float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition) = 0;
     virtual int   FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance) = 0;
 

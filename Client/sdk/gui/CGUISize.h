@@ -14,7 +14,7 @@
 class CGUISize
 {
 public:
-    CGUISize(void) {}
+    CGUISize() {}
     CGUISize(float width, float height) : fWidth(width), fHeight(height) {}
 
     bool operator==(const CGUISize& other) const;
