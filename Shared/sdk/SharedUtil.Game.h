@@ -32,7 +32,7 @@ namespace SharedUtil
     class CVehicleColor
     {
     public:
-        CVehicleColor(void);
+        CVehicleColor();
 
         void SetRGBColors(SColor color1, SColor color2, SColor color3, SColor color4);
         void SetPaletteColors(uchar ucColor1, uchar ucColor2, uchar ucColor3, uchar ucColor4);
@@ -43,16 +43,16 @@ namespace SharedUtil
         SColor GetRGBColor(uint uiSlot);
         uchar  GetPaletteColor(uint uiSlot);
 
-        int GetNumColorsUsed(void);
+        int GetNumColorsUsed();
 
         static uchar  GetPaletteIndexFromRGB(SColor color);
         static SColor GetRGBFromPaletteIndex(uchar ucColor);
 
     protected:
-        void InvalidatePaletteColors(void);
-        void ValidatePaletteColors(void);
-        void InvalidateRGBColors(void);
-        void ValidateRGBColors(void);
+        void InvalidatePaletteColors();
+        void ValidatePaletteColors();
+        void InvalidateRGBColors();
+        void ValidateRGBColors();
 
         SColor m_RGBColors[4];
         uchar  m_ucPaletteColors[4];
@@ -62,7 +62,7 @@ namespace SharedUtil
 
     struct SHeatHazeSettings
     {
-        SHeatHazeSettings(void)
+        SHeatHazeSettings()
             : ucIntensity(0),
               ucRandomShift(0),
               usSpeedMin(1),

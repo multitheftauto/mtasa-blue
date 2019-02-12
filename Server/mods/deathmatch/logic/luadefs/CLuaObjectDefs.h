@@ -15,7 +15,7 @@
 class CLuaObjectDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
     // Object create/destroy functions

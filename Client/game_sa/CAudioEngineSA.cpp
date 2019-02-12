@@ -155,41 +155,23 @@ VOID CAudioEngineSA::StartRadio(unsigned int station)
 // 43 = race one
 // 32 = help
 // 13 = camera take picture
-VOID CAudioEngineSA::PlayFrontEndSound(DWORD dwSound)
+VOID CAudioEngineSA::PlayFrontEndSound(DWORD dwEventID)
 {
-    if (*(DWORD*)VAR_AudioEventVolumes != 0 && dwSound <= 101)            // may prevent a crash
+    if (*(DWORD*)VAR_AudioEventVolumes != 0 && dwEventID <= 101)            // may prevent a crash
     {
         DEBUG_TRACE("VOID CAudioEngineSA::PlayFrontEndSound(DWORD dwSound)");
         DWORD dwFunc = FUNC_ReportFrontendAudioEvent;
-        FLOAT fUnknown = 1.0f;
+        FLOAT fSpeed = 1.0f;
+        FLOAT fVolumeChange = 0.0f;
         _asm
         {
-            push    fUnknown
-            push    0
-            push    dwSound
+            push    fSpeed
+            push    fVolumeChange
+            push    dwEventID
             mov     ecx, CLASS_CAudioEngine
             call    dwFunc
         }
     }
-
-    /*  DWORD dwAudioEntity = 0xB6BC90;
-
-        DWORD dwFunc = 0x507290;
-        _asm
-        {
-            push    1
-            push    dwSound
-            call    dwFunc
-        }
-
-
-        dwFunc = 0x5072B0;
-        _asm
-        {
-            push    dwSound
-            mov     ecx,dwAudioEntity
-            call    dwFunc
-        }*/
 }
 
 VOID CAudioEngineSA::SetEffectsMasterVolume(BYTE bVolume)
@@ -417,13 +399,13 @@ bool CAudioEngineSA::IsAmbientSoundEnabled(eAmbientSoundType eType)
         return false;
 }
 
-VOID CAudioEngineSA::ResetAmbientSounds(void)
+VOID CAudioEngineSA::ResetAmbientSounds()
 {
     SetAmbientSoundEnabled(AMBIENT_SOUND_GENERAL, true);
     SetAmbientSoundEnabled(AMBIENT_SOUND_GUNFIRE, true);
 }
 
-VOID CAudioEngineSA::UpdateAmbientSoundSettings(void)
+VOID CAudioEngineSA::UpdateAmbientSoundSettings()
 {
     // Update gunfire setting
     if (IsAmbientSoundEnabled(AMBIENT_SOUND_GUNFIRE))
@@ -432,7 +414,7 @@ VOID CAudioEngineSA::UpdateAmbientSoundSettings(void)
         MemPut<BYTE>(0x507814, 0x33);            // No gunfire
 }
 
-__declspec(noinline) bool _cdecl IsAmbientSoundGeneralEnabled(void)
+__declspec(noinline) bool _cdecl IsAmbientSoundGeneralEnabled()
 {
     if (pGame)
     {
@@ -488,7 +470,7 @@ bool CAudioEngineSA::IsWorldSoundEnabled(uint uiGroup, uint uiIndex)
     return !m_DisabledWorldSounds.IsRangeSet(uiFirst, uiLast - uiFirst + 1);
 }
 
-void CAudioEngineSA::ResetWorldSounds(void)
+void CAudioEngineSA::ResetWorldSounds()
 {
     m_DisabledWorldSounds = CRanges();
 }

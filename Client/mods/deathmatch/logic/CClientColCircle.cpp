@@ -28,7 +28,7 @@ bool CClientColCircle::DoHitDetection(const CVector& vecNowPosition, float fRadi
     return IsPointNearPoint2D(vecNowPosition, m_vecPosition, fRadius + m_fRadius);
 }
 
-CSphere CClientColCircle::GetWorldBoundingSphere(void)
+CSphere CClientColCircle::GetWorldBoundingSphere()
 {
     CSphere sphere;
     sphere.vecPosition.fX = m_vecPosition.fX;

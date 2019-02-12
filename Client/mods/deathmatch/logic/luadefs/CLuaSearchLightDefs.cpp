@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CLuaSearchLightDefs::LoadFunctions(void)
+void CLuaSearchLightDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"createSearchLight", CreateSearchLight},

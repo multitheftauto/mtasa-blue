@@ -198,7 +198,7 @@ const char* const CNickGen::m_szNouns[] = {
     "Conductor",  "Wheelman",   "Vampire",    "Parasite",   "Tramp",      "Bum",        "Hobo",       "Hitchhiker", "Deadbeat",   "Acrobat",
 };
 
-SString CNickGen::GetRandomNickname(void)
+SString CNickGen::GetRandomNickname()
 {
     srand((unsigned int)time(NULL));
     int iAdjective = rand() % NICKGEN_NUM_ADJECTIVES;

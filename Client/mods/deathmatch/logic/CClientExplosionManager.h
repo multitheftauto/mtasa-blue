@@ -22,7 +22,7 @@ class CClientExplosionManager
 
 public:
     CClientExplosionManager(CClientManager* pManager);
-    ~CClientExplosionManager(void);
+    ~CClientExplosionManager();
 
     // * Game-layer wrapping *
     static bool Hook_StaticExplosionCreation(CEntity* pGameExplodingEntity, CEntity* pGameCreator, const CVector& vecPosition, eExplosionType explosionType);

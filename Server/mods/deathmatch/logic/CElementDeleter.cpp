@@ -40,7 +40,7 @@ void CElementDeleter::Delete(class CElement* pElement, bool bUnlink, bool bUpdat
     }
 }
 
-void CElementDeleter::DoDeleteAll(void)
+void CElementDeleter::DoDeleteAll()
 {
     // This depends on CElementDeleter::Unreference() being called in ~CElement()
     while (!m_List.empty())

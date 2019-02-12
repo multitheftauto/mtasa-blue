@@ -28,7 +28,7 @@ CPrimitiveMaterialBatcher::CPrimitiveMaterialBatcher(CGraphics* graphics)
 //
 //
 ////////////////////////////////////////////////////////////////
-CPrimitiveMaterialBatcher::~CPrimitiveMaterialBatcher(void)
+CPrimitiveMaterialBatcher::~CPrimitiveMaterialBatcher()
 {
 }
 ////////////////////////////////////////////////////////////////
@@ -128,7 +128,7 @@ void CPrimitiveMaterialBatcher::SetDeviceStates()
 // Send all buffered vertices to D3D
 //
 ////////////////////////////////////////////////////////////////
-void CPrimitiveMaterialBatcher::Flush(void)
+void CPrimitiveMaterialBatcher::Flush()
 {
     if (m_primitiveList.empty())
         return;

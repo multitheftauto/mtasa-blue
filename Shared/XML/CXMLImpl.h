@@ -16,13 +16,13 @@
 class CXMLImpl : public CXML
 {
 public:
-    CXMLImpl(void);
-    virtual ~CXMLImpl(void);
+    CXMLImpl();
+    virtual ~CXMLImpl();
 
     CXMLFile* CreateXML(const char* szFilename, bool bUseIDs, bool bReadOnly);
     void      DeleteXML(CXMLFile* pFile);
 
-    CXMLNode* CreateDummyNode(void);
+    CXMLNode* CreateDummyNode();
 
     CXMLAttribute* GetAttrFromID(unsigned long ulID);
     CXMLFile*      GetFileFromID(unsigned long ulID);

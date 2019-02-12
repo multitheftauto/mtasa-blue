@@ -11,7 +11,7 @@
 
 #include <StdInc.h>
 
-CLuaVector3D::CLuaVector3D(void) : CVector()
+CLuaVector3D::CLuaVector3D() : CVector()
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::VECTOR3);
 }
@@ -26,7 +26,7 @@ CLuaVector3D::CLuaVector3D(const CVector& vector) : CVector(vector)
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::VECTOR3);
 }
 
-CLuaVector3D::~CLuaVector3D(void)
+CLuaVector3D::~CLuaVector3D()
 {
     CIdArray::PushUniqueId(this, EIdClass::VECTOR3, m_uiScriptID);
     m_uiScriptID = INVALID_ARRAY_ID;
