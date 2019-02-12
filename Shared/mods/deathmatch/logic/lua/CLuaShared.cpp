@@ -66,7 +66,7 @@ bool CLuaShared::CheckUTF8BOMAndUpdate(const char** pcpOutBuffer, uint* puiOutSi
     return GetUTF8Confidence((const unsigned char*)cpBuffer, uiSize) >= 80;
 }
 
-void CLuaShared::LoadFunctions(void)
+void CLuaShared::LoadFunctions()
 {
     CLuaBitDefs::LoadFunctions();
     CLuaCryptDefs::LoadFunctions();

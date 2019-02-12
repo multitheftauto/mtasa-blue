@@ -9,15 +9,14 @@
  *
  *****************************************************************************/
 
-#ifndef __CMarkerRPCs_H
-#define __CMarkerRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
 class CMarkerRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_ELEMENT_RPC(SetMarkerType);
     DECLARE_ELEMENT_RPC(SetMarkerColor);
@@ -25,5 +24,3 @@ public:
     DECLARE_ELEMENT_RPC(SetMarkerTarget);
     DECLARE_ELEMENT_RPC(SetMarkerIcon);
 };
-
-#endif

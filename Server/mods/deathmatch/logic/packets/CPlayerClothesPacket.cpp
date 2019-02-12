@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CPlayerClothesPacket::~CPlayerClothesPacket(void)
+CPlayerClothesPacket::~CPlayerClothesPacket()
 {
     vector<SPlayerClothes*>::iterator iter = m_List.begin();
     for (; iter != m_List.end(); ++iter)

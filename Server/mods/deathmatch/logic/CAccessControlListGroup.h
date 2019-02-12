@@ -34,13 +34,13 @@ public:
         m_eObjectType = eObjectType;
     }
 
-    virtual ~CAccessControlListGroupObject(void){};
+    virtual ~CAccessControlListGroupObject(){};
 
     static SString GenerateKey(const char* szName, EObjectType eObjectType) { return SString("%s_%d", szName, (unsigned int)eObjectType); }
 
-    const char*    GetObjectName(void) { return m_strName; };
-    EObjectType    GetObjectType(void) { return m_eObjectType; };
-    const SString& GetObjectKey(void) { return m_strKey; };
+    const char*    GetObjectName() { return m_strName; };
+    EObjectType    GetObjectType() { return m_eObjectType; };
+    const SString& GetObjectKey() { return m_strKey; };
 
 private:
     SString     m_strName;
@@ -52,9 +52,9 @@ class CAccessControlListGroup
 {
 public:
     CAccessControlListGroup(const char* szGroupName);
-    ~CAccessControlListGroup(void);
+    ~CAccessControlListGroup();
 
-    const char* GetGroupName(void) { return m_strGroupName; };
+    const char* GetGroupName() { return m_strGroupName; };
 
     CAccessControlListGroupObject* AddObject(const char* szObjectName, CAccessControlListGroupObject::EObjectType eObjectType);
     bool                           FindObjectMatch(const char* szObjectName, CAccessControlListGroupObject::EObjectType eObjectType);
@@ -65,16 +65,16 @@ public:
     class CAccessControlList* GetACL(const char* szACLName);
     void                      RemoveACL(class CAccessControlList* pACL);
 
-    list<class CAccessControlList*>::iterator            IterBeginACL(void) { return m_ACLs.begin(); };
-    list<class CAccessControlList*>::iterator            IterEndACL(void) { return m_ACLs.end(); };
-    list<class CAccessControlListGroupObject*>::iterator IterBeginObjects(void) { return m_Objects.begin(); };
-    list<class CAccessControlListGroupObject*>::iterator IterEndObjects(void) { return m_Objects.end(); };
+    list<class CAccessControlList*>::iterator            IterBeginACL() { return m_ACLs.begin(); };
+    list<class CAccessControlList*>::iterator            IterEndACL() { return m_ACLs.end(); };
+    list<class CAccessControlListGroupObject*>::iterator IterBeginObjects() { return m_Objects.begin(); };
+    list<class CAccessControlListGroupObject*>::iterator IterEndObjects() { return m_Objects.end(); };
 
     void WriteToXMLNode(CXMLNode* pNode);
-    uint GetScriptID(void) const { return m_uiScriptID; }
+    uint GetScriptID() const { return m_uiScriptID; }
 
 private:
-    void OnChange(void);
+    void OnChange();
 
     typedef std::list<class CAccessControlList*> ACLsList;
 

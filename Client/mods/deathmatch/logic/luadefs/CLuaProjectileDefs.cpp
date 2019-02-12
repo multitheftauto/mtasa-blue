@@ -11,15 +11,23 @@
 
 #include "StdInc.h"
 
-void CLuaProjectileDefs::LoadFunctions(void)
+void CLuaProjectileDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("createProjectile", CreateProjectile);
-    CLuaCFunctions::AddFunction("getProjectileType", GetProjectileType);
-    CLuaCFunctions::AddFunction("getProjectileTarget", GetProjectileTarget);
-    CLuaCFunctions::AddFunction("getProjectileCreator", GetProjectileCreator);
-    CLuaCFunctions::AddFunction("getProjectileForce", GetProjectileForce);
-    CLuaCFunctions::AddFunction("setProjectileCounter", SetProjectileCounter);
-    CLuaCFunctions::AddFunction("getProjectileCounter", GetProjectileCounter);
+    std::map<const char*, lua_CFunction> functions{
+        {"createProjectile", CreateProjectile},
+        {"getProjectileType", GetProjectileType},
+        {"getProjectileTarget", GetProjectileTarget},
+        {"getProjectileCreator", GetProjectileCreator},
+        {"getProjectileForce", GetProjectileForce},
+        {"setProjectileCounter", SetProjectileCounter},
+        {"getProjectileCounter", GetProjectileCounter},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaProjectileDefs::AddClass(lua_State* luaVM)

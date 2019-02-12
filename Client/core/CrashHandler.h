@@ -27,7 +27,7 @@ Copyright (c) 1997-2000 John Robbins -- All rights reserved.
 
 // The Win95 version of GetModuleBaseName.
 static DWORD __stdcall Win95GetModuleBaseName(HANDLE hProcess, HMODULE hModule, LPSTR lpBaseName, DWORD nSize);
-BOOL __stdcall IsNT(void);
+BOOL __stdcall IsNT();
 DWORD __stdcall NTGetModuleBaseName(HANDLE hProcess, HMODULE hModule, LPTSTR lpBaseName, DWORD nSize);
 BOOL __stdcall NT4GetLoadedModules(DWORD dwPID, UINT uiCount, HMODULE* paModArray, LPDWORD pdwRealCount);
 BOOL __stdcall TLHELPGetLoadedModules(DWORD dwPID, UINT uiCount, HMODULE* paModArray, LPDWORD pdwRealCount);
@@ -92,7 +92,7 @@ extern "C"
         The item count.  This can be zero if not limiting modules have been
     added.
     ----------------------------------------------------------------------*/
-    UINT BUGSUTIL_DLLINTERFACE __stdcall GetLimitModuleCount(void);
+    UINT BUGSUTIL_DLLINTERFACE __stdcall GetLimitModuleCount();
 
 /*----------------------------------------------------------------------
 FUNCTION        :   GetLimitModulesArray

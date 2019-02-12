@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_TASKBASIC
-#define __CGAMESA_TASKBASIC
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -46,7 +45,7 @@ public:
 class CTaskComplexUseMobilePhoneSA : public virtual CTaskComplexSA, public virtual CTaskComplexUseMobilePhone
 {
 public:
-    CTaskComplexUseMobilePhoneSA(void){};
+    CTaskComplexUseMobilePhoneSA(){};
     CTaskComplexUseMobilePhoneSA(const int iDuration);            // Default is -1
 };
 
@@ -76,13 +75,13 @@ public:
 class CTaskSimpleAnimSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleAnim
 {
 public:
-    CTaskSimpleAnimSA(void){};
+    CTaskSimpleAnimSA(){};
 };
 
 class CTaskSimpleRunAnimSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleRunAnim
 {
 public:
-    CTaskSimpleRunAnimSA(void){};
+    CTaskSimpleRunAnimSA(){};
     CTaskSimpleRunAnimSA(const AssocGroupId animGroup, const AnimationId animID, const float fBlendDelta, const int iTaskType, const char* pTaskName,
                          const bool bHoldLastFrame = false);
 };
@@ -108,7 +107,7 @@ public:
 class CTaskSimpleRunNamedAnimSA : public virtual CTaskSimpleAnimSA, public virtual CTaskSimpleRunNamedAnim
 {
 public:
-    CTaskSimpleRunNamedAnimSA(void){};
+    CTaskSimpleRunNamedAnimSA(){};
     CTaskSimpleRunNamedAnimSA(const char* pAnimName, const char* pAnimGroupName, const int flags, const float fBlendDelta, const int iTime = -1,
                               const bool bDontInterrupt = false, const bool bRunInSequence = false, const bool bOffsetPed = false,
                               const bool bHoldLastFrame = false);
@@ -122,7 +121,7 @@ public:
 class CTaskComplexDieSA : public virtual CTaskComplexSA, public virtual CTaskComplexDie
 {
 public:
-    CTaskComplexDieSA(void){};
+    CTaskComplexDieSA(){};
     CTaskComplexDieSA(const eWeaponType eMeansOfDeath /*=WEAPONTYPE_UNARMED*/, const AssocGroupId animGroup = 0 /*ANIM_STD_PED*/,
                       const AnimationId anim = 0 /*ANIM_STD_KO_FRONT*/, const float fBlendDelta = 4.0f, const float fAnimSpeed = 0.0f,
                       const bool bBeingKilledByStealth = false, const bool bFallingToDeath = false, const int iFallToDeathDir = 0,
@@ -137,7 +136,7 @@ public:
 class CTaskSimpleStealthKillSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleStealthKill
 {
 public:
-    CTaskSimpleStealthKillSA(void){};
+    CTaskSimpleStealthKillSA(){};
     CTaskSimpleStealthKillSA(bool bKiller, class CPed* pPed, const AssocGroupId animGroup);
 };
 
@@ -151,7 +150,7 @@ public:
 class CTaskSimpleDeadSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleDead
 {
 public:
-    CTaskSimpleDeadSA(void){};
+    CTaskSimpleDeadSA(){};
     CTaskSimpleDeadSA(unsigned int uiDeathTimeMS, bool bUnk2);
 };
 
@@ -174,7 +173,7 @@ public:
 class CTaskSimpleBeHitSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleBeHit
 {
 public:
-    CTaskSimpleBeHitSA(void){};
+    CTaskSimpleBeHitSA(){};
     CTaskSimpleBeHitSA(CPed* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
 };
 
@@ -209,7 +208,7 @@ public:
 class CTaskComplexSunbatheSA : public virtual CTaskComplexSA, public virtual CTaskComplexSunbathe
 {
 public:
-    CTaskComplexSunbatheSA(void){};
+    CTaskComplexSunbatheSA(){};
     CTaskComplexSunbatheSA(class CObject* pTowel, const bool bStartStanding);
 
     void SetEndTime(DWORD dwTime);
@@ -227,7 +226,7 @@ public:
 class CTaskSimplePlayerOnFootSA : public virtual CTaskSimpleSA, public virtual CTaskSimplePlayerOnFoot
 {
 public:
-    CTaskSimplePlayerOnFootSA(void);
+    CTaskSimplePlayerOnFootSA();
 };
 
 ////////////////////
@@ -242,7 +241,5 @@ public:
 class CTaskComplexFacialSA : public virtual CTaskComplexSA, public virtual CTaskComplexFacial
 {
 public:
-    CTaskComplexFacialSA(void);
+    CTaskComplexFacialSA();
 };
-
-#endif

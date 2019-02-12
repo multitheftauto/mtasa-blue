@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPACKETHANDLER_H
-#define __CPACKETHANDLER_H
+#pragma once
 
 #include <CClientCommon.h>
 
@@ -110,5 +109,3 @@ public:
     NetBitStreamInterface* m_pEntityAddBitStream;
     uint                   m_uiEntityAddNumEntities;
 };
-
-#endif

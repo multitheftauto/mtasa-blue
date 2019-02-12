@@ -21,7 +21,7 @@ extern CCore* g_pCore;
 //
 //
 ////////////////////////////////////////////////////
-CNewsBrowser::CNewsBrowser(void)
+CNewsBrowser::CNewsBrowser()
 {
     m_pWindow = NULL;
     m_pTabPanel = NULL;
@@ -35,7 +35,7 @@ CNewsBrowser::CNewsBrowser(void)
 //
 //
 ////////////////////////////////////////////////////
-CNewsBrowser::~CNewsBrowser(void)
+CNewsBrowser::~CNewsBrowser()
 {
     DestroyGUI();
 }
@@ -47,7 +47,7 @@ CNewsBrowser::~CNewsBrowser(void)
 //
 //
 ////////////////////////////////////////////////////
-void CNewsBrowser::InitNewsItemList(void)
+void CNewsBrowser::InitNewsItemList()
 {
     m_NewsitemList.clear();
 
@@ -122,7 +122,7 @@ void CNewsBrowser::InitNewsItemList(void)
 //
 //
 ////////////////////////////////////////////////////
-void CNewsBrowser::CreateHeadlines(void)
+void CNewsBrowser::CreateHeadlines()
 {
     InitNewsItemList();
     bool bNewsUpdated = GetApplicationSettingInt("news-updated") == 1;
@@ -144,7 +144,7 @@ void CNewsBrowser::CreateHeadlines(void)
 //
 //
 ////////////////////////////////////////////////////
-void CNewsBrowser::CreateGUI(void)
+void CNewsBrowser::CreateGUI()
 {
     CreateHeadlines();
     CGUI* pManager = g_pCore->GetGUI();
@@ -189,7 +189,7 @@ void CNewsBrowser::CreateGUI(void)
 //
 //
 ////////////////////////////////////////////////////
-void CNewsBrowser::DestroyGUI(void)
+void CNewsBrowser::DestroyGUI()
 {
     // Destroy
     for (uint i = 0; i < m_TabList.size(); i++)
@@ -357,7 +357,7 @@ void CNewsBrowser::SetVisible(bool bVisible)
 //
 //
 ////////////////////////////////////////////////////
-bool CNewsBrowser::IsVisible(void)
+bool CNewsBrowser::IsVisible()
 {
     return m_pWindow && m_pWindow->IsVisible();
 }

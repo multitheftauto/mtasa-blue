@@ -20,7 +20,7 @@ uint CShaderItem::ms_uiCreateTimeCounter = 0;
 //
 //
 ////////////////////////////////////////////////////////////////
-void CShaderItem::PostConstruct(CRenderItemManager* pManager, const SString& strFilename, const SString& strRootPath, SString& strOutStatus, float fPriority,
+void CShaderItem::PostConstruct(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority,
                                 float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask)
 {
     m_fPriority = fPriority;
@@ -32,7 +32,7 @@ void CShaderItem::PostConstruct(CRenderItemManager* pManager, const SString& str
     Super::PostConstruct(pManager);
 
     // Initial creation of d3d data
-    CreateUnderlyingData(strFilename, strRootPath, strOutStatus, bDebug);
+    CreateUnderlyingData(strFile, strRootPath, bIsRawData, strOutStatus, bDebug);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -42,7 +42,7 @@ void CShaderItem::PostConstruct(CRenderItemManager* pManager, const SString& str
 //
 //
 ////////////////////////////////////////////////////////////////
-void CShaderItem::PreDestruct(void)
+void CShaderItem::PreDestruct()
 {
     ReleaseUnderlyingData();
     Super::PreDestruct();
@@ -55,7 +55,7 @@ void CShaderItem::PreDestruct(void)
 // Check underlying data is present
 //
 ////////////////////////////////////////////////////////////////
-bool CShaderItem::IsValid(void)
+bool CShaderItem::IsValid()
 {
     return m_pEffectWrap;
 }
@@ -67,7 +67,7 @@ bool CShaderItem::IsValid(void)
 // Release device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CShaderItem::OnLostDevice(void)
+void CShaderItem::OnLostDevice()
 {
     // Nothing required for CShaderItem
 }
@@ -79,7 +79,7 @@ void CShaderItem::OnLostDevice(void)
 // Recreate device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CShaderItem::OnResetDevice(void)
+void CShaderItem::OnResetDevice()
 {
     // Nothing required for CShaderItem
 }
@@ -91,12 +91,12 @@ void CShaderItem::OnResetDevice(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CShaderItem::CreateUnderlyingData(const SString& strFilename, const SString& strRootPath, SString& strOutStatus, bool bDebug)
+void CShaderItem::CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug)
 {
     assert(!m_pEffectWrap);
     assert(!m_pShaderInstance);
 
-    m_pEffectWrap = m_pManager->GetEffectCloner()->CreateD3DEffect(strFilename, strRootPath, strOutStatus, bDebug);
+    m_pEffectWrap = m_pManager->GetEffectCloner()->CreateD3DEffect(strFile, strRootPath, bIsRawData, strOutStatus, bDebug);
     if (!m_pEffectWrap)
         return;
 
@@ -114,7 +114,7 @@ void CShaderItem::CreateUnderlyingData(const SString& strFilename, const SString
 //
 //
 ////////////////////////////////////////////////////////////////
-void CShaderItem::ReleaseUnderlyingData(void)
+void CShaderItem::ReleaseUnderlyingData()
 {
     m_pManager->NotifyShaderItemUsesDepthBuffer(this, false);
     m_pManager->NotifyShaderItemUsesMultipleRenderTargets(this, false);
@@ -247,7 +247,7 @@ void CShaderItem::SetTransform(const SShaderTransform& transform)
 // If current instance is in use by something else (i.e. in draw queue), we must create a new instance before changing parameter values
 //
 ////////////////////////////////////////////////////////////////
-void CShaderItem::MaybeRenewShaderInstance(void)
+void CShaderItem::MaybeRenewShaderInstance()
 {
     if (m_pShaderInstance->m_iRefCount > 1)
         RenewShaderInstance();
@@ -260,7 +260,7 @@ void CShaderItem::MaybeRenewShaderInstance(void)
 // Create/clone a new instance
 //
 ////////////////////////////////////////////////////////////////
-void CShaderItem::RenewShaderInstance(void)
+void CShaderItem::RenewShaderInstance()
 {
     CShaderInstance* pShaderInstance = new CShaderInstance();
     pShaderInstance->PostConstruct(m_pManager, this);
@@ -273,7 +273,7 @@ void CShaderItem::RenewShaderInstance(void)
 // Check if active technique uses a vertex shader
 //
 ////////////////////////////////////////////////////////////////
-bool CShaderItem::GetUsesVertexShader(void)
+bool CShaderItem::GetUsesVertexShader()
 {
     return m_pEffectWrap->m_pEffectTemplate->m_bUsesVertexShader;
 }

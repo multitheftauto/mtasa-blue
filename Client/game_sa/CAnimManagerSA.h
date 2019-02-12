@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimManagerSA_H
-#define __CAnimManagerSA_H
+#pragma once
 
 #include <game/CAnimManager.h>
 #include <game/CAnimBlendAssociation.h>
@@ -83,15 +82,15 @@ class CAnimManagerSA : public CAnimManager
     typedef std::unique_ptr<CAnimBlendStaticAssociation> StaticAssocIntface_type;
 
 public:
-    CAnimManagerSA(void);
-    ~CAnimManagerSA(void);
+    CAnimManagerSA();
+    ~CAnimManagerSA();
 
-    void Initialize(void);
-    void Shutdown(void);
+    void Initialize();
+    void Shutdown();
 
-    int GetNumAnimations(void);
-    int GetNumAnimBlocks(void);
-    int GetNumAnimAssocDefinitions(void);
+    int GetNumAnimations();
+    int GetNumAnimBlocks();
+    int GetNumAnimAssocDefinitions();
 
     std::unique_ptr<CAnimBlendHierarchy> GetAnimation(int ID);
     std::unique_ptr<CAnimBlendHierarchy> GetAnimation(const char* szName, CAnimBlock* pBlock);
@@ -126,16 +125,16 @@ public:
 
     AnimAssocDefinition* AddAnimAssocDefinition(const char* szBlockName, const char* szAnimName, AssocGroupId animGroup, AnimationId animID,
                                                 AnimDescriptor* pDescriptor);
-    void                 ReadAnimAssociationDefinitions(void);
-    void                 CreateAnimAssocGroups(void);
+    void                 ReadAnimAssociationDefinitions();
+    void                 CreateAnimAssocGroups();
 
     void  UncompressAnimation(CAnimBlendHierarchy* pHierarchy);
     void  RemoveFromUncompressedCache(CAnimBlendHierarchy* pHierarchy);
     void  RemoveFromUncompressedCache(CAnimBlendHierarchySAInterface* pInterface);
     void  LoadAnimFile(const char* szFile);
     void  LoadAnimFile(RwStream* pStream, bool b1, const char* sz1);
-    void  LoadAnimFiles(void);
-    void  RemoveLastAnimFile(void);
+    void  LoadAnimFiles();
+    void  RemoveLastAnimFile();
     BYTE* AllocateKeyFramesMemory(uint32_t u32BytesToAllocate);
     void  FreeKeyFramesMemory(void* pKeyFrames);
 
@@ -144,6 +143,7 @@ public:
     std::unique_ptr<CAnimBlendAssociation> RpAnimBlendClumpGetFirstAssociation(RpClump* pClump);
     std::unique_ptr<CAnimBlendAssociation> RpAnimBlendClumpGetAssociation(RpClump* pClump, const char* szAnimName);
     std::unique_ptr<CAnimBlendAssociation> RpAnimBlendClumpGetAssociation(RpClump* pClump, AnimationId animID);
+    std::unique_ptr<CAnimBlendAssociation> RpAnimBlendClumpGetAssociationHashKey(RpClump* pClump, const unsigned int& uiAnimNameHashKey);
     std::unique_ptr<CAnimBlendAssociation> RpAnimBlendGetNextAssociation(std::unique_ptr<CAnimBlendAssociation>& pAssociation);
     int                                    RpAnimBlendClumpGetNumAssociations(RpClump* pClump);
     void                                   RpAnimBlendClumpUpdateAnimations(RpClump* pClump, float f1, bool b1);
@@ -161,15 +161,15 @@ public:
     std::unique_ptr<CAnimBlendSequence>  GetCustomAnimBlendSequence(CAnimBlendSequenceSAInterface* pInterface);
 
     // Warning! These two functions will create a new interface ( dynamic memory memory allocation )
-    std::unique_ptr<CAnimBlendHierarchy> GetCustomAnimBlendHierarchy(void);
-    std::unique_ptr<CAnimBlendSequence>  GetCustomAnimBlendSequence(void);
+    std::unique_ptr<CAnimBlendHierarchy> GetCustomAnimBlendHierarchy();
+    std::unique_ptr<CAnimBlendSequence>  GetCustomAnimBlendSequence();
 
     void DeleteCustomAnimHierarchyInterface(CAnimBlendHierarchySAInterface* pInterface);
     void DeleteCustomAnimSequenceInterface(CAnimBlendSequenceSAInterface* pInterface);
 
     bool           isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface* pInterface);
-    const SString& GetGateWayBlockName(void) { return m_kGateWayBlockName; };
-    const SString& GetGateWayAnimationName(void) { return m_kGateWayAnimationName; };
+    const SString& GetGateWayBlockName() { return m_kGateWayBlockName; };
+    const SString& GetGateWayAnimationName() { return m_kGateWayAnimationName; };
 
 private:
     CAnimBlendAssocGroup* m_pAnimAssocGroups[MAX_ANIM_GROUPS];
@@ -184,5 +184,3 @@ private:
     const SString m_kGateWayBlockName = "ped";
     const SString m_kGateWayAnimationName = "run_wuzi";
 };
-
-#endif

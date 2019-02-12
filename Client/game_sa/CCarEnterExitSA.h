@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_CARENTEREXIT
-#define __CGAMESA_CARENTEREXIT
+#pragma once
 
 #include <game/CCarEnterExit.h>
 #include "CPedSA.h"
@@ -29,5 +28,3 @@ public:
     int  ComputeTargetDoorToExit(CPed* pPed, CVehicle* pVehicle);
     bool IsRoomForPedToLeaveCar(CVehicle* pVehicle, int iDoor, CVector* pUnknown = 0);
 };
-
-#endif

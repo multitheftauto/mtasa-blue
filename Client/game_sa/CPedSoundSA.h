@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PEDSOUND
-#define __CGAMESA_PEDSOUND
+#pragma once
 
 #include <game/CPedSound.h>
 
@@ -72,15 +71,15 @@ private:
 
 public:
     CPedSoundSA(CPedSoundSAInterface* pInterface) { m_pInterface = pInterface; }
-    CPedSoundSAInterface* GetInterface(void) { return m_pInterface; }
+    CPedSoundSAInterface* GetInterface() { return m_pInterface; }
 
-    short GetVoiceTypeID(void);
-    short GetVoiceID(void);
+    short GetVoiceTypeID();
+    short GetVoiceID();
     void  SetVoiceTypeID(short sVoiceType);
     void  SetVoiceID(short sVoiceID);
 
-    bool IsSpeechDisabled(void);
-    void EnablePedSpeech(void);
+    bool IsSpeechDisabled();
+    void EnablePedSpeech();
     void DisablePedSpeech(bool bStopCurrent);
 
     static short GetVoiceTypeIDFromName(const char* szVoiceTypeName);
@@ -90,5 +89,3 @@ public:
     static const char* GetVoiceTypeNameFromID(short sVoiceTypeID);
     static const char* GetVoiceNameFromID(short sVoiceTypeID, short sVoiceID);
 };
-
-#endif

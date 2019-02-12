@@ -72,7 +72,7 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions(CGame* pGame)
     m_pCustomWeaponManager = pGame->GetCustomWeaponManager();
 }
 
-CStaticFunctionDefinitions::~CStaticFunctionDefinitions(void)
+CStaticFunctionDefinitions::~CStaticFunctionDefinitions()
 {
 }
 
@@ -190,7 +190,7 @@ const char* CStaticFunctionDefinitions::GetCancelReason()
     return m_pEvents->GetLastError();
 }
 
-bool CStaticFunctionDefinitions::WasEventCancelled(void)
+bool CStaticFunctionDefinitions::WasEventCancelled()
 {
     return m_pEvents->WasEventCancelled();
 }
@@ -287,10 +287,6 @@ bool CStaticFunctionDefinitions::DestroyElement(CElement* pElement)
 
 CElement* CStaticFunctionDefinitions::CloneElement(CResource* pResource, CElement* pElement, const CVector& vecPosition, bool bCloneChildren)
 {
-    // TODO: Element types should be able to copy themselves... Some virtual copy constructor
-    //       or something so it can be done at CElement level so we can be type independant.
-    //       This code is ugly and does not support every option/element atm and won't in the future.
-
     // TODO: per-player entity stuff ( visibility )
     assert(pElement);
 
@@ -311,191 +307,27 @@ CElement* CStaticFunctionDefinitions::CloneElement(CResource* pResource, CElemen
         }
     }
 
+    // Can't clone the root
+    if (pElement == m_pMapManager->GetRootElement())
+    {
+        return nullptr;
+    }
+
     CElement* pParent = pElement->GetParentEntity();
-    if (pParent)
+    if (pParent && !pParent->IsCloneable())
     {
-        int iParentType = pParent->GetType();
-        switch (iParentType)
-        {
-            case CElement::DUMMY:
-            case CElement::VEHICLE:
-            case CElement::OBJECT:
-            case CElement::MARKER:
-            case CElement::BLIP:
-            case CElement::PICKUP:
-            case CElement::RADAR_AREA:
-            case CElement::PATH_NODE_UNUSED:
-                break;
-            default:
-                return NULL;
-        }
+        return nullptr;
     }
 
-    int       iType = pElement->GetType();
-    CVector   vecClonedPosition = pElement->GetPosition();
-    CElement* pNewElement = NULL;
     bool      bAddEntity = true;
-    switch (iType)
-    {
-        case CElement::DUMMY:
-        {
-            // Can't clone the root
-            if (pElement != m_pMapManager->GetRootElement())
-            {
-                CDummy* pDummy = static_cast<CDummy*>(pElement);
-
-                pNewElement = new CDummy(g_pGame->GetGroups(), pElement->GetParentEntity());
-                pNewElement->SetName(pDummy->GetName());
-                pNewElement->SetTypeName(pDummy->GetTypeName());
-            }
-            break;
-        }
-
-        case CElement::VEHICLE:
-        {
-            CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
-
-            CVehicle* pTemp = m_pVehicleManager->Create(pVehicle->GetModel(), pVehicle->GetVariant(), pVehicle->GetVariant2(), pElement->GetParentEntity());
-            if (pTemp)
-            {
-                CVector vecRotationDegrees;
-                pVehicle->GetRotationDegrees(vecRotationDegrees);
-                pTemp->SetRotationDegrees(vecRotationDegrees);
-
-                pTemp->SetHealth(pVehicle->GetHealth());
-                pTemp->SetColor(pVehicle->GetColor());
-                pTemp->SetUpgrades(pVehicle->GetUpgrades());
-                pTemp->m_ucDoorStates = pVehicle->m_ucDoorStates;
-                pTemp->m_ucWheelStates = pVehicle->m_ucWheelStates;
-                pTemp->m_ucPanelStates = pVehicle->m_ucPanelStates;
-                pTemp->m_ucLightStates = pVehicle->m_ucLightStates;
-
-                pNewElement = pTemp;
-            }
-            break;
-        }
-
-        case CElement::OBJECT:
-        {
-            CObject* pObject = static_cast<CObject*>(pElement);
-
-            CObject* pTemp = m_pObjectManager->Create(pElement->GetParentEntity(), NULL, pObject->IsLowLod());
-            if (pTemp)
-            {
-                CVector vecRotation;
-                pObject->GetRotation(vecRotation);
-                pTemp->SetRotation(vecRotation);
-                pTemp->SetModel(pObject->GetModel());
-                pTemp->SetParentObject(pObject->GetParentEntity());
-                pTemp->SetLowLodObject(pObject->GetLowLodObject());
-
-                pNewElement = pTemp;
-            }
-            break;
-        }
-
-        case CElement::MARKER:
-        {
-            CMarker* pMarker = static_cast<CMarker*>(pElement);
-
-            CMarker* pTemp = m_pMarkerManager->Create(pElement->GetParentEntity());
-            if (pTemp)
-            {
-                pTemp->SetMarkerType(pMarker->GetMarkerType());
-                pTemp->SetColor(pMarker->GetColor());
-                pTemp->SetSize(pMarker->GetSize());
-
-                if (pResource->HasStarted())
-                    pTemp->Sync(true);
-                bAddEntity = false;
-
-                pNewElement = pTemp;
-            }
-            break;
-        }
-
-        case CElement::BLIP:
-        {
-            CBlip* pBlip = static_cast<CBlip*>(pElement);
-
-            CBlip* pTemp = m_pBlipManager->Create(pElement->GetParentEntity());
-            if (pTemp)
-            {
-                pTemp->m_ucIcon = pBlip->m_ucIcon;
-                pTemp->m_ucSize = pBlip->m_ucSize;
-                pTemp->SetColor(pBlip->GetColor());
-
-                if (pResource->HasStarted())
-                    pTemp->Sync(true);
-                bAddEntity = false;
-
-                pNewElement = pTemp;
-            }
-            break;
-        }
-
-        case CElement::PICKUP:
-        {
-            CPickup* pPickup = static_cast<CPickup*>(pElement);
-
-            CPickup* pTemp = m_pPickupManager->Create(pElement->GetParentEntity());
-            if (pTemp)
-            {
-                pTemp->SetPickupType(pPickup->GetPickupType());
-                pTemp->SetPickupType(pPickup->GetPickupType());
-                pTemp->SetModel(pPickup->GetModel());
-                pTemp->SetWeaponType(pPickup->GetWeaponType());
-                pTemp->SetAmmo(pPickup->GetAmmo());
-                pTemp->SetRespawnIntervals(pPickup->GetRespawnIntervals());
-
-                pNewElement = pTemp;
-            }
-            break;
-        }
-
-        case CElement::RADAR_AREA:
-        {
-            CRadarArea* pRadarArea = static_cast<CRadarArea*>(pElement);
-
-            CRadarArea* pTemp = m_pRadarAreaManager->Create(pElement->GetParentEntity(), NULL);
-            if (pTemp)
-            {
-                pTemp->SetSize(pRadarArea->GetSize());
-                pTemp->SetColor(pRadarArea->GetColor());
-
-                if (pResource->HasStarted())
-                    pTemp->Sync(true);
-                bAddEntity = false;
-
-                pNewElement = pTemp;
-            }
-            break;
-        }
-        case CElement::PED:
-        {
-            CPed* pPed = static_cast<CPed*>(pElement);
-
-            CPed* pTemp = m_pPedManager->Create(pPed->GetModel(), pElement->GetParentEntity(), NULL);
-            if (pTemp)
-            {
-                pTemp->SetPosition(pPed->GetPosition());
-                pTemp->SetRotation(pPed->GetRotation());
-                pTemp->SetHealth(pPed->GetHealth());
-                pTemp->SetArmor(pPed->GetArmor());
-                pTemp->SetSyncable(pTemp->IsSyncable());
-
-                pNewElement = pTemp;
-            }
-            break;
-        }
-    }
+    CElement* pNewElement = pElement->Clone(&bAddEntity, pResource);
 
     if (pNewElement)
     {
         CVector vecNewPosition = vecPosition;
         // If we're cloning children, use the given position as an offset
         if (bCloneChildren)
-            vecNewPosition += vecClonedPosition;
+            vecNewPosition += pElement->GetPosition();
 
         pNewElement->SetPosition(vecNewPosition);
         pNewElement->GetCustomDataPointer()->Copy(pElement->GetCustomDataPointer());
@@ -2153,7 +1985,7 @@ CPed* CStaticFunctionDefinitions::CreatePed(CResource* pResource, unsigned short
     return NULL;
 }
 
-unsigned int CStaticFunctionDefinitions::GetPlayerCount(void)
+unsigned int CStaticFunctionDefinitions::GetPlayerCount()
 {
     return m_pPlayerManager->CountJoined();
 }
@@ -2895,7 +2727,7 @@ bool CStaticFunctionDefinitions::GetPlayerSourceIP(CPlayer* pPlayer, SString& st
     return true;
 }
 
-CPlayer* CStaticFunctionDefinitions::GetRandomPlayer(void)
+CPlayer* CStaticFunctionDefinitions::GetRandomPlayer()
 {
     unsigned int uiJoinedCount = m_pPlayerManager->CountJoined();
     if (uiJoinedCount > 0)
@@ -3446,6 +3278,9 @@ bool CStaticFunctionDefinitions::RedirectPlayer(CElement* pElement, const char* 
     if (IS_PLAYER(pElement))
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
+
+        if (pPlayer->IsLeavingServer())
+            return false;
 
         unsigned char ucHostLength = static_cast<unsigned char>(strlen(szHost));
 
@@ -4282,11 +4117,11 @@ bool CStaticFunctionDefinitions::SetPedDoingGangDriveby(CElement* pElement, bool
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const char* szBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop,
+bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SString& blockName, const SString& animName, int iTime, int iBlend, bool bLoop,
                                                  bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame)
 {
     assert(pElement);
-    RUN_CHILDREN(SetPedAnimation(*iter, szBlockName, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame))
+    RUN_CHILDREN(SetPedAnimation(*iter, blockName, animName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame))
 
     if (IS_PED(pElement))
     {
@@ -4305,15 +4140,10 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const char*
 
             // Tell the players
             CBitStream BitStream;
-            if (szBlockName && szAnimName)
+            if (!blockName.empty() && !animName.empty())
             {
-                unsigned char ucBlockSize = (unsigned char)strlen(szBlockName);
-                unsigned char ucAnimSize = (unsigned char)strlen(szAnimName);
-
-                BitStream.pBitStream->Write(ucBlockSize);
-                BitStream.pBitStream->Write(szBlockName, ucBlockSize);
-                BitStream.pBitStream->Write(ucAnimSize);
-                BitStream.pBitStream->Write(szAnimName, ucAnimSize);
+                BitStream.pBitStream->WriteString<unsigned char>(blockName);
+                BitStream.pBitStream->WriteString<unsigned char>(animName);
                 BitStream.pBitStream->Write(iTime);
                 BitStream.pBitStream->WriteBit(bLoop);
                 BitStream.pBitStream->WriteBit(bUpdatePosition);
@@ -4334,10 +4164,10 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const char*
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, const char* szAnimName, float fProgress)
+bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, const SString& animName, float fProgress)
 {
     assert(pElement);
-    RUN_CHILDREN(SetPedAnimationProgress(*iter, szAnimName, fProgress))
+    RUN_CHILDREN(SetPedAnimationProgress(*iter, animName, fProgress))
 
     if (IS_PED(pElement))
     {
@@ -4345,12 +4175,9 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, con
         if (pPed->IsSpawned())
         {
             CBitStream BitStream;
-            if (szAnimName)
+            if (!animName.empty())
             {
-                unsigned char ucAnimSize = (unsigned char)strlen(szAnimName);
-
-                BitStream.pBitStream->Write(ucAnimSize);
-                BitStream.pBitStream->Write(szAnimName, ucAnimSize);
+                BitStream.pBitStream->WriteString<unsigned char>(animName);
                 BitStream.pBitStream->Write(fProgress);
             }
             else
@@ -4359,6 +4186,28 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, con
                 BitStream.pBitStream->Write((unsigned char)0);
             }
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION_PROGRESS, *BitStream.pBitStream));
+
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CElement* pElement, const SString& animName, float fSpeed)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetPedAnimationSpeed(*iter, animName, fSpeed))
+
+    if (IS_PED(pElement))
+    {
+        CPed* pPed = static_cast<CPed*>(pElement);
+        if (pPed->IsSpawned() && !animName.empty())
+        {
+            CBitStream BitStream;
+            BitStream.pBitStream->WriteString<unsigned char>(animName);
+            BitStream.pBitStream->Write(fSpeed);
+
+            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION_SPEED, *BitStream.pBitStream));
 
             return true;
         }
@@ -4812,38 +4661,37 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsign
 {
     unsigned char ucVariation = ucVariant;
     unsigned char ucVariation2 = ucVariant2;
+
     if (ucVariant == 254 && ucVariant2 == 254)
         CVehicleManager::GetRandomVariation(usModel, ucVariation, ucVariation2);
 
     if (CVehicleManager::IsValidModel(usModel) && (ucVariation <= 5 || ucVariation == 255) && (ucVariation2 <= 5 || ucVariation2 == 255))
     {
-        // CVehicle* pVehicle = m_pVehicleManager->Create ( usModel, m_pMapManager->GetRootElement () );
-        CVehicle* pVehicle = m_pVehicleManager->Create(usModel, ucVariation, ucVariation2, pResource->GetDynamicElementRoot());
-        if (pVehicle)
+        CVehicle* const pVehicle = m_pVehicleManager->Create(pResource->GetDynamicElementRoot(), usModel, ucVariation, ucVariation2);
+
+        if (!pVehicle)
+            return nullptr;
+
+        pVehicle->SetPosition(vecPosition);
+        pVehicle->SetRotationDegrees(vecRotation);
+        pVehicle->SetRespawnPosition(vecPosition);
+        pVehicle->SetRespawnRotationDegrees(vecRotation);
+
+        if (szRegPlate && szRegPlate[0])
+            pVehicle->SetRegPlate(szRegPlate);
+
+        // Only sync if the resource has fully started
+        if (pResource->HasStarted())
         {
-            pVehicle->SetPosition(vecPosition);
-            pVehicle->SetRotationDegrees(vecRotation);
-
-            pVehicle->SetRespawnPosition(vecPosition);
-            pVehicle->SetRespawnRotationDegrees(vecRotation);
-
-            if (szRegPlate && szRegPlate[0])
-            {
-                pVehicle->SetRegPlate(szRegPlate);
-            }
-
-            // Only sync if the resource has fully started
-            if (pResource->HasStarted())
-            {
-                CEntityAddPacket Packet;
-                Packet.Add(pVehicle);
-                m_pPlayerManager->BroadcastOnlyJoined(Packet);
-            }
-            return pVehicle;
+            CEntityAddPacket Packet;
+            Packet.Add(pVehicle);
+            m_pPlayerManager->BroadcastOnlyJoined(Packet);
         }
+
+        return pVehicle;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool CStaticFunctionDefinitions::SetVehicleVariant(CVehicle* pVehicle, unsigned char ucVariant, unsigned char ucVariant2)
@@ -6786,17 +6634,31 @@ bool CStaticFunctionDefinitions::GetVehicleRespawnPosition(CElement* pElement, C
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleRespawnPosition(CElement* pElement, const CVector& vecPosition, const CVector& vecRotation)
+bool CStaticFunctionDefinitions::SetVehicleRespawnRotation(CElement* pElement, const CVector& vecRotation)
 {
     assert(pElement);
-    RUN_CHILDREN(SetVehicleRespawnPosition(*iter, vecPosition, vecRotation))
+    RUN_CHILDREN(SetVehicleRespawnRotation(*iter, vecRotation))
 
     if (IS_VEHICLE(pElement))
     {
         CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
-
-        pVehicle->SetRespawnPosition(vecPosition);
         pVehicle->SetRespawnRotationDegrees(vecRotation);
+
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleRespawnPosition(CElement* pElement, const CVector& vecPosition)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetVehicleRespawnPosition(*iter, vecPosition))
+
+    if (IS_VEHICLE(pElement))
+    {
+        CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+        pVehicle->SetRespawnPosition(vecPosition);
 
         return true;
     }
@@ -8056,29 +7918,27 @@ bool CStaticFunctionDefinitions::SetBlipVisibleDistance(CElement* pElement, unsi
 CObject* CStaticFunctionDefinitions::CreateObject(CResource* pResource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation,
                                                   bool bIsLowLod)
 {
-    // CObject* pObject = m_pObjectManager->Create ( m_pMapManager->GetRootElement () );
-    CObject* pObject = m_pObjectManager->Create(pResource->GetDynamicElementRoot(), NULL, bIsLowLod);
-    if (pObject)
+    CObject* const pObject = m_pObjectManager->Create(pResource->GetDynamicElementRoot(), bIsLowLod);
+
+    if (!pObject)
+        return nullptr;
+
+    // Convert the rotation from degrees to radians managed internally
+    CVector vecRadians = vecRotation;
+    ConvertDegreesToRadians(vecRadians);
+
+    pObject->SetPosition(vecPosition);
+    pObject->SetRotation(vecRadians);
+    pObject->SetModel(usModelID);
+
+    if (pResource->HasStarted())
     {
-        // Convert the rotation from degrees to radians managed internally
-        CVector vecRadians = vecRotation;
-        ConvertDegreesToRadians(vecRadians);
-
-        pObject->SetPosition(vecPosition);
-        pObject->SetRotation(vecRadians);
-        pObject->SetModel(usModelID);
-
-        if (pResource->HasStarted())
-        {
-            CEntityAddPacket Packet;
-            Packet.Add(pObject);
-            m_pPlayerManager->BroadcastOnlyJoined(Packet);
-        }
-
-        return pObject;
+        CEntityAddPacket Packet;
+        Packet.Add(pObject);
+        m_pPlayerManager->BroadcastOnlyJoined(Packet);
     }
 
-    return NULL;
+    return pObject;
 }
 
 bool CStaticFunctionDefinitions::GetObjectRotation(CObject* pObject, CVector& vecRotation)
@@ -8253,31 +8113,29 @@ bool CStaticFunctionDefinitions::IsObjectVisibleInAllDimensions(CElement* pEleme
 CRadarArea* CStaticFunctionDefinitions::CreateRadarArea(CResource* pResource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color,
                                                         CElement* pVisibleTo)
 {
-    // Create it
-    // CRadarArea* pRadarArea = m_pRadarAreaManager->Create ( m_pMapManager->GetRootElement (), NULL );
-    CRadarArea* pRadarArea = m_pRadarAreaManager->Create(pResource->GetDynamicElementRoot(), NULL);
-    if (pRadarArea)
+    CRadarArea* const pRadarArea = m_pRadarAreaManager->Create(pResource->GetDynamicElementRoot());
+
+    if (!pRadarArea)
+        return nullptr;
+
+    // Set the properties
+    CVector vecPosition = CVector(vecPosition2D.fX, vecPosition2D.fY, 0.0f);
+    pRadarArea->SetPosition(vecPosition);
+    pRadarArea->SetSize(vecSize);
+    pRadarArea->SetColor(color);
+
+    // Make him visible to the root
+    if (pVisibleTo)
     {
-        // Set the properties
-        CVector vecPosition = CVector(vecPosition2D.fX, vecPosition2D.fY, 0.0f);
-        pRadarArea->SetPosition(vecPosition);
-        pRadarArea->SetSize(vecSize);
-        pRadarArea->SetColor(color);
-
-        // Make him visible to the root
-        if (pVisibleTo)
-        {
-            pRadarArea->RemoveVisibleToReference(m_pMapManager->GetRootElement());
-            pRadarArea->AddVisibleToReference(pVisibleTo);
-        }
-
-        // Tell all the players
-        if (pResource->HasStarted())
-            pRadarArea->Sync(true);
-        return pRadarArea;
+        pRadarArea->RemoveVisibleToReference(m_pMapManager->GetRootElement());
+        pRadarArea->AddVisibleToReference(pVisibleTo);
     }
 
-    return NULL;
+    // Tell all the players
+    if (pResource->HasStarted())
+        pRadarArea->Sync(true);
+
+    return pRadarArea;
 }
 
 bool CStaticFunctionDefinitions::GetRadarAreaSize(CRadarArea* pRadarArea, CVector2D& vecSize)
@@ -9034,13 +8892,11 @@ CTeam* CStaticFunctionDefinitions::CreateTeam(CResource* pResource, const char* 
     assert(szTeamName);
 
     // If it already exists, do nothing
-    CTeam* pTeam = m_pTeamManager->GetTeam(szTeamName);
-    if (pTeam)
-        return NULL;
+    if (m_pTeamManager->GetTeam(szTeamName))
+        return nullptr;
 
     // Create the new team
-    // pTeam = new CTeam ( m_pTeamManager, m_pMapManager->GetRootElement (), NULL, szTeamName, ucRed, ucGreen, ucBlue );
-    pTeam = new CTeam(m_pTeamManager, pResource->GetDynamicElementRoot(), NULL, szTeamName, ucRed, ucGreen, ucBlue);
+    CTeam* const pTeam = new CTeam(m_pTeamManager, pResource->GetDynamicElementRoot(), szTeamName, ucRed, ucGreen, ucBlue);
 
     // Tell everyone to add this team
     if (pResource->HasStarted())
@@ -9184,35 +9040,34 @@ bool CStaticFunctionDefinitions::SetTeamFriendlyFire(CTeam* pTeam, bool bFriendl
 CWater* CStaticFunctionDefinitions::CreateWater(CResource* pResource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow)
 {
     if (!pV1 || !pV2 || !pV3)
-        return NULL;
+        return nullptr;
 
-    CWater* pWater = m_pWaterManager->Create(pV4 ? CWater::QUAD : CWater::TRIANGLE, pResource->GetDynamicElementRoot(), NULL, bShallow);
+    CWater* const pWater = m_pWaterManager->Create(pV4 ? CWater::QUAD : CWater::TRIANGLE, pResource->GetDynamicElementRoot(), bShallow);
 
-    if (pWater)
+    if (!pWater)
+        return nullptr;
+
+    pWater->SetVertex(0, *pV1);
+    pWater->SetVertex(1, *pV2);
+    pWater->SetVertex(2, *pV3);
+
+    if (pWater->GetWaterType() == CWater::QUAD)
+        pWater->SetVertex(3, *pV4);
+
+    if (!pWater->Valid())
     {
-        pWater->SetVertex(0, *pV1);
-        pWater->SetVertex(1, *pV2);
-        pWater->SetVertex(2, *pV3);
-        if (pWater->GetWaterType() == CWater::QUAD)
-            pWater->SetVertex(3, *pV4);
-
-        if (!pWater->Valid())
-        {
-            delete pWater;
-            return NULL;
-        }
-
-        if (pResource->HasStarted())
-        {
-            CEntityAddPacket Packet;
-            Packet.Add(pWater);
-            m_pPlayerManager->BroadcastOnlyJoined(Packet);
-        }
-
-        return pWater;
+        delete pWater;
+        return nullptr;
     }
 
-    return NULL;
+    if (pResource->HasStarted())
+    {
+        CEntityAddPacket Packet;
+        Packet.Add(pWater);
+        m_pPlayerManager->BroadcastOnlyJoined(Packet);
+    }
+
+    return pWater;
 }
 
 bool CStaticFunctionDefinitions::SetElementWaterLevel(CWater* pWater, float fLevel)
@@ -9247,7 +9102,7 @@ bool CStaticFunctionDefinitions::SetWorldWaterLevel(float fLevel, bool bIncludeW
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetWorldWaterLevel(void)
+bool CStaticFunctionDefinitions::ResetWorldWaterLevel()
 {
     CBitStream BitStream;
     g_pGame->GetWaterManager()->ResetWorldWaterLevel();
@@ -9329,8 +9184,7 @@ bool CStaticFunctionDefinitions::ResetWaterColor()
 
 CColCircle* CStaticFunctionDefinitions::CreateColCircle(CResource* pResource, const CVector2D& vecPosition, float fRadius)
 {
-    // CColCircle * pColShape = new CColCircle ( m_pColManager, m_pMapManager->GetRootElement (), vecPosition, fRadius );
-    CColCircle* pColShape = new CColCircle(m_pColManager, pResource->GetDynamicElementRoot(), vecPosition, fRadius);
+    CColCircle* const pColShape = new CColCircle(m_pColManager, pResource->GetDynamicElementRoot(), vecPosition, fRadius);
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement();
@@ -9488,7 +9342,7 @@ bool CStaticFunctionDefinitions::GetWeaponIDFromName(const char* szName, unsigne
 
 CCustomWeapon* CStaticFunctionDefinitions::CreateWeapon(CResource* pResource, eWeaponType weaponType, CVector vecPosition)
 {
-    CCustomWeapon* pWeapon = new CCustomWeapon(pResource->GetDynamicElementRoot(), NULL, m_pObjectManager, m_pCustomWeaponManager, weaponType);
+    CCustomWeapon* const pWeapon = new CCustomWeapon(pResource->GetDynamicElementRoot(), m_pObjectManager, m_pCustomWeaponManager, weaponType);
     pWeapon->SetPosition(vecPosition);
 
     if (pResource->HasStarted())
@@ -9497,6 +9351,7 @@ CCustomWeapon* CStaticFunctionDefinitions::CreateWeapon(CResource* pResource, eW
         Packet.Add(pWeapon);
         m_pPlayerManager->BroadcastOnlyJoined(Packet);
     }
+
     return pWeapon;
 }
 
@@ -9917,7 +9772,7 @@ bool CStaticFunctionDefinitions::GetClothesTypeName(unsigned char ucType, char* 
     return false;
 }
 
-unsigned int CStaticFunctionDefinitions::GetMaxPlayers(void)
+unsigned int CStaticFunctionDefinitions::GetMaxPlayers()
 {
     return m_pMainConfig->GetMaxPlayers();
 }
@@ -10491,7 +10346,7 @@ bool CStaticFunctionDefinitions::RestoreWorldModel(unsigned short usModel, float
     return true;
 }
 
-bool CStaticFunctionDefinitions::RestoreAllWorldModels(void)
+bool CStaticFunctionDefinitions::RestoreAllWorldModels()
 {
     g_pGame->GetBuildingRemovalManager()->ClearBuildingRemovals();
     CBitStream BitStream;
@@ -10500,7 +10355,7 @@ bool CStaticFunctionDefinitions::RestoreAllWorldModels(void)
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetMoonSize(void)
+bool CStaticFunctionDefinitions::ResetMoonSize()
 {
     CBitStream BitStream;
     g_pGame->SetHasMoonSize(false);
@@ -10708,7 +10563,7 @@ bool CStaticFunctionDefinitions::SetSkyGradient(unsigned char ucTopRed, unsigned
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetSkyGradient(void)
+bool CStaticFunctionDefinitions::ResetSkyGradient()
 {
     g_pGame->SetHasSkyGradient(false);
 
@@ -10739,7 +10594,7 @@ bool CStaticFunctionDefinitions::SetHeatHaze(const SHeatHazeSettings& settings)
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetHeatHaze(void)
+bool CStaticFunctionDefinitions::ResetHeatHaze()
 {
     g_pGame->SetHasHeatHaze(false);
 
@@ -10807,12 +10662,12 @@ bool CStaticFunctionDefinitions::SetCloudsEnabled(bool bEnabled)
     g_pGame->SetCloudsEnabled(bEnabled);
     return true;
 }
-bool CStaticFunctionDefinitions::GetCloudsEnabled(void)
+bool CStaticFunctionDefinitions::GetCloudsEnabled()
 {
     return g_pGame->GetCloudsEnabled();
 }
 
-CElement* CStaticFunctionDefinitions::GetRootElement(void)
+CElement* CStaticFunctionDefinitions::GetRootElement()
 {
     return m_pMapManager->GetRootElement();
 }
@@ -10972,7 +10827,7 @@ bool CStaticFunctionDefinitions::ExecuteSQLQuery(const std::string& strQuery, CL
     return m_pRegistry->Query(strQuery, pArgs, pResult);
 }
 
-const std::string& CStaticFunctionDefinitions::SQLGetLastError(void)
+const std::string& CStaticFunctionDefinitions::SQLGetLastError()
 {
     return m_pRegistry->GetLastError();
 }
@@ -11118,11 +10973,11 @@ CAccount* CStaticFunctionDefinitions::AddAccount(const SString& strName, const S
     return NULL;
 }
 
-CAccount* CStaticFunctionDefinitions::GetAccount(const char* szName, const char* szPassword)
+CAccount* CStaticFunctionDefinitions::GetAccount(const char* szName, const char* szPassword, bool bCaseSensitive)
 {
     assert(szName);
 
-    CAccount* pCurrentAccount = m_pAccountManager->Get(szName);
+    CAccount* pCurrentAccount = m_pAccountManager->Get(szName, szPassword, bCaseSensitive);
     if (pCurrentAccount && (!szPassword || pCurrentAccount->IsPassword(szPassword)))
         return pCurrentAccount;
     else
@@ -11258,6 +11113,9 @@ bool CStaticFunctionDefinitions::KickPlayer(CPlayer* pPlayer, SString strRespons
     // Make sure we have a player
     assert(pPlayer);
 
+    if (pPlayer->IsLeavingServer())
+        return false;
+
     // If our responsible string is too long, crop it to size and display ... in the end so it's obvious it's cropped
     if (strResponsible.length() > MAX_KICK_RESPONSIBLE_LENGTH)
         strResponsible = strResponsible.substr(0, MAX_KICK_RESPONSIBLE_LENGTH - 3) + "...";
@@ -11376,19 +11234,29 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pPlayer, bool bIP, bool bUs
         // Call the event
         CLuaArguments Arguments;
         Arguments.PushBan(pBan);
+        
         if (pResponsible)
             Arguments.PushElement(pResponsible);
+
+        // A script can call kickPlayer in the onPlayerBan event, which would
+        // show him the 'kicked' message instead of our 'banned' message.
+        const bool bLeavingServer = pPlayer->IsLeavingServer();
+        pPlayer->SetLeavingServer(true);
         pPlayer->CallEvent("onPlayerBan", Arguments);
+        pPlayer->SetLeavingServer(bLeavingServer);
 
         // Check if script removed the ban
         if (pBan->IsBeingDeleted())
             return NULL;
 
         // Tell the player that was banned why. QuitPlayer will delete the player.
-        time_t                    Duration = pBan->GetBanTimeRemaining();
-        CPlayerDisconnectedPacket Packet(CPlayerDisconnectedPacket::BAN, Duration, strMessage.c_str());
-        pPlayer->Send(Packet);
-        g_pGame->QuitPlayer(*pPlayer, CClient::QUIT_BAN, false, strReason.c_str(), strResponsible.c_str());
+        if (!pPlayer->IsLeavingServer())
+        {
+            time_t                    Duration = pBan->GetBanTimeRemaining();
+            CPlayerDisconnectedPacket Packet(CPlayerDisconnectedPacket::BAN, Duration, strMessage.c_str());
+            pPlayer->Send(Packet);
+            g_pGame->QuitPlayer(*pPlayer, CClient::QUIT_BAN, false, strReason.c_str(), strResponsible.c_str());
+        }
 
         // Tell everyone else that he was banned from the game including console
         CLogger::LogPrintf("BAN: %s\n", strInfoMessage.c_str());
@@ -11501,26 +11369,28 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
         list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
         for (; iter != m_pPlayerManager->IterEnd(); iter++)
         {
+            CPlayer* const pPlayer = *iter;
+
             // Default to not banning; if the IP, serial and username don't match, we don't want to kick the guy out
             bool bBan = false;
 
             // Check if the player's IP matches the specified one, if specified
             if (bIPSpecified)
             {
-                bBan = (strIP == (*iter)->GetSourceIP());
+                bBan = (strIP == pPlayer->GetSourceIP());
             }
 
             // Check if the player's username matches the specified one, if specified, and he wasn't banned over IP yet
             if (!bBan && bUsernameSpecified)
             {
-                const std::string& strPlayerUsername = (*iter)->GetSerialUser();
+                const std::string& strPlayerUsername = pPlayer->GetSerialUser();
                 bBan = stricmp(strPlayerUsername.c_str(), strUsername.c_str()) == 0;
             }
 
             // Check if the player's serial matches the specified one, if specified, and he wasn't banned over IP or username yet
             if (!bBan && bSerialSpecified)
             {
-                const std::string& strPlayerSerial = (*iter)->GetSerial();
+                const std::string& strPlayerSerial = pPlayer->GetSerial();
                 bBan = stricmp(strPlayerSerial.c_str(), strSerial.c_str()) == 0;
             }
 
@@ -11530,26 +11400,36 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
                 // Set the nick of the ban if this hasn't been done yet
                 if (!bNickSet)
                 {
-                    pBan->SetNick((*iter)->GetNick());
+                    pBan->SetNick(pPlayer->GetNick());
                     bNickSet = true;
                 }
 
                 // Call the event
                 CLuaArguments Arguments;
                 Arguments.PushBan(pBan);
+                
                 if (pResponsible)
                     Arguments.PushElement(pResponsible);
-                (*iter)->CallEvent("onPlayerBan", Arguments);
+                
+                // A script can call kickPlayer in the onPlayerBan event, which would
+                // show him the 'kicked' message instead of our 'banned' message.
+                const bool bLeavingServer = pPlayer->IsLeavingServer();
+                pPlayer->SetLeavingServer(true);
+                pPlayer->CallEvent("onPlayerBan", Arguments);
+                pPlayer->SetLeavingServer(bLeavingServer);
 
                 // Check if script removed the ban
                 if (pBan->IsBeingDeleted())
                     return NULL;
 
                 // Tell the player that was banned why. QuitPlayer will delete the player.
-                time_t                    Duration = pBan->GetBanTimeRemaining();
-                CPlayerDisconnectedPacket Packet(CPlayerDisconnectedPacket::BAN, Duration, strMessage.c_str());
-                (*iter)->Send(Packet);
-                g_pGame->QuitPlayer(**iter, CClient::QUIT_BAN, false, strReason.c_str(), strResponsible.c_str());
+                if (!pPlayer->IsLeavingServer())
+                {
+                    time_t                    Duration = pBan->GetBanTimeRemaining();
+                    CPlayerDisconnectedPacket Packet(CPlayerDisconnectedPacket::BAN, Duration, strMessage.c_str());
+                    pPlayer->Send(Packet);
+                    g_pGame->QuitPlayer(**iter, CClient::QUIT_BAN, false, strReason.c_str(), strResponsible.c_str());
+                }
             }
         }
 
@@ -11595,7 +11475,7 @@ bool CStaticFunctionDefinitions::GetBans(lua_State* pLua)
     return true;
 }
 
-bool CStaticFunctionDefinitions::ReloadBanList(void)
+bool CStaticFunctionDefinitions::ReloadBanList()
 {
     return m_pBanManager->ReloadBanList();
 }

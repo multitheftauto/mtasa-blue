@@ -29,11 +29,11 @@ class CRegisteredCommands
 
 public:
     CRegisteredCommands(class CAccessControlListManager* pACLManager);
-    ~CRegisteredCommands(void);
+    ~CRegisteredCommands();
 
     bool AddCommand(class CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction, bool bRestricted, bool bCaseSensitive);
     bool RemoveCommand(class CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef());
-    void ClearCommands(void);
+    void ClearCommands();
     void CleanUpForVM(class CLuaMain* pLuaMain);
 
     bool CommandExists(const char* szKey, class CLuaMain* pLuaMain = NULL);
@@ -47,7 +47,7 @@ private:
     SCommand* GetCommand(const char* szKey, class CLuaMain* pLuaMain = NULL);
     void CallCommandHandler(class CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, const char* szKey, const char* szArguments, class CClient* pClient);
 
-    void TakeOutTheTrash(void);
+    void TakeOutTheTrash();
 
     list<SCommand*> m_Commands;
     list<SCommand*> m_TrashCan;

@@ -133,7 +133,7 @@ void CLuaCFunctions::RegisterFunctionsWithVM(lua_State* luaVM)
     }
 }
 
-void CLuaCFunctions::RemoveAllFunctions(void)
+void CLuaCFunctions::RemoveAllFunctions()
 {
     // Delete all functions
     std::vector<CLuaCFunction*>::const_iterator iter = m_sFunctions.begin();

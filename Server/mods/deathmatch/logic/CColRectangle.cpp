@@ -11,8 +11,7 @@
 
 #include "StdInc.h"
 
-CColRectangle::CColRectangle(CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, const CVector2D& vecSize, CXMLNode* pNode)
-    : CColShape(pManager, pParent, pNode)
+CColRectangle::CColRectangle(CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, const CVector2D& vecSize) : CColShape(pManager, pParent)
 {
     m_vecPosition.fX = vecPosition.fX;
     m_vecPosition.fY = vecPosition.fY;
@@ -31,7 +30,7 @@ bool CColRectangle::DoHitDetection(const CVector& vecNowPosition)
             vecNowPosition.fY <= m_vecPosition.fY + m_vecSize.fY);
 }
 
-bool CColRectangle::ReadSpecialData(void)
+bool CColRectangle::ReadSpecialData(const int iLine)
 {
     int iTemp;
     if (GetCustomDataInt("dimension", iTemp, true))
@@ -47,7 +46,7 @@ bool CColRectangle::ReadSpecialData(void)
     return true;
 }
 
-CSphere CColRectangle::GetWorldBoundingSphere(void)
+CSphere CColRectangle::GetWorldBoundingSphere()
 {
     CSphere sphere;
     sphere.vecPosition.fX = m_vecPosition.fX + m_vecSize.fX * 0.5f;

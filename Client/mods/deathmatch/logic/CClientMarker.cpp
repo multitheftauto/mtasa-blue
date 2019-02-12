@@ -37,7 +37,7 @@ CClientMarker::CClientMarker(CClientManager* pManager, ElementID ID, int iMarker
     UpdateSpatialData();
 }
 
-CClientMarker::~CClientMarker(void)
+CClientMarker::~CClientMarker()
 {
     // Unlink
     Unlink();
@@ -60,7 +60,7 @@ CClientMarker::~CClientMarker(void)
     }
 }
 
-void CClientMarker::Unlink(void)
+void CClientMarker::Unlink()
 {
     // Remove us from marker manager list
     m_pMarkerManager->RemoveFromList(this);
@@ -102,7 +102,7 @@ bool CClientMarker::SetMatrix(const CMatrix& matrix)
     return true;
 }
 
-void CClientMarker::DoPulse(void)
+void CClientMarker::DoPulse()
 {
     // Update our position/rotation if we're attached
     DoAttaching();
@@ -112,7 +112,7 @@ void CClientMarker::DoPulse(void)
         m_pMarker->DoPulse();
 }
 
-CClientMarker::eMarkerType CClientMarker::GetMarkerType(void) const
+CClientMarker::eMarkerType CClientMarker::GetMarkerType() const
 {
     // Grab the marker class type
     unsigned int uiMarkerType = m_pMarker->GetMarkerType();
@@ -209,7 +209,7 @@ void CClientMarker::SetMarkerType(CClientMarker::eMarkerType eType)
     }
 }
 
-CClient3DMarker* CClientMarker::Get3DMarker(void)
+CClient3DMarker* CClientMarker::Get3DMarker()
 {
     if (m_pMarker->GetMarkerType() == CClientMarkerCommon::CLASS_3DMARKER)
         return static_cast<CClient3DMarker*>(m_pMarker);
@@ -217,7 +217,7 @@ CClient3DMarker* CClientMarker::Get3DMarker(void)
     return NULL;
 }
 
-CClientCheckpoint* CClientMarker::GetCheckpoint(void)
+CClientCheckpoint* CClientMarker::GetCheckpoint()
 {
     if (m_pMarker->GetMarkerType() == CClientMarkerCommon::CLASS_CHECKPOINT)
         return static_cast<CClientCheckpoint*>(m_pMarker);
@@ -225,7 +225,7 @@ CClientCheckpoint* CClientMarker::GetCheckpoint(void)
     return NULL;
 }
 
-CClientCorona* CClientMarker::GetCorona(void)
+CClientCorona* CClientMarker::GetCorona()
 {
     if (m_pMarker->GetMarkerType() == CClientMarkerCommon::CLASS_CORONA)
         return static_cast<CClientCorona*>(m_pMarker);
@@ -243,7 +243,7 @@ bool CClientMarker::IsHit(CClientEntity* pEntity) const
     return m_pMarker->IsHit(pEntity);
 }
 
-bool CClientMarker::IsVisible(void) const
+bool CClientMarker::IsVisible() const
 {
     return m_pMarker->IsVisible();
 }
@@ -253,7 +253,7 @@ void CClientMarker::SetVisible(bool bVisible)
     m_pMarker->SetVisible(bVisible);
 }
 
-SColor CClientMarker::GetColor(void) const
+SColor CClientMarker::GetColor() const
 {
     return m_pMarker->GetColor();
 }
@@ -263,7 +263,7 @@ void CClientMarker::SetColor(const SColor color)
     m_pMarker->SetColor(color);
 }
 
-float CClientMarker::GetSize(void) const
+float CClientMarker::GetSize() const
 {
     return m_pMarker->GetSize();
 }
@@ -346,7 +346,7 @@ bool CClientMarker::TypeToString(unsigned int uiType, SString& strOutString)
     }
 }
 
-bool CClientMarker::IsLimitReached(void)
+bool CClientMarker::IsLimitReached()
 {
     return m_uiStreamedInMarkers >= 32;
 }
@@ -367,7 +367,7 @@ void CClientMarker::StreamIn(bool bInstantly)
     }
 }
 
-void CClientMarker::StreamOut(void)
+void CClientMarker::StreamOut()
 {
     // Streamed in?
     if (IsStreamedIn())
@@ -398,8 +398,8 @@ void CClientMarker::Callback_OnLeave(CClientColShape& Shape, CClientEntity& Enti
     {
         // Call the marker hit event
         CLuaArguments Arguments;
-        Arguments.PushElement(&Entity);                                                    // player that hit it
-        Arguments.PushBoolean((Shape.GetDimension() == Entity.GetDimension()));            // matching dimension?
+        Arguments.PushElement(&Entity);                                              // player that hit it
+        Arguments.PushBoolean((GetDimension() == Entity.GetDimension()));            // matching dimension?
         CallEvent("onClientMarkerLeave", Arguments, true);
     }
 }
@@ -470,7 +470,7 @@ void CClientMarker::CreateOfType(int iType)
     }
 }
 
-CSphere CClientMarker::GetWorldBoundingSphere(void)
+CSphere CClientMarker::GetWorldBoundingSphere()
 {
     CSphere sphere;
     GetPosition(sphere.vecPosition);

@@ -19,28 +19,28 @@ class CPerPlayerEntity : public CElement
     friend class CElement;
 
 public:
-    CPerPlayerEntity(CElement* pParent, CXMLNode* pNode = NULL);
-    ~CPerPlayerEntity(void);
+    CPerPlayerEntity(CElement* pParent);
+    ~CPerPlayerEntity();
 
-    bool IsEntity(void) { return true; }
-    bool IsPerPlayerEntity(void) { return true; };
+    bool IsEntity() { return true; }
+    bool IsPerPlayerEntity() { return true; };
 
     bool Sync(bool bSync);
-    bool IsSynced(void) { return m_bIsSynced; };
+    bool IsSynced() { return m_bIsSynced; };
     void SetIsSynced(bool bIsSynced) { m_bIsSynced = bIsSynced; };
 
     void OnReferencedSubtreeAdd(CElement* pElement);
     void OnReferencedSubtreeRemove(CElement* pElement);
-    void UpdatePerPlayer(void);
+    void UpdatePerPlayer();
 
     bool AddVisibleToReference(CElement* pElement);
     bool RemoveVisibleToReference(CElement* pElement);
-    void ClearVisibleToReferences(void);
+    void ClearVisibleToReferences();
     bool IsVisibleToReferenced(CElement* pElement);
 
     bool IsVisibleToPlayer(CPlayer& Player);
 
-    const std::set<CPlayer*>& GetPlayersList(void) { return m_Players; }
+    const std::set<CPlayer*>& GetPlayersList() { return m_Players; }
 
     static void StaticOnPlayerDelete(CPlayer* pPlayer);
     void        OnPlayerDelete(CPlayer* pPlayer);

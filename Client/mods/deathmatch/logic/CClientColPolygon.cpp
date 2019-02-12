@@ -54,15 +54,6 @@ bool CClientColPolygon::DoHitDetection(const CVector& vecNowPosition, float fRad
     return collides;
 }
 
-bool CClientColPolygon::ReadSpecialData(void)
-{
-    int iTemp;
-    if (GetCustomDataInt("dimension", iTemp, true))
-        m_usDimension = static_cast<unsigned short>(iTemp);
-
-    return true;
-}
-
 void CClientColPolygon::SetPosition(const CVector& vecPosition)
 {
     CVector vecDifference = m_vecPosition - vecPosition;
@@ -104,7 +95,7 @@ bool CClientColPolygon::IsInBounds(CVector vecPoint)
     return fDist <= m_fRadius;
 }
 
-CSphere CClientColPolygon::GetWorldBoundingSphere(void)
+CSphere CClientColPolygon::GetWorldBoundingSphere()
 {
     CSphere sphere;
     sphere.vecPosition.fX = m_vecPosition.fX;

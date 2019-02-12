@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_EXPLOSIONMANAGER
-#define __CGAMESA_EXPLOSIONMANAGER
+#pragma once
 
 #include <game/CExplosionManager.h>
 #include "CExplosionSA.h"
@@ -24,18 +23,16 @@
 class CExplosionManagerSA : public CExplosionManager
 {
 public:
-    CExplosionManagerSA(void);
-    ~CExplosionManagerSA(void);
+    CExplosionManagerSA();
+    ~CExplosionManagerSA();
 
     CExplosion* AddExplosion(CEntity* pExplodingEntity, CEntity* pOwner, eExplosionType explosionType, CVector& vecPosition, unsigned int uiActivationDelay = 0,
                              bool bMakeSound = true, float fCamShake = -1.0f, bool bNoDamage = false);
     VOID        RemoveAllExplosionsInArea(CVector* vecPosition, FLOAT fRadius);
-    VOID        RemoveAllExplosions(void);
+    VOID        RemoveAllExplosions();
     CExplosion* GetExplosion(DWORD ID);
-    CExplosion* FindFreeExplosion(void);
+    CExplosion* FindFreeExplosion();
 
 private:
     CExplosionSA* Explosions[MAX_EXPLOSIONS];
 };
-
-#endif

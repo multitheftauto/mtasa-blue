@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CClock::CClock(void)
+CClock::CClock()
 {
     // Default to 12:00
     m_ulMinuteDuration = 1000;
@@ -40,7 +40,7 @@ void CClock::Set(unsigned char ucHour, unsigned char ucMinute)
     m_ullMidnightTime = GetTickCount64_() - ulSecondsFromMidnight * m_ulMinuteDuration;
 }
 
-unsigned long CClock::GetMinuteDuration(void)
+unsigned long CClock::GetMinuteDuration()
 {
     return m_ulMinuteDuration;
 }

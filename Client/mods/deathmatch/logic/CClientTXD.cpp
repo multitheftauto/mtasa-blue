@@ -17,7 +17,7 @@ CClientTXD::CClientTXD(class CClientManager* pManager, ElementID ID) : ClassInit
     SetTypeName("txd");
 }
 
-CClientTXD::~CClientTXD(void)
+CClientTXD::~CClientTXD()
 {
     // Remove us from all the models
     g_pGame->GetRenderWare()->ModelInfoTXDRemoveTextures(&m_ReplacementTextures);

@@ -11,22 +11,30 @@
 
 #include "StdInc.h"
 
-void CLuaMarkerDefs::LoadFunctions(void)
+void CLuaMarkerDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("createMarker", CreateMarker);
+    std::map<const char*, lua_CFunction> functions{
+        {"createMarker", CreateMarker},
 
-    CLuaCFunctions::AddFunction("getMarkerCount", GetMarkerCount);
-    CLuaCFunctions::AddFunction("getMarkerType", GetMarkerType);
-    CLuaCFunctions::AddFunction("getMarkerSize", GetMarkerSize);
-    CLuaCFunctions::AddFunction("getMarkerColor", GetMarkerColor);
-    CLuaCFunctions::AddFunction("getMarkerTarget", GetMarkerTarget);
-    CLuaCFunctions::AddFunction("getMarkerIcon", GetMarkerIcon);
+        {"getMarkerCount", GetMarkerCount},
+        {"getMarkerType", GetMarkerType},
+        {"getMarkerSize", GetMarkerSize},
+        {"getMarkerColor", GetMarkerColor},
+        {"getMarkerTarget", GetMarkerTarget},
+        {"getMarkerIcon", GetMarkerIcon},
 
-    CLuaCFunctions::AddFunction("setMarkerType", SetMarkerType);
-    CLuaCFunctions::AddFunction("setMarkerSize", SetMarkerSize);
-    CLuaCFunctions::AddFunction("setMarkerColor", SetMarkerColor);
-    CLuaCFunctions::AddFunction("setMarkerTarget", SetMarkerTarget);
-    CLuaCFunctions::AddFunction("setMarkerIcon", SetMarkerIcon);
+        {"setMarkerType", SetMarkerType},
+        {"setMarkerSize", SetMarkerSize},
+        {"setMarkerColor", SetMarkerColor},
+        {"setMarkerTarget", SetMarkerTarget},
+        {"setMarkerIcon", SetMarkerIcon},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaMarkerDefs::AddClass(lua_State* luaVM)

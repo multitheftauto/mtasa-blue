@@ -15,7 +15,7 @@
 class CLuaVehicleDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
     // Vehicle create/destroy functions
@@ -90,6 +90,7 @@ public:
     LUA_DECLARE(SetVehicleIdleRespawnDelay);
     LUA_DECLARE(SetVehicleRespawnDelay);
     LUA_DECLARE(SetVehicleRespawnPosition);
+    LUA_DECLARE(SetVehicleRespawnRotation);
     LUA_DECLARE_OOP(GetVehicleRespawnPosition);
     LUA_DECLARE_OOP(GetVehicleRespawnRotation);
     LUA_DECLARE(ToggleVehicleRespawn);

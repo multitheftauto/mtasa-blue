@@ -15,7 +15,7 @@
 class CLuaPedDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
     // Helper
@@ -73,6 +73,7 @@ public:
     LUA_DECLARE(SetPedDoingGangDriveby);
     LUA_DECLARE(SetPedAnimation);
     LUA_DECLARE(SetPedAnimationProgress);
+    LUA_DECLARE(SetPedAnimationSpeed);
     LUA_DECLARE(SetPedWeaponSlot);
     LUA_DECLARE(SetPedOnFire);
     LUA_DECLARE(SetPedHeadless);

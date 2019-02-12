@@ -21,7 +21,7 @@ public:
     CWaterManager();
     ~CWaterManager();
 
-    CWater* Create(CWater::EWaterType waterType, CElement* pParent, CXMLNode* Node = NULL, bool bShallow = false);
+    CWater* Create(CWater::EWaterType waterType, CElement* pParent, bool bShallow = false);
     CWater* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void    DeleteAll();
 
@@ -33,7 +33,7 @@ public:
 
     const SWorldWaterLevelInfo& GetWorldWaterLevelInfo() const { return m_WorldWaterLevelInfo; }
     void                        SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLevel);
-    void                        ResetWorldWaterLevel(void);
+    void                        ResetWorldWaterLevel();
     void                        SetElementWaterLevel(CWater* pWater, float fLevel);
     void                        SetAllElementWaterLevel(float fLevel);
 

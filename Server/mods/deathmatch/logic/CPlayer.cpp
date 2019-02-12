@@ -14,7 +14,7 @@
 
 extern CGame* g_pGame;
 
-CPlayer::CPlayer(CPlayerManager* pPlayerManager, class CScriptDebugging* pScriptDebugging, const NetServerPlayerID& PlayerSocket) : CPed(NULL, NULL, NULL, 0)
+CPlayer::CPlayer(CPlayerManager* pPlayerManager, class CScriptDebugging* pScriptDebugging, const NetServerPlayerID& PlayerSocket) : CPed(nullptr, nullptr, 0)
 {
     CElementRefManager::AddElementRefs(ELEMENT_REF_DEBUG(this, "CPlayer"), &m_pTeam, NULL);
     CElementRefManager::AddElementListRef(ELEMENT_REF_DEBUG(this, "CPlayer m_lstBroadcastList"), &m_lstBroadcastList);
@@ -101,9 +101,10 @@ CPlayer::CPlayer(CPlayerManager* pPlayerManager, class CScriptDebugging* pScript
     m_UpdateNearListTimer.SetMaxIncrement(500, true);
     m_LastReceivedSyncTimer.SetUseModuleTickCount(true);
     m_ConnectedTimer.SetUseModuleTickCount(true);
+    m_bIsLeavingServer = false;
 }
 
-CPlayer::~CPlayer(void)
+CPlayer::~CPlayer()
 {
     // Make sure the script debugger doesn't reference us
     SetScriptDebugLevel(0);
@@ -171,7 +172,7 @@ CPlayer::~CPlayer(void)
     Unlink();
 }
 
-void CPlayer::Unlink(void)
+void CPlayer::Unlink()
 {
     // Remove us from the player manager
     m_pPlayerManager->RemoveFromList(this);
@@ -180,7 +181,7 @@ void CPlayer::Unlink(void)
     CPerPlayerEntity::StaticOnPlayerDelete(this);
 }
 
-void CPlayer::DoPulse(void)
+void CPlayer::DoPulse()
 {
     if (IsJoined())
     {
@@ -205,7 +206,7 @@ void CPlayer::SetNick(const char* szNick)
     m_strNick.AssignLeft(szNick, MAX_PLAYER_NICK_LENGTH);
 }
 
-const char* CPlayer::GetSourceIP(void)
+const char* CPlayer::GetSourceIP()
 {
     if (m_strIP.empty())
     {
@@ -317,7 +318,7 @@ void CPlayer::RemoveSyncingVehicle(CVehicle* pVehicle)
     }
 }
 
-void CPlayer::RemoveAllSyncingVehicles(void)
+void CPlayer::RemoveAllSyncingVehicles()
 {
     // Unreference us from all
     list<CVehicle*>::const_iterator iter = m_SyncingVehicles.begin();
@@ -363,7 +364,7 @@ void CPlayer::RemoveSyncingPed(CPed* pPed)
     }
 }
 
-void CPlayer::RemoveAllSyncingPeds(void)
+void CPlayer::RemoveAllSyncingPeds()
 {
     // Unreference us from all
     list<CPed*>::const_iterator iter = m_SyncingPeds.begin();
@@ -409,7 +410,7 @@ void CPlayer::RemoveSyncingObject(CObject* pObject)
     }
 }
 
-void CPlayer::RemoveAllSyncingObjects(void)
+void CPlayer::RemoveAllSyncingObjects()
 {
     // Unreference us from all
     list<CObject*>::const_iterator iter = m_SyncingObjects.begin();
@@ -436,7 +437,7 @@ void CPlayer::SetDamageInfo(ElementID ElementID, unsigned char ucWeapon, unsigne
     m_llSetDamageInfoTime = GetTickCount64_();
 }
 
-void CPlayer::ValidateDamageInfo(void)
+void CPlayer::ValidateDamageInfo()
 {
     if (m_llSetDamageInfoTime + 100 < GetTickCount64_())
     {
@@ -447,19 +448,19 @@ void CPlayer::ValidateDamageInfo(void)
     }
 }
 
-ElementID CPlayer::GetPlayerAttacker(void)
+ElementID CPlayer::GetPlayerAttacker()
 {
     ValidateDamageInfo();
     return m_PlayerAttackerID;
 }
 
-unsigned char CPlayer::GetAttackWeapon(void)
+unsigned char CPlayer::GetAttackWeapon()
 {
     ValidateDamageInfo();
     return m_ucAttackWeapon;
 }
 
-unsigned char CPlayer::GetAttackBodyPart(void)
+unsigned char CPlayer::GetAttackBodyPart()
 {
     ValidateDamageInfo();
     return m_ucAttackBodyPart;
@@ -478,7 +479,7 @@ void CPlayer::SetTeam(CTeam* pTeam, bool bChangeTeam)
         m_pTeam->AddPlayer(this, false);
 }
 
-void CPlayer::Reset(void)
+void CPlayer::Reset()
 {
     // Called when resetMapInfo is called to reset per player information that is reset in the clientside implimentation of resetMapInfo. This stops our
     // functions clientside and serverside possibly returning different results.
@@ -559,7 +560,7 @@ void CPlayer::SetNametagOverrideColor(unsigned char ucR, unsigned char ucG, unsi
     m_bNametagColorOverridden = true;
 }
 
-void CPlayer::RemoveNametagOverrideColor(void)
+void CPlayer::RemoveNametagOverrideColor()
 {
     m_ucNametagR = 255;
     m_ucNametagG = 255;
@@ -568,7 +569,7 @@ void CPlayer::RemoveNametagOverrideColor(void)
 }
 
 // Is it time to send a pure sync to every other player ?
-bool CPlayer::IsTimeForPuresyncFar(void)
+bool CPlayer::IsTimeForPuresyncFar()
 {
     long long llTime = GetModuleTickCount64();
     if (llTime > m_llNextFarPuresyncTime)
@@ -629,7 +630,7 @@ void CPlayer::SetWeaponCorrect(bool bWeaponCorrect)
         m_uiWeaponIncorrectCount++;
 }
 
-bool CPlayer::GetWeaponCorrect(void)
+bool CPlayer::GetWeaponCorrect()
 {
     return m_uiWeaponIncorrectCount == 0;
 }
@@ -670,7 +671,7 @@ bool CPlayer::ShouldPlayerBeInNearList(CPlayer* pOther)
     return false;
 }
 
-void CPlayer::MaybeUpdateOthersNearList(void)
+void CPlayer::MaybeUpdateOthersNearList()
 {
     // If too long since last update
     if (m_UpdateNearListTimer.Get() > (uint)g_TickRateSettings.iNearListUpdate * 9 / 10)
@@ -690,7 +691,7 @@ void CPlayer::MaybeUpdateOthersNearList(void)
 }
 
 // Put this player in other players nearlist if this player can observe them in some way
-void CPlayer::UpdateOthersNearList(void)
+void CPlayer::UpdateOthersNearList()
 {
     m_UpdateNearListTimer.Reset();
 
@@ -974,7 +975,7 @@ bool CPlayer::IsTimeToReceivePuresyncNearFrom(CPlayer* pOther, SViewerInfo& near
 //
 // Get the size pure sync packet will be for stats only
 //
-int CPlayer::GetApproxPuresyncPacketSize(void)
+int CPlayer::GetApproxPuresyncPacketSize()
 {
     // vehicle passenger=15/driver=52, ped with weapon=34/no weapon=30
     return m_pVehicle ? (m_uiVehicleSeat ? 15 : 52) : (m_ucWeaponSlot ? 34 : 30);

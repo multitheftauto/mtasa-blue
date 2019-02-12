@@ -15,7 +15,7 @@
 
 using std::list;
 
-void CElementRPCs::LoadFunctions(void)
+void CElementRPCs::LoadFunctions()
 {
     AddHandler(SET_ELEMENT_PARENT, SetElementParent, "SetElementParent");
     AddHandler(SET_ELEMENT_DATA, SetElementData, "SetElementData");

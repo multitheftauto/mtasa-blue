@@ -46,12 +46,12 @@ public:
     }
 
 protected:
-    ~CMasterServer(void) {}            // Must use Release()
+    ~CMasterServer() {}            // Must use Release()
 public:
     //
     // Pulse this master server
     //
-    void Pulse(void)
+    void Pulse()
     {
         if (m_bStatusBusy)
             return;
@@ -78,7 +78,9 @@ public:
                 // Send request
                 this->AddRef();            // Keep object alive
                 m_bStatusBusy = true;
-                GetDownloadManager()->QueueFile(m_Definition.strURL, NULL, "", 0, false, this, StaticDownloadFinishedCallback, false, 2);
+                SHttpRequestOptions options;
+                options.uiConnectionAttempts = 2;
+                GetDownloadManager()->QueueFile(m_Definition.strURL, NULL, this, StaticDownloadFinishedCallback, options);
             }
         }
         else
@@ -92,10 +94,11 @@ public:
             if (m_llLastPushTime == 0 || llTickCountNow - m_llLastPushTime > m_uiPushInterval)
             {
                 m_llLastPushTime = llTickCountNow;
-                SString strPostContent = ASE::GetInstance()->QueryLight();
-                bool    bPostContentBinary = true;
-                GetDownloadManager()->QueueFile(m_Definition.strURL, NULL, &strPostContent.at(0), strPostContent.length(), bPostContentBinary, NULL, NULL,
-                                                false, 1);
+                SHttpRequestOptions options;
+                options.strPostData = ASE::GetInstance()->QueryLight();
+                options.bPostBinary = true;
+                options.uiConnectionAttempts = 1;
+                GetDownloadManager()->QueueFile(m_Definition.strURL, NULL, NULL, NULL, options);
             }
         }
     }
@@ -169,12 +172,12 @@ public:
         }
     }
 
-    const SMasterServerDefinition& GetDefinition(void) const { return m_Definition; }
+    const SMasterServerDefinition& GetDefinition() const { return m_Definition; }
 
     //
     // Get http downloader used for master server comms etc.
     //
-    static CNetHTTPDownloadManagerInterface* GetDownloadManager(void) { return g_pNetServer->GetHTTPDownloadManager(EDownloadMode::ASE); }
+    static CNetHTTPDownloadManagerInterface* GetDownloadManager() { return g_pNetServer->GetHTTPDownloadManager(EDownloadMode::ASE); }
 
 protected:
     bool                          m_bStatusBusy;
@@ -197,7 +200,7 @@ class CMasterServerAnnouncer
 public:
     ZERO_ON_NEW
 
-    ~CMasterServerAnnouncer(void)
+    ~CMasterServerAnnouncer()
     {
         while (!m_MasterServerList.empty())
         {
@@ -209,7 +212,7 @@ public:
     //
     // Make list of master servers to contact
     //
-    void InitServerList(void)
+    void InitServerList()
     {
         assert(m_MasterServerList.empty());
         AddServer(true, true, false, false, 60 * 24, "Querying MTA master server...", QUERY_URL_MTA_MASTER_SERVER);
@@ -252,7 +255,7 @@ public:
     //
     // Pulse each master server in our list
     //
-    void Pulse(void)
+    void Pulse()
     {
         if (m_MasterServerList.empty())
             InitServerList();

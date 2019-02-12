@@ -18,26 +18,26 @@ class CRenderItemManager : public CRenderItemManagerInterface
 {
 public:
     ZERO_ON_NEW
-    CRenderItemManager(void);
-    ~CRenderItemManager(void);
+    CRenderItemManager();
+    ~CRenderItemManager();
 
     // CRenderItemManagerInterface
-    virtual void          DoPulse(void);
+    virtual void          DoPulse();
     virtual CDxFontItem*  CreateDxFont(const SString& strFullFilePath, uint uiSize, bool bBold, DWORD ulQuality = DEFAULT_QUALITY);
     virtual CGuiFontItem* CreateGuiFont(const SString& strFullFilePath, const SString& strFontName, uint uiSize);
     virtual CTextureItem* CreateTexture(const SString& strFullFilePath, const CPixels* pPixels, bool bMipMaps = true, uint uiSizeX = RDEFAULT,
                                         uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP,
                                         ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1);
-    virtual CShaderItem*  CreateShader(const SString& strFullFilePath, const SString& strRootPath, SString& strOutStatus, float fPriority, float fMaxDistance,
+    virtual CShaderItem*  CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority, float fMaxDistance,
                                        bool bLayered, bool bDebug, int iTypeMask);
     virtual CRenderTargetItem* CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false);
     virtual CScreenSourceItem* CreateScreenSource(uint uiSizeX, uint uiSizeY);
     virtual CWebBrowserItem*   CreateWebBrowser(uint uiSizeX, uint uiSizeY);
     virtual bool               SetRenderTarget(CRenderTargetItem* pItem, bool bClear);
     virtual void               EnableSetRenderTargetOldVer(bool bEnable);
-    virtual bool               IsSetRenderTargetEnabledOldVer(void);
-    virtual bool               RestoreDefaultRenderTarget(void);
-    virtual void               UpdateBackBufferCopy(void);
+    virtual bool               IsSetRenderTargetEnabledOldVer();
+    virtual bool               RestoreDefaultRenderTarget();
+    virtual void               UpdateBackBufferCopy();
     virtual void               UpdateScreenSource(CScreenSourceItem* pScreenSourceItem, bool bResampleNow);
     virtual SShaderItemLayers* GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData);
     virtual bool               ApplyShaderItemToWorldTexture(CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity,
@@ -45,15 +45,15 @@ public:
     virtual bool               RemoveShaderItemFromWorldTexture(CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity);
     virtual void               RemoveClientEntityRefs(CClientEntityBase* pClientEntity);
     virtual void               GetVisibleTextureNames(std::vector<SString>& outNameList, const SString& strTextureNameMatch, ushort usModelID);
-    virtual eDxTestMode        GetTestMode(void) { return m_TestMode; }
+    virtual eDxTestMode        GetTestMode() { return m_TestMode; }
     virtual void               SetTestMode(eDxTestMode testMode);
     virtual void               GetDxStatus(SDxStatus& outStatus);
-    virtual CEffectCloner*     GetEffectCloner(void) { return m_pEffectCloner; }
-    virtual void               PreDrawWorld(void);
+    virtual CEffectCloner*     GetEffectCloner() { return m_pEffectCloner; }
+    virtual void               PreDrawWorld();
     virtual void               SetDepthBufferFormat(ERenderFormat depthBufferFormat) { m_depthBufferFormat = depthBufferFormat; }
-    virtual ERenderFormat      GetDepthBufferFormat(void) { return m_depthBufferFormat; }
-    virtual void               SaveReadableDepthBuffer(void);
-    virtual void               FlushNonAARenderTarget(void);
+    virtual ERenderFormat      GetDepthBufferFormat() { return m_depthBufferFormat; }
+    virtual void               SaveReadableDepthBuffer();
+    virtual void               FlushNonAARenderTarget();
     virtual void HandleStretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface, CONST RECT* pDestRect,
                                    int Filter);
 
@@ -61,14 +61,14 @@ public:
     void NotifyContructRenderItem(CRenderItem* pItem);
     void NotifyDestructRenderItem(CRenderItem* pItem);
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
-    void OnLostDevice(void);
-    void OnResetDevice(void);
-    void UpdateBackBufferCopySize(void);
-    bool SaveDefaultRenderTarget(void);
-    bool IsUsingDefaultRenderTarget(void);
+    void OnLostDevice();
+    void OnResetDevice();
+    void UpdateBackBufferCopySize();
+    bool SaveDefaultRenderTarget();
+    bool IsUsingDefaultRenderTarget();
     void ChangeRenderTarget(uint uiSizeX, uint uiSizeY, IDirect3DSurface9* pD3DRenderTarget, IDirect3DSurface9* pD3DZStencilSurface);
     void RemoveShaderItemFromWatchLists(CShaderItem* pShaderItem);
-    void UpdateMemoryUsage(void);
+    void UpdateMemoryUsage();
     bool CanCreateRenderItem(ClassId classId);
     void NotifyShaderItemUsesDepthBuffer(CShaderItem* pShaderItem, bool bUsesDepthBuffer);
     void NotifyShaderItemUsesMultipleRenderTargets(CShaderItem* pShaderItem, bool bUsesMultipleRenderTargets);

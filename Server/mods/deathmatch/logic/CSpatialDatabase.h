@@ -27,7 +27,7 @@ public:
 class CSpatialDatabase
 {
 public:
-    virtual ~CSpatialDatabase(void) {}
+    virtual ~CSpatialDatabase() {}
 
     virtual void UpdateEntity(CElement* pEntity) = 0;
     virtual void RemoveEntity(CElement* pEntity) = 0;

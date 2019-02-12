@@ -22,7 +22,7 @@ CWorldSA::CWorldSA()
 void HOOK_FallenPeds();
 void HOOK_FallenCars();
 
-void CWorldSA::InstallHooks(void)
+void CWorldSA::InstallHooks()
 {
     HookInstall(0x565CB0, (DWORD)HOOK_FallenPeds, 5);
     HookInstall(0x565E80, (DWORD)HOOK_FallenCars, 5);
@@ -174,9 +174,9 @@ void CWorldSA::RemoveReferencesToDeletedObject(CEntitySAInterface* entity)
     }
 }
 
+// THIS FUNCTION IS INCOMPLETE AND SHOULD NOT BE USED
 bool CWorldSA::TestLineSphere(CVector* vecStart, CVector* vecEnd, CVector* vecSphereCenter, float fSphereRadius, CColPoint** colCollision)
 {
-    // THIS FUNCTION IS INCOMPLETE AND SHOULD NOT BE USED
     // Create a CColLine for us
     DWORD dwFunc = FUNC_CColLine_Constructor;
     DWORD dwCColLine[10];            // I don't know how big CColLine is, so we'll just be safe
@@ -309,42 +309,12 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
 
     if (CollisionEntity)
     {
-        CPoolsSA* pPools = ((CPoolsSA*)pGame->GetPools());
+        CPools* pPools = pGame->GetPools();
         if (pPools)
         {
             if (targetEntity)
             {
-                switch (targetEntity->nType)
-                {
-                    case ENTITY_TYPE_PED:
-                        *CollisionEntity = pPools->GetPed((DWORD*)targetEntity);
-                        break;
-                    case ENTITY_TYPE_OBJECT:
-                        *CollisionEntity = pPools->GetObject((DWORD*)targetEntity);
-                        break;
-                    case ENTITY_TYPE_VEHICLE:
-                        *CollisionEntity = pPools->GetVehicle((DWORD*)targetEntity);
-                        break;
-                }
-
-                /*CEntitySA * entity = new CEntitySA();
-                entity->SetInterface((CEntitySAInterface *)targetEntity);
-                eEntityType EntityType = entity->GetEntityType();
-                delete entity;
-                switch(EntityType)
-                {
-                case ENTITY_TYPE_PED:
-                case ENTITY_TYPE_OBJECT:
-                    *CollisionEntity = pPools->GetPed((DWORD *)targetEntity);
-                    if ( *CollisionEntity )
-                        break;
-                    *CollisionEntity = pPools->GetObject((CObjectSAInterface *)targetEntity);
-                    break;
-                case ENTITY_TYPE_VEHICLE:
-                    *CollisionEntity = pPools->GetVehicle((CVehicleSAInterface *)targetEntity);
-                    break;
-
-                }*/
+                *CollisionEntity = pPools->GetEntity((DWORD*)targetEntity);
             }
         }
     }
@@ -497,7 +467,7 @@ bool CWorldSA::HasCollisionBeenLoaded(CVector* vecPosition)
     return bRet;
 }
 
-DWORD CWorldSA::GetCurrentArea(void)
+DWORD CWorldSA::GetCurrentArea()
 {
     return *(DWORD*)VAR_currArea;
 }
@@ -520,7 +490,7 @@ void CWorldSA::SetJetpackMaxHeight(float fHeight)
     MemPut<float>(VAR_fJetpackMaxHeight, fHeight);
 }
 
-float CWorldSA::GetJetpackMaxHeight(void)
+float CWorldSA::GetJetpackMaxHeight()
 {
     return *(float*)(VAR_fJetpackMaxHeight);
 }
@@ -530,7 +500,7 @@ void CWorldSA::SetAircraftMaxHeight(float fHeight)
     g_pCore->GetMultiplayer()->SetAircraftMaxHeight(fHeight);
 }
 
-float CWorldSA::GetAircraftMaxHeight(void)
+float CWorldSA::GetAircraftMaxHeight()
 {
     return g_pCore->GetMultiplayer()->GetAircraftMaxHeight();
 }
@@ -540,7 +510,7 @@ void CWorldSA::SetAircraftMaxVelocity(float fVelocity)
     g_pCore->GetMultiplayer()->SetAircraftMaxVelocity(fVelocity);
 }
 
-float CWorldSA::GetAircraftMaxVelocity(void)
+float CWorldSA::GetAircraftMaxVelocity()
 {
     return g_pCore->GetMultiplayer()->GetAircraftMaxVelocity();
 }
@@ -560,7 +530,7 @@ void CWorldSA::SetOcclusionsEnabled(bool bEnabled)
     }
 }
 
-bool CWorldSA::GetOcclusionsEnabled(void)
+bool CWorldSA::GetOcclusionsEnabled()
 {
     if (*(BYTE*)FUNC_COcclusion_ProcessBeforeRendering == 0x51)            // Is standard value ?
         return true;

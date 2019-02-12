@@ -12,26 +12,34 @@
 
 #define DEFAULT_MAX_FILESIZE 52428800
 
-void CLuaFileDefs::LoadFunctions(void)
+void CLuaFileDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("fileOpen", fileOpen);
-    CLuaCFunctions::AddFunction("fileCreate", fileCreate);
-    CLuaCFunctions::AddFunction("fileExists", fileExists);
-    CLuaCFunctions::AddFunction("fileCopy", fileCopy);
-    CLuaCFunctions::AddFunction("fileRename", fileRename);
-    CLuaCFunctions::AddFunction("fileDelete", fileDelete);
+    std::map<const char*, lua_CFunction> functions{
+        {"fileOpen", fileOpen},
+        {"fileCreate", fileCreate},
+        {"fileExists", fileExists},
+        {"fileCopy", fileCopy},
+        {"fileRename", fileRename},
+        {"fileDelete", fileDelete},
 
-    CLuaCFunctions::AddFunction("fileClose", fileClose);
-    CLuaCFunctions::AddFunction("fileFlush", fileFlush);
-    CLuaCFunctions::AddFunction("fileRead", fileRead);
-    CLuaCFunctions::AddFunction("fileWrite", fileWrite);
+        {"fileClose", fileClose},
+        {"fileFlush", fileFlush},
+        {"fileRead", fileRead},
+        {"fileWrite", fileWrite},
 
-    CLuaCFunctions::AddFunction("fileGetPos", fileGetPos);
-    CLuaCFunctions::AddFunction("fileGetSize", fileGetSize);
-    CLuaCFunctions::AddFunction("fileGetPath", fileGetPath);
-    CLuaCFunctions::AddFunction("fileIsEOF", fileIsEOF);
+        {"fileGetPos", fileGetPos},
+        {"fileGetSize", fileGetSize},
+        {"fileGetPath", fileGetPath},
+        {"fileIsEOF", fileIsEOF},
 
-    CLuaCFunctions::AddFunction("fileSetPos", fileSetPos);
+        {"fileSetPos", fileSetPos},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaFileDefs::AddClass(lua_State* luaVM)
@@ -40,7 +48,11 @@ void CLuaFileDefs::AddClass(lua_State* luaVM)
 
     lua_classmetamethod(luaVM, "__gc", fileCloseGC);
 
-    lua_classfunction(luaVM, "create", "fileCreate");
+#ifdef MTA_CLIENT
+    lua_classfunction(luaVM, "create", CLuaFileDefs::File);
+#else
+    lua_classfunction(luaVM, "create", "fileCreate", CLuaFileDefs::File);
+#endif
 
     lua_classfunction(luaVM, "open", "fileOpen");
     lua_classfunction(luaVM, "new", "fileCreate");
@@ -720,7 +732,7 @@ int CLuaFileDefs::fileWrite(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pFile);
 
-    // Ensure we have atleast one string
+    // Ensure we have at least one string
     if (!argStream.NextIsString())
         argStream.SetTypeError("string");
 
@@ -733,12 +745,14 @@ int CLuaFileDefs::fileWrite(lua_State* luaVM)
         while (argStream.NextIsString())
         {
             // Grab argument and length
-            SString strData;
-            argStream.ReadString(strData);
-            unsigned long ulDataLen = strData.length();
+            SCharStringRef strData;
+            argStream.ReadCharStringRef(strData);
+
+            if (argStream.HasErrors() || !strData.pData)
+                continue;
 
             // Write the data
-            long lArgBytesWritten = pFile->Write(ulDataLen, strData);
+            long lArgBytesWritten = pFile->Write(strData.uiSize, strData.pData);
 
             // Did the file mysteriously disappear?
             if (lArgBytesWritten == -1)

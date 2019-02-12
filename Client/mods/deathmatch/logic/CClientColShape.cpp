@@ -31,7 +31,7 @@ CClientColShape::CClientColShape(CClientManager* pManager, ElementID ID) : Class
     m_pColManager->AddToList(this);
 }
 
-CClientColShape::~CClientColShape(void)
+CClientColShape::~CClientColShape()
 {
     if (m_pOwningMarker && m_pOwningMarker->m_pCollision == this)
         m_pOwningMarker->m_pCollision = NULL;
@@ -43,24 +43,24 @@ CClientColShape::~CClientColShape(void)
     CClientEntityRefManager::RemoveEntityRefs(0, &m_pOwningMarker, &m_pOwningPickup, NULL);
 }
 
-void CClientColShape::Unlink(void)
+void CClientColShape::Unlink()
 {
     m_pColManager->RemoveFromList(this);
 }
 
-void CClientColShape::SizeChanged(void)
+void CClientColShape::SizeChanged()
 {
     UpdateSpatialData();
     // Maybe queue RefreshColliders for v1.1
 }
 
-void CClientColShape::DoPulse(void)
+void CClientColShape::DoPulse()
 {
     // Update our position/rotation if we're attached
     DoAttaching();
 }
 
-bool CClientColShape::IsAttachable(void)
+bool CClientColShape::IsAttachable()
 {
     return (!m_pOwningPickup && !m_pOwningMarker);
 }
@@ -98,7 +98,7 @@ bool CClientColShape::ColliderExists(CClientEntity* pEntity)
     return m_Colliders.contains(pEntity);
 }
 
-void CClientColShape::RemoveAllColliders(void)
+void CClientColShape::RemoveAllColliders()
 {
     CFastList<CClientEntity*>::iterator iter = m_Colliders.begin();
     for (; iter != m_Colliders.end(); iter++)

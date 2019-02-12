@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUISCROLLPANE_IMPL_H
-#define __CGUISCROLLPANE_IMPL_H
+#pragma once
 
 #include <gui/CGUIScrollPane.h>
 #include "CGUIElement_Impl.h"
@@ -19,29 +18,27 @@ class CGUIScrollPane_Impl : public CGUIScrollPane, public CGUIElement_Impl, publ
 {
 public:
     CGUIScrollPane_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL);
-    ~CGUIScrollPane_Impl(void);
+    ~CGUIScrollPane_Impl();
 
     void SetHorizontalScrollBar(bool bEnabled);
     void SetVerticalScrollBar(bool bEnabled);
 
     void  SetHorizontalScrollPosition(float fPosition);
-    float GetHorizontalScrollPosition(void);
+    float GetHorizontalScrollPosition();
 
     void  SetVerticalScrollPosition(float fPosition);
-    float GetVerticalScrollPosition(void);
+    float GetVerticalScrollPosition();
 
     void  SetHorizontalScrollStepSize(float fPosition);
-    float GetHorizontalScrollStepSize(void);
+    float GetHorizontalScrollStepSize();
 
     void  SetVerticalScrollStepSize(float fPosition);
-    float GetVerticalScrollStepSize(void);
+    float GetVerticalScrollStepSize();
 
-    eCGUIType GetType(void) { return CGUI_SCROLLPANE; };
+    eCGUIType GetType() { return CGUI_SCROLLPANE; };
 
     #include "CGUIElement_Inc.h"
 
 private:
     class CGUI_Impl* m_pGUI;
 };
-
-#endif

@@ -9,15 +9,14 @@
  *
  *****************************************************************************/
 
-#ifndef __CElementRPCs_H
-#define __CElementRPCs_H
+#pragma once
 
 #include "CRPCFunctions.h"
 
 class CElementRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_ELEMENT_RPC(SetElementParent);
     DECLARE_ELEMENT_RPC(SetElementData);
@@ -51,5 +50,3 @@ public:
     DECLARE_ELEMENT_RPC(SetWeaponConfig);
     DECLARE_ELEMENT_RPC(SetCallPropagationEnabled);
 };
-
-#endif
