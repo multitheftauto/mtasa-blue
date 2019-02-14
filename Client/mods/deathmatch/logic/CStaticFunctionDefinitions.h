@@ -142,6 +142,7 @@ public:
     static bool           GetPedControlState(CClientPed& Ped, const char* szControl, bool& bState);
     static bool           GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState);
     static bool           IsPedDoingGangDriveby(CClientPed& Ped, bool& bDoingGangDriveby);
+    static bool           GetPedFightingStyle(CClientPed& Ped, unsigned char& ucStyle);
     static bool           GetPedAnimation(CClientPed& Ped, SString& strOutBlockName, SString& strOutAnimName);
     static bool           GetPedMoveAnim(CClientPed& Ped, unsigned int& iMoveAnim);
     static bool           GetPedMoveState(CClientPed& Ped, std::string& strMoveState);
@@ -456,6 +457,8 @@ public:
     static void GUISetAlpha(CClientEntity& Element, float fAlpha);
     static bool GUIBringToFront(CClientEntity& Element);
     static void GUIMoveToBack(CClientEntity& Element);
+    static bool GUIBlur(CClientEntity& Element);
+    static bool GUIFocus(CClientEntity& Element);
 
     static void GUICheckBoxSetSelected(CClientEntity& Element, bool bFlag);
     static void GUIRadioButtonSetSelected(CClientEntity& Element, bool bFlag);

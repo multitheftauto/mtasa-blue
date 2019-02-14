@@ -1688,6 +1688,12 @@ bool CStaticFunctionDefinitions::IsPedDoingGangDriveby(CClientPed& Ped, bool& bD
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetPedFightingStyle(CClientPed& Ped, unsigned char& ucStyle)
+{
+    ucStyle = Ped.GetFightingStyle();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::GetPedAnimation(CClientPed& Ped, SString& strBlockName, SString& strAnimName)
 {
     if (Ped.IsRunningAnimation())
@@ -5652,6 +5658,30 @@ void CStaticFunctionDefinitions::GUIMoveToBack(CClientEntity& Entity)
     }
 }
 
+bool CStaticFunctionDefinitions::GUIBlur(CClientEntity& Entity)
+{
+    // Are we a CGUI element?
+    if (IS_GUI(&Entity))
+    {
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+        GUIElement.GetCGUIElement()->Deactivate();
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GUIFocus(CClientEntity& Entity)
+{
+    // Are we a CGUI element?
+    if (IS_GUI(&Entity))
+    {
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+        GUIElement.GetCGUIElement()->Activate();
+        return true;
+    }
+    return false;
+}
+
 void CStaticFunctionDefinitions::GUICheckBoxSetSelected(CClientEntity& Entity, bool bFlag)
 {
     RUN_CHILDREN(GUICheckBoxSetSelected(**iter, bFlag))
@@ -7586,11 +7616,7 @@ bool CStaticFunctionDefinitions::StopSound(CClientSound& Sound)
 
 bool CStaticFunctionDefinitions::SetSoundPosition(CClientSound& Sound, double dPosition)
 {
-    if (Sound.IsSoundStream())
-        return false;
-
-    Sound.SetPlayPosition(dPosition);
-    return true;
+    return Sound.SetPlayPosition(dPosition);
 }
 
 bool CStaticFunctionDefinitions::SetSoundPosition(CClientPlayer& Player, double dPosition)
