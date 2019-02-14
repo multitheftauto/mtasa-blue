@@ -368,9 +368,11 @@ int CLuaXMLDefs::xmlUnloadFile(lua_State* luaVM)
         CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (luaMain)
         {
-            luaMain->DestroyXML(pNode);
-            lua_pushboolean(luaVM, true);
-            return 1;
+			if (luaMain->DestroyXML(pNode))
+			{
+				lua_pushboolean(luaVM, true);
+				return 1;
+			} 
         }
     }
     else

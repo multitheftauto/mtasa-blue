@@ -68,8 +68,8 @@ public:
 
     CXMLFile*     CreateXML(const char* szFilename, bool bUseIDs = true, bool bReadOnly = false);
     CXMLNode*     ParseString(const char* strXmlContent);
-    void          DestroyXML(CXMLFile* pFile);
-    void          DestroyXML(CXMLNode* pRootNode);
+    bool          DestroyXML(CXMLFile* pFile);
+    bool          DestroyXML(CXMLNode* pRootNode);
     bool          SaveXML(CXMLNode* pRootNode);
     bool          XMLExists(CXMLFile* pFile);
     unsigned long GetXMLFileCount() const { return m_XMLFiles.size(); };

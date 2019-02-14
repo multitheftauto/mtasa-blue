@@ -424,28 +424,36 @@ CXMLNode* CLuaMain::ParseString(const char* strXmlContent)
 }
 
 
-void CLuaMain::DestroyXML(CXMLFile* pFile)
+bool CLuaMain::DestroyXML(CXMLFile* pFile)
 {
-    m_XMLFiles.remove(pFile);
-    delete pFile;
+	if (!m_XMLFiles.empty()) {
+		m_XMLFiles.remove(pFile);
+		delete pFile;
+		return true;
+	}
+	return false;
 }
 
-void CLuaMain::DestroyXML(CXMLNode* pRootNode)
+bool CLuaMain::DestroyXML(CXMLNode* pRootNode)
 {
-    list<CXMLFile*>::iterator iter;
-    for (iter = m_XMLFiles.begin(); iter != m_XMLFiles.end(); ++iter)
-    {
-        CXMLFile* file = (*iter);
-        if (file)
-        {
-            if (file->GetRootNode() == pRootNode)
-            {
-                m_XMLFiles.erase(iter);
-                delete file;
-                break;
-            }
-        }
-    }
+	if (!m_XMLFiles.empty()) {
+		list<CXMLFile*>::iterator iter;
+		for (iter = m_XMLFiles.begin(); iter != m_XMLFiles.end(); ++iter)
+		{
+			CXMLFile* file = (*iter);
+			if (file)
+			{
+				if (file->GetRootNode() == pRootNode)
+				{
+					m_XMLFiles.erase(iter);
+					delete file;
+					break;
+				}
+			}
+		}
+		return true;
+	}
+	return false;
 }
 
 bool CLuaMain::SaveXML(CXMLNode* pRootNode)
