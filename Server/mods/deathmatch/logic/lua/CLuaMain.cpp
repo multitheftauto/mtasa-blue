@@ -418,42 +418,42 @@ CXMLFile* CLuaMain::CreateXML(const char* szFilename, bool bUseIDs, bool bReadOn
 
 CXMLNode* CLuaMain::ParseString(const char* strXmlContent)
 {
-	CXMLNode* xmlNode = g_pServerInterface->GetXML()->ParseString(strXmlContent);
+    CXMLNode* xmlNode = g_pServerInterface->GetXML()->ParseString(strXmlContent);
 
-	return xmlNode;
+    return xmlNode;
 }
 
 
 bool CLuaMain::DestroyXML(CXMLFile* pFile)
 {
-	if (m_XMLFiles.empty()) {
-		return false;
-	}
-	m_XMLFiles.remove(pFile);
-	delete pFile;
-	return true;
+    if (m_XMLFiles.empty()) {
+        return false;
+    }
+    m_XMLFiles.remove(pFile);
+    delete pFile;
+    return true;
 }
 
 bool CLuaMain::DestroyXML(CXMLNode* pRootNode)
 {
-	if (m_XMLFiles.empty()) {
-		return false;
-	}
-	list<CXMLFile*>::iterator iter;
-	for (iter = m_XMLFiles.begin(); iter != m_XMLFiles.end(); ++iter)
-	{
-		CXMLFile* file = (*iter);
-		if (file)
-		{
-			if (file->GetRootNode() == pRootNode)
-			{
-				m_XMLFiles.erase(iter);
-				delete file;
-				break;
-			}
-		}
-	}
-	return true;
+    if (m_XMLFiles.empty()) {
+        return false;
+    }
+    list<CXMLFile*>::iterator iter;
+    for (iter = m_XMLFiles.begin(); iter != m_XMLFiles.end(); ++iter)
+    {
+        CXMLFile* file = (*iter);
+        if (file)
+        {
+            if (file->GetRootNode() == pRootNode)
+            {
+                m_XMLFiles.erase(iter);
+                delete file;
+                break;
+            }
+        }
+    }
+    return true;
 }
 
 bool CLuaMain::SaveXML(CXMLNode* pRootNode)
