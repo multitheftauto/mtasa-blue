@@ -511,6 +511,8 @@ CClientGame::~CClientGame()
     // NULL the global CClientGame var
     g_pClientGame = NULL;
     m_bBeingDeleted = false;
+
+    CStaticFunctionDefinitions::ResetAllSurfaceInfo();
 }
 
 /*

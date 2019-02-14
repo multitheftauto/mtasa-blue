@@ -10,13 +10,54 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+
+#define ARRAY_SurfaceInfos 0xB79538
+
 CWorldSA::CWorldSA()
 {
     m_pBuildingRemovals = new std::multimap<unsigned short, SBuildingRemoval*>;
     m_pDataBuildings = new std::multimap<unsigned short, sDataBuildingRemovalItem*>;
     m_pBinaryBuildings = new std::multimap<unsigned short, sBuildingRemovalItem*>;
 
+    m_pSurfaceInfo = reinterpret_cast<CSurfaceType*>(ARRAY_SurfaceInfos);
+    // Store default surface properties
+    memcpy(&m_pOriginalSurfaceInfo, (void *)ARRAY_SurfaceInfos, sizeof(CSurfaceType));
+
     InstallHooks();
+}
+
+CSurfaceType* CWorldSA::GetSurfaceInfo()
+{
+    return m_pSurfaceInfo;
+}
+
+void CWorldSA::ResetAllSurfaceInfo()
+{
+    DWORD dwSurfaceInfo = (DWORD)m_pSurfaceInfo;
+
+    DWORD dwOriginalSurfaceInfo = (DWORD)(&m_pOriginalSurfaceInfo);
+
+    size_t sOffset = offsetof(CSurfaceType, CSurfaceType::surfType);
+    size_t sSize = sizeof(SurfaceInfo_c) * EColSurfaceValue::SIZE;
+
+    memcpy((void*)(dwSurfaceInfo + sOffset), (void*)(dwOriginalSurfaceInfo + sOffset), sSize);
+}
+
+bool CWorldSA::ResetSurfaceInfo(short sSurfaceID)
+{
+    if (sSurfaceID >= EColSurfaceValue::DEFAULT && sSurfaceID <= EColSurfaceValue::SIZE)
+    {
+        CSurfaceType* pSurfaceInfo = m_pSurfaceInfo;
+        DWORD dwSurfaceInfo = (DWORD)pSurfaceInfo;
+        DWORD dwOriginalSurfaceInfo = (DWORD)(&m_pOriginalSurfaceInfo);
+
+        size_t sOffset = offsetof(CSurfaceType, CSurfaceType::surfType) + sizeof(SurfaceInfo_c) * sSurfaceID;
+        size_t sSize = sizeof(SurfaceInfo_c);
+
+        memcpy((void*)(dwSurfaceInfo + sOffset), (void*)(dwOriginalSurfaceInfo + sOffset), sSize);
+        return true;
+    }
+    return false;
 }
 
 void HOOK_FallenPeds();
