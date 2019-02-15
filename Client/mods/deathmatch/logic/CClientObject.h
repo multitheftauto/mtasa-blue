@@ -108,7 +108,7 @@ public:
     float GetMass();
     void  SetMass(float fMass);
 
-bool IsVisibleInAllDimensions() const { return m_bVisibleInAllDimensions; };
+    bool IsVisibleInAllDimensions() const { return m_bVisibleInAllDimensions; };
     void SetVisibleInAllDimensions(bool bVisible, unsigned short usNewDimension = 0);
 
     bool IsVisibleInAllInteriors() const { return m_bVisibleInAllInteriors; }
