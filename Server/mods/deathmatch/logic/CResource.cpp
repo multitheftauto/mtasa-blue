@@ -933,6 +933,7 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     g_pGame->GetMapManager()->BroadcastResourceElements(m_pResourceElement, m_pDefaultElementGroup);
     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CResourceStartPacket(m_strResourceName.c_str(), this));
     SendNoClientCacheScripts();
+    m_bClientSync = true;
 
     // HACK?: stops resources getting loaded twice when you change them then manually restart
     GenerateChecksums();
@@ -972,6 +973,7 @@ bool CResource::Stop(bool bManualStop)
 
     // Tell all the players that have joined that this resource is stopped
     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CResourceStopPacket(m_usNetID));
+    m_bClientSync = false;
 
     // Call the onResourceStop event on this resource element
     CLuaArguments Arguments;

@@ -9721,3 +9721,18 @@ CClientSearchLight* CStaticFunctionDefinitions::CreateSearchLight(CResource& Res
 
     return nullptr;
 }
+
+bool CStaticFunctionDefinitions::ResetAllSurfaceInfo()
+{
+    g_pGame->GetWorld()->ResetAllSurfaceInfo();
+    return true;
+}
+bool CStaticFunctionDefinitions::ResetSurfaceInfo(short sSurfaceID)
+{
+    if (sSurfaceID >= EColSurfaceValue::DEFAULT && sSurfaceID <= EColSurfaceValue::SIZE)
+    {
+        g_pGame->GetWorld()->ResetSurfaceInfo(sSurfaceID);
+        return true;
+    }
+    return false;
+}
