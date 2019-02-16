@@ -2112,24 +2112,20 @@ int CLuaPedDefs::SetPedMoveAnim(lua_State* luaVM)
 
 int CLuaPedDefs::SetPedArmor(lua_State* luaVM)
 {
-    CClientEntity*   pEntity;
+    CClientPed*      pPed;
     float            fArmor;
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
+    argStream.ReadUserData(pPed);
     argStream.ReadNumber(fArmor);
 
-    if (!argStream.HasErrors())
+    if (argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetPedArmor(*pEntity, fArmor))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushnil(luaVM);
+        return 1;
+    }
 
-    lua_pushboolean(luaVM, false);
+    lua_pushboolean(luaVM, CStaticFunctionDefinitions::SetPedArmor(*pPed, fArmor));
     return 1;
 }
 
