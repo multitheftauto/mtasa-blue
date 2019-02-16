@@ -458,10 +458,8 @@ bool CLuaMain::DestroyXML(CXMLNode* pRootNode)
 
 bool CLuaMain::SaveXML(CXMLNode* pRootNode)
 {
-    list<CXMLFile*>::iterator iter;
-    for (iter = m_XMLFiles.begin(); iter != m_XMLFiles.end(); ++iter)
+    for (CXMLFile* file : m_XMLFiles)
     {
-        CXMLFile* file = (*iter);
         if (file)
         {
             if (file->GetRootNode() == pRootNode)
