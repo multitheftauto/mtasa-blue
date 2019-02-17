@@ -95,6 +95,13 @@
 #include "memdebug.h"
 #include "curl_path.h"
 
+/* A recent macro provided by libssh. Or make our own. */
+#ifndef SSH_STRING_FREE_CHAR
+/* !checksrc! disable ASSIGNWITHINCONDITION 1 */
+#define SSH_STRING_FREE_CHAR(x) \
+    do { if((x) != NULL) { ssh_string_free_char(x); x = NULL; } } while(0)
+#endif
+
 /* Local functions: */
 static CURLcode myssh_connect(struct connectdata *conn, bool *done);
 static CURLcode myssh_multi_statemach(struct connectdata *conn,
@@ -549,6 +556,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
   struct Curl_easy *data = conn->data;
   struct SSHPROTO *protop = data->req.protop;
   struct ssh_conn *sshc = &conn->proto.sshc;
+  curl_socket_t sock = conn->sock[FIRSTSOCKET];
   int rc = SSH_NO_ERROR, err;
   char *new_readdir_line;
   int seekerr = CURL_SEEKFUNC_OK;
@@ -792,7 +800,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
 
       Curl_pgrsTime(conn->data, TIMER_APPCONNECT);      /* SSH is connected */
 
-      conn->sockfd = ssh_get_fd(sshc->ssh_session);
+      conn->sockfd = sock;
       conn->writesockfd = CURL_SOCKET_BAD;
 
       if(conn->handler->protocol == CURLPROTO_SFTP) {
@@ -1661,7 +1669,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
         sshc->sftp_session = NULL;
       }
 
-      Curl_safefree(sshc->homedir);
+      SSH_STRING_FREE_CHAR(sshc->homedir);
       conn->data->state.most_recent_ftp_entrypath = NULL;
 
       state(conn, SSH_SESSION_DISCONNECT);
@@ -1829,7 +1837,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
 
       ssh_disconnect(sshc->ssh_session);
 
-      Curl_safefree(sshc->homedir);
+      SSH_STRING_FREE_CHAR(sshc->homedir);
       conn->data->state.most_recent_ftp_entrypath = NULL;
 
       state(conn, SSH_SESSION_FREE);
@@ -1866,14 +1874,11 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
 
       Curl_safefree(sshc->rsa_pub);
       Curl_safefree(sshc->rsa);
-
       Curl_safefree(sshc->quote_path1);
       Curl_safefree(sshc->quote_path2);
-
-      Curl_safefree(sshc->homedir);
-
       Curl_safefree(sshc->readdir_line);
       Curl_safefree(sshc->readdir_linkPath);
+      SSH_STRING_FREE_CHAR(sshc->homedir);
 
       /* the code we are about to return */
       result = sshc->actualcode;
@@ -2048,6 +2053,7 @@ static CURLcode myssh_connect(struct connectdata *conn, bool *done)
 {
   struct ssh_conn *ssh;
   CURLcode result;
+  curl_socket_t sock = conn->sock[FIRSTSOCKET];
   struct Curl_easy *data = conn->data;
   int rc;
 
@@ -2075,6 +2081,8 @@ static CURLcode myssh_connect(struct connectdata *conn, bool *done)
     failf(data, "Failure initialising ssh session");
     return CURLE_FAILED_INIT;
   }
+
+  ssh_options_set(ssh->ssh_session, SSH_OPTIONS_FD, &sock);
 
   if(conn->user) {
     infof(data, "User: %s\n", conn->user);

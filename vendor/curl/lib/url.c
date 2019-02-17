@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -492,9 +492,9 @@ CURLcode Curl_init_userdefined(struct Curl_easy *data)
 
   /* Set the default CA cert bundle/path detected/specified at build time.
    *
-   * If Schannel (WinSSL) is the selected SSL backend then these locations
-   * are ignored. We allow setting CA location for schannel only when
-   * explicitly specified by the user via CURLOPT_CAINFO / --cacert.
+   * If Schannel is the selected SSL backend then these locations are
+   * ignored. We allow setting CA location for schannel only when explicitly
+   * specified by the user via CURLOPT_CAINFO / --cacert.
    */
   if(Curl_ssl_backend() != CURLSSLBACKEND_SCHANNEL) {
 #if defined(CURL_CA_BUNDLE)
@@ -536,6 +536,7 @@ CURLcode Curl_init_userdefined(struct Curl_easy *data)
   set->fnmatch = ZERO_NULL;
   set->upkeep_interval_ms = CURL_UPKEEP_INTERVAL_DEFAULT;
   set->maxconnects = DEFAULT_CONNCACHE_SIZE; /* for easy handles */
+  set->http09_allowed = TRUE;
   set->httpversion =
 #ifdef USE_NGHTTP2
     CURL_HTTP_VERSION_2TLS
@@ -768,7 +769,6 @@ CURLcode Curl_disconnect(struct Curl_easy *data,
     return CURLE_OK;
   }
 
-  conn->data = data;
   if(conn->dns_entry != NULL) {
     Curl_resolv_unlock(data, conn->dns_entry);
     conn->dns_entry = NULL;
@@ -781,20 +781,22 @@ CURLcode Curl_disconnect(struct Curl_easy *data,
   Curl_http_ntlm_cleanup(conn);
 #endif
 
+  /* the protocol specific disconnect handler needs a transfer for its
+     connection! */
+  conn->data = data;
   if(conn->handler->disconnect)
     /* This is set if protocol-specific cleanups should be made */
     conn->handler->disconnect(conn, dead_connection);
 
     /* unlink ourselves! */
   infof(data, "Closing connection %ld\n", conn->connection_id);
-  Curl_conncache_remove_conn(conn, TRUE);
+  Curl_conncache_remove_conn(data, conn, TRUE);
 
   free_idnconverted_hostname(&conn->host);
   free_idnconverted_hostname(&conn->conn_to_host);
   free_idnconverted_hostname(&conn->http_proxy.host);
   free_idnconverted_hostname(&conn->socks_proxy.host);
 
-  DEBUGASSERT(conn->data == data);
   /* this assumes that the pointer is still there after the connection was
      detected from the cache */
   Curl_ssl_close(conn, FIRSTSOCKET);
@@ -959,13 +961,10 @@ static bool extract_if_dead(struct connectdata *conn,
        handles in pipeline and the connection isn't already marked in
        use */
     bool dead;
-
-    conn->data = data;
     if(conn->handler->connection_check) {
       /* The protocol has a special method for checking the state of the
          connection. Use it to check if the connection is dead. */
       unsigned int state;
-
       state = conn->handler->connection_check(conn, CONNCHECK_ISDEAD);
       dead = (state & CONNRESULT_DEAD);
     }
@@ -976,8 +975,7 @@ static bool extract_if_dead(struct connectdata *conn,
 
     if(dead) {
       infof(data, "Connection %ld seems to be dead!\n", conn->connection_id);
-      Curl_conncache_remove_conn(conn, FALSE);
-      conn->data = NULL; /* detach */
+      Curl_conncache_remove_conn(data, conn, FALSE);
       return TRUE;
     }
   }
@@ -996,6 +994,7 @@ struct prunedead {
 static int call_extract_if_dead(struct connectdata *conn, void *param)
 {
   struct prunedead *p = (struct prunedead *)param;
+  conn->data = p->data; /* transfer to use for this check */
   if(extract_if_dead(conn, p->data)) {
     /* stop the iteration here, pass back the connection that was extracted */
     p->extracted = conn;
@@ -1101,7 +1100,7 @@ ConnectionExists(struct Curl_easy *data,
         if((bundle->multiuse == BUNDLE_UNKNOWN) && data->set.pipewait) {
           infof(data, "Server doesn't support multi-use yet, wait\n");
           *waitpipe = TRUE;
-          Curl_conncache_unlock(needle);
+          Curl_conncache_unlock(data);
           return FALSE; /* no re-use */
         }
 
@@ -1461,11 +1460,11 @@ ConnectionExists(struct Curl_easy *data,
   if(chosen) {
     /* mark it as used before releasing the lock */
     chosen->data = data; /* own it! */
-    Curl_conncache_unlock(needle);
+    Curl_conncache_unlock(data);
     *usethis = chosen;
     return TRUE; /* yes, we found one to use! */
   }
-  Curl_conncache_unlock(needle);
+  Curl_conncache_unlock(data);
 
   if(foundPendingCandidate && data->set.pipewait) {
     infof(data,
@@ -2066,7 +2065,7 @@ static CURLcode parseurlandfillconn(struct Curl_easy *data,
     if(uc) {
       DEBUGF(infof(data, "curl_url_set rejected %s\n", data->change.url));
       return Curl_uc_to_curlcode(uc);
-  }
+    }
   }
 
   uc = curl_url_get(uh, CURLUPART_SCHEME, &data->state.up.scheme, 0);
@@ -2997,7 +2996,7 @@ static CURLcode parse_remote_port(struct Curl_easy *data,
     char portbuf[16];
     CURLUcode uc;
     conn->remote_port = (unsigned short)data->set.use_port;
-    msnprintf(portbuf, sizeof(portbuf), "%u", conn->remote_port);
+    msnprintf(portbuf, sizeof(portbuf), "%d", conn->remote_port);
     uc = curl_url_set(data->state.uh, CURLUPART_PORT, portbuf, 0);
     if(uc)
       return CURLE_OUT_OF_MEMORY;
@@ -3608,6 +3607,7 @@ static CURLcode create_conn(struct Curl_easy *data,
   size_t max_total_connections = Curl_multi_max_total_connections(data->multi);
 
   *async = FALSE;
+  *in_connect = NULL;
 
   /*************************************************************
    * Check input data
@@ -3773,7 +3773,6 @@ static CURLcode create_conn(struct Curl_easy *data,
 
     /* Setup a "faked" transfer that'll do nothing */
     if(!result) {
-      conn->data = data;
       conn->bits.tcpconnect[FIRSTSOCKET] = TRUE; /* we are "connected */
 
       result = Curl_conncache_add_conn(data->state.conn_cache, conn);
@@ -3954,7 +3953,7 @@ static CURLcode create_conn(struct Curl_easy *data,
 
         /* The bundle is full. Extract the oldest connection. */
         conn_candidate = Curl_conncache_extract_bundle(data, bundle);
-        Curl_conncache_unlock(conn);
+        Curl_conncache_unlock(data);
 
         if(conn_candidate)
           (void)Curl_disconnect(data, conn_candidate,
@@ -3966,7 +3965,7 @@ static CURLcode create_conn(struct Curl_easy *data,
         }
       }
       else
-        Curl_conncache_unlock(conn);
+        Curl_conncache_unlock(data);
 
     }
 
@@ -4135,11 +4134,11 @@ CURLcode Curl_setup_conn(struct connectdata *conn,
 }
 
 CURLcode Curl_connect(struct Curl_easy *data,
-                      struct connectdata **in_connect,
                       bool *asyncp,
                       bool *protocol_done)
 {
   CURLcode result;
+  struct connectdata *conn;
 
   *asyncp = FALSE; /* assume synchronous resolves by default */
 
@@ -4149,30 +4148,30 @@ CURLcode Curl_connect(struct Curl_easy *data,
   data->req.maxdownload = -1;
 
   /* call the stuff that needs to be called */
-  result = create_conn(data, in_connect, asyncp);
+  result = create_conn(data, &conn, asyncp);
 
   if(!result) {
-    if(CONN_INUSE(*in_connect))
+    if(CONN_INUSE(conn))
       /* pipelining */
       *protocol_done = TRUE;
     else if(!*asyncp) {
       /* DNS resolution is done: that's either because this is a reused
          connection, in which case DNS was unnecessary, or because DNS
          really did finish already (synch resolver/fast async resolve) */
-      result = Curl_setup_conn(*in_connect, protocol_done);
+      result = Curl_setup_conn(conn, protocol_done);
     }
   }
 
   if(result == CURLE_NO_CONNECTION_AVAILABLE) {
-    *in_connect = NULL;
     return result;
   }
-  else if(result && *in_connect) {
+  else if(result && conn) {
     /* We're not allowed to return failure with memory left allocated in the
        connectdata struct, free those here */
-    Curl_disconnect(data, *in_connect, TRUE);
-    *in_connect = NULL; /* return a NULL */
+    Curl_disconnect(data, conn, TRUE);
   }
+  else
+    Curl_attach_connnection(data, conn);
 
   return result;
 }
