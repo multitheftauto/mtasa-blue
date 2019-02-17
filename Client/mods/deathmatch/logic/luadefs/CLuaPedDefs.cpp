@@ -1710,18 +1710,14 @@ int CLuaPedDefs::SetPedFightingStyle(lua_State* luaVM)
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(ucStyle);
 
-    if (!argStream.HasErrors())
+    if (argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetPedFightingStyle(*pEntity, ucStyle))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushnil(luaVM);
+        return 1;
+    }
 
-    lua_pushboolean(luaVM, false);
+    lua_pushboolean(luaVM, CStaticFunctionDefinitions::SetPedFightingStyle(*pEntity, ucStyle));
     return 1;
 }
 
