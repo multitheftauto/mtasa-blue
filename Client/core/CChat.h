@@ -246,8 +246,8 @@ protected:
     std::string m_strInputText;
     std::string m_strCommand;
 
-    std::vector<std::vector<SString>> m_vecInputHistory;
-    unsigned int                      m_uiSelectedInputHistoryEntry;
+    std::vector<std::pair<SString, SString>> m_vecInputHistory;
+    unsigned int                             m_uiSelectedInputHistoryEntry;
 
     bool  m_bVisible;
     bool  m_bInputVisible;
