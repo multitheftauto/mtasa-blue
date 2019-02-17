@@ -15,7 +15,7 @@
 
 bool bFoo_PlayerLimitCrash = false;
 
-void CFoo::DoPulse(void)
+void CFoo::DoPulse()
 {
     CClientManager* pManager = g_pClientGame->GetManager();
     if (pManager->IsGameLoaded())

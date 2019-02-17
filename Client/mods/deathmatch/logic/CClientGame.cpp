@@ -350,7 +350,7 @@ CClientGame::CClientGame(bool bLocalPlay)
     g_pCore->GetGraphics()->GetRenderItemManager()->SetTestMode(DX_TEST_MODE_NONE);
 }
 
-CClientGame::~CClientGame(void)
+CClientGame::~CClientGame()
 {
     m_bBeingDeleted = true;
     // Stop all explosions. Unfortunately this doesn't fix the crash
@@ -511,6 +511,8 @@ CClientGame::~CClientGame(void)
     // NULL the global CClientGame var
     g_pClientGame = NULL;
     m_bBeingDeleted = false;
+
+    CStaticFunctionDefinitions::ResetAllSurfaceInfo();
 }
 
 /*
@@ -540,7 +542,7 @@ void CClientGame::EnablePacketRecorder(const char* szFilename)
     m_pManager->GetPacketRecorder()->StartRecord(szFilename, true);
 }
 
-void CClientGame::StartPlayback(void)
+void CClientGame::StartPlayback()
 {
     //    strcpy ( m_szNick, "Playback" );
 
@@ -715,7 +717,7 @@ bool CClientGame::OnCancelLocalGameClick(CGUIElement* pElement)
     return false;
 }
 
-void CClientGame::DoPulsePreFrame(void)
+void CClientGame::DoPulsePreFrame()
 {
     if (m_Status == CClientGame::STATUS_JOINED)
     {
@@ -758,7 +760,7 @@ void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRend
     DebugElementRender();
 }
 
-void CClientGame::DoPulsePostFrame(void)
+void CClientGame::DoPulsePostFrame()
 {
     TIMING_CHECKPOINT("+CClientGame::DoPulsePostFrame");
     #ifdef DEBUG_KEYSTATES
@@ -931,7 +933,7 @@ void CClientGame::DoPulsePostFrame(void)
     }
 }
 
-void CClientGame::DoPulses(void)
+void CClientGame::DoPulses()
 {
     TIMING_CHECKPOINT("-CClientGame::DoPulsePostFrame");
 
@@ -1511,7 +1513,7 @@ void CClientGame::SetMimic(unsigned int uiMimicCount)
 
 #endif
 
-void CClientGame::DoVehicleInKeyCheck(void)
+void CClientGame::DoVehicleInKeyCheck()
 {
     // Grab the controller state
     CControllerState cs;
@@ -1533,7 +1535,7 @@ void CClientGame::DoVehicleInKeyCheck(void)
     }
 }
 
-void CClientGame::UpdateVehicleInOut(void)
+void CClientGame::UpdateVehicleInOut()
 {
     // We got told by the server to animate into a certain vehicle?
     if (m_VehicleInOutID != INVALID_ELEMENT_ID)
@@ -1834,7 +1836,7 @@ void CClientGame::UpdateVehicleInOut(void)
     }
 }
 
-void CClientGame::UpdatePlayerTarget(void)
+void CClientGame::UpdatePlayerTarget()
 {
     CControllerState ControllerState;
     m_pLocalPlayer->GetControllerState(ControllerState);
@@ -1897,7 +1899,7 @@ void CClientGame::UpdatePlayerTarget(void)
     }
 }
 
-void CClientGame::UpdatePlayerWeapons(void)
+void CClientGame::UpdatePlayerWeapons()
 {
     // Check whether we changed weapon slots
     eWeaponSlot currentSlot = m_pLocalPlayer->GetCurrentWeaponSlot();
@@ -1970,7 +1972,7 @@ void CClientGame::UpdatePlayerWeapons(void)
     }
 }
 
-void CClientGame::UpdateTrailers(void)
+void CClientGame::UpdateTrailers()
 {
     // This function is here to re-attach trailers if they fall off
 
@@ -2019,7 +2021,7 @@ void CClientGame::UpdateTrailers(void)
     }
 }
 
-void CClientGame::UpdateFireKey(void)
+void CClientGame::UpdateFireKey()
 {
     if (m_pLocalPlayer)
     {
@@ -2133,7 +2135,7 @@ void CClientGame::UpdateFireKey(void)
     }
 }
 
-void CClientGame::UpdateStunts(void)
+void CClientGame::UpdateStunts()
 {
     // * Two wheeler *
     static unsigned long ulLastCarTwoWheelCounter = 0;
@@ -2270,7 +2272,7 @@ void CClientGame::ChangeVehicleWeapon(bool bNext)
     }
 }
 
-void CClientGame::ResetVehicleInOut(void)
+void CClientGame::ResetVehicleInOut()
 {
     m_ulLastVehicleInOutTime = 0;
     m_bIsGettingOutOfVehicle = false;
@@ -2741,7 +2743,7 @@ void CClientGame::SetWanted(DWORD dwWanted)
     m_dwWanted = dwWanted;
 }
 
-void CClientGame::AddBuiltInEvents(void)
+void CClientGame::AddBuiltInEvents()
 {
     // Resource events
     m_Events.AddEvent("onClientResourceStart", "resource", NULL, false);
@@ -2903,7 +2905,7 @@ void CClientGame::AddBuiltInEvents(void)
     m_Events.AddEvent("onClientWorldSound", "group, index, x, y, z", nullptr, false);
 }
 
-void CClientGame::DrawFPS(void)
+void CClientGame::DrawFPS()
 {
     // Draw the background
     float fResWidth = static_cast<float>(g_pCore->GetGraphics()->GetViewportWidth());
@@ -3148,7 +3150,7 @@ void CClientGame::DrawWeaponsyncData(CClientPlayer* pPlayer)
     }
 }
 
-void CClientGame::UpdateMimics(void)
+void CClientGame::UpdateMimics()
 {
     // Got a local player?
     if (m_pLocalPlayer)
@@ -3418,7 +3420,7 @@ void CClientGame::UpdateMimics(void)
     }
 }
 
-void CClientGame::DoPaintballs(void)
+void CClientGame::DoPaintballs()
 {
     if (m_pLocalPlayer)
     {
@@ -3515,7 +3517,7 @@ void CClientGame::QuitPlayer(CClientPlayer* pPlayer, eQuitReason Reason)
     delete pPlayer;
 }
 
-void CClientGame::Event_OnIngame(void)
+void CClientGame::Event_OnIngame()
 {
     // Unpause the game
     g_pGame->Pause(false);
@@ -3583,7 +3585,7 @@ void CClientGame::Event_OnIngame(void)
     WatchDogCompletedSection("L1");
 }
 
-void CClientGame::Event_OnIngameAndConnected(void)
+void CClientGame::Event_OnIngameAndConnected()
 {
     m_ulVerifyTimeStart = CClientTime::GetTime();
 
@@ -3601,7 +3603,7 @@ bool CClientGame::StaticBreakTowLinkHandler(CVehicle* pTowingVehicle)
     return g_pClientGame->BreakTowLinkHandler(pTowingVehicle);
 }
 
-void CClientGame::StaticDrawRadarAreasHandler(void)
+void CClientGame::StaticDrawRadarAreasHandler()
 {
     g_pClientGame->DrawRadarAreasHandler();
 }
@@ -3621,12 +3623,12 @@ void CClientGame::StaticFireHandler(CFire* pFire)
     g_pClientGame->FireHandler(pFire);
 }
 
-void CClientGame::StaticRender3DStuffHandler(void)
+void CClientGame::StaticRender3DStuffHandler()
 {
     g_pClientGame->Render3DStuffHandler();
 }
 
-void CClientGame::StaticPreRenderSkyHandler(void)
+void CClientGame::StaticPreRenderSkyHandler()
 {
     g_pClientGame->PreRenderSkyHandler();
 }
@@ -3669,22 +3671,22 @@ bool CClientGame::StaticBlendAnimationHierarchyHandler(CAnimBlendAssociationSAIn
     return g_pClientGame->BlendAnimationHierarchyHandler(pAnimAssoc, pOutAnimHierarchy, pFlags, pClump);
 }
 
-void CClientGame::StaticPreWorldProcessHandler(void)
+void CClientGame::StaticPreWorldProcessHandler()
 {
     g_pClientGame->PreWorldProcessHandler();
 }
 
-void CClientGame::StaticPostWorldProcessHandler(void)
+void CClientGame::StaticPostWorldProcessHandler()
 {
     g_pClientGame->PostWorldProcessHandler();
 }
 
-void CClientGame::StaticPreFxRenderHandler(void)
+void CClientGame::StaticPreFxRenderHandler()
 {
     g_pCore->OnPreFxRender();
 }
 
-void CClientGame::StaticPreHudRenderHandler(void)
+void CClientGame::StaticPreHudRenderHandler()
 {
     g_pCore->OnPreHUDRender();
 }
@@ -3819,7 +3821,7 @@ void CClientGame::StaticVehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
     g_pClientGame->VehicleWeaponHitHandler(event);
 }
 
-void CClientGame::DrawRadarAreasHandler(void)
+void CClientGame::DrawRadarAreasHandler()
 {
     m_pRadarAreaManager->DoPulse();
 }
@@ -3890,20 +3892,20 @@ void CClientGame::ProjectileInitiateHandler(CClientProjectile* pProjectile)
     pProjectile->CallEvent("onClientProjectileCreation", Arguments, true);
 }
 
-void CClientGame::Render3DStuffHandler(void)
+void CClientGame::Render3DStuffHandler()
 {
 }
 
-void CClientGame::PreRenderSkyHandler(void)
+void CClientGame::PreRenderSkyHandler()
 {
     g_pCore->GetGraphics()->GetRenderItemManager()->PreDrawWorld();
 }
 
-void CClientGame::PreWorldProcessHandler(void)
+void CClientGame::PreWorldProcessHandler()
 {
 }
 
-void CClientGame::PostWorldProcessHandler(void)
+void CClientGame::PostWorldProcessHandler()
 {
     m_pManager->GetMarkerManager()->DoPulse();
     m_pManager->GetPointLightsManager()->DoPulse();
@@ -3919,7 +3921,7 @@ void CClientGame::PostWorldProcessHandler(void)
     m_pRootEntity->CallEvent("onClientPreRender", Arguments, false);
 }
 
-void CClientGame::IdleHandler(void)
+void CClientGame::IdleHandler()
 {
     // If we are minimized we do the pulsing here
     if (g_pCore->IsWindowMinimized())
@@ -4126,7 +4128,7 @@ bool CClientGame::ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CE
 //
 // On demand files
 //
-void CClientGame::DownloadSingularResourceFiles(void)
+void CClientGame::DownloadSingularResourceFiles()
 {
     if (!IsTransferringSingularFiles())
         return;
@@ -5211,7 +5213,7 @@ bool CClientGame::PreWeaponFire(CPlayerPed* pPlayerPed, bool bStopIfUsingBulletS
     return true;
 }
 
-void CClientGame::PostWeaponFire(void)
+void CClientGame::PostWeaponFire()
 {
     // Send bullet sync with local damage info
     if (g_bBulletFireVectorsValid)
@@ -5550,12 +5552,12 @@ void CClientGame::SendProjectileSync(CClientProjectile* pProjectile)
     }
 }
 
-void CClientGame::ResetAmmoInClip(void)
+void CClientGame::ResetAmmoInClip()
 {
     memset(&m_wasWeaponAmmoInClip[0], 0, sizeof(m_wasWeaponAmmoInClip));
 }
 
-void CClientGame::ResetMapInfo(void)
+void CClientGame::ResetMapInfo()
 {
     // Restore some game stuff
     // Keybinds
@@ -6190,7 +6192,7 @@ bool CClientGame::SetCloudsEnabled(bool bEnabled)
     m_bCloudsEnabled = bEnabled;
     return true;
 }
-bool CClientGame::GetCloudsEnabled(void)
+bool CClientGame::GetCloudsEnabled()
 {
     return m_bCloudsEnabled;
 }
@@ -6200,7 +6202,7 @@ bool CClientGame::SetBirdsEnabled(bool bEnabled)
     m_bBirdsEnabled = bEnabled;
     return true;
 }
-bool CClientGame::GetBirdsEnabled(void)
+bool CClientGame::GetBirdsEnabled()
 {
     return m_bBirdsEnabled;
 }
@@ -6257,7 +6259,7 @@ void CClientGame::InitVoice(bool bEnabled, unsigned int uiServerSampleRate, unsi
 //
 // If debug render mode is on, allow each element in range to draw some stuff
 //
-void CClientGame::DebugElementRender(void)
+void CClientGame::DebugElementRender()
 {
     if (!GetDevelopmentMode() || !GetShowCollision())
         return;
@@ -6444,7 +6446,7 @@ void CClientGame::GottenPlayerScreenShot(const CBuffer* pBuffer, uint uiTimeSpen
 //////////////////////////////////////////////////////////////////
 // Process delay send list
 //
-void CClientGame::ProcessDelayedSendList(void)
+void CClientGame::ProcessDelayedSendList()
 {
     CTickCount tickCount = CTickCount::Now();
 
@@ -6573,7 +6575,7 @@ bool CClientGame::IsUsingAlternatePulseOrder(bool bAdvanceDelayCounter)
 // Output info about the connected server for player
 //
 //////////////////////////////////////////////////////////////////
-void CClientGame::OutputServerInfo(void)
+void CClientGame::OutputServerInfo()
 {
     SString strTotalOutput;
     strTotalOutput += SString("Server info for %s", g_pNet->GetConnectedServer(true));
@@ -6707,7 +6709,7 @@ void CClientGame::ChangeFloatPrecision(bool bHigh)
     }
 }
 
-bool CClientGame::IsHighFloatPrecision(void) const
+bool CClientGame::IsHighFloatPrecision() const
 {
     return m_uiPrecisionCallDepth != 0;
 }
@@ -6741,7 +6743,7 @@ AnimationId CClientGame::DrivebyAnimationHandler(AnimationId animId, AssocGroupI
 // Figure out which directory to use for the client resource file cache
 //
 //////////////////////////////////////////////////////////////////
-void CClientGame::SetFileCacheRoot(void)
+void CClientGame::SetFileCacheRoot()
 {
     if (g_pCore->GetCVars()->GetValue<bool>("share_file_cache") == false)
     {

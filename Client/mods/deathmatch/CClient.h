@@ -17,12 +17,12 @@ class CClient : public CClientBase
 {
 public:
     int  ClientInitialize(const char* szArguments, CCoreInterface* pCore);
-    void ClientShutdown(void);
+    void ClientShutdown();
 
-    void PreFrameExecutionHandler(void);
+    void PreFrameExecutionHandler();
     void PreHUDRenderExecutionHandler(bool bDidUnminimize, bool bDidRecreateRenderTargets);
-    void PostFrameExecutionHandler(void);
-    void IdleHandler(void);
+    void PostFrameExecutionHandler();
+    void IdleHandler();
     void RestreamModel(unsigned short usModel);
 
     bool WebsiteRequestResultHandler(const std::unordered_set<SString>& newPages);

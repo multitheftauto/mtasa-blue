@@ -18,19 +18,19 @@ class CClientTeamManager;
 class CClientTeamManager
 {
 public:
-    CClientTeamManager(void);
-    ~CClientTeamManager(void);
+    CClientTeamManager();
+    ~CClientTeamManager();
 
     void AddToList(CClientTeam* pTeam) { m_List.push_back(pTeam); }
     void RemoveFromList(CClientTeam* pTeam);
-    void RemoveAll(void);
+    void RemoveAll();
     bool Exists(CClientTeam* pTeam);
 
     static CClientTeam* GetTeam(ElementID ID);
     CClientTeam*        GetTeam(const char* szName);
 
-    std::list<CClientTeam*>::const_iterator IterBegin(void) { return m_List.begin(); }
-    std::list<CClientTeam*>::const_iterator IterEnd(void) { return m_List.end(); }
+    std::list<CClientTeam*>::const_iterator IterBegin() { return m_List.begin(); }
+    std::list<CClientTeam*>::const_iterator IterEnd() { return m_List.end(); }
 
 private:
     std::list<CClientTeam*> m_List;

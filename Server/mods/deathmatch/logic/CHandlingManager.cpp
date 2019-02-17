@@ -16,7 +16,7 @@ SFixedArray<tHandlingData, HT_MAX> CHandlingManager::m_OriginalHandlingData;
 SFixedArray<CHandlingEntry*, HT_MAX> CHandlingManager::m_pOriginalEntries;
 SFixedArray<CHandlingEntry*, HT_MAX> CHandlingManager::m_pModelEntries;
 
-CHandlingManager::CHandlingManager(void)
+CHandlingManager::CHandlingManager()
 {
     // Initialize all default handlings
     InitializeDefaultHandlings();
@@ -73,7 +73,7 @@ CHandlingManager::CHandlingManager(void)
 }
 //* needs testing by someone who knows more about handling
 
-CHandlingManager::~CHandlingManager(void)
+CHandlingManager::~CHandlingManager()
 {
     // Destroy all original handling entries
     for (int i = 0; i < HT_MAX; i++)
@@ -88,7 +88,7 @@ CHandlingManager::~CHandlingManager(void)
     }
 }
 
-CHandlingEntry* CHandlingManager::CreateHandlingData(void)
+CHandlingEntry* CHandlingManager::CreateHandlingData()
 {
     CHandlingEntry* pHandlingEntry = new CHandlingEntry();
     return pHandlingEntry;
@@ -607,7 +607,7 @@ eHandlingTypes CHandlingManager::GetHandlingID(eVehicleTypes eModel)
     return HT_LANDSTAL;
 }
 
-void CHandlingManager::InitializeDefaultHandlings(void)
+void CHandlingManager::InitializeDefaultHandlings()
 {
     // Reset
     memset(&m_OriginalHandlingData[0], 0, sizeof(m_OriginalHandlingData));

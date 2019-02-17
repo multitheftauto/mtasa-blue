@@ -10,19 +10,60 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+
+#define ARRAY_SurfaceInfos 0xB79538
+
 CWorldSA::CWorldSA()
 {
     m_pBuildingRemovals = new std::multimap<unsigned short, SBuildingRemoval*>;
     m_pDataBuildings = new std::multimap<unsigned short, sDataBuildingRemovalItem*>;
     m_pBinaryBuildings = new std::multimap<unsigned short, sBuildingRemovalItem*>;
 
+    m_pSurfaceInfo = reinterpret_cast<CSurfaceType*>(ARRAY_SurfaceInfos);
+    // Store default surface properties
+    memcpy(&m_pOriginalSurfaceInfo, (void *)ARRAY_SurfaceInfos, sizeof(CSurfaceType));
+
     InstallHooks();
+}
+
+CSurfaceType* CWorldSA::GetSurfaceInfo()
+{
+    return m_pSurfaceInfo;
+}
+
+void CWorldSA::ResetAllSurfaceInfo()
+{
+    DWORD dwSurfaceInfo = (DWORD)m_pSurfaceInfo;
+
+    DWORD dwOriginalSurfaceInfo = (DWORD)(&m_pOriginalSurfaceInfo);
+
+    size_t sOffset = offsetof(CSurfaceType, CSurfaceType::surfType);
+    size_t sSize = sizeof(SurfaceInfo_c) * EColSurfaceValue::SIZE;
+
+    memcpy((void*)(dwSurfaceInfo + sOffset), (void*)(dwOriginalSurfaceInfo + sOffset), sSize);
+}
+
+bool CWorldSA::ResetSurfaceInfo(short sSurfaceID)
+{
+    if (sSurfaceID >= EColSurfaceValue::DEFAULT && sSurfaceID <= EColSurfaceValue::SIZE)
+    {
+        CSurfaceType* pSurfaceInfo = m_pSurfaceInfo;
+        DWORD dwSurfaceInfo = (DWORD)pSurfaceInfo;
+        DWORD dwOriginalSurfaceInfo = (DWORD)(&m_pOriginalSurfaceInfo);
+
+        size_t sOffset = offsetof(CSurfaceType, CSurfaceType::surfType) + sizeof(SurfaceInfo_c) * sSurfaceID;
+        size_t sSize = sizeof(SurfaceInfo_c);
+
+        memcpy((void*)(dwSurfaceInfo + sOffset), (void*)(dwOriginalSurfaceInfo + sOffset), sSize);
+        return true;
+    }
+    return false;
 }
 
 void HOOK_FallenPeds();
 void HOOK_FallenCars();
 
-void CWorldSA::InstallHooks(void)
+void CWorldSA::InstallHooks()
 {
     HookInstall(0x565CB0, (DWORD)HOOK_FallenPeds, 5);
     HookInstall(0x565E80, (DWORD)HOOK_FallenCars, 5);
@@ -467,7 +508,7 @@ bool CWorldSA::HasCollisionBeenLoaded(CVector* vecPosition)
     return bRet;
 }
 
-DWORD CWorldSA::GetCurrentArea(void)
+DWORD CWorldSA::GetCurrentArea()
 {
     return *(DWORD*)VAR_currArea;
 }
@@ -490,7 +531,7 @@ void CWorldSA::SetJetpackMaxHeight(float fHeight)
     MemPut<float>(VAR_fJetpackMaxHeight, fHeight);
 }
 
-float CWorldSA::GetJetpackMaxHeight(void)
+float CWorldSA::GetJetpackMaxHeight()
 {
     return *(float*)(VAR_fJetpackMaxHeight);
 }
@@ -500,7 +541,7 @@ void CWorldSA::SetAircraftMaxHeight(float fHeight)
     g_pCore->GetMultiplayer()->SetAircraftMaxHeight(fHeight);
 }
 
-float CWorldSA::GetAircraftMaxHeight(void)
+float CWorldSA::GetAircraftMaxHeight()
 {
     return g_pCore->GetMultiplayer()->GetAircraftMaxHeight();
 }
@@ -510,7 +551,7 @@ void CWorldSA::SetAircraftMaxVelocity(float fVelocity)
     g_pCore->GetMultiplayer()->SetAircraftMaxVelocity(fVelocity);
 }
 
-float CWorldSA::GetAircraftMaxVelocity(void)
+float CWorldSA::GetAircraftMaxVelocity()
 {
     return g_pCore->GetMultiplayer()->GetAircraftMaxVelocity();
 }
@@ -530,7 +571,7 @@ void CWorldSA::SetOcclusionsEnabled(bool bEnabled)
     }
 }
 
-bool CWorldSA::GetOcclusionsEnabled(void)
+bool CWorldSA::GetOcclusionsEnabled()
 {
     if (*(BYTE*)FUNC_COcclusion_ProcessBeforeRendering == 0x51)            // Is standard value ?
         return true;

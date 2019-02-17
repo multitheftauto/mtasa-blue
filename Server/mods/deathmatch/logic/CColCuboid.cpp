@@ -46,7 +46,7 @@ bool CColCuboid::ReadSpecialData(const int iLine)
     return true;
 }
 
-CSphere CColCuboid::GetWorldBoundingSphere(void)
+CSphere CColCuboid::GetWorldBoundingSphere()
 {
     CSphere sphere;
     sphere.vecPosition = m_vecPosition + m_vecSize * 0.5f;

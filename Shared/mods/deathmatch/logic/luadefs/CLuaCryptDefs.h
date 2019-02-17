@@ -14,7 +14,7 @@
 class CLuaCryptDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     LUA_DECLARE(Md5);
     LUA_DECLARE(Sha256);

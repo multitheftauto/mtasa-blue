@@ -217,8 +217,8 @@ void RotateVector(CVector& vecLine, const CVector& vecRotation);
 void AttachedMatrix(const CMatrix& matrix, CMatrix& returnMatrix, const CVector& vecPosition, const CVector& vecRotation);
 
 unsigned int GetRandom(unsigned int uiLow, unsigned int uiHigh);
-double       GetRandomDouble(void);
-float        GetRandomFloat(void);
+double       GetRandomDouble();
+float        GetRandomFloat();
 
 SString GetDataUnit(unsigned long long ullInput);
 

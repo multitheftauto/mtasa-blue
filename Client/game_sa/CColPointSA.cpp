@@ -11,14 +11,14 @@
 
 #include "StdInc.h"
 
-CColPointSA::CColPointSA(void)
+CColPointSA::CColPointSA()
 {
     m_pInternalInterface = new CColPointSAInterface();
 };
 
 // Get lighting taking into account time of day
 // Returns between 0 and 1
-float CColPointSA::GetLightingForTimeOfDay(void)
+float CColPointSA::GetLightingForTimeOfDay()
 {
     CColLighting lighting = GetLightingB();
 

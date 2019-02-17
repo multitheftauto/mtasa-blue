@@ -11,11 +11,11 @@
 
 #include "StdInc.h"
 
-CTeamManager::CTeamManager(void)
+CTeamManager::CTeamManager()
 {
 }
 
-CTeamManager::~CTeamManager(void)
+CTeamManager::~CTeamManager()
 {
     RemoveAll();
 }
@@ -25,7 +25,7 @@ void CTeamManager::RemoveFromList(CTeam* pTeam)
     m_List.remove(pTeam);
 }
 
-void CTeamManager::RemoveAll(void)
+void CTeamManager::RemoveAll()
 {
     DeletePointersAndClearList(m_List);
 }

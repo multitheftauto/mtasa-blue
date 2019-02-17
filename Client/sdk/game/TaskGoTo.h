@@ -31,7 +31,7 @@ enum
 class CTaskComplexWander : public virtual CTaskComplex
 {
 public:
-    virtual ~CTaskComplexWander(void){};
+    virtual ~CTaskComplexWander(){};
 
     virtual CNodeAddress* GetNextNode() = 0;
     virtual CNodeAddress* GetLastNode() = 0;
@@ -42,5 +42,5 @@ public:
 class CTaskComplexWanderStandard : public virtual CTaskComplexWander
 {
 public:
-    virtual ~CTaskComplexWanderStandard(void){};
+    virtual ~CTaskComplexWanderStandard(){};
 };

@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 
-void CLuaCameraDefs::LoadFunctions(void)
+void CLuaCameraDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         // Cam get funcs

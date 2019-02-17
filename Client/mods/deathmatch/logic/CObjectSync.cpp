@@ -50,7 +50,7 @@ bool CObjectSync::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface&
     return false;
 }
 
-void CObjectSync::DoPulse(void)
+void CObjectSync::DoPulse()
 {
     // Has it been long enough since our last state's sync?
     unsigned long ulCurrentTime = CClientTime::GetTime();
@@ -72,7 +72,7 @@ void CObjectSync::RemoveObject(CDeathmatchObject* pObject)
         m_List.remove(pObject);
 }
 
-void CObjectSync::ClearObjects(void)
+void CObjectSync::ClearObjects()
 {
     m_List.clear();
 }
@@ -190,7 +190,7 @@ void CObjectSync::Packet_ObjectSync(NetBitStreamInterface& BitStream)
     }
 }
 
-void CObjectSync::Sync(void)
+void CObjectSync::Sync()
 {
     // Got any items?
     if (m_List.size() > 0)

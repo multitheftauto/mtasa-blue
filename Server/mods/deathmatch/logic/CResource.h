@@ -230,7 +230,8 @@ public:
     }
     bool IsStarting() const noexcept { return m_eState == EResourceState::Starting; }
     bool IsStopping() const noexcept { return m_eState == EResourceState::Stopping; }
-    bool HasStarted() const noexcept { return m_eState == EResourceState::Running; }
+
+    bool IsClientSynced() const noexcept { return m_bClientSync; }
 
     const SString& GetName() const noexcept { return m_strResourceName; }
 
@@ -358,6 +359,7 @@ private:
 
 private:
     EResourceState m_eState = EResourceState::None;
+    bool           m_bClientSync = false;
 
     unsigned short m_usNetID = -1;
     uint           m_uiScriptID = -1;

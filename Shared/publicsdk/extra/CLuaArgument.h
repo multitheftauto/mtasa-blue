@@ -26,14 +26,14 @@ extern "C"
 class CLuaArgument
 {
 public:
-    CLuaArgument(void);
+    CLuaArgument();
     CLuaArgument(bool bBool);
     CLuaArgument(double dNumber);
     CLuaArgument(const char* szString);
     CLuaArgument(void* pUserData);
     CLuaArgument(const CLuaArgument& Argument);
     CLuaArgument(lua_State* luaVM, unsigned int uiArgument);
-    ~CLuaArgument(void);
+    ~CLuaArgument();
 
     const CLuaArgument& operator=(const CLuaArgument& Argument);
     bool                operator==(const CLuaArgument& Argument);
@@ -42,12 +42,12 @@ public:
     void Read(lua_State* luaVM, unsigned int uiArgument);
     void Push(lua_State* luaVM) const;
 
-    int GetType(void) const { return m_iType; };
+    int GetType() const { return m_iType; };
 
-    bool        GetBoolean(void) const { return m_bBoolean; };
-    lua_Number  GetNumber(void) const { return m_Number; };
-    const char* GetString(void) const { return m_szString; };
-    void*       GetLightUserData(void) const { return m_pLightUserData; };
+    bool        GetBoolean() const { return m_bBoolean; };
+    lua_Number  GetNumber() const { return m_Number; };
+    const char* GetString() const { return m_szString; };
+    void*       GetLightUserData() const { return m_pLightUserData; };
 
 private:
     int        m_iType;

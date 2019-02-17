@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CLuaEventPacket::CLuaEventPacket(void)
+CLuaEventPacket::CLuaEventPacket()
 {
     m_ElementID = INVALID_ELEMENT_ID;
     m_pArguments = &m_ArgumentsStore;

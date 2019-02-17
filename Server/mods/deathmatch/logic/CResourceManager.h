@@ -46,41 +46,41 @@ private:
 
 public:
     ZERO_ON_NEW
-    CResourceManager(void);
-    ~CResourceManager(void);
+    CResourceManager();
+    ~CResourceManager();
 
     CResource*                            Load(bool bIsZipped, const char* szAbsPath, const char* szResourceName);
     void                                  UnloadAndDelete(CResource* pResource);
     CResource*                            GetResource(const char* szResourceName);
     CResource*                            GetResourceFromScriptID(uint uiScriptID);
     void                                  UnloadRemovedResources();
-    void                                  CheckResourceDependencies(void);
+    void                                  CheckResourceDependencies();
     void                                  ListResourcesLoaded(const SString& strListType);
-    std::list<CResource*>::const_iterator IterBegin(void) { return m_resources.begin(); };
-    std::list<CResource*>::const_iterator IterEnd(void) { return m_resources.end(); };
+    std::list<CResource*>::const_iterator IterBegin() { return m_resources.begin(); };
+    std::list<CResource*>::const_iterator IterEnd() { return m_resources.end(); };
 
     bool         Refresh(bool bRefreshAll = false, const SString strJustThisResource = "", bool bShowTiming = false);
     void         UpgradeResources(CResource* pResource = NULL);
     void         CheckResources(CResource* pResource = NULL);
-    unsigned int GetResourceLoadedCount(void) { return m_uiResourceLoadedCount; }
-    unsigned int GetResourceFailedCount(void) { return m_uiResourceFailedCount; }
+    unsigned int GetResourceLoadedCount() { return m_uiResourceLoadedCount; }
+    unsigned int GetResourceFailedCount() { return m_uiResourceFailedCount; }
     void         OnPlayerJoin(CPlayer& Player);
 
-    const char* GetResourceDirectory(void);
+    const char* GetResourceDirectory();
 
     bool StartResource(CResource* pResource, std::list<CResource*>* pDependents = nullptr, bool bManualStart = false,
                        const SResourceStartOptions& StartOptions = SResourceStartOptions());
     bool Reload(CResource* pResource);
-    bool StopAllResources(void);
+    bool StopAllResources();
 
     void QueueResource(CResource* pResource, eResourceQueue eQueueType, const SResourceStartOptions* pStartOptions,
                        std::list<CResource*>* pDependents = nullptr);
-    void ProcessQueue(void);
+    void ProcessQueue();
     void RemoveFromQueue(CResource* pResource);
 
     bool IsAResourceElement(CElement* pElement);
 
-    unsigned short GenerateID(void);
+    unsigned short GenerateID();
     CResource*     GetResourceFromNetID(unsigned short usNetID);
 
     CResource* GetResourceFromLuaState(struct lua_State* luaVM);
@@ -91,7 +91,7 @@ public:
     CResource* RenameResource(CResource* pSourceResource, const SString& strNewResourceName, const SString& strNewOrganizationalPath, SString& strOutStatus);
     bool       DeleteResource(const SString& strResourceName, SString& strOutStatus);
 
-    SString GetResourceTrashDir(void);
+    SString GetResourceTrashDir();
     bool    MoveDirToTrash(const SString& strPathDirName);
     SString GetResourceOrganizationalPath(CResource* pResource);
 
@@ -105,15 +105,15 @@ public:
 
     void    ApplyMinClientRequirement(CResource* pResource, const SString& strMinClientRequirement);
     void    RemoveMinClientRequirement(CResource* pResource);
-    void    ReevaluateMinClientRequirement(void);
-    SString GetMinClientRequirement(void) { return m_strMinClientRequirement; }
+    void    ReevaluateMinClientRequirement();
+    SString GetMinClientRequirement() { return m_strMinClientRequirement; }
 
     void ApplySyncMapElementDataOption(CResource* pResource, bool bSyncMapElementData);
     void RemoveSyncMapElementDataOption(CResource* pResource);
-    void ReevaluateSyncMapElementDataOption(void);
+    void ReevaluateSyncMapElementDataOption();
 
-    void    LoadBlockedFileReasons(void);
-    void    SaveBlockedFileReasons(void);
+    void    LoadBlockedFileReasons();
+    void    SaveBlockedFileReasons();
     void    ClearBlockedFileReason(const SString& strFileHash);
     void    AddBlockedFileReason(const SString& strFileHash, const SString& strReason);
     SString GetBlockedFileReason(const SString& strFileHash);

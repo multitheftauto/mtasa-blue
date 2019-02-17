@@ -16,5 +16,5 @@
 class CBmx : public virtual CVehicle
 {
 public:
-    virtual ~CBmx(void){};
+    virtual ~CBmx(){};
 };

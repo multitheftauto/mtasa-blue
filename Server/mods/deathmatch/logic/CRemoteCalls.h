@@ -41,7 +41,7 @@ public:
     ~CRemoteCall();
     void           MakeCall();
     static void    DownloadFinishedCallback(const SHttpDownloadResult& result);
-    bool           CancelDownload(void);
+    bool           CancelDownload();
     bool           GetDownloadStatus(SDownloadStatus& outDownloadStatus);
     CLuaMain*      GetVM() { return m_VM; };
     bool           IsFetch() { return m_bIsFetch; }
@@ -75,7 +75,7 @@ public:
     void              Remove(CLuaMain* luaMain);
     void              Remove(CRemoteCall* call);
     bool              CallExists(CRemoteCall* call);
-    void              ProcessQueuedFiles(void);
+    void              ProcessQueuedFiles();
     EDownloadModeType GetDownloadModeForQueueName(const SString& strQueueName);
     EDownloadModeType GetDownloadModeFromQueueIndex(uint uiIndex);
 };

@@ -12,12 +12,12 @@
 
 using std::list;
 
-CClientTeamManager::CClientTeamManager(void)
+CClientTeamManager::CClientTeamManager()
 {
     m_bRemoveFromList = true;
 }
 
-CClientTeamManager::~CClientTeamManager(void)
+CClientTeamManager::~CClientTeamManager()
 {
     RemoveAll();
 }
@@ -31,7 +31,7 @@ void CClientTeamManager::RemoveFromList(CClientTeam* pTeam)
     }
 }
 
-void CClientTeamManager::RemoveAll(void)
+void CClientTeamManager::RemoveAll()
 {
     m_bRemoveFromList = false;
 

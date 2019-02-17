@@ -12,7 +12,7 @@
 #include <StdInc.h>
 #include "CPickupRPCs.h"
 
-void CPickupRPCs::LoadFunctions(void)
+void CPickupRPCs::LoadFunctions()
 {
     AddHandler(DESTROY_ALL_PICKUPS, DestroyAllPickups, "DestroyAllPickups");
     AddHandler(SET_PICKUP_TYPE, SetPickupType, "SetPickupType");
