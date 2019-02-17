@@ -162,6 +162,7 @@ public:
     void         Clear();
     void         ClearInput();
     bool         CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs);
+    bool         KeyDownHandler(CGUIKeyEventArgs KeyboardArgs);
     void         SetDxFont(LPD3DXFONT pDXFont);
 
     bool IsVisible() { return m_bVisible; }
@@ -190,6 +191,9 @@ public:
     void Scroll(int iState) { m_iScrollState = iState; };
     void ScrollUp();
     void ScrollDown();
+
+    void ResetInputHistoryChanges();
+    void SelectInputHistoryEntry(uint uiEntry);
 
     void SetChatFont(eChatFont Font);
     void OnModLoad();
@@ -241,6 +245,9 @@ protected:
 
     std::string m_strInputText;
     std::string m_strCommand;
+
+    std::vector<std::vector<SString>> m_vecInputHistory;
+    unsigned int                      m_uiSelectedInputHistoryEntry;
 
     bool  m_bVisible;
     bool  m_bInputVisible;

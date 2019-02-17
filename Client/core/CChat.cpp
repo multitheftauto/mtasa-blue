@@ -60,6 +60,8 @@ CChat::CChat(CGUI* pManager, const CVector2D& vecPosition)
     m_ePositionHorizontal = Chat::Position::Horizontal::LEFT;
     m_ePositionVertical = Chat::Position::Vertical::TOP;
     m_eTextAlign = Chat::Text::Align::LEFT;
+    m_vecInputHistory = {{"", ""}};
+    m_uiSelectedInputHistoryEntry = 0;
 
     // Background area
     m_pBackground = m_pManager->CreateStaticImage();
@@ -106,6 +108,7 @@ void CChat::OnModLoad()
 {
     // Set handlers
     m_pManager->SetCharacterKeyHandler(INPUT_MOD, GUI_CALLBACK_KEY(&CChat::CharacterKeyHandler, this));
+    m_pManager->SetKeyDownHandler(INPUT_MOD, GUI_CALLBACK_KEY(&CChat::KeyDownHandler, this));
 }
 
 void CChat::LoadCVars()
@@ -548,6 +551,38 @@ void CChat::ScrollDown()
     }
 }
 
+// Resets input history edits to their original inputs
+void CChat::ResetInputHistoryChanges()
+{
+    for (auto& i : m_vecInputHistory)
+        i[1] = i[0];
+}
+
+void CChat::SelectInputHistoryEntry(uint uiEntry)
+{
+    uint uiPreviouslySelectedInputHistoryEntry = m_uiSelectedInputHistoryEntry;
+
+    // Check if we're in bounds, otherwise clear selection
+    if (!m_vecInputHistory.empty() && uiEntry > 0 && uiEntry < m_vecInputHistory.size())
+        m_uiSelectedInputHistoryEntry = uiEntry;
+    else
+        m_uiSelectedInputHistoryEntry = 0;
+
+    // Save current input to the input history entry as the second element
+    m_vecInputHistory[uiPreviouslySelectedInputHistoryEntry][1] = m_strInputText.c_str();
+
+    // Clear input
+    ClearInput();
+
+    // If the selected command is empty, let's just stop here
+    SString strInput = m_vecInputHistory[m_uiSelectedInputHistoryEntry][1];
+    if (strInput.empty())
+        return;
+
+    // Set the input
+    SetInputText(strInput.c_str());
+}
+
 bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
 {
     // If we can take input
@@ -573,11 +608,21 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
                 // Empty the chat and hide the input stuff
                 // If theres a command to call, call it
                 if (!m_strCommand.empty() && !m_strInputText.empty())
+                {
                     CCommands::GetSingleton().Execute(m_strCommand.c_str(), m_strInputText.c_str());
+
+                    // If the command is not empty and it isn't identical to the previous entry in history, add it to the history
+                    // The first string is the original command, the second string is for storing the edited command
+                    if (!m_strInputText.empty() && (m_vecInputHistory.empty() || m_vecInputHistory.back()[0] != m_strInputText))
+                        m_vecInputHistory.push_back({m_strInputText, m_strInputText});
+                }
 
                 SetInputVisible(false);
 
                 m_fSmoothScrollResetTime = GetSecondCount();
+
+                ResetInputHistoryChanges();
+                m_uiSelectedInputHistoryEntry = 0;
                 break;
             }
             case VK_TAB:
@@ -699,6 +744,46 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
     return true;
 }
 
+bool CChat::KeyDownHandler(CGUIKeyEventArgs KeyboardArgs)
+{
+    // If we can take input
+    if (!CLocalGUI::GetSingleton().GetConsole()->IsVisible() && IsInputVisible())
+    {
+        switch (KeyboardArgs.scancode)
+        {
+            case CGUIKeys::Scan::ArrowUp:
+            {
+                // If there's nothing to select, break here
+                if (m_vecInputHistory.size() <= 1 || m_uiSelectedInputHistoryEntry == 1)
+                    break;
+
+                // Select the previous entry
+                int iEntry = m_uiSelectedInputHistoryEntry;
+                if (iEntry == 0)
+                    iEntry = m_vecInputHistory.size() - 1;
+                else
+                    iEntry--;
+
+                // Select the previous entry
+                SelectInputHistoryEntry(iEntry);
+                break;
+            }
+
+            case CGUIKeys::Scan::ArrowDown:
+            {
+                // If there's nothing to select, break here
+                if (m_vecInputHistory.size() <= 1 || m_uiSelectedInputHistoryEntry == 0)
+                    break;
+
+                // Select the next entry
+                SelectInputHistoryEntry(m_uiSelectedInputHistoryEntry + 1);
+                break;
+            }
+        }
+    }
+    return true;
+}
+
 void CChat::SetVisible(bool bVisible)
 {
     m_bVisible = bVisible;
@@ -715,6 +800,8 @@ void CChat::SetInputVisible(bool bVisible)
     if (!bVisible)
     {
         ClearInput();
+        ResetInputHistoryChanges();
+        m_uiSelectedInputHistoryEntry = 0;
     }
 
     m_bInputVisible = bVisible;
