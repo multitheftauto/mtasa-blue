@@ -16,11 +16,11 @@
 
 class CChatLineSection;
 
-#define CHAT_WIDTH              320                             // Chatbox default width
-#define CHAT_TEXT_COLOR         CColor(235, 221, 178)           // Chatbox default text color
-#define CHAT_MAX_LINES          100                             // Chatbox maximum chat lines
-#define CHAT_MAX_CHAT_LENGTH    96                              // Chatbox maximum chat message length
-#define CHAT_BUFFER             1024                            // Chatbox buffer size
+#define CHAT_WIDTH 320                                   // Chatbox default width
+#define CHAT_TEXT_COLOR CColor(235, 221, 178)            // Chatbox default text color
+#define CHAT_MAX_LINES 100                               // Chatbox maximum chat lines
+#define CHAT_MAX_CHAT_LENGTH 96                          // Chatbox maximum chat message length
+#define CHAT_BUFFER 1024                                 // Chatbox buffer size
 
 class CColor
 {
@@ -146,6 +146,44 @@ struct SDrawList
     }
 };
 
+//
+// SInputHistoryEntry - A single input history entry
+//
+struct SInputHistoryEntry
+{
+    // Contains the original entry that was submitted
+    SString strEntry;
+    // Contains a version with any temporary inline edits that were made in the chat input
+    SString strTemp;
+
+    SInputHistoryEntry(SString strEntry)
+    {
+        this->strEntry = strEntry;
+        this->strTemp = this->strEntry;
+    }
+
+    // Reset the temporary string to the original string
+    void Reset() { strTemp = strEntry; }
+};
+
+//
+// SInputHistory - Stores input submitted in the chatbox by the user
+//
+struct SInputHistory
+{
+    // List which contains all history entries
+    std::vector<SInputHistoryEntry> vecEntryList;
+
+    SInputHistory() { vecEntryList.emplace_back(""); }
+
+    // Resets input history edits to their original inputs
+    void ResetChanges()
+    {
+        for (auto& i : vecEntryList)
+            i.Reset();
+    }
+};
+
 class CChat
 {
     friend class CChatLine;
@@ -192,7 +230,6 @@ public:
     void ScrollUp();
     void ScrollDown();
 
-    void ResetInputHistoryChanges();
     void SelectInputHistoryEntry(uint uiEntry);
 
     void SetChatFont(eChatFont Font);
@@ -246,8 +283,8 @@ protected:
     std::string m_strInputText;
     std::string m_strCommand;
 
-    std::vector<std::pair<SString, SString>> m_vecInputHistory;
-    unsigned int                             m_uiSelectedInputHistoryEntry;
+    SInputHistory m_InputHistory;
+    unsigned int  m_uiSelectedInputHistoryEntry;
 
     bool  m_bVisible;
     bool  m_bInputVisible;

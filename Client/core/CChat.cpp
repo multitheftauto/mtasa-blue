@@ -60,7 +60,6 @@ CChat::CChat(CGUI* pManager, const CVector2D& vecPosition)
     m_ePositionHorizontal = Chat::Position::Horizontal::LEFT;
     m_ePositionVertical = Chat::Position::Vertical::TOP;
     m_eTextAlign = Chat::Text::Align::LEFT;
-    m_vecInputHistory.emplace_back("", "");
     m_uiSelectedInputHistoryEntry = 0;
 
     // Background area
@@ -551,36 +550,29 @@ void CChat::ScrollDown()
     }
 }
 
-// Resets input history edits to their original inputs
-void CChat::ResetInputHistoryChanges()
-{
-    for (auto& i : m_vecInputHistory)
-        i.second = i.first;
-}
-
 void CChat::SelectInputHistoryEntry(uint uiEntry)
 {
     uint uiPreviouslySelectedInputHistoryEntry = m_uiSelectedInputHistoryEntry;
 
     // Check if we're in bounds, otherwise clear selection
-    if (!m_vecInputHistory.empty() && uiEntry > 0 && uiEntry < m_vecInputHistory.size())
+    if (!m_InputHistory.vecEntryList.empty() && uiEntry > 0 && uiEntry < m_InputHistory.vecEntryList.size())
         m_uiSelectedInputHistoryEntry = uiEntry;
     else
         m_uiSelectedInputHistoryEntry = 0;
 
     // Save current input to the input history entry as the second element
-    m_vecInputHistory[uiPreviouslySelectedInputHistoryEntry].second = m_strInputText.c_str();
+    m_InputHistory.vecEntryList[uiPreviouslySelectedInputHistoryEntry].strTemp = m_strInputText.c_str();
 
     // Clear input
     ClearInput();
 
-    auto strInput = m_vecInputHistory[m_uiSelectedInputHistoryEntry];
+    SString& strSelectedInputHistoryEntry = m_InputHistory.vecEntryList[m_uiSelectedInputHistoryEntry].strTemp;
     // If the selected command is empty, let's just stop here
-    if (strInput.second.empty())
+    if (strSelectedInputHistoryEntry.empty())
         return;
 
     // Set the input
-    SetInputText(strInput.second.c_str());
+    SetInputText(strSelectedInputHistoryEntry.c_str());
 }
 
 bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
@@ -613,15 +605,15 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
 
                     // If the command is not empty and it isn't identical to the previous entry in history, add it to the history
                     // The first string is the original command, the second string is for storing the edited command
-                    if (!m_strInputText.empty() && (m_vecInputHistory.empty() || m_vecInputHistory.back().first != m_strInputText))
-                        m_vecInputHistory.emplace_back(m_strInputText, m_strInputText);
+                    if (!m_strInputText.empty() && (m_InputHistory.vecEntryList.empty() || m_InputHistory.vecEntryList.back().strEntry != m_strInputText))
+                        m_InputHistory.vecEntryList.emplace_back(m_strInputText);
                 }
 
                 SetInputVisible(false);
 
                 m_fSmoothScrollResetTime = GetSecondCount();
 
-                ResetInputHistoryChanges();
+                m_InputHistory.ResetChanges();
                 m_uiSelectedInputHistoryEntry = 0;
                 break;
             }
@@ -754,13 +746,13 @@ bool CChat::KeyDownHandler(CGUIKeyEventArgs KeyboardArgs)
             case CGUIKeys::Scan::ArrowUp:
             {
                 // If there's nothing to select, break here
-                if (m_vecInputHistory.size() <= 1 || m_uiSelectedInputHistoryEntry == 1)
+                if (m_InputHistory.vecEntryList.size() <= 1 || m_uiSelectedInputHistoryEntry == 1)
                     break;
 
                 // Select the previous entry
                 int iEntry = m_uiSelectedInputHistoryEntry;
                 if (iEntry == 0)
-                    iEntry = m_vecInputHistory.size() - 1;
+                    iEntry = m_InputHistory.vecEntryList.size() - 1;
                 else
                     iEntry--;
 
@@ -772,7 +764,7 @@ bool CChat::KeyDownHandler(CGUIKeyEventArgs KeyboardArgs)
             case CGUIKeys::Scan::ArrowDown:
             {
                 // If there's nothing to select, break here
-                if (m_vecInputHistory.size() <= 1 || m_uiSelectedInputHistoryEntry == 0)
+                if (m_InputHistory.vecEntryList.size() <= 1 || m_uiSelectedInputHistoryEntry == 0)
                     break;
 
                 // Select the next entry
@@ -800,7 +792,7 @@ void CChat::SetInputVisible(bool bVisible)
     if (!bVisible)
     {
         ClearInput();
-        ResetInputHistoryChanges();
+        m_InputHistory.ResetChanges();
         m_uiSelectedInputHistoryEntry = 0;
     }
 
