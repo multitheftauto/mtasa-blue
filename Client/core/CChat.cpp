@@ -575,7 +575,7 @@ void CChat::SelectInputHistoryEntry(uint uiEntry)
     ClearInput();
 
     // If the selected command is empty, let's just stop here
-    SString strInput = m_vecInputHistory[m_uiSelectedInputHistoryEntry][1];
+    SString& strInput = m_vecInputHistory[m_uiSelectedInputHistoryEntry][1];
     if (strInput.empty())
         return;
 
