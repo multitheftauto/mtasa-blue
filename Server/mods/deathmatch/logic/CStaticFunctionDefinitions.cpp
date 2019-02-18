@@ -3050,8 +3050,6 @@ bool CStaticFunctionDefinitions::TakePlayerScreenShot(CElement* pElement, uint u
 
 bool CStaticFunctionDefinitions::SetPlayerDebuggerVisible(CElement* pElement, bool bVisible)
 {
-    // * Not used by scripts
-
     assert(pElement);
     RUN_CHILDREN(SetPlayerDebuggerVisible(*iter, bVisible))
 
@@ -3065,6 +3063,18 @@ bool CStaticFunctionDefinitions::SetPlayerDebuggerVisible(CElement* pElement, bo
 
         return true;
     }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetPlayerDebuggerMode(CPlayer* pElement, int iMode)
+{
+    assert(pElement);
+
+    if (iMode >= 0 && iMode <= 3)
+    {
+        return pElement->SetScriptDebugLevel(iMode);
+    }
+    
     return false;
 }
 
@@ -11234,7 +11244,7 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pPlayer, bool bIP, bool bUs
         // Call the event
         CLuaArguments Arguments;
         Arguments.PushBan(pBan);
-        
+
         if (pResponsible)
             Arguments.PushElement(pResponsible);
 
@@ -11407,10 +11417,10 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
                 // Call the event
                 CLuaArguments Arguments;
                 Arguments.PushBan(pBan);
-                
+
                 if (pResponsible)
                     Arguments.PushElement(pResponsible);
-                
+
                 // A script can call kickPlayer in the onPlayerBan event, which would
                 // show him the 'kicked' message instead of our 'banned' message.
                 const bool bLeavingServer = pPlayer->IsLeavingServer();

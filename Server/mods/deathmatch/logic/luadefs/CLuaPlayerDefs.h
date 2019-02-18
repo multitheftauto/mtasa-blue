@@ -64,6 +64,8 @@ public:
     LUA_DECLARE(SetPlayerName);
     LUA_DECLARE(DetonateSatchels);
     LUA_DECLARE(TakePlayerScreenShot);
+    LUA_DECLARE(SetPlayerDebugViewActive);
+    LUA_DECLARE(SetPlayerDebugViewMode);
 
     // All seeing eye
     LUA_DECLARE(GetPlayerAnnounceValue);

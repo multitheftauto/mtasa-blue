@@ -63,6 +63,8 @@ void CLuaPlayerDefs::LoadFunctions()
         {"setPlayerName", SetPlayerName},
         {"detonateSatchels", DetonateSatchels},
         {"takePlayerScreenShot", TakePlayerScreenShot},
+        {"setPlayerDebugViewActive", SetPlayerDebugViewActive},
+        {"setPlayerDebugViewMode", SetPlayerDebugViewMode},
 
         // All seeing eye
         {"getPlayerAnnounceValue", GetPlayerAnnounceValue},
@@ -151,6 +153,8 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setCameraMatrix", "setCameraMatrix");
     lua_classfunction(luaVM, "setCameraInterior", "setCameraInterior");
     lua_classfunction(luaVM, "setCameraTarget", "setCameraTarget");
+    lua_classfunction(luaVM, "setDebugViewActive", "setPlayerDebugViewActive");
+    lua_classfunction(luaVM, "setDebugViewMode", "setPlayerDebugViewMode");
 
     lua_classfunction(luaVM, "isMapForced", "isPlayerMapForced");
     lua_classfunction(luaVM, "isMuted", "isPlayerMuted");
@@ -231,7 +235,7 @@ int CLuaPlayerDefs::CanPlayerUseFunction(lua_State* luaVM)
 int CLuaPlayerDefs::GetPlayerName(lua_State* luaVM)
 {
     //  string getPlayerName ( player thePlayer )
-    CElement* pElement; // player or console
+    CElement* pElement;            // player or console
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -260,7 +264,7 @@ int CLuaPlayerDefs::GetPlayerName(lua_State* luaVM)
 int CLuaPlayerDefs::GetPlayerIP(lua_State* luaVM)
 {
     //  string getPlayerIP ( player thePlayer )
-    CElement* pElement; // player or console
+    CElement* pElement;            // player or console
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -310,7 +314,7 @@ int CLuaPlayerDefs::GetPlayerVersion(lua_State* luaVM)
 int CLuaPlayerDefs::GetPlayerAccount(lua_State* luaVM)
 {
     //  account getPlayerAccount ( player thePlayer )
-    CElement* pElement; // player or console
+    CElement* pElement;            // player or console
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -932,6 +936,59 @@ int CLuaPlayerDefs::TakePlayerScreenShot(lua_State* luaVM)
                 lua_pushboolean(luaVM, true);
                 return 1;
             }
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPlayerDefs::SetPlayerDebugViewActive(lua_State* luaVM)
+{
+    CPlayer* pElement;
+    bool     bActive;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadBool(bActive);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetPlayerDebuggerVisible(pElement, bActive))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPlayerDefs::SetPlayerDebugViewMode(lua_State* luaVM)
+{
+    CPlayer* pElement;
+    int      iMode;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadNumber(iMode);
+
+    if (iMode < 0 || iMode > 3)
+    {
+        argStream.SetCustomError("Invalid Mode (0-3)");
+    }
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetPlayerDebuggerMode(pElement, iMode))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
         }
     }
     else

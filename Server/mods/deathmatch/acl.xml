@@ -136,6 +136,8 @@
       <right name="function.setServerConfigSetting" access="false" />
       <right name="function.updateResourceACLRequest" access="false" />
       <right name="function.shutdown" access="false" />
+      <right name="function.setPlayerDebugViewActive" access="false" />
+      <right name="function.setPlayerDebugViewMode" access="false" />
    </acl>
    <acl name="Moderator">
       <right name="general.ModifyOtherObjects" access="false" />
@@ -229,6 +231,8 @@
       <right name="function.setServerConfigSetting" access="true" />
       <right name="function.updateResourceACLRequest" access="true" />
       <right name="function.shutdown" access="true" />
+      <right name="function.setPlayerDebugViewActive" access="true" />
+      <right name="function.setPlayerDebugViewMode" access="true" />
    </acl>
    <acl name="RPC">
       <right name="function.callRemote" access="true" />
