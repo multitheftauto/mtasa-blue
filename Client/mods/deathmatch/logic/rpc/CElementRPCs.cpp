@@ -426,38 +426,73 @@ void CElementRPCs::SetElementHealth(CClientEntity* pSource, NetBitStreamInterfac
 void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     unsigned short usModel;
-    if (bitStream.Read(usModel))
+
+    if (!bitStream.Read(usModel))
+        return;
+    
+    switch (pSource->GetType())
     {
-        switch (pSource->GetType())
+        case CCLIENTPED:
+        case CCLIENTPLAYER:
         {
-            case CCLIENTPED:
-            case CCLIENTPLAYER:
-            {
-                CClientPed* pPed = static_cast<CClientPed*>(pSource);
-                pPed->SetModel(usModel);
-                break;
-            }
+            CClientPed* pPed = static_cast<CClientPed*>(pSource);
+            const unsigned short usCurrentModel = pPed->GetModel();
 
-            case CCLIENTVEHICLE:
+            if (usCurrentModel != usModel)
             {
-                uchar ucVariant = 255, ucVariant2 = 255;
-                if (bitStream.GetNumberOfUnreadBits() >= sizeof(ucVariant) + sizeof(ucVariant2))
+                if (pPed->SetModel(usModel))
                 {
-                    bitStream.Read(ucVariant);
-                    bitStream.Read(ucVariant2);
+                    CLuaArguments Arguments;
+                    Arguments.PushNumber(usCurrentModel);
+                    Arguments.PushNumber(usModel);
+                    pPed->CallEvent("onClientElementModelChange", Arguments, true);
                 }
-                CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);
-                pVehicle->SetModelBlocking(usModel, ucVariant, ucVariant2);
-                break;
             }
 
-            case CCLIENTOBJECT:
-            case CCLIENTWEAPON:
+            break;
+        }
+
+        case CCLIENTVEHICLE:
+        {
+            uchar ucVariant = 255, ucVariant2 = 255;
+            if (bitStream.GetNumberOfUnreadBits() >= sizeof(ucVariant) + sizeof(ucVariant2))
             {
-                CClientObject* pObject = static_cast<CClientObject*>(pSource);
-                pObject->SetModel(usModel);
-                break;
+                bitStream.Read(ucVariant);
+                bitStream.Read(ucVariant2);
             }
+
+            CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);
+            const unsigned short usCurrentModel = pVehicle->GetModel();
+
+            if (usCurrentModel != usModel)
+            {
+                pVehicle->SetModelBlocking(usModel, ucVariant, ucVariant2);
+
+                CLuaArguments Arguments;
+                Arguments.PushNumber(usCurrentModel);
+                Arguments.PushNumber(usModel);
+                pVehicle->CallEvent("onClientElementModelChange", Arguments, true);
+            }
+
+            break;
+        }
+
+        case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
+        {
+            CClientObject* pObject = static_cast<CClientObject*>(pSource);
+            const unsigned short usCurrentModel = pObject->GetModel();
+            
+            if (usCurrentModel != usModel)
+            {
+                pObject->SetModel(usModel);
+                CLuaArguments Arguments;
+                Arguments.PushNumber(usCurrentModel);
+                Arguments.PushNumber(usModel);
+                pObject->CallEvent("onClientElementModelChange", Arguments, true);
+            }
+
+            break;
         }
     }
 }
