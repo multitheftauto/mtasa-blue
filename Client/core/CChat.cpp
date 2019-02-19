@@ -610,8 +610,7 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
             {
                 CCommands::GetSingleton().Execute(m_strCommand.c_str(), m_strInputText.c_str());
 
-                // If the command is not empty and it isn't identical to the previous entry in history, add it to the history
-                // The first string is the original command, the second string is for storing the edited command
+                // If the input isn't empty and isn't identical to the previous entry in history, add it to the history
                 if (!m_strInputText.empty() && (m_InputHistory.vecEntryList.empty() || m_InputHistory.vecEntryList.back().strEntry != m_strInputText))
                     m_InputHistory.vecEntryList.emplace_back(m_strInputText);
             }
