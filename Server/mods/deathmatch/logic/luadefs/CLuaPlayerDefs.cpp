@@ -972,20 +972,20 @@ int CLuaPlayerDefs::SetPlayerDebugViewActive(lua_State* luaVM)
 int CLuaPlayerDefs::SetPlayerDebugViewMode(lua_State* luaVM)
 {
     CElement*    pElement;
-    unsigned int iMode;
+    unsigned int uiMode;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
-    argStream.ReadNumber(iMode);
+    argStream.ReadNumber(uiMode);
 
-    if (iMode < 0 || iMode > 3)
+    if (uiMode < 0 || uiMode > 3)
     {
         argStream.SetCustomError("Invalid Mode (0-3)");
     }
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetPlayerDebuggerMode(pElement, iMode))
+        if (CStaticFunctionDefinitions::SetPlayerDebuggerMode(pElement, uiMode))
         {
             lua_pushboolean(luaVM, true);
             return 1;
