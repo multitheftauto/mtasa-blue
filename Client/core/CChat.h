@@ -208,6 +208,8 @@ public:
     bool IsInputVisible() { return m_bVisible && m_bInputVisible; }
     void SetInputVisible(bool bVisible);
 
+    bool CanTakeInput() { return !CLocalGUI::GetSingleton().GetConsole()->IsVisible() && IsInputVisible(); };
+
     const char* GetInputPrefix();
     void        SetInputPrefix(const char* szPrefix);
     const char* GetInputText() { return m_strInputText.c_str(); }
