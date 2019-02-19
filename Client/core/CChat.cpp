@@ -559,7 +559,7 @@ void CChat::ResetHistoryChanges()
 
 void CChat::SelectInputHistoryEntry(int iEntry)
 {
-    uint uiPreviouslySelectedInputHistoryEntry = m_iSelectedInputHistoryEntry;
+    int iPreviouslySelectedInputHistoryEntry = m_iSelectedInputHistoryEntry;
 
     // Check if we're in bounds, otherwise clear selection
     if (!m_InputHistory.vecEntryList.empty() && iEntry >= 0 && iEntry < m_InputHistory.vecEntryList.size())
@@ -568,10 +568,10 @@ void CChat::SelectInputHistoryEntry(int iEntry)
         m_iSelectedInputHistoryEntry = -1;
 
     // Save current input as a temporary input value
-    if (uiPreviouslySelectedInputHistoryEntry == -1)
+    if (iPreviouslySelectedInputHistoryEntry == -1)
         m_strSavedInputText = m_strInputText;
     else
-        m_InputHistory.vecEntryList[uiPreviouslySelectedInputHistoryEntry].strTemp = m_strInputText.c_str();
+        m_InputHistory.vecEntryList[iPreviouslySelectedInputHistoryEntry].strTemp = m_strInputText.c_str();
 
     // Clear input
     ClearInput();
