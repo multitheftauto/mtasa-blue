@@ -947,8 +947,8 @@ int CLuaPlayerDefs::TakePlayerScreenShot(lua_State* luaVM)
 
 int CLuaPlayerDefs::SetPlayerDebugViewActive(lua_State* luaVM)
 {
-    CPlayer* pElement;
-    bool     bActive;
+    CElement* pElement;
+    bool      bActive;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -971,8 +971,8 @@ int CLuaPlayerDefs::SetPlayerDebugViewActive(lua_State* luaVM)
 
 int CLuaPlayerDefs::SetPlayerDebugViewMode(lua_State* luaVM)
 {
-    CPlayer* pElement;
-    int      iMode;
+    CElement*    pElement;
+    unsigned int iMode;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);

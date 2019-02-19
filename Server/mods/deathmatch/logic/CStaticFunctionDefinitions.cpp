@@ -3066,15 +3066,22 @@ bool CStaticFunctionDefinitions::SetPlayerDebuggerVisible(CElement* pElement, bo
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPlayerDebuggerMode(CPlayer* pElement, int iMode)
+bool CStaticFunctionDefinitions::SetPlayerDebuggerMode(CElement* pElement, unsigned int iMode)
 {
     assert(pElement);
 
     if (iMode >= 0 && iMode <= 3)
     {
-        return pElement->SetScriptDebugLevel(iMode);
+        RUN_CHILDREN(SetPlayerDebuggerMode(*iter, iMode));
+
+        if (IS_PLAYER(pElement))
+        {
+            CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
+
+            return pPlayer->SetScriptDebugLevel(iMode);
+        }
     }
-    
+
     return false;
 }
 
