@@ -198,7 +198,6 @@ public:
     void         Clear();
     void         ClearInput();
     bool         CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs);
-    bool         KeyDownHandler(CGUIKeyEventArgs KeyboardArgs);
     void         SetDxFont(LPD3DXFONT pDXFont);
 
     bool IsVisible() { return m_bVisible; }
@@ -207,6 +206,9 @@ public:
     void SetInputVisible(bool bVisible);
 
     bool CanTakeInput() { return !CLocalGUI::GetSingleton().GetConsole()->IsVisible() && IsInputVisible(); };
+
+    bool SetNextHistoryText();
+    bool SetPreviousHistoryText();
 
     const char* GetInputPrefix();
     void        SetInputPrefix(const char* szPrefix);

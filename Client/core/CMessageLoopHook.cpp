@@ -369,6 +369,23 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                             }
                         }
                     }
+                    // If the chat is accepting input, and we pressed down/up, scroll the console history
+                    //                          or if we pressed tab, step through possible autocomplete matches
+                    else if (CLocalGUI::GetSingleton().GetChat()->IsInputVisible())
+                    {
+                        if (uMsg == WM_KEYDOWN)
+                        {
+                            if (wParam == VK_DOWN)
+                            {
+                                CLocalGUI::GetSingleton().GetChat()->SetPreviousHistoryText();
+                            }
+
+                            if (wParam == VK_UP)
+                            {
+                                CLocalGUI::GetSingleton().GetChat()->SetNextHistoryText();
+                            }
+                        }
+                    }
                     else if (uMsg == WM_KEYDOWN && CLocalGUI::GetSingleton().GetMainMenu()->GetServerBrowser()->IsAddressBarAwaitingInput())
                     {
                         if (wParam == VK_DOWN)

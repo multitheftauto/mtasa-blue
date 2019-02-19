@@ -107,7 +107,6 @@ void CChat::OnModLoad()
 {
     // Set handlers
     m_pManager->SetCharacterKeyHandler(INPUT_MOD, GUI_CALLBACK_KEY(&CChat::CharacterKeyHandler, this));
-    m_pManager->SetKeyDownHandler(INPUT_MOD, GUI_CALLBACK_KEY(&CChat::KeyDownHandler, this));
 }
 
 void CChat::LoadCVars()
@@ -629,6 +628,7 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
             ResetHistoryChanges();
             break;
         }
+
         case VK_TAB:
         {
             if (m_bNickCompletion && m_strInputText.size() > 0)
@@ -746,34 +746,33 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
     return true;
 }
 
-bool CChat::KeyDownHandler(CGUIKeyEventArgs KeyboardArgs)
+bool CChat::SetNextHistoryText()
 {
     // If we can't take input or history is empty, stop here
     if (!CanTakeInput() || m_InputHistory.vecEntryList.size() == 0)
         return false;
 
-    switch (KeyboardArgs.scancode)
-    {
-        case CGUIKeys::Scan::ArrowUp:
-        {
-            // Select the previous entry
-            if (m_iSelectedInputHistoryEntry > 0)
-                SelectInputHistoryEntry(m_iSelectedInputHistoryEntry - 1);
-            else if (m_iSelectedInputHistoryEntry == -1)
-                SelectInputHistoryEntry(m_InputHistory.vecEntryList.size() - 1);
-            break;
-        }
+    // Select the previous entry
+    if (m_iSelectedInputHistoryEntry > 0)
+        SelectInputHistoryEntry(m_iSelectedInputHistoryEntry - 1);
+    else if (m_iSelectedInputHistoryEntry == -1)
+        SelectInputHistoryEntry(m_InputHistory.vecEntryList.size() - 1);
 
-        case CGUIKeys::Scan::ArrowDown:
-        {
-            // Select the next entry, or the default entry
-            if (m_iSelectedInputHistoryEntry < m_InputHistory.vecEntryList.size() - 1)
-                SelectInputHistoryEntry(m_iSelectedInputHistoryEntry + 1);
-            else
-                SelectInputHistoryEntry(-1);
-            break;
-        }
-    }
+    return true;
+}
+
+bool CChat::SetPreviousHistoryText()
+{
+    // If we can't take input or history is empty, stop here
+    if (!CanTakeInput() || m_InputHistory.vecEntryList.size() == 0)
+        return false;
+
+    // Select the next entry, or the default entry
+    if (m_iSelectedInputHistoryEntry < m_InputHistory.vecEntryList.size() - 1)
+        SelectInputHistoryEntry(m_iSelectedInputHistoryEntry + 1);
+    else
+        SelectInputHistoryEntry(-1);
+
     return true;
 }
 
