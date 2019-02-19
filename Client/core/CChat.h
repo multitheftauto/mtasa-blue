@@ -174,8 +174,6 @@ struct SInputHistory
     // List which contains all history entries
     std::vector<SInputHistoryEntry> vecEntryList;
 
-    SInputHistory() { vecEntryList.emplace_back(""); }
-
     // Resets input history edits to their original inputs
     void ResetChanges()
     {
@@ -233,7 +231,7 @@ public:
     void ScrollDown();
 
     void ResetHistoryChanges();
-    void SelectInputHistoryEntry(uint uiEntry);
+    void SelectInputHistoryEntry(int iEntry);
 
     void SetChatFont(eChatFont Font);
     void OnModLoad();
@@ -286,8 +284,11 @@ protected:
     std::string m_strInputText;
     std::string m_strCommand;
 
+    // Contains a saved copy of initial input text when navigating history entries
+    std::string m_strSavedInputText;
+
     SInputHistory m_InputHistory;
-    unsigned int  m_uiSelectedInputHistoryEntry;
+    int           m_iSelectedInputHistoryEntry;
 
     bool  m_bVisible;
     bool  m_bInputVisible;

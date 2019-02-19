@@ -60,7 +60,7 @@ CChat::CChat(CGUI* pManager, const CVector2D& vecPosition)
     m_ePositionHorizontal = Chat::Position::Horizontal::LEFT;
     m_ePositionVertical = Chat::Position::Vertical::TOP;
     m_eTextAlign = Chat::Text::Align::LEFT;
-    m_uiSelectedInputHistoryEntry = 0;
+    m_iSelectedInputHistoryEntry = -1;
 
     // Background area
     m_pBackground = m_pManager->CreateStaticImage();
@@ -552,34 +552,41 @@ void CChat::ScrollDown()
 
 void CChat::ResetHistoryChanges()
 {
-    // Reset history selection and any history changes
-    m_uiSelectedInputHistoryEntry = 0;
+    // Reset history selection, any history changes and our saved input
+    m_iSelectedInputHistoryEntry = -1;
     m_InputHistory.ResetChanges();
+    m_strSavedInputText.clear();
 }
 
-void CChat::SelectInputHistoryEntry(uint uiEntry)
+void CChat::SelectInputHistoryEntry(int iEntry)
 {
-    uint uiPreviouslySelectedInputHistoryEntry = m_uiSelectedInputHistoryEntry;
+    uint uiPreviouslySelectedInputHistoryEntry = m_iSelectedInputHistoryEntry;
 
     // Check if we're in bounds, otherwise clear selection
-    if (!m_InputHistory.vecEntryList.empty() && uiEntry > 0 && uiEntry < m_InputHistory.vecEntryList.size())
-        m_uiSelectedInputHistoryEntry = uiEntry;
+    if (!m_InputHistory.vecEntryList.empty() && iEntry >= 0 && iEntry < m_InputHistory.vecEntryList.size())
+        m_iSelectedInputHistoryEntry = iEntry;
     else
-        m_uiSelectedInputHistoryEntry = 0;
+        m_iSelectedInputHistoryEntry = -1;
 
-    // Save current input to the input history entry as the second element
-    m_InputHistory.vecEntryList[uiPreviouslySelectedInputHistoryEntry].strTemp = m_strInputText.c_str();
+    // Save current input as a temporary input value
+    if (uiPreviouslySelectedInputHistoryEntry == -1)
+        m_strSavedInputText = m_strInputText;
+    else
+        m_InputHistory.vecEntryList[uiPreviouslySelectedInputHistoryEntry].strTemp = m_strInputText.c_str();
 
     // Clear input
     ClearInput();
 
-    SString& strSelectedInputHistoryEntry = m_InputHistory.vecEntryList[m_uiSelectedInputHistoryEntry].strTemp;
-    // If the selected command is empty, let's just stop here
-    if (strSelectedInputHistoryEntry.empty())
-        return;
-
-    // Set the input
-    SetInputText(strSelectedInputHistoryEntry.c_str());
+    // If we haven't selected any history entry, use our saved input text
+    if (m_iSelectedInputHistoryEntry == -1)
+        SetInputText(m_strSavedInputText.c_str());
+    else
+    {
+        SString& strSelectedInputHistoryEntry = m_InputHistory.vecEntryList[m_iSelectedInputHistoryEntry].strTemp;
+        // If the selected entry isn't empty, fill it in
+        if (!strSelectedInputHistoryEntry.empty())
+            SetInputText(strSelectedInputHistoryEntry.c_str());
+    }
 }
 
 bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
@@ -741,37 +748,29 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
 
 bool CChat::KeyDownHandler(CGUIKeyEventArgs KeyboardArgs)
 {
-    if (!CanTakeInput())
+    // If we can't take input or history is empty, stop here
+    if (!CanTakeInput() || m_InputHistory.vecEntryList.size() == 0)
         return false;
 
     switch (KeyboardArgs.scancode)
     {
         case CGUIKeys::Scan::ArrowUp:
         {
-            // If there's nothing to select, break here
-            if (m_InputHistory.vecEntryList.size() <= 1 || m_uiSelectedInputHistoryEntry == 1)
-                break;
-
             // Select the previous entry
-            int iEntry = m_uiSelectedInputHistoryEntry;
-            if (iEntry == 0)
-                iEntry = m_InputHistory.vecEntryList.size() - 1;
-            else
-                iEntry--;
-
-            // Select the previous entry
-            SelectInputHistoryEntry(iEntry);
+            if (m_iSelectedInputHistoryEntry > 0)
+                SelectInputHistoryEntry(m_iSelectedInputHistoryEntry - 1);
+            else if (m_iSelectedInputHistoryEntry == -1)
+                SelectInputHistoryEntry(m_InputHistory.vecEntryList.size() - 1);
             break;
         }
 
         case CGUIKeys::Scan::ArrowDown:
         {
-            // If there's nothing to select, break here
-            if (m_InputHistory.vecEntryList.size() <= 1 || m_uiSelectedInputHistoryEntry == 0)
-                break;
-
-            // Select the next entry
-            SelectInputHistoryEntry(m_uiSelectedInputHistoryEntry + 1);
+            // Select the next entry, or the default entry
+            if (m_iSelectedInputHistoryEntry < m_InputHistory.vecEntryList.size() - 1)
+                SelectInputHistoryEntry(m_iSelectedInputHistoryEntry + 1);
+            else
+                SelectInputHistoryEntry(-1);
             break;
         }
     }
