@@ -232,6 +232,7 @@ public:
     void ScrollUp();
     void ScrollDown();
 
+    void ResetHistoryChanges();
     void SelectInputHistoryEntry(uint uiEntry);
 
     void SetChatFont(eChatFont Font);

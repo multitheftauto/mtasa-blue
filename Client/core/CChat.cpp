@@ -550,6 +550,13 @@ void CChat::ScrollDown()
     }
 }
 
+void CChat::ResetHistoryChanges()
+{
+    // Reset history selection and any history changes
+    m_uiSelectedInputHistoryEntry = 0;
+    m_InputHistory.ResetChanges();
+}
+
 void CChat::SelectInputHistoryEntry(uint uiEntry)
 {
     uint uiPreviouslySelectedInputHistoryEntry = m_uiSelectedInputHistoryEntry;
@@ -613,8 +620,7 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
 
             m_fSmoothScrollResetTime = GetSecondCount();
 
-            m_InputHistory.ResetChanges();
-            m_uiSelectedInputHistoryEntry = 0;
+            ResetHistoryChanges();
             break;
         }
         case VK_TAB:
@@ -789,8 +795,7 @@ void CChat::SetInputVisible(bool bVisible)
     if (!bVisible)
     {
         ClearInput();
-        m_InputHistory.ResetChanges();
-        m_uiSelectedInputHistoryEntry = 0;
+        ResetHistoryChanges();
     }
 
     m_bInputVisible = bVisible;
