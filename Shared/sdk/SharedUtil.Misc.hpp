@@ -1472,14 +1472,14 @@ SString SharedUtil::ConformPath(const char* szRes, SString szPath, bool bConvert
     // Remove up to first occurrence
     int iPos = strText.find(szPath);
     if (iPos >= 0)
-        return SString("%s%s",szPath.c_str(), strText.substr(iPos + szPath.length()).c_str());
+        return SString("%s%s", szPath.c_str(), strText.substr(iPos + szPath.length()).c_str());
 
     if (strText.substr(0, 3) == "...")
     {
         // Remove up to first '/'
         int iPos = strText.find(cPathSep);
         if (iPos >= 0)
-            return SString("%s%s",szPath.c_str(), strText.substr(iPos + 1).c_str());
+            return SString("%s%s", szPath.c_str(), strText.substr(iPos + 1).c_str());
     }
 
     return strText;

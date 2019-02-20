@@ -686,7 +686,7 @@ bool CLuaMain::LoadClib(lua_State* L, SString strName, SString& strError)
 
     if (!FileExists(strPath))
     {
-        strError += "#3: " + ConformPath(strPath,"modules/");
+        strError += "#3: " + ConformPath(strPath, "modules/");
         return false;
     }
 
@@ -696,8 +696,8 @@ bool CLuaMain::LoadClib(lua_State* L, SString strName, SString& strError)
         !g_pGame->GetACLManager()->CanObjectUseRight(m_pResource->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, strName.c_str(),
                                                      CAccessControlListRight::RIGHT_TYPE_MODULE, false))
     {
-        strError = "could not load module '" + strName + "' from file " + ConformPath(strPath, "modules/") + ":\n\t ACL access denied.  Grant \"module." + strName +
-                    "\" right to resource " + m_pResource->GetName();
+        strError = "could not load module '" + strName + "' from file " + ConformPath(strPath, "modules/") + ":\n\t ACL access denied.  Grant \"module." +
+                   strName + "\" right to resource " + m_pResource->GetName();
         return false;
     }
 

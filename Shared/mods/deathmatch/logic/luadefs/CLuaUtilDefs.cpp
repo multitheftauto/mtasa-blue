@@ -732,7 +732,7 @@ int CLuaUtilDefs::Require(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         SString strError = "";
-        bool bEmpty = false;
+        bool    bEmpty = false;
         // Check if package exists already, if so load it
         // stack: ["moduleName"]
         pLuaMain->GetPackage(luaVM, strMod);            // stack: ["moduleName",pkgModule/nil]
