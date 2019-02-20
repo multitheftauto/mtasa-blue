@@ -642,13 +642,11 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
             // If theres a command to call, call it
             if (!m_strCommand.empty() && !m_strInputText.empty())
             {
-                const char* szInputText = m_strInputText.c_str();
-
-                CCommands::GetSingleton().Execute(m_strCommand.c_str(), szInputText);
+                CCommands::GetSingleton().Execute(m_strCommand.c_str(), m_strInputText.c_str());
 
                 // If the input isn't empty and isn't identical to the previous entry in history, add it to the history
                 if (!m_strInputText.empty() && (m_pInputHistory->Empty() || m_pInputHistory->GetLast() != m_strInputText))
-                    m_pInputHistory->Add(szInputText);
+                    m_pInputHistory->Add(m_strInputText);
             }
 
             SetInputVisible(false);
