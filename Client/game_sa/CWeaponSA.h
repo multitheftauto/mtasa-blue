@@ -69,7 +69,7 @@ public:
 
     VOID         SetAsCurrentWeapon();
     CWeaponInfo* GetInfo(eWeaponSkill skill) { return pGame->GetWeaponInfo(internalInterface->m_eWeaponType, skill); };
-    void         Destroy(void);
+    void         Destroy();
     void         Remove();
     void         Initialize(eWeaponType type, unsigned int uiAmmo, CPed* pPed);
     void         Update(CPed* pPed);

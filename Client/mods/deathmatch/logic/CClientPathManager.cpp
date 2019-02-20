@@ -21,13 +21,13 @@ CClientPathManager::CClientPathManager(CClientManager* pManager)
     m_bRemoveFromList = true;
 }
 
-CClientPathManager::~CClientPathManager(void)
+CClientPathManager::~CClientPathManager()
 {
     // Destroy all path nodes
     DeleteAll();
 }
 
-void CClientPathManager::DeleteAll(void)
+void CClientPathManager::DeleteAll()
 {
     // Delete all nodes in the list
     m_bRemoveFromList = false;
@@ -43,7 +43,7 @@ void CClientPathManager::DeleteAll(void)
     m_bRemoveFromList = true;
 }
 
-void CClientPathManager::DoPulse(void)
+void CClientPathManager::DoPulse()
 {
     list<CClientPathNode*>::const_iterator iter = m_PathNodeList.begin();
     for (; iter != m_PathNodeList.end(); ++iter)
@@ -52,7 +52,7 @@ void CClientPathManager::DoPulse(void)
     }
 }
 
-void CClientPathManager::LinkNodes(void)
+void CClientPathManager::LinkNodes()
 {
     // Link our nodes with the IDs
     list<CClientPathNode*>::const_iterator iterList = m_PathNodeList.begin();

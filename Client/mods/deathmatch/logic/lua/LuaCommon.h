@@ -90,7 +90,7 @@ enum
 
 struct SLuaDebugInfo
 {
-    SLuaDebugInfo(void) : iLine(INVALID_LINE_NUMBER), infoType(DEBUG_INFO_NONE) {}
+    SLuaDebugInfo() : iLine(INVALID_LINE_NUMBER), infoType(DEBUG_INFO_NONE) {}
     SLuaDebugInfo(const SString& strFile, int iLine) : strFile(strFile), iLine(iLine), infoType(DEBUG_INFO_FILE_AND_LINE) {}
     SString strFile;
     SString strShortSrc;

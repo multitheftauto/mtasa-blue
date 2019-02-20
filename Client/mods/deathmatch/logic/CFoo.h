@@ -19,13 +19,13 @@ public:
     #ifdef MTA_DEBUG
     void Init(class CClientGame* pClientGame) { g_pClientGame = pClientGame; };
 
-    void DoPulse(void);
+    void DoPulse();
     void Test(const char* szString);
 
     class CClientGame* g_pClientGame;
     #else
     void Init(CClientGame* pClientGame){};
-    void DoPulse(void){};
+    void DoPulse(){};
     void Test(const char* szString){};
     #endif
 };

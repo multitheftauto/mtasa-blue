@@ -136,7 +136,7 @@ void CEffectTemplate::PostConstruct(CRenderItemManager* pManager, const SString&
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplate::PreDestruct(void)
+void CEffectTemplate::PreDestruct()
 {
     ReleaseUnderlyingData();
     Super::PreDestruct();
@@ -149,7 +149,7 @@ void CEffectTemplate::PreDestruct(void)
 //
 //
 ////////////////////////////////////////////////////////////////
-int CEffectTemplate::GetTicksSinceLastUsed(void)
+int CEffectTemplate::GetTicksSinceLastUsed()
 {
     if (m_uiCloneCount != 0)
         return 0;            // Used right now
@@ -165,7 +165,7 @@ int CEffectTemplate::GetTicksSinceLastUsed(void)
 // Check underlying data is present
 //
 ////////////////////////////////////////////////////////////////
-bool CEffectTemplate::IsValid(void)
+bool CEffectTemplate::IsValid()
 {
     return m_pD3DEffect != NULL;
 }
@@ -177,7 +177,7 @@ bool CEffectTemplate::IsValid(void)
 // Release device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplate::OnLostDevice(void)
+void CEffectTemplate::OnLostDevice()
 {
     m_pD3DEffect->OnLostDevice();
 }
@@ -189,7 +189,7 @@ void CEffectTemplate::OnLostDevice(void)
 // Recreate device stuff
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplate::OnResetDevice(void)
+void CEffectTemplate::OnResetDevice()
 {
     m_pD3DEffect->OnResetDevice();
 }
@@ -401,7 +401,7 @@ bool CEffectTemplate::ValidateDepthBufferUsage(D3DXHANDLE hTechnique, SString& s
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplate::ReleaseUnderlyingData(void)
+void CEffectTemplate::ReleaseUnderlyingData()
 {
     SAFE_RELEASE(m_pD3DEffect);
 }
@@ -447,7 +447,7 @@ void CEffectTemplate::UnCloneD3DEffect(CEffectWrap* pEffectWrap)
 // Recheck MD5's to see if the content has changed
 //
 ////////////////////////////////////////////////////////////////
-bool CEffectTemplate::HaveFilesChanged(void)
+bool CEffectTemplate::HaveFilesChanged()
 {
     if (!m_bHaveFilesChanged)
     {

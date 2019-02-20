@@ -15,7 +15,7 @@
 
 extern CGame* g_pGame;
 
-CHTTPD::CHTTPD(void)
+CHTTPD::CHTTPD()
     : m_BruteForceProtect(4, 30000, 60000 * 5)            // Max of 4 attempts per 30 seconds, then 5 minute ignore
       ,
       m_HttpDosProtect(0, 0, 0)
@@ -39,7 +39,7 @@ CHTTPD::~CHTTPD()
     StopHTTPD();
 }
 
-bool CHTTPD::StopHTTPD(void)
+bool CHTTPD::StopHTTPD()
 {
     // Stop the server if we started it
     if (m_bStartedServer)
@@ -259,7 +259,7 @@ CAccount* CHTTPD::CheckAuthentication(HttpRequest* ipoHttpRequest)
 }
 
 // Called from worker thread. Careful now.
-void CHTTPD::HttpPulse(void)
+void CHTTPD::HttpPulse()
 {
     std::lock_guard<std::mutex> guard(m_mutexLoggedInMap);
 

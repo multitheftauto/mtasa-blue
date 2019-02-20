@@ -27,13 +27,13 @@ CClientTeam::CClientTeam(CClientManager* pManager, ElementID ID, const char* szN
     m_pTeamManager->AddToList(this);
 }
 
-CClientTeam::~CClientTeam(void)
+CClientTeam::~CClientTeam()
 {
     RemoveAll();
     Unlink();
 }
 
-void CClientTeam::Unlink(void)
+void CClientTeam::Unlink()
 {
     m_pTeamManager->RemoveFromList(this);
 }
@@ -54,7 +54,7 @@ void CClientTeam::RemovePlayer(CClientPlayer* pPlayer, bool bChangePlayer)
         pPlayer->SetTeam(NULL, false);
 }
 
-void CClientTeam::RemoveAll(void)
+void CClientTeam::RemoveAll()
 {
     list<CClientPlayer*>::const_iterator iter = m_List.begin();
     for (; iter != m_List.end(); iter++)

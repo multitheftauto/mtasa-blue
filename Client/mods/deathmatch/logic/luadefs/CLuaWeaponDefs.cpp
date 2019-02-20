@@ -13,7 +13,7 @@
 
 #define MIN_CLIENT_REQ_WEAPON_PROPERTY_FLAG     "1.3.5-9.06139"
 
-void CLuaWeaponDefs::LoadFunctions(void)
+void CLuaWeaponDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"getWeaponNameFromID", GetWeaponNameFromID},

@@ -15,7 +15,7 @@
 class CLuaEngineDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
     LUA_DECLARE(EngineLoadDFF);
@@ -44,6 +44,9 @@ public:
     LUA_DECLARE(EngineGetModelIDFromName);
     LUA_DECLARE(EngineGetModelTextureNames);
     LUA_DECLARE(EngineGetVisibleTextureNames);
+    LUA_DECLARE(EngineSetSurfaceProperties);
+    LUA_DECLARE(EngineGetSurfaceProperties);
+    LUA_DECLARE(EngineResetSurfaceProperties);
 
 private:
     static void AddEngineColClass(lua_State* luaVM);

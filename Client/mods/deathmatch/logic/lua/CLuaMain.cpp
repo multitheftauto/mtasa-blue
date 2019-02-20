@@ -45,7 +45,7 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEn
     CClientPerfStatLuaTiming::GetSingleton()->OnLuaMainCreate(this);
 }
 
-CLuaMain::~CLuaMain(void)
+CLuaMain::~CLuaMain()
 {
     g_pClientGame->GetRemoteCalls()->Remove(this);
     g_pClientGame->GetLatentTransferManager()->OnLuaMainDestroy(this);
@@ -63,17 +63,17 @@ CLuaMain::~CLuaMain(void)
     CClientPerfStatLuaTiming::GetSingleton()->OnLuaMainDestroy(this);
 }
 
-bool CLuaMain::BeingDeleted(void)
+bool CLuaMain::BeingDeleted()
 {
     return m_bBeingDeleted;
 }
 
-void CLuaMain::ResetInstructionCount(void)
+void CLuaMain::ResetInstructionCount()
 {
     m_FunctionEnterTimer.Reset();
 }
 
-void CLuaMain::InitSecurity(void)
+void CLuaMain::InitSecurity()
 {
     // Disable dangerous Lua Os library functions
     static const luaL_reg osfuncs[] =
@@ -139,7 +139,7 @@ void CLuaMain::InitClasses(lua_State* luaVM)
     CLuaShared::AddClasses(luaVM);
 }
 
-void CLuaMain::InitVM(void)
+void CLuaMain::InitVM()
 {
     assert(!m_luaVM);
 
@@ -322,11 +322,11 @@ bool CLuaMain::LoadScript(const char* szLUAScript)
     return true;
 }
 
-void CLuaMain::Start(void)
+void CLuaMain::Start()
 {
 }
 
-void CLuaMain::UnloadScript(void)
+void CLuaMain::UnloadScript()
 {
     // ACHTUNG: UNLOAD MODULES!
 
@@ -356,7 +356,7 @@ void CLuaMain::UnloadScript(void)
     }
 }
 
-void CLuaMain::DoPulse(void)
+void CLuaMain::DoPulse()
 {
     m_pLuaTimerManager->DoPulse(this);
 }
@@ -435,7 +435,7 @@ bool CLuaMain::SaveXML(CXMLNode* pRootNode)
 //
 //
 ///////////////////////////////////////////////////////////////
-unsigned long CLuaMain::GetElementCount(void) const
+unsigned long CLuaMain::GetElementCount() const
 {
     if (m_pResource && m_pResource->GetElementGroup())
         return m_pResource->GetElementGroup()->GetCount();

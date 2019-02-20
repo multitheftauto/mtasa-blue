@@ -87,7 +87,7 @@ CChat::CChat(CGUI* pManager, const CVector2D& vecPosition)
     UpdateGUI();
 }
 
-CChat::~CChat(void)
+CChat::~CChat()
 {
     Clear();
     ClearInput();
@@ -102,13 +102,13 @@ CChat::~CChat(void)
         g_pChat = NULL;
 }
 
-void CChat::OnModLoad(void)
+void CChat::OnModLoad()
 {
     // Set handlers
     m_pManager->SetCharacterKeyHandler(INPUT_MOD, GUI_CALLBACK_KEY(&CChat::CharacterKeyHandler, this));
 }
 
-void CChat::LoadCVars(void)
+void CChat::LoadCVars()
 {
     unsigned int Font;
     float        fWidth = 1;
@@ -497,7 +497,7 @@ void CChat::Output(const char* szText, bool bColorCoded)
     } while (szRemainingText);
 }
 
-void CChat::Clear(void)
+void CChat::Clear()
 {
     for (int i = 0; i < CHAT_MAX_LINES; i++)
     {
@@ -505,9 +505,10 @@ void CChat::Clear(void)
     }
     m_uiMostRecentLine = 0;
     m_fSmoothScroll = 0;
+    m_iCacheTextureRevision = -1;
 }
 
-void CChat::ClearInput(void)
+void CChat::ClearInput()
 {
     m_strInputText.clear();
     m_InputLine.Clear();
@@ -775,7 +776,7 @@ void CChat::SetDxFont(LPD3DXFONT pDXFont)
     }
 }
 
-void CChat::UpdateGUI(void)
+void CChat::UpdateGUI()
 {
     m_vecBackgroundSize = CVector2D(m_fNativeWidth * m_vecScale.fX, CChat::GetFontHeight(m_vecScale.fY) * (float(m_uiNumLines) + 0.5f));
     m_vecBackgroundSize.fX = Round(m_vecBackgroundSize.fX);
@@ -798,7 +799,7 @@ void CChat::UpdateGUI(void)
     UpdatePosition();
 }
 
-void CChat::UpdatePosition(void)
+void CChat::UpdatePosition()
 {
     CVector2D vecResolution = m_pManager->GetResolution();
 
@@ -863,7 +864,7 @@ void CChat::SetInputColor(const CColor& Color)
         m_pInput->LoadFromTexture(m_pInputTexture);
 }
 
-const char* CChat::GetInputPrefix(void)
+const char* CChat::GetInputPrefix()
 {
     return m_InputLine.m_Prefix.GetText();
 }
@@ -873,7 +874,7 @@ void CChat::SetInputPrefix(const char* szPrefix)
     m_InputLine.m_Prefix.SetText(szPrefix);
 }
 
-CVector2D CChat::CalcInputSize(void)
+CVector2D CChat::CalcInputSize()
 {
     return CVector2D(m_vecBackgroundSize.fX, (GetFontHeight(m_vecScale.fY) * ((float)m_InputLine.m_ExtraLines.size() + 1.25f)));
 }
@@ -997,7 +998,7 @@ void CChat::DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect
     }
 }
 
-CChatLine::CChatLine(void)
+CChatLine::CChatLine()
 {
     m_bActive = false;
     UpdateCreationTime();
@@ -1156,7 +1157,7 @@ void CChatInputLine::Draw(CVector2D& vecPosition, unsigned char ucAlpha, bool bS
     }
 }
 
-void CChatInputLine::Clear(void)
+void CChatInputLine::Clear()
 {
     m_Sections.clear();
     m_ExtraLines.clear();

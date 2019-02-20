@@ -30,15 +30,15 @@ class CWebCore : public CWebCoreInterface
 {
     struct EventEntry
     {
-        std::function<void(void)> callback;
-        CWebView*                 pWebView;
+        std::function<void()> callback;
+        CWebView*             pWebView;
     #ifdef MTA_DEBUG
         SString name;
     #endif
 
-        EventEntry(const std::function<void(void)>& callback_, CWebView* pWebView_) : callback(callback_), pWebView(pWebView_) {}
+        EventEntry(const std::function<void()>& callback_, CWebView* pWebView_) : callback(callback_), pWebView(pWebView_) {}
 #ifdef MTA_DEBUG
-        EventEntry(const std::function<void(void)>& callback_, CWebView* pWebView_, const SString& name_)
+        EventEntry(const std::function<void()>& callback_, CWebView* pWebView_, const SString& name_)
             : callback(callback_), pWebView(pWebView_), name(name_)
         {
         }
@@ -55,7 +55,7 @@ public:
     void               DoPulse();
     CWebView*          FindWebView(CefRefPtr<CefBrowser> browser);
 
-    void AddEventToEventQueue(std::function<void(void)> func, CWebView* pWebView, const SString& name);
+    void AddEventToEventQueue(std::function<void()> func, CWebView* pWebView, const SString& name);
     void RemoveWebViewEvents(CWebView* pWebView);
     void DoEventQueuePulse();
 

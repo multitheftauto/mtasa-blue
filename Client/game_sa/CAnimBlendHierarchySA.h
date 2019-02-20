@@ -29,7 +29,7 @@ class CAnimBlendHierarchySAInterface
 {
 public:
     // Careful, GetIndex will not work for custom animations
-    int GetIndex(void);
+    int GetIndex();
 
     unsigned int                   uiHashKey;
     CAnimBlendSequenceSAInterface* pSequences;

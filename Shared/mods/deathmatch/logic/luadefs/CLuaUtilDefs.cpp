@@ -10,7 +10,7 @@
 
 #include "StdInc.h"
 
-void CLuaUtilDefs::LoadFunctions(void)
+void CLuaUtilDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         // Util functions to make scripting easier for the end user

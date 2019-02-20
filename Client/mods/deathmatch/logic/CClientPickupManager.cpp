@@ -30,7 +30,7 @@ CClientPickupManager::CClientPickupManager(CClientManager* pManager)
     m_bPickupProcessingDisabled = false;
 }
 
-CClientPickupManager::~CClientPickupManager(void)
+CClientPickupManager::~CClientPickupManager()
 {
     // Delete all the pickups
     DeleteAll();
@@ -48,7 +48,7 @@ CClientPickup* CClientPickupManager::Get(ElementID ID)
     return NULL;
 }
 
-void CClientPickupManager::DeleteAll(void)
+void CClientPickupManager::DeleteAll()
 {
     // Delete each pickup
     m_bDontRemoveFromList = true;
@@ -94,7 +94,7 @@ bool CClientPickupManager::IsValidWeaponID(unsigned short usWeaponID)
     return (usWeaponID > 0 && usWeaponID != 13 && usWeaponID != 19 && usWeaponID != 20 && usWeaponID != 21 && usWeaponID <= 46);
 }
 
-bool CClientPickupManager::IsPickupLimitReached(void)
+bool CClientPickupManager::IsPickupLimitReached()
 {
     // Max 600 pickups
     return (m_uiPickupCount >= 64);

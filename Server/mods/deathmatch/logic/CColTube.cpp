@@ -40,7 +40,7 @@ bool CColTube::ReadSpecialData(const int iLine)
     return true;
 }
 
-CSphere CColTube::GetWorldBoundingSphere(void)
+CSphere CColTube::GetWorldBoundingSphere()
 {
     CSphere sphere;
     sphere.vecPosition.fX = m_vecPosition.fX;

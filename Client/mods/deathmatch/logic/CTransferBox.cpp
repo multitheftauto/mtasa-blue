@@ -17,7 +17,7 @@
 #define TRANSFERBOX_YSTART      20
 #define TRANSFERBOX_SPACER      11
 
-CTransferBox::CTransferBox(void)
+CTransferBox::CTransferBox()
 {
     CGUI* pGUI = g_pCore->GetGUI();
     // Create our text for each transfer type
@@ -80,7 +80,7 @@ CTransferBox::CTransferBox(void)
     m_dTotalSize = 0;
 }
 
-CTransferBox::~CTransferBox(void)
+CTransferBox::~CTransferBox()
 {
     for (unsigned int i = 0; i < TRANSFERBOX_FRAMES; i++)
     {
@@ -95,13 +95,13 @@ CTransferBox::~CTransferBox(void)
         delete m_pProgress;
 }
 
-void CTransferBox::Show(void)
+void CTransferBox::Show()
 {
     m_pWindow->SetVisible(true);
     g_pCore->GetGUI()->SetTransferBoxVisible(true);
 }
 
-void CTransferBox::Hide(void)
+void CTransferBox::Hide()
 {
     m_pWindow->SetVisible(false);
     g_pCore->GetGUI()->SetTransferBoxVisible(false);
@@ -123,7 +123,7 @@ void CTransferBox::SetInfo(double dDownloadSizeNow, CTransferBox::Type eTransfer
     m_pProgress->SetProgress(static_cast<float>(dDownloadSizeNow / m_dTotalSize));
 }
 
-void CTransferBox::DoPulse(void)
+void CTransferBox::DoPulse()
 {
     // animated icon mechanism
     if (m_AnimTimer.Get() > TRANSFERBOX_DELAY)

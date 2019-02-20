@@ -47,7 +47,7 @@ CGUIButton_Impl::CGUIButton_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const ch
     }
 }
 
-CGUIButton_Impl::~CGUIButton_Impl(void)
+CGUIButton_Impl::~CGUIButton_Impl()
 {
     DestroyElement();
 }

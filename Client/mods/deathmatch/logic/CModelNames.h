@@ -24,7 +24,7 @@ public:
     static ushort      ResolveClothesTexID(const SString& strTexNameOrNumber);
 
 protected:
-    static void InitializeMaps(void);
+    static void InitializeMaps();
 
     static std::map<ushort, const char*> ms_ModelIDNameMap;
     static std::map<SString, ushort>     ms_NameModelIDMap;

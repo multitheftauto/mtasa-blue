@@ -12,7 +12,7 @@
 
 #include "StdInc.h"
 
-void CLuaRadarAreaDefs::LoadFunctions(void)
+void CLuaRadarAreaDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"createRadarArea", CreateRadarArea},

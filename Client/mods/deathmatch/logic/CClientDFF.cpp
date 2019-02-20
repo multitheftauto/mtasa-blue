@@ -22,7 +22,7 @@ CClientDFF::CClientDFF(CClientManager* pManager, ElementID ID) : ClassInit(this)
     m_pDFFManager->AddToList(this);
 }
 
-CClientDFF::~CClientDFF(void)
+CClientDFF::~CClientDFF()
 {
     // Remove us from DFF manager list
     m_pDFFManager->RemoveFromList(this);
@@ -99,7 +99,7 @@ bool CClientDFF::LoadDFF(const SString& strFile, bool bIsRawData)
     return true;
 }
 
-void CClientDFF::UnloadDFF(void)
+void CClientDFF::UnloadDFF()
 {
     for (std::map<ushort, SLoadedClumpInfo>::iterator iter = m_LoadedClumpInfoMap.begin(); iter != m_LoadedClumpInfoMap.end(); ++iter)
     {
@@ -200,7 +200,7 @@ void CClientDFF::RestoreModel(unsigned short usModel)
     m_Replaced.remove(usModel);
 }
 
-void CClientDFF::RestoreModels(void)
+void CClientDFF::RestoreModels()
 {
     // Loop through our list over replaced models
     std::list<unsigned short>::iterator iter = m_Replaced.begin();
