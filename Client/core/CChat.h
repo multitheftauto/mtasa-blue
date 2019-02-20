@@ -21,6 +21,7 @@ class CChatLineSection;
 #define CHAT_MAX_LINES 100                               // Chatbox maximum chat lines
 #define CHAT_MAX_CHAT_LENGTH 96                          // Chatbox maximum chat message length
 #define CHAT_BUFFER 1024                                 // Chatbox buffer size
+#define CHAT_INPUT_HISTORY_LENGTH 128                    // Chatbox input history length
 
 class CColor
 {
@@ -146,42 +147,6 @@ struct SDrawList
     }
 };
 
-//
-// SInputHistoryEntry - A single input history entry
-//
-struct SInputHistoryEntry
-{
-    // Contains the original entry that was submitted
-    SString strEntry;
-    // Contains a version with any temporary inline edits that were made in the chat input
-    SString strTemp;
-
-    SInputHistoryEntry(SString strEntry)
-    {
-        this->strEntry = strEntry;
-        this->strTemp = this->strEntry;
-    }
-
-    // Reset the temporary string to the original string
-    void Reset() { strTemp = strEntry; }
-};
-
-//
-// SInputHistory - Stores input submitted in the chatbox by the user
-//
-struct SInputHistory
-{
-    // List which contains all history entries
-    std::vector<SInputHistoryEntry> vecEntryList;
-
-    // Resets input history edits to their original inputs
-    void ResetChanges()
-    {
-        for (auto& i : vecEntryList)
-            i.Reset();
-    }
-};
-
 class CChat
 {
     friend class CChatLine;
@@ -207,6 +172,8 @@ public:
 
     bool CanTakeInput() { return !CLocalGUI::GetSingleton().GetConsole()->IsVisible() && IsInputVisible(); };
 
+    void ResetHistoryChanges();
+    void SelectInputHistoryEntry(int iEntry);
     bool SetNextHistoryText();
     bool SetPreviousHistoryText();
 
@@ -231,9 +198,6 @@ public:
     void Scroll(int iState) { m_iScrollState = iState; };
     void ScrollUp();
     void ScrollDown();
-
-    void ResetHistoryChanges();
-    void SelectInputHistoryEntry(int iEntry);
 
     void SetChatFont(eChatFont Font);
     void OnModLoad();
@@ -289,8 +253,8 @@ protected:
     // Contains a saved copy of initial input text when navigating history entries
     std::string m_strSavedInputText;
 
-    SInputHistory m_InputHistory;
-    int           m_iSelectedInputHistoryEntry;
+    CEntryHistory* m_pInputHistory = new CEntryHistory(CHAT_INPUT_HISTORY_LENGTH);
+    int            m_iSelectedInputHistoryEntry;
 
     bool  m_bVisible;
     bool  m_bInputVisible;

@@ -98,6 +98,7 @@ CChat::~CChat()
     SAFE_DELETE(m_pBackgroundTexture);
     SAFE_DELETE(m_pInput);
     SAFE_DELETE(m_pInputTexture);
+    SAFE_DELETE(m_pInputHistory);
 
     if (g_pChat == this)
         g_pChat = NULL;
@@ -553,7 +554,7 @@ void CChat::ResetHistoryChanges()
 {
     // Reset history selection, any history changes and our saved input
     m_iSelectedInputHistoryEntry = -1;
-    m_InputHistory.ResetChanges();
+    m_pInputHistory->ResetChanges();
     m_strSavedInputText.clear();
 }
 
@@ -562,7 +563,7 @@ void CChat::SelectInputHistoryEntry(int iEntry)
     int iPreviouslySelectedInputHistoryEntry = m_iSelectedInputHistoryEntry;
 
     // Check if we're in bounds, otherwise clear selection
-    if (!m_InputHistory.vecEntryList.empty() && iEntry >= 0 && iEntry < m_InputHistory.vecEntryList.size())
+    if (!m_pInputHistory->Empty() && iEntry >= 0 && iEntry < m_pInputHistory->Size())
         m_iSelectedInputHistoryEntry = iEntry;
     else
         m_iSelectedInputHistoryEntry = -1;
@@ -571,7 +572,7 @@ void CChat::SelectInputHistoryEntry(int iEntry)
     if (iPreviouslySelectedInputHistoryEntry == -1)
         m_strSavedInputText = m_strInputText;
     else
-        m_InputHistory.vecEntryList[iPreviouslySelectedInputHistoryEntry].strTemp = m_strInputText.c_str();
+        m_pInputHistory->Get(iPreviouslySelectedInputHistoryEntry).temp = m_strInputText;
 
     // Clear input
     ClearInput();
@@ -581,11 +582,38 @@ void CChat::SelectInputHistoryEntry(int iEntry)
         SetInputText(m_strSavedInputText.c_str());
     else
     {
-        SString& strSelectedInputHistoryEntry = m_InputHistory.vecEntryList[m_iSelectedInputHistoryEntry].strTemp;
+        SString& strSelectedInputHistoryEntry = m_pInputHistory->Get(m_iSelectedInputHistoryEntry).temp;
         // If the selected entry isn't empty, fill it in
         if (!strSelectedInputHistoryEntry.empty())
             SetInputText(strSelectedInputHistoryEntry.c_str());
     }
+}
+
+bool CChat::SetNextHistoryText()
+{
+    // If we can't take input, history is empty or we're at the end of the list, stop here
+    if (!CanTakeInput() || m_pInputHistory->Size() == 0 || m_iSelectedInputHistoryEntry >= m_pInputHistory->Size() - 1)
+        return false;
+
+    // Select the previous entry
+    SelectInputHistoryEntry(m_iSelectedInputHistoryEntry + 1);
+
+    return true;
+}
+
+bool CChat::SetPreviousHistoryText()
+{
+    // If we can't take input or history is empty, stop here
+    if (!CanTakeInput())
+        return false;
+
+    // Select the next entry, or the default entry
+    if (m_pInputHistory->Size() > 0 && m_iSelectedInputHistoryEntry > 0)
+        SelectInputHistoryEntry(m_iSelectedInputHistoryEntry - 1);
+    else
+        SelectInputHistoryEntry(-1);
+
+    return true;
 }
 
 bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
@@ -614,11 +642,13 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
             // If theres a command to call, call it
             if (!m_strCommand.empty() && !m_strInputText.empty())
             {
-                CCommands::GetSingleton().Execute(m_strCommand.c_str(), m_strInputText.c_str());
+                const char* szInputText = m_strInputText.c_str();
+
+                CCommands::GetSingleton().Execute(m_strCommand.c_str(), szInputText);
 
                 // If the input isn't empty and isn't identical to the previous entry in history, add it to the history
-                if (!m_strInputText.empty() && (m_InputHistory.vecEntryList.empty() || m_InputHistory.vecEntryList.back().strEntry != m_strInputText))
-                    m_InputHistory.vecEntryList.emplace_back(m_strInputText);
+                if (!m_strInputText.empty() && (m_pInputHistory->Empty() || m_pInputHistory->GetLast() != m_strInputText))
+                    m_pInputHistory->Add(szInputText);
             }
 
             SetInputVisible(false);
@@ -743,36 +773,6 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
             break;
         }
     }
-    return true;
-}
-
-bool CChat::SetNextHistoryText()
-{
-    // If we can't take input or history is empty, stop here
-    if (!CanTakeInput() || m_InputHistory.vecEntryList.size() == 0)
-        return false;
-
-    // Select the previous entry
-    if (m_iSelectedInputHistoryEntry > 0)
-        SelectInputHistoryEntry(m_iSelectedInputHistoryEntry - 1);
-    else if (m_iSelectedInputHistoryEntry == -1)
-        SelectInputHistoryEntry(m_InputHistory.vecEntryList.size() - 1);
-
-    return true;
-}
-
-bool CChat::SetPreviousHistoryText()
-{
-    // If we can't take input or history is empty, stop here
-    if (!CanTakeInput() || m_InputHistory.vecEntryList.size() == 0)
-        return false;
-
-    // Select the next entry, or the default entry
-    if (m_iSelectedInputHistoryEntry < m_InputHistory.vecEntryList.size() - 1)
-        SelectInputHistoryEntry(m_iSelectedInputHistoryEntry + 1);
-    else
-        SelectInputHistoryEntry(-1);
-
     return true;
 }
 
