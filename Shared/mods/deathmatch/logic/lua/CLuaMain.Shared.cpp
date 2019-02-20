@@ -91,7 +91,7 @@ void CLuaMain::GetPackage(lua_State* L, SString& strName)
 // Load a Lua lib of a given name
 //
 ///////////////////////////////////////////////////////////////
-bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError)
+bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError, bool& bEmpty)
 {
     SString strPath = strName;
     // Name format shouldn't include slashes.  Subdirs are dots.
@@ -106,6 +106,7 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError)
 #endif
 
     std::vector<char> buffer;
+    strError = "error loading module '" + strName + "' from locations:\n\t";
     // Try <resource>/?.lua
     SString strFilePath = PathJoin(strResPath, strPath + ".lua");
     if (FileExists(strFilePath))
@@ -113,7 +114,7 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError)
     else
     {
         // Don't use a format string for safety, so we construct the error by hand
-        strError += "error loading module " + strName + " from file " + strFilePath + ":\n\t The specified module could not be found";
+        strError += "#1: " + ConformPath(strFilePath, "resources/") + "\n\t";
 
         // Try <resource>/?/init.lua
         strFilePath = PathJoin(strResPath, strPath, "init.lua");
@@ -121,8 +122,7 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError)
             FileLoad(strFilePath, buffer);
         else
         {
-            strError += "\n";
-            strError += "error loading module " + strName + " from file " + strFilePath + ":\n\t The specified module could not be found";
+            strError += "#2: " + ConformPath(strFilePath, "resources/") + "\n\t";
             return false;
         }
     }
@@ -137,7 +137,8 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError)
 
         if (lua_type(L, -1) == LUA_TNIL)
         {
-            strError += "error loading module " + strName + " from file " + strFilePath + ":\n\t Module didn't return a value";
+            strError = "module '" + strName + "' in location " + ConformPath(strFilePath, "resources/") + " didn't return a value.";
+            bEmpty = true;
             return false;
         }
 
@@ -145,7 +146,10 @@ bool CLuaMain::LoadLuaLib(lua_State* L, SString strName, SString& strError)
         return true;
     }
     else
-        strError += "error loading module " + strName + " from file " + strFilePath + ":\n\t Error loading script file";
+    {
+        strError = "could not load module '" + strName + "' from file " + ConformPath(strFilePath, "resources/") + ": File is empty.";
+        bEmpty = true;
+    }
 
     return false;
 }

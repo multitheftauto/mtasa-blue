@@ -209,6 +209,8 @@ namespace SharedUtil
     //
     SString ConformResourcePath(const char* szRes, bool bConvertToUnixPathSep = false);
 
+    SString ConformPath(const char* szRes, SString szPath, bool bConvertToUnixPathSep = false);
+
     //
     // string stuff
     //
