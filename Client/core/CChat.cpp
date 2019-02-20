@@ -591,8 +591,8 @@ void CChat::SelectInputHistoryEntry(int iEntry)
 
 bool CChat::SetNextHistoryText()
 {
-    // If we can't take input, history is empty or we're at the end of the list, stop here
-    if (!CanTakeInput() || m_pInputHistory->Size() == 0 || m_iSelectedInputHistoryEntry >= m_pInputHistory->Size() - 1)
+    // If we can't take input or we're at the end of the list, stop here
+    if (!CanTakeInput() || m_iSelectedInputHistoryEntry >= m_pInputHistory->Size() - 1)
         return false;
 
     // Select the previous entry
@@ -603,7 +603,7 @@ bool CChat::SetNextHistoryText()
 
 bool CChat::SetPreviousHistoryText()
 {
-    // If we can't take input or history is empty, stop here
+    // If we can't take input, stop here
     if (!CanTakeInput())
         return false;
 

@@ -320,8 +320,8 @@ void CConsole::SelectHistoryEntry(int iEntry)
 
 bool CConsole::SetNextHistoryText()
 {
-    // If we can't take input, history is empty or we're at the end of the list, stop here
-    if (!m_pInput->IsActive() || m_pConsoleHistory->Size() == 0 || m_iHistoryIndex >= m_pConsoleHistory->Size() - 1)
+    // If we can't take input or we're at the end of the list, stop here
+    if (!m_pInput->IsActive() || m_iHistoryIndex >= m_pConsoleHistory->Size() - 1)
         return false;
 
     // Select the previous entry
@@ -332,7 +332,7 @@ bool CConsole::SetNextHistoryText()
 
 bool CConsole::SetPreviousHistoryText()
 {
-    // If we can't take input or history is empty, stop here
+    // If we can't take input, stop here
     if (!m_pInput->IsActive())
         return false;
 
