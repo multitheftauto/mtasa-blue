@@ -99,14 +99,14 @@ bool CResource::Load()
     m_strResourceDirectoryPath = PathJoin(m_strAbsPath, m_strResourceName, "/");
     m_strResourceCachePath = PathJoin(g_pServerInterface->GetServerModPath(), "resource-cache", "unzipped", m_strResourceName, "/");
     m_strResourceZip = PathJoin(m_strAbsPath, m_strResourceName + ".zip");
-    
+
     if (m_bResourceIsZip)
     {
         if (!UnzipResource())
         {
             // Unregister EHS stuff
             g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
-            
+
             return false;
         }
     }
@@ -466,6 +466,71 @@ void CResource::SetInfoValue(const char* szKey, const char* szValue, bool bSave)
     }
 }
 
+std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResourceFile)
+{
+    return SharedUtil::async([pResourceFile, this] { 
+        SString strPath;
+
+        if (!GetFilePath(pResourceFile->GetName(), strPath))
+            return SString();
+
+        std::vector<char> buffer;
+        FileLoad(strPath, buffer);
+        uint        uiFileSize = buffer.size();
+        const char* pFileContents = uiFileSize ? buffer.data() : "";
+        CChecksum   Checksum = CChecksum::GenerateChecksumFromBuffer(pFileContents, uiFileSize);
+        pResourceFile->SetLastChecksum(Checksum);
+        pResourceFile->SetLastFileSize(uiFileSize);
+
+        // Check if file is blocked
+        char szHashResult[33];
+        CMD5Hasher::ConvertToHex(pResourceFile->GetLastChecksum().md5, szHashResult);
+        SString strBlockReason = m_pResourceManager->GetBlockedFileReason(szHashResult);
+
+        if (!strBlockReason.empty())
+        {
+            return SString("file '%s' is blocked (%s)", pResourceFile->GetName(), *strBlockReason);
+        }
+
+        // Copy file to http holding directory
+        switch (pResourceFile->GetType())
+        {
+            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
+            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
+            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
+            {
+                SString strCachedFilePath = pResourceFile->GetCachedPathFilename();
+
+                if (!g_pRealNetServer->ValidateHttpCacheFileName(strCachedFilePath))
+                {
+                    FileDelete(strCachedFilePath);
+                    return SString("ERROR: Resource '%s' client filename '%s' not allowed\n", GetName().c_str(), *ExtractFilename(strCachedFilePath));
+                }
+
+                CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFile(strCachedFilePath);
+
+                if (pResourceFile->GetLastChecksum() != cachedChecksum)
+                {
+                    if (!FileSave(strCachedFilePath, pFileContents, uiFileSize))
+                    {
+                        return SString("Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath);
+                    }
+
+                    // If script is 'no client cache', make sure there is no trace of it in the output dir
+                    if (pResourceFile->IsNoClientCache())
+                        FileDelete(pResourceFile->GetCachedPathFilename(true));
+                }
+
+                break;
+            }
+            default:
+                break;
+        }
+
+        return SString();
+    });
+}
+
 bool CResource::GenerateChecksums()
 {
     std::vector<std::future<SString>> checksumTasks;
@@ -473,67 +538,7 @@ bool CResource::GenerateChecksums()
 
     for (CResourceFile* pResourceFile : m_ResourceFiles)
     {
-        checksumTasks.push_back(std::async(std::launch::async, [pResourceFile, this] {
-            SString strPath;
-            
-            if (!GetFilePath(pResourceFile->GetName(), strPath))
-                return SString();
-            
-            std::vector<char> buffer;
-            FileLoad(strPath, buffer);
-            uint        uiFileSize = buffer.size();
-            const char* pFileContents = uiFileSize ? buffer.data() : "";
-            CChecksum   Checksum = CChecksum::GenerateChecksumFromBuffer(pFileContents, uiFileSize);
-            pResourceFile->SetLastChecksum(Checksum);
-            pResourceFile->SetLastFileSize(uiFileSize);
-
-            // Check if file is blocked
-            char szHashResult[33];
-            CMD5Hasher::ConvertToHex(pResourceFile->GetLastChecksum().md5, szHashResult);
-            SString strBlockReason = m_pResourceManager->GetBlockedFileReason(szHashResult);
-            
-            if (!strBlockReason.empty())
-            {
-                return SString("file '%s' is blocked (%s)", pResourceFile->GetName(), *strBlockReason);
-            }
-    
-            // Copy file to http holding directory
-            switch (pResourceFile->GetType())
-            {
-                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
-                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
-                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
-                {
-                    SString strCachedFilePath = pResourceFile->GetCachedPathFilename();
-    
-                    if (!g_pRealNetServer->ValidateHttpCacheFileName(strCachedFilePath))
-                    {
-                        FileDelete(strCachedFilePath);
-                        return SString("ERROR: Resource '%s' client filename '%s' not allowed\n", GetName().c_str(), *ExtractFilename(strCachedFilePath));
-                    }
-    
-                    CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFile(strCachedFilePath);
-                        
-                    if (pResourceFile->GetLastChecksum() != cachedChecksum)
-                    {
-                        if (!FileSave(strCachedFilePath, pFileContents, uiFileSize))
-                        {
-                            return SString("Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath);
-                        }
-    
-                        // If script is 'no client cache', make sure there is no trace of it in the output dir
-                        if (pResourceFile->IsNoClientCache())
-                            FileDelete(pResourceFile->GetCachedPathFilename(true));
-                    }
-    
-                    break;
-                }
-                default:
-                    break;
-            }
-            
-            return SString();
-        }));
+        checksumTasks.push_back(GenerateChecksumForFile(pResourceFile));
     }
 
     bool bOk = true;
@@ -1319,7 +1324,8 @@ bool CResource::ReadIncludedHTML(CXMLNode* pRoot)
                     // This one is supposed to be default, but there's already a default page
                     if (bFoundDefault && bIsDefault)
                     {
-                        CLogger::LogPrintf("Only one html item can be default per resource, ignoring %s in %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                        CLogger::LogPrintf("Only one html item can be default per resource, ignoring %s in %s\n", strFilename.c_str(),
+                                           m_strResourceName.c_str());
                         bIsDefault = false;
                     }
 
@@ -1328,8 +1334,8 @@ bool CResource::ReadIncludedHTML(CXMLNode* pRoot)
                         bFoundDefault = true;
 
                     // Create a new resource HTML file and add it to the list
-                    auto pResourceFile = new CResourceHTMLItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, bIsDefault, bIsRaw, bIsRestricted,
-                                                               m_bOOPEnabledInMetaXml);
+                    auto pResourceFile = new CResourceHTMLItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, bIsDefault, bIsRaw,
+                                                               bIsRestricted, m_bOOPEnabledInMetaXml);
                     m_ResourceFiles.push_back(pResourceFile);
 
                     // This is the first HTML file? Remember it
@@ -1345,8 +1351,7 @@ bool CResource::ReadIncludedHTML(CXMLNode* pRoot)
             }
             else
             {
-                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'html' node of 'meta.xml' for resource '%s', ignoring\n",
-                                   m_strResourceName.c_str());
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'html' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
             }
         }
         else
@@ -1406,7 +1411,8 @@ bool CResource::ReadIncludedConfigs(CXMLNode* pRoot)
 
                 if (bClient && IsFilenameUsed(strFilename, true))
                 {
-                    CLogger::LogPrintf("WARNING: Ignoring duplicate client config file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
+                    CLogger::LogPrintf("WARNING: Ignoring duplicate client config file in resource '%s': '%s'\n", m_strResourceName.c_str(),
+                                       strFilename.c_str());
                     bClient = false;
                 }
                 if (bServer && IsFilenameUsed(strFilename, false))
@@ -1433,8 +1439,7 @@ bool CResource::ReadIncludedConfigs(CXMLNode* pRoot)
             }
             else
             {
-                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'config' node of 'meta.xml' for resource '%s', ignoring\n",
-                                   m_strResourceName.c_str());
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'config' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
             }
         }
         else
@@ -1499,8 +1504,7 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
             }
             else
             {
-                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'file' node of 'meta.xml' for resource '%s', ignoring\n",
-                                   m_strResourceName.c_str());
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'file' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
             }
         }
         else
@@ -1651,7 +1655,8 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
 
                 if (bClient && IsFilenameUsed(strFilename, true))
                 {
-                    CLogger::LogPrintf("WARNING: Ignoring duplicate client script file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
+                    CLogger::LogPrintf("WARNING: Ignoring duplicate client script file in resource '%s': '%s'\n", m_strResourceName.c_str(),
+                                       strFilename.c_str());
                     bClient = false;
                 }
                 if (bServer && IsFilenameUsed(strFilename, false))
@@ -1677,8 +1682,7 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
             }
             else
             {
-                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'script' node of 'meta.xml' for resource '%s', ignoring\n",
-                                   m_strResourceName.c_str());
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'script' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
             }
         }
         else
@@ -1742,8 +1746,7 @@ bool CResource::ReadIncludedMaps(CXMLNode* pRoot)
             }
             else
             {
-                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'map' node of 'meta.xml' for resource '%s', ignoring\n",
-                                   m_strResourceName.c_str());
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'map' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
             }
         }
         else
@@ -2913,8 +2916,7 @@ bool CResource::UnzipResource()
 
             if (ires != UNZ_OK)
                 return false;
-        }
-        while (unzGoToNextFile(m_zipfile) != UNZ_END_OF_LIST_OF_FILE);
+        } while (unzGoToNextFile(m_zipfile) != UNZ_END_OF_LIST_OF_FILE);
     }
 
     // Close the zip file

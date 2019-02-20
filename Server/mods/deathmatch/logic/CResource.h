@@ -191,6 +191,7 @@ public:
     bool IsClientFilesOn() const noexcept { return m_bClientFiles; }
 
     bool             GenerateChecksums();
+    std::future<SString> GenerateChecksumForFile(CResourceFile* pResourceFile);
     const CChecksum& GetLastMetaChecksum() { return m_metaChecksum; }
     bool             HasResourceChanged();
     void             ApplyUpgradeModifications();
