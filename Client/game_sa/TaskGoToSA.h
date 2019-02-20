@@ -90,6 +90,6 @@ public:
 class CTaskComplexWanderStandardSA : public virtual CTaskComplexWanderSA, public virtual CTaskComplexWanderStandard
 {
 public:
-    CTaskComplexWanderStandardSA(void){};
+    CTaskComplexWanderStandardSA(){};
     CTaskComplexWanderStandardSA(const int iMoveState, const unsigned char iDir, const bool bWanderSensibly = true);
 };

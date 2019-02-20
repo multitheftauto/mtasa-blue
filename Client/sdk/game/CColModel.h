@@ -16,6 +16,6 @@ class CColModelSAInterface;
 class CColModel
 {
 public:
-    virtual CColModelSAInterface* GetInterface(void) = 0;
-    virtual void                  Destroy(void) = 0;
+    virtual CColModelSAInterface* GetInterface() = 0;
+    virtual void                  Destroy() = 0;
 };

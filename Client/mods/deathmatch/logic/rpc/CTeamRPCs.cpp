@@ -12,7 +12,7 @@
 #include <StdInc.h>
 #include "CTeamRPCs.h"
 
-void CTeamRPCs::LoadFunctions(void)
+void CTeamRPCs::LoadFunctions()
 {
     AddHandler(SET_TEAM_NAME, SetTeamName, "SetTeamName");
     AddHandler(SET_TEAM_COLOR, SetTeamColor, "SetTeamColor");

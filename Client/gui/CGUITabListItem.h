@@ -15,5 +15,5 @@
 class CGUITabListItem : public CGUIElement
 {
 public:
-    virtual bool ActivateOnTab(void) = 0;
+    virtual bool ActivateOnTab() = 0;
 };

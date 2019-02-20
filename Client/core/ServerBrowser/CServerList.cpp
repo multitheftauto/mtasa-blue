@@ -18,7 +18,7 @@ using namespace std;
 extern CCore*              g_pCore;
 std::set<CServerListItem*> CServerListItem::ms_ValidServerListItemMap;
 
-CServerList::CServerList(void)
+CServerList::CServerList()
 {
     m_bUpdated = false;
     m_iPass = 0;
@@ -28,12 +28,12 @@ CServerList::CServerList(void)
     m_iRevision = 1;
 }
 
-CServerList::~CServerList(void)
+CServerList::~CServerList()
 {
     Clear();
 }
 
-void CServerList::Clear(void)
+void CServerList::Clear()
 {
 #if 1
     // Clear all entries
@@ -48,7 +48,7 @@ void CServerList::Clear(void)
     m_llLastTickCount = 0;
 }
 
-void CServerList::Pulse(void)
+void CServerList::Pulse()
 {
     // Get QueriesPerSecond setting
     int iQueriesPerSecond = 50;
@@ -177,7 +177,7 @@ bool CServerList::Remove(in_addr Address, ushort usGamePort)
     return m_Servers.Remove(Address, usGamePort);
 }
 
-void CServerList::Refresh(void)
+void CServerList::Refresh()
 {            // Assumes we already have a (saved) list of servers, so we just need to refresh
 
     // Reinitialize each server list item
@@ -194,19 +194,19 @@ void CServerList::Refresh(void)
     m_iRevision++;
 }
 
-CServerListInternet::CServerListInternet(void)
+CServerListInternet::CServerListInternet()
 {
     m_ElapsedTime.SetMaxIncrement(500);
     m_pMasterServerManager = NewMasterServerManager();
 }
 
-CServerListInternet::~CServerListInternet(void)
+CServerListInternet::~CServerListInternet()
 {
     delete m_pMasterServerManager;
     m_pMasterServerManager = NULL;
 }
 
-void CServerListInternet::Refresh(void)
+void CServerListInternet::Refresh()
 {            // Gets the server list from the master server and refreshes
     m_ElapsedTime.Reset();
     m_pMasterServerManager->Refresh();
@@ -225,12 +225,12 @@ static bool SortByASEVersionCallback(const CServerListItem* const d1, const CSer
 //
 // Ensure serverlist is sorted by MTA ASE version
 //
-void CServerList::SortByASEVersion(void)
+void CServerList::SortByASEVersion()
 {
     m_Servers.GetList().sort(SortByASEVersionCallback);
 }
 
-void CServerListInternet::Pulse(void)
+void CServerListInternet::Pulse()
 {            // We also need to take care of the master server list here
     unsigned long ulTime = m_ElapsedTime.Get();
 
@@ -284,7 +284,7 @@ void CServerListInternet::Pulse(void)
     }
 }
 
-void CServerListLAN::Pulse(void)
+void CServerListLAN::Pulse()
 {
     char szBuffer[32];
 
@@ -313,7 +313,7 @@ void CServerListLAN::Pulse(void)
     CServerList::Pulse();
 }
 
-void CServerListLAN::Refresh(void)
+void CServerListLAN::Refresh()
 {            // Gets the server list from LAN-broadcasting servers
     m_iPass = 1;
     m_bUpdated = true;
@@ -342,7 +342,7 @@ void CServerListLAN::Refresh(void)
     Discover();
 }
 
-void CServerListLAN::Discover(void)
+void CServerListLAN::Discover()
 {
     m_strStatus = _("Attempting to discover LAN servers");
 
@@ -468,12 +468,12 @@ std::string CServerListItem::Pulse(bool bCanSendQuery, bool bRemoveNonResponding
     }
 }
 
-unsigned short CServerListItem::GetQueryPort(void)
+unsigned short CServerListItem::GetQueryPort()
 {
     return usGamePort + SERVER_LIST_QUERY_PORT_OFFSET;
 }
 
-void CServerListItem::Query(void)
+void CServerListItem::Query()
 {            // Performs a query according to ASE protocol
     sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
@@ -666,7 +666,7 @@ bool CServerListItem::ParseQuery(const char* szBuffer, unsigned int nLength)
 //
 //
 //////////////////////////////////////////////////////////////////////////////
-CServerListItemList::~CServerListItemList(void)
+CServerListItemList::~CServerListItemList()
 {
     dassert(m_List.size() == m_AddressMap.size());
     while (m_List.size())
@@ -814,7 +814,7 @@ CServerListItem::CServerListItem(in_addr _Address, unsigned short _usGamePort, C
 }
 
 // Auto removes from associated list
-CServerListItem::~CServerListItem(void)
+CServerListItem::~CServerListItem()
 {
     if (m_pItemList)
     {
@@ -826,7 +826,7 @@ CServerListItem::~CServerListItem(void)
     CloseSocket();
 }
 
-void CServerListItem::ResetForRefresh(void)
+void CServerListItem::ResetForRefresh()
 {
     CloseSocket();
     bScanned = false;

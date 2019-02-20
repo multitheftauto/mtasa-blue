@@ -25,7 +25,7 @@ struct SLogLine
     unsigned char ucRed;
     unsigned char ucGreen;
     unsigned char ucBlue;
-                  operator SString&(void) { return strText; }
+                  operator SString&() { return strText; }
     bool          operator==(const SLogLine& other) const
     {
         return strText == other.strText && uiMinimumDebugLevel == other.uiMinimumDebugLevel && ucRed == other.ucRed && ucGreen == other.ucGreen &&
@@ -37,7 +37,7 @@ class CScriptDebugging
 {
 public:
     CScriptDebugging(CLuaManager* pLuaManager);
-    ~CScriptDebugging(void);
+    ~CScriptDebugging();
 
     void LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, const char* szFormat, ...);
     void LogInformation(lua_State* luaVM, const char* szFormat, ...);
@@ -59,8 +59,8 @@ public:
     void      PushLuaMain(CLuaMain* pLuaMain);
     void      PopLuaMain(CLuaMain* pLuaMain);
     void      OnLuaMainDestroy(CLuaMain* pLuaMain);
-    CLuaMain* GetTopLuaMain(void);
-    void      UpdateLogOutput(void);
+    CLuaMain* GetTopLuaMain();
+    void      UpdateLogOutput();
 
 private:
     SString ComposeErrorMessage(const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage);

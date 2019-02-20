@@ -26,5 +26,5 @@ public:
     CTrailerSA(CTrailerSAInterface* trailer);
     CTrailerSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
 
-    virtual ~CTrailerSA(void) {}
+    virtual ~CTrailerSA() {}
 };

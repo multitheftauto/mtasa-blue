@@ -14,7 +14,7 @@ using SharedUtil::CalcMTASAPath;
 
 extern CClientGame* g_pClientGame;
 
-CClientManager::CClientManager(void)
+CClientManager::CClientManager()
 {
     m_pMarkerStreamer = new CClientStreamer(CClientMarker::IsLimitReached, 600.0f, 300, 300);
     m_pObjectStreamer = new CClientStreamer(CClientObjectManager::StaticIsObjectLimitReached, 500.0f, 300, 300);
@@ -61,7 +61,7 @@ CClientManager::CClientManager(void)
     m_pCamera->MakeSystemEntity();
 }
 
-CClientManager::~CClientManager(void)
+CClientManager::~CClientManager()
 {
     m_bBeingDeleted = true;
 
@@ -218,7 +218,7 @@ void CClientManager::DoPulse(bool bDoStandardPulses, bool bDoVehicleManagerPulse
     }
 }
 
-void CClientManager::DoRender(void)
+void CClientManager::DoRender()
 {
     if (IsGameLoaded())
     {
@@ -226,7 +226,7 @@ void CClientManager::DoRender(void)
     }
 }
 
-void CClientManager::UpdateStreamers(void)
+void CClientManager::UpdateStreamers()
 {
     // Is the game loaded?
     if (IsGameLoaded())
@@ -270,16 +270,6 @@ void CClientManager::UnreferenceEntity(CClientEntity* pEntity)
     }
 }
 
-CClientEntity* CClientManager::FindEntity(CEntity* pGameEntity, bool bValidatePointer)
-{
-    return g_pClientGame->GetGameEntityXRefManager()->FindClientEntity(pGameEntity);
-}
-
-CClientEntity* CClientManager::FindEntitySafe(CEntity* pGameEntity)
-{
-    return g_pClientGame->GetGameEntityXRefManager()->FindClientEntity(pGameEntity);
-}
-
 void CClientManager::OnUpdateStreamPosition(CClientStreamElement* pElement)
 {
     if (m_pColManager && m_pColManager->Count() > 0)
@@ -289,7 +279,7 @@ void CClientManager::OnUpdateStreamPosition(CClientStreamElement* pElement)
 }
 
 // Only enable LOD hooks when needed
-void CClientManager::OnLowLODElementCreated(void)
+void CClientManager::OnLowLODElementCreated()
 {
     // Switch on with first low LOD element
     if (m_iNumLowLODElements == 0)
@@ -297,7 +287,7 @@ void CClientManager::OnLowLODElementCreated(void)
     m_iNumLowLODElements++;
 }
 
-void CClientManager::OnLowLODElementDestroyed(void)
+void CClientManager::OnLowLODElementDestroyed()
 {
     // Switch off with last low LOD element
     m_iNumLowLODElements--;

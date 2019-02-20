@@ -16,7 +16,7 @@
 class CLuaTaskDefs : public CLuaDefs
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     static int createTaskInstance(lua_State* luaVM);
 

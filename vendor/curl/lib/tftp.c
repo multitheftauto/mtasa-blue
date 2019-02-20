@@ -485,7 +485,7 @@ static CURLcode tftp_send_first(tftp_state_data_t *state, tftp_event_t event)
     /* As RFC3617 describes the separator slash is not actually part of the
        file name so we skip the always-present first letter of the path
        string. */
-    result = Curl_urldecode(data, &state->conn->data->state.path[1], 0,
+    result = Curl_urldecode(data, &state->conn->data->state.up.path[1], 0,
                             &filename, NULL, FALSE);
     if(result)
       return result;
@@ -496,9 +496,9 @@ static CURLcode tftp_send_first(tftp_state_data_t *state, tftp_event_t event)
       return CURLE_TFTP_ILLEGAL; /* too long file name field */
     }
 
-    snprintf((char *)state->spacket.data + 2,
-             state->blksize,
-             "%s%c%s%c", filename, '\0',  mode, '\0');
+    msnprintf((char *)state->spacket.data + 2,
+              state->blksize,
+              "%s%c%s%c", filename, '\0',  mode, '\0');
     sbytes = 4 + strlen(filename) + strlen(mode);
 
     /* optional addition of TFTP options */
@@ -506,8 +506,8 @@ static CURLcode tftp_send_first(tftp_state_data_t *state, tftp_event_t event)
       char buf[64];
       /* add tsize option */
       if(data->set.upload && (data->state.infilesize != -1))
-        snprintf(buf, sizeof(buf), "%" CURL_FORMAT_CURL_OFF_T,
-                 data->state.infilesize);
+        msnprintf(buf, sizeof(buf), "%" CURL_FORMAT_CURL_OFF_T,
+                  data->state.infilesize);
       else
         strcpy(buf, "0"); /* the destination is large enough */
 
@@ -517,7 +517,7 @@ static CURLcode tftp_send_first(tftp_state_data_t *state, tftp_event_t event)
       sbytes += tftp_option_add(state, sbytes,
                                 (char *)state->spacket.data + sbytes, buf);
       /* add blksize option */
-      snprintf(buf, sizeof(buf), "%d", state->requested_blksize);
+      msnprintf(buf, sizeof(buf), "%d", state->requested_blksize);
       sbytes += tftp_option_add(state, sbytes,
                                 (char *)state->spacket.data + sbytes,
                                 TFTP_OPTION_BLKSIZE);
@@ -525,7 +525,7 @@ static CURLcode tftp_send_first(tftp_state_data_t *state, tftp_event_t event)
                                 (char *)state->spacket.data + sbytes, buf);
 
       /* add timeout option */
-      snprintf(buf, sizeof(buf), "%d", state->retry_time);
+      msnprintf(buf, sizeof(buf), "%d", state->retry_time);
       sbytes += tftp_option_add(state, sbytes,
                                 (char *)state->spacket.data + sbytes,
                                 TFTP_OPTION_INTERVAL);
@@ -1374,7 +1374,7 @@ static CURLcode tftp_setup_connection(struct connectdata * conn)
 
   /* TFTP URLs support an extension like ";mode=<typecode>" that
    * we'll try to get now! */
-  type = strstr(data->state.path, ";mode=");
+  type = strstr(data->state.up.path, ";mode=");
 
   if(!type)
     type = strstr(conn->host.rawalloc, ";mode=");

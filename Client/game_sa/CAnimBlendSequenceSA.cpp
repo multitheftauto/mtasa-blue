@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CAnimBlendSequenceSA::Initialize(void)
+void CAnimBlendSequenceSA::Initialize()
 {
     m_pInterface->m_boneId = -1;
     m_pInterface->sFlags = 0;

@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-10 02:54+0100\n"
-"PO-Revision-Date: 2018-09-04 14:21+0000\n"
+"PO-Revision-Date: 2018-12-24 17:30+0000\n"
 "Last-Translator: Easterdie <easterdie@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: ru\n"
@@ -15,9 +15,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"Translators: Easterdie; Александр Шилякин; CoolDark; Kenix; Dr.CrazY; Nexus_; GTA-Multiplayer.com; Stanislav Zverev; Alexander Romanov; SalwadoR; lil_Toady; Gallardo994; Pavel Andreychenko; Nikita Obrekht; MeowCola; The_Creator; Rocketman; FranklinRoosevelt\n"
+"Translators: Easterdie; Александр Шилякин; CoolDark; Kenix; Dr.CrazY; Nexus_; GTA-Multiplayer.com; Stanislav Zverev; Alexander Romanov; SalwadoR; lil_Toady; Gallardo994; Pavel Andreychenko; !; MeowCola; Rocketman; The_Creator; Napoleon  Hill; FranklinRoosevelt; Nikita Obrekht\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1536070875.0\n"
+"X-POOTLE-MTIME: 1545672603.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -57,21 +57,21 @@ msgstr "* Время: %d:%02d:%02d"
 
 #: ..\Client\core\CCommandFuncs.cpp:266
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "подключиться: Используйте 'connect <адрес> [<порт> <ник> <пароль>]'"
+msgstr "Используйте 'connect <адрес> [<порт> <ник> <пароль>]' для подключения"
 
 #: ..\Client\core\CCommandFuncs.cpp:274 ..\Client\core\CCommandFuncs.cpp:342
 msgid "connect: Bad port number"
-msgstr "подключение: Неверный номер порта"
+msgstr "подключение: Неверный порт"
 
 #: ..\Client\core\CCommandFuncs.cpp:296 ..\Client\core\CCommandFuncs.cpp:357
 #, c-format, c-format
 msgid "connect: Connecting to %s:%u..."
-msgstr "подключение: Подключение к %s:%u..."
+msgstr "Подключение: Подключение к %s:%u..."
 
 #: ..\Client\core\CCommandFuncs.cpp:300 ..\Client\core\CCommandFuncs.cpp:361
 #, c-format, c-format
 msgid "connect: could not connect to %s:%u!"
-msgstr "подключение: не удалось подключиться к %s:%u!"
+msgstr "Подключение к %s:%u не удалось!"
 
 #: ..\Client\core\CCommandFuncs.cpp:305
 msgid "connect: Failed to unload current mod"
@@ -494,7 +494,7 @@ msgstr "Транспорт: Огонь"
 
 #: ..\Client\core\CKeyBinds.cpp:198
 msgid "Vehicle secondary fire"
-msgstr "Транспорт: Огонь (2)"
+msgstr "Транспорт: Огонь вторичный"
 
 #: ..\Client\core\CKeyBinds.cpp:199
 msgid "Vehicle left"
@@ -644,7 +644,8 @@ msgstr "Указан неверный порт!"
 #: ..\Client\mods\deathmatch\logic\CClientGame.cpp:563
 #: ..\Client\mods\deathmatch\logic\CClientGame.cpp:655
 msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Неверный никнейм! Пожалуйста, откройте настройки и измените его!"
+msgstr ""
+"Неверное имя пользователя! Пожалуйста, откройте настройки и измените его!"
 
 #: ..\Client\core\CScreenShot.cpp:51
 #, c-format, c-format
@@ -670,7 +671,7 @@ msgstr "Звук"
 
 #: ..\Client\core\CSettings.cpp:117
 msgid "Binds"
-msgstr "Клавиши"
+msgstr "Клавиши управления"
 
 #: ..\Client\core\CSettings.cpp:118
 msgid "Controls"
@@ -682,7 +683,7 @@ msgstr "Интерфейс"
 
 #: ..\Client\core\CSettings.cpp:120
 msgid "Web Browser"
-msgstr "Браузер"
+msgstr "Веб-браузер"
 
 #: ..\Client\core\CSettings.cpp:121
 msgid "Advanced"
@@ -718,7 +719,7 @@ msgstr "Отмена"
 #: ..\Client\core\CSettings.cpp:145 ..\Client\core\CSettings.cpp:336
 #: ..\Client\core\CSettings.cpp:587 ..\Client\core\CSettings.cpp:836
 msgid "Load defaults"
-msgstr "Восстановить стандартные"
+msgstr "Загрузить стандартные"
 
 #. *
 #. *  Controls tab
@@ -730,7 +731,7 @@ msgstr "Чувствительность мыши:"
 #. VerticalAimSensitivity
 #: ..\Client\core\CSettings.cpp:155 ..\Client\core\CSettings.cpp:197
 msgid "Vertical aim sensitivity:"
-msgstr "Вертикальная чувствительность прицела:"
+msgstr "Вертикальная чувствительность мыши:"
 
 #. Mouse Options
 #: ..\Client\core\CSettings.cpp:158
@@ -739,7 +740,7 @@ msgstr "Настройки мыши"
 
 #: ..\Client\core\CSettings.cpp:165
 msgid "Invert mouse vertically"
-msgstr "Инверсия мыши по-вертикали"
+msgstr "Инверсия мыши по вертикали"
 
 #: ..\Client\core\CSettings.cpp:169
 msgid "Steer with mouse"
@@ -799,7 +800,7 @@ msgstr "ДОП. КЛАВИША"
 #. *
 #: ..\Client\core\CSettings.cpp:351 ..\Client\core\CSettings.cpp:354
 msgid "Nick:"
-msgstr "Никнейм:"
+msgstr "Имя пользователя:"
 
 #: ..\Client\core\CSettings.cpp:364
 msgid "Save server passwords"
@@ -838,11 +839,11 @@ msgstr "Громкость радио:"
 
 #: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:456
 msgid "SFX volume:"
-msgstr "Общая громкость:"
+msgstr "Громкость эффектов:"
 
 #: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:475
 msgid "MTA volume:"
-msgstr "Громкость MTA:"
+msgstr "Громкость MTA (звуки в скриптах):"
 
 #: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:494
 msgid "Voice volume:"
@@ -898,7 +899,6 @@ msgid "Mute options"
 msgstr "Настройки заглушения"
 
 #: ..\Client\core\CSettings.cpp:561
-#, fuzzy
 msgid "Mute All sounds when minimized"
 msgstr "Заглушить все звуки, когда игра свёрнута"
 
@@ -1035,7 +1035,7 @@ msgstr "16:9"
 
 #: ..\Client\core\CSettings.cpp:770
 msgid "HUD Match Aspect Ratio"
-msgstr "Размер HUD под соотношение"
+msgstr "Размер интерфейса под соотношение"
 
 #: ..\Client\core\CSettings.cpp:776
 msgid "Volumetric Shadows"
@@ -1055,11 +1055,11 @@ msgstr "Дым шин и т.д."
 
 #: ..\Client\core\CSettings.cpp:792
 msgid "Render vehicles always in high detail"
-msgstr "Всегда отрисовывать транспорт в высоком качестве "
+msgstr "Всегда отображать транспорт в высоком качестве "
 
 #: ..\Client\core\CSettings.cpp:797
 msgid "Full Screen Minimize"
-msgstr "Во весь экран (свернуть)"
+msgstr "Чёрный список"
 
 #: ..\Client\core\CSettings.cpp:809
 msgid "Enable Device Selection Dialog"
@@ -1087,7 +1087,7 @@ msgstr "Введите домен, например google.com"
 
 #: ..\Client\core\CSettings.cpp:879
 msgid "Block"
-msgstr "Блокировать"
+msgstr "Запретить"
 
 #: ..\Client\core\CSettings.cpp:887 ..\Client\core\CSettings.cpp:915
 msgid "Domain"
@@ -1316,7 +1316,6 @@ msgid "Layout"
 msgstr "Макет чата"
 
 #: ..\Client\core\CSettings.cpp:1990 ..\Client\core\CSettings.cpp:2236
-#, fuzzy
 msgid "Options"
 msgstr "Настройки:"
 
@@ -1409,7 +1408,6 @@ msgid "Bottom"
 msgstr "Низ"
 
 #: ..\Client\core\CSettings.cpp:2205
-#, fuzzy
 msgid "Font"
 msgstr "Шрифт:"
 
@@ -1557,11 +1555,11 @@ msgstr ""
 
 #: ..\Client\core\CSettings.cpp:4461
 msgid "Very experimental feature."
-msgstr "(Очень экспериментальная функция)"
+msgstr "Очень экспериментальная функция"
 
 #: ..\Client\core\CSettings.cpp:4463
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
-msgstr "Оптимизация смены одежды CJ (Требуются доп. 65Мб RAM)"
+msgstr "Оптимизация смены одежды CJ (Требуются доп. 65Мб ОЗУ)"
 
 #: ..\Client\core\CSettings.cpp:4465
 msgid "Older routers may require a slower scan speed."
@@ -1643,6 +1641,7 @@ msgid ""
 "Do you want to download and install MTA:SA %s ?"
 msgstr ""
 "Требуется обновление до MTA:SA %s, чтобы присоединиться к выбранному серверу.\n"
+"\n"
 "Вы хотите загрузить и установить MTA:SA %s?"
 
 #: ..\Client\core\CVersionUpdater.cpp:1586
@@ -2432,7 +2431,9 @@ msgid ""
 "Try to launch MTA:SA again?"
 msgstr ""
 "Проблема перезапуска MTA:SA\n"
+"\n"
 "Если проблема сохранилась, то откройте диспетчер задач и остановите процессы 'gta_sa.exe' и 'Multi Theft Auto.exe' \n"
+"\n"
 "\n"
 "Попробовать запустить MTA:SA снова?"
 
@@ -2463,6 +2464,7 @@ msgid ""
 "Do you want to revert to an earlier version?"
 msgstr ""
 "У вас есть проблемы с запуском MTA:SA?.\n"
+"\n"
 "Попробовать откатиться к ранней версии?"
 
 #: ..\Client\loader\MainFunctions.cpp:309
@@ -2535,7 +2537,6 @@ msgstr ""
 "ВНИМАНИЕ\n"
 "\n"
 "MTA:SA обнаружил подозрительную активность.\n"
-"\n"
 "Проверьте вашу систему на наличие вирусов, чтобы убедиться в безопасности.\n"
 "\n"
 
@@ -2599,6 +2600,7 @@ msgid ""
 msgstr ""
 "Путь к папке MTA:SA или GTA: San Andreas\n"
 "имеет символ ';' (точку с запятой).\n"
+"\n"
 "Переустановите MTA:SA и GTA: San Andreas, так, чтобы в \n"
 "пути до папок не было точки с запятой."
 
@@ -2682,12 +2684,12 @@ msgstr ""
 
 #: ..\Client\loader\MainFunctions.cpp:1131
 msgid "Fix configuration issue"
-msgstr ""
+msgstr "Исправить проблему конфигурации"
 
 #. Try to relaunch as admin if not done so already
 #: ..\Client\loader\MainFunctions.cpp:1173
 msgid "Fix elevation required error"
-msgstr ""
+msgstr "Ошибка при исправлении ошибки."
 
 #: ..\Client\loader\MainFunctions.cpp:1180
 #, c-format, c-format, c-format, 
@@ -2697,6 +2699,7 @@ msgid ""
 "[%s]"
 msgstr ""
 "Невозможно запустить Grand Theft Auto: San Andreas.   Попробуйте перезапустить. Если проблема не решена, то обратитесь за помощью на сайте www.multitheftauto.com. \n"
+"\n"
 "[%s]"
 
 #: ..\Client\loader\MainFunctions.cpp:1243
@@ -2724,6 +2727,7 @@ msgid ""
 "Do you want to copy your settings from %s ?"
 msgstr ""
 "Новая версия клиента %s обнаружена.\n"
+"\n"
 "Вы хотите скопировать ваши настройки из %s ?"
 
 #: ..\Client\loader\Utils.cpp:1777
@@ -3124,17 +3128,17 @@ msgstr[2] "%d часов"
 #, c-format, c-format, c-format, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] "%d минута"
-msgstr[1] "%d минут"
+msgstr[0] "%d минут"
+msgstr[1] "%d минута"
 msgstr[2] "%d минуты"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:611
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d секунд"
+msgstr[1] "%d секунда"
+msgstr[2] "%d секунды"
 
 #. Display the error
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:615
@@ -3200,7 +3204,7 @@ msgid ""
 "for support."
 msgstr ""
 "Ошибка протокола (%u). Если проблема не исправлена, то обратитесь на сайт "
-"mtasa.com, чтобы получить поддержку."
+"mtasa.com за помощью."
 
 #: ..\Client\mods\deathmatch\logic\Utils.cpp:160
 msgid "Connection error"

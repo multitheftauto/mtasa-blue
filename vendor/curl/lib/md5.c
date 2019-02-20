@@ -163,13 +163,6 @@ static void MD5_Final(unsigned char digest[16], MD5_CTX *ctx)
     CryptReleaseContext(ctx->hCryptProv, 0);
 }
 
-#elif defined(USE_AXTLS)
-#include <axTLS/config.h>
-#include <axTLS/os_int.h>
-#include <axTLS/crypto.h>
-#include "curl_memory.h"
-/* The last #include file should be: */
-#include "memdebug.h"
 #else
 /* When no other crypto library is available we use this code segment */
 /*
@@ -177,7 +170,7 @@ static void MD5_Final(unsigned char digest[16], MD5_CTX *ctx)
  * MD5 Message-Digest Algorithm (RFC 1321).
  *
  * Homepage:
- http://openwall.info/wiki/people/solar/software/public-domain-source-code/md5
+ https://openwall.info/wiki/people/solar/software/public-domain-source-code/md5
  *
  * Author:
  * Alexander Peslyak, better known as Solar Designer <solar at openwall.com>

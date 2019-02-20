@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CAccessControlListManager::CAccessControlListManager(void) : CXMLConfig(NULL)
+CAccessControlListManager::CAccessControlListManager() : CXMLConfig(NULL)
 {
     m_pXML = NULL;
     m_pRootNode = NULL;
@@ -21,7 +21,7 @@ CAccessControlListManager::CAccessControlListManager(void) : CXMLConfig(NULL)
     m_uiGlobalRevision = 1;
 }
 
-CAccessControlListManager::~CAccessControlListManager(void)
+CAccessControlListManager::~CAccessControlListManager()
 {
     if (m_bNeedsSave)
         Save();
@@ -38,7 +38,7 @@ CAccessControlListManager::~CAccessControlListManager(void)
     }
 }
 
-bool CAccessControlListManager::Load(void)
+bool CAccessControlListManager::Load()
 {
     m_bAllowSave = true;
 
@@ -223,7 +223,7 @@ bool CAccessControlListManager::Load(void)
     return true;
 }
 
-bool CAccessControlListManager::Reload(void)
+bool CAccessControlListManager::Reload()
 {
     // Flush any pending saves - This is ok because reloading is for loading manual changes to acl.xml
     // and manual changes are subject to being overwritten by server actions at any time.
@@ -233,7 +233,7 @@ bool CAccessControlListManager::Reload(void)
     return Load();
 }
 
-bool CAccessControlListManager::Save(void)
+bool CAccessControlListManager::Save()
 {
     // Only allow save after a load was attempted
     if (!m_bAllowSave)
@@ -306,7 +306,7 @@ CAccessControlList* CAccessControlListManager::GetACL(const char* szACLName)
     return NULL;
 }
 
-void CAccessControlListManager::DoPulse(void)
+void CAccessControlListManager::DoPulse()
 {
     // Clear cache every 12 hours or if dirty
     if (m_bReadCacheDirty || GetTickCount64_() - m_llLastTimeReadCacheCleared > 1000 * 60 * 60 * 12)
@@ -317,7 +317,7 @@ void CAccessControlListManager::DoPulse(void)
         Save();
 }
 
-void CAccessControlListManager::ClearReadCache(void)
+void CAccessControlListManager::ClearReadCache()
 {
     m_bReadCacheDirty = false;
     m_llLastTimeReadCacheCleared = GetTickCount64_();
@@ -449,7 +449,7 @@ void CAccessControlListManager::DeleteACL(class CAccessControlList* pACL)
     OnChange();
 }
 
-void CAccessControlListManager::ClearACLs(void)
+void CAccessControlListManager::ClearACLs()
 {
     // Return true if it exists
     list<CAccessControlList*>::iterator iter = m_ACLs.begin();
@@ -463,7 +463,7 @@ void CAccessControlListManager::ClearACLs(void)
     OnChange();
 }
 
-void CAccessControlListManager::ClearGroups(void)
+void CAccessControlListManager::ClearGroups()
 {
     // Delete all the ACLs
     list<CAccessControlListGroup*>::iterator iter = m_Groups.begin();
@@ -572,7 +572,7 @@ std::vector<SString> CAccessControlListManager::GetObjectGroupNames(const SStrin
 //
 // Called when an item within the ACL is modified
 //
-void CAccessControlListManager::OnChange(void)
+void CAccessControlListManager::OnChange()
 {
     m_bReadCacheDirty = true;
     m_bNeedsSave = true;

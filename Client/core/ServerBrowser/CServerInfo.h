@@ -46,17 +46,17 @@ class CServerInfo : public CSingleton<CServerInfo>
     friend class CCore;
 
 public:
-    explicit CServerInfo(void);
-    ~CServerInfo(void);
+    explicit CServerInfo();
+    ~CServerInfo();
 
-    bool IsVisible(void);
-    void Hide(void);
+    bool IsVisible();
+    void Hide();
     void Show(eWindowType WindowType);
     void Show(eWindowType WindowType, const char* szHost, unsigned short usPort, const char* szPassword, CServerListItem* pInitialServerListItem = NULL);
 
     void SetServerInformation(const char* szHost, unsigned short usPort, const char* szPassword, CServerListItem* pInitialServerListItem = NULL);
 
-    void DoPulse(void);
+    void DoPulse();
 
 protected:
     CGUIWindow* m_pWindow;
@@ -97,9 +97,9 @@ private:
     unsigned short m_usPort;
     SString        m_strPassword;
 
-    void Refresh(void);
-    void Connect(void);
-    void Reset(void);
+    void Refresh();
+    void Connect();
+    void Reset();
     void ResetServerGUI(CServerListItem* pServer);
 
     bool OnCloseClicked(CGUIElement* pElement);
