@@ -44,7 +44,7 @@
 
 /* Returns timeout in ms. 0 or negative number means the timeout has already
    triggered */
-time_t Curl_pp_state_timeout(struct pingpong *pp, bool disconnecting)
+time_t Curl_pp_state_timeout(struct pingpong *pp)
 {
   struct connectdata *conn = pp->conn;
   struct Curl_easy *data = conn->data;
@@ -62,7 +62,7 @@ time_t Curl_pp_state_timeout(struct pingpong *pp, bool disconnecting)
   timeout_ms = response_time -
     Curl_timediff(Curl_now(), pp->response); /* spent time */
 
-  if(data->set.timeout && !disconnecting) {
+  if(data->set.timeout) {
     /* if timeout is requested, find out how much remaining time we have */
     time_t timeout2_ms = data->set.timeout - /* timeout time */
       Curl_timediff(Curl_now(), conn->now); /* spent time */
@@ -77,14 +77,13 @@ time_t Curl_pp_state_timeout(struct pingpong *pp, bool disconnecting)
 /*
  * Curl_pp_statemach()
  */
-CURLcode Curl_pp_statemach(struct pingpong *pp, bool block,
-                           bool disconnecting)
+CURLcode Curl_pp_statemach(struct pingpong *pp, bool block)
 {
   struct connectdata *conn = pp->conn;
   curl_socket_t sock = conn->sock[FIRSTSOCKET];
   int rc;
   time_t interval_ms;
-  time_t timeout_ms = Curl_pp_state_timeout(pp, disconnecting);
+  time_t timeout_ms = Curl_pp_state_timeout(pp);
   struct Curl_easy *data = conn->data;
   CURLcode result = CURLE_OK;
 
