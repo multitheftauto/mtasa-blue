@@ -28,6 +28,7 @@ jobs:
   - script: utils\premake5 vs2017
     env:
       DXSDK_DIR: './utils/DXFiles/'
+      CI: 'true'
     displayName: 'Create Visual Studio 2017 Solution'
   - script: utils\premake5 install_data
     displayName: 'Install data files'
