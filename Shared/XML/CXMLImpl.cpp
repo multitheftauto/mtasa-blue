@@ -46,33 +46,50 @@ void CXMLImpl::DeleteXML(CXMLFile* pFile)
 
 CXMLNode* CXMLImpl::ParseString(const char* strXmlContent)
 {
-    TiXmlElement    *xmlRoot;
-    TiXmlNode       *xmlChild;
-    CXMLNodeImpl    *xmlRootNode;
-    CXMLNode        *xmlChildNode;
-
+    TiXmlElement    *xmlDocumentRoot;
+    CXMLNodeImpl    *xmlBaseNode;
+    CXMLNode    *xmlRootNode;
+    
     TiXmlDocument*  xmlDoc = new TiXmlDocument();
 
     if (xmlDoc)
-    {
-        xmlDoc->Parse(strXmlContent, 0, TIXML_ENCODING_UTF8);
-
-        xmlRoot = xmlDoc->RootElement();
-
-        xmlRootNode = new CXMLNodeImpl(NULL, NULL, *xmlRoot);
-
-        xmlChild = 0;
-        while (xmlChild = xmlRoot->IterateChildren(xmlChild))
+    {   
+        if (xmlDoc->Parse(strXmlContent, 0, TIXML_ENCODING_UTF8))
         {
-            xmlChildNode = new CXMLNodeImpl(NULL, xmlRootNode, *xmlChild->ToElement());
-        }
+            xmlDocumentRoot = xmlDoc->RootElement();
 
-        return xmlRootNode;
+            xmlBaseNode = new CXMLNodeImpl(NULL, NULL, *xmlDocumentRoot);
+
+            xmlRootNode = CXMLImpl::BuildNode(xmlBaseNode, xmlDocumentRoot);
+
+            return xmlRootNode;
+        }
+        else
+            return NULL;
     }
     else
     {
         return NULL;
     }
+}
+
+CXMLNode* CXMLImpl::BuildNode(CXMLNodeImpl* xmlParent, TiXmlNode* xmlNode)
+{
+    TiXmlNode       *xmlChild;
+    TiXmlElement    *xmlChildElement;
+    CXMLNodeImpl    *xmlChildNode;
+
+    xmlChild = 0;
+    while (xmlChild = xmlNode->IterateChildren(xmlChild))
+    {
+        xmlChildElement = xmlChild->ToElement();
+
+        xmlChildNode = new CXMLNodeImpl(NULL, xmlParent, *xmlChildElement);
+
+        CXMLImpl::BuildNode(xmlChildNode, xmlChildElement);
+    }
+
+    return xmlParent;
 }
 
 CXMLNode* CXMLImpl::CreateDummyNode()

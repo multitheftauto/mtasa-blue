@@ -230,11 +230,14 @@ int CLuaXMLDefs::xmlLoadString(lua_State* luaVM)
         if (pLuaMain)
         {
             CXMLNode* rootNode = pLuaMain->ParseString(strXmlContent);
-            if (rootNode->IsValid())
+
+            if (rootNode && rootNode->IsValid())
             {
                 lua_pushxmlnode(luaVM, rootNode);
                 return 1;
             }
+            else
+                m_pScriptDebugging->LogCustom(luaVM, "Unable to load XML string");
         }
     }
     else
