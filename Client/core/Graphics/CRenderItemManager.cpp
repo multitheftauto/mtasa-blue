@@ -755,6 +755,7 @@ void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
     outStatus.settings.bHUDMatchAspectRatio = true;
     outStatus.settings.fFieldOfView = 70;
     outStatus.settings.bHighDetailVehicles = false;
+    outStatus.settings.bHighDetailPeds = false;
 
     CVARS_GET("streaming_memory", outStatus.settings.iStreamingMemory);
     CVARS_GET("volumetric_shadows", outStatus.settings.bVolumetricShadows);
@@ -765,6 +766,7 @@ void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
     CVARS_GET("hud_match_aspect_ratio", outStatus.settings.bHUDMatchAspectRatio);
     CVARS_GET("fov", outStatus.settings.fFieldOfView);
     CVARS_GET("high_detail_vehicles", outStatus.settings.bHighDetailVehicles);
+    CVARS_GET("high_detail_peds", outStatus.settings.bHighDetailPeds);
 
     if (outStatus.settings.iFXQuality == 0)
     {

@@ -596,17 +596,17 @@ void CSettingsSA::GetVehiclesLODDistance(float& fVehiclesLODDistance, float& fTr
 // Peds LOD draw distance
 //
 ////////////////////////////////////////////////
- 
+
 void CSettingsSA::SetPedsLODDistance(float fPedsLODDistance)
 {
     ms_fPedsLODDistance = fPedsLODDistance;
 }
- 
+
 float CSettingsSA::GetPedsLODDistance()
 {
     return ms_fPedsLODDistance;
 }
- 
+
 void CSettingsSA::ResetPedsLODDistance()
 {
     bool bHighDetailPeds;
