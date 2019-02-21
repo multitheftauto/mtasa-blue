@@ -7,7 +7,7 @@
  *
  * Copyright (C) 2012 - 2016, Marc Hoersken, <info@marc-hoersken.de>
  * Copyright (C) 2012, Mark Salisbury, <mark.salisbury@hp.com>
- * Copyright (C) 2012 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2012 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -356,6 +356,7 @@ get_cert_location(TCHAR *path, DWORD *store_name, TCHAR **store_path,
                   TCHAR **thumbprint)
 {
   TCHAR *sep;
+  TCHAR *store_path_start;
   size_t store_name_len;
 
   sep = _tcschr(path, TEXT('\\'));
@@ -386,13 +387,17 @@ get_cert_location(TCHAR *path, DWORD *store_name, TCHAR **store_path,
   else
     return CURLE_SSL_CERTPROBLEM;
 
-  *store_path = sep + 1;
+  store_path_start = sep + 1;
 
-  sep = _tcschr(*store_path, TEXT('\\'));
+  sep = _tcschr(store_path_start, TEXT('\\'));
   if(sep == NULL)
     return CURLE_SSL_CERTPROBLEM;
 
-  *sep = 0;
+  *sep = TEXT('\0');
+  *store_path = _tcsdup(store_path_start);
+  *sep = TEXT('\\');
+  if(*store_path == NULL)
+    return CURLE_OUT_OF_MEMORY;
 
   *thumbprint = sep + 1;
   if(_tcslen(*thumbprint) != CERT_THUMBPRINT_STR_LEN)
@@ -435,7 +440,7 @@ schannel_connect_step1(struct connectdata *conn, int sockindex)
                                  VERSION_LESS_THAN_EQUAL)) {
      /* Schannel in Windows XP (OS version 5.1) uses legacy handshakes and
         algorithms that may not be supported by all servers. */
-     infof(data, "schannel: WinSSL version is old and may not be able to "
+     infof(data, "schannel: Windows version is old and may not be able to "
            "connect to some servers due to lack of SNI, algorithms, etc.\n");
   }
 
@@ -608,9 +613,11 @@ schannel_connect_step1(struct connectdata *conn, int sockindex)
         failf(data, "schannel: Failed to open cert store %x %s, "
               "last error is %x",
               cert_store_name, cert_store_path, GetLastError());
+        free(cert_store_path);
         Curl_unicodefree(cert_path);
         return CURLE_SSL_CERTPROBLEM;
       }
+      free(cert_store_path);
 
       cert_thumbprint.pbData = cert_thumbprint_data;
       cert_thumbprint.cbData = CERT_THUMBPRINT_DATA_LEN;
@@ -1414,6 +1421,16 @@ schannel_connect_common(struct connectdata *conn, int sockindex,
     connssl->state = ssl_connection_complete;
     conn->recv[sockindex] = schannel_recv;
     conn->send[sockindex] = schannel_send;
+
+#ifdef SECPKG_ATTR_ENDPOINT_BINDINGS
+    /* When SSPI is used in combination with Schannel
+     * we need the Schannel context to create the Schannel
+     * binding to pass the IIS extended protection checks.
+     * Available on Windows 7 or later.
+     */
+    conn->sslContext = &BACKEND->ctxt->ctxt_handle;
+#endif
+
     *done = TRUE;
   }
   else
@@ -2013,9 +2030,16 @@ static int Curl_schannel_shutdown(struct connectdata *conn, int sockindex)
 
   /* free SSPI Schannel API credential handle */
   if(BACKEND->cred) {
-    Curl_ssl_sessionid_lock(conn);
+    /*
+     * When this function is called from Curl_schannel_close() the connection
+     * might not have an associated transfer so the check for conn->data is
+     * necessary.
+     */
+    if(conn->data)
+      Curl_ssl_sessionid_lock(conn);
     Curl_schannel_session_free(BACKEND->cred);
-    Curl_ssl_sessionid_unlock(conn);
+    if(conn->data)
+      Curl_ssl_sessionid_unlock(conn);
     BACKEND->cred = NULL;
   }
 
@@ -2049,7 +2073,7 @@ static void Curl_schannel_cleanup(void)
 
 static size_t Curl_schannel_version(char *buffer, size_t size)
 {
-  size = msnprintf(buffer, size, "WinSSL");
+  size = msnprintf(buffer, size, "Schannel");
 
   return size;
 }
@@ -2137,11 +2161,11 @@ static CURLcode pkp_pin_peer_pubkey(struct connectdata *conn, int sockindex,
 }
 
 static void Curl_schannel_checksum(const unsigned char *input,
-                      size_t inputlen,
-                      unsigned char *checksum,
-                      size_t checksumlen,
-                      DWORD provType,
-                      const unsigned int algId)
+                                   size_t inputlen,
+                                   unsigned char *checksum,
+                                   size_t checksumlen,
+                                   DWORD provType,
+                                   const unsigned int algId)
 {
   HCRYPTPROV hProv = 0;
   HCRYPTHASH hHash = 0;
@@ -2191,9 +2215,9 @@ static CURLcode Curl_schannel_md5sum(unsigned char *input,
                                      unsigned char *md5sum,
                                      size_t md5len)
 {
-    Curl_schannel_checksum(input, inputlen, md5sum, md5len,
-                           PROV_RSA_FULL, CALG_MD5);
-    return CURLE_OK;
+  Curl_schannel_checksum(input, inputlen, md5sum, md5len,
+                         PROV_RSA_FULL, CALG_MD5);
+  return CURLE_OK;
 }
 
 static CURLcode Curl_schannel_sha256sum(const unsigned char *input,
@@ -2201,9 +2225,9 @@ static CURLcode Curl_schannel_sha256sum(const unsigned char *input,
                                     unsigned char *sha256sum,
                                     size_t sha256len)
 {
-    Curl_schannel_checksum(input, inputlen, sha256sum, sha256len,
-                           PROV_RSA_AES, CALG_SHA_256);
-    return CURLE_OK;
+  Curl_schannel_checksum(input, inputlen, sha256sum, sha256len,
+                         PROV_RSA_AES, CALG_SHA_256);
+  return CURLE_OK;
 }
 
 static void *Curl_schannel_get_internals(struct ssl_connect_data *connssl,

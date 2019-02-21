@@ -7,17 +7,17 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-10 02:54+0100\n"
-"PO-Revision-Date: 2018-11-19 12:37+0000\n"
-"Last-Translator: ccw <ccw808@googlemail.com>\n"
+"PO-Revision-Date: 2018-12-26 16:52+0000\n"
+"Last-Translator: Jacek <jhxp@poczta.onet.pl>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"Translators: Jacek Hałas vel Łagoda; pcpl2; RootKiller; guix; pkpawelo; Jurandovsky; 105NWr; ThePiotrek; Bober; SKmedix; XJMLN; GabVVas\n"
+"Translators: Jacek Hałas vel Łagoda; pcpl2; RootKiller; guix; Kamil Schneider; Jurandovsky; pkpawelo; 105NWr; ThePiotrek; FileEX; XJMLN; Bober; SKmedix; GabVVas; krallxz@gmail.com\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1542631022.0\n"
+"X-POOTLE-MTIME: 1545843164.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -46,7 +46,7 @@ msgstr "Zezwól"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:55
 msgid "Deny"
-msgstr "Odmowa"
+msgstr "Odmów"
 
 #: ..\Client\core\CCommandFuncs.cpp:31
 msgid "***[ COMMAND HELP ]***\n"
@@ -274,7 +274,7 @@ msgstr "Błąd krytyczny"
 
 #: ..\Client\core\CCore.cpp:897
 msgid "TO FIX, REMOVE THIS FILE:"
-msgstr ""
+msgstr "ABY NAPRAWIĆ BŁĄD, USUŃ TEN PLIK:"
 
 #: ..\Client\core\CCore.cpp:929
 #, c-format, c-format
@@ -615,6 +615,8 @@ msgid ""
 "You are using a feature-branch build! This is a test build only which cannot"
 " be used to connect to public servers!"
 msgstr ""
+"To jest testowa kompilacja, której nie możesz użyć do łączenia się z "
+"serwerami publicznymi."
 
 #: ..\Client\core\CMainMenu.cpp:1129
 msgid ""
@@ -834,7 +836,7 @@ msgstr "Przezroczystość:"
 #. *
 #: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:418
 msgid "Master volume:"
-msgstr ""
+msgstr "Głośność główna:"
 
 #: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:437
 msgid "Radio volume:"
@@ -867,7 +869,7 @@ msgstr "Ogólne"
 
 #: ..\Client\core\CSettings.cpp:513
 msgid "Radio options"
-msgstr ""
+msgstr "Opcje radia"
 
 #: ..\Client\core\CSettings.cpp:519
 msgid "Radio Equalizer"
@@ -898,14 +900,12 @@ msgid "Automatic Media Scan"
 msgstr "Automatyczne skanowanie ścieżek"
 
 #: ..\Client\core\CSettings.cpp:555
-#, fuzzy
 msgid "Mute options"
-msgstr "Opcje myszy"
+msgstr "Opcje wyciszenia"
 
 #: ..\Client\core\CSettings.cpp:561
-#, fuzzy
 msgid "Mute All sounds when minimized"
-msgstr "Wycisz dźwięki gry gdy zminimalizowane"
+msgstr "Wycisz wszystkie dźwięki gry, gdy zminimalizowane"
 
 #: ..\Client\core\CSettings.cpp:566
 msgid "Mute Radio sounds when minimized"
@@ -1060,7 +1060,7 @@ msgstr "Dymiące opony itd."
 
 #: ..\Client\core\CSettings.cpp:792
 msgid "Render vehicles always in high detail"
-msgstr ""
+msgstr "Renderuj pojazdy zawsze w wysokich detalach"
 
 #: ..\Client\core\CSettings.cpp:797
 msgid "Full Screen Minimize"
@@ -1196,11 +1196,11 @@ msgstr "Szybka"
 
 #: ..\Client\core\CSettings.cpp:1017 ..\Client\core\CSettings.cpp:2990
 msgid "Normal"
-msgstr ""
+msgstr "Normalna"
 
 #: ..\Client\core\CSettings.cpp:1018 ..\Client\core\CSettings.cpp:2992
 msgid "Above normal"
-msgstr ""
+msgstr "Powyżej normalnej"
 
 #: ..\Client\core\CSettings.cpp:1054
 msgid "Min"
@@ -1316,20 +1316,19 @@ msgstr "Wczytaj"
 
 #: ..\Client\core\CSettings.cpp:1988
 msgid "Colors"
-msgstr ""
+msgstr "Kolory"
 
 #: ..\Client\core\CSettings.cpp:1989
 msgid "Layout"
 msgstr "Układ"
 
 #: ..\Client\core\CSettings.cpp:1990 ..\Client\core\CSettings.cpp:2236
-#, fuzzy
 msgid "Options"
-msgstr "Opcje:"
+msgstr "Opcje"
 
 #: ..\Client\core\CSettings.cpp:1996
 msgid "Chat Background"
-msgstr ""
+msgstr "Tło czatu"
 
 #: ..\Client\core\CSettings.cpp:1996
 msgid "Chat Text"
@@ -1337,7 +1336,7 @@ msgstr "Tekst czatu"
 
 #: ..\Client\core\CSettings.cpp:1996
 msgid "Input Background"
-msgstr ""
+msgstr "Tło wpisywania tekstu"
 
 #: ..\Client\core\CSettings.cpp:1996
 msgid "Input Text"
@@ -1357,7 +1356,7 @@ msgstr "Szerokość:"
 
 #: ..\Client\core\CSettings.cpp:2022
 msgid "Size"
-msgstr ""
+msgstr "Wielkość"
 
 #: ..\Client\core\CSettings.cpp:2071
 msgid "after"
@@ -1381,44 +1380,43 @@ msgstr "Usuwaj stare wiersze"
 
 #: ..\Client\core\CSettings.cpp:2120
 msgid "Horizontal:"
-msgstr ""
+msgstr "Poziomo:"
 
 #: ..\Client\core\CSettings.cpp:2120
 msgid "Vertical:"
-msgstr ""
+msgstr "Pionowo:"
 
 #: ..\Client\core\CSettings.cpp:2120
 msgid "Text-Align:"
-msgstr ""
+msgstr "Wyrównanie tekstu:"
 
 #: ..\Client\core\CSettings.cpp:2120
 msgid "X-Offset:"
-msgstr ""
+msgstr "Przesunięcie X:"
 
 #: ..\Client\core\CSettings.cpp:2121
 msgid "Y-Offset:"
-msgstr ""
+msgstr "Przesunięcie Y:"
 
 #: ..\Client\core\CSettings.cpp:2127
 msgid "Position"
-msgstr ""
+msgstr "Pozycja"
 
 #: ..\Client\core\CSettings.cpp:2142 ..\Client\core\CSettings.cpp:2156
 msgid "Center"
-msgstr ""
+msgstr "Środek"
 
 #: ..\Client\core\CSettings.cpp:2155
 msgid "Top"
-msgstr ""
+msgstr "Góra"
 
 #: ..\Client\core\CSettings.cpp:2157
 msgid "Bottom"
-msgstr ""
+msgstr "Dół"
 
 #: ..\Client\core\CSettings.cpp:2205
-#, fuzzy
 msgid "Font"
-msgstr "Czcionka:"
+msgstr "Czcionka"
 
 #: ..\Client\core\CSettings.cpp:2242
 msgid "Hide background when not typing"
@@ -1426,7 +1424,7 @@ msgstr "Ukryj tło gdy tekst nie jest wpisywany"
 
 #: ..\Client\core\CSettings.cpp:2247
 msgid "Nickname completion using the \"Tab\" key"
-msgstr "Autouzupełnianie nicków używając klawisza \"Tab\""
+msgstr "Autouzupełnienie nicku, klawiszem 'Tab'."
 
 #: ..\Client\core\CSettings.cpp:2252
 msgid "Allow server to flash the window"
@@ -1438,7 +1436,7 @@ msgstr "Zezwalaj na powiadomienia w zasobniku systemowym"
 
 #: ..\Client\core\CSettings.cpp:2262
 msgid "Chat text black/white outline"
-msgstr ""
+msgstr "Czarno biały kontur tekstu czatu"
 
 #. Create a messagebox to notify the user
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'",
@@ -1489,16 +1487,15 @@ msgstr "Przezroczystość:"
 
 #: ..\Client\core\CSettings.cpp:3566
 msgid "Color"
-msgstr ""
+msgstr "Kolor"
 
 #: ..\Client\core\CSettings.cpp:3643
 msgid "Preview"
-msgstr ""
+msgstr "Podgląd"
 
 #: ..\Client\core\CSettings.cpp:3951
-#, fuzzy
 msgid "Please disconnect before changing language"
-msgstr "Rozłącz się z serwerem przed zmianą skórki"
+msgstr "Rozłącz się z serwerem przed zmianą języka"
 
 #: ..\Client\core\CSettings.cpp:3979
 msgid "Please disconnect before changing skin"
@@ -2430,7 +2427,7 @@ msgstr "Gotowe!"
 
 #: ..\Client\loader\Install.cpp:92
 msgid "Do you want to terminate the MTA Server and continue updating?"
-msgstr "Czy chcesz wyłączyć aplikację MTA Server i kontynuować aktualizację?"
+msgstr "Czy chcesz wyłączyć MTA Server i kontynuować aktualizację?"
 
 #: ..\Client\loader\MainFunctions.cpp:235
 msgid ""
@@ -2525,6 +2522,9 @@ msgid ""
 "\n"
 "Do you want to change the following setting?"
 msgstr ""
+"Masz problem z MTA:SA?\n"
+"\n"
+"Chcesz zmienić na następujące ustawienia?"
 
 #: ..\Client\loader\MainFunctions.cpp:412
 msgid ""
@@ -2532,6 +2532,9 @@ msgid ""
 "\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr ""
+"Masz problemy z uruchomieniem MTA:SA?\n"
+"\n"
+"Spróbuj wyłaczyć następujące ustawienia dla GTA i MTA:"
 
 #: ..\Client\loader\MainFunctions.cpp:446
 msgid ""
@@ -2696,15 +2699,18 @@ msgid ""
 "\n"
 "Please restart your PC.\n"
 msgstr ""
+"MTA:SA nie jest kompatybilne z Trybem Awaryjnym systemu Windows.\n"
+"\n"
+"Proszę zrestartować komputer.\n"
 
 #: ..\Client\loader\MainFunctions.cpp:1131
 msgid "Fix configuration issue"
-msgstr ""
+msgstr "Napraw problem z konfiguracją"
 
 #. Try to relaunch as admin if not done so already
 #: ..\Client\loader\MainFunctions.cpp:1173
 msgid "Fix elevation required error"
-msgstr ""
+msgstr "Napraw błąd z uprawnieniami"
 
 #: ..\Client\loader\MainFunctions.cpp:1180
 #, c-format, c-format
@@ -2762,7 +2768,8 @@ msgstr "GTA:SA miało problem z załadowaniem modelu."
 #: ..\Client\loader\Utils.cpp:1826
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr ""
-"Jeżeli modyfikowałeś ostatnio plik gta3.img, spróbuj przeinstalować GTA:SA."
+"Jeśli niedawno zmodyfikowałeś plik 'gta3.img', spróbuj przeinstalować "
+"GTA:SA."
 
 #: ..\Client\loader\Utils.cpp:1851
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
@@ -3153,9 +3160,9 @@ msgstr[2] "%d minut"
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d sekunda"
+msgstr[1] "%d sekundy"
+msgstr[2] "%d sekund"
 
 #. Display the error
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:615
@@ -3207,8 +3214,8 @@ msgid ""
 "Fatal error (%u). If this problem persists, please check out mtasa.com for "
 "support."
 msgstr ""
-"Błąd krytyczny (%u). Jeśli problem się powtarza, skontaktuj się z "
-"www.mtasa.com w celu znalezienia pomocy."
+"Błąd krytyczny (%u). Jeśli problem się powtarza, skontaktuj się z mtasa.com "
+"w celu uzyskania pomocy."
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3220,8 +3227,8 @@ msgid ""
 "Protocol error (%u). If this problem persists, please check out mtasa.com "
 "for support."
 msgstr ""
-"Błąd protokołu (%u). Jeśli problem się powtarza, skontaktuj się z "
-"www.mtasa.com w celu znalezienia pomocy."
+"Błąd protokołu (%u). Jeśli problem się powtarza, skontaktuj się z mtasa.com "
+"w celu uzyskania pomocy."
 
 #: ..\Client\mods\deathmatch\logic\Utils.cpp:160
 msgid "Connection error"

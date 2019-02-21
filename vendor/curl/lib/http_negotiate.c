@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -49,7 +49,6 @@ CURLcode Curl_input_negotiate(struct connectdata *conn, bool proxy,
 
   /* Point to the correct struct with this */
   struct negotiatedata *neg_ctx;
-  struct auth *authp;
 
   if(proxy) {
     userp = conn->http_proxy.user;
@@ -58,7 +57,6 @@ CURLcode Curl_input_negotiate(struct connectdata *conn, bool proxy,
               data->set.str[STRING_PROXY_SERVICE_NAME] : "HTTP";
     host = conn->http_proxy.host.name;
     neg_ctx = &data->state.proxyneg;
-    authp = &conn->data->state.authproxy;
   }
   else {
     userp = conn->user;
@@ -67,7 +65,6 @@ CURLcode Curl_input_negotiate(struct connectdata *conn, bool proxy,
               data->set.str[STRING_SERVICE_NAME] : "HTTP";
     host = conn->host.name;
     neg_ctx = &data->state.negotiate;
-    authp = &conn->data->state.authhost;
   }
 
   /* Not set means empty */
@@ -92,17 +89,17 @@ CURLcode Curl_input_negotiate(struct connectdata *conn, bool proxy,
     }
   }
 
+  /* Supports SSL channel binding for Windows ISS extended protection */
+#if defined(USE_WINDOWS_SSPI) && defined(SECPKG_ATTR_ENDPOINT_BINDINGS)
+  neg_ctx->sslContext = conn->sslContext;
+#endif
+
   /* Initialize the security context and decode our challenge */
   result = Curl_auth_decode_spnego_message(data, userp, passwdp, service,
                                            host, header, neg_ctx);
 
   if(result)
     Curl_auth_spnego_cleanup(neg_ctx);
-  else
-    /* If the status is different than 0 and we encountered no errors
-    it means we have to continue. 0 is the OK value for both GSSAPI
-    (GSS_S_COMPLETE) and SSPI (SEC_E_OK) */
-    authp->done = !neg_ctx->status;
 
   return result;
 }
