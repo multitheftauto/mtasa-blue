@@ -48,7 +48,7 @@ CXMLNode* CXMLImpl::ParseString(const char* strXmlContent)
 {
     TiXmlElement    *xmlDocumentRoot;
     CXMLNodeImpl    *xmlBaseNode;
-    CXMLNode    *xmlRootNode;
+    CXMLNode        *xmlRootNode;
     
     TiXmlDocument*  xmlDoc = new TiXmlDocument();
 
