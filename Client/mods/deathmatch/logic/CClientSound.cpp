@@ -1,9 +1,8 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/CClientSound.cpp
+ *  FILE:        mods/deathmatch/logic/CClientSound.cpp
  *  PURPOSE:     Sound entity class
  *
  *****************************************************************************/
@@ -103,6 +102,11 @@ bool CClientSound::Create()
 {
     if (m_pAudio)
         return false;
+
+    // If we're not allowed to play a stream, stop here
+    if (m_bStream)
+        if (!g_pCore->GetCVars()->GetValue("allow_internet_sound_streams", true))
+            return false;
 
     // Initial state
     if (!m_pBuffer)
@@ -623,6 +627,35 @@ bool CClientSound::IsFxEffectEnabled(uint uiFxEffect)
 ////////////////////////////////////////////////////////////
 void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt)
 {
+    // If this is a stream
+    if (m_bStream)
+    {
+        // Check if we're allowed to play streams, otherwise just destroy the stream
+        // This way we can start the stream without the need to handle this edge case in scripting
+        if (g_pCore->GetCVars()->GetValue("allow_internet_sound_streams", true))
+        {
+            if (!m_pAudio)
+            {
+                // call onClientSoundStarted
+                CLuaArguments Arguments;
+                Arguments.PushString("enabled");            // Reason
+                CallEvent("onClientSoundStarted", Arguments, false);
+                Create();
+            }
+        }
+        else
+        {
+            if (m_pAudio)
+            {
+                // call onClientSoundStopped
+                CLuaArguments Arguments;
+                Arguments.PushString("disabled");            // Reason
+                CallEvent("onClientSoundStopped", Arguments, false);
+                Destroy();
+            }
+        }
+    }
+
     // Update 3D things if required
     if (m_b3D)
     {

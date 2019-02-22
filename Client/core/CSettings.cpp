@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        core/CSettings.cpp
  *  PURPOSE:     In-game settings window
@@ -14,11 +14,11 @@
 
 using namespace std;
 
-#define CORE_MTA_FILLER                 "cgui\\images\\mta_filler.png"
-#define CORE_SETTINGS_UPDATE_INTERVAL   30         // Settings update interval in frames
-#define CORE_SETTINGS_HEADERS           3
-#define CORE_SETTINGS_HEADER_SPACER     " "
-#define CORE_SETTINGS_NO_KEY            " "
+#define CORE_MTA_FILLER "cgui\\images\\mta_filler.png"
+#define CORE_SETTINGS_UPDATE_INTERVAL 30            // Settings update interval in frames
+#define CORE_SETTINGS_HEADERS 3
+#define CORE_SETTINGS_HEADER_SPACER " "
+#define CORE_SETTINGS_NO_KEY " "
 
 extern CCore*              g_pCore;
 extern SBindableGTAControl g_bcControls[];
@@ -375,6 +375,11 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowScreenUpload->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxAllowScreenUpload->GetPosition(vecTemp, false);
     m_pCheckBoxAllowScreenUpload->AutoSize(NULL, 20.0f);
+
+    m_pCheckBoxAllowInternetSoundStreams = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow internet sound streams"), true));
+    m_pCheckBoxAllowInternetSoundStreams->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAllowInternetSoundStreams->GetPosition(vecTemp, false);
+    m_pCheckBoxAllowInternetSoundStreams->AutoSize(NULL, 20.0f);
 
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
@@ -1091,7 +1096,7 @@ void CSettings::CreateGUI()
     // Hide if not Win8
     if (atoi(GetApplicationSetting("real-os-version")) != 8)
     {
-#ifndef MTA_DEBUG   // Don't hide when debugging
+#ifndef MTA_DEBUG            // Don't hide when debugging
         m_pWin8Label->SetVisible(false);
         m_pWin8ColorCheckBox->SetVisible(false);
         m_pWin8MouseCheckBox->SetVisible(false);
@@ -1203,6 +1208,7 @@ void CSettings::CreateGUI()
     m_pComboFxQuality->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnFxQualityChanged, this));
     m_pCheckBoxVolumetricShadows->SetClickHandler(GUI_CALLBACK(&CSettings::OnVolumetricShadowsClick, this));
     m_pCheckBoxAllowScreenUpload->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowScreenUploadClick, this));
+    m_pCheckBoxAllowInternetSoundStreams->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowInternetSoundStreamsClick, this));
     m_pCheckBoxCustomizedSAFiles->SetClickHandler(GUI_CALLBACK(&CSettings::OnCustomizedSAFilesClick, this));
     m_pCheckBoxWindowed->SetClickHandler(GUI_CALLBACK(&CSettings::OnWindowedClick, this));
     m_pCheckBoxShowUnsafeResolutions->SetClickHandler(GUI_CALLBACK(&CSettings::ShowUnsafeResolutionsClick, this));
@@ -1489,6 +1495,11 @@ void CSettings::UpdateVideoTab()
     bool bAllowScreenUploadEnabled;
     CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
     m_pCheckBoxAllowScreenUpload->SetSelected(bAllowScreenUploadEnabled);
+
+    // Allow internet sound streams
+    bool bAllowInternetSoundStreamsEnabled;
+    CVARS_GET("allow_internet_sound_streams", bAllowInternetSoundStreamsEnabled);
+    m_pCheckBoxAllowInternetSoundStreams->SetSelected(bAllowInternetSoundStreamsEnabled);
 
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
@@ -3297,6 +3308,10 @@ void CSettings::SaveData()
     bool bAllowScreenUploadEnabled = m_pCheckBoxAllowScreenUpload->GetSelected();
     CVARS_SET("allow_screen_upload", bAllowScreenUploadEnabled);
 
+    // Allow internet sound streams
+    bool bAllowInternetSoundStreamsEnabled = m_pCheckBoxAllowInternetSoundStreams->GetSelected();
+    CVARS_SET("allow_internet_sound_streams", bAllowInternetSoundStreamsEnabled);
+
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();
     CVARS_SET("grass", bGrassEnabled);
@@ -4295,6 +4310,24 @@ bool CSettings::OnAllowScreenUploadClick(CGUIElement* pElement)
 }
 
 //
+// AllowInternetSoundStreams
+//
+bool CSettings::OnAllowInternetSoundStreamsClick(CGUIElement* pElement)
+{
+    if (!m_pCheckBoxAllowInternetSoundStreams->GetSelected() && !m_bShownAllowInternetSoundStreamsMessage)
+    {
+        m_bShownAllowInternetSoundStreamsMessage = true;
+        SString strMessage;
+        strMessage +=
+            _("Some scripts may play sounds, such as radio, from the internet."
+              "\n\nDisabling this setting may decrease network"
+              "\nbandwidth consumption.\n");
+        CCore::GetSingleton().ShowMessageBox(_("INTERNET SOUND STREAMS"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
+    }
+    return true;
+}
+
+//
 // CustomizedSAFiles
 //
 void CustomizedSAFilesCallBack(void* ptr, unsigned int uiButton)
@@ -4482,6 +4515,8 @@ bool CSettings::OnShowAdvancedSettingDescription(CGUIElement* pElement)
         strText = std::string(_("16-bit color:")) + " " + std::string(_("Enable 16 bit color modes - Requires MTA restart"));
     else if (pCheckBox && pCheckBox == m_pWin8MouseCheckBox)
         strText = std::string(_("Mouse fix:")) + " " + std::string(_("Mouse movement fix - May need PC restart"));
+    else if (pCheckBox && pCheckBox == m_pCheckBoxAllowInternetSoundStreams)
+        strText = std::string(_("Internet sound streams:")) + " " + std::string(_("Disables sounds streaming from the internet. May decrease network bandwidth consumption."));
 
     if (strText != "")
         m_pAdvancedSettingDescriptionLabel->SetText(strText.c_str());
