@@ -979,7 +979,7 @@ int CLuaPlayerDefs::SetPlayerScriptDebugLevel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetPlayerDebuggerLevel(pElement, bHideDebugger ? 0 : uiMode))
+        if (CStaticFunctionDefinitions::SetPlayerScriptDebugLevel(pElement, bHideDebugger ? 0 : uiMode))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -1494,7 +1494,7 @@ int CLuaPlayerDefs::GetPlayerScriptDebugLevel(lua_State* luaVM)
     {
         unsigned int uiLevel;
 
-        if (CStaticFunctionDefinitions::GetPlayerDebuggerLevel(pPlayer, uiLevel))
+        if (CStaticFunctionDefinitions::GetPlayerScriptDebugLevel(pPlayer, uiLevel))
         {
             lua_pushnumber(luaVM, uiLevel);
             return 1;

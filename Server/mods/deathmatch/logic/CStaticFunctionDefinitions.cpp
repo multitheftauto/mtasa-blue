@@ -1864,7 +1864,7 @@ const SString& CStaticFunctionDefinitions::GetPlayerVersion(CPlayer* pPlayer)
     return pPlayer->GetPlayerVersion();
 }
 
-bool CStaticFunctionDefinitions::GetPlayerDebuggerLevel(CPlayer* pPlayer, unsigned int& uiLevel)
+bool CStaticFunctionDefinitions::GetPlayerScriptDebugLevel(CPlayer* pPlayer, unsigned int& uiLevel)
 {
     assert(pPlayer);
 
@@ -3074,13 +3074,13 @@ bool CStaticFunctionDefinitions::SetPlayerDebuggerVisible(CElement* pElement, bo
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPlayerDebuggerLevel(CElement* pElement, unsigned int uiLevel)
+bool CStaticFunctionDefinitions::SetPlayerScriptDebugLevel(CElement* pElement, unsigned int uiLevel)
 {
     assert(pElement);
 
     if (uiLevel >= 0 && uiLevel <= 3)
     {
-        RUN_CHILDREN(SetPlayerDebuggerLevel(*iter, uiLevel));
+        RUN_CHILDREN(SetPlayerScriptDebugLevel(*iter, uiLevel));
 
         if (IS_PLAYER(pElement))
         {
