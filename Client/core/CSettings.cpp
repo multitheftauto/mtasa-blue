@@ -4515,8 +4515,6 @@ bool CSettings::OnShowAdvancedSettingDescription(CGUIElement* pElement)
         strText = std::string(_("16-bit color:")) + " " + std::string(_("Enable 16 bit color modes - Requires MTA restart"));
     else if (pCheckBox && pCheckBox == m_pWin8MouseCheckBox)
         strText = std::string(_("Mouse fix:")) + " " + std::string(_("Mouse movement fix - May need PC restart"));
-    else if (pCheckBox && pCheckBox == m_pCheckBoxAllowInternetSoundStreams)
-        strText = std::string(_("Internet sound streams:")) + " " + std::string(_("Disables sounds streaming from the internet. May decrease network bandwidth consumption."));
 
     if (strText != "")
         m_pAdvancedSettingDescriptionLabel->SetText(strText.c_str());
