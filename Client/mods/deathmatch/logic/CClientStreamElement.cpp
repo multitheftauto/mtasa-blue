@@ -95,14 +95,11 @@ void CClientStreamElement::NotifyCreate()
         m_bDoubleSided = IsDoubleSided();
     SetDoubleSided(m_bDoubleSided);
 
-    if (!m_bStreamedIn)
-    {
-        m_bStreamedIn = true;
-        m_bAttemptingToStreamIn = false;
+    m_bStreamedIn = true;
+    m_bAttemptingToStreamIn = false;
 
-        CLuaArguments Arguments;
-        CallEvent("onClientElementStreamIn", Arguments, true);
-    }
+    CLuaArguments Arguments;
+    CallEvent("onClientElementStreamIn", Arguments, true);
 }
 
 void CClientStreamElement::NotifyUnableToCreate()

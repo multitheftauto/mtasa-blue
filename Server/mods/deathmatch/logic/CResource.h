@@ -191,6 +191,7 @@ public:
     bool IsClientFilesOn() const noexcept { return m_bClientFiles; }
 
     bool             GenerateChecksums();
+    std::future<SString> GenerateChecksumForFile(CResourceFile* pResourceFile);
     const CChecksum& GetLastMetaChecksum() { return m_metaChecksum; }
     bool             HasResourceChanged();
     void             ApplyUpgradeModifications();
@@ -366,6 +367,7 @@ private:
 
     CResourceManager* m_pResourceManager;
 
+    
     SString     m_strResourceName;
     SString     m_strAbsPath;                      // Absolute path to containing directory        i.e. /server/mods/deathmatch/resources
     std::string m_strResourceZip;                  // Absolute path to zip file (if a zip)         i.e. m_strAbsPath/resource_name.zip
@@ -398,6 +400,7 @@ private:
     std::string m_strCircularInclude;
     SString     m_strFailureReason;
     unzFile     m_zipfile = nullptr;
+    CChecksum   m_zipHash;
 
     bool m_bResourceIsZip;
     bool m_bClientConfigs = true;
