@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CStaticFunctionDefinitions.h
  *  PURPOSE:     Header for static function definitions class
@@ -727,6 +727,7 @@ public:
     static bool          GetSoundBufferLength(CClientSound& Sound, double& dBufferLength);
     static bool          SetSoundPaused(CClientSound& Sound, bool bPaused);
     static bool          IsSoundPaused(CClientSound& Sound, bool& bPaused);
+    static bool          IsSoundStopped(CClientSound& Sound, bool& bStopped);
     static bool          SetSoundVolume(CClientSound& Sound, float fVolume);
     static bool          GetSoundVolume(CClientSound& Sound, float& fVolume);
     static bool          SetSoundSpeed(CClientSound& Sound, float fSpeed);

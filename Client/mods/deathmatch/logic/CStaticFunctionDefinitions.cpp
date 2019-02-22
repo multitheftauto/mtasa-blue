@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CStaticFunctionDefinitions.cpp
  *  PURPOSE:     Scripting function processing
@@ -7742,6 +7742,12 @@ bool CStaticFunctionDefinitions::IsSoundPaused(CClientPlayer& Player, bool& bPau
         return true;
     }
     return false;
+}
+
+bool CStaticFunctionDefinitions::IsSoundStopped(CClientSound& Sound, bool& bStopped)
+{
+    bStopped = Sound.IsSoundStopped();
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetSoundVolume(CClientSound& Sound, float fVolume)

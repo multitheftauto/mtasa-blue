@@ -1,8 +1,8 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.x
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/luadefs/CLuaAudioDefs.h
+ *  FILE:        mods/deathmatch/logic/luadefs/CLuaAudioDefs.h
  *  PURPOSE:     Lua audio definitions class header
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -40,6 +40,7 @@ public:
     LUA_DECLARE(GetSoundBufferLength);
     LUA_DECLARE(SetSoundPaused);
     LUA_DECLARE(IsSoundPaused);
+    LUA_DECLARE(IsSoundStopped);
     LUA_DECLARE(SetSoundVolume);
     LUA_DECLARE(GetSoundVolume);
     LUA_DECLARE(SetSoundSpeed);
