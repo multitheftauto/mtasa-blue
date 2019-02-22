@@ -567,6 +567,14 @@ bool CResource::GenerateChecksums()
 bool CResource::HasResourceChanged()
 {
     std::string strPath;
+    if (IsResourceZip() )
+    {
+        // Zip file might have changed
+        CChecksum checksum = CChecksum::GenerateChecksumFromFile(m_strResourceZip);
+        if (checksum != m_zipHash)
+            return true;
+
+    }
 
     for (CResourceFile* pResourceFile : m_ResourceFiles)
     {
@@ -2922,6 +2930,9 @@ bool CResource::UnzipResource()
     // Close the zip file
     unzClose(m_zipfile);
     m_zipfile = nullptr;
+
+    // Store the hash so we can figure out whether it has changed later
+    m_zipHash = CChecksum::GenerateChecksumFromFile(m_strResourceZip);
     return true;
 }
 
