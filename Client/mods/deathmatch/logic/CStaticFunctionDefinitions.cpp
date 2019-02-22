@@ -1460,42 +1460,76 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         {
             // Grab the model
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
-            if (Ped.GetModel() == usModel)
+            const unsigned short usCurrentModel = Ped.GetModel();
+
+            if (usCurrentModel == usModel)
                 return false;
-            if (!CClientPlayerManager::IsValidModel(usModel))
+
+            if (!Ped.SetModel(usModel))
                 return false;
-            Ped.SetModel(usModel);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(usCurrentModel);
+            Arguments.PushNumber(usModel);
+            Ped.CallEvent("onClientElementModelChange", Arguments, true);
             break;
         }
         case CCLIENTVEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
-            if (Vehicle.GetModel() == usModel)
+            const unsigned short usCurrentModel = Vehicle.GetModel();
+
+            if (usCurrentModel == usModel)
                 return false;
+
             if (!CClientVehicleManager::IsValidModel(usModel))
                 return false;
+
             Vehicle.SetModelBlocking(usModel, 255, 255);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(usCurrentModel);
+            Arguments.PushNumber(usModel);
+            Vehicle.CallEvent("onClientElementModelChange", Arguments, true);
             break;
         }
         case CCLIENTOBJECT:
         case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
-            if (Object.GetModel() == usModel)
+            const unsigned short usCurrentModel = Object.GetModel();
+
+            if (usCurrentModel == usModel)
                 return false;
+
             if (!CClientObjectManager::IsValidModel(usModel))
                 return false;
+
             Object.SetModel(usModel);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(usCurrentModel);
+            Arguments.PushNumber(usModel);
+            Object.CallEvent("onClientElementModelChange", Arguments, true);
             break;
         }
         case CCLIENTPROJECTILE:
         {
             CClientProjectile& Projectile = static_cast<CClientProjectile&>(Entity);
-            if (Projectile.GetGameEntity() && Projectile.GetGameEntity()->GetModelIndex() == usModel)
+            const unsigned short usCurrentModel = Projectile.GetModel();
+
+            if (usCurrentModel == usModel)
                 return false;
+
             if (!CClientObjectManager::IsValidModel(usModel))
                 return false;
+
             Projectile.SetModel(usModel);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(usCurrentModel);
+            Arguments.PushNumber(usModel);
+            Projectile.CallEvent("onClientElementModelChange", Arguments, true);
             break;
         }
         default:
