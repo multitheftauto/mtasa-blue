@@ -16,7 +16,7 @@
 class CBike : public virtual CVehicle
 {
 public:
-    virtual ~CBike(void){};
+    virtual ~CBike(){};
 
     // virtual void PlaceOnRoadProperly ( void )=0;
 };

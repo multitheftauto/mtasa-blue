@@ -25,7 +25,7 @@ class CHqComms : public CRefCountable
 public:
     ZERO_ON_NEW
 
-    CHqComms(void)
+    CHqComms()
     {
         m_iPollInterval = TICKS_FROM_MINUTES(60);
         m_strURL = HQCOMMS_URL;
@@ -36,7 +36,7 @@ public:
     //
     // Send query if it's time
     //
-    void Pulse(void)
+    void Pulse()
     {
         // Check for min client version info
         if (m_Stage == HQCOMMS_STAGE_NONE || (m_Stage == HQCOMMS_STAGE_TIMER && m_CheckTimer.Get() > (uint)m_iPollInterval))
@@ -240,10 +240,10 @@ public:
     //
     // Get http downloader used for hq comms etc.
     //
-    static CNetHTTPDownloadManagerInterface* GetDownloadManager(void) { return g_pNetServer->GetHTTPDownloadManager(EDownloadMode::ASE); }
+    static CNetHTTPDownloadManagerInterface* GetDownloadManager() { return g_pNetServer->GetHTTPDownloadManager(EDownloadMode::ASE); }
 
 protected:
-    ~CHqComms(void) {}            // Must use Release()
+    ~CHqComms() {}            // Must use Release()
 
     int          m_iPollInterval;
     int          m_iPrevBadFileHashesRev;

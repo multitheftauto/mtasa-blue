@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:23\n"
-"PO-Revision-Date: 2018-11-21 11:10+0000\n"
-"Last-Translator: Jacek <jhxp@poczta.onet.pl>\n"
+"PO-Revision-Date: 2018-11-22 02:03+0000\n"
+"Last-Translator: xKen <ocean.yh97@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Translators: bromboy2010; steroidz; 99 isme; ccw; Jacek Hałas vel Łagoda\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1542798658.0\n"
+"X-POOTLE-MTIME: 1542852190.0\n"
 
 #. GET_XPVISTA_PLEASE
 #: ../Shared/installer/nightly.nsi:183
@@ -58,7 +58,7 @@ msgstr ""
 #. HEADER_Text
 #: ../Shared/installer/nightly.nsi:189
 msgid "Grand Theft Auto: San Andreas location"
-msgstr "Chọn nơi cài đặt Grand Theft Auto: San Andreas"
+msgstr "Nơi cài đặt Grand Theft Auto: San Andreas"
 
 #. DIRECTORY_Text_Dest
 #: ../Shared/installer/nightly.nsi:190

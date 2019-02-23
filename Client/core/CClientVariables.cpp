@@ -14,18 +14,18 @@
 template <>
 CClientVariables* CSingleton<CClientVariables>::m_pSingleton = NULL;
 
-CClientVariables::CClientVariables(void)
+CClientVariables::CClientVariables()
 {
     m_pStorage = NULL;
     m_bLoaded = false;
     m_iRevision = 1;
 }
 
-CClientVariables::~CClientVariables(void)
+CClientVariables::~CClientVariables()
 {
 }
 
-bool CClientVariables::Load(void)
+bool CClientVariables::Load()
 {
     // Get the root node
     CXMLNode* pRoot = CCore::GetSingleton().GetConfig();
@@ -227,7 +227,7 @@ void CClientVariables::ClampValue(const std::string& strVariable, CVector2D minV
 }
 
 // Ensure CVars are within reasonable limits
-void CClientVariables::ValidateValues(void)
+void CClientVariables::ValidateValues()
 {
     uint uiViewportWidth = CCore::GetSingleton().GetGraphics()->GetViewportWidth();
     uint uiViewportHeight = CCore::GetSingleton().GetGraphics()->GetViewportHeight();
@@ -258,7 +258,7 @@ void CClientVariables::ValidateValues(void)
     ClampValue("mapalpha", 0, 255);
 }
 
-void CClientVariables::LoadDefaults(void)
+void CClientVariables::LoadDefaults()
 {
     #define DEFAULT(__x,__y)    if(!Exists(__x)) \
                                 Set(__x,__y)

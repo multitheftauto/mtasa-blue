@@ -12,13 +12,13 @@
 class CSyncSettingsPacket : public CPacket
 {
 public:
-    CSyncSettingsPacket(void){};
+    CSyncSettingsPacket(){};
     CSyncSettingsPacket(const std::set<eWeaponType>& weaponTypesUsingBulletSync, uchar ucVehExtrapolateEnabled, short sVehExtrapolateBaseMs,
                         short sVehExtrapolatePercent, short sVehExtrapolateMaxMs, uchar ucUseAltPulseOrder, uchar ucAllowFastSprintFix,
                         uchar ucAllowDrivebyAnimationFix, uchar ucAllowShotgunDamageFix);
 
-    ePacketID     GetPacketID(void) const { return PACKET_ID_SYNC_SETTINGS; };
-    unsigned long GetFlags(void) const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const { return PACKET_ID_SYNC_SETTINGS; };
+    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;

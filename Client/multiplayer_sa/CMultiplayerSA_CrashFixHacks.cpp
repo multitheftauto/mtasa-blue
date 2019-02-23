@@ -1088,7 +1088,7 @@ void OnMY_CVehicle_AddUpgrade_Pre(CVehicleSAInterface* pVehicle, int iUpgradeId,
     SetApplicationSetting("diagnostics", "gta-upgrade-fail", argMap.ToString());
 }
 
-void OnMY_CVehicle_AddUpgrade_Post(void)
+void OnMY_CVehicle_AddUpgrade_Post()
 {
     SetApplicationSetting("diagnostics", "gta-upgrade-fail", "");
 }
@@ -1189,12 +1189,12 @@ void _declspec(naked) HOOK_ResetFurnitureObjectCounter()
 // Record when volumetric shadows are being rendered so we can disable them if a crash occurs.
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CVolumetricShadowMgr_Render_Pre(void)
+void OnMY_CVolumetricShadowMgr_Render_Pre()
 {
     OnEnterCrashZone(1);
 }
 
-void OnMY_CVolumetricShadowMgr_Render_Post(void)
+void OnMY_CVolumetricShadowMgr_Render_Post()
 {
     OnEnterCrashZone(0);
 }
@@ -1235,12 +1235,12 @@ inner:
 // Record when volumetric shadows are being updated so we can disable them if a crash occurs.
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CVolumetricShadowMgr_Update_Pre(void)
+void OnMY_CVolumetricShadowMgr_Update_Pre()
 {
     OnEnterCrashZone(2);
 }
 
-void OnMY_CVolumetricShadowMgr_Update_Post(void)
+void OnMY_CVolumetricShadowMgr_Update_Post()
 {
     OnEnterCrashZone(0);
 }
@@ -1454,7 +1454,7 @@ cont:
 // Setup hooks for CrashFixHacks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_CrashFixHacks(void)
+void CMultiplayerSA::InitHooks_CrashFixHacks()
 {
     EZHookInstall(CrashFix_Misc1);
     EZHookInstall(CrashFix_Misc2);

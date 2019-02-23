@@ -32,7 +32,7 @@ public:
     std::vector<SCheckpointItem> m_CheckpointList;
     std::vector<SString>         m_InsideList;
 
-    CTimingCheckpoints(void)
+    CTimingCheckpoints()
     {
         m_bEnabled = false;
         m_FrameStartTimeUs = 0;
@@ -46,7 +46,7 @@ public:
     // Called at start of frame
     //
     ////////////////////////////////////////
-    void BeginTimingCheckpoints(void)
+    void BeginTimingCheckpoints()
     {
         bool bEnabled = (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::LOG_TIMING_0000);
 
@@ -78,7 +78,7 @@ public:
     // Called at end of frame
     //
     ////////////////////////////////////////
-    void EndTimingCheckpoints(void)
+    void EndTimingCheckpoints()
     {
         TIMEUS frameTimeUs = GetTimeUs() - m_FrameStartTimeUs;
 
@@ -103,7 +103,7 @@ public:
     // Check if timings are enabled
     //
     ////////////////////////////////////////
-    bool IsTimingCheckpoints(void) { return m_bEnabled; }
+    bool IsTimingCheckpoints() { return m_bEnabled; }
 
     ////////////////////////////////////////
     //
@@ -138,7 +138,7 @@ public:
     //
     struct SSectionInfo
     {
-        SSectionInfo(void) : iEnterCount(0), iLeaveCount(0), totalTime(0) {}
+        SSectionInfo() : iEnterCount(0), iLeaveCount(0), totalTime(0) {}
         int                 iEnterCount;
         int                 iLeaveCount;
         TIMEUS              totalTime;
@@ -182,7 +182,7 @@ public:
     // Output last frame stats
     //
     ////////////////////////////////////////
-    void DumpTimingCheckpoints(void)
+    void DumpTimingCheckpoints()
     {
         if (!m_bEnabled)
             return;
@@ -268,7 +268,7 @@ public:
     // Delete log file
     //
     ////////////////////////////////////////
-    void ClearLog(void) { FileDelete(m_LogFileName); }
+    void ClearLog() { FileDelete(m_LogFileName); }
 };
 
 CTimingCheckpoints ms_TimingCheckpoints;

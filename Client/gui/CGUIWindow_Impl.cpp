@@ -71,7 +71,7 @@ CGUIWindow_Impl::CGUIWindow_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const ch
     }
 }
 
-CGUIWindow_Impl::~CGUIWindow_Impl(void)
+CGUIWindow_Impl::~CGUIWindow_Impl()
 {
     DestroyElement();
 }
@@ -81,7 +81,7 @@ void CGUIWindow_Impl::SetMovable(bool bMovable)
     reinterpret_cast<CEGUI::FrameWindow*>(m_pWindow)->setDragMovingEnabled(bMovable);
 }
 
-bool CGUIWindow_Impl::IsMovable(void)
+bool CGUIWindow_Impl::IsMovable()
 {
     return reinterpret_cast<CEGUI::FrameWindow*>(m_pWindow)->isDragMovingEnabled();
 }
@@ -91,7 +91,7 @@ void CGUIWindow_Impl::SetSizingEnabled(bool bResizeEnabled)
     reinterpret_cast<CEGUI::FrameWindow*>(m_pWindow)->setSizingEnabled(bResizeEnabled);
 }
 
-bool CGUIWindow_Impl::IsSizingEnabled(void)
+bool CGUIWindow_Impl::IsSizingEnabled()
 {
     return reinterpret_cast<CEGUI::FrameWindow*>(m_pWindow)->isSizingEnabled();
 }
@@ -101,7 +101,7 @@ void CGUIWindow_Impl::SetFrameEnabled(bool bFrameEnabled)
     reinterpret_cast<CEGUI::FrameWindow*>(m_pWindow)->setFrameEnabled(bFrameEnabled);
 }
 
-bool CGUIWindow_Impl::IsFrameEnabled(void)
+bool CGUIWindow_Impl::IsFrameEnabled()
 {
     return reinterpret_cast<CEGUI::FrameWindow*>(m_pWindow)->isFrameEnabled();
 }
@@ -111,7 +111,7 @@ void CGUIWindow_Impl::SetCloseButtonEnabled(bool bCloseButtonEnabled)
     reinterpret_cast<CEGUI::FrameWindow*>(m_pWindow)->setCloseButtonEnabled(bCloseButtonEnabled);
 }
 
-bool CGUIWindow_Impl::IsCloseButtonEnabled(void)
+bool CGUIWindow_Impl::IsCloseButtonEnabled()
 {
     return reinterpret_cast<CEGUI::FrameWindow*>(m_pWindow)->isCloseButtonEnabled();
 }
@@ -121,7 +121,7 @@ void CGUIWindow_Impl::SetTitlebarEnabled(bool bTitlebarEnabled)
     reinterpret_cast<CEGUI::FrameWindow*>(m_pWindow)->setTitleBarEnabled(bTitlebarEnabled);
 }
 
-bool CGUIWindow_Impl::IsTitlebarEnabled(void)
+bool CGUIWindow_Impl::IsTitlebarEnabled()
 {
     return reinterpret_cast<CEGUI::FrameWindow*>(m_pWindow)->isTitleBarEnabled();
 }

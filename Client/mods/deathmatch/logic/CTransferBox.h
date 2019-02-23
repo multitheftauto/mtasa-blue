@@ -27,25 +27,25 @@ public:
         MAX_TYPES
     };
 
-    CTransferBox(void);
-    virtual ~CTransferBox(void);
+    CTransferBox();
+    virtual ~CTransferBox();
 
-    void Show(void);
-    void Hide(void);
+    void Show();
+    void Hide();
 
     void SetInfo(double dDownloadSizeNow, CTransferBox::Type eTransferType = CTransferBox::NORMAL);
 
-    void DoPulse(void);
+    void DoPulse();
 
     bool OnCancelClick(CGUIElement* pElement);
 
-    bool IsVisible(void) { return m_pWindow->IsVisible(); };
-    bool IsEnabled(void) { return m_bEnabled; };
+    bool IsVisible() { return m_pWindow->IsVisible(); };
+    bool IsEnabled() { return m_bEnabled; };
     void SetEnabled(bool bEnabled) { m_bEnabled = bEnabled; };
 
     void AddToTotalSize(double dSize) { m_dTotalSize += dSize; };
 
-    double GetTotalSize(void) { return m_dTotalSize; };
+    double GetTotalSize() { return m_dTotalSize; };
 private:
     CGUIWindow*                                       m_pWindow;
     SFixedArray<CGUIStaticImage*, TRANSFERBOX_FRAMES> m_pIcon;

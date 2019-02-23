@@ -28,7 +28,7 @@ CMapEvent::CMapEvent(CLuaMain* pMain, const char* szName, const CLuaFunctionRef&
     m_bForceAspectRatioAdjustment = m_bAllowAspectRatioAdjustment && SStringX(pMain->GetScriptName()) == "customblips";
 }
 
-CMapEvent::~CMapEvent(void)
+CMapEvent::~CMapEvent()
 {
 }
 

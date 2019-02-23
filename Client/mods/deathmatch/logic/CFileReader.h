@@ -20,11 +20,11 @@ public:
         SIZE_ERROR = -1
     };
 
-    CFileReader(void);
+    CFileReader();
     bool LoadFileToMemory(const SString& strFilePath);
     bool LoadDataBufferToMemory(const SString& buffer);
     // Do not call any file reader functions after calling this function
-    void FreeFileReaderMemory(void);
+    void FreeFileReaderMemory();
 
     template <class T>
     void ReadBuffer(T* pDestination)

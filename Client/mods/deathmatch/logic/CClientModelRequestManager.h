@@ -28,8 +28,8 @@ class CClientModelRequestManager
     friend class CClientManager;
 
 public:
-    CClientModelRequestManager(void);
-    ~CClientModelRequestManager(void);
+    CClientModelRequestManager();
+    ~CClientModelRequestManager();
 
     bool        IsLoaded(unsigned short usModelID);
     bool        IsRequested(CModelInfo* pModelInfo);
@@ -42,7 +42,7 @@ public:
     void Cancel(CClientEntity* pRequester, bool bAllowQueue);
 
 private:
-    void DoPulse(void);
+    void DoPulse();
     bool GetRequestEntry(CClientEntity* pRequester, std::list<SClientModelRequest*>::iterator& iter);
 
     bool                            m_bDoingPulse;

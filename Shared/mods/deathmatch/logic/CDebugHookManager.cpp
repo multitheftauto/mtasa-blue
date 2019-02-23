@@ -24,7 +24,7 @@
 //
 //
 ///////////////////////////////////////////////////////////////
-CDebugHookManager::CDebugHookManager(void)
+CDebugHookManager::CDebugHookManager()
 {
 #ifndef MTA_CLIENT
     m_MaskArgumentsMap["dbConnect"] = {1, 2, 3};               // type, 1=HOST, 2=USERNAME, 3=PASSWORD, options
@@ -42,7 +42,7 @@ CDebugHookManager::CDebugHookManager(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CDebugHookManager::~CDebugHookManager(void)
+CDebugHookManager::~CDebugHookManager()
 {
 }
 

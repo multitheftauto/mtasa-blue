@@ -609,6 +609,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
                     ${Case} "2ed36a3cee7b77da86a343838e3516b6" #EU 3.01 Steam (2014 Nov update) 2014-10-14 21:58:05     5971456
                     ${Case} "5bfd4dd83989a8264de4b8e771f237fd" #EU 3.02 Steam (2014 Dec update) 2014-12-01 20:43:21     5971456
                     ${Case} "d9cb35c898d3298ca904a63e10ee18d7" #DE 3.02 Steam (2014 Dec update) 2016-08-11 20:57:22     5971456
+                    ${Case} "c29d96e0c063cd4568d977bcf273215f" #?? ?.?? 5,719,552 bytes
                         #Copy to gta_sa.exe and commence patching process
                         CopyFiles "$GTA_DIR\$1" "$GTA_DIR\gta_sa.exe.bak"
                         Call InstallPatch
@@ -1701,17 +1702,25 @@ FunctionEnd
 ;****************************************************************
 ; In $0 = install path
 Function RemoveVirtualStore
-    StrCpy $2 $0 "" 3     # Skip first 3 chars
+    StrCpy $2 $0 "" 3     # Remove drive path (first 3 chars)
     StrCpy $3 "$LOCALAPPDATA\VirtualStore\$2"
     StrCpy $4 "$0\FromVirtualStore"
-    IfFileExists $3 0 NoVirtualStore
+    ${If} ${FileExists} $3
         ${LogText} "Moving VirtualStore files from $3 to $4"
         CopyFiles $3\*.* $4
         RmDir /r "$3"
-        Goto done
-    NoVirtualStore:
-        ${LogText} "NoVirtualStore detected at $3"
-    done:
+    ${Else}
+        ${LogText} "No VirtualStore detected at $3"
+    ${EndIf}
+
+    ; Also remove VirtualStore\ProgramData\MTA San Andreas All
+    StrCpy $3 "$LOCALAPPDATA\VirtualStore\ProgramData\MTA San Andreas All"
+    ${If} ${FileExists} $3
+        ${LogText} "Removing $3"
+        RmDir /r "$3"
+    ${Else}
+        ${LogText} "No VirtualStore detected at $3"
+    ${EndIf}
 FunctionEnd
 
 

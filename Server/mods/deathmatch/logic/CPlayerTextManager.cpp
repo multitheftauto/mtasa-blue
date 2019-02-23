@@ -16,7 +16,7 @@ CPlayerTextManager::CPlayerTextManager(CPlayer* player)
     m_pPlayer = player;
 }
 
-CPlayerTextManager::~CPlayerTextManager(void)
+CPlayerTextManager::~CPlayerTextManager()
 {
     // Remove us from all text display's lists
     // Note that RemoveObserver removes itself from the list so we just do this till there are 0 items left

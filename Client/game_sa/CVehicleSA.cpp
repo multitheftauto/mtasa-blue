@@ -246,7 +246,7 @@ CVehicleSA::CVehicleSA(CVehicleSAInterface* pVehicleInterface)
 #endif
 }
 
-void CVehicleSA::Init(void)
+void CVehicleSA::Init()
 {
     m_pInterface->bStreamingDontDelete = true;
     m_pInterface->bDontStream = true;
@@ -431,12 +431,12 @@ VOID CVehicleSA::SetMoveSpeed(CVector* vecMoveSpeed)
 #endif
 }
 
-CVehicleSAInterface* CVehicleSA::GetNextCarriageInTrain(void)
+CVehicleSAInterface* CVehicleSA::GetNextCarriageInTrain()
 {
     return (CVehicleSAInterface*)*(DWORD*)((DWORD)this->GetInterface() + 1492);
 }
 
-CVehicle* CVehicleSA::GetNextTrainCarriage(void)
+CVehicle* CVehicleSA::GetNextTrainCarriage()
 {
     CVehicleSAInterface* pVehicle = GetNextCarriageInTrain();
     if (pVehicle)
@@ -470,7 +470,7 @@ void CVehicleSA::SetNextTrainCarriage(CVehicle* pNext)
     }
 }
 
-CVehicleSAInterface* CVehicleSA::GetPreviousCarriageInTrain(void)
+CVehicleSAInterface* CVehicleSA::GetPreviousCarriageInTrain()
 {
     return (CVehicleSAInterface*)*(DWORD*)((DWORD)this->GetInterface() + 1488);
 }
@@ -493,7 +493,7 @@ void CVehicleSA::SetPreviousTrainCarriage(CVehicle* pPrevious)
     }
 }
 
-CVehicle* CVehicleSA::GetPreviousTrainCarriage(void)
+CVehicle* CVehicleSA::GetPreviousTrainCarriage()
 {
     CVehicleSAInterface* pVehicle = GetPreviousCarriageInTrain();
     if (pVehicle)
@@ -559,7 +559,7 @@ void CVehicleSA::DetachTrainCarriage(CVehicle* pCarriage)
     }
 }
 
-bool CVehicleSA::IsChainEngine(void)
+bool CVehicleSA::IsChainEngine()
 {
     return GetVehicleInterface()->trainFlags.bIsTheChainEngine;
 }
@@ -569,7 +569,7 @@ void CVehicleSA::SetIsChainEngine(bool bChainEngine)
     GetVehicleInterface()->trainFlags.bIsTheChainEngine = bChainEngine;
 }
 
-bool CVehicleSA::IsDerailed(void)
+bool CVehicleSA::IsDerailed()
 {
     CVehicleSAInterface* pInterface = GetVehicleInterface();
     return pInterface->trainFlags.bIsDerailed;
@@ -685,7 +685,7 @@ void CVehicleSA::SetTrainPosition(float fPosition, bool bRecalcOnRailDistance)
     }
 }
 
-bool CVehicleSA::CanPedEnterCar(void)
+bool CVehicleSA::CanPedEnterCar()
 {
     DEBUG_TRACE("bool CVehicleSA::CanPedEnterCar ( void )");
     DWORD dwThis = (DWORD)m_pInterface;
@@ -768,7 +768,7 @@ bool CVehicleSA::AreSwingingDoorsAllowed() const
     return m_bSwingingDoorsAllowed;
 }
 
-bool CVehicleSA::AreDoorsLocked(void)
+bool CVehicleSA::AreDoorsLocked()
 {
     return (GetVehicleInterface()->ul_doorstate == 2 || GetVehicleInterface()->ul_doorstate == 5 || GetVehicleInterface()->ul_doorstate == 4 ||
             GetVehicleInterface()->ul_doorstate == 7 || GetVehicleInterface()->ul_doorstate == 3);
@@ -795,7 +795,7 @@ void CVehicleSA::LockDoors(bool bLocked)
     }
 }
 
-bool CVehicleSA::AreDoorsUndamageable(void)
+bool CVehicleSA::AreDoorsUndamageable()
 {
     return (GetVehicleInterface()->ul_doorstate == 1 || GetVehicleInterface()->ul_doorstate == 7);
 }
@@ -909,7 +909,7 @@ bool CVehicleSA::CanPedStepOutCar(bool bUnknown)
     return bReturn;
 }
 
-bool CVehicleSA::CarHasRoof(void)
+bool CVehicleSA::CarHasRoof()
 {
     DEBUG_TRACE("bool CVehicleSA::CarHasRoof ( void )");
     DWORD dwThis = (DWORD)m_pInterface;
@@ -926,7 +926,7 @@ bool CVehicleSA::CarHasRoof(void)
     return bReturn;
 }
 
-void CVehicleSA::ExtinguishCarFire(void)
+void CVehicleSA::ExtinguishCarFire()
 {
     DEBUG_TRACE("void CVehicleSA::ExtinguishCarFire ( void )");
     DWORD dwThis = (DWORD)m_pInterface;
@@ -939,7 +939,7 @@ void CVehicleSA::ExtinguishCarFire(void)
     }
 }
 
-DWORD CVehicleSA::GetBaseVehicleType(void)
+DWORD CVehicleSA::GetBaseVehicleType()
 {
     DEBUG_TRACE("DWORD CVehicleSA::GetBaseVehicleType ( void )");
     DWORD dwThis = (DWORD)m_pInterface;
@@ -963,25 +963,25 @@ void CVehicleSA::SetBodyDirtLevel(float fDirtLevel)
     GetVehicleInterface()->nBodyDirtLevel = fDirtLevel;
 }
 
-float CVehicleSA::GetBodyDirtLevel(void)
+float CVehicleSA::GetBodyDirtLevel()
 {
     DEBUG_TRACE("float CVehicleSA::GetBodyDirtLevel ( void )");
     return GetVehicleInterface()->nBodyDirtLevel;
 }
 
-unsigned char CVehicleSA::GetCurrentGear(void)
+unsigned char CVehicleSA::GetCurrentGear()
 {
     DEBUG_TRACE("unsigned char CVehicleSA::GetCurrentGear ( void )");
     return GetVehicleInterface()->m_nCurrentGear;
 }
 
-float CVehicleSA::GetGasPedal(void)
+float CVehicleSA::GetGasPedal()
 {
     DEBUG_TRACE("float CVehicleSA::GetGasPedal ( void )");
     return GetVehicleInterface()->m_fGasPedal;
 }
 
-float CVehicleSA::GetHeightAboveRoad(void)
+float CVehicleSA::GetHeightAboveRoad()
 {
     DEBUG_TRACE("float CVehicleSA::GetHeightAboveRoad ( void )");
     DWORD dwThis = (DWORD)GetVehicleInterface();
@@ -998,7 +998,7 @@ float CVehicleSA::GetHeightAboveRoad(void)
     return fReturn;
 }
 
-float CVehicleSA::GetSteerAngle(void)
+float CVehicleSA::GetSteerAngle()
 {
     DEBUG_TRACE("float CVehicleSA::GetSteerAngle ( void )");
     return GetVehicleInterface()->m_fSteerAngle;
@@ -1051,7 +1051,7 @@ bool CVehicleSA::GetTowHitchPos(CVector* pVector)
     return bReturn;
 }
 
-bool CVehicleSA::IsOnItsSide(void)
+bool CVehicleSA::IsOnItsSide()
 {
     DEBUG_TRACE("bool CVehicleSA::IsOnItsSide ( void )");
     DWORD dwThis = (DWORD)m_pInterface;
@@ -1067,7 +1067,7 @@ bool CVehicleSA::IsOnItsSide(void)
     return bReturn;
 }
 
-bool CVehicleSA::IsLawEnforcementVehicle(void)
+bool CVehicleSA::IsLawEnforcementVehicle()
 {
     DEBUG_TRACE("bool CVehicleSA::IsLawEnforcementVehicle ( void )");
     DWORD dwThis = (DWORD)m_pInterface;
@@ -1123,7 +1123,7 @@ bool CVehicleSA::IsSphereTouchingVehicle(CVector* vecOrigin, float fRadius)
     return bReturn;
 }
 
-bool CVehicleSA::IsUpsideDown(void)
+bool CVehicleSA::IsUpsideDown()
 {
     DEBUG_TRACE("bool CVehicleSA::IsUpsideDown ( void )");
     DWORD dwThis = (DWORD)m_pInterface;
@@ -1169,7 +1169,7 @@ void CVehicleSA::SetEngineOn(bool bEngineOn)
     }
 }
 
-CPed* CVehicleSA::GetDriver(void)
+CPed* CVehicleSA::GetDriver()
 {
     DEBUG_TRACE("CPed* CVehicleSA::GetDriver ( void )");
     CPoolsSA* pPools = (CPoolsSA*)pGame->GetPools();
@@ -1609,7 +1609,7 @@ bool CVehicleSA::IsLandingGearDown()
         return false;
 }
 
-void CVehicleSA::Fix(void)
+void CVehicleSA::Fix()
 {
     DEBUG_TRACE("void CVehicleSA::Fix ( void )");
     DWORD dwThis = (DWORD)GetInterface();
@@ -1685,23 +1685,23 @@ void CVehicleSA::FadeOut(bool bFadeOut)
     vehicle->m_nVehicleFlags.bFadeOut = bFadeOut;
 }
 
-bool CVehicleSA::IsFadingOut(void)
+bool CVehicleSA::IsFadingOut()
 {
     CVehicleSAInterface* vehicle = (CVehicleSAInterface*)this->GetInterface();
     return vehicle->m_nVehicleFlags.bFadeOut;
 }
 
-unsigned char CVehicleSA::GetNumberGettingIn(void)
+unsigned char CVehicleSA::GetNumberGettingIn()
 {
     return GetVehicleInterface()->m_nNumGettingIn;
 }
 
-unsigned char CVehicleSA::GetPassengerCount(void)
+unsigned char CVehicleSA::GetPassengerCount()
 {
     return GetVehicleInterface()->m_nNumPassengers;
 }
 
-unsigned char CVehicleSA::GetMaxPassengerCount(void)
+unsigned char CVehicleSA::GetMaxPassengerCount()
 {
     return GetVehicleInterface()->m_nMaxPassengers;
 }
@@ -1726,7 +1726,7 @@ void CVehicleSA::SetTowLink(CVehicle* pVehicle)
     }
 }
 
-bool CVehicleSA::BreakTowLink(void)
+bool CVehicleSA::BreakTowLink()
 {
     DEBUG_TRACE("bool CVehicleSA::BreakTowLink ( void )");
     DWORD dwThis = (DWORD)GetInterface();
@@ -1744,7 +1744,7 @@ bool CVehicleSA::BreakTowLink(void)
     return bReturn;
 }
 
-CVehicle* CVehicleSA::GetTowedVehicle(void)
+CVehicle* CVehicleSA::GetTowedVehicle()
 {
     DEBUG_TRACE("CVehicle * CVehicleSA::GetTowedVehicle ( void )");
     CVehicleSAInterface* pTowedVehicle = (CVehicleSAInterface*)*(DWORD*)((DWORD)this->GetInterface() + 1224);
@@ -1756,7 +1756,7 @@ CVehicle* CVehicleSA::GetTowedVehicle(void)
     return NULL;
 }
 
-CVehicle* CVehicleSA::GetTowedByVehicle(void)
+CVehicle* CVehicleSA::GetTowedByVehicle()
 {
     DEBUG_TRACE("CVehicle * CVehicleSA::GetTowedVehicle ( void )");
     CVehicleSAInterface* pTowedVehicle = (CVehicleSAInterface*)*(DWORD*)((DWORD)this->GetInterface() + 1220);
@@ -1795,7 +1795,7 @@ void CVehicleSA::PickupEntityWithWinch(CEntity* pEntity)
     }
 }
 
-void CVehicleSA::ReleasePickedUpEntityWithWinch(void)
+void CVehicleSA::ReleasePickedUpEntityWithWinch()
 {
     DWORD dwFunc = FUNC_CVehicle_ReleasePickedUpEntityWithWinch;
     DWORD dwThis = (DWORD)GetInterface();
@@ -1853,7 +1853,7 @@ void CVehicleSA::SetRemap(int iRemap)
     }
 }
 
-int CVehicleSA::GetRemapIndex(void)
+int CVehicleSA::GetRemapIndex()
 {
     DWORD dwFunc = FUNC_CVehicle__GetRemapIndex;
     DWORD dwThis = (DWORD)GetInterface();
@@ -1879,7 +1879,7 @@ void CVehicleSA::SetRemapTexDictionary(int iRemapTextureDictionary)
     }
 }
 
-bool CVehicleSA::IsSmokeTrailEnabled(void)
+bool CVehicleSA::IsSmokeTrailEnabled()
 {
     return (*(unsigned char*)((DWORD)this->GetInterface() + 2560) == 1);
 }
@@ -1889,7 +1889,7 @@ void CVehicleSA::SetSmokeTrailEnabled(bool bEnabled)
     MemPutFast<unsigned char>((DWORD)this->GetInterface() + 2560, (bEnabled) ? 1 : 0);
 }
 
-CHandlingEntry* CVehicleSA::GetHandlingData(void)
+CHandlingEntry* CVehicleSA::GetHandlingData()
 {
     return m_pHandlingData;
 }
@@ -1902,7 +1902,7 @@ void CVehicleSA::SetHandlingData(CHandlingEntry* pHandling)
     RecalculateHandling();
 }
 
-void CVehicleSA::RecalculateHandling(void)
+void CVehicleSA::RecalculateHandling()
 {
     if (!m_pHandlingData)
         return;
@@ -2169,7 +2169,7 @@ CVector CVehicleSA::GetWheelPosition(eWheelPosition wheel)
     return CVector();
 }
 
-bool CVehicleSA::IsHeliSearchLightVisible(void)
+bool CVehicleSA::IsHeliSearchLightVisible()
 {
     // See CHeli::PreRender
     DWORD dwThis = (DWORD)GetInterface();
@@ -2183,7 +2183,7 @@ void CVehicleSA::SetHeliSearchLightVisible(bool bVisible)
     MemPutFast<bool>(dwThis + 2577, bVisible);
 }
 
-CColModel* CVehicleSA::GetSpecialColModel(void)
+CColModel* CVehicleSA::GetSpecialColModel()
 {
     CVehicleSAInterface* vehicle = (CVehicleSAInterface*)this->GetInterface();
     if (vehicle->m_nSpecialColModel != 0xFF)
@@ -2229,7 +2229,7 @@ bool CVehicleSA::UpdateMovingCollision(float fAngle)
     return bReturn;
 }
 
-void* CVehicleSA::GetPrivateSuspensionLines(void)
+void* CVehicleSA::GetPrivateSuspensionLines()
 {
     if (m_pSuspensionLines == NULL)
     {
@@ -2255,7 +2255,7 @@ void* CVehicleSA::GetPrivateSuspensionLines(void)
     return m_pSuspensionLines;
 }
 
-void CVehicleSA::CopyGlobalSuspensionLinesToPrivate(void)
+void CVehicleSA::CopyGlobalSuspensionLinesToPrivate()
 {
     CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
     CColDataSA* pColData = pModelInfo->GetInterface()->pColModel->pColData;
@@ -2279,7 +2279,7 @@ void CVehicleSA::CopyGlobalSuspensionLinesToPrivate(void)
     }
 }
 
-void CVehicleSA::RecalculateSuspensionLines(void)
+void CVehicleSA::RecalculateSuspensionLines()
 {
     CHandlingEntry* pHandlingEntry = GetHandlingData();
     // if suspension is master disabled or suspension hasn't changed return.
@@ -2549,7 +2549,7 @@ void CVehicleSA::AddComponent(RwFrame* pFrame, bool bReadOnly)
     m_ExtraFrames.insert(std::pair<SString, SVehicleFrame>(strName, frame));
 }
 
-void CVehicleSA::FinalizeFramesList(void)
+void CVehicleSA::FinalizeFramesList()
 {
     // For each frame, make list of parent frames
     std::map<SString, SVehicleFrame>::iterator iter = m_ExtraFrames.begin();

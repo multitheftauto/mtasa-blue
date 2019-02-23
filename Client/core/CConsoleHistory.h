@@ -13,7 +13,7 @@ class CConsoleHistory
 {
 public:
     CConsoleHistory(unsigned int uiHistoryLength);
-    void        LoadFromFile(void);
+    void        LoadFromFile();
     void        Add(const char* szLine);
     const char* Get(unsigned int uiIndex);
 

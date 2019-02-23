@@ -12,7 +12,7 @@
 
 #define DEFAULT_MAX_FILESIZE 52428800
 
-void CLuaFileDefs::LoadFunctions(void)
+void CLuaFileDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"fileOpen", fileOpen},

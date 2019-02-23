@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CProjectileSyncPacket::CProjectileSyncPacket(void)
+CProjectileSyncPacket::CProjectileSyncPacket()
 {
     m_usModel = 0;
 }
