@@ -402,8 +402,6 @@ CResource* CResourceManager::Load(bool bIsZipped, const char* szAbsPath, const c
     if (!pLoadedResource->IsLoaded())
     {
         CLogger::LogPrintf("Loading of resource '%s' failed\n", szResourceName);
-        UnloadAndDelete(pLoadedResource);
-        pLoadedResource = nullptr;
     }
     else
     {

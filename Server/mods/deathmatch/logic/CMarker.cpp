@@ -52,7 +52,7 @@ CElement* CMarker::Clone(bool* bAddEntity, CResource* pResource)
         pTemp->SetMarkerType(GetMarkerType());
         pTemp->SetColor(GetColor());
         pTemp->SetSize(GetSize());
-        if (pResource->HasStarted())
+        if (pResource->IsClientSynced())
             pTemp->Sync(true);
         *bAddEntity = false;
     }

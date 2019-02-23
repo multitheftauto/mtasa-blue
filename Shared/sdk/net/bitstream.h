@@ -220,28 +220,30 @@ public:
     }
 
     // Write a string (incl. ushort size header)
+    template<typename SizeType = unsigned short>
     void WriteString(const std::string& value)
     {
         // Write the length
-        auto usLength = static_cast<unsigned short>(value.length());
-        Write(usLength);
+        auto length = static_cast<SizeType>(value.length());
+        Write(length);
 
         // Write the characters
-        return WriteStringCharacters(value, usLength);
+        return WriteStringCharacters(value, length);
     }
 
     // Read a string (incl. ushort size header)
+    template<typename SizeType = unsigned short>
     bool ReadString(std::string& result)
     {
         result = "";
 
         // Read the length
-        unsigned short usLength = 0;
-        if (!Read(usLength))
+        SizeType length = 0;
+        if (!Read(length))
             return false;
 
         // Read the characters
-        return ReadStringCharacters(result, usLength);
+        return ReadStringCharacters(result, length);
     }
 
     // Write variable size length
