@@ -88,7 +88,7 @@ typedef struct
     signed __int16 x;
     signed __int16 y;
     signed __int16 z;
-    CVector        getVector() { return CVector(x * 0.0078125f, y * 0.0078125f, z * 0.0078125f); }
+    CVector        getVector() const { return CVector(x * 0.0078125f, y * 0.0078125f, z * 0.0078125f); }
     void           setVector(CVector vec)
     {
         x = static_cast<signed __int16>(vec.fX * 128);
@@ -116,7 +116,7 @@ typedef struct
     CompressedVector*    m_pShadowVertices;
     CColTriangleSA*      m_pShadowTriangles;
 
-    std::map<ushort, CompressedVector> getAllVertices()
+    std::map<ushort, CompressedVector> getAllVertices() const
     {
         std::map<ushort, CompressedVector> vertices;
         for (uint i = 0; numColTriangles > i; i++)
@@ -127,7 +127,7 @@ typedef struct
         }
         return vertices;
     }
-    size_t getNumVertices()
+    size_t getNumVertices() const
     {
         std::map<ushort, bool> vertices;
         for (uint i = 0; numColTriangles > i; i++)
@@ -139,7 +139,7 @@ typedef struct
         return vertices.size();
     }
 
-    bool isValidIndex(char eShape, ushort usIndex, ushort numVertices = 0)
+    bool isValidIndex(char eShape, ushort usIndex, ushort numVertices = 0) const
     {
         switch (eShape)
         {
@@ -159,7 +159,7 @@ typedef struct
         return false;
     }
 
-    std::vector<ushort> getTrianglesByVertex(ushort usVertex)
+    std::vector<ushort> getTrianglesByVertex(ushort usVertex) const
     {
         std::vector<ushort> vecTriangles;
         CColTriangleSA      colTriangle;
@@ -172,7 +172,7 @@ typedef struct
         return vecTriangles;
     }
 
-    std::map<ushort, ushort> getVerticesUsage()
+    std::map<ushort, ushort> getVerticesUsage() const
     {
         std::map<ushort, ushort> verticesUsage;
         for (ushort i = 0; i < numColTriangles; i++)
@@ -203,7 +203,7 @@ public:
     CColModelSA(CColModelSAInterface* pInterface);
     ~CColModelSA();
 
-    CColModelSAInterface* GetInterface() { return m_pInterface; }
+    CColModelSAInterface* GetInterface() const { return m_pInterface; }
     void                  Destroy() { delete this; }
 
 private:

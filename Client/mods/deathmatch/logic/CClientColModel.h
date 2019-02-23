@@ -67,7 +67,7 @@ public:
         }
     }
     static bool CompareVector(CVector& vecMin, CVector& vecMax) { return vecMax.fX >= vecMin.fX && vecMax.fY >= vecMin.fY && vecMax.fZ >= vecMin.fZ; }
-    static void AlignVector(CVector& destMin, CVector& destMax, CVector& src)
+    static void AlignVector(CVector& destMin, CVector& destMax, const CVector& src)
     {
         if (src.fX < destMax.fX)
             destMax.fX = src.fX;
