@@ -1337,12 +1337,8 @@ int CLuaEngineDefs::EngineUpdateModelCollisionBoundingBox(lua_State* luaVM)
                 CClientColModel::AlignVector(maxVec, minVec, pBoxMaxVec);
             }
 
-            std::map<ushort, CompressedVector>           vecVertices = pColData->getAllVertices();
-            std::map<ushort, CompressedVector>::iterator it;
-            for (it = vecVertices.begin(); it != vecVertices.end(); it++)
-            {
-                CClientColModel::AlignVector(maxVec, minVec, it->second.getVector());
-            }
+            for (const auto& pair : pColData->getAllVertices())
+                CClientColModel::AlignVector(maxVec, minVec, pair.second.getVector());
 
             pBoundingBox->fRadius = std::max(DistanceBetweenPoints3D(maxVec, vecCenter), DistanceBetweenPoints3D(minVec, vecCenter));
             pBoundingBox->vecOffset = vecCenter;
