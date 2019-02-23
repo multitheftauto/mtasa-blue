@@ -148,7 +148,7 @@ CWebView* CWebCore::FindWebView(CefRefPtr<CefBrowser> browser)
     return nullptr;
 }
 
-void CWebCore::AddEventToEventQueue(std::function<void(void)> event, CWebView* pWebView, const SString& name)
+void CWebCore::AddEventToEventQueue(std::function<void()> event, CWebView* pWebView, const SString& name)
 {
 #ifndef MTA_DEBUG
     UNREFERENCED_PARAMETER(name);

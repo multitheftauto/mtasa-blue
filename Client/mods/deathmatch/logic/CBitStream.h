@@ -17,8 +17,8 @@ extern CNet* g_pNet;
 class CBitStream
 {
 public:
-    CBitStream(void) { pBitStream = g_pNet->AllocateNetBitStream(); };
-    ~CBitStream(void) { g_pNet->DeallocateNetBitStream(pBitStream); };
+    CBitStream() { pBitStream = g_pNet->AllocateNetBitStream(); };
+    ~CBitStream() { g_pNet->DeallocateNetBitStream(pBitStream); };
 
     NetBitStreamInterface* pBitStream;
 };

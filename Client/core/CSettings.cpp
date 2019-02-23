@@ -24,7 +24,7 @@ extern CCore*              g_pCore;
 extern SBindableGTAControl g_bcControls[];
 extern SBindableKey        g_bkKeys[];
 
-CSettings::CSettings(void)
+CSettings::CSettings()
 {
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
     m_fRadioVolume = (float)gameSettings->GetRadioVolume() / 64.0f;
@@ -44,12 +44,12 @@ CSettings::CSettings(void)
     }
 }
 
-CSettings::~CSettings(void)
+CSettings::~CSettings()
 {
     DestroyGUI();
 }
 
-void CSettings::CreateGUI(void)
+void CSettings::CreateGUI()
 {
     if (m_pWindow)
         DestroyGUI();
@@ -137,7 +137,7 @@ void CSettings::CreateGUI(void)
     m_pBindsList = reinterpret_cast<CGUIGridList*>(pManager->CreateGridList(pTabBinds, false));
     m_pBindsList->SetPosition(CVector2D(10, 15));
     m_pBindsList->SetSize(CVector2D(620, 357));
-    m_pBindsList->SetSorting(false);
+    m_pBindsList->SetSortingEnabled(false);
     m_pBindsList->SetSelectionMode(SelectionModes::CellSingle);
     m_pBindsList->SetDoubleClickHandler(GUI_CALLBACK(&CSettings::OnBindsListClick, this));
 
@@ -1285,7 +1285,7 @@ void CSettings::CreateGUI(void)
     LoadSkins();
 }
 
-void CSettings::DestroyGUI(void)
+void CSettings::DestroyGUI()
 {
     // Destroy
     delete m_pButtonCancel;
@@ -1305,7 +1305,7 @@ void RestartCallBack(void* ptr, unsigned int uiButton)
     }
 }
 
-void CSettings::ShowRestartQuestion(void)
+void CSettings::ShowRestartQuestion()
 {
     SString strMessage = _("Some settings will be changed when you next start MTA");
     strMessage += _("\n\nDo you want to restart now?");
@@ -1329,7 +1329,7 @@ void DisconnectCallback(void* ptr, unsigned int uiButton)
     }
 }
 
-void CSettings::ShowDisconnectQuestion(void)
+void CSettings::ShowDisconnectQuestion()
 {
     SString strMessage = _("Some settings will be changed when you disconnect the current server");
     strMessage += _("\n\nDo you want to disconnect now?");
@@ -1354,7 +1354,7 @@ bool CSettings::OnMouseDoubleClick(CGUIMouseEventArgs Args)
     return false;
 }
 
-void CSettings::Update(void)
+void CSettings::Update()
 {
     // Once each 30 frames
     if (m_dwFrameCount >= CORE_SETTINGS_UPDATE_INTERVAL)
@@ -1409,7 +1409,7 @@ void CSettings::UpdateAudioTab()
     m_pComboUsertrackMode->SetSelectedItemByIndex(gameSettings->GetUsertrackMode());
 }
 
-void CSettings::UpdateVideoTab(void)
+void CSettings::UpdateVideoTab()
 {
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
 
@@ -1545,7 +1545,7 @@ void CSettings::UpdateVideoTab(void)
 //
 // PopulateResolutionComboBox
 //
-void CSettings::PopulateResolutionComboBox(void)
+void CSettings::PopulateResolutionComboBox()
 {
     bool bNextWindowed;
     bool bNextFSMinimize;
@@ -1602,7 +1602,7 @@ void CSettings::PopulateResolutionComboBox(void)
 //
 // Disable/enable the full screen mode options
 //
-void CSettings::UpdateFullScreenComboBoxEnabled(void)
+void CSettings::UpdateFullScreenComboBoxEnabled()
 {
     if (m_pCheckBoxWindowed->GetSelected())
     {
@@ -1621,7 +1621,7 @@ void CSettings::UpdateFullScreenComboBoxEnabled(void)
 //
 // Saves the Joypad settings
 //
-void CSettings::ProcessJoypad(void)
+void CSettings::ProcessJoypad()
 {
     // Update from GUI
     GetJoystickManager()->SetDeadZone(atoi(m_pEditDeadzone->GetText().c_str()));
@@ -1892,7 +1892,7 @@ bool CSettings::OnBindsDefaultClick(CGUIElement* pElement)
     return true;
 }
 
-void CSettings::CreateInterfaceTabGUI(void)
+void CSettings::CreateInterfaceTabGUI()
 {
     if (!m_pTabInterface)
     {
@@ -2292,7 +2292,7 @@ void CSettings::UpdateChatColorPreview(eChatColorType eType)
 }
 
 // Saves the keybinds
-void CSettings::ProcessKeyBinds(void)
+void CSettings::ProcessKeyBinds()
 {
     CKeyBindsInterface* pKeyBinds = CCore::GetSingleton().GetKeyBinds();
 
@@ -2581,7 +2581,7 @@ bool CSettings::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     return false;
 }
 
-void CSettings::Initialize(void)
+void CSettings::Initialize()
 {
     // Add binds and sections
     bool bPrimaryKey = true;
@@ -2800,7 +2800,7 @@ void CSettings::SetVisible(bool bVisible)
     m_pWindow->SetZOrderingEnabled(!bVisible);            // Message boxes dont appear on top otherwise
 }
 
-bool CSettings::IsVisible(void)
+bool CSettings::IsVisible()
 {
     return m_pWindow->IsVisible();
 }
@@ -2870,7 +2870,7 @@ bool CSettings::OnCancelButtonClick(CGUIElement* pElement)
     return true;
 }
 
-void CSettings::LoadData(void)
+void CSettings::LoadData()
 {
     // Ensure CVARS ranges ok
     CClientVariables::GetSingleton().ValidateValues();
@@ -3141,7 +3141,7 @@ void CSettings::LoadData(void)
     ReloadBrowserLists();
 }
 
-void CSettings::ReloadBrowserLists(void)
+void CSettings::ReloadBrowserLists()
 {
     m_pGridBrowserBlacklist->Clear();
     m_pGridBrowserWhitelist->Clear();
@@ -3172,7 +3172,7 @@ bool CSettings::OnTabChanged(CGUIElement* pElement)
     return true;
 }
 
-void CSettings::SaveData(void)
+void CSettings::SaveData()
 {
     std::string    strVar;
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
@@ -3526,7 +3526,7 @@ void CSettings::RemoveKeyBindSection(char* szSectionName)
     }
 }
 
-void CSettings::RemoveAllKeyBindSections(void)
+void CSettings::RemoveAllKeyBindSections()
 {
     list<SKeyBindSection*>::const_iterator iter = m_pKeyBindSections.begin();
     for (; iter != m_pKeyBindSections.end(); iter++)
@@ -4433,7 +4433,7 @@ void NewNicknameCallback(void* ptr, unsigned int uiButton, std::string strNick)
         CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
 }
 
-void CSettings::RequestNewNickname(void)
+void CSettings::RequestNewNickname()
 {
     std::string strNick;
     CVARS_GET("nick", strNick);
@@ -4530,7 +4530,7 @@ void CSettings::TabSkip(bool bBackwards)
     }
 }
 
-bool CSettings::IsActive(void)
+bool CSettings::IsActive()
 {
     return m_pWindow->IsActive();
 }

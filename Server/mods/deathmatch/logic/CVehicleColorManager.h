@@ -17,10 +17,10 @@ class CVehicleColors
 {
 public:
     void         AddColor(const CVehicleColor& colVehicle) { m_Colors.push_back(colVehicle); };
-    unsigned int CountColors(void) { return static_cast<unsigned int>(m_Colors.size()); };
-    void         RemoveAllColors(void) { m_Colors.clear(); };
+    unsigned int CountColors() { return static_cast<unsigned int>(m_Colors.size()); };
+    void         RemoveAllColors() { m_Colors.clear(); };
 
-    CVehicleColor GetRandomColor(void);
+    CVehicleColor GetRandomColor();
 
 private:
     list<CVehicleColor> m_Colors;
@@ -31,7 +31,7 @@ class CVehicleColorManager
 public:
     bool Load(const char* szFilename);
     bool Generate(const char* szFilename);
-    void Reset(void);
+    void Reset();
 
     void          AddColor(unsigned short usModel, const CVehicleColor& colVehicle);
     CVehicleColor GetRandomColor(unsigned short usModel);

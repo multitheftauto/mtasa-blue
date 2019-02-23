@@ -27,7 +27,7 @@ CClientColModel::CClientColModel(CClientManager* pManager, ElementID ID) : Class
     m_pColModelManager->AddToList(this);
 }
 
-CClientColModel::~CClientColModel(void)
+CClientColModel::~CClientColModel()
 {
     // Remove us from DFF manager's list
     m_pColModelManager->RemoveFromList(this);
@@ -108,7 +108,7 @@ void CClientColModel::Restore(unsigned short usModel)
     m_Replaced.remove(usModel);
 }
 
-void CClientColModel::RestoreAll(void)
+void CClientColModel::RestoreAll()
 {
     // Loop through our replaced ids
     std::list<unsigned short>::iterator iter = m_Replaced.begin();

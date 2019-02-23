@@ -193,7 +193,7 @@ CRenderWareSA::CRenderWareSA(eGameVersion version)
     m_bGTAVertexShadersEnabled = true;
 }
 
-CRenderWareSA::~CRenderWareSA(void)
+CRenderWareSA::~CRenderWareSA()
 {
     SAFE_DELETE(m_pMatchChannelManager);
 }

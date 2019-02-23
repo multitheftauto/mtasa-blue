@@ -34,7 +34,7 @@ void CGroups::Delete(CDummy* pDummy)
     delete pDummy;
 }
 
-void CGroups::DeleteAll(void)
+void CGroups::DeleteAll()
 {
     DeletePointersAndClearList(m_List);
 }

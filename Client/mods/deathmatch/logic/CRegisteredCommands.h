@@ -26,15 +26,18 @@ class CRegisteredCommands
     };
 
 public:
-    CRegisteredCommands(void);
-    ~CRegisteredCommands(void);
+    CRegisteredCommands();
+    ~CRegisteredCommands();
 
     bool AddCommand(class CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction, bool bCaseSensitive);
     bool RemoveCommand(class CLuaMain* pLuaMain, const char* szKey);
-    void ClearCommands(void);
+    void ClearCommands();
     void CleanUpForVM(class CLuaMain* pLuaMain);
 
     bool CommandExists(const char* szKey, class CLuaMain* pLuaMain = NULL);
+
+    void GetCommands(lua_State* luaVM);
+    void GetCommands(lua_State* luaVM, CLuaMain* pTargetLuaMain);
 
     bool ProcessCommand(const char* szKey, const char* szArguments);
 
@@ -42,7 +45,7 @@ private:
     SCommand* GetCommand(const char* szKey, class CLuaMain* pLuaMain = NULL);
     void      CallCommandHandler(class CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, const char* szKey, const char* szArguments);
 
-    void TakeOutTheTrash(void);
+    void TakeOutTheTrash();
 
     std::list<SCommand*> m_Commands;
     std::list<SCommand*> m_TrashCan;

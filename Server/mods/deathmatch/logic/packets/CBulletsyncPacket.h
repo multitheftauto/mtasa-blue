@@ -12,12 +12,12 @@
 class CBulletsyncPacket : public CPacket
 {
 public:
-    CBulletsyncPacket(void){};
+    CBulletsyncPacket(){};
     CBulletsyncPacket(class CPlayer* pPlayer);
 
-    bool          HasSimHandler(void) const { return true; }
-    ePacketID     GetPacketID(void) const { return PACKET_ID_PLAYER_BULLETSYNC; };
-    unsigned long GetFlags(void) const { return PACKET_MEDIUM_PRIORITY | PACKET_RELIABLE; };
+    bool          HasSimHandler() const { return true; }
+    ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_BULLETSYNC; };
+    unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_RELIABLE; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;

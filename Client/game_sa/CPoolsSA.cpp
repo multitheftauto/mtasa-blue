@@ -30,7 +30,7 @@ CPoolsSA::CPoolsSA()
     PointerNodeSingleLinkPool = new CPointerNodeSingleLinkPoolSA();
 }
 
-CPoolsSA::~CPoolsSA(void)
+CPoolsSA::~CPoolsSA()
 {
     // Make sure we've deleted all vehicles, objects, peds and buildings
     DeleteAllVehicles();
@@ -48,7 +48,7 @@ CPoolsSA::~CPoolsSA(void)
         delete PointerNodeSingleLinkPool;
 }
 
-void CPoolsSA::DeleteAllBuildings(void)
+void CPoolsSA::DeleteAllBuildings()
 {
     /*
     for ( int i = 0; i < MAX_BUILDINGS; i++ )
@@ -1327,12 +1327,12 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
     return iOut;
 }
 
-CEntryInfoNodePool* CPoolsSA::GetEntryInfoNodePool(void)
+CEntryInfoNodePool* CPoolsSA::GetEntryInfoNodePool()
 {
     return EntryInfoNodePool;
 }
 
-int CEntryInfoNodePoolSA::GetNumberOfUsedSpaces(void)
+int CEntryInfoNodePoolSA::GetNumberOfUsedSpaces()
 {
     DWORD dwFunc = FUNC_CEntryInfoNodePool_GetNoOfUsedSpaces;
     int   iOut = 0;
@@ -1347,12 +1347,12 @@ int CEntryInfoNodePoolSA::GetNumberOfUsedSpaces(void)
     return iOut;
 }
 
-CPointerNodeDoubleLinkPool* CPoolsSA::GetPointerNodeDoubleLinkPool(void)
+CPointerNodeDoubleLinkPool* CPoolsSA::GetPointerNodeDoubleLinkPool()
 {
     return PointerNodeDoubleLinkPool;
 }
 
-int CPointerNodeDoubleLinkPoolSA::GetNumberOfUsedSpaces(void)
+int CPointerNodeDoubleLinkPoolSA::GetNumberOfUsedSpaces()
 {
     DWORD dwFunc = FUNC_CPtrNodeDoubleLinkPool_GetNoOfUsedSpaces;
     int   iOut = 0;
@@ -1367,7 +1367,7 @@ int CPointerNodeDoubleLinkPoolSA::GetNumberOfUsedSpaces(void)
     return iOut;
 }
 
-CPointerNodeSingleLinkPool* CPoolsSA::GetPointerNodeSingleLinkPool(void)
+CPointerNodeSingleLinkPool* CPoolsSA::GetPointerNodeSingleLinkPool()
 {
     return PointerNodeSingleLinkPool;
 }
@@ -1377,7 +1377,7 @@ void CPoolsSA::InvalidateLocalPlayerClientEntity()
     m_pedPool.arrayOfClientEntities[0] = {m_pedPool.arrayOfClientEntities[0].pEntity, nullptr};
 }
 
-int CPointerNodeSingleLinkPoolSA::GetNumberOfUsedSpaces(void)
+int CPointerNodeSingleLinkPoolSA::GetNumberOfUsedSpaces()
 {
     DWORD dwFunc = FUNC_CPtrNodeSingleLinkPool_GetNoOfUsedSpaces;
     int   iOut = 0;

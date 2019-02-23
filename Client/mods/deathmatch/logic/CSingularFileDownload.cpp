@@ -44,7 +44,7 @@ CSingularFileDownload::CSingularFileDownload(CResource* pResource, const char* s
     }
 }
 
-CSingularFileDownload::~CSingularFileDownload(void)
+CSingularFileDownload::~CSingularFileDownload()
 {
 }
 
@@ -70,7 +70,7 @@ void CSingularFileDownload::CallFinished(bool bSuccess)
     SetComplete();
 }
 
-void CSingularFileDownload::Cancel(void)
+void CSingularFileDownload::Cancel()
 {
     m_bBeingDeleted = true;
     m_pResource = NULL;
@@ -78,12 +78,12 @@ void CSingularFileDownload::Cancel(void)
     // TODO: Cancel also in Net
 }
 
-bool CSingularFileDownload::DoesClientAndServerChecksumMatch(void)
+bool CSingularFileDownload::DoesClientAndServerChecksumMatch()
 {
     return (m_LastClientChecksum == m_ServerChecksum);
 }
 
-CChecksum CSingularFileDownload::GenerateClientChecksum(void)
+CChecksum CSingularFileDownload::GenerateClientChecksum()
 {
     m_LastClientChecksum = CChecksum::GenerateChecksumFromFile(m_strName);
     return m_LastClientChecksum;
