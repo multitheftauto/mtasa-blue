@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        game_sa/CObjectGroupPhysicalPropertiesSA.cpp
  *  PURPOSE:     Objects dynamic physical properties handler class
