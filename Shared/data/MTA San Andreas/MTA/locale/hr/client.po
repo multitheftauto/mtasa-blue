@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-10 02:54+0100\n"
-"PO-Revision-Date: 2018-11-19 12:25+0000\n"
+"PO-Revision-Date: 2019-02-17 13:01+0000\n"
 "Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: hr\n"
@@ -15,9 +15,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"Translators: CapY; Josip Devedžić; JoeBullet; Blast3r; GodFather; Playboy\n"
+"Translators: CapY; mega9; JoeBullet; Blast3r; Napoleon  Hill; GodFather; Playboy\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1542630323.0\n"
+"X-POOTLE-MTIME: 1550408493.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -269,7 +269,7 @@ msgstr "Ozbiljna greška"
 
 #: ..\Client\core\CCore.cpp:897
 msgid "TO FIX, REMOVE THIS FILE:"
-msgstr ""
+msgstr "ZA POPRAVAK, UKLONITE OVU DATOTEKU:"
 
 #: ..\Client\core\CCore.cpp:929
 #, c-format, c-format
@@ -608,6 +608,8 @@ msgid ""
 "You are using a feature-branch build! This is a test build only which cannot"
 " be used to connect to public servers!"
 msgstr ""
+"Upotrebljavate gradilište značajki! Ovo je samo test koji se ne može "
+"koristiti za povezivanje s javnim poslužiteljima!"
 
 #: ..\Client\core\CMainMenu.cpp:1129
 msgid ""
@@ -827,7 +829,7 @@ msgstr "Neprozirnost:"
 #. *
 #: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:418
 msgid "Master volume:"
-msgstr ""
+msgstr "Glavna glasnoća:"
 
 #: ..\Client\core\CSettings.cpp:410 ..\Client\core\CSettings.cpp:437
 msgid "Radio volume:"
@@ -860,7 +862,7 @@ msgstr "Općenito"
 
 #: ..\Client\core\CSettings.cpp:513
 msgid "Radio options"
-msgstr ""
+msgstr "Radio mogućnosti"
 
 #: ..\Client\core\CSettings.cpp:519
 msgid "Radio Equalizer"
@@ -891,14 +893,12 @@ msgid "Automatic Media Scan"
 msgstr "Automatsko Skeniranje Medija"
 
 #: ..\Client\core\CSettings.cpp:555
-#, fuzzy
 msgid "Mute options"
-msgstr "Postavke miša"
+msgstr "Opcije utišavanja"
 
 #: ..\Client\core\CSettings.cpp:561
-#, fuzzy
 msgid "Mute All sounds when minimized"
-msgstr "Isključi zvukove efekata kada je minimizirano"
+msgstr "Utišaj sve zvukove kada je minimizirano"
 
 #: ..\Client\core\CSettings.cpp:566
 msgid "Mute Radio sounds when minimized"
@@ -1053,7 +1053,7 @@ msgstr "Dim guma itd"
 
 #: ..\Client\core\CSettings.cpp:792
 msgid "Render vehicles always in high detail"
-msgstr ""
+msgstr "Prikazuj vozila uvijek s visokim detaljima"
 
 #: ..\Client\core\CSettings.cpp:797
 msgid "Full Screen Minimize"
@@ -1189,11 +1189,11 @@ msgstr "Brzo"
 
 #: ..\Client\core\CSettings.cpp:1017 ..\Client\core\CSettings.cpp:2990
 msgid "Normal"
-msgstr ""
+msgstr "Normalno"
 
 #: ..\Client\core\CSettings.cpp:1018 ..\Client\core\CSettings.cpp:2992
 msgid "Above normal"
-msgstr ""
+msgstr "Iznad prosjeka"
 
 #: ..\Client\core\CSettings.cpp:1054
 msgid "Min"
@@ -1306,20 +1306,19 @@ msgstr "Učitaj"
 
 #: ..\Client\core\CSettings.cpp:1988
 msgid "Colors"
-msgstr ""
+msgstr "Boje"
 
 #: ..\Client\core\CSettings.cpp:1989
 msgid "Layout"
 msgstr "Izgled"
 
 #: ..\Client\core\CSettings.cpp:1990 ..\Client\core\CSettings.cpp:2236
-#, fuzzy
 msgid "Options"
-msgstr "Opcije:"
+msgstr "Opcije"
 
 #: ..\Client\core\CSettings.cpp:1996
 msgid "Chat Background"
-msgstr ""
+msgstr "Pozadina chat-a"
 
 #: ..\Client\core\CSettings.cpp:1996
 msgid "Chat Text"
@@ -1327,7 +1326,7 @@ msgstr "Tekst Čavrljanja"
 
 #: ..\Client\core\CSettings.cpp:1996
 msgid "Input Background"
-msgstr ""
+msgstr "Pozadina unosa"
 
 #: ..\Client\core\CSettings.cpp:1996
 msgid "Input Text"
@@ -1347,7 +1346,7 @@ msgstr "Širina:"
 
 #: ..\Client\core\CSettings.cpp:2022
 msgid "Size"
-msgstr ""
+msgstr "Veličina"
 
 #: ..\Client\core\CSettings.cpp:2071
 msgid "after"
@@ -1371,44 +1370,43 @@ msgstr "Postepeno blijedi stari tekst"
 
 #: ..\Client\core\CSettings.cpp:2120
 msgid "Horizontal:"
-msgstr ""
+msgstr "Horizontalno:"
 
 #: ..\Client\core\CSettings.cpp:2120
 msgid "Vertical:"
-msgstr ""
+msgstr "Vertikalno:"
 
 #: ..\Client\core\CSettings.cpp:2120
 msgid "Text-Align:"
-msgstr ""
+msgstr "Poravnanje teksta:"
 
 #: ..\Client\core\CSettings.cpp:2120
 msgid "X-Offset:"
-msgstr ""
+msgstr "X-pomak:"
 
 #: ..\Client\core\CSettings.cpp:2121
 msgid "Y-Offset:"
-msgstr ""
+msgstr "Y-Pomak:"
 
 #: ..\Client\core\CSettings.cpp:2127
 msgid "Position"
-msgstr ""
+msgstr "Položaj"
 
 #: ..\Client\core\CSettings.cpp:2142 ..\Client\core\CSettings.cpp:2156
 msgid "Center"
-msgstr ""
+msgstr "Centar"
 
 #: ..\Client\core\CSettings.cpp:2155
 msgid "Top"
-msgstr ""
+msgstr "Vrh"
 
 #: ..\Client\core\CSettings.cpp:2157
 msgid "Bottom"
-msgstr ""
+msgstr "Dno"
 
 #: ..\Client\core\CSettings.cpp:2205
-#, fuzzy
 msgid "Font"
-msgstr "Font:"
+msgstr "Font"
 
 #: ..\Client\core\CSettings.cpp:2242
 msgid "Hide background when not typing"
@@ -1428,7 +1426,7 @@ msgstr "Dozvoli obavijesti alatne trake"
 
 #: ..\Client\core\CSettings.cpp:2262
 msgid "Chat text black/white outline"
-msgstr ""
+msgstr "Crno/bijelo podebljanje teksta"
 
 #. Create a messagebox to notify the user
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'",
@@ -1478,11 +1476,11 @@ msgstr "Prozirnost:"
 
 #: ..\Client\core\CSettings.cpp:3566
 msgid "Color"
-msgstr ""
+msgstr "Boja"
 
 #: ..\Client\core\CSettings.cpp:3643
 msgid "Preview"
-msgstr ""
+msgstr "Pregled"
 
 #: ..\Client\core\CSettings.cpp:3951
 msgid "Please disconnect before changing language"
@@ -1504,7 +1502,7 @@ msgstr ""
 
 #: ..\Client\core\CSettings.cpp:4269
 msgid "PERFORMANCE WARNING"
-msgstr ""
+msgstr "UPOZORENJE ZA PERFORMANSE"
 
 #: ..\Client\core\CSettings.cpp:4289
 msgid ""
@@ -2084,19 +2082,17 @@ msgid "Idle"
 msgstr "Mirovanje"
 
 #: ..\Client\core\ServerBrowser\CServerList.cpp:152
-#, fuzzy
 msgid "player"
 msgid_plural "players"
 msgstr[0] "igrač"
 msgstr[1] "igrači"
-msgstr[2] ""
+msgstr[2] "igrači"
 
 #: ..\Client\core\ServerBrowser\CServerList.cpp:153
 msgid "on"
 msgstr "uključen"
 
 #: ..\Client\core\ServerBrowser\CServerList.cpp:156
-#, fuzzy
 msgid "server"
 msgid_plural "servers"
 msgstr[0] "poslužitelj"
@@ -2692,12 +2688,12 @@ msgstr ""
 
 #: ..\Client\loader\MainFunctions.cpp:1131
 msgid "Fix configuration issue"
-msgstr ""
+msgstr "Rješavanje problema s konfiguracijom"
 
 #. Try to relaunch as admin if not done so already
 #: ..\Client\loader\MainFunctions.cpp:1173
 msgid "Fix elevation required error"
-msgstr ""
+msgstr "Ispravite 'elevation required' pogrešku"
 
 #: ..\Client\loader\MainFunctions.cpp:1180
 #, c-format, c-format
@@ -3119,31 +3115,31 @@ msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d dan"
 msgstr[1] "%d dana"
-msgstr[2] ""
+msgstr[2] "%d dana"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:607
 #, c-format, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d sat"
-msgstr[1] "%d sati/a"
-msgstr[2] ""
+msgstr[1] "%d sata"
+msgstr[2] "%d sati"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:609
 #, c-format, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minuta"
-msgstr[1] "%d minute/a"
-msgstr[2] ""
+msgstr[1] "%d minute"
+msgstr[2] "%d minuta"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:611
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d sekunda"
+msgstr[1] "%d sekunde"
+msgstr[2] "%d sekundi"
 
 #. Display the error
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:615
