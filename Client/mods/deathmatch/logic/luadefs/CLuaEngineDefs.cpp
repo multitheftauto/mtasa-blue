@@ -948,7 +948,7 @@ CColModelSAInterface* GetModelCollisionInterface(ushort usModel)
             }
         }
     }
-    return false;
+    return nullptr;
 }
 
 int CLuaEngineDefs::EngineGetModelCollisionProperties(lua_State* luaVM)
