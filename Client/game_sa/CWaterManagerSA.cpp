@@ -559,6 +559,8 @@ void CWaterManagerSA::GetZonesIntersecting(const CVector& startPos, const CVecto
 
     for (; n > 0; --n)
     {
+        // A bound check here fixes client crash (https://github.com/multitheftauto/mtasa-blue/issues/835)
+        // See PR https://github.com/multitheftauto/mtasa-blue/pull/836
         if (Between<int>(lowXZone, xZone, highXZone) &&
             Between<int>(lowYZone, yZone, highYZone))
         {
