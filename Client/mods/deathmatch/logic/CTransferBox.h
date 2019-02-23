@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CTransferBox.h
  *  PURPOSE:     Header for transfer box class
@@ -11,11 +11,8 @@
 
 #pragma once
 
-#define TRANSFERBOX_FRAMES  10
-#define TRANSFERBOX_DELAY   50
-
-#include "CClientCommon.h"
-#include <gui/CGUI.h>
+#define TRANSFERBOX_FRAMES 10
+#define TRANSFERBOX_DELAY 50
 
 class CTransferBox
 {
@@ -34,18 +31,15 @@ public:
     void Hide();
 
     void SetInfo(double dDownloadSizeNow, CTransferBox::Type eTransferType = CTransferBox::NORMAL);
-
     void DoPulse();
+    bool IsVisible() const { return m_pWindow->IsVisible(); };
 
-    bool OnCancelClick(CGUIElement* pElement);
+    bool IsEnabled() const;
+    void SetEnabled(bool bEnabled) const;
 
-    bool IsVisible() { return m_pWindow->IsVisible(); };
-    bool IsEnabled() { return m_bEnabled; };
-    void SetEnabled(bool bEnabled) { m_bEnabled = bEnabled; };
+    void   AddToTotalSize(double dSize) { m_dTotalSize += dSize; };
+    double GetTotalSize() const { return m_dTotalSize; };
 
-    void AddToTotalSize(double dSize) { m_dTotalSize += dSize; };
-
-    double GetTotalSize() { return m_dTotalSize; };
 private:
     CGUIWindow*                                       m_pWindow;
     SFixedArray<CGUIStaticImage*, TRANSFERBOX_FRAMES> m_pIcon;
@@ -53,7 +47,6 @@ private:
     CGUIProgressBar*                                  m_pProgress;
 
     bool m_bMultipleDownloads;
-    bool m_bEnabled;
 
     unsigned int m_uiVisible;
     CElapsedTime m_AnimTimer;

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        sdk/gui/CGUI.h
  *  PURPOSE:     Graphical User Interface module interface
@@ -38,14 +38,14 @@ class CGUI;
 #include "CGUITypes.h"
 
 // Path defines for CGUI
-#define CGUI_ICON_MESSAGEBOX_INFO       "cgui\\images\\info.png"
-#define CGUI_ICON_MESSAGEBOX_QUESTION   "cgui\\images\\question.png"
-#define CGUI_ICON_MESSAGEBOX_WARNING    "cgui\\images\\warning.png"
-#define CGUI_ICON_MESSAGEBOX_ERROR      "cgui\\images\\error.png"
-#define CGUI_ICON_SERVER_PASSWORD       "cgui\\images\\locked.png"
+#define CGUI_ICON_MESSAGEBOX_INFO "cgui\\images\\info.png"
+#define CGUI_ICON_MESSAGEBOX_QUESTION "cgui\\images\\question.png"
+#define CGUI_ICON_MESSAGEBOX_WARNING "cgui\\images\\warning.png"
+#define CGUI_ICON_MESSAGEBOX_ERROR "cgui\\images\\error.png"
+#define CGUI_ICON_SERVER_PASSWORD "cgui\\images\\locked.png"
 #define CGUI_GetMaxTextExtent(...) GetMaxTextExtent(__VA_ARGS__, SString())
 
-#define CHECK_CHANNEL(channel) assert ( (channel) >= 0 && (channel) < INPUT_CHANNEL_COUNT )
+#define CHECK_CHANNEL(channel) assert((channel) >= 0 && (channel) < INPUT_CHANNEL_COUNT)
 
 class CGUI
 {
@@ -164,9 +164,11 @@ public:
     virtual void ClearInputHandlers(eInputChannel channel) = 0;
     virtual void ClearSystemKeys() = 0;
 
-    virtual bool IsTransferBoxVisible() = 0;
+    virtual bool IsTransferBoxVisible() const = 0;
     virtual void SetTransferBoxVisible(bool bVisible) = 0;
-    virtual bool IsTransferBoxEnabled() = 0;
+
+    virtual bool IsTransferBoxEnabled() const = 0;
+    virtual void SetTransferBoxEnabled(bool bEnabled) = 0;
 
     virtual void CleanDeadPool() = 0;
 

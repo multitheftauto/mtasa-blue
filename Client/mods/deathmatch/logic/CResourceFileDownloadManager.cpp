@@ -136,15 +136,26 @@ void CResourceFileDownloadManager::DoPulse()
         return;
     }
 
+    bool bAllowTransferBoxControl = g_pCore->GetCVars()->GetValue("allow_server_control_transferbox", false);
+    if (!bAllowTransferBoxControl && !GetTransferBox()->IsEnabled())
+        GetTransferBox()->SetEnabled(true);
+
+    if (GetTransferBox()->IsEnabled() && !GetTransferBox()->IsVisible())
+        GetTransferBox()->Show();
+
     // Update progress box
     GetTransferBox()->SetInfo(uiDownloadSizeTotal);
     GetTransferBox()->DoPulse();
 
-    CLuaArguments Arguments;
-    Arguments.PushNumber(uiDownloadSizeTotal);
-    Arguments.PushNumber(GetTransferBox()->GetTotalSize());
-    g_pClientGame->GetLocalPlayer()->CallEvent("onTransferBoxProgressChange", Arguments, false);
-
+    // Call onClientTransferBoxProgressChange if client allows control over it
+    if (bAllowTransferBoxControl)
+    {
+        CLuaArguments Arguments;
+        Arguments.PushNumber(uiDownloadSizeTotal);
+        Arguments.PushNumber(GetTransferBox()->GetTotalSize());
+        g_pClientGame->GetLocalPlayer()->CallEvent("onClientTransferBoxProgressChange", Arguments, false);
+    }
+    
     // Check if completed downloading current group
     if (m_ActiveFileDownloadList.empty())
     {
@@ -233,7 +244,7 @@ bool CResourceFileDownloadManager::BeginResourceFileDownload(CDownloadableResour
     options.bIsLocal = g_pClientGame->IsLocalGame();
     SString* pstrContext = MakeDownloadContextString(pResourceFile);
     SString  strFilename = pResourceFile->GetName();
-    bool bUniqueDownload = pHTTP->QueueFile(strHTTPDownloadURLFull, strFilename, pstrContext, StaticDownloadFinished, options);
+    bool     bUniqueDownload = pHTTP->QueueFile(strHTTPDownloadURLFull, strFilename, pstrContext, StaticDownloadFinished, options);
     if (!bUniqueDownload)
     {
         // TODO - If piggybacking on another matching download, then adjust progress bar

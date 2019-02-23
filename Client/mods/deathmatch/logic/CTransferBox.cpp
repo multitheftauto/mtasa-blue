@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CTransferBox.cpp
  *  PURPOSE:     Transfer box GUI
@@ -11,11 +11,11 @@
 
 #include <StdInc.h>
 
-#define TRANSFERBOX_HEIGHT      58
-#define TRANSFERBOX_ICONSIZE    20
-#define TRANSFERBOX_PROGRESSHEIGHT  28
-#define TRANSFERBOX_YSTART      20
-#define TRANSFERBOX_SPACER      11
+#define TRANSFERBOX_HEIGHT 58
+#define TRANSFERBOX_ICONSIZE 20
+#define TRANSFERBOX_PROGRESSHEIGHT 28
+#define TRANSFERBOX_YSTART 20
+#define TRANSFERBOX_SPACER 11
 
 CTransferBox::CTransferBox()
 {
@@ -83,26 +83,25 @@ CTransferBox::CTransferBox()
 CTransferBox::~CTransferBox()
 {
     for (unsigned int i = 0; i < TRANSFERBOX_FRAMES; i++)
-    {
         delete m_pIcon[i];
-    }
 
-    if (m_pWindow != NULL)
+    if (m_pWindow != nullptr)
         delete m_pWindow;
-    if (m_pInfo != NULL)
+
+    if (m_pInfo != nullptr)
         delete m_pInfo;
-    if (m_pProgress != NULL)
+
+    if (m_pProgress != nullptr)
         delete m_pProgress;
 }
 
 void CTransferBox::Show()
 {
-    m_dTotalSize = 0;
-    if (IsEnabled())
-    {
-        m_pWindow->SetVisible(true);
-        g_pCore->GetGUI()->SetTransferBoxVisible(true);
-    };
+    if (!IsEnabled())
+        return;
+
+    m_pWindow->SetVisible(true);
+    g_pCore->GetGUI()->SetTransferBoxVisible(true);
 }
 
 void CTransferBox::Hide()
@@ -111,6 +110,16 @@ void CTransferBox::Hide()
     g_pCore->GetGUI()->SetTransferBoxVisible(false);
 
     m_dTotalSize = 0;
+}
+
+bool CTransferBox::IsEnabled() const
+{
+    return g_pCore->GetGUI()->IsTransferBoxEnabled();
+}
+
+void CTransferBox::SetEnabled(bool bEnabled) const
+{
+    g_pCore->GetGUI()->SetTransferBoxEnabled(bEnabled);
 }
 
 void CTransferBox::SetInfo(double dDownloadSizeNow, CTransferBox::Type eTransferType)

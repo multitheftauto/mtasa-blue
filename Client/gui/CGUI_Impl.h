@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        gui/CGUI_Impl.h
  *  PURPOSE:     Graphical User Interface module class
@@ -255,10 +255,11 @@ public:
     void ClearInputHandlers(eInputChannel channel);
     void ClearSystemKeys();
 
-    bool IsTransferBoxVisible() { return m_bTransferBoxVisible; };
+    bool IsTransferBoxVisible() const { return m_bTransferBoxVisible; };
     void SetTransferBoxVisible(bool bVisible) { m_bTransferBoxVisible = bVisible; };
+
+    bool IsTransferBoxEnabled() const { return m_bTransferBoxEnabled; };
     void SetTransferBoxEnabled(bool bEnabled) { m_bTransferBoxEnabled = bEnabled; };
-    bool IsTransferBoxEnabled() { return m_bTransferBoxEnabled; };
 
     bool Event_CharacterKey(const CEGUI::EventArgs& e);
     bool Event_KeyDown(const CEGUI::EventArgs& e);

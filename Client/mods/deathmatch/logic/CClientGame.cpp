@@ -2901,6 +2901,8 @@ void CClientGame::AddBuiltInEvents()
     // Misc events
     m_Events.AddEvent("onClientFileDownloadComplete", "fileName, success", NULL, false);
 
+    m_Events.AddEvent("onClientTransferBoxProgressChange", "downloaded, total", NULL, false);
+
     m_Events.AddEvent("onClientWeaponFire", "ped, x, y, z", NULL, false);
 
     m_Events.AddEvent("onClientWorldSound", "group, index, x, y, z", nullptr, false);

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        core/CSettings.cpp
  *  PURPOSE:     In-game settings window
@@ -14,11 +14,11 @@
 
 using namespace std;
 
-#define CORE_MTA_FILLER                 "cgui\\images\\mta_filler.png"
-#define CORE_SETTINGS_UPDATE_INTERVAL   30         // Settings update interval in frames
-#define CORE_SETTINGS_HEADERS           3
-#define CORE_SETTINGS_HEADER_SPACER     " "
-#define CORE_SETTINGS_NO_KEY            " "
+#define CORE_MTA_FILLER "cgui\\images\\mta_filler.png"
+#define CORE_SETTINGS_UPDATE_INTERVAL 30            // Settings update interval in frames
+#define CORE_SETTINGS_HEADERS 3
+#define CORE_SETTINGS_HEADER_SPACER " "
+#define CORE_SETTINGS_NO_KEY " "
 
 extern CCore*              g_pCore;
 extern SBindableGTAControl g_bcControls[];
@@ -376,10 +376,11 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowScreenUpload->GetPosition(vecTemp, false);
     m_pCheckBoxAllowScreenUpload->AutoSize(NULL, 20.0f);
 
-    m_pCheckBoxAllowControlTransferBox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow server to control transfer box"), true));
-    m_pCheckBoxAllowControlTransferBox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
-    m_pCheckBoxAllowControlTransferBox->GetPosition(vecTemp, false);
-    m_pCheckBoxAllowControlTransferBox->AutoSize(NULL, 20.0f);
+    m_pCheckBoxAllowTransferBoxControl =
+        reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow server to control transfer box"), true));
+    m_pCheckBoxAllowTransferBoxControl->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAllowTransferBoxControl->GetPosition(vecTemp, false);
+    m_pCheckBoxAllowTransferBoxControl->AutoSize(NULL, 20.0f);
 
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
@@ -1096,7 +1097,7 @@ void CSettings::CreateGUI()
     // Hide if not Win8
     if (atoi(GetApplicationSetting("real-os-version")) != 8)
     {
-#ifndef MTA_DEBUG   // Don't hide when debugging
+#ifndef MTA_DEBUG            // Don't hide when debugging
         m_pWin8Label->SetVisible(false);
         m_pWin8ColorCheckBox->SetVisible(false);
         m_pWin8MouseCheckBox->SetVisible(false);
@@ -1208,6 +1209,7 @@ void CSettings::CreateGUI()
     m_pComboFxQuality->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnFxQualityChanged, this));
     m_pCheckBoxVolumetricShadows->SetClickHandler(GUI_CALLBACK(&CSettings::OnVolumetricShadowsClick, this));
     m_pCheckBoxAllowScreenUpload->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowScreenUploadClick, this));
+    m_pCheckBoxAllowTransferBoxControl->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowTransferBoxControl, this));
     m_pCheckBoxCustomizedSAFiles->SetClickHandler(GUI_CALLBACK(&CSettings::OnCustomizedSAFilesClick, this));
     m_pCheckBoxWindowed->SetClickHandler(GUI_CALLBACK(&CSettings::OnWindowedClick, this));
     m_pCheckBoxShowUnsafeResolutions->SetClickHandler(GUI_CALLBACK(&CSettings::ShowUnsafeResolutionsClick, this));
@@ -1498,7 +1500,7 @@ void CSettings::UpdateVideoTab()
     // Allow screen upload
     bool bAllowServerTransferBoxControl;
     CVARS_GET("allow_server_control_transferbox", bAllowServerTransferBoxControl);
-    m_pCheckBoxAllowControlTransferBox->SetSelected(bAllowServerTransferBoxControl);
+    m_pCheckBoxAllowTransferBoxControl->SetSelected(bAllowServerTransferBoxControl);
 
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
@@ -3308,8 +3310,8 @@ void CSettings::SaveData()
     CVARS_SET("allow_screen_upload", bAllowScreenUploadEnabled);
 
     // Allow screen upload
-    bool m_pCheckBoxAllowScreenUpload = m_pCheckBoxAllowControlTransferBox->GetSelected();
-    CVARS_SET("allow_server_control_transferbox", m_pCheckBoxAllowScreenUpload);
+    bool bAllowServerTransferBoxControl = m_pCheckBoxAllowTransferBoxControl->GetSelected();
+    CVARS_SET("allow_server_control_transferbox", bAllowServerTransferBoxControl);
 
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();
@@ -4309,6 +4311,21 @@ bool CSettings::OnAllowScreenUploadClick(CGUIElement* pElement)
 }
 
 //
+// AllowTransferBoxControl
+//
+bool CSettings::OnAllowTransferBoxControl(CGUIElement* pElement)
+{
+    bool bAllowTransferBoxControl = m_pCheckBoxAllowTransferBoxControl->GetSelected();
+    CVARS_SET("allow_server_control_transferbox", bAllowTransferBoxControl);
+
+    // Enable default transfer box now if script control is disabled
+    if (!bAllowTransferBoxControl)
+        g_pCore->GetGUI()->SetTransferBoxEnabled(true);
+
+    return true;
+}
+
+//
 // CustomizedSAFiles
 //
 void CustomizedSAFilesCallBack(void* ptr, unsigned int uiButton)
@@ -4547,9 +4564,4 @@ void CSettings::TabSkip(bool bBackwards)
 bool CSettings::IsActive()
 {
     return m_pWindow->IsActive();
-}
-
-bool CSettings::IsTransferBoxControlEnabled()
-{
-    return bAllowScreenUploadEnabled;
 }

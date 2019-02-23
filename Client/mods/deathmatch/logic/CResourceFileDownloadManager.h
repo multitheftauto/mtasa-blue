@@ -38,7 +38,7 @@ protected:
     void                   DownloadFinished(const SHttpDownloadResult& result);
     SString*               MakeDownloadContextString(CDownloadableResource* pDownloadableResource);
     CDownloadableResource* ResolveDownloadContextString(SString* pString);
-    double                 GetTotalSize() { return g_pClientGame->GetTransferBox()->GetTotalSize(); };
+    double                 GetTotalSize() const { return g_pClientGame->GetTransferBox()->GetTotalSize(); };
 
     std::vector<CDownloadableResource*> m_PendingFileDownloadList;
     std::vector<CDownloadableResource*> m_ActiveFileDownloadList;
