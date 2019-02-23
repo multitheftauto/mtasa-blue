@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-10 02:54+0100\n"
-"PO-Revision-Date: 2018-11-21 11:09+0000\n"
-"Last-Translator: Jacek <jhxp@poczta.onet.pl>\n"
+"PO-Revision-Date: 2018-11-22 02:13+0000\n"
+"Last-Translator: xKen <ocean.yh97@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Translators: bromboy2010; steroidz; 99 isme; Jacek Hałas vel Łagoda\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1542798560.0\n"
+"X-POOTLE-MTIME: 1542852787.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -798,7 +798,7 @@ msgstr "Phím ALT"
 #. *
 #: ..\Client\core\CSettings.cpp:351 ..\Client\core\CSettings.cpp:354
 msgid "Nick:"
-msgstr "Nick:"
+msgstr "Nickname:"
 
 #: ..\Client\core\CSettings.cpp:364
 msgid "Save server passwords"
@@ -886,7 +886,7 @@ msgstr "Ngẫu nhiên"
 
 #: ..\Client\core\CSettings.cpp:545 ..\Client\core\CSettings.cpp:2943
 msgid "Sequential"
-msgstr "Nối tiếp"
+msgstr "Liên tiếp"
 
 #: ..\Client\core\CSettings.cpp:548
 msgid "Automatic Media Scan"
@@ -971,7 +971,7 @@ msgstr "Cửa sổ không viền"
 
 #: ..\Client\core\CSettings.cpp:635 ..\Client\core\CSettings.cpp:1525
 msgid "Borderless keep res"
-msgstr "Giữ không viền"
+msgstr "Không viền"
 
 #: ..\Client\core\CSettings.cpp:639
 msgid "Mip Mapping"
@@ -1322,7 +1322,7 @@ msgstr "Màu nền khung chat"
 
 #: ..\Client\core\CSettings.cpp:1996
 msgid "Chat Text"
-msgstr "Màu chữ"
+msgstr "Màu chữ chat"
 
 #: ..\Client\core\CSettings.cpp:1996
 msgid "Input Background"

@@ -511,6 +511,8 @@ CClientGame::~CClientGame()
     // NULL the global CClientGame var
     g_pClientGame = NULL;
     m_bBeingDeleted = false;
+
+    CStaticFunctionDefinitions::ResetAllSurfaceInfo();
 }
 
 /*
@@ -2752,6 +2754,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientElementStreamIn", "", NULL, false);
     m_Events.AddEvent("onClientElementStreamOut", "", NULL, false);
     m_Events.AddEvent("onClientElementDestroy", "", NULL, false);
+    m_Events.AddEvent("onClientElementModelChange", "oldModel, newModel", nullptr, false);
 
     // Player events
     m_Events.AddEvent("onClientPlayerJoin", "", NULL, false);

@@ -186,6 +186,8 @@ DWORD RETURN_VehColCB = 0x04C83AA;
 #define HOOKPOS_VehCol                                      0x06D6603
 DWORD RETURN_VehCol = 0x06D660C;
 
+#define HOOKPOS_Transmission_CalculateDriveAcceleration 0x6D05E0
+DWORD RETURN_Transmission_CalculateDriveAcceleration = 0x6D05E6;
 // Handling fix - driveType is per model
 #define HOOKPOS_CHandlingData_isNotRWD              0x6A048C
 DWORD RETURN_CHandlingData_isNotRWD = 0x6A0493;
@@ -450,6 +452,7 @@ void HOOK_CrashFix_Misc24();
 void HOOK_CheckAnimMatrix();
 void HOOK_VehColCB();
 void HOOK_VehCol();
+void HOOK_Transmission_CalculateDriveAcceleration();
 void HOOK_isVehDriveTypeNotRWD();
 void HOOK_isVehDriveTypeNotFWD();
 void HOOK_PreFxRender();
@@ -657,6 +660,8 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_PreFxRender, (DWORD)HOOK_PreFxRender, 5);
     HookInstall(HOOKPOS_PreHUDRender, (DWORD)HOOK_PreHUDRender, 5);
     HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7);
+
+    HookInstall(HOOKPOS_Transmission_CalculateDriveAcceleration, (DWORD)HOOK_Transmission_CalculateDriveAcceleration, 5);
 
     HookInstall(HOOKPOS_CHandlingData_isNotRWD, (DWORD)HOOK_isVehDriveTypeNotRWD, 7);
     HookInstall(HOOKPOS_CHandlingData_isNotFWD, (DWORD)HOOK_isVehDriveTypeNotFWD, 7);
@@ -4067,6 +4072,40 @@ void                        GetVehicleDriveType()
 {
     // Get the car drive type from the Vehicle interface
     ucDriveType = static_cast<unsigned char>(pHandlingDriveTypeVeh->m_pVehicle->GetHandlingData()->GetCarDriveType());
+}
+
+static CTransmission* pCurTransmission = nullptr;
+static byte*          pCurGear = nullptr;
+
+void CheckVehicleMaxGear()
+{
+    if (*pCurGear > pCurTransmission->numOfGears)
+    {
+        *pCurGear = pCurTransmission->numOfGears;
+    }
+}
+
+void _declspec(naked) HOOK_Transmission_CalculateDriveAcceleration()
+{
+    _asm
+    {
+        push eax
+        mov pCurTransmission, ecx
+        mov eax, [esp+0xC]
+        mov pCurGear, eax
+        pop eax
+        pushad
+    }
+
+    CheckVehicleMaxGear();
+
+    _asm
+    {
+        popad
+        mov eax, [esp+0x10]
+        mov edx, [eax]
+        jmp RETURN_Transmission_CalculateDriveAcceleration
+    }
 }
 
 void _declspec(naked) HOOK_isVehDriveTypeNotRWD()

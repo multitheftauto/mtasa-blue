@@ -126,6 +126,8 @@ void CLuaGUIDefs::LoadFunctions()
 
         {"guiBringToFront", GUIBringToFront},
         {"guiMoveToBack", GUIMoveToBack},
+        {"guiBlur", GUIBlur},
+        {"guiFocus", GUIFocus},
 
         {"guiCheckBoxSetSelected", GUICheckBoxSetSelected},
         {"guiRadioButtonSetSelected", GUIRadioButtonSetSelected},
@@ -227,6 +229,8 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "bringToFront", "guiBringToFront");
     lua_classfunction(luaVM, "moveToBack", "guiMoveToBack");
+    lua_classfunction(luaVM, "blur", "guiBlur");
+    lua_classfunction(luaVM, "focus", "guiFocus");
 
     lua_classfunction(luaVM, "isChatBoxInputActive", "isChatBoxInputActive");
     lua_classfunction(luaVM, "isConsoleActive", "isConsoleActive");
@@ -1888,6 +1892,46 @@ int CLuaGUIDefs::GUISetEnabled(lua_State* luaVM)
     {
         CStaticFunctionDefinitions::GUISetEnabled(*guiElement, enabled);
         lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIBlur(lua_State* luaVM)
+{
+    //  bool guiBlur ( element guiElement )
+    CClientGUIElement* guiElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(guiElement);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::GUIBlur(*guiElement));
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIFocus(lua_State* luaVM)
+{
+    //  bool guiFocus ( element guiElement )
+    CClientGUIElement* guiElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(guiElement);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, CStaticFunctionDefinitions::GUIFocus(*guiElement));
         return 1;
     }
     else

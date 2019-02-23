@@ -510,8 +510,11 @@ UNITTEST CURLUcode Curl_parse_port(struct Curl_URL *u, char *hostname)
       portptr = &hostname[len];
     else if('%' == endbracket) {
       int zonelen = len;
-      if(1 == sscanf(hostname + zonelen, "25%*[^]]]%c%n", &endbracket, &len))
-        portptr = &hostname[--zonelen + len];
+      if(1 == sscanf(hostname + zonelen, "25%*[^]]%c%n", &endbracket, &len)) {
+        if(']' != endbracket)
+          return CURLUE_MALFORMED_INPUT;
+        portptr = &hostname[--zonelen + len + 1];
+      }
       else
         return CURLUE_MALFORMED_INPUT;
     }
@@ -534,6 +537,14 @@ UNITTEST CURLUcode Curl_parse_port(struct Curl_URL *u, char *hostname)
     long port;
     char portbuf[7];
 
+    /* Browser behavior adaptation. If there's a colon with no digits after,
+       just cut off the name there which makes us ignore the colon and just
+       use the default port. Firefox, Chrome and Safari all do that. */
+    if(!portptr[1]) {
+      *portptr = '\0';
+      return CURLUE_OK;
+    }
+
     if(!ISDIGIT(portptr[1]))
       return CURLUE_BAD_PORT_NUMBER;
 
@@ -547,22 +558,14 @@ UNITTEST CURLUcode Curl_parse_port(struct Curl_URL *u, char *hostname)
     if(rest[0])
       return CURLUE_BAD_PORT_NUMBER;
 
-    if(rest != &portptr[1]) {
-      *portptr++ = '\0'; /* cut off the name there */
-      *rest = 0;
-      /* generate a new to get rid of leading zeroes etc */
-      msnprintf(portbuf, sizeof(portbuf), "%ld", port);
-      u->portnum = port;
-      u->port = strdup(portbuf);
-      if(!u->port)
-        return CURLUE_OUT_OF_MEMORY;
-    }
-    else {
-      /* Browser behavior adaptation. If there's a colon with no digits after,
-         just cut off the name there which makes us ignore the colon and just
-         use the default port. Firefox and Chrome both do that. */
-      *portptr = '\0';
-    }
+    *portptr++ = '\0'; /* cut off the name there */
+    *rest = 0;
+    /* generate a new port number string to get rid of leading zeroes etc */
+    msnprintf(portbuf, sizeof(portbuf), "%ld", port);
+    u->portnum = port;
+    u->port = strdup(portbuf);
+    if(!u->port)
+      return CURLUE_OUT_OF_MEMORY;
   }
 
   return CURLUE_OK;
@@ -864,7 +867,7 @@ static CURLUcode seturl(const char *url, CURLU *u, unsigned int flags)
       return CURLUE_OUT_OF_MEMORY;
   }
 
-  if(query && query[0]) {
+  if(query) {
     u->query = strdup(query);
     if(!u->query)
       return CURLUE_OUT_OF_MEMORY;
@@ -1071,8 +1074,8 @@ CURLUcode curl_url_get(CURLU *u, CURLUPart what,
                     port ? port : "",
                     (u->path && (u->path[0] != '/')) ? "/": "",
                     u->path ? u->path : "/",
-                    u->query? "?": "",
-                    u->query? u->query : "",
+                    (u->query && u->query[0]) ? "?": "",
+                    (u->query && u->query[0]) ? u->query : "",
                     u->fragment? "#": "",
                     u->fragment? u->fragment : "");
     }

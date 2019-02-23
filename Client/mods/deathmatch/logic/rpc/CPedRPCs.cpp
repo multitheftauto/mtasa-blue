@@ -241,37 +241,34 @@ void CPedRPCs::SetPedDoingGangDriveby(CClientEntity* pSource, NetBitStreamInterf
 
 void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    char          szBlockName[64], szAnimName[64];
-    unsigned char ucBlockSize, ucAnimSize;
-    int           iTime;
-    int           iBlend = 250;
-    bool          bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame;
+    std::string blockName;
 
-    if (bitStream.Read(ucBlockSize))
+    if (bitStream.ReadString<unsigned char>(blockName))
     {
         // Grab the ped
         CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
         if (pPed)
         {
-            if (ucBlockSize > 0)
+            if (!blockName.empty())
             {
-                if (bitStream.Read(szBlockName, ucBlockSize) && bitStream.Read(ucAnimSize))
-                {
-                    szBlockName[ucBlockSize] = 0;
-                    if (bitStream.Read(szAnimName, ucAnimSize) && bitStream.Read(iTime) && bitStream.ReadBit(bLoop) && bitStream.ReadBit(bUpdatePosition) &&
-                        bitStream.ReadBit(bInterruptable) && bitStream.ReadBit(bFreezeLastFrame))
-                    {
-                        if (bitStream.Version() >= 0x065)
-                            bitStream.Read(iBlend);
+                std::string animName;
+                int iTime;
+                int iBlend = 250;
+                bool bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame;
 
-                        szAnimName[ucAnimSize] = 0;
+                if (bitStream.ReadString<unsigned char>(animName) &&
+                    bitStream.Read(iTime) &&
+                    bitStream.ReadBit(bLoop) &&
+                    bitStream.ReadBit(bUpdatePosition) &&
+                    bitStream.ReadBit(bInterruptable) &&
+                    bitStream.ReadBit(bFreezeLastFrame))
+                 {
+                    if (bitStream.Version() >= 0x065)
+                        bitStream.Read(iBlend);
 
-                        CAnimBlock* pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(szBlockName);
-                        if (pBlock)
-                        {
-                            pPed->RunNamedAnimation(pBlock, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
-                        }
-                    }
+                    CAnimBlock* pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(blockName.c_str());
+                    if (pBlock)
+                        pPed->RunNamedAnimation(pBlock, animName.c_str(), iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
                 }
             }
             else
@@ -285,28 +282,23 @@ void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bi
 void CPedRPCs::SetPedAnimationProgress(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the player and vehicle id
-    char          szAnimName[64];
-    unsigned char ucAnimSize;
-    float         fProgress;
+    std::string animName;
+    float fProgress;
 
-    if (bitStream.Read(ucAnimSize))
+    if (bitStream.ReadString<unsigned char>(animName))
     {
         // Grab the ped
         CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
         if (pPed)
         {
-            if (ucAnimSize > 0)
+            if (!animName.empty())
             {
-                if (bitStream.Read(szAnimName, ucAnimSize))
+                if (bitStream.Read(fProgress))
                 {
-                    szAnimName[ucAnimSize] = 0;
-                    if (bitStream.Read(fProgress))
+                    auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pPed->GetClump(), animName.c_str());
+                    if (pAnimAssociation)
                     {
-                        auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pPed->GetClump(), szAnimName);
-                        if (pAnimAssociation)
-                        {
-                            pAnimAssociation->SetCurrentProgress(fProgress);
-                        }
+                        pAnimAssociation->SetCurrentProgress(fProgress);
                     }
                 }
             }
@@ -320,28 +312,20 @@ void CPedRPCs::SetPedAnimationProgress(CClientEntity* pSource, NetBitStreamInter
 
 void CPedRPCs::SetPedAnimationSpeed(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    char          szAnimName[64];
-    unsigned char ucAnimSize;
-    float         fSpeed;
+    std::string animName;
+    float fSpeed;
 
-    if (bitStream.Read(ucAnimSize))
+    if (bitStream.ReadString(animName))
     {
         CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
-        if (pPed)
+        if (pPed && !animName.empty())
         {
-            if (ucAnimSize > 0)
+            if (bitStream.Read(fSpeed))
             {
-                if (bitStream.Read(szAnimName, ucAnimSize))
+                auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pPed->GetClump(), animName.c_str());
+                if (pAnimAssociation)
                 {
-                    szAnimName[ucAnimSize] = 0;
-                    if (bitStream.Read(fSpeed))
-                    {
-                        auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pPed->GetClump(), szAnimName);
-                        if (pAnimAssociation)
-                        {
-                            pAnimAssociation->SetCurrentSpeed(fSpeed);
-                        }
-                    }
+                    pAnimAssociation->SetCurrentSpeed(fSpeed);
                 }
             }
         }
