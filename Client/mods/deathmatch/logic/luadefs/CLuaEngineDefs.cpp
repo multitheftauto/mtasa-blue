@@ -1014,13 +1014,9 @@ int CLuaEngineDefs::EngineGetModelCollisionProperties(lua_State* luaVM)
                 lua_settable(luaVM, -3);
                 lua_pushstring(luaVM, "colVertices");
                 if (pCol)
-                {
                     lua_pushnumber(luaVM, pCol->GetVerticesCount());
-                }
                 else
-                {
                     lua_pushnumber(luaVM, pColData->getNumVertices());
-                }
                 lua_settable(luaVM, -3);
             }
 
@@ -1230,13 +1226,9 @@ int CLuaEngineDefs::EngineGetModelCollisionData(lua_State* luaVM)
                             usIndex--;
                             unsigned short usNumVertices;
                             if (pCol)
-                            {
                                 usNumVertices = pCol->GetVerticesCount();
-                            }
                             else
-                            {
                                 usNumVertices = pColData->getNumVertices();
-                            }
 
                             if (pColData->isValidIndex(COLLISION_VERTEX, usIndex, usNumVertices))
                             {
@@ -1261,13 +1253,9 @@ int CLuaEngineDefs::EngineGetModelCollisionData(lua_State* luaVM)
                         {
                             unsigned short usNumVertices;
                             if (pCol)
-                            {
                                 usNumVertices = pCol->GetVerticesCount();
-                            }
                             else
-                            {
                                 usNumVertices = pColData->getNumVertices();
-                            }
 
                             CVector          vec;
                             CompressedVector pVertex;
@@ -1575,9 +1563,7 @@ int CLuaEngineDefs::EngineSetModelCollisionData(lua_State* luaVM)
                                         {
                                             pSphere = &pColData->pColSpheres[it];
                                             if (!CClientColModel::CheckVector(vec1, pSphere->fRadius))
-                                            {
                                                 vecFailed.push_back(it);
-                                            }
                                         }
 
                                         if (vecFailed.size() == 0)
@@ -1765,17 +1751,14 @@ int CLuaEngineDefs::EngineSetModelCollisionData(lua_State* luaVM)
             lua_pushboolean(luaVM, false);
             lua_newtable(luaVM);
             for (unsigned int it : vecFailed)
-            {
                 lua_pushtablevalue(luaVM, i++, it + 1);
-            }
             return 2;
         }
         else
         {
             if (pColModelSAInterface != nullptr)
-            {
                 pCol->SetCollisionHasChanged(true);
-            }
+
             lua_pushboolean(luaVM, true);
             return 1;
         }
