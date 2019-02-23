@@ -1,9 +1,8 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/CClientColModel.h
+ *  FILE:        mods/deathmatch/logic/CClientColModel.h
  *  PURPOSE:     Model collision (.col file) entity class
  *
  *****************************************************************************/
@@ -12,6 +11,9 @@
 
 #include <list>
 #include "CClientEntity.h"
+
+#define MAX_COLLISION_SIZE 128             // collision bounding box in each axis
+#define MAX_COLLISION_SIZE2 256            // twice bigger than MAX_COLLISION_SIZE
 
 class CClientColModel : public CClientEntity
 {
@@ -34,12 +36,53 @@ public:
 
     bool        HasReplaced(unsigned short usModel);
     static bool IsCOLData(const SString& strData);
-    static bool CheckVector(CVector& vec, float fRadius = 0);
-    static bool CheckMoveVector(CVector& vec, float fRadius = 0);
-
-    static bool CompareVector(CVector& vecMin, CVector& vecMax);
-    static void AlignVector(CVector& destMin, CVector& destMax, CVector& src);
-    void        UpdateVerticesCount();
+    static bool CheckVector(CVector& vec, float fRadius = 0)
+    {
+        if (fRadius > 0)
+        {
+            return (MAX_COLLISION_SIZE >= vec.fX + fRadius && vec.fX + fRadius >= -MAX_COLLISION_SIZE && MAX_COLLISION_SIZE >= vec.fY + fRadius &&
+                    vec.fY + fRadius >= -MAX_COLLISION_SIZE && MAX_COLLISION_SIZE >= vec.fZ + fRadius && vec.fZ + fRadius >= -MAX_COLLISION_SIZE) &&
+                   (MAX_COLLISION_SIZE >= vec.fX - fRadius && vec.fX - fRadius >= -MAX_COLLISION_SIZE && MAX_COLLISION_SIZE >= vec.fY - fRadius &&
+                    vec.fY - fRadius >= -MAX_COLLISION_SIZE && MAX_COLLISION_SIZE >= vec.fZ - fRadius && vec.fZ - fRadius >= -MAX_COLLISION_SIZE);
+        }
+        else
+        {
+            return (MAX_COLLISION_SIZE >= vec.fX && vec.fX >= -MAX_COLLISION_SIZE && MAX_COLLISION_SIZE >= vec.fY && vec.fY >= -MAX_COLLISION_SIZE &&
+                    MAX_COLLISION_SIZE >= vec.fZ && vec.fZ >= -MAX_COLLISION_SIZE);
+        }
+    }
+    static bool CheckMoveVector(CVector& vec, float fRadius = 0)
+    {
+        if (fRadius > 0)
+        {
+            return ((MAX_COLLISION_SIZE2 >= vec.fX + fRadius >= -MAX_COLLISION_SIZE2 && MAX_COLLISION_SIZE2 >= vec.fY + fRadius >= -MAX_COLLISION_SIZE2 &&
+                     MAX_COLLISION_SIZE2 >= vec.fZ + fRadius >= -MAX_COLLISION_SIZE2) &&
+                    (MAX_COLLISION_SIZE2 >= vec.fX - fRadius >= -MAX_COLLISION_SIZE2 && MAX_COLLISION_SIZE2 >= vec.fY - fRadius >= -MAX_COLLISION_SIZE2 &&
+                     MAX_COLLISION_SIZE2 >= vec.fZ - fRadius >= -MAX_COLLISION_SIZE2));
+        }
+        else
+        {
+            return (MAX_COLLISION_SIZE2 >= vec.fX && vec.fX >= -MAX_COLLISION_SIZE2 && MAX_COLLISION_SIZE2 >= vec.fY && vec.fY >= -MAX_COLLISION_SIZE2 &&
+                    MAX_COLLISION_SIZE2 >= vec.fZ && vec.fZ >= -MAX_COLLISION_SIZE2);
+        }
+    }
+    static bool CompareVector(CVector& vecMin, CVector& vecMax) { return vecMax.fX >= vecMin.fX && vecMax.fY >= vecMin.fY && vecMax.fZ >= vecMin.fZ; }
+    static void AlignVector(CVector& destMin, CVector& destMax, CVector& src)
+    {
+        if (src.fX < destMax.fX)
+            destMax.fX = src.fX;
+        if (src.fY < destMax.fY)
+            destMax.fY = src.fY;
+        if (src.fZ < destMax.fZ)
+            destMax.fZ = src.fZ;
+        if (src.fX > destMin.fX)
+            destMin.fX = src.fX;
+        if (src.fY > destMin.fY)
+            destMin.fY = src.fY;
+        if (src.fZ > destMin.fZ)
+            destMin.fZ = src.fZ;
+    }
+    void UpdateVerticesCount();
 
     CColModelSAInterface* GetColModelInterface();
 
