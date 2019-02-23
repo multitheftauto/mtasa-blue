@@ -16,10 +16,8 @@ extern CGameSA* pGame;
 CObjectGroupPhysicalPropertiesSAInterface* pObjectInfo = (CObjectGroupPhysicalPropertiesSAInterface*)ARRAY_ObjectGroupsDynamicInfo;
 std::unordered_map<unsigned char, CObjectGroupPhysicalPropertiesSAInterface*> CObjectGroupPhysicalPropertiesSA::ms_OriginalGroupProperties;
 
-CObjectGroupPhysicalPropertiesSA::CObjectGroupPhysicalPropertiesSA()
-{
-    m_pInterface = nullptr;
-}
+CObjectGroupPhysicalPropertiesSA::CObjectGroupPhysicalPropertiesSA() : m_pInterface(nullptr)
+{}
 
 CObjectGroupPhysicalPropertiesSA::CObjectGroupPhysicalPropertiesSA(unsigned char ucObjectGroup) : m_ucObjectGroup(ucObjectGroup)
 {
@@ -27,7 +25,7 @@ CObjectGroupPhysicalPropertiesSA::CObjectGroupPhysicalPropertiesSA(unsigned char
     m_bModified = MapFind(ms_OriginalGroupProperties, ucObjectGroup);    
 }
 
-CObjectGroupPhysicalPropertiesSAInterface* CObjectGroupPhysicalPropertiesSA::GetInterface()
+CObjectGroupPhysicalPropertiesSAInterface* CObjectGroupPhysicalPropertiesSA::GetInterface() const
 {
     return m_pInterface;
 }
@@ -39,14 +37,14 @@ void CObjectGroupPhysicalPropertiesSA::SetGroup(unsigned char ucObjectGroup)
     m_bModified = MapFind(ms_OriginalGroupProperties, ucObjectGroup);
 }
 
-unsigned char CObjectGroupPhysicalPropertiesSA::GetGroup()
+unsigned char CObjectGroupPhysicalPropertiesSA::GetGroup() const
 {
     return m_ucObjectGroup;
 }
 
-bool CObjectGroupPhysicalPropertiesSA::IsValid()
+bool CObjectGroupPhysicalPropertiesSA::IsValid() const
 {
-    return m_pInterface;
+    return m_pInterface != nullptr;
 }
 
 void CObjectGroupPhysicalPropertiesSA::ChangeSafeguard()
@@ -102,7 +100,7 @@ void CObjectGroupPhysicalPropertiesSA::SetMass(float fMass)
     m_pInterface->fMass = fMass;
 }
 
-float CObjectGroupPhysicalPropertiesSA::GetMass()
+float CObjectGroupPhysicalPropertiesSA::GetMass() const
 {
     return m_pInterface->fMass;
 }
@@ -116,7 +114,7 @@ void CObjectGroupPhysicalPropertiesSA::SetTurnMass(float fTurnMass)
     m_pInterface->fTurnMass = fTurnMass;
 }
 
-float CObjectGroupPhysicalPropertiesSA::GetTurnMass()
+float CObjectGroupPhysicalPropertiesSA::GetTurnMass() const
 {
     return m_pInterface->fTurnMass;
 }
@@ -130,9 +128,8 @@ void CObjectGroupPhysicalPropertiesSA::SetAirResistance(float fAirResistance)
     m_pInterface->fAirResistance = fAirResistance;
 }
 
-float CObjectGroupPhysicalPropertiesSA::GetAirResistance()
+float CObjectGroupPhysicalPropertiesSA::GetAirResistance() const
 {
-    ChangeSafeguard();
     return m_pInterface->fAirResistance;
 }
 
@@ -145,7 +142,7 @@ void CObjectGroupPhysicalPropertiesSA::SetElasticity(float fElasticity)
     m_pInterface->fElasticity = fElasticity;
 }
 
-float CObjectGroupPhysicalPropertiesSA::GetElasticity()
+float CObjectGroupPhysicalPropertiesSA::GetElasticity() const
 {
     return m_pInterface->fElasticity;
 }
@@ -159,7 +156,7 @@ void CObjectGroupPhysicalPropertiesSA::SetBuoyancy(float fBuoyancy)
     m_pInterface->fBuoyancy = fBuoyancy;
 }
 
-float CObjectGroupPhysicalPropertiesSA::GetBuoyancy()
+float CObjectGroupPhysicalPropertiesSA::GetBuoyancy() const
 {
     return m_pInterface->fBuoyancy;
 }
@@ -173,7 +170,7 @@ void CObjectGroupPhysicalPropertiesSA::SetUprootLimit(float fUprootLimit)
     m_pInterface->fUprootLimit = fUprootLimit;
 }
 
-float CObjectGroupPhysicalPropertiesSA::GetUprootLimit()
+float CObjectGroupPhysicalPropertiesSA::GetUprootLimit() const
 {
     return m_pInterface->fUprootLimit;
 }
@@ -187,7 +184,7 @@ void CObjectGroupPhysicalPropertiesSA::SetCollisionDamageMultiplier(float fColMu
     m_pInterface->fColDamageMultiplier = fColMult;
 }
 
-float CObjectGroupPhysicalPropertiesSA::GetCollisionDamageMultiplier()
+float CObjectGroupPhysicalPropertiesSA::GetCollisionDamageMultiplier() const
 {
     return m_pInterface->fColDamageMultiplier;
 }
@@ -201,7 +198,7 @@ void CObjectGroupPhysicalPropertiesSA::SetCollisionDamageEffect(eObjectGroup::Da
     m_pInterface->eColDamageEffect = eDamageEffect;
 }
 
-eObjectGroup::DamageEffect CObjectGroupPhysicalPropertiesSA::GetCollisionDamageEffect()
+eObjectGroup::DamageEffect CObjectGroupPhysicalPropertiesSA::GetCollisionDamageEffect() const
 {
     return static_cast<eObjectGroup::DamageEffect>(m_pInterface->eColDamageEffect);
 }
@@ -215,7 +212,7 @@ void CObjectGroupPhysicalPropertiesSA::SetCollisionSpecialResponseCase(eObjectGr
     m_pInterface->eSpecialColResponse = eResponseCase;
 }
 
-eObjectGroup::CollisionResponse CObjectGroupPhysicalPropertiesSA::GetCollisionSpecialResponseCase()
+eObjectGroup::CollisionResponse CObjectGroupPhysicalPropertiesSA::GetCollisionSpecialResponseCase() const
 {
     return static_cast<eObjectGroup::CollisionResponse>(m_pInterface->eSpecialColResponse);
 }
@@ -229,7 +226,7 @@ void CObjectGroupPhysicalPropertiesSA::SetCameraAvoidObject(bool bAvoid)
     m_pInterface->bCameraAvoidObject = bAvoid;
 }
 
-bool CObjectGroupPhysicalPropertiesSA::GetCameraAvoidObject()
+bool CObjectGroupPhysicalPropertiesSA::GetCameraAvoidObject() const
 {
     return m_pInterface->bCameraAvoidObject;
 }
@@ -243,7 +240,7 @@ void CObjectGroupPhysicalPropertiesSA::SetCausesExplosion(bool bExplodes)
     m_pInterface->bCausesExplosion = bExplodes;
 }
 
-bool CObjectGroupPhysicalPropertiesSA::GetCausesExplosion()
+bool CObjectGroupPhysicalPropertiesSA::GetCausesExplosion() const
 {
     return m_pInterface->bCausesExplosion;
 }
@@ -257,7 +254,7 @@ void CObjectGroupPhysicalPropertiesSA::SetFxType(eObjectGroup::FxType eFxType)
     m_pInterface->eFxType = eFxType;
 }
 
-eObjectGroup::FxType CObjectGroupPhysicalPropertiesSA::GetFxType()
+eObjectGroup::FxType CObjectGroupPhysicalPropertiesSA::GetFxType() const
 {
     return static_cast<eObjectGroup::FxType>(m_pInterface->eFxType);
 }
@@ -271,7 +268,7 @@ void CObjectGroupPhysicalPropertiesSA::SetFxOffset(CVector vecOffset)
     m_pInterface->vecFxOffset = vecOffset;
 }
 
-CVector CObjectGroupPhysicalPropertiesSA::GetFxOffset()
+CVector CObjectGroupPhysicalPropertiesSA::GetFxOffset() const
 {
     return m_pInterface->vecFxOffset;
 }
@@ -310,7 +307,7 @@ void CObjectGroupPhysicalPropertiesSA::SetSmashMultiplier(float fMult)
     m_pInterface->fSmashMultiplier = fMult;
 }
 
-float CObjectGroupPhysicalPropertiesSA::GetSmashMultiplier()
+float CObjectGroupPhysicalPropertiesSA::GetSmashMultiplier() const
 {
     return m_pInterface->fSmashMultiplier;
 }
@@ -324,7 +321,7 @@ void CObjectGroupPhysicalPropertiesSA::SetBreakVelocity(CVector vecVelocity)
     m_pInterface->vecBreakVelocity = vecVelocity;
 }
 
-CVector CObjectGroupPhysicalPropertiesSA::GetBreakVelocity()
+CVector CObjectGroupPhysicalPropertiesSA::GetBreakVelocity() const
 {
     return m_pInterface->vecBreakVelocity;
 }
@@ -338,7 +335,7 @@ void CObjectGroupPhysicalPropertiesSA::SetBreakVelocityRandomness(float fRand)
     m_pInterface->fBreakVelocityRand = fRand;
 }
 
-float CObjectGroupPhysicalPropertiesSA::GetBreakVelocityRandomness()
+float CObjectGroupPhysicalPropertiesSA::GetBreakVelocityRandomness() const
 {
     return m_pInterface->fBreakVelocityRand;
 }
@@ -352,7 +349,7 @@ void CObjectGroupPhysicalPropertiesSA::SetBreakMode(eObjectGroup::BreakMode eBre
     m_pInterface->eBreakMode = eBreakMode;
 }
 
-eObjectGroup::BreakMode CObjectGroupPhysicalPropertiesSA::GetBreakMode()
+eObjectGroup::BreakMode CObjectGroupPhysicalPropertiesSA::GetBreakMode() const
 {
     return static_cast<eObjectGroup::BreakMode>(m_pInterface->eBreakMode);
 }
@@ -366,7 +363,7 @@ void CObjectGroupPhysicalPropertiesSA::SetSparksOnImpact(bool bSparks)
     m_pInterface->dwSparksOnImpact = static_cast<bool>(bSparks);
 }
 
-bool CObjectGroupPhysicalPropertiesSA::GetSparksOnImpact()
+bool CObjectGroupPhysicalPropertiesSA::GetSparksOnImpact() const
 {
     return static_cast<bool>(m_pInterface->dwSparksOnImpact);
 }
