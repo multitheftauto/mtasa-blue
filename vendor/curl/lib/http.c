@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -616,6 +616,7 @@ output_auth_headers(struct connectdata *conn,
     result = Curl_output_negotiate(conn, proxy);
     if(result)
       return result;
+    authstatus->done = TRUE;
     negdata->state = GSS_AUTHSENT;
   }
   else
@@ -1681,6 +1682,52 @@ enum proxy_use {
   HEADER_CONNECT  /* sending CONNECT to a proxy */
 };
 
+/* used to compile the provided trailers into one buffer
+   will return an error code if one of the headers is
+   not formatted correctly */
+CURLcode Curl_http_compile_trailers(struct curl_slist *trailers,
+                                    Curl_send_buffer *buffer,
+                                    struct Curl_easy *handle)
+{
+  char *ptr = NULL;
+  CURLcode result = CURLE_OK;
+  const char *endofline_native = NULL;
+  const char *endofline_network = NULL;
+
+  /* TODO: Maybe split Curl_add_custom_headers to make it reusable here */
+
+  if(
+#ifdef CURL_DO_LINEEND_CONV
+     (handle->set.prefer_ascii) ||
+#endif
+     (handle->set.crlf)) {
+    /* \n will become \r\n later on */
+    endofline_native  = "\n";
+    endofline_network = "\x0a";
+  }
+  else {
+    endofline_native  = "\r\n";
+    endofline_network = "\x0d\x0a";
+  }
+
+  while(trailers) {
+    /* only add correctly formatted trailers */
+    ptr = strchr(trailers->data, ':');
+    if(ptr && *(ptr + 1) == ' ') {
+      result = Curl_add_bufferf(&buffer, "%s%s", trailers->data,
+                                endofline_native);
+      if(result)
+        return result;
+    }
+    else
+      infof(handle, "Malformatted trailing header ! Skipping trailer.");
+    trailers = trailers->next;
+  }
+  result = Curl_add_buffer(&buffer, endofline_network,
+                           strlen(endofline_network));
+  return result;
+}
+
 CURLcode Curl_add_custom_headers(struct connectdata *conn,
                                  bool is_connect,
                                  Curl_send_buffer *req_buffer)
@@ -1788,7 +1835,8 @@ CURLcode Curl_add_custom_headers(struct connectdata *conn,
                   checkprefix("Transfer-Encoding:", headers->data))
             /* HTTP/2 doesn't support chunked requests */
             ;
-          else if(checkprefix("Authorization:", headers->data) &&
+          else if((checkprefix("Authorization:", headers->data) ||
+                   checkprefix("Cookie:", headers->data)) &&
                   /* be careful of sending this potentially sensitive header to
                      other hosts */
                   (data->state.this_is_a_follow &&
@@ -3175,6 +3223,10 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
           k->header = FALSE;
           k->badheader = HEADER_ALLBAD;
           streamclose(conn, "bad HTTP: No end-of-message indicator");
+          if(!data->set.http09_allowed) {
+            failf(data, "Received HTTP/0.9 when not allowed\n");
+            return CURLE_UNSUPPORTED_PROTOCOL;
+          }
           break;
         }
       }
@@ -3208,6 +3260,10 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
       if(st == STATUS_BAD) {
         streamclose(conn, "bad HTTP: No end-of-message indicator");
         /* this is not the beginning of a protocol first header line */
+        if(!data->set.http09_allowed) {
+          failf(data, "Received HTTP/0.9 when not allowed\n");
+          return CURLE_UNSUPPORTED_PROTOCOL;
+        }
         k->header = FALSE;
         if(*nread)
           /* since there's more, this is a partial bad header */
@@ -3873,7 +3929,9 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
                          here, or else use real peer host name. */
                       conn->allocptr.cookiehost?
                       conn->allocptr.cookiehost:conn->host.name,
-                      data->state.up.path);
+                      data->state.up.path,
+                      (conn->handler->protocol&CURLPROTO_HTTPS)?
+                      TRUE:FALSE);
       Curl_share_unlock(data, CURL_LOCK_DATA_COOKIE);
     }
 #endif
