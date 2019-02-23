@@ -237,6 +237,13 @@ namespace SharedUtil
         return a < min ? min : a > max ? max : a;
     }
 
+    // Checks whether a value is between two other values ( min <= a <= max )
+    template <class T>
+    bool Between(const T& min, const T& a, const T& max)
+    {
+        return a >= min && a <= max;
+    }
+
     // Lerps between two values depending on the weight
     template <class T>
     T Lerp(const T& from, float fAlpha, const T& to)

@@ -103,6 +103,88 @@ public:
         return vecResult;
     }
 
+    // Intersections code based on https://github.com/juj/MathGeoLib/blob/master/src/Geometry/Plane.h
+    bool IntesectsLinePlane(const CVector& vecRay, const CVector& vecNormal, const CVector& vecPosition, float* fOutDist) const
+    {
+        bool bIntersects = false;
+
+        float fDenom = vecNormal.DotProduct(&vecRay);
+        if (fabs(fDenom) > 1e-4f)
+        {
+            *fOutDist = (vecPosition.Length() - vecNormal.DotProduct(this)) / fDenom;
+            return true;
+        }
+
+        if (fDenom != 0.0f)
+        {
+            *fOutDist = (vecPosition.Length() - vecNormal.DotProduct(this)) / fDenom;
+            return fabs(*fOutDist) < 1e-4f;
+        }
+
+        *fOutDist = 0.0f;
+        return fabs(vecNormal.DotProduct(this) - vecPosition.Length()) < 1e-3f;;
+    }
+
+    bool IntersectsSegmentPlane(const CVector& vecSegment, const CVector& vecNormal, const CVector& vecPosition, CVector* outVec) const
+    {
+        float fDist;
+        CVector vecRay = vecSegment;
+        vecRay.Normalize();
+        bool bIntersects = IntesectsLinePlane(vecRay, vecNormal, vecPosition, &fDist);
+        const float fSegLength = vecSegment.Length();
+        
+        *outVec = *this + vecRay * fDist;
+        return bIntersects && fDist >= 0 && (fDist <= fSegLength);
+    }
+
+    // https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
+    bool IntersectsSegmentTriangle(const CVector& vecSegment, const CVector& vecVert1, const CVector& vecVert2, const CVector& vecVert3, CVector* outVec) const
+    {
+        const float fEpsilon = 1e-6f;
+
+        CVector vecEdge1, vecEdge2, h, s;
+        float a, f, u, v;
+
+        CVector vecRay = vecSegment;
+        vecRay.Normalize();
+        h = vecRay;
+
+        vecEdge1 = vecVert2 - vecVert1;
+        vecEdge2 = vecVert3 - vecVert1;
+
+        h.CrossProduct(&vecEdge2);
+        a = vecEdge1.DotProduct(&h);
+
+        if (a > -fEpsilon && a < fEpsilon)
+        {
+            return false;
+        }
+
+        f = 1.0f / a;
+        s = *this - vecVert1;
+        u = f * s.DotProduct(&h);
+        if (u < 0.0f || u > 1.0f)
+        {
+            return false;
+        }
+
+        CVector sCrossE1 = s;
+        sCrossE1.CrossProduct(&vecEdge1);
+        v = f * vecRay.DotProduct(&sCrossE1);
+        if (v < 0.0f || u + v > 1.0f)
+        {
+            return false;
+        }
+
+        float t = f * vecEdge2.DotProduct(&sCrossE1);
+        if (t > fEpsilon && t <= vecSegment.Length())
+        {
+            *outVec = *this + vecRay * t;
+            return true;
+        }
+        return false;
+    }
+
     CVector operator+(const CVector& vecRight) const { return CVector(fX + vecRight.fX, fY + vecRight.fY, fZ + vecRight.fZ); }
 
     CVector operator-(const CVector& vecRight) const { return CVector(fX - vecRight.fX, fY - vecRight.fY, fZ - vecRight.fZ); }

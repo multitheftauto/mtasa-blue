@@ -1595,6 +1595,31 @@ namespace SharedUtil
             outList.push_back(iter->first);
     }
 
+#ifdef WIN32
+    ///////////////////////////////////////////////////////////////////////////
+    //
+    // GetCurrentProcessorNumberXP for the current thread, especially for Windows XP
+    //
+    // Only a guide as it could change after the call has returned
+    //
+    ///////////////////////////////////////////////////////////////////////////
+    DWORD _GetCurrentProcessorNumberXP()
+    {
+    #ifdef WIN_x64
+        return 0;
+    #else
+        _asm
+        {
+            mov eax, 1
+            cpuid
+            shr ebx, 24
+            mov eax, ebx
+        }
+    #endif
+    }
+
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     //
     // GetCurrentProcessorNumber for the current thread.
@@ -1604,8 +1629,8 @@ namespace SharedUtil
     ///////////////////////////////////////////////////////////////////////////
     DWORD _GetCurrentProcessorNumber()
     {
-        DWORD dwProcessorNumber = -1;
 #ifdef WIN32
+        DWORD dwProcessorNumber = -1;
         typedef DWORD(WINAPI * FUNC_GetCurrentProcessorNumber)();
 
         // Dynamically load GetCurrentProcessorNumber, as it does not exist on XP
@@ -1619,33 +1644,13 @@ namespace SharedUtil
         }
 
         if (pfn)
-            dwProcessorNumber = pfn();
-#endif
-        if (dwProcessorNumber == (DWORD)-1)
-        {
-            auto GetCurrentProcessorNumberXP = []() -> int {
-#ifdef WIN32
-    #ifdef WIN_x64
-                return 0;
-    #else
-                // This should work on XP
-                    _asm
-                    {
-                        mov eax, 1
-                        cpuid
-                        shr ebx, 24
-                        mov eax, ebx
-                    }
-    #endif
-#else
-                // This should work on Linux
-                return sched_getcpu();
-#endif
-            };
+            return pfn();
 
-            dwProcessorNumber = GetCurrentProcessorNumberXP();
-        }
-        return dwProcessorNumber;
+        return _GetCurrentProcessorNumberXP();
+#else
+        // This should work on Linux
+        return sched_getcpu();
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
