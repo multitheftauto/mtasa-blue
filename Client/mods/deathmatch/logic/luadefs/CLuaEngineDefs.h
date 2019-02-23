@@ -44,6 +44,9 @@ public:
     LUA_DECLARE(EngineGetModelIDFromName);
     LUA_DECLARE(EngineGetModelTextureNames);
     LUA_DECLARE(EngineGetVisibleTextureNames);
+    LUA_DECLARE(EngineSetSurfaceProperties);
+    LUA_DECLARE(EngineGetSurfaceProperties);
+    LUA_DECLARE(EngineResetSurfaceProperties);
     LUA_DECLARE(EngineGetModelPhysicalPropertiesGroup)
     LUA_DECLARE(EngineSetModelPhysicalPropertiesGroup)
     LUA_DECLARE(EngineRestoreModelPhysicalPropertiesGroup)

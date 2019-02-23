@@ -42,7 +42,7 @@ CElement* CBlip::Clone(bool* bAddEntity, CResource* pResource)
         pTemp->m_sOrdering = m_sOrdering;
         pTemp->m_usVisibleDistance = m_usVisibleDistance;
         pTemp->SetColor(GetColor());
-        if (pResource->HasStarted())
+        if (pResource->IsClientSynced())
             pTemp->Sync(true);
         *bAddEntity = false;
     }
