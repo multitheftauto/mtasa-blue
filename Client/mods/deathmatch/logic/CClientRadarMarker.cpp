@@ -36,7 +36,7 @@ CClientRadarMarker::CClientRadarMarker(CClientManager* pManager, ElementID ID, s
     Create();
 }
 
-CClientRadarMarker::~CClientRadarMarker(void)
+CClientRadarMarker::~CClientRadarMarker()
 {
     // Try to destroy it
     Destroy();
@@ -45,12 +45,12 @@ CClientRadarMarker::~CClientRadarMarker(void)
     Unlink();
 }
 
-void CClientRadarMarker::Unlink(void)
+void CClientRadarMarker::Unlink()
 {
     m_pRadarMarkerManager->RemoveFromList(this);
 }
 
-void CClientRadarMarker::DoPulse(void)
+void CClientRadarMarker::DoPulse()
 {
     // Are we attached to something?
     if (m_pAttachedToEntity)
@@ -177,14 +177,14 @@ void CClientRadarMarker::SetVisible(bool bVisible)
     m_bIsVisible = bVisible;
 }
 
-bool CClientRadarMarker::Create(void)
+bool CClientRadarMarker::Create()
 {
     m_pManager->GetRadarMarkerManager()->m_bOrderOnPulse = true;
 
     return true;
 }
 
-void CClientRadarMarker::InternalCreate(void)
+void CClientRadarMarker::InternalCreate()
 {
     // Not already got a marker?
     if (!m_pMarker)
@@ -196,12 +196,12 @@ void CClientRadarMarker::InternalCreate(void)
     }
 }
 
-void CClientRadarMarker::Destroy(void)
+void CClientRadarMarker::Destroy()
 {
     DestroyMarker();
 }
 
-void CClientRadarMarker::CreateMarker(void)
+void CClientRadarMarker::CreateMarker()
 {
     // Not already got a marker?
     if (!m_pMarker)
@@ -231,7 +231,7 @@ void CClientRadarMarker::CreateMarker(void)
     }
 }
 
-void CClientRadarMarker::DestroyMarker(void)
+void CClientRadarMarker::DestroyMarker()
 {
     if (m_pMarker)
     {
@@ -271,7 +271,7 @@ void CClientRadarMarker::SetOrdering(short sOrdering)
     }
 }
 
-bool CClientRadarMarker::IsInVisibleDistance(void)
+bool CClientRadarMarker::IsInVisibleDistance()
 {
     float fDistance = DistanceBetweenPoints3D(m_vecPosition, m_pRadarMarkerManager->m_vecCameraPosition);
     return (fDistance <= m_usVisibleDistance);

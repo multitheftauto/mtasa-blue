@@ -13,7 +13,7 @@
 #define MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE  "1.3.0-9.04482"
 #define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE    "1.3.0-9.04482"
 
-void CLuaPedDefs::LoadFunctions(void)
+void CLuaPedDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"createPed", CreatePed},
@@ -54,6 +54,7 @@ void CLuaPedDefs::LoadFunctions(void)
         {"isPedDead", IsPedDead},
 
         {"isPedDoingGangDriveby", IsPedDoingGangDriveby},
+        {"getPedFightingStyle", GetPedFightingStyle},
         {"getPedAnimation", GetPedAnimation},
         {"getPedMoveState", GetPedMoveState},
         {"getPedWalkingStyle", GetPedMoveAnim},
@@ -119,6 +120,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getAnalogControlState", "getPedAnalogControlState");
     lua_classfunction(luaVM, "getAnimation", "getPedAnimation");
     lua_classfunction(luaVM, "getArmor", "getPedArmor");
+    lua_classfunction(luaVM, "getFightingStyle", "getPedFightingStyle");
     lua_classfunction(luaVM, "getClothes", "getPedClothes");
     lua_classfunction(luaVM, "addClothes", "addPedClothes");
     lua_classfunction(luaVM, "removeClothes", "removePedClothes");
@@ -184,6 +186,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "hasJetPack", NULL, "doesPedHaveJetPack");
     lua_classvariable(luaVM, "jetpack", NULL, "isPedWearingJetpack");            // introduced in 1.5.5-9.13846
     lua_classvariable(luaVM, "armor", NULL, "getPedArmor");
+    lua_classvariable(luaVM, "fightingStyle", NULL, "getPedFightingStyle");
     lua_classvariable(luaVM, "cameraRotation", "setPedCameraRotation", "getPedCameraRotation");
     lua_classvariable(luaVM, "contactElement", NULL, "getPedContactElement");
     lua_classvariable(luaVM, "moveState", NULL, "getPedMoveState");
@@ -1158,6 +1161,28 @@ int CLuaPedDefs::IsPedDoingGangDriveby(lua_State* luaVM)
         if (CStaticFunctionDefinitions::IsPedDoingGangDriveby(*pPed, bDoingGangDriveby))
         {
             lua_pushboolean(luaVM, bDoingGangDriveby);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPedDefs::GetPedFightingStyle(lua_State* luaVM)
+{
+    CClientPed*      pPed;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPed);
+
+    if (!argStream.HasErrors())
+    {
+        unsigned char ucStyle;
+        if (CStaticFunctionDefinitions::GetPedFightingStyle(*pPed, ucStyle))
+        {
+            lua_pushnumber(luaVM, ucStyle);
             return 1;
         }
     }

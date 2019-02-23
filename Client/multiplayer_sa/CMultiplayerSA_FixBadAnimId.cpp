@@ -18,10 +18,11 @@ CAnimBlendAssocGroupSAInterface* getAnimAssocGroupInterface(AssocGroupId animGro
 // Check for anims that will crash and change to one that wont. (The new anim will be wrong and look crap though)
 int _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim(AssocGroupId* pAnimGroup, int* pAnimId)
 {
+    pMultiplayer->SetLastStaticAnimationPlayed(*pAnimGroup, *pAnimId);
     CAnimBlendAssocGroupSAInterface* pGroup = getAnimAssocGroupInterface(*pAnimGroup);
 
     DWORD* pInterface = reinterpret_cast<DWORD*>(pGroup);
-    if (pInterface == (DWORD*)0x50 || pInterface == (DWORD*)0xA0)
+    if (pInterface < (DWORD*)0x250)
     {
         LogEvent(534, "CopyAnimation", "Incorrect Group Interface", SString("GroupID = %d | AnimID = %d", *pAnimGroup, *pAnimId), 534);
 
@@ -157,7 +158,7 @@ void _declspec(naked) HOOK_GetAnimHierarchyFromSkinClump()
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_FixBadAnimId(void)
+void CMultiplayerSA::InitHooks_FixBadAnimId()
 {
     EZHookInstall(GetAnimHierarchyFromSkinClump);
 }

@@ -189,7 +189,12 @@ void CLuaDatabaseDefs::DbQueryCallback(CDbJobData* pJobData, void* pContext)
     if (pJobData->stage == EJobStage::RESULT)
     {
         if (pLuaCallback)
-            pLuaCallback->Call();
+        {
+            if (pLuaCallback->IsValid())
+                pLuaCallback->Call();
+            else
+                g_pGame->GetDatabaseManager()->QueryFree(pJobData);
+        }
     }
     g_pGame->GetLuaCallbackManager()->DestroyCallback(pLuaCallback);
 }

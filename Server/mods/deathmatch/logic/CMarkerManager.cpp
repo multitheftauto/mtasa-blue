@@ -43,7 +43,7 @@ CMarker* CMarkerManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvent
     return pMarker;
 }
 
-void CMarkerManager::DeleteAll(void)
+void CMarkerManager::DeleteAll()
 {
     // Delete all markers in the list
     DeletePointersAndClearList(m_Markers);

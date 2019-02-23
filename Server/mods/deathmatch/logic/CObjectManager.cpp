@@ -82,11 +82,11 @@ static unsigned short g_usBreakableModelList[] = {
     // Glass
     3859, 3858, 3857, 1649, 3851};
 
-CObjectManager::CObjectManager(void)
+CObjectManager::CObjectManager()
 {
 }
 
-CObjectManager::~CObjectManager(void)
+CObjectManager::~CObjectManager()
 {
     // Delete all our objects
     DeleteAll();
@@ -118,7 +118,7 @@ CObject* CObjectManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvent
     return pObject;
 }
 
-void CObjectManager::DeleteAll(void)
+void CObjectManager::DeleteAll()
 {
     // Delete all objects, make sure they dont remove themselves from our list (would make this damn slow)
     DeletePointersAndClearList(m_List);

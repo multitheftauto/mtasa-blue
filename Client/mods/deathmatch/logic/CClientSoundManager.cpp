@@ -63,14 +63,14 @@ CClientSoundManager::CClientSoundManager(CClientManager* pClientManager)
     }
 }
 
-CClientSoundManager::~CClientSoundManager(void)
+CClientSoundManager::~CClientSoundManager()
 {
     ProcessStopQueues(true);
     BASS_Stop();
     BASS_Free();
 }
 
-void CClientSoundManager::DoPulse(void)
+void CClientSoundManager::DoPulse()
 {
     UpdateVolume();
 

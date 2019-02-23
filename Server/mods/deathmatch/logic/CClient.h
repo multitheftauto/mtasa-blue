@@ -36,20 +36,20 @@ public:
 
 public:
     CClient(bool bAddGuestAccount = true);
-    ~CClient(void);
+    ~CClient();
 
-    virtual int         GetClientType(void) = 0;
-    virtual const char* GetNick(void) = 0;
+    virtual int         GetClientType() = 0;
+    virtual const char* GetNick() = 0;
 
-    bool IsRegistered(void);
+    bool IsRegistered();
 
     virtual void SendEcho(const char* szEcho) = 0;
     virtual void SendConsole(const char* szEcho) = 0;
 
-    CAccount* GetAccount(void) { return m_pAccount; }
+    CAccount* GetAccount() { return m_pAccount; }
     void      SetAccount(CAccount* pAccount) { m_pAccount = pAccount; }
 
-    CElement* GetElement(void);
+    CElement* GetElement();
 
 protected:
     CAccount* m_pAccount;

@@ -11,11 +11,11 @@
 
 #include "StdInc.h"
 
-CPedManager::CPedManager(void)
+CPedManager::CPedManager()
 {
 }
 
-CPedManager::~CPedManager(void)
+CPedManager::~CPedManager()
 {
     DeleteAll();
 }
@@ -53,7 +53,7 @@ CPed* CPedManager::CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEv
     return pPed;
 }
 
-void CPedManager::DeleteAll(void)
+void CPedManager::DeleteAll()
 {
     // Delete all items
     DeletePointersAndClearList(m_List);

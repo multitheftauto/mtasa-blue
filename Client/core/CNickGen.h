@@ -17,5 +17,5 @@ class CNickGen
 public:
     static const char* const m_szAdjectives[NICKGEN_NUM_ADJECTIVES];
     static const char* const m_szNouns[NICKGEN_NUM_NOUNS];
-    static SString           GetRandomNickname(void);
+    static SString           GetRandomNickname();
 };

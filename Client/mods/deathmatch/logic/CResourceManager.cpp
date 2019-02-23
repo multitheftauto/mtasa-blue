@@ -13,11 +13,11 @@
 
 using std::list;
 
-CResourceManager::CResourceManager(void)
+CResourceManager::CResourceManager()
 {
 }
 
-CResourceManager::~CResourceManager(void)
+CResourceManager::~CResourceManager()
 {
     while (!m_resources.empty())
     {
@@ -94,7 +94,7 @@ CResource* CResourceManager::GetResource(const char* szResourceName)
     return NULL;
 }
 
-void CResourceManager::OnDownloadGroupFinished(void)
+void CResourceManager::OnDownloadGroupFinished()
 {
     // Try to load newly ready resources
     for (std::list<CResource*>::const_iterator iter = m_resources.begin(); iter != m_resources.end(); ++iter)
@@ -141,7 +141,7 @@ bool CResourceManager::Exists(CResource* pResource)
     return m_resources.Contains(pResource);
 }
 
-void CResourceManager::StopAll(void)
+void CResourceManager::StopAll()
 {
     while (m_resources.size() > 0)
     {
@@ -153,6 +153,11 @@ void CResourceManager::StopAll(void)
 bool CResourceManager::ParseResourcePathInput(std::string strInput, CResource*& pResource, std::string* pStrPath, std::string* pStrMetaPath)
 {
     ReplaceOccurrencesInString(strInput, "\\", "/");
+
+    // Disallow file paths with a directory separator at the end
+    if (strInput.back() == '/')
+        return false;
+
     eAccessType accessType = ACCESS_PUBLIC;
     std::string strMetaPath;
 

@@ -8,7 +8,7 @@
  *                             \___|\___/|_| \_\_____|
  *
  * Copyright (C) 2012, Marc Hoersken, <info@marc-hoersken.de>, et al.
- * Copyright (C) 2012 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2012 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -41,7 +41,7 @@
  *  typedef struct X509_name_st X509_NAME;
  *  etc.
  *
- * this wil cause all kinds of C-preprocessing paste errors in
+ * this will cause all kinds of C-preprocessing paste errors in
  * BoringSSL's <openssl/x509.h>: So just undefine those defines here
  * (and only here).
  */
@@ -53,7 +53,7 @@
 
 extern const struct Curl_ssl Curl_ssl_schannel;
 
-CURLcode verify_certificate(struct connectdata *conn, int sockindex);
+CURLcode Curl_verify_certificate(struct connectdata *conn, int sockindex);
 
 /* structs to expose only in schannel.c and schannel_verify.c */
 #ifdef EXPOSE_SCHANNEL_INTERNAL_STRUCTS

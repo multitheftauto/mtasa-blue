@@ -20,7 +20,7 @@
 class CVector2D
 {
 public:
-    CVector2D(void)
+    CVector2D()
     {
         fX = 0;
         fY = 0;
@@ -56,9 +56,9 @@ public:
 
     float Length() const { return sqrt(fX * fX + fY * fY); }
 
-    float LengthSquared(void) const { return (fX * fX) + (fY * fY); }
+    float LengthSquared() const { return (fX * fX) + (fY * fY); }
 
-    void Normalize(void)
+    void Normalize()
     {
         float fLength = Length();
         if (fLength > 0.0f)

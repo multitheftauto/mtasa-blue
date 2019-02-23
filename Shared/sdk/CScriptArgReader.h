@@ -41,7 +41,7 @@ public:
         m_bHasCustomMessage = false;
     }
 
-    ~CScriptArgReader(void) { assert(!IsReadFunctionPending()); }
+    ~CScriptArgReader() { assert(!IsReadFunctionPending()); }
 
     //
     // Read next number
@@ -1090,7 +1090,7 @@ public:
     //
     // Call after other arguments have been read
     //
-    void ReadFunctionComplete(void)
+    void ReadFunctionComplete()
     {
         if (!m_pPendingFunctionOutValue)
             return;
@@ -1111,7 +1111,7 @@ public:
     }
 
     // Debug check
-    bool IsReadFunctionPending(void) const { return m_pPendingFunctionOutValue && m_pPendingFunctionIndex != -1; }
+    bool IsReadFunctionPending() const { return m_pPendingFunctionOutValue && m_pPendingFunctionIndex != -1; }
 
     //
     // Peek at next type
@@ -1159,7 +1159,7 @@ public:
         return false;
     }
 
-    bool NextIsVector4D(void) const
+    bool NextIsVector4D() const
     {
         return (NextCouldBeNumber() && NextCouldBeNumber(1) && NextCouldBeNumber(2) && NextCouldBeNumber(3)) || NextIsUserDataOfType<CLuaVector4D>();
     }
@@ -1170,7 +1170,7 @@ public:
                NextIsUserDataOfType<CLuaVector4D>(iOffset * 3);
     }
 
-    bool NextIsVector2D(void) const
+    bool NextIsVector2D() const
     {
         return (NextCouldBeNumber() && NextCouldBeNumber(1)) || NextIsUserDataOfType<CLuaVector2D>() || NextIsUserDataOfType<CLuaVector3D>() ||
                NextIsUserDataOfType<CLuaVector4D>();
@@ -1283,7 +1283,7 @@ public:
     //
     // GetErrorMessage
     //
-    SString GetErrorMessage(void)
+    SString GetErrorMessage()
     {
         if (!m_bError)
             return "No error";
@@ -1311,7 +1311,7 @@ public:
     //
     // Put off getting error type and value until just before we need it
     //
-    void ResolveErrorGotArgumentTypeAndValue(void)
+    void ResolveErrorGotArgumentTypeAndValue()
     {
         if (!m_bError || m_bResolvedErrorGotArgumentTypeAndValue)
             return;
@@ -1363,7 +1363,7 @@ public:
     //
     // Make full error message
     //
-    SString GetFullErrorMessage(void) { return SString("%s @ '%s' [%s]", *m_strErrorCategory, lua_tostring(m_luaVM, lua_upvalueindex(1)), *GetErrorMessage()); }
+    SString GetFullErrorMessage() { return SString("%s @ '%s' [%s]", *m_strErrorCategory, lua_tostring(m_luaVM, lua_upvalueindex(1)), *GetErrorMessage()); }
 
     //
     // Set custom warning message

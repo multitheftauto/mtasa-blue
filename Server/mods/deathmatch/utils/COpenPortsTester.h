@@ -16,7 +16,7 @@ public:
     //
     // Start a new test
     //
-    void Start(void)
+    void Start()
     {
         if (m_iPortTestStage != 0)
             return;
@@ -130,7 +130,7 @@ public:
     //
     // Get http downloader used for port testing
     //
-    static CNetHTTPDownloadManagerInterface* GetDownloadManager(void) { return g_pNetServer->GetHTTPDownloadManager(EDownloadMode::ASE); }
+    static CNetHTTPDownloadManagerInterface* GetDownloadManager() { return g_pNetServer->GetHTTPDownloadManager(EDownloadMode::ASE); }
 
 protected:
     int m_iPortTestStage;

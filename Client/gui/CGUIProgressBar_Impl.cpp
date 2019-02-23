@@ -44,7 +44,7 @@ CGUIProgressBar_Impl::CGUIProgressBar_Impl(CGUI_Impl* pGUI, CGUIElement* pParent
     }
 }
 
-CGUIProgressBar_Impl::~CGUIProgressBar_Impl(void)
+CGUIProgressBar_Impl::~CGUIProgressBar_Impl()
 {
     DestroyElement();
 }
@@ -54,7 +54,7 @@ void CGUIProgressBar_Impl::SetProgress(float fProgress)
     reinterpret_cast<CEGUI::ProgressBar*>(m_pWindow)->setProgress(fProgress);
 }
 
-float CGUIProgressBar_Impl::GetProgress(void)
+float CGUIProgressBar_Impl::GetProgress()
 {
     return reinterpret_cast<CEGUI::ProgressBar*>(m_pWindow)->getProgress();
 }

@@ -13,7 +13,7 @@
 class CServerCacheInterface
 {
 public:
-    virtual ~CServerCacheInterface(void) {}
+    virtual ~CServerCacheInterface() {}
     virtual void SaveServerCache(bool bWaitUntilFinished) = 0;
     virtual void GetServerCachedInfo(CServerListItem* pItem) = 0;
     virtual void SetServerCachedInfo(const CServerListItem* pItem) = 0;

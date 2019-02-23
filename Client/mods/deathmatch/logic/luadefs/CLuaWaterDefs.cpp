@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CLuaWaterDefs::LoadFunctions(void)
+void CLuaWaterDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"createWater", CreateWater},

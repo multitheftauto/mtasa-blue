@@ -64,7 +64,7 @@ class CGUICallback
 {
 public:
     // Default constructor
-    CGUICallback(void) { memset(m_Callback, 0, sizeof(m_Callback)); }
+    CGUICallback() { memset(m_Callback, 0, sizeof(m_Callback)); }
 
     // Construct from a static function pointer
     CGUICallback(Ret (*pF)(Arguments))
