@@ -11,8 +11,7 @@
 
 #include <game/CPad.h>
 
-#ifndef __CMOUSECONTROL_H
-#define __CMOUSECONTROL_H
+#pragma once
 
 enum MouseControlVehicleType
 {
@@ -25,10 +24,10 @@ enum MouseControlVehicleType
 class CMouseControl
 {
 public:
-    CMouseControl(void);
-    ~CMouseControl(void);
+    CMouseControl();
+    ~CMouseControl();
 
-    void Reset(void);
+    void Reset();
     bool ProcessMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam);
     void ApplyAxes(CControllerState& cs);
 
@@ -36,5 +35,3 @@ protected:
     short m_usLeftStickX;
     short m_usLeftStickY;
 };
-
-#endif

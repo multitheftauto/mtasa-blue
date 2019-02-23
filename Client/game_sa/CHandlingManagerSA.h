@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_CHANDLINGMANAGER
-#define __CGAME_CHANDLINGMANAGER
+#pragma once
 
 #include <game/CHandlingManager.h>
 #include "CHandlingEntrySA.h"
@@ -18,10 +17,10 @@
 class CHandlingManagerSA : public CHandlingManager
 {
 public:
-    CHandlingManagerSA(void);
-    ~CHandlingManagerSA(void);
+    CHandlingManagerSA();
+    ~CHandlingManagerSA();
 
-    CHandlingEntry* CreateHandlingData(void);
+    CHandlingEntry* CreateHandlingData();
 
     const CHandlingEntry* GetOriginalHandlingData(eVehicleTypes eModel);
 
@@ -30,10 +29,10 @@ public:
     eHandlingProperty GetPropertyEnumFromName(std::string strName);
 
     void CheckSuspensionChanges(CHandlingEntry* pEntry);
-    void RemoveChangedVehicle(void);
+    void RemoveChangedVehicle();
 
 private:
-    void InitializeDefaultHandlings(void);
+    void InitializeDefaultHandlings();
 
     static DWORD m_dwStore_LoadHandlingCfg;
 
@@ -44,5 +43,3 @@ private:
     std::map<std::string, eHandlingProperty> m_HandlingNames;
     int                                      iChangedVehicles;
 };
-
-#endif

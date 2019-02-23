@@ -1050,6 +1050,8 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         BitStream.Write((short)vecVertex.fY);
                         BitStream.Write(vecVertex.fZ);
                     }
+                    if (BitStream.Version() >= 0x06C)
+                        BitStream.WriteBit(pWater->IsWaterShallow());
                     break;
                 }
 

@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CClientStreamElement_H
-#define __CClientStreamElement_H
+#pragma once
 
 #include "CClientEntity.h"
 class CClientStreamer;
@@ -23,32 +22,32 @@ class CClientStreamElement : public CClientEntity
 
 public:
     CClientStreamElement(CClientStreamer* pStreamer, ElementID ID);
-    ~CClientStreamElement(void);
+    ~CClientStreamElement();
 
     void                    UpdateStreamPosition(const CVector& vecPosition);
-    CVector                 GetStreamPosition(void) { return m_vecStreamPosition; }
-    CClientStreamSectorRow* GetStreamRow(void) { return m_pStreamRow; }
-    CClientStreamSector*    GetStreamSector(void) { return m_pStreamSector; }
-    bool                    IsStreamedIn(void) { return m_bStreamedIn; }
+    CVector                 GetStreamPosition() { return m_vecStreamPosition; }
+    CClientStreamSectorRow* GetStreamRow() { return m_pStreamRow; }
+    CClientStreamSector*    GetStreamSector() { return m_pStreamSector; }
+    bool                    IsStreamedIn() { return m_bStreamedIn; }
     void                    InternalStreamIn(bool bInstantly);
-    void                    InternalStreamOut(void);
+    void                    InternalStreamOut();
     virtual void            StreamIn(bool bInstantly) = 0;
-    virtual void            StreamOut(void) = 0;
-    virtual void            NotifyCreate(void);
-    void                    NotifyUnableToCreate(void);
+    virtual void            StreamOut() = 0;
+    virtual void            NotifyCreate();
+    void                    NotifyUnableToCreate();
     void                    AddStreamReference(bool bScript = false);
     void                    RemoveStreamReference(bool bScript = false);
     unsigned short          GetStreamReferences(bool bScript = false);
-    unsigned long           GetTotalStreamReferences(void) { return m_usStreamReferences + m_usStreamReferencesScript; }
-    void                    StreamOutForABit(void);
+    unsigned long           GetTotalStreamReferences() { return m_usStreamReferences + m_usStreamReferencesScript; }
+    void                    StreamOutForABit();
     void                    SetDimension(unsigned short usDimension);
-    float                   GetExpDistance(void) { return m_fExpDistance; }
-    virtual CSphere         GetWorldBoundingSphere(void);
+    float                   GetExpDistance() { return m_fExpDistance; }
+    virtual CSphere         GetWorldBoundingSphere();
     float                   GetDistanceToBoundingBoxSquared(const CVector& vecPosition);
 
-    bool IsStreamingCompatibleClass(void) { return true; };
+    bool IsStreamingCompatibleClass() { return true; };
 
-    virtual bool IsVisibleInAllDimensions(void) { return false; };
+    virtual bool IsVisibleInAllDimensions() { return false; };
 
 private:
     void SetStreamRow(CClientStreamSectorRow* pRow) { m_pStreamRow = pRow; }
@@ -72,5 +71,3 @@ public:
     SFixedArray<CVector, 2> m_vecCachedBoundingBox;
     int                     m_iCachedBoundingBoxCounter;
 };
-
-#endif

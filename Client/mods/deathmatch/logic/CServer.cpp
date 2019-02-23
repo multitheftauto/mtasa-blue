@@ -31,7 +31,7 @@ std::list<std::string>         CServer::m_OutputQueue;
 static const SFixedArray<const char*, 4> szServerErrors = {"Server stopped", "Could not load network library", "Loading network library failed",
                                                            "Error loading mod"};
 
-CServer::CServer(void)
+CServer::CServer()
 {
     assert(!g_bIsStarted);
 
@@ -45,7 +45,7 @@ CServer::CServer(void)
     m_strDLLFile = PathJoin(m_strServerRoot, SERVER_DLL_PATH);
 }
 
-CServer::~CServer(void)
+CServer::~CServer()
 {
     // Make sure the server is stopped
     Stop();
@@ -57,7 +57,7 @@ CServer::~CServer(void)
     }
 }
 
-void CServer::DoPulse(void)
+void CServer::DoPulse()
 {
     if (IsRunning())
     {
@@ -132,12 +132,12 @@ bool CServer::Start(const char* szConfig)
     return false;
 }
 
-bool CServer::IsStarted(void)
+bool CServer::IsStarted()
 {
     return g_bIsStarted;
 }
 
-bool CServer::Stop(void)
+bool CServer::Stop()
 {
     // Started?
     if (g_bIsStarted)
@@ -234,7 +234,7 @@ DWORD WINAPI CServer::Thread_EntryPoint(LPVOID pThis)
     return reinterpret_cast<CServer*>(pThis)->Thread_Run();
 }
 
-unsigned long CServer::Thread_Run(void)
+unsigned long CServer::Thread_Run()
 {
     // Enter critical section
     m_CriticalSection.Lock();
@@ -251,7 +251,7 @@ unsigned long CServer::Thread_Run(void)
     if (m_pLibrary->Load(m_strDLLFile))
     {
         // Grab the entrypoint
-        typedef int(Main_t)(int, char*[]);
+        typedef int(Main_t)(int, char* []);
         Main_t* pfnEntryPoint = reinterpret_cast<Main_t*>(m_pLibrary->GetProcedureAddress("Run"));
         if (pfnEntryPoint)
         {

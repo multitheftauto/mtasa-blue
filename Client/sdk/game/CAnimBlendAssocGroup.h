@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimBlendAssocGroup_H
-#define __CAnimBlendAssocGroup_H
+#pragma once
 
 typedef unsigned char BYTE;
 typedef unsigned long AssocGroupId;
@@ -24,14 +23,12 @@ class CAnimBlendAssocGroup
 public:
     virtual CAnimBlendAssociationSAInterface* CopyAnimation(unsigned int AnimID) = 0;
     virtual void                              InitEmptyAssociations(RpClump* pClump) = 0;
-    virtual bool                              IsCreated(void) = 0;
-    virtual int                               GetNumAnimations(void) = 0;
-    virtual CAnimBlock*                       GetAnimBlock(void) = 0;
+    virtual bool                              IsCreated() = 0;
+    virtual int                               GetNumAnimations() = 0;
+    virtual CAnimBlock*                       GetAnimBlock() = 0;
     virtual CAnimBlendStaticAssociation*      GetAnimation(unsigned int ID) = 0;
-    virtual AssocGroupId                      GetGroupID(void) = 0;
+    virtual AssocGroupId                      GetGroupID() = 0;
     virtual void                              CreateAssociations(const char* szBlockName) = 0;
-    virtual bool                              IsLoaded(void) = 0;
+    virtual bool                              IsLoaded() = 0;
     virtual void                              SetIDOffset(int iOffset) = 0;
 };
-
-#endif

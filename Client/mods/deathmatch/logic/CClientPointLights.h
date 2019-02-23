@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CCLIENTPOINTLIGHTS_H
-#define __CCLIENTPOINTLIGHTS_H
+#pragma once
 
 #include "CClientEntity.h"
 
@@ -22,38 +21,38 @@ class CClientPointLights : public CClientEntity
 
 public:
     CClientPointLights(class CClientManager* pManager, ElementID ID);
-    ~CClientPointLights(void);
+    ~CClientPointLights();
 
-    void Unlink(void);
+    void Unlink();
 
-    eClientEntityType GetType(void) const { return CCLIENTPOINTLIGHTS; };
+    eClientEntityType GetType() const { return CCLIENTPOINTLIGHTS; };
 
-    int  GetMode(void) { return m_iMode; };
+    int  GetMode() { return m_iMode; };
     void SetMode(int iMode) { m_iMode = iMode; };
 
     void GetPosition(CVector& vecPosition) const { vecPosition = m_vecPosition; };
     void SetPosition(const CVector& vecPosition) { m_vecPosition = vecPosition; };
 
-    float GetRadius(void) { return m_fRadius; };
+    float GetRadius() { return m_fRadius; };
     void  SetRadius(float fRadius) { m_fRadius = fRadius; };
 
-    SColor GetColor(void) { return m_Color; };
+    SColor GetColor() { return m_Color; };
     void   SetColor(SColor color) { m_Color = color; };
 
-    CVector& GetDirection(void) { return m_vecDirection; };
+    CVector& GetDirection() { return m_vecDirection; };
     void     SetDirection(CVector& vecDirection) { m_vecDirection = vecDirection; };
 
-    bool GetCreatesShadow(void) { return m_bCreatesShadow; };
+    bool GetCreatesShadow() { return m_bCreatesShadow; };
     void SetCreatesShadow(bool bCreatesShadow) { m_bCreatesShadow = bCreatesShadow; };
 
-    CClientEntity* GetAffected(void) { return m_pAffected; };
+    CClientEntity* GetAffected() { return m_pAffected; };
     void           SetAffected(CClientEntity* pAffected) { m_pAffected = pAffected; };
 
     void SetDimension(unsigned short usDimension);
     void RelateDimension(unsigned short usDimension);
 
 protected:
-    void DoPulse(void);
+    void DoPulse();
 
     CClientPointLightsManager* m_pPointLightsManager;
 
@@ -67,5 +66,3 @@ protected:
 
     bool m_bStreamedIn;
 };
-
-#endif

@@ -20,12 +20,12 @@
 class CDynamicLibrary
 {
 public:
-    CDynamicLibrary(void);
-    ~CDynamicLibrary(void);
+    CDynamicLibrary();
+    ~CDynamicLibrary();
 
     bool Load(const char* szFilename);
-    void Unload(void);
-    bool IsLoaded(void);
+    void Unload();
+    bool IsLoaded();
 
     void* GetProcedureAddress(const char* szProcName);
 

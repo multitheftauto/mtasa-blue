@@ -19,7 +19,7 @@ class CLuaModule;
 
 #pragma once
 
-typedef bool (*DefaultModuleFunc)(void);
+typedef bool (*DefaultModuleFunc)();
 typedef void (*RegisterModuleFunc)(lua_State*);
 typedef bool (*InitModuleFunc)(ILuaModuleManager*, char*, char*, float*);
 
@@ -44,7 +44,7 @@ class CLuaModule : public ILuaModuleManager10
 {
 public:
     CLuaModule(CLuaModuleManager* pLuaModuleManager, CScriptDebugging* pScriptDebugging, const char* szFileName, const char* szShortFileName);
-    virtual ~CLuaModule(void);
+    virtual ~CLuaModule();
 
     // functions for external modules until DP2.3
     void      Printf(const char* szFormat, ...);
@@ -68,18 +68,18 @@ public:
     bool GetResourceFilePath(lua_State* luaVM, const char* fileName, char* path, size_t length) override;
 
     // functions for deathmatch
-    int  _LoadModule(void);
-    void _UnloadModule(void);
+    int  _LoadModule();
+    void _UnloadModule();
     void _RegisterFunctions(lua_State* luaVM);
-    void _UnregisterFunctions(void);
-    void _DoPulse(void);
+    void _UnregisterFunctions();
+    void _DoPulse();
     void _ResourceStopping(lua_State* luaVM);
     void _ResourceStopped(lua_State* luaVM);
     bool _DoesFunctionExist(const char* szFunctionName);
 
-    HMODULE      _GetHandle(void) { return m_hModule; };
-    SString      _GetName(void) { return m_szShortFileName; };
-    FunctionInfo _GetFunctions(void) { return m_FunctionInfo; };
+    HMODULE      _GetHandle() { return m_hModule; };
+    SString      _GetName() { return m_szShortFileName; };
+    FunctionInfo _GetFunctions() { return m_FunctionInfo; };
 
 private:
     SString         m_szFileName;

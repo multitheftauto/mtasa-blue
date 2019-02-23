@@ -27,14 +27,14 @@ CClientCheckpoint::CClientCheckpoint(CClientMarker* pThis)
     m_bHasTarget = false;
 }
 
-CClientCheckpoint::~CClientCheckpoint(void)
+CClientCheckpoint::~CClientCheckpoint()
 {
     // Eventually destroy the checkpoint
     Destroy();
     CClientEntityRefManager::RemoveEntityRefs(0, &m_pThis, NULL);
 }
 
-unsigned long CClientCheckpoint::GetCheckpointType(void) const
+unsigned long CClientCheckpoint::GetCheckpointType() const
 {
     switch (m_dwType)
     {
@@ -305,7 +305,7 @@ bool CClientCheckpoint::IconToString(unsigned char ucIcon, SString& strOutString
     }
 }
 
-void CClientCheckpoint::StreamIn(void)
+void CClientCheckpoint::StreamIn()
 {
     // We're now streamed in
     m_bStreamedIn = true;
@@ -317,7 +317,7 @@ void CClientCheckpoint::StreamIn(void)
     }
 }
 
-void CClientCheckpoint::StreamOut(void)
+void CClientCheckpoint::StreamOut()
 {
     // Destroy our checkpoint
     Destroy();
@@ -354,7 +354,7 @@ void CClientCheckpoint::Create(unsigned long ulIdentifier)
     }
 }
 
-void CClientCheckpoint::Destroy(void)
+void CClientCheckpoint::Destroy()
 {
     // Destroy it and NULL it
     if (m_pCheckpoint)
@@ -364,7 +364,7 @@ void CClientCheckpoint::Destroy(void)
     }
 }
 
-void CClientCheckpoint::ReCreate(void)
+void CClientCheckpoint::ReCreate()
 {
     // Recreate if we're streamed in and visible
     if (IsStreamedIn() && m_bVisible)
@@ -374,7 +374,7 @@ void CClientCheckpoint::ReCreate(void)
     }
 }
 
-void CClientCheckpoint::ReCreateWithSameIdentifier(void)
+void CClientCheckpoint::ReCreateWithSameIdentifier()
 {
     // Recreate if we're streamed in and visible
     if (IsStreamedIn() && m_bVisible)

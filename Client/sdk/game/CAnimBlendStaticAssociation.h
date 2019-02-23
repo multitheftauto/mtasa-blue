@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CAnimBlendStaticAssociation_H
-#define __CAnimBlendStaticAssociation_H
+#pragma once
 
 struct RpClump;
 class CAnimBlendHierarchySAInterface;
@@ -24,11 +23,10 @@ public:
     virtual void SetAnimGroup(short sAnimGroup) = 0;
     virtual void SetFlags(short sFlags) = 0;
 
-    virtual unsigned short                  GetNumBlendNodes(void) = 0;
-    virtual short                           GetAnimID(void) = 0;
-    virtual short                           GetAnimGroup(void) = 0;
-    virtual short                           GetFlags(void) = 0;
-    virtual CAnimBlendHierarchySAInterface* GetAnimHierachyInterface(void) = 0;
+    virtual unsigned short                          GetNumBlendNodes() = 0;
+    virtual short                                   GetAnimID() = 0;
+    virtual short                                   GetAnimGroup() = 0;
+    virtual short                                   GetFlags() = 0;
+    virtual CAnimBlendHierarchySAInterface*         GetAnimHierachyInterface() = 0;
+    virtual CAnimBlendStaticAssociationSAInterface* GetInterface() = 0;
 };
-
-#endif

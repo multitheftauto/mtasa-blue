@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CObjectSyncPacket::~CObjectSyncPacket(void)
+CObjectSyncPacket::~CObjectSyncPacket()
 {
     vector<SyncData*>::const_iterator iter = m_Syncs.begin();
     for (; iter != m_Syncs.end(); ++iter)

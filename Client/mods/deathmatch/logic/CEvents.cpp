@@ -12,13 +12,13 @@
 
 using std::list;
 
-CEvents::CEvents(void)
+CEvents::CEvents()
 {
     m_bWasEventCancelled = false;
     m_bEventCancelled = false;
 }
 
-CEvents::~CEvents(void)
+CEvents::~CEvents()
 {
     RemoveAllEvents();
 }
@@ -106,7 +106,7 @@ SEvent* CEvents::Get(const char* szName)
     return NULL;
 }
 
-void CEvents::RemoveAllEvents(void)
+void CEvents::RemoveAllEvents()
 {
     // Delete all items
     CFastHashMap<SString, SEvent*>::const_iterator iter = m_EventHashMap.begin();
@@ -119,14 +119,14 @@ void CEvents::RemoveAllEvents(void)
     m_EventHashMap.clear();
 }
 
-void CEvents::PreEventPulse(void)
+void CEvents::PreEventPulse()
 {
     m_CancelledList.push_back(m_bEventCancelled);
     m_bEventCancelled = false;
     m_bWasEventCancelled = false;
 }
 
-void CEvents::PostEventPulse(void)
+void CEvents::PostEventPulse()
 {
     m_bWasEventCancelled = m_bEventCancelled;
     m_bEventCancelled = m_CancelledList.back() ? true : false;
@@ -138,7 +138,7 @@ void CEvents::CancelEvent(bool bCancelled)
     m_bEventCancelled = bCancelled;
 }
 
-bool CEvents::WasEventCancelled(void)
+bool CEvents::WasEventCancelled()
 {
     return m_bWasEventCancelled;
 }

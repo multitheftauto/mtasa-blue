@@ -53,6 +53,7 @@ void CWebView::Initialise()
     CefBrowserSettings browserSettings;
     browserSettings.windowless_frame_rate = g_pCore->GetFrameRateLimit();
     browserSettings.javascript_access_clipboard = cef_state_t::STATE_DISABLED;
+    browserSettings.javascript_dom_paste = cef_state_t::STATE_DISABLED;
     browserSettings.universal_access_from_file_urls =
         cef_state_t::STATE_DISABLED;            // Also filtered by resource interceptor, but set this nevertheless
     browserSettings.file_access_from_file_urls = cef_state_t::STATE_DISABLED;
@@ -592,16 +593,20 @@ bool CWebView::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProces
 // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderHandler.html#GetViewRect(CefRefPtr%3CCefBrowser%3E,CefRect&) //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
+void CWebView::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
 {
-    if (m_bBeingDestroyed)
-        return false;
-
     rect.x = 0;
     rect.y = 0;
+
+    if (m_bBeingDestroyed)
+    {
+        rect.width = 1;
+        rect.height = 1;
+        return;
+    }
+    
     rect.width = static_cast<int>(m_pWebBrowserRenderItem->m_uiSizeX);
     rect.height = static_cast<int>(m_pWebBrowserRenderItem->m_uiSizeY);
-    return true;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -751,7 +756,7 @@ void CWebView::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> fr
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool isRedirect)
+bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool userGesture, bool isRedirect)
 {
     /*
         From documentation:

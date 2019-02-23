@@ -23,7 +23,7 @@ ADD_ENUM(STATE_GROUP_DEVICE_CAPS, "deviceCaps")
 ADD_ENUM(STATE_GROUP_VERTEX_DECL, "vertexDeclState")
 IMPLEMENT_ENUM_END("state-group")
 
-STypeMapping TypeMappingList[] = {
+const STypeMapping TypeMappingList[] = {
     {TYPE_INT, D3DXPC_SCALAR, D3DXPT_INT, RegMap::Int2Int, 1},
     {TYPE_D3DCOLOR, D3DXPC_SCALAR, D3DXPT_INT, RegMap::Int2Int, 1},            // Can be read as float4 or DWORD color
     {TYPE_D3DCOLOR, D3DXPC_VECTOR, D3DXPT_FLOAT, RegMap::Int2Color, 4},
@@ -47,7 +47,7 @@ STypeMapping TypeMappingList[] = {
 #define ADD_REGISTER(type,name) \
     {offsetof(USING_STRUCT, name), USING_LIST, #name, type}
 
-SRegisterInfo BigRegisterInfoList[] = {
+const SRegisterInfo BigRegisterInfoList[] = {
 
 #define USING_STRUCT CProxyDirect3DDevice9::SD3DRenderState
 #define USING_LIST "RenderState"
@@ -397,7 +397,7 @@ HRESULT CEffectParameters::Begin(UINT* pPasses, DWORD Flags, bool bWorldRender)
 // Ensures secondary render targets are unset
 //
 ////////////////////////////////////////////////////////////////
-HRESULT CEffectParameters::End(void)
+HRESULT CEffectParameters::End()
 {
     HRESULT hResult = m_pD3DEffect->End();
     for (uint i = 0; i < m_SecondaryRenderTargetList.size(); i++)
@@ -417,7 +417,7 @@ HRESULT CEffectParameters::End(void)
 // Called before render
 //
 ////////////////////////////////////////////////////////////////
-bool CEffectParameters::ApplyCommonHandles(void)
+bool CEffectParameters::ApplyCommonHandles()
 {
     if (!m_bUsesCommonHandles)
         return false;
@@ -588,7 +588,7 @@ void BOUNDS_CHECK(const void* ptr, int ptrsize, const void* bufstart, int bufsiz
 // Called before render
 //
 ////////////////////////////////////////////////////////////////
-bool CEffectParameters::ApplyMappedHandles(void)
+bool CEffectParameters::ApplyMappedHandles()
 {
     if (!m_bUsesMappedHandles)
         return false;
@@ -834,7 +834,7 @@ void CEffectParameters::NotifyModifiedParameter(D3DXHANDLE hParameter)
 // Get list of parameters set by any shader instance
 //
 ////////////////////////////////////////////////////////////////
-const std::set<D3DXHANDLE>& CEffectParameters::GetModifiedParameters(void)
+const std::set<D3DXHANDLE>& CEffectParameters::GetModifiedParameters()
 {
     return m_ModifiedParametersList;
 }
@@ -864,7 +864,7 @@ void CEffectParameters::RestoreParametersDefaultValue(const std::vector<D3DXHAND
 // Called during parse stage
 //
 ////////////////////////////////////////////////////////////////
-void CEffectParameters::ReadParameterHandles(void)
+void CEffectParameters::ReadParameterHandles()
 {
     D3DXEFFECT_DESC EffectDesc;
     m_pD3DEffect->GetDesc(&EffectDesc);
@@ -1178,7 +1178,7 @@ void CEffectParameters::AddStateMappedParameter(EStateGroup stateGroup, const SS
 // Called during parse stage
 //
 ////////////////////////////////////////////////////////////////
-void CEffectParameters::ReadCommonHandles(void)
+void CEffectParameters::ReadCommonHandles()
 {
     struct
     {

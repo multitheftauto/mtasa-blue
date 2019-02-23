@@ -10,8 +10,7 @@
 
 class CClientPlayerClothes;
 
-#ifndef __CLIENTPLAYERCLOTHES_H
-#define __CLIENTPLAYERCLOTHES_H
+#pragma once
 
 #define PLAYER_CLOTHING_SLOTS 18
 #define TORSO_CLOTHING_MAX 68
@@ -50,14 +49,14 @@ class CClientPlayerClothes
 {
 public:
     CClientPlayerClothes(CClientPed* pPed);
-    ~CClientPlayerClothes(void);
+    ~CClientPlayerClothes();
 
     const SPlayerClothing* GetClothing(unsigned char ucType);
     void                   AddClothes(const char* szTexture, const char* szModel, unsigned char ucType, bool bAddToModel = true);
     void                   InternalAddClothes(const SPlayerClothing* pClothing, unsigned char ucType);
     bool                   RemoveClothes(unsigned char ucType, bool bRemoveFromModel = true);
 
-    void AddAllToModel(void);
+    void AddAllToModel();
     void RemoveAll(bool bRemoveFromModel = true);
 
     void DefaultClothes(bool bAddToModel = true);
@@ -78,5 +77,3 @@ private:
     static SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS> m_GlobalClothes;
     static bool                                                       m_bStaticInit;
 };
-
-#endif

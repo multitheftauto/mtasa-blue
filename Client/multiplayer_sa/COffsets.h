@@ -9,19 +9,16 @@
  *
  *****************************************************************************/
 
-#ifndef __MULTIPLAYERSA_OFFSETS_H
-#define __MULTIPLAYERSA_OFFSETS_H
+#pragma once
 
 class COffsetsMP
 {
 public:
-    static void Initialize10EU(void);
-    static void Initialize10US(void);
-    static void Initialize11(void);
-    static void Initialize20(void);
+    static void Initialize10EU();
+    static void Initialize10US();
+    static void Initialize11();
+    static void Initialize20();
 
 private:
-    static void InitializeCommon10(void);
+    static void InitializeCommon10();
 };
-
-#endif

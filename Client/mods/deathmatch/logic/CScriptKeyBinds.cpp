@@ -166,7 +166,7 @@ static const SFixedArray<SScriptBindableGTAControl, 45> g_bcControls = {{{"fire"
                                                                          {"group_control_back"},
                                                                          {""}}};
 
-CScriptKeyBinds::~CScriptKeyBinds(void)
+CScriptKeyBinds::~CScriptKeyBinds()
 {
     Clear();
 }
@@ -616,7 +616,7 @@ bool CScriptKeyBinds::ControlFunctionExists(const SScriptBindableGTAControl* pCo
     return bFound;
 }
 
-void CScriptKeyBinds::RemoveDeletedBinds(void)
+void CScriptKeyBinds::RemoveDeletedBinds()
 {
     list<CScriptKeyBind*>::iterator iter = m_List.begin();
     while (iter != m_List.end())

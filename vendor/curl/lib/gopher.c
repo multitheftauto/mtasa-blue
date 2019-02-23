@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -31,9 +31,11 @@
 #include "progress.h"
 #include "gopher.h"
 #include "select.h"
+#include "strdup.h"
 #include "url.h"
 #include "escape.h"
 #include "warnless.h"
+#include "curl_printf.h"
 #include "curl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
@@ -78,7 +80,9 @@ static CURLcode gopher_do(struct connectdata *conn, bool *done)
   curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
 
   curl_off_t *bytecount = &data->req.bytecount;
-  char *path = data->state.path;
+  char *gopherpath;
+  char *path = data->state.up.path;
+  char *query = data->state.up.query;
   char *sel = NULL;
   char *sel_org = NULL;
   ssize_t amount, k;
@@ -86,27 +90,30 @@ static CURLcode gopher_do(struct connectdata *conn, bool *done)
 
   *done = TRUE; /* unconditionally */
 
+  if(path && query)
+    gopherpath = aprintf("%s?%s", path, query);
+  else
+    gopherpath = strdup(path);
+
+  if(!gopherpath)
+    return CURLE_OUT_OF_MEMORY;
+
   /* Create selector. Degenerate cases: / and /1 => convert to "" */
-  if(strlen(path) <= 2) {
+  if(strlen(gopherpath) <= 2) {
     sel = (char *)"";
-    len = (int)strlen(sel);
+    len = strlen(sel);
+    free(gopherpath);
   }
   else {
     char *newp;
-    size_t j, i;
 
     /* Otherwise, drop / and the first character (i.e., item type) ... */
-    newp = path;
+    newp = gopherpath;
     newp += 2;
-
-    /* ... then turn ? into TAB for search servers, Veronica, etc. ... */
-    j = strlen(newp);
-    for(i = 0; i<j; i++)
-      if(newp[i] == '?')
-        newp[i] = '\x09';
 
     /* ... and finally unescape */
     result = Curl_urldecode(data, newp, 0, &sel, &len, FALSE);
+    free(gopherpath);
     if(result)
       return result;
     sel_org = sel;

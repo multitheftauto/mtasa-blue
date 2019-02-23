@@ -161,12 +161,12 @@ uint64 sha512_k[80] = {0x428a2f98d728ae22ULL, 0x7137449123ef65cdULL, 0xb5c0fbcfe
 
 /* SHA-256 functions */
 
-void sha256_transf(sha256_ctx *ctx, const unsigned char *message, unsigned int block_nb)
+void sha256_transf(sha256_ctx* ctx, const unsigned char* message, unsigned int block_nb)
 {
     uint32               w[64];
     uint32               wv[8];
     uint32               t1, t2;
-    const unsigned char *sub_block;
+    const unsigned char* sub_block;
     int                  i;
 
 #ifndef UNROLL_LOOPS
@@ -364,7 +364,7 @@ void sha256_transf(sha256_ctx *ctx, const unsigned char *message, unsigned int b
     }
 }
 
-void sha256(const unsigned char *message, unsigned int len, unsigned char *digest)
+void sha256(const unsigned char* message, unsigned int len, unsigned char* digest)
 {
     sha256_ctx ctx;
 
@@ -373,7 +373,7 @@ void sha256(const unsigned char *message, unsigned int len, unsigned char *diges
     sha256_final(&ctx, digest);
 }
 
-void sha256_init(sha256_ctx *ctx)
+void sha256_init(sha256_ctx* ctx)
 {
 #ifndef UNROLL_LOOPS
     int i;
@@ -396,11 +396,11 @@ void sha256_init(sha256_ctx *ctx)
     ctx->tot_len = 0;
 }
 
-void sha256_update(sha256_ctx *ctx, const unsigned char *message, unsigned int len)
+void sha256_update(sha256_ctx* ctx, const unsigned char* message, unsigned int len)
 {
     unsigned int         block_nb;
     unsigned int         new_len, rem_len, tmp_len;
-    const unsigned char *shifted_message;
+    const unsigned char* shifted_message;
 
     tmp_len = SHA256_BLOCK_SIZE - ctx->len;
     rem_len = len < tmp_len ? len : tmp_len;
@@ -429,7 +429,7 @@ void sha256_update(sha256_ctx *ctx, const unsigned char *message, unsigned int l
     ctx->tot_len += (block_nb + 1) << 6;
 }
 
-void sha256_final(sha256_ctx *ctx, unsigned char *digest)
+void sha256_final(sha256_ctx* ctx, unsigned char* digest)
 {
     unsigned int block_nb;
     unsigned int pm_len;
@@ -469,12 +469,12 @@ void sha256_final(sha256_ctx *ctx, unsigned char *digest)
 
 /* SHA-512 functions */
 
-void sha512_transf(sha512_ctx *ctx, const unsigned char *message, unsigned int block_nb)
+void sha512_transf(sha512_ctx* ctx, const unsigned char* message, unsigned int block_nb)
 {
     uint64               w[80];
     uint64               wv[8];
     uint64               t1, t2;
-    const unsigned char *sub_block;
+    const unsigned char* sub_block;
     int                  i, j;
 
     for (i = 0; i < (int)block_nb; i++)
@@ -641,7 +641,7 @@ void sha512_transf(sha512_ctx *ctx, const unsigned char *message, unsigned int b
     }
 }
 
-void sha512(const unsigned char *message, unsigned int len, unsigned char *digest)
+void sha512(const unsigned char* message, unsigned int len, unsigned char* digest)
 {
     sha512_ctx ctx;
 
@@ -650,7 +650,7 @@ void sha512(const unsigned char *message, unsigned int len, unsigned char *diges
     sha512_final(&ctx, digest);
 }
 
-void sha512_init(sha512_ctx *ctx)
+void sha512_init(sha512_ctx* ctx)
 {
 #ifndef UNROLL_LOOPS
     int i;
@@ -673,11 +673,11 @@ void sha512_init(sha512_ctx *ctx)
     ctx->tot_len = 0;
 }
 
-void sha512_update(sha512_ctx *ctx, const unsigned char *message, unsigned int len)
+void sha512_update(sha512_ctx* ctx, const unsigned char* message, unsigned int len)
 {
     unsigned int         block_nb;
     unsigned int         new_len, rem_len, tmp_len;
-    const unsigned char *shifted_message;
+    const unsigned char* shifted_message;
 
     tmp_len = SHA512_BLOCK_SIZE - ctx->len;
     rem_len = len < tmp_len ? len : tmp_len;
@@ -706,7 +706,7 @@ void sha512_update(sha512_ctx *ctx, const unsigned char *message, unsigned int l
     ctx->tot_len += (block_nb + 1) << 7;
 }
 
-void sha512_final(sha512_ctx *ctx, unsigned char *digest)
+void sha512_final(sha512_ctx* ctx, unsigned char* digest)
 {
     unsigned int block_nb;
     unsigned int pm_len;
@@ -746,7 +746,7 @@ void sha512_final(sha512_ctx *ctx, unsigned char *digest)
 
 /* SHA-384 functions */
 
-void sha384(const unsigned char *message, unsigned int len, unsigned char *digest)
+void sha384(const unsigned char* message, unsigned int len, unsigned char* digest)
 {
     sha384_ctx ctx;
 
@@ -755,7 +755,7 @@ void sha384(const unsigned char *message, unsigned int len, unsigned char *diges
     sha384_final(&ctx, digest);
 }
 
-void sha384_init(sha384_ctx *ctx)
+void sha384_init(sha384_ctx* ctx)
 {
 #ifndef UNROLL_LOOPS
     int i;
@@ -778,11 +778,11 @@ void sha384_init(sha384_ctx *ctx)
     ctx->tot_len = 0;
 }
 
-void sha384_update(sha384_ctx *ctx, const unsigned char *message, unsigned int len)
+void sha384_update(sha384_ctx* ctx, const unsigned char* message, unsigned int len)
 {
     unsigned int         block_nb;
     unsigned int         new_len, rem_len, tmp_len;
-    const unsigned char *shifted_message;
+    const unsigned char* shifted_message;
 
     tmp_len = SHA384_BLOCK_SIZE - ctx->len;
     rem_len = len < tmp_len ? len : tmp_len;
@@ -811,7 +811,7 @@ void sha384_update(sha384_ctx *ctx, const unsigned char *message, unsigned int l
     ctx->tot_len += (block_nb + 1) << 7;
 }
 
-void sha384_final(sha384_ctx *ctx, unsigned char *digest)
+void sha384_final(sha384_ctx* ctx, unsigned char* digest)
 {
     unsigned int block_nb;
     unsigned int pm_len;
@@ -849,7 +849,7 @@ void sha384_final(sha384_ctx *ctx, unsigned char *digest)
 
 /* SHA-224 functions */
 
-void sha224(const unsigned char *message, unsigned int len, unsigned char *digest)
+void sha224(const unsigned char* message, unsigned int len, unsigned char* digest)
 {
     sha224_ctx ctx;
 
@@ -858,7 +858,7 @@ void sha224(const unsigned char *message, unsigned int len, unsigned char *diges
     sha224_final(&ctx, digest);
 }
 
-void sha224_init(sha224_ctx *ctx)
+void sha224_init(sha224_ctx* ctx)
 {
 #ifndef UNROLL_LOOPS
     int i;
@@ -881,11 +881,11 @@ void sha224_init(sha224_ctx *ctx)
     ctx->tot_len = 0;
 }
 
-void sha224_update(sha224_ctx *ctx, const unsigned char *message, unsigned int len)
+void sha224_update(sha224_ctx* ctx, const unsigned char* message, unsigned int len)
 {
     unsigned int         block_nb;
     unsigned int         new_len, rem_len, tmp_len;
-    const unsigned char *shifted_message;
+    const unsigned char* shifted_message;
 
     tmp_len = SHA224_BLOCK_SIZE - ctx->len;
     rem_len = len < tmp_len ? len : tmp_len;
@@ -914,7 +914,7 @@ void sha224_update(sha224_ctx *ctx, const unsigned char *message, unsigned int l
     ctx->tot_len += (block_nb + 1) << 6;
 }
 
-void sha224_final(sha224_ctx *ctx, unsigned char *digest)
+void sha224_final(sha224_ctx* ctx, unsigned char* digest)
 {
     unsigned int block_nb;
     unsigned int pm_len;
@@ -958,7 +958,7 @@ void sha224_final(sha224_ctx *ctx, unsigned char *digest)
 #include <stdio.h>
 #include <stdlib.h>
 
-void test(const char *vector, unsigned char *digest, unsigned int digest_size)
+void test(const char* vector, unsigned char* digest, unsigned int digest_size)
 {
     char output[2 * SHA512_DIGEST_SIZE + 1];
     int  i;
@@ -978,9 +978,9 @@ void test(const char *vector, unsigned char *digest, unsigned int digest_size)
     }
 }
 
-int main(void)
+int main()
 {
-    static const char *vectors[4][3] = {/* SHA-224 */
+    static const char* vectors[4][3] = {/* SHA-224 */
                                         {
                                             "23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7",
                                             "75388b16512776cc5dba5da1fd890150b0c6455cb4f58b1952522525",
@@ -1017,7 +1017,7 @@ int main(void)
         "abcdefghbcdefghicdefghijdefghijkefghij"
         "klfghijklmghijklmnhijklmnoijklmnopjklm"
         "nopqklmnopqrlmnopqrsmnopqrstnopqrstu";
-    unsigned char *message3;
+    unsigned char* message3;
     unsigned int   message3_len = 1000000;
     unsigned char  digest[SHA512_DIGEST_SIZE];
 
@@ -1032,9 +1032,9 @@ int main(void)
     printf("SHA-2 FIPS 180-2 Validation tests\n\n");
     printf("SHA-224 Test vectors\n");
 
-    sha224((const unsigned char *)message1, strlen(message1), digest);
+    sha224((const unsigned char*)message1, strlen(message1), digest);
     test(vectors[0][0], digest, SHA224_DIGEST_SIZE);
-    sha224((const unsigned char *)message2a, strlen(message2a), digest);
+    sha224((const unsigned char*)message2a, strlen(message2a), digest);
     test(vectors[0][1], digest, SHA224_DIGEST_SIZE);
     sha224(message3, message3_len, digest);
     test(vectors[0][2], digest, SHA224_DIGEST_SIZE);
@@ -1042,9 +1042,9 @@ int main(void)
 
     printf("SHA-256 Test vectors\n");
 
-    sha256((const unsigned char *)message1, strlen(message1), digest);
+    sha256((const unsigned char*)message1, strlen(message1), digest);
     test(vectors[1][0], digest, SHA256_DIGEST_SIZE);
-    sha256((const unsigned char *)message2a, strlen(message2a), digest);
+    sha256((const unsigned char*)message2a, strlen(message2a), digest);
     test(vectors[1][1], digest, SHA256_DIGEST_SIZE);
     sha256(message3, message3_len, digest);
     test(vectors[1][2], digest, SHA256_DIGEST_SIZE);
@@ -1052,9 +1052,9 @@ int main(void)
 
     printf("SHA-384 Test vectors\n");
 
-    sha384((const unsigned char *)message1, strlen(message1), digest);
+    sha384((const unsigned char*)message1, strlen(message1), digest);
     test(vectors[2][0], digest, SHA384_DIGEST_SIZE);
-    sha384((const unsigned char *)message2b, strlen(message2b), digest);
+    sha384((const unsigned char*)message2b, strlen(message2b), digest);
     test(vectors[2][1], digest, SHA384_DIGEST_SIZE);
     sha384(message3, message3_len, digest);
     test(vectors[2][2], digest, SHA384_DIGEST_SIZE);
@@ -1062,9 +1062,9 @@ int main(void)
 
     printf("SHA-512 Test vectors\n");
 
-    sha512((const unsigned char *)message1, strlen(message1), digest);
+    sha512((const unsigned char*)message1, strlen(message1), digest);
     test(vectors[3][0], digest, SHA512_DIGEST_SIZE);
-    sha512((const unsigned char *)message2b, strlen(message2b), digest);
+    sha512((const unsigned char*)message2b, strlen(message2b), digest);
     test(vectors[3][1], digest, SHA512_DIGEST_SIZE);
     sha512(message3, message3_len, digest);
     test(vectors[3][2], digest, SHA512_DIGEST_SIZE);

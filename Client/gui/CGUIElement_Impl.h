@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGUIELEMENT_IMPL_H
-#define __CGUIELEMENT_IMPL_H
+#pragma once
 
 #include <gui/CGUIElement.h>
 
@@ -26,18 +25,18 @@ class CGUI_Impl;
 class CGUIElement_Impl : public CGUIElement
 {
 public:
-    CGUIElement_Impl(void);
+    CGUIElement_Impl();
 
     void SetVisible(bool bVisible);
-    bool IsVisible(void);
+    bool IsVisible();
 
     void SetEnabled(bool bEnabled);
-    bool IsEnabled(void);
+    bool IsEnabled();
     void SetZOrderingEnabled(bool bZOrderingEnabled);
-    bool IsZOrderingEnabled(void);
+    bool IsZOrderingEnabled();
 
-    void BringToFront(void);
-    void MoveToBack(void);
+    void BringToFront();
+    void MoveToBack();
 
     void      SetPosition(const CVector2D& vecPosition, bool bRelative = false);
     CVector2D GetPosition(bool bRelative = false);
@@ -53,34 +52,34 @@ public:
     void AutoSize(const char* Text = NULL, float fPaddingX = 0.0f, float fPaddingY = 2.0f);
 
     bool        SetFont(const char* szFontName);
-    std::string GetFont(void);
+    std::string GetFont();
 
     void        SetProperty(const char* szProperty, const char* szValue);
     std::string GetProperty(const char* szProperty);
 
     void      SetMinimumSize(const CVector2D& vecSize);
-    CVector2D GetMinimumSize(void);
+    CVector2D GetMinimumSize();
     void      GetMinimumSize(CVector2D& vecSize);
 
     void      SetMaximumSize(const CVector2D& vecSize);
-    CVector2D GetMaximumSize(void);
+    CVector2D GetMaximumSize();
     void      GetMaximumSize(CVector2D& vecSize);
 
     void        SetText(const char* Text);
-    std::string GetText(void);
+    std::string GetText();
 
     void  SetAlpha(float fAlpha);
-    float GetAlpha(void);
-    float GetEffectiveAlpha(void);
+    float GetAlpha();
+    float GetEffectiveAlpha();
     void  SetInheritsAlpha(bool bInheritsAlpha);
-    bool  GetInheritsAlpha(void);
+    bool  GetInheritsAlpha();
 
-    void Activate(void);
-    void Deactivate(void);
-    bool IsActive(void);
+    void Activate();
+    void Deactivate();
+    bool IsActive();
 
     void SetAlwaysOnTop(bool bAlwaysOnTop);
-    bool IsAlwaysOnTop(void);
+    bool IsAlwaysOnTop();
 
     CRect2D   AbsoluteToRelative(const CRect2D& Rect);
     CVector2D AbsoluteToRelative(const CVector2D& Vector);
@@ -89,17 +88,17 @@ public:
     CVector2D RelativeToAbsolute(const CVector2D& Vector);
 
     void         SetParent(CGUIElement* pParent);
-    CGUIElement* GetParent(void);
+    CGUIElement* GetParent();
 
-    CEGUI::Window* GetWindow(void);
+    CEGUI::Window* GetWindow();
 
-    void ForceRedraw(void);
+    void ForceRedraw();
 
     void  SetUserData(void* pData) { m_pData = pData; }
-    void* GetUserData(void) { return m_pData; }
+    void* GetUserData() { return m_pData; }
 
-    CGUIPropertyIter GetPropertiesBegin(void);
-    CGUIPropertyIter GetPropertiesEnd(void);
+    CGUIPropertyIter GetPropertiesBegin();
+    CGUIPropertyIter GetPropertiesEnd();
 
     void SetMovedHandler(GUI_CALLBACK Callback);
     void SetSizedHandler(GUI_CALLBACK Callback);
@@ -114,20 +113,20 @@ public:
     void SetKeyDownHandler(const GUI_CALLBACK_KEY& Callback);
     void SetEnterKeyHandler(GUI_CALLBACK Callback);
 
-    bool Event_OnClick(void);
-    bool Event_OnDoubleClick(void);
-    bool Event_OnMouseEnter(void);
-    bool Event_OnMouseLeave(void);
-    bool Event_OnMouseButtonDown(void);
+    bool Event_OnClick();
+    bool Event_OnDoubleClick();
+    bool Event_OnMouseEnter();
+    bool Event_OnMouseLeave();
+    bool Event_OnMouseButtonDown();
 
 protected:
-    void DestroyElement(void);
+    void DestroyElement();
 
-    void CorrectEdges(void);
-    void FillProperties(void);
-    void EmptyProperties(void);
+    void CorrectEdges();
+    void FillProperties();
+    void EmptyProperties();
 
-    void AddEvents(void);
+    void AddEvents();
 
     bool Event_OnMoved(const CEGUI::EventArgs& e);
     bool Event_OnSized(const CEGUI::EventArgs& e);
@@ -157,5 +156,3 @@ protected:
     GUI_CALLBACK     m_OnEnter;
     GUI_CALLBACK_KEY m_OnKeyDownWithArgs;
 };
-
-#endif

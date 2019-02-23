@@ -28,26 +28,26 @@ static HWND          hwndNoAvDialog = NULL;
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-const char* dialogStringsYes = _td("Yes");
-const char* dialogStringsNo = _td("No");
-const char* dialogStringsOk = _td("OK");
-const char* dialogStringsQuit = _td("Quit");
-const char* dialogStringsHelp = _td("Help");
-const char* dialogStringsCancel = _td("Cancel");
+const char* const dialogStringsYes = _td("Yes");
+const char* const dialogStringsNo = _td("No");
+const char* const dialogStringsOk = _td("OK");
+const char* const dialogStringsQuit = _td("Quit");
+const char* const dialogStringsHelp = _td("Help");
+const char* const dialogStringsCancel = _td("Cancel");
 
 struct SDialogItemInfo
 {
-    int         iItemId;
-    int         iLeadingSpaces;
-    const char* szItemText;
+    int               iItemId;
+    int               iLeadingSpaces;
+    const char* const szItemText;
 };
 
-SDialogItemInfo g_ProgressDialogItems[] = {
+const SDialogItemInfo g_ProgressDialogItems[] = {
     {IDCANCEL, 0, dialogStringsCancel},
     {-1},
 };
 
-SDialogItemInfo g_CrashedDialogItems[] = {
+const SDialogItemInfo g_CrashedDialogItems[] = {
     {0, 0, _td("MTA: San Andreas has encountered a problem")},
     {IDC_CRASH_HEAD, 0, _td("Crash information")},
     {IDC_SEND_DUMP_CHECK, 0, _td("Tick the check box to send this crash info to MTA devs using the 'internet'")},
@@ -58,7 +58,7 @@ SDialogItemInfo g_CrashedDialogItems[] = {
     {-1},
 };
 
-SDialogItemInfo g_D3dDllDialogItems[] = {
+const SDialogItemInfo g_D3dDllDialogItems[] = {
     {0, 0, _td("MTA: San Andreas - Warning")},
     {IDC_D3DDLL_TEXT1, 0, _td("Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll file:")},
     {IDC_D3DDLL_TEXT2, 0,
@@ -71,7 +71,7 @@ SDialogItemInfo g_D3dDllDialogItems[] = {
     {-1},
 };
 
-SDialogItemInfo g_OptimusDialogItems[] = {
+const SDialogItemInfo g_OptimusDialogItems[] = {
     {0, 0, _td("MTA: San Andreas - Confusing options")},
     {IDC_OPTIMUS_TEXT1, 0, _td("NVidia Optimus detected!")},
     {IDC_OPTIMUS_TEXT2, 0, _td("Try each option and see what works:")},
@@ -90,7 +90,7 @@ SDialogItemInfo g_OptimusDialogItems[] = {
     {-1},
 };
 
-SDialogItemInfo g_NoAvDialogItems[] = {
+const SDialogItemInfo g_NoAvDialogItems[] = {
     {0, 0, _td("MTA: San Andreas")},
     {IDC_NOAV_TEXT1, 0, _td("Warning: Could not detect anti-virus product")},
     {IDC_NOAV_TEXT2, 0,
@@ -217,7 +217,7 @@ void ShowSplash(HINSTANCE hInstance)
 //
 // Hide splash dialog
 //
-void HideSplash(void)
+void HideSplash()
 {
     if (hwndSplash)
     {
@@ -229,7 +229,7 @@ void HideSplash(void)
 //
 // Hide splash dialog temporarily
 //
-void SuspendSplash(void)
+void SuspendSplash()
 {
     if (hwndSplash)
     {
@@ -240,7 +240,7 @@ void SuspendSplash(void)
 //
 // Show splash dialog if was previously suspended
 //
-void ResumeSplash(void)
+void ResumeSplash()
 {
     if (hwndSplash)
     {
@@ -273,7 +273,7 @@ void ShowProgressDialog(HINSTANCE hInstance, const SString& strTitle, bool bAllo
     SetWindowPos(hwndProgressDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 }
 
-void HideProgressDialog(void)
+void HideProgressDialog()
 {
     if (hwndProgressDialog)
     {
@@ -331,7 +331,7 @@ void StartPseudoProgress(HINSTANCE hInstance, const SString& strTitle, const SSt
     UpdateProgress(30, 100);
 }
 
-void StopPseudoProgress(void)
+void StopPseudoProgress()
 {
     if (hwndProgressDialog)
     {
@@ -395,7 +395,7 @@ SString ShowCrashedDialog(HINSTANCE hInstance, const SString& strMessage)
     return "ok";
 }
 
-void HideCrashedDialog(void)
+void HideCrashedDialog()
 {
     if (hwndCrashedDialog)
     {
@@ -486,7 +486,7 @@ void ShowD3dDllDialog(HINSTANCE hInstance, const SString& strPath)
     ResumeSplash();
 }
 
-void HideD3dDllDialog(void)
+void HideD3dDllDialog()
 {
     if (hwndD3dDllDialog)
     {
@@ -575,7 +575,7 @@ void ShowOptimusDialog(HINSTANCE hInstance)
     ResumeSplash();
 }
 
-void HideOptimusDialog(void)
+void HideOptimusDialog()
 {
     if (hwndOptimusDialog)
     {
@@ -667,7 +667,7 @@ void ShowNoAvDialog(HINSTANCE hInstance, bool bEnableScaremongering)
     ResumeSplash();
 }
 
-void HideNoAvDialog(void)
+void HideNoAvDialog()
 {
     if (hwndNoAvDialog)
     {
@@ -684,7 +684,7 @@ void HideNoAvDialog(void)
 // For checking string are correct
 //
 ///////////////////////////////////////////////////////////////
-void TestDialogs(void)
+void TestDialogs()
 {
 #if 0
 #if 1

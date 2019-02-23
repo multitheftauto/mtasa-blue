@@ -28,7 +28,7 @@ bool CClientColTube::DoHitDetection(const CVector& vecNowPosition, float fRadius
             vecNowPosition.fZ <= m_vecPosition.fZ + m_fHeight);
 }
 
-CSphere CClientColTube::GetWorldBoundingSphere(void)
+CSphere CClientColTube::GetWorldBoundingSphere()
 {
     CSphere sphere;
     sphere.vecPosition.fX = m_vecPosition.fX;

@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CVIDEOMODEMANAGER_H
-#define __CVIDEOMODEMANAGER_H
+#pragma once
 
 enum
 {
@@ -21,7 +20,7 @@ enum
 class CVideoModeManagerInterface
 {
 public:
-    virtual ~CVideoModeManagerInterface(void) {}
+    virtual ~CVideoModeManagerInterface() {}
 
     virtual void PreCreateDevice(D3DPRESENT_PARAMETERS* pp) = 0;
     virtual void PostCreateDevice(IDirect3DDevice9* pD3DDevice, D3DPRESENT_PARAMETERS* pp) = 0;
@@ -29,17 +28,15 @@ public:
     virtual void PostReset(D3DPRESENT_PARAMETERS* pp) = 0;
     virtual void GetNextVideoMode(int& iOutNextVideoMode, bool& bOutNextWindowed, bool& bOutNextFullScreenMinimize, int& iNextFullscreenStyle) = 0;
     virtual bool SetVideoMode(int nextVideoMode, bool bNextWindowed, bool bNextFullScreenMinimize, int iNextFullscreenStyle) = 0;
-    virtual bool IsWindowed(void) = 0;
-    virtual bool IsMultiMonitor(void) = 0;
-    virtual bool IsMinimizeEnabled(void) = 0;
-    virtual void OnGainFocus(void) = 0;
-    virtual void OnLoseFocus(void) = 0;
-    virtual void OnPaint(void) = 0;
+    virtual bool IsWindowed() = 0;
+    virtual bool IsMultiMonitor() = 0;
+    virtual bool IsMinimizeEnabled() = 0;
+    virtual void OnGainFocus() = 0;
+    virtual void OnLoseFocus() = 0;
+    virtual void OnPaint() = 0;
     virtual bool GetRequiredDisplayResolution(int& iOutWidth, int& iOutHeight, int& iOutColorBits, int& iOutAdapterIndex) = 0;
-    virtual int  GetFullScreenStyle(void) = 0;
-    virtual bool IsDisplayModeWindowed(void) = 0;
+    virtual int  GetFullScreenStyle() = 0;
+    virtual bool IsDisplayModeWindowed() = 0;
 };
 
-CVideoModeManagerInterface* GetVideoModeManager(void);
-
-#endif
+CVideoModeManagerInterface* GetVideoModeManager();

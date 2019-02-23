@@ -11,21 +11,29 @@
 
 #include "StdInc.h"
 
-void CLuaBlipDefs::LoadFunctions(void)
+void CLuaBlipDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("createBlip", CreateBlip);
-    CLuaCFunctions::AddFunction("createBlipAttachedTo", CreateBlipAttachedTo);
-    CLuaCFunctions::AddFunction("getBlipIcon", GetBlipIcon);
-    CLuaCFunctions::AddFunction("getBlipSize", GetBlipSize);
-    CLuaCFunctions::AddFunction("getBlipColor", GetBlipColor);
-    CLuaCFunctions::AddFunction("getBlipOrdering", GetBlipOrdering);
-    CLuaCFunctions::AddFunction("getBlipVisibleDistance", GetBlipVisibleDistance);
+    std::map<const char*, lua_CFunction> functions{
+        {"createBlip", CreateBlip},
+        {"createBlipAttachedTo", CreateBlipAttachedTo},
+        {"getBlipIcon", GetBlipIcon},
+        {"getBlipSize", GetBlipSize},
+        {"getBlipColor", GetBlipColor},
+        {"getBlipOrdering", GetBlipOrdering},
+        {"getBlipVisibleDistance", GetBlipVisibleDistance},
 
-    CLuaCFunctions::AddFunction("setBlipIcon", SetBlipIcon);
-    CLuaCFunctions::AddFunction("setBlipSize", SetBlipSize);
-    CLuaCFunctions::AddFunction("setBlipColor", SetBlipColor);
-    CLuaCFunctions::AddFunction("setBlipOrdering", SetBlipOrdering);
-    CLuaCFunctions::AddFunction("setBlipVisibleDistance", SetBlipVisibleDistance);
+        {"setBlipIcon", SetBlipIcon},
+        {"setBlipSize", SetBlipSize},
+        {"setBlipColor", SetBlipColor},
+        {"setBlipOrdering", SetBlipOrdering},
+        {"setBlipVisibleDistance", SetBlipVisibleDistance},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaBlipDefs::AddClass(lua_State* luaVM)
@@ -60,25 +68,28 @@ int CLuaBlipDefs::CreateBlip(lua_State* luaVM)
 {
     CVector          vecPosition;
     unsigned char    ucIcon = 0;
-    unsigned char    ucSize = 2;
+    int              iSize = 2;
     SColorRGBA       color(255, 0, 0, 255);
-    short            sOrdering = 0;
-    unsigned short   usVisibleDistance = 16383;
+    int              iOrdering = 0;
+    int              iVisibleDistance = 16383;
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecPosition);
     argStream.ReadNumber(ucIcon, 0);
-    argStream.ReadNumber(ucSize, 2);
+    argStream.ReadNumber(iSize, 2);
     argStream.ReadNumber(color.R, 255);
     argStream.ReadNumber(color.G, 0);
     argStream.ReadNumber(color.B, 0);
     argStream.ReadNumber(color.A, 255);
-    argStream.ReadNumber(sOrdering, 0);
-    argStream.ReadNumber(usVisibleDistance, 16383);
+    argStream.ReadNumber(iOrdering, 0);
+    argStream.ReadNumber(iVisibleDistance, 16383);
 
     if (!CClientRadarMarkerManager::IsValidIcon(ucIcon))
     {
         argStream.SetCustomError("Invalid icon");
     }
+
+    if (iSize < 0 || iSize > 25)
+        argStream.SetCustomWarning(SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", iSize));
 
     if (!argStream.HasErrors())
     {
@@ -88,6 +99,10 @@ int CLuaBlipDefs::CreateBlip(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (pResource)
             {
+                unsigned char  ucSize = Clamp(0, iSize, 25);
+                short          sOrdering = Clamp(-32768, iOrdering, 32767);
+                unsigned short usVisibleDistance = Clamp(0, iVisibleDistance, 65535);
+
                 // Create the blip
                 CClientRadarMarker* pMarker =
                     CStaticFunctionDefinitions::CreateBlip(*pResource, vecPosition, ucIcon, ucSize, color, sOrdering, usVisibleDistance);
@@ -117,25 +132,28 @@ int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
     CClientEntity* pEntity = NULL;
     // Default colors and size
     unsigned char    ucIcon = 0;
-    unsigned char    ucSize = 2;
+    int              iSize = 2;
     SColorRGBA       color(255, 0, 0, 255);
-    short            sOrdering = 0;
-    unsigned short   usVisibleDistance = 16383;
+    int              iOrdering = 0;
+    int              iVisibleDistance = 16383;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(ucIcon, 0);
-    argStream.ReadNumber(ucSize, 2);
+    argStream.ReadNumber(iSize, 2);
     argStream.ReadNumber(color.R, 255);
     argStream.ReadNumber(color.G, 0);
     argStream.ReadNumber(color.B, 0);
     argStream.ReadNumber(color.A, 255);
-    argStream.ReadNumber(sOrdering, 0);
-    argStream.ReadNumber(usVisibleDistance, 16383);
+    argStream.ReadNumber(iOrdering, 0);
+    argStream.ReadNumber(iVisibleDistance, 16383);
 
     if (!CClientRadarMarkerManager::IsValidIcon(ucIcon))
     {
         argStream.SetCustomError("Invalid icon");
     }
+
+    if (iSize < 0 || iSize > 25)
+        argStream.SetCustomWarning(SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", iSize));
 
     if (!argStream.HasErrors())
     {
@@ -145,6 +163,10 @@ int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (pResource)
             {
+                unsigned char  ucSize = Clamp(0, iSize, 25);
+                short          sOrdering = Clamp(-32768, iOrdering, 32767);
+                unsigned short usVisibleDistance = Clamp(0, iVisibleDistance, 65535);
+
                 // Create the blip
                 CClientRadarMarker* pMarker =
                     CStaticFunctionDefinitions::CreateBlipAttachedTo(*pResource, *pEntity, ucIcon, ucSize, color, sOrdering, usVisibleDistance);
@@ -297,13 +319,18 @@ int CLuaBlipDefs::SetBlipIcon(lua_State* luaVM)
 int CLuaBlipDefs::SetBlipSize(lua_State* luaVM)
 {
     CClientEntity*   pEntity = NULL;
-    unsigned char    ucSize = 0;
+    int              iSize = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
-    argStream.ReadNumber(ucSize);
+    argStream.ReadNumber(iSize);
+
+    if (iSize < 0 || iSize > 25)
+        argStream.SetCustomWarning(SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", iSize));
 
     if (!argStream.HasErrors())
     {
+        unsigned char ucSize = Clamp(0, iSize, 25);
+
         if (CStaticFunctionDefinitions::SetBlipSize(*pEntity, ucSize))
         {
             lua_pushboolean(luaVM, true);
@@ -346,13 +373,15 @@ int CLuaBlipDefs::SetBlipColor(lua_State* luaVM)
 int CLuaBlipDefs::SetBlipOrdering(lua_State* luaVM)
 {
     CClientEntity*   pEntity = NULL;
-    short            sOrdering;
+    int              iOrdering;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
-    argStream.ReadNumber(sOrdering);
+    argStream.ReadNumber(iOrdering);
 
     if (!argStream.HasErrors())
     {
+        short sOrdering = Clamp(-32768, iOrdering, 32767);
+
         if (CStaticFunctionDefinitions::SetBlipOrdering(*pEntity, sOrdering))
         {
             lua_pushboolean(luaVM, true);
@@ -369,13 +398,15 @@ int CLuaBlipDefs::SetBlipOrdering(lua_State* luaVM)
 int CLuaBlipDefs::SetBlipVisibleDistance(lua_State* luaVM)
 {
     CClientEntity*   pEntity = NULL;
-    unsigned short   usVisibleDistance;
+    int              iVisibleDistance;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
-    argStream.ReadNumber(usVisibleDistance);
+    argStream.ReadNumber(iVisibleDistance);
 
     if (!argStream.HasErrors())
     {
+        unsigned short usVisibleDistance = Clamp(0, iVisibleDistance, 65535);
+
         if (CStaticFunctionDefinitions::SetBlipVisibleDistance(*pEntity, usVisibleDistance))
         {
             lua_pushboolean(luaVM, true);

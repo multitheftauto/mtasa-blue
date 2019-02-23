@@ -35,9 +35,9 @@ void HOOK_GetFxQuality();
 DWORD RETURN_StoreShadowForVehicle = 0x70BDA9;
 void  HOOK_StoreShadowForVehicle();
 
-float ms_fVehicleLODDistance, ms_fTrainPlaneLODDistance;
+float ms_fVehicleLODDistance, ms_fTrainPlaneLODDistance, ms_fPedsLODDistance;
 
-CSettingsSA::CSettingsSA(void)
+CSettingsSA::CSettingsSA()
 {
     m_pInterface = (CSettingsSAInterface*)CLASS_CMenuManager;
     m_pInterface->bFrameLimiter = false;
@@ -52,12 +52,13 @@ CSettingsSA::CSettingsSA(void)
 
     MemPut(0x732926, &ms_fVehicleLODDistance);
     MemPut(0x732940, &ms_fTrainPlaneLODDistance);
+    MemPut(0x73295E, &ms_fPedsLODDistance);
 
     // Set "radar map and radar" as default radar mode
     SetRadarMode(RADAR_MODE_ALL);
 }
 
-bool CSettingsSA::IsWideScreenEnabled(void)
+bool CSettingsSA::IsWideScreenEnabled()
 {
     return m_pInterface->bUseWideScreen;
 }
@@ -67,7 +68,7 @@ void CSettingsSA::SetWideScreenEnabled(bool bEnabled)
     m_pInterface->bUseWideScreen = bEnabled;
 }
 
-unsigned int CSettingsSA::GetNumVideoModes(void)
+unsigned int CSettingsSA::GetNumVideoModes()
 {
     unsigned int uiReturn = 0;
     _asm
@@ -92,7 +93,7 @@ VideoMode* CSettingsSA::GetVideoModeInfo(VideoMode* modeInfo, unsigned int modeI
     return pReturn;
 }
 
-unsigned int CSettingsSA::GetCurrentVideoMode(void)
+unsigned int CSettingsSA::GetCurrentVideoMode()
 {
     unsigned int uiReturn = 0;
     _asm
@@ -119,7 +120,7 @@ void CSettingsSA::SetCurrentVideoMode(unsigned int modeIndex, bool bOnRestart)
         m_pInterface->dwVideoMode = modeIndex;
 }
 
-uint CSettingsSA::GetNumAdapters(void)
+uint CSettingsSA::GetNumAdapters()
 {
     unsigned int uiReturn = 0;
     _asm
@@ -140,7 +141,7 @@ void CSettingsSA::SetAdapter(unsigned int uiAdapterIndex)
     }
 }
 
-unsigned int CSettingsSA::GetCurrentAdapter(void)
+unsigned int CSettingsSA::GetCurrentAdapter()
 {
     unsigned int uiReturn = 0;
     _asm
@@ -151,7 +152,7 @@ unsigned int CSettingsSA::GetCurrentAdapter(void)
     return uiReturn;
 }
 
-unsigned char CSettingsSA::GetRadioVolume(void)
+unsigned char CSettingsSA::GetRadioVolume()
 {
     return m_pInterface->ucRadioVolume;
 }
@@ -162,7 +163,7 @@ void CSettingsSA::SetRadioVolume(unsigned char ucVolume)
     pGame->GetAudioEngine()->SetMusicMasterVolume(ucVolume);
 }
 
-unsigned char CSettingsSA::GetSFXVolume(void)
+unsigned char CSettingsSA::GetSFXVolume()
 {
     return m_pInterface->ucSfxVolume;
 }
@@ -173,7 +174,7 @@ void CSettingsSA::SetSFXVolume(unsigned char ucVolume)
     pGame->GetAudioEngine()->SetEffectsMasterVolume(ucVolume);
 }
 
-unsigned int CSettingsSA::GetUsertrackMode(void)
+unsigned int CSettingsSA::GetUsertrackMode()
 {
     // 0 = radio, 1 = random, 2 = sequential
     return m_pInterface->ucUsertrackMode;
@@ -184,7 +185,7 @@ void CSettingsSA::SetUsertrackMode(unsigned int uiMode)
     m_pInterface->ucUsertrackMode = uiMode;
 }
 
-bool CSettingsSA::IsUsertrackAutoScan(void)
+bool CSettingsSA::IsUsertrackAutoScan()
 {
     // 1 = yes, 0 = no
     return m_pInterface->bUsertrackAutoScan;
@@ -195,7 +196,7 @@ void CSettingsSA::SetUsertrackAutoScan(bool bEnable)
     m_pInterface->bUsertrackAutoScan = bEnable;
 }
 
-bool CSettingsSA::IsRadioEqualizerEnabled(void)
+bool CSettingsSA::IsRadioEqualizerEnabled()
 {
     // 1 = on, 0 = off
     return m_pInterface->bRadioEqualizer;
@@ -206,7 +207,7 @@ void CSettingsSA::SetRadioEqualizerEnabled(bool bEnable)
     m_pInterface->bRadioEqualizer = bEnable;
 }
 
-bool CSettingsSA::IsRadioAutotuneEnabled(void)
+bool CSettingsSA::IsRadioAutotuneEnabled()
 {
     // 1 = on, 0 = off
     return m_pInterface->bRadioAutotune;
@@ -218,7 +219,7 @@ void CSettingsSA::SetRadioAutotuneEnabled(bool bEnable)
 }
 
 // Minimum is 0.925 and maximum is 1.8
-float CSettingsSA::GetDrawDistance(void)
+float CSettingsSA::GetDrawDistance()
 {
     return m_pInterface->fDrawDistance;
 }
@@ -291,7 +292,7 @@ void CSettingsSA::SetAntiAliasing(unsigned int uiAntiAliasing, bool bOnRestart)
     m_pInterface->dwAntiAliasing = uiAntiAliasing;
 }
 
-bool CSettingsSA::IsMipMappingEnabled(void)
+bool CSettingsSA::IsMipMappingEnabled()
 {
     return m_pInterface->bMipMapping;
 }
@@ -311,7 +312,7 @@ void CSettingsSA::Save()
     }
 }
 
-bool CSettingsSA::IsVolumetricShadowsEnabled(void)
+bool CSettingsSA::IsVolumetricShadowsEnabled()
 {
     return m_bVolumetricShadowsEnabled && !m_bVolumetricShadowsSuspended;
 }
@@ -404,12 +405,12 @@ void _declspec(naked) HOOK_StoreShadowForVehicle()
 // AspectRatio
 //
 ////////////////////////////////////////////////
-eAspectRatio CSettingsSA::GetAspectRatio(void)
+eAspectRatio CSettingsSA::GetAspectRatio()
 {
     return m_AspectRatio;
 }
 
-float CSettingsSA::GetAspectRatioValue(void)
+float CSettingsSA::GetAspectRatioValue()
 {
     return *(float*)0xC3EFA4;
 }
@@ -453,7 +454,7 @@ void CSettingsSA::SetAspectRatio(eAspectRatio aspectRatio, bool bAdjustmentEnabl
 // Grass
 //
 ////////////////////////////////////////////////
-bool CSettingsSA::IsGrassEnabled(void)
+bool CSettingsSA::IsGrassEnabled()
 {
     return *(BYTE*)0x05DBAED == 0x85;
 }
@@ -468,7 +469,7 @@ void CSettingsSA::SetGrassEnabled(bool bEnable)
 // HUD mode (radar map + blips, blips only, nothing)
 //
 ////////////////////////////////////////////////
-eRadarMode CSettingsSA::GetRadarMode(void)
+eRadarMode CSettingsSA::GetRadarMode()
 {
     return *(eRadarMode*)VAR_RadarMode;
 }
@@ -490,22 +491,22 @@ bool  ms_bFOVPlayerFromScript = false;
 bool  ms_bFOVVehicleFromScript = false;
 
 // consider moving this to the camera class - qaisjp
-float CSettingsSA::GetFieldOfViewPlayer(void)
+float CSettingsSA::GetFieldOfViewPlayer()
 {
     return ms_fFOV;
 }
 
-float CSettingsSA::GetFieldOfViewVehicle(void)
+float CSettingsSA::GetFieldOfViewVehicle()
 {
     return ms_fFOVCar;
 }
 
-float CSettingsSA::GetFieldOfViewVehicleMax(void)
+float CSettingsSA::GetFieldOfViewVehicleMax()
 {
     return ms_fFOVCarMax;
 }
 
-void CSettingsSA::UpdateFieldOfViewFromSettings(void)
+void CSettingsSA::UpdateFieldOfViewFromSettings()
 {
     float fFieldOfView;
     g_pCore->GetCVars()->Get("fov", fFieldOfView);
@@ -515,7 +516,7 @@ void CSettingsSA::UpdateFieldOfViewFromSettings(void)
     SetFieldOfViewVehicleMax(100, false);
 }
 
-void CSettingsSA::ResetFieldOfViewFromScript(void)
+void CSettingsSA::ResetFieldOfViewFromScript()
 {
     ms_bFOVPlayerFromScript = false;
     ms_bFOVVehicleFromScript = false;
@@ -567,7 +568,7 @@ void CSettingsSA::SetVehiclesLODDistance(float fVehiclesLODDistance, float fTrai
     ms_fTrainPlaneLODDistance = fTrainsPlanesLODDistance;
 }
 
-void CSettingsSA::ResetVehiclesLODDistance(void)
+void CSettingsSA::ResetVehiclesLODDistance()
 {
     bool bHighDetailVehicles;
     g_pCore->GetCVars()->Get("high_detail_vehicles", bHighDetailVehicles);
@@ -592,12 +593,42 @@ void CSettingsSA::GetVehiclesLODDistance(float& fVehiclesLODDistance, float& fTr
 
 ////////////////////////////////////////////////
 //
+// Peds LOD draw distance
+//
+////////////////////////////////////////////////
+ 
+void CSettingsSA::SetPedsLODDistance(float fPedsLODDistance)
+{
+    ms_fPedsLODDistance = fPedsLODDistance;
+}
+ 
+float CSettingsSA::GetPedsLODDistance()
+{
+    return ms_fPedsLODDistance;
+}
+ 
+void CSettingsSA::ResetPedsLODDistance()
+{
+    bool bHighDetailPeds;
+    g_pCore->GetCVars()->Get("high_detail_peds", bHighDetailPeds);
+    if (bHighDetailPeds)
+    {
+        ms_fPedsLODDistance = MAX_PEDS_LOD_DISTANCE;
+    }
+    else
+    {
+        ms_fPedsLODDistance = DEFAULT_PEDS_LOD_DISTANCE;
+    }
+}
+
+////////////////////////////////////////////////
+//
 // CSettingsSA::HasUnsafeResolutions
 //
 // Return true if DirectX says we have resolutions available that are higher that the desktop
 //
 ////////////////////////////////////////////////
-bool CSettingsSA::HasUnsafeResolutions(void)
+bool CSettingsSA::HasUnsafeResolutions()
 {
     uint numVidModes = GetNumVideoModes();
     for (uint vidMode = 0; vidMode < numVidModes; vidMode++)
@@ -700,7 +731,7 @@ uint CSettingsSA::FindVideoMode(int iResX, int iResY, int iColorBits)
 // Set/validate the required video mode
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CSettingsSA::SetValidVideoMode(void)
+void CSettingsSA::SetValidVideoMode()
 {
     bool bValid = false;
     int  iWidth, iHeight, iColorBits, iAdapterIndex;
@@ -801,7 +832,7 @@ void CSettingsSA::SetValidVideoMode(void)
 // return 2 for multi adapter show dialog
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-int CSettingsSA::OnSelectDevice(void)
+int CSettingsSA::OnSelectDevice()
 {
     if (GetNumAdapters() > 1 && g_pCore->GetDeviceSelectionEnabled())
     {
@@ -829,7 +860,7 @@ int CSettingsSA::OnSelectDevice(void)
 //   * Choose whether to show the device selection dialog box
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-__declspec(noinline) int OnMY_SelectDevice(void)
+__declspec(noinline) int OnMY_SelectDevice()
 {
     CSettingsSA* gameSettings = (CSettingsSA*)pGame->GetSettings();
     return gameSettings->OnSelectDevice();
@@ -870,7 +901,7 @@ single:
 // Setup hooks
 //
 ////////////////////////////////////////////////
-void CSettingsSA::StaticSetHooks(void)
+void CSettingsSA::StaticSetHooks()
 {
     EZHookInstall(SelectDevice);
 }

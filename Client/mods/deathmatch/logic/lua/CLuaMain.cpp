@@ -43,7 +43,7 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEn
     CClientPerfStatLuaTiming::GetSingleton()->OnLuaMainCreate(this);
 }
 
-CLuaMain::~CLuaMain(void)
+CLuaMain::~CLuaMain()
 {
     g_pClientGame->GetRemoteCalls()->Remove(this);
     g_pClientGame->GetLatentTransferManager()->OnLuaMainDestroy(this);
@@ -61,18 +61,32 @@ CLuaMain::~CLuaMain(void)
     CClientPerfStatLuaTiming::GetSingleton()->OnLuaMainDestroy(this);
 }
 
-bool CLuaMain::BeingDeleted(void)
+bool CLuaMain::BeingDeleted()
 {
     return m_bBeingDeleted;
 }
 
-void CLuaMain::ResetInstructionCount(void)
+void CLuaMain::ResetInstructionCount()
 {
     m_FunctionEnterTimer.Reset();
 }
 
-void CLuaMain::InitSecurity(void)
+void CLuaMain::InitSecurity()
 {
+    // Disable dangerous Lua Os library functions
+    static const luaL_reg osfuncs[] =
+    {
+        { "execute", CLuaUtilDefs::DisabledFunction },
+        { "rename", CLuaUtilDefs::DisabledFunction },
+        { "remove", CLuaUtilDefs::DisabledFunction },
+        { "exit", CLuaUtilDefs::DisabledFunction },
+        { "getenv", CLuaUtilDefs::DisabledFunction },
+        { "tmpname", CLuaUtilDefs::DisabledFunction },
+        { "setlocale", CLuaUtilDefs::DisabledFunction },
+        { NULL, NULL }
+    };
+    luaL_register(m_luaVM, "os", osfuncs);
+
     lua_register(m_luaVM, "dofile", CLuaUtilDefs::DisabledFunction);
     lua_register(m_luaVM, "loadfile", CLuaUtilDefs::DisabledFunction);
     lua_register(m_luaVM, "require", CLuaUtilDefs::DisabledFunction);
@@ -123,7 +137,7 @@ void CLuaMain::InitClasses(lua_State* luaVM)
     CLuaShared::AddClasses(luaVM);
 }
 
-void CLuaMain::InitVM(void)
+void CLuaMain::InitVM()
 {
     assert(!m_luaVM);
 
@@ -141,6 +155,7 @@ void CLuaMain::InitVM(void)
     luaopen_table(m_luaVM);
     luaopen_debug(m_luaVM);
     luaopen_utf8(m_luaVM);
+    luaopen_os(m_luaVM);
 
     // Initialize security restrictions. Very important to prevent lua trojans and viruses!
     InitSecurity();
@@ -301,11 +316,11 @@ bool CLuaMain::LoadScript(const char* szLUAScript)
     return true;
 }
 
-void CLuaMain::Start(void)
+void CLuaMain::Start()
 {
 }
 
-void CLuaMain::UnloadScript(void)
+void CLuaMain::UnloadScript()
 {
     // ACHTUNG: UNLOAD MODULES!
 
@@ -335,7 +350,7 @@ void CLuaMain::UnloadScript(void)
     }
 }
 
-void CLuaMain::DoPulse(void)
+void CLuaMain::DoPulse()
 {
     m_pLuaTimerManager->DoPulse(this);
 }
@@ -414,7 +429,7 @@ bool CLuaMain::SaveXML(CXMLNode* pRootNode)
 //
 //
 ///////////////////////////////////////////////////////////////
-unsigned long CLuaMain::GetElementCount(void) const
+unsigned long CLuaMain::GetElementCount() const
 {
     if (m_pResource && m_pResource->GetElementGroup())
         return m_pResource->GetElementGroup()->GetCount();
@@ -490,49 +505,11 @@ const SString& CLuaMain::GetFunctionTag(int iLuaFunction)
 int CLuaMain::PCall(lua_State* L, int nargs, int nresults, int errfunc)
 {
     TIMING_CHECKPOINT("+pcall");
-    std::exception_ptr pException{};
-
     g_pClientGame->ChangeFloatPrecision(true);
     g_pClientGame->GetScriptDebugging()->PushLuaMain(this);
-    int iret = 0;
-
-    try
-    {
-        iret = lua_pcall(L, nargs, nresults, errfunc);
-    }
-    catch (std::bad_alloc& e)
-    {
-        AddExceptionReportLog(7550, "std::bad_alloc", e.what());
-        pException = std::current_exception();
-    }
-    catch (std::runtime_error& e)
-    {
-        AddExceptionReportLog(7551, "std::runtime_error", e.what());
-        pException = std::current_exception();
-    }
-    catch (std::exception& e)
-    {
-        AddExceptionReportLog(7552, "std::exception", e.what());
-        pException = std::current_exception();
-    }
-    catch (std::string& e)
-    {
-        AddExceptionReportLog(7553, "std::string", e.c_str());
-        pException = std::current_exception();
-    }
-    catch (...)
-    {
-        AddReportLog(7554, "CLuaMain::PCall - Unexpected exception thrown");
-    }
-
-    if (pException)
-    {
-        std::rethrow_exception(pException);
-    }
-
+    const int iret = lua_pcall(L, nargs, nresults, errfunc);
     g_pClientGame->GetScriptDebugging()->PopLuaMain(this);
     g_pClientGame->ChangeFloatPrecision(false);
-
     TIMING_CHECKPOINT("-pcall");
     return iret;
 }

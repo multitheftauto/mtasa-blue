@@ -78,45 +78,45 @@ class CSettings
     friend class CCore;
 
 public:
-    CSettings(void);
-    ~CSettings(void);
+    CSettings();
+    ~CSettings();
 
-    void CreateGUI(void);
-    void DestroyGUI(void);
+    void CreateGUI();
+    void DestroyGUI();
 
     bool ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-    void Update(void);
-    void Initialize(void);
+    void Update();
+    void Initialize();
 
     void SetVisible(bool bVisible);
-    bool IsVisible(void);
+    bool IsVisible();
 
     void SetIsModLoaded(bool bLoaded);
 
-    void LoadData(void);
+    void LoadData();
 
-    bool IsCapturingKey(void) { return m_bCaptureKey; }
+    bool IsCapturingKey() { return m_bCaptureKey; }
     void UpdateCaptureAxis();
     void UpdateJoypadTab();
 
     void UpdateAudioTab();
 
-    void UpdateVideoTab(void);
-    void PopulateResolutionComboBox(void);
-    void UpdateFullScreenComboBoxEnabled(void);
+    void UpdateVideoTab();
+    void PopulateResolutionComboBox();
+    void UpdateFullScreenComboBoxEnabled();
 
     void AddKeyBindSection(char* szSectionName);
     void RemoveKeyBindSection(char* szSectionName);
-    void RemoveAllKeyBindSections(void);
+    void RemoveAllKeyBindSections();
 
-    void RequestNewNickname(void);
-    void ShowRestartQuestion(void);
-    void ShowDisconnectQuestion(void);
+    void RequestNewNickname();
+    void ShowRestartQuestion();
+    void ShowDisconnectQuestion();
 
     void TabSkip(bool bBackwards);
 
-    bool IsActive(void);
+    bool IsActive();
 
     void SetSelectedIndex(unsigned int uiIndex);
 
@@ -212,20 +212,26 @@ protected:
     CGUILabel*     m_pCachePathLabel;
     CGUILabel*     m_pCachePathValue;
     CGUIButton*    m_pCachePathShowButton;
+    CGUILabel*     m_pLabelMasterVolume;
     CGUILabel*     m_pLabelRadioVolume;
     CGUILabel*     m_pLabelSFXVolume;
     CGUILabel*     m_pLabelMTAVolume;
     CGUILabel*     m_pLabelVoiceVolume;
+    CGUILabel*     m_pLabelMasterVolumeValue;
     CGUILabel*     m_pLabelRadioVolumeValue;
     CGUILabel*     m_pLabelSFXVolumeValue;
     CGUILabel*     m_pLabelMTAVolumeValue;
     CGUILabel*     m_pLabelVoiceVolumeValue;
+    CGUIScrollBar* m_pAudioMasterVolume;
     CGUIScrollBar* m_pAudioRadioVolume;
     CGUIScrollBar* m_pAudioSFXVolume;
     CGUIScrollBar* m_pAudioMTAVolume;
     CGUIScrollBar* m_pAudioVoiceVolume;
+    CGUILabel*     m_pAudioRadioLabel;
     CGUICheckBox*  m_pCheckBoxAudioEqualizer;
     CGUICheckBox*  m_pCheckBoxAudioAutotune;
+    CGUILabel*     m_pAudioMuteLabel;
+    CGUICheckBox*  m_pCheckBoxMuteMaster;
     CGUICheckBox*  m_pCheckBoxMuteSFX;
     CGUICheckBox*  m_pCheckBoxMuteRadio;
     CGUICheckBox*  m_pCheckBoxMuteMTA;
@@ -336,10 +342,16 @@ protected:
     bool OnBrightnessChanged(CGUIElement* pElement);
     bool OnAnisotropicChanged(CGUIElement* pElement);
     bool OnMapAlphaChanged(CGUIElement* pElement);
+    bool OnMasterVolumeChanged(CGUIElement* pElement);
     bool OnRadioVolumeChanged(CGUIElement* pElement);
     bool OnSFXVolumeChanged(CGUIElement* pElement);
     bool OnMTAVolumeChanged(CGUIElement* pElement);
     bool OnVoiceVolumeChanged(CGUIElement* pElement);
+    bool OnMasterMuteMinimizedChanged(CGUIElement* pElement);
+    bool OnRadioMuteMinimizedChanged(CGUIElement* pElement);
+    bool OnSFXMuteMinimizedChanged(CGUIElement* pElement);
+    bool OnMTAMuteMinimizedChanged(CGUIElement* pElement);
+    bool OnVoiceMuteMinimizedChanged(CGUIElement* pElement);
     bool OnChatRedChanged(CGUIElement* pElement);
     bool OnChatGreenChanged(CGUIElement* pElement);
     bool OnChatBlueChanged(CGUIElement* pElement);
@@ -369,20 +381,20 @@ protected:
     bool OnShowAdvancedSettingDescription(CGUIElement* pElement);
     bool OnHideAdvancedSettingDescription(CGUIElement* pElement);
     bool OnTabChanged(CGUIElement* pElement);
-    void ReloadBrowserLists(void);
+    void ReloadBrowserLists();
 
 private:
-    void CreateInterfaceTabGUI(void);
+    void CreateInterfaceTabGUI();
     void UpdateChatColorPreview(eChatColorType eType);
 
-    void ProcessKeyBinds(void);
-    void ProcessJoypad(void);
+    void ProcessKeyBinds();
+    void ProcessJoypad();
 
-    void SaveData(void);
+    void SaveData();
 
-    void LoadSkins(void);
+    void LoadSkins();
 
-    void   LoadChatPresets(void);
+    void   LoadChatPresets();
     void   CreateChatColorTab(eChatColorType eType, const char* szName, CGUITabPanel* pParent);
     void   LoadChatColorFromCVar(eChatColorType eType, const char* szCVar);
     void   LoadChatColorFromString(eChatColorType eType, const std::string& strColor);
@@ -392,16 +404,36 @@ private:
     int    GetMilliseconds(CGUIEdit* pEdit);
     void   SetMilliseconds(CGUIEdit* pEdit, int milliseconds);
 
+    void ResetGTAVolume();
+    void SetRadioVolume(float fVolume);
+    void SetSFXVolume(float fVolume);
+
     unsigned int m_uiCaptureKey;
     bool         m_bCaptureKey;
     bool         m_bCaptureAxis;
 
     bool m_bIsModLoaded;
 
-    unsigned char m_ucOldRadioVolume;
-    unsigned char m_ucOldSFXVolume;
-    float         m_fOldMTAVolume;
-    float         m_fOldVoiceVolume;
+    float m_fRadioVolume;
+    float m_fSFXVolume;
+
+    float m_fOldMasterVolume;
+    float m_fOldRadioVolume;
+    float m_fOldSFXVolume;
+    float m_fOldMTAVolume;
+    float m_fOldVoiceVolume;
+
+    bool m_bOldMuteMaster;
+    bool m_bOldMuteSFX;
+    bool m_bOldMuteRadio;
+    bool m_bOldMuteMTA;
+    bool m_bOldMuteVoice;
+
+    bool m_bMuteMaster;
+    bool m_bMuteSFX;
+    bool m_bMuteRadio;
+    bool m_bMuteMTA;
+    bool m_bMuteVoice;
 
     CGUIListItem* m_pSelectedBind;
 
@@ -409,11 +441,6 @@ private:
     bool  m_bShownVolumetricShadowsWarning;
     bool  m_bShownAllowScreenUploadMessage;
     int   m_iMaxAnisotropic;
-
-    bool m_bMuteSFX;
-    bool m_bMuteRadio;
-    bool m_bMuteMTA;
-    bool m_bMuteVoice;
 
     std::list<SKeyBindSection*> m_pKeyBindSections;
 };

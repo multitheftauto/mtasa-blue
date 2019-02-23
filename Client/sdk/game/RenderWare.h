@@ -11,8 +11,7 @@
  *
  *****************************************************************************/
 
-#ifndef __RENDERWARE_COMPAT
-#define __RENDERWARE_COMPAT
+#pragma once
 
 /*****************************************************************************/
 /** RenderWare rendering types                                              **/
@@ -169,7 +168,7 @@ struct RpMeshHeader
     unsigned short serialNum;
     unsigned int   totalIndicesInMesh;
     unsigned int   firstMeshOffset;
-    RpMesh*        getMeshes(void) { return (RpMesh*)(this + 1); }
+    RpMesh*        getMeshes() { return (RpMesh*)(this + 1); }
     bool           isValidMeshId(int meshId) { return (meshId >= 0 && numMeshes > meshId); }
 };
 
@@ -464,5 +463,3 @@ struct RwError
 {
     int err1, err2;
 };
-
-#endif

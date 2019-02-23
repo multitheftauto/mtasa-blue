@@ -27,12 +27,12 @@ class CPlayerCamera
 {
 public:
     CPlayerCamera(CPlayer* pPlayer);
-    ~CPlayerCamera(void);
+    ~CPlayerCamera();
 
-    eCameraMode GetMode(void) const { return m_Mode; }
+    eCameraMode GetMode() const { return m_Mode; }
     void        SetMode(eCameraMode Mode);
 
-    const CVector& GetPosition(void) const;
+    const CVector& GetPosition() const;
     void           GetPosition(CVector& vecPosition) const;
     void           SetPosition(const CVector& vecPosition);
 
@@ -41,22 +41,22 @@ public:
 
     void SetMatrix(const CVector& vecPosition, const CVector& vecLookAt);
 
-    CElement* GetTarget(void) const { return m_pTarget; }
+    CElement* GetTarget() const { return m_pTarget; }
     void      SetTarget(CElement* pElement);
 
-    float GetRoll(void) const { return m_fRoll; }
+    float GetRoll() const { return m_fRoll; }
     void  SetRoll(float fRoll) { m_fRoll = fRoll; }
-    float GetFOV(void) const { return m_fFOV; }
+    float GetFOV() const { return m_fFOV; }
     void  SetFOV(float fFOV) { m_fFOV = fFOV; }
 
     void SetRotation(CVector& vecRotation);
 
-    unsigned char GetInterior(void) const { return m_ucInterior; }
+    unsigned char GetInterior() const { return m_ucInterior; }
     void          SetInterior(unsigned char ucInterior) { m_ucInterior = ucInterior; }
 
-    CPlayer* GetPlayer(void) const { return m_pPlayer; }
+    CPlayer* GetPlayer() const { return m_pPlayer; }
 
-    uchar GenerateSyncTimeContext(void);
+    uchar GenerateSyncTimeContext();
     bool  CanUpdateSync(uchar ucRemote);
 
 private:

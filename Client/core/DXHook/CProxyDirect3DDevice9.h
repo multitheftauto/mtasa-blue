@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CPROXYDIRECT3DDEVICE9_H
-#define __CPROXYDIRECT3DDEVICE9_H
+#pragma once
 
 #include <d3d9.h>
 #include "CDirect3DData.h"
@@ -23,13 +22,13 @@ interface CProxyDirect3DDevice9 : public IDirect3DDevice9
 
     /*** IUnknown methods ***/
     virtual HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObj);
-    virtual ULONG __stdcall AddRef(VOID);
-    virtual ULONG __stdcall Release(VOID);
+    virtual ULONG __stdcall AddRef();
+    virtual ULONG __stdcall Release();
 
     /*** IDirect3DDevice9 methods ***/
-    virtual HRESULT __stdcall TestCooperativeLevel(VOID);
-    virtual UINT __stdcall GetAvailableTextureMem(VOID);
-    virtual HRESULT __stdcall EvictManagedResources(VOID);
+    virtual HRESULT __stdcall TestCooperativeLevel();
+    virtual UINT __stdcall GetAvailableTextureMem();
+    virtual HRESULT __stdcall EvictManagedResources();
     virtual HRESULT __stdcall GetDirect3D(IDirect3D9 * *ppD3D9);
     virtual HRESULT __stdcall GetDeviceCaps(D3DCAPS9 * pCaps);
     virtual HRESULT __stdcall GetDisplayMode(UINT iSwapChain, D3DDISPLAYMODE * pMode);
@@ -39,7 +38,7 @@ interface CProxyDirect3DDevice9 : public IDirect3DDevice9
     virtual BOOL __stdcall ShowCursor(BOOL bShow);
     virtual HRESULT __stdcall CreateAdditionalSwapChain(D3DPRESENT_PARAMETERS * pPresentationParameters, IDirect3DSwapChain9 * *pSwapChain);
     virtual HRESULT __stdcall GetSwapChain(UINT iSwapChain, IDirect3DSwapChain9 * *pSwapChain);
-    virtual UINT __stdcall GetNumberOfSwapChains(VOID);
+    virtual UINT __stdcall GetNumberOfSwapChains();
     virtual HRESULT __stdcall Reset(D3DPRESENT_PARAMETERS * pPresentationParameters);
     virtual HRESULT __stdcall Present(CONST RECT * pSourceRect, CONST RECT * pDestRect, HWND hDestWindowOverride, CONST RGNDATA * pDirtyRegion);
     virtual HRESULT __stdcall GetBackBuffer(UINT iSwapChain, UINT iBackBuffer, D3DBACKBUFFER_TYPE Type, IDirect3DSurface9 * *ppBackBuffer);
@@ -75,8 +74,8 @@ interface CProxyDirect3DDevice9 : public IDirect3DDevice9
     virtual HRESULT __stdcall GetRenderTarget(DWORD RenderTargetIndex, IDirect3DSurface9 * *ppRenderTarget);
     virtual HRESULT __stdcall SetDepthStencilSurface(IDirect3DSurface9 * pNewZStencil);
     virtual HRESULT __stdcall GetDepthStencilSurface(IDirect3DSurface9 * *ppZStencilSurface);
-    virtual HRESULT __stdcall BeginScene(VOID);
-    virtual HRESULT __stdcall EndScene(VOID);
+    virtual HRESULT __stdcall BeginScene();
+    virtual HRESULT __stdcall EndScene();
     virtual HRESULT __stdcall Clear(DWORD Count, CONST D3DRECT * pRects, DWORD Flags, D3DCOLOR Color, float Z, DWORD Stencil);
     virtual HRESULT __stdcall SetTransform(D3DTRANSFORMSTATETYPE State, CONST D3DMATRIX * pMatrix);
     virtual HRESULT __stdcall GetTransform(D3DTRANSFORMSTATETYPE State, D3DMATRIX * pMatrix);
@@ -94,7 +93,7 @@ interface CProxyDirect3DDevice9 : public IDirect3DDevice9
     virtual HRESULT __stdcall SetRenderState(D3DRENDERSTATETYPE State, DWORD Value);
     virtual HRESULT __stdcall GetRenderState(D3DRENDERSTATETYPE State, DWORD * pValue);
     virtual HRESULT __stdcall CreateStateBlock(D3DSTATEBLOCKTYPE Type, IDirect3DStateBlock9 * *ppSB);
-    virtual HRESULT __stdcall BeginStateBlock(VOID);
+    virtual HRESULT __stdcall BeginStateBlock();
     virtual HRESULT __stdcall EndStateBlock(IDirect3DStateBlock9 * *ppSB);
     virtual HRESULT __stdcall SetClipStatus(CONST D3DCLIPSTATUS9 * pClipStatus);
     virtual HRESULT __stdcall GetClipStatus(D3DCLIPSTATUS9 * pClipStatus);
@@ -112,9 +111,9 @@ interface CProxyDirect3DDevice9 : public IDirect3DDevice9
     virtual HRESULT __stdcall SetScissorRect(CONST RECT * pRect);
     virtual HRESULT __stdcall GetScissorRect(RECT * pRect);
     virtual HRESULT __stdcall SetSoftwareVertexProcessing(BOOL bSoftware);
-    virtual BOOL __stdcall GetSoftwareVertexProcessing(VOID);
+    virtual BOOL __stdcall GetSoftwareVertexProcessing();
     virtual HRESULT __stdcall SetNPatchMode(float nSegments);
-    virtual FLOAT __stdcall GetNPatchMode(VOID);
+    virtual FLOAT __stdcall GetNPatchMode();
     virtual HRESULT __stdcall DrawPrimitive(D3DPRIMITIVETYPE PrimitiveType, UINT StartVertex, UINT PrimitiveCount);
     virtual HRESULT __stdcall DrawIndexedPrimitive(D3DPRIMITIVETYPE, INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices, UINT startIndex,
                                                    UINT primCount);
@@ -435,7 +434,7 @@ public:
 
     struct SD3DVertexDeclState
     {
-        SD3DVertexDeclState(void) { ZERO_POD_STRUCT(this); }
+        SD3DVertexDeclState() { ZERO_POD_STRUCT(this); }
 
         bool  bUsesStreamAtIndex[2];
         DWORD Position;
@@ -553,5 +552,3 @@ public:
 
 extern CProxyDirect3DDevice9*                  g_pProxyDevice;
 extern CProxyDirect3DDevice9::SD3DDeviceState* g_pDeviceState;
-
-#endif

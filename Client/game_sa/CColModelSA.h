@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_COLMODELSA
-#define __CGAMESA_COLMODELSA
+#pragma once
 
 #include <windows.h>
 #include <game/CColModel.h>
@@ -87,16 +86,14 @@ public:
 class CColModelSA : public CColModel
 {
 public:
-    CColModelSA(void);
+    CColModelSA();
     CColModelSA(CColModelSAInterface* pInterface);
-    ~CColModelSA(void);
+    ~CColModelSA();
 
-    CColModelSAInterface* GetInterface(void) { return m_pInterface; }
-    void                  Destroy(void) { delete this; }
+    CColModelSAInterface* GetInterface() { return m_pInterface; }
+    void                  Destroy() { delete this; }
 
 private:
     CColModelSAInterface* m_pInterface;
     bool                  m_bDestroyInterface;
 };
-
-#endif

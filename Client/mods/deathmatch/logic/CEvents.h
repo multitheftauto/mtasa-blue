@@ -8,8 +8,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CEVENTS_H
-#define __CEVENTS_H
+#pragma once
 
 #include <string>
 #include <list>
@@ -26,8 +25,8 @@ struct SEvent
 class CEvents
 {
 public:
-    CEvents(void);
-    ~CEvents(void);
+    CEvents();
+    ~CEvents();
 
     bool AddEvent(const char* szName, const char* szArguments, class CLuaMain* pLuaMain, bool bAllowRemoteTrigger);
     void RemoveEvent(SEvent* pEvent);
@@ -37,22 +36,20 @@ public:
     bool    Exists(const char* szName) { return Get(szName) != NULL; };
     SEvent* Get(const char* szName);
 
-    CFastHashMap<SString, SEvent*>::const_iterator IterBegin(void) { return m_EventHashMap.begin(); };
-    CFastHashMap<SString, SEvent*>::const_iterator IterEnd(void) { return m_EventHashMap.end(); };
+    CFastHashMap<SString, SEvent*>::const_iterator IterBegin() { return m_EventHashMap.begin(); };
+    CFastHashMap<SString, SEvent*>::const_iterator IterEnd() { return m_EventHashMap.end(); };
 
-    void PreEventPulse(void);
-    void PostEventPulse(void);
+    void PreEventPulse();
+    void PostEventPulse();
 
     void CancelEvent(bool bCancelled = true);
-    bool WasEventCancelled(void);
+    bool WasEventCancelled();
 
 private:
-    void RemoveAllEvents(void);
+    void RemoveAllEvents();
 
     CFastHashMap<SString, SEvent*> m_EventHashMap;
     std::vector<int>               m_CancelledList;
     bool                           m_bEventCancelled;
     bool                           m_bWasEventCancelled;
 };
-
-#endif

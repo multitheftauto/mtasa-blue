@@ -14,18 +14,18 @@
 template <>
 CClientVariables* CSingleton<CClientVariables>::m_pSingleton = NULL;
 
-CClientVariables::CClientVariables(void)
+CClientVariables::CClientVariables()
 {
     m_pStorage = NULL;
     m_bLoaded = false;
     m_iRevision = 1;
 }
 
-CClientVariables::~CClientVariables(void)
+CClientVariables::~CClientVariables()
 {
 }
 
-bool CClientVariables::Load(void)
+bool CClientVariables::Load()
 {
     // Get the root node
     CXMLNode* pRoot = CCore::GetSingleton().GetConfig();
@@ -227,7 +227,7 @@ void CClientVariables::ClampValue(const std::string& strVariable, CVector2D minV
 }
 
 // Ensure CVars are within reasonable limits
-void CClientVariables::ValidateValues(void)
+void CClientVariables::ValidateValues()
 {
     uint uiViewportWidth = CCore::GetSingleton().GetGraphics()->GetViewportWidth();
     uint uiViewportHeight = CCore::GetSingleton().GetGraphics()->GetViewportHeight();
@@ -252,12 +252,13 @@ void CClientVariables::ValidateValues(void)
     ClampValue("chat_position_vertical", Chat::Position::Vertical::TOP, Chat::Position::Vertical::BOTTOM);
     ClampValue("chat_text_alignment", Chat::Text::Align::LEFT, Chat::Text::Align::RIGHT);
     ClampValue("text_scale", 0.8f, 3.0f);
+    ClampValue("mastervolume", 0.0f, 1.0f);
     ClampValue("mtavolume", 0.0f, 1.0f);
     ClampValue("voicevolume", 0.0f, 1.0f);
     ClampValue("mapalpha", 0, 255);
 }
 
-void CClientVariables::LoadDefaults(void)
+void CClientVariables::LoadDefaults()
 {
     #define DEFAULT(__x,__y)    if(!Exists(__x)) \
                                 Set(__x,__y)
@@ -309,6 +310,7 @@ void CClientVariables::LoadDefaults(void)
     DEFAULT("fly_with_mouse", false);                                                 // flying with mouse controls
     DEFAULT("steer_with_mouse", false);                                               // steering with mouse controls
     DEFAULT("classic_controls", false);                                               // classic/standard controls
+    DEFAULT("mastervolume", 1.0f);                                                    // master volume
     DEFAULT("mtavolume", 1.0f);                                                       // custom sound's volume
     DEFAULT("voicevolume", 1.0f);                                                     // voice chat output volume
     DEFAULT("mapalpha", 155);                                                         // map alpha
@@ -334,6 +336,7 @@ void CClientVariables::LoadDefaults(void)
     DEFAULT("multimon_fullscreen_minimize", 1);                                       // 0-off 1-on
     DEFAULT("vertical_aim_sensitivity", 0.0015f);                                     // 0.0015f is GTA default setting
     DEFAULT("process_priority", 0);                                                   // 0-normal 1-above normal 2-high
+    DEFAULT("mute_master_when_minimized", 0);                                         // 0-off 1-on
     DEFAULT("mute_sfx_when_minimized", 0);                                            // 0-off 1-on
     DEFAULT("mute_radio_when_minimized", 0);                                          // 0-off 1-on
     DEFAULT("mute_mta_when_minimized", 0);                                            // 0-off 1-on

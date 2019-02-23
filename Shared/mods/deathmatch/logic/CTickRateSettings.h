@@ -11,7 +11,7 @@
 struct CTickRateSettings
 {
 public:
-    CTickRateSettings(void)
+    CTickRateSettings()
     {
         iPureSync = 100;
         iLightSync = 1500;

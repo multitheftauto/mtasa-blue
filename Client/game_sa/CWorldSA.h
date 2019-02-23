@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_WORLD
-#define __CGAMESA_WORLD
+#pragma once
 
 #define FUNC_Add                                            0x563220 // ##SA##
 #define FUNC_Remove                                         0x563280 // ##SA##
@@ -55,6 +54,7 @@ class CWorldSA : public CWorld
 {
 public:
     CWorldSA();
+    void InstallHooks();
     void Add(CEntity* entity, eDebugCaller CallerId);
     void Add(CEntitySAInterface* entityInterface, eDebugCaller CallerId);
     void Remove(CEntity* entity, eDebugCaller CallerId);
@@ -71,16 +71,16 @@ public:
     void  LoadMapAroundPoint(CVector* vecPosition, float fRadius);
     bool  IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd, const SLineOfSightFlags flags);
     bool  HasCollisionBeenLoaded(CVector* vecPosition);
-    DWORD GetCurrentArea(void);
+    DWORD GetCurrentArea();
     void  SetCurrentArea(DWORD dwArea);
     void  SetJetpackMaxHeight(float fHeight);
-    float GetJetpackMaxHeight(void);
+    float GetJetpackMaxHeight();
     void  SetAircraftMaxHeight(float fHeight);
-    float GetAircraftMaxHeight(void);
+    float GetAircraftMaxHeight();
     void  SetAircraftMaxVelocity(float fVelocity);
-    float GetAircraftMaxVelocity(void);
+    float GetAircraftMaxVelocity();
     void  SetOcclusionsEnabled(bool bEnabled);
-    bool  GetOcclusionsEnabled(void);
+    bool  GetOcclusionsEnabled();
     void  FindWorldPositionForRailTrackPosition(float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition);
     int   FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance);
 
@@ -118,6 +118,9 @@ public:
     bool              IsEntityRemoved(CEntitySAInterface* pInterface);
     bool              CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd);
 
+    CSurfaceType*     GetSurfaceInfo() override;
+    void              ResetAllSurfaceInfo() override;
+    bool              ResetSurfaceInfo(short sSurfaceID) override;
 private:
     std::multimap<unsigned short, SBuildingRemoval*>*         m_pBuildingRemovals;
     std::multimap<unsigned short, sDataBuildingRemovalItem*>* m_pDataBuildings;
@@ -126,6 +129,5 @@ private:
     std::map<DWORD, bool>                                     m_pRemovedEntities;
     std::map<DWORD, bool>                                     m_pAddedEntities;
     float                                                     m_fAircraftMaxHeight;
+    CSurfaceType*                                             m_pSurfaceInfo;
 };
-
-#endif

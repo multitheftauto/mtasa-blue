@@ -11,12 +11,12 @@
 #include <StdInc.h>
 #include <fstream>
 
-CFileReader::CFileReader(void)
+CFileReader::CFileReader()
 {
     m_u32BytesReadFromBuffer = 0;
 }
 
-void CFileReader::FreeFileReaderMemory(void)
+void CFileReader::FreeFileReaderMemory()
 {
     std::vector<char>().swap(m_vecFileDataBuffer);
     m_u32BytesReadFromBuffer = 0;
@@ -44,16 +44,32 @@ void CFileReader::SkipBytes(const std::uint32_t u32BytesToSkip)
 
 bool CFileReader::LoadFileToMemory(const SString& strFilePath)
 {
-    std::ifstream   fileStream(strFilePath, std::ios::binary | std::ios::ate);
-    std::streamsize m_iFileSize = fileStream.tellg();
-    if (m_iFileSize == eIFSTREAM::SIZE_ERROR)
+    std::ifstream   fileStream(FromUTF8(strFilePath), std::ios::binary | std::ios::ate);
+    std::streamsize iFileSize = fileStream.tellg();
+    if (iFileSize == eIFSTREAM::SIZE_ERROR)
     {
         return false;
     }
 
     fileStream.seekg(0, std::ios::beg);
-    m_vecFileDataBuffer.reserve(static_cast<size_t>(m_iFileSize));
-    if (fileStream.read(m_vecFileDataBuffer.data(), m_iFileSize))
+    m_vecFileDataBuffer.reserve(static_cast<size_t>(iFileSize));
+    if (fileStream.read(m_vecFileDataBuffer.data(), iFileSize))
+    {
+        return true;
+    }
+    return false;
+}
+
+bool CFileReader::LoadDataBufferToMemory(const SString& buffer)
+{
+    std::streamsize iBufferSize = buffer.size();
+    if (iBufferSize == eIFSTREAM::SIZE_ERROR)
+    {
+        return false;
+    }
+
+    m_vecFileDataBuffer.reserve(static_cast<size_t>(iBufferSize));
+    if (std::copy(buffer.begin(), buffer.end(), m_vecFileDataBuffer.data()))
     {
         return true;
     }

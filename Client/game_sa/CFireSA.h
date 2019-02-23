@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_FIRE
-#define __CGAMESA_FIRE
+#pragma once
 
 #include <game/CFire.h>
 #include "Common.h"
@@ -68,5 +67,3 @@ public:
     VOID            SetNumGenerationsAllowed(char generations);
     CFireInterface* GetInterface() { return this->internalInterface; }
 };
-
-#endif

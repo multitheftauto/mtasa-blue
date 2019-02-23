@@ -100,7 +100,7 @@ void OnMY_CEntity_Render_Pre(CEntitySAInterface* pEntity)
         CallGameEntityRenderHandler(ms_Rendering);
 }
 
-void OnMY_CEntity_Render_Post(void)
+void OnMY_CEntity_Render_Post()
 {
     if (ms_Rendering)
     {
@@ -236,7 +236,7 @@ void _declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_Mid()
 // End of all ped weapon rendering
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_End(void)
+void OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_End()
 {
     CallGameEntityRenderHandler(NULL);
 }
@@ -312,7 +312,7 @@ limit:
 // WinLoop
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_WinLoop(void)
+void OnMY_WinLoop()
 {
     if (ms_bIsMinimizedAndNotConnected)
         Sleep(10);
@@ -336,6 +336,33 @@ void _declspec(naked) HOOK_WinLoop()
 
         mov     eax, ds:0x0C8D4C0
         jmp     RETURN_WinLoop_BOTH
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CTimer::Update
+//
+// Just before GTA calculates frame time deltas
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CTimer_Update               0x561B10
+#define HOOKSIZE_CTimer_Update              6
+static const DWORD CONTINUE_CTimer_Update = 0x561B16;
+static void _declspec(naked) HOOK_CTimer_Update()
+{
+    _asm
+    {
+        pushad
+    }
+
+    g_pCore->OnGameTimerUpdate();
+
+    _asm
+    {
+        popad
+        mov     ecx,dword ptr ds:[0B7CB28h]
+        jmp     CONTINUE_CTimer_Update
     }
 }
 
@@ -365,7 +392,7 @@ void OnMY_psGrabScreen_GetRect(HWND hWnd, LPRECT pRect)
     pRect->right = std::max(pRect->right, pRect->left + 1);
 }
 
-bool OnMY_psGrabScreen_ShouldUseRect(void)
+bool OnMY_psGrabScreen_ShouldUseRect()
 {
     bool bWindowed;
     g_pCore->GetCVars()->Get("display_windowed", bWindowed);
@@ -410,7 +437,7 @@ use_rect:
 // This is the first thing drawn by GTA
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CClouds_RenderSkyPolys(void)
+void OnMY_CClouds_RenderSkyPolys()
 {
     if (pPreRenderSkyHandlerHandler)
         pPreRenderSkyHandlerHandler();
@@ -614,7 +641,7 @@ void CMultiplayerSA::SetMirrorsEnabled(bool bEnabled)
 // Setup hook
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_Rendering(void)
+void CMultiplayerSA::InitHooks_Rendering()
 {
     EZHookInstall(CallIdle);
     EZHookInstall(CEntity_Render);
@@ -624,6 +651,7 @@ void CMultiplayerSA::InitHooks_Rendering(void)
     EZHookInstall(Check_NoOfVisibleLods);
     EZHookInstall(Check_NoOfVisibleEntities);
     EZHookInstall(WinLoop);
+    EZHookInstall(CTimer_Update);
     EZHookInstall(psGrabScreen);
     EZHookInstallChecked(CClouds_RenderSkyPolys);
     EZHookInstallChecked(RwCameraSetNearClipPlane);

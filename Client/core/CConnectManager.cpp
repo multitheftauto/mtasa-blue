@@ -16,7 +16,7 @@ using namespace std;
 static CConnectManager* g_pConnectManager = NULL;
 extern CCore*           g_pCore;
 
-CConnectManager::CConnectManager(void)
+CConnectManager::CConnectManager()
 {
     g_pConnectManager = this;
 
@@ -34,7 +34,7 @@ CConnectManager::CConnectManager(void)
     m_bNotifyServerBrowser = false;
 }
 
-CConnectManager::~CConnectManager(void)
+CConnectManager::~CConnectManager()
 {
     if (m_pOnCancelClick)
     {
@@ -196,7 +196,7 @@ bool CConnectManager::Event_OnCancelClick(CGUIElement* pElement)
     return true;
 }
 
-bool CConnectManager::Abort(void)
+bool CConnectManager::Abort()
 {
     // Stop the attempt
     CNet* pNet = CCore::GetSingleton().GetNetwork();
@@ -219,7 +219,7 @@ bool CConnectManager::Abort(void)
     return true;
 }
 
-void CConnectManager::DoPulse(void)
+void CConnectManager::DoPulse()
 {
     // Are we connecting?
     if (m_bIsConnecting)
@@ -449,7 +449,7 @@ bool CConnectManager::CheckNickProvided(const char* szNick)
 //
 // Called at least once (maybe more) if a MTA server exists at the current address/port
 //
-void CConnectManager::OnServerExists(void)
+void CConnectManager::OnServerExists()
 {
     if (m_bNotifyServerBrowser)
     {
@@ -479,17 +479,19 @@ void CConnectManager::OpenServerFirewall(in_addr Address, ushort usHttpPort, boo
     if (usHttpPort)
     {
         // Send to server http port if known
+        SHttpRequestOptions options;
+        options.uiConnectionAttempts = 1;
+        options.uiConnectTimeoutMs = uiTimeOut;
         SString strDummyUrl("http://%s:%d/mta_client_firewall_probe/", inet_ntoa(Address), usHttpPort);
-        g_pCore->GetNetwork()
-            ->GetHTTPDownloadManager(EDownloadMode::CONNECT_TCP_SEND)
-            ->QueueFile(strDummyUrl, NULL, "", 0, true, NULL, NULL, false, 1, uiTimeOut);
+        g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::CONNECT_TCP_SEND)->QueueFile(strDummyUrl, NULL, NULL, NULL, options);
     }
     if (usHttpPort == 0 || bHighPriority)
     {
         // Send to standard http port
+        SHttpRequestOptions options;
+        options.uiConnectionAttempts = 1;
+        options.uiConnectTimeoutMs = uiTimeOut;
         SString strDummyUrl("http://%s/mta_client_firewall_probe/", inet_ntoa(Address));
-        g_pCore->GetNetwork()
-            ->GetHTTPDownloadManager(EDownloadMode::CONNECT_TCP_SEND)
-            ->QueueFile(strDummyUrl, NULL, "", 0, true, NULL, NULL, false, 1, uiTimeOut);
+        g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::CONNECT_TCP_SEND)->QueueFile(strDummyUrl, NULL, NULL, NULL, options);
     }
 }

@@ -31,8 +31,10 @@ CSingularFileDownload::CSingularFileDownload(CResource* pResource, const char* s
 
     if (!DoesClientAndServerChecksumMatch())
     {
+        SHttpRequestOptions options;
+        options.bCheckContents = true;
         CNetHTTPDownloadManagerInterface* pHTTP = g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::RESOURCE_SINGULAR_FILES);
-        pHTTP->QueueFile(strHTTPURL.c_str(), szName, NULL, 0, false, this, DownloadFinishedCallBack, false, 10, 10000, true);
+        pHTTP->QueueFile(strHTTPURL.c_str(), szName, this, DownloadFinishedCallBack, options);
         m_bComplete = false;
         g_pClientGame->SetTransferringSingularFiles(true);
     }
@@ -42,7 +44,7 @@ CSingularFileDownload::CSingularFileDownload(CResource* pResource, const char* s
     }
 }
 
-CSingularFileDownload::~CSingularFileDownload(void)
+CSingularFileDownload::~CSingularFileDownload()
 {
 }
 
@@ -68,7 +70,7 @@ void CSingularFileDownload::CallFinished(bool bSuccess)
     SetComplete();
 }
 
-void CSingularFileDownload::Cancel(void)
+void CSingularFileDownload::Cancel()
 {
     m_bBeingDeleted = true;
     m_pResource = NULL;
@@ -76,12 +78,12 @@ void CSingularFileDownload::Cancel(void)
     // TODO: Cancel also in Net
 }
 
-bool CSingularFileDownload::DoesClientAndServerChecksumMatch(void)
+bool CSingularFileDownload::DoesClientAndServerChecksumMatch()
 {
     return (m_LastClientChecksum == m_ServerChecksum);
 }
 
-CChecksum CSingularFileDownload::GenerateClientChecksum(void)
+CChecksum CSingularFileDownload::GenerateClientChecksum()
 {
     m_LastClientChecksum = CChecksum::GenerateChecksumFromFile(m_strName);
     return m_LastClientChecksum;

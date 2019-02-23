@@ -66,12 +66,12 @@ struct sWeaponStats
 class CWeaponStat
 {
 public:
-    CWeaponStat(void);
+    CWeaponStat();
     CWeaponStat(eWeaponType weaponType, eWeaponSkill skillLevel);
-    ~CWeaponStat(void);
+    ~CWeaponStat();
 
-    eWeaponType  GetWeaponType(void);
-    eWeaponSkill GetWeaponSkillLevel(void);
+    eWeaponType  GetWeaponType();
+    eWeaponSkill GetWeaponSkillLevel();
 
     void SetWeaponType(eWeaponType weaponType);
     void SetWeaponSkillLevel(eWeaponSkill skillLevel);
@@ -90,67 +90,67 @@ public:
         tWeaponStats.m_nFlags = iFlags;
     }
     bool IsFlagSet(DWORD flag) { return ((tWeaponStats.m_nFlags & flag) > 0 ? true : false); }
-    int  GetFlags(void) { return tWeaponStats.m_nFlags; }
+    int  GetFlags() { return tWeaponStats.m_nFlags; }
 
-    eWeaponModel GetModel(void) { return (eWeaponModel)tWeaponStats.m_modelId; }
+    eWeaponModel GetModel() { return (eWeaponModel)tWeaponStats.m_modelId; }
     void         SetModel(int iModel)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_modelId = (int)iModel;
     }
 
-    eWeaponModel GetModel2(void) { return (eWeaponModel)tWeaponStats.m_modelId2; }
+    eWeaponModel GetModel2() { return (eWeaponModel)tWeaponStats.m_modelId2; }
     void         SetModel2(int iModel)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_modelId2 = (int)iModel;
     }
 
-    sWeaponStats* GetInterface(void) { return &tWeaponStats; };
+    sWeaponStats* GetInterface() { return &tWeaponStats; };
 
-    float GetWeaponRange(void) { return tWeaponStats.m_fWeaponRange; };
+    float GetWeaponRange() { return tWeaponStats.m_fWeaponRange; };
     void  SetWeaponRange(float fRange)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_fWeaponRange = fRange;
     };
 
-    float GetTargetRange(void) { return tWeaponStats.m_fTargetRange; };
+    float GetTargetRange() { return tWeaponStats.m_fTargetRange; };
     void  SetTargetRange(float fRange)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_fTargetRange = fRange;
     };
 
-    CVector* GetFireOffset(void) { return &tWeaponStats.m_vecFireOffset; };
+    CVector* GetFireOffset() { return &tWeaponStats.m_vecFireOffset; };
     void     SetFireOffset(CVector* vecFireOffset)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_vecFireOffset = *vecFireOffset;
     };
 
-    short GetDamagePerHit(void) { return tWeaponStats.m_nDamage; };
+    short GetDamagePerHit() { return tWeaponStats.m_nDamage; };
     void  SetDamagePerHit(short sDamagePerHit)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_nDamage = sDamagePerHit;
     };
 
-    float GetAccuracy(void) { return tWeaponStats.m_fAccuracy; };
+    float GetAccuracy() { return tWeaponStats.m_fAccuracy; };
     void  SetAccuracy(float fAccuracy)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_fAccuracy = fAccuracy;
     };
 
-    short GetMaximumClipAmmo(void) { return tWeaponStats.m_nAmmo; };
+    short GetMaximumClipAmmo() { return tWeaponStats.m_nAmmo; };
     void  SetMaximumClipAmmo(short sAccuracy)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_nAmmo = sAccuracy;
     };
 
-    float GetMoveSpeed(void) { return tWeaponStats.m_fMoveSpeed; };
+    float GetMoveSpeed() { return tWeaponStats.m_fMoveSpeed; };
     void  SetMoveSpeed(float fMoveSpeed)
     {
         ms_uiAllWeaponStatsRevision++;
@@ -158,7 +158,7 @@ public:
     };
 
     // projectile/areaeffect only
-    float GetFiringSpeed(void) { return tWeaponStats.m_fSpeed; };
+    float GetFiringSpeed() { return tWeaponStats.m_fSpeed; };
     void  SetFiringSpeed(float fFiringSpeed)
     {
         ms_uiAllWeaponStatsRevision++;
@@ -166,49 +166,49 @@ public:
     };
 
     // area effect only
-    float GetRadius(void) { return tWeaponStats.m_fRadius; };
+    float GetRadius() { return tWeaponStats.m_fRadius; };
     void  SetRadius(float fRadius)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_fRadius = fRadius;
     };
 
-    float GetLifeSpan(void) { return tWeaponStats.m_fLifeSpan; };
+    float GetLifeSpan() { return tWeaponStats.m_fLifeSpan; };
     void  SetLifeSpan(float fLifeSpan)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_fLifeSpan = fLifeSpan;
     };
 
-    float GetSpread(void) { return tWeaponStats.m_fSpread; };
+    float GetSpread() { return tWeaponStats.m_fSpread; };
     void  SetSpread(float fSpread)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_fSpread = fSpread;
     };
 
-    float GetAnimBreakoutTime(void) { return tWeaponStats.m_animBreakoutTime; };
+    float GetAnimBreakoutTime() { return tWeaponStats.m_animBreakoutTime; };
     void  SetAnimBreakoutTime(float fBreakoutTime)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_animBreakoutTime = fBreakoutTime;
     };
 
-    eWeaponSlot GetSlot(void) { return (eWeaponSlot)tWeaponStats.m_nWeaponSlot; };
+    eWeaponSlot GetSlot() { return (eWeaponSlot)tWeaponStats.m_nWeaponSlot; };
     void        SetSlot(eWeaponSlot dwSlot)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_nWeaponSlot = (eWeaponSlot)dwSlot;
     };
 
-    eWeaponSkill GetSkill(void) { return tWeaponStats.m_SkillLevel; }
+    eWeaponSkill GetSkill() { return tWeaponStats.m_SkillLevel; }
     void         SetSkill(eWeaponSkill weaponSkill)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_SkillLevel = weaponSkill;
     }
 
-    float GetRequiredStatLevel(void) { return static_cast<float>(tWeaponStats.m_nReqStatLevel); }
+    float GetRequiredStatLevel() { return static_cast<float>(tWeaponStats.m_nReqStatLevel); }
     void  SetRequiredStatLevel(float fStatLevel)
     {
         ms_uiAllWeaponStatsRevision++;
@@ -220,14 +220,14 @@ public:
         tWeaponStats.m_nReqStatLevel = iStatLevel;
     }
 
-    DWORD GetAnimGroup(void) { return tWeaponStats.m_animGroup; }
+    DWORD GetAnimGroup() { return tWeaponStats.m_animGroup; }
     void  SetAnimGroup(DWORD dwAnimGroup)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_animGroup = dwAnimGroup;
     }
 
-    eFireType GetFireType(void) { return tWeaponStats.m_eFireType; }
+    eFireType GetFireType() { return tWeaponStats.m_eFireType; }
     void      SetFireType(eFireType type)
     {
         ms_uiAllWeaponStatsRevision++;
@@ -235,63 +235,63 @@ public:
     }
 
     // Floats
-    float GetWeaponAnimLoopStart(void) { return tWeaponStats.m_animLoopStart; }
+    float GetWeaponAnimLoopStart() { return tWeaponStats.m_animLoopStart; }
     void  SetWeaponAnimLoopStart(float animLoopStart)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_animLoopStart = animLoopStart;
     }
 
-    float GetWeaponAnimLoopStop(void) { return tWeaponStats.m_animLoopEnd; }
+    float GetWeaponAnimLoopStop() { return tWeaponStats.m_animLoopEnd; }
     void  SetWeaponAnimLoopStop(float animLoopEnd)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_animLoopEnd = animLoopEnd;
     }
 
-    float GetWeaponAnimLoopFireTime(void) { return tWeaponStats.m_animFireTime; }
+    float GetWeaponAnimLoopFireTime() { return tWeaponStats.m_animFireTime; }
     void  SetWeaponAnimLoopFireTime(float animFireTime)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_animFireTime = animFireTime;
     }
 
-    float GetWeaponAnim2LoopStart(void) { return tWeaponStats.m_anim2LoopStart; }
+    float GetWeaponAnim2LoopStart() { return tWeaponStats.m_anim2LoopStart; }
     void  SetWeaponAnim2LoopStart(float anim2LoopStart)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_anim2LoopStart = anim2LoopStart;
     }
 
-    float GetWeaponAnim2LoopStop(void) { return tWeaponStats.m_anim2LoopEnd; }
+    float GetWeaponAnim2LoopStop() { return tWeaponStats.m_anim2LoopEnd; }
     void  SetWeaponAnim2LoopStop(float anim2LoopEnd)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_anim2LoopEnd = anim2LoopEnd;
     }
 
-    float GetWeaponAnim2LoopFireTime(void) { return tWeaponStats.m_anim2FireTime; }
+    float GetWeaponAnim2LoopFireTime() { return tWeaponStats.m_anim2FireTime; }
     void  SetWeaponAnim2LoopFireTime(float anim2FireTime)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_anim2FireTime = anim2FireTime;
     }
 
-    float GetWeaponAnimBreakoutTime(void) { return tWeaponStats.m_animBreakoutTime; }
+    float GetWeaponAnimBreakoutTime() { return tWeaponStats.m_animBreakoutTime; }
     void  SetWeaponAnimBreakoutTime(float animBreakoutTime)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_animBreakoutTime = animBreakoutTime;
     }
 
-    float GetWeaponSpeed(void) { return tWeaponStats.m_fSpeed; }
+    float GetWeaponSpeed() { return tWeaponStats.m_fSpeed; }
     void  SetWeaponSpeed(float fSpeed)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_fSpeed = fSpeed;
     }
 
-    float GetWeaponRadius(void) { return tWeaponStats.m_fRadius; }
+    float GetWeaponRadius() { return tWeaponStats.m_fRadius; }
     void  SetWeaponRadius(float fRadius)
     {
         ms_uiAllWeaponStatsRevision++;
@@ -299,21 +299,21 @@ public:
     }
 
     // Ints
-    short GetAimOffsetIndex(void) { return tWeaponStats.m_nAimOffsetIndex; }
+    short GetAimOffsetIndex() { return tWeaponStats.m_nAimOffsetIndex; }
     void  SetAimOffsetIndex(short sIndex)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_nAimOffsetIndex = sIndex;
     }
 
-    BYTE GetDefaultCombo(void) { return tWeaponStats.m_defaultCombo; }
+    BYTE GetDefaultCombo() { return tWeaponStats.m_defaultCombo; }
     void SetDefaultCombo(BYTE defaultCombo)
     {
         ms_uiAllWeaponStatsRevision++;
         tWeaponStats.m_defaultCombo = defaultCombo;
     }
 
-    BYTE GetCombosAvailable(void) { return tWeaponStats.m_nCombosAvailable; }
+    BYTE GetCombosAvailable() { return tWeaponStats.m_nCombosAvailable; }
     void SetCombosAvailable(BYTE nCombosAvailable)
     {
         ms_uiAllWeaponStatsRevision++;
@@ -321,9 +321,9 @@ public:
     }
 
     void SetChanged(bool bChanged) { m_bChanged = bChanged; }
-    bool HasChanged(void) { return m_bChanged; }
+    bool HasChanged() { return m_bChanged; }
 
-    static uint GetAllWeaponStatsRevision(void) { return ms_uiAllWeaponStatsRevision; }
+    static uint GetAllWeaponStatsRevision() { return ms_uiAllWeaponStatsRevision; }
 
 private:
     void HandleFlagsValueChange(DWORD newValue);

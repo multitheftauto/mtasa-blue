@@ -12,26 +12,34 @@
 
 #define DEFAULT_MAX_FILESIZE 52428800
 
-void CLuaFileDefs::LoadFunctions(void)
+void CLuaFileDefs::LoadFunctions()
 {
-    CLuaCFunctions::AddFunction("fileOpen", fileOpen);
-    CLuaCFunctions::AddFunction("fileCreate", fileCreate);
-    CLuaCFunctions::AddFunction("fileExists", fileExists);
-    CLuaCFunctions::AddFunction("fileCopy", fileCopy);
-    CLuaCFunctions::AddFunction("fileRename", fileRename);
-    CLuaCFunctions::AddFunction("fileDelete", fileDelete);
+    std::map<const char*, lua_CFunction> functions{
+        {"fileOpen", fileOpen},
+        {"fileCreate", fileCreate},
+        {"fileExists", fileExists},
+        {"fileCopy", fileCopy},
+        {"fileRename", fileRename},
+        {"fileDelete", fileDelete},
 
-    CLuaCFunctions::AddFunction("fileClose", fileClose);
-    CLuaCFunctions::AddFunction("fileFlush", fileFlush);
-    CLuaCFunctions::AddFunction("fileRead", fileRead);
-    CLuaCFunctions::AddFunction("fileWrite", fileWrite);
+        {"fileClose", fileClose},
+        {"fileFlush", fileFlush},
+        {"fileRead", fileRead},
+        {"fileWrite", fileWrite},
 
-    CLuaCFunctions::AddFunction("fileGetPos", fileGetPos);
-    CLuaCFunctions::AddFunction("fileGetSize", fileGetSize);
-    CLuaCFunctions::AddFunction("fileGetPath", fileGetPath);
-    CLuaCFunctions::AddFunction("fileIsEOF", fileIsEOF);
+        {"fileGetPos", fileGetPos},
+        {"fileGetSize", fileGetSize},
+        {"fileGetPath", fileGetPath},
+        {"fileIsEOF", fileIsEOF},
 
-    CLuaCFunctions::AddFunction("fileSetPos", fileSetPos);
+        {"fileSetPos", fileSetPos},
+    };
+
+    // Add functions
+    for (const auto& pair : functions)
+    {
+        CLuaCFunctions::AddFunction(pair.first, pair.second);
+    }
 }
 
 void CLuaFileDefs::AddClass(lua_State* luaVM)
@@ -210,6 +218,9 @@ int CLuaFileDefs::fileOpen(lua_State* luaVM)
 #ifdef MTA_CLIENT
                         // Make it a child of the resource's file root
                         pFile->SetParent(pResource->GetResourceDynamicEntity());
+                        pFile->SetLuaDebugInfo(g_pClientGame->GetScriptDebugging()->GetLuaDebugInfo(luaVM));
+#else
+                        pFile->SetLuaDebugInfo(g_pGame->GetScriptDebugging()->GetLuaDebugInfo(luaVM));
 #endif
                         // Grab its owner resource
                         CResource* pParentResource = pLuaMain->GetResource();
@@ -314,6 +325,9 @@ int CLuaFileDefs::fileCreate(lua_State* luaVM)
 #ifdef MTA_CLIENT
                     // Make it a child of the resource's file root
                     pFile->SetParent(pResource->GetResourceDynamicEntity());
+                    pFile->SetLuaDebugInfo(g_pClientGame->GetScriptDebugging()->GetLuaDebugInfo(luaVM));
+#else
+                    pFile->SetLuaDebugInfo(g_pGame->GetScriptDebugging()->GetLuaDebugInfo(luaVM));
 #endif
 
                     // Add it to the scrpt resource element group
@@ -428,7 +442,7 @@ int CLuaFileDefs::fileCopy(lua_State* luaVM)
         if (CResourceManager::ParseResourcePathInput(strInputSrcPath, pSrcResource, &strSrcAbsPath) &&
             CResourceManager::ParseResourcePathInput(strInputDestPath, pDestResource, &strDestAbsPath))
         {
-            CheckCanModifyOtherResource(argStream, pThisResource, pSrcResource, pDestResource);
+            CheckCanModifyOtherResources(argStream, pThisResource, { pSrcResource, pDestResource });
             CheckCanAccessOtherResourceFile(argStream, pThisResource, pSrcResource, strSrcAbsPath);
             CheckCanAccessOtherResourceFile(argStream, pThisResource, pDestResource, strDestAbsPath);
             if (!argStream.HasErrors())
@@ -519,7 +533,7 @@ int CLuaFileDefs::fileRename(lua_State* luaVM)
         if (CResourceManager::ParseResourcePathInput(strInputSrcPath, pSrcResource, &strSrcAbsPath) &&
             CResourceManager::ParseResourcePathInput(strInputDestPath, pDestResource, &strDestAbsPath))
         {
-            CheckCanModifyOtherResource(argStream, pThisResource, pSrcResource, pDestResource);
+            CheckCanModifyOtherResources(argStream, pThisResource, { pSrcResource, pDestResource });
             CheckCanAccessOtherResourceFile(argStream, pThisResource, pSrcResource, strSrcAbsPath);
             CheckCanAccessOtherResourceFile(argStream, pThisResource, pDestResource, strDestAbsPath);
             if (!argStream.HasErrors())
@@ -718,7 +732,7 @@ int CLuaFileDefs::fileWrite(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pFile);
 
-    // Ensure we have atleast one string
+    // Ensure we have at least one string
     if (!argStream.NextIsString())
         argStream.SetTypeError("string");
 
@@ -731,12 +745,14 @@ int CLuaFileDefs::fileWrite(lua_State* luaVM)
         while (argStream.NextIsString())
         {
             // Grab argument and length
-            SString strData;
-            argStream.ReadString(strData);
-            unsigned long ulDataLen = strData.length();
+            SCharStringRef strData;
+            argStream.ReadCharStringRef(strData);
+
+            if (argStream.HasErrors() || !strData.pData)
+                continue;
 
             // Write the data
-            long lArgBytesWritten = pFile->Write(ulDataLen, strData);
+            long lArgBytesWritten = pFile->Write(strData.uiSize, strData.pData);
 
             // Did the file mysteriously disappear?
             if (lArgBytesWritten == -1)
@@ -927,16 +943,13 @@ int CLuaFileDefs::fileCloseGC(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Close the file and delete it
-        pFile->Unload();
-        m_pElementDeleter->Delete(pFile);
-
         // This file wasn't closed, so we should warn
         // the scripter that they forgot to close it.
-        m_pScriptDebugging->LogWarning(luaVM, "Unclosed file (%s) was garbage collected. Check your resource for dereferenced files.", *pFile->GetFilePath());
-        // TODO: The debug info reported when Lua automatically garbage collects will
-        //       actually be the exact point Lua pauses for collection. Find a way to
-        //       remove the line number & script file completely.
+        m_pScriptDebugging->LogWarning(pFile->GetLuaDebugInfo(), "Unclosed file (%s) was garbage collected. Check your resource for dereferenced files.", *pFile->GetFilePath());
+       
+        // Close the file and delete it from elements
+        pFile->Unload();
+        m_pElementDeleter->Delete(pFile);
 
         lua_pushboolean(luaVM, true);
         return 1;

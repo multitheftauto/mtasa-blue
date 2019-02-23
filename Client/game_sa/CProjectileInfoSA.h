@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_PROJECTILEINFO
-#define __CGAMESA_PROJECTILEINFO
+#pragma once
 
 #include <game/CProjectileInfo.h>
 #include "CProjectileSA.h"
@@ -72,13 +71,11 @@ public:
     bool             AddProjectile(CEntity* creator, eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity);
     CProjectile*     GetProjectile(void* projectilePointer);
 
-    CEntity* GetTarget(void);
+    CEntity* GetTarget();
     void     SetTarget(CEntity* pEntity);
 
-    bool IsActive(void);
+    bool IsActive();
 
     void  SetCounter(DWORD dwCounter) { internalInterface->dwCounter = dwCounter + pGame->GetSystemTime(); }
-    DWORD GetCounter(void) { return internalInterface->dwCounter - pGame->GetSystemTime(); }
+    DWORD GetCounter() { return internalInterface->dwCounter - pGame->GetSystemTime(); }
 };
-
-#endif

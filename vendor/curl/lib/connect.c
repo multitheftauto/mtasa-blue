@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2017, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -522,7 +522,7 @@ static bool verifyconnect(curl_socket_t sockfd, int *error)
     err = 0;
   }
 #endif
-#ifdef __minix
+#if defined(EBADIOCTL) && defined(__minix)
   /* Minix 3.1.x doesn't support getsockopt on UDP sockets */
   if(EBADIOCTL == err) {
     SET_SOCKERRNO(0);
@@ -655,7 +655,7 @@ bool Curl_getaddressinfo(struct sockaddr *sa, char *addr,
 #if defined(HAVE_SYS_UN_H) && defined(AF_UNIX)
     case AF_UNIX:
       su = (struct sockaddr_un*)sa;
-      snprintf(addr, MAX_IPADR_LEN, "%s", su->sun_path);
+      msnprintf(addr, MAX_IPADR_LEN, "%s", su->sun_path);
       *port = 0;
       return TRUE;
 #endif
@@ -1237,8 +1237,6 @@ static int conn_is_conn(struct connectdata *conn, void *param)
 curl_socket_t Curl_getconnectinfo(struct Curl_easy *data,
                                   struct connectdata **connp)
 {
-  curl_socket_t sockfd;
-
   DEBUGASSERT(data);
 
   /* this works for an easy handle:
@@ -1261,15 +1259,15 @@ curl_socket_t Curl_getconnectinfo(struct Curl_easy *data,
       return CURL_SOCKET_BAD;
     }
 
-    if(connp)
+    if(connp) {
       /* only store this if the caller cares for it */
       *connp = c;
-    sockfd = c->sock[FIRSTSOCKET];
+      c->data = data;
+    }
+    return c->sock[FIRSTSOCKET];
   }
   else
     return CURL_SOCKET_BAD;
-
-  return sockfd;
 }
 
 /*
@@ -1316,7 +1314,7 @@ int Curl_closesocket(struct connectdata *conn,
       conn->sock_accepted[SECONDARYSOCKET] = FALSE;
     else {
       int rc;
-      Curl_multi_closed(conn, sock);
+      Curl_multi_closed(conn->data, sock);
       Curl_set_in_callback(conn->data, true);
       rc = conn->fclosesocket(conn->closesocket_client, sock);
       Curl_set_in_callback(conn->data, false);
@@ -1326,7 +1324,7 @@ int Curl_closesocket(struct connectdata *conn,
 
   if(conn)
     /* tell the multi-socket code about this */
-    Curl_multi_closed(conn, sock);
+    Curl_multi_closed(conn->data, sock);
 
   sclose(sock);
 

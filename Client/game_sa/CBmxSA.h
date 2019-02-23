@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAMESA_BMX
-#define __CGAMESA_BMX
+#pragma once
 
 #include <game/CBmx.h>
 #include "CBikeSA.h"
@@ -27,7 +26,5 @@ public:
     CBmxSA(CBmxSAInterface* bmx);
     CBmxSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
 
-    virtual ~CBmxSA(void){};
+    virtual ~CBmxSA(){};
 };
-
-#endif

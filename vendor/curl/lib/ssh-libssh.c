@@ -95,6 +95,13 @@
 #include "memdebug.h"
 #include "curl_path.h"
 
+/* A recent macro provided by libssh. Or make our own. */
+#ifndef SSH_STRING_FREE_CHAR
+/* !checksrc! disable ASSIGNWITHINCONDITION 1 */
+#define SSH_STRING_FREE_CHAR(x) \
+    do { if((x) != NULL) { ssh_string_free_char(x); x = NULL; } } while(0)
+#endif
+
 /* Local functions: */
 static CURLcode myssh_connect(struct connectdata *conn, bool *done);
 static CURLcode myssh_multi_statemach(struct connectdata *conn,
@@ -204,11 +211,21 @@ static CURLcode sftp_error_to_CURLE(int err)
   return CURLE_SSH;
 }
 
+#ifndef DEBUGBUILD
+#define state(x,y) mystate(x,y)
+#else
+#define state(x,y) mystate(x,y, __LINE__)
+#endif
+
 /*
  * SSH State machine related code
  */
 /* This is the ONLY way to change SSH state! */
-static void state(struct connectdata *conn, sshstate nowstate)
+static void mystate(struct connectdata *conn, sshstate nowstate
+#ifdef DEBUGBUILD
+                    , int lineno
+#endif
+  )
 {
   struct ssh_conn *sshc = &conn->proto.sshc;
 #if defined(DEBUGBUILD) && !defined(CURL_DISABLE_VERBOSE_STRINGS)
@@ -278,8 +295,9 @@ static void state(struct connectdata *conn, sshstate nowstate)
 
 
   if(sshc->state != nowstate) {
-    infof(conn->data, "SSH %p state change from %s to %s\n",
-          (void *) sshc, names[sshc->state], names[nowstate]);
+    infof(conn->data, "SSH %p state change from %s to %s (line %d)\n",
+          (void *) sshc, names[sshc->state], names[nowstate],
+          lineno);
   }
 #endif
 
@@ -418,7 +436,7 @@ cleanup:
 }
 
 #define MOVE_TO_ERROR_STATE(_r) { \
-  state(conn, SSH_SESSION_FREE); \
+  state(conn, SSH_SESSION_DISCONNECT); \
   sshc->actualcode = _r; \
   rc = SSH_ERROR; \
   break; \
@@ -486,7 +504,7 @@ restart:
       if(rc < 0)
         return SSH_ERROR;
 
-    /* fallthrough */
+    /* FALLTHROUGH */
     case 1:
       sshc->kbd_state = 1;
 
@@ -538,6 +556,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
   struct Curl_easy *data = conn->data;
   struct SSHPROTO *protop = data->req.protop;
   struct ssh_conn *sshc = &conn->proto.sshc;
+  curl_socket_t sock = conn->sock[FIRSTSOCKET];
   int rc = SSH_NO_ERROR, err;
   char *new_readdir_line;
   int seekerr = CURL_SEEKFUNC_OK;
@@ -561,7 +580,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
       ssh_set_blocking(sshc->ssh_session, 0);
 
       state(conn, SSH_S_STARTUP);
-      /* fall-through */
+      /* FALLTHROUGH */
 
     case SSH_S_STARTUP:
       rc = ssh_connect(sshc->ssh_session);
@@ -575,7 +594,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
 
       state(conn, SSH_HOSTKEY);
 
-      /* fall-through */
+      /* FALLTHROUGH */
     case SSH_HOSTKEY:
 
       rc = myssh_is_known(conn);
@@ -584,7 +603,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
       }
 
       state(conn, SSH_AUTHLIST);
-      /* fall through */
+      /* FALLTHROUGH */
     case SSH_AUTHLIST:{
         sshc->authed = FALSE;
 
@@ -607,6 +626,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
         sshc->auth_methods = ssh_userauth_list(sshc->ssh_session, NULL);
         if(sshc->auth_methods & SSH_AUTH_METHOD_PUBLICKEY) {
           state(conn, SSH_AUTH_PKEY_INIT);
+          infof(data, "Authentication using SSH public key file\n");
         }
         else if(sshc->auth_methods & SSH_AUTH_METHOD_GSSAPI_MIC) {
           state(conn, SSH_AUTH_GSSAPI);
@@ -651,6 +671,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
         if(rc != SSH_OK) {
           failf(data, "Could not load private key file %s",
                 data->set.str[STRING_SSH_PRIVATE_KEY]);
+          MOVE_TO_ERROR_STATE(CURLE_LOGIN_DENIED);
           break;
         }
 
@@ -659,8 +680,6 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
 
       }
       else {
-        infof(data, "Authentication using SSH public key file\n");
-
         rc = ssh_userauth_publickey_auto(sshc->ssh_session, NULL,
                                          data->set.ssl.key_passwd);
         if(rc == SSH_AUTH_AGAIN) {
@@ -748,7 +767,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
         MOVE_TO_ERROR_STATE(CURLE_LOGIN_DENIED);
       }
       state(conn, SSH_AUTH_PASS);
-      /* fall through */
+      /* FALLTHROUGH */
 
     case SSH_AUTH_PASS:
       rc = ssh_userauth_password(sshc->ssh_session, NULL, conn->passwd);
@@ -781,7 +800,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
 
       Curl_pgrsTime(conn->data, TIMER_APPCONNECT);      /* SSH is connected */
 
-      conn->sockfd = ssh_get_fd(sshc->ssh_session);
+      conn->sockfd = sock;
       conn->writesockfd = CURL_SOCKET_BAD;
 
       if(conn->handler->protocol == CURLPROTO_SFTP) {
@@ -812,7 +831,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
         break;
       }
       state(conn, SSH_SFTP_REALPATH);
-      /* fall through */
+      /* FALLTHROUGH */
     case SSH_SFTP_REALPATH:
       /*
        * Get the "home" directory
@@ -1279,7 +1298,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
       if(sshc->readdir_attrs) {
         sshc->readdir_filename = sshc->readdir_attrs->name;
         sshc->readdir_longentry = sshc->readdir_attrs->longname;
-        sshc->readdir_len = (int)strlen(sshc->readdir_filename);
+        sshc->readdir_len = strlen(sshc->readdir_filename);
 
         if(data->set.ftp_list_only) {
           char *tmpLine;
@@ -1306,11 +1325,11 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
           if(data->set.verbose) {
             Curl_debug(data, CURLINFO_DATA_OUT,
                        (char *)sshc->readdir_filename,
-                       sshc->readdir_len, conn);
+                       sshc->readdir_len);
           }
         }
         else {
-          sshc->readdir_currLen = (int)strlen(sshc->readdir_longentry);
+          sshc->readdir_currLen = strlen(sshc->readdir_longentry);
           sshc->readdir_totalLen = 80 + sshc->readdir_currLen;
           sshc->readdir_line = calloc(sshc->readdir_totalLen, 1);
           if(!sshc->readdir_line) {
@@ -1331,8 +1350,8 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
               break;
             }
 
-            snprintf(sshc->readdir_linkPath, PATH_MAX, "%s%s", protop->path,
-                     sshc->readdir_filename);
+            msnprintf(sshc->readdir_linkPath, PATH_MAX, "%s%s", protop->path,
+                      sshc->readdir_filename);
 
             state(conn, SSH_SFTP_READDIR_LINK);
             break;
@@ -1371,12 +1390,12 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
         if(sshc->readdir_filename == NULL)
           sshc->readdir_len = 0;
         else
-          sshc->readdir_len = (int)strlen(sshc->readdir_tmp);
+          sshc->readdir_len = strlen(sshc->readdir_tmp);
         sshc->readdir_longentry = NULL;
         sshc->readdir_filename = sshc->readdir_tmp;
       }
       else {
-        sshc->readdir_len = (int)strlen(sshc->readdir_link_attrs->name);
+        sshc->readdir_len = strlen(sshc->readdir_link_attrs->name);
         sshc->readdir_filename = sshc->readdir_link_attrs->name;
         sshc->readdir_longentry = sshc->readdir_link_attrs->longname;
       }
@@ -1395,12 +1414,12 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
       }
       sshc->readdir_line = new_readdir_line;
 
-      sshc->readdir_currLen += snprintf(sshc->readdir_line +
-                                        sshc->readdir_currLen,
-                                        sshc->readdir_totalLen -
-                                        sshc->readdir_currLen,
-                                        " -> %s",
-                                        sshc->readdir_filename);
+      sshc->readdir_currLen += msnprintf(sshc->readdir_line +
+                                         sshc->readdir_currLen,
+                                         sshc->readdir_totalLen -
+                                         sshc->readdir_currLen,
+                                         " -> %s",
+                                         sshc->readdir_filename);
 
       sftp_attributes_free(sshc->readdir_link_attrs);
       sshc->readdir_link_attrs = NULL;
@@ -1408,12 +1427,12 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
       sshc->readdir_longentry = NULL;
 
       state(conn, SSH_SFTP_READDIR_BOTTOM);
-      /* fall through */
+      /* FALLTHROUGH */
     case SSH_SFTP_READDIR_BOTTOM:
-      sshc->readdir_currLen += snprintf(sshc->readdir_line +
-                                        sshc->readdir_currLen,
-                                        sshc->readdir_totalLen -
-                                        sshc->readdir_currLen, "\n");
+      sshc->readdir_currLen += msnprintf(sshc->readdir_line +
+                                         sshc->readdir_currLen,
+                                         sshc->readdir_totalLen -
+                                         sshc->readdir_currLen, "\n");
       result = Curl_client_write(conn, CLIENTWRITE_BODY,
                                  sshc->readdir_line,
                                  sshc->readdir_currLen);
@@ -1423,7 +1442,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
         /* output debug output if that is requested */
         if(data->set.verbose) {
           Curl_debug(data, CURLINFO_DATA_OUT, sshc->readdir_line,
-                     sshc->readdir_currLen, conn);
+                     sshc->readdir_currLen);
         }
         data->req.bytecount += sshc->readdir_currLen;
       }
@@ -1650,7 +1669,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
         sshc->sftp_session = NULL;
       }
 
-      Curl_safefree(sshc->homedir);
+      SSH_STRING_FREE_CHAR(sshc->homedir);
       conn->data->state.most_recent_ftp_entrypath = NULL;
 
       state(conn, SSH_SESSION_DISCONNECT);
@@ -1740,7 +1759,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
         MOVE_TO_ERROR_STATE(CURLE_COULDNT_CONNECT);
       }
       state(conn, SSH_SCP_DOWNLOAD);
-      /* fall through */
+      /* FALLTHROUGH */
 
     case SSH_SCP_DOWNLOAD:{
         curl_off_t bytecount;
@@ -1805,7 +1824,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
       ssh_set_blocking(sshc->ssh_session, 0);
 
       state(conn, SSH_SESSION_DISCONNECT);
-      /* fall through */
+      /* FALLTHROUGH */
 
     case SSH_SESSION_DISCONNECT:
       /* during weird times when we've been prematurely aborted, the channel
@@ -1818,11 +1837,11 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
 
       ssh_disconnect(sshc->ssh_session);
 
-      Curl_safefree(sshc->homedir);
+      SSH_STRING_FREE_CHAR(sshc->homedir);
       conn->data->state.most_recent_ftp_entrypath = NULL;
 
       state(conn, SSH_SESSION_FREE);
-      /* fall through */
+      /* FALLTHROUGH */
     case SSH_SESSION_FREE:
       if(sshc->ssh_session) {
         ssh_free(sshc->ssh_session);
@@ -1855,14 +1874,11 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
 
       Curl_safefree(sshc->rsa_pub);
       Curl_safefree(sshc->rsa);
-
       Curl_safefree(sshc->quote_path1);
       Curl_safefree(sshc->quote_path2);
-
-      Curl_safefree(sshc->homedir);
-
       Curl_safefree(sshc->readdir_line);
       Curl_safefree(sshc->readdir_linkPath);
+      SSH_STRING_FREE_CHAR(sshc->homedir);
 
       /* the code we are about to return */
       result = sshc->actualcode;
@@ -2037,6 +2053,7 @@ static CURLcode myssh_connect(struct connectdata *conn, bool *done)
 {
   struct ssh_conn *ssh;
   CURLcode result;
+  curl_socket_t sock = conn->sock[FIRSTSOCKET];
   struct Curl_easy *data = conn->data;
   int rc;
 
@@ -2064,6 +2081,8 @@ static CURLcode myssh_connect(struct connectdata *conn, bool *done)
     failf(data, "Failure initialising ssh session");
     return CURLE_FAILED_INIT;
   }
+
+  ssh_options_set(ssh->ssh_session, SSH_OPTIONS_FD, &sock);
 
   if(conn->user) {
     infof(data, "User: %s\n", conn->user);
@@ -2379,7 +2398,8 @@ static CURLcode sftp_done(struct connectdata *conn, CURLcode status,
     /* Post quote commands are executed after the SFTP_CLOSE state to avoid
        errors that could happen due to open file handles during POSTQUOTE
        operation */
-    if(!status && !premature && conn->data->set.postquote) {
+    if(!status && !premature && conn->data->set.postquote &&
+       !conn->bits.retry) {
       sshc->nextstate = SSH_SFTP_POSTQUOTE_INIT;
       state(conn, SSH_SFTP_CLOSE);
     }
@@ -2425,8 +2445,7 @@ static ssize_t sftp_recv(struct connectdata *conn, int sockindex,
   ssize_t nread;
   (void)sockindex;
 
-  if(len >= (size_t)1<<32)
-    len = (size_t)(1<<31)-1;
+  DEBUGASSERT(len < CURL_MAX_READ_SIZE);
 
   switch(conn->proto.sshc.sftp_recv_state) {
     case 0:
@@ -2438,7 +2457,7 @@ static ssize_t sftp_recv(struct connectdata *conn, int sockindex,
         return -1;
       }
 
-      /* fall-through */
+      /* FALLTHROUGH */
     case 1:
       conn->proto.sshc.sftp_recv_state = 1;
 
@@ -2501,8 +2520,8 @@ static void sftp_quote(struct connectdata *conn)
       return;
     }
     if(data->set.verbose) {
-      Curl_debug(data, CURLINFO_HEADER_OUT, (char *) "PWD\n", 4, conn);
-      Curl_debug(data, CURLINFO_HEADER_IN, tmp, strlen(tmp), conn);
+      Curl_debug(data, CURLINFO_HEADER_OUT, (char *) "PWD\n", 4);
+      Curl_debug(data, CURLINFO_HEADER_IN, tmp, strlen(tmp));
     }
     /* this sends an FTP-like "header" to the header callback so that the
        current directory can be read very similar to how it is read when

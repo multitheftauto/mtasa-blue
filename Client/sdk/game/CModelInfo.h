@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CGAME_MODELINFO
-#define __CGAME_MODELINFO
+#pragma once
 
 #include "Common.h"
 #include "RenderWare.h"
@@ -100,7 +99,7 @@ struct SVehicleSupportedUpgrades
 class CModelInfo
 {
 public:
-    virtual class CBaseModelInfoSAInterface* GetInterface(void) = 0;
+    virtual class CBaseModelInfoSAInterface* GetInterface() = 0;
 
     virtual DWORD GetModel() = 0;
     virtual BOOL  IsBoat() = 0;
@@ -132,7 +131,7 @@ public:
     virtual void ModelAddRef(EModelRequestType requestType, const char* szTag /* = NULL*/) = 0;
     virtual void RemoveRef(bool bRemoveExtraGTARef = false) = 0;
     virtual int  GetRefCount() = 0;
-    virtual bool ForceUnload(void) = 0;
+    virtual bool ForceUnload() = 0;
 
     virtual float GetDistanceFromCentreOfMassToBaseOfModel() = 0;
 
@@ -144,11 +143,13 @@ public:
     virtual short        GetAvailableVehicleMod(unsigned short usSlot) = 0;
     virtual bool         IsUpgradeAvailable(eVehicleUpgradePosn posn) = 0;
     virtual void         SetCustomCarPlateText(const char* szText) = 0;
-    virtual unsigned int GetNumRemaps(void) = 0;
-    virtual void*        GetVehicleSuspensionData(void) = 0;
+    virtual unsigned int GetNumRemaps() = 0;
+    virtual void*        GetVehicleSuspensionData() = 0;
     virtual void*        SetVehicleSuspensionData(void* pSuspensionLines) = 0;
     virtual CVector      GetVehicleExhaustFumesPosition() = 0;
     virtual void         SetVehicleExhaustFumesPosition(const CVector& position) = 0;
+    virtual CVector      GetVehicleDummyPosition(eVehicleDummies eDummy) = 0;
+    virtual void         SetVehicleDummyPosition(eVehicleDummies eDummy, const CVector& vecPosition) = 0;
 
     // Init the supported upgrades structure
     virtual void InitialiseSupportedUpgrades(RpClump* pClump) = 0;
@@ -161,16 +162,14 @@ public:
 
     // Custom collision related functions
     virtual void SetCustomModel(RpClump* pClump) = 0;
-    virtual void RestoreOriginalModel(void) = 0;
+    virtual void RestoreOriginalModel() = 0;
     virtual void SetColModel(CColModel* pColModel) = 0;
-    virtual void RestoreColModel(void) = 0;
+    virtual void RestoreColModel() = 0;
 
     // Call this to make sure the custom vehicle models are being used after a load.
-    virtual void      MakeCustomModel(void) = 0;
-    virtual RwObject* GetRwObject(void) = 0;
+    virtual void      MakeCustomModel() = 0;
+    virtual RwObject* GetRwObject() = 0;
 
-    virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades(void) = 0;
-    virtual void                      ResetSupportedUpgrades(void) = 0;
+    virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() = 0;
+    virtual void                      ResetSupportedUpgrades() = 0;
 };
-
-#endif

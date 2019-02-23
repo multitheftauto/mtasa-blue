@@ -7,7 +7,7 @@
  *               and miscellaneous rendering functions
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
- *  RenderWare is © Criterion Software
+ *  RenderWare is Â© Criterion Software
  *
  *****************************************************************************/
 
@@ -193,7 +193,7 @@ CRenderWareSA::CRenderWareSA(eGameVersion version)
     m_bGTAVertexShadersEnabled = true;
 }
 
-CRenderWareSA::~CRenderWareSA(void)
+CRenderWareSA::~CRenderWareSA()
 {
     SAFE_DELETE(m_pMatchChannelManager);
 }

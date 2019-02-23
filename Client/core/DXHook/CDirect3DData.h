@@ -9,8 +9,7 @@
  *
  *****************************************************************************/
 
-#ifndef __CDIRECT3DDATA_H
-#define __CDIRECT3DDATA_H
+#pragma once
 
 #include <d3d9.h>
 #include "CSingleton.h"
@@ -18,21 +17,21 @@
 class CDirect3DData : public CSingleton<CDirect3DData>
 {
 public:
-    CDirect3DData(void);
-    ~CDirect3DData(void);
+    CDirect3DData();
+    ~CDirect3DData();
 
     void StoreTransform(D3DTRANSFORMSTATETYPE dwMatrixToStore, const D3DMATRIX* pMatrix);
     void GetTransform(D3DTRANSFORMSTATETYPE dwRequestedMatrix, D3DMATRIX* pMatrixOut);
 
-    HWND GetDeviceWindow(void) { return m_hDeviceWindow; };
+    HWND GetDeviceWindow() { return m_hDeviceWindow; };
     void StoreDeviceWindow(HWND hDeviceWindow) { m_hDeviceWindow = hDeviceWindow; };
 
     void StoreViewport(DWORD dwX, DWORD dwY, DWORD dwWidth, DWORD dwHeight);
 
-    DWORD GetViewportX(void);
-    DWORD GetViewportY(void);
-    DWORD GetViewportWidth(void);
-    DWORD GetViewportHeight(void);
+    DWORD GetViewportX();
+    DWORD GetViewportY();
+    DWORD GetViewportWidth();
+    DWORD GetViewportHeight();
 
 private:
     D3DMATRIX m_mViewMatrix;
@@ -46,5 +45,3 @@ private:
     DWORD m_dwViewportWidth;
     DWORD m_dwViewportHeight;
 };
-
-#endif
