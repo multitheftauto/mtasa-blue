@@ -1107,6 +1107,7 @@ int CLuaEngineDefs::EngineGetModelCollisionData(lua_State* luaVM)
                                 argStream.SetCustomError("Invalid box index.");
                                 m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
                                 lua_pushboolean(luaVM, false);
+                                return 1;
                             }
                         }
                         else
