@@ -95,7 +95,6 @@ typedef struct
         y = static_cast<signed __int16>(vec.fY * 128);
         z = static_cast<signed __int16>(vec.fZ * 128);
     }
-
 } CompressedVector;
 
 typedef struct
@@ -127,6 +126,7 @@ typedef struct
         }
         return vertices;
     }
+
     size_t getNumVertices() const
     {
         std::map<ushort, bool> vertices;
@@ -176,12 +176,8 @@ typedef struct
     {
         std::map<ushort, ushort> verticesUsage;
         for (ushort i = 0; i < numColTriangles; i++)
-        {
             for (char cVertex = 0; cVertex < 3; cVertex++)
-            {
                 verticesUsage[pColTriangles[i].vertex[cVertex]]++;
-            }
-        }
         return verticesUsage;
     }
 } CColDataSA;

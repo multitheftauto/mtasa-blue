@@ -1,9 +1,8 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        MTA10/mods/shared_logic/lua/CLuaFunctionParseHelpers.cpp
+ *  FILE:        mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.cpp
  *  PURPOSE:
  *
  *****************************************************************************/
