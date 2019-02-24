@@ -14,7 +14,7 @@
 // use this to check if you're using SA or VC headers
 #define GTA_SA
 
-typedef void(InRenderer)(void);
+typedef void(InRenderer)();
 
 #include "Common.h"
 
@@ -86,7 +86,7 @@ typedef void(InRenderer)(void);
 enum eEntityType;
 
 typedef bool(PreWeaponFireHandler)(class CPlayerPed* pPlayer, bool bStopIfUsingBulletSync);
-typedef void(PostWeaponFireHandler)(void);
+typedef void(PostWeaponFireHandler)();
 typedef void(TaskSimpleBeHitHandler)(class CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
 
 enum eGameVersion
@@ -186,33 +186,33 @@ public:
     virtual VOID         TakeScreenshot(char* szFileName) = 0;
     virtual DWORD*       GetMemoryValue(DWORD dwOffset) = 0;
     virtual void         SetTimeScale(float fTimeScale) = 0;
-    virtual float        GetFPS(void) = 0;
-    virtual float        GetTimeStep(void) = 0;
-    virtual float        GetOldTimeStep(void) = 0;
-    virtual float        GetTimeScale(void) = 0;
+    virtual float        GetFPS() = 0;
+    virtual float        GetTimeStep() = 0;
+    virtual float        GetOldTimeStep() = 0;
+    virtual float        GetTimeScale() = 0;
 
-    virtual void Initialize(void) = 0;
-    virtual void Reset(void) = 0;
-    virtual void Terminate(void) = 0;
+    virtual void Initialize() = 0;
+    virtual void Reset() = 0;
+    virtual void Terminate() = 0;
 
     virtual BOOL InitLocalPlayer(class CClientPed* pClientPed) = 0;
 
-    virtual float GetGravity(void) = 0;
+    virtual float GetGravity() = 0;
     virtual void  SetGravity(float fGravity) = 0;
 
-    virtual float GetGameSpeed(void) = 0;
+    virtual float GetGameSpeed() = 0;
     virtual void  SetGameSpeed(float fSpeed) = 0;
 
-    virtual unsigned long GetMinuteDuration(void) = 0;
+    virtual unsigned long GetMinuteDuration() = 0;
     virtual void          SetMinuteDuration(unsigned long ulDelay) = 0;
 
-    virtual unsigned char GetBlurLevel(void) = 0;
+    virtual unsigned char GetBlurLevel() = 0;
     virtual void          SetBlurLevel(unsigned char ucLevel) = 0;
 
     virtual void SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled);
     virtual bool GetJetpackWeaponEnabled(eWeaponType weaponType);
 
-    virtual eGameVersion GetGameVersion(void) = 0;
+    virtual eGameVersion GetGameVersion() = 0;
 
     virtual bool IsCheatEnabled(const char* szCheatName) = 0;
     virtual bool SetCheatEnabled(const char* szCheatName, bool bEnable) = 0;
@@ -227,7 +227,7 @@ public:
     virtual bool IsWaterCreaturesEnabled() = 0;
     virtual void SetWaterCreaturesEnabled(bool bEnable) = 0;
 
-    virtual CWeapon*     CreateWeapon(void) = 0;
+    virtual CWeapon*     CreateWeapon() = 0;
     virtual CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill) = 0;
 
     virtual bool VerifySADataFileNames() = 0;
@@ -238,14 +238,14 @@ public:
     virtual void SuspendASyncLoading(bool bSuspend, uint uiAutoUnsuspendDelay = 0) = 0;
     virtual bool IsASyncLoadingEnabled(bool bIgnoreSuspend = false) = 0;
 
-    virtual bool HasCreditScreenFadedOut(void) = 0;
-    virtual void FlushPendingRestreamIPL(void) = 0;
-    virtual void ResetModelLodDistances(void) = 0;
-    virtual void ResetAlphaTransparencies(void) = 0;
-    virtual void DisableVSync(void) = 0;
+    virtual bool HasCreditScreenFadedOut() = 0;
+    virtual void FlushPendingRestreamIPL() = 0;
+    virtual void ResetModelLodDistances() = 0;
+    virtual void ResetAlphaTransparencies() = 0;
+    virtual void DisableVSync() = 0;
 
     virtual void  OnPedContextChange(CPed* pPedContext) = 0;
-    virtual CPed* GetPedContext(void) = 0;
+    virtual CPed* GetPedContext() = 0;
 
     virtual void GetShaderReplacementStats(SShaderReplacementStats& outStats) = 0;
 

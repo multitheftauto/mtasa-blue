@@ -28,7 +28,7 @@ CPrimitiveBatcher::CPrimitiveBatcher()
 //
 //
 ////////////////////////////////////////////////////////////////
-CPrimitiveBatcher::~CPrimitiveBatcher(void)
+CPrimitiveBatcher::~CPrimitiveBatcher()
 {
 }
 ////////////////////////////////////////////////////////////////
@@ -126,7 +126,7 @@ void CPrimitiveBatcher::SetDeviceStates()
 // Send all buffered vertices to D3D
 //
 ////////////////////////////////////////////////////////////////
-void CPrimitiveBatcher::Flush(void)
+void CPrimitiveBatcher::Flush()
 {
     if (m_primitiveList.empty())
         return;

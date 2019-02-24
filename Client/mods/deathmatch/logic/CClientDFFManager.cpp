@@ -18,13 +18,13 @@ CClientDFFManager::CClientDFFManager(CClientManager* pManager)
     m_bRemoveFromList = true;
 }
 
-CClientDFFManager::~CClientDFFManager(void)
+CClientDFFManager::~CClientDFFManager()
 {
     // Delete all our DFF's
     RemoveAll();
 }
 
-void CClientDFFManager::RemoveAll(void)
+void CClientDFFManager::RemoveAll()
 {
     // Make sure they don't remove themselves from our list
     m_bRemoveFromList = false;

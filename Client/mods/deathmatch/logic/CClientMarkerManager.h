@@ -20,14 +20,14 @@ class CClientMarkerManager
     friend class CClientGame;
 
 public:
-    unsigned int          Count(void) { return static_cast<unsigned int>(m_Markers.size()); };
+    unsigned int          Count() { return static_cast<unsigned int>(m_Markers.size()); };
     static CClientMarker* Get(ElementID ID);
-    void                  DeleteAll(void);
+    void                  DeleteAll();
 
 private:
     CClientMarkerManager(class CClientManager* pManager);
-    ~CClientMarkerManager(void);
-    void DoPulse(void);
+    ~CClientMarkerManager();
+    void DoPulse();
     void AddToList(CClientMarker* pCheckpoint) { m_Markers.push_back(pCheckpoint); };
     void RemoveFromList(CClientMarker* pCheckpoint)
     {

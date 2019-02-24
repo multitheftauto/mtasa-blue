@@ -16,7 +16,7 @@
 class CWorldRPCs : public CRPCFunctions
 {
 public:
-    static void LoadFunctions(void);
+    static void LoadFunctions();
 
     DECLARE_RPC(SetTime);
     DECLARE_RPC(SetWeather);

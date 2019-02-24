@@ -186,6 +186,8 @@ DWORD RETURN_VehColCB = 0x04C83AA;
 #define HOOKPOS_VehCol                                      0x06D6603
 DWORD RETURN_VehCol = 0x06D660C;
 
+#define HOOKPOS_Transmission_CalculateDriveAcceleration 0x6D05E0
+DWORD RETURN_Transmission_CalculateDriveAcceleration = 0x6D05E6;
 // Handling fix - driveType is per model
 #define HOOKPOS_CHandlingData_isNotRWD              0x6A048C
 DWORD RETURN_CHandlingData_isNotRWD = 0x6A0493;
@@ -450,6 +452,7 @@ void HOOK_CrashFix_Misc24();
 void HOOK_CheckAnimMatrix();
 void HOOK_VehColCB();
 void HOOK_VehCol();
+void HOOK_Transmission_CalculateDriveAcceleration();
 void HOOK_isVehDriveTypeNotRWD();
 void HOOK_isVehDriveTypeNotFWD();
 void HOOK_PreFxRender();
@@ -658,6 +661,8 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_PreHUDRender, (DWORD)HOOK_PreHUDRender, 5);
     HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7);
 
+    HookInstall(HOOKPOS_Transmission_CalculateDriveAcceleration, (DWORD)HOOK_Transmission_CalculateDriveAcceleration, 5);
+
     HookInstall(HOOKPOS_CHandlingData_isNotRWD, (DWORD)HOOK_isVehDriveTypeNotRWD, 7);
     HookInstall(HOOKPOS_CHandlingData_isNotFWD, (DWORD)HOOK_isVehDriveTypeNotFWD, 7);
 
@@ -780,7 +785,7 @@ void CMultiplayerSA::InitHooks()
     MemPut < BYTE > ( 0x62AEEC, 0x90 );
     */
 
-    // DISABLE CAERadioTrackManager::CheckForMissionStatsChanges(void) (special DJ banter)
+    // DISABLE CAERadioTrackManager::CheckForMissionStatsChanges() (special DJ banter)
     MemPut<BYTE>(0x4E8410, 0xC3);
 
     // DISABLE CPopulation__AddToPopulation
@@ -1576,7 +1581,7 @@ void CMultiplayerSA::RemoveRemoteDataStorage(CPlayerPed* pPed)
     CRemoteDataSA::RemoveRemoteDataStorage(pPed);
 }
 
-CPed* CMultiplayerSA::GetContextSwitchedPed(void)
+CPed* CMultiplayerSA::GetContextSwitchedPed()
 {
     return pContextSwitchedPed;
 }
@@ -1664,7 +1669,7 @@ void CMultiplayerSA::SetHeatHaze(const SHeatHazeSettings& settings)
     ApplyHeatHazeEnabled();
 }
 
-void CMultiplayerSA::ResetHeatHaze(void)
+void CMultiplayerSA::ResetHeatHaze()
 {
     SHeatHazeSettings settings;
     settings.ucIntensity = 0x50;
@@ -1689,7 +1694,7 @@ void CMultiplayerSA::SetHeatHazeEnabled(bool bEnabled)
     ApplyHeatHazeEnabled();
 }
 
-void CMultiplayerSA::ApplyHeatHazeEnabled(void)
+void CMultiplayerSA::ApplyHeatHazeEnabled()
 {
     // Enable heat haze if user allows it or scripts have customized it
     if (m_bHeatHazeEnabled || m_bHeatHazeCustomized)
@@ -1875,7 +1880,7 @@ void CMultiplayerSA::GetWindVelocity(float& fX, float& fY, float& fZ)
     fZ = *(float*)0xC813E8;
 }
 
-void CMultiplayerSA::RestoreWindVelocity(void)
+void CMultiplayerSA::RestoreWindVelocity()
 {
     MemPut<WORD>(0x72C616, 0x1DD9);
     MemPut<DWORD>(0x72C616 + 2, 0x00C813E0);
@@ -1927,7 +1932,7 @@ void CMultiplayerSA::RestoreFarClipDistance()
     }
 }
 
-float CMultiplayerSA::GetNearClipDistance(void)
+float CMultiplayerSA::GetNearClipDistance()
 {
     return m_fNearClipDistance;
 }
@@ -1937,7 +1942,7 @@ void CMultiplayerSA::SetNearClipDistance(float fDistance)
     m_fNearClipDistance = Clamp(0.1f, fDistance, 20.f);
 }
 
-void CMultiplayerSA::RestoreNearClipDistance(void)
+void CMultiplayerSA::RestoreNearClipDistance()
 {
     m_fNearClipDistance = DEFAULT_NEAR_CLIP_DISTANCE;
 }
@@ -2113,7 +2118,7 @@ void CMultiplayerSA::SetSkyColor(unsigned char TopRed, unsigned char TopGreen, u
     ucSkyGradientBottomB = BottomBlue;
 }
 
-void CMultiplayerSA::ResetSky(void)
+void CMultiplayerSA::ResetSky()
 {
     bUsingCustomSkyGradient = false;
 }
@@ -2175,7 +2180,7 @@ void CMultiplayerSA::SetWaterColor(float fWaterRed, float fWaterGreen, float fWa
     MemPut<BYTE>(0x7051D7, 255 - (BYTE)fWaterAlpha);
 }
 
-void CMultiplayerSA::ResetWater(void)
+void CMultiplayerSA::ResetWater()
 {
     bUsingCustomWaterColor = false;
     MemPutFast<DWORD>(0x8D5140, 0x40404040);
@@ -2184,7 +2189,7 @@ void CMultiplayerSA::ResetWater(void)
     MemPut<BYTE>(0x7051D7, 184);
 }
 
-bool CMultiplayerSA::GetExplosionsDisabled(void)
+bool CMultiplayerSA::GetExplosionsDisabled()
 {
     return m_bExplosionsDisabled;
 }
@@ -2305,7 +2310,7 @@ void CMultiplayerSA::SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandle
 }
 
 // What we do here is check if the idle handler has been set
-bool CMultiplayerSA::IsConnected(void)
+bool CMultiplayerSA::IsConnected()
 {
     return m_pIdleHandler != NULL;
 }
@@ -2699,7 +2704,7 @@ CVector        vecExplosionLocation;
 DWORD          explosionCreator = 0;
 DWORD          explosionEntity = 0;
 
-bool CallExplosionHandler(void)
+bool CallExplosionHandler()
 {
     // Find out who the creator is
     CEntity*            pExplosionCreator = NULL;
@@ -3115,7 +3120,7 @@ void _declspec(naked) HOOK_CPed_IsPlayer()
     }
 }
 
-void CRunningScript_Process(void)
+void CRunningScript_Process()
 {
     if (!bHasProcessedScript)
     {
@@ -3789,7 +3794,7 @@ void CMultiplayerSA::SetBulletFireHandler(BulletFireHandler* pHandler)
     m_pBulletFireHandler = pHandler;
 }
 
-void CMultiplayerSA::Reset(void)
+void CMultiplayerSA::Reset()
 {
     bHideRadar = false;
     m_pExplosionHandler = NULL;
@@ -3935,7 +3940,7 @@ bool CMultiplayerSA::IsThermalVisionEnabled()
     return (*(BYTE*)0xC402B9 == 1);
 }
 
-float CMultiplayerSA::GetGlobalGravity(void)
+float CMultiplayerSA::GetGlobalGravity()
 {
     return fGlobalGravity;
 }
@@ -3945,7 +3950,7 @@ void CMultiplayerSA::SetGlobalGravity(float fGravity)
     fGlobalGravity = fGravity;
 }
 
-float CMultiplayerSA::GetLocalPlayerGravity(void)
+float CMultiplayerSA::GetLocalPlayerGravity()
 {
     return fLocalPlayerGravity;
 }
@@ -3984,7 +3989,7 @@ void CMultiplayerSA::SetLocalCameraRotation(float fRotation)
     fLocalPlayerCameraRotation = fRotation;
 }
 
-bool CMultiplayerSA::IsCustomCameraRotationEnabled(void)
+bool CMultiplayerSA::IsCustomCameraRotationEnabled()
 {
     return bCustomCameraRotation;
 }
@@ -4104,6 +4109,40 @@ void                        GetVehicleDriveType()
 {
     // Get the car drive type from the Vehicle interface
     ucDriveType = static_cast<unsigned char>(pHandlingDriveTypeVeh->m_pVehicle->GetHandlingData()->GetCarDriveType());
+}
+
+static CTransmission* pCurTransmission = nullptr;
+static byte*          pCurGear = nullptr;
+
+void CheckVehicleMaxGear()
+{
+    if (*pCurGear > pCurTransmission->numOfGears)
+    {
+        *pCurGear = pCurTransmission->numOfGears;
+    }
+}
+
+void _declspec(naked) HOOK_Transmission_CalculateDriveAcceleration()
+{
+    _asm
+    {
+        push eax
+        mov pCurTransmission, ecx
+        mov eax, [esp+0xC]
+        mov pCurGear, eax
+        pop eax
+        pushad
+    }
+
+    CheckVehicleMaxGear();
+
+    _asm
+    {
+        popad
+        mov eax, [esp+0x10]
+        mov edx, [eax]
+        jmp RETURN_Transmission_CalculateDriveAcceleration
+    }
 }
 
 void _declspec(naked) HOOK_isVehDriveTypeNotRWD()
@@ -4771,7 +4810,7 @@ void _declspec(naked) HOOK_PreHUDRender()
 #if !ENABLE_VEHICLE_HEADLIGHT_COLOR
 
 // Dummy stub
-void vehicle_lights_init(void)
+void vehicle_lights_init()
 {
 }
 
@@ -4806,7 +4845,7 @@ void HOOK_CVehicle_DoHeadLightEffect_2();
 void HOOK_CVehicle_DoHeadLightReflectionTwin();
 void HOOK_CVehicle_DoHeadLightReflectionSingle();
 
-void vehicle_lights_init(void)
+void vehicle_lights_init()
 {
     HookInstall(HOOKPOS_CVehicle_DoVehicleLights, (DWORD)HOOK_CVehicle_DoVehicleLights, 8);
     HookInstall(HOOKPOS_CVehicle_DoHeadLightBeam_1, (DWORD)HOOK_CVehicle_DoHeadLightBeam_1, 6);
@@ -5153,12 +5192,12 @@ void CMultiplayerSA::SetAltWaterOrderEnabled(bool bEnable)
 //
 // Notify core when rendering grass so we can do optimal things
 //
-void CPlantMgr_Render_Pre(void)
+void CPlantMgr_Render_Pre()
 {
     g_pCore->NotifyRenderingGrass(true);
 }
 
-void CPlantMgr_Render_Post(void)
+void CPlantMgr_Render_Post()
 {
     g_pCore->NotifyRenderingGrass(false);
 }
@@ -5708,7 +5747,7 @@ void SetModelSuspensionLines(CVehicleSAInterface* pVehicleIntf, void* pSuspensio
 DWORD                dwSuspensionChangedJump = 0x4185C0;
 bool                 bSuspensionChanged = false;
 CVehicleSAInterface* pSuspensionInterface = NULL;
-bool                 CheckHasSuspensionChanged(void)
+bool                 CheckHasSuspensionChanged()
 {
     // Make sure we have a valid suspension interface
     if (pSuspensionInterface)

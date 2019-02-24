@@ -29,14 +29,14 @@ class CRenderWareSA : public CRenderWare
 public:
     ZERO_ON_NEW
     CRenderWareSA(enum eGameVersion version);
-    ~CRenderWareSA(void);
-    void Initialize(void);
+    ~CRenderWareSA();
+    void Initialize();
     bool ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const CBuffer& fileData, bool bFilteringEnabled);
     bool ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, ushort usModelId);
     void ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures);
     void ClothesAddReplacementTxd(char* pFileData, ushort usFileId);
     void ClothesRemoveReplacementTxd(char* pFileData);
-    bool HasClothesReplacementChanged(void);
+    bool HasClothesReplacementChanged();
 
     // Reads and parses a TXD file specified by a path (szTXD)
     RwTexDictionary* ReadTXD(const SString& strFilename, const CBuffer& fileData);
@@ -92,7 +92,7 @@ public:
     bool ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szName);
 
     ushort             GetTXDIDForModelID(ushort usModelID);
-    void               PulseWorldTextureWatch(void);
+    void               PulseWorldTextureWatch();
     void               GetModelTextureNames(std::vector<SString>& outNameList, ushort usModelID);
     void               GetTxdTextures(std::vector<RwTexture*>& outTextureList, ushort usTxdId);
     static void        GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTexDictionary* pTXD);
@@ -109,20 +109,20 @@ public:
 
     // CRenderWareSA methods
     RwTexture*          RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit, SString& strError);
-    void                ResetStats(void);
+    void                ResetStats();
     void                GetShaderReplacementStats(SShaderReplacementStats& outStats);
     CModelTexturesInfo* GetModelTexturesInfo(ushort usModelId);
 
     RwFrame* GetFrameFromName(RpClump* pRoot, SString strName);
 
-    static void  StaticSetHooks(void);
-    static void  StaticSetClothesReplacingHooks(void);
+    static void  StaticSetHooks();
+    static void  StaticSetClothesReplacingHooks();
     static void  RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTexture* pTex);
     static bool  RwTexDictionaryContainsTexture(RwTexDictionary* pTXD, RwTexture* pTex);
     static short CTxdStore_GetTxdRefcount(unsigned short usTxdID);
     static bool  StaticGetTextureCB(RwTexture* texture, std::vector<RwTexture*>* pTextureList);
 
-    void      InitTextureWatchHooks(void);
+    void      InitTextureWatchHooks();
     void      StreamingAddedTexture(ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData);
     void      StreamingRemovedTxd(ushort usTxdId);
     void      ScriptAddedTxd(RwTexDictionary* pTxd);
@@ -137,8 +137,8 @@ public:
 
     void OnTextureStreamIn(STexInfo* pTexInfo);
     void OnTextureStreamOut(STexInfo* pTexInfo);
-    void DisableGTAVertexShadersForAWhile(void);
-    void UpdateDisableGTAVertexShadersTimer(void);
+    void DisableGTAVertexShadersForAWhile();
+    void UpdateDisableGTAVertexShadersTimer();
     void SetGTAVertexShadersEnabled(bool bEnable);
 
     // Watched world textures

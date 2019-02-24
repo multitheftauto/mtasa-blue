@@ -16,7 +16,7 @@ CConsoleHistory::CConsoleHistory(unsigned int uiHistoryLength)
     m_uiHistoryLength = uiHistoryLength;
 }
 
-void CConsoleHistory::LoadFromFile(void)
+void CConsoleHistory::LoadFromFile()
 {
     m_strFilename = CalcMTASAPath(MTA_CONSOLE_INPUT_LOG_PATH);
 

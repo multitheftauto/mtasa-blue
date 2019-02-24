@@ -29,7 +29,7 @@ using namespace std;
 // Prevent the warning issued when doing unsigned short -> void*
 #pragma warning(disable:4312)
 
-CLuaArgument::CLuaArgument(void)
+CLuaArgument::CLuaArgument()
 {
     m_iType = LUA_TNIL;
     m_iIndex = -1;
@@ -58,7 +58,7 @@ CLuaArgument::CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const v
     Read(luaVM, iArgument, pKnownTables);
 }
 
-CLuaArgument::~CLuaArgument(void)
+CLuaArgument::~CLuaArgument()
 {
     // Eventually destroy our table
     DeleteTableData();
@@ -365,7 +365,7 @@ void CLuaArgument::ReadTable(CLuaArguments* table)
     m_iType = LUA_TTABLE;
 }
 
-CClientEntity* CLuaArgument::GetElement(void) const
+CClientEntity* CLuaArgument::GetElement() const
 {
     ElementID ID = TO_ELEMENTID(m_pUserData);
     return CElementIDs::GetElement(ID);

@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CLuaMarkerDefs::LoadFunctions(void)
+void CLuaMarkerDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         {"createMarker", CreateMarker},

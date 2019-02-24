@@ -14,17 +14,17 @@
 class CBlendedWeather
 {
 public:
-    CBlendedWeather(void);
+    CBlendedWeather();
 
-    void DoPulse(void);
+    void DoPulse();
 
     void SetWeather(unsigned char ucWeather);
     void SetWeatherBlended(unsigned char ucWeather, unsigned char ucHour);
 
-    unsigned char GetWeather(void);
-    unsigned char GetWeatherBlendingTo(void) { return m_ucSecondaryBlendedWeather; };
-    unsigned char GetBlendedStartHour(void) { return m_ucBlendStartHour; };
-    unsigned char GetBlendedStopHour(void) { return m_ucBlendStopHour; };
+    unsigned char GetWeather();
+    unsigned char GetWeatherBlendingTo() { return m_ucSecondaryBlendedWeather; };
+    unsigned char GetBlendedStartHour() { return m_ucBlendStartHour; };
+    unsigned char GetBlendedStopHour() { return m_ucBlendStopHour; };
 
 private:
     unsigned char m_ucPrimaryWeather;

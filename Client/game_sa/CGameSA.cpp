@@ -203,7 +203,7 @@ CGameSA::CGameSA()
     CFxSystemSA::StaticSetHooks();
 }
 
-CGameSA::~CGameSA(void)
+CGameSA::~CGameSA()
 {
     delete reinterpret_cast<CPlayerInfoSA*>(m_pPlayerInfo);
 
@@ -372,7 +372,7 @@ BOOL CGameSA::InitLocalPlayer(CClientPed* pClientPed)
     return FALSE;
 }
 
-float CGameSA::GetGravity(void)
+float CGameSA::GetGravity()
 {
     return *(float*)(0x863984);
 }
@@ -382,7 +382,7 @@ void CGameSA::SetGravity(float fGravity)
     MemPut<float>(0x863984, fGravity);
 }
 
-float CGameSA::GetGameSpeed(void)
+float CGameSA::GetGameSpeed()
 {
     return *(float*)(0xB7CB64);
 }
@@ -442,7 +442,7 @@ DWORD* CGameSA::GetMemoryValue(DWORD dwOffset)
         return NULL;
 }
 
-void CGameSA::Reset(void)
+void CGameSA::Reset()
 {
     // Things to do if the game was loaded
     if (GetSystemState() == GS_PLAYING_GAME)
@@ -469,7 +469,7 @@ void CGameSA::Reset(void)
     }
 }
 
-void CGameSA::Terminate(void)
+void CGameSA::Terminate()
 {
     // Initiate the destruction
     delete this;
@@ -480,7 +480,7 @@ void CGameSA::Terminate(void)
     #endif
 }
 
-void CGameSA::Initialize(void)
+void CGameSA::Initialize()
 {
     // Initialize garages
     m_pGarages->Initialize();
@@ -491,12 +491,12 @@ void CGameSA::Initialize(void)
     MemPutFast<BYTE>(CLASS_CMenuManager + 0x5C, 0);
 }
 
-eGameVersion CGameSA::GetGameVersion(void)
+eGameVersion CGameSA::GetGameVersion()
 {
     return m_eGameVersion;
 }
 
-eGameVersion CGameSA::FindGameVersion(void)
+eGameVersion CGameSA::FindGameVersion()
 {
     unsigned char ucA = *reinterpret_cast<unsigned char*>(0x748ADD);
     unsigned char ucB = *reinterpret_cast<unsigned char*>(0x748ADE);
@@ -520,22 +520,22 @@ eGameVersion CGameSA::FindGameVersion(void)
     return m_eGameVersion;
 }
 
-float CGameSA::GetFPS(void)
+float CGameSA::GetFPS()
 {
     return *VAR_FPS;
 }
 
-float CGameSA::GetTimeStep(void)
+float CGameSA::GetTimeStep()
 {
     return *VAR_TimeStep;
 }
 
-float CGameSA::GetOldTimeStep(void)
+float CGameSA::GetOldTimeStep()
 {
     return *VAR_OldTimeStep;
 }
 
-float CGameSA::GetTimeScale(void)
+float CGameSA::GetTimeScale()
 {
     return *VAR_TimeScale;
 }
@@ -545,7 +545,7 @@ void CGameSA::SetTimeScale(float fTimeScale)
     *VAR_TimeScale = fTimeScale;
 }
 
-unsigned char CGameSA::GetBlurLevel(void)
+unsigned char CGameSA::GetBlurLevel()
 {
     return *(unsigned char*)0x8D5104;
 }
@@ -555,7 +555,7 @@ void CGameSA::SetBlurLevel(unsigned char ucLevel)
     MemPutFast<unsigned char>(0x8D5104, ucLevel);
 }
 
-unsigned long CGameSA::GetMinuteDuration(void)
+unsigned long CGameSA::GetMinuteDuration()
 {
     return *(unsigned long*)0xB7015C;
 }
@@ -741,7 +741,7 @@ void CGameSA::SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled)
     }
 }
 
-bool CGameSA::PerformChecks(void)
+bool CGameSA::PerformChecks()
 {
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
@@ -796,7 +796,7 @@ bool CGameSA::IsASyncLoadingEnabled(bool bIgnoreSuspend)
     return true;
 }
 
-void CGameSA::SetupSpecialCharacters(void)
+void CGameSA::SetupSpecialCharacters()
 {
     ModelInfo[1].MakePedModel("TRUTH");
     ModelInfo[2].MakePedModel("MACCER");
@@ -847,7 +847,7 @@ void CGameSA::SetupSpecialCharacters(void)
 }
 
 // Well, has it?
-bool CGameSA::HasCreditScreenFadedOut(void)
+bool CGameSA::HasCreditScreenFadedOut()
 {
     BYTE ucAlpha = *(BYTE*)0xBAB320;
     bool bCreditScreenFadedOut = (GetSystemState() >= 7) && (ucAlpha < 6);
@@ -855,7 +855,7 @@ bool CGameSA::HasCreditScreenFadedOut(void)
 }
 
 // Ensure replaced/restored textures for models in the GTA map are correct
-void CGameSA::FlushPendingRestreamIPL(void)
+void CGameSA::FlushPendingRestreamIPL()
 {
     CModelInfoSA::StaticFlushPendingRestreamIPL();
     m_pRenderWare->ResetStats();
@@ -867,12 +867,12 @@ void CGameSA::GetShaderReplacementStats(SShaderReplacementStats& outStats)
 }
 
 // Ensure models have the default lod distances
-void CGameSA::ResetModelLodDistances(void)
+void CGameSA::ResetModelLodDistances()
 {
     CModelInfoSA::StaticResetLodDistances();
 }
 
-void CGameSA::ResetAlphaTransparencies(void)
+void CGameSA::ResetAlphaTransparencies()
 {
     CModelInfoSA::StaticResetAlphaTransparencies();
 }
@@ -880,11 +880,11 @@ void CGameSA::ResetAlphaTransparencies(void)
 // Disable VSync by forcing what normally happends at the end of the loading screens
 // Note #1: This causes the D3D device to be reset after the next frame
 // Note #2: Some players do not need this to disable VSync. (Possibly because their video card driver settings override it somewhere)
-void CGameSA::DisableVSync(void)
+void CGameSA::DisableVSync()
 {
     MemPutFast<BYTE>(0xBAB318, 0);
 }
-CWeapon* CGameSA::CreateWeapon(void)
+CWeapon* CGameSA::CreateWeapon()
 {
     return new CWeaponSA(new CWeaponSAInterface, NULL, WEAPONSLOT_MAX);
 }
@@ -899,7 +899,7 @@ void CGameSA::OnPedContextChange(CPed* pPedContext)
     m_pPedContext = pPedContext;
 }
 
-CPed* CGameSA::GetPedContext(void)
+CPed* CGameSA::GetPedContext()
 {
     if (!m_pPedContext)
         m_pPedContext = pGame->GetPools()->GetPedFromRef((DWORD)1);

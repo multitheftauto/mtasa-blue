@@ -33,8 +33,8 @@ enum eClimbHeights
 class CTasks
 {
 public:
-    virtual CTaskSimplePlayerOnFoot* CreateTaskSimplePlayerOnFoot(void) = 0;
-    virtual CTaskComplexFacial*      CreateTaskComplexFacial(void) = 0;
+    virtual CTaskSimplePlayerOnFoot* CreateTaskSimplePlayerOnFoot() = 0;
+    virtual CTaskComplexFacial*      CreateTaskComplexFacial() = 0;
 
     virtual CTaskSimpleCarSetPedInAsDriver*    CreateTaskSimpleCarSetPedInAsDriver(CVehicle* pVehicle) = 0;
     virtual CTaskSimpleCarSetPedInAsPassenger* CreateTaskSimpleCarSetPedInAsPassenger(CVehicle* pVehicle, int iTargetDoor) = 0;

@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CMarkerSA::Init(void)
+void CMarkerSA::Init()
 {
     internalInterface->position = CVector(0, 0, 0);
     internalInterface->BlipType = (BYTE)MARKER_TYPE_COORDS;

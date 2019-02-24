@@ -1702,17 +1702,25 @@ FunctionEnd
 ;****************************************************************
 ; In $0 = install path
 Function RemoveVirtualStore
-    StrCpy $2 $0 "" 3     # Skip first 3 chars
+    StrCpy $2 $0 "" 3     # Remove drive path (first 3 chars)
     StrCpy $3 "$LOCALAPPDATA\VirtualStore\$2"
     StrCpy $4 "$0\FromVirtualStore"
-    IfFileExists $3 0 NoVirtualStore
+    ${If} ${FileExists} $3
         ${LogText} "Moving VirtualStore files from $3 to $4"
         CopyFiles $3\*.* $4
         RmDir /r "$3"
-        Goto done
-    NoVirtualStore:
-        ${LogText} "NoVirtualStore detected at $3"
-    done:
+    ${Else}
+        ${LogText} "No VirtualStore detected at $3"
+    ${EndIf}
+
+    ; Also remove VirtualStore\ProgramData\MTA San Andreas All
+    StrCpy $3 "$LOCALAPPDATA\VirtualStore\ProgramData\MTA San Andreas All"
+    ${If} ${FileExists} $3
+        ${LogText} "Removing $3"
+        RmDir /r "$3"
+    ${Else}
+        ${LogText} "No VirtualStore detected at $3"
+    ${EndIf}
 FunctionEnd
 
 

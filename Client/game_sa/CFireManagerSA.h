@@ -36,7 +36,7 @@ private:
 public:
     // constructor
     CFireManagerSA();
-    ~CFireManagerSA(void);
+    ~CFireManagerSA();
 
     VOID   ExtinguishPoint(CVector& vecPosition, float fRadius);
     CFire* StartFire(CEntity* entityTarget, CEntity* entityCreator, float fSize);

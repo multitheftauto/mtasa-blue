@@ -137,7 +137,7 @@ void _declspec(naked) HOOK_CTxdStore_RemoveTxd()
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::InitTextureWatchHooks(void)
+void CRenderWareSA::InitTextureWatchHooks()
 {
     HookInstall(HOOKPOS_CTxdStore_SetupTxdParent, (DWORD)HOOK_CTxdStore_SetupTxdParent, 6);
     HookInstall(HOOKPOS_CTxdStore_RemoveTxd, (DWORD)HOOK_CTxdStore_RemoveTxd, 6);
@@ -158,7 +158,7 @@ void CRenderWareSA::InitTextureWatchHooks(void)
 // Process ms_txdStreamEventList
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::PulseWorldTextureWatch(void)
+void CRenderWareSA::PulseWorldTextureWatch()
 {
     UpdateModuleTickCount64();
     UpdateDisableGTAVertexShadersTimer();
@@ -552,7 +552,7 @@ void CRenderWareSA::RemoveShaderRefs(CSHADERDUMMY* pShaderItem)
 // Save/reset counters
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::ResetStats(void)
+void CRenderWareSA::ResetStats()
 {
     m_uiNumReplacementRequests = m_uiReplacementRequestCounter;
     m_uiNumReplacementMatches = m_uiReplacementMatchCounter;
@@ -580,7 +580,7 @@ void CRenderWareSA::GetShaderReplacementStats(SShaderReplacementStats& outStats)
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::Initialize(void)
+void CRenderWareSA::Initialize()
 {
     if (!MapContains(m_D3DDataTexInfoMap, FAKE_D3DTEXTURE_NO_TEXTURE))
     {
@@ -597,7 +597,7 @@ void CRenderWareSA::Initialize(void)
 // Disable GTA vertex shaders for the next 10 seconds
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::DisableGTAVertexShadersForAWhile(void)
+void CRenderWareSA::DisableGTAVertexShadersForAWhile()
 {
     m_GTAVertexShadersDisabledTimer.Reset();
     SetGTAVertexShadersEnabled(false);
@@ -610,7 +610,7 @@ void CRenderWareSA::DisableGTAVertexShadersForAWhile(void)
 // Update countdown before automatically re enabling GTA vertex shaders
 //
 ////////////////////////////////////////////////////////////////
-void CRenderWareSA::UpdateDisableGTAVertexShadersTimer(void)
+void CRenderWareSA::UpdateDisableGTAVertexShadersTimer()
 {
 #if MTA_DEBUG
     if (m_GTAVertexShadersDisabledTimer.Get() > 1 * 1000)
@@ -967,7 +967,7 @@ inner:
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CRenderWareSA::StaticSetHooks(void)
+void CRenderWareSA::StaticSetHooks()
 {
     EZHookInstall(RwTextureSetName);
     EZHookInstall(RwTextureDestroy_Mid);

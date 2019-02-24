@@ -17,12 +17,12 @@ class CMasterServerManager : public CMasterServerManagerInterface
 {
 public:
     ZERO_ON_NEW
-    CMasterServerManager(void);
-    ~CMasterServerManager(void);
+    CMasterServerManager();
+    ~CMasterServerManager();
 
     // CMasterServerManagerInterface
-    virtual void Refresh(void);
-    virtual bool HasData(void);
+    virtual void Refresh();
+    virtual bool HasData();
     virtual bool ParseList(CServerListItemList& itemList);
 
     // CMasterServerManager
@@ -39,7 +39,7 @@ protected:
 //
 //
 ///////////////////////////////////////////////////////////////
-CMasterServerManagerInterface* NewMasterServerManager(void)
+CMasterServerManagerInterface* NewMasterServerManager()
 {
     return new CMasterServerManager();
 }
@@ -51,7 +51,7 @@ CMasterServerManagerInterface* NewMasterServerManager(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CMasterServerManager::CMasterServerManager(void)
+CMasterServerManager::CMasterServerManager()
 {
     m_ElapsedTime.SetMaxIncrement(500);
 }
@@ -63,7 +63,7 @@ CMasterServerManager::CMasterServerManager(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-CMasterServerManager::~CMasterServerManager(void)
+CMasterServerManager::~CMasterServerManager()
 {
     for (uint i = 0; i < m_MasterServerList.size(); i++)
         SAFE_RELEASE(m_MasterServerList[i]);
@@ -78,7 +78,7 @@ CMasterServerManager::~CMasterServerManager(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-void CMasterServerManager::Refresh(void)
+void CMasterServerManager::Refresh()
 {
     // Create master server list if required
     if (m_MasterServerList.empty())
@@ -105,7 +105,7 @@ void CMasterServerManager::Refresh(void)
 //
 //
 ///////////////////////////////////////////////////////////////
-bool CMasterServerManager::HasData(void)
+bool CMasterServerManager::HasData()
 {
     // Count how many server have responded
     uint uiHasDataCount = 0;

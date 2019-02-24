@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CVehicleInOutPacket::CVehicleInOutPacket(void)
+CVehicleInOutPacket::CVehicleInOutPacket()
 {
     m_ID = INVALID_ELEMENT_ID;
     m_ucSeat = 0;
@@ -58,7 +58,7 @@ CVehicleInOutPacket::CVehicleInOutPacket(ElementID ID, unsigned char ucSeat, uns
     m_ucDoor = 0;
 }
 
-CVehicleInOutPacket::~CVehicleInOutPacket(void)
+CVehicleInOutPacket::~CVehicleInOutPacket()
 {
     if (m_pCorrectVector)
     {
