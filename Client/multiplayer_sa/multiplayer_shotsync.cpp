@@ -81,8 +81,8 @@ CPools* m_pools = 0;
 
 #define VAR_CWorld_IncludeCarTyres 0xb7cd70 // Used for CWorld_ProcessLineOfSight
 
-void InitFireInstantHit_MidHooks(void);
-void InitFireSniper_MidHooks(void);
+void InitFireInstantHit_MidHooks();
+void InitFireSniper_MidHooks();
 
 VOID InitShotsyncHooks()
 {
@@ -225,7 +225,7 @@ bool WriteTargetDataForPed(CPedSAInterface* pPed, DWORD vecTargetPos, CVector* o
     return true;
 }
 
-void Event_PostFire(void)
+void Event_PostFire()
 {
     SClientEntity<CPedSA>* pPedClientEntity = m_pools->GetPed((DWORD*)pShootingPed);
     CPed*                  pTargetingPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
@@ -237,7 +237,7 @@ void Event_PostFire(void)
     bWeaponFire = false;
 }
 
-static void Event_BulletImpact(void)
+static void Event_BulletImpact()
 {
     if (m_pBulletImpactHandler)
     {
@@ -1279,7 +1279,7 @@ VOID InitFireSniper_MidHooks()
 // Called when a remote player fires a bullet
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void HandleRemoteInstantHit(void)
+void HandleRemoteInstantHit()
 {
     SClientEntity<CPedSA>* pPedClientEntity = m_pools->GetPed((DWORD*)pShootingPed);
     CPed*                  pTargetingPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
@@ -1305,7 +1305,7 @@ void HandleRemoteInstantHit(void)
     }
 }
 
-void _cdecl DoFireInstantHitPokes(void)
+void _cdecl DoFireInstantHitPokes()
 {
     MemPutFast<unsigned char>(VAR_CWorld_IncludeCarTyres, 1);
 }

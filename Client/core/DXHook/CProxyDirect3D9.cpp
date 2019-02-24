@@ -36,12 +36,12 @@ HRESULT CProxyDirect3D9::QueryInterface(REFIID riid, void** ppvObj)
     return m_pDevice->QueryInterface(riid, ppvObj);
 }
 
-ULONG CProxyDirect3D9::AddRef(VOID)
+ULONG CProxyDirect3D9::AddRef()
 {
     return m_pDevice->AddRef();
 }
 
-ULONG CProxyDirect3D9::Release(VOID)
+ULONG CProxyDirect3D9::Release()
 {
     // Call original function
     ULONG ulRefCount = m_pDevice->Release();
@@ -56,7 +56,7 @@ HRESULT CProxyDirect3D9::RegisterSoftwareDevice(void* pInitializeFunction)
     return m_pDevice->RegisterSoftwareDevice(pInitializeFunction);
 }
 
-UINT CProxyDirect3D9::GetAdapterCount(VOID)
+UINT CProxyDirect3D9::GetAdapterCount()
 {
     return m_pDevice->GetAdapterCount();
 }
@@ -126,7 +126,7 @@ HMONITOR CProxyDirect3D9::StaticGetAdapterMonitor(UINT Adapter)
     return ms_CreatedDirect3D9List[0]->GetAdapterMonitor(Adapter);
 }
 
-IDirect3D9* CProxyDirect3D9::StaticGetDirect3D(void)
+IDirect3D9* CProxyDirect3D9::StaticGetDirect3D()
 {
     if (ms_CreatedDirect3D9List.empty())
         return NULL;

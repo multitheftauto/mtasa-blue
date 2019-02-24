@@ -15,7 +15,7 @@ CAntiCheatModule::CAntiCheatModule(CAntiCheat& AntiCheat) : m_AntiCheat(AntiChea
     AntiCheat.AddModule(*this);
 }
 
-CAntiCheatModule::~CAntiCheatModule(void)
+CAntiCheatModule::~CAntiCheatModule()
 {
     m_AntiCheat.RemoveModule(*this);
 }

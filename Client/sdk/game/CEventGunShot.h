@@ -16,7 +16,7 @@ class CEventGunShotSAInterface;
 class CEventGunShot
 {
 public:
-    virtual CEventGunShotSAInterface* GetInterface(void) = 0;
+    virtual CEventGunShotSAInterface* GetInterface() = 0;
 
     virtual void Destroy(bool bDestroyInterface) = 0;
 };

@@ -19,13 +19,13 @@ class CMapEvent
     friend class CMapEventManager;
 
 public:
-    class CLuaMain* GetVM(void) { return m_pMain; };
-    const SString&  GetName(void) { return m_strName; };
-    CLuaFunctionRef GetLuaFunction(void) { return m_iLuaFunction; };
-    bool            IsBeingDestroyed(void) { return m_bBeingDestroyed; }
-    bool            IsPropagated(void) { return m_bPropagated; }
-    bool            ShouldAllowAspectRatioAdjustment(void) { return m_bAllowAspectRatioAdjustment; }
-    bool            ShouldForceAspectRatioAdjustment(void) { return m_bForceAspectRatioAdjustment; }
+    class CLuaMain* GetVM() { return m_pMain; };
+    const SString&  GetName() { return m_strName; };
+    CLuaFunctionRef GetLuaFunction() { return m_iLuaFunction; };
+    bool            IsBeingDestroyed() { return m_bBeingDestroyed; }
+    bool            IsPropagated() { return m_bPropagated; }
+    bool            ShouldAllowAspectRatioAdjustment() { return m_bAllowAspectRatioAdjustment; }
+    bool            ShouldForceAspectRatioAdjustment() { return m_bForceAspectRatioAdjustment; }
 
     void Call(const class CLuaArguments& Arguments);
     bool IsHigherPriorityThan(const CMapEvent* pOther);
@@ -33,7 +33,7 @@ public:
 private:
     CMapEvent(class CLuaMain* pMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority,
               float fPriorityMod);
-    ~CMapEvent(void);
+    ~CMapEvent();
 
     void SetBeingDestroyed(bool bBeingDestroyed) { m_bBeingDestroyed = bBeingDestroyed; }
 

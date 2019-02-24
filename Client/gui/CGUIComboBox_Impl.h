@@ -18,31 +18,31 @@ class CGUIComboBox_Impl : public CGUIComboBox, public CGUIElement_Impl
 {
 public:
     CGUIComboBox_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, const char* szCaption = "");
-    ~CGUIComboBox_Impl(void);
+    ~CGUIComboBox_Impl();
 
-    eCGUIType GetType(void) { return CGUI_COMBOBOX; };
+    eCGUIType GetType() { return CGUI_COMBOBOX; };
 
     CGUIListItem* AddItem(const char* szText);
     CGUIListItem* AddItem(CGUIStaticImage* pImage);
     bool          RemoveItem(int index);
     CGUIListItem* GetItemByIndex(int index);
-    CGUIListItem* GetSelectedItem(void);
-    int           GetSelectedItemIndex(void);
-    size_t        GetItemCount(void);
+    CGUIListItem* GetSelectedItem();
+    int           GetSelectedItemIndex();
+    size_t        GetItemCount();
     int           GetItemIndex(CGUIListItem* pItem);
     const char*   GetItemText(int index);
     bool          SetItemText(int index, const char* szText);
     bool          SetSelectedItemByIndex(int index);
-    void          Clear(void);
-    bool          IsOpen(void);
+    void          Clear();
+    bool          IsOpen();
 
     void SetReadOnly(bool bReadonly);
 
     void SetSelectionHandler(GUI_CALLBACK Callback);
     void SetDropListRemoveHandler(GUI_CALLBACK Callback);
 
-    void ShowDropList(void);
-    void HideDropList(void);
+    void ShowDropList();
+    void HideDropList();
 
     #include "CGUIElement_Inc.h"
 

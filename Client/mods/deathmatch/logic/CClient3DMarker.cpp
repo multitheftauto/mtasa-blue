@@ -25,11 +25,11 @@ CClient3DMarker::CClient3DMarker(CClientMarker* pThis)
     m_ulIdentifier = (DWORD)this;
 }
 
-CClient3DMarker::~CClient3DMarker(void)
+CClient3DMarker::~CClient3DMarker()
 {
 }
 
-unsigned long CClient3DMarker::Get3DMarkerType(void)
+unsigned long CClient3DMarker::Get3DMarkerType()
 {
     switch (m_dwType)
     {
@@ -67,20 +67,20 @@ bool CClient3DMarker::IsHit(const CVector& vecPosition) const
     return IsPointNearPoint3D(m_Matrix.vPos, vecPosition, m_fSize + 4);
 }
 
-void CClient3DMarker::StreamIn(void)
+void CClient3DMarker::StreamIn()
 {
     // We're now streamed in
     m_bMarkerStreamedIn = true;
 }
 
-void CClient3DMarker::StreamOut(void)
+void CClient3DMarker::StreamOut()
 {
     // We're no longer streamed in
     m_bMarkerStreamedIn = false;
     m_pMarker = NULL;
 }
 
-void CClient3DMarker::DoPulse(void)
+void CClient3DMarker::DoPulse()
 {
     if (m_bMarkerStreamedIn && m_bVisible && m_pThis->GetInterior() == g_pGame->GetWorld()->GetCurrentArea())
     {

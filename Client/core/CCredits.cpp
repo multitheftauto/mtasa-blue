@@ -20,7 +20,7 @@ namespace CCreditsGUI
 }            // namespace CCreditsGUI
 using namespace CCreditsGUI;
 
-CCredits::CCredits(void)
+CCredits::CCredits()
 {
     CGUI* pManager = g_pCore->GetGUI();
 
@@ -276,7 +276,7 @@ CCredits::CCredits(void)
     m_pWindow->SetEnterKeyHandler(GUI_CALLBACK(&CCredits::OnOKButtonClick, this));
 }
 
-CCredits::~CCredits(void)
+CCredits::~CCredits()
 {
     // Delete all the labels
     int i = 0;
@@ -296,7 +296,7 @@ CCredits::~CCredits(void)
     delete m_pWindow;
 }
 
-void CCredits::Update(void)
+void CCredits::Update()
 {
     if (m_pWindow->IsVisible())
     {
@@ -338,7 +338,7 @@ void CCredits::SetVisible(bool bVisible)
     m_clkStart = clock();
 }
 
-bool CCredits::IsVisible(void)
+bool CCredits::IsVisible()
 {
     return m_pWindow->IsVisible();
 }

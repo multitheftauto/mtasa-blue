@@ -217,7 +217,7 @@ void ShowSplash(HINSTANCE hInstance)
 //
 // Hide splash dialog
 //
-void HideSplash(void)
+void HideSplash()
 {
     if (hwndSplash)
     {
@@ -229,7 +229,7 @@ void HideSplash(void)
 //
 // Hide splash dialog temporarily
 //
-void SuspendSplash(void)
+void SuspendSplash()
 {
     if (hwndSplash)
     {
@@ -240,7 +240,7 @@ void SuspendSplash(void)
 //
 // Show splash dialog if was previously suspended
 //
-void ResumeSplash(void)
+void ResumeSplash()
 {
     if (hwndSplash)
     {
@@ -273,7 +273,7 @@ void ShowProgressDialog(HINSTANCE hInstance, const SString& strTitle, bool bAllo
     SetWindowPos(hwndProgressDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 }
 
-void HideProgressDialog(void)
+void HideProgressDialog()
 {
     if (hwndProgressDialog)
     {
@@ -331,7 +331,7 @@ void StartPseudoProgress(HINSTANCE hInstance, const SString& strTitle, const SSt
     UpdateProgress(30, 100);
 }
 
-void StopPseudoProgress(void)
+void StopPseudoProgress()
 {
     if (hwndProgressDialog)
     {
@@ -395,7 +395,7 @@ SString ShowCrashedDialog(HINSTANCE hInstance, const SString& strMessage)
     return "ok";
 }
 
-void HideCrashedDialog(void)
+void HideCrashedDialog()
 {
     if (hwndCrashedDialog)
     {
@@ -486,7 +486,7 @@ void ShowD3dDllDialog(HINSTANCE hInstance, const SString& strPath)
     ResumeSplash();
 }
 
-void HideD3dDllDialog(void)
+void HideD3dDllDialog()
 {
     if (hwndD3dDllDialog)
     {
@@ -575,7 +575,7 @@ void ShowOptimusDialog(HINSTANCE hInstance)
     ResumeSplash();
 }
 
-void HideOptimusDialog(void)
+void HideOptimusDialog()
 {
     if (hwndOptimusDialog)
     {
@@ -667,7 +667,7 @@ void ShowNoAvDialog(HINSTANCE hInstance, bool bEnableScaremongering)
     ResumeSplash();
 }
 
-void HideNoAvDialog(void)
+void HideNoAvDialog()
 {
     if (hwndNoAvDialog)
     {
@@ -684,7 +684,7 @@ void HideNoAvDialog(void)
 // For checking string are correct
 //
 ///////////////////////////////////////////////////////////////
-void TestDialogs(void)
+void TestDialogs()
 {
 #if 0
 #if 1

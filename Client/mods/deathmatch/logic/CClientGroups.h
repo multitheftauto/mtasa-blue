@@ -19,10 +19,10 @@ class CClientGroups
     friend class CClientDummy;
 
 public:
-    CClientGroups(void) { m_bDontRemoveFromList = false; };
-    ~CClientGroups(void) { DeleteAll(); };
+    CClientGroups() { m_bDontRemoveFromList = false; };
+    ~CClientGroups() { DeleteAll(); };
 
-    void DeleteAll(void);
+    void DeleteAll();
 
 private:
     void AddToList(CClientDummy* pDummy) { m_List.push_back(pDummy); };

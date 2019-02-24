@@ -18,8 +18,8 @@ public:
     void UpdateSimPlayer(CPlayer* pPlayer);
 
     // Any thread methods
-    void LockSimSystem(void);
-    void UnlockSimSystem(void);
+    void LockSimSystem();
+    void UnlockSimSystem();
 
     // Sync thread methods
     bool        HandlePlayerPureSync(const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream);

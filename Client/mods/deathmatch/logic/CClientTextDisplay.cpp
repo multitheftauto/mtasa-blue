@@ -22,7 +22,7 @@ CClientTextDisplay::CClientTextDisplay(CClientDisplayManager* pDisplayManager, i
     m_bVisible = true;
 }
 
-CClientTextDisplay::~CClientTextDisplay(void)
+CClientTextDisplay::~CClientTextDisplay()
 {
 }
 
@@ -39,7 +39,7 @@ void CClientTextDisplay::SetPosition(const CVector& vecPosition)
     m_vecPosition = vecPosition;
 }
 
-void CClientTextDisplay::Render(void)
+void CClientTextDisplay::Render()
 {
     // If we're visible
     if (m_bVisible && !m_strCaption.empty())

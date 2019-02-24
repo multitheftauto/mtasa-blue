@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-void CLuaAudioDefs::LoadFunctions(void)
+void CLuaAudioDefs::LoadFunctions()
 {
     std::map<const char*, lua_CFunction> functions{
         // Audio funcs

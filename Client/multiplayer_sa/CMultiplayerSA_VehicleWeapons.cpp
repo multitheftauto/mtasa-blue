@@ -81,7 +81,7 @@ static void _declspec(naked) HOOK_CWaterCannon__Render()
 // Setup hooks for vehicle weapon related events
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void CMultiplayerSA::InitHooks_VehicleWeapons(void)
+void CMultiplayerSA::InitHooks_VehicleWeapons()
 {
     EZHookInstall(CWaterCannon__Render);
 }

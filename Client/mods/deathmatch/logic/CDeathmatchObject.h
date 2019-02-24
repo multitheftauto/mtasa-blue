@@ -23,7 +23,7 @@ public:
 #else
     CDeathmatchObject(CClientManager* pManager, class CMovingObjectsManager* pMovingObjectsManager, ElementID ID, unsigned short usModel, bool bLowLod);
 #endif
-    ~CDeathmatchObject(void);
+    ~CDeathmatchObject();
 
     // CClientEntity interface
     void SetPosition(const CVector& vecPosition);
@@ -33,10 +33,10 @@ public:
     void SetOrientation(const CVector& vecPosition, const CVector& vecRotationRadians);
 
     void StartMovement(const CPositionRotationAnimation& a_rMoveAnimation);
-    void UpdateMovement(void);
-    void StopMovement(void);
+    void UpdateMovement();
+    void StopMovement();
 
-    bool IsMoving(void) { return m_pMoveAnimation != NULL; };
+    bool IsMoving() { return m_pMoveAnimation != NULL; };
 
     void UpdateContactingBegin(const CVector& vecPreviousPosition, const CVector& vecPreviousRotation);
     void UpdateContacting(const CVector& vecCenterOfRotation, const CVector& vecFrameTranslation, const CVector& vecFrameRotation);

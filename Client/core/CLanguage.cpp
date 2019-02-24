@@ -26,7 +26,7 @@ CLanguage::CLanguage(const SString& strPOPath)
     in.close();
 }
 
-CLanguage::~CLanguage(void)
+CLanguage::~CLanguage()
 {
 }
 

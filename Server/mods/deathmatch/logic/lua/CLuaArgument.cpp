@@ -19,7 +19,7 @@ extern CGame* g_pGame;
 
 using namespace std;
 
-CLuaArgument::CLuaArgument(void)
+CLuaArgument::CLuaArgument()
 {
     m_iType = LUA_TNIL;
     m_pTableData = NULL;
@@ -40,7 +40,7 @@ CLuaArgument::CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const v
     Read(luaVM, iArgument, pKnownTables);
 }
 
-CLuaArgument::~CLuaArgument(void)
+CLuaArgument::~CLuaArgument()
 {
     // Eventually destroy our table
     DeleteTableData();
@@ -409,7 +409,7 @@ void CLuaArgument::ReadScriptID(uint uiScriptID)
     m_pUserData = reinterpret_cast<void*>(uiScriptID);
 }
 
-CElement* CLuaArgument::GetElement(void) const
+CElement* CLuaArgument::GetElement() const
 {
     ElementID ID = TO_ELEMENTID(m_pUserData);
     return CElementIDs::GetElement(ID);

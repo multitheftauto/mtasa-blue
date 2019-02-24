@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CEntity* CCamSA::GetTargetEntity(void) const
+CEntity* CCamSA::GetTargetEntity() const
 {
     CEntitySAInterface* pInterface = m_pInterface->CamTargetEntity;
     if (pInterface)

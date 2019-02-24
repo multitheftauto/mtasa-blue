@@ -29,7 +29,7 @@ CClientStreamElement::CClientStreamElement(CClientStreamer* pStreamer, ElementID
     m_iCachedBoundingBoxCounter = 0;
 }
 
-CClientStreamElement::~CClientStreamElement(void)
+CClientStreamElement::~CClientStreamElement()
 {
     m_pStreamer->RemoveElement(this);
 }
@@ -61,7 +61,7 @@ void CClientStreamElement::InternalStreamIn(bool bInstantly)
     }
 }
 
-void CClientStreamElement::InternalStreamOut(void)
+void CClientStreamElement::InternalStreamOut()
 {
     if (m_bStreamedIn)
     {
@@ -88,7 +88,7 @@ void CClientStreamElement::InternalStreamOut(void)
     }
 }
 
-void CClientStreamElement::NotifyCreate(void)
+void CClientStreamElement::NotifyCreate()
 {
     // Update common atrributes
     if (!m_bDoubleSidedInit)
@@ -102,7 +102,7 @@ void CClientStreamElement::NotifyCreate(void)
     CallEvent("onClientElementStreamIn", Arguments, true);
 }
 
-void CClientStreamElement::NotifyUnableToCreate(void)
+void CClientStreamElement::NotifyUnableToCreate()
 {
     m_bAttemptingToStreamIn = false;
 }
@@ -142,7 +142,7 @@ unsigned short CClientStreamElement::GetStreamReferences(bool bScript)
 }
 
 // Force the element to stream out now. It will stream back in next frame if close enough.
-void CClientStreamElement::StreamOutForABit(void)
+void CClientStreamElement::StreamOutForABit()
 {
     // Remove asap, very messy
     InternalStreamOut();
@@ -160,7 +160,7 @@ void CClientStreamElement::SetDimension(unsigned short usDimension)
     }
 }
 
-CSphere CClientStreamElement::GetWorldBoundingSphere(void)
+CSphere CClientStreamElement::GetWorldBoundingSphere()
 {
     // Default to a point at stream position
     return CSphere(GetStreamPosition(), 0.0f);

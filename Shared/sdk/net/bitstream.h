@@ -24,13 +24,13 @@ class NetBitStreamInterface;
 class NetBitStreamInterfaceNoVersion : public CRefCountable
 {
 public:
-    virtual operator NetBitStreamInterface&(void) = 0;
+    virtual operator NetBitStreamInterface&() = 0;
 
-    virtual int  GetReadOffsetAsBits(void) = 0;
+    virtual int  GetReadOffsetAsBits() = 0;
     virtual void SetReadOffsetAsBits(int iOffset) = 0;
 
-    virtual void Reset(void) = 0;
-    virtual void ResetReadPointer(void) = 0;
+    virtual void Reset() = 0;
+    virtual void ResetReadPointer() = 0;
 
     // Don't use this, it screws up randomly in certain conditions causing packet misalign
     virtual void Write(const unsigned char& input) = 0;
@@ -109,15 +109,15 @@ public:
     virtual bool ReadNormQuat(float& w, float& x, float& y, float& z) = 0;
     virtual bool ReadOrthMatrix(float& m00, float& m01, float& m02, float& m10, float& m11, float& m12, float& m20, float& m21, float& m22) = 0;
     // GetNumberOfBitsUsed appears to round up to the next byte boundary, when reading
-    virtual int GetNumberOfBitsUsed(void) const = 0;
-    virtual int GetNumberOfBytesUsed(void) const = 0;
+    virtual int GetNumberOfBitsUsed() const = 0;
+    virtual int GetNumberOfBytesUsed() const = 0;
     // GetNumberOfUnreadBits appears to round up to the next byte boundary, when reading
-    virtual int GetNumberOfUnreadBits(void) const = 0;
+    virtual int GetNumberOfUnreadBits() const = 0;
 
-    virtual void AlignWriteToByteBoundary(void) const = 0;
-    virtual void AlignReadToByteBoundary(void) const = 0;
+    virtual void AlignWriteToByteBoundary() const = 0;
+    virtual void AlignReadToByteBoundary() const = 0;
 
-    virtual unsigned char* GetData(void) const = 0;
+    virtual unsigned char* GetData() const = 0;
 
     // Force long types to use 4 bytes
     bool Read(unsigned long& e)
@@ -220,28 +220,30 @@ public:
     }
 
     // Write a string (incl. ushort size header)
+    template<typename SizeType = unsigned short>
     void WriteString(const std::string& value)
     {
         // Write the length
-        auto usLength = static_cast<unsigned short>(value.length());
-        Write(usLength);
+        auto length = static_cast<SizeType>(value.length());
+        Write(length);
 
         // Write the characters
-        return WriteStringCharacters(value, usLength);
+        return WriteStringCharacters(value, length);
     }
 
     // Read a string (incl. ushort size header)
+    template<typename SizeType = unsigned short>
     bool ReadString(std::string& result)
     {
         result = "";
 
         // Read the length
-        unsigned short usLength = 0;
-        if (!Read(usLength))
+        SizeType length = 0;
+        if (!Read(length))
             return false;
 
         // Read the characters
-        return ReadStringCharacters(result, usLength);
+        return ReadStringCharacters(result, length);
     }
 
     // Write variable size length
@@ -352,12 +354,12 @@ class NetBitStreamInterface : public NetBitStreamInterfaceNoVersion
     const NetBitStreamInterface& operator=(const NetBitStreamInterface&);
 
 protected:
-    NetBitStreamInterface(void) { DEBUG_CREATE_COUNT("NetBitStreamInterface"); }
-    virtual ~NetBitStreamInterface(void) { DEBUG_DESTROY_COUNT("NetBitStreamInterface"); }
+    NetBitStreamInterface() { DEBUG_CREATE_COUNT("NetBitStreamInterface"); }
+    virtual ~NetBitStreamInterface() { DEBUG_DESTROY_COUNT("NetBitStreamInterface"); }
 
 public:
-    virtual                operator NetBitStreamInterface&(void) { return *this; }
-    virtual unsigned short Version(void) const = 0;
+    virtual                operator NetBitStreamInterface&() { return *this; }
+    virtual unsigned short Version() const = 0;
 };
 
 // Interface for all sync structures

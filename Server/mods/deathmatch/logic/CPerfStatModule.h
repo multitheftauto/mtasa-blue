@@ -77,7 +77,7 @@ public:
         iNumColumns++;
     }
 
-    SString* AddRow(void)
+    SString* AddRow()
     {
         iNumRows++;
         cellList.insert(cellList.end(), ColumnCount(), SString());
@@ -108,12 +108,12 @@ public:
 class CPerfStatModule
 {
 public:
-    virtual ~CPerfStatModule(void) {}
+    virtual ~CPerfStatModule() {}
 
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
-    virtual void           Stop(void){};
+    virtual void           Stop(){};
 };
 
 //
@@ -123,8 +123,8 @@ class CPerfStatLuaTiming : public CPerfStatModule
 {
 public:
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 
     // CPerfStatLuaTiming
@@ -132,7 +132,7 @@ public:
     virtual void OnLuaMainDestroy(CLuaMain* pLuaMain) = 0;
     virtual void UpdateLuaTiming(CLuaMain* pLuaMain, const char* szEventName, TIMEUS timeUs) = 0;
 
-    static CPerfStatLuaTiming* GetSingleton(void);
+    static CPerfStatLuaTiming* GetSingleton();
 };
 
 //
@@ -142,15 +142,15 @@ class CPerfStatLuaMemory : public CPerfStatModule
 {
 public:
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 
     // CPerfStatLuaMemory
     virtual void OnLuaMainCreate(CLuaMain* pLuaMain) = 0;
     virtual void OnLuaMainDestroy(CLuaMain* pLuaMain) = 0;
 
-    static CPerfStatLuaMemory* GetSingleton(void);
+    static CPerfStatLuaMemory* GetSingleton();
 };
 
 //
@@ -160,13 +160,13 @@ class CPerfStatLibMemory : public CPerfStatModule
 {
 public:
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 
     // CPerfStatLibMemory
 
-    static CPerfStatLibMemory* GetSingleton(void);
+    static CPerfStatLibMemory* GetSingleton();
 };
 
 //
@@ -176,13 +176,13 @@ class CPerfStatPacketUsage : public CPerfStatModule
 {
 public:
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 
     // CPerfStatPacketUsage
 
-    static CPerfStatPacketUsage* GetSingleton(void);
+    static CPerfStatPacketUsage* GetSingleton();
 };
 
 //
@@ -192,15 +192,15 @@ class CPerfStatRPCPacketUsage : public CPerfStatModule
 {
 public:
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 
     // CPerfStatRPCPacketUsage
     virtual void UpdatePacketUsageIn(uchar ucRpcId, uint uiSize) = 0;
     virtual void UpdatePacketUsageOut(uchar ucRpcId, uint uiSize) = 0;
 
-    static CPerfStatRPCPacketUsage* GetSingleton(void);
+    static CPerfStatRPCPacketUsage* GetSingleton();
 };
 
 //
@@ -210,8 +210,8 @@ class CPerfStatEventPacketUsage : public CPerfStatModule
 {
 public:
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 
     // CPerfStatRPCPacketUsage
@@ -219,7 +219,7 @@ public:
     virtual void UpdateElementDataUsageRelayed(const char* szName, uint uiNumPlayers, uint uiSize) = 0;
     virtual void UpdateEventUsageOut(const char* szName, uint uiNumPlayers) = 0;
 
-    static CPerfStatEventPacketUsage* GetSingleton(void);
+    static CPerfStatEventPacketUsage* GetSingleton();
 };
 
 //
@@ -229,11 +229,11 @@ class CPerfStatPlayerPacketUsage : public CPerfStatModule
 {
 public:
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 
-    static CPerfStatPlayerPacketUsage* GetSingleton(void);
+    static CPerfStatPlayerPacketUsage* GetSingleton();
 };
 
 //
@@ -243,14 +243,14 @@ class CPerfStatBandwidthUsage : public CPerfStatModule
 {
 public:
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
-    virtual void           Stop(void) = 0;
+    virtual void           Stop() = 0;
 
     // CPerfStatBandwidthUsage
 
-    static CPerfStatBandwidthUsage* GetSingleton(void);
+    static CPerfStatBandwidthUsage* GetSingleton();
 };
 
 //
@@ -260,8 +260,8 @@ class CPerfStatSqliteTiming : public CPerfStatModule
 {
 public:
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 
     // CPerfStatSqliteTiming
@@ -270,7 +270,7 @@ public:
     virtual void UpdateSqliteTiming(CRegistry* pRegistry, const char* szQuery, TIMEUS timeUs) = 0;
     virtual void SetCurrentResource(lua_State* luaVM) = 0;
 
-    static CPerfStatSqliteTiming* GetSingleton(void);
+    static CPerfStatSqliteTiming* GetSingleton();
 };
 
 //
@@ -280,13 +280,13 @@ class CPerfStatBandwidthReduction : public CPerfStatModule
 {
 public:
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 
     // CPerfStatBandwidthReduction
 
-    static CPerfStatBandwidthReduction* GetSingleton(void);
+    static CPerfStatBandwidthReduction* GetSingleton();
 };
 
 //
@@ -296,13 +296,13 @@ class CPerfStatServerInfo : public CPerfStatModule
 {
 public:
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 
     // CPerfStatServerInfo
 
-    static CPerfStatServerInfo* GetSingleton(void);
+    static CPerfStatServerInfo* GetSingleton();
 };
 
 //
@@ -312,11 +312,11 @@ class CPerfStatServerTiming : public CPerfStatModule
 {
 public:
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 
-    static CPerfStatServerTiming* GetSingleton(void);
+    static CPerfStatServerTiming* GetSingleton();
 };
 
 //
@@ -326,14 +326,14 @@ class CPerfStatFunctionTiming : public CPerfStatModule
 {
 public:
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 
     // CPerfStatFunctionTiming
     virtual void UpdateTiming(const SString& strResourceName, const char* szFunctionName, TIMEUS timeUs, uint uiDeltaBytes) = 0;
 
-    static CPerfStatFunctionTiming* GetSingleton(void);
+    static CPerfStatFunctionTiming* GetSingleton();
     static TIMEUS                   ms_PeakUsThresh;
 };
 
@@ -344,15 +344,15 @@ class CPerfStatDebugInfo : public CPerfStatModule
 {
 public:
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 
     // CPerfStatDebugInfo
     virtual bool IsActive(const char* szSectionName = NULL) = 0;
     virtual void AddLine(const SString& strSection, const SString& strData) = 0;
 
-    static CPerfStatDebugInfo* GetSingleton(void);
+    static CPerfStatDebugInfo* GetSingleton();
 };
 
 //
@@ -362,13 +362,13 @@ class CPerfStatDebugTable : public CPerfStatModule
 {
 public:
     // CPerfStatModule
-    virtual const SString& GetCategoryName(void) = 0;
-    virtual void           DoPulse(void) = 0;
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 
     // CPerfStatDebugInfo
     virtual void RemoveLines(const SString& strKeyMatch) = 0;
     virtual void UpdateLine(const SString& strKey, int iLifeTimeMs, ...) = 0;
 
-    static CPerfStatDebugTable* GetSingleton(void);
+    static CPerfStatDebugTable* GetSingleton();
 };
